@@ -113,4 +113,27 @@ class MacroActionTest : VimTestCase() {
     typeText(parseKeys(":d<CR>", "@:", "3@@"))
     assertState("5\n")
   }
+
+  // Broken, see the resulting text
+  fun `ignore test macro with macro`() {
+    val content = """
+            A Discovery
+
+            ${c}I found it in a legendary land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+    """.trimIndent()
+    configureByText(content)
+    typeText(parseKeys("qa", "l", "q", "qb", "10@a", "q", "2@b"))
+
+    val startOffset = content.rangeOf("rocks").startOffset
+
+    waitAndAssert {
+      println(myFixture.editor.caretModel.offset)
+      println(startOffset)
+      println()
+      startOffset == myFixture.editor.caretModel.offset
+    }
+  }
 }

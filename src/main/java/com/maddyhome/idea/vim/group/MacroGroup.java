@@ -156,7 +156,8 @@ public class MacroGroup {
         logger.debug("processing key " + pos);
       }
       PotemkinProgress potemkinProgress =
-        new PotemkinProgress("Macro execution", project, null, "Cancel");
+        new PotemkinProgress(MessageHelper.message("progress.title.macro.execution"), project, null,
+                             MessageHelper.message("stop"));
       potemkinProgress.setIndeterminate(false);
       potemkinProgress.setFraction(0);
       potemkinProgress.runInSwingThread(() -> {
