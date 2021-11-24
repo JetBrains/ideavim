@@ -732,21 +732,6 @@ n  ,f            <Plug>Foo
     TestCase.assertTrue(VimPlugin.isError())
   }
 
-  fun `test double recursion`() {
-    val text = """
-          -----
-          1${c}2345
-          abcde
-          -----
-    """.trimIndent()
-    configureByJavaText(text)
-
-    typeText(commandToKeys("map b wbb"))
-    typeText(StringHelper.parseKeys("b"))
-
-    TestCase.assertTrue(VimPlugin.isError())
-  }
-
   fun `test map with expression`() {
     // we test that ternary expression works and cursor stays at the same place after leaving normal mode
     val text = """
