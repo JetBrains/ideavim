@@ -136,4 +136,10 @@ class MacroActionTest : VimTestCase() {
       startOffset == myFixture.editor.caretModel.offset
     }
   }
+
+  fun `test macro with count`() {
+    configureByText("${c}0\n1\n2\n3\n4\n5\n")
+    typeText(parseKeys("qajq", "4@a"))
+    assertState("0\n1\n2\n3\n4\n${c}5\n")
+  }
 }
