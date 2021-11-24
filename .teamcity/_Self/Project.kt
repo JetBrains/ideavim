@@ -1,14 +1,6 @@
 package _Self
 
-import _Self.buildTypes.Nvim
-import _Self.buildTypes.PluginVerifier
-import _Self.buildTypes.PropertyBased
-import _Self.buildTypes.Qodana
-import _Self.buildTypes.TestsForIntelliJ20202
-import _Self.buildTypes.TestsForIntelliJ20203
-import _Self.buildTypes.TestsForIntelliJ20211
-import _Self.buildTypes.TestsForIntelliJ20212
-import _Self.buildTypes.TestsForIntelliJEAP
+import _Self.buildTypes.*
 import _Self.subprojects.GitHub
 import _Self.subprojects.OldTests
 import _Self.subprojects.Releases
@@ -40,6 +32,7 @@ object Project : Project({
   buildType(TestsForIntelliJEAP)
 
   buildType(PropertyBased)
+  buildType(LongRunning)
 
   buildType(Nvim)
   buildType(PluginVerifier)

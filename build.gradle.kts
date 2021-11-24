@@ -168,6 +168,7 @@ ktlint {
 tasks {
     test {
         exclude("**/propertybased/**")
+        exclude("**/longrunning/**")
         exclude("/ui/**")
     }
 }
@@ -181,6 +182,11 @@ tasks.register<Test>("testWithNeovim") {
 tasks.register<Test>("testPropertyBased") {
     group = "verification"
     include("**/propertybased/**")
+}
+
+tasks.register<Test>("testLongRunning") {
+    group = "verification"
+    include("**/longrunning/**")
 }
 
 tasks.register<Test>("testUi") {
