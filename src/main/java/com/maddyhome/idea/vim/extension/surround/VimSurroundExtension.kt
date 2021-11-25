@@ -124,8 +124,8 @@ class VimSurroundExtension : VimExtension {
         perform("da" + pick(charFrom), editor)
         // Insert the surrounding characters and paste
         if (newSurround != null) {
-          innerValue.addAll(0, StringHelper.parseKeys(escape(newSurround.first)))
-          innerValue.addAll(StringHelper.parseKeys(escape(newSurround.second)))
+          innerValue.addAll(0, StringHelper.parseKeys(newSurround.first))
+          innerValue.addAll(StringHelper.parseKeys(newSurround.second))
         }
         pasteSurround(innerValue, editor)
         // Restore the old value
@@ -133,8 +133,6 @@ class VimSurroundExtension : VimExtension {
         // Jump back to start
         executeNormalWithoutMapping(StringHelper.parseKeys("`["), editor)
       }
-
-      private fun escape(sequence: String): String = sequence.replace("<", "\\<")
 
       private fun perform(sequence: String, editor: Editor) {
         ClipboardOptionHelper.IdeaputDisabler()

@@ -59,15 +59,6 @@ class MapCommandTest : VimTestCase() {
     assertOffset(6)
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
-  fun testBackslashEscape() {
-    configureByText("\n")
-    typeText(commandToKeys("imap \\\\,\\<,\\n foo"))
-    assertPluginError(false)
-    typeText(StringHelper.stringToKeys("i\\,<,\\n"))
-    assertState("foo\n")
-  }
-
   fun testBackslashAtEnd() {
     configureByText("\n")
     typeText(commandToKeys("imap foo\\ bar"))
@@ -782,6 +773,32 @@ n  ,f            <Plug>Foo
     assertPluginError(true)
     assertPluginErrorMessageContains("E117: Unknown function: unknownFunction")
     assertState(text)
+  }
+
+  fun `test rhc with triangle brackets`() {
+    configureByText("\n")
+    typeText(commandToKeys("inoremap p <p>"))
+    typeText(parseKeys("ip"))
+    assertState("<p>\n")
+  }
+
+  fun `test pattern in mapping`() {
+    configureByText(
+      """
+      private fun myfun(funArg: String) {
+        println(${c}funArg)
+      }
+      """.trimIndent()
+    )
+    typeText(commandToKeys("nnoremap ,f ?\\<fun\\><CR>"))
+    typeText(parseKeys(",f"))
+    assertState(
+      """
+      private ${c}fun myfun(funArg: String) {
+        println(funArg)
+      }
+      """.trimIndent()
+    )
   }
 
   private fun checkDelayedMapping(before: String, after: String) {

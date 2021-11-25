@@ -116,7 +116,7 @@ public class StringHelper {
             break;
           case ESCAPE:
             state = KeyParserState.INIT;
-            if (c != '\\' && c != '<') {
+            if (c != '\\') {
               result.add(getKeyStroke('\\'));
             }
             result.add(getKeyStroke(c));
@@ -138,7 +138,7 @@ public class StringHelper {
                 if (leader != null) {
                   result.addAll(leader);
                 }
-                else if (specialKey != null) {
+                else if (specialKey != null && specialKeyName.length() > 1) {
                   result.add(specialKey);
                 }
                 else {

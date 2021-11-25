@@ -90,7 +90,7 @@ class VimSurroundExtensionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun testSurroundTag() {
     configureByText("Hello ${c}World!\n")
-    typeText(parseKeys("ysiw\\<em>"))
+    typeText(parseKeys("ysiw<em>"))
     assertState("Hello <em>World</em>!\n")
   }
 
@@ -98,7 +98,7 @@ class VimSurroundExtensionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun testSurroundTagWithAttributes() {
     configureByText("Hello ${c}World!")
-    typeText(parseKeys("ysiw\\<span class=\"important\" data-foo=\"bar\">"))
+    typeText(parseKeys("ysiw<span class=\"important\" data-foo=\"bar\">"))
     assertState("Hello <span class=\"important\" data-foo=\"bar\">World</span>!")
   }
 
@@ -353,7 +353,7 @@ class VimSurroundExtensionTest : VimTestCase() {
     val before = "<div><p>${c}Foo</p></div>"
     val after = "<div>${c}<b>Foo</b></div>"
 
-    doTest(listOf("cst\\<b>"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(listOf("cst<b>"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
@@ -378,7 +378,7 @@ class VimSurroundExtensionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test wrap with tag full line`() {
     doTest(
-      listOf("VS\\<p>"),
+      listOf("VS<p>"),
       """
       <h1>Title</h1>
       
@@ -411,7 +411,7 @@ class VimSurroundExtensionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test wrap with tag full line in middle`() {
     doTest(
-      listOf("VS\\<p>"),
+      listOf("VS<p>"),
       """
       <div>
           <p>Some paragraph</p>
@@ -433,7 +433,7 @@ class VimSurroundExtensionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test wrap line with char selection`() {
     doTest(
-      listOf("vawES\\<p>"),
+      listOf("vawES<p>"),
       """
       <div>
           <p>Some paragraph</p>

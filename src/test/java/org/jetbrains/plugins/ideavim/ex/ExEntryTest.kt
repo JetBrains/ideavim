@@ -593,13 +593,13 @@ class ExEntryTest : VimTestCase() {
   }
 
   fun `test cmap Ctrl`() {
-    typeExInput(":cmap \\<C-B> b<CR>")
+    typeText(StringHelper.stringToKeys(":cmap <C-B> b") + StringHelper.parseKeys("<CR>"))
     typeExInput(":<C-B>")
     assertExText("b")
     deactivateExEntry()
 
     VimPlugin.getRegister().setKeys('e', StringHelper.parseKeys("hello world"))
-    typeExInput(":cmap d \\<C-R><CR>")
+    typeText(StringHelper.stringToKeys(":cmap d <C-R>") + StringHelper.parseKeys("<CR>"))
     typeExInput(":de")
     assertExText("hello world")
   }
