@@ -192,7 +192,7 @@ class NotificationService(private val project: Project?) {
     ActionIdNotifier.notifyActionId(id, project)
   }
 
-  private object ActionIdNotifier {
+  object ActionIdNotifier {
     private var notification: Notification? = null
     private const val NO_ID = "<i>Cannot detect action id</i>"
 

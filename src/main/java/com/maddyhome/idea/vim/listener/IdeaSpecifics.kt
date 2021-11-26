@@ -37,8 +37,8 @@ import com.intellij.openapi.project.DumbAwareToggleAction
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.group.NotificationService
 import com.maddyhome.idea.vim.helper.EditorDataContext
-import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.helper.inNormalMode
 import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
@@ -65,8 +65,7 @@ object IdeaSpecifics {
 
       //region Track action id
       if (FindActionId.enabled) {
-        val copyActionText = MessageHelper.message("action.copy.action.id.text")
-        if (copyActionText != action.templateText) {
+        if (action !is NotificationService.ActionIdNotifier.CopyActionId && action !is NotificationService.ActionIdNotifier.StopTracking) {
           val id: String? = ActionManager.getInstance().getId(action)
           VimPlugin.getNotifications(dataContext.getData(CommonDataKeys.PROJECT)).notifyActionId(id)
         }
