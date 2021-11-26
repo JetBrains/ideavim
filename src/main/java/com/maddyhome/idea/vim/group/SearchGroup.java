@@ -54,6 +54,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression;
 import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression;
+import com.maddyhome.idea.vim.vimscript.model.functions.handlers.SubmatchFunctionHandler;
 import com.maddyhome.idea.vim.vimscript.model.options.OptionChangeListener;
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser;
 import com.maddyhome.idea.vim.vimscript.services.OptionService;
@@ -745,6 +746,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
     boolean got_quit = false;
     int lcount = EditorHelper.getLineCount(editor);
     Expression expression = null;
+    int latestOff = -1;
     for (int lnum = line1; lnum <= line2 && !got_quit; ) {
       CharacterPosition newpos = null;
       int nmatch = sp.vim_regexec_multi(regmatch, editor, lcount, lnum, searchcol);
@@ -801,8 +803,9 @@ public class SearchGroup implements PersistentStateComponent<Element> {
                 break;
             }
           }
-          // todo submatch function
-          if (doReplace) {
+          if (doReplace && startoff != latestOff) {
+            latestOff = startoff;
+            SubmatchFunctionHandler.INSTANCE.setLatestMatch(editor.getDocument().getText(new com.intellij.openapi.util.TextRange(startoff, endoff)));
             MotionGroup.moveCaret(editor, caret, startoff);
             if (expression != null) {
               try {
@@ -858,6 +861,8 @@ public class SearchGroup implements PersistentStateComponent<Element> {
         VimPlugin.showMessage(MessageHelper.message(Msg.e_patnotf2, pattern));
       }
     }
+
+    SubmatchFunctionHandler.INSTANCE.setLatestMatch("");
 
     // todo throw multiple exceptions at once
     if (!exceptions.isEmpty()) {

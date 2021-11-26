@@ -10,5 +10,6 @@
     <vimLibraryFunction implementation="com.maddyhome.idea.vim.vimscript.model.functions.handlers.FunctionFunctionHandler" name="function"/>
     <vimLibraryFunction implementation="com.maddyhome.idea.vim.vimscript.model.functions.handlers.FuncrefFunctionHandler" name="funcref"/>
     <vimLibraryFunction implementation="com.maddyhome.idea.vim.vimscript.model.functions.handlers.HasFunctionHandler" name="has"/>
+    <vimLibraryFunction implementation="com.maddyhome.idea.vim.vimscript.model.functions.handlers.SubmatchFunctionHandler" name="submatch"/>
   </extensions>
 </idea-plugin>
