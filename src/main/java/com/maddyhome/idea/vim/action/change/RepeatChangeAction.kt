@@ -70,7 +70,8 @@ class RepeatChangeAction : VimActionHandler.SingleExecution() {
         }
         state.setExecutingCommand(lastCommand)
 
-        KeyHandler.executeVimAction(editor, lastCommand.action, context, operatorArguments)
+        val arguments = operatorArguments.copy(count0 = lastCommand.rawCount)
+        KeyHandler.executeVimAction(editor, lastCommand.action, context, arguments)
 
         VimRepeater.saveLastChange(lastCommand)
       }

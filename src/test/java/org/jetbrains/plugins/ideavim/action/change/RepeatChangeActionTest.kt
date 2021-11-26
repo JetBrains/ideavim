@@ -295,4 +295,25 @@ class RepeatChangeActionTest : VimTestCase() {
     """.trimIndent()
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
+
+  fun `test repeat with count`() {
+      val keys = listOf("4x", "j", ".")
+      val before = """
+              A Discovery
+  
+              ${c}I found it in a legendary land
+              all rocks and lavender and tufted grass,
+              where it was settled on some sodden sand
+              hard by the torrent of a mountain pass.
+  """.trimIndent()
+      val after = """
+              A Discovery
+  
+              und it in a legendary land
+              ${c}rocks and lavender and tufted grass,
+              where it was settled on some sodden sand
+              hard by the torrent of a mountain pass.
+  """.trimIndent()
+      doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
 }
