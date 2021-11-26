@@ -805,7 +805,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
             if (expression != null) {
               try {
               match = expression
-                .evaluate(editor, new EditorDataContext(editor, null), new Script(new ArrayList<>()))
+                .evaluate(editor, EditorDataContext.init(editor, null), new Script(new ArrayList<>()))
                 .toInsertableString();
               } catch (Exception e) {
                 exceptions.add((ExException) e);
