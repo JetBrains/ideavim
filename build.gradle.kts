@@ -11,7 +11,7 @@ buildscript {
     }
 
     dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.0")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.10")
         classpath("com.github.AlexPl292:mark-down-to-slack:1.1.2")
         classpath("org.eclipse.jgit:org.eclipse.jgit:5.13.0.202109080827-r")
         classpath("org.kohsuke:github-api:1.135")
@@ -22,7 +22,7 @@ buildscript {
 plugins {
     antlr
     java
-    kotlin("jvm") version "1.6.0"
+    kotlin("jvm") version "1.5.10"
 
     id("org.jetbrains.intellij") version "1.3.0"
     id("org.jetbrains.changelog") version "1.3.1"
