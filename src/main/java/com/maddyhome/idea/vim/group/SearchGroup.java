@@ -17,8 +17,6 @@
  */
 package com.maddyhome.idea.vim.group;
 
-import com.intellij.ide.DataManager;
-import com.intellij.openapi.actionSystem.impl.EdtDataContext;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.RoamingType;
@@ -50,7 +48,6 @@ import com.maddyhome.idea.vim.ui.ModalEntry;
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
 import com.maddyhome.idea.vim.vimscript.model.Script;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType;
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression;
 import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression;
@@ -60,8 +57,6 @@ import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser;
 import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import kotlin.Pair;
 import kotlin.jvm.functions.Function1;
-import org.codehaus.groovy.runtime.StringGroovyMethods;
-import org.jaxen.expr.Expr;
 import org.jdom.Element;
 import org.jetbrains.annotations.*;
 
