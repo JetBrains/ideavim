@@ -29,9 +29,6 @@ import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.CommandLineHelper
 import com.maddyhome.idea.vim.vimscript.model.Script
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 
 class InsertRegisterAction : VimActionHandler.SingleExecution() {
@@ -50,7 +47,7 @@ class InsertRegisterAction : VimActionHandler.SingleExecution() {
             if (expression.isNotEmpty()) {
               val expressionValue = VimscriptParser.parseExpression(expression)?.evaluate(editor, context, Script(listOf()))
                 ?: throw ExException("E15: Invalid expression: $expression")
-              val textToStore = vimDataTypeToString(expressionValue)
+              val textToStore = expressionValue.toInsertableString()
               VimPlugin.getRegister().storeTextSpecial('=', textToStore)
             }
             VimPlugin.getChange().insertRegister(editor, context, argument.character)
@@ -69,15 +66,5 @@ class InsertRegisterAction : VimActionHandler.SingleExecution() {
   @SuppressWarnings("deprecation") // [VERSION UPDATE] 212+ getService
   private fun readExpression(editor: Editor): String? {
     return ServiceManager.getService(CommandLineHelper::class.java).inputString(editor, "=", null)
-  }
-
-  private fun vimDataTypeToString(value: VimDataType): String {
-    return when (value) {
-      is VimList -> {
-        value.values.joinToString(separator = "") { it.toString() + "\n" }
-      }
-      is VimDictionary -> value.asString()
-      else -> value.toString()
-    }
   }
 }

@@ -17,6 +17,8 @@
  */
 package com.maddyhome.idea.vim.group;
 
+import com.intellij.ide.DataManager;
+import com.intellij.openapi.actionSystem.impl.EdtDataContext;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.RoamingType;
@@ -38,6 +40,7 @@ import com.intellij.openapi.util.Trinity;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.common.CharacterPosition;
 import com.maddyhome.idea.vim.common.TextRange;
+import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.ex.ranges.LineRange;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.regexp.CharPointer;
@@ -45,13 +48,19 @@ import com.maddyhome.idea.vim.regexp.CharacterClasses;
 import com.maddyhome.idea.vim.regexp.RegExp;
 import com.maddyhome.idea.vim.ui.ModalEntry;
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
+import com.maddyhome.idea.vim.vimscript.model.Script;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
+import com.maddyhome.idea.vim.vimscript.model.expressions.Expression;
+import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression;
 import com.maddyhome.idea.vim.vimscript.model.options.OptionChangeListener;
+import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser;
 import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import kotlin.Pair;
 import kotlin.jvm.functions.Function1;
+import org.codehaus.groovy.runtime.StringGroovyMethods;
+import org.jaxen.expr.Expr;
 import org.jdom.Element;
 import org.jetbrains.annotations.*;
 
@@ -515,6 +524,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
   public boolean processSubstituteCommand(@NotNull Editor editor, @NotNull Caret caret, @NotNull LineRange range,
                                           @NotNull @NonNls String excmd, @NonNls String exarg) {
     // Explicitly exit visual mode here, so that visual mode marks don't change when we move the cursor to a match.
+    List<ExException> exceptions = new ArrayList<>();
     if (CommandStateHelper.inVisualMode(editor)) {
       ModeHelper.exitVisualMode(editor);
     }
@@ -734,6 +744,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
     boolean firstMatch = true;
     boolean got_quit = false;
     int lcount = EditorHelper.getLineCount(editor);
+    Expression expression = null;
     for (int lnum = line1; lnum <= line2 && !got_quit; ) {
       CharacterPosition newpos = null;
       int nmatch = sp.vim_regexec_multi(regmatch, editor, lcount, lnum, searchcol);
@@ -743,8 +754,16 @@ public class SearchGroup implements PersistentStateComponent<Element> {
           firstMatch = false;
         }
 
+
         String match = sp.vim_regsub_multi(regmatch, lnum, sub, 1, false);
-        if (match == null) {
+        if (sub.charAt(0) == '\\' && sub.charAt(1) == '=') {
+          String exprString = sub.toString().substring(2);
+          expression = VimscriptParser.INSTANCE.parseExpression(exprString);
+          if (expression == null) {
+            exceptions.add(new ExException("E15: Invalid expression: " + exprString));
+            expression = new SimpleExpression(new VimString(""));
+          }
+        } else if (match == null) {
           return false;
         }
 
@@ -782,9 +801,23 @@ public class SearchGroup implements PersistentStateComponent<Element> {
                 break;
             }
           }
-
+          // todo submatch function
           if (doReplace) {
-            ApplicationManager.getApplication().runWriteAction(() -> editor.getDocument().replaceString(startoff, endoff, match));
+            MotionGroup.moveCaret(editor, caret, startoff);
+            if (expression != null) {
+              try {
+              match = expression
+                .evaluate(editor, new EditorDataContext(editor, null), new Script(new ArrayList<>()))
+                .toInsertableString();
+              } catch (Exception e) {
+                exceptions.add((ExException) e);
+                match = "";
+              }
+            }
+
+            String finalMatch = match;
+            ApplicationManager.getApplication().runWriteAction(() -> editor.getDocument().replaceString(startoff, endoff,
+                                                                                                        finalMatch));
             lastMatch = startoff;
             newpos = CharacterPosition.Companion.fromOffset(editor, newend);
 
@@ -824,6 +857,12 @@ public class SearchGroup implements PersistentStateComponent<Element> {
       else {
         VimPlugin.showMessage(MessageHelper.message(Msg.e_patnotf2, pattern));
       }
+    }
+
+    // todo throw multiple exceptions at once
+    if (!exceptions.isEmpty()) {
+      VimPlugin.indicateError();
+      VimPlugin.showMessage(exceptions.get(0).toString());
     }
 
     // TODO: Support reporting number of changes (:help 'report')

@@ -45,4 +45,16 @@ sealed class VimDataType {
 
   abstract fun lockVar(depth: Int)
   abstract fun unlockVar(depth: Int)
+
+  // use in cases when VimDataType's value should be inserted into document
+  // e.g. expression register or substitute with expression
+  fun toInsertableString(): String {
+    return when (this) {
+      is VimList -> {
+        this.values.joinToString(separator = "") { it.toString() + "\n" }
+      }
+      is VimDictionary -> this.asString()
+      else -> this.toString()
+    }
+  }
 }
