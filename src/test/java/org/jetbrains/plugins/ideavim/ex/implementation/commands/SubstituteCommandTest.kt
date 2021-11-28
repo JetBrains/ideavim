@@ -22,7 +22,6 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.IgnoreCaseOptionsData
 import com.maddyhome.idea.vim.option.SmartCaseOptionsData
-import com.maddyhome.idea.vim.vimscript.Executor
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import org.jetbrains.plugins.ideavim.OptionValueType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -826,47 +825,59 @@ class SubstituteCommandTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test simple expression`() {
-    configureByText("""
+    configureByText(
+      """
       val s1 = "oh"
       val s2 = "hi"
       val s3 = "Mark"
-      """.trimIndent())
+      """.trimIndent()
+    )
     typeText(commandToKeys("%s/\\d/\\=21*2"))
-    assertState("""
+    assertState(
+      """
       val s42 = "oh"
       val s42 = "hi"
       val s42 = "Mark"
-      """.trimIndent())
+      """.trimIndent()
+    )
   }
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test line-dependent expression`() {
-    configureByText("""
+    configureByText(
+      """
       0. Milk (1 l.)
       0. Bread
       0. Coke (2 l.)
-      """.trimIndent())
+      """.trimIndent()
+    )
     typeText(commandToKeys("%s/\\d\\+/\\=line('.')"))
-    assertState("""
+    assertState(
+      """
       1. Milk (1 l.)
       2. Bread
       3. Coke (2 l.)
-      """.trimIndent())
+      """.trimIndent()
+    )
   }
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test substitute with submatch function`() {
-    configureByText("""
+    configureByText(
+      """
       val ch1 = tree.getChild(0)
       ${c}val ch1 = tree.getChild(0)
-      """.trimIndent())
+      """.trimIndent()
+    )
     typeText(commandToKeys("s/\\d\\+/\\=submatch(0)+1/g"))
-    assertState("""
+    assertState(
+      """
       val ch1 = tree.getChild(0)
       val ch2 = tree.getChild(1)
-      """.trimIndent())
+      """.trimIndent()
+    )
   }
 
   // todo will work when vim strings will be finished
@@ -897,48 +908,56 @@ class SubstituteCommandTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test exception during expression evaluation`() {
-    configureByText("""
+    configureByText(
+      """
       val str = "first"
       16128
       16132
       16136
       16140
       val str2 = "second"
-      """.trimIndent())
+      """.trimIndent()
+    )
     typeText(commandToKeys("%s/\\d\\+/\\=printf('0x%04x', submatch(0))"))
     assertPluginError(true)
     assertPluginErrorMessageContains("E117: Unknown function: printf")
-    assertState("""
+    assertState(
+      """
       val str = "first"
       
       
       
       
       val str = "second"
-      """.trimIndent())
+      """.trimIndent()
+    )
   }
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test invalid expression`() {
-    configureByText("""
+    configureByText(
+      """
       val str = "first"
       16128
       16132
       16136
       16140
       val str2 = "second"
-      """.trimIndent())
+      """.trimIndent()
+    )
     typeText(commandToKeys("%s/\\d\\+/\\=*&("))
     assertPluginError(true)
     assertPluginErrorMessageContains("E15: Invalid expression: *&(")
-    assertState("""
+    assertState(
+      """
       val str = "first"
       
       
       
       
       val str = "second"
-      """.trimIndent())
+      """.trimIndent()
+    )
   }
 }
