@@ -27,7 +27,6 @@ usual beta standards.
 
 ### Features:
 * Make IdeaVim compatible with CodeWithMe | [VIM-2332](https://youtrack.jetbrains.com/issue/VIM-2332)
-* `:normal` command | [VIM-830](https://youtrack.jetbrains.com/issue/VIM-830)
 * expression register `<C-R>=` | [VIM-521](https://youtrack.jetbrains.com/issue/VIM-521)
 
 ### Fixes:

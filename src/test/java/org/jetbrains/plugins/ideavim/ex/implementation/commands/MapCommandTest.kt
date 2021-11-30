@@ -801,6 +801,33 @@ n  ,f            <Plug>Foo
     )
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
+  fun `test with shorter conflict`() {
+    val text = """
+          -----
+          1${c}2345
+          abcde
+          -----
+    """.trimIndent()
+    configureByJavaText(text)
+
+    typeText(commandToKeys("map kkk l"))
+    typeText(commandToKeys("map kk h"))
+    typeText(StringHelper.parseKeys("kk"))
+
+    checkDelayedMapping(
+      text,
+      """
+              -----
+              ${c}12345
+              abcde
+              -----
+      """.trimIndent()
+    )
+    assertMode(CommandState.Mode.COMMAND)
+    assertSubMode(CommandState.SubMode.NONE)
+  }
+
   private fun checkDelayedMapping(before: String, after: String) {
     assertState(before)
 
