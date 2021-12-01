@@ -53,6 +53,7 @@ usual beta standards.
 * [391](https://github.com/JetBrains/ideavim/pull/391) by [Matt Ellis](https://github.com/citizenmatt): fix(VIM-2432): handle scrolloff with <C-D> and <C-U>
 * [401](https://github.com/JetBrains/ideavim/pull/401) by [Matt Ellis](https://github.com/citizenmatt): Reset caret shape when disabling plugin
 * [407](https://github.com/JetBrains/ideavim/pull/407) by [eugene nizienko](https://github.com/nizienko): Video recording for ui tests
+* [418](https://github.com/JetBrains/ideavim/pull/418) by [chylex](https://github.com/chylex): Fix compile errors in unit tests on Windows
 
 ## 1.8.0, 2021-10-27
 
