@@ -802,7 +802,7 @@ n  ,f            <Plug>Foo
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
-  fun `test with shorter conflict`() {
+  fun `ignoretest with shorter conflict`() {
     val text = """
           -----
           1${c}2345
