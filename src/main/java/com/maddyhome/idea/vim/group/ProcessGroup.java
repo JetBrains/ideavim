@@ -125,7 +125,7 @@ public class ProcessGroup {
 
       if (logger.isDebugEnabled()) logger.debug("swing=" + SwingUtilities.isEventDispatchThread());
 
-      Executor.INSTANCE.execute(text, editor, context, false, true);
+      Executor.INSTANCE.execute(text, editor, context, false, true, null);
     }
     catch (ExException e) {
       VimPlugin.showMessage(e.getMessage());

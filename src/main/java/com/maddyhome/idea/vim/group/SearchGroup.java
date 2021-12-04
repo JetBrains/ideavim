@@ -46,7 +46,7 @@ import com.maddyhome.idea.vim.regexp.CharacterClasses;
 import com.maddyhome.idea.vim.regexp.RegExp;
 import com.maddyhome.idea.vim.ui.ModalEntry;
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
-import com.maddyhome.idea.vim.vimscript.model.Script;
+import com.maddyhome.idea.vim.vimscript.model.Executable;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression;
@@ -518,7 +518,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
    */
   @RWLockLabel.SelfSynchronized
   public boolean processSubstituteCommand(@NotNull Editor editor, @NotNull Caret caret, @NotNull LineRange range,
-                                          @NotNull @NonNls String excmd, @NonNls String exarg) {
+                                          @NotNull @NonNls String excmd, @NonNls String exarg, @NotNull Executable parent) {
     // Explicitly exit visual mode here, so that visual mode marks don't change when we move the cursor to a match.
     List<ExException> exceptions = new ArrayList<>();
     if (CommandStateHelper.inVisualMode(editor)) {
@@ -805,7 +805,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
             if (expression != null) {
               try {
               match = expression
-                .evaluate(editor, EditorDataContext.init(editor, null), new Script(new ArrayList<>()))
+                .evaluate(editor, EditorDataContext.init(editor, null), parent)
                 .toInsertableString();
               } catch (Exception e) {
                 exceptions.add((ExException) e);

@@ -25,6 +25,7 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
+import com.maddyhome.idea.vim.vimscript.model.Script
 
 class ChangeLastSearchReplaceAction : ChangeEditorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
@@ -38,7 +39,7 @@ class ChangeLastSearchReplaceAction : ChangeEditorActionHandler.SingleExecution(
     var result = true
     for (caret in editor.caretModel.allCarets) {
       val line = caret.logicalPosition.line
-      if (!VimPlugin.getSearch().processSubstituteCommand(editor, caret, LineRange(line, line), "s", "//~/")) {
+      if (!VimPlugin.getSearch().processSubstituteCommand(editor, caret, LineRange(line, line), "s", "//~/", Script(listOf()))) {
         result = false
       }
     }

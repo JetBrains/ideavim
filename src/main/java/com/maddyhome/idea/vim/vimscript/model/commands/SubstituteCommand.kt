@@ -33,7 +33,7 @@ data class SubstituteCommand(val ranges: Ranges, val argument: String, val comma
     var result = true
     for (caret in editor.caretModel.allCarets) {
       val lineRange = getLineRange(editor, caret)
-      if (!VimPlugin.getSearch().processSubstituteCommand(editor, caret, lineRange, command, argument)) {
+      if (!VimPlugin.getSearch().processSubstituteCommand(editor, caret, lineRange, command, argument, this.parent)) {
         result = false
       }
     }

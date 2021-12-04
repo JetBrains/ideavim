@@ -22,6 +22,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.IgnoreCaseOptionsData
 import com.maddyhome.idea.vim.option.SmartCaseOptionsData
+import com.maddyhome.idea.vim.vimscript.Executor
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import org.jetbrains.plugins.ideavim.OptionValueType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -880,30 +881,34 @@ class SubstituteCommandTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
     )
   }
 
-  // todo will work when vim strings will be finished
-//  @VimOptionDefaultAll
-//  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
-//  fun `test substitute with submatch function2`() {
-//    configureByText("""
-//      val ch1 = tree.getChild(0)
-//      ${s}val ch1 = tree.getChild(0)
-//      val ch1 = tree.getChild(0)
-//      val ch1 = tree.getChild(0)${se}
-//      """.trimIndent())
-//    Executor.execute("""
-//      function! IncrementWholeLine() range|
-//        execute "s/\\d\\+/\\=submatch(0)+1/g"|
-//        nohl
-//      endfunction
-//      """.trimIndent())
-//    typeText(commandToKeys("call IncrementWholeLine()"))
-//    assertState("""
-//      val ch1 = tree.getChild(0)
-//      val ch2 = tree.getChild(1)
-//      val ch3 = tree.getChild(2)
-//      val ch4 = tree.getChild(3)
-//      """.trimIndent())
-//  }
+  @VimOptionDefaultAll
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  fun `test substitute with submatch function2`() {
+    configureByText(
+      """
+      val ch1 = tree.getChild(0)
+      val ch1 = tree.getChild(0)
+      val ch1 = tree.getChild(0)
+      val ch1 = tree.getChild(0)
+      """.trimIndent()
+    )
+    Executor.execute(
+      """
+      function! IncrementWholeLine() range|
+        execute ":" .. a:firstline .. "," .. a:lastline .. "s/\\d\\+/\\=submatch(0)+line('.')-a:firstline+1/g"|
+      endfunction
+      """.trimIndent()
+    )
+    typeText(commandToKeys("2,4call IncrementWholeLine()"))
+    assertState(
+      """
+      val ch1 = tree.getChild(0)
+      val ch2 = tree.getChild(1)
+      val ch3 = tree.getChild(2)
+      val ch4 = tree.getChild(3)
+      """.trimIndent()
+    )
+  }
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
