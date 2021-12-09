@@ -24,6 +24,7 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.EmptyAction
 import com.intellij.openapi.actionSystem.PlatformDataKeys
+import com.intellij.openapi.application.invokeLater
 import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Editor
@@ -35,12 +36,14 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.EditorDataContext
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.HandlerInjector
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.helper.inNormalMode
 import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
 import com.maddyhome.idea.vim.helper.isPrimaryEditor
 import com.maddyhome.idea.vim.helper.isTemplateActive
+import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
 import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
 import com.maddyhome.idea.vim.listener.AceJumpService
@@ -116,12 +119,20 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
         return false
       }
 
+      val keyCode = keyStroke.keyCode
+
+      if (HandlerInjector.notebookCommandMode()) {
+        LOG.trace("Python Notebook command mode")
+        if (keyCode == KeyEvent.VK_RIGHT || keyCode == KeyEvent.VK_KP_RIGHT || keyCode == KeyEvent.VK_ENTER) {
+          invokeLater { editor.updateCaretsVisualAttributes() }
+        }
+        return false
+      }
+
       if (AceJumpService.getInstance()?.isActive(editor) == true) {
         LOG.trace("Do not execute shortcut because AceJump is active")
         return false
       }
-
-      val keyCode = keyStroke.keyCode
 
       if (LookupManager.getActiveLookup(editor) != null && !LookupKeys.isEnabledForLookup(keyStroke)) {
         LOG.trace("Do not execute shortcut because of lookup keys")

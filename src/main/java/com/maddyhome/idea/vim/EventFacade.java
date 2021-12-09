@@ -27,6 +27,7 @@ import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.actionSystem.TypedAction;
 import com.intellij.openapi.editor.actionSystem.TypedActionHandler;
 import com.intellij.openapi.editor.event.*;
+import com.maddyhome.idea.vim.helper.HandlerInjector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -51,6 +52,15 @@ public class EventFacade {
 
   public void setupTypedActionHandler(@NotNull VimTypedActionHandler handler) {
     final TypedAction typedAction = getTypedAction();
+
+    if (HandlerInjector.notebookCommandMode()) {
+      TypedActionHandler result = HandlerInjector.inject();
+      if (result != null) {
+        myOriginalTypedActionHandler = result;
+        return;
+      }
+    }
+
     myOriginalTypedActionHandler = typedAction.getRawHandler();
 
     typedAction.setupRawHandler(handler);
