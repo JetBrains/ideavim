@@ -18,8 +18,12 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.mark
 
-import com.intellij.ide.bookmarks.BookmarkManager
+import com.intellij.ide.bookmark.BookmarksManager
+import com.intellij.ide.bookmark.LineBookmark
+import com.intellij.testFramework.PlatformTestUtil
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.group.createLineBookmark
+import com.maddyhome.idea.vim.group.mnemonic
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.option.IdeaMarksOptionsData
 import junit.framework.TestCase
@@ -27,7 +31,6 @@ import org.jetbrains.plugins.ideavim.OptionValueType
 import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
 import org.jetbrains.plugins.ideavim.VimTestOption
-import org.junit.Ignore
 
 class MotionMarkActionTest : VimOptionTestCase(IdeaMarksOptionsData.name) {
   @VimOptionTestConfiguration(VimTestOption(IdeaMarksOptionsData.name, OptionValueType.NUMBER, "1"))
@@ -75,7 +78,10 @@ class MotionMarkActionTest : VimOptionTestCase(IdeaMarksOptionsData.name) {
     """.trimIndent()
     configureByText(text)
     typeText(keys)
-    checkMarks('A' to 2, 'B' to 2, 'C' to 2)
+    checkMarks('A' to 2)
+
+    // Previously it was like this, but now it's impossible to set multiple bookmarks on the same line.
+//    checkMarks('A' to 2, 'B' to 2, 'C' to 2)
   }
 
   @VimOptionTestConfiguration(VimTestOption(IdeaMarksOptionsData.name, OptionValueType.NUMBER, "1"))
@@ -105,34 +111,8 @@ class MotionMarkActionTest : VimOptionTestCase(IdeaMarksOptionsData.name) {
             hard by the torrent of a mountain pass.
     """.trimIndent()
     configureByText(text)
-    val bookmarkManager = BookmarkManager.getInstance(myFixture.project)
-    bookmarkManager.addEditorBookmark(myFixture.editor, 2)
-    val bookmark = bookmarkManager.findEditorBookmark(myFixture.editor.document, 2) ?: kotlin.test.fail()
-    bookmarkManager.setMnemonic(bookmark, 'A')
-    val vimMarks = VimPlugin.getMark().getMarks(myFixture.editor)
-    TestCase.assertEquals(1, vimMarks.size)
-    TestCase.assertEquals('A', vimMarks[0].key)
-  }
-
-  @VimOptionTestConfiguration(VimTestOption(IdeaMarksOptionsData.name, OptionValueType.NUMBER, "1"))
-  @Ignore("Probably one day it would be possible to test it")
-  fun `ignoretest apply new state`() {
-    val text = """
-            A Discovery
-
-            I ${c}found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
-    """.trimIndent()
-    configureByText(text)
-    val bookmarkManager = BookmarkManager.getInstance(myFixture.project)
-    bookmarkManager.addEditorBookmark(myFixture.editor, 2)
-    val bookmark = bookmarkManager.findEditorBookmark(myFixture.editor.document, 2) ?: kotlin.test.fail()
-
-    bookmark.mnemonic = 'A'
-    bookmarkManager.applyNewStateInTestMode(listOf(bookmark))
-
+    myFixture.project.createLineBookmark(myFixture.editor, 2, 'A')
+    PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
     val vimMarks = VimPlugin.getMark().getMarks(myFixture.editor)
     TestCase.assertEquals(1, vimMarks.size)
     TestCase.assertEquals('A', vimMarks[0].key)
@@ -149,15 +129,12 @@ class MotionMarkActionTest : VimOptionTestCase(IdeaMarksOptionsData.name) {
             hard by the torrent of a mountain pass.
     """.trimIndent()
     configureByText(text)
-    var bookmarkManager = BookmarkManager.getInstance(myFixture.project)
-    bookmarkManager.addEditorBookmark(myFixture.editor, 2)
-    var bookmark = bookmarkManager.findEditorBookmark(myFixture.editor.document, 2) ?: kotlin.test.fail()
-    bookmarkManager.setMnemonic(bookmark, 'A')
 
-    bookmarkManager = BookmarkManager.getInstance(myFixture.project)
-    bookmarkManager.addEditorBookmark(myFixture.editor, 4)
-    bookmark = bookmarkManager.findEditorBookmark(myFixture.editor.document, 4) ?: kotlin.test.fail()
-    bookmarkManager.setMnemonic(bookmark, 'A')
+    val bookmark = myFixture.project.createLineBookmark(myFixture.editor, 2, 'A')
+
+    BookmarksManager.getInstance(myFixture.project)?.remove(bookmark!!)
+    myFixture.project.createLineBookmark(myFixture.editor, 4, 'A')
+    PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
     val vimMarks = VimPlugin.getMark().getMarks(myFixture.editor)
     TestCase.assertEquals(1, vimMarks.size)
     TestCase.assertEquals('A', vimMarks[0].key)
@@ -165,11 +142,12 @@ class MotionMarkActionTest : VimOptionTestCase(IdeaMarksOptionsData.name) {
   }
 
   private fun checkMarks(vararg marks: Pair<Char, Int>) {
-    val validBookmarks = BookmarkManager.getInstance(myFixture.project).validBookmarks
+    val project = myFixture.project
+    val validBookmarks = BookmarksManager.getInstance(project)!!.bookmarks.sortedBy { it.mnemonic(project) }
     assertEquals(marks.size, validBookmarks.size)
-    marks.forEachIndexed { index, (mn, line) ->
-      assertEquals(mn, validBookmarks[marks.size - index - 1].mnemonic)
-      assertEquals(line, validBookmarks[marks.size - index - 1].line)
+    marks.sortedBy { it.first }.forEachIndexed { index, (mn, line) ->
+      assertEquals(mn, validBookmarks[index].mnemonic(project))
+      assertEquals(line, (validBookmarks[index] as LineBookmark).line)
     }
   }
 }
