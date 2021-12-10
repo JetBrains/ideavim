@@ -33,6 +33,10 @@
         <li><a href="https://youtrack.jetbrains.com/issue/VIM-2026">VIM-2026</a> Keep global marks after restart</li>
         <li><a href="https://youtrack.jetbrains.com/issue/VIM-1691">VIM-1691</a> Fix default path for <code>!</code> command
         </li>
+        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2487">VIM-2487</a>
+          <a href="https://youtrack.jetbrains.com/issue/VIM-2434">VIM-2434</a>
+          Fix IdeaVim in PyCharm notebooks
+        </li>
       </ul>
 
       <h3>Merged PRs:</h3>
@@ -48,6 +52,9 @@
         </li>
         <li><a href="https://github.com/JetBrains/ideavim/pull/407">407</a> by <a href="https://github.com/nizienko">eugene
           nizienko</a>: Video recording for ui tests
+        </li>
+        <li><a href="https://github.com/JetBrains/ideavim/pull/418">418</a> by <a href="https://github.com/chylex">chylex</a>:
+          Fix compile errors in unit tests on Windows
         </li>
       </ul>
     ]]>

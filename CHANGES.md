@@ -47,6 +47,9 @@ usual beta standards.
 * [VIM-2461](https://youtrack.jetbrains.com/issue/VIM-2461) Show action id before action execution
 * [VIM-2026](https://youtrack.jetbrains.com/issue/VIM-2026) Keep global marks after restart
 * [VIM-1691](https://youtrack.jetbrains.com/issue/VIM-1691) Fix default path for `!` command
+* [VIM-2487](https://youtrack.jetbrains.com/issue/VIM-2487)
+  [VIM-2434](https://youtrack.jetbrains.com/issue/VIM-2434)
+  Fix IdeaVim in PyCharm notebooks
 
 ### Merged PRs:
 * [390](https://github.com/JetBrains/ideavim/pull/390) by [chylex](https://github.com/chylex): [VIM-2255] Missing reload icon in .ideavimrc on Windows
