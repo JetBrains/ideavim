@@ -25,6 +25,8 @@ usual beta standards.
 
 ## To Be Released
 
+## 1.9.0, 2021-12-10
+
 ### Features:
 * Make IdeaVim compatible with CodeWithMe | [VIM-2332](https://youtrack.jetbrains.com/issue/VIM-2332)
 * expression register `<C-R>=` | [VIM-521](https://youtrack.jetbrains.com/issue/VIM-521)
