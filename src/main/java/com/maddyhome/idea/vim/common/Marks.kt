@@ -100,7 +100,8 @@ class IntellijMark(bookmark: LineBookmark, override val col: Int, project: Proje
 
   private fun getMark(): LineBookmark? =
     getProject()?.let {
-        project -> BookmarksManager.getInstance(project)?.getBookmark(BookmarkType.get(key)) as? LineBookmark
+      project ->
+      BookmarksManager.getInstance(project)?.getBookmark(BookmarkType.get(key)) as? LineBookmark
     }
 
   private fun getProject(): Project? {
