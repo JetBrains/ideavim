@@ -51,6 +51,11 @@ class CommandState private constructor(private val editor: Editor) {
     }
   var isDotRepeatInProgress = false
   var isRegisterPending = false
+  var isReplaceCharacter = false
+    set(value) {
+      field = value
+      onModeChanged()
+    }
 
   /**
    * The currently executing command
@@ -112,8 +117,8 @@ class CommandState private constructor(private val editor: Editor) {
   }
 
   fun resetReplaceCharacter() {
-    if (subMode == SubMode.REPLACE_CHARACTER) {
-      popModes()
+    if (isReplaceCharacter) {
+      isReplaceCharacter = false
     }
   }
 
@@ -354,7 +359,7 @@ class CommandState private constructor(private val editor: Editor) {
   }
 
   enum class SubMode {
-    NONE, REPLACE_CHARACTER, VISUAL_CHARACTER, VISUAL_LINE, VISUAL_BLOCK
+    NONE, VISUAL_CHARACTER, VISUAL_LINE, VISUAL_BLOCK
   }
 
   private data class ModeState(val mode: Mode, val subMode: SubMode) {

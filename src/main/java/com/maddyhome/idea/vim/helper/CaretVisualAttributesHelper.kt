@@ -62,7 +62,7 @@ fun removeCaretsVisualAttributes(editor: Editor) {
 }
 
 fun Editor.guicursorMode(): GuiCursorMode {
-  if (subMode == CommandState.SubMode.REPLACE_CHARACTER) {
+  if (this.commandState.isReplaceCharacter) {
     // Can be true for NORMAL and VISUAL
     return GuiCursorMode.REPLACE
   }

@@ -931,7 +931,7 @@ public class KeyHandler {
 
     // Another special case. Force a mode change to update the caret shape
     if (action instanceof ChangeCharacterAction || action instanceof ChangeVisualCharacterAction) {
-      editorState.pushModes(editorState.getMode(), CommandState.SubMode.REPLACE_CHARACTER);
+      editorState.setReplaceCharacter(true);
     }
   }
 
