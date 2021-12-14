@@ -147,6 +147,9 @@ class CommandState private constructor(private val editor: Editor) {
       Mode.SELECT -> MappingMode.SELECT
       Mode.CMD_LINE -> MappingMode.CMD_LINE
       Mode.OP_PENDING -> MappingMode.OP_PENDING
+      Mode.INSERT_NORMAL -> MappingMode.NORMAL
+      Mode.INSERT_VISUAL -> MappingMode.VISUAL
+      Mode.INSERT_SELECT -> MappingMode.SELECT
     }
   }
 
@@ -306,24 +309,35 @@ class CommandState private constructor(private val editor: Editor) {
     }
     return buildString {
       when (modeState.mode) {
-        Mode.COMMAND -> if (modeState.subMode == SubMode.SINGLE_COMMAND) {
-          append('(').append(getStatusString(pos - 1).toLowerCase()).append(')')
-        }
+        Mode.INSERT_NORMAL -> append("-- (insert) --")
         Mode.INSERT -> append("INSERT")
         Mode.REPLACE -> append("REPLACE")
         Mode.VISUAL, Mode.SELECT -> {
-          if (pos > 0) {
-            val tmp = modeStates[pos - 1]
-            if (tmp.mode == Mode.COMMAND && tmp.subMode == SubMode.SINGLE_COMMAND) {
-              append(getStatusString(pos - 1))
-              append(" - ")
-            }
-          }
+          append("-- VISUAL")
           when (modeState.subMode) {
             SubMode.VISUAL_LINE -> append(modeState.mode).append(" LINE")
             SubMode.VISUAL_BLOCK -> append(modeState.mode).append(" BLOCK")
-            else -> append(modeState.mode)
+            else -> Unit
           }
+          append(" --")
+        }
+        Mode.INSERT_VISUAL -> {
+          append("-- (insert) VISUAL")
+          when (modeState.subMode) {
+            SubMode.VISUAL_LINE -> append(modeState.mode).append(" LINE")
+            SubMode.VISUAL_BLOCK -> append(modeState.mode).append(" BLOCK")
+            else -> Unit
+          }
+          append(" --")
+        }
+        Mode.INSERT_SELECT -> {
+          append("-- (insert) SELECT")
+          when (modeState.subMode) {
+            SubMode.VISUAL_LINE -> append(modeState.mode).append(" LINE")
+            SubMode.VISUAL_BLOCK -> append(modeState.mode).append(" BLOCK")
+            else -> Unit
+          }
+          append(" --")
         }
         else -> Unit
       }
@@ -335,11 +349,11 @@ class CommandState private constructor(private val editor: Editor) {
     COMMAND, VISUAL, SELECT, INSERT, CMD_LINE, /*EX*/
 
     // Additional modes
-    OP_PENDING, REPLACE /*, VISUAL_REPLACE, INSERT_NORMAL, INSERT_VISUAL, INSERT_SELECT */
+    OP_PENDING, REPLACE /*, VISUAL_REPLACE*/, INSERT_NORMAL, INSERT_VISUAL, INSERT_SELECT
   }
 
   enum class SubMode {
-    NONE, SINGLE_COMMAND, REGISTER_PENDING, REPLACE_CHARACTER, VISUAL_CHARACTER, VISUAL_LINE, VISUAL_BLOCK
+    NONE, REGISTER_PENDING, REPLACE_CHARACTER, VISUAL_CHARACTER, VISUAL_LINE, VISUAL_BLOCK
   }
 
   private data class ModeState(val mode: Mode, val subMode: SubMode) {

@@ -46,6 +46,65 @@ class ChangeActionTest : VimTestCase() {
     )
   }
 
+  // VIM-620 |i_CTRL-O|
+  fun testInsertSingleCommandAndNewLineInserting2() {
+    doTest(
+      listOf("i", "<C-O>", "v"),
+      "12${c}345", "12${s}${c}3${se}45", CommandState.Mode.INSERT_VISUAL, CommandState.SubMode.VISUAL_CHARACTER
+    )
+  }
+
+  // VIM-620 |i_CTRL-O|
+  fun testInsertSingleCommandAndNewLineInserting3() {
+    doTest(
+      listOf("i", "<C-O>", "v", "<esc>"),
+      "12${c}345", "12${c}345", CommandState.Mode.INSERT, CommandState.SubMode.NONE
+    )
+  }
+
+  // VIM-620 |i_CTRL-O|
+  fun testInsertSingleCommandAndNewLineInserting4() {
+    doTest(
+      listOf("i", "<C-O>", "v", "d"),
+      "12${c}345", "12${c}45", CommandState.Mode.INSERT, CommandState.SubMode.NONE
+    )
+  }
+
+  // VIM-620 |i_CTRL-O|
+  fun testInsertSingleCommandAndNewLineInserting5() {
+    doTest(
+      listOf("i", "<C-O>", "v", "<C-G>"),
+      "12${c}345", "12${s}3${c}${se}45", CommandState.Mode.INSERT_SELECT, CommandState.SubMode.VISUAL_CHARACTER
+    )
+  }
+
+  // VIM-620 |i_CTRL-O|
+  fun testInsertSingleCommandAndNewLineInserting6() {
+    doTest(
+      listOf("i", "<C-O>", "gh"),
+      "12${c}345", "12${s}3${c}${se}45", CommandState.Mode.INSERT_SELECT, CommandState.SubMode.VISUAL_CHARACTER
+    )
+  }
+
+  // VIM-620 |i_CTRL-O|
+  fun testInsertSingleCommandAndNewLineInserting7() {
+    doTest(
+      listOf("i", "<C-O>", "gh", "<esc>"),
+      "12${c}345", "123${c}45", CommandState.Mode.INSERT, CommandState.SubMode.NONE
+    )
+  }
+
+/*
+  // Turn it on after typing via handlers are implemented for tests
+  // VIM-620 |i_CTRL-O|
+  fun ignoreTestInsertSingleCommandAndNewLineInserting8() {
+    doTest(
+      listOf("i", "<C-O>", "gh", "d"),
+      "12${c}345", "12d${c}45", CommandState.Mode.INSERT, CommandState.SubMode.NONE
+    )
+  }
+*/
+
   // VIM-311 |i_CTRL-O|
   fun testInsertSingleCommand() {
     doTest(

@@ -80,6 +80,9 @@ fun Editor.guicursorMode(): GuiCursorMode {
     CommandState.Mode.REPLACE -> GuiCursorMode.REPLACE
     // This doesn't handle ci and cr, but we don't care - our CMD_LINE will never call this
     CommandState.Mode.CMD_LINE -> GuiCursorMode.CMD_LINE
+    CommandState.Mode.INSERT_NORMAL -> GuiCursorMode.NORMAL
+    CommandState.Mode.INSERT_VISUAL -> GuiCursorMode.VISUAL
+    CommandState.Mode.INSERT_SELECT -> GuiCursorMode.INSERT
   }
 }
 

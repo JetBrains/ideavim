@@ -26,7 +26,10 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.commandState
+import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
+import com.maddyhome.idea.vim.helper.pushSelectMode
+import com.maddyhome.idea.vim.helper.pushVisualMode
 
 /**
  * @author Alex Plate
@@ -47,8 +50,8 @@ class SelectToggleVisualMode : VimActionHandler.SingleExecution() {
       val subMode = commandState.subMode
       val mode = commandState.mode
       commandState.popModes()
-      if (mode == CommandState.Mode.VISUAL) {
-        commandState.pushModes(CommandState.Mode.SELECT, subMode)
+      if (mode.inVisualMode) {
+        commandState.pushSelectMode(subMode, mode)
         if (subMode != CommandState.SubMode.VISUAL_LINE) {
           editor.caretModel.runForEachCaret {
             if (it.offset + VimPlugin.getVisualMotion().selectionAdj == it.selectionEnd) {
@@ -57,7 +60,7 @@ class SelectToggleVisualMode : VimActionHandler.SingleExecution() {
           }
         }
       } else {
-        commandState.pushModes(CommandState.Mode.VISUAL, subMode)
+        commandState.pushVisualMode(subMode, mode)
         if (subMode != CommandState.SubMode.VISUAL_LINE) {
           editor.caretModel.runForEachCaret {
             if (it.offset == it.selectionEnd && it.visualLineStart <= it.offset - VimPlugin.getVisualMotion().selectionAdj) {

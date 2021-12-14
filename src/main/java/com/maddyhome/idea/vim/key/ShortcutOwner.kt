@@ -87,6 +87,9 @@ sealed class ShortcutOwnerInfo {
         CommandState.Mode.CMD_LINE -> this.normal
         CommandState.Mode.OP_PENDING -> this.normal
         CommandState.Mode.REPLACE -> this.insert
+        CommandState.Mode.INSERT_NORMAL -> this.normal
+        CommandState.Mode.INSERT_VISUAL -> this.visual
+        CommandState.Mode.INSERT_SELECT -> this.select
       }
     }
   }

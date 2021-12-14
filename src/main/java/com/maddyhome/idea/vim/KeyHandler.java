@@ -602,13 +602,12 @@ public class KeyHandler {
     return !unhandledKeyStrokes.isEmpty() && unhandledKeyStrokes.get(0).equals(StringHelper.PlugKeyStroke);
   }
 
-  @SuppressWarnings("RedundantIfStatement")
   private boolean isCommandCountKey(char chKey, @NotNull CommandState editorState) {
     // Make sure to avoid handling '0' as the start of a count.
     final CommandBuilder commandBuilder = editorState.getCommandBuilder();
-    boolean notRegisterPendingCommand = editorState.getMode() == CommandState.Mode.COMMAND &&
+    boolean notRegisterPendingCommand = CommandStateHelper.inNormalMode(editorState.getMode()) &&
                                         editorState.getSubMode() != CommandState.SubMode.REGISTER_PENDING;
-    boolean visualMode = editorState.getMode() == CommandState.Mode.VISUAL;
+    boolean visualMode = CommandStateHelper.inVisualMode(editorState.getMode());
     boolean opPendingMode = editorState.getMode() == CommandState.Mode.OP_PENDING;
     if (notRegisterPendingCommand || visualMode || opPendingMode) {
       if (commandBuilder.isExpectingCount() &&
@@ -1085,7 +1084,7 @@ public class KeyHandler {
       // mode we were in. This handles commands in those modes that temporarily allow us to execute normal
       // mode commands. An exception is if this command should leave us in the temporary mode such as
       // "select register"
-      if (editorState.getSubMode() == CommandState.SubMode.SINGLE_COMMAND &&
+      if (CommandStateHelper.inSingleNormalMode(editorState.getMode()) &&
           (!cmd.getFlags().contains(CommandFlags.FLAG_EXPECT_MORE))) {
         editorState.popModes();
       }

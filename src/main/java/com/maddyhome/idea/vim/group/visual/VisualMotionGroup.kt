@@ -33,6 +33,8 @@ import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.inVisualMode
+import com.maddyhome.idea.vim.helper.pushSelectMode
+import com.maddyhome.idea.vim.helper.pushVisualMode
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.helper.vimForEachCaret
 import com.maddyhome.idea.vim.helper.vimLastColumn
@@ -121,7 +123,7 @@ class VisualMotionGroup {
       if (rawCount > 0) {
         val primarySubMode = editor.caretModel.primaryCaret.vimLastVisualOperatorRange?.type?.toSubMode()
           ?: subMode
-        editor.commandState.pushModes(CommandState.Mode.VISUAL, primarySubMode)
+        editor.commandState.pushVisualMode(primarySubMode)
 
         editor.vimForEachCaret {
           val range = it.vimLastVisualOperatorRange ?: VisualChange.default(subMode)
@@ -134,7 +136,7 @@ class VisualMotionGroup {
           it.vimSetSelection(it.offset, end, true)
         }
       } else {
-        editor.commandState.pushModes(CommandState.Mode.VISUAL, subMode)
+        editor.commandState.pushVisualMode(subMode)
         editor.vimForEachCaret { it.vimSetSelection(it.offset) }
       }
       return true
@@ -213,7 +215,7 @@ class VisualMotionGroup {
   }
 
   fun enterSelectMode(editor: Editor, subMode: CommandState.SubMode): Boolean {
-    editor.commandState.pushModes(CommandState.Mode.SELECT, subMode)
+    editor.commandState.pushSelectMode(subMode)
     editor.vimForEachCaret { it.vimSelectionStart = it.vimLeadSelectionOffset }
     return true
   }

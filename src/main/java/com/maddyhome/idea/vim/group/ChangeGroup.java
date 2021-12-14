@@ -769,7 +769,7 @@ public class ChangeGroup {
    * @param editor The editor to put into NORMAL mode for one command
    */
   public void processSingleCommand(@NotNull Editor editor) {
-    CommandState.getInstance(editor).pushModes(CommandState.Mode.COMMAND, CommandState.SubMode.SINGLE_COMMAND);
+    CommandState.getInstance(editor).pushModes(CommandState.Mode.INSERT_NORMAL, CommandState.SubMode.NONE);
     clearStrokes(editor);
   }
 
