@@ -267,7 +267,7 @@ public class KeyHandler {
         else if (isExpectingCharArgument(commandBuilder)) {
           handleCharArgument(key, chKey, editorState);
         }
-        else if (editorState.getSubMode() == CommandState.SubMode.REGISTER_PENDING) {
+        else if (editorState.isRegisterPending()) {
           LOG.trace("Pending mode.");
           commandBuilder.addKey(key);
           handleSelectRegister(editorState, chKey);
@@ -291,7 +291,7 @@ public class KeyHandler {
             commandBuilder.addKey(key);
           } else if (isSelectRegister(key, editorState)) {
             LOG.trace("Select register");
-            editorState.pushModes(CommandState.Mode.COMMAND, CommandState.SubMode.REGISTER_PENDING);
+            editorState.setRegisterPending(true);
             commandBuilder.addKey(key);
           }
           else { // node == null
@@ -409,7 +409,7 @@ public class KeyHandler {
     if (commandBuilder.isAwaitingCharOrDigraphArgument()
       || commandBuilder.isBuildingMultiKeyCommand()
       || isMappingDisabledForKey(key, commandState)
-      || commandState.getSubMode() == CommandState.SubMode.REGISTER_PENDING) {
+      || commandState.isRegisterPending()) {
       LOG.debug("Finish key processing, returning false");
       return false;
     }
@@ -606,7 +606,7 @@ public class KeyHandler {
     // Make sure to avoid handling '0' as the start of a count.
     final CommandBuilder commandBuilder = editorState.getCommandBuilder();
     boolean notRegisterPendingCommand = CommandStateHelper.inNormalMode(editorState.getMode()) &&
-                                        editorState.getSubMode() != CommandState.SubMode.REGISTER_PENDING;
+                                        !editorState.isRegisterPending();
     boolean visualMode = CommandStateHelper.inVisualMode(editorState.getMode());
     boolean opPendingMode = editorState.getMode() == CommandState.Mode.OP_PENDING;
     if (notRegisterPendingCommand || visualMode || opPendingMode) {
@@ -645,7 +645,7 @@ public class KeyHandler {
       return false;
     }
 
-    if (editorState.getSubMode() == CommandState.SubMode.REGISTER_PENDING) {
+    if (editorState.isRegisterPending()) {
       return true;
     }
 

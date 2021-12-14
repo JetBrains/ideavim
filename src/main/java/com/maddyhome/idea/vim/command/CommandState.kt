@@ -50,6 +50,7 @@ class CommandState private constructor(private val editor: Editor) {
       doShowMode()
     }
   var isDotRepeatInProgress = false
+  var isRegisterPending = false
 
   /**
    * The currently executing command
@@ -117,8 +118,8 @@ class CommandState private constructor(private val editor: Editor) {
   }
 
   fun resetRegisterPending() {
-    if (subMode == SubMode.REGISTER_PENDING) {
-      popModes()
+    if (isRegisterPending) {
+      isRegisterPending = false
     }
   }
 
@@ -353,7 +354,7 @@ class CommandState private constructor(private val editor: Editor) {
   }
 
   enum class SubMode {
-    NONE, REGISTER_PENDING, REPLACE_CHARACTER, VISUAL_CHARACTER, VISUAL_LINE, VISUAL_BLOCK
+    NONE, REPLACE_CHARACTER, VISUAL_CHARACTER, VISUAL_LINE, VISUAL_BLOCK
   }
 
   private data class ModeState(val mode: Mode, val subMode: SubMode) {
