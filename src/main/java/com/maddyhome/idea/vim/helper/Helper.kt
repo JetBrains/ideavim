@@ -27,6 +27,7 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.common.TextRange
 import java.util.*
 
@@ -160,3 +161,11 @@ annotation class RWLockLabel {
 
 val TextRange.endOffsetInclusive
   get() = if (this.endOffset > 0 && this.endOffset > this.startOffset) this.endOffset - 1 else this.endOffset
+
+fun vimEnabled(editor: Editor?): Boolean {
+  if (!VimPlugin.isEnabled()) return false
+  if (editor != null && editor.isIdeaVimDisabledHere) return false
+  return true
+}
+
+fun vimDisabled(editor: Editor?): Boolean = !vimEnabled(editor)
