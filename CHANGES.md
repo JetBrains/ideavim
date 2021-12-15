@@ -25,6 +25,9 @@ usual beta standards.
 
 ## To Be Released
 
+### Fixes:
+* [VIM-2502](https://youtrack.jetbrains.com/issue/VIM-2502) Fix the shape of new carets
+
 ## 1.9.0, 2021-12-10
 
 ### Features:
