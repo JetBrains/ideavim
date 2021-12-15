@@ -19,8 +19,11 @@
 package org.jetbrains.plugins.ideavim.helper
 
 import com.intellij.openapi.editor.Caret
+import com.intellij.openapi.editor.VisualPosition
 import com.intellij.openapi.editor.ex.EditorSettingsExternalizable
+import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.helper.EditorDataContext
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.helper.buildGreater212
@@ -29,6 +32,7 @@ import com.maddyhome.idea.vim.helper.shape
 import com.maddyhome.idea.vim.helper.thickness
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.services.OptionService
+import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -263,6 +267,24 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
     typeText(parseKeys("r"))
     VimPlugin.setEnabled(false)
     assertCaretVisualAttributes("DEFAULT", 1.0f)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
+  fun `test adding new caret via IJ`() {
+    configureByText("${c}I found it in a legendary land")
+    myFixture.editor.caretModel.addCaret(VisualPosition(0, 5))
+    assertCaretVisualAttributes("BLOCK", 0f)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
+  fun `test adding new caret below`() {
+    configureByText("""
+      |${c}I found it in a legendary land
+      |all rocks and lavender and tufted grass,
+    """.trimMargin())
+    KeyHandler.executeAction("EditorCloneCaretBelow", EditorDataContext.init(myFixture.editor))
+    TestCase.assertEquals(2, myFixture.editor.caretModel.caretCount)
+    assertCaretVisualAttributes("BLOCK", 0f)
   }
 
   private fun assertCaretVisualAttributes(expectedShape: String, expectedThickness: Float) {

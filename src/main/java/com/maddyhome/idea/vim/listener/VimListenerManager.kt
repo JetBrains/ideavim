@@ -22,7 +22,10 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.diagnostic.trace
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.editor.actionSystem.TypedAction
+import com.intellij.openapi.editor.event.CaretEvent
+import com.intellij.openapi.editor.event.CaretListener
 import com.intellij.openapi.editor.event.EditorFactoryEvent
 import com.intellij.openapi.editor.event.EditorFactoryListener
 import com.intellij.openapi.editor.event.EditorMouseEvent
@@ -65,6 +68,7 @@ import com.maddyhome.idea.vim.helper.localEditors
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
+import com.maddyhome.idea.vim.helper.vimDisabled
 import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.listener.MouseEventsDataHolder.skipEvents
 import com.maddyhome.idea.vim.listener.MouseEventsDataHolder.skipNDragEvents
@@ -114,6 +118,8 @@ object VimListenerManager {
       VimPlugin.getOptionService().addListener("iskeyword", KeywordOptionChangeListener)
 
       EventFacade.getInstance().addEditorFactoryListener(VimEditorFactoryListener, VimPlugin.getInstance())
+
+      EditorFactory.getInstance().eventMulticaster.addCaretListener(VimCaretListener, VimPlugin.getInstance())
     }
 
     fun disable() {
@@ -127,6 +133,8 @@ object VimListenerManager {
       VimPlugin.getOptionService().removeListener("iskeyword", KeywordOptionChangeListener)
 
       EventFacade.getInstance().removeEditorFactoryListener(VimEditorFactoryListener)
+
+      EditorFactory.getInstance().eventMulticaster.removeCaretListener(VimCaretListener)
     }
   }
 
@@ -169,6 +177,18 @@ object VimListenerManager {
       VimPlugin.getEditorIfCreated()?.editorDeinit(editor, isReleased)
 
       VimPlugin.getChange().editorReleased(editor)
+    }
+  }
+
+  object VimCaretListener : CaretListener {
+    override fun caretAdded(event: CaretEvent) {
+      if (vimDisabled(event.editor)) return
+      event.editor.updateCaretsVisualAttributes()
+    }
+
+    override fun caretRemoved(event: CaretEvent) {
+      if (vimDisabled(event.editor)) return
+      event.editor.updateCaretsVisualAttributes()
     }
   }
 
