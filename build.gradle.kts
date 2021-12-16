@@ -73,15 +73,16 @@ configurations {
 // --- Compilation
 
 tasks {
-    // Include tests for testing on LATEST-EAP-SNAPSHOT
-//    val test by getting(Test::class) {
-//        isScanForTestClasses = false
-//        // Only run tests from classes that end with "Test"
-//        include("**/*Test.class")
-//        include("**/*Tests.class")
-//        exclude("**/ParserTest.class")
-//    }
-//
+    // Issue in gradle 7.3
+    val test by getting(Test::class) {
+        isScanForTestClasses = false
+        // Only run tests from classes that end with "Test"
+        include("**/*Test.class")
+        include("**/*test.class")
+        include("**/*Tests.class")
+        exclude("**/ParserTest.class")
+    }
+
     compileJava {
         sourceCompatibility = javaVersion
         targetCompatibility = javaVersion
