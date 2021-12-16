@@ -20,6 +20,7 @@ package com.maddyhome.idea.vim.option;
 
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.helper.VimNlsSafe;
+import com.maddyhome.idea.vim.vimscript.model.commands.SetCommand;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
 import com.maddyhome.idea.vim.vimscript.services.OptionService;
@@ -119,12 +120,16 @@ public class NumberOption extends TextOption {
       String oldValue = getValue();
       this.value = num;
       onChanged(oldValue, getValue());
-      try {
-      if (!(((VimInt)VimPlugin.getOptionService()
-        .getOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, name)).getValue() == value)) {
-        VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, new VimInt(value), name);
+      // we won't use OptionService if the method was invoked during set command execution (set command will call OptionService by itself)
+      if (!SetCommand.Companion.isExecutingCommand$IdeaVIM()) {
+        try {
+          if (!(((VimInt)VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, name)).getValue() == value)) {
+            VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, new VimInt(value), name);
+          }
+        }
+        catch (Exception e) {
+        }
       }
-      } catch (Exception e) {}
 
       return true;
     }

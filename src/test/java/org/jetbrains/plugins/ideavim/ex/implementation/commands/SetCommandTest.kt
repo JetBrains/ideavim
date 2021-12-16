@@ -18,6 +18,8 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.vimscript.services.OptionService
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class SetCommandTest : VimTestCase() {
@@ -27,5 +29,13 @@ class SetCommandTest : VimTestCase() {
     typeText(commandToKeys("set unknownOption"))
     assertPluginError(true)
     assertPluginErrorMessageContains("Unknown option: unknownOption")
+  }
+
+  fun `test toggle option`() {
+    configureByText("\n")
+    typeText(commandToKeys("set rnu"))
+    assertTrue(VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "rnu"))
+    typeText(commandToKeys("set rnu!"))
+    assertFalse(VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "rnu"))
   }
 }
