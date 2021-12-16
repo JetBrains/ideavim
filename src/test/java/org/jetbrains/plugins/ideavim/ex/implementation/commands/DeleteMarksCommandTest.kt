@@ -18,7 +18,6 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
-import com.intellij.openapi.editor.LogicalPosition
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.common.Mark
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -35,22 +34,11 @@ class DeleteMarksCommandTest : VimTestCase() {
          all rocks and lavender and tufted grass,
          where it was settled on some sodden sand
          hard by the torrent of a mountain pass.
-
-         The features it combines mark it as new
-         to science: shape and shade -- the special tinge,
-         akin to moonlight, tempering its blue,
-         the dingy underside, the checquered fringe.
-
-         My needles have teased out its sculpted sex;
-         corroded tissues could no longer hide
-         that priceless mote now dimpling the convex
-         and limpid teardrop on a lighted slide.
          """.trimMargin()
     )
 
     marks.forEachIndexed { index, c ->
-      VimPlugin.getMark()
-        .setMark(myFixture.editor, c, myFixture.editor.logicalPositionToOffset(LogicalPosition(index, 0)))
+      VimPlugin.getMark().setMark(myFixture.editor, c, index * 10)
     }
   }
 

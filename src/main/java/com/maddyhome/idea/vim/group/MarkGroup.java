@@ -18,10 +18,9 @@
 
 package com.maddyhome.idea.vim.group;
 
-import com.intellij.ide.bookmark.BookmarkGroup;
-import com.intellij.ide.bookmark.BookmarkType;
-import com.intellij.ide.bookmark.BookmarksManager;
-import com.intellij.ide.bookmark.LineBookmark;
+import com.intellij.ide.bookmarks.Bookmark;
+import com.intellij.ide.bookmarks.BookmarkManager;
+import com.intellij.ide.bookmarks.BookmarksListener;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.RoamingType;
 import com.intellij.openapi.components.State;
@@ -48,6 +47,7 @@ import com.maddyhome.idea.vim.helper.HelperKt;
 import com.maddyhome.idea.vim.helper.SearchHelper;
 import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import org.jdom.Element;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -221,7 +221,7 @@ public class MarkGroup implements PersistentStateComponent<Element> {
       HashMap<Character, Mark> fmarks = getFileMarks(editor.getDocument());
       if (fmarks == null) return false;
 
-      @Nullable LineBookmark systemMark = SystemMarks.createOrGetSystemMark(ch, lp.line, editor);
+      Bookmark systemMark = createOrGetSystemMark(ch, lp.line, editor);
       Mark mark;
       if (systemMark != null) {
         mark = new IntellijMark(systemMark, lp.column, editor.getProject());
@@ -236,6 +236,22 @@ public class MarkGroup implements PersistentStateComponent<Element> {
     }
 
     return true;
+  }
+
+  private @Nullable Bookmark createOrGetSystemMark(char ch, int line, @NotNull Editor editor) {
+    if (!VimPlugin.getOptionService().isSet(new OptionService.Scope.LOCAL(editor), "ideamarks", "ideamarks")) return null;
+    final Project project = editor.getProject();
+    if (project == null) return null;
+    final BookmarkManager bookmarkManager = BookmarkManager.getInstance(project);
+
+    Bookmark bookmark = bookmarkManager.findBookmarkForMnemonic(ch);
+    if (bookmark != null && bookmark.getLine() == line) return bookmark;
+
+    final VirtualFile virtualFile = EditorHelper.getVirtualFile(editor);
+    if (virtualFile == null) return null;
+    bookmark = bookmarkManager.addTextBookmark(virtualFile, line, "");
+    bookmarkManager.setMnemonic(bookmark, ch);
+    return bookmark;
   }
 
   public static String extractProtocol(@NotNull VirtualFile vf) {
@@ -730,56 +746,68 @@ public class MarkGroup implements PersistentStateComponent<Element> {
     }
   }
 
-  public static class VimBookmarksListener implements com.intellij.ide.bookmark.BookmarksListener {
-    private final Project myProject;
+  public static class MarkListener implements BookmarksListener {
 
-    public VimBookmarksListener(Project project) {
-      myProject = project;
+    private final Project project;
+    private Bookmark bookmarkTemplate = null;
+
+    @Contract(pure = true)
+    public MarkListener(Project project) {
+      this.project = project;
     }
 
+    /**
+     * IJ has an interesting approach in mnemonic marks initialization. Firstly it creates an unnamed mark,
+     * then updates it. In general, it creates two events: one for creation and one for mnemonic set.
+     * However, when IJ starts and reads existing marks from caches, it creates marks with mnemonics already.
+     */
     @Override
-    public void bookmarkAdded(@NotNull BookmarkGroup group, com.intellij.ide.bookmark.@NotNull Bookmark bookmark) {
+    public void bookmarkAdded(@NotNull Bookmark b) {
       if (!VimPlugin.isEnabled()) return;
       if (!VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL.INSTANCE, "ideamarks",  "ideamarks")) return;
-
-      if (!(bookmark instanceof LineBookmark)) return;
-      BookmarksManager bookmarksManager = BookmarksManager.getInstance(myProject);
-      if (bookmarksManager == null) return;
-      BookmarkType type = bookmarksManager.getType(bookmark);
-      if (type == null) return;
-
-      char mnemonic = type.getMnemonic();
-      if (GLOBAL_MARKS.indexOf(mnemonic) == -1) return;
-
-      createVimMark((LineBookmark)bookmark, mnemonic);
-    }
-
-    @Override
-    public void bookmarkRemoved(@NotNull BookmarkGroup group, com.intellij.ide.bookmark.@NotNull Bookmark bookmark) {
-      if (!VimPlugin.isEnabled()) return;
-      if (!VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL.INSTANCE, "ideamarks",  "ideamarks")) return;
-
-      if (!(bookmark instanceof LineBookmark)) return;
-      BookmarksManager bookmarksManager = BookmarksManager.getInstance(myProject);
-      if (bookmarksManager == null) return;
-      BookmarkType type = bookmarksManager.getType(bookmark);
-      if (type == null) return;
-      char ch = type.getMnemonic();
-      if (GLOBAL_MARKS.indexOf(ch) != -1) {
-        FileMarks<Character, Mark> fmarks = VimPlugin.getMark().getFileMarks(((LineBookmark)bookmark).getFile().getPath());
-        fmarks.remove(ch);
-        VimPlugin.getMark().globalMarks.remove(ch);
+      if (b.getMnemonic() == '\u0000') {
+        bookmarkTemplate = b;
+      } else {
+        createVimMark(b);
       }
     }
 
-    private void createVimMark(@NotNull LineBookmark b, char mnemonic) {
-      int col = 0;
-      Editor editor = EditorHelper.getEditor(b.getFile());
-      if (editor != null) col = editor.getCaretModel().getCurrentCaret().getLogicalPosition().column;
-      IntellijMark mark = new IntellijMark(b, col, myProject);
-      FileMarks<Character, Mark> fmarks = VimPlugin.getMark().getFileMarks(b.getFile().getPath());
-      fmarks.put(mnemonic, mark);
-      VimPlugin.getMark().globalMarks.put(mnemonic, mark);
+    @Override
+    public void bookmarkRemoved(@NotNull Bookmark b) {
+      if (!VimPlugin.isEnabled()) return;
+      if (!VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL.INSTANCE, "ideamarks",  "ideamarks")) return;
+
+      char ch = b.getMnemonic();
+      if (GLOBAL_MARKS.indexOf(ch) != -1) {
+        FileMarks<Character, Mark> fmarks = VimPlugin.getMark().getFileMarks(b.getFile().getPath());
+        fmarks.remove(ch);
+        VimPlugin.getMark().globalMarks.remove(ch);
+        // No need to call mark.clear()
+      }
+    }
+
+    @Override
+    public void bookmarkChanged(@NotNull Bookmark b) {
+      if (!VimPlugin.isEnabled()) return;
+      /* IJ sets named marks in two steps. Firstly it creates an unnamed mark, then adds a mnemonic */
+      if (!VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL.INSTANCE, "ideamarks", "ideamarks")) return;
+      if (b != bookmarkTemplate) return;
+      bookmarkTemplate = null;
+
+      createVimMark(b);
+    }
+
+    private void createVimMark(@NotNull Bookmark b) {
+      char ch = b.getMnemonic();
+      if (GLOBAL_MARKS.indexOf(ch) != -1) {
+        int col = 0;
+        Editor editor = EditorHelper.getEditor(b.getFile());
+        if (editor != null) col = editor.getCaretModel().getCurrentCaret().getLogicalPosition().column;
+        IntellijMark mark = new IntellijMark(b, col, project);
+        FileMarks<Character, Mark> fmarks = VimPlugin.getMark().getFileMarks(b.getFile().getPath());
+        fmarks.put(ch, mark);
+        VimPlugin.getMark().globalMarks.put(ch, mark);
+      }
     }
   }
 
