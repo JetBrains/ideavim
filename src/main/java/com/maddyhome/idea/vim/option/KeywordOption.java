@@ -19,6 +19,7 @@
 package com.maddyhome.idea.vim.option;
 
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.vimscript.model.commands.SetCommand;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
 import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import org.apache.commons.lang.math.NumberUtils;
@@ -67,13 +68,17 @@ public final class KeywordOption extends StringListOption {
     this.value.addAll(vals);
     keywordSpecs.addAll(0, specs);
     onChanged(oldValue, getValue());
-    try {
-      String joinedValue = getValue();
-      if (!((VimString)VimPlugin.getOptionService()
-        .getOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, name)).getValue().equals(joinedValue)) {
-        VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, new VimString(joinedValue), name);
+    // we won't use OptionService if the method was invoked during set command execution (set command will call OptionService by itself)
+    if (!SetCommand.Companion.isExecutingCommand$IdeaVIM()) {
+      try {
+        String joinedValue = getValue();
+        if (!((VimString)VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, name)).getValue().equals(joinedValue)) {
+          VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, new VimString(joinedValue), name);
+        }
       }
-    } catch (Exception e) {}
+      catch (Exception e) {
+      }
+    }
     return true;
   }
 

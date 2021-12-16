@@ -41,12 +41,18 @@ import kotlin.math.min
 data class SetCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
+  companion object {
+    internal var isExecutingCommand = false
+  }
+
   override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
+    isExecutingCommand = true
     try {
       OptionsManager.parseOptionLine(editor, argument, true)
     } catch (e: ExException) {
       // same exceptions will be thrown later, so we ignore them for now
     }
+    isExecutingCommand = false
     return if (parseOptionLine(editor, argument, OptionService.Scope.GLOBAL, failOnBad = true)) {
       ExecutionResult.Success
     } else {

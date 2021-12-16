@@ -20,6 +20,7 @@ package com.maddyhome.idea.vim.option;
 
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.helper.VimNlsSafe;
+import com.maddyhome.idea.vim.vimscript.model.commands.SetCommand;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt;
 import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import org.jetbrains.annotations.ApiStatus;
@@ -93,11 +94,16 @@ public class ToggleOption extends Option<Boolean> {
     if (val != old) {
       onChanged(old, val);
     }
-    try {
-      if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL.INSTANCE, name, name) != val) {
-        VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, new VimInt(val ? 1 : 0), name);
+    // we won't use OptionService if the method was invoked during set command execution (set command will call OptionService by itself)
+    if (!SetCommand.Companion.isExecutingCommand$IdeaVIM()) {
+      try {
+        if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL.INSTANCE, name, name) != val) {
+          VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, new VimInt(val ? 1 : 0), name);
+        }
       }
-    } catch (Exception e) {}
+      catch (Exception e) {
+      }
+    }
 }
 
   /**
