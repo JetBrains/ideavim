@@ -278,10 +278,12 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   fun `test adding new caret below`() {
-    configureByText("""
+    configureByText(
+      """
       |${c}I found it in a legendary land
       |all rocks and lavender and tufted grass,
-    """.trimMargin())
+    """.trimMargin()
+    )
     KeyHandler.executeAction("EditorCloneCaretBelow", EditorDataContext.init(myFixture.editor))
     TestCase.assertEquals(2, myFixture.editor.caretModel.caretCount)
     assertCaretVisualAttributes("BLOCK", 0f)

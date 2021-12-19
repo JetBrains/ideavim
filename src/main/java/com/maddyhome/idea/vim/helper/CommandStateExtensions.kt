@@ -137,8 +137,7 @@ fun CommandState.pushVisualMode(subMode: CommandState.SubMode, prevMode: Command
   if (prevMode.inSingleMode) {
     popModes()
     pushModes(CommandState.Mode.INSERT_VISUAL, subMode)
-  }
-  else {
+  } else {
     pushModes(CommandState.Mode.VISUAL, subMode)
   }
 }
@@ -147,8 +146,7 @@ fun CommandState.pushSelectMode(subMode: CommandState.SubMode, prevMode: Command
   if (prevMode.inSingleMode) {
     popModes()
     pushModes(CommandState.Mode.INSERT_SELECT, subMode)
-  }
-  else {
+  } else {
     pushModes(CommandState.Mode.SELECT, subMode)
   }
 }
