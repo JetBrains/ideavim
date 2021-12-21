@@ -18,8 +18,9 @@
 
 package com.maddyhome.idea.vim.common
 
-import com.intellij.ide.bookmarks.Bookmark
-import com.intellij.ide.bookmarks.BookmarkManager
+import com.intellij.ide.bookmark.BookmarkType
+import com.intellij.ide.bookmark.BookmarksManager
+import com.intellij.ide.bookmark.LineBookmark
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.project.Project
@@ -79,11 +80,11 @@ data class VimMark(
   }
 }
 
-class IntellijMark(bookmark: Bookmark, override val col: Int, project: Project?) : Mark {
+class IntellijMark(bookmark: LineBookmark, override val col: Int, project: Project?) : Mark {
 
   private val project: WeakReference<Project?> = WeakReference(project)
 
-  override val key = bookmark.mnemonic
+  override val key = BookmarksManager.getInstance(project)?.getType(bookmark)?.mnemonic!!
   override val logicalLine: Int
     get() = getMark()?.line ?: 0
   override val filename: String
@@ -91,14 +92,16 @@ class IntellijMark(bookmark: Bookmark, override val col: Int, project: Project?)
   override val protocol: String
     get() = getMark()?.file?.let { MarkGroup.extractProtocol(it) } ?: ""
 
-  override fun isClear(): Boolean = getMark()?.isValid?.not() ?: false
+  override fun isClear(): Boolean = getMark() == null
   override fun clear() {
     val mark = getMark() ?: return
-    getProject()?.let { project -> BookmarkManager.getInstance(project).removeBookmark(mark) }
+    getProject()?.let { project -> BookmarksManager.getInstance(project)?.remove(mark) }
   }
 
-  private fun getMark(): Bookmark? =
-    getProject()?.let { project -> BookmarkManager.getInstance(project).findBookmarkForMnemonic(key) }
+  private fun getMark(): LineBookmark? =
+    getProject()?.let {
+        project -> BookmarksManager.getInstance(project)?.getBookmark(BookmarkType.get(key)) as? LineBookmark
+    }
 
   private fun getProject(): Project? {
     val proj = project.get() ?: return null

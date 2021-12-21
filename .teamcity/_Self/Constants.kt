@@ -14,7 +14,7 @@ object Constants {
   const val PROPERTY_TESTS = "LATEST-EAP-SNAPSHOT"
   const val LONG_RUNNING_TESTS = "LATEST-EAP-SNAPSHOT"
   const val QODANA_TESTS = "LATEST-EAP-SNAPSHOT"
-  const val RELEASE = "2021.2.2"
+  const val RELEASE = "2021.3"
   const val RELEASE_DEV = "LATEST-EAP-SNAPSHOT"
   const val RELEASE_EAP = "LATEST-EAP-SNAPSHOT"
 }
