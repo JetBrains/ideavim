@@ -17,7 +17,8 @@
  */
 package org.jetbrains.plugins.ideavim
 
-import com.intellij.ide.bookmark.BookmarksManager
+import com.intellij.ide.bookmarks.Bookmark
+import com.intellij.ide.bookmarks.BookmarkManager
 import com.intellij.ide.highlighter.JavaFileType
 import com.intellij.ide.highlighter.XmlFileType
 import com.intellij.json.JsonFileType
@@ -77,6 +78,7 @@ import com.maddyhome.idea.vim.vimscript.services.OptionService
 import com.maddyhome.idea.vim.vimscript.services.VariableServiceImpl
 import org.assertj.core.api.Assertions
 import org.junit.Assert
+import java.util.function.Consumer
 import javax.swing.KeyStroke
 
 /**
@@ -127,10 +129,8 @@ abstract class VimTestCase : UsefulTestCase() {
   override fun tearDown() {
     val swingTimer = swingTimer
     swingTimer?.stop()
-    val bookmarksManager = BookmarksManager.getInstance(myFixture.project)
-    bookmarksManager?.bookmarks?.forEach { bookmark ->
-      bookmarksManager.remove(bookmark)
-    }
+    val bookmarkManager = BookmarkManager.getInstance(myFixture.project)
+    bookmarkManager.validBookmarks.forEach(Consumer { bookmark: Bookmark? -> bookmarkManager.removeBookmark(bookmark!!) })
     SelectionVimListenerSuppressor.lock().use { myFixture.tearDown() }
     ExEntryPanel.getInstance().deactivate(false)
     (VimPlugin.getVariableService() as VariableServiceImpl).clear()
