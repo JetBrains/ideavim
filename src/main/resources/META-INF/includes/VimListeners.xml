@@ -18,8 +18,8 @@
     <listener class="com.maddyhome.idea.vim.listener.IdeaSpecifics$VimTemplateManagerListener"
               topic="com.intellij.codeInsight.template.TemplateManagerListener"/>
 
-    <listener class="com.maddyhome.idea.vim.group.MarkGroup$MarkListener"
-              topic="com.intellij.ide.bookmarks.BookmarksListener"/>
+    <listener class="com.maddyhome.idea.vim.group.MarkGroup$VimBookmarksListener"
+              topic="com.intellij.ide.bookmark.BookmarksListener"/>
 
     <listener class="com.maddyhome.idea.vim.listener.IdeaSpecifics$VimFindModelListener"
               topic="com.intellij.find.FindModelListener"/>
