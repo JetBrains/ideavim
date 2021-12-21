@@ -27,6 +27,8 @@ usual beta standards.
 
 ### Fixes:
 * [VIM-2502](https://youtrack.jetbrains.com/issue/VIM-2502) Fix the shape of new carets
+* [VIM-2499](https://youtrack.jetbrains.com/issue/VIM-2499) Fix mapping to esc
+* [VIM-2500](https://youtrack.jetbrains.com/issue/VIM-2500) Fix esc for normal mode
 
 ## 1.9.0, 2021-12-10
 
