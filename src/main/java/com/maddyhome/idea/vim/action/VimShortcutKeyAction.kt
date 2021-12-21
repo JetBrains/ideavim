@@ -198,7 +198,7 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
 
   private fun isEnabledForEscape(editor: Editor): Boolean {
     val ideaVimSupportValue = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.LOCAL(editor), "ideavimsupport") as VimString).value
-    return editor.isPrimaryEditor() && !editor.inNormalMode ||
+    return editor.isPrimaryEditor() ||
       EditorHelper.isFileEditor(editor) && !editor.inNormalMode ||
       ideaVimSupportValue.contains("dialog") && !editor.inNormalMode
   }
