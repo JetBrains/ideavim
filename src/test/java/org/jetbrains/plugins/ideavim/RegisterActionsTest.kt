@@ -43,7 +43,7 @@ class RegisterActionsTest : VimTestCase() {
     }
     val keys = StringHelper.parseKeys("jklwB") // just random keys
     val before = "I ${c}found it in a legendary land"
-    val after = "I ${c}found it in a legendary land"
+    val after = "I jklwB${c}found it in a legendary land"
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
       VimPlugin.setEnabled(false)
     }

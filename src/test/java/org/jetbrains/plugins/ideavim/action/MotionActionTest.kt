@@ -21,6 +21,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.helper.vimCommandState
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -63,6 +64,19 @@ class MotionActionTest : VimTestCase() {
     doTest(listOf("f", "<Esc>", "<Esc>"), content, content, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     assertPluginError(true)
     assertOffset(2)
+  }
+
+  fun testEscapeInCommandAndNumber() {
+    val content = """
+     on${c}e two
+     three
+     
+    """.trimIndent()
+    doTest(listOf("12", "<Esc>"), content, content, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    assertPluginError(false)
+    val vimCommandState = myFixture.editor.vimCommandState
+    kotlin.test.assertNotNull(vimCommandState)
+    assertEmpty(vimCommandState.commandBuilder.keys.toList())
   }
 
   // |h| |l|

@@ -21,6 +21,7 @@
 package org.jetbrains.plugins.ideavim.group.visual
 
 import com.intellij.codeInsight.lookup.Lookup
+import com.intellij.codeInsight.lookup.LookupManager
 import com.intellij.codeInsight.template.TemplateManager
 import com.intellij.codeInsight.template.impl.TemplateManagerImpl
 import com.intellij.ide.DataManager
@@ -150,6 +151,7 @@ class TemplateTest : VimOptionTestCase(IdeaRefactorMode.name) {
     waitAndAssertMode(myFixture, CommandState.Mode.SELECT)
     assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
 
+    LookupManager.hideActiveLookup(myFixture.project)
     typeText(parseKeys("<Left>"))
     assertState(CommandState.Mode.INSERT, CommandState.SubMode.NONE)
     typeText(parseKeys("pre", "<CR>"))
@@ -182,6 +184,7 @@ class TemplateTest : VimOptionTestCase(IdeaRefactorMode.name) {
     waitAndAssertMode(myFixture, CommandState.Mode.SELECT)
     assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
 
+    LookupManager.hideActiveLookup(myFixture.project)
     typeText(parseKeys("<Right>"))
     assertState(CommandState.Mode.INSERT, CommandState.SubMode.NONE)
     assertState(
@@ -211,6 +214,7 @@ class TemplateTest : VimOptionTestCase(IdeaRefactorMode.name) {
     waitAndAssertMode(myFixture, CommandState.Mode.SELECT)
     assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
 
+    LookupManager.hideActiveLookup(myFixture.project)
     typeText(parseKeys("<Left>"))
     assertState(CommandState.Mode.INSERT, CommandState.SubMode.NONE)
     assertState(
@@ -240,6 +244,7 @@ class TemplateTest : VimOptionTestCase(IdeaRefactorMode.name) {
     waitAndAssertMode(myFixture, CommandState.Mode.SELECT)
     assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
 
+    LookupManager.hideActiveLookup(myFixture.project)
     typeText(parseKeys("<Right>"))
     assertState(CommandState.Mode.INSERT, CommandState.SubMode.NONE)
     assertState(

@@ -29,6 +29,9 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 class InsertTabActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.MULTICARET)
   fun `test insert tab`() {
+    setupChecks {
+      keyHandler = Checks.KeyHandlerMethod.DIRECT_TO_VIM
+    }
     val before = "I fo${c}und it in a legendary land"
     val after = "I fo    ${c}und it in a legendary land"
     configureByText(before)
@@ -40,6 +43,9 @@ class InsertTabActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test insert tab scrolls at end of line`() {
+    setupChecks {
+      keyHandler = Checks.KeyHandlerMethod.DIRECT_TO_VIM
+    }
     VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "sidescrolloff", VimInt(10))
     configureByColumns(200)
 

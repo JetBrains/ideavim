@@ -21,6 +21,10 @@ import com.intellij.ide.bookmark.BookmarksManager
 import com.intellij.ide.highlighter.JavaFileType
 import com.intellij.ide.highlighter.XmlFileType
 import com.intellij.json.JsonFileType
+import com.intellij.openapi.actionSystem.ActionManager
+import com.intellij.openapi.actionSystem.ActionPlaces
+import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.actionSystem.ex.ActionUtil
 import com.intellij.openapi.application.PathManager
 import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.editor.Editor
@@ -43,6 +47,7 @@ import com.intellij.testFramework.fixtures.impl.LightTempDirTestFixtureImpl
 import com.intellij.util.ThrowableRunnable
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.action.VimShortcutKeyAction
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.CommandState.SubMode
 import com.maddyhome.idea.vim.command.MappingMode
@@ -77,6 +82,8 @@ import com.maddyhome.idea.vim.vimscript.services.OptionService
 import com.maddyhome.idea.vim.vimscript.services.VariableServiceImpl
 import org.assertj.core.api.Assertions
 import org.junit.Assert
+import java.awt.event.KeyEvent
+import java.util.*
 import javax.swing.KeyStroke
 
 /**
@@ -262,7 +269,10 @@ abstract class VimTestCase : UsefulTestCase() {
     NeovimTesting.typeCommand(keys.filterNotNull().joinToString(separator = "") { toKeyNotation(it) }, this)
     val editor = myFixture.editor
     val project = myFixture.project
-    typeText(keys, editor, project)
+    when (Checks.keyHandler) {
+        Checks.KeyHandlerMethod.DIRECT_TO_VIM -> typeText(keys, editor, project)
+        Checks.KeyHandlerMethod.VIA_IDE -> typeTextViaIde(keys, editor)
+    }
     return editor
   }
 
@@ -620,6 +630,29 @@ abstract class VimTestCase : UsefulTestCase() {
     }
   }
 
+  private fun typeTextViaIde(keys: List<KeyStroke?>, editor: Editor) {
+    TestInputModel.getInstance(editor).setKeyStrokes(keys)
+
+    val inputModel = TestInputModel.getInstance(editor)
+    var key = inputModel.nextKeyStroke()
+    while (key != null) {
+      val keyChar = key.keyChar
+      if (keyChar != KeyEvent.CHAR_UNDEFINED) {
+        myFixture.type(keyChar)
+      } else {
+        val event =
+          KeyEvent(editor.component, KeyEvent.KEY_PRESSED, Date().time, key.modifiers, key.keyCode, key.keyChar)
+
+        val e = AnActionEvent(event, EditorDataContext.init(editor), ActionPlaces.KEYBOARD_SHORTCUT, VimShortcutKeyAction.instance.templatePresentation,
+          ActionManager.getInstance(), 0)
+        if (ActionUtil.lastUpdateAndCheckDumb(VimShortcutKeyAction.instance, e, true)) {
+          ActionUtil.performActionDumbAwareWithCallbacks(VimShortcutKeyAction.instance, e)
+        }
+      }
+      key = inputModel.nextKeyStroke()
+    }
+  }
+
   companion object {
     const val c = EditorTestUtil.CARET_TAG
     const val s = EditorTestUtil.SELECTION_START_TAG
@@ -674,10 +707,13 @@ abstract class VimTestCase : UsefulTestCase() {
 
     val neoVim = NeoVim()
 
+    var keyHandler = KeyHandlerMethod.VIA_IDE
+
     fun reset() {
       caretShape = true
 
       neoVim.reset()
+      keyHandler = KeyHandlerMethod.VIA_IDE
     }
 
     class NeoVim {
@@ -688,6 +724,11 @@ abstract class VimTestCase : UsefulTestCase() {
         ignoredRegisters = setOf()
         exitOnTearDown = true
       }
+    }
+
+    enum class KeyHandlerMethod {
+      VIA_IDE,
+      DIRECT_TO_VIM,
     }
   }
 }

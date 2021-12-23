@@ -54,7 +54,7 @@ class CommandParserTest : VimTestCase() {
     }
     val keys = commandToKeys(">>")
     val before = "I ${c}found it in a legendary land"
-    val after = "I ${c}found it in a legendary land"
+    val after = "I :>>${c}found it in a legendary land"
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
       VimPlugin.setEnabled(false)
     }
