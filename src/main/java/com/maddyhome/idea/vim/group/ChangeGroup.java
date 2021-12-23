@@ -101,7 +101,7 @@ public class ChangeGroup {
 
   private final List<VimInsertListener> insertListeners = ContainerUtil.createLockFreeCopyOnWriteList();
 
-  private void setInsertRepeat(int lines, int column, boolean append) {
+  public void setInsertRepeat(int lines, int column, boolean append) {
     repeatLines = lines;
     repeatColumn = column;
     repeatAppend = append;
@@ -1135,11 +1135,46 @@ public class ChangeGroup {
 
   public @Nullable Pair<TextRange, SelectionType> getDeleteRangeAndType(@NotNull Editor editor,
                                                                         @NotNull Caret caret,
-                                                                        @NotNull DataContext context, final @NotNull Argument argument,
+                                                                        @NotNull DataContext context,
+                                                                        final @NotNull Argument argument,
                                                                         boolean isChange,
                                                                         @NotNull OperatorArguments operatorArguments) {
     final TextRange range =
       MotionGroup.getMotionRange(editor, caret, context, argument, operatorArguments);
+    if (range == null) return null;
+
+    // Delete motion commands that are not linewise become linewise if all the following are true:
+    // 1) The range is across multiple lines
+    // 2) There is only whitespace before the start of the range
+    // 3) There is only whitespace after the end of the range
+    SelectionType type;
+    if (argument.getMotion().isLinewiseMotion()) {
+      type = SelectionType.LINE_WISE;
+    }
+    else {
+      type = SelectionType.CHARACTER_WISE;
+    }
+    final Command motion = argument.getMotion();
+    if (!isChange && !motion.isLinewiseMotion()) {
+      LogicalPosition start = editor.offsetToLogicalPosition(range.getStartOffset());
+      LogicalPosition end = editor.offsetToLogicalPosition(range.getEndOffset());
+      if (start.line != end.line) {
+        if (!SearchHelper.anyNonWhitespace(editor, range.getStartOffset(), -1) &&
+            !SearchHelper.anyNonWhitespace(editor, range.getEndOffset(), 1)) {
+          type = SelectionType.LINE_WISE;
+        }
+      }
+    }
+    return new Pair<>(range, type);
+  }
+
+  public @Nullable Pair<TextRange, SelectionType> getDeleteRangeAndType2(@NotNull Editor editor,
+                                                                         @NotNull Caret caret,
+                                                                         @NotNull DataContext context,
+                                                                         final @NotNull Argument argument,
+                                                                         boolean isChange,
+                                                                         @NotNull OperatorArguments operatorArguments) {
+    final TextRange range = MotionGroup.getMotionRange2(editor, caret, context, argument, operatorArguments);
     if (range == null) return null;
 
     // Delete motion commands that are not linewise become linewise if all the following are true:
@@ -1338,11 +1373,19 @@ public class ChangeGroup {
       }
     }
 
-    Pair<TextRange, SelectionType> deleteRangeAndType =
-      getDeleteRangeAndType(editor, caret, context, argument, true, operatorArguments.withCount0(count0));
-    if (deleteRangeAndType == null) return false;
-
-    return changeRange(editor, caret, deleteRangeAndType.getFirst(), deleteRangeAndType.getSecond(), context);
+    if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL.INSTANCE, "experimentalapi", "experimentalapi")) {
+      Pair<TextRange, SelectionType> deleteRangeAndType =
+        getDeleteRangeAndType2(editor, caret, context, argument, true, operatorArguments.withCount0(count0));
+      if (deleteRangeAndType == null) return false;
+      ChangeGroupKt.changeRange(editor, caret, deleteRangeAndType.getFirst(), deleteRangeAndType.getSecond(), context);
+      return true;
+    }
+    else {
+      Pair<TextRange, SelectionType> deleteRangeAndType =
+        getDeleteRangeAndType(editor, caret, context, argument, true, operatorArguments.withCount0(count0));
+      if (deleteRangeAndType == null) return false;
+      return changeRange(editor, caret, deleteRangeAndType.getFirst(), deleteRangeAndType.getSecond(), context);
+    }
   }
 
   /**
@@ -1354,7 +1397,7 @@ public class ChangeGroup {
    * @param range  The range corresponding to the selected block
    * @return total number of lines
    */
-  private static int getLinesCountInVisualBlock(@NotNull Editor editor, @NotNull TextRange range) {
+  static int getLinesCountInVisualBlock(@NotNull Editor editor, @NotNull TextRange range) {
     final int[] startOffsets = range.getStartOffsets();
     if (startOffsets.length == 0) return 0;
     final LogicalPosition firstStart = editor.offsetToLogicalPosition(startOffsets[0]);

@@ -46,12 +46,10 @@ import com.maddyhome.idea.vim.handler.MotionActionHandlerKt;
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.listener.AppCodeTemplates;
-import com.maddyhome.idea.vim.listener.IdeaSpecifics;
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt;
 import com.maddyhome.idea.vim.vimscript.model.options.LocalOptionChangeListener;
-import com.maddyhome.idea.vim.vimscript.model.options.OptionChangeListener;
 import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import kotlin.Pair;
 import kotlin.ranges.IntProgression;
@@ -177,6 +175,84 @@ public class MotionGroup {
       if (id.equals(VIM_MOTION_WORD_RIGHT) ||
           id.equals(VIM_MOTION_BIG_WORD_RIGHT) ||
           id.equals(VIM_MOTION_CAMEL_RIGHT)) {
+        if (!SearchHelper.anyNonWhitespace(editor, end, -1)) {
+          end = start + lastNewLine;
+        }
+      }
+    }
+
+    return new TextRange(start, end);
+  }
+
+  public static @Nullable TextRange getMotionRange2(@NotNull Editor editor,
+                                                    @NotNull Caret caret,
+                                                    DataContext context,
+                                                    @NotNull Argument argument,
+                                                    @NotNull OperatorArguments operatorArguments) {
+    int start;
+    int end;
+    if (argument.getType() == Argument.Type.OFFSETS) {
+      final VimSelection offsets = argument.getOffsets().get(caret);
+      if (offsets == null) return null;
+
+      final Pair<Integer, Integer> nativeStartAndEnd = offsets.getNativeStartAndEnd();
+      start = nativeStartAndEnd.getFirst();
+      end = nativeStartAndEnd.getSecond();
+    }
+    else {
+      final Command cmd = argument.getMotion();
+      // Normalize the counts between the command and the motion argument
+      int cnt = cmd.getCount() * operatorArguments.getCount1();
+      int raw = operatorArguments.getCount0() == 0 && cmd.getRawCount() == 0 ? 0 : cnt;
+      if (cmd.getAction() instanceof MotionActionHandler) {
+        MotionActionHandler action = (MotionActionHandler)cmd.getAction();
+
+        // This is where we are now
+        start = caret.getOffset();
+
+        // Execute the motion (without moving the cursor) and get where we end
+        Motion motion =
+          action.getHandlerOffset(editor, caret, context, cmd.getArgument(), operatorArguments.withCount0(raw));
+
+        // Invalid motion
+        if (Motion.Error.INSTANCE.equals(motion)) return null;
+        if (Motion.NoMotion.INSTANCE.equals(motion)) return null;
+        end = ((Motion.AbsoluteOffset)motion).getOffset();
+
+        // If inclusive, add the last character to the range
+        if (action.getMotionType() == MotionType.INCLUSIVE && end < EditorHelperRt.getFileSize(editor)) {
+          if (start > end) {
+            start++;
+          }
+          else {
+            end++;
+          }
+        }
+      }
+      else if (cmd.getAction() instanceof TextObjectActionHandler) {
+        TextObjectActionHandler action = (TextObjectActionHandler)cmd.getAction();
+
+        TextRange range = action.getRange(editor, caret, context, cnt, raw, cmd.getArgument());
+
+        if (range == null) return null;
+
+        start = range.getStartOffset();
+        end = range.getEndOffset();
+
+        if (cmd.isLinewiseMotion()) end--;
+      }
+      else {
+        throw new RuntimeException(
+          "Commands doesn't take " + cmd.getAction().getClass().getSimpleName() + " as an operator");
+      }
+    }
+
+    // This is a kludge for dw, dW, and d[w. Without this kludge, an extra newline is operated when it shouldn't be.
+    String id = argument.getMotion().getAction().getId();
+    if (id.equals(VIM_MOTION_WORD_RIGHT) || id.equals(VIM_MOTION_BIG_WORD_RIGHT) || id.equals(VIM_MOTION_CAMEL_RIGHT)) {
+      String text = editor.getDocument().getCharsSequence().subSequence(start, end).toString();
+      final int lastNewLine = text.lastIndexOf('\n');
+      if (lastNewLine > 0) {
         if (!SearchHelper.anyNonWhitespace(editor, end, -1)) {
           end = start + lastNewLine;
         }

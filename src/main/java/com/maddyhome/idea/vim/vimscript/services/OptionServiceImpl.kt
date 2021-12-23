@@ -169,6 +169,8 @@ internal class OptionServiceImpl : OptionService {
         valueAsString.split(",").forEach { GuiCursorOptionHelper.convertToken(it) }
       }
     },
+
+    ToggleOption("experimentalapi", "experimentalapi", false)
   )
   private val globalValues = mutableMapOf<String, VimDataType>()
   private val localValuesKey = Key<MutableMap<String, VimDataType>>("localOptions")
