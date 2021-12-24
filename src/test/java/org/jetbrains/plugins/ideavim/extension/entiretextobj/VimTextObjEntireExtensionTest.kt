@@ -20,6 +20,7 @@ package org.jetbrains.plugins.ideavim.extension.entiretextobj
 
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper
+import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.JavaVimTestCase
 
 /**
@@ -100,12 +101,14 @@ class VimTextObjEntireExtensionTest : JavaVimTestCase() {
     assertSelection(null)
   }
 
+  @VimBehaviorDiffers(originalVimAfter =
+  "\n  \n \n<caret>\n\n  \n \n", description = "Our code changes the motion type to linewise, but it should not")
   // |d| |ae|
   fun testDeleteEntireBufferIgnoreLeadingTrailing() {
     doTest(
       StringHelper.parseKeys("die"),
       "\n  \n \n${poem}\n  \n \n",
-      "\n  \n \n<caret>\n\n  \n \n"
+      "\n  \n \n<caret>\n  \n \n"
     ) // additional \n because poem ends with a \n
     assertMode(CommandState.Mode.COMMAND)
     assertSelection(null)

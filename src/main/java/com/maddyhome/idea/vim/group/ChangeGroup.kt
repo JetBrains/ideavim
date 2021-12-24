@@ -30,6 +30,9 @@ import com.maddyhome.idea.vim.common.editor.IjVimEditor
 import com.maddyhome.idea.vim.common.editor.OperatedRange
 import com.maddyhome.idea.vim.common.editor.VimMachine
 import com.maddyhome.idea.vim.common.editor.toVimRange
+import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.fileSize
+import com.maddyhome.idea.vim.helper.inlayAwareVisualColumn
 import com.maddyhome.idea.vim.helper.vimChangeActionSwitchMode
 import com.maddyhome.idea.vim.helper.vimLastColumn
 
@@ -79,4 +82,41 @@ fun changeRange(
   } else {
     VimPlugin.getChange().insertBeforeCursor(editor, context)
   }
+}
+
+fun deleteRange(
+  editor: Editor,
+  caret: Caret,
+  range: TextRange,
+  type: SelectionType,
+): Boolean {
+  val vimEditor = IjVimEditor(editor)
+  val vimRange = toVimRange(range, type)
+
+  val vimCaret = IjVimCaret(caret)
+  vimCaret.caret.vimLastColumn = vimCaret.caret.inlayAwareVisualColumn
+  val deletedInfo = VimMachine.instance.delete(vimRange, vimEditor, vimCaret)
+  if (deletedInfo != null) {
+    when (deletedInfo) {
+      is OperatedRange.Characters -> {
+        val newOffset = EditorHelper.normalizeOffset(editor, deletedInfo.leftOffset.point, false)
+        vimCaret.moveToOffset(newOffset)
+      }
+      is OperatedRange.Block -> TODO()
+      is OperatedRange.Lines -> {
+        if (deletedInfo.lastNewLineCharMissing) {
+          // TODO: 24.12.2021 Empty line
+          // TODO: 24.12.2021 keep caret offset
+          val lineStartOffset = editor.document.getLineStartOffset(deletedInfo.lineAbove)
+          if (lineStartOffset > 0 && lineStartOffset - 1 < editor.fileSize && editor.document.charsSequence[lineStartOffset - 1] == '\n') {
+            editor.document.deleteString(lineStartOffset - 1, lineStartOffset)
+          }
+          vimCaret.moveAtTextLineStart(deletedInfo.lineAbove - 1)
+        } else {
+          vimCaret.moveAtTextLineStart(deletedInfo.lineAbove)
+        }
+      }
+    }
+  }
+  return deletedInfo != null
 }

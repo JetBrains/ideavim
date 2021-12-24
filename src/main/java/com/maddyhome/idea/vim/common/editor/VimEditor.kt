@@ -119,6 +119,7 @@ class IjVimEditor(val editor: Editor) : VimEditor {
 interface VimCaret {
   fun moveToOffset(offset: Int)
   fun moveAtLineStart(line: Int)
+  fun moveAtTextLineStart(line: Int)
 }
 
 class IjVimCaret(val caret: Caret) : VimCaret {
@@ -127,9 +128,14 @@ class IjVimCaret(val caret: Caret) : VimCaret {
     MotionGroup.moveCaret(caret.editor, caret, offset)
   }
 
-  // TODO: 23.12.2021 moveCaretToLineWithStartOfLineOption
   override fun moveAtLineStart(line: Int) {
-    val offset = caret.editor.document.getLineStartOffset(line)
+    val offset = VimPlugin.getMotion().moveCaretToLineWithStartOfLineOption(caret.editor, line, caret)
+    MotionGroup.moveCaret(caret.editor, caret, offset)
+  }
+
+  // TODO: 24.12.2021 This is not really text start. It may keep the caret offset
+  override fun moveAtTextLineStart(line: Int) {
+    val offset = VimPlugin.getMotion().moveCaretToLineWithStartOfLineOption(caret.editor, line, caret)
     MotionGroup.moveCaret(caret.editor, caret, offset)
   }
 }
