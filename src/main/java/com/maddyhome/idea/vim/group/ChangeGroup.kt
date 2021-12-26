@@ -65,7 +65,7 @@ fun changeRange(
       vimCaret.moveAtLineStart(deletedInfo.lineAbove)
       VimPlugin.getChange().insertBeforeCursor(editor, context)
     } else {
-      when(deletedInfo) {
+      when (deletedInfo) {
         is OperatedRange.Characters -> {
           vimCaret.moveToOffset(deletedInfo.leftOffset.point)
         }

@@ -270,8 +270,8 @@ abstract class VimTestCase : UsefulTestCase() {
     val editor = myFixture.editor
     val project = myFixture.project
     when (Checks.keyHandler) {
-        Checks.KeyHandlerMethod.DIRECT_TO_VIM -> typeText(keys, editor, project)
-        Checks.KeyHandlerMethod.VIA_IDE -> typeTextViaIde(keys, editor)
+      Checks.KeyHandlerMethod.DIRECT_TO_VIM -> typeText(keys, editor, project)
+      Checks.KeyHandlerMethod.VIA_IDE -> typeTextViaIde(keys, editor)
     }
     return editor
   }
@@ -643,8 +643,10 @@ abstract class VimTestCase : UsefulTestCase() {
         val event =
           KeyEvent(editor.component, KeyEvent.KEY_PRESSED, Date().time, key.modifiers, key.keyCode, key.keyChar)
 
-        val e = AnActionEvent(event, EditorDataContext.init(editor), ActionPlaces.KEYBOARD_SHORTCUT, VimShortcutKeyAction.instance.templatePresentation,
-          ActionManager.getInstance(), 0)
+        val e = AnActionEvent(
+          event, EditorDataContext.init(editor), ActionPlaces.KEYBOARD_SHORTCUT, VimShortcutKeyAction.instance.templatePresentation,
+          ActionManager.getInstance(), 0
+        )
         if (ActionUtil.lastUpdateAndCheckDumb(VimShortcutKeyAction.instance, e, true)) {
           ActionUtil.performActionDumbAwareWithCallbacks(VimShortcutKeyAction.instance, e)
         }

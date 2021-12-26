@@ -73,10 +73,12 @@ class ChangeLineActionTest : VimTestCase() {
       "S",
       """
             I found it in a legendary land
-            all ${c}rocks and lavender and tufted grass,""".trimIndent(),
+            all ${c}rocks and lavender and tufted grass,
+      """.trimIndent(),
       """
             I found it in a legendary land
-            $c""".trimIndent(),
+            $c
+      """.trimIndent(),
       CommandState.Mode.INSERT, CommandState.SubMode.NONE
     )
   }
