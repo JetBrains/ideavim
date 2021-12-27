@@ -43,6 +43,23 @@ class ChangeMotionActionTest : VimTestCase() {
     )
   }
 
+  // VIM-296 |cc|
+  fun testChangeLineWithIndent() {
+    doTest(
+      "cc",
+      """
+        fun main {
+            ${c}bar
+        }
+        """.trimIndent(),
+      """
+        fun main {
+            ${c}
+        }
+        """.trimIndent(), CommandState.Mode.INSERT, CommandState.SubMode.NONE
+    )
+  }
+
   // VIM-536 |cc|
   fun testChangeLineAtSecondLastLine() {
     doTest(
