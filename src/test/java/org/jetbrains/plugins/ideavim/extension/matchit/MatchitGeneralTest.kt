@@ -20,8 +20,10 @@ package org.jetbrains.plugins.ideavim.extension.matchit
 
 import com.intellij.ide.highlighter.HtmlFileType
 import com.intellij.ide.highlighter.JavaFileType
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
+import com.maddyhome.idea.vim.vimscript.services.OptionService
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -209,12 +211,24 @@ class MatchitGeneralTest : VimTestCase() {
           puts "Positive"
         end
       """.trimIndent(),
-      """
+      if (VimPlugin.getOptionService()
+          .isSet(OptionService.Scope.GLOBAL, "experimentalapi", "experimentalapi")
+      ) {
+        """
         if x == 0
           puts "Zero"
           puts "Positive"
         end
-      """.trimIndent(),
+      """.trimIndent()
+      } else {
+        """
+              if x == 0
+                puts "Zero"
+              $c
+                puts "Positive"
+              end
+             """.trimIndent()
+      },
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
