@@ -149,18 +149,12 @@ class IjVimEditor(val editor: Editor) : MutableLinearEditor() {
 
 interface VimCaret {
   fun moveToOffset(offset: Int)
-  fun moveAtLineStart(line: Int)
   fun moveAtTextLineStart(line: Int)
 }
 
 class IjVimCaret(val caret: Caret) : VimCaret {
   override fun moveToOffset(offset: Int) {
     // TODO: 17.12.2021 Unpack internal actions
-    MotionGroup.moveCaret(caret.editor, caret, offset)
-  }
-
-  override fun moveAtLineStart(line: Int) {
-    val offset = VimPlugin.getMotion().moveCaretToLineWithStartOfLineOption(caret.editor, line, caret)
     MotionGroup.moveCaret(caret.editor, caret, offset)
   }
 

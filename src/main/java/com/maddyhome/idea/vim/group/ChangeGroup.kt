@@ -65,7 +65,7 @@ fun changeRange(
       if (!deletedInfo.lastNewLineCharMissing) {
         vimEditor.addLine(deletedInfo.lineAbove)
       }
-      vimCaret.moveAtLineStart(deletedInfo.lineAbove)
+      vimCaret.moveAtTextLineStart(deletedInfo.lineAbove)
       VimPlugin.getChange().insertBeforeCursor(editor, context)
     } else {
       when (deletedInfo) {
