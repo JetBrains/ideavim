@@ -25,9 +25,11 @@ import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.MarkGroup
 import com.maddyhome.idea.vim.group.MotionGroup
+import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.fileSize
 import com.maddyhome.idea.vim.helper.inlayAwareVisualColumn
 import com.maddyhome.idea.vim.helper.vimLastColumn
+import com.maddyhome.idea.vim.vimscript.services.OptionService.Scope.LOCAL
 import kotlin.math.max
 import kotlin.math.min
 
@@ -35,10 +37,39 @@ import kotlin.math.min
  * Every line in [VimEditor] ends with a new line
  * TODO: What are the rules about the last actual line without the new line character?
  * TODO: Minimize the amount of methods to implement
+ *
+ * # New line and line count
+ *
+ * In vim **every** line always ends with a new line character. If you'll open a file that doesn't end with
+ *   a new line and save it without a modification, the new line character will be automatically added.
+ * This is not how the most editors work. The file and the line may end without a new character symbol.
+ * This affects a [lineCount] function. A three-lines file in vim contains four lines in other editors.
+ * Also this complicated deletion logic.
+ *
+ * At the moment, we consider a what-user-sees approach. A file with two lines where every line ends with
+ *   a new line character, is considered as a three-lines file because it's represented in the editor like this.
+ *
+ * TODO: We should understand what logic changes if we use a two or three lines editors.
  */
 interface VimEditor {
+
+  val lfMakesNewLine: Boolean
+
   fun deleteDryRun(range: VimRange): OperatedRange?
   fun fileSize(): Long
+
+  // TODO: 28.12.2021 Vim always has at least one line!!
+  //   Edit: seems like it's not true. Need to recheck it with neovim
+  //   Edit: ctrl-g shows "No Lines" for empty buffer
+  fun lineCount(): Int
+
+  fun getLineRange(line: Int): Pair<Inclusive, Exclusive>
+  fun charAt(offset: Int): Char
+}
+
+fun VimEditor.indentForLine(line: Int): Int {
+  val editor = (this as IjVimEditor).editor
+  return EditorHelper.getLeadingCharacterOffset(editor, line)
 }
 
 interface MutableVimEditor {
@@ -49,13 +80,12 @@ interface MutableVimEditor {
    *   will be called before [delete]?
    */
   fun delete(range: VimRange)
-  fun addLine(atPosition: Int): Boolean
+  fun addLine(atPosition: EditorLine.Exclusive): EditorLine.Inclusive?
+  fun insertText(atPosition: Exclusive, text: CharSequence)
 }
 
 abstract class LinearEditor : VimEditor {
-  abstract fun getLineRange(line: Int): Pair<Inclusive, Exclusive>
   abstract fun getLine(offset: Int): Int
-  abstract fun charAt(offset: Int): Char
   abstract fun getText(left: Inclusive, right: Exclusive): CharSequence
 }
 
@@ -76,10 +106,12 @@ abstract class MutableLinearEditor : MutableVimEditor, LinearEditor() {
         deleteRange(startOffset, endOffset)
       }
       is VimRange.Line.Offsets -> {
-        val startOffset = getLineRange(getLine(range.offsetAbove())).first
+        var startOffset = getLineRange(getLine(range.offsetAbove())).first
         var endOffset = getLineRange(getLine(range.offsetBelow())).second
         if (endOffset.point < fileSize() && charAt(endOffset.point) == '\n') {
           endOffset = (endOffset.point + 1).excl
+        } else if (startOffset.point > 0 && lfMakesNewLine) {
+          startOffset = (startOffset.point - 1).incl
         }
         deleteRange(startOffset, endOffset)
       }
@@ -103,31 +135,49 @@ abstract class MutableLinearEditor : MutableVimEditor, LinearEditor() {
       }
       is VimRange.Line.Offsets -> {
         val lineAbove = getLine(range.offsetAbove())
-        val startOffset = getLineRange(lineAbove).first
+        var startOffset = getLineRange(lineAbove).first
         val lineBelow = getLine(range.offsetBelow())
         var endOffset = getLineRange(lineBelow).second
         val endsWithNewLine = endOffset.point < fileSize() && charAt(endOffset.point) == '\n'
         if (endOffset.point < fileSize() && charAt(endOffset.point) == '\n') {
           endOffset = (endOffset.point + 1).excl
+        } else if (startOffset.point > 0 && lfMakesNewLine) {
+          startOffset = (startOffset.point - 1).incl
         }
         val textToDelete = getText(startOffset, endOffset)
-        OperatedRange.Lines(textToDelete, lineAbove, lineBelow, !endsWithNewLine)
+        OperatedRange.Lines(textToDelete, EditorLine.Inclusive.init(lineAbove, this), lineBelow, !endsWithNewLine)
       }
     }
   }
 }
 
 class IjVimEditor(val editor: Editor) : MutableLinearEditor() {
+  override val lfMakesNewLine: Boolean = true
+
   override fun fileSize(): Long = editor.fileSize.toLong()
+
+  // TODO: 28.12.2021 Vim always has at least one line
+  override fun lineCount(): Int {
+    val lineCount = editor.document.lineCount
+    return lineCount.coerceAtLeast(1)
+  }
 
   override fun deleteRange(leftOffset: Inclusive, rightOffset: Exclusive) {
     editor.document.deleteString(leftOffset.point, rightOffset.point)
   }
 
-  override fun addLine(atPosition: Int): Boolean {
-    val offset = editor.document.getLineStartOffset(atPosition)
+  override fun addLine(atPosition: EditorLine.Exclusive): EditorLine.Inclusive {
+    val offset: Int = if (atPosition.line < lineCount()) {
+      editor.document.getLineStartOffset(atPosition.line)
+    } else {
+      fileSize().toInt()
+    }
     editor.document.insertString(offset, "\n")
-    return true
+    return EditorLine.Inclusive.init(atPosition.line, this)
+  }
+
+  override fun insertText(atPosition: Exclusive, text: CharSequence) {
+    editor.document.insertString(atPosition.point, text)
   }
 
   override fun getLineRange(line: Int): Pair<Inclusive, Exclusive> {
@@ -147,21 +197,39 @@ class IjVimEditor(val editor: Editor) : MutableLinearEditor() {
   }
 }
 
+// TODO: 29.12.2021 Split interface to mutable and immutable
 interface VimCaret {
+  val editor: VimEditor
   fun moveToOffset(offset: Int)
-  fun moveAtTextLineStart(line: Int)
+  fun offsetForLineStartSkipLeading(line: Int): Int
+  fun getLine(): Int
 }
 
 class IjVimCaret(val caret: Caret) : VimCaret {
+  override val editor: VimEditor
+    get() = IjVimEditor(caret.editor)
+
   override fun moveToOffset(offset: Int) {
     // TODO: 17.12.2021 Unpack internal actions
     MotionGroup.moveCaret(caret.editor, caret, offset)
   }
 
-  // TODO: 24.12.2021 This is not really text start. It may keep the caret offset
-  override fun moveAtTextLineStart(line: Int) {
-    val offset = VimPlugin.getMotion().moveCaretToLineWithStartOfLineOption(caret.editor, line, caret)
-    MotionGroup.moveCaret(caret.editor, caret, offset)
+  override fun offsetForLineStartSkipLeading(line: Int): Int {
+    return VimPlugin.getMotion().moveCaretToLineStartSkipLeading((editor as IjVimEditor).editor, line)
+  }
+
+  override fun getLine(): Int {
+    return caret.logicalPosition.line
+  }
+}
+
+fun VimCaret.offsetForLineWithStartOfLineOption(logicalLine: EditorLine.Inclusive): Int {
+  val ijEditor = (this.editor as IjVimEditor).editor
+  val caret = (this as IjVimCaret).caret
+  return if (VimPlugin.getOptionService().isSet(LOCAL(ijEditor), "startofline")) {
+    offsetForLineStartSkipLeading(logicalLine.line)
+  } else {
+    VimPlugin.getMotion().moveCaretToLineWithSameColumn(ijEditor, logicalLine.line, caret)
   }
 }
 
@@ -222,7 +290,7 @@ fun OperatedRange.toNormalizedTextRange(editor: Editor): TextRange {
   return when (this) {
     is OperatedRange.Block -> TODO()
     is OperatedRange.Lines -> {
-      val startOffset = editor.document.getLineStartOffset(this.lineAbove)
+      val startOffset = editor.document.getLineStartOffset(this.lineAbove.line)
       val endOffset = editor.document.getLineEndOffset(this.lineBelow)
       TextRange(startOffset, endOffset)
     }
@@ -292,8 +360,42 @@ class VimMachineImpl : VimMachine {
   }
 }
 
+sealed class EditorLine private constructor(val line: Int) {
+  class Inclusive(line: Int) : EditorLine(line) {
+    companion object {
+      fun init(line: Int, forEditor: VimEditor): Inclusive {
+        if (line < 0) error("")
+        if (line >= forEditor.lineCount()) error("")
+        return Inclusive(line)
+      }
+    }
+  }
+  class Exclusive(line: Int) : EditorLine(line) {
+
+    // TODO: 28.12.2021 WARNING, I'm not sure that this method is safe and okay
+    fun toInclusive(forEditor: VimEditor): Inclusive {
+      return Inclusive.init(line, forEditor)
+    }
+
+    fun shrinkToInclusive(forEditor: VimEditor): Inclusive {
+      val newLine = this.line.coerceIn(0 until forEditor.lineCount())
+      return Inclusive.init(newLine, forEditor)
+    }
+
+    companion object {
+      fun init(line: Int, forEditor: VimEditor): Exclusive {
+        if (line < 0) error("")
+        // TODO: 28.12.2021 Is this logic correct?
+        //   IJ has an additional line
+        if (line > forEditor.lineCount()) error("")
+        return Exclusive(line)
+      }
+    }
+  }
+}
+
 sealed class OperatedRange {
-  class Lines(val text: CharSequence, val lineAbove: Int, val lineBelow: Int, val lastNewLineCharMissing: Boolean) : OperatedRange()
+  class Lines(val text: CharSequence, val lineAbove: EditorLine.Inclusive, val lineBelow: Int, val lastNewLineCharMissing: Boolean) : OperatedRange()
   class Characters(val text: CharSequence, val leftOffset: Inclusive, val rightOffset: Inclusive) : OperatedRange()
   class Block : OperatedRange() {
     init {

@@ -54,9 +54,9 @@ class ChangeMotionActionTest : VimTestCase() {
         """.trimIndent(),
       """
         fun main {
-            ${c}
+        ...${c}.
         }
-        """.trimIndent(), CommandState.Mode.INSERT, CommandState.SubMode.NONE
+        """.trimIndent().dotToSpace(), CommandState.Mode.INSERT, CommandState.SubMode.NONE
     )
   }
 

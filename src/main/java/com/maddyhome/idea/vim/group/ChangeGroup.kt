@@ -24,14 +24,18 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.SelectionType
+import com.maddyhome.idea.vim.common.IndentConfig
 import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.common.editor.EditorLine
 import com.maddyhome.idea.vim.common.editor.IjVimCaret
 import com.maddyhome.idea.vim.common.editor.IjVimEditor
 import com.maddyhome.idea.vim.common.editor.OperatedRange
 import com.maddyhome.idea.vim.common.editor.VimMachine
+import com.maddyhome.idea.vim.common.editor.excl
+import com.maddyhome.idea.vim.common.editor.indentForLine
+import com.maddyhome.idea.vim.common.editor.offsetForLineWithStartOfLineOption
 import com.maddyhome.idea.vim.common.editor.toVimRange
 import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.helper.fileSize
 import com.maddyhome.idea.vim.helper.inlayAwareVisualColumn
 import com.maddyhome.idea.vim.helper.vimChangeActionSwitchMode
 import com.maddyhome.idea.vim.helper.vimLastColumn
@@ -58,14 +62,23 @@ fun changeRange(
 
   // Remove the range
   val vimCaret = IjVimCaret(caret)
+  val indent = editor.offsetToLogicalPosition(vimEditor.indentForLine(vimCaret.getLine())).column
   val deletedInfo = VimMachine.instance.delete(vimRange, vimEditor, vimCaret)
   if (deletedInfo != null) {
     if (deletedInfo is OperatedRange.Lines) {
       // Add new line in case of linewise motion
-      if (!deletedInfo.lastNewLineCharMissing) {
-        vimEditor.addLine(deletedInfo.lineAbove)
+      val existingLine = if (vimEditor.fileSize() != 0L) {
+        vimEditor.addLine(EditorLine.Exclusive.init(deletedInfo.lineAbove.line, vimEditor))
+      } else {
+        EditorLine.Inclusive.init(0, vimEditor)
       }
-      vimCaret.moveAtTextLineStart(deletedInfo.lineAbove)
+
+      val offset = vimCaret.offsetForLineWithStartOfLineOption(existingLine)
+      // TODO: 29.12.2021 IndentConfig is not abstract
+      val indentText = IndentConfig.create(editor).createIndentBySize(indent)
+      vimEditor.insertText(offset.excl, indentText)
+      val caretOffset = offset + (indentText.length - 1).coerceAtLeast(0)
+      vimCaret.moveToOffset(caretOffset)
       VimPlugin.getChange().insertBeforeCursor(editor, context)
     } else {
       when (deletedInfo) {
@@ -104,17 +117,9 @@ fun deleteRange(
       }
       is OperatedRange.Block -> TODO()
       is OperatedRange.Lines -> {
-        if (deletedInfo.lastNewLineCharMissing) {
-          // TODO: 24.12.2021 Empty line
-          // TODO: 24.12.2021 keep caret offset
-          val lineStartOffset = editor.document.getLineStartOffset(deletedInfo.lineAbove)
-          if (lineStartOffset > 0 && lineStartOffset - 1 < editor.fileSize && editor.document.charsSequence[lineStartOffset - 1] == '\n') {
-            editor.document.deleteString(lineStartOffset - 1, lineStartOffset)
-          }
-          vimCaret.moveAtTextLineStart(deletedInfo.lineAbove - 1)
-        } else {
-          vimCaret.moveAtTextLineStart(deletedInfo.lineAbove)
-        }
+        val line = EditorLine.Inclusive.init(deletedInfo.lineAbove.line.coerceAtMost(vimEditor.lineCount() - 1), vimEditor)
+        val offset = vimCaret.offsetForLineWithStartOfLineOption(line)
+        vimCaret.moveToOffset(offset)
       }
     }
   }
