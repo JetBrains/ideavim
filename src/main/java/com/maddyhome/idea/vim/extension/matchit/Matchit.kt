@@ -360,7 +360,7 @@ private fun findMatchingPair(editor: Editor, caretOffset: Int, isInOpPending: Bo
   val offset: Int
   var searchParams = getMatchitSearchParams(editor, caretOffset, closingPatternsTable)
   if (searchParams != null) {
-    offset = findOpeningPair(editor, isInOpPending, searchParams)
+    offset = findOpeningPair(editor, searchParams)
     // If the user is on a valid pattern, but we didn't find a matching pair, then the cursor shouldn't move.
     // We return the current caret offset to reflect that case, as opposed to -1 which means the cursor isn't on a
     // valid pattern at all.
@@ -418,7 +418,7 @@ private fun getMatchitSearchParams(editor: Editor, caretOffset: Int, patternsTab
 }
 
 private fun findClosingPair(editor: Editor, isInOpPending: Boolean, searchParams: MatchitSearchParams): Int {
-  val (caretOffset, searchStartOffset, openingPattern, closingPattern, skipComments, skipStrings) = searchParams
+  val (_, searchStartOffset, openingPattern, closingPattern, skipComments, skipStrings) = searchParams
   val chars = editor.document.charsSequence
   val searchSpace = chars.subSequence(searchStartOffset, chars.length)
 
@@ -428,55 +428,46 @@ private fun findClosingPair(editor: Editor, isInOpPending: Boolean, searchParams
 
   // We're looking for the first closing pair that isn't already matched by an opening.
   // As we find opening patterns, we push their offsets to this stack and pop whenever we find a closing pattern,
-  // effectively crossing off that item from our search. We have to track both the start and end of the pattern since
-  // the motion depends on whether we're in op pending mode or not.
-  var closingPairRange: Pair<Int, Int>? = null
-  val unmatchedOpeningPairs: Deque<Pair<Int, Int>> = ArrayDeque()
+  // effectively crossing off that item from our search.
+  val unmatchedOpeningPairs: Deque<Int> = ArrayDeque()
   while (matcher.find()) {
-    val matchStartOffset = searchStartOffset + matcher.start()
-    val matchEndOffset = searchStartOffset + matcher.end()
+    val matchOffset = if (isInOpPending) {
+      searchStartOffset + matcher.end() - 1
+    } else {
+      searchStartOffset + matcher.start()
+    }
 
-    if (matchShouldBeSkipped(editor, matchStartOffset, skipComments, skipStrings)) {
+    if (matchShouldBeSkipped(editor, matchOffset, skipComments, skipStrings)) {
       continue
     }
 
-    val foundOpeningPattern = matcher.group("opening") != null
-    // Middle patterns e.g. "elsif" can appear any number of times between a strict opening and a strict closing.
-    val foundMiddlePattern = foundOpeningPattern && compiledClosingPattern.matcher(matcher.group("opening")).matches()
+    val openingGroup = matcher.group("opening")
+    val foundOpeningPattern = openingGroup != null
+    val foundMiddlePattern = foundOpeningPattern && compiledClosingPattern.matcher(openingGroup).matches()
 
     if (foundMiddlePattern) {
+      // Middle patterns e.g. "elsif" can appear any number of times between a strict opening and a strict closing.
       if (!unmatchedOpeningPairs.isEmpty()) {
         unmatchedOpeningPairs.pop()
-        unmatchedOpeningPairs.push(Pair(matchStartOffset, matchEndOffset))
+        unmatchedOpeningPairs.push(matchOffset)
       } else {
-        closingPairRange = Pair(matchStartOffset, matchEndOffset)
-        break
+        return matchOffset
       }
     } else if (foundOpeningPattern) {
-      unmatchedOpeningPairs.push(Pair(matchStartOffset, matchEndOffset))
+      unmatchedOpeningPairs.push(matchOffset)
     } else {
       // Found a closing pattern
       if (!unmatchedOpeningPairs.isEmpty()) {
         unmatchedOpeningPairs.pop()
       } else {
-        closingPairRange = Pair(matchStartOffset, matchEndOffset)
-        break
+        return matchOffset
       }
     }
   }
-
-  if (closingPairRange != null) {
-    return if (isInOpPending && caretOffset < closingPairRange.first) {
-      closingPairRange.second - 1 // Jump to the last char of the match
-    } else {
-      closingPairRange.first
-    }
-  }
-
   return -1
 }
 
-private fun findOpeningPair(editor: Editor, isInOpPending: Boolean, searchParams: MatchitSearchParams): Int {
+private fun findOpeningPair(editor: Editor, searchParams: MatchitSearchParams): Int {
   val (caretOffset, _, openingPattern, closingPattern, skipComments, skipStrings) = searchParams
   val chars = editor.document.charsSequence
   val searchSpace = chars.subSequence(0, caretOffset)
@@ -485,44 +476,38 @@ private fun findOpeningPair(editor: Editor, isInOpPending: Boolean, searchParams
   val compiledSearchPattern = Pattern.compile(String.format("(?<opening>%s)|(?<closing>%s)", openingPattern, closingPattern))
   val matcher = compiledSearchPattern.matcher(searchSpace)
 
-  val unmatchedOpeningPairs: Deque<Pair<Int, Int>> = ArrayDeque()
+  val unmatchedOpeningPairs: Deque<Int> = ArrayDeque()
   while (matcher.find()) {
-    val matchStartOffset = matcher.start()
-    val matchEndOffset = matcher.end()
+    val matchOffset = matcher.start()
 
-    if (matchShouldBeSkipped(editor, matchStartOffset, skipComments, skipStrings)) {
+    if (matchShouldBeSkipped(editor, matchOffset, skipComments, skipStrings)) {
       continue
     }
 
-    val foundOpeningPattern = matcher.group("opening") != null
-    val foundMiddlePattern = foundOpeningPattern && compiledClosingPattern.matcher(matcher.group("opening")).matches()
+    val openingGroup = matcher.group("opening")
+    val foundOpeningPattern = openingGroup != null
+    val foundMiddlePattern = foundOpeningPattern && compiledClosingPattern.matcher(openingGroup).matches()
 
     if (foundMiddlePattern) {
       if (!unmatchedOpeningPairs.isEmpty()) {
         unmatchedOpeningPairs.pop()
-        unmatchedOpeningPairs.push(Pair(matchStartOffset, matchEndOffset))
+        unmatchedOpeningPairs.push(matchOffset)
       } else {
-        unmatchedOpeningPairs.push(Pair(matchStartOffset, matchEndOffset))
+        unmatchedOpeningPairs.push(matchOffset)
       }
     } else if (foundOpeningPattern) {
-      unmatchedOpeningPairs.push(Pair(matchStartOffset, matchEndOffset))
+      unmatchedOpeningPairs.push(matchOffset)
     } else if (!unmatchedOpeningPairs.isEmpty()) {
       // Found a closing pattern. We check the stack isn't empty to handle malformed code.
       unmatchedOpeningPairs.pop()
     }
   }
 
-  if (!unmatchedOpeningPairs.isEmpty()) {
-    val openingPairRange = unmatchedOpeningPairs.pop()
-
-    return if (isInOpPending && caretOffset < openingPairRange.first) {
-      openingPairRange.second - 1
-    } else {
-      openingPairRange.first
-    }
+  return if (!unmatchedOpeningPairs.isEmpty()) {
+    unmatchedOpeningPairs.pop()
+  } else {
+    -1
   }
-
-  return -1
 }
 
 /**

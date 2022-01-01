@@ -258,6 +258,30 @@ class MatchitGeneralTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
+  fun `test delete from else to elsif with reverse motion`() {
+    doTest(
+      "dg%",
+      """
+        if x == 0
+          puts "Zero"
+        elsif x < -1
+          puts "Negative"
+        ${c}else
+          puts "Positive"
+        end
+      """.trimIndent(),
+      """
+        if x == 0
+          puts "Zero"
+        ${c}lse
+          puts "Positive"
+        end
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+    )
+  }
+
+  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test delete from opening to closing div`() {
     doTest(
       "d%",
