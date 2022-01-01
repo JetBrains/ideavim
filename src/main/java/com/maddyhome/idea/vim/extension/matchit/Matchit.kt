@@ -163,8 +163,8 @@ private data class MatchitPatternsTable(
  * All the information we need to find a match.
  */
 private data class MatchitSearchParams(
-  val caretOffset: Int,
-  val endOfCurrentPattern: Int,
+  val initialPatternStart: Int, // Starting offset of the pattern containing the cursor.
+  val initialPatternEnd: Int,
   val targetOpeningPattern: String,
   val targetClosingPattern: String,
 
@@ -393,15 +393,15 @@ private fun getMatchitSearchParams(editor: Editor, caretOffset: Int, patternsTab
   val targetClosingPattern: String
 
   for ((pattern, searchPair) in patternsTable) {
-    val (searchOffset, backRef) = parsePatternAtOffset(currentLineChars, caretOffset - currentLineStart, pattern)
-    if (searchOffset >= 0) {
+    val (patternOffsets, backRef) = parsePatternAtOffset(currentLineChars, caretOffset - currentLineStart, pattern)
+    if (patternOffsets != null) {
       // HTML attributes are a special case where the cursor is inside of quotes, but we want to jump as if we were
       // anywhere else inside the opening tag.
       val skipComments = !isComment(currentPsiElement)
       val skipQuotes = !isQuoted(currentPsiElement) || isHtmlAttribute(currentPsiElement)
 
       // Substitute any captured back references to the search patterns, if necessary.
-      if (backRef != "") {
+      if (backRef != null) {
         targetOpeningPattern = String.format(searchPair.first, backRef)
         targetClosingPattern = String.format(searchPair.second, backRef)
       } else {
@@ -409,8 +409,10 @@ private fun getMatchitSearchParams(editor: Editor, caretOffset: Int, patternsTab
         targetClosingPattern = searchPair.second
       }
 
-      val endOfCurrentPattern = currentLineStart + searchOffset
-      return MatchitSearchParams(caretOffset, endOfCurrentPattern, targetOpeningPattern, targetClosingPattern, skipComments, skipQuotes)
+      val currentPatternStart = currentLineStart + patternOffsets.first
+      val currentPatternEnd = currentLineStart + patternOffsets.second
+
+      return MatchitSearchParams(currentPatternStart, currentPatternEnd, targetOpeningPattern, targetClosingPattern, skipComments, skipQuotes)
     }
   }
 
@@ -464,13 +466,14 @@ private fun findClosingPair(editor: Editor, isInOpPending: Boolean, searchParams
       }
     }
   }
+
   return -1
 }
 
 private fun findOpeningPair(editor: Editor, searchParams: MatchitSearchParams): Int {
-  val (caretOffset, _, openingPattern, closingPattern, skipComments, skipStrings) = searchParams
+  val (searchEndOffset, _, openingPattern, closingPattern, skipComments, skipStrings) = searchParams
   val chars = editor.document.charsSequence
-  val searchSpace = chars.subSequence(0, caretOffset)
+  val searchSpace = chars.subSequence(0, searchEndOffset)
 
   val compiledClosingPattern = Pattern.compile(closingPattern)
   val compiledSearchPattern = Pattern.compile(String.format("(?<opening>%s)|(?<closing>%s)", openingPattern, closingPattern))
@@ -511,26 +514,28 @@ private fun findOpeningPair(editor: Editor, searchParams: MatchitSearchParams): 
 }
 
 /**
- * If the char sequence at the given offset matches the pattern, this will return the final offset of the match
- * as well as any back references that were captured.
+ * If the char sequence at the given offset matches the pattern, this will return the offsets of the match as well as
+ * any back references that were captured.
  */
-private fun parsePatternAtOffset(chars: CharSequence, offset: Int, pattern: String): Pair<Int, String> {
+private fun parsePatternAtOffset(chars: CharSequence, offset: Int, pattern: String): Pair<Pair<Int, Int>?, String?> {
   val matcher = Pattern.compile(pattern).matcher(chars)
 
   while (matcher.find()) {
     val matchStart = matcher.start()
     val matchEnd = matcher.end()
+    val matchRange = Pair(matchStart, matchEnd)
 
     if (offset in matchStart until matchEnd) {
       if (matcher.groupCount() > 0) {
-        return Pair(matchEnd, matcher.group(1))
+        return Pair(matchRange, matcher.group(1))
       }
-      return Pair(matchEnd, "")
+      return Pair(matchRange, null)
     } else if (offset < matchStart) {
-      return Pair(-1, "")
+      return Pair(null, null)
     }
   }
-  return Pair(-1, "")
+
+  return Pair(null, null)
 }
 
 private fun matchShouldBeSkipped(editor: Editor, offset: Int, skipComments: Boolean, skipStrings: Boolean): Boolean {
