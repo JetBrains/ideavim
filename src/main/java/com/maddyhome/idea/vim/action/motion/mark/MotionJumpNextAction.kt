@@ -38,7 +38,6 @@ class MotionJumpNextAction : MotionActionHandler.ForEachCaret() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-
     val project = editor.project
     if (project != null) {
       for (i in 1..operatorArguments.count1) {
