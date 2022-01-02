@@ -247,10 +247,9 @@ public class ProcessGroup {
       if (exitCode != null && exitCode != 0) {
         VimPlugin.showMessage("shell returned " + exitCode);
         VimPlugin.indicateError();
-        return output.getStderr() + output.getStdout();
       }
 
-      return output.getStdout();
+      return output.getStderr() + output.getStdout();
     }, "IdeaVim - !" + command, true, editor.getProject());
   }
 
