@@ -51,12 +51,13 @@ class ChangeMotionActionTest : VimTestCase() {
         fun main {
             ${c}bar
         }
-        """.trimIndent(),
+      """.trimIndent(),
       """
         fun main {
         ...${c}.
         }
-        """.trimIndent().dotToSpace(), CommandState.Mode.INSERT, CommandState.SubMode.NONE
+      """.trimIndent().dotToSpace(),
+      CommandState.Mode.INSERT, CommandState.SubMode.NONE
     )
   }
 

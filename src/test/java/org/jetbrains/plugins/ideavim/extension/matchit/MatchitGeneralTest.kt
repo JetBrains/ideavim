@@ -191,13 +191,16 @@ class MatchitGeneralTest : VimTestCase() {
     )
   }
 
-  @VimBehaviorDiffers(originalVimAfter = """
+  @VimBehaviorDiffers(
+    originalVimAfter = """
         if x == 0
           puts "Zero"
         $c
           puts "Positive"
         end
-  """, description = "Our code changes the motion type to linewise, but it should not")
+  """,
+    description = "Our code changes the motion type to linewise, but it should not"
+  )
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test delete from elseif to else`() {
     doTest(
@@ -212,14 +215,14 @@ class MatchitGeneralTest : VimTestCase() {
         end
       """.trimIndent(),
       if (VimPlugin.getOptionService()
-          .isSet(OptionService.Scope.GLOBAL, "experimentalapi", "experimentalapi")
+        .isSet(OptionService.Scope.GLOBAL, "experimentalapi", "experimentalapi")
       ) {
         """
         if x == 0
           puts "Zero"
           puts "Positive"
         end
-      """.trimIndent()
+        """.trimIndent()
       } else {
         """
               if x == 0
@@ -227,7 +230,7 @@ class MatchitGeneralTest : VimTestCase() {
               $c
                 puts "Positive"
               end
-             """.trimIndent()
+        """.trimIndent()
       },
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )

@@ -399,7 +399,7 @@ sealed class OperatedRange {
   class Characters(val text: CharSequence, val leftOffset: Inclusive, val rightOffset: Inclusive) : OperatedRange()
   class Block : OperatedRange() {
     init {
-        TODO()
+      TODO()
     }
   }
 }

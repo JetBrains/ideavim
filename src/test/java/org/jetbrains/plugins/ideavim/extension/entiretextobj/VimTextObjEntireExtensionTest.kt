@@ -103,8 +103,11 @@ class VimTextObjEntireExtensionTest : JavaVimTestCase() {
     assertSelection(null)
   }
 
-  @VimBehaviorDiffers(originalVimAfter =
-  "\n  \n \n<caret>\n\n  \n \n", description = "Our code changes the motion type to linewise, but it should not")
+  @VimBehaviorDiffers(
+    originalVimAfter =
+    "\n  \n \n<caret>\n\n  \n \n",
+    description = "Our code changes the motion type to linewise, but it should not"
+  )
   // |d| |ae|
   fun testDeleteEntireBufferIgnoreLeadingTrailing() {
     doTest(
