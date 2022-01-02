@@ -39,15 +39,15 @@ class MotionJumpNextAction : MotionActionHandler.ForEachCaret() {
     operatorArguments: OperatorArguments,
   ): Motion {
 
-    val project = editor.getProject();
+    val project = editor.project
     if (project != null) {
       for (i in 1..operatorArguments.count1) {
         if (IdeDocumentHistory.getInstance(project).isForwardAvailable.not()) {
-          return Motion.AbsoluteOffset(-(i - 1));
+          return Motion.AbsoluteOffset(-(i - 1))
         }
-        IdeDocumentHistory.getInstance(project).forward();
+        IdeDocumentHistory.getInstance(project).forward()
       }
-      return Motion.AbsoluteOffset(-operatorArguments.count1);
+      return Motion.AbsoluteOffset(-operatorArguments.count1)
     } else {
       return VimPlugin.getMotion().moveCaretToJump(editor, -operatorArguments.count1).toMotionOrError()
     }
