@@ -20,6 +20,7 @@ package com.maddyhome.idea.vim.action.motion.mark
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.fileEditor.ex.IdeDocumentHistory
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.MotionType
@@ -36,7 +37,18 @@ class MotionJumpPreviousAction : MotionActionHandler.ForEachCaret() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    return VimPlugin.getMotion().moveCaretToJump(editor, -operatorArguments.count1).toMotionOrError()
+    val project = editor.getProject();
+    if (project != null) {
+      for (i in 1..operatorArguments.count1) {
+        if (IdeDocumentHistory.getInstance(project).isBackAvailable.not()) {
+          return Motion.AbsoluteOffset(i - 1);
+        }
+        IdeDocumentHistory.getInstance(project).back();
+      }
+      return Motion.AbsoluteOffset(operatorArguments.count1);
+    } else {
+      return VimPlugin.getMotion().moveCaretToJump(editor, operatorArguments.count1).toMotionOrError()
+    }
   }
 
   override val motionType: MotionType = MotionType.EXCLUSIVE
