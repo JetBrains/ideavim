@@ -245,7 +245,7 @@ binaryOperator3:        LESS | LESS_IC | LESS_CS
 binaryOperator4:        AMPERSAND AMPERSAND;
 binaryOperator5:        LOGICAL_OR;
 
-register:               AT (DIGIT | lowercaseAlphabeticChar | uppercaseAlphabeticChar | MINUS | COLON | DOT | MOD | NUM | ASSIGN | STAR | PLUS | TILDE | UNDERSCORE | DIV | AT);
+register:               AT (DIGIT | lowercaseAlphabeticChar | uppercaseAlphabeticChar | MINUS | COLON | DOT | MOD | NUM | ASSIGN | STAR | PLUS | TILDE | UNDERSCORE | DIV | AT | QUOTE);
 // todo argumentDeclaration but without default values
 lambda:                 L_CURLY WS* argumentsDeclaration WS* ARROW WS* expr WS* R_CURLY;
 

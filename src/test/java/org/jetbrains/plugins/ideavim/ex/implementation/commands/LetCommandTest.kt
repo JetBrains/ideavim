@@ -18,8 +18,10 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
+import com.intellij.testFramework.PlatformTestUtil
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment
+import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -237,5 +239,62 @@ class LetCommandTest : VimTestCase() {
     typeText(commandToKeys("echo dict"))
 
     assertExOutput("{'a': 'b', 'key': 'value'}\n")
+  }
+
+  fun `test numbered register`() {
+    configureByText("\n")
+    typeText(commandToKeys("let @4 = 'inumber register works'"))
+    typeText(commandToKeys("echo @4"))
+    assertExOutput("inumber register works\n")
+
+    typeText(parseKeys("@4"))
+    if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "ideadelaymacro")) {
+      PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
+    }
+    assertState("number register works\n")
+  }
+
+  fun `test lowercase letter register`() {
+    configureByText("\n")
+    typeText(commandToKeys("let @o = 'ilowercase letter register works'"))
+    typeText(commandToKeys("echo @o"))
+    assertExOutput("ilowercase letter register works\n")
+
+    typeText(parseKeys("@o"))
+    if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "ideadelaymacro")) {
+      PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
+    }
+    assertState("lowercase letter register works\n")
+  }
+
+  fun `test uppercase letter register`() {
+    configureByText("\n")
+    typeText(commandToKeys("let @O = 'iuppercase letter register works'"))
+    typeText(commandToKeys("echo @O"))
+    assertExOutput("iuppercase letter register works\n")
+
+    typeText(parseKeys("@O"))
+    if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "ideadelaymacro")) {
+      PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
+    }
+    assertState("uppercase letter register works\n")
+    typeText(parseKeys("<Esc>"))
+
+    typeText(commandToKeys("let @O = '!'"))
+    typeText(commandToKeys("echo @O"))
+    assertExOutput("iuppercase letter register works!\n")
+  }
+
+  fun `test unnamed register`() {
+    configureByText("\n")
+    typeText(commandToKeys("let @\" = 'iunnamed register works'"))
+    typeText(commandToKeys("echo @\""))
+    assertExOutput("iunnamed register works\n")
+
+    typeText(parseKeys("@\""))
+    if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "ideadelaymacro")) {
+      PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
+    }
+    assertState("unnamed register works\n")
   }
 }

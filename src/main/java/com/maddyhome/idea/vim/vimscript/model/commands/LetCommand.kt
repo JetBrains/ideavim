@@ -186,7 +186,15 @@ data class LetCommand(
 
       is EnvVariableExpression -> TODO()
 
-      is Register -> TODO()
+      is Register -> {
+        if (!(variable.char.isLetter() || variable.char.isDigit() || variable.char == '"')) {
+          throw ExException("Let command supports only 0-9a-zA-Z\" registers at the moment")
+        }
+
+        VimPlugin.getRegister().startRecording(editor, variable.char)
+        VimPlugin.getRegister().recordText(expression.evaluate(editor, context, parent).asString())
+        VimPlugin.getRegister().finishRecording(editor)
+      }
 
       else -> throw ExException("E121: Undefined variable")
     }
