@@ -25,6 +25,11 @@ usual beta standards.
 
 ## To Be Released
 
+### Features:
+* Add register support to let command | [VIM-749](https://youtrack.jetbrains.com/issue/VIM-749)
+* Add register support to let command | [VIM-1783](https://youtrack.jetbrains.com/issue/VIM-1783)
+* Add `trackactionids`/`tai` option to track action ids
+
 ### Fixes:
 * [VIM-2502](https://youtrack.jetbrains.com/issue/VIM-2502) Fix the shape of new carets
 * [VIM-2499](https://youtrack.jetbrains.com/issue/VIM-2499) Fix mapping to esc
