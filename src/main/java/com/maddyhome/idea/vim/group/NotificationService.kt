@@ -42,7 +42,6 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
-import com.maddyhome.idea.vim.listener.FindActionId
 import com.maddyhome.idea.vim.option.ClipboardOptionsData
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable
 import com.maddyhome.idea.vim.vimscript.services.OptionService
@@ -235,7 +234,7 @@ class NotificationService(private val project: Project?) {
 
     class StopTracking : DumbAwareAction("Stop Tracking") {
       override fun actionPerformed(e: AnActionEvent) {
-        FindActionId.enabled = false
+        VimPlugin.getOptionService().unsetOption(OptionService.Scope.GLOBAL, "trackactionids")
         notification?.expire()
       }
     }

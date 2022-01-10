@@ -51,6 +51,7 @@ internal class OptionServiceImpl : OptionService {
     ToggleOption("visualbell", "vb", false),
     ToggleOption("wrapscan", "ws", true),
     ToggleOption("ideadelaymacro", "ideadelaymacro", true),
+    ToggleOption("trackactionids", "tai", false),
     StringOption("ide", "ide", ApplicationNamesInfo.getInstance().fullProductNameWithEdition),
     StringOption("idearefactormode", "idearefactormode", "select", isList = false, ideaRefactorModeValues),
     StringOption("ideastatusicon", "ideastatusicon", "enabled", isList = false, ideaStatusIconValues),
