@@ -71,6 +71,12 @@ import kotlin.math.min
  *     deleted.
  *  Also, during the development it turned out that using such appriach causes a lot of `+1` and `-1` operations that
  *     seem to be redundant.
+ *
+ * ---
+ * # Lines
+ *
+ * We use two types of line reference: Offset and pointer. Offset referrers to a between-lines position.
+ *   Pointer referrers to the concrete line.
  */
 interface VimEditor {
 
@@ -101,7 +107,7 @@ interface MutableVimEditor {
    *   will be called before [delete]?
    */
   fun delete(range: VimRange)
-  fun addLine(atPosition: EditorLine.Exclusive): EditorLine.Inclusive?
+  fun addLine(atPosition: EditorLine.Offset): EditorLine.Pointer?
   fun insertText(atPosition: Offset, text: CharSequence)
 }
 
@@ -159,14 +165,13 @@ abstract class MutableLinearEditor : MutableVimEditor, LinearEditor() {
         var startOffset = getLineRange(lineAbove).first
         val lineBelow = getLine(range.offsetBelow())
         var endOffset = getLineRange(lineBelow).second
-        val endsWithNewLine = endOffset.point < fileSize() && charAt(endOffset.point) == '\n'
         if (endOffset.point < fileSize() && charAt(endOffset.point) == '\n') {
           endOffset = (endOffset.point + 1).offset
         } else if (startOffset.point > 0 && lfMakesNewLine) {
           startOffset = (startOffset.point - 1).offset
         }
         val textToDelete = getText(startOffset, endOffset)
-        OperatedRange.Lines(textToDelete, EditorLine.Inclusive.init(lineAbove, this), lineBelow, !endsWithNewLine)
+        OperatedRange.Lines(textToDelete, EditorLine.Offset.init(lineAbove, this), lineBelow - lineAbove)
       }
     }
   }
@@ -187,14 +192,14 @@ class IjVimEditor(val editor: Editor) : MutableLinearEditor() {
     editor.document.deleteString(leftOffset.point, rightOffset.point)
   }
 
-  override fun addLine(atPosition: EditorLine.Exclusive): EditorLine.Inclusive {
+  override fun addLine(atPosition: EditorLine.Offset): EditorLine.Pointer {
     val offset: Int = if (atPosition.line < lineCount()) {
       editor.document.getLineStartOffset(atPosition.line)
     } else {
       fileSize().toInt()
     }
     editor.document.insertString(offset, "\n")
-    return EditorLine.Inclusive.init(atPosition.line, this)
+    return EditorLine.Pointer.init(atPosition.line, this)
   }
 
   override fun insertText(atPosition: Offset, text: CharSequence) {
@@ -246,7 +251,7 @@ class IjVimCaret(val caret: Caret) : VimCaret {
   }
 }
 
-fun VimCaret.offsetForLineWithStartOfLineOption(logicalLine: EditorLine.Inclusive): Int {
+fun VimCaret.offsetForLineWithStartOfLineOption(logicalLine: EditorLine.Pointer): Int {
   val ijEditor = (this.editor as IjVimEditor).editor
   val caret = (this as IjVimCaret).caret
   return if (VimPlugin.getOptionService().isSet(LOCAL(ijEditor), "startofline")) {
@@ -269,12 +274,14 @@ fun VimCaret.offsetForLineWithStartOfLineOption(logicalLine: EditorLine.Inclusiv
  */
 sealed class VimRange {
   sealed class Line : VimRange() {
-    class Range(val startLine: EditorLine.Inclusive, val endLine: EditorLine.Inclusive) : Line() {
+    class Range(val startLine: EditorLine.Pointer, val endLine: EditorLine.Pointer) : Line() {
       fun lineAbove(): Int = min(startLine.line, endLine.line)
       fun lineBelow(): Int = max(startLine.line, endLine.line)
     }
 
     class Multiple(val lines: List<Int>) : Line()
+
+    // TODO: 11.01.2022 How converting offsets to lines work?
     class Offsets(val startOffset: Offset, val endOffset: Offset) : Line() {
       fun offsetAbove(): Offset = min(startOffset.point, endOffset.point).offset
       fun offsetBelow(): Offset = max(startOffset.point, endOffset.point).offset
@@ -313,8 +320,9 @@ fun OperatedRange.toNormalizedTextRange(editor: Editor): TextRange {
   return when (this) {
     is OperatedRange.Block -> TODO()
     is OperatedRange.Lines -> {
+      // TODO: 11.01.2022 This is unsafe
       val startOffset = editor.document.getLineStartOffset(this.lineAbove.line)
-      val endOffset = editor.document.getLineEndOffset(this.lineBelow)
+      val endOffset = editor.document.getLineEndOffset(lineAbove.line + linesOperated)
       TextRange(startOffset, endOffset)
     }
     is OperatedRange.Characters -> TextRange(this.leftOffset.point, this.rightOffset.point)
@@ -383,41 +391,35 @@ class VimMachineImpl : VimMachine {
 }
 
 sealed class EditorLine private constructor(val line: Int) {
-  class Inclusive(line: Int) : EditorLine(line) {
+  class Pointer(line: Int) : EditorLine(line) {
     companion object {
-      fun init(line: Int, forEditor: VimEditor): Inclusive {
+      fun init(line: Int, forEditor: VimEditor): Pointer {
         if (line < 0) error("")
         if (line >= forEditor.lineCount()) error("")
-        return Inclusive(line)
+        return Pointer(line)
       }
     }
   }
-  class Exclusive(line: Int) : EditorLine(line) {
+  class Offset(line: Int) : EditorLine(line) {
 
-    // TODO: 28.12.2021 WARNING, I'm not sure that this method is safe and okay
-    fun toInclusive(forEditor: VimEditor): Inclusive {
-      return Inclusive.init(line, forEditor)
-    }
-
-    fun shrinkToInclusive(forEditor: VimEditor): Inclusive {
-      val newLine = this.line.coerceIn(0 until forEditor.lineCount())
-      return Inclusive.init(newLine, forEditor)
+    fun toPointer(forEditor: VimEditor): Pointer {
+      return Pointer.init(line.coerceAtMost(forEditor.lineCount() - 1), forEditor)
     }
 
     companion object {
-      fun init(line: Int, forEditor: VimEditor): Exclusive {
+      fun init(line: Int, forEditor: VimEditor): Offset {
         if (line < 0) error("")
         // TODO: 28.12.2021 Is this logic correct?
         //   IJ has an additional line
         if (line > forEditor.lineCount()) error("")
-        return Exclusive(line)
+        return Offset(line)
       }
     }
   }
 }
 
 sealed class OperatedRange {
-  class Lines(val text: CharSequence, val lineAbove: EditorLine.Inclusive, val lineBelow: Int, val lastNewLineCharMissing: Boolean) : OperatedRange()
+  class Lines(val text: CharSequence, val lineAbove: EditorLine.Offset, val linesOperated: Int) : OperatedRange()
   class Characters(val text: CharSequence, val leftOffset: Offset, val rightOffset: Offset) : OperatedRange()
   class Block : OperatedRange() {
     init {
