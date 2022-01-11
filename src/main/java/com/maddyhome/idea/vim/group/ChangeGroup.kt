@@ -31,8 +31,8 @@ import com.maddyhome.idea.vim.common.editor.IjVimCaret
 import com.maddyhome.idea.vim.common.editor.IjVimEditor
 import com.maddyhome.idea.vim.common.editor.OperatedRange
 import com.maddyhome.idea.vim.common.editor.VimMachine
-import com.maddyhome.idea.vim.common.editor.excl
 import com.maddyhome.idea.vim.common.editor.indentForLine
+import com.maddyhome.idea.vim.common.editor.offset
 import com.maddyhome.idea.vim.common.editor.offsetForLineWithStartOfLineOption
 import com.maddyhome.idea.vim.common.editor.toVimRange
 import com.maddyhome.idea.vim.helper.EditorHelper
@@ -76,7 +76,7 @@ fun changeRange(
       val offset = vimCaret.offsetForLineWithStartOfLineOption(existingLine)
       // TODO: 29.12.2021 IndentConfig is not abstract
       val indentText = IndentConfig.create(editor).createIndentBySize(indent)
-      vimEditor.insertText(offset.excl, indentText)
+      vimEditor.insertText(offset.offset, indentText)
       val caretOffset = offset + (indentText.length - 1).coerceAtLeast(0)
       vimCaret.moveToOffset(caretOffset)
       VimPlugin.getChange().insertBeforeCursor(editor, context)

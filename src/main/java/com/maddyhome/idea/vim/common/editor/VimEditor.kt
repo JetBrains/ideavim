@@ -63,7 +63,7 @@ interface VimEditor {
   //   Edit: ctrl-g shows "No Lines" for empty buffer
   fun lineCount(): Int
 
-  fun getLineRange(line: Int): Pair<Inclusive, Exclusive>
+  fun getLineRange(line: Int): Pair<Offset, Offset>
   fun charAt(offset: Int): Char
 }
 
@@ -81,23 +81,23 @@ interface MutableVimEditor {
    */
   fun delete(range: VimRange)
   fun addLine(atPosition: EditorLine.Exclusive): EditorLine.Inclusive?
-  fun insertText(atPosition: Exclusive, text: CharSequence)
+  fun insertText(atPosition: Offset, text: CharSequence)
 }
 
 abstract class LinearEditor : VimEditor {
-  abstract fun getLine(offset: Int): Int
-  abstract fun getText(left: Inclusive, right: Exclusive): CharSequence
+  abstract fun getLine(offset: Offset): Int
+  abstract fun getText(left: Offset, right: Offset): CharSequence
 }
 
 abstract class MutableLinearEditor : MutableVimEditor, LinearEditor() {
-  abstract fun deleteRange(leftOffset: Inclusive, rightOffset: Exclusive)
+  abstract fun deleteRange(leftOffset: Offset, rightOffset: Offset)
 
   override fun delete(range: VimRange) {
     when (range) {
       is VimRange.Block -> TODO()
       is VimRange.Character.Multiple -> TODO()
       is VimRange.Character.Range -> {
-        deleteRange(range.offsetAbove().incl, range.offsetBelow().excl)
+        deleteRange(range.offsetAbove(), range.offsetBelow())
       }
       is VimRange.Line.Multiple -> TODO()
       is VimRange.Line.Range -> {
@@ -109,9 +109,9 @@ abstract class MutableLinearEditor : MutableVimEditor, LinearEditor() {
         var startOffset = getLineRange(getLine(range.offsetAbove())).first
         var endOffset = getLineRange(getLine(range.offsetBelow())).second
         if (endOffset.point < fileSize() && charAt(endOffset.point) == '\n') {
-          endOffset = (endOffset.point + 1).excl
+          endOffset = (endOffset.point + 1).offset
         } else if (startOffset.point > 0 && lfMakesNewLine) {
-          startOffset = (startOffset.point - 1).incl
+          startOffset = (startOffset.point - 1).offset
         }
         deleteRange(startOffset, endOffset)
       }
@@ -123,8 +123,8 @@ abstract class MutableLinearEditor : MutableVimEditor, LinearEditor() {
       is VimRange.Block -> TODO()
       is VimRange.Character.Multiple -> TODO()
       is VimRange.Character.Range -> {
-        val textToDelete = getText(range.offsetAbove().incl, range.offsetBelow().excl)
-        OperatedRange.Characters(textToDelete, range.offsetAbove().incl, range.offsetBelow().incl)
+        val textToDelete = getText(range.offsetAbove(), range.offsetBelow())
+        OperatedRange.Characters(textToDelete, range.offsetAbove(), range.offsetBelow())
       }
       is VimRange.Line.Multiple -> TODO()
       is VimRange.Line.Range -> {
@@ -140,9 +140,9 @@ abstract class MutableLinearEditor : MutableVimEditor, LinearEditor() {
         var endOffset = getLineRange(lineBelow).second
         val endsWithNewLine = endOffset.point < fileSize() && charAt(endOffset.point) == '\n'
         if (endOffset.point < fileSize() && charAt(endOffset.point) == '\n') {
-          endOffset = (endOffset.point + 1).excl
+          endOffset = (endOffset.point + 1).offset
         } else if (startOffset.point > 0 && lfMakesNewLine) {
-          startOffset = (startOffset.point - 1).incl
+          startOffset = (startOffset.point - 1).offset
         }
         val textToDelete = getText(startOffset, endOffset)
         OperatedRange.Lines(textToDelete, EditorLine.Inclusive.init(lineAbove, this), lineBelow, !endsWithNewLine)
@@ -162,7 +162,7 @@ class IjVimEditor(val editor: Editor) : MutableLinearEditor() {
     return lineCount.coerceAtLeast(1)
   }
 
-  override fun deleteRange(leftOffset: Inclusive, rightOffset: Exclusive) {
+  override fun deleteRange(leftOffset: Offset, rightOffset: Offset) {
     editor.document.deleteString(leftOffset.point, rightOffset.point)
   }
 
@@ -176,23 +176,25 @@ class IjVimEditor(val editor: Editor) : MutableLinearEditor() {
     return EditorLine.Inclusive.init(atPosition.line, this)
   }
 
-  override fun insertText(atPosition: Exclusive, text: CharSequence) {
+  override fun insertText(atPosition: Offset, text: CharSequence) {
     editor.document.insertString(atPosition.point, text)
   }
 
-  override fun getLineRange(line: Int): Pair<Inclusive, Exclusive> {
-    return editor.document.getLineStartOffset(line).incl to editor.document.getLineEndOffset(line).excl
+  // TODO: 30.12.2021 Is end offset inclusive?
+  override fun getLineRange(line: Int): Pair<Offset, Offset> {
+    // TODO: 30.12.2021 getLineEndOffset returns the same value for "xyz" and "xyz\n"
+    return editor.document.getLineStartOffset(line).offset to editor.document.getLineEndOffset(line).offset
   }
 
-  override fun getLine(offset: Int): Int {
-    return editor.offsetToLogicalPosition(offset).line
+  override fun getLine(offset: Offset): Int {
+    return editor.offsetToLogicalPosition(offset.point).line
   }
 
   override fun charAt(offset: Int): Char {
     return editor.document.charsSequence[offset]
   }
 
-  override fun getText(left: Inclusive, right: Exclusive): CharSequence {
+  override fun getText(left: Offset, right: Offset): CharSequence {
     return editor.document.charsSequence.subSequence(left.point, right.point)
   }
 }
@@ -246,37 +248,37 @@ fun VimCaret.offsetForLineWithStartOfLineOption(logicalLine: EditorLine.Inclusiv
  */
 sealed class VimRange {
   sealed class Line : VimRange() {
-    class Range(val startLine: Inclusive, val endLine: Inclusive) : Line() {
-      fun lineAbove(): Int = min(startLine.point, endLine.point)
-      fun lineBelow(): Int = max(startLine.point, endLine.point)
+    class Range(val startLine: EditorLine.Inclusive, val endLine: EditorLine.Inclusive) : Line() {
+      fun lineAbove(): Int = min(startLine.line, endLine.line)
+      fun lineBelow(): Int = max(startLine.line, endLine.line)
     }
 
     class Multiple(val lines: List<Int>) : Line()
-    class Offsets(val startOffset: Inclusive, val endOffset: Inclusive) : Line() {
-      fun offsetAbove(): Int = min(startOffset.point, endOffset.point)
-      fun offsetBelow(): Int = max(startOffset.point, endOffset.point)
+    class Offsets(val startOffset: Offset, val endOffset: Offset) : Line() {
+      fun offsetAbove(): Offset = min(startOffset.point, endOffset.point).offset
+      fun offsetBelow(): Offset = max(startOffset.point, endOffset.point).offset
     }
   }
 
   sealed class Character : VimRange() {
     class Range(val range: VimTextRange) : Character() {
-      fun offsetAbove(): Int = min(range.start.point, range.end.point)
-      fun offsetBelow(): Int = max(range.start.point, range.end.point)
+      fun offsetAbove(): Offset = min(range.start.point, range.end.point).offset
+      fun offsetBelow(): Offset = max(range.start.point, range.end.point).offset
     }
 
     class Multiple(val ranges: List<VimTextRange>) : Character()
   }
 
-  class Block(val start: Inclusive, val end: Inclusive) : VimRange()
+  class Block(val start: Offset, val end: Offset) : VimRange()
 }
 
 fun toVimRange(range: TextRange, type: SelectionType): VimRange {
   return when (type) {
     SelectionType.LINE_WISE -> {
-      VimRange.Line.Offsets(range.startOffset.incl, range.endOffset.incl)
+      VimRange.Line.Offsets(range.startOffset.offset, range.endOffset.offset)
     }
     SelectionType.CHARACTER_WISE -> VimRange.Character.Range(range.startOffset including range.endOffset)
-    SelectionType.BLOCK_WISE -> VimRange.Block(range.startOffset.incl, range.endOffset.incl)
+    SelectionType.BLOCK_WISE -> VimRange.Block(range.startOffset.offset, range.endOffset.offset)
   }
 }
 
@@ -302,24 +304,23 @@ fun OperatedRange.toNormalizedTextRange(editor: Editor): TextRange {
  * `start` is not lower than `end`
  */
 data class VimTextRange(
-  val start: Inclusive,
-  val end: Inclusive,
-)
-
-infix fun Int.including(another: Int): VimTextRange {
-  return VimTextRange(this.incl, another.incl)
+  val start: Offset,
+  val end: Offset,
+) {
+  init {
+    if (start.point > end.point) {
+      println()
+    }
+  }
 }
 
-val Int.incl: Inclusive
-  get() = Inclusive(this)
-val Int.excl: Exclusive
-  get() = Exclusive(this)
+infix fun Int.including(another: Int): VimTextRange {
+  return VimTextRange(this.offset, another.offset)
+}
 
-/**
- * Can be converted to value class
- */
-data class Inclusive(val point: Int)
-data class Exclusive(val point: Int)
+data class Offset(val point: Int)
+val Int.offset: Offset
+  get() = Offset(this)
 
 interface VimMachine {
   fun delete(range: VimRange, editor: VimEditor, caret: VimCaret): OperatedRange?
@@ -396,7 +397,7 @@ sealed class EditorLine private constructor(val line: Int) {
 
 sealed class OperatedRange {
   class Lines(val text: CharSequence, val lineAbove: EditorLine.Inclusive, val lineBelow: Int, val lastNewLineCharMissing: Boolean) : OperatedRange()
-  class Characters(val text: CharSequence, val leftOffset: Inclusive, val rightOffset: Inclusive) : OperatedRange()
+  class Characters(val text: CharSequence, val leftOffset: Offset, val rightOffset: Offset) : OperatedRange()
   class Block : OperatedRange() {
     init {
       TODO()
