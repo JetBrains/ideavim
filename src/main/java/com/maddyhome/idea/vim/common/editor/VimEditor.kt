@@ -34,9 +34,7 @@ import kotlin.math.max
 import kotlin.math.min
 
 /**
- * Every line in [VimEditor] ends with a new line
- * TODO: What are the rules about the last actual line without the new line character?
- * TODO: Minimize the amount of methods to implement
+ * Every line in [VimEditor] ends with a new line TODO <- this is probably not true already
  *
  * # New line and line count
  *
@@ -85,9 +83,17 @@ interface VimEditor {
   fun deleteDryRun(range: VimRange): OperatedRange?
   fun fileSize(): Long
 
-  // TODO: 28.12.2021 Vim always has at least one line!!
-  //   Edit: seems like it's not true. Need to recheck it with neovim
-  //   Edit: ctrl-g shows "No Lines" for empty buffer
+  /**
+   * Vim has always at least one line. When we need to understand that there are no lines, it has a flag "ML_EMPTY"
+   *   which indicated that the buffer is empty. However, the line count is still 1.
+   *
+   * The variable for line count is named `ml_line_count` in `memline` structure. There is a single spot where
+   *   `0` is assigned to this variable (at the end of `buf_freeall` function), however I'm not sure that this affects
+   *   the opened buffer.
+   * Another thing that I don't understand is that I don't see where this variable is updated. There is a small chance
+   *   that this variable doesn't present the line count, so I may be wrong and line count can return zero.
+   * I've explored this question by looking at the implementation of ctrl-g command in normal mode.
+   */
   fun lineCount(): Int
 
   fun getLineRange(line: Int): Pair<Offset, Offset>
@@ -182,7 +188,6 @@ class IjVimEditor(val editor: Editor) : MutableLinearEditor() {
 
   override fun fileSize(): Long = editor.fileSize.toLong()
 
-  // TODO: 28.12.2021 Vim always has at least one line
   override fun lineCount(): Int {
     val lineCount = editor.document.lineCount
     return lineCount.coerceAtLeast(1)
