@@ -50,6 +50,27 @@ import kotlin.math.min
  *   a new line character, is considered as a three-lines file because it's represented in the editor like this.
  *
  * TODO: We should understand what logic changes if we use a two or three lines editors.
+ *
+ * ---
+ * # Offset and range deletion
+ *
+ * [Offset] is a position between characters.
+ * [delete] method, that works on offset-offset, deltes the character *between* two offsets. That means that:
+ * - It's possible and simply applicable when the start offset is larger than end offset
+ * - Inclusive/Exclusive words are not applicable to such operation. So we don't define the operation
+ *      like "... with end offset exclusive". However, technically, the "right" or the "larger" offset is exclusive.
+ *
+ * ## Other decisions review:
+ * - End offset exclusive:
+ *   This is a classic approach, that is used in most APIs, however, it's inconvenient for the case where the
+ *     start offset is larger than end offset (direction switching) because for such offset switching it turns that
+ *     start offset is exclusive and end offset is inclusive.
+ * - End offset inclusive:
+ *   This approach is convenient for direction switching, however, makes the situation that empty range cannot be
+ *     specified. E.g. range 1:1 would delete the character under `1`, however it looks like that nothing should be
+ *     deleted.
+ *  Also, during the development it turned out that using such appriach causes a lot of `+1` and `-1` operations that
+ *     seem to be redundant.
  */
 interface VimEditor {
 
