@@ -77,7 +77,7 @@ fun changeRange(
       // TODO: 29.12.2021 IndentConfig is not abstract
       val indentText = IndentConfig.create(editor).createIndentBySize(indent)
       vimEditor.insertText(offset.offset, indentText)
-      val caretOffset = offset + (indentText.length - 1).coerceAtLeast(0)
+      val caretOffset = offset + indentText.length
       vimCaret.moveToOffset(caretOffset)
       VimPlugin.getChange().insertBeforeCursor(editor, context)
     } else {
