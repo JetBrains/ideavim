@@ -71,6 +71,44 @@ import kotlin.math.min
  *     seem to be redundant.
  *
  * ---
+ * # Offset and pointer
+ *
+ * It seems line it would be helpful to split "string offset" into [Pointer] and [Offset] where [Pointer] referrers
+ *   to a concrete existing character and [Offset] referrers to an in-between position.
+ * Apart from semantic improvement (methods like `insertAt(Offset)`, `deleteAt(Pointer)` seem to be more obvious),
+ *   looks like it may fix some concrete issues where we pass one type as a parameter, which is a different type.
+ *   For example, let's delete a first character on the line. For the classic code it would look like
+ *   ```
+ *   fun lineStart(line: Int): Int
+ *   fun deleteAt(offset: Int)
+ *
+ *   val lineStart = data.lineStart(x)
+ *   data.deleteAt(lineStart)
+ *   ```
+ *   This code compiles and looks fine. However, with [Offset] and [Pointer] approach it would fail
+ *   ```
+ *   fun lineStart(line: Int): Offset // <- return the removed position
+ *   fun deleteAt(offset: Pointer)
+ *
+ *   val lineStart: Offset = data.lineStart(x)
+ *   data.deleteAt(lineStart) // ERROR: incorrect argument type
+ *   ```
+ *   So, we have to convert the [Offset] to [Pointer] somehow and during the conversion we may observe the problem
+ *   that the line may contain no characters at all (at the file end). So the code is either semantically incorrect,
+ *   or we should convert an [Offset] to [Pointer] keeping the fact that [Offset] is not exactly the [Pointer].
+ *   ```
+ *   ...
+ *   fun Offset.toPointer(forData: String): Pointer? {
+ *     return if (this < forData.length) Pointer(this) else null
+ *   }
+ *
+ *   val lineFirstCharacter: Pointer = data.lineStart(x).toPointer(data)
+ *   if (lineFirstCharacter != null) {
+ *     data.deleteAt(lineFirstCharacter)
+ *   }
+ *   ```
+ *
+ * ---
  * # Lines
  *
  * We use two types of line reference: Offset and pointer. Offset referrers to a between-lines position.
@@ -96,8 +134,8 @@ interface VimEditor {
    */
   fun lineCount(): Int
 
-  fun getLineRange(line: Int): Pair<Offset, Offset>
-  fun charAt(offset: Int): Char
+  fun getLineRange(line: EditorLine.Pointer): Pair<Offset, Offset>
+  fun charAt(offset: Pointer): Char
 }
 
 fun VimEditor.indentForLine(line: Int): Int {
@@ -118,7 +156,7 @@ interface MutableVimEditor {
 }
 
 abstract class LinearEditor : VimEditor {
-  abstract fun getLine(offset: Offset): Int
+  abstract fun getLine(offset: Offset): EditorLine.Pointer
   abstract fun getText(left: Offset, right: Offset): CharSequence
 }
 
@@ -141,7 +179,7 @@ abstract class MutableLinearEditor : MutableVimEditor, LinearEditor() {
       is VimRange.Line.Offsets -> {
         var startOffset = getLineRange(getLine(range.offsetAbove())).first
         var endOffset = getLineRange(getLine(range.offsetBelow())).second
-        if (endOffset.point < fileSize() && charAt(endOffset.point) == '\n') {
+        if (endOffset.point < fileSize() && charAt(endOffset.point.pointer) == '\n') {
           endOffset = (endOffset.point + 1).offset
         } else if (startOffset.point > 0 && lfMakesNewLine) {
           startOffset = (startOffset.point - 1).offset
@@ -171,13 +209,13 @@ abstract class MutableLinearEditor : MutableVimEditor, LinearEditor() {
         var startOffset = getLineRange(lineAbove).first
         val lineBelow = getLine(range.offsetBelow())
         var endOffset = getLineRange(lineBelow).second
-        if (endOffset.point < fileSize() && charAt(endOffset.point) == '\n') {
+        if (endOffset.point < fileSize() && charAt(endOffset.point.pointer) == '\n') {
           endOffset = (endOffset.point + 1).offset
         } else if (startOffset.point > 0 && lfMakesNewLine) {
           startOffset = (startOffset.point - 1).offset
         }
         val textToDelete = getText(startOffset, endOffset)
-        OperatedRange.Lines(textToDelete, EditorLine.Offset.init(lineAbove, this), lineBelow - lineAbove)
+        OperatedRange.Lines(textToDelete, EditorLine.Offset.init(lineAbove.line, this), lineBelow.line - lineAbove.line)
       }
     }
   }
@@ -212,17 +250,17 @@ class IjVimEditor(val editor: Editor) : MutableLinearEditor() {
   }
 
   // TODO: 30.12.2021 Is end offset inclusive?
-  override fun getLineRange(line: Int): Pair<Offset, Offset> {
+  override fun getLineRange(line: EditorLine.Pointer): Pair<Offset, Offset> {
     // TODO: 30.12.2021 getLineEndOffset returns the same value for "xyz" and "xyz\n"
-    return editor.document.getLineStartOffset(line).offset to editor.document.getLineEndOffset(line).offset
+    return editor.document.getLineStartOffset(line.line).offset to editor.document.getLineEndOffset(line.line).offset
   }
 
-  override fun getLine(offset: Offset): Int {
-    return editor.offsetToLogicalPosition(offset.point).line
+  override fun getLine(offset: Offset): EditorLine.Pointer {
+    return EditorLine.Pointer.init(editor.offsetToLogicalPosition(offset.point).line, this)
   }
 
-  override fun charAt(offset: Int): Char {
-    return editor.document.charsSequence[offset]
+  override fun charAt(offset: Pointer): Char {
+    return editor.document.charsSequence[offset.point]
   }
 
   override fun getText(left: Offset, right: Offset): CharSequence {
@@ -280,8 +318,8 @@ fun VimCaret.offsetForLineWithStartOfLineOption(logicalLine: EditorLine.Pointer)
 sealed class VimRange {
   sealed class Line : VimRange() {
     class Range(val startLine: EditorLine.Pointer, val endLine: EditorLine.Pointer) : Line() {
-      fun lineAbove(): Int = min(startLine.line, endLine.line)
-      fun lineBelow(): Int = max(startLine.line, endLine.line)
+      fun lineAbove(): EditorLine.Pointer = listOf(startLine, endLine).minByOrNull { it.line }!!
+      fun lineBelow(): EditorLine.Pointer = listOf(startLine, endLine).maxByOrNull { it.line }!!
     }
 
     class Multiple(val lines: List<Int>) : Line()
@@ -353,8 +391,11 @@ infix fun Int.including(another: Int): VimTextRange {
 }
 
 data class Offset(val point: Int)
+data class Pointer(val point: Int)
 val Int.offset: Offset
   get() = Offset(this)
+val Int.pointer: Pointer
+  get() = Pointer(this)
 
 interface VimMachine {
   fun delete(range: VimRange, editor: VimEditor, caret: VimCaret): OperatedRange?
