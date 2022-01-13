@@ -186,6 +186,24 @@ abstract class VimTestCase : UsefulTestCase() {
   protected fun configureByXmlText(content: String) = configureByText(XmlFileType.INSTANCE, content)
   protected fun configureByJsonText(content: String) = configureByText(JsonFileType.INSTANCE, content)
 
+  protected fun configureAndGuard(content: String) {
+    var myContent = content.replace(c, "").replace(s, "").replace(se, "")
+    val ranges = ArrayList<Pair<Int, Int>>()
+    while (true) {
+      val start = myContent.indexOfFirst { it == '[' }
+      if (start < 0) break
+      myContent = myContent.removeRange(start, start + 1)
+      val end = myContent.indexOfFirst { it == ']' }
+      if (end < 0) break
+      myContent = myContent.removeRange(end, end + 1)
+      ranges.add(start to end)
+    }
+    configureByText(content.replace("[", "").replace("]", ""))
+    for ((start, end) in ranges) {
+      myFixture.editor.document.createGuardedBlock(start, end)
+    }
+  }
+
   private fun configureByText(fileType: FileType, content: String): Editor {
     @Suppress("IdeaVimAssertState")
     myFixture.configureByText(fileType, content)
