@@ -34,6 +34,7 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.ChangeGroup
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.helper.inlayAwareVisualColumn
 import com.maddyhome.idea.vim.helper.vimCarets
 import com.maddyhome.idea.vim.helper.vimChangeActionSwitchMode
@@ -129,45 +130,49 @@ fun deleteRange(
 fun insertLineAround(editor: Editor, context: DataContext, shift: Int) {
   val vimEditor: MutableVimEditor = IjVimEditor(editor)
   val project = editor.project
-  for (caret in editor.vimCarets()) {
-    val vimCaret: VimCaret = IjVimCaret(caret)
-    val line = vimCaret.getLine()
-
-    // Calculating next line with minding folders
-    val currentVisualPosition = editor.logicalToVisualPosition(LogicalPosition(line.line, 0))
-    val nextVisualPosition = VisualPosition(currentVisualPosition.line + shift, 0)
-    val nextLogicalLine = editor.visualToLogicalPosition(nextVisualPosition).line
-
-    val position = EditorLine.Offset.init(nextLogicalLine, vimEditor)
-
-    val insertedLine = vimEditor.addLine(position) ?: continue
-    VimPlugin.getChange().saveStrokes("\n")
-
-    var lineStart = vimEditor.getLineRange(insertedLine).first
-    val initialLineStart = lineStart
-
-    // Set up indent
-    // Firstly set up primitive indent
-    val lineStartOffset = vimEditor.getLineRange(line).first
-    val text = editor.document.charsSequence
-    val lineStartWsEndOffset = CharArrayUtil.shiftForward(text, lineStartOffset.point, " \t")
-    val indent = text.subSequence(lineStartOffset.point, min(caret.offset, lineStartWsEndOffset))
-    vimEditor.insertText(lineStart, indent)
-    lineStart = (lineStart.point + indent.length).offset
-
-    if (project != null) {
-      // Secondly set up language smart indent
-      val language = PsiUtilBase.getLanguageInEditor(caret, project)
-      val newIndent = EnterHandler.adjustLineIndentNoCommit(language, editor.document, editor, lineStart.point)
-      lineStart = if (newIndent >= 0) newIndent.offset else lineStart
-    }
-    VimPlugin.getChange()
-      .saveStrokes(editor.document.getText(com.intellij.openapi.util.TextRange(initialLineStart.point,
-        lineStart.point)))
-
-    vimCaret.moveToOffset(lineStart.point)
-  }
 
   VimPlugin.getChange().initInsert(editor, context, CommandState.Mode.INSERT)
+
+  if (!editor.commandState.isDotRepeatInProgress) {
+    for (caret in editor.vimCarets()) {
+      val vimCaret: VimCaret = IjVimCaret(caret)
+      val line = vimCaret.getLine()
+
+      // Calculating next line with minding folders
+      val currentVisualPosition = editor.logicalToVisualPosition(LogicalPosition(line.line, 0))
+      val nextVisualPosition = VisualPosition(currentVisualPosition.line + shift, 0)
+      val nextLogicalLine = editor.visualToLogicalPosition(nextVisualPosition).line
+
+      val position = EditorLine.Offset.init(nextLogicalLine, vimEditor)
+
+      val insertedLine = vimEditor.addLine(position) ?: continue
+      VimPlugin.getChange().saveStrokes("\n")
+
+      var lineStart = vimEditor.getLineRange(insertedLine).first
+      val initialLineStart = lineStart
+
+      // Set up indent
+      // Firstly set up primitive indent
+      val lineStartOffset = vimEditor.getLineRange(line).first
+      val text = editor.document.charsSequence
+      val lineStartWsEndOffset = CharArrayUtil.shiftForward(text, lineStartOffset.point, " \t")
+      val indent = text.subSequence(lineStartOffset.point, min(caret.offset, lineStartWsEndOffset))
+      vimEditor.insertText(lineStart, indent)
+      lineStart = (lineStart.point + indent.length).offset
+
+      if (project != null) {
+        // Secondly set up language smart indent
+        val language = PsiUtilBase.getLanguageInEditor(caret, project)
+        val newIndent = EnterHandler.adjustLineIndentNoCommit(language, editor.document, editor, lineStart.point)
+        lineStart = if (newIndent >= 0) newIndent.offset else lineStart
+      }
+      VimPlugin.getChange()
+        .saveStrokes(editor.document.getText(com.intellij.openapi.util.TextRange(initialLineStart.point,
+          lineStart.point)))
+
+      vimCaret.moveToOffset(lineStart.point)
+    }
+  }
+
   MotionGroup.scrollCaretIntoView(editor)
 }

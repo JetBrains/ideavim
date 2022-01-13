@@ -506,6 +506,7 @@ public class ChangeGroup {
         }
       }
     }
+    System.out.println("");
   }
 
   /**

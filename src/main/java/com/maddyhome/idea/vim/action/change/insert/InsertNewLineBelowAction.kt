@@ -64,7 +64,7 @@ class InsertNewLineAboveAction : ChangeEditorActionHandler.SingleExecution() {
   ): Boolean {
     if (editor.isOneLineMode) return false
     if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "experimentalapi")) {
-      insertLineAround(editor, context, -1)
+      insertLineAround(editor, context, 0)
     } else {
       VimPlugin.getChange().insertNewLineAbove(editor, context)
     }
