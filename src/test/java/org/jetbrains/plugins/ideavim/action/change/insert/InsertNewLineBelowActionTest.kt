@@ -111,4 +111,34 @@ class InsertNewLineBelowActionTest : VimTestCase() {
     assertPosition(30, 0)
     assertVisibleArea(6, 40)
   }
+
+  fun `test insert new line below with count`() {
+    val before = """I found it in a legendary land
+        |${c}all rocks and lavender and tufted grass,
+        |where it was settled on some sodden sand
+        |hard by the torrent of a mountain pass.""".trimMargin()
+    val after = """I found it in a legendary land
+        |all rocks and lavender and tufted grass,
+        |$c
+        |where it was settled on some sodden sand
+        |hard by the torrent of a mountain pass.""".trimMargin()
+    doTest("5o", before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+  }
+
+  fun `test insert new line below with count and escape`() {
+    val before = """I found it in a legendary land
+        |${c}all rocks and lavender and tufted grass,
+        |where it was settled on some sodden sand
+        |hard by the torrent of a mountain pass.""".trimMargin()
+    val after = """I found it in a legendary land
+        |all rocks and lavender and tufted grass,
+        |123
+        |123
+        |123
+        |123
+        |12${c}3
+        |where it was settled on some sodden sand
+        |hard by the torrent of a mountain pass.""".trimMargin()
+    doTest("5o123<esc>", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
 }

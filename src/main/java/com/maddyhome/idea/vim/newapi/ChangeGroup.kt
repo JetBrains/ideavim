@@ -35,8 +35,8 @@ import com.maddyhome.idea.vim.group.ChangeGroup
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.inlayAwareVisualColumn
+import com.maddyhome.idea.vim.helper.vimCarets
 import com.maddyhome.idea.vim.helper.vimChangeActionSwitchMode
-import com.maddyhome.idea.vim.helper.vimForEachCaret
 import com.maddyhome.idea.vim.helper.vimLastColumn
 import kotlin.math.min
 
@@ -129,7 +129,7 @@ fun deleteRange(
 fun insertLineBelow(editor: Editor, context: DataContext) {
   val vimEditor: MutableVimEditor = IjVimEditor(editor)
   val project = editor.project
-  editor.vimForEachCaret { caret ->
+  for (caret in editor.vimCarets()) {
     val vimCaret: VimCaret = IjVimCaret(caret)
     val line = vimCaret.getLine()
 
@@ -140,9 +140,11 @@ fun insertLineBelow(editor: Editor, context: DataContext) {
 
     val position = EditorLine.Offset.init(nextLogicalLine, vimEditor)
 
-    val insertedLine = vimEditor.addLine(position) ?: return@vimForEachCaret
+    val insertedLine = vimEditor.addLine(position) ?: continue
+    VimPlugin.getChange().saveStrokes("\n")
 
     var lineStart = vimEditor.getLineRange(insertedLine).first
+    val initialLineStart = lineStart
 
     // Set up indent
     // Firstly set up primitive indent
@@ -159,6 +161,9 @@ fun insertLineBelow(editor: Editor, context: DataContext) {
       val newIndent = EnterHandler.adjustLineIndentNoCommit(language, editor.document, editor, lineStart.point)
       lineStart = if (newIndent >= 0) newIndent.offset else lineStart
     }
+    VimPlugin.getChange()
+      .saveStrokes(editor.document.getText(com.intellij.openapi.util.TextRange(initialLineStart.point,
+        lineStart.point)))
 
     vimCaret.moveToOffset(lineStart.point)
   }

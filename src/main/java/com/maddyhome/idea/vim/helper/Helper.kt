@@ -77,6 +77,14 @@ inline fun <reified T : Enum<T>> enumSetOf(vararg value: T): EnumSet<T> = when (
   else -> EnumSet.of(value[0], *value.slice(1..value.lastIndex).toTypedArray())
 }
 
+fun Editor.vimCarets(): List<Caret> {
+  return if (this.inBlockSubMode) {
+    listOf(this.caretModel.primaryCaret)
+  } else {
+    this.caretModel.allCarets
+  }
+}
+
 inline fun Editor.vimForEachCaret(action: (caret: Caret) -> Unit) {
   if (this.inBlockSubMode) {
     action(this.caretModel.primaryCaret)

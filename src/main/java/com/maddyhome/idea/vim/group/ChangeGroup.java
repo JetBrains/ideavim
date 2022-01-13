@@ -511,7 +511,7 @@ public class ChangeGroup {
   /**
    * Terminate insert/replace mode after the user presses Escape or Ctrl-C
    * <p>
-   * DEPRECATED. Please, don't use this function directly. Use ModeHelper.exitInsert
+   * DEPRECATED. Please, don't use this function directly. Use ModeHelper.exitInsertMode in file ModeExtensions.kt
    */
   public void processEscape(@NotNull Editor editor,
                             @Nullable DataContext context,
@@ -634,7 +634,8 @@ public class ChangeGroup {
 
   /**
    * This repeats the previous insert count times
-   *  @param editor  The editor to insert into
+   *
+   * @param editor  The editor to insert into
    * @param context The data context
    * @param count   The number of times to repeat the previous insert
    */
@@ -2003,6 +2004,11 @@ public class ChangeGroup {
     if (lastStrokes != null) {
       lastStrokes.clear();
     }
+  }
+
+  public void saveStrokes(String newStrokes) {
+    char[] chars = newStrokes.toCharArray();
+    strokes.add(chars);
   }
 
   private int repeatLines;
