@@ -1208,7 +1208,7 @@ public class MultipleCaretsTest extends VimTestCase {
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   public void testInsertNewLineAboveActionWithMultipleCaretsInLine() {
     typeTextInFile(parseKeys("O", "<ESC>"), "a<caret>bcd<caret>e\n" + "abc<caret>d<caret>e\n");
-    assertState("<caret>\n" + "abcde\n" + "<caret>\n" + "abcde\n");
+    assertState("<caret>\n<caret>\nabcde\n<caret>\n<caret>\nabcde\n");
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)

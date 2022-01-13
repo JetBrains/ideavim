@@ -141,4 +141,52 @@ class InsertNewLineBelowActionTest : VimTestCase() {
         |hard by the torrent of a mountain pass.""".trimMargin()
     doTest("5o123<esc>", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
+
+  fun `test insert new line below with folds`() {
+    val before = """I found it in a legendary land
+        |${c}all rocks [and lavender] and tufted grass,
+        |where it was settled on some sodden sand
+        |hard by the torrent of a mountain pass.""".trimMargin()
+    val after = """I found it in a legendary land
+        |all rocks and lavender and tufted grass,
+        |$c
+        |where it was settled on some sodden sand
+        |hard by the torrent of a mountain pass.""".trimMargin()
+
+    configureAndFold(before, "")
+
+    performTest("o", after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+  }
+
+  fun `test insert new line below with folds 2`() {
+    val before = """I found it in a legendary land
+        |${c}all rocks [and lavender and tufted grass,
+        |where it was settled] on some sodden sand
+        |hard by the torrent of a mountain pass.""".trimMargin()
+    val after = """I found it in a legendary land
+        |all rocks and lavender and tufted grass,
+        |where it was settled on some sodden sand
+        |$c
+        |hard by the torrent of a mountain pass.""".trimMargin()
+
+    configureAndFold(before, "")
+
+    performTest("o", after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+  }
+
+  fun `test pycharm notebook folders`() {
+    val before = """[I found it in a legendary land
+        |]${c}all rocks and lavender and tufted grass,
+        |[where it was settled on some sodden sand
+        |]hard by the torrent of a mountain pass.""".trimMargin()
+    val after = """I found it in a legendary land
+        |all rocks and lavender and tufted grass,
+        |$c
+        |where it was settled on some sodden sand
+        |hard by the torrent of a mountain pass.""".trimMargin()
+
+    configureAndFold(before, "")
+
+    performTest("o", after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+  }
 }

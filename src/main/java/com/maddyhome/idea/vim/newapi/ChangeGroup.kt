@@ -22,8 +22,6 @@ import com.intellij.codeInsight.editorActions.EnterHandler
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.editor.LogicalPosition
-import com.intellij.openapi.editor.VisualPosition
 import com.intellij.psi.util.PsiUtilBase
 import com.intellij.util.text.CharArrayUtil
 import com.maddyhome.idea.vim.VimPlugin
@@ -139,11 +137,12 @@ fun insertLineAround(editor: Editor, context: DataContext, shift: Int) {
       val line = vimCaret.getLine()
 
       // Calculating next line with minding folders
-      val currentVisualPosition = editor.logicalToVisualPosition(LogicalPosition(line.line, 0))
-      val nextVisualPosition = VisualPosition(currentVisualPosition.line + shift, 0)
-      val nextLogicalLine = editor.visualToLogicalPosition(nextVisualPosition).line
-
-      val position = EditorLine.Offset.init(nextLogicalLine, vimEditor)
+      val lineEndOffset = if (shift == 1) {
+        VimPlugin.getMotion().moveCaretToLineEnd(editor, caret)
+      } else {
+        VimPlugin.getMotion().moveCaretToLineStart(editor, caret)
+      }
+      val position = EditorLine.Offset.init(editor.offsetToLogicalPosition(lineEndOffset).line + shift, vimEditor)
 
       val insertedLine = vimEditor.addLine(position) ?: continue
       VimPlugin.getChange().saveStrokes("\n")
