@@ -153,10 +153,10 @@ fun insertLineAround(editor: Editor, context: DataContext, shift: Int) {
 
       // Set up indent
       // Firstly set up primitive indent
-      val lineStartOffset = vimEditor.getLineRange(line).first
+      val lineStartOffset = vimEditor.getLineRange(line).first.point + (1 - shift)
       val text = editor.document.charsSequence
-      val lineStartWsEndOffset = CharArrayUtil.shiftForward(text, lineStartOffset.point, " \t")
-      val indent = text.subSequence(lineStartOffset.point, min(caret.offset, lineStartWsEndOffset))
+      val lineStartWsEndOffset = CharArrayUtil.shiftForward(text, lineStartOffset, " \t")
+      val indent = text.subSequence(lineStartOffset, min(caret.offset, lineStartWsEndOffset))
       vimEditor.insertText(lineStart, indent)
       lineStart = (lineStart.point + indent.length).offset
 

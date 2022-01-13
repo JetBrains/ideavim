@@ -237,7 +237,23 @@ class IjVimEditor(val editor: Editor) : MutableLinearEditor() {
 
   override fun addLine(atPosition: EditorLine.Offset): EditorLine.Pointer {
     val offset: Int = if (atPosition.line < lineCount()) {
-      editor.document.getLineStartOffset(atPosition.line)
+
+      // The new line character is inserted before the new line char of the previous line. So it works line an enter
+      //   on a line end. I believe that the correct implementation would be to insert the new line char after the
+      //   \n of the previous line, however at the moment this won't update the mark on this line.
+      //   https://youtrack.jetbrains.com/issue/IDEA-286587
+
+      val lineStart = (editor.document.getLineStartOffset(atPosition.line) - 1).coerceAtLeast(0)
+      val guard = editor.document.getOffsetGuard(lineStart)
+      if (guard != null && guard.endOffset == lineStart + 1) {
+        // Dancing around guarded blocks. It may happen that this concrete position is locked, but the next
+        //   (after the new line character) is not. In this case we can actually insert the line after this
+        //   new line char
+        // Such thing is often used in pycharm notebooks.
+        lineStart + 1
+      } else {
+        lineStart
+      }
     } else {
       fileSize().toInt()
     }
