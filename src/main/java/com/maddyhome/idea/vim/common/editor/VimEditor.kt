@@ -143,7 +143,7 @@ fun VimEditor.indentForLine(line: Int): Int {
   return EditorHelper.getLeadingCharacterOffset(editor, line)
 }
 
-interface MutableVimEditor {
+interface MutableVimEditor : VimEditor {
   /**
    * Returns actually deleted range and the according text, if any.
    *
@@ -273,7 +273,7 @@ interface VimCaret {
   val editor: VimEditor
   fun moveToOffset(offset: Int)
   fun offsetForLineStartSkipLeading(line: Int): Int
-  fun getLine(): Int
+  fun getLine(): EditorLine.Pointer
 }
 
 class IjVimCaret(val caret: Caret) : VimCaret {
@@ -289,8 +289,8 @@ class IjVimCaret(val caret: Caret) : VimCaret {
     return VimPlugin.getMotion().moveCaretToLineStartSkipLeading((editor as IjVimEditor).editor, line)
   }
 
-  override fun getLine(): Int {
-    return caret.logicalPosition.line
+  override fun getLine(): EditorLine.Pointer {
+    return EditorLine.Pointer.init(caret.logicalPosition.line, editor)
   }
 }
 

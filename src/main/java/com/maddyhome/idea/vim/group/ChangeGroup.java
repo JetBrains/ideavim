@@ -400,7 +400,7 @@ public class ChangeGroup {
    * @param context The data context
    * @param mode    The mode - indicate insert or replace
    */
-  private void initInsert(@NotNull Editor editor, @NotNull DataContext context, @NotNull CommandState.Mode mode) {
+  public void initInsert(@NotNull Editor editor, @NotNull DataContext context, @NotNull CommandState.Mode mode) {
     final CommandState state = CommandState.getInstance(editor);
 
     final CaretModel caretModel = editor.getCaretModel();
