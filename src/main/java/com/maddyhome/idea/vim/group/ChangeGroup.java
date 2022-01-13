@@ -63,6 +63,7 @@ import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor;
 import com.maddyhome.idea.vim.listener.VimInsertListener;
 import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
+import com.maddyhome.idea.vim.newapi.ChangeGroupKt;
 import com.maddyhome.idea.vim.option.StrictMode;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
 import com.maddyhome.idea.vim.vimscript.services.OptionService;
@@ -1397,7 +1398,7 @@ public class ChangeGroup {
    * @param range  The range corresponding to the selected block
    * @return total number of lines
    */
-  static int getLinesCountInVisualBlock(@NotNull Editor editor, @NotNull TextRange range) {
+  public static int getLinesCountInVisualBlock(@NotNull Editor editor, @NotNull TextRange range) {
     final int[] startOffsets = range.getStartOffsets();
     if (startOffsets.length == 0) return 0;
     final LogicalPosition firstStart = editor.offsetToLogicalPosition(startOffsets[0]);

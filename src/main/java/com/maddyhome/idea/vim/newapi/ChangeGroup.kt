@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2021 The IdeaVim authors
+ * Copyright (C) 2003-2022 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.group
+package com.maddyhome.idea.vim.newapi
 
 import com.intellij.codeInsight.editorActions.EnterHandler
 import com.intellij.openapi.actionSystem.DataContext
@@ -29,17 +29,8 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.IndentConfig
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.common.editor.EditorLine
-import com.maddyhome.idea.vim.common.editor.IjVimCaret
-import com.maddyhome.idea.vim.common.editor.IjVimEditor
-import com.maddyhome.idea.vim.common.editor.MutableVimEditor
-import com.maddyhome.idea.vim.common.editor.OperatedRange
-import com.maddyhome.idea.vim.common.editor.VimCaret
-import com.maddyhome.idea.vim.common.editor.VimMachine
-import com.maddyhome.idea.vim.common.editor.indentForLine
-import com.maddyhome.idea.vim.common.editor.offset
-import com.maddyhome.idea.vim.common.editor.offsetForLineWithStartOfLineOption
-import com.maddyhome.idea.vim.common.editor.toVimRange
+import com.maddyhome.idea.vim.group.ChangeGroup
+import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.inlayAwareVisualColumn
 import com.maddyhome.idea.vim.helper.vimChangeActionSwitchMode
