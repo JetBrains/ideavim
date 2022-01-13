@@ -22,6 +22,8 @@ import com.intellij.codeInsight.editorActions.EnterHandler
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.LogicalPosition
+import com.intellij.openapi.editor.VisualPosition
 import com.intellij.psi.util.PsiUtilBase
 import com.intellij.util.text.CharArrayUtil
 import com.maddyhome.idea.vim.VimPlugin
@@ -130,7 +132,13 @@ fun insertLineBelow(editor: Editor, context: DataContext) {
   editor.vimForEachCaret { caret ->
     val vimCaret: VimCaret = IjVimCaret(caret)
     val line = vimCaret.getLine()
-    val position = EditorLine.Offset.init(line.line + 1, vimEditor)
+
+    // Calculating next line with minding folders
+    val currentVisualPosition = editor.logicalToVisualPosition(LogicalPosition(line.line, 0))
+    val nextVisualPosition = VisualPosition(currentVisualPosition.line + 1, 0)
+    val nextLogicalLine = editor.visualToLogicalPosition(nextVisualPosition).line
+
+    val position = EditorLine.Offset.init(nextLogicalLine, vimEditor)
 
     val insertedLine = vimEditor.addLine(position) ?: return@vimForEachCaret
 
