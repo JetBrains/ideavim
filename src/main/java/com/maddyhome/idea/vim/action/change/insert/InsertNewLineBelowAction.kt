@@ -24,9 +24,9 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.newapi.insertLineBelow
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
+import com.maddyhome.idea.vim.newapi.insertLineAround
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import java.util.*
 
@@ -43,9 +43,30 @@ class InsertNewLineBelowAction : ChangeEditorActionHandler.SingleExecution() {
   ): Boolean {
     if (editor.isOneLineMode) return false
     if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "experimentalapi")) {
-      insertLineBelow(editor, context)
+      insertLineAround(editor, context, 1)
     } else {
       VimPlugin.getChange().insertNewLineBelow(editor, context)
+    }
+    return true
+  }
+}
+
+class InsertNewLineAboveAction : ChangeEditorActionHandler.SingleExecution() {
+  override val type: Command.Type = Command.Type.INSERT
+
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MULTIKEY_UNDO)
+
+  override fun execute(
+    editor: Editor,
+    context: DataContext,
+    argument: Argument?,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
+    if (editor.isOneLineMode) return false
+    if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "experimentalapi")) {
+      insertLineAround(editor, context, -1)
+    } else {
+      VimPlugin.getChange().insertNewLineAbove(editor, context)
     }
     return true
   }

@@ -126,7 +126,7 @@ fun deleteRange(
   return deletedInfo != null
 }
 
-fun insertLineBelow(editor: Editor, context: DataContext) {
+fun insertLineAround(editor: Editor, context: DataContext, shift: Int) {
   val vimEditor: MutableVimEditor = IjVimEditor(editor)
   val project = editor.project
   for (caret in editor.vimCarets()) {
@@ -135,7 +135,7 @@ fun insertLineBelow(editor: Editor, context: DataContext) {
 
     // Calculating next line with minding folders
     val currentVisualPosition = editor.logicalToVisualPosition(LogicalPosition(line.line, 0))
-    val nextVisualPosition = VisualPosition(currentVisualPosition.line + 1, 0)
+    val nextVisualPosition = VisualPosition(currentVisualPosition.line + shift, 0)
     val nextLogicalLine = editor.visualToLogicalPosition(nextVisualPosition).line
 
     val position = EditorLine.Offset.init(nextLogicalLine, vimEditor)
