@@ -36,6 +36,10 @@ usual beta standards.
 * [VIM-2500](https://youtrack.jetbrains.com/issue/VIM-2500) Fix esc for normal mode
 * [VIM-2523](https://youtrack.jetbrains.com/issue/VIM-2523) `i` command for the folder in the project tree
 
+### Merged PRs:
+* [441](https://github.com/JetBrains/ideavim/pull/441) by [DanEEStar](https://github.com/DanEEStar): Add Matchit support for Vue.js files
+* [440](https://github.com/JetBrains/ideavim/pull/440) by [Kevin Suen](ksrb): Add matchit support for handlebars
+
 ## 1.9.0, 2021-12-10
 
 ### Features:
