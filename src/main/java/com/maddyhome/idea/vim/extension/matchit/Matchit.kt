@@ -194,7 +194,7 @@ private object MatchitPatterns {
 
   // Files that can contain HTML or HTML-like content.
   // These are just the file types that have HTML Matchit support enabled by default in their Vim ftplugin files.
-  private val htmlLikeFileTypes = arrayOf("HTML", "XML", "XHTML", "JSP", "JavaScript", "JSX Harmony", "TypeScript", "TypeScript JSX", "Vue.js")
+  private val htmlLikeFileTypes = arrayOf("Handlebars/Mustache", "HTML", "XML", "XHTML", "JSP", "JavaScript", "JSX Harmony", "TypeScript", "TypeScript JSX", "Vue.js")
 
   private val htmlPatternsTable = createHtmlPatternsTable()
   private val rubyPatternsTable = createRubyPatternsTable()
