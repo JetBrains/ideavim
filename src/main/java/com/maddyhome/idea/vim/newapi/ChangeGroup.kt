@@ -67,7 +67,11 @@ fun changeRange(
     if (deletedInfo is OperatedRange.Lines) {
       // Add new line in case of linewise motion
       val existingLine = if (vimEditor.fileSize() != 0L) {
-        vimEditor.addLine(deletedInfo.lineAbove)
+        if (deletedInfo.shiftType != LineDeleteShift.NO_NL) {
+          vimEditor.addLine(deletedInfo.lineAbove)
+        } else {
+          EditorLine.Pointer.init(deletedInfo.lineAbove.line, vimEditor)
+        }
       } else {
         EditorLine.Pointer.init(0, vimEditor)
       }
@@ -117,8 +121,14 @@ fun deleteRange(
       is OperatedRange.Block -> TODO()
       is OperatedRange.Lines -> {
         val line = deletedInfo.lineAbove.toPointer(vimEditor)
-        val offset = vimCaret.offsetForLineWithStartOfLineOption(line)
-        vimCaret.moveToOffset(offset)
+        if (deletedInfo.shiftType != LineDeleteShift.NL_ON_START) {
+          val offset = vimCaret.offsetForLineWithStartOfLineOption(line)
+          vimCaret.moveToOffset(offset)
+        } else {
+          val logicalLine = EditorLine.Pointer.init((line.line - 1).coerceAtLeast(0), vimEditor)
+          val offset = vimCaret.offsetForLineWithStartOfLineOption(logicalLine)
+          vimCaret.moveToOffset(offset)
+        }
       }
     }
   }

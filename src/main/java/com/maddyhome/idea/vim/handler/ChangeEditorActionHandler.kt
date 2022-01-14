@@ -19,6 +19,7 @@
 package com.maddyhome.idea.vim.handler
 
 import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.ReadOnlyFragmentModificationException
@@ -108,7 +109,11 @@ sealed class ChangeEditorActionHandler : EditorActionHandlerBase(false) {
         }
       }
     } catch (e: ReadOnlyFragmentModificationException) {
-      EditorActionManager.getInstance().getReadonlyFragmentModificationHandler(doc).handle(e)
+      if (ApplicationManager.getApplication().isUnitTestMode) {
+       throw e
+      } else {
+        EditorActionManager.getInstance().getReadonlyFragmentModificationHandler(doc).handle(e)
+      }
     } finally {
       doc.stopGuardedBlockChecking()
     }

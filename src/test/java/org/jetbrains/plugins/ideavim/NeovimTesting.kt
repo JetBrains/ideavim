@@ -218,6 +218,8 @@ enum class SkipNeovimReason {
   PLUGIN_ERROR,
 
   VIM_SCRIPT,
+
+  GUARDED_BLOCKS,
 }
 
 fun LogicalPosition.toVimCoords(): VimCoords {

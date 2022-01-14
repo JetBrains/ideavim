@@ -148,7 +148,7 @@ interface MutableVimEditor : VimEditor {
    * Returns actually deleted range and the according text, if any.
    *
    * TODO: How to make a clear code difference between [delete] and [deleteDryRun]. How to make sure that [deleteDryRun]
-   *   will be called before [delete]?
+   *   will be called before [delete]? Should we call [deleteDryRun] before [delete]?
    */
   fun delete(range: VimRange)
   fun addLine(atPosition: EditorLine.Offset): EditorLine.Pointer?
@@ -179,12 +179,16 @@ abstract class MutableLinearEditor : MutableVimEditor, LinearEditor() {
       is VimRange.Line.Offsets -> {
         var startOffset = getLineRange(getLine(range.offsetAbove())).first
         var endOffset = getLineRange(getLine(range.offsetBelow())).second
+        var shiftType = LineDeleteShift.NO_NL
         if (endOffset.point < fileSize() && charAt(endOffset.point.pointer) == '\n') {
           endOffset = (endOffset.point + 1).offset
+         shiftType = LineDeleteShift.NL_ON_END
         } else if (startOffset.point > 0 && lfMakesNewLine) {
           startOffset = (startOffset.point - 1).offset
+          shiftType = LineDeleteShift.NL_ON_START
         }
-        deleteRange(startOffset, endOffset)
+        val (newStart, newEnd) = (startOffset to endOffset).search((this as IjVimEditor).editor, shiftType)?.first ?: return
+        deleteRange(newStart, newEnd)
       }
     }
   }
@@ -209,16 +213,71 @@ abstract class MutableLinearEditor : MutableVimEditor, LinearEditor() {
         var startOffset = getLineRange(lineAbove).first
         val lineBelow = getLine(range.offsetBelow())
         var endOffset = getLineRange(lineBelow).second
+        var shiftType = LineDeleteShift.NO_NL
         if (endOffset.point < fileSize() && charAt(endOffset.point.pointer) == '\n') {
           endOffset = (endOffset.point + 1).offset
+          shiftType = LineDeleteShift.NL_ON_END
         } else if (startOffset.point > 0 && lfMakesNewLine) {
           startOffset = (startOffset.point - 1).offset
+          shiftType = LineDeleteShift.NL_ON_START
         }
-        val textToDelete = getText(startOffset, endOffset)
-        OperatedRange.Lines(textToDelete, EditorLine.Offset.init(lineAbove.line, this), lineBelow.line - lineAbove.line)
+        val data = (startOffset to endOffset).search((this as IjVimEditor).editor, shiftType) ?: return null
+        val (newStart, newEnd) = data.first
+        shiftType = data.second
+        val textToDelete = getText(newStart, newEnd)
+        OperatedRange.Lines(textToDelete, EditorLine.Offset.init(lineAbove.line, this), lineBelow.line - lineAbove.line, shiftType)
       }
     }
   }
+
+  fun Pair<Offset, Offset>.search(editor: Editor, shiftType: LineDeleteShift): Pair<Pair<Offset, Offset>, LineDeleteShift>? {
+
+    return when (shiftType) {
+      LineDeleteShift.NO_NL -> if (noGuard(editor)) return this to shiftType else null
+      LineDeleteShift.NL_ON_END -> {
+        if (noGuard(editor)) return this to shiftType
+
+        shift(-1, -1) {
+          if (noGuard(editor)) return this to LineDeleteShift.NL_ON_START
+        }
+
+        shift(shiftEnd = -1) {
+          if (noGuard(editor)) return this to LineDeleteShift.NO_NL
+        }
+
+        null
+      }
+      LineDeleteShift.NL_ON_START -> {
+        if (noGuard(editor)) return this to shiftType
+
+        shift(shiftStart = 1) {
+          if (noGuard(editor)) return this to LineDeleteShift.NO_NL
+        }
+
+        null
+      }
+    }
+  }
+
+  private fun Pair<Offset, Offset>.noGuard(editor: Editor): Boolean {
+    return editor.document.getRangeGuard(this.first.point, this.second.point) == null
+  }
+
+  private inline fun Pair<Offset, Offset>.shift(
+    shiftStart: Int = 0,
+    shiftEnd: Int = 0,
+    action: Pair<Offset, Offset>.() -> Unit,
+  ) {
+    val data =
+      (this.first.point + shiftStart).coerceAtLeast(0).offset to (this.second.point + shiftEnd).coerceAtLeast(0).offset
+    data.action()
+  }
+}
+
+enum class LineDeleteShift {
+  NL_ON_START,
+  NL_ON_END,
+  NO_NL,
 }
 
 class IjVimEditor(val editor: Editor) : MutableLinearEditor() {
@@ -481,7 +540,7 @@ sealed class EditorLine private constructor(val line: Int) {
 }
 
 sealed class OperatedRange {
-  class Lines(val text: CharSequence, val lineAbove: EditorLine.Offset, val linesOperated: Int) : OperatedRange()
+  class Lines(val text: CharSequence, val lineAbove: EditorLine.Offset, val linesOperated: Int, val shiftType: LineDeleteShift) : OperatedRange()
   class Characters(val text: CharSequence, val leftOffset: Offset, val rightOffset: Offset) : OperatedRange()
   class Block : OperatedRange() {
     init {
