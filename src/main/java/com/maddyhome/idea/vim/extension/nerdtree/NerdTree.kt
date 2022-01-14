@@ -337,6 +337,7 @@ class NerdTree : VimExtension {
       "NERDTreeMapOpenSplit", "i",
       NerdAction.Code { project, _, event ->
         val file = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return@Code
+        if (file.isDirectory) return@Code
         val splitters = FileEditorManagerEx.getInstanceEx(project).splitters
         val currentWindow = splitters.currentWindow
         currentWindow.split(SwingConstants.HORIZONTAL, true, file, true)
