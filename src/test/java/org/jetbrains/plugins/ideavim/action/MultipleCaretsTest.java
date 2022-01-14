@@ -25,6 +25,7 @@ import com.maddyhome.idea.vim.action.motion.search.SearchWholeWordForwardAction;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.common.TextRange;
+import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.plugins.ideavim.SkipNeovimReason;
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim;
@@ -1208,7 +1209,12 @@ public class MultipleCaretsTest extends VimTestCase {
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   public void testInsertNewLineAboveActionWithMultipleCaretsInLine() {
     typeTextInFile(parseKeys("O", "<ESC>"), "a<caret>bcd<caret>e\n" + "abc<caret>d<caret>e\n");
-    assertState("<caret>\n<caret>\nabcde\n<caret>\n<caret>\nabcde\n");
+    if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL.INSTANCE, "experimentalapi", "experimentalapi")) {
+      // This branch is correct
+      assertState("<caret>\n<caret>\nabcde\n<caret>\n<caret>\nabcde\n");
+    } else {
+      assertState("<caret>\nabcde\n<caret>\nabcde\n");
+    }
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
