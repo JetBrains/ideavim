@@ -147,6 +147,7 @@ tasks {
     runPluginVerifier {
         downloadDir.set("${project.buildDir}/pluginVerifier/ides")
         teamCityOutputFormat.set(true)
+        ideVersions.set(listOf("IC-2021.3.1"))
     }
 
     generateGrammarSource {
@@ -157,11 +158,6 @@ tasks {
 
     named("compileKotlin") {
         dependsOn("generateGrammarSource")
-    }
-
-    patchPluginXml {
-        sinceBuild.set("2021.3")
-        untilBuild.set("")
     }
 }
 
