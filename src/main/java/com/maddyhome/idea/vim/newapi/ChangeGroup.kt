@@ -120,12 +120,12 @@ fun deleteRange(
       }
       is OperatedRange.Block -> TODO()
       is OperatedRange.Lines -> {
-        val line = deletedInfo.lineAbove.toPointer(vimEditor)
         if (deletedInfo.shiftType != LineDeleteShift.NL_ON_START) {
+          val line = deletedInfo.lineAbove.toPointer(vimEditor)
           val offset = vimCaret.offsetForLineWithStartOfLineOption(line)
           vimCaret.moveToOffset(offset)
         } else {
-          val logicalLine = EditorLine.Pointer.init((line.line - 1).coerceAtLeast(0), vimEditor)
+          val logicalLine = EditorLine.Pointer.init((deletedInfo.lineAbove.line - 1).coerceAtLeast(0), vimEditor)
           val offset = vimCaret.offsetForLineWithStartOfLineOption(logicalLine)
           vimCaret.moveToOffset(offset)
         }

@@ -18,11 +18,10 @@
 
 package org.jetbrains.plugins.ideavim.extension.entiretextobj
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
-import com.maddyhome.idea.vim.vimscript.services.OptionService
+import com.maddyhome.idea.vim.helper.experimentalApi
 import org.jetbrains.plugins.ideavim.JavaVimTestCase
 
 /**
@@ -113,7 +112,7 @@ class VimTextObjEntireExtensionTest : JavaVimTestCase() {
     doTest(
       StringHelper.parseKeys("die"),
       "\n  \n \n${poem}\n  \n \n",
-      if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "experimentalapi", "experimentalapi")) {
+      if (experimentalApi()) {
         "\n  \n \n<caret>\n  \n \n"
       } else {
         "\n  \n \n<caret>\n\n  \n \n"

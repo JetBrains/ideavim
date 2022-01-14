@@ -25,9 +25,9 @@ import com.maddyhome.idea.vim.action.DuplicableOperatorAction
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.newapi.deleteRange
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
-import com.maddyhome.idea.vim.vimscript.services.OptionService
+import com.maddyhome.idea.vim.helper.experimentalApi
+import com.maddyhome.idea.vim.newapi.deleteRange
 
 class DeleteMotionAction : ChangeEditorActionHandler.ForEachCaret(), DuplicableOperatorAction {
   override val type: Command.Type = Command.Type.DELETE
@@ -44,7 +44,7 @@ class DeleteMotionAction : ChangeEditorActionHandler.ForEachCaret(), DuplicableO
     operatorArguments: OperatorArguments,
   ): Boolean {
     if (argument == null) return false
-    if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "experimentalapi")) {
+    if (experimentalApi()) {
       val (first, second) = VimPlugin.getChange()
         .getDeleteRangeAndType2(editor, caret, context, argument, false, operatorArguments)
         ?: return false

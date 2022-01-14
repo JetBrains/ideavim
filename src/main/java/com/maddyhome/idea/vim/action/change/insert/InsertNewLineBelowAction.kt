@@ -26,8 +26,8 @@ import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
+import com.maddyhome.idea.vim.helper.experimentalApi
 import com.maddyhome.idea.vim.newapi.insertLineAround
-import com.maddyhome.idea.vim.vimscript.services.OptionService
 import java.util.*
 
 class InsertNewLineBelowAction : ChangeEditorActionHandler.SingleExecution() {
@@ -42,7 +42,7 @@ class InsertNewLineBelowAction : ChangeEditorActionHandler.SingleExecution() {
     operatorArguments: OperatorArguments,
   ): Boolean {
     if (editor.isOneLineMode) return false
-    if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "experimentalapi")) {
+    if (experimentalApi()) {
       insertLineAround(editor, context, 1)
     } else {
       VimPlugin.getChange().insertNewLineBelow(editor, context)
@@ -63,7 +63,7 @@ class InsertNewLineAboveAction : ChangeEditorActionHandler.SingleExecution() {
     operatorArguments: OperatorArguments,
   ): Boolean {
     if (editor.isOneLineMode) return false
-    if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "experimentalapi")) {
+    if (experimentalApi()) {
       insertLineAround(editor, context, 0)
     } else {
       VimPlugin.getChange().insertNewLineAbove(editor, context)
