@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2021 The IdeaVim authors
+ * Copyright (C) 2003-2022 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -63,6 +63,7 @@ import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor;
 import com.maddyhome.idea.vim.listener.VimInsertListener;
 import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
+import com.maddyhome.idea.vim.newapi.ChangeGroupKt;
 import com.maddyhome.idea.vim.option.StrictMode;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
 import com.maddyhome.idea.vim.vimscript.services.OptionService;
@@ -400,7 +401,7 @@ public class ChangeGroup {
    * @param context The data context
    * @param mode    The mode - indicate insert or replace
    */
-  private void initInsert(@NotNull Editor editor, @NotNull DataContext context, @NotNull CommandState.Mode mode) {
+  public void initInsert(@NotNull Editor editor, @NotNull DataContext context, @NotNull CommandState.Mode mode) {
     final CommandState state = CommandState.getInstance(editor);
 
     final CaretModel caretModel = editor.getCaretModel();
@@ -505,12 +506,13 @@ public class ChangeGroup {
         }
       }
     }
+    System.out.println("");
   }
 
   /**
    * Terminate insert/replace mode after the user presses Escape or Ctrl-C
    * <p>
-   * DEPRECATED. Please, don't use this function directly. Use ModeHelper.exitInsert
+   * DEPRECATED. Please, don't use this function directly. Use ModeHelper.exitInsertMode in file ModeExtensions.kt
    */
   public void processEscape(@NotNull Editor editor,
                             @Nullable DataContext context,
@@ -633,7 +635,8 @@ public class ChangeGroup {
 
   /**
    * This repeats the previous insert count times
-   *  @param editor  The editor to insert into
+   *
+   * @param editor  The editor to insert into
    * @param context The data context
    * @param count   The number of times to repeat the previous insert
    */
@@ -1397,7 +1400,7 @@ public class ChangeGroup {
    * @param range  The range corresponding to the selected block
    * @return total number of lines
    */
-  static int getLinesCountInVisualBlock(@NotNull Editor editor, @NotNull TextRange range) {
+  public static int getLinesCountInVisualBlock(@NotNull Editor editor, @NotNull TextRange range) {
     final int[] startOffsets = range.getStartOffsets();
     if (startOffsets.length == 0) return 0;
     final LogicalPosition firstStart = editor.offsetToLogicalPosition(startOffsets[0]);
@@ -2002,6 +2005,11 @@ public class ChangeGroup {
     if (lastStrokes != null) {
       lastStrokes.clear();
     }
+  }
+
+  public void saveStrokes(String newStrokes) {
+    char[] chars = newStrokes.toCharArray();
+    strokes.add(chars);
   }
 
   private int repeatLines;

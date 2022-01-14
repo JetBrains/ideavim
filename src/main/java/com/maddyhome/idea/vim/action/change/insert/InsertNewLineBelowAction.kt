@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2021 The IdeaVim authors
+ * Copyright (C) 2003-2022 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,6 +26,8 @@ import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
+import com.maddyhome.idea.vim.helper.experimentalApi
+import com.maddyhome.idea.vim.newapi.insertLineAround
 import java.util.*
 
 class InsertNewLineBelowAction : ChangeEditorActionHandler.SingleExecution() {
@@ -40,7 +42,32 @@ class InsertNewLineBelowAction : ChangeEditorActionHandler.SingleExecution() {
     operatorArguments: OperatorArguments,
   ): Boolean {
     if (editor.isOneLineMode) return false
-    VimPlugin.getChange().insertNewLineBelow(editor, context)
+    if (experimentalApi()) {
+      insertLineAround(editor, context, 1)
+    } else {
+      VimPlugin.getChange().insertNewLineBelow(editor, context)
+    }
+    return true
+  }
+}
+
+class InsertNewLineAboveAction : ChangeEditorActionHandler.SingleExecution() {
+  override val type: Command.Type = Command.Type.INSERT
+
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MULTIKEY_UNDO)
+
+  override fun execute(
+    editor: Editor,
+    context: DataContext,
+    argument: Argument?,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
+    if (editor.isOneLineMode) return false
+    if (experimentalApi()) {
+      insertLineAround(editor, context, 0)
+    } else {
+      VimPlugin.getChange().insertNewLineAbove(editor, context)
+    }
     return true
   }
 }

@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2021 The IdeaVim authors
+ * Copyright (C) 2003-2022 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,10 +20,9 @@ package org.jetbrains.plugins.ideavim.extension.matchit
 
 import com.intellij.ide.highlighter.HtmlFileType
 import com.intellij.ide.highlighter.JavaFileType
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
-import com.maddyhome.idea.vim.vimscript.services.OptionService
+import com.maddyhome.idea.vim.helper.experimentalApi
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -214,9 +213,7 @@ class MatchitGeneralTest : VimTestCase() {
           puts "Positive"
         end
       """.trimIndent(),
-      if (VimPlugin.getOptionService()
-        .isSet(OptionService.Scope.GLOBAL, "experimentalapi", "experimentalapi")
-      ) {
+      if (experimentalApi()) {
         """
         if x == 0
           puts "Zero"

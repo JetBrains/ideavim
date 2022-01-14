@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2021 The IdeaVim authors
+ * Copyright (C) 2003-2022 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -54,7 +54,7 @@ class ChangeMotionActionTest : VimTestCase() {
       """.trimIndent(),
       """
         fun main {
-        ...${c}.
+        ....${c}
         }
       """.trimIndent().dotToSpace(),
       CommandState.Mode.INSERT, CommandState.SubMode.NONE

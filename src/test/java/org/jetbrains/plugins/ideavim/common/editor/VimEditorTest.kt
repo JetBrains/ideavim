@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2021 The IdeaVim authors
+ * Copyright (C) 2003-2022 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,9 +20,8 @@ package org.jetbrains.plugins.ideavim.common.editor
 
 import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.command.WriteCommandAction
-import com.maddyhome.idea.vim.common.editor.IjVimEditor
-import com.maddyhome.idea.vim.common.editor.excl
-import com.maddyhome.idea.vim.common.editor.incl
+import com.maddyhome.idea.vim.newapi.IjVimEditor
+import com.maddyhome.idea.vim.newapi.offset
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class VimEditorTest : VimTestCase() {
@@ -31,7 +30,7 @@ class VimEditorTest : VimTestCase() {
     val vimEditor = IjVimEditor(myFixture.editor)
     WriteCommandAction.runWriteCommandAction(myFixture.project) {
       runWriteAction {
-        vimEditor.deleteRange(0.incl, 5.excl)
+        vimEditor.deleteRange(0.offset, 5.offset)
       }
     }
     assertState("567890")

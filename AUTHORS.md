@@ -380,6 +380,10 @@ Contributors:
   [![icon][github]](https://github.com/chylex)
   &nbsp;
   chylex
+* [![icon][mail]](mailto:daniel.egger@gmail.com)
+  [![icon][github]](https://github.com/DanEEStar)
+  &nbsp;
+  DanEEStar
                         
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainers.

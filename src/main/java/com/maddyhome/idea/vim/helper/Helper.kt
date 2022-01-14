@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2021 The IdeaVim authors
+ * Copyright (C) 2003-2022 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.vimscript.services.OptionService
 import java.util.*
 
 /**
@@ -75,6 +76,14 @@ inline fun <reified T : Enum<T>> enumSetOf(vararg value: T): EnumSet<T> = when (
   0 -> noneOfEnum()
   1 -> EnumSet.of(value[0])
   else -> EnumSet.of(value[0], *value.slice(1..value.lastIndex).toTypedArray())
+}
+
+fun Editor.vimCarets(): List<Caret> {
+  return if (this.inBlockSubMode) {
+    listOf(this.caretModel.primaryCaret)
+  } else {
+    this.caretModel.allCarets
+  }
 }
 
 inline fun Editor.vimForEachCaret(action: (caret: Caret) -> Unit) {
@@ -169,3 +178,7 @@ fun vimEnabled(editor: Editor?): Boolean {
 }
 
 fun vimDisabled(editor: Editor?): Boolean = !vimEnabled(editor)
+
+fun experimentalApi(): Boolean {
+  return VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "experimentalapi")
+}

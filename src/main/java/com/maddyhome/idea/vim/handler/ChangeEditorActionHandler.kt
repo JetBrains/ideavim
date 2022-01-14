@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2021 The IdeaVim authors
+ * Copyright (C) 2003-2022 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 package com.maddyhome.idea.vim.handler
 
 import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.ReadOnlyFragmentModificationException
@@ -108,7 +109,11 @@ sealed class ChangeEditorActionHandler : EditorActionHandlerBase(false) {
         }
       }
     } catch (e: ReadOnlyFragmentModificationException) {
-      EditorActionManager.getInstance().getReadonlyFragmentModificationHandler(doc).handle(e)
+      if (ApplicationManager.getApplication().isUnitTestMode) {
+       throw e
+      } else {
+        EditorActionManager.getInstance().getReadonlyFragmentModificationHandler(doc).handle(e)
+      }
     } finally {
       doc.stopGuardedBlockChecking()
     }

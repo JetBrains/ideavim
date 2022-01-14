@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2021 The IdeaVim authors
+ * Copyright (C) 2003-2022 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -110,5 +110,83 @@ class InsertNewLineBelowActionTest : VimTestCase() {
     typeText(parseKeys("o"))
     assertPosition(30, 0)
     assertVisibleArea(6, 40)
+  }
+
+  fun `test insert new line below with count`() {
+    val before = """I found it in a legendary land
+        |${c}all rocks and lavender and tufted grass,
+        |where it was settled on some sodden sand
+        |hard by the torrent of a mountain pass.""".trimMargin()
+    val after = """I found it in a legendary land
+        |all rocks and lavender and tufted grass,
+        |$c
+        |where it was settled on some sodden sand
+        |hard by the torrent of a mountain pass.""".trimMargin()
+    doTest("5o", before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+  }
+
+  fun `test insert new line below with count and escape`() {
+    val before = """I found it in a legendary land
+        |${c}all rocks and lavender and tufted grass,
+        |where it was settled on some sodden sand
+        |hard by the torrent of a mountain pass.""".trimMargin()
+    val after = """I found it in a legendary land
+        |all rocks and lavender and tufted grass,
+        |123
+        |123
+        |123
+        |123
+        |12${c}3
+        |where it was settled on some sodden sand
+        |hard by the torrent of a mountain pass.""".trimMargin()
+    doTest("5o123<esc>", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
+
+  fun `test insert new line below with folds`() {
+    val before = """I found it in a legendary land
+        |${c}all rocks [and lavender] and tufted grass,
+        |where it was settled on some sodden sand
+        |hard by the torrent of a mountain pass.""".trimMargin()
+    val after = """I found it in a legendary land
+        |all rocks and lavender and tufted grass,
+        |$c
+        |where it was settled on some sodden sand
+        |hard by the torrent of a mountain pass.""".trimMargin()
+
+    configureAndFold(before, "")
+
+    performTest("o", after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+  }
+
+  fun `test insert new line below with folds 2`() {
+    val before = """I found it in a legendary land
+        |${c}all rocks [and lavender and tufted grass,
+        |where it was settled] on some sodden sand
+        |hard by the torrent of a mountain pass.""".trimMargin()
+    val after = """I found it in a legendary land
+        |all rocks and lavender and tufted grass,
+        |where it was settled on some sodden sand
+        |$c
+        |hard by the torrent of a mountain pass.""".trimMargin()
+
+    configureAndFold(before, "")
+
+    performTest("o", after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+  }
+
+  fun `test pycharm notebook folders`() {
+    val before = """[I found it in a legendary land
+        |]${c}all rocks and lavender and tufted grass,
+        |[where it was settled on some sodden sand
+        |]hard by the torrent of a mountain pass.""".trimMargin()
+    val after = """I found it in a legendary land
+        |all rocks and lavender and tufted grass,
+        |$c
+        |where it was settled on some sodden sand
+        |hard by the torrent of a mountain pass.""".trimMargin()
+
+    configureAndFold(before, "")
+
+    performTest("o", after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
   }
 }

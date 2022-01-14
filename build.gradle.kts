@@ -118,7 +118,9 @@ gradle.projectsEvaluated {
 intellij {
     version.set(ideaVersion)
     pluginName.set("IdeaVim")
+
     updateSinceUntilBuild.set(false)
+
     downloadSources.set(downloadIdeaSources.toBoolean())
     instrumentCode.set(instrumentPluginCode.toBoolean())
     intellijRepository.set("https://www.jetbrains.com/intellij-repository")
@@ -155,6 +157,11 @@ tasks {
 
     named("compileKotlin") {
         dependsOn("generateGrammarSource")
+    }
+
+    patchPluginXml {
+        sinceBuild.set("2021.3")
+        untilBuild.set("")
     }
 }
 

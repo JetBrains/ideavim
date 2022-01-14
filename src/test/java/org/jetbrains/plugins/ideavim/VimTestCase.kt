@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2021 The IdeaVim authors
+ * Copyright (C) 2003-2022 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -185,6 +185,39 @@ abstract class VimTestCase : UsefulTestCase() {
   protected fun configureByJavaText(content: String) = configureByText(JavaFileType.INSTANCE, content)
   protected fun configureByXmlText(content: String) = configureByText(XmlFileType.INSTANCE, content)
   protected fun configureByJsonText(content: String) = configureByText(JsonFileType.INSTANCE, content)
+
+  protected fun configureAndGuard(content: String) {
+    val ranges = extractBrackets(content)
+    for ((start, end) in ranges) {
+      myFixture.editor.document.createGuardedBlock(start, end)
+    }
+  }
+
+  protected fun configureAndFold(content: String, placeholder: String) {
+    val ranges = extractBrackets(content)
+    myFixture.editor.foldingModel.runBatchFoldingOperation {
+      for ((start, end) in ranges) {
+        val foldRegion = myFixture.editor.foldingModel.addFoldRegion(start, end, placeholder)
+        foldRegion?.isExpanded = false
+      }
+    }
+  }
+
+  private fun extractBrackets(content: String): ArrayList<Pair<Int, Int>> {
+    var myContent = content.replace(c, "").replace(s, "").replace(se, "")
+    val ranges = ArrayList<Pair<Int, Int>>()
+    while (true) {
+      val start = myContent.indexOfFirst { it == '[' }
+      if (start < 0) break
+      myContent = myContent.removeRange(start, start + 1)
+      val end = myContent.indexOfFirst { it == ']' }
+      if (end < 0) break
+      myContent = myContent.removeRange(end, end + 1)
+      ranges.add(start to end)
+      }
+    configureByText(content.replace("[", "").replace("]", ""))
+    return ranges
+  }
 
   private fun configureByText(fileType: FileType, content: String): Editor {
     @Suppress("IdeaVimAssertState")
@@ -541,7 +574,7 @@ abstract class VimTestCase : UsefulTestCase() {
     NeovimTesting.assertState(myFixture.editor, this)
   }
 
-  private fun performTest(keys: String, after: String, modeAfter: CommandState.Mode, subModeAfter: SubMode) {
+  protected fun performTest(keys: String, after: String, modeAfter: CommandState.Mode, subModeAfter: SubMode) {
     typeText(parseKeys(keys))
     @Suppress("IdeaVimAssertState")
     myFixture.checkResult(after)

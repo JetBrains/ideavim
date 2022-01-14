@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2021 The IdeaVim authors
+ * Copyright (C) 2003-2022 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -337,6 +337,7 @@ class NerdTree : VimExtension {
       "NERDTreeMapOpenSplit", "i",
       NerdAction.Code { project, _, event ->
         val file = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return@Code
+        if (file.isDirectory) return@Code
         val splitters = FileEditorManagerEx.getInstanceEx(project).splitters
         val currentWindow = splitters.currentWindow
         currentWindow.split(SwingConstants.HORIZONTAL, true, file, true)
