@@ -294,7 +294,7 @@ class CommandState private constructor(private val editor: Editor) {
   private fun doShowMode() {
     val msg = StringBuilder()
     if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "showmode")) {
-      msg.append(getStatusString(modeStates.size - 1))
+      msg.append(getStatusString())
     }
     if (isRecording) {
       if (msg.isNotEmpty()) {
@@ -305,24 +305,32 @@ class CommandState private constructor(private val editor: Editor) {
     VimPlugin.showMode(msg.toString())
   }
 
-  private fun getStatusString(pos: Int): String {
-    val modeState = if (pos >= 0 && pos < modeStates.size) {
+  internal fun getStatusString(): String {
+    val pos = modeStates.size - 1
+    val modeState = if (pos >= 0) {
       modeStates[pos]
-    } else if (pos < 0) {
-      defaultModeState
     } else {
-      return ""
+      defaultModeState
     }
     return buildString {
       when (modeState.mode) {
         Mode.INSERT_NORMAL -> append("-- (insert) --")
         Mode.INSERT -> append("INSERT")
         Mode.REPLACE -> append("REPLACE")
-        Mode.VISUAL, Mode.SELECT -> {
+        Mode.VISUAL -> {
           append("-- VISUAL")
           when (modeState.subMode) {
-            SubMode.VISUAL_LINE -> append(modeState.mode).append(" LINE")
-            SubMode.VISUAL_BLOCK -> append(modeState.mode).append(" BLOCK")
+            SubMode.VISUAL_LINE -> append(" LINE")
+            SubMode.VISUAL_BLOCK -> append(" BLOCK")
+            else -> Unit
+          }
+          append(" --")
+        }
+        Mode.SELECT -> {
+          append("-- SELECT")
+          when (modeState.subMode) {
+            SubMode.VISUAL_LINE -> append(" LINE")
+            SubMode.VISUAL_BLOCK -> append(" BLOCK")
             else -> Unit
           }
           append(" --")
@@ -330,8 +338,8 @@ class CommandState private constructor(private val editor: Editor) {
         Mode.INSERT_VISUAL -> {
           append("-- (insert) VISUAL")
           when (modeState.subMode) {
-            SubMode.VISUAL_LINE -> append(modeState.mode).append(" LINE")
-            SubMode.VISUAL_BLOCK -> append(modeState.mode).append(" BLOCK")
+            SubMode.VISUAL_LINE -> append(" LINE")
+            SubMode.VISUAL_BLOCK -> append(" BLOCK")
             else -> Unit
           }
           append(" --")
@@ -339,8 +347,8 @@ class CommandState private constructor(private val editor: Editor) {
         Mode.INSERT_SELECT -> {
           append("-- (insert) SELECT")
           when (modeState.subMode) {
-            SubMode.VISUAL_LINE -> append(modeState.mode).append(" LINE")
-            SubMode.VISUAL_BLOCK -> append(modeState.mode).append(" BLOCK")
+            SubMode.VISUAL_LINE -> append(" LINE")
+            SubMode.VISUAL_BLOCK -> append(" BLOCK")
             else -> Unit
           }
           append(" --")
