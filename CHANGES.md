@@ -34,6 +34,7 @@ usual beta standards.
 * [VIM-2502](https://youtrack.jetbrains.com/issue/VIM-2502) Fix the shape of new carets
 * [VIM-2499](https://youtrack.jetbrains.com/issue/VIM-2499) Fix mapping to esc
 * [VIM-2500](https://youtrack.jetbrains.com/issue/VIM-2500) Fix esc for normal mode
+* [VIM-2523](https://youtrack.jetbrains.com/issue/VIM-2523) `i` command for the folder in the project tree
 
 ## 1.9.0, 2021-12-10
 
