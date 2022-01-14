@@ -384,6 +384,10 @@ Contributors:
   [![icon][github]](https://github.com/DanEEStar)
   &nbsp;
   DanEEStar
+* [![icon][mail]](mailto:ksrbkevinsuen@gmail.com)
+  [![icon][github]](https://github.com/ksrb)
+  &nbsp;
+  Kevin Suen
                         
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainers.
