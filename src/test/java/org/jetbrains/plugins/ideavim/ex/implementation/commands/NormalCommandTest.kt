@@ -175,6 +175,12 @@ class NormalCommandTest : VimTestCase() {
     assertState("hello <Esc<caret>>world !")
   }
 
+  fun `test C-R`() {
+    configureByText("myprop: \"my value\"")
+    typeText(commandToKeys("exe \"norm ^dei-\\<C-R>\\\"-\""))
+    assertState("-myprop-: \"my value\"")
+  }
+
   private fun doTest(command: String, before: String, after: String) {
     myFixture.configureByText("a.java", before)
     typeText(commandToKeys(command))

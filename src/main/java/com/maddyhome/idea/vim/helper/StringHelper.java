@@ -63,11 +63,19 @@ public class StringHelper {
   }
 
   public static @NotNull List<KeyStroke> stringToKeys(@NotNull @NonNls String s) {
-    // The following if is a dirty hack to finally support `let mapleader = "\<space>"`
-    if ("\\<SPACE>".equalsIgnoreCase(s)) return Collections.singletonList(getKeyStroke(' '));
     final List<KeyStroke> res = new ArrayList<>();
     for (int i = 0; i < s.length(); i++) {
-      res.add(getKeyStroke(s.charAt(i)));
+      char c = s.charAt(i);
+      if (isControlCharacter(c) && c != 10) {
+        if (c == 0) {
+          // J is a special case, it's keycode is 0 because keycode 10 is reserved by \n
+          res.add(getKeyStroke('J', CTRL_DOWN_MASK));
+        } else {
+          res.add(getKeyStroke(c + 'A' - 1, CTRL_DOWN_MASK));
+        }
+      } else {
+        res.add(getKeyStroke(c));
+      }
     }
     return res;
   }
@@ -329,6 +337,13 @@ public class StringHelper {
               int keyCode = specialKey.getKeyCode();
               if (specialKey.getKeyCode() == 0) {
                 keyCode = specialKey.getKeyChar();
+              } else if ((specialKey.getModifiers() & CTRL_DOWN_MASK) == CTRL_DOWN_MASK) {
+                if (specialKey.getKeyCode() == 'J') {
+                  // 'J' is a special case, keycode 10 is \n char
+                  keyCode = 0;
+                } else {
+                  keyCode = specialKey.getKeyCode() - 'A' + 1;
+                }
               }
               result.append((char) keyCode);
             } else {
