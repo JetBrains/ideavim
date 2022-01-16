@@ -214,7 +214,7 @@ abstract class VimTestCase : UsefulTestCase() {
       if (end < 0) break
       myContent = myContent.removeRange(end, end + 1)
       ranges.add(start to end)
-      }
+    }
     configureByText(content.replace("[", "").replace("]", ""))
     return ranges
   }

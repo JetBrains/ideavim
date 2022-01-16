@@ -110,7 +110,7 @@ sealed class ChangeEditorActionHandler : EditorActionHandlerBase(false) {
       }
     } catch (e: ReadOnlyFragmentModificationException) {
       if (ApplicationManager.getApplication().isUnitTestMode) {
-       throw e
+        throw e
       } else {
         EditorActionManager.getInstance().getReadonlyFragmentModificationHandler(doc).handle(e)
       }

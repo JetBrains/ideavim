@@ -176,8 +176,14 @@ fun insertLineAround(editor: Editor, context: DataContext, shift: Int) {
         lineStart = if (newIndent >= 0) newIndent.offset else lineStart
       }
       VimPlugin.getChange()
-        .saveStrokes(editor.document.getText(com.intellij.openapi.util.TextRange(initialLineStart.point,
-          lineStart.point)))
+        .saveStrokes(
+          editor.document.getText(
+            com.intellij.openapi.util.TextRange(
+              initialLineStart.point,
+              lineStart.point
+            )
+          )
+        )
 
       vimCaret.moveToOffset(lineStart.point)
     }

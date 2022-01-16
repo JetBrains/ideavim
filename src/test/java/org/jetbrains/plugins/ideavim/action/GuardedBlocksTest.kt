@@ -42,17 +42,21 @@ class GuardedBlocksTest : VimTestCase() {
   @TestWithoutNeovim(reason = SkipNeovimReason.GUARDED_BLOCKS)
   fun `test delete line with block`() {
     if (!experimentalApi()) return
-    configureAndGuard("""
+    configureAndGuard(
+      """
       [1234567890
       ]123${c}4567890[
       1234567890]
-      """.trimIndent())
+      """.trimIndent()
+    )
     typeText(parseKeys("dd"))
-    assertState("""
+    assertState(
+      """
       1234567890
-      ${c}
+      $c
       1234567890
-    """.trimIndent())
+      """.trimIndent()
+    )
   }
 
 /*
@@ -95,85 +99,105 @@ class GuardedBlocksTest : VimTestCase() {
   @TestWithoutNeovim(reason = SkipNeovimReason.GUARDED_BLOCKS)
   fun `test delete line fully unmodifiable`() {
     if (!experimentalApi()) return
-    configureAndGuard("""
+    configureAndGuard(
+      """
       [123${c}4567890
       ]123456789[0
       1234567890]
-      """.trimIndent())
+      """.trimIndent()
+    )
     typeText(parseKeys("dd"))
-    assertState("""
+    assertState(
+      """
       123${c}4567890
       1234567890
       1234567890
-    """.trimIndent())
+      """.trimIndent()
+    )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.GUARDED_BLOCKS)
   fun `test delete line fully unmodifiable end`() {
     if (!experimentalApi()) return
-    configureAndGuard("""
+    configureAndGuard(
+      """
       [1234567890
       ]123456789[0
       123456${c}7890]
-      """.trimIndent())
+      """.trimIndent()
+    )
     typeText(parseKeys("dd"))
-    assertState("""
+    assertState(
+      """
       1234567890
       1234567890
       123456${c}7890
-    """.trimIndent())
+      """.trimIndent()
+    )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.GUARDED_BLOCKS)
   fun `test change line with block`() {
     if (!experimentalApi()) return
-    configureAndGuard("""
+    configureAndGuard(
+      """
       [1234567890
       ]123${c}4567890[
       1234567890]
-      """.trimIndent())
+      """.trimIndent()
+    )
     typeText(parseKeys("cc"))
-    assertState("""
+    assertState(
+      """
       1234567890
-      ${c}
+      $c
       1234567890
-    """.trimIndent())
+      """.trimIndent()
+    )
     assertMode(CommandState.Mode.INSERT)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.GUARDED_BLOCKS)
   fun `test change line with block1`() {
     if (!experimentalApi()) return
-    configureAndGuard("""
+    configureAndGuard(
+      """
       [1234567890
       ]123${c}4567890[
       1234567890]
-      """.trimIndent())
+      """.trimIndent()
+    )
     typeText(parseKeys("O"))
-    assertState("""
+    assertState(
+      """
       1234567890
-      ${c}
+      $c
       1234567890
       1234567890
-    """.trimIndent())
+      """.trimIndent()
+    )
     assertMode(CommandState.Mode.INSERT)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.GUARDED_BLOCKS)
   fun `test change line with block2`() {
     if (!experimentalApi()) return
-    configureAndGuard("""
+    configureAndGuard(
+      """
       [1234567890
       ]123${c}4567890[
       1234567890]
-      """.trimIndent())
+      """.trimIndent()
+    )
     typeText(parseKeys("o"))
-    assertState("""
+    assertState(
+      """
       1234567890
       1234567890
-      ${c}
+      $c
       1234567890
-    """.trimIndent())
+      """.trimIndent()
+    )
     assertMode(CommandState.Mode.INSERT)
   }
 
@@ -218,79 +242,99 @@ class GuardedBlocksTest : VimTestCase() {
   @TestWithoutNeovim(reason = SkipNeovimReason.GUARDED_BLOCKS)
   fun `test change line with block at the end`() {
     if (!experimentalApi()) return
-    configureAndGuard("""
+    configureAndGuard(
+      """
       [1234567890
       ]12345${c}67890
-      """.trimIndent())
+      """.trimIndent()
+    )
     typeText(parseKeys("cc"))
-    assertState("""
+    assertState(
+      """
       1234567890
-      ${c}
-    """.trimIndent())
+      $c
+      """.trimIndent()
+    )
     assertMode(CommandState.Mode.INSERT)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.GUARDED_BLOCKS)
   fun `test delete line near the guard`() {
     if (!experimentalApi()) return
-    configureAndGuard("""
+    configureAndGuard(
+      """
       123456${c}7890[
       1234567890]
-      """.trimIndent())
+      """.trimIndent()
+    )
     typeText(parseKeys("dd"))
-    assertState("""
-      ${c}
+    assertState(
+      """
+      $c
       1234567890
-    """.trimIndent())
+      """.trimIndent()
+    )
     assertMode(CommandState.Mode.COMMAND)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.GUARDED_BLOCKS)
   fun `test delete line near the guard with line above`() {
     if (!experimentalApi()) return
-    configureAndGuard("""
+    configureAndGuard(
+      """
       1234567890
       123456${c}7890[
       1234567890]
-      """.trimIndent())
+      """.trimIndent()
+    )
     typeText(parseKeys("dd"))
-    assertState("""
+    assertState(
+      """
       ${c}1234567890
       1234567890
-    """.trimIndent())
+      """.trimIndent()
+    )
     assertMode(CommandState.Mode.COMMAND)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.GUARDED_BLOCKS)
   fun `test change line near the guard with line above`() {
     if (!experimentalApi()) return
-    configureAndGuard("""
+    configureAndGuard(
+      """
       1234567890
       123456${c}7890[
       1234567890]
-      """.trimIndent())
+      """.trimIndent()
+    )
     typeText(parseKeys("cc"))
-    assertState("""
+    assertState(
+      """
       1234567890
-      ${c}
+      $c
       1234567890
-    """.trimIndent())
+      """.trimIndent()
+    )
     assertMode(CommandState.Mode.INSERT)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.GUARDED_BLOCKS)
   fun `test delete line near the guard with line above on empty line`() {
     if (!experimentalApi()) return
-    configureAndGuard("""
+    configureAndGuard(
+      """
       1234567890
-      ${c}[
+      $c[
       1234567890]
-      """.trimIndent())
+      """.trimIndent()
+    )
     typeText(parseKeys("dd"))
-    assertState("""
+    assertState(
+      """
       1234567890
       1234567890
-    """.trimIndent())
+      """.trimIndent()
+    )
     assertMode(CommandState.Mode.COMMAND)
   }
 }

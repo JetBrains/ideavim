@@ -182,7 +182,7 @@ abstract class MutableLinearEditor : MutableVimEditor, LinearEditor() {
         var shiftType = LineDeleteShift.NO_NL
         if (endOffset.point < fileSize() && charAt(endOffset.point.pointer) == '\n') {
           endOffset = (endOffset.point + 1).offset
-         shiftType = LineDeleteShift.NL_ON_END
+          shiftType = LineDeleteShift.NL_ON_END
         } else if (startOffset.point > 0 && lfMakesNewLine) {
           startOffset = (startOffset.point - 1).offset
           shiftType = LineDeleteShift.NL_ON_START
