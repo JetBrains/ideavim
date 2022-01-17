@@ -124,4 +124,18 @@ class InsertNewLineAboveActionTest : VimTestCase() {
     assertPosition(15, 0)
     assertVisibleArea(5, 39)
   }
+
+  fun `test insert new line above first line`() {
+    val before = """${c}I found it in a legendary land
+        |all rocks and lavender and tufted grass,
+        |where it was settled on some sodden sand
+        |hard by the torrent of a mountain pass.""".trimMargin()
+    val after = """
+        |$c
+        |I found it in a legendary land
+        |all rocks and lavender and tufted grass,
+        |where it was settled on some sodden sand
+        |hard by the torrent of a mountain pass.""".trimMargin()
+    doTest("O", before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+  }
 }

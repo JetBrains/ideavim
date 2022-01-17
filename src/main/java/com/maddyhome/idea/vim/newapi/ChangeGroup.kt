@@ -146,6 +146,13 @@ fun insertLineAround(editor: Editor, context: DataContext, shift: Int) {
       val vimCaret: VimCaret = IjVimCaret(caret)
       val line = vimCaret.getLine()
 
+
+      // Current line indent
+      val lineStartOffset = vimEditor.getLineRange(line).first.point
+      val text = editor.document.charsSequence
+      val lineStartWsEndOffset = CharArrayUtil.shiftForward(text, lineStartOffset, " \t")
+      val indent = text.subSequence(lineStartOffset, min(caret.offset, lineStartWsEndOffset))
+
       // Calculating next line with minding folders
       val lineEndOffset = if (shift == 1) {
         VimPlugin.getMotion().moveCaretToLineEnd(editor, caret)
@@ -162,10 +169,6 @@ fun insertLineAround(editor: Editor, context: DataContext, shift: Int) {
 
       // Set up indent
       // Firstly set up primitive indent
-      val lineStartOffset = vimEditor.getLineRange(line).first.point + (1 - shift)
-      val text = editor.document.charsSequence
-      val lineStartWsEndOffset = CharArrayUtil.shiftForward(text, lineStartOffset, " \t")
-      val indent = text.subSequence(lineStartOffset, min(caret.offset, lineStartWsEndOffset))
       vimEditor.insertText(lineStart, indent)
       lineStart = (lineStart.point + indent.length).offset
 
