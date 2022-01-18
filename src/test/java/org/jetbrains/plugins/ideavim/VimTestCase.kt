@@ -148,6 +148,7 @@ abstract class VimTestCase : UsefulTestCase() {
     VimPlugin.getSearch().resetState()
     VimPlugin.getMark().resetAllMarks()
     VimPlugin.getChange().resetRepeat()
+    VimPlugin.getKey().savedShortcutConflicts.clear()
 
     // Tear down neovim
     NeovimTesting.tearDown(this)
