@@ -67,10 +67,41 @@ class InsertNewLineBelowActionTest : VimTestCase() {
     doTest("o", before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
   }
 
+  fun `test insert new line below matches indent for plain text 1`() {
+    val before = """    I found it in a legendary land
+        | ${c}   all rocks and lavender and tufted grass,
+        |    where it was settled on some sodden sand
+        |    hard by the torrent of a mountain pass.""".trimMargin()
+    val after = """    I found it in a legendary land
+        |    all rocks and lavender and tufted grass,
+        |    $c
+        |    where it was settled on some sodden sand
+        |    hard by the torrent of a mountain pass.""".trimMargin()
+    doTest("o", before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+  }
+
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN) // Java support would be a neovim plugin
   fun `test insert new line below matches indent for java`() {
     val before = """public class C {
       |  ${c}Integer a;
+      |  Integer b;
+      |}
+    """.trimMargin()
+    val after = """public class C {
+      |  Integer a;
+      |  $c
+      |  Integer b;
+      |}
+    """.trimMargin()
+    configureByJavaText(before)
+    typeText(parseKeys("o"))
+    assertState(after)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN) // Java support would be a neovim plugin
+  fun `test insert new line below matches indent for java 1`() {
+    val before = """public class C {
+      |${c}  Integer a;
       |  Integer b;
       |}
     """.trimMargin()

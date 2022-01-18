@@ -37,7 +37,6 @@ import com.maddyhome.idea.vim.helper.inlayAwareVisualColumn
 import com.maddyhome.idea.vim.helper.vimCarets
 import com.maddyhome.idea.vim.helper.vimChangeActionSwitchMode
 import com.maddyhome.idea.vim.helper.vimLastColumn
-import kotlin.math.min
 
 fun changeRange(
   editor: Editor,
@@ -151,7 +150,7 @@ fun insertLineAround(editor: Editor, context: DataContext, shift: Int) {
       val lineStartOffset = vimEditor.getLineRange(line).first.point
       val text = editor.document.charsSequence
       val lineStartWsEndOffset = CharArrayUtil.shiftForward(text, lineStartOffset, " \t")
-      val indent = text.subSequence(lineStartOffset, min(caret.offset, lineStartWsEndOffset))
+      val indent = text.subSequence(lineStartOffset, lineStartWsEndOffset)
 
       // Calculating next line with minding folders
       val lineEndOffset = if (shift == 1) {
