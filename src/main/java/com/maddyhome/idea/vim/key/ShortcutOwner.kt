@@ -101,6 +101,7 @@ sealed class ShortcutOwnerInfo {
     val allIde = AllModes(ShortcutOwner.IDE)
 
     val allPerModeVim = PerMode(ShortcutOwner.VIM, ShortcutOwner.VIM, ShortcutOwner.VIM, ShortcutOwner.VIM)
+    val allPerModeIde = PerMode(ShortcutOwner.IDE, ShortcutOwner.IDE, ShortcutOwner.IDE, ShortcutOwner.IDE)
 
     private val wights = mapOf(
       "a" to 0,

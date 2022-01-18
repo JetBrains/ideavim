@@ -37,7 +37,7 @@ data class SetHandlerCommand(val ranges: Ranges, val argument: String) : Command
   private fun doCommand(): Boolean {
     if (argument.isBlank()) return false
 
-    val args = argument.split(" ")
+    val args = argument.trim().split(" ")
     if (args.isEmpty()) return false
 
     val key = try {
