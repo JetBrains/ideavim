@@ -154,4 +154,13 @@ class MotionUnmatchedBraceCloseActionTest : VimTestCase() {
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE
     )
   }
+
+  fun `test go to next bracket multiple brackets`() {
+    doTest(
+      "]}",
+      """ {${c} {}} """,
+      """ { {}${c}} """,
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+    )
+  }
 }
