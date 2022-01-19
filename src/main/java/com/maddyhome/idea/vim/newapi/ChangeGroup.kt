@@ -134,6 +134,16 @@ fun deleteRange(
   return deletedInfo != null
 }
 
+/**
+ * Known issues of this code:
+ * - Indent is incorrect when `o` for kotlin code like
+ *   ```
+ *   if (true) {
+ *   }
+ *   ```
+ *   This is probably the kotlin issue, but still
+ * - `*` character doesn't appear when `o` in javadoc section
+ */
 fun insertLineAround(editor: Editor, context: DataContext, shift: Int) {
   val vimEditor: MutableVimEditor = IjVimEditor(editor)
   val project = editor.project
