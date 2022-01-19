@@ -31,8 +31,10 @@ import com.maddyhome.idea.vim.handler.toMotionOrError
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
-class MotionUnmatchedParenOpenAction : MotionActionHandler.ForEachCaret() {
+sealed class MotionUnmatchedAction(private val motionChar: Char) : MotionActionHandler.ForEachCaret() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
+
+  override val motionType: MotionType = MotionType.EXCLUSIVE
 
   override fun getOffset(
     editor: Editor,
@@ -41,8 +43,13 @@ class MotionUnmatchedParenOpenAction : MotionActionHandler.ForEachCaret() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    return VimPlugin.getMotion().moveCaretToUnmatchedBlock(editor, caret, operatorArguments.count1, '(').toMotionOrError()
+    return VimPlugin.getMotion()
+      .moveCaretToUnmatchedBlock(editor, caret, operatorArguments.count1, motionChar)
+      .toMotionOrError()
   }
-
-  override val motionType: MotionType = MotionType.EXCLUSIVE
 }
+
+class MotionUnmatchedBraceCloseAction : MotionUnmatchedAction('}')
+class MotionUnmatchedBraceOpenAction : MotionUnmatchedAction('{')
+class MotionUnmatchedParenCloseAction : MotionUnmatchedAction(')')
+class MotionUnmatchedParenOpenAction : MotionUnmatchedAction('(')

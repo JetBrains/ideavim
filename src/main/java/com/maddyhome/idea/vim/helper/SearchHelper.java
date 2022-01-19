@@ -467,7 +467,7 @@ public class SearchHelper {
     char match = blockChars.charAt(loc);
     char found = blockChars.charAt(loc - dir.toInt());
 
-    return findBlockLocation(chars, found, match, dir, pos, count, false);
+    return findBlockLocation(chars, found, match, dir, pos + dir.toInt(), count, false);
   }
 
   public static @Nullable TextRange findBlockRange(@NotNull Editor editor,
