@@ -204,7 +204,7 @@ class VimSurroundExtension : VimExtension {
   companion object {
     private const val REGISTER = '"'
 
-    private val tagNameAndAttributesCapturePattern = "(\\w+)([^>]*)>".toPattern()
+    private val tagNameAndAttributesCapturePattern = "(\\S+)([^>]*)>".toPattern()
 
     private val SURROUND_PAIRS = mapOf(
       'b' to ("(" to ")"),
