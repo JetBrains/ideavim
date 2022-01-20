@@ -111,6 +111,13 @@ class VimSurroundExtensionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  fun testSurroundCustomElement() {
+    configureByText("${c}Click me!")
+    typeText(parseKeys("VS<custom-button>"))
+    assertState("<custom-button>Click me!</custom-button>")
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun testSurroundFunctionName() {
     configureByText("foo = b${c}ar")
     typeText(parseKeys("ysiwfbaz"))
