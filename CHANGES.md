@@ -39,6 +39,7 @@ usual beta standards.
 * [441](https://github.com/JetBrains/ideavim/pull/441) by [DanEEStar](https://github.com/DanEEStar): Add Matchit support for Vue.js files
 * [440](https://github.com/JetBrains/ideavim/pull/440) by [Kevin Suen](https://github.com/ksrb): Add matchit support for handlebars
 * [448](https://github.com/JetBrains/ideavim/pull/448) by [Michael Schertenleib](https://github.com/cravay): Support custom element names in vim-surround
+* [435](https://github.com/JetBrains/ideavim/pull/435) by [Piotr Mikulski](https://github.com/pmnoxx): Print stderr when running a command just like vim does
 
 ## 1.9.0, 2021-12-10
 
