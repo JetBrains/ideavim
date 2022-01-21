@@ -104,7 +104,7 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
   private static final String PLAYBACK_REGISTERS = RECORDABLE_REGISTERS + UNNAMED_REGISTER + CLIPBOARD_REGISTERS + LAST_INSERTED_TEXT_REGISTER;
   public static final String VALID_REGISTERS = WRITABLE_REGISTERS + READONLY_REGISTERS;
 
-  private static final Logger logger = Logger.getInstance(RegisterGroup.class.getName());
+  private static final Logger logger = Logger.getInstance(RegisterGroup.class);
 
   private final @NotNull HashMap<Character, Register> registers = new HashMap<>();
   private char defaultRegister = UNNAMED_REGISTER;
@@ -512,20 +512,28 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
   }
 
   public void saveData(final @NotNull Element element) {
-    logger.debug("saveData");
+    logger.debug("Save registers data");
     final Element registersElement = new Element("registers");
+    if (logger.isTraceEnabled()) {
+      logger.trace("Saving " + registers.size() + " registers");
+    }
     for (Character key : registers.keySet()) {
       final Register register = registers.get(key);
+      if (logger.isTraceEnabled()) {
+        logger.trace("Saving register '" + key + "'");
+      }
       final Element registerElement = new Element("register");
       registerElement.setAttribute("name", String.valueOf(key));
       registerElement.setAttribute("type", Integer.toString(register.getType().getValue()));
       final String text = register.getText();
       if (text != null) {
+        logger.trace("Save register as 'text'");
         final Element textElement = new Element("text");
         StringHelper.setSafeXmlText(textElement, text);
         registerElement.addContent(textElement);
       }
       else {
+        logger.trace("Save register as 'keys'");
         final Element keys = new Element("keys");
         final List<KeyStroke> list = register.getKeys();
         for (KeyStroke stroke : list) {
@@ -541,29 +549,41 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
     }
 
     element.addContent(registersElement);
+    logger.debug("Finish saving registers data");
   }
 
   public void readData(final @NotNull Element element) {
-    logger.debug("readData");
+    logger.debug("Read registers data");
     final Element registersElement = element.getChild("registers");
     if (registersElement != null) {
+      logger.trace("'registers' element is not null");
       final List<Element> registerElements = registersElement.getChildren("register");
+      if (logger.isTraceEnabled()) {
+        logger.trace("Detected " + registerElements.size() + " register elements");
+      }
       for (Element registerElement : registerElements) {
         final char key = registerElement.getAttributeValue("name").charAt(0);
+        if (logger.isTraceEnabled()) {
+          logger.trace("Read register '" + key + "'");
+        }
         final Register register;
         final Element textElement = registerElement.getChild("text");
         final String typeText = registerElement.getAttributeValue("type");
         final SelectionType type = SelectionType.fromValue(Integer.parseInt(typeText));
         if (textElement != null) {
+          logger.trace("Register has 'text' element");
           final String text = StringHelper.getSafeXmlText(textElement);
           if (text != null) {
+            logger.trace("Register data parsed");
             register = new Register(key, type, text, Collections.emptyList());
           }
           else {
+            logger.trace("Cannot parse register data");
             register = null;
           }
         }
         else {
+          logger.trace("Register has 'keys' element");
           final Element keysElement = registerElement.getChild("keys");
           final List<Element> keyElements = keysElement.getChildren("key");
           final List<KeyStroke> strokes = new ArrayList<>();
@@ -578,9 +598,11 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
           }
           register = new Register(key, type, strokes);
         }
+        logger.trace("Save register to vim registers");
         registers.put(key, register);
       }
     }
+    logger.debug("Finish reading registers data");
   }
 
   private @Nullable Register refreshClipboardRegister(char r) {
