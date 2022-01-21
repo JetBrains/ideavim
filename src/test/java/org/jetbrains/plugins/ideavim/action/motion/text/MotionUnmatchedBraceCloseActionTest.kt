@@ -28,14 +28,14 @@ class MotionUnmatchedBraceCloseActionTest : VimTestCase() {
       "]}",
       """
       int main() {
-        ${c}
+        $c
       }
-    """.trimIndent(),
+      """.trimIndent(),
       """
       int main() {
         
-      ${c}}
-    """.trimIndent(),
+      $c}
+      """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE
     )
   }
@@ -46,48 +46,50 @@ class MotionUnmatchedBraceCloseActionTest : VimTestCase() {
       """
       class Xxx {
         int main() {
-          ${c}
+          $c
         }
       }
-    """.trimIndent(),
+      """.trimIndent(),
       """
       class Xxx {
         int main() {
           
-        ${c}}
+        $c}
       }
-    """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE
     )
   }
 
-  @VimBehaviorDiffers(originalVimAfter = """
+  @VimBehaviorDiffers(
+    originalVimAfter = """
       class Xxx {
         int main() {
           
           String  x = "}"
-        ${c}}
+        $c}
       }
-  """)
+  """
+  )
   fun `test go to next bracket with quotes`() {
     doTest(
       "]}",
       """
       class Xxx {
         int main() {
-          ${c}
+          $c
           String  x = "}"
         }
       }
-    """.trimIndent(),
+      """.trimIndent(),
       """
       class Xxx {
         int main() {
           
-          String  x = "${c}}"
+          String  x = "$c}"
         }
       }
-    """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE
     )
   }
@@ -98,17 +100,17 @@ class MotionUnmatchedBraceCloseActionTest : VimTestCase() {
       """
       class Xxx {
         int main() {
-          ${c}
+          $c
         }
       }
-    """.trimIndent(),
+      """.trimIndent(),
       """
       class Xxx {
         int main() {
           
         }
-      ${c}}
-    """.trimIndent(),
+      $c}
+      """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE
     )
   }
@@ -119,17 +121,17 @@ class MotionUnmatchedBraceCloseActionTest : VimTestCase() {
       """
       class Xxx {
         int main() {
-          ${c}
+          $c
         }
       }
-    """.trimIndent(),
+      """.trimIndent(),
       """
       class Xxx {
         int main() {
           
         }
-      ${c}}
-    """.trimIndent(),
+      $c}
+      """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE
     )
   }
@@ -140,17 +142,17 @@ class MotionUnmatchedBraceCloseActionTest : VimTestCase() {
       """
       class Xxx {
         int main() {
-          ${c}
+          $c
         }
       }
-    """.trimIndent(),
+      """.trimIndent(),
       """
       class Xxx {
         int main() {
           
         }
-      ${c}}
-    """.trimIndent(),
+      $c}
+      """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE
     )
   }
@@ -158,8 +160,8 @@ class MotionUnmatchedBraceCloseActionTest : VimTestCase() {
   fun `test go to next bracket multiple brackets`() {
     doTest(
       "]}",
-      """ {${c} {}} """,
-      """ { {}${c}} """,
+      """ {$c {}} """,
+      """ { {}$c} """,
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE
     )
   }

@@ -155,7 +155,6 @@ fun insertLineAround(editor: Editor, context: DataContext, shift: Int) {
       val vimCaret: VimCaret = IjVimCaret(caret)
       val line = vimCaret.getLine()
 
-
       // Current line indent
       val lineStartOffset = vimEditor.getLineRange(line).first.point
       val text = editor.document.charsSequence

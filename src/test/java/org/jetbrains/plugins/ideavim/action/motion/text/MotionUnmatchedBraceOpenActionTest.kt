@@ -28,14 +28,14 @@ class MotionUnmatchedBraceOpenActionTest : VimTestCase() {
       "[{",
       """
       int main() {
-        ${c}
+        $c
       }
-    """.trimIndent(),
+      """.trimIndent(),
       """
-      int main() ${c}{
+      int main() $c{
         
       }
-    """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE
     )
   }
@@ -46,17 +46,17 @@ class MotionUnmatchedBraceOpenActionTest : VimTestCase() {
       """
       class Xxx {
         int main() {
-          ${c}
+          $c
         }
       }
-    """.trimIndent(),
+      """.trimIndent(),
       """
       class Xxx {
-        int main() ${c}{
+        int main() $c{
           
         }
       }
-    """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE
     )
   }
@@ -67,17 +67,17 @@ class MotionUnmatchedBraceOpenActionTest : VimTestCase() {
       """
       class Xxx {
         int main() {
-          ${c}
+          $c
         }
       }
-    """.trimIndent(),
+      """.trimIndent(),
       """
-      class Xxx ${c}{
+      class Xxx $c{
         int main() {
           
         }
       }
-    """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE
     )
   }
@@ -88,45 +88,47 @@ class MotionUnmatchedBraceOpenActionTest : VimTestCase() {
       """
       class Xxx {
         int main() {
-          ${c}
+          $c
         }
       }
-    """.trimIndent(),
+      """.trimIndent(),
       """
-      class Xxx ${c}{
+      class Xxx $c{
         int main() {
           
         }
       }
-    """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE
     )
   }
 
-  @VimBehaviorDiffers(originalVimAfter = """
-      class Xxx ${c}{
+  @VimBehaviorDiffers(
+    originalVimAfter = """
+      class Xxx $c{
         int main() {
           
         }
       }
-  """)
+  """
+  )
   fun `test go to next next bracket with great count`() {
     doTest(
       "5[{",
       """
       class Xxx {
         int main() {
-          ${c}
+          $c
         }
       }
-    """.trimIndent(),
+      """.trimIndent(),
       """
       class Xxx {
         int main() {
-          ${c}
+          $c
         }
       }
-    """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE
     )
   }
