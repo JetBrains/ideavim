@@ -392,6 +392,10 @@ Contributors:
   [![icon][github]](https://github.com/cravay)
   &nbsp;
   Michael Schertenleib
+* [![icon][mail]](mailto:piotr@near.org)
+  [![icon][github]](https://github.com/pmnoxx)
+  &nbsp;
+  Piotr Mikulski
                         
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainers.
