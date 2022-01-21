@@ -388,6 +388,10 @@ Contributors:
   [![icon][github]](https://github.com/ksrb)
   &nbsp;
   Kevin Suen
+* [![icon][mail]](mailto:michael.schertenleib@inftec.ch)
+  [![icon][github]](https://github.com/cravay)
+  &nbsp;
+  Michael Schertenleib
                         
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainers.
