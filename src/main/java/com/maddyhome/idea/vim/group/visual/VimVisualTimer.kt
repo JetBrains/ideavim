@@ -35,7 +35,7 @@ import javax.swing.Timer
  *   If IdeaVim had reacted to this selection immediately, its listeners were called twice: after selection set and
  *   after selection removing. After there both operations vim would get normal mode, what is inconvenient because user
  *   expects vim to stay in insert mode.
- *   Same approach is used in some accented characters on MacOs and for Romaji layout in Japanese language (VIM-1725).
+ *   Same approach is used in some accented characters on macOS and for Romaji layout in Japanese language (VIM-1725).
  *
  * Because of this IdeaVim doesn't react to selection change immediately. After selection was changed, vim waits some
  *   time (100 ms by default) and enables visual mode (or any another) if selection was not changed during this time.
