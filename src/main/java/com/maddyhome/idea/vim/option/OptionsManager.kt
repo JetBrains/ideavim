@@ -600,7 +600,7 @@ object LookupKeysData {
     "<Tab>", "<Down>", "<Up>", "<Enter>", "<Left>", "<Right>",
     "<C-Down>", "<C-Up>",
     "<PageUp>", "<PageDown>",
-    // New line in vim, but QuickDoc on MacOs
+    // New line in vim, but QuickDoc on macOS
     "<C-J>",
     // QuickDoc for non-mac layouts.
     // Vim: Insert next non-digit literally (same as <Ctrl-V>). Not yet supported (19.01.2020)
