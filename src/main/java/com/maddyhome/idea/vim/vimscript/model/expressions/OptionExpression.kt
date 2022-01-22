@@ -28,7 +28,7 @@ import com.maddyhome.idea.vim.vimscript.services.OptionService
 
 data class OptionExpression(val scope: Scope, val optionName: String) : Expression() {
 
-  override fun evaluate(editor: Editor, context: DataContext, parent: VimLContext): VimDataType {
+  override fun evaluate(editor: Editor, context: DataContext, vimContext: VimLContext): VimDataType {
     return when (scope) {
       Scope.GLOBAL_VARIABLE -> VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, optionName, originalString)
       Scope.LOCAL_VARIABLE -> VimPlugin.getOptionService().getOptionValue(OptionService.Scope.LOCAL(editor), optionName, originalString)

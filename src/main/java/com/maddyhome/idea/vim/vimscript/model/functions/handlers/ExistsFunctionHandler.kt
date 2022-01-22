@@ -41,7 +41,7 @@ object ExistsFunctionHandler : FunctionHandler() {
     argumentValues: List<Expression>,
     editor: Editor,
     context: DataContext,
-    parent: VimLContext,
+    vimContext: VimLContext,
   ): VimDataType {
     val expression = argumentValues[0]
     return if (expression is SimpleExpression && expression.data is VimString) {

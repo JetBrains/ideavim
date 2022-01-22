@@ -75,7 +75,7 @@ data class VimFuncref(
     throw ExException("E703: using Funcref as a Number")
   }
 
-  fun execute(name: String, args: List<Expression>, editor: Editor, context: DataContext, parent: VimLContext): VimDataType {
+  fun execute(name: String, args: List<Expression>, editor: Editor, context: DataContext, vimContext: VimLContext): VimDataType {
     if (handler is DefinedFunctionHandler && handler.function.flags.contains(FunctionFlag.DICT)) {
       if (dictionary == null) {
         throw ExException("E725: Calling dict function without Dictionary: $name")
@@ -97,11 +97,11 @@ data class VimFuncref(
       val handler = when (type) {
         Type.LAMBDA, Type.FUNCREF -> this.handler
         Type.FUNCTION -> {
-          FunctionStorage.getFunctionHandlerOrNull(handler.scope, handler.name, parent)
+          FunctionStorage.getFunctionHandlerOrNull(handler.scope, handler.name, vimContext)
             ?: throw ExException("E117: Unknown function: ${handler.name}")
         }
       }
-      return handler.executeFunction(allArguments, editor, context, parent)
+      return handler.executeFunction(allArguments, editor, context, vimContext)
     }
 
     override fun deepCopy(level: Int): VimFuncref {

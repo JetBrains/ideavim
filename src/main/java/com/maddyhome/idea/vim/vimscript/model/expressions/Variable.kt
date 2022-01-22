@@ -27,11 +27,11 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 data class Variable(val scope: Scope?, val name: CurlyBracesName) : Expression() {
   constructor(scope: Scope?, name: String) : this(scope, CurlyBracesName(listOf(SimpleExpression(name))))
 
-  override fun evaluate(editor: Editor, context: DataContext, parent: VimLContext): VimDataType {
-    return VimPlugin.getVariableService().getNonNullVariableValue(this, editor, context, parent)
+  override fun evaluate(editor: Editor, context: DataContext, vimContext: VimLContext): VimDataType {
+    return VimPlugin.getVariableService().getNonNullVariableValue(this, editor, context, vimContext)
   }
 
-  fun toString(editor: Editor, context: DataContext, parent: VimLContext): String {
-    return (scope?.toString() ?: "") + name.evaluate(editor, context, parent)
+  fun toString(editor: Editor, context: DataContext, vimContext: VimLContext): String {
+    return (scope?.toString() ?: "") + name.evaluate(editor, context, vimContext)
   }
 }

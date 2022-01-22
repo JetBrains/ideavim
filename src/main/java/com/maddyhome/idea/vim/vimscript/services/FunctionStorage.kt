@@ -39,7 +39,7 @@ object FunctionStorage {
   private val extensionPoint = ExtensionPointName.create<FunctionBeanClass>("IdeaVIM.vimLibraryFunction")
   private val builtInFunctions: MutableMap<String, FunctionHandler> = mutableMapOf()
 
-  fun deleteFunction(name: String, scope: Scope? = null, parent: VimLContext) {
+  fun deleteFunction(name: String, scope: Scope? = null, vimContext: VimLContext) {
     if (name[0].isLowerCase() && scope != Scope.SCRIPT_VARIABLE) {
       throw ExException("E128: Function name must start with a capital or \"s:\": $name")
     }
@@ -56,12 +56,12 @@ object FunctionStorage {
           }
         }
         Scope.SCRIPT_VARIABLE -> {
-          if (parent.getFirstParentContext() !is Script) {
+          if (vimContext.getFirstParentContext() !is Script) {
             throw ExException("E81: Using <SID> not in a script context")
           }
 
-          if (getScriptFunction(name, parent) != null) {
-            deleteScriptFunction(name, parent)
+          if (getScriptFunction(name, vimContext) != null) {
+            deleteScriptFunction(name, vimContext)
             return
           } else {
             throw ExException("E130: Unknown function: ${scope.c}:$name")
@@ -76,9 +76,9 @@ object FunctionStorage {
       return
     }
 
-    val firstParentContext = parent.getFirstParentContext()
-    if (firstParentContext is Script && getScriptFunction(name, parent) != null) {
-      deleteScriptFunction(name, parent)
+    val firstParentContext = vimContext.getFirstParentContext()
+    if (firstParentContext is Script && getScriptFunction(name, vimContext) != null) {
+      deleteScriptFunction(name, vimContext)
       return
     }
     throw ExException("E130: Unknown function: $name")
@@ -109,12 +109,12 @@ object FunctionStorage {
     }
   }
 
-  fun getFunctionHandler(scope: Scope?, name: String, parent: VimLContext): FunctionHandler {
-    return getFunctionHandlerOrNull(scope, name, parent)
+  fun getFunctionHandler(scope: Scope?, name: String, vimContext: VimLContext): FunctionHandler {
+    return getFunctionHandlerOrNull(scope, name, vimContext)
       ?: throw ExException("E117: Unknown function: ${scope?.toString() ?: ""}$name")
   }
 
-  fun getFunctionHandlerOrNull(scope: Scope?, name: String, parent: VimLContext): FunctionHandler? {
+  fun getFunctionHandlerOrNull(scope: Scope?, name: String, vimContext: VimLContext): FunctionHandler? {
     if (scope == null) {
       val builtInFunction = getBuiltInFunction(name)
       if (builtInFunction != null) {
@@ -122,22 +122,22 @@ object FunctionStorage {
       }
     }
 
-    val definedFunction = getUserDefinedFunction(scope, name, parent)
+    val definedFunction = getUserDefinedFunction(scope, name, vimContext)
     if (definedFunction != null) {
       return DefinedFunctionHandler(definedFunction)
     }
     return null
   }
 
-  fun getUserDefinedFunction(scope: Scope?, name: String, parent: VimLContext): FunctionDeclaration? {
+  fun getUserDefinedFunction(scope: Scope?, name: String, vimContext: VimLContext): FunctionDeclaration? {
     return when (scope) {
       Scope.GLOBAL_VARIABLE -> globalFunctions[name]
-      Scope.SCRIPT_VARIABLE -> getScriptFunction(name, parent)
+      Scope.SCRIPT_VARIABLE -> getScriptFunction(name, vimContext)
       null -> {
-        val firstParentContext = parent.getFirstParentContext()
+        val firstParentContext = vimContext.getFirstParentContext()
         when (firstParentContext) {
           is CommandLineVimLContext -> globalFunctions[name]
-          is Script -> globalFunctions[name] ?: getScriptFunction(name, parent)
+          is Script -> globalFunctions[name] ?: getScriptFunction(name, vimContext)
           else -> throw RuntimeException("Unknown parent context")
         }
       }
@@ -154,13 +154,13 @@ object FunctionStorage {
     script.scriptFunctions[functionDeclaration.name] = functionDeclaration
   }
 
-  private fun getScriptFunction(name: String, parent: VimLContext): FunctionDeclaration? {
-    val script = parent.getScript() ?: throw ExException("E120: Using <SID> not in a script context: s:$name")
+  private fun getScriptFunction(name: String, vimContext: VimLContext): FunctionDeclaration? {
+    val script = vimContext.getScript() ?: throw ExException("E120: Using <SID> not in a script context: s:$name")
     return script.scriptFunctions[name]
   }
 
-  private fun deleteScriptFunction(name: String, parent: VimLContext) {
-    val script = parent.getScript() ?: throw ExException("E81: Using <SID> not in a script context")
+  private fun deleteScriptFunction(name: String, vimContext: VimLContext) {
+    val script = vimContext.getScript() ?: throw ExException("E81: Using <SID> not in a script context")
     if (script.scriptFunctions[name] != null) {
       script.scriptFunctions[name]!!.isDeleted = true
     }

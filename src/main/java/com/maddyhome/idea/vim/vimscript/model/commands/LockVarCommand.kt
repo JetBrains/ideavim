@@ -36,7 +36,7 @@ class LockVarCommand(val ranges: Ranges, val argument: String) : Command.SingleE
   // todo doesn't throw proper vim exceptions in case of wrong arguments
   override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
     val variableAndDepth = parseVariableAndDepth(argument)
-    VimPlugin.getVariableService().lockVariable(variableAndDepth.first, variableAndDepth.second, editor, context, parent)
+    VimPlugin.getVariableService().lockVariable(variableAndDepth.first, variableAndDepth.second, editor, context, vimContext)
     return ExecutionResult.Success
   }
 }
@@ -50,7 +50,7 @@ class UnlockVarCommand(val ranges: Ranges, val argument: String) : Command.Singl
   // todo doesn't throw proper vim exceptions in case of wrong arguments
   override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
     val variableAndDepth = parseVariableAndDepth(argument)
-    VimPlugin.getVariableService().unlockVariable(variableAndDepth.first, variableAndDepth.second, editor, context, parent)
+    VimPlugin.getVariableService().unlockVariable(variableAndDepth.first, variableAndDepth.second, editor, context, vimContext)
     return ExecutionResult.Success
   }
 }

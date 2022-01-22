@@ -60,7 +60,7 @@ data class UnknownCommand(val ranges: Ranges, val name: String, val argument: St
             return if (parsedCommand is UnknownCommand) {
               processPossiblyAliasCommand(commandAlias.command, editor, context, aliasCountdown - 1)
             } else {
-              parsedCommand.parent = this.parent
+              parsedCommand.vimContext = this.vimContext
               parsedCommand.execute(editor, context)
               ExecutionResult.Success
             }

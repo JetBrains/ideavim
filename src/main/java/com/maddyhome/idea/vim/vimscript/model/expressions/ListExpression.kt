@@ -26,8 +26,8 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 
 data class ListExpression(val list: MutableList<Expression>) : Expression() {
 
-  override fun evaluate(editor: Editor, context: DataContext, parent: VimLContext): VimDataType {
-    val evaluatedList = list.map { it.evaluate(editor, context, parent) }.toMutableList()
+  override fun evaluate(editor: Editor, context: DataContext, vimContext: VimLContext): VimDataType {
+    val evaluatedList = list.map { it.evaluate(editor, context, vimContext) }.toMutableList()
     return VimList(evaluatedList)
   }
 }

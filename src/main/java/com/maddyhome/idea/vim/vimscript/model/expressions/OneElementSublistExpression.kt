@@ -29,24 +29,24 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
 data class OneElementSublistExpression(val index: Expression, val expression: Expression) : Expression() {
 
-  override fun evaluate(editor: Editor, context: DataContext, parent: VimLContext): VimDataType {
-    val expressionValue = expression.evaluate(editor, context, parent)
+  override fun evaluate(editor: Editor, context: DataContext, vimContext: VimLContext): VimDataType {
+    val expressionValue = expression.evaluate(editor, context, vimContext)
     if (expressionValue is VimDictionary) {
-      return expressionValue.dictionary[VimString(index.evaluate(editor, context, parent).asString())]
+      return expressionValue.dictionary[VimString(index.evaluate(editor, context, vimContext).asString())]
         ?: throw ExException(
           "E716: Key not present in Dictionary: \"${
-          index.evaluate(editor, context, parent).asString()
+          index.evaluate(editor, context, vimContext).asString()
           }\""
         )
     } else {
-      val indexValue = Integer.parseInt(index.evaluate(editor, context, parent).asString())
+      val indexValue = Integer.parseInt(index.evaluate(editor, context, vimContext).asString())
       if (expressionValue is VimList && (indexValue >= expressionValue.values.size || indexValue < 0)) {
         throw ExException("E684: list index out of range: $indexValue")
       }
       if (indexValue < 0) {
         return VimString("")
       }
-      return SublistExpression(SimpleExpression(indexValue), SimpleExpression(indexValue), SimpleExpression(expressionValue)).evaluate(editor, context, parent)
+      return SublistExpression(SimpleExpression(indexValue), SimpleExpression(indexValue), SimpleExpression(expressionValue)).evaluate(editor, context, vimContext)
     }
   }
 }

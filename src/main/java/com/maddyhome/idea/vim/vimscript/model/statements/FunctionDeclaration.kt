@@ -39,7 +39,7 @@ data class FunctionDeclaration(
   val flags: Set<FunctionFlag>,
   val hasOptionalArguments: Boolean,
 ) : Executable {
-  override lateinit var parent: VimLContext
+  override lateinit var vimContext: VimLContext
   var isDeleted = false
 
   /**
@@ -56,7 +56,7 @@ data class FunctionDeclaration(
       throw ExException("E125: Illegal argument: $forbiddenArgument")
     }
 
-    body.forEach { it.parent = this }
+    body.forEach { it.vimContext = this }
     FunctionStorage.storeFunction(this)
     return ExecutionResult.Success
   }

@@ -41,20 +41,20 @@ object FunctionFunctionHandler : FunctionHandler() {
     argumentValues: List<Expression>,
     editor: Editor,
     context: DataContext,
-    parent: VimLContext,
+    vimContext: VimLContext,
   ): VimFuncref {
-    val arg1 = argumentValues[0].evaluate(editor, context, parent)
+    val arg1 = argumentValues[0].evaluate(editor, context, vimContext)
     if (arg1 !is VimString) {
       throw ExException("E129: Function name required")
     }
     val scopeAndName = arg1.value.extractScopeAndName()
-    val function = FunctionStorage.getFunctionHandlerOrNull(scopeAndName.first, scopeAndName.second, parent)
+    val function = FunctionStorage.getFunctionHandlerOrNull(scopeAndName.first, scopeAndName.second, vimContext)
       ?: throw ExException("E700: Unknown function: ${if (scopeAndName.first != null) scopeAndName.first!!.c + ":" else ""}${scopeAndName.second}")
 
     var arglist: VimList? = null
     var dictionary: VimDictionary? = null
-    val arg2 = argumentValues.getOrNull(1)?.evaluate(editor, context, parent)
-    val arg3 = argumentValues.getOrNull(2)?.evaluate(editor, context, parent)
+    val arg2 = argumentValues.getOrNull(1)?.evaluate(editor, context, vimContext)
+    val arg3 = argumentValues.getOrNull(2)?.evaluate(editor, context, vimContext)
 
     if (arg2 is VimDictionary && arg3 is VimDictionary) {
       throw ExException("E923: Second argument of function() must be a list or a dict")
@@ -88,21 +88,21 @@ object FuncrefFunctionHandler : FunctionHandler() {
     argumentValues: List<Expression>,
     editor: Editor,
     context: DataContext,
-    parent: VimLContext,
+    vimContext: VimLContext,
   ): VimFuncref {
-    val arg1 = argumentValues[0].evaluate(editor, context, parent)
+    val arg1 = argumentValues[0].evaluate(editor, context, vimContext)
     if (arg1 !is VimString) {
       throw ExException("E129: Function name required")
     }
     val scopeAndName = arg1.value.extractScopeAndName()
-    val function = FunctionStorage.getUserDefinedFunction(scopeAndName.first, scopeAndName.second, parent)
+    val function = FunctionStorage.getUserDefinedFunction(scopeAndName.first, scopeAndName.second, vimContext)
       ?: throw ExException("E700: Unknown function: ${scopeAndName.first?.toString() ?: ""}${scopeAndName.second}")
     val handler = DefinedFunctionHandler(function)
 
     var arglist: VimList? = null
     var dictionary: VimDictionary? = null
-    val arg2 = argumentValues.getOrNull(1)?.evaluate(editor, context, parent)
-    val arg3 = argumentValues.getOrNull(2)?.evaluate(editor, context, parent)
+    val arg2 = argumentValues.getOrNull(1)?.evaluate(editor, context, vimContext)
+    val arg3 = argumentValues.getOrNull(2)?.evaluate(editor, context, vimContext)
 
     if (arg2 is VimDictionary && arg3 is VimDictionary) {
       throw ExException("E923: Second argument of function() must be a list or a dict")

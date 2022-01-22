@@ -26,11 +26,11 @@ import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 
 data class WhileLoop(val condition: Expression, val body: List<Executable>) : Executable {
-  override lateinit var parent: VimLContext
+  override lateinit var vimContext: VimLContext
 
   override fun execute(editor: Editor, context: DataContext): ExecutionResult {
     var result: ExecutionResult = ExecutionResult.Success
-    body.forEach { it.parent = this }
+    body.forEach { it.vimContext = this }
 
     while (condition.evaluate(editor, context, this).asBoolean()) {
       for (statement in body) {

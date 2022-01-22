@@ -26,10 +26,10 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.operators.BinaryOperat
 
 data class BinExpression(val left: Expression, val right: Expression, val operator: BinaryOperator) : Expression() {
 
-  override fun evaluate(editor: Editor, context: DataContext, parent: VimLContext): VimDataType {
+  override fun evaluate(editor: Editor, context: DataContext, vimContext: VimLContext): VimDataType {
     return operator.handler.performOperation(
-      left.evaluate(editor, context, parent),
-      right.evaluate(editor, context, parent)
+      left.evaluate(editor, context, vimContext),
+      right.evaluate(editor, context, vimContext)
     )
   }
 }

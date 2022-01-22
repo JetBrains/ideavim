@@ -27,7 +27,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 data class ScopeExpression(val scope: Scope) : Expression() {
 
   // this expression should never have been evaluated and only be used as a function argument
-  override fun evaluate(editor: Editor, context: DataContext, parent: VimLContext): VimDataType {
+  override fun evaluate(editor: Editor, context: DataContext, vimContext: VimLContext): VimDataType {
     throw ExException("Cannot evaluate scope expression: $scope")
   }
 }

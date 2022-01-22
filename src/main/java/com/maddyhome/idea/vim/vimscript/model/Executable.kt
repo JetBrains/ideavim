@@ -23,11 +23,10 @@ import com.intellij.openapi.editor.Editor
 
 interface Executable : VimLContext {
 
-  // todo rename
-  var parent: VimLContext
+  var vimContext: VimLContext
 
   override fun getPreviousParentContext(): VimLContext {
-    return parent
+    return vimContext
   }
 
   fun execute(editor: Editor, context: DataContext): ExecutionResult

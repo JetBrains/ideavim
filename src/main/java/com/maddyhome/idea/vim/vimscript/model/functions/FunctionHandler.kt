@@ -35,11 +35,11 @@ abstract class FunctionHandler {
   abstract val maximumNumberOfArguments: Int?
   var ranges: Ranges? = null
 
-  protected abstract fun doFunction(argumentValues: List<Expression>, editor: Editor, context: DataContext, parent: VimLContext): VimDataType
+  protected abstract fun doFunction(argumentValues: List<Expression>, editor: Editor, context: DataContext, vimContext: VimLContext): VimDataType
 
-  fun executeFunction(arguments: List<Expression>, editor: Editor, context: DataContext, parent: VimLContext): VimDataType {
+  fun executeFunction(arguments: List<Expression>, editor: Editor, context: DataContext, vimContext: VimLContext): VimDataType {
     checkFunctionCall(arguments)
-    val result = doFunction(arguments, editor, context, parent)
+    val result = doFunction(arguments, editor, context, vimContext)
     ranges = null
     return result
   }

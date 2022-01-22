@@ -43,10 +43,10 @@ data class AnonymousFunctionDeclaration(
   val hasOptionalArguments: Boolean,
 ) : Executable {
 
-  override lateinit var parent: VimLContext
+  override lateinit var vimContext: VimLContext
 
   override fun execute(editor: Editor, context: DataContext): ExecutionResult {
-    val container = sublist.expression.evaluate(editor, context, parent)
+    val container = sublist.expression.evaluate(editor, context, vimContext)
     if (container !is VimDictionary) {
       throw ExException("E1203: Dot can only be used on a dictionary")
     }
@@ -59,7 +59,7 @@ data class AnonymousFunctionDeclaration(
       }
     }
     val declaration = FunctionDeclaration(null, VimFuncref.anonymousCounter++.toString(), args, defaultArgs, body, replaceExisting, flags + FunctionFlag.DICT, hasOptionalArguments)
-    declaration.parent = this.parent
+    declaration.vimContext = this.vimContext
     container.dictionary[index] = VimFuncref(DefinedFunctionHandler(declaration), VimList(mutableListOf()), container, VimFuncref.Type.FUNCREF)
     container.dictionary[index]
     return ExecutionResult.Success

@@ -25,11 +25,11 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 
 data class TernaryExpression(val condition: Expression, val then: Expression, val otherwise: Expression) : Expression() {
 
-  override fun evaluate(editor: Editor, context: DataContext, parent: VimLContext): VimDataType {
-    return if (condition.evaluate(editor, context, parent).asDouble() != 0.0) {
-      then.evaluate(editor, context, parent)
+  override fun evaluate(editor: Editor, context: DataContext, vimContext: VimLContext): VimDataType {
+    return if (condition.evaluate(editor, context, vimContext).asDouble() != 0.0) {
+      then.evaluate(editor, context, vimContext)
     } else {
-      otherwise.evaluate(editor, context, parent)
+      otherwise.evaluate(editor, context, vimContext)
     }
   }
 }

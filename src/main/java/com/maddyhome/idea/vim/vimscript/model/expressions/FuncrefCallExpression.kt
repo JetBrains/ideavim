@@ -28,18 +28,18 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
 
 data class FuncrefCallExpression(val expression: Expression, val args: List<Expression>) : Expression() {
 
-  fun evaluateWithRange(ranges: Ranges?, editor: Editor, context: DataContext, parent: VimLContext): VimDataType {
-    val value = expression.evaluate(editor, context, parent)
+  fun evaluateWithRange(ranges: Ranges?, editor: Editor, context: DataContext, vimContext: VimLContext): VimDataType {
+    val value = expression.evaluate(editor, context, vimContext)
     if (value is VimFuncref) {
       value.handler.ranges = ranges
-      return value.execute(value.handler.name, args, editor, context, parent)
+      return value.execute(value.handler.name, args, editor, context, vimContext)
     } else {
       // todo more exceptions
       throw ExException("E15: Invalid expression")
     }
   }
 
-  override fun evaluate(editor: Editor, context: DataContext, parent: VimLContext): VimDataType {
-    return evaluateWithRange(null, editor, context, parent)
+  override fun evaluate(editor: Editor, context: DataContext, vimContext: VimLContext): VimDataType {
+    return evaluateWithRange(null, editor, context, vimContext)
   }
 }

@@ -63,26 +63,26 @@ data class LetCommand(
     if (!isSyntaxSupported) return ExecutionResult.Error
     when (variable) {
       is Variable -> {
-        if ((variable.scope == Scope.SCRIPT_VARIABLE && parent.getFirstParentContext() !is Script) ||
-          (!isInsideFunction(parent) && (variable.scope == Scope.FUNCTION_VARIABLE || variable.scope == Scope.LOCAL_VARIABLE))
+        if ((variable.scope == Scope.SCRIPT_VARIABLE && vimContext.getFirstParentContext() !is Script) ||
+          (!isInsideFunction(vimContext) && (variable.scope == Scope.FUNCTION_VARIABLE || variable.scope == Scope.LOCAL_VARIABLE))
         ) {
-          throw ExException("E461: Illegal variable name: ${variable.toString(editor, context, parent)}")
+          throw ExException("E461: Illegal variable name: ${variable.toString(editor, context, vimContext)}")
         }
 
         if (isReadOnlyVariable(variable, editor, context)) {
-          throw ExException("E46: Cannot change read-only variable \"${variable.toString(editor, context, parent)}\"")
+          throw ExException("E46: Cannot change read-only variable \"${variable.toString(editor, context, vimContext)}\"")
         }
 
-        val leftValue = VimPlugin.getVariableService().getNullableVariableValue(variable, editor, context, parent)
+        val leftValue = VimPlugin.getVariableService().getNullableVariableValue(variable, editor, context, vimContext)
         if (leftValue?.isLocked == true && leftValue.lockOwner?.name == variable.name) {
-          throw ExException("E741: Value is locked: ${variable.toString(editor, context, parent)}")
+          throw ExException("E741: Value is locked: ${variable.toString(editor, context, vimContext)}")
         }
-        val rightValue = expression.evaluate(editor, context, parent)
+        val rightValue = expression.evaluate(editor, context, vimContext)
         VimPlugin.getVariableService().storeVariable(variable, operator.getNewValue(leftValue, rightValue), editor, context, this)
       }
 
       is OneElementSublistExpression -> {
-        when (val containerValue = variable.expression.evaluate(editor, context, parent)) {
+        when (val containerValue = variable.expression.evaluate(editor, context, vimContext)) {
           is VimDictionary -> {
             val dictKey = VimString(variable.index.evaluate(editor, context, this).asString())
             if (operator != AssignmentOperator.ASSIGNMENT && !containerValue.dictionary.containsKey(dictKey)) {
@@ -121,7 +121,7 @@ data class LetCommand(
             if (containerValue.values[index].isLocked) {
               throw ExException("E741: Value is locked: ${variable.originalString}")
             }
-            containerValue.values[index] = operator.getNewValue(containerValue.values[index], expression.evaluate(editor, context, parent))
+            containerValue.values[index] = operator.getNewValue(containerValue.values[index], expression.evaluate(editor, context, vimContext))
           }
           is VimBlob -> TODO()
           else -> throw ExException("E689: Can only index a List, Dictionary or Blob")
@@ -176,7 +176,7 @@ data class LetCommand(
       }
 
       is OptionExpression -> {
-        val optionValue = variable.evaluate(editor, context, parent)
+        val optionValue = variable.evaluate(editor, context, vimContext)
         if (operator == AssignmentOperator.ASSIGNMENT || operator == AssignmentOperator.CONCATENATION ||
           operator == AssignmentOperator.ADDITION || operator == AssignmentOperator.SUBTRACTION
         ) {
@@ -199,7 +199,7 @@ data class LetCommand(
         }
 
         VimPlugin.getRegister().startRecording(editor, variable.char)
-        VimPlugin.getRegister().recordText(expression.evaluate(editor, context, parent).asString())
+        VimPlugin.getRegister().recordText(expression.evaluate(editor, context, vimContext).asString())
         VimPlugin.getRegister().finishRecording(editor)
       }
 
@@ -222,7 +222,7 @@ data class LetCommand(
 
   private fun isReadOnlyVariable(variable: Variable, editor: Editor, context: DataContext): Boolean {
     if (variable.scope == Scope.FUNCTION_VARIABLE) return true
-    if (variable.scope == null && variable.name.evaluate(editor, context, parent).value == "self" && isInsideDictionaryFunction()) return true
+    if (variable.scope == null && variable.name.evaluate(editor, context, vimContext).value == "self" && isInsideDictionaryFunction()) return true
     return false
   }
 

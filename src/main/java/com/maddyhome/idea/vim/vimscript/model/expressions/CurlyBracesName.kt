@@ -25,7 +25,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
 data class CurlyBracesName(val parts: List<Expression>) : Expression() {
 
-  override fun evaluate(editor: Editor, context: DataContext, parent: VimLContext): VimString {
-    return VimString(parts.joinToString(separator = "") { it.evaluate(editor, context, parent).asString() })
+  override fun evaluate(editor: Editor, context: DataContext, vimContext: VimLContext): VimString {
+    return VimString(parts.joinToString(separator = "") { it.evaluate(editor, context, vimContext).asString() })
   }
 }

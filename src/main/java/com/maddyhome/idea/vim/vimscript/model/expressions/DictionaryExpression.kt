@@ -29,16 +29,16 @@ import com.maddyhome.idea.vim.vimscript.model.functions.DefinedFunctionHandler
 
 data class DictionaryExpression(val dictionary: LinkedHashMap<Expression, Expression>) : Expression() {
 
-  override fun evaluate(editor: Editor, context: DataContext, parent: VimLContext): VimDataType {
+  override fun evaluate(editor: Editor, context: DataContext, vimContext: VimLContext): VimDataType {
     val dict = VimDictionary(linkedMapOf())
     for ((key, value) in dictionary) {
-      val evaluatedVal = value.evaluate(editor, context, parent)
+      val evaluatedVal = value.evaluate(editor, context, vimContext)
       var newFuncref = evaluatedVal
       if (evaluatedVal is VimFuncref && evaluatedVal.handler is DefinedFunctionHandler && !evaluatedVal.isSelfFixed) {
         newFuncref = evaluatedVal.copy()
         newFuncref.dictionary = dict
       }
-      dict.dictionary[VimString(key.evaluate(editor, context, parent).asString())] = newFuncref
+      dict.dictionary[VimString(key.evaluate(editor, context, vimContext).asString())] = newFuncref
     }
     return dict
   }

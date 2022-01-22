@@ -35,7 +35,7 @@ data class SimpleExpression(val data: VimDataType) : Expression() {
   constructor(value: MutableList<VimDataType>) : this(VimList(value))
   constructor(value: LinkedHashMap<VimString, VimDataType>) : this(VimDictionary(value))
 
-  override fun evaluate(editor: Editor, context: DataContext, parent: VimLContext): VimDataType {
+  override fun evaluate(editor: Editor, context: DataContext, vimContext: VimLContext): VimDataType {
     return data
   }
 }

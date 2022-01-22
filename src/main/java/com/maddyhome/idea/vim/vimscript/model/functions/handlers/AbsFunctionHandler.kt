@@ -38,9 +38,9 @@ object AbsFunctionHandler : FunctionHandler() {
     argumentValues: List<Expression>,
     editor: Editor,
     context: DataContext,
-    parent: VimLContext,
+    vimContext: VimLContext,
   ): VimDataType {
-    val argument = argumentValues[0].evaluate(editor, context, parent)
+    val argument = argumentValues[0].evaluate(editor, context, vimContext)
     return if (argument is VimFloat) {
       VimFloat(abs(argument.value))
     } else {

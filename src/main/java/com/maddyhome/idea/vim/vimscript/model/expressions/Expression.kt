@@ -26,5 +26,5 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 abstract class Expression {
 
   lateinit var originalString: String
-  abstract fun evaluate(editor: Editor, context: DataContext, parent: VimLContext): VimDataType
+  abstract fun evaluate(editor: Editor, context: DataContext, vimContext: VimLContext): VimDataType
 }

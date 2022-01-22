@@ -25,7 +25,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 
 data class EnvVariableExpression(val variableName: String) : Expression() {
 
-  override fun evaluate(editor: Editor, context: DataContext, parent: VimLContext): VimDataType {
+  override fun evaluate(editor: Editor, context: DataContext, vimContext: VimLContext): VimDataType {
     TODO("Not yet implemented")
   }
 }

@@ -29,7 +29,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
 data class Register(val char: Char) : Expression() {
 
-  override fun evaluate(editor: Editor, context: DataContext, parent: VimLContext): VimDataType {
+  override fun evaluate(editor: Editor, context: DataContext, vimContext: VimLContext): VimDataType {
     val register = VimPlugin.getRegister().getRegister(char) ?: throw ExException("Register is not supported yet")
     // todo Esc like keys should be one char
     return VimString(StringHelper.toKeyNotation(register.keys))

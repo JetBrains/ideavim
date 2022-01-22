@@ -25,8 +25,8 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 
 class LambdaFunctionCallExpression(val lambda: LambdaExpression, val arguments: List<Expression>) : Expression() {
 
-  override fun evaluate(editor: Editor, context: DataContext, parent: VimLContext): VimDataType {
-    val funcref = lambda.evaluate(editor, context, parent)
-    return funcref.execute("", arguments, editor, context, parent)
+  override fun evaluate(editor: Editor, context: DataContext, vimContext: VimLContext): VimDataType {
+    val funcref = lambda.evaluate(editor, context, vimContext)
+    return funcref.execute("", arguments, editor, context, vimContext)
   }
 }

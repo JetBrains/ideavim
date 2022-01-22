@@ -24,7 +24,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
 
 data class Script(val units: List<Executable> = ArrayList()) : Executable {
-  override lateinit var parent: VimLContext
+  override lateinit var vimContext: VimLContext
 
   /**
    * we store the "s:" scope variables and functions here
@@ -40,7 +40,7 @@ data class Script(val units: List<Executable> = ArrayList()) : Executable {
   override fun execute(editor: Editor, context: DataContext): ExecutionResult {
     var latestResult: ExecutionResult = ExecutionResult.Success
     for (unit in units) {
-      unit.parent = this
+      unit.vimContext = this
       if (latestResult is ExecutionResult.Success) {
         latestResult = unit.execute(editor, context)
       } else {

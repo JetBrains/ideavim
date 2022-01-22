@@ -34,11 +34,11 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
 
 // todo refactor us senpai :(
 data class ForLoop(val variable: Variable, val iterable: Expression, val body: List<Executable>) : Executable {
-  override lateinit var parent: VimLContext
+  override lateinit var vimContext: VimLContext
 
   override fun execute(editor: Editor, context: DataContext): ExecutionResult {
     var result: ExecutionResult = ExecutionResult.Success
-    body.forEach { it.parent = this }
+    body.forEach { it.vimContext = this }
 
     var iterableValue = iterable.evaluate(editor, context, this)
     if (iterableValue is VimString) {
@@ -94,11 +94,11 @@ data class ForLoop(val variable: Variable, val iterable: Expression, val body: L
 }
 
 data class ForLoopWithList(val variables: List<String>, val iterable: Expression, val body: List<Executable>) : Executable {
-  override lateinit var parent: VimLContext
+  override lateinit var vimContext: VimLContext
 
   override fun execute(editor: Editor, context: DataContext): ExecutionResult {
     var result: ExecutionResult = ExecutionResult.Success
-    body.forEach { it.parent = this }
+    body.forEach { it.vimContext = this }
 
     var iterableValue = iterable.evaluate(editor, context, this)
     if (iterableValue is VimList) {

@@ -33,6 +33,6 @@ data class ExecuteCommand(val ranges: Ranges, val expressions: List<Expression>)
 
   override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
     val command = expressions.joinToString(separator = " ") { it.evaluate(editor, context, this).asString() }
-    return Executor.execute(command, editor, context, skipHistory = true, indicateErrors = true, this.parent)
+    return Executor.execute(command, editor, context, skipHistory = true, indicateErrors = true, this.vimContext)
   }
 }

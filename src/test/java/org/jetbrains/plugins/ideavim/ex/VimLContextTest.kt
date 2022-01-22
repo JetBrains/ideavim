@@ -37,9 +37,9 @@ class VimLContextTest {
     val ifStatement2 = IfStatement(listOf(Pair(SimpleExpression(1), listOf(ifStatement1))))
     val script = Script(listOf(ifStatement2))
 
-    echoCommand.parent = ifStatement1
-    ifStatement1.parent = ifStatement2
-    ifStatement2.parent = script
+    echoCommand.vimContext = ifStatement1
+    ifStatement1.vimContext = ifStatement2
+    ifStatement2.vimContext = script
 
     assertEquals(script, echoCommand.getFirstParentContext())
   }

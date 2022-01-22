@@ -51,31 +51,31 @@ internal class VariableServiceImpl : VariableService {
     }
   }
 
-  override fun isVariableLocked(variable: Variable, editor: Editor, context: DataContext, parent: VimLContext): Boolean {
-    return getNullableVariableValue(variable, editor, context, parent)?.isLocked ?: false
+  override fun isVariableLocked(variable: Variable, editor: Editor, context: DataContext, vimContext: VimLContext): Boolean {
+    return getNullableVariableValue(variable, editor, context, vimContext)?.isLocked ?: false
   }
 
-  override fun lockVariable(variable: Variable, depth: Int, editor: Editor, context: DataContext, parent: VimLContext) {
-    val value = getNullableVariableValue(variable, editor, context, parent) ?: return
+  override fun lockVariable(variable: Variable, depth: Int, editor: Editor, context: DataContext, vimContext: VimLContext) {
+    val value = getNullableVariableValue(variable, editor, context, vimContext) ?: return
     value.lockOwner = variable
     value.lockVar(depth)
   }
 
-  override fun unlockVariable(variable: Variable, depth: Int, editor: Editor, context: DataContext, parent: VimLContext) {
-    val value = getNullableVariableValue(variable, editor, context, parent) ?: return
+  override fun unlockVariable(variable: Variable, depth: Int, editor: Editor, context: DataContext, vimContext: VimLContext) {
+    val value = getNullableVariableValue(variable, editor, context, vimContext) ?: return
     value.unlockVar(depth)
   }
 
-  override fun storeVariable(variable: Variable, value: VimDataType, editor: Editor, context: DataContext, parent: VimLContext) {
-    val scope = variable.scope ?: getDefaultVariableScope(parent)
+  override fun storeVariable(variable: Variable, value: VimDataType, editor: Editor, context: DataContext, vimContext: VimLContext) {
+    val scope = variable.scope ?: getDefaultVariableScope(vimContext)
     when (scope) {
       Scope.GLOBAL_VARIABLE -> {
-        storeGlobalVariable(variable.name.evaluate(editor, context, parent).value, value)
+        storeGlobalVariable(variable.name.evaluate(editor, context, vimContext).value, value)
         val scopeForGlobalEnvironment = variable.scope?.toString() ?: ""
         VimScriptGlobalEnvironment.getInstance()
-          .variables[scopeForGlobalEnvironment + variable.name.evaluate(editor, context, parent)] = value.simplify()
+          .variables[scopeForGlobalEnvironment + variable.name.evaluate(editor, context, vimContext)] = value.simplify()
       }
-      Scope.SCRIPT_VARIABLE -> storeScriptVariable(variable.name.evaluate(editor, context, parent).value, value, parent)
+      Scope.SCRIPT_VARIABLE -> storeScriptVariable(variable.name.evaluate(editor, context, vimContext).value, value, vimContext)
       Scope.WINDOW_VARIABLE, Scope.TABPAGE_VARIABLE -> {
         val variableKey = scope.c + ":" + variable.name
         if (editor.getUserData(tabAndWindowVariablesKey) == null) {
@@ -84,43 +84,43 @@ internal class VariableServiceImpl : VariableService {
           editor.getUserData(tabAndWindowVariablesKey)!![variableKey] = value
         }
       }
-      Scope.FUNCTION_VARIABLE -> storeFunctionVariable(variable.name.evaluate(editor, context, parent).value, value, parent)
-      Scope.LOCAL_VARIABLE -> storeLocalVariable(variable.name.evaluate(editor, context, parent).value, value, parent)
+      Scope.FUNCTION_VARIABLE -> storeFunctionVariable(variable.name.evaluate(editor, context, vimContext).value, value, vimContext)
+      Scope.LOCAL_VARIABLE -> storeLocalVariable(variable.name.evaluate(editor, context, vimContext).value, value, vimContext)
       Scope.BUFFER_VARIABLE -> {
         if (editor.document.getUserData(bufferVariablesKey) == null) {
-          editor.document.putUserData(bufferVariablesKey, mutableMapOf(variable.name.evaluate(editor, context, parent).value to value))
+          editor.document.putUserData(bufferVariablesKey, mutableMapOf(variable.name.evaluate(editor, context, vimContext).value to value))
         } else {
-          editor.document.getUserData(bufferVariablesKey)!![variable.name.evaluate(editor, context, parent).value] = value
+          editor.document.getUserData(bufferVariablesKey)!![variable.name.evaluate(editor, context, vimContext).value] = value
         }
       }
       Scope.VIM_VARIABLE -> throw ExException("The 'v:' scope is not implemented yet :(")
     }
   }
 
-  override fun getNullableVariableValue(variable: Variable, editor: Editor, context: DataContext, parent: VimLContext): VimDataType? {
-    val scope = variable.scope ?: getDefaultVariableScope(parent)
+  override fun getNullableVariableValue(variable: Variable, editor: Editor, context: DataContext, vimContext: VimLContext): VimDataType? {
+    val scope = variable.scope ?: getDefaultVariableScope(vimContext)
     return when (scope) {
-      Scope.GLOBAL_VARIABLE -> getGlobalVariableValue(variable.name.evaluate(editor, context, parent).value)
-      Scope.SCRIPT_VARIABLE -> getScriptVariable(variable.name.evaluate(editor, context, parent).value, parent)
+      Scope.GLOBAL_VARIABLE -> getGlobalVariableValue(variable.name.evaluate(editor, context, vimContext).value)
+      Scope.SCRIPT_VARIABLE -> getScriptVariable(variable.name.evaluate(editor, context, vimContext).value, vimContext)
       Scope.WINDOW_VARIABLE, Scope.TABPAGE_VARIABLE -> {
         val variableKey = scope.c + ":" + variable.name
         editor.getUserData(tabAndWindowVariablesKey)?.get(variableKey)
       }
-      Scope.FUNCTION_VARIABLE -> getFunctionVariable(variable.name.evaluate(editor, context, parent).value, parent)
-      Scope.LOCAL_VARIABLE -> getLocalVariable(variable.name.evaluate(editor, context, parent).value, parent)
+      Scope.FUNCTION_VARIABLE -> getFunctionVariable(variable.name.evaluate(editor, context, vimContext).value, vimContext)
+      Scope.LOCAL_VARIABLE -> getLocalVariable(variable.name.evaluate(editor, context, vimContext).value, vimContext)
       Scope.BUFFER_VARIABLE -> {
-        editor.document.getUserData(bufferVariablesKey)?.get(variable.name.evaluate(editor, context, parent).value)
+        editor.document.getUserData(bufferVariablesKey)?.get(variable.name.evaluate(editor, context, vimContext).value)
       }
       Scope.VIM_VARIABLE -> throw ExException("The 'v:' scope is not implemented yet :(")
     }
   }
 
-  override fun getNonNullVariableValue(variable: Variable, editor: Editor, context: DataContext, parent: VimLContext): VimDataType {
-    return getNullableVariableValue(variable, editor, context, parent)
+  override fun getNonNullVariableValue(variable: Variable, editor: Editor, context: DataContext, vimContext: VimLContext): VimDataType {
+    return getNullableVariableValue(variable, editor, context, vimContext)
       ?: throw ExException(
         "E121: Undefined variable: " +
           (if (variable.scope != null) variable.scope.c + ":" else "") +
-          variable.name.evaluate(editor, context, parent).value
+          variable.name.evaluate(editor, context, vimContext).value
       )
   }
 
@@ -128,14 +128,14 @@ internal class VariableServiceImpl : VariableService {
     return globalVariables[name]
   }
 
-  private fun getScriptVariable(name: String, parent: VimLContext): VimDataType? {
-    val script = parent.getScript() ?: throw ExException("E121: Undefined variable: s:$name")
+  private fun getScriptVariable(name: String, vimContext: VimLContext): VimDataType? {
+    val script = vimContext.getScript() ?: throw ExException("E121: Undefined variable: s:$name")
     return script.scriptVariables[name]
   }
 
-  private fun getFunctionVariable(name: String, parent: VimLContext): VimDataType? {
+  private fun getFunctionVariable(name: String, vimContext: VimLContext): VimDataType? {
     val visibleVariables = mutableListOf<Map<String, VimDataType>>()
-    var node: VimLContext = parent
+    var node: VimLContext = vimContext
     while (!node.isFirstParentContext()) {
       if (node is FunctionDeclaration) {
         visibleVariables.add(node.functionVariables)
@@ -154,9 +154,9 @@ internal class VariableServiceImpl : VariableService {
     return functionVariablesMap[name]
   }
 
-  private fun getLocalVariable(name: String, parent: VimLContext): VimDataType? {
+  private fun getLocalVariable(name: String, vimContext: VimLContext): VimDataType? {
     val visibleVariables = mutableListOf<Map<String, VimDataType>>()
-    var node: VimLContext = parent
+    var node: VimLContext = vimContext
     while (!node.isFirstParentContext()) {
       if (node is FunctionDeclaration) {
         visibleVariables.add(node.localVariables)
@@ -179,13 +179,13 @@ internal class VariableServiceImpl : VariableService {
     globalVariables[name] = value
   }
 
-  private fun storeScriptVariable(name: String, value: VimDataType, parent: VimLContext) {
-    val script = parent.getScript() ?: throw ExException("E461: Illegal variable name: s:$name")
+  private fun storeScriptVariable(name: String, value: VimDataType, vimContext: VimLContext) {
+    val script = vimContext.getScript() ?: throw ExException("E461: Illegal variable name: s:$name")
     script.scriptVariables[name] = value
   }
 
-  private fun storeFunctionVariable(name: String, value: VimDataType, parent: VimLContext) {
-    var node: VimLContext = parent
+  private fun storeFunctionVariable(name: String, value: VimDataType, vimContext: VimLContext) {
+    var node: VimLContext = vimContext
     while (!(node.isFirstParentContext() || node is FunctionDeclaration)) {
       node = node.getPreviousParentContext()
     }
@@ -197,8 +197,8 @@ internal class VariableServiceImpl : VariableService {
     }
   }
 
-  private fun storeLocalVariable(name: String, value: VimDataType, parent: VimLContext) {
-    var node: VimLContext = parent
+  private fun storeLocalVariable(name: String, value: VimDataType, vimContext: VimLContext) {
+    var node: VimLContext = vimContext
     while (!(node.isFirstParentContext() || node is FunctionDeclaration)) {
       node = node.getPreviousParentContext()
     }

@@ -34,23 +34,23 @@ data class FunctionCallExpression(val scope: Scope?, val functionName: CurlyBrac
   constructor(scope: Scope?, functionName: String, arguments: MutableList<Expression>) :
     this(scope, CurlyBracesName(listOf(SimpleExpression(functionName))), arguments)
 
-  override fun evaluate(editor: Editor, context: DataContext, parent: VimLContext): VimDataType {
-    val handler = FunctionStorage.getFunctionHandlerOrNull(scope, functionName.evaluate(editor, context, parent).value, parent)
+  override fun evaluate(editor: Editor, context: DataContext, vimContext: VimLContext): VimDataType {
+    val handler = FunctionStorage.getFunctionHandlerOrNull(scope, functionName.evaluate(editor, context, vimContext).value, vimContext)
     if (handler != null) {
       if (handler is DefinedFunctionHandler && handler.function.flags.contains(FunctionFlag.DICT)) {
         throw ExException(
           "E725: Calling dict function without Dictionary: " +
-            (scope?.toString() ?: "") + functionName.evaluate(editor, context, parent)
+            (scope?.toString() ?: "") + functionName.evaluate(editor, context, vimContext)
         )
       }
-      return handler.executeFunction(this.arguments, editor, context, parent)
+      return handler.executeFunction(this.arguments, editor, context, vimContext)
     }
 
-    val funcref = VimPlugin.getVariableService().getNullableVariableValue(Variable(scope, functionName), editor, context, parent)
+    val funcref = VimPlugin.getVariableService().getNullableVariableValue(Variable(scope, functionName), editor, context, vimContext)
     if (funcref is VimFuncref) {
       val name = (if (scope != null) scope.c + ":" else "") + functionName
-      return funcref.execute(name, arguments, editor, context, parent)
+      return funcref.execute(name, arguments, editor, context, vimContext)
     }
-    throw ExException("E117: Unknown function: ${if (scope != null) scope.c + ":" else ""}${functionName.evaluate(editor, context, parent)}")
+    throw ExException("E117: Unknown function: ${if (scope != null) scope.c + ":" else ""}${functionName.evaluate(editor, context, vimContext)}")
   }
 }

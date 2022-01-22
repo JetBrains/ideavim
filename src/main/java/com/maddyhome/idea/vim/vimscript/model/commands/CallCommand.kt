@@ -44,14 +44,14 @@ class CallCommand(val ranges: Ranges, val functionCall: Expression) : Command.Si
     if (functionCall is FunctionCallExpression) {
       val function = FunctionStorage.getFunctionHandlerOrNull(
         functionCall.scope,
-        functionCall.functionName.evaluate(editor, context, parent).value,
-        parent
+        functionCall.functionName.evaluate(editor, context, vimContext).value,
+        vimContext
       )
       if (function != null) {
         if (function is DefinedFunctionHandler && function.function.flags.contains(FunctionFlag.DICT)) {
           throw ExException(
             "E725: Calling dict function without Dictionary: " +
-              (functionCall.scope?.toString() ?: "") + functionCall.functionName.evaluate(editor, context, parent)
+              (functionCall.scope?.toString() ?: "") + functionCall.functionName.evaluate(editor, context, vimContext)
           )
         }
         function.ranges = ranges
@@ -59,17 +59,17 @@ class CallCommand(val ranges: Ranges, val functionCall: Expression) : Command.Si
         return ExecutionResult.Success
       }
 
-      val name = (functionCall.scope?.toString() ?: "") + functionCall.functionName.evaluate(editor, context, parent)
-      val funcref = VimPlugin.getVariableService().getNullableVariableValue(Variable(functionCall.scope, functionCall.functionName), editor, context, parent)
+      val name = (functionCall.scope?.toString() ?: "") + functionCall.functionName.evaluate(editor, context, vimContext)
+      val funcref = VimPlugin.getVariableService().getNullableVariableValue(Variable(functionCall.scope, functionCall.functionName), editor, context, vimContext)
       if (funcref is VimFuncref) {
         funcref.handler.ranges = ranges
-        funcref.execute(name, functionCall.arguments, editor, context, parent)
+        funcref.execute(name, functionCall.arguments, editor, context, vimContext)
         return ExecutionResult.Success
       }
 
       throw ExException("E117: Unknown function: $name")
     } else if (functionCall is FuncrefCallExpression) {
-      functionCall.evaluateWithRange(ranges, editor, context, parent)
+      functionCall.evaluateWithRange(ranges, editor, context, vimContext)
       return ExecutionResult.Success
     } else {
       // todo add more exceptions

@@ -38,9 +38,9 @@ object SubmatchFunctionHandler : FunctionHandler() {
     argumentValues: List<Expression>,
     editor: Editor,
     context: DataContext,
-    parent: VimLContext,
+    vimContext: VimLContext,
   ): VimDataType {
-    val firstArgValue = argumentValues[0].evaluate(editor, context, parent).toVimNumber()
+    val firstArgValue = argumentValues[0].evaluate(editor, context, vimContext).toVimNumber()
     if (firstArgValue.value != 0 || argumentValues.size > 1) {
       throw ExException("Sorry, only `submatch(0)` is supported :(")
     }

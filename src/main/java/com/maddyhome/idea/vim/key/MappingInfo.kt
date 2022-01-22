@@ -113,7 +113,7 @@ class ToKeysMappingInfo(
 
 class ToExpressionMappingInfo(
   private val toExpression: Expression,
-  private val parent: VimLContext,
+  private val vimContext: VimLContext,
   fromKeys: List<KeyStroke>,
   isRecursive: Boolean,
   owner: MappingOwner,
@@ -124,7 +124,7 @@ class ToExpressionMappingInfo(
   override fun execute(editor: Editor, context: DataContext) {
     LOG.debug("Executing 'ToExpression' mapping info...")
     val editorDataContext = EditorDataContext.init(editor, context)
-    val toKeys = parseKeys(toExpression.evaluate(editor, context, parent).toString())
+    val toKeys = parseKeys(toExpression.evaluate(editor, context, vimContext).toString())
     val fromIsPrefix = KeyHandler.isPrefix(fromKeys, toKeys)
     var first = true
     for (keyStroke in toKeys) {

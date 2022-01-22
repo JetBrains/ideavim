@@ -43,11 +43,11 @@ object Executor {
   var executingVimScript = false
 
   @Throws(ExException::class)
-  fun execute(scriptString: String, editor: Editor, context: DataContext, skipHistory: Boolean, indicateErrors: Boolean = true, parent: VimLContext): ExecutionResult {
+  fun execute(scriptString: String, editor: Editor, context: DataContext, skipHistory: Boolean, indicateErrors: Boolean = true, vimContext: VimLContext): ExecutionResult {
     var finalResult: ExecutionResult = ExecutionResult.Success
 
     val script = VimscriptParser.parse(scriptString)
-    script.units.forEach { it.parent = parent }
+    script.units.forEach { it.vimContext = vimContext }
 
     for (unit in script.units) {
       try {

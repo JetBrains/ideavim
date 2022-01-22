@@ -26,16 +26,16 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
 
 interface VariableService {
 
-  fun isVariableLocked(variable: Variable, editor: Editor, context: DataContext, parent: VimLContext): Boolean
+  fun isVariableLocked(variable: Variable, editor: Editor, context: DataContext, vimContext: VimLContext): Boolean
 
-  fun lockVariable(variable: Variable, depth: Int, editor: Editor, context: DataContext, parent: VimLContext)
+  fun lockVariable(variable: Variable, depth: Int, editor: Editor, context: DataContext, vimContext: VimLContext)
 
-  fun unlockVariable(variable: Variable, depth: Int, editor: Editor, context: DataContext, parent: VimLContext)
+  fun unlockVariable(variable: Variable, depth: Int, editor: Editor, context: DataContext, vimContext: VimLContext)
 
-  fun storeVariable(variable: Variable, value: VimDataType, editor: Editor, context: DataContext, parent: VimLContext)
+  fun storeVariable(variable: Variable, value: VimDataType, editor: Editor, context: DataContext, vimContext: VimLContext)
 
   // todo replace with one method after Result class
   fun getGlobalVariableValue(name: String): VimDataType?
-  fun getNullableVariableValue(variable: Variable, editor: Editor, context: DataContext, parent: VimLContext): VimDataType?
-  fun getNonNullVariableValue(variable: Variable, editor: Editor, context: DataContext, parent: VimLContext): VimDataType
+  fun getNullableVariableValue(variable: Variable, editor: Editor, context: DataContext, vimContext: VimLContext): VimDataType?
+  fun getNonNullVariableValue(variable: Variable, editor: Editor, context: DataContext, vimContext: VimLContext): VimDataType
 }

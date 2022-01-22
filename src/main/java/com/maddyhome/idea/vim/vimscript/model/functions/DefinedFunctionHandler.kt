@@ -46,7 +46,7 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) : FunctionH
   override val minimumNumberOfArguments = function.args.size
   override val maximumNumberOfArguments get() = if (function.hasOptionalArguments) null else function.args.size + function.defaultArgs.size
 
-  override fun doFunction(argumentValues: List<Expression>, editor: Editor, context: DataContext, parent: VimLContext): VimDataType {
+  override fun doFunction(argumentValues: List<Expression>, editor: Editor, context: DataContext, vimContext: VimLContext): VimDataType {
     var returnValue: VimDataType? = null
     val exceptionsCaught = mutableListOf<ExException>()
     val isRangeGiven = (ranges?.size() ?: 0) > 0
@@ -89,7 +89,7 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) : FunctionH
     var result: ExecutionResult = ExecutionResult.Success
     if (function.flags.contains(FunctionFlag.ABORT)) {
       for (statement in function.body) {
-        statement.parent = function
+        statement.vimContext = function
         if (result is ExecutionResult.Success) {
           result = statement.execute(editor, context)
         }
@@ -105,7 +105,7 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) : FunctionH
     } else {
       // todo in release 1.9. in this case multiple exceptions can be thrown at once but we don't support it
       for (statement in function.body) {
-        statement.parent = function
+        statement.vimContext = function
         try {
           result = statement.execute(editor, context)
           when (result) {
@@ -136,7 +136,7 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) : FunctionH
     for ((index, name) in function.args.withIndex()) {
       VimPlugin.getVariableService().storeVariable(
         Variable(Scope.FUNCTION_VARIABLE, name),
-        argumentValues[index].evaluate(editor, context, function.parent),
+        argumentValues[index].evaluate(editor, context, function.vimContext),
         editor,
         context,
         function
@@ -147,7 +147,7 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) : FunctionH
       val expressionToStore = if (index + function.args.size < argumentValues.size) argumentValues[index + function.args.size] else function.defaultArgs[index].second
       VimPlugin.getVariableService().storeVariable(
         Variable(Scope.FUNCTION_VARIABLE, function.defaultArgs[index].first),
-        expressionToStore.evaluate(editor, context, function.parent),
+        expressionToStore.evaluate(editor, context, function.vimContext),
         editor,
         context,
         function
@@ -158,7 +158,7 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) : FunctionH
       val remainingArgs = if (function.args.size + function.defaultArgs.size < argumentValues.size) {
         VimList(
           argumentValues.subList(function.args.size + function.defaultArgs.size, argumentValues.size)
-            .map { it.evaluate(editor, context, function.parent) }.toMutableList()
+            .map { it.evaluate(editor, context, function.vimContext) }.toMutableList()
         )
       } else {
         VimList(mutableListOf())

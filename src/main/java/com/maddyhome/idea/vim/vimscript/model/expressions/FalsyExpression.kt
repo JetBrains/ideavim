@@ -27,13 +27,13 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 
 class FalsyExpression(val left: Expression, val right: Expression) : Expression() {
 
-  override fun evaluate(editor: Editor, context: DataContext, parent: VimLContext): VimDataType {
-    val leftValue = left.evaluate(editor, context, parent)
+  override fun evaluate(editor: Editor, context: DataContext, vimContext: VimLContext): VimDataType {
+    val leftValue = left.evaluate(editor, context, vimContext)
     val isLeftTrue = when (leftValue) {
       is VimList -> leftValue.values.isNotEmpty()
       is VimDictionary -> leftValue.dictionary.isNotEmpty()
       else -> leftValue.asBoolean()
     }
-    return if (isLeftTrue) leftValue else right.evaluate(editor, context, parent)
+    return if (isLeftTrue) leftValue else right.evaluate(editor, context, vimContext)
   }
 }

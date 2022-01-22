@@ -26,7 +26,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.operators.UnaryOperato
 
 data class UnaryExpression(val operator: UnaryOperator, val expression: Expression) : Expression() {
 
-  override fun evaluate(editor: Editor, context: DataContext, parent: VimLContext): VimDataType {
-    return operator.handler.performOperation(expression.evaluate(editor, context, parent))
+  override fun evaluate(editor: Editor, context: DataContext, vimContext: VimLContext): VimDataType {
+    return operator.handler.performOperation(expression.evaluate(editor, context, vimContext))
   }
 }

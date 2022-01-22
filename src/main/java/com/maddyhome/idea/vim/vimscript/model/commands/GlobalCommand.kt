@@ -190,9 +190,9 @@ data class GlobalCommand(val ranges: Ranges, val argument: String, val invert: B
     // TODO: 26.05.2021 What about folds?
     editor.caretModel.moveToOffset(lineStartOffset)
     if (cmd == null || cmd.isEmpty() || (cmd.length == 1 && cmd[0] == '\n')) {
-      Executor.execute("p", editor, context, skipHistory = true, indicateErrors = true, this.parent)
+      Executor.execute("p", editor, context, skipHistory = true, indicateErrors = true, this.vimContext)
     } else {
-      Executor.execute(cmd, editor, context, skipHistory = true, indicateErrors = true, this.parent)
+      Executor.execute(cmd, editor, context, skipHistory = true, indicateErrors = true, this.vimContext)
     }
   }
 

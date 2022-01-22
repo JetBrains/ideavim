@@ -26,7 +26,7 @@ import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 
 data class IfStatement(val conditionToBody: List<Pair<Expression, List<Executable>>>) : Executable {
-  override lateinit var parent: VimLContext
+  override lateinit var vimContext: VimLContext
 
   override fun execute(editor: Editor, context: DataContext): ExecutionResult {
     var result: ExecutionResult = ExecutionResult.Success
@@ -34,7 +34,7 @@ data class IfStatement(val conditionToBody: List<Pair<Expression, List<Executabl
     for ((condition, statements) in conditionToBody) {
       if (condition.evaluate(editor, context, this).asBoolean()) {
         statementsToExecute = statements
-        statementsToExecute.forEach { it.parent = this }
+        statementsToExecute.forEach { it.vimContext = this }
         break
       }
     }
