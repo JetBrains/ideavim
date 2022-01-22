@@ -114,12 +114,14 @@ object FunctionStorage {
       ?: throw ExException("E117: Unknown function: ${scope?.toString() ?: ""}$name")
   }
 
-  // todo g:abs should be unknown function !!!
   fun getFunctionHandlerOrNull(scope: Scope?, name: String, parent: VimLContext): FunctionHandler? {
-    val builtInFunction = getBuiltInFunction(name)
-    if (builtInFunction != null) {
-      return builtInFunction
+    if (scope == null) {
+      val builtInFunction = getBuiltInFunction(name)
+      if (builtInFunction != null) {
+        return builtInFunction
+      }
     }
+
     val definedFunction = getUserDefinedFunction(scope, name, parent)
     if (definedFunction != null) {
       return DefinedFunctionHandler(definedFunction)

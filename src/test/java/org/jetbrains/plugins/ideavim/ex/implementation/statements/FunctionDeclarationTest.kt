@@ -715,4 +715,12 @@ class FunctionDeclarationTest : VimTestCase() {
     assertPluginError(true)
     assertPluginErrorMessageContains("E120: Using <SID> not in a script context: s:F1")
   }
+
+  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
+  fun `test get built-in function with global scope`() {
+    configureByText("\n")
+    typeText(commandToKeys("echo g:abs(-10)"))
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E117: Unknown function: g:abs")
+  }
 }
