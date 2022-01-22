@@ -24,6 +24,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
+import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimBlob
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
@@ -33,7 +34,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
 
 // todo refactor us senpai :(
 data class ForLoop(val variable: Variable, val iterable: Expression, val body: List<Executable>) : Executable {
-  override lateinit var parent: Executable
+  override lateinit var parent: VimLContext
 
   override fun execute(editor: Editor, context: DataContext): ExecutionResult {
     var result: ExecutionResult = ExecutionResult.Success
@@ -93,7 +94,7 @@ data class ForLoop(val variable: Variable, val iterable: Expression, val body: L
 }
 
 data class ForLoopWithList(val variables: List<String>, val iterable: Expression, val body: List<Executable>) : Executable {
-  override lateinit var parent: Executable
+  override lateinit var parent: VimLContext
 
   override fun execute(editor: Editor, context: DataContext): ExecutionResult {
     var result: ExecutionResult = ExecutionResult.Success

@@ -22,13 +22,13 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.Ranges
-import com.maddyhome.idea.vim.vimscript.model.Executable
+import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
 
 data class FuncrefCallExpression(val expression: Expression, val args: List<Expression>) : Expression() {
 
-  fun evaluateWithRange(ranges: Ranges?, editor: Editor, context: DataContext, parent: Executable): VimDataType {
+  fun evaluateWithRange(ranges: Ranges?, editor: Editor, context: DataContext, parent: VimLContext): VimDataType {
     val value = expression.evaluate(editor, context, parent)
     if (value is VimFuncref) {
       value.handler.ranges = ranges
@@ -39,7 +39,7 @@ data class FuncrefCallExpression(val expression: Expression, val args: List<Expr
     }
   }
 
-  override fun evaluate(editor: Editor, context: DataContext, parent: Executable): VimDataType {
+  override fun evaluate(editor: Editor, context: DataContext, parent: VimLContext): VimDataType {
     return evaluateWithRange(null, editor, context, parent)
   }
 }

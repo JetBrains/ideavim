@@ -24,10 +24,11 @@ import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.FinishException
 import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
+import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.services.PatternService
 
 data class TryStatement(val tryBlock: TryBlock, val catchBlocks: List<CatchBlock>, val finallyBlock: FinallyBlock?) : Executable {
-  override lateinit var parent: Executable
+  override lateinit var parent: VimLContext
 
   override fun execute(editor: Editor, context: DataContext): ExecutionResult {
     var uncaughtException: ExException? = null
@@ -75,7 +76,7 @@ data class TryStatement(val tryBlock: TryBlock, val catchBlocks: List<CatchBlock
 }
 
 data class TryBlock(val body: List<Executable>) : Executable {
-  override lateinit var parent: Executable
+  override lateinit var parent: VimLContext
   override fun execute(editor: Editor, context: DataContext): ExecutionResult {
     body.forEach { it.parent = this.parent }
     return executeBody(body, editor, context)
@@ -83,7 +84,7 @@ data class TryBlock(val body: List<Executable>) : Executable {
 }
 
 data class CatchBlock(val pattern: String, val body: List<Executable>) : Executable {
-  override lateinit var parent: Executable
+  override lateinit var parent: VimLContext
   override fun execute(editor: Editor, context: DataContext): ExecutionResult {
     body.forEach { it.parent = this.parent }
     return executeBody(body, editor, context)
@@ -91,7 +92,7 @@ data class CatchBlock(val pattern: String, val body: List<Executable>) : Executa
 }
 
 data class FinallyBlock(val body: List<Executable>) : Executable {
-  override lateinit var parent: Executable
+  override lateinit var parent: VimLContext
   override fun execute(editor: Editor, context: DataContext): ExecutionResult {
     body.forEach { it.parent = this.parent }
     return executeBody(body, editor, context)

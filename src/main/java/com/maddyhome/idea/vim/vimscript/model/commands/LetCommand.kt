@@ -23,9 +23,9 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.Ranges
-import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.Script
+import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimBlob
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
@@ -63,9 +63,16 @@ data class LetCommand(
     if (!isSyntaxSupported) return ExecutionResult.Error
     when (variable) {
       is Variable -> {
+        if ((variable.scope == Scope.SCRIPT_VARIABLE && parent.getFirstParentContext() !is Script) ||
+          (!isInsideFunction(parent) && (variable.scope == Scope.FUNCTION_VARIABLE || variable.scope == Scope.LOCAL_VARIABLE))
+        ) {
+          throw ExException("E461: Illegal variable name: ${variable.toString(editor, context, parent)}")
+        }
+
         if (isReadOnlyVariable(variable, editor, context)) {
           throw ExException("E46: Cannot change read-only variable \"${variable.toString(editor, context, parent)}\"")
         }
+
         val leftValue = VimPlugin.getVariableService().getNullableVariableValue(variable, editor, context, parent)
         if (leftValue?.isLocked == true && leftValue.lockOwner?.name == variable.name) {
           throw ExException("E741: Value is locked: ${variable.toString(editor, context, parent)}")
@@ -201,6 +208,18 @@ data class LetCommand(
     return ExecutionResult.Success
   }
 
+  private fun isInsideFunction(vimLContext: VimLContext): Boolean {
+    var isInsideFunction = false
+    var node = vimLContext
+    while (!node.isFirstParentContext()) {
+      if (node is FunctionDeclaration) {
+        isInsideFunction = true
+      }
+      node = node.getPreviousParentContext()
+    }
+    return isInsideFunction
+  }
+
   private fun isReadOnlyVariable(variable: Variable, editor: Editor, context: DataContext): Boolean {
     if (variable.scope == Scope.FUNCTION_VARIABLE) return true
     if (variable.scope == null && variable.name.evaluate(editor, context, parent).value == "self" && isInsideDictionaryFunction()) return true
@@ -208,12 +227,12 @@ data class LetCommand(
   }
 
   private fun isInsideDictionaryFunction(): Boolean {
-    var node: Executable = this
-    while (node !is Script) {
+    var node: VimLContext = this
+    while (!node.isFirstParentContext()) {
       if (node is FunctionDeclaration && node.flags.contains(FunctionFlag.DICT)) {
         return true
       }
-      node = node.parent
+      node = node.getPreviousParentContext()
     }
     return false
   }

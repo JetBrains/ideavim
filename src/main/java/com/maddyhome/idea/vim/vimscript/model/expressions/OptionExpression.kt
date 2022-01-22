@@ -22,13 +22,13 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.ExException
-import com.maddyhome.idea.vim.vimscript.model.Executable
+import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 
 data class OptionExpression(val scope: Scope, val optionName: String) : Expression() {
 
-  override fun evaluate(editor: Editor, context: DataContext, parent: Executable): VimDataType {
+  override fun evaluate(editor: Editor, context: DataContext, parent: VimLContext): VimDataType {
     return when (scope) {
       Scope.GLOBAL_VARIABLE -> VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, optionName, originalString)
       Scope.LOCAL_VARIABLE -> VimPlugin.getOptionService().getOptionValue(OptionService.Scope.LOCAL(editor), optionName, originalString)

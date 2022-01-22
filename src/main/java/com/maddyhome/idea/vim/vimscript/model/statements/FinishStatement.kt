@@ -23,9 +23,10 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.ex.FinishException
 import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
+import com.maddyhome.idea.vim.vimscript.model.VimLContext
 
 object FinishStatement : Executable {
-  override lateinit var parent: Executable
+  override lateinit var parent: VimLContext
 
   override fun execute(editor: Editor, context: DataContext): ExecutionResult {
     throw FinishException()

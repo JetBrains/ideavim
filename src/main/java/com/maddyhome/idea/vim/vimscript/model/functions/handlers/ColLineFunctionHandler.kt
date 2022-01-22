@@ -25,7 +25,7 @@ import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.vimLine
 import com.maddyhome.idea.vim.helper.vimSelectionStart
-import com.maddyhome.idea.vim.vimscript.model.Executable
+import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
@@ -46,7 +46,7 @@ object LineFunctionHandler : FunctionHandler() {
     argumentValues: List<Expression>,
     editor: Editor,
     context: DataContext,
-    parent: Executable,
+    parent: VimLContext,
   ): VimInt {
     val argument = argumentValues[0].evaluate(editor, context, parent)
     return variableToPosition(editor, argument, true)?.first ?: VimInt.ZERO
@@ -63,7 +63,7 @@ object ColFunctionHandler : FunctionHandler() {
     argumentValues: List<Expression>,
     editor: Editor,
     context: DataContext,
-    parent: Executable,
+    parent: VimLContext,
   ): VimDataType {
     val argument = argumentValues[0].evaluate(editor, context, parent)
     return variableToPosition(editor, argument, false)?.second ?: VimInt.ZERO

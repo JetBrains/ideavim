@@ -71,6 +71,14 @@ class DelfunctionCommandTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
+  fun `test delete script function from command line context`() {
+    configureByText("\n")
+    typeText(commandToKeys("delfunction s:F1"))
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E81: Using <SID> not in a script context")
+  }
+
+  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
   fun `test delete nonexistent function with ignoreError flag`() {
     configureByText("\n")
     typeText(commandToKeys("delfunction! F1"))

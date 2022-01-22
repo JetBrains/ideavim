@@ -56,7 +56,7 @@ data class RepeatCommand(val ranges: Ranges, val argument: String) : Command.For
     val reg = VimPlugin.getRegister().getPlaybackRegister(arg) ?: return ExecutionResult.Error
     val text = reg.text ?: return ExecutionResult.Error
 
-    Executor.execute(text, editor, context, false)
+    Executor.execute(text, editor, context, skipHistory = false, indicateErrors = true, this.parent)
     return ExecutionResult.Success
   }
 }

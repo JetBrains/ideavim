@@ -42,7 +42,7 @@ import com.maddyhome.idea.vim.helper.VimNlsSafe
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.helper.vimSelectionStart
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
-import com.maddyhome.idea.vim.vimscript.model.Executable
+import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
@@ -113,7 +113,7 @@ class ToKeysMappingInfo(
 
 class ToExpressionMappingInfo(
   private val toExpression: Expression,
-  private val parent: Executable,
+  private val parent: VimLContext,
   fromKeys: List<KeyStroke>,
   isRecursive: Boolean,
   owner: MappingOwner,

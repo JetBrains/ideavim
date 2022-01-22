@@ -23,6 +23,7 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
+import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
@@ -38,7 +39,7 @@ data class FunctionDeclaration(
   val flags: Set<FunctionFlag>,
   val hasOptionalArguments: Boolean,
 ) : Executable {
-  override lateinit var parent: Executable
+  override lateinit var parent: VimLContext
   var isDeleted = false
 
   /**

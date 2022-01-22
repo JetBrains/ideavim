@@ -41,10 +41,11 @@ import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.noneOfEnum
 import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
+import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import java.util.*
 
 sealed class Command(var commandRanges: Ranges, val commandArgument: String) : Executable {
-  override lateinit var parent: Executable
+  override lateinit var parent: VimLContext
 
   abstract val argFlags: CommandHandlerFlags
   protected open val optFlags: EnumSet<CommandFlags> = noneOfEnum()

@@ -23,9 +23,8 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.util.Key
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment
-import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.ExecutableContext
-import com.maddyhome.idea.vim.vimscript.model.Script
+import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimBlob
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
@@ -45,29 +44,29 @@ internal class VariableServiceImpl : VariableService {
   private val tabAndWindowVariablesKey = Key<MutableMap<String, VimDataType>>("TabAndWindowVariables")
   private val bufferVariablesKey = Key<MutableMap<String, VimDataType>>("BufferVariables")
 
-  private fun getDefaultVariableScope(executable: Executable): Scope {
-    return when (executable.getContext()) {
-      ExecutableContext.SCRIPT -> Scope.GLOBAL_VARIABLE
+  private fun getDefaultVariableScope(executable: VimLContext): Scope {
+    return when (executable.getExecutableContext(executable)) {
+      ExecutableContext.SCRIPT, ExecutableContext.COMMAND_LINE -> Scope.GLOBAL_VARIABLE
       ExecutableContext.FUNCTION -> Scope.LOCAL_VARIABLE
     }
   }
 
-  override fun isVariableLocked(variable: Variable, editor: Editor, context: DataContext, parent: Executable): Boolean {
+  override fun isVariableLocked(variable: Variable, editor: Editor, context: DataContext, parent: VimLContext): Boolean {
     return getNullableVariableValue(variable, editor, context, parent)?.isLocked ?: false
   }
 
-  override fun lockVariable(variable: Variable, depth: Int, editor: Editor, context: DataContext, parent: Executable) {
+  override fun lockVariable(variable: Variable, depth: Int, editor: Editor, context: DataContext, parent: VimLContext) {
     val value = getNullableVariableValue(variable, editor, context, parent) ?: return
     value.lockOwner = variable
     value.lockVar(depth)
   }
 
-  override fun unlockVariable(variable: Variable, depth: Int, editor: Editor, context: DataContext, parent: Executable) {
+  override fun unlockVariable(variable: Variable, depth: Int, editor: Editor, context: DataContext, parent: VimLContext) {
     val value = getNullableVariableValue(variable, editor, context, parent) ?: return
     value.unlockVar(depth)
   }
 
-  override fun storeVariable(variable: Variable, value: VimDataType, editor: Editor, context: DataContext, parent: Executable) {
+  override fun storeVariable(variable: Variable, value: VimDataType, editor: Editor, context: DataContext, parent: VimLContext) {
     val scope = variable.scope ?: getDefaultVariableScope(parent)
     when (scope) {
       Scope.GLOBAL_VARIABLE -> {
@@ -98,7 +97,7 @@ internal class VariableServiceImpl : VariableService {
     }
   }
 
-  override fun getNullableVariableValue(variable: Variable, editor: Editor, context: DataContext, parent: Executable): VimDataType? {
+  override fun getNullableVariableValue(variable: Variable, editor: Editor, context: DataContext, parent: VimLContext): VimDataType? {
     val scope = variable.scope ?: getDefaultVariableScope(parent)
     return when (scope) {
       Scope.GLOBAL_VARIABLE -> getGlobalVariableValue(variable.name.evaluate(editor, context, parent).value)
@@ -116,7 +115,7 @@ internal class VariableServiceImpl : VariableService {
     }
   }
 
-  override fun getNonNullVariableValue(variable: Variable, editor: Editor, context: DataContext, parent: Executable): VimDataType {
+  override fun getNonNullVariableValue(variable: Variable, editor: Editor, context: DataContext, parent: VimLContext): VimDataType {
     return getNullableVariableValue(variable, editor, context, parent)
       ?: throw ExException(
         "E121: Undefined variable: " +
@@ -129,27 +128,22 @@ internal class VariableServiceImpl : VariableService {
     return globalVariables[name]
   }
 
-  private fun getScriptVariable(name: String, parent: Executable): VimDataType? {
-    val script = parent.getScript()
+  private fun getScriptVariable(name: String, parent: VimLContext): VimDataType? {
+    val script = parent.getScript() ?: throw ExException("E121: Undefined variable: s:$name")
     return script.scriptVariables[name]
   }
 
-  private fun getFunctionVariable(name: String, parent: Executable): VimDataType? {
+  private fun getFunctionVariable(name: String, parent: VimLContext): VimDataType? {
     val visibleVariables = mutableListOf<Map<String, VimDataType>>()
-    var node: Executable? = parent
-    while (node != null) {
+    var node: VimLContext = parent
+    while (!node.isFirstParentContext()) {
       if (node is FunctionDeclaration) {
         visibleVariables.add(node.functionVariables)
         if (!node.flags.contains(FunctionFlag.CLOSURE)) {
           break
         }
       }
-      // todo better parent logic
-      node = if (node is Script) {
-        null
-      } else {
-        node.parent
-      }
+      node = node.getPreviousParentContext()
     }
 
     visibleVariables.reverse()
@@ -160,22 +154,17 @@ internal class VariableServiceImpl : VariableService {
     return functionVariablesMap[name]
   }
 
-  private fun getLocalVariable(name: String, parent: Executable): VimDataType? {
+  private fun getLocalVariable(name: String, parent: VimLContext): VimDataType? {
     val visibleVariables = mutableListOf<Map<String, VimDataType>>()
-    var node: Executable? = parent
-    while (node != null) {
+    var node: VimLContext = parent
+    while (!node.isFirstParentContext()) {
       if (node is FunctionDeclaration) {
         visibleVariables.add(node.localVariables)
         if (!node.flags.contains(FunctionFlag.CLOSURE)) {
           break
         }
       }
-      // todo better parent logic
-      node = if (node is Script) {
-        null
-      } else {
-        node.parent
-      }
+      node = node.getPreviousParentContext()
     }
 
     visibleVariables.reverse()
@@ -190,44 +179,38 @@ internal class VariableServiceImpl : VariableService {
     globalVariables[name] = value
   }
 
-  private fun storeScriptVariable(name: String, value: VimDataType, parent: Executable) {
-    val script = parent.getScript()
+  private fun storeScriptVariable(name: String, value: VimDataType, parent: VimLContext) {
+    val script = parent.getScript() ?: throw ExException("E461: Illegal variable name: s:$name")
     script.scriptVariables[name] = value
   }
 
-  private fun storeFunctionVariable(name: String, value: VimDataType, parent: Executable) {
-    var node: Executable? = parent
-    while (node != null) {
-      if (node is FunctionDeclaration) {
-        break
-      }
-      node = node.parent
+  private fun storeFunctionVariable(name: String, value: VimDataType, parent: VimLContext) {
+    var node: VimLContext = parent
+    while (!(node.isFirstParentContext() || node is FunctionDeclaration)) {
+      node = node.getPreviousParentContext()
     }
+
     if (node is FunctionDeclaration) {
       node.functionVariables[name] = value
     } else {
-      TODO()
+      throw ExException("E461: Illegal variable name: a:$name")
     }
   }
 
-  private fun storeLocalVariable(name: String, value: VimDataType, parent: Executable) {
-    var node: Executable? = parent
-    while (node != null) {
-      if (node is FunctionDeclaration) {
-        break
-      }
-      node = node.parent
+  private fun storeLocalVariable(name: String, value: VimDataType, parent: VimLContext) {
+    var node: VimLContext = parent
+    while (!(node.isFirstParentContext() || node is FunctionDeclaration)) {
+      node = node.getPreviousParentContext()
     }
     if (node is FunctionDeclaration) {
       node.localVariables[name] = value
     } else {
-      TODO()
+      throw ExException("E461: Illegal variable name: l:$name")
     }
   }
 
-  // todo fix me i'm ugly :(
   fun clear() {
-    globalVariables = mutableMapOf()
+    globalVariables.clear()
   }
 
   private fun VimDataType.simplify(): Any {

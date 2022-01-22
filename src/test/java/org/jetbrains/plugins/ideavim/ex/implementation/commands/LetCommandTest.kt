@@ -297,4 +297,28 @@ class LetCommandTest : VimTestCase() {
     }
     assertState("unnamed register works\n")
   }
+
+  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
+  fun `test define script variable with command line context`() {
+    configureByText("\n")
+    typeText(commandToKeys("let s:my_var = 'oh, hi Mark'"))
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E461: Illegal variable name: s:my_var")
+  }
+
+  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
+  fun `test define local variable with command line context`() {
+    configureByText("\n")
+    typeText(commandToKeys("let l:my_var = 'oh, hi Mark'"))
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E461: Illegal variable name: l:my_var")
+  }
+
+  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
+  fun `test define function variable with command line context`() {
+    configureByText("\n")
+    typeText(commandToKeys("let a:my_var = 'oh, hi Mark'"))
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E461: Illegal variable name: a:my_var")
+  }
 }

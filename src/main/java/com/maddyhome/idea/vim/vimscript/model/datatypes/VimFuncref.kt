@@ -22,7 +22,7 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.ExException
-import com.maddyhome.idea.vim.vimscript.model.Executable
+import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
@@ -75,7 +75,7 @@ data class VimFuncref(
     throw ExException("E703: using Funcref as a Number")
   }
 
-  fun execute(name: String, args: List<Expression>, editor: Editor, context: DataContext, parent: Executable): VimDataType {
+  fun execute(name: String, args: List<Expression>, editor: Editor, context: DataContext, parent: VimLContext): VimDataType {
     if (handler is DefinedFunctionHandler && handler.function.flags.contains(FunctionFlag.DICT)) {
       if (dictionary == null) {
         throw ExException("E725: Calling dict function without Dictionary: $name")

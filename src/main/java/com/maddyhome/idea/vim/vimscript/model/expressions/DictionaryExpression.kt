@@ -20,7 +20,7 @@ package com.maddyhome.idea.vim.vimscript.model.expressions
 
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
-import com.maddyhome.idea.vim.vimscript.model.Executable
+import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
@@ -29,7 +29,7 @@ import com.maddyhome.idea.vim.vimscript.model.functions.DefinedFunctionHandler
 
 data class DictionaryExpression(val dictionary: LinkedHashMap<Expression, Expression>) : Expression() {
 
-  override fun evaluate(editor: Editor, context: DataContext, parent: Executable): VimDataType {
+  override fun evaluate(editor: Editor, context: DataContext, parent: VimLContext): VimDataType {
     val dict = VimDictionary(linkedMapOf())
     for ((key, value) in dictionary) {
       val evaluatedVal = value.evaluate(editor, context, parent)

@@ -22,7 +22,7 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.ExException
-import com.maddyhome.idea.vim.vimscript.model.Executable
+import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
 import com.maddyhome.idea.vim.vimscript.model.functions.DefinedFunctionHandler
@@ -34,7 +34,7 @@ data class FunctionCallExpression(val scope: Scope?, val functionName: CurlyBrac
   constructor(scope: Scope?, functionName: String, arguments: MutableList<Expression>) :
     this(scope, CurlyBracesName(listOf(SimpleExpression(functionName))), arguments)
 
-  override fun evaluate(editor: Editor, context: DataContext, parent: Executable): VimDataType {
+  override fun evaluate(editor: Editor, context: DataContext, parent: VimLContext): VimDataType {
     val handler = FunctionStorage.getFunctionHandlerOrNull(scope, functionName.evaluate(editor, context, parent).value, parent)
     if (handler != null) {
       if (handler is DefinedFunctionHandler && handler.function.flags.contains(FunctionFlag.DICT)) {

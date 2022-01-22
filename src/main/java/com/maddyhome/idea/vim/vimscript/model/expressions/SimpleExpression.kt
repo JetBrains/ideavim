@@ -20,7 +20,7 @@ package com.maddyhome.idea.vim.vimscript.model.expressions
 
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
-import com.maddyhome.idea.vim.vimscript.model.Executable
+import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFloat
@@ -35,7 +35,7 @@ data class SimpleExpression(val data: VimDataType) : Expression() {
   constructor(value: MutableList<VimDataType>) : this(VimList(value))
   constructor(value: LinkedHashMap<VimString, VimDataType>) : this(VimDictionary(value))
 
-  override fun evaluate(editor: Editor, context: DataContext, parent: Executable): VimDataType {
+  override fun evaluate(editor: Editor, context: DataContext, parent: VimLContext): VimDataType {
     return data
   }
 }

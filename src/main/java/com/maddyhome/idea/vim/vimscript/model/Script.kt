@@ -23,8 +23,8 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
 
-data class Script(val units: List<Executable>) : Executable {
-  override lateinit var parent: Executable
+data class Script(val units: List<Executable> = ArrayList()) : Executable {
+  override lateinit var parent: VimLContext
 
   /**
    * we store the "s:" scope variables and functions here
@@ -32,6 +32,10 @@ data class Script(val units: List<Executable>) : Executable {
    */
   val scriptVariables: MutableMap<String, VimDataType> = mutableMapOf()
   val scriptFunctions: MutableMap<String, FunctionDeclaration> = mutableMapOf()
+
+  override fun getPreviousParentContext(): VimLContext {
+    throw RuntimeException("Script has no parent context")
+  }
 
   override fun execute(editor: Editor, context: DataContext): ExecutionResult {
     var latestResult: ExecutionResult = ExecutionResult.Success

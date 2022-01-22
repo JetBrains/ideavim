@@ -690,4 +690,29 @@ class FunctionDeclarationTest : VimTestCase() {
 
     typeText(commandToKeys("delfunction! AddNumbers"))
   }
+
+  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
+  fun `test define script function in command line context`() {
+    configureByText("\n")
+    typeText(
+      commandToKeys(
+        "" +
+          "function s:GetHiString(name) |" +
+          "  return 'Oh hi ' . a:name | " +
+          "endfunction"
+      )
+    )
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E81: Using <SID> not in a script context")
+  }
+
+  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
+  fun `test get script function in command line context`() {
+    configureByText("\n")
+    typeText(
+      commandToKeys("echo s:F1()")
+    )
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E120: Using <SID> not in a script context: s:F1")
+  }
 }

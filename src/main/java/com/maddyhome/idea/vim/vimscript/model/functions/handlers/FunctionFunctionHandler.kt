@@ -21,7 +21,7 @@ package com.maddyhome.idea.vim.vimscript.model.functions.handlers
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.ex.ExException
-import com.maddyhome.idea.vim.vimscript.model.Executable
+import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
@@ -41,7 +41,7 @@ object FunctionFunctionHandler : FunctionHandler() {
     argumentValues: List<Expression>,
     editor: Editor,
     context: DataContext,
-    parent: Executable,
+    parent: VimLContext,
   ): VimFuncref {
     val arg1 = argumentValues[0].evaluate(editor, context, parent)
     if (arg1 !is VimString) {
@@ -88,7 +88,7 @@ object FuncrefFunctionHandler : FunctionHandler() {
     argumentValues: List<Expression>,
     editor: Editor,
     context: DataContext,
-    parent: Executable,
+    parent: VimLContext,
   ): VimFuncref {
     val arg1 = argumentValues[0].evaluate(editor, context, parent)
     if (arg1 !is VimString) {

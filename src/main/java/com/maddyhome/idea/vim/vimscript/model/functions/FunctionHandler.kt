@@ -22,7 +22,7 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.Ranges
-import com.maddyhome.idea.vim.vimscript.model.Executable
+import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
@@ -35,9 +35,9 @@ abstract class FunctionHandler {
   abstract val maximumNumberOfArguments: Int?
   var ranges: Ranges? = null
 
-  protected abstract fun doFunction(argumentValues: List<Expression>, editor: Editor, context: DataContext, parent: Executable): VimDataType
+  protected abstract fun doFunction(argumentValues: List<Expression>, editor: Editor, context: DataContext, parent: VimLContext): VimDataType
 
-  fun executeFunction(arguments: List<Expression>, editor: Editor, context: DataContext, parent: Executable): VimDataType {
+  fun executeFunction(arguments: List<Expression>, editor: Editor, context: DataContext, parent: VimLContext): VimDataType {
     checkFunctionCall(arguments)
     val result = doFunction(arguments, editor, context, parent)
     ranges = null

@@ -27,8 +27,10 @@ import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.FinishException
 import com.maddyhome.idea.vim.group.HistoryGroup
 import com.maddyhome.idea.vim.group.RegisterGroup
-import com.maddyhome.idea.vim.vimscript.model.Executable
+import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
+import com.maddyhome.idea.vim.vimscript.model.Script
+import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.commands.Command
 import com.maddyhome.idea.vim.vimscript.model.commands.RepeatCommand
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
@@ -41,11 +43,11 @@ object Executor {
   var executingVimScript = false
 
   @Throws(ExException::class)
-  fun execute(scriptString: String, editor: Editor, context: DataContext, skipHistory: Boolean, indicateErrors: Boolean = true, parent: Executable? = null): ExecutionResult {
+  fun execute(scriptString: String, editor: Editor, context: DataContext, skipHistory: Boolean, indicateErrors: Boolean = true, parent: VimLContext): ExecutionResult {
     var finalResult: ExecutionResult = ExecutionResult.Success
 
     val script = VimscriptParser.parse(scriptString)
-    script.units.forEach { if (parent == null) it.parent = script else it.parent = parent }
+    script.units.forEach { it.parent = parent }
 
     for (unit in script.units) {
       try {
@@ -90,7 +92,7 @@ object Executor {
   fun execute(scriptString: String, skipHistory: Boolean = true) {
     val editor = TextComponentEditorImpl(null, JTextArea())
     val context = DataContext.EMPTY_CONTEXT
-    execute(scriptString, editor, context, skipHistory)
+    execute(scriptString, editor, context, skipHistory, indicateErrors = true, CommandLineVimLContext)
   }
 
   @JvmStatic
@@ -98,7 +100,7 @@ object Executor {
     val editor = TextComponentEditorImpl(null, JTextArea())
     val context = DataContext.EMPTY_CONTEXT
     try {
-      execute(file.readText(), editor, context, skipHistory = true, indicateErrors)
+      execute(file.readText(), editor, context, skipHistory = true, indicateErrors, Script())
     } catch (ignored: IOException) { }
   }
 
@@ -106,7 +108,7 @@ object Executor {
   fun executeLastCommand(editor: Editor, context: DataContext): Boolean {
     val reg = VimPlugin.getRegister().getRegister(':') ?: return false
     val text = reg.text ?: return false
-    execute(text, editor, context, false)
+    execute(text, editor, context, skipHistory = false, indicateErrors = true, CommandLineVimLContext)
     return true
   }
 }
