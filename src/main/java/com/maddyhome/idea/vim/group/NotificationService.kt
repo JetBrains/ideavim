@@ -103,7 +103,7 @@ class NotificationService(private val project: Project?) {
   }
 
   fun enableRepeatingMode() = Messages.showYesNoDialog(
-    "Do you want to enable repeating keys in Mac OS X on press and hold?\n\n" +
+    "Do you want to enable repeating keys in macOS on press and hold?\n\n" +
       "(You can do it manually by running 'defaults write -g " +
       "ApplePressAndHoldEnabled 0' in the console).",
     IDEAVIM_NOTIFICATION_TITLE,
