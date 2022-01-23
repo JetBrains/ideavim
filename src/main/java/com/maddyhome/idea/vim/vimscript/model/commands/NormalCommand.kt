@@ -34,13 +34,14 @@ import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.getTopLevelEditor
 import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
+import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 
 data class NormalCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.WRITABLE, Flag.SAVE_VISUAL)
 
   override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
-    if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "ideadelaymacro")) {
+    if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, OptionConstants.ideadelaymacroName)) {
       return ExecutionResult.Success
     }
 

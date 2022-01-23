@@ -22,6 +22,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
+import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import java.util.*
 
@@ -92,7 +93,7 @@ object GuiCursorOptionHelper {
       var highlightGroup = ""
       var lmapHighlightGroup = ""
       var blinkModes = emptyList<String>()
-      (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "guicursor") as VimString).value
+      (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, OptionConstants.guicursorName) as VimString).value
         .split(",")
         .map { convertToken(it) }
         .forEach { state ->

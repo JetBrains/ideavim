@@ -29,6 +29,7 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.Direction
 import com.maddyhome.idea.vim.helper.RunnableHelper
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -1415,17 +1416,17 @@ class SearchGroupTest : VimTestCase() {
     assertEquals(9, res)
   }
 
-  private fun setIgnoreCase() = VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, "ignorecase")
-  private fun setSmartCase() = VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, "smartcase")
+  private fun setIgnoreCase() = VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, OptionConstants.ignorecaseName)
+  private fun setSmartCase() = VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, OptionConstants.smartcaseName)
 
   private fun setIgnoreCaseAndSmartCase() {
     setIgnoreCase()
     setSmartCase()
   }
 
-  private fun setHighlightSearch() = VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, "hlsearch")
-  private fun clearHighlightSearch() = VimPlugin.getOptionService().unsetOption(OptionService.Scope.GLOBAL, "hlsearch")
-  private fun setIncrementalSearch() = VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, "incsearch")
+  private fun setHighlightSearch() = VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, OptionConstants.hlsearchName)
+  private fun clearHighlightSearch() = VimPlugin.getOptionService().unsetOption(OptionService.Scope.GLOBAL, OptionConstants.hlsearchName)
+  private fun setIncrementalSearch() = VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, OptionConstants.incsearchName)
 
   // TODO: Remove these search methods and test by invoking VIM commands rather than calling APIs
   private fun search(pattern: String, input: String, expectedLocation: Int): Int {

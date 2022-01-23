@@ -28,6 +28,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
+import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import java.util.*
 
@@ -47,7 +48,7 @@ class DeleteJoinVisualLinesAction : VisualOperatorActionHandler.SingleExecution(
     operatorArguments: OperatorArguments,
   ): Boolean {
     if (editor.isOneLineMode) return false
-    if (VimPlugin.getOptionService().isSet(OptionService.Scope.LOCAL(editor), "ideajoin")) {
+    if (VimPlugin.getOptionService().isSet(OptionService.Scope.LOCAL(editor), OptionConstants.ideajoinName)) {
       VimPlugin.getChange().joinViaIdeaBySelections(editor, context, caretsAndSelections)
       return true
     }

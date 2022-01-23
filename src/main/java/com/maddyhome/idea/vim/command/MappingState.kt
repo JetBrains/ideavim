@@ -22,6 +22,7 @@ import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.diagnostic.trace
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
+import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import java.awt.event.ActionListener
 import javax.swing.KeyStroke
@@ -33,7 +34,7 @@ class MappingState {
 
   var mappingMode = MappingMode.NORMAL
 
-  private val timer = Timer((VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "timeoutlen") as VimInt).value, null)
+  private val timer = Timer((VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, OptionConstants.timeoutlenName) as VimInt).value, null)
   private var keyList = mutableListOf<KeyStroke>()
 
   init {
@@ -41,7 +42,7 @@ class MappingState {
   }
 
   fun startMappingTimer(actionListener: ActionListener) {
-    timer.initialDelay = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "timeoutlen") as VimInt).value
+    timer.initialDelay = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, OptionConstants.timeoutlenName) as VimInt).value
     timer.actionListeners.forEach { timer.removeActionListener(it) }
     timer.addActionListener(actionListener)
     timer.start()

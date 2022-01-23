@@ -41,6 +41,7 @@ import com.maddyhome.idea.vim.listener.VimListenerManager
 import com.maddyhome.idea.vim.option.SelectModeOptionData
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.IdeaRefactorModeHelper
+import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 
 object IdeaSelectionControl {
@@ -148,7 +149,7 @@ object IdeaSelectionControl {
     selectionSource: VimListenerManager.SelectionSource,
     logReason: Boolean,
   ): CommandState.Mode {
-    val selectmode = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.LOCAL(editor), "selectmode") as VimString).value
+    val selectmode = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.LOCAL(editor), OptionConstants.selectmodeName) as VimString).value
     return when {
       editor.isOneLineMode -> {
         if (logReason) logger.debug("Enter select mode. Reason: one line mode")
@@ -163,7 +164,7 @@ object IdeaSelectionControl {
         CommandState.Mode.SELECT
       }
       selectionSource == VimListenerManager.SelectionSource.OTHER &&
-        SelectModeOptionData.ideaselection in (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "selectmode") as VimString).value -> {
+        SelectModeOptionData.ideaselection in (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, OptionConstants.selectmodeName) as VimString).value -> {
         if (logReason) logger.debug("Enter select mode. Selection source is OTHER and selectMode has refactoring")
         CommandState.Mode.SELECT
       }

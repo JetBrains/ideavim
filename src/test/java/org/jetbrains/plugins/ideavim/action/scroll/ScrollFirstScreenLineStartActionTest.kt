@@ -22,6 +22,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
+import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import org.jetbrains.plugins.ideavim.VimTestCase
 
@@ -49,7 +50,7 @@ class ScrollFirstScreenLineStartActionTest : VimTestCase() {
   }
 
   fun `test scroll current line to top of screen minus scrolloff`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
     configureByPages(5)
     setPositionAndScroll(0, 19)
     typeText(StringHelper.parseKeys("z<CR>"))
@@ -66,7 +67,7 @@ class ScrollFirstScreenLineStartActionTest : VimTestCase() {
   }
 
   fun `test scrolls count line to top of screen minus scrolloff`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolljump", VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, OptionConstants.scrolljumpName, VimInt(10))
     configureByPages(5)
     setPositionAndScroll(0, 19)
     typeText(StringHelper.parseKeys("z<CR>"))
@@ -84,7 +85,7 @@ class ScrollFirstScreenLineStartActionTest : VimTestCase() {
   }
 
   fun `test scroll current line to top of screen ignoring scrolljump`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolljump", VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, OptionConstants.scrolljumpName, VimInt(10))
     configureByPages(5)
     setPositionAndScroll(0, 19)
     typeText(StringHelper.parseKeys("z<CR>"))

@@ -66,6 +66,7 @@ import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
 import com.maddyhome.idea.vim.newapi.ChangeGroupKt;
 import com.maddyhome.idea.vim.option.StrictMode;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
+import com.maddyhome.idea.vim.vimscript.services.OptionConstants;
 import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import kotlin.Pair;
 import kotlin.text.StringsKt;
@@ -1376,7 +1377,7 @@ public class ChangeGroup {
       }
     }
 
-    if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL.INSTANCE, "experimentalapi", "experimentalapi")) {
+    if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL.INSTANCE, OptionConstants.experimentalapiName, OptionConstants.experimentalapiName)) {
       Pair<TextRange, SelectionType> deleteRangeAndType =
         getDeleteRangeAndType2(editor, caret, context, argument, true, operatorArguments.withCount0(count0));
       if (deleteRangeAndType == null) return false;
@@ -1934,7 +1935,7 @@ public class ChangeGroup {
                                         @NotNull TextRange selectedRange,
                                         final int count,
                                         boolean avalanche) {
-    String nf = ((VimString) VimPlugin.getOptionService().getOptionValue(new OptionService.Scope.LOCAL(editor), "nrformats", "nrformats")).getValue();
+    String nf = ((VimString) VimPlugin.getOptionService().getOptionValue(new OptionService.Scope.LOCAL(editor), OptionConstants.nrformatsName, OptionConstants.nrformatsName)).getValue();
     boolean alpha = nf.contains("alpha");
     boolean hex = nf.contains("hex");
     boolean octal = nf.contains("octal");
@@ -1976,7 +1977,7 @@ public class ChangeGroup {
   private @Nullable List<Object> lastStrokes;
 
   public boolean changeNumber(final @NotNull Editor editor, @NotNull Caret caret, final int count) {
-    final String nf = ((VimString) VimPlugin.getOptionService().getOptionValue(new OptionService.Scope.LOCAL(editor), "nrformats", "nrformats")).getValue();
+    final String nf = ((VimString) VimPlugin.getOptionService().getOptionValue(new OptionService.Scope.LOCAL(editor), OptionConstants.nrformatsName, OptionConstants.nrformatsName)).getValue();
     final boolean alpha = nf.contains("alpha");
     final boolean hex = nf.contains("hex");
     final boolean octal = nf.contains("octal");

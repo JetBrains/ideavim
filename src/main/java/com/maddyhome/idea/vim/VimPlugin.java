@@ -53,10 +53,7 @@ import com.maddyhome.idea.vim.option.OptionsManager;
 import com.maddyhome.idea.vim.ui.StatusBarIconFactory;
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable;
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
-import com.maddyhome.idea.vim.vimscript.services.FunctionStorage;
-import com.maddyhome.idea.vim.vimscript.services.OptionService;
-import com.maddyhome.idea.vim.vimscript.services.VariableService;
-import com.maddyhome.idea.vim.vimscript.services.VariableServiceImpl;
+import com.maddyhome.idea.vim.vimscript.services.*;
 import org.jdom.Element;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
@@ -299,7 +296,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     if (ApplicationManager.getApplication().isUnitTestMode()) {
       getInstance().error = true;
     }
-    else if (!VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL.INSTANCE, "visualbell", "visualbell")) {
+    else if (!VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL.INSTANCE, OptionConstants.visualbellName, OptionConstants.visualbellName)) {
       // Vim only allows a beep once every half second - :help 'visualbell'
       final long currentTimeMillis = System.currentTimeMillis();
       if (currentTimeMillis - lastBeepTimeMillis > 500) {

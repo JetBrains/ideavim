@@ -26,6 +26,7 @@ import com.intellij.openapi.editor.actionSystem.TypedActionHandlerEx
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.maddyhome.idea.vim.helper.EditorDataContext
 import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
+import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
@@ -38,7 +39,7 @@ import javax.swing.KeyStroke
  */
 class VimTypedActionHandler(origHandler: TypedActionHandler?) : TypedActionHandlerEx {
   private val handler = KeyHandler.getInstance()
-  private val traceTime = VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "ideatracetime")
+  private val traceTime = VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, OptionConstants.ideatracetimeName)
 
   init {
     handler.originalHandler = origHandler

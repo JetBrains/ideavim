@@ -23,6 +23,7 @@ import com.maddyhome.idea.vim.helper.CharacterHelper;
 import com.maddyhome.idea.vim.vimscript.Executor;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.KeywordOptionHelper;
+import com.maddyhome.idea.vim.vimscript.services.OptionConstants;
 import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
@@ -37,12 +38,12 @@ public class KeywordOptionTest extends VimTestCase {
 
   private String getOptionValue() {
     return ((VimString)VimPlugin.getOptionService()
-      .getOptionValue(OptionService.Scope.GLOBAL.INSTANCE, "iskeyword", "iskeyword")).getValue();
+      .getOptionValue(OptionService.Scope.GLOBAL.INSTANCE, OptionConstants.iskeywordName, OptionConstants.iskeywordName)).getValue();
   }
 
   private void setKeyword(String val) {
     VimPlugin.getOptionService()
-      .setOptionValue(OptionService.Scope.GLOBAL.INSTANCE, "iskeyword", new VimString(val), "testToken");
+      .setOptionValue(OptionService.Scope.GLOBAL.INSTANCE, OptionConstants.iskeywordName, new VimString(val), "testToken");
   }
 
   private void assertIsKeyword(char c) {

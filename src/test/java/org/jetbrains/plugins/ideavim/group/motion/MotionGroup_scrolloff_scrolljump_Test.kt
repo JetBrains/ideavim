@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.option.ScrollJumpData
 import com.maddyhome.idea.vim.option.ScrollOffData
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
+import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import org.jetbrains.plugins.ideavim.OptionValueType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -359,7 +360,7 @@ class MotionGroup_scrolloff_Test : VimOptionTestCase(ScrollOffData.name) {
     configureByPages(5)
     setPositionAndScroll(50, 50)
 
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(999))
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, OptionConstants.scrolloffName, VimInt(999))
 
     assertPosition(50, 0)
     assertVisibleArea(33, 67)

@@ -31,6 +31,7 @@ import com.maddyhome.idea.vim.helper.getShape
 import com.maddyhome.idea.vim.helper.shape
 import com.maddyhome.idea.vim.helper.thickness
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
+import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -165,7 +166,7 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   fun `test nested visual mode in ide gets visual caret`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "keymodel", VimString("startsel,stopsel"))
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, OptionConstants.keymodelName, VimString("startsel,stopsel"))
     configureByText("I ${c}found it in a legendary land")
     typeText(parseKeys("i", "<S-Right><S-Right><S-Right>"))
     assertCaretVisualAttributes("BLOCK", 0F)
@@ -173,7 +174,7 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   fun `test caret reset to insert after leaving nested visual mode`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "keymodel", VimString("startsel,stopsel"))
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, OptionConstants.keymodelName, VimString("startsel,stopsel"))
     configureByText("I ${c}found it in a legendary land")
     typeText(parseKeys("i", "<S-Right><S-Right><S-Right>", "<Right>"))
     assertCaretVisualAttributes("BAR", 0.25F)
@@ -181,7 +182,7 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   fun `test caret reset to insert after cancelling nested visual mode`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "keymodel", VimString("startsel,stopsel"))
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, OptionConstants.keymodelName, VimString("startsel,stopsel"))
     configureByText("I ${c}found it in a legendary land")
     typeText(parseKeys("i", "<S-Right><S-Right><S-Right>", "<Esc>"))
     assertCaretVisualAttributes("BAR", 0.25F)

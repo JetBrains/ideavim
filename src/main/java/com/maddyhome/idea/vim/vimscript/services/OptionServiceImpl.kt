@@ -43,49 +43,49 @@ internal class OptionServiceImpl : OptionService {
   // todo use me please :(
   private val logger = logger<OptionServiceImpl>()
   private val options = MultikeyMap(
-    NumberOption("maxmapdepth", "mmd", 20),
-    NumberOption("scroll", "scr", 0),
-    NumberOption("scrolloff", "so", 0),
-    NumberOption("sidescroll", "ss", 0),
-    NumberOption("sidescrolloff", "siso", 0),
-    ToggleOption("digraph", "dg", false),
-    ToggleOption("gdefault", "gd", false),
-    ToggleOption("hlsearch", "hls", false),
-    ToggleOption("ideacopypreprocess", "ideacopypreprocess", false),
-    ToggleOption("ideajoin", "ideajoin", false),
-    ToggleOption("ideamarks", "ideamarks", true),
-    ToggleOption("ideastrictmode", "ideastrictmode", false),
-    ToggleOption("ideatracetime", "ideatracetime", false),
-    ToggleOption("ignorecase", "ic", false),
-    ToggleOption("incsearch", "is", false),
-    ToggleOption("more", "more", true),
-    ToggleOption("number", "nu", false),
-    ToggleOption("relativenumber", "rnu", false),
-    ToggleOption("showcmd", "sc", true),
-    ToggleOption("showmode", "smd", false),
-    ToggleOption("smartcase", "scs", false),
-    ToggleOption("startofline", "sol", true),
-    ToggleOption("timeout", "to", true),
-    ToggleOption("visualbell", "vb", false),
-    ToggleOption("wrapscan", "ws", true),
-    ToggleOption("ideadelaymacro", "ideadelaymacro", true),
-    ToggleOption("trackactionids", "tai", false),
-    StringOption("ide", "ide", ApplicationNamesInfo.getInstance().fullProductNameWithEdition),
-    StringOption("idearefactormode", "idearefactormode", "select", isList = false, ideaRefactorModeValues),
-    StringOption("ideastatusicon", "ideastatusicon", "enabled", isList = false, ideaStatusIconValues),
-    StringOption("ideawrite", "ideawrite", "all", isList = false, ideaWriteValues),
-    StringOption("selection", "sel", "inclusive", isList = false, setOf("old", "inclusive", "exclusive")),
-    StringOption("shell", "sh", if (SystemInfo.isWindows) "cmd.exe" else System.getenv("SHELL") ?: "sh"),
-    StringOption("shellxescape", "sxe", if (SystemInfo.isWindows) "\"&|<>()@^" else "", isList = false),
-    StringOption("virtualedit", "ve", "", isList = false, setOf("onemore", "block", "insert", "all")),
-    StringOption("viminfo", "vi", "'100,<50,s10,h", isList = true),
-    StringOption("nrformats", "nf", "hex", isList = true, setOf("octal", "hex", "alpha")),
-    StringOption("clipboard", "cb", "ideaput,autoselect,exclude:cons\\|linux", isList = true),
-    StringOption("selectmode", "slm", "", isList = true, setOf("mouse", "key", "cmd", "ideaselection")),
-    StringOption("ideavimsupport", "ideavimsupport", "dialog", isList = true, ideavimsupportValues),
-    StringOption("keymodel", "km", "continueselect,stopselect", isList = true, setOf("startsel", "stopsel", "stopselect", "stopvisual", "continueselect", "continuevisual")),
-    StringOption("lookupkeys", "lookupkeys", "<Tab>,<Down>,<Up>,<Enter>,<Left>,<Right>,<C-Down>,<C-Up>,<PageUp>,<PageDown>,<C-J>,<C-Q>", isList = true),
-    object : StringOption("matchpairs", "mps", "(:),{:},[:]", isList = true) {
+    NumberOption(OptionConstants.maxmapdepthName, OptionConstants.maxmapdepthAlias, 20),
+    NumberOption(OptionConstants.scrollName,OptionConstants.scrollAlias, 0),
+    NumberOption(OptionConstants.scrolloffName, OptionConstants.scrolloffAlias, 0),
+    NumberOption(OptionConstants.sidescrollName, OptionConstants.sidescrollAlias, 0),
+    NumberOption(OptionConstants.sidescrolloffName, OptionConstants.sidescrolloffAlias, 0),
+    ToggleOption(OptionConstants.digraphName, OptionConstants.digraphAlias, false),
+    ToggleOption(OptionConstants.gdefaultName, OptionConstants.gdefaultAlias, false),
+    ToggleOption(OptionConstants.hlsearchName, OptionConstants.hlsearchAlias, false),
+    ToggleOption(OptionConstants.ideacopypreprocessName, OptionConstants.ideacopypreprocessAlias, false),
+    ToggleOption(OptionConstants.ideajoinName, OptionConstants.ideajoinAlias, false),
+    ToggleOption(OptionConstants.ideamarksName, OptionConstants.ideamarksAlias, true),
+    ToggleOption(OptionConstants.ideastrictmodeName, OptionConstants.ideastrictmodeAlias, false),
+    ToggleOption(OptionConstants.ideatracetimeName, OptionConstants.ideatracetimeAlias, false),
+    ToggleOption(OptionConstants.ignorecaseName, OptionConstants.ignorecaseAlias, false),
+    ToggleOption(OptionConstants.incsearchName, OptionConstants.incsearchAlias, false),
+    ToggleOption(OptionConstants.moreName, OptionConstants.moreAlias, true),
+    ToggleOption(OptionConstants.numberName, OptionConstants.numberAlias, false),
+    ToggleOption(OptionConstants.relativenumberName, OptionConstants.relativenumberAlias, false),
+    ToggleOption(OptionConstants.showcmdName, OptionConstants.showcmdAlias, true),
+    ToggleOption(OptionConstants.showmodeName, OptionConstants.showmodeAlias, false),
+    ToggleOption(OptionConstants.smartcaseName, OptionConstants.smartcaseAlias, false),
+    ToggleOption(OptionConstants.startoflineName, OptionConstants.startoflineAlias, true),
+    ToggleOption(OptionConstants.timeoutName, OptionConstants.timeoutAlias, true),
+    ToggleOption(OptionConstants.visualbellName, OptionConstants.visualbellAlias, false),
+    ToggleOption(OptionConstants.wrapscanName, OptionConstants.wrapscanAlias, true),
+    ToggleOption(OptionConstants.ideadelaymacroName, OptionConstants.ideadelaymacroAlias, true),
+    ToggleOption(OptionConstants.trackactionidsName, OptionConstants.trackactionidsAlias, false),
+    StringOption(OptionConstants.ideName, OptionConstants.ideAlias, ApplicationNamesInfo.getInstance().fullProductNameWithEdition),
+    StringOption(OptionConstants.idearefactormodeName, OptionConstants.idearefactormodeAlias, "select", isList = false, ideaRefactorModeValues),
+    StringOption(OptionConstants.ideastatusiconName, OptionConstants.ideastatusiconAlias, "enabled", isList = false, ideaStatusIconValues),
+    StringOption(OptionConstants.ideawriteName, OptionConstants.ideawriteAlias, "all", isList = false, ideaWriteValues),
+    StringOption(OptionConstants.selectionName, OptionConstants.selectionAlias, "inclusive", isList = false, setOf("old", "inclusive", "exclusive")),
+    StringOption(OptionConstants.shellName, OptionConstants.shellAlias, if (SystemInfo.isWindows) "cmd.exe" else System.getenv("SHELL") ?: "sh"),
+    StringOption(OptionConstants.shellxescapeName, OptionConstants.shellxescapeAlias, if (SystemInfo.isWindows) "\"&|<>()@^" else "", isList = false),
+    StringOption(OptionConstants.virtualeditName, OptionConstants.virtualeditAlias, "", isList = false, setOf("onemore", "block", "insert", "all")),
+    StringOption(OptionConstants.viminfoName, OptionConstants.viminfoAlias, "'100,<50,s10,h", isList = true),
+    StringOption(OptionConstants.nrformatsName, OptionConstants.nrformatsAlias, "hex", isList = true, setOf("octal", "hex", "alpha")),
+    StringOption(OptionConstants.clipboardName, OptionConstants.clipboardAlias, "ideaput,autoselect,exclude:cons\\|linux", isList = true),
+    StringOption(OptionConstants.selectmodeName, OptionConstants.selectmodeAlias, "", isList = true, setOf("mouse", "key", "cmd", "ideaselection")),
+    StringOption(OptionConstants.ideavimsupportName, OptionConstants.ideavimsupportAlias, "dialog", isList = true, ideavimsupportValues),
+    StringOption(OptionConstants.keymodelName, OptionConstants.keymodelAlias, "continueselect,stopselect", isList = true, setOf("startsel", "stopsel", "stopselect", "stopvisual", "continueselect", "continuevisual")),
+    StringOption(OptionConstants.lookupkeysName, OptionConstants.lookupkeysAlias, "<Tab>,<Down>,<Up>,<Enter>,<Left>,<Right>,<C-Down>,<C-Up>,<PageUp>,<PageDown>,<C-J>,<C-Q>", isList = true),
+    object : StringOption(OptionConstants.matchpairsName, OptionConstants.matchpairsAlias, "(:),{:},[:]", isList = true) {
       override fun checkIfValueValid(value: VimDataType, token: String) {
         super.checkIfValueValid(value, token)
         for (v in split((value as VimString).value)!!) {
@@ -95,7 +95,7 @@ internal class OptionServiceImpl : OptionService {
         }
       }
     },
-    object : NumberOption("scrolljump", "sj", 1) {
+    object : NumberOption(OptionConstants.scrolljumpName, OptionConstants.scrolljumpAlias, 1) {
       override fun checkIfValueValid(value: VimDataType, token: String) {
         super.checkIfValueValid(value, token)
         if ((value as VimInt).value < -100) {
@@ -103,7 +103,7 @@ internal class OptionServiceImpl : OptionService {
         }
       }
     },
-    object : NumberOption("history", "hi", 50) {
+    object : NumberOption(OptionConstants.historyName, OptionConstants.historyAlias, 50) {
       override fun checkIfValueValid(value: VimDataType, token: String) {
         super.checkIfValueValid(value, token)
         if ((value as VimInt).value < 0) {
@@ -111,7 +111,7 @@ internal class OptionServiceImpl : OptionService {
         }
       }
     },
-    object : NumberOption("timeoutlen", "tm", 1000) {
+    object : NumberOption(OptionConstants.timeoutlenName, OptionConstants.timeoutlenAlias, 1000) {
       override fun checkIfValueValid(value: VimDataType, token: String) {
         super.checkIfValueValid(value, token)
         if ((value as VimInt).value < 0) {
@@ -119,7 +119,7 @@ internal class OptionServiceImpl : OptionService {
         }
       }
     },
-    object : NumberOption("undolevels", "ul", 1000) {
+    object : NumberOption(OptionConstants.undolevelsName, OptionConstants.undolevelsAlias, 1000) {
       override fun checkIfValueValid(value: VimDataType, token: String) {
         super.checkIfValueValid(value, token)
         if ((value as VimInt).value < 0) {
@@ -127,7 +127,7 @@ internal class OptionServiceImpl : OptionService {
         }
       }
     },
-    object : NumberOption("visualdelay", "visualdelay", 100) {
+    object : NumberOption(OptionConstants.visualdelayName, OptionConstants.visualdelayAlias, 100) {
       override fun checkIfValueValid(value: VimDataType, token: String) {
         super.checkIfValueValid(value, token)
         if ((value as VimInt).value < 0) {
@@ -135,10 +135,10 @@ internal class OptionServiceImpl : OptionService {
         }
       }
     },
-    object : StringOption("shellcmdflag", "shcf", "") {
+    object : StringOption(OptionConstants.shellcmdflagName, OptionConstants.shellcmdflagAlias, "") {
       // default value changes if so does the "shell" option
       override fun getDefaultValue(): VimString {
-        val shell = (getGlobalOptionValue("shell") as VimString).value
+        val shell = (getGlobalOptionValue(OptionConstants.shellName) as VimString).value
         return VimString(
           if (SystemInfo.isWindows && !shell.contains("sh"))
             "/c"
@@ -147,10 +147,10 @@ internal class OptionServiceImpl : OptionService {
         )
       }
     },
-    object : StringOption("shellxquote", "sxq", "") {
+    object : StringOption(OptionConstants.shellxquoteName, OptionConstants.shellxquoteAlias, "") {
       // default value changes if so does the "shell" option
       override fun getDefaultValue(): VimString {
-        val shell = (getGlobalOptionValue("shell") as VimString).value
+        val shell = (getGlobalOptionValue(OptionConstants.shellName) as VimString).value
         return VimString(
           when {
             SystemInfo.isWindows && shell == "cmd.exe" -> "("
@@ -160,7 +160,7 @@ internal class OptionServiceImpl : OptionService {
         )
       }
     },
-    object : StringOption("iskeyword", "isk", "@,48-57,_", isList = true) {
+    object : StringOption(OptionConstants.iskeywordName, OptionConstants.iskeywordAlias, "@,48-57,_", isList = true) {
       override fun checkIfValueValid(value: VimDataType, token: String) {
         super.checkIfValueValid(value, token)
         if (KeywordOptionHelper.isValueInvalid((value as VimString).value)) {
@@ -173,7 +173,7 @@ internal class OptionServiceImpl : OptionService {
       }
     },
     object : StringOption(
-      "guicursor", "gcr",
+      OptionConstants.guicursorName, OptionConstants.guicursorAlias,
       "n-v-c:block-Cursor/lCursor," +
         "ve:ver35-Cursor," +
         "o:hor50-Cursor," +
@@ -189,8 +189,7 @@ internal class OptionServiceImpl : OptionService {
       }
     },
 
-//    ToggleOption("experimentalapi", "experimentalapi", true)
-    ToggleOption("experimentalapi", "experimentalapi", false)
+    ToggleOption(OptionConstants.experimentalapiName, OptionConstants.experimentalapiAlias, false)
   )
   private val globalValues = mutableMapOf<String, VimDataType>()
   private val localValuesKey = Key<MutableMap<String, VimDataType>>("localOptions")

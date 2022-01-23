@@ -28,6 +28,7 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
+import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import kotlin.test.fail
 
@@ -77,7 +78,7 @@ inline fun waitAndAssert(timeInMillis: Int = 1000, condition: () -> Boolean) {
 fun waitAndAssertMode(
   fixture: CodeInsightTestFixture,
   mode: CommandState.Mode,
-  timeInMillis: Int = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "visualdelay") as VimInt).value + 1000,
+  timeInMillis: Int = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, OptionConstants.visualdelayName) as VimInt).value + 1000,
 ) {
   waitAndAssert(timeInMillis) { fixture.editor.mode == mode }
 }

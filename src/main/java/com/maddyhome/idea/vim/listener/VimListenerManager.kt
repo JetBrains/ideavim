@@ -78,6 +78,7 @@ import com.maddyhome.idea.vim.option.StrictMode
 import com.maddyhome.idea.vim.ui.ShowCmdOptionChangeListener
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.KeywordOptionChangeListener
+import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import javax.swing.SwingUtilities
@@ -110,12 +111,12 @@ object VimListenerManager {
         StrictMode.fail("typeAction expected to be non-vim.")
       }
 
-      VimPlugin.getOptionService().addListener("number", EditorGroup.NumberChangeListener.INSTANCE)
-      VimPlugin.getOptionService().addListener("relativenumber", EditorGroup.NumberChangeListener.INSTANCE)
-      VimPlugin.getOptionService().addListener("scrolloff", MotionGroup.ScrollOptionsChangeListener.INSTANCE)
-      VimPlugin.getOptionService().addListener("showcmd", ShowCmdOptionChangeListener)
-      VimPlugin.getOptionService().addListener("guicursor", GuicursorChangeListener)
-      VimPlugin.getOptionService().addListener("iskeyword", KeywordOptionChangeListener)
+      VimPlugin.getOptionService().addListener(OptionConstants.numberName, EditorGroup.NumberChangeListener.INSTANCE)
+      VimPlugin.getOptionService().addListener(OptionConstants.relativenumberName, EditorGroup.NumberChangeListener.INSTANCE)
+      VimPlugin.getOptionService().addListener(OptionConstants.scrolloffName, MotionGroup.ScrollOptionsChangeListener.INSTANCE)
+      VimPlugin.getOptionService().addListener(OptionConstants.showcmdName, ShowCmdOptionChangeListener)
+      VimPlugin.getOptionService().addListener(OptionConstants.guicursorName, GuicursorChangeListener)
+      VimPlugin.getOptionService().addListener(OptionConstants.iskeywordName, KeywordOptionChangeListener)
 
       EventFacade.getInstance().addEditorFactoryListener(VimEditorFactoryListener, VimPlugin.getInstance())
 
@@ -125,12 +126,12 @@ object VimListenerManager {
     fun disable() {
       EventFacade.getInstance().restoreTypedActionHandler()
 
-      VimPlugin.getOptionService().removeListener("number", EditorGroup.NumberChangeListener.INSTANCE)
-      VimPlugin.getOptionService().removeListener("relativenumber", EditorGroup.NumberChangeListener.INSTANCE)
-      VimPlugin.getOptionService().removeListener("scrolloff", MotionGroup.ScrollOptionsChangeListener.INSTANCE)
-      VimPlugin.getOptionService().removeListener("showcmd", ShowCmdOptionChangeListener)
-      VimPlugin.getOptionService().removeListener("guicursor", GuicursorChangeListener)
-      VimPlugin.getOptionService().removeListener("iskeyword", KeywordOptionChangeListener)
+      VimPlugin.getOptionService().removeListener(OptionConstants.numberName, EditorGroup.NumberChangeListener.INSTANCE)
+      VimPlugin.getOptionService().removeListener(OptionConstants.relativenumberName, EditorGroup.NumberChangeListener.INSTANCE)
+      VimPlugin.getOptionService().removeListener(OptionConstants.scrolloffName, MotionGroup.ScrollOptionsChangeListener.INSTANCE)
+      VimPlugin.getOptionService().removeListener(OptionConstants.showcmdName, ShowCmdOptionChangeListener)
+      VimPlugin.getOptionService().removeListener(OptionConstants.guicursorName, GuicursorChangeListener)
+      VimPlugin.getOptionService().removeListener(OptionConstants.iskeywordName, KeywordOptionChangeListener)
 
       EventFacade.getInstance().removeEditorFactoryListener(VimEditorFactoryListener)
 

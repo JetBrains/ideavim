@@ -22,6 +22,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState.Companion.getInstance
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -142,7 +143,7 @@ class MacroActionTest : VimTestCase() {
   fun `test macro with count`() {
     configureByText("${c}0\n1\n2\n3\n4\n5\n")
     typeText(parseKeys("qajq", "4@a"))
-    if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "ideadelaymacro")) {
+    if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, OptionConstants.ideadelaymacroName)) {
       PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
     }
     assertState("0\n1\n2\n3\n4\n${c}5\n")

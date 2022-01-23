@@ -78,6 +78,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.GuiCursorOptionHelper
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.GuiCursorType
 import com.maddyhome.idea.vim.vimscript.parser.errors.IdeavimErrorListener
+import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import com.maddyhome.idea.vim.vimscript.services.VariableServiceImpl
 import org.assertj.core.api.Assertions
@@ -115,7 +116,7 @@ abstract class VimTestCase : UsefulTestCase() {
     VimPlugin.getKey().resetKeyMappings()
     VimPlugin.getSearch().resetState()
     if (!VimPlugin.isEnabled()) VimPlugin.setEnabled(true)
-    VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, "ideastrictmode")
+    VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, OptionConstants.ideastrictmodeName)
     GuicursorChangeListener.processGlobalValueChange(null)
     Checks.reset()
 
@@ -275,15 +276,15 @@ abstract class VimTestCase : UsefulTestCase() {
     // Note that it is possible to request a position which would be invalid under normal Vim!
     // We disable scrolloff + scrolljump, position as requested, and reset. When resetting scrolloff, Vim will
     // recalculate the correct offsets, and that could move the top and/or caret line
-    val scrolloff = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "scrolloff") as VimInt).value
-    val scrolljump = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "scrolljump") as VimInt).value
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(0))
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolljump", VimInt(1))
+    val scrolloff = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, OptionConstants.scrolloffName) as VimInt).value
+    val scrolljump = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, OptionConstants.scrolljumpName) as VimInt).value
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, OptionConstants.scrolloffName, VimInt(0))
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, OptionConstants.scrolljumpName, VimInt(1))
 
     typeText(parseKeys("${scrollToLogicalLine + 1}z<CR>", "${caretLogicalLine + 1}G", "${caretLogicalColumn + 1}|"))
 
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(scrolloff))
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolljump", VimInt(scrolljump))
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, OptionConstants.scrolloffName, VimInt(scrolloff))
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, OptionConstants.scrolljumpName, VimInt(scrolljump))
 
     // Make sure we're where we want to be. If there are block inlays, we can't easily assert the bottom line because
     // we'd have to duplicate the scrolling logic here. Asserting top when we know height is good enough

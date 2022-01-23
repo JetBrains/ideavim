@@ -22,6 +22,7 @@ import com.intellij.testFramework.PlatformTestUtil
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -128,19 +129,19 @@ class LetCommandTest : VimTestCase() {
   fun `test let option`() {
     configureByText("\n")
     typeText(commandToKeys("set noincsearch"))
-    assertFalse(VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "incsearch"))
+    assertFalse(VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, OptionConstants.incsearchName))
     typeText(commandToKeys("let &incsearch = 12"))
-    assertTrue(VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "incsearch"))
+    assertTrue(VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, OptionConstants.incsearchName))
     typeText(commandToKeys("set noincsearch"))
-    assertFalse(VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "incsearch"))
+    assertFalse(VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, OptionConstants.incsearchName))
   }
 
   fun `test let option2`() {
     configureByText("\n")
     typeText(commandToKeys("set incsearch"))
-    assertTrue(VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "incsearch"))
+    assertTrue(VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, OptionConstants.incsearchName))
     typeText(commandToKeys("let &incsearch = 0"))
-    assertFalse(VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "incsearch"))
+    assertFalse(VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, OptionConstants.incsearchName))
   }
 
   fun `test comment`() {
@@ -248,7 +249,7 @@ class LetCommandTest : VimTestCase() {
     assertExOutput("inumber register works\n")
 
     typeText(parseKeys("@4"))
-    if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "ideadelaymacro")) {
+    if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, OptionConstants.ideadelaymacroName)) {
       PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
     }
     assertState("number register works\n")
@@ -261,7 +262,7 @@ class LetCommandTest : VimTestCase() {
     assertExOutput("ilowercase letter register works\n")
 
     typeText(parseKeys("@o"))
-    if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "ideadelaymacro")) {
+    if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, OptionConstants.ideadelaymacroName)) {
       PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
     }
     assertState("lowercase letter register works\n")
@@ -274,7 +275,7 @@ class LetCommandTest : VimTestCase() {
     assertExOutput("iuppercase letter register works\n")
 
     typeText(parseKeys("@O"))
-    if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "ideadelaymacro")) {
+    if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, OptionConstants.ideadelaymacroName)) {
       PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
     }
     assertState("uppercase letter register works\n")
@@ -292,7 +293,7 @@ class LetCommandTest : VimTestCase() {
     assertExOutput("iunnamed register works\n")
 
     typeText(parseKeys("@\""))
-    if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "ideadelaymacro")) {
+    if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, OptionConstants.ideadelaymacroName)) {
       PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
     }
     assertState("unnamed register works\n")

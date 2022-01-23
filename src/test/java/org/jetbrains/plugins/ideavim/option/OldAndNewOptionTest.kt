@@ -22,6 +22,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
+import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -30,19 +31,19 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 class OldAndNewOptionTest : VimTestCase() {
 
   fun `test toggle option`() {
-    TestCase.assertFalse(VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "rnu"))
+    TestCase.assertFalse(VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, OptionConstants.relativenumberName))
     OptionsManager.relativenumber.set()
-    TestCase.assertTrue(VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "rnu"))
+    TestCase.assertTrue(VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, OptionConstants.relativenumberName))
     OptionsManager.relativenumber.reset()
-    TestCase.assertFalse(VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "rnu"))
+    TestCase.assertFalse(VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, OptionConstants.relativenumberName))
   }
 
   fun `test toggle option 2`() {
-    TestCase.assertFalse(VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "rnu"))
-    VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, "rnu")
+    TestCase.assertFalse(VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, OptionConstants.relativenumberName))
+    VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, OptionConstants.relativenumberName)
     TestCase.assertTrue(OptionsManager.relativenumber.isSet)
-    VimPlugin.getOptionService().unsetOption(OptionService.Scope.GLOBAL, "rnu")
-    TestCase.assertFalse(VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "rnu"))
+    VimPlugin.getOptionService().unsetOption(OptionService.Scope.GLOBAL, OptionConstants.relativenumberName)
+    TestCase.assertFalse(VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, OptionConstants.relativenumberName))
   }
 
   fun `test number option`() {
@@ -62,18 +63,18 @@ class OldAndNewOptionTest : VimTestCase() {
   }
 
   fun `test string option`() {
-    TestCase.assertEquals("all", VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "ideawrite").asString())
+    TestCase.assertEquals("all", VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, OptionConstants.ideawriteName).asString())
     OptionsManager.ideawrite.set("file")
-    TestCase.assertEquals("file", VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "ideawrite").asString())
+    TestCase.assertEquals("file", VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, OptionConstants.ideawriteName).asString())
     OptionsManager.ideawrite.resetDefault()
-    TestCase.assertEquals("all", VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "ideawrite").asString())
+    TestCase.assertEquals("all", VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, OptionConstants.ideawriteName).asString())
   }
 
   fun `test string option 2`() {
     TestCase.assertEquals("all", OptionsManager.ideawrite.value)
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "ideawrite", VimString("file"))
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, OptionConstants.ideawriteName, VimString("file"))
     TestCase.assertEquals("file", OptionsManager.ideawrite.value)
-    VimPlugin.getOptionService().resetDefault(OptionService.Scope.GLOBAL, "ideawrite")
+    VimPlugin.getOptionService().resetDefault(OptionService.Scope.GLOBAL, OptionConstants.ideawriteName)
     TestCase.assertEquals("all", OptionsManager.ideawrite.value)
   }
 

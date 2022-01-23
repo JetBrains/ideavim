@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
+import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 
 class DeleteJoinLinesAction : ChangeEditorActionHandler.SingleExecution() {
@@ -38,7 +39,7 @@ class DeleteJoinLinesAction : ChangeEditorActionHandler.SingleExecution() {
     operatorArguments: OperatorArguments,
   ): Boolean {
     if (editor.isOneLineMode) return false
-    if (VimPlugin.getOptionService().isSet(OptionService.Scope.LOCAL(editor), "ideajoin")) {
+    if (VimPlugin.getOptionService().isSet(OptionService.Scope.LOCAL(editor), OptionConstants.ideajoinName)) {
       return VimPlugin.getChange().joinViaIdeaByCount(editor, context, operatorArguments.count1)
     }
     VimPlugin.getEditor().notifyIdeaJoin(editor.project)

@@ -24,6 +24,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
+import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import org.jetbrains.plugins.ideavim.VimTestCase
 
@@ -115,7 +116,7 @@ class VisualToggleBlockModeActionTest : VimTestCase() {
                     hard by the torrent of a mountain pass.
       """.trimIndent()
     )
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "selectmode", VimString("cmd"))
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, OptionConstants.selectmodeName, VimString("cmd"))
     typeText(parseKeys("<C-V>"))
     assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_BLOCK)
   }

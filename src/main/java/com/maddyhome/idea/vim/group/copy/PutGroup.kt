@@ -52,6 +52,7 @@ import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.option.ClipboardOptionsData
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.ClipboardOptionHelper
+import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import java.awt.datatransfer.DataFlavor
 import java.util.*
@@ -164,7 +165,7 @@ class PutGroup {
     additionalData: Map<String, Any>,
   ) {
     val subMode = data.visualSelection?.typeInEditor?.toSubMode() ?: CommandState.SubMode.NONE
-    if (ClipboardOptionsData.ideaput in (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "clipboard") as VimString).value) {
+    if (ClipboardOptionsData.ideaput in (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, OptionConstants.clipboardName) as VimString).value) {
       val idePasteProvider = getProviderForPasteViaIde(context, text.typeInRegister, data)
       if (idePasteProvider != null) {
         logger.debug("Perform put via idea paste")
@@ -611,7 +612,7 @@ class PutGroup {
 
   private fun notifyAboutIdeaPut(project: Project?) {
     if (VimPlugin.getVimState().isIdeaPutNotified ||
-      ClipboardOptionsData.ideaput in (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "clipboard") as VimString).value ||
+      ClipboardOptionsData.ideaput in (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, OptionConstants.clipboardName) as VimString).value ||
       ClipboardOptionHelper.ideaputDisabled
     ) return
 

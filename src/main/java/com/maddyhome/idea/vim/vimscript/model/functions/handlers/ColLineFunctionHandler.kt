@@ -33,6 +33,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.datatypes.asVimInt
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
+import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 
 // TODO: 03.08.2021 Support second parameter
@@ -76,7 +77,7 @@ private fun currentCol(editor: Editor): VimInt {
 
   // If virtualedit is set, the col is one more
   // XXX Should we also check the current mode?
-  if ((VimPlugin.getOptionService().getOptionValue(OptionService.Scope.LOCAL(editor), "virtualedit") as VimString).value.isNotEmpty()) {
+  if ((VimPlugin.getOptionService().getOptionValue(OptionService.Scope.LOCAL(editor), OptionConstants.virtualeditName) as VimString).value.isNotEmpty()) {
     lineLength += 1
   }
 

@@ -29,6 +29,7 @@ import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.fileSize
 import com.maddyhome.idea.vim.helper.inlayAwareVisualColumn
 import com.maddyhome.idea.vim.helper.vimLastColumn
+import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService.Scope.LOCAL
 import kotlin.math.max
 import kotlin.math.min
@@ -372,7 +373,7 @@ class IjVimCaret(val caret: Caret) : VimCaret {
 fun VimCaret.offsetForLineWithStartOfLineOption(logicalLine: EditorLine.Pointer): Int {
   val ijEditor = (this.editor as IjVimEditor).editor
   val caret = (this as IjVimCaret).caret
-  return if (VimPlugin.getOptionService().isSet(LOCAL(ijEditor), "startofline")) {
+  return if (VimPlugin.getOptionService().isSet(LOCAL(ijEditor), OptionConstants.startoflineName)) {
     offsetForLineStartSkipLeading(logicalLine.line)
   } else {
     VimPlugin.getMotion().moveCaretToLineWithSameColumn(ijEditor, logicalLine.line, caret)

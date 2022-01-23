@@ -44,6 +44,7 @@ import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
 import com.maddyhome.idea.vim.vimscript.Executor;
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
+import com.maddyhome.idea.vim.vimscript.services.OptionConstants;
 import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -183,10 +184,10 @@ public class ProcessGroup {
     // Finally, we're also not bothering with the crazy space and backslash handling of the 'shell' options content.
     return ProgressManager.getInstance().runProcessWithProgressSynchronously(() -> {
 
-      final String shell = ((VimString) VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL.INSTANCE, "shell", "shell")).getValue();
-      final String shellcmdflag = ((VimString) VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL.INSTANCE, "shellcmdflag", "shellcmdflag")).getValue();
-      final String shellxescape = ((VimString) VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL.INSTANCE, "shellxescape", "shellxescape")).getValue();
-      final String shellxquote = ((VimString) VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL.INSTANCE, "shellxquote", "shellxquote")).getValue();
+      final String shell = ((VimString) VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL.INSTANCE, OptionConstants.shellName, OptionConstants.shellName)).getValue();
+      final String shellcmdflag = ((VimString) VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL.INSTANCE, OptionConstants.shellcmdflagName, OptionConstants.shellcmdflagName)).getValue();
+      final String shellxescape = ((VimString) VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL.INSTANCE, OptionConstants.shellxescapeName, OptionConstants.shellxescapeName)).getValue();
+      final String shellxquote = ((VimString) VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL.INSTANCE, OptionConstants.shellxquoteName, OptionConstants.shellxquoteName)).getValue();
 
       // For Win32. See :help 'shellxescape'
       final String escapedCommand = shellxquote.equals("(")

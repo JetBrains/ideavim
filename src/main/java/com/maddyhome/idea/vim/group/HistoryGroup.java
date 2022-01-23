@@ -26,6 +26,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.helper.StringHelper;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt;
+import com.maddyhome.idea.vim.vimscript.services.OptionConstants;
 import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import org.jdom.Element;
 import org.jetbrains.annotations.NonNls;
@@ -172,7 +173,7 @@ public class HistoryGroup implements PersistentStateComponent<Element> {
 
   private static int maxLength() {
     return ((VimInt) VimPlugin.getOptionService()
-      .getOptionValue(OptionService.Scope.GLOBAL.INSTANCE, "history",  "history")).getValue();
+      .getOptionValue(OptionService.Scope.GLOBAL.INSTANCE, OptionConstants.historyName,  OptionConstants.historyName)).getValue();
   }
 
   @Nullable

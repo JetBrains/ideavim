@@ -21,6 +21,7 @@ package org.jetbrains.plugins.ideavim.action.change.delete
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
+import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import org.jetbrains.plugins.ideavim.VimTestCase
 
@@ -118,7 +119,7 @@ class DeleteCharacterLeftActionTest : VimTestCase() {
   }
 
   fun `test deleting characters scrolls caret into view`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "sidescrolloff", VimInt(5))
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, OptionConstants.sidescrolloffName, VimInt(5))
     configureByText("Hello world".repeat(200))
 
     // Scroll 70 characters to the left. First character on line should now be 71. sidescrolloff puts us at 76
