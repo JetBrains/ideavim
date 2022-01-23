@@ -20,8 +20,6 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
-import com.maddyhome.idea.vim.option.IgnoreCaseOptionsData
-import com.maddyhome.idea.vim.option.SmartCaseOptionsData
 import com.maddyhome.idea.vim.vimscript.Executor
 import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
@@ -37,7 +35,7 @@ import org.jetbrains.plugins.ideavim.VimTestOption
 /**
  * @author Alex Plate
  */
-class SubstituteCommandTest : VimOptionTestCase(SmartCaseOptionsData.name, IgnoreCaseOptionsData.name) {
+class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcaseName, OptionConstants.ignorecaseName) {
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test one letter`() {
@@ -201,8 +199,8 @@ class SubstituteCommandTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
     )
   }
 
-  @VimOptionTestConfiguration(VimTestOption(IgnoreCaseOptionsData.name, OptionValueType.NUMBER, "1"))
-  @VimOptionDefault(SmartCaseOptionsData.name)
+  @VimOptionTestConfiguration(VimTestOption(OptionConstants.ignorecaseName, OptionValueType.NUMBER, "1"))
+  @VimOptionDefault(OptionConstants.smartcaseName)
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test ignorecase option`() {
     doTest(

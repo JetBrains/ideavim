@@ -38,10 +38,10 @@ object LenFunctionHandler : FunctionHandler() {
   override val maximumNumberOfArguments = 1
 
   override fun doFunction(
-      argumentValues: List<Expression>,
-      editor: Editor,
-      context: DataContext,
-      vimContext: VimLContext,
+    argumentValues: List<Expression>,
+    editor: Editor,
+    context: DataContext,
+    vimContext: VimLContext,
   ): VimDataType {
     val argument = argumentValues[0].evaluate(editor, context, vimContext)
     return when (argument) {

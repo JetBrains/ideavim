@@ -22,7 +22,6 @@ package org.jetbrains.plugins.ideavim.action.motion.leftright
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.option.KeyModelOptionData
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
@@ -34,7 +33,7 @@ import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
 import org.jetbrains.plugins.ideavim.VimTestOption
 
-class MotionHomeActionTest : VimOptionTestCase(KeyModelOptionData.name) {
+class MotionHomeActionTest : VimOptionTestCase(OptionConstants.keymodelName) {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionDefaultAll
   fun `test motion home`() {
@@ -61,11 +60,11 @@ class MotionHomeActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   @VimOptionDefaultAll
   fun `test default stop select`() {
     val keymodel = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, OptionConstants.keymodelName) as VimString).value
-    assertTrue(KeyModelOptionData.stopselect in keymodel)
+    assertTrue(OptionConstants.keymodel_stopselect in keymodel)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, OptionValueType.STRING, ""))
+  @VimOptionTestConfiguration(VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, ""))
   fun `test continue visual`() {
     val keys = listOf("v", "<Home>")
     val before = """
@@ -88,7 +87,7 @@ class MotionHomeActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, OptionValueType.STRING, ""))
+  @VimOptionTestConfiguration(VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, ""))
   fun `test continue select`() {
     val keys = listOf("gh", "<Home>")
     val before = """
@@ -113,9 +112,9 @@ class MotionHomeActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(
-      KeyModelOptionData.name,
+      OptionConstants.keymodelName,
       OptionValueType.STRING,
-      KeyModelOptionData.stopvisual
+      OptionConstants.keymodel_stopvisual
     )
   )
   fun `test exit visual`() {
@@ -142,9 +141,9 @@ class MotionHomeActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(
-      KeyModelOptionData.name,
+      OptionConstants.keymodelName,
       OptionValueType.STRING,
-      KeyModelOptionData.stopselect
+      OptionConstants.keymodel_stopselect
     )
   )
   fun `test exit select`() {

@@ -42,7 +42,6 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
-import com.maddyhome.idea.vim.option.ClipboardOptionsData
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable
 import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
@@ -76,7 +75,7 @@ class NotificationService(private val project: Project?) {
         notification,
         "set clipboard+=ideaput",
         "ideaput"
-      ) { VimPlugin.getOptionService().appendValue(OptionService.Scope.GLOBAL, OptionConstants.clipboardName, ClipboardOptionsData.ideaput, OptionConstants.clipboardName) }
+      ) { VimPlugin.getOptionService().appendValue(OptionService.Scope.GLOBAL, OptionConstants.clipboardName, OptionConstants.clipboard_ideaput, OptionConstants.clipboardName) }
     )
 
     notification.notify(project)

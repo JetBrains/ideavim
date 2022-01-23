@@ -38,7 +38,6 @@ import com.maddyhome.idea.vim.helper.inNormalMode
 import com.maddyhome.idea.vim.helper.inSelectMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.listener.VimListenerManager
-import com.maddyhome.idea.vim.option.IdeaRefactorMode
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
@@ -55,7 +54,7 @@ import org.jetbrains.plugins.ideavim.waitAndAssertMode
 /**
  * @author Alex Plate
  */
-class TemplateTest : VimOptionTestCase(IdeaRefactorMode.name) {
+class TemplateTest : VimOptionTestCase(OptionConstants.idearefactormodeName) {
 
   override fun setUp() {
     super.setUp()
@@ -119,7 +118,7 @@ class TemplateTest : VimOptionTestCase(IdeaRefactorMode.name) {
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test selectmode without template`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, OptionConstants.idearefactormodeName, VimString(IdeaRefactorMode.visual))
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, OptionConstants.idearefactormodeName, VimString(OptionConstants.idearefactormode_visual))
     configureByJavaText(
       """
             class Hello {
@@ -319,7 +318,7 @@ class TemplateTest : VimOptionTestCase(IdeaRefactorMode.name) {
     )
   }
 
-  @VimOptionTestConfiguration(VimTestOption(IdeaRefactorMode.name, OptionValueType.STRING, IdeaRefactorMode.keep))
+  @VimOptionTestConfiguration(VimTestOption(OptionConstants.idearefactormodeName, OptionValueType.STRING, OptionConstants.idearefactormode_keep))
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test template in normal mode`() {
     configureByJavaText(
@@ -335,7 +334,7 @@ class TemplateTest : VimOptionTestCase(IdeaRefactorMode.name) {
     assertDoesntChange { myFixture.editor.inNormalMode }
   }
 
-  @VimOptionTestConfiguration(VimTestOption(IdeaRefactorMode.name, OptionValueType.STRING, IdeaRefactorMode.keep))
+  @VimOptionTestConfiguration(VimTestOption(OptionConstants.idearefactormodeName, OptionValueType.STRING, OptionConstants.idearefactormode_keep))
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test save mode for insert mode`() {
     configureByJavaText(
@@ -352,7 +351,7 @@ class TemplateTest : VimOptionTestCase(IdeaRefactorMode.name) {
     assertDoesntChange { myFixture.editor.inInsertMode }
   }
 
-  @VimOptionTestConfiguration(VimTestOption(IdeaRefactorMode.name, OptionValueType.STRING, IdeaRefactorMode.keep))
+  @VimOptionTestConfiguration(VimTestOption(OptionConstants.idearefactormodeName, OptionValueType.STRING, OptionConstants.idearefactormode_keep))
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test save mode for visual mode`() {
     configureByJavaText(
@@ -369,7 +368,7 @@ class TemplateTest : VimOptionTestCase(IdeaRefactorMode.name) {
     assertDoesntChange { myFixture.editor.inVisualMode }
   }
 
-  @VimOptionTestConfiguration(VimTestOption(IdeaRefactorMode.name, OptionValueType.STRING, IdeaRefactorMode.select))
+  @VimOptionTestConfiguration(VimTestOption(OptionConstants.idearefactormodeName, OptionValueType.STRING, OptionConstants.idearefactormode_select))
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test template to select in normal mode`() {
     configureByJavaText(
@@ -385,7 +384,7 @@ class TemplateTest : VimOptionTestCase(IdeaRefactorMode.name) {
     waitAndAssertMode(myFixture, CommandState.Mode.SELECT)
   }
 
-  @VimOptionTestConfiguration(VimTestOption(IdeaRefactorMode.name, OptionValueType.STRING, IdeaRefactorMode.select))
+  @VimOptionTestConfiguration(VimTestOption(OptionConstants.idearefactormodeName, OptionValueType.STRING, OptionConstants.idearefactormode_select))
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test template to select in insert mode`() {
     configureByJavaText(
@@ -402,7 +401,7 @@ class TemplateTest : VimOptionTestCase(IdeaRefactorMode.name) {
     waitAndAssertMode(myFixture, CommandState.Mode.SELECT)
   }
 
-  @VimOptionTestConfiguration(VimTestOption(IdeaRefactorMode.name, OptionValueType.STRING, IdeaRefactorMode.select))
+  @VimOptionTestConfiguration(VimTestOption(OptionConstants.idearefactormodeName, OptionValueType.STRING, OptionConstants.idearefactormode_select))
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test template to select in visual mode`() {
     configureByJavaText(
@@ -419,7 +418,7 @@ class TemplateTest : VimOptionTestCase(IdeaRefactorMode.name) {
     assertDoesntChange { myFixture.editor.inVisualMode }
   }
 
-  @VimOptionTestConfiguration(VimTestOption(IdeaRefactorMode.name, OptionValueType.STRING, IdeaRefactorMode.select))
+  @VimOptionTestConfiguration(VimTestOption(OptionConstants.idearefactormodeName, OptionValueType.STRING, OptionConstants.idearefactormode_select))
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test template to select in select mode`() {
     configureByJavaText(
@@ -436,7 +435,7 @@ class TemplateTest : VimOptionTestCase(IdeaRefactorMode.name) {
     assertDoesntChange { myFixture.editor.inSelectMode }
   }
 
-  @VimOptionTestConfiguration(VimTestOption(IdeaRefactorMode.name, OptionValueType.STRING, IdeaRefactorMode.visual))
+  @VimOptionTestConfiguration(VimTestOption(OptionConstants.idearefactormodeName, OptionValueType.STRING, OptionConstants.idearefactormode_visual))
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test template to visual in normal mode`() {
     configureByJavaText(
@@ -452,7 +451,7 @@ class TemplateTest : VimOptionTestCase(IdeaRefactorMode.name) {
     waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
   }
 
-  @VimOptionTestConfiguration(VimTestOption(IdeaRefactorMode.name, OptionValueType.STRING, IdeaRefactorMode.visual))
+  @VimOptionTestConfiguration(VimTestOption(OptionConstants.idearefactormodeName, OptionValueType.STRING, OptionConstants.idearefactormode_visual))
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test template to visual in insert mode`() {
     configureByJavaText(
@@ -469,7 +468,7 @@ class TemplateTest : VimOptionTestCase(IdeaRefactorMode.name) {
     waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
   }
 
-  @VimOptionTestConfiguration(VimTestOption(IdeaRefactorMode.name, OptionValueType.STRING, IdeaRefactorMode.visual))
+  @VimOptionTestConfiguration(VimTestOption(OptionConstants.idearefactormodeName, OptionValueType.STRING, OptionConstants.idearefactormode_visual))
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test template to visual in visual mode`() {
     configureByJavaText(
@@ -486,7 +485,7 @@ class TemplateTest : VimOptionTestCase(IdeaRefactorMode.name) {
     assertDoesntChange { myFixture.editor.inVisualMode }
   }
 
-  @VimOptionTestConfiguration(VimTestOption(IdeaRefactorMode.name, OptionValueType.STRING, IdeaRefactorMode.visual))
+  @VimOptionTestConfiguration(VimTestOption(OptionConstants.idearefactormodeName, OptionValueType.STRING, OptionConstants.idearefactormode_visual))
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test template to visual in select mode`() {
     configureByJavaText(
@@ -503,7 +502,7 @@ class TemplateTest : VimOptionTestCase(IdeaRefactorMode.name) {
     assertDoesntChange { myFixture.editor.inSelectMode }
   }
 
-  @VimOptionTestConfiguration(VimTestOption(IdeaRefactorMode.name, OptionValueType.STRING, IdeaRefactorMode.keep))
+  @VimOptionTestConfiguration(VimTestOption(OptionConstants.idearefactormodeName, OptionValueType.STRING, OptionConstants.idearefactormode_keep))
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test template with multiple times`() {
     configureByJavaText(c)
@@ -524,7 +523,7 @@ class TemplateTest : VimOptionTestCase(IdeaRefactorMode.name) {
     assertNull(TemplateManagerImpl.getTemplateState(myFixture.editor))
   }
 
-  @VimOptionTestConfiguration(VimTestOption(IdeaRefactorMode.name, OptionValueType.STRING, IdeaRefactorMode.keep))
+  @VimOptionTestConfiguration(VimTestOption(OptionConstants.idearefactormodeName, OptionValueType.STRING, OptionConstants.idearefactormode_keep))
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test template with lookup`() {
     configureByJavaText(

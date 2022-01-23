@@ -44,10 +44,10 @@ object LineFunctionHandler : FunctionHandler() {
   override val maximumNumberOfArguments = 2
 
   override fun doFunction(
-      argumentValues: List<Expression>,
-      editor: Editor,
-      context: DataContext,
-      vimContext: VimLContext,
+    argumentValues: List<Expression>,
+    editor: Editor,
+    context: DataContext,
+    vimContext: VimLContext,
   ): VimInt {
     val argument = argumentValues[0].evaluate(editor, context, vimContext)
     return variableToPosition(editor, argument, true)?.first ?: VimInt.ZERO
@@ -61,10 +61,10 @@ object ColFunctionHandler : FunctionHandler() {
   override val maximumNumberOfArguments = 1
 
   override fun doFunction(
-      argumentValues: List<Expression>,
-      editor: Editor,
-      context: DataContext,
-      vimContext: VimLContext,
+    argumentValues: List<Expression>,
+    editor: Editor,
+    context: DataContext,
+    vimContext: VimLContext,
   ): VimDataType {
     val argument = argumentValues[0].evaluate(editor, context, vimContext)
     return variableToPosition(editor, argument, false)?.second ?: VimInt.ZERO

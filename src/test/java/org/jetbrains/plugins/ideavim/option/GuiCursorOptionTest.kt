@@ -20,7 +20,6 @@ package org.jetbrains.plugins.ideavim.option
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.enumSetOf
-import com.maddyhome.idea.vim.option.GuiCursorOptionData
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.GuiCursorMode
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.GuiCursorOptionHelper
@@ -88,35 +87,35 @@ class GuiCursorOptionTest : VimTestCase() {
     VimPlugin.getOptionService().resetDefault(OptionService.Scope.GLOBAL, OptionConstants.guicursorName)
     // E545: Missing colon: {value}
     assertExException("E545: Missing colon: whatever") { setValue("whatever") }
-    assertEquals(GuiCursorOptionData.defaultValue, getOptionValue())
+    assertTrue(VimPlugin.getOptionService().isDefault(OptionService.Scope.GLOBAL, OptionConstants.guicursorName))
   }
 
   fun `test ignores set with invalid mode`() {
     VimPlugin.getOptionService().resetDefault(OptionService.Scope.GLOBAL, OptionConstants.guicursorName)
     // E546: Illegal mode: {value}
     assertExException("E546: Illegal mode: foo:block-Cursor") { setValue("foo:block-Cursor") }
-    assertEquals(GuiCursorOptionData.defaultValue, getOptionValue())
+    assertTrue(VimPlugin.getOptionService().isDefault(OptionService.Scope.GLOBAL, OptionConstants.guicursorName))
   }
 
   fun `test ignores set with invalid mode 2`() {
     VimPlugin.getOptionService().resetDefault(OptionService.Scope.GLOBAL, OptionConstants.guicursorName)
     // E546: Illegal mode: {value}
     assertExException("E546: Illegal mode: n-foo:block-Cursor") { setValue("n-foo:block-Cursor") }
-    assertEquals(GuiCursorOptionData.defaultValue, getOptionValue())
+    assertTrue(VimPlugin.getOptionService().isDefault(OptionService.Scope.GLOBAL, OptionConstants.guicursorName))
   }
 
   fun `test ignores set with zero thickness`() {
     VimPlugin.getOptionService().resetDefault(OptionService.Scope.GLOBAL, OptionConstants.guicursorName)
     // E549: Illegal percentage
     assertExException("E549: Illegal percentage: n:ver0-Cursor") { setValue("n:ver0-Cursor") }
-    assertEquals(GuiCursorOptionData.defaultValue, getOptionValue())
+    assertTrue(VimPlugin.getOptionService().isDefault(OptionService.Scope.GLOBAL, OptionConstants.guicursorName))
   }
 
   fun `test ignores set with invalid vertical cursor details`() {
     VimPlugin.getOptionService().resetDefault(OptionService.Scope.GLOBAL, OptionConstants.guicursorName)
     // E548: Digit expected: {value}
     assertExException("E548: Digit expected: n:ver-Cursor") { setValue("n:ver-Cursor") }
-    assertEquals(GuiCursorOptionData.defaultValue, getOptionValue())
+    assertTrue(VimPlugin.getOptionService().isDefault(OptionService.Scope.GLOBAL, OptionConstants.guicursorName))
   }
 
   fun `test simple string means block caret and highlight group`() {

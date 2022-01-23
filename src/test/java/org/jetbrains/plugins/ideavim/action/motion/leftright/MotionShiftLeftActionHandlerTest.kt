@@ -21,8 +21,7 @@
 package org.jetbrains.plugins.ideavim.action.motion.leftright
 
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.option.KeyModelOptionData
-import com.maddyhome.idea.vim.option.SelectModeOptionData
+import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import org.jetbrains.plugins.ideavim.OptionValueType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -30,11 +29,11 @@ import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
 import org.jetbrains.plugins.ideavim.VimTestOption
 
-class MotionShiftLeftActionHandlerTest : VimOptionTestCase(KeyModelOptionData.name, SelectModeOptionData.name) {
+class MotionShiftLeftActionHandlerTest : VimOptionTestCase(OptionConstants.keymodelName, OptionConstants.selectmodeName) {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
-    VimTestOption(KeyModelOptionData.name, OptionValueType.STRING, KeyModelOptionData.startsel),
-    VimTestOption(SelectModeOptionData.name, OptionValueType.STRING, "")
+    VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, OptionConstants.keymodel_startsel),
+    VimTestOption(OptionConstants.selectmodeName, OptionValueType.STRING, "")
   )
   fun `test visual left`() {
     doTest(
@@ -61,8 +60,8 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
-    VimTestOption(KeyModelOptionData.name, OptionValueType.STRING, KeyModelOptionData.startsel),
-    VimTestOption(SelectModeOptionData.name, OptionValueType.STRING, "")
+    VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, OptionConstants.keymodel_startsel),
+    VimTestOption(OptionConstants.selectmodeName, OptionValueType.STRING, "")
   )
   fun `test visual left twice`() {
     doTest(
@@ -89,8 +88,8 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
-    VimTestOption(KeyModelOptionData.name, OptionValueType.STRING, KeyModelOptionData.startsel),
-    VimTestOption(SelectModeOptionData.name, OptionValueType.STRING, SelectModeOptionData.key)
+    VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, OptionConstants.keymodel_startsel),
+    VimTestOption(OptionConstants.selectmodeName, OptionValueType.STRING, OptionConstants.selectmode_key)
   )
   fun `test select left`() {
     doTest(
@@ -117,8 +116,8 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
-    VimTestOption(KeyModelOptionData.name, OptionValueType.STRING, KeyModelOptionData.startsel),
-    VimTestOption(SelectModeOptionData.name, OptionValueType.STRING, SelectModeOptionData.key)
+    VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, OptionConstants.keymodel_startsel),
+    VimTestOption(OptionConstants.selectmodeName, OptionValueType.STRING, OptionConstants.selectmode_key)
   )
   fun `test select left twice`() {
     doTest(
@@ -145,8 +144,8 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
-    VimTestOption(KeyModelOptionData.name, OptionValueType.STRING, KeyModelOptionData.continueselect),
-    VimTestOption(SelectModeOptionData.name, OptionValueType.STRING, "")
+    VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
+    VimTestOption(OptionConstants.selectmodeName, OptionValueType.STRING, "")
   )
   fun `test simple motion char mode`() {
     doTest(
@@ -174,8 +173,8 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
-    VimTestOption(KeyModelOptionData.name, OptionValueType.STRING, KeyModelOptionData.continueselect),
-    VimTestOption(SelectModeOptionData.name, OptionValueType.STRING, "")
+    VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
+    VimTestOption(OptionConstants.selectmodeName, OptionValueType.STRING, "")
   )
   fun `test double motion char mode`() {
     doTest(
@@ -203,8 +202,8 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
-    VimTestOption(KeyModelOptionData.name, OptionValueType.STRING, KeyModelOptionData.continueselect),
-    VimTestOption(SelectModeOptionData.name, OptionValueType.STRING, "")
+    VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
+    VimTestOption(OptionConstants.selectmodeName, OptionValueType.STRING, "")
   )
   fun `test at line start char mode`() {
     doTest(
@@ -232,8 +231,8 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
-    VimTestOption(KeyModelOptionData.name, OptionValueType.STRING, KeyModelOptionData.continueselect),
-    VimTestOption(SelectModeOptionData.name, OptionValueType.STRING, "")
+    VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
+    VimTestOption(OptionConstants.selectmodeName, OptionValueType.STRING, "")
   )
   fun `test at file start char mode`() {
     doTest(
@@ -261,8 +260,8 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
-    VimTestOption(KeyModelOptionData.name, OptionValueType.STRING, KeyModelOptionData.continueselect),
-    VimTestOption(SelectModeOptionData.name, OptionValueType.STRING, "")
+    VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
+    VimTestOption(OptionConstants.selectmodeName, OptionValueType.STRING, "")
   )
   fun `test char mode multicaret`() {
     doTest(
@@ -290,8 +289,8 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
-    VimTestOption(KeyModelOptionData.name, OptionValueType.STRING, KeyModelOptionData.continueselect),
-    VimTestOption(SelectModeOptionData.name, OptionValueType.STRING, "")
+    VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
+    VimTestOption(OptionConstants.selectmodeName, OptionValueType.STRING, "")
   )
   fun `test simple motion line mode`() {
     doTest(
@@ -319,8 +318,8 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
-    VimTestOption(KeyModelOptionData.name, OptionValueType.STRING, KeyModelOptionData.continueselect),
-    VimTestOption(SelectModeOptionData.name, OptionValueType.STRING, "")
+    VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
+    VimTestOption(OptionConstants.selectmodeName, OptionValueType.STRING, "")
   )
   fun `test to line start line mode`() {
     doTest(
@@ -348,8 +347,8 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
-    VimTestOption(KeyModelOptionData.name, OptionValueType.STRING, KeyModelOptionData.continueselect),
-    VimTestOption(SelectModeOptionData.name, OptionValueType.STRING, "")
+    VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
+    VimTestOption(OptionConstants.selectmodeName, OptionValueType.STRING, "")
   )
   fun `test to file start line mode`() {
     doTest(
@@ -377,8 +376,8 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
-    VimTestOption(KeyModelOptionData.name, OptionValueType.STRING, KeyModelOptionData.continueselect),
-    VimTestOption(SelectModeOptionData.name, OptionValueType.STRING, "")
+    VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
+    VimTestOption(OptionConstants.selectmodeName, OptionValueType.STRING, "")
   )
   fun `test line mode multicaret`() {
     doTest(
@@ -406,8 +405,8 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
-    VimTestOption(KeyModelOptionData.name, OptionValueType.STRING, KeyModelOptionData.continueselect),
-    VimTestOption(SelectModeOptionData.name, OptionValueType.STRING, "")
+    VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
+    VimTestOption(OptionConstants.selectmodeName, OptionValueType.STRING, "")
   )
   fun `test simple motion block mode`() {
     doTest(
@@ -435,8 +434,8 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
-    VimTestOption(KeyModelOptionData.name, OptionValueType.STRING, KeyModelOptionData.continueselect),
-    VimTestOption(SelectModeOptionData.name, OptionValueType.STRING, "")
+    VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
+    VimTestOption(OptionConstants.selectmodeName, OptionValueType.STRING, "")
   )
   fun `test twice motion block mode`() {
     doTest(
@@ -464,8 +463,8 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
-    VimTestOption(KeyModelOptionData.name, OptionValueType.STRING, KeyModelOptionData.continueselect),
-    VimTestOption(SelectModeOptionData.name, OptionValueType.STRING, "")
+    VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
+    VimTestOption(OptionConstants.selectmodeName, OptionValueType.STRING, "")
   )
   fun `test at line start block mode`() {
     doTest(
@@ -493,8 +492,8 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
-    VimTestOption(KeyModelOptionData.name, OptionValueType.STRING, KeyModelOptionData.continueselect),
-    VimTestOption(SelectModeOptionData.name, OptionValueType.STRING, "")
+    VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
+    VimTestOption(OptionConstants.selectmodeName, OptionValueType.STRING, "")
   )
   fun `test at file start block mode`() {
     doTest(
@@ -522,8 +521,8 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
-    VimTestOption(KeyModelOptionData.name, OptionValueType.STRING, KeyModelOptionData.continueselect),
-    VimTestOption(SelectModeOptionData.name, OptionValueType.STRING, "")
+    VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
+    VimTestOption(OptionConstants.selectmodeName, OptionValueType.STRING, "")
   )
   fun `test multiline with empty line block mode`() {
     doTest(
@@ -552,8 +551,8 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
-    VimTestOption(KeyModelOptionData.name, OptionValueType.STRING, KeyModelOptionData.continueselect),
-    VimTestOption(SelectModeOptionData.name, OptionValueType.STRING, "")
+    VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
+    VimTestOption(OptionConstants.selectmodeName, OptionValueType.STRING, "")
   )
   fun `test multiline block mode`() {
     doTest(
@@ -582,8 +581,8 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
-    VimTestOption(KeyModelOptionData.name, OptionValueType.STRING, KeyModelOptionData.continuevisual),
-    VimTestOption(SelectModeOptionData.name, OptionValueType.STRING, "")
+    VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, OptionConstants.keymodel_continuevisual),
+    VimTestOption(OptionConstants.selectmodeName, OptionValueType.STRING, "")
   )
   fun `test continuevisual`() {
     doTest(
@@ -611,8 +610,8 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
-    VimTestOption(KeyModelOptionData.name, OptionValueType.STRING, ""),
-    VimTestOption(SelectModeOptionData.name, OptionValueType.STRING, "")
+    VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, ""),
+    VimTestOption(OptionConstants.selectmodeName, OptionValueType.STRING, "")
   )
   fun `test no continueselect`() {
     doTest(
@@ -640,8 +639,8 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
-    VimTestOption(KeyModelOptionData.name, OptionValueType.STRING, ""),
-    VimTestOption(SelectModeOptionData.name, OptionValueType.STRING, "")
+    VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, ""),
+    VimTestOption(OptionConstants.selectmodeName, OptionValueType.STRING, "")
   )
   fun `test no continuevisual`() {
     doTest(

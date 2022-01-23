@@ -178,7 +178,7 @@ public class FileGroup {
    */
   public void saveFile(DataContext context) {
     String action;
-    if (IdeaWriteData.all.equals(((VimString) VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL.INSTANCE, OptionConstants.ideawriteName, OptionConstants.ideawriteName)).getValue())) {
+    if (OptionConstants.ideawrite_all.equals(((VimString) VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL.INSTANCE, OptionConstants.ideawriteName, OptionConstants.ideawriteName)).getValue())) {
       action = "SaveAll";
     }
     else {

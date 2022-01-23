@@ -19,7 +19,6 @@
 package com.maddyhome.idea.vim.vimscript.model.options.helpers
 
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.option.ClipboardOptionsData
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
@@ -33,13 +32,13 @@ object ClipboardOptionHelper {
 
     init {
       val optionValue = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, OptionConstants.clipboardName) as VimString).value
-      containedBefore = optionValue.contains(ClipboardOptionsData.ideaput)
-      VimPlugin.getOptionService().removeValue(OptionService.Scope.GLOBAL, OptionConstants.clipboardName, ClipboardOptionsData.ideaput, OptionConstants.clipboardName)
+      containedBefore = optionValue.contains(OptionConstants.clipboard_ideaput)
+      VimPlugin.getOptionService().removeValue(OptionService.Scope.GLOBAL, OptionConstants.clipboardName, OptionConstants.clipboard_ideaput, OptionConstants.clipboardName)
       ideaputDisabled = true
     }
 
     override fun close() {
-      if (containedBefore) VimPlugin.getOptionService().appendValue(OptionService.Scope.GLOBAL, OptionConstants.clipboardName, ClipboardOptionsData.ideaput, OptionConstants.clipboardName)
+      if (containedBefore) VimPlugin.getOptionService().appendValue(OptionService.Scope.GLOBAL, OptionConstants.clipboardName, OptionConstants.clipboard_ideaput, OptionConstants.clipboardName)
       ideaputDisabled = false
     }
   }

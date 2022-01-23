@@ -38,7 +38,6 @@ import com.maddyhome.idea.vim.helper.isTemplateActive
 import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.popAllModes
 import com.maddyhome.idea.vim.listener.VimListenerManager
-import com.maddyhome.idea.vim.option.SelectModeOptionData
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.IdeaRefactorModeHelper
 import com.maddyhome.idea.vim.vimscript.services.OptionConstants
@@ -155,7 +154,7 @@ object IdeaSelectionControl {
         if (logReason) logger.debug("Enter select mode. Reason: one line mode")
         CommandState.Mode.SELECT
       }
-      selectionSource == VimListenerManager.SelectionSource.MOUSE && SelectModeOptionData.mouse in selectmode -> {
+      selectionSource == VimListenerManager.SelectionSource.MOUSE && OptionConstants.selectmode_mouse in selectmode -> {
         if (logReason) logger.debug("Enter select mode. Selection source is mouse and selectMode option has mouse")
         CommandState.Mode.SELECT
       }
@@ -164,7 +163,7 @@ object IdeaSelectionControl {
         CommandState.Mode.SELECT
       }
       selectionSource == VimListenerManager.SelectionSource.OTHER &&
-        SelectModeOptionData.ideaselection in (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, OptionConstants.selectmodeName) as VimString).value -> {
+        OptionConstants.selectmode_ideaselection in (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, OptionConstants.selectmodeName) as VimString).value -> {
         if (logReason) logger.debug("Enter select mode. Selection source is OTHER and selectMode has refactoring")
         CommandState.Mode.SELECT
       }

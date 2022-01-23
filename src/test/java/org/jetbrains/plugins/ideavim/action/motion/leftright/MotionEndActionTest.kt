@@ -21,7 +21,7 @@
 package org.jetbrains.plugins.ideavim.action.motion.leftright
 
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.option.KeyModelOptionData
+import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import org.jetbrains.plugins.ideavim.OptionValueType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -30,7 +30,7 @@ import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
 import org.jetbrains.plugins.ideavim.VimTestOption
 
-class MotionEndActionTest : VimOptionTestCase(KeyModelOptionData.name) {
+class MotionEndActionTest : VimOptionTestCase(OptionConstants.keymodelName) {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionDefaultAll
   fun `test motion end`() {
@@ -55,7 +55,7 @@ class MotionEndActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, OptionValueType.STRING, ""))
+  @VimOptionTestConfiguration(VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, ""))
   fun `test continue visual`() {
     val keys = listOf("v", "<End>")
     val before = """
@@ -78,7 +78,7 @@ class MotionEndActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, OptionValueType.STRING, ""))
+  @VimOptionTestConfiguration(VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, ""))
   fun `test continue select`() {
     val keys = listOf("gh", "<End>")
     val before = """
@@ -103,9 +103,9 @@ class MotionEndActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(
-      KeyModelOptionData.name,
+      OptionConstants.keymodelName,
       OptionValueType.STRING,
-      KeyModelOptionData.stopvisual
+      OptionConstants.keymodel_stopvisual
     )
   )
   fun `test exit visual`() {
@@ -132,9 +132,9 @@ class MotionEndActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(
-      KeyModelOptionData.name,
+      OptionConstants.keymodelName,
       OptionValueType.STRING,
-      KeyModelOptionData.stopselect
+      OptionConstants.keymodel_stopselect
     )
   )
   fun `test exit select`() {

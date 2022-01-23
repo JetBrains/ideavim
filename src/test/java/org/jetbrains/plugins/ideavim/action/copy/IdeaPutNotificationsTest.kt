@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.group.NotificationService
 import com.maddyhome.idea.vim.helper.StringHelper
-import com.maddyhome.idea.vim.option.ClipboardOptionsData
+import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import org.jetbrains.plugins.ideavim.OptionValueType
 import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
@@ -33,8 +33,8 @@ import org.jetbrains.plugins.ideavim.rangeOf
 /**
  * @author Alex Plate
  */
-class IdeaPutNotificationsTest : VimOptionTestCase(ClipboardOptionsData.name) {
-  @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, OptionValueType.STRING, ""))
+class IdeaPutNotificationsTest : VimOptionTestCase(OptionConstants.clipboardName) {
+  @VimOptionTestConfiguration(VimTestOption(OptionConstants.clipboardName, OptionValueType.STRING, ""))
   fun `test notification exists if no ideaput`() {
     val before = "${c}I found it in a legendary land"
     configureByText(before)
@@ -44,15 +44,15 @@ class IdeaPutNotificationsTest : VimOptionTestCase(ClipboardOptionsData.name) {
 
     val notification = EventLog.getLogModel(myFixture.project).notifications.last()
     assertEquals(NotificationService.IDEAVIM_NOTIFICATION_TITLE, notification.title)
-    assertTrue(ClipboardOptionsData.ideaput in notification.content)
+    assertTrue(OptionConstants.clipboard_ideaput in notification.content)
     assertEquals(2, notification.actions.size)
   }
 
   @VimOptionTestConfiguration(
     VimTestOption(
-      ClipboardOptionsData.name,
+      OptionConstants.clipboardName,
       OptionValueType.STRING,
-      ClipboardOptionsData.ideaput
+      OptionConstants.clipboard_ideaput
     )
   )
   fun `test no notification on ideaput`() {
@@ -63,10 +63,10 @@ class IdeaPutNotificationsTest : VimOptionTestCase(ClipboardOptionsData.name) {
     typeText(StringHelper.parseKeys("p"))
 
     val notifications = EventLog.getLogModel(myFixture.project).notifications
-    assertTrue(notifications.isEmpty() || notifications.last().isExpired || ClipboardOptionsData.ideaput !in notifications.last().content)
+    assertTrue(notifications.isEmpty() || notifications.last().isExpired || OptionConstants.clipboard_ideaput !in notifications.last().content)
   }
 
-  @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, OptionValueType.STRING, ""))
+  @VimOptionTestConfiguration(VimTestOption(OptionConstants.clipboardName, OptionValueType.STRING, ""))
   fun `test no notification if already was`() {
     val before = "${c}I found it in a legendary land"
     configureByText(before)
@@ -75,7 +75,7 @@ class IdeaPutNotificationsTest : VimOptionTestCase(ClipboardOptionsData.name) {
     typeText(StringHelper.parseKeys("p"))
 
     val notifications = EventLog.getLogModel(myFixture.project).notifications
-    assertTrue(notifications.isEmpty() || notifications.last().isExpired || ClipboardOptionsData.ideaput !in notifications.last().content)
+    assertTrue(notifications.isEmpty() || notifications.last().isExpired || OptionConstants.clipboard_ideaput !in notifications.last().content)
   }
 
   private fun appReadySetup(notifierEnabled: Boolean) {

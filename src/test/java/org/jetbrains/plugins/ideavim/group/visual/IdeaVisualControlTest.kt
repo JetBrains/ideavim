@@ -29,7 +29,7 @@ import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.listener.VimListenerManager
-import com.maddyhome.idea.vim.option.SelectModeOptionData
+import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import org.jetbrains.plugins.ideavim.OptionValueType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -43,7 +43,7 @@ import org.jetbrains.plugins.ideavim.waitAndAssertMode
 /**
  * @author Alex Plate
  */
-class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
+class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) {
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable character selection no selection`() {
@@ -724,9 +724,9 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
 
   @VimOptionTestConfiguration(
     VimTestOption(
-      SelectModeOptionData.name,
+      OptionConstants.selectmodeName,
       OptionValueType.STRING,
-      SelectModeOptionData.ideaselection
+      OptionConstants.selectmode_ideaselection
     )
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
@@ -747,7 +747,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
     waitAndAssertMode(myFixture, CommandState.Mode.SELECT)
   }
 
-  @VimOptionTestConfiguration(VimTestOption(SelectModeOptionData.name, OptionValueType.STRING, ""))
+  @VimOptionTestConfiguration(VimTestOption(OptionConstants.selectmodeName, OptionValueType.STRING, ""))
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test control selection to visual mode`() {
     configureByText(
@@ -766,7 +766,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
     waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
   }
 
-  @VimOptionTestConfiguration(VimTestOption(SelectModeOptionData.name, OptionValueType.STRING, ""))
+  @VimOptionTestConfiguration(VimTestOption(OptionConstants.selectmodeName, OptionValueType.STRING, ""))
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test control selection from line to char visual modes`() {
     configureByText(
@@ -790,7 +790,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
     assertCaretsVisualAttributes()
   }
 
-  @VimOptionTestConfiguration(VimTestOption(SelectModeOptionData.name, OptionValueType.STRING, ""))
+  @VimOptionTestConfiguration(VimTestOption(OptionConstants.selectmodeName, OptionValueType.STRING, ""))
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test control selection from line to char visual modes in keep mode`() {
     configureByText(

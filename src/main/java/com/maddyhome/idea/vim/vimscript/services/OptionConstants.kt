@@ -107,12 +107,20 @@ internal class OptionConstants {
 
     const val idearefactormodeName = "idearefactormode"
     const val idearefactormodeAlias = "idearefactormode"
+    const val idearefactormode_keep = "keep"
+    const val idearefactormode_select = "select"
+    const val idearefactormode_visual = "visual"
 
     const val ideastatusiconName = "ideastatusicon"
     const val ideastatusiconAlias = "ideastatusicon"
+    const val ideastatusicon_enabled = "enabled"
+    const val ideastatusicon_gray = "gray"
+    const val ideastatusicon_disabled = "disabled"
 
     const val ideawriteName = "ideawrite"
     const val ideawriteAlias = "ideawrite"
+    const val ideawrite_all = "all"
+    const val ideawrite_file = "file"
 
     const val selectionName = "selection"
     const val selectionAlias = "sel"
@@ -125,6 +133,10 @@ internal class OptionConstants {
 
     const val virtualeditName = "virtualedit"
     const val virtualeditAlias = "ve"
+    const val virtualedit_onemore = "onemore"
+    const val virtualedit_block = "block"
+    const val virtualedit_insert = "insert"
+    const val virtualedit_all = "all"
 
     const val viminfoName = "viminfo"
     const val viminfoAlias = "vi"
@@ -134,15 +146,27 @@ internal class OptionConstants {
 
     const val clipboardName = "clipboard"
     const val clipboardAlias = "cb"
+    const val clipboard_ideaput = "ideaput"
+    const val clipboard_unnamed = "unnamed"
 
     const val selectmodeName = "selectmode"
     const val selectmodeAlias = "slm"
+    const val selectmode_mouse = "mouse"
+    const val selectmode_key = "key"
+    const val selectmode_cmd = "cmd"
+    const val selectmode_ideaselection = "ideaselection"
 
     const val ideavimsupportName = "ideavimsupport"
     const val ideavimsupportAlias = "ideavimsupport"
 
     const val keymodelName = "keymodel"
     const val keymodelAlias = "km"
+    const val keymodel_startsel = "startsel"
+    const val keymodel_stopsel = "stopsel"
+    const val keymodel_stopselect = "stopselect"
+    const val keymodel_stopvisual = "stopvisual"
+    const val keymodel_continueselect = "continueselect"
+    const val keymodel_continuevisual = "continuevisual"
 
     const val lookupkeysName = "lookupkeys"
     const val lookupkeysAlias = "lookupkeys"

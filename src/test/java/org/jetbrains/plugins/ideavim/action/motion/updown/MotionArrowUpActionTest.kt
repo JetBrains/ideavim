@@ -23,7 +23,6 @@ package org.jetbrains.plugins.ideavim.action.motion.updown
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
-import com.maddyhome.idea.vim.option.KeyModelOptionData
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
@@ -35,7 +34,7 @@ import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
 import org.jetbrains.plugins.ideavim.VimTestOption
 
-class MotionArrowUpActionTest : VimOptionTestCase(KeyModelOptionData.name) {
+class MotionArrowUpActionTest : VimOptionTestCase(OptionConstants.keymodelName) {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionDefaultAll
   fun `test visual default options`() {
@@ -64,9 +63,9 @@ class MotionArrowUpActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(
-      KeyModelOptionData.name,
+      OptionConstants.keymodelName,
       OptionValueType.STRING,
-      KeyModelOptionData.stopsel
+      OptionConstants.keymodel_stopsel
     )
   )
   fun `test visual stopsel`() {
@@ -95,9 +94,9 @@ class MotionArrowUpActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(
-      KeyModelOptionData.name,
+      OptionConstants.keymodelName,
       OptionValueType.STRING,
-      KeyModelOptionData.stopselect
+      OptionConstants.keymodel_stopselect
     )
   )
   fun `test visual stopselect`() {
@@ -126,9 +125,9 @@ class MotionArrowUpActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(
-      KeyModelOptionData.name,
+      OptionConstants.keymodelName,
       OptionValueType.STRING,
-      KeyModelOptionData.stopvisual
+      OptionConstants.keymodel_stopvisual
     )
   )
   fun `test visual stopvisual`() {
@@ -157,9 +156,9 @@ class MotionArrowUpActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(
-      KeyModelOptionData.name,
+      OptionConstants.keymodelName,
       OptionValueType.STRING,
-      KeyModelOptionData.stopvisual
+      OptionConstants.keymodel_stopvisual
     )
   )
   fun `test visual stopvisual multicaret`() {
@@ -188,9 +187,9 @@ class MotionArrowUpActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(
-      KeyModelOptionData.name,
+      OptionConstants.keymodelName,
       OptionValueType.STRING,
-      KeyModelOptionData.stopselect
+      OptionConstants.keymodel_stopselect
     )
   )
   fun `test char select simple move`() {
@@ -218,7 +217,7 @@ class MotionArrowUpActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, OptionValueType.STRING, ""))
+  @VimOptionTestConfiguration(VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, ""))
   fun `test char select stopsel`() {
     doTest(
       listOf("gh", "<Up>"),
@@ -246,9 +245,9 @@ class MotionArrowUpActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(
-      KeyModelOptionData.name,
+      OptionConstants.keymodelName,
       OptionValueType.STRING,
-      KeyModelOptionData.stopselect
+      OptionConstants.keymodel_stopselect
     )
   )
   fun `test select multiple carets`() {

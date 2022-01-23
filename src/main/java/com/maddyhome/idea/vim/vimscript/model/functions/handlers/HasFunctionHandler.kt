@@ -34,10 +34,10 @@ object HasFunctionHandler : FunctionHandler() {
   private val supportedFeatures = setOf("ide")
 
   override fun doFunction(
-      argumentValues: List<Expression>,
-      editor: Editor,
-      context: DataContext,
-      vimContext: VimLContext,
+    argumentValues: List<Expression>,
+    editor: Editor,
+    context: DataContext,
+    vimContext: VimLContext,
   ): VimDataType {
     return if (supportedFeatures.contains(argumentValues[0].evaluate(editor, context, vimContext).asString()))
       VimInt.ONE
