@@ -396,6 +396,10 @@ Contributors:
   [![icon][github]](https://github.com/pmnoxx)
   &nbsp;
   Piotr Mikulski
+* [![icon][mail]](mailto:lonrevip@gmail.com)
+  [![icon][github]](https://github.com/lonre)
+  &nbsp;
+  Lonre Wang
                         
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainers.
