@@ -18,7 +18,7 @@
 
 package com.maddyhome.idea.vim.vimscript.services
 
-internal class OptionConstants {
+class OptionConstants {
 
   companion object {
     const val maxmapdepthName = "maxmapdepth"
