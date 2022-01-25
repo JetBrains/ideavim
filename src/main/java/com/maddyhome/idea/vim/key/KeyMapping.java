@@ -101,9 +101,8 @@ public class KeyMapping implements Iterable<List<KeyStroke>> {
                   @NotNull Expression toExpression,
                   @NotNull MappingOwner owner,
                   @NotNull String originalString,
-                  @NotNull VimLContext vimContext,
                   boolean recursive) {
-    myKeys.put(new ArrayList<>(fromKeys), new ToExpressionMappingInfo(toExpression, vimContext, fromKeys, recursive, owner, originalString));
+    myKeys.put(new ArrayList<>(fromKeys), new ToExpressionMappingInfo(toExpression, fromKeys, recursive, owner, originalString));
     fillPrefixes(fromKeys);
   }
 

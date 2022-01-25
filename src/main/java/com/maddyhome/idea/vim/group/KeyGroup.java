@@ -153,9 +153,8 @@ public class KeyGroup implements PersistentStateComponent<Element> {
                             @NotNull MappingOwner owner,
                             @NotNull Expression toExpr,
                             @NotNull String originalString,
-                            @NotNull VimLContext vimContext,
                             boolean recursive) {
-    modes.stream().map(this::getKeyMapping).forEach(o -> o.put(fromKeys, toExpr, owner, originalString, vimContext, recursive));
+    modes.stream().map(this::getKeyMapping).forEach(o -> o.put(fromKeys, toExpr, owner, originalString, recursive));
     registerKeyMapping(fromKeys, owner);
   }
 

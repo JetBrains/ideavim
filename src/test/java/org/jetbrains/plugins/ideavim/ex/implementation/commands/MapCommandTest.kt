@@ -17,16 +17,21 @@
  */
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.textarea.TextComponentEditorImpl
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.vimscript.Executor
+import com.maddyhome.idea.vim.vimscript.model.Script
+import com.maddyhome.idea.vim.vimscript.services.OptionService
 import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.waitAndAssert
+import javax.swing.JTextArea
 
 /**
  * @author vlan
@@ -758,6 +763,48 @@ n  ,f            <Plug>Foo
     typeText(parseKeys("t"))
     assertPluginErrorMessageContains("E15: Invalid expression: ^f8a")
   }
+
+    @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
+  fun `test map expr context`() {
+    val text = """
+          -----
+          1${c}2345
+          abcde
+          -----
+    """.trimIndent()
+    configureByJavaText(text)
+
+    val editor = TextComponentEditorImpl(null, JTextArea())
+    val context = DataContext.EMPTY_CONTEXT
+    Executor.execute("""
+      let s:mapping = '^f8a'
+      nnoremap <expr> t s:mapping
+    """.trimIndent(), editor, context, skipHistory = false, indicateErrors = true, null)
+    typeText(parseKeys("t"))
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E121: Undefined variable: s:mapping")
+  }
+
+  // todo keyPresses invoked inside a script should have access to the script context
+//  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
+//  fun `test map expr context`() {
+//    configureByText("\n")
+//    typeText(commandToKeys("""
+//      let s:var = 'itext'|
+//      nnoremap <expr> t s:var|
+//      fun! T()|
+//        normal t|
+//      endfun|
+//    """.trimIndent()))
+//    assertState("\n")
+//    typeText(commandToKeys("call T()"))
+//    assertPluginError(false)
+//    assertState("text\n")
+//
+//    typeText(parseKeys("t"))
+//    assertPluginError(true)
+//    assertPluginErrorMessageContains("E121: Undefined variable: s:var")
+//  }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
   fun `test exception during expression evaluation in map with expression`() {

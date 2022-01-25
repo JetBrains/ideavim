@@ -43,11 +43,11 @@ object Executor {
   var executingVimScript = false
 
   @Throws(ExException::class)
-  fun execute(scriptString: String, editor: Editor, context: DataContext, skipHistory: Boolean, indicateErrors: Boolean = true, vimContext: VimLContext): ExecutionResult {
+  fun execute(scriptString: String, editor: Editor, context: DataContext, skipHistory: Boolean, indicateErrors: Boolean = true, vimContext: VimLContext? = null): ExecutionResult {
     var finalResult: ExecutionResult = ExecutionResult.Success
 
     val script = VimscriptParser.parse(scriptString)
-    script.units.forEach { it.vimContext = vimContext }
+    script.units.forEach { it.vimContext = vimContext ?: script }
 
     for (unit in script.units) {
       try {
@@ -100,7 +100,7 @@ object Executor {
     val editor = TextComponentEditorImpl(null, JTextArea())
     val context = DataContext.EMPTY_CONTEXT
     try {
-      execute(file.readText(), editor, context, skipHistory = true, indicateErrors, Script())
+      execute(file.readText(), editor, context, skipHistory = true, indicateErrors)
     } catch (ignored: IOException) { }
   }
 
