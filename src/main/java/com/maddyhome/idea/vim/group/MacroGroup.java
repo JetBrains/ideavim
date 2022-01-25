@@ -24,6 +24,7 @@ import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.progress.ProcessCanceledException;
+import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.util.PotemkinProgress;
 import com.intellij.openapi.project.Project;
 import com.maddyhome.idea.vim.KeyHandler;
@@ -172,7 +173,9 @@ public class MacroGroup {
             catch (ProcessCanceledException e) {
               return;
             }
-            KeyHandler.getInstance().handleKey(editor, key, context);
+            ProgressManager.getInstance().executeNonCancelableSection(() -> {
+              KeyHandler.getInstance().handleKey(editor, key, context);
+            });
           }
         }
       });
