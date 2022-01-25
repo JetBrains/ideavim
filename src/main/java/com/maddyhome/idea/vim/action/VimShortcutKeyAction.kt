@@ -122,8 +122,8 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
 
       val keyCode = keyStroke.keyCode
 
-      if (HandlerInjector.notebookCommandMode()) {
-        LOG.trace("Python Notebook command mode")
+      if (EditorHelper.getVirtualFile(editor)?.extension == "ipynb" && HandlerInjector.notebookCommandMode()) {
+        LOG.debug("Python Notebook command mode")
         if (keyCode == KeyEvent.VK_RIGHT || keyCode == KeyEvent.VK_KP_RIGHT || keyCode == KeyEvent.VK_ENTER) {
           invokeLater { editor.updateCaretsVisualAttributes() }
         }
