@@ -171,12 +171,15 @@ public class ChangeGroup {
     if (editor.isOneLineMode()) return;
 
     // See also EditorStartNewLineBefore. That will move the caret to line start, call EditorEnter to create a new line,
-    // and then move up and call EditorLineEnd. We get better indent positioning by going to the line end of the
-    // previous line and hitting enter, especially with plain text files.
+    //   and then move up and call EditorLineEnd. We get better indent positioning by going to the line end of the
+    //   previous line and hitting enter, especially with plain text files.
+    // However, we'll use EditorStartNewLineBefore in PyCharm notebooks where the last character of the previous line
+    //   may be locked with a guard
 
     // Note that we're deliberately bypassing MotionGroup.moveCaret to avoid side effects, most notably unncessary
     // scrolling
     Set<Caret> firstLiners = new HashSet<>();
+    Set<Pair<Caret, Integer>> moves = new HashSet<>();
     for (Caret caret : editor.getCaretModel().getAllCarets()) {
       final int offset;
       if (caret.getVisualPosition().line == 0) {
@@ -187,17 +190,29 @@ public class ChangeGroup {
       else {
         offset = VimPlugin.getMotion().moveCaretToLineEnd(editor, caret.getLogicalPosition().line - 1, true);
       }
-      caret.moveToOffset(offset);
+      moves.add(new Pair<>(caret, offset));
     }
 
-    initInsert(editor, context, CommandState.Mode.INSERT);
-    runEnterAction(editor, context);
-
-    for (Caret caret : editor.getCaretModel().getAllCarets()) {
-      if (firstLiners.contains(caret)) {
-        final int offset = VimPlugin.getMotion().moveCaretToLineEnd(editor, 0, true);
-        MotionGroup.moveCaret(editor, caret, offset);
+    // Check if the "last character on previous line" has a guard
+    // This is actively used in pycharm notebooks https://youtrack.jetbrains.com/issue/VIM-2495
+    boolean hasGuards = moves.stream().anyMatch(it -> editor.getDocument().getOffsetGuard(it.getSecond()) != null);
+    if (!hasGuards) {
+      for (Pair<Caret, Integer> move : moves) {
+        move.getFirst().moveToOffset(move.getSecond());
       }
+
+      initInsert(editor, context, CommandState.Mode.INSERT);
+      runEnterAction(editor, context);
+
+      for (Caret caret : editor.getCaretModel().getAllCarets()) {
+        if (firstLiners.contains(caret)) {
+          final int offset = VimPlugin.getMotion().moveCaretToLineEnd(editor, 0, true);
+          MotionGroup.moveCaret(editor, caret, offset);
+        }
+      }
+    } else {
+      initInsert(editor, context, CommandState.Mode.INSERT);
+      runEnterAboveAction(editor, context);
     }
 
     MotionGroup.scrollCaretIntoView(editor);
@@ -271,6 +286,19 @@ public class ChangeGroup {
       // While repeating the enter action has been already executed because `initInsert` repeats the input
       final ActionManager actionManager = ActionManager.getInstance();
       final AnAction action = actionManager.getAction(IdeActions.ACTION_EDITOR_ENTER);
+      if (action != null) {
+        strokes.add(action);
+        KeyHandler.executeAction(action, context);
+      }
+    }
+  }
+
+  private void runEnterAboveAction(Editor editor, @NotNull DataContext context) {
+    CommandState state = CommandState.getInstance(editor);
+    if (!state.isDotRepeatInProgress()) {
+      // While repeating the enter action has been already executed because `initInsert` repeats the input
+      final ActionManager actionManager = ActionManager.getInstance();
+      final AnAction action = actionManager.getAction("EditorStartNewLineBefore");
       if (action != null) {
         strokes.add(action);
         KeyHandler.executeAction(action, context);
