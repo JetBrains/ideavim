@@ -639,6 +639,17 @@ class MatchitRubyTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
+  fun `test jump from one line condition to if`() {
+    doTest(
+      "%",
+      """if tr${c}ue puts "true" end""",
+      """${c}if true puts "true" end""",
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+    )
+  }
+
+
+  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from end to unless after a semicolon`() {
     doTest(
       "%",
@@ -1204,12 +1215,12 @@ class MatchitRubyTest : VimTestCase() {
       "%",
       """
         $c=begin
-          Multiline comment
+          end comment
         =end
       """.trimIndent(),
       """
         =begin
-          Multiline comment
+          end comment
         =${c}end
       """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
@@ -1222,12 +1233,12 @@ class MatchitRubyTest : VimTestCase() {
       "%",
       """
         =begin
-          Multiline comment
+          begin comment
         $c=end
       """.trimIndent(),
       """
         =${c}begin
-          Multiline comment
+          begin comment
         =end
       """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
@@ -1853,6 +1864,16 @@ class MatchitRubyTest : VimTestCase() {
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
+  
+  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
+  fun `test reverse jump from one line condition to if`() {
+    doTest(
+      "g%",
+      """if tr${c}ue puts "true" end""",
+      """${c}if true puts "true" end""",
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+    )
+  }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from do to end`() {
@@ -2434,12 +2455,12 @@ class MatchitRubyTest : VimTestCase() {
       "g%",
       """
         $c=begin
-          Multiline comment
+          end comment
         =end
       """.trimIndent(),
       """
         =begin
-          Multiline comment
+          end comment
         =${c}end
       """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
@@ -2452,12 +2473,12 @@ class MatchitRubyTest : VimTestCase() {
       "g%",
       """
         =begin
-          Multiline comment
+          begin comment
         $c=end
       """.trimIndent(),
       """
         =${c}begin
-          Multiline comment
+          begin comment
         =end
       """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
