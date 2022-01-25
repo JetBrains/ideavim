@@ -34,6 +34,7 @@ usual beta standards.
 * [VIM-2500](https://youtrack.jetbrains.com/issue/VIM-2500) Fix esc for normal mode
 * [VIM-2523](https://youtrack.jetbrains.com/issue/VIM-2523) `i` command for the folder in the project tree
 * [VIM-2471](https://youtrack.jetbrains.com/issue/VIM-2471) Multiple [{ and ]} actions
+* [VIM-2504](https://youtrack.jetbrains.com/issue/VIM-2504) Fix esc with using python notebooks
 
 ### Merged PRs:
 * [441](https://github.com/JetBrains/ideavim/pull/441) by [DanEEStar](https://github.com/DanEEStar): Add Matchit support for Vue.js files
