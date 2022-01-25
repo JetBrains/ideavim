@@ -189,7 +189,7 @@ internal class OptionServiceImpl : OptionService {
       }
     },
 
-    ToggleOption(OptionConstants.experimentalapiName, OptionConstants.experimentalapiAlias, false)
+    ToggleOption(OptionConstants.experimentalapiName, OptionConstants.experimentalapiAlias, true)
   )
   private val globalValues = mutableMapOf<String, VimDataType>()
   private val localValuesKey = Key<MutableMap<String, VimDataType>>("localOptions")
