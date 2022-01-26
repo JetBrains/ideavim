@@ -371,7 +371,7 @@ internal class OptionServiceImpl : OptionService {
   override fun addListener(optionName: String, listener: OptionChangeListener<VimDataType>, executeOnAdd: Boolean) {
     options.get(optionName)!!.addOptionChangeListener(listener)
     if (executeOnAdd) {
-      listener.processGlobalValueChange(null)
+      listener.processGlobalValueChange(getGlobalOptionValue(optionName))
     }
   }
 

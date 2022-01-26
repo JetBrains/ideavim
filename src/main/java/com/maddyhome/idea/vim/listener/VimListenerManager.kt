@@ -116,7 +116,7 @@ object VimListenerManager {
       VimPlugin.getOptionService().addListener(OptionConstants.scrolloffName, MotionGroup.ScrollOptionsChangeListener.INSTANCE)
       VimPlugin.getOptionService().addListener(OptionConstants.showcmdName, ShowCmdOptionChangeListener)
       VimPlugin.getOptionService().addListener(OptionConstants.guicursorName, GuicursorChangeListener)
-      VimPlugin.getOptionService().addListener(OptionConstants.iskeywordName, KeywordOptionChangeListener)
+      VimPlugin.getOptionService().addListener(OptionConstants.iskeywordName, KeywordOptionChangeListener, true)
 
       EventFacade.getInstance().addEditorFactoryListener(VimEditorFactoryListener, VimPlugin.getInstance())
 
