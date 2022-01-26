@@ -185,7 +185,7 @@ class DoubleQuotedStringTest {
     assertEquals(listOf(getKeyStroke(70, CTRL_DOWN_MASK)), StringHelper.stringToKeys(6.toChar().toString()))
     assertEquals(listOf(getKeyStroke(71, CTRL_DOWN_MASK)), StringHelper.stringToKeys(7.toChar().toString()))
     assertEquals(listOf(getKeyStroke(72, CTRL_DOWN_MASK)), StringHelper.stringToKeys(8.toChar().toString()))
-    assertEquals(listOf(getKeyStroke(73, CTRL_DOWN_MASK)), StringHelper.stringToKeys(9.toChar().toString()))
+    assertEquals(listOf(getKeyStroke('\t')), StringHelper.stringToKeys(9.toChar().toString()))
     assertEquals(listOf(getKeyStroke(74, CTRL_DOWN_MASK)), StringHelper.stringToKeys(0.toChar().toString()))
     assertEquals(listOf(getKeyStroke(75, CTRL_DOWN_MASK)), StringHelper.stringToKeys(11.toChar().toString()))
     assertEquals(listOf(getKeyStroke(76, CTRL_DOWN_MASK)), StringHelper.stringToKeys(12.toChar().toString()))

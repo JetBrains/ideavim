@@ -70,6 +70,8 @@ public class StringHelper {
         if (c == 0) {
           // J is a special case, it's keycode is 0 because keycode 10 is reserved by \n
           res.add(getKeyStroke('J', CTRL_DOWN_MASK));
+        } else if (c == '\t') {
+          res.add(getKeyStroke('\t'));
         } else {
           res.add(getKeyStroke(c + 'A' - 1, CTRL_DOWN_MASK));
         }
