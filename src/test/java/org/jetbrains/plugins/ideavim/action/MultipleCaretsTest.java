@@ -25,6 +25,7 @@ import com.maddyhome.idea.vim.action.motion.search.SearchWholeWordForwardAction;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.common.TextRange;
+import com.maddyhome.idea.vim.helper.VimBehaviorDiffers;
 import com.maddyhome.idea.vim.vimscript.services.OptionConstants;
 import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import org.jetbrains.annotations.NotNull;
@@ -1207,12 +1208,12 @@ public class MultipleCaretsTest extends VimTestCase {
     assertState("abcd<caret>e\n" + "abcde\n" + "abcd<caret>e\n" + "abcde\n" + "abcde\n" + "abcd<caret>e\n" + "abcde\n");
   }
 
+  @VimBehaviorDiffers(originalVimAfter = "<caret>\n<caret>\nabcde\n<caret>\n<caret>\nabcde\n")
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   public void testInsertNewLineAboveActionWithMultipleCaretsInLine() {
     typeTextInFile(parseKeys("O", "<ESC>"), "a<caret>bcd<caret>e\n" + "abc<caret>d<caret>e\n");
     if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL.INSTANCE, OptionConstants.experimentalapiName, OptionConstants.experimentalapiName)) {
-      // This branch is correct
-      assertState("<caret>\n<caret>\nabcde\n<caret>\n<caret>\nabcde\n");
+      assertState("<caret>\nabcde\n<caret>\nabcde\n");
     } else {
       assertState("<caret>\nabcde\n<caret>\nabcde\n");
     }
