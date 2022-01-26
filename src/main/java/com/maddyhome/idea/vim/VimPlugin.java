@@ -357,7 +357,9 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
    *      the extensions are initialized.
    * 4) Components initialization
    *    This should happen after ideavimrc execution because VimListenerManager accesses `number` option
-   *    to init line numbers and guicaret to initialize carets.
+   *      to init line numbers and guicaret to initialize carets.
+   *    However, there is a question about listeners attaching. Listeners registration happens after the .ideavimrc
+   *      execution, what theoretically may cause bugs (e.g. VIM-2540)
    */
   private void turnOnPlugin() {
     // 1) Update state
