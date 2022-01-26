@@ -339,24 +339,48 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     return ServiceManager.getService(VimPlugin.class);
   }
 
+  /**
+   * IdeaVim plugin initialization.
+   * This is an important operation and some commands ordering should be preserved.
+   * Please make sure that the documentation of this function is in sync with the code
+   *
+   * 1) Update state
+   *    This schedules a state update. In most cases it just shows some dialogs to the user. As I know, there are
+   *      no special reasons to keep this command as a first line, so it seems safe to move it.
+   * 2) Command registration
+   *    This block should be located BEFORE ~/.ideavimrc execution. Without it the commands won't be registered
+   *      and initialized, but ~/.ideavimrc file may refer or execute some commands or functions.
+   *    This block DOES NOT initialize extensions, but only registers the available ones.
+   * 3) ~/.ideavimrc execution
+   *    3.1 executes commands from the .ideavimrc file and 3.2 initializes extensions.
+   *    3.1 MUST BE BEFORE 3.2. This is a flow of vim/IdeaVim initialization, firstly .ideavimrc is executed and then
+   *      the extensions are initialized.
+   * 4) Components initialization
+   *    This should happen after ideavimrc execution because VimListenerManager accesses `number` option
+   *    to init line numbers and guicaret to initialize carets.
+   */
   private void turnOnPlugin() {
+    // 1) Update state
     ApplicationManager.getApplication().invokeLater(this::updateState);
 
-    // Register vim actions in command mode
+    // 2) Command registration
+    // 2.1) Register vim actions in command mode
     RegisterActions.registerActions();
 
-    // Register extensions
+    // 2.2) Register extensions
     VimExtensionRegistrar.registerExtensions();
 
-    // Register functions
+    // 2.3) Register functions
     FunctionStorage.INSTANCE.registerHandlers();
 
-    // Execute ~/.ideavimrc
+    // 3) ~/.ideavimrc execution
+    // 3.1) Execute ~/.ideavimrc
     registerIdeavimrc();
 
-    // Initialize extensions
+    // 3.2) Initialize extensions. Always after 3.1
     VimExtensionRegistrar.enableDelayedExtensions();
 
+    // 4) Components initialization
     // Some options' default values are based on values set in .ideavimrc, e.g. 'shellxquote' on Windows when 'shell'
     // is cmd.exe has a different default to when 'shell' contains "sh"
     OptionsManager.INSTANCE.completeInitialisation();
