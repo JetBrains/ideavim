@@ -2,11 +2,41 @@
   <name>IdeaVim</name>
   <id>IdeaVIM</id>
   <change-notes><![CDATA[
+      <h3>Features:</h3>
+      <ul>
+        <li>Add register support to let command | <a href="https://youtrack.jetbrains.com/issue/VIM-749">VIM-749</a>, <a
+            href="https://youtrack.jetbrains.com/issue/VIM-1783">VIM-1783</a></li>
+      </ul>
+
       <h3>Fixes:</h3>
       <ul>
         <li><a href="https://youtrack.jetbrains.com/issue/VIM-2502">VIM-2502</a> Fix the shape of new carets</li>
         <li><a href="https://youtrack.jetbrains.com/issue/VIM-2499">VIM-2499</a> Fix mapping to esc</li>
         <li><a href="https://youtrack.jetbrains.com/issue/VIM-2500">VIM-2500</a> Fix esc for normal mode</li>
+        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2523">VIM-2523</a> <code>i</code> command for the folder in the
+          project tree
+        </li>
+        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2471">VIM-2471</a> Multiple [{ and ]} actions</li>
+        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2504">VIM-2504</a> Fix esc with using python notebooks</li>
+      </ul>
+
+      <h3>Merged PRs:</h3>
+      <ul>
+        <li><a href="https://github.com/JetBrains/ideavim/pull/441">441</a> by <a href="https://github.com/DanEEStar">DanEEStar</a>:
+          Add Matchit support for Vue.js files
+        </li>
+        <li><a href="https://github.com/JetBrains/ideavim/pull/440">440</a> by <a href="https://github.com/ksrb">Kevin
+          Suen</a>: Add matchit support for handlebars
+        </li>
+        <li><a href="https://github.com/JetBrains/ideavim/pull/448">448</a> by <a href="https://github.com/cravay">Michael
+          Schertenleib</a>: Support custom element names in vim-surround
+        </li>
+        <li><a href="https://github.com/JetBrains/ideavim/pull/435">435</a> by <a href="https://github.com/pmnoxx">Piotr
+          Mikulski</a>: Print stderr when running a command just like vim does
+        </li>
+        <li><a href="https://github.com/JetBrains/ideavim/pull/449">449</a> by <a href="https://github.com/lonre">Lonre
+          Wang</a>: Typo fix
+        </li>
       </ul>
     ]]>
   </change-notes>
