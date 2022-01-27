@@ -42,6 +42,7 @@ import com.maddyhome.idea.vim.helper.EditorDataContext
 import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.helper.inNormalMode
 import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.IdeaRefactorModeHelper
 import com.maddyhome.idea.vim.vimscript.services.OptionConstants
@@ -92,7 +93,7 @@ object IdeaSpecifics {
             commandState.popModes()
           }
           VimPlugin.getChange().insertBeforeCursor(it, dataContext)
-          KeyHandler.getInstance().reset(it)
+          KeyHandler.getInstance().reset(it.vim)
         }
       }
       //endregion
@@ -128,7 +129,7 @@ object IdeaSpecifics {
           // Template with selection is handled by [com.maddyhome.idea.vim.group.visual.VisualMotionGroup.controlNonVimSelectionChange]
           if (editor.inNormalMode) {
             VimPlugin.getChange().insertBeforeCursor(editor, EditorDataContext.init(editor))
-            KeyHandler.getInstance().reset(editor)
+            KeyHandler.getInstance().reset(editor.vim)
           }
         }
       }
@@ -153,7 +154,7 @@ object IdeaSpecifics {
         val editor = oldLookup.editor
         if (editor.isIdeaVimDisabledHere) return
         // VIM-1858
-        KeyHandler.getInstance().partialReset(editor)
+        KeyHandler.getInstance().partialReset(editor.vim)
       }
     }
   }

@@ -32,6 +32,8 @@ import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
 import com.maddyhome.idea.vim.helper.updateCaretsVisualPosition
 import com.maddyhome.idea.vim.helper.vimCommandState
 import com.maddyhome.idea.vim.key.CommandPartNode
+import com.maddyhome.idea.vim.newapi.IjVimEditor
+import com.maddyhome.idea.vim.newapi.VimEditor
 import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import org.jetbrains.annotations.Contract
@@ -389,8 +391,8 @@ class CommandState private constructor(private val editor: Editor?) {
     private val globalState = CommandState(null)
 
     @JvmStatic
-    fun getInstance(editor: Editor): CommandState {
-      return if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, OptionConstants.ideaglobalmodeName)) {
+    fun getInstance(editor: Editor?): CommandState {
+      return if (editor == null || VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, OptionConstants.ideaglobalmodeName)) {
         globalState
       } else {
         var res = editor.vimCommandState
@@ -399,6 +401,15 @@ class CommandState private constructor(private val editor: Editor?) {
           editor.vimCommandState = res
         }
         res
+      }
+    }
+
+    @JvmStatic
+    fun getInstance(editor: VimEditor): CommandState {
+      return if (editor is IjVimEditor) {
+        getInstance(editor.editor)
+      } else {
+        getInstance(null)
       }
     }
 

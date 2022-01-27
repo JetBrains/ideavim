@@ -42,8 +42,8 @@ import com.maddyhome.idea.vim.helper.VimNlsSafe
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.helper.vimSelectionStart
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
-import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
@@ -102,7 +102,7 @@ class ToKeysMappingInfo(
     for (keyStroke in toKeys) {
       val recursive = isRecursive && !(first && fromIsPrefix)
       val keyHandler = KeyHandler.getInstance()
-      keyHandler.handleKey(editor, keyStroke, editorDataContext, recursive, false)
+      keyHandler.handleKey(editor.vim, keyStroke, editorDataContext, recursive, false)
       first = false
     }
   }
@@ -130,7 +130,7 @@ class ToExpressionMappingInfo(
     for (keyStroke in toKeys) {
       val recursive = isRecursive && !(first && fromIsPrefix)
       val keyHandler = KeyHandler.getInstance()
-      keyHandler.handleKey(editor, keyStroke, editorDataContext, recursive, false)
+      keyHandler.handleKey(editor.vim, keyStroke, editorDataContext, recursive, false)
       first = false
     }
   }

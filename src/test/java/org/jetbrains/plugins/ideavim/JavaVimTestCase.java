@@ -29,9 +29,9 @@ import com.maddyhome.idea.vim.group.visual.VimVisualTimer;
 import com.maddyhome.idea.vim.helper.EditorDataContext;
 import com.maddyhome.idea.vim.helper.RunnableHelper;
 import com.maddyhome.idea.vim.helper.TestInputModel;
+import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
 import com.maddyhome.idea.vim.vimscript.services.OptionService;
-import com.maddyhome.idea.vim.vimscript.services.VariableService;
 import com.maddyhome.idea.vim.vimscript.services.VariableServiceImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -52,7 +52,7 @@ public abstract class JavaVimTestCase extends JavaCodeInsightFixtureTestCase {
 
     Editor editor = myFixture.getEditor();
     if (editor != null) {
-      KeyHandler.getInstance().fullReset(editor);
+      KeyHandler.getInstance().fullReset(new IjVimEditor(editor));
     }
     VimPlugin.getOptionService().resetAllOptions();
     VimPlugin.getKey().resetKeyMappings();

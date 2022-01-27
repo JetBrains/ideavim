@@ -49,6 +49,8 @@ import com.maddyhome.idea.vim.handler.ActionBeanClass;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.key.*;
+import com.maddyhome.idea.vim.newapi.IjVimEditor;
+import com.maddyhome.idea.vim.newapi.VimEditor;
 import com.maddyhome.idea.vim.ui.ShowCmd;
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt;
@@ -184,7 +186,7 @@ public class KeyHandler {
    * @param context The data context
    */
   public void handleKey(@NotNull Editor editor, @NotNull KeyStroke key, @NotNull DataContext context) {
-    handleKey(editor, key, context, true, false);
+    handleKey(new IjVimEditor(editor), key, context, true, false);
   }
 
   /**
@@ -217,7 +219,7 @@ public class KeyHandler {
    *
    * TODO mappingCompleted and recursionCounter - we should find a more beautiful way to use them
    */
-  public void handleKey(@NotNull Editor editor,
+  public void handleKey(@NotNull IjVimEditor editor,
                         @NotNull KeyStroke key,
                         @NotNull DataContext context,
                         boolean allowKeyMappings,
@@ -241,7 +243,7 @@ public class KeyHandler {
     VimPlugin.clearError();
     // All the editor actions should be performed with top level editor!!!
     // Be careful: all the EditorActionHandler implementation should correctly process InjectedEditors
-    editor = HelperKt.getTopLevelEditor(editor);
+    editor = new IjVimEditor(HelperKt.getTopLevelEditor(editor.getEditor()));
 
     final CommandState editorState = CommandState.getInstance(editor);
     final CommandBuilder commandBuilder = editorState.getCommandBuilder();
@@ -302,13 +304,13 @@ public class KeyHandler {
             // If we are in insert/replace mode send this key in for processing
             if (editorState.getMode() == CommandState.Mode.INSERT || editorState.getMode() == CommandState.Mode.REPLACE) {
               LOG.trace("Process insert or replace");
-              shouldRecord &= VimPlugin.getChange().processKey(editor, context, key);
+              shouldRecord &= VimPlugin.getChange().processKey(editor.getEditor(), context, key);
             } else if (editorState.getMode() == CommandState.Mode.SELECT) {
               LOG.trace("Process select");
-              shouldRecord &= VimPlugin.getChange().processKeyInSelectMode(editor, context, key);
+              shouldRecord &= VimPlugin.getChange().processKeyInSelectMode(editor.getEditor(), context, key);
             } else if (editorState.getMappingState().getMappingMode() == MappingMode.CMD_LINE) {
               LOG.trace("Process cmd line");
-              shouldRecord &= VimPlugin.getProcess().processExKey(editor, key);
+              shouldRecord &= VimPlugin.getProcess().processExKey(editor.getEditor(), key);
             }
             // If we get here then the user has entered an unrecognized series of keystrokes
             else {
@@ -371,7 +373,7 @@ public class KeyHandler {
     return true;
   }
 
-  private void handleEditorReset(@NotNull Editor editor, @NotNull KeyStroke key, final @NotNull DataContext context, @NotNull CommandState editorState) {
+  private void handleEditorReset(@NotNull IjVimEditor editor, @NotNull KeyStroke key, final @NotNull DataContext context, @NotNull CommandState editorState) {
     final CommandBuilder commandBuilder = editorState.getCommandBuilder();
     if (commandBuilder.isAwaitingCharOrDigraphArgument()) {
       editorState.resetReplaceCharacter();
@@ -384,7 +386,7 @@ public class KeyHandler {
         if (key.getKeyCode() == KeyEvent.VK_ESCAPE) {
           Ref<Boolean> executed = Ref.create();
           CommandProcessor.getInstance()
-            .executeCommand(editor.getProject(),
+            .executeCommand(editor.getEditor().getProject(),
                             () -> executed.set(KeyHandler.executeAction(IdeActions.ACTION_EDITOR_ESCAPE, context)),
                             "", null);
           indicateError = !executed.get();
@@ -398,7 +400,7 @@ public class KeyHandler {
     reset(editor);
   }
 
-  private boolean handleKeyMapping(final @NotNull Editor editor,
+  private boolean handleKeyMapping(final @NotNull IjVimEditor editor,
                                    final @NotNull KeyStroke key,
                                    final @NotNull DataContext context,
                                    boolean mappingCompleted) {
@@ -427,8 +429,8 @@ public class KeyHandler {
 
     // Returns true if any of these methods handle the key. False means that the key is unrelated to mapping and should
     // be processed as normal.
-    boolean mappingProcessed = handleUnfinishedMappingSequence(editor, mappingState, mapping, mappingCompleted) ||
-                               handleCompleteMappingSequence(editor, context, mappingState, mapping, key) ||
+    boolean mappingProcessed = handleUnfinishedMappingSequence(editor.getEditor(), mappingState, mapping, mappingCompleted) ||
+                               handleCompleteMappingSequence(editor.getEditor(), context, mappingState, mapping, key) ||
                                handleAbandonedMappingSequence(editor, mappingState, context);
     if (LOG.isDebugEnabled()) LOG.debug("Finish mapping processing. Return " + mappingProcessed);
     return mappingProcessed;
@@ -486,7 +488,7 @@ public class KeyHandler {
 
         LOG.trace("Processing unhandled keys...");
         for (KeyStroke keyStroke : unhandledKeys) {
-          handleKey(editor, keyStroke, EditorDataContext.init(editor, null), true, true);
+          handleKey(new IjVimEditor(editor), keyStroke, EditorDataContext.init(editor, null), true, true);
         }
       }, ModalityState.stateForComponent(editor.getComponent())));
     }
@@ -546,14 +548,14 @@ public class KeyHandler {
     // If we've just evaluated the previous key sequence, make sure to also handle the current key
     if (mappingInfo != currentMappingInfo) {
       LOG.trace("Evaluating the current key");
-      handleKey(editor, key, currentContext, true, false);
+      handleKey(new IjVimEditor(editor), key, currentContext, true, false);
     }
 
     LOG.trace("Success processing of mapping");
     return true;
   }
 
-  private boolean handleAbandonedMappingSequence(@NotNull Editor editor,
+  private boolean handleAbandonedMappingSequence(@NotNull IjVimEditor editor,
                                                  @NotNull MappingState mappingState,
                                                  DataContext context) {
 
@@ -703,7 +705,7 @@ public class KeyHandler {
     commandState.resetReplaceCharacter();
   }
 
-  private boolean handleDigraph(@NotNull Editor editor,
+  private boolean handleDigraph(@NotNull IjVimEditor editor,
                                 @NotNull KeyStroke key,
                                 @NotNull DataContext context,
                                 @NotNull CommandState editorState) {
@@ -728,7 +730,7 @@ public class KeyHandler {
       }
     }
 
-    DigraphResult res = editorState.processDigraphKey(key, editor);
+    DigraphResult res = editorState.processDigraphKey(key, editor.getEditor());
     if (ExEntryPanel.getInstance().isActive()) {
       switch (res.getResult()) {
         case DigraphResult.RES_HANDLED:
@@ -759,7 +761,7 @@ public class KeyHandler {
           return false;
         }
         editorState.getCommandBuilder().addKey(key);
-        handleKey(editor, stroke, context);
+        handleKey(editor.getEditor(), stroke, context);
         return true;
 
       case DigraphResult.RES_BAD:
@@ -774,7 +776,7 @@ public class KeyHandler {
         // state. E.g. waiting for {char} <BS> {char}. Let the key handler have a go at it.
         if (commandBuilder.getExpectedArgumentType() == Argument.Type.DIGRAPH) {
           commandBuilder.fallbackToCharacterArgument();
-          handleKey(editor, key, context);
+          handleKey(editor.getEditor(), key, context);
           return true;
         }
         return false;
@@ -783,7 +785,7 @@ public class KeyHandler {
     return false;
   }
 
-  private void executeCommand(@NotNull Editor editor,
+  private void executeCommand(@NotNull IjVimEditor editor,
                               @NotNull DataContext context,
                               @NotNull CommandState editorState) {
     LOG.trace("Command execution");
@@ -799,11 +801,11 @@ public class KeyHandler {
     // Save off the command we are about to execute
     editorState.setExecutingCommand(command);
 
-    Project project = editor.getProject();
+    Project project = editor.getEditor().getProject();
     final Command.Type type = command.getType();
     if (type.isWrite()) {
-      boolean modificationAllowed = EditorModificationUtil.checkModificationAllowed(editor);
-      boolean writeRequested = EditorModificationUtil.requestWriting(editor);
+      boolean modificationAllowed = EditorModificationUtil.checkModificationAllowed(editor.getEditor());
+      boolean writeRequested = EditorModificationUtil.requestWriting(editor.getEditor());
       if (!modificationAllowed || !writeRequested) {
         VimPlugin.indicateError();
         reset(editor);
@@ -817,7 +819,7 @@ public class KeyHandler {
     }
 
     if (ApplicationManager.getApplication().isDispatchThread()) {
-      Runnable action = new ActionRunner(editor, context, command, operatorArguments);
+      Runnable action = new ActionRunner(editor.getEditor(), context, command, operatorArguments);
       EditorActionHandlerBase cmdAction = command.getAction();
       String name = cmdAction.getId();
 
@@ -833,8 +835,7 @@ public class KeyHandler {
     }
   }
 
-  private void handleCommandNode(Editor editor,
-                                 DataContext context,
+  private void handleCommandNode(IjVimEditor editor, DataContext context,
                                  KeyStroke key,
                                  @NotNull CommandNode<ActionBeanClass> node,
                                  CommandState editorState) {
@@ -859,7 +860,7 @@ public class KeyHandler {
     else {
       LOG.trace("Set waiting for the argument");
       final Argument.Type argumentType = action.getArgumentType();
-      startWaitingForArgument(editor, context, key.getKeyChar(), action, argumentType, editorState);
+      startWaitingForArgument(editor.getEditor(), context, key.getKeyChar(), action, argumentType, editorState);
       partialReset(editor);
     }
 
@@ -883,7 +884,7 @@ public class KeyHandler {
          operator, which would be invoked first (e.g. 'd' in "d/foo").
       */
       LOG.trace("Processing ex_string");
-      String text = VimPlugin.getProcess().endSearchCommand(editor);
+      String text = VimPlugin.getProcess().endSearchCommand(editor.getEditor());
       commandBuilder.popCommandPart();  // Pop ProcessExEntryAction
       commandBuilder.completeCommandPart(new Argument(text)); // Set search text on SearchEntry(Fwd|Rev)Action
       editorState.popModes(); // Pop CMD_LINE
@@ -959,7 +960,7 @@ public class KeyHandler {
    *
    * @param editor The editor to reset.
    */
-  public void partialReset(@NotNull Editor editor) {
+  public void partialReset(@NotNull VimEditor editor) {
     CommandState editorState = CommandState.getInstance(editor);
     editorState.getMappingState().resetMappingSequence();
     editorState.getCommandBuilder().resetInProgressCommandPart(getKeyRoot(editorState.getMappingState().getMappingMode()));
@@ -970,7 +971,7 @@ public class KeyHandler {
    *
    * @param editor The editor to reset.
    */
-  public void reset(@NotNull Editor editor) {
+  public void reset(@NotNull VimEditor editor) {
     partialReset(editor);
     CommandState editorState = CommandState.getInstance(editor);
     editorState.getCommandBuilder().resetAll(getKeyRoot(editorState.getMappingState().getMappingMode()));
@@ -986,7 +987,7 @@ public class KeyHandler {
    *
    * @param editor The editor to reset.
    */
-  public void fullReset(@NotNull Editor editor) {
+  public void fullReset(@NotNull IjVimEditor editor) {
     VimPlugin.clearError();
     CommandState.getInstance(editor).reset();
     reset(editor);
@@ -994,7 +995,7 @@ public class KeyHandler {
     if (registerGroup != null) {
       registerGroup.resetRegister();
     }
-    editor.getSelectionModel().removeSelection();
+    editor.getEditor().getSelectionModel().removeSelection();
   }
 
   // This method is copied from com.intellij.openapi.editor.actionSystem.EditorAction.getProjectAwareDataContext
@@ -1054,7 +1055,7 @@ public class KeyHandler {
   static class ActionRunner implements Runnable {
     @Contract(pure = true)
     ActionRunner(Editor editor, DataContext context, Command cmd, OperatorArguments operatorArguments) {
-      this.editor = editor;
+      this.editor = new IjVimEditor(editor);
       this.context = context;
       this.cmd = cmd;
       this.operatorArguments = operatorArguments;
@@ -1071,9 +1072,9 @@ public class KeyHandler {
         VimPlugin.getRegister().selectRegister(register);
       }
 
-      executeVimAction(editor, cmd.getAction(), context, operatorArguments);
+      executeVimAction(editor.getEditor(), cmd.getAction(), context, operatorArguments);
       if (editorState.getMode() == CommandState.Mode.INSERT || editorState.getMode() == CommandState.Mode.REPLACE) {
-        VimPlugin.getChange().processCommand(editor, cmd);
+        VimPlugin.getChange().processCommand(editor.getEditor(), cmd);
       }
 
       // Now the command has been executed let's clean up a few things.
@@ -1096,7 +1097,7 @@ public class KeyHandler {
       }
     }
 
-    private final Editor editor;
+    private final IjVimEditor editor;
     private final DataContext context;
     private final Command cmd;
     private final OperatorArguments operatorArguments;

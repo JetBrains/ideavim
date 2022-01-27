@@ -281,6 +281,9 @@ enum class LineDeleteShift {
   NO_NL,
 }
 
+val Editor.vim: IjVimEditor
+  get() = IjVimEditor(this)
+
 class IjVimEditor(val editor: Editor) : MutableLinearEditor() {
   override val lfMakesNewLine: Boolean = true
 

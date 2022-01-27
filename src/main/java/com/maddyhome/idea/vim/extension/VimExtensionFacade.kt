@@ -31,6 +31,7 @@ import com.maddyhome.idea.vim.helper.TestInputModel
 import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.OperatorFunction
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.ui.ModalEntry
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
@@ -97,7 +98,7 @@ object VimExtensionFacade {
   @JvmStatic
   fun executeNormalWithoutMapping(keys: List<KeyStroke>, editor: Editor) {
     val context = EditorDataContext.init(editor)
-    keys.forEach { KeyHandler.getInstance().handleKey(editor, it, context, false, false) }
+    keys.forEach { KeyHandler.getInstance().handleKey(editor.vim, it, context, false, false) }
   }
 
   /** Returns a single key stroke from the user input similar to 'getchar()'. */

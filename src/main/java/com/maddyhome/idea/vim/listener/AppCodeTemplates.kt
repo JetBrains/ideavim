@@ -34,6 +34,7 @@ import com.maddyhome.idea.vim.action.motion.select.SelectToggleVisualMode
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer
 import com.maddyhome.idea.vim.helper.fileSize
 import com.maddyhome.idea.vim.helper.inVisualMode
+import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.annotations.NotNull
 
 /**
@@ -67,7 +68,7 @@ object AppCodeTemplates {
           VimVisualTimer.doNow()
           if (myEditor.inVisualMode) {
             SelectToggleVisualMode.toggleMode(myEditor)
-            KeyHandler.getInstance().partialReset(myEditor)
+            KeyHandler.getInstance().partialReset(myEditor.vim)
           }
         }
       }

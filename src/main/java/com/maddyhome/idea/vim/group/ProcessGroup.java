@@ -40,6 +40,7 @@ import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.ex.InvalidCommandException;
 import com.maddyhome.idea.vim.helper.UiHelper;
+import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
 import com.maddyhome.idea.vim.vimscript.Executor;
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext;
@@ -102,7 +103,7 @@ public class ProcessGroup {
     }
     else {
       CommandState.getInstance(editor).popModes();
-      KeyHandler.getInstance().reset(editor);
+      KeyHandler.getInstance().reset(new IjVimEditor(editor));
       return false;
     }
   }
@@ -145,7 +146,7 @@ public class ProcessGroup {
 
   public void cancelExEntry(final @NotNull Editor editor, boolean resetCaret) {
     CommandState.getInstance(editor).popModes();
-    KeyHandler.getInstance().reset(editor);
+    KeyHandler.getInstance().reset(new IjVimEditor(editor));
     ExEntryPanel panel = ExEntryPanel.getInstance();
     panel.deactivate(true, resetCaret);
   }

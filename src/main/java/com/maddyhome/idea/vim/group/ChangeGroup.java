@@ -64,6 +64,7 @@ import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor;
 import com.maddyhome.idea.vim.listener.VimInsertListener;
 import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
 import com.maddyhome.idea.vim.newapi.ChangeGroupKt;
+import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.option.StrictMode;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
 import com.maddyhome.idea.vim.vimscript.services.OptionConstants;
@@ -934,7 +935,7 @@ public class ChangeGroup {
       res = processKey(editor, context, key);
 
       ModeHelper.exitSelectMode(editor, false);
-      KeyHandler.getInstance().reset(editor);
+      KeyHandler.getInstance().reset(new IjVimEditor(editor));
 
       if (isPrintableChar(key.getKeyChar()) || activeTemplateWithLeftRightMotion(editor, key)) {
         VimPlugin.getChange().insertBeforeCursor(editor, context);

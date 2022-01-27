@@ -74,6 +74,7 @@ import com.maddyhome.idea.vim.listener.MouseEventsDataHolder.skipEvents
 import com.maddyhome.idea.vim.listener.MouseEventsDataHolder.skipNDragEvents
 import com.maddyhome.idea.vim.listener.VimListenerManager.EditorListeners.add
 import com.maddyhome.idea.vim.listener.VimListenerManager.EditorListeners.remove
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.option.StrictMode
 import com.maddyhome.idea.vim.ui.ShowCmdOptionChangeListener
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
@@ -437,7 +438,7 @@ object VimListenerManager {
             editor.exitVisualMode()
           } else if (editor.inSelectMode) {
             editor.exitSelectMode(false)
-            KeyHandler.getInstance().reset(editor)
+            KeyHandler.getInstance().reset(editor.vim)
           }
         }
 

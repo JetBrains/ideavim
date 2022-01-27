@@ -33,6 +33,7 @@ import com.maddyhome.idea.vim.helper.exitSelectMode
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.getTopLevelEditor
 import com.maddyhome.idea.vim.helper.mode
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
@@ -82,9 +83,9 @@ data class NormalCommand(val ranges: Ranges, val argument: String) : Command.Sin
       // Perform operations
       val keys = stringToKeys(argument)
       val keyHandler = KeyHandler.getInstance()
-      keyHandler.reset(editor)
+      keyHandler.reset(editor.vim)
       for (key in keys) {
-        keyHandler.handleKey(editor, key, context, useMappings, true)
+        keyHandler.handleKey(editor.vim, key, context, useMappings, true)
       }
 
       // Exit if state leaves as insert or cmd_line

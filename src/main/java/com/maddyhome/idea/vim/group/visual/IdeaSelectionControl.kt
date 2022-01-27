@@ -38,6 +38,7 @@ import com.maddyhome.idea.vim.helper.isTemplateActive
 import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.popAllModes
 import com.maddyhome.idea.vim.listener.VimListenerManager
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.IdeaRefactorModeHelper
 import com.maddyhome.idea.vim.vimscript.services.OptionConstants
@@ -93,7 +94,7 @@ object IdeaSelectionControl {
         }
       }
 
-      KeyHandler.getInstance().reset(editor)
+      KeyHandler.getInstance().reset(editor.vim)
       logger.debug("${editor.mode} is enabled")
     }
   }

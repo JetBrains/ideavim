@@ -71,6 +71,7 @@ import com.maddyhome.idea.vim.helper.thickness
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.ToKeysMappingInfo
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
@@ -109,7 +110,7 @@ abstract class VimTestCase : UsefulTestCase() {
     // Note that myFixture.editor is usually null here. It's only set once configureByText has been called
     val editor = myFixture.editor
     if (editor != null) {
-      KeyHandler.getInstance().fullReset(editor)
+      KeyHandler.getInstance().fullReset(editor.vim)
     }
     VimPlugin.getOptionService().resetAllOptions()
     OptionsManager.resetAllOptions()

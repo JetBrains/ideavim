@@ -46,6 +46,7 @@ import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
 import com.maddyhome.idea.vim.helper.userData
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import java.lang.Integer.min
@@ -309,7 +310,7 @@ class VimMultipleCursorsExtension : VimExtension {
   private fun enterVisualMode(editor: Editor) {
     // We need to reset the key handler to make sure we pick up the fact that we're in visual mode
     VimPlugin.getVisualMotion().enterVisualMode(editor, CommandState.SubMode.VISUAL_CHARACTER)
-    KeyHandler.getInstance().reset(editor)
+    KeyHandler.getInstance().reset(editor.vim)
   }
 
   private fun findNextOccurrence(editor: Editor, startOffset: Int, text: String, whole: Boolean): Int {

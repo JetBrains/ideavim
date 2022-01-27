@@ -29,13 +29,14 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.getTopLevelEditor
 import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.vimForEachCaret
+import com.maddyhome.idea.vim.newapi.vim
 
 class ResetModeAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_WRITABLE
 
   override fun execute(editor: Editor, context: DataContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
     val modeBeforeReset = editor.mode
-    KeyHandler.getInstance().fullReset(editor.getTopLevelEditor())
+    KeyHandler.getInstance().fullReset(editor.getTopLevelEditor().vim)
 
     if (modeBeforeReset == CommandState.Mode.INSERT) {
       editor.vimForEachCaret { caret ->

@@ -29,6 +29,7 @@ import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.commandState
+import com.maddyhome.idea.vim.newapi.vim
 
 /**
  * @author vlan
@@ -59,7 +60,7 @@ class OperatorAction : VimActionHandler.SingleExecution() {
         if (range != null) {
           VimPlugin.getMark().setChangeMarks(editor, range)
           val selectionType = if (motion.isLinewiseMotion()) SelectionType.LINE_WISE else SelectionType.CHARACTER_WISE
-          KeyHandler.getInstance().reset(editor)
+          KeyHandler.getInstance().reset(editor.vim)
           val result = operatorFunction.apply(editor, context, selectionType)
           VimRepeater.repeatHandler = saveRepeatHandler
           return result

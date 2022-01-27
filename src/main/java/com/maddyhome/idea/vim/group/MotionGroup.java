@@ -46,6 +46,7 @@ import com.maddyhome.idea.vim.handler.MotionActionHandlerKt;
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.listener.AppCodeTemplates;
+import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt;
@@ -1484,7 +1485,7 @@ public class MotionGroup {
       ExOutputModel.getInstance(editor).clear();
       if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
         ModeHelper.exitVisualMode(editor);
-        KeyHandler.getInstance().reset(editor);
+        KeyHandler.getInstance().reset(new IjVimEditor(editor));
       }
     }
   }
