@@ -32,9 +32,7 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.ChangeGroup
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.helper.inlayAwareVisualColumn
-import com.maddyhome.idea.vim.helper.vimCarets
 import com.maddyhome.idea.vim.helper.vimChangeActionSwitchMode
 import com.maddyhome.idea.vim.helper.vimLastColumn
 
@@ -152,9 +150,9 @@ fun insertLineAround(editor: Editor, context: DataContext, shift: Int) {
 
   VimPlugin.getChange().initInsert(editor, context, CommandState.Mode.INSERT)
 
-  if (!editor.commandState.isDotRepeatInProgress) {
-    for (caret in editor.vimCarets()) {
-      val vimCaret: VimCaret = IjVimCaret(caret)
+  if (!CommandState.getInstance(vimEditor).isDotRepeatInProgress) {
+    for (vimCaret in vimEditor.carets()) {
+      val caret = (vimCaret as IjVimCaret).caret
       val line = vimCaret.getLine()
 
       // Current line indent

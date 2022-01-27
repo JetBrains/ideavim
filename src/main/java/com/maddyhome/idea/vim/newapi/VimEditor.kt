@@ -28,6 +28,7 @@ import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.fileSize
 import com.maddyhome.idea.vim.helper.getTopLevelEditor
+import com.maddyhome.idea.vim.helper.inBlockSubMode
 import com.maddyhome.idea.vim.helper.inlayAwareVisualColumn
 import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.vimscript.services.OptionConstants
@@ -138,6 +139,7 @@ interface VimEditor {
 
   fun getLineRange(line: EditorLine.Pointer): Pair<Offset, Offset>
   fun charAt(offset: Pointer): Char
+  fun carets(): List<VimCaret>
 }
 
 fun VimEditor.indentForLine(line: Int): Int {
@@ -348,6 +350,14 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
 
   override fun charAt(offset: Pointer): Char {
     return editor.document.charsSequence[offset.point]
+  }
+
+  override fun carets(): List<VimCaret> {
+    return if (editor.inBlockSubMode) {
+      listOf(IjVimCaret(editor.caretModel.primaryCaret))
+    } else {
+      editor.caretModel.allCarets.map { IjVimCaret(it) }
+    }
   }
 
   override fun getText(left: Offset, right: Offset): CharSequence {
