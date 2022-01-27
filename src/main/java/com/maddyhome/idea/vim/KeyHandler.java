@@ -307,7 +307,7 @@ public class KeyHandler {
               shouldRecord &= VimPlugin.getChange().processKeyInSelectMode(editor.getEditor(), context, key);
             } else if (editorState.getMappingState().getMappingMode() == MappingMode.CMD_LINE) {
               LOG.trace("Process cmd line");
-              shouldRecord &= VimPlugin.getProcess().processExKey(editor.getEditor(), key);
+              shouldRecord &= VimPlugin.getProcess().processExKey(editor, key);
             }
             // If we get here then the user has entered an unrecognized series of keystrokes
             else {

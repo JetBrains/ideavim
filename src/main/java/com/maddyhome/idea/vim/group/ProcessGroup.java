@@ -41,6 +41,7 @@ import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.ex.InvalidCommandException;
 import com.maddyhome.idea.vim.helper.UiHelper;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
+import com.maddyhome.idea.vim.newapi.VimEditor;
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
 import com.maddyhome.idea.vim.vimscript.Executor;
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext;
@@ -90,7 +91,7 @@ public class ProcessGroup {
     panel.activate(editor, context, ":", initText, 1);
   }
 
-  public boolean processExKey(Editor editor, @NotNull KeyStroke stroke) {
+  public boolean processExKey(@NotNull VimEditor editor, @NotNull KeyStroke stroke) {
     // This will only get called if somehow the key focus ended up in the editor while the ex entry window
     // is open. So I'll put focus back in the editor and process the key.
 
@@ -103,7 +104,7 @@ public class ProcessGroup {
     }
     else {
       CommandState.getInstance(editor).popModes();
-      KeyHandler.getInstance().reset(new IjVimEditor(editor));
+      KeyHandler.getInstance().reset(editor);
       return false;
     }
   }
