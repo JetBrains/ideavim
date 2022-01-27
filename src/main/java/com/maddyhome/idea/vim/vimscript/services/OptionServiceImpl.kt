@@ -56,6 +56,7 @@ internal class OptionServiceImpl : OptionService {
     ToggleOption(OptionConstants.ideamarksName, OptionConstants.ideamarksAlias, true),
     ToggleOption(OptionConstants.ideastrictmodeName, OptionConstants.ideastrictmodeAlias, false),
     ToggleOption(OptionConstants.ideatracetimeName, OptionConstants.ideatracetimeAlias, false),
+    ToggleOption(OptionConstants.ideaglobalmodeName, OptionConstants.ideaglobalmodeAlias, false),
     ToggleOption(OptionConstants.ignorecaseName, OptionConstants.ignorecaseAlias, false),
     ToggleOption(OptionConstants.incsearchName, OptionConstants.incsearchAlias, false),
     ToggleOption(OptionConstants.moreName, OptionConstants.moreAlias, true),

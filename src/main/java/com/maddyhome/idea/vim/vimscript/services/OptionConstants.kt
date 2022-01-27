@@ -203,5 +203,8 @@ class OptionConstants {
 
     const val experimentalapiName = "experimentalapi"
     const val experimentalapiAlias = "experimentalapi"
+
+    const val ideaglobalmodeName = "ideaglobalmode"
+    const val ideaglobalmodeAlias = "ideaglobalmode"
   }
 }

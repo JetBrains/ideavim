@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.helper.DigraphResult
 import com.maddyhome.idea.vim.helper.DigraphSequence
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.VimNlsSafe
+import com.maddyhome.idea.vim.helper.localEditors
 import com.maddyhome.idea.vim.helper.noneOfEnum
 import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
 import com.maddyhome.idea.vim.helper.updateCaretsVisualPosition
@@ -40,7 +41,7 @@ import javax.swing.KeyStroke
 /**
  * Used to maintain state before and while entering a Vim command (operator, motion, text object, etc.)
  */
-class CommandState private constructor(private val editor: Editor) {
+class CommandState private constructor(private val editor: Editor?) {
   val commandBuilder = CommandBuilder(getKeyRootNode(MappingMode.NORMAL))
   private val modeStates = Stack<ModeState>()
   val mappingState = MappingState()
@@ -136,8 +137,15 @@ class CommandState private constructor(private val editor: Editor) {
   }
 
   private fun onModeChanged() {
-    editor.updateCaretsVisualAttributes()
-    editor.updateCaretsVisualPosition()
+    if (editor != null) {
+      editor.updateCaretsVisualAttributes()
+      editor.updateCaretsVisualPosition()
+    } else {
+      localEditors().forEach { editor ->
+        editor.updateCaretsVisualAttributes()
+        editor.updateCaretsVisualPosition()
+      }
+    }
     doShowMode()
   }
 
@@ -378,15 +386,20 @@ class CommandState private constructor(private val editor: Editor) {
   companion object {
     private val logger = Logger.getInstance(CommandState::class.java.name)
     private val defaultModeState = ModeState(Mode.COMMAND, SubMode.NONE)
+    private val globalState = CommandState(null)
 
     @JvmStatic
     fun getInstance(editor: Editor): CommandState {
-      var res = editor.vimCommandState
-      if (res == null) {
-        res = CommandState(editor)
-        editor.vimCommandState = res
+      return if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, OptionConstants.ideaglobalmodeName)) {
+        globalState
+      } else {
+        var res = editor.vimCommandState
+        if (res == null) {
+          res = CommandState(editor)
+          editor.vimCommandState = res
+        }
+        res
       }
-      return res
     }
 
     private fun getKeyRootNode(mappingMode: MappingMode): CommandPartNode<ActionBeanClass> {

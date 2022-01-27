@@ -31,9 +31,9 @@ import com.intellij.openapi.wm.impl.status.EditorBasedWidget
 import com.intellij.openapi.wm.impl.status.widget.StatusBarWidgetsManager
 import com.intellij.util.Consumer
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.VimNlsSafe
-import com.maddyhome.idea.vim.helper.vimCommandState
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.options.OptionChangeListener
 import com.maddyhome.idea.vim.vimscript.services.OptionConstants
@@ -69,7 +69,7 @@ object ShowCmd {
   fun getFullText(editor: Editor?): String {
     if (!VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, OptionConstants.showcmdName) || editor == null || editor.isDisposed) return ""
 
-    val editorState = editor.vimCommandState ?: return ""
+    val editorState = CommandState.getInstance(editor)
     return StringHelper.toPrintableCharacters(editorState.commandBuilder.keys + editorState.mappingState.keys)
   }
 }
