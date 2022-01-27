@@ -241,9 +241,6 @@ public class KeyHandler {
     }
 
     VimPlugin.clearError();
-    // All the editor actions should be performed with top level editor!!!
-    // Be careful: all the EditorActionHandler implementation should correctly process InjectedEditors
-    editor = new IjVimEditor(HelperKt.getTopLevelEditor(editor.getEditor()));
 
     final CommandState editorState = CommandState.getInstance(editor);
     final CommandBuilder commandBuilder = editorState.getCommandBuilder();

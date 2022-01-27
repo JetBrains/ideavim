@@ -27,6 +27,7 @@ import com.maddyhome.idea.vim.group.MarkGroup
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.fileSize
+import com.maddyhome.idea.vim.helper.getTopLevelEditor
 import com.maddyhome.idea.vim.helper.inlayAwareVisualColumn
 import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.vimscript.services.OptionConstants
@@ -284,7 +285,14 @@ enum class LineDeleteShift {
 val Editor.vim: IjVimEditor
   get() = IjVimEditor(this)
 
-class IjVimEditor(val editor: Editor) : MutableLinearEditor() {
+class IjVimEditor(editor: Editor) : MutableLinearEditor() {
+
+  // All the editor actions should be performed with top level editor!!!
+  // Be careful: all the EditorActionHandler implementation should correctly process InjectedEditors
+  // TBH, I don't like the names. Need to think a bit more about this
+  val editor = editor.getTopLevelEditor()
+  val originalEditor = editor
+
   override val lfMakesNewLine: Boolean = true
 
   override fun fileSize(): Long = editor.fileSize.toLong()
