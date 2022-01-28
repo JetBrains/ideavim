@@ -65,6 +65,7 @@ import com.maddyhome.idea.vim.listener.VimInsertListener;
 import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
 import com.maddyhome.idea.vim.newapi.ChangeGroupKt;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
+import com.maddyhome.idea.vim.newapi.VimEditor;
 import com.maddyhome.idea.vim.option.StrictMode;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
 import com.maddyhome.idea.vim.vimscript.services.OptionConstants;
@@ -353,7 +354,7 @@ public class ChangeGroup {
     if (register != null) {
       final List<KeyStroke> keys = register.getKeys();
       for (KeyStroke k : keys) {
-        processKey(editor, context, k);
+        processKey(new IjVimEditor(editor), context, k);
       }
       return true;
     }
@@ -897,7 +898,7 @@ public class ChangeGroup {
    * @param key     The user entered keystroke
    * @return true if this was a regular character, false if not
    */
-  public boolean processKey(final @NotNull Editor editor,
+  public boolean processKey(final @NotNull VimEditor editor,
                             final @NotNull DataContext context,
                             final @NotNull KeyStroke key) {
     if (logger.isDebugEnabled()) {
@@ -905,21 +906,13 @@ public class ChangeGroup {
     }
 
     if (key.getKeyChar() != KeyEvent.CHAR_UNDEFINED) {
-      final Document doc = editor.getDocument();
-      CommandProcessor.getInstance().executeCommand(editor.getProject(), () -> ApplicationManager.getApplication()
-                                                      .runWriteAction(() -> KeyHandler.getInstance().getOriginalHandler().execute(editor, key.getKeyChar(), context)),
-                                                    "", doc, UndoConfirmationPolicy.DEFAULT, doc);
-      MotionGroup.scrollCaretIntoView(editor);
+      type(editor, context, key.getKeyChar());
       return true;
     }
 
     // Shift-space
     if (key.getKeyCode() == 32 && ((key.getModifiers() & KeyEvent.SHIFT_DOWN_MASK) != 0)) {
-      final Document doc = editor.getDocument();
-      CommandProcessor.getInstance().executeCommand(editor.getProject(), () -> ApplicationManager.getApplication()
-                                                      .runWriteAction(() -> KeyHandler.getInstance().getOriginalHandler().execute(editor, ' ', context)),
-                                                    "", doc, UndoConfirmationPolicy.DEFAULT, doc);
-      MotionGroup.scrollCaretIntoView(editor);
+      type(editor, context, ' ');
       return true;
     }
 
@@ -927,18 +920,27 @@ public class ChangeGroup {
     return false;
   }
 
-  public boolean processKeyInSelectMode(final @NotNull Editor editor,
+  private void type(@NotNull VimEditor vimEditor, @NotNull DataContext context, char key) {
+    Editor editor = ((IjVimEditor)vimEditor).getEditor();
+    final Document doc = editor.getDocument();
+    CommandProcessor.getInstance().executeCommand(editor.getProject(), () -> ApplicationManager.getApplication()
+                                                    .runWriteAction(() -> KeyHandler.getInstance().getOriginalHandler().execute(editor, key, context)), "", doc,
+                                                  UndoConfirmationPolicy.DEFAULT, doc);
+    MotionGroup.scrollCaretIntoView(editor);
+  }
+
+  public boolean processKeyInSelectMode(final @NotNull IjVimEditor editor,
                                         final @NotNull DataContext context,
                                         final @NotNull KeyStroke key) {
     boolean res;
     try (VimListenerSuppressor.Locked ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
       res = processKey(editor, context, key);
 
-      ModeHelper.exitSelectMode(editor, false);
-      KeyHandler.getInstance().reset(new IjVimEditor(editor));
+      ModeHelper.exitSelectMode(editor.getEditor(), false);
+      KeyHandler.getInstance().reset(editor);
 
-      if (isPrintableChar(key.getKeyChar()) || activeTemplateWithLeftRightMotion(editor, key)) {
-        VimPlugin.getChange().insertBeforeCursor(editor, context);
+      if (isPrintableChar(key.getKeyChar()) || activeTemplateWithLeftRightMotion(editor.getEditor(), key)) {
+        VimPlugin.getChange().insertBeforeCursor(editor.getEditor(), context);
       }
     }
 

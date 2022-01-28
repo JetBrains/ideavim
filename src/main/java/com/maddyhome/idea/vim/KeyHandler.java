@@ -301,10 +301,10 @@ public class KeyHandler {
             // If we are in insert/replace mode send this key in for processing
             if (editorState.getMode() == CommandState.Mode.INSERT || editorState.getMode() == CommandState.Mode.REPLACE) {
               LOG.trace("Process insert or replace");
-              shouldRecord &= VimPlugin.getChange().processKey(editor.getEditor(), context, key);
+              shouldRecord &= VimPlugin.getChange().processKey(editor, context, key);
             } else if (editorState.getMode() == CommandState.Mode.SELECT) {
               LOG.trace("Process select");
-              shouldRecord &= VimPlugin.getChange().processKeyInSelectMode(editor.getEditor(), context, key);
+              shouldRecord &= VimPlugin.getChange().processKeyInSelectMode(editor, context, key);
             } else if (editorState.getMappingState().getMappingMode() == MappingMode.CMD_LINE) {
               LOG.trace("Process cmd line");
               shouldRecord &= VimPlugin.getProcess().processExKey(editor, key);
