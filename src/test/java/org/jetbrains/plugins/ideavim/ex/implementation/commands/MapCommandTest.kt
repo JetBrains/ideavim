@@ -24,8 +24,6 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.vimscript.Executor
-import com.maddyhome.idea.vim.vimscript.model.Script
-import com.maddyhome.idea.vim.vimscript.services.OptionService
 import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -764,7 +762,7 @@ n  ,f            <Plug>Foo
     assertPluginErrorMessageContains("E15: Invalid expression: ^f8a")
   }
 
-    @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
+  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
   fun `test map expr context`() {
     val text = """
           -----
@@ -776,10 +774,13 @@ n  ,f            <Plug>Foo
 
     val editor = TextComponentEditorImpl(null, JTextArea())
     val context = DataContext.EMPTY_CONTEXT
-    Executor.execute("""
+    Executor.execute(
+      """
       let s:mapping = '^f8a'
       nnoremap <expr> t s:mapping
-    """.trimIndent(), editor, context, skipHistory = false, indicateErrors = true, null)
+      """.trimIndent(),
+      editor, context, skipHistory = false, indicateErrors = true, null
+    )
     typeText(parseKeys("t"))
     assertPluginError(true)
     assertPluginErrorMessageContains("E121: Undefined variable: s:mapping")
