@@ -45,42 +45,42 @@ class GuiCursorOptionTest : VimTestCase() {
     assertEquals(6, values.size)
 
     assertEquals(enumSetOf(GuiCursorMode.NORMAL, GuiCursorMode.VISUAL, GuiCursorMode.CMD_LINE), values[0].modes)
-    assertEquals(GuiCursorType.BLOCK, values[0].attributes.type)
-    assertEquals("Cursor", values[0].attributes.highlightGroup)
-    assertEquals("lCursor", values[0].attributes.lmapHighlightGroup)
+    assertEquals(GuiCursorType.BLOCK, values[0].type)
+    assertEquals("Cursor", values[0].highlightGroup)
+    assertEquals("lCursor", values[0].lmapHighlightGroup)
 
     assertEquals(enumSetOf(GuiCursorMode.VISUAL_EXCLUSIVE), values[1].modes)
-    assertEquals(GuiCursorType.VER, values[1].attributes.type)
-    assertEquals(35, values[1].attributes.thickness)
-    assertEquals("Cursor", values[1].attributes.highlightGroup)
-    assertEquals("", values[1].attributes.lmapHighlightGroup)
+    assertEquals(GuiCursorType.VER, values[1].type)
+    assertEquals(35, values[1].thickness)
+    assertEquals("Cursor", values[1].highlightGroup)
+    assertEquals("", values[1].lmapHighlightGroup)
 
     assertEquals(enumSetOf(GuiCursorMode.OP_PENDING), values[2].modes)
-    assertEquals(GuiCursorType.HOR, values[2].attributes.type)
-    assertEquals(50, values[2].attributes.thickness)
-    assertEquals("Cursor", values[2].attributes.highlightGroup)
-    assertEquals("", values[2].attributes.lmapHighlightGroup)
+    assertEquals(GuiCursorType.HOR, values[2].type)
+    assertEquals(50, values[2].thickness)
+    assertEquals("Cursor", values[2].highlightGroup)
+    assertEquals("", values[2].lmapHighlightGroup)
 
     assertEquals(enumSetOf(GuiCursorMode.INSERT, GuiCursorMode.CMD_LINE_INSERT), values[3].modes)
-    assertEquals(GuiCursorType.VER, values[3].attributes.type)
-    assertEquals(25, values[3].attributes.thickness)
-    assertEquals("Cursor", values[3].attributes.highlightGroup)
-    assertEquals("lCursor", values[3].attributes.lmapHighlightGroup)
+    assertEquals(GuiCursorType.VER, values[3].type)
+    assertEquals(25, values[3].thickness)
+    assertEquals("Cursor", values[3].highlightGroup)
+    assertEquals("lCursor", values[3].lmapHighlightGroup)
 
     assertEquals(enumSetOf(GuiCursorMode.REPLACE, GuiCursorMode.CMD_LINE_REPLACE), values[4].modes)
-    assertEquals(GuiCursorType.HOR, values[4].attributes.type)
-    assertEquals(20, values[4].attributes.thickness)
-    assertEquals("Cursor", values[4].attributes.highlightGroup)
-    assertEquals("lCursor", values[4].attributes.lmapHighlightGroup)
+    assertEquals(GuiCursorType.HOR, values[4].type)
+    assertEquals(20, values[4].thickness)
+    assertEquals("Cursor", values[4].highlightGroup)
+    assertEquals("lCursor", values[4].lmapHighlightGroup)
 
     assertEquals(enumSetOf(GuiCursorMode.SHOW_MATCH), values[5].modes)
-    assertEquals(GuiCursorType.BLOCK, values[5].attributes.type)
-    assertEquals("Cursor", values[5].attributes.highlightGroup)
-    assertEquals("", values[5].attributes.lmapHighlightGroup)
-    assertEquals(3, values[5].attributes.blinkModes.size)
-    assertEquals("blinkwait175", values[5].attributes.blinkModes[0])
-    assertEquals("blinkoff150", values[5].attributes.blinkModes[1])
-    assertEquals("blinkon175", values[5].attributes.blinkModes[2])
+    assertEquals(GuiCursorType.BLOCK, values[5].type)
+    assertEquals("Cursor", values[5].highlightGroup)
+    assertEquals("", values[5].lmapHighlightGroup)
+    assertEquals(3, values[5].blinkModes.size)
+    assertEquals("blinkwait175", values[5].blinkModes[0])
+    assertEquals("blinkoff150", values[5].blinkModes[1])
+    assertEquals("blinkon175", values[5].blinkModes[2])
   }
 
   fun `test ignores set with missing colon`() {
@@ -118,15 +118,16 @@ class GuiCursorOptionTest : VimTestCase() {
     assertTrue(VimPlugin.getOptionService().isDefault(OptionService.Scope.GLOBAL, OptionConstants.guicursorName))
   }
 
-  fun `test simple string means block caret and highlight group`() {
+  fun `test simple string means default caret and highlight group`() {
     VimPlugin.getOptionService().resetDefault(OptionService.Scope.GLOBAL, OptionConstants.guicursorName)
     setValue("n:MyHighlightGroup")
     val values = getOptionValue().split(",").map { GuiCursorOptionHelper.convertToken(it) }
     assertEquals(1, values.size)
     assertEquals(enumSetOf(GuiCursorMode.NORMAL), values[0].modes)
-    assertEquals(GuiCursorType.BLOCK, values[0].attributes.type)
-    assertEquals("MyHighlightGroup", values[0].attributes.highlightGroup)
-    assertEquals("", values[0].attributes.lmapHighlightGroup)
+    // null from convertToken and we'll give it a default value in getAttributes
+    assertEquals(null, values[0].type)
+    assertEquals("MyHighlightGroup", values[0].highlightGroup)
+    assertEquals("", values[0].lmapHighlightGroup)
   }
 
   fun `test get effective values`() {

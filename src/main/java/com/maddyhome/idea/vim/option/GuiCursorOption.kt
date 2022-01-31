@@ -88,7 +88,7 @@ class GuiCursorOption(name: String, abbrev: String, defaultValue: String) :
       }
     }
 
-    return GuiCursorEntry(token, modes, GuiCursorAttributes(type, thickness, highlightGroup, lmapHighlightGroup, blinkModes))
+    return GuiCursorEntry(token, modes, type, thickness, highlightGroup, lmapHighlightGroup, blinkModes)
   }
 
   override fun onChanged(oldValue: String?, newValue: String?) {
@@ -103,18 +103,22 @@ class GuiCursorOption(name: String, abbrev: String, defaultValue: String) :
       var highlightGroup = ""
       var lmapHighlightGroup = ""
       var blinkModes = emptyList<String>()
-      values().forEach { state ->
-        if (state.modes.contains(mode) || state.modes.contains(GuiCursorMode.ALL)) {
-          type = state.attributes.type
-          thickness = state.attributes.thickness
-          if (state.attributes.highlightGroup.isNotEmpty()) {
-            highlightGroup = state.attributes.highlightGroup
+      values().forEach { data ->
+        if (data.modes.contains(mode) || data.modes.contains(GuiCursorMode.ALL)) {
+          if (data.type != null) {
+            type = data.type
           }
-          if (state.attributes.lmapHighlightGroup.isNotEmpty()) {
-            lmapHighlightGroup = state.attributes.lmapHighlightGroup
+          if (data.thickness != null) {
+            thickness = data.thickness
           }
-          if (state.attributes.blinkModes.isNotEmpty()) {
-            blinkModes = state.attributes.blinkModes
+          if (data.highlightGroup.isNotEmpty()) {
+            highlightGroup = data.highlightGroup
+          }
+          if (data.lmapHighlightGroup.isNotEmpty()) {
+            lmapHighlightGroup = data.lmapHighlightGroup
+          }
+          if (data.blinkModes.isNotEmpty()) {
+            blinkModes = data.blinkModes
           }
         }
       }
