@@ -217,9 +217,26 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
+  fun `test block used when caret shape is unspecified`() {
+    configureByText("I found it in a legendary land")
+    enterCommand("set guicursor=c:ver25")
+    assertCaretVisualAttributes("BLOCK", 0.0F)
+    typeText(parseKeys("i"))
+    assertCaretVisualAttributes("BLOCK", 0.0F)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   fun `test 'all' guicursor option`() {
     configureByText("I found it in a legendary land")
     enterCommand("set guicursor+=a:ver25")
+    assertCaretVisualAttributes("BAR", 0.25F)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
+  fun `test 'all' guicursor option without cursor shape does not affect existing shapes`() {
+    configureByText("I found it in a legendary land")
+    enterCommand("set guicursor+=a:blinkwait200-blinkoff125-blinkon150-Cursor/lCursor")
+    typeText(parseKeys("i"))
     assertCaretVisualAttributes("BAR", 0.25F)
   }
 
