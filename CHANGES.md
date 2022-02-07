@@ -27,6 +27,7 @@ usual beta standards.
 
 ### Features:
 * Add register support to let command | [VIM-749](https://youtrack.jetbrains.com/issue/VIM-749), [VIM-1783](https://youtrack.jetbrains.com/issue/VIM-1783)
+* Add tabmove command | [VIM-1164](https://youtrack.jetbrains.com/issue/VIM-1164)
 
 ### Fixes:
 * [VIM-2502](https://youtrack.jetbrains.com/issue/VIM-2502) Fix the shape of new carets

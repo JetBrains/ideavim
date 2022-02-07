@@ -94,6 +94,7 @@ import com.maddyhome.idea.vim.vimscript.model.commands.SplitType
 import com.maddyhome.idea.vim.vimscript.model.commands.SubstituteCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.TabCloseCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.TabOnlyCommand
+import com.maddyhome.idea.vim.vimscript.model.commands.TabMoveCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.UndoCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.UnknownCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.UnlockVarCommand
@@ -646,6 +647,10 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
     "tabclo" to TabCloseCommand::class,
     "tabclos" to TabCloseCommand::class,
     "tabclose" to TabCloseCommand::class,
+    "tabm" to TabMoveCommand::class,
+    "tabmo" to TabMoveCommand::class,
+    "tabmov" to TabMoveCommand::class,
+    "tabmove" to TabMoveCommand::class,
     "tabo" to TabOnlyCommand::class,
     "tabon" to TabOnlyCommand::class,
     "tabonl" to TabOnlyCommand::class,
