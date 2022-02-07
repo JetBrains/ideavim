@@ -54,7 +54,12 @@ public class DigraphResult {
   }
 
   public static DigraphResult done(@Nullable KeyStroke stroke) {
-    return new DigraphResult(stroke);
+    // for some reason vim does not let to insert char 10 as a digraph, it inserts 10 instead
+    if (stroke == null || stroke.getKeyCode() != 10) {
+      return new DigraphResult(stroke);
+    } else {
+      return new DigraphResult(KeyStroke.getKeyStroke((char) 0));
+    }
   }
 
   public static DigraphResult handled(char promptCharacter) {

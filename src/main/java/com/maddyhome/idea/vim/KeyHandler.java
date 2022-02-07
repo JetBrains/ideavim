@@ -718,12 +718,12 @@ public class KeyHandler {
     final CommandBuilder commandBuilder = editorState.getCommandBuilder();
     if (commandBuilder.getExpectedArgumentType() == Argument.Type.DIGRAPH) {
       LOG.trace("Expected argument is digraph");
-      if (DigraphSequence.isDigraphStart(key)) {
+      if (editorState.getDigraphSequence().isDigraphStart(key)) {
         editorState.startDigraphSequence();
         editorState.getCommandBuilder().addKey(key);
         return true;
       }
-      if (DigraphSequence.isLiteralStart(key)) {
+      if (editorState.getDigraphSequence().isLiteralStart(key)) {
         editorState.startLiteralSequence();
         editorState.getCommandBuilder().addKey(key);
         return true;

@@ -47,7 +47,7 @@ class CommandState private constructor(private val editor: Editor?) {
   val commandBuilder = CommandBuilder(getKeyRootNode(MappingMode.NORMAL))
   private val modeStates = Stack<ModeState>()
   val mappingState = MappingState()
-  private val digraphSequence = DigraphSequence()
+  val digraphSequence = DigraphSequence()
   var isRecording = false
     set(value) {
       field = value

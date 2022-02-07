@@ -22,6 +22,8 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.command.Argument;
+import com.maddyhome.idea.vim.command.CommandBuilder;
 import com.maddyhome.idea.vim.vimscript.services.OptionConstants;
 import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import org.jetbrains.annotations.NotNull;
@@ -47,13 +49,18 @@ public class DigraphSequence {
   public DigraphSequence() {
   }
 
-  public static boolean isDigraphStart(@NotNull KeyStroke key) {
-    return key.getKeyCode() == KeyEvent.VK_K && (key.getModifiers() & KeyEvent.CTRL_DOWN_MASK) != 0;
+  public boolean isDigraphStart(@NotNull KeyStroke key) {
+    return
+      digraphState == DIG_STATE_PENDING && // if state has changed, then it's not a start
+      key.getKeyCode() == KeyEvent.VK_K &&
+      (key.getModifiers() & KeyEvent.CTRL_DOWN_MASK) != 0;
   }
 
-  public static boolean isLiteralStart(@NotNull KeyStroke key) {
-    return (key.getKeyCode() == KeyEvent.VK_V || key.getKeyCode() == KeyEvent.VK_Q) &&
-           (key.getModifiers() & KeyEvent.CTRL_DOWN_MASK) != 0;
+  public boolean isLiteralStart(@NotNull KeyStroke key) {
+    return
+      digraphState == DIG_STATE_PENDING && // if state has changed, then it's not a start
+      (key.getKeyCode() == KeyEvent.VK_V || key.getKeyCode() == KeyEvent.VK_Q) &&
+      (key.getModifiers() & KeyEvent.CTRL_DOWN_MASK) != 0;
   }
 
   public DigraphResult startDigraphSequence() {
@@ -168,6 +175,11 @@ public class DigraphSequence {
 
               return DigraphResult.done(code);
             }
+            KeyStroke ks = specialKeyToKeyCode(key);
+            if (ks != null) {
+              return DigraphResult.done(ks);
+            }
+
             logger.debug("unknown");
             digraphState = DIG_STATE_PENDING;
 
@@ -225,12 +237,46 @@ public class DigraphSequence {
           }
 
           return DigraphResult.done(code);
+        } else if (codeCnt == 0) {
+          digraphState = DIG_STATE_PENDING;
+          if (specialKeyToKeyCode(key) != null) {
+            return DigraphResult.done(specialKeyToKeyCode(key));
+          } else {
+            return DigraphResult.done(key);
+          }
         }
         return DigraphResult.BAD;
 
       default:
         return DigraphResult.BAD;
     }
+  }
+
+  private KeyStroke specialKeyToKeyCode(@NotNull KeyStroke key) {
+    if ((key.getModifiers() & KeyEvent.CTRL_DOWN_MASK) != 0) {
+      String specialKeyCode = StringHelper.parseVimString("\\" + StringHelper.toKeyNotation(key));
+      if (specialKeyCode.length() == 1) {
+        if (specialKeyCode.charAt(0) == 10) {
+          return KeyStroke.getKeyStroke((char) 0);
+        } else {
+          return KeyStroke.getKeyStroke(specialKeyCode.charAt(0));
+        }
+      } else {
+        logger.error("Digraph char was recognized as multiple chars");
+      }
+    } else {
+      switch (key.getKeyCode()) {
+        // enter
+        case 10:
+          return KeyStroke.getKeyStroke((char) 13);
+        // escape
+        case 27:
+          return KeyStroke.getKeyStroke((char) 27);
+        default:
+          return null;
+      }
+    }
+    return null;
   }
 
   public void reset() {
