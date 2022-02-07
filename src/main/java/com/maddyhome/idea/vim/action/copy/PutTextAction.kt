@@ -43,7 +43,7 @@ sealed class PutTextBaseAction(
   ): Boolean {
     val lastRegister = VimPlugin.getRegister().lastRegister
     val textData = if (lastRegister != null) TextData(
-      lastRegister.text ?: StringHelper.toKeyNotation(lastRegister.keys),
+      lastRegister.text ?: StringHelper.toKeyCodedString(lastRegister.keys),
       lastRegister.type,
       lastRegister.transferableData
     ) else null

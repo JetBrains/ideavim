@@ -18,9 +18,10 @@
 
 package com.maddyhome.idea.vim.helper;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.openapi.vcs.changes.ignore.psi.impl.IgnoreNegationImpl;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.group.RegisterGroup;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
 import org.apache.commons.codec.binary.Base64;
 import org.jdom.Element;
@@ -31,7 +32,6 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static java.awt.event.KeyEvent.*;
@@ -48,6 +48,8 @@ public class StringHelper {
    */
   private static final int VK_PLUG = KeyEvent.CHAR_UNDEFINED - 1;
   public static final int VK_ACTION = KeyEvent.CHAR_UNDEFINED - 2;
+
+  private static final Logger logger = Logger.getInstance(RegisterGroup.class);
 
   private StringHelper() {}
 
@@ -411,6 +413,34 @@ public class StringHelper {
 
   private static boolean isControlKeyCode(@NotNull KeyStroke key) {
     return key.getKeyChar() == CHAR_UNDEFINED && key.getKeyCode() < 0x20 && key.getModifiers() == 0;
+  }
+
+  public static @NotNull String toKeyCodedString(@NotNull List<KeyStroke> keys) {
+    final StringBuilder builder = new StringBuilder();
+    for (KeyStroke key : keys) {
+      Character keyAsChar = keyStrokeToChar(key);
+      if (keyAsChar != null) {
+        builder.append(keyAsChar);
+      } else {
+        logger.error("Unknown key " + key);
+      }
+    }
+    return builder.toString();
+  }
+
+  private static Character keyStrokeToChar(@NotNull KeyStroke key) {
+    if (key.getKeyChar() != CHAR_UNDEFINED) {
+      return key.getKeyChar();
+    } else if ((key.getModifiers() & CTRL_DOWN_MASK) == CTRL_DOWN_MASK) {
+      if (key.getKeyCode() == 'J') {
+        // 'J' is a special case, keycode 10 is \n char
+        return (char)0;
+      }
+      else {
+        return (char)(key.getKeyCode() - 'A' + 1);
+      }
+    }
+    return (char) key.getKeyCode();
   }
 
   public static @NotNull String toKeyNotation(@NotNull List<KeyStroke> keys) {
