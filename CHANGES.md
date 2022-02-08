@@ -45,6 +45,7 @@ usual beta standards.
 * [448](https://github.com/JetBrains/ideavim/pull/448) by [Michael Schertenleib](https://github.com/cravay): Support custom element names in vim-surround
 * [435](https://github.com/JetBrains/ideavim/pull/435) by [Piotr Mikulski](https://github.com/pmnoxx): Print stderr when running a command just like vim does
 * [449](https://github.com/JetBrains/ideavim/pull/449) by [Lonre Wang](https://github.com/lonre): Typo fix
+* [453](https://github.com/JetBrains/ideavim/pull/453) by [Matt Ellis](https://github.com/citizenmatt): fix(VIM-2470): Fix incorrect reset of cursor shape
 
 ## 1.9.0, 2021-12-10
 
