@@ -32,7 +32,6 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorModificationUtil;
 import com.intellij.openapi.editor.actionSystem.ActionPlan;
 import com.intellij.openapi.editor.actionSystem.DocCommandGroupId;
-import com.intellij.openapi.editor.actionSystem.TypedActionHandler;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.ui.popup.ListPopup;
@@ -98,24 +97,6 @@ public class KeyHandler {
    * Creates an instance
    */
   private KeyHandler() {
-  }
-
-  /**
-   * Sets the original key handler
-   *
-   * @param origHandler The original key handler
-   */
-  public void setOriginalHandler(TypedActionHandler origHandler) {
-    this.origHandler = origHandler;
-  }
-
-  /**
-   * Gets the original key handler
-   *
-   * @return The original key handler
-   */
-  public TypedActionHandler getOriginalHandler() {
-    return origHandler;
   }
 
   public static void executeVimAction(@NotNull Editor editor,
@@ -881,7 +862,7 @@ public class KeyHandler {
          operator, which would be invoked first (e.g. 'd' in "d/foo").
       */
       LOG.trace("Processing ex_string");
-      String text = VimPlugin.getProcess().endSearchCommand(editor.getEditor());
+      String text = VimPlugin.getProcess().endSearchCommand();
       commandBuilder.popCommandPart();  // Pop ProcessExEntryAction
       commandBuilder.completeCommandPart(new Argument(text)); // Set search text on SearchEntry(Fwd|Rev)Action
       editorState.popModes(); // Pop CMD_LINE
@@ -1100,7 +1081,6 @@ public class KeyHandler {
     private final OperatorArguments operatorArguments;
   }
 
-  private TypedActionHandler origHandler;
   private int handleKeyRecursionCount = 0;
 
   private static KeyHandler instance;

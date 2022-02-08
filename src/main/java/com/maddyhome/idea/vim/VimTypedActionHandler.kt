@@ -26,6 +26,7 @@ import com.intellij.openapi.editor.actionSystem.TypedActionHandlerEx
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.maddyhome.idea.vim.helper.EditorDataContext
 import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
+import com.maddyhome.idea.vim.key.KeyHandlerKeeper
 import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import java.awt.event.KeyAdapter
@@ -37,19 +38,19 @@ import javax.swing.KeyStroke
  *
  * IDE shortcut keys used by Vim commands are handled by [com.maddyhome.idea.vim.action.VimShortcutKeyAction].
  */
-class VimTypedActionHandler(origHandler: TypedActionHandler?) : TypedActionHandlerEx {
+class VimTypedActionHandler(origHandler: TypedActionHandler) : TypedActionHandlerEx {
   private val handler = KeyHandler.getInstance()
   private val traceTime = VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, OptionConstants.ideatracetimeName)
 
   init {
-    handler.originalHandler = origHandler
+    KeyHandlerKeeper.getInstance().originalHandler = origHandler
   }
 
   override fun beforeExecute(editor: Editor, charTyped: Char, context: DataContext, plan: ActionPlan) {
     LOG.trace("Before execute for typed action")
     if (editor.isIdeaVimDisabledHere) {
       LOG.trace("IdeaVim disabled here, finish")
-      (handler.originalHandler as? TypedActionHandlerEx)?.beforeExecute(editor, charTyped, context, plan)
+      (KeyHandlerKeeper.getInstance().originalHandler as? TypedActionHandlerEx)?.beforeExecute(editor, charTyped, context, plan)
       return
     }
 
@@ -63,7 +64,7 @@ class VimTypedActionHandler(origHandler: TypedActionHandler?) : TypedActionHandl
     LOG.trace("Execute for typed action")
     if (editor.isIdeaVimDisabledHere) {
       LOG.trace("IdeaVim disabled here, finish")
-      handler.originalHandler.execute(editor, charTyped, context)
+      KeyHandlerKeeper.getInstance().originalHandler.execute(editor, charTyped, context)
       return
     }
 

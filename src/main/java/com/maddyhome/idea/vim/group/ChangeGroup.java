@@ -60,6 +60,7 @@ import com.maddyhome.idea.vim.group.visual.VisualModeHelperKt;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.handler.Motion;
 import com.maddyhome.idea.vim.helper.*;
+import com.maddyhome.idea.vim.key.KeyHandlerKeeper;
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor;
 import com.maddyhome.idea.vim.listener.VimInsertListener;
 import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
@@ -822,7 +823,7 @@ public class ChangeGroup {
                                final @NotNull KeyStroke key,
                                @NotNull ActionPlan plan) {
 
-    final TypedActionHandler originalHandler = KeyHandler.getInstance().getOriginalHandler();
+    final TypedActionHandler originalHandler = KeyHandlerKeeper.getInstance().getOriginalHandler();
 
     if (originalHandler instanceof TypedActionHandlerEx) {
       ((TypedActionHandlerEx)originalHandler).beforeExecute(editor, key.getKeyChar(), context, plan);
@@ -924,7 +925,7 @@ public class ChangeGroup {
     Editor editor = ((IjVimEditor)vimEditor).getEditor();
     final Document doc = editor.getDocument();
     CommandProcessor.getInstance().executeCommand(editor.getProject(), () -> ApplicationManager.getApplication()
-                                                    .runWriteAction(() -> KeyHandler.getInstance().getOriginalHandler().execute(editor, key, context)), "", doc,
+                                                    .runWriteAction(() -> KeyHandlerKeeper.getInstance().getOriginalHandler().execute(editor, key, context)), "", doc,
                                                   UndoConfirmationPolicy.DEFAULT, doc);
     MotionGroup.scrollCaretIntoView(editor);
   }
@@ -936,7 +937,7 @@ public class ChangeGroup {
     try (VimListenerSuppressor.Locked ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
       res = processKey(editor, context, key);
 
-      ModeHelper.exitSelectMode(editor.getEditor(), false);
+      ModeHelper.exitSelectMode(editor, false);
       KeyHandler.getInstance().reset(editor);
 
       if (isPrintableChar(key.getKeyChar()) || activeTemplateWithLeftRightMotion(editor.getEditor(), key)) {

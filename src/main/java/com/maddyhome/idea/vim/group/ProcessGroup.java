@@ -74,7 +74,7 @@ public class ProcessGroup {
     panel.activate(editor, context, label, initText, count);
   }
 
-  public @NotNull String endSearchCommand(final @NotNull Editor editor) {
+  public @NotNull String endSearchCommand() {
     ExEntryPanel panel = ExEntryPanel.getInstance();
     panel.deactivate(true);
 

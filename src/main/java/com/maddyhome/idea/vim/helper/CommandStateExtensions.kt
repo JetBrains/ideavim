@@ -23,6 +23,7 @@ package com.maddyhome.idea.vim.helper
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.newapi.VimEditor
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
@@ -74,6 +75,9 @@ val CommandState.Mode.hasVisualSelection
 val Editor.mode
   get() = this.commandState.mode
 
+val VimEditor.mode
+  get() = this.commandState.mode
+
 var Editor.subMode
   get() = this.commandState.subMode
   set(value) {
@@ -108,6 +112,9 @@ val CommandState.Mode.inVisualMode
 val Editor.inSelectMode
   get() = this.mode == CommandState.Mode.SELECT || this.mode == CommandState.Mode.INSERT_SELECT
 
+val VimEditor.inSelectMode
+  get() = this.mode == CommandState.Mode.SELECT || this.mode == CommandState.Mode.INSERT_SELECT
+
 @get:JvmName("inBlockSubMode")
 val Editor.inBlockSubMode
   get() = this.subMode == CommandState.SubMode.VISUAL_BLOCK
@@ -132,6 +139,9 @@ val CommandState.Mode.inSingleNormalMode: Boolean
 
 @get:JvmName("commandState")
 val Editor.commandState
+  get() = CommandState.getInstance(this)
+
+val VimEditor.commandState
   get() = CommandState.getInstance(this)
 
 fun CommandState.pushVisualMode(subMode: CommandState.SubMode, prevMode: CommandState.Mode = this.mode) {

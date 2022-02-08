@@ -116,6 +116,9 @@ import kotlin.math.min
  *
  * We use two types of line reference: Offset and pointer. Offset referrers to a between-lines position.
  *   Pointer referrers to the concrete line.
+ *
+ * TODO We should check if we can keep the same VimEditor instance between edits.
+ *   For example, can we store local options right in the editor implementation?
  */
 interface VimEditor {
 
