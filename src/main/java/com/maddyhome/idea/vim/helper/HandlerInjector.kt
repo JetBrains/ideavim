@@ -24,6 +24,10 @@ import com.maddyhome.idea.vim.VimTypedActionHandler
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
 
+/**
+ * It's needed to wait till JupyterCommandModeTypingBlocker is going to be registered using an extension point
+ * After that, we would be able to register our typingHandler before (or after) the one from jupyter.
+ */
 class HandlerInjector {
   companion object {
     @JvmStatic
