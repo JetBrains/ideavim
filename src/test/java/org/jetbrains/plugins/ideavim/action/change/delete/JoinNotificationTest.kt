@@ -20,6 +20,7 @@
 
 package org.jetbrains.plugins.ideavim.action.change.delete
 
+import com.intellij.notification.ActionCenter
 import com.intellij.notification.EventLog
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.group.NotificationService
@@ -41,10 +42,14 @@ class JoinNotificationTest : VimOptionTestCase(OptionConstants.ideajoinName) {
     appReadySetup(false)
     typeText(StringHelper.parseKeys("J"))
 
-    val notification = EventLog.getLogModel(myFixture.project).notifications.last()
-    assertEquals(NotificationService.IDEAVIM_NOTIFICATION_TITLE, notification.title)
-    assertTrue(OptionConstants.ideajoinName in notification.content)
-    assertEquals(3, notification.actions.size)
+    val notification = ActionCenter.getNotifications(myFixture.project, true).last()
+    try {
+      assertEquals(NotificationService.IDEAVIM_NOTIFICATION_TITLE, notification.title)
+      assertTrue(OptionConstants.ideajoinName in notification.content)
+      assertEquals(3, notification.actions.size)
+    } finally {
+      notification.expire()
+    }
   }
 
   @VimOptionTestConfiguration(VimTestOption(OptionConstants.ideajoinName, OptionValueType.NUMBER, "1"))
@@ -54,7 +59,7 @@ class JoinNotificationTest : VimOptionTestCase(OptionConstants.ideajoinName) {
     appReadySetup(false)
     typeText(StringHelper.parseKeys("J"))
 
-    val notifications = EventLog.getLogModel(myFixture.project).notifications
+    val notifications = ActionCenter.getNotifications(myFixture.project, true)
     assertTrue(notifications.isEmpty() || notifications.last().isExpired || OptionConstants.ideajoinName !in notifications.last().content)
   }
 
