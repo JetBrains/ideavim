@@ -528,7 +528,7 @@ public class ChangeGroup {
             strokes.add(lastStroke);
           }
           else if (lastStroke instanceof EditorActionHandlerBase) {
-            KeyHandler.executeVimAction(editor, (EditorActionHandlerBase)lastStroke, context, operatorArguments);
+            VimActionExecutor.executeVimAction(editor, (EditorActionHandlerBase)lastStroke, context, operatorArguments);
             strokes.add(lastStroke);
           }
           else if (lastStroke instanceof char[]) {

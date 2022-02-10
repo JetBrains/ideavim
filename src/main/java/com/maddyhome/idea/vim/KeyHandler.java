@@ -18,19 +18,16 @@
 
 package com.maddyhome.idea.vim;
 
-import com.intellij.ide.DataManager;
 import com.intellij.ide.IdeEventQueue;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.command.CommandProcessor;
-import com.intellij.openapi.command.UndoConfirmationPolicy;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorModificationUtil;
 import com.intellij.openapi.editor.actionSystem.ActionPlan;
-import com.intellij.openapi.editor.actionSystem.DocCommandGroupId;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Ref;
 import com.maddyhome.idea.vim.action.change.VimRepeater;
@@ -54,7 +51,6 @@ import com.maddyhome.idea.vim.vimscript.services.OptionConstants;
 import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import kotlin.NotImplementedError;
 import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -62,12 +58,7 @@ import javax.swing.*;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import static com.intellij.openapi.actionSystem.CommonDataKeys.*;
-import static com.intellij.openapi.actionSystem.PlatformDataKeys.PROJECT_FILE_DIRECTORY;
 
 /**
  * This handles every keystroke that the user can argType except those that are still valid hotkeys for various Idea
@@ -93,16 +84,6 @@ public class KeyHandler {
    * Creates an instance
    */
   private KeyHandler() {
-  }
-
-  public static void executeVimAction(@NotNull Editor editor,
-                                      @NotNull EditorActionHandlerBase cmd,
-                                      DataContext context,
-                                      @NotNull OperatorArguments operatorArguments) {
-    CommandProcessor.getInstance()
-      .executeCommand(editor.getProject(), () -> cmd.execute(editor, getProjectAwareDataContext(editor, context), operatorArguments),
-                      cmd.getId(), DocCommandGroupId.noneGroupId(editor.getDocument()), UndoConfirmationPolicy.DEFAULT,
-                      editor.getDocument());
   }
 
   /**
@@ -920,54 +901,10 @@ public class KeyHandler {
     editor.getEditor().getSelectionModel().removeSelection();
   }
 
-  // This method is copied from com.intellij.openapi.editor.actionSystem.EditorAction.getProjectAwareDataContext
-  private static @NotNull DataContext getProjectAwareDataContext(final @NotNull Editor editor,
-                                                                 final @NotNull DataContext original) {
-    if (PROJECT.getData(original) == editor.getProject()) {
-      return new DialogAwareDataContext(original);
-    }
-
-    return dataId -> {
-      if (PROJECT.is(dataId)) {
-        final Project project = editor.getProject();
-        if (project != null) {
-          return project;
-        }
-      }
-      return original.getData(dataId);
-    };
-
-  }
-
   private void setPromptCharacterEx(final char promptCharacter) {
     final ExEntryPanel exEntryPanel = ExEntryPanel.getInstance();
     if (exEntryPanel.isActive()) {
         exEntryPanel.getEntry().setCurrentActionPromptCharacter(promptCharacter);
-    }
-  }
-
-  // This class is copied from com.intellij.openapi.editor.actionSystem.DialogAwareDataContext.DialogAwareDataContext
-  private static final class DialogAwareDataContext implements DataContext {
-    @SuppressWarnings("rawtypes")
-    private static final DataKey[] keys = {PROJECT, PROJECT_FILE_DIRECTORY, EDITOR, VIRTUAL_FILE, PSI_FILE};
-    private final Map<String, Object> values = new HashMap<>();
-
-    DialogAwareDataContext(DataContext context) {
-      for (DataKey<?> key : keys) {
-        values.put(key.getName(), key.getData(context));
-      }
-    }
-
-    @Override
-    public @Nullable Object getData(@NotNull @NonNls String dataId) {
-      if (values.containsKey(dataId)) {
-        return values.get(dataId);
-      }
-      final Editor editor = (Editor)values.get(EDITOR.getName());
-      if (editor != null) {
-        return DataManager.getInstance().getDataContext(editor.getContentComponent()).getData(dataId);
-      }
-      return null;
     }
   }
 
@@ -994,7 +931,7 @@ public class KeyHandler {
         VimPlugin.getRegister().selectRegister(register);
       }
 
-      executeVimAction(editor.getEditor(), cmd.getAction(), context, operatorArguments);
+      VimActionExecutor.executeVimAction(editor.getEditor(), cmd.getAction(), context, operatorArguments);
       if (editorState.getMode() == CommandState.Mode.INSERT || editorState.getMode() == CommandState.Mode.REPLACE) {
         VimPlugin.getChange().processCommand(editor.getEditor(), cmd);
       }
