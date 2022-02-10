@@ -706,7 +706,7 @@ abstract class VimTestCase : UsefulTestCase() {
           val inputModel = TestInputModel.getInstance(editor)
           var key = inputModel.nextKeyStroke()
           while (key != null) {
-            keyHandler.handleKey(editor, key, dataContext)
+            keyHandler.handleKey(editor, key, dataContext.vim)
             key = inputModel.nextKeyStroke()
           }
         },

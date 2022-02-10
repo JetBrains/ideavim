@@ -64,9 +64,7 @@ import com.maddyhome.idea.vim.key.KeyHandlerKeeper;
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor;
 import com.maddyhome.idea.vim.listener.VimInsertListener;
 import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
-import com.maddyhome.idea.vim.newapi.ChangeGroupKt;
-import com.maddyhome.idea.vim.newapi.IjVimEditor;
-import com.maddyhome.idea.vim.newapi.VimEditor;
+import com.maddyhome.idea.vim.newapi.*;
 import com.maddyhome.idea.vim.option.StrictMode;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
 import com.maddyhome.idea.vim.vimscript.services.OptionConstants;
@@ -355,7 +353,7 @@ public class ChangeGroup {
     if (register != null) {
       final List<KeyStroke> keys = register.getKeys();
       for (KeyStroke k : keys) {
-        processKey(new IjVimEditor(editor), context, k);
+        processKey(new IjVimEditor(editor), new IjExecutionContext(context), k);
       }
       return true;
     }
@@ -900,7 +898,7 @@ public class ChangeGroup {
    * @return true if this was a regular character, false if not
    */
   public boolean processKey(final @NotNull VimEditor editor,
-                            final @NotNull DataContext context,
+                            final @NotNull ExecutionContext context,
                             final @NotNull KeyStroke key) {
     if (logger.isDebugEnabled()) {
       logger.debug("processKey(" + key + ")");
@@ -921,17 +919,18 @@ public class ChangeGroup {
     return false;
   }
 
-  private void type(@NotNull VimEditor vimEditor, @NotNull DataContext context, char key) {
+  private void type(@NotNull VimEditor vimEditor, @NotNull ExecutionContext context, char key) {
     Editor editor = ((IjVimEditor)vimEditor).getEditor();
+    DataContext ijContext = ExecutionContextKt.getIj(context);
     final Document doc = editor.getDocument();
     CommandProcessor.getInstance().executeCommand(editor.getProject(), () -> ApplicationManager.getApplication()
-                                                    .runWriteAction(() -> KeyHandlerKeeper.getInstance().getOriginalHandler().execute(editor, key, context)), "", doc,
+                                                    .runWriteAction(() -> KeyHandlerKeeper.getInstance().getOriginalHandler().execute(editor, key, ijContext)), "", doc,
                                                   UndoConfirmationPolicy.DEFAULT, doc);
     MotionGroup.scrollCaretIntoView(editor);
   }
 
   public boolean processKeyInSelectMode(final @NotNull IjVimEditor editor,
-                                        final @NotNull DataContext context,
+                                        final @NotNull ExecutionContext context,
                                         final @NotNull KeyStroke key) {
     boolean res;
     try (VimListenerSuppressor.Locked ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
@@ -941,7 +940,8 @@ public class ChangeGroup {
       KeyHandler.getInstance().reset(editor);
 
       if (isPrintableChar(key.getKeyChar()) || activeTemplateWithLeftRightMotion(editor.getEditor(), key)) {
-        VimPlugin.getChange().insertBeforeCursor(editor.getEditor(), context);
+        DataContext ijContext = ExecutionContextKt.getIj(context);
+        VimPlugin.getChange().insertBeforeCursor(editor.getEditor(), ijContext);
       }
     }
 

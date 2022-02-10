@@ -52,7 +52,6 @@ import com.maddyhome.idea.vim.handler.ActionBeanClass
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import com.maddyhome.idea.vim.helper.ActionExecutor
 import com.maddyhome.idea.vim.helper.DigraphResult
-import com.maddyhome.idea.vim.helper.EditorDataContext.Companion.init
 import com.maddyhome.idea.vim.helper.MessageHelper.message
 import com.maddyhome.idea.vim.helper.RunnableHelper.runReadCommand
 import com.maddyhome.idea.vim.helper.RunnableHelper.runWriteCommand
@@ -67,8 +66,10 @@ import com.maddyhome.idea.vim.key.CommandNode
 import com.maddyhome.idea.vim.key.CommandPartNode
 import com.maddyhome.idea.vim.key.KeyMapping
 import com.maddyhome.idea.vim.key.Node
+import com.maddyhome.idea.vim.newapi.ExecutionContext
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.VimEditor
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.ui.ShowCmd.update
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
@@ -120,7 +121,7 @@ class KeyHandler {
    * @param key     The keystroke typed by the user
    * @param context The data context
    */
-  fun handleKey(editor: Editor, key: KeyStroke, context: DataContext) {
+  fun handleKey(editor: Editor, key: KeyStroke, context: ExecutionContext) {
     handleKey(IjVimEditor(editor), key, context, allowKeyMappings = true, mappingCompleted = false)
   }
 
@@ -135,7 +136,7 @@ class KeyHandler {
   fun handleKey(
     editor: IjVimEditor,
     key: KeyStroke,
-    context: DataContext,
+    context: ExecutionContext,
     allowKeyMappings: Boolean,
     mappingCompleted: Boolean,
   ) {
@@ -232,7 +233,7 @@ class KeyHandler {
 
   fun finishedCommandPreparation(
     editor: IjVimEditor,
-    context: DataContext,
+    context: ExecutionContext,
     editorState: CommandState,
     commandBuilder: CommandBuilder,
     key: KeyStroke?,
@@ -277,7 +278,7 @@ class KeyHandler {
   private fun handleEditorReset(
     editor: IjVimEditor,
     key: KeyStroke,
-    context: DataContext,
+    context: ExecutionContext,
     editorState: CommandState,
   ) {
     val commandBuilder = editorState.commandBuilder
@@ -292,7 +293,7 @@ class KeyHandler {
           val executed = Ref.create<Boolean>()
           CommandProcessor.getInstance()
             .executeCommand(editor.editor.project,
-              { executed.set(ActionExecutor.executeAction(IdeActions.ACTION_EDITOR_ESCAPE, context)) },
+              { executed.set(ActionExecutor.executeAction(IdeActions.ACTION_EDITOR_ESCAPE, context.ij)) },
               "", null)
           indicateError = !executed.get()
         }
@@ -307,7 +308,7 @@ class KeyHandler {
   private fun handleKeyMapping(
     editor: IjVimEditor,
     key: KeyStroke,
-    context: DataContext,
+    context: ExecutionContext,
     mappingCompleted: Boolean,
   ): Boolean {
     LOG.debug("Start processing key mappings.")
@@ -334,7 +335,7 @@ class KeyHandler {
     // be processed as normal.
     val mappingProcessed =
       handleUnfinishedMappingSequence(editor, mappingState, mapping, mappingCompleted) ||
-        handleCompleteMappingSequence(editor.editor, context, mappingState, mapping, key) ||
+        handleCompleteMappingSequence(editor, context, mappingState, mapping, key) ||
         handleAbandonedMappingSequence(editor, mappingState, context)
     LOG.debug { "Finish mapping processing. Return $mappingProcessed" }
 
@@ -351,7 +352,7 @@ class KeyHandler {
   }
 
   private fun handleUnfinishedMappingSequence(
-    editor: IjVimEditor,
+    editor: VimEditor,
     mappingState: MappingState,
     mapping: KeyMapping,
     mappingCompleted: Boolean,
@@ -384,22 +385,23 @@ class KeyHandler {
       //   but before invoke later is handled. This is a rare case, so I'll just add a check to isPluginMapping.
       //   But this "unexpected behaviour" exists and it would be better not to relay on mutable state with delays.
       //   https://youtrack.jetbrains.com/issue/VIM-2392
+      val ijEditor = (editor as IjVimEditor).editor
       mappingState.startMappingTimer { actionEvent: ActionEvent? ->
         application.invokeLater(
           {
             LOG.debug("Delayed mapping timer call")
             val unhandledKeys = mappingState.detachKeys()
-            if (editor.editor.isDisposed || isPluginMapping(unhandledKeys)) {
+            if (ijEditor.isDisposed || isPluginMapping(unhandledKeys)) {
               LOG.debug("Abandon mapping timer")
               return@invokeLater
             }
             LOG.trace("Processing unhandled keys...")
             for (keyStroke in unhandledKeys) {
-              handleKey(editor, keyStroke, init(editor.editor, null),
+              handleKey(editor, keyStroke, ExecutionContext.onEditor(editor),
                 allowKeyMappings = true,
                 mappingCompleted = true)
             }
-          }, ModalityState.stateForComponent(editor.editor.component))
+          }, ModalityState.stateForComponent(ijEditor.component))
       }
     }
     LOG.trace("Unfinished mapping processing finished")
@@ -407,8 +409,8 @@ class KeyHandler {
   }
 
   private fun handleCompleteMappingSequence(
-    editor: Editor,
-    context: DataContext,
+    editor: IjVimEditor,
+    context: ExecutionContext,
     mappingState: MappingState,
     mapping: KeyMapping,
     key: KeyStroke,
@@ -441,10 +443,10 @@ class KeyHandler {
       return false
     }
     mappingState.resetMappingSequence()
-    val currentContext = init(editor, context)
+    val currentContext = context.updateEditor(editor)
     LOG.trace("Executing mapping info")
     try {
-      mappingInfo.execute(editor, context)
+      mappingInfo.execute(editor.editor, context.ij)
     } catch (e: Exception) {
       VimPlugin.showMessage(e.message)
       VimPlugin.indicateError()
@@ -464,7 +466,7 @@ class KeyHandler {
     // If we've just evaluated the previous key sequence, make sure to also handle the current key
     if (mappingInfo !== currentMappingInfo) {
       LOG.trace("Evaluating the current key")
-      handleKey(IjVimEditor(editor), key, currentContext, allowKeyMappings = true, false)
+      handleKey(editor, key, currentContext, allowKeyMappings = true, false)
     }
     LOG.trace("Success processing of mapping")
     return true
@@ -473,7 +475,7 @@ class KeyHandler {
   private fun handleAbandonedMappingSequence(
     editor: IjVimEditor,
     mappingState: MappingState,
-    context: DataContext,
+    context: ExecutionContext,
   ): Boolean {
     LOG.debug("Processing abandoned mapping sequence")
     // The user has terminated a mapping sequence with an unexpected key
@@ -608,7 +610,7 @@ class KeyHandler {
   private fun handleDigraph(
     editor: IjVimEditor,
     key: KeyStroke,
-    context: DataContext,
+    context: ExecutionContext,
     editorState: CommandState,
   ): Boolean {
     LOG.debug("Handling digraph")
@@ -678,7 +680,7 @@ class KeyHandler {
 
   private fun executeCommand(
     editor: IjVimEditor,
-    context: DataContext,
+    context: ExecutionContext,
     editorState: CommandState,
   ) {
     LOG.trace("Command execution")
@@ -707,7 +709,7 @@ class KeyHandler {
       IdeEventQueue.getInstance().flushDelayedKeyEvents()
     }
     if (ApplicationManager.getApplication().isDispatchThread) {
-      val action: Runnable = ActionRunner(editor.editor, context, command, operatorArguments)
+      val action: Runnable = ActionRunner(editor.editor, context.ij, command, operatorArguments)
       val cmdAction = command.action
       val name = cmdAction.id
       if (type.isWrite) {
@@ -721,7 +723,8 @@ class KeyHandler {
   }
 
   private fun handleCommandNode(
-    editor: IjVimEditor, context: DataContext,
+    editor: IjVimEditor,
+    context: ExecutionContext,
     key: KeyStroke,
     node: CommandNode<ActionBeanClass>,
     editorState: CommandState,
@@ -780,7 +783,7 @@ class KeyHandler {
 
   private fun startWaitingForArgument(
     editor: Editor,
-    context: DataContext,
+    context: ExecutionContext,
     key: Char,
     action: EditorActionHandlerBase,
     argument: Argument.Type,
@@ -808,7 +811,7 @@ class KeyHandler {
       Argument.Type.EX_STRING -> {
         // The current Command expects an EX_STRING argument. E.g. SearchEntry(Fwd|Rev)Action. This won't execute until
         // state hits READY. Start the ex input field, push CMD_LINE mode and wait for the argument.
-        VimPlugin.getProcess().startSearchCommand(editor, context, commandBuilder.count, key)
+        VimPlugin.getProcess().startSearchCommand(editor, context.ij, commandBuilder.count, key)
         commandBuilder.commandState = CurrentCommandState.NEW_COMMAND
         editorState.pushModes(CommandState.Mode.CMD_LINE, CommandState.SubMode.NONE)
       }

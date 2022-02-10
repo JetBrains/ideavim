@@ -25,6 +25,7 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
+import com.maddyhome.idea.vim.newapi.vim
 import javax.swing.KeyStroke
 
 class InsertCompletedLiteralAction : VimActionHandler.SingleExecution() {
@@ -34,7 +35,7 @@ class InsertCompletedLiteralAction : VimActionHandler.SingleExecution() {
   override fun execute(editor: Editor, context: DataContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
     // The converted literal character has been captured as an argument, push it back through key handler
     val keyStroke = KeyStroke.getKeyStroke(cmd.argument!!.character)
-    KeyHandler.getInstance().handleKey(editor, keyStroke, context)
+    KeyHandler.getInstance().handleKey(editor, keyStroke, context.vim)
     return true
   }
 }

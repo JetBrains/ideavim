@@ -106,7 +106,7 @@ class ToKeysMappingInfo(
     for (keyStroke in toKeys) {
       val recursive = isRecursive && !(first && fromIsPrefix)
       val keyHandler = KeyHandler.getInstance()
-      keyHandler.handleKey(editor.vim, keyStroke, editorDataContext, recursive, false)
+      keyHandler.handleKey(editor.vim, keyStroke, editorDataContext.vim, recursive, false)
       first = false
     }
   }
@@ -134,7 +134,7 @@ class ToExpressionMappingInfo(
     for (keyStroke in toKeys) {
       val recursive = isRecursive && !(first && fromIsPrefix)
       val keyHandler = KeyHandler.getInstance()
-      keyHandler.handleKey(editor.vim, keyStroke, editorDataContext, recursive, false)
+      keyHandler.handleKey(editor.vim, keyStroke, editorDataContext.vim, recursive, false)
       first = false
     }
   }
@@ -182,7 +182,7 @@ class ToHandlerMappingInfo(
           invokeLater {
             KeyHandler.getInstance().finishedCommandPreparation(
               IjVimEditor(editor),
-              context, CommandState.getInstance(editor), CommandState.getInstance(editor).commandBuilder, null, false)
+              context.vim, CommandState.getInstance(editor), CommandState.getInstance(editor).commandBuilder, null, false)
           }
         }
       }

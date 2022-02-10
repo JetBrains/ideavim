@@ -49,6 +49,7 @@ import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
 import com.maddyhome.idea.vim.listener.AceJumpService
 import com.maddyhome.idea.vim.listener.AppCodeTemplates.appCodeTemplateCaptured
 import com.maddyhome.idea.vim.newapi.IjVimEditor
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.options.OptionChangeListener
@@ -79,7 +80,7 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
       // Should we use HelperKt.getTopLevelEditor(editor) here, as we did in former EditorKeyHandler?
       try {
         val start = if (traceTime) System.currentTimeMillis() else null
-        KeyHandler.getInstance().handleKey(editor, keyStroke, EditorDataContext.init(editor, e.dataContext))
+        KeyHandler.getInstance().handleKey(editor, keyStroke, EditorDataContext.init(editor, e.dataContext).vim)
         if (start != null) {
           val duration = System.currentTimeMillis() - start
           LOG.info("VimShortcut update '$keyStroke': $duration ms")

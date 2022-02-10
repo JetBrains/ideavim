@@ -85,7 +85,7 @@ data class NormalCommand(val ranges: Ranges, val argument: String) : Command.Sin
       val keyHandler = KeyHandler.getInstance()
       keyHandler.reset(editor.vim)
       for (key in keys) {
-        keyHandler.handleKey(editor.vim, key, context, useMappings, true)
+        keyHandler.handleKey(editor.vim, key, context.vim, useMappings, true)
       }
 
       // Exit if state leaves as insert or cmd_line

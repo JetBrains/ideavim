@@ -29,6 +29,7 @@ import com.maddyhome.idea.vim.group.visual.VimVisualTimer;
 import com.maddyhome.idea.vim.helper.EditorDataContext;
 import com.maddyhome.idea.vim.helper.RunnableHelper;
 import com.maddyhome.idea.vim.helper.TestInputModel;
+import com.maddyhome.idea.vim.newapi.IjExecutionContext;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
 import com.maddyhome.idea.vim.vimscript.services.OptionService;
@@ -99,7 +100,7 @@ public abstract class JavaVimTestCase extends JavaCodeInsightFixtureTestCase {
           exEntryPanel.handleKey(key);
         }
         else {
-          keyHandler.handleKey(editor, key, dataContext);
+          keyHandler.handleKey(editor, key, new IjExecutionContext(dataContext));
         }
       }
     }, null, null);
