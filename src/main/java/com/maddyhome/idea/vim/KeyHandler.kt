@@ -91,18 +91,6 @@ class KeyHandler {
   private var handleKeyRecursionCount = 0
 
   /**
-   * This is the main key handler for the Vim plugin. Every keystroke not handled directly by Idea is sent here for
-   * processing.
-   *
-   * @param editor  The editor the key was typed into
-   * @param key     The keystroke typed by the user
-   * @param context The data context
-   */
-  fun handleKey(editor: Editor, key: KeyStroke, context: DataContext) {
-    handleKey(IjVimEditor(editor), key, context, allowKeyMappings = true, mappingCompleted = false)
-  }
-
-  /**
    * Invoked before acquiring a write lock and actually handling the keystroke.
    *
    *
@@ -123,6 +111,18 @@ class KeyHandler {
     if (mode == CommandState.Mode.INSERT || mode == CommandState.Mode.REPLACE) {
       VimPlugin.getChange().beforeProcessKey(editor, context, key, plan)
     }
+  }
+
+  /**
+   * This is the main key handler for the Vim plugin. Every keystroke not handled directly by Idea is sent here for
+   * processing.
+   *
+   * @param editor  The editor the key was typed into
+   * @param key     The keystroke typed by the user
+   * @param context The data context
+   */
+  fun handleKey(editor: Editor, key: KeyStroke, context: DataContext) {
+    handleKey(IjVimEditor(editor), key, context, allowKeyMappings = true, mappingCompleted = false)
   }
 
   /**
