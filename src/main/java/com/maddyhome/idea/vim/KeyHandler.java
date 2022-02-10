@@ -305,6 +305,15 @@ public class KeyHandler {
       handleKeyRecursionCount--;
     }
 
+    finishedCommandPreparation(editor, context, editorState, commandBuilder, key, shouldRecord);
+  }
+
+  public void finishedCommandPreparation(@NotNull IjVimEditor editor,
+                                         @NotNull DataContext context,
+                                         CommandState editorState,
+                                         @NotNull CommandBuilder commandBuilder,
+                                         @Nullable KeyStroke key,
+                                         boolean shouldRecord) {
     // Do we have a fully entered command at this point? If so, let's execute it.
     if (commandBuilder.isReady()) {
       LOG.trace("Ready command builder. Execute command.");
@@ -320,7 +329,7 @@ public class KeyHandler {
     }
 
     // Don't record the keystroke that stops the recording (unmapped this is `q`)
-    if (shouldRecord && editorState.isRecording()) {
+    if (shouldRecord && editorState.isRecording() && key != null) {
       VimPlugin.getRegister().recordKeyStroke(key);
     }
 

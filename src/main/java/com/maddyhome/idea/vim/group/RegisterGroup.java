@@ -470,7 +470,7 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
     }
   }
 
-  public void recordKeyStroke(KeyStroke key) {
+  public void recordKeyStroke(@NotNull KeyStroke key) {
     if (recordRegister != 0 && recordList != null) {
       recordList.add(key);
     }

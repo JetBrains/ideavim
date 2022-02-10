@@ -18,6 +18,7 @@
 package com.maddyhome.idea.vim.key
 
 import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.application.invokeLater
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Caret
@@ -39,9 +40,11 @@ import com.maddyhome.idea.vim.helper.EditorDataContext
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.StringHelper.toKeyNotation
 import com.maddyhome.idea.vim.helper.VimNlsSafe
+import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.helper.vimSelectionStart
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
+import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
@@ -168,6 +171,22 @@ class ToHandlerMappingInfo(
       clean()
     }
 
+    val handler = extensionHandler
+    if (handler is VimExtensionHandler.WithCallback) {
+      handler._backingFunction = Runnable {
+        myFun(shouldCalculateOffsets, editor, startOffsets)
+
+
+        if (shouldCalculateOffsets) {
+          invokeLater {
+            KeyHandler.getInstance().finishedCommandPreparation(
+              IjVimEditor(editor),
+              context, CommandState.getInstance(editor), CommandState.getInstance(editor).commandBuilder, null, false)
+          }
+        }
+      }
+    }
+
     processor.executeCommand(
       editor.project, { extensionHandler.execute(editor, context) },
       "Vim " + extensionHandler.javaClass.simpleName, null
@@ -179,39 +198,50 @@ class ToHandlerMappingInfo(
       repeatHandler = true
     }
 
-    if (shouldCalculateOffsets && !commandState.commandBuilder.hasCurrentCommandPartArgument()) {
-      val offsets: MutableMap<Caret, VimSelection> = HashMap()
-      for (caret in editor.caretModel.allCarets) {
-        var startOffset = startOffsets[caret]
-        if (caret.hasSelection()) {
-          val vimSelection = create(caret.vimSelectionStart, caret.offset, fromSubMode(editor.subMode), editor)
-          offsets[caret] = vimSelection
-          commandState.popModes()
-        } else if (startOffset != null && startOffset != caret.offset) {
-          // Command line motions are always characterwise exclusive
-          var endOffset = caret.offset
-          if (startOffset < endOffset) {
-            endOffset -= 1
-          } else {
-            startOffset -= 1
-          }
-          val vimSelection = create(startOffset, endOffset, SelectionType.CHARACTER_WISE, editor)
-          offsets[caret] = vimSelection
-          SelectionVimListenerSuppressor.lock().use {
-            // Move caret to the initial offset for better undo action
-            //  This is not a necessary thing, but without it undo action look less convenient
-            editor.caretModel.moveToOffset(startOffset)
-          }
-        }
-      }
-      if (offsets.isNotEmpty()) {
-        commandState.commandBuilder.completeCommandPart(Argument(offsets))
-      }
+    if (handler !is VimExtensionHandler.WithCallback) {
+      myFun(shouldCalculateOffsets, editor, startOffsets)
     }
   }
 
   companion object {
     private val LOG = logger<ToHandlerMappingInfo>()
+
+    private fun myFun(
+      shouldCalculateOffsets: Boolean,
+      editor: Editor,
+      startOffsets: Map<Caret, Int>,
+    ) {
+      val commandState = editor.commandState
+      if (shouldCalculateOffsets && !commandState.commandBuilder.hasCurrentCommandPartArgument()) {
+        val offsets: MutableMap<Caret, VimSelection> = HashMap()
+        for (caret in editor.caretModel.allCarets) {
+          var startOffset = startOffsets[caret]
+          if (caret.hasSelection()) {
+            val vimSelection = create(caret.vimSelectionStart, caret.offset, fromSubMode(editor.subMode), editor)
+            offsets[caret] = vimSelection
+            commandState.popModes()
+          } else if (startOffset != null && startOffset != caret.offset) {
+            // Command line motions are always characterwise exclusive
+            var endOffset = caret.offset
+            if (startOffset < endOffset) {
+              endOffset -= 1
+            } else {
+              startOffset -= 1
+            }
+            val vimSelection = create(startOffset, endOffset, SelectionType.CHARACTER_WISE, editor)
+            offsets[caret] = vimSelection
+            SelectionVimListenerSuppressor.lock().use {
+              // Move caret to the initial offset for better undo action
+              //  This is not a necessary thing, but without it undo action look less convenient
+              editor.caretModel.moveToOffset(startOffset)
+            }
+          }
+        }
+        if (offsets.isNotEmpty()) {
+          commandState.commandBuilder.completeCommandPart(Argument(offsets))
+        }
+      }
+    }
   }
 }
 
