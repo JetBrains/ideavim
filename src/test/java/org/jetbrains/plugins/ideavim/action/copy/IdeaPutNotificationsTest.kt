@@ -18,6 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.action.copy
 
+import com.intellij.notification.ActionCenter
 import com.intellij.notification.EventLog
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.SelectionType
@@ -42,10 +43,14 @@ class IdeaPutNotificationsTest : VimOptionTestCase(OptionConstants.clipboardName
     VimPlugin.getRegister().storeText(myFixture.editor, before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
     typeText(StringHelper.parseKeys("p"))
 
-    val notification = EventLog.getLogModel(myFixture.project).notifications.last()
-    assertEquals(NotificationService.IDEAVIM_NOTIFICATION_TITLE, notification.title)
-    assertTrue(OptionConstants.clipboard_ideaput in notification.content)
-    assertEquals(2, notification.actions.size)
+    val notification = ActionCenter.getNotifications(myFixture.project, true).last()
+    try {
+      assertEquals(NotificationService.IDEAVIM_NOTIFICATION_TITLE, notification.title)
+      assertTrue(OptionConstants.clipboard_ideaput in notification.content)
+      assertEquals(2, notification.actions.size)
+    } finally {
+      notification.expire()
+    }
   }
 
   @VimOptionTestConfiguration(
@@ -62,7 +67,7 @@ class IdeaPutNotificationsTest : VimOptionTestCase(OptionConstants.clipboardName
     VimPlugin.getRegister().storeText(myFixture.editor, before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
     typeText(StringHelper.parseKeys("p"))
 
-    val notifications = EventLog.getLogModel(myFixture.project).notifications
+    val notifications = ActionCenter.getNotifications(myFixture.project, true)
     assertTrue(notifications.isEmpty() || notifications.last().isExpired || OptionConstants.clipboard_ideaput !in notifications.last().content)
   }
 
