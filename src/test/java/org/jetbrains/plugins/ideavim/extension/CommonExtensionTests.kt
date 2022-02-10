@@ -353,7 +353,7 @@ private class TestExtension : VimExtension {
     putExtensionHandlerMapping(MappingMode.N, parseKeys("<Plug>TestMotion"), owner, MoveLinewiseInNormal(), false)
     putExtensionHandlerMapping(MappingMode.N, parseKeys("<Plug>TestMissing"), owner, MoveLinewiseInNormal(), false)
     putExtensionHandlerMapping(MappingMode.NO, parseKeys("<Plug>TestDelayed"), owner, DelayedAction(), false)
-    putExtensionHandlerMapping(MappingMode.NO, parseKeys("<Plug>TestDelayedIncorrect"), owner, DelayedIncorrectAction(), false)
+    putExtensionHandlerMapping(MappingMode.NO, parseKeys("<Plug>TestIncorrectDelayed"), owner, DelayedIncorrectAction(), false)
 
     putKeyMapping(MappingMode.O, parseKeys("U"), owner, parseKeys("<Plug>TestExtensionEmulateInclusive"), true)
     putKeyMapping(MappingMode.O, parseKeys("P"), owner, parseKeys("<Plug>TestExtensionBackwardsCharacter"), true)
@@ -361,7 +361,7 @@ private class TestExtension : VimExtension {
     putKeyMapping(MappingMode.O, parseKeys("O"), owner, parseKeys("<Plug>TestExtensionLinewise"), true)
     putKeyMapping(MappingMode.N, parseKeys("Q"), owner, parseKeys("<Plug>TestMotion"), true)
     putKeyMapping(MappingMode.NO, parseKeys("R"), owner, parseKeys("<Plug>TestDelayed"), true)
-    putKeyMapping(MappingMode.NO, parseKeys("E"), owner, parseKeys("<Plug>TestDelayedIncorrect"), true)
+    putKeyMapping(MappingMode.NO, parseKeys("E"), owner, parseKeys("<Plug>TestIncorrectDelayed"), true)
 
     putKeyMappingIfMissing(MappingMode.N, parseKeys("Z"), owner, parseKeys("<Plug>TestMissing"), true)
     putKeyMappingIfMissing(MappingMode.I, parseKeys("L"), owner, parseKeys("<Plug>TestMissing"), true)
