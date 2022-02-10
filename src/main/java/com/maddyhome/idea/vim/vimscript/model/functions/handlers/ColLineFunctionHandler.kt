@@ -25,6 +25,7 @@ import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.vimLine
 import com.maddyhome.idea.vim.helper.vimSelectionStart
+import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
@@ -77,7 +78,7 @@ private fun currentCol(editor: Editor): VimInt {
 
   // If virtualedit is set, the col is one more
   // XXX Should we also check the current mode?
-  if ((VimPlugin.getOptionService().getOptionValue(OptionService.Scope.LOCAL(editor), OptionConstants.virtualeditName) as VimString).value.isNotEmpty()) {
+  if ((VimPlugin.getOptionService().getOptionValue(OptionService.Scope.LOCAL(IjVimEditor(editor)), OptionConstants.virtualeditName) as VimString).value.isNotEmpty()) {
     lineLength += 1
   }
 

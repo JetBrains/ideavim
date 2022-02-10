@@ -38,6 +38,7 @@ import com.maddyhome.idea.vim.helper.isTemplateActive
 import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.popAllModes
 import com.maddyhome.idea.vim.listener.VimListenerManager
+import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.IdeaRefactorModeHelper
@@ -149,7 +150,7 @@ object IdeaSelectionControl {
     selectionSource: VimListenerManager.SelectionSource,
     logReason: Boolean,
   ): CommandState.Mode {
-    val selectmode = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.LOCAL(editor), OptionConstants.selectmodeName) as VimString).value
+    val selectmode = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.LOCAL(IjVimEditor(editor)), OptionConstants.selectmodeName) as VimString).value
     return when {
       editor.isOneLineMode -> {
         if (logReason) logger.debug("Enter select mode. Reason: one line mode")

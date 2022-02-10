@@ -397,7 +397,7 @@ class IjVimCaret(val caret: Caret) : VimCaret {
 fun VimCaret.offsetForLineWithStartOfLineOption(logicalLine: EditorLine.Pointer): Int {
   val ijEditor = (this.editor as IjVimEditor).editor
   val caret = (this as IjVimCaret).caret
-  return if (VimPlugin.getOptionService().isSet(LOCAL(ijEditor), OptionConstants.startoflineName)) {
+  return if (VimPlugin.getOptionService().isSet(LOCAL(editor), OptionConstants.startoflineName)) {
     offsetForLineStartSkipLeading(logicalLine.line)
   } else {
     VimPlugin.getMotion().moveCaretToLineWithSameColumn(ijEditor, logicalLine.line, caret)

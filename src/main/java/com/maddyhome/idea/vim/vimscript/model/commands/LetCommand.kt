@@ -23,6 +23,7 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.Ranges
+import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.Script
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
@@ -183,7 +184,7 @@ data class LetCommand(
           val newValue = operator.getNewValue(optionValue, expression.evaluate(editor, context, this))
           when (variable.scope) {
             Scope.GLOBAL_VARIABLE -> VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, variable.optionName, newValue, variable.originalString)
-            Scope.LOCAL_VARIABLE -> VimPlugin.getOptionService().setOptionValue(OptionService.Scope.LOCAL(editor), variable.optionName, newValue, variable.originalString)
+            Scope.LOCAL_VARIABLE -> VimPlugin.getOptionService().setOptionValue(OptionService.Scope.LOCAL(IjVimEditor(editor)), variable.optionName, newValue, variable.originalString)
             else -> throw ExException("Invalid option scope")
           }
         } else {

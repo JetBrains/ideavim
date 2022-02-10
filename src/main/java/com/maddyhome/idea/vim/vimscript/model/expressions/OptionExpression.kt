@@ -22,6 +22,7 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.services.OptionService
@@ -31,7 +32,7 @@ data class OptionExpression(val scope: Scope, val optionName: String) : Expressi
   override fun evaluate(editor: Editor, context: DataContext, vimContext: VimLContext): VimDataType {
     return when (scope) {
       Scope.GLOBAL_VARIABLE -> VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, optionName, originalString)
-      Scope.LOCAL_VARIABLE -> VimPlugin.getOptionService().getOptionValue(OptionService.Scope.LOCAL(editor), optionName, originalString)
+      Scope.LOCAL_VARIABLE -> VimPlugin.getOptionService().getOptionValue(OptionService.Scope.LOCAL(IjVimEditor(editor)), optionName, originalString)
       else -> throw ExException("Invalid option scope")
     }
   }

@@ -48,6 +48,7 @@ import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
 import com.maddyhome.idea.vim.listener.AceJumpService
 import com.maddyhome.idea.vim.listener.AppCodeTemplates.appCodeTemplateCaptured
+import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.options.OptionChangeListener
@@ -198,7 +199,7 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
   }
 
   private fun isEnabledForEscape(editor: Editor): Boolean {
-    val ideaVimSupportValue = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.LOCAL(editor), OptionConstants.ideavimsupportName) as VimString).value
+    val ideaVimSupportValue = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.LOCAL(IjVimEditor(editor)), OptionConstants.ideavimsupportName) as VimString).value
     return editor.isPrimaryEditor() ||
       EditorHelper.isFileEditor(editor) && !editor.inNormalMode ||
       ideaVimSupportValue.contains("dialog") && !editor.inNormalMode

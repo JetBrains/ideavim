@@ -74,7 +74,6 @@ import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
-import com.maddyhome.idea.vim.vimscript.services.OptionService.Scope.LOCAL
 import java.awt.event.ActionEvent
 import java.awt.event.InputEvent
 import java.awt.event.KeyEvent
@@ -312,7 +311,7 @@ class KeyHandler {
     mappingCompleted: Boolean,
   ): Boolean {
     LOG.debug("Start processing key mappings.")
-    val commandState = getInstance(editor)
+    val commandState = editor.commandState
     val mappingState = commandState.mappingState
     val commandBuilder = commandState.commandBuilder
     if (commandBuilder.isAwaitingCharOrDigraphArgument()
@@ -334,7 +333,7 @@ class KeyHandler {
     // Returns true if any of these methods handle the key. False means that the key is unrelated to mapping and should
     // be processed as normal.
     val mappingProcessed =
-      handleUnfinishedMappingSequence(editor.editor, mappingState, mapping, mappingCompleted) ||
+      handleUnfinishedMappingSequence(editor, mappingState, mapping, mappingCompleted) ||
         handleCompleteMappingSequence(editor.editor, context, mappingState, mapping, key) ||
         handleAbandonedMappingSequence(editor, mappingState, context)
     LOG.debug { "Finish mapping processing. Return $mappingProcessed" }
@@ -352,7 +351,7 @@ class KeyHandler {
   }
 
   private fun handleUnfinishedMappingSequence(
-    editor: Editor,
+    editor: IjVimEditor,
     mappingState: MappingState,
     mapping: KeyMapping,
     mappingCompleted: Boolean,
@@ -378,7 +377,7 @@ class KeyHandler {
     // user has typed "dw" wait for the timeout, and then replay "d" and "w" without any mapping (which will of course
     // delete a word)
     val application = ApplicationManager.getApplication()
-    if (VimPlugin.getOptionService().isSet(LOCAL(editor), OptionConstants.timeoutName, OptionConstants.timeoutName)) {
+    if (VimPlugin.getOptionService().isSet(OptionService.Scope.LOCAL(editor), OptionConstants.timeoutName, OptionConstants.timeoutName)) {
       LOG.trace("Timeout is set. Schedule a mapping timer")
       // XXX There is a strange issue that reports that mapping state is empty at the moment of the function call.
       //   At the moment, I see the only one possibility this to happen - other key is handled after the timer executed,
@@ -390,17 +389,17 @@ class KeyHandler {
           {
             LOG.debug("Delayed mapping timer call")
             val unhandledKeys = mappingState.detachKeys()
-            if (editor.isDisposed || isPluginMapping(unhandledKeys)) {
+            if (editor.editor.isDisposed || isPluginMapping(unhandledKeys)) {
               LOG.debug("Abandon mapping timer")
               return@invokeLater
             }
             LOG.trace("Processing unhandled keys...")
             for (keyStroke in unhandledKeys) {
-              handleKey(IjVimEditor(editor), keyStroke, init(editor, null),
+              handleKey(editor, keyStroke, init(editor.editor, null),
                 allowKeyMappings = true,
                 mappingCompleted = true)
             }
-          }, ModalityState.stateForComponent(editor.component))
+          }, ModalityState.stateForComponent(editor.editor.component))
       }
     }
     LOG.trace("Unfinished mapping processing finished")

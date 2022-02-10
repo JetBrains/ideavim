@@ -22,8 +22,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.command.CommandBuilder;
+import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.vimscript.services.OptionConstants;
 import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import org.jetbrains.annotations.NotNull;
@@ -84,7 +83,7 @@ public class DigraphSequence {
       case DIG_STATE_PENDING:
         logger.debug("DIG_STATE_PENDING");
         if (key.getKeyCode() == KeyEvent.VK_BACK_SPACE
-            && VimPlugin.getOptionService().isSet(new OptionService.Scope.LOCAL(editor), OptionConstants.digraphName, OptionConstants.digraphName)) {
+            && VimPlugin.getOptionService().isSet(new OptionService.Scope.LOCAL(new IjVimEditor(editor)), OptionConstants.digraphName, OptionConstants.digraphName)) {
           digraphState = DIG_STATE_BACK_SPACE;
         }
         else if (key.getKeyChar() != KeyEvent.CHAR_UNDEFINED) {

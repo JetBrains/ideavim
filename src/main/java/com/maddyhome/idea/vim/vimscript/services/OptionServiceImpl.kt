@@ -20,11 +20,13 @@ package com.maddyhome.idea.vim.vimscript.services
 
 import com.intellij.openapi.application.ApplicationNamesInfo
 import com.intellij.openapi.diagnostic.logger
-import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.SystemInfo
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.helper.localEditors
+import com.maddyhome.idea.vim.newapi.IjVimEditor
+import com.maddyhome.idea.vim.newapi.IjVimLocalOptions
+import com.maddyhome.idea.vim.newapi.VimEditor
+import com.maddyhome.idea.vim.newapi.VimLocalOptions
 import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
@@ -39,6 +41,9 @@ import com.maddyhome.idea.vim.vimscript.model.options.helpers.GuiCursorOptionHel
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.KeywordOptionHelper
 
 internal class OptionServiceImpl : OptionService {
+
+  // This should be injected with some DI
+  private val localOptions: VimLocalOptions = IjVimLocalOptions()
 
   // todo use me please :(
   private val logger = logger<OptionServiceImpl>()
@@ -193,7 +198,6 @@ internal class OptionServiceImpl : OptionService {
     ToggleOption(OptionConstants.experimentalapiName, OptionConstants.experimentalapiAlias, true)
   )
   private val globalValues = mutableMapOf<String, VimDataType>()
-  private val localValuesKey = Key<MutableMap<String, VimDataType>>("localOptions")
 
   override fun setOptionValue(scope: OptionService.Scope, optionName: String, value: VimDataType, token: String) {
     val option = options.get(optionName) ?: throw ExException("E518: Unknown option: $token")
@@ -244,12 +248,8 @@ internal class OptionServiceImpl : OptionService {
     globalValues[optionName] = value
   }
 
-  private fun setLocalOptionValue(optionName: String, value: VimDataType, editor: Editor) {
-    if (editor.getUserData(localValuesKey) == null) {
-      editor.putUserData(localValuesKey, mutableMapOf(optionName to value))
-    } else {
-      editor.getUserData(localValuesKey)!![optionName] = value
-    }
+  private fun setLocalOptionValue(optionName: String, value: VimDataType, editor: VimEditor) {
+    localOptions.setOption(editor, optionName, value)
   }
 
   private fun getGlobalOptionValue(optionName: String): VimDataType? {
@@ -257,9 +257,9 @@ internal class OptionServiceImpl : OptionService {
     return globalValues[option.name] ?: options.get(option.name)?.getDefaultValue()
   }
 
-  private fun getLocalOptionValue(optionName: String, editor: Editor): VimDataType? {
+  private fun getLocalOptionValue(optionName: String, editor: VimEditor): VimDataType? {
     val option = options.get(optionName) ?: return null
-    return editor.getUserData(localValuesKey)?.get(option.name) ?: getGlobalOptionValue(optionName)
+    return localOptions.getOptions(editor)[option.name] ?: getGlobalOptionValue(optionName)
   }
 
   /**
@@ -345,7 +345,7 @@ internal class OptionServiceImpl : OptionService {
   override fun resetAllOptions() {
     globalValues.clear()
     for (editor in localEditors()) {
-      editor.getUserData(localValuesKey)?.clear()
+      localOptions.reset(IjVimEditor(editor))
     }
   }
 

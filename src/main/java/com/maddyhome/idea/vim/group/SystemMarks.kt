@@ -26,6 +26,7 @@ import com.intellij.ide.bookmark.providers.LineBookmarkProvider
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService.Scope.LOCAL
 
@@ -33,7 +34,7 @@ class SystemMarks {
   companion object {
     @JvmStatic
     fun createOrGetSystemMark(ch: Char, line: Int, editor: Editor): LineBookmark? {
-      if (!VimPlugin.getOptionService().isSet(LOCAL(editor), OptionConstants.ideamarksName, OptionConstants.ideamarksName)) return null
+      if (!VimPlugin.getOptionService().isSet(LOCAL(IjVimEditor(editor)), OptionConstants.ideamarksName, OptionConstants.ideamarksName)) return null
 
       val project = editor.project ?: return null
       val type = BookmarkType.get(ch)

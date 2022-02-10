@@ -26,6 +26,7 @@ import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.editor.ex.EditorSettingsExternalizable
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.options.OptionChangeListener
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.GuiCursorMode
@@ -199,7 +200,7 @@ private class LegacyCaretVisualAttributesProvider : CaretVisualAttributesProvide
     } else {
       // The default for REPLACE is hor20. It makes more sense to map HOR to a block, but REPLACE has traditionally been
       // drawn the same as INSERT, as a bar. If the 'guicursor' option is still at default, keep REPLACE a bar
-      if (VimPlugin.getOptionService().isDefault(OptionService.Scope.LOCAL(editor), OptionConstants.guicursorName) && editor.guicursorMode() == GuiCursorMode.REPLACE) {
+      if (VimPlugin.getOptionService().isDefault(OptionService.Scope.LOCAL(IjVimEditor(editor)), OptionConstants.guicursorName) && editor.guicursorMode() == GuiCursorMode.REPLACE) {
         setBlockCursor(editor, false)
       } else {
         when (GuiCursorOptionHelper.getAttributes(editor.guicursorMode()).type) {

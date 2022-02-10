@@ -18,7 +18,7 @@
 
 package com.maddyhome.idea.vim.vimscript.model.options
 
-import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.newapi.VimEditor
 
 interface OptionChangeListener<T> {
 
@@ -28,5 +28,5 @@ interface OptionChangeListener<T> {
 // options that can change their values in specific editors
 interface LocalOptionChangeListener<T> : OptionChangeListener<T> {
 
-  fun processLocalValueChange(oldValue: T?, editor: Editor)
+  fun processLocalValueChange(oldValue: T?, editor: VimEditor)
 }

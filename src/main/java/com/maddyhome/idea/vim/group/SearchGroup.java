@@ -41,6 +41,7 @@ import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.ex.ranges.LineRange;
 import com.maddyhome.idea.vim.helper.*;
+import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.regexp.CharPointer;
 import com.maddyhome.idea.vim.regexp.CharacterClasses;
 import com.maddyhome.idea.vim.regexp.RegExp;
@@ -614,7 +615,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
     }
     else {
       // :h :&& - "Note that :s and :& don't keep the flags"
-      do_all = VimPlugin.getOptionService().isSet(new OptionService.Scope.LOCAL(editor), OptionConstants.gdefaultName, OptionConstants.gdefaultName);
+      do_all = VimPlugin.getOptionService().isSet(new OptionService.Scope.LOCAL(new IjVimEditor(editor)), OptionConstants.gdefaultName, OptionConstants.gdefaultName);
       do_ask = false;
       do_error = true;
       do_ic = 0;

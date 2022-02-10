@@ -18,7 +18,7 @@
 
 package com.maddyhome.idea.vim.vimscript.services
 
-import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.newapi.VimEditor
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.options.Option
 import com.maddyhome.idea.vim.vimscript.model.options.OptionChangeListener
@@ -82,6 +82,6 @@ interface OptionService {
 
   sealed class Scope {
     object GLOBAL : Scope()
-    class LOCAL(val editor: Editor) : Scope()
+    class LOCAL(val editor: VimEditor) : Scope()
   }
 }

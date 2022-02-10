@@ -27,6 +27,7 @@ import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.Msg
+import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.services.OptionService
@@ -65,7 +66,7 @@ data class SetLocalCommand(val ranges: Ranges, val argument: String) : Command.S
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
-    return if (parseOptionLine(editor, argument, OptionService.Scope.LOCAL(editor), failOnBad = true)) {
+    return if (parseOptionLine(editor, argument, OptionService.Scope.LOCAL(IjVimEditor(editor)), failOnBad = true)) {
       ExecutionResult.Success
     } else {
       ExecutionResult.Error

@@ -34,6 +34,7 @@ import com.intellij.ui.ColorUtil
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ranges.LineRange
+import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import org.jetbrains.annotations.Contract
@@ -59,7 +60,7 @@ fun updateIncsearchHighlights(
 ): Int {
   val searchStartOffset =
     if (searchRange != null) EditorHelper.getLineStartOffset(editor, searchRange.startLine) else caretOffset
-  val showHighlights = VimPlugin.getOptionService().isSet(OptionService.Scope.LOCAL(editor), OptionConstants.hlsearchName)
+  val showHighlights = VimPlugin.getOptionService().isSet(OptionService.Scope.LOCAL(IjVimEditor(editor)), OptionConstants.hlsearchName)
   return updateSearchHighlights(pattern, false, showHighlights, searchStartOffset, searchRange, forwards, false)
 }
 
