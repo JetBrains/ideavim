@@ -40,12 +40,12 @@ import com.intellij.ui.KeyStrokeAdapter
 import com.intellij.ui.TreeExpandCollapse
 import com.intellij.ui.speedSearch.SpeedSearchSupply
 import com.intellij.util.ui.tree.TreeUtil
-import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.common.CommandAlias
 import com.maddyhome.idea.vim.common.CommandAliasHandler
 import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.group.KeyGroup
+import com.maddyhome.idea.vim.helper.ActionExecutor
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.runAfterGotFocus
 import com.maddyhome.idea.vim.key.CommandNode
@@ -508,9 +508,12 @@ class NerdTree : VimExtension {
       }
       val application = ApplicationManager.getApplication()
       if (application.isUnitTestMode) {
-        KeyHandler.executeAction(action, context)
+          ActionExecutor.executeAction(action, context)
       } else {
-        runAfterGotFocus { KeyHandler.executeAction(action, context) }
+        runAfterGotFocus {
+            ActionExecutor.executeAction(action,
+                context)
+        }
       }
     }
 

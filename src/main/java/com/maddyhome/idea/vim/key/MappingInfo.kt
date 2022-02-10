@@ -36,6 +36,7 @@ import com.maddyhome.idea.vim.command.SelectionType.Companion.fromSubMode
 import com.maddyhome.idea.vim.extension.VimExtensionHandler
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.group.visual.VimSelection.Companion.create
+import com.maddyhome.idea.vim.helper.ActionExecutor
 import com.maddyhome.idea.vim.helper.EditorDataContext
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.StringHelper.toKeyNotation
@@ -257,7 +258,7 @@ class ToActionMappingInfo(
     LOG.debug("Executing 'ToAction' mapping...")
     val editorDataContext = EditorDataContext.init(editor, context)
     val dataContext = CaretSpecificDataContext(editorDataContext, editor.caretModel.currentCaret)
-    KeyHandler.executeAction(action, dataContext)
+    ActionExecutor.executeAction(action, dataContext)
   }
 
   companion object {

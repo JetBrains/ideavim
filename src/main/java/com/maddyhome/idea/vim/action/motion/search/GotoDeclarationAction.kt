@@ -19,12 +19,12 @@ package com.maddyhome.idea.vim.action.motion.search
 
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
-import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
+import com.maddyhome.idea.vim.helper.ActionExecutor
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
@@ -35,7 +35,7 @@ class GotoDeclarationAction : VimActionHandler.SingleExecution() {
 
   override fun execute(editor: Editor, context: DataContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
     VimPlugin.getMark().saveJumpLocation(editor)
-    KeyHandler.executeAction("GotoDeclaration", context)
+    ActionExecutor.executeAction("GotoDeclaration", context)
     return true
   }
 }

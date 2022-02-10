@@ -21,7 +21,6 @@ package com.maddyhome.idea.vim;
 import com.intellij.ide.DataManager;
 import com.intellij.ide.IdeEventQueue;
 import com.intellij.openapi.actionSystem.*;
-import com.intellij.openapi.actionSystem.ex.ActionManagerEx;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
@@ -33,8 +32,6 @@ import com.intellij.openapi.editor.EditorModificationUtil;
 import com.intellij.openapi.editor.actionSystem.ActionPlan;
 import com.intellij.openapi.editor.actionSystem.DocCommandGroupId;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.popup.JBPopupFactory;
-import com.intellij.openapi.ui.popup.ListPopup;
 import com.intellij.openapi.util.Ref;
 import com.maddyhome.idea.vim.action.change.VimRepeater;
 import com.maddyhome.idea.vim.action.change.change.ChangeCharacterAction;
@@ -62,7 +59,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
@@ -107,55 +103,6 @@ public class KeyHandler {
       .executeCommand(editor.getProject(), () -> cmd.execute(editor, getProjectAwareDataContext(editor, context), operatorArguments),
                       cmd.getId(), DocCommandGroupId.noneGroupId(editor.getDocument()), UndoConfirmationPolicy.DEFAULT,
                       editor.getDocument());
-  }
-
-  /**
-   * Execute an action
-   *
-   * @param action  The action to execute
-   * @param context The context to run it in
-   */
-  @SuppressWarnings("deprecation")
-  public static boolean executeAction(@NotNull AnAction action, @NotNull DataContext context) {
-    final AnActionEvent event =
-      new AnActionEvent(null, context, ActionPlaces.KEYBOARD_SHORTCUT, action.getTemplatePresentation(),
-                        ActionManager.getInstance(), 0);
-
-    if (action instanceof ActionGroup && !((ActionGroup)action).canBePerformed(context)) {
-      // Some ActionGroups should not be performed, but shown as a popup
-      ListPopup popup = JBPopupFactory.getInstance()
-        .createActionGroupPopup(event.getPresentation().getText(), (ActionGroup)action, context, false, null, -1);
-
-      Component component = context.getData(PlatformDataKeys.CONTEXT_COMPONENT);
-      if (component != null) {
-        Window window = SwingUtilities.getWindowAncestor(component);
-        if (window != null) {
-          popup.showInCenterOf(window);
-        }
-        return true;
-      }
-      popup.showInFocusCenter();
-      return true;
-    }
-    else {
-      // beforeActionPerformedUpdate should be called to update the action. It fixes some rider-specific problems.
-      //   because rider use async update method. See VIM-1819.
-      action.beforeActionPerformedUpdate(event);
-      if (event.getPresentation().isEnabled()) {
-        // Executing listeners for action. I can't be sure that this code is absolutely correct,
-        //   action execution process in IJ seems to be more complicated.
-        ActionManagerEx actionManager = ActionManagerEx.getInstanceEx();
-        // [VERSION UPDATE] 212+
-        actionManager.fireBeforeActionPerformed(action, event.getDataContext(), event);
-
-        action.actionPerformed(event);
-
-        // [VERSION UPDATE] 212+
-        actionManager.fireAfterActionPerformed(action, event.getDataContext(), event);
-        return true;
-      }
-    }
-    return false;
   }
 
   /**
@@ -374,7 +321,7 @@ public class KeyHandler {
           Ref<Boolean> executed = Ref.create();
           CommandProcessor.getInstance()
             .executeCommand(editor.getEditor().getProject(),
-                            () -> executed.set(KeyHandler.executeAction(IdeActions.ACTION_EDITOR_ESCAPE, context)),
+                            () -> executed.set(ActionExecutor.executeAction(IdeActions.ACTION_EDITOR_ESCAPE, context)),
                             "", null);
           indicateError = !executed.get();
         }
@@ -927,18 +874,6 @@ public class KeyHandler {
 
   private boolean checkArgumentCompatibility(@Nullable Argument.Type expectedArgumentType, @NotNull EditorActionHandlerBase action) {
     return !(expectedArgumentType == Argument.Type.MOTION && action.getType() != Command.Type.MOTION);
-  }
-
-  /**
-   * Execute an action by name
-   *
-   * @param name    The name of the action to execute
-   * @param context The context to run it in
-   */
-  public static boolean executeAction(@NotNull @NonNls String name, @NotNull DataContext context) {
-    ActionManager aMgr = ActionManager.getInstance();
-    AnAction action = aMgr.getAction(name);
-    return action != null && executeAction(action, context);
   }
 
   /**

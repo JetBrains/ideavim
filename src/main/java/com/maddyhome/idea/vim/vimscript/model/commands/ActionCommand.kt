@@ -23,9 +23,9 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
-import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.Ranges
+import com.maddyhome.idea.vim.helper.ActionExecutor
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.runAfterGotFocus
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
@@ -50,6 +50,6 @@ data class ActionCommand(val ranges: Ranges, val argument: String) : Command.Sin
   }
 
   private fun executeAction(action: AnAction, context: DataContext) {
-    KeyHandler.executeAction(action, context)
+      ActionExecutor.executeAction(action, context)
   }
 }

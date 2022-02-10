@@ -291,7 +291,7 @@ public class ChangeGroup {
       final AnAction action = actionManager.getAction(IdeActions.ACTION_EDITOR_ENTER);
       if (action != null) {
         strokes.add(action);
-        KeyHandler.executeAction(action, context);
+        ActionExecutor.executeAction(action, context);
       }
     }
   }
@@ -304,7 +304,7 @@ public class ChangeGroup {
       final AnAction action = actionManager.getAction("EditorStartNewLineBefore");
       if (action != null) {
         strokes.add(action);
-        KeyHandler.executeAction(action, context);
+        ActionExecutor.executeAction(action, context);
       }
     }
   }
@@ -524,7 +524,7 @@ public class ChangeGroup {
       for (int i = 0; i < count; i++) {
         for (Object lastStroke : lastStrokes) {
           if (lastStroke instanceof AnAction) {
-            KeyHandler.executeAction((AnAction)lastStroke, context);
+            ActionExecutor.executeAction((AnAction)lastStroke, context);
             strokes.add(lastStroke);
           }
           else if (lastStroke instanceof EditorActionHandlerBase) {
@@ -605,7 +605,7 @@ public class ChangeGroup {
     final KeyStroke enterKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
     final List<AnAction> actions = VimPlugin.getKey().getActions(editor.getComponent(), enterKeyStroke);
     for (AnAction action : actions) {
-      if (KeyHandler.executeAction(action, context)) {
+      if (ActionExecutor.executeAction(action, context)) {
         break;
       }
     }
@@ -1062,7 +1062,7 @@ public class ChangeGroup {
       return lline + count <= total;
     });
     if (!allowedExecution) return false;
-    for (int i = 0; i < executions; i++) KeyHandler.executeAction(IdeActions.ACTION_EDITOR_JOIN_LINES, context);
+    for (int i = 0; i < executions; i++) ActionExecutor.executeAction(IdeActions.ACTION_EDITOR_JOIN_LINES, context);
     return true;
   }
 
@@ -1074,7 +1074,7 @@ public class ChangeGroup {
       final Pair<Integer, Integer> nativeRange = range.getNativeStartAndEnd();
       caret.setSelection(nativeRange.getFirst(), nativeRange.getSecond());
     });
-    KeyHandler.executeAction(IdeActions.ACTION_EDITOR_JOIN_LINES, context);
+    ActionExecutor.executeAction(IdeActions.ACTION_EDITOR_JOIN_LINES, context);
     editor.getCaretModel().getAllCarets().forEach(caret -> {
       caret.removeSelection();
       final VisualPosition currentVisualPosition = caret.getVisualPosition();
@@ -1694,7 +1694,7 @@ public class ChangeGroup {
 
     VisualModeHelperKt.vimSetSystemSelectionSilently(editor.getSelectionModel(), startOffset, endOffset);
 
-    KeyHandler.executeAction(IdeActions.ACTION_EDITOR_AUTO_INDENT_LINES, context);
+    ActionExecutor.executeAction(IdeActions.ACTION_EDITOR_AUTO_INDENT_LINES, context);
 
     final int firstLine = editor.offsetToLogicalPosition(Math.min(startOffset, endOffset)).line;
     final int newOffset = VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, firstLine);

@@ -36,15 +36,10 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileVisitor;
-import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.helper.EditorHelper;
-import com.maddyhome.idea.vim.helper.EditorHelperRt;
-import com.maddyhome.idea.vim.helper.MessageHelper;
-import com.maddyhome.idea.vim.helper.SearchHelper;
-import com.maddyhome.idea.vim.option.IdeaWriteData;
+import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
 import com.maddyhome.idea.vim.vimscript.services.OptionConstants;
 import com.maddyhome.idea.vim.vimscript.services.OptionService;
@@ -184,14 +179,14 @@ public class FileGroup {
     else {
       action = "SaveDocument";
     }
-    KeyHandler.executeAction(action, context);
+    ActionExecutor.executeAction(action, context);
   }
 
   /**
    * Saves all files in the project.
    */
   public void saveFiles(DataContext context) {
-    KeyHandler.executeAction("SaveAll", context);
+    ActionExecutor.executeAction("SaveAll", context);
   }
 
   /**
