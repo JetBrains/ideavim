@@ -33,7 +33,7 @@ import org.jetbrains.plugins.ideavim.VimTestOption
  * @author Alex Plate
  */
 class JoinNotificationTest : VimOptionTestCase(OptionConstants.ideajoinName) {
-  // [VERSION UPDATE] 221+
+  // [VERSION UPDATE] 221+: Uncomment
 /*
   @VimOptionTestConfiguration(VimTestOption(OptionConstants.ideajoinName, OptionValueType.NUMBER, "0"))
   fun `test notification shown for no ideajoin`() {
@@ -53,7 +53,7 @@ class JoinNotificationTest : VimOptionTestCase(OptionConstants.ideajoinName) {
   }
 */
 
-  // [VERSION UPDATE] 221+
+  // [VERSION UPDATE] 221+: Uncomment
 /*
   @VimOptionTestConfiguration(VimTestOption(OptionConstants.ideajoinName, OptionValueType.NUMBER, "1"))
   fun `test notification not shown for ideajoin`() {
