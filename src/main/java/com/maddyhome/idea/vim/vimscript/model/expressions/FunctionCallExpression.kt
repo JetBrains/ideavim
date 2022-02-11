@@ -22,6 +22,7 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.statistic.VimscriptState
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
@@ -35,6 +36,7 @@ data class FunctionCallExpression(val scope: Scope?, val functionName: CurlyBrac
     this(scope, CurlyBracesName(listOf(SimpleExpression(functionName))), arguments)
 
   override fun evaluate(editor: Editor, context: DataContext, vimContext: VimLContext): VimDataType {
+    VimscriptState.isFunctionCallUsed = true
     val handler = FunctionStorage.getFunctionHandlerOrNull(scope, functionName.evaluate(editor, context, vimContext).value, vimContext)
     if (handler != null) {
       if (handler is DefinedFunctionHandler && handler.function.flags.contains(FunctionFlag.DICT)) {

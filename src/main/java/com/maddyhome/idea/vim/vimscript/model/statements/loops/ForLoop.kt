@@ -22,6 +22,7 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.statistic.VimscriptState
 import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
@@ -37,6 +38,7 @@ data class ForLoop(val variable: Variable, val iterable: Expression, val body: L
   override lateinit var vimContext: VimLContext
 
   override fun execute(editor: Editor, context: DataContext): ExecutionResult {
+    VimscriptState.isLoopUsed = true
     var result: ExecutionResult = ExecutionResult.Success
     body.forEach { it.vimContext = this }
 

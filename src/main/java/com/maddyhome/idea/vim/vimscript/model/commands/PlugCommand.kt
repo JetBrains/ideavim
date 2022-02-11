@@ -22,6 +22,7 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.extension.VimExtensionRegistrar
+import com.maddyhome.idea.vim.statistic.VimscriptState
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
@@ -39,6 +40,8 @@ data class PlugCommand(val ranges: Ranges, val argument: String) : Command.Singl
     if (!VimExtensionRegistrar.setOptionByPluginAlias(pluginAlias)) {
       return ExecutionResult.Error
     }
+
+    VimscriptState.extensionsEnabledWithPlug.add(VimExtensionRegistrar.extensionAliases[pluginAlias] ?: "unknown extension")
     return ExecutionResult.Success
   }
 }

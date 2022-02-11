@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.key.MappingOwner
+import com.maddyhome.idea.vim.statistic.VimscriptState
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.commands.Command
 import com.maddyhome.idea.vim.vimscript.model.commands.mapping.MapCommand.SpecialArgument.EXPR
@@ -68,6 +69,7 @@ data class MapCommand(val ranges: Ranges, val argument: String, val cmd: String)
     }
 
     if (arguments.specialArguments.contains(EXPR)) {
+      VimscriptState.isMapExprUsed = true
       VimPlugin.getKey()
         .putKeyMapping(modes, arguments.fromKeys, MappingOwner.IdeaVim, arguments.toExpr, arguments.secondArgument, commandInfo.isRecursive)
     } else {

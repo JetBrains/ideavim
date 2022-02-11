@@ -21,6 +21,7 @@ package com.maddyhome.idea.vim.vimscript.model.commands
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.ex.ranges.Ranges
+import com.maddyhome.idea.vim.statistic.VimscriptState
 import com.maddyhome.idea.vim.vimscript.Executor
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
@@ -35,6 +36,8 @@ data class SourceCommand(val ranges: Ranges, val argument: String) : Command.Sin
   override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
     val path = expandUser(argument.trim())
     Executor.executeFile(File(path), vimContext.getFirstParentContext() is CommandLineVimLContext)
+
+    VimscriptState.sourcedFiles.add(path)
     return ExecutionResult.Success
   }
 

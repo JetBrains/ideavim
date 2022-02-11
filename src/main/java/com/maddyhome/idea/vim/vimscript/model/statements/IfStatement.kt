@@ -20,6 +20,8 @@ package com.maddyhome.idea.vim.vimscript.model.statements
 
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.group.visual.VimSelection
+import com.maddyhome.idea.vim.statistic.VimscriptState
 import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
@@ -29,6 +31,7 @@ data class IfStatement(val conditionToBody: List<Pair<Expression, List<Executabl
   override lateinit var vimContext: VimLContext
 
   override fun execute(editor: Editor, context: DataContext): ExecutionResult {
+    VimscriptState.isIfUsed = true
     var result: ExecutionResult = ExecutionResult.Success
     var statementsToExecute: List<Executable>? = null
     for ((condition, statements) in conditionToBody) {
