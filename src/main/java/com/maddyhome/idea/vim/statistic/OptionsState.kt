@@ -31,7 +31,7 @@ import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import com.maddyhome.idea.vim.vimscript.services.OptionServiceImpl
 
-class VimStatistic : ApplicationUsagesCollector() {
+internal class OptionsState : ApplicationUsagesCollector() {
 
   override fun getGroup(): EventLogGroup = GROUP
 
