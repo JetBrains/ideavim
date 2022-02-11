@@ -242,7 +242,7 @@ private object ShortcutConflictsSettings : DumbAwareAction(MessageHelper.message
   }
 }
 
-private object JoinEap : DumbAwareAction()/*, LightEditCompatible*/ {
+internal object JoinEap : DumbAwareAction()/*, LightEditCompatible*/ {
   private const val EAP_LINK = "https://plugins.jetbrains.com/plugins/eap/ideavim"
 
   fun eapActive() = EAP_LINK in UpdateSettings.getInstance().storedPluginHosts

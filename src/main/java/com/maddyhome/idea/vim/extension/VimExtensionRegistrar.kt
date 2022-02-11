@@ -24,6 +24,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.key.MappingOwner.Plugin.Companion.remove
 import com.maddyhome.idea.vim.option.OptionsManager
+import com.maddyhome.idea.vim.statistic.PluginState
 import com.maddyhome.idea.vim.vimscript.Executor
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.options.OptionChangeListener
@@ -31,8 +32,8 @@ import com.maddyhome.idea.vim.vimscript.model.options.ToggleOption
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 
 object VimExtensionRegistrar {
-  private val registeredExtensions: MutableSet<String> = HashSet()
-  private val extensionAliases = HashMap<String, String>()
+  internal val registeredExtensions: MutableSet<String> = HashSet()
+  internal val extensionAliases = HashMap<String, String>()
   private var extensionRegistered = false
   private val logger = logger<VimExtensionRegistrar>()
 
@@ -74,6 +75,7 @@ object VimExtensionRegistrar {
         override fun processGlobalValueChange(oldValue: VimDataType?) {
           if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, name)) {
             initExtension(extensionBean, name)
+            PluginState.enabledExtensions.add(name)
           } else {
             extensionBean.instance.dispose()
           }
