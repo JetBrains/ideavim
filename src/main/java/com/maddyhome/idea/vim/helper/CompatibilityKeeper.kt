@@ -23,16 +23,9 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.CaretVisualAttributes
 import java.awt.Color
 
-// [VERSION UPDATE] 212+ (the whole file)
-
 internal fun getCaretVisualAttributes(color: Color?, weight: CaretVisualAttributes.Weight, shape: String, thickness: Float): CaretVisualAttributes {
-  if (buildGreater212()) {
-    val constructor = CaretVisualAttributes::class.java.constructors.find { it.parameterCount == 4 }!!
-    return constructor.newInstance(color, weight, getShape(shape), thickness) as CaretVisualAttributes
-  } else {
-    val constrcutor = CaretVisualAttributes::class.java.constructors.find { it.parameterCount == 2 }!!
-    return constrcutor.newInstance(color, weight) as CaretVisualAttributes
-  }
+  val constructor = CaretVisualAttributes::class.java.constructors.find { it.parameterCount == 4 }!!
+  return constructor.newInstance(color, weight, getShape(shape), thickness) as CaretVisualAttributes
 }
 
 @Suppress("UNCHECKED_CAST")

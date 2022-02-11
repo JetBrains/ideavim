@@ -19,7 +19,7 @@ package com.maddyhome.idea.vim.action.change.insert
 
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.components.ServiceManager
+import com.intellij.openapi.components.service
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
@@ -63,8 +63,7 @@ class InsertRegisterAction : VimActionHandler.SingleExecution() {
     }
   }
 
-  @SuppressWarnings("deprecation") // [VERSION UPDATE] 212+ getService
   private fun readExpression(editor: Editor): String? {
-    return ServiceManager.getService(CommandLineHelper::class.java).inputString(editor, "=", null)
+    return service<CommandLineHelper>().inputString(editor, "=", null)
   }
 }

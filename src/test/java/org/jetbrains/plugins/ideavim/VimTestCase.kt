@@ -44,7 +44,6 @@ import com.intellij.testFramework.UsefulTestCase
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
 import com.intellij.testFramework.fixtures.impl.LightTempDirTestFixtureImpl
-import com.intellij.util.ThrowableRunnable
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.VimShortcutKeyAction
@@ -639,31 +638,7 @@ abstract class VimTestCase : UsefulTestCase() {
   }
 
   protected fun assertExException(expectedErrorMessage: String, action: () -> Unit) {
-    assertThrowsX(ExException::class.java, expectedErrorMessage, action)
-  }
-
-  // [VERSION UPDATE] 211+ Use assertThrows from super
-  private fun assertThrowsX(
-    exceptionClass: Class<out Throwable?>,
-    expectedErrorMsgPart: String?,
-    runnable: ThrowableRunnable<*>,
-  ) {
-    var wasThrown = false
-    try {
-      runnable.run()
-    } catch (e: Throwable) {
-      wasThrown = true
-      if (!exceptionClass.isInstance(e)) {
-        throw AssertionError("Expected instance of: " + exceptionClass + " actual: " + e.javaClass, e)
-      }
-      if (expectedErrorMsgPart != null) {
-        assertTrue(e.message, e.message!!.contains(expectedErrorMsgPart))
-      }
-    } finally {
-      if (!wasThrown) {
-        fail("$exceptionClass must be thrown.")
-      }
-    }
+    assertThrows(ExException::class.java, expectedErrorMessage, action)
   }
 
   private fun typeTextViaIde(keys: List<KeyStroke?>, editor: Editor) {

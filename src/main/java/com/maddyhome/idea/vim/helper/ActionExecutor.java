@@ -65,13 +65,11 @@ public class ActionExecutor {
         // Executing listeners for action. I can't be sure that this code is absolutely correct,
         //   action execution process in IJ seems to be more complicated.
         ActionManagerEx actionManager = ActionManagerEx.getInstanceEx();
-        // [VERSION UPDATE] 212+
-        actionManager.fireBeforeActionPerformed(action, event.getDataContext(), event);
+        actionManager.fireBeforeActionPerformed(action, event);
 
         action.actionPerformed(event);
 
-        // [VERSION UPDATE] 212+
-        actionManager.fireAfterActionPerformed(action, event.getDataContext(), event);
+        actionManager.fireAfterActionPerformed(action, event, AnActionResult.PERFORMED);
         return true;
       }
     }

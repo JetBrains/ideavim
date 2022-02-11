@@ -19,7 +19,7 @@
 package com.maddyhome.idea.vim.group
 
 import com.intellij.openapi.components.Service
-import com.intellij.openapi.components.ServiceManager
+import com.intellij.openapi.components.service
 import com.intellij.openapi.editor.Editor
 
 @Service
@@ -27,9 +27,7 @@ class EditorHolderService {
   var editor: Editor? = null
 
   companion object {
-    // [VERSION UPDATE] 212+
-    @Suppress("DEPRECATION")
     @JvmStatic
-    fun getInstance(): EditorHolderService = ServiceManager.getService(EditorHolderService::class.java)
+    fun getInstance(): EditorHolderService = service()
   }
 }

@@ -169,7 +169,6 @@ class NerdTree : VimExtension {
   }
 
   class ProjectViewListener(private val project: Project) : ToolWindowManagerListener {
-    // [VERSION UPDATE] 2020.1+
     override fun toolWindowShown(id: String, toolWindow: ToolWindow) {
       if (ToolWindowId.PROJECT_VIEW != toolWindow.id) return
 

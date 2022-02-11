@@ -25,7 +25,6 @@ import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.diagnostic.Logger;
@@ -53,7 +52,10 @@ import com.maddyhome.idea.vim.option.OptionsManager;
 import com.maddyhome.idea.vim.ui.StatusBarIconFactory;
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable;
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
-import com.maddyhome.idea.vim.vimscript.services.*;
+import com.maddyhome.idea.vim.vimscript.services.FunctionStorage;
+import com.maddyhome.idea.vim.vimscript.services.OptionConstants;
+import com.maddyhome.idea.vim.vimscript.services.OptionService;
+import com.maddyhome.idea.vim.vimscript.services.VariableService;
 import org.jdom.Element;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
@@ -74,8 +76,6 @@ import static com.maddyhome.idea.vim.vimscript.services.VimRcService.executeIdea
  * This is an application level plugin meaning that all open projects will share a common instance of the plugin.
  * Registers and marks are shared across open projects so you can copy and paste between files of different projects.
  */
-@SuppressWarnings("deprecation")
-// [VERSION UPDATE] 212+ getService
 @State(name = "VimSettings", storages = {@Storage("$APP_CONFIG$/vim_settings.xml")})
 public class VimPlugin implements PersistentStateComponent<Element>, Disposable {
   private static final String IDEAVIM_PLUGIN_ID = "IdeaVIM";
@@ -128,10 +128,10 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
    */
   public static @NotNull NotificationService getNotifications(@Nullable Project project) {
     if (project == null) {
-      return ServiceManager.getService(NotificationService.class);
+      return ApplicationManager.getApplication().getService(NotificationService.class);
     }
     else {
-      return ServiceManager.getService(project, NotificationService.class);
+      return project.getService(NotificationService.class);
     }
   }
 
@@ -141,23 +141,23 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
 
 
   public static @NotNull MotionGroup getMotion() {
-    return ServiceManager.getService(MotionGroup.class);
+    return ApplicationManager.getApplication().getService(MotionGroup.class);
   }
 
   public static @NotNull ChangeGroup getChange() {
-    return ServiceManager.getService(ChangeGroup.class);
+    return ApplicationManager.getApplication().getService(ChangeGroup.class);
   }
 
   public static @NotNull CommandGroup getCommand() {
-    return ServiceManager.getService(CommandGroup.class);
+    return ApplicationManager.getApplication().getService(CommandGroup.class);
   }
 
   public static @NotNull MarkGroup getMark() {
-    return ServiceManager.getService(MarkGroup.class);
+    return ApplicationManager.getApplication().getService(MarkGroup.class);
   }
 
   public static @NotNull RegisterGroup getRegister() {
-    return ServiceManager.getService(RegisterGroup.class);
+    return ApplicationManager.getApplication().getService(RegisterGroup.class);
   }
 
   public static @Nullable RegisterGroup getRegisterIfCreated() {
@@ -165,11 +165,11 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   }
 
   public static @NotNull FileGroup getFile() {
-    return ServiceManager.getService(FileGroup.class);
+    return ApplicationManager.getApplication().getService(FileGroup.class);
   }
 
   public static @NotNull SearchGroup getSearch() {
-    return ServiceManager.getService(SearchGroup.class);
+    return ApplicationManager.getApplication().getService(SearchGroup.class);
   }
 
   public static @Nullable SearchGroup getSearchIfCreated() {
@@ -177,23 +177,23 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   }
 
   public static @NotNull ProcessGroup getProcess() {
-    return ServiceManager.getService(ProcessGroup.class);
+    return ApplicationManager.getApplication().getService(ProcessGroup.class);
   }
 
   public static @NotNull MacroGroup getMacro() {
-    return ServiceManager.getService(MacroGroup.class);
+    return ApplicationManager.getApplication().getService(MacroGroup.class);
   }
 
   public static @NotNull DigraphGroup getDigraph() {
-    return ServiceManager.getService(DigraphGroup.class);
+    return ApplicationManager.getApplication().getService(DigraphGroup.class);
   }
 
   public static @NotNull HistoryGroup getHistory() {
-    return ServiceManager.getService(HistoryGroup.class);
+    return ApplicationManager.getApplication().getService(HistoryGroup.class);
   }
 
   public static @NotNull KeyGroup getKey() {
-    return ServiceManager.getService(KeyGroup.class);
+    return ApplicationManager.getApplication().getService(KeyGroup.class);
   }
 
   public static @Nullable KeyGroup getKeyIfCreated() {
@@ -201,11 +201,11 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   }
 
   public static @NotNull WindowGroup getWindow() {
-    return ServiceManager.getService(WindowGroup.class);
+    return ApplicationManager.getApplication().getService(WindowGroup.class);
   }
 
   public static @NotNull EditorGroup getEditor() {
-    return ServiceManager.getService(EditorGroup.class);
+    return ApplicationManager.getApplication().getService(EditorGroup.class);
   }
 
   public static @Nullable EditorGroup getEditorIfCreated() {
@@ -213,23 +213,23 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   }
 
   public static @NotNull VisualMotionGroup getVisualMotion() {
-    return ServiceManager.getService(VisualMotionGroup.class);
+    return ApplicationManager.getApplication().getService(VisualMotionGroup.class);
   }
 
   public static @NotNull YankGroup getYank() {
-    return ServiceManager.getService(YankGroup.class);
+    return ApplicationManager.getApplication().getService(YankGroup.class);
   }
 
   public static @NotNull PutGroup getPut() {
-    return ServiceManager.getService(PutGroup.class);
+    return ApplicationManager.getApplication().getService(PutGroup.class);
   }
 
   public static @NotNull VariableService getVariableService() {
-    return ServiceManager.getService(VariableService.class);
+    return ApplicationManager.getApplication().getService(VariableService.class);
   }
 
   public static @NotNull OptionService getOptionService() {
-    return ServiceManager.getService(OptionService.class);
+    return ApplicationManager.getApplication().getService(OptionService.class);
   }
 
   private static @NotNull NotificationService getNotifications() {
@@ -336,7 +336,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   }
 
   public static @NotNull VimPlugin getInstance() {
-    return ServiceManager.getService(VimPlugin.class);
+    return ApplicationManager.getApplication().getService(VimPlugin.class);
   }
 
   /**
