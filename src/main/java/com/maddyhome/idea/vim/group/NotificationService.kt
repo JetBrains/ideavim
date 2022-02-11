@@ -42,6 +42,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
+import com.maddyhome.idea.vim.statistic.ActionTracker
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable
 import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
@@ -211,11 +212,18 @@ class NotificationService(private val project: Project?) {
 
         it.notify(project)
       }
+
+      if (id != null) {
+        ActionTracker.logTrackedAction(id)
+      }
     }
 
     class CopyActionId(val id: String?, val project: Project?) : DumbAwareAction(MessageHelper.message("action.copy.action.id.text")) {
       override fun actionPerformed(e: AnActionEvent) {
         CopyPasteManager.getInstance().setContents(StringSelection(id ?: ""))
+        if (id != null) {
+          ActionTracker.logCopiedAction(id)
+        }
         notification?.expire()
 
         val content = if (id == null) "No action id" else "Action id copied: $id"
