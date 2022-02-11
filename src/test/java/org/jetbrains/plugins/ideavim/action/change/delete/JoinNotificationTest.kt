@@ -20,10 +20,8 @@
 
 package org.jetbrains.plugins.ideavim.action.change.delete
 
-import com.intellij.notification.ActionCenter
 import com.intellij.notification.EventLog
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.group.NotificationService
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import org.jetbrains.plugins.ideavim.OptionValueType
@@ -35,6 +33,8 @@ import org.jetbrains.plugins.ideavim.VimTestOption
  * @author Alex Plate
  */
 class JoinNotificationTest : VimOptionTestCase(OptionConstants.ideajoinName) {
+  // [VERSION UPDATE] 221+
+/*
   @VimOptionTestConfiguration(VimTestOption(OptionConstants.ideajoinName, OptionValueType.NUMBER, "0"))
   fun `test notification shown for no ideajoin`() {
     val before = "I found${c} it\n in a legendary land"
@@ -51,7 +51,10 @@ class JoinNotificationTest : VimOptionTestCase(OptionConstants.ideajoinName) {
       notification.expire()
     }
   }
+*/
 
+  // [VERSION UPDATE] 221+
+/*
   @VimOptionTestConfiguration(VimTestOption(OptionConstants.ideajoinName, OptionValueType.NUMBER, "1"))
   fun `test notification not shown for ideajoin`() {
     val before = "I found${c} it\n in a legendary land"
@@ -62,6 +65,7 @@ class JoinNotificationTest : VimOptionTestCase(OptionConstants.ideajoinName) {
     val notifications = ActionCenter.getNotifications(myFixture.project, true)
     assertTrue(notifications.isEmpty() || notifications.last().isExpired || OptionConstants.ideajoinName !in notifications.last().content)
   }
+*/
 
   @VimOptionTestConfiguration(VimTestOption(OptionConstants.ideajoinName, OptionValueType.NUMBER, "0"))
   fun `test notification not shown if was shown already`() {
