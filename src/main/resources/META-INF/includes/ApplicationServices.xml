@@ -13,6 +13,8 @@
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.HistoryGroup"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.KeyGroup"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.WindowGroup"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.TabServiceImpl"
+                        serviceInterface="com.maddyhome.idea.vim.group.TabService"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.EditorGroup"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.visual.VisualMotionGroup"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.copy.YankGroup"/>

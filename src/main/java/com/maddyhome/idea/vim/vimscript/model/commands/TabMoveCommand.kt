@@ -19,11 +19,8 @@
 package com.maddyhome.idea.vim.vimscript.model.commands
 
 import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
-import com.intellij.ui.tabs.JBTabs
-import com.intellij.ui.tabs.TabInfo
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
@@ -40,48 +37,41 @@ data class TabMoveCommand(val ranges: Ranges, val argument: String) : Command.Si
       throw ExException("Range form of tabmove command is not supported. Please use the argument form")
     }
 
-    val project = PlatformDataKeys.PROJECT.getData(context) ?: return ExecutionResult.Error
-    val fileEditorManager = FileEditorManagerEx.getInstanceEx(project)
-    val currentWindow = fileEditorManager.currentWindow
-    val tabbedPane = currentWindow.tabbedPane
-    val tabs = tabbedPane.tabs
-    val currentTab = tabs.selectedInfo ?: return ExecutionResult.Error
-
-    val currentIndex = tabs.getIndexOf(currentTab)
+    val tabService = VimPlugin.getTabService()
+    val tabCount = tabService.getTabCount(context)
+    val currentIndex = tabService.getCurrentTabIndex(context)
     val index: Int
 
     try {
       index = if (argument.startsWith("+")) {
-        val number = argument.substring(1)
-        currentIndex + Integer.parseInt(number)
+        val number = Integer.parseInt(argument.substring(1))
+        if (number == 0) {
+          throw ExException("E474: Invalid argument")
+        }
+        currentIndex + number
       } else if (argument.startsWith("-")) {
-        val number = argument.substring(1)
-        currentIndex - Integer.parseInt(number)
+        val number = Integer.parseInt(argument.substring(1))
+        if (number == 0) {
+          throw ExException("E474: Invalid argument")
+        }
+        currentIndex - number
       } else if (argument == "$" || argument.isBlank()) {
-        tabbedPane.tabCount - 1
+        tabCount - 1
       } else {
         var number = Integer.parseInt(argument)
 
         // it's strange, but it is the way Vim works
         if (number > currentIndex) number -= 1
-
         number
       }
     } catch (e: NumberFormatException) {
       throw ExException("E474: Invalid argument")
     }
 
-    if (index < 0 || index >= tabbedPane.tabCount) {
+    if (index < 0 || index >= tabCount) {
       throw ExException("E474: Invalid argument")
     }
-    moveTabToIndex(currentTab, index, tabs)
-
+    tabService.moveCurrentTabToIndex(index, context)
     return ExecutionResult.Success
-  }
-
-  private fun moveTabToIndex(tab: TabInfo, index: Int, tabs: JBTabs) {
-    tabs.removeTab(tab)
-    tabs.addTab(tab, index)
-    tabs.select(tab, true)
   }
 }

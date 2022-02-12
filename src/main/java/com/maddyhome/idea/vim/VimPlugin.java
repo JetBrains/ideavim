@@ -204,6 +204,10 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     return ApplicationManager.getApplication().getService(WindowGroup.class);
   }
 
+  public static @NotNull TabService getTabService() {
+    return ApplicationManager.getApplication().getService(TabService.class);
+  }
+
   public static @NotNull EditorGroup getEditor() {
     return ApplicationManager.getApplication().getService(EditorGroup.class);
   }
