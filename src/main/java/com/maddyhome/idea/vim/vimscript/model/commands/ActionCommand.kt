@@ -50,6 +50,6 @@ data class ActionCommand(val ranges: Ranges, val argument: String) : Command.Sin
   }
 
   private fun executeAction(action: AnAction, context: DataContext) {
-      ActionExecutor.executeAction(action, context)
+    ActionExecutor.executeAction(action, context)
   }
 }

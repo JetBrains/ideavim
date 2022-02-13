@@ -186,7 +186,7 @@ class OpMappingTest : VimTestCase() {
 
     typeText(parseKeys("dR"))
     PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
-    assertState("I fou${c} in a legendary land")
+    assertState("I fou$c in a legendary land")
   }
 
   /**
@@ -201,7 +201,7 @@ class OpMappingTest : VimTestCase() {
 
     typeText(parseKeys("dE"))
     PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
-    assertState("I found it${c} in a legendary land")
+    assertState("I found it$c in a legendary land")
   }
 }
 

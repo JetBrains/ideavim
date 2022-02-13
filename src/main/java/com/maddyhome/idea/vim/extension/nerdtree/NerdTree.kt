@@ -507,11 +507,13 @@ class NerdTree : VimExtension {
       }
       val application = ApplicationManager.getApplication()
       if (application.isUnitTestMode) {
-          ActionExecutor.executeAction(action, context)
+        ActionExecutor.executeAction(action, context)
       } else {
         runAfterGotFocus {
-            ActionExecutor.executeAction(action,
-                context)
+          ActionExecutor.executeAction(
+            action,
+            context
+          )
         }
       }
     }

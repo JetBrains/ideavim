@@ -84,5 +84,4 @@ internal class VimscriptState : ApplicationUsagesCollector() {
       IS_FUNCTION_CALL_USED,
     )
   }
-
 }

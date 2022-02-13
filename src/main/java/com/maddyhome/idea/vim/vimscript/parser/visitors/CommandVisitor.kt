@@ -93,8 +93,8 @@ import com.maddyhome.idea.vim.vimscript.model.commands.SplitCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.SplitType
 import com.maddyhome.idea.vim.vimscript.model.commands.SubstituteCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.TabCloseCommand
-import com.maddyhome.idea.vim.vimscript.model.commands.TabOnlyCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.TabMoveCommand
+import com.maddyhome.idea.vim.vimscript.model.commands.TabOnlyCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.UndoCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.UnknownCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.UnlockVarCommand

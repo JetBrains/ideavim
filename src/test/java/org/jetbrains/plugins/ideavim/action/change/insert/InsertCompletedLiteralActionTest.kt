@@ -44,7 +44,7 @@ import org.junit.experimental.theories.Theory
 import org.junit.runner.RunWith
 
 @RunWith(Theories::class)
-class InsertCompletedLiteralActionTest: VimTestCase() {
+class InsertCompletedLiteralActionTest : VimTestCase() {
 
   companion object {
     @JvmStatic
@@ -79,23 +79,23 @@ class InsertCompletedLiteralActionTest: VimTestCase() {
 
   // todo parametrized
   // FYI space key after code will be sent via VimPlugin.getMacro().postKey(key, editor);, that's why we ignore the last space in tests
-  //fun `octal codes`(@FromDataPoints("octalPrefix") prefix: String) {
+  // fun `octal codes`(@FromDataPoints("octalPrefix") prefix: String) {
   @Theory
   fun `octal codes`() {
     for (prefix in octalPrefix) {
-      checkInsert("$prefix "," ")
-      checkInsert("${prefix}7 ","${7.toChar()}")
-      checkInsert("${prefix}07 ","${7.toChar()}")
-      checkInsert("${prefix}007","${7.toChar()}")
+      checkInsert("$prefix ", " ")
+      checkInsert("${prefix}7 ", "${7.toChar()}")
+      checkInsert("${prefix}07 ", "${7.toChar()}")
+      checkInsert("${prefix}007", "${7.toChar()}")
     }
   }
 
   // FYI space key after code will be sent via VimPlugin.getMacro().postKey(key, editor);, that's why we ignore the last space in tests
   @Theory
   fun `decimal codes`() {
-    checkInsert("1 ","${1.toChar()}")
-    checkInsert("01 ","${1.toChar()}")
-    checkInsert("001","${1.toChar()}")
+    checkInsert("1 ", "${1.toChar()}")
+    checkInsert("01 ", "${1.toChar()}")
+    checkInsert("001", "${1.toChar()}")
   }
 
   // FYI space key after code will be sent via VimPlugin.getMacro().postKey(key, editor);, that's why we ignore the last space in tests
@@ -116,14 +116,14 @@ class InsertCompletedLiteralActionTest: VimTestCase() {
     }
 
     for (prefix in longHexPrefix) {
-      checkInsert("$prefix "," ")
-      checkInsert("${prefix}B ","${11.toChar()}")
-      checkInsert("${prefix}0B ","${11.toChar()}")
-      checkInsert("${prefix}00B ","${11.toChar()}")
-      checkInsert("${prefix}000B ","${11.toChar()}")
-      checkInsert("${prefix}0000B ","${11.toChar()}")
-      checkInsert("${prefix}00000B ","${11.toChar()}")
-      checkInsert("${prefix}000000B ","${11.toChar()}")
+      checkInsert("$prefix ", " ")
+      checkInsert("${prefix}B ", "${11.toChar()}")
+      checkInsert("${prefix}0B ", "${11.toChar()}")
+      checkInsert("${prefix}00B ", "${11.toChar()}")
+      checkInsert("${prefix}000B ", "${11.toChar()}")
+      checkInsert("${prefix}0000B ", "${11.toChar()}")
+      checkInsert("${prefix}00000B ", "${11.toChar()}")
+      checkInsert("${prefix}000000B ", "${11.toChar()}")
       checkInsert("${prefix}0000000B", "${11.toChar()}")
     }
   }
@@ -163,7 +163,6 @@ class InsertCompletedLiteralActionTest: VimTestCase() {
 //    checkInsert("u000A", 0.toChar().toString())
 //    checkInsert("U0000000A", 0.toChar().toString())
 //  }
-
 
   @Theory
   fun `regular character`() {

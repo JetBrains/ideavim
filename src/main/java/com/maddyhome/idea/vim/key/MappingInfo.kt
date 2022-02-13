@@ -177,12 +177,12 @@ class ToHandlerMappingInfo(
       handler._backingFunction = Runnable {
         myFun(shouldCalculateOffsets, editor, startOffsets)
 
-
         if (shouldCalculateOffsets) {
           invokeLater {
             KeyHandler.getInstance().finishedCommandPreparation(
               IjVimEditor(editor),
-              context.vim, CommandState.getInstance(editor), CommandState.getInstance(editor).commandBuilder, null, false)
+              context.vim, CommandState.getInstance(editor), CommandState.getInstance(editor).commandBuilder, null, false
+            )
           }
         }
       }
