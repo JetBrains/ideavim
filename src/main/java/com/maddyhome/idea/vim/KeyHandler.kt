@@ -25,7 +25,6 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.editor.EditorModificationUtil
 import com.intellij.openapi.editor.actionSystem.ActionPlan
-import com.intellij.openapi.util.Ref
 import com.maddyhome.idea.vim.action.change.VimRepeater.Extension.argumentCaptured
 import com.maddyhome.idea.vim.action.change.change.ChangeCharacterAction
 import com.maddyhome.idea.vim.action.change.change.ChangeVisualCharacterAction
@@ -291,13 +290,13 @@ class KeyHandler {
       if (register.currentRegister == register.defaultRegister) {
         var indicateError = true
         if (key.keyCode == KeyEvent.VK_ESCAPE) {
-          val executed = Ref.create<Boolean>()
+          val executed = arrayOf<Boolean?>(null)
           ActionExecutor.executeCommand(
               editor.editor.project,
-              { executed.set(ActionExecutor.executeAction(IdeActions.ACTION_EDITOR_ESCAPE, context.ij)) },
+              { executed[0] = ActionExecutor.executeAction(IdeActions.ACTION_EDITOR_ESCAPE, context.ij) },
               "", null
             )
-          indicateError = !executed.get()
+          indicateError = !executed[0]!!
         }
         if (indicateError) {
           VimPlugin.indicateError()
