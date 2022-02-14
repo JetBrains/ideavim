@@ -25,9 +25,6 @@ import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
-import com.intellij.openapi.diagnostic.Logger
-import com.intellij.openapi.diagnostic.debug
-import com.intellij.openapi.diagnostic.trace
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorModificationUtil
 import com.intellij.openapi.editor.actionSystem.ActionPlan
@@ -69,7 +66,10 @@ import com.maddyhome.idea.vim.key.Node
 import com.maddyhome.idea.vim.newapi.ExecutionContext
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.VimEditor
+import com.maddyhome.idea.vim.newapi.VimLogger
+import com.maddyhome.idea.vim.newapi.debug
 import com.maddyhome.idea.vim.newapi.ij
+import com.maddyhome.idea.vim.newapi.trace
 import com.maddyhome.idea.vim.ui.ShowCmd.update
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
@@ -945,9 +945,7 @@ class KeyHandler {
     }
 
     companion object {
-      private val LOG = Logger.getInstance(
-        KeyHandler::class.java
-      )
+      private val LOG: VimLogger = vimLogger<KeyHandler>()
 
       fun <T> isPrefix(list1: List<T>, list2: List<T>): Boolean {
         if (list1.size > list2.size) {
