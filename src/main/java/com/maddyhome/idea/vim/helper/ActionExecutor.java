@@ -20,10 +20,14 @@ package com.maddyhome.idea.vim.helper;
 
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.actionSystem.ex.ActionManagerEx;
+import com.intellij.openapi.command.CommandProcessor;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.ui.popup.ListPopup;
+import com.intellij.openapi.util.NlsContexts;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
@@ -86,5 +90,12 @@ public class ActionExecutor {
     ActionManager aMgr = ActionManager.getInstance();
     AnAction action = aMgr.getAction(name);
     return action != null && executeAction(action, context);
+  }
+
+  public static void executeCommand(@Nullable Project project,
+                                    @NotNull Runnable runnable,
+                                    @Nullable @NlsContexts.Command String name,
+                                    @Nullable Object groupId) {
+    CommandProcessor.getInstance().executeCommand(project, runnable, name, groupId);
   }
 }

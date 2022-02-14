@@ -45,7 +45,7 @@ class ExShortcutKeyAction(private val exEntryPanel: ExEntryPanel) : DumbAwareAct
     val keyStroke = getKeyStroke(e)
     if (keyStroke != null) {
       val editor = exEntryPanel.entry.editor
-      KeyHandler.getInstance().handleKey(editor, keyStroke, EditorDataContext.init(editor, e.dataContext).vim)
+      KeyHandler.getInstance().handleKey(editor.vim, keyStroke, EditorDataContext.init(editor, e.dataContext).vim)
     }
   }
 

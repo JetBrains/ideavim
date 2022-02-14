@@ -122,7 +122,7 @@ class CompleteEntryAction : TextAction(ExEditorKit.CompleteEntry) {
     //   write action
     // * The key handler routines get the chance to clean up and reset state
     val entry = ExEntryPanel.getInstance().entry
-    KeyHandler.getInstance().handleKey(entry.editor, stroke, entry.context.vim)
+    KeyHandler.getInstance().handleKey(entry.editor.vim, stroke, entry.context.vim)
   }
 
   companion object {

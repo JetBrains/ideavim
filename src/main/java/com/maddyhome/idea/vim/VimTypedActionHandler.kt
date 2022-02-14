@@ -59,7 +59,7 @@ class VimTypedActionHandler(origHandler: TypedActionHandler) : TypedActionHandle
     LOG.trace("Executing before execute")
     val modifiers = if (charTyped == ' ' && VimKeyListener.isSpaceShift) KeyEvent.SHIFT_DOWN_MASK else 0
     val keyStroke = KeyStroke.getKeyStroke(charTyped, modifiers)
-    handler.beforeHandleKey(editor, keyStroke, IjExecutionContext(context), plan)
+    handler.beforeHandleKey(editor.vim, keyStroke, IjExecutionContext(context), plan)
   }
 
   override fun execute(editor: Editor, charTyped: Char, context: DataContext) {
@@ -75,7 +75,7 @@ class VimTypedActionHandler(origHandler: TypedActionHandler) : TypedActionHandle
       val modifiers = if (charTyped == ' ' && VimKeyListener.isSpaceShift) KeyEvent.SHIFT_DOWN_MASK else 0
       val keyStroke = KeyStroke.getKeyStroke(charTyped, modifiers)
       val startTime = if (traceTime) System.currentTimeMillis() else null
-      handler.handleKey(editor, keyStroke, EditorDataContext.init(editor, context).vim)
+      handler.handleKey(editor.vim, keyStroke, EditorDataContext.init(editor, context).vim)
       if (startTime != null) {
         val duration = System.currentTimeMillis() - startTime
         LOG.info("VimTypedAction '$charTyped': $duration ms")

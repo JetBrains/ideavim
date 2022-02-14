@@ -289,6 +289,8 @@ enum class LineDeleteShift {
 
 val Editor.vim: IjVimEditor
   get() = IjVimEditor(this)
+val VimEditor.ij: Editor
+  get() = (this as IjVimEditor).editor
 
 class IjVimEditor(editor: Editor) : MutableLinearEditor() {
 

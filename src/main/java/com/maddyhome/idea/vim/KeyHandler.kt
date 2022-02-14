@@ -23,7 +23,6 @@ import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
-import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorModificationUtil
 import com.intellij.openapi.editor.actionSystem.ActionPlan
 import com.intellij.openapi.util.Ref
@@ -100,7 +99,7 @@ class KeyHandler {
    * @param plan    The current action plan
    */
   fun beforeHandleKey(
-    editor: Editor,
+    editor: VimEditor,
     key: KeyStroke,
     context: ExecutionContext,
     plan: ActionPlan,
@@ -119,8 +118,8 @@ class KeyHandler {
    * @param key     The keystroke typed by the user
    * @param context The data context
    */
-  fun handleKey(editor: Editor, key: KeyStroke, context: ExecutionContext) {
-    handleKey(IjVimEditor(editor), key, context, allowKeyMappings = true, mappingCompleted = false)
+  fun handleKey(editor: IjVimEditor, key: KeyStroke, context: ExecutionContext) {
+    handleKey(editor, key, context, allowKeyMappings = true, mappingCompleted = false)
   }
 
   /**
@@ -293,8 +292,7 @@ class KeyHandler {
         var indicateError = true
         if (key.keyCode == KeyEvent.VK_ESCAPE) {
           val executed = Ref.create<Boolean>()
-          CommandProcessor.getInstance()
-            .executeCommand(
+          ActionExecutor.executeCommand(
               editor.editor.project,
               { executed.set(ActionExecutor.executeAction(IdeActions.ACTION_EDITOR_ESCAPE, context.ij)) },
               "", null
@@ -667,7 +665,7 @@ class KeyHandler {
           }
           val stroke = res.stroke ?: return false
           editorState.commandBuilder.addKey(key)
-          handleKey(editor.editor, stroke, context)
+          handleKey(editor, stroke, context)
           return true
         }
         DigraphResult.RES_BAD -> {
@@ -682,7 +680,7 @@ class KeyHandler {
           // state. E.g. waiting for {char} <BS> {char}. Let the key handler have a go at it.
           if (commandBuilder.expectedArgumentType === Argument.Type.DIGRAPH) {
             commandBuilder.fallbackToCharacterArgument()
-            handleKey(editor.editor, key, context)
+            handleKey(editor, key, context)
             return true
           }
           return false
@@ -721,7 +719,7 @@ class KeyHandler {
         }
       }
       if (ApplicationManager.getApplication().isDispatchThread) {
-        val action: Runnable = ActionRunner(editor.editor, context, command, operatorArguments)
+        val action: Runnable = ActionRunner(editor, context, command, operatorArguments)
         val cmdAction = command.action
         val name = cmdAction.id
         if (type.isWrite) {
@@ -758,7 +756,7 @@ class KeyHandler {
       } else {
         LOG.trace("Set waiting for the argument")
         val argumentType = action.argumentType
-        startWaitingForArgument(editor.editor, context, key.keyChar, action, argumentType!!, editorState)
+        startWaitingForArgument(editor, context, key.keyChar, action, argumentType!!, editorState)
         partialReset(editor)
       }
 
@@ -794,7 +792,7 @@ class KeyHandler {
     }
 
     private fun startWaitingForArgument(
-      editor: Editor,
+      editor: VimEditor,
       context: ExecutionContext,
       key: Char,
       action: EditorActionHandlerBase,
@@ -823,7 +821,7 @@ class KeyHandler {
         Argument.Type.EX_STRING -> {
           // The current Command expects an EX_STRING argument. E.g. SearchEntry(Fwd|Rev)Action. This won't execute until
           // state hits READY. Start the ex input field, push CMD_LINE mode and wait for the argument.
-          VimPlugin.getProcess().startSearchCommand(editor, context.ij, commandBuilder.count, key)
+          VimPlugin.getProcess().startSearchCommand(editor.ij, context.ij, commandBuilder.count, key)
           commandBuilder.commandState = CurrentCommandState.NEW_COMMAND
           editorState.pushModes(CommandState.Mode.CMD_LINE, CommandState.SubMode.NONE)
         }
@@ -895,7 +893,7 @@ class KeyHandler {
      * This was used as an experiment to execute actions as a runnable.
      */
     internal class ActionRunner(
-      editor: Editor?,
+      val editor: IjVimEditor,
       val context: ExecutionContext,
       val cmd: Command,
       val operatorArguments: OperatorArguments,
@@ -930,12 +928,6 @@ class KeyHandler {
         if (editorState.commandBuilder.isDone()) {
           getInstance().reset(editor)
         }
-      }
-
-      private val editor: IjVimEditor
-
-      init {
-        this.editor = IjVimEditor(editor!!)
       }
     }
 

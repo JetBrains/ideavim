@@ -33,6 +33,7 @@ import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.StringHelper;
 import com.maddyhome.idea.vim.newapi.IjExecutionContext;
+import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.vimscript.services.OptionConstants;
 import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import org.jetbrains.annotations.NotNull;
@@ -143,7 +144,7 @@ public class MacroGroup {
           logger.debug("processing key " + pos);
         }
         // Handle one keystroke then queue up the next key
-        KeyHandler.getInstance().handleKey(editor, keys.get(pos), new IjExecutionContext(context));
+        KeyHandler.getInstance().handleKey(new IjVimEditor(editor), keys.get(pos), new IjExecutionContext(context));
         if (pos < keys.size() - 1) {
           playbackKeys(editor, context, project, keys, pos + 1, cnt, total);
         }
@@ -175,7 +176,7 @@ public class MacroGroup {
               return;
             }
             ProgressManager.getInstance().executeNonCancelableSection(() -> {
-              KeyHandler.getInstance().handleKey(editor, key, new IjExecutionContext(context));
+              KeyHandler.getInstance().handleKey(new IjVimEditor(editor), key, new IjExecutionContext(context));
             });
           }
         }
