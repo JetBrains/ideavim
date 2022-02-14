@@ -404,6 +404,10 @@ Contributors:
   [![icon][github]](https://github.com/AlexPl292)
   &nbsp;
   Alex Pláte
+* [![icon][mail]](mailto:david@dadon.fr)
+  [![icon][github]](https://github.com/ddadon10)
+  &nbsp;
+  David Dadon
                         
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainers.
