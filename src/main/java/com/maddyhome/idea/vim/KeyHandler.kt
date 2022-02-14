@@ -17,7 +17,6 @@
  */
 package com.maddyhome.idea.vim
 
-import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.IdeActions
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
@@ -103,7 +102,7 @@ class KeyHandler {
   fun beforeHandleKey(
     editor: Editor,
     key: KeyStroke,
-    context: DataContext,
+    context: ExecutionContext,
     plan: ActionPlan,
   ) {
     val mode = editor.mode
@@ -722,7 +721,7 @@ class KeyHandler {
         }
       }
       if (ApplicationManager.getApplication().isDispatchThread) {
-        val action: Runnable = ActionRunner(editor.editor, context.ij, command, operatorArguments)
+        val action: Runnable = ActionRunner(editor.editor, context, command, operatorArguments)
         val cmdAction = command.action
         val name = cmdAction.id
         if (type.isWrite) {
@@ -897,7 +896,7 @@ class KeyHandler {
      */
     internal class ActionRunner(
       editor: Editor?,
-      val context: DataContext,
+      val context: ExecutionContext,
       val cmd: Command,
       val operatorArguments: OperatorArguments,
     ) : Runnable {
@@ -908,7 +907,7 @@ class KeyHandler {
         if (register != null) {
           VimPlugin.getRegister().selectRegister(register)
         }
-        VimActionExecutor.executeVimAction(editor.editor, cmd.action, context, operatorArguments)
+        VimActionExecutor.executeVimAction(editor.editor, cmd.action, context.ij, operatorArguments)
         if (editorState.mode === CommandState.Mode.INSERT || editorState.mode === CommandState.Mode.REPLACE) {
           VimPlugin.getChange().processCommand(editor.editor, cmd)
         }

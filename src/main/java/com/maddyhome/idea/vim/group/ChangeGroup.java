@@ -817,14 +817,14 @@ public class ChangeGroup {
    * @param plan    the current action plan draft
    */
   public void beforeProcessKey(final @NotNull Editor editor,
-                               final @NotNull DataContext context,
+                               final @NotNull ExecutionContext context,
                                final @NotNull KeyStroke key,
                                @NotNull ActionPlan plan) {
 
     final TypedActionHandler originalHandler = KeyHandlerKeeper.getInstance().getOriginalHandler();
 
     if (originalHandler instanceof TypedActionHandlerEx) {
-      ((TypedActionHandlerEx)originalHandler).beforeExecute(editor, key.getKeyChar(), context, plan);
+      ((TypedActionHandlerEx)originalHandler).beforeExecute(editor, key.getKeyChar(), ((IjExecutionContext)context).getContext(), plan);
     }
   }
 

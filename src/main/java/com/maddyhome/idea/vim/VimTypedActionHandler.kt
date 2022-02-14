@@ -27,6 +27,7 @@ import com.intellij.openapi.progress.ProcessCanceledException
 import com.maddyhome.idea.vim.helper.EditorDataContext
 import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
 import com.maddyhome.idea.vim.key.KeyHandlerKeeper
+import com.maddyhome.idea.vim.newapi.IjExecutionContext
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
@@ -58,7 +59,7 @@ class VimTypedActionHandler(origHandler: TypedActionHandler) : TypedActionHandle
     LOG.trace("Executing before execute")
     val modifiers = if (charTyped == ' ' && VimKeyListener.isSpaceShift) KeyEvent.SHIFT_DOWN_MASK else 0
     val keyStroke = KeyStroke.getKeyStroke(charTyped, modifiers)
-    handler.beforeHandleKey(editor, keyStroke, context, plan)
+    handler.beforeHandleKey(editor, keyStroke, IjExecutionContext(context), plan)
   }
 
   override fun execute(editor: Editor, charTyped: Char, context: DataContext) {
