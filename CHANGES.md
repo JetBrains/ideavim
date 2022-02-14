@@ -47,6 +47,7 @@ usual beta standards.
 * [435](https://github.com/JetBrains/ideavim/pull/435) by [Piotr Mikulski](https://github.com/pmnoxx): Print stderr when running a command just like vim does
 * [449](https://github.com/JetBrains/ideavim/pull/449) by [Lonre Wang](https://github.com/lonre): Typo fix
 * [453](https://github.com/JetBrains/ideavim/pull/453) by [Matt Ellis](https://github.com/citizenmatt): fix(VIM-2470): Fix incorrect reset of cursor shape
+* [461](https://github.com/JetBrains/ideavim/pull/461) by [David Dadon](https://github.com/ddadon10): Add shortcut to ideajoin example
 
 ## 1.9.0, 2021-12-10
 
