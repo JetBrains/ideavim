@@ -19,7 +19,6 @@
 package com.maddyhome.idea.vim.action.motion.updown
 
 import com.intellij.codeInsight.lookup.LookupManager
-import com.intellij.ide.IdeEventQueue
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.IdeActions
 import com.intellij.openapi.editor.Caret
@@ -76,7 +75,6 @@ class MotionDownCtrlNAction : MotionDownAction() {
     return if (activeLookup != null) {
       val primaryCaret = editor.caretModel.primaryCaret
       if (caret == primaryCaret) {
-        IdeEventQueue.getInstance().flushDelayedKeyEvents()
         EditorActionManager.getInstance().getActionHandler(IdeActions.ACTION_EDITOR_MOVE_CARET_DOWN)
           .execute(editor, primaryCaret, context)
       }

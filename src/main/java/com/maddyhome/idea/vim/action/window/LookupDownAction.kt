@@ -19,19 +19,15 @@
 package com.maddyhome.idea.vim.action.window
 
 import com.intellij.codeInsight.lookup.LookupManager
-import com.intellij.ide.IdeEventQueue
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.IdeActions
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.actionSystem.EditorActionManager
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.ActionExecutor
-import com.maddyhome.idea.vim.helper.enumSetOf
-import java.util.*
 
 /**
  * @author Alex Plate
@@ -42,11 +38,9 @@ class LookupDownAction : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TYPEAHEAD_SELF_MANAGE)
   override fun execute(editor: Editor, context: DataContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
     val activeLookup = LookupManager.getActiveLookup(editor)
     if (activeLookup != null) {
-      IdeEventQueue.getInstance().flushDelayedKeyEvents()
       EditorActionManager.getInstance().getActionHandler(IdeActions.ACTION_EDITOR_MOVE_CARET_DOWN)
         .execute(editor, editor.caretModel.primaryCaret, context)
     } else {

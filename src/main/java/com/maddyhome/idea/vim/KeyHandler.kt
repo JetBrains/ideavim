@@ -17,7 +17,6 @@
  */
 package com.maddyhome.idea.vim
 
-import com.intellij.ide.IdeEventQueue
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.IdeActions
 import com.intellij.openapi.application.ApplicationManager
@@ -721,9 +720,6 @@ class KeyHandler {
           LOG.warn("File is not writable")
           return
         }
-      }
-      if (!command.flags.contains(CommandFlags.FLAG_TYPEAHEAD_SELF_MANAGE)) {
-        IdeEventQueue.getInstance().flushDelayedKeyEvents()
       }
       if (ApplicationManager.getApplication().isDispatchThread) {
         val action: Runnable = ActionRunner(editor.editor, context.ij, command, operatorArguments)
