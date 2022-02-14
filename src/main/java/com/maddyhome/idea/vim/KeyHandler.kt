@@ -17,13 +17,11 @@
  */
 package com.maddyhome.idea.vim
 
-import com.intellij.openapi.actionSystem.IdeActions
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
-import com.intellij.openapi.editor.EditorModificationUtil
 import com.intellij.openapi.editor.actionSystem.ActionPlan
 import com.maddyhome.idea.vim.action.change.VimRepeater.Extension.argumentCaptured
 import com.maddyhome.idea.vim.action.change.change.ChangeCharacterAction
@@ -293,7 +291,7 @@ class KeyHandler {
           val executed = arrayOf<Boolean?>(null)
           ActionExecutor.executeCommand(
               editor.editor.project,
-              { executed[0] = ActionExecutor.executeAction(IdeActions.ACTION_EDITOR_ESCAPE, context.ij) },
+              { executed[0] = ActionExecutor.executeEsc(context.ij) },
               "", null
             )
           indicateError = !executed[0]!!
@@ -708,9 +706,7 @@ class KeyHandler {
       val project = editor.editor.project
       val type = command.type
       if (type.isWrite) {
-        val modificationAllowed = EditorModificationUtil.checkModificationAllowed(editor.editor)
-        val writeRequested = EditorModificationUtil.requestWriting(editor.editor)
-        if (!modificationAllowed || !writeRequested) {
+        if (!editor.isWritable()) {
           VimPlugin.indicateError()
           reset(editor)
           LOG.warn("File is not writable")

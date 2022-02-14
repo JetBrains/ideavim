@@ -20,6 +20,7 @@ package com.maddyhome.idea.vim.newapi
 
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.EditorModificationUtil
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
@@ -143,6 +144,7 @@ interface VimEditor {
   fun getLineRange(line: EditorLine.Pointer): Pair<Offset, Offset>
   fun charAt(offset: Pointer): Char
   fun carets(): List<VimCaret>
+  fun isWritable(): Boolean
 }
 
 fun VimEditor.indentForLine(line: Int): Int {
@@ -363,6 +365,12 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
     } else {
       editor.caretModel.allCarets.map { IjVimCaret(it) }
     }
+  }
+
+  override fun isWritable(): Boolean {
+    val modificationAllowed = EditorModificationUtil.checkModificationAllowed(editor)
+    val writeRequested = EditorModificationUtil.requestWriting(editor)
+    return modificationAllowed && writeRequested
   }
 
   override fun getText(left: Offset, right: Offset): CharSequence {

@@ -98,4 +98,8 @@ public class ActionExecutor {
                                     @Nullable Object groupId) {
     CommandProcessor.getInstance().executeCommand(project, runnable, name, groupId);
   }
+
+  public static boolean executeEsc(@NotNull DataContext context) {
+    return ActionExecutor.executeAction(IdeActions.ACTION_EDITOR_ESCAPE, context);
+  }
 }
