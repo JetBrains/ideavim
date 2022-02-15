@@ -26,10 +26,19 @@ import javax.swing.*;
 import java.awt.event.InputEvent;
 import java.util.List;
 
+import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
+
 /**
  * @author vlan
  */
 public class StringHelperTest extends VimTestCase {
+
+  public void testFalseSpecialKey() {
+    List<KeyStroke> expectedKeys = parseKeys("move '<-2");
+    expectedKeys.addAll(parseKeys("<CR>"));
+    assertEquals(expectedKeys, parseKeys("move '<-2<CR>"));
+  }
+
   public void testParseKeyModifiers() {
     assertTypedKeyStroke('C', "C");
     assertTypedKeyStroke('c', "c");
@@ -117,7 +126,7 @@ public class StringHelperTest extends VimTestCase {
 
   @NotNull
   private KeyStroke parseKeyStroke(@NotNull String s) {
-    final List<KeyStroke> actualStrokes = StringHelper.parseKeys(s);
+    final List<KeyStroke> actualStrokes = parseKeys(s);
     assertEquals(StringHelper.toKeyNotation(actualStrokes), 1, actualStrokes.size());
     return actualStrokes.get(0);
   }

@@ -99,6 +99,7 @@ public class StringHelper {
    */
   public static @NotNull List<KeyStroke> parseKeys(@NotNull @NonNls String... strings) {
     final List<KeyStroke> result = new ArrayList<>();
+    char specialKeyStart = '<';
     for (String s : strings) {
       KeyParserState state = KeyParserState.INIT;
       StringBuilder specialKeyBuilder = new StringBuilder();
@@ -110,6 +111,7 @@ public class StringHelper {
               state = KeyParserState.ESCAPE;
             }
             else if (c == '<' || c == '«') {
+              specialKeyStart = c;
               state = KeyParserState.SPECIAL;
               specialKeyBuilder = new StringBuilder();
             }
@@ -162,7 +164,14 @@ public class StringHelper {
               }
             }
             else {
-              specialKeyBuilder.append(c);
+              // e.g. move '<-2<CR> - the first part does not belong to any special key
+              if (c == '<' || c == '«') {
+                result.add(getKeyStroke(specialKeyStart));
+                result.addAll(stringToKeys(specialKeyBuilder.toString()));
+                specialKeyBuilder = new StringBuilder();
+              } else {
+                specialKeyBuilder.append(c);
+              }
             }
             break;
         }
@@ -171,7 +180,7 @@ public class StringHelper {
         result.add(getKeyStroke('\\'));
       }
       else if (state == KeyParserState.SPECIAL) {
-        result.add(getKeyStroke('<'));
+        result.add(getKeyStroke(specialKeyStart));
         result.addAll(stringToKeys(specialKeyBuilder.toString()));
       }
     }
