@@ -22,7 +22,6 @@ import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
-import com.intellij.openapi.editor.actionSystem.ActionPlan
 import com.maddyhome.idea.vim.action.change.VimRepeater.Extension.argumentCaptured
 import com.maddyhome.idea.vim.action.change.change.ChangeCharacterAction
 import com.maddyhome.idea.vim.action.change.change.ChangeVisualCharacterAction
@@ -52,7 +51,6 @@ import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.helper.inNormalMode
 import com.maddyhome.idea.vim.helper.inSingleNormalMode
 import com.maddyhome.idea.vim.helper.inVisualMode
-import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.key.CommandNode
 import com.maddyhome.idea.vim.key.CommandPartNode
 import com.maddyhome.idea.vim.key.KeyMapping
@@ -83,29 +81,6 @@ import javax.swing.KeyStroke
 class KeyHandler {
 
   private var handleKeyRecursionCount = 0
-
-  /**
-   * Invoked before acquiring a write lock and actually handling the keystroke.
-   *
-   *
-   * Drafts an optional [ActionPlan] that will be used as a base for zero-latency rendering in editor.
-   *
-   * @param editor  The editor the key was typed into
-   * @param key     The keystroke typed by the user
-   * @param context The data context
-   * @param plan    The current action plan
-   */
-  fun beforeHandleKey(
-    editor: VimEditor,
-    key: KeyStroke,
-    context: ExecutionContext,
-    plan: ActionPlan,
-  ) {
-    val mode = editor.mode
-    if (mode == CommandState.Mode.INSERT || mode == CommandState.Mode.REPLACE) {
-      VimPlugin.getChange().beforeProcessKey(editor, context, key, plan)
-    }
-  }
 
   /**
    * This is the main key handler for the Vim plugin. Every keystroke not handled directly by Idea is sent here for

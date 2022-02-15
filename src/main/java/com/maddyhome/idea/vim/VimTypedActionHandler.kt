@@ -25,9 +25,9 @@ import com.intellij.openapi.editor.actionSystem.TypedActionHandler
 import com.intellij.openapi.editor.actionSystem.TypedActionHandlerEx
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.maddyhome.idea.vim.helper.EditorDataContext
+import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
 import com.maddyhome.idea.vim.key.KeyHandlerKeeper
-import com.maddyhome.idea.vim.newapi.IjExecutionContext
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
@@ -59,7 +59,17 @@ class VimTypedActionHandler(origHandler: TypedActionHandler) : TypedActionHandle
     LOG.trace("Executing before execute")
     val modifiers = if (charTyped == ' ' && VimKeyListener.isSpaceShift) KeyEvent.SHIFT_DOWN_MASK else 0
     val keyStroke = KeyStroke.getKeyStroke(charTyped, modifiers)
-    handler.beforeHandleKey(editor.vim, keyStroke, IjExecutionContext(context), plan)
+
+    /* Invoked before acquiring a write lock and actually handling the keystroke.
+     *
+     * Drafts an optional [ActionPlan] that will be used as a base for zero-latency rendering in editor.
+     */
+    if (editor.inInsertMode) {
+      val originalHandler = KeyHandlerKeeper.getInstance().originalHandler
+      if (originalHandler is TypedActionHandlerEx) {
+        originalHandler.beforeExecute(editor, keyStroke.keyChar, context, plan)
+      }
+    }
   }
 
   override fun execute(editor: Editor, charTyped: Char, context: DataContext) {

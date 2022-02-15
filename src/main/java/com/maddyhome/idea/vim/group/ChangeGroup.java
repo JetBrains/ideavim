@@ -29,9 +29,6 @@ import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.command.UndoConfirmationPolicy;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.*;
-import com.intellij.openapi.editor.actionSystem.ActionPlan;
-import com.intellij.openapi.editor.actionSystem.TypedActionHandler;
-import com.intellij.openapi.editor.actionSystem.TypedActionHandlerEx;
 import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.editor.event.EditorMouseEvent;
@@ -804,28 +801,6 @@ public class ChangeGroup {
   public void processSingleCommand(@NotNull Editor editor) {
     CommandState.getInstance(editor).pushModes(CommandState.Mode.INSERT_NORMAL, CommandState.SubMode.NONE);
     clearStrokes(editor);
-  }
-
-  /**
-   * Drafts an {@link ActionPlan} for preemptive rendering before "regular" keystroke processing in insert/replace mode.
-   * <p>
-   * Like {@link #processKey(Editor, DataContext, KeyStroke)}, delegates the task to the original handler.
-   *
-   * @param editor  The editor the character was typed into
-   * @param context The data context
-   * @param key     The user entered keystroke
-   * @param plan    the current action plan draft
-   */
-  public void beforeProcessKey(final @NotNull VimEditor editor,
-                               final @NotNull ExecutionContext context,
-                               final @NotNull KeyStroke key,
-                               @NotNull ActionPlan plan) {
-
-    final TypedActionHandler originalHandler = KeyHandlerKeeper.getInstance().getOriginalHandler();
-
-    if (originalHandler instanceof TypedActionHandlerEx) {
-      ((TypedActionHandlerEx)originalHandler).beforeExecute(((IjVimEditor)editor).getEditor(), key.getKeyChar(), ((IjExecutionContext)context).getContext(), plan);
-    }
   }
 
   /**
