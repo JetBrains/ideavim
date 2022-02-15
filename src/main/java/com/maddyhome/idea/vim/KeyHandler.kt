@@ -262,10 +262,10 @@ class KeyHandler {
         if (key.keyCode == KeyEvent.VK_ESCAPE) {
           val executed = arrayOf<Boolean?>(null)
           ActionExecutor.executeCommand(
-              editor.editor.project,
-              { executed[0] = ActionExecutor.executeEsc(context.ij) },
-              "", null
-            )
+            editor.editor.project,
+            { executed[0] = ActionExecutor.executeEsc(context.ij) },
+            "", null
+          )
           indicateError = !executed[0]!!
         }
         if (indicateError) {
@@ -348,7 +348,9 @@ class KeyHandler {
     // Every time a key is pressed and handled, the timer is stopped. E.g. if there is a mapping for "dweri", and the
     // user has typed "dw" wait for the timeout, and then replay "d" and "w" without any mapping (which will of course
     // delete a word)
-    if (VimPlugin.getOptionService().isSet(OptionService.Scope.LOCAL(editor), OptionConstants.timeoutName, OptionConstants.timeoutName)) {
+    if (VimPlugin.getOptionService()
+        .isSet(OptionService.Scope.LOCAL(editor), OptionConstants.timeoutName, OptionConstants.timeoutName)
+    ) {
       LOG.trace("Timeout is set. Schedule a mapping timer")
       // XXX There is a strange issue that reports that mapping state is empty at the moment of the function call.
       //   At the moment, I see the only one possibility this to happen - other key is handled after the timer executed,
@@ -376,358 +378,358 @@ class KeyHandler {
           }, editor
         )
       }
-      }
-      LOG.trace("Unfinished mapping processing finished")
-      return true
     }
+    LOG.trace("Unfinished mapping processing finished")
+    return true
+  }
 
-    private fun handleCompleteMappingSequence(
-      editor: IjVimEditor,
-      context: ExecutionContext,
-      mappingState: MappingState,
-      mapping: KeyMapping,
-      key: KeyStroke,
-    ): Boolean {
-      LOG.trace("Processing complete mapping sequence...")
-      // The current sequence isn't a prefix, check to see if it's a completed sequence.
-      val currentMappingInfo = mapping[mappingState.keys]
-      var mappingInfo = currentMappingInfo
-      if (mappingInfo == null) {
-        LOG.trace("Haven't found any mapping info for the given sequence. Trying to apply mapping to a subsequence.")
-        // It's an abandoned sequence, check to see if the previous sequence was a complete sequence.
-        // TODO: This is incorrect behaviour
-        // What about sequences that were completed N keys ago?
-        // This should really be handled as part of an abandoned key sequence. We should also consolidate the replay
-        // of cached keys - this happens in timeout, here and also in abandoned sequences.
-        // Extract most of this method into handleMappingInfo. If we have a complete sequence, call it and we're done.
-        // If it's not a complete sequence, handleAbandonedMappingSequence should do something like call
-        // mappingState.detachKeys and look for the longest complete sequence in the returned list, evaluate it, and then
-        // replay any keys not yet handled. NB: The actual implementation should be compared to Vim behaviour to see what
-        // should actually happen.
-        val previouslyUnhandledKeySequence = ArrayList<KeyStroke>()
-        mappingState.keys.forEach(Consumer { e: KeyStroke -> previouslyUnhandledKeySequence.add(e) })
-        if (previouslyUnhandledKeySequence.size > 1) {
-          previouslyUnhandledKeySequence.removeAt(previouslyUnhandledKeySequence.size - 1)
-          mappingInfo = mapping[previouslyUnhandledKeySequence]
-        }
+  private fun handleCompleteMappingSequence(
+    editor: IjVimEditor,
+    context: ExecutionContext,
+    mappingState: MappingState,
+    mapping: KeyMapping,
+    key: KeyStroke,
+  ): Boolean {
+    LOG.trace("Processing complete mapping sequence...")
+    // The current sequence isn't a prefix, check to see if it's a completed sequence.
+    val currentMappingInfo = mapping[mappingState.keys]
+    var mappingInfo = currentMappingInfo
+    if (mappingInfo == null) {
+      LOG.trace("Haven't found any mapping info for the given sequence. Trying to apply mapping to a subsequence.")
+      // It's an abandoned sequence, check to see if the previous sequence was a complete sequence.
+      // TODO: This is incorrect behaviour
+      // What about sequences that were completed N keys ago?
+      // This should really be handled as part of an abandoned key sequence. We should also consolidate the replay
+      // of cached keys - this happens in timeout, here and also in abandoned sequences.
+      // Extract most of this method into handleMappingInfo. If we have a complete sequence, call it and we're done.
+      // If it's not a complete sequence, handleAbandonedMappingSequence should do something like call
+      // mappingState.detachKeys and look for the longest complete sequence in the returned list, evaluate it, and then
+      // replay any keys not yet handled. NB: The actual implementation should be compared to Vim behaviour to see what
+      // should actually happen.
+      val previouslyUnhandledKeySequence = ArrayList<KeyStroke>()
+      mappingState.keys.forEach(Consumer { e: KeyStroke -> previouslyUnhandledKeySequence.add(e) })
+      if (previouslyUnhandledKeySequence.size > 1) {
+        previouslyUnhandledKeySequence.removeAt(previouslyUnhandledKeySequence.size - 1)
+        mappingInfo = mapping[previouslyUnhandledKeySequence]
       }
-      if (mappingInfo == null) {
-        LOG.trace("Cannot find any mapping info for the sequence. Return false.")
-        return false
-      }
-      mappingState.resetMappingSequence()
-      val currentContext = context.updateEditor(editor)
-      LOG.trace("Executing mapping info")
-      try {
-        mappingInfo.execute(editor.editor, context.ij)
-      } catch (e: Exception) {
-        VimPlugin.showMessage(e.message)
-        VimPlugin.indicateError()
-        LOG.warn(
-          """
+    }
+    if (mappingInfo == null) {
+      LOG.trace("Cannot find any mapping info for the sequence. Return false.")
+      return false
+    }
+    mappingState.resetMappingSequence()
+    val currentContext = context.updateEditor(editor)
+    LOG.trace("Executing mapping info")
+    try {
+      mappingInfo.execute(editor.editor, context.ij)
+    } catch (e: Exception) {
+      VimPlugin.showMessage(e.message)
+      VimPlugin.indicateError()
+      LOG.warn(
+        """
                 Caught exception during ${mappingInfo.getPresentableString()}
                 ${e.message}
           """.trimIndent()
-        )
-      } catch (e: NotImplementedError) {
-        VimPlugin.showMessage(e.message)
-        VimPlugin.indicateError()
-        LOG.warn(
-          """
+      )
+    } catch (e: NotImplementedError) {
+      VimPlugin.showMessage(e.message)
+      VimPlugin.indicateError()
+      LOG.warn(
+        """
                  Caught exception during ${mappingInfo.getPresentableString()}
                  ${e.message}
           """.trimIndent()
-        )
-      }
-
-      // If we've just evaluated the previous key sequence, make sure to also handle the current key
-      if (mappingInfo !== currentMappingInfo) {
-        LOG.trace("Evaluating the current key")
-        handleKey(editor, key, currentContext, allowKeyMappings = true, false)
-      }
-      LOG.trace("Success processing of mapping")
-      return true
-    }
-
-    private fun handleAbandonedMappingSequence(
-      editor: IjVimEditor,
-      mappingState: MappingState,
-      context: ExecutionContext,
-    ): Boolean {
-      LOG.debug("Processing abandoned mapping sequence")
-      // The user has terminated a mapping sequence with an unexpected key
-      // E.g. if there is a mapping for "hello" and user enters command "help" the processing of "h", "e" and "l" will be
-      //   prevented by this handler. Make sure the currently unhandled keys are processed as normal.
-      val unhandledKeyStrokes = mappingState.detachKeys()
-
-      // If there is only the current key to handle, do nothing
-      if (unhandledKeyStrokes.size == 1) {
-        LOG.trace("There is only one key in mapping. Return false.")
-        return false
-      }
-
-      // Okay, look at the code below. Why is the first key handled separately?
-      // Let's assume the next mappings:
-      //   - map ds j
-      //   - map I 2l
-      // If user enters `dI`, the first `d` will be caught be this handler because it's a prefix for `ds` command.
-      //  After the user enters `I`, the caught `d` should be processed without mapping, and the rest of keys
-      //  should be processed with mappings (to make I work)
-      if (isPluginMapping(unhandledKeyStrokes)) {
-        LOG.trace("This is a plugin mapping, process it")
-        handleKey(
-          editor, unhandledKeyStrokes[unhandledKeyStrokes.size - 1], context,
-          allowKeyMappings = true,
-          mappingCompleted = false
-        )
-      } else {
-        LOG.trace("Process abandoned keys.")
-        handleKey(editor, unhandledKeyStrokes[0], context, allowKeyMappings = false, mappingCompleted = false)
-        for (keyStroke in unhandledKeyStrokes.subList(1, unhandledKeyStrokes.size)) {
-          handleKey(editor, keyStroke, context, allowKeyMappings = true, mappingCompleted = false)
-        }
-      }
-      LOG.trace("Return true from abandoned keys processing.")
-      return true
-    }
-
-    // The <Plug>mappings are not executed if they fail to map to something.
-    //   E.g.
-    //   - map <Plug>iA someAction
-    //   - map I <Plug>i
-    //   For `IA` someAction should be executed.
-    //   But if the user types `Ib`, `<Plug>i` won't be executed again. Only `b` will be passed to keyHandler.
-    private fun isPluginMapping(unhandledKeyStrokes: List<KeyStroke>): Boolean {
-      return unhandledKeyStrokes.isNotEmpty() && unhandledKeyStrokes[0] == StringHelper.PlugKeyStroke
-    }
-
-    private fun isCommandCountKey(chKey: Char, editorState: CommandState): Boolean {
-      // Make sure to avoid handling '0' as the start of a count.
-      val commandBuilder = editorState.commandBuilder
-      val notRegisterPendingCommand = editorState.mode.inNormalMode && !editorState.isRegisterPending
-      val visualMode = editorState.mode.inVisualMode
-      val opPendingMode = editorState.mode === CommandState.Mode.OP_PENDING
-
-      if (notRegisterPendingCommand || visualMode || opPendingMode) {
-        if (commandBuilder.isExpectingCount && Character.isDigit(chKey) && (commandBuilder.count > 0 || chKey != '0')) {
-          LOG.debug("This is a command key count")
-          return true
-        }
-      }
-      LOG.debug("This is NOT a command key count")
-      return false
-    }
-
-    private fun isDeleteCommandCountKey(key: KeyStroke, editorState: CommandState): Boolean {
-      // See `:help N<Del>`
-      val commandBuilder = editorState.commandBuilder
-      val isDeleteCommandKeyCount =
-        (editorState.mode === CommandState.Mode.COMMAND || editorState.mode === CommandState.Mode.VISUAL || editorState.mode === CommandState.Mode.OP_PENDING) &&
-          commandBuilder.isExpectingCount && commandBuilder.count > 0 && key.keyCode == KeyEvent.VK_DELETE
-
-      LOG.debug { "This is a delete command key count: $isDeleteCommandKeyCount" }
-      return isDeleteCommandKeyCount
-    }
-
-    private fun isEditorReset(key: KeyStroke, editorState: CommandState): Boolean {
-      val editorReset = editorState.mode == CommandState.Mode.COMMAND && StringHelper.isCloseKeyStroke(key)
-      LOG.debug { "This is editor reset: $editorReset" }
-      return editorReset
-    }
-
-    private fun isSelectRegister(key: KeyStroke, editorState: CommandState): Boolean {
-      if (editorState.mode != CommandState.Mode.COMMAND && editorState.mode != CommandState.Mode.VISUAL) {
-        return false
-      }
-      return if (editorState.isRegisterPending) {
-        true
-      } else key.keyChar == '"' && !editorState.isOperatorPending && editorState.commandBuilder.expectedArgumentType == null
-    }
-
-    private fun handleSelectRegister(commandState: CommandState, chKey: Char) {
-      LOG.trace("Handle select register")
-      commandState.resetRegisterPending()
-      if (VimPlugin.getRegister().isValid(chKey)) {
-        LOG.trace("Valid register")
-        commandState.commandBuilder.pushCommandPart(chKey)
-      } else {
-        LOG.trace("Invalid register, set command state to BAD_COMMAND")
-        commandState.commandBuilder.commandState = CurrentCommandState.BAD_COMMAND
-      }
-    }
-
-    private fun isExpectingCharArgument(commandBuilder: CommandBuilder): Boolean {
-      val expectingCharArgument = commandBuilder.expectedArgumentType === Argument.Type.CHARACTER
-      LOG.debug { "Expecting char argument: $expectingCharArgument" }
-      return expectingCharArgument
-    }
-
-    private fun handleCharArgument(key: KeyStroke, chKey: Char, commandState: CommandState) {
-      var chKey = chKey
-      LOG.trace("Handling char argument")
-      // We are expecting a character argument - is this a regular character the user typed?
-      // Some special keys can be handled as character arguments - let's check for them here.
-      if (chKey.toInt() == 0) {
-        when (key.keyCode) {
-          KeyEvent.VK_TAB -> chKey = '\t'
-          KeyEvent.VK_ENTER -> chKey = '\n'
-        }
-      }
-      val commandBuilder = commandState.commandBuilder
-      if (chKey.toInt() != 0) {
-        LOG.trace("Add character argument to the current command")
-        // Create the character argument, add it to the current command, and signal we are ready to process the command
-        commandBuilder.completeCommandPart(Argument(chKey))
-      } else {
-        LOG.trace("This is not a valid character argument. Set command state to BAD_COMMAND")
-        // Oops - this isn't a valid character argument
-        commandBuilder.commandState = CurrentCommandState.BAD_COMMAND
-      }
-      commandState.resetReplaceCharacter()
-    }
-
-    private fun handleDigraph(
-      editor: IjVimEditor,
-      key: KeyStroke,
-      context: ExecutionContext,
-      editorState: CommandState,
-    ): Boolean {
-      LOG.debug("Handling digraph")
-      // Support starting a digraph/literal sequence if the operator accepts one as an argument, e.g. 'r' or 'f'.
-      // Normally, we start the sequence (in Insert or CmdLine mode) through a VimAction that can be mapped. Our
-      // VimActions don't work as arguments for operators, so we have to special case here. Helpfully, Vim appears to
-      // hardcode the shortcuts, and doesn't support mapping, so everything works nicely.
-      val commandBuilder = editorState.commandBuilder
-      if (commandBuilder.expectedArgumentType == Argument.Type.DIGRAPH) {
-        LOG.trace("Expected argument is digraph")
-        if (editorState.digraphSequence.isDigraphStart(key)) {
-          editorState.startDigraphSequence()
-          editorState.commandBuilder.addKey(key)
-          return true
-        }
-        if (editorState.digraphSequence.isLiteralStart(key)) {
-          editorState.startLiteralSequence()
-          editorState.commandBuilder.addKey(key)
-          return true
-        }
-      }
-      val res = editorState.processDigraphKey(key, editor.editor)
-      if (ExEntryPanel.getInstance().isActive) {
-        when (res.result) {
-          DigraphResult.RES_HANDLED -> setPromptCharacterEx(if (commandBuilder.isPuttingLiteral()) '^' else key.keyChar)
-          DigraphResult.RES_DONE, DigraphResult.RES_BAD -> if (key.keyCode == KeyEvent.VK_C && key.modifiers and InputEvent.CTRL_DOWN_MASK != 0) {
-            return false
-          } else {
-            ExEntryPanel.getInstance().entry.clearCurrentAction()
-          }
-        }
-      }
-      when (res.result) {
-        DigraphResult.RES_HANDLED -> {
-          editorState.commandBuilder.addKey(key)
-          return true
-        }
-        DigraphResult.RES_DONE -> {
-          if (commandBuilder.expectedArgumentType === Argument.Type.DIGRAPH) {
-            commandBuilder.fallbackToCharacterArgument()
-          }
-          val stroke = res.stroke ?: return false
-          editorState.commandBuilder.addKey(key)
-          handleKey(editor, stroke, context)
-          return true
-        }
-        DigraphResult.RES_BAD -> {
-          // BAD is an error. We were expecting a valid character, and we didn't get it.
-          if (commandBuilder.expectedArgumentType != null) {
-            commandBuilder.commandState = CurrentCommandState.BAD_COMMAND
-          }
-          return true
-        }
-        DigraphResult.RES_UNHANDLED -> {
-          // UNHANDLED means the key stroke made no sense in the context of a digraph, but isn't an error in the current
-          // state. E.g. waiting for {char} <BS> {char}. Let the key handler have a go at it.
-          if (commandBuilder.expectedArgumentType === Argument.Type.DIGRAPH) {
-            commandBuilder.fallbackToCharacterArgument()
-            handleKey(editor, key, context)
-            return true
-          }
-          return false
-        }
-      }
-      return false
-    }
-
-    private fun executeCommand(
-      editor: IjVimEditor,
-      context: ExecutionContext,
-      editorState: CommandState,
-    ) {
-      LOG.trace("Command execution")
-      val command = editorState.commandBuilder.buildCommand()
-      val operatorArguments = OperatorArguments(
-        editorState.mappingState.mappingMode == MappingMode.OP_PENDING,
-        command.rawCount, editorState.mode, editorState.subMode
       )
+    }
 
-      // If we were in "operator pending" mode, reset back to normal mode.
-      editorState.resetOpPending()
+    // If we've just evaluated the previous key sequence, make sure to also handle the current key
+    if (mappingInfo !== currentMappingInfo) {
+      LOG.trace("Evaluating the current key")
+      handleKey(editor, key, currentContext, allowKeyMappings = true, false)
+    }
+    LOG.trace("Success processing of mapping")
+    return true
+  }
 
-      // Save off the command we are about to execute
-      editorState.setExecutingCommand(command)
-      val project = editor.editor.project
-      val type = command.type
-      if (type.isWrite) {
-        if (!editor.isWritable()) {
-          VimPlugin.indicateError()
-          reset(editor)
-          LOG.warn("File is not writable")
-          return
-        }
+  private fun handleAbandonedMappingSequence(
+    editor: IjVimEditor,
+    mappingState: MappingState,
+    context: ExecutionContext,
+  ): Boolean {
+    LOG.debug("Processing abandoned mapping sequence")
+    // The user has terminated a mapping sequence with an unexpected key
+    // E.g. if there is a mapping for "hello" and user enters command "help" the processing of "h", "e" and "l" will be
+    //   prevented by this handler. Make sure the currently unhandled keys are processed as normal.
+    val unhandledKeyStrokes = mappingState.detachKeys()
+
+    // If there is only the current key to handle, do nothing
+    if (unhandledKeyStrokes.size == 1) {
+      LOG.trace("There is only one key in mapping. Return false.")
+      return false
+    }
+
+    // Okay, look at the code below. Why is the first key handled separately?
+    // Let's assume the next mappings:
+    //   - map ds j
+    //   - map I 2l
+    // If user enters `dI`, the first `d` will be caught be this handler because it's a prefix for `ds` command.
+    //  After the user enters `I`, the caught `d` should be processed without mapping, and the rest of keys
+    //  should be processed with mappings (to make I work)
+    if (isPluginMapping(unhandledKeyStrokes)) {
+      LOG.trace("This is a plugin mapping, process it")
+      handleKey(
+        editor, unhandledKeyStrokes[unhandledKeyStrokes.size - 1], context,
+        allowKeyMappings = true,
+        mappingCompleted = false
+      )
+    } else {
+      LOG.trace("Process abandoned keys.")
+      handleKey(editor, unhandledKeyStrokes[0], context, allowKeyMappings = false, mappingCompleted = false)
+      for (keyStroke in unhandledKeyStrokes.subList(1, unhandledKeyStrokes.size)) {
+        handleKey(editor, keyStroke, context, allowKeyMappings = true, mappingCompleted = false)
       }
-      if (VimPlugin.isMainThread()) {
-        val action: Runnable = ActionRunner(editor, context, command, operatorArguments)
-        val cmdAction = command.action
-        val name = cmdAction.id
-        if (type.isWrite) {
-          runWriteCommand(project, action, name, action)
-        } else if (type.isRead) {
-          runReadCommand(project, action, name, action)
+    }
+    LOG.trace("Return true from abandoned keys processing.")
+    return true
+  }
+
+  // The <Plug>mappings are not executed if they fail to map to something.
+  //   E.g.
+  //   - map <Plug>iA someAction
+  //   - map I <Plug>i
+  //   For `IA` someAction should be executed.
+  //   But if the user types `Ib`, `<Plug>i` won't be executed again. Only `b` will be passed to keyHandler.
+  private fun isPluginMapping(unhandledKeyStrokes: List<KeyStroke>): Boolean {
+    return unhandledKeyStrokes.isNotEmpty() && unhandledKeyStrokes[0] == StringHelper.PlugKeyStroke
+  }
+
+  private fun isCommandCountKey(chKey: Char, editorState: CommandState): Boolean {
+    // Make sure to avoid handling '0' as the start of a count.
+    val commandBuilder = editorState.commandBuilder
+    val notRegisterPendingCommand = editorState.mode.inNormalMode && !editorState.isRegisterPending
+    val visualMode = editorState.mode.inVisualMode
+    val opPendingMode = editorState.mode === CommandState.Mode.OP_PENDING
+
+    if (notRegisterPendingCommand || visualMode || opPendingMode) {
+      if (commandBuilder.isExpectingCount && Character.isDigit(chKey) && (commandBuilder.count > 0 || chKey != '0')) {
+        LOG.debug("This is a command key count")
+        return true
+      }
+    }
+    LOG.debug("This is NOT a command key count")
+    return false
+  }
+
+  private fun isDeleteCommandCountKey(key: KeyStroke, editorState: CommandState): Boolean {
+    // See `:help N<Del>`
+    val commandBuilder = editorState.commandBuilder
+    val isDeleteCommandKeyCount =
+      (editorState.mode === CommandState.Mode.COMMAND || editorState.mode === CommandState.Mode.VISUAL || editorState.mode === CommandState.Mode.OP_PENDING) &&
+        commandBuilder.isExpectingCount && commandBuilder.count > 0 && key.keyCode == KeyEvent.VK_DELETE
+
+    LOG.debug { "This is a delete command key count: $isDeleteCommandKeyCount" }
+    return isDeleteCommandKeyCount
+  }
+
+  private fun isEditorReset(key: KeyStroke, editorState: CommandState): Boolean {
+    val editorReset = editorState.mode == CommandState.Mode.COMMAND && StringHelper.isCloseKeyStroke(key)
+    LOG.debug { "This is editor reset: $editorReset" }
+    return editorReset
+  }
+
+  private fun isSelectRegister(key: KeyStroke, editorState: CommandState): Boolean {
+    if (editorState.mode != CommandState.Mode.COMMAND && editorState.mode != CommandState.Mode.VISUAL) {
+      return false
+    }
+    return if (editorState.isRegisterPending) {
+      true
+    } else key.keyChar == '"' && !editorState.isOperatorPending && editorState.commandBuilder.expectedArgumentType == null
+  }
+
+  private fun handleSelectRegister(commandState: CommandState, chKey: Char) {
+    LOG.trace("Handle select register")
+    commandState.resetRegisterPending()
+    if (VimPlugin.getRegister().isValid(chKey)) {
+      LOG.trace("Valid register")
+      commandState.commandBuilder.pushCommandPart(chKey)
+    } else {
+      LOG.trace("Invalid register, set command state to BAD_COMMAND")
+      commandState.commandBuilder.commandState = CurrentCommandState.BAD_COMMAND
+    }
+  }
+
+  private fun isExpectingCharArgument(commandBuilder: CommandBuilder): Boolean {
+    val expectingCharArgument = commandBuilder.expectedArgumentType === Argument.Type.CHARACTER
+    LOG.debug { "Expecting char argument: $expectingCharArgument" }
+    return expectingCharArgument
+  }
+
+  private fun handleCharArgument(key: KeyStroke, chKey: Char, commandState: CommandState) {
+    var chKey = chKey
+    LOG.trace("Handling char argument")
+    // We are expecting a character argument - is this a regular character the user typed?
+    // Some special keys can be handled as character arguments - let's check for them here.
+    if (chKey.toInt() == 0) {
+      when (key.keyCode) {
+        KeyEvent.VK_TAB -> chKey = '\t'
+        KeyEvent.VK_ENTER -> chKey = '\n'
+      }
+    }
+    val commandBuilder = commandState.commandBuilder
+    if (chKey.toInt() != 0) {
+      LOG.trace("Add character argument to the current command")
+      // Create the character argument, add it to the current command, and signal we are ready to process the command
+      commandBuilder.completeCommandPart(Argument(chKey))
+    } else {
+      LOG.trace("This is not a valid character argument. Set command state to BAD_COMMAND")
+      // Oops - this isn't a valid character argument
+      commandBuilder.commandState = CurrentCommandState.BAD_COMMAND
+    }
+    commandState.resetReplaceCharacter()
+  }
+
+  private fun handleDigraph(
+    editor: IjVimEditor,
+    key: KeyStroke,
+    context: ExecutionContext,
+    editorState: CommandState,
+  ): Boolean {
+    LOG.debug("Handling digraph")
+    // Support starting a digraph/literal sequence if the operator accepts one as an argument, e.g. 'r' or 'f'.
+    // Normally, we start the sequence (in Insert or CmdLine mode) through a VimAction that can be mapped. Our
+    // VimActions don't work as arguments for operators, so we have to special case here. Helpfully, Vim appears to
+    // hardcode the shortcuts, and doesn't support mapping, so everything works nicely.
+    val commandBuilder = editorState.commandBuilder
+    if (commandBuilder.expectedArgumentType == Argument.Type.DIGRAPH) {
+      LOG.trace("Expected argument is digraph")
+      if (editorState.digraphSequence.isDigraphStart(key)) {
+        editorState.startDigraphSequence()
+        editorState.commandBuilder.addKey(key)
+        return true
+      }
+      if (editorState.digraphSequence.isLiteralStart(key)) {
+        editorState.startLiteralSequence()
+        editorState.commandBuilder.addKey(key)
+        return true
+      }
+    }
+    val res = editorState.processDigraphKey(key, editor.editor)
+    if (ExEntryPanel.getInstance().isActive) {
+      when (res.result) {
+        DigraphResult.RES_HANDLED -> setPromptCharacterEx(if (commandBuilder.isPuttingLiteral()) '^' else key.keyChar)
+        DigraphResult.RES_DONE, DigraphResult.RES_BAD -> if (key.keyCode == KeyEvent.VK_C && key.modifiers and InputEvent.CTRL_DOWN_MASK != 0) {
+          return false
         } else {
-          ActionExecutor.executeCommand(project, action, name, action)
+          ExEntryPanel.getInstance().entry.clearCurrentAction()
         }
       }
     }
+    when (res.result) {
+      DigraphResult.RES_HANDLED -> {
+        editorState.commandBuilder.addKey(key)
+        return true
+      }
+      DigraphResult.RES_DONE -> {
+        if (commandBuilder.expectedArgumentType === Argument.Type.DIGRAPH) {
+          commandBuilder.fallbackToCharacterArgument()
+        }
+        val stroke = res.stroke ?: return false
+        editorState.commandBuilder.addKey(key)
+        handleKey(editor, stroke, context)
+        return true
+      }
+      DigraphResult.RES_BAD -> {
+        // BAD is an error. We were expecting a valid character, and we didn't get it.
+        if (commandBuilder.expectedArgumentType != null) {
+          commandBuilder.commandState = CurrentCommandState.BAD_COMMAND
+        }
+        return true
+      }
+      DigraphResult.RES_UNHANDLED -> {
+        // UNHANDLED means the key stroke made no sense in the context of a digraph, but isn't an error in the current
+        // state. E.g. waiting for {char} <BS> {char}. Let the key handler have a go at it.
+        if (commandBuilder.expectedArgumentType === Argument.Type.DIGRAPH) {
+          commandBuilder.fallbackToCharacterArgument()
+          handleKey(editor, key, context)
+          return true
+        }
+        return false
+      }
+    }
+    return false
+  }
 
-    private fun handleCommandNode(
-      editor: IjVimEditor,
-      context: ExecutionContext,
-      key: KeyStroke,
-      node: CommandNode<ActionBeanClass>,
-      editorState: CommandState,
-    ) {
-      LOG.trace("Handle command node")
-      // The user entered a valid command. Create the command and add it to the stack.
-      val action = node.actionHolder.instance
-      val commandBuilder = editorState.commandBuilder
-      val expectedArgumentType = commandBuilder.expectedArgumentType
-      commandBuilder.pushCommandPart(action)
-      if (!checkArgumentCompatibility(expectedArgumentType, action)) {
-        LOG.trace("Return from command node handling")
-        commandBuilder.commandState = CurrentCommandState.BAD_COMMAND
+  private fun executeCommand(
+    editor: IjVimEditor,
+    context: ExecutionContext,
+    editorState: CommandState,
+  ) {
+    LOG.trace("Command execution")
+    val command = editorState.commandBuilder.buildCommand()
+    val operatorArguments = OperatorArguments(
+      editorState.mappingState.mappingMode == MappingMode.OP_PENDING,
+      command.rawCount, editorState.mode, editorState.subMode
+    )
+
+    // If we were in "operator pending" mode, reset back to normal mode.
+    editorState.resetOpPending()
+
+    // Save off the command we are about to execute
+    editorState.setExecutingCommand(command)
+    val project = editor.editor.project
+    val type = command.type
+    if (type.isWrite) {
+      if (!editor.isWritable()) {
+        VimPlugin.indicateError()
+        reset(editor)
+        LOG.warn("File is not writable")
         return
       }
-      if (action.argumentType == null || stopMacroRecord(node, editorState)) {
-        LOG.trace("Set command state to READY")
-        commandBuilder.commandState = CurrentCommandState.READY
+    }
+    if (VimPlugin.isMainThread()) {
+      val action: Runnable = ActionRunner(editor, context, command, operatorArguments)
+      val cmdAction = command.action
+      val name = cmdAction.id
+      if (type.isWrite) {
+        runWriteCommand(project, action, name, action)
+      } else if (type.isRead) {
+        runReadCommand(project, action, name, action)
       } else {
-        LOG.trace("Set waiting for the argument")
-        val argumentType = action.argumentType
-        startWaitingForArgument(editor, context, key.keyChar, action, argumentType!!, editorState)
-        partialReset(editor)
+        ActionExecutor.executeCommand(project, action, name, action)
       }
+    }
+  }
 
-      // TODO In the name of God, get rid of EX_STRING, FLAG_COMPLETE_EX and all the related staff
-      if (expectedArgumentType === Argument.Type.EX_STRING && action.flags.contains(CommandFlags.FLAG_COMPLETE_EX)) {
+  private fun handleCommandNode(
+    editor: IjVimEditor,
+    context: ExecutionContext,
+    key: KeyStroke,
+    node: CommandNode<ActionBeanClass>,
+    editorState: CommandState,
+  ) {
+    LOG.trace("Handle command node")
+    // The user entered a valid command. Create the command and add it to the stack.
+    val action = node.actionHolder.instance
+    val commandBuilder = editorState.commandBuilder
+    val expectedArgumentType = commandBuilder.expectedArgumentType
+    commandBuilder.pushCommandPart(action)
+    if (!checkArgumentCompatibility(expectedArgumentType, action)) {
+      LOG.trace("Return from command node handling")
+      commandBuilder.commandState = CurrentCommandState.BAD_COMMAND
+      return
+    }
+    if (action.argumentType == null || stopMacroRecord(node, editorState)) {
+      LOG.trace("Set command state to READY")
+      commandBuilder.commandState = CurrentCommandState.READY
+    } else {
+      LOG.trace("Set waiting for the argument")
+      val argumentType = action.argumentType
+      startWaitingForArgument(editor, context, key.keyChar, action, argumentType!!, editorState)
+      partialReset(editor)
+    }
+
+    // TODO In the name of God, get rid of EX_STRING, FLAG_COMPLETE_EX and all the related staff
+    if (expectedArgumentType === Argument.Type.EX_STRING && action.flags.contains(CommandFlags.FLAG_COMPLETE_EX)) {
       /* The only action that implements FLAG_COMPLETE_EX is ProcessExEntryAction.
    * When pressing ':', ExEntryAction is chosen as the command. Since it expects no arguments, it is invoked and
      calls ProcessGroup#startExCommand, pushes CMD_LINE mode, and the action is popped. The ex handler will push
@@ -745,180 +747,180 @@ class KeyHandler {
    and SearchEntry(Fwd|Rev)Action, and the ex command invoked in ProcessExEntryAction, but that breaks any initial
    operator, which would be invoked first (e.g. 'd' in "d/foo").
 */
-        LOG.trace("Processing ex_string")
-        val text = VimPlugin.getProcess().endSearchCommand()
-        commandBuilder.popCommandPart() // Pop ProcessExEntryAction
-        commandBuilder.completeCommandPart(Argument(text)) // Set search text on SearchEntry(Fwd|Rev)Action
-        editorState.popModes() // Pop CMD_LINE
-      }
-    }
-
-    private fun stopMacroRecord(node: CommandNode<ActionBeanClass>, editorState: CommandState): Boolean {
-      return editorState.isRecording && node.actionHolder.instance is ToggleRecordingAction
-    }
-
-    private fun startWaitingForArgument(
-      editor: VimEditor,
-      context: ExecutionContext,
-      key: Char,
-      action: EditorActionHandlerBase,
-      argument: Argument.Type,
-      editorState: CommandState,
-    ) {
-      val commandBuilder = editorState.commandBuilder
-      when (argument) {
-        Argument.Type.MOTION -> {
-          if (editorState.isDotRepeatInProgress && argumentCaptured != null) {
-            commandBuilder.completeCommandPart(argumentCaptured!!)
-          }
-          editorState.pushModes(CommandState.Mode.OP_PENDING, CommandState.SubMode.NONE)
-        }
-        Argument.Type.DIGRAPH -> // Command actions represent the completion of a command. Showcmd relies on this - if the action represents a
-          // part of a command, the showcmd output is reset part way through. This means we need to special case entering
-          // digraph/literal input mode. We have an action that takes a digraph as an argument, and pushes it back through
-          // the key handler when it's complete.
-          if (action is InsertCompletedDigraphAction) {
-            editorState.startDigraphSequence()
-            setPromptCharacterEx('?')
-          } else if (action is InsertCompletedLiteralAction) {
-            editorState.startLiteralSequence()
-            setPromptCharacterEx('^')
-          }
-        Argument.Type.EX_STRING -> {
-          // The current Command expects an EX_STRING argument. E.g. SearchEntry(Fwd|Rev)Action. This won't execute until
-          // state hits READY. Start the ex input field, push CMD_LINE mode and wait for the argument.
-          VimPlugin.getProcess().startSearchCommand(editor.ij, context.ij, commandBuilder.count, key)
-          commandBuilder.commandState = CurrentCommandState.NEW_COMMAND
-          editorState.pushModes(CommandState.Mode.CMD_LINE, CommandState.SubMode.NONE)
-        }
-      }
-
-      // Another special case. Force a mode change to update the caret shape
-      if (action is ChangeCharacterAction || action is ChangeVisualCharacterAction) {
-        editorState.isReplaceCharacter = true
-      }
-    }
-
-    private fun checkArgumentCompatibility(
-      expectedArgumentType: Argument.Type?,
-      action: EditorActionHandlerBase,
-    ): Boolean {
-      return !(expectedArgumentType === Argument.Type.MOTION && action.type !== Command.Type.MOTION)
-    }
-
-    /**
-     * Partially resets the state of this handler. Resets the command count, clears the key list, resets the key tree
-     * node to the root for the current mode we are in.
-     *
-     * @param editor The editor to reset.
-     */
-    fun partialReset(editor: VimEditor) {
-      val editorState = getInstance(editor)
-      editorState.mappingState.resetMappingSequence()
-      editorState.commandBuilder.resetInProgressCommandPart(getKeyRoot(editorState.mappingState.mappingMode))
-    }
-
-    /**
-     * Resets the state of this handler. Does a partial reset then resets the mode, the command, and the argument.
-     *
-     * @param editor The editor to reset.
-     */
-    fun reset(editor: VimEditor) {
-      partialReset(editor)
-      val editorState = getInstance(editor)
-      editorState.commandBuilder.resetAll(getKeyRoot(editorState.mappingState.mappingMode))
-    }
-
-    private fun getKeyRoot(mappingMode: MappingMode): CommandPartNode<ActionBeanClass> {
-      return VimPlugin.getKey().getKeyRoot(mappingMode)
-    }
-
-    /**
-     * Completely resets the state of this handler. Resets the command mode to normal, resets, and clears the selected
-     * register.
-     *
-     * @param editor The editor to reset.
-     */
-    fun fullReset(editor: IjVimEditor) {
-      VimPlugin.clearError()
-      getInstance(editor).reset()
-      reset(editor)
-      val registerGroup = VimPlugin.getRegisterIfCreated()
-      registerGroup?.resetRegister()
-      editor.editor.selectionModel.removeSelection()
-    }
-
-    private fun setPromptCharacterEx(promptCharacter: Char) {
-      val exEntryPanel = ExEntryPanel.getInstance()
-      if (exEntryPanel.isActive) {
-        exEntryPanel.entry.setCurrentActionPromptCharacter(promptCharacter)
-      }
-    }
-
-    /**
-     * This was used as an experiment to execute actions as a runnable.
-     */
-    internal class ActionRunner(
-      val editor: IjVimEditor,
-      val context: ExecutionContext,
-      val cmd: Command,
-      val operatorArguments: OperatorArguments,
-    ) : Runnable {
-      override fun run() {
-        val editorState = getInstance(editor)
-        editorState.commandBuilder.commandState = CurrentCommandState.NEW_COMMAND
-        val register = cmd.register
-        if (register != null) {
-          VimPlugin.getRegister().selectRegister(register)
-        }
-        VimActionExecutor.executeVimAction(editor.editor, cmd.action, context.ij, operatorArguments)
-        if (editorState.mode === CommandState.Mode.INSERT || editorState.mode === CommandState.Mode.REPLACE) {
-          VimPlugin.getChange().processCommand(editor.editor, cmd)
-        }
-
-        // Now the command has been executed let's clean up a few things.
-
-        // By default, the "empty" register is used by all commands, so we want to reset whatever the last register
-        // selected by the user was to the empty register
-        VimPlugin.getRegister().resetRegister()
-
-        // If, at this point, we are not in insert, replace, or visual modes, we need to restore the previous
-        // mode we were in. This handles commands in those modes that temporarily allow us to execute normal
-        // mode commands. An exception is if this command should leave us in the temporary mode such as
-        // "select register"
-        if (editorState.mode.inSingleNormalMode &&
-          !cmd.flags.contains(CommandFlags.FLAG_EXPECT_MORE)
-        ) {
-          editorState.popModes()
-        }
-        if (editorState.commandBuilder.isDone()) {
-          getInstance().reset(editor)
-        }
-      }
-    }
-
-    companion object {
-      private val LOG: VimLogger = vimLogger<KeyHandler>()
-
-      fun <T> isPrefix(list1: List<T>, list2: List<T>): Boolean {
-        if (list1.size > list2.size) {
-          return false
-        }
-        for (i in list1.indices) {
-          if (list1[i] != list2[i]) {
-            return false
-          }
-        }
-        return true
-      }
-
-      /**
-       * Returns a reference to the singleton instance of this class
-       *
-       * @return A reference to the singleton
-       */
-      @JvmStatic
-      fun getInstance(): KeyHandler = service()
+      LOG.trace("Processing ex_string")
+      val text = VimPlugin.getProcess().endSearchCommand()
+      commandBuilder.popCommandPart() // Pop ProcessExEntryAction
+      commandBuilder.completeCommandPart(Argument(text)) // Set search text on SearchEntry(Fwd|Rev)Action
+      editorState.popModes() // Pop CMD_LINE
     }
   }
+
+  private fun stopMacroRecord(node: CommandNode<ActionBeanClass>, editorState: CommandState): Boolean {
+    return editorState.isRecording && node.actionHolder.instance is ToggleRecordingAction
+  }
+
+  private fun startWaitingForArgument(
+    editor: VimEditor,
+    context: ExecutionContext,
+    key: Char,
+    action: EditorActionHandlerBase,
+    argument: Argument.Type,
+    editorState: CommandState,
+  ) {
+    val commandBuilder = editorState.commandBuilder
+    when (argument) {
+      Argument.Type.MOTION -> {
+        if (editorState.isDotRepeatInProgress && argumentCaptured != null) {
+          commandBuilder.completeCommandPart(argumentCaptured!!)
+        }
+        editorState.pushModes(CommandState.Mode.OP_PENDING, CommandState.SubMode.NONE)
+      }
+      Argument.Type.DIGRAPH -> // Command actions represent the completion of a command. Showcmd relies on this - if the action represents a
+        // part of a command, the showcmd output is reset part way through. This means we need to special case entering
+        // digraph/literal input mode. We have an action that takes a digraph as an argument, and pushes it back through
+        // the key handler when it's complete.
+        if (action is InsertCompletedDigraphAction) {
+          editorState.startDigraphSequence()
+          setPromptCharacterEx('?')
+        } else if (action is InsertCompletedLiteralAction) {
+          editorState.startLiteralSequence()
+          setPromptCharacterEx('^')
+        }
+      Argument.Type.EX_STRING -> {
+        // The current Command expects an EX_STRING argument. E.g. SearchEntry(Fwd|Rev)Action. This won't execute until
+        // state hits READY. Start the ex input field, push CMD_LINE mode and wait for the argument.
+        VimPlugin.getProcess().startSearchCommand(editor.ij, context.ij, commandBuilder.count, key)
+        commandBuilder.commandState = CurrentCommandState.NEW_COMMAND
+        editorState.pushModes(CommandState.Mode.CMD_LINE, CommandState.SubMode.NONE)
+      }
+    }
+
+    // Another special case. Force a mode change to update the caret shape
+    if (action is ChangeCharacterAction || action is ChangeVisualCharacterAction) {
+      editorState.isReplaceCharacter = true
+    }
+  }
+
+  private fun checkArgumentCompatibility(
+    expectedArgumentType: Argument.Type?,
+    action: EditorActionHandlerBase,
+  ): Boolean {
+    return !(expectedArgumentType === Argument.Type.MOTION && action.type !== Command.Type.MOTION)
+  }
+
+  /**
+   * Partially resets the state of this handler. Resets the command count, clears the key list, resets the key tree
+   * node to the root for the current mode we are in.
+   *
+   * @param editor The editor to reset.
+   */
+  fun partialReset(editor: VimEditor) {
+    val editorState = getInstance(editor)
+    editorState.mappingState.resetMappingSequence()
+    editorState.commandBuilder.resetInProgressCommandPart(getKeyRoot(editorState.mappingState.mappingMode))
+  }
+
+  /**
+   * Resets the state of this handler. Does a partial reset then resets the mode, the command, and the argument.
+   *
+   * @param editor The editor to reset.
+   */
+  fun reset(editor: VimEditor) {
+    partialReset(editor)
+    val editorState = getInstance(editor)
+    editorState.commandBuilder.resetAll(getKeyRoot(editorState.mappingState.mappingMode))
+  }
+
+  private fun getKeyRoot(mappingMode: MappingMode): CommandPartNode<ActionBeanClass> {
+    return VimPlugin.getKey().getKeyRoot(mappingMode)
+  }
+
+  /**
+   * Completely resets the state of this handler. Resets the command mode to normal, resets, and clears the selected
+   * register.
+   *
+   * @param editor The editor to reset.
+   */
+  fun fullReset(editor: IjVimEditor) {
+    VimPlugin.clearError()
+    getInstance(editor).reset()
+    reset(editor)
+    val registerGroup = VimPlugin.getRegisterIfCreated()
+    registerGroup?.resetRegister()
+    editor.editor.selectionModel.removeSelection()
+  }
+
+  private fun setPromptCharacterEx(promptCharacter: Char) {
+    val exEntryPanel = ExEntryPanel.getInstance()
+    if (exEntryPanel.isActive) {
+      exEntryPanel.entry.setCurrentActionPromptCharacter(promptCharacter)
+    }
+  }
+
+  /**
+   * This was used as an experiment to execute actions as a runnable.
+   */
+  internal class ActionRunner(
+    val editor: IjVimEditor,
+    val context: ExecutionContext,
+    val cmd: Command,
+    val operatorArguments: OperatorArguments,
+  ) : Runnable {
+    override fun run() {
+      val editorState = getInstance(editor)
+      editorState.commandBuilder.commandState = CurrentCommandState.NEW_COMMAND
+      val register = cmd.register
+      if (register != null) {
+        VimPlugin.getRegister().selectRegister(register)
+      }
+      VimActionExecutor.executeVimAction(editor.editor, cmd.action, context.ij, operatorArguments)
+      if (editorState.mode === CommandState.Mode.INSERT || editorState.mode === CommandState.Mode.REPLACE) {
+        VimPlugin.getChange().processCommand(editor.editor, cmd)
+      }
+
+      // Now the command has been executed let's clean up a few things.
+
+      // By default, the "empty" register is used by all commands, so we want to reset whatever the last register
+      // selected by the user was to the empty register
+      VimPlugin.getRegister().resetRegister()
+
+      // If, at this point, we are not in insert, replace, or visual modes, we need to restore the previous
+      // mode we were in. This handles commands in those modes that temporarily allow us to execute normal
+      // mode commands. An exception is if this command should leave us in the temporary mode such as
+      // "select register"
+      if (editorState.mode.inSingleNormalMode &&
+        !cmd.flags.contains(CommandFlags.FLAG_EXPECT_MORE)
+      ) {
+        editorState.popModes()
+      }
+      if (editorState.commandBuilder.isDone()) {
+        getInstance().reset(editor)
+      }
+    }
+  }
+
+  companion object {
+    private val LOG: VimLogger = vimLogger<KeyHandler>()
+
+    fun <T> isPrefix(list1: List<T>, list2: List<T>): Boolean {
+      if (list1.size > list2.size) {
+        return false
+      }
+      for (i in list1.indices) {
+        if (list1[i] != list2[i]) {
+          return false
+        }
+      }
+      return true
+    }
+
+    /**
+     * Returns a reference to the singleton instance of this class
+     *
+     * @return A reference to the singleton
+     */
+    @JvmStatic
+    fun getInstance(): KeyHandler = service()
+  }
+}
   
