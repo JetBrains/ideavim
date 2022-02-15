@@ -51,7 +51,6 @@ import com.maddyhome.idea.vim.key.CommandPartNode
 import com.maddyhome.idea.vim.key.KeyMapping
 import com.maddyhome.idea.vim.key.Node
 import com.maddyhome.idea.vim.newapi.ExecutionContext
-import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.VimEditor
 import com.maddyhome.idea.vim.newapi.VimLogger
 import com.maddyhome.idea.vim.newapi.debug
@@ -84,7 +83,7 @@ class KeyHandler {
    * @param key     The keystroke typed by the user
    * @param context The data context
    */
-  fun handleKey(editor: IjVimEditor, key: KeyStroke, context: ExecutionContext) {
+  fun handleKey(editor: VimEditor, key: KeyStroke, context: ExecutionContext) {
     handleKey(editor, key, context, allowKeyMappings = true, mappingCompleted = false)
   }
 
@@ -97,7 +96,7 @@ class KeyHandler {
    * TODO mappingCompleted and recursionCounter - we should find a more beautiful way to use them
    */
   fun handleKey(
-    editor: IjVimEditor,
+    editor: VimEditor,
     key: KeyStroke,
     context: ExecutionContext,
     allowKeyMappings: Boolean,
@@ -199,7 +198,7 @@ class KeyHandler {
   }
 
   fun finishedCommandPreparation(
-    editor: IjVimEditor,
+    editor: VimEditor,
     context: ExecutionContext,
     editorState: CommandState,
     commandBuilder: CommandBuilder,
@@ -243,7 +242,7 @@ class KeyHandler {
   }
 
   private fun handleEditorReset(
-    editor: IjVimEditor,
+    editor: VimEditor,
     key: KeyStroke,
     context: ExecutionContext,
     editorState: CommandState,
@@ -259,7 +258,7 @@ class KeyHandler {
         if (key.keyCode == KeyEvent.VK_ESCAPE) {
           val executed = arrayOf<Boolean?>(null)
           ActionExecutor.executeCommand(
-            editor.editor.project,
+            editor.ij.project,
             { executed[0] = ActionExecutor.executeEsc(context.ij) },
             "", null
           )
@@ -274,7 +273,7 @@ class KeyHandler {
   }
 
   private fun handleKeyMapping(
-    editor: IjVimEditor,
+    editor: VimEditor,
     key: KeyStroke,
     context: ExecutionContext,
     mappingCompleted: Boolean,
@@ -354,7 +353,7 @@ class KeyHandler {
       //   but before invoke later is handled. This is a rare case, so I'll just add a check to isPluginMapping.
       //   But this "unexpected behaviour" exists and it would be better not to relay on mutable state with delays.
       //   https://youtrack.jetbrains.com/issue/VIM-2392
-      val ijEditor = (editor as IjVimEditor).editor
+      val ijEditor = editor.ij
       mappingState.startMappingTimer { actionEvent: ActionEvent? ->
         VimPlugin.invokeLater(
           {
@@ -381,7 +380,7 @@ class KeyHandler {
   }
 
   private fun handleCompleteMappingSequence(
-    editor: IjVimEditor,
+    editor: VimEditor,
     context: ExecutionContext,
     mappingState: MappingState,
     mapping: KeyMapping,
@@ -449,7 +448,7 @@ class KeyHandler {
   }
 
   private fun handleAbandonedMappingSequence(
-    editor: IjVimEditor,
+    editor: VimEditor,
     mappingState: MappingState,
     context: ExecutionContext,
   ): Boolean {
@@ -586,7 +585,7 @@ class KeyHandler {
   }
 
   private fun handleDigraph(
-    editor: IjVimEditor,
+    editor: VimEditor,
     key: KeyStroke,
     context: ExecutionContext,
     editorState: CommandState,
@@ -610,7 +609,7 @@ class KeyHandler {
         return true
       }
     }
-    val res = editorState.processDigraphKey(key, editor.editor)
+    val res = editorState.processDigraphKey(key, editor.ij)
     if (ExEntryPanel.getInstance().isActive) {
       when (res.result) {
         DigraphResult.RES_HANDLED -> setPromptCharacterEx(if (commandBuilder.isPuttingLiteral()) '^' else key.keyChar)
@@ -657,7 +656,7 @@ class KeyHandler {
   }
 
   private fun executeCommand(
-    editor: IjVimEditor,
+    editor: VimEditor,
     context: ExecutionContext,
     editorState: CommandState,
   ) {
@@ -673,7 +672,7 @@ class KeyHandler {
 
     // Save off the command we are about to execute
     editorState.setExecutingCommand(command)
-    val project = editor.editor.project
+    val project = editor.ij.project
     val type = command.type
     if (type.isWrite) {
       if (!editor.isWritable()) {
@@ -698,7 +697,7 @@ class KeyHandler {
   }
 
   private fun handleCommandNode(
-    editor: IjVimEditor,
+    editor: VimEditor,
     context: ExecutionContext,
     key: KeyStroke,
     node: CommandNode<ActionBeanClass>,
@@ -838,13 +837,13 @@ class KeyHandler {
    *
    * @param editor The editor to reset.
    */
-  fun fullReset(editor: IjVimEditor) {
+  fun fullReset(editor: VimEditor) {
     VimPlugin.clearError()
     getInstance(editor).reset()
     reset(editor)
     val registerGroup = VimPlugin.getRegisterIfCreated()
     registerGroup?.resetRegister()
-    editor.editor.selectionModel.removeSelection()
+    editor.ij.selectionModel.removeSelection()
   }
 
   private fun setPromptCharacterEx(promptCharacter: Char) {
@@ -858,7 +857,7 @@ class KeyHandler {
    * This was used as an experiment to execute actions as a runnable.
    */
   internal class ActionRunner(
-    val editor: IjVimEditor,
+    val editor: VimEditor,
     val context: ExecutionContext,
     val cmd: Command,
     val operatorArguments: OperatorArguments,
@@ -870,9 +869,9 @@ class KeyHandler {
       if (register != null) {
         VimPlugin.getRegister().selectRegister(register)
       }
-      VimActionExecutor.executeVimAction(editor.editor, cmd.action, context.ij, operatorArguments)
+      VimActionExecutor.executeVimAction(editor.ij, cmd.action, context.ij, operatorArguments)
       if (editorState.mode === CommandState.Mode.INSERT || editorState.mode === CommandState.Mode.REPLACE) {
-        VimPlugin.getChange().processCommand(editor.editor, cmd)
+        VimPlugin.getChange().processCommand(editor.ij, cmd)
       }
 
       // Now the command has been executed let's clean up a few things.

@@ -904,7 +904,7 @@ public class ChangeGroup {
     MotionGroup.scrollCaretIntoView(editor);
   }
 
-  public boolean processKeyInSelectMode(final @NotNull IjVimEditor editor,
+  public boolean processKeyInSelectMode(final @NotNull VimEditor editor,
                                         final @NotNull ExecutionContext context,
                                         final @NotNull KeyStroke key) {
     boolean res;
@@ -914,9 +914,9 @@ public class ChangeGroup {
       ModeHelper.exitSelectMode(editor, false);
       KeyHandler.getInstance().reset(editor);
 
-      if (isPrintableChar(key.getKeyChar()) || activeTemplateWithLeftRightMotion(editor.getEditor(), key)) {
+      if (isPrintableChar(key.getKeyChar()) || activeTemplateWithLeftRightMotion(((IjVimEditor)editor).getEditor(), key)) {
         DataContext ijContext = ExecutionContextKt.getIj(context);
-        VimPlugin.getChange().insertBeforeCursor(editor.getEditor(), ijContext);
+        VimPlugin.getChange().insertBeforeCursor(((IjVimEditor)editor).getEditor(), ijContext);
       }
     }
 

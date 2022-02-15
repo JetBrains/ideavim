@@ -50,6 +50,7 @@ import com.maddyhome.idea.vim.group.visual.VisualMotionGroup;
 import com.maddyhome.idea.vim.helper.MacKeyRepeat;
 import com.maddyhome.idea.vim.listener.VimListenerManager;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
+import com.maddyhome.idea.vim.newapi.VimEditor;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import com.maddyhome.idea.vim.ui.StatusBarIconFactory;
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable;
@@ -246,9 +247,9 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     return ApplicationManager.getApplication().isDispatchThread();
   }
 
-  public static void invokeLater(Runnable runnable, IjVimEditor editor) {
+  public static void invokeLater(Runnable runnable, VimEditor editor) {
     ApplicationManager.getApplication()
-      .invokeLater(runnable, ModalityState.stateForComponent(editor.getEditor().getComponent()));
+      .invokeLater(runnable, ModalityState.stateForComponent(((IjVimEditor)editor).getEditor().getComponent()));
   }
 
   private boolean ideavimrcRegistered = false;

@@ -43,7 +43,6 @@ import com.maddyhome.idea.vim.helper.vimSelectionStart
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.newapi.ExecutionContext
 import com.maddyhome.idea.vim.newapi.IjVimCaret
-import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.Offset
 import com.maddyhome.idea.vim.newapi.VimEditor
 import com.maddyhome.idea.vim.newapi.ij
@@ -66,7 +65,7 @@ sealed class MappingInfo(
   @VimNlsSafe
   abstract fun getPresentableString(): String
 
-  abstract fun execute(editor: IjVimEditor, context: ExecutionContext)
+  abstract fun execute(editor: VimEditor, context: ExecutionContext)
 
   override fun compareTo(other: MappingInfo): Int {
     val size = fromKeys.size
@@ -102,7 +101,7 @@ class ToKeysMappingInfo(
 ) : MappingInfo(fromKeys, isRecursive, owner) {
   override fun getPresentableString(): String = toKeyNotation(toKeys)
 
-  override fun execute(editor: IjVimEditor, context: ExecutionContext) {
+  override fun execute(editor: VimEditor, context: ExecutionContext) {
     LOG.debug("Executing 'ToKeys' mapping info...")
     val editorDataContext = ExecutionContext.onEditor(editor, context)
     val fromIsPrefix = KeyHandler.isPrefix(fromKeys, toKeys)
@@ -129,7 +128,7 @@ class ToExpressionMappingInfo(
 ) : MappingInfo(fromKeys, isRecursive, owner) {
   override fun getPresentableString(): String = originalString
 
-  override fun execute(editor: IjVimEditor, context: ExecutionContext) {
+  override fun execute(editor: VimEditor, context: ExecutionContext) {
     LOG.debug("Executing 'ToExpression' mapping info...")
     val editorDataContext = ExecutionContext.onEditor(editor, context)
     val toKeys = parseKeys(toExpression.evaluate(editor.ij, context.ij, CommandLineVimLContext).toString())
@@ -156,7 +155,7 @@ class ToHandlerMappingInfo(
 ) : MappingInfo(fromKeys, isRecursive, owner) {
   override fun getPresentableString(): String = "call ${extensionHandler.javaClass.canonicalName}"
 
-  override fun execute(editor: IjVimEditor, context: ExecutionContext) {
+  override fun execute(editor: VimEditor, context: ExecutionContext) {
     LOG.debug("Executing 'ToHandler' mapping info...")
     val commandState = CommandState.getInstance(editor)
 
@@ -256,7 +255,7 @@ class ToActionMappingInfo(
 ) : MappingInfo(fromKeys, isRecursive, owner) {
   override fun getPresentableString(): String = "action $action"
 
-  override fun execute(editor: IjVimEditor, context: ExecutionContext) {
+  override fun execute(editor: VimEditor, context: ExecutionContext) {
     LOG.debug("Executing 'ToAction' mapping...")
     val editorDataContext = ExecutionContext.onEditor(editor, context)
     val dataContext = CaretSpecificDataContext(editorDataContext.ij, editor.ij.caretModel.currentCaret)
