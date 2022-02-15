@@ -655,8 +655,12 @@ abstract class VimTestCase : UsefulTestCase() {
           KeyEvent(editor.component, KeyEvent.KEY_PRESSED, Date().time, key.modifiers, key.keyCode, key.keyChar)
 
         val e = AnActionEvent(
-          event, EditorDataContext.init(editor), ActionPlaces.KEYBOARD_SHORTCUT, VimShortcutKeyAction.instance.templatePresentation,
-          ActionManager.getInstance(), 0
+          event,
+          EditorDataContext.init(editor),
+          ActionPlaces.KEYBOARD_SHORTCUT,
+          VimShortcutKeyAction.instance.templatePresentation.clone(),
+          ActionManager.getInstance(),
+          0
         )
         if (ActionUtil.lastUpdateAndCheckDumb(VimShortcutKeyAction.instance, e, true)) {
           ActionUtil.performActionDumbAwareWithCallbacks(VimShortcutKeyAction.instance, e)
