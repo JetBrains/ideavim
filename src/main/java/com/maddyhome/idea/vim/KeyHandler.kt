@@ -17,8 +17,6 @@
  */
 package com.maddyhome.idea.vim
 
-import com.intellij.openapi.components.Service
-import com.intellij.openapi.components.service
 import com.maddyhome.idea.vim.action.change.VimRepeater.Extension.argumentCaptured
 import com.maddyhome.idea.vim.action.change.change.ChangeCharacterAction
 import com.maddyhome.idea.vim.action.change.change.ChangeVisualCharacterAction
@@ -74,7 +72,6 @@ import javax.swing.KeyStroke
  * This handles every keystroke that the user can argType except those that are still valid hotkeys for various Idea
  * actions. This is a singleton.
  */
-@Service
 class KeyHandler {
 
   private var handleKeyRecursionCount = 0
@@ -914,13 +911,9 @@ class KeyHandler {
       return true
     }
 
-    /**
-     * Returns a reference to the singleton instance of this class
-     *
-     * @return A reference to the singleton
-     */
+    private val instance = KeyHandler()
     @JvmStatic
-    fun getInstance(): KeyHandler = service()
+    fun getInstance() = instance
   }
 }
   
