@@ -93,12 +93,41 @@ private data class ProcessedTextData(
 )
 
 class PutGroup {
-  fun putText(editor: Editor, context: DataContext, data: PutData): Boolean {
+  fun putText(editor: Editor, context: DataContext, data: PutData, updateVisualMarks: Boolean = false): Boolean {
     val additionalData = collectPreModificationData(editor, data)
     deleteSelectedText(editor, data)
     val processedText = processText(editor, data) ?: return false
     putTextAndSetCaretPosition(editor, context, processedText, data, additionalData)
+
+    if (updateVisualMarks) {
+      wrapInsertedTextWithVisualMarks(editor, data, processedText)
+    }
+
     return true
+  }
+
+  /**
+   * see ":h gv":
+   * After using "p" or "P" in Visual mode the text that was put will be selected
+   */
+  private fun wrapInsertedTextWithVisualMarks(editor: Editor, data: PutData, text: ProcessedTextData) {
+    val textLength: Int = data.textData?.rawText?.length ?: return
+    val selections = data.visualSelection?.caretsAndSelections?.values?.toList() ?: return
+    if (selections.size != 1) return
+
+    var fistIndex = selections[0].vimStart
+    val lastIndex = fistIndex + textLength - 1
+
+    if (wasTextInsertedLineWise(text)) {
+      // here we skip the \n char before the inserted text
+      fistIndex += 1
+    }
+
+    VimPlugin.getMark().setVisualSelectionMarks(editor, TextRange(fistIndex, lastIndex))
+  }
+
+  private fun wasTextInsertedLineWise(text: ProcessedTextData): Boolean {
+    return text.typeInRegister == SelectionType.LINE_WISE
   }
 
   fun putTextForCaret(editor: Editor, caret: Caret, context: DataContext, data: PutData): Boolean {

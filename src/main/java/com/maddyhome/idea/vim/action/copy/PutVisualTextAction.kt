@@ -58,7 +58,7 @@ sealed class PutVisualTextBaseAction(
     val selection = PutData.VisualSelection(caretsAndSelections, caretsAndSelections.values.first().type)
     val putData = PutData(textData, selection, cmd.count, insertTextBeforeCaret, indent, caretAfterInsertedText)
 
-    return VimPlugin.getPut().putText(editor, context, putData)
+    return VimPlugin.getPut().putText(editor, context, putData, true)
   }
 }
 
