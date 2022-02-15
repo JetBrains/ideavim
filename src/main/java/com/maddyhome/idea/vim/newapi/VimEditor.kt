@@ -376,6 +376,14 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
   override fun getText(left: Offset, right: Offset): CharSequence {
     return editor.document.charsSequence.subSequence(left.point, right.point)
   }
+
+  override fun equals(other: Any?): Boolean {
+    error("equals and hashCode should not be used with IjVimEditor")
+  }
+
+  override fun hashCode(): Int {
+    error("equals and hashCode should not be used with IjVimEditor")
+  }
 }
 
 // TODO: 29.12.2021 Split interface to mutable and immutable
@@ -409,6 +417,14 @@ class IjVimCaret(val caret: Caret) : VimCaret {
 
   override fun hasSelection(): Boolean {
     return caret.hasSelection()
+  }
+
+  override fun equals(other: Any?): Boolean {
+    error("equals and hashCode should not be used with IjVimCaret")
+  }
+
+  override fun hashCode(): Int {
+    error("equals and hashCode should not be used with IjVimCaret")
   }
 }
 

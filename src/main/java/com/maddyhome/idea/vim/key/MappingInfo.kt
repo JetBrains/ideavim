@@ -169,7 +169,7 @@ class ToHandlerMappingInfo(
     val shouldCalculateOffsets: Boolean = commandState.isOperatorPending
 
     val startOffsets: Map<Caret, Offset> =
-      editor.carets().associateWith { it.offset }.mapKeys { (it.key as IjVimCaret).caret }
+      editor.carets().map { (it as IjVimCaret).caret }.associateWith { it.offset.offset }
 
     if (extensionHandler.isRepeatable) {
       clean()
