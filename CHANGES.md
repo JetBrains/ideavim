@@ -39,6 +39,7 @@ usual beta standards.
 * [VIM-2540](https://youtrack.jetbrains.com/issue/VIM-2540) Fix option listeners
 * [VIM-2548](https://youtrack.jetbrains.com/issue/VIM-2548) Fix paste
 * [VIM-2470](https://youtrack.jetbrains.com/issue/VIM-2470) Fix incorrect reset of cursor shape
+* [VIM-2223](https://youtrack.jetbrains.com/issue/VIM-2223), [VIM-1684](https://youtrack.jetbrains.com/issue/VIM-1684), [VIM-2491](https://youtrack.jetbrains.com/issue/VIM-2491) Fix `gv`
 
 ### Merged PRs:
 * [441](https://github.com/JetBrains/ideavim/pull/441) by [DanEEStar](https://github.com/DanEEStar): Add Matchit support for Vue.js files

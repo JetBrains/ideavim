@@ -23,6 +23,47 @@ import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class MarksCommandTest : VimTestCase() {
+
+  // https://youtrack.jetbrains.com/issue/VIM-2223
+  fun `test gv after replacing a line`() {
+    configureByText(
+      """I found it in a legendary land
+                      |all rocks$c and lavender and tufted grass,
+                      |where it was settled on some sodden sand
+                      |hard by the torrent of a mountain pass.
+                    """.trimMargin()
+    )
+    typeText(parseKeys("VyjVpgv"))
+    assertState(
+      """I found it in a legendary land
+                      |all rocks and lavender and tufted grass,
+                      |${s}all rocks and lavender and tufted grass,
+                      |${se}hard by the torrent of a mountain pass.
+                    """.trimMargin()
+    )
+  }
+
+  // https://youtrack.jetbrains.com/issue/VIM-1684
+  fun `test reselecting different text length`() {
+    configureByText("""
+      # (response.get${c}_data(as_text=True))
+      # (response.data.decode("utf-8"))
+    """.trimIndent())
+    typeText(parseKeys("vi)yjvi)pgv"))
+    assertState("""
+      # (response.get_data(as_text=True))
+      # (response.get_data(as_text=True))
+    """.trimIndent())
+  }
+
+  // https://youtrack.jetbrains.com/issue/VIM-2491
+  fun `test mapping with gv`() {
+    configureByText("Oh, hi ${c}Andy Tom John")
+    typeText(commandToKeys("xnoremap p pgvy"))
+    typeText(parseKeys("yewvepwvep"))
+    assertState("Oh, hi Andy Andy Andy")
+  }
+
   fun `test list empty marks`() {
     configureByText("")
     enterCommand("marks")
