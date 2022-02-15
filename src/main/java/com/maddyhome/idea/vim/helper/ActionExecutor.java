@@ -39,7 +39,7 @@ public class ActionExecutor {
   @SuppressWarnings("deprecation")
   public static boolean executeAction(@NotNull AnAction action, @NotNull DataContext context) {
     final AnActionEvent event =
-      new AnActionEvent(null, context, ActionPlaces.KEYBOARD_SHORTCUT, action.getTemplatePresentation(),
+      new AnActionEvent(null, context, ActionPlaces.KEYBOARD_SHORTCUT, action.getTemplatePresentation().clone(),
                         ActionManager.getInstance(), 0);
 
     if (!ActionUtil.lastUpdateAndCheckDumb(action, event, false)) {
