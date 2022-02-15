@@ -418,7 +418,7 @@ class KeyHandler {
     val currentContext = context.updateEditor(editor)
     LOG.trace("Executing mapping info")
     try {
-      mappingInfo.execute(editor.editor, context.ij)
+      mappingInfo.execute(editor, context)
     } catch (e: Exception) {
       VimPlugin.showMessage(e.message)
       VimPlugin.indicateError()

@@ -381,14 +381,18 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
 // TODO: 29.12.2021 Split interface to mutable and immutable
 interface VimCaret {
   val editor: VimEditor
+  val offset: Offset
   fun moveToOffset(offset: Int)
   fun offsetForLineStartSkipLeading(line: Int): Int
   fun getLine(): EditorLine.Pointer
+  fun hasSelection(): Boolean
 }
 
 class IjVimCaret(val caret: Caret) : VimCaret {
   override val editor: VimEditor
     get() = IjVimEditor(caret.editor)
+  override val offset: Offset
+    get() = caret.offset.offset
 
   override fun moveToOffset(offset: Int) {
     // TODO: 17.12.2021 Unpack internal actions
@@ -401,6 +405,10 @@ class IjVimCaret(val caret: Caret) : VimCaret {
 
   override fun getLine(): EditorLine.Pointer {
     return EditorLine.Pointer.init(caret.logicalPosition.line, editor)
+  }
+
+  override fun hasSelection(): Boolean {
+    return caret.hasSelection()
   }
 }
 

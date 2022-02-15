@@ -84,6 +84,12 @@ var Editor.subMode
     this.commandState.subMode = value
   }
 
+var VimEditor.subMode
+  get() = this.commandState.subMode
+  set(value) {
+    this.commandState.subMode = value
+  }
+
 @get:JvmName("inNormalMode")
 val Editor.inNormalMode
   get() = this.mode.inNormalMode

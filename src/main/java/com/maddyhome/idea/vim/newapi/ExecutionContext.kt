@@ -32,8 +32,8 @@ interface ExecutionContext {
   fun updateEditor(editor: VimEditor): ExecutionContext
 
   companion object {
-    fun onEditor(editor: VimEditor): ExecutionContext {
-      return IjExecutionContext(EditorDataContext.init((editor as IjVimEditor).editor, null))
+    fun onEditor(editor: VimEditor, prevContext: ExecutionContext? = null): ExecutionContext {
+      return IjExecutionContext(EditorDataContext.init((editor as IjVimEditor).editor, prevContext?.ij))
     }
   }
 }

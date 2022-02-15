@@ -17,12 +17,9 @@
  */
 package com.maddyhome.idea.vim.key
 
-import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.application.invokeLater
-import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Caret
-import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.actionSystem.CaretSpecificDataContext
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.action.change.VimRepeater.Extension.argumentCaptured
@@ -37,7 +34,6 @@ import com.maddyhome.idea.vim.extension.VimExtensionHandler
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.group.visual.VimSelection.Companion.create
 import com.maddyhome.idea.vim.helper.ActionExecutor
-import com.maddyhome.idea.vim.helper.EditorDataContext
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.StringHelper.toKeyNotation
 import com.maddyhome.idea.vim.helper.VimNlsSafe
@@ -45,8 +41,13 @@ import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.helper.vimSelectionStart
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
+import com.maddyhome.idea.vim.newapi.ExecutionContext
+import com.maddyhome.idea.vim.newapi.IjVimCaret
 import com.maddyhome.idea.vim.newapi.IjVimEditor
-import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.newapi.Offset
+import com.maddyhome.idea.vim.newapi.VimEditor
+import com.maddyhome.idea.vim.newapi.ij
+import com.maddyhome.idea.vim.newapi.offset
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import java.awt.event.KeyEvent
@@ -56,13 +57,16 @@ import kotlin.math.min
 /**
  * @author vlan
  */
-sealed class MappingInfo(val fromKeys: List<KeyStroke>, val isRecursive: Boolean, val owner: MappingOwner) :
-  Comparable<MappingInfo> {
+sealed class MappingInfo(
+  val fromKeys: List<KeyStroke>,
+  val isRecursive: Boolean,
+  val owner: MappingOwner,
+) : Comparable<MappingInfo> {
 
   @VimNlsSafe
   abstract fun getPresentableString(): String
 
-  abstract fun execute(editor: Editor, context: DataContext)
+  abstract fun execute(editor: IjVimEditor, context: ExecutionContext)
 
   override fun compareTo(other: MappingInfo): Int {
     val size = fromKeys.size
@@ -98,15 +102,15 @@ class ToKeysMappingInfo(
 ) : MappingInfo(fromKeys, isRecursive, owner) {
   override fun getPresentableString(): String = toKeyNotation(toKeys)
 
-  override fun execute(editor: Editor, context: DataContext) {
+  override fun execute(editor: IjVimEditor, context: ExecutionContext) {
     LOG.debug("Executing 'ToKeys' mapping info...")
-    val editorDataContext = EditorDataContext.init(editor, context)
+    val editorDataContext = ExecutionContext.onEditor(editor, context)
     val fromIsPrefix = KeyHandler.isPrefix(fromKeys, toKeys)
     var first = true
     for (keyStroke in toKeys) {
       val recursive = isRecursive && !(first && fromIsPrefix)
       val keyHandler = KeyHandler.getInstance()
-      keyHandler.handleKey(editor.vim, keyStroke, editorDataContext.vim, recursive, false)
+      keyHandler.handleKey(editor, keyStroke, editorDataContext, recursive, false)
       first = false
     }
   }
@@ -125,16 +129,16 @@ class ToExpressionMappingInfo(
 ) : MappingInfo(fromKeys, isRecursive, owner) {
   override fun getPresentableString(): String = originalString
 
-  override fun execute(editor: Editor, context: DataContext) {
+  override fun execute(editor: IjVimEditor, context: ExecutionContext) {
     LOG.debug("Executing 'ToExpression' mapping info...")
-    val editorDataContext = EditorDataContext.init(editor, context)
-    val toKeys = parseKeys(toExpression.evaluate(editor, context, CommandLineVimLContext).toString())
+    val editorDataContext = ExecutionContext.onEditor(editor, context)
+    val toKeys = parseKeys(toExpression.evaluate(editor.ij, context.ij, CommandLineVimLContext).toString())
     val fromIsPrefix = KeyHandler.isPrefix(fromKeys, toKeys)
     var first = true
     for (keyStroke in toKeys) {
       val recursive = isRecursive && !(first && fromIsPrefix)
       val keyHandler = KeyHandler.getInstance()
-      keyHandler.handleKey(editor.vim, keyStroke, editorDataContext.vim, recursive, false)
+      keyHandler.handleKey(editor, keyStroke, editorDataContext, recursive, false)
       first = false
     }
   }
@@ -152,9 +156,8 @@ class ToHandlerMappingInfo(
 ) : MappingInfo(fromKeys, isRecursive, owner) {
   override fun getPresentableString(): String = "call ${extensionHandler.javaClass.canonicalName}"
 
-  override fun execute(editor: Editor, context: DataContext) {
+  override fun execute(editor: IjVimEditor, context: ExecutionContext) {
     LOG.debug("Executing 'ToHandler' mapping info...")
-    val processor = CommandProcessor.getInstance()
     val commandState = CommandState.getInstance(editor)
 
     // Cache isOperatorPending in case the extension changes the mode while moving the caret
@@ -166,7 +169,8 @@ class ToHandlerMappingInfo(
     // TODO: Is this legal? Should we assert in this case?
     val shouldCalculateOffsets: Boolean = commandState.isOperatorPending
 
-    val startOffsets: Map<Caret, Int> = editor.caretModel.allCarets.associateWith { it.offset }
+    val startOffsets: Map<Caret, Offset> =
+      editor.carets().associateWith { it.offset }.mapKeys { (it.key as IjVimCaret).caret }
 
     if (extensionHandler.isRepeatable) {
       clean()
@@ -180,18 +184,16 @@ class ToHandlerMappingInfo(
         if (shouldCalculateOffsets) {
           invokeLater {
             KeyHandler.getInstance().finishedCommandPreparation(
-              IjVimEditor(editor),
-              context.vim, CommandState.getInstance(editor), CommandState.getInstance(editor).commandBuilder, null, false
+              editor,
+              context, CommandState.getInstance(editor), CommandState.getInstance(editor).commandBuilder, null, false
             )
           }
         }
       }
     }
 
-    processor.executeCommand(
-      editor.project, { extensionHandler.execute(editor, context) },
-      "Vim " + extensionHandler.javaClass.simpleName, null
-    )
+    ActionExecutor.executeCommand(editor.ij.project, { extensionHandler.execute(editor.ij, context.ij) },
+      "Vim " + extensionHandler.javaClass.simpleName, null)
 
     if (extensionHandler.isRepeatable) {
       lastExtensionHandler = extensionHandler
@@ -209,32 +211,32 @@ class ToHandlerMappingInfo(
 
     private fun myFun(
       shouldCalculateOffsets: Boolean,
-      editor: Editor,
-      startOffsets: Map<Caret, Int>,
+      editor: VimEditor,
+      startOffsets: Map<Caret, Offset>,
     ) {
       val commandState = editor.commandState
       if (shouldCalculateOffsets && !commandState.commandBuilder.hasCurrentCommandPartArgument()) {
         val offsets: MutableMap<Caret, VimSelection> = HashMap()
-        for (caret in editor.caretModel.allCarets) {
+        for (caret in editor.carets().map { (it as IjVimCaret).caret }) {
           var startOffset = startOffsets[caret]
           if (caret.hasSelection()) {
-            val vimSelection = create(caret.vimSelectionStart, caret.offset, fromSubMode(editor.subMode), editor)
+            val vimSelection = create(caret.vimSelectionStart, caret.offset, fromSubMode(editor.subMode), editor.ij)
             offsets[caret] = vimSelection
             commandState.popModes()
-          } else if (startOffset != null && startOffset != caret.offset) {
+          } else if (startOffset != null && startOffset.point != caret.offset) {
             // Command line motions are always characterwise exclusive
-            var endOffset = caret.offset
-            if (startOffset < endOffset) {
-              endOffset -= 1
+            var endOffset = caret.offset.offset
+            if (startOffset.point < endOffset.point) {
+              endOffset = (endOffset.point - 1).offset
             } else {
-              startOffset -= 1
+              startOffset = (startOffset.point - 1).offset
             }
-            val vimSelection = create(startOffset, endOffset, SelectionType.CHARACTER_WISE, editor)
+            val vimSelection = create(startOffset.point, endOffset.point, SelectionType.CHARACTER_WISE, editor.ij)
             offsets[caret] = vimSelection
             SelectionVimListenerSuppressor.lock().use {
               // Move caret to the initial offset for better undo action
               //  This is not a necessary thing, but without it undo action look less convenient
-              editor.caretModel.moveToOffset(startOffset)
+              editor.ij.caretModel.moveToOffset(startOffset.point)
             }
           }
         }
@@ -254,10 +256,10 @@ class ToActionMappingInfo(
 ) : MappingInfo(fromKeys, isRecursive, owner) {
   override fun getPresentableString(): String = "action $action"
 
-  override fun execute(editor: Editor, context: DataContext) {
+  override fun execute(editor: IjVimEditor, context: ExecutionContext) {
     LOG.debug("Executing 'ToAction' mapping...")
-    val editorDataContext = EditorDataContext.init(editor, context)
-    val dataContext = CaretSpecificDataContext(editorDataContext, editor.caretModel.currentCaret)
+    val editorDataContext = ExecutionContext.onEditor(editor, context)
+    val dataContext = CaretSpecificDataContext(editorDataContext.ij, editor.ij.caretModel.currentCaret)
     ActionExecutor.executeAction(action, dataContext)
   }
 
