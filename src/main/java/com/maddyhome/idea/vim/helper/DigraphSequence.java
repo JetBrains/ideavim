@@ -20,9 +20,9 @@ package com.maddyhome.idea.vim.helper;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
+import com.maddyhome.idea.vim.newapi.VimEditor;
 import com.maddyhome.idea.vim.vimscript.services.OptionConstants;
 import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import org.jetbrains.annotations.NotNull;
@@ -78,12 +78,12 @@ public class DigraphSequence {
     return DigraphResult.HANDLED_LITERAL;
   }
 
-  public @NotNull DigraphResult processKey(@NotNull KeyStroke key, @NotNull Editor editor) {
+  public @NotNull DigraphResult processKey(@NotNull KeyStroke key, @NotNull VimEditor editor) {
     switch (digraphState) {
       case DIG_STATE_PENDING:
         logger.debug("DIG_STATE_PENDING");
         if (key.getKeyCode() == KeyEvent.VK_BACK_SPACE
-            && VimPlugin.getOptionService().isSet(new OptionService.Scope.LOCAL(new IjVimEditor(editor)), OptionConstants.digraphName, OptionConstants.digraphName)) {
+            && VimPlugin.getOptionService().isSet(new OptionService.Scope.LOCAL(editor), OptionConstants.digraphName, OptionConstants.digraphName)) {
           digraphState = DIG_STATE_BACK_SPACE;
         }
         else if (key.getKeyChar() != KeyEvent.CHAR_UNDEFINED) {
@@ -232,7 +232,7 @@ public class DigraphSequence {
           if (!ApplicationManager.getApplication().isUnitTestMode()) {
             // The key we received isn't part of the literal, so post it to be handled after we've handled the literal.
             // This requires swing, so we can't run it in tests.
-            VimPlugin.getMacro().postKey(key, editor);
+            VimPlugin.getMacro().postKey(key, ((IjVimEditor)editor).getEditor());
           }
 
           return DigraphResult.done(code);

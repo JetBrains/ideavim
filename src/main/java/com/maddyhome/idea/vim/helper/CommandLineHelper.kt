@@ -22,6 +22,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.action.change.VimRepeater
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.ui.ModalEntry
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import java.awt.event.KeyEvent
@@ -31,7 +32,7 @@ import javax.swing.KeyStroke
 class CommandLineHelper {
 
   fun inputString(editor: Editor, prompt: String, finishOn: Char?): String? {
-    if (editor.commandState.isDotRepeatInProgress) {
+    if (editor.vim.commandState.isDotRepeatInProgress) {
       val input = VimRepeater.Extension.consumeString()
       return input ?: error("Not enough strings saved: ${VimRepeater.Extension.lastExtensionHandler}")
     }

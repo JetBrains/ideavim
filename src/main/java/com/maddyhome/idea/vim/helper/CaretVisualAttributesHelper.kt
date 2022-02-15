@@ -27,6 +27,7 @@ import com.intellij.openapi.editor.ex.EditorSettingsExternalizable
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.newapi.IjVimEditor
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.options.OptionChangeListener
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.GuiCursorMode
@@ -68,7 +69,7 @@ fun removeCaretsVisualAttributes(editor: Editor) {
 }
 
 fun Editor.guicursorMode(): GuiCursorMode {
-  if (this.commandState.isReplaceCharacter) {
+  if (this.vim.commandState.isReplaceCharacter) {
     // Can be true for NORMAL and VISUAL
     return GuiCursorMode.REPLACE
   }

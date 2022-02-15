@@ -28,6 +28,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.StringHelper.stringToKeys
+import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.helper.exitInsertMode
 import com.maddyhome.idea.vim.helper.exitSelectMode
 import com.maddyhome.idea.vim.helper.exitVisualMode
@@ -53,7 +54,7 @@ data class NormalCommand(val ranges: Ranges, val argument: String) : Command.Sin
       argument = argument.substring(1)
     }
 
-    val commandState = CommandState.getInstance(editor)
+    val commandState = editor.vim.commandState
     val rangeUsed = ranges.size() != 0
     when (editor.mode) {
       CommandState.Mode.VISUAL -> {

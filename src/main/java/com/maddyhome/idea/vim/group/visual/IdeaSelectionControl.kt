@@ -80,13 +80,13 @@ object IdeaSelectionControl {
           return@singleTask
         }
 
-        logger.debug("Some carets have selection. State before adjustment: ${editor.commandState.toSimpleString()}")
+        logger.debug("Some carets have selection. State before adjustment: ${editor.vim.commandState.toSimpleString()}")
 
         editor.popAllModes()
 
         activateMode(editor, chooseSelectionMode(editor, selectionSource, true))
       } else {
-        logger.debug("None of carets have selection. State before adjustment: ${editor.commandState.toSimpleString()}")
+        logger.debug("None of carets have selection. State before adjustment: ${editor.vim.commandState.toSimpleString()}")
         if (editor.inVisualMode) editor.exitVisualMode()
         if (editor.inSelectMode) editor.exitSelectMode(false)
 

@@ -88,7 +88,7 @@ object IdeaSpecifics {
       }
       ) {
         editor?.let {
-          val commandState = it.commandState
+          val commandState = it.vim.commandState
           while (commandState.mode != CommandState.Mode.COMMAND) {
             commandState.popModes()
           }

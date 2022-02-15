@@ -32,12 +32,13 @@ import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.newapi.IjVimCaret
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.VimEditor
+import com.maddyhome.idea.vim.newapi.vim
 
 /**
  * Pop all modes, but leave editor state. E.g. editor selection is not removed.
  */
 fun Editor.popAllModes() {
-  val commandState = this.commandState
+  val commandState = this.vim.commandState
   while (commandState.mode != CommandState.Mode.COMMAND) {
     commandState.popModes()
   }
@@ -63,7 +64,7 @@ fun Editor.exitVisualMode() {
 
     this.subMode = CommandState.SubMode.NONE
 
-    this.commandState.popModes()
+    this.vim.commandState.popModes()
   }
 }
 
@@ -71,7 +72,7 @@ fun Editor.exitVisualMode() {
 fun Editor.exitSelectMode(adjustCaretPosition: Boolean) {
   if (!this.inSelectMode) return
 
-  this.commandState.popModes()
+  this.vim.commandState.popModes()
   SelectionVimListenerSuppressor.lock().use {
     this.caretModel.allCarets.forEach {
       it.removeSelection()

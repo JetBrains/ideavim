@@ -34,6 +34,7 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.CharacterPosition;
 import com.maddyhome.idea.vim.common.TextRange;
+import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.regexp.CharPointer;
 import com.maddyhome.idea.vim.regexp.RegExp;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType;
@@ -891,7 +892,7 @@ public class SearchHelper {
         selectionEndWithoutNewline++;
       }
 
-      final CommandState.Mode mode = CommandState.getInstance(editor).getMode();
+      final CommandState.Mode mode = CommandState.getInstance(new IjVimEditor(editor)).getMode();
       if (mode == CommandState.Mode.VISUAL) {
         if (closingTagTextRange.getStartOffset() == selectionEndWithoutNewline &&
           openingTag.getEndOffset() == selectionStart) {

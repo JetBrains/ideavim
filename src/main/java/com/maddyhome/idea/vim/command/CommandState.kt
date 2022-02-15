@@ -17,9 +17,6 @@
  */
 package com.maddyhome.idea.vim.command
 
-import com.intellij.openapi.diagnostic.Logger
-import com.intellij.openapi.diagnostic.debug
-import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.handler.ActionBeanClass
 import com.maddyhome.idea.vim.helper.DigraphResult
@@ -32,8 +29,10 @@ import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
 import com.maddyhome.idea.vim.helper.updateCaretsVisualPosition
 import com.maddyhome.idea.vim.helper.vimCommandState
 import com.maddyhome.idea.vim.key.CommandPartNode
-import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.VimEditor
+import com.maddyhome.idea.vim.newapi.debug
+import com.maddyhome.idea.vim.newapi.ij
+import com.maddyhome.idea.vim.vimLogger
 import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import org.jetbrains.annotations.Contract
@@ -43,7 +42,7 @@ import javax.swing.KeyStroke
 /**
  * Used to maintain state before and while entering a Vim command (operator, motion, text object, etc.)
  */
-class CommandState private constructor(private val editor: Editor?) {
+class CommandState private constructor(private val editor: VimEditor?) {
   val commandBuilder = CommandBuilder(getKeyRootNode(MappingMode.NORMAL))
   private val modeStates = Stack<ModeState>()
   val mappingState = MappingState()
@@ -140,8 +139,8 @@ class CommandState private constructor(private val editor: Editor?) {
 
   private fun onModeChanged() {
     if (editor != null) {
-      editor.updateCaretsVisualAttributes()
-      editor.updateCaretsVisualPosition()
+      editor.ij.updateCaretsVisualAttributes()
+      editor.ij.updateCaretsVisualPosition()
     } else {
       localEditors().forEach { editor ->
         editor.updateCaretsVisualAttributes()
@@ -189,7 +188,7 @@ class CommandState private constructor(private val editor: Editor?) {
     digraphSequence.startLiteralSequence()
   }
 
-  fun processDigraphKey(key: KeyStroke, editor: Editor): DigraphResult {
+  fun processDigraphKey(key: KeyStroke, editor: VimEditor): DigraphResult {
     return digraphSequence.processKey(key, editor)
   }
 
@@ -386,30 +385,21 @@ class CommandState private constructor(private val editor: Editor?) {
   }
 
   companion object {
-    private val logger = Logger.getInstance(CommandState::class.java.name)
+    private val logger = vimLogger<CommandState>()
     private val defaultModeState = ModeState(Mode.COMMAND, SubMode.NONE)
     private val globalState = CommandState(null)
 
     @JvmStatic
-    fun getInstance(editor: Editor?): CommandState {
+    fun getInstance(editor: VimEditor?): CommandState {
       return if (editor == null || VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, OptionConstants.ideaglobalmodeName)) {
         globalState
       } else {
-        var res = editor.vimCommandState
+        var res = editor.ij.vimCommandState
         if (res == null) {
           res = CommandState(editor)
-          editor.vimCommandState = res
+          editor.ij.vimCommandState = res
         }
         res
-      }
-    }
-
-    @JvmStatic
-    fun getInstance(editor: VimEditor): CommandState {
-      return if (editor is IjVimEditor) {
-        getInstance(editor.editor)
-      } else {
-        getInstance(null)
       }
     }
 

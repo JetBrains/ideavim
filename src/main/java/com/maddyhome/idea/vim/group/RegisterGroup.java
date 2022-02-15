@@ -56,6 +56,7 @@ import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.StringHelper;
+import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.ui.ClipboardHandler;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
@@ -375,7 +376,7 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
   }
 
   private boolean isSmallDeletionSpecialCase(Editor editor) {
-    Command currentCommand = CommandState.getInstance(editor).getExecutingCommand();
+    Command currentCommand = CommandState.getInstance(new IjVimEditor(editor)).getExecutingCommand();
     if (currentCommand != null) {
       Argument argument = currentCommand.getArgument();
       if (argument != null) {
@@ -460,7 +461,7 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
 
   public boolean startRecording(Editor editor, char register) {
     if (RECORDABLE_REGISTERS.indexOf(register) != -1) {
-      CommandState.getInstance(editor).setRecording(true);
+      CommandState.getInstance(new IjVimEditor(editor)).setRecording(true);
       recordRegister = register;
       recordList = new ArrayList<>();
       return true;
@@ -506,7 +507,7 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
           reg.addKeys(recordList);
         }
       }
-      CommandState.getInstance(editor).setRecording(false);
+      CommandState.getInstance(new IjVimEditor(editor)).setRecording(false);
     }
 
     recordRegister = 0;

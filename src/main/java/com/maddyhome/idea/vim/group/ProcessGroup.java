@@ -86,7 +86,7 @@ public class ProcessGroup {
     if (editor.isOneLineMode()) return;
 
     String initText = getRange(editor, cmd);
-    CommandState.getInstance(editor).pushModes(CommandState.Mode.CMD_LINE, CommandState.SubMode.NONE);
+    CommandState.getInstance(new IjVimEditor(editor)).pushModes(CommandState.Mode.CMD_LINE, CommandState.SubMode.NONE);
     ExEntryPanel panel = ExEntryPanel.getInstance();
     panel.activate(editor, context, ":", initText, 1);
   }
@@ -114,7 +114,7 @@ public class ProcessGroup {
     panel.deactivate(true);
     boolean res = true;
     try {
-      CommandState.getInstance(editor).popModes();
+      CommandState.getInstance(new IjVimEditor(editor)).popModes();
 
       logger.debug("processing command");
 
@@ -146,7 +146,7 @@ public class ProcessGroup {
   }
 
   public void cancelExEntry(final @NotNull Editor editor, boolean resetCaret) {
-    CommandState.getInstance(editor).popModes();
+    CommandState.getInstance(new IjVimEditor(editor)).popModes();
     KeyHandler.getInstance().reset(new IjVimEditor(editor));
     ExEntryPanel panel = ExEntryPanel.getInstance();
     panel.deactivate(true, resetCaret);
@@ -154,14 +154,14 @@ public class ProcessGroup {
 
   public void startFilterCommand(@NotNull Editor editor, DataContext context, @NotNull Command cmd) {
     String initText = getRange(editor, cmd) + "!";
-    CommandState.getInstance(editor).pushModes(CommandState.Mode.CMD_LINE, CommandState.SubMode.NONE);
+    CommandState.getInstance(new IjVimEditor(editor)).pushModes(CommandState.Mode.CMD_LINE, CommandState.SubMode.NONE);
     ExEntryPanel panel = ExEntryPanel.getInstance();
     panel.activate(editor, context, ":", initText, 1);
   }
 
   private @NotNull String getRange(Editor editor, @NotNull Command cmd) {
     String initText = "";
-    if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
+    if (CommandState.getInstance(new IjVimEditor(editor)).getMode() == CommandState.Mode.VISUAL) {
       initText = "'<,'>";
     }
     else if (cmd.getRawCount() > 0) {

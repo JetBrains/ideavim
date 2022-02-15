@@ -48,6 +48,7 @@ import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.helper.vimLastSelectionType
 import com.maddyhome.idea.vim.helper.vimLastVisualOperatorRange
 import com.maddyhome.idea.vim.helper.vimSelectionStart
+import com.maddyhome.idea.vim.newapi.vim
 
 /**
  * @author Alex Plate
@@ -228,7 +229,7 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
       }
       else -> this.caretModel.allCarets.associateWith { caret ->
 
-        val subMode = this.commandState.subMode
+        val subMode = this.vim.commandState.subMode
         VimSimpleSelection.createWithNative(
           caret.vimSelectionStart,
           caret.offset,

@@ -33,6 +33,7 @@ import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.helper.getTopLevelEditor
 import com.maddyhome.idea.vim.helper.noneOfEnum
+import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.annotations.NonNls
 import java.util.*
 import javax.swing.KeyStroke
@@ -94,7 +95,7 @@ abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
     val topLevelEditor = editor.getTopLevelEditor()
     logger.debug("Execute command with handler: " + this.javaClass.name)
 
-    val cmd = topLevelEditor.commandState.executingCommand ?: run {
+    val cmd = topLevelEditor.vim.commandState.executingCommand ?: run {
       VimPlugin.indicateError()
       return
     }

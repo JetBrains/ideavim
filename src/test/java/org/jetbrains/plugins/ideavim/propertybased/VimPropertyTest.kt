@@ -21,7 +21,6 @@ package org.jetbrains.plugins.ideavim.propertybased
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.newapi.vim
@@ -36,14 +35,14 @@ abstract class VimPropertyTest : VimTestCase() {
   }
 
   protected fun reset(editor: Editor) {
-    editor.commandState.mappingState.resetMappingSequence()
+    editor.vim.commandState.mappingState.resetMappingSequence()
     VimPlugin.getKey().resetKeyMappings()
 
     KeyHandler.getInstance().fullReset(editor.vim)
     VimPlugin.getRegister().resetRegisters()
     editor.caretModel.runForEachCaret { it.moveToOffset(0) }
 
-    CommandState.getInstance(editor).resetDigraph()
+    editor.vim.commandState.resetDigraph()
     VimPlugin.getSearch().resetState()
     VimPlugin.getChange().reset()
   }

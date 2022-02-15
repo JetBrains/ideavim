@@ -65,7 +65,9 @@ import com.maddyhome.idea.vim.helper.buildGreater212
 import com.maddyhome.idea.vim.helper.getShape
 import com.maddyhome.idea.vim.helper.guicursorMode
 import com.maddyhome.idea.vim.helper.inBlockSubMode
+import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.shape
+import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.helper.thickness
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.ToKeysMappingInfo
@@ -444,12 +446,12 @@ abstract class VimTestCase : UsefulTestCase() {
   }
 
   fun assertMode(expectedMode: CommandState.Mode) {
-    val mode = CommandState.getInstance(myFixture.editor).mode
+    val mode = myFixture.editor.mode
     Assert.assertEquals(expectedMode, mode)
   }
 
   fun assertSubMode(expectedSubMode: SubMode) {
-    val subMode = CommandState.getInstance(myFixture.editor).subMode
+    val subMode = myFixture.editor.subMode
     Assert.assertEquals(expectedSubMode, subMode)
   }
 

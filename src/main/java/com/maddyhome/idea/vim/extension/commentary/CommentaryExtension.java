@@ -36,6 +36,7 @@ import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.extension.VimExtension;
 import com.maddyhome.idea.vim.extension.VimExtensionHandler;
 import com.maddyhome.idea.vim.key.OperatorFunction;
+import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -105,7 +106,7 @@ public class CommentaryExtension implements VimExtension {
       final TextRange range = getCommentRange(editor);
       if (range == null) return false;
 
-      if (CommandState.getInstance(editor).getMode() != CommandState.Mode.VISUAL) {
+      if (CommandState.getInstance(new IjVimEditor(editor)).getMode() != CommandState.Mode.VISUAL) {
         editor.getSelectionModel().setSelection(range.getStartOffset(), range.getEndOffset());
       }
 
@@ -138,7 +139,7 @@ public class CommentaryExtension implements VimExtension {
     }
 
     private @Nullable TextRange getCommentRange(@NotNull Editor editor) {
-      final CommandState.Mode mode = CommandState.getInstance(editor).getMode();
+      final CommandState.Mode mode = CommandState.getInstance(new IjVimEditor(editor)).getMode();
       switch (mode) {
         case COMMAND:
           return VimPlugin.getMark().getChangeMarks(editor);

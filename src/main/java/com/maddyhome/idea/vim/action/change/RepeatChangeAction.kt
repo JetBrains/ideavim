@@ -35,7 +35,7 @@ class RepeatChangeAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_WRITABLE
 
   override fun execute(editor: Editor, context: DataContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
-    val state = editor.commandState
+    val state = editor.vim.commandState
     val lastCommand = VimRepeater.lastChangeCommand
 
     if (lastCommand == null && VimRepeater.Extension.lastExtensionHandler == null) return false

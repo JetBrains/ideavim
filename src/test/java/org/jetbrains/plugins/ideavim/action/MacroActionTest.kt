@@ -19,9 +19,10 @@ package org.jetbrains.plugins.ideavim.action
 
 import com.intellij.testFramework.PlatformTestUtil
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.command.CommandState.Companion.getInstance
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.helper.commandState
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import junit.framework.TestCase
@@ -36,7 +37,7 @@ class MacroActionTest : VimTestCase() {
   // |q|
   fun testRecordMacro() {
     val editor = typeTextInFile(parseKeys("qa", "3l", "q"), "on<caret>e two three\n")
-    val commandState = getInstance(editor)
+    val commandState = editor.vim.commandState
     assertFalse(commandState.isRecording)
     val registerGroup = VimPlugin.getRegister()
     val register = registerGroup.getRegister('a')

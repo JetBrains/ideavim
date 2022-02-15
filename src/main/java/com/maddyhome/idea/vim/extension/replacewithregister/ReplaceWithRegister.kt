@@ -39,9 +39,11 @@ import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.helper.EditorDataContext
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.exitVisualMode
+import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.helper.vimForEachCaret
 import com.maddyhome.idea.vim.key.OperatorFunction
+import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.annotations.NonNls
 
 class ReplaceWithRegister : VimExtension {
@@ -125,7 +127,7 @@ class ReplaceWithRegister : VimExtension {
       return true
     }
 
-    private fun getRange(editor: Editor): TextRange? = when (CommandState.getInstance(editor).mode) {
+    private fun getRange(editor: Editor): TextRange? = when (editor.vim.mode) {
       CommandState.Mode.COMMAND -> VimPlugin.getMark().getChangeMarks(editor)
       CommandState.Mode.VISUAL -> editor.caretModel.primaryCaret.run { TextRange(selectionStart, selectionEnd) }
       else -> null

@@ -22,6 +22,7 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.helper.commandState
+import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -274,7 +275,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
       |dfkjsg
     """.trimMargin()
     val editor = configureByText(before)
-    editor.commandState.pushModes(CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
+    editor.vim.commandState.pushModes(CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
 
     typeText(parseKeys("<A-p>"))
 
@@ -483,7 +484,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
       |dfkjsg
     """.trimMargin()
     val editor = configureByText(before)
-    editor.commandState.pushModes(CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
+    editor.vim.commandState.pushModes(CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
 
     typeText(parseKeys("<A-x>"))
     assertMode(CommandState.Mode.VISUAL)
@@ -571,7 +572,7 @@ fun getCellType(${s}pos$se: VisualPosition): CellType {
   fun `test ignores regex in search pattern`() {
     val before = "test ${s}t.*st${c}$se toast tallest t.*st"
     val editor = configureByText(before)
-    editor.commandState.pushModes(CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
+    editor.vim.commandState.pushModes(CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
 
     typeText(parseKeys("<A-n><A-n>"))
     val after = "test ${s}t.*st$se toast tallest ${s}t.*st$se"

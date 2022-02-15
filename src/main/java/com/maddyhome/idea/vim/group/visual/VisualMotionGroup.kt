@@ -56,7 +56,7 @@ class VisualMotionGroup {
 
     editor.caretModel.removeSecondaryCarets()
 
-    editor.commandState.pushModes(CommandState.Mode.VISUAL, lastSelectionType.toSubMode())
+    editor.vim.commandState.pushModes(CommandState.Mode.VISUAL, lastSelectionType.toSubMode())
 
     val primaryCaret = editor.caretModel.primaryCaret
     primaryCaret.vimSetSelection(visualMarks.startOffset, visualMarks.endOffset - 1, true)
@@ -125,7 +125,7 @@ class VisualMotionGroup {
       if (rawCount > 0) {
         val primarySubMode = editor.caretModel.primaryCaret.vimLastVisualOperatorRange?.type?.toSubMode()
           ?: subMode
-        editor.commandState.pushVisualMode(primarySubMode)
+        editor.vim.commandState.pushVisualMode(primarySubMode)
 
         editor.vimForEachCaret {
           val range = it.vimLastVisualOperatorRange ?: VisualChange.default(subMode)
@@ -138,7 +138,7 @@ class VisualMotionGroup {
           it.vimSetSelection(it.offset, end, true)
         }
       } else {
-        editor.commandState.pushVisualMode(subMode)
+        editor.vim.commandState.pushVisualMode(subMode)
         editor.vimForEachCaret { it.vimSetSelection(it.offset) }
       }
       return true
@@ -164,9 +164,9 @@ class VisualMotionGroup {
     val autodetectedMode = autodetectVisualSubmode(editor)
 
     if (editor.inVisualMode) {
-      editor.commandState.popModes()
+      editor.vim.commandState.popModes()
     }
-    editor.commandState.pushModes(CommandState.Mode.VISUAL, autodetectedMode)
+    editor.vim.commandState.pushModes(CommandState.Mode.VISUAL, autodetectedMode)
     if (autodetectedMode == CommandState.SubMode.VISUAL_BLOCK) {
       val (start, end) = blockModeStartAndEnd(editor)
       editor.caretModel.removeSecondaryCarets()
@@ -207,7 +207,7 @@ class VisualMotionGroup {
    */
   fun enterVisualMode(editor: Editor, subMode: CommandState.SubMode? = null): Boolean {
     val autodetectedSubMode = subMode ?: autodetectVisualSubmode(editor)
-    editor.commandState.pushModes(CommandState.Mode.VISUAL, autodetectedSubMode)
+    editor.vim.commandState.pushModes(CommandState.Mode.VISUAL, autodetectedSubMode)
     if (autodetectedSubMode == CommandState.SubMode.VISUAL_BLOCK) {
       editor.caretModel.primaryCaret.run { vimSelectionStart = vimLeadSelectionOffset }
     } else {
@@ -217,7 +217,7 @@ class VisualMotionGroup {
   }
 
   fun enterSelectMode(editor: Editor, subMode: CommandState.SubMode): Boolean {
-    editor.commandState.pushSelectMode(subMode)
+    editor.vim.commandState.pushSelectMode(subMode)
     editor.vimForEachCaret { it.vimSelectionStart = it.vimLeadSelectionOffset }
     return true
   }

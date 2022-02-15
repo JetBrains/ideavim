@@ -46,6 +46,7 @@ import com.maddyhome.idea.vim.common.*;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.HelperKt;
 import com.maddyhome.idea.vim.helper.SearchHelper;
+import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.vimscript.services.OptionConstants;
 import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import org.jdom.Element;
@@ -592,7 +593,7 @@ public class MarkGroup implements PersistentStateComponent<Element> {
           int markLineStartOff = EditorHelper.getLineStartOffset(editor, mark.getLogicalLine());
           int markLineEndOff = EditorHelper.getLineEndOffset(editor, mark.getLogicalLine(), true);
 
-          Command command = CommandState.getInstance(editor).getExecutingCommand();
+          Command command = CommandState.getInstance(new IjVimEditor(editor)).getExecutingCommand();
           // If text is being changed from the start of the mark line (a special case for mark deletion)
           boolean changeFromMarkLineStart = command != null && command.getType() == Command.Type.CHANGE
                                             && delStartOff == markLineStartOff;

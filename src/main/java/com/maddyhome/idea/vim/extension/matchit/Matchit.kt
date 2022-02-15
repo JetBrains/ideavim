@@ -30,7 +30,6 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
-import com.maddyhome.idea.vim.command.CommandState.Companion.getInstance
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
@@ -49,6 +48,7 @@ import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.helper.getTopLevelEditor
 import com.maddyhome.idea.vim.helper.vimForEachCaret
+import com.maddyhome.idea.vim.newapi.vim
 import java.util.*
 import java.util.regex.Pattern
 
@@ -99,11 +99,11 @@ class Matchit : VimExtension {
   private class MatchitHandler(private val reverse: Boolean) : VimExtensionHandler {
 
     override fun execute(editor: Editor, context: DataContext) {
-      val commandState = getInstance(editor)
+      val commandState = editor.vim.commandState
       val count = commandState.commandBuilder.count
 
       // Reset the command count so it doesn't transfer onto subsequent commands.
-      editor.getTopLevelEditor().commandState.commandBuilder.resetCount()
+      editor.getTopLevelEditor().vim.commandState.commandBuilder.resetCount()
 
       // Normally we want to jump to the start of the matching pair. But when moving forward in operator
       // pending mode, we want to include the entire match. isInOpPending makes that distinction.

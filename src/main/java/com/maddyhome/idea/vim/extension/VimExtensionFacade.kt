@@ -103,7 +103,7 @@ object VimExtensionFacade {
   /** Returns a single key stroke from the user input similar to 'getchar()'. */
   @JvmStatic
   fun inputKeyStroke(editor: Editor): KeyStroke {
-    if (editor.commandState.isDotRepeatInProgress) {
+    if (editor.vim.commandState.isDotRepeatInProgress) {
       val input = VimRepeater.Extension.consumeKeystroke()
       return input ?: error("Not enough keystrokes saved: ${VimRepeater.Extension.lastExtensionHandler}")
     }

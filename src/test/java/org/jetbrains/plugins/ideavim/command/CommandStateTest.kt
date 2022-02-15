@@ -20,6 +20,7 @@ package org.jetbrains.plugins.ideavim.command
 
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.commandState
+import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -28,7 +29,7 @@ class CommandStateTest : VimTestCase() {
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test status string in normal`() {
     configureByText("123")
-    val statusString = myFixture.editor.commandState.getStatusString()
+    val statusString = myFixture.editor.vim.commandState.getStatusString()
     assertEquals("", statusString)
   }
 
@@ -36,7 +37,7 @@ class CommandStateTest : VimTestCase() {
   fun `test status string in insert`() {
     configureByText("123")
     typeText(parseKeys("i"))
-    val statusString = myFixture.editor.commandState.getStatusString()
+    val statusString = myFixture.editor.vim.commandState.getStatusString()
     assertEquals("INSERT", statusString)
   }
 
@@ -44,7 +45,7 @@ class CommandStateTest : VimTestCase() {
   fun `test status string in replace`() {
     configureByText("123")
     typeText(parseKeys("R"))
-    val statusString = myFixture.editor.commandState.getStatusString()
+    val statusString = myFixture.editor.vim.commandState.getStatusString()
     assertEquals("REPLACE", statusString)
   }
 
@@ -52,7 +53,7 @@ class CommandStateTest : VimTestCase() {
   fun `test status string in visual`() {
     configureByText("123")
     typeText(parseKeys("v"))
-    val statusString = myFixture.editor.commandState.getStatusString()
+    val statusString = myFixture.editor.vim.commandState.getStatusString()
     assertEquals("-- VISUAL --", statusString)
   }
 
@@ -60,7 +61,7 @@ class CommandStateTest : VimTestCase() {
   fun `test status string in visual line`() {
     configureByText("123")
     typeText(parseKeys("V"))
-    val statusString = myFixture.editor.commandState.getStatusString()
+    val statusString = myFixture.editor.vim.commandState.getStatusString()
     assertEquals("-- VISUAL LINE --", statusString)
   }
 
@@ -68,7 +69,7 @@ class CommandStateTest : VimTestCase() {
   fun `test status string in visual block`() {
     configureByText("123")
     typeText(parseKeys("<C-V>"))
-    val statusString = myFixture.editor.commandState.getStatusString()
+    val statusString = myFixture.editor.vim.commandState.getStatusString()
     assertEquals("-- VISUAL BLOCK --", statusString)
   }
 
@@ -76,7 +77,7 @@ class CommandStateTest : VimTestCase() {
   fun `test status string in select`() {
     configureByText("123")
     typeText(parseKeys("gh"))
-    val statusString = myFixture.editor.commandState.getStatusString()
+    val statusString = myFixture.editor.vim.commandState.getStatusString()
     assertEquals("-- SELECT --", statusString)
   }
 
@@ -84,7 +85,7 @@ class CommandStateTest : VimTestCase() {
   fun `test status string in select line`() {
     configureByText("123")
     typeText(parseKeys("gH"))
-    val statusString = myFixture.editor.commandState.getStatusString()
+    val statusString = myFixture.editor.vim.commandState.getStatusString()
     assertEquals("-- SELECT LINE --", statusString)
   }
 
@@ -92,7 +93,7 @@ class CommandStateTest : VimTestCase() {
   fun `test status string in select block`() {
     configureByText("123")
     typeText(parseKeys("g<C-H>"))
-    val statusString = myFixture.editor.commandState.getStatusString()
+    val statusString = myFixture.editor.vim.commandState.getStatusString()
     assertEquals("-- SELECT BLOCK --", statusString)
   }
 
@@ -100,7 +101,7 @@ class CommandStateTest : VimTestCase() {
   fun `test status string in one command`() {
     configureByText("123")
     typeText(parseKeys("i<C-O>"))
-    val statusString = myFixture.editor.commandState.getStatusString()
+    val statusString = myFixture.editor.vim.commandState.getStatusString()
     assertEquals("-- (insert) --", statusString)
   }
 
@@ -108,7 +109,7 @@ class CommandStateTest : VimTestCase() {
   fun `test status string in one command visual`() {
     configureByText("123")
     typeText(parseKeys("i<C-O>v"))
-    val statusString = myFixture.editor.commandState.getStatusString()
+    val statusString = myFixture.editor.vim.commandState.getStatusString()
     assertEquals("-- (insert) VISUAL --", statusString)
   }
 
@@ -116,7 +117,7 @@ class CommandStateTest : VimTestCase() {
   fun `test status string in one command visual block`() {
     configureByText("123")
     typeText(parseKeys("i<C-O><C-V>"))
-    val statusString = myFixture.editor.commandState.getStatusString()
+    val statusString = myFixture.editor.vim.commandState.getStatusString()
     assertEquals("-- (insert) VISUAL BLOCK --", statusString)
   }
 
@@ -124,7 +125,7 @@ class CommandStateTest : VimTestCase() {
   fun `test status string in one command visual line`() {
     configureByText("123")
     typeText(parseKeys("i<C-O>V"))
-    val statusString = myFixture.editor.commandState.getStatusString()
+    val statusString = myFixture.editor.vim.commandState.getStatusString()
     assertEquals("-- (insert) VISUAL LINE --", statusString)
   }
 
@@ -132,7 +133,7 @@ class CommandStateTest : VimTestCase() {
   fun `test status string in one command select`() {
     configureByText("123")
     typeText(parseKeys("i<C-O>gh"))
-    val statusString = myFixture.editor.commandState.getStatusString()
+    val statusString = myFixture.editor.vim.commandState.getStatusString()
     assertEquals("-- (insert) SELECT --", statusString)
   }
 
@@ -140,7 +141,7 @@ class CommandStateTest : VimTestCase() {
   fun `test status string in one command select block`() {
     configureByText("123")
     typeText(parseKeys("i<C-O>g<C-H>"))
-    val statusString = myFixture.editor.commandState.getStatusString()
+    val statusString = myFixture.editor.vim.commandState.getStatusString()
     assertEquals("-- (insert) SELECT BLOCK --", statusString)
   }
 
@@ -148,7 +149,7 @@ class CommandStateTest : VimTestCase() {
   fun `test status string in one command select line`() {
     configureByText("123")
     typeText(parseKeys("i<C-O>gH"))
-    val statusString = myFixture.editor.commandState.getStatusString()
+    val statusString = myFixture.editor.vim.commandState.getStatusString()
     assertEquals("-- (insert) SELECT LINE --", statusString)
   }
 }

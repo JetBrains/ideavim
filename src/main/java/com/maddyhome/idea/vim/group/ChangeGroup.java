@@ -275,7 +275,7 @@ public class ChangeGroup {
   }
 
   private void runEnterAction(Editor editor, @NotNull DataContext context) {
-    CommandState state = CommandState.getInstance(editor);
+    CommandState state = CommandState.getInstance(new IjVimEditor(editor));
     if (!state.isDotRepeatInProgress()) {
       // While repeating the enter action has been already executed because `initInsert` repeats the input
       final NativeAction action = VimInjectorKt.getInjector().getNativeActionManager().getEnterAction();
@@ -287,7 +287,7 @@ public class ChangeGroup {
   }
 
   private void runEnterAboveAction(Editor editor, @NotNull DataContext context) {
-    CommandState state = CommandState.getInstance(editor);
+    CommandState state = CommandState.getInstance(new IjVimEditor(editor));
     if (!state.isDotRepeatInProgress()) {
       // While repeating the enter action has been already executed because `initInsert` repeats the input
       final NativeAction action = VimInjectorKt.getInjector().getNativeActionManager().getCreateLineAboveCaret();
@@ -423,7 +423,7 @@ public class ChangeGroup {
    * @param mode    The mode - indicate insert or replace
    */
   public void initInsert(@NotNull Editor editor, @NotNull DataContext context, @NotNull CommandState.Mode mode) {
-    final CommandState state = CommandState.getInstance(editor);
+    final CommandState state = CommandState.getInstance(new IjVimEditor(editor));
 
     final CaretModel caretModel = editor.getCaretModel();
     for (Caret caret : caretModel.getAllCarets()) {
@@ -441,12 +441,12 @@ public class ChangeGroup {
         setInsertEditorState(editor, false);
       }
       if (cmd.getFlags().contains(CommandFlags.FLAG_NO_REPEAT_INSERT)) {
-        CommandState commandState = CommandState.getInstance(editor);
+        CommandState commandState = CommandState.getInstance(new IjVimEditor(editor));
         repeatInsert(editor, context, 1, false,
                      new OperatorArguments(false, 1, commandState.getMode(), commandState.getSubMode()));
       }
       else {
-        CommandState commandState = CommandState.getInstance(editor);
+        CommandState commandState = CommandState.getInstance(new IjVimEditor(editor));
         repeatInsert(editor, context, cmd.getCount(), false,
                      new OperatorArguments(false, cmd.getCount(), commandState.getMode(), commandState.getSubMode()));
       }
@@ -549,7 +549,7 @@ public class ChangeGroup {
     markGroup.setMark(editor, '^', offset);
     markGroup.setMark(editor, MarkGroup.MARK_CHANGE_END, offset);
 
-    if (CommandState.getInstance(editor).getMode() == CommandState.Mode.REPLACE) {
+    if (CommandState.getInstance(new IjVimEditor(editor)).getMode() == CommandState.Mode.REPLACE) {
       setInsertEditorState(editor, true);
     }
 
@@ -569,7 +569,7 @@ public class ChangeGroup {
       repeatInsert(editor, context, cnt == 0 ? 0 : cnt - 1, true, operatorArguments);
     }
 
-    if (CommandState.getInstance(editor).getMode() == CommandState.Mode.INSERT) {
+    if (CommandState.getInstance(new IjVimEditor(editor)).getMode() == CommandState.Mode.INSERT) {
       updateLastInsertedTextRegister();
     }
 
@@ -577,7 +577,7 @@ public class ChangeGroup {
     offset = editor.getCaretModel().getPrimaryCaret().getOffset();
     markGroup.setMark(editor, MarkGroup.MARK_CHANGE_POS, offset);
 
-    CommandState.getInstance(editor).popModes();
+    CommandState.getInstance(new IjVimEditor(editor)).popModes();
     exitAllSingleCommandInsertModes(editor);
   }
 
@@ -591,7 +591,7 @@ public class ChangeGroup {
    * @param context The data context
    */
   public void processEnter(@NotNull Editor editor, @NotNull DataContext context) {
-    if (CommandState.getInstance(editor).getMode() == CommandState.Mode.REPLACE) {
+    if (CommandState.getInstance(new IjVimEditor(editor)).getMode() == CommandState.Mode.REPLACE) {
       setInsertEditorState(editor, true);
     }
     final KeyStroke enterKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
@@ -601,7 +601,7 @@ public class ChangeGroup {
         break;
       }
     }
-    if (CommandState.getInstance(editor).getMode() == CommandState.Mode.REPLACE) {
+    if (CommandState.getInstance(new IjVimEditor(editor)).getMode() == CommandState.Mode.REPLACE) {
       setInsertEditorState(editor, false);
     }
   }
@@ -723,7 +723,7 @@ public class ChangeGroup {
     final EditorEx editorEx = ObjectUtils.tryCast(editor, EditorEx.class);
     if (editorEx == null) return;
     editorEx.setInsertMode(!editorEx.isInsertMode());
-    CommandState.getInstance(editor).toggleInsertOverwrite();
+    CommandState.getInstance(new IjVimEditor(editor)).toggleInsertOverwrite();
   }
 
   /**
@@ -796,7 +796,7 @@ public class ChangeGroup {
    * @param editor The editor to put into NORMAL mode for one command
    */
   public void processSingleCommand(@NotNull Editor editor) {
-    CommandState.getInstance(editor).pushModes(CommandState.Mode.INSERT_NORMAL, CommandState.SubMode.NONE);
+    CommandState.getInstance(new IjVimEditor(editor)).pushModes(CommandState.Mode.INSERT_NORMAL, CommandState.SubMode.NONE);
     clearStrokes(editor);
   }
 
@@ -1980,9 +1980,9 @@ public class ChangeGroup {
 
   private void exitAllSingleCommandInsertModes(@NotNull Editor editor) {
     while (CommandStateHelper.inSingleCommandMode(editor)) {
-      CommandState.getInstance(editor).popModes();
+      CommandState.getInstance(new IjVimEditor(editor)).popModes();
       if (CommandStateHelper.inInsertMode(editor)) {
-        CommandState.getInstance(editor).popModes();
+        CommandState.getInstance(new IjVimEditor(editor)).popModes();
       }
     }
   }

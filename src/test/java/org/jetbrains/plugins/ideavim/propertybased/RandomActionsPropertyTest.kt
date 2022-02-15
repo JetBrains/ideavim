@@ -21,9 +21,10 @@ package org.jetbrains.plugins.ideavim.propertybased
 import com.intellij.ide.IdeEventQueue
 import com.intellij.openapi.editor.Editor
 import com.intellij.testFramework.PlatformTestUtil
-import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper
+import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.key.CommandNode
+import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.jetCheck.Generator
 import org.jetbrains.jetCheck.ImperativeCommand
 import org.jetbrains.jetCheck.PropertyChecker
@@ -93,7 +94,7 @@ class RandomActionsPropertyTest : VimPropertyTest() {
 
 private class AvailableActions(private val editor: Editor) : ImperativeCommand {
   override fun performCommand(env: ImperativeCommand.Environment) {
-    val currentNode = CommandState.getInstance(editor).commandBuilder.getCurrentTrie()
+    val currentNode = editor.vim.commandState.commandBuilder.getCurrentTrie()
 
     val possibleKeys = currentNode.keys.toList().sortedBy { StringHelper.toKeyNotation(it) }
     val keyGenerator = Generator.integers(0, possibleKeys.lastIndex)

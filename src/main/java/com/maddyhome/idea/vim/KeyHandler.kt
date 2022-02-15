@@ -607,7 +607,7 @@ class KeyHandler {
         return true
       }
     }
-    val res = editorState.processDigraphKey(key, editor.ij)
+    val res = editorState.processDigraphKey(key, editor)
     if (ExEntryPanel.getInstance().isActive) {
       when (res.result) {
         DigraphResult.RES_HANDLED -> setPromptCharacterEx(if (commandBuilder.isPuttingLiteral()) '^' else key.keyChar)

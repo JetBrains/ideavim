@@ -29,6 +29,7 @@ import com.maddyhome.idea.vim.handler.TextObjectActionHandler;
 import com.maddyhome.idea.vim.helper.InlayHelperKt;
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor;
 import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
+import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -135,7 +136,7 @@ public class VimTextObjEntireExtension implements VimExtension {
 
     @Override
     public void execute(@NotNull Editor editor, @NotNull DataContext context) {
-      @NotNull CommandState commandState = CommandState.getInstance(editor);
+      @NotNull CommandState commandState = CommandState.getInstance(new IjVimEditor(editor));
       int count = Math.max(1, commandState.getCommandBuilder().getCount());
 
       final EntireTextObjectHandler textObjectHandler = new EntireTextObjectHandler(ignoreLeadingAndTrailing);

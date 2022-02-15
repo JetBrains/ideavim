@@ -108,7 +108,7 @@ public abstract class JavaVimTestCase extends JavaCodeInsightFixtureTestCase {
   }
 
   public void assertMode(@NotNull CommandState.Mode expectedMode) {
-    final CommandState.Mode mode = CommandState.getInstance(myFixture.getEditor()).getMode();
+    final CommandState.Mode mode = CommandState.getInstance(new IjVimEditor(myFixture.getEditor())).getMode();
     assertEquals(expectedMode, mode);
   }
 

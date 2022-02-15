@@ -878,7 +878,7 @@ public class MotionGroup {
   }
 
   private static int getScrollJump(@NotNull Editor editor, int height) {
-    final EnumSet<CommandFlags> flags = CommandState.getInstance(editor).getExecutingCommandFlags();
+    final EnumSet<CommandFlags> flags = CommandState.getInstance(new IjVimEditor(editor)).getExecutingCommandFlags();
     final boolean scrollJump = !flags.contains(CommandFlags.FLAG_IGNORE_SCROLL_JUMP);
 
     // Default value is 1. Zero is a valid value, but we normalise to 1 - we always want to scroll at least one line
@@ -903,7 +903,7 @@ public class MotionGroup {
     final int halfWidth = getApproximateScreenWidth(editor) / 2;
     final int scrollOffset = getNormalizedSideScrollOffset(editor);
 
-    final EnumSet<CommandFlags> flags = CommandState.getInstance(editor).getExecutingCommandFlags();
+    final EnumSet<CommandFlags> flags = CommandState.getInstance(new IjVimEditor(editor)).getExecutingCommandFlags();
     final boolean allowSidescroll = !flags.contains(CommandFlags.FLAG_IGNORE_SIDE_SCROLL_JUMP);
     int sidescroll = ((VimInt) VimPlugin.getOptionService().getOptionValue(new OptionService.Scope.LOCAL(new IjVimEditor(editor)), OptionConstants.sidescrollName, OptionConstants.sidescrollName)).getValue();
 
@@ -974,7 +974,7 @@ public class MotionGroup {
                                          boolean isBig) {
     int dir = 1;
     boolean selection = false;
-    if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
+    if (CommandState.getInstance(new IjVimEditor(editor)).getMode() == CommandState.Mode.VISUAL) {
       if (UserDataManager.getVimSelectionStart(caret) > caret.getOffset()) {
         dir = -1;
       }
@@ -1484,7 +1484,7 @@ public class MotionGroup {
     if (fileEditor instanceof TextEditor) {
       final Editor editor = ((TextEditor)fileEditor).getEditor();
       ExOutputModel.getInstance(editor).clear();
-      if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
+      if (CommandState.getInstance(new IjVimEditor(editor)).getMode() == CommandState.Mode.VISUAL) {
         ModeHelper.exitVisualMode(editor);
         KeyHandler.getInstance().reset(new IjVimEditor(editor));
       }

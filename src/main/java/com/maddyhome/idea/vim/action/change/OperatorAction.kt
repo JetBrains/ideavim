@@ -44,7 +44,7 @@ class OperatorAction : VimActionHandler.SingleExecution() {
     if (operatorFunction != null) {
       val argument = cmd.argument
       if (argument != null) {
-        if (!editor.commandState.isDotRepeatInProgress) {
+        if (!editor.vim.commandState.isDotRepeatInProgress) {
           VimRepeater.Extension.argumentCaptured = argument
         }
         val saveRepeatHandler = VimRepeater.repeatHandler

@@ -40,8 +40,12 @@ import com.maddyhome.idea.vim.VimInjectorKt;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.helper.*;
+import com.maddyhome.idea.vim.helper.EditorHelper;
+import com.maddyhome.idea.vim.helper.EditorHelperRt;
+import com.maddyhome.idea.vim.helper.MessageHelper;
+import com.maddyhome.idea.vim.helper.SearchHelper;
 import com.maddyhome.idea.vim.newapi.IjExecutionContext;
+import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.newapi.NativeAction;
 import com.maddyhome.idea.vim.newapi.NativeActionKt;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
@@ -286,7 +290,7 @@ public class FileGroup {
     StringBuilder msg = new StringBuilder();
     Document doc = editor.getDocument();
 
-    if (CommandState.getInstance(editor).getMode() != CommandState.Mode.VISUAL) {
+    if (CommandState.getInstance(new IjVimEditor(editor)).getMode() != CommandState.Mode.VISUAL) {
       LogicalPosition lp = editor.getCaretModel().getLogicalPosition();
       int col = editor.getCaretModel().getOffset() - doc.getLineStartOffset(lp.line);
       int endoff = doc.getLineEndOffset(lp.line);

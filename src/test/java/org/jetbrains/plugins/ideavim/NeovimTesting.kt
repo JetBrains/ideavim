@@ -30,6 +30,7 @@ import com.maddyhome.idea.vim.common.CharacterPosition
 import com.maddyhome.idea.vim.group.RegisterGroup
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.helper.commandState
+import com.maddyhome.idea.vim.newapi.vim
 import org.junit.Assert.assertEquals
 
 internal object NeovimTesting {
@@ -145,7 +146,7 @@ internal object NeovimTesting {
   }
 
   private fun assertMode(editor: Editor) {
-    val ideavimState = editor.commandState.toVimNotation()
+    val ideavimState = editor.vim.commandState.toVimNotation()
     val neovimState = neovimApi.mode.get().mode
     assertEquals(neovimState, ideavimState)
   }

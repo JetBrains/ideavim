@@ -24,6 +24,7 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.newapi.VimEditor
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
@@ -73,15 +74,15 @@ val CommandState.Mode.hasVisualSelection
   }
 
 val Editor.mode
-  get() = this.commandState.mode
+  get() = this.vim.commandState.mode
 
 val VimEditor.mode
   get() = this.commandState.mode
 
 var Editor.subMode
-  get() = this.commandState.subMode
+  get() = this.vim.commandState.subMode
   set(value) {
-    this.commandState.subMode = value
+    this.vim.commandState.subMode = value
   }
 
 var VimEditor.subMode
@@ -104,7 +105,7 @@ val Editor.inInsertMode
 
 @get:JvmName("inRepeatMode")
 val Editor.inRepeatMode
-  get() = this.commandState.isDotRepeatInProgress
+  get() = this.vim.commandState.isDotRepeatInProgress
 
 @get:JvmName("inVisualMode")
 val Editor.inVisualMode
@@ -142,10 +143,6 @@ val CommandState.Mode.inSingleNormalMode: Boolean
     CommandState.Mode.INSERT_NORMAL -> true
     else -> false
   }
-
-@get:JvmName("commandState")
-val Editor.commandState
-  get() = CommandState.getInstance(this)
 
 val VimEditor.commandState
   get() = CommandState.getInstance(this)

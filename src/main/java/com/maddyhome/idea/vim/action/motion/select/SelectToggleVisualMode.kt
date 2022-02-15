@@ -30,6 +30,7 @@ import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.helper.pushSelectMode
 import com.maddyhome.idea.vim.helper.pushVisualMode
+import com.maddyhome.idea.vim.newapi.vim
 
 /**
  * @author Alex Plate
@@ -46,7 +47,7 @@ class SelectToggleVisualMode : VimActionHandler.SingleExecution() {
 
   companion object {
     fun toggleMode(editor: Editor) {
-      val commandState = editor.commandState
+      val commandState = editor.vim.commandState
       val subMode = commandState.subMode
       val mode = commandState.mode
       commandState.popModes()
