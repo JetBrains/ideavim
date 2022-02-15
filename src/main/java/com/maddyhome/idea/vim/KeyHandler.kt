@@ -35,13 +35,11 @@ import com.maddyhome.idea.vim.command.MappingState
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ActionBeanClass
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
-import com.maddyhome.idea.vim.helper.ActionExecutor
 import com.maddyhome.idea.vim.helper.DigraphResult
 import com.maddyhome.idea.vim.helper.MessageHelper.message
 import com.maddyhome.idea.vim.helper.RunnableHelper.runReadCommand
 import com.maddyhome.idea.vim.helper.RunnableHelper.runWriteCommand
 import com.maddyhome.idea.vim.helper.StringHelper
-import com.maddyhome.idea.vim.helper.VimActionExecutor
 import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.helper.inNormalMode
 import com.maddyhome.idea.vim.helper.inSingleNormalMode
@@ -257,9 +255,9 @@ class KeyHandler {
         var indicateError = true
         if (key.keyCode == KeyEvent.VK_ESCAPE) {
           val executed = arrayOf<Boolean?>(null)
-          ActionExecutor.executeCommand(
-            editor.ij.project,
-            { executed[0] = ActionExecutor.executeEsc(context.ij) },
+          injector.actionExecutor.executeCommand(
+            editor,
+            { executed[0] = injector.actionExecutor.executeEsc(context) },
             "", null
           )
           indicateError = !executed[0]!!
@@ -691,7 +689,7 @@ class KeyHandler {
       } else if (type.isRead) {
         runReadCommand(project, action, name, action)
       } else {
-        ActionExecutor.executeCommand(project, action, name, action)
+        injector.actionExecutor.executeCommand(editor, action, name, action)
       }
     }
   }
@@ -869,7 +867,7 @@ class KeyHandler {
       if (register != null) {
         VimPlugin.getRegister().selectRegister(register)
       }
-      VimActionExecutor.executeVimAction(editor.ij, cmd.action, context.ij, operatorArguments)
+      injector.actionExecutor.executeVimAction(editor, cmd.action, context, operatorArguments)
       if (editorState.mode === CommandState.Mode.INSERT || editorState.mode === CommandState.Mode.REPLACE) {
         VimPlugin.getChange().processCommand(editor.ij, cmd)
       }

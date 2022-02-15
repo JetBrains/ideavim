@@ -29,14 +29,15 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
-import com.maddyhome.idea.vim.helper.ActionExecutor
+import com.maddyhome.idea.vim.injector
+import com.maddyhome.idea.vim.newapi.vim
 
 class VimCollapseAllRegions : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override fun execute(editor: Editor, context: DataContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
-    ActionExecutor.executeAction(ACTION_COLLAPSE_ALL_REGIONS, context)
+    injector.actionExecutor.executeAction(ACTION_COLLAPSE_ALL_REGIONS, context.vim)
     return true
   }
 }
@@ -46,7 +47,7 @@ class VimCollapseRegion : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override fun execute(editor: Editor, context: DataContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
-    ActionExecutor.executeAction(ACTION_COLLAPSE_REGION, context)
+    injector.actionExecutor.executeAction(ACTION_COLLAPSE_REGION, context.vim)
     return true
   }
 }
@@ -55,7 +56,7 @@ class VimCollapseRegionRecursively : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override fun execute(editor: Editor, context: DataContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
-    ActionExecutor.executeAction(ACTION_COLLAPSE_REGION_RECURSIVELY, context)
+    injector.actionExecutor.executeAction(ACTION_COLLAPSE_REGION_RECURSIVELY, context.vim)
     return true
   }
 }
@@ -65,7 +66,7 @@ class VimExpandAllRegions : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override fun execute(editor: Editor, context: DataContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
-    ActionExecutor.executeAction(ACTION_EXPAND_ALL_REGIONS, context)
+    injector.actionExecutor.executeAction(ACTION_EXPAND_ALL_REGIONS, context.vim)
     return true
   }
 }
@@ -75,7 +76,7 @@ class VimExpandRegion : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override fun execute(editor: Editor, context: DataContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
-    ActionExecutor.executeAction(ACTION_EXPAND_REGION, context)
+    injector.actionExecutor.executeAction(ACTION_EXPAND_REGION, context.vim)
     return true
   }
 }
@@ -85,7 +86,7 @@ class VimExpandRegionRecursively : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override fun execute(editor: Editor, context: DataContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
-    ActionExecutor.executeAction(ACTION_EXPAND_REGION_RECURSIVELY, context)
+    injector.actionExecutor.executeAction(ACTION_EXPAND_REGION_RECURSIVELY, context.vim)
     return true
   }
 }

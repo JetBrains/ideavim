@@ -24,8 +24,9 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
-import com.maddyhome.idea.vim.helper.ActionExecutor
 import com.maddyhome.idea.vim.helper.enumSetOf
+import com.maddyhome.idea.vim.injector
+import com.maddyhome.idea.vim.newapi.vim
 import java.util.*
 
 class GotoDeclarationAction : VimActionHandler.SingleExecution() {
@@ -35,7 +36,7 @@ class GotoDeclarationAction : VimActionHandler.SingleExecution() {
 
   override fun execute(editor: Editor, context: DataContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
     VimPlugin.getMark().saveJumpLocation(editor)
-    ActionExecutor.executeAction("GotoDeclaration", context)
+    injector.actionExecutor.executeAction("GotoDeclaration", context.vim)
     return true
   }
 }

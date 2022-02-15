@@ -23,8 +23,9 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.ranges.Ranges
-import com.maddyhome.idea.vim.helper.ActionExecutor
 import com.maddyhome.idea.vim.helper.EditorDataContext
+import com.maddyhome.idea.vim.injector
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
@@ -48,7 +49,7 @@ data class EditFileCommand(val ranges: Ranges, val argument: String) : Command.S
 
     // Don't open a choose file dialog under a write action
     ApplicationManager.getApplication().invokeLater {
-      ActionExecutor.executeAction("OpenFile", EditorDataContext.init(editor, context))
+      injector.actionExecutor.executeAction("OpenFile", EditorDataContext.init(editor, context).vim)
     }
 
     return ExecutionResult.Success

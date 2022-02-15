@@ -24,7 +24,8 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
-import com.maddyhome.idea.vim.helper.ActionExecutor
+import com.maddyhome.idea.vim.injector
+import com.maddyhome.idea.vim.newapi.vim
 
 /**
  * @author Alex Plate
@@ -40,7 +41,7 @@ class CtrlDownAction : VimActionHandler.SingleExecution() {
     val keyStroke = keySet.first().first()
     val actions = VimPlugin.getKey().getKeymapConflicts(keyStroke)
     for (action in actions) {
-      if (ActionExecutor.executeAction(action, context)) break
+      if (injector.actionExecutor.executeAction(action.vim, context.vim)) break
     }
     return true
   }
@@ -56,7 +57,7 @@ class CtrlUpAction : VimActionHandler.SingleExecution() {
     val keyStroke = keySet.first().first()
     val actions = VimPlugin.getKey().getKeymapConflicts(keyStroke)
     for (action in actions) {
-      if (ActionExecutor.executeAction(action, context)) break
+      if (injector.actionExecutor.executeAction(action.vim, context.vim)) break
     }
     return true
   }

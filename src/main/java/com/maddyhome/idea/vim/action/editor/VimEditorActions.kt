@@ -27,8 +27,9 @@ import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.IdeActionHandler
 import com.maddyhome.idea.vim.handler.VimActionHandler
-import com.maddyhome.idea.vim.helper.ActionExecutor
 import com.maddyhome.idea.vim.helper.enumSetOf
+import com.maddyhome.idea.vim.injector
+import com.maddyhome.idea.vim.newapi.vim
 import java.awt.event.KeyEvent
 import java.util.*
 import javax.swing.KeyStroke
@@ -80,7 +81,7 @@ class VimQuickJavaDoc : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override fun execute(editor: Editor, context: DataContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
-    ActionExecutor.executeAction(IdeActions.ACTION_QUICK_JAVADOC, context)
+    injector.actionExecutor.executeAction(IdeActions.ACTION_QUICK_JAVADOC, context.vim)
     return true
   }
 }

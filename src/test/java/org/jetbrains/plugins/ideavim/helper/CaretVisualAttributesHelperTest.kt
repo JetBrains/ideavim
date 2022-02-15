@@ -22,7 +22,6 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.VisualPosition
 import com.intellij.openapi.editor.ex.EditorSettingsExternalizable
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.helper.ActionExecutor
 import com.maddyhome.idea.vim.helper.EditorDataContext
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
@@ -30,6 +29,8 @@ import com.maddyhome.idea.vim.helper.buildGreater212
 import com.maddyhome.idea.vim.helper.getShape
 import com.maddyhome.idea.vim.helper.shape
 import com.maddyhome.idea.vim.helper.thickness
+import com.maddyhome.idea.vim.injector
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
@@ -302,7 +303,7 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
       |all rocks and lavender and tufted grass,
     """.trimMargin()
     )
-    ActionExecutor.executeAction("EditorCloneCaretBelow", EditorDataContext.init(myFixture.editor))
+    injector.actionExecutor.executeAction("EditorCloneCaretBelow", EditorDataContext.init(myFixture.editor).vim)
     TestCase.assertEquals(2, myFixture.editor.caretModel.caretCount)
     assertCaretVisualAttributes("BLOCK", 0f)
   }

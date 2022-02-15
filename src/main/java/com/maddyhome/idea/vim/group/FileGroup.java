@@ -36,10 +36,14 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileVisitor;
+import com.maddyhome.idea.vim.VimInjectorKt;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.helper.*;
+import com.maddyhome.idea.vim.newapi.IjExecutionContext;
+import com.maddyhome.idea.vim.newapi.NativeAction;
+import com.maddyhome.idea.vim.newapi.NativeActionKt;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
 import com.maddyhome.idea.vim.vimscript.services.OptionConstants;
 import com.maddyhome.idea.vim.vimscript.services.OptionService;
@@ -124,7 +128,7 @@ public class FileGroup {
       return res;
     }
     final Ref<VirtualFile> result = Ref.create();
-    final VirtualFileVisitor<Object> visitor = new VirtualFileVisitor<Object>() {
+    final VirtualFileVisitor<Object> visitor = new VirtualFileVisitor<>() {
       @Override
       public boolean visitFile(@NotNull VirtualFile file) {
         if (file.getName().equals(filename)) {
@@ -172,21 +176,22 @@ public class FileGroup {
    * Saves specific file in the project.
    */
   public void saveFile(DataContext context) {
-    String action;
+    NativeAction action;
     if (OptionConstants.ideawrite_all.equals(((VimString) VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL.INSTANCE, OptionConstants.ideawriteName, OptionConstants.ideawriteName)).getValue())) {
-      action = "SaveAll";
+      action = VimInjectorKt.getInjector().getNativeActionManager().getSaveAll();
     }
     else {
-      action = "SaveDocument";
+      action = VimInjectorKt.getInjector().getNativeActionManager().getSaveCurrent();
     }
-    ActionExecutor.executeAction(action, context);
+    NativeActionKt.execute(action, new IjExecutionContext(context));
   }
 
   /**
    * Saves all files in the project.
    */
   public void saveFiles(DataContext context) {
-    ActionExecutor.executeAction("SaveAll", context);
+    NativeActionKt.execute(VimInjectorKt.getInjector().getNativeActionManager().getSaveAll(),
+                           new IjExecutionContext(context));
   }
 
   /**

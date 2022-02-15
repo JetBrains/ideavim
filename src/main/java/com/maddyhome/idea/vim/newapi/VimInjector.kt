@@ -19,15 +19,23 @@
 package com.maddyhome.idea.vim
 
 import com.intellij.openapi.diagnostic.Logger
+import com.maddyhome.idea.vim.helper.IjActionExecutor
+import com.maddyhome.idea.vim.helper.VimActionExecutor
+import com.maddyhome.idea.vim.newapi.IjNativeActionManager
 import com.maddyhome.idea.vim.newapi.IjVimLogger
+import com.maddyhome.idea.vim.newapi.NativeActionManager
 import com.maddyhome.idea.vim.newapi.VimLogger
 
 interface VimInjector {
   fun <T : Any> getLogger(clazz: Class<T>): VimLogger
+  val actionExecutor: VimActionExecutor
+  val nativeActionManager: NativeActionManager
 }
 
 class IjVimInjector : VimInjector {
   override fun <T : Any> getLogger(clazz: Class<T>): VimLogger = IjVimLogger(Logger.getInstance(clazz::class.java))
+  override val actionExecutor: VimActionExecutor = IjActionExecutor()
+  override val nativeActionManager: NativeActionManager = IjNativeActionManager()
 }
 
 // We should inject logger here somehow

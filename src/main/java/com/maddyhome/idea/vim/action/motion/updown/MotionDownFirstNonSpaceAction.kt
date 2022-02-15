@@ -30,7 +30,8 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotion
-import com.maddyhome.idea.vim.helper.ActionExecutor
+import com.maddyhome.idea.vim.injector
+import com.maddyhome.idea.vim.newapi.vim
 
 class MotionDownFirstNonSpaceAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.LINE_WISE
@@ -58,7 +59,7 @@ class EnterNormalAction : MotionActionHandler.ForEachCaret() {
   ): Motion {
     val templateState = TemplateManagerImpl.getTemplateState(editor)
     return if (templateState != null) {
-      ActionExecutor.executeAction(IdeActions.ACTION_EDITOR_NEXT_TEMPLATE_VARIABLE, context)
+      injector.actionExecutor.executeAction(IdeActions.ACTION_EDITOR_NEXT_TEMPLATE_VARIABLE, context.vim)
       Motion.NoMotion
     } else {
       VimPlugin.getMotion().moveCaretToLineStartSkipLeadingOffset(editor, caret, operatorArguments.count1).toMotion()

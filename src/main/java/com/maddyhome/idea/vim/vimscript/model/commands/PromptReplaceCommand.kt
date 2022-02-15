@@ -21,7 +21,8 @@ package com.maddyhome.idea.vim.vimscript.model.commands
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.ex.ranges.Ranges
-import com.maddyhome.idea.vim.helper.ActionExecutor
+import com.maddyhome.idea.vim.injector
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
@@ -30,6 +31,6 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 data class PromptReplaceCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
   override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
   override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
-    return if (ActionExecutor.executeAction("Replace", context)) ExecutionResult.Success else ExecutionResult.Error
+    return if (injector.actionExecutor.executeAction("Replace", context.vim)) ExecutionResult.Success else ExecutionResult.Error
   }
 }

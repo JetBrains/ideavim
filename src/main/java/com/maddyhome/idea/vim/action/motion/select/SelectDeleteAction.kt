@@ -24,8 +24,9 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
-import com.maddyhome.idea.vim.helper.ActionExecutor
 import com.maddyhome.idea.vim.helper.exitSelectMode
+import com.maddyhome.idea.vim.injector
+import com.maddyhome.idea.vim.newapi.vim
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
@@ -41,7 +42,7 @@ class SelectDeleteAction : VimActionHandler.SingleExecution() {
     val enterKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0)
     val actions = VimPlugin.getKey().getActions(editor.component, enterKeyStroke)
     for (action in actions) {
-      if (ActionExecutor.executeAction(action, context)) {
+      if (injector.actionExecutor.executeAction(action.vim, context.vim)) {
         break
       }
     }

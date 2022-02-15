@@ -33,13 +33,13 @@ import com.maddyhome.idea.vim.command.SelectionType.Companion.fromSubMode
 import com.maddyhome.idea.vim.extension.VimExtensionHandler
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.group.visual.VimSelection.Companion.create
-import com.maddyhome.idea.vim.helper.ActionExecutor
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.StringHelper.toKeyNotation
 import com.maddyhome.idea.vim.helper.VimNlsSafe
 import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.helper.vimSelectionStart
+import com.maddyhome.idea.vim.injector
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.newapi.ExecutionContext
 import com.maddyhome.idea.vim.newapi.IjVimCaret
@@ -47,6 +47,7 @@ import com.maddyhome.idea.vim.newapi.Offset
 import com.maddyhome.idea.vim.newapi.VimEditor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.offset
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import java.awt.event.KeyEvent
@@ -191,7 +192,7 @@ class ToHandlerMappingInfo(
       }
     }
 
-    ActionExecutor.executeCommand(editor.ij.project, { extensionHandler.execute(editor.ij, context.ij) },
+    injector.actionExecutor.executeCommand(editor, { extensionHandler.execute(editor.ij, context.ij) },
       "Vim " + extensionHandler.javaClass.simpleName, null)
 
     if (extensionHandler.isRepeatable) {
@@ -259,7 +260,7 @@ class ToActionMappingInfo(
     LOG.debug("Executing 'ToAction' mapping...")
     val editorDataContext = ExecutionContext.onEditor(editor, context)
     val dataContext = CaretSpecificDataContext(editorDataContext.ij, editor.ij.caretModel.currentCaret)
-    ActionExecutor.executeAction(action, dataContext)
+    injector.actionExecutor.executeAction(action, dataContext.vim)
   }
 
   companion object {

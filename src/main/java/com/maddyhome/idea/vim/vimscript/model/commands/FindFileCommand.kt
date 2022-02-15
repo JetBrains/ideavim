@@ -23,7 +23,8 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.ranges.Ranges
-import com.maddyhome.idea.vim.helper.ActionExecutor
+import com.maddyhome.idea.vim.injector
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
@@ -42,7 +43,7 @@ data class FindFileCommand(val ranges: Ranges, val argument: String) : Command.S
       return if (res) ExecutionResult.Success else ExecutionResult.Error
     }
 
-    ApplicationManager.getApplication().invokeLater { ActionExecutor.executeAction("GotoFile", context) }
+    ApplicationManager.getApplication().invokeLater { injector.actionExecutor.executeAction("GotoFile", context.vim) }
 
     return ExecutionResult.Success
   }
