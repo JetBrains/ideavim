@@ -24,6 +24,7 @@ import com.intellij.notification.NotificationListener;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
@@ -48,6 +49,7 @@ import com.maddyhome.idea.vim.group.copy.YankGroup;
 import com.maddyhome.idea.vim.group.visual.VisualMotionGroup;
 import com.maddyhome.idea.vim.helper.MacKeyRepeat;
 import com.maddyhome.idea.vim.listener.VimListenerManager;
+import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import com.maddyhome.idea.vim.ui.StatusBarIconFactory;
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable;
@@ -238,6 +240,15 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
 
   private static @NotNull NotificationService getNotifications() {
     return getNotifications(null);
+  }
+
+  public static boolean isMainThread() {
+    return ApplicationManager.getApplication().isDispatchThread();
+  }
+
+  public static void invokeLater(Runnable runnable, IjVimEditor editor) {
+    ApplicationManager.getApplication()
+      .invokeLater(runnable, ModalityState.stateForComponent(editor.getEditor().getComponent()));
   }
 
   private boolean ideavimrcRegistered = false;

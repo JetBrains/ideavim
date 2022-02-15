@@ -17,9 +17,6 @@
  */
 package com.maddyhome.idea.vim
 
-import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.application.ModalityState
-import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.maddyhome.idea.vim.action.change.VimRepeater.Extension.argumentCaptured
@@ -351,7 +348,6 @@ class KeyHandler {
     // Every time a key is pressed and handled, the timer is stopped. E.g. if there is a mapping for "dweri", and the
     // user has typed "dw" wait for the timeout, and then replay "d" and "w" without any mapping (which will of course
     // delete a word)
-    val application = ApplicationManager.getApplication()
     if (VimPlugin.getOptionService().isSet(OptionService.Scope.LOCAL(editor), OptionConstants.timeoutName, OptionConstants.timeoutName)) {
       LOG.trace("Timeout is set. Schedule a mapping timer")
       // XXX There is a strange issue that reports that mapping state is empty at the moment of the function call.
@@ -361,7 +357,7 @@ class KeyHandler {
       //   https://youtrack.jetbrains.com/issue/VIM-2392
       val ijEditor = (editor as IjVimEditor).editor
       mappingState.startMappingTimer { actionEvent: ActionEvent? ->
-        application.invokeLater(
+        VimPlugin.invokeLater(
           {
             LOG.debug("Delayed mapping timer call")
             val unhandledKeys = mappingState.detachKeys()
@@ -377,9 +373,9 @@ class KeyHandler {
                 mappingCompleted = true
               )
             }
-          }, ModalityState.stateForComponent(ijEditor.component)
-          )
-        }
+          }, editor
+        )
+      }
       }
       LOG.trace("Unfinished mapping processing finished")
       return true
@@ -688,7 +684,7 @@ class KeyHandler {
           return
         }
       }
-      if (ApplicationManager.getApplication().isDispatchThread) {
+      if (VimPlugin.isMainThread()) {
         val action: Runnable = ActionRunner(editor, context, command, operatorArguments)
         val cmdAction = command.action
         val name = cmdAction.id
@@ -697,7 +693,7 @@ class KeyHandler {
         } else if (type.isRead) {
           runReadCommand(project, action, name, action)
         } else {
-          CommandProcessor.getInstance().executeCommand(project, action, name, action)
+          ActionExecutor.executeCommand(project, action, name, action)
         }
       }
     }
