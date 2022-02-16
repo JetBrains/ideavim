@@ -18,7 +18,6 @@
 
 package com.maddyhome.idea.vim.handler
 
-import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.Caret
@@ -31,8 +30,10 @@ import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.commandState
-import com.maddyhome.idea.vim.helper.getTopLevelEditor
 import com.maddyhome.idea.vim.helper.noneOfEnum
+import com.maddyhome.idea.vim.newapi.IjVimCaret
+import com.maddyhome.idea.vim.newapi.IjVimEditor
+import com.maddyhome.idea.vim.newapi.VimCaret
 import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.annotations.NonNls
 import java.util.*
@@ -80,27 +81,26 @@ abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
   ): Boolean
 
   fun execute(editor: Editor, context: DataContext, operatorArguments: OperatorArguments) {
-    val hostEditor: Editor = CommonDataKeys.HOST_EDITOR.getData(context) ?: editor
-    val action = { caret: Caret -> doExecute(editor, caret, context, operatorArguments) }
+    val hostEditor = IjVimEditor(editor)
+    val action = { caret: VimCaret -> doExecute(editor, (caret as IjVimCaret).caret, context, operatorArguments) }
     if (myRunForEachCaret) {
-      hostEditor.caretModel.runForEachCaret(action)
+      hostEditor.forEachCaret(action)
     } else {
-      action(editor.caretModel.currentCaret)
+      action(IjVimCaret(editor.caretModel.currentCaret))
     }
   }
 
   private fun doExecute(editor: Editor, caret: Caret, context: DataContext, operatorArguments: OperatorArguments) {
     if (!VimPlugin.isEnabled()) return
 
-    val topLevelEditor = editor.getTopLevelEditor()
     logger.debug("Execute command with handler: " + this.javaClass.name)
 
-    val cmd = topLevelEditor.vim.commandState.executingCommand ?: run {
+    val cmd = editor.vim.commandState.executingCommand ?: run {
       VimPlugin.indicateError()
       return
     }
 
-    if (!baseExecute(topLevelEditor, caret, CaretSpecificDataContext(context, caret), cmd, operatorArguments)) VimPlugin.indicateError()
+    if (!baseExecute(editor, caret, CaretSpecificDataContext(context, caret), cmd, operatorArguments)) VimPlugin.indicateError()
   }
 
   open fun process(cmd: Command) {

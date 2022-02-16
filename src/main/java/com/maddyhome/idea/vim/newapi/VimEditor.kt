@@ -144,6 +144,13 @@ interface VimEditor {
   fun getLineRange(line: EditorLine.Pointer): Pair<Offset, Offset>
   fun charAt(offset: Pointer): Char
   fun carets(): List<VimCaret>
+
+  /**
+   * This method should perform caret merging after the operations. This is similar to IJ runForEachCaret
+   * TODO review
+   */
+  fun forEachCaret(action: (VimCaret) -> Unit)
+
   fun isWritable(): Boolean
 }
 
@@ -364,6 +371,15 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
       listOf(IjVimCaret(editor.caretModel.primaryCaret))
     } else {
       editor.caretModel.allCarets.map { IjVimCaret(it) }
+    }
+  }
+
+  @Suppress("ideavimRunForEachCaret")
+  override fun forEachCaret(action: (VimCaret) -> Unit) {
+    if (editor.inBlockSubMode) {
+      action(IjVimCaret(editor.caretModel.primaryCaret))
+    } else {
+      editor.caretModel.runForEachCaret { action(IjVimCaret(it)) }
     }
   }
 
