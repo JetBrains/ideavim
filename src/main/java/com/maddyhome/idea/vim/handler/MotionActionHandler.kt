@@ -18,10 +18,7 @@
 
 package com.maddyhome.idea.vim.handler
 
-import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.diagnostic.logger
-import com.intellij.openapi.editor.Caret
-import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.event.CaretEvent
 import com.intellij.openapi.editor.event.CaretListener
 import com.maddyhome.idea.vim.VimPlugin
@@ -40,6 +37,7 @@ import com.maddyhome.idea.vim.newapi.ExecutionContext
 import com.maddyhome.idea.vim.newapi.VimCaret
 import com.maddyhome.idea.vim.newapi.VimEditor
 import com.maddyhome.idea.vim.newapi.ij
+import com.maddyhome.idea.vim.newapi.vim
 
 /**
  * @author Alex Plate
@@ -64,9 +62,9 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
      * The method executes only once it there is block selection.
      */
     abstract fun getOffset(
-      editor: Editor,
-      caret: Caret,
-      context: DataContext,
+      editor: VimEditor,
+      caret: VimCaret,
+      context: ExecutionContext,
       argument: Argument?,
       operatorArguments: OperatorArguments,
     ): Motion
@@ -75,21 +73,21 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
      * This method is called before [getOffset] once for each [caret].
      * The method executes only once it there is block selection.
      */
-    open fun preOffsetComputation(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean = true
+    open fun preOffsetComputation(editor: VimEditor, caret: VimCaret, context: ExecutionContext, cmd: Command): Boolean = true
 
     /**
      * This method is called after [getOffset], but before caret motion.
      *
      * The method executes for each caret, but only once it there is block selection.
      */
-    open fun preMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command) {}
+    open fun preMove(editor: VimEditor, caret: VimCaret, context: ExecutionContext, cmd: Command) {}
 
     /**
      * This method is called after [getOffset] and after caret motion.
      *
      * The method executes for each caret, but only once it there is block selection.
      */
-    open fun postMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command) {}
+    open fun postMove(editor: VimEditor, caret: VimCaret, context: ExecutionContext, cmd: Command) {}
   }
 
   /**
@@ -105,8 +103,8 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
      *   called 1 time.
      */
     abstract fun getOffset(
-      editor: Editor,
-      context: DataContext,
+      editor: VimEditor,
+      context: ExecutionContext,
       argument: Argument?,
       operatorArguments: OperatorArguments
     ): Motion
@@ -115,21 +113,21 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
      * This method is called before [getOffset].
      * The method executes only once.
      */
-    open fun preOffsetComputation(editor: Editor, context: DataContext, cmd: Command): Boolean = true
+    open fun preOffsetComputation(editor: VimEditor, context: ExecutionContext, cmd: Command): Boolean = true
 
     /**
      * This method is called after [getOffset], but before caret motion.
      *
      * The method executes only once.
      */
-    open fun preMove(editor: Editor, context: DataContext, cmd: Command) = Unit
+    open fun preMove(editor: VimEditor, context: ExecutionContext, cmd: Command) = Unit
 
     /**
      * This method is called after [getOffset] and after caret motion.
      *
      * The method executes only once it there is block selection.
      */
-    open fun postMove(editor: Editor, context: DataContext, cmd: Command) = Unit
+    open fun postMove(editor: VimEditor, context: ExecutionContext, cmd: Command) = Unit
   }
 
   abstract val motionType: MotionType
@@ -137,9 +135,9 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
   final override val type: Command.Type = Command.Type.MOTION
 
   fun getHandlerOffset(
-    editor: Editor,
-    caret: Caret,
-    context: DataContext,
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
@@ -160,9 +158,9 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
 
     when (this) {
       is SingleExecution -> run {
-        if (!preOffsetComputation(editor.ij, context.ij, cmd)) return@run
+        if (!preOffsetComputation(editor, context, cmd)) return@run
 
-        val offset = getOffset(editor.ij, context.ij, cmd.argument, operatorArguments)
+        val offset = getOffset(editor, context, cmd.argument, operatorArguments)
 
         when (offset) {
           is Motion.AbsoluteOffset -> {
@@ -176,9 +174,9 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
             if (!editor.ij.isEndAllowed) {
               resultOffset = EditorHelper.normalizeOffset(editor.ij, resultOffset, false)
             }
-            preMove(editor.ij, context.ij, cmd)
+            preMove(editor, context, cmd)
             MotionGroup.moveCaret(editor.ij, editor.ij.caretModel.primaryCaret, resultOffset)
-            postMove(editor.ij, context.ij, cmd)
+            postMove(editor, context, cmd)
           }
           is Motion.Error -> VimPlugin.indicateError()
           is Motion.NoMotion -> Unit
@@ -187,17 +185,17 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
       is ForEachCaret -> run {
         when {
           blockSubmodeActive || editor.ij.caretModel.caretCount == 1 -> {
-            val primaryCaret = editor.ij.caretModel.primaryCaret
-            doExecuteForEach(editor.ij, primaryCaret, context.ij, cmd, operatorArguments)
+            val primaryCaret = editor.primaryCaret()
+            doExecuteForEach(editor, primaryCaret, context, cmd, operatorArguments)
           }
           else -> {
             try {
               editor.ij.caretModel.addCaretListener(CaretMergingWatcher)
               editor.ij.caretModel.runForEachCaret { caret ->
                 doExecuteForEach(
-                  editor.ij,
-                  caret,
-                  context.ij,
+                  editor,
+                  caret.vim,
+                  context,
                   cmd,
                   operatorArguments
                 )
@@ -214,9 +212,9 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
   }
 
   private fun doExecuteForEach(
-    editor: Editor,
-    caret: Caret,
-    context: DataContext,
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
     cmd: Command,
     operatorArguments: OperatorArguments
   ) {
@@ -232,14 +230,14 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
           logger<MotionActionHandler>().error("Offset is less than 0. $resultMotion. ${this.javaClass.name}")
         }
         if (CommandFlags.FLAG_SAVE_JUMP in cmd.flags) {
-          VimPlugin.getMark().saveJumpLocation(editor)
+          VimPlugin.getMark().saveJumpLocation(editor.ij)
         }
-        if (!editor.isEndAllowed) {
-          resultMotion = EditorHelper.normalizeOffset(editor, resultMotion, false)
+        if (!editor.ij.isEndAllowed) {
+          resultMotion = EditorHelper.normalizeOffset(editor.ij, resultMotion, false)
         }
         preMove(editor, caret, context, cmd)
-        MotionGroup.moveCaret(editor, caret, resultMotion)
-        val postMoveCaret = if (editor.inBlockSubMode) editor.caretModel.primaryCaret else caret
+        MotionGroup.moveCaret(editor.ij, caret.ij, resultMotion)
+        val postMoveCaret = if (editor.ij.inBlockSubMode) editor.primaryCaret() else caret
         postMove(editor, postMoveCaret, context, cmd)
       }
       is Motion.Error -> VimPlugin.indicateError()

@@ -48,6 +48,10 @@ import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.helper.getTopLevelEditor
 import com.maddyhome.idea.vim.helper.vimForEachCaret
+import com.maddyhome.idea.vim.newapi.ExecutionContext
+import com.maddyhome.idea.vim.newapi.VimCaret
+import com.maddyhome.idea.vim.newapi.VimEditor
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import java.util.*
 import java.util.regex.Pattern
@@ -80,13 +84,13 @@ class Matchit : VimExtension {
     override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
 
     override fun getOffset(
-      editor: Editor,
-      caret: Caret,
-      context: DataContext,
-      argument: Argument?,
-      operatorArguments: OperatorArguments,
+        editor: VimEditor,
+        caret: VimCaret,
+        context: ExecutionContext,
+        argument: Argument?,
+        operatorArguments: OperatorArguments,
     ): Motion {
-      return getMatchitOffset(editor, caret, operatorArguments.count0, isInOpPending, reverse).toMotionOrError()
+      return getMatchitOffset(editor.ij, caret.ij, operatorArguments.count0, isInOpPending, reverse).toMotionOrError()
     }
 
     override fun process(cmd: Command) {

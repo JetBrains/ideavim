@@ -425,6 +425,9 @@ interface VimCaret {
 val VimCaret.ij: Caret
   get() = (this as IjVimCaret).caret
 
+val Caret.vim: VimCaret
+  get() = IjVimCaret(this)
+
 class IjVimCaret(val caret: Caret) : VimCaret {
   override val editor: VimEditor
     get() = IjVimEditor(caret.editor)

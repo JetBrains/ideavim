@@ -18,9 +18,6 @@
 
 package com.maddyhome.idea.vim.action.motion.leftright
 
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Caret
-import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
@@ -35,7 +32,10 @@ import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.helper.vimLastColumn
-import com.maddyhome.idea.vim.newapi.IjVimEditor
+import com.maddyhome.idea.vim.newapi.ExecutionContext
+import com.maddyhome.idea.vim.newapi.VimCaret
+import com.maddyhome.idea.vim.newapi.VimEditor
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
@@ -49,27 +49,28 @@ open class MotionLastColumnAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.INCLUSIVE
 
   override fun getOffset(
-    editor: Editor,
-    caret: Caret,
-    context: DataContext,
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    val allow = if (editor.inVisualMode) {
-      val opt = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.LOCAL(IjVimEditor(editor)), OptionConstants.selectionName) as VimString).value
+    val allow = if (editor.ij.inVisualMode) {
+      val opt = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.LOCAL(editor),
+        OptionConstants.selectionName) as VimString).value
       opt != "old"
     } else {
-      if (operatorArguments.isOperatorPending) false else editor.isEndAllowed
+      if (operatorArguments.isOperatorPending) false else editor.ij.isEndAllowed
     }
 
-    return VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret, operatorArguments.count1 - 1, allow).toMotion()
+    return VimPlugin.getMotion().moveCaretToLineEndOffset(editor.ij, caret.ij, operatorArguments.count1 - 1, allow).toMotion()
   }
 
-  override fun postMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command) {
-    caret.vimLastColumn = MotionGroup.LAST_COLUMN
+  override fun postMove(editor: VimEditor, caret: VimCaret, context: ExecutionContext, cmd: Command) {
+    caret.ij.vimLastColumn = MotionGroup.LAST_COLUMN
   }
 
-  override fun preMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command) {
-    caret.vimLastColumn = MotionGroup.LAST_COLUMN
+  override fun preMove(editor: VimEditor, caret: VimCaret, context: ExecutionContext, cmd: Command) {
+    caret.ij.vimLastColumn = MotionGroup.LAST_COLUMN
   }
 }

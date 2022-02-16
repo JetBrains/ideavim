@@ -17,9 +17,6 @@
  */
 package com.maddyhome.idea.vim.action.motion.updown
 
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Caret
-import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
@@ -31,22 +28,26 @@ import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotion
 import com.maddyhome.idea.vim.handler.toMotionOrError
 import com.maddyhome.idea.vim.helper.enumSetOf
+import com.maddyhome.idea.vim.newapi.ExecutionContext
+import com.maddyhome.idea.vim.newapi.VimCaret
+import com.maddyhome.idea.vim.newapi.VimEditor
+import com.maddyhome.idea.vim.newapi.ij
 import java.util.*
 
 class MotionPercentOrMatchAction : MotionActionHandler.ForEachCaret() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
 
   override fun getOffset(
-    editor: Editor,
-    caret: Caret,
-    context: DataContext,
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
     return if (operatorArguments.count0 == 0) {
-      VimPlugin.getMotion().moveCaretToMatchingPair(editor, caret).toMotionOrError()
+      VimPlugin.getMotion().moveCaretToMatchingPair(editor.ij, caret.ij).toMotionOrError()
     } else {
-      VimPlugin.getMotion().moveCaretToLinePercent(editor, caret, operatorArguments.count1).toMotion()
+      VimPlugin.getMotion().moveCaretToLinePercent(editor.ij, caret.ij, operatorArguments.count1).toMotion()
     }
   }
 

@@ -18,10 +18,7 @@
 
 package com.maddyhome.idea.vim.action.motion.select.motion
 
-import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.diagnostic.Logger
-import com.intellij.openapi.editor.Caret
-import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.MotionType
@@ -32,6 +29,10 @@ import com.maddyhome.idea.vim.handler.toMotion
 import com.maddyhome.idea.vim.handler.toMotionOrError
 import com.maddyhome.idea.vim.helper.exitSelectMode
 import com.maddyhome.idea.vim.helper.isTemplateActive
+import com.maddyhome.idea.vim.newapi.ExecutionContext
+import com.maddyhome.idea.vim.newapi.VimCaret
+import com.maddyhome.idea.vim.newapi.VimEditor
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
@@ -45,28 +46,28 @@ class SelectMotionRightAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
   override fun getOffset(
-    editor: Editor,
-    caret: Caret,
-    context: DataContext,
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
     val keymodel = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, OptionConstants.keymodelName) as VimString).value
     if (OptionConstants.keymodel_stopsel in keymodel || OptionConstants.keymodel_stopselect in keymodel) {
       logger.debug("Keymodel option has stopselect. Exiting select mode")
-      val startSelection = caret.selectionStart
-      val endSelection = caret.selectionEnd
+      val startSelection = caret.ij.selectionStart
+      val endSelection = caret.ij.selectionEnd
       editor.exitSelectMode(false)
-      if (editor.isTemplateActive()) {
+      if (editor.ij.isTemplateActive()) {
         logger.debug("Template is active. Activate insert mode")
-        VimPlugin.getChange().insertBeforeCursor(editor, context)
-        if (caret.offset in startSelection..endSelection) {
+        VimPlugin.getChange().insertBeforeCursor(editor.ij, context.ij)
+        if (caret.offset.point in startSelection..endSelection) {
           return endSelection.toMotion()
         }
       }
-      return caret.offset.toMotion()
+      return caret.offset.point.toMotion()
     }
-    return VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret, operatorArguments.count1, false).toMotionOrError()
+    return VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor.ij, caret.ij, operatorArguments.count1, false).toMotionOrError()
   }
 
   companion object {

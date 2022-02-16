@@ -30,6 +30,10 @@ import com.maddyhome.idea.vim.helper.exitSelectMode
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.inSelectMode
 import com.maddyhome.idea.vim.helper.inVisualMode
+import com.maddyhome.idea.vim.newapi.ExecutionContext
+import com.maddyhome.idea.vim.newapi.VimCaret
+import com.maddyhome.idea.vim.newapi.VimEditor
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
@@ -120,21 +124,22 @@ abstract class ShiftedArrowKeyHandler : VimActionHandler.SingleExecution() {
  */
 abstract class NonShiftedSpecialKeyHandler : MotionActionHandler.ForEachCaret() {
   final override fun getOffset(
-    editor: Editor,
-    caret: Caret,
-    context: DataContext,
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    val keymodel = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, OptionConstants.keymodelName) as VimString).value.split(",")
+    val keymodel = (VimPlugin.getOptionService()
+      .getOptionValue(OptionService.Scope.GLOBAL, OptionConstants.keymodelName) as VimString).value.split(",")
     if (editor.inSelectMode && (OptionConstants.keymodel_stopsel in keymodel || OptionConstants.keymodel_stopselect in keymodel)) {
       editor.exitSelectMode(false)
     }
-    if (editor.inVisualMode && (OptionConstants.keymodel_stopsel in keymodel || OptionConstants.keymodel_stopvisual in keymodel)) {
-      editor.exitVisualMode()
+    if (editor.ij.inVisualMode && (OptionConstants.keymodel_stopsel in keymodel || OptionConstants.keymodel_stopvisual in keymodel)) {
+      editor.ij.exitVisualMode()
     }
 
-    return offset(editor, caret, context, operatorArguments.count1, operatorArguments.count0, argument).toMotionOrError()
+    return offset(editor.ij, caret.ij, context.ij, operatorArguments.count1, operatorArguments.count0, argument).toMotionOrError()
   }
 
   /**

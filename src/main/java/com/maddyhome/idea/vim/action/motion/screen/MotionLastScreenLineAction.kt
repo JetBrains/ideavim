@@ -17,9 +17,6 @@
  */
 package com.maddyhome.idea.vim.action.motion.screen
 
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Caret
-import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
@@ -31,6 +28,10 @@ import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotion
 import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.helper.vimLine
+import com.maddyhome.idea.vim.newapi.ExecutionContext
+import com.maddyhome.idea.vim.newapi.VimCaret
+import com.maddyhome.idea.vim.newapi.VimEditor
+import com.maddyhome.idea.vim.newapi.ij
 import java.util.*
 
 /*
@@ -49,19 +50,19 @@ abstract class MotionLastScreenLineActionBase(private val operatorPending: Boole
   override val motionType: MotionType = MotionType.LINE_WISE
 
   override fun getOffset(
-    editor: Editor,
-    caret: Caret,
-    context: DataContext,
-    argument: Argument?,
-    operatorArguments: OperatorArguments,
+      editor: VimEditor,
+      caret: VimCaret,
+      context: ExecutionContext,
+      argument: Argument?,
+      operatorArguments: OperatorArguments,
   ): Motion {
-    return VimPlugin.getMotion().moveCaretToLastScreenLine(editor, caret, operatorArguments.count1, !operatorPending).toMotion()
+    return VimPlugin.getMotion().moveCaretToLastScreenLine(editor.ij, caret.ij, operatorArguments.count1, !operatorPending).toMotion()
   }
 
-  override fun postMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command) {
+  override fun postMove(editor: VimEditor, caret: VimCaret, context: ExecutionContext, cmd: Command) {
     if (operatorPending) {
       // Convert current caret line from a 0-based logical line to a 1-based logical line
-      VimPlugin.getMotion().scrollLineToFirstScreenLine(editor, caret.vimLine, false)
+      VimPlugin.getMotion().scrollLineToFirstScreenLine(editor.ij, caret.ij.vimLine, false)
     }
   }
 }

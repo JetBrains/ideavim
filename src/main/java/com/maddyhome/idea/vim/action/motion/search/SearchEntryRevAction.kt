@@ -17,9 +17,6 @@
  */
 package com.maddyhome.idea.vim.action.motion.search
 
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Caret
-import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
@@ -30,6 +27,10 @@ import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotionOrError
 import com.maddyhome.idea.vim.helper.Direction
 import com.maddyhome.idea.vim.helper.enumSetOf
+import com.maddyhome.idea.vim.newapi.ExecutionContext
+import com.maddyhome.idea.vim.newapi.VimCaret
+import com.maddyhome.idea.vim.newapi.VimEditor
+import com.maddyhome.idea.vim.newapi.ij
 import java.util.*
 
 class SearchEntryRevAction : MotionActionHandler.ForEachCaret() {
@@ -38,15 +39,15 @@ class SearchEntryRevAction : MotionActionHandler.ForEachCaret() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
 
   override fun getOffset(
-    editor: Editor,
-    caret: Caret,
-    context: DataContext,
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
     if (argument == null) return Motion.Error
     return VimPlugin.getSearch()
-      .processSearchCommand(editor, argument.string, caret.offset, Direction.BACKWARDS).toMotionOrError()
+      .processSearchCommand(editor.ij, argument.string, caret.offset.point, Direction.BACKWARDS).toMotionOrError()
   }
 
   override val motionType: MotionType = MotionType.EXCLUSIVE

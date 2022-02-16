@@ -17,9 +17,6 @@
  */
 package com.maddyhome.idea.vim.action.motion.text
 
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Caret
-import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
@@ -28,19 +25,23 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
+import com.maddyhome.idea.vim.newapi.ExecutionContext
+import com.maddyhome.idea.vim.newapi.VimCaret
+import com.maddyhome.idea.vim.newapi.VimEditor
+import com.maddyhome.idea.vim.newapi.ij
 import java.util.*
 
 class MotionMethodNextStartAction : MotionActionHandler.ForEachCaret() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
 
   override fun getOffset(
-    editor: Editor,
-    caret: Caret,
-    context: DataContext,
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    val moveCaretToMethodStart = VimPlugin.getMotion().moveCaretToMethodStart(editor, caret, operatorArguments.count1)
+    val moveCaretToMethodStart = VimPlugin.getMotion().moveCaretToMethodStart(editor.ij, caret.ij, operatorArguments.count1)
     return if (moveCaretToMethodStart < 0) Motion.Error else Motion.AbsoluteOffset(moveCaretToMethodStart)
   }
 

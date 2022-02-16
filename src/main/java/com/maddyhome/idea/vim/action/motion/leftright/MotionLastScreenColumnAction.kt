@@ -17,9 +17,6 @@
  */
 package com.maddyhome.idea.vim.action.motion.leftright
 
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Caret
-import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
@@ -31,38 +28,42 @@ import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.vimLastColumn
-import com.maddyhome.idea.vim.newapi.IjVimEditor
+import com.maddyhome.idea.vim.newapi.ExecutionContext
+import com.maddyhome.idea.vim.newapi.VimCaret
+import com.maddyhome.idea.vim.newapi.VimEditor
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 
 class MotionLastScreenColumnAction : MotionActionHandler.ForEachCaret() {
   override fun getOffset(
-    editor: Editor,
-    caret: Caret,
-    context: DataContext,
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
     var allow = false
-    if (editor.inInsertMode) {
+    if (editor.ij.inInsertMode) {
       allow = true
-    } else if (editor.inVisualMode) {
-      val opt = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.LOCAL(IjVimEditor(editor)), OptionConstants.selectionName) as VimString).value
+    } else if (editor.ij.inVisualMode) {
+      val opt = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.LOCAL(editor),
+        OptionConstants.selectionName) as VimString).value
       if (opt != "old") {
         allow = true
       }
     }
-    return VimPlugin.getMotion().moveCaretToLineScreenEnd(editor, caret, allow)
+    return VimPlugin.getMotion().moveCaretToLineScreenEnd(editor.ij, caret.ij, allow)
   }
 
   override fun postMove(
-    editor: Editor,
-    caret: Caret,
-    context: DataContext,
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
     cmd: Command,
   ) {
-    caret.vimLastColumn = MotionGroup.LAST_COLUMN
+    caret.ij.vimLastColumn = MotionGroup.LAST_COLUMN
   }
 
   override val motionType: MotionType = MotionType.INCLUSIVE

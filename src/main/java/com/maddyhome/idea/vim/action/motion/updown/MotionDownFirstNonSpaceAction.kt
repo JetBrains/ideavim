@@ -19,10 +19,7 @@
 package com.maddyhome.idea.vim.action.motion.updown
 
 import com.intellij.codeInsight.template.impl.TemplateManagerImpl
-import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.IdeActions
-import com.intellij.openapi.editor.Caret
-import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.MotionType
@@ -31,19 +28,23 @@ import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotion
 import com.maddyhome.idea.vim.injector
-import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.newapi.ExecutionContext
+import com.maddyhome.idea.vim.newapi.VimCaret
+import com.maddyhome.idea.vim.newapi.VimEditor
+import com.maddyhome.idea.vim.newapi.ij
 
 class MotionDownFirstNonSpaceAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.LINE_WISE
 
   override fun getOffset(
-    editor: Editor,
-    caret: Caret,
-    context: DataContext,
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    return VimPlugin.getMotion().moveCaretToLineStartSkipLeadingOffset(editor, caret, operatorArguments.count1).toMotion()
+    return VimPlugin.getMotion().moveCaretToLineStartSkipLeadingOffset(editor.ij, caret.ij, operatorArguments.count1)
+      .toMotion()
   }
 }
 
@@ -51,18 +52,18 @@ class EnterNormalAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.LINE_WISE
 
   override fun getOffset(
-    editor: Editor,
-    caret: Caret,
-    context: DataContext,
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    val templateState = TemplateManagerImpl.getTemplateState(editor)
+    val templateState = TemplateManagerImpl.getTemplateState(editor.ij)
     return if (templateState != null) {
-      injector.actionExecutor.executeAction(IdeActions.ACTION_EDITOR_NEXT_TEMPLATE_VARIABLE, context.vim)
+      injector.actionExecutor.executeAction(IdeActions.ACTION_EDITOR_NEXT_TEMPLATE_VARIABLE, context)
       Motion.NoMotion
     } else {
-      VimPlugin.getMotion().moveCaretToLineStartSkipLeadingOffset(editor, caret, operatorArguments.count1).toMotion()
+      VimPlugin.getMotion().moveCaretToLineStartSkipLeadingOffset(editor.ij, caret.ij, operatorArguments.count1).toMotion()
     }
   }
 }

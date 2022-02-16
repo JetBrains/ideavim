@@ -18,9 +18,6 @@
 
 package com.maddyhome.idea.vim.action.motion.mark
 
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Caret
-import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
@@ -29,6 +26,10 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotionOrError
+import com.maddyhome.idea.vim.newapi.ExecutionContext
+import com.maddyhome.idea.vim.newapi.VimCaret
+import com.maddyhome.idea.vim.newapi.VimEditor
+import com.maddyhome.idea.vim.newapi.ij
 import java.util.*
 
 class MotionGotoMarkAction : MotionActionHandler.ForEachCaret() {
@@ -39,16 +40,16 @@ class MotionGotoMarkAction : MotionActionHandler.ForEachCaret() {
   override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_SAVE_JUMP)
 
   override fun getOffset(
-    editor: Editor,
-    caret: Caret,
-    context: DataContext,
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
     if (argument == null) return Motion.Error
 
     val mark = argument.character
-    return VimPlugin.getMotion().moveCaretToMark(editor, mark, false).toMotionOrError()
+    return VimPlugin.getMotion().moveCaretToMark(editor.ij, mark, false).toMotionOrError()
   }
 }
 
@@ -58,15 +59,15 @@ class MotionGotoMarkNoSaveJumpAction : MotionActionHandler.ForEachCaret() {
   override val argumentType: Argument.Type = Argument.Type.CHARACTER
 
   override fun getOffset(
-    editor: Editor,
-    caret: Caret,
-    context: DataContext,
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
     if (argument == null) return Motion.Error
 
     val mark = argument.character
-    return VimPlugin.getMotion().moveCaretToMark(editor, mark, false).toMotionOrError()
+    return VimPlugin.getMotion().moveCaretToMark(editor.ij, mark, false).toMotionOrError()
   }
 }

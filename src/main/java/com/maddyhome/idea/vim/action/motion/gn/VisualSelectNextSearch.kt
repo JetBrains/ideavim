@@ -17,8 +17,6 @@
  */
 package com.maddyhome.idea.vim.action.motion.gn
 
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
@@ -28,18 +26,21 @@ import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotionOrError
 import com.maddyhome.idea.vim.helper.noneOfEnum
+import com.maddyhome.idea.vim.newapi.ExecutionContext
+import com.maddyhome.idea.vim.newapi.VimEditor
+import com.maddyhome.idea.vim.newapi.ij
 import java.util.*
 
 class VisualSelectNextSearch : MotionActionHandler.SingleExecution() {
   override val flags: EnumSet<CommandFlags> = noneOfEnum()
 
   override fun getOffset(
-    editor: Editor,
-    context: DataContext,
+    editor: VimEditor,
+    context: ExecutionContext,
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    return VimPlugin.getMotion().selectNextSearch(editor, operatorArguments.count1, true).toMotionOrError()
+    return VimPlugin.getMotion().selectNextSearch(editor.ij, operatorArguments.count1, true).toMotionOrError()
   }
 
   override val motionType: MotionType = MotionType.EXCLUSIVE

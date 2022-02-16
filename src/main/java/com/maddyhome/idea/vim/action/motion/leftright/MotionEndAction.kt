@@ -31,7 +31,11 @@ import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.helper.inSelectMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.vimLastColumn
+import com.maddyhome.idea.vim.newapi.ExecutionContext
 import com.maddyhome.idea.vim.newapi.IjVimEditor
+import com.maddyhome.idea.vim.newapi.VimCaret
+import com.maddyhome.idea.vim.newapi.VimEditor
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
@@ -60,11 +64,11 @@ class MotionEndAction : NonShiftedSpecialKeyHandler() {
     return VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret, count - 1, allow)
   }
 
-  override fun preMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command) {
-    caret.vimLastColumn = MotionGroup.LAST_COLUMN
+  override fun preMove(editor: VimEditor, caret: VimCaret, context: ExecutionContext, cmd: Command) {
+    caret.ij.vimLastColumn = MotionGroup.LAST_COLUMN
   }
 
-  override fun postMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command) {
-    caret.vimLastColumn = MotionGroup.LAST_COLUMN
+  override fun postMove(editor: VimEditor, caret: VimCaret, context: ExecutionContext, cmd: Command) {
+    caret.ij.vimLastColumn = MotionGroup.LAST_COLUMN
   }
 }

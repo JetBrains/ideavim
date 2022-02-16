@@ -18,9 +18,6 @@
 
 package com.maddyhome.idea.vim.action.motion.leftright
 
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Caret
-import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
@@ -31,6 +28,10 @@ import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotionOrError
 import com.maddyhome.idea.vim.helper.Direction
 import com.maddyhome.idea.vim.helper.enumSetOf
+import com.maddyhome.idea.vim.newapi.ExecutionContext
+import com.maddyhome.idea.vim.newapi.VimCaret
+import com.maddyhome.idea.vim.newapi.VimEditor
+import com.maddyhome.idea.vim.newapi.ij
 import java.util.*
 
 enum class TillCharacterMotionType {
@@ -59,18 +60,18 @@ sealed class TillCharacterMotion(
     if (direction == Direction.BACKWARDS) MotionType.EXCLUSIVE else MotionType.INCLUSIVE
 
   override fun getOffset(
-    editor: Editor,
-    caret: Caret,
-    context: DataContext,
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
     if (argument == null) return Motion.Error
     val res = if (finishBeforeCharacter) {
       VimPlugin.getMotion()
-        .moveCaretToBeforeNextCharacterOnLine(editor, caret, direction.toInt() * operatorArguments.count1, argument.character)
+        .moveCaretToBeforeNextCharacterOnLine(editor.ij, caret.ij, direction.toInt() * operatorArguments.count1, argument.character)
     } else {
-      VimPlugin.getMotion().moveCaretToNextCharacterOnLine(editor, caret, direction.toInt() * operatorArguments.count1, argument.character)
+      VimPlugin.getMotion().moveCaretToNextCharacterOnLine(editor.ij, caret.ij, direction.toInt() * operatorArguments.count1, argument.character)
     }
     VimPlugin.getMotion().setLastFTCmd(tillCharacterMotionType, argument.character)
     return res.toMotionOrError()

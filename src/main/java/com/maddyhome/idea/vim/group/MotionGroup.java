@@ -46,6 +46,7 @@ import com.maddyhome.idea.vim.handler.MotionActionHandlerKt;
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.listener.AppCodeTemplates;
+import com.maddyhome.idea.vim.newapi.IjExecutionContext;
 import com.maddyhome.idea.vim.newapi.IjVimCaret;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.newapi.VimEditor;
@@ -116,7 +117,7 @@ public class MotionGroup {
 
         // Execute the motion (without moving the cursor) and get where we end
         Motion motion =
-          action.getHandlerOffset(editor, caret, context, cmd.getArgument(), operatorArguments.withCount0(raw));
+          action.getHandlerOffset(new IjVimEditor(editor), new IjVimCaret(caret), new IjExecutionContext(context), cmd.getArgument(), operatorArguments.withCount0(raw));
 
         // Invalid motion
         if (Motion.Error.INSTANCE.equals(motion)) return null;
@@ -216,7 +217,7 @@ public class MotionGroup {
 
         // Execute the motion (without moving the cursor) and get where we end
         Motion motion =
-          action.getHandlerOffset(editor, caret, context, cmd.getArgument(), operatorArguments.withCount0(raw));
+          action.getHandlerOffset(new IjVimEditor(editor), new IjVimCaret(caret), new IjExecutionContext(context), cmd.getArgument(), operatorArguments.withCount0(raw));
 
         // Invalid motion
         if (Motion.Error.INSTANCE.equals(motion)) return null;

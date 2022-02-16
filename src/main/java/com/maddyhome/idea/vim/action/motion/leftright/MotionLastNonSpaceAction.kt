@@ -17,9 +17,6 @@
  */
 package com.maddyhome.idea.vim.action.motion.leftright
 
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Caret
-import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.MotionType
@@ -27,16 +24,21 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotion
+import com.maddyhome.idea.vim.newapi.ExecutionContext
+import com.maddyhome.idea.vim.newapi.VimCaret
+import com.maddyhome.idea.vim.newapi.VimEditor
+import com.maddyhome.idea.vim.newapi.ij
 
 class MotionLastNonSpaceAction : MotionActionHandler.ForEachCaret() {
   override fun getOffset(
-    editor: Editor,
-    caret: Caret,
-    context: DataContext,
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    return VimPlugin.getMotion().moveCaretToLineEndSkipLeadingOffset(editor, caret, operatorArguments.count1 - 1).toMotion()
+    return VimPlugin.getMotion().moveCaretToLineEndSkipLeadingOffset(editor.ij, caret.ij, operatorArguments.count1 - 1)
+      .toMotion()
   }
 
   override val motionType: MotionType = MotionType.INCLUSIVE
