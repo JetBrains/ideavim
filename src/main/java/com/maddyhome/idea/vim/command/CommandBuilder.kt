@@ -18,8 +18,6 @@
 
 package com.maddyhome.idea.vim.command
 
-import com.intellij.openapi.diagnostic.debug
-import com.intellij.openapi.diagnostic.logger
 import com.maddyhome.idea.vim.action.DuplicableOperatorAction
 import com.maddyhome.idea.vim.action.ResetModeAction
 import com.maddyhome.idea.vim.action.change.insert.InsertCompletedDigraphAction
@@ -29,6 +27,8 @@ import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import com.maddyhome.idea.vim.key.CommandPartNode
 import com.maddyhome.idea.vim.key.Node
 import com.maddyhome.idea.vim.key.RootNode
+import com.maddyhome.idea.vim.newapi.debug
+import com.maddyhome.idea.vim.vimLogger
 import org.jetbrains.annotations.TestOnly
 import java.util.*
 import javax.swing.KeyStroke
@@ -206,6 +206,6 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode<ActionB
   fun getCurrentTrie(): CommandPartNode<ActionBeanClass> = currentCommandPartNode
 
   companion object {
-    private val LOG = logger<CommandBuilder>()
+    private val LOG = vimLogger<CommandBuilder>()
   }
 }
