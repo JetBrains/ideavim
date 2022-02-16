@@ -23,6 +23,10 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
+import com.maddyhome.idea.vim.newapi.ExecutionContext
+import com.maddyhome.idea.vim.newapi.VimCaret
+import com.maddyhome.idea.vim.newapi.VimEditor
+import com.maddyhome.idea.vim.newapi.ij
 
 /**
  * Handler for common usage.
@@ -62,15 +66,15 @@ sealed class VimActionHandler(myRunForEachCaret: Boolean) : EditorActionHandlerB
   }
 
   final override fun baseExecute(
-    editor: Editor,
-    caret: Caret,
-    context: DataContext,
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
     cmd: Command,
     operatorArguments: OperatorArguments
   ): Boolean {
     return when (this) {
-      is ForEachCaret -> execute(editor, caret, context, cmd, operatorArguments)
-      is SingleExecution -> execute(editor, context, cmd, operatorArguments)
+      is ForEachCaret -> execute(editor.ij, caret.ij, context.ij, cmd, operatorArguments)
+      is SingleExecution -> execute(editor.ij, context.ij, cmd, operatorArguments)
     }
   }
 }

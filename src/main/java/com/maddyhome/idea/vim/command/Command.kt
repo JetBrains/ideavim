@@ -18,12 +18,12 @@
 
 package com.maddyhome.idea.vim.command
 
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Caret
-import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler
+import com.maddyhome.idea.vim.newapi.ExecutionContext
+import com.maddyhome.idea.vim.newapi.VimCaret
+import com.maddyhome.idea.vim.newapi.VimEditor
 import java.util.*
 
 /**
@@ -125,9 +125,9 @@ private object NonExecutableActionHandler : EditorActionHandlerBase(false) {
     get() = error("This action should not be executed")
 
   override fun baseExecute(
-    editor: Editor,
-    caret: Caret,
-    context: DataContext,
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
     cmd: Command,
     operatorArguments: OperatorArguments
   ): Boolean {

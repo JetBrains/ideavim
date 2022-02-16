@@ -36,6 +36,10 @@ import com.maddyhome.idea.vim.helper.inBlockSubMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.helper.vimSelectionStart
+import com.maddyhome.idea.vim.newapi.ExecutionContext
+import com.maddyhome.idea.vim.newapi.VimCaret
+import com.maddyhome.idea.vim.newapi.VimEditor
+import com.maddyhome.idea.vim.newapi.ij
 
 /**
  * @author Alex Plate
@@ -146,19 +150,19 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
   }
 
   final override fun baseExecute(
-    editor: Editor,
-    caret: Caret,
-    context: DataContext,
-    cmd: Command,
-    operatorArguments: OperatorArguments,
+      editor: VimEditor,
+      caret: VimCaret,
+      context: ExecutionContext,
+      cmd: Command,
+      operatorArguments: OperatorArguments,
   ): Boolean {
-    val blockSubmodeActive = editor.inBlockSubMode
+    val blockSubmodeActive = editor.ij.inBlockSubMode
 
     when (this) {
       is SingleExecution -> run {
-        if (!preOffsetComputation(editor, context, cmd)) return@run
+        if (!preOffsetComputation(editor.ij, context.ij, cmd)) return@run
 
-        val offset = getOffset(editor, context, cmd.argument, operatorArguments)
+        val offset = getOffset(editor.ij, context.ij, cmd.argument, operatorArguments)
 
         when (offset) {
           is Motion.AbsoluteOffset -> {
@@ -167,14 +171,14 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
               logger<MotionActionHandler>().error("Offset is less than 0. $resultOffset. ${this.javaClass.name}")
             }
             if (CommandFlags.FLAG_SAVE_JUMP in cmd.flags) {
-              VimPlugin.getMark().saveJumpLocation(editor)
+              VimPlugin.getMark().saveJumpLocation(editor.ij)
             }
-            if (!editor.isEndAllowed) {
-              resultOffset = EditorHelper.normalizeOffset(editor, resultOffset, false)
+            if (!editor.ij.isEndAllowed) {
+              resultOffset = EditorHelper.normalizeOffset(editor.ij, resultOffset, false)
             }
-            preMove(editor, context, cmd)
-            MotionGroup.moveCaret(editor, editor.caretModel.primaryCaret, resultOffset)
-            postMove(editor, context, cmd)
+            preMove(editor.ij, context.ij, cmd)
+            MotionGroup.moveCaret(editor.ij, editor.ij.caretModel.primaryCaret, resultOffset)
+            postMove(editor.ij, context.ij, cmd)
           }
           is Motion.Error -> VimPlugin.indicateError()
           is Motion.NoMotion -> Unit
@@ -182,24 +186,24 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
       }
       is ForEachCaret -> run {
         when {
-          blockSubmodeActive || editor.caretModel.caretCount == 1 -> {
-            val primaryCaret = editor.caretModel.primaryCaret
-            doExecuteForEach(editor, primaryCaret, context, cmd, operatorArguments)
+          blockSubmodeActive || editor.ij.caretModel.caretCount == 1 -> {
+            val primaryCaret = editor.ij.caretModel.primaryCaret
+            doExecuteForEach(editor.ij, primaryCaret, context.ij, cmd, operatorArguments)
           }
           else -> {
             try {
-              editor.caretModel.addCaretListener(CaretMergingWatcher)
-              editor.caretModel.runForEachCaret { caret ->
+              editor.ij.caretModel.addCaretListener(CaretMergingWatcher)
+              editor.ij.caretModel.runForEachCaret { caret ->
                 doExecuteForEach(
-                  editor,
+                  editor.ij,
                   caret,
-                  context,
+                  context.ij,
                   cmd,
                   operatorArguments
                 )
               }
             } finally {
-              editor.caretModel.removeCaretListener(CaretMergingWatcher)
+              editor.ij.caretModel.removeCaretListener(CaretMergingWatcher)
             }
           }
         }

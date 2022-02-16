@@ -48,6 +48,10 @@ import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.helper.vimLastSelectionType
 import com.maddyhome.idea.vim.helper.vimLastVisualOperatorRange
 import com.maddyhome.idea.vim.helper.vimSelectionStart
+import com.maddyhome.idea.vim.newapi.ExecutionContext
+import com.maddyhome.idea.vim.newapi.VimCaret
+import com.maddyhome.idea.vim.newapi.VimEditor
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 
 /**
@@ -128,31 +132,31 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
   }
 
   final override fun baseExecute(
-    editor: Editor,
-    caret: Caret,
-    context: DataContext,
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
     cmd: Command,
     operatorArguments: OperatorArguments
   ): Boolean {
     logger.info("Execute visual command $cmd")
 
-    editor.vimChangeActionSwitchMode = null
+    editor.ij.vimChangeActionSwitchMode = null
 
-    val selections = editor.collectSelections() ?: return false
+    val selections = editor.ij.collectSelections() ?: return false
     logger.debug { "Count of selection segments: ${selections.size}" }
     logger.debug { selections.values.joinToString("\n") { vimSelection -> "Caret: $vimSelection" } }
 
-    val commandWrapper = VisualStartFinishWrapper(editor, cmd)
+    val commandWrapper = VisualStartFinishWrapper(editor.ij, cmd)
     commandWrapper.start()
 
     val res = Ref.create(true)
     when (this) {
       is SingleExecution -> {
-        res.set(executeForAllCarets(editor, context, cmd, selections, operatorArguments))
+        res.set(executeForAllCarets(editor.ij, context.ij, cmd, selections, operatorArguments))
       }
       is ForEachCaret -> {
         logger.debug("Calling 'before execution'")
-        if (!beforeExecution(editor, context, cmd, selections)) {
+        if (!beforeExecution(editor.ij, context.ij, cmd, selections)) {
           logger.debug("Before execution block returned false. Stop further processing")
           return false
         }
@@ -161,18 +165,18 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
           selections.keys.isEmpty() -> return false
           selections.keys.size == 1 -> res.set(
             executeAction(
-              editor,
+              editor.ij,
               selections.keys.first(),
-              context,
+              context.ij,
               cmd,
               selections.values.first(),
               operatorArguments
             )
           )
-          else -> editor.caretModel.runForEachCaret(
+          else -> editor.ij.caretModel.runForEachCaret(
             { currentCaret ->
               val range = selections.getValue(currentCaret)
-              val loopRes = executeAction(editor, currentCaret, context, cmd, range, operatorArguments)
+              val loopRes = executeAction(editor.ij, currentCaret, context.ij, cmd, range, operatorArguments)
               res.set(loopRes and res.get())
             },
             true
@@ -180,14 +184,14 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
         }
 
         logger.debug("Calling 'after execution'")
-        afterExecution(editor, context, cmd, res.get())
+        afterExecution(editor.ij, context.ij, cmd, res.get())
       }
     }
 
     commandWrapper.finish(res.get())
 
-    editor.vimChangeActionSwitchMode?.let {
-      VimPlugin.getChange().processPostChangeModeSwitch(editor, context, it)
+    editor.ij.vimChangeActionSwitchMode?.let {
+      VimPlugin.getChange().processPostChangeModeSwitch(editor.ij, context.ij, it)
     }
 
     return res.get()

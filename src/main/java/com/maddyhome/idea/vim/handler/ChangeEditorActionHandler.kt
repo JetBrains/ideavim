@@ -32,6 +32,10 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.helper.vimChangeActionSwitchMode
 import com.maddyhome.idea.vim.helper.vimLastColumn
+import com.maddyhome.idea.vim.newapi.ExecutionContext
+import com.maddyhome.idea.vim.newapi.VimCaret
+import com.maddyhome.idea.vim.newapi.VimEditor
+import com.maddyhome.idea.vim.newapi.ij
 
 /**
  * Base handler for commands that performs change actions.
@@ -73,9 +77,9 @@ sealed class ChangeEditorActionHandler : EditorActionHandlerBase(false) {
   }
 
   final override fun baseExecute(
-    editor: Editor,
-    caret: Caret,
-    context: DataContext,
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
@@ -85,19 +89,19 @@ sealed class ChangeEditorActionHandler : EditorActionHandlerBase(false) {
     // is called for each task and call the handlers for each caret, if implemented.
 
     // Shouldn't we just use [EditorWriteActionHandler]?
-    editor.vimChangeActionSwitchMode = null
+    editor.ij.vimChangeActionSwitchMode = null
 
-    val doc = editor.document
+    val doc = editor.ij.document
     doc.startGuardedBlockChecking()
 
     val worked = Ref.create(true)
     try {
       when (this) {
         is ForEachCaret -> {
-          editor.caretModel.runForEachCaret(
+          editor.ij.caretModel.runForEachCaret(
             { current ->
               if (!current.isValid) return@runForEachCaret
-              if (!execute(editor, current, context, cmd.argument, operatorArguments)) {
+              if (!execute(editor.ij, current, context.ij, cmd.argument, operatorArguments)) {
                 worked.set(false)
               }
             },
@@ -105,7 +109,7 @@ sealed class ChangeEditorActionHandler : EditorActionHandlerBase(false) {
           )
         }
         is SingleExecution -> {
-          worked.set(execute(editor, context, cmd.argument, operatorArguments))
+          worked.set(execute(editor.ij, context.ij, cmd.argument, operatorArguments))
         }
       }
     } catch (e: ReadOnlyFragmentModificationException) {
@@ -121,12 +125,12 @@ sealed class ChangeEditorActionHandler : EditorActionHandlerBase(false) {
     if (worked.get()) {
       VimRepeater.saveLastChange(cmd)
       VimRepeater.repeatHandler = false
-      editor.caretModel.allCarets.forEach { it.vimLastColumn = it.visualPosition.column }
+      editor.ij.caretModel.allCarets.forEach { it.vimLastColumn = it.visualPosition.column }
     }
 
-    val toSwitch = editor.vimChangeActionSwitchMode
+    val toSwitch = editor.ij.vimChangeActionSwitchMode
     if (toSwitch != null) {
-      VimPlugin.getChange().processPostChangeModeSwitch(editor, context, toSwitch)
+      VimPlugin.getChange().processPostChangeModeSwitch(editor.ij, context.ij, toSwitch)
     }
 
     return worked.get()

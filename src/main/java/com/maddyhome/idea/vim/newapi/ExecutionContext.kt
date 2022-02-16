@@ -19,6 +19,7 @@
 package com.maddyhome.idea.vim.newapi
 
 import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.actionSystem.CaretSpecificDataContext
 import com.maddyhome.idea.vim.helper.EditorDataContext
 
 /**
@@ -34,6 +35,10 @@ interface ExecutionContext {
   companion object {
     fun onEditor(editor: VimEditor, prevContext: ExecutionContext? = null): ExecutionContext {
       return IjExecutionContext(EditorDataContext.init((editor as IjVimEditor).editor, prevContext?.ij))
+    }
+
+    fun onCaret(caret: VimCaret, prevContext: ExecutionContext): ExecutionContext {
+      return IjExecutionContext(CaretSpecificDataContext(prevContext.ij, caret.ij))
     }
   }
 }

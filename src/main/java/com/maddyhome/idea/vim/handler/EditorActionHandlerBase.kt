@@ -18,11 +18,6 @@
 
 package com.maddyhome.idea.vim.handler
 
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.diagnostic.Logger
-import com.intellij.openapi.editor.Caret
-import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.editor.actionSystem.CaretSpecificDataContext
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
@@ -31,10 +26,10 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.helper.noneOfEnum
-import com.maddyhome.idea.vim.newapi.IjVimCaret
-import com.maddyhome.idea.vim.newapi.IjVimEditor
+import com.maddyhome.idea.vim.newapi.ExecutionContext
 import com.maddyhome.idea.vim.newapi.VimCaret
-import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.newapi.VimEditor
+import com.maddyhome.idea.vim.vimLogger
 import org.jetbrains.annotations.NonNls
 import java.util.*
 import javax.swing.KeyStroke
@@ -73,34 +68,33 @@ abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
   open val flags: EnumSet<CommandFlags> = noneOfEnum()
 
   abstract fun baseExecute(
-    editor: Editor,
-    caret: Caret,
-    context: DataContext,
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean
 
-  fun execute(editor: Editor, context: DataContext, operatorArguments: OperatorArguments) {
-    val hostEditor = IjVimEditor(editor)
-    val action = { caret: VimCaret -> doExecute(editor, (caret as IjVimCaret).caret, context, operatorArguments) }
+  fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
+    val action = { caret: VimCaret -> doExecute(editor, caret, context, operatorArguments) }
     if (myRunForEachCaret) {
-      hostEditor.forEachCaret(action)
+      editor.forEachCaret(action)
     } else {
-      action(IjVimCaret(editor.caretModel.currentCaret))
+      action(editor.primaryCaret())
     }
   }
 
-  private fun doExecute(editor: Editor, caret: Caret, context: DataContext, operatorArguments: OperatorArguments) {
+  private fun doExecute(editor: VimEditor, caret: VimCaret, context: ExecutionContext, operatorArguments: OperatorArguments) {
     if (!VimPlugin.isEnabled()) return
 
     logger.debug("Execute command with handler: " + this.javaClass.name)
 
-    val cmd = editor.vim.commandState.executingCommand ?: run {
+    val cmd = editor.commandState.executingCommand ?: run {
       VimPlugin.indicateError()
       return
     }
 
-    if (!baseExecute(editor, caret, CaretSpecificDataContext(context, caret), cmd, operatorArguments)) VimPlugin.indicateError()
+    if (!baseExecute(editor, caret, ExecutionContext.onCaret(caret, context), cmd, operatorArguments)) VimPlugin.indicateError()
   }
 
   open fun process(cmd: Command) {
@@ -108,7 +102,7 @@ abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
   }
 
   companion object {
-    private val logger = Logger.getInstance(EditorActionHandlerBase::class.java.name)
+    private val logger = vimLogger<EditorActionHandlerBase>()
 
     fun parseKeysSet(keyStrings: List<String>) = keyStrings.map { StringHelper.parseKeys(it) }.toSet()
 

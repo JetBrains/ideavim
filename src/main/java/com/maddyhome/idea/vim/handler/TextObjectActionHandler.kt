@@ -35,6 +35,10 @@ import com.maddyhome.idea.vim.helper.endOffsetInclusive
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.helper.vimSelectionStart
+import com.maddyhome.idea.vim.newapi.ExecutionContext
+import com.maddyhome.idea.vim.newapi.VimCaret
+import com.maddyhome.idea.vim.newapi.VimEditor
+import com.maddyhome.idea.vim.newapi.ij
 
 /**
  * @author Alex Plate
@@ -67,31 +71,31 @@ abstract class TextObjectActionHandler : EditorActionHandlerBase(true) {
    * This code is called when user executes text object in visual mode. E.g. `va(a(a(`
    */
   final override fun baseExecute(
-    editor: Editor,
-    caret: Caret,
-    context: DataContext,
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    if (!editor.inVisualMode) return true
+    if (!editor.ij.inVisualMode) return true
 
-    val range = getRange(editor, caret, context, cmd.count, cmd.rawCount, cmd.argument) ?: return false
+    val range = getRange(editor.ij, caret.ij, context.ij, cmd.count, cmd.rawCount, cmd.argument) ?: return false
 
     val block = CommandFlags.FLAG_TEXT_BLOCK in cmd.flags
-    val newstart = if (block || caret.offset >= caret.vimSelectionStart) range.startOffset else range.endOffsetInclusive
-    val newend = if (block || caret.offset >= caret.vimSelectionStart) range.endOffsetInclusive else range.startOffset
+    val newstart = if (block || caret.offset.point >= caret.vimSelectionStart) range.startOffset else range.endOffsetInclusive
+    val newend = if (block || caret.offset.point >= caret.vimSelectionStart) range.endOffsetInclusive else range.startOffset
 
-    if (caret.vimSelectionStart == caret.offset || block) {
-      caret.vimSetSelection(newstart, newstart, false)
+    if (caret.vimSelectionStart == caret.offset.point || block) {
+      caret.ij.vimSetSelection(newstart, newstart, false)
     }
 
-    if (visualType == TextObjectVisualType.LINE_WISE && editor.subMode != CommandState.SubMode.VISUAL_LINE) {
-      VimPlugin.getVisualMotion().toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_LINE)
-    } else if (visualType != TextObjectVisualType.LINE_WISE && editor.subMode == CommandState.SubMode.VISUAL_LINE) {
-      VimPlugin.getVisualMotion().toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_CHARACTER)
+    if (visualType == TextObjectVisualType.LINE_WISE && editor.ij.subMode != CommandState.SubMode.VISUAL_LINE) {
+      VimPlugin.getVisualMotion().toggleVisual(editor.ij, 1, 0, CommandState.SubMode.VISUAL_LINE)
+    } else if (visualType != TextObjectVisualType.LINE_WISE && editor.ij.subMode == CommandState.SubMode.VISUAL_LINE) {
+      VimPlugin.getVisualMotion().toggleVisual(editor.ij, 1, 0, CommandState.SubMode.VISUAL_CHARACTER)
     }
 
-    MotionGroup.moveCaret(editor, caret, newend)
+    MotionGroup.moveCaret(editor.ij, caret.ij, newend)
 
     return true
   }

@@ -43,6 +43,7 @@ import com.maddyhome.idea.vim.newapi.IjNativeAction
 import com.maddyhome.idea.vim.newapi.NativeAction
 import com.maddyhome.idea.vim.newapi.VimEditor
 import com.maddyhome.idea.vim.newapi.ij
+import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.annotations.NonNls
 import javax.swing.SwingUtilities
 
@@ -155,7 +156,7 @@ class IjActionExecutor : VimActionExecutor {
   ) {
     CommandProcessor.getInstance()
       .executeCommand(editor.ij.project,
-        { cmd.execute(editor.ij, getProjectAwareDataContext(editor.ij, context.ij), operatorArguments) },
+        { cmd.execute(editor, getProjectAwareDataContext(editor.ij, context.ij).vim, operatorArguments) },
         cmd.id, DocCommandGroupId.noneGroupId(editor.ij.document), UndoConfirmationPolicy.DEFAULT,
         editor.ij.document)
   }

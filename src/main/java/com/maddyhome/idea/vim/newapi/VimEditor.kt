@@ -151,6 +151,12 @@ interface VimEditor {
    */
   fun forEachCaret(action: (VimCaret) -> Unit)
 
+  /**
+   * Do we really need this?
+   * TODO
+   */
+  fun primaryCaret(): VimCaret
+
   fun isWritable(): Boolean
 }
 
@@ -383,6 +389,10 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
     }
   }
 
+  override fun primaryCaret(): VimCaret {
+    return IjVimCaret(editor.caretModel.primaryCaret)
+  }
+
   override fun isWritable(): Boolean {
     val modificationAllowed = EditorModificationUtil.checkModificationAllowed(editor)
     val writeRequested = EditorModificationUtil.requestWriting(editor)
@@ -411,6 +421,9 @@ interface VimCaret {
   fun getLine(): EditorLine.Pointer
   fun hasSelection(): Boolean
 }
+
+val VimCaret.ij: Caret
+  get() = (this as IjVimCaret).caret
 
 class IjVimCaret(val caret: Caret) : VimCaret {
   override val editor: VimEditor
