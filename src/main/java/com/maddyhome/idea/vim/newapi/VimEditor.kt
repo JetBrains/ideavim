@@ -419,13 +419,9 @@ class IjVimCaret(val caret: Caret) : VimCaret {
     return caret.hasSelection()
   }
 
-  override fun equals(other: Any?): Boolean {
-    error("equals and hashCode should not be used with IjVimCaret")
-  }
+  override fun equals(other: Any?): Boolean = this.caret == (other as? IjVimCaret)?.caret
 
-  override fun hashCode(): Int {
-    error("equals and hashCode should not be used with IjVimCaret")
-  }
+  override fun hashCode(): Int = this.caret.hashCode()
 }
 
 fun VimCaret.offsetForLineWithStartOfLineOption(logicalLine: EditorLine.Pointer): Int {

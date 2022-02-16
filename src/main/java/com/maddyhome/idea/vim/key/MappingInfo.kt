@@ -19,7 +19,6 @@ package com.maddyhome.idea.vim.key
 
 import com.intellij.openapi.application.invokeLater
 import com.intellij.openapi.diagnostic.logger
-import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.actionSystem.CaretSpecificDataContext
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.action.change.VimRepeater.Extension.argumentCaptured
@@ -42,8 +41,8 @@ import com.maddyhome.idea.vim.helper.vimSelectionStart
 import com.maddyhome.idea.vim.injector
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.newapi.ExecutionContext
-import com.maddyhome.idea.vim.newapi.IjVimCaret
 import com.maddyhome.idea.vim.newapi.Offset
+import com.maddyhome.idea.vim.newapi.VimCaret
 import com.maddyhome.idea.vim.newapi.VimEditor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.offset
@@ -169,8 +168,7 @@ class ToHandlerMappingInfo(
     // TODO: Is this legal? Should we assert in this case?
     val shouldCalculateOffsets: Boolean = commandState.isOperatorPending
 
-    val startOffsets: Map<Caret, Offset> =
-      editor.carets().map { (it as IjVimCaret).caret }.associateWith { it.offset.offset }
+    val startOffsets: Map<VimCaret, Offset> = editor.carets().associateWith { it.offset }
 
     if (extensionHandler.isRepeatable) {
       clean()
@@ -212,20 +210,20 @@ class ToHandlerMappingInfo(
     private fun myFun(
       shouldCalculateOffsets: Boolean,
       editor: VimEditor,
-      startOffsets: Map<Caret, Offset>,
+      startOffsets: Map<VimCaret, Offset>,
     ) {
       val commandState = editor.commandState
       if (shouldCalculateOffsets && !commandState.commandBuilder.hasCurrentCommandPartArgument()) {
-        val offsets: MutableMap<Caret, VimSelection> = HashMap()
-        for (caret in editor.carets().map { (it as IjVimCaret).caret }) {
+        val offsets: MutableMap<VimCaret, VimSelection> = HashMap()
+        for (caret in editor.carets()) {
           var startOffset = startOffsets[caret]
           if (caret.hasSelection()) {
-            val vimSelection = create(caret.vimSelectionStart, caret.offset, fromSubMode(editor.subMode), editor.ij)
+            val vimSelection = create(caret.vimSelectionStart, caret.offset.point, fromSubMode(editor.subMode), editor.ij)
             offsets[caret] = vimSelection
             commandState.popModes()
-          } else if (startOffset != null && startOffset.point != caret.offset) {
+          } else if (startOffset != null && startOffset.point != caret.offset.point) {
             // Command line motions are always characterwise exclusive
-            var endOffset = caret.offset.offset
+            var endOffset = caret.offset
             if (startOffset.point < endOffset.point) {
               endOffset = (endOffset.point - 1).offset
             } else {

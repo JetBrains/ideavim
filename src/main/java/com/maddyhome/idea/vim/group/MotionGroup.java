@@ -46,6 +46,7 @@ import com.maddyhome.idea.vim.handler.MotionActionHandlerKt;
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.listener.AppCodeTemplates;
+import com.maddyhome.idea.vim.newapi.IjVimCaret;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.newapi.VimEditor;
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
@@ -95,7 +96,7 @@ public class MotionGroup {
     int start;
     int end;
     if (argument.getType() == Argument.Type.OFFSETS) {
-      final VimSelection offsets = argument.getOffsets().get(caret);
+      final VimSelection offsets = argument.getOffsets().get(new IjVimCaret(caret));
       if (offsets == null) return null;
 
       final Pair<Integer, Integer> nativeStartAndEnd = offsets.getNativeStartAndEnd();
@@ -195,7 +196,7 @@ public class MotionGroup {
     int start;
     int end;
     if (argument.getType() == Argument.Type.OFFSETS) {
-      final VimSelection offsets = argument.getOffsets().get(caret);
+      final VimSelection offsets = argument.getOffsets().get(new IjVimCaret(caret));
       if (offsets == null) return null;
 
       final Pair<Integer, Integer> nativeStartAndEnd = offsets.getNativeStartAndEnd();
