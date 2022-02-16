@@ -36,6 +36,7 @@ import com.intellij.openapi.editor.RawText
 import com.intellij.openapi.ide.CopyPasteManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.text.StringUtil
+import com.jetbrains.rd.util.firstOrNull
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.SelectionType
@@ -112,10 +113,11 @@ class PutGroup {
    */
   private fun wrapInsertedTextWithVisualMarks(editor: Editor, data: PutData, text: ProcessedTextData) {
     val textLength: Int = data.textData?.rawText?.length ?: return
-    val selections = data.visualSelection?.caretsAndSelections?.values?.toList() ?: return
-    if (selections.size != 1) return
+    val currentCaret = editor.caretModel.currentCaret
+    val caretsAndSelections = data.visualSelection?.caretsAndSelections ?: return
+    val selection = caretsAndSelections[currentCaret] ?: caretsAndSelections.firstOrNull()?.value ?: return
 
-    var fistIndex = selections[0].vimStart
+    var fistIndex = selection.vimStart
     val lastIndex = fistIndex + textLength - 1
 
     if (wasTextInsertedLineWise(text)) {
