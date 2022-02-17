@@ -24,7 +24,6 @@ import com.intellij.internal.statistic.eventLog.events.EventFields
 import com.intellij.internal.statistic.eventLog.events.VarargEventId
 import com.intellij.internal.statistic.service.fus.collectors.ApplicationUsagesCollector
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.extension.VimExtensionRegistrar
 import com.maddyhome.idea.vim.ui.JoinEap
 
 internal class PluginState : ApplicationUsagesCollector() {
@@ -44,7 +43,7 @@ internal class PluginState : ApplicationUsagesCollector() {
   companion object {
     private val GROUP = EventLogGroup("vim.common", 1)
 
-    val extensionNames = VimExtensionRegistrar.registeredExtensions.toList()
+    val extensionNames = listOf("textobj-entire", "argtextobj", "ReplaceWithRegister", "vim-paragraph-motion", "highlightedyank", "multiple-cursors", "exchange", "NERDTree", "surround", "commentary", "matchit", "textobj-indent")
     val enabledExtensions = HashSet<String>()
 
     private val PLUGIN_ENABLED = EventFields.Boolean("is_plugin_enabled")
