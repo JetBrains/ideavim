@@ -18,6 +18,7 @@
 
 package com.maddyhome.idea.vim
 
+import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.Logger
 import com.maddyhome.idea.vim.helper.IjActionExecutor
 import com.maddyhome.idea.vim.helper.VimActionExecutor
@@ -25,17 +26,26 @@ import com.maddyhome.idea.vim.newapi.IjNativeActionManager
 import com.maddyhome.idea.vim.newapi.IjVimLogger
 import com.maddyhome.idea.vim.newapi.NativeActionManager
 import com.maddyhome.idea.vim.newapi.VimLogger
+import com.maddyhome.idea.vim.vimscript.services.OptionService
 
 interface VimInjector {
   fun <T : Any> getLogger(clazz: Class<T>): VimLogger
   val actionExecutor: VimActionExecutor
   val nativeActionManager: NativeActionManager
+
+  // TODO We should somehow state that [OptionServiceImpl] can be used from any implementation
+  val optionService: OptionService
 }
 
 class IjVimInjector : VimInjector {
   override fun <T : Any> getLogger(clazz: Class<T>): VimLogger = IjVimLogger(Logger.getInstance(clazz::class.java))
+
+  // TODO Inject via application service
   override val actionExecutor: VimActionExecutor = IjActionExecutor()
   override val nativeActionManager: NativeActionManager = IjNativeActionManager()
+
+  override val optionService: OptionService
+    get() = service()
 }
 
 // We should inject logger here somehow

@@ -108,7 +108,7 @@ class KeyHandler {
       """.trimIndent()
     }
     val mapMapDepth = (
-      VimPlugin.getOptionService().getOptionValue(
+      injector.optionService.getOptionValue(
         OptionService.Scope.GLOBAL,
         OptionConstants.maxmapdepthName,
         OptionConstants.maxmapdepthName
@@ -342,7 +342,7 @@ class KeyHandler {
     // Every time a key is pressed and handled, the timer is stopped. E.g. if there is a mapping for "dweri", and the
     // user has typed "dw" wait for the timeout, and then replay "d" and "w" without any mapping (which will of course
     // delete a word)
-    if (VimPlugin.getOptionService()
+    if (injector.optionService
         .isSet(OptionService.Scope.LOCAL(editor), OptionConstants.timeoutName, OptionConstants.timeoutName)
     ) {
       LOG.trace("Timeout is set. Schedule a mapping timer")
