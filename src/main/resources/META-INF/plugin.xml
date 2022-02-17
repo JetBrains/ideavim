@@ -6,6 +6,7 @@
       <ul>
         <li>Add register support to let command | <a href="https://youtrack.jetbrains.com/issue/VIM-749">VIM-749</a>, <a
             href="https://youtrack.jetbrains.com/issue/VIM-1783">VIM-1783</a></li>
+        <li>Add tabmove command | <a href="https://youtrack.jetbrains.com/issue/VIM-1164">VIM-1164</a></li>
       </ul>
 
       <h3>Fixes:</h3>
@@ -18,6 +19,12 @@
         </li>
         <li><a href="https://youtrack.jetbrains.com/issue/VIM-2471">VIM-2471</a> Multiple [{ and ]} actions</li>
         <li><a href="https://youtrack.jetbrains.com/issue/VIM-2504">VIM-2504</a> Fix esc with using python notebooks</li>
+        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2540">VIM-2540</a> Fix option listeners</li>
+        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2548">VIM-2548</a> Fix paste</li>
+        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2470">VIM-2470</a> Fix incorrect reset of cursor shape</li>
+        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2223">VIM-2223</a>, <a
+            href="https://youtrack.jetbrains.com/issue/VIM-1684">VIM-1684</a>, <a
+            href="https://youtrack.jetbrains.com/issue/VIM-2491">VIM-2491</a> Fix <code>gv</code></li>
       </ul>
 
       <h3>Merged PRs:</h3>
@@ -36,6 +43,12 @@
         </li>
         <li><a href="https://github.com/JetBrains/ideavim/pull/449">449</a> by <a href="https://github.com/lonre">Lonre
           Wang</a>: Typo fix
+        </li>
+        <li><a href="https://github.com/JetBrains/ideavim/pull/453">453</a> by <a href="https://github.com/citizenmatt">Matt
+          Ellis</a>: fix(VIM-2470): Fix incorrect reset of cursor shape
+        </li>
+        <li><a href="https://github.com/JetBrains/ideavim/pull/461">461</a> by <a href="https://github.com/ddadon10">David
+          Dadon</a>: Add shortcut to ideajoin example
         </li>
       </ul>
     ]]>
