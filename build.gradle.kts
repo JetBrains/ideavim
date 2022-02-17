@@ -24,7 +24,7 @@ plugins {
     java
     kotlin("jvm") version "1.5.10"
 
-    id("org.jetbrains.intellij") version "1.3.1"
+    id("org.jetbrains.intellij") version "1.4.0"
     id("org.jetbrains.changelog") version "1.3.0"
 
     // ktlint linter - read more: https://github.com/JLLeitschuh/ktlint-gradle
