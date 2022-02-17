@@ -1,1 +1,3 @@
 rootProject.name = 'IdeaVIM'
+include 'vim-engine'
+

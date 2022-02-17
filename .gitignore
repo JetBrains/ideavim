@@ -10,9 +10,9 @@
 !/.idea/runConfigurations
 !/.idea/codeStyles
 
-/build/
-/out/
-/tmp/
+**/build/
+**/out/
+**/tmp/
 
 *.DS_Store
 
