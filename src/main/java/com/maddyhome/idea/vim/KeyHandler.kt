@@ -33,7 +33,6 @@ import com.maddyhome.idea.vim.command.CurrentCommandState
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.MappingState
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.handler.ActionBeanClass
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import com.maddyhome.idea.vim.helper.DigraphResult
 import com.maddyhome.idea.vim.helper.MessageHelper.message
@@ -49,6 +48,7 @@ import com.maddyhome.idea.vim.key.CommandPartNode
 import com.maddyhome.idea.vim.key.KeyMapping
 import com.maddyhome.idea.vim.key.Node
 import com.maddyhome.idea.vim.newapi.ExecutionContext
+import com.maddyhome.idea.vim.newapi.VimActionsInitiator
 import com.maddyhome.idea.vim.newapi.VimEditor
 import com.maddyhome.idea.vim.newapi.VimLogger
 import com.maddyhome.idea.vim.newapi.debug
@@ -154,14 +154,14 @@ class KeyHandler {
 
           // Ask the key/action tree if this is an appropriate key at this point in the command and if so,
           // return the node matching this keystroke
-          val node: Node<ActionBeanClass>? = mapOpCommand(key, commandBuilder.getChildNode(key), editorState)
+          val node: Node<VimActionsInitiator>? = mapOpCommand(key, commandBuilder.getChildNode(key), editorState)
           LOG.trace("Get the node for the current mode")
 
-          if (node is CommandNode<ActionBeanClass>) {
+          if (node is CommandNode<VimActionsInitiator>) {
             LOG.trace("Node is a command node")
             handleCommandNode(editor, context, key, node, editorState)
             commandBuilder.addKey(key)
-          } else if (node is CommandPartNode<ActionBeanClass>) {
+          } else if (node is CommandPartNode<VimActionsInitiator>) {
             LOG.trace("Node is a command part node")
             commandBuilder.setCurrentCommandPartNode(node)
             commandBuilder.addKey(key)
@@ -233,9 +233,9 @@ class KeyHandler {
    */
   private fun mapOpCommand(
     key: KeyStroke,
-    node: Node<ActionBeanClass>?,
+    node: Node<VimActionsInitiator>?,
     editorState: CommandState,
-  ): Node<ActionBeanClass>? {
+  ): Node<VimActionsInitiator>? {
     return if (editorState.isDuplicateOperatorKeyStroke(key)) {
       editorState.commandBuilder.getChildNode(KeyStroke.getKeyStroke('_'))
     } else node
@@ -700,12 +700,12 @@ class KeyHandler {
     editor: VimEditor,
     context: ExecutionContext,
     key: KeyStroke,
-    node: CommandNode<ActionBeanClass>,
+    node: CommandNode<VimActionsInitiator>,
     editorState: CommandState,
   ) {
     LOG.trace("Handle command node")
     // The user entered a valid command. Create the command and add it to the stack.
-    val action = node.actionHolder.instance
+    val action = node.actionHolder.getInstance()
     val commandBuilder = editorState.commandBuilder
     val expectedArgumentType = commandBuilder.expectedArgumentType
     commandBuilder.pushCommandPart(action)
@@ -751,8 +751,8 @@ class KeyHandler {
     }
   }
 
-  private fun stopMacroRecord(node: CommandNode<ActionBeanClass>, editorState: CommandState): Boolean {
-    return editorState.isRecording && node.actionHolder.instance is ToggleRecordingAction
+  private fun stopMacroRecord(node: CommandNode<VimActionsInitiator>, editorState: CommandState): Boolean {
+    return editorState.isRecording && node.actionHolder.getInstance() is ToggleRecordingAction
   }
 
   private fun startWaitingForArgument(
@@ -827,7 +827,7 @@ class KeyHandler {
     editorState.commandBuilder.resetAll(getKeyRoot(editorState.mappingState.mappingMode))
   }
 
-  private fun getKeyRoot(mappingMode: MappingMode): CommandPartNode<ActionBeanClass> {
+  private fun getKeyRoot(mappingMode: MappingMode): CommandPartNode<VimActionsInitiator> {
     return injector.keyGroup.getKeyRoot(mappingMode)
   }
 

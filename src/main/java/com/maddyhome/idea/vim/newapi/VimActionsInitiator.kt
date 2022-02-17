@@ -16,16 +16,18 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.group;
+package com.maddyhome.idea.vim.newapi
 
-import com.maddyhome.idea.vim.command.MappingMode;
-import com.maddyhome.idea.vim.key.CommandPartNode;
-import com.maddyhome.idea.vim.key.KeyMapping;
-import com.maddyhome.idea.vim.newapi.VimActionsInitiator;
-import org.jetbrains.annotations.NotNull;
+import com.maddyhome.idea.vim.handler.ActionBeanClass
+import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 
-public interface VimKeyGroup {
-  @NotNull KeyMapping getKeyMapping(@NotNull MappingMode mode);
-
-  @NotNull CommandPartNode<VimActionsInitiator> getKeyRoot(@NotNull MappingMode mappingMode);
+interface VimActionsInitiator {
+  fun getInstance(): EditorActionHandlerBase
 }
+
+class IjVimActionsInitiator(val bean: ActionBeanClass) : VimActionsInitiator {
+  override fun getInstance(): EditorActionHandlerBase = bean.instance
+}
+
+val VimActionsInitiator.ij: ActionBeanClass
+  get() = (this as IjVimActionsInitiator).bean

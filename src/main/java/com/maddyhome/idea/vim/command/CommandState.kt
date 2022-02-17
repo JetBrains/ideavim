@@ -18,7 +18,6 @@
 package com.maddyhome.idea.vim.command
 
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.handler.ActionBeanClass
 import com.maddyhome.idea.vim.helper.DigraphResult
 import com.maddyhome.idea.vim.helper.DigraphSequence
 import com.maddyhome.idea.vim.helper.MessageHelper
@@ -29,6 +28,7 @@ import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
 import com.maddyhome.idea.vim.helper.updateCaretsVisualPosition
 import com.maddyhome.idea.vim.helper.vimCommandState
 import com.maddyhome.idea.vim.key.CommandPartNode
+import com.maddyhome.idea.vim.newapi.VimActionsInitiator
 import com.maddyhome.idea.vim.newapi.VimEditor
 import com.maddyhome.idea.vim.newapi.debug
 import com.maddyhome.idea.vim.newapi.ij
@@ -403,7 +403,7 @@ class CommandState private constructor(private val editor: VimEditor?) {
       }
     }
 
-    private fun getKeyRootNode(mappingMode: MappingMode): CommandPartNode<ActionBeanClass> {
+    private fun getKeyRootNode(mappingMode: MappingMode): CommandPartNode<VimActionsInitiator> {
       return VimPlugin.getKey().getKeyRoot(mappingMode)
     }
   }

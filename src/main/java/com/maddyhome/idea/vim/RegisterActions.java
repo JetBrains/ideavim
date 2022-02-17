@@ -22,6 +22,7 @@ import com.maddyhome.idea.vim.group.KeyGroup;
 import com.maddyhome.idea.vim.handler.ActionBeanClass;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.key.MappingOwner;
+import com.maddyhome.idea.vim.newapi.IjVimActionsInitiator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -71,7 +72,7 @@ public class RegisterActions {
 
   private static void registerVimCommandActions() {
     KeyGroup parser = VimPlugin.getKey();
-    VIM_ACTIONS_EP.extensions().forEach(parser::registerCommandAction);
+    VIM_ACTIONS_EP.extensions().map(IjVimActionsInitiator::new).forEach(parser::registerCommandAction);
   }
 
   private static void registerEmptyShortcuts() {

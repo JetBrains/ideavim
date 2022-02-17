@@ -24,6 +24,7 @@ import com.intellij.testFramework.PlatformTestUtil
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.key.CommandNode
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.jetCheck.Generator
 import org.jetbrains.jetCheck.ImperativeCommand
@@ -104,7 +105,7 @@ private class AvailableActions(private val editor: Editor) : ImperativeCommand {
     val usedKey = env.generateValue(keyGenerator, null)
     val node = currentNode[usedKey]
 
-    env.logMessage("Use command: ${StringHelper.toKeyNotation(usedKey)}. ${if (node is CommandNode) "Action: ${node.actionHolder.actionId}" else ""}")
+    env.logMessage("Use command: ${StringHelper.toKeyNotation(usedKey)}. ${if (node is CommandNode) "Action: ${node.actionHolder.ij.actionId}" else ""}")
     VimTestCase.typeText(listOf(usedKey), editor, editor.project)
 
     IdeEventQueue.getInstance().flushQueue()

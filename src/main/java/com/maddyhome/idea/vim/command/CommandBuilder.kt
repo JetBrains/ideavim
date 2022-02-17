@@ -22,18 +22,18 @@ import com.maddyhome.idea.vim.action.DuplicableOperatorAction
 import com.maddyhome.idea.vim.action.ResetModeAction
 import com.maddyhome.idea.vim.action.change.insert.InsertCompletedDigraphAction
 import com.maddyhome.idea.vim.action.change.insert.InsertCompletedLiteralAction
-import com.maddyhome.idea.vim.handler.ActionBeanClass
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import com.maddyhome.idea.vim.key.CommandPartNode
 import com.maddyhome.idea.vim.key.Node
 import com.maddyhome.idea.vim.key.RootNode
+import com.maddyhome.idea.vim.newapi.VimActionsInitiator
 import com.maddyhome.idea.vim.newapi.debug
 import com.maddyhome.idea.vim.newapi.vimLogger
 import org.jetbrains.annotations.TestOnly
 import java.util.*
 import javax.swing.KeyStroke
 
-class CommandBuilder(private var currentCommandPartNode: CommandPartNode<ActionBeanClass>) {
+class CommandBuilder(private var currentCommandPartNode: CommandPartNode<VimActionsInitiator>) {
   private val commandParts = ArrayDeque<Command>()
   private var keyList = mutableListOf<KeyStroke>()
 
@@ -110,11 +110,11 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode<ActionB
     keyList.removeAt(keyList.size - 1)
   }
 
-  fun setCurrentCommandPartNode(newNode: CommandPartNode<ActionBeanClass>) {
+  fun setCurrentCommandPartNode(newNode: CommandPartNode<VimActionsInitiator>) {
     currentCommandPartNode = newNode
   }
 
-  fun getChildNode(key: KeyStroke): Node<ActionBeanClass>? {
+  fun getChildNode(key: KeyStroke): Node<VimActionsInitiator>? {
     return currentCommandPartNode[key]
   }
 
@@ -184,7 +184,7 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode<ActionB
     return command
   }
 
-  fun resetAll(commandPartNode: CommandPartNode<ActionBeanClass>) {
+  fun resetAll(commandPartNode: CommandPartNode<VimActionsInitiator>) {
     resetInProgressCommandPart(commandPartNode)
     commandState = CurrentCommandState.NEW_COMMAND
     commandParts.clear()
@@ -197,13 +197,13 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode<ActionB
     count = 0
   }
 
-  fun resetInProgressCommandPart(commandPartNode: CommandPartNode<ActionBeanClass>) {
+  fun resetInProgressCommandPart(commandPartNode: CommandPartNode<VimActionsInitiator>) {
     count = 0
     setCurrentCommandPartNode(commandPartNode)
   }
 
   @TestOnly
-  fun getCurrentTrie(): CommandPartNode<ActionBeanClass> = currentCommandPartNode
+  fun getCurrentTrie(): CommandPartNode<VimActionsInitiator> = currentCommandPartNode
 
   companion object {
     private val LOG = vimLogger<CommandBuilder>()

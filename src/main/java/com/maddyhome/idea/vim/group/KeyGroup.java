@@ -39,11 +39,12 @@ import com.maddyhome.idea.vim.action.VimShortcutKeyAction;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
 import com.maddyhome.idea.vim.extension.VimExtensionHandler;
-import com.maddyhome.idea.vim.handler.ActionBeanClass;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.helper.HelperKt;
 import com.maddyhome.idea.vim.helper.StringHelper;
 import com.maddyhome.idea.vim.key.*;
+import com.maddyhome.idea.vim.newapi.IjVimActionsInitiator;
+import com.maddyhome.idea.vim.newapi.VimActionsInitiator;
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression;
 import kotlin.Pair;
 import kotlin.text.StringsKt;
@@ -77,7 +78,7 @@ public class KeyGroup implements PersistentStateComponent<Element>, VimKeyGroup 
   // It should be ShortcutOwnerInfo, but we use Object to keep the compatibility with easymotion
   private final @NotNull Map<KeyStroke, Object> shortcutConflicts = new LinkedHashMap<>();
   private final @NotNull Set<RequiredShortcut> requiredShortcutKeys = new HashSet<>(300);
-  private final @NotNull Map<MappingMode, CommandPartNode<ActionBeanClass>> keyRoots = new EnumMap<>(MappingMode.class);
+  private final @NotNull Map<MappingMode, CommandPartNode<VimActionsInitiator>> keyRoots = new EnumMap<>(MappingMode.class);
   private final @NotNull Map<MappingMode, KeyMapping> keyMappings = new EnumMap<>(MappingMode.class);
   private @Nullable OperatorFunction operatorFunction = null;
 
@@ -335,7 +336,7 @@ public class KeyGroup implements PersistentStateComponent<Element>, VimKeyGroup 
    * @return The key mapping tree root
    */
   @Override
-  public @NotNull CommandPartNode<ActionBeanClass> getKeyRoot(@NotNull MappingMode mappingMode) {
+  public @NotNull CommandPartNode<VimActionsInitiator> getKeyRoot(@NotNull MappingMode mappingMode) {
     return keyRoots.computeIfAbsent(mappingMode, (key) -> new RootNode<>());
   }
 
@@ -360,17 +361,18 @@ public class KeyGroup implements PersistentStateComponent<Element>, VimKeyGroup 
     if (prefixes != null) prefixes.clear();
   }
 
-  public void registerCommandAction(@NotNull ActionBeanClass actionHolder) {
+  public void registerCommandAction(@NotNull VimActionsInitiator actionHolder) {
+    IjVimActionsInitiator holder = (IjVimActionsInitiator)actionHolder;
 
-    if (!VimPlugin.getPluginId().equals(actionHolder.getPluginDescriptor().getPluginId())) {
+    if (!VimPlugin.getPluginId().equals(holder.getBean().getPluginDescriptor().getPluginId())) {
       logger.error("IdeaVim doesn't accept contributions to `vimActions` extension points. " +
                    "Please create a plugin using `VimExtension`. " +
                    "Plugin to blame: " +
-                   actionHolder.getPluginDescriptor().getPluginId());
+                   holder.getBean().getPluginDescriptor().getPluginId());
       return;
     }
 
-    Set<List<KeyStroke>> actionKeys = actionHolder.getParsedKeys();
+    Set<List<KeyStroke>> actionKeys = holder.getBean().getParsedKeys();
     if (actionKeys == null) {
       final EditorActionHandlerBase action = actionHolder.getInstance();
       if (action instanceof ComplicatedKeysAction) {
@@ -381,9 +383,9 @@ public class KeyGroup implements PersistentStateComponent<Element>, VimKeyGroup 
       }
     }
 
-    Set<MappingMode> actionModes = actionHolder.getParsedModes();
+    Set<MappingMode> actionModes = holder.getBean().getParsedModes();
     if (actionModes == null) {
-      throw new RuntimeException("Cannot register action: " + actionHolder.getImplementation());
+      throw new RuntimeException("Cannot register action: " + holder.getBean().getImplementation());
     }
 
     if (ApplicationManager.getApplication().isUnitTestMode()) {
@@ -400,7 +402,7 @@ public class KeyGroup implements PersistentStateComponent<Element>, VimKeyGroup 
       registerRequiredShortcut(keyStrokes, MappingOwner.IdeaVim.INSTANCE);
 
       for (MappingMode mappingMode : actionModes) {
-        Node<ActionBeanClass> node = getKeyRoot(mappingMode);
+        Node<VimActionsInitiator> node = getKeyRoot(mappingMode);
         NodesKt.addLeafs(node, keyStrokes, actionHolder);
       }
     }
