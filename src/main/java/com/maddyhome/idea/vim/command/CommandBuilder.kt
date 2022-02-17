@@ -22,12 +22,12 @@ import com.maddyhome.idea.vim.action.DuplicableOperatorAction
 import com.maddyhome.idea.vim.action.ResetModeAction
 import com.maddyhome.idea.vim.action.change.insert.InsertCompletedDigraphAction
 import com.maddyhome.idea.vim.action.change.insert.InsertCompletedLiteralAction
+import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import com.maddyhome.idea.vim.key.CommandPartNode
 import com.maddyhome.idea.vim.key.Node
 import com.maddyhome.idea.vim.key.RootNode
 import com.maddyhome.idea.vim.newapi.VimActionsInitiator
-import com.maddyhome.idea.vim.newapi.debug
 import com.maddyhome.idea.vim.newapi.vimLogger
 import org.jetbrains.annotations.TestOnly
 import java.util.*

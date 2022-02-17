@@ -16,12 +16,26 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.newapi
+package com.maddyhome.idea.vim.diagnostic
 
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
+interface VimLogger {
+  fun isTrace(): Boolean
+  fun trace(data: String)
 
-interface VimLocalOptions {
-  fun getOptions(editor: VimEditor): Map<String, VimDataType>
-  fun setOption(editor: VimEditor, optionName: String, value: VimDataType)
-  fun reset(editor: VimEditor)
+  fun isDebug(): Boolean
+  fun debug(data: String)
+
+  fun warn(message: String)
+}
+
+fun VimLogger.trace(message: () -> String) {
+  if (isTrace()) {
+    trace(message())
+  }
+}
+
+fun VimLogger.debug(message: () -> String) {
+  if (isDebug()) {
+    debug(message())
+  }
 }

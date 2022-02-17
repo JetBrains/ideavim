@@ -18,21 +18,7 @@
 
 package com.maddyhome.idea.vim.newapi
 
-import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.application.ModalityState
-
 interface VimApplication {
   fun isMainThread(): Boolean
   fun invokeLater(action: () -> Unit, editor: VimEditor)
-}
-
-class IjVimApplication : VimApplication {
-  override fun isMainThread(): Boolean {
-    return ApplicationManager.getApplication().isDispatchThread
-  }
-
-  override fun invokeLater(runnable: () -> Unit, editor: VimEditor) {
-    ApplicationManager.getApplication()
-      .invokeLater(runnable, ModalityState.stateForComponent((editor as IjVimEditor).editor.component))
-  }
 }

@@ -18,6 +18,7 @@
 package com.maddyhome.idea.vim.command
 
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.helper.DigraphResult
 import com.maddyhome.idea.vim.helper.DigraphSequence
 import com.maddyhome.idea.vim.helper.MessageHelper
@@ -30,7 +31,6 @@ import com.maddyhome.idea.vim.helper.vimCommandState
 import com.maddyhome.idea.vim.key.CommandPartNode
 import com.maddyhome.idea.vim.newapi.VimActionsInitiator
 import com.maddyhome.idea.vim.newapi.VimEditor
-import com.maddyhome.idea.vim.newapi.debug
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vimLogger
 import com.maddyhome.idea.vim.vimscript.services.OptionConstants

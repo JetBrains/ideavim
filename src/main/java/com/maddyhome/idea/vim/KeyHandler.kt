@@ -33,6 +33,9 @@ import com.maddyhome.idea.vim.command.CurrentCommandState
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.MappingState
 import com.maddyhome.idea.vim.command.OperatorArguments
+import com.maddyhome.idea.vim.diagnostic.VimLogger
+import com.maddyhome.idea.vim.diagnostic.debug
+import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import com.maddyhome.idea.vim.helper.DigraphResult
 import com.maddyhome.idea.vim.helper.MessageHelper.message
@@ -50,11 +53,8 @@ import com.maddyhome.idea.vim.key.Node
 import com.maddyhome.idea.vim.newapi.ExecutionContext
 import com.maddyhome.idea.vim.newapi.VimActionsInitiator
 import com.maddyhome.idea.vim.newapi.VimEditor
-import com.maddyhome.idea.vim.newapi.VimLogger
-import com.maddyhome.idea.vim.newapi.debug
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.injector
-import com.maddyhome.idea.vim.newapi.trace
 import com.maddyhome.idea.vim.newapi.vimLogger
 import com.maddyhome.idea.vim.ui.ShowCmd.update
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel

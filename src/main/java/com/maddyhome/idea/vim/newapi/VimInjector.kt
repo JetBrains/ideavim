@@ -21,6 +21,8 @@ package com.maddyhome.idea.vim.newapi
 import com.intellij.openapi.components.service
 import com.intellij.openapi.components.serviceIfCreated
 import com.intellij.openapi.diagnostic.Logger
+import com.maddyhome.idea.vim.common.VimMessages
+import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.group.VimChangeGroup
 import com.maddyhome.idea.vim.group.VimKeyGroup
 import com.maddyhome.idea.vim.group.VimProcessGroup

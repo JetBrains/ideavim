@@ -16,26 +16,18 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.common
+package com.maddyhome.idea.vim.newapi
 
-interface VimLogger {
-  fun isTrace(): Boolean
-  fun trace(data: String)
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.ModalityState
 
-  fun isDebug(): Boolean
-  fun debug(data: String)
-
-  fun warn(message: String)
-}
-
-fun VimLogger.trace(message: () -> String) {
-  if (isTrace()) {
-    trace(message())
+class IjVimApplication : VimApplication {
+  override fun isMainThread(): Boolean {
+    return ApplicationManager.getApplication().isDispatchThread
   }
-}
 
-fun VimLogger.debug(message: () -> String) {
-  if (isDebug()) {
-    debug(message())
+  override fun invokeLater(runnable: () -> Unit, editor: VimEditor) {
+    ApplicationManager.getApplication()
+      .invokeLater(runnable, ModalityState.stateForComponent((editor as IjVimEditor).editor.component))
   }
 }

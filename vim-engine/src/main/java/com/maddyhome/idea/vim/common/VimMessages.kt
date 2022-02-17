@@ -16,12 +16,13 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.newapi
+package com.maddyhome.idea.vim.common
 
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
-
-interface VimLocalOptions {
-  fun getOptions(editor: VimEditor): Map<String, VimDataType>
-  fun setOption(editor: VimEditor, optionName: String, value: VimDataType)
-  fun reset(editor: VimEditor)
+interface VimMessages {
+  fun showMessage(message: String?)
+  fun getMessage(): String?
+  fun indicateError()
+  fun clearError()
+  fun isError(): Boolean
 }
+

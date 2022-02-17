@@ -21,17 +21,10 @@ package com.maddyhome.idea.vim.newapi
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.wm.WindowManager
+import com.maddyhome.idea.vim.common.VimMessages
 import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import java.awt.Toolkit
-
-interface VimMessages {
-  fun showMessage(message: String?)
-  fun getMessage(): String?
-  fun indicateError()
-  fun clearError()
-  fun isError(): Boolean
-}
 
 class IjVimMessages : VimMessages {
 
@@ -63,9 +56,9 @@ class IjVimMessages : VimMessages {
     if (ApplicationManager.getApplication().isUnitTestMode) {
       error = true
     } else if (!injector.optionService.isSet(
-        OptionService.Scope.GLOBAL,
-        OptionConstants.visualbellName,
-        OptionConstants.visualbellName
+            OptionService.Scope.GLOBAL,
+            OptionConstants.visualbellName,
+            OptionConstants.visualbellName
       )
     ) {
       // Vim only allows a beep once every half second - :help 'visualbell'
