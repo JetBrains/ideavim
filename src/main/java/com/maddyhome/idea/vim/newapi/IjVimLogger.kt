@@ -19,28 +19,7 @@
 package com.maddyhome.idea.vim.newapi
 
 import com.intellij.openapi.diagnostic.Logger
-
-interface VimLogger {
-  fun isTrace(): Boolean
-  fun trace(data: String)
-
-  fun isDebug(): Boolean
-  fun debug(data: String)
-
-  fun warn(message: String)
-}
-
-fun VimLogger.trace(message: () -> String) {
-  if (isTrace()) {
-    trace(message())
-  }
-}
-
-fun VimLogger.debug(message: () -> String) {
-  if (isDebug()) {
-    debug(message())
-  }
-}
+import com.maddyhome.idea.vim.common.VimLogger
 
 class IjVimLogger(private val logger: Logger) : VimLogger {
   override fun isTrace(): Boolean = logger.isTraceEnabled
