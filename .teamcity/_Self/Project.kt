@@ -9,6 +9,8 @@ import _Self.vcsRoots.Branch_183
 import _Self.vcsRoots.Branch_191_193
 import _Self.vcsRoots.Branch_201
 import _Self.vcsRoots.Branch_202
+import _Self.vcsRoots.Branch_203_212
+import _Self.vcsRoots.Branch_Release
 import _Self.vcsRoots.GitHubPullRequest
 import jetbrains.buildServer.configs.kotlin.v2019_2.Project
 
@@ -23,6 +25,8 @@ object Project : Project({
   vcsRoot(Branch_191_193)
   vcsRoot(Branch_201)
   vcsRoot(Branch_202)
+  vcsRoot(Branch_203_212)
+  vcsRoot(Branch_Release)
   vcsRoot(GitHubPullRequest)
 
   // Builds
