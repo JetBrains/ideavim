@@ -53,7 +53,9 @@ import com.maddyhome.idea.vim.newapi.VimEditor
 import com.maddyhome.idea.vim.newapi.VimLogger
 import com.maddyhome.idea.vim.newapi.debug
 import com.maddyhome.idea.vim.newapi.ij
+import com.maddyhome.idea.vim.newapi.injector
 import com.maddyhome.idea.vim.newapi.trace
+import com.maddyhome.idea.vim.newapi.vimLogger
 import com.maddyhome.idea.vim.ui.ShowCmd.update
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
@@ -174,13 +176,13 @@ class KeyHandler {
             // If we are in insert/replace mode send this key in for processing
             if (editorState.mode == CommandState.Mode.INSERT || editorState.mode == CommandState.Mode.REPLACE) {
               LOG.trace("Process insert or replace")
-              shouldRecord = VimPlugin.getChange().processKey(editor, context, key) && shouldRecord
+              shouldRecord = injector.changeGroup.processKey(editor, context, key) && shouldRecord
             } else if (editorState.mode == CommandState.Mode.SELECT) {
               LOG.trace("Process select")
-              shouldRecord = VimPlugin.getChange().processKeyInSelectMode(editor, context, key) && shouldRecord
+              shouldRecord = injector.changeGroup.processKeyInSelectMode(editor, context, key) && shouldRecord
             } else if (editorState.mappingState.mappingMode == MappingMode.CMD_LINE) {
               LOG.trace("Process cmd line")
-              shouldRecord = VimPlugin.getProcess().processExKey(editor, key) && shouldRecord
+              shouldRecord = injector.processGroup.processExKey(editor, key) && shouldRecord
             } else {
               LOG.trace("Set command state to bad_command")
               commandBuilder.commandState = CurrentCommandState.BAD_COMMAND
@@ -218,7 +220,7 @@ class KeyHandler {
 
     // Don't record the keystroke that stops the recording (unmapped this is `q`)
     if (shouldRecord && editorState.isRecording && key != null) {
-      VimPlugin.getRegister().recordKeyStroke(key)
+      injector.registerGroup.recordKeyStroke(key)
     }
 
     // This will update immediately, if we're on the EDT (which we are)
@@ -250,7 +252,7 @@ class KeyHandler {
       editorState.resetReplaceCharacter()
     }
     if (commandBuilder.isAtDefaultState) {
-      val register = VimPlugin.getRegister()
+      val register = injector.registerGroup
       if (register.currentRegister == register.defaultRegister) {
         var indicateError = true
         if (key.keyCode == KeyEvent.VK_ESCAPE) {
@@ -293,7 +295,7 @@ class KeyHandler {
     // Save the unhandled key strokes until we either complete or abandon the sequence.
     LOG.trace("Add key to mapping state")
     mappingState.addKey(key)
-    val mapping = VimPlugin.getKey().getKeyMapping(mappingState.mappingMode)
+    val mapping = injector.keyGroup.getKeyMapping(mappingState.mappingMode)
     LOG.trace { "Get keys for mapping mode. mode = " + mappingState.mappingMode }
 
     // Returns true if any of these methods handle the key. False means that the key is unrelated to mapping and should
@@ -353,7 +355,7 @@ class KeyHandler {
       //   https://youtrack.jetbrains.com/issue/VIM-2392
       val ijEditor = editor.ij
       mappingState.startMappingTimer { actionEvent: ActionEvent? ->
-        VimPlugin.invokeLater(
+        injector.application.invokeLater(
           {
             LOG.debug("Delayed mapping timer call")
             val unhandledKeys = mappingState.detachKeys()
@@ -543,7 +545,7 @@ class KeyHandler {
   private fun handleSelectRegister(commandState: CommandState, chKey: Char) {
     LOG.trace("Handle select register")
     commandState.resetRegisterPending()
-    if (VimPlugin.getRegister().isValid(chKey)) {
+    if (injector.registerGroup.isValid(chKey)) {
       LOG.trace("Valid register")
       commandState.commandBuilder.pushCommandPart(chKey)
     } else {
@@ -680,7 +682,7 @@ class KeyHandler {
         return
       }
     }
-    if (VimPlugin.isMainThread()) {
+    if (injector.application.isMainThread()) {
       val action: Runnable = ActionRunner(editor, context, command, operatorArguments)
       val cmdAction = command.action
       val name = cmdAction.id
@@ -742,7 +744,7 @@ class KeyHandler {
    operator, which would be invoked first (e.g. 'd' in "d/foo").
 */
       LOG.trace("Processing ex_string")
-      val text = VimPlugin.getProcess().endSearchCommand()
+      val text = injector.processGroup.endSearchCommand()
       commandBuilder.popCommandPart() // Pop ProcessExEntryAction
       commandBuilder.completeCommandPart(Argument(text)) // Set search text on SearchEntry(Fwd|Rev)Action
       editorState.popModes() // Pop CMD_LINE
@@ -783,7 +785,7 @@ class KeyHandler {
       Argument.Type.EX_STRING -> {
         // The current Command expects an EX_STRING argument. E.g. SearchEntry(Fwd|Rev)Action. This won't execute until
         // state hits READY. Start the ex input field, push CMD_LINE mode and wait for the argument.
-        VimPlugin.getProcess().startSearchCommand(editor.ij, context.ij, commandBuilder.count, key)
+        injector.processGroup.startSearchCommand(editor.ij, context.ij, commandBuilder.count, key)
         commandBuilder.commandState = CurrentCommandState.NEW_COMMAND
         editorState.pushModes(CommandState.Mode.CMD_LINE, CommandState.SubMode.NONE)
       }
@@ -826,7 +828,7 @@ class KeyHandler {
   }
 
   private fun getKeyRoot(mappingMode: MappingMode): CommandPartNode<ActionBeanClass> {
-    return VimPlugin.getKey().getKeyRoot(mappingMode)
+    return injector.keyGroup.getKeyRoot(mappingMode)
   }
 
   /**
@@ -839,8 +841,7 @@ class KeyHandler {
     injector.messages.clearError()
     getInstance(editor).reset()
     reset(editor)
-    val registerGroup = VimPlugin.getRegisterIfCreated()
-    registerGroup?.resetRegister()
+    injector.registerGroupIfCreated?.resetRegister()
     editor.ij.selectionModel.removeSelection()
   }
 
@@ -865,18 +866,18 @@ class KeyHandler {
       editorState.commandBuilder.commandState = CurrentCommandState.NEW_COMMAND
       val register = cmd.register
       if (register != null) {
-        VimPlugin.getRegister().selectRegister(register)
+        injector.registerGroup.selectRegister(register)
       }
       injector.actionExecutor.executeVimAction(editor, cmd.action, context, operatorArguments)
       if (editorState.mode === CommandState.Mode.INSERT || editorState.mode === CommandState.Mode.REPLACE) {
-        VimPlugin.getChange().processCommand(editor.ij, cmd)
+        injector.changeGroup.processCommand(editor.ij, cmd)
       }
 
       // Now the command has been executed let's clean up a few things.
 
       // By default, the "empty" register is used by all commands, so we want to reset whatever the last register
       // selected by the user was to the empty register
-      VimPlugin.getRegister().resetRegister()
+      injector.registerGroup.resetRegister()
 
       // If, at this point, we are not in insert, replace, or visual modes, we need to restore the previous
       // mode we were in. This handles commands in those modes that temporarily allow us to execute normal

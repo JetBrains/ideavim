@@ -44,8 +44,6 @@ import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.helper.HelperKt;
 import com.maddyhome.idea.vim.helper.StringHelper;
 import com.maddyhome.idea.vim.key.*;
-import com.maddyhome.idea.vim.vimscript.model.Executable;
-import com.maddyhome.idea.vim.vimscript.model.VimLContext;
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression;
 import kotlin.Pair;
 import kotlin.text.StringsKt;
@@ -68,7 +66,7 @@ import static java.util.stream.Collectors.toList;
  * @author vlan
  */
 @State(name = "VimKeySettings", storages = {@Storage(value = "$APP_CONFIG$/vim_settings.xml")})
-public class KeyGroup implements PersistentStateComponent<Element> {
+public class KeyGroup implements PersistentStateComponent<Element>, VimKeyGroup {
   public static final @NonNls String SHORTCUT_CONFLICTS_ELEMENT = "shortcut-conflicts";
   private static final @NonNls String SHORTCUT_CONFLICT_ELEMENT = "shortcut-conflict";
   private static final @NonNls String OWNER_ATTRIBUTE = "owner";
@@ -316,6 +314,7 @@ public class KeyGroup implements PersistentStateComponent<Element> {
     return shortcutConflicts;
   }
 
+  @Override
   public @NotNull KeyMapping getKeyMapping(@NotNull MappingMode mode) {
     KeyMapping mapping = keyMappings.get(mode);
     if (mapping == null) {
@@ -335,6 +334,7 @@ public class KeyGroup implements PersistentStateComponent<Element> {
    * @param mappingMode The mapping mode
    * @return The key mapping tree root
    */
+  @Override
   public @NotNull CommandPartNode<ActionBeanClass> getKeyRoot(@NotNull MappingMode mappingMode) {
     return keyRoots.computeIfAbsent(mappingMode, (key) -> new RootNode<>());
   }

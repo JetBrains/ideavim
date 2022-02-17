@@ -21,7 +21,6 @@ package com.maddyhome.idea.vim.newapi
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.IdeActions
-import com.maddyhome.idea.vim.injector
 
 interface NativeAction {
   val action: Any

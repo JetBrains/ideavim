@@ -24,7 +24,6 @@ import com.intellij.notification.NotificationListener;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
@@ -46,8 +45,7 @@ import com.maddyhome.idea.vim.group.copy.YankGroup;
 import com.maddyhome.idea.vim.group.visual.VisualMotionGroup;
 import com.maddyhome.idea.vim.helper.MacKeyRepeat;
 import com.maddyhome.idea.vim.listener.VimListenerManager;
-import com.maddyhome.idea.vim.newapi.IjVimEditor;
-import com.maddyhome.idea.vim.newapi.VimEditor;
+import com.maddyhome.idea.vim.newapi.VimInjectorKt;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import com.maddyhome.idea.vim.ui.StatusBarIconFactory;
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable;
@@ -78,11 +76,6 @@ import static com.maddyhome.idea.vim.vimscript.services.VimRcService.executeIdea
 public class VimPlugin implements PersistentStateComponent<Element>, Disposable {
   private static final String IDEAVIM_PLUGIN_ID = "IdeaVIM";
   public static final int STATE_VERSION = 7;
-
-  private static long lastBeepTimeMillis;
-
-  private boolean error = false;
-  private String message = null;
 
   private int previousStateVersion = 0;
   private String previousKeyMap = "";
@@ -143,7 +136,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   }
 
   public static @NotNull ChangeGroup getChange() {
-    return ApplicationManager.getApplication().getService(ChangeGroup.class);
+    return ((ChangeGroup)VimInjectorKt.getInjector().getChangeGroup());
   }
 
   public static @NotNull CommandGroup getCommand() {
@@ -155,11 +148,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   }
 
   public static @NotNull RegisterGroup getRegister() {
-    return ApplicationManager.getApplication().getService(RegisterGroup.class);
-  }
-
-  public static @Nullable RegisterGroup getRegisterIfCreated() {
-    return ApplicationManager.getApplication().getServiceIfCreated(RegisterGroup.class);
+    return ((RegisterGroup)VimInjectorKt.getInjector().getRegisterGroup());
   }
 
   public static @NotNull FileGroup getFile() {
@@ -175,7 +164,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   }
 
   public static @NotNull ProcessGroup getProcess() {
-    return ApplicationManager.getApplication().getService(ProcessGroup.class);
+    return ((ProcessGroup)VimInjectorKt.getInjector().getProcessGroup());
   }
 
   public static @NotNull MacroGroup getMacro() {
@@ -191,11 +180,11 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   }
 
   public static @NotNull KeyGroup getKey() {
-    return ApplicationManager.getApplication().getService(KeyGroup.class);
+    return ((KeyGroup)VimInjectorKt.getInjector().getKeyGroup());
   }
 
   public static @Nullable KeyGroup getKeyIfCreated() {
-    return ApplicationManager.getApplication().getServiceIfCreated(KeyGroup.class);
+    return ((KeyGroup)ApplicationManager.getApplication().getServiceIfCreated(VimKeyGroup.class));
   }
 
   public static @NotNull WindowGroup getWindow() {
@@ -236,15 +225,6 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
 
   private static @NotNull NotificationService getNotifications() {
     return getNotifications(null);
-  }
-
-  public static boolean isMainThread() {
-    return ApplicationManager.getApplication().isDispatchThread();
-  }
-
-  public static void invokeLater(Runnable runnable, VimEditor editor) {
-    ApplicationManager.getApplication()
-      .invokeLater(runnable, ModalityState.stateForComponent(((IjVimEditor)editor).getEditor().getComponent()));
   }
 
   private boolean ideavimrcRegistered = false;
@@ -293,11 +273,11 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   }
 
   public static boolean isError() {
-    return getInstance().error;
+    return VimInjectorKt.getInjector().getMessages().isError();
   }
 
   public static String getMessage() {
-    return getInstance().message;
+    return VimInjectorKt.getInjector().getMessages().getMessage();
   }
 
   /**

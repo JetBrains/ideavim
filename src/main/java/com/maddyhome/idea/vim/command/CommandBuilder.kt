@@ -28,7 +28,7 @@ import com.maddyhome.idea.vim.key.CommandPartNode
 import com.maddyhome.idea.vim.key.Node
 import com.maddyhome.idea.vim.key.RootNode
 import com.maddyhome.idea.vim.newapi.debug
-import com.maddyhome.idea.vim.vimLogger
+import com.maddyhome.idea.vim.newapi.vimLogger
 import org.jetbrains.annotations.TestOnly
 import java.util.*
 import javax.swing.KeyStroke

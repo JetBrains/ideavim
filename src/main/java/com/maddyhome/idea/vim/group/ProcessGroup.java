@@ -56,11 +56,12 @@ import java.io.*;
 import java.util.ArrayList;
 
 
-public class ProcessGroup {
+public class ProcessGroup implements VimProcessGroup {
   public String getLastCommand() {
     return lastCommand;
   }
 
+  @Override
   public void startSearchCommand(@NotNull Editor editor, DataContext context, int count, char leader) {
     if (editor.isOneLineMode()) // Don't allow searching in one line editors
     {
@@ -74,6 +75,7 @@ public class ProcessGroup {
     panel.activate(editor, context, label, initText, count);
   }
 
+  @Override
   public @NotNull String endSearchCommand() {
     ExEntryPanel panel = ExEntryPanel.getInstance();
     panel.deactivate(true);
@@ -91,6 +93,7 @@ public class ProcessGroup {
     panel.activate(editor, context, ":", initText, 1);
   }
 
+  @Override
   public boolean processExKey(@NotNull VimEditor editor, @NotNull KeyStroke stroke) {
     // This will only get called if somehow the key focus ended up in the editor while the ex entry window
     // is open. So I'll put focus back in the editor and process the key.

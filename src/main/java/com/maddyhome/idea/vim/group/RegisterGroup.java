@@ -83,7 +83,7 @@ import java.util.stream.Collectors;
 @State(name = "VimRegisterSettings", storages = {
   @Storage(value = "$APP_CONFIG$/vim_settings_local.xml", roamingType = RoamingType.DISABLED)
 })
-public class RegisterGroup implements PersistentStateComponent<Element> {
+public class RegisterGroup implements PersistentStateComponent<Element>, VimRegisterGroup {
   public static final char UNNAMED_REGISTER = '"';
   public static final char LAST_SEARCH_REGISTER = '/';        // IdeaVim does not supporting writing to this register
   public static final char LAST_COMMAND_REGISTER = ':';
@@ -139,13 +139,12 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
     );
   }
 
-  /**
-   * Check to see if the last selected register can be written to.
-   */
-  private boolean isRegisterWritable() {
-    return READONLY_REGISTERS.indexOf(lastRegister) < 0;
+  @Override
+  public boolean isRegisterWritable() {
+    return RegisterGroup.READONLY_REGISTERS.indexOf(lastRegister) < 0;
   }
 
+  @Override
   public boolean isValid(char reg) {
     return VALID_REGISTERS.indexOf(reg) != -1;
   }
@@ -156,6 +155,7 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
    * @param reg The register name
    * @return true if a valid register name, false if not
    */
+  @Override
   public boolean selectRegister(char reg) {
     if (isValid(reg)) {
       lastRegister = reg;
@@ -171,11 +171,13 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
   /**
    * Reset the selected register back to the default register.
    */
+  @Override
   public void resetRegister() {
     lastRegister = defaultRegister;
     logger.debug("Last register reset to default register");
   }
 
+  @Override
   public void resetRegisters() {
     defaultRegister = UNNAMED_REGISTER;
     lastRegister = defaultRegister;
@@ -191,7 +193,10 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
    * @param isDelete is from a delete
    * @return true if able to store the text into the register, false if not
    */
-  public boolean storeText(@NotNull Editor editor, @NotNull TextRange range, @NotNull SelectionType type,
+  @Override
+  public boolean storeText(@NotNull Editor editor,
+                           @NotNull TextRange range,
+                           @NotNull SelectionType type,
                            boolean isDelete) {
     if (isRegisterWritable()) {
       String text = EditorHelper.getText(editor, range);
@@ -222,6 +227,7 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
    * @param text      The text to store, without further processing
    * @return          True if the text is stored, false if the passed register is not supported
    */
+  @Override
   public boolean storeTextSpecial(char register, @NotNull String text) {
     if (READONLY_REGISTERS.indexOf(register) == -1 && register != LAST_SEARCH_REGISTER
         && register != UNNAMED_REGISTER) {
@@ -398,10 +404,12 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
    *
    * @return The register, null if no such register
    */
+  @Override
   public @Nullable Register getLastRegister() {
     return getRegister(lastRegister);
   }
 
+  @Override
   public @Nullable Register getPlaybackRegister(char r) {
     if (PLAYBACK_REGISTERS.indexOf(r) != 0) {
       return getRegister(r);
@@ -411,6 +419,7 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
     }
   }
 
+  @Override
   public @Nullable Register getRegister(char r) {
     // Uppercase registers actually get the lowercase register
     if (Character.isUpperCase(r)) {
@@ -419,6 +428,7 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
     return CLIPBOARD_REGISTERS.indexOf(r) >= 0 ? refreshClipboardRegister(r) : registers.get(r);
   }
 
+  @Override
   public void saveRegister(char r, Register register) {
     // Uppercase registers actually get the lowercase register
     if (Character.isUpperCase(r)) {
@@ -435,6 +445,7 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
    *
    * @return The register name
    */
+  @Override
   public char getCurrentRegister() {
     return lastRegister;
   }
@@ -442,10 +453,12 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
   /**
    * The register key for the default register.
    */
+  @Override
   public char getDefaultRegister() {
     return defaultRegister;
   }
 
+  @Override
   public @NotNull List<Register> getRegisters() {
     final List<Register> res = new ArrayList<>(registers.values());
     for (int i = 0; i < CLIPBOARD_REGISTERS.length(); i++) {
@@ -459,6 +472,7 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
     return res;
   }
 
+  @Override
   public boolean startRecording(Editor editor, char register) {
     if (RECORDABLE_REGISTERS.indexOf(register) != -1) {
       CommandState.getInstance(new IjVimEditor(editor)).setRecording(true);
@@ -471,26 +485,31 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
     }
   }
 
+  @Override
   public void recordKeyStroke(@NotNull KeyStroke key) {
     if (recordRegister != 0 && recordList != null) {
       recordList.add(key);
     }
   }
 
+  @Override
   public void recordText(@NotNull String text) {
     if (recordRegister != 0 && recordList != null) {
       recordList.addAll(StringHelper.stringToKeys(text));
     }
   }
 
+  @Override
   public void setKeys(char register, @NotNull List<KeyStroke> keys) {
     registers.put(register, new Register(register, SelectionType.CHARACTER_WISE, keys));
   }
 
+  @Override
   public void setKeys(char register, @NotNull List<KeyStroke> keys, SelectionType type) {
     registers.put(register, new Register(register, type, keys));
   }
 
+  @Override
   public void finishRecording(Editor editor) {
     if (recordRegister != 0) {
       Register reg = null;

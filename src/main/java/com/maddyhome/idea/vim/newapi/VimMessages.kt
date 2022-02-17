@@ -21,15 +21,16 @@ package com.maddyhome.idea.vim.newapi
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.wm.WindowManager
-import com.maddyhome.idea.vim.injector
 import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import java.awt.Toolkit
 
 interface VimMessages {
   fun showMessage(message: String?)
+  fun getMessage(): String?
   fun indicateError()
   fun clearError()
+  fun isError(): Boolean
 }
 
 class IjVimMessages : VimMessages {
@@ -56,6 +57,8 @@ class IjVimMessages : VimMessages {
     }
   }
 
+  override fun getMessage(): String? = message
+
   override fun indicateError() {
     if (ApplicationManager.getApplication().isUnitTestMode) {
       error = true
@@ -79,4 +82,6 @@ class IjVimMessages : VimMessages {
       error = false
     }
   }
+
+  override fun isError(): Boolean = error
 }

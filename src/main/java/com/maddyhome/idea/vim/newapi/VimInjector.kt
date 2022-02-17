@@ -16,18 +16,17 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim
+package com.maddyhome.idea.vim.newapi
 
 import com.intellij.openapi.components.service
+import com.intellij.openapi.components.serviceIfCreated
 import com.intellij.openapi.diagnostic.Logger
+import com.maddyhome.idea.vim.group.VimChangeGroup
+import com.maddyhome.idea.vim.group.VimKeyGroup
+import com.maddyhome.idea.vim.group.VimProcessGroup
+import com.maddyhome.idea.vim.group.VimRegisterGroup
 import com.maddyhome.idea.vim.helper.IjActionExecutor
 import com.maddyhome.idea.vim.helper.VimActionExecutor
-import com.maddyhome.idea.vim.newapi.IjNativeActionManager
-import com.maddyhome.idea.vim.newapi.IjVimLogger
-import com.maddyhome.idea.vim.newapi.IjVimMessages
-import com.maddyhome.idea.vim.newapi.NativeActionManager
-import com.maddyhome.idea.vim.newapi.VimLogger
-import com.maddyhome.idea.vim.newapi.VimMessages
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 
 interface VimInjector {
@@ -35,6 +34,12 @@ interface VimInjector {
   val actionExecutor: VimActionExecutor
   val nativeActionManager: NativeActionManager
   val messages: VimMessages
+  val registerGroup: VimRegisterGroup
+  val registerGroupIfCreated: VimRegisterGroup?
+  val changeGroup: VimChangeGroup
+  val processGroup: VimProcessGroup
+  val keyGroup: VimKeyGroup
+  val application: VimApplication
 
   // TODO We should somehow state that [OptionServiceImpl] can be used from any implementation
   val optionService: OptionService
@@ -47,6 +52,17 @@ class IjVimInjector : VimInjector {
   override val actionExecutor: VimActionExecutor = IjActionExecutor()
   override val nativeActionManager: NativeActionManager = IjNativeActionManager()
   override val messages: VimMessages = IjVimMessages()
+  override val registerGroup: VimRegisterGroup
+    get() = service()
+  override val registerGroupIfCreated: VimRegisterGroup?
+    get() = serviceIfCreated()
+  override val changeGroup: VimChangeGroup
+    get() = service()
+  override val processGroup: VimProcessGroup
+    get() = service()
+  override val keyGroup: VimKeyGroup
+    get() = service()
+  override val application: VimApplication = IjVimApplication()
 
   override val optionService: OptionService
     get() = service()

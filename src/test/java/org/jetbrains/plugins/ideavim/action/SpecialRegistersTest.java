@@ -21,6 +21,7 @@ package org.jetbrains.plugins.ideavim.action;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.group.RegisterGroup;
+import com.maddyhome.idea.vim.group.VimRegisterGroup;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 import org.junit.Assert;
 
@@ -38,7 +39,7 @@ public class SpecialRegistersTest extends VimTestCase {
   protected void setUp() throws Exception {
     super.setUp();
 
-    final RegisterGroup registerGroup = VimPlugin.getRegister();
+    final VimRegisterGroup registerGroup = VimPlugin.getRegister();
     registerGroup.setKeys('a', stringToKeys(DUMMY_TEXT));
     registerGroup.setKeys(RegisterGroup.SMALL_DELETION_REGISTER, stringToKeys(DUMMY_TEXT));
     for (char c = '0'; c <= '9'; c++) {
@@ -219,7 +220,7 @@ public class SpecialRegistersTest extends VimTestCase {
   }
 
   private String getRegisterText(char registerName) {
-    final RegisterGroup registerGroup = VimPlugin.getRegister();
+    final VimRegisterGroup registerGroup = VimPlugin.getRegister();
     final Register register = registerGroup.getRegister(registerName);
     assertNotNull(register);
 

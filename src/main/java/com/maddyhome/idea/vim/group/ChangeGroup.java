@@ -77,7 +77,7 @@ import java.util.*;
 /**
  * Provides all the insert/replace related functionality
  */
-public class ChangeGroup {
+public class ChangeGroup implements VimChangeGroup {
 
   private static final int MAX_REPEAT_CHARS_COUNT = 10000;
 
@@ -733,6 +733,7 @@ public class ChangeGroup {
    * @param editor The editor the command was executed in
    * @param cmd    The command that was executed
    */
+  @Override
   public void processCommand(@NotNull Editor editor, @NotNull Command cmd) {
     // return value never used here
     if (cmd.getFlags().contains(CommandFlags.FLAG_SAVE_STROKE)) {
@@ -869,6 +870,7 @@ public class ChangeGroup {
    * @param key     The user entered keystroke
    * @return true if this was a regular character, false if not
    */
+  @Override
   public boolean processKey(final @NotNull VimEditor editor,
                             final @NotNull ExecutionContext context,
                             final @NotNull KeyStroke key) {
@@ -901,6 +903,7 @@ public class ChangeGroup {
     MotionGroup.scrollCaretIntoView(editor);
   }
 
+  @Override
   public boolean processKeyInSelectMode(final @NotNull VimEditor editor,
                                         final @NotNull ExecutionContext context,
                                         final @NotNull KeyStroke key) {
