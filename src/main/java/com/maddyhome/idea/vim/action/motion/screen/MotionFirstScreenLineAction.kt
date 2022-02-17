@@ -29,7 +29,7 @@ import com.maddyhome.idea.vim.handler.toMotion
 import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.helper.vimLine
 import com.maddyhome.idea.vim.newapi.ExecutionContext
-import com.maddyhome.idea.vim.newapi.VimCaret
+import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.newapi.VimEditor
 import com.maddyhome.idea.vim.newapi.ij
 import java.util.*
@@ -50,11 +50,11 @@ abstract class MotionFirstScreenLineActionBase(private val operatorPending: Bool
   override val motionType: MotionType = MotionType.LINE_WISE
 
   override fun getOffset(
-    editor: VimEditor,
-    caret: VimCaret,
-    context: ExecutionContext,
-    argument: Argument?,
-    operatorArguments: OperatorArguments,
+      editor: VimEditor,
+      caret: VimCaret,
+      context: ExecutionContext,
+      argument: Argument?,
+      operatorArguments: OperatorArguments,
   ): Motion {
 
     // Only apply scrolloff for NX motions. For op pending, use the actual first line and apply scrolloff after.

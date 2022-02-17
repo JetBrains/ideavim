@@ -32,7 +32,7 @@ import com.maddyhome.idea.vim.handler.toMotion
 import com.maddyhome.idea.vim.handler.toMotionOrError
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.newapi.ExecutionContext
-import com.maddyhome.idea.vim.newapi.VimCaret
+import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.newapi.VimEditor
 import com.maddyhome.idea.vim.newapi.ij
 
@@ -40,10 +40,10 @@ sealed class MotionUpBase : MotionActionHandler.ForEachCaret() {
   private var col: Int = 0
 
   override fun preOffsetComputation(
-    editor: VimEditor,
-    caret: VimCaret,
-    context: ExecutionContext,
-    cmd: Command,
+      editor: VimEditor,
+      caret: VimCaret,
+      context: ExecutionContext,
+      cmd: Command,
   ): Boolean {
     col = EditorHelper.prepareLastColumn(caret.ij)
     return true
@@ -58,11 +58,11 @@ open class MotionUpAction : MotionUpBase() {
   override val motionType: MotionType = MotionType.LINE_WISE
 
   override fun getOffset(
-    editor: VimEditor,
-    caret: VimCaret,
-    context: ExecutionContext,
-    argument: Argument?,
-    operatorArguments: OperatorArguments,
+      editor: VimEditor,
+      caret: VimCaret,
+      context: ExecutionContext,
+      argument: Argument?,
+      operatorArguments: OperatorArguments,
   ): Motion {
     return VimPlugin.getMotion().moveCaretVertical(editor.ij, caret.ij, -operatorArguments.count1).toMotionOrError()
   }
@@ -70,11 +70,11 @@ open class MotionUpAction : MotionUpBase() {
 
 class MotionUpCtrlPAction : MotionUpAction() {
   override fun getOffset(
-    editor: VimEditor,
-    caret: VimCaret,
-    context: ExecutionContext,
-    argument: Argument?,
-    operatorArguments: OperatorArguments,
+      editor: VimEditor,
+      caret: VimCaret,
+      context: ExecutionContext,
+      argument: Argument?,
+      operatorArguments: OperatorArguments,
   ): Motion {
     val activeLookup = LookupManager.getActiveLookup(editor.ij)
     return if (activeLookup != null) {
@@ -94,11 +94,11 @@ class MotionUpNotLineWiseAction : MotionUpBase() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
   override fun getOffset(
-    editor: VimEditor,
-    caret: VimCaret,
-    context: ExecutionContext,
-    argument: Argument?,
-    operatorArguments: OperatorArguments,
+      editor: VimEditor,
+      caret: VimCaret,
+      context: ExecutionContext,
+      argument: Argument?,
+      operatorArguments: OperatorArguments,
   ): Motion {
     return VimPlugin.getMotion().moveCaretVertical(editor.ij, caret.ij, -operatorArguments.count1).toMotionOrError()
   }

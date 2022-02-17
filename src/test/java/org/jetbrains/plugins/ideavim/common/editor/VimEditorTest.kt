@@ -20,8 +20,8 @@ package org.jetbrains.plugins.ideavim.common.editor
 
 import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.command.WriteCommandAction
+import com.maddyhome.idea.vim.common.offset
 import com.maddyhome.idea.vim.newapi.IjVimEditor
-import com.maddyhome.idea.vim.newapi.offset
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class VimEditorTest : VimTestCase() {

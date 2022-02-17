@@ -25,16 +25,24 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.psi.util.PsiUtilBase
 import com.intellij.util.text.CharArrayUtil
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.SelectionType
+import com.maddyhome.idea.vim.common.EditorLine
 import com.maddyhome.idea.vim.common.IndentConfig
+import com.maddyhome.idea.vim.common.OperatedRange
 import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.common.VimRange
+import com.maddyhome.idea.vim.common.including
+import com.maddyhome.idea.vim.common.offset
 import com.maddyhome.idea.vim.group.ChangeGroup
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.inlayAwareVisualColumn
 import com.maddyhome.idea.vim.helper.vimChangeActionSwitchMode
 import com.maddyhome.idea.vim.helper.vimLastColumn
+import com.maddyhome.idea.vim.vimscript.services.OptionConstants
+import com.maddyhome.idea.vim.vimscript.services.OptionService
 
 fun changeRange(
   editor: Editor,
@@ -59,7 +67,7 @@ fun changeRange(
   // Remove the range
   val vimCaret = IjVimCaret(caret)
   val indent = editor.offsetToLogicalPosition(vimEditor.indentForLine(vimCaret.getLine().line)).column
-  val deletedInfo = VimMachine.instance.delete(vimRange, vimEditor, vimCaret)
+  val deletedInfo = injector.vimMachine.delete(vimRange, vimEditor, vimCaret)
   if (deletedInfo != null) {
     if (deletedInfo is OperatedRange.Lines) {
       // Add new line in case of linewise motion
@@ -108,7 +116,7 @@ fun deleteRange(
 
   val vimCaret = IjVimCaret(caret)
   vimCaret.caret.vimLastColumn = vimCaret.caret.inlayAwareVisualColumn
-  val deletedInfo = VimMachine.instance.delete(vimRange, vimEditor, vimCaret)
+  val deletedInfo = injector.vimMachine.delete(vimRange, vimEditor, vimCaret)
   if (deletedInfo != null) {
     when (deletedInfo) {
       is OperatedRange.Characters -> {
@@ -201,4 +209,35 @@ fun insertLineAround(editor: Editor, context: DataContext, shift: Int) {
   }
 
   MotionGroup.scrollCaretIntoView(editor)
+}
+
+fun VimCaret.offsetForLineWithStartOfLineOption(logicalLine: EditorLine.Pointer): Int {
+  val ijEditor = (this.editor as IjVimEditor).editor
+  val caret = (this as IjVimCaret).caret
+  return if (VimPlugin.getOptionService().isSet(OptionService.Scope.LOCAL(editor), OptionConstants.startoflineName)) {
+    offsetForLineStartSkipLeading(logicalLine.line)
+  } else {
+    VimPlugin.getMotion().moveCaretToLineWithSameColumn(ijEditor, logicalLine.line, caret)
+  }
+}
+
+fun VimEditor.indentForLine(line: Int): Int {
+  val editor = (this as IjVimEditor).editor
+  return EditorHelper.getLeadingCharacterOffset(editor, line)
+}
+
+fun toVimRange(range: TextRange, type: SelectionType): VimRange {
+  return when (type) {
+    SelectionType.LINE_WISE -> {
+      VimRange.Line.Offsets(range.startOffset.offset, range.endOffset.offset)
+    }
+    SelectionType.CHARACTER_WISE -> VimRange.Character.Range(range.startOffset including range.endOffset)
+    SelectionType.BLOCK_WISE -> VimRange.Block(range.startOffset.offset, range.endOffset.offset)
+  }
+}
+
+fun OperatedRange.toType() = when (this) {
+  is OperatedRange.Characters -> SelectionType.CHARACTER_WISE
+  is OperatedRange.Lines -> SelectionType.LINE_WISE
+  is OperatedRange.Block -> SelectionType.BLOCK_WISE
 }

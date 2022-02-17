@@ -21,7 +21,8 @@ package com.maddyhome.idea.vim.newapi
 import com.intellij.openapi.components.service
 import com.intellij.openapi.components.serviceIfCreated
 import com.intellij.openapi.diagnostic.Logger
-import com.maddyhome.idea.vim.common.VimMessages
+import com.maddyhome.idea.vim.common.VimMachine
+import com.maddyhome.idea.vim.api.VimMessages
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.group.VimChangeGroup
 import com.maddyhome.idea.vim.group.VimKeyGroup
@@ -42,6 +43,8 @@ interface VimInjector {
   val processGroup: VimProcessGroup
   val keyGroup: VimKeyGroup
   val application: VimApplication
+
+  val vimMachine: VimMachine
 
   // TODO We should somehow state that [OptionServiceImpl] can be used from any implementation
   val optionService: OptionService
@@ -65,6 +68,7 @@ class IjVimInjector : VimInjector {
   override val keyGroup: VimKeyGroup
     get() = service()
   override val application: VimApplication = IjVimApplication()
+  override val vimMachine: VimMachine = VimMachineImpl()
 
   override val optionService: OptionService
     get() = service()
