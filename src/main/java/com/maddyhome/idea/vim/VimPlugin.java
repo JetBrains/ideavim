@@ -35,11 +35,8 @@ import com.intellij.openapi.keymap.ex.KeymapManagerEx;
 import com.intellij.openapi.keymap.impl.DefaultKeymap;
 import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.SystemInfo;
-import com.intellij.openapi.wm.StatusBar;
-import com.intellij.openapi.wm.WindowManager;
 import com.maddyhome.idea.vim.config.VimState;
 import com.maddyhome.idea.vim.config.migration.ApplicationConfigurationMigrator;
 import com.maddyhome.idea.vim.extension.VimExtensionRegistrar;
@@ -56,7 +53,6 @@ import com.maddyhome.idea.vim.ui.StatusBarIconFactory;
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable;
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
 import com.maddyhome.idea.vim.vimscript.services.FunctionStorage;
-import com.maddyhome.idea.vim.vimscript.services.OptionConstants;
 import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import com.maddyhome.idea.vim.vimscript.services.VariableService;
 import org.jdom.Element;
@@ -65,7 +61,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.event.HyperlinkEvent;
-import java.awt.*;
 
 import static com.maddyhome.idea.vim.group.EditorGroup.EDITOR_STORE_ELEMENT;
 import static com.maddyhome.idea.vim.group.KeyGroup.SHORTCUT_CONFLICTS_ELEMENT;
@@ -309,23 +304,11 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
    * Indicate to the user that an error has occurred. Just beep.
    */
   public static void indicateError() {
-    if (ApplicationManager.getApplication().isUnitTestMode()) {
-      getInstance().error = true;
-    }
-    else if (!VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL.INSTANCE, OptionConstants.visualbellName, OptionConstants.visualbellName)) {
-      // Vim only allows a beep once every half second - :help 'visualbell'
-      final long currentTimeMillis = System.currentTimeMillis();
-      if (currentTimeMillis - lastBeepTimeMillis > 500) {
-        Toolkit.getDefaultToolkit().beep();
-        lastBeepTimeMillis = currentTimeMillis;
-      }
-    }
+    VimInjectorKt.getInjector().getMessages().indicateError();
   }
 
   public static void clearError() {
-    if (ApplicationManager.getApplication().isUnitTestMode()) {
-      getInstance().error = false;
-    }
+    VimInjectorKt.getInjector().getMessages().clearError();
   }
 
   public static void showMode(String msg) {
@@ -333,22 +316,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   }
 
   public static void showMessage(@Nls(capitalization = Nls.Capitalization.Sentence) @Nullable String msg) {
-    if (ApplicationManager.getApplication().isUnitTestMode()) {
-      getInstance().message = msg;
-    }
-    ProjectManager pm = ProjectManager.getInstance();
-    Project[] projects = pm.getOpenProjects();
-    for (Project project : projects) {
-      StatusBar bar = WindowManager.getInstance().getStatusBar(project);
-      if (bar != null) {
-        if (msg == null || msg.length() == 0) {
-          bar.setInfo("");
-        }
-        else {
-          bar.setInfo("VIM - " + msg);
-        }
-      }
-    }
+    VimInjectorKt.getInjector().getMessages().showMessage(msg);
   }
 
   public static @NotNull VimPlugin getInstance() {

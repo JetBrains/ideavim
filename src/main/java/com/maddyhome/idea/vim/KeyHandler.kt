@@ -115,13 +115,13 @@ class KeyHandler {
       ) as VimInt
       ).value
     if (handleKeyRecursionCount >= mapMapDepth) {
-      VimPlugin.showMessage(message("E223"))
-      VimPlugin.indicateError()
+      injector.messages.showMessage(message("E223"))
+      injector.messages.indicateError()
       LOG.warn("Key handling, maximum recursion of the key received. maxdepth=$mapMapDepth")
       return
     }
 
-    VimPlugin.clearError()
+    injector.messages.clearError()
     val editorState = editor.commandState
     val commandBuilder = editorState.commandBuilder
 
@@ -212,7 +212,7 @@ class KeyHandler {
       editorState.resetOpPending()
       editorState.resetRegisterPending()
       editorState.resetReplaceCharacter()
-      VimPlugin.indicateError()
+      injector.messages.indicateError()
       reset(editor)
     }
 
@@ -263,7 +263,7 @@ class KeyHandler {
           indicateError = !executed[0]!!
         }
         if (indicateError) {
-          VimPlugin.indicateError()
+          injector.messages.indicateError()
         }
       }
     }
@@ -417,8 +417,8 @@ class KeyHandler {
     try {
       mappingInfo.execute(editor, context)
     } catch (e: Exception) {
-      VimPlugin.showMessage(e.message)
-      VimPlugin.indicateError()
+      injector.messages.showMessage(e.message)
+      injector.messages.indicateError()
       LOG.warn(
         """
                 Caught exception during ${mappingInfo.getPresentableString()}
@@ -426,8 +426,8 @@ class KeyHandler {
           """.trimIndent()
       )
     } catch (e: NotImplementedError) {
-      VimPlugin.showMessage(e.message)
-      VimPlugin.indicateError()
+      injector.messages.showMessage(e.message)
+      injector.messages.indicateError()
       LOG.warn(
         """
                  Caught exception during ${mappingInfo.getPresentableString()}
@@ -674,7 +674,7 @@ class KeyHandler {
     val type = command.type
     if (type.isWrite) {
       if (!editor.isWritable()) {
-        VimPlugin.indicateError()
+        injector.messages.indicateError()
         reset(editor)
         LOG.warn("File is not writable")
         return
@@ -836,7 +836,7 @@ class KeyHandler {
    * @param editor The editor to reset.
    */
   fun fullReset(editor: VimEditor) {
-    VimPlugin.clearError()
+    injector.messages.clearError()
     getInstance(editor).reset()
     reset(editor)
     val registerGroup = VimPlugin.getRegisterIfCreated()
