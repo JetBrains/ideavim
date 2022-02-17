@@ -33,6 +33,8 @@ object Qodana : BuildType({
       codeInspectionXmlConfig = "Custom"
       codeInspectionCustomXmlConfigPath = ".idea/inspectionProfiles/Qodana.xml"
       reportAsTestsEnable = "true"
+      clearConditions()
+      param("licenseaudit-enable", "true")
       param("clonefinder-languages", "Java")
       param("clonefinder-mode", "")
       param("report-version", "")
