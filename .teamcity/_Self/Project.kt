@@ -26,9 +26,6 @@ object Project : Project({
   vcsRoot(GitHubPullRequest)
 
   // Builds
-  buildType(TestsForIntelliJ20203)
-  buildType(TestsForIntelliJ20211)
-  buildType(TestsForIntelliJ20212)
   buildType(TestsForIntelliJ20213)
   buildType(TestsForIntelliJEAP)
 
