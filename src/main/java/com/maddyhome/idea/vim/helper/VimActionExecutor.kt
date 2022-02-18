@@ -38,7 +38,7 @@ import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.openapi.util.NlsContexts
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
-import com.maddyhome.idea.vim.newapi.ExecutionContext
+import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.newapi.IjNativeAction
 import com.maddyhome.idea.vim.newapi.NativeAction
 import com.maddyhome.idea.vim.api.VimEditor
@@ -74,10 +74,10 @@ interface VimActionExecutor {
   fun executeEsc(context: ExecutionContext): Boolean
 
   fun executeVimAction(
-      editor: VimEditor,
-      cmd: EditorActionHandlerBase,
-      context: ExecutionContext,
-      operatorArguments: OperatorArguments,
+    editor: VimEditor,
+    cmd: EditorActionHandlerBase,
+    context: ExecutionContext,
+    operatorArguments: OperatorArguments,
   )
 }
 
@@ -149,10 +149,10 @@ class IjActionExecutor : VimActionExecutor {
   }
 
   override fun executeVimAction(
-      editor: VimEditor,
-      cmd: EditorActionHandlerBase,
-      context: ExecutionContext,
-      operatorArguments: OperatorArguments,
+    editor: VimEditor,
+    cmd: EditorActionHandlerBase,
+    context: ExecutionContext,
+    operatorArguments: OperatorArguments,
   ) {
     CommandProcessor.getInstance()
       .executeCommand(editor.ij.project,

@@ -18,7 +18,9 @@
 
 package com.maddyhome.idea.vim.handler
 
-import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
@@ -26,9 +28,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.helper.noneOfEnum
-import com.maddyhome.idea.vim.newapi.ExecutionContext
-import com.maddyhome.idea.vim.api.VimCaret
-import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.newapi.injector
 import com.maddyhome.idea.vim.newapi.vimLogger
 import org.jetbrains.annotations.NonNls
 import java.util.*
@@ -68,11 +68,11 @@ abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
   open val flags: EnumSet<CommandFlags> = noneOfEnum()
 
   abstract fun baseExecute(
-      editor: VimEditor,
-      caret: VimCaret,
-      context: ExecutionContext,
-      cmd: Command,
-      operatorArguments: OperatorArguments,
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
   ): Boolean
 
   fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
@@ -85,16 +85,21 @@ abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
   }
 
   private fun doExecute(editor: VimEditor, caret: VimCaret, context: ExecutionContext, operatorArguments: OperatorArguments) {
-    if (!VimPlugin.isEnabled()) return
+    if (!injector.enabler.isEnabled()) return
 
     logger.debug("Execute command with handler: " + this.javaClass.name)
 
     val cmd = editor.commandState.executingCommand ?: run {
-      VimPlugin.indicateError()
+      injector.messages.indicateError()
       return
     }
 
-    if (!baseExecute(editor, caret, ExecutionContext.onCaret(caret, context), cmd, operatorArguments)) VimPlugin.indicateError()
+    if (!baseExecute(editor,
+        caret,
+        injector.executionContextManager.onCaret(caret, context),
+        cmd,
+        operatorArguments)
+    ) injector.messages.indicateError()
   }
 
   open fun process(cmd: Command) {

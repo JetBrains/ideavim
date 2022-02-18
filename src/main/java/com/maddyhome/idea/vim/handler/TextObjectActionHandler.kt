@@ -35,7 +35,7 @@ import com.maddyhome.idea.vim.helper.endOffsetInclusive
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.helper.vimSelectionStart
-import com.maddyhome.idea.vim.newapi.ExecutionContext
+import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.newapi.ij
@@ -71,11 +71,11 @@ abstract class TextObjectActionHandler : EditorActionHandlerBase(true) {
    * This code is called when user executes text object in visual mode. E.g. `va(a(a(`
    */
   final override fun baseExecute(
-      editor: VimEditor,
-      caret: VimCaret,
-      context: ExecutionContext,
-      cmd: Command,
-      operatorArguments: OperatorArguments,
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
   ): Boolean {
     if (!editor.ij.inVisualMode) return true
 

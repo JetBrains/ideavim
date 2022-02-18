@@ -30,7 +30,7 @@ import com.maddyhome.idea.vim.helper.exitSelectMode
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.inSelectMode
 import com.maddyhome.idea.vim.helper.inVisualMode
-import com.maddyhome.idea.vim.newapi.ExecutionContext
+import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.newapi.ij
@@ -124,11 +124,11 @@ abstract class ShiftedArrowKeyHandler : VimActionHandler.SingleExecution() {
  */
 abstract class NonShiftedSpecialKeyHandler : MotionActionHandler.ForEachCaret() {
   final override fun getOffset(
-      editor: VimEditor,
-      caret: VimCaret,
-      context: ExecutionContext,
-      argument: Argument?,
-      operatorArguments: OperatorArguments,
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    argument: Argument?,
+    operatorArguments: OperatorArguments,
   ): Motion {
     val keymodel = (VimPlugin.getOptionService()
       .getOptionValue(OptionService.Scope.GLOBAL, OptionConstants.keymodelName) as VimString).value.split(",")

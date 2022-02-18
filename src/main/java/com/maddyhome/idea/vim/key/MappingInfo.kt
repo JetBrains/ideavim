@@ -25,12 +25,14 @@ import com.maddyhome.idea.vim.action.change.VimRepeater.Extension.argumentCaptur
 import com.maddyhome.idea.vim.action.change.VimRepeater.Extension.clean
 import com.maddyhome.idea.vim.action.change.VimRepeater.Extension.lastExtensionHandler
 import com.maddyhome.idea.vim.action.change.VimRepeater.repeatHandler
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.command.SelectionType.Companion.fromSubMode
 import com.maddyhome.idea.vim.common.Offset
-import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.common.offset
 import com.maddyhome.idea.vim.extension.VimExtensionHandler
 import com.maddyhome.idea.vim.group.visual.VimSelection
@@ -42,8 +44,6 @@ import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.helper.vimSelectionStart
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
-import com.maddyhome.idea.vim.newapi.ExecutionContext
-import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.injector
 import com.maddyhome.idea.vim.newapi.vim
@@ -103,7 +103,7 @@ class ToKeysMappingInfo(
 
   override fun execute(editor: VimEditor, context: ExecutionContext) {
     LOG.debug("Executing 'ToKeys' mapping info...")
-    val editorDataContext = ExecutionContext.onEditor(editor, context)
+    val editorDataContext = injector.executionContextManager.onEditor(editor, context)
     val fromIsPrefix = KeyHandler.isPrefix(fromKeys, toKeys)
     var first = true
     for (keyStroke in toKeys) {
@@ -130,7 +130,7 @@ class ToExpressionMappingInfo(
 
   override fun execute(editor: VimEditor, context: ExecutionContext) {
     LOG.debug("Executing 'ToExpression' mapping info...")
-    val editorDataContext = ExecutionContext.onEditor(editor, context)
+    val editorDataContext = injector.executionContextManager.onEditor(editor, context)
     val toKeys = parseKeys(toExpression.evaluate(editor.ij, context.ij, CommandLineVimLContext).toString())
     val fromIsPrefix = KeyHandler.isPrefix(fromKeys, toKeys)
     var first = true
@@ -256,7 +256,7 @@ class ToActionMappingInfo(
 
   override fun execute(editor: VimEditor, context: ExecutionContext) {
     LOG.debug("Executing 'ToAction' mapping...")
-    val editorDataContext = ExecutionContext.onEditor(editor, context)
+    val editorDataContext = injector.executionContextManager.onEditor(editor, context)
     val dataContext = CaretSpecificDataContext(editorDataContext.ij, editor.ij.caretModel.currentCaret)
     injector.actionExecutor.executeAction(action, dataContext.vim)
   }

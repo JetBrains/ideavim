@@ -43,6 +43,7 @@ import com.intellij.psi.util.PsiUtilBase;
 import com.intellij.util.ObjectUtils;
 import com.intellij.util.containers.ContainerUtil;
 import com.maddyhome.idea.vim.*;
+import com.maddyhome.idea.vim.api.ExecutionContext;
 import com.maddyhome.idea.vim.api.VimEditor;
 import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.common.IndentConfig;
@@ -896,7 +897,7 @@ public class ChangeGroup implements VimChangeGroup {
 
   private void type(@NotNull VimEditor vimEditor, @NotNull ExecutionContext context, char key) {
     Editor editor = ((IjVimEditor)vimEditor).getEditor();
-    DataContext ijContext = ExecutionContextKt.getIj(context);
+    DataContext ijContext = IjExecutionContextKt.getIj(context);
     final Document doc = editor.getDocument();
     CommandProcessor.getInstance().executeCommand(editor.getProject(), () -> ApplicationManager.getApplication()
                                                     .runWriteAction(() -> KeyHandlerKeeper.getInstance().getOriginalHandler().execute(editor, key, ijContext)), "", doc,
@@ -916,7 +917,7 @@ public class ChangeGroup implements VimChangeGroup {
       KeyHandler.getInstance().reset(editor);
 
       if (isPrintableChar(key.getKeyChar()) || activeTemplateWithLeftRightMotion(((IjVimEditor)editor).getEditor(), key)) {
-        DataContext ijContext = ExecutionContextKt.getIj(context);
+        DataContext ijContext = IjExecutionContextKt.getIj(context);
         VimPlugin.getChange().insertBeforeCursor(((IjVimEditor)editor).getEditor(), ijContext);
       }
     }

@@ -22,6 +22,9 @@ import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.event.CaretEvent
 import com.intellij.openapi.editor.event.CaretListener
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
@@ -33,9 +36,6 @@ import com.maddyhome.idea.vim.helper.inBlockSubMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.helper.vimSelectionStart
-import com.maddyhome.idea.vim.newapi.ExecutionContext
-import com.maddyhome.idea.vim.api.VimCaret
-import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 
@@ -62,11 +62,11 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
      * The method executes only once it there is block selection.
      */
     abstract fun getOffset(
-        editor: VimEditor,
-        caret: VimCaret,
-        context: ExecutionContext,
-        argument: Argument?,
-        operatorArguments: OperatorArguments,
+      editor: VimEditor,
+      caret: VimCaret,
+      context: ExecutionContext,
+      argument: Argument?,
+      operatorArguments: OperatorArguments,
     ): Motion
 
     /**
@@ -103,10 +103,10 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
      *   called 1 time.
      */
     abstract fun getOffset(
-        editor: VimEditor,
-        context: ExecutionContext,
-        argument: Argument?,
-        operatorArguments: OperatorArguments
+      editor: VimEditor,
+      context: ExecutionContext,
+      argument: Argument?,
+      operatorArguments: OperatorArguments
     ): Motion
 
     /**
@@ -135,11 +135,11 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
   final override val type: Command.Type = Command.Type.MOTION
 
   fun getHandlerOffset(
-      editor: VimEditor,
-      caret: VimCaret,
-      context: ExecutionContext,
-      argument: Argument?,
-      operatorArguments: OperatorArguments,
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    argument: Argument?,
+    operatorArguments: OperatorArguments,
   ): Motion {
     return when (this) {
       is SingleExecution -> getOffset(editor, context, argument, operatorArguments)
@@ -148,11 +148,11 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
   }
 
   final override fun baseExecute(
-      editor: VimEditor,
-      caret: VimCaret,
-      context: ExecutionContext,
-      cmd: Command,
-      operatorArguments: OperatorArguments,
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
   ): Boolean {
     val blockSubmodeActive = editor.ij.inBlockSubMode
 
@@ -212,11 +212,11 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
   }
 
   private fun doExecuteForEach(
-      editor: VimEditor,
-      caret: VimCaret,
-      context: ExecutionContext,
-      cmd: Command,
-      operatorArguments: OperatorArguments
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments
   ) {
     this as ForEachCaret
     if (!preOffsetComputation(editor, caret, context, cmd)) return

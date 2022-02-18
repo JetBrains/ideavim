@@ -18,15 +18,10 @@
 
 package com.maddyhome.idea.vim.api
 
-interface VimMessages {
-  fun showMessage(message: String?)
-  fun getMessage(): String?
-  fun indicateError()
-  fun clearError()
-  fun isError(): Boolean
-
-  fun showMode(msg: String) {
-    showMessage(msg)
-  }
+/**
+ * This is terrible, just unbind VimPlugin from IJ
+ * THis class is created only to move some other classes to vim-engine
+ */
+interface VimEnabler {
+  fun isEnabled(): Boolean
 }
-

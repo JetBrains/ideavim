@@ -18,12 +18,12 @@
 
 package com.maddyhome.idea.vim.command
 
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler
-import com.maddyhome.idea.vim.newapi.ExecutionContext
-import com.maddyhome.idea.vim.api.VimCaret
-import com.maddyhome.idea.vim.api.VimEditor
 import java.util.*
 
 /**

@@ -17,7 +17,7 @@
  */
 package com.maddyhome.idea.vim.command
 
-import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.helper.DigraphResult
 import com.maddyhome.idea.vim.helper.DigraphSequence
@@ -30,8 +30,8 @@ import com.maddyhome.idea.vim.helper.updateCaretsVisualPosition
 import com.maddyhome.idea.vim.helper.vimCommandState
 import com.maddyhome.idea.vim.key.CommandPartNode
 import com.maddyhome.idea.vim.newapi.VimActionsInitiator
-import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.newapi.ij
+import com.maddyhome.idea.vim.newapi.injector
 import com.maddyhome.idea.vim.newapi.vimLogger
 import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
@@ -303,7 +303,7 @@ class CommandState private constructor(private val editor: VimEditor?) {
 
   private fun doShowMode() {
     val msg = StringBuilder()
-    if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, OptionConstants.showmodeName)) {
+    if (injector.optionService.isSet(OptionService.Scope.GLOBAL, OptionConstants.showmodeName)) {
       msg.append(getStatusString())
     }
     if (isRecording) {
@@ -312,7 +312,7 @@ class CommandState private constructor(private val editor: VimEditor?) {
       }
       msg.append(MessageHelper.message("show.mode.recording"))
     }
-    VimPlugin.showMode(msg.toString())
+    injector.messages.showMode(msg.toString())
   }
 
   internal fun getStatusString(): String {
@@ -391,7 +391,7 @@ class CommandState private constructor(private val editor: VimEditor?) {
 
     @JvmStatic
     fun getInstance(editor: VimEditor?): CommandState {
-      return if (editor == null || VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, OptionConstants.ideaglobalmodeName)) {
+      return if (editor == null || injector.optionService.isSet(OptionService.Scope.GLOBAL, OptionConstants.ideaglobalmodeName)) {
         globalState
       } else {
         var res = editor.ij.vimCommandState
@@ -404,7 +404,7 @@ class CommandState private constructor(private val editor: VimEditor?) {
     }
 
     private fun getKeyRootNode(mappingMode: MappingMode): CommandPartNode<VimActionsInitiator> {
-      return VimPlugin.getKey().getKeyRoot(mappingMode)
+      return injector.keyGroup.getKeyRoot(mappingMode)
     }
   }
 

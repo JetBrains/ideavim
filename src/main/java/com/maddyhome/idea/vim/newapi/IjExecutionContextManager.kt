@@ -15,30 +15,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-package com.maddyhome.idea.vim.action.motion.text
 
-import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.command.Argument
-import com.maddyhome.idea.vim.command.MotionType
-import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.handler.Motion
-import com.maddyhome.idea.vim.handler.MotionActionHandler
-import com.maddyhome.idea.vim.handler.toMotionOrError
+package com.maddyhome.idea.vim.newapi
+
+import com.intellij.openapi.editor.actionSystem.CaretSpecificDataContext
 import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.ExecutionContextManager
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.newapi.ij
+import com.maddyhome.idea.vim.helper.EditorDataContext
 
-class MotionCamelEndRightAction : MotionActionHandler.ForEachCaret() {
-  override fun getOffset(
-    editor: VimEditor,
-    caret: VimCaret,
-    context: ExecutionContext,
-    argument: Argument?,
-    operatorArguments: OperatorArguments,
-  ): Motion {
-    return VimPlugin.getMotion().moveCaretToNextCamelEnd(editor.ij, caret.ij, operatorArguments.count1).toMotionOrError()
+class IjExecutionContextManager : ExecutionContextManager {
+  override fun onEditor(editor: VimEditor, prevContext: ExecutionContext?): ExecutionContext {
+    return IjExecutionContext(EditorDataContext.init((editor as IjVimEditor).editor, prevContext?.ij))
   }
 
-  override val motionType: MotionType = MotionType.INCLUSIVE
+  override fun onCaret(caret: VimCaret, prevContext: ExecutionContext): ExecutionContext {
+    return IjExecutionContext(CaretSpecificDataContext(prevContext.ij, caret.ij))
+  }
 }

@@ -19,34 +19,9 @@
 package com.maddyhome.idea.vim.newapi
 
 import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.actionSystem.CaretSpecificDataContext
-import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.helper.EditorDataContext
-
-/**
- * This would be ideal if we could provide a typed solution, but sofar this is just a holder
- */
-
-interface ExecutionContext {
-  val context: Any
-
-  // TODO: 10.02.2022 Not sure about this method
-  fun updateEditor(editor: VimEditor): ExecutionContext
-
-  companion object {
-    fun onEditor(editor: VimEditor, prevContext: ExecutionContext? = null): ExecutionContext {
-      return IjExecutionContext(EditorDataContext.init((editor as IjVimEditor).editor, prevContext?.ij))
-    }
-
-    fun onCaret(caret: VimCaret, prevContext: ExecutionContext): ExecutionContext {
-      return IjExecutionContext(CaretSpecificDataContext(prevContext.ij, caret.ij))
-    }
-  }
-}
-
-val ExecutionContext.ij: DataContext
-  get() = (this as IjExecutionContext).context
 
 class IjExecutionContext(override val context: DataContext) : ExecutionContext {
   override fun updateEditor(editor: VimEditor): ExecutionContext {
@@ -56,3 +31,7 @@ class IjExecutionContext(override val context: DataContext) : ExecutionContext {
 
 val DataContext.vim
   get() = IjExecutionContext(this)
+
+val ExecutionContext.ij: DataContext
+  get() = (this as IjExecutionContext).context
+

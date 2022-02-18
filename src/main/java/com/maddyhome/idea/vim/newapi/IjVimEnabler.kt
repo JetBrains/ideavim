@@ -16,17 +16,13 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.api
+package com.maddyhome.idea.vim.newapi
 
-interface VimMessages {
-  fun showMessage(message: String?)
-  fun getMessage(): String?
-  fun indicateError()
-  fun clearError()
-  fun isError(): Boolean
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.VimEnabler
 
-  fun showMode(msg: String) {
-    showMessage(msg)
+class IjVimEnabler : VimEnabler {
+  override fun isEnabled(): Boolean {
+    return VimPlugin.isEnabled()
   }
 }
-

@@ -292,7 +292,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   }
 
   public static void showMode(String msg) {
-    showMessage(msg);
+    VimInjectorKt.getInjector().getMessages().showMode(msg);
   }
 
   public static void showMessage(@Nls(capitalization = Nls.Capitalization.Sentence) @Nullable String msg) {

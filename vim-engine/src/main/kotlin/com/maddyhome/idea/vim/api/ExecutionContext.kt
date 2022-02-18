@@ -18,15 +18,18 @@
 
 package com.maddyhome.idea.vim.api
 
-interface VimMessages {
-  fun showMessage(message: String?)
-  fun getMessage(): String?
-  fun indicateError()
-  fun clearError()
-  fun isError(): Boolean
+/**
+ * This would be ideal if we could provide a typed solution, but sofar this is just a holder
+ */
 
-  fun showMode(msg: String) {
-    showMessage(msg)
-  }
+interface ExecutionContext {
+  val context: Any
+
+  // TODO: 10.02.2022 Not sure about this method
+  fun updateEditor(editor: VimEditor): ExecutionContext
 }
 
+interface ExecutionContextManager {
+  fun onEditor(editor: VimEditor, prevContext: ExecutionContext? = null): ExecutionContext
+  fun onCaret(caret: VimCaret, prevContext: ExecutionContext): ExecutionContext
+}

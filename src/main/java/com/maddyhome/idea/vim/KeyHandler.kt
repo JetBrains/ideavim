@@ -50,7 +50,7 @@ import com.maddyhome.idea.vim.key.CommandNode
 import com.maddyhome.idea.vim.key.CommandPartNode
 import com.maddyhome.idea.vim.key.KeyMapping
 import com.maddyhome.idea.vim.key.Node
-import com.maddyhome.idea.vim.newapi.ExecutionContext
+import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.newapi.VimActionsInitiator
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.newapi.ij
@@ -366,7 +366,7 @@ class KeyHandler {
             LOG.trace("Processing unhandled keys...")
             for (keyStroke in unhandledKeys) {
               handleKey(
-                editor, keyStroke, ExecutionContext.onEditor(editor),
+                editor, keyStroke, injector.executionContextManager.onEditor(editor),
                 allowKeyMappings = true,
                 mappingCompleted = true
               )
