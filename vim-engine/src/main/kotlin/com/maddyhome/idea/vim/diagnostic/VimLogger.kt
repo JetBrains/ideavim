@@ -26,6 +26,8 @@ interface VimLogger {
   fun debug(data: String)
 
   fun warn(message: String)
+  fun error(message: String)
+  fun info(message: String)
 }
 
 fun VimLogger.trace(message: () -> String) {

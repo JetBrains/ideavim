@@ -23,4 +23,5 @@ import com.maddyhome.idea.vim.api.VimEditor
 interface VimApplication {
   fun isMainThread(): Boolean
   fun invokeLater(action: () -> Unit, editor: VimEditor)
+  fun isUnitTest(): Boolean
 }
