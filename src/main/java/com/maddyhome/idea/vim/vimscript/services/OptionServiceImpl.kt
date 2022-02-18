@@ -25,7 +25,7 @@ import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.helper.localEditors
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.IjVimLocalOptions
-import com.maddyhome.idea.vim.newapi.VimEditor
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.newapi.VimLocalOptions
 import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType

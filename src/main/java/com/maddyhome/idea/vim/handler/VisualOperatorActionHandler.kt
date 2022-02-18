@@ -50,7 +50,7 @@ import com.maddyhome.idea.vim.helper.vimLastVisualOperatorRange
 import com.maddyhome.idea.vim.helper.vimSelectionStart
 import com.maddyhome.idea.vim.newapi.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
-import com.maddyhome.idea.vim.newapi.VimEditor
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 
@@ -132,11 +132,11 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
   }
 
   final override fun baseExecute(
-    editor: VimEditor,
-    caret: VimCaret,
-    context: ExecutionContext,
-    cmd: Command,
-    operatorArguments: OperatorArguments
+      editor: VimEditor,
+      caret: VimCaret,
+      context: ExecutionContext,
+      cmd: Command,
+      operatorArguments: OperatorArguments
   ): Boolean {
     logger.info("Execute visual command $cmd")
 

@@ -34,7 +34,7 @@ import com.maddyhome.idea.vim.helper.vimChangeActionSwitchMode
 import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.newapi.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
-import com.maddyhome.idea.vim.newapi.VimEditor
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.newapi.ij
 
 /**
@@ -77,11 +77,11 @@ sealed class ChangeEditorActionHandler : EditorActionHandlerBase(false) {
   }
 
   final override fun baseExecute(
-    editor: VimEditor,
-    caret: VimCaret,
-    context: ExecutionContext,
-    cmd: Command,
-    operatorArguments: OperatorArguments,
+      editor: VimEditor,
+      caret: VimCaret,
+      context: ExecutionContext,
+      cmd: Command,
+      operatorArguments: OperatorArguments,
   ): Boolean {
     // Here we have to save the last changed command. This should be done separately for each
     // call of the task, not for each caret. Currently there is no way to schedule any action

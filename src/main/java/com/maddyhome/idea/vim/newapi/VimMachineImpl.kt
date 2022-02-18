@@ -23,6 +23,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.common.OperatedRange
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.common.VimMachine
 import com.maddyhome.idea.vim.common.VimRange
 import com.maddyhome.idea.vim.group.MarkGroup

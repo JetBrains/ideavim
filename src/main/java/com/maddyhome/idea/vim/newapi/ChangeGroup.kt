@@ -25,7 +25,10 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.psi.util.PsiUtilBase
 import com.intellij.util.text.CharArrayUtil
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.LineDeleteShift
+import com.maddyhome.idea.vim.api.MutableVimEditor
 import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.EditorLine

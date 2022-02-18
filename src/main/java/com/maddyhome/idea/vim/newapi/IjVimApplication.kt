@@ -20,6 +20,7 @@ package com.maddyhome.idea.vim.newapi
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
+import com.maddyhome.idea.vim.api.VimEditor
 
 class IjVimApplication : VimApplication {
   override fun isMainThread(): Boolean {

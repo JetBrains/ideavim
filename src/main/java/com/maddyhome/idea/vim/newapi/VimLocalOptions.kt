@@ -18,6 +18,7 @@
 
 package com.maddyhome.idea.vim.newapi
 
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 
 interface VimLocalOptions {

@@ -20,7 +20,7 @@ package com.maddyhome.idea.vim.group;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.newapi.VimEditor;
+import com.maddyhome.idea.vim.api.VimEditor;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;

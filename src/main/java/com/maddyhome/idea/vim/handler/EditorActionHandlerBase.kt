@@ -28,7 +28,7 @@ import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.helper.noneOfEnum
 import com.maddyhome.idea.vim.newapi.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
-import com.maddyhome.idea.vim.newapi.VimEditor
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.newapi.vimLogger
 import org.jetbrains.annotations.NonNls
 import java.util.*
@@ -68,11 +68,11 @@ abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
   open val flags: EnumSet<CommandFlags> = noneOfEnum()
 
   abstract fun baseExecute(
-    editor: VimEditor,
-    caret: VimCaret,
-    context: ExecutionContext,
-    cmd: Command,
-    operatorArguments: OperatorArguments,
+      editor: VimEditor,
+      caret: VimCaret,
+      context: ExecutionContext,
+      cmd: Command,
+      operatorArguments: OperatorArguments,
   ): Boolean
 
   fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {

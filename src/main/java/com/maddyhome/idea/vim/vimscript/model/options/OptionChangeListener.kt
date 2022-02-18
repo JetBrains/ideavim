@@ -18,7 +18,7 @@
 
 package com.maddyhome.idea.vim.vimscript.model.options
 
-import com.maddyhome.idea.vim.newapi.VimEditor
+import com.maddyhome.idea.vim.api.VimEditor
 
 interface OptionChangeListener<T> {
 

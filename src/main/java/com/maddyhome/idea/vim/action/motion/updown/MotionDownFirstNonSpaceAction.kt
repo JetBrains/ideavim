@@ -30,7 +30,7 @@ import com.maddyhome.idea.vim.handler.toMotion
 import com.maddyhome.idea.vim.newapi.injector
 import com.maddyhome.idea.vim.newapi.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
-import com.maddyhome.idea.vim.newapi.VimEditor
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.newapi.ij
 
 class MotionDownFirstNonSpaceAction : MotionActionHandler.ForEachCaret() {

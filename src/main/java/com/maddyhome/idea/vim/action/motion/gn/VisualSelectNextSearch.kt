@@ -27,7 +27,7 @@ import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotionOrError
 import com.maddyhome.idea.vim.helper.noneOfEnum
 import com.maddyhome.idea.vim.newapi.ExecutionContext
-import com.maddyhome.idea.vim.newapi.VimEditor
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.newapi.ij
 import java.util.*
 
@@ -35,10 +35,10 @@ class VisualSelectNextSearch : MotionActionHandler.SingleExecution() {
   override val flags: EnumSet<CommandFlags> = noneOfEnum()
 
   override fun getOffset(
-    editor: VimEditor,
-    context: ExecutionContext,
-    argument: Argument?,
-    operatorArguments: OperatorArguments,
+      editor: VimEditor,
+      context: ExecutionContext,
+      argument: Argument?,
+      operatorArguments: OperatorArguments,
   ): Motion {
     return VimPlugin.getMotion().selectNextSearch(editor.ij, operatorArguments.count1, true).toMotionOrError()
   }

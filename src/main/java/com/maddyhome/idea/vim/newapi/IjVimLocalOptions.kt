@@ -19,6 +19,7 @@
 package com.maddyhome.idea.vim.newapi
 
 import com.intellij.openapi.util.Key
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 
 class IjVimLocalOptions : VimLocalOptions {

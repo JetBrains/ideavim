@@ -41,7 +41,7 @@ import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import com.maddyhome.idea.vim.newapi.ExecutionContext
 import com.maddyhome.idea.vim.newapi.IjNativeAction
 import com.maddyhome.idea.vim.newapi.NativeAction
-import com.maddyhome.idea.vim.newapi.VimEditor
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.annotations.NonNls
@@ -65,19 +65,19 @@ interface VimActionExecutor {
   fun executeAction(name: @NonNls String, context: ExecutionContext): Boolean
 
   fun executeCommand(
-    editor: VimEditor?,
-    runnable: Runnable,
-    name: @NlsContexts.Command String?,
-    groupId: Any?,
+      editor: VimEditor?,
+      runnable: Runnable,
+      name: @NlsContexts.Command String?,
+      groupId: Any?,
   )
 
   fun executeEsc(context: ExecutionContext): Boolean
 
   fun executeVimAction(
-    editor: VimEditor,
-    cmd: EditorActionHandlerBase,
-    context: ExecutionContext,
-    operatorArguments: OperatorArguments,
+      editor: VimEditor,
+      cmd: EditorActionHandlerBase,
+      context: ExecutionContext,
+      operatorArguments: OperatorArguments,
   )
 }
 
@@ -136,10 +136,10 @@ class IjActionExecutor : VimActionExecutor {
   }
 
   override fun executeCommand(
-    editor: VimEditor?,
-    runnable: Runnable,
-    name: @NlsContexts.Command String?,
-    groupId: Any?,
+      editor: VimEditor?,
+      runnable: Runnable,
+      name: @NlsContexts.Command String?,
+      groupId: Any?,
   ) {
     CommandProcessor.getInstance().executeCommand(editor?.ij?.project, runnable, name, groupId)
   }
@@ -149,10 +149,10 @@ class IjActionExecutor : VimActionExecutor {
   }
 
   override fun executeVimAction(
-    editor: VimEditor,
-    cmd: EditorActionHandlerBase,
-    context: ExecutionContext,
-    operatorArguments: OperatorArguments,
+      editor: VimEditor,
+      cmd: EditorActionHandlerBase,
+      context: ExecutionContext,
+      operatorArguments: OperatorArguments,
   ) {
     CommandProcessor.getInstance()
       .executeCommand(editor.ij.project,

@@ -43,7 +43,7 @@ import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.helper.vimSelectionStart
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.newapi.ExecutionContext
-import com.maddyhome.idea.vim.newapi.VimEditor
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.injector
 import com.maddyhome.idea.vim.newapi.vim
@@ -208,9 +208,9 @@ class ToHandlerMappingInfo(
     private val LOG = logger<ToHandlerMappingInfo>()
 
     private fun myFun(
-      shouldCalculateOffsets: Boolean,
-      editor: VimEditor,
-      startOffsets: Map<VimCaret, Offset>,
+        shouldCalculateOffsets: Boolean,
+        editor: VimEditor,
+        startOffsets: Map<VimCaret, Offset>,
     ) {
       val commandState = editor.commandState
       if (shouldCalculateOffsets && !commandState.commandBuilder.hasCurrentCommandPartArgument()) {

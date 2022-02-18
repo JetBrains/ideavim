@@ -18,6 +18,8 @@
 
 package com.maddyhome.idea.vim.newapi
 
+import com.maddyhome.idea.vim.api.VimEditor
+
 interface VimApplication {
   fun isMainThread(): Boolean
   fun invokeLater(action: () -> Unit, editor: VimEditor)
