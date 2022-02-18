@@ -15,66 +15,63 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.maddyhome.idea.vim.helper
 
-package com.maddyhome.idea.vim.helper;
+import javax.swing.KeyStroke
 
-import org.jetbrains.annotations.Nullable;
+class DigraphResult {
+  val result: Int
+  val stroke: KeyStroke?
+  var promptCharacter = 0.toChar()
+    private set
 
-import javax.swing.*;
-
-public class DigraphResult {
-  public static final int RES_HANDLED = 0;
-  public static final int RES_UNHANDLED = 1;
-  public static final int RES_DONE = 3;
-  public static final int RES_BAD = 4;
-
-  static final DigraphResult HANDLED_DIGRAPH = new DigraphResult(RES_HANDLED, '?');
-  static final DigraphResult HANDLED_LITERAL = new DigraphResult(RES_HANDLED, '^');
-  static final DigraphResult UNHANDLED = new DigraphResult(RES_UNHANDLED);
-  static final DigraphResult BAD = new DigraphResult(RES_BAD);
-
-  private final int result;
-  private final @Nullable KeyStroke stroke;
-  private char promptCharacter;
-
-  private DigraphResult(int result) {
-    this.result = result;
-    stroke = null;
+  private constructor(result: Int) {
+    this.result = result
+    stroke = null
   }
 
-  private DigraphResult(@SuppressWarnings("SameParameterValue") int result, char promptCharacter) {
-    this.result = result;
-    this.promptCharacter = promptCharacter;
-    stroke = null;
+  private constructor(result: Int, promptCharacter: Char) {
+    this.result = result
+    this.promptCharacter = promptCharacter
+    stroke = null
   }
 
-  private DigraphResult(@Nullable KeyStroke stroke) {
-    result = RES_DONE;
-    this.stroke = stroke;
+  private constructor(stroke: KeyStroke?) {
+    result = RES_DONE
+    this.stroke = stroke
   }
 
-  public static DigraphResult done(@Nullable KeyStroke stroke) {
-    // for some reason vim does not let to insert char 10 as a digraph, it inserts 10 instead
-    if (stroke == null || stroke.getKeyCode() != 10) {
-      return new DigraphResult(stroke);
-    } else {
-      return new DigraphResult(KeyStroke.getKeyStroke((char) 0));
+  companion object {
+    const val RES_HANDLED = 0
+    const val RES_UNHANDLED = 1
+    const val RES_DONE = 3
+    const val RES_BAD = 4
+
+    @JvmField
+    val HANDLED_DIGRAPH = DigraphResult(RES_HANDLED, '?')
+
+    @JvmField
+    val HANDLED_LITERAL = DigraphResult(RES_HANDLED, '^')
+
+    @JvmField
+    val UNHANDLED = DigraphResult(RES_UNHANDLED)
+
+    @JvmField
+    val BAD = DigraphResult(RES_BAD)
+
+    @JvmStatic
+    fun done(stroke: KeyStroke?): DigraphResult {
+      // for some reason vim does not let to insert char 10 as a digraph, it inserts 10 instead
+      return if (stroke == null || stroke.keyCode != 10) {
+        DigraphResult(stroke)
+      } else {
+        DigraphResult(KeyStroke.getKeyStroke(0.toChar()))
+      }
     }
-  }
 
-  public static DigraphResult handled(char promptCharacter) {
-    return new DigraphResult(RES_HANDLED, promptCharacter);
-  }
-
-  public @Nullable KeyStroke getStroke() {
-    return stroke;
-  }
-
-  public int getResult() {
-    return result;
-  }
-
-  public char getPromptCharacter() {
-    return promptCharacter;
+    @JvmStatic
+    fun handled(promptCharacter: Char): DigraphResult {
+      return DigraphResult(RES_HANDLED, promptCharacter)
+    }
   }
 }
