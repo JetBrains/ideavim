@@ -37,7 +37,7 @@ import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
-import com.maddyhome.idea.vim.helper.DigraphResult
+import com.maddyhome.idea.vim.common.DigraphResult
 import com.maddyhome.idea.vim.helper.MessageHelper.message
 import com.maddyhome.idea.vim.helper.RunnableHelper.runReadCommand
 import com.maddyhome.idea.vim.helper.RunnableHelper.runWriteCommand

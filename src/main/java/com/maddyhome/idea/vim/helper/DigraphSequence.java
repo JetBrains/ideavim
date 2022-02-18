@@ -21,6 +21,7 @@ package com.maddyhome.idea.vim.helper;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.common.DigraphResult;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.api.VimEditor;
 import com.maddyhome.idea.vim.vimscript.services.OptionConstants;
