@@ -20,10 +20,10 @@ package com.maddyhome.idea.vim.newapi
 
 import com.intellij.openapi.editor.Caret
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.common.EditorLine
-import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.common.EditorLine
+import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.common.offset
 import com.maddyhome.idea.vim.group.MotionGroup
 
@@ -35,7 +35,7 @@ class IjVimCaret(val caret: Caret) : VimCaret {
 
   override fun moveToOffset(offset: Int) {
     // TODO: 17.12.2021 Unpack internal actions
-      MotionGroup.moveCaret(caret.editor, caret, offset)
+    MotionGroup.moveCaret(caret.editor, caret, offset)
   }
 
   override fun offsetForLineStartSkipLeading(line: Int): Int {

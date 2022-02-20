@@ -190,8 +190,10 @@ class ToHandlerMappingInfo(
       }
     }
 
-    injector.actionExecutor.executeCommand(editor, { extensionHandler.execute(editor.ij, context.ij) },
-      "Vim " + extensionHandler.javaClass.simpleName, null)
+    injector.actionExecutor.executeCommand(
+      editor, { extensionHandler.execute(editor.ij, context.ij) },
+      "Vim " + extensionHandler.javaClass.simpleName, null
+    )
 
     if (extensionHandler.isRepeatable) {
       lastExtensionHandler = extensionHandler
@@ -208,9 +210,9 @@ class ToHandlerMappingInfo(
     private val LOG = logger<ToHandlerMappingInfo>()
 
     private fun myFun(
-        shouldCalculateOffsets: Boolean,
-        editor: VimEditor,
-        startOffsets: Map<VimCaret, Offset>,
+      shouldCalculateOffsets: Boolean,
+      editor: VimEditor,
+      startOffsets: Map<VimCaret, Offset>,
     ) {
       val commandState = editor.commandState
       if (shouldCalculateOffsets && !commandState.commandBuilder.hasCurrentCommandPartArgument()) {

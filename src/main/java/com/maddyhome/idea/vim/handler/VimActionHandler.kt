@@ -21,11 +21,11 @@ package com.maddyhome.idea.vim.handler
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
-import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.newapi.ij
 
 /**

@@ -44,7 +44,7 @@ class DigraphSequence {
   }
 
   fun isLiteralStart(key: KeyStroke): Boolean {
-    return digraphState == DIG_STATE_PENDING &&  // if state has changed, then it's not a start
+    return digraphState == DIG_STATE_PENDING && // if state has changed, then it's not a start
       (key.keyCode == KeyEvent.VK_V || key.keyCode == KeyEvent.VK_Q) && key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0
   }
 
@@ -66,8 +66,8 @@ class DigraphSequence {
     return when (digraphState) {
       DIG_STATE_PENDING -> {
         logger.debug("DIG_STATE_PENDING")
-        if (key.keyCode == KeyEvent.VK_BACK_SPACE
-          && injector.optionService.isSet(Scope.LOCAL(editor), OptionConstants.digraphName)
+        if (key.keyCode == KeyEvent.VK_BACK_SPACE &&
+          injector.optionService.isSet(Scope.LOCAL(editor), OptionConstants.digraphName)
         ) {
           digraphState = DIG_STATE_BACK_SPACE
         } else if (key.keyChar != KeyEvent.CHAR_UNDEFINED) {

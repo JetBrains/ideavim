@@ -20,10 +20,10 @@ package com.maddyhome.idea.vim.newapi
 
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.common.OperatedRange
-import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.common.OperatedRange
+import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.common.VimMachine
 import com.maddyhome.idea.vim.common.VimRange
 import com.maddyhome.idea.vim.group.MarkGroup
@@ -73,4 +73,3 @@ fun OperatedRange.toNormalizedTextRange(editor: Editor): TextRange {
     is OperatedRange.Characters -> TextRange(this.leftOffset.point, this.rightOffset.point)
   }
 }
-

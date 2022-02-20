@@ -45,15 +45,19 @@ class MarksCommandTest : VimTestCase() {
 
   // https://youtrack.jetbrains.com/issue/VIM-1684
   fun `test reselecting different text length`() {
-    configureByText("""
+    configureByText(
+      """
       # (response.get${c}_data(as_text=True))
       # (response.data.decode("utf-8"))
-    """.trimIndent())
+      """.trimIndent()
+    )
     typeText(parseKeys("vi)yjvi)pgv"))
-    assertState("""
+    assertState(
+      """
       # (response.get_data(as_text=True))
       # (response.get_data(as_text=True))
-    """.trimIndent())
+      """.trimIndent()
+    )
   }
 
   // https://youtrack.jetbrains.com/issue/VIM-2491

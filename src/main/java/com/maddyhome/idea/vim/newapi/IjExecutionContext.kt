@@ -34,4 +34,3 @@ val DataContext.vim
 
 val ExecutionContext.ij: DataContext
   get() = (this as IjExecutionContext).context
-

@@ -36,12 +36,12 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.actionSystem.DocCommandGroupId
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.openapi.util.NlsContexts
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
-import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.newapi.IjNativeAction
 import com.maddyhome.idea.vim.newapi.NativeAction
-import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.annotations.NonNls
@@ -65,10 +65,10 @@ interface VimActionExecutor {
   fun executeAction(name: @NonNls String, context: ExecutionContext): Boolean
 
   fun executeCommand(
-      editor: VimEditor?,
-      runnable: Runnable,
-      name: @NlsContexts.Command String?,
-      groupId: Any?,
+    editor: VimEditor?,
+    runnable: Runnable,
+    name: @NlsContexts.Command String?,
+    groupId: Any?,
   )
 
   fun executeEsc(context: ExecutionContext): Boolean
@@ -90,8 +90,10 @@ class IjActionExecutor : VimActionExecutor {
    */
   override fun executeAction(action: NativeAction, context: ExecutionContext): Boolean {
     val ijAction = (action as IjNativeAction).action
-    val event = AnActionEvent(null, context.ij, ActionPlaces.KEYBOARD_SHORTCUT, ijAction.templatePresentation.clone(),
-      ActionManager.getInstance(), 0)
+    val event = AnActionEvent(
+      null, context.ij, ActionPlaces.KEYBOARD_SHORTCUT, ijAction.templatePresentation.clone(),
+      ActionManager.getInstance(), 0
+    )
     if (ijAction is ActionGroup && !ijAction.canBePerformed(context.ij)) {
       // Some ActionGroups should not be performed, but shown as a popup
       val popup = JBPopupFactory.getInstance()
@@ -136,10 +138,10 @@ class IjActionExecutor : VimActionExecutor {
   }
 
   override fun executeCommand(
-      editor: VimEditor?,
-      runnable: Runnable,
-      name: @NlsContexts.Command String?,
-      groupId: Any?,
+    editor: VimEditor?,
+    runnable: Runnable,
+    name: @NlsContexts.Command String?,
+    groupId: Any?,
   ) {
     CommandProcessor.getInstance().executeCommand(editor?.ij?.project, runnable, name, groupId)
   }
@@ -155,10 +157,12 @@ class IjActionExecutor : VimActionExecutor {
     operatorArguments: OperatorArguments,
   ) {
     CommandProcessor.getInstance()
-      .executeCommand(editor.ij.project,
+      .executeCommand(
+        editor.ij.project,
         { cmd.execute(editor, getProjectAwareDataContext(editor.ij, context.ij).vim, operatorArguments) },
         cmd.id, DocCommandGroupId.noneGroupId(editor.ij.document), UndoConfirmationPolicy.DEFAULT,
-        editor.ij.document)
+        editor.ij.document
+      )
   }
 
   // This method is copied from com.intellij.openapi.editor.actionSystem.EditorAction.getProjectAwareDataContext
@@ -200,11 +204,13 @@ class IjActionExecutor : VimActionExecutor {
     }
 
     companion object {
-      private val keys = arrayOf<DataKey<*>>(CommonDataKeys.PROJECT,
+      private val keys = arrayOf<DataKey<*>>(
+        CommonDataKeys.PROJECT,
         PlatformCoreDataKeys.PROJECT_FILE_DIRECTORY,
         CommonDataKeys.EDITOR,
         CommonDataKeys.VIRTUAL_FILE,
-        CommonDataKeys.PSI_FILE)
+        CommonDataKeys.PSI_FILE
+      )
     }
   }
 }

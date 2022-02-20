@@ -18,6 +18,9 @@
 package com.maddyhome.idea.vim.action.motion.leftright
 
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.MotionType
@@ -28,9 +31,6 @@ import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.vimLastColumn
-import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.VimCaret
-import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.services.OptionConstants
@@ -38,18 +38,22 @@ import com.maddyhome.idea.vim.vimscript.services.OptionService
 
 class MotionLastScreenColumnAction : MotionActionHandler.ForEachCaret() {
   override fun getOffset(
-      editor: VimEditor,
-      caret: VimCaret,
-      context: ExecutionContext,
-      argument: Argument?,
-      operatorArguments: OperatorArguments,
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    argument: Argument?,
+    operatorArguments: OperatorArguments,
   ): Motion {
     var allow = false
     if (editor.ij.inInsertMode) {
       allow = true
     } else if (editor.ij.inVisualMode) {
-      val opt = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.LOCAL(editor),
-        OptionConstants.selectionName) as VimString).value
+      val opt = (
+        VimPlugin.getOptionService().getOptionValue(
+          OptionService.Scope.LOCAL(editor),
+          OptionConstants.selectionName
+        ) as VimString
+        ).value
       if (opt != "old") {
         allow = true
       }
@@ -58,10 +62,10 @@ class MotionLastScreenColumnAction : MotionActionHandler.ForEachCaret() {
   }
 
   override fun postMove(
-      editor: VimEditor,
-      caret: VimCaret,
-      context: ExecutionContext,
-      cmd: Command,
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    cmd: Command,
   ) {
     caret.ij.vimLastColumn = MotionGroup.LAST_COLUMN
   }

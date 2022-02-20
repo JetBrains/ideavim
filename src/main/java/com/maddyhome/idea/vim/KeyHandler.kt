@@ -23,6 +23,8 @@ import com.maddyhome.idea.vim.action.change.change.ChangeVisualCharacterAction
 import com.maddyhome.idea.vim.action.change.insert.InsertCompletedDigraphAction
 import com.maddyhome.idea.vim.action.change.insert.InsertCompletedLiteralAction
 import com.maddyhome.idea.vim.action.macro.ToggleRecordingAction
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandBuilder
@@ -33,11 +35,11 @@ import com.maddyhome.idea.vim.command.CurrentCommandState
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.MappingState
 import com.maddyhome.idea.vim.command.OperatorArguments
+import com.maddyhome.idea.vim.common.DigraphResult
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
-import com.maddyhome.idea.vim.common.DigraphResult
 import com.maddyhome.idea.vim.helper.MessageHelper.message
 import com.maddyhome.idea.vim.helper.RunnableHelper.runReadCommand
 import com.maddyhome.idea.vim.helper.RunnableHelper.runWriteCommand
@@ -50,9 +52,7 @@ import com.maddyhome.idea.vim.key.CommandNode
 import com.maddyhome.idea.vim.key.CommandPartNode
 import com.maddyhome.idea.vim.key.KeyMapping
 import com.maddyhome.idea.vim.key.Node
-import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.newapi.VimActionsInitiator
-import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.injector
 import com.maddyhome.idea.vim.newapi.vimLogger
@@ -345,7 +345,7 @@ class KeyHandler {
     // user has typed "dw" wait for the timeout, and then replay "d" and "w" without any mapping (which will of course
     // delete a word)
     if (injector.optionService
-        .isSet(OptionService.Scope.LOCAL(editor), OptionConstants.timeoutName, OptionConstants.timeoutName)
+      .isSet(OptionService.Scope.LOCAL(editor), OptionConstants.timeoutName, OptionConstants.timeoutName)
     ) {
       LOG.trace("Timeout is set. Schedule a mapping timer")
       // XXX There is a strange issue that reports that mapping state is empty at the moment of the function call.
@@ -425,7 +425,7 @@ class KeyHandler {
         """
                 Caught exception during ${mappingInfo.getPresentableString()}
                 ${e.message}
-          """.trimIndent()
+        """.trimIndent()
       )
     } catch (e: NotImplementedError) {
       injector.messages.showMessage(e.message)
@@ -434,7 +434,7 @@ class KeyHandler {
         """
                  Caught exception during ${mappingInfo.getPresentableString()}
                  ${e.message}
-          """.trimIndent()
+        """.trimIndent()
       )
     }
 
@@ -914,4 +914,3 @@ class KeyHandler {
     fun getInstance() = instance
   }
 }
-  
