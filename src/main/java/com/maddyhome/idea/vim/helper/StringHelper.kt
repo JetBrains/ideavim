@@ -179,7 +179,7 @@ object StringHelper {
    *
    *
    * Note that "\000" and "\x00" force end of the string (same for \\u, \U etc)
-  </C-W></xxx> */
+   </C-W></xxx> */
   fun parseVimString(vimString: String): String {
     val result = StringBuilder()
     var state = VimStringState.INIT
