@@ -17,7 +17,6 @@
  */
 package com.maddyhome.idea.vim.helper
 
-import com.intellij.openapi.util.text.StringUtil
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.CharacterHelper.isInvisibleControlCharacter
 import com.maddyhome.idea.vim.helper.CharacterHelper.isZeroWidthCharacter
@@ -28,6 +27,7 @@ import org.jetbrains.annotations.Contract
 import org.jetbrains.annotations.NonNls
 import java.awt.event.InputEvent
 import java.awt.event.KeyEvent
+import java.util.*
 import javax.swing.KeyStroke
 
 object StringHelper {
@@ -438,7 +438,7 @@ object StringHelper {
       name = if (containsDisplayUppercaseKeyNames(name)) {
         name.toUpperCase()
       } else {
-        StringUtil.capitalize(name)
+        capitalize(name)
       }
     }
     if (name == null) {
@@ -452,6 +452,16 @@ object StringHelper {
       }
     }
     return if (name != null) "<$prefix$name>" else "<<$key>>"
+  }
+
+  /**
+   * Capitalize the first letter of the sentence.
+   */
+  @Contract(pure = true)
+  fun capitalize(s: String): String {
+    if (s.isEmpty()) return s
+    if (s.length == 1) return s.toUpperCase(Locale.ENGLISH)
+    return if (Character.isUpperCase(s[0])) s else s[0].toUpperCase().toString() + s.substring(1)
   }
 
   fun toPrintableCharacters(keys: List<KeyStroke>): String {
