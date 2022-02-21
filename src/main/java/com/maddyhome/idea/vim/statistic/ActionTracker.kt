@@ -21,15 +21,12 @@ package com.maddyhome.idea.vim.statistic
 import com.intellij.internal.statistic.eventLog.EventLogGroup
 import com.intellij.internal.statistic.eventLog.events.EventFields
 import com.intellij.internal.statistic.service.fus.collectors.CounterUsagesCollector
-import com.intellij.openapi.actionSystem.ActionManager
 
 internal class ActionTracker : CounterUsagesCollector() {
   companion object {
-    private val actions = ActionManager.getInstance().getActionIdList("")
-
     private val GROUP = EventLogGroup("vim.actions", 1)
-    private val TRACKED_ACTIONS = GROUP.registerEvent("tracked", EventFields.String("action_id", actions))
-    private val COPIED_ACTIONS = GROUP.registerEvent("copied", EventFields.String("action_id", actions))
+    private val TRACKED_ACTIONS = GROUP.registerEvent("tracked", EventFields.StringValidatedByCustomRule("action_id", "action"))
+    private val COPIED_ACTIONS = GROUP.registerEvent("copied", EventFields.StringValidatedByCustomRule("action_id", "action"))
 
     fun logTrackedAction(actionId: String) {
       TRACKED_ACTIONS.log(actionId)
