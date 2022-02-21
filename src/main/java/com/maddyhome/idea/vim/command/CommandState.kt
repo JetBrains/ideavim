@@ -22,7 +22,6 @@ import com.maddyhome.idea.vim.common.DigraphResult
 import com.maddyhome.idea.vim.common.MappingMode
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.helper.DigraphSequence
-import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.VimNlsSafe
 import com.maddyhome.idea.vim.helper.localEditors
 import com.maddyhome.idea.vim.helper.noneOfEnum
@@ -311,7 +310,7 @@ class CommandState private constructor(private val editor: VimEditor?) {
       if (msg.isNotEmpty()) {
         msg.append(" - ")
       }
-      msg.append(MessageHelper.message("show.mode.recording"))
+      msg.append(injector.messages.message("show.mode.recording"))
     }
     injector.messages.showMode(msg.toString())
   }

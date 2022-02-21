@@ -23,6 +23,7 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.wm.WindowManager
 import com.maddyhome.idea.vim.api.VimMessages
+import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import java.awt.Toolkit
@@ -79,4 +80,6 @@ class IjVimMessages : VimMessages {
   }
 
   override fun isError(): Boolean = error
+
+  override fun message(key: String): String = MessageHelper.message(key)
 }
