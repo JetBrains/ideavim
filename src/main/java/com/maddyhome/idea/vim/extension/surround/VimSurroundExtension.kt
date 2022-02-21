@@ -39,7 +39,6 @@ import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.key.OperatorFunction
-import com.maddyhome.idea.vim.option.ClipboardOptionsData.IdeaputDisabler
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.ClipboardOptionHelper
 import org.jetbrains.annotations.NonNls
 import java.awt.event.KeyEvent
@@ -104,10 +103,10 @@ class VimSurroundExtension : VimExtension {
 
     override fun execute(editor: Editor, context: DataContext) {
       val charFrom = getChar(editor)
-      if (charFrom.toInt() == 0) return
+      if (charFrom.code == 0) return
 
       val charTo = getChar(editor)
-      if (charTo.toInt() == 0) return
+      if (charTo.code == 0) return
 
       val newSurround = getOrInputPair(charTo, editor) ?: return
       runWriteAction { change(editor, charFrom, newSurround) }
@@ -168,7 +167,7 @@ class VimSurroundExtension : VimExtension {
     override fun execute(editor: Editor, context: DataContext) {
       // Deleting surround is just changing the surrounding to "nothing"
       val charFrom = getChar(editor)
-      if (charFrom.toInt() == 0) return
+      if (charFrom.code == 0) return
 
       runWriteAction { CSurroundHandler.change(editor, charFrom, null) }
     }
@@ -177,7 +176,7 @@ class VimSurroundExtension : VimExtension {
   private class Operator : OperatorFunction {
     override fun apply(editor: Editor, context: DataContext, selectionType: SelectionType): Boolean {
       val c = getChar(editor)
-      if (c.toInt() == 0) return true
+      if (c.code == 0) return true
 
       val pair = getOrInputPair(c, editor) ?: return false
       // XXX: Will it work with line-wise or block-wise selections?
@@ -257,7 +256,7 @@ class VimSurroundExtension : VimExtension {
     private fun getChar(editor: Editor): Char {
       val key = inputKeyStroke(editor)
       val keyChar = key.keyChar
-      return if (keyChar == KeyEvent.CHAR_UNDEFINED || keyChar.toInt() == KeyEvent.VK_ESCAPE) {
+      return if (keyChar == KeyEvent.CHAR_UNDEFINED || keyChar.code == KeyEvent.VK_ESCAPE) {
         0.toChar()
       } else keyChar
     }

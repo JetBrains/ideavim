@@ -101,14 +101,14 @@ tasks {
     compileKotlin {
         kotlinOptions {
             jvmTarget = javaVersion
-            apiVersion = "1.4"
+            apiVersion = "1.5"
 //            allWarningsAsErrors = true
         }
     }
     compileTestKotlin {
         kotlinOptions {
             jvmTarget = javaVersion
-            apiVersion = "1.4"
+            apiVersion = "1.5"
 //            allWarningsAsErrors = true
         }
     }

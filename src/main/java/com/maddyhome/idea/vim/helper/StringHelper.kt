@@ -39,15 +39,15 @@ object StringHelper {
   /**
    * Fake key for <Plug> mappings </Plug>
    */
-  private const val VK_PLUG = KeyEvent.CHAR_UNDEFINED.toInt() - 1
-  const val VK_ACTION = KeyEvent.CHAR_UNDEFINED.toInt() - 2
+  private const val VK_PLUG = KeyEvent.CHAR_UNDEFINED.code - 1
+  const val VK_ACTION = KeyEvent.CHAR_UNDEFINED.code - 2
 
   private fun toEscapeNotation(key: KeyStroke): String? {
     val c = key.keyChar
     if (isControlCharacter(c)) {
-      return "^" + (c.toInt() + 'A'.toInt() - 1).toChar()
+      return "^" + (c.code + 'A'.code - 1).toChar()
     } else if (isControlKeyCode(key)) {
-      return "^" + (key.keyCode + 'A'.toInt() - 1).toChar()
+      return "^" + (key.keyCode + 'A'.code - 1).toChar()
     }
     return null
   }
@@ -56,14 +56,14 @@ object StringHelper {
   fun stringToKeys(s: @NonNls String): List<KeyStroke> {
     val res: MutableList<KeyStroke> = ArrayList()
     for (element in s) {
-      if (isControlCharacter(element) && element.toInt() != 10) {
-        if (element.toInt() == 0) {
+      if (isControlCharacter(element) && element.code != 10) {
+        if (element.code == 0) {
           // J is a special case, it's keycode is 0 because keycode 10 is reserved by \n
-          res.add(KeyStroke.getKeyStroke('J'.toInt(), InputEvent.CTRL_DOWN_MASK))
+          res.add(KeyStroke.getKeyStroke('J'.code, InputEvent.CTRL_DOWN_MASK))
         } else if (element == '\t') {
           res.add(KeyStroke.getKeyStroke('\t'))
         } else {
-          res.add(KeyStroke.getKeyStroke(element.toInt() + 'A'.toInt() - 1, InputEvent.CTRL_DOWN_MASK))
+          res.add(KeyStroke.getKeyStroke(element.code + 'A'.code - 1, InputEvent.CTRL_DOWN_MASK))
         }
       } else {
         res.add(KeyStroke.getKeyStroke(element))
@@ -89,22 +89,22 @@ object StringHelper {
       for (element in s) {
         when (state) {
           KeyParserState.INIT -> when (element) {
-              '\\' -> state = KeyParserState.ESCAPE
-              '<', '«' -> {
-                  specialKeyStart = element
-                  state = KeyParserState.SPECIAL
-                  specialKeyBuilder = StringBuilder()
+            '\\' -> state = KeyParserState.ESCAPE
+            '<', '«' -> {
+              specialKeyStart = element
+              state = KeyParserState.SPECIAL
+              specialKeyBuilder = StringBuilder()
+            }
+            else -> {
+              val stroke: KeyStroke = if (element == '\t' || element == '\n') {
+                KeyStroke.getKeyStroke(element.code, 0)
+              } else if (isControlCharacter(element)) {
+                KeyStroke.getKeyStroke(element.code + 'A'.code - 1, InputEvent.CTRL_DOWN_MASK)
+              } else {
+                KeyStroke.getKeyStroke(element)
               }
-              else -> {
-                  val stroke: KeyStroke = if (element == '\t' || element == '\n') {
-                    KeyStroke.getKeyStroke(element.toInt(), 0)
-                  } else if (isControlCharacter(element)) {
-                    KeyStroke.getKeyStroke(element.toInt() + 'A'.toInt() - 1, InputEvent.CTRL_DOWN_MASK)
-                  } else {
-                    KeyStroke.getKeyStroke(element)
-                  }
-                  result.add(stroke)
-              }
+              result.add(stroke)
+            }
           }
           KeyParserState.ESCAPE -> {
             state = KeyParserState.INIT
@@ -116,7 +116,7 @@ object StringHelper {
           KeyParserState.SPECIAL -> if (element == '>' || element == '»') {
             state = KeyParserState.INIT
             val specialKeyName = specialKeyBuilder.toString()
-            val lower = specialKeyName.toLowerCase()
+            val lower = specialKeyName.lowercase(Locale.getDefault())
             require("sid" != lower) { "<$specialKeyName> is not supported" }
             if ("comma" == lower) {
               result.add(KeyStroke.getKeyStroke(','))
@@ -193,7 +193,7 @@ object StringHelper {
       when (state) {
         VimStringState.INIT -> if (c == '\\') {
           state = VimStringState.ESCAPE
-        } else if (c.toInt() == 0) {
+        } else if (c.code == 0) {
           i = vimStringWithForceEnd.length
         } else {
           result.append(c)
@@ -240,7 +240,7 @@ object StringHelper {
           } else if (c == '<') {
             state = VimStringState.SPECIAL
             specialKeyBuilder = StringBuilder()
-          } else if (c.toInt() == 0) {
+          } else if (c.code == 0) {
             i = vimStringWithForceEnd.length // force end of the string
           } else {
             result.append(c)
@@ -305,7 +305,7 @@ object StringHelper {
           }
         }
         VimStringState.SPECIAL -> {
-          if (c.toInt() == 0) {
+          if (c.code == 0) {
             result.append(specialKeyBuilder)
           }
           if (c == '>') {
@@ -313,13 +313,13 @@ object StringHelper {
             if (specialKey != null) {
               var keyCode = specialKey.keyCode
               if (specialKey.keyCode == 0) {
-                keyCode = specialKey.keyChar.toInt()
+                keyCode = specialKey.keyChar.code
               } else if (specialKey.modifiers and InputEvent.CTRL_DOWN_MASK == InputEvent.CTRL_DOWN_MASK) {
-                keyCode = if (specialKey.keyCode == 'J'.toInt()) {
+                keyCode = if (specialKey.keyCode == 'J'.code) {
                   // 'J' is a special case, keycode 10 is \n char
                   0
                 } else {
-                  specialKey.keyCode - 'A'.toInt() + 1
+                  specialKey.keyCode - 'A'.code + 1
                 }
               }
               result.append(keyCode.toChar())
@@ -328,7 +328,7 @@ object StringHelper {
             }
             specialKeyBuilder = StringBuilder()
             state = VimStringState.INIT
-          } else if (c.toInt() == 0) {
+          } else if (c.code == 0) {
             result.append("<").append(specialKeyBuilder)
             state = VimStringState.INIT
           } else {
@@ -344,16 +344,16 @@ object StringHelper {
   @Contract(pure = true)
   private fun octalDigitToNumber(c: Char): Int? {
     return if (c in '0'..'7') {
-      c.toInt() - '0'.toInt()
+      c.code - '0'.code
     } else null
   }
 
   private fun hexDigitToNumber(c: Char): Int? {
     val lowerChar = Character.toLowerCase(c)
     if (Character.isDigit(lowerChar)) {
-      return lowerChar.toInt() - '0'.toInt()
+      return lowerChar.code - '0'.code
     } else if (lowerChar in 'a'..'f') {
-      return lowerChar.toInt() - 'a'.toInt() + 10
+      return lowerChar.code - 'a'.code + 10
     }
     return null
   }
@@ -391,16 +391,17 @@ object StringHelper {
     if (key.keyChar != KeyEvent.CHAR_UNDEFINED) {
       return key.keyChar
     } else if (key.modifiers and InputEvent.CTRL_DOWN_MASK == InputEvent.CTRL_DOWN_MASK) {
-      return if (key.keyCode == 'J'.toInt()) {
+      return if (key.keyCode == 'J'.code) {
         // 'J' is a special case, keycode 10 is \n char
         0.toChar()
       } else {
-        (key.keyCode - 'A'.toInt() + 1).toChar()
+        (key.keyCode - 'A'.code + 1).toChar()
       }
     }
     return key.keyCode.toChar()
   }
 
+  @JvmStatic
   fun toKeyNotation(keys: List<KeyStroke>): String {
     if (keys.isEmpty()) {
       return "<Nop>"
@@ -436,7 +437,7 @@ object StringHelper {
     var name = getVimKeyValue(keyCode)
     if (name != null) {
       name = if (containsDisplayUppercaseKeyNames(name)) {
-        name.toUpperCase()
+        name.uppercase(Locale.getDefault())
       } else {
         capitalize(name)
       }
@@ -491,12 +492,12 @@ object StringHelper {
     if (c == KeyEvent.CHAR_UNDEFINED && key.modifiers == 0) {
       c = key.keyCode.toChar()
     } else if (c == KeyEvent.CHAR_UNDEFINED && key.modifiers and InputEvent.CTRL_DOWN_MASK != 0) {
-      c = (key.keyCode - 'A'.toInt() + 1).toChar()
+      c = (key.keyCode - 'A'.code + 1).toChar()
     }
-    if (c.toInt() <= 31) {
-      return "^" + (c.toInt() + 'A'.toInt() - 1).toChar()
-    } else if (c.toInt() == 127) {
-      return "^" + (c.toInt() - 'A'.toInt() + 1).toChar()
+    if (c.code <= 31) {
+      return "^" + (c.code + 'A'.code - 1).toChar()
+    } else if (c.code == 127) {
+      return "^" + (c.code - 'A'.code + 1).toChar()
       // Vim doesn't use these representations unless :set encoding=latin1. Technically, we could use them if the
       // encoding of the buffer for the mark, jump or :ascii char is. But what encoding would we use for registers?
       // Since we support Unicode, just treat everything as Unicode.
@@ -507,7 +508,7 @@ object StringHelper {
 //    } else if (c == 255) {
 //      return "~" + (char)(c - (('A' - 1) * 3));
     } else if (isInvisibleControlCharacter(c) || isZeroWidthCharacter(c)) {
-      return String.format("<%04x>", c.toInt())
+      return String.format("<%04x>", c.code)
     }
     return c.toString()
   }
@@ -523,7 +524,7 @@ object StringHelper {
 
   @JvmStatic
   fun isCloseKeyStroke(key: KeyStroke): Boolean {
-    return key.keyCode == KeyEvent.VK_ESCAPE || key.keyChar.toInt() == KeyEvent.VK_ESCAPE || key.keyCode == KeyEvent.VK_C && key.modifiers and InputEvent.CTRL_DOWN_MASK != 0 || key.keyCode == '['.toInt() && key.modifiers and InputEvent.CTRL_DOWN_MASK != 0
+    return key.keyCode == KeyEvent.VK_ESCAPE || key.keyChar.code == KeyEvent.VK_ESCAPE || key.keyCode == KeyEvent.VK_C && key.modifiers and InputEvent.CTRL_DOWN_MASK != 0 || key.keyCode == '['.code && key.modifiers and InputEvent.CTRL_DOWN_MASK != 0
   }
 
   /**
@@ -553,7 +554,7 @@ object StringHelper {
   }
 
   private fun parseSpecialKey(s: String, modifiers: Int): KeyStroke? {
-    val lower = s.toLowerCase()
+    val lower = s.lowercase(Locale.getDefault())
     val keyCode = getVimKeyName(lower)
     val typedChar = getVimTypedKeyName(lower)
     if (keyCode != null) {
@@ -662,7 +663,7 @@ object StringHelper {
     } else if (modifiers == InputEvent.SHIFT_DOWN_MASK && Character.isLetter(c)) {
       KeyStroke.getKeyStroke(Character.toUpperCase(c))
     } else {
-      KeyStroke.getKeyStroke(Character.toUpperCase(c).toInt(), modifiers)
+      KeyStroke.getKeyStroke(Character.toUpperCase(c).code, modifiers)
     }
   }
 

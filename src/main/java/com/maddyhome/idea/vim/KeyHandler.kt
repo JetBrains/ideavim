@@ -61,7 +61,6 @@ import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
-import java.awt.event.ActionEvent
 import java.awt.event.InputEvent
 import java.awt.event.KeyEvent
 import java.util.function.Consumer
@@ -354,7 +353,7 @@ class KeyHandler {
       //   But this "unexpected behaviour" exists and it would be better not to relay on mutable state with delays.
       //   https://youtrack.jetbrains.com/issue/VIM-2392
       val ijEditor = editor.ij
-      mappingState.startMappingTimer { actionEvent: ActionEvent? ->
+      mappingState.startMappingTimer {
         injector.application.invokeLater(
           {
             LOG.debug("Delayed mapping timer call")
@@ -561,21 +560,21 @@ class KeyHandler {
   }
 
   private fun handleCharArgument(key: KeyStroke, chKey: Char, commandState: CommandState) {
-    var chKey = chKey
+    var mutableChKey = chKey
     LOG.trace("Handling char argument")
     // We are expecting a character argument - is this a regular character the user typed?
     // Some special keys can be handled as character arguments - let's check for them here.
-    if (chKey.toInt() == 0) {
+    if (mutableChKey.code == 0) {
       when (key.keyCode) {
-        KeyEvent.VK_TAB -> chKey = '\t'
-        KeyEvent.VK_ENTER -> chKey = '\n'
+        KeyEvent.VK_TAB -> mutableChKey = '\t'
+        KeyEvent.VK_ENTER -> mutableChKey = '\n'
       }
     }
     val commandBuilder = commandState.commandBuilder
-    if (chKey.toInt() != 0) {
+    if (mutableChKey.code != 0) {
       LOG.trace("Add character argument to the current command")
       // Create the character argument, add it to the current command, and signal we are ready to process the command
-      commandBuilder.completeCommandPart(Argument(chKey))
+      commandBuilder.completeCommandPart(Argument(mutableChKey))
     } else {
       LOG.trace("This is not a valid character argument. Set command state to BAD_COMMAND")
       // Oops - this isn't a valid character argument
@@ -789,6 +788,7 @@ class KeyHandler {
         commandBuilder.commandState = CurrentCommandState.NEW_COMMAND
         editorState.pushModes(CommandState.Mode.CMD_LINE, CommandState.SubMode.NONE)
       }
+      else -> Unit
     }
 
     // Another special case. Force a mode change to update the caret shape

@@ -54,11 +54,11 @@ object KeywordOptionHelper {
   }
 
   fun isKeyword(c: Char): Boolean {
-    if (c.toInt() >= '\u0100'.toInt()) {
+    if (c.code >= '\u0100'.code) {
       return true
     }
     for (spec in keywordSpecs) {
-      if (spec.contains(c.toInt())) {
+      if (spec.contains(c.code)) {
         return !spec.negate()
       }
     }
@@ -172,7 +172,7 @@ object KeywordOptionHelper {
       return if (NumberUtils.isNumber(str)) {
         str.toInt() // If we have a number, it represents the Unicode code point of a letter
       } else {
-        str[0].toInt() // If it's not a number we should only have strings consisting of one char
+        str[0].code // If it's not a number we should only have strings consisting of one char
       }
     }
 

@@ -131,7 +131,7 @@ object ExEditorKit : DefaultEditorKit() {
         val key = convert(e)
         if (key != null) {
           val c = key.keyChar
-          if (c.toInt() > 0) {
+          if (c.code > 0) {
             if (target.useHandleKeyFromEx) {
               val entry = ExEntryPanel.getInstance().entry
               val editor = entry.editor
@@ -157,7 +157,7 @@ object ExEditorKit : DefaultEditorKit() {
       val ch = cmd[0]
       if (ch < ' ') {
         if (mods and ActionEvent.CTRL_MASK != 0) {
-          return KeyStroke.getKeyStroke(KeyEvent.VK_A + ch.toInt() - 1, mods)
+          return KeyStroke.getKeyStroke(KeyEvent.VK_A + ch.code - 1, mods)
         }
       } else {
         return KeyStroke.getKeyStroke(Character.valueOf(ch), mods)

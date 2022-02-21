@@ -27,6 +27,7 @@ import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
+import java.util.*
 
 /**
  * @author smartbomb
@@ -36,7 +37,7 @@ data class ActionListCommand(val ranges: Ranges, val argument: String) : Command
 
   override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
     val lineSeparator = "\n"
-    val searchPattern = argument.trim().toLowerCase().split("*")
+    val searchPattern = argument.trim().lowercase(Locale.getDefault()).split("*")
     val actionManager = ActionManager.getInstance()
 
     val actions = actionManager.getActionIdList("")
@@ -47,7 +48,7 @@ data class ActionListCommand(val ranges: Ranges, val argument: String) : Command
         }
         if (shortcuts.isBlank()) actionName else "${actionName.padEnd(50)} $shortcuts"
       }
-      .filter { line -> searchPattern.all { it in line.toLowerCase() } }
+      .filter { line -> searchPattern.all { it in line.lowercase(Locale.getDefault()) } }
       .joinToString(lineSeparator)
 
     ExOutputModel.getInstance(editor).output(MessageHelper.message("ex.show.all.actions.0.1", lineSeparator, actions))

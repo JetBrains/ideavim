@@ -18,11 +18,13 @@
 
 package com.maddyhome.idea.vim.vimscript.model.datatypes
 
+import java.util.*
+
 data class VimString(val value: String) : VimDataType() {
 
   // todo refactoring
   override fun asDouble(): Double {
-    val text: String = value.toLowerCase()
+    val text: String = value.lowercase(Locale.getDefault())
     val intString = StringBuilder()
 
     if (text.startsWith("0x")) {

@@ -29,6 +29,7 @@ import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.inBlockSubMode
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
+import java.util.*
 
 /**
  * @author Alex Selesse
@@ -110,8 +111,8 @@ data class SortCommand(val ranges: Ranges, val argument: String) : Command.Singl
         o1ToCompare = tmp
       }
       if (myIgnoreCase) {
-        o1ToCompare = o1ToCompare.toUpperCase()
-        o2ToCompare = o2ToCompare.toUpperCase()
+        o1ToCompare = o1ToCompare.uppercase(Locale.getDefault())
+        o2ToCompare = o2ToCompare.uppercase(Locale.getDefault())
       }
       return if (myNumber) StringUtil.naturalCompare(o1ToCompare, o2ToCompare) else o1ToCompare.compareTo(o2ToCompare)
     }

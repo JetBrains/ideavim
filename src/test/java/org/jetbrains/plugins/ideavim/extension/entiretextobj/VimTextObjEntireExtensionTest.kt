@@ -23,6 +23,7 @@ import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.helper.experimentalApi
 import org.jetbrains.plugins.ideavim.JavaVimTestCase
+import java.util.*
 
 /**
  * @author Alexandre Grison (@agrison)
@@ -159,6 +160,6 @@ I took the one less traveled by,
 And that has made all the difference.
 """
   private val poemNoCaret = poem.replace("<caret>", "")
-  private val poemUC = poemNoCaret.toUpperCase()
-  private val poemLC = poemNoCaret.toLowerCase()
+  private val poemUC = poemNoCaret.uppercase(Locale.getDefault())
+  private val poemLC = poemNoCaret.lowercase(Locale.getDefault())
 }

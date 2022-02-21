@@ -215,7 +215,7 @@ class DigraphSequence {
     if (key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0) {
       val specialKeyCode = StringHelper.parseVimString("\\" + StringHelper.toKeyNotation(key))
       if (specialKeyCode.length == 1) {
-        return if (specialKeyCode[0].toInt() == 10) {
+        return if (specialKeyCode[0].code == 10) {
           KeyStroke.getKeyStroke(0.toChar())
         } else {
           KeyStroke.getKeyStroke(specialKeyCode[0])

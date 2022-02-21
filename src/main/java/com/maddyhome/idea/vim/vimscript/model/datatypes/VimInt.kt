@@ -18,6 +18,8 @@
 
 package com.maddyhome.idea.vim.vimscript.model.datatypes
 
+import java.util.*
+
 data class VimInt(val value: Int) : VimDataType() {
 
   constructor(octalDecimalOrHexNumber: String) : this(parseNumber(octalDecimalOrHexNumber) ?: 0)
@@ -57,7 +59,7 @@ data class VimInt(val value: Int) : VimDataType() {
 }
 
 fun parseNumber(octalDecimalOrHexNumber: String): Int? {
-  val n = octalDecimalOrHexNumber.toLowerCase()
+  val n = octalDecimalOrHexNumber.lowercase(Locale.getDefault())
   return when {
     n.matches(Regex("[-]?0[x][0-9a-f]+")) -> n.replaceFirst("0x", "").toInt(16)
     n.matches(Regex("[-]?[0][0-7]+")) -> n.toInt(8)

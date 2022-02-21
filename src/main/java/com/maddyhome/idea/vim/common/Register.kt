@@ -47,7 +47,7 @@ class Register {
   ) {
     this.name = name
     this.type = type
-    this.keys = StringHelper.stringToKeys(text)
+    this.keys = StringHelper.stringToKeys(text).toMutableList()
     this.transferableData = transferableData
     this.rawText = text
   }
@@ -61,7 +61,7 @@ class Register {
   ) {
     this.name = name
     this.type = type
-    this.keys = StringHelper.stringToKeys(text)
+    this.keys = StringHelper.stringToKeys(text).toMutableList()
     this.transferableData = transferableData
     this.rawText = rawText
   }
@@ -96,7 +96,7 @@ class Register {
     private const val ORDER = "\"0123456789abcdefghijklmnopqrstuvwxyz-*+.:%#/="
 
     override fun compare(o1: Register, o2: Register): Int {
-      return ORDER.indexOf(o1.name.toLowerCase()) - ORDER.indexOf(o2.name.toLowerCase())
+      return ORDER.indexOf(o1.name.lowercaseChar()) - ORDER.indexOf(o2.name.lowercaseChar())
     }
   }
 }
