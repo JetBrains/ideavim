@@ -16,14 +16,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.newapi
+package com.maddyhome.idea.vim.group;
 
-import com.maddyhome.idea.vim.api.VimEditor
-import javax.swing.KeyStroke
-
-interface VimApplication {
-  fun isMainThread(): Boolean
-  fun invokeLater(action: () -> Unit, editor: VimEditor)
-  fun isUnitTest(): Boolean
-  fun postKey(stroke: KeyStroke, editor: VimEditor)
+public interface VimDigraphGroup {
+  char getDigraph(char ch1, char ch2);
 }

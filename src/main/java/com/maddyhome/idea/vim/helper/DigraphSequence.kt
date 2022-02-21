@@ -17,12 +17,10 @@
  */
 package com.maddyhome.idea.vim.helper
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.common.DigraphResult
 import com.maddyhome.idea.vim.common.DigraphResult.Companion.done
 import com.maddyhome.idea.vim.common.DigraphResult.Companion.handled
-import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.injector
 import com.maddyhome.idea.vim.newapi.vimLogger
 import com.maddyhome.idea.vim.vimscript.services.OptionConstants
@@ -79,7 +77,7 @@ class DigraphSequence {
         logger.debug("DIG_STATE_BACK_SPACE")
         digraphState = DIG_STATE_PENDING
         if (key.keyChar != KeyEvent.CHAR_UNDEFINED) {
-          val ch = VimPlugin.getDigraph().getDigraph(digraphChar, key.keyChar)
+          val ch = injector.digraphGroup.getDigraph(digraphChar, key.keyChar)
           digraphChar = 0.toChar()
           return done(KeyStroke.getKeyStroke(ch))
         }
@@ -99,7 +97,7 @@ class DigraphSequence {
         logger.debug("DIG_STATE_DIG_TWO")
         digraphState = DIG_STATE_PENDING
         if (key.keyChar != KeyEvent.CHAR_UNDEFINED) {
-          val ch = VimPlugin.getDigraph().getDigraph(digraphChar, key.keyChar)
+          val ch = injector.digraphGroup.getDigraph(digraphChar, key.keyChar)
           return done(KeyStroke.getKeyStroke(ch))
         }
         DigraphResult.BAD
@@ -194,7 +192,7 @@ class DigraphSequence {
           if (!injector.application.isUnitTest()) {
             // The key we received isn't part of the literal, so post it to be handled after we've handled the literal.
             // This requires swing, so we can't run it in tests.
-            VimPlugin.getMacro().postKey(key, (editor as IjVimEditor).editor)
+            injector.application.postKey(key, editor)
           }
           return done(code)
         } else if (codeCnt == 0) {

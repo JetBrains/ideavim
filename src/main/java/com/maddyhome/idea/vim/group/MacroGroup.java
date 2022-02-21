@@ -40,8 +40,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.util.List;
 
 /**
@@ -182,23 +180,6 @@ public class MacroGroup {
         }
       });
     }
-  }
-
-  public void postKey(@NotNull KeyStroke stroke, @NotNull Editor editor) {
-    final Component component = SwingUtilities.getAncestorOfClass(Window.class, editor.getComponent());
-    final KeyEvent event = createKeyEvent(stroke, component);
-    ApplicationManager.getApplication().invokeLater(() -> {
-      if (logger.isDebugEnabled()) {
-        logger.debug("posting " + event);
-      }
-      Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(event);
-    });
-  }
-
-  private @NotNull KeyEvent createKeyEvent(@NotNull KeyStroke stroke, Component component) {
-    return new KeyEvent(component,
-                        stroke.getKeyChar() == KeyEvent.CHAR_UNDEFINED ? KeyEvent.KEY_PRESSED : KeyEvent.KEY_TYPED,
-                        System.currentTimeMillis(), stroke.getModifiers(), stroke.getKeyCode(), stroke.getKeyChar());
   }
 
   public char getLastRegister() {

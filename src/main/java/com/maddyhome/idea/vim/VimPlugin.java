@@ -172,7 +172,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   }
 
   public static @NotNull DigraphGroup getDigraph() {
-    return ApplicationManager.getApplication().getService(DigraphGroup.class);
+    return (DigraphGroup)VimInjectorKt.getInjector().getDigraphGroup();
   }
 
   public static @NotNull HistoryGroup getHistory() {

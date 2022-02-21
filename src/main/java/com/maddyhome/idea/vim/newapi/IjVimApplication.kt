@@ -22,6 +22,12 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.components.Service
 import com.maddyhome.idea.vim.api.VimEditor
+import java.awt.Component
+import java.awt.Toolkit
+import java.awt.Window
+import java.awt.event.KeyEvent
+import javax.swing.KeyStroke
+import javax.swing.SwingUtilities
 
 @Service
 class IjVimApplication : VimApplication {
@@ -29,12 +35,33 @@ class IjVimApplication : VimApplication {
     return ApplicationManager.getApplication().isDispatchThread
   }
 
-  override fun invokeLater(runnable: () -> Unit, editor: VimEditor) {
+  override fun invokeLater(action: () -> Unit, editor: VimEditor) {
     ApplicationManager.getApplication()
-      .invokeLater(runnable, ModalityState.stateForComponent((editor as IjVimEditor).editor.component))
+      .invokeLater(action, ModalityState.stateForComponent((editor as IjVimEditor).editor.component))
   }
 
   override fun isUnitTest(): Boolean {
     return ApplicationManager.getApplication().isUnitTestMode
+  }
+
+  override fun postKey(stroke: KeyStroke, editor: VimEditor) {
+    val component: Component = SwingUtilities.getAncestorOfClass(Window::class.java, editor.ij.component)
+    val event = createKeyEvent(stroke, component)
+    ApplicationManager.getApplication().invokeLater {
+      if (logger.isDebug()) {
+        logger.debug("posting $event")
+      }
+      Toolkit.getDefaultToolkit().systemEventQueue.postEvent(event)
+    }
+  }
+
+  private fun createKeyEvent(stroke: KeyStroke, component: Component): KeyEvent {
+    return KeyEvent(component,
+      if (stroke.keyChar == KeyEvent.CHAR_UNDEFINED) KeyEvent.KEY_PRESSED else KeyEvent.KEY_TYPED,
+      System.currentTimeMillis(), stroke.modifiers, stroke.keyCode, stroke.keyChar)
+  }
+
+  companion object {
+    private val logger = vimLogger<IjVimApplication>()
   }
 }

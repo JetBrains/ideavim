@@ -30,11 +30,12 @@ import javax.swing.*;
 import java.util.HashMap;
 import java.util.TreeMap;
 
-public class DigraphGroup {
+public class DigraphGroup implements VimDigraphGroup {
   public DigraphGroup() {
     loadDigraphs();
   }
 
+  @Override
   public char getDigraph(char ch1, char ch2) {
     String key = new String(new char[]{ch1, ch2});
     Character ch = digraphs.get(key);

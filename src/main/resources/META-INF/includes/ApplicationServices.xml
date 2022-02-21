@@ -12,7 +12,8 @@
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.ProcessGroup"
                         serviceInterface="com.maddyhome.idea.vim.group.VimProcessGroup"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.MacroGroup"/>
-    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.DigraphGroup"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.DigraphGroup"
+                        serviceInterface="com.maddyhome.idea.vim.group.VimDigraphGroup"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.HistoryGroup"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.KeyGroup"
                         serviceInterface="com.maddyhome.idea.vim.group.VimKeyGroup"/>

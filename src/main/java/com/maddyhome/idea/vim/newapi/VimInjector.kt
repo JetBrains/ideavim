@@ -27,6 +27,7 @@ import com.maddyhome.idea.vim.api.VimMessages
 import com.maddyhome.idea.vim.common.VimMachine
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.group.VimChangeGroup
+import com.maddyhome.idea.vim.group.VimDigraphGroup
 import com.maddyhome.idea.vim.group.VimKeyGroup
 import com.maddyhome.idea.vim.group.VimProcessGroup
 import com.maddyhome.idea.vim.group.VimRegisterGroup
@@ -46,6 +47,7 @@ interface VimInjector {
   val keyGroup: VimKeyGroup
   val application: VimApplication
   val executionContextManager: ExecutionContextManager
+  val digraphGroup: VimDigraphGroup
 
   val vimMachine: VimMachine
 
@@ -82,6 +84,8 @@ class IjVimInjector : VimInjector {
     get() = service<VimMachineImpl>()
   override val enabler: VimEnabler
     get() = service<IjVimEnabler>()
+  override val digraphGroup: VimDigraphGroup
+    get() = service()
 
   override val optionService: OptionService
     get() = service()
