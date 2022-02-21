@@ -156,6 +156,9 @@ interface VimEditor {
     editor: VimEditor,
     shiftType: LineDeleteShift,
   ): Pair<Pair<Offset, Offset>, LineDeleteShift>?
+
+  fun updateCaretsVisualAttributes()
+  fun updateCaretsVisualPosition()
 }
 
 interface MutableVimEditor : VimEditor {

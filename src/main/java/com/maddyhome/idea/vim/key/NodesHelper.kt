@@ -16,16 +16,10 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.newapi
+package com.maddyhome.idea.vim.key
 
-import com.maddyhome.idea.vim.api.VimEditor
-import javax.swing.KeyStroke
+import com.maddyhome.idea.vim.helper.StringHelper
 
-interface VimApplication {
-  fun isMainThread(): Boolean
-  fun invokeLater(action: () -> Unit, editor: VimEditor)
-  fun isUnitTest(): Boolean
-  fun postKey(stroke: KeyStroke, editor: VimEditor)
-
-  fun localEditors(): List<VimEditor>
+fun <T> Node<T>.addLeafs(keys: String, actionHolder: T) {
+  addLeafs(StringHelper.parseKeys(keys), actionHolder)
 }

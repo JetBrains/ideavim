@@ -55,6 +55,10 @@ class IjVimApplication : VimApplication {
     }
   }
 
+  override fun localEditors(): List<VimEditor> {
+    return com.maddyhome.idea.vim.helper.localEditors().map { IjVimEditor(it) }
+  }
+
   private fun createKeyEvent(stroke: KeyStroke, component: Component): KeyEvent {
     return KeyEvent(component,
       if (stroke.keyChar == KeyEvent.CHAR_UNDEFINED) KeyEvent.KEY_PRESSED else KeyEvent.KEY_TYPED,

@@ -22,11 +22,7 @@ import com.maddyhome.idea.vim.common.DigraphResult
 import com.maddyhome.idea.vim.common.MappingMode
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.helper.DigraphSequence
-import com.maddyhome.idea.vim.helper.VimNlsSafe
-import com.maddyhome.idea.vim.helper.localEditors
 import com.maddyhome.idea.vim.helper.noneOfEnum
-import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
-import com.maddyhome.idea.vim.helper.updateCaretsVisualPosition
 import com.maddyhome.idea.vim.helper.vimCommandState
 import com.maddyhome.idea.vim.key.CommandPartNode
 import com.maddyhome.idea.vim.newapi.VimActionsInitiator
@@ -139,10 +135,10 @@ class CommandState private constructor(private val editor: VimEditor?) {
 
   private fun onModeChanged() {
     if (editor != null) {
-      editor.ij.updateCaretsVisualAttributes()
-      editor.ij.updateCaretsVisualPosition()
+      editor.updateCaretsVisualAttributes()
+      editor.updateCaretsVisualPosition()
     } else {
-      localEditors().forEach { editor ->
+      injector.application.localEditors().forEach { editor ->
         editor.updateCaretsVisualAttributes()
         editor.updateCaretsVisualPosition()
       }
@@ -275,7 +271,6 @@ class CommandState private constructor(private val editor: VimEditor?) {
    *   be added. It's better not to compare the whole string but only
    *   the leading character(s).
    */
-  @VimNlsSafe
   fun toVimNotation(): String {
     return when (mode) {
       Mode.COMMAND -> "n"

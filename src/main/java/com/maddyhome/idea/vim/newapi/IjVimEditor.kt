@@ -31,6 +31,8 @@ import com.maddyhome.idea.vim.common.offset
 import com.maddyhome.idea.vim.helper.fileSize
 import com.maddyhome.idea.vim.helper.getTopLevelEditor
 import com.maddyhome.idea.vim.helper.inBlockSubMode
+import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
+import com.maddyhome.idea.vim.helper.updateCaretsVisualPosition
 
 class IjVimEditor(editor: Editor) : MutableLinearEditor() {
 
@@ -155,6 +157,14 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
         null
       }
     }
+  }
+
+  override fun updateCaretsVisualAttributes() {
+    editor.updateCaretsVisualAttributes()
+  }
+
+  override fun updateCaretsVisualPosition() {
+    editor.updateCaretsVisualPosition()
   }
 
   private fun Pair<Offset, Offset>.noGuard(editor: Editor): Boolean {
