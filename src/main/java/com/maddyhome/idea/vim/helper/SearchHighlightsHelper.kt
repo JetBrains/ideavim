@@ -36,6 +36,7 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import org.jetbrains.annotations.Contract
 import java.awt.Color
@@ -60,7 +61,7 @@ fun updateIncsearchHighlights(
 ): Int {
   val searchStartOffset =
     if (searchRange != null) EditorHelper.getLineStartOffset(editor, searchRange.startLine) else caretOffset
-  val showHighlights = VimPlugin.getOptionService().isSet(OptionService.Scope.LOCAL(IjVimEditor(editor)), OptionConstants.hlsearchName)
+  val showHighlights = VimPlugin.getOptionService().isSet(OptionScope.LOCAL(IjVimEditor(editor)), OptionConstants.hlsearchName)
   return updateSearchHighlights(pattern, false, showHighlights, searchStartOffset, searchRange, forwards, false)
 }
 
@@ -120,7 +121,7 @@ private fun updateSearchHighlights(
       } else if (shouldAddCurrentMatchSearchHighlight(pattern, showHighlights, initialOffset)) {
         // nohlsearch + incsearch
         val searchOptions = EnumSet.of(SearchOptions.WHOLE_FILE)
-        if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, OptionConstants.wrapscanName)) {
+        if (VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.wrapscanName)) {
           searchOptions.add(SearchOptions.WRAP)
         }
         if (shouldIgnoreSmartCase) searchOptions.add(SearchOptions.IGNORE_SMARTCASE)
@@ -182,7 +183,7 @@ private fun findClosestMatch(editor: Editor, results: List<TextRange>, initialOf
     }
     d2 - d1
   }
-  if (!VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, OptionConstants.wrapscanName)) {
+  if (!VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.wrapscanName)) {
     val start = max.startOffset
     if (forwards && start < initialOffset) {
       return -1

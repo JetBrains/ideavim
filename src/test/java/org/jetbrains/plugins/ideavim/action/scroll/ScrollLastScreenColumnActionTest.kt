@@ -24,6 +24,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.Assert
@@ -42,7 +43,7 @@ class ScrollLastScreenColumnActionTest : VimTestCase() {
   }
 
   fun `test scroll caret column to last screen column with sidescrolloff`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, OptionConstants.sidescrolloffName, VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.sidescrolloffName, VimInt(10))
     configureByColumns(200)
     typeText(StringHelper.parseKeys("100|", "ze"))
     assertVisibleLineBounds(0, 30, 109)
@@ -61,7 +62,7 @@ class ScrollLastScreenColumnActionTest : VimTestCase() {
   }
 
   fun `test scroll end of line to last screen column with sidescrolloff`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, OptionConstants.sidescrolloffName, VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.sidescrolloffName, VimInt(10))
     configureByColumns(200)
     typeText(StringHelper.parseKeys("$", "ze"))
     // See myFixture.editor.settings.additionalColumnsCount
@@ -70,7 +71,7 @@ class ScrollLastScreenColumnActionTest : VimTestCase() {
 
   fun `test scroll caret column to last screen column with sidescrolloff containing an inline inlay`() {
     // The offset should include space for the inlay
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, OptionConstants.sidescrolloffName, VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.sidescrolloffName, VimInt(10))
     configureByColumns(200)
     val inlay = addInlay(101, true, 5)
     typeText(StringHelper.parseKeys("100|", "ze"))

@@ -21,6 +21,7 @@ package com.maddyhome.idea.vim.helper
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.SearchHelper.findPositionOfFirstCharacter
 import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 
 enum class Direction(private val value: Int) {
@@ -200,7 +201,7 @@ private fun quoteChanges(chars: CharSequence, begin: Int) = sequence {
  * history, the smartcase option is applied, and `\<Work\>` will only match `Work`.
  */
 fun shouldIgnoreCase(pattern: String, ignoreSmartCaseOption: Boolean): Boolean {
-  val sc = VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, OptionConstants.smartcaseName) &&
+  val sc = VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.smartcaseName) &&
     !ignoreSmartCaseOption
-  return VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, OptionConstants.ignorecaseName) && !(sc && StringHelper.containsUpperCase(pattern))
+  return VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.ignorecaseName) && !(sc && StringHelper.containsUpperCase(pattern))
 }

@@ -23,6 +23,7 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
+import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 
 // Currently support only matchit
@@ -31,7 +32,7 @@ class PackaddCommand(val ranges: Ranges, val argument: String) : Command.SingleE
 
   override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
     if (argument == "matchit" || (argument.startsWith("!") && argument.drop(1).trim() == "matchit")) {
-      VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, "matchit")
+      VimPlugin.getOptionService().setOption(OptionScope.GLOBAL, "matchit")
     }
     return ExecutionResult.Success
   }

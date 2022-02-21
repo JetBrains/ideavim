@@ -25,6 +25,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import org.jetbrains.jetCheck.Generator
 import org.jetbrains.jetCheck.ImperativeCommand
@@ -56,7 +57,7 @@ class IncrementDecrementTest : VimPropertyTest() {
     setupChecks {
       this.neoVim.ignoredRegisters = setOf(':')
     }
-    VimPlugin.getOptionService().appendValue(OptionService.Scope.GLOBAL, OptionConstants.nrformatsName, "octal", OptionConstants.nrformatsName)
+    VimPlugin.getOptionService().appendValue(OptionScope.GLOBAL, OptionConstants.nrformatsName, "octal", OptionConstants.nrformatsName)
     PropertyChecker.checkScenarios {
       ImperativeCommand { env ->
         val number = env.generateValue(testNumberGenerator, "Generate %s number")

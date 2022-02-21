@@ -38,6 +38,7 @@ import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import java.util.*
 
@@ -58,7 +59,7 @@ open class MotionLastColumnAction : MotionActionHandler.ForEachCaret() {
     val allow = if (editor.ij.inVisualMode) {
       val opt = (
         VimPlugin.getOptionService().getOptionValue(
-          OptionService.Scope.LOCAL(editor),
+          OptionScope.LOCAL(editor),
           OptionConstants.selectionName
         ) as VimString
         ).value

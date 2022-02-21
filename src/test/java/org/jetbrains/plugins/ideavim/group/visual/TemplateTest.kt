@@ -40,6 +40,7 @@ import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.listener.VimListenerManager
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import org.jetbrains.plugins.ideavim.OptionValueType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -118,7 +119,7 @@ class TemplateTest : VimOptionTestCase(OptionConstants.idearefactormodeName) {
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test selectmode without template`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, OptionConstants.idearefactormodeName, VimString(
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.idearefactormodeName, VimString(
         OptionConstants.idearefactormode_visual))
     configureByJavaText(
       """

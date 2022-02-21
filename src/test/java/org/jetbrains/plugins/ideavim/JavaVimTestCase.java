@@ -32,7 +32,7 @@ import com.maddyhome.idea.vim.helper.TestInputModel;
 import com.maddyhome.idea.vim.newapi.IjExecutionContext;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
-import com.maddyhome.idea.vim.vimscript.services.OptionService;
+import com.maddyhome.idea.vim.options.OptionScope;
 import com.maddyhome.idea.vim.vimscript.services.VariableServiceImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -73,7 +73,7 @@ public abstract class JavaVimTestCase extends JavaCodeInsightFixtureTestCase {
 
   protected void enableExtensions(@NotNull String... extensionNames) {
     for (String name : extensionNames) {
-      VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL.INSTANCE, name,  name);
+      VimPlugin.getOptionService().setOption(OptionScope.GLOBAL.INSTANCE, name, name);
     }
   }
 

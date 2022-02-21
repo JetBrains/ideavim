@@ -24,7 +24,7 @@ import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.helper.VimNlsSafe;
 import com.maddyhome.idea.vim.vimscript.model.commands.SetCommand;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
-import com.maddyhome.idea.vim.vimscript.services.OptionService;
+import com.maddyhome.idea.vim.options.OptionScope;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -177,8 +177,8 @@ public abstract class ListOption<T> extends TextOption {
     if (!SetCommand.Companion.isExecutingCommand$IdeaVIM()) {
       try {
         String joinedValue = getValue();
-        if (!((VimString)VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, name)).getValue().equals(joinedValue)) {
-          VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, new VimString(joinedValue), name);
+        if (!((VimString)VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL.INSTANCE, name, name)).getValue().equals(joinedValue)) {
+          VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL.INSTANCE, name, new VimString(joinedValue), name);
         }
       }
       catch (Exception e) {
@@ -199,8 +199,8 @@ public abstract class ListOption<T> extends TextOption {
     try {
     String joinedValue = getValue();
     if (!((VimString)VimPlugin.getOptionService()
-      .getOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, name)).getValue().equals(joinedValue)) {
-      VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, new VimString(joinedValue), name);
+      .getOptionValue(OptionScope.GLOBAL.INSTANCE, name, name)).getValue().equals(joinedValue)) {
+      VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL.INSTANCE, name, new VimString(joinedValue), name);
     }
     } catch (Exception e) {}
 
@@ -219,8 +219,8 @@ public abstract class ListOption<T> extends TextOption {
     try {
     String joinedValue = getValue();
     if (!((VimString)VimPlugin.getOptionService()
-      .getOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, name)).getValue().equals(joinedValue)) {
-      VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, new VimString(joinedValue), name);
+      .getOptionValue(OptionScope.GLOBAL.INSTANCE, name, name)).getValue().equals(joinedValue)) {
+      VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL.INSTANCE, name, new VimString(joinedValue), name);
     }
     } catch (Exception e) {}
 
@@ -238,8 +238,8 @@ public abstract class ListOption<T> extends TextOption {
     try {
     String joinedValue = getValue();
     if (!((VimString)VimPlugin.getOptionService()
-      .getOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, name)).getValue().equals(joinedValue)) {
-      VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, new VimString(joinedValue), name);
+      .getOptionValue(OptionScope.GLOBAL.INSTANCE, name, name)).getValue().equals(joinedValue)) {
+      VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL.INSTANCE, name, new VimString(joinedValue), name);
     }
     } catch (Exception e) {}
 
@@ -296,8 +296,8 @@ public abstract class ListOption<T> extends TextOption {
       try {
       String joinedValue = getValue();
       if (!((VimString)VimPlugin.getOptionService()
-        .getOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, name)).getValue().equals(joinedValue)) {
-        VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, new VimString(joinedValue), name);
+        .getOptionValue(OptionScope.GLOBAL.INSTANCE, name, name)).getValue().equals(joinedValue)) {
+        VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL.INSTANCE, name, new VimString(joinedValue), name);
       }
       } catch (Exception e) {}
     }

@@ -44,6 +44,7 @@ import com.maddyhome.idea.vim.helper.vimSelectionStart
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 
 /**
@@ -283,7 +284,7 @@ class VisualMotionGroup {
   }
 
   val exclusiveSelection: Boolean
-    get() = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, OptionConstants.selectionName) as VimString).value == "exclusive"
+    get() = (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, OptionConstants.selectionName) as VimString).value == "exclusive"
   val selectionAdj: Int
     get() = if (exclusiveSelection) 0 else 1
 }

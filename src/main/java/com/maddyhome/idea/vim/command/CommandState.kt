@@ -28,6 +28,7 @@ import com.maddyhome.idea.vim.newapi.VimActionsInitiator
 import com.maddyhome.idea.vim.newapi.injector
 import com.maddyhome.idea.vim.newapi.vimLogger
 import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import org.jetbrains.annotations.Contract
 import java.util.*
@@ -298,7 +299,7 @@ class CommandState(private val editor: VimEditor?) {
 
   private fun doShowMode() {
     val msg = StringBuilder()
-    if (injector.optionService.isSet(OptionService.Scope.GLOBAL, OptionConstants.showmodeName)) {
+    if (injector.optionService.isSet(OptionScope.GLOBAL, OptionConstants.showmodeName)) {
       msg.append(getStatusString())
     }
     if (isRecording) {
@@ -386,7 +387,7 @@ class CommandState(private val editor: VimEditor?) {
 
     @JvmStatic
     fun getInstance(editor: VimEditor?): CommandState {
-      return if (editor == null || injector.optionService.isSet(OptionService.Scope.GLOBAL, OptionConstants.ideaglobalmodeName)) {
+      return if (editor == null || injector.optionService.isSet(OptionScope.GLOBAL, OptionConstants.ideaglobalmodeName)) {
         globalState
       } else {
         injector.commandStateFor(editor)

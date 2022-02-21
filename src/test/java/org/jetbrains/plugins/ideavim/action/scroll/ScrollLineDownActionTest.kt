@@ -23,6 +23,7 @@ import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -52,7 +53,7 @@ class ScrollLineDownActionTest : VimTestCase() {
   }
 
   fun `test scroll line down will maintain current column at start of line with sidescrolloff`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
     configureByPages(5)
     setPositionAndScroll(30, 50, 5)
     typeText(parseKeys("<C-E>"))
@@ -91,7 +92,7 @@ class ScrollLineDownActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll down uses scrolloff and moves cursor`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
     configureByPages(5)
     setPositionAndScroll(20, 30)
     typeText(parseKeys("<C-E>"))
@@ -100,7 +101,7 @@ class ScrollLineDownActionTest : VimTestCase() {
   }
 
   fun `test scroll down is not affected by scrolljump`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, OptionConstants.scrolljumpName, VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolljumpName, VimInt(10))
     configureByPages(5)
     setPositionAndScroll(20, 20)
     typeText(parseKeys("<C-E>"))
@@ -125,7 +126,7 @@ class ScrollLineDownActionTest : VimTestCase() {
   }
 
   fun `test scroll line down at end of file with virtual space and scrolloff`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
     configureByLines(100, "    I found it in a legendary land")
     setEditorVirtualSpace()
     setPositionAndScroll(75, 95, 4)

@@ -30,6 +30,7 @@ import com.maddyhome.idea.vim.helper.vimForEachCaret
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 
 class VisualToggleLineModeAction : VimActionHandler.SingleExecution() {
@@ -37,7 +38,7 @@ class VisualToggleLineModeAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override fun execute(editor: Editor, context: DataContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
-    val listOption = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.LOCAL(IjVimEditor(editor)), OptionConstants.selectmodeName) as VimString).value
+    val listOption = (VimPlugin.getOptionService().getOptionValue(OptionScope.LOCAL(IjVimEditor(editor)), OptionConstants.selectmodeName) as VimString).value
     return if ("cmd" in listOption) {
       VimPlugin.getVisualMotion().enterSelectMode(editor, CommandState.SubMode.VISUAL_LINE).also {
         editor.vimForEachCaret { it.vimSetSelection(it.offset) }

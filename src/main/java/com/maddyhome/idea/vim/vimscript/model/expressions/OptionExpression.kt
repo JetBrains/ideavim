@@ -25,14 +25,15 @@ import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
+import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 
 data class OptionExpression(val scope: Scope, val optionName: String) : Expression() {
 
   override fun evaluate(editor: Editor, context: DataContext, vimContext: VimLContext): VimDataType {
     return when (scope) {
-      Scope.GLOBAL_VARIABLE -> VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, optionName, originalString)
-      Scope.LOCAL_VARIABLE -> VimPlugin.getOptionService().getOptionValue(OptionService.Scope.LOCAL(IjVimEditor(editor)), optionName, originalString)
+      Scope.GLOBAL_VARIABLE -> VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, optionName, originalString)
+      Scope.LOCAL_VARIABLE -> VimPlugin.getOptionService().getOptionValue(OptionScope.LOCAL(IjVimEditor(editor)), optionName, originalString)
       else -> throw ExException("Invalid option scope")
     }
   }

@@ -30,6 +30,7 @@ import com.intellij.openapi.util.Key
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import java.util.*
 
@@ -174,5 +175,5 @@ fun vimEnabled(editor: Editor?): Boolean {
 fun vimDisabled(editor: Editor?): Boolean = !vimEnabled(editor)
 
 fun experimentalApi(): Boolean {
-  return VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, OptionConstants.experimentalapiName)
+  return VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.experimentalapiName)
 }

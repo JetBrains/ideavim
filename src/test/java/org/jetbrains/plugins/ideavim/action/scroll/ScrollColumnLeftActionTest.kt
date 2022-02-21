@@ -23,6 +23,7 @@ import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -77,7 +78,7 @@ class ScrollColumnLeftActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun`test scrolls column to left with sidescrolloff moves cursor`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, OptionConstants.sidescrolloffName, VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.sidescrolloffName, VimInt(10))
     configureByColumns(200)
     typeText(parseKeys("100|", "zs", "zl"))
     assertPosition(0, 100)
@@ -86,7 +87,7 @@ class ScrollColumnLeftActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun`test scroll column to left ignores sidescroll`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, OptionConstants.sidescrollName, VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.sidescrollName, VimInt(10))
     configureByColumns(200)
     typeText(parseKeys("100|"))
     // Assert we got initial scroll correct

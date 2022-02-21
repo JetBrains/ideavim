@@ -22,7 +22,7 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.helper.VimNlsSafe;
 import com.maddyhome.idea.vim.vimscript.model.commands.SetCommand;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt;
-import com.maddyhome.idea.vim.vimscript.services.OptionService;
+import com.maddyhome.idea.vim.options.OptionScope;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -97,8 +97,8 @@ public class ToggleOption extends Option<Boolean> {
     // we won't use OptionService if the method was invoked during set command execution (set command will call OptionService by itself)
     if (!SetCommand.Companion.isExecutingCommand$IdeaVIM()) {
       try {
-        if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL.INSTANCE, name, name) != val) {
-          VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, new VimInt(val ? 1 : 0), name);
+        if (VimPlugin.getOptionService().isSet(OptionScope.GLOBAL.INSTANCE, name, name) != val) {
+          VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL.INSTANCE, name, new VimInt(val ? 1 : 0), name);
         }
       }
       catch (Exception e) {
@@ -142,8 +142,8 @@ public class ToggleOption extends Option<Boolean> {
   public void resetDefault() {
     value = dflt;
     try {
-      if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL.INSTANCE, name, name) != dflt) {
-        VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, new VimInt(dflt ? 1 : 0), name);
+      if (VimPlugin.getOptionService().isSet(OptionScope.GLOBAL.INSTANCE, name, name) != dflt) {
+        VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL.INSTANCE, name, new VimInt(dflt ? 1 : 0), name);
       }
     } catch (Exception e) {}
   }

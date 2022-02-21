@@ -23,6 +23,7 @@ import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -67,7 +68,7 @@ class MotionFirstScreenLineActionTest : VimTestCase() {
   }
 
   fun `test move caret ignores scrolloff when top of screen is top of file`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
     configureByLines(50, "    I found it in a legendary land")
     setPositionAndScroll(0, 20)
     typeText(parseKeys("H"))
@@ -76,7 +77,7 @@ class MotionFirstScreenLineActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test move caret applies scrolloff when top of screen is not top of file`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
     configureByLines(50, "    I found it in a legendary land")
     setPositionAndScroll(1, 20)
     typeText(parseKeys("H"))
@@ -85,7 +86,7 @@ class MotionFirstScreenLineActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test move caret applies scrolloff when top of screen is not top of file 2`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(20, 40)
     typeText(parseKeys("H"))
@@ -93,7 +94,7 @@ class MotionFirstScreenLineActionTest : VimTestCase() {
   }
 
   fun `test move caret to first screen line with count and scrolloff at top of file`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
     configureByLines(50, "    I found it in a legendary land")
     setPositionAndScroll(0, 20)
     typeText(parseKeys("5H"))
@@ -102,7 +103,7 @@ class MotionFirstScreenLineActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test move caret to first screen line with count and scrolloff not at top of file`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(20, 40)
     typeText(parseKeys("5H"))
@@ -126,7 +127,7 @@ class MotionFirstScreenLineActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test operator pending acts to first screen line with nostartofline`() {
-    VimPlugin.getOptionService().unsetOption(OptionService.Scope.GLOBAL, OptionConstants.startoflineName)
+    VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.startoflineName)
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(20, 40, 10)
     typeText(parseKeys("dH"))
@@ -135,7 +136,7 @@ class MotionFirstScreenLineActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test operator pending acts on count line from top of screen with nostartofline`() {
-    VimPlugin.getOptionService().unsetOption(OptionService.Scope.GLOBAL, OptionConstants.startoflineName)
+    VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.startoflineName)
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(20, 40, 10)
     typeText(parseKeys("d5H"))
@@ -143,7 +144,7 @@ class MotionFirstScreenLineActionTest : VimTestCase() {
   }
 
   fun `test operator pending acts to first screen line and then scrolls scrolloff`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(20, 40)
     typeText(parseKeys("dH"))
@@ -153,7 +154,7 @@ class MotionFirstScreenLineActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test move caret to same column with nostartofline`() {
-    VimPlugin.getOptionService().unsetOption(OptionService.Scope.GLOBAL, OptionConstants.startoflineName)
+    VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.startoflineName)
     configureByLines(50, "    I found it in a legendary land")
     setPositionAndScroll(0, 20, 10)
     typeText(parseKeys("H"))
@@ -162,7 +163,7 @@ class MotionFirstScreenLineActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test move caret to end of shorter line with nostartofline`() {
-    VimPlugin.getOptionService().unsetOption(OptionService.Scope.GLOBAL, OptionConstants.startoflineName)
+    VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.startoflineName)
     configureByLines(70, "    I found it in a legendary land")
     setPositionAndScroll(10, 30, 10)
     typeText(parseKeys("A", " extra text", "<Esc>"))

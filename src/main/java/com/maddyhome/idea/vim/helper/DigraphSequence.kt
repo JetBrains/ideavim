@@ -24,7 +24,7 @@ import com.maddyhome.idea.vim.common.DigraphResult.Companion.handled
 import com.maddyhome.idea.vim.newapi.injector
 import com.maddyhome.idea.vim.newapi.vimLogger
 import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.vimscript.services.OptionService.Scope
+import com.maddyhome.idea.vim.options.OptionScope
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
@@ -65,7 +65,7 @@ class DigraphSequence {
       DIG_STATE_PENDING -> {
         logger.debug("DIG_STATE_PENDING")
         if (key.keyCode == KeyEvent.VK_BACK_SPACE &&
-          injector.optionService.isSet(Scope.LOCAL(editor), OptionConstants.digraphName)
+          injector.optionService.isSet(OptionScope.LOCAL(editor), OptionConstants.digraphName)
         ) {
           digraphState = DIG_STATE_BACK_SPACE
         } else if (key.keyChar != KeyEvent.CHAR_UNDEFINED) {

@@ -22,6 +22,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -70,7 +71,7 @@ class ScrollHalfPageDownActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun`test scroll downwards in bottom half of last page moves caret to the last line with scrolloff`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
     configureByPages(5)
     setPositionAndScroll(140, 164)
     typeText(parseKeys("<C-D>"))
@@ -110,12 +111,12 @@ class ScrollHalfPageDownActionTest : VimTestCase() {
     configureByPages(5)
     setPositionAndScroll(100, 110)
     typeText(parseKeys("10<C-D>"))
-    assertEquals((VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, OptionConstants.scrollName) as VimInt).value, 10)
+    assertEquals((VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, OptionConstants.scrollName) as VimInt).value, 10)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun`test scroll downwards uses scroll option`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, OptionConstants.scrollName, VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrollName, VimInt(10))
     configureByPages(5)
     setPositionAndScroll(100, 110)
     typeText(parseKeys("<C-D>"))
@@ -143,7 +144,7 @@ class ScrollHalfPageDownActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun`test scroll downwards keeps same column with nostartofline`() {
-    VimPlugin.getOptionService().unsetOption(OptionService.Scope.GLOBAL, OptionConstants.startoflineName)
+    VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.startoflineName)
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(20, 25, 14)
     typeText(parseKeys("<C-D>"))

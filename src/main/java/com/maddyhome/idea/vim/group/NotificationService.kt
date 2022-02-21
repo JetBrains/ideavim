@@ -45,6 +45,7 @@ import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
 import com.maddyhome.idea.vim.statistic.ActionTracker
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable
 import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import com.maddyhome.idea.vim.vimscript.services.VimRcService
 import java.awt.datatransfer.StringSelection
@@ -76,7 +77,7 @@ class NotificationService(private val project: Project?) {
         notification,
         "set clipboard+=ideaput",
         "ideaput"
-      ) { VimPlugin.getOptionService().appendValue(OptionService.Scope.GLOBAL, OptionConstants.clipboardName, OptionConstants.clipboard_ideaput, OptionConstants.clipboardName) }
+      ) { VimPlugin.getOptionService().appendValue(OptionScope.GLOBAL, OptionConstants.clipboardName, OptionConstants.clipboard_ideaput, OptionConstants.clipboardName) }
     )
 
     notification.notify(project)
@@ -96,7 +97,7 @@ class NotificationService(private val project: Project?) {
         notification,
         "set ideajoin",
         OptionConstants.ideajoinName
-      ) { VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, OptionConstants.ideajoinName) }
+      ) { VimPlugin.getOptionService().setOption(OptionScope.GLOBAL, OptionConstants.ideajoinName) }
     )
 
     notification.addAction(HelpLink(ideajoinExamplesUrl))
@@ -242,7 +243,7 @@ class NotificationService(private val project: Project?) {
 
     class StopTracking : DumbAwareAction("Stop Tracking") {
       override fun actionPerformed(e: AnActionEvent) {
-        VimPlugin.getOptionService().unsetOption(OptionService.Scope.GLOBAL, OptionConstants.trackactionidsName)
+        VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.trackactionidsName)
         notification?.expire()
       }
     }

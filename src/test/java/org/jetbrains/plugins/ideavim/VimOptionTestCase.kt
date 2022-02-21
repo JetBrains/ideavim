@@ -21,6 +21,7 @@ package org.jetbrains.plugins.ideavim
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
+import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 
 /**
@@ -60,8 +61,8 @@ abstract class VimOptionTestCase(option: String, vararg otherOptions: String) : 
 
       annotationValues.value.forEach {
         when (it.valueType) {
-          OptionValueType.STRING -> VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, it.optionName, VimString(it.value))
-          OptionValueType.NUMBER -> VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, it.optionName, VimInt(it.value))
+          OptionValueType.STRING -> VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, it.optionName, VimString(it.value))
+          OptionValueType.NUMBER -> VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, it.optionName, VimInt(it.value))
         }
       }
     }

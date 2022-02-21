@@ -24,6 +24,7 @@ import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.ui.ex.ExDocument
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -38,46 +39,46 @@ class ExEntryTest : VimTestCase() {
   }
 
   fun `test cancel entry`() {
-    assertFalse(VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, OptionConstants.incsearchName))
+    assertFalse(VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.incsearchName))
     typeExInput(":set incsearch<Esc>")
-    assertFalse(VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, OptionConstants.incsearchName))
+    assertFalse(VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.incsearchName))
     assertIsDeactivated()
 
     deactivateExEntry()
 
-    assertFalse(VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, OptionConstants.incsearchName))
+    assertFalse(VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.incsearchName))
     typeExInput(":set incsearch<C-[>")
-    assertFalse(VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, OptionConstants.incsearchName))
+    assertFalse(VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.incsearchName))
     assertIsDeactivated()
 
     deactivateExEntry()
 
-    assertFalse(VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, OptionConstants.incsearchName))
+    assertFalse(VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.incsearchName))
     typeExInput(":set incsearch<C-C>")
-    assertFalse(VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, OptionConstants.incsearchName))
+    assertFalse(VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.incsearchName))
     assertIsDeactivated()
   }
 
   fun `test complete entry`() {
-    assertFalse(VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, OptionConstants.incsearchName))
+    assertFalse(VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.incsearchName))
     typeExInput(":set incsearch<Enter>")
-    assertTrue(VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, OptionConstants.incsearchName))
+    assertTrue(VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.incsearchName))
     assertIsDeactivated()
 
     deactivateExEntry()
     VimPlugin.getOptionService().resetAllOptions()
 
-    assertFalse(VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, OptionConstants.incsearchName))
+    assertFalse(VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.incsearchName))
     typeExInput(":set incsearch<C-J>")
-    assertTrue(VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, OptionConstants.incsearchName))
+    assertTrue(VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.incsearchName))
     assertIsDeactivated()
 
     deactivateExEntry()
     VimPlugin.getOptionService().resetAllOptions()
 
-    assertFalse(VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, OptionConstants.incsearchName))
+    assertFalse(VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.incsearchName))
     typeExInput(":set incsearch<C-M>")
-    assertTrue(VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, OptionConstants.incsearchName))
+    assertTrue(VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.incsearchName))
     assertIsDeactivated()
   }
 

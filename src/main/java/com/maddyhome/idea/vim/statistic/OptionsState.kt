@@ -28,6 +28,7 @@ import com.intellij.internal.statistic.eventLog.events.VarargEventId
 import com.intellij.internal.statistic.service.fus.collectors.ApplicationUsagesCollector
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import com.maddyhome.idea.vim.vimscript.services.OptionServiceImpl
 
@@ -43,21 +44,21 @@ internal class OptionsState : ApplicationUsagesCollector() {
         IDEAJOIN withOption OptionConstants.ideajoinName,
         IDEAMARKS withOption OptionConstants.ideamarksName,
         IDEAREFACTOR withOption OptionConstants.idearefactormodeName,
-        IDEAPUT with optionService.contains(OptionService.Scope.GLOBAL, OptionConstants.clipboardName, "ideaput"),
+        IDEAPUT with optionService.contains(OptionScope.GLOBAL, OptionConstants.clipboardName, "ideaput"),
         IDEASTATUSICON withOption OptionConstants.ideastatusiconName,
         IDEAWRITE withOption OptionConstants.ideawriteName,
-        IDEASELECTION with optionService.contains(OptionService.Scope.GLOBAL, OptionConstants.selectmodeName, "ideaselection"),
-        IDEAVIMSUPPORT with optionService.getValues(OptionService.Scope.GLOBAL, OptionConstants.ideavimsupportName)!!
+        IDEASELECTION with optionService.contains(OptionScope.GLOBAL, OptionConstants.selectmodeName, "ideaselection"),
+        IDEAVIMSUPPORT with optionService.getValues(OptionScope.GLOBAL, OptionConstants.ideavimsupportName)!!
       )
     )
   }
 
   private infix fun BooleanEventField.withOption(name: String): EventPair<Boolean> {
-    return this.with(VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, name))
+    return this.with(VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, name))
   }
 
   private infix fun StringEventField.withOption(name: String): EventPair<String?> {
-    return this.with(VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, name).asString())
+    return this.with(VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, name).asString())
   }
 
   companion object {

@@ -44,6 +44,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.operators.AssignmentOp
 import com.maddyhome.idea.vim.vimscript.model.functions.DefinedFunctionHandler
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
+import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 
 /**
@@ -183,8 +184,8 @@ data class LetCommand(
         ) {
           val newValue = operator.getNewValue(optionValue, expression.evaluate(editor, context, this))
           when (variable.scope) {
-            Scope.GLOBAL_VARIABLE -> VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, variable.optionName, newValue, variable.originalString)
-            Scope.LOCAL_VARIABLE -> VimPlugin.getOptionService().setOptionValue(OptionService.Scope.LOCAL(IjVimEditor(editor)), variable.optionName, newValue, variable.originalString)
+            Scope.GLOBAL_VARIABLE -> VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, variable.optionName, newValue, variable.originalString)
+            Scope.LOCAL_VARIABLE -> VimPlugin.getOptionService().setOptionValue(OptionScope.LOCAL(IjVimEditor(editor)), variable.optionName, newValue, variable.originalString)
             else -> throw ExException("Invalid option scope")
           }
         } else {

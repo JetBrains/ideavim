@@ -30,6 +30,7 @@ import com.maddyhome.idea.vim.helper.Msg
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
+import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import com.maddyhome.idea.vim.vimscript.services.OptionServiceImpl
 import java.util.*
@@ -54,7 +55,7 @@ data class SetCommand(val ranges: Ranges, val argument: String) : Command.Single
       // same exceptions will be thrown later, so we ignore them for now
     }
     isExecutingCommand = false
-    return if (parseOptionLine(editor, argument, OptionService.Scope.GLOBAL, failOnBad = true)) {
+    return if (parseOptionLine(editor, argument, OptionScope.GLOBAL, failOnBad = true)) {
       ExecutionResult.Success
     } else {
       ExecutionResult.Error
@@ -66,7 +67,7 @@ data class SetLocalCommand(val ranges: Ranges, val argument: String) : Command.S
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
-    return if (parseOptionLine(editor, argument, OptionService.Scope.LOCAL(IjVimEditor(editor)), failOnBad = true)) {
+    return if (parseOptionLine(editor, argument, OptionScope.LOCAL(IjVimEditor(editor)), failOnBad = true)) {
       ExecutionResult.Success
     } else {
       ExecutionResult.Error
@@ -99,7 +100,7 @@ data class SetLocalCommand(val ranges: Ranges, val argument: String) : Command.S
  * @return True if no errors were found, false if there were any errors
  */
 // todo is failOnBad used anywhere?
-fun parseOptionLine(editor: Editor, args: String, scope: OptionService.Scope, failOnBad: Boolean): Boolean {
+fun parseOptionLine(editor: Editor, args: String, scope: OptionScope, failOnBad: Boolean): Boolean {
   // No arguments so we show changed values
   val optionService = (VimPlugin.getOptionService() as OptionServiceImpl)
   when {
@@ -196,7 +197,7 @@ fun parseOptionLine(editor: Editor, args: String, scope: OptionService.Scope, fa
   return true
 }
 
-private fun showOptions(editor: Editor, nameAndToken: Collection<Pair<String, String>>, scope: OptionService.Scope, showIntro: Boolean) {
+private fun showOptions(editor: Editor, nameAndToken: Collection<Pair<String, String>>, scope: OptionScope, showIntro: Boolean) {
   val optionService = VimPlugin.getOptionService()
   val optionsToShow = mutableListOf<String>()
   var unknownOption: Pair<String, String>? = null
@@ -264,7 +265,7 @@ private fun showOptions(editor: Editor, nameAndToken: Collection<Pair<String, St
   }
 }
 
-private fun optionToString(scope: OptionService.Scope, name: String, editor: Editor): String {
+private fun optionToString(scope: OptionScope, name: String, editor: Editor): String {
   val value = VimPlugin.getOptionService().getOptionValue(scope, name)
   return if (VimPlugin.getOptionService().isToggleOption(name)) {
     if (value.asBoolean()) "  $name" else "no$name"

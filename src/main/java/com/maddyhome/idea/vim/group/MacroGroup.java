@@ -35,7 +35,7 @@ import com.maddyhome.idea.vim.helper.StringHelper;
 import com.maddyhome.idea.vim.newapi.IjExecutionContext;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.options.OptionConstants;
-import com.maddyhome.idea.vim.vimscript.services.OptionService;
+import com.maddyhome.idea.vim.options.OptionScope;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -128,7 +128,7 @@ public class MacroGroup {
       return;
     }
 
-    if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL.INSTANCE, OptionConstants.ideadelaymacroName, OptionConstants.ideadelaymacroName)) {
+    if (VimPlugin.getOptionService().isSet(OptionScope.GLOBAL.INSTANCE, OptionConstants.ideadelaymacroName, OptionConstants.ideadelaymacroName)) {
       // This took a while to get just right. The original approach has a loop that made a runnable for each
       // character. It worked except for one case - if the macro had a complete ex command, the editor did not
       // end up with the focus and I couldn't find anyway to get it to have focus. This approach was the only

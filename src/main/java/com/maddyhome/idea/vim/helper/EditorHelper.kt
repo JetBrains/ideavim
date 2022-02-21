@@ -29,6 +29,7 @@ import com.intellij.util.ui.table.JBTableRowEditor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import java.awt.Component
 import javax.swing.JComponent
@@ -43,7 +44,7 @@ val Editor.fileSize: Int
  */
 val Editor.isIdeaVimDisabledHere: Boolean
   get() {
-    val ideaVimSupportValue = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, OptionConstants.ideavimsupportName) as VimString).value
+    val ideaVimSupportValue = (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, OptionConstants.ideavimsupportName) as VimString).value
     return disabledInDialog ||
       (!ClientId.isCurrentlyUnderLocalId) || // CWM-927
       (!ideaVimSupportValue.contains("singleline") && isDatabaseCell()) ||
@@ -56,7 +57,7 @@ private fun Editor.isDatabaseCell(): Boolean {
 
 private val Editor.disabledInDialog: Boolean
   get() {
-    val ideaVimSupportValue = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, OptionConstants.ideavimsupportName) as VimString).value
+    val ideaVimSupportValue = (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, OptionConstants.ideavimsupportName) as VimString).value
     return (!ideaVimSupportValue.contains("dialog") && !ideaVimSupportValue.contains("dialoglegacy")) &&
       (!this.isPrimaryEditor() && !EditorHelper.isFileEditor(this))
   }

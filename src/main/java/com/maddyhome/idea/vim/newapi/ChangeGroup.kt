@@ -45,6 +45,7 @@ import com.maddyhome.idea.vim.helper.inlayAwareVisualColumn
 import com.maddyhome.idea.vim.helper.vimChangeActionSwitchMode
 import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 
 fun changeRange(
@@ -217,7 +218,7 @@ fun insertLineAround(editor: Editor, context: DataContext, shift: Int) {
 fun VimCaret.offsetForLineWithStartOfLineOption(logicalLine: EditorLine.Pointer): Int {
   val ijEditor = (this.editor as IjVimEditor).editor
   val caret = (this as IjVimCaret).caret
-  return if (VimPlugin.getOptionService().isSet(OptionService.Scope.LOCAL(editor), OptionConstants.startoflineName)) {
+  return if (VimPlugin.getOptionService().isSet(OptionScope.LOCAL(editor), OptionConstants.startoflineName)) {
     offsetForLineStartSkipLeading(logicalLine.line)
   } else {
     VimPlugin.getMotion().moveCaretToLineWithSameColumn(ijEditor, logicalLine.line, caret)

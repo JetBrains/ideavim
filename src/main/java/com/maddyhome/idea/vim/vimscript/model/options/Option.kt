@@ -24,6 +24,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.datatypes.parseNumber
+import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 
 sealed class Option<T : VimDataType>(val name: String, val abbrev: String, private val defaultValue: T) {
@@ -42,11 +43,11 @@ sealed class Option<T : VimDataType>(val name: String, val abbrev: String, priva
     listeners.remove(listener)
   }
 
-  fun onChanged(scope: OptionService.Scope, oldValue: VimDataType) {
+  fun onChanged(scope: OptionScope, oldValue: VimDataType) {
     for (listener in listeners) {
       when (scope) {
-        is OptionService.Scope.GLOBAL -> listener.processGlobalValueChange(oldValue)
-        is OptionService.Scope.LOCAL -> {
+        is OptionScope.GLOBAL -> listener.processGlobalValueChange(oldValue)
+        is OptionScope.LOCAL -> {
           if (listener is LocalOptionChangeListener) {
             listener.processLocalValueChange(oldValue, scope.editor)
           } else {

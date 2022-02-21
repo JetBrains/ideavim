@@ -35,6 +35,7 @@ import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import java.util.*
 
@@ -54,7 +55,7 @@ class MotionGotoLineLastEndAction : MotionActionHandler.ForEachCaret() {
     if (editor.ij.inInsertMode) {
       allow = true
     } else if (editor.ij.inVisualMode) {
-      val opt = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.LOCAL(editor), OptionConstants.selectionName) as VimString).value
+      val opt = (VimPlugin.getOptionService().getOptionValue(OptionScope.LOCAL(editor), OptionConstants.selectionName) as VimString).value
       if (opt != "old") {
         allow = true
       }
@@ -80,7 +81,7 @@ class MotionGotoLineLastEndInsertAction : MotionActionHandler.ForEachCaret() {
     if (editor.ij.inInsertMode) {
       allow = true
     } else if (editor.ij.inVisualMode) {
-      val opt = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.LOCAL(editor), OptionConstants.selectionName) as VimString).value
+      val opt = (VimPlugin.getOptionService().getOptionValue(OptionScope.LOCAL(editor), OptionConstants.selectionName) as VimString).value
       if (opt != "old") {
         allow = true
       }

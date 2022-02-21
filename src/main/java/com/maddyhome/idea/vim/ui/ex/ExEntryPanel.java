@@ -40,7 +40,7 @@ import com.maddyhome.idea.vim.vimscript.model.commands.Command;
 import com.maddyhome.idea.vim.vimscript.model.commands.SubstituteCommand;
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser;
 import com.maddyhome.idea.vim.options.OptionConstants;
-import com.maddyhome.idea.vim.vimscript.services.OptionService;
+import com.maddyhome.idea.vim.options.OptionScope;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -430,7 +430,7 @@ public class ExEntryPanel extends JPanel {
   }
 
   private boolean isIncSearchEnabled() {
-    return VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL.INSTANCE, OptionConstants.incsearchName, OptionConstants.incsearchName);
+    return VimPlugin.getOptionService().isSet(OptionScope.GLOBAL.INSTANCE, OptionConstants.incsearchName, OptionConstants.incsearchName);
   }
 
   private boolean active;

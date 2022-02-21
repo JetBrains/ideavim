@@ -27,11 +27,12 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 
 @get:VimNlsSafe
 val usesVirtualSpace
-  get() = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, OptionConstants.virtualeditName) as VimString).value == "onemore"
+  get() = (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, OptionConstants.virtualeditName) as VimString).value == "onemore"
 
 /**
  * Please use `isEndAllowed` based on `Editor` (another extension function)

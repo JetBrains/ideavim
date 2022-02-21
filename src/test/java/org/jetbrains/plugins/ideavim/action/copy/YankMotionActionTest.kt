@@ -23,6 +23,7 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -62,8 +63,8 @@ class YankMotionActionTest : VimTestCase() {
 
   @Suppress("DANGEROUS_CHARACTERS")
   fun `test unnamed saved to " register`() {
-    val clipboardValue = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, OptionConstants.clipboardName) as VimString).value
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, OptionConstants.clipboardName, VimString("unnamed"))
+    val clipboardValue = (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, OptionConstants.clipboardName) as VimString).value
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.clipboardName, VimString("unnamed"))
 
     try {
       configureByText("I found it in a ${c}legendary land")
@@ -75,7 +76,7 @@ class YankMotionActionTest : VimTestCase() {
       val quoteRegister = VimPlugin.getRegister().getRegister('"') ?: kotlin.test.fail("Register \" is empty")
       assertEquals("legendary", quoteRegister.text)
     } finally {
-      VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, OptionConstants.clipboardName, VimString(clipboardValue))
+      VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.clipboardName, VimString(clipboardValue))
     }
   }
 

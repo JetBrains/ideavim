@@ -62,7 +62,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
 import com.maddyhome.idea.vim.vimscript.model.options.OptionChangeListener;
 import com.maddyhome.idea.vim.options.OptionConstants;
-import com.maddyhome.idea.vim.vimscript.services.OptionService;
+import com.maddyhome.idea.vim.options.OptionScope;
 import kotlin.Pair;
 import org.jdom.Element;
 import org.jetbrains.annotations.NonNls;
@@ -122,7 +122,7 @@ public class RegisterGroup implements PersistentStateComponent<Element>, VimRegi
         @Override
         public void processGlobalValueChange(@Nullable VimDataType oldValue) {
           String clipboardOptionValue = ((VimString) VimPlugin.getOptionService()
-            .getOptionValue(OptionService.Scope.GLOBAL.INSTANCE, OptionConstants.clipboardName, OptionConstants.clipboardName)).getValue();
+            .getOptionValue(OptionScope.GLOBAL.INSTANCE, OptionConstants.clipboardName, OptionConstants.clipboardName)).getValue();
           if (clipboardOptionValue.contains("unnamed")) {
             defaultRegister = '*';
           }
@@ -367,7 +367,7 @@ public class RegisterGroup implements PersistentStateComponent<Element>, VimRegi
     String rawText = TextBlockTransferable.convertLineSeparators(text, "\n", transferableDatas);
 
 
-    if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL.INSTANCE, OptionConstants.ideacopypreprocessName, OptionConstants.ideacopypreprocessName)) {
+    if (VimPlugin.getOptionService().isSet(OptionScope.GLOBAL.INSTANCE, OptionConstants.ideacopypreprocessName, OptionConstants.ideacopypreprocessName)) {
       String escapedText;
       for (CopyPastePreProcessor processor : CopyPastePreProcessor.EP_NAME.getExtensionList()) {
         escapedText = processor.preprocessOnCopy(file, textRange.getStartOffsets(), textRange.getEndOffsets(), rawText);

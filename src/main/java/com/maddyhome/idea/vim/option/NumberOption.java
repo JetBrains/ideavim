@@ -22,8 +22,7 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.helper.VimNlsSafe;
 import com.maddyhome.idea.vim.vimscript.model.commands.SetCommand;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt;
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
-import com.maddyhome.idea.vim.vimscript.services.OptionService;
+import com.maddyhome.idea.vim.options.OptionScope;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -123,8 +122,8 @@ public class NumberOption extends TextOption {
       // we won't use OptionService if the method was invoked during set command execution (set command will call OptionService by itself)
       if (!SetCommand.Companion.isExecutingCommand$IdeaVIM()) {
         try {
-          if (!(((VimInt)VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, name)).getValue() == value)) {
-            VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, new VimInt(value), name);
+          if (!(((VimInt)VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL.INSTANCE, name, name)).getValue() == value)) {
+            VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL.INSTANCE, name, new VimInt(value), name);
           }
         }
         catch (Exception e) {
@@ -159,8 +158,8 @@ public class NumberOption extends TextOption {
       onChanged(oldValue, getValue());
       try {
       if (!(((VimInt)VimPlugin.getOptionService()
-        .getOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, name)).getValue() == value)) {
-        VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, new VimInt(value), name);
+        .getOptionValue(OptionScope.GLOBAL.INSTANCE, name, name)).getValue() == value)) {
+        VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL.INSTANCE, name, new VimInt(value), name);
       }
       } catch (Exception e) {}
 
@@ -192,8 +191,8 @@ public class NumberOption extends TextOption {
       onChanged(oldValue, getValue());
       try {
       if (!(((VimInt)VimPlugin.getOptionService()
-        .getOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, name)).getValue() == value)) {
-        VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, new VimInt(value), name);
+        .getOptionValue(OptionScope.GLOBAL.INSTANCE, name, name)).getValue() == value)) {
+        VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL.INSTANCE, name, new VimInt(value), name);
       }
       } catch (Exception e) {}
 
@@ -225,8 +224,8 @@ public class NumberOption extends TextOption {
       onChanged(oldValue, getValue());
       try {
       if (!(((VimInt)VimPlugin.getOptionService()
-        .getOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, name)).getValue() == value)) {
-        VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, new VimInt(value), name);
+        .getOptionValue(OptionScope.GLOBAL.INSTANCE, name, name)).getValue() == value)) {
+        VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL.INSTANCE, name, new VimInt(value), name);
       }
       } catch (Exception e) {}
       return true;
@@ -257,8 +256,8 @@ public class NumberOption extends TextOption {
     }
     try {
     if (!(((VimInt)VimPlugin.getOptionService()
-      .getOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, name)).getValue() == value)) {
-      VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, new VimInt(value), name);
+      .getOptionValue(OptionScope.GLOBAL.INSTANCE, name, name)).getValue() == value)) {
+      VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL.INSTANCE, name, new VimInt(value), name);
     }
     } catch (Exception e) {}
   }

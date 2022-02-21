@@ -25,6 +25,7 @@ import com.intellij.openapi.wm.WindowManager
 import com.maddyhome.idea.vim.api.VimMessages
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import java.awt.Toolkit
 
@@ -59,7 +60,7 @@ class IjVimMessages : VimMessages {
     if (ApplicationManager.getApplication().isUnitTestMode) {
       error = true
     } else if (!injector.optionService.isSet(
-        OptionService.Scope.GLOBAL,
+        OptionScope.GLOBAL,
         OptionConstants.visualbellName,
         OptionConstants.visualbellName
       )

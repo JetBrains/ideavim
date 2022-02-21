@@ -23,6 +23,7 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer.mode
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer.singleTask
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
+import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import java.awt.event.ActionEvent
 import javax.swing.Timer
@@ -74,7 +75,7 @@ object VimVisualTimer {
     if (mode == null) mode = currentMode
 
     // Default delay - 100 ms
-    val timer = Timer((VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "visualdelay") as VimInt).value) {
+    val timer = Timer((VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, "visualdelay") as VimInt).value) {
       timerAction(task)
     }
     timer.isRepeats = false

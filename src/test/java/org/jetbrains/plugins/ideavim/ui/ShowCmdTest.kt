@@ -23,6 +23,7 @@ import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.ui.ShowCmd
 import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -38,12 +39,12 @@ class ShowCmdTest : VimTestCase() {
   @TestWithoutNeovim(reason = SkipNeovimReason.SHOW_CMD)
   fun `test showcmd on by default`() {
     VimPlugin.getOptionService().resetAllOptions()
-    assertTrue(VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, OptionConstants.showcmdName))
+    assertTrue(VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.showcmdName))
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SHOW_CMD)
   fun `test showcmd shows nothing if disabled`() {
-    VimPlugin.getOptionService().unsetOption(OptionService.Scope.GLOBAL, OptionConstants.showcmdName)
+    VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.showcmdName)
 
     typeText(parseKeys("3"))
     assertEquals("", getShowCmdText())

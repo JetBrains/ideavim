@@ -32,6 +32,7 @@ import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 
 class MotionShiftEndAction : ShiftedSpecialKeyHandler() {
@@ -44,7 +45,7 @@ class MotionShiftEndAction : ShiftedSpecialKeyHandler() {
       if (editor.inInsertMode) {
         allow = true
       } else if (editor.inVisualMode || editor.inSelectMode) {
-        val opt = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.LOCAL(IjVimEditor(editor)), OptionConstants.selectionName) as VimString).value
+        val opt = (VimPlugin.getOptionService().getOptionValue(OptionScope.LOCAL(IjVimEditor(editor)), OptionConstants.selectionName) as VimString).value
         if (opt != "old") {
           allow = true
         }

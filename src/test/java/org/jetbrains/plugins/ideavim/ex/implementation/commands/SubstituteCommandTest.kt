@@ -22,6 +22,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.vimscript.Executor
 import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import org.jetbrains.plugins.ideavim.OptionValueType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -213,7 +214,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcaseName, O
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test smartcase option`() {
-    VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, OptionConstants.smartcaseName)
+    VimPlugin.getOptionService().setOption(OptionScope.GLOBAL, OptionConstants.smartcaseName)
 
     // smartcase does nothing if ignorecase is not set
     doTest(
@@ -227,7 +228,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcaseName, O
       "foo bar foo\nbar FOO foo"
     )
 
-    VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, OptionConstants.ignorecaseName)
+    VimPlugin.getOptionService().setOption(OptionScope.GLOBAL, OptionConstants.ignorecaseName)
     doTest(
       "%s/foo/bar/g",
       "foo Foo foo\nFoo FOO foo",
@@ -249,14 +250,14 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcaseName, O
       "bar bar bar\nbar bar bar"
     )
 
-    VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, OptionConstants.ignorecaseName)
+    VimPlugin.getOptionService().setOption(OptionScope.GLOBAL, OptionConstants.ignorecaseName)
     doTest(
       "%s/foo/bar/gi",
       "foo Foo foo\nFoo FOO foo",
       "bar bar bar\nbar bar bar"
     )
 
-    VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, OptionConstants.smartcaseName)
+    VimPlugin.getOptionService().setOption(OptionScope.GLOBAL, OptionConstants.smartcaseName)
     doTest(
       "%s/foo/bar/gi",
       "foo Foo foo\nFoo FOO foo",
@@ -273,14 +274,14 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcaseName, O
       "bar Foo bar\nFoo FOO bar"
     )
 
-    VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, OptionConstants.ignorecaseName)
+    VimPlugin.getOptionService().setOption(OptionScope.GLOBAL, OptionConstants.ignorecaseName)
     doTest(
       "%s/foo/bar/gI",
       "foo Foo foo\nFoo FOO foo",
       "bar Foo bar\nFoo FOO bar"
     )
 
-    VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, OptionConstants.smartcaseName)
+    VimPlugin.getOptionService().setOption(OptionScope.GLOBAL, OptionConstants.smartcaseName)
     doTest(
       "%s/Foo/bar/gI",
       "foo Foo foo\nFoo FOO foo",

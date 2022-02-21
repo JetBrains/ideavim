@@ -22,6 +22,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -131,7 +132,7 @@ class ScrollPageUpActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll page up moves cursor with scrolloff`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
     configureByPages(5)
     setPositionAndScroll(129, 149)
     typeText(parseKeys("<C-B>"))
@@ -141,7 +142,7 @@ class ScrollPageUpActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll page up in insert mode cursor with scrolloff`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
     configureByPages(5)
     setPositionAndScroll(129, 149)
     typeText(parseKeys("i", "<S-Up>"))
@@ -151,7 +152,7 @@ class ScrollPageUpActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll page up ignores scrolljump`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, OptionConstants.scrolljumpName, VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolljumpName, VimInt(10))
     configureByPages(5)
     setPositionAndScroll(129, 149)
     typeText(parseKeys("<C-B>"))
@@ -222,7 +223,7 @@ class ScrollPageUpActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll page up too many times moves caret to bottom of screen plus scrolloff`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
     configureByPages(5)
     setPositionAndScroll(40, 60)
     typeText(parseKeys("20<C-B>"))
@@ -277,7 +278,7 @@ class ScrollPageUpActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll page up keeps same column with nostartofline`() {
-    VimPlugin.getOptionService().unsetOption(OptionService.Scope.GLOBAL, OptionConstants.startoflineName)
+    VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.startoflineName)
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(50, 60, 14)
     typeText(parseKeys("<C-B>"))

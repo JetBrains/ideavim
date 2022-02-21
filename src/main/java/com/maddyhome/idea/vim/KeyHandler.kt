@@ -60,6 +60,7 @@ import com.maddyhome.idea.vim.ui.ShowCmd.update
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import java.awt.event.InputEvent
 import java.awt.event.KeyEvent
@@ -110,7 +111,7 @@ class KeyHandler {
     }
     val mapMapDepth = (
       injector.optionService.getOptionValue(
-        OptionService.Scope.GLOBAL,
+        OptionScope.GLOBAL,
         OptionConstants.maxmapdepthName,
         OptionConstants.maxmapdepthName
       ) as VimInt
@@ -344,7 +345,7 @@ class KeyHandler {
     // user has typed "dw" wait for the timeout, and then replay "d" and "w" without any mapping (which will of course
     // delete a word)
     if (injector.optionService
-      .isSet(OptionService.Scope.LOCAL(editor), OptionConstants.timeoutName, OptionConstants.timeoutName)
+      .isSet(OptionScope.LOCAL(editor), OptionConstants.timeoutName, OptionConstants.timeoutName)
     ) {
       LOG.trace("Timeout is set. Schedule a mapping timer")
       // XXX There is a strange issue that reports that mapping state is empty at the moment of the function call.

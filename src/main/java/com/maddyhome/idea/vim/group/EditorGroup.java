@@ -39,7 +39,7 @@ import com.maddyhome.idea.vim.api.VimEditor;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType;
 import com.maddyhome.idea.vim.vimscript.model.options.LocalOptionChangeListener;
 import com.maddyhome.idea.vim.options.OptionConstants;
-import com.maddyhome.idea.vim.vimscript.services.OptionService;
+import com.maddyhome.idea.vim.options.OptionScope;
 import org.jdom.Element;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NonNls;
@@ -63,7 +63,7 @@ public class EditorGroup implements PersistentStateComponent<Element> {
     @Override
     public void caretPositionChanged(@NotNull CaretEvent e) {
       final boolean requiresRepaint = e.getNewPosition().line != e.getOldPosition().line;
-      if (requiresRepaint && VimPlugin.getOptionService().isSet(new OptionService.Scope.LOCAL(new IjVimEditor(e.getEditor())), OptionConstants.relativenumberName, OptionConstants.relativenumberName)) {
+      if (requiresRepaint && VimPlugin.getOptionService().isSet(new OptionScope.LOCAL(new IjVimEditor(e.getEditor())), OptionConstants.relativenumberName, OptionConstants.relativenumberName)) {
         repaintRelativeLineNumbers(e.getEditor());
       }
     }
@@ -111,8 +111,8 @@ public class EditorGroup implements PersistentStateComponent<Element> {
   }
 
   private static void updateLineNumbers(final @NotNull Editor editor) {
-    final boolean relativeNumber = VimPlugin.getOptionService().isSet(new OptionService.Scope.LOCAL(new IjVimEditor(editor)), OptionConstants.relativenumberName, OptionConstants.relativenumberName);
-    final boolean number = VimPlugin.getOptionService().isSet(new OptionService.Scope.LOCAL(new IjVimEditor(editor)), OptionConstants.numberName, OptionConstants.numberName);
+    final boolean relativeNumber = VimPlugin.getOptionService().isSet(new OptionScope.LOCAL(new IjVimEditor(editor)), OptionConstants.relativenumberName, OptionConstants.relativenumberName);
+    final boolean number = VimPlugin.getOptionService().isSet(new OptionScope.LOCAL(new IjVimEditor(editor)), OptionConstants.numberName, OptionConstants.numberName);
 
     final boolean showBuiltinEditorLineNumbers = shouldShowBuiltinLineNumbers(editor, number, relativeNumber);
 
@@ -240,7 +240,7 @@ public class EditorGroup implements PersistentStateComponent<Element> {
 
   public void notifyIdeaJoin(@Nullable Project project) {
     if (VimPlugin.getVimState().isIdeaJoinNotified()
-        || VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL.INSTANCE, OptionConstants.ideajoinName,  OptionConstants.ideajoinName)) {
+        || VimPlugin.getOptionService().isSet(OptionScope.GLOBAL.INSTANCE, OptionConstants.ideajoinName, OptionConstants.ideajoinName)) {
       return;
     }
 
@@ -290,7 +290,7 @@ public class EditorGroup implements PersistentStateComponent<Element> {
   private static class RelativeLineNumberConverter implements LineNumberConverter {
     @Override
     public Integer convert(@NotNull Editor editor, int lineNumber) {
-      final boolean number = VimPlugin.getOptionService().isSet(new OptionService.Scope.LOCAL(new IjVimEditor(editor)), OptionConstants.numberName, OptionConstants.numberName);
+      final boolean number = VimPlugin.getOptionService().isSet(new OptionScope.LOCAL(new IjVimEditor(editor)), OptionConstants.numberName, OptionConstants.numberName);
       final int caretLine = editor.getCaretModel().getLogicalPosition().line;
 
       // lineNumber is 1 based

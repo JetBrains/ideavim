@@ -20,6 +20,7 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import org.jetbrains.plugins.ideavim.VimTestCase
 
@@ -35,8 +36,8 @@ class SetCommandTest : VimTestCase() {
   fun `test toggle option`() {
     configureByText("\n")
     typeText(commandToKeys("set rnu"))
-    assertTrue(VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, OptionConstants.relativenumberName))
+    assertTrue(VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.relativenumberName))
     typeText(commandToKeys("set rnu!"))
-    assertFalse(VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, OptionConstants.relativenumberName))
+    assertFalse(VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.relativenumberName))
   }
 }

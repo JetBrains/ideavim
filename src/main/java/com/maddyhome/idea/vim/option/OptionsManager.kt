@@ -40,6 +40,7 @@ import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
+import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import org.jetbrains.annotations.ApiStatus.ScheduledForRemoval
 import org.jetbrains.annotations.Contract
@@ -442,7 +443,7 @@ object SelectModeOptionData {
   val option = BoundedStringListOption(name, abbr, default, options)
 
   fun ideaselectionEnabled(): Boolean {
-    return ideaselection in (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "selectmode") as VimString).value
+    return ideaselection in (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, "selectmode") as VimString).value
   }
 }
 
@@ -465,14 +466,14 @@ object ClipboardOptionsData {
   class IdeaputDisabler : AutoCloseable {
     private val containedBefore: Boolean
     init {
-      val optionValue = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "clipboard") as VimString).value
+      val optionValue = (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, "clipboard") as VimString).value
       containedBefore = optionValue.contains(ideaput)
-      VimPlugin.getOptionService().removeValue(OptionService.Scope.GLOBAL, "clipboard", ideaput, "clipboard")
+      VimPlugin.getOptionService().removeValue(OptionScope.GLOBAL, "clipboard", ideaput, "clipboard")
       ideaputDisabled = true
     }
 
     override fun close() {
-      if (containedBefore) VimPlugin.getOptionService().appendValue(OptionService.Scope.GLOBAL, "clipboard", ideaput, "clipboard")
+      if (containedBefore) VimPlugin.getOptionService().appendValue(OptionScope.GLOBAL, "clipboard", ideaput, "clipboard")
       ideaputDisabled = false
     }
   }
@@ -543,8 +544,8 @@ object IdeaRefactorMode {
 
   val availableValues = arrayOf(keep, select, visual)
 
-  fun keepMode(): Boolean = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "idearefactormode") as VimString).value == keep
-  fun selectMode(): Boolean = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "idearefactormode") as VimString).value == select
+  fun keepMode(): Boolean = (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, "idearefactormode") as VimString).value == keep
+  fun selectMode(): Boolean = (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, "idearefactormode") as VimString).value == select
 
   fun correctSelection(editor: Editor) {
     val action: () -> Unit = {
@@ -711,7 +712,7 @@ object ShellXQuoteOptionData {
 @ScheduledForRemoval(inVersion = "1.11")
 object StrictMode {
   val on: Boolean
-    get() = VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "ideastrictmode")
+    get() = VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, "ideastrictmode")
 
   @NonNls
   fun fail(message: @NonNls String) {

@@ -29,6 +29,7 @@ import com.maddyhome.idea.vim.vimscript.Executor
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.options.OptionChangeListener
 import com.maddyhome.idea.vim.vimscript.model.options.ToggleOption
+import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 
 object VimExtensionRegistrar {
@@ -73,7 +74,7 @@ object VimExtensionRegistrar {
       name,
       object : OptionChangeListener<VimDataType> {
         override fun processGlobalValueChange(oldValue: VimDataType?) {
-          if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, name)) {
+          if (VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, name)) {
             initExtension(extensionBean, name)
             PluginState.enabledExtensions.add(name)
           } else {
@@ -122,7 +123,7 @@ object VimExtensionRegistrar {
   fun setOptionByPluginAlias(alias: String): Boolean {
     val name = extensionAliases[alias] ?: return false
     try {
-      VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, name)
+      VimPlugin.getOptionService().setOption(OptionScope.GLOBAL, name)
     } catch (e: ExException) {
       return false
     }
