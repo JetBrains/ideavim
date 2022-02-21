@@ -31,7 +31,7 @@ import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
-import com.maddyhome.idea.vim.vimscript.services.OptionConstants
+import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 
 object IdeaRefactorModeHelper {

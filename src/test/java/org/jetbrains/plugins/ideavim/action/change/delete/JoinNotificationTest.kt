@@ -23,7 +23,7 @@ package org.jetbrains.plugins.ideavim.action.change.delete
 import com.intellij.notification.EventLog
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.StringHelper
-import com.maddyhome.idea.vim.vimscript.services.OptionConstants
+import com.maddyhome.idea.vim.options.OptionConstants
 import org.jetbrains.plugins.ideavim.OptionValueType
 import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration

@@ -52,7 +52,7 @@ import com.maddyhome.idea.vim.helper.fileSize
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.ClipboardOptionHelper
-import com.maddyhome.idea.vim.vimscript.services.OptionConstants
+import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import java.awt.datatransfer.DataFlavor
 import java.util.*

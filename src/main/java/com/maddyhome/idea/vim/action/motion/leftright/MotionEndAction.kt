@@ -37,7 +37,7 @@ import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
-import com.maddyhome.idea.vim.vimscript.services.OptionConstants
+import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 
 class MotionEndAction : NonShiftedSpecialKeyHandler() {

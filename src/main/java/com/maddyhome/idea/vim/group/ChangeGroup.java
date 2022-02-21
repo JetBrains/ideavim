@@ -62,7 +62,7 @@ import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
 import com.maddyhome.idea.vim.newapi.*;
 import com.maddyhome.idea.vim.option.StrictMode;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
-import com.maddyhome.idea.vim.vimscript.services.OptionConstants;
+import com.maddyhome.idea.vim.options.OptionConstants;
 import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import kotlin.Pair;
 import kotlin.text.StringsKt;

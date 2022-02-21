@@ -24,7 +24,7 @@ import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.wm.WindowManager
 import com.maddyhome.idea.vim.api.VimMessages
 import com.maddyhome.idea.vim.helper.MessageHelper
-import com.maddyhome.idea.vim.vimscript.services.OptionConstants
+import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import java.awt.Toolkit
 

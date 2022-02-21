@@ -45,7 +45,7 @@ import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.SearchHelper;
 import com.maddyhome.idea.vim.newapi.*;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
-import com.maddyhome.idea.vim.vimscript.services.OptionConstants;
+import com.maddyhome.idea.vim.options.OptionConstants;
 import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

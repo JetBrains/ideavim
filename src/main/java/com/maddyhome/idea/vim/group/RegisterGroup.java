@@ -61,7 +61,7 @@ import com.maddyhome.idea.vim.ui.ClipboardHandler;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
 import com.maddyhome.idea.vim.vimscript.model.options.OptionChangeListener;
-import com.maddyhome.idea.vim.vimscript.services.OptionConstants;
+import com.maddyhome.idea.vim.options.OptionConstants;
 import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import kotlin.Pair;
 import org.jdom.Element;

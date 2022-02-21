@@ -40,7 +40,7 @@ import com.maddyhome.idea.vim.regexp.RegExp;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
 import com.maddyhome.idea.vim.vimscript.model.options.OptionChangeListener;
-import com.maddyhome.idea.vim.vimscript.services.OptionConstants;
+import com.maddyhome.idea.vim.options.OptionConstants;
 import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import kotlin.Pair;
 import org.jetbrains.annotations.Contract;

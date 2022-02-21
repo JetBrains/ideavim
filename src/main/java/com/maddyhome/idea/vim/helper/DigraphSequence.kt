@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.common.DigraphResult.Companion.done
 import com.maddyhome.idea.vim.common.DigraphResult.Companion.handled
 import com.maddyhome.idea.vim.newapi.injector
 import com.maddyhome.idea.vim.newapi.vimLogger
-import com.maddyhome.idea.vim.vimscript.services.OptionConstants
+import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService.Scope
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke

@@ -27,7 +27,7 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.IJSwingUtilities;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.helper.*;
-import com.maddyhome.idea.vim.vimscript.services.OptionConstants;
+import com.maddyhome.idea.vim.options.OptionConstants;
 import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;

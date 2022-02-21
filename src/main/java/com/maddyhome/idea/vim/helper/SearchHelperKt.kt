@@ -20,7 +20,7 @@ package com.maddyhome.idea.vim.helper
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.SearchHelper.findPositionOfFirstCharacter
-import com.maddyhome.idea.vim.vimscript.services.OptionConstants
+import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 
 enum class Direction(private val value: Int) {

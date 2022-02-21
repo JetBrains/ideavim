@@ -27,7 +27,7 @@ import com.intellij.internal.statistic.eventLog.events.StringEventField
 import com.intellij.internal.statistic.eventLog.events.VarargEventId
 import com.intellij.internal.statistic.service.fus.collectors.ApplicationUsagesCollector
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.vimscript.services.OptionConstants
+import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import com.maddyhome.idea.vim.vimscript.services.OptionServiceImpl
 

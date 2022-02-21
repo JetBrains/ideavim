@@ -46,7 +46,7 @@ import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
 import com.maddyhome.idea.vim.vimscript.Executor;
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
-import com.maddyhome.idea.vim.vimscript.services.OptionConstants;
+import com.maddyhome.idea.vim.options.OptionConstants;
 import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

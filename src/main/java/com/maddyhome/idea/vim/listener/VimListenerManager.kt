@@ -79,7 +79,7 @@ import com.maddyhome.idea.vim.option.StrictMode
 import com.maddyhome.idea.vim.ui.ShowCmdOptionChangeListener
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.KeywordOptionChangeListener
-import com.maddyhome.idea.vim.vimscript.services.OptionConstants
+import com.maddyhome.idea.vim.options.OptionConstants
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import javax.swing.SwingUtilities

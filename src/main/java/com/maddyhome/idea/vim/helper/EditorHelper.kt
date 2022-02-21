@@ -28,7 +28,7 @@ import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.util.ui.table.JBTableRowEditor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
-import com.maddyhome.idea.vim.vimscript.services.OptionConstants
+import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import java.awt.Component
 import javax.swing.JComponent

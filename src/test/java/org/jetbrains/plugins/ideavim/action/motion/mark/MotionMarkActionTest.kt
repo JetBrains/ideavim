@@ -25,7 +25,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.group.createLineBookmark
 import com.maddyhome.idea.vim.group.mnemonic
 import com.maddyhome.idea.vim.helper.StringHelper
-import com.maddyhome.idea.vim.vimscript.services.OptionConstants
+import com.maddyhome.idea.vim.options.OptionConstants
 import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.OptionValueType
 import org.jetbrains.plugins.ideavim.VimOptionTestCase

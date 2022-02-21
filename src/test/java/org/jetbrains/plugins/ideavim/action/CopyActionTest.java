@@ -24,7 +24,7 @@ import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
-import com.maddyhome.idea.vim.vimscript.services.OptionConstants;
+import com.maddyhome.idea.vim.options.OptionConstants;
 import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import org.jetbrains.plugins.ideavim.SkipNeovimReason;
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim;

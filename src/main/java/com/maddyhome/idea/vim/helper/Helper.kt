@@ -29,7 +29,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.vimscript.services.OptionConstants
+import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import java.util.*
 

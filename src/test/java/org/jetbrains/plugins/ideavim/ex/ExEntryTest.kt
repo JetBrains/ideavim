@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.ui.ex.ExDocument
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
-import com.maddyhome.idea.vim.vimscript.services.OptionConstants
+import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim

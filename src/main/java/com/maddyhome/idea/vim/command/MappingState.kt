@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.newapi.injector
 import com.maddyhome.idea.vim.newapi.vimLogger
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
-import com.maddyhome.idea.vim.vimscript.services.OptionConstants
+import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import java.awt.event.ActionListener
 import javax.swing.KeyStroke

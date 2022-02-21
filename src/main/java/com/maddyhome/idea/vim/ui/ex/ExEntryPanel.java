@@ -39,7 +39,7 @@ import com.maddyhome.idea.vim.ui.ExPanelBorder;
 import com.maddyhome.idea.vim.vimscript.model.commands.Command;
 import com.maddyhome.idea.vim.vimscript.model.commands.SubstituteCommand;
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser;
-import com.maddyhome.idea.vim.vimscript.services.OptionConstants;
+import com.maddyhome.idea.vim.options.OptionConstants;
 import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
