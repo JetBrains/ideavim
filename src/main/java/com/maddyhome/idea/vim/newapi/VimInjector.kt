@@ -22,8 +22,10 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.components.serviceIfCreated
 import com.intellij.openapi.diagnostic.Logger
 import com.maddyhome.idea.vim.api.ExecutionContextManager
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimEnabler
 import com.maddyhome.idea.vim.api.VimMessages
+import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.common.VimMachine
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.group.VimChangeGroup
@@ -33,6 +35,7 @@ import com.maddyhome.idea.vim.group.VimProcessGroup
 import com.maddyhome.idea.vim.group.VimRegisterGroup
 import com.maddyhome.idea.vim.helper.IjActionExecutor
 import com.maddyhome.idea.vim.helper.VimActionExecutor
+import com.maddyhome.idea.vim.helper.vimCommandState
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 
 interface VimInjector {
@@ -55,6 +58,8 @@ interface VimInjector {
 
   // TODO We should somehow state that [OptionServiceImpl] can be used from any implementation
   val optionService: OptionService
+
+  fun commandStateFor(editor: VimEditor): CommandState
 }
 
 class IjVimInjector : VimInjector {
@@ -89,6 +94,15 @@ class IjVimInjector : VimInjector {
 
   override val optionService: OptionService
     get() = service()
+
+  override fun commandStateFor(editor: VimEditor): CommandState {
+    var res = editor.ij.vimCommandState
+    if (res == null) {
+      res = CommandState(editor)
+      editor.ij.vimCommandState = res
+    }
+    return res
+  }
 }
 
 // We should inject logger here somehow

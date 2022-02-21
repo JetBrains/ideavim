@@ -18,15 +18,13 @@
 package com.maddyhome.idea.vim.command
 
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.common.CommandPartNode
 import com.maddyhome.idea.vim.common.DigraphResult
 import com.maddyhome.idea.vim.common.MappingMode
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.helper.DigraphSequence
 import com.maddyhome.idea.vim.helper.noneOfEnum
-import com.maddyhome.idea.vim.helper.vimCommandState
-import com.maddyhome.idea.vim.common.CommandPartNode
 import com.maddyhome.idea.vim.newapi.VimActionsInitiator
-import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.injector
 import com.maddyhome.idea.vim.newapi.vimLogger
 import com.maddyhome.idea.vim.vimscript.services.OptionConstants
@@ -37,8 +35,10 @@ import javax.swing.KeyStroke
 
 /**
  * Used to maintain state before and while entering a Vim command (operator, motion, text object, etc.)
+ *
+ * // TODO: 21.02.2022 This constructor should be empty
  */
-class CommandState private constructor(private val editor: VimEditor?) {
+class CommandState(private val editor: VimEditor?) {
   val commandBuilder = CommandBuilder(getKeyRootNode(MappingMode.NORMAL))
   private val modeStates = Stack<ModeState>()
   val mappingState = MappingState()
@@ -389,12 +389,7 @@ class CommandState private constructor(private val editor: VimEditor?) {
       return if (editor == null || injector.optionService.isSet(OptionService.Scope.GLOBAL, OptionConstants.ideaglobalmodeName)) {
         globalState
       } else {
-        var res = editor.ij.vimCommandState
-        if (res == null) {
-          res = CommandState(editor)
-          editor.ij.vimCommandState = res
-        }
-        res
+        injector.commandStateFor(editor)
       }
     }
 
