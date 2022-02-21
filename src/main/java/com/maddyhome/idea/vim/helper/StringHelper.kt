@@ -461,8 +461,8 @@ object StringHelper {
   @Contract(pure = true)
   fun capitalize(s: String): String {
     if (s.isEmpty()) return s
-    if (s.length == 1) return s.toUpperCase(Locale.ENGLISH)
-    return if (Character.isUpperCase(s[0])) s else s[0].toUpperCase().toString() + s.substring(1)
+    if (s.length == 1) return s.uppercase()
+    return if (Character.isUpperCase(s[0])) s else s[0].uppercaseChar().toString() + s.substring(1)
   }
 
   fun toPrintableCharacters(keys: List<KeyStroke>): String {
