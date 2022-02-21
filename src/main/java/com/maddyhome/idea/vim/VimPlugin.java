@@ -277,7 +277,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   }
 
   public static String getMessage() {
-    return VimInjectorKt.getInjector().getMessages().getMessage();
+    return VimInjectorKt.getInjector().getMessages().getStatusBarMessage();
   }
 
   /**
@@ -296,7 +296,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   }
 
   public static void showMessage(@Nls(capitalization = Nls.Capitalization.Sentence) @Nullable String msg) {
-    VimInjectorKt.getInjector().getMessages().showMessage(msg);
+    VimInjectorKt.getInjector().getMessages().showStatusBarMessage(msg);
   }
 
   public static @NotNull VimPlugin getInstance() {

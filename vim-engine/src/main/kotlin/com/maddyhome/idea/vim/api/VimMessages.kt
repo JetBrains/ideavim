@@ -19,14 +19,14 @@
 package com.maddyhome.idea.vim.api
 
 interface VimMessages {
-  fun showMessage(message: String?)
-  fun getMessage(): String?
+  fun showStatusBarMessage(message: String?)
+  fun getStatusBarMessage(): String?
   fun indicateError()
   fun clearError()
   fun isError(): Boolean
 
   fun showMode(msg: String) {
-    showMessage(msg)
+    showStatusBarMessage(msg)
   }
 }
 

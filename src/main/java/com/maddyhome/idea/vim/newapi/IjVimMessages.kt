@@ -34,7 +34,7 @@ class IjVimMessages : VimMessages {
   private var error = false
   private var lastBeepTimeMillis = 0L
 
-  override fun showMessage(msg: String?) {
+  override fun showStatusBarMessage(msg: String?) {
     if (ApplicationManager.getApplication().isUnitTestMode) {
       message = msg
     }
@@ -52,7 +52,7 @@ class IjVimMessages : VimMessages {
     }
   }
 
-  override fun getMessage(): String? = message
+  override fun getStatusBarMessage(): String? = message
 
   override fun indicateError() {
     if (ApplicationManager.getApplication().isUnitTestMode) {

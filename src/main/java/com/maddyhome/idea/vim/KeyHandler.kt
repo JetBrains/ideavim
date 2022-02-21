@@ -116,7 +116,7 @@ class KeyHandler {
       ) as VimInt
       ).value
     if (handleKeyRecursionCount >= mapMapDepth) {
-      injector.messages.showMessage(message("E223"))
+      injector.messages.showStatusBarMessage(message("E223"))
       injector.messages.indicateError()
       LOG.warn("Key handling, maximum recursion of the key received. maxdepth=$mapMapDepth")
       return
@@ -418,7 +418,7 @@ class KeyHandler {
     try {
       mappingInfo.execute(editor, context)
     } catch (e: Exception) {
-      injector.messages.showMessage(e.message)
+      injector.messages.showStatusBarMessage(e.message)
       injector.messages.indicateError()
       LOG.warn(
         """
@@ -427,7 +427,7 @@ class KeyHandler {
         """.trimIndent()
       )
     } catch (e: NotImplementedError) {
-      injector.messages.showMessage(e.message)
+      injector.messages.showStatusBarMessage(e.message)
       injector.messages.indicateError()
       LOG.warn(
         """
