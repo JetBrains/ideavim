@@ -43,17 +43,18 @@ import com.intellij.util.ui.tree.TreeUtil
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.common.CommandAlias
 import com.maddyhome.idea.vim.common.CommandAliasHandler
+import com.maddyhome.idea.vim.common.CommandNode
+import com.maddyhome.idea.vim.common.CommandPartNode
+import com.maddyhome.idea.vim.common.Node
+import com.maddyhome.idea.vim.common.RootNode
+import com.maddyhome.idea.vim.common.addLeafs
 import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.group.KeyGroup
 import com.maddyhome.idea.vim.helper.MessageHelper
+import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.runAfterGotFocus
-import com.maddyhome.idea.vim.key.CommandNode
-import com.maddyhome.idea.vim.key.CommandPartNode
 import com.maddyhome.idea.vim.key.MappingOwner
-import com.maddyhome.idea.vim.key.Node
 import com.maddyhome.idea.vim.key.RequiredShortcut
-import com.maddyhome.idea.vim.key.RootNode
-import com.maddyhome.idea.vim.key.addLeafs
 import com.maddyhome.idea.vim.newapi.injector
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
@@ -557,4 +558,8 @@ class NerdTree : VimExtension {
       )
     }
   }
+}
+
+private fun <T> Node<T>.addLeafs(keys: String, actionHolder: T) {
+  addLeafs(StringHelper.parseKeys(keys), actionHolder)
 }

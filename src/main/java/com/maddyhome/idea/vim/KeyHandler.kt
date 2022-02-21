@@ -48,10 +48,10 @@ import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.helper.inNormalMode
 import com.maddyhome.idea.vim.helper.inSingleNormalMode
 import com.maddyhome.idea.vim.helper.inVisualMode
-import com.maddyhome.idea.vim.key.CommandNode
-import com.maddyhome.idea.vim.key.CommandPartNode
+import com.maddyhome.idea.vim.common.CommandNode
+import com.maddyhome.idea.vim.common.CommandPartNode
 import com.maddyhome.idea.vim.key.KeyMapping
-import com.maddyhome.idea.vim.key.Node
+import com.maddyhome.idea.vim.common.Node
 import com.maddyhome.idea.vim.newapi.VimActionsInitiator
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.injector

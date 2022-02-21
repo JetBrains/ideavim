@@ -24,7 +24,7 @@ import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.helper.DigraphSequence
 import com.maddyhome.idea.vim.helper.noneOfEnum
 import com.maddyhome.idea.vim.helper.vimCommandState
-import com.maddyhome.idea.vim.key.CommandPartNode
+import com.maddyhome.idea.vim.common.CommandPartNode
 import com.maddyhome.idea.vim.newapi.VimActionsInitiator
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.injector

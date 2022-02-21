@@ -19,7 +19,7 @@
 package com.maddyhome.idea.vim.group;
 
 import com.maddyhome.idea.vim.common.MappingMode;
-import com.maddyhome.idea.vim.key.CommandPartNode;
+import com.maddyhome.idea.vim.common.CommandPartNode;
 import com.maddyhome.idea.vim.key.KeyMapping;
 import com.maddyhome.idea.vim.newapi.VimActionsInitiator;
 import org.jetbrains.annotations.NotNull;

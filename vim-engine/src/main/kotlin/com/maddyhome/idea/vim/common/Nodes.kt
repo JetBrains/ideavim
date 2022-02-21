@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.key
+package com.maddyhome.idea.vim.common
 
 import javax.swing.KeyStroke
 

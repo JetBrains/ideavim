@@ -23,7 +23,7 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.testFramework.PlatformTestUtil
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.commandState
-import com.maddyhome.idea.vim.key.CommandNode
+import com.maddyhome.idea.vim.common.CommandNode
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.jetCheck.Generator
