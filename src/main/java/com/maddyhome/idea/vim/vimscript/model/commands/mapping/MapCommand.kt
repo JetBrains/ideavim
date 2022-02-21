@@ -21,7 +21,7 @@ package com.maddyhome.idea.vim.vimscript.model.commands.mapping
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.common.MappingMode
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys

@@ -25,7 +25,7 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.testFramework.PlatformTestUtil
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.common.MappingMode
 import com.maddyhome.idea.vim.extension.Alias
 import com.maddyhome.idea.vim.extension.ExtensionBeanClass
 import com.maddyhome.idea.vim.extension.VimExtension

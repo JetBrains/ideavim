@@ -19,7 +19,7 @@
 package org.jetbrains.plugins.ideavim.group
 
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.common.MappingMode
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.key.MappingOwner
 import org.jetbrains.plugins.ideavim.SkipNeovimReason

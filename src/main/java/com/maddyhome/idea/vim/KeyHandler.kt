@@ -32,7 +32,7 @@ import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.CommandState.Companion.getInstance
 import com.maddyhome.idea.vim.command.CurrentCommandState
-import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.common.MappingMode
 import com.maddyhome.idea.vim.command.MappingState
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.DigraphResult

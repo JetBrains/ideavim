@@ -24,6 +24,7 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.*;
+import com.maddyhome.idea.vim.common.MappingMode;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.extension.VimExtension;
 import com.maddyhome.idea.vim.extension.VimExtensionHandler;

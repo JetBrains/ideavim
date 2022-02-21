@@ -21,6 +21,7 @@ package com.maddyhome.idea.vim.command
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.diagnostic.trace
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.common.MappingMode
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.services.OptionConstants
 import com.maddyhome.idea.vim.vimscript.services.OptionService

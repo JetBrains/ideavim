@@ -19,6 +19,7 @@ package com.maddyhome.idea.vim.command
 
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.common.DigraphResult
+import com.maddyhome.idea.vim.common.MappingMode
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.helper.DigraphSequence
 import com.maddyhome.idea.vim.helper.MessageHelper
