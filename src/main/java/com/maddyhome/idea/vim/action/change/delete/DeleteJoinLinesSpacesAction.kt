@@ -29,7 +29,6 @@ import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.services.OptionService
 
 class DeleteJoinLinesSpacesAction : ChangeEditorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.DELETE

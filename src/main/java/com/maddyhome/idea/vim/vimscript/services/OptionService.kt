@@ -18,7 +18,6 @@
 
 package com.maddyhome.idea.vim.vimscript.services
 
-import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.options.Option

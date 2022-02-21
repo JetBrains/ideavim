@@ -54,7 +54,6 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.ClipboardOptionHelper
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.services.OptionService
 import java.awt.datatransfer.DataFlavor
 import java.util.*
 import kotlin.math.abs

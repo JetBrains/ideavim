@@ -29,7 +29,6 @@ import com.maddyhome.idea.vim.newapi.injector
 import com.maddyhome.idea.vim.newapi.vimLogger
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.services.OptionService
 import org.jetbrains.annotations.Contract
 import java.util.*
 import javax.swing.KeyStroke

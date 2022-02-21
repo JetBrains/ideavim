@@ -24,7 +24,6 @@ import com.maddyhome.idea.vim.group.visual.VimVisualTimer.mode
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer.singleTask
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.services.OptionService
 import java.awt.event.ActionEvent
 import javax.swing.Timer
 

@@ -35,7 +35,6 @@ import com.maddyhome.idea.vim.vimscript.model.options.helpers.GuiCursorOptionHel
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.GuiCursorType
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.services.OptionService
 import java.awt.Color
 
 /**

@@ -26,7 +26,6 @@ import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.services.OptionService
 
 data class OptionExpression(val scope: Scope, val optionName: String) : Expression() {
 

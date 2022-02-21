@@ -24,7 +24,6 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.services.OptionService
 
 // Currently support only matchit
 class PackaddCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {

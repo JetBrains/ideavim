@@ -29,7 +29,6 @@ import com.intellij.internal.statistic.service.fus.collectors.ApplicationUsagesC
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.services.OptionService
 import com.maddyhome.idea.vim.vimscript.services.OptionServiceImpl
 
 internal class OptionsState : ApplicationUsagesCollector() {

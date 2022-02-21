@@ -31,7 +31,6 @@ import com.maddyhome.idea.vim.key.KeyHandlerKeeper
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.services.OptionService
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke

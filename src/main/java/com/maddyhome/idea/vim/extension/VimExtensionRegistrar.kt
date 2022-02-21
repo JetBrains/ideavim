@@ -30,7 +30,6 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.options.OptionChangeListener
 import com.maddyhome.idea.vim.vimscript.model.options.ToggleOption
 import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.services.OptionService
 
 object VimExtensionRegistrar {
   internal val registeredExtensions: MutableSet<String> = HashSet()

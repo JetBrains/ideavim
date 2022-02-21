@@ -43,11 +43,10 @@ import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.helper.inNormalMode
 import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
 import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
-import com.maddyhome.idea.vim.vimscript.model.options.helpers.IdeaRefactorModeHelper
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.services.OptionService
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
+import com.maddyhome.idea.vim.vimscript.model.options.helpers.IdeaRefactorModeHelper
 import org.jetbrains.annotations.NonNls
 
 /**

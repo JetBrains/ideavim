@@ -22,7 +22,6 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.SearchHelper.findPositionOfFirstCharacter
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.services.OptionService
 
 enum class Direction(private val value: Int) {
   BACKWARDS(-1), FORWARDS(1);

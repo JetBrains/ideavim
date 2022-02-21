@@ -31,7 +31,6 @@ import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.services.OptionService
 import com.maddyhome.idea.vim.vimscript.services.OptionServiceImpl
 import java.util.*
 import kotlin.math.ceil

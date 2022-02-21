@@ -25,7 +25,6 @@ import com.maddyhome.idea.vim.newapi.vimLogger
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.services.OptionService
 import java.awt.event.ActionListener
 import javax.swing.KeyStroke
 import javax.swing.Timer

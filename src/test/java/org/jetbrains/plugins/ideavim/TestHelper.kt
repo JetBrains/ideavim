@@ -30,7 +30,6 @@ import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.services.OptionService
 import kotlin.test.fail
 
 /**
