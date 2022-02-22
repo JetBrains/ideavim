@@ -22,8 +22,6 @@ import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 import com.maddyhome.idea.vim.extension.VimExtensionHandler;
 import com.maddyhome.idea.vim.helper.StringHelper;
-import com.maddyhome.idea.vim.vimscript.model.Executable;
-import com.maddyhome.idea.vim.vimscript.model.VimLContext;
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression;
 import kotlin.Pair;
 import org.jetbrains.annotations.NotNull;
@@ -39,7 +37,7 @@ import java.util.stream.Collectors;
  *
  * @author vlan
  */
-public class KeyMapping implements Iterable<List<KeyStroke>> {
+public class KeyMapping implements Iterable<List<KeyStroke>>, KeyMappingLayer {
   /**
    * Contains all key mapping for some mode.
    */
@@ -149,7 +147,8 @@ public class KeyMapping implements Iterable<List<KeyStroke>> {
       .map(o -> new Pair<>(o.getKey(), o.getValue())).collect(Collectors.toList());
   }
 
-  public boolean isPrefix(@NotNull Iterable<KeyStroke> keys) {
+  @Override
+  public boolean isPrefix(@NotNull Iterable<? extends KeyStroke> keys) {
     // Having a parameter of Iterable allows for a nicer API, because we know when a given list is immutable.
     // Perhaps we should look at changing this to a trie or something?
     assert (keys instanceof List) : "keys must be of type List<KeyStroke>";
@@ -173,5 +172,12 @@ public class KeyMapping implements Iterable<List<KeyStroke>> {
     return myKeys.entrySet().stream().filter(
       o -> o.getValue() instanceof ToKeysMappingInfo && ((ToKeysMappingInfo)o.getValue()).getToKeys().equals(toKeys))
       .map(o -> new Pair<>(o.getKey(), o.getValue())).collect(Collectors.toList());
+  }
+
+  @Nullable
+  @Override
+  public MappingInfoLayer getLayer(@NotNull Iterable<? extends KeyStroke> keys) {
+    Iterable<KeyStroke> keys1 = (Iterable<KeyStroke>)keys;
+    return get(keys1);
   }
 }

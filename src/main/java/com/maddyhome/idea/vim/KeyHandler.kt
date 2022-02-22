@@ -51,7 +51,7 @@ import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.helper.inNormalMode
 import com.maddyhome.idea.vim.helper.inSingleNormalMode
 import com.maddyhome.idea.vim.helper.inVisualMode
-import com.maddyhome.idea.vim.key.KeyMapping
+import com.maddyhome.idea.vim.key.KeyMappingLayer
 import com.maddyhome.idea.vim.newapi.VimActionsInitiator
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.injector
@@ -294,7 +294,7 @@ class KeyHandler {
     // Save the unhandled key strokes until we either complete or abandon the sequence.
     LOG.trace("Add key to mapping state")
     mappingState.addKey(key)
-    val mapping = injector.keyGroup.getKeyMapping(mappingState.mappingMode)
+    val mapping = injector.keyGroup.getKeyMappingLayer(mappingState.mappingMode)
     LOG.trace { "Get keys for mapping mode. mode = " + mappingState.mappingMode }
 
     // Returns true if any of these methods handle the key. False means that the key is unrelated to mapping and should
@@ -320,7 +320,7 @@ class KeyHandler {
   private fun handleUnfinishedMappingSequence(
     editor: VimEditor,
     mappingState: MappingState,
-    mapping: KeyMapping,
+    mapping: KeyMappingLayer,
     mappingCompleted: Boolean,
   ): Boolean {
     LOG.trace("Processing unfinished mappings...")
@@ -382,12 +382,12 @@ class KeyHandler {
     editor: VimEditor,
     context: ExecutionContext,
     mappingState: MappingState,
-    mapping: KeyMapping,
+    mapping: KeyMappingLayer,
     key: KeyStroke,
   ): Boolean {
     LOG.trace("Processing complete mapping sequence...")
     // The current sequence isn't a prefix, check to see if it's a completed sequence.
-    val currentMappingInfo = mapping[mappingState.keys]
+    val currentMappingInfo = mapping.getLayer(mappingState.keys)
     var mappingInfo = currentMappingInfo
     if (mappingInfo == null) {
       LOG.trace("Haven't found any mapping info for the given sequence. Trying to apply mapping to a subsequence.")
@@ -405,7 +405,7 @@ class KeyHandler {
       mappingState.keys.forEach(Consumer { e: KeyStroke -> previouslyUnhandledKeySequence.add(e) })
       if (previouslyUnhandledKeySequence.size > 1) {
         previouslyUnhandledKeySequence.removeAt(previouslyUnhandledKeySequence.size - 1)
-        mappingInfo = mapping[previouslyUnhandledKeySequence]
+        mappingInfo = mapping.getLayer(previouslyUnhandledKeySequence)
       }
     }
     if (mappingInfo == null) {

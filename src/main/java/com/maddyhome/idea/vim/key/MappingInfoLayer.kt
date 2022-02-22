@@ -16,19 +16,12 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.group;
+package com.maddyhome.idea.vim.key
 
-import com.maddyhome.idea.vim.common.MappingMode;
-import com.maddyhome.idea.vim.common.CommandPartNode;
-import com.maddyhome.idea.vim.key.KeyMapping;
-import com.maddyhome.idea.vim.key.KeyMappingLayer;
-import com.maddyhome.idea.vim.newapi.VimActionsInitiator;
-import org.jetbrains.annotations.NotNull;
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
 
-public interface VimKeyGroup {
-  @NotNull KeyMapping getKeyMapping(@NotNull MappingMode mode);
-
-  @NotNull CommandPartNode<VimActionsInitiator> getKeyRoot(@NotNull MappingMode mappingMode);
-
-  @NotNull KeyMappingLayer getKeyMappingLayer(@NotNull MappingMode mode);
+interface MappingInfoLayer {
+  fun getPresentableString(): String
+  fun execute(editor: VimEditor, context: ExecutionContext)
 }

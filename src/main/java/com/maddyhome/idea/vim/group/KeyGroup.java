@@ -340,6 +340,11 @@ public class KeyGroup implements PersistentStateComponent<Element>, VimKeyGroup 
     return keyRoots.computeIfAbsent(mappingMode, (key) -> new RootNode<>());
   }
 
+  @Override
+  public @NotNull KeyMappingLayer getKeyMappingLayer(@NotNull MappingMode mode) {
+    return getKeyMapping(mode);
+  }
+
   /**
    * Registers a shortcut that is handled by KeyHandler#handleKey directly, rather than by an action
    *
