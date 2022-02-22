@@ -72,7 +72,6 @@ annotation class VimBehaviorDiffers(
 
 fun <T : Comparable<T>> sort(a: T, b: T) = if (a > b) b to a else a to b
 
-inline fun <reified T : Enum<T>> noneOfEnum(): EnumSet<T> = EnumSet.noneOf(T::class.java)
 inline fun <reified T : Enum<T>> enumSetOf(vararg value: T): EnumSet<T> = when (value.size) {
   0 -> noneOfEnum()
   1 -> EnumSet.of(value[0])
