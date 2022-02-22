@@ -44,6 +44,7 @@ import com.intellij.util.ObjectUtils;
 import com.intellij.util.containers.ContainerUtil;
 import com.maddyhome.idea.vim.*;
 import com.maddyhome.idea.vim.api.ExecutionContext;
+import com.maddyhome.idea.vim.api.MutableVimEditor;
 import com.maddyhome.idea.vim.api.VimEditor;
 import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.common.IndentConfig;
@@ -736,13 +737,13 @@ public class ChangeGroup implements VimChangeGroup {
    * @param cmd    The command that was executed
    */
   @Override
-  public void processCommand(@NotNull Editor editor, @NotNull Command cmd) {
+  public void processCommand(@NotNull VimEditor editor, @NotNull Command cmd) {
     // return value never used here
     if (cmd.getFlags().contains(CommandFlags.FLAG_SAVE_STROKE)) {
       strokes.add(cmd.getAction());
     }
     else if (cmd.getFlags().contains(CommandFlags.FLAG_CLEAR_STROKES)) {
-      clearStrokes(editor);
+      clearStrokes(((IjVimEditor)editor).getEditor());
     }
   }
 

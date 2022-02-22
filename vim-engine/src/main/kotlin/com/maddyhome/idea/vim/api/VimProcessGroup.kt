@@ -15,20 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.maddyhome.idea.vim.api
 
-package com.maddyhome.idea.vim.group;
+import javax.swing.KeyStroke
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.api.VimEditor;
-import org.jetbrains.annotations.NotNull;
-
-import javax.swing.*;
-
-public interface VimProcessGroup {
-  void startSearchCommand(@NotNull Editor editor, DataContext context, int count, char leader);
-
-  @NotNull String endSearchCommand();
-
-  boolean processExKey(@NotNull VimEditor editor, @NotNull KeyStroke stroke);
+interface VimProcessGroup {
+    fun startSearchCommand(editor: VimEditor, context: ExecutionContext?, count: Int, leader: Char)
+    fun endSearchCommand(): String
+    fun processExKey(editor: VimEditor, stroke: KeyStroke): Boolean
 }

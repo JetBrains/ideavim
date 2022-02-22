@@ -10,7 +10,7 @@
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.FileGroup"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.SearchGroup"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.ProcessGroup"
-                        serviceInterface="com.maddyhome.idea.vim.group.VimProcessGroup"/>
+                        serviceInterface="com.maddyhome.idea.vim.api.VimProcessGroup"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.MacroGroup"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.DigraphGroup"
                         serviceInterface="com.maddyhome.idea.vim.group.VimDigraphGroup"/>

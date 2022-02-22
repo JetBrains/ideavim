@@ -35,19 +35,21 @@ import com.intellij.util.execution.ParametersListUtil;
 import com.intellij.util.text.CharSequenceReader;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.api.ExecutionContext;
+import com.maddyhome.idea.vim.api.VimEditor;
+import com.maddyhome.idea.vim.api.VimProcessGroup;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.ex.InvalidCommandException;
 import com.maddyhome.idea.vim.helper.UiHelper;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
-import com.maddyhome.idea.vim.api.VimEditor;
+import com.maddyhome.idea.vim.options.OptionConstants;
+import com.maddyhome.idea.vim.options.OptionScope;
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
 import com.maddyhome.idea.vim.vimscript.Executor;
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
-import com.maddyhome.idea.vim.options.OptionConstants;
-import com.maddyhome.idea.vim.options.OptionScope;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -62,8 +64,8 @@ public class ProcessGroup implements VimProcessGroup {
   }
 
   @Override
-  public void startSearchCommand(@NotNull Editor editor, DataContext context, int count, char leader) {
-    if (editor.isOneLineMode()) // Don't allow searching in one line editors
+  public void startSearchCommand(@NotNull VimEditor editor, ExecutionContext context, int count, char leader) {
+    if (((IjVimEditor)editor).getEditor().isOneLineMode()) // Don't allow searching in one line editors
     {
       return;
     }
@@ -72,7 +74,7 @@ public class ProcessGroup implements VimProcessGroup {
     String label = String.valueOf(leader);
 
     ExEntryPanel panel = ExEntryPanel.getInstance();
-    panel.activate(editor, context, label, initText, count);
+    panel.activate(((IjVimEditor)editor).getEditor(), ((DataContext)context.getContext()), label, initText, count);
   }
 
   @Override

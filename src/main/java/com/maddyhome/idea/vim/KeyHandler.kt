@@ -31,11 +31,14 @@ import com.maddyhome.idea.vim.command.CommandBuilder
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.CommandState.Companion.getInstance
-import com.maddyhome.idea.vim.common.CurrentCommandState
-import com.maddyhome.idea.vim.common.MappingMode
 import com.maddyhome.idea.vim.command.MappingState
 import com.maddyhome.idea.vim.command.OperatorArguments
+import com.maddyhome.idea.vim.common.CommandNode
+import com.maddyhome.idea.vim.common.CommandPartNode
+import com.maddyhome.idea.vim.common.CurrentCommandState
 import com.maddyhome.idea.vim.common.DigraphResult
+import com.maddyhome.idea.vim.common.MappingMode
+import com.maddyhome.idea.vim.common.Node
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.trace
@@ -48,19 +51,16 @@ import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.helper.inNormalMode
 import com.maddyhome.idea.vim.helper.inSingleNormalMode
 import com.maddyhome.idea.vim.helper.inVisualMode
-import com.maddyhome.idea.vim.common.CommandNode
-import com.maddyhome.idea.vim.common.CommandPartNode
 import com.maddyhome.idea.vim.key.KeyMapping
-import com.maddyhome.idea.vim.common.Node
 import com.maddyhome.idea.vim.newapi.VimActionsInitiator
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.injector
 import com.maddyhome.idea.vim.newapi.vimLogger
+import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.ui.ShowCmd.update
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
-import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
 import java.awt.event.InputEvent
 import java.awt.event.KeyEvent
 import java.util.function.Consumer
@@ -784,7 +784,7 @@ class KeyHandler {
       Argument.Type.EX_STRING -> {
         // The current Command expects an EX_STRING argument. E.g. SearchEntry(Fwd|Rev)Action. This won't execute until
         // state hits READY. Start the ex input field, push CMD_LINE mode and wait for the argument.
-        injector.processGroup.startSearchCommand(editor.ij, context.ij, commandBuilder.count, key)
+        injector.processGroup.startSearchCommand(editor, context, commandBuilder.count, key)
         commandBuilder.commandState = CurrentCommandState.NEW_COMMAND
         editorState.pushModes(CommandState.Mode.CMD_LINE, CommandState.SubMode.NONE)
       }
@@ -870,7 +870,7 @@ class KeyHandler {
       }
       injector.actionExecutor.executeVimAction(editor, cmd.action, context, operatorArguments)
       if (editorState.mode === CommandState.Mode.INSERT || editorState.mode === CommandState.Mode.REPLACE) {
-        injector.changeGroup.processCommand(editor.ij, cmd)
+        injector.changeGroup.processCommand(editor, cmd)
       }
 
       // Now the command has been executed let's clean up a few things.

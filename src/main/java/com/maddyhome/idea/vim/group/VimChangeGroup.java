@@ -18,16 +18,15 @@
 
 package com.maddyhome.idea.vim.group;
 
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.api.ExecutionContext;
 import com.maddyhome.idea.vim.api.VimEditor;
+import com.maddyhome.idea.vim.command.Command;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 
 public interface VimChangeGroup {
-  void processCommand(@NotNull Editor editor, @NotNull Command cmd);
+  void processCommand(@NotNull VimEditor editor, @NotNull Command cmd);
 
   boolean processKey(@NotNull VimEditor editor, @NotNull ExecutionContext context, @NotNull KeyStroke key);
 
