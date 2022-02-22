@@ -47,6 +47,7 @@ import com.maddyhome.idea.vim.action.motion.text.MotionParagraphPreviousAction;
 import com.maddyhome.idea.vim.action.motion.text.MotionSentenceNextStartAction;
 import com.maddyhome.idea.vim.action.motion.text.MotionSentencePreviousStartAction;
 import com.maddyhome.idea.vim.action.motion.updown.MotionPercentOrMatchAction;
+import com.maddyhome.idea.vim.api.VimRegisterGroup;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
@@ -139,7 +140,6 @@ public class RegisterGroup implements PersistentStateComponent<Element>, VimRegi
     );
   }
 
-  @Override
   public boolean isRegisterWritable() {
     return RegisterGroup.READONLY_REGISTERS.indexOf(lastRegister) < 0;
   }
@@ -193,7 +193,6 @@ public class RegisterGroup implements PersistentStateComponent<Element>, VimRegi
    * @param isDelete is from a delete
    * @return true if able to store the text into the register, false if not
    */
-  @Override
   public boolean storeText(@NotNull Editor editor,
                            @NotNull TextRange range,
                            @NotNull SelectionType type,
@@ -227,7 +226,6 @@ public class RegisterGroup implements PersistentStateComponent<Element>, VimRegi
    * @param text      The text to store, without further processing
    * @return          True if the text is stored, false if the passed register is not supported
    */
-  @Override
   public boolean storeTextSpecial(char register, @NotNull String text) {
     if (READONLY_REGISTERS.indexOf(register) == -1 && register != LAST_SEARCH_REGISTER
         && register != UNNAMED_REGISTER) {
@@ -404,12 +402,10 @@ public class RegisterGroup implements PersistentStateComponent<Element>, VimRegi
    *
    * @return The register, null if no such register
    */
-  @Override
   public @Nullable Register getLastRegister() {
     return getRegister(lastRegister);
   }
 
-  @Override
   public @Nullable Register getPlaybackRegister(char r) {
     if (PLAYBACK_REGISTERS.indexOf(r) != 0) {
       return getRegister(r);
@@ -419,7 +415,6 @@ public class RegisterGroup implements PersistentStateComponent<Element>, VimRegi
     }
   }
 
-  @Override
   public @Nullable Register getRegister(char r) {
     // Uppercase registers actually get the lowercase register
     if (Character.isUpperCase(r)) {
@@ -428,7 +423,6 @@ public class RegisterGroup implements PersistentStateComponent<Element>, VimRegi
     return CLIPBOARD_REGISTERS.indexOf(r) >= 0 ? refreshClipboardRegister(r) : registers.get(r);
   }
 
-  @Override
   public void saveRegister(char r, Register register) {
     // Uppercase registers actually get the lowercase register
     if (Character.isUpperCase(r)) {
@@ -458,7 +452,6 @@ public class RegisterGroup implements PersistentStateComponent<Element>, VimRegi
     return defaultRegister;
   }
 
-  @Override
   public @NotNull List<Register> getRegisters() {
     final List<Register> res = new ArrayList<>(registers.values());
     for (int i = 0; i < CLIPBOARD_REGISTERS.length(); i++) {
@@ -472,7 +465,6 @@ public class RegisterGroup implements PersistentStateComponent<Element>, VimRegi
     return res;
   }
 
-  @Override
   public boolean startRecording(Editor editor, char register) {
     if (RECORDABLE_REGISTERS.indexOf(register) != -1) {
       CommandState.getInstance(new IjVimEditor(editor)).setRecording(true);
@@ -492,24 +484,20 @@ public class RegisterGroup implements PersistentStateComponent<Element>, VimRegi
     }
   }
 
-  @Override
   public void recordText(@NotNull String text) {
     if (recordRegister != 0 && recordList != null) {
       recordList.addAll(StringHelper.stringToKeys(text));
     }
   }
 
-  @Override
   public void setKeys(char register, @NotNull List<KeyStroke> keys) {
     registers.put(register, new Register(register, SelectionType.CHARACTER_WISE, keys));
   }
 
-  @Override
   public void setKeys(char register, @NotNull List<KeyStroke> keys, SelectionType type) {
     registers.put(register, new Register(register, type, keys));
   }
 
-  @Override
   public void finishRecording(Editor editor) {
     if (recordRegister != 0) {
       Register reg = null;
