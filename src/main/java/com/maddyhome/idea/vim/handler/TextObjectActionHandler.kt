@@ -18,10 +18,6 @@
 
 package com.maddyhome.idea.vim.handler
 
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Caret
-import com.intellij.openapi.editor.Editor
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -32,13 +28,11 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.command.TextObjectVisualType
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.group.MotionGroup
-import com.maddyhome.idea.vim.group.visual.vimSetSelection
 import com.maddyhome.idea.vim.helper.endOffsetInclusive
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.helper.vimSelectionStart
-import com.maddyhome.idea.vim.newapi.ij
+import com.maddyhome.idea.vim.newapi.injector
 
 /**
  * @author Alex Plate
@@ -59,9 +53,9 @@ abstract class TextObjectActionHandler : EditorActionHandlerBase(true) {
   abstract val visualType: TextObjectVisualType
 
   abstract fun getRange(
-    editor: Editor,
-    caret: Caret,
-    context: DataContext,
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
     count: Int,
     rawCount: Int,
     argument: Argument?,
@@ -77,25 +71,25 @@ abstract class TextObjectActionHandler : EditorActionHandlerBase(true) {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    if (!editor.ij.inVisualMode) return true
+    if (!editor.inVisualMode) return true
 
-    val range = getRange(editor.ij, caret.ij, context.ij, cmd.count, cmd.rawCount, cmd.argument) ?: return false
+    val range = getRange(editor, caret, context, cmd.count, cmd.rawCount, cmd.argument) ?: return false
 
     val block = CommandFlags.FLAG_TEXT_BLOCK in cmd.flags
     val newstart = if (block || caret.offset.point >= caret.vimSelectionStart) range.startOffset else range.endOffsetInclusive
     val newend = if (block || caret.offset.point >= caret.vimSelectionStart) range.endOffsetInclusive else range.startOffset
 
     if (caret.vimSelectionStart == caret.offset.point || block) {
-      caret.ij.vimSetSelection(newstart, newstart, false)
+      caret.vimSetSelection(newstart, newstart, false)
     }
 
-    if (visualType == TextObjectVisualType.LINE_WISE && editor.ij.subMode != CommandState.SubMode.VISUAL_LINE) {
-      VimPlugin.getVisualMotion().toggleVisual(editor.ij, 1, 0, CommandState.SubMode.VISUAL_LINE)
-    } else if (visualType != TextObjectVisualType.LINE_WISE && editor.ij.subMode == CommandState.SubMode.VISUAL_LINE) {
-      VimPlugin.getVisualMotion().toggleVisual(editor.ij, 1, 0, CommandState.SubMode.VISUAL_CHARACTER)
+    if (visualType == TextObjectVisualType.LINE_WISE && editor.subMode != CommandState.SubMode.VISUAL_LINE) {
+      injector.visualMotionGroup.toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_LINE)
+    } else if (visualType != TextObjectVisualType.LINE_WISE && editor.subMode == CommandState.SubMode.VISUAL_LINE) {
+      injector.visualMotionGroup.toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_CHARACTER)
     }
 
-    MotionGroup.moveCaret(editor.ij, caret.ij, newend)
+    caret.moveToOffset(newend)
 
     return true
   }

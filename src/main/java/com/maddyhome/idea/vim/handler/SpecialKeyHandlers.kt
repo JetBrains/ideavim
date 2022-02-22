@@ -33,10 +33,11 @@ import com.maddyhome.idea.vim.helper.exitSelectMode
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.inSelectMode
 import com.maddyhome.idea.vim.helper.inVisualMode
+import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
 /**
  * @author Alex Plate
@@ -56,7 +57,7 @@ abstract class ShiftedSpecialKeyHandler : VimActionHandler.SingleExecution() {
         VimPlugin.getVisualMotion().enterSelectMode(editor, CommandState.SubMode.VISUAL_CHARACTER)
       } else {
         VimPlugin.getVisualMotion()
-          .toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_CHARACTER)
+          .toggleVisual(IjVimEditor(editor), 1, 0, CommandState.SubMode.VISUAL_CHARACTER)
       }
     }
     motion(editor, context, cmd)
@@ -92,7 +93,7 @@ abstract class ShiftedArrowKeyHandler : VimActionHandler.SingleExecution() {
           VimPlugin.getVisualMotion().enterSelectMode(editor, CommandState.SubMode.VISUAL_CHARACTER)
         } else {
           VimPlugin.getVisualMotion()
-            .toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_CHARACTER)
+            .toggleVisual(IjVimEditor(editor), 1, 0, CommandState.SubMode.VISUAL_CHARACTER)
         }
       }
       motionWithKeyModel(editor, context, cmd)

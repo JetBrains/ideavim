@@ -18,14 +18,15 @@
 
 package com.maddyhome.idea.vim.action.motion.gn
 
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Caret
-import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.TextObjectVisualType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler
+import com.maddyhome.idea.vim.newapi.ij
 
 /**
  * @author Alex Plate
@@ -36,15 +37,15 @@ class GnPreviousTextObject : TextObjectActionHandler() {
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
 
   override fun getRange(
-    editor: Editor,
-    caret: Caret,
-    context: DataContext,
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
     count: Int,
     rawCount: Int,
     argument: Argument?,
   ): TextRange? {
-    if (caret != editor.caretModel.primaryCaret) return null
-    val range = VimPlugin.getSearch().getNextSearchRange(editor, count, false)
+    if (caret != editor.primaryCaret()) return null
+    val range = VimPlugin.getSearch().getNextSearchRange(editor.ij, count, false)
     return range?.let { TextRange(it.startOffset, it.endOffset) }
   }
 }

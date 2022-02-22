@@ -137,7 +137,7 @@ public class MotionGroup {
       else if (cmd.getAction() instanceof TextObjectActionHandler) {
         TextObjectActionHandler action = (TextObjectActionHandler)cmd.getAction();
 
-        TextRange range = action.getRange(editor, caret, context, cnt, raw, cmd.getArgument());
+        TextRange range = action.getRange(new IjVimEditor(editor), new IjVimCaret(caret), new IjExecutionContext(context), cnt, raw, cmd.getArgument());
 
         if (range == null) return null;
 
@@ -237,7 +237,14 @@ public class MotionGroup {
       else if (cmd.getAction() instanceof TextObjectActionHandler) {
         TextObjectActionHandler action = (TextObjectActionHandler)cmd.getAction();
 
-        TextRange range = action.getRange(editor, caret, context, cnt, raw, cmd.getArgument());
+        TextRange range = action.getRange(
+          new IjVimEditor(editor),
+          new IjVimCaret(caret),
+          new IjExecutionContext(context),
+          cnt,
+          raw,
+          cmd.getArgument()
+        );
 
         if (range == null) return null;
 

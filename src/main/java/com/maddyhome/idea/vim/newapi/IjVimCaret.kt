@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.common.EditorLine
 import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.common.offset
 import com.maddyhome.idea.vim.group.MotionGroup
+import com.maddyhome.idea.vim.group.visual.vimSetSelection
 import com.maddyhome.idea.vim.group.visual.vimSetSystemSelectionSilently
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.helper.vimLastColumn
@@ -68,6 +69,10 @@ class IjVimCaret(val caret: Caret) : VimCaret {
 
   override fun moveToInlayAwareOffset(newOffset: Int) {
     caret.moveToInlayAwareOffset(newOffset)
+  }
+
+  override fun vimSetSelection(start: Int, end: Int, moveCaretToSelectionEnd: Boolean) {
+    caret.vimSetSelection(start, end, moveCaretToSelectionEnd)
   }
 
   override fun equals(other: Any?): Boolean = this.caret == (other as? IjVimCaret)?.caret

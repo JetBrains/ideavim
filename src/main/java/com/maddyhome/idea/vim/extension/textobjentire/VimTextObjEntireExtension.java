@@ -21,6 +21,9 @@ package com.maddyhome.idea.vim.extension.textobjentire;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
+import com.maddyhome.idea.vim.api.ExecutionContext;
+import com.maddyhome.idea.vim.api.VimCaret;
+import com.maddyhome.idea.vim.api.VimEditor;
 import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.common.MappingMode;
 import com.maddyhome.idea.vim.common.TextRange;
@@ -30,6 +33,8 @@ import com.maddyhome.idea.vim.handler.TextObjectActionHandler;
 import com.maddyhome.idea.vim.helper.InlayHelperKt;
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor;
 import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
+import com.maddyhome.idea.vim.newapi.IjExecutionContext;
+import com.maddyhome.idea.vim.newapi.IjVimCaret;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -98,18 +103,18 @@ public class VimTextObjEntireExtension implements VimExtension {
 
       @Nullable
       @Override
-      public TextRange getRange(@NotNull Editor editor,
-                                @NotNull Caret caret,
-                                @NotNull DataContext context,
+      public TextRange getRange(@NotNull VimEditor editor,
+                                @NotNull VimCaret caret,
+                                @NotNull ExecutionContext context,
                                 int count,
                                 int rawCount,
                                 @Nullable Argument argument) {
-        int start = 0, end = editor.getDocument().getTextLength();
+        int start = 0, end = ((IjVimEditor)editor).getEditor().getDocument().getTextLength();
 
         // for the `ie` text object we don't want leading an trailing spaces
         // so we have to scan the document text to find the correct start & end
         if (ignoreLeadingAndTrailing) {
-          String content = editor.getDocument().getText();
+          String content = ((IjVimEditor)editor).getEditor().getDocument().getText();
           for (int i = 0; i < content.length(); ++i) {
             if (!Character.isWhitespace(content.charAt(i))) {
               start = i;
@@ -144,7 +149,7 @@ public class VimTextObjEntireExtension implements VimExtension {
       //noinspection DuplicatedCode
       if (!commandState.isOperatorPending()) {
         editor.getCaretModel().runForEachCaret((Caret caret) -> {
-          final TextRange range = textObjectHandler.getRange(editor, caret, context, count, 0, null);
+          final TextRange range = textObjectHandler.getRange(new IjVimEditor(editor), new IjVimCaret(caret), new IjExecutionContext(context), count, 0, null);
           if (range != null) {
             try (VimListenerSuppressor.Locked ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
               if (commandState.getMode() == CommandState.Mode.VISUAL) {

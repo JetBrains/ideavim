@@ -33,6 +33,7 @@ import com.maddyhome.idea.vim.group.VimDigraphGroup
 import com.maddyhome.idea.vim.group.VimKeyGroup
 import com.maddyhome.idea.vim.group.VimProcessGroup
 import com.maddyhome.idea.vim.group.VimRegisterGroup
+import com.maddyhome.idea.vim.group.visual.VimVisualMotionGroup
 import com.maddyhome.idea.vim.helper.IjActionExecutor
 import com.maddyhome.idea.vim.helper.VimActionExecutor
 import com.maddyhome.idea.vim.helper.vimCommandState
@@ -51,6 +52,7 @@ interface VimInjector {
   val application: VimApplication
   val executionContextManager: ExecutionContextManager
   val digraphGroup: VimDigraphGroup
+  val visualMotionGroup: VimVisualMotionGroup
 
   val vimMachine: VimMachine
 
@@ -90,6 +92,8 @@ class IjVimInjector : VimInjector {
   override val enabler: VimEnabler
     get() = service<IjVimEnabler>()
   override val digraphGroup: VimDigraphGroup
+    get() = service()
+  override val visualMotionGroup: VimVisualMotionGroup
     get() = service()
 
   override val optionService: OptionService

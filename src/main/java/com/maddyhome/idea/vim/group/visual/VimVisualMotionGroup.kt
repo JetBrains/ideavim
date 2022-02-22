@@ -16,31 +16,18 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.newapi
+package com.maddyhome.idea.vim.group.visual
 
-import com.intellij.openapi.actionSystem.AnAction
-import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.command.CommandState
 
-interface NativeAction {
-  val action: Any
+interface VimVisualMotionGroup {
+  /**
+   * This function toggles visual mode.
+   *
+   * If visual mode is disabled, enable it
+   * If visual mode is enabled, but [subMode] differs, update visual according to new [subMode]
+   * If visual mode is enabled with the same [subMode], disable it
+   */
+  fun toggleVisual(editor: VimEditor, count: Int, rawCount: Int, subMode: CommandState.SubMode): Boolean
 }
-
-fun NativeAction?.execute(context: ExecutionContext) {
-  if (this == null) return
-  injector.actionExecutor.executeAction(this, context)
-}
-
-val AnAction.vim: IjNativeAction
-  get() = IjNativeAction(this)
-
-class IjNativeAction(override val action: AnAction) : NativeAction
-
-interface NativeActionManager {
-  val enterAction: NativeAction?
-  val createLineAboveCaret: NativeAction?
-  val joinLines: NativeAction?
-  val indentLines: NativeAction?
-  val saveAll: NativeAction?
-  val saveCurrent: NativeAction?
-}
-

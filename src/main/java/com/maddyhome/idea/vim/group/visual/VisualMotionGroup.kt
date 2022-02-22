@@ -25,6 +25,7 @@ import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.editor.ScrollType
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
@@ -41,15 +42,16 @@ import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.helper.vimLastSelectionType
 import com.maddyhome.idea.vim.helper.vimLastVisualOperatorRange
 import com.maddyhome.idea.vim.helper.vimSelectionStart
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
 /**
  * @author Alex Plate
  */
-class VisualMotionGroup {
+class VisualMotionGroup : VimVisualMotionGroup {
   fun selectPreviousVisualMode(editor: Editor): Boolean {
     val lastSelectionType = editor.vimLastSelectionType ?: return false
     val visualMarks = VimPlugin.getMark().getVisualSelectionMarks(editor) ?: return false
@@ -119,17 +121,17 @@ class VisualMotionGroup {
    * If visual mode is enabled, but [subMode] differs, update visual according to new [subMode]
    * If visual mode is enabled with the same [subMode], disable it
    */
-  fun toggleVisual(editor: Editor, count: Int, rawCount: Int, subMode: CommandState.SubMode): Boolean {
+  override fun toggleVisual(editor: VimEditor, count: Int, rawCount: Int, subMode: CommandState.SubMode): Boolean {
     if (!editor.inVisualMode) {
       // Enable visual subMode
       if (rawCount > 0) {
-        val primarySubMode = editor.caretModel.primaryCaret.vimLastVisualOperatorRange?.type?.toSubMode()
+        val primarySubMode = editor.ij.caretModel.primaryCaret.vimLastVisualOperatorRange?.type?.toSubMode()
           ?: subMode
-        editor.vim.commandState.pushVisualMode(primarySubMode)
+        editor.commandState.pushVisualMode(primarySubMode)
 
-        editor.vimForEachCaret {
+        editor.ij.vimForEachCaret {
           val range = it.vimLastVisualOperatorRange ?: VisualChange.default(subMode)
-          val end = VisualOperation.calculateRange(editor, range, count, it)
+          val end = VisualOperation.calculateRange(editor.ij, range, count, it)
           val lastColumn =
             if (range.columns == MotionGroup.LAST_COLUMN) MotionGroup.LAST_COLUMN else editor.offsetToLogicalPosition(
               end
@@ -138,22 +140,22 @@ class VisualMotionGroup {
           it.vimSetSelection(it.offset, end, true)
         }
       } else {
-        editor.vim.commandState.pushVisualMode(subMode)
-        editor.vimForEachCaret { it.vimSetSelection(it.offset) }
+        editor.commandState.pushVisualMode(subMode)
+        editor.ij.vimForEachCaret { it.vimSetSelection(it.offset) }
       }
       return true
     }
 
     if (subMode == editor.subMode) {
       // Disable visual subMode
-      editor.exitVisualMode()
+      editor.ij.exitVisualMode()
       return true
     }
 
     // Update visual subMode with new sub subMode
     editor.subMode = subMode
-    for (caret in editor.caretModel.allCarets) {
-      caret.vimUpdateEditorSelection()
+    for (caret in editor.carets()) {
+      caret.ij.vimUpdateEditorSelection()
     }
 
     return true

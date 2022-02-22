@@ -23,6 +23,9 @@ import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.api.ExecutionContext;
+import com.maddyhome.idea.vim.api.VimCaret;
+import com.maddyhome.idea.vim.api.VimEditor;
 import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.common.MappingMode;
 import com.maddyhome.idea.vim.common.TextRange;
@@ -34,6 +37,8 @@ import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.VimNlsSafe;
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor;
 import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
+import com.maddyhome.idea.vim.newapi.IjExecutionContext;
+import com.maddyhome.idea.vim.newapi.IjVimCaret;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
 import org.jetbrains.annotations.Nls;
@@ -201,9 +206,9 @@ public class VimArgTextObjExtension implements VimExtension {
 
       @Nullable
       @Override
-      public TextRange getRange(@NotNull Editor editor,
-                                @NotNull Caret caret,
-                                @NotNull DataContext context,
+      public TextRange getRange(@NotNull VimEditor editor,
+                                @NotNull VimCaret caret,
+                                @NotNull ExecutionContext context,
                                 int count,
                                 int rawCount,
                                 @Nullable Argument argument) {
@@ -220,8 +225,8 @@ public class VimArgTextObjExtension implements VimExtension {
             return null;
           }
         }
-        final ArgBoundsFinder finder = new ArgBoundsFinder(editor.getDocument(), bracketPairs);
-        int pos = caret.getOffset();
+        final ArgBoundsFinder finder = new ArgBoundsFinder(((IjVimEditor)editor).getEditor().getDocument(), bracketPairs);
+        int pos = ((IjVimCaret)caret).getCaret().getOffset();
 
         for (int i = 0; i < count; ++i) {
           if (!finder.findBoundsAt(pos)) {
@@ -254,14 +259,15 @@ public class VimArgTextObjExtension implements VimExtension {
     @Override
     public void execute(@NotNull Editor editor, @NotNull DataContext context) {
 
-      @NotNull CommandState commandState = CommandState.getInstance(new IjVimEditor(editor));
+      IjVimEditor vimEditor = new IjVimEditor(editor);
+      @NotNull CommandState commandState = CommandState.getInstance(vimEditor);
       int count = Math.max(1, commandState.getCommandBuilder().getCount());
 
       final ArgumentTextObjectHandler textObjectHandler = new ArgumentTextObjectHandler(isInner);
       //noinspection DuplicatedCode
       if (!commandState.isOperatorPending()) {
         editor.getCaretModel().runForEachCaret((Caret caret) -> {
-          final TextRange range = textObjectHandler.getRange(editor, caret, context, count, 0, null);
+          final TextRange range = textObjectHandler.getRange(vimEditor, new IjVimCaret(caret), new IjExecutionContext(context), count, 0, null);
           if (range != null) {
             try (VimListenerSuppressor.Locked ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
               if (commandState.getMode() == CommandState.Mode.VISUAL) {

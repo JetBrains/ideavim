@@ -21,6 +21,9 @@ package com.maddyhome.idea.vim.extension.textobjindent;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
+import com.maddyhome.idea.vim.api.ExecutionContext;
+import com.maddyhome.idea.vim.api.VimCaret;
+import com.maddyhome.idea.vim.api.VimEditor;
 import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.common.MappingMode;
 import com.maddyhome.idea.vim.common.TextRange;
@@ -30,6 +33,8 @@ import com.maddyhome.idea.vim.handler.TextObjectActionHandler;
 import com.maddyhome.idea.vim.helper.InlayHelperKt;
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor;
 import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
+import com.maddyhome.idea.vim.newapi.IjExecutionContext;
+import com.maddyhome.idea.vim.newapi.IjVimCaret;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -101,14 +106,14 @@ public class VimIndentObject implements VimExtension {
 
       @Nullable
       @Override
-      public TextRange getRange(@NotNull Editor editor,
-                                @NotNull Caret caret,
-                                @NotNull DataContext context,
+      public TextRange getRange(@NotNull VimEditor editor,
+                                @NotNull VimCaret caret,
+                                @NotNull ExecutionContext context,
                                 int count,
                                 int rawCount,
                                 @Nullable Argument argument) {
-        final CharSequence charSequence = editor.getDocument().getCharsSequence();
-        final int caretOffset = caret.getOffset();
+        final CharSequence charSequence = ((IjVimEditor)editor).getEditor().getDocument().getCharsSequence();
+        final int caretOffset = ((IjVimCaret)caret).getCaret().getOffset();
 
         // Part 1: Find the start of the caret line.
         int caretLineStartOffset = caretOffset;
@@ -264,14 +269,15 @@ public class VimIndentObject implements VimExtension {
 
     @Override
     public void execute(@NotNull Editor editor, @NotNull DataContext context) {
-      @NotNull CommandState commandState = CommandState.getInstance(new IjVimEditor(editor));
+      IjVimEditor vimEditor = new IjVimEditor(editor);
+      @NotNull CommandState commandState = CommandState.getInstance(vimEditor);
       int count = Math.max(1, commandState.getCommandBuilder().getCount());
 
       final IndentObjectHandler textObjectHandler = new IndentObjectHandler(includeAbove, includeBelow);
 
       if (!commandState.isOperatorPending()) {
         editor.getCaretModel().runForEachCaret((Caret caret) -> {
-          final TextRange range = textObjectHandler.getRange(editor, caret, context, count, 0, null);
+          final TextRange range = textObjectHandler.getRange(vimEditor, new IjVimCaret(caret), new IjExecutionContext(context), count, 0, null);
           if (range != null) {
             try (VimListenerSuppressor.Locked ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
               if (commandState.getMode() == CommandState.Mode.VISUAL) {

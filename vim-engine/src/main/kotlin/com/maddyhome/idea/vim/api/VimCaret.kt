@@ -16,4 +16,5 @@ interface VimCaret {
   fun vimSetSystemSelectionSilently(start: Int, end: Int)
   val isValid: Boolean
   fun moveToInlayAwareOffset(newOffset: Int)
+  fun vimSetSelection(start: Int, end: Int = start, moveCaretToSelectionEnd: Boolean = false)
 }

@@ -25,9 +25,9 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
 @get:VimNlsSafe
 val usesVirtualSpace
@@ -109,6 +109,9 @@ val Editor.inRepeatMode
 
 @get:JvmName("inVisualMode")
 val Editor.inVisualMode
+  get() = this.mode.inVisualMode
+
+val VimEditor.inVisualMode
   get() = this.mode.inVisualMode
 
 @get:JvmName("inVisualMode")

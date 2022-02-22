@@ -28,9 +28,9 @@ import com.maddyhome.idea.vim.group.visual.vimSetSelection
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.vimForEachCaret
 import com.maddyhome.idea.vim.newapi.IjVimEditor
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
 class VisualToggleLineModeAction : VimActionHandler.SingleExecution() {
 
@@ -43,6 +43,6 @@ class VisualToggleLineModeAction : VimActionHandler.SingleExecution() {
         editor.vimForEachCaret { it.vimSetSelection(it.offset) }
       }
     } else VimPlugin.getVisualMotion()
-      .toggleVisual(editor, cmd.count, cmd.rawCount, CommandState.SubMode.VISUAL_LINE)
+      .toggleVisual(IjVimEditor(editor), cmd.count, cmd.rawCount, CommandState.SubMode.VISUAL_LINE)
   }
 }

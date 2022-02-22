@@ -204,7 +204,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   }
 
   public static @NotNull VisualMotionGroup getVisualMotion() {
-    return ApplicationManager.getApplication().getService(VisualMotionGroup.class);
+    return (VisualMotionGroup)VimInjectorKt.getInjector().getVisualMotionGroup();
   }
 
   public static @NotNull YankGroup getYank() {
