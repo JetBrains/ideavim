@@ -140,6 +140,8 @@ interface VimEditor {
    */
   fun forEachCaret(action: (VimCaret) -> Unit)
 
+  // --------------------------------------------------------------------
+
   /**
    * Do we really need this?
    * TODO
@@ -159,6 +161,18 @@ interface VimEditor {
 
   fun updateCaretsVisualAttributes()
   fun updateCaretsVisualPosition()
+
+  fun lineEndForOffset(offset: Int): Int
+  fun lineStartForOffset(offset: Int): Int
+
+  fun offsetToLogicalPosition(offset: Int): VimLogicalPosition
+  fun logicalPositionToOffset(position: VimLogicalPosition): Int
+  fun lineLength(line: Int): Int
+
+  fun removeSecondaryCarets()
+  fun vimSetSystemBlockSelectionSilently(start: VimLogicalPosition, end: VimLogicalPosition)
+
+  fun getLineEndOffset(line: Int, allowEnd: Boolean): Int
 }
 
 interface MutableVimEditor : VimEditor {
@@ -257,3 +271,5 @@ enum class LineDeleteShift {
   NL_ON_END,
   NO_NL,
 }
+
+class VimLogicalPosition(val line: Int, val column: Int, val leansForward: Boolean = false)

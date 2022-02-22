@@ -18,15 +18,15 @@
 
 package com.maddyhome.idea.vim.group.visual
 
-import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.editor.LogicalPosition
+import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.VimLogicalPosition
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.command.SelectionType.BLOCK_WISE
 import com.maddyhome.idea.vim.command.SelectionType.CHARACTER_WISE
 import com.maddyhome.idea.vim.command.SelectionType.LINE_WISE
+import com.maddyhome.idea.vim.common.Pointer
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.helper.EditorHelper
 import org.jetbrains.annotations.NonNls
 import kotlin.math.max
 import kotlin.math.min
@@ -49,14 +49,14 @@ sealed class VimSelection {
   abstract val type: SelectionType
   abstract val vimStart: Int
   abstract val vimEnd: Int
-  protected abstract val editor: Editor
+  protected abstract val editor: VimEditor
 
   abstract fun toVimTextRange(skipNewLineForLineMode: Boolean = false): TextRange
 
   abstract fun getNativeStartAndEnd(): Pair<Int, Int>
 
   companion object {
-    fun create(vimStart: Int, vimEnd: Int, type: SelectionType, editor: Editor) = when (type) {
+    fun create(vimStart: Int, vimEnd: Int, type: SelectionType, editor: VimEditor) = when (type) {
       CHARACTER_WISE -> {
         val nativeSelection = charToNativeSelection(editor, vimStart, vimEnd, CommandState.Mode.VISUAL)
         VimCharacterSelection(vimStart, vimEnd, nativeSelection.first, nativeSelection.second, editor)
@@ -114,13 +114,12 @@ sealed class VimSimpleSelection : VimSelection() {
       nativeStart: Int,
       nativeEnd: Int,
       type: SelectionType,
-      editor: Editor,
-    ) =
-      when (type) {
-        CHARACTER_WISE -> VimCharacterSelection(vimStart, vimEnd, nativeStart, nativeEnd, editor)
-        LINE_WISE -> VimLineSelection(vimStart, vimEnd, nativeStart, nativeEnd, editor)
-        BLOCK_WISE -> error("This method works only for line and character selection")
-      }
+      editor: VimEditor,
+    ) = when (type) {
+      CHARACTER_WISE -> VimCharacterSelection(vimStart, vimEnd, nativeStart, nativeEnd, editor)
+      LINE_WISE -> VimLineSelection(vimStart, vimEnd, nativeStart, nativeEnd, editor)
+      BLOCK_WISE -> error("This method works only for line and character selection")
+    }
   }
 }
 
@@ -129,7 +128,7 @@ class VimCharacterSelection(
   override val vimEnd: Int,
   override val nativeStart: Int,
   override val nativeEnd: Int,
-  override val editor: Editor,
+  override val editor: VimEditor,
 ) : VimSimpleSelection() {
   override val normNativeStart = min(nativeStart, nativeEnd)
   override val normNativeEnd = max(nativeStart, nativeEnd)
@@ -143,14 +142,14 @@ class VimLineSelection(
   override val vimEnd: Int,
   override val nativeStart: Int,
   override val nativeEnd: Int,
-  override val editor: Editor,
+  override val editor: VimEditor,
 ) : VimSimpleSelection() {
   override val normNativeStart = min(nativeStart, nativeEnd)
   override val normNativeEnd = max(nativeStart, nativeEnd)
   override val type = LINE_WISE
 
   override fun toVimTextRange(skipNewLineForLineMode: Boolean) =
-    if (skipNewLineForLineMode && editor.document.textLength >= normNativeEnd && normNativeEnd > 0 && editor.document.text[normNativeEnd - 1] == '\n') {
+    if (skipNewLineForLineMode && editor.fileSize() >= normNativeEnd && normNativeEnd > 0 && editor.charAt(Pointer(normNativeEnd - 1)) == '\n') {
       TextRange(normNativeStart, (normNativeEnd - 1).coerceAtLeast(0))
     } else {
       TextRange(normNativeStart, normNativeEnd)
@@ -160,7 +159,7 @@ class VimLineSelection(
 class VimBlockSelection(
   override val vimStart: Int,
   override val vimEnd: Int,
-  override val editor: Editor,
+  override val editor: VimEditor,
   private val toLineEnd: Boolean,
 ) : VimSelection() {
   override fun getNativeStartAndEnd() = blockToNativeSelection(editor, vimStart, vimEnd, CommandState.Mode.VISUAL).let {
@@ -176,7 +175,7 @@ class VimBlockSelection(
       starts += start
       ends += end
     }
-    return TextRange(starts.toIntArray(), ends.toIntArray()).also { it.normalize(editor.document.textLength) }
+    return TextRange(starts.toIntArray(), ends.toIntArray()).also { it.normalize(editor.fileSize().toInt()) }
   }
 
   private fun forEachLine(action: (start: Int, end: Int) -> Unit) {
@@ -184,11 +183,11 @@ class VimBlockSelection(
     val lineRange =
       if (logicalStart.line > logicalEnd.line) logicalEnd.line..logicalStart.line else logicalStart.line..logicalEnd.line
     lineRange.map { line ->
-      val start = editor.logicalPositionToOffset(LogicalPosition(line, logicalStart.column))
+      val start = editor.logicalPositionToOffset(VimLogicalPosition(line, logicalStart.column))
       val end = if (toLineEnd) {
-        EditorHelper.getLineEndOffset(editor, line, true)
+        editor.getLineEndOffset(line, true)
       } else {
-        editor.logicalPositionToOffset(LogicalPosition(line, logicalEnd.column))
+        editor.logicalPositionToOffset(VimLogicalPosition(line, logicalEnd.column))
       }
       action(start, end)
     }

@@ -7,8 +7,13 @@ import com.maddyhome.idea.vim.common.Offset
 interface VimCaret {
   val editor: VimEditor
   val offset: Offset
+  val vimLastColumn: Int
+  val selectionStart: Int
   fun moveToOffset(offset: Int)
   fun offsetForLineStartSkipLeading(line: Int): Int
   fun getLine(): EditorLine.Pointer
   fun hasSelection(): Boolean
+  fun vimSetSystemSelectionSilently(start: Int, end: Int)
+  val isValid: Boolean
+  fun moveToInlayAwareOffset(newOffset: Int)
 }

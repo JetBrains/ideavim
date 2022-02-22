@@ -220,7 +220,7 @@ class ToHandlerMappingInfo(
         for (caret in editor.carets()) {
           var startOffset = startOffsets[caret]
           if (caret.hasSelection()) {
-            val vimSelection = create(caret.vimSelectionStart, caret.offset.point, fromSubMode(editor.subMode), editor.ij)
+            val vimSelection = create(caret.vimSelectionStart, caret.offset.point, fromSubMode(editor.subMode), editor)
             offsets[caret] = vimSelection
             commandState.popModes()
           } else if (startOffset != null && startOffset.point != caret.offset.point) {
@@ -231,7 +231,7 @@ class ToHandlerMappingInfo(
             } else {
               startOffset = (startOffset.point - 1).offset
             }
-            val vimSelection = create(startOffset.point, endOffset.point, SelectionType.CHARACTER_WISE, editor.ij)
+            val vimSelection = create(startOffset.point, endOffset.point, SelectionType.CHARACTER_WISE, editor)
             offsets[caret] = vimSelection
             SelectionVimListenerSuppressor.lock().use {
               // Move caret to the initial offset for better undo action

@@ -23,9 +23,9 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.common.MappingMode
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.command.isLine
+import com.maddyhome.idea.vim.common.MappingMode
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.extension.VimExtensionFacade
@@ -43,6 +43,7 @@ import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.helper.vimForEachCaret
 import com.maddyhome.idea.vim.key.OperatorFunction
+import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.annotations.NonNls
 
@@ -68,7 +69,7 @@ class ReplaceWithRegister : VimExtension {
         val selectionStart = caret.selectionStart
         val selectionEnd = caret.selectionEnd
 
-        caretsAndSelections += caret to VimSelection.create(selectionStart, selectionEnd - 1, typeInEditor, editor)
+        caretsAndSelections += caret to VimSelection.create(selectionStart, selectionEnd - 1, typeInEditor, IjVimEditor(editor))
       }
       doReplace(editor, PutData.VisualSelection(caretsAndSelections, typeInEditor))
       editor.exitVisualMode()
@@ -94,7 +95,7 @@ class ReplaceWithRegister : VimExtension {
         val lineStart = editor.document.getLineStartOffset(logicalLine)
         val lineEnd = editor.document.getLineEndOffset(logicalLine)
 
-        caretsAndSelections += caret to VimSelection.create(lineStart, lineEnd, SelectionType.LINE_WISE, editor)
+        caretsAndSelections += caret to VimSelection.create(lineStart, lineEnd, SelectionType.LINE_WISE, IjVimEditor(editor))
       }
 
       val visualSelection = PutData.VisualSelection(caretsAndSelections, SelectionType.LINE_WISE)
@@ -118,7 +119,7 @@ class ReplaceWithRegister : VimExtension {
             range.startOffset,
             range.endOffset - 1,
             selectionType,
-            editor
+            IjVimEditor(editor)
           )
         ),
         selectionType

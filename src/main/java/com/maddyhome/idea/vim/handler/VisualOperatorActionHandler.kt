@@ -51,6 +51,7 @@ import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.helper.vimLastSelectionType
 import com.maddyhome.idea.vim.helper.vimLastVisualOperatorRange
 import com.maddyhome.idea.vim.helper.vimSelectionStart
+import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 
@@ -208,7 +209,7 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
             primaryCaret to VimBlockSelection(
               primaryCaret.offset,
               end,
-              this, range.columns >= MotionGroup.LAST_COLUMN
+              IjVimEditor(this), range.columns >= MotionGroup.LAST_COLUMN
             )
           )
         } else {
@@ -216,7 +217,7 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
           this.caretModel.allCarets.forEach { caret ->
             val range = caret.vimLastVisualOperatorRange ?: return@forEach
             val end = VisualOperation.calculateRange(this, range, 1, caret)
-            carets += caret to VimSelection.create(caret.offset, end, range.type, this)
+            carets += caret to VimSelection.create(caret.offset, end, range.type, IjVimEditor(this))
           }
           carets.toMap()
         }
@@ -227,7 +228,7 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
           primaryCaret to VimBlockSelection(
             primaryCaret.vimSelectionStart,
             primaryCaret.offset,
-            this, primaryCaret.vimLastColumn >= MotionGroup.LAST_COLUMN
+            IjVimEditor(this), primaryCaret.vimLastColumn >= MotionGroup.LAST_COLUMN
           )
         )
       }
@@ -240,7 +241,7 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
           caret.selectionStart,
           caret.selectionEnd,
           SelectionType.fromSubMode(subMode),
-          this
+          IjVimEditor(this)
         )
       }
     }

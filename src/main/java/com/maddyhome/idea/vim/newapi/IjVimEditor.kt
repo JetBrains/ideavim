@@ -20,14 +20,18 @@ package com.maddyhome.idea.vim.newapi
 
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorModificationUtil
+import com.intellij.openapi.editor.LogicalPosition
 import com.maddyhome.idea.vim.api.LineDeleteShift
 import com.maddyhome.idea.vim.api.MutableLinearEditor
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.VimLogicalPosition
 import com.maddyhome.idea.vim.common.EditorLine
 import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.common.Pointer
 import com.maddyhome.idea.vim.common.offset
+import com.maddyhome.idea.vim.group.visual.vimSetSystemBlockSelectionSilently
+import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.fileSize
 import com.maddyhome.idea.vim.helper.getTopLevelEditor
 import com.maddyhome.idea.vim.helper.inBlockSubMode
@@ -165,6 +169,41 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
 
   override fun updateCaretsVisualPosition() {
     editor.updateCaretsVisualPosition()
+  }
+
+  override fun lineEndForOffset(offset: Int): Int {
+    return EditorHelper.getLineEndForOffset(editor, offset)
+  }
+
+  override fun lineStartForOffset(offset: Int): Int {
+    return EditorHelper.getLineStartForOffset(editor, offset)
+  }
+
+  override fun offsetToLogicalPosition(offset: Int): VimLogicalPosition {
+    return editor.offsetToLogicalPosition(offset).let { VimLogicalPosition(it.line, it.column, it.leansForward) }
+  }
+
+  override fun logicalPositionToOffset(position: VimLogicalPosition): Int {
+    val logicalPosition = LogicalPosition(position.line, position.column, position.leansForward)
+    return editor.logicalPositionToOffset(logicalPosition)
+  }
+
+  override fun lineLength(line: Int): Int {
+    return EditorHelper.getLineLength(editor, line)
+  }
+
+  override fun removeSecondaryCarets() {
+    editor.caretModel.removeSecondaryCarets()
+  }
+
+  override fun vimSetSystemBlockSelectionSilently(start: VimLogicalPosition, end: VimLogicalPosition) {
+    val startPosition = LogicalPosition(start.line, start.column, start.leansForward)
+    val endPosition = LogicalPosition(end.line, end.column, end.leansForward)
+    editor.selectionModel.vimSetSystemBlockSelectionSilently(startPosition, endPosition)
+  }
+
+  override fun getLineEndOffset(line: Int, allowEnd: Boolean): Int {
+    return EditorHelper.getLineEndOffset(editor, line, allowEnd)
   }
 
   private fun Pair<Offset, Offset>.noGuard(editor: Editor): Boolean {
