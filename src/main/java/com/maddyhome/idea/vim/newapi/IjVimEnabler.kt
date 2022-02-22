@@ -18,9 +18,11 @@
 
 package com.maddyhome.idea.vim.newapi
 
+import com.intellij.openapi.components.Service
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.VimEnabler
 
+@Service
 class IjVimEnabler : VimEnabler {
   override fun isEnabled(): Boolean {
     return VimPlugin.isEnabled()

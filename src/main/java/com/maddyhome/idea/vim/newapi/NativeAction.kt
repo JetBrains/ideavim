@@ -21,6 +21,7 @@ package com.maddyhome.idea.vim.newapi
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.IdeActions
+import com.intellij.openapi.components.Service
 import com.maddyhome.idea.vim.api.ExecutionContext
 
 interface NativeAction {
@@ -46,6 +47,7 @@ interface NativeActionManager {
   val saveCurrent: NativeAction?
 }
 
+@Service
 class IjNativeActionManager : NativeActionManager {
   override val enterAction: NativeAction? by lazy { byName(IdeActions.ACTION_EDITOR_ENTER) }
   override val createLineAboveCaret: NativeAction? by lazy { byName("EditorStartNewLineBefore") }

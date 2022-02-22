@@ -18,6 +18,7 @@
 
 package com.maddyhome.idea.vim.newapi
 
+import com.intellij.openapi.components.Service
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.VimCaret
@@ -30,6 +31,7 @@ import com.maddyhome.idea.vim.group.MarkGroup
 import com.maddyhome.idea.vim.helper.inlayAwareVisualColumn
 import com.maddyhome.idea.vim.helper.vimLastColumn
 
+@Service
 class VimMachineImpl : VimMachine {
   /**
    * The information I'd like to know after the deletion:

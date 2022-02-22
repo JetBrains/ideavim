@@ -32,6 +32,7 @@ import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.actionSystem.ex.ActionManagerEx
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.command.UndoConfirmationPolicy
+import com.intellij.openapi.components.Service
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.actionSystem.DocCommandGroupId
 import com.intellij.openapi.ui.popup.JBPopupFactory
@@ -81,6 +82,7 @@ interface VimActionExecutor {
   )
 }
 
+@Service
 class IjActionExecutor : VimActionExecutor {
   /**
    * Execute an action

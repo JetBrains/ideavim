@@ -18,6 +18,7 @@
 
 package com.maddyhome.idea.vim.newapi
 
+import com.intellij.openapi.components.Service
 import com.intellij.openapi.editor.actionSystem.CaretSpecificDataContext
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ExecutionContextManager
@@ -25,6 +26,7 @@ import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.helper.EditorDataContext
 
+@Service
 class IjExecutionContextManager : ExecutionContextManager {
   override fun onEditor(editor: VimEditor, prevContext: ExecutionContext?): ExecutionContext {
     return IjExecutionContext(EditorDataContext.init((editor as IjVimEditor).editor, prevContext?.ij))

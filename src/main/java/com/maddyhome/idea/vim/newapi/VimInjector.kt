@@ -58,10 +58,12 @@ interface VimInjector {
 class IjVimInjector : VimInjector {
   override fun <T : Any> getLogger(clazz: Class<T>): VimLogger = IjVimLogger(Logger.getInstance(clazz::class.java))
 
-  // TODO Inject via application service
-  override val actionExecutor: VimActionExecutor = IjActionExecutor()
-  override val nativeActionManager: NativeActionManager = IjNativeActionManager()
-  override val messages: VimMessages = IjVimMessages()
+  override val actionExecutor: VimActionExecutor
+    get() = service<IjActionExecutor>()
+  override val nativeActionManager: NativeActionManager
+    get() = service<IjNativeActionManager>()
+  override val messages: VimMessages
+    get() = service<IjVimMessages>()
   override val registerGroup: VimRegisterGroup
     get() = service()
   override val registerGroupIfCreated: VimRegisterGroup?
@@ -72,10 +74,14 @@ class IjVimInjector : VimInjector {
     get() = service()
   override val keyGroup: VimKeyGroup
     get() = service()
-  override val application: VimApplication = IjVimApplication()
-  override val executionContextManager: ExecutionContextManager = IjExecutionContextManager()
-  override val vimMachine: VimMachine = VimMachineImpl()
-  override val enabler: VimEnabler = IjVimEnabler()
+  override val application: VimApplication
+    get() = service<IjVimApplication>()
+  override val executionContextManager: ExecutionContextManager
+    get() = service<IjExecutionContextManager>()
+  override val vimMachine: VimMachine
+    get() = service<VimMachineImpl>()
+  override val enabler: VimEnabler
+    get() = service<IjVimEnabler>()
 
   override val optionService: OptionService
     get() = service()
