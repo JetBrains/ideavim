@@ -30,7 +30,6 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.inBlockSubMode
 import com.maddyhome.idea.vim.helper.inVisualMode
@@ -175,7 +174,7 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
               resultOffset = EditorHelper.normalizeOffset(editor.ij, resultOffset, false)
             }
             preMove(editor, context, cmd)
-            MotionGroup.moveCaret(editor.ij, editor.ij.caretModel.primaryCaret, resultOffset)
+            editor.primaryCaret().moveToOffset(resultOffset)
             postMove(editor, context, cmd)
           }
           is Motion.Error -> VimPlugin.indicateError()
@@ -236,7 +235,7 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
           resultMotion = EditorHelper.normalizeOffset(editor.ij, resultMotion, false)
         }
         preMove(editor, caret, context, cmd)
-        MotionGroup.moveCaret(editor.ij, caret.ij, resultMotion)
+        caret.moveToOffset(resultMotion)
         val postMoveCaret = if (editor.ij.inBlockSubMode) editor.primaryCaret() else caret
         postMove(editor, postMoveCaret, context, cmd)
       }
