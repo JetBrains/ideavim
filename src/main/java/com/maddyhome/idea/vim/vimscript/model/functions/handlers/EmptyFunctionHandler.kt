@@ -56,6 +56,7 @@ object EmptyFunctionHandler : FunctionHandler() {
       is VimFloat -> argument.value == 0.0
       is VimFuncref -> false
       is VimBlob -> TODO("Not yet implemented")
+      else -> error("Unexpected")
     }
     return isEmpty.asVimInt()
   }

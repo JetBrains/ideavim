@@ -19,11 +19,9 @@
 package org.jetbrains.plugins.ideavim.extension.argtextobj;
 
 import com.google.common.collect.Lists;
-import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers;
 import com.maddyhome.idea.vim.vimscript.Executor;
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
 import org.jetbrains.plugins.ideavim.SkipNeovimReason;
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim;
 import org.jetbrains.plugins.ideavim.VimTestCase;

@@ -222,6 +222,7 @@ internal class VariableServiceImpl : VariableService {
       is VimDictionary -> this.dictionary
       is VimBlob -> "blob"
       is VimFuncref -> "funcref"
+      else -> error("Unexpected")
     }
   }
 }

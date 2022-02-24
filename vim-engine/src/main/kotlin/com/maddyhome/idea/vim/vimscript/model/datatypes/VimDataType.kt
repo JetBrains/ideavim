@@ -18,7 +18,7 @@
 
 package com.maddyhome.idea.vim.vimscript.model.datatypes
 
-sealed class VimDataType {
+abstract class VimDataType {
 
   abstract fun asDouble(): Double
 
