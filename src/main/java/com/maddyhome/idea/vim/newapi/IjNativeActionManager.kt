@@ -37,3 +37,8 @@ class IjNativeActionManager : NativeActionManager {
     return action?.vim
   }
 }
+
+val AnAction.vim: IjNativeAction
+  get() = IjNativeAction(this)
+
+class IjNativeAction(override val action: AnAction) : NativeAction

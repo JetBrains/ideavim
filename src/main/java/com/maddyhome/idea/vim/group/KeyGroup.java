@@ -315,7 +315,6 @@ public class KeyGroup implements PersistentStateComponent<Element>, VimKeyGroup 
     return shortcutConflicts;
   }
 
-  @Override
   public @NotNull KeyMapping getKeyMapping(@NotNull MappingMode mode) {
     KeyMapping mapping = keyMappings.get(mode);
     if (mapping == null) {

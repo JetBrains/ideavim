@@ -21,6 +21,7 @@ package com.maddyhome.idea.vim.newapi
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.components.Service
+import com.maddyhome.idea.vim.api.VimApplication
 import com.maddyhome.idea.vim.api.VimEditor
 import java.awt.Component
 import java.awt.Toolkit

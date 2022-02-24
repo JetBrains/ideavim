@@ -15,9 +15,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.maddyhome.idea.vim.api
 
-package com.maddyhome.idea.vim.group;
-
-public interface VimDigraphGroup {
-  char getDigraph(char ch1, char ch2);
+interface VimDigraphGroup {
+    fun getDigraph(ch1: Char, ch2: Char): Char
 }

@@ -18,7 +18,6 @@
 
 package com.maddyhome.idea.vim.newapi
 
-import com.intellij.openapi.actionSystem.AnAction
 import com.maddyhome.idea.vim.api.ExecutionContext
 
 interface NativeAction {
@@ -29,11 +28,6 @@ fun NativeAction?.execute(context: ExecutionContext) {
   if (this == null) return
   injector.actionExecutor.executeAction(this, context)
 }
-
-val AnAction.vim: IjNativeAction
-  get() = IjNativeAction(this)
-
-class IjNativeAction(override val action: AnAction) : NativeAction
 
 interface NativeActionManager {
   val enterAction: NativeAction?
