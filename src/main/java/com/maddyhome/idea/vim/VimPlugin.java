@@ -45,6 +45,7 @@ import com.maddyhome.idea.vim.group.copy.YankGroup;
 import com.maddyhome.idea.vim.group.visual.VisualMotionGroup;
 import com.maddyhome.idea.vim.helper.MacKeyRepeat;
 import com.maddyhome.idea.vim.listener.VimListenerManager;
+import com.maddyhome.idea.vim.newapi.IjVimInjector;
 import com.maddyhome.idea.vim.newapi.VimInjectorKt;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import com.maddyhome.idea.vim.ui.StatusBarIconFactory;
@@ -75,6 +76,11 @@ import static com.maddyhome.idea.vim.vimscript.services.VimRcService.executeIdea
  */
 @State(name = "VimSettings", storages = {@Storage("$APP_CONFIG$/vim_settings.xml")})
 public class VimPlugin implements PersistentStateComponent<Element>, Disposable {
+
+  static {
+    VimInjectorKt.setInjector(new IjVimInjector());
+  }
+
   private static final String IDEAVIM_PLUGIN_ID = "IdeaVIM";
   public static final int STATE_VERSION = 7;
 
