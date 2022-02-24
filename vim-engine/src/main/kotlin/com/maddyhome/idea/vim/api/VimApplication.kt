@@ -27,4 +27,7 @@ interface VimApplication {
   fun postKey(stroke: KeyStroke, editor: VimEditor)
 
   fun localEditors(): List<VimEditor>
+
+  fun runWriteCommand(editor: VimEditor, name: String?, groupId: Any?, command: Runnable)
+  fun runReadCommand(editor: VimEditor, name: String?, groupId: Any?, command: Runnable)
 }

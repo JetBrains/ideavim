@@ -38,9 +38,6 @@ import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
-import com.maddyhome.idea.vim.helper.MessageHelper.message
-import com.maddyhome.idea.vim.helper.RunnableHelper.runReadCommand
-import com.maddyhome.idea.vim.helper.RunnableHelper.runWriteCommand
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.helper.inNormalMode
@@ -111,7 +108,7 @@ class KeyHandler {
       ) as VimInt
       ).value
     if (handleKeyRecursionCount >= mapMapDepth) {
-      injector.messages.showStatusBarMessage(message("E223"))
+      injector.messages.showStatusBarMessage(injector.messages.message("E223"))
       injector.messages.indicateError()
       LOG.warn("Key handling, maximum recursion of the key received. maxdepth=$mapMapDepth")
       return
@@ -666,7 +663,6 @@ class KeyHandler {
 
     // Save off the command we are about to execute
     editorState.setExecutingCommand(command)
-    val project = editor.ij.project
     val type = command.type
     if (type.isWrite) {
       if (!editor.isWritable()) {
@@ -681,9 +677,9 @@ class KeyHandler {
       val cmdAction = command.action
       val name = cmdAction.id
       if (type.isWrite) {
-        runWriteCommand(project, action, name, action)
+        injector.application.runWriteCommand(editor, name, action, action)
       } else if (type.isRead) {
-        runReadCommand(project, action, name, action)
+        injector.application.runReadCommand(editor, name, action, action)
       } else {
         injector.actionExecutor.executeCommand(editor, action, name, action)
       }
