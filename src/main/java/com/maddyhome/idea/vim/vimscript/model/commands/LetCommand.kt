@@ -75,7 +75,7 @@ data class LetCommand(
         }
 
         val leftValue = VimPlugin.getVariableService().getNullableVariableValue(variable, editor, context, vimContext)
-        if (leftValue?.isLocked == true && leftValue.lockOwner?.name == variable.name) {
+        if (leftValue?.isLocked == true && (leftValue.lockOwner as? Variable)?.name == variable.name) {
           throw ExException("E741: Value is locked: ${variable.toString(editor, context, vimContext)}")
         }
         val rightValue = expression.evaluate(editor, context, vimContext)
