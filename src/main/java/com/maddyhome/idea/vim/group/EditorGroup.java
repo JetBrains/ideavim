@@ -37,7 +37,7 @@ import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.api.VimEditor;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType;
-import com.maddyhome.idea.vim.vimscript.model.options.LocalOptionChangeListener;
+import com.maddyhome.idea.vim.options.LocalOptionChangeListener;
 import com.maddyhome.idea.vim.options.OptionConstants;
 import com.maddyhome.idea.vim.options.OptionScope;
 import org.jdom.Element;

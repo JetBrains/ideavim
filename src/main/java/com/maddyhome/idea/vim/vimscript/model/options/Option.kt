@@ -20,6 +20,8 @@ package com.maddyhome.idea.vim.vimscript.model.options
 
 import com.intellij.util.containers.ContainerUtil
 import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.options.LocalOptionChangeListener
+import com.maddyhome.idea.vim.options.OptionChangeListener
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt

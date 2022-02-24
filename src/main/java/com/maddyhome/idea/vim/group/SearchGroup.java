@@ -53,7 +53,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression;
 import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression;
 import com.maddyhome.idea.vim.vimscript.model.functions.handlers.SubmatchFunctionHandler;
-import com.maddyhome.idea.vim.vimscript.model.options.OptionChangeListener;
+import com.maddyhome.idea.vim.options.OptionChangeListener;
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser;
 import com.maddyhome.idea.vim.options.OptionConstants;
 import com.maddyhome.idea.vim.options.OptionScope;

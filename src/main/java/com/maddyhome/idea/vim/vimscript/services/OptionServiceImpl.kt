@@ -36,7 +36,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.datatypes.parseNumber
 import com.maddyhome.idea.vim.vimscript.model.options.NumberOption
 import com.maddyhome.idea.vim.vimscript.model.options.Option
-import com.maddyhome.idea.vim.vimscript.model.options.OptionChangeListener
+import com.maddyhome.idea.vim.options.OptionChangeListener
 import com.maddyhome.idea.vim.vimscript.model.options.StringOption
 import com.maddyhome.idea.vim.vimscript.model.options.ToggleOption
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.GuiCursorOptionHelper

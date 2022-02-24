@@ -50,7 +50,7 @@ import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
-import com.maddyhome.idea.vim.vimscript.model.options.OptionChangeListener
+import com.maddyhome.idea.vim.options.OptionChangeListener
 import org.jetbrains.annotations.NonNls
 import java.awt.Point
 import java.awt.event.MouseEvent

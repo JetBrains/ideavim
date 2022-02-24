@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.vimscript.model.options
+package com.maddyhome.idea.vim.options
 
 import com.maddyhome.idea.vim.api.VimEditor
 

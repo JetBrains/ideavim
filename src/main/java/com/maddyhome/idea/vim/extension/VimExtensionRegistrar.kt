@@ -28,7 +28,7 @@ import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.statistic.PluginState
 import com.maddyhome.idea.vim.vimscript.Executor
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
-import com.maddyhome.idea.vim.vimscript.model.options.OptionChangeListener
+import com.maddyhome.idea.vim.options.OptionChangeListener
 import com.maddyhome.idea.vim.vimscript.model.options.ToggleOption
 
 object VimExtensionRegistrar {
