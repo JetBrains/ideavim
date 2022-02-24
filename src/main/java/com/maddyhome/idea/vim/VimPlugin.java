@@ -52,6 +52,7 @@ import com.maddyhome.idea.vim.ui.VimEmulationConfigurable;
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
 import com.maddyhome.idea.vim.vimscript.services.FunctionStorage;
 import com.maddyhome.idea.vim.vimscript.services.OptionService;
+import com.maddyhome.idea.vim.vimscript.services.OptionServiceImpl;
 import com.maddyhome.idea.vim.vimscript.services.VariableService;
 import org.jdom.Element;
 import org.jetbrains.annotations.Nls;
@@ -221,6 +222,10 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
 
   public static @NotNull OptionService getOptionService() {
     return VimInjectorKt.getInjector().getOptionService();
+  }
+
+  public static @NotNull OptionServiceImpl getOptionServiceImpl() {
+    return (OptionServiceImpl)VimInjectorKt.getInjector().getOptionService();
   }
 
   private static @NotNull NotificationService getNotifications() {

@@ -28,6 +28,7 @@ import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.IjVimLocalOptions
 import com.maddyhome.idea.vim.newapi.VimLocalOptions
 import com.maddyhome.idea.vim.option.OptionsManager
+import com.maddyhome.idea.vim.options.OptionChangeListener
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
@@ -36,7 +37,6 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.datatypes.parseNumber
 import com.maddyhome.idea.vim.vimscript.model.options.NumberOption
 import com.maddyhome.idea.vim.vimscript.model.options.Option
-import com.maddyhome.idea.vim.options.OptionChangeListener
 import com.maddyhome.idea.vim.vimscript.model.options.StringOption
 import com.maddyhome.idea.vim.vimscript.model.options.ToggleOption
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.GuiCursorOptionHelper
@@ -373,7 +373,10 @@ internal class OptionServiceImpl : OptionService {
     return options.secondaryKeys
   }
 
-  override fun addOption(option: Option<out VimDataType>) {
+  /**
+   * TODO this should be moved to the interface
+   */
+  fun addOption(option: Option<out VimDataType>) {
     options.put(option.name, option.abbrev, option)
   }
 

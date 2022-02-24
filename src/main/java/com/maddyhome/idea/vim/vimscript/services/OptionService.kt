@@ -18,10 +18,9 @@
 
 package com.maddyhome.idea.vim.vimscript.services
 
+import com.maddyhome.idea.vim.options.OptionChangeListener
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
-import com.maddyhome.idea.vim.vimscript.model.options.Option
-import com.maddyhome.idea.vim.options.OptionChangeListener
 
 interface OptionService {
 
@@ -70,8 +69,6 @@ interface OptionService {
   fun getOptions(): Set<String>
 
   fun getAbbrevs(): Set<String>
-
-  fun addOption(option: Option<out VimDataType>)
 
   fun removeOption(optionName: String)
 
