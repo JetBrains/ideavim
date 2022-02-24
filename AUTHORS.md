@@ -408,6 +408,10 @@ Contributors:
   [![icon][github]](https://github.com/ddadon10)
   &nbsp;
   David Dadon
+* [![icon][mail]](mailto:hollandpirates@gmail.com)
+  [![icon][github]](https://github.com/PHPirates)
+  &nbsp;
+  Thomas Schouten
                         
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainers.
