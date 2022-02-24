@@ -49,7 +49,7 @@ import kotlin.math.ceil
 import kotlin.math.min
 
 /**
- * @deprecated use {@link com.maddyhome.idea.vim.vimscript.services.OptionService} instead
+ * @deprecated use {@link com.maddyhome.idea.vim.options.OptionService} instead
  * (VimPlugin.getOptionService())
  */
 @Deprecated("was replaced by OptionService")

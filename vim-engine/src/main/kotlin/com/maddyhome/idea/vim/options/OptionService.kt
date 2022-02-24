@@ -16,10 +16,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.vimscript.services
+package com.maddyhome.idea.vim.options
 
-import com.maddyhome.idea.vim.options.OptionChangeListener
-import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 
 interface OptionService {

@@ -38,7 +38,7 @@ import com.maddyhome.idea.vim.group.visual.VimVisualMotionGroup
 import com.maddyhome.idea.vim.helper.IjActionExecutor
 import com.maddyhome.idea.vim.helper.VimActionExecutor
 import com.maddyhome.idea.vim.helper.vimCommandState
-import com.maddyhome.idea.vim.vimscript.services.OptionService
+import com.maddyhome.idea.vim.options.OptionService
 
 interface VimInjector {
   fun <T : Any> getLogger(clazz: Class<T>): VimLogger

@@ -51,7 +51,7 @@ import com.maddyhome.idea.vim.ui.StatusBarIconFactory;
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable;
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
 import com.maddyhome.idea.vim.vimscript.services.FunctionStorage;
-import com.maddyhome.idea.vim.vimscript.services.OptionService;
+import com.maddyhome.idea.vim.options.OptionService;
 import com.maddyhome.idea.vim.vimscript.services.OptionServiceImpl;
 import com.maddyhome.idea.vim.vimscript.services.VariableService;
 import org.jdom.Element;

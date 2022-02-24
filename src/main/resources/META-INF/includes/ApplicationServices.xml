@@ -29,7 +29,7 @@
                         serviceInterface="com.maddyhome.idea.vim.vimscript.services.VariableService"/>
 
     <applicationService serviceImplementation="com.maddyhome.idea.vim.vimscript.services.OptionServiceImpl"
-                        serviceInterface="com.maddyhome.idea.vim.vimscript.services.OptionService"/>
+                        serviceInterface="com.maddyhome.idea.vim.options.OptionService"/>
 
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.NotificationService"/>
   </extensions>

@@ -31,6 +31,7 @@ import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.options.OptionChangeListener
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.options.OptionService
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
