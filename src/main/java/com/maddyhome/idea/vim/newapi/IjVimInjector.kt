@@ -18,7 +18,9 @@ import com.maddyhome.idea.vim.group.VimChangeGroup
 import com.maddyhome.idea.vim.group.VimKeyGroup
 import com.maddyhome.idea.vim.group.visual.VimVisualMotionGroup
 import com.maddyhome.idea.vim.helper.IjActionExecutor
+import com.maddyhome.idea.vim.helper.IjVimStringParser
 import com.maddyhome.idea.vim.helper.VimActionExecutor
+import com.maddyhome.idea.vim.helper.VimStringParser
 import com.maddyhome.idea.vim.helper.vimCommandState
 import com.maddyhome.idea.vim.options.OptionService
 
@@ -56,6 +58,8 @@ class IjVimInjector : VimInjector {
 
   override val optionService: OptionService
     get() = service()
+  override val parser: VimStringParser
+    get() = service<IjVimStringParser>()
 
   override fun commandStateFor(editor: VimEditor): CommandState {
     var res = editor.ij.vimCommandState

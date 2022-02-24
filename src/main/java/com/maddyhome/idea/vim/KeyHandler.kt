@@ -38,7 +38,6 @@ import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
-import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.helper.inNormalMode
 import com.maddyhome.idea.vim.helper.inSingleNormalMode
@@ -487,7 +486,7 @@ class KeyHandler {
   //   For `IA` someAction should be executed.
   //   But if the user types `Ib`, `<Plug>i` won't be executed again. Only `b` will be passed to keyHandler.
   private fun isPluginMapping(unhandledKeyStrokes: List<KeyStroke>): Boolean {
-    return unhandledKeyStrokes.isNotEmpty() && unhandledKeyStrokes[0] == StringHelper.PlugKeyStroke
+    return unhandledKeyStrokes.isNotEmpty() && unhandledKeyStrokes[0] == injector.parser.plugKeyStroke
   }
 
   private fun isCommandCountKey(chKey: Char, editorState: CommandState): Boolean {
@@ -519,7 +518,7 @@ class KeyHandler {
   }
 
   private fun isEditorReset(key: KeyStroke, editorState: CommandState): Boolean {
-    val editorReset = editorState.mode == CommandState.Mode.COMMAND && StringHelper.isCloseKeyStroke(key)
+    val editorReset = editorState.mode == CommandState.Mode.COMMAND && injector.parser.isCloseKeyStroke(key)
     LOG.debug { "This is editor reset: $editorReset" }
     return editorReset
   }

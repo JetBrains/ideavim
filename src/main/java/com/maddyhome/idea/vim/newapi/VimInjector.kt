@@ -33,6 +33,7 @@ import com.maddyhome.idea.vim.group.VimChangeGroup
 import com.maddyhome.idea.vim.group.VimKeyGroup
 import com.maddyhome.idea.vim.group.visual.VimVisualMotionGroup
 import com.maddyhome.idea.vim.helper.VimActionExecutor
+import com.maddyhome.idea.vim.helper.VimStringParser
 import com.maddyhome.idea.vim.options.OptionService
 
 interface VimInjector {
@@ -56,6 +57,8 @@ interface VimInjector {
 
   // TODO We should somehow state that [OptionServiceImpl] can be used from any implementation
   val optionService: OptionService
+
+  val parser: VimStringParser
 
   fun commandStateFor(editor: VimEditor): CommandState
 }
