@@ -18,11 +18,6 @@
 package com.maddyhome.idea.vim
 
 import com.maddyhome.idea.vim.action.change.VimRepeater.Extension.argumentCaptured
-import com.maddyhome.idea.vim.action.change.change.ChangeCharacterAction
-import com.maddyhome.idea.vim.action.change.change.ChangeVisualCharacterAction
-import com.maddyhome.idea.vim.action.change.insert.InsertCompletedDigraphAction
-import com.maddyhome.idea.vim.action.change.insert.InsertCompletedLiteralAction
-import com.maddyhome.idea.vim.action.macro.ToggleRecordingAction
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.Argument
@@ -751,7 +746,9 @@ class KeyHandler {
   }
 
   private fun stopMacroRecord(node: CommandNode<VimActionsInitiator>, editorState: CommandState): Boolean {
-    return editorState.isRecording && node.actionHolder.getInstance() is ToggleRecordingAction
+    // TODO
+//    return editorState.isRecording && node.actionHolder.getInstance() is ToggleRecordingAction
+    return editorState.isRecording && node.actionHolder.getInstance().id == "VimToggleRecordingAction"
   }
 
   private fun startWaitingForArgument(
@@ -774,10 +771,13 @@ class KeyHandler {
         // part of a command, the showcmd output is reset part way through. This means we need to special case entering
         // digraph/literal input mode. We have an action that takes a digraph as an argument, and pushes it back through
         // the key handler when it's complete.
-        if (action is InsertCompletedDigraphAction) {
+
+        // TODO
+//        if (action is InsertCompletedDigraphAction) {
+        if (action.id == "VimInsertCompletedDigraphAction") {
           editorState.startDigraphSequence()
           setPromptCharacterEx('?')
-        } else if (action is InsertCompletedLiteralAction) {
+        } else if (action.id == "VimInsertCompletedLiteralAction") {
           editorState.startLiteralSequence()
           setPromptCharacterEx('^')
         }
@@ -792,7 +792,9 @@ class KeyHandler {
     }
 
     // Another special case. Force a mode change to update the caret shape
-    if (action is ChangeCharacterAction || action is ChangeVisualCharacterAction) {
+    // This was a typed solution
+    // if (action is ChangeCharacterAction || action is ChangeVisualCharacterAction)
+    if (action.id == "VimChangeCharacterAction" || action.id == "VimChangeVisualCharacterAction") {
       editorState.isReplaceCharacter = true
     }
   }
