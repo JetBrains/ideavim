@@ -23,6 +23,11 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
+## To Be Released
+
+### Merged PRs:
+* [468](https://github.com/JetBrains/ideavim/pull/468) by [Thomas Schouten](https://github.com/PHPirates): Implement UserDataHolder for EditorDataContext
+
 ## 1.10.0, 2022-02-17
 
 ### Features:
