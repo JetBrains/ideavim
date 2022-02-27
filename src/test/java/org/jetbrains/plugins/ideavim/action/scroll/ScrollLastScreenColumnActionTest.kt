@@ -22,9 +22,9 @@ import com.intellij.openapi.editor.Inlay
 import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.StringHelper
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.Assert
 

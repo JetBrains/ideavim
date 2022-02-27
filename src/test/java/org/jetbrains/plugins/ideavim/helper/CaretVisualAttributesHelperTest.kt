@@ -31,9 +31,9 @@ import com.maddyhome.idea.vim.helper.shape
 import com.maddyhome.idea.vim.helper.thickness
 import com.maddyhome.idea.vim.newapi.injector
 import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim

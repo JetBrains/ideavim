@@ -43,4 +43,3 @@ interface NativeActionManager {
   val saveAll: NativeAction?
   val saveCurrent: NativeAction?
 }
-

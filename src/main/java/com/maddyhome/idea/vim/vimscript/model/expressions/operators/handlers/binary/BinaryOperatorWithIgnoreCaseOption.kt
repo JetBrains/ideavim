@@ -19,9 +19,9 @@
 package com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.binary
 
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 
 abstract class BinaryOperatorWithIgnoreCaseOption(
   private val caseInsensitiveImpl: BinaryOperatorHandler,

@@ -50,10 +50,10 @@ import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.fileSize
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
-import com.maddyhome.idea.vim.vimscript.model.options.helpers.ClipboardOptionHelper
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
+import com.maddyhome.idea.vim.vimscript.model.options.helpers.ClipboardOptionHelper
 import java.awt.datatransfer.DataFlavor
 import java.util.*
 import kotlin.math.abs

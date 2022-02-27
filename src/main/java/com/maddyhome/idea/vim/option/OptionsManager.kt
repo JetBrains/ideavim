@@ -39,8 +39,8 @@ import com.maddyhome.idea.vim.helper.hasVisualSelection
 import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import org.jetbrains.annotations.ApiStatus.ScheduledForRemoval
 import org.jetbrains.annotations.Contract
 import org.jetbrains.annotations.NonNls

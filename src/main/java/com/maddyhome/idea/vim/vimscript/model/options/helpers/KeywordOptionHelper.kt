@@ -19,11 +19,11 @@
 package com.maddyhome.idea.vim.vimscript.model.options.helpers
 
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.options.OptionChangeListener
-import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
 import org.apache.commons.lang.math.NumberUtils
 import java.util.regex.Pattern
 

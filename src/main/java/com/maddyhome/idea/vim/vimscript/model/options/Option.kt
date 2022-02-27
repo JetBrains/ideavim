@@ -20,11 +20,11 @@ package com.maddyhome.idea.vim.vimscript.model.options
 
 import com.intellij.util.containers.ContainerUtil
 import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.datatypes.parseNumber
-import com.maddyhome.idea.vim.options.OptionScope
 
 sealed class Option<T : VimDataType>(val name: String, val abbrev: String, private val defaultValue: T) {
 

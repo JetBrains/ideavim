@@ -40,10 +40,10 @@ import com.maddyhome.idea.vim.helper.popAllModes
 import com.maddyhome.idea.vim.listener.VimListenerManager
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
-import com.maddyhome.idea.vim.vimscript.model.options.helpers.IdeaRefactorModeHelper
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
+import com.maddyhome.idea.vim.vimscript.model.options.helpers.IdeaRefactorModeHelper
 
 object IdeaSelectionControl {
   /**

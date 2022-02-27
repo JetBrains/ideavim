@@ -29,8 +29,8 @@ import com.intellij.openapi.editor.markup.RangeHighlighter
 import com.intellij.openapi.util.Key
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.common.MappingMode
 import com.maddyhome.idea.vim.command.SelectionType
+import com.maddyhome.idea.vim.common.MappingMode
 import com.maddyhome.idea.vim.common.Mark
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.common.VimMark

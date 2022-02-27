@@ -60,9 +60,11 @@ class IjVimApplication : VimApplication {
   }
 
   private fun createKeyEvent(stroke: KeyStroke, component: Component): KeyEvent {
-    return KeyEvent(component,
+    return KeyEvent(
+      component,
       if (stroke.keyChar == KeyEvent.CHAR_UNDEFINED) KeyEvent.KEY_PRESSED else KeyEvent.KEY_TYPED,
-      System.currentTimeMillis(), stroke.modifiers, stroke.keyCode, stroke.keyChar)
+      System.currentTimeMillis(), stroke.modifiers, stroke.keyCode, stroke.keyChar
+    )
   }
 
   companion object {

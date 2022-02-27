@@ -21,11 +21,11 @@ package org.jetbrains.plugins.ideavim
 import com.maddyhome.idea.vim.RegisterActions.VIM_ACTIONS_EP
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.common.CommandNode
+import com.maddyhome.idea.vim.common.CommandPartNode
 import com.maddyhome.idea.vim.common.MappingMode
 import com.maddyhome.idea.vim.handler.ActionBeanClass
 import com.maddyhome.idea.vim.helper.StringHelper
-import com.maddyhome.idea.vim.common.CommandNode
-import com.maddyhome.idea.vim.common.CommandPartNode
 import junit.framework.TestCase
 import javax.swing.KeyStroke
 

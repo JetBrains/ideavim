@@ -19,9 +19,9 @@
 package org.jetbrains.plugins.ideavim
 
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
-import com.maddyhome.idea.vim.options.OptionScope
 
 /**
  * @author Alex Plate

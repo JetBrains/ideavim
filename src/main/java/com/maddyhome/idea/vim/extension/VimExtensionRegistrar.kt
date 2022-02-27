@@ -24,12 +24,12 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.key.MappingOwner.Plugin.Companion.remove
 import com.maddyhome.idea.vim.option.OptionsManager
+import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.statistic.PluginState
 import com.maddyhome.idea.vim.vimscript.Executor
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.options.OptionChangeListener
 import com.maddyhome.idea.vim.vimscript.model.options.ToggleOption
-import com.maddyhome.idea.vim.options.OptionScope
 
 object VimExtensionRegistrar {
   internal val registeredExtensions: MutableSet<String> = HashSet()

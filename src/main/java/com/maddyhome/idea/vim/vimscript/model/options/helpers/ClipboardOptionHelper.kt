@@ -19,9 +19,9 @@
 package com.maddyhome.idea.vim.vimscript.model.options.helpers
 
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
 object ClipboardOptionHelper {
   var ideaputDisabled = false

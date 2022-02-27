@@ -89,11 +89,19 @@ internal class OptionServiceImpl : OptionService {
     StringOption(OptionConstants.viminfoName, OptionConstants.viminfoAlias, "'100,<50,s10,h", isList = true),
     StringOption(OptionConstants.nrformatsName, OptionConstants.nrformatsAlias, "hex", isList = true, setOf("octal", "hex", "alpha")),
     StringOption(OptionConstants.clipboardName, OptionConstants.clipboardAlias, "ideaput,autoselect,exclude:cons\\|linux", isList = true),
-    StringOption(OptionConstants.selectmodeName, OptionConstants.selectmodeAlias, "", isList = true, setOf(
-      OptionConstants.selectmode_mouse, OptionConstants.selectmode_key, OptionConstants.selectmode_cmd, OptionConstants.selectmode_ideaselection)),
+    StringOption(
+      OptionConstants.selectmodeName, OptionConstants.selectmodeAlias, "", isList = true,
+      setOf(
+        OptionConstants.selectmode_mouse, OptionConstants.selectmode_key, OptionConstants.selectmode_cmd, OptionConstants.selectmode_ideaselection
+      )
+    ),
     StringOption(OptionConstants.ideavimsupportName, OptionConstants.ideavimsupportAlias, "dialog", isList = true, ideavimsupportValues),
-    StringOption(OptionConstants.keymodelName, OptionConstants.keymodelAlias, "${OptionConstants.keymodel_continueselect},${OptionConstants.keymodel_stopselect}", isList = true, setOf(
-      OptionConstants.keymodel_startsel, OptionConstants.keymodel_stopsel, OptionConstants.keymodel_stopselect, OptionConstants.keymodel_stopvisual, OptionConstants.keymodel_continueselect, OptionConstants.keymodel_continuevisual)),
+    StringOption(
+      OptionConstants.keymodelName, OptionConstants.keymodelAlias, "${OptionConstants.keymodel_continueselect},${OptionConstants.keymodel_stopselect}", isList = true,
+      setOf(
+        OptionConstants.keymodel_startsel, OptionConstants.keymodel_stopsel, OptionConstants.keymodel_stopselect, OptionConstants.keymodel_stopvisual, OptionConstants.keymodel_continueselect, OptionConstants.keymodel_continuevisual
+      )
+    ),
     StringOption(OptionConstants.lookupkeysName, OptionConstants.lookupkeysAlias, "<Tab>,<Down>,<Up>,<Enter>,<Left>,<Right>,<C-Down>,<C-Up>,<PageUp>,<PageDown>,<C-J>,<C-Q>", isList = true),
     object : StringOption(OptionConstants.matchpairsName, OptionConstants.matchpairsAlias, "(:),{:},[:]", isList = true) {
       override fun checkIfValueValid(value: VimDataType, token: String) {

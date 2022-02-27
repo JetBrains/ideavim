@@ -60,8 +60,8 @@ class IjActionExecutor : VimActionExecutor {
   override fun executeAction(action: NativeAction, context: ExecutionContext): Boolean {
     val ijAction = (action as IjNativeAction).action
     val event = AnActionEvent(
-        null, context.ij, ActionPlaces.KEYBOARD_SHORTCUT, ijAction.templatePresentation.clone(),
-        ActionManager.getInstance(), 0
+      null, context.ij, ActionPlaces.KEYBOARD_SHORTCUT, ijAction.templatePresentation.clone(),
+      ActionManager.getInstance(), 0
     )
     if (ijAction is ActionGroup && !ijAction.canBePerformed(context.ij)) {
       // Some ActionGroups should not be performed, but shown as a popup
@@ -107,10 +107,10 @@ class IjActionExecutor : VimActionExecutor {
   }
 
   override fun executeCommand(
-      editor: VimEditor?,
-      runnable: Runnable,
-      name: @NlsContexts.Command String?,
-      groupId: Any?,
+    editor: VimEditor?,
+    runnable: Runnable,
+    name: @NlsContexts.Command String?,
+    groupId: Any?,
   ) {
     CommandProcessor.getInstance().executeCommand(editor?.ij?.project, runnable, name, groupId)
   }
@@ -120,10 +120,10 @@ class IjActionExecutor : VimActionExecutor {
   }
 
   override fun executeVimAction(
-      editor: VimEditor,
-      cmd: EditorActionHandlerBase,
-      context: ExecutionContext,
-      operatorArguments: OperatorArguments,
+    editor: VimEditor,
+    cmd: EditorActionHandlerBase,
+    context: ExecutionContext,
+    operatorArguments: OperatorArguments,
   ) {
     CommandProcessor.getInstance()
       .executeCommand(
@@ -136,8 +136,8 @@ class IjActionExecutor : VimActionExecutor {
 
   // This method is copied from com.intellij.openapi.editor.actionSystem.EditorAction.getProjectAwareDataContext
   private fun getProjectAwareDataContext(
-      editor: Editor,
-      original: DataContext,
+    editor: Editor,
+    original: DataContext,
   ): DataContext {
     return if (CommonDataKeys.PROJECT.getData(original) === editor.project) {
       DialogAwareDataContext(original)
@@ -174,11 +174,11 @@ class IjActionExecutor : VimActionExecutor {
 
     companion object {
       private val keys = arrayOf<DataKey<*>>(
-          CommonDataKeys.PROJECT,
-          PlatformCoreDataKeys.PROJECT_FILE_DIRECTORY,
-          CommonDataKeys.EDITOR,
-          CommonDataKeys.VIRTUAL_FILE,
-          CommonDataKeys.PSI_FILE
+        CommonDataKeys.PROJECT,
+        PlatformCoreDataKeys.PROJECT_FILE_DIRECTORY,
+        CommonDataKeys.EDITOR,
+        CommonDataKeys.VIRTUAL_FILE,
+        CommonDataKeys.PSI_FILE
       )
     }
   }
