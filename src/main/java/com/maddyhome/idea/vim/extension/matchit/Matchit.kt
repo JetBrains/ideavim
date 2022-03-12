@@ -234,6 +234,8 @@ private object FileTypePatterns {
       this.cPatterns
     } else if (fileTypeName == "Makefile" || fileName == "Makefile") {
       this.gnuMakePatterns
+    } else if (fileTypeName == "CMakeLists.txt" || fileName == "CMakeLists") {
+      this.cMakePatterns
     } else {
       return null
     }
@@ -248,6 +250,7 @@ private object FileTypePatterns {
   private val rubyAndHtmlPatterns = rubyPatterns + htmlPatterns
   private val cPatterns = createCPatterns()
   private val gnuMakePatterns = createGnuMakePatterns()
+  private val cMakePatterns = createCMakePatterns()
 
   private fun createHtmlPatterns(): LanguagePatterns {
     // A tag name may contain any characters except slashes, whitespace, and angle brackets.
@@ -302,6 +305,16 @@ private object FileTypePatterns {
     return (
       LanguagePatterns("\\bdefine\\b", "\\bendef\\b") +
       LanguagePatterns("(?<!else )ifn?(?:eq|def)\\b", "\\belse(?:\\s+ifn?(?:eq|def))?\\b", "\\bendif\\b")
+    )
+  }
+
+  private fun createCMakePatterns(): LanguagePatterns {
+    // Original patterns: https://github.com/vim/vim/blob/master/runtime/ftplugin/cmake.vim
+    return (
+      LanguagePatterns("\\bif\\b", "\\belse(?:if)?\\b", "\\bendif\\b") +
+      LanguagePatterns("\\b(?:foreach)|(?:while)\\b", "\\bbreak\\b", "\\b(?:endforeach)|(?:endwhile)\\b") +
+      LanguagePatterns("\\bmacro\\b", "\\bendmacro\\b") +
+      LanguagePatterns("\\bfunction\\b", "\\bendfunction\\b")
     )
   }
 
