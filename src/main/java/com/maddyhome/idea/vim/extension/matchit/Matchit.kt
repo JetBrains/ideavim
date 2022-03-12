@@ -220,6 +220,7 @@ private object FileTypePatterns {
     // fileType is only populated for files supported by the user's IDE + language plugins.
     // Checking the file's name or extension is a simple fallback which also makes unit testing easier.
     val fileTypeName = virtualFile?.fileType?.name
+    val fileName = virtualFile?.nameWithoutExtension
     val fileExtension = virtualFile?.extension
 
     return if (fileTypeName in htmlLikeFileTypes) {
@@ -231,6 +232,8 @@ private object FileTypePatterns {
     } else if (fileTypeName == "C++" || fileTypeName == "C#" || fileTypeName == "ObjectiveC" || fileExtension == "c") {
       // "C++" also covers plain C.
       this.cPatterns
+    } else if (fileTypeName == "Makefile" || fileName == "Makefile") {
+      this.gnuMakePatterns
     } else {
       return null
     }
@@ -244,6 +247,7 @@ private object FileTypePatterns {
   private val rubyPatterns = createRubyPatterns()
   private val rubyAndHtmlPatterns = rubyPatterns + htmlPatterns
   private val cPatterns = createCPatterns()
+  private val gnuMakePatterns = createGnuMakePatterns()
 
   private fun createHtmlPatterns(): LanguagePatterns {
     // A tag name may contain any characters except slashes, whitespace, and angle brackets.
@@ -291,6 +295,14 @@ private object FileTypePatterns {
   private fun createCPatterns(): LanguagePatterns {
     // Original patterns: https://github.com/vim/vim/blob/master/runtime/ftplugin/c.vim
     return LanguagePatterns("#\\s*if(?:def|ndef)?\\b", "#\\s*(?:elif|else)\\b", "#\\s*endif\\b")
+  }
+
+  private fun createGnuMakePatterns(): LanguagePatterns {
+    // Original patterns: https://github.com/vim/vim/blob/master/runtime/ftplugin/make.vim
+    return (
+      LanguagePatterns("\\bdefine\\b", "\\bendef\\b") +
+      LanguagePatterns("(?<!else )ifn?(?:eq|def)\\b", "\\belse(?:\\s+ifn?(?:eq|def))?\\b", "\\bendif\\b")
+    )
   }
 
 }
