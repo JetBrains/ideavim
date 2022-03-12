@@ -228,6 +228,9 @@ private object FileTypePatterns {
       this.rubyPatterns
     } else if (fileTypeName == "RHTML" || fileExtension == "erb") {
       this.rubyAndHtmlPatterns
+    } else if (fileTypeName == "C++" || fileTypeName == "C#" || fileTypeName == "ObjectiveC" || fileExtension == "c") {
+      // "C++" also covers plain C.
+      this.cPatterns
     } else {
       return null
     }
@@ -240,6 +243,7 @@ private object FileTypePatterns {
   private val htmlPatterns = createHtmlPatterns()
   private val rubyPatterns = createRubyPatterns()
   private val rubyAndHtmlPatterns = rubyPatterns + htmlPatterns
+  private val cPatterns = createCPatterns()
 
   private fun createHtmlPatterns(): LanguagePatterns {
     // A tag name may contain any characters except slashes, whitespace, and angle brackets.
@@ -282,6 +286,11 @@ private object FileTypePatterns {
       LanguagePatterns(blockCommentStart, blockCommentEnd) +
       LanguagePatterns(openingKeywords, middleKeywords, endKeyword)
     )
+  }
+
+  private fun createCPatterns(): LanguagePatterns {
+    // Original patterns: https://github.com/vim/vim/blob/master/runtime/ftplugin/c.vim
+    return LanguagePatterns("#\\s*if(?:def|ndef)?\\b", "#\\s*(?:elif|else)\\b", "#\\s*endif\\b")
   }
 
 }
