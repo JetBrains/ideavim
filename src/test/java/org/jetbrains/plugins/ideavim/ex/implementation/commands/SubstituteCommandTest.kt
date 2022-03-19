@@ -964,4 +964,16 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcaseName, O
       """.trimIndent()
     )
   }
+
+  // VIM-2553
+  @VimOptionDefaultAll
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  fun `test removing consecutive matches`() {
+    doTest(
+      "%s/[*/]//g",
+      "/* comment */",
+      " comment "
+    )
+  }
+
 }

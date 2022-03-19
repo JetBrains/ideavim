@@ -743,7 +743,6 @@ public class SearchGroup implements PersistentStateComponent<Element> {
     boolean got_quit = false;
     int lcount = EditorHelper.getLineCount(editor);
     Expression expression = null;
-    int latestOff = -1;
     for (int lnum = line1; lnum <= line2 && !got_quit; ) {
       CharacterPosition newpos = null;
       int nmatch = sp.vim_regexec_multi(regmatch, editor, lcount, lnum, searchcol);
@@ -771,7 +770,6 @@ public class SearchGroup implements PersistentStateComponent<Element> {
         CharacterPosition endpos = new CharacterPosition(lnum + regmatch.endpos[0].lnum, regmatch.endpos[0].col);
         int startoff = startpos.toOffset(editor);
         int endoff = endpos.toOffset(editor);
-        int newend = startoff + match.length();
 
         if (do_all || line != lastLine) {
           boolean doReplace = true;
@@ -800,8 +798,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
                 break;
             }
           }
-          if (doReplace && startoff != latestOff) {
-            latestOff = startoff;
+          if (doReplace) {
             SubmatchFunctionHandler.INSTANCE.setLatestMatch(editor.getDocument().getText(new com.intellij.openapi.util.TextRange(startoff, endoff)));
             MotionGroup.moveCaret(editor, caret, startoff);
             if (expression != null) {
@@ -819,6 +816,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
             ApplicationManager.getApplication().runWriteAction(() -> editor.getDocument().replaceString(startoff, endoff,
                                                                                                         finalMatch));
             lastMatch = startoff;
+            int newend = startoff + match.length();
             newpos = CharacterPosition.Companion.fromOffset(editor, newend);
 
             lnum += newpos.line - endpos.line;
