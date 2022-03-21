@@ -18,6 +18,7 @@
 package com.maddyhome.idea.vim.command
 
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injectorBase
 import com.maddyhome.idea.vim.common.CommandPartNode
 import com.maddyhome.idea.vim.common.DigraphResult
 import com.maddyhome.idea.vim.common.MappingMode
@@ -138,7 +139,7 @@ class CommandState(private val editor: VimEditor?) {
       editor.updateCaretsVisualAttributes()
       editor.updateCaretsVisualPosition()
     } else {
-      injector.application.localEditors().forEach { editor ->
+      injectorBase.application.localEditors().forEach { editor ->
         editor.updateCaretsVisualAttributes()
         editor.updateCaretsVisualPosition()
       }
@@ -298,16 +299,16 @@ class CommandState(private val editor: VimEditor?) {
 
   private fun doShowMode() {
     val msg = StringBuilder()
-    if (injector.optionService.isSet(OptionScope.GLOBAL, OptionConstants.showmodeName)) {
+    if (injectorBase.optionService.isSet(OptionScope.GLOBAL, OptionConstants.showmodeName)) {
       msg.append(getStatusString())
     }
     if (isRecording) {
       if (msg.isNotEmpty()) {
         msg.append(" - ")
       }
-      msg.append(injector.messages.message("show.mode.recording"))
+      msg.append(injectorBase.messages.message("show.mode.recording"))
     }
-    injector.messages.showMode(msg.toString())
+    injectorBase.messages.showMode(msg.toString())
   }
 
   internal fun getStatusString(): String {
@@ -386,7 +387,7 @@ class CommandState(private val editor: VimEditor?) {
 
     @JvmStatic
     fun getInstance(editor: VimEditor?): CommandState {
-      return if (editor == null || injector.optionService.isSet(OptionScope.GLOBAL, OptionConstants.ideaglobalmodeName)) {
+      return if (editor == null || injectorBase.optionService.isSet(OptionScope.GLOBAL, OptionConstants.ideaglobalmodeName)) {
         globalState
       } else {
         injector.commandStateFor(editor)
