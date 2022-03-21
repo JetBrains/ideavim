@@ -36,6 +36,7 @@ import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.SystemInfo;
+import com.maddyhome.idea.vim.api.VimInjectorBaseKt;
 import com.maddyhome.idea.vim.config.VimState;
 import com.maddyhome.idea.vim.config.migration.ApplicationConfigurationMigrator;
 import com.maddyhome.idea.vim.extension.VimExtensionRegistrar;
@@ -79,6 +80,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
 
   static {
     VimInjectorKt.setInjector(new IjVimInjector());
+    VimInjectorBaseKt.setInjectorBase(new IjVimInjector());
   }
 
   private static final String IDEAVIM_PLUGIN_ID = "IdeaVIM";

@@ -18,11 +18,10 @@
 package com.maddyhome.idea.vim.helper
 
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injectorBase
 import com.maddyhome.idea.vim.common.DigraphResult
 import com.maddyhome.idea.vim.common.DigraphResult.Companion.done
 import com.maddyhome.idea.vim.common.DigraphResult.Companion.handled
-import com.maddyhome.idea.vim.newapi.injector
-import com.maddyhome.idea.vim.newapi.vimLogger
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import java.awt.event.KeyEvent
@@ -65,7 +64,7 @@ class DigraphSequence {
       DIG_STATE_PENDING -> {
         logger.debug("DIG_STATE_PENDING")
         if (key.keyCode == KeyEvent.VK_BACK_SPACE &&
-          injector.optionService.isSet(OptionScope.LOCAL(editor), OptionConstants.digraphName)
+          injectorBase.optionService.isSet(OptionScope.LOCAL(editor), OptionConstants.digraphName)
         ) {
           digraphState = DIG_STATE_BACK_SPACE
         } else if (key.keyChar != KeyEvent.CHAR_UNDEFINED) {
@@ -77,7 +76,7 @@ class DigraphSequence {
         logger.debug("DIG_STATE_BACK_SPACE")
         digraphState = DIG_STATE_PENDING
         if (key.keyChar != KeyEvent.CHAR_UNDEFINED) {
-          val ch = injector.digraphGroup.getDigraph(digraphChar, key.keyChar)
+          val ch = injectorBase.digraphGroup.getDigraph(digraphChar, key.keyChar)
           digraphChar = 0.toChar()
           return done(KeyStroke.getKeyStroke(ch))
         }
@@ -97,7 +96,7 @@ class DigraphSequence {
         logger.debug("DIG_STATE_DIG_TWO")
         digraphState = DIG_STATE_PENDING
         if (key.keyChar != KeyEvent.CHAR_UNDEFINED) {
-          val ch = injector.digraphGroup.getDigraph(digraphChar, key.keyChar)
+          val ch = injectorBase.digraphGroup.getDigraph(digraphChar, key.keyChar)
           return done(KeyStroke.getKeyStroke(ch))
         }
         DigraphResult.BAD
@@ -189,10 +188,10 @@ class DigraphSequence {
           val `val` = digits.toInt(codeType)
           digraphState = DIG_STATE_PENDING
           val code = KeyStroke.getKeyStroke(`val`.toChar())
-          if (!injector.application.isUnitTest()) {
+          if (!injectorBase.application.isUnitTest()) {
             // The key we received isn't part of the literal, so post it to be handled after we've handled the literal.
             // This requires swing, so we can't run it in tests.
-            injector.application.postKey(key, editor)
+            injectorBase.application.postKey(key, editor)
           }
           return done(code)
         } else if (codeCnt == 0) {
@@ -243,6 +242,6 @@ class DigraphSequence {
     private const val DIG_STATE_CODE_START = 10
     private const val DIG_STATE_CODE_CHAR = 11
     private const val DIG_STATE_BACK_SPACE = 20
-    private val logger = vimLogger<DigraphSequence>()
+    private val logger = injectorBase.getLogger(DigraphSequence::class.java)
   }
 }

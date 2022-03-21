@@ -18,47 +18,21 @@
 
 package com.maddyhome.idea.vim.newapi
 
-import com.maddyhome.idea.vim.api.ExecutionContextManager
-import com.maddyhome.idea.vim.api.VimApplication
-import com.maddyhome.idea.vim.api.VimDigraphGroup
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.VimEnabler
-import com.maddyhome.idea.vim.api.VimMessages
-import com.maddyhome.idea.vim.api.VimProcessGroup
-import com.maddyhome.idea.vim.api.VimRegisterGroup
-import com.maddyhome.idea.vim.api.VimStringParser
+import com.maddyhome.idea.vim.api.VimInjectorBase
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.common.VimMachine
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.group.VimChangeGroup
 import com.maddyhome.idea.vim.group.VimKeyGroup
 import com.maddyhome.idea.vim.group.visual.VimVisualMotionGroup
 import com.maddyhome.idea.vim.helper.VimActionExecutor
-import com.maddyhome.idea.vim.options.OptionService
 
-interface VimInjector {
-  fun <T : Any> getLogger(clazz: Class<T>): VimLogger
+interface VimInjector : VimInjectorBase {
   val actionExecutor: VimActionExecutor
   val nativeActionManager: NativeActionManager
-  val messages: VimMessages
-  val registerGroup: VimRegisterGroup
-  val registerGroupIfCreated: VimRegisterGroup?
   val changeGroup: VimChangeGroup
-  val processGroup: VimProcessGroup
   val keyGroup: VimKeyGroup
-  val application: VimApplication
-  val executionContextManager: ExecutionContextManager
-  val digraphGroup: VimDigraphGroup
   val visualMotionGroup: VimVisualMotionGroup
-
-  val vimMachine: VimMachine
-
-  val enabler: VimEnabler
-
-  // TODO We should somehow state that [OptionServiceImpl] can be used from any implementation
-  val optionService: OptionService
-
-  val parser: VimStringParser
 
   fun commandStateFor(editor: VimEditor): CommandState
 }
