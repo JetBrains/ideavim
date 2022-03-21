@@ -15,11 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-package com.maddyhome.idea.vim.helper
+package com.maddyhome.idea.vim.common
 
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injectorBase
-import com.maddyhome.idea.vim.common.DigraphResult
 import com.maddyhome.idea.vim.common.DigraphResult.Companion.done
 import com.maddyhome.idea.vim.common.DigraphResult.Companion.handled
 import com.maddyhome.idea.vim.options.OptionConstants
@@ -210,7 +209,7 @@ class DigraphSequence {
 
   private fun specialKeyToKeyCode(key: KeyStroke): KeyStroke? {
     if (key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0) {
-      val specialKeyCode = StringHelper.parseVimString("\\" + StringHelper.toKeyNotation(key))
+      val specialKeyCode = CommonStringHelper.parseVimString("\\" + CommonStringHelper.toKeyNotation(key))
       if (specialKeyCode.length == 1) {
         return if (specialKeyCode[0].code == 10) {
           KeyStroke.getKeyStroke(0.toChar())
