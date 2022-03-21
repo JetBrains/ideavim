@@ -1,4 +1,4 @@
-package com.maddyhome.idea.vim.helper
+package com.maddyhome.idea.vim.api
 
 import javax.swing.KeyStroke
 

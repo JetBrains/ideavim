@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.api.VimEnabler
 import com.maddyhome.idea.vim.api.VimMessages
 import com.maddyhome.idea.vim.api.VimProcessGroup
 import com.maddyhome.idea.vim.api.VimRegisterGroup
+import com.maddyhome.idea.vim.api.VimStringParser
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.common.VimMachine
 import com.maddyhome.idea.vim.diagnostic.VimLogger
@@ -33,7 +34,6 @@ import com.maddyhome.idea.vim.group.VimChangeGroup
 import com.maddyhome.idea.vim.group.VimKeyGroup
 import com.maddyhome.idea.vim.group.visual.VimVisualMotionGroup
 import com.maddyhome.idea.vim.helper.VimActionExecutor
-import com.maddyhome.idea.vim.helper.VimStringParser
 import com.maddyhome.idea.vim.options.OptionService
 
 interface VimInjector {
