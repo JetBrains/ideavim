@@ -75,3 +75,8 @@ val CommandState.Mode.inSingleNormalMode: Boolean
     else -> false
   }
 
+val VimEditor.inNormalMode
+  get() = this.mode.inNormalMode
+
+val CommandState.Mode.inNormalMode
+  get() = this == CommandState.Mode.COMMAND || this == CommandState.Mode.INSERT_NORMAL
