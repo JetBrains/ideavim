@@ -16,10 +16,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.group;
+package com.maddyhome.idea.vim.api;
 
-import com.maddyhome.idea.vim.api.ExecutionContext;
-import com.maddyhome.idea.vim.api.VimEditor;
 import com.maddyhome.idea.vim.command.Command;
 import org.jetbrains.annotations.NotNull;
 

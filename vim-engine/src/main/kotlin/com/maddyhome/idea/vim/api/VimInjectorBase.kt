@@ -27,6 +27,7 @@ interface VimInjectorBase {
   fun <T : Any> getLogger(clazz: Class<T>): VimLogger
   fun commandStateFor(editor: VimEditor): CommandState
   val engineEditorHelper: EngineEditorHelper
+  val changeGroup: VimChangeGroup
 }
 
 lateinit var injectorBase: VimInjectorBase
