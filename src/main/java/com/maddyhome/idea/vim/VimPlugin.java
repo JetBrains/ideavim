@@ -36,7 +36,7 @@ import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.SystemInfo;
-import com.maddyhome.idea.vim.api.VimInjectorBaseKt;
+import com.maddyhome.idea.vim.api.VimInjectorKt;
 import com.maddyhome.idea.vim.api.VimKeyGroup;
 import com.maddyhome.idea.vim.config.VimState;
 import com.maddyhome.idea.vim.config.migration.ApplicationConfigurationMigrator;
@@ -48,13 +48,12 @@ import com.maddyhome.idea.vim.group.visual.VisualMotionGroup;
 import com.maddyhome.idea.vim.helper.MacKeyRepeat;
 import com.maddyhome.idea.vim.listener.VimListenerManager;
 import com.maddyhome.idea.vim.newapi.IjVimInjector;
-import com.maddyhome.idea.vim.newapi.VimInjectorKt;
 import com.maddyhome.idea.vim.option.OptionsManager;
+import com.maddyhome.idea.vim.options.OptionService;
 import com.maddyhome.idea.vim.ui.StatusBarIconFactory;
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable;
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
 import com.maddyhome.idea.vim.vimscript.services.FunctionStorage;
-import com.maddyhome.idea.vim.options.OptionService;
 import com.maddyhome.idea.vim.vimscript.services.OptionServiceImpl;
 import com.maddyhome.idea.vim.vimscript.services.VariableService;
 import org.jdom.Element;
@@ -81,7 +80,6 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
 
   static {
     VimInjectorKt.setInjector(new IjVimInjector());
-    VimInjectorBaseKt.setInjectorBase(new IjVimInjector());
   }
 
   private static final String IDEAVIM_PLUGIN_ID = "IdeaVIM";
@@ -154,7 +152,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   }
 
   public static @NotNull MarkGroup getMark() {
-    return ((MarkGroup)VimInjectorBaseKt.getInjectorBase().getMarkGroup());
+    return ((MarkGroup)VimInjectorKt.getInjector().getMarkGroup());
   }
 
   public static @NotNull RegisterGroup getRegister() {

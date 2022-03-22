@@ -25,7 +25,7 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.exitSelectMode
-import com.maddyhome.idea.vim.newapi.injector
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke

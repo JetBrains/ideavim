@@ -28,6 +28,7 @@ import com.maddyhome.idea.vim.action.change.VimRepeater.repeatHandler
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.SelectionType
@@ -42,10 +43,8 @@ import com.maddyhome.idea.vim.helper.StringHelper.toKeyNotation
 import com.maddyhome.idea.vim.helper.VimNlsSafe
 import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.helper.subMode
-import com.maddyhome.idea.vim.helper.vimSelectionStart
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.newapi.ij
-import com.maddyhome.idea.vim.newapi.injector
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression

@@ -1,7 +1,7 @@
 package com.maddyhome.idea.vim.helper
 
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.injectorBase
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.options.OptionConstants
@@ -49,7 +49,7 @@ val CommandState.Mode.isEndAllowed: Boolean
   }
 
 val usesVirtualSpace
-  get() = (injectorBase.optionService.getOptionValue(
+  get() = (injector.optionService.getOptionValue(
     OptionScope.GLOBAL,
     OptionConstants.virtualeditName
   ) as VimString).value == "onemore"

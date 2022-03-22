@@ -18,7 +18,7 @@
 
 package com.maddyhome.idea.vim.command
 
-import com.maddyhome.idea.vim.api.injectorBase
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.MappingMode
 import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.options.OptionConstants
@@ -34,7 +34,7 @@ class MappingState {
 
   var mappingMode = MappingMode.NORMAL
 
-  private val timer = Timer((injectorBase.optionService.getOptionValue(OptionScope.GLOBAL, OptionConstants.timeoutlenName) as VimInt).value, null)
+  private val timer = Timer((injector.optionService.getOptionValue(OptionScope.GLOBAL, OptionConstants.timeoutlenName) as VimInt).value, null)
   private var keyList = mutableListOf<KeyStroke>()
 
   init {
@@ -42,7 +42,7 @@ class MappingState {
   }
 
   fun startMappingTimer(actionListener: ActionListener) {
-    timer.initialDelay = (injectorBase.optionService.getOptionValue(OptionScope.GLOBAL, OptionConstants.timeoutlenName) as VimInt).value
+    timer.initialDelay = (injector.optionService.getOptionValue(OptionScope.GLOBAL, OptionConstants.timeoutlenName) as VimInt).value
     timer.actionListeners.forEach { timer.removeActionListener(it) }
     timer.addActionListener(actionListener)
     timer.start()
@@ -72,6 +72,6 @@ class MappingState {
   }
 
   companion object {
-    private val LOG = injectorBase.getLogger(MappingState::class.java)
+    private val LOG = injector.getLogger(MappingState::class.java)
   }
 }

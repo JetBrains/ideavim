@@ -21,7 +21,7 @@ package com.maddyhome.idea.vim.handler
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.injectorBase
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
@@ -83,23 +83,23 @@ abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
   }
 
   private fun doExecute(editor: VimEditor, caret: VimCaret, context: ExecutionContext, operatorArguments: OperatorArguments) {
-    if (!injectorBase.enabler.isEnabled()) return
+    if (!injector.enabler.isEnabled()) return
 
     logger.debug("Execute command with handler: " + this.javaClass.name)
 
     val cmd = CommandState.getInstance(editor).executingCommand ?: run {
-      injectorBase.messages.indicateError()
+      injector.messages.indicateError()
       return
     }
 
     if (!baseExecute(
         editor,
         caret,
-        injectorBase.executionContextManager.onCaret(caret, context),
+        injector.executionContextManager.onCaret(caret, context),
         cmd,
         operatorArguments
       )
-    ) injectorBase.messages.indicateError()
+    ) injector.messages.indicateError()
   }
 
   open fun process(cmd: Command) {
@@ -107,13 +107,13 @@ abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
   }
 
   companion object {
-    private val logger = injectorBase.getLogger(EditorActionHandlerBase::class.java)
+    private val logger = injector.getLogger(EditorActionHandlerBase::class.java)
 
-    fun parseKeysSet(keyStrings: List<String>) = keyStrings.map { injectorBase.parser.parseKeys(it) }.toSet()
+    fun parseKeysSet(keyStrings: List<String>) = keyStrings.map { injector.parser.parseKeys(it) }.toSet()
 
     @JvmStatic
     fun parseKeysSet(@NonNls vararg keyStrings: String): Set<List<KeyStroke>> = List(keyStrings.size) {
-      injectorBase.parser.parseKeys(keyStrings[it])
+      injector.parser.parseKeys(keyStrings[it])
     }.toSet()
 
     @NonNls

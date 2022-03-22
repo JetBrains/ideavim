@@ -15,18 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.maddyhome.idea.vim.api
 
-package com.maddyhome.idea.vim.api;
+import com.maddyhome.idea.vim.command.Command
+import javax.swing.KeyStroke
 
-import com.maddyhome.idea.vim.command.Command;
-import org.jetbrains.annotations.NotNull;
-
-import javax.swing.*;
-
-public interface VimChangeGroup {
-  void processCommand(@NotNull VimEditor editor, @NotNull Command cmd);
-
-  boolean processKey(@NotNull VimEditor editor, @NotNull ExecutionContext context, @NotNull KeyStroke key);
-
-  boolean processKeyInSelectMode(@NotNull VimEditor editor, @NotNull ExecutionContext context, @NotNull KeyStroke key);
+interface VimChangeGroup {
+    fun processCommand(editor: VimEditor, cmd: Command)
+    fun processKey(editor: VimEditor, context: ExecutionContext, key: KeyStroke): Boolean
+    fun processKeyInSelectMode(editor: VimEditor, context: ExecutionContext, key: KeyStroke): Boolean
 }

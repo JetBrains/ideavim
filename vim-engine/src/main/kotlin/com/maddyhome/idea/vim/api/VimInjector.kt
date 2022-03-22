@@ -5,7 +5,7 @@ import com.maddyhome.idea.vim.common.VimMachine
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.options.OptionService
 
-interface VimInjectorBase {
+interface VimInjector {
   val parser: VimStringParser
   val messages: VimMessages
   val registerGroup: VimRegisterGroup
@@ -30,4 +30,4 @@ interface VimInjectorBase {
   val actionExecutor: VimActionExecutor
 }
 
-lateinit var injectorBase: VimInjectorBase
+lateinit var injector: VimInjector

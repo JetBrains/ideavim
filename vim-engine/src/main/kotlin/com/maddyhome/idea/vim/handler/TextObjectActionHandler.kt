@@ -21,7 +21,7 @@ package com.maddyhome.idea.vim.handler
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.injectorBase
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
@@ -83,9 +83,9 @@ abstract class TextObjectActionHandler : EditorActionHandlerBase(true) {
     }
 
     if (visualType == TextObjectVisualType.LINE_WISE && editor.subMode != CommandState.SubMode.VISUAL_LINE) {
-      injectorBase.visualMotionGroup.toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_LINE)
+      injector.visualMotionGroup.toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_LINE)
     } else if (visualType != TextObjectVisualType.LINE_WISE && editor.subMode == CommandState.SubMode.VISUAL_LINE) {
-      injectorBase.visualMotionGroup.toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_CHARACTER)
+      injector.visualMotionGroup.toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_CHARACTER)
     }
 
     caret.moveToOffset(newend)

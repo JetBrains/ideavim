@@ -2,7 +2,7 @@ package com.maddyhome.idea.vim.group.visual
 
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimLogicalPosition
-import com.maddyhome.idea.vim.api.injectorBase
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
@@ -33,7 +33,7 @@ fun lineToNativeSelection(editor: VimEditor, start: Int, end: Int): Pair<Int, In
 fun <T : Comparable<T>> sort(a: T, b: T) = if (a > b) b to a else a to b
 
 private fun isExclusiveSelection(): Boolean {
-  return (injectorBase.optionService.getOptionValue(
+  return (injector.optionService.getOptionValue(
     OptionScope.GLOBAL,
     OptionConstants.selectionName
   ) as VimString).value == "exclusive"

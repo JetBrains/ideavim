@@ -19,7 +19,7 @@ package com.maddyhome.idea.vim.command
 
 import com.maddyhome.idea.vim.api.VimActionsInitiator
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.injectorBase
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.CommandPartNode
 import com.maddyhome.idea.vim.common.DigraphResult
 import com.maddyhome.idea.vim.common.DigraphSequence
@@ -137,7 +137,7 @@ class CommandState(private val editor: VimEditor?) {
       editor.updateCaretsVisualAttributes()
       editor.updateCaretsVisualPosition()
     } else {
-      injectorBase.application.localEditors().forEach { editor ->
+      injector.application.localEditors().forEach { editor ->
         editor.updateCaretsVisualAttributes()
         editor.updateCaretsVisualPosition()
       }
@@ -297,16 +297,16 @@ class CommandState(private val editor: VimEditor?) {
 
   private fun doShowMode() {
     val msg = StringBuilder()
-    if (injectorBase.optionService.isSet(OptionScope.GLOBAL, OptionConstants.showmodeName)) {
+    if (injector.optionService.isSet(OptionScope.GLOBAL, OptionConstants.showmodeName)) {
       msg.append(getStatusString())
     }
     if (isRecording) {
       if (msg.isNotEmpty()) {
         msg.append(" - ")
       }
-      msg.append(injectorBase.messages.message("show.mode.recording"))
+      msg.append(injector.messages.message("show.mode.recording"))
     }
-    injectorBase.messages.showMode(msg.toString())
+    injector.messages.showMode(msg.toString())
   }
 
   fun getStatusString(): String {
@@ -379,21 +379,21 @@ class CommandState(private val editor: VimEditor?) {
   }
 
   companion object {
-    private val logger = injectorBase.getLogger(CommandState::class.java)
+    private val logger = injector.getLogger(CommandState::class.java)
     private val defaultModeState = ModeState(Mode.COMMAND, SubMode.NONE)
     private val globalState = CommandState(null)
 
     @JvmStatic
     fun getInstance(editor: VimEditor?): CommandState {
-      return if (editor == null || injectorBase.optionService.isSet(OptionScope.GLOBAL, OptionConstants.ideaglobalmodeName)) {
+      return if (editor == null || injector.optionService.isSet(OptionScope.GLOBAL, OptionConstants.ideaglobalmodeName)) {
         globalState
       } else {
-        injectorBase.commandStateFor(editor)
+        injector.commandStateFor(editor)
       }
     }
 
     private fun getKeyRootNode(mappingMode: MappingMode): CommandPartNode<VimActionsInitiator> {
-      return injectorBase.keyGroup.getKeyRoot(mappingMode)
+      return injector.keyGroup.getKeyRoot(mappingMode)
     }
   }
 

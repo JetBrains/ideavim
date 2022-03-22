@@ -19,7 +19,7 @@
 package com.maddyhome.idea.vim.command
 
 import com.maddyhome.idea.vim.api.VimActionsInitiator
-import com.maddyhome.idea.vim.api.injectorBase
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.CommandPartNode
 import com.maddyhome.idea.vim.common.CurrentCommandState
 import com.maddyhome.idea.vim.common.Node
@@ -203,6 +203,6 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode<VimActi
   fun getCurrentTrie(): CommandPartNode<VimActionsInitiator> = currentCommandPartNode
 
   companion object {
-    private val LOG = injectorBase.getLogger(CommandBuilder::class.java)
+    private val LOG = injector.getLogger(CommandBuilder::class.java)
   }
 }

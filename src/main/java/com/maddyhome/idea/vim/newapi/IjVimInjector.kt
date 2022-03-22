@@ -6,11 +6,13 @@ import com.intellij.openapi.diagnostic.Logger
 import com.maddyhome.idea.vim.api.EngineEditorHelper
 import com.maddyhome.idea.vim.api.ExecutionContextManager
 import com.maddyhome.idea.vim.api.NativeActionManager
+import com.maddyhome.idea.vim.api.VimActionExecutor
 import com.maddyhome.idea.vim.api.VimApplication
 import com.maddyhome.idea.vim.api.VimChangeGroup
 import com.maddyhome.idea.vim.api.VimDigraphGroup
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimEnabler
+import com.maddyhome.idea.vim.api.VimInjector
 import com.maddyhome.idea.vim.api.VimKeyGroup
 import com.maddyhome.idea.vim.api.VimMarkGroup
 import com.maddyhome.idea.vim.api.VimMessages
@@ -25,7 +27,6 @@ import com.maddyhome.idea.vim.group.MarkGroup
 import com.maddyhome.idea.vim.helper.IjActionExecutor
 import com.maddyhome.idea.vim.helper.IjEditorHelper
 import com.maddyhome.idea.vim.helper.IjVimStringParser
-import com.maddyhome.idea.vim.api.VimActionExecutor
 import com.maddyhome.idea.vim.helper.vimCommandState
 import com.maddyhome.idea.vim.options.OptionService
 

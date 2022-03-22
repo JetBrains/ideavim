@@ -29,7 +29,7 @@ import com.maddyhome.idea.vim.helper.buildGreater212
 import com.maddyhome.idea.vim.helper.getShape
 import com.maddyhome.idea.vim.helper.shape
 import com.maddyhome.idea.vim.helper.thickness
-import com.maddyhome.idea.vim.newapi.injector
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope

@@ -55,7 +55,7 @@ import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.runAfterGotFocus
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.RequiredShortcut
-import com.maddyhome.idea.vim.newapi.injector
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import java.awt.event.KeyEvent

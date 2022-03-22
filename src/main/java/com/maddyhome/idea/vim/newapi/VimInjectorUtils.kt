@@ -18,13 +18,7 @@
 
 package com.maddyhome.idea.vim.newapi
 
-import com.maddyhome.idea.vim.api.VimInjectorBase
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.diagnostic.VimLogger
-
-interface VimInjector : VimInjectorBase {
-}
-
-// We should inject logger here somehow
-lateinit var injector: VimInjector
 
 inline fun <reified T : Any> vimLogger(): VimLogger = injector.getLogger(T::class.java)

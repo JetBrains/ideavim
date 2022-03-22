@@ -22,7 +22,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimCaretListener
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.injectorBase
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
@@ -162,16 +162,16 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
               logger.error("Offset is less than 0. $resultOffset. ${this.javaClass.name}")
             }
             if (CommandFlags.FLAG_SAVE_JUMP in cmd.flags) {
-              injectorBase.markGroup.saveJumpLocation(editor)
+              injector.markGroup.saveJumpLocation(editor)
             }
             if (!editor.isEndAllowed) {
-              resultOffset = injectorBase.engineEditorHelper.normalizeOffset(editor, resultOffset, false)
+              resultOffset = injector.engineEditorHelper.normalizeOffset(editor, resultOffset, false)
             }
             preMove(editor, context, cmd)
             editor.primaryCaret().moveToOffset(resultOffset)
             postMove(editor, context, cmd)
           }
-          is Motion.Error -> injectorBase.messages.indicateError()
+          is Motion.Error -> injector.messages.indicateError()
           is Motion.NoMotion -> Unit
         }
       }
@@ -223,17 +223,17 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
           logger.error("Offset is less than 0. $resultMotion. ${this.javaClass.name}")
         }
         if (CommandFlags.FLAG_SAVE_JUMP in cmd.flags) {
-          injectorBase.markGroup.saveJumpLocation(editor)
+          injector.markGroup.saveJumpLocation(editor)
         }
         if (!editor.isEndAllowed) {
-          resultMotion = injectorBase.engineEditorHelper.normalizeOffset(editor, resultMotion, false)
+          resultMotion = injector.engineEditorHelper.normalizeOffset(editor, resultMotion, false)
         }
         preMove(editor, caret, context, cmd)
         caret.moveToOffset(resultMotion)
         val postMoveCaret = if (editor.inBlockSubMode) editor.primaryCaret() else caret
         postMove(editor, postMoveCaret, context, cmd)
       }
-      is Motion.Error -> injectorBase.messages.indicateError()
+      is Motion.Error -> injector.messages.indicateError()
       is Motion.NoMotion -> Unit
     }
   }
@@ -260,7 +260,7 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
   }
 
   companion object {
-    val logger = injectorBase.getLogger(MotionActionHandler::class.java)
+    val logger = injector.getLogger(MotionActionHandler::class.java)
   }
 }
 
