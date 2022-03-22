@@ -29,7 +29,6 @@ import com.maddyhome.idea.vim.helper.VimActionExecutor
 
 interface VimInjector : VimInjectorBase {
   val actionExecutor: VimActionExecutor
-  val nativeActionManager: NativeActionManager
   val changeGroup: VimChangeGroup
   val keyGroup: VimKeyGroup
   val visualMotionGroup: VimVisualMotionGroup

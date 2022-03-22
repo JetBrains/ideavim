@@ -183,15 +183,15 @@ public class FileGroup {
     else {
       action = VimInjectorKt.getInjector().getNativeActionManager().getSaveCurrent();
     }
-    NativeActionKt.execute(action, new IjExecutionContext(context));
+    ExecuteExtensionKt.execute(action, new IjExecutionContext(context));
   }
 
   /**
    * Saves all files in the project.
    */
   public void saveFiles(DataContext context) {
-    NativeActionKt.execute(VimInjectorKt.getInjector().getNativeActionManager().getSaveAll(),
-                           new IjExecutionContext(context));
+    ExecuteExtensionKt.execute(VimInjectorKt.getInjector().getNativeActionManager().getSaveAll(),
+                               new IjExecutionContext(context));
   }
 
   /**
