@@ -312,7 +312,7 @@ public class KeyHandler {
   }
 
   /**
-   * See the description for {@link com.maddyhome.idea.vim.action.DuplicableOperatorAction}
+   * See the description for {@link com.maddyhome.idea.vim.command.DuplicableOperatorAction}
    */
   private Node mapOpCommand(KeyStroke key, Node node, @NotNull CommandState editorState) {
     if (editorState.isDuplicateOperatorKeyStroke(key)) {

@@ -21,6 +21,7 @@ package com.maddyhome.idea.vim.handler
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injectorBase
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
@@ -31,8 +32,6 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.helper.endOffsetInclusive
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.subMode
-import com.maddyhome.idea.vim.helper.vimSelectionStart
-import com.maddyhome.idea.vim.newapi.injector
 
 /**
  * @author Alex Plate
@@ -84,9 +83,9 @@ abstract class TextObjectActionHandler : EditorActionHandlerBase(true) {
     }
 
     if (visualType == TextObjectVisualType.LINE_WISE && editor.subMode != CommandState.SubMode.VISUAL_LINE) {
-      injector.visualMotionGroup.toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_LINE)
+      injectorBase.visualMotionGroup.toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_LINE)
     } else if (visualType != TextObjectVisualType.LINE_WISE && editor.subMode == CommandState.SubMode.VISUAL_LINE) {
-      injector.visualMotionGroup.toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_CHARACTER)
+      injectorBase.visualMotionGroup.toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_CHARACTER)
     }
 
     caret.moveToOffset(newend)

@@ -3,22 +3,26 @@ package com.maddyhome.idea.vim.newapi
 import com.intellij.openapi.components.service
 import com.intellij.openapi.components.serviceIfCreated
 import com.intellij.openapi.diagnostic.Logger
+import com.maddyhome.idea.vim.api.EngineEditorHelper
 import com.maddyhome.idea.vim.api.ExecutionContextManager
 import com.maddyhome.idea.vim.api.VimApplication
 import com.maddyhome.idea.vim.api.VimDigraphGroup
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimEnabler
+import com.maddyhome.idea.vim.api.VimKeyGroup
+import com.maddyhome.idea.vim.api.VimMarkGroup
 import com.maddyhome.idea.vim.api.VimMessages
 import com.maddyhome.idea.vim.api.VimProcessGroup
 import com.maddyhome.idea.vim.api.VimRegisterGroup
 import com.maddyhome.idea.vim.api.VimStringParser
+import com.maddyhome.idea.vim.api.VimVisualMotionGroup
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.common.VimMachine
 import com.maddyhome.idea.vim.diagnostic.VimLogger
+import com.maddyhome.idea.vim.group.MarkGroup
 import com.maddyhome.idea.vim.group.VimChangeGroup
-import com.maddyhome.idea.vim.group.VimKeyGroup
-import com.maddyhome.idea.vim.group.visual.VimVisualMotionGroup
 import com.maddyhome.idea.vim.helper.IjActionExecutor
+import com.maddyhome.idea.vim.helper.IjEditorHelper
 import com.maddyhome.idea.vim.helper.IjVimStringParser
 import com.maddyhome.idea.vim.helper.VimActionExecutor
 import com.maddyhome.idea.vim.helper.vimCommandState
@@ -43,6 +47,8 @@ class IjVimInjector : VimInjector {
     get() = service()
   override val keyGroup: VimKeyGroup
     get() = service()
+  override val markGroup: VimMarkGroup
+    get() = service<MarkGroup>()
   override val application: VimApplication
     get() = service<IjVimApplication>()
   override val executionContextManager: ExecutionContextManager
@@ -69,4 +75,7 @@ class IjVimInjector : VimInjector {
     }
     return res
   }
+
+  override val engineEditorHelper: EngineEditorHelper
+    get() = service<IjEditorHelper>()
 }

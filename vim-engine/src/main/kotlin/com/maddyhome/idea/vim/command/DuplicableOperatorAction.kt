@@ -16,18 +16,19 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.newapi
+package com.maddyhome.idea.vim.command
 
-import com.maddyhome.idea.vim.handler.ActionBeanClass
-import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
-
-interface VimActionsInitiator {
-  fun getInstance(): EditorActionHandlerBase
+/**
+ * There are some double-character commands like `cc`, `dd`, `yy`.
+ * During the execution these commands are replaced with `c_`, `d_`, `y_`, etc.
+ *
+ * This is not any kind of workaround, this is exactly how the original vim works.
+ *   The `dd` command (and others) should not be processed as a monolith command, or it will lead to problems
+ *   like this: https://youtrack.jetbrains.com/issue/VIM-1189
+ *
+ * If some command implements this interface, and the user enters motion operator that is the same as the command itself, the
+ *   motion operator will be replaced with `_`.
+ */
+interface DuplicableOperatorAction {
+  val duplicateWith: Char
 }
-
-class IjVimActionsInitiator(val bean: ActionBeanClass) : VimActionsInitiator {
-  override fun getInstance(): EditorActionHandlerBase = bean.instance
-}
-
-val VimActionsInitiator.ij: ActionBeanClass
-  get() = (this as IjVimActionsInitiator).bean

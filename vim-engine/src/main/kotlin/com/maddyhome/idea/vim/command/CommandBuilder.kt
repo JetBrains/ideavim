@@ -18,18 +18,14 @@
 
 package com.maddyhome.idea.vim.command
 
-import com.maddyhome.idea.vim.action.DuplicableOperatorAction
-import com.maddyhome.idea.vim.action.ResetModeAction
-import com.maddyhome.idea.vim.action.change.insert.InsertCompletedDigraphAction
-import com.maddyhome.idea.vim.action.change.insert.InsertCompletedLiteralAction
+import com.maddyhome.idea.vim.api.VimActionsInitiator
+import com.maddyhome.idea.vim.api.injectorBase
 import com.maddyhome.idea.vim.common.CommandPartNode
 import com.maddyhome.idea.vim.common.CurrentCommandState
 import com.maddyhome.idea.vim.common.Node
 import com.maddyhome.idea.vim.common.RootNode
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
-import com.maddyhome.idea.vim.newapi.VimActionsInitiator
-import com.maddyhome.idea.vim.newapi.vimLogger
 import org.jetbrains.annotations.TestOnly
 import java.util.*
 import javax.swing.KeyStroke
@@ -139,7 +135,7 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode<VimActi
   }
 
   fun isPuttingLiteral(): Boolean {
-    return !commandParts.isEmpty() && commandParts.last.action is InsertCompletedLiteralAction
+    return !commandParts.isEmpty() && commandParts.last.action.id == "VimInsertCompletedLiteralAction"
   }
 
   fun isDone(): Boolean {
@@ -161,7 +157,7 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode<VimActi
   }
 
   fun buildCommand(): Command {
-    if (commandParts.last.action is InsertCompletedDigraphAction || commandParts.last.action is ResetModeAction) {
+    if (commandParts.last.action.id == "VimInsertCompletedDigraphAction" || commandParts.last.action.id == "VimResetModeAction") {
       expectedArgumentType = prevExpectedArgumentType
       prevExpectedArgumentType = null
       return commandParts.removeLast()
@@ -207,6 +203,6 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode<VimActi
   fun getCurrentTrie(): CommandPartNode<VimActionsInitiator> = currentCommandPartNode
 
   companion object {
-    private val LOG = vimLogger<CommandBuilder>()
+    private val LOG = injectorBase.getLogger(CommandBuilder::class.java)
   }
 }

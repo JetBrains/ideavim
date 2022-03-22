@@ -21,9 +21,12 @@ package com.maddyhome.idea.vim.newapi
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorModificationUtil
 import com.intellij.openapi.editor.LogicalPosition
+import com.intellij.openapi.editor.event.CaretEvent
+import com.intellij.openapi.editor.event.CaretListener
 import com.maddyhome.idea.vim.api.LineDeleteShift
 import com.maddyhome.idea.vim.api.MutableLinearEditor
 import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.VimCaretListener
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimLogicalPosition
 import com.maddyhome.idea.vim.common.EditorLine
@@ -204,6 +207,23 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
 
   override fun getLineEndOffset(line: Int, allowEnd: Boolean): Int {
     return EditorHelper.getLineEndOffset(editor, line, allowEnd)
+  }
+
+  val listenersMap: MutableMap<VimCaretListener, CaretListener> = mutableMapOf()
+
+  override fun addCaretListener(listener: VimCaretListener) {
+    val caretListener = object : CaretListener {
+      override fun caretRemoved(event: CaretEvent) {
+        listener.caretRemoved(event.caret?.vim)
+      }
+    }
+    listenersMap[listener] = caretListener
+    editor.caretModel.addCaretListener(caretListener)
+  }
+
+  override fun removeCaretListener(listener: VimCaretListener) {
+    val caretListener = listenersMap.remove(listener) ?: error("Existing listener expected")
+    editor.caretModel.removeCaretListener(caretListener)
   }
 
   private fun Pair<Offset, Offset>.noGuard(editor: Editor): Boolean {

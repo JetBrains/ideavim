@@ -18,25 +18,19 @@
 
 package com.maddyhome.idea.vim.handler
 
-import com.intellij.openapi.diagnostic.logger
-import com.intellij.openapi.editor.event.CaretEvent
-import com.intellij.openapi.editor.event.CaretListener
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.VimCaretListener
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injectorBase
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.inBlockSubMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.isEndAllowed
-import com.maddyhome.idea.vim.helper.vimSelectionStart
-import com.maddyhome.idea.vim.newapi.ij
-import com.maddyhome.idea.vim.newapi.vim
 
 /**
  * @author Alex Plate
@@ -153,7 +147,7 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    val blockSubmodeActive = editor.ij.inBlockSubMode
+    val blockSubmodeActive = editor.inBlockSubMode
 
     when (this) {
       is SingleExecution -> run {
@@ -165,42 +159,42 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
           is Motion.AbsoluteOffset -> {
             var resultOffset = offset.offset
             if (resultOffset < 0) {
-              logger<MotionActionHandler>().error("Offset is less than 0. $resultOffset. ${this.javaClass.name}")
+              logger.error("Offset is less than 0. $resultOffset. ${this.javaClass.name}")
             }
             if (CommandFlags.FLAG_SAVE_JUMP in cmd.flags) {
-              VimPlugin.getMark().saveJumpLocation(editor.ij)
+              injectorBase.markGroup.saveJumpLocation(editor)
             }
-            if (!editor.ij.isEndAllowed) {
-              resultOffset = EditorHelper.normalizeOffset(editor.ij, resultOffset, false)
+            if (!editor.isEndAllowed) {
+              resultOffset = injectorBase.engineEditorHelper.normalizeOffset(editor, resultOffset, false)
             }
             preMove(editor, context, cmd)
             editor.primaryCaret().moveToOffset(resultOffset)
             postMove(editor, context, cmd)
           }
-          is Motion.Error -> VimPlugin.indicateError()
+          is Motion.Error -> injectorBase.messages.indicateError()
           is Motion.NoMotion -> Unit
         }
       }
       is ForEachCaret -> run {
         when {
-          blockSubmodeActive || editor.ij.caretModel.caretCount == 1 -> {
+          blockSubmodeActive || editor.carets().size == 1 -> {
             val primaryCaret = editor.primaryCaret()
             doExecuteForEach(editor, primaryCaret, context, cmd, operatorArguments)
           }
           else -> {
             try {
-              editor.ij.caretModel.addCaretListener(CaretMergingWatcher)
-              editor.ij.caretModel.runForEachCaret { caret ->
+              editor.addCaretListener(CaretMergingWatcher)
+              editor.forEachCaret { caret ->
                 doExecuteForEach(
                   editor,
-                  caret.vim,
+                  caret,
                   context,
                   cmd,
                   operatorArguments
                 )
               }
             } finally {
-              editor.ij.caretModel.removeCaretListener(CaretMergingWatcher)
+              editor.removeCaretListener(CaretMergingWatcher)
             }
           }
         }
@@ -226,42 +220,47 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
       is Motion.AbsoluteOffset -> {
         var resultMotion = offset.offset
         if (resultMotion < 0) {
-          logger<MotionActionHandler>().error("Offset is less than 0. $resultMotion. ${this.javaClass.name}")
+          logger.error("Offset is less than 0. $resultMotion. ${this.javaClass.name}")
         }
         if (CommandFlags.FLAG_SAVE_JUMP in cmd.flags) {
-          VimPlugin.getMark().saveJumpLocation(editor.ij)
+          injectorBase.markGroup.saveJumpLocation(editor)
         }
-        if (!editor.ij.isEndAllowed) {
-          resultMotion = EditorHelper.normalizeOffset(editor.ij, resultMotion, false)
+        if (!editor.isEndAllowed) {
+          resultMotion = injectorBase.engineEditorHelper.normalizeOffset(editor, resultMotion, false)
         }
         preMove(editor, caret, context, cmd)
         caret.moveToOffset(resultMotion)
-        val postMoveCaret = if (editor.ij.inBlockSubMode) editor.primaryCaret() else caret
+        val postMoveCaret = if (editor.inBlockSubMode) editor.primaryCaret() else caret
         postMove(editor, postMoveCaret, context, cmd)
       }
-      is Motion.Error -> VimPlugin.indicateError()
+      is Motion.Error -> injectorBase.messages.indicateError()
       is Motion.NoMotion -> Unit
     }
   }
 
-  private object CaretMergingWatcher : CaretListener {
-    override fun caretRemoved(event: CaretEvent) {
-      val editor = event.editor
-      val caretToDelete = event.caret ?: return
+  private object CaretMergingWatcher : VimCaretListener {
+    override fun caretRemoved(caret: VimCaret?) {
+      caret ?: return
+      val editor = caret.editor
+      val caretToDelete = caret
       if (editor.inVisualMode) {
-        for (caret in editor.caretModel.allCarets) {
-          val curCaretStart = caret.selectionStart
-          val curCaretEnd = caret.selectionEnd
+        for (vimCaret in editor.carets()) {
+          val curCaretStart = vimCaret.selectionStart
+          val curCaretEnd = vimCaret.selectionEnd
           val caretStartBetweenCur = caretToDelete.selectionStart in curCaretStart until curCaretEnd
           val caretEndBetweenCur = caretToDelete.selectionEnd in curCaretStart + 1..curCaretEnd
           if (caretStartBetweenCur || caretEndBetweenCur) {
             // Okay, caret is being removed because of merging
             val vimSelectionStart = caretToDelete.vimSelectionStart
-            caret.vimSelectionStart = vimSelectionStart
+            vimCaret.vimSelectionStart = vimSelectionStart
           }
         }
       }
     }
+  }
+
+  companion object {
+    val logger = injectorBase.getLogger(MotionActionHandler::class.java)
   }
 }
 

@@ -21,15 +21,13 @@ package com.maddyhome.idea.vim.handler
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injectorBase
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.helper.StringHelper
-import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.helper.noneOfEnum
-import com.maddyhome.idea.vim.newapi.injector
-import com.maddyhome.idea.vim.newapi.vimLogger
 import org.jetbrains.annotations.NonNls
 import java.util.*
 import javax.swing.KeyStroke
@@ -85,23 +83,23 @@ abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
   }
 
   private fun doExecute(editor: VimEditor, caret: VimCaret, context: ExecutionContext, operatorArguments: OperatorArguments) {
-    if (!injector.enabler.isEnabled()) return
+    if (!injectorBase.enabler.isEnabled()) return
 
     logger.debug("Execute command with handler: " + this.javaClass.name)
 
-    val cmd = editor.commandState.executingCommand ?: run {
-      injector.messages.indicateError()
+    val cmd = CommandState.getInstance(editor).executingCommand ?: run {
+      injectorBase.messages.indicateError()
       return
     }
 
     if (!baseExecute(
         editor,
         caret,
-        injector.executionContextManager.onCaret(caret, context),
+        injectorBase.executionContextManager.onCaret(caret, context),
         cmd,
         operatorArguments
       )
-    ) injector.messages.indicateError()
+    ) injectorBase.messages.indicateError()
   }
 
   open fun process(cmd: Command) {
@@ -109,13 +107,13 @@ abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
   }
 
   companion object {
-    private val logger = vimLogger<EditorActionHandlerBase>()
+    private val logger = injectorBase.getLogger(EditorActionHandlerBase::class.java)
 
-    fun parseKeysSet(keyStrings: List<String>) = keyStrings.map { StringHelper.parseKeys(it) }.toSet()
+    fun parseKeysSet(keyStrings: List<String>) = keyStrings.map { injectorBase.parser.parseKeys(it) }.toSet()
 
     @JvmStatic
     fun parseKeysSet(@NonNls vararg keyStrings: String): Set<List<KeyStroke>> = List(keyStrings.size) {
-      StringHelper.parseKeys(keyStrings[it])
+      injectorBase.parser.parseKeys(keyStrings[it])
     }.toSet()
 
     @NonNls

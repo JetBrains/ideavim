@@ -173,6 +173,9 @@ interface VimEditor {
   fun vimSetSystemBlockSelectionSilently(start: VimLogicalPosition, end: VimLogicalPosition)
 
   fun getLineEndOffset(line: Int, allowEnd: Boolean): Int
+
+  fun addCaretListener(listener: VimCaretListener)
+  fun removeCaretListener(listener: VimCaretListener)
 }
 
 interface MutableVimEditor : VimEditor {

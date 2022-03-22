@@ -1,21 +1,3 @@
-/*
- * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2022 The IdeaVim authors
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
- */
-
 package com.maddyhome.idea.vim.command
 
 import com.maddyhome.idea.vim.api.ExecutionContext
@@ -31,17 +13,17 @@ import java.util.*
  * an argument if appropriate for the command. The command has a count and a type.
  */
 data class Command(
-  var rawCount: Int,
-  var action: EditorActionHandlerBase,
-  val type: Type,
-  var flags: EnumSet<CommandFlags>,
+    var rawCount: Int,
+    var action: EditorActionHandlerBase,
+    val type: Type,
+    var flags: EnumSet<CommandFlags>,
 ) {
 
   constructor(rawCount: Int, register: Char) : this(
     rawCount,
     NonExecutableActionHandler,
     Type.SELECT_REGISTER,
-    EnumSet.of(CommandFlags.FLAG_EXPECT_MORE)
+      EnumSet.of(CommandFlags.FLAG_EXPECT_MORE)
   ) {
     this.register = register
   }

@@ -9,6 +9,8 @@ interface VimCaret {
   val offset: Offset
   val vimLastColumn: Int
   val selectionStart: Int
+  val selectionEnd: Int
+  var vimSelectionStart: Int
   fun moveToOffset(offset: Int)
   fun offsetForLineStartSkipLeading(line: Int): Int
   fun getLine(): EditorLine.Pointer

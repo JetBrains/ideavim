@@ -29,21 +29,21 @@ internal fun getCaretVisualAttributes(color: Color?, weight: CaretVisualAttribut
 }
 
 @Suppress("UNCHECKED_CAST")
-internal fun getShape(shape: String): Any {
+fun getShape(shape: String): Any {
   val shapeClass = CaretVisualAttributes::class.java.classLoader.loadClass("com.intellij.openapi.editor.CaretVisualAttributes\$Shape")
   return java.lang.Enum.valueOf(shapeClass as Class<Enum<*>>, shape)
 }
 
-internal fun Caret.shape(): Any? {
+fun Caret.shape(): Any? {
   val method = CaretVisualAttributes::class.java.getMethod("getShape")
   return method.invoke(this.visualAttributes)
 }
 
-internal fun Caret.thickness(): Any? {
+fun Caret.thickness(): Any? {
   val method = CaretVisualAttributes::class.java.getMethod("getThickness")
   return method.invoke(this.visualAttributes)
 }
 
-internal fun buildGreater212(): Boolean {
+fun buildGreater212(): Boolean {
   return ApplicationInfo.getInstance().build.baselineVersion >= 212
 }

@@ -826,7 +826,7 @@ public class ChangeGroup implements VimChangeGroup {
         .forEach(c -> editor.getCaretModel().removeCaret(c));
       boolean res = deleteText(editor, rangeToDelete, SelectionType.CHARACTER_WISE);
 
-      if (CommandStateHelper.getUsesVirtualSpace()) {
+      if (EngineHelperKt.getUsesVirtualSpace()) {
         MotionGroup.moveCaret(editor, caret, startOffset);
       }
       else {
@@ -1666,7 +1666,7 @@ public class ChangeGroup implements VimChangeGroup {
       MotionGroup.getMotionRange(editor, caret, context, argument, operatorArguments);
     if (range != null) {
       autoIndentRange(editor, caret, context,
-                      new TextRange(range.getStartOffset(), HelperKt.getEndOffsetInclusive(range)));
+                      new TextRange(range.getStartOffset(), EngineHelperKt.getEndOffsetInclusive(range)));
     }
   }
 

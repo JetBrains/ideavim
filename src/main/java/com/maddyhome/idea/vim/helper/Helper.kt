@@ -28,7 +28,6 @@ import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import java.util.*
@@ -160,9 +159,6 @@ annotation class RWLockLabel {
   @Target(AnnotationTarget.FUNCTION)
   annotation class NoLockRequired
 }
-
-val TextRange.endOffsetInclusive
-  get() = if (this.endOffset > 0 && this.endOffset > this.startOffset) this.endOffset - 1 else this.endOffset
 
 fun vimEnabled(editor: Editor?): Boolean {
   if (!VimPlugin.isEnabled()) return false

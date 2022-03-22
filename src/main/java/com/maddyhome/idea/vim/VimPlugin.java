@@ -37,6 +37,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.SystemInfo;
 import com.maddyhome.idea.vim.api.VimInjectorBaseKt;
+import com.maddyhome.idea.vim.api.VimKeyGroup;
 import com.maddyhome.idea.vim.config.VimState;
 import com.maddyhome.idea.vim.config.migration.ApplicationConfigurationMigrator;
 import com.maddyhome.idea.vim.extension.VimExtensionRegistrar;
@@ -153,7 +154,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   }
 
   public static @NotNull MarkGroup getMark() {
-    return ApplicationManager.getApplication().getService(MarkGroup.class);
+    return ((MarkGroup)VimInjectorBaseKt.getInjectorBase().getMarkGroup());
   }
 
   public static @NotNull RegisterGroup getRegister() {

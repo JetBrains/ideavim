@@ -15,19 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.maddyhome.idea.vim.api
 
-package com.maddyhome.idea.vim.group.visual
+import com.maddyhome.idea.vim.common.CommandPartNode
+import com.maddyhome.idea.vim.common.MappingMode
+import com.maddyhome.idea.vim.key.KeyMappingLayer
 
-import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.command.CommandState
-
-interface VimVisualMotionGroup {
-  /**
-   * This function toggles visual mode.
-   *
-   * If visual mode is disabled, enable it
-   * If visual mode is enabled, but [subMode] differs, update visual according to new [subMode]
-   * If visual mode is enabled with the same [subMode], disable it
-   */
-  fun toggleVisual(editor: VimEditor, count: Int, rawCount: Int, subMode: CommandState.SubMode): Boolean
+interface VimKeyGroup {
+    fun getKeyRoot(mappingMode: MappingMode): CommandPartNode<VimActionsInitiator>
+    fun getKeyMappingLayer(mode: MappingMode): KeyMappingLayer
 }

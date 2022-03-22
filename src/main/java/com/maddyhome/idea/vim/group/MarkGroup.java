@@ -40,6 +40,8 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.api.VimEditor;
+import com.maddyhome.idea.vim.api.VimMarkGroup;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.*;
@@ -63,7 +65,7 @@ import java.util.stream.Collectors;
 @State(name = "VimMarksSettings", storages = {
   @Storage(value = "$APP_CONFIG$/vim_settings_local.xml", roamingType = RoamingType.DISABLED)
 })
-public class MarkGroup implements PersistentStateComponent<Element> {
+public class MarkGroup implements PersistentStateComponent<Element>, VimMarkGroup {
   public static final char MARK_VISUAL_START = '<';
   public static final char MARK_VISUAL_END = '>';
   public static final char MARK_CHANGE_START = '[';
@@ -81,6 +83,11 @@ public class MarkGroup implements PersistentStateComponent<Element> {
    *
    * @param editor  The editor the jump will occur in
    */
+  @Override
+  public void saveJumpLocation(@NotNull VimEditor editor) {
+    saveJumpLocation(((IjVimEditor)editor).getEditor());
+  }
+
   public void saveJumpLocation(@NotNull Editor editor) {
     addJump(editor, true);
     setMark(editor, '\'');

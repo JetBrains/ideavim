@@ -27,13 +27,11 @@ import com.intellij.openapi.editor.RangeMarker
 import com.intellij.openapi.editor.markup.RangeHighlighter
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.UserDataHolder
-import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.group.visual.VisualChange
 import com.maddyhome.idea.vim.group.visual.vimLeadSelectionOffset
-import com.maddyhome.idea.vim.newapi.IjVimCaret
 import com.maddyhome.idea.vim.ui.ExOutputPanel
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
@@ -57,14 +55,6 @@ var Caret.vimSelectionStart: Int
   }
   set(value) {
     _vimSelectionStart = value
-  }
-
-var VimCaret.vimSelectionStart: Int
-  get() {
-    return (this as IjVimCaret).caret.vimSelectionStart
-  }
-  set(value) {
-    (this as IjVimCaret).caret.vimSelectionStart = value
   }
 
 fun Caret.vimSelectionStartClear() {

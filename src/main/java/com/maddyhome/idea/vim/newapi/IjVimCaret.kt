@@ -30,6 +30,7 @@ import com.maddyhome.idea.vim.group.visual.vimSetSelection
 import com.maddyhome.idea.vim.group.visual.vimSetSystemSelectionSilently
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.helper.vimLastColumn
+import com.maddyhome.idea.vim.helper.vimSelectionStart
 
 class IjVimCaret(val caret: Caret) : VimCaret {
   override val editor: VimEditor
@@ -40,6 +41,13 @@ class IjVimCaret(val caret: Caret) : VimCaret {
     get() = caret.vimLastColumn
   override val selectionStart: Int
     get() = caret.selectionStart
+  override val selectionEnd: Int
+    get() = caret.selectionEnd
+  override var vimSelectionStart: Int
+    get() = this.caret.vimSelectionStart
+    set(value) {
+      this.caret.vimSelectionStart = value
+    }
 
   override fun moveToOffset(offset: Int) {
     // TODO: 17.12.2021 Unpack internal actions

@@ -29,23 +29,6 @@ import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
-@get:VimNlsSafe
-val usesVirtualSpace
-  get() = (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, OptionConstants.virtualeditName) as VimString).value == "onemore"
-
-/**
- * Please use `isEndAllowed` based on `Editor` (another extension function)
- * It takes "single command" into account.
- */
-val CommandState.Mode.isEndAllowed: Boolean
-  get() = when (this) {
-    CommandState.Mode.INSERT, CommandState.Mode.VISUAL, CommandState.Mode.SELECT -> true
-    CommandState.Mode.COMMAND, CommandState.Mode.CMD_LINE, CommandState.Mode.REPLACE, CommandState.Mode.OP_PENDING -> usesVirtualSpace
-    CommandState.Mode.INSERT_NORMAL -> usesVirtualSpace
-    CommandState.Mode.INSERT_VISUAL -> usesVirtualSpace
-    CommandState.Mode.INSERT_SELECT -> usesVirtualSpace
-  }
-
 val Editor.isEndAllowed: Boolean
   get() = when (this.mode) {
     CommandState.Mode.INSERT, CommandState.Mode.VISUAL, CommandState.Mode.SELECT, CommandState.Mode.INSERT_VISUAL, CommandState.Mode.INSERT_SELECT -> true
@@ -76,19 +59,10 @@ val CommandState.Mode.hasVisualSelection
 val Editor.mode
   get() = this.vim.commandState.mode
 
-val VimEditor.mode
-  get() = this.commandState.mode
-
 var Editor.subMode
   get() = this.vim.commandState.subMode
   set(value) {
     this.vim.commandState.subMode = value
-  }
-
-var VimEditor.subMode
-  get() = this.commandState.subMode
-  set(value) {
-    this.commandState.subMode = value
   }
 
 @get:JvmName("inNormalMode")
@@ -109,9 +83,6 @@ val Editor.inRepeatMode
 
 @get:JvmName("inVisualMode")
 val Editor.inVisualMode
-  get() = this.mode.inVisualMode
-
-val VimEditor.inVisualMode
   get() = this.mode.inVisualMode
 
 @get:JvmName("inVisualMode")
@@ -146,9 +117,6 @@ val CommandState.Mode.inSingleNormalMode: Boolean
     CommandState.Mode.INSERT_NORMAL -> true
     else -> false
   }
-
-val VimEditor.commandState
-  get() = CommandState.getInstance(this)
 
 fun CommandState.pushVisualMode(subMode: CommandState.SubMode, prevMode: CommandState.Mode = this.mode) {
   if (prevMode.inSingleMode) {

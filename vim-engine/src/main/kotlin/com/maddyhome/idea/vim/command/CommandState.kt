@@ -17,17 +17,15 @@
  */
 package com.maddyhome.idea.vim.command
 
+import com.maddyhome.idea.vim.api.VimActionsInitiator
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injectorBase
 import com.maddyhome.idea.vim.common.CommandPartNode
 import com.maddyhome.idea.vim.common.DigraphResult
+import com.maddyhome.idea.vim.common.DigraphSequence
 import com.maddyhome.idea.vim.common.MappingMode
 import com.maddyhome.idea.vim.diagnostic.debug
-import com.maddyhome.idea.vim.common.DigraphSequence
 import com.maddyhome.idea.vim.helper.noneOfEnum
-import com.maddyhome.idea.vim.newapi.VimActionsInitiator
-import com.maddyhome.idea.vim.newapi.injector
-import com.maddyhome.idea.vim.newapi.vimLogger
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import org.jetbrains.annotations.Contract
@@ -311,7 +309,7 @@ class CommandState(private val editor: VimEditor?) {
     injectorBase.messages.showMode(msg.toString())
   }
 
-  internal fun getStatusString(): String {
+  fun getStatusString(): String {
     val pos = modeStates.size - 1
     val modeState = if (pos >= 0) {
       modeStates[pos]
@@ -381,7 +379,7 @@ class CommandState(private val editor: VimEditor?) {
   }
 
   companion object {
-    private val logger = vimLogger<CommandState>()
+    private val logger = injectorBase.getLogger(CommandState::class.java)
     private val defaultModeState = ModeState(Mode.COMMAND, SubMode.NONE)
     private val globalState = CommandState(null)
 
@@ -390,12 +388,12 @@ class CommandState(private val editor: VimEditor?) {
       return if (editor == null || injectorBase.optionService.isSet(OptionScope.GLOBAL, OptionConstants.ideaglobalmodeName)) {
         globalState
       } else {
-        injector.commandStateFor(editor)
+        injectorBase.commandStateFor(editor)
       }
     }
 
     private fun getKeyRootNode(mappingMode: MappingMode): CommandPartNode<VimActionsInitiator> {
-      return injector.keyGroup.getKeyRoot(mappingMode)
+      return injectorBase.keyGroup.getKeyRoot(mappingMode)
     }
   }
 

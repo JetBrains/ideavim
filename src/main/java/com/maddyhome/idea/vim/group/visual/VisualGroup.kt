@@ -22,8 +22,6 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.VisualPosition
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.VimLogicalPosition
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.EditorHelper
@@ -33,7 +31,6 @@ import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
-import com.maddyhome.idea.vim.helper.sort
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
 import com.maddyhome.idea.vim.helper.vimLastColumn
@@ -134,50 +131,6 @@ val Caret.vimLeadSelectionOffset: Int
     }
     return caretOffset
   }
-
-fun charToNativeSelection(editor: VimEditor, start: Int, end: Int, mode: CommandState.Mode): Pair<Int, Int> {
-  val (nativeStart, nativeEnd) = sort(start, end)
-  val lineEnd = editor.lineEndForOffset(nativeEnd)
-  val adj =
-    if (VimPlugin.getVisualMotion().exclusiveSelection || nativeEnd == lineEnd || mode == CommandState.Mode.SELECT) 0 else 1
-  val adjEnd = (nativeEnd + adj).coerceAtMost(editor.fileSize().toInt())
-  return nativeStart to adjEnd
-}
-
-/**
- * Convert vim's selection start and end to corresponding native selection.
- *
- * Adds caret adjustment or extends to line start / end in case of linewise selection
- */
-fun lineToNativeSelection(editor: VimEditor, start: Int, end: Int): Pair<Int, Int> {
-  val (nativeStart, nativeEnd) = sort(start, end)
-  val lineStart = editor.lineStartForOffset(nativeStart)
-  // Extend to \n char of line to fill full line with selection
-  val lineEnd = (editor.lineEndForOffset(nativeEnd) + 1).coerceAtMost(editor.fileSize().toInt())
-  return lineStart to lineEnd
-}
-
-fun blockToNativeSelection(
-  editor: VimEditor,
-  start: Int,
-  end: Int,
-  mode: CommandState.Mode,
-): Pair<VimLogicalPosition, VimLogicalPosition> {
-  var blockStart = editor.offsetToLogicalPosition(start)
-  var blockEnd = editor.offsetToLogicalPosition(end)
-  if (!VimPlugin.getVisualMotion().exclusiveSelection && mode != CommandState.Mode.SELECT) {
-    if (blockStart.column > blockEnd.column) {
-      if (blockStart.column < editor.lineLength(blockStart.line)) {
-        blockStart = VimLogicalPosition(blockStart.line, blockStart.column + 1)
-      }
-    } else {
-      if (blockEnd.column < editor.lineLength(blockEnd.line)) {
-        blockEnd = VimLogicalPosition(blockEnd.line, blockEnd.column + 1)
-      }
-    }
-  }
-  return blockStart to blockEnd
-}
 
 fun moveCaretOneCharLeftFromSelectionEnd(editor: Editor, predictedMode: CommandState.Mode) {
   if (predictedMode != CommandState.Mode.VISUAL) {
