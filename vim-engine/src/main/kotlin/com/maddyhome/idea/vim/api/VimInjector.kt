@@ -28,6 +28,7 @@ interface VimInjector {
   val engineEditorHelper: EngineEditorHelper
   val changeGroup: VimChangeGroup
   val actionExecutor: VimActionExecutor
+  val exEntryPanel: ExEntryPanel
 }
 
 lateinit var injector: VimInjector

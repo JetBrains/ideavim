@@ -27,6 +27,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.ui.ShowCmd
 import java.awt.Toolkit
 
 @Service
@@ -83,4 +84,7 @@ class IjVimMessages : VimMessages {
   override fun isError(): Boolean = error
 
   override fun message(key: String): String = MessageHelper.message(key)
+  override fun updateStatusBar() {
+    ShowCmd.update()
+  }
 }

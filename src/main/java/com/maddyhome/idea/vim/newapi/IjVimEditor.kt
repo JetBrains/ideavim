@@ -226,6 +226,14 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
     editor.caretModel.removeCaretListener(caretListener)
   }
 
+  override fun isDisposed(): Boolean {
+    return editor.isDisposed
+  }
+
+  override fun removeSelection() {
+    editor.selectionModel.removeSelection()
+  }
+
   private fun Pair<Offset, Offset>.noGuard(editor: Editor): Boolean {
     return editor.document.getRangeGuard(this.first.point, this.second.point) == null
   }

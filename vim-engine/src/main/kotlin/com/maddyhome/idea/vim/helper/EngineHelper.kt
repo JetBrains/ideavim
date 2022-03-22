@@ -69,3 +69,9 @@ val CommandState.Mode.inSingleMode: Boolean
     else -> false
   }
 
+val CommandState.Mode.inSingleNormalMode: Boolean
+  get() = when (this) {
+    CommandState.Mode.INSERT_NORMAL -> true
+    else -> false
+  }
+

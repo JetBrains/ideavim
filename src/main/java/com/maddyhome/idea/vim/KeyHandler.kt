@@ -45,12 +45,8 @@ import com.maddyhome.idea.vim.helper.inNormalMode
 import com.maddyhome.idea.vim.helper.inSingleNormalMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.key.KeyMappingLayer
-import com.maddyhome.idea.vim.newapi.ij
-import com.maddyhome.idea.vim.newapi.vimLogger
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.ui.ShowCmd.update
-import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import java.awt.event.InputEvent
 import java.awt.event.KeyEvent
@@ -214,7 +210,7 @@ class KeyHandler {
     }
 
     // This will update immediately, if we're on the EDT (which we are)
-    update()
+    injector.messages.updateStatusBar()
     LOG.trace("----------- Key Handler Finished -----------")
   }
 
@@ -343,13 +339,12 @@ class KeyHandler {
       //   but before invoke later is handled. This is a rare case, so I'll just add a check to isPluginMapping.
       //   But this "unexpected behaviour" exists and it would be better not to relay on mutable state with delays.
       //   https://youtrack.jetbrains.com/issue/VIM-2392
-      val ijEditor = editor.ij
       mappingState.startMappingTimer {
         injector.application.invokeLater(
           {
             LOG.debug("Delayed mapping timer call")
             val unhandledKeys = mappingState.detachKeys()
-            if (ijEditor.isDisposed || isPluginMapping(unhandledKeys)) {
+            if (editor.isDisposed() || isPluginMapping(unhandledKeys)) {
               LOG.debug("Abandon mapping timer")
               return@invokeLater
             }
@@ -600,13 +595,13 @@ class KeyHandler {
       }
     }
     val res = editorState.processDigraphKey(key, editor)
-    if (ExEntryPanel.getInstance().isActive) {
+    if (injector.exEntryPanel.isActive()) {
       when (res.result) {
         DigraphResult.RES_HANDLED -> setPromptCharacterEx(if (commandBuilder.isPuttingLiteral()) '^' else key.keyChar)
         DigraphResult.RES_DONE, DigraphResult.RES_BAD -> if (key.keyCode == KeyEvent.VK_C && key.modifiers and InputEvent.CTRL_DOWN_MASK != 0) {
           return false
         } else {
-          ExEntryPanel.getInstance().entry.clearCurrentAction()
+          injector.exEntryPanel.clearCurrentAction()
         }
       }
     }
@@ -839,13 +834,13 @@ class KeyHandler {
     getInstance(editor).reset()
     reset(editor)
     injector.registerGroupIfCreated?.resetRegister()
-    editor.ij.selectionModel.removeSelection()
+    editor.removeSelection()
   }
 
   private fun setPromptCharacterEx(promptCharacter: Char) {
-    val exEntryPanel = ExEntryPanel.getInstance()
-    if (exEntryPanel.isActive) {
-      exEntryPanel.entry.setCurrentActionPromptCharacter(promptCharacter)
+    val exEntryPanel = injector.exEntryPanel
+    if (exEntryPanel.isActive()) {
+      exEntryPanel.setCurrentActionPromptCharacter(promptCharacter)
     }
   }
 
@@ -892,7 +887,7 @@ class KeyHandler {
   }
 
   companion object {
-    private val LOG: VimLogger = vimLogger<KeyHandler>()
+    private val LOG: VimLogger = injector.getLogger(KeyHandler::class.java)
 
     fun <T> isPrefix(list1: List<T>, list2: List<T>): Boolean {
       if (list1.size > list2.size) {

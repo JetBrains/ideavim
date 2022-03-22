@@ -4,6 +4,7 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.components.serviceIfCreated
 import com.intellij.openapi.diagnostic.Logger
 import com.maddyhome.idea.vim.api.EngineEditorHelper
+import com.maddyhome.idea.vim.api.ExEntryPanel
 import com.maddyhome.idea.vim.api.ExecutionContextManager
 import com.maddyhome.idea.vim.api.NativeActionManager
 import com.maddyhome.idea.vim.api.VimActionExecutor
@@ -35,6 +36,8 @@ class IjVimInjector : VimInjector {
 
   override val actionExecutor: VimActionExecutor
     get() = service<IjActionExecutor>()
+  override val exEntryPanel: ExEntryPanel
+    get() = service<IjExEntryPanel>()
   override val nativeActionManager: NativeActionManager
     get() = service<IjNativeActionManager>()
   override val messages: VimMessages

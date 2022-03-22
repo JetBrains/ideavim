@@ -176,6 +176,10 @@ interface VimEditor {
 
   fun addCaretListener(listener: VimCaretListener)
   fun removeCaretListener(listener: VimCaretListener)
+
+  fun isDisposed(): Boolean
+
+  fun removeSelection()
 }
 
 interface MutableVimEditor : VimEditor {
