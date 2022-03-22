@@ -22,6 +22,8 @@ import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.IdeActions
 import com.intellij.openapi.components.Service
+import com.maddyhome.idea.vim.api.NativeAction
+import com.maddyhome.idea.vim.api.NativeActionManager
 
 @Service
 class IjNativeActionManager : NativeActionManager {

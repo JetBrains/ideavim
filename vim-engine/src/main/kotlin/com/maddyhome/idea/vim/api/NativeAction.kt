@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.newapi
+package com.maddyhome.idea.vim.api
 
 interface NativeAction {
   val action: Any

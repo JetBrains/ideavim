@@ -15,14 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-package com.maddyhome.idea.vim.helper
+package com.maddyhome.idea.vim.api
 
-import com.intellij.openapi.util.NlsContexts
-import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
-import com.maddyhome.idea.vim.newapi.NativeAction
 import org.jetbrains.annotations.NonNls
 
 interface VimActionExecutor {
@@ -45,7 +41,7 @@ interface VimActionExecutor {
   fun executeCommand(
     editor: VimEditor?,
     runnable: Runnable,
-    name: @NlsContexts.Command String?,
+    name: String?,
     groupId: Any?,
   )
 

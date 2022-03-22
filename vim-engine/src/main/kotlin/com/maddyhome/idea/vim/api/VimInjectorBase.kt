@@ -3,7 +3,6 @@ package com.maddyhome.idea.vim.api
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.common.VimMachine
 import com.maddyhome.idea.vim.diagnostic.VimLogger
-import com.maddyhome.idea.vim.newapi.NativeActionManager
 import com.maddyhome.idea.vim.options.OptionService
 
 interface VimInjectorBase {
@@ -28,6 +27,7 @@ interface VimInjectorBase {
   fun commandStateFor(editor: VimEditor): CommandState
   val engineEditorHelper: EngineEditorHelper
   val changeGroup: VimChangeGroup
+  val actionExecutor: VimActionExecutor
 }
 
 lateinit var injectorBase: VimInjectorBase

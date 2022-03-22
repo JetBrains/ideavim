@@ -20,10 +20,8 @@ package com.maddyhome.idea.vim.newapi
 
 import com.maddyhome.idea.vim.api.VimInjectorBase
 import com.maddyhome.idea.vim.diagnostic.VimLogger
-import com.maddyhome.idea.vim.helper.VimActionExecutor
 
 interface VimInjector : VimInjectorBase {
-  val actionExecutor: VimActionExecutor
 }
 
 // We should inject logger here somehow

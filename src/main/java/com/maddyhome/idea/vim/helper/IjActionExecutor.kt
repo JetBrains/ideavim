@@ -43,7 +43,8 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import com.maddyhome.idea.vim.newapi.IjNativeAction
-import com.maddyhome.idea.vim.newapi.NativeAction
+import com.maddyhome.idea.vim.api.NativeAction
+import com.maddyhome.idea.vim.api.VimActionExecutor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.annotations.NonNls
