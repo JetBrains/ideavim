@@ -22,7 +22,6 @@ import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.extension.VimExtensionHandler
@@ -107,7 +106,6 @@ object VimRepeater {
 
   object Extension {
     var lastExtensionHandler: VimExtensionHandler? = null
-    var argumentCaptured: Argument? = null
 
     private val keyStrokes = mutableListOf<KeyStroke>()
     private val strings = mutableListOf<String>()

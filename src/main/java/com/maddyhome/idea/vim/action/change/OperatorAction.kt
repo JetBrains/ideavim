@@ -25,6 +25,7 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.command.SelectionType
+import com.maddyhome.idea.vim.common.argumentCaptured
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.MessageHelper
@@ -45,7 +46,7 @@ class OperatorAction : VimActionHandler.SingleExecution() {
       val argument = cmd.argument
       if (argument != null) {
         if (!editor.vim.commandState.isDotRepeatInProgress) {
-          VimRepeater.Extension.argumentCaptured = argument
+          argumentCaptured = argument
         }
         val saveRepeatHandler = VimRepeater.repeatHandler
         val motion = argument.motion

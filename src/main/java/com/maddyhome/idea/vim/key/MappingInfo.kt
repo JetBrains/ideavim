@@ -21,7 +21,6 @@ import com.intellij.openapi.application.invokeLater
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.actionSystem.CaretSpecificDataContext
 import com.maddyhome.idea.vim.KeyHandler
-import com.maddyhome.idea.vim.action.change.VimRepeater.Extension.argumentCaptured
 import com.maddyhome.idea.vim.action.change.VimRepeater.Extension.clean
 import com.maddyhome.idea.vim.action.change.VimRepeater.Extension.lastExtensionHandler
 import com.maddyhome.idea.vim.action.change.VimRepeater.repeatHandler
@@ -34,6 +33,7 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.command.SelectionType.Companion.fromSubMode
 import com.maddyhome.idea.vim.common.Offset
+import com.maddyhome.idea.vim.common.argumentCaptured
 import com.maddyhome.idea.vim.common.offset
 import com.maddyhome.idea.vim.extension.VimExtensionHandler
 import com.maddyhome.idea.vim.group.visual.VimSelection

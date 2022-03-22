@@ -17,7 +17,6 @@
  */
 package com.maddyhome.idea.vim
 
-import com.maddyhome.idea.vim.action.change.VimRepeater.Extension.argumentCaptured
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimActionsInitiator
 import com.maddyhome.idea.vim.api.VimEditor
@@ -36,6 +35,7 @@ import com.maddyhome.idea.vim.common.CurrentCommandState
 import com.maddyhome.idea.vim.common.DigraphResult
 import com.maddyhome.idea.vim.common.MappingMode
 import com.maddyhome.idea.vim.common.Node
+import com.maddyhome.idea.vim.common.argumentCaptured
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.trace
