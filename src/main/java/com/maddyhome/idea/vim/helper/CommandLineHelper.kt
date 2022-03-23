@@ -42,7 +42,7 @@ class CommandLineHelper {
       val inputModel = TestInputModel.getInstance(editor)
       var key: KeyStroke? = inputModel.nextKeyStroke()
       while (key != null &&
-        !StringHelper.isCloseKeyStroke(key) && key.keyCode != KeyEvent.VK_ENTER &&
+        !key.isCloseKeyStroke() && key.keyCode != KeyEvent.VK_ENTER &&
         (finishOn == null || key.keyChar != finishOn)
       ) {
         val c = key.keyChar
@@ -63,7 +63,7 @@ class CommandLineHelper {
       exEntryPanel.activate(editor, EditorDataContext.init(editor), prompt.ifEmpty { " " }, "", 1)
       ModalEntry.activate { key: KeyStroke ->
         return@activate when {
-          StringHelper.isCloseKeyStroke(key) -> {
+          key.isCloseKeyStroke() -> {
             exEntryPanel.deactivate(true)
             false
           }

@@ -45,6 +45,7 @@ import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.helper.inNormalMode
 import com.maddyhome.idea.vim.helper.inSingleNormalMode
 import com.maddyhome.idea.vim.helper.inVisualMode
+import com.maddyhome.idea.vim.helper.isCloseKeyStroke
 import com.maddyhome.idea.vim.key.KeyMappingLayer
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
@@ -514,7 +515,7 @@ class KeyHandler {
   }
 
   private fun isEditorReset(key: KeyStroke, editorState: CommandState): Boolean {
-    val editorReset = editorState.mode == CommandState.Mode.COMMAND && injector.parser.isCloseKeyStroke(key)
+    val editorReset = editorState.mode == CommandState.Mode.COMMAND && key.isCloseKeyStroke()
     LOG.debug { "This is editor reset: $editorReset" }
     return editorReset
   }

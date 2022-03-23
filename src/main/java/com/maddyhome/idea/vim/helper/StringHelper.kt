@@ -522,11 +522,6 @@ object StringHelper {
     return false
   }
 
-  @JvmStatic
-  fun isCloseKeyStroke(key: KeyStroke): Boolean {
-    return key.keyCode == KeyEvent.VK_ESCAPE || key.keyChar.code == KeyEvent.VK_ESCAPE || key.keyCode == KeyEvent.VK_C && key.modifiers and InputEvent.CTRL_DOWN_MASK != 0 || key.keyCode == '['.code && key.modifiers and InputEvent.CTRL_DOWN_MASK != 0
-  }
-
   /**
    * Set the text of an XML element, safely encode it if needed.
    */

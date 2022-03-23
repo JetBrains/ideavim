@@ -929,7 +929,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
     final Function1<KeyStroke, Boolean> keyStrokeProcessor = key -> {
       final ReplaceConfirmationChoice choice;
       final char c = key.getKeyChar();
-      if (StringHelper.isCloseKeyStroke(key) || c == 'q') {
+      if (StringAndKeysKt.isCloseKeyStroke(key) || c == 'q') {
         choice = ReplaceConfirmationChoice.QUIT;
       } else if (c == 'y') {
         choice = ReplaceConfirmationChoice.SUBSTITUTE_THIS;

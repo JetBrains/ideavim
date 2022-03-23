@@ -18,7 +18,7 @@
 
 package com.maddyhome.idea.vim.ui
 
-import com.maddyhome.idea.vim.helper.StringHelper
+import com.maddyhome.idea.vim.helper.isCloseKeyStroke
 import java.awt.KeyEventDispatcher
 import java.awt.KeyboardFocusManager
 import java.awt.Toolkit
@@ -38,7 +38,7 @@ object ModalEntry {
         val stroke: KeyStroke
         if (e.id == KeyEvent.KEY_RELEASED) {
           stroke = KeyStroke.getKeyStrokeForEvent(e)
-          if (!StringHelper.isCloseKeyStroke(stroke) && stroke.keyCode != KeyEvent.VK_ENTER) {
+          if (!stroke.isCloseKeyStroke() && stroke.keyCode != KeyEvent.VK_ENTER) {
             return true
           }
         } else if (e.id == KeyEvent.KEY_TYPED) {

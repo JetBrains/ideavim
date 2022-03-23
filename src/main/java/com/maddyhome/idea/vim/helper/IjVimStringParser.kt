@@ -12,8 +12,4 @@ class IjVimStringParser : VimStringParser {
   override fun parseKeys(vararg strings: String): List<KeyStroke> {
     return StringHelper.parseKeys(*strings)
   }
-
-  override fun isCloseKeyStroke(key: KeyStroke): Boolean {
-    return StringHelper.isCloseKeyStroke(key)
-  }
 }
