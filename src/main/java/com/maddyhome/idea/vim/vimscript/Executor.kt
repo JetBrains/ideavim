@@ -23,10 +23,10 @@ import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.textarea.TextComponentEditorImpl
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.VimRegisterGroupBase
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.FinishException
 import com.maddyhome.idea.vim.group.HistoryGroup
-import com.maddyhome.idea.vim.group.RegisterGroup
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
@@ -82,7 +82,7 @@ object Executor {
     if (!skipHistory) {
       VimPlugin.getHistory().addEntry(HistoryGroup.COMMAND, scriptString)
       if (script.units.size == 1 && script.units[0] is Command && script.units[0] !is RepeatCommand) {
-        VimPlugin.getRegister().storeTextSpecial(RegisterGroup.LAST_COMMAND_REGISTER, scriptString)
+        VimPlugin.getRegister().storeTextSpecial(VimRegisterGroupBase.LAST_COMMAND_REGISTER, scriptString)
       }
     }
     return finalResult

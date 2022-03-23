@@ -2155,7 +2155,7 @@ public class ChangeGroup implements VimChangeGroup {
         }
       }
     }
-    VimPlugin.getRegister().storeTextSpecial(RegisterGroup.LAST_INSERTED_TEXT_REGISTER, textToPutRegister.toString());
+    VimPlugin.getRegister().storeTextSpecial(VimRegisterGroupBase.LAST_INSERTED_TEXT_REGISTER, textToPutRegister.toString());
   }
 
   private int oldOffset = -1;

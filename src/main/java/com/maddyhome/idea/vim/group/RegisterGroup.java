@@ -47,7 +47,7 @@ import com.maddyhome.idea.vim.action.motion.text.MotionParagraphPreviousAction;
 import com.maddyhome.idea.vim.action.motion.text.MotionSentenceNextStartAction;
 import com.maddyhome.idea.vim.action.motion.text.MotionSentencePreviousStartAction;
 import com.maddyhome.idea.vim.action.motion.updown.MotionPercentOrMatchAction;
-import com.maddyhome.idea.vim.api.VimRegisterGroup;
+import com.maddyhome.idea.vim.api.VimRegisterGroupBase;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
@@ -58,15 +58,14 @@ import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.StringHelper;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
-import com.maddyhome.idea.vim.ui.ClipboardHandler;
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType;
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
 import com.maddyhome.idea.vim.options.OptionChangeListener;
 import com.maddyhome.idea.vim.options.OptionConstants;
 import com.maddyhome.idea.vim.options.OptionScope;
+import com.maddyhome.idea.vim.ui.ClipboardHandler;
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType;
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
 import kotlin.Pair;
 import org.jdom.Element;
-import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -84,36 +83,11 @@ import java.util.stream.Collectors;
 @State(name = "VimRegisterSettings", storages = {
   @Storage(value = "$APP_CONFIG$/vim_settings_local.xml", roamingType = RoamingType.DISABLED)
 })
-public class RegisterGroup implements PersistentStateComponent<Element>, VimRegisterGroup {
-  public static final char UNNAMED_REGISTER = '"';
-  public static final char LAST_SEARCH_REGISTER = '/';        // IdeaVim does not supporting writing to this register
-  public static final char LAST_COMMAND_REGISTER = ':';
-  public static final char LAST_INSERTED_TEXT_REGISTER = '.';
-  public static final char SMALL_DELETION_REGISTER = '-';
-  public static final char BLACK_HOLE_REGISTER = '_';
-  public static final char ALTERNATE_BUFFER_REGISTER = '#';  // Not supported
-  public static final char EXPRESSION_BUFFER_REGISTER = '=';
-  public static final char CURRENT_FILENAME_REGISTER = '%';  // Not supported
-  public static final @NonNls String CLIPBOARD_REGISTERS = "*+";
-  private static final @NonNls String NUMBERED_REGISTERS = "0123456789";
-  private static final @NonNls String NAMED_REGISTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
-  private static final @NonNls String WRITABLE_REGISTERS = NUMBERED_REGISTERS + NAMED_REGISTERS + CLIPBOARD_REGISTERS
-    + SMALL_DELETION_REGISTER + BLACK_HOLE_REGISTER + UNNAMED_REGISTER + LAST_SEARCH_REGISTER;
-  private static final String READONLY_REGISTERS = ""
-    + CURRENT_FILENAME_REGISTER + LAST_COMMAND_REGISTER + LAST_INSERTED_TEXT_REGISTER + ALTERNATE_BUFFER_REGISTER
-    + EXPRESSION_BUFFER_REGISTER; // Expression buffer is not actually readonly
-  private static final @NonNls String RECORDABLE_REGISTERS = NUMBERED_REGISTERS + NAMED_REGISTERS + UNNAMED_REGISTER;
-  private static final String PLAYBACK_REGISTERS = RECORDABLE_REGISTERS + UNNAMED_REGISTER + CLIPBOARD_REGISTERS + LAST_INSERTED_TEXT_REGISTER;
-  public static final String VALID_REGISTERS = WRITABLE_REGISTERS + READONLY_REGISTERS;
+public class RegisterGroup extends VimRegisterGroupBase implements PersistentStateComponent<Element> {
 
   private static final Logger logger = Logger.getInstance(RegisterGroup.class);
 
   private final @NotNull HashMap<Character, Register> registers = new HashMap<>();
-  private char defaultRegister = UNNAMED_REGISTER;
-  private char lastRegister = defaultRegister;
-  private char recordRegister = 0;
-  private @Nullable List<KeyStroke> recordList = null;
 
   public RegisterGroup() {
 
@@ -141,40 +115,7 @@ public class RegisterGroup implements PersistentStateComponent<Element>, VimRegi
   }
 
   public boolean isRegisterWritable() {
-    return RegisterGroup.READONLY_REGISTERS.indexOf(lastRegister) < 0;
-  }
-
-  @Override
-  public boolean isValid(char reg) {
-    return VALID_REGISTERS.indexOf(reg) != -1;
-  }
-
-  /**
-   * Store which register the user wishes to work with.
-   *
-   * @param reg The register name
-   * @return true if a valid register name, false if not
-   */
-  @Override
-  public boolean selectRegister(char reg) {
-    if (isValid(reg)) {
-      lastRegister = reg;
-      if (logger.isDebugEnabled()) logger.debug("register selected: " + lastRegister);
-
-      return true;
-    }
-    else {
-      return false;
-    }
-  }
-
-  /**
-   * Reset the selected register back to the default register.
-   */
-  @Override
-  public void resetRegister() {
-    lastRegister = defaultRegister;
-    logger.debug("Last register reset to default register");
+    return VimRegisterGroupBase.READONLY_REGISTERS.indexOf(lastRegister) < 0;
   }
 
   @Override
@@ -434,24 +375,6 @@ public class RegisterGroup implements PersistentStateComponent<Element>, VimRegi
     registers.put(r, register);
   }
 
-  /**
-   * Gets the last register name selected by the user
-   *
-   * @return The register name
-   */
-  @Override
-  public char getCurrentRegister() {
-    return lastRegister;
-  }
-
-  /**
-   * The register key for the default register.
-   */
-  @Override
-  public char getDefaultRegister() {
-    return defaultRegister;
-  }
-
   public @NotNull List<Register> getRegisters() {
     final List<Register> res = new ArrayList<>(registers.values());
     for (int i = 0; i < CLIPBOARD_REGISTERS.length(); i++) {
@@ -474,13 +397,6 @@ public class RegisterGroup implements PersistentStateComponent<Element>, VimRegi
     }
     else {
       return false;
-    }
-  }
-
-  @Override
-  public void recordKeyStroke(@NotNull KeyStroke key) {
-    if (recordRegister != 0 && recordList != null) {
-      recordList.add(key);
     }
   }
 

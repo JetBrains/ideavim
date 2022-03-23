@@ -36,6 +36,7 @@ import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.util.Trinity;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.api.VimRegisterGroupBase;
 import com.maddyhome.idea.vim.common.CharacterPosition;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.ExException;
@@ -188,7 +189,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
     }
 
     // Vim never actually sets this register, but looks it up on request
-    VimPlugin.getRegister().storeTextSpecial(RegisterGroup.LAST_SEARCH_REGISTER, pattern);
+    VimPlugin.getRegister().storeTextSpecial(VimRegisterGroupBase.LAST_SEARCH_REGISTER, pattern);
 
     // This will remove an existing entry and add it back to the end, and is expected to do so even if the string value
     // is the same

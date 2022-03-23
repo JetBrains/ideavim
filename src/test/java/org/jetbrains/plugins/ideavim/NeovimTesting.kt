@@ -25,9 +25,9 @@ import com.ensarsarajcic.neovim.java.corerpc.client.ProcessRpcConnection
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.LogicalPosition
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.VimRegisterGroupBase
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.CharacterPosition
-import com.maddyhome.idea.vim.group.RegisterGroup
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.newapi.vim
@@ -152,16 +152,16 @@ internal object NeovimTesting {
   }
 
   private const val nonCheckingRegisters =
-    RegisterGroup.CLIPBOARD_REGISTERS +
-      RegisterGroup.LAST_INSERTED_TEXT_REGISTER +
-      RegisterGroup.BLACK_HOLE_REGISTER +
-      RegisterGroup.LAST_SEARCH_REGISTER +
-      RegisterGroup.ALTERNATE_BUFFER_REGISTER +
-      RegisterGroup.EXPRESSION_BUFFER_REGISTER +
-      RegisterGroup.CURRENT_FILENAME_REGISTER
+    VimRegisterGroupBase.CLIPBOARD_REGISTERS +
+      VimRegisterGroupBase.LAST_INSERTED_TEXT_REGISTER +
+      VimRegisterGroupBase.BLACK_HOLE_REGISTER +
+      VimRegisterGroupBase.LAST_SEARCH_REGISTER +
+      VimRegisterGroupBase.ALTERNATE_BUFFER_REGISTER +
+      VimRegisterGroupBase.EXPRESSION_BUFFER_REGISTER +
+      VimRegisterGroupBase.CURRENT_FILENAME_REGISTER
 
   private fun assertRegisters() {
-    for (register in RegisterGroup.VALID_REGISTERS) {
+    for (register in VimRegisterGroupBase.VALID_REGISTERS) {
       if (register in nonCheckingRegisters) continue
       if (register in VimTestCase.Checks.neoVim.ignoredRegisters) continue
       val neovimRegister = neovimApi.callFunction("getreg", listOf(register)).get().toString()
