@@ -39,6 +39,7 @@ import com.maddyhome.idea.vim.common.argumentCaptured
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.trace
+import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.helper.inNormalMode
@@ -887,7 +888,7 @@ class KeyHandler {
   }
 
   companion object {
-    private val LOG: VimLogger = injector.getLogger(KeyHandler::class.java)
+    private val LOG: VimLogger = vimLogger<KeyHandler>()
 
     fun <T> isPrefix(list1: List<T>, list2: List<T>): Boolean {
       if (list1.size > list2.size) {

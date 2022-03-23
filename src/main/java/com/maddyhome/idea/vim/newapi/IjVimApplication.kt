@@ -23,6 +23,7 @@ import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.components.Service
 import com.maddyhome.idea.vim.api.VimApplication
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.helper.RunnableHelper
 import java.awt.Component
 import java.awt.Toolkit

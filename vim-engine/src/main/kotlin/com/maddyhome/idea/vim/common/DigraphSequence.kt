@@ -21,6 +21,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.DigraphResult.Companion.done
 import com.maddyhome.idea.vim.common.DigraphResult.Companion.handled
+import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import java.awt.event.KeyEvent
@@ -241,6 +242,6 @@ class DigraphSequence {
     private const val DIG_STATE_CODE_START = 10
     private const val DIG_STATE_CODE_CHAR = 11
     private const val DIG_STATE_BACK_SPACE = 20
-    private val logger = injector.getLogger(DigraphSequence::class.java)
+    private val logger = vimLogger<DigraphSequence>()
   }
 }

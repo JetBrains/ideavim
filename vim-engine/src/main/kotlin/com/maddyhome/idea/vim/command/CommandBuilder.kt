@@ -19,12 +19,12 @@
 package com.maddyhome.idea.vim.command
 
 import com.maddyhome.idea.vim.api.VimActionsInitiator
-import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.CommandPartNode
 import com.maddyhome.idea.vim.common.CurrentCommandState
 import com.maddyhome.idea.vim.common.Node
 import com.maddyhome.idea.vim.common.RootNode
 import com.maddyhome.idea.vim.diagnostic.debug
+import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import org.jetbrains.annotations.TestOnly
 import java.util.*
@@ -203,6 +203,6 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode<VimActi
   fun getCurrentTrie(): CommandPartNode<VimActionsInitiator> = currentCommandPartNode
 
   companion object {
-    private val LOG = injector.getLogger(CommandBuilder::class.java)
+    private val LOG = vimLogger<CommandBuilder>()
   }
 }

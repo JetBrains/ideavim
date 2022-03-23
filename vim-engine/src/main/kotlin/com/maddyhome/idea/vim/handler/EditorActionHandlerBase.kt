@@ -27,6 +27,7 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.OperatorArguments
+import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.helper.noneOfEnum
 import org.jetbrains.annotations.NonNls
 import java.util.*
@@ -107,7 +108,7 @@ abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
   }
 
   companion object {
-    private val logger = injector.getLogger(EditorActionHandlerBase::class.java)
+    private val logger = vimLogger<EditorActionHandlerBase>()
 
     fun parseKeysSet(keyStrings: List<String>) = keyStrings.map { injector.parser.parseKeys(it) }.toSet()
 

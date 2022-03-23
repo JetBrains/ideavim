@@ -21,6 +21,7 @@ package com.maddyhome.idea.vim.command
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.MappingMode
 import com.maddyhome.idea.vim.diagnostic.trace
+import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
@@ -72,6 +73,6 @@ class MappingState {
   }
 
   companion object {
-    private val LOG = injector.getLogger(MappingState::class.java)
+    private val LOG = vimLogger<MappingState>()
   }
 }

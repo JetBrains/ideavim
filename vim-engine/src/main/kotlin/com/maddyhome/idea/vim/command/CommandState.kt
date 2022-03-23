@@ -25,6 +25,7 @@ import com.maddyhome.idea.vim.common.DigraphResult
 import com.maddyhome.idea.vim.common.DigraphSequence
 import com.maddyhome.idea.vim.common.MappingMode
 import com.maddyhome.idea.vim.diagnostic.debug
+import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.helper.noneOfEnum
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
@@ -379,7 +380,7 @@ class CommandState(private val editor: VimEditor?) {
   }
 
   companion object {
-    private val logger = injector.getLogger(CommandState::class.java)
+    private val logger = vimLogger<CommandState>()
     private val defaultModeState = ModeState(Mode.COMMAND, SubMode.NONE)
     private val globalState = CommandState(null)
 

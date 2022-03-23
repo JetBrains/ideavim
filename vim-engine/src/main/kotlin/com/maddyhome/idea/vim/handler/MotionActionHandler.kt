@@ -28,6 +28,7 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
+import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.helper.inBlockSubMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.isEndAllowed
@@ -260,7 +261,7 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
   }
 
   companion object {
-    val logger = injector.getLogger(MotionActionHandler::class.java)
+    val logger = vimLogger<MotionActionHandler>()
   }
 }
 

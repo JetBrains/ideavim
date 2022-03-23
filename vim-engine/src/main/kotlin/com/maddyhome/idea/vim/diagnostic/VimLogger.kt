@@ -18,6 +18,8 @@
 
 package com.maddyhome.idea.vim.diagnostic
 
+import com.maddyhome.idea.vim.api.injector
+
 interface VimLogger {
   fun isTrace(): Boolean
   fun trace(data: String)
@@ -41,3 +43,5 @@ fun VimLogger.debug(message: () -> String) {
     debug(message())
   }
 }
+
+inline fun <reified T : Any> vimLogger(): VimLogger = injector.getLogger(T::class.java)
