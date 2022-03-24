@@ -179,6 +179,35 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
   }
 
   /**
+   * Store text into the last register.
+   *
+   * @param editor   The editor to get the text from
+   * @param range    The range of the text to store
+   * @param type     The type of copy
+   * @param isDelete is from a delete
+   * @return true if able to store the text into the register, false if not
+   */
+  override fun storeText(
+    editor: VimEditor,
+    range: TextRange,
+    type: SelectionType,
+    isDelete: Boolean
+  ): Boolean {
+    if (isRegisterWritable()) {
+      var text = injector.engineEditorHelper.getText(editor, range)
+
+      if (type == SelectionType.LINE_WISE && (text.isEmpty() || text[text.length - 1] != '\n')) {
+        // Linewise selection always has a new line at the end
+        text += '\n'.toString()
+      }
+
+      return storeTextInternal(editor, range, text, type, lastRegister, isDelete)
+    }
+
+    return false
+  }
+
+  /**
    * Gets the last register name selected by the user
    *
    * @return The register name

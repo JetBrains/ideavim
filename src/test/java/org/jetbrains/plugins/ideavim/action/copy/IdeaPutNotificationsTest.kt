@@ -22,6 +22,7 @@ import com.intellij.notification.EventLog
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.helper.StringHelper
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
 import org.jetbrains.plugins.ideavim.OptionValueType
 import org.jetbrains.plugins.ideavim.VimOptionTestCase
@@ -80,7 +81,7 @@ class IdeaPutNotificationsTest : VimOptionTestCase(OptionConstants.clipboardName
     val before = "${c}I found it in a legendary land"
     configureByText(before)
     appReadySetup(true)
-    VimPlugin.getRegister().storeText(myFixture.editor, before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
+    VimPlugin.getRegister().storeText(myFixture.editor.vim, before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
     typeText(StringHelper.parseKeys("p"))
 
     val notifications = EventLog.getLogModel(myFixture.project).notifications

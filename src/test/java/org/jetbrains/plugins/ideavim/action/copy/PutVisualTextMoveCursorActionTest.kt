@@ -23,6 +23,7 @@ import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
+import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -38,7 +39,7 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
   fun `test put visual text`() {
     val before = "${c}I found it in a legendary land"
     val editor = configureByText(before)
-    VimPlugin.getRegister().storeText(editor, TextRange(16, 25), SelectionType.CHARACTER_WISE, false)
+    VimPlugin.getRegister().storeText(editor.vim, TextRange(16, 25), SelectionType.CHARACTER_WISE, false)
     typeText(parseKeys("v2e", "2gp"))
     val after = "legendarylegendary$c in a legendary land"
     assertState(after)
@@ -48,7 +49,7 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
   fun `test put visual text linewise`() {
     val before = "${c}I found it in a legendary land"
     val editor = configureByText(before)
-    VimPlugin.getRegister().storeText(editor, TextRange(16, 25), SelectionType.LINE_WISE, false)
+    VimPlugin.getRegister().storeText(editor.vim, TextRange(16, 25), SelectionType.LINE_WISE, false)
     typeText(parseKeys("v2e", "gp"))
     val after = """
 
@@ -62,7 +63,7 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
   fun `test put visual text line linewise`() {
     val before = "${c}I found it in a legendary land"
     val editor = configureByText(before)
-    VimPlugin.getRegister().storeText(editor, TextRange(16, 25), SelectionType.CHARACTER_WISE, false)
+    VimPlugin.getRegister().storeText(editor.vim, TextRange(16, 25), SelectionType.CHARACTER_WISE, false)
     typeText(parseKeys("V", "gp"))
     val after = "legendary\n$c"
     assertState(after)
@@ -87,7 +88,7 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.
     """.trimIndent()
     val editor = configureByText(file)
-    VimPlugin.getRegister().storeText(editor, TextRange(2, 11), SelectionType.LINE_WISE, false)
+    VimPlugin.getRegister().storeText(editor.vim, TextRange(2, 11), SelectionType.LINE_WISE, false)
     typeText(parseKeys("V", "gp"))
     assertState(newFile)
   }
@@ -130,7 +131,7 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
   fun `test Put visual text linewise`() {
     val before = "${c}I found it in a legendary land"
     val editor = configureByText(before)
-    VimPlugin.getRegister().storeText(editor, TextRange(16, 25), SelectionType.LINE_WISE, false)
+    VimPlugin.getRegister().storeText(editor.vim, TextRange(16, 25), SelectionType.LINE_WISE, false)
     typeText(parseKeys("v2e", "gP"))
     val after = """
 
@@ -144,7 +145,7 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
   fun `test Put visual text`() {
     val before = "${c}I found it in a legendary land"
     val editor = configureByText(before)
-    VimPlugin.getRegister().storeText(editor, TextRange(16, 25), SelectionType.CHARACTER_WISE, false)
+    VimPlugin.getRegister().storeText(editor.vim, TextRange(16, 25), SelectionType.CHARACTER_WISE, false)
     typeText(parseKeys("v2e", "2gP"))
     val after = "legendarylegendary$c in a legendary land"
     assertState(after)
@@ -154,7 +155,7 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
   fun `test Put visual text full line`() {
     val before = "${c}I found it in a legendary land"
     val editor = configureByText(before)
-    VimPlugin.getRegister().storeText(editor, TextRange(16, 25), SelectionType.CHARACTER_WISE, false)
+    VimPlugin.getRegister().storeText(editor.vim, TextRange(16, 25), SelectionType.CHARACTER_WISE, false)
     typeText(parseKeys("v$", "2gP"))
     val after = "legendarylegendar${c}y"
     assertState(after)
@@ -164,7 +165,7 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
   fun `test Put visual text line linewise`() {
     val before = "${c}I found it in a legendary land"
     val editor = configureByText(before)
-    VimPlugin.getRegister().storeText(editor, TextRange(16, 25), SelectionType.CHARACTER_WISE, false)
+    VimPlugin.getRegister().storeText(editor.vim, TextRange(16, 25), SelectionType.CHARACTER_WISE, false)
     typeText(parseKeys("V", "gP"))
     val after = "legendary\n$c"
     assertState(after)
@@ -202,7 +203,7 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
 
     """.trimIndent()
     val editor = configureByText(before)
-    VimPlugin.getRegister().storeText(editor, TextRange(14, 21), SelectionType.LINE_WISE, false)
+    VimPlugin.getRegister().storeText(editor.vim, TextRange(14, 21), SelectionType.LINE_WISE, false)
     typeText(parseKeys("vl", "gp"))
     val after = """
             q
@@ -231,7 +232,7 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
             vbn
     """.trimIndent()
     val editor = configureByText(before)
-    VimPlugin.getRegister().storeText(editor, TextRange(16, 19), SelectionType.BLOCK_WISE, false)
+    VimPlugin.getRegister().storeText(editor.vim, TextRange(16, 19), SelectionType.BLOCK_WISE, false)
     typeText(parseKeys("<S-v>", "gp"))
     val after = """
             ${c}fgh
@@ -255,7 +256,7 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
             vbn
     """.trimIndent()
     val editor = configureByText(before)
-    VimPlugin.getRegister().storeText(editor, TextRange(16, 19), SelectionType.LINE_WISE, false)
+    VimPlugin.getRegister().storeText(editor.vim, TextRange(16, 19), SelectionType.LINE_WISE, false)
     typeText(parseKeys("<C-v>", "h", "gp"))
     val after = """
             q
@@ -275,7 +276,7 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
   fun `ignoretest put visual text multicaret`() {
     val before = "${c}qwe asd ${c}zxc rty ${c}fgh vbn"
     val editor = configureByText(before)
-    VimPlugin.getRegister().storeText(editor, TextRange(16, 19), SelectionType.CHARACTER_WISE, false)
+    VimPlugin.getRegister().storeText(editor.vim, TextRange(16, 19), SelectionType.CHARACTER_WISE, false)
     typeText(parseKeys("v2e", "2gp"))
     val after = "fghfgh$c fghfgh$c fghfgh$c"
     assertState(after)

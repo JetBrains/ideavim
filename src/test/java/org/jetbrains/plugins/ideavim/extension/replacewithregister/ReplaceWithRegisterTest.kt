@@ -24,6 +24,7 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
+import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -51,7 +52,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
     val text = "one ${c}two three"
 
     configureByText(text)
-    VimPlugin.getRegister().storeText(myFixture.editor, text rangeOf "one", SelectionType.CHARACTER_WISE, false)
+    VimPlugin.getRegister().storeText(myFixture.editor.vim, text rangeOf "one", SelectionType.CHARACTER_WISE, false)
     typeText(parseKeys("griw"))
     assertState("one on${c}e three")
     assertEquals("one", VimPlugin.getRegister().lastRegister?.text)
@@ -169,7 +170,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
     val text = "one ${c}two three four"
 
     configureByText(text)
-    VimPlugin.getRegister().storeText(myFixture.editor, text rangeOf "one", SelectionType.CHARACTER_WISE, false)
+    VimPlugin.getRegister().storeText(myFixture.editor.vim, text rangeOf "one", SelectionType.CHARACTER_WISE, false)
     typeText(parseKeys("3griw"))
     assertState("one on${c}e four")
     assertEquals("one", VimPlugin.getRegister().lastRegister?.text)
@@ -181,7 +182,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
     val text = "one ${c}two ${c}three four"
 
     configureByText(text)
-    VimPlugin.getRegister().storeText(myFixture.editor, text rangeOf "one", SelectionType.CHARACTER_WISE, false)
+    VimPlugin.getRegister().storeText(myFixture.editor.vim, text rangeOf "one", SelectionType.CHARACTER_WISE, false)
     typeText(parseKeys("griw"))
     assertState("one two one four")
     assertEquals("one", VimPlugin.getRegister().lastRegister?.text)
@@ -192,7 +193,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
     val text = "one ${c}two three four"
 
     configureByText(text)
-    VimPlugin.getRegister().storeText(myFixture.editor, text rangeOf "one", SelectionType.CHARACTER_WISE, false)
+    VimPlugin.getRegister().storeText(myFixture.editor.vim, text rangeOf "one", SelectionType.CHARACTER_WISE, false)
     typeText(parseKeys("griw", "w", "."))
     assertState("one one on${c}e four")
     assertEquals("one", VimPlugin.getRegister().lastRegister?.text)
@@ -210,7 +211,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
     """.trimIndent()
 
     configureByText(text)
-    VimPlugin.getRegister().storeText(myFixture.editor, text rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
+    VimPlugin.getRegister().storeText(myFixture.editor.vim, text rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
     typeText(parseKeys("grr"))
     assertState(
       """
@@ -385,7 +386,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
     """.trimIndent()
 
     configureByText(text)
-    VimPlugin.getRegister().storeText(myFixture.editor, text rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
+    VimPlugin.getRegister().storeText(myFixture.editor.vim, text rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
     typeText(parseKeys("viw", "gr"))
     assertState(
       """
@@ -454,7 +455,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
     """.trimIndent()
 
     configureByText(text)
-    VimPlugin.getRegister().storeText(myFixture.editor, text rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
+    VimPlugin.getRegister().storeText(myFixture.editor.vim, text rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
     typeText(parseKeys("V", "gr"))
     assertState(
       """

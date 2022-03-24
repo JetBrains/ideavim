@@ -23,6 +23,7 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
+import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.rangeOf
 import org.junit.Test
@@ -54,7 +55,7 @@ class PutTestAfterCursorActionTest : VimTestCase() {
             hard by the ${c}torrent of a mountain pass.
     """.trimIndent()
     val editor = configureByText(before)
-    VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
+    VimPlugin.getRegister().storeText(editor.vim, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
     typeText(StringHelper.parseKeys("p"))
     val after = """
             A Discovery

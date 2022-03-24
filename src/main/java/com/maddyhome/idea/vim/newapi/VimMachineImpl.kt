@@ -51,7 +51,7 @@ class VimMachineImpl : VimMachine {
 
     val normalizedRange = operatedText.toNormalizedTextRange(editor.editor)
     VimPlugin.getRegister()
-      .storeText(editor.editor, normalizedRange, operatedText.toType(), true)
+      .storeText(editor, normalizedRange, operatedText.toType(), true)
 
     editor.delete(range)
 

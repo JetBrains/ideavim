@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers;
+import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.options.OptionConstants;
 import com.maddyhome.idea.vim.options.OptionScope;
 import org.jetbrains.annotations.NotNull;
@@ -1389,7 +1390,7 @@ public class MultipleCaretsTest extends VimTestCase {
   public void testPutTextBeforeCursor() {
     final String before = "<caret>qwe asd <caret>zxc rty <caret>fgh vbn";
     final Editor editor = configureByText(before);
-    VimPlugin.getRegister().storeText(editor, new TextRange(16, 19), SelectionType.CHARACTER_WISE, false);
+    VimPlugin.getRegister().storeText(new IjVimEditor(editor), new TextRange(16, 19), SelectionType.CHARACTER_WISE, false);
     typeText(parseKeys("P", "3l", "P"));
     final String after = "fghqwfg<caret>he asd fghzxfg<caret>hc rty fghfgfg<caret>hh vbn";
     assertState(after);
@@ -1399,7 +1400,7 @@ public class MultipleCaretsTest extends VimTestCase {
   public void testPutTextBeforeCursorOverlapRange() {
     final String before = "<caret>q<caret>we asd zxc rty <caret>fgh vbn";
     final Editor editor = configureByText(before);
-    VimPlugin.getRegister().storeText(editor, new TextRange(16, 19), SelectionType.CHARACTER_WISE, false);
+    VimPlugin.getRegister().storeText(new IjVimEditor(editor), new TextRange(16, 19), SelectionType.CHARACTER_WISE, false);
     typeText(parseKeys("P"));
     final String after = "fg<caret>hqfg<caret>hwe asd zxc rty fg<caret>hfgh vbn";
     assertState(after);
@@ -1409,7 +1410,7 @@ public class MultipleCaretsTest extends VimTestCase {
   public void testPutTextAfterCursor() {
     final String before = "<caret>qwe asd <caret>zxc rty <caret>fgh vbn";
     final Editor editor = configureByText(before);
-    VimPlugin.getRegister().storeText(editor, new TextRange(16, 19), SelectionType.CHARACTER_WISE, false);
+    VimPlugin.getRegister().storeText(new IjVimEditor(editor), new TextRange(16, 19), SelectionType.CHARACTER_WISE, false);
     typeText(parseKeys("p", "3l", "2p"));
     final String after = "qfghwe fghfg<caret>hasd zfghxc fghfg<caret>hrty ffghgh fghfg<caret>hvbn";
     assertState(after);
@@ -1419,7 +1420,7 @@ public class MultipleCaretsTest extends VimTestCase {
   public void testPutTextAfterCursorOverlapRange() {
     final String before = "<caret>q<caret>we asd zxc rty <caret>fgh vbn";
     final Editor editor = configureByText(before);
-    VimPlugin.getRegister().storeText(editor, new TextRange(16, 19), SelectionType.CHARACTER_WISE, false);
+    VimPlugin.getRegister().storeText(new IjVimEditor(editor), new TextRange(16, 19), SelectionType.CHARACTER_WISE, false);
     typeText(parseKeys("2p"));
     final String after = "qfghfg<caret>hwfghfg<caret>he asd zxc rty ffghfg<caret>hgh vbn";
     assertState(after);
@@ -1430,7 +1431,7 @@ public class MultipleCaretsTest extends VimTestCase {
   public void testPutTextBeforeCursorLinewise() {
     final String before = "q<caret>werty\n" + "as<caret>dfgh\n" + "<caret>zxcvbn\n";
     final Editor editor = configureByText(before);
-    VimPlugin.getRegister().storeText(editor, new TextRange(14, 21), SelectionType.LINE_WISE, false);
+    VimPlugin.getRegister().storeText(new IjVimEditor(editor), new TextRange(14, 21), SelectionType.LINE_WISE, false);
     typeText(parseKeys("P"));
     final String after =
       "<caret>zxcvbn\n" + "qwerty\n" + "<caret>zxcvbn\n" + "asdfgh\n" + "<caret>zxcvbn\n" + "zxcvbn\n";
@@ -1461,7 +1462,7 @@ public class MultipleCaretsTest extends VimTestCase {
 
   private void testPutOverlapLine(@NotNull String before, @NotNull String after, boolean beforeCursor) {
     Editor editor = configureByText(before);
-    VimPlugin.getRegister().storeText(editor, new TextRange(14, 21), SelectionType.LINE_WISE, false);
+    VimPlugin.getRegister().storeText(new IjVimEditor(editor), new TextRange(14, 21), SelectionType.LINE_WISE, false);
     typeText(parseKeys(beforeCursor ? "P" : "p"));
     assertState(after);
   }
@@ -1470,7 +1471,7 @@ public class MultipleCaretsTest extends VimTestCase {
   public void testPutTextAfterCursorLinewise() {
     final String before = "q<caret>werty\n" + "as<caret>dfgh\n" + "<caret>zxcvbn\n";
     final Editor editor = configureByText(before);
-    VimPlugin.getRegister().storeText(editor, new TextRange(14, 21), SelectionType.LINE_WISE, false);
+    VimPlugin.getRegister().storeText(new IjVimEditor(editor), new TextRange(14, 21), SelectionType.LINE_WISE, false);
     typeText(parseKeys("p"));
     final String after =
       "qwerty\n" + "<caret>zxcvbn\n" + "asdfgh\n" + "<caret>zxcvbn\n" + "zxcvbn\n" + "<caret>zxcvbn\n";
@@ -1482,7 +1483,7 @@ public class MultipleCaretsTest extends VimTestCase {
   public void testPutTextBeforeCursorMoveCursor() {
     final String before = "qw<caret>e asd z<caret>xc rty <caret>fgh vbn";
     final Editor editor = configureByText(before);
-    VimPlugin.getRegister().storeText(editor, new TextRange(16, 19), SelectionType.CHARACTER_WISE, false);
+    VimPlugin.getRegister().storeText(new IjVimEditor(editor), new TextRange(16, 19), SelectionType.CHARACTER_WISE, false);
     typeText(parseKeys("l", "gP", "b", "gP"));
     final String after = "fgh<caret>qwefgh asd fgh<caret>zxfghc rty fgh<caret>ffghgh vbn";
     assertState(after);
@@ -1492,7 +1493,7 @@ public class MultipleCaretsTest extends VimTestCase {
   public void testPutTextAfterCursorMoveCursor() {
     final String before = "qw<caret>e asd z<caret>xc rty <caret>fgh vbn";
     final Editor editor = configureByText(before);
-    VimPlugin.getRegister().storeText(editor, new TextRange(16, 19), SelectionType.CHARACTER_WISE, false);
+    VimPlugin.getRegister().storeText(new IjVimEditor(editor), new TextRange(16, 19), SelectionType.CHARACTER_WISE, false);
     typeText(parseKeys("l", "gp", "b", "gp"));
     final String after = "qwe ffgh<caret>ghasd zfgh<caret>xcfgh rty ffgh<caret>gfghh vbn";
     assertState(after);
@@ -1503,7 +1504,7 @@ public class MultipleCaretsTest extends VimTestCase {
   public void testPutTextBeforeCursorMoveCursorLinewise() {
     final String before = "qwert<caret>y\n" + "<caret>asdfgh\n" + "zxc<caret>vbn\n";
     final Editor editor = configureByText(before);
-    VimPlugin.getRegister().storeText(editor, new TextRange(14, 21), SelectionType.LINE_WISE, false);
+    VimPlugin.getRegister().storeText(new IjVimEditor(editor), new TextRange(14, 21), SelectionType.LINE_WISE, false);
     typeText(parseKeys("gP"));
     final String after =
       "zxcvbn\n" + "<caret>qwerty\n" + "zxcvbn\n" + "<caret>asdfgh\n" + "zxcvbn\n" + "<caret>zxcvbn\n";
@@ -1514,7 +1515,7 @@ public class MultipleCaretsTest extends VimTestCase {
   public void testPutTextAfterCursorMoveCursorLinewise() {
     final String before = "qwert<caret>y\n" + "<caret>asdfgh\n" + "zxc<caret>vbn\n";
     final Editor editor = configureByText(before);
-    VimPlugin.getRegister().storeText(editor, new TextRange(14, 21), SelectionType.LINE_WISE, false);
+    VimPlugin.getRegister().storeText(new IjVimEditor(editor), new TextRange(14, 21), SelectionType.LINE_WISE, false);
     typeText(parseKeys("gp"));
     final String after =
       "qwerty\n" + "zxcvbn\n" + "<caret>asdfgh\n" + "zxcvbn\n" + "<caret>zxcvbn\n" + "zxcvbn\n<caret>";
@@ -1535,7 +1536,7 @@ public class MultipleCaretsTest extends VimTestCase {
                           "}";
 
     final Editor editor = configureByJavaText(before);
-    VimPlugin.getRegister().storeText(editor, new TextRange(118, 139), SelectionType.LINE_WISE, false);
+    VimPlugin.getRegister().storeText(new IjVimEditor(editor), new TextRange(118, 139), SelectionType.LINE_WISE, false);
     typeText(parseKeys("P"));
 
     final String after = "class C {\n" +
@@ -1569,7 +1570,7 @@ public class MultipleCaretsTest extends VimTestCase {
                           "}";
 
     final Editor editor = configureByJavaText(before);
-    VimPlugin.getRegister().storeText(editor, new TextRange(118, 139), SelectionType.LINE_WISE, false);
+    VimPlugin.getRegister().storeText(new IjVimEditor(editor), new TextRange(118, 139), SelectionType.LINE_WISE, false);
     typeText(parseKeys("p"));
 
     final String after = "class C {\n" +
@@ -1594,7 +1595,7 @@ public class MultipleCaretsTest extends VimTestCase {
     final String before = " *<caret> on<caret>e\n" + " * two\n";
     final Editor editor = configureByText(before);
     VimPlugin.getRegister()
-      .storeText(editor, new TextRange(new int[]{0, 7}, new int[]{2, 9}), SelectionType.BLOCK_WISE, false);
+      .storeText(new IjVimEditor(editor), new TextRange(new int[]{0, 7}, new int[]{2, 9}), SelectionType.BLOCK_WISE, false);
     typeText(parseKeys("p"));
     final String after = " * <caret> *one<caret> *\n" + " *  *two *\n";
     assertState(after);
@@ -1605,7 +1606,7 @@ public class MultipleCaretsTest extends VimTestCase {
     final String before = " *<caret> on<caret>e\n" + " * two\n";
     final Editor editor = configureByText(before);
     VimPlugin.getRegister()
-      .storeText(editor, new TextRange(new int[]{0, 7}, new int[]{2, 8}), SelectionType.BLOCK_WISE, false);
+      .storeText(new IjVimEditor(editor), new TextRange(new int[]{0, 7}, new int[]{2, 8}), SelectionType.BLOCK_WISE, false);
     typeText(parseKeys("P"));
     final String after = " *<caret> * on<caret> *e\n" + " *   tw  o\n";
     assertState(after);
@@ -1616,7 +1617,7 @@ public class MultipleCaretsTest extends VimTestCase {
   public void testPutLinewiseWithoutLineSeparatorAtTheEndOfFile() {
     final String before = "qwe\nasd\nz<caret>xc\nrty\nfg<caret>h\nvb<caret>n";
     final Editor editor = configureByText(before);
-    VimPlugin.getRegister().storeText(editor, new TextRange(0, 3), SelectionType.LINE_WISE, false);
+    VimPlugin.getRegister().storeText(new IjVimEditor(editor), new TextRange(0, 3), SelectionType.LINE_WISE, false);
     typeText(parseKeys("p"));
     final String after = "qwe\nasd\nzxc\n<caret>qwe\nrty\nfgh\n<caret>qwe\nvbn\n<caret>qwe\n";
     assertState(after);

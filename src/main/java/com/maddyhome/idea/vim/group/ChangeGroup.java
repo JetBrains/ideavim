@@ -1874,7 +1874,7 @@ public class ChangeGroup implements VimChangeGroup {
 
     if (type == null ||
         CommandStateHelper.inInsertMode(editor) ||
-        VimPlugin.getRegister().storeText(editor, updatedRange, type, true)) {
+        VimPlugin.getRegister().storeText(new IjVimEditor(editor), updatedRange, type, true)) {
       final Document document = editor.getDocument();
       final int[] startOffsets = updatedRange.getStartOffsets();
       final int[] endOffsets = updatedRange.getEndOffsets();

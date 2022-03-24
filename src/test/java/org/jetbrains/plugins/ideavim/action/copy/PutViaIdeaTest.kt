@@ -23,6 +23,7 @@ import com.intellij.openapi.ide.CopyPasteManager
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.helper.StringHelper
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
@@ -56,7 +57,7 @@ class PutViaIdeaTest : VimTestCase() {
     configureByText(before)
 
     VimPlugin.getRegister()
-      .storeText(myFixture.editor, before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
+      .storeText(myFixture.editor.vim, before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
 
     typeText(StringHelper.parseKeys("ve", "p"))
     val after = "legendar${c}y it in a legendary land"
@@ -69,7 +70,7 @@ class PutViaIdeaTest : VimTestCase() {
     configureByText(before)
 
     VimPlugin.getRegister()
-      .storeText(myFixture.editor, before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
+      .storeText(myFixture.editor.vim, before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
 
     typeText(StringHelper.parseKeys("ppp"))
     val after = "Ilegendarylegendarylegendar${c}y found it in a legendary land"
@@ -85,7 +86,7 @@ class PutViaIdeaTest : VimTestCase() {
     CopyPasteManager.getInstance().setContents(TextBlockTransferable("Buffer", emptyList(), null))
 
     VimPlugin.getRegister()
-      .storeText(myFixture.editor, before rangeOf "legendary$randomUUID", SelectionType.CHARACTER_WISE, false)
+      .storeText(myFixture.editor.vim, before rangeOf "legendary$randomUUID", SelectionType.CHARACTER_WISE, false)
 
     val sizeBefore = CopyPasteManager.getInstance().allContents.size
     typeText(StringHelper.parseKeys("ve", "p"))
@@ -104,7 +105,7 @@ class PutViaIdeaTest : VimTestCase() {
     configureByText(before)
 
     VimPlugin.getRegister().storeText(
-      myFixture.editor,
+      myFixture.editor.vim,
       before rangeOf "\nI found it in a legendary land\n",
       SelectionType.CHARACTER_WISE,
       false

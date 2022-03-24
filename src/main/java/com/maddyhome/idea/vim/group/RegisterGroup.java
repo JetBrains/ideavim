@@ -44,7 +44,6 @@ import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.StringHelper;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.options.OptionChangeListener;
@@ -98,33 +97,6 @@ public class RegisterGroup extends VimRegisterGroupBase implements PersistentSta
       },
       true
     );
-  }
-
-  /**
-   * Store text into the last register.
-   *
-   * @param editor   The editor to get the text from
-   * @param range    The range of the text to store
-   * @param type     The type of copy
-   * @param isDelete is from a delete
-   * @return true if able to store the text into the register, false if not
-   */
-  public boolean storeText(@NotNull Editor editor,
-                           @NotNull TextRange range,
-                           @NotNull SelectionType type,
-                           boolean isDelete) {
-    if (isRegisterWritable()) {
-      String text = EditorHelper.getText(editor, range);
-
-      if (type == SelectionType.LINE_WISE && (text.length() == 0 || text.charAt(text.length() - 1) != '\n')) {
-        // Linewise selection always has a new line at the end
-        text += '\n';
-      }
-
-      return storeTextInternal(new IjVimEditor(editor), range, text, type, lastRegister, isDelete);
-    }
-
-    return false;
   }
 
   /**

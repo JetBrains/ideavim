@@ -22,6 +22,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -116,7 +117,7 @@ class MultipleCaretsTest : VimTestCase() {
 
     """.trimIndent()
     val editor = configureByText(before)
-    VimPlugin.getRegister().storeText(editor, TextRange(16, 19), SelectionType.CHARACTER_WISE, false)
+    VimPlugin.getRegister().storeText(editor.vim, TextRange(16, 19), SelectionType.CHARACTER_WISE, false)
     typeText(commandToKeys("pu"))
     val after = """
           qwe
@@ -145,7 +146,7 @@ class MultipleCaretsTest : VimTestCase() {
 
     """.trimIndent()
     val editor = configureByText(before)
-    VimPlugin.getRegister().storeText(editor, TextRange(16, 19), SelectionType.CHARACTER_WISE, false)
+    VimPlugin.getRegister().storeText(editor.vim, TextRange(16, 19), SelectionType.CHARACTER_WISE, false)
     typeText(commandToKeys("4pu"))
     val after = """
           qwe
@@ -163,7 +164,7 @@ class MultipleCaretsTest : VimTestCase() {
 //  fun testPutVisualLines() {
 //    val before = "${c}qwe\n" + "rty\n" + "as${c}d\n" + "fgh\n" + "zxc\n" + "vbn\n"
 //    val editor = configureByText(before)
-//    VimPlugin.getRegister().storeText(editor, TextRange(16, 19), SelectionType.CHARACTER_WISE, false)
+//    VimPlugin.getRegister().storeText(editor.vim, TextRange(16, 19), SelectionType.CHARACTER_WISE, false)
 //
 //    typeText(parseKeys("vj"))
 //    typeText(commandToKeys("pu"))

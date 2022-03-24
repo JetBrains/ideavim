@@ -17,6 +17,7 @@
  */
 package com.maddyhome.idea.vim.api
 
+import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
 import javax.swing.KeyStroke
 
@@ -34,6 +35,14 @@ interface VimRegisterGroup {
   ): List<*>
 
   fun preprocessText(vimEditor: VimEditor, textRange: TextRange, text: String, transferableData: List<*>): String
+
+  /** Store text into the last register. */
+  fun storeText(
+    editor: VimEditor,
+    range: TextRange,
+    type: SelectionType,
+    isDelete: Boolean
+  ): Boolean
 
   val currentRegister: Char
   val defaultRegister: Char

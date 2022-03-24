@@ -32,6 +32,7 @@ import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.fileSize
 import com.maddyhome.idea.vim.listener.VimYankListener
+import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.annotations.Contract
 import kotlin.math.min
 
@@ -197,6 +198,6 @@ class YankGroup {
 
     notifyListeners(editor, range)
 
-    return VimPlugin.getRegister().storeText(editor, range, type, false)
+    return VimPlugin.getRegister().storeText(editor.vim, range, type, false)
   }
 }
