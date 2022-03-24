@@ -256,7 +256,9 @@ public class MarkGroup implements PersistentStateComponent<Element>, VimMarkGrou
     setMark(editor, MARK_VISUAL_END, range.getEndOffset());
   }
 
-  public void setChangeMarks(@NotNull Editor editor, @NotNull TextRange range) {
+  @Override
+  public void setChangeMarks(@NotNull VimEditor vimEditor, @NotNull TextRange range) {
+    Editor editor = ((IjVimEditor)vimEditor).getEditor();
     setMark(editor, MARK_CHANGE_START, range.getStartOffset());
     setMark(editor, MARK_CHANGE_END, range.getEndOffset()-1);
   }

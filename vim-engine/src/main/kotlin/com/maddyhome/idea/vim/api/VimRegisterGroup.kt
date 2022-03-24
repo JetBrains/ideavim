@@ -17,6 +17,7 @@
  */
 package com.maddyhome.idea.vim.api
 
+import com.maddyhome.idea.vim.common.TextRange
 import javax.swing.KeyStroke
 
 interface VimRegisterGroup {
@@ -26,6 +27,14 @@ interface VimRegisterGroup {
   fun resetRegisters()
   fun recordKeyStroke(key: KeyStroke)
   fun isRegisterWritable(): Boolean
+  fun getTransferableData(
+    vimEditor: VimEditor,
+    textRange: TextRange,
+    text: String
+  ): List<*>
+
+  fun preprocessText(vimEditor: VimEditor, textRange: TextRange, text: String, transferableData: List<*>): String
+
   val currentRegister: Char
   val defaultRegister: Char
 }

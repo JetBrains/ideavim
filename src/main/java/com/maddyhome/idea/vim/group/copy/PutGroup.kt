@@ -48,6 +48,7 @@ import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.TestClipboardModel
 import com.maddyhome.idea.vim.helper.fileSize
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
@@ -170,7 +171,7 @@ class PutGroup {
       if (data.visualSelection != null) {
         val offset = editor.caretModel.primaryCaret.offset
         VimPlugin.getMark().setMark(editor, MarkGroup.MARK_CHANGE_POS, offset)
-        VimPlugin.getMark().setChangeMarks(editor, TextRange(offset, offset + 1))
+        VimPlugin.getMark().setChangeMarks(editor.vim, TextRange(offset, offset + 1))
       }
       return null
     }
@@ -231,7 +232,7 @@ class PutGroup {
         editor, caret, context, text.text, text.typeInRegister, subMode,
         startOffset, data.count, data.indent, data.caretAfterInsertedText
       )
-      VimPlugin.getMark().setChangeMarks(editor, TextRange(startOffset, endOffset))
+      VimPlugin.getMark().setChangeMarks(editor.vim, TextRange(startOffset, endOffset))
       moveCaretToEndPosition(
         editor,
         caret,
@@ -384,7 +385,7 @@ class PutGroup {
         startOffset,
         startOffset + text.text.length
       ) else startOffset + text.text.length
-      VimPlugin.getMark().setChangeMarks(editor, TextRange(startOffset, endOffset))
+      VimPlugin.getMark().setChangeMarks(editor.vim, TextRange(startOffset, endOffset))
       VimPlugin.getMark().setMark(editor, MarkGroup.MARK_CHANGE_POS, startOffset)
       moveCaretToEndPosition(
         editor,

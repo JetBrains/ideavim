@@ -57,7 +57,7 @@ class VimMachineImpl : VimMachine {
 
     val start = normalizedRange.startOffset
     VimPlugin.getMark().setMark(editor.editor, MarkGroup.MARK_CHANGE_POS, start)
-    VimPlugin.getMark().setChangeMarks(editor.editor, TextRange(start, start + 1))
+    VimPlugin.getMark().setChangeMarks(editor, TextRange(start, start + 1))
 
     return operatedText
   }

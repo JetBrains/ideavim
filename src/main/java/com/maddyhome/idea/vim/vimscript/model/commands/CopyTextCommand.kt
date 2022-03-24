@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.group.copy.PutData
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 
@@ -44,8 +45,8 @@ data class CopyTextCommand(val ranges: Ranges, val argument: String) : Command.S
       val goToLineCommand = VimscriptParser.parseCommand(argument) ?: throw ExException("E16: Invalid range")
       val line = goToLineCommand.commandRanges.getFirstLine(editor, caret)
 
-      val transferableData = VimPlugin.getRegister().getTransferableData(editor, range, text)
-      val textData = PutData.TextData(text, SelectionType.LINE_WISE, transferableData)
+      val transferableData = VimPlugin.getRegister().getTransferableData(editor.vim, range, text)
+      val textData = PutData.TextData(text, SelectionType.LINE_WISE, transferableData as List<Any>)
       val putData = PutData(
         textData,
         null,

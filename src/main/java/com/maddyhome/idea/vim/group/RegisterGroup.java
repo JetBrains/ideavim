@@ -37,25 +37,13 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.motion.mark.MotionGotoFileMarkAction;
-import com.maddyhome.idea.vim.action.motion.search.SearchAgainNextAction;
-import com.maddyhome.idea.vim.action.motion.search.SearchAgainPreviousAction;
-import com.maddyhome.idea.vim.action.motion.search.SearchEntryFwdAction;
-import com.maddyhome.idea.vim.action.motion.search.SearchEntryRevAction;
-import com.maddyhome.idea.vim.action.motion.text.MotionParagraphNextAction;
-import com.maddyhome.idea.vim.action.motion.text.MotionParagraphPreviousAction;
-import com.maddyhome.idea.vim.action.motion.text.MotionSentenceNextStartAction;
-import com.maddyhome.idea.vim.action.motion.text.MotionSentencePreviousStartAction;
-import com.maddyhome.idea.vim.action.motion.updown.MotionPercentOrMatchAction;
+import com.maddyhome.idea.vim.api.VimEditor;
 import com.maddyhome.idea.vim.api.VimInjectorKt;
 import com.maddyhome.idea.vim.api.VimRegisterGroupBase;
-import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.StringHelper;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
@@ -73,9 +61,9 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * This group works with command associated with copying and pasting text
@@ -133,7 +121,7 @@ public class RegisterGroup extends VimRegisterGroupBase implements PersistentSta
         text += '\n';
       }
 
-      return storeTextInternal(editor, range, text, type, lastRegister, isDelete);
+      return storeTextInternal(new IjVimEditor(editor), range, text, type, lastRegister, isDelete);
     }
 
     return false;
@@ -164,100 +152,9 @@ public class RegisterGroup extends VimRegisterGroupBase implements PersistentSta
     return true;
   }
 
-  private boolean storeTextInternal(@NotNull Editor editor, @NotNull TextRange range, @NotNull String text,
-                                    @NotNull SelectionType type, char register, boolean isDelete) {
-    // Null register doesn't get saved, but acts like it was
-    if (lastRegister == BLACK_HOLE_REGISTER) return true;
-
-    int start = range.getStartOffset();
-    int end = range.getEndOffset();
-
-    if (isDelete && start == end) {
-      return true;
-    }
-
-    // Normalize the start and end
-    if (start > end) {
-      int t = start;
-      start = end;
-      end = t;
-    }
-
-    // If this is an uppercase register, we need to append the text to the corresponding lowercase register
-    final List<TextBlockTransferableData> transferableData = start != -1 ? getTransferableData(editor, range, text) : new ArrayList<>();
-    final String processedText = start != -1 ? preprocessText(editor, range, text, transferableData) : text;
-    if (logger.isDebugEnabled()) {
-      final String transferableClasses =
-        transferableData.stream().map(it -> it.getClass().getName()).collect(Collectors.joining(","));
-      logger.debug("Copy to '" + lastRegister + "' with transferable data: " + transferableClasses);
-    }
-    if (Character.isUpperCase(register)) {
-      char lreg = Character.toLowerCase(register);
-      Register r = myRegisters.get(lreg);
-      // Append the text if the lowercase register existed
-      if (r != null) {
-        r.addTextAndResetTransferableData(processedText);
-      }
-      // Set the text if the lowercase register didn't exist yet
-      else {
-        myRegisters.put(lreg, new Register(lreg, type, processedText, new ArrayList<>(transferableData)));
-        if (logger.isDebugEnabled()) logger.debug("register '" + register + "' contains: \"" + processedText + "\"");
-      }
-    }
-    // Put the text in the specified register
-    else {
-      myRegisters.put(register, new Register(register, type, processedText, new ArrayList<>(transferableData)));
-      if (logger.isDebugEnabled()) logger.debug("register '" + register + "' contains: \"" + processedText + "\"");
-    }
-
-    if (CLIPBOARD_REGISTERS.indexOf(register) >= 0) {
-      VimInjectorKt.getInjector().getClipboardManager().setClipboardText(processedText, text, new ArrayList<>(transferableData));
-    }
-
-    // Also add it to the unnamed register if the default wasn't specified
-    if (register != UNNAMED_REGISTER && ".:/".indexOf(register) == -1) {
-      myRegisters.put(UNNAMED_REGISTER, new Register(UNNAMED_REGISTER, type, processedText, new ArrayList<>(transferableData)));
-      if (logger.isDebugEnabled()) logger.debug("register '" + UNNAMED_REGISTER + "' contains: \"" + processedText + "\"");
-    }
-
-    if (isDelete) {
-      boolean smallInlineDeletion = (type == SelectionType.CHARACTER_WISE ||  type == SelectionType.BLOCK_WISE ) &&
-                       editor.offsetToLogicalPosition(start).line == editor.offsetToLogicalPosition(end).line;
-
-      // Deletes go into numbered registers only if text is smaller than a line, register is used or it's a special case
-      if (!smallInlineDeletion || register != defaultRegister || isSmallDeletionSpecialCase(editor)) {
-        // Old 1 goes to 2, etc. Old 8 to 9, old 9 is lost
-        for (char d = '8'; d >= '1'; d--) {
-          Register t = myRegisters.get(d);
-          if (t != null) {
-            t.setName((char)(d + 1));
-            myRegisters.put((char)(d + 1), t);
-          }
-        }
-        myRegisters.put('1', new Register('1', type, processedText, new ArrayList<>(transferableData)));
-      }
-
-      // Deletes smaller than one line and without specified register go the the "-" register
-      if (smallInlineDeletion && register == defaultRegister) {
-        myRegisters.put(SMALL_DELETION_REGISTER, new Register(SMALL_DELETION_REGISTER, type, processedText, new ArrayList<>(transferableData)));
-      }
-    }
-    // Yanks also go to register 0 if the default register was used
-    else if (register == defaultRegister) {
-      myRegisters.put('0', new Register('0', type, processedText, new ArrayList<>(transferableData)));
-      if (logger.isDebugEnabled()) logger.debug("register '" + '0' + "' contains: \"" + processedText + "\"");
-    }
-
-    if (start != -1) {
-      VimPlugin.getMark().setChangeMarks(editor, new TextRange(start, end));
-    }
-
-    return true;
-  }
-
-  public @NotNull List<TextBlockTransferableData> getTransferableData(@NotNull Editor editor,
-                                                                      @NotNull TextRange textRange,
-                                                                      String text) {
+  @Override
+  public @NotNull List<?> getTransferableData(@NotNull VimEditor vimEditor, @NotNull TextRange textRange, @NotNull String text) {
+    Editor editor = ((IjVimEditor)vimEditor).getEditor();
     final List<TextBlockTransferableData> transferableDatas = new ArrayList<>();
     final Project project = editor.getProject();
     if (project == null) return new ArrayList<>();
@@ -284,13 +181,19 @@ public class RegisterGroup extends VimRegisterGroupBase implements PersistentSta
     return transferableDatas;
   }
 
-  private String preprocessText(@NotNull Editor editor, @NotNull TextRange textRange, String text, List<TextBlockTransferableData> transferableDatas) {
+  @Override
+  public @NotNull String preprocessText(@NotNull VimEditor vimEditor,
+                                        @NotNull TextRange textRange,
+                                        @NotNull String text,
+                                        @NotNull List<?> transferableData) {
+    Editor editor = ((IjVimEditor)vimEditor).getEditor();
     final Project project = editor.getProject();
     if (project == null) return text;
 
     final PsiFile file = PsiDocumentManager.getInstance(project).getPsiFile(editor.getDocument());
     if (file == null) return text;
-    String rawText = TextBlockTransferable.convertLineSeparators(text, "\n", transferableDatas);
+    String rawText = TextBlockTransferable.convertLineSeparators(text, "\n",
+                                                                 (Collection<? extends TextBlockTransferableData>)transferableData);
 
 
     if (VimPlugin.getOptionService().isSet(OptionScope.GLOBAL.INSTANCE, OptionConstants.ideacopypreprocessName, OptionConstants.ideacopypreprocessName)) {
@@ -305,24 +208,6 @@ public class RegisterGroup extends VimRegisterGroupBase implements PersistentSta
 
 
     return text;
-  }
-
-  private boolean isSmallDeletionSpecialCase(Editor editor) {
-    Command currentCommand = CommandState.getInstance(new IjVimEditor(editor)).getExecutingCommand();
-    if (currentCommand != null) {
-      Argument argument = currentCommand.getArgument();
-      if (argument != null) {
-        Command motionCommand = argument.getMotion();
-        EditorActionHandlerBase action = motionCommand.getAction();
-        return action instanceof MotionPercentOrMatchAction || action instanceof MotionSentencePreviousStartAction
-          || action instanceof MotionSentenceNextStartAction || action instanceof MotionGotoFileMarkAction
-          || action instanceof SearchEntryFwdAction || action instanceof SearchEntryRevAction
-          || action instanceof SearchAgainNextAction || action instanceof SearchAgainPreviousAction
-          || action instanceof MotionParagraphNextAction || action instanceof MotionParagraphPreviousAction;
-      }
-    }
-
-    return false;
   }
 
   /**

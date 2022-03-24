@@ -51,6 +51,7 @@ import com.maddyhome.idea.vim.helper.moveToInlayAwareLogicalPosition
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.key.OperatorFunction
+import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.annotations.NonNls
 
 /**
@@ -203,7 +204,7 @@ class VimExchangeExtension : VimExtension {
     private fun exchange(editor: Editor, ex1: Exchange, ex2: Exchange, reverse: Boolean, expand: Boolean) {
       fun pasteExchange(sourceExchange: Exchange, targetExchange: Exchange) {
         VimPlugin.getMark().setChangeMarks(
-          editor,
+          editor.vim,
           TextRange(editor.getMarkOffset(targetExchange.start), editor.getMarkOffset(targetExchange.end) + 1)
         )
         // do this instead of direct text manipulation to set change marks

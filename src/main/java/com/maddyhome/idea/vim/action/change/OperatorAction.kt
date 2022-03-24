@@ -59,7 +59,7 @@ class OperatorAction : VimActionHandler.SingleExecution() {
             operatorArguments
           )
         if (range != null) {
-          VimPlugin.getMark().setChangeMarks(editor, range)
+          VimPlugin.getMark().setChangeMarks(editor.vim, range)
           val selectionType = if (motion.isLinewiseMotion()) SelectionType.LINE_WISE else SelectionType.CHARACTER_WISE
           KeyHandler.getInstance().reset(editor.vim)
           val result = operatorFunction.apply(editor, context, selectionType)

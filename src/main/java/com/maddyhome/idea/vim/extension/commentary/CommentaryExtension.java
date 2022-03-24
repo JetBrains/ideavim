@@ -164,7 +164,7 @@ public class CommentaryExtension implements VimExtension {
       final int line = editor.getDocument().getLineNumber(offset);
       final int lineStart = editor.getDocument().getLineStartOffset(line);
       final int lineEnd = editor.getDocument().getLineEndOffset(line);
-      VimPlugin.getMark().setChangeMarks(editor, new TextRange(lineStart, lineEnd));
+      VimPlugin.getMark().setChangeMarks(new IjVimEditor(editor), new TextRange(lineStart, lineEnd));
       new Operator().apply(editor, context, SelectionType.LINE_WISE);
     }
   }

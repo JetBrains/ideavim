@@ -1749,7 +1749,7 @@ public class ChangeGroup implements VimChangeGroup {
     editor.getDocument().replaceString(start, end, str);
 
     final int newEnd = start + str.length();
-    VimPlugin.getMark().setChangeMarks(editor, new TextRange(start, newEnd));
+    VimPlugin.getMark().setChangeMarks(new IjVimEditor(editor), new TextRange(start, newEnd));
     VimPlugin.getMark().setMark(editor, MarkGroup.MARK_CHANGE_POS, newEnd);
   }
 
@@ -1885,7 +1885,7 @@ public class ChangeGroup implements VimChangeGroup {
       if (type != null) {
         final int start = updatedRange.getStartOffset();
         VimPlugin.getMark().setMark(editor, MarkGroup.MARK_CHANGE_POS, start);
-        VimPlugin.getMark().setChangeMarks(editor, new TextRange(start, start + 1));
+        VimPlugin.getMark().setChangeMarks(new IjVimEditor(editor), new TextRange(start, start + 1));
       }
 
       return true;
