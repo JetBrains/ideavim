@@ -1,6 +1,7 @@
 package com.maddyhome.idea.vim.newapi
 
 import com.intellij.codeInsight.editorActions.CopyPastePostProcessor
+import com.intellij.codeInsight.editorActions.CopyPastePreProcessor
 import com.intellij.codeInsight.editorActions.TextBlockTransferable
 import com.intellij.codeInsight.editorActions.TextBlockTransferableData
 import com.intellij.ide.CopyPasteManagerEx
@@ -8,11 +9,21 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.editor.CaretStateTransferableData
 import com.intellij.openapi.editor.RawText
+import com.intellij.openapi.editor.richcopy.view.HtmlTransferableData
+import com.intellij.openapi.editor.richcopy.view.RtfTransferableData
+import com.intellij.openapi.project.DumbService
+import com.intellij.openapi.project.IndexNotReadyException
+import com.intellij.psi.PsiDocumentManager
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.VimClipboardManager
+import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.helper.TestClipboardModel
 import com.maddyhome.idea.vim.helper.TestClipboardModel.contents
+import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.options.OptionScope
 import java.awt.HeadlessException
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.Transferable
@@ -53,6 +64,63 @@ class IjClipboardManager : VimClipboardManager {
     } catch (ignored: HeadlessException) {
     }
     return null
+  }
+
+  override fun getTransferableData(vimEditor: VimEditor, textRange: TextRange, text: String): List<Any> {
+    val editor = (vimEditor as IjVimEditor).editor
+    val transferableData: MutableList<TextBlockTransferableData> = ArrayList()
+    val project = editor.project ?: return ArrayList()
+
+    val file = PsiDocumentManager.getInstance(project).getPsiFile(editor.document) ?: return ArrayList()
+    DumbService.getInstance(project).withAlternativeResolveEnabled {
+      for (processor in CopyPastePostProcessor.EP_NAME.extensionList) {
+        try {
+          transferableData.addAll(
+            processor.collectTransferableData(
+              file,
+              editor,
+              textRange.startOffsets,
+              textRange.endOffsets
+            )
+          )
+        } catch (ignore: IndexNotReadyException) {
+        }
+      }
+    }
+    transferableData.add(CaretStateTransferableData(intArrayOf(0), intArrayOf(text.length)))
+
+    // These data provided by {@link com.intellij.openapi.editor.richcopy.TextWithMarkupProcessor} doesn't work with
+    //   IdeaVim and I don't see a way to fix it
+    // See https://youtrack.jetbrains.com/issue/VIM-1785
+    // See https://youtrack.jetbrains.com/issue/VIM-1731
+    transferableData.removeIf { it: TextBlockTransferableData? -> it is RtfTransferableData || it is HtmlTransferableData }
+    return transferableData
+  }
+
+  override fun preprocessText(
+    vimEditor: VimEditor,
+    textRange: TextRange,
+    text: String,
+    transferableData: List<*>,
+  ): String {
+    val editor = (vimEditor as IjVimEditor).editor
+    val project = editor.project ?: return text
+    val file = PsiDocumentManager.getInstance(project).getPsiFile(editor.document) ?: return text
+    val rawText = TextBlockTransferable.convertLineSeparators(
+      text, "\n",
+      transferableData as Collection<TextBlockTransferableData?>
+    )
+    if (VimPlugin.getOptionService()
+        .isSet(OptionScope.GLOBAL, OptionConstants.ideacopypreprocessName, OptionConstants.ideacopypreprocessName)
+    ) {
+      for (processor in CopyPastePreProcessor.EP_NAME.extensionList) {
+        val escapedText = processor.preprocessOnCopy(file, textRange.startOffsets, textRange.endOffsets, rawText)
+        if (escapedText != null) {
+          return escapedText
+        }
+      }
+    }
+    return text
   }
 
   private fun setContents(contents: Transferable) {

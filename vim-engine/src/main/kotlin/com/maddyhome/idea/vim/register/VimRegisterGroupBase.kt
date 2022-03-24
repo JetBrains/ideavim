@@ -110,8 +110,9 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
 
     // If this is an uppercase register, we need to append the text to the corresponding lowercase register
     val transferableData: List<Any> =
-      if (start != -1) getTransferableData(editor, range, text) as List<Any> else ArrayList()
-    val processedText = if (start != -1) preprocessText(editor, range, text, transferableData) else text
+      if (start != -1) injector.clipboardManager.getTransferableData(editor, range, text) else ArrayList()
+    val processedText =
+      if (start != -1) injector.clipboardManager.preprocessText(editor, range, text, transferableData) else text
     logger.debug {
       val transferableClasses = transferableData.joinToString(",") { it.javaClass.name }
       "Copy to '$lastRegister' with transferable data: $transferableClasses"

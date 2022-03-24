@@ -18,35 +18,19 @@
 
 package com.maddyhome.idea.vim.group;
 
-import com.intellij.codeInsight.editorActions.CopyPastePostProcessor;
-import com.intellij.codeInsight.editorActions.CopyPastePreProcessor;
-import com.intellij.codeInsight.editorActions.TextBlockTransferable;
-import com.intellij.codeInsight.editorActions.TextBlockTransferableData;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.RoamingType;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.editor.CaretStateTransferableData;
-import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.richcopy.view.HtmlTransferableData;
-import com.intellij.openapi.editor.richcopy.view.RtfTransferableData;
-import com.intellij.openapi.project.DumbService;
-import com.intellij.openapi.project.IndexNotReadyException;
-import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiDocumentManager;
-import com.intellij.psi.PsiFile;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.api.VimEditor;
-import com.maddyhome.idea.vim.register.VimRegisterGroupBase;
 import com.maddyhome.idea.vim.command.SelectionType;
-import com.maddyhome.idea.vim.register.Register;
-import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.helper.StringHelper;
-import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.options.OptionChangeListener;
 import com.maddyhome.idea.vim.options.OptionConstants;
 import com.maddyhome.idea.vim.options.OptionScope;
+import com.maddyhome.idea.vim.register.Register;
+import com.maddyhome.idea.vim.register.VimRegisterGroupBase;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
 import org.jdom.Element;
@@ -56,7 +40,6 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -93,64 +76,6 @@ public class RegisterGroup extends VimRegisterGroupBase implements PersistentSta
       },
       true
     );
-  }
-
-  @Override
-  public @NotNull List<?> getTransferableData(@NotNull VimEditor vimEditor, @NotNull TextRange textRange, @NotNull String text) {
-    Editor editor = ((IjVimEditor)vimEditor).getEditor();
-    final List<TextBlockTransferableData> transferableDatas = new ArrayList<>();
-    final Project project = editor.getProject();
-    if (project == null) return new ArrayList<>();
-
-    final PsiFile file = PsiDocumentManager.getInstance(project).getPsiFile(editor.getDocument());
-    if (file == null) return new ArrayList<>();
-    DumbService.getInstance(project).withAlternativeResolveEnabled(() -> {
-      for (CopyPastePostProcessor<? extends TextBlockTransferableData> processor : CopyPastePostProcessor.EP_NAME
-        .getExtensionList()) {
-        try {
-          transferableDatas.addAll(processor.collectTransferableData(file, editor, textRange.getStartOffsets(), textRange.getEndOffsets()));
-        }
-        catch (IndexNotReadyException ignore) {
-        }
-      }
-    });
-    transferableDatas.add(new CaretStateTransferableData(new int[]{0}, new int[]{text.length()}));
-
-    // These data provided by {@link com.intellij.openapi.editor.richcopy.TextWithMarkupProcessor} doesn't work with
-    //   IdeaVim and I don't see a way to fix it
-    // See https://youtrack.jetbrains.com/issue/VIM-1785
-    // See https://youtrack.jetbrains.com/issue/VIM-1731
-    transferableDatas.removeIf(it -> (it instanceof RtfTransferableData) || (it instanceof HtmlTransferableData));
-    return transferableDatas;
-  }
-
-  @Override
-  public @NotNull String preprocessText(@NotNull VimEditor vimEditor,
-                                        @NotNull TextRange textRange,
-                                        @NotNull String text,
-                                        @NotNull List<?> transferableData) {
-    Editor editor = ((IjVimEditor)vimEditor).getEditor();
-    final Project project = editor.getProject();
-    if (project == null) return text;
-
-    final PsiFile file = PsiDocumentManager.getInstance(project).getPsiFile(editor.getDocument());
-    if (file == null) return text;
-    String rawText = TextBlockTransferable.convertLineSeparators(text, "\n",
-                                                                 (Collection<? extends TextBlockTransferableData>)transferableData);
-
-
-    if (VimPlugin.getOptionService().isSet(OptionScope.GLOBAL.INSTANCE, OptionConstants.ideacopypreprocessName, OptionConstants.ideacopypreprocessName)) {
-      String escapedText;
-      for (CopyPastePreProcessor processor : CopyPastePreProcessor.EP_NAME.getExtensionList()) {
-        escapedText = processor.preprocessOnCopy(file, textRange.getStartOffsets(), textRange.getEndOffsets(), rawText);
-        if (escapedText != null) {
-          return escapedText;
-        }
-      }
-    }
-
-
-    return text;
   }
 
   public void saveData(final @NotNull Element element) {

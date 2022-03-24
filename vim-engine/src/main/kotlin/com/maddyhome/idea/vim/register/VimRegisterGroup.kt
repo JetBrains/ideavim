@@ -29,13 +29,6 @@ interface VimRegisterGroup {
   fun resetRegisters()
   fun recordKeyStroke(key: KeyStroke)
   fun isRegisterWritable(): Boolean
-  fun getTransferableData(
-    vimEditor: VimEditor,
-    textRange: TextRange,
-    text: String,
-  ): List<*>
-
-  fun preprocessText(vimEditor: VimEditor, textRange: TextRange, text: String, transferableData: List<*>): String
 
   /** Store text into the last register. */
   fun storeText(
