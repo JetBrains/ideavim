@@ -21,7 +21,7 @@ package org.jetbrains.plugins.ideavim.action;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
-import com.maddyhome.idea.vim.common.Register;
+import com.maddyhome.idea.vim.register.Register;
 import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
 import com.maddyhome.idea.vim.options.OptionConstants;

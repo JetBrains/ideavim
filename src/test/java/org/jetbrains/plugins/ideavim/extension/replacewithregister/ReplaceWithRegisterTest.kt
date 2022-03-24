@@ -19,7 +19,7 @@
 package org.jetbrains.plugins.ideavim.extension.replacewithregister
 
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.api.VimRegisterGroupBase.Companion.UNNAMED_REGISTER
+import com.maddyhome.idea.vim.register.VimRegisterGroupBase.Companion.UNNAMED_REGISTER
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys

@@ -6,7 +6,7 @@
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.CommandGroup"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.MarkGroup"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.RegisterGroup"
-                        serviceInterface="com.maddyhome.idea.vim.api.VimRegisterGroup"/>
+                        serviceInterface="com.maddyhome.idea.vim.register.VimRegisterGroup"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.FileGroup"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.SearchGroup"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.ProcessGroup"

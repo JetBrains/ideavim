@@ -36,7 +36,7 @@ import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.util.Trinity;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.api.VimRegisterGroupBase;
+import com.maddyhome.idea.vim.register.VimRegisterGroupBase;
 import com.maddyhome.idea.vim.common.CharacterPosition;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.ExException;

@@ -23,7 +23,7 @@ import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.motion.search.SearchWholeWordForwardAction;
 import com.maddyhome.idea.vim.command.SelectionType;
-import com.maddyhome.idea.vim.common.Register;
+import com.maddyhome.idea.vim.register.Register;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;

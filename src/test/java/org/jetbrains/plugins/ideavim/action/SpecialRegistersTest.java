@@ -19,8 +19,8 @@
 package org.jetbrains.plugins.ideavim.action;
 
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.api.VimRegisterGroupBase;
-import com.maddyhome.idea.vim.common.Register;
+import com.maddyhome.idea.vim.register.VimRegisterGroupBase;
+import com.maddyhome.idea.vim.register.Register;
 import com.maddyhome.idea.vim.group.RegisterGroup;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 import org.junit.Assert;

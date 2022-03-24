@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.api.VimKeyGroup
 import com.maddyhome.idea.vim.api.VimMarkGroup
 import com.maddyhome.idea.vim.api.VimMessages
 import com.maddyhome.idea.vim.api.VimProcessGroup
-import com.maddyhome.idea.vim.api.VimRegisterGroup
+import com.maddyhome.idea.vim.register.VimRegisterGroup
 import com.maddyhome.idea.vim.api.VimStringParser
 import com.maddyhome.idea.vim.api.VimVisualMotionGroup
 import com.maddyhome.idea.vim.command.CommandState
