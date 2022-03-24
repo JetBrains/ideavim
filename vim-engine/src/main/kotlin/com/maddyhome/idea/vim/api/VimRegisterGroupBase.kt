@@ -1,5 +1,6 @@
 package com.maddyhome.idea.vim.api
 
+import com.maddyhome.idea.vim.common.Register
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import javax.swing.KeyStroke
@@ -12,6 +13,9 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
   protected var recordList: MutableList<KeyStroke>? = null
 
   override fun isValid(reg: Char): Boolean = VALID_REGISTERS.indexOf(reg) != -1
+
+  @JvmField
+  val myRegisters = HashMap<Char, Register>()
 
   /**
    * Store which register the user wishes to work with.
@@ -47,6 +51,12 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
 
   override fun isRegisterWritable(): Boolean {
     return READONLY_REGISTERS.indexOf(lastRegister) < 0
+  }
+
+  override fun resetRegisters() {
+    VimRegisterGroupBase.defaultRegister = UNNAMED_REGISTER
+    lastRegister = defaultRegister
+    myRegisters.clear()
   }
 
   /**

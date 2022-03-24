@@ -17,8 +17,8 @@
  */
 package com.maddyhome.idea.vim.common
 
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.SelectionType
-import com.maddyhome.idea.vim.helper.StringHelper
 import org.jetbrains.annotations.NonNls
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
@@ -46,7 +46,7 @@ class Register {
   ) {
     this.name = name
     this.type = type
-    this.keys = StringHelper.stringToKeys(text).toMutableList()
+    this.keys = injector.parser.stringToKeys(text).toMutableList()
     this.transferableData = transferableData
     this.rawText = text
   }
@@ -60,7 +60,7 @@ class Register {
   ) {
     this.name = name
     this.type = type
-    this.keys = StringHelper.stringToKeys(text).toMutableList()
+    this.keys = injector.parser.stringToKeys(text).toMutableList()
     this.transferableData = transferableData
     this.rawText = rawText
   }
@@ -82,7 +82,7 @@ class Register {
    * Append the supplied text to any existing text.
    */
   fun addTextAndResetTransferableData(text: String) {
-    addKeys(StringHelper.stringToKeys(text))
+    addKeys(injector.parser.stringToKeys(text))
     transferableData.clear()
   }
 

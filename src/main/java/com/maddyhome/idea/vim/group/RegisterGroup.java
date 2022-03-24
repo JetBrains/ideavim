@@ -74,7 +74,6 @@ import javax.swing.*;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -87,8 +86,6 @@ import java.util.stream.Collectors;
 public class RegisterGroup extends VimRegisterGroupBase implements PersistentStateComponent<Element> {
 
   private static final Logger logger = Logger.getInstance(RegisterGroup.class);
-
-  private final @NotNull HashMap<Character, Register> registers = new HashMap<>();
 
   public RegisterGroup() {
 
@@ -113,13 +110,6 @@ public class RegisterGroup extends VimRegisterGroupBase implements PersistentSta
       },
       true
     );
-  }
-
-  @Override
-  public void resetRegisters() {
-    defaultRegister = UNNAMED_REGISTER;
-    lastRegister = defaultRegister;
-    registers.clear();
   }
 
   /**
@@ -169,7 +159,7 @@ public class RegisterGroup extends VimRegisterGroupBase implements PersistentSta
         && register != UNNAMED_REGISTER) {
       return false;
     }
-    registers.put(register, new Register(register, SelectionType.CHARACTER_WISE, text, new ArrayList<>()));
+    myRegisters.put(register, new Register(register, SelectionType.CHARACTER_WISE, text, new ArrayList<>()));
     if (logger.isDebugEnabled()) logger.debug("register '" + register + "' contains: \"" + text + "\"");
     return true;
   }
@@ -203,20 +193,20 @@ public class RegisterGroup extends VimRegisterGroupBase implements PersistentSta
     }
     if (Character.isUpperCase(register)) {
       char lreg = Character.toLowerCase(register);
-      Register r = registers.get(lreg);
+      Register r = myRegisters.get(lreg);
       // Append the text if the lowercase register existed
       if (r != null) {
         r.addTextAndResetTransferableData(processedText);
       }
       // Set the text if the lowercase register didn't exist yet
       else {
-        registers.put(lreg, new Register(lreg, type, processedText, new ArrayList<>(transferableData)));
+        myRegisters.put(lreg, new Register(lreg, type, processedText, new ArrayList<>(transferableData)));
         if (logger.isDebugEnabled()) logger.debug("register '" + register + "' contains: \"" + processedText + "\"");
       }
     }
     // Put the text in the specified register
     else {
-      registers.put(register, new Register(register, type, processedText, new ArrayList<>(transferableData)));
+      myRegisters.put(register, new Register(register, type, processedText, new ArrayList<>(transferableData)));
       if (logger.isDebugEnabled()) logger.debug("register '" + register + "' contains: \"" + processedText + "\"");
     }
 
@@ -226,7 +216,7 @@ public class RegisterGroup extends VimRegisterGroupBase implements PersistentSta
 
     // Also add it to the unnamed register if the default wasn't specified
     if (register != UNNAMED_REGISTER && ".:/".indexOf(register) == -1) {
-      registers.put(UNNAMED_REGISTER, new Register(UNNAMED_REGISTER, type, processedText, new ArrayList<>(transferableData)));
+      myRegisters.put(UNNAMED_REGISTER, new Register(UNNAMED_REGISTER, type, processedText, new ArrayList<>(transferableData)));
       if (logger.isDebugEnabled()) logger.debug("register '" + UNNAMED_REGISTER + "' contains: \"" + processedText + "\"");
     }
 
@@ -238,23 +228,23 @@ public class RegisterGroup extends VimRegisterGroupBase implements PersistentSta
       if (!smallInlineDeletion || register != defaultRegister || isSmallDeletionSpecialCase(editor)) {
         // Old 1 goes to 2, etc. Old 8 to 9, old 9 is lost
         for (char d = '8'; d >= '1'; d--) {
-          Register t = registers.get(d);
+          Register t = myRegisters.get(d);
           if (t != null) {
             t.setName((char)(d + 1));
-            registers.put((char)(d + 1), t);
+            myRegisters.put((char)(d + 1), t);
           }
         }
-        registers.put('1', new Register('1', type, processedText, new ArrayList<>(transferableData)));
+        myRegisters.put('1', new Register('1', type, processedText, new ArrayList<>(transferableData)));
       }
 
       // Deletes smaller than one line and without specified register go the the "-" register
       if (smallInlineDeletion && register == defaultRegister) {
-        registers.put(SMALL_DELETION_REGISTER, new Register(SMALL_DELETION_REGISTER, type, processedText, new ArrayList<>(transferableData)));
+        myRegisters.put(SMALL_DELETION_REGISTER, new Register(SMALL_DELETION_REGISTER, type, processedText, new ArrayList<>(transferableData)));
       }
     }
     // Yanks also go to register 0 if the default register was used
     else if (register == defaultRegister) {
-      registers.put('0', new Register('0', type, processedText, new ArrayList<>(transferableData)));
+      myRegisters.put('0', new Register('0', type, processedText, new ArrayList<>(transferableData)));
       if (logger.isDebugEnabled()) logger.debug("register '" + '0' + "' contains: \"" + processedText + "\"");
     }
 
@@ -358,7 +348,7 @@ public class RegisterGroup extends VimRegisterGroupBase implements PersistentSta
     if (Character.isUpperCase(r)) {
       r = Character.toLowerCase(r);
     }
-    return CLIPBOARD_REGISTERS.indexOf(r) >= 0 ? refreshClipboardRegister(r) : registers.get(r);
+    return CLIPBOARD_REGISTERS.indexOf(r) >= 0 ? refreshClipboardRegister(r) : myRegisters.get(r);
   }
 
   public void saveRegister(char r, Register register) {
@@ -375,11 +365,11 @@ public class RegisterGroup extends VimRegisterGroupBase implements PersistentSta
           .setClipboardText(text, rawText, new ArrayList<>(register.getTransferableData()));
       }
     }
-    registers.put(r, register);
+    myRegisters.put(r, register);
   }
 
   public @NotNull List<Register> getRegisters() {
-    final List<Register> res = new ArrayList<>(registers.values());
+    final List<Register> res = new ArrayList<>(myRegisters.values());
     for (int i = 0; i < CLIPBOARD_REGISTERS.length(); i++) {
       final char r = CLIPBOARD_REGISTERS.charAt(i);
       final Register register = refreshClipboardRegister(r);
@@ -410,11 +400,11 @@ public class RegisterGroup extends VimRegisterGroupBase implements PersistentSta
   }
 
   public void setKeys(char register, @NotNull List<KeyStroke> keys) {
-    registers.put(register, new Register(register, SelectionType.CHARACTER_WISE, keys));
+    myRegisters.put(register, new Register(register, SelectionType.CHARACTER_WISE, keys));
   }
 
   public void setKeys(char register, @NotNull List<KeyStroke> keys, SelectionType type) {
-    registers.put(register, new Register(register, type, keys));
+    myRegisters.put(register, new Register(register, type, keys));
   }
 
   public void finishRecording(Editor editor) {
@@ -427,7 +417,7 @@ public class RegisterGroup extends VimRegisterGroupBase implements PersistentSta
       if (recordList != null) {
         if (reg == null) {
           reg = new Register(Character.toLowerCase(recordRegister), SelectionType.CHARACTER_WISE, recordList);
-          registers.put(Character.toLowerCase(recordRegister), reg);
+          myRegisters.put(Character.toLowerCase(recordRegister), reg);
         }
         else {
           reg.addKeys(recordList);
@@ -443,10 +433,10 @@ public class RegisterGroup extends VimRegisterGroupBase implements PersistentSta
     logger.debug("Save registers data");
     final Element registersElement = new Element("registers");
     if (logger.isTraceEnabled()) {
-      logger.trace("Saving " + registers.size() + " registers");
+      logger.trace("Saving " + myRegisters.size() + " registers");
     }
-    for (Character key : registers.keySet()) {
-      final Register register = registers.get(key);
+    for (Character key : myRegisters.keySet()) {
+      final Register register = myRegisters.get(key);
       if (logger.isTraceEnabled()) {
         logger.trace("Saving register '" + key + "'");
       }
@@ -527,7 +517,7 @@ public class RegisterGroup extends VimRegisterGroupBase implements PersistentSta
           register = new Register(key, type, strokes);
         }
         logger.trace("Save register to vim registers");
-        registers.put(key, register);
+        myRegisters.put(key, register);
       }
     }
     logger.debug("Finish reading registers data");
@@ -536,7 +526,7 @@ public class RegisterGroup extends VimRegisterGroupBase implements PersistentSta
   private @Nullable Register refreshClipboardRegister(char r) {
     final Pair<String, List<TextBlockTransferableData>> clipboardData = ClipboardHandler.getClipboardTextAndTransferableData();
     if (clipboardData == null) return null;
-    final Register currentRegister = registers.get(r);
+    final Register currentRegister = myRegisters.get(r);
     final String text = clipboardData.getFirst();
     final List<TextBlockTransferableData> transferableData = clipboardData.getSecond();
     if (text != null) {
