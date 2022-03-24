@@ -24,6 +24,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.newapi.IjVimEditor
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.Script
@@ -199,9 +200,9 @@ data class LetCommand(
           throw ExException("Let command supports only 0-9a-zA-Z\" registers at the moment")
         }
 
-        VimPlugin.getRegister().startRecording(editor, variable.char)
+        VimPlugin.getRegister().startRecording(editor.vim, variable.char)
         VimPlugin.getRegister().recordText(expression.evaluate(editor, context, vimContext).asString())
-        VimPlugin.getRegister().finishRecording(editor)
+        VimPlugin.getRegister().finishRecording(editor.vim)
       }
 
       else -> throw ExException("E121: Undefined variable")

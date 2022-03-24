@@ -36,7 +36,7 @@ data class RegistersCommand(val ranges: Ranges, val argument: String) : Command.
   override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
 
     val registerGroup = VimPlugin.getRegister()
-    val regs = registerGroup.registers
+    val regs = registerGroup.getRegisters()
       .filter { argument.isEmpty() || argument.contains(it.name) }
       .joinToString("\n", prefix = "Type Name Content\n") { reg ->
         val type = when (reg.type) {

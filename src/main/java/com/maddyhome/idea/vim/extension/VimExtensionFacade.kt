@@ -139,12 +139,12 @@ object VimExtensionFacade {
   /** Set the current contents of the given register */
   @JvmStatic
   fun setRegister(register: Char, keys: List<KeyStroke?>?) {
-    VimPlugin.getRegister().setKeys(register, keys ?: emptyList())
+    VimPlugin.getRegister().setKeys(register, keys?.filterNotNull() ?: emptyList())
   }
 
   /** Set the current contents of the given register */
   @JvmStatic
   fun setRegister(register: Char, keys: List<KeyStroke?>?, type: SelectionType) {
-    VimPlugin.getRegister().setKeys(register, keys ?: emptyList(), type)
+    VimPlugin.getRegister().setKeys(register, keys?.filterNotNull() ?: emptyList(), type)
   }
 }

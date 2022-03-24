@@ -36,9 +36,9 @@ class ToggleRecordingAction : VimActionHandler.SingleExecution() {
     return if (!editor.vim.commandState.isRecording) {
       val argument = cmd.argument ?: return false
       val reg = argument.character
-      VimPlugin.getRegister().startRecording(editor, reg)
+      VimPlugin.getRegister().startRecording(editor.vim, reg)
     } else {
-      VimPlugin.getRegister().finishRecording(editor)
+      VimPlugin.getRegister().finishRecording(editor.vim)
       true
     }
   }

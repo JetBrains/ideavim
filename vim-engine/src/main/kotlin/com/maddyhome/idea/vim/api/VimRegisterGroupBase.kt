@@ -29,7 +29,7 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
    */
   override fun selectRegister(reg: Char): Boolean {
     return if (isValid(reg)) {
-      lastRegister = reg
+      VimRegisterGroupBase.lastRegister = reg
       logger.debug { "register selected: $lastRegister" }
 
       true
@@ -42,7 +42,7 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
    * Reset the selected register back to the default register.
    */
   override fun resetRegister() {
-    lastRegister = defaultRegister
+    VimRegisterGroupBase.lastRegister = defaultRegister
     logger.debug("Last register reset to default register")
   }
 
@@ -54,12 +54,12 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
   }
 
   override fun isRegisterWritable(): Boolean {
-    return READONLY_REGISTERS.indexOf(lastRegister) < 0
+    return READONLY_REGISTERS.indexOf(VimRegisterGroupBase.lastRegister) < 0
   }
 
   override fun resetRegisters() {
     VimRegisterGroupBase.defaultRegister = UNNAMED_REGISTER
-    lastRegister = defaultRegister
+    VimRegisterGroupBase.lastRegister = defaultRegister
     myRegisters.clear()
   }
 
@@ -91,7 +91,7 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     type: SelectionType, register: Char, isDelete: Boolean,
   ): Boolean {
     // Null register doesn't get saved, but acts like it was
-    if (lastRegister == BLACK_HOLE_REGISTER) return true
+    if (VimRegisterGroupBase.lastRegister == BLACK_HOLE_REGISTER) return true
 
     var start = range.startOffset
     var end = range.endOffset
@@ -191,7 +191,7 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     editor: VimEditor,
     range: TextRange,
     type: SelectionType,
-    isDelete: Boolean
+    isDelete: Boolean,
   ): Boolean {
     if (isRegisterWritable()) {
       var text = injector.engineEditorHelper.getText(editor, range)
@@ -201,10 +201,151 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
         text += '\n'.toString()
       }
 
-      return storeTextInternal(editor, range, text, type, lastRegister, isDelete)
+      return storeTextInternal(editor, range, text, type, VimRegisterGroupBase.lastRegister, isDelete)
     }
 
     return false
+  }
+
+  /**
+   * Stores text, character wise, in the given special register
+   *
+   *
+   * This method is intended to support writing to registers when the text cannot be yanked from an editor. This is
+   * expected to only be used to update the search and command registers. It will not update named registers.
+   *
+   *
+   * While this method allows setting the unnamed register, this should only be done from tests, and only when it's
+   * not possible to yank or cut from the fixture editor. This method will skip additional text processing, and won't
+   * update other registers such as the small delete register or reorder the numbered registers. It is much more
+   * preferable to yank from the fixture editor.
+   *
+   * @param register  The register to use for storing the text. Cannot be a normal text register
+   * @param text      The text to store, without further processing
+   * @return          True if the text is stored, false if the passed register is not supported
+   */
+  override fun storeTextSpecial(register: Char, text: String): Boolean {
+    if (READONLY_REGISTERS.indexOf(register) == -1 && register != LAST_SEARCH_REGISTER && register != UNNAMED_REGISTER) {
+      return false
+    }
+    myRegisters[register] = Register(register, SelectionType.CHARACTER_WISE, text, ArrayList())
+    logger.debug { "register '$register' contains: \"$text\"" }
+    return true
+  }
+
+  private fun guessSelectionType(text: String): SelectionType {
+    return if (text.endsWith("\n")) SelectionType.LINE_WISE else SelectionType.CHARACTER_WISE
+  }
+
+  protected fun refreshClipboardRegister(r: Char): Register? {
+    val clipboardData = injector.clipboardManager.getClipboardTextAndTransferableData() ?: return null
+    val currentRegister = myRegisters[r]
+    val text = clipboardData.first
+    val transferableData = clipboardData.second?.toMutableList()
+    if (currentRegister != null && text == currentRegister.text) {
+      return currentRegister
+    }
+    return transferableData?.let { Register(r, guessSelectionType(text), text, it) }
+  }
+
+  override fun getRegister(r: Char): Register? {
+    var myR = r
+    // Uppercase registers actually get the lowercase register
+    if (Character.isUpperCase(myR)) {
+      myR = Character.toLowerCase(myR)
+    }
+    return if (CLIPBOARD_REGISTERS.indexOf(myR) >= 0) refreshClipboardRegister(myR) else myRegisters[myR]
+  }
+
+  override fun getRegisters(): List<Register> {
+    val res = ArrayList(myRegisters.values)
+    for (i in CLIPBOARD_REGISTERS.indices) {
+      val r = CLIPBOARD_REGISTERS[i]
+      val register = refreshClipboardRegister(r)
+      if (register != null) {
+        res.add(register)
+      }
+    }
+    res.sortWith(Register.KeySorter)
+    return res
+  }
+
+  override fun saveRegister(r: Char, register: Register) {
+    var myR = r
+    // Uppercase registers actually get the lowercase register
+    if (Character.isUpperCase(myR)) {
+      myR = Character.toLowerCase(myR)
+    }
+    if (CLIPBOARD_REGISTERS.indexOf(myR) >= 0) {
+      val text = register.text
+      val rawText = register.rawText
+      if (text != null && rawText != null) {
+        injector
+          .clipboardManager
+          .setClipboardText(text, rawText, ArrayList(register.transferableData))
+      }
+    }
+    myRegisters[myR] = register
+  }
+
+  override fun startRecording(editor: VimEditor, register: Char): Boolean {
+    return if (RECORDABLE_REGISTERS.indexOf(register) != -1) {
+      CommandState.getInstance(editor).isRecording = true
+      recordRegister = register
+      recordList = ArrayList()
+      true
+    } else {
+      false
+    }
+  }
+
+  /**
+   * Get the last register selected by the user
+   *
+   * @return The register, null if no such register
+   */
+  override val lastRegister: Register?
+    get() = getRegister(VimRegisterGroupBase.lastRegister)
+
+  override fun getPlaybackRegister(r: Char): Register? {
+    return if (PLAYBACK_REGISTERS.indexOf(r) != 0) getRegister(r) else null
+  }
+
+  override fun recordText(text: String) {
+    val myRecordList = recordList
+    if (recordRegister != 0.toChar() && myRecordList != null) {
+      myRecordList.addAll(injector.parser.stringToKeys(text))
+    }
+  }
+
+  override fun setKeys(register: Char, keys: List<KeyStroke>) {
+    myRegisters[register] = Register(register, SelectionType.CHARACTER_WISE, keys.toMutableList())
+  }
+
+  override fun setKeys(register: Char, keys: List<KeyStroke>, type: SelectionType) {
+    myRegisters[register] = Register(register, type, keys.toMutableList())
+  }
+
+  override fun finishRecording(editor: VimEditor) {
+    if (recordRegister != 0.toChar()) {
+      var reg: Register? = null
+      if (Character.isUpperCase(recordRegister)) {
+        reg = getRegister(recordRegister)
+      }
+
+      val myRecordList = recordList
+      if (myRecordList != null) {
+        if (reg == null) {
+          reg = Register(Character.toLowerCase(recordRegister), SelectionType.CHARACTER_WISE, myRecordList)
+          myRegisters[Character.toLowerCase(recordRegister)] = reg
+        } else {
+          reg.addKeys(myRecordList)
+        }
+      }
+      CommandState.getInstance(editor).isRecording = false
+    }
+
+    recordRegister = 0.toChar()
   }
 
   /**
@@ -213,7 +354,7 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
    * @return The register name
    */
   override val currentRegister: Char
-    get() = lastRegister
+    get() = VimRegisterGroupBase.lastRegister
 
   override val defaultRegister: Char
     get() = VimRegisterGroupBase.defaultRegister
