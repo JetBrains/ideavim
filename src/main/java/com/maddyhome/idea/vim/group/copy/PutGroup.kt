@@ -19,7 +19,6 @@
 package com.maddyhome.idea.vim.group.copy
 
 import com.intellij.codeInsight.editorActions.TextBlockTransferable
-import com.intellij.codeInsight.editorActions.TextBlockTransferableData
 import com.intellij.ide.CopyPasteManagerEx
 import com.intellij.ide.PasteProvider
 import com.intellij.openapi.actionSystem.DataContext
@@ -82,14 +81,14 @@ data class PutData(
   data class TextData(
     val rawText: String?,
     val typeInRegister: SelectionType,
-    val transferableData: List<TextBlockTransferableData>,
+    val transferableData: List<Any>,
   )
 }
 
 private data class ProcessedTextData(
   val text: String,
   val typeInRegister: SelectionType,
-  val transferableData: List<TextBlockTransferableData>,
+  val transferableData: List<Any>,
 )
 
 class PutGroup {

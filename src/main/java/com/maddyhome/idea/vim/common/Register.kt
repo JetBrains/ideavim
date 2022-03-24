@@ -17,7 +17,6 @@
  */
 package com.maddyhome.idea.vim.common
 
-import com.intellij.codeInsight.editorActions.TextBlockTransferableData
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.helper.StringHelper
 import org.jetbrains.annotations.NonNls
@@ -28,7 +27,7 @@ class Register {
   var name: Char
   val type: SelectionType
   val keys: MutableList<KeyStroke>
-  val transferableData: MutableList<out TextBlockTransferableData>
+  val transferableData: MutableList<out Any>
   val rawText: String?
 
   constructor(name: Char, type: SelectionType, keys: MutableList<KeyStroke>) {
@@ -43,7 +42,7 @@ class Register {
     name: Char,
     type: SelectionType,
     text: String,
-    transferableData: MutableList<out TextBlockTransferableData>,
+    transferableData: MutableList<out Any>,
   ) {
     this.name = name
     this.type = type
@@ -56,7 +55,7 @@ class Register {
     name: Char,
     type: SelectionType,
     text: String,
-    transferableData: MutableList<out TextBlockTransferableData>,
+    transferableData: MutableList<out Any>,
     rawText: String,
   ) {
     this.name = name
