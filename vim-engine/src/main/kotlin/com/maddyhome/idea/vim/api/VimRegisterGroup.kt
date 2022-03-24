@@ -25,6 +25,7 @@ interface VimRegisterGroup {
   fun resetRegister()
   fun resetRegisters()
   fun recordKeyStroke(key: KeyStroke)
+  fun isRegisterWritable(): Boolean
   val currentRegister: Char
   val defaultRegister: Char
 }

@@ -28,6 +28,7 @@ interface VimInjector {
   val changeGroup: VimChangeGroup
   val actionExecutor: VimActionExecutor
   val exEntryPanel: ExEntryPanel
+  val clipboardManager: VimClipboardManager
 
   /**
    * Please use vimLogger() function

@@ -11,7 +11,7 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
   @JvmField
   protected var recordList: MutableList<KeyStroke>? = null
 
-  override fun isValid(reg: Char): Boolean = VALID_REGISTERS.indexOf(reg) == -1
+  override fun isValid(reg: Char): Boolean = VALID_REGISTERS.indexOf(reg) != -1
 
   /**
    * Store which register the user wishes to work with.
@@ -43,6 +43,10 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     if (recordRegister != 0.toChar() && myRecordList != null) {
       myRecordList.add(key)
     }
+  }
+
+  override fun isRegisterWritable(): Boolean {
+    return READONLY_REGISTERS.indexOf(lastRegister) < 0
   }
 
   /**

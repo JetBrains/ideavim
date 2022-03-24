@@ -26,18 +26,16 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
-import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.editor.Caret
-import com.intellij.openapi.editor.CaretStateTransferableData
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.editor.RangeMarker
-import com.intellij.openapi.editor.RawText
 import com.intellij.openapi.ide.CopyPasteManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.text.StringUtil
 import com.jetbrains.rd.util.firstOrNull
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.command.isBlock
@@ -48,6 +46,7 @@ import com.maddyhome.idea.vim.group.MarkGroup
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.TestClipboardModel
 import com.maddyhome.idea.vim.helper.fileSize
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.options.OptionConstants
@@ -359,7 +358,8 @@ class PutGroup {
     val allContentsBefore = CopyPasteManager.getInstance().allContents
     val sizeBeforeInsert = allContentsBefore.size
     val firstItemBefore = allContentsBefore.firstOrNull()
-    val origContent: TextBlockTransferable = setClipboardText(text.text, text.transferableData)
+    val origTestContents = TestClipboardModel.contents
+    val origContent: TextBlockTransferable = injector.clipboardManager.setClipboardText(text.text, transferableData = text.transferableData) as TextBlockTransferable
     val allContentsAfter = CopyPasteManager.getInstance().allContents
     val sizeAfterInsert = allContentsAfter.size
     try {
@@ -367,6 +367,7 @@ class PutGroup {
     } finally {
       val textOnTop =
         ((firstItemBefore as? TextBlockTransferable)?.getTransferData(DataFlavor.stringFlavor) as? String) != text.text
+      TestClipboardModel.contents = origTestContents
       if (sizeBeforeInsert != sizeAfterInsert || textOnTop) {
         // Sometimes inserted text replaces existing one. E.g. on insert with + or * register
         (CopyPasteManager.getInstance() as? CopyPasteManagerEx)?.run { removeContent(origContent) }
@@ -396,19 +397,6 @@ class PutGroup {
         data.caretAfterInsertedText
       )
     }
-  }
-
-  private fun setClipboardText(text: String, transferableData: List<TextBlockTransferableData>): TextBlockTransferable {
-    val mutableTransferableData = transferableData.toMutableList()
-    val s = TextBlockTransferable.convertLineSeparators(text, "\n", transferableData)
-    if (mutableTransferableData.none { it is CaretStateTransferableData }) {
-      // Manually add CaretStateTransferableData to avoid adjustment of copied text to multicaret
-      mutableTransferableData += CaretStateTransferableData(intArrayOf(0), intArrayOf(s.length))
-    }
-    logger.debug { "Paste text with transferable data: ${transferableData.joinToString { it.javaClass.name }}" }
-    val content = TextBlockTransferable(s, mutableTransferableData, RawText(text))
-    CopyPasteManager.getInstance().setContents(content)
-    return content
   }
 
   private fun putTextInternal(

@@ -19,14 +19,11 @@
 package com.maddyhome.idea.vim.ui;
 
 import com.intellij.codeInsight.editorActions.CopyPastePostProcessor;
-import com.intellij.codeInsight.editorActions.TextBlockTransferable;
 import com.intellij.codeInsight.editorActions.TextBlockTransferableData;
 import com.intellij.ide.CopyPasteManagerEx;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.editor.RawText;
 import com.maddyhome.idea.vim.helper.TestClipboardModel;
 import kotlin.Pair;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
@@ -75,21 +72,6 @@ public class ClipboardHandler {
     return allValues;
   }
 
-  /**
-   * Puts the supplied text into the system clipboard
-   *
-   * @param text The text to add to the clipboard
-   */
-  public static void setClipboardText(String text, List<TextBlockTransferableData> transferableData, String rawText) {
-    try {
-      final String s = TextBlockTransferable.convertLineSeparators(text, "\n", transferableData);
-      TextBlockTransferable content = new TextBlockTransferable(s, transferableData, new RawText(rawText));
-      setContents(content);
-    }
-    catch (HeadlessException ignored) {
-    }
-  }
-
   private static @Nullable Transferable getContents() {
     if (ApplicationManager.getApplication().isUnitTestMode()) {
       return TestClipboardModel.INSTANCE.getContents();
@@ -97,15 +79,5 @@ public class ClipboardHandler {
 
     CopyPasteManagerEx manager = CopyPasteManagerEx.getInstanceEx();
     return manager.getContents();
-  }
-
-  private static void setContents(@NotNull Transferable contents) {
-    if (ApplicationManager.getApplication().isUnitTestMode()) {
-      TestClipboardModel.INSTANCE.setContents(contents);
-    }
-    else {
-      CopyPasteManagerEx copyPasteManager = CopyPasteManagerEx.getInstanceEx();
-      copyPasteManager.setContents(contents);
-    }
   }
 }

@@ -47,6 +47,7 @@ import com.maddyhome.idea.vim.action.motion.text.MotionParagraphPreviousAction;
 import com.maddyhome.idea.vim.action.motion.text.MotionSentenceNextStartAction;
 import com.maddyhome.idea.vim.action.motion.text.MotionSentencePreviousStartAction;
 import com.maddyhome.idea.vim.action.motion.updown.MotionPercentOrMatchAction;
+import com.maddyhome.idea.vim.api.VimInjectorKt;
 import com.maddyhome.idea.vim.api.VimRegisterGroupBase;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
@@ -112,10 +113,6 @@ public class RegisterGroup extends VimRegisterGroupBase implements PersistentSta
       },
       true
     );
-  }
-
-  public boolean isRegisterWritable() {
-    return VimRegisterGroupBase.READONLY_REGISTERS.indexOf(lastRegister) < 0;
   }
 
   @Override
@@ -224,7 +221,7 @@ public class RegisterGroup extends VimRegisterGroupBase implements PersistentSta
     }
 
     if (CLIPBOARD_REGISTERS.indexOf(register) >= 0) {
-      ClipboardHandler.setClipboardText(processedText, new ArrayList<>(transferableData), text);
+      VimInjectorKt.getInjector().getClipboardManager().setClipboardText(processedText, text, new ArrayList<>(transferableData));
     }
 
     // Also add it to the unnamed register if the default wasn't specified
@@ -370,7 +367,13 @@ public class RegisterGroup extends VimRegisterGroupBase implements PersistentSta
       r = Character.toLowerCase(r);
     }
     if (CLIPBOARD_REGISTERS.indexOf(r) >= 0) {
-      ClipboardHandler.setClipboardText(register.getText(), new ArrayList<>(register.getTransferableData()), register.getRawText());
+      String text = register.getText();
+      String rawText = register.getRawText();
+      if (text != null && rawText != null) {
+        VimInjectorKt.getInjector()
+          .getClipboardManager()
+          .setClipboardText(text, rawText, new ArrayList<>(register.getTransferableData()));
+      }
     }
     registers.put(r, register);
   }

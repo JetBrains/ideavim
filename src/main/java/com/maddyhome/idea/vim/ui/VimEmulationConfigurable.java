@@ -33,6 +33,7 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.ui.UIUtil;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.api.VimInjectorKt;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.StringHelper;
 import com.maddyhome.idea.vim.key.ShortcutOwner;
@@ -404,7 +405,7 @@ public class VimEmulationConfigurable implements Configurable {
       }
 
       String data = stringBuilder.toString();
-      ClipboardHandler.setClipboardText(data, Collections.emptyList(), data);
+      VimInjectorKt.getInjector().getClipboardManager().setClipboardText(data, data, Collections.emptyList());
     }
   }
 

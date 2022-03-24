@@ -10,6 +10,7 @@ import com.maddyhome.idea.vim.api.NativeActionManager
 import com.maddyhome.idea.vim.api.VimActionExecutor
 import com.maddyhome.idea.vim.api.VimApplication
 import com.maddyhome.idea.vim.api.VimChangeGroup
+import com.maddyhome.idea.vim.api.VimClipboardManager
 import com.maddyhome.idea.vim.api.VimDigraphGroup
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimEnabler
@@ -38,6 +39,8 @@ class IjVimInjector : VimInjector {
     get() = service<IjActionExecutor>()
   override val exEntryPanel: ExEntryPanel
     get() = service<IjExEntryPanel>()
+  override val clipboardManager: VimClipboardManager
+    get() = service<IjClipboardManager>()
   override val nativeActionManager: NativeActionManager
     get() = service<IjNativeActionManager>()
   override val messages: VimMessages

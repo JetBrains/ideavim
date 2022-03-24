@@ -19,9 +19,9 @@
 package org.jetbrains.plugins.ideavim.extension.replacewithregister
 
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.VimRegisterGroupBase.Companion.UNNAMED_REGISTER
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.SelectionType
-import com.maddyhome.idea.vim.group.RegisterGroup
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -62,7 +62,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
     val text = ""
 
     configureByText(text)
-    VimPlugin.getRegister().storeTextSpecial(RegisterGroup.UNNAMED_REGISTER, "one")
+    VimPlugin.getRegister().storeTextSpecial(UNNAMED_REGISTER, "one")
     typeText(parseKeys("griw"))
     assertState("on${c}e")
   }
@@ -72,7 +72,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
     val text = "${c}one"
 
     configureByText(text)
-    VimPlugin.getRegister().storeTextSpecial(RegisterGroup.UNNAMED_REGISTER, "")
+    VimPlugin.getRegister().storeTextSpecial(UNNAMED_REGISTER, "")
     typeText(parseKeys("griw"))
     assertState(c)
   }
