@@ -22,13 +22,13 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.ranges.Ranges
-import com.maddyhome.idea.vim.group.MarkGroup.DEL_FILE_MARKS
-import com.maddyhome.idea.vim.group.MarkGroup.DEL_MARKS
-import com.maddyhome.idea.vim.group.MarkGroup.RO_GLOBAL_MARKS
-import com.maddyhome.idea.vim.group.MarkGroup.WR_GLOBAL_MARKS
-import com.maddyhome.idea.vim.group.MarkGroup.WR_REGULAR_FILE_MARKS
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.Msg
+import com.maddyhome.idea.vim.mark.VimMarkConstants.DEL_FILE_MARKS
+import com.maddyhome.idea.vim.mark.VimMarkConstants.DEL_MARKS
+import com.maddyhome.idea.vim.mark.VimMarkConstants.RO_GLOBAL_MARKS
+import com.maddyhome.idea.vim.mark.VimMarkConstants.WR_GLOBAL_MARKS
+import com.maddyhome.idea.vim.mark.VimMarkConstants.WR_REGULAR_FILE_MARKS
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 private val VIML_COMMENT = Regex("(?<!\\\\)\".*")

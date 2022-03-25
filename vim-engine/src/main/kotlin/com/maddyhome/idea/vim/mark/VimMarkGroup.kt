@@ -1,5 +1,6 @@
-package com.maddyhome.idea.vim.api
+package com.maddyhome.idea.vim.mark
 
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.common.TextRange
 
 interface VimMarkGroup {

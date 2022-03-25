@@ -27,9 +27,9 @@ import com.maddyhome.idea.vim.common.OperatedRange
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.common.VimMachine
 import com.maddyhome.idea.vim.common.VimRange
-import com.maddyhome.idea.vim.group.MarkGroup
 import com.maddyhome.idea.vim.helper.inlayAwareVisualColumn
 import com.maddyhome.idea.vim.helper.vimLastColumn
+import com.maddyhome.idea.vim.mark.VimMarkConstants.MARK_CHANGE_POS
 
 @Service
 class VimMachineImpl : VimMachine {
@@ -56,7 +56,7 @@ class VimMachineImpl : VimMachine {
     editor.delete(range)
 
     val start = normalizedRange.startOffset
-    VimPlugin.getMark().setMark(editor.editor, MarkGroup.MARK_CHANGE_POS, start)
+    VimPlugin.getMark().setMark(editor.editor, MARK_CHANGE_POS, start)
     VimPlugin.getMark().setChangeMarks(editor, TextRange(start, start + 1))
 
     return operatedText

@@ -78,6 +78,7 @@ import java.awt.event.KeyEvent;
 import java.math.BigInteger;
 import java.util.*;
 
+import static com.maddyhome.idea.vim.mark.VimMarkConstants.*;
 import static com.maddyhome.idea.vim.register.RegisterConstants.LAST_INSERTED_TEXT_REGISTER;
 
 /**
@@ -436,7 +437,7 @@ public class ChangeGroup implements VimChangeGroup {
       UserDataManager
         .setVimInsertStart(caret, editor.getDocument().createRangeMarker(caret.getOffset(), caret.getOffset()));
       if (caret == caretModel.getPrimaryCaret()) {
-        VimPlugin.getMark().setMark(editor, MarkGroup.MARK_CHANGE_START, caret.getOffset());
+        VimPlugin.getMark().setMark(editor, MARK_CHANGE_START, caret.getOffset());
       }
     }
 
@@ -553,7 +554,7 @@ public class ChangeGroup implements VimChangeGroup {
     int offset = editor.getCaretModel().getPrimaryCaret().getOffset();
     final MarkGroup markGroup = VimPlugin.getMark();
     markGroup.setMark(editor, '^', offset);
-    markGroup.setMark(editor, MarkGroup.MARK_CHANGE_END, offset);
+    markGroup.setMark(editor, MARK_CHANGE_END, offset);
 
     if (CommandState.getInstance(new IjVimEditor(editor)).getMode() == CommandState.Mode.REPLACE) {
       setInsertEditorState(editor, true);
@@ -581,7 +582,7 @@ public class ChangeGroup implements VimChangeGroup {
 
     // The change pos '.' mark is the offset AFTER processing escape, and after switching to overtype
     offset = editor.getCaretModel().getPrimaryCaret().getOffset();
-    markGroup.setMark(editor, MarkGroup.MARK_CHANGE_POS, offset);
+    markGroup.setMark(editor, MARK_CHANGE_POS, offset);
 
     CommandState.getInstance(new IjVimEditor(editor)).popModes();
     exitAllSingleCommandInsertModes(editor);
@@ -1715,7 +1716,7 @@ public class ChangeGroup implements VimChangeGroup {
     editor.getDocument().insertString(offset, str);
     InlayHelperKt.moveToInlayAwareOffset(caret, offset + str.length());
 
-    VimPlugin.getMark().setMark(editor, MarkGroup.MARK_CHANGE_POS, offset);
+    VimPlugin.getMark().setMark(editor, MARK_CHANGE_POS, offset);
   }
 
   public void insertText(@NotNull Editor editor, @NotNull Caret caret, @NotNull String str) {
@@ -1755,7 +1756,7 @@ public class ChangeGroup implements VimChangeGroup {
 
     final int newEnd = start + str.length();
     VimPlugin.getMark().setChangeMarks(new IjVimEditor(editor), new TextRange(start, newEnd));
-    VimPlugin.getMark().setMark(editor, MarkGroup.MARK_CHANGE_POS, newEnd);
+    VimPlugin.getMark().setMark(editor, MARK_CHANGE_POS, newEnd);
   }
 
   public void indentRange(@NotNull Editor editor,
@@ -1889,7 +1890,7 @@ public class ChangeGroup implements VimChangeGroup {
 
       if (type != null) {
         final int start = updatedRange.getStartOffset();
-        VimPlugin.getMark().setMark(editor, MarkGroup.MARK_CHANGE_POS, start);
+        VimPlugin.getMark().setMark(editor, MARK_CHANGE_POS, start);
         VimPlugin.getMark().setChangeMarks(new IjVimEditor(editor), new TextRange(start, start + 1));
       }
 

@@ -3,6 +3,7 @@ package com.maddyhome.idea.vim.api
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.common.VimMachine
 import com.maddyhome.idea.vim.diagnostic.VimLogger
+import com.maddyhome.idea.vim.mark.VimMarkGroup
 import com.maddyhome.idea.vim.options.OptionService
 import com.maddyhome.idea.vim.register.VimRegisterGroup
 

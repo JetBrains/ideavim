@@ -42,7 +42,6 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissin
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setOperatorFunction
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setRegister
 import com.maddyhome.idea.vim.extension.VimExtensionHandler
-import com.maddyhome.idea.vim.group.MarkGroup
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.StringHelper.stringToKeys
@@ -51,6 +50,7 @@ import com.maddyhome.idea.vim.helper.moveToInlayAwareLogicalPosition
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.key.OperatorFunction
+import com.maddyhome.idea.vim.mark.VimMarkConstants
 import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.annotations.NonNls
 
@@ -326,9 +326,9 @@ class VimExchangeExtension : VimExtension {
       fun getMarks(isVisual: Boolean): Pair<Mark, Mark> {
         val (startMark, endMark) =
           if (isVisual) {
-            Pair(MarkGroup.MARK_VISUAL_START, MarkGroup.MARK_VISUAL_END)
+            Pair(VimMarkConstants.MARK_VISUAL_START, VimMarkConstants.MARK_VISUAL_END)
           } else {
-            Pair(MarkGroup.MARK_CHANGE_START, MarkGroup.MARK_CHANGE_END)
+            Pair(VimMarkConstants.MARK_CHANGE_START, VimMarkConstants.MARK_CHANGE_END)
           }
         val marks = VimPlugin.getMark()
         return Pair(marks.getMark(editor, startMark)!!, marks.getMark(editor, endMark)!!)
