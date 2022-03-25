@@ -25,6 +25,7 @@ import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.Msg
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
@@ -39,7 +40,7 @@ data class MarkCommand(val ranges: Ranges, val argument: String) : Command.Singl
     val offset = EditorHelper.getLineStartOffset(editor, line)
 
     val result = if (mark.isLetter() || mark in "'`") {
-      VimPlugin.getMark().setMark(editor, mark, offset)
+      VimPlugin.getMark().setMark(editor.vim, mark, offset)
     } else {
       VimPlugin.showMessage(MessageHelper.message(Msg.E191))
       false

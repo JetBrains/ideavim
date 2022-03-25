@@ -148,4 +148,57 @@ abstract class VimMarkGroupBase : VimMarkGroup {
       jumps[index]
     }
   }
+
+  /**
+   * Sets the specified mark to the specified location.
+   *
+   * @param editor  The editor the mark is associated with
+   * @param ch      The mark to set
+   * @param offset  The offset to set the mark to
+   * @return true if able to set the mark, false if not
+   */
+  override fun setMark(editor: VimEditor, ch: Char, offset: Int): Boolean {
+    var myCh = ch
+    if (myCh == '`') myCh = '\''
+    val lp = editor.offsetToLogicalPosition(offset)
+
+    val path = editor.getPath() ?: return false
+
+    // File specific marks get added to the file
+    if (VimMarkConstants.FILE_MARKS.indexOf(myCh) >= 0) {
+      val fmarks = getFileMarks(path)
+
+      val mark = VimMark(myCh, lp.line, lp.column, path, editor.extractProtocol())
+      fmarks[myCh] = mark
+    } else if (VimMarkConstants.GLOBAL_MARKS.indexOf(myCh) >= 0) {
+      val fmarks = getFileMarks(path)
+
+      var mark = createSystemMark(myCh, lp.line, lp.column, editor)
+      if (mark == null) {
+        mark = VimMark(myCh, lp.line, lp.column, path, editor.extractProtocol())
+      }
+      fmarks[myCh] = mark
+      val oldMark = globalMarks.put(myCh, mark)
+      if (oldMark is VimMark) {
+        oldMark.clear()
+      }
+    }// Global marks get set to both the file and the global list of marks
+
+    return true
+  }
+
+  /**
+   * Sets the specified mark to the caret position of the editor
+   *
+   * @param editor  The editor to get the current position from
+   * @param ch      The mark set set
+   * @return True if a valid, writable mark, false if not
+   */
+  override fun setMark(editor: VimEditor, ch: Char): Boolean {
+    return VimMarkConstants.VALID_SET_MARKS.indexOf(ch) >= 0 && setMark(
+      editor,
+      ch,
+      editor.primaryCaret().offset.point
+    )
+  }
 }

@@ -69,7 +69,7 @@ public class MarkGroup extends VimMarkGroupBase implements PersistentStateCompon
   public void editorReleased(@NotNull EditorFactoryEvent event) {
     // Save off the last caret position of the file before it is closed
     Editor editor = event.getEditor();
-    setMark(editor, '"', editor.getCaretModel().getOffset());
+    setMark(new IjVimEditor(editor), '"', editor.getCaretModel().getOffset());
   }
 
   /**
@@ -84,7 +84,7 @@ public class MarkGroup extends VimMarkGroupBase implements PersistentStateCompon
 
   public void saveJumpLocation(@NotNull Editor editor) {
     addJump(new IjVimEditor(editor), true);
-    setMark(editor, '\'');
+    setMark(new IjVimEditor(editor), '\'');
 
     Project project = editor.getProject();
     if (project != null) {
@@ -114,62 +114,14 @@ public class MarkGroup extends VimMarkGroupBase implements PersistentStateCompon
     return mark;
   }
 
-  /**
-   * Sets the specified mark to the caret position of the editor
-   *
-   * @param editor  The editor to get the current position from
-   * @param ch      The mark set set
-   * @return True if a valid, writable mark, false if not
-   */
-  public boolean setMark(@NotNull Editor editor, char ch) {
-    return VALID_SET_MARKS.indexOf(ch) >= 0 && setMark(editor, ch, editor.getCaretModel().getOffset());
-  }
-
-  /**
-   * Sets the specified mark to the specified location.
-   *
-   * @param editor  The editor the mark is associated with
-   * @param ch      The mark to set
-   * @param offset  The offset to set the mark to
-   * @return true if able to set the mark, false if not
-   */
-  public boolean setMark(@NotNull Editor editor, char ch, int offset) {
-    if (ch == '`') ch = '\'';
-    LogicalPosition lp = editor.offsetToLogicalPosition(offset);
-
-    final VirtualFile vf = EditorHelper.getVirtualFile(editor);
-    if (vf == null) {
-      return false;
+  @Override
+  public @Nullable Mark createSystemMark(char ch, int line, int col, @NotNull VimEditor editor) {
+    Editor ijEditor = ((IjVimEditor)editor).getEditor();
+    @Nullable LineBookmark systemMark = SystemMarks.createOrGetSystemMark(ch, line, ijEditor);
+    if (systemMark == null) {
+      return null;
     }
-
-    // File specific marks get added to the file
-    if (FILE_MARKS.indexOf(ch) >= 0) {
-      HashMap<Character, Mark> fmarks = getFileMarks(editor.getDocument());
-      if (fmarks == null) return false;
-
-      Mark mark = new VimMark(ch, lp.line, lp.column, vf.getPath(), extractProtocol(vf));
-      fmarks.put(ch, mark);
-    }
-    // Global marks get set to both the file and the global list of marks
-    else if (GLOBAL_MARKS.indexOf(ch) >= 0) {
-      HashMap<Character, Mark> fmarks = getFileMarks(editor.getDocument());
-      if (fmarks == null) return false;
-
-      @Nullable LineBookmark systemMark = SystemMarks.createOrGetSystemMark(ch, lp.line, editor);
-      Mark mark;
-      if (systemMark != null) {
-        mark = new IntellijMark(systemMark, lp.column, editor.getProject());
-      } else {
-        mark = new VimMark(ch, lp.line, lp.column, vf.getPath(), extractProtocol(vf));
-      }
-      fmarks.put(ch, mark);
-      Mark oldMark = globalMarks.put(ch, mark);
-      if (oldMark instanceof VimMark) {
-        oldMark.clear();
-      }
-    }
-
-    return true;
+    return new IntellijMark(systemMark, col, ijEditor.getProject());
   }
 
   public static String extractProtocol(@NotNull VirtualFile vf) {
@@ -177,15 +129,14 @@ public class MarkGroup extends VimMarkGroupBase implements PersistentStateCompon
   }
 
   public void setVisualSelectionMarks(@NotNull Editor editor, @NotNull TextRange range) {
-    setMark(editor, MARK_VISUAL_START, range.getStartOffset());
-    setMark(editor, MARK_VISUAL_END, range.getEndOffset());
+    setMark(new IjVimEditor(editor), MARK_VISUAL_START, range.getStartOffset());
+    setMark(new IjVimEditor(editor), MARK_VISUAL_END, range.getEndOffset());
   }
 
   @Override
   public void setChangeMarks(@NotNull VimEditor vimEditor, @NotNull TextRange range) {
-    Editor editor = ((IjVimEditor)vimEditor).getEditor();
-    setMark(editor, MARK_CHANGE_START, range.getStartOffset());
-    setMark(editor, MARK_CHANGE_END, range.getEndOffset()-1);
+    setMark(vimEditor, MARK_CHANGE_START, range.getStartOffset());
+    setMark(vimEditor, MARK_CHANGE_END, range.getEndOffset()-1);
   }
 
   public @Nullable TextRange getChangeMarks(@NotNull Editor editor) {
@@ -313,7 +264,7 @@ public class MarkGroup extends VimMarkGroupBase implements PersistentStateCompon
     Element fileMarksElem = new Element("filemarks");
 
     List<FileMarks<Character, Mark>> files = new ArrayList<>(fileMarks.values());
-    files.sort(Comparator.comparing(o -> o.getMyTimestamp()));
+    files.sort(Comparator.comparing(FileMarks<Character, Mark>::getMyTimestamp));
 
     if (files.size() > SAVE_MARK_COUNT) {
       files = files.subList(files.size() - SAVE_MARK_COUNT, files.size());

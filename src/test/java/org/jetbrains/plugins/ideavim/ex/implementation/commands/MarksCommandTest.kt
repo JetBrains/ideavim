@@ -20,6 +20,7 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class MarksCommandTest : VimTestCase() {
@@ -197,7 +198,7 @@ class MarksCommandTest : VimTestCase() {
                       |hard by the torrent of a mountain pass.
                       """.trimMargin()
     )
-    VimPlugin.getMark().setMark(myFixture.editor, 'a', 100000)
+    VimPlugin.getMark().setMark(myFixture.editor.vim, 'a', 100000)
     enterCommand("marks")
     assertExOutput(
       """mark line  col file/text

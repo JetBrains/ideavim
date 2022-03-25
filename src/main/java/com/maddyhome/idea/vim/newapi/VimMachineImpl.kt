@@ -56,7 +56,7 @@ class VimMachineImpl : VimMachine {
     editor.delete(range)
 
     val start = normalizedRange.startOffset
-    VimPlugin.getMark().setMark(editor.editor, MARK_CHANGE_POS, start)
+    VimPlugin.getMark().setMark(editor, MARK_CHANGE_POS, start)
     VimPlugin.getMark().setChangeMarks(editor, TextRange(start, start + 1))
 
     return operatedText

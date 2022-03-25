@@ -51,7 +51,7 @@ class DeleteMarksCommandTest : VimTestCase() {
 
     marks.forEachIndexed { index, c ->
       VimPlugin.getMark()
-        .setMark(myFixture.editor, c, myFixture.editor.logicalPositionToOffset(LogicalPosition(index, 0)))
+        .setMark(myFixture.editor.vim, c, myFixture.editor.logicalPositionToOffset(LogicalPosition(index, 0)))
     }
   }
 

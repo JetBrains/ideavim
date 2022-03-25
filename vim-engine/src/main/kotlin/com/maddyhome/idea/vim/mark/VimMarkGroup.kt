@@ -24,4 +24,24 @@ interface VimMarkGroup {
    * @return The jump or null if out of range.
    */
   fun getJump(count: Int): Jump?
+  fun createSystemMark(ch: Char, line: Int, col: Int, editor: VimEditor): Mark?
+
+  /**
+   * Sets the specified mark to the specified location.
+   *
+   * @param editor  The editor the mark is associated with
+   * @param ch      The mark to set
+   * @param offset  The offset to set the mark to
+   * @return true if able to set the mark, false if not
+   */
+  fun setMark(editor: VimEditor, ch: Char, offset: Int): Boolean
+
+  /**
+   * Sets the specified mark to the caret position of the editor
+   *
+   * @param editor  The editor to get the current position from
+   * @param ch      The mark set set
+   * @return True if a valid, writable mark, false if not
+   */
+  fun setMark(editor: VimEditor, ch: Char): Boolean
 }

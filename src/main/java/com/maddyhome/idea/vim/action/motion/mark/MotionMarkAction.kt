@@ -24,6 +24,7 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
+import com.maddyhome.idea.vim.newapi.vim
 
 class MotionMarkAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
@@ -32,6 +33,6 @@ class MotionMarkAction : VimActionHandler.SingleExecution() {
 
   override fun execute(editor: Editor, context: DataContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
     val argument = cmd.argument
-    return argument != null && VimPlugin.getMark().setMark(editor, argument.character)
+    return argument != null && VimPlugin.getMark().setMark(editor.vim, argument.character)
   }
 }

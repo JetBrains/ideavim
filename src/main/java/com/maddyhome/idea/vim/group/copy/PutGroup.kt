@@ -170,7 +170,7 @@ class PutGroup {
     var text = data.textData?.rawText ?: run {
       if (data.visualSelection != null) {
         val offset = editor.caretModel.primaryCaret.offset
-        VimPlugin.getMark().setMark(editor, MARK_CHANGE_POS, offset)
+        VimPlugin.getMark().setMark(editor.vim, MARK_CHANGE_POS, offset)
         VimPlugin.getMark().setChangeMarks(editor.vim, TextRange(offset, offset + 1))
       }
       return null
@@ -386,7 +386,7 @@ class PutGroup {
         startOffset + text.text.length
       ) else startOffset + text.text.length
       VimPlugin.getMark().setChangeMarks(editor.vim, TextRange(startOffset, endOffset))
-      VimPlugin.getMark().setMark(editor, MARK_CHANGE_POS, startOffset)
+      VimPlugin.getMark().setMark(editor.vim, MARK_CHANGE_POS, startOffset)
       moveCaretToEndPosition(
         editor,
         caret,
