@@ -7,6 +7,9 @@ import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
+import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import javax.swing.KeyStroke
 
 abstract class VimRegisterGroupBase : VimRegisterGroup {
@@ -21,6 +24,26 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
 
   @JvmField
   val myRegisters = HashMap<Char, Register>()
+
+  init {
+    injector.optionService.addListener(
+      OptionConstants.clipboardName,
+      {
+        val clipboardOptionValue = (injector.optionService.getOptionValue(
+          OptionScope.GLOBAL,
+          OptionConstants.clipboardName,
+          OptionConstants.clipboardName
+        ) as VimString).value
+        when {
+          "unnamed" in clipboardOptionValue -> Companion.defaultRegister = '*'
+          "unnamedplus" in clipboardOptionValue -> Companion.defaultRegister = '+'
+          else -> Companion.defaultRegister = UNNAMED_REGISTER
+        }
+        Companion.lastRegister = Companion.defaultRegister
+      },
+      true
+    )
+  }
 
   /**
    * Store which register the user wishes to work with.

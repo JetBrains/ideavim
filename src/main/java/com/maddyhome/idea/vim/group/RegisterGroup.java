@@ -23,16 +23,10 @@ import com.intellij.openapi.components.RoamingType;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.diagnostic.Logger;
-import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.helper.StringHelper;
-import com.maddyhome.idea.vim.options.OptionChangeListener;
-import com.maddyhome.idea.vim.options.OptionConstants;
-import com.maddyhome.idea.vim.options.OptionScope;
 import com.maddyhome.idea.vim.register.Register;
 import com.maddyhome.idea.vim.register.VimRegisterGroupBase;
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType;
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -52,31 +46,6 @@ import java.util.List;
 public class RegisterGroup extends VimRegisterGroupBase implements PersistentStateComponent<Element> {
 
   private static final Logger logger = Logger.getInstance(RegisterGroup.class);
-
-  public RegisterGroup() {
-
-    VimPlugin.getOptionService().addListener(
-      OptionConstants.clipboardName,
-      new OptionChangeListener<VimDataType>() {
-        @Override
-        public void processGlobalValueChange(@Nullable VimDataType oldValue) {
-          String clipboardOptionValue = ((VimString) VimPlugin.getOptionService()
-            .getOptionValue(OptionScope.GLOBAL.INSTANCE, OptionConstants.clipboardName, OptionConstants.clipboardName)).getValue();
-          if (clipboardOptionValue.contains("unnamed")) {
-            defaultRegister = '*';
-          }
-          else if (clipboardOptionValue.contains("unnamedplus")) {
-            defaultRegister = '+';
-          }
-          else {
-            defaultRegister = UNNAMED_REGISTER;
-          }
-          lastRegister = defaultRegister;
-        }
-      },
-      true
-    );
-  }
 
   public void saveData(final @NotNull Element element) {
     logger.debug("Save registers data");
