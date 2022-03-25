@@ -66,10 +66,10 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
           OptionConstants.clipboardName,
           OptionConstants.clipboardName
         ) as VimString).value
-        when {
-          "unnamed" in clipboardOptionValue -> defaultRegisterChar = '*'
-          "unnamedplus" in clipboardOptionValue -> defaultRegisterChar = '+'
-          else -> defaultRegisterChar = UNNAMED_REGISTER
+        defaultRegisterChar = when {
+          "unnamed" in clipboardOptionValue -> '*'
+          "unnamedplus" in clipboardOptionValue -> '+'
+          else -> UNNAMED_REGISTER
         }
         lastRegisterChar = defaultRegisterChar
       },
