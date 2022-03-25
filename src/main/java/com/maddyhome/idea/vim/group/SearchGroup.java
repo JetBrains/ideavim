@@ -36,13 +36,15 @@ import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.util.Trinity;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.register.VimRegisterGroupBase;
 import com.maddyhome.idea.vim.common.CharacterPosition;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.ex.ranges.LineRange;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
+import com.maddyhome.idea.vim.options.OptionChangeListener;
+import com.maddyhome.idea.vim.options.OptionConstants;
+import com.maddyhome.idea.vim.options.OptionScope;
 import com.maddyhome.idea.vim.regexp.CharPointer;
 import com.maddyhome.idea.vim.regexp.CharacterClasses;
 import com.maddyhome.idea.vim.regexp.RegExp;
@@ -54,10 +56,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression;
 import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression;
 import com.maddyhome.idea.vim.vimscript.model.functions.handlers.SubmatchFunctionHandler;
-import com.maddyhome.idea.vim.options.OptionChangeListener;
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser;
-import com.maddyhome.idea.vim.options.OptionConstants;
-import com.maddyhome.idea.vim.options.OptionScope;
 import kotlin.Pair;
 import kotlin.jvm.functions.Function1;
 import org.jdom.Element;
@@ -70,6 +69,7 @@ import java.util.*;
 
 import static com.maddyhome.idea.vim.helper.HelperKt.localEditors;
 import static com.maddyhome.idea.vim.helper.SearchHelperKtKt.shouldIgnoreCase;
+import static com.maddyhome.idea.vim.register.RegisterConstants.LAST_SEARCH_REGISTER;
 
 @State(name = "VimSearchSettings", storages = {
   @Storage(value = "$APP_CONFIG$/vim_settings_local.xml", roamingType = RoamingType.DISABLED)
@@ -189,7 +189,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
     }
 
     // Vim never actually sets this register, but looks it up on request
-    VimPlugin.getRegister().storeTextSpecial(VimRegisterGroupBase.LAST_SEARCH_REGISTER, pattern);
+    VimPlugin.getRegister().storeTextSpecial(LAST_SEARCH_REGISTER, pattern);
 
     // This will remove an existing entry and add it back to the end, and is expected to do so even if the string value
     // is the same

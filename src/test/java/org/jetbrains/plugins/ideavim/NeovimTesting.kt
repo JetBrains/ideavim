@@ -25,12 +25,19 @@ import com.ensarsarajcic.neovim.java.corerpc.client.ProcessRpcConnection
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.LogicalPosition
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.register.VimRegisterGroupBase
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.CharacterPosition
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.register.RegisterConstants.ALTERNATE_BUFFER_REGISTER
+import com.maddyhome.idea.vim.register.RegisterConstants.BLACK_HOLE_REGISTER
+import com.maddyhome.idea.vim.register.RegisterConstants.CLIPBOARD_REGISTERS
+import com.maddyhome.idea.vim.register.RegisterConstants.CURRENT_FILENAME_REGISTER
+import com.maddyhome.idea.vim.register.RegisterConstants.EXPRESSION_BUFFER_REGISTER
+import com.maddyhome.idea.vim.register.RegisterConstants.LAST_INSERTED_TEXT_REGISTER
+import com.maddyhome.idea.vim.register.RegisterConstants.LAST_SEARCH_REGISTER
+import com.maddyhome.idea.vim.register.RegisterConstants.VALID_REGISTERS
 import org.junit.Assert.assertEquals
 
 internal object NeovimTesting {
@@ -152,16 +159,16 @@ internal object NeovimTesting {
   }
 
   private const val nonCheckingRegisters =
-    VimRegisterGroupBase.CLIPBOARD_REGISTERS +
-      VimRegisterGroupBase.LAST_INSERTED_TEXT_REGISTER +
-      VimRegisterGroupBase.BLACK_HOLE_REGISTER +
-      VimRegisterGroupBase.LAST_SEARCH_REGISTER +
-      VimRegisterGroupBase.ALTERNATE_BUFFER_REGISTER +
-      VimRegisterGroupBase.EXPRESSION_BUFFER_REGISTER +
-      VimRegisterGroupBase.CURRENT_FILENAME_REGISTER
+    CLIPBOARD_REGISTERS +
+      LAST_INSERTED_TEXT_REGISTER +
+      BLACK_HOLE_REGISTER +
+      LAST_SEARCH_REGISTER +
+      ALTERNATE_BUFFER_REGISTER +
+      EXPRESSION_BUFFER_REGISTER +
+      CURRENT_FILENAME_REGISTER
 
   private fun assertRegisters() {
-    for (register in VimRegisterGroupBase.VALID_REGISTERS) {
+    for (register in VALID_REGISTERS) {
       if (register in nonCheckingRegisters) continue
       if (register in VimTestCase.Checks.neoVim.ignoredRegisters) continue
       val neovimRegister = neovimApi.callFunction("getreg", listOf(register)).get().toString()

@@ -23,12 +23,12 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.util.Ref
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.register.VimRegisterGroupBase
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.handler.VimActionHandler
+import com.maddyhome.idea.vim.register.RegisterConstants.LAST_COMMAND_REGISTER
 import com.maddyhome.idea.vim.vimscript.Executor
 
 class PlaybackRegisterAction : VimActionHandler.SingleExecution() {
@@ -43,7 +43,7 @@ class PlaybackRegisterAction : VimActionHandler.SingleExecution() {
     val application = ApplicationManager.getApplication()
     val res = Ref.create(false)
     when {
-      reg == VimRegisterGroupBase.LAST_COMMAND_REGISTER || (reg == '@' && VimPlugin.getMacro().lastRegister == VimRegisterGroupBase.LAST_COMMAND_REGISTER) -> { // No write action
+      reg == LAST_COMMAND_REGISTER || (reg == '@' && VimPlugin.getMacro().lastRegister == LAST_COMMAND_REGISTER) -> { // No write action
         try {
           var i = 0
           while (i < cmd.count) {

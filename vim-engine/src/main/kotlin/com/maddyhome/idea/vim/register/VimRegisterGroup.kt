@@ -23,6 +23,16 @@ import com.maddyhome.idea.vim.common.TextRange
 import javax.swing.KeyStroke
 
 interface VimRegisterGroup {
+
+  /**
+   * Get the last register selected by the user
+   *
+   * @return The register, null if no such register
+   */
+  val lastRegister: Register?
+  val currentRegister: Char
+  val defaultRegister: Char
+
   fun isValid(reg: Char): Boolean
   fun selectRegister(reg: Char): Boolean
   fun resetRegister()
@@ -62,13 +72,4 @@ interface VimRegisterGroup {
   fun setKeys(register: Char, keys: List<KeyStroke>)
   fun setKeys(register: Char, keys: List<KeyStroke>, type: SelectionType)
   fun finishRecording(editor: VimEditor)
-
-  /**
-   * Get the last register selected by the user
-   *
-   * @return The register, null if no such register
-   */
-  val lastRegister: Register?
-  val currentRegister: Char
-  val defaultRegister: Char
 }

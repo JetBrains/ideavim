@@ -42,11 +42,13 @@ import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.util.PsiUtilBase;
 import com.intellij.util.ObjectUtils;
 import com.intellij.util.containers.ContainerUtil;
-import com.maddyhome.idea.vim.*;
+import com.maddyhome.idea.vim.EventFacade;
+import com.maddyhome.idea.vim.KeyHandler;
+import com.maddyhome.idea.vim.RegisterActions;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.*;
 import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.common.IndentConfig;
-import com.maddyhome.idea.vim.register.Register;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.ranges.LineRange;
 import com.maddyhome.idea.vim.group.visual.VimSelection;
@@ -60,10 +62,10 @@ import com.maddyhome.idea.vim.listener.VimInsertListener;
 import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
 import com.maddyhome.idea.vim.newapi.*;
 import com.maddyhome.idea.vim.option.StrictMode;
-import com.maddyhome.idea.vim.register.VimRegisterGroupBase;
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
 import com.maddyhome.idea.vim.options.OptionConstants;
 import com.maddyhome.idea.vim.options.OptionScope;
+import com.maddyhome.idea.vim.register.Register;
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
 import kotlin.Pair;
 import kotlin.text.StringsKt;
 import org.jetbrains.annotations.NonNls;
@@ -75,6 +77,8 @@ import javax.swing.*;
 import java.awt.event.KeyEvent;
 import java.math.BigInteger;
 import java.util.*;
+
+import static com.maddyhome.idea.vim.register.RegisterConstants.LAST_INSERTED_TEXT_REGISTER;
 
 /**
  * Provides all the insert/replace related functionality
@@ -2156,7 +2160,7 @@ public class ChangeGroup implements VimChangeGroup {
         }
       }
     }
-    VimPlugin.getRegister().storeTextSpecial(VimRegisterGroupBase.LAST_INSERTED_TEXT_REGISTER, textToPutRegister.toString());
+    VimPlugin.getRegister().storeTextSpecial(LAST_INSERTED_TEXT_REGISTER, textToPutRegister.toString());
   }
 
   private int oldOffset = -1;
