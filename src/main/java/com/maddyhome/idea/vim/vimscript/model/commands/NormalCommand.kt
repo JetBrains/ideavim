@@ -60,7 +60,7 @@ data class NormalCommand(val ranges: Ranges, val argument: String) : Command.Sin
       CommandState.Mode.VISUAL -> {
         editor.getTopLevelEditor().exitVisualMode()
         if (!rangeUsed) {
-          val selectionStart = VimPlugin.getMark().getMark(editor, '<')!!
+          val selectionStart = VimPlugin.getMark().getMark(editor.vim, '<')!!
           editor.caretModel.moveToLogicalPosition(LogicalPosition(selectionStart.logicalLine, selectionStart.col))
         }
       }

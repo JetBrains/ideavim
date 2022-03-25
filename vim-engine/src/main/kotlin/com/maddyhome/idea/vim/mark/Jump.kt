@@ -16,6 +16,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.common
+package com.maddyhome.idea.vim.mark
 
 data class Jump(var logicalLine: Int, val col: Int, var filepath: String)

@@ -23,6 +23,7 @@ import com.intellij.openapi.editor.EditorModificationUtil
 import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.editor.event.CaretEvent
 import com.intellij.openapi.editor.event.CaretListener
+import com.intellij.openapi.vfs.VirtualFileManager
 import com.maddyhome.idea.vim.api.LineDeleteShift
 import com.maddyhome.idea.vim.api.MutableLinearEditor
 import com.maddyhome.idea.vim.api.VimCaret
@@ -232,6 +233,14 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
 
   override fun removeSelection() {
     editor.selectionModel.removeSelection()
+  }
+
+  override fun getPath(): String? {
+    return EditorHelper.getVirtualFile(editor)?.path
+  }
+
+  override fun extractProtocol(): String? {
+    return EditorHelper.getVirtualFile(editor)?.getUrl()?.let { VirtualFileManager.extractProtocol(it) }
   }
 
   private fun Pair<Offset, Offset>.noGuard(editor: Editor): Boolean {

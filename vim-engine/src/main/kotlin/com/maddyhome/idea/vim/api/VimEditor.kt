@@ -180,6 +180,9 @@ interface VimEditor {
   fun isDisposed(): Boolean
 
   fun removeSelection()
+
+  fun getPath(): String?
+  fun extractProtocol(): String?
 }
 
 interface MutableVimEditor : VimEditor {

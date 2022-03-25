@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.vimLine
 import com.maddyhome.idea.vim.helper.vimSelectionStart
 import com.maddyhome.idea.vim.newapi.IjVimEditor
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
@@ -131,7 +132,7 @@ private fun variableToPosition(editor: Editor, variable: VimDataType, dollarForL
 
   // Mark
   if (name.length >= 2 && name[0] == '\'') {
-    val mark = VimPlugin.getMark().getMark(editor, name[1]) ?: return null
+    val mark = VimPlugin.getMark().getMark(editor.vim, name[1]) ?: return null
     val markLogicalLine = (mark.logicalLine + 1).asVimInt()
     val markLogicalCol = (mark.col + 1).asVimInt()
     return markLogicalLine to markLogicalCol

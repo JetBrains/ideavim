@@ -39,6 +39,7 @@ import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.key.OperatorFunction
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.ClipboardOptionHelper
 import org.jetbrains.annotations.NonNls
 import java.awt.event.KeyEvent
@@ -144,7 +145,7 @@ class VimSurroundExtension : VimExtension {
       ) { // This logic is direct from vim-surround
         val offset = editor.caretModel.offset
         val lineEndOffset = EditorHelper.getLineEndForOffset(editor, offset)
-        val motionEndMark = VimPlugin.getMark().getMark(editor, ']')
+        val motionEndMark = VimPlugin.getMark().getMark(editor.vim, ']')
         val motionEndOffset = if (motionEndMark != null) {
           EditorHelper.getOffset(editor, motionEndMark.logicalLine, motionEndMark.col)
         } else -1

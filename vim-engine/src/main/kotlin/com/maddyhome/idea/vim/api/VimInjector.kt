@@ -32,6 +32,8 @@ interface VimInjector {
   val exEntryPanel: ExEntryPanel
   val clipboardManager: VimClipboardManager
 
+  val searchHelper: VimSearchHelper
+
   /**
    * Please use vimLogger() function
    */

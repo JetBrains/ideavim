@@ -43,11 +43,10 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.VimEditor;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
-import com.maddyhome.idea.vim.common.*;
+import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.HelperKt;
-import com.maddyhome.idea.vim.helper.SearchHelper;
-import com.maddyhome.idea.vim.mark.VimMarkGroupBase;
+import com.maddyhome.idea.vim.mark.*;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.options.OptionConstants;
 import com.maddyhome.idea.vim.options.OptionScope;
@@ -84,81 +83,12 @@ public class MarkGroup extends VimMarkGroupBase implements PersistentStateCompon
   }
 
   public void saveJumpLocation(@NotNull Editor editor) {
-    addJump(editor, true);
+    addJump(new IjVimEditor(editor), true);
     setMark(editor, '\'');
 
     Project project = editor.getProject();
     if (project != null) {
       IdeDocumentHistory.getInstance(project).includeCurrentCommandAsNavigation();
-    }
-  }
-
-  /**
-   * Gets the requested mark for the editor
-   *
-   * @param editor The editor to get the mark for
-   * @param ch     The desired mark
-   * @return The requested mark if set, null if not set
-   */
-  public @Nullable Mark getMark(@NotNull Editor editor, char ch) {
-    Mark mark = null;
-    if (ch == '`') ch = '\'';
-
-    // Make sure this is a valid mark
-    if (VALID_GET_MARKS.indexOf(ch) < 0) return null;
-
-    VirtualFile vf = EditorHelper.getVirtualFile(editor);
-    if ("{}".indexOf(ch) >= 0 && vf != null) {
-      int offset = SearchHelper.findNextParagraph(editor, editor.getCaretModel().getPrimaryCaret(), ch == '{' ? -1 : 1,
-                                                  false);
-      offset = EditorHelper.normalizeOffset(editor, offset, false);
-      LogicalPosition lp = editor.offsetToLogicalPosition(offset);
-      mark = new VimMark(ch, lp.line, lp.column, vf.getPath(), extractProtocol(vf));
-    }
-    else if ("()".indexOf(ch) >= 0 && vf != null) {
-      int offset = SearchHelper.findNextSentenceStart(editor, editor.getCaretModel().getPrimaryCaret(),
-                                                      ch == '(' ? -1 : 1, false, true);
-      offset = EditorHelper.normalizeOffset(editor, offset, false);
-      LogicalPosition lp = editor.offsetToLogicalPosition(offset);
-      mark = new VimMark(ch, lp.line, lp.column, vf.getPath(), extractProtocol(vf));
-    }
-    // If this is a file mark, get the mark from this file
-    else if (FILE_MARKS.indexOf(ch) >= 0) {
-      final HashMap<Character, Mark> fmarks = getFileMarks(editor.getDocument());
-      if (fmarks != null) {
-        mark = fmarks.get(ch);
-        if (mark != null && mark.isClear()) {
-          fmarks.remove(ch);
-          mark = null;
-        }
-      }
-    }
-    // This is a mark from another file
-    else if (GLOBAL_MARKS.indexOf(ch) >= 0) {
-      mark = globalMarks.get(ch);
-      if (mark != null && mark.isClear()) {
-        globalMarks.remove(ch);
-        mark = null;
-      }
-    }
-
-    return mark;
-  }
-
-  /**
-   * Get the requested jump.
-   *
-   * @param count Postive for next jump (Ctrl-I), negative for previous jump (Ctrl-O).
-   * @return The jump or null if out of range.
-   */
-  public @Nullable Jump getJump(int count) {
-    int index = jumps.size() - 1 - (jumpSpot - count);
-    if (index < 0 || index >= jumps.size()) {
-      return null;
-    }
-    else {
-      jumpSpot -= count;
-      return jumps.get(index);
     }
   }
 
@@ -267,50 +197,14 @@ public class MarkGroup extends VimMarkGroupBase implements PersistentStateCompon
   }
 
   private @Nullable TextRange getMarksRange(@NotNull Editor editor, char startMark, char endMark) {
-    final Mark start = getMark(editor, startMark);
-    final Mark end = getMark(editor, endMark);
+    final Mark start = getMark(new IjVimEditor(editor), startMark);
+    final Mark end = getMark(new IjVimEditor(editor), endMark);
     if (start != null && end != null) {
       final int startOffset = EditorHelper.getOffset(editor, start.getLogicalLine(), start.getCol());
       final int endOffset = EditorHelper.getOffset(editor, end.getLogicalLine(), end.getCol());
       return new TextRange(startOffset, endOffset+1);
     }
     return null;
-  }
-
-  public void addJump(@NotNull Editor editor, boolean reset) {
-    addJump(editor, editor.getCaretModel().getOffset(), reset);
-  }
-
-  private void addJump(@NotNull Editor editor, int offset, boolean reset) {
-    final VirtualFile vf = EditorHelper.getVirtualFile(editor);
-    if (vf == null) {
-      return;
-    }
-
-    LogicalPosition lp = editor.offsetToLogicalPosition(offset);
-    Jump jump = new Jump(lp.line, lp.column, vf.getPath());
-    final String filename = jump.getFilepath();
-
-    for (int i = 0; i < jumps.size(); i++) {
-      Jump j = jumps.get(i);
-      if (filename.equals(j.getFilepath()) && j.getLogicalLine() == jump.getLogicalLine()) {
-        jumps.remove(i);
-        break;
-      }
-    }
-
-    jumps.add(jump);
-
-    if (reset) {
-      jumpSpot = -1;
-    }
-    else {
-      jumpSpot++;
-    }
-
-    if (jumps.size() > SAVE_JUMP_COUNT) {
-      jumps.remove(0);
-    }
   }
 
   public void resetAllMarks() {
@@ -396,23 +290,6 @@ public class MarkGroup extends VimMarkGroupBase implements PersistentStateCompon
     return res;
   }
 
-  /**
-   * Gets the map of marks for the specified file
-   *
-   * @param filename The file to get the marks for
-   * @return The map of marks. The keys are <code>Character</code>s of the mark names, the values are
-   *         <code>Mark</code>s.
-   */
-  private FileMarks<Character, Mark> getFileMarks(String filename) {
-    FileMarks<Character, Mark> marks = fileMarks.get(filename);
-    if (marks == null) {
-      marks = new FileMarks<>();
-      fileMarks.put(filename, marks);
-    }
-
-    return marks;
-  }
-
   public void saveData(@NotNull Element element) {
     Element marksElem = new Element("globalmarks");
     if (!VimPlugin.getOptionService().isSet(OptionScope.GLOBAL.INSTANCE, OptionConstants.ideamarksName, OptionConstants.ideamarksName)) {
@@ -436,7 +313,7 @@ public class MarkGroup extends VimMarkGroupBase implements PersistentStateCompon
     Element fileMarksElem = new Element("filemarks");
 
     List<FileMarks<Character, Mark>> files = new ArrayList<>(fileMarks.values());
-    files.sort(Comparator.comparing(o -> o.timestamp));
+    files.sort(Comparator.comparing(o -> o.getMyTimestamp()));
 
     if (files.size() > SAVE_MARK_COUNT) {
       files = files.subList(files.size() - SAVE_MARK_COUNT, files.size());
@@ -451,7 +328,7 @@ public class MarkGroup extends VimMarkGroupBase implements PersistentStateCompon
       if (marks.size() > 0) {
         Element fileMarkElem = new Element("file");
         fileMarkElem.setAttribute("name", file);
-        fileMarkElem.setAttribute("timestamp", Long.toString(marks.timestamp.getTime()));
+        fileMarkElem.setAttribute("timestamp", Long.toString(marks.getMyTimestamp().getTime()));
         for (Mark mark : marks.values()) {
           if (!mark.isClear() && !Character.isUpperCase(mark.getKey()) &&
               SAVE_FILE_MARKS.indexOf(mark.getKey()) >= 0) {
@@ -660,20 +537,6 @@ public class MarkGroup extends VimMarkGroupBase implements PersistentStateCompon
     readData(state);
   }
 
-  private static class FileMarks<K, V> extends HashMap<K, V> {
-    public void setTimestamp(Date timestamp) {
-      this.timestamp = timestamp;
-    }
-
-    @Override
-    public V put(K key, V value) {
-      timestamp = new Date();
-      return super.put(key, value);
-    }
-
-    private Date timestamp = new Date();
-  }
-
   /**
    * This class is used to listen to editor document changes
    */
@@ -789,13 +652,7 @@ public class MarkGroup extends VimMarkGroupBase implements PersistentStateCompon
     }
   }
 
-  private final @NotNull HashMap<String, FileMarks<Character, Mark>> fileMarks = new HashMap<>();
-  private final @NotNull HashMap<Character, Mark> globalMarks = new HashMap<>();
-  private final @NotNull List<Jump> jumps = new ArrayList<>();
-  private int jumpSpot = -1;
-
   private static final int SAVE_MARK_COUNT = 20;
-  private static final int SAVE_JUMP_COUNT = 100;
 
   private static final Logger logger = Logger.getInstance(MarkGroup.class.getName());
 }

@@ -21,7 +21,8 @@ package org.jetbrains.plugins.ideavim.action;
 import com.google.common.collect.Lists;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
-import com.maddyhome.idea.vim.common.Mark;
+import com.maddyhome.idea.vim.mark.Mark;
+import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import org.jetbrains.plugins.ideavim.SkipNeovimReason;
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim;
 import org.jetbrains.plugins.ideavim.VimTestCase;
@@ -35,7 +36,7 @@ public class MarkTest extends VimTestCase {
   // |m|
   public void testLocalMark() {
     typeTextInFile(parseKeys("ma"), "    foo\n" + "    ba<caret>r\n" + "    baz\n");
-    Mark mark = VimPlugin.getMark().getMark(myFixture.getEditor(), 'a');
+    Mark mark = VimPlugin.getMark().getMark(new IjVimEditor(myFixture.getEditor()), 'a');
     assertNotNull(mark);
     assertEquals(1, mark.getLogicalLine());
     assertEquals(6, mark.getCol());
@@ -44,7 +45,7 @@ public class MarkTest extends VimTestCase {
   // |m|
   public void testGlobalMark() {
     typeTextInFile(parseKeys("mG"), "    foo\n" + "    ba<caret>r\n" + "    baz\n");
-    Mark mark = VimPlugin.getMark().getMark(myFixture.getEditor(), 'G');
+    Mark mark = VimPlugin.getMark().getMark(new IjVimEditor(myFixture.getEditor()), 'G');
     assertNotNull(mark);
     assertEquals(1, mark.getLogicalLine());
     assertEquals(6, mark.getCol());
@@ -53,28 +54,28 @@ public class MarkTest extends VimTestCase {
   // |m|
   public void testMarkIsDeletedWhenLineIsDeleted() {
     typeTextInFile(parseKeys("mx", "dd"), "    foo\n" + "    ba<caret>r\n" + "    baz\n");
-    Mark mark = VimPlugin.getMark().getMark(myFixture.getEditor(), 'x');
+    Mark mark = VimPlugin.getMark().getMark(new IjVimEditor(myFixture.getEditor()), 'x');
     assertNull(mark);
   }
 
   // |m|
   public void testMarkIsNotDeletedWhenLineIsOneCharAndReplaced() {
     typeTextInFile(parseKeys("ma", "r1"), "foo\n" + "<caret>0\n" + "bar\n");
-    Mark mark = VimPlugin.getMark().getMark(myFixture.getEditor(), 'a');
+    Mark mark = VimPlugin.getMark().getMark(new IjVimEditor(myFixture.getEditor()), 'a');
     assertNotNull(mark);
   }
 
   // |m|
   public void testMarkIsNotDeletedWhenLineIsChanged() {
     typeTextInFile(parseKeys("ma", "cc"), "    foo\n" + "    ba<caret>r\n" + "    baz\n");
-    Mark mark = VimPlugin.getMark().getMark(myFixture.getEditor(), 'a');
+    Mark mark = VimPlugin.getMark().getMark(new IjVimEditor(myFixture.getEditor()), 'a');
     assertNotNull(mark);
   }
 
   // |m|
   public void testMarkIsMovedUpWhenLinesArePartiallyDeletedAbove() {
     typeTextInFile(parseKeys("mx", "2k", "dd", "0dw"), "    foo\n" + "    bar\n" + "    ba<caret>z\n");
-    Mark mark = VimPlugin.getMark().getMark(myFixture.getEditor(), 'x');
+    Mark mark = VimPlugin.getMark().getMark(new IjVimEditor(myFixture.getEditor()), 'x');
     assertNotNull(mark);
     assertEquals(1, mark.getLogicalLine());
     assertEquals(6, mark.getCol());
@@ -83,7 +84,7 @@ public class MarkTest extends VimTestCase {
   // |m|
   public void testMarkIsMovedUpWhenLinesAreDeletedAbove() {
     typeTextInFile(parseKeys("mx", "2k", "2dd"), "    foo\n" + "    bar\n" + "    ba<caret>z\n");
-    Mark mark = VimPlugin.getMark().getMark(myFixture.getEditor(), 'x');
+    Mark mark = VimPlugin.getMark().getMark(new IjVimEditor(myFixture.getEditor()), 'x');
     assertNotNull(mark);
     assertEquals(0, mark.getLogicalLine());
     assertEquals(6, mark.getCol());
@@ -92,7 +93,7 @@ public class MarkTest extends VimTestCase {
   // |m|
   public void testMarkIsMovedDownWhenLinesAreInsertedAbove() {
     typeTextInFile(parseKeys("mY", "Obiff"), "foo\n" + "ba<caret>r\n" + "baz\n");
-    Mark mark = VimPlugin.getMark().getMark(myFixture.getEditor(), 'Y');
+    Mark mark = VimPlugin.getMark().getMark(new IjVimEditor(myFixture.getEditor()), 'Y');
     assertNotNull(mark);
     assertEquals(2, mark.getLogicalLine());
     assertEquals(2, mark.getCol());
@@ -101,7 +102,7 @@ public class MarkTest extends VimTestCase {
   // |m|
   public void testMarkIsMovedDownWhenLinesAreInsertedAboveWithIndentation() {
     typeTextInFile(parseKeys("mY", "Obiff"), "    foo\n" + "    ba<caret>r\n" + "    baz\n");
-    Mark mark = VimPlugin.getMark().getMark(myFixture.getEditor(), 'Y');
+    Mark mark = VimPlugin.getMark().getMark(new IjVimEditor(myFixture.getEditor()), 'Y');
     assertNotNull(mark);
     assertEquals(2, mark.getLogicalLine());
     assertEquals(6, mark.getCol());

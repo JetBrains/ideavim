@@ -31,9 +31,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.MappingMode
-import com.maddyhome.idea.vim.common.Mark
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.common.VimMark
 import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.executeNormalWithoutMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.getRegister
@@ -50,6 +48,8 @@ import com.maddyhome.idea.vim.helper.moveToInlayAwareLogicalPosition
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.key.OperatorFunction
+import com.maddyhome.idea.vim.mark.Mark
+import com.maddyhome.idea.vim.mark.VimMark
 import com.maddyhome.idea.vim.mark.VimMarkConstants
 import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.annotations.NonNls
@@ -331,7 +331,7 @@ class VimExchangeExtension : VimExtension {
             Pair(VimMarkConstants.MARK_CHANGE_START, VimMarkConstants.MARK_CHANGE_END)
           }
         val marks = VimPlugin.getMark()
-        return Pair(marks.getMark(editor, startMark)!!, marks.getMark(editor, endMark)!!)
+        return Pair(marks.getMark(editor.vim, startMark)!!, marks.getMark(editor.vim, endMark)!!)
       }
 
       val unnRegText = getRegister('"')
@@ -367,7 +367,7 @@ class VimExchangeExtension : VimExtension {
       setRegister('*', starRegText)
       setRegister('+', plusRegText)
 
-      return if (selectionStart.offset(editor) <= selectionEnd.offset(editor)) {
+      return if (selectionStart.offset(editor.vim) <= selectionEnd.offset(editor.vim)) {
         Exchange(selectionType.toSubMode(), selectionStart, selectionEnd, text)
       } else {
         Exchange(selectionType.toSubMode(), selectionEnd, selectionStart, text)

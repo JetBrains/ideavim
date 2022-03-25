@@ -29,6 +29,7 @@ import com.maddyhome.idea.vim.mark.VimMarkConstants.DEL_MARKS
 import com.maddyhome.idea.vim.mark.VimMarkConstants.RO_GLOBAL_MARKS
 import com.maddyhome.idea.vim.mark.VimMarkConstants.WR_GLOBAL_MARKS
 import com.maddyhome.idea.vim.mark.VimMarkConstants.WR_REGULAR_FILE_MARKS
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 private val VIML_COMMENT = Regex("(?<!\\\\)\".*")
@@ -73,7 +74,7 @@ data class DeleteMarksCommand(val ranges: Ranges, val argument: String) : Comman
 private fun deleteMark(editor: Editor, character: Char) {
   if (character != ' ') {
     val markGroup = VimPlugin.getMark()
-    val mark = markGroup.getMark(editor, character) ?: return
+    val mark = markGroup.getMark(editor.vim, character) ?: return
     markGroup.removeMark(character, mark)
   }
 }

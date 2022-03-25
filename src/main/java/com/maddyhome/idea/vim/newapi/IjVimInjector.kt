@@ -16,10 +16,9 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimEnabler
 import com.maddyhome.idea.vim.api.VimInjector
 import com.maddyhome.idea.vim.api.VimKeyGroup
-import com.maddyhome.idea.vim.mark.VimMarkGroup
 import com.maddyhome.idea.vim.api.VimMessages
 import com.maddyhome.idea.vim.api.VimProcessGroup
-import com.maddyhome.idea.vim.register.VimRegisterGroup
+import com.maddyhome.idea.vim.api.VimSearchHelper
 import com.maddyhome.idea.vim.api.VimStringParser
 import com.maddyhome.idea.vim.api.VimVisualMotionGroup
 import com.maddyhome.idea.vim.command.CommandState
@@ -30,7 +29,9 @@ import com.maddyhome.idea.vim.helper.IjActionExecutor
 import com.maddyhome.idea.vim.helper.IjEditorHelper
 import com.maddyhome.idea.vim.helper.IjVimStringParser
 import com.maddyhome.idea.vim.helper.vimCommandState
+import com.maddyhome.idea.vim.mark.VimMarkGroup
 import com.maddyhome.idea.vim.options.OptionService
+import com.maddyhome.idea.vim.register.VimRegisterGroup
 
 class IjVimInjector : VimInjector {
   override fun <T : Any> getLogger(clazz: Class<T>): VimLogger = IjVimLogger(Logger.getInstance(clazz::class.java))
@@ -41,6 +42,8 @@ class IjVimInjector : VimInjector {
     get() = service<IjExEntryPanel>()
   override val clipboardManager: VimClipboardManager
     get() = service<IjClipboardManager>()
+  override val searchHelper: VimSearchHelper
+    get() = service<IjVimSearchHelper>()
   override val nativeActionManager: NativeActionManager
     get() = service<IjNativeActionManager>()
   override val messages: VimMessages

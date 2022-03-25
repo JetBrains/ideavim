@@ -34,8 +34,8 @@ import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.motion.leftright.TillCharacterMotionType;
 import com.maddyhome.idea.vim.command.*;
-import com.maddyhome.idea.vim.common.Jump;
-import com.maddyhome.idea.vim.common.Mark;
+import com.maddyhome.idea.vim.mark.Jump;
+import com.maddyhome.idea.vim.mark.Mark;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
 import com.maddyhome.idea.vim.group.visual.VimSelection;
@@ -1006,7 +1006,7 @@ public class MotionGroup {
   }
 
   public int moveCaretToMark(@NotNull Editor editor, char ch, boolean toLineStart) {
-    final Mark mark = VimPlugin.getMark().getMark(editor, ch);
+    final Mark mark = VimPlugin.getMark().getMark(new IjVimEditor(editor), ch);
     if (mark == null) return -1;
 
     final VirtualFile vf = getVirtualFile(editor);
@@ -1056,7 +1056,7 @@ public class MotionGroup {
       final Editor newEditor = selectEditor(editor, newFile);
       if (newEditor != null) {
         if (spot == -1) {
-          VimPlugin.getMark().addJump(editor, false);
+          VimPlugin.getMark().addJump(new IjVimEditor(editor), false);
         }
         moveCaret(newEditor, newEditor.getCaretModel().getCurrentCaret(),
                   normalizeOffset(newEditor, newEditor.logicalPositionToOffset(lp), false));
@@ -1066,7 +1066,7 @@ public class MotionGroup {
     }
     else {
       if (spot == -1) {
-        VimPlugin.getMark().addJump(editor, false);
+        VimPlugin.getMark().addJump(new IjVimEditor(editor), false);
       }
 
       return editor.logicalPositionToOffset(lp);

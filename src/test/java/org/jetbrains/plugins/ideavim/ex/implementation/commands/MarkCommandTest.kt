@@ -19,6 +19,7 @@
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.newapi.vim
 import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.VimTestCase
 
@@ -35,7 +36,7 @@ class MarkCommandTest : VimTestCase() {
                        """.trimMargin()
     )
     typeText(commandToKeys("mark a"))
-    VimPlugin.getMark().getMark(myFixture.editor, 'a')?.let {
+    VimPlugin.getMark().getMark(myFixture.editor.vim, 'a')?.let {
       assertEquals(2, it.logicalLine)
       assertEquals(0, it.col)
     } ?: TestCase.fail("Mark is null")
@@ -50,7 +51,7 @@ class MarkCommandTest : VimTestCase() {
                        """.trimMargin()
     )
     typeText(commandToKeys("mark G"))
-    VimPlugin.getMark().getMark(myFixture.editor, 'G')?.let {
+    VimPlugin.getMark().getMark(myFixture.editor.vim, 'G')?.let {
       assertEquals(2, it.logicalLine)
       assertEquals(0, it.col)
     } ?: TestCase.fail("Mark is null")
@@ -65,7 +66,7 @@ class MarkCommandTest : VimTestCase() {
                        """.trimMargin()
     )
     typeText(commandToKeys("k a"))
-    VimPlugin.getMark().getMark(myFixture.editor, 'a')?.let {
+    VimPlugin.getMark().getMark(myFixture.editor.vim, 'a')?.let {
       assertEquals(2, it.logicalLine)
       assertEquals(0, it.col)
     } ?: TestCase.fail("Mark is null")
@@ -80,7 +81,7 @@ class MarkCommandTest : VimTestCase() {
                        """.trimMargin()
     )
     typeText(commandToKeys("1,2 mark a"))
-    VimPlugin.getMark().getMark(myFixture.editor, 'a')?.let {
+    VimPlugin.getMark().getMark(myFixture.editor.vim, 'a')?.let {
       assertEquals(1, it.logicalLine)
       assertEquals(0, it.col)
     } ?: TestCase.fail("Mark is null")

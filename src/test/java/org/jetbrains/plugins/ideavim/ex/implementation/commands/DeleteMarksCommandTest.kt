@@ -20,7 +20,8 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.intellij.openapi.editor.LogicalPosition
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.common.Mark
+import com.maddyhome.idea.vim.mark.Mark
+import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -55,7 +56,7 @@ class DeleteMarksCommandTest : VimTestCase() {
   }
 
   private fun getMark(ch: Char): Mark? {
-    return VimPlugin.getMark().getMark(myFixture.editor, ch)
+    return VimPlugin.getMark().getMark(myFixture.editor.vim, ch)
   }
 
   fun `test delete single mark`() {
