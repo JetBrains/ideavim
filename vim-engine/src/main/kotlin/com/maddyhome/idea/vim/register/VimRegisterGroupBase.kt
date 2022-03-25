@@ -30,13 +30,13 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
   protected var recordList: MutableList<KeyStroke>? = null
 
   @JvmField
-  val myRegisters = HashMap<Char, Register>()
+  protected val myRegisters = HashMap<Char, Register>()
 
   @JvmField
-  var defaultRegisterChar = UNNAMED_REGISTER
+  protected var defaultRegisterChar = UNNAMED_REGISTER
 
   @JvmField
-  var lastRegisterChar = defaultRegisterChar
+  protected var lastRegisterChar = defaultRegisterChar
 
   /**
    * Gets the last register name selected by the user
