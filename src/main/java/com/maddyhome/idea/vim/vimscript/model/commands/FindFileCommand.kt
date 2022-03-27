@@ -22,8 +22,8 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 

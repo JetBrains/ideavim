@@ -21,10 +21,10 @@ package com.maddyhome.idea.vim.action.motion.scroll
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
-import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim
 
 /**

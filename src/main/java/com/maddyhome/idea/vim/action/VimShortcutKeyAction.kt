@@ -50,11 +50,11 @@ import com.maddyhome.idea.vim.listener.AceJumpService
 import com.maddyhome.idea.vim.listener.AppCodeTemplates.appCodeTemplateCaptured
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.options.OptionChangeListener
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
-import com.maddyhome.idea.vim.options.OptionChangeListener
 import java.awt.event.InputEvent
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke

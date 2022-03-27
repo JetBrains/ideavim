@@ -20,10 +20,10 @@ package com.maddyhome.idea.vim.handler
 
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.group.MotionGroup
-import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim
 
 /**

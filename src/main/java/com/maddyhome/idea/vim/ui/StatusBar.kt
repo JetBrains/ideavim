@@ -46,11 +46,11 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.group.NotificationService
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.icons.VimIcons
+import com.maddyhome.idea.vim.options.OptionChangeListener
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
-import com.maddyhome.idea.vim.options.OptionChangeListener
 import org.jetbrains.annotations.NonNls
 import java.awt.Point
 import java.awt.event.MouseEvent

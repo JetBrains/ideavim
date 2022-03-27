@@ -26,10 +26,10 @@ import com.intellij.openapi.actionSystem.IdeActions.ACTION_EXPAND_ALL_REGIONS
 import com.intellij.openapi.actionSystem.IdeActions.ACTION_EXPAND_REGION
 import com.intellij.openapi.actionSystem.IdeActions.ACTION_EXPAND_REGION_RECURSIVELY
 import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
-import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim
 
 class VimCollapseAllRegions : VimActionHandler.SingleExecution() {

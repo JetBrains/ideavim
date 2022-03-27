@@ -4,7 +4,7 @@ import com.intellij.openapi.components.Service
 import com.maddyhome.idea.vim.api.ExEntryPanel
 
 @Service
-class IjExEntryPanel: ExEntryPanel {
+class IjExEntryPanel : ExEntryPanel {
   override fun isActive(): Boolean {
     return com.maddyhome.idea.vim.ui.ex.ExEntryPanel.getInstance().isActive
   }

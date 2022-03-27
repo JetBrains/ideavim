@@ -22,13 +22,13 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.IdeActions
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.action.ComplicatedKeysAction
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.IdeActionHandler
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
-import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim
 import java.awt.event.KeyEvent
 import java.util.*
