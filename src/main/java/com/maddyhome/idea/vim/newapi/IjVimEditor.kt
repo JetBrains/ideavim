@@ -21,6 +21,7 @@ package com.maddyhome.idea.vim.newapi
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorModificationUtil
 import com.intellij.openapi.editor.LogicalPosition
+import com.intellij.openapi.editor.ScrollType
 import com.intellij.openapi.editor.VisualPosition
 import com.intellij.openapi.editor.event.CaretEvent
 import com.intellij.openapi.editor.event.CaretListener
@@ -32,9 +33,11 @@ import com.maddyhome.idea.vim.api.VimCaretListener
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimLogicalPosition
 import com.maddyhome.idea.vim.api.VimVisualPosition
+import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.EditorLine
 import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.common.Pointer
+import com.maddyhome.idea.vim.common.VimScrollType
 import com.maddyhome.idea.vim.common.offset
 import com.maddyhome.idea.vim.group.visual.vimSetSystemBlockSelectionSilently
 import com.maddyhome.idea.vim.helper.EditorHelper
@@ -45,6 +48,7 @@ import com.maddyhome.idea.vim.helper.getTopLevelEditor
 import com.maddyhome.idea.vim.helper.inBlockSubMode
 import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
 import com.maddyhome.idea.vim.helper.updateCaretsVisualPosition
+import com.maddyhome.idea.vim.helper.vimLastSelectionType
 
 class IjVimEditor(editor: Editor) : MutableLinearEditor() {
 
@@ -257,6 +261,23 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
 
   override fun exitVisualModeNative() {
     this.editor.exitVisualMode()
+  }
+
+  override var vimLastSelectionType: SelectionType?
+    get() = editor.vimLastSelectionType
+    set(value) {
+      editor.vimLastSelectionType = value
+    }
+
+  override fun scrollToCaret(type: VimScrollType) {
+    val scrollType = when (type) {
+      VimScrollType.RELATIVE -> ScrollType.RELATIVE
+      VimScrollType.CENTER -> ScrollType.CENTER
+      VimScrollType.MAKE_VISIBLE -> ScrollType.MAKE_VISIBLE
+      VimScrollType.CENTER_UP -> ScrollType.CENTER_UP
+      VimScrollType.CENTER_DOWN -> ScrollType.CENTER_DOWN
+    }
+    editor.scrollingModel.scrollToCaret(scrollType)
   }
 
   private fun Pair<Offset, Offset>.noGuard(editor: Editor): Boolean {

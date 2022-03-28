@@ -19,18 +19,14 @@
 package com.maddyhome.idea.vim.group.visual
 
 import com.intellij.find.FindManager
-import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.LogicalPosition
-import com.intellij.openapi.editor.ScrollType
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimMotionGroupBase
-import com.maddyhome.idea.vim.api.VimVisualMotionGroup
+import com.maddyhome.idea.vim.api.VimVisualMotionGroupBase
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.command.SelectionType
-import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.commandState
@@ -41,7 +37,6 @@ import com.maddyhome.idea.vim.helper.pushVisualMode
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.helper.vimForEachCaret
 import com.maddyhome.idea.vim.helper.vimLastColumn
-import com.maddyhome.idea.vim.helper.vimLastSelectionType
 import com.maddyhome.idea.vim.helper.vimLastVisualOperatorRange
 import com.maddyhome.idea.vim.helper.vimSelectionStart
 import com.maddyhome.idea.vim.newapi.ij
@@ -53,66 +48,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 /**
  * @author Alex Plate
  */
-class VisualMotionGroup : VimVisualMotionGroup {
-  fun selectPreviousVisualMode(editor: Editor): Boolean {
-    val lastSelectionType = editor.vimLastSelectionType ?: return false
-    val visualMarks = VimPlugin.getMark().getVisualSelectionMarks(editor.vim) ?: return false
-
-    editor.caretModel.removeSecondaryCarets()
-
-    editor.vim.commandState.pushModes(CommandState.Mode.VISUAL, lastSelectionType.toSubMode())
-
-    val primaryCaret = editor.caretModel.primaryCaret
-    primaryCaret.vimSetSelection(visualMarks.startOffset, visualMarks.endOffset - 1, true)
-
-    editor.scrollingModel.scrollToCaret(ScrollType.CENTER)
-
-    return true
-  }
-
-  fun swapVisualSelections(editor: Editor): Boolean {
-    val lastSelectionType = editor.vimLastSelectionType ?: return false
-
-    val lastVisualRange = VimPlugin.getMark().getVisualSelectionMarks(editor.vim) ?: return false
-    val primaryCaret = editor.caretModel.primaryCaret
-    editor.caretModel.removeSecondaryCarets()
-    val vimSelectionStart = primaryCaret.vimSelectionStart
-
-    editor.vimLastSelectionType = SelectionType.fromSubMode(editor.subMode)
-    VimPlugin.getMark().setVisualSelectionMarks(editor.vim, TextRange(vimSelectionStart, primaryCaret.offset))
-
-    editor.subMode = lastSelectionType.toSubMode()
-    primaryCaret.vimSetSelection(lastVisualRange.startOffset, lastVisualRange.endOffset, true)
-
-    editor.scrollingModel.scrollToCaret(ScrollType.CENTER)
-
-    return true
-  }
-
-  fun swapVisualEnds(editor: Editor, caret: Caret): Boolean {
-    val vimSelectionStart = caret.vimSelectionStart
-    caret.vimSelectionStart = caret.offset
-
-    MotionGroup.moveCaret(editor, caret, vimSelectionStart)
-
-    return true
-  }
-
-  fun swapVisualEndsBigO(editor: Editor): Boolean {
-    val caret = editor.caretModel.primaryCaret
-    val anotherSideCaret = editor.caretModel.allCarets.let { if (it.first() == caret) it.last() else it.first() }
-    val adj = VimPlugin.getVisualMotion().selectionAdj
-
-    if (caret.offset == caret.selectionStart) {
-      caret.vimSelectionStart = anotherSideCaret.selectionStart
-      MotionGroup.moveCaret(editor, caret, caret.selectionEnd - adj)
-    } else {
-      caret.vimSelectionStart = anotherSideCaret.selectionEnd - adj
-      MotionGroup.moveCaret(editor, caret, caret.selectionStart)
-    }
-
-    return true
-  }
+class VisualMotionGroup : VimVisualMotionGroupBase() {
 
   // =============================== ENTER VISUAL and SELECT MODE ==============================================
 

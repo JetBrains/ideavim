@@ -18,11 +18,13 @@
 
 package com.maddyhome.idea.vim.api
 
+import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.EditorLine
 import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.common.OperatedRange
 import com.maddyhome.idea.vim.common.Pointer
 import com.maddyhome.idea.vim.common.VimRange
+import com.maddyhome.idea.vim.common.VimScrollType
 import com.maddyhome.idea.vim.common.offset
 import com.maddyhome.idea.vim.common.pointer
 
@@ -188,6 +190,10 @@ interface VimEditor {
 
   fun exitSelectModeNative(adjustCaret: Boolean)
   fun exitVisualModeNative()
+
+  var vimLastSelectionType: SelectionType?
+
+  fun scrollToCaret(type: VimScrollType)
 }
 
 interface MutableVimEditor : VimEditor {

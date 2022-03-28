@@ -20,11 +20,13 @@ package com.maddyhome.idea.vim.action.motion.visual
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
-import com.maddyhome.idea.vim.helper.vimForEachCaret
+import com.maddyhome.idea.vim.helper.inBlockSubMode
+import com.maddyhome.idea.vim.newapi.IjVimCaret
 import com.maddyhome.idea.vim.newapi.ij
 
 /**
@@ -34,9 +36,68 @@ class VisualSwapEndsAction : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
-  override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
+  override fun execute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
     var ret = true
-    editor.ij.vimForEachCaret { ret = ret and VimPlugin.getVisualMotion().swapVisualEnds(editor.ij, it) }
+    editor.forEachCaret { ret = ret and swapVisualEnds(it) }
     return ret
   }
+}
+
+/**
+ * @author vlan
+ */
+class VisualSwapEndsBlockAction : VimActionHandler.SingleExecution() {
+
+  override val type: Command.Type = Command.Type.OTHER_READONLY
+
+  override fun execute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
+    if (editor.inBlockSubMode) {
+      return swapVisualEndsBigO(editor)
+    }
+
+    var ret = true
+    for (caret in editor.carets()) {
+      ret = ret && swapVisualEnds(caret)
+    }
+    return ret
+  }
+}
+
+private fun swapVisualEnds(caret: VimCaret): Boolean {
+  val vimSelectionStart = caret.vimSelectionStart
+  caret.vimSelectionStart = caret.offset.point
+
+  caret.moveToOffset(vimSelectionStart)
+
+  return true
+}
+
+fun swapVisualEndsBigO(editor: VimEditor): Boolean {
+  val caret = editor.primaryCaret()
+  val ijCaret = (caret as IjVimCaret).caret
+
+  // Here we should not use engine-api. It really should be all carets
+  val anotherSideCaret = editor.ij.caretModel.allCarets.let { if (it.first() == ijCaret) it.last() else it.first() }
+
+  val adj = VimPlugin.getVisualMotion().selectionAdj
+
+  if (caret.offset.point == caret.selectionStart) {
+    caret.vimSelectionStart = anotherSideCaret.selectionStart
+    caret.moveToOffset(caret.selectionEnd - adj)
+  } else {
+    caret.vimSelectionStart = anotherSideCaret.selectionEnd - adj
+    caret.moveToOffset(caret.selectionStart)
+  }
+
+  return true
 }
