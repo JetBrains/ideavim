@@ -65,7 +65,7 @@ open class MotionDownAction : MotionDownBase() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    return VimPlugin.getMotion().moveCaretVertical(editor.ij, caret.ij, operatorArguments.count1).toMotionOrError()
+    return VimPlugin.getMotion().getVerticalMotionOffset(editor, caret, operatorArguments.count1).toMotionOrError()
   }
 }
 
@@ -102,6 +102,6 @@ class MotionDownNotLineWiseAction : MotionDownBase() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    return VimPlugin.getMotion().moveCaretVertical(editor.ij, caret.ij, operatorArguments.count1).toMotionOrError()
+    return VimPlugin.getMotion().getVerticalMotionOffset(editor, caret, operatorArguments.count1).toMotionOrError()
   }
 }

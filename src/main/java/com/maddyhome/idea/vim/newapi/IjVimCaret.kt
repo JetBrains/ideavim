@@ -22,6 +22,7 @@ import com.intellij.openapi.editor.Caret
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.VimVisualPosition
 import com.maddyhome.idea.vim.common.EditorLine
 import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.common.offset
@@ -81,6 +82,11 @@ class IjVimCaret(val caret: Caret) : VimCaret {
 
   override fun vimSetSelection(start: Int, end: Int, moveCaretToSelectionEnd: Boolean) {
     caret.vimSetSelection(start, end, moveCaretToSelectionEnd)
+  }
+
+  override fun getVisualPosition(): VimVisualPosition {
+    val visualPosition = caret.visualPosition
+    return VimVisualPosition(visualPosition.line, visualPosition.column, visualPosition.leansRight)
   }
 
   override fun equals(other: Any?): Boolean = this.caret == (other as? IjVimCaret)?.caret

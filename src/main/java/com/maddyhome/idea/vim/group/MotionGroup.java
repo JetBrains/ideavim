@@ -33,9 +33,11 @@ import com.intellij.util.MathUtil;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.motion.leftright.TillCharacterMotionType;
+import com.maddyhome.idea.vim.api.VimCaret;
+import com.maddyhome.idea.vim.api.VimEditor;
+import com.maddyhome.idea.vim.api.VimInjectorKt;
+import com.maddyhome.idea.vim.api.VimVisualPosition;
 import com.maddyhome.idea.vim.command.*;
-import com.maddyhome.idea.vim.mark.Jump;
-import com.maddyhome.idea.vim.mark.Mark;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
 import com.maddyhome.idea.vim.group.visual.VimSelection;
@@ -46,16 +48,17 @@ import com.maddyhome.idea.vim.handler.MotionActionHandlerKt;
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.listener.AppCodeTemplates;
+import com.maddyhome.idea.vim.mark.Jump;
+import com.maddyhome.idea.vim.mark.Mark;
 import com.maddyhome.idea.vim.newapi.IjExecutionContext;
 import com.maddyhome.idea.vim.newapi.IjVimCaret;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
-import com.maddyhome.idea.vim.api.VimEditor;
-import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType;
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt;
 import com.maddyhome.idea.vim.options.LocalOptionChangeListener;
 import com.maddyhome.idea.vim.options.OptionConstants;
 import com.maddyhome.idea.vim.options.OptionScope;
+import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType;
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt;
 import kotlin.Pair;
 import kotlin.ranges.IntProgression;
 import org.jetbrains.annotations.Contract;
@@ -280,7 +283,7 @@ public class MotionGroup {
     final int topVisualLine = getVisualLineAtTopOfScreen(editor);
     final int bottomVisualLine = getVisualLineAtBottomOfScreen(editor);
     final int caretVisualLine = editor.getCaretModel().getVisualPosition().line;
-    final int lastVisualLine = EditorHelper.getVisualLineCount(editor) - 1;
+    final int lastVisualLine = EditorHelper.getVisualLineCount(new IjVimEditor(editor)) - 1;
 
     final int newVisualLine;
     if (caretVisualLine < topVisualLine + scrollOffset) {
@@ -760,7 +763,7 @@ public class MotionGroup {
 
     final int topLine = getVisualLineAtTopOfScreen(editor);
     final int bottomLine = getVisualLineAtBottomOfScreen(editor);
-    final int lastLine = EditorHelper.getVisualLineCount(editor) - 1;
+    final int lastLine = EditorHelper.getVisualLineCount(new IjVimEditor(editor)) - 1;
 
     // We need the non-normalised value here, so we can handle cases such as so=999 to keep the current line centred
     final int scrollOffset = ((VimInt) VimPlugin.getOptionService().getOptionValue(new OptionScope.LOCAL(new IjVimEditor(editor)), OptionConstants.scrolloffName, OptionConstants.scrolloffName)).getValue();
@@ -836,7 +839,7 @@ public class MotionGroup {
         // the line heights of the lines above and below caretLine (up to scrolloff or end of file).
         // Our implementation ignores soft wrap line heights. Folds already have a line height of 1.
         final int usedAbove = caretLine - newTopLine;
-        final int usedBelow = min(scrollOffset, getVisualLineCount(editor) - caretLine);
+        final int usedBelow = min(scrollOffset, getVisualLineCount(new IjVimEditor(editor)) - caretLine);
         final int used = 1 + usedAbove + usedBelow;
         if (used > height) {
           scrollVisualLineToMiddleOfScreen(editor, caretLine, false);
@@ -870,7 +873,7 @@ public class MotionGroup {
         // The minus one is for the current line
         //noinspection UnnecessaryLocalVariable
         final int usedAbove = scrolledAbove;
-        final int usedBelow = min(getVisualLineCount(editor) - caretLine, usedAbove - 1);
+        final int usedBelow = min(getVisualLineCount(new IjVimEditor(editor)) - caretLine, usedAbove - 1);
         final int used = min(height + 1, usedAbove + usedBelow);
 
         // If we've expanded more than a screen full, redraw with the cursor in the middle of the screen. If we're going
@@ -1256,7 +1259,7 @@ public class MotionGroup {
     // lines of the file and virtual space. Vim normally scrolls window height minus two, but when the caret is on last
     // line minus one, this becomes window height minus one, meaning the top line of the current page becomes the bottom
     // line of the new page, and the caret doesn't move. Make sure we don't beep in this scenario.
-    return caretVisualLine == EditorHelper.getVisualLineCount(editor) - 2;
+    return caretVisualLine == EditorHelper.getVisualLineCount(new IjVimEditor(editor)) - 2;
   }
 
   public @Range(from = 0, to = Integer.MAX_VALUE) int moveCaretToLineWithSameColumn(@NotNull Editor editor,
@@ -1402,7 +1405,7 @@ public class MotionGroup {
         offset = moveCaretToLineStartSkipLeading(editor, visualLineToLogicalLine(editor, visualLine));
       }
       else {
-        offset = moveCaretVertical(editor, editor.getCaretModel().getPrimaryCaret(),
+        offset = getVerticalMotionOffset(new IjVimEditor(editor), new IjVimCaret(editor.getCaretModel().getPrimaryCaret()),
                                    visualLineToLogicalLine(editor, visualLine) -
                                    editor.getCaretModel().getLogicalPosition().line);
       }
@@ -1438,33 +1441,35 @@ public class MotionGroup {
     return editor.getCaretModel().getOffset();
   }
 
-  public int moveCaretVertical(@NotNull Editor editor, @NotNull Caret caret, int count) {
-    VisualPosition pos = caret.getVisualPosition();
-    if ((pos.line == 0 && count < 0) || (pos.line >= getVisualLineCount(editor) - 1 && count > 0)) {
+  public int getVerticalMotionOffset(@NotNull VimEditor editor, @NotNull VimCaret caret, int count) {
+    VimVisualPosition pos = caret.getVisualPosition();
+    if ((pos.getLine() == 0 && count < 0) || (pos.getLine() >= getVisualLineCount(editor) - 1 && count > 0)) {
       return -1;
     }
     else {
-      int col = UserDataManager.getVimLastColumn(caret);
-      int line = normalizeVisualLine(editor, pos.line + count);
+      int col = caret.getVimLastColumn();
+      int line = VimInjectorKt.getInjector().getEngineEditorHelper().normalizeVisualLine(editor, pos.getLine() + count);
 
       if (col == LAST_COLUMN) {
-        col = normalizeVisualColumn(editor, line, col,
-                                    CommandStateHelper.isEndAllowedIgnoringOnemore(CommandStateHelper.getMode(editor)));
+        col = VimInjectorKt.getInjector().getEngineEditorHelper().normalizeVisualColumn(editor, line, col,
+                                    CommandStateHelper.isEndAllowedIgnoringOnemore(EngineHelperKt.getMode(editor)));
       }
       else {
         if (line < 0) {
           // https://web.ea.pages.jetbrains.team/#/issue/266279
           // There is a weird exception for line < 0, but I don't understand how this may happen
-          throw new RuntimeException("Line is " + line + " , pos.line=" + pos.line + ", count=" + count);
+          throw new RuntimeException("Line is " + line + " , pos.line=" + pos.getLine() + ", count=" + count);
         }
-        int newInlineElements = InlayHelperKt.amountOfInlaysBeforeVisualPosition(editor, new VisualPosition(line, col));
+        int newInlineElements = VimInjectorKt.getInjector().getEngineEditorHelper()
+          .amountOfInlaysBeforeVisualPosition(editor, new VimVisualPosition(line, col, false));
 
-        col = normalizeVisualColumn(editor, line, col, CommandStateHelper.isEndAllowed(editor));
+        col = VimInjectorKt.getInjector().getEngineEditorHelper()
+          .normalizeVisualColumn(editor, line, col, EngineHelperKt.isEndAllowed(editor));
         col += newInlineElements;
       }
 
-      VisualPosition newPos = new VisualPosition(line, col);
-      return visualPositionToOffset(editor, newPos);
+      VimVisualPosition newPos = new VimVisualPosition(line, col, false);
+      return editor.visualPositionToOffset(newPos).getPoint();
     }
   }
 
@@ -1537,7 +1542,7 @@ public class MotionGroup {
 
     final int scrollOffset = normalizeToScreen ? getNormalizedScrollOffset(editor) : 0;
 
-    final int maxVisualLine = getVisualLineCount(editor);
+    final int maxVisualLine = getVisualLineCount(new IjVimEditor(editor));
 
     final int topVisualLine = getVisualLineAtTopOfScreen(editor);
     final int topScrollOff = topVisualLine > 0 ? scrollOffset : 0;

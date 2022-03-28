@@ -33,6 +33,7 @@ import com.maddyhome.idea.vim.handler.NonShiftedSpecialKeyHandler
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.newapi.ij
+import com.maddyhome.idea.vim.newapi.vim
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
@@ -52,7 +53,7 @@ class MotionArrowDownAction : NonShiftedSpecialKeyHandler(), ComplicatedKeysActi
     rawCount: Int,
     argument: Argument?,
   ): Int {
-    return VimPlugin.getMotion().moveCaretVertical(editor, caret, count)
+    return VimPlugin.getMotion().getVerticalMotionOffset(editor.vim, caret.vim, count)
   }
 
   override fun preOffsetComputation(editor: VimEditor, caret: VimCaret, context: ExecutionContext, cmd: Command): Boolean {

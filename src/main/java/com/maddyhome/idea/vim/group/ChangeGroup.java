@@ -235,7 +235,7 @@ public class ChangeGroup implements VimChangeGroup {
       firstLiner = true;
     }
     else {
-      MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretVertical(editor, caret, -1));
+      MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().getVerticalMotionOffset(new IjVimEditor(editor), new IjVimCaret(caret), -1));
       MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineEnd(editor, caret));
     }
 
@@ -243,7 +243,7 @@ public class ChangeGroup implements VimChangeGroup {
     insertText(editor, caret, "\n" + IndentConfig.create(editor).createIndentBySize(col));
 
     if (firstLiner) {
-      MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretVertical(editor, caret, -1));
+      MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().getVerticalMotionOffset(new IjVimEditor(editor), new IjVimCaret(caret), -1));
     }
   }
 

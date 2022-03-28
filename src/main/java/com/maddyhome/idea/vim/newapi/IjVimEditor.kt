@@ -21,6 +21,7 @@ package com.maddyhome.idea.vim.newapi
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorModificationUtil
 import com.intellij.openapi.editor.LogicalPosition
+import com.intellij.openapi.editor.VisualPosition
 import com.intellij.openapi.editor.event.CaretEvent
 import com.intellij.openapi.editor.event.CaretListener
 import com.intellij.openapi.vfs.VirtualFileManager
@@ -30,6 +31,7 @@ import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimCaretListener
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimLogicalPosition
+import com.maddyhome.idea.vim.api.VimVisualPosition
 import com.maddyhome.idea.vim.common.EditorLine
 import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.common.Pointer
@@ -241,6 +243,10 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
 
   override fun extractProtocol(): String? {
     return EditorHelper.getVirtualFile(editor)?.getUrl()?.let { VirtualFileManager.extractProtocol(it) }
+  }
+
+  override fun visualPositionToOffset(position: VimVisualPosition): Offset {
+    return editor.visualPositionToOffset(VisualPosition(position.line, position.column, position.leansRight)).offset
   }
 
   private fun Pair<Offset, Offset>.noGuard(editor: Editor): Boolean {

@@ -6,4 +6,8 @@ interface EngineEditorHelper {
   fun normalizeOffset(editor: VimEditor, offset: Int, allowEnd: Boolean): Int
   fun getText(editor: VimEditor, range: TextRange): String
   fun getOffset(editor: VimEditor, line: Int, column: Int): Int
+  fun logicalLineToVisualLine(editor: VimEditor, line: Int): Int
+  fun normalizeVisualLine(editor: VimEditor, line: Int): Int
+  fun normalizeVisualColumn(editor: VimEditor, line: Int, col: Int, allowEnd: Boolean): Int
+  fun amountOfInlaysBeforeVisualPosition(editor: VimEditor, pos: VimVisualPosition): Int
 }

@@ -183,6 +183,8 @@ interface VimEditor {
 
   fun getPath(): String?
   fun extractProtocol(): String?
+
+  fun visualPositionToOffset(position: VimVisualPosition): Offset
 }
 
 interface MutableVimEditor : VimEditor {
@@ -283,3 +285,4 @@ enum class LineDeleteShift {
 }
 
 class VimLogicalPosition(val line: Int, val column: Int, val leansForward: Boolean = false)
+class VimVisualPosition(val line: Int, val column: Int, val leansRight: Boolean = false)

@@ -37,6 +37,7 @@ import com.maddyhome.idea.vim.extension.VimExtensionRegistrar
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.isEndAllowed
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.option.ToggleOption
 import com.maddyhome.idea.vim.vimscript.Executor
@@ -397,7 +398,7 @@ private class TestExtension : VimExtension {
     override fun execute(editor: Editor, context: DataContext) {
       VimPlugin.getVisualMotion().enterVisualMode(editor, CommandState.SubMode.VISUAL_LINE)
       val caret = editor.caretModel.currentCaret
-      val newOffset = VimPlugin.getMotion().moveCaretVertical(editor, caret, 1)
+      val newOffset = VimPlugin.getMotion().getVerticalMotionOffset(editor.vim, caret.vim, 1)
       MotionGroup.moveCaret(editor, caret, newOffset)
     }
   }

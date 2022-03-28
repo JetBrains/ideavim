@@ -64,7 +64,7 @@ open class MotionUpAction : MotionUpBase() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    return VimPlugin.getMotion().moveCaretVertical(editor.ij, caret.ij, -operatorArguments.count1).toMotionOrError()
+    return VimPlugin.getMotion().getVerticalMotionOffset(editor, caret, -operatorArguments.count1).toMotionOrError()
   }
 }
 
@@ -100,6 +100,6 @@ class MotionUpNotLineWiseAction : MotionUpBase() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    return VimPlugin.getMotion().moveCaretVertical(editor.ij, caret.ij, -operatorArguments.count1).toMotionOrError()
+    return VimPlugin.getMotion().getVerticalMotionOffset(editor, caret, -operatorArguments.count1).toMotionOrError()
   }
 }
