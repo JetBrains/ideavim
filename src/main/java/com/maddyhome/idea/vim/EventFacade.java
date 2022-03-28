@@ -53,7 +53,7 @@ public class EventFacade {
   public void setupTypedActionHandler(@NotNull VimTypedActionHandler handler) {
     final TypedAction typedAction = getTypedAction();
 
-    if (HandlerInjector.notebookCommandMode()) {
+    if (HandlerInjector.notebookCommandMode(null)) {
       TypedActionHandler result = HandlerInjector.inject();
       if (result != null) {
         myOriginalTypedActionHandler = result;

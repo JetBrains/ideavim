@@ -18,6 +18,7 @@
 
 package com.maddyhome.idea.vim.helper
 
+import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.actionSystem.TypedAction
 import com.intellij.openapi.editor.actionSystem.TypedActionHandler
 import com.maddyhome.idea.vim.VimTypedActionHandler
@@ -55,8 +56,13 @@ class HandlerInjector {
     }
 
     @JvmStatic
-    fun notebookCommandMode(): Boolean {
-      return TypedAction.getInstance().rawHandler::class.java.simpleName.equals("JupyterCommandModeTypingBlocker")
+    fun notebookCommandMode(editor: Editor?): Boolean {
+      return if (editor != null) {
+        val inEditor = EditorHelper.getVirtualFile(editor)?.extension == "ipynb"
+        TypedAction.getInstance().rawHandler::class.java.simpleName.equals("JupyterCommandModeTypingBlocker") && inEditor
+      } else {
+        TypedAction.getInstance().rawHandler::class.java.simpleName.equals("JupyterCommandModeTypingBlocker")
+      }
     }
   }
 }

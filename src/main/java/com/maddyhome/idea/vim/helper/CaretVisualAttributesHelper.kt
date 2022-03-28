@@ -52,7 +52,7 @@ fun Caret.forceBarCursor() {
 fun Editor.updateCaretsVisualAttributes() {
   // In notebooks command mode the caret is hidden
   // Without this if the caret appears inside of a cell while it shouldn't
-  if (!HandlerInjector.notebookCommandMode()) {
+  if (!HandlerInjector.notebookCommandMode(this)) {
     updatePrimaryCaretVisualAttributes()
     updateSecondaryCaretsVisualAttributes()
   }
