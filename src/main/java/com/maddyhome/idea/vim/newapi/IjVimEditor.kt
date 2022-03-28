@@ -38,6 +38,8 @@ import com.maddyhome.idea.vim.common.Pointer
 import com.maddyhome.idea.vim.common.offset
 import com.maddyhome.idea.vim.group.visual.vimSetSystemBlockSelectionSilently
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.exitSelectMode
+import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.fileSize
 import com.maddyhome.idea.vim.helper.getTopLevelEditor
 import com.maddyhome.idea.vim.helper.inBlockSubMode
@@ -247,6 +249,14 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
 
   override fun visualPositionToOffset(position: VimVisualPosition): Offset {
     return editor.visualPositionToOffset(VisualPosition(position.line, position.column, position.leansRight)).offset
+  }
+
+  override fun exitSelectModeNative(adjustCaret: Boolean) {
+    this.exitSelectMode(adjustCaret)
+  }
+
+  override fun exitVisualModeNative() {
+    this.editor.exitVisualMode()
   }
 
   private fun Pair<Offset, Offset>.noGuard(editor: Editor): Boolean {

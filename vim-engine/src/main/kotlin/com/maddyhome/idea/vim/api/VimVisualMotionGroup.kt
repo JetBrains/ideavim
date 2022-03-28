@@ -29,4 +29,5 @@ interface VimVisualMotionGroup {
    * If visual mode is enabled with the same [subMode], disable it
    */
   fun toggleVisual(editor: VimEditor, count: Int, rawCount: Int, subMode: CommandState.SubMode): Boolean
+  fun enterSelectMode(editor: VimEditor, subMode: CommandState.SubMode): Boolean
 }

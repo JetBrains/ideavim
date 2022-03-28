@@ -124,7 +124,7 @@ object IdeaSelectionControl {
       CommandState.Mode.VISUAL -> VimPlugin.getVisualMotion()
         .enterVisualMode(editor, VimPlugin.getVisualMotion().autodetectVisualSubmode(editor))
       CommandState.Mode.SELECT -> VimPlugin.getVisualMotion()
-        .enterSelectMode(editor, VimPlugin.getVisualMotion().autodetectVisualSubmode(editor))
+        .enterSelectMode(editor.vim, VimPlugin.getVisualMotion().autodetectVisualSubmode(editor))
       CommandState.Mode.INSERT -> VimPlugin.getChange().insertBeforeCursor(
         editor,
         EditorDataContext.init(editor)

@@ -185,6 +185,9 @@ interface VimEditor {
   fun extractProtocol(): String?
 
   fun visualPositionToOffset(position: VimVisualPosition): Offset
+
+  fun exitSelectModeNative(adjustCaret: Boolean)
+  fun exitVisualModeNative()
 }
 
 interface MutableVimEditor : VimEditor {

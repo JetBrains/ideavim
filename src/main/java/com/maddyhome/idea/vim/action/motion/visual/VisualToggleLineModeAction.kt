@@ -40,7 +40,7 @@ class VisualToggleLineModeAction : VimActionHandler.SingleExecution() {
   override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
     val listOption = (VimPlugin.getOptionService().getOptionValue(OptionScope.LOCAL(IjVimEditor(editor.ij)), OptionConstants.selectmodeName) as VimString).value
     return if ("cmd" in listOption) {
-      VimPlugin.getVisualMotion().enterSelectMode(editor.ij, CommandState.SubMode.VISUAL_LINE).also {
+      VimPlugin.getVisualMotion().enterSelectMode(editor, CommandState.SubMode.VISUAL_LINE).also {
         editor.ij.vimForEachCaret { it.vimSetSelection(it.offset) }
       }
     } else VimPlugin.getVisualMotion()

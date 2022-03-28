@@ -92,3 +92,7 @@ val CommandState.Mode.isEndAllowedIgnoringOnemore: Boolean
 
 val VimEditor.inInsertMode
   get() = this.mode == CommandState.Mode.INSERT || this.mode == CommandState.Mode.REPLACE
+
+val VimEditor.inSelectMode
+  get() = this.mode == CommandState.Mode.SELECT || this.mode == CommandState.Mode.INSERT_SELECT
+

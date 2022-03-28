@@ -36,7 +36,7 @@ class VisualToggleBlockModeAction : VimActionHandler.SingleExecution() {
   override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
     val listOption = (VimPlugin.getOptionService().getOptionValue(OptionScope.LOCAL(IjVimEditor(editor.ij)), OptionConstants.selectmodeName) as VimString).value
     return if (listOption.contains("cmd")) {
-      VimPlugin.getVisualMotion().enterSelectMode(editor.ij, CommandState.SubMode.VISUAL_BLOCK)
+      VimPlugin.getVisualMotion().enterSelectMode(editor, CommandState.SubMode.VISUAL_BLOCK)
     } else VimPlugin.getVisualMotion()
       .toggleVisual(IjVimEditor(editor.ij), cmd.count, cmd.rawCount, CommandState.SubMode.VISUAL_BLOCK)
   }

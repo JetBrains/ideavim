@@ -220,9 +220,9 @@ class VisualMotionGroup : VimVisualMotionGroup {
     return true
   }
 
-  fun enterSelectMode(editor: Editor, subMode: CommandState.SubMode): Boolean {
-    editor.vim.commandState.pushSelectMode(subMode)
-    editor.vimForEachCaret { it.vimSelectionStart = it.vimLeadSelectionOffset }
+  override fun enterSelectMode(editor: VimEditor, subMode: CommandState.SubMode): Boolean {
+    editor.commandState.pushSelectMode(subMode)
+    editor.forEachCaret { it.vimSelectionStart = it.vimLeadSelectionOffset }
     return true
   }
 

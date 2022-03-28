@@ -18,9 +18,9 @@
 
 package com.maddyhome.idea.vim.action.motion.leftright
 
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimMotionGroupBase
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.group.MotionGroup
@@ -30,7 +30,7 @@ import com.maddyhome.idea.vim.helper.inSelectMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.vimForEachCaret
 import com.maddyhome.idea.vim.helper.vimLastColumn
-import com.maddyhome.idea.vim.newapi.IjVimEditor
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
@@ -39,21 +39,21 @@ class MotionShiftEndAction : ShiftedSpecialKeyHandler() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
-  override fun motion(editor: Editor, context: DataContext, cmd: Command) {
-    editor.vimForEachCaret { caret ->
+  override fun motion(editor: VimEditor, context: ExecutionContext, cmd: Command) {
+    editor.ij.vimForEachCaret { caret ->
       var allow = false
       if (editor.inInsertMode) {
         allow = true
       } else if (editor.inVisualMode || editor.inSelectMode) {
-        val opt = (VimPlugin.getOptionService().getOptionValue(OptionScope.LOCAL(IjVimEditor(editor)), OptionConstants.selectionName) as VimString).value
+        val opt = (VimPlugin.getOptionService().getOptionValue(OptionScope.LOCAL(editor), OptionConstants.selectionName) as VimString).value
         if (opt != "old") {
           allow = true
         }
       }
 
-      val newOffset = VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret, cmd.count - 1, allow)
+      val newOffset = VimPlugin.getMotion().moveCaretToLineEndOffset(editor.ij, caret, cmd.count - 1, allow)
       caret.vimLastColumn = VimMotionGroupBase.LAST_COLUMN
-      MotionGroup.moveCaret(editor, caret, newOffset)
+      MotionGroup.moveCaret(editor.ij, caret, newOffset)
       caret.vimLastColumn = VimMotionGroupBase.LAST_COLUMN
     }
   }

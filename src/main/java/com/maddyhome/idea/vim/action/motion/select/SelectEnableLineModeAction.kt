@@ -44,6 +44,6 @@ class SelectEnableLineModeAction : VimActionHandler.SingleExecution() {
       val lineStart = EditorHelper.getLineStartForOffset(editor.ij, caret.offset)
       caret.vimSetSystemSelectionSilently(lineStart, lineEnd)
     }
-    return VimPlugin.getVisualMotion().enterSelectMode(editor.ij, CommandState.SubMode.VISUAL_LINE)
+    return VimPlugin.getVisualMotion().enterSelectMode(editor, CommandState.SubMode.VISUAL_LINE)
   }
 }

@@ -47,6 +47,6 @@ class SelectEnableBlockModeAction : VimActionHandler.SingleExecution() {
       moveToInlayAwareOffset((offset + 1).coerceAtMost(lineEnd))
       vimLastColumn = visualPosition.column
     }
-    return VimPlugin.getVisualMotion().enterSelectMode(editor.ij, CommandState.SubMode.VISUAL_BLOCK)
+    return VimPlugin.getVisualMotion().enterSelectMode(editor, CommandState.SubMode.VISUAL_BLOCK)
   }
 }

@@ -18,13 +18,14 @@
 
 package com.maddyhome.idea.vim.action.motion.leftright
 
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.handler.ShiftedSpecialKeyHandler
 import com.maddyhome.idea.vim.helper.vimForEachCaret
+import com.maddyhome.idea.vim.newapi.ij
 
 /**
  * @author Alex Plate
@@ -33,10 +34,10 @@ class MotionShiftHomeAction : ShiftedSpecialKeyHandler() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
-  override fun motion(editor: Editor, context: DataContext, cmd: Command) {
-    editor.vimForEachCaret { caret ->
-      val newOffset = VimPlugin.getMotion().moveCaretToLineStart(editor, caret)
-      MotionGroup.moveCaret(editor, caret, newOffset)
+  override fun motion(editor: VimEditor, context: ExecutionContext, cmd: Command) {
+    editor.ij.vimForEachCaret { caret ->
+      val newOffset = VimPlugin.getMotion().moveCaretToLineStart(editor.ij, caret)
+      MotionGroup.moveCaret(editor.ij, caret, newOffset)
     }
   }
 }
