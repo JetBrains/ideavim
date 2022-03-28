@@ -29,7 +29,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotionOrError
-import com.maddyhome.idea.vim.helper.Direction
+import com.maddyhome.idea.vim.common.Direction
 import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.newapi.ij
 import java.util.*

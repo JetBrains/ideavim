@@ -22,7 +22,7 @@ import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.helper.Direction
+import com.maddyhome.idea.vim.common.Direction
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.newapi.vim
 import java.util.*

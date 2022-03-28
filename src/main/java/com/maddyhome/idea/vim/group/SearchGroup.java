@@ -37,6 +37,7 @@ import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.util.Trinity;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.common.CharacterPosition;
+import com.maddyhome.idea.vim.common.Direction;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.ex.ranges.LineRange;

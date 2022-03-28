@@ -26,7 +26,7 @@ import com.intellij.openapi.util.Ref
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.motion.search.SearchWholeWordForwardAction
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.Direction
+import com.maddyhome.idea.vim.common.Direction
 import com.maddyhome.idea.vim.helper.RunnableHelper
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.options.OptionConstants

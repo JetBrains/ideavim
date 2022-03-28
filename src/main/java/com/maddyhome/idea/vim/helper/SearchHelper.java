@@ -33,6 +33,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.CharacterPosition;
+import com.maddyhome.idea.vim.common.Direction;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.regexp.CharPointer;

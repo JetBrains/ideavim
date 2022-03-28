@@ -19,27 +19,10 @@
 package com.maddyhome.idea.vim.helper
 
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.common.Direction
 import com.maddyhome.idea.vim.helper.SearchHelper.findPositionOfFirstCharacter
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
-
-enum class Direction(private val value: Int) {
-  BACKWARDS(-1), FORWARDS(1);
-
-  fun toInt(): Int = value
-  fun reverse(): Direction = when (this) {
-    BACKWARDS -> FORWARDS
-    FORWARDS -> BACKWARDS
-  }
-
-  companion object {
-    fun fromInt(value: Int) = when (value) {
-      BACKWARDS.value -> BACKWARDS
-      FORWARDS.value -> FORWARDS
-      else -> FORWARDS
-    }
-  }
-}
 
 enum class SearchOptions {
   BACKWARDS, WANT_ENDPOS, WRAP, SHOW_MESSAGES, WHOLE_FILE, IGNORE_SMARTCASE

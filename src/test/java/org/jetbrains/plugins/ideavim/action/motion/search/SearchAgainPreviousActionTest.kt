@@ -20,7 +20,7 @@ package org.jetbrains.plugins.ideavim.action.motion.search
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.Direction
+import com.maddyhome.idea.vim.common.Direction
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
