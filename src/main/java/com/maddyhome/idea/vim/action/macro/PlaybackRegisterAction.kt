@@ -17,17 +17,18 @@
  */
 package com.maddyhome.idea.vim.action.macro
 
-import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.util.Ref
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.handler.VimActionHandler
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.register.RegisterConstants.LAST_COMMAND_REGISTER
 import com.maddyhome.idea.vim.vimscript.Executor
 
@@ -36,10 +37,10 @@ class PlaybackRegisterAction : VimActionHandler.SingleExecution() {
 
   override val argumentType: Argument.Type = Argument.Type.CHARACTER
 
-  override fun execute(editor: Editor, context: DataContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
+  override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
     val argument = cmd.argument ?: return false
     val reg = argument.character
-    val project = PlatformDataKeys.PROJECT.getData(context)
+    val project = PlatformDataKeys.PROJECT.getData(context.ij)
     val application = ApplicationManager.getApplication()
     val res = Ref.create(false)
     when {
@@ -47,13 +48,13 @@ class PlaybackRegisterAction : VimActionHandler.SingleExecution() {
         try {
           var i = 0
           while (i < cmd.count) {
-            res.set(Executor.executeLastCommand(editor, context))
+            res.set(Executor.executeLastCommand(editor.ij, context.ij))
             if (!res.get()) {
               break
             }
             i += 1
           }
-          VimPlugin.getMacro().setLastRegister(reg)
+          VimPlugin.getMacro().lastRegister = reg
         } catch (e: ExException) {
           res.set(false)
         }
@@ -61,14 +62,14 @@ class PlaybackRegisterAction : VimActionHandler.SingleExecution() {
       reg == '@' -> {
         application.runWriteAction {
           res.set(
-            VimPlugin.getMacro().playbackLastRegister(editor, context, project, cmd.count)
+            VimPlugin.getMacro().playbackLastRegister(editor.ij, context.ij, project, cmd.count)
           )
         }
       }
       else -> {
         application.runWriteAction {
           res.set(
-            VimPlugin.getMacro().playbackRegister(editor, context, project, reg, cmd.count)
+            VimPlugin.getMacro().playbackRegister(editor.ij, context.ij, project, reg, cmd.count)
           )
         }
       }

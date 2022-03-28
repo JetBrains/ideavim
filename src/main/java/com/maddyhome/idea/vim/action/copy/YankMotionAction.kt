@@ -17,14 +17,15 @@
  */
 package com.maddyhome.idea.vim.action.copy
 
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.DuplicableOperatorAction
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
+import com.maddyhome.idea.vim.newapi.ij
 
 class YankMotionAction : VimActionHandler.SingleExecution(), DuplicableOperatorAction {
   override val type: Command.Type = Command.Type.COPY
@@ -33,8 +34,8 @@ class YankMotionAction : VimActionHandler.SingleExecution(), DuplicableOperatorA
 
   override val duplicateWith: Char = 'y'
 
-  override fun execute(editor: Editor, context: DataContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
+  override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
     val argument = cmd.argument ?: return false
-    return VimPlugin.getYank().yankMotion(editor, context, argument, operatorArguments)
+    return VimPlugin.getYank().yankMotion(editor.ij, context.ij, argument, operatorArguments)
   }
 }

@@ -17,15 +17,16 @@
  */
 package com.maddyhome.idea.vim.action.motion.scroll
 
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.enumSetOf
+import com.maddyhome.idea.vim.newapi.ij
 import java.util.*
 
 class MotionScrollLastScreenLinePageStartAction : VimActionHandler.SingleExecution() {
@@ -33,26 +34,26 @@ class MotionScrollLastScreenLinePageStartAction : VimActionHandler.SingleExecuti
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_IGNORE_SCROLL_JUMP)
 
-  override fun execute(editor: Editor, context: DataContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
+  override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
     val motion = VimPlugin.getMotion()
 
     // Without [count]: Redraw with the line just above the window at the bottom of the window. Put the cursor in that
     // line, at the first non-blank in the line.
     if (cmd.rawCount == 0) {
       val prevVisualLine = EditorHelper.normalizeVisualLine(
-        editor,
-        EditorHelper.getVisualLineAtTopOfScreen(editor) - 1
+        editor.ij,
+        EditorHelper.getVisualLineAtTopOfScreen(editor.ij) - 1
       )
-      val logicalLine = EditorHelper.visualLineToLogicalLine(editor, prevVisualLine)
-      return motion.scrollLineToLastScreenLine(editor, logicalLine + 1, true)
+      val logicalLine = EditorHelper.visualLineToLogicalLine(editor.ij, prevVisualLine)
+      return motion.scrollLineToLastScreenLine(editor.ij, logicalLine + 1, true)
     }
 
     // [count]z^ first scrolls [count] to the bottom of the window, then moves the caret to the line that is now at
     // the top, and then move that line to the bottom of the window
-    var logicalLine = EditorHelper.normalizeLine(editor, cmd.rawCount - 1)
-    if (motion.scrollLineToLastScreenLine(editor, logicalLine + 1, false)) {
-      logicalLine = EditorHelper.visualLineToLogicalLine(editor, EditorHelper.getVisualLineAtTopOfScreen(editor))
-      return motion.scrollLineToLastScreenLine(editor, logicalLine + 1, true)
+    var logicalLine = EditorHelper.normalizeLine(editor.ij, cmd.rawCount - 1)
+    if (motion.scrollLineToLastScreenLine(editor.ij, logicalLine + 1, false)) {
+      logicalLine = EditorHelper.visualLineToLogicalLine(editor.ij, EditorHelper.getVisualLineAtTopOfScreen(editor.ij))
+      return motion.scrollLineToLastScreenLine(editor.ij, logicalLine + 1, true)
     }
 
     return false

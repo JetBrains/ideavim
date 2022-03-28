@@ -18,9 +18,9 @@
 
 package com.maddyhome.idea.vim.action.change.change
 
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.DuplicableOperatorAction
@@ -28,6 +28,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.endOffsetInclusive
+import com.maddyhome.idea.vim.newapi.ij
 
 class FilterMotionAction : VimActionHandler.SingleExecution(), DuplicableOperatorAction {
 
@@ -37,26 +38,26 @@ class FilterMotionAction : VimActionHandler.SingleExecution(), DuplicableOperato
 
   override val duplicateWith: Char = '!'
 
-  override fun execute(editor: Editor, context: DataContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
+  override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
     val argument = cmd.argument ?: return false
     val range = MotionGroup
       .getMotionRange(
-        editor, editor.caretModel.primaryCaret, context,
+        editor.ij, editor.primaryCaret().ij, context.ij,
         argument,
         operatorArguments
       )
       ?: return false
 
-    val current = editor.caretModel.logicalPosition
+    val current = editor.ij.caretModel.logicalPosition
     val start = editor.offsetToLogicalPosition(range.startOffset)
     val end = editor.offsetToLogicalPosition(range.endOffsetInclusive)
     if (current.line != start.line) {
-      MotionGroup.moveCaret(editor, editor.caretModel.primaryCaret, range.startOffset)
+      MotionGroup.moveCaret(editor.ij, editor.primaryCaret().ij, range.startOffset)
     }
 
     val count = if (start.line < end.line) end.line - start.line + 1 else 1
 
-    VimPlugin.getProcess().startFilterCommand(editor, context, Argument.EMPTY_COMMAND.copy(rawCount = count))
+    VimPlugin.getProcess().startFilterCommand(editor.ij, context.ij, Argument.EMPTY_COMMAND.copy(rawCount = count))
 
     return true
   }

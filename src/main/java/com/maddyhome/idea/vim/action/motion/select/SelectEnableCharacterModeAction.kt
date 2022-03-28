@@ -18,9 +18,9 @@
 
 package com.maddyhome.idea.vim.action.motion.select
 
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.OperatorArguments
@@ -29,6 +29,7 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.helper.vimLastColumn
+import com.maddyhome.idea.vim.newapi.ij
 
 /**
  * @author Alex Plate
@@ -38,15 +39,15 @@ class SelectEnableCharacterModeAction : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
-  override fun execute(editor: Editor, context: DataContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
-    editor.caretModel.runForEachCaret { caret ->
-      val lineEnd = EditorHelper.getLineEndForOffset(editor, caret.offset)
+  override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
+    editor.ij.caretModel.runForEachCaret { caret ->
+      val lineEnd = EditorHelper.getLineEndForOffset(editor.ij, caret.offset)
       caret.run {
         vimSetSystemSelectionSilently(offset, (offset + 1).coerceAtMost(lineEnd))
         moveToInlayAwareOffset((offset + 1).coerceAtMost(lineEnd))
         vimLastColumn = visualPosition.column
       }
     }
-    return VimPlugin.getVisualMotion().enterSelectMode(editor, CommandState.SubMode.VISUAL_CHARACTER)
+    return VimPlugin.getVisualMotion().enterSelectMode(editor.ij, CommandState.SubMode.VISUAL_CHARACTER)
   }
 }

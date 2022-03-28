@@ -17,24 +17,24 @@
  */
 package com.maddyhome.idea.vim.action.change
 
-import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.command.CommandProcessor
-import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.extension.VimExtensionHandler
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.commandState
-import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.newapi.ij
 import javax.swing.KeyStroke
 
 class RepeatChangeAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_WRITABLE
 
-  override fun execute(editor: Editor, context: DataContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
-    val state = editor.vim.commandState
+  override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
+    val state = editor.commandState
     val lastCommand = VimRepeater.lastChangeCommand
 
     if (lastCommand == null && VimRepeater.Extension.lastExtensionHandler == null) return false
@@ -54,8 +54,8 @@ class RepeatChangeAction : VimActionHandler.SingleExecution() {
       if (repeatHandler && lastHandler != null) {
         val processor = CommandProcessor.getInstance()
         processor.executeCommand(
-          editor.project,
-          { lastHandler.execute(editor, context) },
+          editor.ij.project,
+          { lastHandler.execute(editor.ij, context.ij) },
           "Vim " + lastHandler.javaClass.simpleName,
           null
         )
@@ -71,7 +71,7 @@ class RepeatChangeAction : VimActionHandler.SingleExecution() {
         state.setExecutingCommand(lastCommand)
 
         val arguments = operatorArguments.copy(count0 = lastCommand.rawCount)
-        injector.actionExecutor.executeVimAction(editor.vim, lastCommand.action, context.vim, arguments)
+        injector.actionExecutor.executeVimAction(editor, lastCommand.action, context, arguments)
 
         VimRepeater.saveLastChange(lastCommand)
       }

@@ -17,9 +17,9 @@
  */
 package com.maddyhome.idea.vim.action.motion.visual
 
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.group.MotionGroup
@@ -28,6 +28,7 @@ import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.getTopLevelEditor
 import com.maddyhome.idea.vim.helper.vimForEachCaret
+import com.maddyhome.idea.vim.newapi.ij
 
 /**
  * @author vlan
@@ -35,15 +36,15 @@ import com.maddyhome.idea.vim.helper.vimForEachCaret
 class VisualExitModeAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
-  override fun execute(editor: Editor, context: DataContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
-    editor.getTopLevelEditor().exitVisualMode()
+  override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
+    editor.ij.getTopLevelEditor().exitVisualMode()
 
     // Should it be in [exitVisualMode]?
-    editor.vimForEachCaret { caret ->
-      val lineEnd = EditorHelper.getLineEndForOffset(editor, caret.offset)
+    editor.ij.vimForEachCaret { caret ->
+      val lineEnd = EditorHelper.getLineEndForOffset(editor.ij, caret.offset)
       if (lineEnd == caret.offset) {
-        val position = VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret, -1, false)
-        MotionGroup.moveCaret(editor, caret, position)
+        val position = VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor.ij, caret, -1, false)
+        MotionGroup.moveCaret(editor.ij, caret, position)
       }
     }
 

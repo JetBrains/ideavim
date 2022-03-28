@@ -18,14 +18,15 @@
 
 package com.maddyhome.idea.vim.action.motion.select
 
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.exitSelectMode
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
@@ -38,16 +39,16 @@ class SelectDeleteAction : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.INSERT
 
-  override fun execute(editor: Editor, context: DataContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
+  override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
     val enterKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0)
-    val actions = VimPlugin.getKey().getActions(editor.component, enterKeyStroke)
+    val actions = VimPlugin.getKey().getActions(editor.ij.component, enterKeyStroke)
     for (action in actions) {
-      if (injector.actionExecutor.executeAction(action.vim, context.vim)) {
+      if (injector.actionExecutor.executeAction(action.vim, context)) {
         break
       }
     }
     editor.exitSelectMode(true)
-    VimPlugin.getChange().insertBeforeCursor(editor, context)
+    VimPlugin.getChange().insertBeforeCursor(editor.ij, context.ij)
     return true
   }
 }

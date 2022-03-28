@@ -18,9 +18,9 @@
 
 package com.maddyhome.idea.vim.action.motion.scroll
 
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
@@ -37,11 +37,11 @@ class CtrlDownAction : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
-  override fun execute(editor: Editor, context: DataContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
+  override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
     val keyStroke = keySet.first().first()
     val actions = VimPlugin.getKey().getKeymapConflicts(keyStroke)
     for (action in actions) {
-      if (injector.actionExecutor.executeAction(action.vim, context.vim)) break
+      if (injector.actionExecutor.executeAction(action.vim, context)) break
     }
     return true
   }
@@ -53,11 +53,11 @@ class CtrlUpAction : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
-  override fun execute(editor: Editor, context: DataContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
+  override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
     val keyStroke = keySet.first().first()
     val actions = VimPlugin.getKey().getKeymapConflicts(keyStroke)
     for (action in actions) {
-      if (injector.actionExecutor.executeAction(action.vim, context.vim)) break
+      if (injector.actionExecutor.executeAction(action.vim, context)) break
     }
     return true
   }

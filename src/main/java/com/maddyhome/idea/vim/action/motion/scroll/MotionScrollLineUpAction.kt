@@ -17,14 +17,15 @@
  */
 package com.maddyhome.idea.vim.action.motion.scroll
 
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
+import com.maddyhome.idea.vim.newapi.ij
 import java.util.*
 
 class MotionScrollLineUpAction : VimActionHandler.SingleExecution() {
@@ -32,7 +33,7 @@ class MotionScrollLineUpAction : VimActionHandler.SingleExecution() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_IGNORE_SCROLL_JUMP)
 
-  override fun execute(editor: Editor, context: DataContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
-    return VimPlugin.getMotion().scrollLine(editor, -cmd.count)
+  override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
+    return VimPlugin.getMotion().scrollLine(editor.ij, -cmd.count)
   }
 }

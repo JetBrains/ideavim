@@ -32,7 +32,6 @@ import com.maddyhome.idea.vim.helper.exitSelectMode
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.inSelectMode
 import com.maddyhome.idea.vim.helper.inVisualMode
-import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
@@ -49,17 +48,17 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
  * Handler is called once for all carets
  */
 abstract class ShiftedSpecialKeyHandler : VimActionHandler.SingleExecution() {
-  final override fun execute(editor: Editor, context: DataContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
+  final override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
     val startSel = OptionConstants.keymodel_startsel in (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, OptionConstants.keymodelName) as VimString).value
     if (startSel && !editor.inVisualMode && !editor.inSelectMode) {
       if (OptionConstants.selectmode_key in (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, OptionConstants.selectmodeName) as VimString).value) {
-        VimPlugin.getVisualMotion().enterSelectMode(editor, CommandState.SubMode.VISUAL_CHARACTER)
+        VimPlugin.getVisualMotion().enterSelectMode(editor.ij, CommandState.SubMode.VISUAL_CHARACTER)
       } else {
         VimPlugin.getVisualMotion()
-          .toggleVisual(IjVimEditor(editor), 1, 0, CommandState.SubMode.VISUAL_CHARACTER)
+          .toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_CHARACTER)
       }
     }
-    motion(editor, context, cmd)
+    motion(editor.ij, context.ij, cmd)
     return true
   }
 
@@ -78,7 +77,7 @@ abstract class ShiftedSpecialKeyHandler : VimActionHandler.SingleExecution() {
  * Handler is called once for all carets
  */
 abstract class ShiftedArrowKeyHandler : VimActionHandler.SingleExecution() {
-  final override fun execute(editor: Editor, context: DataContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
+  final override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
     val keymodelOption = (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, OptionConstants.keymodelName) as VimString).value
     val startSel = OptionConstants.keymodel_startsel in keymodelOption
     val inVisualMode = editor.inVisualMode
@@ -89,15 +88,15 @@ abstract class ShiftedArrowKeyHandler : VimActionHandler.SingleExecution() {
     if (startSel || continueSelectSelection || continueVisualSelection) {
       if (!inVisualMode && !inSelectMode) {
         if (OptionConstants.selectmode_key in (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, OptionConstants.selectmodeName) as VimString).value) {
-          VimPlugin.getVisualMotion().enterSelectMode(editor, CommandState.SubMode.VISUAL_CHARACTER)
+          VimPlugin.getVisualMotion().enterSelectMode(editor.ij, CommandState.SubMode.VISUAL_CHARACTER)
         } else {
           VimPlugin.getVisualMotion()
-            .toggleVisual(IjVimEditor(editor), 1, 0, CommandState.SubMode.VISUAL_CHARACTER)
+            .toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_CHARACTER)
         }
       }
-      motionWithKeyModel(editor, context, cmd)
+      motionWithKeyModel(editor.ij, context.ij, cmd)
     } else {
-      motionWithoutKeyModel(editor, context, cmd)
+      motionWithoutKeyModel(editor.ij, context.ij, cmd)
     }
     return true
   }
