@@ -3,9 +3,11 @@ package com.maddyhome.idea.vim.helper
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.editor.VisualPosition
 import com.maddyhome.idea.vim.api.EngineEditorHelper
+import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimVisualPosition
 import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.newapi.IjVimCaret
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 
 @Service
@@ -42,5 +44,17 @@ class IjEditorHelper : EngineEditorHelper {
         pos.leansRight
       )
     )
+  }
+
+  override fun getVisualLineCount(editor: VimEditor): Int {
+    return EditorHelper.getVisualLineCount(editor)
+  }
+
+  override fun prepareLastColumn(caret: VimCaret): Int {
+    return EditorHelper.prepareLastColumn((caret as IjVimCaret).caret)
+  }
+
+  override fun updateLastColumn(caret: VimCaret, prevLastColumn: Int) {
+    EditorHelper.updateLastColumn((caret as IjVimCaret).caret, prevLastColumn)
   }
 }

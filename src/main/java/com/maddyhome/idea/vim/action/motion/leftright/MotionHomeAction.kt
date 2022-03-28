@@ -18,25 +18,26 @@
 
 package com.maddyhome.idea.vim.action.motion.leftright
 
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Caret
-import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.handler.NonShiftedSpecialKeyHandler
+import com.maddyhome.idea.vim.newapi.ij
 
 class MotionHomeAction : NonShiftedSpecialKeyHandler() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
   override fun offset(
-    editor: Editor,
-    caret: Caret,
-    context: DataContext,
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
     count: Int,
     rawCount: Int,
     argument: Argument?,
   ): Int {
-    return VimPlugin.getMotion().moveCaretToLineStart(editor, caret)
+    return VimPlugin.getMotion().moveCaretToLineStart(editor.ij, caret.ij)
   }
 }

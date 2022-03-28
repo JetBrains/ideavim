@@ -21,11 +21,11 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.VimMotionGroupBase
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.helper.inInsertMode
@@ -67,7 +67,7 @@ class MotionLastScreenColumnAction : MotionActionHandler.ForEachCaret() {
     context: ExecutionContext,
     cmd: Command,
   ) {
-    caret.ij.vimLastColumn = MotionGroup.LAST_COLUMN
+    caret.ij.vimLastColumn = VimMotionGroupBase.LAST_COLUMN
   }
 
   override val motionType: MotionType = MotionType.INCLUSIVE

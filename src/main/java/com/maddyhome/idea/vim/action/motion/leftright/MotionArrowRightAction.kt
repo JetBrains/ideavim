@@ -18,16 +18,17 @@
 
 package com.maddyhome.idea.vim.action.motion.leftright
 
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Caret
-import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.ComplicatedKeysAction
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.handler.NonShiftedSpecialKeyHandler
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.isEndAllowed
+import com.maddyhome.idea.vim.newapi.ij
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
@@ -40,14 +41,14 @@ class MotionArrowRightAction : NonShiftedSpecialKeyHandler(), ComplicatedKeysAct
   )
 
   override fun offset(
-    editor: Editor,
-    caret: Caret,
-    context: DataContext,
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
     count: Int,
     rawCount: Int,
     argument: Argument?,
   ): Int {
     val allowPastEnd = editor.isEndAllowed
-    return VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret, count, allowPastEnd)
+    return VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor.ij, caret.ij, count, allowPastEnd)
   }
 }

@@ -10,4 +10,7 @@ interface EngineEditorHelper {
   fun normalizeVisualLine(editor: VimEditor, line: Int): Int
   fun normalizeVisualColumn(editor: VimEditor, line: Int, col: Int, allowEnd: Boolean): Int
   fun amountOfInlaysBeforeVisualPosition(editor: VimEditor, pos: VimVisualPosition): Int
+  fun getVisualLineCount(editor: VimEditor): Int
+  fun prepareLastColumn(caret: VimCaret): Int
+  fun updateLastColumn(caret: VimCaret, prevLastColumn: Int)
 }

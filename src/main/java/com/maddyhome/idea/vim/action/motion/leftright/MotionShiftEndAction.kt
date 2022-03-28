@@ -21,6 +21,7 @@ package com.maddyhome.idea.vim.action.motion.leftright
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.VimMotionGroupBase
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.handler.ShiftedSpecialKeyHandler
@@ -51,9 +52,9 @@ class MotionShiftEndAction : ShiftedSpecialKeyHandler() {
       }
 
       val newOffset = VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret, cmd.count - 1, allow)
-      caret.vimLastColumn = MotionGroup.LAST_COLUMN
+      caret.vimLastColumn = VimMotionGroupBase.LAST_COLUMN
       MotionGroup.moveCaret(editor, caret, newOffset)
-      caret.vimLastColumn = MotionGroup.LAST_COLUMN
+      caret.vimLastColumn = VimMotionGroupBase.LAST_COLUMN
     }
   }
 }

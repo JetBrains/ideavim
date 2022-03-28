@@ -22,8 +22,8 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.VisualPosition
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.VimMotionGroupBase
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.inBlockSubMode
 import com.maddyhome.idea.vim.helper.inSelectMode
@@ -190,7 +190,7 @@ private fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: Ca
         val lineStartOffset = EditorHelper.getLineStartOffset(editor, line)
 
         // Extend selection to line end if it was made with `$` command
-        if (lastColumn >= MotionGroup.LAST_COLUMN) {
+        if (lastColumn >= VimMotionGroupBase.LAST_COLUMN) {
           aCaret.vimSetSystemSelectionSilently(aCaret.selectionStart, lineEndOffset)
           val newOffset = (lineEndOffset - VimPlugin.getVisualMotion().selectionAdj).coerceAtLeast(lineStartOffset)
           aCaret.moveToInlayAwareOffset(newOffset)

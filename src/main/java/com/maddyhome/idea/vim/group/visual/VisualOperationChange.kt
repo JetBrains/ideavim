@@ -22,10 +22,10 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.LogicalPosition
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.VimMotionGroupBase
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.SelectionType
-import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.inBlockSubMode
 import com.maddyhome.idea.vim.helper.sort
@@ -64,8 +64,8 @@ object VisualOperation {
 
     if (CommandFlags.FLAG_MOT_LINEWISE in cmdFlags) return VisualChange(lines, ep.column, SelectionType.LINE_WISE)
 
-    val chars = if (editor.caretModel.primaryCaret.vimLastColumn == MotionGroup.LAST_COLUMN) {
-      MotionGroup.LAST_COLUMN
+    val chars = if (editor.caretModel.primaryCaret.vimLastColumn == VimMotionGroupBase.LAST_COLUMN) {
+      VimMotionGroupBase.LAST_COLUMN
     } else when (type) {
       SelectionType.LINE_WISE -> ep.column
       SelectionType.CHARACTER_WISE -> if (lines > 1) ep.column - VimPlugin.getVisualMotion().selectionAdj else ep.column - sp.column

@@ -29,11 +29,11 @@ import com.maddyhome.idea.vim.action.change.VimRepeater
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.VimMotionGroupBase
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.command.SelectionType
-import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.visual.VimBlockSelection
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.group.visual.VimSimpleSelection
@@ -209,7 +209,7 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
             primaryCaret to VimBlockSelection(
               primaryCaret.offset,
               end,
-              IjVimEditor(this), range.columns >= MotionGroup.LAST_COLUMN
+              IjVimEditor(this), range.columns >= VimMotionGroupBase.LAST_COLUMN
             )
           )
         } else {
@@ -228,7 +228,7 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
           primaryCaret to VimBlockSelection(
             primaryCaret.vimSelectionStart,
             primaryCaret.offset,
-            IjVimEditor(this), primaryCaret.vimLastColumn >= MotionGroup.LAST_COLUMN
+            IjVimEditor(this), primaryCaret.vimLastColumn >= VimMotionGroupBase.LAST_COLUMN
           )
         )
       }

@@ -80,3 +80,15 @@ val VimEditor.inNormalMode
 
 val CommandState.Mode.inNormalMode
   get() = this == CommandState.Mode.COMMAND || this == CommandState.Mode.INSERT_NORMAL
+
+val CommandState.Mode.isEndAllowedIgnoringOnemore: Boolean
+  get() = when (this) {
+    CommandState.Mode.INSERT, CommandState.Mode.VISUAL, CommandState.Mode.SELECT -> true
+    CommandState.Mode.COMMAND, CommandState.Mode.CMD_LINE, CommandState.Mode.REPLACE, CommandState.Mode.OP_PENDING -> false
+    CommandState.Mode.INSERT_NORMAL -> false
+    CommandState.Mode.INSERT_VISUAL -> true
+    CommandState.Mode.INSERT_SELECT -> true
+  }
+
+val VimEditor.inInsertMode
+  get() = this.mode == CommandState.Mode.INSERT || this.mode == CommandState.Mode.REPLACE

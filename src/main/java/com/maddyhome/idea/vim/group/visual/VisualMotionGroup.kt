@@ -26,6 +26,7 @@ import com.intellij.openapi.editor.ScrollType
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.VimMotionGroupBase
 import com.maddyhome.idea.vim.api.VimVisualMotionGroup
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.SelectionType
@@ -134,7 +135,7 @@ class VisualMotionGroup : VimVisualMotionGroup {
           val range = it.vimLastVisualOperatorRange ?: VisualChange.default(subMode)
           val end = VisualOperation.calculateRange(editor.ij, range, count, it)
           val lastColumn =
-            if (range.columns == MotionGroup.LAST_COLUMN) MotionGroup.LAST_COLUMN else editor.offsetToLogicalPosition(
+            if (range.columns == VimMotionGroupBase.LAST_COLUMN) VimMotionGroupBase.LAST_COLUMN else editor.offsetToLogicalPosition(
               end
             ).column
           it.vimLastColumn = lastColumn

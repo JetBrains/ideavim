@@ -19,7 +19,6 @@
 package com.maddyhome.idea.vim.handler
 
 import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
@@ -142,16 +141,16 @@ abstract class NonShiftedSpecialKeyHandler : MotionActionHandler.ForEachCaret() 
       editor.ij.exitVisualMode()
     }
 
-    return offset(editor.ij, caret.ij, context.ij, operatorArguments.count1, operatorArguments.count0, argument).toMotionOrError()
+    return offset(editor, caret, context, operatorArguments.count1, operatorArguments.count0, argument).toMotionOrError()
   }
 
   /**
    * Calculate new offset for current [caret]
    */
   abstract fun offset(
-    editor: Editor,
-    caret: Caret,
-    context: DataContext,
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
     count: Int,
     rawCount: Int,
     argument: Argument?,

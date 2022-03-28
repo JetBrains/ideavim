@@ -18,9 +18,6 @@
 
 package com.maddyhome.idea.vim.action.motion.updown
 
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Caret
-import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.ComplicatedKeysAction
 import com.maddyhome.idea.vim.api.ExecutionContext
@@ -33,7 +30,6 @@ import com.maddyhome.idea.vim.handler.NonShiftedSpecialKeyHandler
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.newapi.ij
-import com.maddyhome.idea.vim.newapi.vim
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
@@ -46,14 +42,14 @@ class MotionArrowUpAction : NonShiftedSpecialKeyHandler(), ComplicatedKeysAction
   private var col: Int = 0
 
   override fun offset(
-    editor: Editor,
-    caret: Caret,
-    context: DataContext,
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
     count: Int,
     rawCount: Int,
     argument: Argument?,
   ): Int {
-    return VimPlugin.getMotion().getVerticalMotionOffset(editor.vim, caret.vim, -count)
+    return VimPlugin.getMotion().getVerticalMotionOffset(editor, caret, -count)
   }
 
   override fun preOffsetComputation(editor: VimEditor, caret: VimCaret, context: ExecutionContext, cmd: Command): Boolean {

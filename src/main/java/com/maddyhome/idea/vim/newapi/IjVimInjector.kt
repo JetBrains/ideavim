@@ -17,6 +17,7 @@ import com.maddyhome.idea.vim.api.VimEnabler
 import com.maddyhome.idea.vim.api.VimInjector
 import com.maddyhome.idea.vim.api.VimKeyGroup
 import com.maddyhome.idea.vim.api.VimMessages
+import com.maddyhome.idea.vim.api.VimMotionGroup
 import com.maddyhome.idea.vim.api.VimProcessGroup
 import com.maddyhome.idea.vim.api.VimSearchHelper
 import com.maddyhome.idea.vim.api.VimStringParser
@@ -25,6 +26,7 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.common.VimMachine
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.group.MarkGroup
+import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.IjActionExecutor
 import com.maddyhome.idea.vim.helper.IjEditorHelper
 import com.maddyhome.idea.vim.helper.IjVimStringParser
@@ -44,6 +46,8 @@ class IjVimInjector : VimInjector {
     get() = service<IjClipboardManager>()
   override val searchHelper: VimSearchHelper
     get() = service<IjVimSearchHelper>()
+  override val motion: VimMotionGroup
+    get() = service<MotionGroup>()
   override val nativeActionManager: NativeActionManager
     get() = service<IjNativeActionManager>()
   override val messages: VimMessages

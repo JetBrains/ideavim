@@ -18,23 +18,19 @@
 
 package com.maddyhome.idea.vim.action.motion.leftright
 
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Caret
-import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.VimMotionGroupBase
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.MotionType
-import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.handler.NonShiftedSpecialKeyHandler
 import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.helper.inSelectMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.vimLastColumn
-import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
@@ -44,9 +40,9 @@ class MotionEndAction : NonShiftedSpecialKeyHandler() {
   override val motionType: MotionType = MotionType.INCLUSIVE
 
   override fun offset(
-    editor: Editor,
-    caret: Caret,
-    context: DataContext,
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
     count: Int,
     rawCount: Int,
     argument: Argument?,
@@ -55,20 +51,20 @@ class MotionEndAction : NonShiftedSpecialKeyHandler() {
     if (editor.inInsertMode) {
       allow = true
     } else if (editor.inVisualMode || editor.inSelectMode) {
-      val opt = (VimPlugin.getOptionService().getOptionValue(OptionScope.LOCAL(IjVimEditor(editor)), OptionConstants.selectionName) as VimString).value
+      val opt = (VimPlugin.getOptionService().getOptionValue(OptionScope.LOCAL(editor), OptionConstants.selectionName) as VimString).value
       if (opt != "old") {
         allow = true
       }
     }
 
-    return VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret, count - 1, allow)
+    return VimPlugin.getMotion().moveCaretToLineEndOffset(editor.ij, caret.ij, count - 1, allow)
   }
 
   override fun preMove(editor: VimEditor, caret: VimCaret, context: ExecutionContext, cmd: Command) {
-    caret.ij.vimLastColumn = MotionGroup.LAST_COLUMN
+    caret.ij.vimLastColumn = VimMotionGroupBase.LAST_COLUMN
   }
 
   override fun postMove(editor: VimEditor, caret: VimCaret, context: ExecutionContext, cmd: Command) {
-    caret.ij.vimLastColumn = MotionGroup.LAST_COLUMN
+    caret.ij.vimLastColumn = VimMotionGroupBase.LAST_COLUMN
   }
 }

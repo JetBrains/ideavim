@@ -33,6 +33,7 @@ interface VimInjector {
   val clipboardManager: VimClipboardManager
 
   val searchHelper: VimSearchHelper
+  val motion: VimMotionGroup
 
   /**
    * Please use vimLogger() function

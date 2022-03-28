@@ -33,10 +33,7 @@ import com.intellij.util.MathUtil;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.motion.leftright.TillCharacterMotionType;
-import com.maddyhome.idea.vim.api.VimCaret;
-import com.maddyhome.idea.vim.api.VimEditor;
-import com.maddyhome.idea.vim.api.VimInjectorKt;
-import com.maddyhome.idea.vim.api.VimVisualPosition;
+import com.maddyhome.idea.vim.api.*;
 import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
@@ -78,8 +75,7 @@ import static java.lang.Math.min;
 /**
  * This handles all motion related commands and marks
  */
-public class MotionGroup {
-  public static final int LAST_COLUMN = 9999;
+public class MotionGroup extends VimMotionGroupBase {
 
   /**
    * This helper method calculates the complete range a motion will move over taking into account whether
@@ -1439,38 +1435,6 @@ public class MotionGroup {
     final boolean absolute = rawCount >= 1;
     switchEditorTab(EditorWindow.DATA_KEY.getData(context), absolute ? rawCount - 1 : 1, absolute);
     return editor.getCaretModel().getOffset();
-  }
-
-  public int getVerticalMotionOffset(@NotNull VimEditor editor, @NotNull VimCaret caret, int count) {
-    VimVisualPosition pos = caret.getVisualPosition();
-    if ((pos.getLine() == 0 && count < 0) || (pos.getLine() >= getVisualLineCount(editor) - 1 && count > 0)) {
-      return -1;
-    }
-    else {
-      int col = caret.getVimLastColumn();
-      int line = VimInjectorKt.getInjector().getEngineEditorHelper().normalizeVisualLine(editor, pos.getLine() + count);
-
-      if (col == LAST_COLUMN) {
-        col = VimInjectorKt.getInjector().getEngineEditorHelper().normalizeVisualColumn(editor, line, col,
-                                    CommandStateHelper.isEndAllowedIgnoringOnemore(EngineHelperKt.getMode(editor)));
-      }
-      else {
-        if (line < 0) {
-          // https://web.ea.pages.jetbrains.team/#/issue/266279
-          // There is a weird exception for line < 0, but I don't understand how this may happen
-          throw new RuntimeException("Line is " + line + " , pos.line=" + pos.getLine() + ", count=" + count);
-        }
-        int newInlineElements = VimInjectorKt.getInjector().getEngineEditorHelper()
-          .amountOfInlaysBeforeVisualPosition(editor, new VimVisualPosition(line, col, false));
-
-        col = VimInjectorKt.getInjector().getEngineEditorHelper()
-          .normalizeVisualColumn(editor, line, col, EngineHelperKt.isEndAllowed(editor));
-        col += newInlineElements;
-      }
-
-      VimVisualPosition newPos = new VimVisualPosition(line, col, false);
-      return editor.visualPositionToOffset(newPos).getPoint();
-    }
   }
 
   public @Range(from = 0, to = Integer.MAX_VALUE) int moveCaretToLinePercent(@NotNull Editor editor,

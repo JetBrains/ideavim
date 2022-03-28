@@ -684,7 +684,7 @@ public class ChangeGroup implements VimChangeGroup {
 
         for (int i = 0; i < repeatLines; i++) {
           if (repeatAppend &&
-              repeatColumn < MotionGroup.LAST_COLUMN &&
+              repeatColumn < VimMotionGroupBase.LAST_COLUMN &&
               EditorHelper.getVisualLineLength(editor, visualLine + i) < repeatColumn) {
             final String pad = EditorHelper.pad(editor, context, logicalLine + i, repeatColumn);
             if (pad.length() > 0) {
@@ -693,7 +693,7 @@ public class ChangeGroup implements VimChangeGroup {
             }
           }
           int updatedCount = started ? (i == 0 ? count : count + 1) : count;
-          if (repeatColumn >= MotionGroup.LAST_COLUMN) {
+          if (repeatColumn >= VimMotionGroupBase.LAST_COLUMN) {
             caret.moveToOffset(VimPlugin.getMotion().moveCaretToLineEnd(editor, logicalLine + i, true));
             repeatInsertText(editor, context, updatedCount, operatorArguments);
           }
@@ -1467,13 +1467,13 @@ public class ChangeGroup implements VimChangeGroup {
       }
       else if (append) {
         column += range.getMaxLength();
-        if (UserDataManager.getVimLastColumn(caret) == MotionGroup.LAST_COLUMN) {
-          column = MotionGroup.LAST_COLUMN;
+        if (UserDataManager.getVimLastColumn(caret) == VimMotionGroupBase.LAST_COLUMN) {
+          column = VimMotionGroupBase.LAST_COLUMN;
         }
       }
 
       final int lineLength = EditorHelper.getLineLength(editor, line);
-      if (column < MotionGroup.LAST_COLUMN && lineLength < column) {
+      if (column < VimMotionGroupBase.LAST_COLUMN && lineLength < column) {
         final String pad = EditorHelper.pad(editor, context, line, column);
         final int offset = editor.getDocument().getLineEndOffset(line);
         insertText(editor, caret, offset, pad);
@@ -1559,8 +1559,8 @@ public class ChangeGroup implements VimChangeGroup {
     if (type == SelectionType.BLOCK_WISE) {
       lines = getLinesCountInVisualBlock(editor, range);
       col = editor.offsetToLogicalPosition(range.getStartOffset()).column;
-      if (UserDataManager.getVimLastColumn(caret) == MotionGroup.LAST_COLUMN) {
-        col = MotionGroup.LAST_COLUMN;
+      if (UserDataManager.getVimLastColumn(caret) == VimMotionGroupBase.LAST_COLUMN) {
+        col = VimMotionGroupBase.LAST_COLUMN;
       }
     }
     boolean after = range.getEndOffset() >= EditorHelperRt.getFileSize(editor);
