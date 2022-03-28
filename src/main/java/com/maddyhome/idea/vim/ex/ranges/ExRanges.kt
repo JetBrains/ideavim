@@ -24,6 +24,7 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.Direction
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.newapi.vim
 import java.util.*
 
 /**
@@ -207,7 +208,7 @@ class MarkRange(private val mark: Char, offset: Int, move: Boolean) : Range(offs
    * @return The zero based line number, -1 if there is no such mark set in the file
    */
   override fun getRangeLine(editor: Editor, lastZero: Boolean): Int {
-    val mark = VimPlugin.getMark().getFileMark(editor, mark)
+    val mark = VimPlugin.getMark().getFileMark(editor.vim, mark)
     return mark?.logicalLine ?: -1
   }
 

@@ -996,7 +996,7 @@ public class MotionGroup {
   }
 
   public int moveCaretToFileMark(@NotNull Editor editor, char ch, boolean toLineStart) {
-    final Mark mark = VimPlugin.getMark().getFileMark(editor, ch);
+    final Mark mark = VimPlugin.getMark().getFileMark(new IjVimEditor(editor), ch);
     if (mark == null) return -1;
 
     final int line = mark.getLogicalLine();

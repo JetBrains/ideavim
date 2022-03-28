@@ -37,7 +37,7 @@ data class FindClassCommand(val ranges: Ranges, val argument: String) : Command.
     if (arg.isNotEmpty()) {
       val res = VimPlugin.getFile().openFile("$arg.java", context)
       if (res) {
-        VimPlugin.getMark().saveJumpLocation(editor)
+        VimPlugin.getMark().saveJumpLocation(editor.vim)
       }
 
       return if (res) ExecutionResult.Success else ExecutionResult.Error

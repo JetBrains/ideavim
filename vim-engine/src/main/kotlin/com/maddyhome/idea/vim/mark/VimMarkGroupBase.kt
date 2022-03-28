@@ -2,6 +2,7 @@ package com.maddyhome.idea.vim.mark
 
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.common.TextRange
 import java.util.*
 
 abstract class VimMarkGroupBase : VimMarkGroup {
@@ -200,5 +201,112 @@ abstract class VimMarkGroupBase : VimMarkGroup {
       ch,
       editor.primaryCaret().offset.point
     )
+  }
+
+  /**
+   * Saves the caret location prior to doing a jump
+   *
+   * @param editor  The editor the jump will occur in
+   */
+  override fun saveJumpLocation(editor: VimEditor) {
+    addJump(editor, true)
+    setMark(editor, '\'')
+
+    includeCurrentCommandAsNavigation(editor)
+  }
+
+  /**
+   * Get's a mark from the file
+   *
+   * @param editor The editor to get the mark from
+   * @param ch     The mark to get
+   * @return The mark in the current file, if set, null if no such mark
+   */
+  override fun getFileMark(editor: VimEditor, ch: Char): Mark? {
+    var myCh = ch
+    if (myCh == '`') myCh = '\''
+    val path = editor.getPath() ?: return null
+    val fmarks = getFileMarks(path)
+    var mark: Mark? = fmarks[myCh]
+    if (mark != null && mark.isClear()) {
+      fmarks.remove(myCh)
+      mark = null
+    }
+
+    return mark
+  }
+
+  override fun setVisualSelectionMarks(editor: VimEditor, range: TextRange) {
+    setMark(editor, VimMarkConstants.MARK_VISUAL_START, range.startOffset)
+    setMark(editor, VimMarkConstants.MARK_VISUAL_END, range.endOffset)
+  }
+
+  override fun setChangeMarks(vimEditor: VimEditor, range: TextRange) {
+    setMark(vimEditor, VimMarkConstants.MARK_CHANGE_START, range.startOffset)
+    setMark(vimEditor, VimMarkConstants.MARK_CHANGE_END, range.endOffset - 1)
+  }
+
+  private fun getMarksRange(editor: VimEditor, startMark: Char, endMark: Char): TextRange? {
+    val start = getMark(editor, startMark)
+    val end = getMark(editor, endMark)
+    if (start != null && end != null) {
+      val startOffset = injector.engineEditorHelper.getOffset(editor, start.logicalLine, start.col)
+      val endOffset = injector.engineEditorHelper.getOffset(editor, end.logicalLine, end.col)
+      return TextRange(startOffset, endOffset + 1)
+    }
+    return null
+  }
+
+  override fun getChangeMarks(editor: VimEditor): TextRange? {
+    return getMarksRange(editor, VimMarkConstants.MARK_CHANGE_START, VimMarkConstants.MARK_CHANGE_END)
+  }
+
+  override fun getVisualSelectionMarks(editor: VimEditor): TextRange? {
+    return getMarksRange(editor, VimMarkConstants.MARK_VISUAL_START, VimMarkConstants.MARK_VISUAL_END)
+  }
+
+  override fun resetAllMarks() {
+    globalMarks.clear()
+    fileMarks.clear()
+    jumps.clear()
+  }
+
+  override fun removeMark(ch: Char, mark: Mark) {
+    if (VimMarkConstants.FILE_MARKS.indexOf(ch) >= 0) {
+      val fmarks = getFileMarks(mark.filename)
+      fmarks.remove(ch)
+    } else if (VimMarkConstants.GLOBAL_MARKS.indexOf(ch) >= 0) {
+      // Global marks are added to global and file marks
+      val fmarks = getFileMarks(mark.filename)
+      fmarks.remove(ch)
+      globalMarks.remove(ch)
+    }
+
+    mark.clear()
+  }
+
+  override fun getMarks(editor: VimEditor): List<Mark> {
+    val res = HashSet<Mark>()
+
+    val path = editor.getPath()
+    if (path != null) {
+      val marks = getFileMarks(path)
+      res.addAll(marks.values)
+    }
+    res.addAll(globalMarks.values)
+
+    val list = ArrayList(res)
+
+    list.sortWith(Mark.KeySorter)
+
+    return list
+  }
+
+  override fun getJumps(): List<Jump> {
+    return jumps
+  }
+
+  override fun getJumpSpot(): Int {
+    return jumpSpot
   }
 }

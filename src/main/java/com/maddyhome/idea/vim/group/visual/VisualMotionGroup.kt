@@ -55,7 +55,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 class VisualMotionGroup : VimVisualMotionGroup {
   fun selectPreviousVisualMode(editor: Editor): Boolean {
     val lastSelectionType = editor.vimLastSelectionType ?: return false
-    val visualMarks = VimPlugin.getMark().getVisualSelectionMarks(editor) ?: return false
+    val visualMarks = VimPlugin.getMark().getVisualSelectionMarks(editor.vim) ?: return false
 
     editor.caretModel.removeSecondaryCarets()
 
@@ -72,13 +72,13 @@ class VisualMotionGroup : VimVisualMotionGroup {
   fun swapVisualSelections(editor: Editor): Boolean {
     val lastSelectionType = editor.vimLastSelectionType ?: return false
 
-    val lastVisualRange = VimPlugin.getMark().getVisualSelectionMarks(editor) ?: return false
+    val lastVisualRange = VimPlugin.getMark().getVisualSelectionMarks(editor.vim) ?: return false
     val primaryCaret = editor.caretModel.primaryCaret
     editor.caretModel.removeSecondaryCarets()
     val vimSelectionStart = primaryCaret.vimSelectionStart
 
     editor.vimLastSelectionType = SelectionType.fromSubMode(editor.subMode)
-    VimPlugin.getMark().setVisualSelectionMarks(editor, TextRange(vimSelectionStart, primaryCaret.offset))
+    VimPlugin.getMark().setVisualSelectionMarks(editor.vim, TextRange(vimSelectionStart, primaryCaret.offset))
 
     editor.subMode = lastSelectionType.toSubMode()
     primaryCaret.vimSetSelection(lastVisualRange.startOffset, lastVisualRange.endOffset, true)

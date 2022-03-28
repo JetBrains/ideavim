@@ -22,6 +22,7 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.ranges.Ranges
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
@@ -32,7 +33,7 @@ data class SelectLastFileCommand(val ranges: Ranges, val argument: String) : Com
   override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
     val res = VimPlugin.getFile().selectFile(999, context)
     if (res) {
-      VimPlugin.getMark().saveJumpLocation(editor)
+      VimPlugin.getMark().saveJumpLocation(editor.vim)
     }
     return if (res) ExecutionResult.Success else ExecutionResult.Error
   }

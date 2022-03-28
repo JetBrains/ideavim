@@ -124,7 +124,7 @@ class PutGroup {
       fistIndex += 1
     }
 
-    VimPlugin.getMark().setVisualSelectionMarks(editor, TextRange(fistIndex, lastIndex))
+    VimPlugin.getMark().setVisualSelectionMarks(editor.vim, TextRange(fistIndex, lastIndex))
   }
 
   private fun wasTextInsertedLineWise(text: ProcessedTextData): Boolean {

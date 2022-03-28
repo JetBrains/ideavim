@@ -25,6 +25,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.group.createLineBookmark
 import com.maddyhome.idea.vim.group.mnemonic
 import com.maddyhome.idea.vim.helper.StringHelper
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
 import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.OptionValueType
@@ -113,7 +114,7 @@ class MotionMarkActionTest : VimOptionTestCase(OptionConstants.ideamarksName) {
     configureByText(text)
     myFixture.project.createLineBookmark(myFixture.editor, 2, 'A')
     PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
-    val vimMarks = VimPlugin.getMark().getMarks(myFixture.editor)
+    val vimMarks = VimPlugin.getMark().getMarks(myFixture.editor.vim)
     TestCase.assertEquals(1, vimMarks.size)
     TestCase.assertEquals('A', vimMarks[0].key)
   }
@@ -135,7 +136,7 @@ class MotionMarkActionTest : VimOptionTestCase(OptionConstants.ideamarksName) {
     BookmarksManager.getInstance(myFixture.project)?.remove(bookmark!!)
     myFixture.project.createLineBookmark(myFixture.editor, 4, 'A')
     PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
-    val vimMarks = VimPlugin.getMark().getMarks(myFixture.editor)
+    val vimMarks = VimPlugin.getMark().getMarks(myFixture.editor.vim)
     TestCase.assertEquals(1, vimMarks.size)
     TestCase.assertEquals('A', vimMarks[0].key)
     TestCase.assertEquals(4, vimMarks[0].logicalLine)

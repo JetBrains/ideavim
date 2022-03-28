@@ -35,7 +35,7 @@ class GotoDeclarationAction : VimActionHandler.SingleExecution() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
 
   override fun execute(editor: Editor, context: DataContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
-    VimPlugin.getMark().saveJumpLocation(editor)
+    VimPlugin.getMark().saveJumpLocation(editor.vim)
     injector.actionExecutor.executeAction("GotoDeclaration", context.vim)
     return true
   }

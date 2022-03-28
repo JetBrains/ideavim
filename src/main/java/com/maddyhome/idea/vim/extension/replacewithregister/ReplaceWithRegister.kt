@@ -129,7 +129,7 @@ class ReplaceWithRegister : VimExtension {
     }
 
     private fun getRange(editor: Editor): TextRange? = when (editor.vim.mode) {
-      CommandState.Mode.COMMAND -> VimPlugin.getMark().getChangeMarks(editor)
+      CommandState.Mode.COMMAND -> VimPlugin.getMark().getChangeMarks(editor.vim)
       CommandState.Mode.VISUAL -> editor.caretModel.primaryCaret.run { TextRange(selectionStart, selectionEnd) }
       else -> null
     }

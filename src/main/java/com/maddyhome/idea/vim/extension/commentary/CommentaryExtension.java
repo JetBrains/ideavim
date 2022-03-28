@@ -30,8 +30,8 @@ import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
-import com.maddyhome.idea.vim.common.MappingMode;
 import com.maddyhome.idea.vim.command.SelectionType;
+import com.maddyhome.idea.vim.common.MappingMode;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.extension.VimExtension;
 import com.maddyhome.idea.vim.extension.VimExtensionHandler;
@@ -142,7 +142,7 @@ public class CommentaryExtension implements VimExtension {
       final CommandState.Mode mode = CommandState.getInstance(new IjVimEditor(editor)).getMode();
       switch (mode) {
         case COMMAND:
-          return VimPlugin.getMark().getChangeMarks(editor);
+          return VimPlugin.getMark().getChangeMarks(new IjVimEditor(editor));
         case VISUAL:
           Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
           return new TextRange(primaryCaret.getSelectionStart(), primaryCaret.getSelectionEnd());

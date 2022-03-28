@@ -750,7 +750,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
       int nmatch = sp.vim_regexec_multi(regmatch, editor, lcount, lnum, searchcol);
       if (nmatch > 0) {
         if (firstMatch) {
-          VimPlugin.getMark().saveJumpLocation(editor);
+          VimPlugin.getMark().saveJumpLocation(new IjVimEditor(editor));
           firstMatch = false;
         }
 

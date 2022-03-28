@@ -38,12 +38,10 @@ import com.intellij.openapi.fileEditor.ex.IdeDocumentHistory;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.vfs.VirtualFileManager;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.VimEditor;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
-import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.HelperKt;
 import com.maddyhome.idea.vim.mark.*;
@@ -72,46 +70,12 @@ public class MarkGroup extends VimMarkGroupBase implements PersistentStateCompon
     setMark(new IjVimEditor(editor), '"', editor.getCaretModel().getOffset());
   }
 
-  /**
-   * Saves the caret location prior to doing a jump
-   *
-   * @param editor  The editor the jump will occur in
-   */
   @Override
-  public void saveJumpLocation(@NotNull VimEditor editor) {
-    saveJumpLocation(((IjVimEditor)editor).getEditor());
-  }
-
-  public void saveJumpLocation(@NotNull Editor editor) {
-    addJump(new IjVimEditor(editor), true);
-    setMark(new IjVimEditor(editor), '\'');
-
-    Project project = editor.getProject();
+  public void includeCurrentCommandAsNavigation(@NotNull VimEditor editor) {
+    Project project = ((IjVimEditor)editor).getEditor().getProject();
     if (project != null) {
       IdeDocumentHistory.getInstance(project).includeCurrentCommandAsNavigation();
     }
-  }
-
-  /**
-   * Get's a mark from the file
-   *
-   * @param editor The editor to get the mark from
-   * @param ch     The mark to get
-   * @return The mark in the current file, if set, null if no such mark
-   */
-  public @Nullable Mark getFileMark(@NotNull Editor editor, char ch) {
-    if (ch == '`') ch = '\'';
-    final HashMap<Character, Mark> fmarks = getFileMarks(editor.getDocument());
-    if (fmarks == null) {
-      return null;
-    }
-    Mark mark = fmarks.get(ch);
-    if (mark != null && mark.isClear()) {
-      fmarks.remove(ch);
-      mark = null;
-    }
-
-    return mark;
   }
 
   @Override
@@ -122,85 +86,6 @@ public class MarkGroup extends VimMarkGroupBase implements PersistentStateCompon
       return null;
     }
     return new IntellijMark(systemMark, col, ijEditor.getProject());
-  }
-
-  public static String extractProtocol(@NotNull VirtualFile vf) {
-    return VirtualFileManager.extractProtocol(vf.getUrl());
-  }
-
-  public void setVisualSelectionMarks(@NotNull Editor editor, @NotNull TextRange range) {
-    setMark(new IjVimEditor(editor), MARK_VISUAL_START, range.getStartOffset());
-    setMark(new IjVimEditor(editor), MARK_VISUAL_END, range.getEndOffset());
-  }
-
-  @Override
-  public void setChangeMarks(@NotNull VimEditor vimEditor, @NotNull TextRange range) {
-    setMark(vimEditor, MARK_CHANGE_START, range.getStartOffset());
-    setMark(vimEditor, MARK_CHANGE_END, range.getEndOffset()-1);
-  }
-
-  public @Nullable TextRange getChangeMarks(@NotNull Editor editor) {
-    return getMarksRange(editor, MARK_CHANGE_START, MARK_CHANGE_END);
-  }
-
-  public @Nullable TextRange getVisualSelectionMarks(@NotNull Editor editor) {
-    return getMarksRange(editor, MARK_VISUAL_START, MARK_VISUAL_END);
-  }
-
-  private @Nullable TextRange getMarksRange(@NotNull Editor editor, char startMark, char endMark) {
-    final Mark start = getMark(new IjVimEditor(editor), startMark);
-    final Mark end = getMark(new IjVimEditor(editor), endMark);
-    if (start != null && end != null) {
-      final int startOffset = EditorHelper.getOffset(editor, start.getLogicalLine(), start.getCol());
-      final int endOffset = EditorHelper.getOffset(editor, end.getLogicalLine(), end.getCol());
-      return new TextRange(startOffset, endOffset+1);
-    }
-    return null;
-  }
-
-  public void resetAllMarks() {
-    globalMarks.clear();
-    fileMarks.clear();
-    jumps.clear();
-  }
-
-  public void removeMark(char ch, @NotNull Mark mark) {
-    if (FILE_MARKS.indexOf(ch) >= 0) {
-      HashMap<Character, Mark> fmarks = getFileMarks(mark.getFilename());
-      fmarks.remove(ch);
-    }
-    else if (GLOBAL_MARKS.indexOf(ch) >= 0) {
-      // Global marks are added to global and file marks
-      HashMap<Character, Mark> fmarks = getFileMarks(mark.getFilename());
-      fmarks.remove(ch);
-      globalMarks.remove(ch);
-    }
-
-    mark.clear();
-  }
-
-  public @NotNull List<Mark> getMarks(@NotNull Editor editor) {
-    HashSet<Mark> res = new HashSet<>();
-
-    final FileMarks<Character, Mark> marks = getFileMarks(editor.getDocument());
-    if (marks != null) {
-      res.addAll(marks.values());
-    }
-    res.addAll(globalMarks.values());
-
-    ArrayList<Mark> list = new ArrayList<>(res);
-
-    list.sort(Mark.KeySorter.INSTANCE);
-
-    return list;
-  }
-
-  public @NotNull List<Jump> getJumps() {
-    return jumps;
-  }
-
-  public int getJumpSpot() {
-    return jumpSpot;
   }
 
   /**

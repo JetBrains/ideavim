@@ -59,7 +59,7 @@ fun Editor.exitVisualMode() {
     this.vimLastSelectionType = selectionType
     val primaryCaret = this.caretModel.primaryCaret
     val vimSelectionStart = primaryCaret.vimSelectionStart
-    VimPlugin.getMark().setVisualSelectionMarks(this, TextRange(vimSelectionStart, primaryCaret.offset))
+    VimPlugin.getMark().setVisualSelectionMarks(this.vim, TextRange(vimSelectionStart, primaryCaret.offset))
     this.caretModel.allCarets.forEach { it.vimSelectionStartClear() }
 
     this.subMode = CommandState.SubMode.NONE

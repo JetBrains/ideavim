@@ -44,4 +44,22 @@ interface VimMarkGroup {
    * @return True if a valid, writable mark, false if not
    */
   fun setMark(editor: VimEditor, ch: Char): Boolean
+    fun includeCurrentCommandAsNavigation(editor: VimEditor)
+
+  /**
+   * Get's a mark from the file
+   *
+   * @param editor The editor to get the mark from
+   * @param ch     The mark to get
+   * @return The mark in the current file, if set, null if no such mark
+   */
+  fun getFileMark(editor: VimEditor, ch: Char): Mark?
+  fun setVisualSelectionMarks(editor: VimEditor, range: TextRange)
+  fun getChangeMarks(editor: VimEditor): TextRange?
+  fun getVisualSelectionMarks(editor: VimEditor): TextRange?
+  fun resetAllMarks()
+  fun removeMark(ch: Char, mark: Mark)
+  fun getMarks(editor: VimEditor): List<Mark>
+  fun getJumps(): List<Jump>
+  fun getJumpSpot(): Int
 }

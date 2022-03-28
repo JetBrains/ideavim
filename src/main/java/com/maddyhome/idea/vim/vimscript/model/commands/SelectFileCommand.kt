@@ -22,6 +22,7 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.ranges.Ranges
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
@@ -36,7 +37,7 @@ data class SelectFileCommand(val ranges: Ranges, val argument: String) : Command
     if (count > 0) {
       val res = VimPlugin.getFile().selectFile(count - 1, context)
       if (res) {
-        VimPlugin.getMark().saveJumpLocation(editor)
+        VimPlugin.getMark().saveJumpLocation(editor.vim)
       }
 
       return if (res) ExecutionResult.Success else ExecutionResult.Error

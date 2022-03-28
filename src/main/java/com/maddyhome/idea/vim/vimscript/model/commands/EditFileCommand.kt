@@ -36,13 +36,13 @@ data class EditFileCommand(val ranges: Ranges, val argument: String) : Command.S
   override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
     val arg = argument
     if (arg == "#") {
-      VimPlugin.getMark().saveJumpLocation(editor)
+      VimPlugin.getMark().saveJumpLocation(editor.vim)
       VimPlugin.getFile().selectPreviousTab(context)
       return ExecutionResult.Success
     } else if (arg.isNotEmpty()) {
       val res = VimPlugin.getFile().openFile(arg, context)
       if (res) {
-        VimPlugin.getMark().saveJumpLocation(editor)
+        VimPlugin.getMark().saveJumpLocation(editor.vim)
       }
       return if (res) ExecutionResult.Success else ExecutionResult.Error
     }

@@ -22,6 +22,7 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.ranges.Ranges
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
@@ -33,7 +34,7 @@ data class WriteNextFileCommand(val ranges: Ranges, val argument: String) : Comm
     val count = getCount(editor, 1, true)
 
     VimPlugin.getFile().saveFile(context)
-    VimPlugin.getMark().saveJumpLocation(editor)
+    VimPlugin.getMark().saveJumpLocation(editor.vim)
     VimPlugin.getFile().selectNextFile(count, context)
 
     return ExecutionResult.Success

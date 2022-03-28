@@ -195,7 +195,7 @@ class VimSurroundExtension : VimExtension {
     }
 
     private fun getSurroundRange(editor: Editor): TextRange? = when (editor.mode) {
-      CommandState.Mode.COMMAND -> VimPlugin.getMark().getChangeMarks(editor)
+      CommandState.Mode.COMMAND -> VimPlugin.getMark().getChangeMarks(editor.vim)
       CommandState.Mode.VISUAL -> editor.caretModel.primaryCaret.run { TextRange(selectionStart, selectionEnd) }
       else -> null
     }

@@ -15,4 +15,8 @@ class IjEditorHelper : EngineEditorHelper {
   override fun getText(editor: VimEditor, range: TextRange): String {
     return EditorHelper.getText((editor as IjVimEditor).editor, range)
   }
+
+  override fun getOffset(editor: VimEditor, line: Int, column: Int): Int {
+    return EditorHelper.getOffset((editor as IjVimEditor).editor, line, column)
+  }
 }
