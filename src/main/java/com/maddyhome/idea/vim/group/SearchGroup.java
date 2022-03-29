@@ -42,6 +42,7 @@ import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.ex.ranges.LineRange;
 import com.maddyhome.idea.vim.helper.*;
+import com.maddyhome.idea.vim.history.HistoryConstants;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.options.OptionChangeListener;
 import com.maddyhome.idea.vim.options.OptionConstants;
@@ -194,7 +195,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
 
     // This will remove an existing entry and add it back to the end, and is expected to do so even if the string value
     // is the same
-    VimPlugin.getHistory().addEntry(HistoryGroup.SEARCH, pattern);
+    VimPlugin.getHistory().addEntry(HistoryConstants.SEARCH, pattern);
   }
 
   /**

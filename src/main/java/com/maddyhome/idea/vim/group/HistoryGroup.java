@@ -23,90 +23,23 @@ import com.intellij.openapi.components.RoamingType;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.diagnostic.Logger;
-import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.helper.StringHelper;
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt;
-import com.maddyhome.idea.vim.options.OptionConstants;
-import com.maddyhome.idea.vim.options.OptionScope;
+import com.maddyhome.idea.vim.history.HistoryBlock;
+import com.maddyhome.idea.vim.history.HistoryEntry;
+import com.maddyhome.idea.vim.history.VimHistoryBase;
 import org.jdom.Element;
-import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.TestOnly;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import static com.maddyhome.idea.vim.history.HistoryConstants.*;
 
 @State(name = "VimHistorySettings", storages = {
   @Storage(value = "$APP_CONFIG$/vim_settings_local.xml", roamingType = RoamingType.DISABLED)
 })
-public class HistoryGroup implements PersistentStateComponent<Element> {
-  public static final @NonNls String SEARCH = "search";
-  public static final @NonNls String COMMAND = "cmd";
-  public static final @NonNls String EXPRESSION = "expr";
-  public static final @NonNls String INPUT = "input";
-
-  public void addEntry(String key, @NotNull String text) {
-    if (logger.isDebugEnabled()) {
-      logger.debug("Add entry '" + text + "' to " + key);
-    }
-
-    HistoryBlock block = blocks(key);
-    block.addEntry(text);
-  }
-
-  public @NotNull List<HistoryEntry> getEntries(String key, int first, int last) {
-    HistoryBlock block = blocks(key);
-
-    List<HistoryEntry> entries = block.getEntries();
-    List<HistoryEntry> res = new ArrayList<>();
-    if (first < 0) {
-      if (-first > entries.size()) {
-        first = Integer.MAX_VALUE;
-      }
-      else {
-        HistoryEntry entry = entries.get(entries.size() + first);
-        first = entry.getNumber();
-      }
-    }
-    if (last < 0) {
-      if (-last > entries.size()) {
-        last = Integer.MIN_VALUE;
-      }
-      else {
-        HistoryEntry entry = entries.get(entries.size() + last);
-        last = entry.getNumber();
-      }
-    }
-    else if (last == 0) {
-      last = Integer.MAX_VALUE;
-    }
-
-    if (logger.isDebugEnabled()) {
-      logger.debug("first=" + first);
-      logger.debug("last=" + last);
-    }
-
-    for (HistoryEntry entry : entries) {
-      if (entry.getNumber() >= first && entry.getNumber() <= last) {
-        res.add(entry);
-      }
-    }
-
-    return res;
-  }
-
-  private HistoryBlock blocks(String key) {
-    HistoryBlock block = histories.get(key);
-    if (block == null) {
-      block = new HistoryBlock();
-      histories.put(key, block);
-    }
-
-    return block;
-  }
+public class HistoryGroup extends VimHistoryBase implements PersistentStateComponent<Element> {
 
   public void saveData(@NotNull Element element) {
     logger.debug("saveData");
@@ -121,7 +54,7 @@ public class HistoryGroup implements PersistentStateComponent<Element> {
   }
 
   private void saveData(@NotNull Element element, String key) {
-    final HistoryBlock block = histories.get(key);
+    final HistoryBlock block = getHistories().get(key);
     if (block == null) {
       return;
     }
@@ -151,13 +84,13 @@ public class HistoryGroup implements PersistentStateComponent<Element> {
   }
 
   private void readData(@NotNull Element element, String key) {
-    HistoryBlock block = histories.get(key);
+    HistoryBlock block = getHistories().get(key);
     if (block != null) {
       return;
     }
 
     block = new HistoryBlock();
-    histories.put(key, block);
+    getHistories().put(key, block);
 
     final Element root = element.getChild("history-" + key);
     if (root != null) {
@@ -169,11 +102,6 @@ public class HistoryGroup implements PersistentStateComponent<Element> {
         }
       }
     }
-  }
-
-  private static int maxLength() {
-    return ((VimInt) VimPlugin.getOptionService()
-      .getOptionValue(OptionScope.GLOBAL.INSTANCE, OptionConstants.historyName, OptionConstants.historyName)).getValue();
   }
 
   @Nullable
@@ -191,53 +119,8 @@ public class HistoryGroup implements PersistentStateComponent<Element> {
 
   @TestOnly
   public void clear() {
-    histories.clear();
+    getHistories().clear();
   }
-
-  private static class HistoryBlock {
-    public void addEntry(@NotNull String text) {
-      for (int i = 0; i < entries.size(); i++) {
-        HistoryEntry entry = entries.get(i);
-        if (text.equals(entry.getEntry())) {
-          entries.remove(i);
-          break;
-        }
-      }
-
-      entries.add(new HistoryEntry(++counter, text));
-
-      if (entries.size() > maxLength()) {
-        entries.remove(0);
-      }
-    }
-
-    public @NotNull List<HistoryEntry> getEntries() {
-      return entries;
-    }
-
-    private final @NotNull List<HistoryEntry> entries = new ArrayList<>();
-    private int counter;
-  }
-
-  public static class HistoryEntry {
-    public HistoryEntry(int number, @NotNull String entry) {
-      this.number = number;
-      this.entry = entry;
-    }
-
-    public int getNumber() {
-      return number;
-    }
-
-    public @NotNull String getEntry() {
-      return entry;
-    }
-
-    private final int number;
-    private final @NotNull String entry;
-  }
-
-  private final @NotNull Map<String, HistoryBlock> histories = new HashMap<>();
 
   private static final Logger logger = Logger.getInstance(HistoryGroup.class.getName());
 }

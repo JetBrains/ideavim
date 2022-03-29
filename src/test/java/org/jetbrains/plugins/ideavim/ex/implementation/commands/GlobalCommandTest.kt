@@ -20,7 +20,7 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.group.HistoryGroup
+import com.maddyhome.idea.vim.history.HistoryConstants
 import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -176,7 +176,7 @@ class GlobalCommandTest : VimTestCase() {
 
   fun `test check history`() {
     VimPlugin.getHistory().clear()
-    val initialEntries = VimPlugin.getHistory().getEntries(HistoryGroup.COMMAND, 0, 0)
+    val initialEntries = VimPlugin.getHistory().getEntries(HistoryConstants.COMMAND, 0, 0)
     doTest(
       "g/found/d",
       initialText,
@@ -188,7 +188,7 @@ class GlobalCommandTest : VimTestCase() {
             hard by the torrent of a mountain pass. 
       """.trimIndent(),
     )
-    val entries = VimPlugin.getHistory().getEntries(HistoryGroup.COMMAND, 0, 0)
+    val entries = VimPlugin.getHistory().getEntries(HistoryConstants.COMMAND, 0, 0)
     TestCase.assertEquals(1, entries.size - initialEntries.size)
     val element = entries.last()
     TestCase.assertEquals("g/found/d", element.entry)

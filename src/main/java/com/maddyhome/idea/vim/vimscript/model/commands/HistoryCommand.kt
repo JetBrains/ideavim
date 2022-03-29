@@ -25,10 +25,10 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.ex.ranges.Ranges
-import com.maddyhome.idea.vim.group.HistoryGroup.COMMAND
-import com.maddyhome.idea.vim.group.HistoryGroup.EXPRESSION
-import com.maddyhome.idea.vim.group.HistoryGroup.INPUT
-import com.maddyhome.idea.vim.group.HistoryGroup.SEARCH
+import com.maddyhome.idea.vim.history.HistoryConstants.COMMAND
+import com.maddyhome.idea.vim.history.HistoryConstants.EXPRESSION
+import com.maddyhome.idea.vim.history.HistoryConstants.INPUT
+import com.maddyhome.idea.vim.history.HistoryConstants.SEARCH
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**

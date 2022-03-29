@@ -25,7 +25,7 @@ import com.intellij.openapi.editor.textarea.TextComponentEditorImpl
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.FinishException
-import com.maddyhome.idea.vim.group.HistoryGroup
+import com.maddyhome.idea.vim.history.HistoryConstants
 import com.maddyhome.idea.vim.register.RegisterConstants.LAST_COMMAND_REGISTER
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
@@ -80,7 +80,7 @@ object Executor {
     }
 
     if (!skipHistory) {
-      VimPlugin.getHistory().addEntry(HistoryGroup.COMMAND, scriptString)
+      VimPlugin.getHistory().addEntry(HistoryConstants.COMMAND, scriptString)
       if (script.units.size == 1 && script.units[0] is Command && script.units[0] !is RepeatCommand) {
         VimPlugin.getRegister().storeTextSpecial(LAST_COMMAND_REGISTER, scriptString)
       }

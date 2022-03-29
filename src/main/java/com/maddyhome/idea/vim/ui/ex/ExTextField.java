@@ -26,8 +26,9 @@ import com.intellij.ui.paint.PaintUtil;
 import com.intellij.util.ui.JBUI;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.group.EditorHolderService;
-import com.maddyhome.idea.vim.group.HistoryGroup;
 import com.maddyhome.idea.vim.helper.UiHelper;
+import com.maddyhome.idea.vim.history.HistoryConstants;
+import com.maddyhome.idea.vim.history.HistoryEntry;
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.GuiCursorAttributes;
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.GuiCursorMode;
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.GuiCursorOptionHelper;
@@ -134,10 +135,10 @@ public class ExTextField extends JTextField {
     switch (type.charAt(0)) {
       case '/':
       case '?':
-        hkey = HistoryGroup.SEARCH;
+        hkey = HistoryConstants.SEARCH;
         break;
       case ':':
-        hkey = HistoryGroup.COMMAND;
+        hkey = HistoryConstants.COMMAND;
         break;
     }
 
@@ -171,7 +172,7 @@ public class ExTextField extends JTextField {
           txt = lastEntry;
         }
         else {
-          HistoryGroup.HistoryEntry entry = history.get(i);
+          HistoryEntry entry = history.get(i);
           txt = entry.getEntry();
         }
 
@@ -192,7 +193,7 @@ public class ExTextField extends JTextField {
         txt = lastEntry;
       }
       else {
-        HistoryGroup.HistoryEntry entry = history.get(histIndex);
+        HistoryEntry entry = history.get(histIndex);
         txt = entry.getEntry();
       }
 
@@ -583,7 +584,7 @@ public class ExTextField extends JTextField {
   private final CommandLineCaret caret;
   private String lastEntry;
   private String actualText;
-  private List<HistoryGroup.HistoryEntry> history;
+  private List<HistoryEntry> history;
   private int histIndex = 0;
   private @Nullable MultiStepAction currentAction;
   private char currentActionPromptCharacter;
