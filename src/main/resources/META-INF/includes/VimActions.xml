@@ -80,8 +80,8 @@
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.text.MotionUnmatchedParenOpenAction" mappingModes="NXO" keys="[("/>
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.text.MotionSectionBackwardEndAction" mappingModes="NXO" keys="[]"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.text.MotionSectionBackwardStartAction" mappingModes="NXO" keys="[["/>
-    <vimAction implementation="com.maddyhome.idea.vim.action.motion.text.MotionSectionForwardEndAction" mappingModes="NXO" keys="]]"/>
-    <vimAction implementation="com.maddyhome.idea.vim.action.motion.text.MotionSectionForwardStartAction" mappingModes="NXO" keys="]["/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.text.MotionSectionForwardStartAction" mappingModes="NXO" keys="]]"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.text.MotionSectionForwardEndAction" mappingModes="NXO" keys="]["/>
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.text.MotionMethodPreviousEndAction" mappingModes="NXO" keys="[M"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.text.MotionMethodPreviousStartAction" mappingModes="NXO" keys="[m"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.text.MotionMethodNextEndAction" mappingModes="NXO" keys="]M"/>

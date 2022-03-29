@@ -359,8 +359,8 @@
  * |]M|                   {@link com.maddyhome.idea.vim.action.motion.text.MotionMethodNextEndAction}
  * |]P|                   {@link com.maddyhome.idea.vim.action.copy.PutVisualTextBeforeCursorNoIndentAction}
  * |]P|                   {@link com.maddyhome.idea.vim.action.copy.PutTextBeforeCursorNoIndentAction}
- * |][|                   {@link com.maddyhome.idea.vim.action.motion.text.MotionSectionForwardStartAction}
- * |]]|                   {@link com.maddyhome.idea.vim.action.motion.text.MotionSectionForwardEndAction}
+ * |][|                   {@link com.maddyhome.idea.vim.action.motion.text.MotionSectionForwardEndAction}
+ * |]]|                   {@link com.maddyhome.idea.vim.action.motion.text.MotionSectionForwardStartAction}
  * |]c|                   TO BE IMPLEMENTED
  * |]d|                   TO BE IMPLEMENTED
  * |]f|                   TO BE IMPLEMENTED

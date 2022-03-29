@@ -26,7 +26,7 @@ class MotionSectionForwardEndActionTest : VimTestCase() {
   @VimBehaviorDiffers(originalVimAfter = c, description = "Full text is deleted")
   fun `test remove full text`() {
     doTest(
-      "d]]",
+      "d][",
       """
           ${c}I found it in a legendary land
           all rocks and lavender and tufted grass,
@@ -41,7 +41,7 @@ class MotionSectionForwardEndActionTest : VimTestCase() {
   @VimBehaviorDiffers(originalVimAfter = c, description = "Full text is deleted")
   fun `test remove full text with new line at the end`() {
     doTest(
-      "d]]",
+      "d][",
       """
           ${c}I found it in a legendary land
           all rocks and lavender and tufted grass,
@@ -50,6 +50,117 @@ class MotionSectionForwardEndActionTest : VimTestCase() {
           
       """.trimIndent(),
       "$c.\n",
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+    )
+  }
+
+  fun `test move forward`() {
+    doTest(
+      "][",
+      """
+      {
+        {
+        
+        }
+      $c}
+      {
+        {
+        }
+      }
+      {
+        {
+        }
+      }
+    """.trimIndent(),
+      """
+      {
+        {
+        
+        }
+      }
+      {
+        {
+        }
+      $c}
+      {
+        {
+        }
+      }
+    """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+    )
+  }
+
+  fun `test move forward twice`() {
+    doTest(
+      "][][",
+      """
+      {
+        {
+        $c
+        }
+      }
+      {
+        {
+        }
+      }
+      {
+        {
+        }
+      }
+    """.trimIndent(),
+      """
+      {
+        {
+        
+        }
+      }
+      {
+        {
+        }
+      $c}
+      {
+        {
+        }
+      }
+    """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+    )
+  }
+
+  fun `test move forward till the end`() {
+    doTest(
+      "][][][",
+      """
+      {
+        {
+        $c
+        }
+      }
+      {
+        {
+        }
+      }
+      {
+        {
+        }
+      }
+    """.trimIndent(),
+      """
+      {
+        {
+        
+        }
+      }
+      {
+        {
+        }
+      }
+      {
+        {
+        }
+      $c}
+    """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE
     )
   }
