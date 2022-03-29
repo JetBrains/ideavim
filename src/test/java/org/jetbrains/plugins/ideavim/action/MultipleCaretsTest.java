@@ -602,7 +602,7 @@ public class MultipleCaretsTest extends VimTestCase {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   public void testMotionSectionForwardEndAction() {
-    typeTextInFile(parseKeys("]]"), "n<caret>ot_a_brace\n" +
+    typeTextInFile(parseKeys("]["), "n<caret>ot_a_brace\n" +
                                     "{\n" +
                                     "n<caret>ot_a_brace\n" +
                                     "<caret>}\n" +
@@ -622,7 +622,7 @@ public class MultipleCaretsTest extends VimTestCase {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   public void testMotionSectionForwardStartAction() {
-    typeTextInFile(parseKeys("]["), "n<caret>ot_a_brace\n" +
+    typeTextInFile(parseKeys("]]"), "n<caret>ot_a_brace\n" +
                                     "{\n" +
                                     "n<caret>ot_a_brace\n" +
                                     "<caret>}\n" +
