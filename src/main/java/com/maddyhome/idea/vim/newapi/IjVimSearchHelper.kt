@@ -30,4 +30,14 @@ class IjVimSearchHelper : VimSearchHelper {
       count, countCurrent, requireAll
     )
   }
+
+  override fun findSection(editor: VimEditor, caret: VimCaret, type: Char, dir: Int, count: Int): Int {
+    return SearchHelper.findSection(
+      (editor as IjVimEditor).editor,
+      (caret as IjVimCaret).caret,
+      type,
+      dir,
+      count,
+    )
+  }
 }

@@ -15,4 +15,12 @@ interface VimSearchHelper {
     countCurrent: Boolean,
     requireAll: Boolean,
   ): Int
+
+  fun findSection(
+    editor: VimEditor,
+    caret: VimCaret,
+    type: Char,
+    dir: Int,
+    count: Int,
+  ): Int
 }

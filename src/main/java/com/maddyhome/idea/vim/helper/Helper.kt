@@ -30,7 +30,6 @@ import com.intellij.openapi.util.Key
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
-import java.util.*
 
 /**
  * This annotation is created for test functions (methods).
@@ -70,12 +69,6 @@ annotation class VimBehaviorDiffers(
 )
 
 fun <T : Comparable<T>> sort(a: T, b: T) = if (a > b) b to a else a to b
-
-inline fun <reified T : Enum<T>> enumSetOf(vararg value: T): EnumSet<T> = when (value.size) {
-  0 -> noneOfEnum()
-  1 -> EnumSet.of(value[0])
-  else -> EnumSet.of(value[0], *value.slice(1..value.lastIndex).toTypedArray())
-}
 
 // TODO Should be replaced with VimEditor.carets()
 inline fun Editor.vimForEachCaret(action: (caret: Caret) -> Unit) {

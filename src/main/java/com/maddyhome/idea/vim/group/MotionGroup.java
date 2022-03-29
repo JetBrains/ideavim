@@ -611,21 +611,6 @@ public class MotionGroup extends VimMotionGroupBase {
     }
   }
 
-  public int moveCaretToSection(@NotNull Editor editor, @NotNull Caret caret, char type, int dir, int count) {
-    if ((caret.getOffset() == 0 && count < 0) ||
-        (caret.getOffset() >= EditorHelperRt.getFileSize(editor) - 1 && count > 0)) {
-      return -1;
-    }
-    else {
-      int res = SearchHelper.findSection(editor, caret, type, dir, count);
-      if (res != -1) {
-        res = normalizeOffset(editor, res, false);
-      }
-
-      return res;
-    }
-  }
-
   public int moveCaretToMethodStart(@NotNull Editor editor, @NotNull Caret caret, int count) {
     return SearchHelper.findMethodStart(editor, caret, count);
   }
