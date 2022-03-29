@@ -552,26 +552,6 @@ public class MotionGroup extends VimMotionGroupBase {
     }
   }
 
-  /**
-   * This moves the caret to the start of the next/previous paragraph.
-   *
-   * @param editor The editor to move in
-   * @param caret  The caret to be moved
-   * @param count  The number of paragraphs to skip
-   * @return position
-   */
-  public int moveCaretToNextParagraph(@NotNull Editor editor, @NotNull Caret caret, int count) {
-    int res = SearchHelper.findNextParagraph(editor, caret, count, false);
-    if (res >= 0) {
-      res = normalizeOffset(editor, res, true);
-    }
-    else {
-      res = -1;
-    }
-
-    return res;
-  }
-
   public int moveCaretToNextSentenceStart(@NotNull Editor editor, @NotNull Caret caret, int count) {
     int res = SearchHelper.findNextSentenceStart(editor, caret, count, false, true);
     if (res >= 0) {

@@ -23,4 +23,10 @@ interface VimSearchHelper {
     dir: Int,
     count: Int,
   ): Int
+
+  fun findNextCamelEnd(
+    editor: VimEditor,
+    caret: VimCaret,
+    count: Int,
+  ): Int
 }

@@ -40,4 +40,12 @@ class IjVimSearchHelper : VimSearchHelper {
       count,
     )
   }
+
+  override fun findNextCamelEnd(editor: VimEditor, caret: VimCaret, count: Int): Int {
+    return SearchHelper.findNextCamelEnd(
+      (editor as IjVimEditor).editor,
+      (caret as IjVimCaret).caret,
+      count,
+    )
+  }
 }
