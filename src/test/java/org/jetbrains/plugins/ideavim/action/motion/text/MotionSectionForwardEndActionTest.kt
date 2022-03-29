@@ -71,7 +71,7 @@ class MotionSectionForwardEndActionTest : VimTestCase() {
         {
         }
       }
-    """.trimIndent(),
+      """.trimIndent(),
       """
       {
         {
@@ -86,7 +86,7 @@ class MotionSectionForwardEndActionTest : VimTestCase() {
         {
         }
       }
-    """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE
     )
   }
@@ -108,7 +108,7 @@ class MotionSectionForwardEndActionTest : VimTestCase() {
         {
         }
       }
-    """.trimIndent(),
+      """.trimIndent(),
       """
       {
         {
@@ -123,7 +123,7 @@ class MotionSectionForwardEndActionTest : VimTestCase() {
         {
         }
       }
-    """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE
     )
   }
@@ -145,7 +145,7 @@ class MotionSectionForwardEndActionTest : VimTestCase() {
         {
         }
       }
-    """.trimIndent(),
+      """.trimIndent(),
       """
       {
         {
@@ -160,7 +160,7 @@ class MotionSectionForwardEndActionTest : VimTestCase() {
         {
         }
       $c}
-    """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE
     )
   }

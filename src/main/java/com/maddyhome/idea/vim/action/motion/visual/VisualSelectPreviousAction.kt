@@ -34,10 +34,10 @@ class VisualSelectPreviousAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override fun execute(
-      editor: VimEditor,
-      context: ExecutionContext,
-      cmd: Command,
-      operatorArguments: OperatorArguments,
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
   ): Boolean { // FIXME: 2019-03-05 Make it multicaret
     return selectPreviousVisualMode(editor)
   }

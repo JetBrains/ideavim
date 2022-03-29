@@ -86,7 +86,6 @@ tasks.register<Test>("testWithNeovim") {
     exclude("/ui/**")
 }
 
-
 tasks {
     // Issue in gradle 7.3
     val test by getting(Test::class) {
