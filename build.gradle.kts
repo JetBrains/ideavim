@@ -79,10 +79,26 @@ configurations {
 }
 
 // --- Compilation
+// This can be moved to other test registration when issue with tests in gradle will be fixed
+tasks.register<Test>("testWithNeovim") {
+    group = "verification"
+    systemProperty("ideavim.nvim.test", "true")
+    exclude("/ui/**")
+}
+
 
 tasks {
     // Issue in gradle 7.3
     val test by getting(Test::class) {
+        isScanForTestClasses = false
+        // Only run tests from classes that end with "Test"
+        include("**/*Test.class")
+        include("**/*test.class")
+        include("**/*Tests.class")
+        exclude("**/ParserTest.class")
+    }
+
+    val testWithNeovim by getting(Test::class) {
         isScanForTestClasses = false
         // Only run tests from classes that end with "Test"
         include("**/*Test.class")
@@ -183,12 +199,6 @@ tasks {
         exclude("**/longrunning/**")
         exclude("/ui/**")
     }
-}
-
-tasks.register<Test>("testWithNeovim") {
-    group = "verification"
-    systemProperty("ideavim.nvim.test", "true")
-    exclude("/ui/**")
 }
 
 tasks.register<Test>("testPropertyBased") {
