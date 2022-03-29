@@ -64,6 +64,6 @@ class MotionGotoLineFirstInsertAction : MotionActionHandler.ForEachCaret() {
     operatorArguments: OperatorArguments,
   ): Motion {
     val line = EditorHelper.normalizeLine(editor.ij, operatorArguments.count1 - 1)
-    return VimPlugin.getMotion().moveCaretToLineStart(editor.ij, line).toMotion()
+    return VimPlugin.getMotion().moveCaretToLineStart(editor, line).toMotion()
   }
 }

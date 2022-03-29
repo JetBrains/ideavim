@@ -1243,7 +1243,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
       int newLine = EditorHelper.normalizeLine(editor, line + offset);
 
       // TODO: Don't move the caret!
-      res = VimPlugin.getMotion().moveCaretToLineStart(editor, newLine);
+      res = VimPlugin.getMotion().moveCaretToLineStart(new IjVimEditor(editor), newLine);
     }
     else if (hasEndOffset || offset != 0) {
       int base = hasEndOffset ? range.getEndOffset() - 1 : range.getStartOffset();

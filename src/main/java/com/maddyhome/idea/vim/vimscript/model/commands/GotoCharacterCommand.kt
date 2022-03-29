@@ -21,10 +21,12 @@ package com.maddyhome.idea.vim.vimscript.model.commands
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.group.MotionGroup
+import com.maddyhome.idea.vim.helper.fileSize
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
+import kotlin.math.max
+import kotlin.math.min
 
 /**
  * see "h :goto"
@@ -36,7 +38,7 @@ data class GotoCharacterCommand(val ranges: Ranges, val argument: String) : Comm
     val count = getCount(editor, caret, 1, true)
     if (count <= 0) return ExecutionResult.Error
 
-    val offset = VimPlugin.getMotion().moveCaretToNthCharacter(editor, count - 1)
+    val offset = max(0, min(count - 1, editor.fileSize - 1))
     if (offset == -1) return ExecutionResult.Error
 
     MotionGroup.moveCaret(editor, caret, offset)

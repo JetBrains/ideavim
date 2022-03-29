@@ -17,12 +17,10 @@
  */
 package com.maddyhome.idea.vim.action.motion.text
 
-import com.intellij.openapi.editor.Caret
-import com.intellij.openapi.editor.Editor
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
@@ -30,10 +28,11 @@ import com.maddyhome.idea.vim.common.Direction
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.Motion.AbsoluteOffset
 import com.maddyhome.idea.vim.handler.MotionActionHandler
-import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.helper.SearchHelper
-import com.maddyhome.idea.vim.helper.fileSize
-import com.maddyhome.idea.vim.newapi.ij
+
+class MotionBigWordEndLeftAction : WordEndAction(Direction.BACKWARDS, true)
+class MotionBigWordEndRightAction : WordEndAction(Direction.FORWARDS, true)
+class MotionWordEndLeftAction : WordEndAction(Direction.BACKWARDS, false)
+class MotionWordEndRightAction : WordEndAction(Direction.FORWARDS, false)
 
 sealed class WordEndAction(val direction: Direction, val bigWord: Boolean) : MotionActionHandler.ForEachCaret() {
   override fun getOffset(
@@ -43,31 +42,26 @@ sealed class WordEndAction(val direction: Direction, val bigWord: Boolean) : Mot
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    return moveCaretToNextWordEnd(editor.ij, caret.ij, direction.toInt() * operatorArguments.count1, bigWord)
+    return moveCaretToNextWordEnd(editor, caret, direction.toInt() * operatorArguments.count1, bigWord)
   }
 
   override val motionType: MotionType = MotionType.INCLUSIVE
 }
 
-class MotionBigWordEndLeftAction : WordEndAction(Direction.BACKWARDS, true)
-class MotionBigWordEndRightAction : WordEndAction(Direction.FORWARDS, true)
-class MotionWordEndLeftAction : WordEndAction(Direction.BACKWARDS, false)
-class MotionWordEndRightAction : WordEndAction(Direction.FORWARDS, false)
-
-fun moveCaretToNextWordEnd(editor: Editor, caret: Caret, count: Int, bigWord: Boolean): Motion {
-  if (caret.offset == 0 && count < 0 || caret.offset >= editor.fileSize - 1 && count > 0) {
+fun moveCaretToNextWordEnd(editor: VimEditor, caret: VimCaret, count: Int, bigWord: Boolean): Motion {
+  if (caret.offset.point == 0 && count < 0 || caret.offset.point >= editor.fileSize() - 1 && count > 0) {
     return Motion.Error
   }
 
   // If we are doing this move as part of a change command (e.q. cw), we need to count the current end of
   // word if the cursor happens to be on the end of a word already. If this is a normal move, we don't count
   // the current word.
-  val pos = SearchHelper.findNextWordEnd(editor, caret, count, bigWord)
+  val pos = injector.searchHelper.findNextWordEnd(editor, caret, count, bigWord)
   return if (pos == -1) {
     if (count < 0) {
-      AbsoluteOffset(VimPlugin.getMotion().moveCaretToLineStart(editor, 0))
+      AbsoluteOffset(injector.motion.moveCaretToLineStart(editor, 0))
     } else {
-      AbsoluteOffset(VimPlugin.getMotion().moveCaretToLineEnd(editor, EditorHelper.getLineCount(editor) - 1, false))
+      AbsoluteOffset(injector.motion.moveCaretToLineEnd(editor, editor.lineCount() - 1, false))
     }
   } else {
     AbsoluteOffset(pos)

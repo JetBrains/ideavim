@@ -189,7 +189,7 @@ public class ChangeGroup implements VimChangeGroup {
         firstLiners.add(caret);
       }
       else {
-        offset = VimPlugin.getMotion().moveCaretToLineEnd(editor, caret.getLogicalPosition().line - 1, true);
+        offset = VimPlugin.getMotion().moveCaretToLineEnd(new IjVimEditor(editor), caret.getLogicalPosition().line - 1, true);
       }
       moves.add(new Pair<>(caret, offset));
     }
@@ -207,7 +207,7 @@ public class ChangeGroup implements VimChangeGroup {
 
       for (Caret caret : editor.getCaretModel().getAllCarets()) {
         if (firstLiners.contains(caret)) {
-          final int offset = VimPlugin.getMotion().moveCaretToLineEnd(editor, 0, true);
+          final int offset = VimPlugin.getMotion().moveCaretToLineEnd(new IjVimEditor(editor), 0, true);
           MotionGroup.moveCaret(editor, caret, offset);
         }
       }
@@ -694,7 +694,7 @@ public class ChangeGroup implements VimChangeGroup {
           }
           int updatedCount = started ? (i == 0 ? count : count + 1) : count;
           if (repeatColumn >= VimMotionGroupBase.LAST_COLUMN) {
-            caret.moveToOffset(VimPlugin.getMotion().moveCaretToLineEnd(editor, logicalLine + i, true));
+            caret.moveToOffset(VimPlugin.getMotion().moveCaretToLineEnd(new IjVimEditor(editor), logicalLine + i, true));
             repeatInsertText(editor, context, updatedCount, operatorArguments);
           }
           else if (EditorHelper.getVisualLineLength(editor, visualLine + i) >= repeatColumn) {
@@ -1011,7 +1011,7 @@ public class ChangeGroup implements VimChangeGroup {
                                    int count,
                                    boolean spaces) {
     // start my moving the cursor to the very end of the first line
-    MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineEnd(editor, startLine, true));
+    MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineEnd(new IjVimEditor(editor), startLine, true));
     for (int i = 1; i < count; i++) {
       int start = VimPlugin.getMotion().moveCaretToLineEnd(editor, caret);
       int trailingWhitespaceStart = VimPlugin.getMotion().moveCaretToLineEndSkipLeadingOffset(editor, caret, 0);
@@ -1023,7 +1023,7 @@ public class ChangeGroup implements VimChangeGroup {
         offset = VimPlugin.getMotion().moveCaretToLineStartSkipLeadingOffset(editor, caret, 1);
       }
       else {
-        offset = VimPlugin.getMotion().moveCaretToLineStart(editor, caret.getLogicalPosition().line + 1);
+        offset = VimPlugin.getMotion().moveCaretToLineStart(new IjVimEditor(editor), caret.getLogicalPosition().line + 1);
       }
       deleteText(editor, new TextRange(caret.getOffset(), offset), null);
       if (spaces && !hasTrailingWhitespace) {

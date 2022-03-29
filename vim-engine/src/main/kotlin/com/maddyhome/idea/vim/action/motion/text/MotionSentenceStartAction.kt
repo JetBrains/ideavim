@@ -17,21 +17,21 @@
  */
 package com.maddyhome.idea.vim.action.motion.text
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
+import com.maddyhome.idea.vim.handler.toMotionOrError
 import com.maddyhome.idea.vim.helper.enumSetOf
-import com.maddyhome.idea.vim.newapi.ij
 import java.util.*
 
-class MotionMethodNextStartAction : MotionActionHandler.ForEachCaret() {
+class MotionSentenceNextStartAction : MotionActionHandler.ForEachCaret() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
 
   override fun getOffset(
@@ -41,9 +41,34 @@ class MotionMethodNextStartAction : MotionActionHandler.ForEachCaret() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    val moveCaretToMethodStart = VimPlugin.getMotion().moveCaretToMethodStart(editor.ij, caret.ij, operatorArguments.count1)
-    return if (moveCaretToMethodStart < 0) Motion.Error else Motion.AbsoluteOffset(moveCaretToMethodStart)
+    return moveCaretToNextSentenceStart(editor, caret, operatorArguments.count1).toMotionOrError()
   }
 
   override val motionType: MotionType = MotionType.EXCLUSIVE
+}
+
+class MotionSentencePreviousStartAction : MotionActionHandler.ForEachCaret() {
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
+
+  override fun getOffset(
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    argument: Argument?,
+    operatorArguments: OperatorArguments,
+  ): Motion {
+    return moveCaretToNextSentenceStart(editor, caret, -operatorArguments.count1).toMotionOrError()
+  }
+
+  override val motionType: MotionType = MotionType.EXCLUSIVE
+}
+
+private fun moveCaretToNextSentenceStart(editor: VimEditor, caret: VimCaret, count: Int): Int {
+  var res = injector.searchHelper.findNextSentenceStart(editor, caret, count, countCurrent = false, requireAll = true)
+  res = if (res >= 0) {
+    injector.engineEditorHelper.normalizeOffset(editor, res, true)
+  } else {
+    -1
+  }
+  return res
 }

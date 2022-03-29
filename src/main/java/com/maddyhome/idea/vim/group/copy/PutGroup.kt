@@ -306,7 +306,7 @@ class PutGroup {
       when (typeInRegister) {
         SelectionType.LINE_WISE -> {
           startOffset =
-            min(editor.document.textLength, VimPlugin.getMotion().moveCaretToLineEnd(editor, line, true) + 1)
+            min(editor.document.textLength, VimPlugin.getMotion().moveCaretToLineEnd(editor.vim, line, true) + 1)
           if (startOffset > 0 && startOffset == editor.document.textLength && editor.document.charsSequence[startOffset - 1] != '\n') {
             application.runWriteAction { editor.document.insertString(startOffset, "\n") }
             startOffset++

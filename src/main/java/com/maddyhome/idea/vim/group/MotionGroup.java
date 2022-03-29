@@ -380,10 +380,6 @@ public class MotionGroup extends VimMotionGroupBase {
     return EditorHelper.normalizeVisualLine(editor, targetCaretVisualLine);
   }
 
-  public @Range(from = 0, to = Integer.MAX_VALUE) int moveCaretToNthCharacter(@NotNull Editor editor, int count) {
-    return max(0, min(count, EditorHelperRt.getFileSize(editor) - 1));
-  }
-
   private static int getScrollOption(int rawCount) {
     if (rawCount == 0) {
       return ((VimInt) VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL.INSTANCE, OptionConstants.scrollName, OptionConstants.scrollName)).getValue();
@@ -541,10 +537,10 @@ public class MotionGroup extends VimMotionGroupBase {
     int pos = SearchHelper.findNextWordEnd(editor, caret, count, bigWord);
     if (pos == -1) {
       if (count < 0) {
-        return new Motion.AbsoluteOffset(moveCaretToLineStart(editor, 0));
+        return new Motion.AbsoluteOffset(moveCaretToLineStart(new IjVimEditor(editor), 0));
       }
       else {
-        return new Motion.AbsoluteOffset(moveCaretToLineEnd(editor, getLineCount(editor) - 1, false));
+        return new Motion.AbsoluteOffset(moveCaretToLineEnd(new IjVimEditor(editor), getLineCount(editor) - 1, false));
       }
     }
     else {
@@ -562,29 +558,6 @@ public class MotionGroup extends VimMotionGroupBase {
     }
 
     return res;
-  }
-
-  public int moveCaretToUnmatchedBlock(@NotNull Editor editor, @NotNull Caret caret, int count, char type) {
-    if ((editor.getCaretModel().getOffset() == 0 && count < 0) ||
-        (editor.getCaretModel().getOffset() >= EditorHelperRt.getFileSize(editor) - 1 && count > 0)) {
-      return -1;
-    }
-    else {
-      int res = SearchHelper.findUnmatchedBlock(editor, caret, type, count);
-      if (res != -1) {
-        res = normalizeOffset(editor, res, false);
-      }
-
-      return res;
-    }
-  }
-
-  public int moveCaretToMethodStart(@NotNull Editor editor, @NotNull Caret caret, int count) {
-    return SearchHelper.findMethodStart(editor, caret, count);
-  }
-
-  public int moveCaretToMethodEnd(@NotNull Editor editor, @NotNull Caret caret, int count) {
-    return SearchHelper.findMethodEnd(editor, caret, count);
   }
 
   public void setLastFTCmd(TillCharacterMotionType lastFTCmd, char lastChar) {
@@ -1060,7 +1033,7 @@ public class MotionGroup extends VimMotionGroupBase {
     final VisualPosition visualPosition = caret.getVisualPosition();
     final int lastVisualLineColumn = EditorUtil.getLastVisualLineColumnNumber(editor, visualPosition.line);
     final VisualPosition visualEndOfLine = new VisualPosition(visualPosition.line, lastVisualLineColumn, true);
-    return moveCaretToLineEnd(editor, editor.visualToLogicalPosition(visualEndOfLine).line, true);
+    return moveCaretToLineEnd(new IjVimEditor(editor), editor.visualToLogicalPosition(visualEndOfLine).line, true);
   }
 
   public boolean scrollColumns(@NotNull Editor editor, int columns) {
@@ -1095,14 +1068,7 @@ public class MotionGroup extends VimMotionGroupBase {
   public @Range(from = 0, to = Integer.MAX_VALUE) int moveCaretToLineStart(@NotNull Editor editor,
                                                                            @NotNull Caret caret) {
     int logicalLine = caret.getLogicalPosition().line;
-    return moveCaretToLineStart(editor, logicalLine);
-  }
-
-  public @Range(from = 0, to = Integer.MAX_VALUE) int moveCaretToLineStart(@NotNull Editor editor, int line) {
-    if (line >= getLineCount(editor)) {
-      return EditorHelperRt.getFileSize(editor);
-    }
-    return getLineStartOffset(editor, line);
+    return moveCaretToLineStart(new IjVimEditor(editor), logicalLine);
   }
 
   public Motion moveCaretToLineScreenStart(@NotNull Editor editor, @NotNull Caret caret) {
@@ -1315,12 +1281,6 @@ public class MotionGroup extends VimMotionGroupBase {
     return pos;
   }
 
-  public @Range(from = 0, to = Integer.MAX_VALUE) int moveCaretToLineEnd(@NotNull Editor editor,
-                                                                         int line,
-                                                                         boolean allowPastEnd) {
-    return normalizeOffset(editor, line, getLineEndOffset(editor, line, allowPastEnd), allowPastEnd);
-  }
-
   // Scrolls current or [count] line to given screen location
   // In Vim, [count] refers to a file line, so it's a one-based logical line
   private void scrollLineToScreenLocation(@NotNull Editor editor,
@@ -1402,7 +1362,7 @@ public class MotionGroup extends VimMotionGroupBase {
                                                                                int rawCount,
                                                                                int line,
                                                                                boolean pastEnd) {
-    return moveCaretToLineEnd(editor, rawCount == 0 ? normalizeLine(editor, getLineCount(editor) - 1) : line, pastEnd);
+    return moveCaretToLineEnd(new IjVimEditor(editor), rawCount == 0 ? normalizeLine(editor, getLineCount(editor) - 1) : line, pastEnd);
   }
 
   private enum ScreenLocation {
@@ -1497,7 +1457,7 @@ public class MotionGroup extends VimMotionGroupBase {
       return 0;
     }
     else {
-      return moveCaretToLineEnd(editor, visualLineToLogicalLine(editor, line), allowPastEnd);
+      return moveCaretToLineEnd(new IjVimEditor(editor), visualLineToLogicalLine(editor, line), allowPastEnd);
     }
   }
 

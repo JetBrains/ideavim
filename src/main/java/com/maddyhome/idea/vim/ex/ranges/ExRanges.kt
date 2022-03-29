@@ -322,9 +322,9 @@ class SearchRange(pattern: String, offset: Int, move: Boolean) : Range(offset, m
 
   private fun getSearchOffset(editor: Editor, line: Int, direction: Direction, lastZero: Boolean): Int {
     return if (direction == Direction.FORWARDS && !lastZero) {
-      VimPlugin.getMotion().moveCaretToLineEnd(editor, line, true)
+      VimPlugin.getMotion().moveCaretToLineEnd(editor.vim, line, true)
     } else {
-      VimPlugin.getMotion().moveCaretToLineStart(editor, line)
+      VimPlugin.getMotion().moveCaretToLineStart(editor.vim, line)
     }
   }
 

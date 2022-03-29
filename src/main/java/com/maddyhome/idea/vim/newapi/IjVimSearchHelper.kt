@@ -64,4 +64,46 @@ class IjVimSearchHelper : VimSearchHelper {
       requireAll,
     )
   }
+
+  override fun findNextCamelStart(editor: VimEditor, caret: VimCaret, count: Int): Int {
+    return SearchHelper.findNextCamelStart(
+      (editor as IjVimEditor).editor,
+      (caret as IjVimCaret).caret,
+      count,
+    )
+  }
+
+  override fun findMethodEnd(editor: VimEditor, caret: VimCaret, count: Int): Int {
+    return SearchHelper.findMethodEnd(
+      (editor as IjVimEditor).editor,
+      (caret as IjVimCaret).caret,
+      count,
+    )
+  }
+
+  override fun findMethodStart(editor: VimEditor, caret: VimCaret, count: Int): Int {
+    return SearchHelper.findMethodStart(
+      (editor as IjVimEditor).editor,
+      (caret as IjVimCaret).caret,
+      count,
+    )
+  }
+
+  override fun findUnmatchedBlock(editor: VimEditor, caret: VimCaret, type: Char, count: Int): Int {
+    return SearchHelper.findUnmatchedBlock(
+      (editor as IjVimEditor).editor,
+      (caret as IjVimCaret).caret,
+      type,
+      count,
+    )
+  }
+
+  override fun findNextWordEnd(editor: VimEditor, caret: VimCaret, count: Int, bigWord: Boolean): Int {
+    return SearchHelper.findNextWordEnd(
+      (editor as IjVimEditor).editor,
+      (caret as IjVimCaret).caret,
+      count,
+      bigWord,
+    )
+  }
 }

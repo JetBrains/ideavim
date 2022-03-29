@@ -16,6 +16,10 @@ class IjEditorHelper : EngineEditorHelper {
     return EditorHelper.normalizeOffset((editor as IjVimEditor).editor, offset, allowEnd)
   }
 
+  override fun normalizeOffset(editor: VimEditor, line: Int, offset: Int, allowEnd: Boolean): Int {
+    return EditorHelper.normalizeOffset((editor as IjVimEditor).editor, line, offset, allowEnd)
+  }
+
   override fun getText(editor: VimEditor, range: TextRange): String {
     return EditorHelper.getText((editor as IjVimEditor).editor, range)
   }
@@ -56,5 +60,13 @@ class IjEditorHelper : EngineEditorHelper {
 
   override fun updateLastColumn(caret: VimCaret, prevLastColumn: Int) {
     EditorHelper.updateLastColumn((caret as IjVimCaret).caret, prevLastColumn)
+  }
+
+  override fun getLineEndOffset(editor: VimEditor, line: Int, allowEnd: Boolean): Int {
+    return EditorHelper.getLineEndOffset((editor as IjVimEditor).editor, line, allowEnd)
+  }
+
+  override fun getLineStartOffset(editor: VimEditor, line: Int): Int {
+    return EditorHelper.getLineStartOffset((editor as IjVimEditor).editor, line)
   }
 }

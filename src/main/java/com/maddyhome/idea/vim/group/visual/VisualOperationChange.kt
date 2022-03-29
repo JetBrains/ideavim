@@ -32,6 +32,7 @@ import com.maddyhome.idea.vim.helper.sort
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.helper.vimSelectionStart
+import com.maddyhome.idea.vim.newapi.vim
 import java.util.*
 import kotlin.math.min
 
@@ -94,7 +95,7 @@ object VisualOperation {
       SelectionType.LINE_WISE -> VimPlugin.getMotion().moveCaretToLineWithSameColumn(editor, endLine, caret)
       SelectionType.CHARACTER_WISE -> when {
         lines > 1 -> VimPlugin.getMotion()
-          .moveCaretToLineStart(editor, endLine) + min(EditorHelper.getLineLength(editor, endLine), chars)
+          .moveCaretToLineStart(editor.vim, endLine) + min(EditorHelper.getLineLength(editor, endLine), chars)
         else -> EditorHelper.normalizeOffset(editor, sp.line, caret.offset + chars - 1, true)
       }
       SelectionType.BLOCK_WISE -> {

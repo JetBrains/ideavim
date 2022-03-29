@@ -37,4 +37,37 @@ interface VimSearchHelper {
     countCurrent: Boolean,
     requireAll: Boolean,
   ): Int
+
+  fun findNextCamelStart(
+    editor: VimEditor,
+    caret: VimCaret,
+    count: Int,
+  ): Int
+
+  fun findMethodEnd(
+    editor: VimEditor,
+    caret: VimCaret,
+    count: Int,
+  ): Int
+
+
+  fun findMethodStart(
+    editor: VimEditor,
+    caret: VimCaret,
+    count: Int,
+  ): Int
+
+  fun findUnmatchedBlock(
+    editor: VimEditor,
+    caret: VimCaret,
+    type: Char,
+    count: Int,
+  ): Int
+
+  fun findNextWordEnd(
+    editor: VimEditor,
+    caret: VimCaret,
+    count: Int,
+    bigWord: Boolean,
+  ): Int
 }

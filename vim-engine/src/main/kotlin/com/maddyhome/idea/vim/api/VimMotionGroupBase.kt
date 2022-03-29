@@ -37,6 +37,22 @@ abstract class VimMotionGroupBase : VimMotionGroup {
     }
   }
 
+  override fun moveCaretToLineEnd(editor: VimEditor, line: Int, allowPastEnd: Boolean): Int {
+    return injector.engineEditorHelper.normalizeOffset(
+      editor,
+      line,
+      injector.engineEditorHelper.getLineEndOffset(editor, line, allowPastEnd),
+      allowPastEnd
+    )
+  }
+
+  override fun moveCaretToLineStart(editor: VimEditor, line: Int): Int {
+    if (line >= editor.lineCount()) {
+      return editor.fileSize().toInt()
+    }
+    return injector.engineEditorHelper.getLineStartOffset(editor, line)
+  }
+
   companion object {
     const val LAST_COLUMN = 9999
   }

@@ -17,10 +17,10 @@
  */
 package com.maddyhome.idea.vim.action.motion.text
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
@@ -29,11 +29,12 @@ import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotionOrError
 import com.maddyhome.idea.vim.helper.enumSetOf
-import com.maddyhome.idea.vim.newapi.ij
 import java.util.*
 
-class MotionSentenceNextStartAction : MotionActionHandler.ForEachCaret() {
+sealed class MotionUnmatchedAction(private val motionChar: Char) : MotionActionHandler.ForEachCaret() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
+
+  override val motionType: MotionType = MotionType.EXCLUSIVE
 
   override fun getOffset(
     editor: VimEditor,
@@ -42,8 +43,24 @@ class MotionSentenceNextStartAction : MotionActionHandler.ForEachCaret() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    return VimPlugin.getMotion().moveCaretToNextSentenceStart(editor.ij, caret.ij, operatorArguments.count1).toMotionOrError()
+    return moveCaretToUnmatchedBlock(editor, caret, operatorArguments.count1, motionChar)
+      .toMotionOrError()
   }
+}
 
-  override val motionType: MotionType = MotionType.EXCLUSIVE
+class MotionUnmatchedBraceCloseAction : MotionUnmatchedAction('}')
+class MotionUnmatchedBraceOpenAction : MotionUnmatchedAction('{')
+class MotionUnmatchedParenCloseAction : MotionUnmatchedAction(')')
+class MotionUnmatchedParenOpenAction : MotionUnmatchedAction('(')
+
+private fun moveCaretToUnmatchedBlock(editor: VimEditor, caret: VimCaret, count: Int, type: Char): Int {
+  return if (editor.primaryCaret().offset.point == 0 && count < 0 || editor.primaryCaret().offset.point >= editor.fileSize() - 1 && count > 0) {
+    -1
+  } else {
+    var res = injector.searchHelper.findUnmatchedBlock(editor, caret, type, count)
+    if (res != -1) {
+      res = injector.engineEditorHelper.normalizeOffset(editor, res, false)
+    }
+    res
+  }
 }

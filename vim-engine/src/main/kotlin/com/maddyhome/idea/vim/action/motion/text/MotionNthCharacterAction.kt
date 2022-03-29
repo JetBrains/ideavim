@@ -17,7 +17,6 @@
  */
 package com.maddyhome.idea.vim.action.motion.text
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -27,12 +26,13 @@ import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
-import com.maddyhome.idea.vim.handler.toMotionOrError
+import com.maddyhome.idea.vim.handler.toMotion
 import com.maddyhome.idea.vim.helper.enumSetOf
-import com.maddyhome.idea.vim.newapi.ij
 import java.util.*
+import kotlin.math.max
+import kotlin.math.min
 
-class MotionMethodPreviousStartAction : MotionActionHandler.ForEachCaret() {
+class MotionNthCharacterAction : MotionActionHandler.ForEachCaret() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
 
   override fun getOffset(
@@ -42,7 +42,7 @@ class MotionMethodPreviousStartAction : MotionActionHandler.ForEachCaret() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    return VimPlugin.getMotion().moveCaretToMethodStart(editor.ij, caret.ij, -operatorArguments.count1).toMotionOrError()
+    return max(0, min(operatorArguments.count1 - 1, editor.fileSize().toInt() - 1)).toMotion()
   }
 
   override val motionType: MotionType = MotionType.EXCLUSIVE
