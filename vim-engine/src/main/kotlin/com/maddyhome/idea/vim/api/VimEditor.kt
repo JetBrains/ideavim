@@ -118,6 +118,7 @@ interface VimEditor {
 
   fun deleteDryRun(range: VimRange): OperatedRange?
   fun fileSize(): Long
+  fun text(): CharSequence
 
   /**
    * Vim has always at least one line. When we need to understand that there are no lines, it has a flag "ML_EMPTY"
@@ -135,6 +136,7 @@ interface VimEditor {
   fun getLineRange(line: EditorLine.Pointer): Pair<Offset, Offset>
   fun charAt(offset: Pointer): Char
   fun carets(): List<VimCaret>
+  fun nativeCarets(): List<VimCaret>
 
   /**
    * This method should perform caret merging after the operations. This is similar to IJ runForEachCaret

@@ -29,7 +29,6 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotionOrError
-import com.maddyhome.idea.vim.newapi.ij
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
@@ -43,7 +42,7 @@ class MotionRightAction : MotionActionHandler.ForEachCaret() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    return VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor.ij, caret.ij, operatorArguments.count1, true)
+    return VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret, operatorArguments.count1, true)
       .toMotionOrError()
   }
 }
@@ -63,7 +62,7 @@ class MotionRightInsertAction : MotionActionHandler.ForEachCaret(), ComplicatedK
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    return VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor.ij, caret.ij, operatorArguments.count1, true)
+    return VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret, operatorArguments.count1, true)
       .toMotionOrError()
   }
 }

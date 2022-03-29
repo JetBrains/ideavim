@@ -28,7 +28,6 @@ import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.handler.NonShiftedSpecialKeyHandler
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.isEndAllowed
-import com.maddyhome.idea.vim.newapi.ij
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
@@ -49,6 +48,6 @@ class MotionArrowRightAction : NonShiftedSpecialKeyHandler(), ComplicatedKeysAct
     argument: Argument?,
   ): Int {
     val allowPastEnd = editor.isEndAllowed
-    return VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor.ij, caret.ij, count, allowPastEnd)
+    return VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret, count, allowPastEnd)
   }
 }

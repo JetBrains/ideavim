@@ -27,7 +27,6 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.handler.NonShiftedSpecialKeyHandler
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
-import com.maddyhome.idea.vim.newapi.ij
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
@@ -45,6 +44,6 @@ class MotionArrowLeftAction : NonShiftedSpecialKeyHandler(), ComplicatedKeysActi
     rawCount: Int,
     argument: Argument?,
   ): Int {
-    return VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor.ij, caret.ij, -count, false)
+    return VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret, -count, false)
   }
 }

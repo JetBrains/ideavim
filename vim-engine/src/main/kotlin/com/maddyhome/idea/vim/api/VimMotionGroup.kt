@@ -16,4 +16,10 @@ interface VimMotionGroup {
    * @return position
    */
   fun findOffsetOfNextWord(editor: VimEditor, searchFrom: Int, count: Int, bigWord: Boolean): Motion
+  fun getOffsetOfHorizontalMotion(
+    editor: VimEditor,
+    caret: VimCaret,
+    count: Int,
+    allowPastEnd: Boolean
+  ): Int
 }

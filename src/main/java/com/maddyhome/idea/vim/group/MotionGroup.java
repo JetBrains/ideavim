@@ -56,7 +56,6 @@ import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt;
 import kotlin.Pair;
-import kotlin.ranges.IntProgression;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -1075,34 +1074,6 @@ public class MotionGroup extends VimMotionGroupBase {
     // FIX - allows cursor over newlines
     int oldOffset = caret.getOffset();
     int offset = min(max(0, caret.getOffset() + count), EditorHelperRt.getFileSize(editor));
-    if (offset == oldOffset) {
-      return -1;
-    }
-    else {
-      return offset;
-    }
-  }
-
-  public int getOffsetOfHorizontalMotion(@NotNull Editor editor,
-                                         @NotNull Caret caret,
-                                         int count,
-                                         boolean allowPastEnd) {
-    int oldOffset = caret.getOffset();
-    int diff = 0;
-    CharSequence text = editor.getDocument().getCharsSequence();
-    int sign = (int)Math.signum(count);
-    for (int pointer : new IntProgression(0, count - sign, sign)) {
-      int textPointer = oldOffset + pointer;
-      if (textPointer < text.length() && textPointer >= 0) {
-        // Actual char size can differ from 1 if unicode characters are used (like 🐔)
-        diff += Character.charCount(Character.codePointAt(text, textPointer));
-      }
-      else {
-        diff += 1;
-      }
-    }
-    int offset = normalizeOffset(editor, caret.getLogicalPosition().line, oldOffset + (sign * diff), allowPastEnd);
-
     if (offset == oldOffset) {
       return -1;
     }

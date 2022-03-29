@@ -69,4 +69,8 @@ class IjEditorHelper : EngineEditorHelper {
   override fun getLineStartOffset(editor: VimEditor, line: Int): Int {
     return EditorHelper.getLineStartOffset((editor as IjVimEditor).editor, line)
   }
+
+  override fun getLineEndForOffset(editor: VimEditor, offset: Int): Int {
+    return EditorHelper.getLineEndForOffset((editor as IjVimEditor).editor, offset)
+  }
 }

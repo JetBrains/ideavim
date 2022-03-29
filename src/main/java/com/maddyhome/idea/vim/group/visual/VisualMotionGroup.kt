@@ -22,7 +22,6 @@ import com.intellij.find.FindManager
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.LogicalPosition
 import com.maddyhome.idea.vim.KeyHandler
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimMotionGroupBase
 import com.maddyhome.idea.vim.api.VimVisualMotionGroupBase
@@ -32,7 +31,6 @@ import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.inVisualMode
-import com.maddyhome.idea.vim.helper.pushSelectMode
 import com.maddyhome.idea.vim.helper.pushVisualMode
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.helper.vimForEachCaret
@@ -41,9 +39,6 @@ import com.maddyhome.idea.vim.helper.vimLastVisualOperatorRange
 import com.maddyhome.idea.vim.helper.vimSelectionStart
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
 /**
  * @author Alex Plate
@@ -156,12 +151,6 @@ class VisualMotionGroup : VimVisualMotionGroupBase() {
     return true
   }
 
-  override fun enterSelectMode(editor: VimEditor, subMode: CommandState.SubMode): Boolean {
-    editor.commandState.pushSelectMode(subMode)
-    editor.forEachCaret { it.vimSelectionStart = it.vimLeadSelectionOffset }
-    return true
-  }
-
   fun autodetectVisualSubmode(editor: Editor): CommandState.SubMode {
     // IJ specific. See https://youtrack.jetbrains.com/issue/VIM-1924.
     val project = editor.project
@@ -221,9 +210,4 @@ class VisualMotionGroup : VimVisualMotionGroupBase() {
     val lastLine = editor.offsetToLogicalPosition(selections.last().first).line
     return selections.first().first to editor.logicalPositionToOffset(LogicalPosition(lastLine, maxColumn))
   }
-
-  val exclusiveSelection: Boolean
-    get() = (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, OptionConstants.selectionName) as VimString).value == "exclusive"
-  val selectionAdj: Int
-    get() = if (exclusiveSelection) 0 else 1
 }

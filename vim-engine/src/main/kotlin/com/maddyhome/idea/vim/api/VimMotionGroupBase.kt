@@ -5,6 +5,7 @@ import com.maddyhome.idea.vim.handler.toMotionOrError
 import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.helper.isEndAllowedIgnoringOnemore
 import com.maddyhome.idea.vim.helper.mode
+import kotlin.math.sign
 
 abstract class VimMotionGroupBase : VimMotionGroup {
   override fun getVerticalMotionOffset(editor: VimEditor, caret: VimCaret, count: Int): Int {
@@ -69,6 +70,31 @@ abstract class VimMotionGroupBase : VimMotionGroup {
       return Motion.Error
     }
     return (injector.searchHelper.findNextWord(editor, searchFrom, count, bigWord)).toMotionOrError()
+  }
+
+  override fun getOffsetOfHorizontalMotion(
+    editor: VimEditor,
+    caret: VimCaret,
+    count: Int,
+    allowPastEnd: Boolean
+  ): Int {
+    val oldOffset = caret.offset.point
+    var diff = 0
+    val text = editor.text()
+    val sign = sign(count.toFloat()).toInt()
+    for (pointer in IntProgression.fromClosedRange(0, count -sign, sign)) {
+      val textPointer = oldOffset + pointer
+      diff += if (textPointer < text.length && textPointer >= 0) {
+          // Actual char size can differ from 1 if unicode characters are used (like 🐔)
+        Character.charCount(Character.codePointAt(text, textPointer))
+      } else {
+        1
+      }
+    }
+    val offset = injector.engineEditorHelper
+      .normalizeOffset(editor, caret.getLine().line, oldOffset + (sign * diff), allowPastEnd)
+
+    return if (offset == oldOffset) -1 else offset
   }
 
   companion object {

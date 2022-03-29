@@ -41,7 +41,7 @@ class ResetModeAction : VimActionHandler.SingleExecution() {
 
     if (modeBeforeReset == CommandState.Mode.INSERT) {
       editor.ij.vimForEachCaret { caret ->
-        val position = VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor.ij, caret, -1, false)
+        val position = VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret.vim, -1, false)
         MotionGroup.moveCaret(editor.ij, caret, position)
       }
     }

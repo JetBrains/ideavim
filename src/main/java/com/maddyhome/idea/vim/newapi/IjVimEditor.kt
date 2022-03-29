@@ -62,6 +62,10 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
 
   override fun fileSize(): Long = editor.fileSize.toLong()
 
+  override fun text(): CharSequence {
+    return editor.document.charsSequence
+  }
+
   override fun lineCount(): Int {
     val lineCount = editor.document.lineCount
     return lineCount.coerceAtLeast(1)
@@ -121,6 +125,10 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
     } else {
       editor.caretModel.allCarets.map { IjVimCaret(it) }
     }
+  }
+
+  override fun nativeCarets(): List<VimCaret> {
+    return editor.caretModel.allCarets.map { IjVimCaret(it) }
   }
 
   @Suppress("ideavimRunForEachCaret")

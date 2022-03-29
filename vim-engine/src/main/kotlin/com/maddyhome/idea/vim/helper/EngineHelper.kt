@@ -101,3 +101,12 @@ inline fun <reified T : Enum<T>> enumSetOf(vararg value: T): EnumSet<T> = when (
   1 -> EnumSet.of(value[0])
   else -> EnumSet.of(value[0], *value.slice(1..value.lastIndex).toTypedArray())
 }
+
+fun CommandState.pushSelectMode(subMode: CommandState.SubMode, prevMode: CommandState.Mode = this.mode) {
+  if (prevMode.inSingleMode) {
+    popModes()
+    pushModes(CommandState.Mode.INSERT_SELECT, subMode)
+  } else {
+    pushModes(CommandState.Mode.SELECT, subMode)
+  }
+}

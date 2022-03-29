@@ -15,52 +15,39 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+
 package com.maddyhome.idea.vim.action.motion.visual
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.command.SelectionType
-import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.common.VimScrollType
 import com.maddyhome.idea.vim.handler.VimActionHandler
-import com.maddyhome.idea.vim.helper.subMode
+import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
-/**
- * @author vlan
- */
-class VisualSwapSelectionsAction : VimActionHandler.SingleExecution() {
+class VisualToggleLineModeAction : VimActionHandler.SingleExecution() {
+
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
-  // FIXME: 2019-03-05 Make it multicaret
   override fun execute(
     editor: VimEditor,
     context: ExecutionContext,
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    return swapVisualSelections(editor)
+    val listOption = (injector.optionService.getOptionValue(
+      OptionScope.LOCAL(editor),
+      OptionConstants.selectmodeName
+    ) as VimString).value
+    return if ("cmd" in listOption) {
+      injector.visualMotionGroup.enterSelectMode(editor, CommandState.SubMode.VISUAL_LINE).also {
+        editor.forEachCaret { it.vimSetSelection(it.offset.point) }
+      }
+    } else injector.visualMotionGroup
+      .toggleVisual(editor, cmd.count, cmd.rawCount, CommandState.SubMode.VISUAL_LINE)
   }
-}
-
-private fun swapVisualSelections(editor: VimEditor): Boolean {
-  val lastSelectionType = editor.vimLastSelectionType ?: return false
-
-  val lastVisualRange = VimPlugin.getMark().getVisualSelectionMarks(editor) ?: return false
-  val primaryCaret = editor.primaryCaret()
-  editor.removeSecondaryCarets()
-  val vimSelectionStart = primaryCaret.vimSelectionStart
-
-  editor.vimLastSelectionType = SelectionType.fromSubMode(editor.subMode)
-  injector.markGroup.setVisualSelectionMarks(editor, TextRange(vimSelectionStart, primaryCaret.offset.point))
-
-  editor.subMode = lastSelectionType.toSubMode()
-  primaryCaret.vimSetSelection(lastVisualRange.startOffset, lastVisualRange.endOffset, true)
-
-  editor.scrollToCaret(VimScrollType.CENTER)
-
-  return true
 }

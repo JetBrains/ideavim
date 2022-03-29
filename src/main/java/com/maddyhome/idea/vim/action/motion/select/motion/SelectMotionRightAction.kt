@@ -67,7 +67,7 @@ class SelectMotionRightAction : MotionActionHandler.ForEachCaret() {
       }
       return caret.offset.point.toMotion()
     }
-    return VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor.ij, caret.ij, operatorArguments.count1, false).toMotionOrError()
+    return VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret, operatorArguments.count1, false).toMotionOrError()
   }
 
   companion object {

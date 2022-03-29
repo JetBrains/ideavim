@@ -16,4 +16,5 @@ interface EngineEditorHelper {
   fun updateLastColumn(caret: VimCaret, prevLastColumn: Int)
   fun getLineEndOffset(editor: VimEditor, line: Int, allowEnd: Boolean): Int
   fun getLineStartOffset(editor: VimEditor, line: Int): Int
+  fun getLineEndForOffset(editor: VimEditor, offset: Int): Int
 }

@@ -150,7 +150,8 @@ public class ChangeGroup implements VimChangeGroup {
    */
   public void insertAfterCursor(@NotNull Editor editor, @NotNull DataContext context) {
     for (Caret caret : editor.getCaretModel().getAllCarets()) {
-      MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret, 1, true));
+      MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().getOffsetOfHorizontalMotion(new IjVimEditor(editor),
+                                                                                             new IjVimCaret(caret), 1, true));
     }
     initInsert(editor, context, CommandState.Mode.INSERT);
   }
@@ -633,7 +634,8 @@ public class ChangeGroup implements VimChangeGroup {
       if (offset < charsSequence.length()) {
         char ch = charsSequence.charAt(offset);
         editor.getDocument().insertString(caret.getOffset(), Character.toString(ch));
-        MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret, 1, true));
+        MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion()
+          .getOffsetOfHorizontalMotion(new IjVimEditor(editor), new IjVimCaret(caret), 1, true));
         res = true;
       }
     }
@@ -709,7 +711,8 @@ public class ChangeGroup implements VimChangeGroup {
       }
       else {
         repeatInsertText(editor, context, count, operatorArguments);
-        final int position = VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret, -1, false);
+        final int position = VimPlugin.getMotion().getOffsetOfHorizontalMotion(new IjVimEditor(editor),
+                                                                               new IjVimCaret(caret), -1, false);
 
         MotionGroup.moveCaret(editor, caret, position);
       }
@@ -774,7 +777,8 @@ public class ChangeGroup implements VimChangeGroup {
    * @return true if able to delete, false if not
    */
   public boolean deleteCharacter(@NotNull Editor editor, @NotNull Caret caret, int count, boolean isChange) {
-    final int endOffset = VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret, count, true);
+    final int endOffset = VimPlugin.getMotion().getOffsetOfHorizontalMotion(new IjVimEditor(editor),
+                                                                            new IjVimCaret(caret), count, true);
     if (endOffset != -1) {
       final boolean res = deleteText(editor, new TextRange(caret.getOffset(), endOffset), SelectionType.CHARACTER_WISE);
 
@@ -835,7 +839,7 @@ public class ChangeGroup implements VimChangeGroup {
         MotionGroup.moveCaret(editor, caret, startOffset);
       }
       else {
-        int pos = VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret, -1, false);
+        int pos = VimPlugin.getMotion().getOffsetOfHorizontalMotion(new IjVimEditor(editor), new IjVimCaret(caret), -1, false);
         if (pos != -1) {
           MotionGroup.moveCaret(editor, caret, pos);
         }
@@ -1029,7 +1033,8 @@ public class ChangeGroup implements VimChangeGroup {
       if (spaces && !hasTrailingWhitespace) {
         insertText(editor, caret, " ");
         MotionGroup
-          .moveCaret(editor, caret, VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret, -1, true));
+          .moveCaret(editor, caret, VimPlugin.getMotion().getOffsetOfHorizontalMotion(new IjVimEditor(editor),
+                                                                                      new IjVimCaret(caret), -1, true));
       }
     }
 
@@ -1440,7 +1445,7 @@ public class ChangeGroup implements VimChangeGroup {
    * @return true if able to change count characters
    */
   public boolean changeCaseToggleCharacter(@NotNull Editor editor, @NotNull Caret caret, int count) {
-    final int offset = VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret, count, true);
+    final int offset = VimPlugin.getMotion().getOffsetOfHorizontalMotion(new IjVimEditor(editor), new IjVimCaret(caret), count, true);
     if (offset == -1) {
       return false;
     }

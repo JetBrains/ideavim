@@ -18,16 +18,14 @@
 
 package com.maddyhome.idea.vim.action.motion.visual
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.inBlockSubMode
-import com.maddyhome.idea.vim.newapi.IjVimCaret
-import com.maddyhome.idea.vim.newapi.ij
 
 /**
  * @author vlan
@@ -82,14 +80,11 @@ private fun swapVisualEnds(caret: VimCaret): Boolean {
   return true
 }
 
-fun swapVisualEndsBigO(editor: VimEditor): Boolean {
+private fun swapVisualEndsBigO(editor: VimEditor): Boolean {
   val caret = editor.primaryCaret()
-  val ijCaret = (caret as IjVimCaret).caret
+  val anotherSideCaret = editor.nativeCarets().let { if (it.first() == caret) it.last() else it.first() }
 
-  // Here we should not use engine-api. It really should be all carets
-  val anotherSideCaret = editor.ij.caretModel.allCarets.let { if (it.first() == ijCaret) it.last() else it.first() }
-
-  val adj = VimPlugin.getVisualMotion().selectionAdj
+  val adj = injector.visualMotionGroup.selectionAdj
 
   if (caret.offset.point == caret.selectionStart) {
     caret.vimSelectionStart = anotherSideCaret.selectionStart

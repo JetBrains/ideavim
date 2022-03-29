@@ -458,7 +458,7 @@ class PutGroup {
 
       MotionGroup.moveCaret(
         editor, possiblyOverlappedCaret,
-        VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, possiblyOverlappedCaret, 1, true)
+        VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor.vim, possiblyOverlappedCaret.vim, 1, true)
       )
       overlappedCarets.add(possiblyOverlappedCaret)
     }
@@ -471,7 +471,7 @@ class PutGroup {
     for (overlappedCaret in overlappedCarets) {
       MotionGroup.moveCaret(
         editor, overlappedCaret,
-        VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, overlappedCaret, -1, true)
+        VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor.vim, overlappedCaret.vim, -1, true)
       )
     }
 
