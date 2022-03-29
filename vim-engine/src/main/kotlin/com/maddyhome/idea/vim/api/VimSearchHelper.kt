@@ -29,4 +29,12 @@ interface VimSearchHelper {
     caret: VimCaret,
     count: Int,
   ): Int
+
+  fun findNextSentenceEnd(
+    editor: VimEditor,
+    caret: VimCaret,
+    count: Int,
+    countCurrent: Boolean,
+    requireAll: Boolean,
+  ): Int
 }

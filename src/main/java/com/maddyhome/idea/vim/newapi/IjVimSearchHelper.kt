@@ -48,4 +48,20 @@ class IjVimSearchHelper : VimSearchHelper {
       count,
     )
   }
+
+  override fun findNextSentenceEnd(
+    editor: VimEditor,
+    caret: VimCaret,
+    count: Int,
+    countCurrent: Boolean,
+    requireAll: Boolean,
+  ): Int {
+    return SearchHelper.findNextSentenceEnd(
+      (editor as IjVimEditor).editor,
+      (caret as IjVimCaret).caret,
+      count,
+      countCurrent,
+      requireAll,
+    )
+  }
 }

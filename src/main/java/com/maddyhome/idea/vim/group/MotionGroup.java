@@ -564,18 +564,6 @@ public class MotionGroup extends VimMotionGroupBase {
     return res;
   }
 
-  public int moveCaretToNextSentenceEnd(@NotNull Editor editor, @NotNull Caret caret, int count) {
-    int res = SearchHelper.findNextSentenceEnd(editor, caret, count, false, true);
-    if (res >= 0) {
-      res = normalizeOffset(editor, res, false);
-    }
-    else {
-      res = -1;
-    }
-
-    return res;
-  }
-
   public int moveCaretToUnmatchedBlock(@NotNull Editor editor, @NotNull Caret caret, int count, char type) {
     if ((editor.getCaretModel().getOffset() == 0 && count < 0) ||
         (editor.getCaretModel().getOffset() >= EditorHelperRt.getFileSize(editor) - 1 && count > 0)) {
