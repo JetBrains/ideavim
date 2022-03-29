@@ -41,7 +41,6 @@ import com.maddyhome.idea.vim.group.visual.VimSelection;
 import com.maddyhome.idea.vim.group.visual.VisualGroupKt;
 import com.maddyhome.idea.vim.handler.Motion;
 import com.maddyhome.idea.vim.handler.MotionActionHandler;
-import com.maddyhome.idea.vim.handler.MotionActionHandlerKt;
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.listener.AppCodeTemplates;
@@ -498,22 +497,6 @@ public class MotionGroup extends VimMotionGroupBase {
     else {
       return SearchHelper.findNextCamelEnd(editor, caret, count);
     }
-  }
-
-  /**
-   * This moves the caret to the start of the next/previous word/WORD.
-   *
-   * @param editor  The editor to move in
-   * @param count   The number of words to skip
-   * @param bigWord If true then find WORD, if false then find word
-   * @return position
-   */
-  public Motion findOffsetOfNextWord(@NotNull Editor editor, int searchFrom, int count, boolean bigWord) {
-    final int size = EditorHelperRt.getFileSize(editor);
-    if ((searchFrom == 0 && count < 0) || (searchFrom >= size - 1 && count > 0)) {
-      return Motion.Error.INSTANCE;
-    }
-    return MotionActionHandlerKt.toMotionOrError(SearchHelper.findNextWord(editor, searchFrom, count, bigWord));
   }
 
   /**

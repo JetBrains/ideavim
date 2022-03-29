@@ -70,4 +70,6 @@ interface VimSearchHelper {
     count: Int,
     bigWord: Boolean,
   ): Int
+
+  fun findNextWord(editor: VimEditor, searchFrom: Int, count: Int, bigWord: Boolean): Int
 }

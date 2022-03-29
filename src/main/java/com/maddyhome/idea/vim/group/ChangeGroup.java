@@ -406,7 +406,7 @@ public class ChangeGroup implements VimChangeGroup {
         deleteTo = pointer + 1;
       }
       else {
-        Motion motion = VimPlugin.getMotion().findOffsetOfNextWord(editor, pointer + 1, -1, false);
+        Motion motion = VimPlugin.getMotion().findOffsetOfNextWord(new IjVimEditor(editor), pointer + 1, -1, false);
         if (motion instanceof Motion.AbsoluteOffset) {
           deleteTo = ((Motion.AbsoluteOffset)motion).getOffset();
         }

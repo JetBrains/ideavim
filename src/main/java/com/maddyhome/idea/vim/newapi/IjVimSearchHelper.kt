@@ -106,4 +106,13 @@ class IjVimSearchHelper : VimSearchHelper {
       bigWord,
     )
   }
+
+  override fun findNextWord(editor: VimEditor, searchFrom: Int, count: Int, bigWord: Boolean): Int {
+    return SearchHelper.findNextWord(
+      (editor as IjVimEditor).editor,
+      searchFrom,
+      count,
+      bigWord
+    )
+  }
 }
