@@ -24,6 +24,13 @@ import org.jetbrains.annotations.NonNls
 interface VimActionExecutor {
 
   val ACTION_EDITOR_NEXT_TEMPLATE_VARIABLE: String
+  val ACTION_COLLAPSE_ALL_REGIONS: String
+  val ACTION_COLLAPSE_REGION: String
+  val ACTION_COLLAPSE_REGION_RECURSIVELY: String
+  val ACTION_EXPAND_ALL_REGIONS: String
+  val ACTION_EXPAND_REGION: String
+  val ACTION_EXPAND_REGION_RECURSIVELY: String
+
 
   /**
    * Execute an action

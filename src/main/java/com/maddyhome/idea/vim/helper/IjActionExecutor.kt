@@ -54,6 +54,18 @@ import javax.swing.SwingUtilities
 class IjActionExecutor : VimActionExecutor {
   override val ACTION_EDITOR_NEXT_TEMPLATE_VARIABLE: String
     get() = IdeActions.ACTION_EDITOR_NEXT_TEMPLATE_VARIABLE
+  override val ACTION_COLLAPSE_ALL_REGIONS: String
+    get() = IdeActions.ACTION_COLLAPSE_ALL_REGIONS
+  override val ACTION_COLLAPSE_REGION: String
+    get() = IdeActions.ACTION_COLLAPSE_REGION
+  override val ACTION_COLLAPSE_REGION_RECURSIVELY: String
+    get() = IdeActions.ACTION_COLLAPSE_REGION_RECURSIVELY
+  override val ACTION_EXPAND_ALL_REGIONS: String
+    get() = IdeActions.ACTION_EXPAND_ALL_REGIONS
+  override val ACTION_EXPAND_REGION: String
+    get() = IdeActions.ACTION_EXPAND_REGION
+  override val ACTION_EXPAND_REGION_RECURSIVELY: String
+    get() = IdeActions.ACTION_EXPAND_REGION_RECURSIVELY
 
   /**
    * Execute an action
