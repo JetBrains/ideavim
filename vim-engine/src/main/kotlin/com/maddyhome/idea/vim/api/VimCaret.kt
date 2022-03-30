@@ -21,4 +21,5 @@ interface VimCaret {
   fun moveToInlayAwareOffset(newOffset: Int)
   fun vimSetSelection(start: Int, end: Int = start, moveCaretToSelectionEnd: Boolean = false)
   fun getVisualPosition(): VimVisualPosition
+  val visualLineStart: Int
 }

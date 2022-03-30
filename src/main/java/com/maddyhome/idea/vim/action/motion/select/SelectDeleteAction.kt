@@ -39,7 +39,12 @@ class SelectDeleteAction : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.INSERT
 
-  override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
+  override fun execute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
     val enterKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0)
     val actions = VimPlugin.getKey().getActions(editor.ij.component, enterKeyStroke)
     for (action in actions) {
@@ -48,7 +53,7 @@ class SelectDeleteAction : VimActionHandler.SingleExecution() {
       }
     }
     editor.exitSelectMode(true)
-    VimPlugin.getChange().insertBeforeCursor(editor.ij, context.ij)
+    VimPlugin.getChange().insertBeforeCursor(editor, context)
     return true
   }
 }

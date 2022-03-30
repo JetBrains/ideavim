@@ -21,7 +21,8 @@ import com.maddyhome.idea.vim.command.Command
 import javax.swing.KeyStroke
 
 interface VimChangeGroup {
-    fun processCommand(editor: VimEditor, cmd: Command)
-    fun processKey(editor: VimEditor, context: ExecutionContext, key: KeyStroke): Boolean
-    fun processKeyInSelectMode(editor: VimEditor, context: ExecutionContext, key: KeyStroke): Boolean
+  fun processCommand(editor: VimEditor, cmd: Command)
+  fun processKey(editor: VimEditor, context: ExecutionContext, key: KeyStroke): Boolean
+  fun processKeyInSelectMode(editor: VimEditor, context: ExecutionContext, key: KeyStroke): Boolean
+  fun insertBeforeCursor(editor: VimEditor, context: ExecutionContext)
 }

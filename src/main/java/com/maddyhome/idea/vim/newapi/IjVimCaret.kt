@@ -92,6 +92,9 @@ class IjVimCaret(val caret: Caret) : VimCaret {
     return VimVisualPosition(visualPosition.line, visualPosition.column, visualPosition.leansRight)
   }
 
+  override val visualLineStart: Int
+    get() = caret.visualLineStart
+
   override fun equals(other: Any?): Boolean = this.caret == (other as? IjVimCaret)?.caret
 
   override fun hashCode(): Int = this.caret.hashCode()

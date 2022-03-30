@@ -46,6 +46,7 @@ import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.fileSize
 import com.maddyhome.idea.vim.helper.getTopLevelEditor
 import com.maddyhome.idea.vim.helper.inBlockSubMode
+import com.maddyhome.idea.vim.helper.isTemplateActive
 import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
 import com.maddyhome.idea.vim.helper.updateCaretsVisualPosition
 import com.maddyhome.idea.vim.helper.vimLastSelectionType
@@ -286,6 +287,10 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
       VimScrollType.CENTER_DOWN -> ScrollType.CENTER_DOWN
     }
     editor.scrollingModel.scrollToCaret(scrollType)
+  }
+
+  override fun isTemplateActive(): Boolean {
+    return editor.isTemplateActive()
   }
 
   private fun Pair<Offset, Offset>.noGuard(editor: Editor): Boolean {

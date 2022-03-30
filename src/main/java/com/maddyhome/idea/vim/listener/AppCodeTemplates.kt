@@ -67,7 +67,7 @@ object AppCodeTemplates {
         if (myEditor != null) {
           VimVisualTimer.doNow()
           if (myEditor.inVisualMode) {
-            SelectToggleVisualMode.toggleMode(myEditor)
+            SelectToggleVisualMode.toggleMode(myEditor.vim)
             KeyHandler.getInstance().partialReset(myEditor.vim)
           }
         }

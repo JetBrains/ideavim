@@ -92,7 +92,7 @@ object IdeaSpecifics {
           while (commandState.mode != CommandState.Mode.COMMAND) {
             commandState.popModes()
           }
-          VimPlugin.getChange().insertBeforeCursor(it, dataContext)
+          VimPlugin.getChange().insertBeforeCursor(it.vim, dataContext.vim)
           KeyHandler.getInstance().reset(it.vim)
         }
       }
@@ -128,7 +128,7 @@ object IdeaSpecifics {
           // Enable insert mode if there is no selection in template
           // Template with selection is handled by [com.maddyhome.idea.vim.group.visual.VisualMotionGroup.controlNonVimSelectionChange]
           if (editor.inNormalMode) {
-            VimPlugin.getChange().insertBeforeCursor(editor, EditorDataContext.init(editor))
+            VimPlugin.getChange().insertBeforeCursor(editor.vim, EditorDataContext.init(editor).vim)
             KeyHandler.getInstance().reset(editor.vim)
           }
         }

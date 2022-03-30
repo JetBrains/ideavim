@@ -92,7 +92,7 @@ fun changeRange(
       vimEditor.insertText(offset.offset, indentText)
       val caretOffset = offset + indentText.length
       vimCaret.moveToOffset(caretOffset)
-      VimPlugin.getChange().insertBeforeCursor(editor, context)
+      VimPlugin.getChange().insertBeforeCursor(editor.vim, context.vim)
     } else {
       when (deletedInfo) {
         is OperatedRange.Characters -> {
@@ -106,7 +106,7 @@ fun changeRange(
       editor.vimChangeActionSwitchMode = CommandState.Mode.INSERT
     }
   } else {
-    VimPlugin.getChange().insertBeforeCursor(editor, context)
+    VimPlugin.getChange().insertBeforeCursor(editor.vim, context.vim)
   }
 }
 

@@ -110,3 +110,12 @@ fun CommandState.pushSelectMode(subMode: CommandState.SubMode, prevMode: Command
     pushModes(CommandState.Mode.SELECT, subMode)
   }
 }
+
+fun CommandState.pushVisualMode(subMode: CommandState.SubMode, prevMode: CommandState.Mode = this.mode) {
+  if (prevMode.inSingleMode) {
+    popModes()
+    pushModes(CommandState.Mode.INSERT_VISUAL, subMode)
+  } else {
+    pushModes(CommandState.Mode.VISUAL, subMode)
+  }
+}

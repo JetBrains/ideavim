@@ -115,8 +115,9 @@ public class ChangeGroup implements VimChangeGroup {
    *  @param editor  The editor to insert into
    * @param context The data context
    */
-  public void insertBeforeCursor(@NotNull Editor editor, @NotNull DataContext context) {
-    initInsert(editor, context, CommandState.Mode.INSERT);
+  @Override
+  public void insertBeforeCursor(@NotNull VimEditor editor, @NotNull ExecutionContext context) {
+    initInsert(((IjVimEditor)editor).getEditor(), ((IjExecutionContext)context).getContext(), CommandState.Mode.INSERT);
   }
 
   /**
@@ -320,7 +321,7 @@ public class ChangeGroup implements VimChangeGroup {
       MotionGroup.moveCaret(editor, caret, offset);
     }
 
-    insertBeforeCursor(editor, context);
+    insertBeforeCursor(new IjVimEditor(editor), new IjExecutionContext(context));
   }
 
   /**
@@ -926,8 +927,7 @@ public class ChangeGroup implements VimChangeGroup {
       KeyHandler.getInstance().reset(editor);
 
       if (isPrintableChar(key.getKeyChar()) || activeTemplateWithLeftRightMotion(((IjVimEditor)editor).getEditor(), key)) {
-        DataContext ijContext = IjExecutionContextKt.getIj(context);
-        VimPlugin.getChange().insertBeforeCursor(((IjVimEditor)editor).getEditor(), ijContext);
+        VimPlugin.getChange().insertBeforeCursor(editor, context);
       }
     }
 
@@ -1496,7 +1496,7 @@ public class ChangeGroup implements VimChangeGroup {
     }
 
     if (visualBlockMode || !append) {
-      insertBeforeCursor(editor, context);
+      insertBeforeCursor(new IjVimEditor(editor), new IjExecutionContext(context));
     }
     else {
       insertAfterCursor(editor, context);
@@ -1581,7 +1581,7 @@ public class ChangeGroup implements VimChangeGroup {
       if (type == SelectionType.LINE_WISE) {
         // Please don't use `getDocument().getText().isEmpty()` because it converts CharSequence into String
         if (editor.getDocument().getTextLength() == 0) {
-          insertBeforeCursor(editor, context);
+          insertBeforeCursor(new IjVimEditor(editor), new IjExecutionContext(context));
         }
         else if (after && !EditorHelperRt.endsWithNewLine(editor)) {
           insertNewLineBelow(editor, caret, lp.column);
@@ -1598,7 +1598,7 @@ public class ChangeGroup implements VimChangeGroup {
       }
     }
     else {
-      insertBeforeCursor(editor, context);
+      insertBeforeCursor(new IjVimEditor(editor), new IjExecutionContext(context));
     }
 
     return true;

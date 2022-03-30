@@ -81,10 +81,6 @@ val Editor.inRepeatMode
 val Editor.inVisualMode
   get() = this.mode.inVisualMode
 
-@get:JvmName("inVisualMode")
-val CommandState.Mode.inVisualMode
-  get() = this == CommandState.Mode.VISUAL || this == CommandState.Mode.INSERT_VISUAL
-
 @get:JvmName("inSelectMode")
 val Editor.inSelectMode
   get() = this.mode == CommandState.Mode.SELECT || this.mode == CommandState.Mode.INSERT_SELECT
@@ -113,21 +109,3 @@ val CommandState.Mode.inSingleNormalMode: Boolean
     CommandState.Mode.INSERT_NORMAL -> true
     else -> false
   }
-
-fun CommandState.pushVisualMode(subMode: CommandState.SubMode, prevMode: CommandState.Mode = this.mode) {
-  if (prevMode.inSingleMode) {
-    popModes()
-    pushModes(CommandState.Mode.INSERT_VISUAL, subMode)
-  } else {
-    pushModes(CommandState.Mode.VISUAL, subMode)
-  }
-}
-
-fun CommandState.pushSelectMode(subMode: CommandState.SubMode, prevMode: CommandState.Mode = this.mode) {
-  if (prevMode.inSingleMode) {
-    popModes()
-    pushModes(CommandState.Mode.INSERT_SELECT, subMode)
-  } else {
-    pushModes(CommandState.Mode.SELECT, subMode)
-  }
-}

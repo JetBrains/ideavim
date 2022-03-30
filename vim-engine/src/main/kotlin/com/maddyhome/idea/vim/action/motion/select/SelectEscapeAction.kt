@@ -23,18 +23,21 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
-import com.maddyhome.idea.vim.helper.exitSelectMode
 import com.maddyhome.idea.vim.helper.inBlockSubMode
-import com.maddyhome.idea.vim.newapi.ij
 
 class SelectEscapeAction : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
-  override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
+  override fun execute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
     val blockMode = editor.inBlockSubMode
-    editor.exitSelectMode(true)
-    if (blockMode) editor.ij.caretModel.removeSecondaryCarets()
+    editor.exitSelectModeNative(true)
+    if (blockMode) editor.removeSecondaryCarets()
     return true
   }
 }

@@ -34,6 +34,7 @@ import com.intellij.openapi.project.Project;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.helper.*;
+import com.maddyhome.idea.vim.newapi.IjExecutionContext;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.api.VimEditor;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType;
@@ -222,7 +223,7 @@ public class EditorGroup implements PersistentStateComponent<Element> {
     if (!EditorHelper.isFileEditor(editor) &&
         editor.getDocument().isWritable() &&
         !CommandStateHelper.inInsertMode(editor)) {
-      VimPlugin.getChange().insertBeforeCursor(editor, EditorDataContext.init(editor, null));
+      VimPlugin.getChange().insertBeforeCursor(new IjVimEditor(editor), new IjExecutionContext(EditorDataContext.init(editor, null)));
       KeyHandler.getInstance().reset(new IjVimEditor(editor));
     }
     updateCaretsVisualAttributes(editor);

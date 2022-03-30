@@ -196,6 +196,7 @@ interface VimEditor {
   var vimLastSelectionType: SelectionType?
 
   fun scrollToCaret(type: VimScrollType)
+  fun isTemplateActive(): Boolean
 }
 
 interface MutableVimEditor : VimEditor {

@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
+import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.annotations.Contract
 import java.util.*
 
@@ -41,7 +42,7 @@ class InsertBeforeCursorAction : ChangeEditorActionHandler.SingleExecution() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    VimPlugin.getChange().insertBeforeCursor(editor, context)
+    VimPlugin.getChange().insertBeforeCursor(editor.vim, context.vim)
     return true
   }
 }
