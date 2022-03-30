@@ -4,7 +4,10 @@ import com.intellij.openapi.components.Service
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimSearchHelper
+import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.helper.SearchHelper
+import com.maddyhome.idea.vim.helper.SearchOptions
+import java.util.*
 
 @Service
 class IjVimSearchHelper : VimSearchHelper {
@@ -114,5 +117,15 @@ class IjVimSearchHelper : VimSearchHelper {
       count,
       bigWord
     )
+  }
+
+  override fun findPattern(
+    editor: VimEditor,
+    pattern: String?,
+    startOffset: Int,
+    count: Int,
+    searchOptions: EnumSet<SearchOptions>?,
+  ): TextRange? {
+    return SearchHelper.findPattern(editor.ij, pattern, startOffset, count, searchOptions)
   }
 }

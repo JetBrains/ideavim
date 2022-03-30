@@ -26,6 +26,7 @@ import com.intellij.openapi.editor.VisualPosition
 import com.intellij.openapi.util.NlsSafe
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.common.MappingMode
 import com.maddyhome.idea.vim.common.TextRange
@@ -239,7 +240,7 @@ class VimMultipleCursorsExtension : VimExtension {
       }
 
       if (!editor.inVisualMode) {
-        enterVisualMode(editor)
+        enterVisualMode(editor.vim)
       }
 
       // Note that ignoreCase is not overridden by the `\C` in the pattern
@@ -301,17 +302,17 @@ class VimMultipleCursorsExtension : VimExtension {
     val range = SearchHelper.findWordUnderCursor(editor, caret) ?: return null
     if (range.startOffset > caret.offset) return null
 
-    enterVisualMode(editor)
+    enterVisualMode(editor.vim)
 
     // Select the word under the caret, moving the caret to the end of the selection
     caret.vimSetSelection(range.startOffset, range.endOffsetInclusive, true)
     return TextRange(caret.selectionStart, caret.selectionEnd)
   }
 
-  private fun enterVisualMode(editor: Editor) {
+  private fun enterVisualMode(editor: VimEditor) {
     // We need to reset the key handler to make sure we pick up the fact that we're in visual mode
     VimPlugin.getVisualMotion().enterVisualMode(editor, CommandState.SubMode.VISUAL_CHARACTER)
-    KeyHandler.getInstance().reset(editor.vim)
+    KeyHandler.getInstance().reset(editor)
   }
 
   private fun findNextOccurrence(editor: Editor, startOffset: Int, text: String, whole: Boolean): Int {

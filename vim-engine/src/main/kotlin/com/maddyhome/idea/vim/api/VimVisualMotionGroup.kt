@@ -33,4 +33,20 @@ interface VimVisualMotionGroup {
    */
   fun toggleVisual(editor: VimEditor, count: Int, rawCount: Int, subMode: CommandState.SubMode): Boolean
   fun enterSelectMode(editor: VimEditor, subMode: CommandState.SubMode): Boolean
+
+  /**
+   * Enters visual mode based on current editor state.
+   * If [subMode] is null, subMode will be detected automatically
+   *
+   * it:
+   * - Updates command state
+   * - Updates [vimSelectionStart] property
+   * - Updates caret colors
+   * - Updates care shape
+   *
+   * - DOES NOT change selection
+   * - DOES NOT move caret
+   * - DOES NOT check if carets actually have any selection
+   */
+  fun enterVisualMode(editor: VimEditor, subMode: CommandState.SubMode? = null): Boolean
 }

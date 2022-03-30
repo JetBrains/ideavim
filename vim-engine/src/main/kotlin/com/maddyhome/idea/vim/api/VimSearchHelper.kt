@@ -1,5 +1,9 @@
 package com.maddyhome.idea.vim.api
 
+import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.helper.SearchOptions
+import java.util.*
+
 interface VimSearchHelper {
   fun findNextParagraph(
     editor: VimEditor,
@@ -72,4 +76,12 @@ interface VimSearchHelper {
   ): Int
 
   fun findNextWord(editor: VimEditor, searchFrom: Int, count: Int, bigWord: Boolean): Int
+
+  fun findPattern(
+    editor: VimEditor,
+    pattern: String?,
+    startOffset: Int,
+    count: Int,
+    searchOptions: EnumSet<SearchOptions>?,
+  ): TextRange?
 }

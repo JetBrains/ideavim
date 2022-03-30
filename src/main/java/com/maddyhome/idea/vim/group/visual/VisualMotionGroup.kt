@@ -140,13 +140,13 @@ class VisualMotionGroup : VimVisualMotionGroupBase() {
    * - DOES NOT move caret
    * - DOES NOT check if carets actually have any selection
    */
-  fun enterVisualMode(editor: Editor, subMode: CommandState.SubMode? = null): Boolean {
-    val autodetectedSubMode = subMode ?: autodetectVisualSubmode(editor)
-    editor.vim.commandState.pushModes(CommandState.Mode.VISUAL, autodetectedSubMode)
+  override fun enterVisualMode(editor: VimEditor, subMode: CommandState.SubMode?): Boolean {
+    val autodetectedSubMode = subMode ?: autodetectVisualSubmode(editor.ij)
+    editor.commandState.pushModes(CommandState.Mode.VISUAL, autodetectedSubMode)
     if (autodetectedSubMode == CommandState.SubMode.VISUAL_BLOCK) {
-      editor.caretModel.primaryCaret.run { vimSelectionStart = vimLeadSelectionOffset }
+      editor.ij.caretModel.primaryCaret.run { vimSelectionStart = vimLeadSelectionOffset }
     } else {
-      editor.caretModel.allCarets.forEach { it.vimSelectionStart = it.vimLeadSelectionOffset }
+      editor.ij.caretModel.allCarets.forEach { it.vimSelectionStart = it.vimLeadSelectionOffset }
     }
     return true
   }

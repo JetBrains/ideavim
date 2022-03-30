@@ -36,6 +36,9 @@ import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.util.Trinity;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.api.VimEditor;
+import com.maddyhome.idea.vim.api.VimInjectorKt;
+import com.maddyhome.idea.vim.api.VimSearchGroupBase;
 import com.maddyhome.idea.vim.common.CharacterPosition;
 import com.maddyhome.idea.vim.common.Direction;
 import com.maddyhome.idea.vim.common.TextRange;
@@ -76,7 +79,7 @@ import static com.maddyhome.idea.vim.register.RegisterConstants.LAST_SEARCH_REGI
 @State(name = "VimSearchSettings", storages = {
   @Storage(value = "$APP_CONFIG$/vim_settings_local.xml", roamingType = RoamingType.DISABLED)
 })
-public class SearchGroup implements PersistentStateComponent<Element> {
+public class SearchGroup extends VimSearchGroupBase implements PersistentStateComponent<Element> {
   public SearchGroup() {
     VimPlugin.getOptionService().addListener(
       OptionConstants.hlsearchName,
@@ -990,11 +993,12 @@ public class SearchGroup implements PersistentStateComponent<Element> {
    * @param forwards  Search forwards or backwards
    * @return          The TextRange of the next occurrence or null if not found
    */
-  public @Nullable TextRange getNextSearchRange(@NotNull Editor editor, int count, boolean forwards) {
-    editor.getCaretModel().removeSecondaryCarets();
+  @Override
+  public @Nullable TextRange getNextSearchRange(@NotNull VimEditor editor, int count, boolean forwards) {
+    editor.removeSecondaryCarets();
     TextRange current = findUnderCaret(editor);
 
-    if (current == null || CommandStateHelper.inVisualMode(editor) && atEdgeOfGnRange(current, editor, forwards)) {
+    if (current == null || CommandStateHelper.inVisualMode(((IjVimEditor)editor).getEditor()) && atEdgeOfGnRange(current, ((IjVimEditor)editor).getEditor(), forwards)) {
       current = findNextSearchForGn(editor, count, forwards);
     }
     else if (count > 1) {
@@ -1013,30 +1017,34 @@ public class SearchGroup implements PersistentStateComponent<Element> {
     }
   }
 
-  private @Nullable TextRange findNextSearchForGn(@NotNull Editor editor, int count, boolean forwards) {
+  private @Nullable TextRange findNextSearchForGn(@NotNull VimEditor editor, int count, boolean forwards) {
     if (forwards) {
       final EnumSet<SearchOptions> searchOptions = EnumSet.of(SearchOptions.WRAP, SearchOptions.WHOLE_FILE);
-      return SearchHelper.findPattern(editor, getLastUsedPattern(), editor.getCaretModel().getOffset(), count, searchOptions);
+      return VimInjectorKt.getInjector().getSearchHelper().findPattern(editor, getLastUsedPattern(), editor.primaryCaret().getOffset().getPoint(), count, searchOptions);
     } else {
-      return searchBackward(editor, editor.getCaretModel().getOffset(), count);
+      return searchBackward(editor, editor.primaryCaret().getOffset().getPoint(), count);
     }
   }
 
-  private @Nullable TextRange findUnderCaret(@NotNull Editor editor) {
-    final TextRange backSearch = searchBackward(editor, editor.getCaretModel().getOffset() + 1, 1);
+  @Override
+  @Nullable
+  public TextRange findUnderCaret(@NotNull VimEditor editor) {
+    final TextRange backSearch = searchBackward(editor, editor.primaryCaret().getOffset().getPoint() + 1, 1);
     if (backSearch == null) return null;
-    return backSearch.contains(editor.getCaretModel().getOffset()) ? backSearch : null;
+    return backSearch.contains(editor.primaryCaret().getOffset().getPoint()) ? backSearch : null;
   }
 
-  private @Nullable TextRange searchBackward(@NotNull Editor editor, int offset, int count) {
+  @Override
+  @Nullable
+  public TextRange searchBackward(@NotNull VimEditor editor, int offset, int count) {
     // Backward search returns wrongs end offset for some cases. That's why we should perform additional forward search
     final EnumSet<SearchOptions> searchOptions = EnumSet.of(SearchOptions.WRAP, SearchOptions.WHOLE_FILE, SearchOptions.BACKWARDS);
-    final TextRange foundBackward = SearchHelper.findPattern(editor, getLastUsedPattern(), offset, count, searchOptions);
+    final TextRange foundBackward = VimInjectorKt.getInjector().getSearchHelper().findPattern(editor, getLastUsedPattern(), offset, count, searchOptions);
     if (foundBackward == null) return null;
     int startOffset = foundBackward.getStartOffset() - 1;
-    if (startOffset < 0) startOffset = EditorHelperRt.getFileSize(editor);
+    if (startOffset < 0) startOffset = (int)editor.fileSize();
     searchOptions.remove(SearchOptions.BACKWARDS);
-    return SearchHelper.findPattern(editor, getLastUsedPattern(), startOffset, 1, searchOptions);
+    return VimInjectorKt.getInjector().getSearchHelper().findPattern(editor, getLastUsedPattern(), startOffset, 1, searchOptions);
   }
 
 

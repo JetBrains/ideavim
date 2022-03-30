@@ -1337,19 +1337,6 @@ public class MotionGroup extends VimMotionGroupBase {
     return lastFTChar;
   }
 
-  public int selectNextSearch(@NotNull Editor editor, int count, boolean forwards) {
-    final Caret caret = editor.getCaretModel().getPrimaryCaret();
-    final TextRange range = VimPlugin.getSearch().getNextSearchRange(editor, count, forwards);
-    if (range == null) return -1;
-    final int adj = VimPlugin.getVisualMotion().getSelectionAdj();
-    if (!CommandStateHelper.inVisualMode(editor)) {
-      final int startOffset = forwards ? range.getStartOffset() : max(range.getEndOffset() - adj, 0);
-      MotionGroup.moveCaret(editor, caret, startOffset);
-      VimPlugin.getVisualMotion().enterVisualMode(editor, CommandState.SubMode.VISUAL_CHARACTER);
-    }
-    return forwards ? max(range.getEndOffset() - adj, 0) : range.getStartOffset();
-  }
-
   private @NotNull TillCharacterMotionType lastFTCmd = TillCharacterMotionType.LAST_SMALL_T;
   private char lastFTChar;
 

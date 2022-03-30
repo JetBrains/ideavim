@@ -18,21 +18,20 @@
 
 package com.maddyhome.idea.vim.action.motion.gn
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.TextObjectVisualType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler
-import com.maddyhome.idea.vim.newapi.ij
 
 /**
  * @author Alex Plate
  */
 
-class GnNextTextObject : TextObjectActionHandler() {
+class GnPreviousTextObject : TextObjectActionHandler() {
 
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
 
@@ -45,7 +44,7 @@ class GnNextTextObject : TextObjectActionHandler() {
     argument: Argument?,
   ): TextRange? {
     if (caret != editor.primaryCaret()) return null
-    val range = VimPlugin.getSearch().getNextSearchRange(editor.ij, count, true)
+    val range = injector.searchGroup.getNextSearchRange(editor, count, false)
     return range?.let { TextRange(it.startOffset, it.endOffset) }
   }
 }

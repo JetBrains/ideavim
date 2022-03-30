@@ -24,10 +24,6 @@ import com.maddyhome.idea.vim.helper.SearchHelper.findPositionOfFirstCharacter
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 
-enum class SearchOptions {
-  BACKWARDS, WANT_ENDPOS, WRAP, SHOW_MESSAGES, WHOLE_FILE, IGNORE_SMARTCASE
-}
-
 private data class State(val position: Int, val trigger: Char, val inQuote: Boolean?, val lastOpenSingleQuotePos: Int)
 
 // bounds are considered inside corresponding quotes

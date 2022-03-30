@@ -36,6 +36,7 @@ interface VimInjector {
   val motion: VimMotionGroup
   val lookupManager: VimLookupManager
   val templateManager: VimTemplateManager
+  val searchGroup: VimSearchGroup
 
   /**
    * Please use vimLogger() function

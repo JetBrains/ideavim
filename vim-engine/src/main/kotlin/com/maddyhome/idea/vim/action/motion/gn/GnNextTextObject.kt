@@ -15,33 +15,36 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+
 package com.maddyhome.idea.vim.action.motion.gn
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
-import com.maddyhome.idea.vim.command.CommandFlags
-import com.maddyhome.idea.vim.command.MotionType
-import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.handler.Motion
-import com.maddyhome.idea.vim.handler.MotionActionHandler
-import com.maddyhome.idea.vim.handler.toMotionOrError
-import com.maddyhome.idea.vim.helper.noneOfEnum
-import com.maddyhome.idea.vim.newapi.ij
-import java.util.*
+import com.maddyhome.idea.vim.command.TextObjectVisualType
+import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.handler.TextObjectActionHandler
 
-class VisualSelectNextSearch : MotionActionHandler.SingleExecution() {
-  override val flags: EnumSet<CommandFlags> = noneOfEnum()
+/**
+ * @author Alex Plate
+ */
 
-  override fun getOffset(
+class GnNextTextObject : TextObjectActionHandler() {
+
+  override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
+
+  override fun getRange(
     editor: VimEditor,
+    caret: VimCaret,
     context: ExecutionContext,
+    count: Int,
+    rawCount: Int,
     argument: Argument?,
-    operatorArguments: OperatorArguments,
-  ): Motion {
-    return VimPlugin.getMotion().selectNextSearch(editor.ij, operatorArguments.count1, true).toMotionOrError()
+  ): TextRange? {
+    if (caret != editor.primaryCaret()) return null
+    val range = injector.searchGroup.getNextSearchRange(editor, count, true)
+    return range?.let { TextRange(it.startOffset, it.endOffset) }
   }
-
-  override val motionType: MotionType = MotionType.EXCLUSIVE
 }

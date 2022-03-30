@@ -375,7 +375,7 @@ private class TestExtension : VimExtension {
 
   private class MoveEmulateInclusive : VimExtensionHandler {
     override fun execute(editor: Editor, context: DataContext) {
-      VimPlugin.getVisualMotion().enterVisualMode(editor, CommandState.SubMode.VISUAL_CHARACTER)
+      VimPlugin.getVisualMotion().enterVisualMode(editor.vim, CommandState.SubMode.VISUAL_CHARACTER)
       val caret = editor.caretModel.currentCaret
       val newOffset = VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor.vim, caret.vim, 5, editor.isEndAllowed)
       MotionGroup.moveCaret(editor, caret, newOffset)
@@ -396,7 +396,7 @@ private class TestExtension : VimExtension {
 
   private class MoveLinewise : VimExtensionHandler {
     override fun execute(editor: Editor, context: DataContext) {
-      VimPlugin.getVisualMotion().enterVisualMode(editor, CommandState.SubMode.VISUAL_LINE)
+      VimPlugin.getVisualMotion().enterVisualMode(editor.vim, CommandState.SubMode.VISUAL_LINE)
       val caret = editor.caretModel.currentCaret
       val newOffset = VimPlugin.getMotion().getVerticalMotionOffset(editor.vim, caret.vim, 1)
       MotionGroup.moveCaret(editor, caret, newOffset)

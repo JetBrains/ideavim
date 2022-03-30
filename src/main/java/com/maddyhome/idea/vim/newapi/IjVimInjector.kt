@@ -20,6 +20,7 @@ import com.maddyhome.idea.vim.api.VimLookupManager
 import com.maddyhome.idea.vim.api.VimMessages
 import com.maddyhome.idea.vim.api.VimMotionGroup
 import com.maddyhome.idea.vim.api.VimProcessGroup
+import com.maddyhome.idea.vim.api.VimSearchGroup
 import com.maddyhome.idea.vim.api.VimSearchHelper
 import com.maddyhome.idea.vim.api.VimStringParser
 import com.maddyhome.idea.vim.api.VimTemplateManager
@@ -29,6 +30,7 @@ import com.maddyhome.idea.vim.common.VimMachine
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.group.MarkGroup
 import com.maddyhome.idea.vim.group.MotionGroup
+import com.maddyhome.idea.vim.group.SearchGroup
 import com.maddyhome.idea.vim.helper.IjActionExecutor
 import com.maddyhome.idea.vim.helper.IjEditorHelper
 import com.maddyhome.idea.vim.helper.IjVimStringParser
@@ -54,6 +56,8 @@ class IjVimInjector : VimInjector {
     get() = service<IjVimLookupManager>()
   override val templateManager: VimTemplateManager
     get() = service<IjTemplateManager>()
+  override val searchGroup: VimSearchGroup
+    get() = service<SearchGroup>()
   override val nativeActionManager: NativeActionManager
     get() = service<IjNativeActionManager>()
   override val messages: VimMessages
