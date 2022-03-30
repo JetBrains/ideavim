@@ -452,8 +452,9 @@ public class MotionGroup extends VimMotionGroupBase {
     return VimPlugin.getFile().selectEditor(editor.getProject(), file);
   }
 
-  public int moveCaretToMatchingPair(@NotNull Editor editor, @NotNull Caret caret) {
-    int pos = SearchHelper.findMatchingPairOnCurrentLine(editor, caret);
+  @Override
+  public int moveCaretToMatchingPair(@NotNull VimEditor editor, @NotNull VimCaret caret) {
+    int pos = SearchHelper.findMatchingPairOnCurrentLine(((IjVimEditor)editor).getEditor(), ((IjVimCaret)caret).getCaret());
     if (pos >= 0) {
       return pos;
     }
@@ -908,7 +909,7 @@ public class MotionGroup extends VimMotionGroupBase {
 
     final int line = mark.getLogicalLine();
     return toLineStart
-           ? moveCaretToLineStartSkipLeading(editor, line)
+           ? moveCaretToLineStartSkipLeading(new IjVimEditor(editor), line)
            : editor.logicalPositionToOffset(new LogicalPosition(line, mark.getCol()));
   }
 
@@ -922,7 +923,7 @@ public class MotionGroup extends VimMotionGroupBase {
     final int line = mark.getLogicalLine();
     if (vf.getPath().equals(mark.getFilename())) {
       return toLineStart
-             ? moveCaretToLineStartSkipLeading(editor, line)
+             ? moveCaretToLineStartSkipLeading(new IjVimEditor(editor), line)
              : editor.logicalPositionToOffset(new LogicalPosition(line, mark.getCol()));
     }
 
@@ -930,7 +931,7 @@ public class MotionGroup extends VimMotionGroupBase {
     if (selectedEditor != null) {
       for (Caret caret : selectedEditor.getCaretModel().getAllCarets()) {
         moveCaret(selectedEditor, caret, toLineStart
-                                         ? moveCaretToLineStartSkipLeading(selectedEditor, line)
+                                         ? moveCaretToLineStartSkipLeading(new IjVimEditor(selectedEditor), line)
                                          : selectedEditor.logicalPositionToOffset(
                                            new LogicalPosition(line, mark.getCol())));
       }
@@ -996,19 +997,13 @@ public class MotionGroup extends VimMotionGroupBase {
 
   public int moveCaretToLineStartSkipLeading(@NotNull Editor editor, @NotNull Caret caret) {
     int logicalLine = caret.getLogicalPosition().line;
-    return moveCaretToLineStartSkipLeading(editor, logicalLine);
+    return moveCaretToLineStartSkipLeading(new IjVimEditor(editor), logicalLine);
   }
 
-  public @Range(from = 0, to = Integer.MAX_VALUE) int moveCaretToLineStartSkipLeading(@NotNull Editor editor,
+  @Override
+  public @Range(from = 0, to = Integer.MAX_VALUE) int moveCaretToLineStartSkipLeading(@NotNull VimEditor editor,
                                                                                       int line) {
-    return getLeadingCharacterOffset(editor, line);
-  }
-
-  public @Range(from = 0, to = Integer.MAX_VALUE) int moveCaretToLineStartSkipLeadingOffset(@NotNull Editor editor,
-                                                                                            @NotNull Caret caret,
-                                                                                            int linesOffset) {
-    int line = normalizeVisualLine(editor, caret.getVisualPosition().line + linesOffset);
-    return moveCaretToLineStartSkipLeading(editor, visualLineToLogicalLine(editor, line));
+    return getLeadingCharacterOffset(((IjVimEditor)editor).getEditor(), line);
   }
 
   public int moveCaretToLineEnd(@NotNull Editor editor, @NotNull Caret caret) {
@@ -1082,45 +1077,46 @@ public class MotionGroup extends VimMotionGroupBase {
     }
   }
 
-  public boolean scrollFullPage(@NotNull Editor editor, @NotNull Caret caret, int pages) {
-    assert pages != 0;
-    return pages > 0 ? scrollFullPageDown(editor, caret, pages) : scrollFullPageUp(editor, caret, Math.abs(pages));
-  }
+  @Override
+  public boolean scrollFullPageDown(@NotNull VimEditor editor, @NotNull VimCaret caret, int pages) {
+    Editor ijEditor = ((IjVimEditor)editor).getEditor();
+    Caret ijCaret = ((IjVimCaret)caret).getCaret();
+    final Pair<Boolean, Integer> result = EditorHelper.scrollFullPageDown(ijEditor, pages);
 
-  private boolean scrollFullPageDown(@NotNull Editor editor, @NotNull Caret caret, int pages) {
-    final Pair<Boolean, Integer> result = EditorHelper.scrollFullPageDown(editor, pages);
-
-    final int scrollOffset = getNormalizedScrollOffset(editor);
-    final int topVisualLine = getVisualLineAtTopOfScreen(editor);
+    final int scrollOffset = getNormalizedScrollOffset(ijEditor);
+    final int topVisualLine = getVisualLineAtTopOfScreen(ijEditor);
     int caretVisualLine = result.getSecond();
     if (caretVisualLine < topVisualLine + scrollOffset) {
-      caretVisualLine = normalizeVisualLine(editor, caretVisualLine + scrollOffset);
+      caretVisualLine = normalizeVisualLine(ijEditor, caretVisualLine + scrollOffset);
     }
 
-    if (caretVisualLine != caret.getVisualPosition().line) {
+    if (caretVisualLine != ijCaret.getVisualPosition().line) {
       final int offset =
-        moveCaretToLineWithStartOfLineOption(editor, visualLineToLogicalLine(editor, caretVisualLine), caret);
-      moveCaret(editor, caret, offset);
+        moveCaretToLineWithStartOfLineOption(editor, visualLineToLogicalLine(ijEditor, caretVisualLine), caret);
+      moveCaret(ijEditor, ijCaret, offset);
       return result.getFirst();
     }
 
     return false;
   }
 
-  private boolean scrollFullPageUp(@NotNull Editor editor, @NotNull Caret caret, int pages) {
-    final Pair<Boolean, Integer> result = EditorHelper.scrollFullPageUp(editor, pages);
+  @Override
+  public boolean scrollFullPageUp(@NotNull VimEditor editor, @NotNull VimCaret caret, int pages) {
+    Editor ijEditor = ((IjVimEditor)editor).getEditor();
+    Caret ijCaret = ((IjVimCaret)caret).getCaret();
+    final Pair<Boolean, Integer> result = EditorHelper.scrollFullPageUp(ijEditor, pages);
 
-    final int scrollOffset = getNormalizedScrollOffset(editor);
-    final int bottomVisualLine = getVisualLineAtBottomOfScreen(editor);
+    final int scrollOffset = getNormalizedScrollOffset(ijEditor);
+    final int bottomVisualLine = getVisualLineAtBottomOfScreen(ijEditor);
     int caretVisualLine = result.getSecond();
     if (caretVisualLine > bottomVisualLine - scrollOffset) {
-      caretVisualLine = normalizeVisualLine(editor, caretVisualLine - scrollOffset);
+      caretVisualLine = normalizeVisualLine(ijEditor, caretVisualLine - scrollOffset);
     }
 
-    if (caretVisualLine != caret.getVisualPosition().line && caretVisualLine != -1) {
+    if (caretVisualLine != ijCaret.getVisualPosition().line && caretVisualLine != -1) {
       final int offset =
-        moveCaretToLineWithStartOfLineOption(editor, visualLineToLogicalLine(editor, caretVisualLine), caret);
-      moveCaret(editor, caret, offset);
+        moveCaretToLineWithStartOfLineOption(editor, visualLineToLogicalLine(ijEditor, caretVisualLine), caret);
+      moveCaret(ijEditor, ijCaret, offset);
       return result.getFirst();
     }
 
@@ -1128,7 +1124,7 @@ public class MotionGroup extends VimMotionGroupBase {
     // lines of the file and virtual space. Vim normally scrolls window height minus two, but when the caret is on last
     // line minus one, this becomes window height minus one, meaning the top line of the current page becomes the bottom
     // line of the new page, and the caret doesn't move. Make sure we don't beep in this scenario.
-    return caretVisualLine == EditorHelper.getVisualLineCount(new IjVimEditor(editor)) - 2;
+    return caretVisualLine == EditorHelper.getVisualLineCount(editor) - 2;
   }
 
   public @Range(from = 0, to = Integer.MAX_VALUE) int moveCaretToLineWithSameColumn(@NotNull Editor editor,
@@ -1150,14 +1146,16 @@ public class MotionGroup extends VimMotionGroupBase {
     return editor.logicalPositionToOffset(newPos);
   }
 
-  public @Range(from = 0, to = Integer.MAX_VALUE) int moveCaretToLineWithStartOfLineOption(@NotNull Editor editor,
+  @Override
+  public @Range(from = 0, to = Integer.MAX_VALUE) int moveCaretToLineWithStartOfLineOption(@NotNull VimEditor editor,
                                                                                            int logicalLine,
-                                                                                           @NotNull Caret caret) {
-    if (VimPlugin.getOptionService().isSet(new OptionScope.LOCAL(new IjVimEditor(editor)), OptionConstants.startoflineName, OptionConstants.startoflineName)) {
+                                                                                           @NotNull VimCaret caret) {
+    if (VimPlugin.getOptionService().isSet(new OptionScope.LOCAL(editor), OptionConstants.startoflineName, OptionConstants.startoflineName)) {
       return moveCaretToLineStartSkipLeading(editor, logicalLine);
     }
     else {
-      return moveCaretToLineWithSameColumn(editor, logicalLine, caret);
+      return moveCaretToLineWithSameColumn(((IjVimEditor)editor).getEditor(), logicalLine,
+                                           ((IjVimCaret)caret).getCaret());
     }
   }
 
@@ -1206,7 +1204,7 @@ public class MotionGroup extends VimMotionGroupBase {
     }
 
     int logicalLine = visualLineToLogicalLine(editor, targetCaretVisualLine);
-    int caretOffset = moveCaretToLineWithStartOfLineOption(editor, logicalLine, caret);
+    int caretOffset = moveCaretToLineWithStartOfLineOption(new IjVimEditor(editor), logicalLine, new IjVimCaret(caret));
     moveCaret(editor, caret, caretOffset);
 
     return true;
@@ -1265,7 +1263,7 @@ public class MotionGroup extends VimMotionGroupBase {
     if (visualLine != editor.getCaretModel().getVisualPosition().line || start) {
       int offset;
       if (start) {
-        offset = moveCaretToLineStartSkipLeading(editor, visualLineToLogicalLine(editor, visualLine));
+        offset = moveCaretToLineStartSkipLeading(new IjVimEditor(editor), visualLineToLogicalLine(editor, visualLine));
       }
       else {
         offset = getVerticalMotionOffset(new IjVimEditor(editor), new IjVimCaret(editor.getCaretModel().getPrimaryCaret()),
@@ -1304,19 +1302,14 @@ public class MotionGroup extends VimMotionGroupBase {
     return editor.getCaretModel().getOffset();
   }
 
-  public @Range(from = 0, to = Integer.MAX_VALUE) int moveCaretToLinePercent(@NotNull Editor editor,
-                                                                             @NotNull Caret caret,
+  @Override
+  public @Range(from = 0, to = Integer.MAX_VALUE) int moveCaretToLinePercent(@NotNull VimEditor editor,
+                                                                             @NotNull VimCaret caret,
                                                                              int count) {
-    return moveCaretToLineWithStartOfLineOption(editor, normalizeLine(editor, (getLineCount(editor) *
-                                                                               MathUtil.clamp(count, 0, 100) + 99) /
-                                                                              100 - 1), caret);
-  }
-
-  public @Range(from = 0, to = Integer.MAX_VALUE) int moveCaretGotoLineLastEnd(@NotNull Editor editor,
-                                                                               int rawCount,
-                                                                               int line,
-                                                                               boolean pastEnd) {
-    return moveCaretToLineEnd(new IjVimEditor(editor), rawCount == 0 ? normalizeLine(editor, getLineCount(editor) - 1) : line, pastEnd);
+    return moveCaretToLineWithStartOfLineOption(editor,
+                                                normalizeLine(((IjVimEditor)editor).getEditor(),
+                                                              (editor.lineCount() * MathUtil.clamp(count, 0, 100) +
+                                                               99) / 100 - 1), caret);
   }
 
   private enum ScreenLocation {
@@ -1398,7 +1391,7 @@ public class MotionGroup extends VimMotionGroupBase {
     }
 
     final int targetLogicalLine = visualLineToLogicalLine(editor, targetVisualLine);
-    return moveCaretToLineWithStartOfLineOption(editor, targetLogicalLine, caret);
+    return moveCaretToLineWithStartOfLineOption(new IjVimEditor(editor), targetLogicalLine, new IjVimCaret(caret));
   }
 
   public @Range(from = 0, to = Integer.MAX_VALUE) int moveCaretToLineEndOffset(@NotNull Editor editor,

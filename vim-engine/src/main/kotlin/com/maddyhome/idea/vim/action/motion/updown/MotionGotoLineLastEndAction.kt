@@ -18,10 +18,10 @@
 
 package com.maddyhome.idea.vim.action.motion.updown
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
@@ -29,12 +29,15 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotion
-import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.enumSetOf
-import com.maddyhome.idea.vim.newapi.ij
+import com.maddyhome.idea.vim.helper.inInsertMode
+import com.maddyhome.idea.vim.helper.inVisualMode
+import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import java.util.*
 
-class MotionGotoLineFirstAction : MotionActionHandler.ForEachCaret() {
+class MotionGotoLineLastEndAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.LINE_WISE
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
@@ -46,12 +49,24 @@ class MotionGotoLineFirstAction : MotionActionHandler.ForEachCaret() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    val line = EditorHelper.normalizeLine(editor.ij, operatorArguments.count1 - 1)
-    return VimPlugin.getMotion().moveCaretToLineWithStartOfLineOption(editor.ij, line, caret.ij).toMotion()
+    var allow = false
+    if (editor.inInsertMode) {
+      allow = true
+    } else if (editor.inVisualMode) {
+      val opt = (injector.optionService.getOptionValue(
+        OptionScope.LOCAL(editor),
+        OptionConstants.selectionName
+      ) as VimString).value
+      if (opt != "old") {
+        allow = true
+      }
+    }
+
+    return moveCaretGotoLineLastEnd(editor, operatorArguments.count0, operatorArguments.count1 - 1, allow).toMotion()
   }
 }
 
-class MotionGotoLineFirstInsertAction : MotionActionHandler.ForEachCaret() {
+class MotionGotoLineLastEndInsertAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_CLEAR_STROKES)
@@ -63,7 +78,30 @@ class MotionGotoLineFirstInsertAction : MotionActionHandler.ForEachCaret() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    val line = EditorHelper.normalizeLine(editor.ij, operatorArguments.count1 - 1)
-    return VimPlugin.getMotion().moveCaretToLineStart(editor, line).toMotion()
+    var allow = false
+    if (editor.inInsertMode) {
+      allow = true
+    } else if (editor.inVisualMode) {
+      val opt = (injector.optionService
+        .getOptionValue(OptionScope.LOCAL(editor), OptionConstants.selectionName) as VimString).value
+      if (opt != "old") {
+        allow = true
+      }
+    }
+
+    return moveCaretGotoLineLastEnd(editor, operatorArguments.count0, operatorArguments.count1 - 1, allow).toMotion()
   }
+}
+
+private fun moveCaretGotoLineLastEnd(
+  editor: VimEditor,
+  rawCount: Int,
+  line: Int,
+  pastEnd: Boolean,
+): Int {
+  return injector.motion.moveCaretToLineEnd(
+    editor,
+    if (rawCount == 0) injector.engineEditorHelper.normalizeLine(editor, editor.lineCount() - 1) else line,
+    pastEnd
+  )
 }

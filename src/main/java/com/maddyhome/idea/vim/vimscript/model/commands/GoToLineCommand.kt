@@ -25,6 +25,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import java.lang.Integer.min
 
@@ -44,7 +45,7 @@ data class GoToLineCommand(val ranges: Ranges) :
     val line = min(this.getLine(editor, caret), EditorHelper.getLineCount(editor) - 1)
 
     if (line >= 0) {
-      val offset = VimPlugin.getMotion().moveCaretToLineWithStartOfLineOption(editor, line, caret)
+      val offset = VimPlugin.getMotion().moveCaretToLineWithStartOfLineOption(editor.vim, line, caret.vim)
       MotionGroup.moveCaret(editor, caret, offset)
       return ExecutionResult.Success
     }

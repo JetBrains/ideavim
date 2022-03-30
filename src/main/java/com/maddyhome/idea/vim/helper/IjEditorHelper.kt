@@ -9,6 +9,7 @@ import com.maddyhome.idea.vim.api.VimVisualPosition
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.newapi.IjVimCaret
 import com.maddyhome.idea.vim.newapi.IjVimEditor
+import com.maddyhome.idea.vim.newapi.ij
 
 @Service
 class IjEditorHelper : EngineEditorHelper {
@@ -72,5 +73,13 @@ class IjEditorHelper : EngineEditorHelper {
 
   override fun getLineEndForOffset(editor: VimEditor, offset: Int): Int {
     return EditorHelper.getLineEndForOffset((editor as IjVimEditor).editor, offset)
+  }
+
+  override fun visualLineToLogicalLine(editor: VimEditor, line: Int): Int {
+    return EditorHelper.visualLineToLogicalLine(editor.ij, line)
+  }
+
+  override fun normalizeLine(editor: VimEditor, line: Int): Int {
+    return EditorHelper.normalizeLine(editor.ij, line)
   }
 }

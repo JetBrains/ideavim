@@ -17,19 +17,18 @@
  */
 package com.maddyhome.idea.vim.action.motion.updown
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotion
-import com.maddyhome.idea.vim.newapi.ij
 
-class MotionUpFirstNonSpaceAction : MotionActionHandler.ForEachCaret() {
+class MotionDownLess1FirstNonSpaceAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.LINE_WISE
 
   override fun getOffset(
@@ -39,7 +38,7 @@ class MotionUpFirstNonSpaceAction : MotionActionHandler.ForEachCaret() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    return VimPlugin.getMotion().moveCaretToLineStartSkipLeadingOffset(editor.ij, caret.ij, -operatorArguments.count1)
+    return injector.motion.moveCaretToLineStartSkipLeadingOffset(editor, caret, operatorArguments.count1 - 1)
       .toMotion()
   }
 }

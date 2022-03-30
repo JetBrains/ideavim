@@ -855,7 +855,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
     if (!got_quit) {
       if (lastMatch != -1) {
         MotionGroup.moveCaret(editor, caret,
-          VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, editor.offsetToLogicalPosition(lastMatch).line));
+          VimPlugin.getMotion().moveCaretToLineStartSkipLeading(new IjVimEditor(editor), editor.offsetToLogicalPosition(lastMatch).line));
       }
       else {
         VimPlugin.showMessage(MessageHelper.message(Msg.e_patnotf2, pattern));

@@ -967,7 +967,8 @@ public class ChangeGroup implements VimChangeGroup {
       boolean res = deleteText(editor, new TextRange(start, offset), SelectionType.LINE_WISE);
       if (res && caret.getOffset() >= EditorHelperRt.getFileSize(editor) && caret.getOffset() != 0) {
         MotionGroup
-          .moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineStartSkipLeadingOffset(editor, caret, -1));
+          .moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineStartSkipLeadingOffset(new IjVimEditor(editor),
+                                                                                                new IjVimCaret(caret), -1));
       }
 
       return res;
@@ -1024,7 +1025,8 @@ public class ChangeGroup implements VimChangeGroup {
       MotionGroup.moveCaret(editor, caret, start);
       int offset;
       if (spaces) {
-        offset = VimPlugin.getMotion().moveCaretToLineStartSkipLeadingOffset(editor, caret, 1);
+        offset = VimPlugin.getMotion().moveCaretToLineStartSkipLeadingOffset(new IjVimEditor(editor),
+                                                                             new IjVimCaret(caret), 1);
       }
       else {
         offset = VimPlugin.getMotion().moveCaretToLineStart(new IjVimEditor(editor), caret.getLogicalPosition().line + 1);
@@ -1263,7 +1265,8 @@ public class ChangeGroup implements VimChangeGroup {
       int pos = EditorHelper.normalizeOffset(editor, range.getStartOffset(), isChange);
       if (type == SelectionType.LINE_WISE) {
         pos = VimPlugin.getMotion()
-          .moveCaretToLineWithStartOfLineOption(editor, editor.offsetToLogicalPosition(pos).line, caret);
+          .moveCaretToLineWithStartOfLineOption(new IjVimEditor(editor), editor.offsetToLogicalPosition(pos).line,
+                                                new IjVimCaret(caret));
       }
       MotionGroup.moveCaret(editor, caret, pos);
     }
@@ -1604,7 +1607,7 @@ public class ChangeGroup implements VimChangeGroup {
   private void restoreCursor(@NotNull Editor editor, @NotNull Caret caret, int startLine) {
     if (caret != editor.getCaretModel().getPrimaryCaret()) {
       editor.getCaretModel().addCaret(
-        editor.offsetToVisualPosition(VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, startLine)), false);
+        editor.offsetToVisualPosition(VimPlugin.getMotion().moveCaretToLineStartSkipLeading(new IjVimEditor(editor), startLine)), false);
     }
   }
 
@@ -1653,7 +1656,7 @@ public class ChangeGroup implements VimChangeGroup {
       final int endOffset = EditorHelper.getLineEndForOffset(editor, ends[i] - (startOffset == ends[i] ? 0 : 1));
       reformatCode(editor, startOffset, endOffset);
     }
-    final int newOffset = VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, firstLine);
+    final int newOffset = VimPlugin.getMotion().moveCaretToLineStartSkipLeading(new IjVimEditor(editor), firstLine);
     MotionGroup.moveCaret(editor, caret, newOffset);
     return true;
   }
@@ -1695,7 +1698,7 @@ public class ChangeGroup implements VimChangeGroup {
     }
 
     final int firstLine = editor.offsetToLogicalPosition(Math.min(startOffset, endOffset)).line;
-    final int newOffset = VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, firstLine);
+    final int newOffset = VimPlugin.getMotion().moveCaretToLineStartSkipLeading(new IjVimEditor(editor), firstLine);
     MotionGroup.moveCaret(editor, caret, newOffset);
     restoreCursor(editor, caret, caret.getLogicalPosition().line);
   }
@@ -1826,7 +1829,7 @@ public class ChangeGroup implements VimChangeGroup {
       for (int l = sline; l <= eline; l++) {
         final int soff = EditorHelper.getLineStartOffset(editor, l);
         final int eoff = EditorHelper.getLineEndOffset(editor, l, true);
-        final int woff = VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, l);
+        final int woff = VimPlugin.getMotion().moveCaretToLineStartSkipLeading(new IjVimEditor(editor), l);
         final int col = editor.offsetToVisualPosition(woff).column;
         final int limit = Math.max(0, col + dir * indentConfig.getTotalIndent(count));
         if (col > 0 || soff != eoff) {
@@ -1839,7 +1842,8 @@ public class ChangeGroup implements VimChangeGroup {
     if (!CommandStateHelper.inInsertMode(editor)) {
       if (!range.isMultiple()) {
         MotionGroup
-          .moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineWithStartOfLineOption(editor, sline, caret));
+          .moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineWithStartOfLineOption(new IjVimEditor(editor), sline,
+                                                                                               new IjVimCaret(caret)));
       }
       else {
         MotionGroup.moveCaret(editor, caret, range.getStartOffset());

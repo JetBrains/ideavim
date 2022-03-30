@@ -5,6 +5,7 @@ import com.maddyhome.idea.vim.handler.toMotionOrError
 import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.helper.isEndAllowedIgnoringOnemore
 import com.maddyhome.idea.vim.helper.mode
+import kotlin.math.abs
 import kotlin.math.sign
 
 abstract class VimMotionGroupBase : VimMotionGroup {
@@ -95,6 +96,20 @@ abstract class VimMotionGroupBase : VimMotionGroup {
       .normalizeOffset(editor, caret.getLine().line, oldOffset + (sign * diff), allowPastEnd)
 
     return if (offset == oldOffset) -1 else offset
+  }
+
+  override fun moveCaretToLineStartSkipLeadingOffset(
+    editor: VimEditor,
+    caret: VimCaret,
+    linesOffset: Int
+  ): Int {
+    val line = injector.engineEditorHelper.normalizeVisualLine(editor, caret.getVisualPosition().line + linesOffset)
+    return moveCaretToLineStartSkipLeading(editor, injector.engineEditorHelper.visualLineToLogicalLine(editor, line))
+  }
+
+  override fun scrollFullPage(editor: VimEditor, caret: VimCaret, pages: Int): Boolean {
+    assert(pages != 0)
+    return if (pages > 0) scrollFullPageDown(editor, caret, pages) else scrollFullPageUp(editor, caret, abs(pages))
   }
 
   companion object {

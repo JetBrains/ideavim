@@ -18,13 +18,10 @@
 
 package com.maddyhome.idea.vim.action.motion.updown
 
-import com.intellij.codeInsight.lookup.LookupManager
-import com.intellij.openapi.actionSystem.IdeActions
-import com.intellij.openapi.editor.actionSystem.EditorActionManager
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.MotionType
@@ -33,8 +30,6 @@ import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotion
 import com.maddyhome.idea.vim.handler.toMotionOrError
-import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.newapi.ij
 
 sealed class MotionDownBase : MotionActionHandler.ForEachCaret() {
   private var col: Int = 0
@@ -45,12 +40,12 @@ sealed class MotionDownBase : MotionActionHandler.ForEachCaret() {
     context: ExecutionContext,
     cmd: Command,
   ): Boolean {
-    col = EditorHelper.prepareLastColumn(caret.ij)
+    col = injector.engineEditorHelper.prepareLastColumn(caret)
     return true
   }
 
   override fun postMove(editor: VimEditor, caret: VimCaret, context: ExecutionContext, cmd: Command) {
-    EditorHelper.updateLastColumn(caret.ij, col)
+    injector.engineEditorHelper.updateLastColumn(caret, col)
   }
 }
 
@@ -65,7 +60,7 @@ open class MotionDownAction : MotionDownBase() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    return VimPlugin.getMotion().getVerticalMotionOffset(editor, caret, operatorArguments.count1).toMotionOrError()
+    return injector.motion.getVerticalMotionOffset(editor, caret, operatorArguments.count1).toMotionOrError()
   }
 }
 
@@ -77,12 +72,11 @@ class MotionDownCtrlNAction : MotionDownAction() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    val activeLookup = LookupManager.getActiveLookup(editor.ij)
+    val activeLookup = injector.lookupManager.getActiveLookup(editor)
     return if (activeLookup != null) {
-      val primaryCaret = editor.ij.caretModel.primaryCaret
+      val primaryCaret = editor.primaryCaret()
       if (caret == primaryCaret) {
-        EditorActionManager.getInstance().getActionHandler(IdeActions.ACTION_EDITOR_MOVE_CARET_DOWN)
-          .execute(editor.ij, primaryCaret, context.ij)
+        activeLookup.down(primaryCaret, context)
       }
       caret.offset.point.toMotion()
     } else {
@@ -102,6 +96,6 @@ class MotionDownNotLineWiseAction : MotionDownBase() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    return VimPlugin.getMotion().getVerticalMotionOffset(editor, caret, operatorArguments.count1).toMotionOrError()
+    return injector.motion.getVerticalMotionOffset(editor, caret, operatorArguments.count1).toMotionOrError()
   }
 }

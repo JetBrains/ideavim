@@ -52,6 +52,9 @@ import javax.swing.SwingUtilities
 
 @Service
 class IjActionExecutor : VimActionExecutor {
+  override val ACTION_EDITOR_NEXT_TEMPLATE_VARIABLE: String
+    get() = IdeActions.ACTION_EDITOR_NEXT_TEMPLATE_VARIABLE
+
   /**
    * Execute an action
    *

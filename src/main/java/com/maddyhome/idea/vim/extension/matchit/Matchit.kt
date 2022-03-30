@@ -325,11 +325,11 @@ private fun getMatchitOffset(editor: Editor, caret: Caret, count: Int, isInOpPen
 
   if (count > 0) {
     // Matchit doesn't affect the percent motion, so we fall back to the default behavior.
-    motion = VimPlugin.getMotion().moveCaretToLinePercent(editor, caret, count)
+    motion = VimPlugin.getMotion().moveCaretToLinePercent(editor.vim, caret.vim, count)
   } else {
     // Check the simplest case first.
     if (defaultPairs.contains(currentChar)) {
-      motion = VimPlugin.getMotion().moveCaretToMatchingPair(editor, caret)
+      motion = VimPlugin.getMotion().moveCaretToMatchingPair(editor.vim, caret.vim)
     } else {
       val patternsTable = MatchitPatterns.getPatternsForFile(virtualFile, reverse)
       if (patternsTable != null) {
@@ -338,7 +338,7 @@ private fun getMatchitOffset(editor: Editor, caret: Caret, count: Int, isInOpPen
 
       if (motion < 0) {
         // Use default motion if the file type isn't supported or we didn't find any extended pairs.
-        motion = VimPlugin.getMotion().moveCaretToMatchingPair(editor, caret)
+        motion = VimPlugin.getMotion().moveCaretToMatchingPair(editor.vim, caret.vim)
       }
     }
   }

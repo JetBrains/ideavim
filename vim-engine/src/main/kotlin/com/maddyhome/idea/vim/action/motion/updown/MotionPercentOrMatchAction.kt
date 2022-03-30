@@ -15,49 +15,44 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-
 package com.maddyhome.idea.vim.action.motion.updown
 
-import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.action.ComplicatedKeysAction
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
-import com.maddyhome.idea.vim.handler.NonShiftedSpecialKeyHandler
-import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
-import com.maddyhome.idea.vim.newapi.ij
-import java.awt.event.KeyEvent
-import javax.swing.KeyStroke
+import com.maddyhome.idea.vim.command.OperatorArguments
+import com.maddyhome.idea.vim.handler.Motion
+import com.maddyhome.idea.vim.handler.MotionActionHandler
+import com.maddyhome.idea.vim.handler.toMotion
+import com.maddyhome.idea.vim.handler.toMotionOrError
+import com.maddyhome.idea.vim.helper.enumSetOf
+import java.util.*
 
-class MotionArrowUpAction : NonShiftedSpecialKeyHandler(), ComplicatedKeysAction {
-  override val motionType: MotionType = MotionType.LINE_WISE
+class MotionPercentOrMatchAction : MotionActionHandler.ForEachCaret() {
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
 
-  override val keyStrokesSet: Set<List<KeyStroke>> =
-    setOf(parseKeys("<Up>"), listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_UP, 0)))
-
-  private var col: Int = 0
-
-  override fun offset(
+  override fun getOffset(
     editor: VimEditor,
     caret: VimCaret,
     context: ExecutionContext,
-    count: Int,
-    rawCount: Int,
     argument: Argument?,
-  ): Int {
-    return VimPlugin.getMotion().getVerticalMotionOffset(editor, caret, -count)
+    operatorArguments: OperatorArguments,
+  ): Motion {
+    return if (operatorArguments.count0 == 0) {
+      injector.motion.moveCaretToMatchingPair(editor, caret).toMotionOrError()
+    } else {
+      injector.motion.moveCaretToLinePercent(editor, caret, operatorArguments.count1).toMotion()
+    }
   }
 
-  override fun preOffsetComputation(editor: VimEditor, caret: VimCaret, context: ExecutionContext, cmd: Command): Boolean {
-    col = EditorHelper.prepareLastColumn(caret.ij)
-    return true
+  override fun process(cmd: Command) {
+    motionType = if (cmd.rawCount != 0) MotionType.LINE_WISE else MotionType.INCLUSIVE
   }
 
-  override fun postMove(editor: VimEditor, caret: VimCaret, context: ExecutionContext, cmd: Command) {
-    EditorHelper.updateLastColumn(caret.ij, col)
-  }
+  override var motionType: MotionType = MotionType.INCLUSIVE
 }

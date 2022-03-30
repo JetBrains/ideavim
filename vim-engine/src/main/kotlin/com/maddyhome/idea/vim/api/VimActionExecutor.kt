@@ -22,6 +22,9 @@ import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import org.jetbrains.annotations.NonNls
 
 interface VimActionExecutor {
+
+  val ACTION_EDITOR_NEXT_TEMPLATE_VARIABLE: String
+
   /**
    * Execute an action
    *

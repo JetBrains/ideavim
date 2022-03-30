@@ -18,16 +18,11 @@
 
 package com.maddyhome.idea.vim.action.motion.updown
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.handler.ShiftedArrowKeyHandler
-import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.helper.vimForEachCaret
-import com.maddyhome.idea.vim.newapi.ij
-import com.maddyhome.idea.vim.newapi.vim
 
 /**
  * @author Alex Plate
@@ -38,16 +33,16 @@ class MotionShiftDownAction : ShiftedArrowKeyHandler() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override fun motionWithKeyModel(editor: VimEditor, context: ExecutionContext, cmd: Command) {
-    editor.ij.vimForEachCaret { caret ->
-      val vertical = VimPlugin.getMotion().getVerticalMotionOffset(editor, caret.vim, cmd.count)
-      val col = EditorHelper.prepareLastColumn(caret)
-      MotionGroup.moveCaret(editor.ij, caret, vertical)
+    editor.forEachCaret { caret ->
+      val vertical = injector.motion.getVerticalMotionOffset(editor, caret, cmd.count)
+      val col = injector.engineEditorHelper.prepareLastColumn(caret)
+      caret.moveToOffset(vertical)
 
-      EditorHelper.updateLastColumn(caret, col)
+      injector.engineEditorHelper.updateLastColumn(caret, col)
     }
   }
 
   override fun motionWithoutKeyModel(editor: VimEditor, context: ExecutionContext, cmd: Command) {
-    VimPlugin.getMotion().scrollFullPage(editor.ij, editor.ij.caretModel.primaryCaret, cmd.count)
+    injector.motion.scrollFullPage(editor, editor.primaryCaret(), cmd.count)
   }
 }

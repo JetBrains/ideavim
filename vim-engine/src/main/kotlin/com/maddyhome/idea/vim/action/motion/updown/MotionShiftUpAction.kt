@@ -15,31 +15,34 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+
 package com.maddyhome.idea.vim.action.motion.updown
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.command.Argument
-import com.maddyhome.idea.vim.command.MotionType
-import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.handler.Motion
-import com.maddyhome.idea.vim.handler.MotionActionHandler
-import com.maddyhome.idea.vim.handler.toMotion
-import com.maddyhome.idea.vim.newapi.ij
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.handler.ShiftedArrowKeyHandler
 
-class MotionDownLess1FirstNonSpaceAction : MotionActionHandler.ForEachCaret() {
-  override val motionType: MotionType = MotionType.LINE_WISE
+/**
+ * @author Alex Plate
+ */
 
-  override fun getOffset(
-    editor: VimEditor,
-    caret: VimCaret,
-    context: ExecutionContext,
-    argument: Argument?,
-    operatorArguments: OperatorArguments,
-  ): Motion {
-    return VimPlugin.getMotion().moveCaretToLineStartSkipLeadingOffset(editor.ij, caret.ij, operatorArguments.count1 - 1)
-      .toMotion()
+class MotionShiftUpAction : ShiftedArrowKeyHandler() {
+
+  override val type: Command.Type = Command.Type.OTHER_READONLY
+
+  override fun motionWithKeyModel(editor: VimEditor, context: ExecutionContext, cmd: Command) {
+    editor.forEachCaret { caret ->
+      val vertical = injector.motion.getVerticalMotionOffset(editor, caret, -cmd.count)
+      val col = injector.engineEditorHelper.prepareLastColumn(caret)
+      caret.moveToOffset(vertical)
+
+      injector.engineEditorHelper.updateLastColumn(caret, col)
+    }
+  }
+
+  override fun motionWithoutKeyModel(editor: VimEditor, context: ExecutionContext, cmd: Command) {
+    injector.motion.scrollFullPage(editor, editor.primaryCaret(), -cmd.count)
   }
 }

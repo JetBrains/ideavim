@@ -15,12 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+
 package com.maddyhome.idea.vim.action.motion.updown
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
@@ -28,15 +29,13 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotion
-import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.enumSetOf
-import com.maddyhome.idea.vim.newapi.ij
 import java.util.*
 
-class MotionGotoLineLastAction : MotionActionHandler.ForEachCaret() {
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
-
+class MotionGotoLineFirstAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.LINE_WISE
+
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
 
   override fun getOffset(
     editor: VimEditor,
@@ -45,14 +44,24 @@ class MotionGotoLineLastAction : MotionActionHandler.ForEachCaret() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    val line = EditorHelper.normalizeLine(
-      editor.ij,
-      if (operatorArguments.count0 == 0) {
-        EditorHelper.getLineCount(editor.ij) - 1
-      } else {
-        operatorArguments.count0 - 1
-      }
-    )
-    return VimPlugin.getMotion().moveCaretToLineWithStartOfLineOption(editor.ij, line, caret.ij).toMotion()
+    val line = injector.engineEditorHelper.normalizeLine(editor, operatorArguments.count1 - 1)
+    return injector.motion.moveCaretToLineWithStartOfLineOption(editor, line, caret).toMotion()
+  }
+}
+
+class MotionGotoLineFirstInsertAction : MotionActionHandler.ForEachCaret() {
+  override val motionType: MotionType = MotionType.EXCLUSIVE
+
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_CLEAR_STROKES)
+
+  override fun getOffset(
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    argument: Argument?,
+    operatorArguments: OperatorArguments,
+  ): Motion {
+    val line = injector.engineEditorHelper.normalizeLine(editor, operatorArguments.count1 - 1)
+    return injector.motion.moveCaretToLineStart(editor, line).toMotion()
   }
 }

@@ -22,4 +22,18 @@ interface VimMotionGroup {
     count: Int,
     allowPastEnd: Boolean
   ): Int
+
+  fun moveCaretToLineStartSkipLeading(editor: VimEditor, line: Int): Int
+  fun moveCaretToLineStartSkipLeadingOffset(
+    editor: VimEditor,
+    caret: VimCaret,
+    linesOffset: Int
+  ): Int
+
+  fun scrollFullPageDown(editor: VimEditor, caret: VimCaret, pages: Int): Boolean
+  fun scrollFullPageUp(editor: VimEditor, caret: VimCaret, pages: Int): Boolean
+  fun scrollFullPage(editor: VimEditor, caret: VimCaret, pages: Int): Boolean
+  fun moveCaretToMatchingPair(editor: VimEditor, caret: VimCaret): Int
+  fun moveCaretToLinePercent(editor: VimEditor, caret: VimCaret, count: Int): Int
+  fun moveCaretToLineWithStartOfLineOption(editor: VimEditor, logicalLine: Int, caret: VimCaret): Int
 }

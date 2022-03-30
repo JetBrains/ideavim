@@ -59,7 +59,7 @@ class IjVimCaret(val caret: Caret) : VimCaret {
   }
 
   override fun offsetForLineStartSkipLeading(line: Int): Int {
-    return VimPlugin.getMotion().moveCaretToLineStartSkipLeading((editor as IjVimEditor).editor, line)
+    return VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, line)
   }
 
   override fun getLine(): EditorLine.Pointer {
