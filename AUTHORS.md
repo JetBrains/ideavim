@@ -412,6 +412,10 @@ Contributors:
   [![icon][github]](https://github.com/PHPirates)
   &nbsp;
   Thomas Schouten
+* [![icon][mail]](mailto:sr@mail25.de)
+  [![icon][github]](https://github.com/Vvalter)
+  &nbsp;
+  Simon Rainer
                         
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainers.
