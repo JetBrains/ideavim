@@ -5,6 +5,7 @@ import com.maddyhome.idea.vim.common.VimMachine
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.mark.VimMarkGroup
 import com.maddyhome.idea.vim.options.OptionService
+import com.maddyhome.idea.vim.put.VimPut
 import com.maddyhome.idea.vim.register.VimRegisterGroup
 
 interface VimInjector {
@@ -37,6 +38,7 @@ interface VimInjector {
   val lookupManager: VimLookupManager
   val templateManager: VimTemplateManager
   val searchGroup: VimSearchGroup
+  val put: VimPut
 
   /**
    * Please use vimLogger() function

@@ -220,7 +220,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   }
 
   public static @NotNull PutGroup getPut() {
-    return ApplicationManager.getApplication().getService(PutGroup.class);
+    return (PutGroup)VimInjectorKt.getInjector().getPut();
   }
 
   public static @NotNull VariableService getVariableService() {

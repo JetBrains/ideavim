@@ -34,6 +34,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.text.StringUtil
 import com.jetbrains.rd.util.firstOrNull
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.SelectionType
@@ -51,6 +52,7 @@ import com.maddyhome.idea.vim.mark.VimMarkConstants.MARK_CHANGE_POS
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.put.VimPut
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.ClipboardOptionHelper
 import java.awt.datatransfer.DataFlavor
@@ -92,7 +94,7 @@ private data class ProcessedTextData(
   val transferableData: List<Any>,
 )
 
-class PutGroup {
+class PutGroup : VimPut {
   fun putText(editor: Editor, context: DataContext, data: PutData, updateVisualMarks: Boolean = false): Boolean {
     val additionalData = collectPreModificationData(editor, data)
     deleteSelectedText(editor, data)

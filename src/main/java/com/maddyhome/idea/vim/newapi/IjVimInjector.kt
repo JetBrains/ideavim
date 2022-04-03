@@ -31,12 +31,14 @@ import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.group.MarkGroup
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.SearchGroup
+import com.maddyhome.idea.vim.group.copy.PutGroup
 import com.maddyhome.idea.vim.helper.IjActionExecutor
 import com.maddyhome.idea.vim.helper.IjEditorHelper
 import com.maddyhome.idea.vim.helper.IjVimStringParser
 import com.maddyhome.idea.vim.helper.vimCommandState
 import com.maddyhome.idea.vim.mark.VimMarkGroup
 import com.maddyhome.idea.vim.options.OptionService
+import com.maddyhome.idea.vim.put.VimPut
 import com.maddyhome.idea.vim.register.VimRegisterGroup
 
 class IjVimInjector : VimInjector {
@@ -58,6 +60,8 @@ class IjVimInjector : VimInjector {
     get() = service<IjTemplateManager>()
   override val searchGroup: VimSearchGroup
     get() = service<SearchGroup>()
+  override val put: VimPut
+    get() = service<PutGroup>()
   override val nativeActionManager: NativeActionManager
     get() = service<IjNativeActionManager>()
   override val messages: VimMessages
