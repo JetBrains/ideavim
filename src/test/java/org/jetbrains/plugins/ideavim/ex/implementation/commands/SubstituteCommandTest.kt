@@ -975,5 +975,4 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcaseName, O
       " comment "
     )
   }
-
 }
