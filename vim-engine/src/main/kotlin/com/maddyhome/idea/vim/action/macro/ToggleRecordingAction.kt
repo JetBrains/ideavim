@@ -17,9 +17,9 @@
  */
 package com.maddyhome.idea.vim.action.macro
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
@@ -35,9 +35,9 @@ class ToggleRecordingAction : VimActionHandler.SingleExecution() {
     return if (!editor.commandState.isRecording) {
       val argument = cmd.argument ?: return false
       val reg = argument.character
-      VimPlugin.getRegister().startRecording(editor, reg)
+      injector.registerGroup.startRecording(editor, reg)
     } else {
-      VimPlugin.getRegister().finishRecording(editor)
+      injector.registerGroup.finishRecording(editor)
       true
     }
   }
