@@ -91,4 +91,50 @@ interface VimSearchHelper {
     count: Int,
     ch: Char,
   ): Int
+
+  fun findWordUnderCursor(
+    editor: VimEditor,
+    caret: VimCaret,
+    count: Int,
+    dir: Int,
+    isOuter: Boolean,
+    isBig: Boolean,
+    hasSelection: Boolean,
+  ): TextRange
+
+  fun findSentenceRange(
+    editor: VimEditor,
+    caret: VimCaret,
+    count: Int,
+    isOuter: Boolean,
+  ): TextRange
+
+  fun findParagraphRange(
+    editor: VimEditor,
+    caret: VimCaret,
+    count: Int,
+    isOuter: Boolean,
+  ): TextRange?
+
+  fun findBlockTagRange(
+    editor: VimEditor,
+    caret: VimCaret,
+    count: Int,
+    isOuter: Boolean,
+  ): TextRange?
+
+  fun findBlockQuoteInLineRange(
+    editor: VimEditor,
+    caret: VimCaret,
+    quote: Char,
+    isOuter: Boolean,
+  ): TextRange?
+
+  fun findBlockRange(
+    editor: VimEditor,
+    caret: VimCaret,
+    type: Char,
+    count: Int,
+    isOuter: Boolean,
+  ): TextRange?
 }

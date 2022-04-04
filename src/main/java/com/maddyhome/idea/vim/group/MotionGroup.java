@@ -324,39 +324,6 @@ public class MotionGroup extends VimMotionGroupBase {
     }
   }
 
-  public @Nullable TextRange getBlockQuoteRange(@NotNull Editor editor,
-                                                @NotNull Caret caret,
-                                                char quote,
-                                                boolean isOuter) {
-    return SearchHelper.findBlockQuoteInLineRange(editor, caret, quote, isOuter);
-  }
-
-  public @Nullable TextRange getBlockRange(@NotNull Editor editor,
-                                           @NotNull Caret caret,
-                                           int count,
-                                           boolean isOuter,
-                                           char type) {
-    return SearchHelper.findBlockRange(editor, caret, type, count, isOuter);
-  }
-
-  public @Nullable TextRange getBlockTagRange(@NotNull Editor editor,
-                                              @NotNull Caret caret,
-                                              int count,
-                                              boolean isOuter) {
-    return SearchHelper.findBlockTagRange(editor, caret, count, isOuter);
-  }
-
-  public @NotNull TextRange getSentenceRange(@NotNull Editor editor, @NotNull Caret caret, int count, boolean isOuter) {
-    return SearchHelper.findSentenceRange(editor, caret, count, isOuter);
-  }
-
-  public @Nullable TextRange getParagraphRange(@NotNull Editor editor,
-                                               @NotNull Caret caret,
-                                               int count,
-                                               boolean isOuter) {
-    return SearchHelper.findParagraphRange(editor, caret, count, isOuter);
-  }
-
   // Get the visual line that will be in the same screen relative location as the current caret line, after the screen
   // has been scrolled
   private static int getScrollScreenTargetCaretVisualLine(final @NotNull Editor editor, int rawCount, boolean down) {
@@ -808,25 +775,6 @@ public class MotionGroup extends VimMotionGroupBase {
     moveCaretToView(editor);
 
     return true;
-  }
-
-  public @NotNull TextRange getWordRange(@NotNull Editor editor,
-                                         @NotNull Caret caret,
-                                         int count,
-                                         boolean isOuter,
-                                         boolean isBig) {
-    int dir = 1;
-    boolean selection = false;
-    if (CommandState.getInstance(new IjVimEditor(editor)).getMode() == CommandState.Mode.VISUAL) {
-      if (UserDataManager.getVimSelectionStart(caret) > caret.getOffset()) {
-        dir = -1;
-      }
-      if (UserDataManager.getVimSelectionStart(caret) != caret.getOffset()) {
-        selection = true;
-      }
-    }
-
-    return SearchHelper.findWordUnderCursor(editor, caret, count, dir, isOuter, isBig, selection);
   }
 
   public int moveCaretToFileMark(@NotNull Editor editor, char ch, boolean toLineStart) {

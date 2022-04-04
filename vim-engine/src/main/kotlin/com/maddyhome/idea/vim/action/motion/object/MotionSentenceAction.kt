@@ -18,20 +18,19 @@
 
 package com.maddyhome.idea.vim.action.motion.`object`
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.TextObjectVisualType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
-import com.maddyhome.idea.vim.newapi.ij
 import java.util.*
 
-class MotionInnerBlockParenAction : TextObjectActionHandler() {
+class MotionInnerSentenceAction : TextObjectActionHandler() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
 
@@ -44,7 +43,25 @@ class MotionInnerBlockParenAction : TextObjectActionHandler() {
     count: Int,
     rawCount: Int,
     argument: Argument?,
-  ): TextRange? {
-    return VimPlugin.getMotion().getBlockRange(editor.ij, caret.ij, count, false, '(')
+  ): TextRange {
+    return injector.searchHelper.findSentenceRange(editor, caret, count, false)
+  }
+}
+
+class MotionOuterSentenceAction : TextObjectActionHandler() {
+
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
+
+  override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
+
+  override fun getRange(
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    count: Int,
+    rawCount: Int,
+    argument: Argument?,
+  ): TextRange {
+    return injector.searchHelper.findSentenceRange(editor, caret, count, true)
   }
 }

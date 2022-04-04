@@ -132,4 +132,47 @@ class IjVimSearchHelper : VimSearchHelper {
   override fun findNextCharacterOnLine(editor: VimEditor, caret: VimCaret, count: Int, ch: Char): Int {
     return SearchHelper.findNextCharacterOnLine(editor.ij, caret.ij, count, ch)
   }
+
+  override fun findWordUnderCursor(
+    editor: VimEditor,
+    caret: VimCaret,
+    count: Int,
+    dir: Int,
+    isOuter: Boolean,
+    isBig: Boolean,
+    hasSelection: Boolean,
+  ): TextRange {
+    return SearchHelper.findWordUnderCursor(editor.ij, caret.ij, count, dir, isOuter, isBig, hasSelection)
+  }
+
+  override fun findSentenceRange(editor: VimEditor, caret: VimCaret, count: Int, isOuter: Boolean): TextRange {
+    return SearchHelper.findSentenceRange(editor.ij, caret.ij, count, isOuter)
+  }
+
+  override fun findParagraphRange(editor: VimEditor, caret: VimCaret, count: Int, isOuter: Boolean): TextRange? {
+    return SearchHelper.findParagraphRange(editor.ij, caret.ij, count, isOuter)
+  }
+
+  override fun findBlockTagRange(editor: VimEditor, caret: VimCaret, count: Int, isOuter: Boolean): TextRange? {
+    return SearchHelper.findBlockTagRange(editor.ij, caret.ij, count, isOuter)
+  }
+
+  override fun findBlockQuoteInLineRange(
+    editor: VimEditor,
+    caret: VimCaret,
+    quote: Char,
+    isOuter: Boolean,
+  ): TextRange? {
+    return SearchHelper.findBlockQuoteInLineRange(editor.ij, caret.ij, quote, isOuter)
+  }
+
+  override fun findBlockRange(
+    editor: VimEditor,
+    caret: VimCaret,
+    type: Char,
+    count: Int,
+    isOuter: Boolean,
+  ): TextRange? {
+    return SearchHelper.findBlockRange(editor.ij, caret.ij, type, count, isOuter)
+  }
 }
