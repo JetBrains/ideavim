@@ -25,7 +25,6 @@ import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
-import com.maddyhome.idea.vim.newapi.ij
 import java.util.*
 
 class MotionScrollColumnLeftAction : VimActionHandler.SingleExecution() {
@@ -34,6 +33,6 @@ class MotionScrollColumnLeftAction : VimActionHandler.SingleExecution() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_IGNORE_SIDE_SCROLL_JUMP)
 
   override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
-    return VimPlugin.getMotion().scrollColumns(editor.ij, cmd.count)
+    return VimPlugin.getMotion().scrollColumns(editor, cmd.count)
   }
 }

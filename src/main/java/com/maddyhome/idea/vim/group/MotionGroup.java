@@ -514,13 +514,15 @@ public class MotionGroup extends VimMotionGroupBase {
     return true;
   }
 
-  public boolean scrollLineToMiddleScreenLine(@NotNull Editor editor, int rawCount, boolean start) {
-    scrollLineToScreenLocation(editor, ScreenLocation.MIDDLE, rawCount, start);
+  @Override
+  public boolean scrollLineToMiddleScreenLine(@NotNull VimEditor editor, int rawCount, boolean start) {
+    scrollLineToScreenLocation(((IjVimEditor)editor).getEditor(), ScreenLocation.MIDDLE, rawCount, start);
     return true;
   }
 
-  public boolean scrollLineToLastScreenLine(@NotNull Editor editor, int rawCount, boolean start) {
-    scrollLineToScreenLocation(editor, ScreenLocation.BOTTOM, rawCount, start);
+  @Override
+  public boolean scrollLineToLastScreenLine(@NotNull VimEditor editor, int rawCount, boolean start) {
+    scrollLineToScreenLocation(((IjVimEditor)editor).getEditor(), ScreenLocation.BOTTOM, rawCount, start);
     return true;
   }
 
@@ -533,13 +535,15 @@ public class MotionGroup extends VimMotionGroupBase {
     return true;
   }
 
-  public boolean scrollCaretColumnToLastScreenColumn(@NotNull Editor editor) {
-    final VisualPosition caretVisualPosition = editor.getCaretModel().getVisualPosition();
-    final int scrollOffset = getNormalizedSideScrollOffset(editor);
+  @Override
+  public boolean scrollCaretColumnToLastScreenColumn(@NotNull VimEditor editor) {
+    Editor ijEditor = ((IjVimEditor)editor).getEditor();
+    final VisualPosition caretVisualPosition = ijEditor.getCaretModel().getVisualPosition();
+    final int scrollOffset = getNormalizedSideScrollOffset(ijEditor);
     // TODO: Should the offset be applied to visual columns? This includes inline inlays and folds
     final int column =
-      normalizeVisualColumn(editor, caretVisualPosition.line, caretVisualPosition.column + scrollOffset, false);
-    scrollColumnToRightOfScreen(editor, caretVisualPosition.line, column);
+      normalizeVisualColumn(ijEditor, caretVisualPosition.line, caretVisualPosition.column + scrollOffset, false);
+    scrollColumnToRightOfScreen(ijEditor, caretVisualPosition.line, column);
     return true;
   }
 
@@ -760,19 +764,21 @@ public class MotionGroup extends VimMotionGroupBase {
     return moveCaretToScreenLocation(editor, caret, ScreenLocation.MIDDLE, 0, false);
   }
 
-  public boolean scrollLine(@NotNull Editor editor, int lines) {
+  @Override
+  public boolean scrollLine(@NotNull VimEditor editor, int lines) {
     assert lines != 0 : "lines cannot be 0";
+    Editor ijEditor = ((IjVimEditor)editor).getEditor();
 
     if (lines > 0) {
-      final int visualLine = getVisualLineAtTopOfScreen(editor);
-      scrollVisualLineToTopOfScreen(editor, visualLine + lines);
+      final int visualLine = getVisualLineAtTopOfScreen(ijEditor);
+      scrollVisualLineToTopOfScreen(ijEditor, visualLine + lines);
     }
     else {
-      final int visualLine = getNonNormalizedVisualLineAtBottomOfScreen(editor);
-      scrollVisualLineToBottomOfScreen(editor, visualLine + lines);
+      final int visualLine = getNonNormalizedVisualLineAtBottomOfScreen(ijEditor);
+      scrollVisualLineToBottomOfScreen(ijEditor, visualLine + lines);
     }
 
-    moveCaretToView(editor);
+    moveCaretToView(ijEditor);
 
     return true;
   }
@@ -884,12 +890,14 @@ public class MotionGroup extends VimMotionGroupBase {
     return moveCaretToLineEnd(new IjVimEditor(editor), editor.visualToLogicalPosition(visualEndOfLine).line, true);
   }
 
-  public boolean scrollColumns(@NotNull Editor editor, int columns) {
-    final VisualPosition caretVisualPosition = editor.getCaretModel().getVisualPosition();
+  @Override
+  public boolean scrollColumns(@NotNull VimEditor editor, int columns) {
+    Editor ijEditor = ((IjVimEditor)editor).getEditor();
+    final VisualPosition caretVisualPosition = ijEditor.getCaretModel().getVisualPosition();
     if (columns > 0) {
       // TODO: Don't add columns to visual position. This includes inlays and folds
-      int visualColumn = normalizeVisualColumn(editor, caretVisualPosition.line,
-                                               getVisualColumnAtLeftOfScreen(editor, caretVisualPosition.line) +
+      int visualColumn = normalizeVisualColumn(ijEditor, caretVisualPosition.line,
+                                               getVisualColumnAtLeftOfScreen(ijEditor, caretVisualPosition.line) +
                                                columns, false);
 
       // If the target column has an inlay preceding it, move passed it. This inlay will have been (incorrectly)
@@ -897,19 +905,19 @@ public class MotionGroup extends VimMotionGroupBase {
       // can get stuck trying to make sure the inlay is visible.
       // A better solution is to not use VisualPosition everywhere, especially for arithmetic
       final Inlay<?> inlay =
-        editor.getInlayModel().getInlineElementAt(new VisualPosition(caretVisualPosition.line, visualColumn - 1));
+        ijEditor.getInlayModel().getInlineElementAt(new VisualPosition(caretVisualPosition.line, visualColumn - 1));
       if (inlay != null && !inlay.isRelatedToPrecedingText()) {
         visualColumn++;
       }
 
-      scrollColumnToLeftOfScreen(editor, caretVisualPosition.line, visualColumn);
+      scrollColumnToLeftOfScreen(ijEditor, caretVisualPosition.line, visualColumn);
     }
     else {
       // Don't normalise the rightmost column, or we break virtual space
-      final int visualColumn = getVisualColumnAtRightOfScreen(editor, caretVisualPosition.line) + columns;
-      scrollColumnToRightOfScreen(editor, caretVisualPosition.line, visualColumn);
+      final int visualColumn = getVisualColumnAtRightOfScreen(ijEditor, caretVisualPosition.line) + columns;
+      scrollColumnToRightOfScreen(ijEditor, caretVisualPosition.line, visualColumn);
     }
-    moveCaretToView(editor);
+    moveCaretToView(ijEditor);
     return true;
   }
 
@@ -1019,53 +1027,56 @@ public class MotionGroup extends VimMotionGroupBase {
     }
   }
 
-  public boolean scrollScreen(final @NotNull Editor editor, final @NotNull Caret caret, int rawCount, boolean down) {
-    final CaretModel caretModel = editor.getCaretModel();
+  @Override
+  public boolean scrollScreen(final @NotNull VimEditor editor, final @NotNull VimCaret caret, int rawCount, boolean down) {
+    Editor ijEditor = ((IjVimEditor)editor).getEditor();
+    Caret ijCaret = ((IjVimCaret)caret).getCaret();
+    final CaretModel caretModel = ijEditor.getCaretModel();
     final int currentLogicalLine = caretModel.getLogicalPosition().line;
 
-    if ((!down && currentLogicalLine <= 0) || (down && currentLogicalLine >= getLineCount(editor) - 1)) {
+    if ((!down && currentLogicalLine <= 0) || (down && currentLogicalLine >= getLineCount(ijEditor) - 1)) {
       return false;
     }
 
-    final Rectangle visibleArea = getVisibleArea(editor);
+    final Rectangle visibleArea = getVisibleArea(ijEditor);
 
     // We want to scroll the screen and keep the caret in the same screen-relative position. Calculate which line will
     // be at the current caret line and work the offsets out from that
-    int targetCaretVisualLine = getScrollScreenTargetCaretVisualLine(editor, rawCount, down);
+    int targetCaretVisualLine = getScrollScreenTargetCaretVisualLine(ijEditor, rawCount, down);
 
     // Scroll at most one screen height
-    final int yInitialCaret = editor.visualLineToY(caretModel.getVisualPosition().line);
-    final int yTargetVisualLine = editor.visualLineToY(targetCaretVisualLine);
+    final int yInitialCaret = ijEditor.visualLineToY(caretModel.getVisualPosition().line);
+    final int yTargetVisualLine = ijEditor.visualLineToY(targetCaretVisualLine);
     if (Math.abs(yTargetVisualLine - yInitialCaret) > visibleArea.height) {
 
       final int yPrevious = visibleArea.y;
       boolean moved;
       if (down) {
-        targetCaretVisualLine = getVisualLineAtBottomOfScreen(editor) + 1;
-        moved = scrollVisualLineToTopOfScreen(editor, targetCaretVisualLine);
+        targetCaretVisualLine = getVisualLineAtBottomOfScreen(ijEditor) + 1;
+        moved = scrollVisualLineToTopOfScreen(ijEditor, targetCaretVisualLine);
       }
       else {
-        targetCaretVisualLine = getVisualLineAtTopOfScreen(editor) - 1;
-        moved = scrollVisualLineToBottomOfScreen(editor, targetCaretVisualLine);
+        targetCaretVisualLine = getVisualLineAtTopOfScreen(ijEditor) - 1;
+        moved = scrollVisualLineToBottomOfScreen(ijEditor, targetCaretVisualLine);
       }
       if (moved) {
         // We'll keep the caret at the same position, although that might not be the same line offset as previously
-        targetCaretVisualLine = editor.yToVisualLine(yInitialCaret + getVisibleArea(editor).y - yPrevious);
+        targetCaretVisualLine = ijEditor.yToVisualLine(yInitialCaret + getVisibleArea(ijEditor).y - yPrevious);
       }
     }
     else {
-      scrollVisualLineToCaretLocation(editor, targetCaretVisualLine);
+      scrollVisualLineToCaretLocation(ijEditor, targetCaretVisualLine);
 
-      final int scrollOffset = getNormalizedScrollOffset(editor);
-      final int visualTop = getVisualLineAtTopOfScreen(editor) + (down ? scrollOffset : 0);
-      final int visualBottom = getVisualLineAtBottomOfScreen(editor) - (down ? 0 : scrollOffset);
+      final int scrollOffset = getNormalizedScrollOffset(ijEditor);
+      final int visualTop = getVisualLineAtTopOfScreen(ijEditor) + (down ? scrollOffset : 0);
+      final int visualBottom = getVisualLineAtBottomOfScreen(ijEditor) - (down ? 0 : scrollOffset);
 
       targetCaretVisualLine = max(visualTop, min(visualBottom, targetCaretVisualLine));
     }
 
-    int logicalLine = visualLineToLogicalLine(editor, targetCaretVisualLine);
-    int caretOffset = moveCaretToLineWithStartOfLineOption(new IjVimEditor(editor), logicalLine, new IjVimCaret(caret));
-    moveCaret(editor, caret, caretOffset);
+    int logicalLine = visualLineToLogicalLine(ijEditor, targetCaretVisualLine);
+    int caretOffset = moveCaretToLineWithStartOfLineOption(editor, logicalLine, caret);
+    moveCaret(ijEditor, ijCaret, caretOffset);
 
     return true;
   }

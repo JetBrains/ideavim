@@ -82,4 +82,12 @@ class IjEditorHelper : EngineEditorHelper {
   override fun normalizeLine(editor: VimEditor, line: Int): Int {
     return EditorHelper.normalizeLine(editor.ij, line)
   }
+
+  override fun getVisualLineAtTopOfScreen(editor: VimEditor): Int {
+    return EditorHelper.getVisualLineAtTopOfScreen(editor.ij)
+  }
+
+  override fun getApproximateScreenWidth(editor: VimEditor): Int {
+    return EditorHelper.getApproximateScreenWidth(editor.ij)
+  }
 }

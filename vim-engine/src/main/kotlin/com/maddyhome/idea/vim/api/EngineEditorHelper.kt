@@ -19,4 +19,6 @@ interface EngineEditorHelper {
   fun getLineEndForOffset(editor: VimEditor, offset: Int): Int
   fun visualLineToLogicalLine(editor: VimEditor, line: Int): Int
   fun normalizeLine(editor: VimEditor, line: Int): Int
+  fun getVisualLineAtTopOfScreen(editor: VimEditor): Int
+  fun getApproximateScreenWidth(editor: VimEditor): Int
 }

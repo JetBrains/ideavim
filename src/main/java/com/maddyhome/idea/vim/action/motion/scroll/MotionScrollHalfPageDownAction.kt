@@ -25,7 +25,6 @@ import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
-import com.maddyhome.idea.vim.newapi.ij
 import java.util.*
 
 class MotionScrollHalfPageDownAction : VimActionHandler.SingleExecution() {
@@ -34,6 +33,6 @@ class MotionScrollHalfPageDownAction : VimActionHandler.SingleExecution() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_IGNORE_SCROLL_JUMP)
 
   override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
-    return VimPlugin.getMotion().scrollScreen(editor.ij, editor.ij.caretModel.primaryCaret, cmd.rawCount, true)
+    return VimPlugin.getMotion().scrollScreen(editor, editor.primaryCaret(), cmd.rawCount, true)
   }
 }

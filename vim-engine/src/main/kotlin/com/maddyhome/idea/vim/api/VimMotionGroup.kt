@@ -83,4 +83,10 @@ interface VimMotionGroup {
   fun moveCaretToLineScreenStart(editor: VimEditor, caret: VimCaret): Motion
   fun moveCaretToLineStartSkipLeading(editor: VimEditor, caret: VimCaret): Int
   fun moveCaretToColumn(editor: VimEditor, caret: VimCaret, count: Int, allowEnd: Boolean): Motion
+  fun scrollLineToMiddleScreenLine(editor: VimEditor, rawCount: Int, start: Boolean): Boolean
+  fun scrollLine(editor: VimEditor, lines: Int): Boolean
+  fun scrollLineToLastScreenLine(editor: VimEditor, rawCount: Int, start: Boolean): Boolean
+  fun scrollCaretColumnToLastScreenColumn(editor: VimEditor): Boolean
+  fun scrollColumns(editor: VimEditor, columns: Int): Boolean
+  fun scrollScreen(editor: VimEditor, caret: VimCaret, rawCount: Int, down: Boolean): Boolean
 }
