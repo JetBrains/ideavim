@@ -15,30 +15,37 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+
 package com.maddyhome.idea.vim.action.motion.leftright
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.command.Argument
-import com.maddyhome.idea.vim.command.MotionType
-import com.maddyhome.idea.vim.command.OperatorArguments
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.handler.Motion
-import com.maddyhome.idea.vim.handler.MotionActionHandler
-import com.maddyhome.idea.vim.handler.toMotion
-import com.maddyhome.idea.vim.newapi.ij
+import com.maddyhome.idea.vim.handler.ShiftedArrowKeyHandler
 
-class MotionFirstScreenNonSpaceAction : MotionActionHandler.ForEachCaret() {
-  override fun getOffset(
-    editor: VimEditor,
-    caret: VimCaret,
-    context: ExecutionContext,
-    argument: Argument?,
-    operatorArguments: OperatorArguments,
-  ): Motion {
-    return VimPlugin.getMotion().moveCaretToLineScreenStartSkipLeading(editor.ij, caret.ij).toMotion()
+/**
+ * @author Alex Plate
+ */
+
+class MotionShiftRightAction : ShiftedArrowKeyHandler() {
+
+  override val type: Command.Type = Command.Type.OTHER_READONLY
+
+  override fun motionWithKeyModel(editor: VimEditor, context: ExecutionContext, cmd: Command) {
+    editor.forEachCaret { caret ->
+      val vertical = injector.motion.getOffsetOfHorizontalMotion(editor, caret, cmd.count, true)
+      caret.moveToOffset(vertical)
+    }
   }
 
-  override val motionType: MotionType = MotionType.EXCLUSIVE
+  override fun motionWithoutKeyModel(editor: VimEditor, context: ExecutionContext, cmd: Command) {
+    editor.forEachCaret { caret ->
+      val newOffset = injector.motion.findOffsetOfNextWord(editor, caret.offset.point, cmd.count, false)
+      if (newOffset is Motion.AbsoluteOffset) {
+        caret.moveToOffset(newOffset.offset)
+      }
+    }
+  }
 }

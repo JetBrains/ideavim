@@ -33,7 +33,7 @@ abstract class VimMarkGroupBase : VimMarkGroup {
   }
 
   override fun addJump(editor: VimEditor, reset: Boolean) {
-    addJump(editor, editor.primaryCaret().offset.point, reset)
+    addJump(editor, editor.currentCaret().offset.point, reset)
   }
 
   private fun addJump(editor: VimEditor, offset: Int, reset: Boolean) {
@@ -199,7 +199,7 @@ abstract class VimMarkGroupBase : VimMarkGroup {
     return VimMarkConstants.VALID_SET_MARKS.indexOf(ch) >= 0 && setMark(
       editor,
       ch,
-      editor.primaryCaret().offset.point
+      editor.currentCaret().offset.point
     )
   }
 

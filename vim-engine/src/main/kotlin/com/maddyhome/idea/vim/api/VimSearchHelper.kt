@@ -84,4 +84,11 @@ interface VimSearchHelper {
     count: Int,
     searchOptions: EnumSet<SearchOptions>?,
   ): TextRange?
+
+  fun findNextCharacterOnLine(
+    editor: VimEditor,
+    caret: VimCaret,
+    count: Int,
+    ch: Char,
+  ): Int
 }

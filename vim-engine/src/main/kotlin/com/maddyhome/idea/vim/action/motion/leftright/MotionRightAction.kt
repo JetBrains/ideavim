@@ -18,11 +18,11 @@
 
 package com.maddyhome.idea.vim.action.motion.leftright
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.ComplicatedKeysAction
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
@@ -42,8 +42,7 @@ class MotionRightAction : MotionActionHandler.ForEachCaret() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    return VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret, operatorArguments.count1, true)
-      .toMotionOrError()
+    return injector.motion.getOffsetOfHorizontalMotion(editor, caret, operatorArguments.count1, true).toMotionOrError()
   }
 }
 
@@ -62,7 +61,6 @@ class MotionRightInsertAction : MotionActionHandler.ForEachCaret(), ComplicatedK
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    return VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret, operatorArguments.count1, true)
-      .toMotionOrError()
+    return injector.motion.getOffsetOfHorizontalMotion(editor, caret, operatorArguments.count1, true).toMotionOrError()
   }
 }

@@ -24,8 +24,7 @@
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.visual.VisualMotionGroup"
                         serviceInterface="com.maddyhome.idea.vim.api.VimVisualMotionGroup"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.copy.YankGroup"/>
-    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.copy.PutGroup"
-                        serviceInterface="com.maddyhome.idea.vim.put.VimPut"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.copy.PutGroup"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.vimscript.services.VariableServiceImpl"
                         serviceInterface="com.maddyhome.idea.vim.vimscript.services.VariableService"/>
 

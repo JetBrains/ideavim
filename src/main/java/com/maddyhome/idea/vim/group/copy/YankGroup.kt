@@ -103,8 +103,8 @@ class YankGroup {
     val caretModel = editor.caretModel
     val ranges = ArrayList<Pair<Int, Int>>(caretModel.caretCount)
     for (caret in caretModel.allCarets) {
-      val start = VimPlugin.getMotion().moveCaretToLineStart(editor, caret)
-      val end = min(VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret, count - 1, true) + 1, editor.fileSize)
+      val start = VimPlugin.getMotion().moveCaretToLineStart(editor.vim, caret.vim)
+      val end = min(VimPlugin.getMotion().moveCaretToLineEndOffset(editor.vim, caret.vim, count - 1, true) + 1, editor.fileSize)
 
       if (end == -1) continue
 

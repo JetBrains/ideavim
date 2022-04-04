@@ -17,18 +17,18 @@
  */
 package com.maddyhome.idea.vim.action.motion.leftright
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
-import com.maddyhome.idea.vim.newapi.ij
+import com.maddyhome.idea.vim.handler.toMotion
 
-class MotionLeftWrapAction : MotionActionHandler.ForEachCaret() {
+class MotionLastNonSpaceAction : MotionActionHandler.ForEachCaret() {
   override fun getOffset(
     editor: VimEditor,
     caret: VimCaret,
@@ -36,10 +36,9 @@ class MotionLeftWrapAction : MotionActionHandler.ForEachCaret() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    val moveCaretHorizontalWrap =
-      VimPlugin.getMotion().moveCaretHorizontalWrap(editor.ij, caret.ij, -operatorArguments.count1)
-    return if (moveCaretHorizontalWrap < 0) Motion.Error else Motion.AbsoluteOffset(moveCaretHorizontalWrap)
+    return injector.motion.moveCaretToLineEndSkipLeadingOffset(editor, caret, operatorArguments.count1 - 1)
+      .toMotion()
   }
 
-  override val motionType: MotionType = MotionType.EXCLUSIVE
+  override val motionType: MotionType = MotionType.INCLUSIVE
 }

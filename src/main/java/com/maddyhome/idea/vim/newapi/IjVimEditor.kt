@@ -145,6 +145,10 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
     return IjVimCaret(editor.caretModel.primaryCaret)
   }
 
+  override fun currentCaret(): VimCaret {
+    return IjVimCaret(editor.caretModel.currentCaret)
+  }
+
   override fun isWritable(): Boolean {
     val modificationAllowed = EditorModificationUtil.checkModificationAllowed(editor)
     val writeRequested = EditorModificationUtil.requestWriting(editor)

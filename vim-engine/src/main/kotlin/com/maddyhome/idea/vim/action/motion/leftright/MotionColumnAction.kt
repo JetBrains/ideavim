@@ -17,18 +17,18 @@
  */
 package com.maddyhome.idea.vim.action.motion.leftright
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
+import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
-import com.maddyhome.idea.vim.newapi.ij
 
-class MotionMiddleColumnAction : MotionActionHandler.ForEachCaret() {
+class MotionColumnAction : MotionActionHandler.ForEachCaret() {
   override fun getOffset(
     editor: VimEditor,
     caret: VimCaret,
@@ -36,8 +36,17 @@ class MotionMiddleColumnAction : MotionActionHandler.ForEachCaret() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    return VimPlugin.getMotion().moveCaretToMiddleColumn(editor.ij, caret.ij)
+    return injector.motion.moveCaretToColumn(editor, caret, operatorArguments.count1 - 1, false)
   }
 
-  override val motionType: MotionType = MotionType.INCLUSIVE
+  override fun postMove(
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    cmd: Command,
+  ) {
+    caret.vimLastColumn = cmd.count - 1
+  }
+
+  override val motionType: MotionType = MotionType.EXCLUSIVE
 }

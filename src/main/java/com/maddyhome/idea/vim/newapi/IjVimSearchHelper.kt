@@ -128,4 +128,8 @@ class IjVimSearchHelper : VimSearchHelper {
   ): TextRange? {
     return SearchHelper.findPattern(editor.ij, pattern, startOffset, count, searchOptions)
   }
+
+  override fun findNextCharacterOnLine(editor: VimEditor, caret: VimCaret, count: Int, ch: Char): Int {
+    return SearchHelper.findNextCharacterOnLine(editor.ij, caret.ij, count, ch)
+  }
 }

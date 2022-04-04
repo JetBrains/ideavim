@@ -19,7 +19,7 @@
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionLeftWrapAction" mappingModes="NXO" keys="«BS»,«C-H»"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionLeftMatchCharAction" mappingModes="NXO" keys="F"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionLeftTillMatchCharAction" mappingModes="NXO" keys="T"/>
-    <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionMiddleColumnAction" mappingModes="NXO" keys="gm"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.macro.MotionMiddleColumnAction" mappingModes="NXO" keys="gm"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionRightAction" mappingModes="NXO" keys="l"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionRightInsertAction" mappingModes="I"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionRightWrapAction" mappingModes="NXO" keys=" "/>

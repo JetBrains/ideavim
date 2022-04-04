@@ -54,7 +54,7 @@ class MotionUnmatchedParenCloseAction : MotionUnmatchedAction(')')
 class MotionUnmatchedParenOpenAction : MotionUnmatchedAction('(')
 
 private fun moveCaretToUnmatchedBlock(editor: VimEditor, caret: VimCaret, count: Int, type: Char): Int {
-  return if (editor.primaryCaret().offset.point == 0 && count < 0 || editor.primaryCaret().offset.point >= editor.fileSize() - 1 && count > 0) {
+  return if (editor.currentCaret().offset.point == 0 && count < 0 || editor.currentCaret().offset.point >= editor.fileSize() - 1 && count > 0) {
     -1
   } else {
     var res = injector.searchHelper.findUnmatchedBlock(editor, caret, type, count)

@@ -32,7 +32,6 @@ import com.intellij.openapi.vfs.VirtualFileSystem;
 import com.intellij.util.MathUtil;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.motion.leftright.TillCharacterMotionType;
 import com.maddyhome.idea.vim.api.*;
 import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.common.TextRange;
@@ -543,79 +542,6 @@ public class MotionGroup extends VimMotionGroupBase {
     return res;
   }
 
-  public void setLastFTCmd(TillCharacterMotionType lastFTCmd, char lastChar) {
-    this.lastFTCmd = lastFTCmd;
-    this.lastFTChar = lastChar;
-  }
-
-  public int repeatLastMatchChar(@NotNull Editor editor, @NotNull Caret caret, int count) {
-    int res = -1;
-    int startPos = editor.getCaretModel().getOffset();
-    switch (lastFTCmd) {
-      case LAST_F:
-        res = moveCaretToNextCharacterOnLine(editor, caret, -count, lastFTChar);
-        break;
-      case LAST_SMALL_F:
-        res = moveCaretToNextCharacterOnLine(editor, caret, count, lastFTChar);
-        break;
-      case LAST_T:
-        res = moveCaretToBeforeNextCharacterOnLine(editor, caret, -count, lastFTChar);
-        if (res == startPos && Math.abs(count) == 1) {
-          res = moveCaretToBeforeNextCharacterOnLine(editor, caret, -2 * count, lastFTChar);
-        }
-        break;
-      case LAST_SMALL_T:
-        res = moveCaretToBeforeNextCharacterOnLine(editor, caret, count, lastFTChar);
-        if (res == startPos && Math.abs(count) == 1) {
-          res = moveCaretToBeforeNextCharacterOnLine(editor, caret, 2 * count, lastFTChar);
-        }
-        break;
-    }
-
-    return res;
-  }
-
-  /**
-   * This moves the caret to the next/previous matching character on the current line
-   *
-   * @param caret  The caret to be moved
-   * @param count  The number of occurrences to move to
-   * @param ch     The character to search for
-   * @param editor The editor to search in
-   * @return True if [count] character matches were found, false if not
-   */
-  public int moveCaretToNextCharacterOnLine(@NotNull Editor editor, @NotNull Caret caret, int count, char ch) {
-    int pos = SearchHelper.findNextCharacterOnLine(editor, caret, count, ch);
-
-    if (pos >= 0) {
-      return pos;
-    }
-    else {
-      return -1;
-    }
-  }
-
-  /**
-   * This moves the caret next to the next/previous matching character on the current line
-   *
-   * @param caret  The caret to be moved
-   * @param count  The number of occurrences to move to
-   * @param ch     The character to search for
-   * @param editor The editor to search in
-   * @return True if [count] character matches were found, false if not
-   */
-  public int moveCaretToBeforeNextCharacterOnLine(@NotNull Editor editor, @NotNull Caret caret, int count, char ch) {
-    int pos = SearchHelper.findNextCharacterOnLine(editor, caret, count, ch);
-
-    if (pos >= 0) {
-      int step = count >= 0 ? 1 : -1;
-      return pos - step;
-    }
-    else {
-      return -1;
-    }
-  }
-
   public boolean scrollLineToFirstScreenLine(@NotNull Editor editor, int rawCount, boolean start) {
     scrollLineToScreenLocation(editor, ScreenLocation.TOP, rawCount, start);
     return true;
@@ -981,23 +907,20 @@ public class MotionGroup extends VimMotionGroupBase {
     }
   }
 
-  public Motion moveCaretToMiddleColumn(@NotNull Editor editor, @NotNull Caret caret) {
-    final int width = getApproximateScreenWidth(editor) / 2;
-    final int len = getLineLength(editor);
+  @Override
+  public @NotNull Motion moveCaretToMiddleColumn(@NotNull VimEditor editor, @NotNull VimCaret caret) {
+    final int width = getApproximateScreenWidth(((IjVimEditor)editor).getEditor()) / 2;
+    final int len = getLineLength(((IjVimEditor)editor).getEditor());
 
     return moveCaretToColumn(editor, caret, max(0, min(len - 1, width)), false);
   }
 
-  public Motion moveCaretToColumn(@NotNull Editor editor, @NotNull Caret caret, int count, boolean allowEnd) {
-    int line = caret.getLogicalPosition().line;
-    int pos = normalizeColumn(editor, line, count, allowEnd);
+  @Override
+  public Motion moveCaretToColumn(@NotNull VimEditor editor, @NotNull VimCaret caret, int count, boolean allowEnd) {
+    int line = caret.getLine().getLine();
+    int pos = normalizeColumn(((IjVimEditor)editor).getEditor(), line, count, allowEnd);
 
-    return new Motion.AbsoluteOffset(editor.logicalPositionToOffset(new LogicalPosition(line, pos)));
-  }
-
-  public int moveCaretToLineStartSkipLeading(@NotNull Editor editor, @NotNull Caret caret) {
-    int logicalLine = caret.getLogicalPosition().line;
-    return moveCaretToLineStartSkipLeading(new IjVimEditor(editor), logicalLine);
+    return new Motion.AbsoluteOffset(editor.logicalPositionToOffset(new VimLogicalPosition(line, pos, false)));
   }
 
   @Override
@@ -1042,39 +965,28 @@ public class MotionGroup extends VimMotionGroupBase {
     return true;
   }
 
-  public @Range(from = 0, to = Integer.MAX_VALUE) int moveCaretToLineStart(@NotNull Editor editor,
-                                                                           @NotNull Caret caret) {
-    int logicalLine = caret.getLogicalPosition().line;
-    return moveCaretToLineStart(new IjVimEditor(editor), logicalLine);
-  }
-
-  public Motion moveCaretToLineScreenStart(@NotNull Editor editor, @NotNull Caret caret) {
-    final int col = getVisualColumnAtLeftOfScreen(editor, caret.getVisualPosition().line);
+  @Override
+  public @NotNull Motion moveCaretToLineScreenStart(@NotNull VimEditor editor, @NotNull VimCaret caret) {
+    final int col =
+      getVisualColumnAtLeftOfScreen(((IjVimEditor)editor).getEditor(), caret.getVisualPosition().getLine());
     return moveCaretToColumn(editor, caret, col, false);
   }
 
-  public @Range(from = 0, to = Integer.MAX_VALUE) int moveCaretToLineScreenStartSkipLeading(@NotNull Editor editor,
-                                                                                            @NotNull Caret caret) {
-    final int col = getVisualColumnAtLeftOfScreen(editor, caret.getVisualPosition().line);
-    final int logicalLine = caret.getLogicalPosition().line;
-    return getLeadingCharacterOffset(editor, logicalLine, col);
+  @Override
+  public @Range(from = 0, to = Integer.MAX_VALUE) int moveCaretToLineScreenStartSkipLeading(@NotNull VimEditor editor,
+                                                                                            @NotNull VimCaret caret) {
+    final int col = getVisualColumnAtLeftOfScreen(((IjVimEditor)editor).getEditor(), caret.getVisualPosition().getLine());
+    final int logicalLine = caret.getLine().getLine();
+    return getLeadingCharacterOffset(((IjVimEditor)editor).getEditor(), logicalLine, col);
   }
 
-  public Motion moveCaretToLineScreenEnd(@NotNull Editor editor, @NotNull Caret caret, boolean allowEnd) {
-    final int col = getVisualColumnAtRightOfScreen(editor, caret.getVisualPosition().line);
+  @Override
+  public @NotNull Motion moveCaretToLineScreenEnd(@NotNull VimEditor editor,
+                                                  @NotNull VimCaret caret,
+                                                  boolean allowEnd) {
+    final int col =
+      getVisualColumnAtRightOfScreen(((IjVimEditor)editor).getEditor(), caret.getVisualPosition().getLine());
     return moveCaretToColumn(editor, caret, col, allowEnd);
-  }
-
-  public int moveCaretHorizontalWrap(@NotNull Editor editor, @NotNull Caret caret, int count) {
-    // FIX - allows cursor over newlines
-    int oldOffset = caret.getOffset();
-    int offset = min(max(0, caret.getOffset() + count), EditorHelperRt.getFileSize(editor));
-    if (offset == oldOffset) {
-      return -1;
-    }
-    else {
-      return offset;
-    }
   }
 
   @Override
@@ -1210,29 +1122,6 @@ public class MotionGroup extends VimMotionGroupBase {
     return true;
   }
 
-  public @Range(from = 0, to = Integer.MAX_VALUE) int moveCaretToLineEndSkipLeadingOffset(@NotNull Editor editor,
-                                                                                          @NotNull Caret caret,
-                                                                                          int linesOffset) {
-    int line =
-      visualLineToLogicalLine(editor, normalizeVisualLine(editor, caret.getVisualPosition().line + linesOffset));
-    int start = getLineStartOffset(editor, line);
-    int end = getLineEndOffset(editor, line, true);
-    CharSequence chars = editor.getDocument().getCharsSequence();
-    int pos = start;
-    for (int offset = end; offset > start; offset--) {
-      if (offset >= chars.length()) {
-        break;
-      }
-
-      if (!Character.isWhitespace(chars.charAt(offset))) {
-        pos = offset;
-        break;
-      }
-    }
-
-    return pos;
-  }
-
   // Scrolls current or [count] line to given screen location
   // In Vim, [count] refers to a file line, so it's a one-based logical line
   private void scrollLineToScreenLocation(@NotNull Editor editor,
@@ -1329,17 +1218,6 @@ public class MotionGroup extends VimMotionGroupBase {
     }
   }
 
-  public @NotNull TillCharacterMotionType getLastFTCmd() {
-    return lastFTCmd;
-  }
-
-  public char getLastFTChar() {
-    return lastFTChar;
-  }
-
-  private @NotNull TillCharacterMotionType lastFTCmd = TillCharacterMotionType.LAST_SMALL_T;
-  private char lastFTChar;
-
   // visualLineOffset is a zero based offset to subtract from the direction of travel, where zero is the same as a count
   // of 1. I.e. 1L = L, which is an offset of zero. 2L is an offset of 1 extra line
   // When normalizeToScreen is true, the offset is bounded to the current screen dimensions, and scrolloff is applied.
@@ -1379,20 +1257,6 @@ public class MotionGroup extends VimMotionGroupBase {
 
     final int targetLogicalLine = visualLineToLogicalLine(editor, targetVisualLine);
     return moveCaretToLineWithStartOfLineOption(new IjVimEditor(editor), targetLogicalLine, new IjVimCaret(caret));
-  }
-
-  public @Range(from = 0, to = Integer.MAX_VALUE) int moveCaretToLineEndOffset(@NotNull Editor editor,
-                                                                               @NotNull Caret caret,
-                                                                               int cntForward,
-                                                                               boolean allowPastEnd) {
-    int line = normalizeVisualLine(editor, caret.getVisualPosition().line + cntForward);
-
-    if (line < 0) {
-      return 0;
-    }
-    else {
-      return moveCaretToLineEnd(new IjVimEditor(editor), visualLineToLogicalLine(editor, line), allowPastEnd);
-    }
   }
 
   public static class ScrollOptionsChangeListener implements LocalOptionChangeListener<VimDataType> {

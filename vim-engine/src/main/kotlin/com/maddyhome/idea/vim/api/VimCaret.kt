@@ -7,7 +7,7 @@ import com.maddyhome.idea.vim.common.Offset
 interface VimCaret {
   val editor: VimEditor
   val offset: Offset
-  val vimLastColumn: Int
+  var vimLastColumn: Int
   val selectionStart: Int
   val selectionEnd: Int
   var vimSelectionStart: Int

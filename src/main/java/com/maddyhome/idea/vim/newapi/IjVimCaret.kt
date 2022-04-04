@@ -39,8 +39,11 @@ class IjVimCaret(val caret: Caret) : VimCaret {
     get() = IjVimEditor(caret.editor)
   override val offset: Offset
     get() = caret.offset.offset
-  override val vimLastColumn: Int
+  override var vimLastColumn: Int
     get() = caret.vimLastColumn
+    set(value) {
+      caret.vimLastColumn = value
+    }
   override val selectionStart: Int
     get() = caret.selectionStart
   override val selectionEnd: Int

@@ -15,20 +15,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-package com.maddyhome.idea.vim.action.motion.leftright
+package com.maddyhome.idea.vim.action.macro
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
-import com.maddyhome.idea.vim.newapi.ij
 
-class MotionLastMatchCharAction : MotionActionHandler.ForEachCaret() {
+class MotionMiddleColumnAction : MotionActionHandler.ForEachCaret() {
   override fun getOffset(
     editor: VimEditor,
     caret: VimCaret,
@@ -36,9 +35,8 @@ class MotionLastMatchCharAction : MotionActionHandler.ForEachCaret() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    val repeatLastMatchChar = VimPlugin.getMotion().repeatLastMatchChar(editor.ij, caret.ij, operatorArguments.count1)
-    return if (repeatLastMatchChar < 0) Motion.Error else Motion.AbsoluteOffset(repeatLastMatchChar)
+    return injector.motion.moveCaretToMiddleColumn(editor, caret)
   }
 
-  override val motionType: MotionType = MotionType.EXCLUSIVE
+  override val motionType: MotionType = MotionType.INCLUSIVE
 }

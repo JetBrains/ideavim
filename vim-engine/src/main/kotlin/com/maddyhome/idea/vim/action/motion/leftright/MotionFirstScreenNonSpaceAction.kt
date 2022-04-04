@@ -15,25 +15,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-
 package com.maddyhome.idea.vim.action.motion.leftright
 
-import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.action.ComplicatedKeysAction
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
-import java.awt.event.KeyEvent
-import javax.swing.KeyStroke
+import com.maddyhome.idea.vim.handler.toMotion
 
-class MotionLeftAction : MotionActionHandler.ForEachCaret() {
-  override val motionType: MotionType = MotionType.EXCLUSIVE
-
+class MotionFirstScreenNonSpaceAction : MotionActionHandler.ForEachCaret() {
   override fun getOffset(
     editor: VimEditor,
     caret: VimCaret,
@@ -41,29 +36,8 @@ class MotionLeftAction : MotionActionHandler.ForEachCaret() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    val offsetOfHorizontalMotion =
-      VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret, -operatorArguments.count1, false)
-    return if (offsetOfHorizontalMotion < 0) Motion.Error else Motion.AbsoluteOffset(offsetOfHorizontalMotion)
+    return injector.motion.moveCaretToLineScreenStartSkipLeading(editor, caret).toMotion()
   }
-}
 
-class MotionLeftInsertModeAction : MotionActionHandler.ForEachCaret(), ComplicatedKeysAction {
   override val motionType: MotionType = MotionType.EXCLUSIVE
-
-  override val keyStrokesSet: Set<List<KeyStroke>> = setOf(
-    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0)),
-    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_LEFT, 0))
-  )
-
-  override fun getOffset(
-    editor: VimEditor,
-    caret: VimCaret,
-    context: ExecutionContext,
-    argument: Argument?,
-    operatorArguments: OperatorArguments,
-  ): Motion {
-    val offsetOfHorizontalMotion =
-      VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret, -operatorArguments.count1, false)
-    return if (offsetOfHorizontalMotion < 0) Motion.Error else Motion.AbsoluteOffset(offsetOfHorizontalMotion)
-  }
 }

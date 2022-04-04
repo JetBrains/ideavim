@@ -151,6 +151,7 @@ interface VimEditor {
    * TODO
    */
   fun primaryCaret(): VimCaret
+  fun currentCaret(): VimCaret
 
   fun isWritable(): Boolean
 

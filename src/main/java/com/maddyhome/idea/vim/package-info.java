@@ -427,7 +427,7 @@
  * |gk|                   {@link com.maddyhome.idea.vim.action.motion.updown.MotionUpNotLineWiseAction}
  * |gn|                   {@link com.maddyhome.idea.vim.action.motion.gn.VisualSelectNextSearch}
  * |gn|                   {@link com.maddyhome.idea.vim.action.motion.gn.GnNextTextObject}
- * |gm|                   {@link com.maddyhome.idea.vim.action.motion.leftright.MotionMiddleColumnAction}
+ * |gm|                   {@link com.maddyhome.idea.vim.action.macro.MotionMiddleColumnAction}
  * |go|                   {@link com.maddyhome.idea.vim.action.motion.text.MotionNthCharacterAction}
  * |gp|                   {@link com.maddyhome.idea.vim.action.copy.PutVisualTextAfterCursorMoveCursorAction}
  * |gp|                   {@link com.maddyhome.idea.vim.action.copy.PutTextAfterCursorActionMoveCursor}

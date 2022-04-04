@@ -15,22 +15,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+
 package com.maddyhome.idea.vim.action.motion.leftright
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
-import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
-import com.maddyhome.idea.vim.helper.vimLastColumn
-import com.maddyhome.idea.vim.newapi.ij
+import com.maddyhome.idea.vim.handler.toMotion
+import com.maddyhome.idea.vim.helper.enumSetOf
+import java.util.*
 
-class MotionColumnAction : MotionActionHandler.ForEachCaret() {
+class MotionFirstColumnAction : MotionActionHandler.ForEachCaret() {
+  override val motionType: MotionType = MotionType.EXCLUSIVE
+
   override fun getOffset(
     editor: VimEditor,
     caret: VimCaret,
@@ -38,17 +42,22 @@ class MotionColumnAction : MotionActionHandler.ForEachCaret() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    return VimPlugin.getMotion().moveCaretToColumn(editor.ij, caret.ij, operatorArguments.count1 - 1, false)
+    return injector.motion.moveCaretToLineStart(editor, caret).toMotion()
   }
+}
 
-  override fun postMove(
+class MotionFirstColumnInsertModeAction : MotionActionHandler.ForEachCaret() {
+  override val motionType: MotionType = MotionType.EXCLUSIVE
+
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_STROKE)
+
+  override fun getOffset(
     editor: VimEditor,
     caret: VimCaret,
     context: ExecutionContext,
-    cmd: Command,
-  ) {
-    caret.ij.vimLastColumn = cmd.count - 1
+    argument: Argument?,
+    operatorArguments: OperatorArguments,
+  ): Motion {
+    return injector.motion.moveCaretToLineStart(editor, caret).toMotion()
   }
-
-  override val motionType: MotionType = MotionType.EXCLUSIVE
 }

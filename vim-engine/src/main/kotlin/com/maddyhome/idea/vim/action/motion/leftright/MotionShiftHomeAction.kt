@@ -18,38 +18,23 @@
 
 package com.maddyhome.idea.vim.action.motion.leftright
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.group.MotionGroup
-import com.maddyhome.idea.vim.handler.Motion
-import com.maddyhome.idea.vim.handler.ShiftedArrowKeyHandler
-import com.maddyhome.idea.vim.helper.vimForEachCaret
-import com.maddyhome.idea.vim.newapi.ij
-import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.handler.ShiftedSpecialKeyHandler
 
 /**
  * @author Alex Plate
  */
-
-class MotionShiftLeftAction : ShiftedArrowKeyHandler() {
+class MotionShiftHomeAction : ShiftedSpecialKeyHandler() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
-  override fun motionWithKeyModel(editor: VimEditor, context: ExecutionContext, cmd: Command) {
-    editor.ij.vimForEachCaret { caret ->
-      val vertical = VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret.vim, -cmd.count, true)
-      MotionGroup.moveCaret(editor.ij, caret, vertical)
-    }
-  }
-
-  override fun motionWithoutKeyModel(editor: VimEditor, context: ExecutionContext, cmd: Command) {
-    editor.ij.vimForEachCaret { caret ->
-      val newOffset = VimPlugin.getMotion().findOffsetOfNextWord(editor, caret.offset, -cmd.count, false)
-      if (newOffset is Motion.AbsoluteOffset) {
-        MotionGroup.moveCaret(editor.ij, caret, newOffset.offset)
-      }
+  override fun motion(editor: VimEditor, context: ExecutionContext, cmd: Command) {
+    editor.forEachCaret { caret ->
+      val newOffset = injector.motion.moveCaretToLineStart(editor, caret)
+      caret.moveToOffset(newOffset)
     }
   }
 }

@@ -178,7 +178,7 @@ fun insertLineAround(editor: Editor, context: DataContext, shift: Int) {
       val lineEndOffset = if (shift == 1) {
         VimPlugin.getMotion().moveCaretToLineEnd(editor, caret)
       } else {
-        VimPlugin.getMotion().moveCaretToLineStart(editor, caret)
+        VimPlugin.getMotion().moveCaretToLineStart(editor.vim, caret.vim)
       }
       val position = EditorLine.Offset.init(editor.offsetToLogicalPosition(lineEndOffset).line + shift, vimEditor)
 
