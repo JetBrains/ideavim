@@ -28,6 +28,7 @@ usual beta standards.
 ### Fixes:
 * [VIM-2587](https://youtrack.jetbrains.com/issue/VIM-2587) Use ctrl-6 as ctrl-^
 * [VIM-2590](https://youtrack.jetbrains.com/issue/VIM-2590) Fix caret shape in PyCharm
+* [VIM-2553](https://youtrack.jetbrains.com/issue/VIM-2553) Substitute consecutive matches
 
 ### Merged PRs:
 * [468](https://github.com/JetBrains/ideavim/pull/468) by [Thomas Schouten](https://github.com/PHPirates): Implement UserDataHolder for EditorDataContext
