@@ -17,43 +17,35 @@
  */
 package com.maddyhome.idea.vim.action.change.delete
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.command.Argument
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.command.DuplicableOperatorAction
+import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
-import com.maddyhome.idea.vim.helper.experimentalApi
-import com.maddyhome.idea.vim.newapi.deleteRange
+import com.maddyhome.idea.vim.group.visual.VimSelection
+import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
+import com.maddyhome.idea.vim.helper.enumSetOf
+import java.util.*
 
-class DeleteMotionAction : ChangeEditorActionHandler.ForEachCaret(), DuplicableOperatorAction {
+/**
+ * @author vlan
+ */
+class DeleteVisualAction : VisualOperatorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.DELETE
 
-  override val argumentType: Argument.Type = Argument.Type.MOTION
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_EXIT_VISUAL)
 
-  override val duplicateWith: Char = 'd'
-
-  override fun execute(
+  override fun executeAction(
     editor: VimEditor,
     caret: VimCaret,
     context: ExecutionContext,
-    argument: Argument?,
+    cmd: Command,
+    range: VimSelection,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    if (argument == null) return false
-    if (experimentalApi()) {
-      val (first, second) = VimPlugin.getChange()
-        .getDeleteRangeAndType2(editor, caret, context, argument, false, operatorArguments)
-        ?: return false
-      return deleteRange(editor, caret, first, second)
-    } else {
-      val (first, second) = VimPlugin.getChange()
-        .getDeleteRangeAndType(editor, caret, context, argument, false, operatorArguments)
-        ?: return false
-      return VimPlugin.getChange().deleteRange(editor, caret, first, second, false)
-    }
+    val selectionType = range.type
+    return injector.changeGroup.deleteRange(editor, caret, range.toVimTextRange(false), selectionType, false)
   }
 }

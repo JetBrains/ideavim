@@ -13,6 +13,7 @@ import com.maddyhome.idea.vim.api.VimChangeGroup
 import com.maddyhome.idea.vim.api.VimClipboardManager
 import com.maddyhome.idea.vim.api.VimDigraphGroup
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.VimEditorGroup
 import com.maddyhome.idea.vim.api.VimEnabler
 import com.maddyhome.idea.vim.api.VimInjector
 import com.maddyhome.idea.vim.api.VimKeyGroup
@@ -28,6 +29,7 @@ import com.maddyhome.idea.vim.api.VimVisualMotionGroup
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.common.VimMachine
 import com.maddyhome.idea.vim.diagnostic.VimLogger
+import com.maddyhome.idea.vim.group.EditorGroup
 import com.maddyhome.idea.vim.group.MarkGroup
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.SearchGroup
@@ -107,4 +109,6 @@ class IjVimInjector : VimInjector {
 
   override val engineEditorHelper: EngineEditorHelper
     get() = service<IjEditorHelper>()
+  override val editorGroup: VimEditorGroup
+    get() = service<EditorGroup>()
 }

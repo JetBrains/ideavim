@@ -28,6 +28,7 @@ interface VimInjector {
   val visualMotionGroup: VimVisualMotionGroup
   fun commandStateFor(editor: VimEditor): CommandState
   val engineEditorHelper: EngineEditorHelper
+  val editorGroup: VimEditorGroup
   val changeGroup: VimChangeGroup
   val actionExecutor: VimActionExecutor
   val exEntryPanel: ExEntryPanel

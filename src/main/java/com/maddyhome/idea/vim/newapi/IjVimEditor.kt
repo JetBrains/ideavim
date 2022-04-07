@@ -180,6 +180,10 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
     return modificationAllowed && writeRequested
   }
 
+  override fun isOneLineMode(): Boolean {
+    return editor.isOneLineMode
+  }
+
   override fun getText(left: Offset, right: Offset): CharSequence {
     return editor.document.charsSequence.subSequence(left.point, right.point)
   }

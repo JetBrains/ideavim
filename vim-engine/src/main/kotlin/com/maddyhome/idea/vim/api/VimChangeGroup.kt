@@ -90,7 +90,7 @@ interface VimChangeGroup {
 
   fun joinViaIdeaByCount(editor: VimEditor, context: ExecutionContext, count: Int): Boolean
 
-  fun joinViaIdeaBySelections(editor: VimEditor, context: ExecutionContext, caretsAndSelections: Map<VimCaret?, VimSelection?>)
+  fun joinViaIdeaBySelections(editor: VimEditor, context: ExecutionContext, caretsAndSelections: Map<VimCaret, VimSelection>)
 
   fun changeReplace(editor: VimEditor, context: ExecutionContext)
 
@@ -98,11 +98,12 @@ interface VimChangeGroup {
 
   fun changeCharacterRange(editor: VimEditor, range: TextRange, ch: Char): Boolean
 
-  fun getDeleteRangeAndType(editor: VimEditor, caret: VimCaret, context: ExecutionContext, argument: Argument, isChange: Boolean, operatorArguments: OperatorArguments): Pair<TextRange?, SelectionType?>?
+  fun getDeleteRangeAndType(editor: VimEditor, caret: VimCaret, context: ExecutionContext, argument: Argument, isChange: Boolean, operatorArguments: OperatorArguments): Pair<TextRange, SelectionType>?
 
-  fun getDeleteRangeAndType2(editor: VimEditor, caret: VimCaret, context: ExecutionContext, argument: Argument, isChange: Boolean, operatorArguments: OperatorArguments): Pair<TextRange?, SelectionType?>?
+  fun getDeleteRangeAndType2(editor: VimEditor, caret: VimCaret, context: ExecutionContext, argument: Argument, isChange: Boolean, operatorArguments: OperatorArguments): Pair<TextRange, SelectionType>?
 
   fun deleteRange(editor: VimEditor, caret: VimCaret, range: TextRange, type: SelectionType?, isChange: Boolean): Boolean
+  fun deleteRange2(editor: VimEditor, caret: VimCaret, range: TextRange, type: SelectionType): Boolean
 
   fun changeCharacters(editor: VimEditor, caret: VimCaret, count: Int): Boolean
 

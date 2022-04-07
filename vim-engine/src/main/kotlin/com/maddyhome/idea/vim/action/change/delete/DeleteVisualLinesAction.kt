@@ -17,7 +17,6 @@
  */
 package com.maddyhome.idea.vim.action.change.delete
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -62,6 +61,6 @@ class DeleteVisualLinesAction : VisualOperatorActionHandler.ForEachCaret() {
         Triple(caret, lineRange, SelectionType.LINE_WISE)
       }
     }
-    return VimPlugin.getChange().deleteRange(editor, usedCaret, usedRange, usedType, false)
+    return injector.changeGroup.deleteRange(editor, usedCaret, usedRange, usedType, false)
   }
 }

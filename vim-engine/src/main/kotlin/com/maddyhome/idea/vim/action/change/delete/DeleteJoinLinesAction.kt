@@ -17,21 +17,18 @@
  */
 package com.maddyhome.idea.vim.action.change.delete
 
-import com.intellij.openapi.editor.Caret
-import com.intellij.openapi.util.Ref
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
-import com.maddyhome.idea.vim.newapi.IjVimCaret
-import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 
-class DeleteJoinLinesSpacesAction : ChangeEditorActionHandler.SingleExecution() {
+class DeleteJoinLinesAction : ChangeEditorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.DELETE
 
   override fun execute(
@@ -40,18 +37,18 @@ class DeleteJoinLinesSpacesAction : ChangeEditorActionHandler.SingleExecution() 
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    if ((editor as IjVimEditor).editor.isOneLineMode) return false
-    if (VimPlugin.getOptionService().isSet(OptionScope.LOCAL(editor), OptionConstants.ideajoinName)) {
-      return VimPlugin.getChange().joinViaIdeaByCount(editor, context, operatorArguments.count1)
+    if (editor.isOneLineMode()) return false
+    if (injector.optionService.isSet(OptionScope.LOCAL(editor), OptionConstants.ideajoinName)) {
+      return injector.changeGroup.joinViaIdeaByCount(editor, context, operatorArguments.count1)
     }
-    VimPlugin.getEditor().notifyIdeaJoin(editor.editor.project)
-    val res = Ref.create(true)
-    editor.editor.caretModel.runForEachCaret(
-      { caret: Caret ->
-        if (!VimPlugin.getChange().deleteJoinLines(editor, IjVimCaret(caret), operatorArguments.count1, true)) res.set(false)
+    injector.editorGroup.notifyIdeaJoin(editor)
+    val res = arrayOf(true)
+    editor.forEachNativeCaret(
+      { caret: VimCaret ->
+        if (!injector.changeGroup.deleteJoinLines(editor, caret, operatorArguments.count1, false)) res[0] = false
       },
       true
     )
-    return res.get()
+    return res[0]
   }
 }

@@ -17,29 +17,38 @@
  */
 package com.maddyhome.idea.vim.action.change.delete
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
+import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.options.OptionScope
 
-class DeleteCharacterAction : DeleteCharacter({ 1 })
-class DeleteCharacterLeftAction : DeleteCharacter({ -it })
-class DeleteCharacterRightAction : DeleteCharacter({ it })
-
-abstract class DeleteCharacter(private val countModifier: (Int) -> Int) : ChangeEditorActionHandler.ForEachCaret() {
+class DeleteJoinLinesSpacesAction : ChangeEditorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.DELETE
 
   override fun execute(
     editor: VimEditor,
-    caret: VimCaret,
     context: ExecutionContext,
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    return VimPlugin.getChange().deleteCharacter(editor, caret, countModifier(operatorArguments.count1), false)
+    if (editor.isOneLineMode()) return false
+    if (injector.optionService.isSet(OptionScope.LOCAL(editor), OptionConstants.ideajoinName)) {
+      return injector.changeGroup.joinViaIdeaByCount(editor, context, operatorArguments.count1)
+    }
+    injector.editorGroup.notifyIdeaJoin(editor)
+    val res = arrayOf(true)
+    editor.forEachNativeCaret(
+      { caret: VimCaret ->
+        if (!injector.changeGroup.deleteJoinLines(editor, caret, operatorArguments.count1, true)) res[0] =false
+      },
+      true
+    )
+    return res[0]
   }
 }

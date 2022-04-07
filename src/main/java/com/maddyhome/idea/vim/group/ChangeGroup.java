@@ -1087,7 +1087,7 @@ public class ChangeGroup extends VimChangeGroupBase {
   @Override
   public void joinViaIdeaBySelections(@NotNull VimEditor editor,
                                       @NotNull ExecutionContext context,
-                                      @NotNull Map<@NotNull VimCaret, ? extends VimSelection> caretsAndSelections) {
+                                      @NotNull Map<@NotNull VimCaret, @NotNull ? extends VimSelection> caretsAndSelections) {
     caretsAndSelections.forEach((caret, range) -> {
       if (!caret.isValid()) return;
       final Pair<Integer, Integer> nativeRange = range.getNativeStartAndEnd();
@@ -1315,6 +1315,14 @@ public class ChangeGroup extends VimChangeGroupBase {
            range.getStartOffset() != 0 &&
            ((IjVimEditor) editor).getEditor().getDocument().getCharsSequence().charAt(endOffset - 1) != '\n' &&
            endOffset == fileSize;
+  }
+
+  @Override
+  public boolean deleteRange2(@NotNull VimEditor editor,
+                              @NotNull VimCaret caret,
+                              @NotNull TextRange range,
+                              @NotNull SelectionType type) {
+    return com.maddyhome.idea.vim.newapi.ChangeGroupKt.deleteRange(editor, caret, range, type);
   }
 
   /**

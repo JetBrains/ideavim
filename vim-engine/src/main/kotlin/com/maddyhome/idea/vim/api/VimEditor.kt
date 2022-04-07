@@ -161,7 +161,7 @@ interface VimEditor {
   fun currentCaret(): VimCaret
 
   fun isWritable(): Boolean
-
+  fun isOneLineMode(): Boolean
   /**
    * Function for refactoring, get rid of it
    */

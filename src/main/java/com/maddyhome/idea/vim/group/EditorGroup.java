@@ -33,14 +33,15 @@ import com.intellij.openapi.editor.ex.EditorGutterComponentEx;
 import com.intellij.openapi.project.Project;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.api.VimEditor;
+import com.maddyhome.idea.vim.api.VimEditorGroup;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.newapi.IjExecutionContext;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
-import com.maddyhome.idea.vim.api.VimEditor;
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType;
 import com.maddyhome.idea.vim.options.LocalOptionChangeListener;
 import com.maddyhome.idea.vim.options.OptionConstants;
 import com.maddyhome.idea.vim.options.OptionScope;
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType;
 import org.jdom.Element;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NonNls;
@@ -53,7 +54,7 @@ import static com.maddyhome.idea.vim.helper.CaretVisualAttributesHelperKt.update
  * @author vlan
  */
 @State(name = "VimEditorSettings", storages = {@Storage(value = "$APP_CONFIG$/vim_settings.xml")})
-public class EditorGroup implements PersistentStateComponent<Element> {
+public class EditorGroup implements PersistentStateComponent<Element>, VimEditorGroup {
   private static final boolean REFRAIN_FROM_SCROLLING_VIM_VALUE = true;
   public static final @NonNls String EDITOR_STORE_ELEMENT = "editor";
 
@@ -260,6 +261,11 @@ public class EditorGroup implements PersistentStateComponent<Element> {
   @Override
   public void loadState(@NotNull Element state) {
     readData(state);
+  }
+
+  @Override
+  public void notifyIdeaJoin(@NotNull VimEditor editor) {
+    notifyIdeaJoin(((IjVimEditor) editor).getEditor().getProject());
   }
 
   public static class NumberChangeListener implements LocalOptionChangeListener<VimDataType> {
