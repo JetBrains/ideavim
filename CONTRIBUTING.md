@@ -4,6 +4,9 @@ IdeaVim is an open source project created by 80+ contributors. Would you like to
 
 This page is created to help you start contributing. And who knows, maybe in a few days this project will be brighter than ever!
 
+:warning: The plugin is currently under a huge refactoring aiming to split into vim-engine and IdeaVim in order to
+support the new [Fleet IDE](https://www.jetbrains.com/fleet/).
+
 ## Before you begin
 
 - The project is written in Kotlin and Java. Choose whichever language you feel more comfortable with,
