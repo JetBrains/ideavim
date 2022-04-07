@@ -43,6 +43,7 @@ import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.ex.InvalidCommandException;
 import com.maddyhome.idea.vim.helper.UiHelper;
+import com.maddyhome.idea.vim.newapi.IjExecutionContext;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.options.OptionConstants;
 import com.maddyhome.idea.vim.options.OptionScope;
@@ -157,11 +158,12 @@ public class ProcessGroup implements VimProcessGroup {
     panel.deactivate(true, resetCaret);
   }
 
-  public void startFilterCommand(@NotNull Editor editor, DataContext context, @NotNull Command cmd) {
-    String initText = getRange(editor, cmd) + "!";
-    CommandState.getInstance(new IjVimEditor(editor)).pushModes(CommandState.Mode.CMD_LINE, CommandState.SubMode.NONE);
+  @Override
+  public void startFilterCommand(@NotNull VimEditor editor, ExecutionContext context, @NotNull Command cmd) {
+    String initText = getRange(((IjVimEditor) editor).getEditor(), cmd) + "!";
+    CommandState.getInstance(editor).pushModes(CommandState.Mode.CMD_LINE, CommandState.SubMode.NONE);
     ExEntryPanel panel = ExEntryPanel.getInstance();
-    panel.activate(editor, context, ":", initText, 1);
+    panel.activate(((IjVimEditor) editor).getEditor(), ((IjExecutionContext) context).getContext(), ":", initText, 1);
   }
 
   private @NotNull String getRange(Editor editor, @NotNull Command cmd) {

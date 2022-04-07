@@ -17,10 +17,12 @@
  */
 package com.maddyhome.idea.vim.api
 
+import com.maddyhome.idea.vim.command.Command
 import javax.swing.KeyStroke
 
 interface VimProcessGroup {
     fun startSearchCommand(editor: VimEditor, context: ExecutionContext?, count: Int, leader: Char)
     fun endSearchCommand(): String
     fun processExKey(editor: VimEditor, stroke: KeyStroke): Boolean
+    fun startFilterCommand(editor: VimEditor, context: ExecutionContext?, cmd: Command)
 }

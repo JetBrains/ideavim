@@ -1,6 +1,9 @@
 package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.action.motion.leftright.TillCharacterMotionType
+import com.maddyhome.idea.vim.command.Argument
+import com.maddyhome.idea.vim.command.OperatorArguments
+import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.handler.Motion
 
 interface VimMotionGroup {
@@ -8,6 +11,7 @@ interface VimMotionGroup {
   var lastFTChar: Char
 
   fun getVerticalMotionOffset(editor: VimEditor, caret: VimCaret, count: Int): Int
+  fun moveCaretToLineEnd(editor: VimEditor, caret: VimCaret): Int
   fun moveCaretToLineEnd(editor: VimEditor, line: Int, allowPastEnd: Boolean): Int
   fun moveCaretToLineStart(editor: VimEditor, line: Int): Int
 
@@ -65,14 +69,14 @@ interface VimMotionGroup {
   fun setLastFTCmd(lastFTCmd: TillCharacterMotionType, lastChar: Char)
   fun moveCaretToLineStart(
     editor: VimEditor,
-    caret: VimCaret
+    caret: VimCaret,
   ): Int
 
   fun moveCaretToLineEndOffset(
     editor: VimEditor,
     caret: VimCaret,
     cntForward: Int,
-    allowPastEnd: Boolean
+    allowPastEnd: Boolean,
   ): Int
 
   fun moveCaretToMiddleColumn(editor: VimEditor, caret: VimCaret): Motion
@@ -89,4 +93,7 @@ interface VimMotionGroup {
   fun scrollCaretColumnToLastScreenColumn(editor: VimEditor): Boolean
   fun scrollColumns(editor: VimEditor, columns: Int): Boolean
   fun scrollScreen(editor: VimEditor, caret: VimCaret, rawCount: Int, down: Boolean): Boolean
+  fun moveCaret(editor: VimEditor, caret: VimCaret, offset: Int)
+  fun getMotionRange(editor: VimEditor, caret: VimCaret, context: ExecutionContext, argument: Argument, operatorArguments: OperatorArguments): TextRange?
+  fun moveCaretToLineWithSameColumn(editor: VimEditor, logicalLine: Int, caret: VimCaret): Int
 }

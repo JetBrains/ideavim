@@ -17,10 +17,10 @@
  */
 package com.maddyhome.idea.vim.action.copy
 
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Caret
-import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
@@ -28,6 +28,7 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
+import com.maddyhome.idea.vim.newapi.IjVimEditor
 import java.util.*
 
 /**
@@ -39,10 +40,10 @@ class YankVisualAction : VisualOperatorActionHandler.SingleExecution() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_EXIT_VISUAL)
 
   override fun executeForAllCarets(
-    editor: Editor,
-    context: DataContext,
+    editor: VimEditor,
+    context: ExecutionContext,
     cmd: Command,
-    caretsAndSelections: Map<Caret, VimSelection>,
+    caretsAndSelections: Map<VimCaret, VimSelection>,
     operatorArguments: OperatorArguments,
   ): Boolean {
     val selections = caretsAndSelections.values
@@ -56,6 +57,6 @@ class YankVisualAction : VisualOperatorActionHandler.SingleExecution() {
     val vimSelection = selections.firstOrNull() ?: return false
     val startsArray = starts.toIntArray()
     val endsArray = ends.toIntArray()
-    return VimPlugin.getYank().yankRange(editor, TextRange(startsArray, endsArray), vimSelection.type, true)
+    return VimPlugin.getYank().yankRange((editor as IjVimEditor).editor, TextRange(startsArray, endsArray), vimSelection.type, true)
   }
 }

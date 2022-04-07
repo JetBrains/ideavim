@@ -22,16 +22,19 @@ import com.intellij.openapi.editor.Caret
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.VimLogicalPosition
 import com.maddyhome.idea.vim.api.VimVisualPosition
 import com.maddyhome.idea.vim.common.EditorLine
 import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.common.offset
 import com.maddyhome.idea.vim.group.MotionGroup
+import com.maddyhome.idea.vim.group.visual.VisualChange
 import com.maddyhome.idea.vim.group.visual.vimLeadSelectionOffset
 import com.maddyhome.idea.vim.group.visual.vimSetSelection
 import com.maddyhome.idea.vim.group.visual.vimSetSystemSelectionSilently
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.helper.vimLastColumn
+import com.maddyhome.idea.vim.helper.vimLastVisualOperatorRange
 import com.maddyhome.idea.vim.helper.vimSelectionStart
 
 class IjVimCaret(val caret: Caret) : VimCaret {
@@ -55,7 +58,11 @@ class IjVimCaret(val caret: Caret) : VimCaret {
     }
   override val vimLeadSelectionOffset: Int
     get() = this.caret.vimLeadSelectionOffset
-
+  override var vimLastVisualOperatorRange: VisualChange?
+    get() = this.caret.vimLastVisualOperatorRange
+    set(value) {
+      this.caret.vimLastVisualOperatorRange = value
+    }
   override fun moveToOffset(offset: Int) {
     // TODO: 17.12.2021 Unpack internal actions
     MotionGroup.moveCaret(caret.editor, caret, offset)
@@ -88,6 +95,11 @@ class IjVimCaret(val caret: Caret) : VimCaret {
 
   override fun vimSetSelection(start: Int, end: Int, moveCaretToSelectionEnd: Boolean) {
     caret.vimSetSelection(start, end, moveCaretToSelectionEnd)
+  }
+
+  override fun getLogicalPosition(): VimLogicalPosition {
+    val logicalPosition = caret.logicalPosition
+    return VimLogicalPosition(logicalPosition.line, logicalPosition.column, logicalPosition.leansForward)
   }
 
   override fun getVisualPosition(): VimVisualPosition {

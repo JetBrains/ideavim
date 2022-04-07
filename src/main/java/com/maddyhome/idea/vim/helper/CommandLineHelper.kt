@@ -21,7 +21,7 @@ package com.maddyhome.idea.vim.helper
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.editor.Editor
-import com.maddyhome.idea.vim.action.change.VimRepeater
+import com.maddyhome.idea.vim.action.change.Extension
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.ui.ModalEntry
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
@@ -33,8 +33,8 @@ class CommandLineHelper {
 
   fun inputString(editor: Editor, prompt: String, finishOn: Char?): String? {
     if (editor.vim.commandState.isDotRepeatInProgress) {
-      val input = VimRepeater.Extension.consumeString()
-      return input ?: error("Not enough strings saved: ${VimRepeater.Extension.lastExtensionHandler}")
+      val input = Extension.consumeString()
+      return input ?: error("Not enough strings saved: ${Extension.lastExtensionHandler}")
     }
 
     if (ApplicationManager.getApplication().isUnitTestMode) {
@@ -54,7 +54,7 @@ class CommandLineHelper {
       if (finishOn != null && key != null && key.keyChar == finishOn) {
         builder.append(key.keyChar)
       }
-      VimRepeater.Extension.addString(builder.toString())
+      Extension.addString(builder.toString())
       return builder.toString()
     } else {
       var text: String? = null
@@ -85,7 +85,7 @@ class CommandLineHelper {
         }
       }
       if (text != null) {
-        VimRepeater.Extension.addString(text!!)
+        Extension.addString(text!!)
       }
       return text
     }

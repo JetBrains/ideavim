@@ -17,15 +17,16 @@
  */
 package com.maddyhome.idea.vim.action.change.insert
 
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
+import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.insertLineAround
 import java.util.*
 
@@ -35,12 +36,12 @@ class InsertNewLineBelowAction : ChangeEditorActionHandler.SingleExecution() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MULTIKEY_UNDO)
 
   override fun execute(
-    editor: Editor,
-    context: DataContext,
+    editor: VimEditor,
+    context: ExecutionContext,
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    if (editor.isOneLineMode) return false
+    if ((editor as IjVimEditor).editor.isOneLineMode) return false
 //    if (experimentalApi()) {
     @Suppress("ConstantConditionIf")
     if (false) {
@@ -58,12 +59,12 @@ class InsertNewLineAboveAction : ChangeEditorActionHandler.SingleExecution() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MULTIKEY_UNDO)
 
   override fun execute(
-    editor: Editor,
-    context: DataContext,
+    editor: VimEditor,
+    context: ExecutionContext,
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    if (editor.isOneLineMode) return false
+    if ((editor as IjVimEditor).editor.isOneLineMode) return false
 //    if (experimentalApi()) {
     @Suppress("ConstantConditionIf")
     if (false) {

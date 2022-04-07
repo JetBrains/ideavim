@@ -24,6 +24,8 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ranges.Ranges
+import com.maddyhome.idea.vim.newapi.IjVimCaret
+import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
@@ -39,7 +41,7 @@ data class JoinLinesCommand(val ranges: Ranges, val argument: String) : Command.
     val textRange = getTextRange(editor, caret, true)
 
     return if (VimPlugin.getChange().deleteJoinRange(
-        editor, caret,
+        IjVimEditor(editor), IjVimCaret(caret),
         TextRange(
             textRange.startOffset,
             textRange.endOffset - 1

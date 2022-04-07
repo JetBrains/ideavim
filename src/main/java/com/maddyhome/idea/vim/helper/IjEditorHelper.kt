@@ -1,7 +1,9 @@
 package com.maddyhome.idea.vim.helper
 
 import com.intellij.openapi.components.Service
+import com.intellij.openapi.editor.ReadOnlyFragmentModificationException
 import com.intellij.openapi.editor.VisualPosition
+import com.intellij.openapi.editor.actionSystem.EditorActionManager
 import com.maddyhome.idea.vim.api.EngineEditorHelper
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -71,6 +73,10 @@ class IjEditorHelper : EngineEditorHelper {
     return EditorHelper.getLineStartOffset((editor as IjVimEditor).editor, line)
   }
 
+  override fun getLineStartForOffset(editor: VimEditor, line: Int): Int {
+    return EditorHelper.getLineStartForOffset((editor as IjVimEditor).editor, line)
+  }
+
   override fun getLineEndForOffset(editor: VimEditor, offset: Int): Int {
     return EditorHelper.getLineEndForOffset((editor as IjVimEditor).editor, offset)
   }
@@ -89,5 +95,11 @@ class IjEditorHelper : EngineEditorHelper {
 
   override fun getApproximateScreenWidth(editor: VimEditor): Int {
     return EditorHelper.getApproximateScreenWidth(editor.ij)
+  }
+
+  override fun handleWithReadonlyFragmentModificationHandler(editor: VimEditor, exception: Exception) {
+    return EditorActionManager.getInstance()
+      .getReadonlyFragmentModificationHandler(editor.ij.document)
+      .handle(exception as ReadOnlyFragmentModificationException?)
   }
 }

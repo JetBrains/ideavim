@@ -25,8 +25,8 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.psi.util.PsiUtilBase
 import com.intellij.util.text.CharArrayUtil
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.LineDeleteShift
-import com.maddyhome.idea.vim.api.MutableVimEditor
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimMotionGroupBase
@@ -62,7 +62,7 @@ fun changeRange(
   var col = 0
   var lines = 0
   if (type === SelectionType.BLOCK_WISE) {
-    lines = ChangeGroup.getLinesCountInVisualBlock(editor, range)
+    lines = ChangeGroup.getLinesCountInVisualBlock(IjVimEditor(editor), range)
     col = editor.offsetToLogicalPosition(range.startOffset).column
     if (caret.vimLastColumn == VimMotionGroupBase.LAST_COLUMN) {
       col = VimMotionGroupBase.LAST_COLUMN
@@ -111,33 +111,31 @@ fun changeRange(
 }
 
 fun deleteRange(
-  editor: Editor,
-  caret: Caret,
+  editor: VimEditor,
+  caret: VimCaret,
   range: TextRange,
   type: SelectionType,
 ): Boolean {
-  val vimEditor = IjVimEditor(editor)
   val vimRange = toVimRange(range, type)
 
-  val vimCaret = IjVimCaret(caret)
-  vimCaret.caret.vimLastColumn = vimCaret.caret.inlayAwareVisualColumn
-  val deletedInfo = injector.vimMachine.delete(vimRange, vimEditor, vimCaret)
+  (caret as IjVimCaret).caret.vimLastColumn = caret.caret.inlayAwareVisualColumn
+  val deletedInfo = injector.vimMachine.delete(vimRange, editor, caret)
   if (deletedInfo != null) {
     when (deletedInfo) {
       is OperatedRange.Characters -> {
-        val newOffset = EditorHelper.normalizeOffset(editor, deletedInfo.leftOffset.point, false)
-        vimCaret.moveToOffset(newOffset)
+        val newOffset = injector.engineEditorHelper.normalizeOffset(editor, deletedInfo.leftOffset.point, false)
+        caret.moveToOffset(newOffset)
       }
       is OperatedRange.Block -> TODO()
       is OperatedRange.Lines -> {
         if (deletedInfo.shiftType != LineDeleteShift.NL_ON_START) {
-          val line = deletedInfo.lineAbove.toPointer(vimEditor)
-          val offset = vimCaret.offsetForLineWithStartOfLineOption(line)
-          vimCaret.moveToOffset(offset)
+          val line = deletedInfo.lineAbove.toPointer(editor)
+          val offset = caret.offsetForLineWithStartOfLineOption(line)
+          caret.moveToOffset(offset)
         } else {
-          val logicalLine = EditorLine.Pointer.init((deletedInfo.lineAbove.line - 1).coerceAtLeast(0), vimEditor)
-          val offset = vimCaret.offsetForLineWithStartOfLineOption(logicalLine)
-          vimCaret.moveToOffset(offset)
+          val logicalLine = EditorLine.Pointer.init((deletedInfo.lineAbove.line - 1).coerceAtLeast(0), editor)
+          val offset = caret.offsetForLineWithStartOfLineOption(logicalLine)
+          caret.moveToOffset(offset)
         }
       }
     }
@@ -157,51 +155,50 @@ fun deleteRange(
  *   This is probably the kotlin issue, but still
  * - `*` character doesn't appear when `o` in javadoc section
  */
-fun insertLineAround(editor: Editor, context: DataContext, shift: Int) {
-  val vimEditor: MutableVimEditor = IjVimEditor(editor)
-  val project = editor.project
+fun insertLineAround(editor: VimEditor, context: ExecutionContext, shift: Int) {
+  val project = (editor as IjVimEditor).editor.project
 
   VimPlugin.getChange().initInsert(editor, context, CommandState.Mode.INSERT)
 
-  if (!CommandState.getInstance(vimEditor).isDotRepeatInProgress) {
-    for (vimCaret in vimEditor.carets()) {
+  if (!CommandState.getInstance(editor).isDotRepeatInProgress) {
+    for (vimCaret in editor.carets()) {
       val caret = (vimCaret as IjVimCaret).caret
       val line = vimCaret.getLine()
 
       // Current line indent
-      val lineStartOffset = vimEditor.getLineRange(line).first.point
-      val text = editor.document.charsSequence
+      val lineStartOffset = editor.getLineRange(line).first.point
+      val text = editor.editor.document.charsSequence
       val lineStartWsEndOffset = CharArrayUtil.shiftForward(text, lineStartOffset, " \t")
       val indent = text.subSequence(lineStartOffset, lineStartWsEndOffset)
 
       // Calculating next line with minding folders
       val lineEndOffset = if (shift == 1) {
-        VimPlugin.getMotion().moveCaretToLineEnd(editor, caret)
+        VimPlugin.getMotion().moveCaretToLineEnd(editor, IjVimCaret(caret))
       } else {
-        VimPlugin.getMotion().moveCaretToLineStart(editor.vim, caret.vim)
+        VimPlugin.getMotion().moveCaretToLineStart(editor, caret.vim)
       }
-      val position = EditorLine.Offset.init(editor.offsetToLogicalPosition(lineEndOffset).line + shift, vimEditor)
+      val position = EditorLine.Offset.init(editor.offsetToLogicalPosition(lineEndOffset).line + shift, editor)
 
-      val insertedLine = vimEditor.addLine(position) ?: continue
+      val insertedLine = editor.addLine(position) ?: continue
       VimPlugin.getChange().saveStrokes("\n")
 
-      var lineStart = vimEditor.getLineRange(insertedLine).first
+      var lineStart = editor.getLineRange(insertedLine).first
       val initialLineStart = lineStart
 
       // Set up indent
       // Firstly set up primitive indent
-      vimEditor.insertText(lineStart, indent)
+      editor.insertText(lineStart, indent)
       lineStart = (lineStart.point + indent.length).offset
 
       if (project != null) {
         // Secondly set up language smart indent
         val language = PsiUtilBase.getLanguageInEditor(caret, project)
-        val newIndent = EnterHandler.adjustLineIndentNoCommit(language, editor.document, editor, lineStart.point)
+        val newIndent = EnterHandler.adjustLineIndentNoCommit(language, editor.editor.document, editor.editor, lineStart.point)
         lineStart = if (newIndent >= 0) newIndent.offset else lineStart
       }
       VimPlugin.getChange()
         .saveStrokes(
-          editor.document.getText(
+          editor.editor.document.getText(
             com.intellij.openapi.util.TextRange(
               initialLineStart.point,
               lineStart.point
@@ -213,16 +210,14 @@ fun insertLineAround(editor: Editor, context: DataContext, shift: Int) {
     }
   }
 
-  MotionGroup.scrollCaretIntoView(editor)
+  MotionGroup.scrollCaretIntoView(editor.editor)
 }
 
 fun VimCaret.offsetForLineWithStartOfLineOption(logicalLine: EditorLine.Pointer): Int {
-  val ijEditor = (this.editor as IjVimEditor).editor
-  val caret = (this as IjVimCaret).caret
   return if (VimPlugin.getOptionService().isSet(OptionScope.LOCAL(editor), OptionConstants.startoflineName)) {
     offsetForLineStartSkipLeading(logicalLine.line)
   } else {
-    VimPlugin.getMotion().moveCaretToLineWithSameColumn(ijEditor, logicalLine.line, caret)
+    VimPlugin.getMotion().moveCaretToLineWithSameColumn(editor, logicalLine.line, this)
   }
 }
 

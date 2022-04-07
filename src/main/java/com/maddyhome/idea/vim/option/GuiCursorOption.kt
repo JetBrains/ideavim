@@ -26,7 +26,7 @@ import com.maddyhome.idea.vim.vimscript.model.options.helpers.GuiCursorType
 import org.jetbrains.annotations.ApiStatus
 
 /**
- * @deprecated use {@link com.maddyhome.idea.vim.vimscript.model.options.helpers.GuiCursorOptionHelper} instead
+ * @deprecated use {@link com.maddyhome.idea.vim.options.helpers.GuiCursorOptionHelper} instead
  */
 @Deprecated("options are now replaced by helper classes")
 @ApiStatus.ScheduledForRemoval(inVersion = "1.11")

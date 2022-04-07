@@ -38,6 +38,7 @@ interface VimInjector {
   val lookupManager: VimLookupManager
   val templateManager: VimTemplateManager
   val searchGroup: VimSearchGroup
+  val statisticsService: VimStatistics
   val put: VimPut
 
   /**

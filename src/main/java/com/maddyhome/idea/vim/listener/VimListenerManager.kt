@@ -74,12 +74,13 @@ import com.maddyhome.idea.vim.listener.MouseEventsDataHolder.skipEvents
 import com.maddyhome.idea.vim.listener.MouseEventsDataHolder.skipNDragEvents
 import com.maddyhome.idea.vim.listener.VimListenerManager.EditorListeners.add
 import com.maddyhome.idea.vim.listener.VimListenerManager.EditorListeners.remove
+import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.option.StrictMode
 import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.options.helpers.KeywordOptionChangeListener
 import com.maddyhome.idea.vim.ui.ShowCmdOptionChangeListener
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
-import com.maddyhome.idea.vim.vimscript.model.options.helpers.KeywordOptionChangeListener
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import javax.swing.SwingUtilities
@@ -164,7 +165,7 @@ object VimListenerManager {
 
       VimPlugin.getEditor().editorCreated(editor)
 
-      VimPlugin.getChange().editorCreated(editor)
+      VimPlugin.getChange().editorCreated(IjVimEditor(editor))
     }
 
     fun remove(editor: Editor, isReleased: Boolean) {
@@ -178,7 +179,7 @@ object VimListenerManager {
 
       VimPlugin.getEditorIfCreated()?.editorDeinit(editor, isReleased)
 
-      VimPlugin.getChange().editorReleased(editor)
+      VimPlugin.getChange().editorReleased(IjVimEditor(editor))
     }
   }
 

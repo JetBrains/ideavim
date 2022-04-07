@@ -22,7 +22,7 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.action.change.VimRepeater
+import com.maddyhome.idea.vim.action.change.Extension
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.MappingMode
 import com.maddyhome.idea.vim.helper.CommandLineHelper
@@ -104,8 +104,8 @@ object VimExtensionFacade {
   @JvmStatic
   fun inputKeyStroke(editor: Editor): KeyStroke {
     if (editor.vim.commandState.isDotRepeatInProgress) {
-      val input = VimRepeater.Extension.consumeKeystroke()
-      return input ?: error("Not enough keystrokes saved: ${VimRepeater.Extension.lastExtensionHandler}")
+      val input = Extension.consumeKeystroke()
+      return input ?: error("Not enough keystrokes saved: ${Extension.lastExtensionHandler}")
     }
 
     val key: KeyStroke? = if (ApplicationManager.getApplication().isUnitTestMode) {
@@ -119,7 +119,7 @@ object VimExtensionFacade {
       ref
     }
     val result = key ?: KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE.toChar())
-    VimRepeater.Extension.addKeystroke(result)
+    Extension.addKeystroke(result)
     return result
   }
 

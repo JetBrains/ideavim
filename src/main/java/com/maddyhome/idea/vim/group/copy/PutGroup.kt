@@ -48,12 +48,15 @@ import com.maddyhome.idea.vim.helper.TestClipboardModel
 import com.maddyhome.idea.vim.helper.fileSize
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.mark.VimMarkConstants.MARK_CHANGE_POS
+import com.maddyhome.idea.vim.newapi.IjExecutionContext
+import com.maddyhome.idea.vim.newapi.IjVimCaret
+import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.options.helpers.ClipboardOptionHelper
 import com.maddyhome.idea.vim.put.VimPutBase
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
-import com.maddyhome.idea.vim.vimscript.model.options.helpers.ClipboardOptionHelper
 import java.awt.datatransfer.DataFlavor
 import java.util.*
 import kotlin.math.abs
@@ -161,7 +164,7 @@ class PutGroup : VimPutBase() {
         val range = selection.toVimTextRange(false).normalize()
 
         ApplicationManager.getApplication().runWriteAction {
-          VimPlugin.getChange().deleteRange(editor, caret, range, selection.type, false)
+          VimPlugin.getChange().deleteRange(IjVimEditor(editor), IjVimCaret(caret), range, selection.type, false)
         }
         caret.moveToInlayAwareOffset(range.startOffset)
       }
@@ -500,7 +503,7 @@ class PutGroup : VimPutBase() {
       val limit = currentLine + lineCount - EditorHelper.getLineCount(editor)
       for (i in 0 until limit) {
         MotionGroup.moveCaret(editor, caret, editor.fileSize)
-        VimPlugin.getChange().insertText(editor, caret, "\n")
+        VimPlugin.getChange().insertText(IjVimEditor(editor), IjVimCaret(caret), "\n")
       }
     }
 
@@ -524,17 +527,17 @@ class PutGroup : VimPutBase() {
       val insertOffset = editor.logicalPositionToOffset(LogicalPosition(currentLine, currentColumn))
       MotionGroup.moveCaret(editor, caret, insertOffset)
       val insertedText = origSegment + segment.repeat(count - 1)
-      VimPlugin.getChange().insertText(editor, caret, insertedText)
+      VimPlugin.getChange().insertText(IjVimEditor(editor), IjVimCaret(caret), insertedText)
       endOffset += insertedText.length
 
       if (mode == CommandState.SubMode.VISUAL_LINE) {
         MotionGroup.moveCaret(editor, caret, endOffset)
-        VimPlugin.getChange().insertText(editor, caret, "\n")
+        VimPlugin.getChange().insertText(IjVimEditor(editor), IjVimCaret(caret), "\n")
         ++endOffset
       } else {
         if (pad.isNotEmpty()) {
           MotionGroup.moveCaret(editor, caret, insertOffset)
-          VimPlugin.getChange().insertText(editor, caret, pad)
+          VimPlugin.getChange().insertText(IjVimEditor(editor), IjVimCaret(caret), pad)
           endOffset += pad.length
         }
       }
@@ -562,7 +565,7 @@ class PutGroup : VimPutBase() {
   ): Int {
     MotionGroup.moveCaret(editor, caret, startOffset)
     val insertedText = text.repeat(count)
-    VimPlugin.getChange().insertText(editor, caret, insertedText)
+    VimPlugin.getChange().insertText(IjVimEditor(editor), IjVimCaret(caret), insertedText)
 
     val endOffset = if (indent)
       doIndent(editor, caret, context, startOffset, startOffset + insertedText.length)
@@ -615,7 +618,7 @@ class PutGroup : VimPutBase() {
     val startLineOffset = editor.document.getLineStartOffset(startLine)
     val endLineOffset = editor.document.getLineEndOffset(endLine)
 
-    VimPlugin.getChange().autoIndentRange(editor, caret, context, TextRange(startLineOffset, endLineOffset))
+    VimPlugin.getChange().autoIndentRange(IjVimEditor(editor), IjVimCaret(caret), IjExecutionContext(context), TextRange(startLineOffset, endLineOffset))
     return EditorHelper.getLineEndOffset(editor, endLine, true)
   }
 

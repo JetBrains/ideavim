@@ -17,10 +17,11 @@
  */
 package com.maddyhome.idea.vim.action.change.delete
 
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Caret
-import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
@@ -28,9 +29,7 @@ import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
-import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.enumSetOf
-import com.maddyhome.idea.vim.helper.fileSize
 import java.util.*
 
 /**
@@ -42,9 +41,9 @@ class DeleteVisualLinesEndAction : VisualOperatorActionHandler.ForEachCaret() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_EXIT_VISUAL)
 
   override fun executeAction(
-    editor: Editor,
-    caret: Caret,
-    context: DataContext,
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
     cmd: Command,
     range: VimSelection,
     operatorArguments: OperatorArguments,
@@ -55,17 +54,16 @@ class DeleteVisualLinesEndAction : VisualOperatorActionHandler.ForEachCaret() {
       val ends = vimTextRange.endOffsets
       for (i in starts.indices) {
         if (ends[i] > starts[i]) {
-          ends[i] = EditorHelper.getLineEndForOffset(editor, starts[i])
+          ends[i] = injector.engineEditorHelper.getLineEndForOffset(editor, starts[i])
         }
       }
       val blockRange = TextRange(starts, ends)
-      VimPlugin.getChange()
-        .deleteRange(editor, editor.caretModel.primaryCaret, blockRange, SelectionType.BLOCK_WISE, false)
+      VimPlugin.getChange().deleteRange(editor, editor.primaryCaret(), blockRange, SelectionType.BLOCK_WISE, false)
     } else {
-      val lineEndForOffset = EditorHelper.getLineEndForOffset(editor, vimTextRange.endOffset)
-      val endsWithNewLine = if (lineEndForOffset == editor.fileSize) 0 else 1
+      val lineEndForOffset = injector.engineEditorHelper.getLineEndForOffset(editor, vimTextRange.endOffset)
+      val endsWithNewLine = if (lineEndForOffset.toLong() == editor.fileSize()) 0 else 1
       val lineRange = TextRange(
-        EditorHelper.getLineStartForOffset(editor, vimTextRange.startOffset),
+        injector.engineEditorHelper.getLineStartForOffset(editor, vimTextRange.startOffset),
         lineEndForOffset + endsWithNewLine
       )
       VimPlugin.getChange().deleteRange(editor, caret, lineRange, SelectionType.LINE_WISE, false)

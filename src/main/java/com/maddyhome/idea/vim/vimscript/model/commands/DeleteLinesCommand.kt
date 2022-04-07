@@ -24,6 +24,8 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.ex.ranges.Ranges
+import com.maddyhome.idea.vim.newapi.IjVimCaret
+import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
@@ -45,7 +47,7 @@ data class DeleteLinesCommand(val ranges: Ranges, var argument: String) : Comman
 
     val textRange = getTextRange(editor, caret, true)
     return if (VimPlugin.getChange()
-      .deleteRange(editor, caret, textRange, SelectionType.LINE_WISE, false)
+      .deleteRange(IjVimEditor(editor), IjVimCaret(caret), textRange, SelectionType.LINE_WISE, false)
     ) ExecutionResult.Success
     else ExecutionResult.Error
   }

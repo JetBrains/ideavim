@@ -33,6 +33,7 @@ import com.maddyhome.idea.vim.api.VimCaretListener
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimLogicalPosition
 import com.maddyhome.idea.vim.api.VimVisualPosition
+import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.EditorLine
 import com.maddyhome.idea.vim.common.Offset
@@ -49,6 +50,8 @@ import com.maddyhome.idea.vim.helper.inBlockSubMode
 import com.maddyhome.idea.vim.helper.isTemplateActive
 import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
 import com.maddyhome.idea.vim.helper.updateCaretsVisualPosition
+import com.maddyhome.idea.vim.helper.vimChangeActionSwitchMode
+import com.maddyhome.idea.vim.helper.vimKeepingVisualOperatorAction
 import com.maddyhome.idea.vim.helper.vimLastSelectionType
 
 class IjVimEditor(editor: Editor) : MutableLinearEditor() {
@@ -60,6 +63,16 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
   val originalEditor = editor
 
   override val lfMakesNewLine: Boolean = true
+  override var vimChangeActionSwitchMode: CommandState.Mode?
+    get() = editor.vimChangeActionSwitchMode
+    set(value) {
+      editor.vimChangeActionSwitchMode = value
+    }
+  override var vimKeepingVisualOperatorAction: Boolean
+    get() = editor.vimKeepingVisualOperatorAction
+    set(value) {
+      editor.vimKeepingVisualOperatorAction = value
+    }
 
   override fun fileSize(): Long = editor.fileSize.toLong()
 
@@ -134,11 +147,23 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
 
   @Suppress("ideavimRunForEachCaret")
   override fun forEachCaret(action: (VimCaret) -> Unit) {
+    forEachCaret(action, false)
+  }
+
+  override fun forEachCaret(action: (VimCaret) -> Unit, reverse: Boolean) {
     if (editor.inBlockSubMode) {
       action(IjVimCaret(editor.caretModel.primaryCaret))
     } else {
-      editor.caretModel.runForEachCaret { action(IjVimCaret(it)) }
+      editor.caretModel.runForEachCaret({ action(IjVimCaret(it)) }, reverse)
     }
+  }
+
+  override fun forEachNativeCaret(action: (VimCaret) -> Unit) {
+    forEachNativeCaret(action, false)
+  }
+
+  override fun forEachNativeCaret(action: (VimCaret) -> Unit, reverse: Boolean) {
+    editor.caretModel.runForEachCaret({ action(IjVimCaret(it)) }, reverse)
   }
 
   override fun primaryCaret(): VimCaret {
@@ -217,6 +242,10 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
     return EditorHelper.getLineLength(editor, line)
   }
 
+  override fun removeCaret(caret: VimCaret) {
+    editor.caretModel.removeCaret((caret as IjVimCaret).caret)
+  }
+
   override fun removeSecondaryCarets() {
     editor.caretModel.removeSecondaryCarets()
   }
@@ -274,6 +303,16 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
 
   override fun exitVisualModeNative() {
     this.editor.exitVisualMode()
+  }
+
+  override fun startGuardedBlockChecking() {
+    val doc = editor.document
+    doc.startGuardedBlockChecking()
+  }
+
+  override fun stopGuardedBlockChecking() {
+    val doc = editor.document
+    doc.stopGuardedBlockChecking()
   }
 
   override var vimLastSelectionType: SelectionType?

@@ -17,15 +17,16 @@
  */
 package com.maddyhome.idea.vim.action.change.delete
 
-import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
-import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.util.Ref
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
+import com.maddyhome.idea.vim.newapi.IjVimCaret
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
@@ -34,20 +35,20 @@ class DeleteJoinLinesAction : ChangeEditorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.DELETE
 
   override fun execute(
-    editor: Editor,
-    context: DataContext,
+    editor: VimEditor,
+    context: ExecutionContext,
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    if (editor.isOneLineMode) return false
-    if (VimPlugin.getOptionService().isSet(OptionScope.LOCAL(IjVimEditor(editor)), OptionConstants.ideajoinName)) {
+    if ((editor as IjVimEditor).editor.isOneLineMode) return false
+    if (VimPlugin.getOptionService().isSet(OptionScope.LOCAL(editor), OptionConstants.ideajoinName)) {
       return VimPlugin.getChange().joinViaIdeaByCount(editor, context, operatorArguments.count1)
     }
-    VimPlugin.getEditor().notifyIdeaJoin(editor.project)
+    VimPlugin.getEditor().notifyIdeaJoin(editor.editor.project)
     val res = Ref.create(true)
-    editor.caretModel.runForEachCaret(
+    editor.editor.caretModel.runForEachCaret(
       { caret: Caret ->
-        if (!VimPlugin.getChange().deleteJoinLines(editor, caret, operatorArguments.count1, false)) res.set(false)
+        if (!VimPlugin.getChange().deleteJoinLines(editor, IjVimCaret(caret), operatorArguments.count1, false)) res.set(false)
       },
       true
     )

@@ -16,9 +16,11 @@ interface EngineEditorHelper {
   fun updateLastColumn(caret: VimCaret, prevLastColumn: Int)
   fun getLineEndOffset(editor: VimEditor, line: Int, allowEnd: Boolean): Int
   fun getLineStartOffset(editor: VimEditor, line: Int): Int
+  fun getLineStartForOffset(editor: VimEditor, line: Int): Int
   fun getLineEndForOffset(editor: VimEditor, offset: Int): Int
   fun visualLineToLogicalLine(editor: VimEditor, line: Int): Int
   fun normalizeLine(editor: VimEditor, line: Int): Int
   fun getVisualLineAtTopOfScreen(editor: VimEditor): Int
   fun getApproximateScreenWidth(editor: VimEditor): Int
+  fun handleWithReadonlyFragmentModificationHandler(editor: VimEditor, exception: java.lang.Exception)
 }

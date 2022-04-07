@@ -17,10 +17,10 @@
  */
 package com.maddyhome.idea.vim.action.change.insert
 
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Caret
-import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
@@ -28,6 +28,7 @@ import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
+import com.maddyhome.idea.vim.newapi.IjVimEditor
 import java.util.*
 
 /**
@@ -39,13 +40,13 @@ class VisualBlockInsertAction : VisualOperatorActionHandler.SingleExecution() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MULTIKEY_UNDO, CommandFlags.FLAG_EXIT_VISUAL)
 
   override fun executeForAllCarets(
-    editor: Editor,
-    context: DataContext,
+    editor: VimEditor,
+    context: ExecutionContext,
     cmd: Command,
-    caretsAndSelections: Map<Caret, VimSelection>,
+    caretsAndSelections: Map<VimCaret, VimSelection>,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    if (editor.isOneLineMode) return false
+    if ((editor as IjVimEditor).editor.isOneLineMode) return false
     val vimSelection = caretsAndSelections.values.stream().findFirst().orElse(null) ?: return false
     return if (vimSelection.type == SelectionType.BLOCK_WISE) {
       VimPlugin.getChange().blockInsert(editor, context, vimSelection.toVimTextRange(false), false, operatorArguments)

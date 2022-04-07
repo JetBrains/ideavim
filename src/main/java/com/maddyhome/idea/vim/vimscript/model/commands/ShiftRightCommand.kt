@@ -24,6 +24,9 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ranges.Ranges
+import com.maddyhome.idea.vim.newapi.IjExecutionContext
+import com.maddyhome.idea.vim.newapi.IjVimCaret
+import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
@@ -36,7 +39,7 @@ data class ShiftRightCommand(val ranges: Ranges, val argument: String, val lengt
     val range = getTextRange(editor, caret, true)
     val endOffsets = range.endOffsets.map { it - 1 }.toIntArray()
     VimPlugin.getChange().indentRange(
-      editor, caret, context,
+      IjVimEditor(editor), IjVimCaret(caret), IjExecutionContext(context),
       TextRange(range.startOffsets, endOffsets),
       length, 1
     )

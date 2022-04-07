@@ -18,6 +18,7 @@
 
 package com.maddyhome.idea.vim.api
 
+import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.EditorLine
 import com.maddyhome.idea.vim.common.Offset
@@ -115,6 +116,8 @@ import com.maddyhome.idea.vim.common.pointer
 interface VimEditor {
 
   val lfMakesNewLine: Boolean
+  var vimChangeActionSwitchMode: CommandState.Mode?
+  var vimKeepingVisualOperatorAction: Boolean
 
   fun deleteDryRun(range: VimRange): OperatedRange?
   fun fileSize(): Long
@@ -142,7 +145,11 @@ interface VimEditor {
    * This method should perform caret merging after the operations. This is similar to IJ runForEachCaret
    * TODO review
    */
+
   fun forEachCaret(action: (VimCaret) -> Unit)
+  fun forEachCaret(action: (VimCaret) -> Unit, reverse: Boolean = false)
+  fun forEachNativeCaret(action: (VimCaret) -> Unit)
+  fun forEachNativeCaret(action: (VimCaret) -> Unit, reverse: Boolean = false)
 
   // --------------------------------------------------------------------
 
@@ -174,6 +181,7 @@ interface VimEditor {
   fun logicalPositionToOffset(position: VimLogicalPosition): Int
   fun lineLength(line: Int): Int
 
+  fun removeCaret(caret: VimCaret)
   fun removeSecondaryCarets()
   fun vimSetSystemBlockSelectionSilently(start: VimLogicalPosition, end: VimLogicalPosition)
 
@@ -198,6 +206,9 @@ interface VimEditor {
 
   fun scrollToCaret(type: VimScrollType)
   fun isTemplateActive(): Boolean
+
+  fun startGuardedBlockChecking()
+  fun stopGuardedBlockChecking()
 }
 
 interface MutableVimEditor : VimEditor {

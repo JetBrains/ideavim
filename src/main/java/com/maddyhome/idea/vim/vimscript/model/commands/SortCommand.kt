@@ -28,6 +28,7 @@ import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.inBlockSubMode
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
+import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import java.util.*
@@ -52,7 +53,7 @@ data class SortCommand(val ranges: Ranges, val argument: String) : Command.Singl
     if (editor.inBlockSubMode) {
       val primaryCaret = editor.caretModel.primaryCaret
       val range = getSortLineRange(editor, primaryCaret)
-      val worked = VimPlugin.getChange().sortRange(editor, range, lineComparator)
+      val worked = VimPlugin.getChange().sortRange(IjVimEditor(editor), range, lineComparator)
       primaryCaret.moveToInlayAwareOffset(
         VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor.vim, range.startLine)
       )
@@ -62,7 +63,7 @@ data class SortCommand(val ranges: Ranges, val argument: String) : Command.Singl
     var worked = true
     for (caret in editor.caretModel.allCarets) {
       val range = getSortLineRange(editor, caret)
-      if (!VimPlugin.getChange().sortRange(editor, range, lineComparator)) {
+      if (!VimPlugin.getChange().sortRange(IjVimEditor(editor), range, lineComparator)) {
         worked = false
       }
       caret.moveToInlayAwareOffset(VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor.vim, range.startLine))

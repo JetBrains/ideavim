@@ -24,11 +24,9 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.extension.VimExtensionHandler
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.newapi.ij
-import javax.swing.KeyStroke
 
 class RepeatChangeAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_WRITABLE
@@ -37,14 +35,14 @@ class RepeatChangeAction : VimActionHandler.SingleExecution() {
     val state = editor.commandState
     val lastCommand = VimRepeater.lastChangeCommand
 
-    if (lastCommand == null && VimRepeater.Extension.lastExtensionHandler == null) return false
+    if (lastCommand == null && Extension.lastExtensionHandler == null) return false
 
     // Save state
     val save = state.executingCommand
     val lastFTCmd = VimPlugin.getMotion().lastFTCmd
     val lastFTChar = VimPlugin.getMotion().lastFTChar
     val reg = VimPlugin.getRegister().currentRegister
-    val lastHandler = VimRepeater.Extension.lastExtensionHandler
+    val lastHandler = Extension.lastExtensionHandler
     val repeatHandler = VimRepeater.repeatHandler
 
     state.isDotRepeatInProgress = true
@@ -83,65 +81,10 @@ class RepeatChangeAction : VimActionHandler.SingleExecution() {
     // Restore state
     if (save != null) state.setExecutingCommand(save)
     VimPlugin.getMotion().setLastFTCmd(lastFTCmd, lastFTChar)
-    if (lastHandler != null) VimRepeater.Extension.lastExtensionHandler = lastHandler
+    if (lastHandler != null) Extension.lastExtensionHandler = lastHandler
     VimRepeater.repeatHandler = repeatHandler
-    VimRepeater.Extension.reset()
+    Extension.reset()
     VimPlugin.getRegister().selectRegister(reg)
     return true
-  }
-}
-
-object VimRepeater {
-  var repeatHandler = false
-
-  var lastChangeCommand: Command? = null
-    private set
-  var lastChangeRegister = VimPlugin.getRegister().defaultRegister
-    private set
-
-  fun saveLastChange(command: Command) {
-    lastChangeCommand = command
-    lastChangeRegister = VimPlugin.getRegister().currentRegister
-  }
-
-  object Extension {
-    var lastExtensionHandler: VimExtensionHandler? = null
-
-    private val keyStrokes = mutableListOf<KeyStroke>()
-    private val strings = mutableListOf<String>()
-
-    private var keystrokePointer = 0
-    private var stringPointer = 0
-
-    fun addKeystroke(key: KeyStroke) = keyStrokes.add(key)
-    fun addString(key: String) = strings.add(key)
-
-    fun consumeKeystroke(): KeyStroke? {
-      if (keystrokePointer in keyStrokes.indices) {
-        keystrokePointer += 1
-        return keyStrokes[keystrokePointer - 1]
-      }
-      return null
-    }
-
-    fun consumeString(): String? {
-      if (stringPointer in strings.indices) {
-        stringPointer += 1
-        return strings[stringPointer - 1]
-      }
-      return null
-    }
-
-    fun reset() {
-      keystrokePointer = 0
-      stringPointer = 0
-    }
-
-    fun clean() {
-      keyStrokes.clear()
-      strings.clear()
-      keystrokePointer = 0
-      stringPointer = 0
-    }
   }
 }

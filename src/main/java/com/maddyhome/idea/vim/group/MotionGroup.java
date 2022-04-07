@@ -74,6 +74,13 @@ import static java.lang.Math.min;
  */
 public class MotionGroup extends VimMotionGroupBase {
 
+  public @Nullable TextRange getMotionRange(@NotNull VimEditor editor,
+                                            @NotNull VimCaret caret,
+                                            ExecutionContext context,
+                                            @NotNull Argument argument,
+                                            @NotNull OperatorArguments operatorArguments) {
+    return getMotionRange(((IjVimEditor) editor).getEditor(), ((IjVimCaret) caret).getCaret(), ((IjExecutionContext) context).getContext(), argument, operatorArguments);
+  }
   /**
    * This helper method calculates the complete range a motion will move over taking into account whether
    * the motion is FLAG_MOT_LINEWISE or FLAG_MOT_CHARACTERWISE (FLAG_MOT_INCLUSIVE or FLAG_MOT_EXCLUSIVE).
@@ -361,6 +368,10 @@ public class MotionGroup extends VimMotionGroupBase {
   private static int getNormalizedSideScrollOffset(final @NotNull Editor editor) {
     final int sideScrollOffset = ((VimInt) VimPlugin.getOptionService().getOptionValue(new OptionScope.LOCAL(new IjVimEditor(editor)), OptionConstants.sidescrolloffName, OptionConstants.sidescrolloffName)).getValue();
     return normalizeSideScrollOffset(editor, sideScrollOffset);
+  }
+
+  public void moveCaret(@NotNull VimEditor editor, @NotNull VimCaret caret, int offset) {
+    moveCaret(((IjVimEditor) editor).getEditor(), ((IjVimCaret) caret).getCaret(), offset);
   }
 
   public static void moveCaret(@NotNull Editor editor, @NotNull Caret caret, int offset) {
@@ -883,11 +894,11 @@ public class MotionGroup extends VimMotionGroupBase {
     return getLeadingCharacterOffset(((IjVimEditor)editor).getEditor(), line);
   }
 
-  public int moveCaretToLineEnd(@NotNull Editor editor, @NotNull Caret caret) {
-    final VisualPosition visualPosition = caret.getVisualPosition();
-    final int lastVisualLineColumn = EditorUtil.getLastVisualLineColumnNumber(editor, visualPosition.line);
+  public int moveCaretToLineEnd(@NotNull VimEditor editor, @NotNull VimCaret caret) {
+    final VisualPosition visualPosition = ((IjVimCaret) caret).getCaret().getVisualPosition();
+    final int lastVisualLineColumn = EditorUtil.getLastVisualLineColumnNumber(((IjVimEditor) editor).getEditor(), visualPosition.line);
     final VisualPosition visualEndOfLine = new VisualPosition(visualPosition.line, lastVisualLineColumn, true);
-    return moveCaretToLineEnd(new IjVimEditor(editor), editor.visualToLogicalPosition(visualEndOfLine).line, true);
+    return moveCaretToLineEnd(editor, ((IjVimEditor) editor).getEditor().visualToLogicalPosition(visualEndOfLine).line, true);
   }
 
   @Override
@@ -995,23 +1006,23 @@ public class MotionGroup extends VimMotionGroupBase {
     return caretVisualLine == EditorHelper.getVisualLineCount(editor) - 2;
   }
 
-  public @Range(from = 0, to = Integer.MAX_VALUE) int moveCaretToLineWithSameColumn(@NotNull Editor editor,
+  public @Range(from = 0, to = Integer.MAX_VALUE) int moveCaretToLineWithSameColumn(@NotNull VimEditor editor,
                                                                                     int logicalLine,
-                                                                                    @NotNull Caret caret) {
-    int col = UserDataManager.getVimLastColumn(caret);
+                                                                                    @NotNull VimCaret caret) {
+    int col = UserDataManager.getVimLastColumn(((IjVimCaret) caret).getCaret());
     int line = logicalLine;
     if (logicalLine < 0) {
       line = 0;
       col = 0;
     }
-    else if (logicalLine >= getLineCount(editor)) {
-      line = normalizeLine(editor, getLineCount(editor) - 1);
-      col = getLineLength(editor, line);
+    else if (logicalLine >= editor.lineCount()) {
+      line = normalizeLine(((IjVimEditor) editor).getEditor(), editor.lineCount() - 1);
+      col = getLineLength(((IjVimEditor) editor).getEditor(), line);
     }
 
-    LogicalPosition newPos = new LogicalPosition(line, normalizeColumn(editor, line, col, false));
+    LogicalPosition newPos = new LogicalPosition(line, normalizeColumn(((IjVimEditor) editor).getEditor(), line, col, false));
 
-    return editor.logicalPositionToOffset(newPos);
+    return ((IjVimEditor) editor).getEditor().logicalPositionToOffset(newPos);
   }
 
   @Override
@@ -1022,8 +1033,7 @@ public class MotionGroup extends VimMotionGroupBase {
       return moveCaretToLineStartSkipLeading(editor, logicalLine);
     }
     else {
-      return moveCaretToLineWithSameColumn(((IjVimEditor)editor).getEditor(), logicalLine,
-                                           ((IjVimCaret)caret).getCaret());
+      return moveCaretToLineWithSameColumn(editor, logicalLine, caret);
     }
   }
 

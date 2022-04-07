@@ -24,6 +24,8 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.fileSize
+import com.maddyhome.idea.vim.newapi.IjVimCaret
+import com.maddyhome.idea.vim.newapi.IjVimEditor
 import org.jetbrains.annotations.NonNls
 import kotlin.math.min
 
@@ -153,7 +155,7 @@ class Ranges {
       if (range.isMove) {
         MotionGroup.moveCaret(
           editor, editor.caretModel.primaryCaret,
-          VimPlugin.getMotion().moveCaretToLineWithSameColumn(editor, endLine, editor.caretModel.primaryCaret)
+          VimPlugin.getMotion().moveCaretToLineWithSameColumn(IjVimEditor(editor), endLine, IjVimCaret(editor.caretModel.primaryCaret))
         )
       }
       // Did that last range represent the start of the file?
@@ -177,7 +179,7 @@ class Ranges {
       if (range.isMove) MotionGroup.moveCaret(
         editor,
         caret,
-        VimPlugin.getMotion().moveCaretToLineWithSameColumn(editor, endLine, editor.caretModel.primaryCaret)
+        VimPlugin.getMotion().moveCaretToLineWithSameColumn(IjVimEditor(editor), endLine, IjVimCaret(editor.caretModel.primaryCaret))
       )
       lastZero = endLine < 0
       ++count

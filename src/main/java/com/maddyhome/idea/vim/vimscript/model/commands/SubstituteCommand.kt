@@ -22,6 +22,8 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.ranges.Ranges
+import com.maddyhome.idea.vim.newapi.IjVimCaret
+import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
@@ -33,7 +35,7 @@ data class SubstituteCommand(val ranges: Ranges, val argument: String, val comma
     var result = true
     for (caret in editor.caretModel.allCarets) {
       val lineRange = getLineRange(editor, caret)
-      if (!VimPlugin.getSearch().processSubstituteCommand(editor, caret, lineRange, command, argument, this.vimContext)) {
+      if (!VimPlugin.getSearch().processSubstituteCommand(IjVimEditor(editor), IjVimCaret(caret), lineRange, command, argument, this.vimContext)) {
         result = false
       }
     }

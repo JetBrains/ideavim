@@ -37,6 +37,7 @@ import com.maddyhome.idea.vim.helper.vimForEachCaret
 import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.helper.vimLastVisualOperatorRange
 import com.maddyhome.idea.vim.helper.vimSelectionStart
+import com.maddyhome.idea.vim.newapi.IjVimCaret
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 
@@ -64,7 +65,7 @@ class VisualMotionGroup : VimVisualMotionGroupBase() {
 
         editor.ij.vimForEachCaret {
           val range = it.vimLastVisualOperatorRange ?: VisualChange.default(subMode)
-          val end = VisualOperation.calculateRange(editor.ij, range, count, it)
+          val end = VisualOperation.calculateRange(editor, range, count, IjVimCaret(it))
           val lastColumn =
             if (range.columns == VimMotionGroupBase.LAST_COLUMN) VimMotionGroupBase.LAST_COLUMN else editor.offsetToLogicalPosition(
               end

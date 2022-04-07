@@ -19,9 +19,10 @@
 package com.maddyhome.idea.vim.option;
 
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.options.OptionScope;
+import com.maddyhome.idea.vim.options.helpers.KeywordOptionHelper;
 import com.maddyhome.idea.vim.vimscript.model.commands.SetCommand;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
-import com.maddyhome.idea.vim.options.OptionScope;
 import org.apache.commons.lang.math.NumberUtils;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NonNls;
@@ -37,7 +38,7 @@ import java.util.stream.Collectors;
 
 
 /**
- * @deprecated use {@link com.maddyhome.idea.vim.vimscript.model.options.helpers.KeywordOptionHelper} instead
+ * @deprecated use {@link KeywordOptionHelper} instead
  */
 @Deprecated
 @ApiStatus.ScheduledForRemoval(inVersion = "1.11")

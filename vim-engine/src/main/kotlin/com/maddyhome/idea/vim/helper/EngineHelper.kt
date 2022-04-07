@@ -20,6 +20,9 @@ val VimEditor.mode
 val VimEditor.inVisualMode
   get() = this.mode.inVisualMode
 
+val VimEditor.inRepeatMode
+  get() = this.commandState.isDotRepeatInProgress
+
 var VimEditor.subMode
   get() = this.commandState.subMode
   set(value) {

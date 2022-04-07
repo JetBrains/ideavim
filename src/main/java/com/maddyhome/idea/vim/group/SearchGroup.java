@@ -36,6 +36,7 @@ import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.util.Trinity;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.api.VimCaret;
 import com.maddyhome.idea.vim.api.VimEditor;
 import com.maddyhome.idea.vim.api.VimInjectorKt;
 import com.maddyhome.idea.vim.api.VimSearchGroupBase;
@@ -46,6 +47,7 @@ import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.ex.ranges.LineRange;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.history.HistoryConstants;
+import com.maddyhome.idea.vim.newapi.IjVimCaret;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.options.OptionChangeListener;
 import com.maddyhome.idea.vim.options.OptionConstants;
@@ -72,6 +74,7 @@ import java.text.NumberFormat;
 import java.text.ParsePosition;
 import java.util.*;
 
+import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
 import static com.maddyhome.idea.vim.helper.HelperKt.localEditors;
 import static com.maddyhome.idea.vim.helper.SearchHelperKtKt.shouldIgnoreCase;
 import static com.maddyhome.idea.vim.register.RegisterConstants.LAST_SEARCH_REGISTER;
@@ -525,12 +528,12 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
    * @return        True if the substitution succeeds, false on error. Will succeed even if nothing is modified
    */
   @RWLockLabel.SelfSynchronized
-  public boolean processSubstituteCommand(@NotNull Editor editor, @NotNull Caret caret, @NotNull LineRange range,
+  public boolean processSubstituteCommand(@NotNull VimEditor editor, @NotNull VimCaret caret, @NotNull LineRange range,
                                           @NotNull @NonNls String excmd, @NonNls String exarg, @NotNull VimLContext parent) {
     // Explicitly exit visual mode here, so that visual mode marks don't change when we move the cursor to a match.
     List<ExException> exceptions = new ArrayList<>();
-    if (CommandStateHelper.inVisualMode(editor)) {
-      ModeHelper.exitVisualMode(editor);
+    if (CommandStateHelper.inVisualMode(((IjVimEditor) editor).getEditor())) {
+      ModeHelper.exitVisualMode(((IjVimEditor) editor).getEditor());
     }
 
     CharPointer cmd = new CharPointer(new StringBuffer(exarg));
@@ -620,7 +623,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
     }
     else {
       // :h :&& - "Note that :s and :& don't keep the flags"
-      do_all = VimPlugin.getOptionService().isSet(new OptionScope.LOCAL(new IjVimEditor(editor)), OptionConstants.gdefaultName, OptionConstants.gdefaultName);
+      do_all = VimPlugin.getOptionService().isSet(new OptionScope.LOCAL(editor), OptionConstants.gdefaultName, OptionConstants.gdefaultName);
       do_ask = false;
       do_error = true;
       do_ic = 0;
@@ -677,7 +680,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
         return false;
       }
       line1 = line2;
-      line2 = EditorHelper.normalizeLine(editor, line1 + i - 1);
+      line2 = EditorHelper.normalizeLine(((IjVimEditor) editor).getEditor(), line1 + i - 1);
     }
 
     /*
@@ -734,8 +737,8 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
     resetShowSearchHighlight();
     forceUpdateSearchHighlights();
 
-    int start = editor.getDocument().getLineStartOffset(line1);
-    int end = editor.getDocument().getLineEndOffset(line2);
+    int start = ((IjVimEditor) editor).getEditor().getDocument().getLineStartOffset(line1);
+    int end = ((IjVimEditor) editor).getEditor().getDocument().getLineEndOffset(line2);
 
     if (logger.isDebugEnabled()) {
       logger.debug("search range=[" + start + "," + end + "]");
@@ -747,14 +750,14 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
     int searchcol = 0;
     boolean firstMatch = true;
     boolean got_quit = false;
-    int lcount = EditorHelper.getLineCount(editor);
+    int lcount = EditorHelper.getLineCount(((IjVimEditor) editor).getEditor());
     Expression expression = null;
     for (int lnum = line1; lnum <= line2 && !got_quit; ) {
       CharacterPosition newpos = null;
-      int nmatch = sp.vim_regexec_multi(regmatch, editor, lcount, lnum, searchcol);
+      int nmatch = sp.vim_regexec_multi(regmatch, ((IjVimEditor) editor).getEditor(), lcount, lnum, searchcol);
       if (nmatch > 0) {
         if (firstMatch) {
-          VimPlugin.getMark().saveJumpLocation(new IjVimEditor(editor));
+          VimPlugin.getMark().saveJumpLocation(editor);
           firstMatch = false;
         }
 
@@ -774,15 +777,15 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
         int line = lnum + regmatch.startpos[0].lnum;
         CharacterPosition startpos = new CharacterPosition(lnum + regmatch.startpos[0].lnum, regmatch.startpos[0].col);
         CharacterPosition endpos = new CharacterPosition(lnum + regmatch.endpos[0].lnum, regmatch.endpos[0].col);
-        int startoff = startpos.toOffset(editor);
-        int endoff = endpos.toOffset(editor);
+        int startoff = startpos.toOffset(((IjVimEditor) editor).getEditor());
+        int endoff = endpos.toOffset(((IjVimEditor) editor).getEditor());
 
         if (do_all || line != lastLine) {
           boolean doReplace = true;
           if (do_ask) {
-            RangeHighlighter hl = SearchHighlightsHelper.addSubstitutionConfirmationHighlight(editor, startoff, endoff);
-            final ReplaceConfirmationChoice choice = confirmChoice(editor, match, caret, startoff);
-            editor.getMarkupModel().removeHighlighter(hl);
+            RangeHighlighter hl = SearchHighlightsHelper.addSubstitutionConfirmationHighlight(((IjVimEditor) editor).getEditor(), startoff, endoff);
+            final ReplaceConfirmationChoice choice = confirmChoice(((IjVimEditor) editor).getEditor(), match, ((IjVimCaret) caret).getCaret(), startoff);
+            ((IjVimEditor) editor).getEditor().getMarkupModel().removeHighlighter(hl);
             switch (choice) {
               case SUBSTITUTE_THIS:
                 doReplace = true;
@@ -805,12 +808,12 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
             }
           }
           if (doReplace) {
-            SubmatchFunctionHandler.INSTANCE.setLatestMatch(editor.getDocument().getText(new com.intellij.openapi.util.TextRange(startoff, endoff)));
-            MotionGroup.moveCaret(editor, caret, startoff);
+            SubmatchFunctionHandler.INSTANCE.setLatestMatch(((IjVimEditor) editor).getEditor().getDocument().getText(new com.intellij.openapi.util.TextRange(startoff, endoff)));
+            injector.getMotion().moveCaret(editor, caret, startoff);
             if (expression != null) {
               try {
               match = expression
-                .evaluate(editor, EditorDataContext.init(editor, null), parent)
+                .evaluate(((IjVimEditor) editor).getEditor(), EditorDataContext.init(((IjVimEditor) editor).getEditor(), null), parent)
                 .toInsertableString();
               } catch (Exception e) {
                 exceptions.add((ExException) e);
@@ -819,11 +822,11 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
             }
 
             String finalMatch = match;
-            ApplicationManager.getApplication().runWriteAction(() -> editor.getDocument().replaceString(startoff, endoff,
+            ApplicationManager.getApplication().runWriteAction(() -> ((IjVimEditor) editor).getEditor().getDocument().replaceString(startoff, endoff,
                                                                                                         finalMatch));
             lastMatch = startoff;
             int newend = startoff + match.length();
-            newpos = CharacterPosition.Companion.fromOffset(editor, newend);
+            newpos = CharacterPosition.Companion.fromOffset(((IjVimEditor) editor).getEditor(), newend);
 
             lnum += newpos.line - endpos.line;
             line2 += newpos.line - endpos.line;
@@ -855,8 +858,8 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
 
     if (!got_quit) {
       if (lastMatch != -1) {
-        MotionGroup.moveCaret(editor, caret,
-          VimPlugin.getMotion().moveCaretToLineStartSkipLeading(new IjVimEditor(editor), editor.offsetToLogicalPosition(lastMatch).line));
+        injector.getMotion().moveCaret(editor, caret,
+          VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, editor.offsetToLogicalPosition(lastMatch).getLine()));
       }
       else {
         VimPlugin.showMessage(MessageHelper.message(Msg.e_patnotf2, pattern));

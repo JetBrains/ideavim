@@ -29,6 +29,8 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.CommandLineHelper
+import com.maddyhome.idea.vim.newapi.IjExecutionContext
+import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.vimscript.model.Script
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
@@ -47,12 +49,12 @@ class InsertRegisterAction : VimActionHandler.SingleExecution() {
           val expression = readExpression(editor.ij)
           if (expression != null) {
             if (expression.isNotEmpty()) {
-              val expressionValue = VimscriptParser.parseExpression(expression)?.evaluate(editor.ij, context.ij, Script(listOf()))
+              val expressionValue = VimscriptParser.parseExpression(expression)?.evaluate((editor as IjVimEditor).editor, (context as IjExecutionContext).context, Script(listOf()))
                 ?: throw ExException("E15: Invalid expression: $expression")
               val textToStore = expressionValue.toInsertableString()
               VimPlugin.getRegister().storeTextSpecial('=', textToStore)
             }
-            VimPlugin.getChange().insertRegister(editor.ij, context.ij, argument.character)
+            VimPlugin.getChange().insertRegister(editor, context, argument.character)
           }
         } catch (e: ExException) {
           VimPlugin.indicateError()
@@ -61,7 +63,7 @@ class InsertRegisterAction : VimActionHandler.SingleExecution() {
       }
       return true
     } else {
-      return argument != null && VimPlugin.getChange().insertRegister(editor.ij, context.ij, argument.character)
+      return argument != null && VimPlugin.getChange().insertRegister(editor, context, argument.character)
     }
   }
 

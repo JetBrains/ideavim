@@ -25,6 +25,8 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.group.MotionGroup
+import com.maddyhome.idea.vim.newapi.IjVimCaret
+import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.vimscript.Executor
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
@@ -46,7 +48,7 @@ data class RepeatCommand(val ranges: Ranges, val argument: String) : Command.For
     MotionGroup.moveCaret(
       editor,
       caret,
-      VimPlugin.getMotion().moveCaretToLineWithSameColumn(editor, line, editor.caretModel.primaryCaret)
+      VimPlugin.getMotion().moveCaretToLineWithSameColumn(IjVimEditor(editor), line, IjVimCaret(editor.caretModel.primaryCaret))
     )
 
     if (arg == ':') {

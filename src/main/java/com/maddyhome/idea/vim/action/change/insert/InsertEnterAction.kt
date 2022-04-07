@@ -26,7 +26,6 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
-import com.maddyhome.idea.vim.helper.getTopLevelEditor
 import com.maddyhome.idea.vim.newapi.ij
 import java.util.*
 
@@ -36,7 +35,7 @@ class InsertEnterAction : VimActionHandler.SingleExecution() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_STROKE)
 
   override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
-    VimPlugin.getChange().processEnter(editor.ij.getTopLevelEditor(), context.ij)
+    VimPlugin.getChange().processEnter(editor, context)
     MotionGroup.scrollCaretIntoView(editor.ij)
     return true
   }
