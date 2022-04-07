@@ -18,10 +18,10 @@
 
 package com.maddyhome.idea.vim.action.change.shift
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
@@ -33,7 +33,7 @@ import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
-class ShiftRightLinesAction : ChangeEditorActionHandler.ForEachCaret() {
+class ShiftLeftLinesAction : ChangeEditorActionHandler.ForEachCaret() {
 
   override val type: Command.Type = Command.Type.INSERT
 
@@ -46,18 +46,18 @@ class ShiftRightLinesAction : ChangeEditorActionHandler.ForEachCaret() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    VimPlugin.getChange().indentLines(editor, caret, context, operatorArguments.count1, 1)
+    injector.changeGroup.indentLines(editor, caret, context, operatorArguments.count1, -1)
 
     return true
   }
 }
 
-class ShiftRightMotionAction : ChangeEditorActionHandler.ForEachCaret(), DuplicableOperatorAction {
+class ShiftLeftMotionAction : ChangeEditorActionHandler.ForEachCaret(), DuplicableOperatorAction {
   override val type: Command.Type = Command.Type.CHANGE
 
   override val argumentType: Argument.Type = Argument.Type.MOTION
 
-  override val duplicateWith: Char = '>'
+  override val duplicateWith: Char = '<'
 
   override fun execute(
     editor: VimEditor,
@@ -68,12 +68,12 @@ class ShiftRightMotionAction : ChangeEditorActionHandler.ForEachCaret(), Duplica
   ): Boolean {
     argument ?: return false
 
-    VimPlugin.getChange().indentMotion(editor, caret, context, argument, 1, operatorArguments)
+    injector.changeGroup.indentMotion(editor, caret, context, argument, -1, operatorArguments)
     return true
   }
 }
 
-class ShiftRightVisualAction : VisualOperatorActionHandler.ForEachCaret() {
+class ShiftLeftVisualAction : VisualOperatorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.CHANGE
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_EXIT_VISUAL)
@@ -86,7 +86,7 @@ class ShiftRightVisualAction : VisualOperatorActionHandler.ForEachCaret() {
     range: VimSelection,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    VimPlugin.getChange().indentRange(editor, caret, context, range.toVimTextRange(false), cmd.count, 1)
+    injector.changeGroup.indentRange(editor, caret, context, range.toVimTextRange(false), cmd.count, -1)
     return true
   }
 }

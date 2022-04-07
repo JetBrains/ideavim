@@ -17,10 +17,10 @@
  */
 package com.maddyhome.idea.vim.action.change.shift
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.DuplicableOperatorAction
@@ -47,7 +47,7 @@ class AutoIndentMotionAction : ChangeEditorActionHandler.ForEachCaret(), Duplica
     if (argument == null) {
       return false
     }
-    VimPlugin.getChange().autoIndentMotion(editor, caret, context, argument, operatorArguments)
+    injector.changeGroup.autoIndentMotion(editor, caret, context, argument, operatorArguments)
     return true
   }
 }
