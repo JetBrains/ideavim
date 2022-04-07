@@ -19,6 +19,7 @@
 package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.EditorLine
 import com.maddyhome.idea.vim.common.Offset
@@ -199,6 +200,7 @@ interface VimEditor {
 
   fun visualPositionToOffset(position: VimVisualPosition): Offset
 
+  fun exitInsertMode(context: ExecutionContext, operatorArguments: OperatorArguments)
   fun exitSelectModeNative(adjustCaret: Boolean)
   fun exitVisualModeNative()
 

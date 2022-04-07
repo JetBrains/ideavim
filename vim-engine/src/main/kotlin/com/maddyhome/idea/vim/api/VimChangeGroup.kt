@@ -54,6 +54,8 @@ interface VimChangeGroup {
 
   fun insertDeletePreviousWord(editor: VimEditor, caret: VimCaret): Boolean
 
+  fun insertLineAround(editor: VimEditor, context: ExecutionContext, shift: Int)
+
   fun initInsert(editor: VimEditor, context: ExecutionContext, mode: CommandState.Mode)
 
   fun editorCreated(editor: VimEditor?)

@@ -26,6 +26,7 @@ import com.intellij.openapi.editor.VisualPosition
 import com.intellij.openapi.editor.event.CaretEvent
 import com.intellij.openapi.editor.event.CaretListener
 import com.intellij.openapi.vfs.VirtualFileManager
+import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.LineDeleteShift
 import com.maddyhome.idea.vim.api.MutableLinearEditor
 import com.maddyhome.idea.vim.api.VimCaret
@@ -34,6 +35,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimLogicalPosition
 import com.maddyhome.idea.vim.api.VimVisualPosition
 import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.EditorLine
 import com.maddyhome.idea.vim.common.Offset
@@ -42,6 +44,7 @@ import com.maddyhome.idea.vim.common.VimScrollType
 import com.maddyhome.idea.vim.common.offset
 import com.maddyhome.idea.vim.group.visual.vimSetSystemBlockSelectionSilently
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.exitInsertMode
 import com.maddyhome.idea.vim.helper.exitSelectMode
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.fileSize
@@ -299,6 +302,10 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
 
   override fun visualPositionToOffset(position: VimVisualPosition): Offset {
     return editor.visualPositionToOffset(VisualPosition(position.line, position.column, position.leansRight)).offset
+  }
+
+  override fun exitInsertMode(context: ExecutionContext, operatorArguments: OperatorArguments) {
+    editor.exitInsertMode(context.ij, operatorArguments)
   }
 
   override fun exitSelectModeNative(adjustCaret: Boolean) {

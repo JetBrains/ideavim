@@ -17,31 +17,27 @@
  */
 package com.maddyhome.idea.vim.action.change.insert
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
-import com.maddyhome.idea.vim.helper.enumSetOf
-import org.jetbrains.annotations.Contract
-import java.util.*
 
-class InsertBeforeCursorAction : ChangeEditorActionHandler.SingleExecution() {
-  @get:Contract(pure = true)
+class InsertCharacterAboveCursorAction : ChangeEditorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.INSERT
-
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MULTIKEY_UNDO)
 
   override fun execute(
     editor: VimEditor,
+    caret: VimCaret,
     context: ExecutionContext,
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    VimPlugin.getChange().insertBeforeCursor(editor, context)
-    return true
+    return if (editor.isOneLineMode()) {
+      false
+    } else injector.changeGroup.insertCharacterAroundCursor(editor, caret, -1)
   }
 }

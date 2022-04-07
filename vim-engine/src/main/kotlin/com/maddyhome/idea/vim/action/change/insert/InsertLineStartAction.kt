@@ -17,42 +17,29 @@
  */
 package com.maddyhome.idea.vim.action.change.insert
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.command.SelectionType
-import com.maddyhome.idea.vim.group.visual.VimSelection
-import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
+import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
-import com.maddyhome.idea.vim.newapi.IjVimEditor
 import java.util.*
 
-/**
- * @author vlan
- */
-class VisualBlockAppendAction : VisualOperatorActionHandler.SingleExecution() {
+class InsertLineStartAction : ChangeEditorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.INSERT
 
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MULTIKEY_UNDO, CommandFlags.FLAG_EXIT_VISUAL)
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MULTIKEY_UNDO)
 
-  override fun executeForAllCarets(
+  override fun execute(
     editor: VimEditor,
     context: ExecutionContext,
-    cmd: Command,
-    caretsAndSelections: Map<VimCaret, VimSelection>,
+    argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    if ((editor as IjVimEditor).editor.isOneLineMode) return false
-    val range = caretsAndSelections.values.stream().findFirst().orElse(null) ?: return false
-    return if (range.type == SelectionType.BLOCK_WISE) {
-      VimPlugin.getChange().blockInsert(editor, context, range.toVimTextRange(false), true, operatorArguments)
-    } else {
-      VimPlugin.getChange().insertAfterLineEnd(editor, context)
-      true
-    }
+    injector.changeGroup.insertLineStart(editor, context)
+    return true
   }
 }

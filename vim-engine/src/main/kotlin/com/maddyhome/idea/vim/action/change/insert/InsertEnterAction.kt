@@ -17,42 +17,24 @@
  */
 package com.maddyhome.idea.vim.action.change.insert
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.command.SelectionType
-import com.maddyhome.idea.vim.group.visual.VimSelection
-import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
+import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
-import com.maddyhome.idea.vim.newapi.IjVimEditor
 import java.util.*
 
-/**
- * @author vlan
- */
-class VisualBlockInsertAction : VisualOperatorActionHandler.SingleExecution() {
+class InsertEnterAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.INSERT
 
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MULTIKEY_UNDO, CommandFlags.FLAG_EXIT_VISUAL)
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_STROKE)
 
-  override fun executeForAllCarets(
-    editor: VimEditor,
-    context: ExecutionContext,
-    cmd: Command,
-    caretsAndSelections: Map<VimCaret, VimSelection>,
-    operatorArguments: OperatorArguments,
-  ): Boolean {
-    if ((editor as IjVimEditor).editor.isOneLineMode) return false
-    val vimSelection = caretsAndSelections.values.stream().findFirst().orElse(null) ?: return false
-    return if (vimSelection.type == SelectionType.BLOCK_WISE) {
-      VimPlugin.getChange().blockInsert(editor, context, vimSelection.toVimTextRange(false), false, operatorArguments)
-    } else {
-      VimPlugin.getChange().insertBeforeFirstNonBlank(editor, context)
-      true
-    }
+  override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
+    injector.changeGroup.processEnter(editor, context)
+    injector.motion.scrollCaretIntoView(editor)
+    return true
   }
 }

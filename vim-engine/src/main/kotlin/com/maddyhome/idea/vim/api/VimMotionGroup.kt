@@ -38,6 +38,7 @@ interface VimMotionGroup {
     linesOffset: Int,
   ): Int
 
+  fun scrollCaretIntoView(editor: VimEditor)
   fun scrollFullPageDown(editor: VimEditor, caret: VimCaret, pages: Int): Boolean
   fun scrollFullPageUp(editor: VimEditor, caret: VimCaret, pages: Int): Boolean
   fun scrollFullPage(editor: VimEditor, caret: VimCaret, pages: Int): Boolean

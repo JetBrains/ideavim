@@ -17,10 +17,9 @@
  */
 package com.maddyhome.idea.vim.action.change.insert
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
@@ -29,18 +28,18 @@ import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
-class InsertDeletePreviousWordAction : ChangeEditorActionHandler.ForEachCaret() {
+class InsertAfterCursorAction : ChangeEditorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.INSERT
 
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_CLEAR_STROKES)
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MULTIKEY_UNDO)
 
   override fun execute(
     editor: VimEditor,
-    caret: VimCaret,
     context: ExecutionContext,
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    return VimPlugin.getChange().insertDeletePreviousWord(editor, caret)
+    injector.changeGroup.insertAfterCursor(editor, context)
+    return true
   }
 }

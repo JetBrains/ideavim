@@ -558,6 +558,11 @@ public class MotionGroup extends VimMotionGroupBase {
     return true;
   }
 
+  @Override
+  public void scrollCaretIntoView(@NotNull VimEditor editor) {
+    scrollCaretIntoView(((IjVimEditor) editor).getEditor());
+  }
+
   public static void scrollCaretIntoView(@NotNull Editor editor) {
     final VisualPosition position = editor.getCaretModel().getVisualPosition();
     scrollCaretIntoViewVertically(editor, position.line);

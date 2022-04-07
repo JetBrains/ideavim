@@ -1318,6 +1318,11 @@ public class ChangeGroup extends VimChangeGroupBase {
   }
 
   @Override
+  public void insertLineAround(@NotNull VimEditor editor, @NotNull ExecutionContext context, int shift) {
+    com.maddyhome.idea.vim.newapi.ChangeGroupKt.insertLineAround(editor, context, shift);
+  }
+
+  @Override
   public boolean deleteRange2(@NotNull VimEditor editor,
                               @NotNull VimCaret caret,
                               @NotNull TextRange range,

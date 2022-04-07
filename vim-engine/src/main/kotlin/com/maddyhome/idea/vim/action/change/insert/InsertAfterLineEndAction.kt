@@ -17,20 +17,18 @@
  */
 package com.maddyhome.idea.vim.action.change.insert
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
-import com.maddyhome.idea.vim.newapi.IjVimEditor
-import com.maddyhome.idea.vim.newapi.insertLineAround
 import java.util.*
 
-class InsertNewLineBelowAction : ChangeEditorActionHandler.SingleExecution() {
+class InsertAfterLineEndAction : ChangeEditorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.INSERT
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MULTIKEY_UNDO)
@@ -41,37 +39,7 @@ class InsertNewLineBelowAction : ChangeEditorActionHandler.SingleExecution() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    if ((editor as IjVimEditor).editor.isOneLineMode) return false
-//    if (experimentalApi()) {
-    @Suppress("ConstantConditionIf")
-    if (false) {
-      insertLineAround(editor, context, 1)
-    } else {
-      VimPlugin.getChange().insertNewLineBelow(editor, context)
-    }
-    return true
-  }
-}
-
-class InsertNewLineAboveAction : ChangeEditorActionHandler.SingleExecution() {
-  override val type: Command.Type = Command.Type.INSERT
-
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MULTIKEY_UNDO)
-
-  override fun execute(
-    editor: VimEditor,
-    context: ExecutionContext,
-    argument: Argument?,
-    operatorArguments: OperatorArguments,
-  ): Boolean {
-    if ((editor as IjVimEditor).editor.isOneLineMode) return false
-//    if (experimentalApi()) {
-    @Suppress("ConstantConditionIf")
-    if (false) {
-      insertLineAround(editor, context, 0)
-    } else {
-      VimPlugin.getChange().insertNewLineAbove(editor, context)
-    }
+    injector.changeGroup.insertAfterLineEnd(editor, context)
     return true
   }
 }
