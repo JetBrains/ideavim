@@ -170,7 +170,7 @@ tasks {
     runPluginVerifier {
         downloadDir.set("${project.buildDir}/pluginVerifier/ides")
         teamCityOutputFormat.set(true)
-        ideVersions.set(listOf("IC-2021.3.1"))
+        ideVersions.set(listOf("IC-2021.3.4"))
     }
 
     generateGrammarSource {
