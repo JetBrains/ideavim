@@ -33,6 +33,7 @@ usual beta standards.
 ### Merged PRs:
 * [468](https://github.com/JetBrains/ideavim/pull/468) by [Thomas Schouten](https://github.com/PHPirates): Implement UserDataHolder for EditorDataContext
 * [483](https://github.com/JetBrains/ideavim/pull/483) by [Simon Rainer](https://github.com/Vvalter): Fix(VIM-2553): Substitute consecutive matches
+* [488](https://github.com/JetBrains/ideavim/pull/488) by [Martin Yzeiri](https://github.com/myzeiri): Add Matchit support for the C family of languages
 
 ## 1.10.0, 2022-02-17
 
