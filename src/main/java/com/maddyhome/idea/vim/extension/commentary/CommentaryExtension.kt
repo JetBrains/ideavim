@@ -15,157 +15,141 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.maddyhome.idea.vim.extension.commentary
 
-package com.maddyhome.idea.vim.extension.commentary;
-
-import com.intellij.codeInsight.actions.MultiCaretCodeInsightActionHandler;
-import com.intellij.codeInsight.generation.CommentByBlockCommentHandler;
-import com.intellij.codeInsight.generation.CommentByLineCommentHandler;
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.application.WriteAction;
-import com.intellij.openapi.editor.Caret;
-import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiDocumentManager;
-import com.intellij.psi.PsiFile;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.CommandState;
-import com.maddyhome.idea.vim.command.SelectionType;
-import com.maddyhome.idea.vim.common.MappingMode;
-import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.extension.VimExtension;
-import com.maddyhome.idea.vim.extension.VimExtensionHandler;
-import com.maddyhome.idea.vim.key.OperatorFunction;
-import com.maddyhome.idea.vim.newapi.IjVimEditor;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import static com.maddyhome.idea.vim.extension.VimExtensionFacade.*;
-import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
+import com.intellij.codeInsight.generation.CommentByBlockCommentHandler
+import com.intellij.codeInsight.generation.CommentByLineCommentHandler
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.application.WriteAction
+import com.intellij.openapi.editor.Editor
+import com.intellij.psi.PsiDocumentManager
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.CommandState.Companion.getInstance
+import com.maddyhome.idea.vim.command.SelectionType
+import com.maddyhome.idea.vim.common.MappingMode
+import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.extension.VimExtension
+import com.maddyhome.idea.vim.extension.VimExtensionFacade.executeNormalWithoutMapping
+import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping
+import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
+import com.maddyhome.idea.vim.extension.VimExtensionFacade.setOperatorFunction
+import com.maddyhome.idea.vim.extension.VimExtensionHandler
+import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.key.OperatorFunction
+import com.maddyhome.idea.vim.newapi.IjVimEditor
 
 /**
  * @author dhleong
  */
-public class CommentaryExtension implements VimExtension {
-
-  @Override
-  public @NotNull String getName() {
-    return "commentary";
+class CommentaryExtension : VimExtension {
+  override fun getName(): String {
+    return "commentary"
   }
 
-  @Override
-  public void init() {
-    putExtensionHandlerMapping(MappingMode.N, parseKeys("<Plug>(CommentMotion)"), getOwner(),
-                               new CommentMotionHandler(), false);
-    putExtensionHandlerMapping(MappingMode.N, parseKeys("<Plug>(CommentLine)"), getOwner(), new CommentLineHandler(),
-                               false);
-    putExtensionHandlerMapping(MappingMode.XO, parseKeys("<Plug>(CommentMotionV)"), getOwner(),
-                               new CommentMotionVHandler(), false);
-
-    putKeyMappingIfMissing(MappingMode.N, parseKeys("gc"), getOwner(), parseKeys("<Plug>(CommentMotion)"), true);
-    putKeyMappingIfMissing(MappingMode.N, parseKeys("gcc"), getOwner(), parseKeys("<Plug>(CommentLine)"), true);
-    putKeyMappingIfMissing(MappingMode.XO, parseKeys("gc"), getOwner(), parseKeys("<Plug>(CommentMotionV)"), true);
+  override fun init() {
+    putExtensionHandlerMapping(
+      MappingMode.N, parseKeys("<Plug>(CommentMotion)"), owner,
+      CommentMotionHandler(), false
+    )
+    putExtensionHandlerMapping(
+      MappingMode.N, parseKeys("<Plug>(CommentLine)"), owner, CommentLineHandler(),
+      false
+    )
+    putExtensionHandlerMapping(
+      MappingMode.XO, parseKeys("<Plug>(CommentMotionV)"), owner,
+      CommentMotionVHandler(), false
+    )
+    putKeyMappingIfMissing(MappingMode.N, parseKeys("gc"), owner, parseKeys("<Plug>(CommentMotion)"), true)
+    putKeyMappingIfMissing(MappingMode.N, parseKeys("gcc"), owner, parseKeys("<Plug>(CommentLine)"), true)
+    putKeyMappingIfMissing(MappingMode.XO, parseKeys("gc"), owner, parseKeys("<Plug>(CommentMotionV)"), true)
   }
 
-  private static class CommentMotionHandler implements VimExtensionHandler {
-    @Override
-    public boolean isRepeatable() {
-      return true;
+  private class CommentMotionHandler : VimExtensionHandler {
+    override fun isRepeatable(): Boolean {
+      return true
     }
 
-    @Override
-    public void execute(@NotNull Editor editor, @NotNull DataContext context) {
-      setOperatorFunction(new Operator());
-      executeNormalWithoutMapping(parseKeys("g@"), editor);
+    override fun execute(editor: Editor, context: DataContext) {
+      setOperatorFunction(Operator())
+      executeNormalWithoutMapping(parseKeys("g@"), editor)
     }
   }
 
-  private static class CommentMotionVHandler implements VimExtensionHandler {
-    @Override
-    public void execute(@NotNull Editor editor, @NotNull DataContext context) {
-      if (!editor.getCaretModel().getPrimaryCaret().hasSelection()) {
-        return;
+  private class CommentMotionVHandler : VimExtensionHandler {
+    override fun execute(editor: Editor, context: DataContext) {
+      if (!editor.caretModel.primaryCaret.hasSelection()) {
+        return
       }
 
       // always use line-wise comments
-      if (!new Operator().apply(editor, context, SelectionType.LINE_WISE)) {
-        return;
+      if (!Operator().apply(editor, context, SelectionType.LINE_WISE)) {
+        return
       }
+      WriteAction.run<RuntimeException> {
 
-      WriteAction.run(() -> {
         // Leave visual mode
-        executeNormalWithoutMapping(parseKeys("<Esc>"), editor);
-        editor.getCaretModel().moveToOffset(editor.getCaretModel().getPrimaryCaret().getSelectionStart());
-      });
+        executeNormalWithoutMapping(parseKeys("<Esc>"), editor)
+        editor.caretModel.moveToOffset(editor.caretModel.primaryCaret.selectionStart)
+      }
     }
   }
 
-  private static class Operator implements OperatorFunction {
-    @Override
-    public boolean apply(@NotNull Editor editor, @NotNull DataContext context, @NotNull SelectionType selectionType) {
-      final TextRange range = getCommentRange(editor);
-      if (range == null) return false;
-
-      if (CommandState.getInstance(new IjVimEditor(editor)).getMode() != CommandState.Mode.VISUAL) {
-        editor.getSelectionModel().setSelection(range.getStartOffset(), range.getEndOffset());
+  private class Operator : OperatorFunction {
+    override fun apply(editor: Editor, context: DataContext, selectionType: SelectionType): Boolean {
+      val range = getCommentRange(editor) ?: return false
+      if (getInstance(IjVimEditor(editor)).mode !== CommandState.Mode.VISUAL) {
+        editor.selectionModel.setSelection(range.startOffset, range.endOffset)
       }
-
-      final MultiCaretCodeInsightActionHandler handler = selectionType == SelectionType.CHARACTER_WISE
-                                                         ? new CommentByBlockCommentHandler()
-                                                         : new CommentByLineCommentHandler();
-
-      return WriteAction.compute(() -> {
+      val handler =
+        if (selectionType === SelectionType.CHARACTER_WISE) CommentByBlockCommentHandler() else CommentByLineCommentHandler()
+      return WriteAction.compute<Boolean, RuntimeException> {
         try {
-          Project proj = editor.getProject();
-          if (proj == null) return false;
-
-          PsiFile file = PsiDocumentManager.getInstance(proj).getPsiFile(editor.getDocument());
-          if (file == null) return false;
-
-          handler.invoke(editor.getProject(), editor, editor.getCaretModel().getCurrentCaret(), file);
-          handler.postInvoke();
+          val proj = editor.project ?: return@compute false
+          val file = PsiDocumentManager.getInstance(proj).getPsiFile(editor.document) ?: return@compute false
+          handler.invoke(editor.project!!, editor, editor.caretModel.currentCaret, file)
+          handler.postInvoke()
 
           // Jump back to start if in block mode
-          if (selectionType == SelectionType.CHARACTER_WISE) {
-            executeNormalWithoutMapping(parseKeys("`["), editor);
+          if (selectionType === SelectionType.CHARACTER_WISE) {
+            executeNormalWithoutMapping(parseKeys("`["), editor)
           }
-          return true;
-        }
-        finally {
+          return@compute true
+        } finally {
           // remove the selection
-          editor.getSelectionModel().removeSelection();
+          editor.selectionModel.removeSelection()
         }
-      });
+      }
     }
 
-    private @Nullable TextRange getCommentRange(@NotNull Editor editor) {
-      final CommandState.Mode mode = CommandState.getInstance(new IjVimEditor(editor)).getMode();
-      switch (mode) {
-        case COMMAND:
-          return VimPlugin.getMark().getChangeMarks(new IjVimEditor(editor));
-        case VISUAL:
-          Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
-          return new TextRange(primaryCaret.getSelectionStart(), primaryCaret.getSelectionEnd());
-        default:
-          return null;
+    private fun getCommentRange(editor: Editor): TextRange? {
+      val mode = getInstance(IjVimEditor(editor)).mode
+      return when (mode) {
+        CommandState.Mode.COMMAND -> VimPlugin.getMark()
+          .getChangeMarks(IjVimEditor(editor))
+
+        CommandState.Mode.VISUAL -> {
+          val primaryCaret = editor.caretModel.primaryCaret
+          TextRange(primaryCaret.selectionStart, primaryCaret.selectionEnd)
+        }
+
+        else -> null
       }
     }
   }
 
-  private static class CommentLineHandler implements VimExtensionHandler {
-    @Override
-    public boolean isRepeatable() {
-      return true;
+  private class CommentLineHandler : VimExtensionHandler {
+    override fun isRepeatable(): Boolean {
+      return true
     }
 
-    @Override
-    public void execute(@NotNull Editor editor, @NotNull DataContext context) {
-      final int offset = editor.getCaretModel().getOffset();
-      final int line = editor.getDocument().getLineNumber(offset);
-      final int lineStart = editor.getDocument().getLineStartOffset(line);
-      final int lineEnd = editor.getDocument().getLineEndOffset(line);
-      VimPlugin.getMark().setChangeMarks(new IjVimEditor(editor), new TextRange(lineStart, lineEnd));
-      new Operator().apply(editor, context, SelectionType.LINE_WISE);
+    override fun execute(editor: Editor, context: DataContext) {
+      val offset = editor.caretModel.offset
+      val line = editor.document.getLineNumber(offset)
+      val lineStart = editor.document.getLineStartOffset(line)
+      val lineEnd = editor.document.getLineEndOffset(line)
+      VimPlugin.getMark().setChangeMarks(IjVimEditor(editor), TextRange(lineStart, lineEnd))
+      Operator().apply(editor, context, SelectionType.LINE_WISE)
     }
   }
 }
