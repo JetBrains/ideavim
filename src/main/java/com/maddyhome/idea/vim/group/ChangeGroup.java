@@ -1655,7 +1655,7 @@ public class ChangeGroup extends VimChangeGroupBase {
   }
 
   private void restoreCursor(@NotNull VimEditor editor, @NotNull VimCaret caret, int startLine) {
-    if (caret != ((IjVimEditor) editor).getEditor().getCaretModel().getPrimaryCaret()) {
+    if (!caret.equals(editor.primaryCaret())) {
       ((IjVimEditor) editor).getEditor().getCaretModel().addCaret(
         ((IjVimEditor) editor).getEditor().offsetToVisualPosition(VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, startLine)), false);
     }
