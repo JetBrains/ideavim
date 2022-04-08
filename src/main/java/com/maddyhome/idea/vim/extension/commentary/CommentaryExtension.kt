@@ -43,12 +43,13 @@ class CommentaryExtension : VimExtension {
   override fun getName() = "commentary"
 
   override fun init() {
-    putExtensionHandlerMapping(MappingMode.N, parseKeys("<Plug>(CommentMotion)"), owner, CommentMotionHandler(), false)
-    putExtensionHandlerMapping(MappingMode.N, parseKeys("<Plug>(CommentLine)"), owner, CommentLineHandler(), false)
-    putExtensionHandlerMapping(MappingMode.XO, parseKeys("<Plug>(CommentMotionV)"), owner, CommentMotionVHandler(), false)
-    putKeyMappingIfMissing(MappingMode.N, parseKeys("gc"), owner, parseKeys("<Plug>(CommentMotion)"), true)
-    putKeyMappingIfMissing(MappingMode.N, parseKeys("gcc"), owner, parseKeys("<Plug>(CommentLine)"), true)
-    putKeyMappingIfMissing(MappingMode.XO, parseKeys("gc"), owner, parseKeys("<Plug>(CommentMotionV)"), true)
+    putExtensionHandlerMapping(MappingMode.N, parseKeys("<Plug>Commentary"), owner, CommentMotionHandler(), false)
+    putExtensionHandlerMapping(MappingMode.XO, parseKeys("<Plug>Commentary"), owner, CommentMotionVHandler(), false)
+    putExtensionHandlerMapping(MappingMode.N, parseKeys("<Plug>CommentaryLine"), owner, CommentLineHandler(), false)
+
+    putKeyMappingIfMissing(MappingMode.N, parseKeys("gc"), owner, parseKeys("<Plug>Commentary"), true)
+    putKeyMappingIfMissing(MappingMode.XO, parseKeys("gc"), owner, parseKeys("<Plug>Commentary"), true)
+    putKeyMappingIfMissing(MappingMode.N, parseKeys("gcc"), owner, parseKeys("<Plug>CommentaryLine"), true)
   }
 
   private class CommentMotionHandler : VimExtensionHandler {
