@@ -20,7 +20,7 @@ package com.maddyhome.idea.vim.extension.commentary
 import com.intellij.codeInsight.generation.CommentByBlockCommentHandler
 import com.intellij.codeInsight.generation.CommentByLineCommentHandler
 import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.application.WriteAction
+import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.editor.Editor
 import com.intellij.psi.PsiDocumentManager
 import com.maddyhome.idea.vim.VimPlugin
@@ -84,7 +84,7 @@ class CommentaryExtension : VimExtension {
         return
       }
 
-      WriteAction.run<RuntimeException> {
+      runWriteAction {
         // Leave visual mode
         executeNormalWithoutMapping(parseKeys("<Esc>"), editor)
         editor.caretModel.moveToOffset(editor.caretModel.primaryCaret.selectionStart)
@@ -95,15 +95,18 @@ class CommentaryExtension : VimExtension {
   private class Operator : OperatorFunction {
     override fun apply(editor: Editor, context: DataContext, selectionType: SelectionType): Boolean {
       val range = getCommentRange(editor) ?: return false
+
       if (getInstance(IjVimEditor(editor)).mode !== CommandState.Mode.VISUAL) {
         editor.selectionModel.setSelection(range.startOffset, range.endOffset)
       }
+
       val handler =
         if (selectionType === SelectionType.CHARACTER_WISE) CommentByBlockCommentHandler() else CommentByLineCommentHandler()
-      return WriteAction.compute<Boolean, RuntimeException> {
+
+      return runWriteAction {
         try {
-          val proj = editor.project ?: return@compute false
-          val file = PsiDocumentManager.getInstance(proj).getPsiFile(editor.document) ?: return@compute false
+          val proj = editor.project ?: return@runWriteAction false
+          val file = PsiDocumentManager.getInstance(proj).getPsiFile(editor.document) ?: return@runWriteAction false
           handler.invoke(editor.project!!, editor, editor.caretModel.currentCaret, file)
           handler.postInvoke()
 
@@ -111,7 +114,7 @@ class CommentaryExtension : VimExtension {
           if (selectionType === SelectionType.CHARACTER_WISE) {
             executeNormalWithoutMapping(parseKeys("`["), editor)
           }
-          return@compute true
+          return@runWriteAction true
         } finally {
           // remove the selection
           editor.selectionModel.removeSelection()
