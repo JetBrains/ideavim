@@ -24,9 +24,6 @@ import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.JavaVimTestCase
 import org.jetbrains.plugins.ideavim.VimTestCase.Companion.c
 
-/**
- * @author dhleong
- */
 class CommentaryExtensionTest : JavaVimTestCase() {
   override fun setUp() {
     super.setUp()
@@ -259,6 +256,343 @@ class CommentaryExtensionTest : JavaVimTestCase() {
         //final Int value4 = 42;
         //final Int value5 = 42;
         final Int value6 = 42;
+      """.trimIndent()
+    )
+  }
+
+  fun `test text object deletes single line comment`() {
+    doTest(
+      parseKeys("dgc"),
+      """
+        // <caret>Comment 1
+        final Int value = 42;
+      """.trimIndent(),
+      """
+        final Int value = 42;
+      """.trimIndent()
+    )
+  }
+
+  fun `test text object deletes multiple line comments`() {
+    doTest(
+      parseKeys("dgc"),
+      """
+        // <caret>Comment 1
+        // Comment 2
+        // Comment 3
+        // Comment 4
+        // Comment 5
+        final Int value = 42;
+      """.trimIndent(),
+      """
+        final Int value = 42;
+      """.trimIndent()
+    )
+  }
+
+  fun `test text object deletes multiple line comments 2`() {
+    doTest(
+      parseKeys("dgc"),
+      """
+        // Comment 1
+        // Comment 2
+        // <caret>Comment 3
+        // Comment 4
+        // Comment 5
+        final Int value = 42;
+      """.trimIndent(),
+      """
+        final Int value = 42;
+      """.trimIndent()
+    )
+  }
+
+  fun `test text object deletes single line comment from leading whitespace`() {
+    doTest(
+      parseKeys("dgc"),
+      """
+        <caret> // Comment 1
+        final Int value = 42;
+      """.trimIndent(),
+      """
+        final Int value = 42;
+      """.trimIndent()
+    )
+  }
+
+  fun `test text object deletes single line comment from leading whitespace 2`() {
+    doTest(
+      parseKeys("dgc"),
+      """
+        <caret>
+        
+        // Comment 1
+        final Int value = 42;
+      """.trimIndent(),
+      """
+        final Int value = 42;
+      """.trimIndent()
+    )
+  }
+
+  fun `test text object deletes single line comment from leading whitespace 3`() {
+    doTest(
+      parseKeys("dgc"),
+      """
+        final Int value1 = 42;
+        <caret>
+        
+        // Comment 1
+        final Int value2 = 42;
+      """.trimIndent(),
+      """
+        final Int value1 = 42;
+        final Int value2 = 42;
+      """.trimIndent()
+    )
+  }
+
+  fun `test text object deletes single line comment from trailing whitespace`() {
+    doTest(
+      parseKeys("dgc"),
+      """
+        
+        // Comment 1
+        <caret>
+        
+        final Int value = 42;
+      """.trimIndent(),
+      """
+        final Int value = 42;
+      """.trimIndent()
+    )
+  }
+
+  fun `test text object deletes single line comments separated by whitespace`() {
+    doTest(
+      parseKeys("dgc"),
+      """
+        // <caret> Comment 1
+        
+        // Comment 2
+        final Int value = 42;
+      """.trimIndent(),
+      """
+        final Int value = 42;
+      """.trimIndent()
+    )
+  }
+
+  fun `test text object deletes disjointed single line comments from whitespace`() {
+    doTest(
+      parseKeys("dgc"),
+      """
+        // Comment 1
+        <caret>
+        // Comment 2
+        final Int value = 42;
+      """.trimIndent(),
+      """
+        final Int value = 42;
+      """.trimIndent()
+    )
+  }
+
+  fun `test text object deletes single line comment from current line`() {
+    doTest(
+      parseKeys("dgc"),
+      """
+        // Comment
+        final Int <caret>value = 42;
+      """.trimIndent(),
+      """
+        final Int value = 42;
+      """.trimIndent()
+    )
+  }
+
+  fun `test text object deletes single line comment from current line 2`() {
+    doTest(
+      parseKeys("dgc"),
+      """
+        // Comment
+        final Int <caret>value = 42;
+        final Int value2 = 42;
+      """.trimIndent(),
+      """
+        final Int value = 42;
+        final Int value2 = 42;
+      """.trimIndent()
+    )
+  }
+
+  fun `test text object does not delete line with comment and text`() {
+    doTest(
+      parseKeys("dgc"),
+      """
+        final Int <caret>value = 42; // Comment
+      """.trimIndent(),
+      """
+        final Int value = 42; // Comment
+      """.trimIndent()
+    )
+  }
+
+  fun `test text object deletes block comment`() {
+    doTest(
+      parseKeys("dgc"),
+      """
+        /* <caret>Comment 1 */
+        final Int value = 42;
+      """.trimIndent(),
+      """
+        final Int value = 42;
+      """.trimIndent()
+    )
+  }
+
+  fun `test text object deletes multi-line block comment`() {
+    doTest(
+      parseKeys("dgc"),
+      """
+        /* Comment 1
+         * <caret>Comment 2
+         * Comment 3 */
+        final Int value = 42;
+      """.trimIndent(),
+      """
+        final Int value = 42;
+      """.trimIndent()
+    )
+  }
+
+  fun `test text object deletes adjoining multi-line block comments`() {
+    doTest(
+      parseKeys("dgc"),
+      """
+        /* Comment 1
+         * Comment 2
+         * Comment 3 */
+        /* Comment 1
+         * <caret>Comment 2
+         * Comment 3 */
+        final Int value = 42;
+      """.trimIndent(),
+      """
+        final Int value = 42;
+      """.trimIndent()
+    )
+  }
+
+  fun `test text object deletes adjoining multi-line block comments 2`() {
+    doTest(
+      parseKeys("dgc"),
+      """
+        /* Comment 1
+         * <caret>Comment 2
+         * Comment 3 */
+         
+        /* Comment 1
+         * Comment 2
+         * Comment 3 */
+        final Int value = 42;
+      """.trimIndent(),
+      """
+        final Int value = 42;
+      """.trimIndent()
+    )
+  }
+
+  fun `test text object does not delete line with text and block comment`() {
+    doTest(
+      parseKeys("dgc"),
+      """
+        final Int value /* Block comment */ = 42;
+      """.trimIndent(),
+      """
+        final Int value /* Block comment */ = 42;
+      """.trimIndent()
+    )
+  }
+
+  fun `test text object deletes JavaDoc comment`() {
+    doTest(
+      parseKeys("dgc"),
+      """
+        /**
+         * <caret>Cool summary, dude
+         * @param value the value, innit
+         * @param name what's your name?
+         */
+        public void something(int value, String name) {
+        }
+      """.trimIndent(),
+      """
+        public void something(int value, String name) {
+        }
+      """.trimIndent()
+    )
+  }
+
+  fun `test text object deletes JavaDoc comment from leading whitespace`() {
+    doTest(
+      parseKeys("dgc"),
+      """
+        <caret>
+        /**
+         * Cool summary, dude
+         * @param value the value, innit
+         * @param name what's your name?
+         */
+        public void something(int value, String name) {
+        }
+      """.trimIndent(),
+      """
+        public void something(int value, String name) {
+        }
+      """.trimIndent()
+    )
+  }
+
+  fun `test text object deletes JavaDoc comment and adjoining comments`() {
+    doTest(
+      parseKeys("dgc"),
+      """
+        // <caret>This should be deleted too
+        /**
+         * Cool summary, dude
+         * @param value the value, innit
+         * @param name what's your name?
+         */
+        public void something(int value, String name) {
+        }
+      """.trimIndent(),
+      """
+        public void something(int value, String name) {
+        }
+      """.trimIndent()
+    )
+  }
+
+  fun `test text object deletes JavaDoc comment and adjoining comments separated by whitespace`() {
+    doTest(
+      parseKeys("dgc"),
+      """
+        // <caret>This should be deleted too
+        
+        /* Block comment */
+        
+        /**
+         * Cool summary, dude
+         * @param value the value, innit
+         * @param name what's your name?
+         */
+        public void something(int value, String name) {
+        }
+      """.trimIndent(),
+      """
+        public void something(int value, String name) {
+        }
       """.trimIndent()
     )
   }
