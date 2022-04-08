@@ -21,6 +21,7 @@ package org.jetbrains.plugins.ideavim.extension.commentary
 import com.intellij.ide.highlighter.HtmlFileType
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.JavaVimTestCase
 import org.jetbrains.plugins.ideavim.VimTestCase.Companion.c
 
@@ -234,6 +235,44 @@ class CommentaryExtensionTest : JavaVimTestCase() {
       """
                 //if (condition) {
                 //}
+      """.trimIndent()
+    )
+  }
+
+  @VimBehaviorDiffers(description = "IntelliJ's uncomment leaves the leading whitespace")
+  fun `test uncomment with gcgc`() {
+    doTest(
+      parseKeys("gcgc"),
+      """
+        // final Int value1 = 42;
+        // final Int value2 = 42;
+        // final Int value3 = 42;
+        final Int <caret>value4 = 42;
+      """.trimIndent(),
+      """
+         final Int value1 = 42;
+         final Int value2 = 42;
+         final Int value3 = 42;
+        final Int value4 = 42;
+      """.trimIndent()
+    )
+  }
+
+  @VimBehaviorDiffers(description = "IntelliJ's uncomment leaves the leading whitespace")
+  fun `test uncomment with gcu`() {
+    doTest(
+      parseKeys("gcu"),
+      """
+        // final Int value1 = 42;
+        // final Int value2 = 42;
+        // final Int value3 = 42;
+        final Int <caret>value4 = 42;
+      """.trimIndent(),
+      """
+         final Int value1 = 42;
+         final Int value2 = 42;
+         final Int value3 = 42;
+        final Int value4 = 42;
       """.trimIndent()
     )
   }

@@ -65,6 +65,7 @@ class CommentaryExtension : VimExtension {
 
     putKeyMappingIfMissing(MappingMode.NXO, parseKeys("gc"), owner, parseKeys("<Plug>Commentary"), true)
     putKeyMappingIfMissing(MappingMode.N, parseKeys("gcc"), owner, parseKeys("<Plug>CommentaryLine"), true)
+    putKeyMappingIfMissing(MappingMode.N, parseKeys("gcu"), owner, parseKeys("<Plug>Commentary<Plug>Commentary"), true)
   }
 
   private class CommentMotionHandler : VimExtensionHandler {
