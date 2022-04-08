@@ -39,40 +39,37 @@ import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 
-/**
- * @author dhleong
- */
 class CommentaryExtension : VimExtension {
-  override fun getName(): String {
-    return "commentary"
-  }
+  override fun getName() = "commentary"
 
   override fun init() {
-    putExtensionHandlerMapping(
-      MappingMode.N, parseKeys("<Plug>(CommentMotion)"), owner,
-      CommentMotionHandler(), false
-    )
-    putExtensionHandlerMapping(
-      MappingMode.N, parseKeys("<Plug>(CommentLine)"), owner, CommentLineHandler(),
-      false
-    )
-    putExtensionHandlerMapping(
-      MappingMode.XO, parseKeys("<Plug>(CommentMotionV)"), owner,
-      CommentMotionVHandler(), false
-    )
+    putExtensionHandlerMapping(MappingMode.N, parseKeys("<Plug>(CommentMotion)"), owner, CommentMotionHandler(), false)
+    putExtensionHandlerMapping(MappingMode.N, parseKeys("<Plug>(CommentLine)"), owner, CommentLineHandler(), false)
+    putExtensionHandlerMapping(MappingMode.XO, parseKeys("<Plug>(CommentMotionV)"), owner, CommentMotionVHandler(), false)
     putKeyMappingIfMissing(MappingMode.N, parseKeys("gc"), owner, parseKeys("<Plug>(CommentMotion)"), true)
     putKeyMappingIfMissing(MappingMode.N, parseKeys("gcc"), owner, parseKeys("<Plug>(CommentLine)"), true)
     putKeyMappingIfMissing(MappingMode.XO, parseKeys("gc"), owner, parseKeys("<Plug>(CommentMotionV)"), true)
   }
 
   private class CommentMotionHandler : VimExtensionHandler {
-    override fun isRepeatable(): Boolean {
-      return true
-    }
+    override fun isRepeatable() = true
 
     override fun execute(editor: Editor, context: DataContext) {
       setOperatorFunction(Operator())
       executeNormalWithoutMapping(parseKeys("g@"), editor)
+    }
+  }
+
+  private class CommentLineHandler : VimExtensionHandler {
+    override fun isRepeatable() = true
+
+    override fun execute(editor: Editor, context: DataContext) {
+      val offset = editor.caretModel.offset
+      val line = editor.document.getLineNumber(offset)
+      val lineStart = editor.document.getLineStartOffset(line)
+      val lineEnd = editor.document.getLineEndOffset(line)
+      VimPlugin.getMark().setChangeMarks(IjVimEditor(editor), TextRange(lineStart, lineEnd))
+      Operator().apply(editor, context, SelectionType.LINE_WISE)
     }
   }
 
@@ -86,8 +83,8 @@ class CommentaryExtension : VimExtension {
       if (!Operator().apply(editor, context, SelectionType.LINE_WISE)) {
         return
       }
-      WriteAction.run<RuntimeException> {
 
+      WriteAction.run<RuntimeException> {
         // Leave visual mode
         executeNormalWithoutMapping(parseKeys("<Esc>"), editor)
         editor.caretModel.moveToOffset(editor.caretModel.primaryCaret.selectionStart)
@@ -125,31 +122,13 @@ class CommentaryExtension : VimExtension {
     private fun getCommentRange(editor: Editor): TextRange? {
       val mode = getInstance(IjVimEditor(editor)).mode
       return when (mode) {
-        CommandState.Mode.COMMAND -> VimPlugin.getMark()
-          .getChangeMarks(IjVimEditor(editor))
-
+        CommandState.Mode.COMMAND -> VimPlugin.getMark().getChangeMarks(IjVimEditor(editor))
         CommandState.Mode.VISUAL -> {
           val primaryCaret = editor.caretModel.primaryCaret
           TextRange(primaryCaret.selectionStart, primaryCaret.selectionEnd)
         }
-
         else -> null
       }
-    }
-  }
-
-  private class CommentLineHandler : VimExtensionHandler {
-    override fun isRepeatable(): Boolean {
-      return true
-    }
-
-    override fun execute(editor: Editor, context: DataContext) {
-      val offset = editor.caretModel.offset
-      val line = editor.document.getLineNumber(offset)
-      val lineStart = editor.document.getLineStartOffset(line)
-      val lineEnd = editor.document.getLineEndOffset(line)
-      VimPlugin.getMark().setChangeMarks(IjVimEditor(editor), TextRange(lineStart, lineEnd))
-      Operator().apply(editor, context, SelectionType.LINE_WISE)
     }
   }
 }

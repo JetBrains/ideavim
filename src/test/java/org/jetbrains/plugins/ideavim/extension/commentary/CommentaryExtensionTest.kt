@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2022 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@ package org.jetbrains.plugins.ideavim.extension.commentary
 
 import com.intellij.ide.highlighter.HtmlFileType
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper
+import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.JavaVimTestCase
 import org.jetbrains.plugins.ideavim.VimTestCase.Companion.c
 
@@ -33,10 +33,10 @@ class CommentaryExtensionTest : JavaVimTestCase() {
     enableExtensions("commentary")
   }
 
-  // |gc| |l|
+  // |gc| |l| + move caret
   fun testBlockCommentSingle() {
     doTest(
-      StringHelper.parseKeys("gcll"),
+      parseKeys("gcll"),
       "<caret>if (condition) {\n" + "}\n",
       "/<caret>*i*/f (condition) {\n" + "}\n"
     )
@@ -47,7 +47,7 @@ class CommentaryExtensionTest : JavaVimTestCase() {
   // |gc| |iw|
   fun testBlockCommentInnerWord() {
     doTest(
-      StringHelper.parseKeys("gciw"),
+      parseKeys("gciw"),
       "<caret>if (condition) {\n" + "}\n",
       "<caret>/*if*/ (condition) {\n" + "}\n"
     )
@@ -58,7 +58,7 @@ class CommentaryExtensionTest : JavaVimTestCase() {
   // |gc| |iw|
   fun testBlockCommentTillForward() {
     doTest(
-      StringHelper.parseKeys("gct{"),
+      parseKeys("gct{"),
       "<caret>if (condition) {\n" + "}\n",
       "<caret>/*if (condition) */{\n" + "}\n"
     )
@@ -67,7 +67,7 @@ class CommentaryExtensionTest : JavaVimTestCase() {
   // |gc| |ab|
   fun testBlockCommentOuterParens() {
     doTest(
-      StringHelper.parseKeys("gcab"),
+      parseKeys("gcab"),
       "if (<caret>condition) {\n" + "}\n",
       "if <caret>/*(condition)*/ {\n" + "}\n"
     )
@@ -80,7 +80,7 @@ class CommentaryExtensionTest : JavaVimTestCase() {
 // |gc| |j|
   fun testLineCommentDown() {
     doTest(
-      StringHelper.parseKeys("gcj"),
+      parseKeys("gcj"),
       "<caret>if (condition) {\n" + "}\n",
       "//if (condition) {\n" +
         "//}\n"
@@ -90,7 +90,7 @@ class CommentaryExtensionTest : JavaVimTestCase() {
   // |gc| |ip|
   fun testLineCommentInnerParagraph() {
     doTest(
-      StringHelper.parseKeys("gcip"),
+      parseKeys("gcip"),
       "<caret>if (condition) {\n" + "}\n",
       "//if (condition) {\n" +
         "//}\n"
@@ -100,7 +100,7 @@ class CommentaryExtensionTest : JavaVimTestCase() {
   // |gc| |ip|
   fun testLineCommentSingleLineInnerParagraph() {
     doTest(
-      StringHelper.parseKeys("gcip"),
+      parseKeys("gcip"),
       "${c}if (condition) {}",
       "//if (condition) {}"
     )
@@ -109,7 +109,7 @@ class CommentaryExtensionTest : JavaVimTestCase() {
   /* Ensure uncommenting works as well */ // |gc| |ip|
   fun testLineUncommentInnerParagraph() {
     doTest(
-      StringHelper.parseKeys("gcip"),
+      parseKeys("gcip"),
       "<caret>//if (condition) {\n" + "//}\n",
       "if (condition) {\n" +
         "}\n"
@@ -121,7 +121,7 @@ class CommentaryExtensionTest : JavaVimTestCase() {
   // |gc| |ip|
   fun testLineUncommentSingleLineInnerParagraph() {
     doTest(
-      StringHelper.parseKeys("gcip"),
+      parseKeys("gcip"),
       "$c//if (condition) {}",
       "if (condition) {}"
     )
@@ -130,7 +130,7 @@ class CommentaryExtensionTest : JavaVimTestCase() {
   /* Visual mode */ // |gc| |ip|
   fun testLineCommentVisualInnerParagraph() {
     doTest(
-      StringHelper.parseKeys("vipgc"),
+      parseKeys("vipgc"),
       "<caret>if (condition) {\n" + "}\n",
       "//if (condition) {\n" +
         "//}\n"
@@ -140,7 +140,7 @@ class CommentaryExtensionTest : JavaVimTestCase() {
   // |gc| |ip|
   fun testLineUncommentVisualInnerParagraph() {
     doTest(
-      StringHelper.parseKeys("vipgc"),
+      parseKeys("vipgc"),
       "<caret>//if (condition) {\n" + "//}\n",
       "if (condition) {\n" +
         "}\n"
@@ -150,7 +150,7 @@ class CommentaryExtensionTest : JavaVimTestCase() {
   /* Special shortcut gcc is always linewise */ // |gcc|
   fun testLineCommentShortcut() {
     doTest(
-      StringHelper.parseKeys("gccj"),
+      parseKeys("gccj"),
       "<caret>if (condition) {\n" + "}\n",
       "//if (condition) {\n" +
         "<caret>}\n"
@@ -162,7 +162,7 @@ class CommentaryExtensionTest : JavaVimTestCase() {
   // |gcc|
   fun testLineCommentShortcutPreservesCaret() {
     doTest(
-      StringHelper.parseKeys("gcc"),
+      parseKeys("gcc"),
       "if (<caret>condition) {\n" + "}\n",
       "//if (<caret>condition) {\n" + "}\n"
     )
@@ -173,7 +173,7 @@ class CommentaryExtensionTest : JavaVimTestCase() {
   // |gcc|
   fun testLineUncommentShortcut() {
     doTest(
-      StringHelper.parseKeys("gcc"),
+      parseKeys("gcc"),
       "<caret>//if (condition) {\n" + "}\n",
       "<caret>if (condition) {\n" +
         "}\n"
@@ -185,7 +185,7 @@ class CommentaryExtensionTest : JavaVimTestCase() {
   // |gcc|
   fun testHTMLCommentShortcut() {
     myFixture.configureByText(HtmlFileType.INSTANCE, "<div />")
-    typeText(StringHelper.parseKeys("gcc"))
+    typeText(parseKeys("gcc"))
     myFixture.checkResult("<!--<div />-->")
     assertMode(CommandState.Mode.COMMAND)
     assertSelection(null)
@@ -193,7 +193,7 @@ class CommentaryExtensionTest : JavaVimTestCase() {
 
   fun `test comment motion repeat`() {
     doTest(
-      StringHelper.parseKeys("gcj", "jj."),
+      parseKeys("gcj", "jj."),
       """
                  <caret>if (condition) {
                  }
@@ -211,7 +211,7 @@ class CommentaryExtensionTest : JavaVimTestCase() {
 
   fun `test comment motion right repeat`() {
     doTest(
-      StringHelper.parseKeys("gciw", "jj."),
+      parseKeys("gciw", "jj."),
       """
                 <caret>if (condition) {
                 }
@@ -229,7 +229,7 @@ class CommentaryExtensionTest : JavaVimTestCase() {
 
   fun `test comment line repeat`() {
     doTest(
-      StringHelper.parseKeys("gcc", "j."),
+      parseKeys("gcc", "j."),
       """
                  <caret>if (condition) {
                  }
