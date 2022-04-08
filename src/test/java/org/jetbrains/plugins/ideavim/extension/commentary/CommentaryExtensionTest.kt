@@ -240,4 +240,26 @@ class CommentaryExtensionTest : JavaVimTestCase() {
       """.trimIndent()
     )
   }
+
+  fun `test comment line with count`() {
+    doTest(
+      parseKeys("4gcc"),
+      """
+        final Int value1 = 42;
+        final Int <caret>value2 = 42;
+        final Int value3 = 42;
+        final Int value4 = 42;
+        final Int value5 = 42;
+        final Int value6 = 42;
+      """.trimIndent(),
+      """
+        final Int value1 = 42;
+        //final Int value2 = 42;
+        //final Int value3 = 42;
+        //final Int value4 = 42;
+        //final Int value5 = 42;
+        final Int value6 = 42;
+      """.trimIndent()
+    )
+  }
 }

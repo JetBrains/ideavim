@@ -45,7 +45,7 @@ class CommentaryExtension : VimExtension {
   override fun init() {
     putExtensionHandlerMapping(MappingMode.N, parseKeys("<Plug>Commentary"), owner, CommentMotionHandler(), false)
     putExtensionHandlerMapping(MappingMode.XO, parseKeys("<Plug>Commentary"), owner, CommentMotionVHandler(), false)
-    putExtensionHandlerMapping(MappingMode.N, parseKeys("<Plug>CommentaryLine"), owner, CommentLineHandler(), false)
+    putKeyMappingIfMissing(MappingMode.N, parseKeys("<Plug>CommentaryLine"), owner, parseKeys("gc_"), true)
 
     putKeyMappingIfMissing(MappingMode.N, parseKeys("gc"), owner, parseKeys("<Plug>Commentary"), true)
     putKeyMappingIfMissing(MappingMode.XO, parseKeys("gc"), owner, parseKeys("<Plug>Commentary"), true)
@@ -58,19 +58,6 @@ class CommentaryExtension : VimExtension {
     override fun execute(editor: Editor, context: DataContext) {
       setOperatorFunction(Operator())
       executeNormalWithoutMapping(parseKeys("g@"), editor)
-    }
-  }
-
-  private class CommentLineHandler : VimExtensionHandler {
-    override fun isRepeatable() = true
-
-    override fun execute(editor: Editor, context: DataContext) {
-      val offset = editor.caretModel.offset
-      val line = editor.document.getLineNumber(offset)
-      val lineStart = editor.document.getLineStartOffset(line)
-      val lineEnd = editor.document.getLineEndOffset(line)
-      VimPlugin.getMark().setChangeMarks(IjVimEditor(editor), TextRange(lineStart, lineEnd))
-      Operator().apply(editor, context, SelectionType.LINE_WISE)
     }
   }
 
