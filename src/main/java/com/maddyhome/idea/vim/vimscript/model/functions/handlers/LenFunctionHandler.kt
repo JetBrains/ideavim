@@ -18,8 +18,8 @@
 
 package com.maddyhome.idea.vim.vimscript.model.functions.handlers
 
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimBlob
@@ -39,8 +39,8 @@ object LenFunctionHandler : FunctionHandler() {
 
   override fun doFunction(
     argumentValues: List<Expression>,
-    editor: Editor,
-    context: DataContext,
+    editor: VimEditor,
+    context: ExecutionContext,
     vimContext: VimLContext,
   ): VimDataType {
     val argument = argumentValues[0].evaluate(editor, context, vimContext)

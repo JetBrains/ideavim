@@ -24,7 +24,7 @@ interface VimMessages {
   fun indicateError()
   fun clearError()
   fun isError(): Boolean
-  fun message(key: String): String
+  fun message(key: String, vararg params: Any): String
 
   fun updateStatusBar()
 

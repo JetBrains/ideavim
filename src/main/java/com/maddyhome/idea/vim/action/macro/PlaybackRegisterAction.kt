@@ -48,7 +48,7 @@ class PlaybackRegisterAction : VimActionHandler.SingleExecution() {
         try {
           var i = 0
           while (i < cmd.count) {
-            res.set(Executor.executeLastCommand(editor.ij, context.ij))
+            res.set(Executor.executeLastCommand(editor, context))
             if (!res.get()) {
               break
             }

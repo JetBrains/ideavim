@@ -20,9 +20,9 @@ package com.maddyhome.idea.vim.vimscript.model.commands
 
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.AnAction
-import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.Ranges
@@ -38,7 +38,7 @@ data class ActionCommand(val ranges: Ranges, val argument: String) : Command.Sin
 
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY, Flag.SAVE_VISUAL)
 
-  override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
+  override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
     val actionName = argument.trim()
     val action = ActionManager.getInstance().getAction(actionName) ?: throw ExException(MessageHelper.message("action.not.found.0", actionName))
     val application = ApplicationManager.getApplication()
@@ -50,7 +50,7 @@ data class ActionCommand(val ranges: Ranges, val argument: String) : Command.Sin
     return ExecutionResult.Success
   }
 
-  private fun executeAction(action: AnAction, context: DataContext) {
-    injector.actionExecutor.executeAction(action.vim, context.vim)
+  private fun executeAction(action: AnAction, context: ExecutionContext) {
+    injector.actionExecutor.executeAction(action.vim, context)
   }
 }

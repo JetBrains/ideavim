@@ -162,6 +162,7 @@ interface VimEditor {
   fun currentCaret(): VimCaret
 
   fun isWritable(): Boolean
+  fun isDocumentWritable(): Boolean
   fun isOneLineMode(): Boolean
   /**
    * Function for refactoring, get rid of it
@@ -186,6 +187,7 @@ interface VimEditor {
   fun removeSecondaryCarets()
   fun vimSetSystemBlockSelectionSilently(start: VimLogicalPosition, end: VimLogicalPosition)
 
+  fun getLineStartOffset(line: Int): Int
   fun getLineEndOffset(line: Int, allowEnd: Boolean): Int
 
   fun addCaretListener(listener: VimCaretListener)

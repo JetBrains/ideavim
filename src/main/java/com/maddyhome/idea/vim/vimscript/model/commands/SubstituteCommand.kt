@@ -18,12 +18,10 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.ex.ranges.Ranges
-import com.maddyhome.idea.vim.newapi.IjVimCaret
-import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
@@ -31,11 +29,11 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  */
 data class SubstituteCommand(val ranges: Ranges, val argument: String, val command: String) : Command.SingleExecution(ranges, argument) {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
-  override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
+  override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
     var result = true
-    for (caret in editor.caretModel.allCarets) {
+    for (caret in editor.nativeCarets()) {
       val lineRange = getLineRange(editor, caret)
-      if (!VimPlugin.getSearch().processSubstituteCommand(IjVimEditor(editor), IjVimCaret(caret), lineRange, command, argument, this.vimContext)) {
+      if (!VimPlugin.getSearch().processSubstituteCommand(editor, caret, lineRange, command, argument, this.vimContext)) {
         result = false
       }
     }

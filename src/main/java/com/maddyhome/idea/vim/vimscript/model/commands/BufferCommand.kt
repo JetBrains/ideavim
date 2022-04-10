@@ -18,14 +18,16 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
-import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.PlatformDataKeys
-import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.MessageHelper
+import com.maddyhome.idea.vim.newapi.ij
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
@@ -36,7 +38,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 data class BufferCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges) {
   override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
-  override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
+  override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
     val arg = argument.trim()
     val overrideModified = arg.startsWith('!')
     val buffer = if (overrideModified) arg.replace(Regex("^!\\s*"), "") else arg
@@ -46,12 +48,12 @@ data class BufferCommand(val ranges: Ranges, val argument: String) : Command.Sin
       if (buffer.matches(Regex("^\\d+$"))) {
         val bufNum = buffer.toInt() - 1
 
-        if (!VimPlugin.getFile().selectFile(bufNum, context)) {
+        if (!VimPlugin.getFile().selectFile(bufNum, context.ij)) {
           VimPlugin.showMessage(MessageHelper.message("buffer.0.does.not.exist", bufNum))
           result = false
         }
       } else if (buffer == "#") {
-        VimPlugin.getFile().selectPreviousTab(context)
+        VimPlugin.getFile().selectPreviousTab(context.ij)
       } else {
         val editors = findPartialMatch(context, buffer)
 
@@ -61,11 +63,11 @@ data class BufferCommand(val ranges: Ranges, val argument: String) : Command.Sin
             result = false
           }
           1 -> {
-            if (EditorHelper.hasUnsavedChanges(editor) && !overrideModified) {
+            if (EditorHelper.hasUnsavedChanges(editor.ij) && !overrideModified) {
               VimPlugin.showMessage(MessageHelper.message("no.write.since.last.change.add.to.override"))
               result = false
             } else {
-              VimPlugin.getFile().openFile(EditorHelper.getVirtualFile(editors[0])!!.name, context)
+              VimPlugin.getFile().openFile(EditorHelper.getVirtualFile(editors[0].ij)!!.name, context.ij)
             }
           }
           else -> {
@@ -79,14 +81,14 @@ data class BufferCommand(val ranges: Ranges, val argument: String) : Command.Sin
     return if (result) ExecutionResult.Success else ExecutionResult.Error
   }
 
-  private fun findPartialMatch(context: DataContext, fileName: String): List<Editor> {
-    val matchedFiles = mutableListOf<Editor>()
-    val project = PlatformDataKeys.PROJECT.getData(context) ?: return matchedFiles
+  private fun findPartialMatch(context: ExecutionContext, fileName: String): List<VimEditor> {
+    val matchedFiles = mutableListOf<VimEditor>()
+    val project = PlatformDataKeys.PROJECT.getData(context.ij) ?: return matchedFiles
 
     for (file in FileEditorManager.getInstance(project).openFiles) {
       if (file.name.contains(fileName)) {
         val editor = EditorHelper.getEditor(file) ?: continue
-        matchedFiles.add(editor)
+        matchedFiles.add(editor.vim)
       }
     }
 

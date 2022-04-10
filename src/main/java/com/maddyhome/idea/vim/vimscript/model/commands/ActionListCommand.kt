@@ -19,13 +19,14 @@
 package com.maddyhome.idea.vim.vimscript.model.commands
 
 import com.intellij.openapi.actionSystem.ActionManager
-import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.KeyboardShortcut
-import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.StringHelper
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import java.util.*
 
@@ -35,7 +36,7 @@ import java.util.*
 data class ActionListCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges) {
   override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
-  override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
+  override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
     val lineSeparator = "\n"
     val searchPattern = argument.trim().lowercase(Locale.getDefault()).split("*")
     val actionManager = ActionManager.getInstance()
@@ -51,7 +52,7 @@ data class ActionListCommand(val ranges: Ranges, val argument: String) : Command
       .filter { line -> searchPattern.all { it in line.lowercase(Locale.getDefault()) } }
       .joinToString(lineSeparator)
 
-    ExOutputModel.getInstance(editor).output(MessageHelper.message("ex.show.all.actions.0.1", lineSeparator, actions))
+    ExOutputModel.getInstance(editor.ij).output(MessageHelper.message("ex.show.all.actions.0.1", lineSeparator, actions))
     return ExecutionResult.Success
   }
 }

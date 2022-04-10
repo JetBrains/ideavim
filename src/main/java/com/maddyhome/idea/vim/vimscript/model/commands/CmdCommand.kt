@@ -18,15 +18,16 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.util.NlsSafe
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.common.CommandAlias
 import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.group.CommandGroup.Companion.BLACKLISTED_ALIASES
 import com.maddyhome.idea.vim.helper.MessageHelper
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
@@ -47,7 +48,7 @@ data class CmdCommand(val ranges: Ranges, val argument: String) : Command.Single
     const val zeroOrOneArguments = "?"
     const val moreThanZeroArguments = "+"
   }
-  override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
+  override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
     val result: Boolean = if (argument.trim().isEmpty()) {
       this.listAlias(editor, "")
     } else {
@@ -56,7 +57,7 @@ data class CmdCommand(val ranges: Ranges, val argument: String) : Command.Single
     return if (result) ExecutionResult.Success else ExecutionResult.Error
   }
 
-  private fun listAlias(editor: Editor, filter: String): Boolean {
+  private fun listAlias(editor: VimEditor, filter: String): Boolean {
     val lineSeparator = "\n"
     val allAliases = VimPlugin.getCommand().listAliases()
     val aliases = allAliases.filter {
@@ -64,11 +65,11 @@ data class CmdCommand(val ranges: Ranges, val argument: String) : Command.Single
     }.map {
       "${it.key.padEnd(12)}${it.value.numberOfArguments.padEnd(11)}${it.value.printValue()}"
     }.sortedWith(String.CASE_INSENSITIVE_ORDER).joinToString(lineSeparator)
-    ExOutputModel.getInstance(editor).output("Name        Args       Definition$lineSeparator$aliases")
+    ExOutputModel.getInstance(editor.ij).output("Name        Args       Definition$lineSeparator$aliases")
     return true
   }
 
-  private fun addAlias(editor: Editor?): Boolean {
+  private fun addAlias(editor: VimEditor?): Boolean {
     var argument = argument.trim()
 
     // Handle overwriting of aliases

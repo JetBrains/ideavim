@@ -135,7 +135,7 @@ public class ProcessGroup implements VimProcessGroup {
 
       if (logger.isDebugEnabled()) logger.debug("swing=" + SwingUtilities.isEventDispatchThread());
 
-      Executor.INSTANCE.execute(text, editor, context, false, true, CommandLineVimLContext.INSTANCE);
+      Executor.INSTANCE.execute(text, new IjVimEditor(editor), new IjExecutionContext(context), false, true, CommandLineVimLContext.INSTANCE);
     }
     catch (ExException e) {
       VimPlugin.showMessage(e.getMessage());

@@ -41,7 +41,7 @@ import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.option.ToggleOption
 import com.maddyhome.idea.vim.vimscript.Executor
-import com.maddyhome.idea.vim.vimscript.Executor.executingVimScript
+import com.maddyhome.idea.vim.vimscript.Executor.executingVimscript
 import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -316,9 +316,9 @@ class PlugMissingKeysTest : VimTestCase() {
   }
 
   private fun executeLikeVimrc(vararg text: String) {
-    executingVimScript = true
+    executingVimscript = true
     Executor.execute(text.joinToString("\n"), false)
-    executingVimScript = false
+    executingVimscript = false
     VimExtensionRegistrar.enableDelayedExtensions()
   }
 }

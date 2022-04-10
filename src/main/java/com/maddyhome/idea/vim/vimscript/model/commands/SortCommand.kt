@@ -18,17 +18,17 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Caret
-import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.util.text.StringUtil
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.inBlockSubMode
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
-import com.maddyhome.idea.vim.newapi.IjVimEditor
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import java.util.*
@@ -41,7 +41,7 @@ data class SortCommand(val ranges: Ranges, val argument: String) : Command.Singl
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.WRITABLE)
 
   @Throws(ExException::class)
-  override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
+  override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
     val arg = argument
     val nonEmptyArg = arg.trim().isNotEmpty()
 
@@ -51,28 +51,28 @@ data class SortCommand(val ranges: Ranges, val argument: String) : Command.Singl
 
     val lineComparator = LineComparator(ignoreCase, number, reverse)
     if (editor.inBlockSubMode) {
-      val primaryCaret = editor.caretModel.primaryCaret
+      val primaryCaret = editor.primaryCaret()
       val range = getSortLineRange(editor, primaryCaret)
-      val worked = VimPlugin.getChange().sortRange(IjVimEditor(editor), range, lineComparator)
+      val worked = VimPlugin.getChange().sortRange(editor, range, lineComparator)
       primaryCaret.moveToInlayAwareOffset(
-        VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor.vim, range.startLine)
+        VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, range.startLine)
       )
       return if (worked) ExecutionResult.Success else ExecutionResult.Error
     }
 
     var worked = true
-    for (caret in editor.caretModel.allCarets) {
+    for (caret in editor.nativeCarets()) {
       val range = getSortLineRange(editor, caret)
-      if (!VimPlugin.getChange().sortRange(IjVimEditor(editor), range, lineComparator)) {
+      if (!VimPlugin.getChange().sortRange(editor, range, lineComparator)) {
         worked = false
       }
-      caret.moveToInlayAwareOffset(VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor.vim, range.startLine))
+      caret.moveToInlayAwareOffset(VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, range.startLine))
     }
 
     return if (worked) ExecutionResult.Success else ExecutionResult.Error
   }
 
-  private fun getSortLineRange(editor: Editor, caret: Caret): LineRange {
+  private fun getSortLineRange(editor: VimEditor, caret: VimCaret): LineRange {
     val range = getLineRange(editor, caret)
 
     // Something like "30,20sort" gets converted to "20,30sort"
@@ -81,7 +81,7 @@ data class SortCommand(val ranges: Ranges, val argument: String) : Command.Singl
     // If we don't have a range, we either have "sort", a selection, or a block
     if (normalizedRange.endLine - normalizedRange.startLine == 0) {
       // If we have a selection.
-      val selectionModel = editor.selectionModel
+      val selectionModel = editor.ij.selectionModel
       return if (selectionModel.hasSelection()) {
         val start = selectionModel.selectionStart
         val end = selectionModel.selectionEnd
@@ -91,7 +91,7 @@ data class SortCommand(val ranges: Ranges, val argument: String) : Command.Singl
 
         LineRange(startLine, endLine)
       } else {
-        LineRange(0, editor.document.lineCount - 1)
+        LineRange(0, editor.lineCount() - 1)
       } // If we have a generic selection, i.e. "sort" entire document
     }
 

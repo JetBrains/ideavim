@@ -18,18 +18,20 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
-import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.editor.Document
-import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.vimLine
+import com.maddyhome.idea.vim.newapi.ij
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import org.jetbrains.annotations.NonNls
 
@@ -46,34 +48,34 @@ data class BufferListCommand(val ranges: Ranges, val argument: String) : Command
     val SUPPORTED_FILTERS = setOf('+', '=', 'a', '%', '#')
   }
 
-  override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
+  override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
     val arg = argument.trim()
     val filter = pruneUnsupportedFilters(arg)
     val bufferList = getBufferList(context, filter)
 
-    ExOutputModel.getInstance(editor).output(bufferList.joinToString(separator = "\n"))
+    ExOutputModel.getInstance(editor.ij).output(bufferList.joinToString(separator = "\n"))
 
     return ExecutionResult.Success
   }
 
   private fun pruneUnsupportedFilters(filter: String) = filter.filter { it in SUPPORTED_FILTERS }
 
-  private fun getBufferList(context: DataContext, filter: String): List<String> {
+  private fun getBufferList(context: ExecutionContext, filter: String): List<String> {
     val bufferList = mutableListOf<String>()
-    val project = PlatformDataKeys.PROJECT.getData(context) ?: return emptyList()
+    val project = PlatformDataKeys.PROJECT.getData(context.ij) ?: return emptyList()
 
     val fem = FileEditorManager.getInstance(project)
     val openFiles = fem.openFiles
     val bufNumPad = openFiles.size.toString().length
     val currentFile = fem.selectedFiles[0]
-    val previousFile = VimPlugin.getFile().getPreviousTab(context)
+    val previousFile = VimPlugin.getFile().getPreviousTab(context.ij)
     val virtualFileDisplayMap = buildVirtualFileDisplayMap(project)
 
     var index = 1
     for ((file, displayFileName) in virtualFileDisplayMap) {
       val editor = EditorHelper.getEditor(file) ?: continue
 
-      val bufStatus = getBufferStatus(editor, file, currentFile, previousFile)
+      val bufStatus = getBufferStatus(editor.vim, file, currentFile, previousFile)
 
       if (bufStatusMatchesFilter(filter, bufStatus)) {
         val lineNum = editor.vimLine
@@ -118,7 +120,7 @@ data class BufferListCommand(val ranges: Ranges, val argument: String) : Command
 }
 
 private fun getBufferStatus(
-  editor: Editor,
+  editor: VimEditor,
   file: VirtualFile,
   currentFile: VirtualFile,
   previousFile: VirtualFile?,
@@ -135,7 +137,7 @@ private fun getBufferStatus(
     bufStatus.setCharAt(2, '=')
   }
 
-  if (isDocumentDirty(editor.document)) {
+  if (isDocumentDirty(editor.ij.document)) {
     bufStatus.setCharAt(3, '+')
   }
 

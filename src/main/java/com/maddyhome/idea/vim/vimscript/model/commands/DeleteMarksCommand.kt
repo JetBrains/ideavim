@@ -18,9 +18,9 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.Msg
@@ -29,7 +29,6 @@ import com.maddyhome.idea.vim.mark.VimMarkConstants.DEL_MARKS
 import com.maddyhome.idea.vim.mark.VimMarkConstants.RO_GLOBAL_MARKS
 import com.maddyhome.idea.vim.mark.VimMarkConstants.WR_GLOBAL_MARKS
 import com.maddyhome.idea.vim.mark.VimMarkConstants.WR_REGULAR_FILE_MARKS
-import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 private val VIML_COMMENT = Regex("(?<!\\\\)\".*")
@@ -46,7 +45,7 @@ private const val UNESCAPED_QUOTE = "\""
 data class DeleteMarksCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
   override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_REQUIRED, Access.READ_ONLY)
 
-  override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
+  override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
     val processedArg = argument
       .replace(VIML_COMMENT, "")
       .replace(ESCAPED_QUOTE, UNESCAPED_QUOTE)
@@ -71,10 +70,10 @@ data class DeleteMarksCommand(val ranges: Ranges, val argument: String) : Comman
   }
 }
 
-private fun deleteMark(editor: Editor, character: Char) {
+private fun deleteMark(editor: VimEditor, character: Char) {
   if (character != ' ') {
     val markGroup = VimPlugin.getMark()
-    val mark = markGroup.getMark(editor.vim, character) ?: return
+    val mark = markGroup.getMark(editor, character) ?: return
     markGroup.removeMark(character, mark)
   }
 }

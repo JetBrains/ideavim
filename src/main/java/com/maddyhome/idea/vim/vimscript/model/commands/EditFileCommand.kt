@@ -18,13 +18,14 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
-import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.EditorDataContext
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
@@ -33,23 +34,23 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  */
 data class EditFileCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
   override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
-  override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
+  override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
     val arg = argument
     if (arg == "#") {
-      VimPlugin.getMark().saveJumpLocation(editor.vim)
-      VimPlugin.getFile().selectPreviousTab(context)
+      VimPlugin.getMark().saveJumpLocation(editor)
+      VimPlugin.getFile().selectPreviousTab(context.ij)
       return ExecutionResult.Success
     } else if (arg.isNotEmpty()) {
-      val res = VimPlugin.getFile().openFile(arg, context)
+      val res = VimPlugin.getFile().openFile(arg, context.ij)
       if (res) {
-        VimPlugin.getMark().saveJumpLocation(editor.vim)
+        VimPlugin.getMark().saveJumpLocation(editor)
       }
       return if (res) ExecutionResult.Success else ExecutionResult.Error
     }
 
     // Don't open a choose file dialog under a write action
     ApplicationManager.getApplication().invokeLater {
-      injector.actionExecutor.executeAction("OpenFile", EditorDataContext.init(editor, context).vim)
+      injector.actionExecutor.executeAction("OpenFile", EditorDataContext.init(editor.ij, context.ij).vim)
     }
 
     return ExecutionResult.Success

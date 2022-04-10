@@ -30,6 +30,7 @@ import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.io.FileUtil
+import com.maddyhome.idea.vim.api.VimrcFileState
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.icons.VimIcons
 import com.maddyhome.idea.vim.ui.ReloadFloatingToolbarActionGroup.Companion.ACTION_GROUP
@@ -49,14 +50,14 @@ import org.jetbrains.annotations.TestOnly
  * - Action / action group
  */
 
-object VimRcFileState {
+object VimRcFileState : VimrcFileState {
   // Hash of .ideavimrc parsed to Script class
   private var state: Int? = null
 
   // ModificationStamp. Can be taken only from document. Doesn't play a big role, but can help speed up [equalTo]
   private var modificationStamp = 0L
 
-  var filePath: String? = null
+  override var filePath: String? = null
 
   private val saveStateListeners = ArrayList<() -> Unit>()
 
@@ -67,7 +68,7 @@ object VimRcFileState {
     saveStateListeners.forEach { it() }
   }
 
-  fun saveFileState(filePath: String) {
+  override fun saveFileState(filePath: String) {
     val vimRcFile = VimRcService.findIdeaVimRc()
     val ideaVimRcText = vimRcFile?.readText() ?: ""
     saveFileState(filePath, ideaVimRcText)

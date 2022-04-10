@@ -18,14 +18,12 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Caret
-import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ranges.Ranges
-import com.maddyhome.idea.vim.newapi.IjVimCaret
-import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
@@ -34,14 +32,14 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 data class JoinLinesCommand(val ranges: Ranges, val argument: String) : Command.ForEachCaret(ranges, argument) {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.WRITABLE)
 
-  override fun processCommand(editor: Editor, caret: Caret, context: DataContext): ExecutionResult {
+  override fun processCommand(editor: VimEditor, caret: VimCaret, context: ExecutionContext): ExecutionResult {
     val arg = argument
     val spaces = arg.isEmpty() || arg[0] != '!'
 
     val textRange = getTextRange(editor, caret, true)
 
     return if (VimPlugin.getChange().deleteJoinRange(
-        IjVimEditor(editor), IjVimCaret(caret),
+        editor, caret,
         TextRange(
             textRange.startOffset,
             textRange.endOffset - 1

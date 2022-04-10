@@ -18,14 +18,15 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands.mapping
 
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.common.MappingMode
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.key.MappingOwner
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.statistic.VimscriptState
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.commands.Command
@@ -45,16 +46,16 @@ data class MapCommand(val ranges: Ranges, val argument: String, val cmd: String)
   override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   @Throws(ExException::class)
-  override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
+  override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
     return if (executeCommand(editor)) ExecutionResult.Success else ExecutionResult.Error
   }
 
   @Throws(ExException::class)
-  private fun executeCommand(editor: Editor?): Boolean {
+  private fun executeCommand(editor: VimEditor?): Boolean {
     val commandInfo = COMMAND_INFOS.find { cmd.startsWith(it.prefix) } ?: return false
     val modes = commandInfo.mappingModes
 
-    if (argument.isEmpty()) return editor != null && VimPlugin.getKey().showKeyMappings(modes, editor)
+    if (argument.isEmpty()) return editor != null && VimPlugin.getKey().showKeyMappings(modes, editor.ij)
 
     val arguments = try {
       parseCommandArguments(argument) ?: return false

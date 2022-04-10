@@ -18,13 +18,14 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.Ranges
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
@@ -34,7 +35,7 @@ data class YankLinesCommand(val ranges: Ranges, var argument: String) : Command.
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   @Throws(ExException::class)
-  override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
+  override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
     val argument = this.argument
     val registerGroup = VimPlugin.getRegister()
     val register = if (argument.isNotEmpty() && !argument[0].isDigit()) {
@@ -46,17 +47,16 @@ data class YankLinesCommand(val ranges: Ranges, var argument: String) : Command.
 
     if (!registerGroup.selectRegister(register)) return ExecutionResult.Error
 
-    val caretModel = editor.caretModel
-    val starts = ArrayList<Int>(caretModel.caretCount)
-    val ends = ArrayList<Int>(caretModel.caretCount)
-    for (caret in caretModel.allCarets) {
+    val starts = ArrayList<Int>(editor.nativeCarets().size)
+    val ends = ArrayList<Int>(editor.nativeCarets().size)
+    for (caret in editor.nativeCarets()) {
       val range = getTextRange(editor, caret, true)
       starts.add(range.startOffset)
       ends.add(range.endOffset)
     }
 
     return if (VimPlugin.getYank().yankRange(
-        editor,
+        editor.ij,
         TextRange(starts.toIntArray(), ends.toIntArray()),
         SelectionType.LINE_WISE, false
       )
