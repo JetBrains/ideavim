@@ -35,12 +35,12 @@ class MatchitCTest : VimTestCase() {
     doTest(
       "%",
       """
-        ${c}#if !defined (VAL_1)
+        $c#if !defined (VAL_1)
         #endif
       """.trimIndent(),
       """
         #if !defined (VAL_1)
-        ${c}#endif
+        $c#endif
       """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
     )
@@ -56,7 +56,7 @@ class MatchitCTest : VimTestCase() {
       """.trimIndent(),
       """
            #if !defined (VAL_1)
-        ${c}#endif
+        $c#endif
       """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
     )
@@ -67,7 +67,7 @@ class MatchitCTest : VimTestCase() {
     doTest(
       "%",
       """
-        ${c}#if !defined (VAL_1)
+        $c#if !defined (VAL_1)
           #define VAL_1 1
         #elif !defined (VAL_2)
           #define VAL_2 2
@@ -75,7 +75,7 @@ class MatchitCTest : VimTestCase() {
       """
         #if !defined (VAL_1)
           #define VAL_1 1
-        ${c}#elif !defined (VAL_2)
+        $c#elif !defined (VAL_2)
           #define VAL_2 2
       """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
@@ -87,7 +87,7 @@ class MatchitCTest : VimTestCase() {
     doTest(
       "%",
       """
-        ${c}#if !defined (VAL_1)
+        $c#if !defined (VAL_1)
           #define VAL_1 1
         #else
           #define VAL_2 2
@@ -95,7 +95,7 @@ class MatchitCTest : VimTestCase() {
       """
         #if !defined (VAL_1)
           #define VAL_1 1
-        ${c}#else
+        $c#else
           #define VAL_2 2
       """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
@@ -107,12 +107,12 @@ class MatchitCTest : VimTestCase() {
     doTest(
       "%",
       """
-        ${c}#elif !defined (VAL_2)
+        $c#elif !defined (VAL_2)
         #else
       """.trimIndent(),
       """
         #elif !defined (VAL_2)
-        ${c}#else
+        $c#else
       """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
     )
@@ -128,7 +128,7 @@ class MatchitCTest : VimTestCase() {
       """.trimIndent(),
       """
            #elif !defined (VAL_2)
-        ${c}#else
+        $c#else
       """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
     )
@@ -139,12 +139,12 @@ class MatchitCTest : VimTestCase() {
     doTest(
       "%",
       """
-        ${c}#else
+        $c#else
         #endif
       """.trimIndent(),
       """
         #else
-        ${c}#endif
+        $c#endif
       """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
     )
@@ -160,7 +160,7 @@ class MatchitCTest : VimTestCase() {
       """.trimIndent(),
       """
            #else !defined (VAL_2)
-        ${c}#endif
+        $c#endif
       """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
     )
@@ -177,10 +177,10 @@ class MatchitCTest : VimTestCase() {
           #define VAL_2 2
         #else
           #define VAL_3 3
-        ${c}#endif
+        $c#endif
       """.trimIndent(),
       """
-        ${c}#if !defined (VAL_1)
+        $c#if !defined (VAL_1)
           #define VAL_1 1
         #elif !defined (VAL_2)
           #define VAL_2 2
@@ -197,12 +197,12 @@ class MatchitCTest : VimTestCase() {
     doTest(
       "%",
       """
-        ${c}#ifdef DEBUG
+        $c#ifdef DEBUG
         #endif
       """.trimIndent(),
       """
         #ifdef DEBUG
-        ${c}#endif
+        $c#endif
       """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
     )
@@ -213,12 +213,12 @@ class MatchitCTest : VimTestCase() {
     doTest(
       "%",
       """
-        ${c}#ifdef DEBUG
+        $c#ifdef DEBUG
         #elif PROD
       """.trimIndent(),
       """
         #ifdef DEBUG
-        ${c}#elif PROD
+        $c#elif PROD
       """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
     )
@@ -229,12 +229,12 @@ class MatchitCTest : VimTestCase() {
     doTest(
       "%",
       """
-        ${c}#ifdef DEBUG
+        $c#ifdef DEBUG
         #else
       """.trimIndent(),
       """
         #ifdef DEBUG
-        ${c}#else
+        $c#else
       """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
     )
@@ -246,10 +246,10 @@ class MatchitCTest : VimTestCase() {
       "%",
       """
         #ifdef DEBUG
-        ${c}#endif
+        $c#endif
       """.trimIndent(),
       """
-        ${c}#ifdef DEBUG
+        $c#ifdef DEBUG
         #endif
       """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
@@ -261,12 +261,12 @@ class MatchitCTest : VimTestCase() {
     doTest(
       "%",
       """
-        ${c}#ifndef DEBUG
+        $c#ifndef DEBUG
         #endif
       """.trimIndent(),
       """
         #ifndef DEBUG
-        ${c}#endif
+        $c#endif
       """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
     )
@@ -277,12 +277,12 @@ class MatchitCTest : VimTestCase() {
     doTest(
       "%",
       """
-        ${c}#ifndef DEBUG
+        $c#ifndef DEBUG
         #elif PROD
       """.trimIndent(),
       """
         #ifndef DEBUG
-        ${c}#elif PROD
+        $c#elif PROD
       """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
     )
@@ -293,12 +293,12 @@ class MatchitCTest : VimTestCase() {
     doTest(
       "%",
       """
-        ${c}#ifndef DEBUG
+        $c#ifndef DEBUG
         #else
       """.trimIndent(),
       """
         #ifndef DEBUG
-        ${c}#else
+        $c#else
       """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
     )
@@ -310,10 +310,10 @@ class MatchitCTest : VimTestCase() {
       "%",
       """
         #ifndef DEBUG
-        ${c}#endif
+        $c#endif
       """.trimIndent(),
       """
-        ${c}#ifndef DEBUG
+        $c#ifndef DEBUG
         #endif
       """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
@@ -325,11 +325,11 @@ class MatchitCTest : VimTestCase() {
     doTest(
       "%",
       """
-        ${c}#ifff DEBUG
+        $c#ifff DEBUG
         #endif
       """.trimIndent(),
       """
-        ${c}#ifff DEBUG
+        $c#ifff DEBUG
         #endif
       """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
@@ -346,7 +346,7 @@ class MatchitCTest : VimTestCase() {
       """.trimIndent(),
       """
         #  if DEBUG
-        ${c}#endif
+        $c#endif
       """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
     )
@@ -365,7 +365,7 @@ class MatchitCTest : VimTestCase() {
       """
         #ifdef CONDITION1
         #  ifdef CONDITION2
-        ${c}#  endif
+        $c#  endif
         #endif
       """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
@@ -381,12 +381,12 @@ class MatchitCTest : VimTestCase() {
     doTest(
       "g%",
       """
-        ${c}#if !defined (VAL_1)
+        $c#if !defined (VAL_1)
         #endif
       """.trimIndent(),
       """
         #if !defined (VAL_1)
-        ${c}#endif
+        $c#endif
       """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
     )
@@ -402,7 +402,7 @@ class MatchitCTest : VimTestCase() {
       """.trimIndent(),
       """
            #if !defined (VAL_1)
-        ${c}#endif
+        $c#endif
       """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
     )
@@ -414,10 +414,10 @@ class MatchitCTest : VimTestCase() {
       "g%",
       """
         #  if DEBUG
-        ${c}#endif
+        $c#endif
       """.trimIndent(),
       """
-        ${c}#  if DEBUG
+        $c#  if DEBUG
         #endif
       """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
@@ -431,10 +431,10 @@ class MatchitCTest : VimTestCase() {
       """
         #else
           #define VAL_3 3
-        ${c}#endif
+        $c#endif
       """.trimIndent(),
       """
-        ${c}#else
+        $c#else
           #define VAL_3 3
         #endif
       """.trimIndent(),
@@ -449,12 +449,12 @@ class MatchitCTest : VimTestCase() {
       """
         #elif !defined (VAL_2)
           #define VAL_2 2
-        ${c}#else
+        $c#else
           #define VAL_3 3
         #endif
       """.trimIndent(),
       """
-        ${c}#elif !defined (VAL_2)
+        $c#elif !defined (VAL_2)
           #define VAL_2 2
         #else
           #define VAL_3 3
@@ -476,7 +476,7 @@ class MatchitCTest : VimTestCase() {
         #endif
       """.trimIndent(),
       """
-        ${c}#elif !defined (VAL_2)
+        $c#elif !defined (VAL_2)
             #define VAL_2 2
           #else
             #define VAL_3 3
@@ -493,11 +493,11 @@ class MatchitCTest : VimTestCase() {
       """
         #if !defined (VAL_1)
           #define VAL_1 1
-        ${c}#elif !defined (VAL_2)
+        $c#elif !defined (VAL_2)
           #define VAL_2 2
       """.trimIndent(),
       """
-        ${c}#if !defined (VAL_1)
+        $c#if !defined (VAL_1)
           #define VAL_1 1
         #elif !defined (VAL_2)
           #define VAL_2 2
@@ -511,12 +511,12 @@ class MatchitCTest : VimTestCase() {
     doTest(
       "g%",
       """
-        ${c}#ifdef DEBUG
+        $c#ifdef DEBUG
         #endif
       """.trimIndent(),
       """
         #ifdef DEBUG
-        ${c}#endif
+        $c#endif
       """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
     )
@@ -528,10 +528,10 @@ class MatchitCTest : VimTestCase() {
       "g%",
       """
         #ifdef DEBUG
-        ${c}#endif
+        $c#endif
       """.trimIndent(),
       """
-        ${c}#ifdef DEBUG
+        $c#ifdef DEBUG
         #endif
       """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
@@ -544,10 +544,10 @@ class MatchitCTest : VimTestCase() {
       "g%",
       """
         #ifdef DEBUG
-        ${c}#else
+        $c#else
       """.trimIndent(),
       """
-        ${c}#ifdef DEBUG
+        $c#ifdef DEBUG
         #else
       """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
@@ -560,10 +560,10 @@ class MatchitCTest : VimTestCase() {
       "g%",
       """
         #ifdef DEBUG
-        ${c}#elif PROD
+        $c#elif PROD
       """.trimIndent(),
       """
-        ${c}#ifdef DEBUG
+        $c#ifdef DEBUG
         #elif PROD
       """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
@@ -575,12 +575,12 @@ class MatchitCTest : VimTestCase() {
     doTest(
       "g%",
       """
-        ${c}#ifndef DEBUG
+        $c#ifndef DEBUG
         #endif
       """.trimIndent(),
       """
         #ifndef DEBUG
-        ${c}#endif
+        $c#endif
       """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
     )
@@ -592,10 +592,10 @@ class MatchitCTest : VimTestCase() {
       "g%",
       """
         #ifndef DEBUG
-        ${c}#endif
+        $c#endif
       """.trimIndent(),
       """
-        ${c}#ifndef DEBUG
+        $c#ifndef DEBUG
         #endif
       """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
@@ -608,10 +608,10 @@ class MatchitCTest : VimTestCase() {
       "g%",
       """
         #ifndef DEBUG
-        ${c}#elif PROD
+        $c#elif PROD
       """.trimIndent(),
       """
-        ${c}#ifndef DEBUG
+        $c#ifndef DEBUG
         #elif PROD
       """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
@@ -624,14 +624,13 @@ class MatchitCTest : VimTestCase() {
       "g%",
       """
         #ifndef DEBUG
-        ${c}#else
+        $c#else
       """.trimIndent(),
       """
-        ${c}#ifndef DEBUG
+        $c#ifndef DEBUG
         #else
       """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
     )
   }
-
 }

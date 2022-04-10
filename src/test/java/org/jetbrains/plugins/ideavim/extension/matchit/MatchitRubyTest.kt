@@ -648,7 +648,6 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
-
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from end to unless after a semicolon`() {
     doTest(
@@ -1864,7 +1863,7 @@ class MatchitRubyTest : VimTestCase() {
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
-  
+
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from one line condition to if`() {
     doTest(

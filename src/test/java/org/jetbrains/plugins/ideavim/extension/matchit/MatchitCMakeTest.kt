@@ -991,5 +991,4 @@ class MatchitCMakeTest : VimTestCase() {
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "CMakeLists.txt"
     )
   }
-
 }

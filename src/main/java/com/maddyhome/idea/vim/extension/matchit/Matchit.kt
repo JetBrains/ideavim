@@ -156,7 +156,7 @@ private data class LanguagePatterns(
   val reversedClosings: PatternsTable,
 ) {
   // Helper constructor for languages that don't need reversed patterns.
-  constructor(openings: PatternsTable, closings: PatternsTable): this(openings, closings, openings, closings)
+  constructor(openings: PatternsTable, closings: PatternsTable) : this(openings, closings, openings, closings)
 
   operator fun plus(newLanguagePatterns: LanguagePatterns): LanguagePatterns {
     return LanguagePatterns(
@@ -270,8 +270,8 @@ private object FileTypePatterns {
 
     return (
       LanguagePatterns("<", ">") +
-      LanguagePatterns(mapOf(openingTagPattern to htmlSearchPair), mapOf(closingTagPattern to htmlSearchPair))
-    )
+        LanguagePatterns(mapOf(openingTagPattern to htmlSearchPair), mapOf(closingTagPattern to htmlSearchPair))
+      )
   }
 
   private fun createRubyPatterns(): LanguagePatterns {
@@ -291,8 +291,8 @@ private object FileTypePatterns {
 
     return (
       LanguagePatterns(blockCommentStart, blockCommentEnd) +
-      LanguagePatterns(openingKeywords, middleKeywords, endKeyword)
-    )
+        LanguagePatterns(openingKeywords, middleKeywords, endKeyword)
+      )
   }
 
   private fun createCPatterns(): LanguagePatterns {
@@ -304,20 +304,19 @@ private object FileTypePatterns {
     // Original patterns: https://github.com/vim/vim/blob/master/runtime/ftplugin/make.vim
     return (
       LanguagePatterns("\\bdefine\\b", "\\bendef\\b") +
-      LanguagePatterns("(?<!else )ifn?(?:eq|def)\\b", "\\belse(?:\\s+ifn?(?:eq|def))?\\b", "\\bendif\\b")
-    )
+        LanguagePatterns("(?<!else )ifn?(?:eq|def)\\b", "\\belse(?:\\s+ifn?(?:eq|def))?\\b", "\\bendif\\b")
+      )
   }
 
   private fun createCMakePatterns(): LanguagePatterns {
     // Original patterns: https://github.com/vim/vim/blob/master/runtime/ftplugin/cmake.vim
     return (
       LanguagePatterns("\\bif\\b", "\\belse(?:if)?\\b", "\\bendif\\b") +
-      LanguagePatterns("\\b(?:foreach)|(?:while)\\b", "\\bbreak\\b", "\\b(?:endforeach)|(?:endwhile)\\b") +
-      LanguagePatterns("\\bmacro\\b", "\\bendmacro\\b") +
-      LanguagePatterns("\\bfunction\\b", "\\bendfunction\\b")
-    )
+        LanguagePatterns("\\b(?:foreach)|(?:while)\\b", "\\bbreak\\b", "\\b(?:endforeach)|(?:endwhile)\\b") +
+        LanguagePatterns("\\bmacro\\b", "\\bendmacro\\b") +
+        LanguagePatterns("\\bfunction\\b", "\\bendfunction\\b")
+      )
   }
-
 }
 
 /*
@@ -410,8 +409,9 @@ private fun findMatchingPair(
           caretInClosestMatch = true
           foundCloserMatch = true
         }
-      } else if (!caretInClosestMatch && matchStart < closestMatchStart
-          && !containsDefaultPairs(currentLineChars.subSequence(offset, matchStart))) {
+      } else if (!caretInClosestMatch && matchStart < closestMatchStart &&
+        !containsDefaultPairs(currentLineChars.subSequence(offset, matchStart))
+      ) {
         // A default pair after the cursor is preferred over any extended pairs after the cursor.
         foundCloserMatch = true
       }
