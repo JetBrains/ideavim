@@ -161,10 +161,6 @@ class ToHandlerMappingInfo(
     // Cache isOperatorPending in case the extension changes the mode while moving the caret
     // See CommonExtensionTest
     // TODO: Is this legal? Should we assert in this case?
-
-    // Cache isOperatorPending in case the extension changes the mode while moving the caret
-    // See CommonExtensionTest
-    // TODO: Is this legal? Should we assert in this case?
     val shouldCalculateOffsets: Boolean = commandState.isOperatorPending
 
     val startOffsets: Map<VimCaret, Offset> = editor.carets().associateWith { it.offset }

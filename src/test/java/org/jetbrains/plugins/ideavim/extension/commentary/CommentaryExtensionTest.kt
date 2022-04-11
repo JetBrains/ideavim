@@ -80,7 +80,16 @@ class CommentaryExtensionTest : JavaVimTestCase() {
     doTest(
       parseKeys("gcj"),
       "<caret>if (condition) {\n" + "}\n",
-      "//if (condition) {\n" +
+      "<caret>//if (condition) {\n" +
+        "//}\n"
+    )
+  }
+
+  fun testLineCommentDownPreservesAbsoluteCaretLocation() {
+    doTest(
+      parseKeys("gcj"),
+      "if (<caret>condition) {\n" + "}\n",
+      "//if<caret> (condition) {\n" +
         "//}\n"
     )
   }
@@ -158,11 +167,11 @@ class CommentaryExtensionTest : JavaVimTestCase() {
   }
 
   // |gcc|
-  fun testLineCommentShortcutPreservesCaret() {
+  fun testLineCommentShortcutSetsCaretToMotionLocation() {
     doTest(
       parseKeys("gcc"),
       "if (<caret>condition) {\n" + "}\n",
-      "//if (<caret>condition) {\n" + "}\n"
+      "<caret>//if (condition) {\n" + "}\n"
     )
     assertMode(CommandState.Mode.COMMAND)
     assertSelection(null)
@@ -278,6 +287,7 @@ class CommentaryExtensionTest : JavaVimTestCase() {
   }
 
   fun `test comment line with count`() {
+    // Caret position is kept as the position *before* the commenting. This is how Vim works
     doTest(
       parseKeys("4gcc"),
       """
@@ -290,7 +300,7 @@ class CommentaryExtensionTest : JavaVimTestCase() {
       """.trimIndent(),
       """
         final Int value1 = 42;
-        //final Int value2 = 42;
+        //final In<caret>t value2 = 42;
         //final Int value3 = 42;
         //final Int value4 = 42;
         //final Int value5 = 42;

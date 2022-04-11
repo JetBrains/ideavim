@@ -25,6 +25,7 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.command.SelectionType
+import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.common.argumentCaptured
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.handler.VimActionHandler
@@ -50,14 +51,26 @@ class OperatorAction : VimActionHandler.SingleExecution() {
         }
         val saveRepeatHandler = VimRepeater.repeatHandler
         val motion = argument.motion
-        val range = MotionGroup
-          .getMotionRange(
+
+        // Note that we're using getMotionRange2 in order to avoid normalising the linewise range into line start
+        // offsets that will be used to set the change marks. This affects things like the location of the caret in the
+        // Commentary extension
+        val range = MotionGroup.getMotionRange2(
             editor.ij,
             editor.ij.caretModel.primaryCaret,
             context.ij,
             argument,
             operatorArguments
-          )
+          )?.normalize()?.let {
+
+          // If we're linewise, make sure the end offset isn't just the EOL char
+          if (motion.isLinewiseMotion() && it.endOffset < editor.fileSize()) {
+            TextRange(it.startOffset, it.endOffset + 1)
+          }
+          else {
+            it
+          }
+        }
         if (range != null) {
           VimPlugin.getMark().setChangeMarks(editor, range)
           val selectionType = if (motion.isLinewiseMotion()) SelectionType.LINE_WISE else SelectionType.CHARACTER_WISE

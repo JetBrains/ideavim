@@ -138,19 +138,14 @@ class CommentaryExtension : VimExtension {
 
   private class CommentMotionVHandler : VimExtensionHandler {
     override fun execute(editor: Editor, context: DataContext) {
-      if (!editor.caretModel.primaryCaret.hasSelection()) {
-        return
-      }
-
-      // always use line-wise comments
-      if (!Operator().apply(editor, context, SelectionType.LINE_WISE)) {
-        return
-      }
-
-      runWriteAction {
-        // Leave visual mode
-        executeNormalWithoutMapping(parseKeys("<Esc>"), editor)
-        editor.caretModel.moveToOffset(editor.caretModel.primaryCaret.selectionStart)
+      if (editor.caretModel.primaryCaret.hasSelection()) {
+        // always use line-wise comments
+        Operator().apply(editor, context, SelectionType.LINE_WISE)
+        runWriteAction {
+          // Leave visual mode. The operator will only remove selection if it adds it. We could let the operator remove
+          // the selection always, which would asynchronously exit visual mode, but this makes it synchronous
+          executeNormalWithoutMapping(parseKeys("<Esc>"), editor)
+        }
       }
     }
   }
@@ -159,7 +154,8 @@ class CommentaryExtension : VimExtension {
     override fun apply(editor: Editor, context: DataContext, selectionType: SelectionType): Boolean {
       val range = getCommentRange(editor) ?: return false
 
-      if (getInstance(IjVimEditor(editor)).mode !== CommandState.Mode.VISUAL) {
+      val mode = getInstance(IjVimEditor(editor)).mode
+      if (mode !== CommandState.Mode.VISUAL) {
         editor.selectionModel.setSelection(range.startOffset, range.endOffset)
       }
 
@@ -172,15 +168,21 @@ class CommentaryExtension : VimExtension {
           val file = PsiDocumentManager.getInstance(proj).getPsiFile(editor.document) ?: return@runWriteAction false
           handler.invoke(editor.project!!, editor, editor.caretModel.currentCaret, file)
           handler.postInvoke()
-
-          // Jump back to start if in block mode
-          if (selectionType === SelectionType.CHARACTER_WISE) {
-            executeNormalWithoutMapping(parseKeys("`["), editor)
-          }
           return@runWriteAction true
         } finally {
-          // remove the selection
-          editor.selectionModel.removeSelection()
+          // Remove the selection, if we added it
+          if (mode !== CommandState.Mode.VISUAL) {
+            editor.selectionModel.removeSelection()
+          }
+
+          // Put the caret back at the start of the range, as though it was moved by the operator's motion argument.
+          // This is what Vim does. If IntelliJ is configured to add comments at the start of the line, this might put
+          // the caret in the "wrong" place. E.g. gc_ should put the caret on the first non-whitespace character. This
+          // is calculated by the motion, saved in the marks and then we insert the comment. If it's inserted at the
+          // first non-whitespace character, then the caret is in the right place. If it's inserted at the first column,
+          // then the caret is now in a bit of a weird place. We can't detect this scenario, so we just have to accept
+          // the difference
+          editor.caretModel.primaryCaret.moveToOffset(range.startOffset)
         }
       }
     }
@@ -189,10 +191,7 @@ class CommentaryExtension : VimExtension {
       val mode = getInstance(IjVimEditor(editor)).mode
       return when (mode) {
         CommandState.Mode.COMMAND -> VimPlugin.getMark().getChangeMarks(IjVimEditor(editor))
-        CommandState.Mode.VISUAL -> {
-          val primaryCaret = editor.caretModel.primaryCaret
-          TextRange(primaryCaret.selectionStart, primaryCaret.selectionEnd)
-        }
+        CommandState.Mode.VISUAL -> editor.caretModel.primaryCaret.let { TextRange(it.selectionStart, it.selectionEnd) }
         else -> null
       }
     }
