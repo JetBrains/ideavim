@@ -413,7 +413,10 @@ class VimExchangeExtensionTest : VimTestCase() {
     configureByText(before)
     typeText(StringHelper.parseKeys("cxj"))
 
-    assertHighlighter(0, 19, HighlighterTargetArea.LINES_IN_RANGE)
+    // Note that this is the range of the motion. The implementation will select the text with linewise 'V', so the
+    // correct text is yanked. The LINES_IN_RANGE means the highlight is drawn across the whole line
+    // so the correct text is
+    assertHighlighter(4, 14, HighlighterTargetArea.LINES_IN_RANGE)
 
     // Exit vim-exchange
     exitExchange()
@@ -430,7 +433,9 @@ class VimExchangeExtensionTest : VimTestCase() {
     configureByText(before)
     typeText(StringHelper.parseKeys("cxx"))
 
-    assertHighlighter(0, 9, HighlighterTargetArea.LINES_IN_RANGE)
+    // Note that this is the range of the motion. The implementation will select the text with linewise 'V', so the
+    // correct text is yanked. The LINES_IN_RANGE means the highlight is drawn across the whole line
+    assertHighlighter(0, 4, HighlighterTargetArea.LINES_IN_RANGE)
 
     // Exit vim-exchange
     exitExchange()
