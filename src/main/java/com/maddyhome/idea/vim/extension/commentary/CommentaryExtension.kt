@@ -67,8 +67,9 @@ class CommentaryExtension : VimExtension {
         editor.selectionModel.setSelection(range.startOffset, range.endOffset)
       }
 
+      // Treat block- and character-wise selections as block comments
       val handler =
-        if (selectionType === SelectionType.CHARACTER_WISE) CommentByBlockCommentHandler() else CommentByLineCommentHandler()
+        if (selectionType === SelectionType.LINE_WISE) CommentByLineCommentHandler() else CommentByBlockCommentHandler()
 
       return runWriteAction {
         try {
@@ -86,7 +87,7 @@ class CommentaryExtension : VimExtension {
           // Put the caret back at the start of the range, as though it was moved by the operator's motion argument.
           // This is what Vim does. If IntelliJ is configured to add comments at the start of the line, this might put
           // the caret in the "wrong" place. E.g. gc_ should put the caret on the first non-whitespace character. This
-          // is calculated by the motion, saved in the marks and then we insert the comment. If it's inserted at the
+          // is calculated by the motion, saved in the marks, and then we insert the comment. If it's inserted at the
           // first non-whitespace character, then the caret is in the right place. If it's inserted at the first column,
           // then the caret is now in a bit of a weird place. We can't detect this scenario, so we just have to accept
           // the difference
@@ -101,115 +102,109 @@ class CommentaryExtension : VimExtension {
   override fun getName() = "commentary"
 
   override fun init() {
-    putExtensionHandlerMapping(MappingMode.NO, parseKeys("<Plug>Commentary"), owner, CommentMotionHandler(), false)
-    putExtensionHandlerMapping(MappingMode.X, parseKeys("<Plug>Commentary"), owner, CommentMotionVHandler(), false)
-    putKeyMappingIfMissing(MappingMode.N, parseKeys("<Plug>CommentaryLine"), owner, parseKeys("gc_"), true)
+    val plugCommentaryKeys = parseKeys("<Plug>Commentary")
+    val plugCommentaryLineKeys = parseKeys("<Plug>CommentaryLine")
+    putExtensionHandlerMapping(MappingMode.NX, plugCommentaryKeys, owner, CommentaryOperatorHandler(), false)
+    putExtensionHandlerMapping(MappingMode.O, plugCommentaryKeys, owner, CommentaryTextObjectMotionHandler(), false)
+    putKeyMappingIfMissing(MappingMode.N, plugCommentaryLineKeys, owner, parseKeys("gc_"), true)
 
-    putKeyMappingIfMissing(MappingMode.NXO, parseKeys("gc"), owner, parseKeys("<Plug>Commentary"), true)
-    putKeyMappingIfMissing(MappingMode.N, parseKeys("gcc"), owner, parseKeys("<Plug>CommentaryLine"), true)
+    putKeyMappingIfMissing(MappingMode.NXO, parseKeys("gc"), owner, plugCommentaryKeys, true)
+    putKeyMappingIfMissing(MappingMode.N, parseKeys("gcc"), owner, plugCommentaryLineKeys, true)
     putKeyMappingIfMissing(MappingMode.N, parseKeys("gcu"), owner, parseKeys("<Plug>Commentary<Plug>Commentary"), true)
 
     addCommand("Commentary", CommentaryCommandAliasHandler())
   }
 
-  private class CommentMotionHandler : VimExtensionHandler {
+  /**
+   * Sets up the operator, pending a motion
+   *
+   * E.g. handles the `gc` in `gc_`, by setting the operator function, then invoking `g@` to receive the `_` motion to
+   * invoke the operator. This object is both the mapping handler and the operator function.
+   */
+  private class CommentaryOperatorHandler : OperatorFunction, VimExtensionHandler {
+    override fun isRepeatable() = true
+
+    override fun execute(editor: Editor, context: DataContext) {
+      setOperatorFunction(this)
+      executeNormalWithoutMapping(parseKeys("g@"), editor)
+    }
+
+    override fun apply(editor: Editor, context: DataContext, selectionType: SelectionType): Boolean {
+      val range = VimPlugin.getMark().getChangeMarks(IjVimEditor(editor)) ?: return false
+      return doCommentary(editor, range, selectionType, true)
+    }
+  }
+
+  /**
+   * The text object handler that provides the motion in e.g. `dgc`
+   *
+   * This object is both the `<Plug>Commentary` mapping handler and the text object handler
+   */
+  private class CommentaryTextObjectMotionHandler: TextObjectActionHandler(), VimExtensionHandler {
     override fun isRepeatable() = true
 
     override fun execute(editor: Editor, context: DataContext) {
       val commandState = getInstance(IjVimEditor(editor))
       val count = maxOf(1, commandState.commandBuilder.count)
 
-      if (commandState.isOperatorPending) {
-        val textObjectHandler = CommentTextObjectHandler()
-        commandState.commandBuilder.completeCommandPart(Argument(Command(count, textObjectHandler, Command.Type.MOTION,
-          EnumSet.noneOf(CommandFlags::class.java))))
-      }
-      else {
-        setOperatorFunction(Operator())
-        executeNormalWithoutMapping(parseKeys("g@"), editor)
-      }
+      val textObjectHandler = this
+      commandState.commandBuilder.completeCommandPart(Argument(Command(count, textObjectHandler, Command.Type.MOTION,
+        EnumSet.noneOf(CommandFlags::class.java))))
     }
 
-    private class CommentTextObjectHandler : TextObjectActionHandler() {
-      override val visualType: TextObjectVisualType = TextObjectVisualType.LINE_WISE
+    override val visualType: TextObjectVisualType = TextObjectVisualType.LINE_WISE
 
-      override fun getRange(
-        editor: VimEditor,
-        caret: VimCaret,
-        context: ExecutionContext,
-        count: Int,
-        rawCount: Int,
-        argument: Argument?
-      ): TextRange? {
+    override fun getRange(
+      editor: VimEditor,
+      caret: VimCaret,
+      context: ExecutionContext,
+      count: Int,
+      rawCount: Int,
+      argument: Argument?
+    ): TextRange? {
 
-        val nativeEditor = (editor as IjVimEditor).editor
-        val file = PsiHelper.getFile(nativeEditor) ?: return null
-        val lastLine = editor.lineCount()
+      val nativeEditor = (editor as IjVimEditor).editor
+      val file = PsiHelper.getFile(nativeEditor) ?: return null
+      val lastLine = editor.lineCount()
 
-        var startLine = caret.getLogicalPosition().line
-        while (startLine > 0 && isCommentLine(file, nativeEditor, startLine - 1)) startLine--
-        var endLine = caret.getLogicalPosition().line - 1
-        while (endLine < lastLine && isCommentLine(file, nativeEditor, endLine + 1)) endLine++
+      var startLine = caret.getLogicalPosition().line
+      while (startLine > 0 && isCommentLine(file, nativeEditor, startLine - 1)) startLine--
+      var endLine = caret.getLogicalPosition().line - 1
+      while (endLine < lastLine && isCommentLine(file, nativeEditor, endLine + 1)) endLine++
 
-        if (startLine <= endLine) {
-          val startOffset = EditorHelper.getLineStartOffset(nativeEditor, startLine)
-          val endOffset = EditorHelper.getLineStartOffset(nativeEditor, endLine + 1)
-          return TextRange(startOffset, endOffset)
-        }
-
-        return null
+      if (startLine <= endLine) {
+        val startOffset = EditorHelper.getLineStartOffset(nativeEditor, startLine)
+        val endOffset = EditorHelper.getLineStartOffset(nativeEditor, endLine + 1)
+        return TextRange(startOffset, endOffset)
       }
 
-      // Check all leaf nodes in the given line are whitespace, comments, or are owned by comments
-      private fun isCommentLine(file: PsiFile, editor: Editor, logicalLine: Int): Boolean {
-        val startOffset = EditorHelper.getLineStartOffset(editor, logicalLine)
-        val endOffset = EditorHelper.getLineEndOffset(editor, logicalLine, true)
-        val startElement = file.findElementAt(startOffset) ?: return false
-        var next: PsiElement? = startElement
-        while (next != null && next.textRange.startOffset <= endOffset) {
-          if (next !is PsiWhiteSpace && !isComment(next))
-            return false
-          next = PsiTreeUtil.nextLeaf(next, true)
-        }
-
-        return true
-      }
-
-      private fun isComment(element: PsiElement) =
-        PsiTreeUtil.getParentOfType(element, PsiComment::class.java, false) != null
+      return null
     }
+
+    // Check all leaf nodes in the given line are whitespace, comments, or are owned by comments
+    private fun isCommentLine(file: PsiFile, editor: Editor, logicalLine: Int): Boolean {
+      val startOffset = EditorHelper.getLineStartOffset(editor, logicalLine)
+      val endOffset = EditorHelper.getLineEndOffset(editor, logicalLine, true)
+      val startElement = file.findElementAt(startOffset) ?: return false
+      var next: PsiElement? = startElement
+      while (next != null && next.textRange.startOffset <= endOffset) {
+        if (next !is PsiWhiteSpace && !isComment(next))
+          return false
+        next = PsiTreeUtil.nextLeaf(next, true)
+      }
+
+      return true
+    }
+
+    private fun isComment(element: PsiElement) =
+      PsiTreeUtil.getParentOfType(element, PsiComment::class.java, false) != null
   }
 
-  private class CommentMotionVHandler : VimExtensionHandler {
-    override fun execute(editor: Editor, context: DataContext) {
-      if (editor.caretModel.primaryCaret.hasSelection()) {
-        // always use line-wise comments
-        Operator().apply(editor, context, SelectionType.LINE_WISE)
-        runWriteAction {
-          // Leave visual mode. The operator will only remove selection if it adds it. We could let the operator remove
-          // the selection always, which would asynchronously exit visual mode, but this makes it synchronous
-          executeNormalWithoutMapping(parseKeys("<Esc>"), editor)
-        }
-      }
-    }
-  }
-
-  private class Operator : OperatorFunction {
-    override fun apply(editor: Editor, context: DataContext, selectionType: SelectionType): Boolean {
-      val range = getCommentRange(editor) ?: return false
-      return doCommentary(editor, range, selectionType, true)
-    }
-
-    private fun getCommentRange(editor: Editor): TextRange? {
-      val mode = getInstance(IjVimEditor(editor)).mode
-      return when (mode) {
-        CommandState.Mode.COMMAND -> VimPlugin.getMark().getChangeMarks(IjVimEditor(editor))
-        CommandState.Mode.VISUAL -> editor.caretModel.primaryCaret.let { TextRange(it.selectionStart, it.selectionEnd) }
-        else -> null
-      }
-    }
-  }
-
+  /**
+   * The handler for the `Commentary` user defined command
+   *
+   * Used like `:1,3Commentary` or `g/fun/Commentary`
+   */
   private class CommentaryCommandAliasHandler: CommandAliasHandler {
     override fun execute(command:String, ranges: Ranges, editor: Editor, context: DataContext) {
       doCommentary(editor, ranges.getTextRange(editor, -1), SelectionType.LINE_WISE, false)
