@@ -49,6 +49,7 @@ import com.maddyhome.idea.vim.common.CommandPartNode
 import com.maddyhome.idea.vim.common.Node
 import com.maddyhome.idea.vim.common.RootNode
 import com.maddyhome.idea.vim.common.addLeafs
+import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.group.KeyGroup
 import com.maddyhome.idea.vim.helper.MessageHelper
@@ -143,13 +144,13 @@ class NerdTree : VimExtension {
   }
 
   class IjCommandHandler(private val actionId: String) : CommandAliasHandler {
-    override fun execute(editor: Editor, context: DataContext) {
+    override fun execute(command: String, ranges: Ranges, editor: Editor, context: DataContext) {
       callAction(actionId, context)
     }
   }
 
   class ToggleHandler : CommandAliasHandler {
-    override fun execute(editor: Editor, context: DataContext) {
+    override fun execute(command: String, ranges: Ranges, editor: Editor, context: DataContext) {
       val project = editor.project ?: return
       val toolWindow = ToolWindowManagerEx.getInstanceEx(project).getToolWindow(ToolWindowId.PROJECT_VIEW) ?: return
       if (toolWindow.isVisible) {
@@ -161,7 +162,7 @@ class NerdTree : VimExtension {
   }
 
   class CloseHandler : CommandAliasHandler {
-    override fun execute(editor: Editor, context: DataContext) {
+    override fun execute(command: String, ranges: Ranges, editor: Editor, context: DataContext) {
       val project = editor.project ?: return
       val toolWindow = ToolWindowManagerEx.getInstanceEx(project).getToolWindow(ToolWindowId.PROJECT_VIEW) ?: return
       if (toolWindow.isVisible) {

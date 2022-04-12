@@ -39,9 +39,12 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.CommandState.Companion.getInstance
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.command.TextObjectVisualType
+import com.maddyhome.idea.vim.common.CommandAliasHandler
 import com.maddyhome.idea.vim.common.MappingMode
 import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.extension.VimExtension
+import com.maddyhome.idea.vim.extension.VimExtensionFacade.addCommand
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.executeNormalWithoutMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
@@ -56,6 +59,45 @@ import com.maddyhome.idea.vim.newapi.IjVimEditor
 import java.util.*
 
 class CommentaryExtension : VimExtension {
+
+  companion object {
+    fun doCommentary(editor: Editor, range: TextRange, selectionType: SelectionType, resetCaret: Boolean): Boolean {
+      val mode = getInstance(IjVimEditor(editor)).mode
+      if (mode !== CommandState.Mode.VISUAL) {
+        editor.selectionModel.setSelection(range.startOffset, range.endOffset)
+      }
+
+      val handler =
+        if (selectionType === SelectionType.CHARACTER_WISE) CommentByBlockCommentHandler() else CommentByLineCommentHandler()
+
+      return runWriteAction {
+        try {
+          val proj = editor.project ?: return@runWriteAction false
+          val file = PsiDocumentManager.getInstance(proj).getPsiFile(editor.document) ?: return@runWriteAction false
+          handler.invoke(editor.project!!, editor, editor.caretModel.currentCaret, file)
+          handler.postInvoke()
+          return@runWriteAction true
+        } finally {
+          // Remove the selection, if we added it
+          if (mode !== CommandState.Mode.VISUAL) {
+            editor.selectionModel.removeSelection()
+          }
+
+          // Put the caret back at the start of the range, as though it was moved by the operator's motion argument.
+          // This is what Vim does. If IntelliJ is configured to add comments at the start of the line, this might put
+          // the caret in the "wrong" place. E.g. gc_ should put the caret on the first non-whitespace character. This
+          // is calculated by the motion, saved in the marks and then we insert the comment. If it's inserted at the
+          // first non-whitespace character, then the caret is in the right place. If it's inserted at the first column,
+          // then the caret is now in a bit of a weird place. We can't detect this scenario, so we just have to accept
+          // the difference
+          if (resetCaret) {
+            editor.caretModel.primaryCaret.moveToOffset(range.startOffset)
+          }
+        }
+      }
+    }
+  }
+
   override fun getName() = "commentary"
 
   override fun init() {
@@ -66,6 +108,8 @@ class CommentaryExtension : VimExtension {
     putKeyMappingIfMissing(MappingMode.NXO, parseKeys("gc"), owner, parseKeys("<Plug>Commentary"), true)
     putKeyMappingIfMissing(MappingMode.N, parseKeys("gcc"), owner, parseKeys("<Plug>CommentaryLine"), true)
     putKeyMappingIfMissing(MappingMode.N, parseKeys("gcu"), owner, parseKeys("<Plug>Commentary<Plug>Commentary"), true)
+
+    addCommand("Commentary", CommentaryCommandAliasHandler())
   }
 
   private class CommentMotionHandler : VimExtensionHandler {
@@ -153,38 +197,7 @@ class CommentaryExtension : VimExtension {
   private class Operator : OperatorFunction {
     override fun apply(editor: Editor, context: DataContext, selectionType: SelectionType): Boolean {
       val range = getCommentRange(editor) ?: return false
-
-      val mode = getInstance(IjVimEditor(editor)).mode
-      if (mode !== CommandState.Mode.VISUAL) {
-        editor.selectionModel.setSelection(range.startOffset, range.endOffset)
-      }
-
-      val handler =
-        if (selectionType === SelectionType.CHARACTER_WISE) CommentByBlockCommentHandler() else CommentByLineCommentHandler()
-
-      return runWriteAction {
-        try {
-          val proj = editor.project ?: return@runWriteAction false
-          val file = PsiDocumentManager.getInstance(proj).getPsiFile(editor.document) ?: return@runWriteAction false
-          handler.invoke(editor.project!!, editor, editor.caretModel.currentCaret, file)
-          handler.postInvoke()
-          return@runWriteAction true
-        } finally {
-          // Remove the selection, if we added it
-          if (mode !== CommandState.Mode.VISUAL) {
-            editor.selectionModel.removeSelection()
-          }
-
-          // Put the caret back at the start of the range, as though it was moved by the operator's motion argument.
-          // This is what Vim does. If IntelliJ is configured to add comments at the start of the line, this might put
-          // the caret in the "wrong" place. E.g. gc_ should put the caret on the first non-whitespace character. This
-          // is calculated by the motion, saved in the marks and then we insert the comment. If it's inserted at the
-          // first non-whitespace character, then the caret is in the right place. If it's inserted at the first column,
-          // then the caret is now in a bit of a weird place. We can't detect this scenario, so we just have to accept
-          // the difference
-          editor.caretModel.primaryCaret.moveToOffset(range.startOffset)
-        }
-      }
+      return doCommentary(editor, range, selectionType, true)
     }
 
     private fun getCommentRange(editor: Editor): TextRange? {
@@ -194,6 +207,12 @@ class CommentaryExtension : VimExtension {
         CommandState.Mode.VISUAL -> editor.caretModel.primaryCaret.let { TextRange(it.selectionStart, it.selectionEnd) }
         else -> null
       }
+    }
+  }
+
+  private class CommentaryCommandAliasHandler: CommandAliasHandler {
+    override fun execute(command:String, ranges: Ranges, editor: Editor, context: DataContext) {
+      doCommentary(editor, ranges.getTextRange(editor, -1), SelectionType.LINE_WISE, false)
     }
   }
 }

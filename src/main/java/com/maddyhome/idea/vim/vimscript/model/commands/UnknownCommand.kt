@@ -66,7 +66,7 @@ data class UnknownCommand(val ranges: Ranges, val name: String, val argument: St
             }
           }
           is GoalCommand.Call -> {
-            commandAlias.handler.execute(editor, context)
+            commandAlias.handler.execute(name, ranges, editor, context)
             return ExecutionResult.Success
           }
         }

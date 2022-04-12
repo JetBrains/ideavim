@@ -645,4 +645,97 @@ class CommentaryExtensionTest : JavaVimTestCase() {
       """.trimIndent()
     )
   }
+
+  fun `test Commentary command comments current line`() {
+    doTest(
+      parseKeys(":Commentary<CR>"),
+      """
+        final int var value1 = 42;
+        final int var <caret>value2 = 42;
+        final int var value3 = 42;
+      """.trimIndent(),
+      """
+        final int var value1 = 42;
+        //final int var <caret>value2 = 42;
+        final int var value3 = 42;
+      """.trimIndent()
+    )
+  }
+
+  fun `test Commentary command comments simple line range`() {
+    doTest(
+      parseKeys(":2Commentary<CR>"),
+      """
+        final int var <caret>value1 = 42;
+        final int var value2 = 42;
+        final int var value3 = 42;
+      """.trimIndent(),
+      """
+        final int var <caret>value1 = 42;
+        //final int var value2 = 42;
+        final int var value3 = 42;
+      """.trimIndent()
+    )
+  }
+
+  fun `test Commentary command comments line range`() {
+    doTest(
+      parseKeys(":1,3Commentary<CR>"),
+      """
+        final int var <caret>value1 = 42;
+        final int var value2 = 42;
+        final int var value3 = 42;
+      """.trimIndent(),
+      """
+        //final int var <caret>value1 = 42;
+        //final int var value2 = 42;
+        //final int var value3 = 42;
+      """.trimIndent()
+    )
+  }
+
+  @VimBehaviorDiffers("""
+        <caret>//final int var value1 = 42;
+        //final int var value2 = 42;
+        //final int var value3 = 42;
+  """,
+    description = "Vim exits Visual mode before entering Command mode, and resets the caret to the start of the visual selection." +
+      "When executing the Commentary command, we don't move the caret, so it should be end up at the start of the visual selection." +
+      "Note that Escape exits Visual mode, but leaves the caret where it is",
+    shouldBeFixed = true)
+  fun `test Commentary command comments visual range`() {
+    doTest(
+      parseKeys("Vjj", ":Commentary<CR>"),
+      """
+        final int var <caret>value1 = 42;
+        final int var value2 = 42;
+        final int var value3 = 42;
+      """.trimIndent(),
+      """
+        //final int var value1 = 42;
+        //final int var value2 = 42;
+        //final int var <caret>value3 = 42;
+      """.trimIndent()
+    )
+  }
+
+  fun `test Commentary command comments search range`() {
+    doTest(
+      parseKeys(":g/value2/Commentary<CR>"),
+      """
+        final int var <caret>value1 = 42;
+        final int var value2 = 42;
+        final int var value3 = 42;
+        final int var value21 = 42;
+        final int var value22 = 42;
+      """.trimIndent(),
+      """
+        final int var value1 = 42;
+        //final int var value2 = 42;
+        final int var value3 = 42;
+        //final int var value21 = 42;
+        <caret>//final int var value22 = 42;
+      """.trimIndent()
+    )
+  }
 }
