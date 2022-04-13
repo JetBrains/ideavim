@@ -17,13 +17,11 @@
  */
 package com.maddyhome.idea.vim.extension.commentary
 
-import com.intellij.codeInsight.generation.CommentByBlockCommentHandler
-import com.intellij.codeInsight.generation.CommentByLineCommentHandler
 import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.actionSystem.IdeActions
 import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.editor.Editor
 import com.intellij.psi.PsiComment
-import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiWhiteSpace
@@ -32,6 +30,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
@@ -56,28 +55,29 @@ import com.maddyhome.idea.vim.helper.PsiHelper
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.newapi.IjVimEditor
+import com.maddyhome.idea.vim.newapi.vim
 import java.util.*
 
 class CommentaryExtension : VimExtension {
 
   companion object {
-    fun doCommentary(editor: Editor, range: TextRange, selectionType: SelectionType, resetCaret: Boolean): Boolean {
-      val mode = getInstance(IjVimEditor(editor)).mode
+    fun doCommentary(editor: Editor, context: DataContext, range: TextRange, selectionType: SelectionType, resetCaret: Boolean): Boolean {
+      val mode = getInstance(editor.vim).mode
       if (mode !== CommandState.Mode.VISUAL) {
         editor.selectionModel.setSelection(range.startOffset, range.endOffset)
       }
 
-      // Treat block- and character-wise selections as block comments
-      val handler =
-        if (selectionType === SelectionType.LINE_WISE) CommentByLineCommentHandler() else CommentByBlockCommentHandler()
-
       return runWriteAction {
         try {
-          val proj = editor.project ?: return@runWriteAction false
-          val file = PsiDocumentManager.getInstance(proj).getPsiFile(editor.document) ?: return@runWriteAction false
-          handler.invoke(editor.project!!, editor, editor.caretModel.currentCaret, file)
-          handler.postInvoke()
-          return@runWriteAction true
+          // Treat block- and character-wise selections as block comments
+          val actionName = if (selectionType === SelectionType.LINE_WISE) {
+            IdeActions.ACTION_COMMENT_LINE
+          }
+          else {
+            IdeActions.ACTION_COMMENT_BLOCK
+          }
+
+          injector.actionExecutor.executeAction(actionName, context.vim)
         } finally {
           // Remove the selection, if we added it
           if (mode !== CommandState.Mode.VISUAL) {
@@ -130,8 +130,8 @@ class CommentaryExtension : VimExtension {
     }
 
     override fun apply(editor: Editor, context: DataContext, selectionType: SelectionType): Boolean {
-      val range = VimPlugin.getMark().getChangeMarks(IjVimEditor(editor)) ?: return false
-      return doCommentary(editor, range, selectionType, true)
+      val range = VimPlugin.getMark().getChangeMarks(editor.vim) ?: return false
+      return doCommentary(editor, context, range, selectionType, true)
     }
   }
 
@@ -144,7 +144,7 @@ class CommentaryExtension : VimExtension {
     override fun isRepeatable() = true
 
     override fun execute(editor: Editor, context: DataContext) {
-      val commandState = getInstance(IjVimEditor(editor))
+      val commandState = getInstance(editor.vim)
       val count = maxOf(1, commandState.commandBuilder.count)
 
       val textObjectHandler = this
@@ -207,7 +207,7 @@ class CommentaryExtension : VimExtension {
    */
   private class CommentaryCommandAliasHandler: CommandAliasHandler {
     override fun execute(command:String, ranges: Ranges, editor: Editor, context: DataContext) {
-      doCommentary(editor, ranges.getTextRange(editor, -1), SelectionType.LINE_WISE, false)
+      doCommentary(editor, context, ranges.getTextRange(editor, -1), SelectionType.LINE_WISE, false)
     }
   }
 }
