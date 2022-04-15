@@ -63,8 +63,6 @@ fun Editor.exitVisualMode() {
     VimPlugin.getMark().setVisualSelectionMarks(this.vim, TextRange(vimSelectionStart, primaryCaret.offset))
     this.caretModel.allCarets.forEach { it.vimSelectionStartClear() }
 
-    this.subMode = CommandState.SubMode.NONE
-
     this.vim.commandState.popModes()
   }
 }
