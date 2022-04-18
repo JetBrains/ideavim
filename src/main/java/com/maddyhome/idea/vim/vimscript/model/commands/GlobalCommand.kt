@@ -18,22 +18,22 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.RangeMarker
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.group.SearchGroup.RE_BOTH
 import com.maddyhome.idea.vim.group.SearchGroup.RE_LAST
 import com.maddyhome.idea.vim.group.SearchGroup.RE_SEARCH
 import com.maddyhome.idea.vim.group.SearchGroup.RE_SUBST
-import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.MessageHelper.message
 import com.maddyhome.idea.vim.helper.Msg
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.regexp.CharPointer
 import com.maddyhome.idea.vim.regexp.RegExp
-import com.maddyhome.idea.vim.vimscript.Executor
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
@@ -42,14 +42,14 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 data class GlobalCommand(val ranges: Ranges, val argument: String, val invert: Boolean) : Command.SingleExecution(ranges, argument) {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
 
-  override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
+  override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
     var result: ExecutionResult = ExecutionResult.Success
-    editor.caretModel.removeSecondaryCarets()
-    val caret = editor.caretModel.currentCaret
+    editor.removeSecondaryCarets()
+    val caret = editor.currentCaret()
 
     // For :g command the default range is %
     val lineRange: LineRange = if (ranges.size() == 0) {
-      LineRange(0, editor.document.lineCount - 1)
+      LineRange(0, editor.lineCount() - 1)
     } else {
       getLineRange(editor, caret)
     }
@@ -60,13 +60,13 @@ data class GlobalCommand(val ranges: Ranges, val argument: String, val invert: B
   }
 
   private fun processGlobalCommand(
-    editor: Editor,
-    context: DataContext,
+    editor: VimEditor,
+    context: ExecutionContext,
     range: LineRange,
   ): Boolean {
     // When nesting the command works on one line.  This allows for
     // ":g/found/v/notfound/command".
-    if (globalBusy && (range.startLine != 0 || range.endLine != editor.document.lineCount - 1)) {
+    if (globalBusy && (range.startLine != 0 || range.endLine != editor.lineCount() - 1)) {
       VimPlugin.showMessage(message("E147"))
       VimPlugin.indicateError()
       return false
@@ -115,11 +115,11 @@ data class GlobalCommand(val ranges: Ranges, val argument: String, val invert: B
     val sp = second.getThird()
 
     var match: Int
-    val lcount = EditorHelper.getLineCount(editor)
+    val lcount = editor.lineCount()
     val searchcol = 0
     if (globalBusy) {
-      val offset = editor.caretModel.currentCaret.offset
-      val lineStartOffset = editor.document.getLineStartOffset(editor.document.getLineNumber(offset))
+      val offset = editor.currentCaret().offset
+      val lineStartOffset = editor.lineStartForOffset(offset.point)
       match = sp.vim_regexec_multi(regmatch, editor, lcount, lineStartOffset, searchcol)
       if ((!invert && match > 0) || (invert && match <= 0)) {
         globalExecuteOne(editor, context, lineStartOffset, cmd.toString())
@@ -144,8 +144,8 @@ data class GlobalCommand(val ranges: Ranges, val argument: String, val invert: B
         // a match on this line?
         match = sp.vim_regexec_multi(regmatch, editor, lcount, lnum, searchcol)
         if ((!invert && match > 0) || (invert && match <= 0)) {
-          val lineStartOffset = editor.document.getLineStartOffset(lnum)
-          marks += editor.document.createRangeMarker(lineStartOffset, lineStartOffset)
+          val lineStartOffset = editor.getLineStartOffset(lnum)
+          marks += editor.ij.document.createRangeMarker(lineStartOffset, lineStartOffset)
           ndone += 1
         }
         // TODO: 25.05.2021 Check break
@@ -167,7 +167,7 @@ data class GlobalCommand(val ranges: Ranges, val argument: String, val invert: B
     return true
   }
 
-  private fun globalExe(editor: Editor, context: DataContext, marks: List<RangeMarker>, cmd: String) {
+  private fun globalExe(editor: VimEditor, context: ExecutionContext, marks: List<RangeMarker>, cmd: String) {
     globalBusy = true
     try {
       for (mark in marks) {
@@ -186,13 +186,13 @@ data class GlobalCommand(val ranges: Ranges, val argument: String, val invert: B
     // TODO: 26.05.2021 Add other staff
   }
 
-  private fun globalExecuteOne(editor: Editor, context: DataContext, lineStartOffset: Int, cmd: String?) {
+  private fun globalExecuteOne(editor: VimEditor, context: ExecutionContext, lineStartOffset: Int, cmd: String?) {
     // TODO: 26.05.2021 What about folds?
-    editor.caretModel.moveToOffset(lineStartOffset)
+    editor.currentCaret().moveToOffset(lineStartOffset)
     if (cmd == null || cmd.isEmpty() || (cmd.length == 1 && cmd[0] == '\n')) {
-      Executor.execute("p", editor, context, skipHistory = true, indicateErrors = true, this.vimContext)
+      injector.vimscriptExecutor.execute("p", editor, context, skipHistory = true, indicateErrors = true, this.vimContext)
     } else {
-      Executor.execute(cmd, editor, context, skipHistory = true, indicateErrors = true, this.vimContext)
+      injector.vimscriptExecutor.execute(cmd, editor, context, skipHistory = true, indicateErrors = true, this.vimContext)
     }
   }
 

@@ -18,11 +18,12 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.util.TextRange
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.ex.ranges.Ranges
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
@@ -31,14 +32,14 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 data class PrintCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
-  override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
-    editor.caretModel.removeSecondaryCarets()
-    val caret = editor.caretModel.currentCaret
+  override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
+    editor.removeSecondaryCarets()
+    val caret = editor.currentCaret()
     val textRange = getTextRange(editor, caret, checkCount = true)
 
-    val text = editor.document.getText(TextRange(textRange.startOffset, textRange.endOffset))
+    val text = editor.ij.document.getText(TextRange(textRange.startOffset, textRange.endOffset))
 
-    val exOutputModel = ExOutputModel.getInstance(editor)
+    val exOutputModel = ExOutputModel.getInstance(editor.ij)
     exOutputModel.output((exOutputModel.text ?: "") + text)
     return ExecutionResult.Success
   }

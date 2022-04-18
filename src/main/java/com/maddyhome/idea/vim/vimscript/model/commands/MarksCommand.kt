@@ -18,14 +18,15 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.StringHelper.stringToKeys
 import com.maddyhome.idea.vim.helper.StringHelper.toPrintableCharacters
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
@@ -35,19 +36,19 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 data class MarksCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
-  override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
+  override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
 
     // Yeah, lower case. Vim uses lower case here, but Title Case in :registers. Go figure.
-    val res = VimPlugin.getMark().getMarks(editor.vim)
+    val res = VimPlugin.getMark().getMarks(editor)
       .filter { argument.isEmpty() || argument.contains(it.key) }
       .joinToString("\n", prefix = "mark line  col file/text\n") { mark ->
 
         // Lines are 1 based, columns zero based. See :help :marks
         val line = (mark.logicalLine + 1).toString().padStart(5)
         val column = mark.col.toString().padStart(3)
-        val vf = EditorHelper.getVirtualFile(editor)
+        val vf = EditorHelper.getVirtualFile(editor.ij)
         val text = if (vf != null && vf.path == mark.filename) {
-          val lineText = EditorHelper.getLineText(editor, mark.logicalLine).trim().take(200)
+          val lineText = EditorHelper.getLineText(editor.ij, mark.logicalLine).trim().take(200)
           toPrintableCharacters(stringToKeys(lineText)).take(200)
         } else {
           mark.filename
@@ -56,7 +57,7 @@ data class MarksCommand(val ranges: Ranges, val argument: String) : Command.Sing
         " ${mark.key}  $line  $column $text"
       }
 
-    ExOutputModel.getInstance(editor).output(res)
+    ExOutputModel.getInstance(editor.ij).output(res)
 
     return ExecutionResult.Success
   }

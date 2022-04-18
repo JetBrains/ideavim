@@ -33,15 +33,15 @@ import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.tree.ParseTree
 
-object VimscriptParser {
+object VimscriptParser : com.maddyhome.idea.vim.api.VimscriptParser {
 
   private val logger = logger<VimscriptParser>()
   val linesWithErrors = mutableListOf<Int>()
   private const val MAX_NUMBER_OF_TRIES = 5
   var tries = 0
 
-  fun parse(text: String): Script {
-    val preprocessedText = uncommentIdeaVimIgnore(getTextWithoutErrors(text))
+  override fun parse(script: String): Script {
+    val preprocessedText = uncommentIdeaVimIgnore(getTextWithoutErrors(script))
     linesWithErrors.clear()
     val parser =
       getParser(preprocessedText + "\n", true) // grammar expects that any script ends with a newline character
@@ -63,8 +63,8 @@ object VimscriptParser {
     }
   }
 
-  fun parseExpression(text: String): Expression? {
-    val parser = getParser(text, true)
+  override fun parseExpression(expression: String): Expression? {
+    val parser = getParser(expression, true)
     val AST: ParseTree = parser.expr()
     if (linesWithErrors.isNotEmpty()) {
       linesWithErrors.clear()
@@ -73,8 +73,8 @@ object VimscriptParser {
     return ExpressionVisitor.visit(AST)
   }
 
-  fun parseCommand(text: String): Command? {
-    val textToParse = text.replace("\n", "") + "\n" // grammar expects that any command ends with a newline character
+  override fun parseCommand(command: String): Command? {
+    val textToParse = command.replace("\n", "") + "\n" // grammar expects that any command ends with a newline character
     val parser = getParser(textToParse, true)
     val AST: ParseTree = parser.command()
     if (linesWithErrors.isNotEmpty()) {

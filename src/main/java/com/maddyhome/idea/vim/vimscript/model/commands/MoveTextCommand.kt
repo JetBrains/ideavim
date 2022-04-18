@@ -18,10 +18,10 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Caret
-import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ExException
@@ -32,7 +32,8 @@ import com.maddyhome.idea.vim.group.copy.PutData
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.Msg
-import com.maddyhome.idea.vim.helper.fileSize
+import com.maddyhome.idea.vim.newapi.ij
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 import kotlin.math.min
@@ -44,23 +45,22 @@ data class MoveTextCommand(val ranges: Ranges, val argument: String) : Command.S
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED, Access.WRITABLE)
 
   @Throws(ExException::class)
-  override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
-    val carets = EditorHelper.getOrderedCaretsList(editor)
-    val caretModel = editor.caretModel
-    val caretCount = caretModel.caretCount
+  override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
+    val carets = EditorHelper.getOrderedCaretsList(editor.ij)
+    val caretCount = editor.nativeCarets().size
 
     val texts = ArrayList<String>(caretCount)
     val ranges = ArrayList<TextRange>(caretCount)
-    var line = editor.fileSize
+    var line = editor.fileSize().toInt()
     val goToLineCommand = VimscriptParser.parseCommand(argument) ?: throw ExException("E16: Invalid range")
 
     var lastRange: TextRange? = null
     for (caret in carets) {
-      val range = getTextRange(editor, caret, false)
-      val lineRange = getLineRange(editor, caret)
+      val range = getTextRange(editor, caret.vim, false)
+      val lineRange = getLineRange(editor, caret.vim)
 
-      line = min(line, normalizeLine(editor, caret, goToLineCommand, lineRange))
-      texts.add(EditorHelper.getText(editor, range.startOffset, range.endOffset))
+      line = min(line, normalizeLine(editor, caret.vim, goToLineCommand, lineRange))
+      texts.add(EditorHelper.getText(editor.ij, range.startOffset, range.endOffset))
 
       if (lastRange == null || lastRange.startOffset != range.startOffset && lastRange.endOffset != range.endOffset) {
         ranges.add(range)
@@ -68,7 +68,7 @@ data class MoveTextCommand(val ranges: Ranges, val argument: String) : Command.S
       }
     }
 
-    ranges.forEach { editor.document.deleteString(it.startOffset, it.endOffset) }
+    ranges.forEach { editor.ij.document.deleteString(it.startOffset, it.endOffset) }
 
     for (i in 0 until caretCount) {
       val caret = carets[i]
@@ -84,7 +84,7 @@ data class MoveTextCommand(val ranges: Ranges, val argument: String) : Command.S
         caretAfterInsertedText = false,
         putToLine = line
       )
-      VimPlugin.getPut().putTextForCaret(editor, caret, context, putData)
+      VimPlugin.getPut().putTextForCaret(editor.ij, caret, context.ij, putData)
     }
 
     return ExecutionResult.Success
@@ -92,8 +92,8 @@ data class MoveTextCommand(val ranges: Ranges, val argument: String) : Command.S
 
   @Throws
   private fun normalizeLine(
-    editor: Editor,
-    caret: Caret,
+    editor: VimEditor,
+    caret: VimCaret,
     command: Command,
     lineRange: LineRange,
   ): Int {

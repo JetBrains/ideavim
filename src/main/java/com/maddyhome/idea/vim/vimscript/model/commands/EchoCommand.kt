@@ -18,10 +18,11 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.ex.ranges.Ranges
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 
@@ -32,11 +33,11 @@ data class EchoCommand(val ranges: Ranges, val args: List<Expression>) : Command
 
   override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
-  override fun processCommand(editor: Editor, context: DataContext): ExecutionResult.Success {
+  override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult.Success {
     val text = args.joinToString(separator = " ", postfix = "\n") {
       it.evaluate(editor, context, this).toString()
     }
-    ExOutputModel.getInstance(editor).output(text)
+    ExOutputModel.getInstance(editor.ij).output(text)
     return ExecutionResult.Success
   }
 }

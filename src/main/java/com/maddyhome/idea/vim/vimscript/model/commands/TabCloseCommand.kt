@@ -18,13 +18,14 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
-import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.PlatformDataKeys
-import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.MessageHelper
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
@@ -35,9 +36,9 @@ data class TabCloseCommand(val ranges: Ranges, val argument: String) : Command.S
 
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
-  override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
+  override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
 
-    val project = PlatformDataKeys.PROJECT.getData(context) ?: return ExecutionResult.Error
+    val project = PlatformDataKeys.PROJECT.getData(context.ij) ?: return ExecutionResult.Error
     val fileEditorManager = FileEditorManagerEx.getInstanceEx(project)
     val currentWindow = fileEditorManager.currentWindow
     val tabbedPane = currentWindow.tabbedPane

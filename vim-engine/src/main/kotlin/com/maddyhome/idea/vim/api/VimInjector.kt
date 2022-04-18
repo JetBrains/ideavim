@@ -7,6 +7,7 @@ import com.maddyhome.idea.vim.mark.VimMarkGroup
 import com.maddyhome.idea.vim.options.OptionService
 import com.maddyhome.idea.vim.put.VimPut
 import com.maddyhome.idea.vim.register.VimRegisterGroup
+import com.maddyhome.idea.vim.vimscript.services.VariableService
 
 interface VimInjector {
   val parser: VimStringParser
@@ -39,8 +40,14 @@ interface VimInjector {
   val lookupManager: VimLookupManager
   val templateManager: VimTemplateManager
   val searchGroup: VimSearchGroup
-//  val statisticsService: VimStatistics
+  val statisticsService: VimStatistics
   val put: VimPut
+
+  val vimscriptExecutor: VimscriptExecutor
+  val vimscriptParser: VimscriptParser
+  val variableService: VariableService
+  val functionService: VimscriptFunctionService
+  val vimrcFileState: VimrcFileState
 
   /**
    * Please use vimLogger() function

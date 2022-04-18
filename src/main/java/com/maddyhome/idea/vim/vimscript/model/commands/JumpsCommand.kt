@@ -18,14 +18,15 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.StringHelper.stringToKeys
 import com.maddyhome.idea.vim.helper.StringHelper.toPrintableCharacters
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import kotlin.math.absoluteValue
 
@@ -34,7 +35,7 @@ import kotlin.math.absoluteValue
  */
 data class JumpsCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_FORBIDDEN, Access.READ_ONLY)
-  override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
+  override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
     val jumps = VimPlugin.getMark().getJumps()
     val spot = VimPlugin.getMark().getJumpSpot()
 
@@ -50,9 +51,9 @@ data class JumpsCommand(val ranges: Ranges, val argument: String) : Command.Sing
       text.append(jump.col.toString().padStart(3))
 
       text.append(" ")
-      val vf = EditorHelper.getVirtualFile(editor)
+      val vf = EditorHelper.getVirtualFile(editor.ij)
       if (vf != null && vf.path == jump.filepath) {
-        val line = EditorHelper.getLineText(editor, jump.logicalLine).trim().take(200)
+        val line = EditorHelper.getLineText(editor.ij, jump.logicalLine).trim().take(200)
         val keys = stringToKeys(line)
         text.append(toPrintableCharacters(keys).take(200))
       } else {
@@ -66,7 +67,7 @@ data class JumpsCommand(val ranges: Ranges, val argument: String) : Command.Sing
       text.append(">\n")
     }
 
-    ExOutputModel.getInstance(editor).output(text.toString())
+    ExOutputModel.getInstance(editor.ij).output(text.toString())
 
     return ExecutionResult.Success
   }

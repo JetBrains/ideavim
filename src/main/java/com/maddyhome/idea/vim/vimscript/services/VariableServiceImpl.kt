@@ -18,11 +18,12 @@
 
 package com.maddyhome.idea.vim.vimscript.services
 
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.util.Key
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.vimscript.model.ExecutableContext
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimBlob
@@ -51,22 +52,22 @@ internal class VariableServiceImpl : VariableService {
     }
   }
 
-  override fun isVariableLocked(variable: Variable, editor: Editor, context: DataContext, vimContext: VimLContext): Boolean {
+  override fun isVariableLocked(variable: Variable, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): Boolean {
     return getNullableVariableValue(variable, editor, context, vimContext)?.isLocked ?: false
   }
 
-  override fun lockVariable(variable: Variable, depth: Int, editor: Editor, context: DataContext, vimContext: VimLContext) {
+  override fun lockVariable(variable: Variable, depth: Int, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext) {
     val value = getNullableVariableValue(variable, editor, context, vimContext) ?: return
     value.lockOwner = variable
     value.lockVar(depth)
   }
 
-  override fun unlockVariable(variable: Variable, depth: Int, editor: Editor, context: DataContext, vimContext: VimLContext) {
+  override fun unlockVariable(variable: Variable, depth: Int, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext) {
     val value = getNullableVariableValue(variable, editor, context, vimContext) ?: return
     value.unlockVar(depth)
   }
 
-  override fun storeVariable(variable: Variable, value: VimDataType, editor: Editor, context: DataContext, vimContext: VimLContext) {
+  override fun storeVariable(variable: Variable, value: VimDataType, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext) {
     val scope = variable.scope ?: getDefaultVariableScope(vimContext)
     when (scope) {
       Scope.GLOBAL_VARIABLE -> {
@@ -78,48 +79,48 @@ internal class VariableServiceImpl : VariableService {
       Scope.SCRIPT_VARIABLE -> storeScriptVariable(variable.name.evaluate(editor, context, vimContext).value, value, vimContext)
       Scope.WINDOW_VARIABLE, Scope.TABPAGE_VARIABLE -> {
         val variableKey = scope.c + ":" + variable.name
-        if (editor.getUserData(tabAndWindowVariablesKey) == null) {
-          editor.putUserData(tabAndWindowVariablesKey, mutableMapOf(variableKey to value))
+        if (editor.ij.getUserData(tabAndWindowVariablesKey) == null) {
+          editor.ij.putUserData(tabAndWindowVariablesKey, mutableMapOf(variableKey to value))
         } else {
-          editor.getUserData(tabAndWindowVariablesKey)!![variableKey] = value
+          editor.ij.getUserData(tabAndWindowVariablesKey)!![variableKey] = value
         }
       }
       Scope.FUNCTION_VARIABLE -> storeFunctionVariable(variable.name.evaluate(editor, context, vimContext).value, value, vimContext)
       Scope.LOCAL_VARIABLE -> storeLocalVariable(variable.name.evaluate(editor, context, vimContext).value, value, vimContext)
       Scope.BUFFER_VARIABLE -> {
-        if (editor.document.getUserData(bufferVariablesKey) == null) {
-          editor.document.putUserData(bufferVariablesKey, mutableMapOf(variable.name.evaluate(editor, context, vimContext).value to value))
+        if (editor.ij.document.getUserData(bufferVariablesKey) == null) {
+          editor.ij.document.putUserData(bufferVariablesKey, mutableMapOf(variable.name.evaluate(editor, context, vimContext).value to value))
         } else {
-          editor.document.getUserData(bufferVariablesKey)!![variable.name.evaluate(editor, context, vimContext).value] = value
+          editor.ij.document.getUserData(bufferVariablesKey)!![variable.name.evaluate(editor, context, vimContext).value] = value
         }
       }
       Scope.VIM_VARIABLE -> throw ExException("The 'v:' scope is not implemented yet :(")
     }
   }
 
-  override fun getNullableVariableValue(variable: Variable, editor: Editor, context: DataContext, vimContext: VimLContext): VimDataType? {
+  override fun getNullableVariableValue(variable: Variable, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType? {
     val scope = variable.scope ?: getDefaultVariableScope(vimContext)
     return when (scope) {
       Scope.GLOBAL_VARIABLE -> getGlobalVariableValue(variable.name.evaluate(editor, context, vimContext).value)
       Scope.SCRIPT_VARIABLE -> getScriptVariable(variable.name.evaluate(editor, context, vimContext).value, vimContext)
       Scope.WINDOW_VARIABLE, Scope.TABPAGE_VARIABLE -> {
         val variableKey = scope.c + ":" + variable.name
-        editor.getUserData(tabAndWindowVariablesKey)?.get(variableKey)
+        editor.ij.getUserData(tabAndWindowVariablesKey)?.get(variableKey)
       }
       Scope.FUNCTION_VARIABLE -> getFunctionVariable(variable.name.evaluate(editor, context, vimContext).value, vimContext)
       Scope.LOCAL_VARIABLE -> getLocalVariable(variable.name.evaluate(editor, context, vimContext).value, vimContext)
       Scope.BUFFER_VARIABLE -> {
-        editor.document.getUserData(bufferVariablesKey)?.get(variable.name.evaluate(editor, context, vimContext).value)
+        editor.ij.document.getUserData(bufferVariablesKey)?.get(variable.name.evaluate(editor, context, vimContext).value)
       }
       Scope.VIM_VARIABLE -> throw ExException("The 'v:' scope is not implemented yet :(")
     }
   }
 
-  override fun getNonNullVariableValue(variable: Variable, editor: Editor, context: DataContext, vimContext: VimLContext): VimDataType {
+  override fun getNonNullVariableValue(variable: Variable, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType {
     return getNullableVariableValue(variable, editor, context, vimContext)
       ?: throw ExException(
         "E121: Undefined variable: " +
-          (if (variable.scope != null) variable.scope.c + ":" else "") +
+          (if (variable.scope != null) variable.scope!!.c + ":" else "") +
           variable.name.evaluate(editor, context, vimContext).value
       )
   }

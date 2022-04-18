@@ -20,6 +20,7 @@ package com.maddyhome.idea.vim.vimscript.services
 
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.extensions.ExtensionPointName
+import com.maddyhome.idea.vim.api.VimscriptFunctionService
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
 import com.maddyhome.idea.vim.vimscript.model.Script
@@ -30,7 +31,7 @@ import com.maddyhome.idea.vim.vimscript.model.functions.FunctionBeanClass
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
 
-object FunctionStorage {
+object FunctionStorage : VimscriptFunctionService {
 
   private val logger = logger<FunctionStorage>()
 
@@ -39,7 +40,7 @@ object FunctionStorage {
   private val extensionPoint = ExtensionPointName.create<FunctionBeanClass>("IdeaVIM.vimLibraryFunction")
   private val builtInFunctions: MutableMap<String, FunctionHandler> = mutableMapOf()
 
-  fun deleteFunction(name: String, scope: Scope? = null, vimContext: VimLContext) {
+  override fun deleteFunction(name: String, scope: Scope?, vimContext: VimLContext) {
     if (name[0].isLowerCase() && scope != Scope.SCRIPT_VARIABLE) {
       throw ExException("E128: Function name must start with a capital or \"s:\": $name")
     }
@@ -84,7 +85,7 @@ object FunctionStorage {
     throw ExException("E130: Unknown function: $name")
   }
 
-  fun storeFunction(declaration: FunctionDeclaration) {
+  override fun storeFunction(declaration: FunctionDeclaration) {
     val scope: Scope = declaration.scope ?: getDefaultFunctionScope()
     when (scope) {
       Scope.GLOBAL_VARIABLE -> {
@@ -109,12 +110,12 @@ object FunctionStorage {
     }
   }
 
-  fun getFunctionHandler(scope: Scope?, name: String, vimContext: VimLContext): FunctionHandler {
+  override fun getFunctionHandler(scope: Scope?, name: String, vimContext: VimLContext): FunctionHandler {
     return getFunctionHandlerOrNull(scope, name, vimContext)
       ?: throw ExException("E117: Unknown function: ${scope?.toString() ?: ""}$name")
   }
 
-  fun getFunctionHandlerOrNull(scope: Scope?, name: String, vimContext: VimLContext): FunctionHandler? {
+  override fun getFunctionHandlerOrNull(scope: Scope?, name: String, vimContext: VimLContext): FunctionHandler? {
     if (scope == null) {
       val builtInFunction = getBuiltInFunction(name)
       if (builtInFunction != null) {
@@ -129,7 +130,7 @@ object FunctionStorage {
     return null
   }
 
-  fun getUserDefinedFunction(scope: Scope?, name: String, vimContext: VimLContext): FunctionDeclaration? {
+  override fun getUserDefinedFunction(scope: Scope?, name: String, vimContext: VimLContext): FunctionDeclaration? {
     return when (scope) {
       Scope.GLOBAL_VARIABLE -> globalFunctions[name]
       Scope.SCRIPT_VARIABLE -> getScriptFunction(name, vimContext)
@@ -145,7 +146,7 @@ object FunctionStorage {
     }
   }
 
-  fun getBuiltInFunction(name: String): FunctionHandler? {
+  override fun getBuiltInFunction(name: String): FunctionHandler? {
     return builtInFunctions[name]
   }
 
@@ -171,11 +172,12 @@ object FunctionStorage {
     return Scope.GLOBAL_VARIABLE
   }
 
-  fun registerHandlers() {
+  override fun registerHandlers() {
     extensionPoint.extensions().forEach(FunctionBeanClass::register)
   }
 
-  fun addHandler(handlerHolder: FunctionBeanClass) {
+  override fun addHandler(handlerHolder: Any) {
+    handlerHolder as FunctionBeanClass
     if (handlerHolder.name != null) {
       builtInFunctions[handlerHolder.name!!] = handlerHolder.instance
     } else {

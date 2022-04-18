@@ -18,17 +18,18 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
-import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
-import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.MessageHelper
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
@@ -37,7 +38,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 data class CmdFilterCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges) {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
 
-  override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
+  override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
     logger.debug("execute")
     val command = buildString {
       var inBackslash = false
@@ -52,7 +53,7 @@ data class CmdFilterCommand(val ranges: Ranges, val argument: String) : Command.
             append(last)
           }
           !inBackslash && c == '%' -> {
-            val virtualFile = EditorHelper.getVirtualFile(editor)
+            val virtualFile = EditorHelper.getVirtualFile(editor.ij)
             if (virtualFile == null) {
               // Note that we use a slightly different error message to Vim, because we don't support alternate files or file
               // name modifiers. (I also don't know what the :p:h means)
@@ -74,23 +75,23 @@ data class CmdFilterCommand(val ranges: Ranges, val argument: String) : Command.
       return ExecutionResult.Error
     }
 
-    val workingDirectory = editor.project?.basePath
+    val workingDirectory = editor.ij.project?.basePath
     return try {
       if (ranges.size() == 0) {
         // Show command output in a window
-        VimPlugin.getProcess().executeCommand(editor, command, null, workingDirectory)?.let {
-          ExOutputModel.getInstance(editor).output(it)
+        VimPlugin.getProcess().executeCommand(editor.ij, command, null, workingDirectory)?.let {
+          ExOutputModel.getInstance(editor.ij).output(it)
         }
         ExecutionResult.Success
       } else {
         // Filter
         val range = this.getTextRange(editor, false)
-        val input = editor.document.charsSequence.subSequence(range.startOffset, range.endOffset)
-        VimPlugin.getProcess().executeCommand(editor, command, input, workingDirectory)?.let {
+        val input = editor.ij.document.charsSequence.subSequence(range.startOffset, range.endOffset)
+        VimPlugin.getProcess().executeCommand(editor.ij, command, input, workingDirectory)?.let {
           ApplicationManager.getApplication().runWriteAction {
             val start = editor.offsetToLogicalPosition(range.startOffset)
             val end = editor.offsetToLogicalPosition(range.endOffset)
-            editor.document.replaceString(range.startOffset, range.endOffset, it)
+            editor.ij.document.replaceString(range.startOffset, range.endOffset, it)
             val linesFiltered = end.line - start.line
             if (linesFiltered > 2) {
               VimPlugin.showMessage("$linesFiltered lines filtered")

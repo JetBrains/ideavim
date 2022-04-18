@@ -16,4 +16,12 @@ class IjVimStringParser : VimStringParser {
   override fun stringToKeys(string: String): List<KeyStroke> {
     return StringHelper.stringToKeys(string)
   }
+
+  override fun toKeyNotation(keyStroke: KeyStroke): String {
+    return StringHelper.toKeyNotation(keyStroke)
+  }
+
+  override fun toKeyNotation(keyStrokes: List<KeyStroke>): String {
+    return StringHelper.toKeyNotation(keyStrokes)
+  }
 }

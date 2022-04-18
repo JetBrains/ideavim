@@ -22,6 +22,7 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.Executor
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
 import com.maddyhome.idea.vim.vimscript.model.commands.EchoCommand
@@ -319,7 +320,7 @@ class CommandParserTest : VimTestCase() {
         nnoremap Y y${'$'}
 
       """.trimIndent().replace("\n", "\r\n"),
-      myFixture.editor, DataContext.EMPTY_CONTEXT, skipHistory = true, indicateErrors = true, CommandLineVimLContext
+      myFixture.editor.vim, DataContext.EMPTY_CONTEXT.vim, skipHistory = true, indicateErrors = true, CommandLineVimLContext
     )
     typeText(StringHelper.parseKeys("Yp"))
     assertState("----------\n1234556789${c}067890\n----------\n")

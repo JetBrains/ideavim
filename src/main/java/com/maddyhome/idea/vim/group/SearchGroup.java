@@ -47,6 +47,7 @@ import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.ex.ranges.LineRange;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.history.HistoryConstants;
+import com.maddyhome.idea.vim.newapi.IjExecutionContext;
 import com.maddyhome.idea.vim.newapi.IjVimCaret;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.options.OptionChangeListener;
@@ -754,7 +755,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
     Expression expression = null;
     for (int lnum = line1; lnum <= line2 && !got_quit; ) {
       CharacterPosition newpos = null;
-      int nmatch = sp.vim_regexec_multi(regmatch, ((IjVimEditor) editor).getEditor(), lcount, lnum, searchcol);
+      int nmatch = sp.vim_regexec_multi(regmatch, editor, lcount, lnum, searchcol);
       if (nmatch > 0) {
         if (firstMatch) {
           VimPlugin.getMark().saveJumpLocation(editor);
@@ -813,7 +814,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
             if (expression != null) {
               try {
               match = expression
-                .evaluate(((IjVimEditor) editor).getEditor(), EditorDataContext.init(((IjVimEditor) editor).getEditor(), null), parent)
+                .evaluate(editor, new IjExecutionContext(EditorDataContext.init(((IjVimEditor) editor).getEditor(), null)), parent)
                 .toInsertableString();
               } catch (Exception e) {
                 exceptions.add((ExException) e);
@@ -877,6 +878,25 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
     // TODO: Support reporting number of changes (:help 'report')
 
     return true;
+  }
+
+  @Override
+  public void setLastSearchPattern(@Nullable String lastSearchPattern) {
+    this.lastSearch = lastSearchPattern;
+  }
+
+  @Override
+  public void setLastSubstitutePattern(@Nullable String lastSubstitutePattern) {
+    this.lastSubstitute = lastSubstitutePattern;
+  }
+
+  @Override
+  public int processSearchRange(@NotNull VimEditor editor,
+                                @NotNull String pattern,
+                                int patternOffset,
+                                int startOffset,
+                                @NotNull Direction direction) {
+    return processSearchRange(((IjVimEditor) editor).getEditor(), pattern, patternOffset, startOffset, direction);
   }
 
   public Pair<Boolean, Trinity<RegExp.regmmatch_T, String, RegExp>> search_regcomp(CharPointer pat,

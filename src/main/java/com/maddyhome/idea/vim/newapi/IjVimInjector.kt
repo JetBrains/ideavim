@@ -23,9 +23,14 @@ import com.maddyhome.idea.vim.api.VimMotionGroup
 import com.maddyhome.idea.vim.api.VimProcessGroup
 import com.maddyhome.idea.vim.api.VimSearchGroup
 import com.maddyhome.idea.vim.api.VimSearchHelper
+import com.maddyhome.idea.vim.api.VimStatistics
 import com.maddyhome.idea.vim.api.VimStringParser
 import com.maddyhome.idea.vim.api.VimTemplateManager
 import com.maddyhome.idea.vim.api.VimVisualMotionGroup
+import com.maddyhome.idea.vim.api.VimrcFileState
+import com.maddyhome.idea.vim.api.VimscriptExecutor
+import com.maddyhome.idea.vim.api.VimscriptFunctionService
+import com.maddyhome.idea.vim.api.VimscriptParser
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.common.VimMachine
 import com.maddyhome.idea.vim.diagnostic.VimLogger
@@ -42,6 +47,10 @@ import com.maddyhome.idea.vim.mark.VimMarkGroup
 import com.maddyhome.idea.vim.options.OptionService
 import com.maddyhome.idea.vim.put.VimPut
 import com.maddyhome.idea.vim.register.VimRegisterGroup
+import com.maddyhome.idea.vim.ui.VimRcFileState
+import com.maddyhome.idea.vim.vimscript.Executor
+import com.maddyhome.idea.vim.vimscript.services.FunctionStorage
+import com.maddyhome.idea.vim.vimscript.services.VariableService
 
 class IjVimInjector : VimInjector {
   override fun <T : Any> getLogger(clazz: Class<T>): VimLogger = IjVimLogger(Logger.getInstance(clazz::class.java))
@@ -92,6 +101,19 @@ class IjVimInjector : VimInjector {
     get() = service()
   override val visualMotionGroup: VimVisualMotionGroup
     get() = service()
+  override val statisticsService: VimStatistics
+    get() = service()
+
+  override val functionService: VimscriptFunctionService
+    get() = FunctionStorage
+  override val variableService: VariableService
+    get() = service()
+  override val vimrcFileState: VimrcFileState
+    get() = VimRcFileState
+  override val vimscriptExecutor: VimscriptExecutor
+    get() = Executor
+  override val vimscriptParser: VimscriptParser
+    get() = com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 
   override val optionService: OptionService
     get() = service()

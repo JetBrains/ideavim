@@ -1,6 +1,7 @@
 package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.common.TextRange
+import java.nio.CharBuffer
 
 interface EngineEditorHelper {
   fun normalizeOffset(editor: VimEditor, offset: Int, allowEnd: Boolean): Int
@@ -23,4 +24,5 @@ interface EngineEditorHelper {
   fun getVisualLineAtTopOfScreen(editor: VimEditor): Int
   fun getApproximateScreenWidth(editor: VimEditor): Int
   fun handleWithReadonlyFragmentModificationHandler(editor: VimEditor, exception: java.lang.Exception)
+  fun getLineBuffer(editor: VimEditor, line: Int): CharBuffer
 }

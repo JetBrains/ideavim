@@ -12,6 +12,7 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.newapi.IjVimCaret
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
+import java.nio.CharBuffer
 
 @Service
 class IjEditorHelper : EngineEditorHelper {
@@ -101,5 +102,9 @@ class IjEditorHelper : EngineEditorHelper {
     return EditorActionManager.getInstance()
       .getReadonlyFragmentModificationHandler(editor.ij.document)
       .handle(exception as ReadOnlyFragmentModificationException?)
+  }
+
+  override fun getLineBuffer(editor: VimEditor, line: Int): CharBuffer {
+    return EditorHelper.getLineBuffer(editor.ij, line)
   }
 }

@@ -955,5 +955,4 @@ class MatchitGNUMakeTest : VimTestCase() {
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "Makefile"
     )
   }
-
 }

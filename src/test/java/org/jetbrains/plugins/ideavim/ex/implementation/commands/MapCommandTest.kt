@@ -23,6 +23,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.Executor
 import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -779,7 +780,7 @@ n  ,f            <Plug>Foo
       let s:mapping = '^f8a'
       nnoremap <expr> t s:mapping
       """.trimIndent(),
-      editor, context, skipHistory = false, indicateErrors = true, null
+      editor.vim, context.vim, skipHistory = false, indicateErrors = true, null
     )
     typeText(parseKeys("t"))
     assertPluginError(true)

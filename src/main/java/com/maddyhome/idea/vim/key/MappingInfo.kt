@@ -130,7 +130,7 @@ class ToExpressionMappingInfo(
   override fun execute(editor: VimEditor, context: ExecutionContext) {
     LOG.debug("Executing 'ToExpression' mapping info...")
     val editorDataContext = injector.executionContextManager.onEditor(editor, context)
-    val toKeys = parseKeys(toExpression.evaluate(editor.ij, context.ij, CommandLineVimLContext).toString())
+    val toKeys = parseKeys(toExpression.evaluate(editor, context, CommandLineVimLContext).toString())
     val fromIsPrefix = KeyHandler.isPrefix(fromKeys, toKeys)
     var first = true
     for (keyStroke in toKeys) {

@@ -18,11 +18,12 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.Ranges
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import java.lang.NumberFormatException
 
@@ -32,14 +33,14 @@ import java.lang.NumberFormatException
 data class TabMoveCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
-  override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
+  override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
     if (ranges.size() != 0) {
       throw ExException("Range form of tabmove command is not supported. Please use the argument form")
     }
 
     val tabService = VimPlugin.getTabService()
-    val tabCount = tabService.getTabCount(context)
-    val currentIndex = tabService.getCurrentTabIndex(context)
+    val tabCount = tabService.getTabCount(context.ij)
+    val currentIndex = tabService.getCurrentTabIndex(context.ij)
     val index: Int
 
     try {
@@ -71,7 +72,7 @@ data class TabMoveCommand(val ranges: Ranges, val argument: String) : Command.Si
     if (index < 0 || index >= tabCount) {
       throw ExException("E474: Invalid argument")
     }
-    tabService.moveCurrentTabToIndex(index, context)
+    tabService.moveCurrentTabToIndex(index, context.ij)
     return ExecutionResult.Success
   }
 }

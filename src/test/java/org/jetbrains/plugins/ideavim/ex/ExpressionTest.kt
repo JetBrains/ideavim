@@ -20,6 +20,7 @@ package org.jetbrains.plugins.ideavim.ex
 
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.textarea.TextComponentEditorImpl
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
@@ -29,5 +30,5 @@ import javax.swing.JTextArea
 fun Expression.evaluate(vimContext: VimLContext = CommandLineVimLContext): VimDataType {
   val editor = TextComponentEditorImpl(null, JTextArea())
   val context = DataContext.EMPTY_CONTEXT
-  return this.evaluate(editor, context, vimContext)
+  return this.evaluate(editor.vim, context.vim, vimContext)
 }

@@ -15,6 +15,7 @@ interface VimCaret {
   val vimLeadSelectionOffset: Int
   var vimLastVisualOperatorRange: VisualChange?
   fun moveToOffset(offset: Int)
+  fun moveToLogicalPosition(logicalPosition: VimLogicalPosition)
   fun offsetForLineStartSkipLeading(line: Int): Int
   fun getLine(): EditorLine.Pointer
   fun hasSelection(): Boolean

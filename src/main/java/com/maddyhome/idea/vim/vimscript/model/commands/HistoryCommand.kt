@@ -18,17 +18,18 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
-import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.diagnostic.debug
-import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.history.HistoryConstants.COMMAND
 import com.maddyhome.idea.vim.history.HistoryConstants.EXPRESSION
 import com.maddyhome.idea.vim.history.HistoryConstants.INPUT
 import com.maddyhome.idea.vim.history.HistoryConstants.SEARCH
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
@@ -36,7 +37,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  */
 data class HistoryCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
   override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
-  override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
+  override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
     logger.debug("execute")
 
     var arg = argument.trim().ifEmpty { "cmd" }
@@ -110,7 +111,7 @@ data class HistoryCommand(val ranges: Ranges, val argument: String) : Command.Si
       else -> ""
     }
 
-    ExOutputModel.getInstance(editor).output(res)
+    ExOutputModel.getInstance(editor.ij).output(res)
 
     return ExecutionResult.Success
   }

@@ -89,7 +89,7 @@ object VimExtensionRegistrar {
   }
 
   private fun initExtension(extensionBean: ExtensionBeanClass, name: String) {
-    if (Executor.executingVimScript) {
+    if (Executor.executingVimscript) {
       delayedExtensionEnabling += extensionBean
     } else {
       extensionBean.instance.init()

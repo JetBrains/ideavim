@@ -18,9 +18,9 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.common.GoalCommand
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.InvalidCommandException
@@ -42,11 +42,11 @@ data class UnknownCommand(val ranges: Ranges, val name: String, val argument: St
     const val MAX_RECURSION = 100
   }
 
-  override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
+  override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
     return processPossiblyAliasCommand("$name $argument", editor, context, MAX_RECURSION)
   }
 
-  private fun processPossiblyAliasCommand(name: String, editor: Editor, context: DataContext, aliasCountdown: Int): ExecutionResult {
+  private fun processPossiblyAliasCommand(name: String, editor: VimEditor, context: ExecutionContext, aliasCountdown: Int): ExecutionResult {
     if (VimPlugin.getCommand().isAlias(name)) {
       if (aliasCountdown > 0) {
         val commandAlias = VimPlugin.getCommand().getAliasCommand(name, 1)

@@ -18,16 +18,16 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.ex.ranges.Ranges
-import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.Msg
-import com.maddyhome.idea.vim.newapi.IjVimEditor
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
@@ -46,10 +46,10 @@ data class SetCommand(val ranges: Ranges, val argument: String) : Command.Single
     internal var isExecutingCommand = false
   }
 
-  override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
+  override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
     isExecutingCommand = true
     try {
-      OptionsManager.parseOptionLine(editor, argument, true)
+      OptionsManager.parseOptionLine(editor.ij, argument, true)
     } catch (e: ExException) {
       // same exceptions will be thrown later, so we ignore them for now
     }
@@ -65,8 +65,8 @@ data class SetCommand(val ranges: Ranges, val argument: String) : Command.Single
 data class SetLocalCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
-  override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
-    return if (parseOptionLine(editor, argument, OptionScope.LOCAL(IjVimEditor(editor)), failOnBad = true)) {
+  override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
+    return if (parseOptionLine(editor, argument, OptionScope.LOCAL(editor), failOnBad = true)) {
       ExecutionResult.Success
     } else {
       ExecutionResult.Error
@@ -99,7 +99,7 @@ data class SetLocalCommand(val ranges: Ranges, val argument: String) : Command.S
  * @return True if no errors were found, false if there were any errors
  */
 // todo is failOnBad used anywhere?
-fun parseOptionLine(editor: Editor, args: String, scope: OptionScope, failOnBad: Boolean): Boolean {
+fun parseOptionLine(editor: VimEditor, args: String, scope: OptionScope, failOnBad: Boolean): Boolean {
   // No arguments so we show changed values
   val optionService = (VimPlugin.getOptionService() as OptionServiceImpl)
   when {
@@ -196,7 +196,7 @@ fun parseOptionLine(editor: Editor, args: String, scope: OptionScope, failOnBad:
   return true
 }
 
-private fun showOptions(editor: Editor, nameAndToken: Collection<Pair<String, String>>, scope: OptionScope, showIntro: Boolean) {
+private fun showOptions(editor: VimEditor, nameAndToken: Collection<Pair<String, String>>, scope: OptionScope, showIntro: Boolean) {
   val optionService = VimPlugin.getOptionService()
   val optionsToShow = mutableListOf<String>()
   var unknownOption: Pair<String, String>? = null
@@ -220,7 +220,7 @@ private fun showOptions(editor: Editor, nameAndToken: Collection<Pair<String, St
   cols.sort()
   extra.sort()
 
-  var width = EditorHelper.getApproximateScreenWidth(editor)
+  var width = injector.engineEditorHelper.getApproximateScreenWidth(editor)
   if (width < 20) {
     width = 80
   }
@@ -257,14 +257,14 @@ private fun showOptions(editor: Editor, nameAndToken: Collection<Pair<String, St
       res.append("\n")
     }
   }
-  ExOutputModel.getInstance(editor).output(res.toString())
+  ExOutputModel.getInstance(editor.ij).output(res.toString())
 
   if (unknownOption != null) {
     throw ExException("E518: Unknown option: ${unknownOption.second}")
   }
 }
 
-private fun optionToString(scope: OptionScope, name: String, editor: Editor): String {
+private fun optionToString(scope: OptionScope, name: String, editor: VimEditor): String {
   val value = VimPlugin.getOptionService().getOptionValue(scope, name)
   return if (VimPlugin.getOptionService().isToggleOption(name)) {
     if (value.asBoolean()) "  $name" else "no$name"

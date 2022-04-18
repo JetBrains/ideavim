@@ -183,6 +183,10 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
     return modificationAllowed && writeRequested
   }
 
+  override fun isDocumentWritable(): Boolean {
+    return editor.document.isWritable
+  }
+
   override fun isOneLineMode(): Boolean {
     return editor.isOneLineMode
   }
@@ -261,6 +265,10 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
     val startPosition = LogicalPosition(start.line, start.column, start.leansForward)
     val endPosition = LogicalPosition(end.line, end.column, end.leansForward)
     editor.selectionModel.vimSetSystemBlockSelectionSilently(startPosition, endPosition)
+  }
+
+  override fun getLineStartOffset(line: Int): Int {
+    return EditorHelper.getLineStartOffset(editor, line)
   }
 
   override fun getLineEndOffset(line: Int, allowEnd: Boolean): Int {

@@ -18,22 +18,20 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.editor.LogicalPosition
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.VimLogicalPosition
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ranges.Ranges
-import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.StringHelper.stringToKeys
 import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.helper.exitInsertMode
 import com.maddyhome.idea.vim.helper.exitSelectMode
-import com.maddyhome.idea.vim.helper.exitVisualMode
-import com.maddyhome.idea.vim.helper.getTopLevelEditor
 import com.maddyhome.idea.vim.helper.mode
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
@@ -42,7 +40,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 data class NormalCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.WRITABLE, Flag.SAVE_VISUAL)
 
-  override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
+  override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
     if (VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.ideadelaymacroName)) {
       return ExecutionResult.Success
     }
@@ -54,45 +52,45 @@ data class NormalCommand(val ranges: Ranges, val argument: String) : Command.Sin
       argument = argument.substring(1)
     }
 
-    val commandState = editor.vim.commandState
+    val commandState = editor.commandState
     val rangeUsed = ranges.size() != 0
     when (editor.mode) {
       CommandState.Mode.VISUAL -> {
-        editor.getTopLevelEditor().exitVisualMode()
+        editor.exitVisualModeNative()
         if (!rangeUsed) {
-          val selectionStart = VimPlugin.getMark().getMark(editor.vim, '<')!!
-          editor.caretModel.moveToLogicalPosition(LogicalPosition(selectionStart.logicalLine, selectionStart.col))
+          val selectionStart = VimPlugin.getMark().getMark(editor, '<')!!
+          editor.currentCaret().moveToLogicalPosition(VimLogicalPosition(selectionStart.logicalLine, selectionStart.col))
         }
       }
-      CommandState.Mode.CMD_LINE -> VimPlugin.getProcess().cancelExEntry(editor, false)
+      CommandState.Mode.CMD_LINE -> VimPlugin.getProcess().cancelExEntry(editor.ij, false)
       CommandState.Mode.INSERT, CommandState.Mode.REPLACE -> editor.exitInsertMode(context, OperatorArguments(false, 1, commandState.mode, commandState.subMode))
       CommandState.Mode.SELECT -> editor.exitSelectMode(false)
       CommandState.Mode.OP_PENDING, CommandState.Mode.COMMAND -> Unit
     }
-    val range = getLineRange(editor, editor.caretModel.primaryCaret)
+    val range = getLineRange(editor, editor.primaryCaret())
 
     for (line in range.startLine..range.endLine) {
       if (rangeUsed) {
         // Move caret to the first position on line
-        if (editor.document.lineCount < line) {
+        if (editor.lineCount() < line) {
           break
         }
-        val startOffset = EditorHelper.getLineStartOffset(editor, line)
-        editor.caretModel.moveToOffset(startOffset)
+        val startOffset = editor.getLineStartOffset(line)
+        editor.currentCaret().moveToOffset(startOffset)
       }
 
       // Perform operations
       val keys = stringToKeys(argument)
       val keyHandler = KeyHandler.getInstance()
-      keyHandler.reset(editor.vim)
+      keyHandler.reset(editor)
       for (key in keys) {
-        keyHandler.handleKey(editor.vim, key, context.vim, useMappings, true)
+        keyHandler.handleKey(editor, key, context, useMappings, true)
       }
 
       // Exit if state leaves as insert or cmd_line
       val mode = commandState.mode
       if (mode == CommandState.Mode.CMD_LINE) {
-        VimPlugin.getProcess().cancelExEntry(editor, false)
+        VimPlugin.getProcess().cancelExEntry(editor.ij, false)
       }
       if (mode == CommandState.Mode.INSERT || mode == CommandState.Mode.REPLACE) {
         editor.exitInsertMode(context, OperatorArguments(false, 1, commandState.mode, commandState.subMode))

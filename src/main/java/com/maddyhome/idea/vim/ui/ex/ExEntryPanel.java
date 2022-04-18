@@ -33,6 +33,7 @@ import com.maddyhome.idea.vim.ex.ranges.LineRange;
 import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.helper.SearchHighlightsHelper;
 import com.maddyhome.idea.vim.helper.UiHelper;
+import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.regexp.CharPointer;
 import com.maddyhome.idea.vim.regexp.RegExp;
 import com.maddyhome.idea.vim.ui.ExPanelBorder;
@@ -288,7 +289,7 @@ public class ExEntryPanel extends JPanel {
           VimPlugin.getSearch().resetIncsearchHighlights();
           return;
         }
-        searchRange = command.getLineRange(editor);
+        searchRange = command.getLineRange(new IjVimEditor(editor));
       }
 
       final String labelText = label.getText();

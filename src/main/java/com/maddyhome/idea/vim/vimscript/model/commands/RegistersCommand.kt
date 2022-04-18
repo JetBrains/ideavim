@@ -18,14 +18,15 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
@@ -33,7 +34,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  */
 data class RegistersCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
-  override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
+  override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
 
     val registerGroup = VimPlugin.getRegister()
     val regs = registerGroup.getRegisters()
@@ -48,7 +49,7 @@ data class RegistersCommand(val ranges: Ranges, val argument: String) : Command.
         "  $type  \"${reg.name}   ${StringHelper.toPrintableCharacters(text).take(200)}"
       }
 
-    ExOutputModel.getInstance(editor).output(regs)
+    ExOutputModel.getInstance(editor.ij).output(regs)
 
     return ExecutionResult.Success
   }

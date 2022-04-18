@@ -55,16 +55,17 @@ import com.maddyhome.idea.vim.helper.PsiHelper
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.newapi.IjVimEditor
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import java.util.*
 
 class CommentaryExtension : VimExtension {
 
   companion object {
-    fun doCommentary(editor: Editor, context: DataContext, range: TextRange, selectionType: SelectionType, resetCaret: Boolean): Boolean {
-      val mode = getInstance(editor.vim).mode
+    fun doCommentary(editor: VimEditor, context: ExecutionContext, range: TextRange, selectionType: SelectionType, resetCaret: Boolean): Boolean {
+      val mode = getInstance(editor).mode
       if (mode !== CommandState.Mode.VISUAL) {
-        editor.selectionModel.setSelection(range.startOffset, range.endOffset)
+        editor.ij.selectionModel.setSelection(range.startOffset, range.endOffset)
       }
 
       return runWriteAction {
@@ -77,11 +78,11 @@ class CommentaryExtension : VimExtension {
             IdeActions.ACTION_COMMENT_BLOCK
           }
 
-          injector.actionExecutor.executeAction(actionName, context.vim)
+          injector.actionExecutor.executeAction(actionName, context)
         } finally {
           // Remove the selection, if we added it
           if (mode !== CommandState.Mode.VISUAL) {
-            editor.selectionModel.removeSelection()
+            editor.removeSelection()
           }
 
           // Put the caret back at the start of the range, as though it was moved by the operator's motion argument.
@@ -92,7 +93,7 @@ class CommentaryExtension : VimExtension {
           // then the caret is now in a bit of a weird place. We can't detect this scenario, so we just have to accept
           // the difference
           if (resetCaret) {
-            editor.caretModel.primaryCaret.moveToOffset(range.startOffset)
+            editor.primaryCaret().moveToOffset(range.startOffset)
           }
         }
       }
@@ -131,7 +132,7 @@ class CommentaryExtension : VimExtension {
 
     override fun apply(editor: Editor, context: DataContext, selectionType: SelectionType): Boolean {
       val range = VimPlugin.getMark().getChangeMarks(editor.vim) ?: return false
-      return doCommentary(editor, context, range, selectionType, true)
+      return doCommentary(editor.vim, context.vim, range, selectionType, true)
     }
   }
 
@@ -206,7 +207,7 @@ class CommentaryExtension : VimExtension {
    * Used like `:1,3Commentary` or `g/fun/Commentary`
    */
   private class CommentaryCommandAliasHandler: CommandAliasHandler {
-    override fun execute(command:String, ranges: Ranges, editor: Editor, context: DataContext) {
+    override fun execute(command:String, ranges: Ranges, editor: VimEditor, context: ExecutionContext) {
       doCommentary(editor, context, ranges.getTextRange(editor, -1), SelectionType.LINE_WISE, false)
     }
   }

@@ -21,6 +21,7 @@ package com.maddyhome.idea.vim.newapi
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.components.Service
+import com.intellij.openapi.util.Computable
 import com.maddyhome.idea.vim.api.VimApplication
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.diagnostic.vimLogger
@@ -68,6 +69,14 @@ class IjVimApplication : VimApplication {
 
   override fun runReadCommand(editor: VimEditor, name: String?, groupId: Any?, command: Runnable) {
     RunnableHelper.runReadCommand((editor as IjVimEditor).editor.project, command, name, groupId)
+  }
+
+  override fun <T> runWriteAction(action: () -> T): T {
+    return ApplicationManager.getApplication().runWriteAction(Computable(action))
+  }
+
+  override fun <T> runReadAction(action: () -> T): T {
+    return ApplicationManager.getApplication().runReadAction(Computable(action))
   }
 
   private fun createKeyEvent(stroke: KeyStroke, component: Component): KeyEvent {

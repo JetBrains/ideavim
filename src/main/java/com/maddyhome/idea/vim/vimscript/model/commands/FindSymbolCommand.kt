@@ -18,12 +18,11 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
-import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.ranges.Ranges
-import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
@@ -31,9 +30,9 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  */
 data class FindSymbolCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
   override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
-  override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
+  override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
     // TODO: Check the command argument and jump to a specific symbol
-    ApplicationManager.getApplication().invokeLater { injector.actionExecutor.executeAction("GotoSymbol", context.vim) }
+    ApplicationManager.getApplication().invokeLater { injector.actionExecutor.executeAction("GotoSymbol", context) }
     return ExecutionResult.Success
   }
 }

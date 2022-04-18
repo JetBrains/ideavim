@@ -168,7 +168,7 @@ public class SearchHelper {
           /*
            * Look for a match somewhere in the line.
            */
-          nmatched = sp.vim_regexec_multi(regmatch, editor, lcount, lnum, 0);
+          nmatched = sp.vim_regexec_multi(regmatch, new IjVimEditor(editor), lcount, lnum, 0);
           if (nmatched > 0) {
             /* match may actually be in another line when using \zs */
             matchpos = new RegExp.lpos_T(regmatch.startpos[0]);
@@ -204,7 +204,7 @@ public class SearchHelper {
                   ++matchcol;
                 }
                 if (ptr.charAt(matchcol) == '\u0000' ||
-                  (nmatched = sp.vim_regexec_multi(regmatch, editor, lcount, lnum, matchcol)) == 0) {
+                  (nmatched = sp.vim_regexec_multi(regmatch, new IjVimEditor(editor), lcount, lnum, matchcol)) == 0) {
                   match_ok = false;
                   break;
                 }
@@ -259,7 +259,7 @@ public class SearchHelper {
                   ++matchcol;
                 }
                 if (ptr.charAt(matchcol) == '\u0000' ||
-                  (nmatched = sp.vim_regexec_multi(regmatch, editor, lcount, lnum + matchpos.lnum, matchcol)) == 0) {
+                  (nmatched = sp.vim_regexec_multi(regmatch, new IjVimEditor(editor), lcount, lnum + matchpos.lnum, matchcol)) == 0) {
                   break;
                 }
 
@@ -383,7 +383,7 @@ public class SearchHelper {
 
     int col = 0;
     for (int line = startLine; line <= actualEndLine; ) {
-      int matchedLines = regExp.vim_regexec_multi(regMatch, editor, lineCount, line, col);
+      int matchedLines = regExp.vim_regexec_multi(regMatch, new IjVimEditor(editor), lineCount, line, col);
       if (matchedLines > 0) {
         final CharacterPosition startPos = new CharacterPosition(line + regMatch.startpos[0].lnum,
           regMatch.startpos[0].col);

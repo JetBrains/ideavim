@@ -20,12 +20,16 @@ package com.maddyhome.idea.vim.vimscript
 
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.diagnostic.logger
-import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.textarea.TextComponentEditorImpl
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.VimScriptExecutorBase
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.FinishException
 import com.maddyhome.idea.vim.history.HistoryConstants
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.register.RegisterConstants.LAST_COMMAND_REGISTER
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
@@ -37,12 +41,12 @@ import java.io.File
 import java.io.IOException
 import javax.swing.JTextArea
 
-object Executor {
+object Executor : VimScriptExecutorBase() {
   private val logger = logger<Executor>()
-  var executingVimScript = false
+  override var executingVimscript = false
 
   @Throws(ExException::class)
-  fun execute(scriptString: String, editor: Editor, context: DataContext, skipHistory: Boolean, indicateErrors: Boolean = true, vimContext: VimLContext? = null): ExecutionResult {
+  override fun execute(scriptString: String, editor: VimEditor, context: ExecutionContext, skipHistory: Boolean, indicateErrors: Boolean, vimContext: VimLContext?): ExecutionResult {
     var finalResult: ExecutionResult = ExecutionResult.Success
 
     val script = VimscriptParser.parse(scriptString)
@@ -76,6 +80,9 @@ object Executor {
       } catch (e: Exception) {
         logger.warn("Caught: ${e.message}")
         logger.warn(e.stackTrace.toString())
+        if (injector.application.isUnitTest()) {
+          throw e
+        }
       }
     }
 
@@ -88,23 +95,22 @@ object Executor {
     return finalResult
   }
 
-  fun execute(scriptString: String, skipHistory: Boolean = true) {
-    val editor = TextComponentEditorImpl(null, JTextArea())
-    val context = DataContext.EMPTY_CONTEXT
+  override fun execute(scriptString: String, skipHistory: Boolean) {
+    val editor = TextComponentEditorImpl(null, JTextArea()).vim
+    val context = DataContext.EMPTY_CONTEXT.vim
     execute(scriptString, editor, context, skipHistory, indicateErrors = true, CommandLineVimLContext)
   }
 
-  @JvmStatic
-  fun executeFile(file: File, indicateErrors: Boolean = false) {
-    val editor = TextComponentEditorImpl(null, JTextArea())
-    val context = DataContext.EMPTY_CONTEXT
+  override fun executeFile(file: File, indicateErrors: Boolean) {
+    val editor = TextComponentEditorImpl(null, JTextArea()).vim
+    val context = DataContext.EMPTY_CONTEXT.vim
     try {
       execute(file.readText(), editor, context, skipHistory = true, indicateErrors)
     } catch (ignored: IOException) { }
   }
 
   @Throws(ExException::class)
-  fun executeLastCommand(editor: Editor, context: DataContext): Boolean {
+  override fun executeLastCommand(editor: VimEditor, context: ExecutionContext): Boolean {
     val reg = VimPlugin.getRegister().getRegister(':') ?: return false
     val text = reg.text ?: return false
     execute(text, editor, context, skipHistory = false, indicateErrors = true, CommandLineVimLContext)

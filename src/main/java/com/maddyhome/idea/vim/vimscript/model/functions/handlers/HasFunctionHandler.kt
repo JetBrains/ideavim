@@ -18,8 +18,8 @@
 
 package com.maddyhome.idea.vim.vimscript.model.functions.handlers
 
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.statistic.VimscriptState
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
@@ -36,8 +36,8 @@ object HasFunctionHandler : FunctionHandler() {
 
   override fun doFunction(
     argumentValues: List<Expression>,
-    editor: Editor,
-    context: DataContext,
+    editor: VimEditor,
+    context: ExecutionContext,
     vimContext: VimLContext,
   ): VimDataType {
     val feature = argumentValues[0].evaluate(editor, context, vimContext).asString()

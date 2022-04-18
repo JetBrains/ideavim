@@ -18,14 +18,14 @@
 
 package com.maddyhome.idea.vim.vimscript.model.functions.handlers
 
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.vimLine
 import com.maddyhome.idea.vim.helper.vimSelectionStart
-import com.maddyhome.idea.vim.newapi.IjVimEditor
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
@@ -47,8 +47,8 @@ object LineFunctionHandler : FunctionHandler() {
 
   override fun doFunction(
     argumentValues: List<Expression>,
-    editor: Editor,
-    context: DataContext,
+    editor: VimEditor,
+    context: ExecutionContext,
     vimContext: VimLContext,
   ): VimInt {
     val argument = argumentValues[0].evaluate(editor, context, vimContext)
@@ -64,8 +64,8 @@ object ColFunctionHandler : FunctionHandler() {
 
   override fun doFunction(
     argumentValues: List<Expression>,
-    editor: Editor,
-    context: DataContext,
+    editor: VimEditor,
+    context: ExecutionContext,
     vimContext: VimLContext,
   ): VimDataType {
     val argument = argumentValues[0].evaluate(editor, context, vimContext)
@@ -73,13 +73,13 @@ object ColFunctionHandler : FunctionHandler() {
   }
 }
 
-private fun currentCol(editor: Editor): VimInt {
-  val logicalPosition = editor.caretModel.currentCaret.logicalPosition
-  var lineLength = EditorHelper.getLineLength(editor, logicalPosition.line)
+private fun currentCol(editor: VimEditor): VimInt {
+  val logicalPosition = editor.currentCaret().getLogicalPosition()
+  var lineLength = editor.lineLength(logicalPosition.line)
 
   // If virtualedit is set, the col is one more
   // XXX Should we also check the current mode?
-  if ((VimPlugin.getOptionService().getOptionValue(OptionScope.LOCAL(IjVimEditor(editor)), OptionConstants.virtualeditName) as VimString).value.isNotEmpty()) {
+  if ((VimPlugin.getOptionService().getOptionValue(OptionScope.LOCAL(editor), OptionConstants.virtualeditName) as VimString).value.isNotEmpty()) {
     lineLength += 1
   }
 
@@ -88,17 +88,17 @@ private fun currentCol(editor: Editor): VimInt {
 
 // Analog of var2fpos function
 // Translate variable to position
-private fun variableToPosition(editor: Editor, variable: VimDataType, dollarForLine: Boolean): Pair<VimInt, VimInt>? {
+private fun variableToPosition(editor: VimEditor, variable: VimDataType, dollarForLine: Boolean): Pair<VimInt, VimInt>? {
   if (variable is VimList) {
     if (variable.values.size < 2) return null
 
     val line = indexAsNumber(variable, 0) ?: return null
-    if (line <= 0 || line > editor.document.lineCount) {
+    if (line <= 0 || line > editor.lineCount()) {
       return null
     }
 
     var column = indexAsNumber(variable, 1) ?: return null
-    val lineLength = EditorHelper.getLineLength(editor, line.value - 1)
+    val lineLength = editor.lineLength(line.value - 1)
 
     if (variable[1].asString() == "$") {
       column = (lineLength + 1).asVimInt()
@@ -115,15 +115,15 @@ private fun variableToPosition(editor: Editor, variable: VimDataType, dollarForL
   if (name.isEmpty()) return null
 
   // Current caret line
-  if (name[0] == '.') return editor.vimLine.asVimInt() to currentCol(editor)
+  if (name[0] == '.') return editor.ij.vimLine.asVimInt() to currentCol(editor)
 
   // Visual start
   if (name == "v") {
     if (editor.inVisualMode) {
-      return editor.vimLine.asVimInt() to currentCol(editor)
+      return editor.ij.vimLine.asVimInt() to currentCol(editor)
     }
 
-    val vimStart = editor.caretModel.currentCaret.vimSelectionStart
+    val vimStart = editor.currentCaret().vimSelectionStart
     val visualLine = (editor.offsetToLogicalPosition(vimStart).line + 1).asVimInt()
     val visualCol = (editor.offsetToLogicalPosition(vimStart).column + 1).asVimInt()
 
@@ -132,7 +132,7 @@ private fun variableToPosition(editor: Editor, variable: VimDataType, dollarForL
 
   // Mark
   if (name.length >= 2 && name[0] == '\'') {
-    val mark = VimPlugin.getMark().getMark(editor.vim, name[1]) ?: return null
+    val mark = VimPlugin.getMark().getMark(editor, name[1]) ?: return null
     val markLogicalLine = (mark.logicalLine + 1).asVimInt()
     val markLogicalCol = (mark.col + 1).asVimInt()
     return markLogicalLine to markLogicalCol
@@ -141,26 +141,26 @@ private fun variableToPosition(editor: Editor, variable: VimDataType, dollarForL
   // First visual line
   if (name.length >= 2 && name[0] == 'w' && name[1] == '0') {
     if (!dollarForLine) return null
-    val actualVisualTop = EditorHelper.getVisualLineAtTopOfScreen(editor)
-    val actualLogicalTop = EditorHelper.visualLineToLogicalLine(editor, actualVisualTop)
+    val actualVisualTop = EditorHelper.getVisualLineAtTopOfScreen(editor.ij)
+    val actualLogicalTop = EditorHelper.visualLineToLogicalLine(editor.ij, actualVisualTop)
     return (actualLogicalTop + 1).asVimInt() to currentCol(editor)
   }
 
   // Last visual line
   if (name.length >= 2 && name[0] == 'w' && name[1] == '$') {
     if (!dollarForLine) return null
-    val actualVisualBottom = EditorHelper.getVisualLineAtBottomOfScreen(editor)
-    val actualLogicalBottom = EditorHelper.visualLineToLogicalLine(editor, actualVisualBottom)
+    val actualVisualBottom = EditorHelper.getVisualLineAtBottomOfScreen(editor.ij)
+    val actualLogicalBottom = EditorHelper.visualLineToLogicalLine(editor.ij, actualVisualBottom)
     return (actualLogicalBottom + 1).asVimInt() to currentCol(editor)
   }
 
   // Last column or line
   if (name[0] == '$') {
     return if (dollarForLine) {
-      editor.document.lineCount.asVimInt() to VimInt.ZERO
+      editor.lineCount().asVimInt() to VimInt.ZERO
     } else {
-      val line = editor.caretModel.currentCaret.logicalPosition.line
-      val lineLength = EditorHelper.getLineLength(editor, line)
+      val line = editor.currentCaret().getLogicalPosition().line
+      val lineLength = editor.lineLength(line)
       (line + 1).asVimInt() to lineLength.asVimInt()
     }
   }
