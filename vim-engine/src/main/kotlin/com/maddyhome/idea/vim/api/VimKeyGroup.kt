@@ -20,8 +20,10 @@ package com.maddyhome.idea.vim.api
 import com.maddyhome.idea.vim.common.CommandPartNode
 import com.maddyhome.idea.vim.common.MappingMode
 import com.maddyhome.idea.vim.key.KeyMappingLayer
+import javax.swing.KeyStroke
 
 interface VimKeyGroup {
-    fun getKeyRoot(mappingMode: MappingMode): CommandPartNode<VimActionsInitiator>
-    fun getKeyMappingLayer(mode: MappingMode): KeyMappingLayer
+  fun getKeyRoot(mappingMode: MappingMode): CommandPartNode<VimActionsInitiator>
+  fun getKeyMappingLayer(mode: MappingMode): KeyMappingLayer
+  fun getActions(editor: VimEditor, keyStroke: KeyStroke): List<NativeAction>
 }

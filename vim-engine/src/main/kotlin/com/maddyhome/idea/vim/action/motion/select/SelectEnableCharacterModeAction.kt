@@ -18,26 +18,21 @@
 
 package com.maddyhome.idea.vim.action.motion.select
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
-import com.maddyhome.idea.vim.helper.exitSelectMode
-import com.maddyhome.idea.vim.newapi.ij
-import com.maddyhome.idea.vim.newapi.vim
-import java.awt.event.KeyEvent
-import javax.swing.KeyStroke
 
 /**
  * @author Alex Plate
  */
 
-class SelectDeleteAction : VimActionHandler.SingleExecution() {
+class SelectEnableCharacterModeAction : VimActionHandler.SingleExecution() {
 
-  override val type: Command.Type = Command.Type.INSERT
+  override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override fun execute(
     editor: VimEditor,
@@ -45,15 +40,14 @@ class SelectDeleteAction : VimActionHandler.SingleExecution() {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    val enterKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0)
-    val actions = VimPlugin.getKey().getActions(editor.ij.component, enterKeyStroke)
-    for (action in actions) {
-      if (injector.actionExecutor.executeAction(action.vim, context)) {
-        break
+    editor.forEachNativeCaret { caret ->
+      val lineEnd = injector.engineEditorHelper.getLineEndForOffset(editor, caret.offset.point)
+      caret.run {
+        vimSetSystemSelectionSilently(offset.point, (offset.point + 1).coerceAtMost(lineEnd))
+        moveToInlayAwareOffset((offset.point + 1).coerceAtMost(lineEnd))
+        vimLastColumn = getVisualPosition().column
       }
     }
-    editor.exitSelectMode(true)
-    VimPlugin.getChange().insertBeforeCursor(editor, context)
-    return true
+    return injector.visualMotionGroup.enterSelectMode(editor, CommandState.SubMode.VISUAL_CHARACTER)
   }
 }

@@ -18,32 +18,38 @@
 
 package com.maddyhome.idea.vim.action.motion.select
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.group.visual.vimSetSystemSelectionSilently
 import com.maddyhome.idea.vim.handler.VimActionHandler
-import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.newapi.ij
+import java.awt.event.KeyEvent
+import javax.swing.KeyStroke
 
 /**
  * @author Alex Plate
  */
 
-class SelectEnableLineModeAction : VimActionHandler.SingleExecution() {
+class SelectDeleteAction : VimActionHandler.SingleExecution() {
 
-  override val type: Command.Type = Command.Type.OTHER_READONLY
+  override val type: Command.Type = Command.Type.INSERT
 
-  override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
-    @Suppress("ideavimRunForEachCaret")
-    editor.ij.caretModel.runForEachCaret { caret ->
-      val lineEnd = EditorHelper.getLineEndForOffset(editor.ij, caret.offset)
-      val lineStart = EditorHelper.getLineStartForOffset(editor.ij, caret.offset)
-      caret.vimSetSystemSelectionSilently(lineStart, lineEnd)
+  override fun execute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
+    val enterKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0)
+    val actions = injector.keyGroup.getActions(editor, enterKeyStroke)
+    for (action in actions) {
+      if (injector.actionExecutor.executeAction(action, context)) {
+        break
+      }
     }
-    return VimPlugin.getVisualMotion().enterSelectMode(editor, CommandState.SubMode.VISUAL_LINE)
+    editor.exitSelectModeNative(true)
+    injector.changeGroup.insertBeforeCursor(editor, context)
+    return true
   }
 }

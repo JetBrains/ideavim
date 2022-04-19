@@ -18,18 +18,13 @@
 
 package com.maddyhome.idea.vim.action.motion.select
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.group.visual.vimSetSystemSelectionSilently
 import com.maddyhome.idea.vim.handler.VimActionHandler
-import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
-import com.maddyhome.idea.vim.helper.vimLastColumn
-import com.maddyhome.idea.vim.newapi.ij
 
 /**
  * @author Alex Plate
@@ -39,14 +34,19 @@ class SelectEnableBlockModeAction : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
-  override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
-    editor.ij.caretModel.removeSecondaryCarets()
-    val lineEnd = EditorHelper.getLineEndForOffset(editor.ij, editor.ij.caretModel.primaryCaret.offset)
-    editor.ij.caretModel.primaryCaret.run {
-      vimSetSystemSelectionSilently(offset, (offset + 1).coerceAtMost(lineEnd))
-      moveToInlayAwareOffset((offset + 1).coerceAtMost(lineEnd))
-      vimLastColumn = visualPosition.column
+  override fun execute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
+    editor.removeSecondaryCarets()
+    val lineEnd = injector.engineEditorHelper.getLineEndForOffset(editor, editor.primaryCaret().offset.point)
+    editor.primaryCaret().run {
+      vimSetSystemSelectionSilently(offset.point, (offset.point + 1).coerceAtMost(lineEnd))
+      moveToInlayAwareOffset((offset.point + 1).coerceAtMost(lineEnd))
+      vimLastColumn = getVisualPosition().column
     }
-    return VimPlugin.getVisualMotion().enterSelectMode(editor, CommandState.SubMode.VISUAL_BLOCK)
+    return injector.visualMotionGroup.enterSelectMode(editor, CommandState.SubMode.VISUAL_BLOCK)
   }
 }

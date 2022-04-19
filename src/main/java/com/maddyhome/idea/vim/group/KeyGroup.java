@@ -36,6 +36,9 @@ import com.maddyhome.idea.vim.EventFacade;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.ComplicatedKeysAction;
 import com.maddyhome.idea.vim.action.VimShortcutKeyAction;
+import com.maddyhome.idea.vim.api.NativeAction;
+import com.maddyhome.idea.vim.api.VimActionsInitiator;
+import com.maddyhome.idea.vim.api.VimEditor;
 import com.maddyhome.idea.vim.api.VimKeyGroup;
 import com.maddyhome.idea.vim.common.*;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
@@ -44,8 +47,9 @@ import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.helper.HelperKt;
 import com.maddyhome.idea.vim.helper.StringHelper;
 import com.maddyhome.idea.vim.key.*;
+import com.maddyhome.idea.vim.newapi.IjNativeAction;
 import com.maddyhome.idea.vim.newapi.IjVimActionsInitiator;
-import com.maddyhome.idea.vim.api.VimActionsInitiator;
+import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression;
 import kotlin.Pair;
 import kotlin.text.StringsKt;
@@ -526,11 +530,17 @@ public class KeyGroup implements PersistentStateComponent<Element>, VimKeyGroup 
     return "";
   }
 
-  public @NotNull List<AnAction> getActions(@NotNull Component component, @NotNull KeyStroke keyStroke) {
+  private @NotNull List<AnAction> getActions(@NotNull Component component, @NotNull KeyStroke keyStroke) {
     final List<AnAction> results = new ArrayList<>();
     results.addAll(getLocalActions(component, keyStroke));
     results.addAll(getKeymapActions(keyStroke));
     return results;
+  }
+
+  @Override
+  public @NotNull List<NativeAction> getActions(@NotNull VimEditor editor, @NotNull KeyStroke keyStroke) {
+    return getActions(((IjVimEditor)editor).getEditor().getComponent(), keyStroke).stream()
+      .map(IjNativeAction::new).collect(toList());
   }
 
   private static @NotNull List<AnAction> getLocalActions(@NotNull Component component, @NotNull KeyStroke keyStroke) {

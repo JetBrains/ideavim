@@ -22,6 +22,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 
@@ -29,12 +30,21 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
  * @author Alex Plate
  */
 
-class SelectEnterAction : VimActionHandler.SingleExecution() {
+class SelectEnableLineModeAction : VimActionHandler.SingleExecution() {
 
-  override val type: Command.Type = Command.Type.INSERT
+  override val type: Command.Type = Command.Type.OTHER_READONLY
 
-  override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
-    injector.changeGroup.processEnter(editor, context)
-    return true
+  override fun execute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
+    editor.forEachNativeCaret { caret ->
+      val lineEnd = injector.engineEditorHelper.getLineEndForOffset(editor, caret.offset.point)
+      val lineStart = injector.engineEditorHelper.getLineStartForOffset(editor, caret.offset.point)
+      caret.vimSetSystemSelectionSilently(lineStart, lineEnd)
+    }
+    return injector.visualMotionGroup.enterSelectMode(editor, CommandState.SubMode.VISUAL_LINE)
   }
 }

@@ -620,9 +620,9 @@ public class ChangeGroup extends VimChangeGroupBase {
       setInsertEditorState(editor, true);
     }
     final KeyStroke enterKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
-    final List<AnAction> actions = VimPlugin.getKey().getActions(((IjVimEditor) editor).getEditor().getComponent(), enterKeyStroke);
-    for (AnAction action : actions) {
-      if (VimInjectorKt.getInjector().getActionExecutor().executeAction(new IjNativeAction(action), context)) {
+    final List<NativeAction> actions = VimPlugin.getKey().getActions(editor, enterKeyStroke);
+    for (NativeAction action : actions) {
+      if (VimInjectorKt.getInjector().getActionExecutor().executeAction(action, context)) {
         break;
       }
     }
