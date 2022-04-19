@@ -35,7 +35,6 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.command.CommandState.Companion.getInstance
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.command.TextObjectVisualType
 import com.maddyhome.idea.vim.common.CommandAliasHandler
@@ -46,6 +45,7 @@ import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.addCommand
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.executeNormalWithoutMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping
+import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setOperatorFunction
 import com.maddyhome.idea.vim.extension.VimExtensionHandler
@@ -53,6 +53,7 @@ import com.maddyhome.idea.vim.handler.TextObjectActionHandler
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.PsiHelper
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
@@ -63,7 +64,7 @@ class CommentaryExtension : VimExtension {
 
   companion object {
     fun doCommentary(editor: VimEditor, context: ExecutionContext, range: TextRange, selectionType: SelectionType, resetCaret: Boolean): Boolean {
-      val mode = getInstance(editor).mode
+      val mode = editor.commandState.mode
       if (mode !== CommandState.Mode.VISUAL) {
         editor.ij.selectionModel.setSelection(range.startOffset, range.endOffset)
       }
@@ -113,6 +114,12 @@ class CommentaryExtension : VimExtension {
     putKeyMappingIfMissing(MappingMode.N, parseKeys("gcc"), owner, plugCommentaryLineKeys, true)
     putKeyMappingIfMissing(MappingMode.N, parseKeys("gcu"), owner, parseKeys("<Plug>Commentary<Plug>Commentary"), true)
 
+    // Previous versions of IdeaVim used different mappings to Vim's Commentary. Make sure everything works if someone
+    // is still using the old mapping
+    putKeyMapping(MappingMode.N, parseKeys("<Plug>(CommentMotion)"), owner, plugCommentaryKeys, true)
+    putKeyMapping(MappingMode.XO, parseKeys("<Plug>(CommentMotionV)"), owner, plugCommentaryKeys, true)
+    putKeyMapping(MappingMode.N, parseKeys("<Plug>(CommentLine)"), owner, plugCommentaryLineKeys, true)
+
     addCommand("Commentary", CommentaryCommandAliasHandler())
   }
 
@@ -145,7 +152,7 @@ class CommentaryExtension : VimExtension {
     override fun isRepeatable() = true
 
     override fun execute(editor: Editor, context: DataContext) {
-      val commandState = getInstance(editor.vim)
+      val commandState = editor.vim.commandState
       val count = maxOf(1, commandState.commandBuilder.count)
 
       val textObjectHandler = this
