@@ -26,4 +26,5 @@ interface VimKeyGroup {
   fun getKeyRoot(mappingMode: MappingMode): CommandPartNode<VimActionsInitiator>
   fun getKeyMappingLayer(mode: MappingMode): KeyMappingLayer
   fun getActions(editor: VimEditor, keyStroke: KeyStroke): List<NativeAction>
+  fun getKeymapConflicts(keyStroke: KeyStroke): List<NativeAction>
 }

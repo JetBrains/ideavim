@@ -269,7 +269,8 @@ public class KeyGroup implements PersistentStateComponent<Element>, VimKeyGroup 
     }
   }
 
-  public @NotNull List<AnAction> getKeymapConflicts(@NotNull KeyStroke keyStroke) {
+  @Override
+  public @NotNull List<NativeAction> getKeymapConflicts(@NotNull KeyStroke keyStroke) {
     final KeymapManagerEx keymapManager = KeymapManagerEx.getInstanceEx();
     final Keymap keymap = keymapManager.getActiveKeymap();
     final KeyboardShortcut shortcut = new KeyboardShortcut(keyStroke, null);
@@ -281,7 +282,7 @@ public class KeyGroup implements PersistentStateComponent<Element>, VimKeyGroup 
         actions.add(action);
       }
     }
-    return actions;
+    return actions.stream().map(IjNativeAction::new).collect(toList());
   }
 
   public @NotNull Map<KeyStroke, ShortcutOwnerInfo> getShortcutConflicts() {
@@ -291,7 +292,7 @@ public class KeyGroup implements PersistentStateComponent<Element>, VimKeyGroup 
     for (RequiredShortcut requiredShortcut : requiredShortcutKeys) {
       KeyStroke keyStroke = requiredShortcut.getKeyStroke();
       if (!VimShortcutKeyAction.VIM_ONLY_EDITOR_KEYS.contains(keyStroke)) {
-        final List<AnAction> conflicts = getKeymapConflicts(keyStroke);
+        final List<NativeAction> conflicts = getKeymapConflicts(keyStroke);
         if (!conflicts.isEmpty()) {
           final Object owner = savedConflicts.get(keyStroke);
           ShortcutOwnerInfo result;

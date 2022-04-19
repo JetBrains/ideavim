@@ -33,6 +33,7 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.ui.UIUtil;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.api.NativeAction;
 import com.maddyhome.idea.vim.api.VimInjectorKt;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.StringHelper;
@@ -349,9 +350,9 @@ public class VimEmulationConfigurable implements Configurable {
         myRows.clear();
         for (Map.Entry<KeyStroke, ShortcutOwnerInfo> entry : VimPlugin.getKey().getShortcutConflicts().entrySet()) {
           final KeyStroke keyStroke = entry.getKey();
-          final List<AnAction> actions = VimPlugin.getKey().getKeymapConflicts(keyStroke);
+          final List<NativeAction> actions = VimPlugin.getKey().getKeymapConflicts(keyStroke);
           if (!actions.isEmpty()) {
-            myRows.add(new Row(keyStroke, actions.get(0), entry.getValue()));
+            myRows.add(new Row(keyStroke, ((AnAction)actions.get(0).getAction()), entry.getValue()));
           }
         }
         Collections.sort(myRows);

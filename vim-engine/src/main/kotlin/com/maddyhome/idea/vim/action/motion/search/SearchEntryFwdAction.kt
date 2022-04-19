@@ -17,10 +17,10 @@
  */
 package com.maddyhome.idea.vim.action.motion.search
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
@@ -30,10 +30,11 @@ import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotionOrError
 import com.maddyhome.idea.vim.helper.enumSetOf
-import com.maddyhome.idea.vim.newapi.ij
 import java.util.*
 
-class SearchWordBackwardAction : MotionActionHandler.ForEachCaret() {
+class SearchEntryFwdAction : MotionActionHandler.ForEachCaret() {
+  override val argumentType: Argument.Type = Argument.Type.EX_STRING
+
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
 
   override fun getOffset(
@@ -43,8 +44,9 @@ class SearchWordBackwardAction : MotionActionHandler.ForEachCaret() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    return VimPlugin.getSearch().searchWord(editor.ij, caret.ij, operatorArguments.count1, false, Direction.BACKWARDS)
-      .toMotionOrError()
+    if (argument == null) return Motion.Error
+    return injector.searchGroup
+      .processSearchCommand(editor, argument.string, caret.offset.point, Direction.FORWARDS).toMotionOrError()
   }
 
   override val motionType: MotionType = MotionType.EXCLUSIVE

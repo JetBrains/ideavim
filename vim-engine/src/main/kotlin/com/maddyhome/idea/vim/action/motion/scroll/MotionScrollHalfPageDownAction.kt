@@ -17,32 +17,22 @@
  */
 package com.maddyhome.idea.vim.action.motion.scroll
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
-import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.enumSetOf
-import com.maddyhome.idea.vim.newapi.ij
 import java.util.*
 
-class MotionScrollFirstScreenLinePageStartAction : VimActionHandler.SingleExecution() {
+class MotionScrollHalfPageDownAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_IGNORE_SCROLL_JUMP)
 
   override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
-    var rawCount = cmd.rawCount
-    if (rawCount == 0) {
-      val nextVisualLine = EditorHelper.normalizeVisualLine(
-        editor.ij,
-        EditorHelper.getVisualLineAtBottomOfScreen(editor.ij) + 1
-      )
-      rawCount = EditorHelper.visualLineToLogicalLine(editor.ij, nextVisualLine) + 1 // rawCount is 1 based
-    }
-    return VimPlugin.getMotion().scrollLineToFirstScreenLine(editor.ij, rawCount, true)
+    return injector.motion.scrollScreen(editor, editor.primaryCaret(), cmd.rawCount, true)
   }
 }

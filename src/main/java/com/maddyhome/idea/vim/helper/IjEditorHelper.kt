@@ -107,4 +107,8 @@ class IjEditorHelper : EngineEditorHelper {
   override fun getLineBuffer(editor: VimEditor, line: Int): CharBuffer {
     return EditorHelper.getLineBuffer(editor.ij, line)
   }
+
+  override fun getVisualLineAtBottomOfScreen(editor: VimEditor): Int {
+    return EditorHelper.getVisualLineAtBottomOfScreen(editor.ij)
+  }
 }

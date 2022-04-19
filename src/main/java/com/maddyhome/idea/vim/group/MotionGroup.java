@@ -520,8 +520,9 @@ public class MotionGroup extends VimMotionGroupBase {
     return res;
   }
 
-  public boolean scrollLineToFirstScreenLine(@NotNull Editor editor, int rawCount, boolean start) {
-    scrollLineToScreenLocation(editor, ScreenLocation.TOP, rawCount, start);
+  @Override
+  public boolean scrollLineToFirstScreenLine(@NotNull VimEditor editor, int rawCount, boolean start) {
+    scrollLineToScreenLocation(((IjVimEditor)editor).getEditor(), ScreenLocation.TOP, rawCount, start);
     return true;
   }
 
@@ -537,7 +538,9 @@ public class MotionGroup extends VimMotionGroupBase {
     return true;
   }
 
-  public boolean scrollCaretColumnToFirstScreenColumn(@NotNull Editor editor) {
+  @Override
+  public boolean scrollCaretColumnToFirstScreenColumn(@NotNull VimEditor vimEditor) {
+    Editor editor = ((IjVimEditor)vimEditor).getEditor();
     final VisualPosition caretVisualPosition = editor.getCaretModel().getVisualPosition();
     final int scrollOffset = getNormalizedSideScrollOffset(editor);
     // TODO: Should the offset be applied to visual columns? This includes inline inlays and folds

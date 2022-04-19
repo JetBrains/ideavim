@@ -36,10 +36,7 @@ import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.util.Trinity;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.api.VimCaret;
-import com.maddyhome.idea.vim.api.VimEditor;
-import com.maddyhome.idea.vim.api.VimInjectorKt;
-import com.maddyhome.idea.vim.api.VimSearchGroupBase;
+import com.maddyhome.idea.vim.api.*;
 import com.maddyhome.idea.vim.common.CharacterPosition;
 import com.maddyhome.idea.vim.common.Direction;
 import com.maddyhome.idea.vim.common.TextRange;
@@ -273,7 +270,8 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
    * @param dir         The direction to search
    * @return            Offset to the next occurrence of the pattern or -1 if not found
    */
-  public int processSearchCommand(@NotNull Editor editor, @NotNull String command, int startOffset, @NotNull Direction dir) {
+  @Override
+  public int processSearchCommand(@NotNull VimEditor editor, @NotNull String command, int startOffset, @NotNull Direction dir) {
     boolean isNewPattern = false;
     String pattern = null;
     String patternOffset = null;
@@ -361,7 +359,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
     resetShowSearchHighlight();
     forceUpdateSearchHighlights();
 
-    return findItOffset(editor, startOffset, 1, lastDir);
+    return findItOffset(((IjVimEditor)editor).getEditor(), startOffset, 1, lastDir);
   }
 
   /**
@@ -432,14 +430,15 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
    * @param dir     Which direction to search
    * @return        The offset of the result or the start of the word under the caret if not found. Returns -1 on error
    */
-  public int searchWord(@NotNull Editor editor, @NotNull Caret caret, int count, boolean whole, Direction dir) {
-    TextRange range = SearchHelper.findWordUnderCursor(editor, caret);
+  @Override
+  public int searchWord(@NotNull VimEditor editor, @NotNull VimCaret caret, int count, boolean whole, Direction dir) {
+    TextRange range = SearchHelper.findWordUnderCursor(((IjVimEditor)editor).getEditor(), ((IjVimCaret)caret).getCaret());
     if (range == null) {
       logger.warn("No range was found");
       return -1;
     }
 
-    final String pattern = SearchHelper.makeSearchPattern(EditorHelper.getText(editor, range.getStartOffset(), range.getEndOffset()), whole);
+    final String pattern = SearchHelper.makeSearchPattern(EditorHelper.getText(((IjVimEditor)editor).getEditor(), range.getStartOffset(), range.getEndOffset()), whole);
 
     // Updates RE_LAST, ready for findItOffset
     // Direction is always saved
@@ -453,7 +452,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
     resetShowSearchHighlight();
     forceUpdateSearchHighlights();
 
-    final int offset = findItOffset(editor, range.getStartOffset(), count, lastDir);
+    final int offset = findItOffset(((IjVimEditor)editor).getEditor(), range.getStartOffset(), count, lastDir);
     return offset == -1 ? range.getStartOffset() : offset;
   }
 
@@ -468,8 +467,9 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
    * @param count   Find the nth occurrence
    * @return        The offset of the next match, or -1 if not found
    */
-  public int searchNext(@NotNull Editor editor, @NotNull Caret caret, int count) {
-    return searchNextWithDirection(editor, caret, count, lastDir);
+  @Override
+  public int searchNext(@NotNull VimEditor editor, @NotNull VimCaret caret, int count) {
+    return searchNextWithDirection(((IjVimEditor)editor).getEditor(), ((IjVimCaret)caret).getCaret(), count, lastDir);
   }
 
   /**
@@ -483,8 +483,10 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
    * @param count   Find the nth occurrence
    * @return        The offset of the next match, or -1 if not found
    */
-  public int searchPrevious(@NotNull Editor editor, @NotNull Caret caret, int count) {
-    return searchNextWithDirection(editor, caret, count, lastDir.reverse());
+  @Override
+  public int searchPrevious(@NotNull VimEditor editor, @NotNull VimCaret caret, int count) {
+    return searchNextWithDirection(((IjVimEditor)editor).getEditor(), ((IjVimCaret)caret).getCaret(), count,
+                                   lastDir.reverse());
   }
 
   // See normal.c:nv_next
@@ -1296,7 +1298,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
         ppos++;
       }
 
-      res = processSearchCommand(editor, lastPatternOffset.substring(ppos + 1), res, nextDir);
+      res = processSearchCommand(new IjVimEditor(editor), lastPatternOffset.substring(ppos + 1), res, nextDir);
     }
     return res;
   }

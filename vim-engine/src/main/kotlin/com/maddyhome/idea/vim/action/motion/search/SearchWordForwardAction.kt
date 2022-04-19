@@ -15,25 +15,36 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-package com.maddyhome.idea.vim.action.motion.scroll
+package com.maddyhome.idea.vim.action.motion.search
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.handler.VimActionHandler
+import com.maddyhome.idea.vim.common.Direction
+import com.maddyhome.idea.vim.handler.Motion
+import com.maddyhome.idea.vim.handler.MotionActionHandler
+import com.maddyhome.idea.vim.handler.toMotionOrError
 import com.maddyhome.idea.vim.helper.enumSetOf
-import com.maddyhome.idea.vim.newapi.ij
 import java.util.*
 
-class MotionScrollFirstScreenLineStartAction : VimActionHandler.SingleExecution() {
-  override val type: Command.Type = Command.Type.OTHER_READONLY
+class SearchWordForwardAction : MotionActionHandler.ForEachCaret() {
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
 
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_IGNORE_SCROLL_JUMP)
-
-  override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
-    return VimPlugin.getMotion().scrollLineToFirstScreenLine(editor.ij, cmd.rawCount, true)
+  override fun getOffset(
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    argument: Argument?,
+    operatorArguments: OperatorArguments,
+  ): Motion {
+    return injector.searchGroup.searchWord(editor, caret, operatorArguments.count1, false, Direction.FORWARDS)
+      .toMotionOrError()
   }
+
+  override val motionType: MotionType = MotionType.EXCLUSIVE
 }

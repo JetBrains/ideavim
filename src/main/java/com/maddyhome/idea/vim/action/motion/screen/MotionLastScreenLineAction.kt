@@ -62,7 +62,7 @@ abstract class MotionLastScreenLineActionBase(private val operatorPending: Boole
   override fun postMove(editor: VimEditor, caret: VimCaret, context: ExecutionContext, cmd: Command) {
     if (operatorPending) {
       // Convert current caret line from a 0-based logical line to a 1-based logical line
-      VimPlugin.getMotion().scrollLineToFirstScreenLine(editor.ij, caret.ij.vimLine, false)
+      VimPlugin.getMotion().scrollLineToFirstScreenLine(editor, caret.ij.vimLine, false)
     }
   }
 }

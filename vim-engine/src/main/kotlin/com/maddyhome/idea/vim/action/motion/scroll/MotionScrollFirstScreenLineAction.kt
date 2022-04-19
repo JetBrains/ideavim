@@ -15,37 +15,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-package com.maddyhome.idea.vim.action.motion.search
+package com.maddyhome.idea.vim.action.motion.scroll
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.command.Argument
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
-import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.common.Direction
-import com.maddyhome.idea.vim.handler.Motion
-import com.maddyhome.idea.vim.handler.MotionActionHandler
-import com.maddyhome.idea.vim.handler.toMotionOrNoMotion
+import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
-import com.maddyhome.idea.vim.newapi.ij
 import java.util.*
 
-class SearchWholeWordBackwardAction : MotionActionHandler.ForEachCaret() {
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
+class MotionScrollFirstScreenLineAction : VimActionHandler.SingleExecution() {
+  override val type: Command.Type = Command.Type.OTHER_READONLY
 
-  override fun getOffset(
-    editor: VimEditor,
-    caret: VimCaret,
-    context: ExecutionContext,
-    argument: Argument?,
-    operatorArguments: OperatorArguments,
-  ): Motion {
-    return VimPlugin.getSearch().searchWord(editor.ij, caret.ij, operatorArguments.count1, true, Direction.BACKWARDS)
-      .toMotionOrNoMotion()
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_IGNORE_SCROLL_JUMP)
+
+  override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
+    return injector.motion.scrollLineToFirstScreenLine(editor, cmd.rawCount, false)
   }
-
-  override val motionType: MotionType = MotionType.EXCLUSIVE
 }

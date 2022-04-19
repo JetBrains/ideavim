@@ -29,6 +29,7 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.common.Direction
 import com.maddyhome.idea.vim.helper.RunnableHelper
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -1439,7 +1440,7 @@ class SearchGroupTest : VimTestCase() {
       project,
       {
         // Does not move the caret!
-        val n = searchGroup.processSearchCommand(editor, pattern, myFixture.caretOffset, Direction.FORWARDS)
+        val n = searchGroup.processSearchCommand(editor.vim, pattern, myFixture.caretOffset, Direction.FORWARDS)
         ref.set(n)
       },
       null, null
@@ -1463,7 +1464,7 @@ class SearchGroupTest : VimTestCase() {
       project,
       {
         // Does not move the caret!
-        val n = searchGroup.processSearchCommand(editor, pattern, myFixture.caretOffset, Direction.FORWARDS)
+        val n = searchGroup.processSearchCommand(editor.vim, pattern, myFixture.caretOffset, Direction.FORWARDS)
         ref.set(n)
       },
       null, null

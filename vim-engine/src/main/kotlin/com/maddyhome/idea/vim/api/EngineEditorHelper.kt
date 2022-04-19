@@ -25,4 +25,5 @@ interface EngineEditorHelper {
   fun getApproximateScreenWidth(editor: VimEditor): Int
   fun handleWithReadonlyFragmentModificationHandler(editor: VimEditor, exception: java.lang.Exception)
   fun getLineBuffer(editor: VimEditor, line: Int): CharBuffer
+  fun getVisualLineAtBottomOfScreen(editor: VimEditor): Int
 }

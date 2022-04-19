@@ -97,4 +97,6 @@ interface VimMotionGroup {
   fun moveCaret(editor: VimEditor, caret: VimCaret, offset: Int)
   fun getMotionRange(editor: VimEditor, caret: VimCaret, context: ExecutionContext, argument: Argument, operatorArguments: OperatorArguments): TextRange?
   fun moveCaretToLineWithSameColumn(editor: VimEditor, logicalLine: Int, caret: VimCaret): Int
+  fun scrollLineToFirstScreenLine(editor: VimEditor, rawCount: Int, start: Boolean): Boolean
+  fun scrollCaretColumnToFirstScreenColumn(vimEditor: VimEditor): Boolean
 }

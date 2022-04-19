@@ -18,14 +18,12 @@
 
 package com.maddyhome.idea.vim.action.motion.scroll
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
-import com.maddyhome.idea.vim.newapi.vim
 
 /**
  * @author Alex Plate
@@ -37,11 +35,16 @@ class CtrlDownAction : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
-  override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
+  override fun execute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
     val keyStroke = keySet.first().first()
-    val actions = VimPlugin.getKey().getKeymapConflicts(keyStroke)
+    val actions = injector.keyGroup.getKeymapConflicts(keyStroke)
     for (action in actions) {
-      if (injector.actionExecutor.executeAction(action.vim, context)) break
+      if (injector.actionExecutor.executeAction(action, context)) break
     }
     return true
   }
@@ -53,11 +56,16 @@ class CtrlUpAction : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
-  override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
+  override fun execute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
     val keyStroke = keySet.first().first()
-    val actions = VimPlugin.getKey().getKeymapConflicts(keyStroke)
+    val actions = injector.keyGroup.getKeymapConflicts(keyStroke)
     for (action in actions) {
-      if (injector.actionExecutor.executeAction(action.vim, context)) break
+      if (injector.actionExecutor.executeAction(action, context)) break
     }
     return true
   }
