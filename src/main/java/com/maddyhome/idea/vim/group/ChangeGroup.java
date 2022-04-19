@@ -321,12 +321,12 @@ public class ChangeGroup extends VimChangeGroupBase {
    */
   @Override
   public void insertAtPreviousInsert(@NotNull VimEditor editor, @NotNull ExecutionContext context) {
-    ((IjVimEditor) editor).getEditor().getCaretModel().removeSecondaryCarets();
+    editor.removeSecondaryCarets();
 
-    final Caret caret = ((IjVimEditor) editor).getEditor().getCaretModel().getPrimaryCaret();
-    final int offset = VimPlugin.getMotion().moveCaretToMark(((IjVimEditor) editor).getEditor(), '^', false);
+    final VimCaret caret = editor.primaryCaret();
+    final int offset = VimPlugin.getMotion().moveCaretToMark(editor, '^', false);
     if (offset != -1) {
-      injector.getMotion().moveCaret(editor, new IjVimCaret(caret), offset);
+      injector.getMotion().moveCaret(editor, caret, offset);
     }
 
     insertBeforeCursor(editor, context);

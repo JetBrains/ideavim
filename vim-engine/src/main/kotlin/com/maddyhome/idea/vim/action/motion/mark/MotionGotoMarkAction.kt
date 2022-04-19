@@ -18,10 +18,10 @@
 
 package com.maddyhome.idea.vim.action.motion.mark
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
@@ -29,10 +29,9 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotionOrError
-import com.maddyhome.idea.vim.newapi.ij
 import java.util.*
 
-class MotionGotoFileMarkAction : MotionActionHandler.ForEachCaret() {
+class MotionGotoMarkAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
   override val argumentType: Argument.Type = Argument.Type.CHARACTER
@@ -49,11 +48,11 @@ class MotionGotoFileMarkAction : MotionActionHandler.ForEachCaret() {
     if (argument == null) return Motion.Error
 
     val mark = argument.character
-    return VimPlugin.getMotion().moveCaretToFileMark(editor.ij, mark, false).toMotionOrError()
+    return injector.motion.moveCaretToMark(editor, mark, false).toMotionOrError()
   }
 }
 
-class MotionGotoFileMarkNoSaveJumpAction : MotionActionHandler.ForEachCaret() {
+class MotionGotoMarkNoSaveJumpAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
   override val argumentType: Argument.Type = Argument.Type.CHARACTER
@@ -68,6 +67,6 @@ class MotionGotoFileMarkNoSaveJumpAction : MotionActionHandler.ForEachCaret() {
     if (argument == null) return Motion.Error
 
     val mark = argument.character
-    return VimPlugin.getMotion().moveCaretToFileMark(editor.ij, mark, false).toMotionOrError()
+    return injector.motion.moveCaretToMark(editor, mark, false).toMotionOrError()
   }
 }

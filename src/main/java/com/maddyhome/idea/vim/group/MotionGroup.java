@@ -764,23 +764,28 @@ public class MotionGroup extends VimMotionGroupBase {
     }
   }
 
-  public int moveCaretToFirstScreenLine(@NotNull Editor editor,
-                                        @NotNull Caret caret,
+  @Override
+  public int moveCaretToFirstScreenLine(@NotNull VimEditor editor,
+                                        @NotNull VimCaret caret,
                                         int count,
                                         boolean normalizeToScreen) {
-    return moveCaretToScreenLocation(editor, caret, ScreenLocation.TOP, count - 1, normalizeToScreen);
+    return moveCaretToScreenLocation(((IjVimEditor)editor).getEditor(), ((IjVimCaret)caret).getCaret(),
+                                     ScreenLocation.TOP, count - 1, normalizeToScreen);
   }
 
-  public @Range(from = 0, to = Integer.MAX_VALUE) int moveCaretToLastScreenLine(@NotNull Editor editor,
-                                                                                @NotNull Caret caret,
-                                                                                int count,
-                                                                                boolean normalizeToScreen) {
-    return moveCaretToScreenLocation(editor, caret, ScreenLocation.BOTTOM, count - 1, normalizeToScreen);
+  @Override
+  public int moveCaretToLastScreenLine(@NotNull VimEditor editor,
+                                       @NotNull VimCaret caret,
+                                       int count,
+                                       boolean normalizeToScreen) {
+    return moveCaretToScreenLocation(((IjVimEditor)editor).getEditor(), ((IjVimCaret)caret).getCaret(),
+                                     ScreenLocation.BOTTOM, count - 1, normalizeToScreen);
   }
 
-  public @Range(from = 0, to = Integer.MAX_VALUE) int moveCaretToMiddleScreenLine(@NotNull Editor editor,
-                                                                                  @NotNull Caret caret) {
-    return moveCaretToScreenLocation(editor, caret, ScreenLocation.MIDDLE, 0, false);
+  @Override
+  public int moveCaretToMiddleScreenLine(@NotNull VimEditor editor, @NotNull VimCaret caret) {
+    return moveCaretToScreenLocation(((IjVimEditor)editor).getEditor(), ((IjVimCaret)caret).getCaret(),
+                                     ScreenLocation.MIDDLE, 0, false);
   }
 
   @Override
@@ -802,31 +807,33 @@ public class MotionGroup extends VimMotionGroupBase {
     return true;
   }
 
-  public int moveCaretToFileMark(@NotNull Editor editor, char ch, boolean toLineStart) {
-    final Mark mark = VimPlugin.getMark().getFileMark(new IjVimEditor(editor), ch);
+  @Override
+  public int moveCaretToFileMark(@NotNull VimEditor editor, char ch, boolean toLineStart) {
+    final Mark mark = VimPlugin.getMark().getFileMark(editor, ch);
     if (mark == null) return -1;
 
     final int line = mark.getLogicalLine();
     return toLineStart
-           ? moveCaretToLineStartSkipLeading(new IjVimEditor(editor), line)
-           : editor.logicalPositionToOffset(new LogicalPosition(line, mark.getCol()));
+           ? moveCaretToLineStartSkipLeading(editor, line)
+           : editor.logicalPositionToOffset(new VimLogicalPosition(line, mark.getCol(), false));
   }
 
-  public int moveCaretToMark(@NotNull Editor editor, char ch, boolean toLineStart) {
-    final Mark mark = VimPlugin.getMark().getMark(new IjVimEditor(editor), ch);
+  @Override
+  public int moveCaretToMark(@NotNull VimEditor editor, char ch, boolean toLineStart) {
+    final Mark mark = VimPlugin.getMark().getMark(editor, ch);
     if (mark == null) return -1;
 
-    final VirtualFile vf = getVirtualFile(editor);
+    final VirtualFile vf = getVirtualFile(((IjVimEditor)editor).getEditor());
     if (vf == null) return -1;
 
     final int line = mark.getLogicalLine();
     if (vf.getPath().equals(mark.getFilename())) {
       return toLineStart
-             ? moveCaretToLineStartSkipLeading(new IjVimEditor(editor), line)
-             : editor.logicalPositionToOffset(new LogicalPosition(line, mark.getCol()));
+             ? moveCaretToLineStartSkipLeading(editor, line)
+             : editor.logicalPositionToOffset(new VimLogicalPosition(line, mark.getCol(), false));
     }
 
-    final Editor selectedEditor = selectEditor(editor, mark);
+    final Editor selectedEditor = selectEditor(((IjVimEditor)editor).getEditor(), mark);
     if (selectedEditor != null) {
       for (Caret caret : selectedEditor.getCaretModel().getAllCarets()) {
         moveCaret(selectedEditor, caret, toLineStart
@@ -838,7 +845,8 @@ public class MotionGroup extends VimMotionGroupBase {
     return -2;
   }
 
-  public int moveCaretToJump(@NotNull Editor editor, int count) {
+  @Override
+  public int moveCaretToJump(@NotNull VimEditor editor, int count) {
     final int spot = VimPlugin.getMark().getJumpSpot();
     final Jump jump = VimPlugin.getMark().getJump(count);
 
@@ -846,12 +854,13 @@ public class MotionGroup extends VimMotionGroupBase {
       return -1;
     }
 
-    final VirtualFile vf = getVirtualFile(editor);
+    final VirtualFile vf = getVirtualFile(((IjVimEditor)editor).getEditor());
     if (vf == null) {
       return -1;
     }
 
-    final LogicalPosition lp = new LogicalPosition(jump.getLogicalLine(), jump.getCol());
+    final VimLogicalPosition lp = new VimLogicalPosition(jump.getLogicalLine(), jump.getCol(), false);
+    final LogicalPosition lpnative = new LogicalPosition(jump.getLogicalLine(), jump.getCol(), false);
     final String fileName = jump.getFilepath();
     if (!vf.getPath().equals(fileName)) {
       final VirtualFile newFile =
@@ -860,20 +869,20 @@ public class MotionGroup extends VimMotionGroupBase {
         return -2;
       }
 
-      final Editor newEditor = selectEditor(editor, newFile);
+      final Editor newEditor = selectEditor(((IjVimEditor)editor).getEditor(), newFile);
       if (newEditor != null) {
         if (spot == -1) {
-          VimPlugin.getMark().addJump(new IjVimEditor(editor), false);
+          VimPlugin.getMark().addJump(editor, false);
         }
         moveCaret(newEditor, newEditor.getCaretModel().getCurrentCaret(),
-                  normalizeOffset(newEditor, newEditor.logicalPositionToOffset(lp), false));
+                  normalizeOffset(newEditor, newEditor.logicalPositionToOffset(lpnative), false));
       }
 
       return -2;
     }
     else {
       if (spot == -1) {
-        VimPlugin.getMark().addJump(new IjVimEditor(editor), false);
+        VimPlugin.getMark().addJump(editor, false);
       }
 
       return editor.logicalPositionToOffset(lp);

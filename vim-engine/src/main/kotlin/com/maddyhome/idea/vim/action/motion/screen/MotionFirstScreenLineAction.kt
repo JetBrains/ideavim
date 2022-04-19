@@ -17,11 +17,12 @@
  */
 package com.maddyhome.idea.vim.action.motion.screen
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
+import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
@@ -29,15 +30,20 @@ import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotion
 import com.maddyhome.idea.vim.helper.enumSetOf
-import com.maddyhome.idea.vim.newapi.ij
 import java.util.*
 
 /*
-                                                 *M*
-M                       To Middle line of window, on the first non-blank
+                                                *H*
+H                       To line [count] from top (Home) of window (default:
+                        first line on the window) on the first non-blank
                         character |linewise|.  See also 'startofline' option.
+                        Cursor is adjusted for 'scrolloff' option, unless an
+                        operator is pending, in which case the text may
+                        scroll.  E.g. "yH" yanks from the first visible line
+                        until the cursor line (inclusive).
  */
-class MotionMiddleScreenLineAction : MotionActionHandler.ForEachCaret() {
+abstract class MotionFirstScreenLineActionBase(private val operatorPending: Boolean) :
+  MotionActionHandler.ForEachCaret() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
 
   override val motionType: MotionType = MotionType.LINE_WISE
@@ -49,6 +55,21 @@ class MotionMiddleScreenLineAction : MotionActionHandler.ForEachCaret() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    return VimPlugin.getMotion().moveCaretToMiddleScreenLine(editor.ij, caret.ij).toMotion()
+
+    // Only apply scrolloff for NX motions. For op pending, use the actual first line and apply scrolloff after.
+    // E.g. yH will yank from first visible line to current line, but it also moves the caret to the first visible line.
+    // This is inside scrolloff, so Vim scrolls
+    return injector.motion.moveCaretToFirstScreenLine(editor, caret, operatorArguments.count1, !operatorPending)
+      .toMotion()
+  }
+
+  override fun postMove(editor: VimEditor, caret: VimCaret, context: ExecutionContext, cmd: Command) {
+    if (operatorPending) {
+      // Convert current caret line from a 0-based logical line to a 1-based logical line
+      injector.motion.scrollLineToFirstScreenLine(editor, caret.vimLine, false)
+    }
   }
 }
+
+class MotionFirstScreenLineAction : MotionFirstScreenLineActionBase(false)
+class MotionOpPendingFirstScreenLineAction : MotionFirstScreenLineActionBase(true)

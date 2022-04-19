@@ -36,6 +36,7 @@ import com.maddyhome.idea.vim.group.visual.vimSetSystemSelectionSilently
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.helper.vimLastVisualOperatorRange
+import com.maddyhome.idea.vim.helper.vimLine
 import com.maddyhome.idea.vim.helper.vimSelectionStart
 
 class IjVimCaret(val caret: Caret) : VimCaret {
@@ -64,6 +65,9 @@ class IjVimCaret(val caret: Caret) : VimCaret {
     set(value) {
       this.caret.vimLastVisualOperatorRange = value
     }
+  override val vimLine: Int
+    get() = this.caret.vimLine
+
   override fun moveToOffset(offset: Int) {
     // TODO: 17.12.2021 Unpack internal actions
     MotionGroup.moveCaret(caret.editor, caret, offset)
