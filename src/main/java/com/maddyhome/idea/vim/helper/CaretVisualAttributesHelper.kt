@@ -30,6 +30,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.GuiCursorMode
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.GuiCursorOptionHelper
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.GuiCursorType
+import org.jetbrains.annotations.TestOnly
 import java.awt.Color
 
 /**
@@ -39,14 +40,12 @@ import java.awt.Color
  * behaviour, e.g. handling selection updates during mouse drag.
  */
 fun Caret.forceBarCursor() {
-  // [VERSION UPDATE] 2021.2+
-  // Create + cache CaretVisualAttributes
-  provider.setBarCursor(editor)
+  editor.caretModel.primaryCaret.visualAttributes = BAR
 }
 
 fun Editor.updateCaretsVisualAttributes() {
   // In notebooks command mode the caret is hidden
-  // Without this if the caret appears inside of a cell while it shouldn't
+  // Without this if the caret appears inside a cell while it shouldn't
   if (!HandlerInjector.notebookCommandMode(this)) {
     updatePrimaryCaretVisualAttributes()
     updateSecondaryCaretsVisualAttributes()
@@ -60,10 +59,22 @@ fun Editor.updateCaretsVisualAttributes() {
  */
 fun Editor.removeCaretsVisualAttributes() {
   caretModel.allCarets.forEach { it.visualAttributes = CaretVisualAttributes.DEFAULT }
-  settings.isBlockCursor = EditorSettingsExternalizable.getInstance().isBlockCursor
 }
 
-fun Editor.guicursorMode(): GuiCursorMode {
+fun Editor.hasBlockOrUnderscoreCaret() = isBlockCursorOverride() ||
+  GuiCursorOptionHelper.getAttributes(guicursorMode()).type.let {
+    it == GuiCursorType.BLOCK || it == GuiCursorType.HOR
+  }
+
+object GuicursorChangeListener : OptionChangeListener<VimDataType> {
+  override fun processGlobalValueChange(oldValue: VimDataType?) {
+    AttributesCache.clear()
+    GuiCursorOptionHelper.clearEffectiveValues()
+    localEditors().forEach { it.updatePrimaryCaretVisualAttributes() }
+  }
+}
+
+private fun Editor.guicursorMode(): GuiCursorMode {
   if (this.vim.commandState.isReplaceCharacter) {
     // Can be true for NORMAL and VISUAL
     return GuiCursorMode.REPLACE
@@ -88,11 +99,6 @@ fun Editor.guicursorMode(): GuiCursorMode {
   }
 }
 
-fun Editor.hasBlockOrUnderscoreCaret() = isBlockCursorOverride() ||
-  GuiCursorOptionHelper.getAttributes(guicursorMode()).type.let {
-    it == GuiCursorType.BLOCK || it == GuiCursorType.HOR
-  }
-
 /**
  * Allow the "use block caret" setting to override guicursor options - if set, we use block caret everywhere, if
  * not, we use guicursor options.
@@ -102,12 +108,15 @@ fun Editor.hasBlockOrUnderscoreCaret() = isBlockCursorOverride() ||
 private fun isBlockCursorOverride() = EditorSettingsExternalizable.getInstance().isBlockCursor
 
 private fun Editor.updatePrimaryCaretVisualAttributes() {
-  provider.setPrimaryCaretVisualAttributes(this)
+  caretModel.primaryCaret.visualAttributes = AttributesCache.getCaretVisualAttributes(this)
+
+  // Make sure the caret is visible as soon as it's set. It might be invisible while blinking
+  (this as? EditorEx)?.setCaretVisible(true)
 }
 
 private fun Editor.updateSecondaryCaretsVisualAttributes() {
   // IntelliJ simulates visual block with multiple carets with selections. Do our best to hide them
-  val attributes = provider.getSecondaryCaretVisualAttributes(this, inBlockSubMode)
+  val attributes = if (inBlockSubMode) HIDDEN else AttributesCache.getCaretVisualAttributes(this)
   this.caretModel.allCarets.forEach {
     if (it != this.caretModel.primaryCaret) {
       it.visualAttributes = attributes
@@ -115,37 +124,14 @@ private fun Editor.updateSecondaryCaretsVisualAttributes() {
   }
 }
 
-object GuicursorChangeListener : OptionChangeListener<VimDataType> {
-  override fun processGlobalValueChange(oldValue: VimDataType?) {
-    provider.clearCache()
-    GuiCursorOptionHelper.clearEffectiveValues()
-    localEditors().forEach { it.updatePrimaryCaretVisualAttributes() }
-  }
-}
+private val HIDDEN = CaretVisualAttributes(null, CaretVisualAttributes.Weight.NORMAL, CaretVisualAttributes.Shape.BAR, 0F)
+private val BLOCK = CaretVisualAttributes(null, CaretVisualAttributes.Weight.NORMAL, CaretVisualAttributes.Shape.BLOCK, 1.0F)
+private val BAR = CaretVisualAttributes(null, CaretVisualAttributes.Weight.NORMAL, CaretVisualAttributes.Shape.BAR, 0.25F)
 
-// [VERSION UPDATE] 2021.2+
-// Once the plugin requires 2021.2 as a base version, get rid of all this and just set the attributes directly
-private val provider: CaretVisualAttributesProvider by lazy {
-  DefaultCaretVisualAttributesProvider()
-}
-
-private interface CaretVisualAttributesProvider {
-  fun setPrimaryCaretVisualAttributes(editor: Editor)
-  fun getSecondaryCaretVisualAttributes(editor: Editor, inBlockSubMode: Boolean): CaretVisualAttributes
-  fun setBarCursor(editor: Editor)
-  fun clearCache() {}
-}
-
-private class DefaultCaretVisualAttributesProvider : CaretVisualAttributesProvider {
-  companion object {
-    private val HIDDEN = CaretVisualAttributes(null, CaretVisualAttributes.Weight.NORMAL, CaretVisualAttributes.Shape.BAR, 0F)
-    private val BLOCK = CaretVisualAttributes(null, CaretVisualAttributes.Weight.NORMAL, CaretVisualAttributes.Shape.BLOCK, 1.0F)
-    private val BAR = CaretVisualAttributes(null, CaretVisualAttributes.Weight.NORMAL, CaretVisualAttributes.Shape.BAR, 0.25F)
-  }
-
+private object AttributesCache {
   private val cache = mutableMapOf<GuiCursorMode, CaretVisualAttributes>()
 
-  private fun getCaretVisualAttributes(editor: Editor): CaretVisualAttributes {
+  fun getCaretVisualAttributes(editor: Editor): CaretVisualAttributes {
     if (isBlockCursorOverride()) {
       return BLOCK
     }
@@ -163,23 +149,8 @@ private class DefaultCaretVisualAttributesProvider : CaretVisualAttributesProvid
     }
   }
 
-  override fun setPrimaryCaretVisualAttributes(editor: Editor) {
-    editor.caretModel.primaryCaret.visualAttributes = getCaretVisualAttributes(editor)
-
-    // If the caret is blinking, make sure it's made visible as soon as the mode changes
-    // See also EditorImpl.updateCaretCursor (called when changing EditorSettings.setBlockCursor)
-    (editor as? EditorEx)?.setCaretVisible(true)
-  }
-
-  override fun getSecondaryCaretVisualAttributes(editor: Editor, inBlockSubMode: Boolean): CaretVisualAttributes {
-    return if (inBlockSubMode) HIDDEN else getCaretVisualAttributes(editor)
-  }
-
-  override fun setBarCursor(editor: Editor) {
-    editor.caretModel.primaryCaret.visualAttributes = BAR
-  }
-
-  override fun clearCache() {
-    cache.clear()
-  }
+  fun clear() = cache.clear()
 }
+
+@TestOnly
+fun getGuiCursorMode(editor: Editor) = editor.guicursorMode()
