@@ -21,16 +21,11 @@ package com.maddyhome.idea.vim.helper
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.CaretVisualAttributes
 import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.editor.colors.EditorColors
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.editor.ex.EditorSettingsExternalizable
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionChangeListener
-import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.GuiCursorMode
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.GuiCursorOptionHelper
@@ -63,9 +58,9 @@ fun Editor.updateCaretsVisualAttributes() {
  *
  * Used when Vim emulation is disabled
  */
-fun removeCaretsVisualAttributes(editor: Editor) {
-  editor.caretModel.allCarets.forEach { it.visualAttributes = CaretVisualAttributes.DEFAULT }
-  editor.settings.isBlockCursor = EditorSettingsExternalizable.getInstance().isBlockCursor
+fun Editor.removeCaretsVisualAttributes() {
+  caretModel.allCarets.forEach { it.visualAttributes = CaretVisualAttributes.DEFAULT }
+  settings.isBlockCursor = EditorSettingsExternalizable.getInstance().isBlockCursor
 }
 
 fun Editor.guicursorMode(): GuiCursorMode {
@@ -131,11 +126,7 @@ object GuicursorChangeListener : OptionChangeListener<VimDataType> {
 // [VERSION UPDATE] 2021.2+
 // Once the plugin requires 2021.2 as a base version, get rid of all this and just set the attributes directly
 private val provider: CaretVisualAttributesProvider by lazy {
-  if (buildGreater212()) {
-    DefaultCaretVisualAttributesProvider()
-  } else {
-    LegacyCaretVisualAttributesProvider()
-  }
+  DefaultCaretVisualAttributesProvider()
 }
 
 private interface CaretVisualAttributesProvider {
@@ -147,9 +138,9 @@ private interface CaretVisualAttributesProvider {
 
 private class DefaultCaretVisualAttributesProvider : CaretVisualAttributesProvider {
   companion object {
-    private val HIDDEN = getCaretVisualAttributes(null, CaretVisualAttributes.Weight.NORMAL, "BAR", 0F)
-    private val BLOCK = getCaretVisualAttributes(null, CaretVisualAttributes.Weight.NORMAL, "BLOCK", 1.0F)
-    private val BAR = getCaretVisualAttributes(null, CaretVisualAttributes.Weight.NORMAL, "BAR", 0.25F)
+    private val HIDDEN = CaretVisualAttributes(null, CaretVisualAttributes.Weight.NORMAL, CaretVisualAttributes.Shape.BAR, 0F)
+    private val BLOCK = CaretVisualAttributes(null, CaretVisualAttributes.Weight.NORMAL, CaretVisualAttributes.Shape.BLOCK, 1.0F)
+    private val BAR = CaretVisualAttributes(null, CaretVisualAttributes.Weight.NORMAL, CaretVisualAttributes.Shape.BAR, 0.25F)
   }
 
   private val cache = mutableMapOf<GuiCursorMode, CaretVisualAttributes>()
@@ -163,12 +154,12 @@ private class DefaultCaretVisualAttributesProvider : CaretVisualAttributesProvid
     return cache.getOrPut(guicursorMode) {
       val attributes = GuiCursorOptionHelper.getAttributes(guicursorMode)
       val shape = when (attributes.type) {
-        GuiCursorType.BLOCK -> "BLOCK"
-        GuiCursorType.VER -> "BAR"
-        GuiCursorType.HOR -> "UNDERSCORE"
+        GuiCursorType.BLOCK -> CaretVisualAttributes.Shape.BLOCK
+        GuiCursorType.VER -> CaretVisualAttributes.Shape.BAR
+        GuiCursorType.HOR -> CaretVisualAttributes.Shape.UNDERSCORE
       }
       val colour: Color? = null // Support highlight group?
-      getCaretVisualAttributes(colour, CaretVisualAttributes.Weight.NORMAL, shape, attributes.thickness / 100F)
+      CaretVisualAttributes(colour, CaretVisualAttributes.Weight.NORMAL, shape, attributes.thickness / 100F)
     }
   }
 
@@ -190,45 +181,5 @@ private class DefaultCaretVisualAttributesProvider : CaretVisualAttributesProvid
 
   override fun clearCache() {
     cache.clear()
-  }
-}
-
-// For 2021.1 and below
-private class LegacyCaretVisualAttributesProvider : CaretVisualAttributesProvider {
-  override fun setPrimaryCaretVisualAttributes(editor: Editor) {
-    if (isBlockCursorOverride()) {
-      setBlockCursor(editor, true)
-    } else {
-      // The default for REPLACE is hor20. It makes more sense to map HOR to a block, but REPLACE has traditionally been
-      // drawn the same as INSERT, as a bar. If the 'guicursor' option is still at default, keep REPLACE a bar
-      if (VimPlugin.getOptionService().isDefault(OptionScope.LOCAL(IjVimEditor(editor)), OptionConstants.guicursorName) && editor.guicursorMode() == GuiCursorMode.REPLACE) {
-        setBlockCursor(editor, false)
-      } else {
-        when (GuiCursorOptionHelper.getAttributes(editor.guicursorMode()).type) {
-          GuiCursorType.BLOCK, GuiCursorType.HOR -> setBlockCursor(editor, true)
-          GuiCursorType.VER -> setBlockCursor(editor, false)
-        }
-      }
-    }
-  }
-
-  override fun getSecondaryCaretVisualAttributes(editor: Editor, inBlockSubMode: Boolean): CaretVisualAttributes =
-    if (inBlockSubMode) {
-      // Do our best to hide the caret
-      val color = editor.colorsScheme.getColor(EditorColors.SELECTION_BACKGROUND_COLOR)
-      CaretVisualAttributes(color, CaretVisualAttributes.Weight.NORMAL)
-    } else {
-      CaretVisualAttributes.DEFAULT
-    }
-
-  override fun setBarCursor(editor: Editor) {
-    setBlockCursor(editor, false)
-  }
-
-  private fun setBlockCursor(editor: Editor, block: Boolean) {
-    // This setting really means "use block cursor in insert mode". When set, it swaps the bar/block + insert/overwrite
-    // relationship - the editor draws a bar for overwrite. To get a block at all times, the block cursor setting needs
-    // to match the insert mode.
-    editor.settings.isBlockCursor = if (block) editor.isInsertMode else !editor.isInsertMode
   }
 }
