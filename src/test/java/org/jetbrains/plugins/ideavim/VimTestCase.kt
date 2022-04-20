@@ -62,7 +62,7 @@ import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.StringHelper.stringToKeys
 import com.maddyhome.idea.vim.helper.StringHelper.toKeyNotation
 import com.maddyhome.idea.vim.helper.TestInputModel
-import com.maddyhome.idea.vim.helper.guicursorMode
+import com.maddyhome.idea.vim.helper.getGuiCursorMode
 import com.maddyhome.idea.vim.helper.inBlockSubMode
 import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.subMode
@@ -480,7 +480,7 @@ abstract class VimTestCase : UsefulTestCase() {
   protected fun assertCaretsVisualAttributes() {
     if (!Checks.caretShape) return
     val editor = myFixture.editor
-    val attributes = GuiCursorOptionHelper.getAttributes(editor.guicursorMode())
+    val attributes = GuiCursorOptionHelper.getAttributes(getGuiCursorMode(editor))
     val colour = editor.colorsScheme.getColor(EditorColors.CARET_COLOR)
 
     editor.caretModel.allCarets.forEach { caret ->
