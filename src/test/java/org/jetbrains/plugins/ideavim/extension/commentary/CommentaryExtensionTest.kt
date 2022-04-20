@@ -19,13 +19,13 @@
 package org.jetbrains.plugins.ideavim.extension.commentary
 
 import com.intellij.ide.highlighter.HtmlFileType
+import com.intellij.ide.highlighter.JavaFileType
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
-import org.jetbrains.plugins.ideavim.JavaVimTestCase
-import org.jetbrains.plugins.ideavim.VimTestCase.Companion.c
+import org.jetbrains.plugins.ideavim.VimTestCase
 
-class CommentaryExtensionTest : JavaVimTestCase() {
+@Suppress("SpellCheckingInspection")
+class CommentaryExtensionTest : VimTestCase() {
   override fun setUp() {
     super.setUp()
     enableExtensions("commentary")
@@ -34,40 +34,42 @@ class CommentaryExtensionTest : JavaVimTestCase() {
   // |gc| |l| + move caret
   fun testBlockCommentSingle() {
     doTest(
-      parseKeys("gcll"),
+      "gcll",
       "<caret>if (condition) {\n" + "}\n",
-      "/<caret>*i*/f (condition) {\n" + "}\n"
+      "/<caret>*i*/f (condition) {\n" + "}\n",
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
     )
-    assertMode(CommandState.Mode.COMMAND)
     assertSelection(null)
   }
 
   // |gc| |iw|
   fun testBlockCommentInnerWord() {
     doTest(
-      parseKeys("gciw"),
+      "gciw",
       "<caret>if (condition) {\n" + "}\n",
-      "<caret>/*if*/ (condition) {\n" + "}\n"
+      "<caret>/*if*/ (condition) {\n" + "}\n",
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
     )
-    assertMode(CommandState.Mode.COMMAND)
     assertSelection(null)
   }
 
   // |gc| |iw|
   fun testBlockCommentTillForward() {
     doTest(
-      parseKeys("gct{"),
+      "gct{",
       "<caret>if (condition) {\n" + "}\n",
-      "<caret>/*if (condition) */{\n" + "}\n"
+      "<caret>/*if (condition) */{\n" + "}\n",
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
   // |gc| |ab|
   fun testBlockCommentOuterParens() {
     doTest(
-      parseKeys("gcab"),
+      "gcab",
       "if (<caret>condition) {\n" + "}\n",
-      "if <caret>/*(condition)*/ {\n" + "}\n"
+      "if <caret>/*(condition)*/ {\n" + "}\n",
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
@@ -78,129 +80,140 @@ class CommentaryExtensionTest : JavaVimTestCase() {
 // |gc| |j|
   fun testLineCommentDown() {
     doTest(
-      parseKeys("gcj"),
+      "gcj",
       "<caret>if (condition) {\n" + "}\n",
       "<caret>//if (condition) {\n" +
-        "//}\n"
+        "//}\n",
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
   fun testLineCommentDownPreservesAbsoluteCaretLocation() {
     doTest(
-      parseKeys("gcj"),
+      "gcj",
       "if (<caret>condition) {\n" + "}\n",
       "//if<caret> (condition) {\n" +
-        "//}\n"
+        "//}\n",
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
   // |gc| |ip|
   fun testLineCommentInnerParagraph() {
     doTest(
-      parseKeys("gcip"),
+      "gcip",
       "<caret>if (condition) {\n" + "}\n",
       "//if (condition) {\n" +
-        "//}\n"
+        "//}\n",
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
   // |gc| |ip|
   fun testLineCommentSingleLineInnerParagraph() {
     doTest(
-      parseKeys("gcip"),
+      "gcip",
       "${c}if (condition) {}",
-      "//if (condition) {}"
+      "//if (condition) {}",
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
   /* Ensure uncommenting works as well */ // |gc| |ip|
   fun testLineUncommentInnerParagraph() {
     doTest(
-      parseKeys("gcip"),
+      "gcip",
       "<caret>//if (condition) {\n" + "//}\n",
       "if (condition) {\n" +
-        "}\n"
+        "}\n",
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
     )
-    assertMode(CommandState.Mode.COMMAND)
     assertSelection(null)
   }
 
   // |gc| |ip|
   fun testLineUncommentSingleLineInnerParagraph() {
     doTest(
-      parseKeys("gcip"),
+      "gcip",
       "$c//if (condition) {}",
-      "if (condition) {}"
+      "if (condition) {}",
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
   /* Visual mode */ // |gc| |ip|
   fun testLineCommentVisualInnerParagraph() {
     doTest(
-      parseKeys("vipgc"),
+      "vipgc",
       "<caret>if (condition) {\n" + "}\n",
       "//if (condition) {\n" +
-        "//}\n"
+        "//}\n",
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
   // |gc| |ip|
   fun testLineUncommentVisualInnerParagraph() {
     doTest(
-      parseKeys("vipgc"),
+      "vipgc",
       "<caret>//if (condition) {\n" + "//}\n",
       "if (condition) {\n" +
-        "}\n"
+        "}\n",
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
   /* Special shortcut gcc is always linewise */ // |gcc|
   fun testLineCommentShortcut() {
     doTest(
-      parseKeys("gccj"),
+      "gccj",
       "<caret>if (condition) {\n" + "}\n",
       "//if (condition) {\n" +
-        "<caret>}\n"
+        "<caret>}\n",
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
     )
-    assertMode(CommandState.Mode.COMMAND)
     assertSelection(null)
   }
 
   // |gcc|
   fun testLineCommentShortcutSetsCaretToMotionLocation() {
     doTest(
-      parseKeys("gcc"),
+      "gcc",
       "if (<caret>condition) {\n" + "}\n",
-      "<caret>//if (condition) {\n" + "}\n"
+      "<caret>//if (condition) {\n" + "}\n",
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
     )
-    assertMode(CommandState.Mode.COMMAND)
     assertSelection(null)
   }
 
   // |gcc|
   fun testLineUncommentShortcut() {
     doTest(
-      parseKeys("gcc"),
+      "gcc",
       "<caret>//if (condition) {\n" + "}\n",
       "<caret>if (condition) {\n" +
-        "}\n"
+        "}\n",
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
     )
-    assertMode(CommandState.Mode.COMMAND)
     assertSelection(null)
   }
 
   // |gcc|
   fun testHTMLCommentShortcut() {
-    myFixture.configureByText(HtmlFileType.INSTANCE, "<div />")
-    typeText(parseKeys("gcc"))
-    myFixture.checkResult("<!--<div />-->")
-    assertMode(CommandState.Mode.COMMAND)
+    doTest(
+      "gcc",
+      "<div />",
+      "<!--<div />-->",
+      CommandState.Mode.COMMAND,
+      CommandState.SubMode.NONE,
+      HtmlFileType.INSTANCE
+    )
     assertSelection(null)
   }
 
   fun `test comment motion repeat`() {
     doTest(
-      parseKeys("gcj", "jj."),
+      "gcj" + "jj.",
       """
                  <caret>if (condition) {
                  }
@@ -212,13 +225,14 @@ class CommentaryExtensionTest : JavaVimTestCase() {
                 //}
                 //if (condition) {
                 //}
-      """.trimIndent()
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
   fun `test comment motion right repeat`() {
     doTest(
-      parseKeys("gciw", "jj."),
+      "gciw" + "jj.",
       """
                 <caret>if (condition) {
                 }
@@ -230,13 +244,14 @@ class CommentaryExtensionTest : JavaVimTestCase() {
                 }
                 /*if*/ (condition) {
                 }
-      """.trimIndent()
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
   fun `test comment line repeat`() {
     doTest(
-      parseKeys("gcc", "j."),
+      "gcc" + "j.",
       """
                  <caret>if (condition) {
                  }
@@ -244,14 +259,15 @@ class CommentaryExtensionTest : JavaVimTestCase() {
       """
                 //if (condition) {
                 //}
-      """.trimIndent()
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
   @VimBehaviorDiffers(description = "IntelliJ's uncomment leaves the leading whitespace")
   fun `test uncomment with gcgc`() {
     doTest(
-      parseKeys("gcgc"),
+      "gcgc",
       """
         // final Int value1 = 42;
         // final Int value2 = 42;
@@ -263,14 +279,15 @@ class CommentaryExtensionTest : JavaVimTestCase() {
          final Int value2 = 42;
          final Int value3 = 42;
         final Int value4 = 42;
-      """.trimIndent()
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
   @VimBehaviorDiffers(description = "IntelliJ's uncomment leaves the leading whitespace")
   fun `test uncomment with gcu`() {
     doTest(
-      parseKeys("gcu"),
+      "gcu",
       """
         // final Int value1 = 42;
         // final Int value2 = 42;
@@ -282,14 +299,15 @@ class CommentaryExtensionTest : JavaVimTestCase() {
          final Int value2 = 42;
          final Int value3 = 42;
         final Int value4 = 42;
-      """.trimIndent()
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
   fun `test comment line with count`() {
     // Caret position is kept as the position *before* the commenting. This is how Vim works
     doTest(
-      parseKeys("4gcc"),
+      "4gcc",
       """
         final Int value1 = 42;
         final Int <caret>value2 = 42;
@@ -305,26 +323,28 @@ class CommentaryExtensionTest : JavaVimTestCase() {
         //final Int value4 = 42;
         //final Int value5 = 42;
         final Int value6 = 42;
-      """.trimIndent()
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
   fun `test text object deletes single line comment`() {
     doTest(
-      parseKeys("dgc"),
+      "dgc",
       """
         // <caret>Comment 1
         final Int value = 42;
       """.trimIndent(),
       """
         final Int value = 42;
-      """.trimIndent()
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
   fun `test text object deletes multiple line comments`() {
     doTest(
-      parseKeys("dgc"),
+      "dgc",
       """
         // <caret>Comment 1
         // Comment 2
@@ -335,13 +355,14 @@ class CommentaryExtensionTest : JavaVimTestCase() {
       """.trimIndent(),
       """
         final Int value = 42;
-      """.trimIndent()
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
   fun `test text object deletes multiple line comments 2`() {
     doTest(
-      parseKeys("dgc"),
+      "dgc",
       """
         // Comment 1
         // Comment 2
@@ -352,26 +373,28 @@ class CommentaryExtensionTest : JavaVimTestCase() {
       """.trimIndent(),
       """
         final Int value = 42;
-      """.trimIndent()
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
   fun `test text object deletes single line comment from leading whitespace`() {
     doTest(
-      parseKeys("dgc"),
+      "dgc",
       """
         <caret> // Comment 1
         final Int value = 42;
       """.trimIndent(),
       """
         final Int value = 42;
-      """.trimIndent()
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
   fun `test text object deletes single line comment from leading whitespace 2`() {
     doTest(
-      parseKeys("dgc"),
+      "dgc",
       """
         <caret>
         
@@ -380,13 +403,14 @@ class CommentaryExtensionTest : JavaVimTestCase() {
       """.trimIndent(),
       """
         final Int value = 42;
-      """.trimIndent()
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
   fun `test text object deletes single line comment from leading whitespace 3`() {
     doTest(
-      parseKeys("dgc"),
+      "dgc",
       """
         final Int value1 = 42;
         <caret>
@@ -397,13 +421,14 @@ class CommentaryExtensionTest : JavaVimTestCase() {
       """
         final Int value1 = 42;
         final Int value2 = 42;
-      """.trimIndent()
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
   fun `test text object deletes single line comment from trailing whitespace`() {
     doTest(
-      parseKeys("dgc"),
+      "dgc",
       """
         
         // Comment 1
@@ -413,13 +438,14 @@ class CommentaryExtensionTest : JavaVimTestCase() {
       """.trimIndent(),
       """
         final Int value = 42;
-      """.trimIndent()
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
   fun `test text object deletes single line comments separated by whitespace`() {
     doTest(
-      parseKeys("dgc"),
+      "dgc",
       """
         // <caret> Comment 1
         
@@ -428,13 +454,14 @@ class CommentaryExtensionTest : JavaVimTestCase() {
       """.trimIndent(),
       """
         final Int value = 42;
-      """.trimIndent()
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
   fun `test text object deletes disjointed single line comments from whitespace`() {
     doTest(
-      parseKeys("dgc"),
+      "dgc",
       """
         // Comment 1
         <caret>
@@ -443,26 +470,28 @@ class CommentaryExtensionTest : JavaVimTestCase() {
       """.trimIndent(),
       """
         final Int value = 42;
-      """.trimIndent()
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
   fun `test text object deletes single line comment from current line`() {
     doTest(
-      parseKeys("dgc"),
+      "dgc",
       """
         // Comment
         final Int <caret>value = 42;
       """.trimIndent(),
       """
         final Int value = 42;
-      """.trimIndent()
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
   fun `test text object deletes single line comment from current line 2`() {
     doTest(
-      parseKeys("dgc"),
+      "dgc",
       """
         // Comment
         final Int <caret>value = 42;
@@ -471,38 +500,41 @@ class CommentaryExtensionTest : JavaVimTestCase() {
       """
         final Int value = 42;
         final Int value2 = 42;
-      """.trimIndent()
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
   fun `test text object does not delete line with comment and text`() {
     doTest(
-      parseKeys("dgc"),
+      "dgc",
       """
         final Int <caret>value = 42; // Comment
       """.trimIndent(),
       """
         final Int value = 42; // Comment
-      """.trimIndent()
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
   fun `test text object deletes block comment`() {
     doTest(
-      parseKeys("dgc"),
+      "dgc",
       """
         /* <caret>Comment 1 */
         final Int value = 42;
       """.trimIndent(),
       """
         final Int value = 42;
-      """.trimIndent()
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
   fun `test text object deletes multi-line block comment`() {
     doTest(
-      parseKeys("dgc"),
+      "dgc",
       """
         /* Comment 1
          * <caret>Comment 2
@@ -511,13 +543,14 @@ class CommentaryExtensionTest : JavaVimTestCase() {
       """.trimIndent(),
       """
         final Int value = 42;
-      """.trimIndent()
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
   fun `test text object deletes adjoining multi-line block comments`() {
     doTest(
-      parseKeys("dgc"),
+      "dgc",
       """
         /* Comment 1
          * Comment 2
@@ -529,13 +562,14 @@ class CommentaryExtensionTest : JavaVimTestCase() {
       """.trimIndent(),
       """
         final Int value = 42;
-      """.trimIndent()
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
   fun `test text object deletes adjoining multi-line block comments 2`() {
     doTest(
-      parseKeys("dgc"),
+      "dgc",
       """
         /* Comment 1
          * <caret>Comment 2
@@ -548,25 +582,27 @@ class CommentaryExtensionTest : JavaVimTestCase() {
       """.trimIndent(),
       """
         final Int value = 42;
-      """.trimIndent()
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
   fun `test text object does not delete line with text and block comment`() {
     doTest(
-      parseKeys("dgc"),
+      "dgc",
       """
         final Int value /* Block comment */ = 42;
       """.trimIndent(),
       """
         final Int value /* Block comment */ = 42;
-      """.trimIndent()
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
   fun `test text object deletes JavaDoc comment`() {
     doTest(
-      parseKeys("dgc"),
+      "dgc",
       """
         /**
          * <caret>Cool summary, dude
@@ -579,13 +615,14 @@ class CommentaryExtensionTest : JavaVimTestCase() {
       """
         public void something(int value, String name) {
         }
-      """.trimIndent()
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
   fun `test text object deletes JavaDoc comment from leading whitespace`() {
     doTest(
-      parseKeys("dgc"),
+      "dgc",
       """
         <caret>
         /**
@@ -599,13 +636,14 @@ class CommentaryExtensionTest : JavaVimTestCase() {
       """
         public void something(int value, String name) {
         }
-      """.trimIndent()
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
   fun `test text object deletes JavaDoc comment and adjoining comments`() {
     doTest(
-      parseKeys("dgc"),
+      "dgc",
       """
         // <caret>This should be deleted too
         /**
@@ -619,13 +657,14 @@ class CommentaryExtensionTest : JavaVimTestCase() {
       """
         public void something(int value, String name) {
         }
-      """.trimIndent()
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
   fun `test text object deletes JavaDoc comment and adjoining comments separated by whitespace`() {
     doTest(
-      parseKeys("dgc"),
+      "dgc",
       """
         // <caret>This should be deleted too
         
@@ -642,13 +681,14 @@ class CommentaryExtensionTest : JavaVimTestCase() {
       """
         public void something(int value, String name) {
         }
-      """.trimIndent()
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
   fun `test Commentary command comments current line`() {
     doTest(
-      parseKeys(":Commentary<CR>"),
+      ":Commentary<CR>",
       """
         final int var value1 = 42;
         final int var <caret>value2 = 42;
@@ -658,13 +698,14 @@ class CommentaryExtensionTest : JavaVimTestCase() {
         final int var value1 = 42;
         //final int var <caret>value2 = 42;
         final int var value3 = 42;
-      """.trimIndent()
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
   fun `test Commentary command comments simple line range`() {
     doTest(
-      parseKeys(":2Commentary<CR>"),
+      ":2Commentary<CR>",
       """
         final int var <caret>value1 = 42;
         final int var value2 = 42;
@@ -674,13 +715,14 @@ class CommentaryExtensionTest : JavaVimTestCase() {
         final int var <caret>value1 = 42;
         //final int var value2 = 42;
         final int var value3 = 42;
-      """.trimIndent()
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
   fun `test Commentary command comments line range`() {
     doTest(
-      parseKeys(":1,3Commentary<CR>"),
+      ":1,3Commentary<CR>",
       """
         final int var <caret>value1 = 42;
         final int var value2 = 42;
@@ -690,11 +732,13 @@ class CommentaryExtensionTest : JavaVimTestCase() {
         //final int var <caret>value1 = 42;
         //final int var value2 = 42;
         //final int var value3 = 42;
-      """.trimIndent()
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
-  @VimBehaviorDiffers("""
+  @VimBehaviorDiffers(
+    """
         <caret>//final int var value1 = 42;
         //final int var value2 = 42;
         //final int var value3 = 42;
@@ -702,10 +746,11 @@ class CommentaryExtensionTest : JavaVimTestCase() {
     description = "Vim exits Visual mode before entering Command mode, and resets the caret to the start of the visual selection." +
       "When executing the Commentary command, we don't move the caret, so it should be end up at the start of the visual selection." +
       "Note that Escape exits Visual mode, but leaves the caret where it is",
-    shouldBeFixed = true)
+    shouldBeFixed = true
+  )
   fun `test Commentary command comments visual range`() {
     doTest(
-      parseKeys("Vjj", ":Commentary<CR>"),
+      "Vjj" + ":Commentary<CR>",
       """
         final int var <caret>value1 = 42;
         final int var value2 = 42;
@@ -715,13 +760,14 @@ class CommentaryExtensionTest : JavaVimTestCase() {
         //final int var value1 = 42;
         //final int var value2 = 42;
         //final int var <caret>value3 = 42;
-      """.trimIndent()
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
   fun `test Commentary command comments search range`() {
     doTest(
-      parseKeys(":g/value2/Commentary<CR>"),
+      ":g/value2/Commentary<CR>",
       """
         final int var <caret>value1 = 42;
         final int var value2 = 42;
@@ -735,7 +781,8 @@ class CommentaryExtensionTest : JavaVimTestCase() {
         final int var value3 = 42;
         //final int var value21 = 42;
         <caret>//final int var value22 = 42;
-      """.trimIndent()
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 }
