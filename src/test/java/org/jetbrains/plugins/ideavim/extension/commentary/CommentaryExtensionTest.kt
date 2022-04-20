@@ -23,6 +23,7 @@ import com.intellij.ide.highlighter.JavaFileType
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.yaml.YAMLFileType
 
 @Suppress("SpellCheckingInspection")
 class CommentaryExtensionTest : VimTestCase() {
@@ -783,6 +784,33 @@ class CommentaryExtensionTest : VimTestCase() {
         <caret>//final int var value22 = 42;
       """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
+    )
+  }
+
+  fun `test block comment falls back to line comment when not available`() {
+    doTest(
+      "gcw",
+      """
+      american:
+      - <caret>Boston Red Sox
+      - Detroit Tigers
+      - New York Yankees
+      national:
+      - New York Mets
+      - Chicago Cubs
+      - Atlanta Braves
+      """.trimIndent(),
+      """
+      american:
+      #- Boston Red Sox
+      - Detroit Tigers
+      - New York Yankees
+      national:
+      - New York Mets
+      - Chicago Cubs
+      - Atlanta Braves
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, YAMLFileType.YML
     )
   }
 }

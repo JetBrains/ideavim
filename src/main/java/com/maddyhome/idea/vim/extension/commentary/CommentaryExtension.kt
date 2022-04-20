@@ -71,15 +71,16 @@ class CommentaryExtension : VimExtension {
 
       return runWriteAction {
         try {
-          // Treat block- and character-wise selections as block comments
-          val actionName = if (selectionType === SelectionType.LINE_WISE) {
-            IdeActions.ACTION_COMMENT_LINE
-          }
-          else {
-            IdeActions.ACTION_COMMENT_BLOCK
+          // Treat block- and character-wise selections as block comments. Be ready to fall back to if the first action
+          // isn't available
+          val actions = if (selectionType === SelectionType.LINE_WISE) {
+            listOf(IdeActions.ACTION_COMMENT_LINE, IdeActions.ACTION_COMMENT_BLOCK)
+          } else {
+            listOf(IdeActions.ACTION_COMMENT_BLOCK, IdeActions.ACTION_COMMENT_LINE)
           }
 
-          injector.actionExecutor.executeAction(actionName, context)
+          injector.actionExecutor.executeAction(actions[0], context)
+            || injector.actionExecutor.executeAction(actions[1], context)
         } finally {
           // Remove the selection, if we added it
           if (mode !== CommandState.Mode.VISUAL) {
