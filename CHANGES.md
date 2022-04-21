@@ -25,15 +25,27 @@ usual beta standards.
 
 ## To Be Released
 
+### Features:
+* Add `gcu` command for Commentary plugin
+* Add `:Commentary` command, which works great for commands such as `:%s/fun/Commentary`
+
+### Changes:
+* Uses the same mappings as Commentary, so custom bindings for the Vim plugin will work with IdeaVim, too.
+  E.g. `<Plug>Commentary` instead of `<Plug>(CommentMotion)`. Old mappings are maintained for compatibility.
+
 ### Fixes:
 * [VIM-2587](https://youtrack.jetbrains.com/issue/VIM-2587) Use ctrl-6 as ctrl-^
 * [VIM-2590](https://youtrack.jetbrains.com/issue/VIM-2590) Fix caret shape in PyCharm
 * [VIM-2553](https://youtrack.jetbrains.com/issue/VIM-2553) Substitute consecutive matches
+* [VIM-1687](https://youtrack.jetbrains.com/issue/VIM-1687) Support count for `gcc`
+* [VIM-2381](https://youtrack.jetbrains.com/issue/VIM-2381) Fall back to line comment if block comment is not available
+* [VIM-2589](https://youtrack.jetbrains.com/issue/VIM-2589) Add `gc` text object
 
 ### Merged PRs:
 * [468](https://github.com/JetBrains/ideavim/pull/468) by [Thomas Schouten](https://github.com/PHPirates): Implement UserDataHolder for EditorDataContext
 * [483](https://github.com/JetBrains/ideavim/pull/483) by [Simon Rainer](https://github.com/Vvalter): Fix(VIM-2553): Substitute consecutive matches
 * [488](https://github.com/JetBrains/ideavim/pull/488) by [Martin Yzeiri](https://github.com/myzeiri): Add Matchit support for the C family of languages
+* [493](https://github.com/JetBrains/ideavim/pull/493) by [Matt Ellis](https://github.com/citizenmatt): Improvements to Commentary extension
 
 ## 1.10.0, 2022-02-17
 
