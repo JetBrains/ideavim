@@ -558,6 +558,7 @@
  * |v_gq|                 {@link com.maddyhome.idea.vim.action.change.change.ReformatCodeVisualAction}
  * |v_gv|                 {@link com.maddyhome.idea.vim.action.motion.visual.VisualSwapSelectionsAction}
  * |v_g`|                 {@link com.maddyhome.idea.vim.action.motion.mark.MotionGotoFileMarkNoSaveJumpAction}
+ * |v_g@|                 {@link com.maddyhome.idea.vim.action.change.VisualOperatorAction}
  * |v_iquote|             {@link com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockDoubleQuoteAction}
  * |v_i'|                 {@link com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockSingleQuoteAction}
  * |v_i(|                 {@link com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockParenAction}

@@ -27,7 +27,6 @@ import com.maddyhome.idea.vim.ex.InvalidCommandException
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.Msg
-import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.commands.UnknownCommand.Constants.MAX_RECURSION
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
@@ -67,7 +66,7 @@ data class UnknownCommand(val ranges: Ranges, val name: String, val argument: St
             }
           }
           is GoalCommand.Call -> {
-            commandAlias.handler.execute(editor.ij, context.ij)
+            commandAlias.handler.execute(name, ranges, editor, context)
             return ExecutionResult.Success
           }
         }

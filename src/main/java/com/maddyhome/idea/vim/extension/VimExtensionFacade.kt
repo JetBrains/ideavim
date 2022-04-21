@@ -24,6 +24,8 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.change.Extension
 import com.maddyhome.idea.vim.command.SelectionType
+import com.maddyhome.idea.vim.common.CommandAlias
+import com.maddyhome.idea.vim.common.CommandAliasHandler
 import com.maddyhome.idea.vim.common.MappingMode
 import com.maddyhome.idea.vim.helper.CommandLineHelper
 import com.maddyhome.idea.vim.helper.EditorDataContext
@@ -79,6 +81,29 @@ object VimExtensionFacade {
   ) {
     val filteredModes = modes.filterNotTo(HashSet()) { VimPlugin.getKey().hasmapto(it, toKeys) }
     VimPlugin.getKey().putKeyMapping(filteredModes, fromKeys, pluginOwner, toKeys, recursive)
+  }
+
+  /**
+   * Equivalent to calling 'command' to set up a user-defined command or alias
+   */
+  fun addCommand(
+    name: String,
+    handler: CommandAliasHandler
+  ) {
+    addCommand(name, 0, 0, handler)
+  }
+
+  /**
+   * Equivalent to calling 'command' to set up a user-defined command or alias
+   */
+  @JvmStatic
+  fun addCommand(
+    name: String,
+    minimumNumberOfArguments: Int,
+    maximumNumberOfArguments: Int,
+    handler: CommandAliasHandler
+  ) {
+    VimPlugin.getCommand().setAlias(name, CommandAlias.Call(minimumNumberOfArguments, maximumNumberOfArguments, name, handler))
   }
 
   /** Sets the value of 'operatorfunc' to be used as the operator function in 'g@'. */

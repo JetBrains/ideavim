@@ -147,7 +147,8 @@ intellij {
     downloadSources.set(downloadIdeaSources.toBoolean())
     instrumentCode.set(instrumentPluginCode.toBoolean())
     intellijRepository.set("https://www.jetbrains.com/intellij-repository")
-    plugins.set(listOf("java", "AceJump:3.8.4"))
+    // Yaml is only used for testing. It's part of the IdeaIC distribution, but needs to be included as a reference
+    plugins.set(listOf("java", "AceJump:3.8.4", "yaml"))
 }
 
 tasks {

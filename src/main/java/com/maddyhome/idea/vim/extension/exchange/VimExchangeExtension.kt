@@ -49,7 +49,6 @@ import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.mark.Mark
-import com.maddyhome.idea.vim.mark.VimMark
 import com.maddyhome.idea.vim.mark.VimMarkConstants
 import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.annotations.NonNls
@@ -313,13 +312,6 @@ class VimExchangeExtension : VimExtension {
     }
 
     private fun getExchange(editor: Editor, isVisual: Boolean, selectionType: SelectionType): Exchange {
-      fun getEndCol(selectionEnd: Mark, type: CommandState.SubMode): Int {
-        return if (type == CommandState.SubMode.VISUAL_LINE) {
-          EditorHelper.getLineLength(editor, selectionEnd.logicalLine)
-        } else {
-          selectionEnd.col
-        }
-      }
 
       // TODO: improve KeyStroke list to sting conversion
       fun getRegisterText(reg: Char): String = getRegister(reg)?.map { it.keyChar }?.joinToString("") ?: ""
@@ -338,22 +330,13 @@ class VimExchangeExtension : VimExtension {
       val starRegText = getRegister('*')
       val plusRegText = getRegister('+')
 
-      var (selectionStart, selectionEnd) = getMarks(isVisual)
+      val (selectionStart, selectionEnd) = getMarks(isVisual)
       if (isVisual) {
         executeNormalWithoutMapping(parseKeys("gvy"), editor)
         // TODO: handle
         // if &selection ==# 'exclusive' && start != end
         // 			let end.column -= len(matchstr(@@, '\_.$'))
       } else {
-        selectionEnd = selectionEnd.let {
-          VimMark.create(
-            it.key,
-            it.logicalLine,
-            getEndCol(it, selectionType.toSubMode()),
-            it.filename,
-            it.protocol
-          )!!
-        }
         when (selectionType) {
           SelectionType.LINE_WISE -> executeNormalWithoutMapping(stringToKeys("`[V`]y"), editor)
           SelectionType.BLOCK_WISE -> executeNormalWithoutMapping(stringToKeys("""`[<C-V>`]y"""), editor)

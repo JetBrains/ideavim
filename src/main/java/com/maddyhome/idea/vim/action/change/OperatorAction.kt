@@ -20,56 +20,105 @@ package com.maddyhome.idea.vim.action.change
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.command.SelectionType
+import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.common.argumentCaptured
 import com.maddyhome.idea.vim.group.MotionGroup
+import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.handler.VimActionHandler
+import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.commandState
+import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.newapi.ij
+import java.util.*
 
-/**
- * @author vlan
- */
+private fun doOperatorAction(editor: VimEditor, context: ExecutionContext, textRange: TextRange, selectionType: SelectionType): Boolean {
+  val operatorFunction = VimPlugin.getKey().operatorFunction
+  if (operatorFunction == null) {
+    VimPlugin.showMessage(MessageHelper.message("E774"))
+    return false
+  }
+
+  val saveRepeatHandler = VimRepeater.repeatHandler
+  VimPlugin.getMark().setChangeMarks(editor, textRange)
+  KeyHandler.getInstance().reset(editor)
+  val result = operatorFunction.apply(editor.ij, context.ij, selectionType)
+  VimRepeater.repeatHandler = saveRepeatHandler
+  return result
+}
+
 class OperatorAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 
   override val argumentType: Argument.Type = Argument.Type.MOTION
 
   override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
-    val operatorFunction = VimPlugin.getKey().operatorFunction
-    if (operatorFunction != null) {
-      val argument = cmd.argument
-      if (argument != null) {
-        if (!editor.commandState.isDotRepeatInProgress) {
-          argumentCaptured = argument
-        }
-        val saveRepeatHandler = VimRepeater.repeatHandler
-        val motion = argument.motion
-        val range = MotionGroup
-          .getMotionRange(
-            editor.ij,
-            editor.ij.caretModel.primaryCaret,
-            context.ij,
-            argument,
-            operatorArguments
-          )
-        if (range != null) {
-          VimPlugin.getMark().setChangeMarks(editor, range)
-          val selectionType = if (motion.isLinewiseMotion()) SelectionType.LINE_WISE else SelectionType.CHARACTER_WISE
-          KeyHandler.getInstance().reset(editor)
-          val result = operatorFunction.apply(editor.ij, context.ij, selectionType)
-          VimRepeater.repeatHandler = saveRepeatHandler
-          return result
-        }
-      }
-      return false
+    val argument = cmd.argument ?: return false
+    if (!editor.commandState.isDotRepeatInProgress) {
+      argumentCaptured = argument
     }
-    VimPlugin.showMessage(MessageHelper.message("E774"))
+    val range = getMotionRange(editor, context, argument, operatorArguments)
+
+    if (range != null) {
+      val selectionType = if (argument.motion.isLinewiseMotion()) {
+        SelectionType.LINE_WISE
+      }
+      else {
+        SelectionType.CHARACTER_WISE
+      }
+      return doOperatorAction(editor, context, range, selectionType)
+    }
     return false
+  }
+
+  private fun getMotionRange(
+    editor: VimEditor,
+    context: ExecutionContext,
+    argument: Argument,
+    operatorArguments: OperatorArguments): TextRange? {
+
+    // Note that we're using getMotionRange2 in order to avoid normalising the linewise range into line start
+    // offsets that will be used to set the change marks. This affects things like the location of the caret in the
+    // Commentary extension
+    val ijEditor = editor.ij
+    return MotionGroup.getMotionRange2(
+      ijEditor,
+      ijEditor.caretModel.primaryCaret,
+      context.ij,
+      argument,
+      operatorArguments
+    )?.normalize()?.let {
+
+      // If we're linewise, make sure the end offset isn't just the EOL char
+      if (argument.motion.isLinewiseMotion() && it.endOffset < editor.fileSize()) {
+        TextRange(it.startOffset, it.endOffset + 1)
+      } else {
+        it
+      }
+    }
+  }
+}
+
+class VisualOperatorAction: VisualOperatorActionHandler.ForEachCaret() {
+  override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
+
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_EXIT_VISUAL)
+
+  override fun executeAction(
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    cmd: Command,
+    range: VimSelection,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
+    return doOperatorAction(editor, context, range.toVimTextRange(), range.type)
   }
 }

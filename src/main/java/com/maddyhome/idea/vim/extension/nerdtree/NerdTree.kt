@@ -23,10 +23,8 @@ import com.intellij.ide.projectView.impl.ProjectViewImpl
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
-import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.logger
-import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.project.Project
@@ -41,6 +39,8 @@ import com.intellij.ui.TreeExpandCollapse
 import com.intellij.ui.speedSearch.SpeedSearchSupply
 import com.intellij.util.ui.tree.TreeUtil
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.CommandAlias
 import com.maddyhome.idea.vim.common.CommandAliasHandler
@@ -49,6 +49,7 @@ import com.maddyhome.idea.vim.common.CommandPartNode
 import com.maddyhome.idea.vim.common.Node
 import com.maddyhome.idea.vim.common.RootNode
 import com.maddyhome.idea.vim.common.addLeafs
+import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.group.KeyGroup
 import com.maddyhome.idea.vim.helper.MessageHelper
@@ -56,6 +57,7 @@ import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.runAfterGotFocus
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.RequiredShortcut
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import java.awt.event.KeyEvent
@@ -143,14 +145,14 @@ class NerdTree : VimExtension {
   }
 
   class IjCommandHandler(private val actionId: String) : CommandAliasHandler {
-    override fun execute(editor: Editor, context: DataContext) {
+    override fun execute(command: String, ranges: Ranges, editor: VimEditor, context: ExecutionContext) {
       callAction(actionId, context)
     }
   }
 
   class ToggleHandler : CommandAliasHandler {
-    override fun execute(editor: Editor, context: DataContext) {
-      val project = editor.project ?: return
+    override fun execute(command: String, ranges: Ranges, editor: VimEditor, context: ExecutionContext) {
+      val project = editor.ij.project ?: return
       val toolWindow = ToolWindowManagerEx.getInstanceEx(project).getToolWindow(ToolWindowId.PROJECT_VIEW) ?: return
       if (toolWindow.isVisible) {
         toolWindow.hide()
@@ -161,8 +163,8 @@ class NerdTree : VimExtension {
   }
 
   class CloseHandler : CommandAliasHandler {
-    override fun execute(editor: Editor, context: DataContext) {
-      val project = editor.project ?: return
+    override fun execute(command: String, ranges: Ranges, editor: VimEditor, context: ExecutionContext) {
+      val project = editor.ij.project ?: return
       val toolWindow = ToolWindowManagerEx.getInstanceEx(project).getToolWindow(ToolWindowId.PROJECT_VIEW) ?: return
       if (toolWindow.isVisible) {
         toolWindow.hide()
@@ -217,7 +219,7 @@ class NerdTree : VimExtension {
 
           val action = nextNode.actionHolder
           when (action) {
-            is NerdAction.ToIj -> callAction(action.name, e.dataContext)
+            is NerdAction.ToIj -> callAction(action.name, e.dataContext.vim)
             is NerdAction.Code -> e.project?.let { action.action(it, e.dataContext, e) }
           }
         }
@@ -353,7 +355,7 @@ class NerdTree : VimExtension {
         currentWindow.split(SwingConstants.VERTICAL, true, file, true)
 
         // FIXME: 22.01.2021 This solution bouncing a bit
-        callAction("ActivateProjectToolWindow", context)
+        callAction("ActivateProjectToolWindow", context.vim)
       }
     )
     registerCommand(
@@ -364,7 +366,7 @@ class NerdTree : VimExtension {
         val currentWindow = splitters.currentWindow
         currentWindow.split(SwingConstants.HORIZONTAL, true, file, true)
 
-        callAction("ActivateProjectToolWindow", context)
+        callAction("ActivateProjectToolWindow", context.vim)
       }
     )
     registerCommand(
@@ -502,19 +504,19 @@ class NerdTree : VimExtension {
 
     private val LOG = logger<NerdTree>()
 
-    fun callAction(name: String, context: DataContext) {
+    fun callAction(name: String, context: ExecutionContext) {
       val action = ActionManager.getInstance().getAction(name) ?: run {
         VimPlugin.showMessage(MessageHelper.message("action.not.found.0", name))
         return
       }
       val application = ApplicationManager.getApplication()
       if (application.isUnitTestMode) {
-        injector.actionExecutor.executeAction(action.vim, context.vim)
+        injector.actionExecutor.executeAction(action.vim, context)
       } else {
         runAfterGotFocus {
           injector.actionExecutor.executeAction(
             action.vim,
-            context.vim,
+            context,
           )
         }
       }
