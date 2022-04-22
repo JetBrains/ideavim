@@ -18,35 +18,34 @@
 
 package com.maddyhome.idea.vim.action.window
 
-import com.intellij.codeInsight.lookup.LookupManager
-import com.intellij.openapi.actionSystem.IdeActions
-import com.intellij.openapi.editor.actionSystem.EditorActionManager
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
-import com.maddyhome.idea.vim.newapi.ij
 
 /**
  * @author Alex Plate
  */
-class LookupDownAction : VimActionHandler.SingleExecution() {
+class LookupUpAction : VimActionHandler.SingleExecution() {
 
-  private val keySet = parseKeysSet("<C-N>")
+  private val keySet = injector.parser.parseKeysSet("<C-P>")
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
-  override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
-    val activeLookup = LookupManager.getActiveLookup(editor.ij)
+  override fun execute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
+    val activeLookup = injector.lookupManager.getActiveLookup(editor)
     if (activeLookup != null) {
-      EditorActionManager.getInstance().getActionHandler(IdeActions.ACTION_EDITOR_MOVE_CARET_DOWN)
-        .execute(editor.ij, editor.ij.caretModel.primaryCaret, context.ij)
+      activeLookup.up(editor.primaryCaret(), context)
     } else {
       val keyStroke = keySet.first().first()
-      val actions = VimPlugin.getKey().getKeymapConflicts(keyStroke)
+      val actions = injector.keyGroup.getKeymapConflicts(keyStroke)
       for (action in actions) {
         if (injector.actionExecutor.executeAction(action, context)) break
       }

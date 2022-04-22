@@ -1166,15 +1166,18 @@ public class MotionGroup extends VimMotionGroupBase {
     }
   }
 
-  public int moveCaretGotoPreviousTab(@NotNull Editor editor, @NotNull DataContext context, int rawCount) {
-    switchEditorTab(EditorWindow.DATA_KEY.getData(context), rawCount >= 1 ? -rawCount : -1, false);
-    return editor.getCaretModel().getOffset();
+  @Override
+  public int moveCaretGotoPreviousTab(@NotNull VimEditor editor, @NotNull ExecutionContext context, int rawCount) {
+    switchEditorTab(EditorWindow.DATA_KEY.getData((DataContext)context.getContext()), rawCount >= 1 ? -rawCount : -1, false);
+    return editor.currentCaret().getOffset().getPoint();
   }
 
-  public int moveCaretGotoNextTab(@NotNull Editor editor, @NotNull DataContext context, int rawCount) {
+  @Override
+  public int moveCaretGotoNextTab(@NotNull VimEditor editor, @NotNull ExecutionContext context, int rawCount) {
     final boolean absolute = rawCount >= 1;
-    switchEditorTab(EditorWindow.DATA_KEY.getData(context), absolute ? rawCount - 1 : 1, absolute);
-    return editor.getCaretModel().getOffset();
+    switchEditorTab(EditorWindow.DATA_KEY.getData((DataContext)context.getContext()), absolute ? rawCount - 1 : 1,
+                    absolute);
+    return editor.currentCaret().getOffset().getPoint();
   }
 
   @Override

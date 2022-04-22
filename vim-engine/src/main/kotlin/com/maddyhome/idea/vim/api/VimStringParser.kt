@@ -8,4 +8,5 @@ interface VimStringParser {
   fun stringToKeys(string: String): List<KeyStroke>
   fun toKeyNotation(keyStroke: KeyStroke): String
   fun toKeyNotation(keyStrokes: List<KeyStroke>): String
+  fun parseKeysSet(vararg keys: String): Set<List<KeyStroke>>
 }

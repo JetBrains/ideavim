@@ -117,4 +117,6 @@ interface VimMotionGroup {
   fun moveCaretToFileMark(editor: VimEditor, ch: Char, toLineStart: Boolean): Int
   fun moveCaretToMark(editor: VimEditor, ch: Char, toLineStart: Boolean): Int
   fun moveCaretToJump(editor: VimEditor, count: Int): Int
+    fun moveCaretGotoNextTab(editor: VimEditor, context: ExecutionContext, rawCount: Int): Int
+  fun moveCaretGotoPreviousTab(editor: VimEditor, context: ExecutionContext, rawCount: Int): Int
 }

@@ -38,6 +38,8 @@ import com.maddyhome.idea.vim.group.EditorGroup
 import com.maddyhome.idea.vim.group.MarkGroup
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.SearchGroup
+import com.maddyhome.idea.vim.group.VimWindowGroup
+import com.maddyhome.idea.vim.group.WindowGroup
 import com.maddyhome.idea.vim.group.copy.PutGroup
 import com.maddyhome.idea.vim.helper.IjActionExecutor
 import com.maddyhome.idea.vim.helper.IjEditorHelper
@@ -73,6 +75,8 @@ class IjVimInjector : VimInjector {
     get() = service<SearchGroup>()
   override val put: VimPut
     get() = service<PutGroup>()
+  override val window: VimWindowGroup
+    get() = service<WindowGroup>()
   override val nativeActionManager: NativeActionManager
     get() = service<IjNativeActionManager>()
   override val messages: VimMessages

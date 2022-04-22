@@ -22,7 +22,6 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.ex.ranges.Ranges
-import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
@@ -33,9 +32,9 @@ data class SplitCommand(val ranges: Ranges, val argument: String, val splitType:
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
     if (splitType == SplitType.VERTICAL) {
-      VimPlugin.getWindow().splitWindowVertical(context.ij, argument)
+      VimPlugin.getWindow().splitWindowVertical(context, argument)
     } else {
-      VimPlugin.getWindow().splitWindowHorizontal(context.ij, argument)
+      VimPlugin.getWindow().splitWindowHorizontal(context, argument)
     }
 
     return ExecutionResult.Success

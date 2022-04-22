@@ -25,7 +25,9 @@ import com.intellij.openapi.fileEditor.impl.EditorWindow;
 import com.intellij.openapi.fileEditor.impl.EditorWithProviderComposite;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.util.concurrency.annotations.RequiresReadLock;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.api.ExecutionContext;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.RWLockLabel;
 import org.jetbrains.annotations.NotNull;
@@ -36,17 +38,19 @@ import java.awt.*;
 import java.util.List;
 import java.util.*;
 
-public class WindowGroup {
-  public void closeCurrentWindow(@NotNull DataContext context) {
-    final FileEditorManagerEx fileEditorManager = getFileEditorManager(context);
+public class WindowGroup extends WindowGroupBase {
+  @Override
+  public void closeCurrentWindow(@NotNull ExecutionContext context) {
+    final FileEditorManagerEx fileEditorManager = getFileEditorManager((DataContext)context.getContext());
     final EditorWindow window = fileEditorManager.getSplitters().getCurrentWindow();
     if (window != null) {
       window.closeAllExcept(null);
     }
   }
 
-  public void closeAllExceptCurrent(@NotNull DataContext context) {
-    final FileEditorManagerEx fileEditorManager = getFileEditorManager(context);
+  @Override
+  public void closeAllExceptCurrent(@NotNull ExecutionContext context) {
+    final FileEditorManagerEx fileEditorManager = getFileEditorManager(((DataContext)context.getContext()));
     final EditorWindow current = fileEditorManager.getCurrentWindow();
     for (final EditorWindow window : fileEditorManager.getWindows()) {
       if (window != current) {
@@ -64,41 +68,48 @@ public class WindowGroup {
     getFileEditorManager(context).closeAllFiles();
   }
 
-  public void selectNextWindow(@NotNull DataContext context) {
-    final FileEditorManagerEx fileEditorManager = getFileEditorManager(context);
+  @Override
+  public void selectNextWindow(@NotNull ExecutionContext context) {
+    final FileEditorManagerEx fileEditorManager = getFileEditorManager(((DataContext)context.getContext()));
     final EditorWindow current = fileEditorManager.getCurrentWindow();
     if (current != null) {
       fileEditorManager.getNextWindow(current).setAsCurrentWindow(true);
     }
   }
 
-  public void selectPreviousWindow(@NotNull DataContext context) {
-    final FileEditorManagerEx fileEditorManager = getFileEditorManager(context);
+  @Override
+  public void selectPreviousWindow(@NotNull ExecutionContext context) {
+    final FileEditorManagerEx fileEditorManager = getFileEditorManager(((DataContext)context.getContext()));
     final EditorWindow current = fileEditorManager.getCurrentWindow();
     if (current != null) {
       fileEditorManager.getPrevWindow(current).setAsCurrentWindow(true);
     }
   }
 
-  public void selectWindow(@NotNull DataContext context, int index) {
-    final FileEditorManagerEx fileEditorManager = getFileEditorManager(context);
+  @Override
+  public void selectWindow(@NotNull ExecutionContext context, int index) {
+    final FileEditorManagerEx fileEditorManager = getFileEditorManager(((DataContext)context.getContext()));
     final EditorWindow[] windows = fileEditorManager.getWindows();
     if (index - 1 < windows.length) {
       windows[index - 1].setAsCurrentWindow(true);
     }
   }
 
-  public void splitWindowHorizontal(@NotNull DataContext context, @NotNull String filename) {
-    splitWindow(SwingConstants.HORIZONTAL, context, filename);
+  @Override
+  public void splitWindowHorizontal(@NotNull ExecutionContext context, @NotNull String filename) {
+    splitWindow(SwingConstants.HORIZONTAL, (DataContext)context.getContext(), filename);
   }
 
-  public void splitWindowVertical(@NotNull DataContext context, @NotNull String filename) {
-    splitWindow(SwingConstants.VERTICAL, context, filename);
+  @Override
+  public void splitWindowVertical(@NotNull ExecutionContext context, @NotNull String filename) {
+    splitWindow(SwingConstants.VERTICAL, (DataContext)context.getContext(), filename);
   }
 
+  @Override
   @RWLockLabel.Readonly
-  public void selectWindowInRow(@NotNull DataContext context, int relativePosition, boolean vertical) {
-    final FileEditorManagerEx fileEditorManager = getFileEditorManager(context);
+  @RequiresReadLock
+  public void selectWindowInRow(@NotNull ExecutionContext context, int relativePosition, boolean vertical) {
+    final FileEditorManagerEx fileEditorManager = getFileEditorManager(((DataContext)context.getContext()));
     final EditorWindow currentWindow = fileEditorManager.getCurrentWindow();
     if (currentWindow != null) {
       final EditorWindow[] windows = fileEditorManager.getWindows();

@@ -196,7 +196,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   }
 
   public static @NotNull WindowGroup getWindow() {
-    return ApplicationManager.getApplication().getService(WindowGroup.class);
+    return ((WindowGroup)VimInjectorKt.getInjector().getWindow());
   }
 
   public static @NotNull TabService getTabService() {

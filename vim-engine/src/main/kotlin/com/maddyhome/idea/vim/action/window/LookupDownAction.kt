@@ -15,24 +15,40 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+
 package com.maddyhome.idea.vim.action.window
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
-import com.maddyhome.idea.vim.newapi.ij
 
-class WindowPrevAction : VimActionHandler.SingleExecution() {
+/**
+ * @author Alex Plate
+ */
+class LookupDownAction : VimActionHandler.SingleExecution() {
+
+  private val keySet = parseKeysSet("<C-N>")
+
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
-  override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
-    if (cmd.rawCount == 0) {
-      VimPlugin.getWindow().selectPreviousWindow(context.ij)
+  override fun execute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
+    val activeLookup = injector.lookupManager.getActiveLookup(editor)
+    if (activeLookup != null) {
+      activeLookup.down(editor.primaryCaret(), context)
     } else {
-      VimPlugin.getWindow().selectWindow(context.ij, cmd.count)
+      val keyStroke = keySet.first().first()
+      val actions = injector.keyGroup.getKeymapConflicts(keyStroke)
+      for (action in actions) {
+        if (injector.actionExecutor.executeAction(action, context)) break
+      }
     }
     return true
   }

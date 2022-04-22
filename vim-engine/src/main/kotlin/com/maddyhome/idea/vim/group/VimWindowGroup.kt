@@ -15,24 +15,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-package com.maddyhome.idea.vim.action.window
+package com.maddyhome.idea.vim.group
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.handler.VimActionHandler
-import com.maddyhome.idea.vim.newapi.ij
 
-/**
- * @author rasendubi
- */
-class HorizontalSplitAction : VimActionHandler.SingleExecution() {
-  override val type: Command.Type = Command.Type.OTHER_READONLY
-
-  override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
-    VimPlugin.getWindow().splitWindowHorizontal(context.ij, "")
-    return true
-  }
+interface VimWindowGroup {
+  fun selectWindowInRow(context: ExecutionContext, relativePosition: Int, vertical: Boolean)
+  fun selectNextWindow(context: ExecutionContext)
+  fun selectWindow(context: ExecutionContext, index: Int)
+  fun selectPreviousWindow(context: ExecutionContext)
+  fun closeAllExceptCurrent(context: ExecutionContext)
+  fun splitWindowVertical(context: ExecutionContext, filename: String)
+  fun splitWindowHorizontal(context: ExecutionContext, filename: String)
+  fun closeCurrentWindow(context: ExecutionContext)
 }
