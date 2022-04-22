@@ -17,10 +17,10 @@
  */
 package com.maddyhome.idea.vim.action.copy
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
@@ -29,7 +29,6 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
-import com.maddyhome.idea.vim.newapi.IjVimEditor
 import java.util.*
 
 /**
@@ -61,6 +60,6 @@ class YankVisualLinesAction : VisualOperatorActionHandler.SingleExecution() {
 
     val selection =
       if (vimSelection.type == SelectionType.BLOCK_WISE) SelectionType.BLOCK_WISE else SelectionType.LINE_WISE
-    return VimPlugin.getYank().yankRange((editor as IjVimEditor).editor, TextRange(startsArray, endsArray), selection, true)
+    return injector.yank.yankRange(editor, TextRange(startsArray, endsArray), selection, true)
   }
 }

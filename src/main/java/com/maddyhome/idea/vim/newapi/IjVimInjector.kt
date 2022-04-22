@@ -41,6 +41,7 @@ import com.maddyhome.idea.vim.group.SearchGroup
 import com.maddyhome.idea.vim.group.VimWindowGroup
 import com.maddyhome.idea.vim.group.WindowGroup
 import com.maddyhome.idea.vim.group.copy.PutGroup
+import com.maddyhome.idea.vim.group.copy.YankGroup
 import com.maddyhome.idea.vim.helper.IjActionExecutor
 import com.maddyhome.idea.vim.helper.IjEditorHelper
 import com.maddyhome.idea.vim.helper.IjVimStringParser
@@ -53,6 +54,7 @@ import com.maddyhome.idea.vim.ui.VimRcFileState
 import com.maddyhome.idea.vim.vimscript.Executor
 import com.maddyhome.idea.vim.vimscript.services.FunctionStorage
 import com.maddyhome.idea.vim.vimscript.services.VariableService
+import com.maddyhome.idea.vim.yank.VimYankGroup
 
 class IjVimInjector : VimInjector {
   override fun <T : Any> getLogger(clazz: Class<T>): VimLogger = IjVimLogger(Logger.getInstance(clazz::class.java))
@@ -77,6 +79,8 @@ class IjVimInjector : VimInjector {
     get() = service<PutGroup>()
   override val window: VimWindowGroup
     get() = service<WindowGroup>()
+  override val yank: VimYankGroup
+    get() = service<YankGroup>()
   override val nativeActionManager: NativeActionManager
     get() = service<IjNativeActionManager>()
   override val messages: VimMessages

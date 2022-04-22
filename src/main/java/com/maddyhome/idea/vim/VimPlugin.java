@@ -216,7 +216,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   }
 
   public static @NotNull YankGroup getYank() {
-    return ApplicationManager.getApplication().getService(YankGroup.class);
+    return (YankGroup)VimInjectorKt.getInjector().getYank();
   }
 
   public static @NotNull PutGroup getPut() {

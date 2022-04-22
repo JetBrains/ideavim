@@ -9,6 +9,7 @@ import com.maddyhome.idea.vim.options.OptionService
 import com.maddyhome.idea.vim.put.VimPut
 import com.maddyhome.idea.vim.register.VimRegisterGroup
 import com.maddyhome.idea.vim.vimscript.services.VariableService
+import com.maddyhome.idea.vim.yank.VimYankGroup
 
 interface VimInjector {
   val parser: VimStringParser
@@ -44,6 +45,7 @@ interface VimInjector {
   val statisticsService: VimStatistics
   val put: VimPut
   val window: VimWindowGroup
+  val yank: VimYankGroup
 
   val vimscriptExecutor: VimscriptExecutor
   val vimscriptParser: VimscriptParser

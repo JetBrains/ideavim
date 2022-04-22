@@ -25,7 +25,6 @@ import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.Ranges
-import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
@@ -56,7 +55,7 @@ data class YankLinesCommand(val ranges: Ranges, var argument: String) : Command.
     }
 
     return if (VimPlugin.getYank().yankRange(
-        editor.ij,
+        editor,
         TextRange(starts.toIntArray(), ends.toIntArray()),
         SelectionType.LINE_WISE, false
       )

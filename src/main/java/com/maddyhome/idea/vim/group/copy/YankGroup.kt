@@ -18,12 +18,13 @@
 
 package com.maddyhome.idea.vim.group.copy
 
-import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.util.containers.ContainerUtil
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.motion.updown.MotionDownLess1FirstNonSpaceAction
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.command.SelectionType
@@ -32,11 +33,13 @@ import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.fileSize
 import com.maddyhome.idea.vim.listener.VimYankListener
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.yank.YankGroupBase
 import org.jetbrains.annotations.Contract
 import kotlin.math.min
 
-class YankGroup {
+class YankGroup : YankGroupBase() {
   private val yankListeners: MutableList<VimYankListener> = ContainerUtil.createLockFreeCopyOnWriteList()
 
   fun addListener(listener: VimYankListener) = yankListeners.add(listener)
@@ -57,15 +60,15 @@ class YankGroup {
    * @param argument The motion command argument
    * @return true if able to yank the text, false if not
    */
-  fun yankMotion(
-    editor: Editor,
-    context: DataContext,
+  override fun yankMotion(
+    editor: VimEditor,
+    context: ExecutionContext,
     argument: Argument,
     operatorArguments: OperatorArguments
   ): Boolean {
     val motion = argument.motion
 
-    val caretModel = editor.caretModel
+    val caretModel = editor.ij.caretModel
     if (caretModel.caretCount <= 0) return false
 
     val ranges = ArrayList<Pair<Int, Int>>(caretModel.caretCount)
@@ -75,7 +78,7 @@ class YankGroup {
       if (argument.motion.action is MotionDownLess1FirstNonSpaceAction) null else HashMap<Caret, Int>(caretModel.caretCount)
 
     for (caret in caretModel.allCarets) {
-      val motionRange = MotionGroup.getMotionRange(editor, caret, context, argument, operatorArguments)
+      val motionRange = MotionGroup.getMotionRange(editor.ij, caret, context.ij, argument, operatorArguments)
         ?: continue
 
       assert(motionRange.size() == 1)
@@ -89,7 +92,7 @@ class YankGroup {
     if (range.size() == 0) return false
 
     val selectionType = if (type == SelectionType.CHARACTER_WISE && range.isMultiple) SelectionType.BLOCK_WISE else type
-    return yankRange(editor, range, selectionType, startOffsets)
+    return yankRange(editor.ij, range, selectionType, startOffsets)
   }
 
   /**
@@ -99,12 +102,12 @@ class YankGroup {
    * @param count  The number of lines to yank
    * @return true if able to yank the lines, false if not
    */
-  fun yankLine(editor: Editor, count: Int): Boolean {
-    val caretModel = editor.caretModel
+  override fun yankLine(editor: VimEditor, count: Int): Boolean {
+    val caretModel = editor.ij.caretModel
     val ranges = ArrayList<Pair<Int, Int>>(caretModel.caretCount)
     for (caret in caretModel.allCarets) {
-      val start = VimPlugin.getMotion().moveCaretToLineStart(editor.vim, caret.vim)
-      val end = min(VimPlugin.getMotion().moveCaretToLineEndOffset(editor.vim, caret.vim, count - 1, true) + 1, editor.fileSize)
+      val start = VimPlugin.getMotion().moveCaretToLineStart(editor, caret.vim)
+      val end = min(VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret.vim, count - 1, true) + 1, editor.fileSize().toInt())
 
       if (end == -1) continue
 
@@ -112,7 +115,7 @@ class YankGroup {
     }
 
     val range = getTextRange(ranges, SelectionType.LINE_WISE) ?: return false
-    return yankRange(editor, range, SelectionType.LINE_WISE, null)
+    return yankRange(editor.ij, range, SelectionType.LINE_WISE, null)
   }
 
   /**
@@ -123,24 +126,24 @@ class YankGroup {
    * @param type   The type of yank
    * @return true if able to yank the range, false if not
    */
-  fun yankRange(editor: Editor, range: TextRange?, type: SelectionType, moveCursor: Boolean): Boolean {
+  override fun yankRange(editor: VimEditor, range: TextRange?, type: SelectionType, moveCursor: Boolean): Boolean {
     range ?: return false
 
     val selectionType = if (type == SelectionType.CHARACTER_WISE && range.isMultiple) SelectionType.BLOCK_WISE else type
 
     if (type == SelectionType.LINE_WISE) {
       for (i in 0 until range.size()) {
-        if (editor.offsetToLogicalPosition(range.startOffsets[i]).column != 0) {
-          range.startOffsets[i] = EditorHelper.getLineStartForOffset(editor, range.startOffsets[i])
+        if (editor.ij.offsetToLogicalPosition(range.startOffsets[i]).column != 0) {
+          range.startOffsets[i] = EditorHelper.getLineStartForOffset(editor.ij, range.startOffsets[i])
         }
-        if (editor.offsetToLogicalPosition(range.endOffsets[i]).column != 0) {
+        if (editor.ij.offsetToLogicalPosition(range.endOffsets[i]).column != 0) {
           range.endOffsets[i] =
-            (EditorHelper.getLineEndForOffset(editor, range.endOffsets[i]) + 1).coerceAtMost(editor.fileSize)
+            (EditorHelper.getLineEndForOffset(editor.ij, range.endOffsets[i]) + 1).coerceAtMost(editor.ij.fileSize)
         }
       }
     }
 
-    val caretModel = editor.caretModel
+    val caretModel = editor.ij.caretModel
     val rangeStartOffsets = range.startOffsets
     val rangeEndOffsets = range.endOffsets
 
@@ -155,9 +158,9 @@ class YankGroup {
         }
       }
 
-      yankRange(editor, range, selectionType, startOffsets)
+      yankRange(editor.ij, range, selectionType, startOffsets)
     } else {
-      yankRange(editor, range, selectionType, null)
+      yankRange(editor.ij, range, selectionType, null)
     }
   }
 
