@@ -15,435 +15,346 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.maddyhome.idea.vim.ui
 
-package com.maddyhome.idea.vim.ui;
-
-import com.intellij.icons.AllIcons;
-import com.intellij.openapi.actionSystem.ActionToolbarPosition;
-import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.KeyboardShortcut;
-import com.intellij.openapi.keymap.KeymapUtil;
-import com.intellij.openapi.options.Configurable;
-import com.intellij.openapi.ui.ComboBoxTableRenderer;
-import com.intellij.openapi.ui.StripeTable;
-import com.intellij.openapi.wm.IdeFocusManager;
-import com.intellij.ui.*;
-import com.intellij.ui.components.JBLabel;
-import com.intellij.util.containers.ContainerUtil;
-import com.intellij.util.ui.UIUtil;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.api.NativeAction;
-import com.maddyhome.idea.vim.api.VimInjectorKt;
-import com.maddyhome.idea.vim.helper.MessageHelper;
-import com.maddyhome.idea.vim.helper.StringHelper;
-import com.maddyhome.idea.vim.key.ShortcutOwner;
-import com.maddyhome.idea.vim.key.ShortcutOwnerInfo;
-import org.jetbrains.annotations.Nls;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import javax.swing.*;
-import javax.swing.border.LineBorder;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableCellEditor;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumn;
-import java.awt.*;
-import java.util.List;
-import java.util.*;
+import com.intellij.icons.AllIcons
+import com.intellij.openapi.actionSystem.ActionToolbarPosition
+import com.intellij.openapi.actionSystem.AnAction
+import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.actionSystem.KeyboardShortcut
+import com.intellij.openapi.keymap.KeymapUtil
+import com.intellij.openapi.options.Configurable
+import com.intellij.openapi.ui.ComboBoxTableRenderer
+import com.intellij.openapi.ui.StripeTable
+import com.intellij.openapi.wm.IdeFocusManager
+import com.intellij.ui.DumbAwareActionButton
+import com.intellij.ui.HyperlinkLabel
+import com.intellij.ui.IdeBorderFactory
+import com.intellij.ui.JBColor
+import com.intellij.ui.TableUtil
+import com.intellij.ui.ToolbarDecorator
+import com.intellij.ui.components.JBLabel
+import com.intellij.util.containers.ContainerUtil
+import com.intellij.util.ui.UIUtil
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.helper.MessageHelper.message
+import com.maddyhome.idea.vim.helper.StringHelper.toKeyNotation
+import com.maddyhome.idea.vim.key.ShortcutOwner
+import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
+import com.maddyhome.idea.vim.key.ShortcutOwnerInfo.AllModes
+import com.maddyhome.idea.vim.key.ShortcutOwnerInfo.PerMode
+import org.jetbrains.annotations.Nls
+import java.awt.BorderLayout
+import java.awt.Dimension
+import java.util.*
+import javax.swing.JComponent
+import javax.swing.JPanel
+import javax.swing.JTable
+import javax.swing.KeyStroke
+import javax.swing.border.LineBorder
+import javax.swing.table.AbstractTableModel
+import javax.swing.table.TableCellEditor
+import javax.swing.table.TableCellRenderer
+import javax.swing.table.TableColumn
 
 /**
  * @author vlan
  */
-public class VimEmulationConfigurable implements Configurable {
-  private final @NotNull VimShortcutConflictsTable.Model myConflictsTableModel = new VimShortcutConflictsTable.Model();
-  private final @NotNull VimSettingsPanel myPanel = new VimSettingsPanel(myConflictsTableModel);
+class VimEmulationConfigurable : Configurable {
+  private val settingsPanel: VimSettingsPanel by lazy { VimSettingsPanel() }
 
-  @Override
-  public @NotNull String getDisplayName() {
-    return MessageHelper.message("configurable.name.vim.emulation");
+  override fun getDisplayName(): String = message("configurable.name.vim.emulation")
+
+  override fun getHelpTopic(): String? {
+    return null
   }
 
-  @Override
-  public @Nullable String getHelpTopic() {
-    return null;
+  // The component here should be created on demand, only after calling this method.
+  // We're trying to do that by initializing settingsPanel in lazy
+  override fun createComponent(): JComponent {
+    return settingsPanel
   }
 
-  @Override
-  public @Nullable JComponent createComponent() {
-    return myPanel;
+  override fun isModified(): Boolean {
+    return settingsPanel.model.isModified
   }
 
-  @Override
-  public boolean isModified() {
-    return myConflictsTableModel.isModified();
+  override fun apply() {
+    settingsPanel.model.apply()
   }
 
-  @Override
-  public void apply() {
-    myConflictsTableModel.apply();
+  override fun reset() {
+    settingsPanel.model.reset()
   }
 
-  @Override
-  public void reset() {
-    myConflictsTableModel.reset();
-  }
+  override fun disposeUIResources() {}
 
-  @Override
-  public void disposeUIResources() {
-  }
+  private class VimSettingsPanel() : JPanel() {
 
-  private static final class VimSettingsPanel extends JPanel {
+    val model: VimShortcutConflictsTable.Model = VimShortcutConflictsTable.Model()
 
-    public VimSettingsPanel(@NotNull VimShortcutConflictsTable.Model model) {
-      VimShortcutConflictsTable shortcutConflictsTable = new VimShortcutConflictsTable(model);
-      setLayout(new BorderLayout());
-
-      ToolbarDecorator decorator = ToolbarDecorator.createDecorator(shortcutConflictsTable);
-      decorator.setToolbarPosition(ActionToolbarPosition.RIGHT);
-      decorator.addExtraAction(new CopyForRcAction(model));
-      decorator.addExtraAction(new ResetHandlersAction(model, shortcutConflictsTable));
-
-      final JPanel scrollPane = decorator.createPanel();
-      scrollPane.setBorder(new LineBorder(JBColor.border()));
-      final JPanel conflictsPanel = new JPanel(new BorderLayout());
-      final String title = MessageHelper.message("border.title.shortcut.conflicts.for.active.keymap");
-      conflictsPanel.setBorder(IdeBorderFactory.createTitledBorder(title, false));
-      conflictsPanel.add(scrollPane);
-      add(conflictsPanel, BorderLayout.CENTER);
-      addHelpLine(model);
+    init {
+      val shortcutConflictsTable = VimShortcutConflictsTable(model)
+      layout = BorderLayout()
+      val decorator = ToolbarDecorator.createDecorator(shortcutConflictsTable)
+      decorator.setToolbarPosition(ActionToolbarPosition.RIGHT)
+      decorator.addExtraAction(CopyForRcAction(model))
+      decorator.addExtraAction(ResetHandlersAction(model, shortcutConflictsTable))
+      val scrollPane = decorator.createPanel()
+      scrollPane.border = LineBorder(JBColor.border())
+      val conflictsPanel = JPanel(BorderLayout())
+      val title = message("border.title.shortcut.conflicts.for.active.keymap")
+      conflictsPanel.border = IdeBorderFactory.createTitledBorder(title, false)
+      conflictsPanel.add(scrollPane)
+      add(conflictsPanel, BorderLayout.CENTER)
+      addHelpLine(model)
     }
 
-    public void addHelpLine(VimShortcutConflictsTable.Model model) {
-      @Nullable VimShortcutConflictsTable.Row firstPerMode = ContainerUtil.find(model.myRows, row -> {
-        ShortcutOwnerInfo owner = row.getOwner();
-        return owner instanceof ShortcutOwnerInfo.PerMode;
-      });
+    fun addHelpLine(model: VimShortcutConflictsTable.Model) {
+      val firstPerMode = ContainerUtil.find(model.rows) { row: VimShortcutConflictsTable.Row ->
+        val owner: ShortcutOwnerInfo = row.owner
+        owner is PerMode
+      }
       if (firstPerMode == null) {
-        HyperlinkLabel label = new HyperlinkLabel();
-        label.setHtmlText(MessageHelper.message("configurable.keyhandler.link"));
-        label.setHyperlinkTarget("https://jb.gg/vim-sethandler");
-        label.setForeground(UIUtil.getInactiveTextColor());
-        add(label, BorderLayout.SOUTH);
-      }
-      else {
-        JBLabel helpLine = new JBLabel();
-        helpLine.setText(MessageHelper.message("configurable.noneditablehandler.helper.text.with.example",
-                         ((ShortcutOwnerInfo.PerMode)firstPerMode.myOwner).toNotation(),
-                         KeymapUtil.getShortcutText(new KeyboardShortcut(firstPerMode.getKeyStroke(), null))));
-        helpLine.setForeground(UIUtil.getInactiveTextColor());
-        add(helpLine, BorderLayout.SOUTH);
+        val label = HyperlinkLabel()
+        label.setHtmlText(message("configurable.keyhandler.link"))
+        label.setHyperlinkTarget("https://jb.gg/vim-sethandler")
+        label.foreground = UIUtil.getInactiveTextColor()
+        add(label, BorderLayout.SOUTH)
+      } else {
+        val helpLine = JBLabel()
+        helpLine.text = message("configurable.noneditablehandler.helper.text.with.example",
+          (firstPerMode.owner as PerMode).toNotation(),
+          KeymapUtil.getShortcutText(KeyboardShortcut(firstPerMode.keyStroke, null)))
+        helpLine.foreground = UIUtil.getInactiveTextColor()
+        add(helpLine, BorderLayout.SOUTH)
       }
     }
   }
 
-  private static final class VimShortcutConflictsTable extends StripeTable {
-    final ComboBoxTableRenderer<ShortcutOwner> renderer = new ShortcutOwnerRenderer();
+  class VimShortcutConflictsTable(model: Model) : StripeTable(model) {
+    private val renderer: ComboBoxTableRenderer<ShortcutOwner> = ShortcutOwnerRenderer()
 
-    public VimShortcutConflictsTable(@NotNull Model model) {
-      super(model);
-      getTableColumn(Column.KEYSTROKE).setPreferredWidth(100);
-      getTableColumn(Column.IDE_ACTION).setPreferredWidth(400);
-      final TableColumn ownerColumn = getTableColumn(Column.OWNER);
-      ownerColumn.setPreferredWidth(150);
+    init {
+      getTableColumn(Column.KEYSTROKE).preferredWidth = 100
+      getTableColumn(Column.IDE_ACTION).preferredWidth = 400
+      val ownerColumn = getTableColumn(Column.OWNER)
+      ownerColumn.preferredWidth = 150
     }
 
-    @Override
-    public TableCellRenderer getCellRenderer(int row, int column) {
-      if (column != Column.OWNER.getIndex()) return super.getCellRenderer(row, column);
-      Model model = (Model)getModel();
-      ShortcutOwnerInfo owner = model.myRows.get(row).getOwner();
-      if (owner instanceof ShortcutOwnerInfo.PerMode) return super.getCellRenderer(row, column);
-      return renderer;
+    override fun getCellRenderer(row: Int, column: Int): TableCellRenderer {
+      if (column != Column.OWNER.index) return super.getCellRenderer(row, column)
+      val model = model as Model
+      val owner: ShortcutOwnerInfo = model.rows[row].owner
+      return if (owner is PerMode) super.getCellRenderer(row, column) else renderer
     }
 
-    @Override
-    public TableCellEditor getCellEditor(int row, int column) {
-      if (column != Column.OWNER.getIndex()) return super.getCellEditor(row, column);
-      Model model = (Model)getModel();
-      ShortcutOwnerInfo owner = model.myRows.get(row).getOwner();
-      if (owner instanceof ShortcutOwnerInfo.PerMode) return super.getCellEditor(row, column);
-      return renderer;
+    override fun getCellEditor(row: Int, column: Int): TableCellEditor {
+      if (column != Column.OWNER.index) return super.getCellEditor(row, column)
+      val model = model as Model
+      val owner: ShortcutOwnerInfo = model.rows[row].owner
+      return if (owner is PerMode) super.getCellEditor(row, column) else renderer
     }
 
-    @Override
-    public @NotNull Dimension getMinimumSize() {
-      return calcSize(super.getMinimumSize());
+    override fun getMinimumSize(): Dimension {
+      return calcSize(super.getMinimumSize())
     }
 
-    @Override
-    public @NotNull Dimension getPreferredSize() {
-      return calcSize(super.getPreferredSize());
+    override fun getPreferredSize(): Dimension {
+      return calcSize(super.getPreferredSize())
     }
 
-    private @NotNull Dimension calcSize(@NotNull Dimension dimension) {
-      final Container container = getParent();
+    private fun calcSize(dimension: Dimension): Dimension {
+      val container = parent
       if (container != null) {
-        final Dimension size = container.getSize();
-        return new Dimension(size.width, dimension.height);
+        val size = container.size
+        return Dimension(size.width, dimension.height)
       }
-      return dimension;
+      return dimension
     }
 
-    private @NotNull TableColumn getTableColumn(@NotNull Column column) {
-      return getColumnModel().getColumn(column.getIndex());
+    private fun getTableColumn(column: Column): TableColumn {
+      return getColumnModel().getColumn(column.index)
     }
 
-    private static final class ShortcutOwnerRenderer extends ComboBoxTableRenderer<ShortcutOwner> {
-      public ShortcutOwnerRenderer() {
-        super(ShortcutOwner.values());
-      }
-
-      @Override
-      protected void customizeComponent(ShortcutOwner owner, JTable table, boolean isSelected) {
-        super.customizeComponent(owner, table, isSelected);
+    private class ShortcutOwnerRenderer : ComboBoxTableRenderer<ShortcutOwner>(ShortcutOwner.values()) {
+      override fun customizeComponent(owner: ShortcutOwner, table: JTable, isSelected: Boolean) {
+        super.customizeComponent(owner, table, isSelected)
         if (owner == ShortcutOwner.UNDEFINED) {
-          setForeground(UIUtil.getComboBoxDisabledForeground());
+          foreground = UIUtil.getComboBoxDisabledForeground()
         }
       }
 
-      @Override
-      public boolean isCellEditable(EventObject event) {
-        return true;
+      override fun isCellEditable(event: EventObject): Boolean {
+        return true
       }
     }
 
-    private enum Column {
+    private enum class Column(val index: Int, val title: @Nls(capitalization = Nls.Capitalization.Title) String) {
       KEYSTROKE(0, "Shortcut"),
       IDE_ACTION(1, "IDE Action"),
       OWNER(2, "Handler");
 
-      private static final @NotNull Map<Integer, Column> ourMembers = new HashMap<>();
+      companion object {
+        private val ourMembers: MutableMap<Int, Column> = HashMap()
 
-      static {
-        for (Column column : values()) {
-          ourMembers.put(column.myIndex, column);
+        init {
+          for (column in values()) {
+            ourMembers[column.index] = column
+          }
+        }
+
+        fun fromIndex(index: Int): Column? {
+          return ourMembers[index]
         }
       }
+    }
 
-      private final int myIndex;
-      private final @NotNull String myTitle;
+    class Row(val keyStroke: KeyStroke, val action: AnAction, var owner: ShortcutOwnerInfo) : Comparable<Row> {
 
-      Column(int index, @NotNull @Nls(capitalization = Nls.Capitalization.Title) String title) {
-        myIndex = index;
-        myTitle = title;
-      }
-
-      public static @Nullable Column fromIndex(int index) {
-        return ourMembers.get(index);
-      }
-
-      public int getIndex() {
-        return myIndex;
-      }
-
-      public @NotNull String getTitle() {
-        return myTitle;
+      override fun compareTo(other: Row): Int {
+        val otherKeyStroke: KeyStroke = other.keyStroke
+        val keyCodeDiff: Int = keyStroke.keyCode - otherKeyStroke.keyCode
+        return if (keyCodeDiff != 0) keyCodeDiff else keyStroke.modifiers - otherKeyStroke.modifiers
       }
     }
 
-    private static final class Row implements Comparable<Row> {
-      private final @NotNull KeyStroke myKeyStroke;
-      private final @NotNull AnAction myAction;
-      private @NotNull ShortcutOwnerInfo myOwner;
+    class Model : AbstractTableModel() {
+      val rows: MutableList<Row> = ArrayList()
 
-      private Row(@NotNull KeyStroke keyStroke, @NotNull AnAction action, @NotNull ShortcutOwnerInfo owner) {
-        myKeyStroke = keyStroke;
-        myAction = action;
-        myOwner = owner;
+      init {
+        reset()
       }
 
-      public @NotNull KeyStroke getKeyStroke() {
-        return myKeyStroke;
+      override fun getRowCount(): Int {
+        return rows.size
       }
 
-      public @NotNull AnAction getAction() {
-        return myAction;
+      override fun getColumnCount(): Int {
+        return Column.values().size
       }
 
-      public @NotNull ShortcutOwnerInfo getOwner() {
-        return myOwner;
-      }
-
-      @Override
-      public int compareTo(@NotNull Row row) {
-        final KeyStroke otherKeyStroke = row.getKeyStroke();
-        final int keyCodeDiff = myKeyStroke.getKeyCode() - otherKeyStroke.getKeyCode();
-        return keyCodeDiff != 0 ? keyCodeDiff : myKeyStroke.getModifiers() - otherKeyStroke.getModifiers();
-      }
-
-      public void setOwner(@NotNull ShortcutOwnerInfo owner) {
-        myOwner = owner;
-      }
-    }
-
-    private static final class Model extends AbstractTableModel {
-      private final @NotNull List<Row> myRows = new ArrayList<>();
-
-      public Model() {
-        reset();
-      }
-
-      @Override
-      public int getRowCount() {
-        return myRows.size();
-      }
-
-      @Override
-      public int getColumnCount() {
-        return Column.values().length;
-      }
-
-      @Override
-      public @Nullable Object getValueAt(int rowIndex, int columnIndex) {
-        final Column column = Column.fromIndex(columnIndex);
-        if (column != null && rowIndex >= 0 && rowIndex < myRows.size()) {
-          final Row row = myRows.get(rowIndex);
-          switch (column) {
-            case KEYSTROKE:
-              return KeymapUtil.getShortcutText(new KeyboardShortcut(row.getKeyStroke(), null));
-            case IDE_ACTION:
-              return row.getAction().getTemplatePresentation().getText();
-            case OWNER:
-              ShortcutOwnerInfo owner = row.getOwner();
-              if (owner instanceof ShortcutOwnerInfo.AllModes) {
-                return ((ShortcutOwnerInfo.AllModes)owner).getOwner();
-              } else if (owner instanceof ShortcutOwnerInfo.PerMode) {
-                return ((ShortcutOwnerInfo.PerMode)owner).toNotation();
+      override fun getValueAt(rowIndex: Int, columnIndex: Int): Any? {
+        val column = Column.fromIndex(columnIndex)
+        if (column != null && rowIndex >= 0 && rowIndex < rows.size) {
+          val row = rows[rowIndex]
+          when (column) {
+            Column.KEYSTROKE -> return KeymapUtil.getShortcutText(KeyboardShortcut(row.keyStroke, null))
+            Column.IDE_ACTION -> return row.action.templatePresentation.text
+            Column.OWNER -> {
+              val owner: ShortcutOwnerInfo = row.owner
+              if (owner is AllModes) {
+                return owner.owner
+              } else if (owner is PerMode) {
+                return owner.toNotation()
               }
+            }
           }
         }
-        return null;
+        return null
       }
 
-      @Override
-      public void setValueAt(Object object, int rowIndex, int columnIndex) {
-        final Column column = Column.fromIndex(columnIndex);
-        if (column != null && rowIndex >= 0 && rowIndex < myRows.size() && object instanceof ShortcutOwner) {
-          final Row row = myRows.get(rowIndex);
-          row.setOwner(new ShortcutOwnerInfo.AllModes((ShortcutOwner)object));
+      override fun setValueAt(`object`: Any, rowIndex: Int, columnIndex: Int) {
+        val column = Column.fromIndex(columnIndex)
+        if (column != null && rowIndex >= 0 && rowIndex < rows.size && `object` is ShortcutOwner) {
+          val row = rows[rowIndex]
+          row.owner = AllModes(`object`)
         }
       }
 
-      @Override
-      public boolean isCellEditable(int rowIndex, int columnIndex) {
-        if (myRows.get(rowIndex).myOwner instanceof ShortcutOwnerInfo.PerMode) return false;
-        return Column.fromIndex(columnIndex) == Column.OWNER;
+      override fun isCellEditable(rowIndex: Int, columnIndex: Int): Boolean {
+        return if (rows[rowIndex].owner is PerMode) false else Column.fromIndex(columnIndex) == Column.OWNER
       }
 
-      @Override
-      public @Nullable String getColumnName(int index) {
-        final Column column = Column.fromIndex(index);
-        return column != null ? column.getTitle() : null;
+      override fun getColumnName(index: Int): String? {
+        return Column.fromIndex(index)?.title
       }
 
-      public boolean isModified() {
-        return !VimPlugin.getKey().getShortcutConflicts().equals(getCurrentData());
+      val isModified: Boolean
+        get() = VimPlugin.getKey().shortcutConflicts != currentData
+
+      fun apply() {
+        VimPlugin.getKey().savedShortcutConflicts.putAll(currentData)
       }
 
-      public void apply() {
-        VimPlugin.getKey().getSavedShortcutConflicts().putAll(getCurrentData());
-      }
-
-      public void reset() {
-        myRows.clear();
-        for (Map.Entry<KeyStroke, ShortcutOwnerInfo> entry : VimPlugin.getKey().getShortcutConflicts().entrySet()) {
-          final KeyStroke keyStroke = entry.getKey();
-          final List<NativeAction> actions = VimPlugin.getKey().getKeymapConflicts(keyStroke);
-          if (!actions.isEmpty()) {
-            myRows.add(new Row(keyStroke, ((AnAction)actions.get(0).getAction()), entry.getValue()));
+      fun reset() {
+        rows.clear()
+        for ((keyStroke, value) in VimPlugin.getKey().shortcutConflicts) {
+          val actions = VimPlugin.getKey().getKeymapConflicts(keyStroke)
+          if (actions.isNotEmpty()) {
+            rows.add(Row(keyStroke, actions[0].action as AnAction, value))
           }
         }
-        Collections.sort(myRows);
+        rows.sort()
       }
 
-      private @NotNull Map<KeyStroke, ShortcutOwnerInfo> getCurrentData() {
-        final Map<KeyStroke, ShortcutOwnerInfo> result = new HashMap<>();
-        for (Row row : myRows) {
-          result.put(row.getKeyStroke(), row.getOwner());
+      private val currentData: Map<KeyStroke, ShortcutOwnerInfo>
+        get() {
+          val result: MutableMap<KeyStroke, ShortcutOwnerInfo> = HashMap()
+          for (row in rows) {
+            result[row.keyStroke] = row.owner
+          }
+          return result
         }
-        return result;
-      }
-
-      public @NotNull List<Row> getRows() {
-        return myRows;
-      }
     }
   }
 
-  private static class CopyForRcAction extends DumbAwareActionButton {
-    private final VimShortcutConflictsTable.Model myModel;
+  private class CopyForRcAction(
+    private val myModel: VimShortcutConflictsTable.Model,
+  ) : DumbAwareActionButton("Copy Config for .ideavimrc",
+    "Copy config for .ideavimrc in sethandler format",
+    AllIcons.Actions.Copy) {
 
-    public CopyForRcAction(VimShortcutConflictsTable.@NotNull Model model) {
-      super("Copy Config for .ideavimrc", "Copy config for .ideavimrc in sethandler format", AllIcons.Actions.Copy);
-      myModel = model;
-    }
-
-    @Override
-    public void updateButton(@NotNull AnActionEvent e) {
-      boolean enabled = myModel.getRows().stream().anyMatch(it -> it.getOwner() instanceof ShortcutOwnerInfo.AllModes &&
-                                                                  ((ShortcutOwnerInfo.AllModes)it.getOwner()).getOwner() !=
-                                                                  ShortcutOwner.UNDEFINED);
-      e.getPresentation().setEnabled(enabled);
-    }
-
-    @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
-      StringBuilder stringBuilder = new StringBuilder();
-      for (VimShortcutConflictsTable.Row row : myModel.getRows()) {
-        ShortcutOwnerInfo ownerInfo = row.getOwner();
-        if (!(ownerInfo instanceof ShortcutOwnerInfo.AllModes)) continue;
-        ShortcutOwner owner = ((ShortcutOwnerInfo.AllModes)ownerInfo).getOwner();
-        if (owner == ShortcutOwner.UNDEFINED) continue;
-
-        stringBuilder.append("sethandler ");
-        stringBuilder.append(StringHelper.toKeyNotation(row.getKeyStroke()));
-        stringBuilder.append(" ");
-        stringBuilder.append("a:");
-        stringBuilder.append(owner.getOwnerName());
-        stringBuilder.append("\n");
+    override fun updateButton(e: AnActionEvent) {
+      val enabled: Boolean = myModel.rows.stream().anyMatch {
+        it.owner is AllModes && (it.owner as AllModes).owner != ShortcutOwner.UNDEFINED
       }
+      e.presentation.isEnabled = enabled
+    }
 
-      String data = stringBuilder.toString();
-      VimInjectorKt.getInjector().getClipboardManager().setClipboardText(data, data, Collections.emptyList());
+    override fun actionPerformed(e: AnActionEvent) {
+      val stringBuilder = StringBuilder()
+      for (row in myModel.rows) {
+        val ownerInfo: ShortcutOwnerInfo = row.owner as? AllModes ?: continue
+        val owner = (ownerInfo as AllModes).owner
+        if (owner === ShortcutOwner.UNDEFINED) continue
+        stringBuilder.append("sethandler ")
+        stringBuilder.append(toKeyNotation(row.keyStroke))
+        stringBuilder.append(" ")
+        stringBuilder.append("a:")
+        stringBuilder.append(owner.ownerName)
+        stringBuilder.append("\n")
+      }
+      val data = stringBuilder.toString()
+      injector.clipboardManager.setClipboardText(data, data, emptyList())
     }
   }
 
-  public static class ResetHandlersAction extends DumbAwareActionButton {
-
-    private final VimShortcutConflictsTable.Model myModel;
-    private final VimShortcutConflictsTable myTable;
-
-    public ResetHandlersAction(VimShortcutConflictsTable.@NotNull Model model, VimShortcutConflictsTable table) {
-      super("Reset Handlers", "Reset handlers", AllIcons.General.Reset);
-      myModel = model;
-      myTable = table;
+  class ResetHandlersAction(
+    private val myModel: VimShortcutConflictsTable.Model,
+    private val myTable: VimShortcutConflictsTable,
+  ) : DumbAwareActionButton("Reset Handlers", "Reset handlers", AllIcons.General.Reset) {
+    override fun updateButton(e: AnActionEvent) {
+      val enabled: Boolean = myModel.rows.stream().anyMatch {
+        it.owner is AllModes && (it.owner as AllModes).owner != ShortcutOwner.UNDEFINED
+      }
+      e.presentation.isEnabled = enabled
     }
 
-    @Override
-    public void updateButton(@NotNull AnActionEvent e) {
-      boolean enabled = myModel.getRows().stream().anyMatch(it -> it.getOwner() instanceof ShortcutOwnerInfo.AllModes &&
-                                                                  ((ShortcutOwnerInfo.AllModes)it.getOwner()).getOwner() !=
-                                                                  ShortcutOwner.UNDEFINED);
-      e.getPresentation().setEnabled(enabled);
-    }
-
-    @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
-      TableUtil.stopEditing(myTable);
-      for (VimShortcutConflictsTable.Row row : myModel.getRows()) {
-        ShortcutOwnerInfo owner = row.getOwner();
-        if (owner instanceof ShortcutOwnerInfo.AllModes) {
-          if (((ShortcutOwnerInfo.AllModes)owner).getOwner() != ShortcutOwner.UNDEFINED) {
-            row.setOwner(ShortcutOwnerInfo.allUndefined);
+    override fun actionPerformed(e: AnActionEvent) {
+      TableUtil.stopEditing(myTable)
+      for (row in myModel.rows) {
+        val owner: ShortcutOwnerInfo = row.owner
+        if (owner is AllModes) {
+          if (owner.owner != ShortcutOwner.UNDEFINED) {
+            row.owner = ShortcutOwnerInfo.allUndefined
           }
         }
       }
-
       IdeFocusManager.getGlobalInstance()
-        .doWhenFocusSettlesDown(() -> IdeFocusManager.getGlobalInstance().requestFocus(myTable, true));
-      TableUtil.updateScroller(myTable);
+        .doWhenFocusSettlesDown { IdeFocusManager.getGlobalInstance().requestFocus(myTable, true) }
+      TableUtil.updateScroller(myTable)
     }
   }
 }
