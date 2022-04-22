@@ -122,3 +122,7 @@ fun CommandState.pushVisualMode(subMode: CommandState.SubMode, prevMode: Command
     pushModes(CommandState.Mode.VISUAL, subMode)
   }
 }
+
+fun <K, V> Map<K, V>.firstOrNull(): Map.Entry<K, V>? {
+  return this.entries.firstOrNull()
+}

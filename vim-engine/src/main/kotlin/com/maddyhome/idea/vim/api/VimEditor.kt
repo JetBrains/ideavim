@@ -136,6 +136,7 @@ interface VimEditor {
    * I've explored this question by looking at the implementation of ctrl-g command in normal mode.
    */
   fun lineCount(): Int
+  fun nativeLineCount(): Int
 
   fun getLineRange(line: EditorLine.Pointer): Pair<Offset, Offset>
   fun charAt(offset: Pointer): Char
@@ -164,6 +165,7 @@ interface VimEditor {
   fun isWritable(): Boolean
   fun isDocumentWritable(): Boolean
   fun isOneLineMode(): Boolean
+
   /**
    * Function for refactoring, get rid of it
    */
@@ -189,6 +191,7 @@ interface VimEditor {
 
   fun getLineStartOffset(line: Int): Int
   fun getLineEndOffset(line: Int, allowEnd: Boolean): Int
+  fun getLineEndForOffset(offset: Int): Int
 
   fun addCaretListener(listener: VimCaretListener)
   fun removeCaretListener(listener: VimCaretListener)
@@ -312,5 +315,14 @@ enum class LineDeleteShift {
   NO_NL,
 }
 
-class VimLogicalPosition(val line: Int, val column: Int, val leansForward: Boolean = false)
+class VimLogicalPosition(
+  val line: Int,
+  val column: Int,
+  val leansForward: Boolean = false,
+) : Comparable<VimLogicalPosition> {
+  override fun compareTo(other: VimLogicalPosition): Int {
+    return if (line != other.line) line - other.line else column - other.column
+  }
+}
+
 class VimVisualPosition(val line: Int, val column: Int, val leansRight: Boolean = false)

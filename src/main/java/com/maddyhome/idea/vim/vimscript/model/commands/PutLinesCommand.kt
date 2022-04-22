@@ -23,9 +23,8 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.ex.ranges.Ranges
-import com.maddyhome.idea.vim.group.copy.PutData
+import com.maddyhome.idea.vim.put.PutData
 import com.maddyhome.idea.vim.helper.StringHelper
-import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
@@ -63,6 +62,6 @@ data class PutLinesCommand(val ranges: Ranges, val argument: String) : Command.S
       caretAfterInsertedText = false,
       putToLine = line
     )
-    return if (VimPlugin.getPut().putText(editor.ij, context.ij, putData)) ExecutionResult.Success else ExecutionResult.Error
+    return if (VimPlugin.getPut().putText(editor, context, putData)) ExecutionResult.Success else ExecutionResult.Error
   }
 }

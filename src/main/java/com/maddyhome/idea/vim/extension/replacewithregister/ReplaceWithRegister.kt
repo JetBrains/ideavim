@@ -19,9 +19,9 @@
 package com.maddyhome.idea.vim.extension.replacewithregister
 
 import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.command.isLine
@@ -33,16 +33,15 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.executeNormalWithoutM
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setOperatorFunction
 import com.maddyhome.idea.vim.extension.VimExtensionHandler
-import com.maddyhome.idea.vim.group.MotionGroup
-import com.maddyhome.idea.vim.group.copy.PutData
+import com.maddyhome.idea.vim.put.PutData
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.helper.EditorDataContext
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.subMode
-import com.maddyhome.idea.vim.helper.vimForEachCaret
 import com.maddyhome.idea.vim.key.OperatorFunction
+import com.maddyhome.idea.vim.newapi.IjExecutionContext
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.annotations.NonNls
@@ -63,9 +62,9 @@ class ReplaceWithRegister : VimExtension {
 
   private class RwrVisual : VimExtensionHandler {
     override fun execute(editor: Editor, context: DataContext) {
-      val caretsAndSelections = mutableMapOf<Caret, VimSelection>()
+      val caretsAndSelections = mutableMapOf<VimCaret, VimSelection>()
       val typeInEditor = SelectionType.fromSubMode(editor.subMode)
-      editor.vimForEachCaret { caret ->
+      editor.vim.forEachCaret { caret ->
         val selectionStart = caret.selectionStart
         val selectionEnd = caret.selectionEnd
 
@@ -89,9 +88,9 @@ class ReplaceWithRegister : VimExtension {
     override fun isRepeatable(): Boolean = true
 
     override fun execute(editor: Editor, context: DataContext) {
-      val caretsAndSelections = mutableMapOf<Caret, VimSelection>()
-      editor.vimForEachCaret { caret ->
-        val logicalLine = caret.logicalPosition.line
+      val caretsAndSelections = mutableMapOf<VimCaret, VimSelection>()
+      editor.vim.forEachCaret { caret ->
+        val logicalLine = caret.getLogicalPosition().line
         val lineStart = editor.document.getLineStartOffset(logicalLine)
         val lineEnd = editor.document.getLineEndOffset(logicalLine)
 
@@ -101,10 +100,10 @@ class ReplaceWithRegister : VimExtension {
       val visualSelection = PutData.VisualSelection(caretsAndSelections, SelectionType.LINE_WISE)
       doReplace(editor, visualSelection)
 
-      editor.vimForEachCaret { caret ->
+      editor.vim.forEachCaret { caret ->
         val vimStart = caretsAndSelections[caret]?.vimStart
         if (vimStart != null) {
-          MotionGroup.moveCaret(editor, caret, vimStart)
+          caret.moveToOffset(vimStart)
         }
       }
     }
@@ -115,7 +114,7 @@ class ReplaceWithRegister : VimExtension {
       val range = getRange(editor) ?: return false
       val visualSelection = PutData.VisualSelection(
         mapOf(
-          editor.caretModel.primaryCaret to VimSelection.create(
+          editor.caretModel.primaryCaret.vim to VimSelection.create(
             range.startOffset,
             range.endOffset - 1,
             selectionType,
@@ -167,7 +166,7 @@ class ReplaceWithRegister : VimExtension {
         caretAfterInsertedText = false,
         putToLine = -1
       )
-      VimPlugin.getPut().putText(editor, EditorDataContext.init(editor), putData)
+      VimPlugin.getPut().putText(IjVimEditor(editor), IjExecutionContext(EditorDataContext.init(editor)), putData)
 
       VimPlugin.getRegister().saveRegister(savedRegister.name, savedRegister)
       VimPlugin.getRegister().saveRegister(VimPlugin.getRegister().defaultRegister, savedRegister)

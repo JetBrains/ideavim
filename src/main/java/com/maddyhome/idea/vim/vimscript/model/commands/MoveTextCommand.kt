@@ -28,12 +28,12 @@ import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.InvalidRangeException
 import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.ex.ranges.Ranges
-import com.maddyhome.idea.vim.group.copy.PutData
+import com.maddyhome.idea.vim.put.PutData
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.Msg
+import com.maddyhome.idea.vim.newapi.IjVimCaret
 import com.maddyhome.idea.vim.newapi.ij
-import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 import kotlin.math.min
@@ -46,7 +46,7 @@ data class MoveTextCommand(val ranges: Ranges, val argument: String) : Command.S
 
   @Throws(ExException::class)
   override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
-    val carets = EditorHelper.getOrderedCaretsList(editor.ij)
+    val carets = EditorHelper.getOrderedCaretsList(editor.ij).map { IjVimCaret(it) }
     val caretCount = editor.nativeCarets().size
 
     val texts = ArrayList<String>(caretCount)
@@ -56,10 +56,10 @@ data class MoveTextCommand(val ranges: Ranges, val argument: String) : Command.S
 
     var lastRange: TextRange? = null
     for (caret in carets) {
-      val range = getTextRange(editor, caret.vim, false)
-      val lineRange = getLineRange(editor, caret.vim)
+      val range = getTextRange(editor, caret, false)
+      val lineRange = getLineRange(editor, caret)
 
-      line = min(line, normalizeLine(editor, caret.vim, goToLineCommand, lineRange))
+      line = min(line, normalizeLine(editor, caret, goToLineCommand, lineRange))
       texts.add(EditorHelper.getText(editor.ij, range.startOffset, range.endOffset))
 
       if (lastRange == null || lastRange.startOffset != range.startOffset && lastRange.endOffset != range.endOffset) {
@@ -84,7 +84,7 @@ data class MoveTextCommand(val ranges: Ranges, val argument: String) : Command.S
         caretAfterInsertedText = false,
         putToLine = line
       )
-      VimPlugin.getPut().putTextForCaret(editor.ij, caret, context.ij, putData)
+      VimPlugin.getPut().putTextForCaret(editor, caret, context, putData)
     }
 
     return ExecutionResult.Success

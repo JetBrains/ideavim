@@ -18,20 +18,17 @@
 
 package com.maddyhome.idea.vim.action.copy
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.group.copy.PutData
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
-import com.maddyhome.idea.vim.newapi.IjExecutionContext
-import com.maddyhome.idea.vim.newapi.IjVimCaret
-import com.maddyhome.idea.vim.newapi.IjVimEditor
+import com.maddyhome.idea.vim.put.PutData
 import java.util.*
 
 /**
@@ -55,16 +52,16 @@ sealed class PutVisualTextBaseAction(
     operatorArguments: OperatorArguments,
   ): Boolean {
     if (caretsAndSelections.isEmpty()) return false
-    val textData = VimPlugin.getRegister().lastRegister?.let { PutData.TextData(it.text, it.type, it.transferableData) }
-    VimPlugin.getRegister().resetRegister()
+    val textData = injector.registerGroup.lastRegister?.let { PutData.TextData(it.text, it.type, it.transferableData) }
+    injector.registerGroup.resetRegister()
 
     val selection = PutData.VisualSelection(
-      caretsAndSelections.map { (it.key as IjVimCaret).caret to it.value }.toMap(),
+      caretsAndSelections,
       caretsAndSelections.values.first().type
     )
     val putData = PutData(textData, selection, cmd.count, insertTextBeforeCaret, indent, caretAfterInsertedText)
 
-    return VimPlugin.getPut().putText((editor as IjVimEditor).editor, (context as IjExecutionContext).context, putData, true)
+    return injector.put.putText(editor, context, putData, true)
   }
 }
 

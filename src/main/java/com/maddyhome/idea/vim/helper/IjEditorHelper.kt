@@ -4,7 +4,9 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.editor.ReadOnlyFragmentModificationException
 import com.intellij.openapi.editor.VisualPosition
 import com.intellij.openapi.editor.actionSystem.EditorActionManager
+import com.intellij.openapi.util.text.StringUtil
 import com.maddyhome.idea.vim.api.EngineEditorHelper
+import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimVisualPosition
@@ -110,5 +112,17 @@ class IjEditorHelper : EngineEditorHelper {
 
   override fun getVisualLineAtBottomOfScreen(editor: VimEditor): Int {
     return EditorHelper.getVisualLineAtBottomOfScreen(editor.ij)
+  }
+
+  override fun pad(editor: VimEditor, context: ExecutionContext, line: Int, to: Int): String {
+    return EditorHelper.pad(editor.ij, context.ij, line, to)
+  }
+
+  override fun getLineLength(editor: VimEditor, logicalLine: Int): Int {
+    return EditorHelper.getLineLength(editor.ij, logicalLine)
+  }
+
+  override fun getLineBreakCount(text: CharSequence): Int {
+    return StringUtil.getLineBreakCount(text)
   }
 }

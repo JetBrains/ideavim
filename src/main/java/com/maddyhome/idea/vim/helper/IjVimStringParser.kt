@@ -29,4 +29,8 @@ class IjVimStringParser : VimStringParser {
   override fun parseKeysSet(vararg keys: String): Set<List<KeyStroke>> {
     return EditorActionHandlerBase.parseKeysSet(*keys)
   }
+
+  override fun toKeyCodedString(keys: List<KeyStroke>): String {
+    return StringHelper.toKeyCodedString(keys)
+  }
 }

@@ -88,6 +88,10 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
     return lineCount.coerceAtLeast(1)
   }
 
+  override fun nativeLineCount(): Int {
+    return editor.document.lineCount
+  }
+
   override fun deleteRange(leftOffset: Offset, rightOffset: Offset) {
     editor.document.deleteString(leftOffset.point, rightOffset.point)
   }
@@ -273,6 +277,10 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
 
   override fun getLineEndOffset(line: Int, allowEnd: Boolean): Int {
     return EditorHelper.getLineEndOffset(editor, line, allowEnd)
+  }
+
+  override fun getLineEndForOffset(offset: Int): Int {
+    return EditorHelper.getLineEndForOffset(editor, offset)
   }
 
   val listenersMap: MutableMap<VimCaretListener, CaretListener> = mutableMapOf()
