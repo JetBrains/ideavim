@@ -20,6 +20,7 @@ package com.maddyhome.idea.vim.group
 
 import com.intellij.icons.AllIcons
 import com.intellij.ide.BrowserUtil
+import com.intellij.ide.IdeBundle
 import com.intellij.ide.actions.OpenFileAction
 import com.intellij.ide.actions.RevealFileAction
 import com.intellij.notification.Notification
@@ -38,6 +39,7 @@ import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.SystemInfo
+import com.intellij.openapi.util.registry.Registry
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.key.ShortcutOwner
@@ -47,6 +49,7 @@ import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.statistic.ActionTracker
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable
 import com.maddyhome.idea.vim.vimscript.services.VimRcService
+import org.jetbrains.annotations.Nls
 import java.awt.datatransfer.StringSelection
 import java.io.File
 import javax.swing.KeyStroke
@@ -204,7 +207,7 @@ class NotificationService(private val project: Project?) {
       Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE, content, NotificationType.INFORMATION).let {
         notification = it
         it.whenExpired { notification = null }
-        it.setContent(it.content + "<br><br><small>Use Event Log to see previous ids</small>")
+        it.setContent(it.content + "<br><br><small>Use ${getToolwindowName()} to see previous ids</small>")
 
         it.addAction(StopTracking())
 
@@ -216,6 +219,15 @@ class NotificationService(private val project: Project?) {
       if (id != null) {
         ActionTracker.logTrackedAction(id)
       }
+    }
+
+    // [VERSION UPDATE] 221+ Use ActionCenter.getToolWindowName
+    private fun getToolwindowName(): @Nls String {
+      return IdeBundle.message(if (isEnabled()) "toolwindow.stripe.Notifications" else "toolwindow.stripe.Event_Log")
+    }
+
+    private fun isEnabled(): Boolean {
+      return Registry.`is`("ide.notification.action.center", true)
     }
 
     class CopyActionId(val id: String?, val project: Project?) : DumbAwareAction(MessageHelper.message("action.copy.action.id.text")) {
