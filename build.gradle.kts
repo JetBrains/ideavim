@@ -38,6 +38,7 @@ val ideaVersion: String by project
 val downloadIdeaSources: String by project
 val instrumentPluginCode: String by project
 val remoteRobotVersion: String by project
+val antlrVersion: String by project
 
 val publishChannels: String by project
 val publishToken: String by project
@@ -66,8 +67,8 @@ dependencies {
     testImplementation("com.intellij.remoterobot:remote-robot:$remoteRobotVersion")
     testImplementation("com.intellij.remoterobot:remote-fixtures:$remoteRobotVersion")
     testImplementation("com.automation-remarks:video-recorder-junit:2.0")
-    runtimeOnly("org.antlr:antlr4-runtime:4.10.1")
-    antlr("org.antlr:antlr4:4.9.3")
+    runtimeOnly("org.antlr:antlr4-runtime:$antlrVersion")
+    antlr("org.antlr:antlr4:$antlrVersion")
 
     implementation(project(":vim-engine"))
 }
