@@ -27,6 +27,7 @@ import com.maddyhome.idea.vim.vimscript.Executor
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
 import com.maddyhome.idea.vim.vimscript.model.commands.EchoCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.LetCommand
+import com.maddyhome.idea.vim.vimscript.model.commands.NormalCommand
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
@@ -436,5 +437,19 @@ class CommandParserTest : VimTestCase() {
     )
     typeText(commandToKeys("echo x"))
     assertExOutput("42\n")
+  }
+
+  fun `test carriage return in the end of a command`() {
+    val command = VimscriptParser.parseCommand("normal /search\r")
+    assertTrue(command is NormalCommand)
+    assertEquals("/search\r", (command as NormalCommand).argument)
+  }
+
+  fun `test carriage return in the end of a script`() {
+    val script = VimscriptParser.parse("normal /search\r")
+    assertEquals(1, script.units.size)
+    val command = script.units[0]
+    assertTrue(command is NormalCommand)
+    assertEquals("/search\r", (command as NormalCommand).argument)
   }
 }

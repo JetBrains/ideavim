@@ -38,13 +38,12 @@ object VimscriptParser : com.maddyhome.idea.vim.api.VimscriptParser {
   private val logger = logger<VimscriptParser>()
   val linesWithErrors = mutableListOf<Int>()
   private const val MAX_NUMBER_OF_TRIES = 5
-  var tries = 0
+  private var tries = 0
 
   override fun parse(script: String): Script {
     val preprocessedText = uncommentIdeaVimIgnore(getTextWithoutErrors(script))
     linesWithErrors.clear()
-    val parser =
-      getParser(preprocessedText + "\n", true) // grammar expects that any script ends with a newline character
+    val parser = getParser(addNewlineIfMissing(preprocessedText), true)
     val AST: ParseTree = parser.script()
     return if (linesWithErrors.isNotEmpty()) {
       if (tries > MAX_NUMBER_OF_TRIES) {
@@ -74,8 +73,7 @@ object VimscriptParser : com.maddyhome.idea.vim.api.VimscriptParser {
   }
 
   override fun parseCommand(command: String): Command? {
-    val textToParse = command.replace("\n", "") + "\n" // grammar expects that any command ends with a newline character
-    val parser = getParser(textToParse, true)
+    val parser = getParser(addNewlineIfMissing(command), true)
     val AST: ParseTree = parser.command()
     if (linesWithErrors.isNotEmpty()) {
       linesWithErrors.clear()
@@ -84,9 +82,20 @@ object VimscriptParser : com.maddyhome.idea.vim.api.VimscriptParser {
     return CommandVisitor.visit(AST)
   }
 
+  // grammar expects that any command or script ends with a newline character
+  private fun addNewlineIfMissing(text: String): String {
+    return if (text.last() == '\n') {
+      text
+    } else if (text.last() == '\r') {
+      // fix to do not erase the \r (e.g. :normal /search^M)
+      text + "\r\n"
+    } else {
+      text + "\n"
+    }
+  }
+
   fun parseLetCommand(text: String): Command? {
-    val textToParse = text.replace("\n", "") + "\n" // grammar expects that any command ends with a newline character
-    val parser = getParser(textToParse, true)
+    val parser = getParser(addNewlineIfMissing(text), true)
     val AST: ParseTree = parser.letCommands()
     if (linesWithErrors.isNotEmpty()) {
       linesWithErrors.clear()
