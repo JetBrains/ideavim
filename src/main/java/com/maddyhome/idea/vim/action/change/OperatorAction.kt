@@ -69,8 +69,7 @@ class OperatorAction : VimActionHandler.SingleExecution() {
     if (range != null) {
       val selectionType = if (argument.motion.isLinewiseMotion()) {
         SelectionType.LINE_WISE
-      }
-      else {
+      } else {
         SelectionType.CHARACTER_WISE
       }
       return doOperatorAction(editor, context, range, selectionType)
@@ -82,7 +81,8 @@ class OperatorAction : VimActionHandler.SingleExecution() {
     editor: VimEditor,
     context: ExecutionContext,
     argument: Argument,
-    operatorArguments: OperatorArguments): TextRange? {
+    operatorArguments: OperatorArguments
+  ): TextRange? {
 
     // Note that we're using getMotionRange2 in order to avoid normalising the linewise range into line start
     // offsets that will be used to set the change marks. This affects things like the location of the caret in the
@@ -106,7 +106,7 @@ class OperatorAction : VimActionHandler.SingleExecution() {
   }
 }
 
-class VisualOperatorAction: VisualOperatorActionHandler.ForEachCaret() {
+class VisualOperatorAction : VisualOperatorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_EXIT_VISUAL)

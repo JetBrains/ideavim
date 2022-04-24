@@ -79,8 +79,8 @@ class CommentaryExtension : VimExtension {
             listOf(IdeActions.ACTION_COMMENT_BLOCK, IdeActions.ACTION_COMMENT_LINE)
           }
 
-          injector.actionExecutor.executeAction(actions[0], context)
-            || injector.actionExecutor.executeAction(actions[1], context)
+          injector.actionExecutor.executeAction(actions[0], context) ||
+            injector.actionExecutor.executeAction(actions[1], context)
         } finally {
           // Remove the selection, if we added it
           if (mode !== CommandState.Mode.VISUAL) {
@@ -149,7 +149,7 @@ class CommentaryExtension : VimExtension {
    *
    * This object is both the `<Plug>Commentary` mapping handler and the text object handler
    */
-  private class CommentaryTextObjectMotionHandler: TextObjectActionHandler(), VimExtensionHandler {
+  private class CommentaryTextObjectMotionHandler : TextObjectActionHandler(), VimExtensionHandler {
     override fun isRepeatable() = true
 
     override fun execute(editor: Editor, context: DataContext) {
@@ -157,8 +157,14 @@ class CommentaryExtension : VimExtension {
       val count = maxOf(1, commandState.commandBuilder.count)
 
       val textObjectHandler = this
-      commandState.commandBuilder.completeCommandPart(Argument(Command(count, textObjectHandler, Command.Type.MOTION,
-        EnumSet.noneOf(CommandFlags::class.java))))
+      commandState.commandBuilder.completeCommandPart(
+        Argument(
+          Command(
+            count, textObjectHandler, Command.Type.MOTION,
+            EnumSet.noneOf(CommandFlags::class.java)
+          )
+        )
+      )
     }
 
     override val visualType: TextObjectVisualType = TextObjectVisualType.LINE_WISE
@@ -214,8 +220,8 @@ class CommentaryExtension : VimExtension {
    *
    * Used like `:1,3Commentary` or `g/fun/Commentary`
    */
-  private class CommentaryCommandAliasHandler: CommandAliasHandler {
-    override fun execute(command:String, ranges: Ranges, editor: VimEditor, context: ExecutionContext) {
+  private class CommentaryCommandAliasHandler : CommandAliasHandler {
+    override fun execute(command: String, ranges: Ranges, editor: VimEditor, context: ExecutionContext) {
       doCommentary(editor, context, ranges.getTextRange(editor, -1), SelectionType.LINE_WISE, false)
     }
   }
