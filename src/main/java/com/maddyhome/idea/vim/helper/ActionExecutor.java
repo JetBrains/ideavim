@@ -19,7 +19,7 @@
 package com.maddyhome.idea.vim.helper;
 
 import com.intellij.openapi.actionSystem.*;
-import com.intellij.openapi.actionSystem.ex.ActionManagerEx;
+import com.intellij.openapi.actionSystem.ex.ActionUtil;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.ui.popup.ListPopup;
 import org.jetbrains.annotations.NonNls;
@@ -27,6 +27,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
+import java.lang.reflect.Method;
 
 public class ActionExecutor {
   /**
@@ -41,7 +42,10 @@ public class ActionExecutor {
       new AnActionEvent(null, context, ActionPlaces.KEYBOARD_SHORTCUT, action.getTemplatePresentation(),
                         ActionManager.getInstance(), 0);
 
-    if (action instanceof ActionGroup && !((ActionGroup)action).canBePerformed(context)) {
+    if (!ActionUtil.lastUpdateAndCheckDumb(action, event, false)) {
+      return false;
+    }
+    if (action instanceof ActionGroup && !canBePerformed(event, (ActionGroup) action, context)) {
       // Some ActionGroups should not be performed, but shown as a popup
       ListPopup popup = JBPopupFactory.getInstance()
         .createActionGroupPopup(event.getPresentation().getText(), (ActionGroup)action, context, false, null, -1);
@@ -58,22 +62,20 @@ public class ActionExecutor {
       return true;
     }
     else {
-      // beforeActionPerformedUpdate should be called to update the action. It fixes some rider-specific problems.
-      //   because rider use async update method. See VIM-1819.
-      action.beforeActionPerformedUpdate(event);
-      if (event.getPresentation().isEnabled()) {
-        // Executing listeners for action. I can't be sure that this code is absolutely correct,
-        //   action execution process in IJ seems to be more complicated.
-        ActionManagerEx actionManager = ActionManagerEx.getInstanceEx();
-        actionManager.fireBeforeActionPerformed(action, event);
-
-        action.actionPerformed(event);
-
-        actionManager.fireAfterActionPerformed(action, event, AnActionResult.PERFORMED);
-        return true;
-      }
+      ActionUtil.performActionDumbAwareWithCallbacks(action, event);
+      return true;
     }
-    return false;
+  }
+
+  private static boolean canBePerformed(AnActionEvent event, ActionGroup action, DataContext context) {
+    Presentation presentation = event.getPresentation();
+    try {
+      Method isPerformGroup = Presentation.class.getMethod("isPerformGroup");
+      return ((Boolean)isPerformGroup.invoke(presentation));
+    }
+    catch (Exception exception) {
+      return action.canBePerformed(context);
+    }
   }
 
   /**
