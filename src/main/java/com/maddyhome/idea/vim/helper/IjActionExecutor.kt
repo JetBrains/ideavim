@@ -23,14 +23,14 @@ import com.intellij.openapi.actionSystem.ActionGroup
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.actionSystem.AnActionResult
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.DataKey
 import com.intellij.openapi.actionSystem.IdeActions
 import com.intellij.openapi.actionSystem.PlatformCoreDataKeys
 import com.intellij.openapi.actionSystem.PlatformDataKeys
-import com.intellij.openapi.actionSystem.ex.ActionManagerEx
+import com.intellij.openapi.actionSystem.Presentation
+import com.intellij.openapi.actionSystem.ex.ActionUtil
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.command.UndoConfirmationPolicy
 import com.intellij.openapi.components.Service
@@ -79,7 +79,12 @@ class IjActionExecutor : VimActionExecutor {
       null, context.ij, ActionPlaces.KEYBOARD_SHORTCUT, ijAction.templatePresentation.clone(),
       ActionManager.getInstance(), 0
     )
-    if (ijAction is ActionGroup && !ijAction.canBePerformed(context.ij)) {
+    // beforeActionPerformedUpdate should be called to update the action. It fixes some rider-specific problems.
+    //   because rider use async update method. See VIM-1819.
+    // This method executes inside of lastUpdateAndCheckDumb
+    // Another related issue: VIM-2604
+    if (!ActionUtil.lastUpdateAndCheckDumb(ijAction, event, false)) return false
+    if (ijAction is ActionGroup && !canBePerformed(event, ijAction, context.ij)) {
       // Some ActionGroups should not be performed, but shown as a popup
       val popup = JBPopupFactory.getInstance()
         .createActionGroupPopup(event.presentation.text, ijAction, context.ij, false, null, -1)
@@ -94,20 +99,20 @@ class IjActionExecutor : VimActionExecutor {
       popup.showInFocusCenter()
       return true
     } else {
-      // beforeActionPerformedUpdate should be called to update the action. It fixes some rider-specific problems.
-      //   because rider use async update method. See VIM-1819.
-      ijAction.beforeActionPerformedUpdate(event)
-      if (event.presentation.isEnabled) {
-        // Executing listeners for action. I can't be sure that this code is absolutely correct,
-        //   action execution process in IJ seems to be more complicated.
-        val actionManager = ActionManagerEx.getInstanceEx()
-        actionManager.fireBeforeActionPerformed(ijAction, event)
-        ijAction.actionPerformed(event)
-        actionManager.fireAfterActionPerformed(ijAction, event, AnActionResult.PERFORMED)
-        return true
-      }
+      ActionUtil.performActionDumbAwareWithCallbacks(ijAction, event)
+      return true
     }
-    return false
+  }
+
+  private fun canBePerformed(event: AnActionEvent, action: ActionGroup, context: DataContext): Boolean {
+    val presentation = event.presentation
+    return try {
+      // [VERSION UPDATE] 221+ Just use Presentation.isPerformGroup
+      val method = Presentation::class.java.getMethod("isPerformGroup")
+      method.invoke(presentation) as Boolean
+    } catch (e: Exception) {
+      action.canBePerformed(context)
+    }
   }
 
   /**
