@@ -28,11 +28,13 @@ object Qodana : BuildType({
   steps {
     qodana {
       name = "Qodana"
+/*
       reportAsTestsEnable = ""
       failBuildOnErrors = ""
       codeInspectionXmlConfig = "Custom"
       codeInspectionCustomXmlConfigPath = ".idea/inspectionProfiles/Qodana.xml"
       reportAsTestsEnable = "true"
+*/
       clearConditions()
       param("licenseaudit-enable", "true")
       param("clonefinder-languages", "Java")
