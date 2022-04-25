@@ -40,6 +40,7 @@ usual beta standards.
 * [VIM-1687](https://youtrack.jetbrains.com/issue/VIM-1687) Support count for `gcc`
 * [VIM-2381](https://youtrack.jetbrains.com/issue/VIM-2381) Fall back to line comment if block comment is not available
 * [VIM-2589](https://youtrack.jetbrains.com/issue/VIM-2589) Add `gc` text object
+* [VIM-2604](https://youtrack.jetbrains.com/issue/VIM-2604) Update action execution rules
 
 ### Merged PRs:
 * [468](https://github.com/JetBrains/ideavim/pull/468) by [Thomas Schouten](https://github.com/PHPirates): Implement UserDataHolder for EditorDataContext
