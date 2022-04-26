@@ -17,20 +17,23 @@
  */
 package com.maddyhome.idea.vim.action.file
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
-import com.maddyhome.idea.vim.newapi.ij
 
-class FileSaveCloseAction : VimActionHandler.SingleExecution() {
-  override val type: Command.Type = Command.Type.OTHER_WRITABLE
+class FileGetHexAction : VimActionHandler.SingleExecution() {
+  override val type: Command.Type = Command.Type.OTHER_READONLY
 
-  override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
-    VimPlugin.getFile().saveFile(context.ij)
-    VimPlugin.getFile().closeFile(editor.ij, context.ij)
+  override fun execute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
+    injector.file.displayHexInfo(editor)
     return true
   }
 }

@@ -38,7 +38,7 @@ data class EditFileCommand(val ranges: Ranges, val argument: String) : Command.S
     val arg = argument
     if (arg == "#") {
       VimPlugin.getMark().saveJumpLocation(editor)
-      VimPlugin.getFile().selectPreviousTab(context.ij)
+      VimPlugin.getFile().selectPreviousTab(context)
       return ExecutionResult.Success
     } else if (arg.isNotEmpty()) {
       val res = VimPlugin.getFile().openFile(arg, context.ij)

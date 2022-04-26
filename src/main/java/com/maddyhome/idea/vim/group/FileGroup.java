@@ -37,8 +37,7 @@ import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileVisitor;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.api.NativeAction;
-import com.maddyhome.idea.vim.api.VimInjectorKt;
+import com.maddyhome.idea.vim.api.*;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.helper.EditorHelper;
@@ -56,7 +55,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 
-public class FileGroup {
+public class FileGroup extends VimFileBase {
   public boolean openFile(@NotNull String filename, @NotNull DataContext context) {
     if (logger.isDebugEnabled()) {
       logger.debug("openFile(" + filename + ")");
@@ -149,12 +148,13 @@ public class FileGroup {
   /**
    * Closes the current editor.
    */
-  public void closeFile(@NotNull Editor editor, @NotNull DataContext context) {
-    final Project project = PlatformDataKeys.PROJECT.getData(context);
+  @Override
+  public void closeFile(@NotNull VimEditor editor, @NotNull ExecutionContext context) {
+    final Project project = PlatformDataKeys.PROJECT.getData(((DataContext)context.getContext()));
     if (project != null) {
       final FileEditorManagerEx fileEditorManager = FileEditorManagerEx.getInstanceEx(project);
       final EditorWindow window = fileEditorManager.getCurrentWindow();
-      final VirtualFile virtualFile = EditorHelper.getVirtualFile(editor);
+      final VirtualFile virtualFile = EditorHelper.getVirtualFile(((IjVimEditor)editor).getEditor());
 
       if (virtualFile != null && window != null) {
         window.closeFile(virtualFile);
@@ -179,7 +179,8 @@ public class FileGroup {
   /**
    * Saves specific file in the project.
    */
-  public void saveFile(DataContext context) {
+  @Override
+  public void saveFile(@NotNull ExecutionContext context) {
     NativeAction action;
     if (OptionConstants.ideawrite_all.equals(((VimString) VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL.INSTANCE, OptionConstants.ideawriteName, OptionConstants.ideawriteName)).getValue())) {
       action = VimInjectorKt.getInjector().getNativeActionManager().getSaveAll();
@@ -187,7 +188,7 @@ public class FileGroup {
     else {
       action = VimInjectorKt.getInjector().getNativeActionManager().getSaveCurrent();
     }
-    ExecuteExtensionKt.execute(action, new IjExecutionContext(context));
+    ExecuteExtensionKt.execute(action, context);
   }
 
   /**
@@ -239,8 +240,9 @@ public class FileGroup {
   /**
    * Selects previous editor tab.
    */
-  public void selectPreviousTab(@NotNull DataContext context) {
-    Project project = PlatformDataKeys.PROJECT.getData(context);
+  @Override
+  public void selectPreviousTab(@NotNull ExecutionContext context) {
+    Project project = PlatformDataKeys.PROJECT.getData(((DataContext)context.getContext()));
     if (project == null) return;
     VirtualFile vf = LastTabService.getInstance(project).getLastTab();
     if (vf != null && vf.isValid()) {
@@ -279,14 +281,9 @@ public class FileGroup {
     return null;
   }
 
-  public void displayHexInfo(@NotNull Editor editor) {
-    int offset = editor.getCaretModel().getOffset();
-    char ch = editor.getDocument().getCharsSequence().charAt(offset);
-
-    VimPlugin.showMessage(Long.toHexString(ch));
-  }
-
-  public void displayLocationInfo(@NotNull Editor editor) {
+  @Override
+  public void displayLocationInfo(@NotNull VimEditor vimEditor) {
+    Editor editor = ((IjVimEditor)vimEditor).getEditor();
     StringBuilder msg = new StringBuilder();
     Document doc = editor.getDocument();
 
@@ -371,7 +368,9 @@ public class FileGroup {
     VimPlugin.showMessage(msg.toString());
   }
 
-  public void displayFileInfo(@NotNull Editor editor, boolean fullPath) {
+  @Override
+  public void displayFileInfo(@NotNull VimEditor vimEditor, boolean fullPath) {
+    Editor editor = ((IjVimEditor)vimEditor).getEditor();
     StringBuilder msg = new StringBuilder();
     VirtualFile vf = EditorHelper.getVirtualFile(editor);
     if (vf != null) {

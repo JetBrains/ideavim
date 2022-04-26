@@ -24,10 +24,9 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.EngineStringHelper
 import com.maddyhome.idea.vim.helper.StringHelper.stringToKeys
-import com.maddyhome.idea.vim.helper.StringHelper.toPrintableCharacters
 import com.maddyhome.idea.vim.newapi.ij
-import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
@@ -49,7 +48,7 @@ data class MarksCommand(val ranges: Ranges, val argument: String) : Command.Sing
         val vf = EditorHelper.getVirtualFile(editor.ij)
         val text = if (vf != null && vf.path == mark.filename) {
           val lineText = EditorHelper.getLineText(editor.ij, mark.logicalLine).trim().take(200)
-          toPrintableCharacters(stringToKeys(lineText)).take(200)
+          EngineStringHelper.toPrintableCharacters(stringToKeys(lineText)).take(200)
         } else {
           mark.filename
         }

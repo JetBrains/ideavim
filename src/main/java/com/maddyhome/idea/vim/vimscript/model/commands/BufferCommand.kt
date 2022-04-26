@@ -53,7 +53,7 @@ data class BufferCommand(val ranges: Ranges, val argument: String) : Command.Sin
           result = false
         }
       } else if (buffer == "#") {
-        VimPlugin.getFile().selectPreviousTab(context.ij)
+        VimPlugin.getFile().selectPreviousTab(context)
       } else {
         val editors = findPartialMatch(context, buffer)
 

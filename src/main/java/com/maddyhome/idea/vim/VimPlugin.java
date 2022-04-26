@@ -160,7 +160,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   }
 
   public static @NotNull FileGroup getFile() {
-    return ApplicationManager.getApplication().getService(FileGroup.class);
+    return (FileGroup)VimInjectorKt.getInjector().getFile();
   }
 
   public static @NotNull SearchGroup getSearch() {

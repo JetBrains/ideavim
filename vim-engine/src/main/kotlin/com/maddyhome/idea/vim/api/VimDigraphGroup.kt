@@ -18,5 +18,6 @@
 package com.maddyhome.idea.vim.api
 
 interface VimDigraphGroup {
-    fun getDigraph(ch1: Char, ch2: Char): Char
+  fun getDigraph(ch1: Char, ch2: Char): Char
+  fun displayAsciiInfo(editor: VimEditor)
 }

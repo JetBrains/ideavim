@@ -46,6 +46,7 @@ interface VimInjector {
   val put: VimPut
   val window: VimWindowGroup
   val yank: VimYankGroup
+  val file: VimFile
 
   val vimscriptExecutor: VimscriptExecutor
   val vimscriptParser: VimscriptParser

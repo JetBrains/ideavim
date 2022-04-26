@@ -1242,7 +1242,7 @@ class RegExp {
 
     private fun peekchr(): Int {
         if (curchr == -1) {
-            when (regparse!!.charAt(0).also { curchr = it.toInt() }) {
+            when (regparse!!.charAt(0).also { curchr = it.code }) {
                 '.', '[', '~' ->           /* magic when 'magic' is on */if (reg_magic >= MAGIC_ON) {
                     curchr = Magic.magic(curchr)
                 }
@@ -3471,7 +3471,7 @@ class RegExp {
         /* Header fields of interest. */if (r.regstart != '\u0000') {
             res.append("start `")
             if (r.regstart < ' ') {
-                res.append("^").append('@' + r.regstart.toInt())
+                res.append("^").append('@' + r.regstart.code)
             } else {
                 res.append(r.regstart)
             }

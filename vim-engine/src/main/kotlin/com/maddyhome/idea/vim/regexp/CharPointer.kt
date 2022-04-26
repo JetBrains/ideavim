@@ -192,7 +192,7 @@ class CharPointer {
     }
 
     fun OP(): Int {
-        return charAt().toInt()
+        return charAt().code
     }
 
     fun OPERAND(): CharPointer {

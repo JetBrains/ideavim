@@ -20,18 +20,14 @@ package com.maddyhome.idea.vim.group;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.api.VimDigraphGroup;
+import com.maddyhome.idea.vim.api.VimDigraphGroupBase;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
 import com.maddyhome.idea.vim.helper.EditorHelper;
-import com.maddyhome.idea.vim.helper.StringHelper;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
 import java.util.HashMap;
-import java.util.TreeMap;
 
-public class DigraphGroup implements VimDigraphGroup {
+public class DigraphGroup extends VimDigraphGroupBase {
   public DigraphGroup() {
     loadDigraphs();
   }
@@ -50,25 +46,6 @@ public class DigraphGroup implements VimDigraphGroup {
     }
     else {
       return ch;
-    }
-  }
-
-  public void displayAsciiInfo(@NotNull Editor editor) {
-    int offset = editor.getCaretModel().getOffset();
-    CharSequence charsSequence = editor.getDocument().getCharsSequence();
-    if (charsSequence.length() == 0 || offset >= charsSequence.length()) return;
-    char ch = charsSequence.charAt(offset);
-
-    final String digraph = keys.get(ch);
-    final String digraphText = digraph == null ? "" : ", Digr " + digraph;
-
-    if (ch < 0x100) {
-      VimPlugin.showMessage(String.format("<%s>  %d,  Hex %02x,  Oct %03o%s",
-        StringHelper.toPrintableCharacter(KeyStroke.getKeyStroke(ch)), (int) ch, (int) ch, (int) ch, digraphText));
-    }
-    else {
-      VimPlugin.showMessage(String.format("<%s> %d, Hex %04x, Oct %o%s",
-        StringHelper.toPrintableCharacter(KeyStroke.getKeyStroke(ch)), (int) ch, (int) ch, (int) ch, digraphText));
     }
   }
 
@@ -98,8 +75,8 @@ public class DigraphGroup implements VimDigraphGroup {
 
     StringBuilder res = new StringBuilder();
     int cnt = 0;
-    for (Character code : keys.keySet()) {
-      String key = keys.get(code);
+    for (Character code : getKeys().keySet()) {
+      String key = getKeys().get(code);
 
       res.append(key);
       res.append(' ');
@@ -144,7 +121,7 @@ public class DigraphGroup implements VimDigraphGroup {
         char ch = defaultDigraphs[i + 2];
         String key = new String(new char[]{defaultDigraphs[i], defaultDigraphs[i + 1]});
         digraphs.put(key, ch);
-        keys.put(ch, key);
+        getKeys().put(ch, key);
       }
     }
 
@@ -1750,7 +1727,6 @@ public class DigraphGroup implements VimDigraphGroup {
     's', 't', '\ufb06', // LATIN SMALL LIGATURE ST
   };
   private final @NotNull HashMap<String, Character> digraphs = new HashMap<>(defaultDigraphs.length);
-  private final @NotNull TreeMap<Character, String> keys = new TreeMap<>();
 
   private static final Logger logger = Logger.getInstance(DigraphGroup.class.getName());
 }

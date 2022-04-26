@@ -24,8 +24,8 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.EngineStringHelper
 import com.maddyhome.idea.vim.helper.StringHelper.stringToKeys
-import com.maddyhome.idea.vim.helper.StringHelper.toPrintableCharacters
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import kotlin.math.absoluteValue
@@ -55,7 +55,7 @@ data class JumpsCommand(val ranges: Ranges, val argument: String) : Command.Sing
       if (vf != null && vf.path == jump.filepath) {
         val line = EditorHelper.getLineText(editor.ij, jump.logicalLine).trim().take(200)
         val keys = stringToKeys(line)
-        text.append(toPrintableCharacters(keys).take(200))
+        text.append(EngineStringHelper.toPrintableCharacters(keys).take(200))
       } else {
         text.append(jump.filepath)
       }
