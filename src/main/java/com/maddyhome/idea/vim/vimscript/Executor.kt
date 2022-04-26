@@ -19,6 +19,7 @@
 package com.maddyhome.idea.vim.vimscript
 
 import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.textarea.TextComponentEditorImpl
 import com.maddyhome.idea.vim.VimPlugin
@@ -41,7 +42,8 @@ import java.io.File
 import java.io.IOException
 import javax.swing.JTextArea
 
-object Executor : VimScriptExecutorBase() {
+@Service
+class Executor : VimScriptExecutorBase() {
   private val logger = logger<Executor>()
   override var executingVimscript = false
 

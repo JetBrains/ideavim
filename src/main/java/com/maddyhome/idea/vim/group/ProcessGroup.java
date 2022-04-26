@@ -37,6 +37,7 @@ import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.ExecutionContext;
 import com.maddyhome.idea.vim.api.VimEditor;
+import com.maddyhome.idea.vim.api.VimInjectorKt;
 import com.maddyhome.idea.vim.api.VimProcessGroup;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
@@ -48,7 +49,6 @@ import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.options.OptionConstants;
 import com.maddyhome.idea.vim.options.OptionScope;
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
-import com.maddyhome.idea.vim.vimscript.Executor;
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
 import org.jetbrains.annotations.NotNull;
@@ -135,7 +135,7 @@ public class ProcessGroup implements VimProcessGroup {
 
       if (logger.isDebugEnabled()) logger.debug("swing=" + SwingUtilities.isEventDispatchThread());
 
-      Executor.INSTANCE.execute(text, new IjVimEditor(editor), new IjExecutionContext(context), false, true, CommandLineVimLContext.INSTANCE);
+      VimInjectorKt.getInjector().getVimscriptExecutor().execute(text, new IjVimEditor(editor), new IjExecutionContext(context), false, true, CommandLineVimLContext.INSTANCE);
     }
     catch (ExException e) {
       VimPlugin.showMessage(e.getMessage());

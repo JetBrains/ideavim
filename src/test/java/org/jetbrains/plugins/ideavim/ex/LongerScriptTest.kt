@@ -18,7 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.ex
 
-import com.maddyhome.idea.vim.vimscript.Executor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 import com.maddyhome.idea.vim.vimscript.parser.errors.IdeavimErrorListener
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -70,7 +70,7 @@ class LongerScriptTest : VimTestCase() {
     """.trimIndent()
     val parsingTime = measureTimeMillis { VimscriptParser.parse(function) }
     println(parsingTime)
-    Executor.execute(function)
+    injector.vimscriptExecutor.execute(function)
     typeText(commandToKeys("echo F('s[ubstitute]')"))
     assertExOutput("'s' | 'su' | 'sub' | 'subs' | 'subst' | 'substi' | 'substit' | 'substitu' | 'substitut' | 'substitute';\n")
   }

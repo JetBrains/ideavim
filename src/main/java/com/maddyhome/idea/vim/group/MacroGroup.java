@@ -18,26 +18,23 @@
 
 package com.maddyhome.idea.vim.group;
 
-import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.util.PotemkinProgress;
 import com.intellij.openapi.project.Project;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.register.Register;
+import com.maddyhome.idea.vim.api.ExecutionContext;
+import com.maddyhome.idea.vim.api.VimEditor;
 import com.maddyhome.idea.vim.helper.MessageHelper;
-import com.maddyhome.idea.vim.helper.StringHelper;
-import com.maddyhome.idea.vim.newapi.IjExecutionContext;
+import com.maddyhome.idea.vim.macro.VimMacroBase;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.options.OptionConstants;
 import com.maddyhome.idea.vim.options.OptionScope;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.util.List;
@@ -45,80 +42,20 @@ import java.util.List;
 /**
  * Used to handle playback of macros
  */
-public class MacroGroup {
+public class MacroGroup extends VimMacroBase {
   private static final Logger logger = Logger.getInstance(MacroGroup.class.getName());
-  private char lastRegister = 0;
-
-  /**
-   * This method is used to play the macro of keystrokes stored in the specified registers.
-   *
-   * @param editor  The editor to play the macro in
-   * @param context The data context
-   * @param project The project
-   * @param reg     The register to get the macro from
-   * @param count   The number of times to execute the macro
-   * @return true if able to play the macro, false if invalid or empty register
-   */
-  public boolean playbackRegister(@NotNull Editor editor,
-                                  @NotNull DataContext context,
-                                  @Nullable Project project,
-                                  char reg,
-                                  int count) {
-    if (logger.isDebugEnabled()) {
-      logger.debug("play bakc register " + reg + " " + count + " times");
-    }
-    Register register = VimPlugin.getRegister().getPlaybackRegister(reg);
-    if (register == null) {
-      return false;
-    }
-    List<KeyStroke> keys;
-    if (register.getRawText() == null) {
-      keys = register.getKeys();
-    }
-    else {
-      keys = StringHelper.parseKeys(register.getRawText());
-    }
-    playbackKeys(editor, context, project, keys, 0, 0, count);
-
-    lastRegister = reg;
-
-    return true;
-  }
-
-  /**
-   * This plays back the last register that was executed, if any.
-   *
-   * @param editor  The editr to play the macro in
-   * @param context The data context
-   * @param project The project
-   * @param count   The number of times to execute the macro
-   * @return true if able to play the macro, false in no previous playback
-   */
-  public boolean playbackLastRegister(@NotNull Editor editor,
-                                      @NotNull DataContext context,
-                                      @Nullable Project project,
-                                      int count) {
-    return lastRegister != 0 && playbackRegister(editor, context, project, lastRegister, count);
-  }
 
   /**
    * This puts a single keystroke at the end of the event queue for playback
-   *
-   * @param editor  The editor to play the key in
-   * @param context The data context
-   * @param project The project
-   * @param keys    The list of keys to playback
-   * @param pos     The position within the list for the specific key to queue
-   * @param cnt     count
-   * @param total   total
    */
-  public void playbackKeys(final @NotNull Editor editor,
-                           final @NotNull DataContext context,
-                           final @Nullable Project project,
-                           final @NotNull List<KeyStroke> keys,
+  @Override
+  public void playbackKeys(final @NotNull VimEditor editor,
+                           final @NotNull ExecutionContext context,
+                           final @NotNull List<? extends KeyStroke> keys,
                            final int pos,
                            final int cnt,
                            final int total) {
+    Project project = ((IjVimEditor)editor).getEditor().getProject();
     if (logger.isDebugEnabled()) {
       logger.debug("playbackKeys " + pos);
     }
@@ -142,12 +79,12 @@ public class MacroGroup {
           logger.debug("processing key " + pos);
         }
         // Handle one keystroke then queue up the next key
-        KeyHandler.getInstance().handleKey(new IjVimEditor(editor), keys.get(pos), new IjExecutionContext(context));
+        KeyHandler.getInstance().handleKey(editor, keys.get(pos), context);
         if (pos < keys.size() - 1) {
-          playbackKeys(editor, context, project, keys, pos + 1, cnt, total);
+          playbackKeys(editor, context, keys, pos + 1, cnt, total);
         }
         else {
-          playbackKeys(editor, context, project, keys, 0, cnt + 1, total);
+          playbackKeys(editor, context, keys, 0, cnt + 1, total);
         }
       };
 
@@ -174,19 +111,11 @@ public class MacroGroup {
               return;
             }
             ProgressManager.getInstance().executeNonCancelableSection(() -> {
-              KeyHandler.getInstance().handleKey(new IjVimEditor(editor), key, new IjExecutionContext(context));
+              KeyHandler.getInstance().handleKey(editor, key, context);
             });
           }
         }
       });
     }
-  }
-
-  public char getLastRegister() {
-    return lastRegister;
-  }
-
-  public void setLastRegister(char lastRegister) {
-    this.lastRegister = lastRegister;
   }
 }

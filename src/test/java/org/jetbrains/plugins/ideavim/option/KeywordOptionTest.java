@@ -19,11 +19,11 @@
 package org.jetbrains.plugins.ideavim.option;
 
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.api.VimInjectorKt;
 import com.maddyhome.idea.vim.helper.CharacterHelper;
 import com.maddyhome.idea.vim.options.OptionConstants;
 import com.maddyhome.idea.vim.options.OptionScope;
 import com.maddyhome.idea.vim.options.helpers.KeywordOptionHelper;
-import com.maddyhome.idea.vim.vimscript.Executor;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
@@ -62,7 +62,7 @@ public class KeywordOptionTest extends VimTestCase {
   }
 
   public void testSingleCommaIsAValueAsAppend() {
-    Executor.INSTANCE.execute("set iskeyword^=,", false);
+    VimInjectorKt.getInjector().getVimscriptExecutor().execute("set iskeyword^=,", false);
     assertTrue(getValues().contains(","));
   }
 
@@ -146,13 +146,13 @@ public class KeywordOptionTest extends VimTestCase {
 
   public void testCaretRemovesAChar() {
     setKeyword("a");
-    Executor.INSTANCE.execute("set iskeyword+=^a", true);
+    VimInjectorKt.getInjector().getVimscriptExecutor().execute("set iskeyword+=^a", true);
     assertIsNotKeyword('a');
   }
 
   public void testCaretRemovesARange() {
     setKeyword("a-c");
-    Executor.INSTANCE.execute("set iskeyword+=^b-c,d", true);
+    VimInjectorKt.getInjector().getVimscriptExecutor().execute("set iskeyword+=^b-c,d", true);
     assertIsKeyword('a');
     assertIsNotKeyword('b');
     assertIsNotKeyword('c');

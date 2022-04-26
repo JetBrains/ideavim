@@ -20,10 +20,10 @@ package org.jetbrains.plugins.ideavim.ex
 
 import com.intellij.openapi.actionSystem.DataContext
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.vimscript.Executor
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
 import com.maddyhome.idea.vim.vimscript.model.commands.EchoCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.LetCommand
@@ -315,7 +315,7 @@ class CommandParserTest : VimTestCase() {
 
   fun `test bug with caret return symbol`() {
     configureByText("----------\n1234${c}567890\n----------\n")
-    Executor.execute(
+    injector.vimscriptExecutor.execute(
       """
         " Map perso ---------------------------------------------
         nnoremap Y y${'$'}

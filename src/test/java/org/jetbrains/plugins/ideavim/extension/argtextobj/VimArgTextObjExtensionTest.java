@@ -19,9 +19,9 @@
 package org.jetbrains.plugins.ideavim.extension.argtextobj;
 
 import com.google.common.collect.Lists;
+import com.maddyhome.idea.vim.api.VimInjectorKt;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers;
-import com.maddyhome.idea.vim.vimscript.Executor;
 import org.jetbrains.plugins.ideavim.SkipNeovimReason;
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim;
 import org.jetbrains.plugins.ideavim.VimTestCase;
@@ -38,7 +38,7 @@ public class VimArgTextObjExtensionTest extends VimTestCase {
   }
 
   private void setArgTextObjPairsVariable(String value) {
-    Executor.INSTANCE.execute("let argtextobj_pairs='" + value + "'", true);
+    VimInjectorKt.getInjector().getVimscriptExecutor().execute("let argtextobj_pairs='" + value + "'", true);
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)

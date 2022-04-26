@@ -20,9 +20,9 @@ package com.maddyhome.idea.vim.vimscript.model.commands
 
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.statistic.VimscriptState
-import com.maddyhome.idea.vim.vimscript.Executor
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import java.io.File
@@ -35,7 +35,7 @@ data class SourceCommand(val ranges: Ranges, val argument: String) : Command.Sin
   override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_REQUIRED, Access.READ_ONLY)
   override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
     val path = expandUser(argument.trim())
-    Executor.executeFile(File(path), vimContext.getFirstParentContext() is CommandLineVimLContext)
+    injector.vimscriptExecutor.executeFile(File(path), vimContext.getFirstParentContext() is CommandLineVimLContext)
 
     VimscriptState.sourcedFiles.add(path)
     return ExecutionResult.Success

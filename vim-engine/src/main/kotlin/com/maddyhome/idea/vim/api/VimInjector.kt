@@ -4,6 +4,7 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.common.VimMachine
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.group.VimWindowGroup
+import com.maddyhome.idea.vim.macro.VimMacro
 import com.maddyhome.idea.vim.mark.VimMarkGroup
 import com.maddyhome.idea.vim.options.OptionService
 import com.maddyhome.idea.vim.put.VimPut
@@ -47,6 +48,7 @@ interface VimInjector {
   val window: VimWindowGroup
   val yank: VimYankGroup
   val file: VimFile
+  val macro: VimMacro
 
   val vimscriptExecutor: VimscriptExecutor
   val vimscriptParser: VimscriptParser

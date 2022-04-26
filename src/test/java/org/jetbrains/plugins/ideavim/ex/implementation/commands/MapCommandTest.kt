@@ -20,11 +20,11 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.textarea.TextComponentEditorImpl
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.vimscript.Executor
 import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -258,7 +258,7 @@ n  ,f            <Plug>Foo
   @TestWithoutNeovim(reason = SkipNeovimReason.VIM_SCRIPT)
   fun testBackspaceCharacterInVimRc() {
     configureByText("\n")
-    Executor.execute("inoremap # X\u0008#\n")
+    injector.vimscriptExecutor.execute("inoremap # X\u0008#\n")
     typeText(StringHelper.parseKeys("i", "#", "<Esc>"))
     assertState("#\n")
     assertMode(CommandState.Mode.COMMAND)
@@ -276,7 +276,7 @@ n  ,f            <Plug>Foo
   
       """.trimIndent()
     )
-    Executor.execute("map \u0018i dd\n", true)
+    injector.vimscriptExecutor.execute("map \u0018i dd\n", true)
     typeText(StringHelper.parseKeys("i", "#", "<Esc>"))
     assertState(
       """
@@ -296,7 +296,7 @@ n  ,f            <Plug>Foo
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun testBarCtrlVEscaped() {
     configureByText("${c}foo\n")
-    Executor.execute("imap a b \u0016|\u0016| c |\n")
+    injector.vimscriptExecutor.execute("imap a b \u0016|\u0016| c |\n")
     typeText(StringHelper.parseKeys("ia"))
     assertState("b || c foo\n")
   }
@@ -305,7 +305,7 @@ n  ,f            <Plug>Foo
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "bad term codes")
   fun testCtrlMCtrlLAsNewLine() {
     configureByText("${c}foo\n")
-    Executor.execute("map A :%s/foo/bar/g\r\u000C\n")
+    injector.vimscriptExecutor.execute("map A :%s/foo/bar/g\r\u000C\n")
     typeText(StringHelper.parseKeys("A"))
     assertState("bar\n")
   }
@@ -322,7 +322,7 @@ n  ,f            <Plug>Foo
   @TestWithoutNeovim(reason = SkipNeovimReason.VIM_SCRIPT)
   fun testRemappingZeroStillAllowsZeroToBeUsedInCount() {
     configureByText("a${c}bcdefghijklmnop\n")
-    Executor.execute("map 0 ^")
+    injector.vimscriptExecutor.execute("map 0 ^")
     typeText(StringHelper.parseKeys("10~"))
     assertState("aBCDEFGHIJKlmnop\n")
   }
@@ -775,7 +775,7 @@ n  ,f            <Plug>Foo
 
     val editor = TextComponentEditorImpl(null, JTextArea())
     val context = DataContext.EMPTY_CONTEXT
-    Executor.execute(
+    injector.vimscriptExecutor.execute(
       """
       let s:mapping = '^f8a'
       nnoremap <expr> t s:mapping

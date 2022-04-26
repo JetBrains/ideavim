@@ -18,31 +18,31 @@
 package com.maddyhome.idea.vim.action
 
 import com.maddyhome.idea.vim.KeyHandler
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.handler.VimActionHandler
-import com.maddyhome.idea.vim.helper.getTopLevelEditor
 import com.maddyhome.idea.vim.helper.mode
-import com.maddyhome.idea.vim.helper.vimForEachCaret
-import com.maddyhome.idea.vim.newapi.ij
-import com.maddyhome.idea.vim.newapi.vim
 
 class ResetModeAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_WRITABLE
 
-  override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
+  override fun execute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
     val modeBeforeReset = editor.mode
-    KeyHandler.getInstance().fullReset(editor.ij.getTopLevelEditor().vim)
+    KeyHandler.getInstance().fullReset(editor)
 
     if (modeBeforeReset == CommandState.Mode.INSERT) {
-      editor.ij.vimForEachCaret { caret ->
-        val position = VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret.vim, -1, false)
-        MotionGroup.moveCaret(editor.ij, caret, position)
+      editor.forEachCaret { caret ->
+        val position = injector.motion.getOffsetOfHorizontalMotion(editor, caret, -1, false)
+        caret.moveToOffset(position)
       }
     }
 

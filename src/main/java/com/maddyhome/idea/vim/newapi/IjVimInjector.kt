@@ -37,6 +37,7 @@ import com.maddyhome.idea.vim.common.VimMachine
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.group.EditorGroup
 import com.maddyhome.idea.vim.group.FileGroup
+import com.maddyhome.idea.vim.group.MacroGroup
 import com.maddyhome.idea.vim.group.MarkGroup
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.SearchGroup
@@ -48,6 +49,7 @@ import com.maddyhome.idea.vim.helper.IjActionExecutor
 import com.maddyhome.idea.vim.helper.IjEditorHelper
 import com.maddyhome.idea.vim.helper.IjVimStringParser
 import com.maddyhome.idea.vim.helper.vimCommandState
+import com.maddyhome.idea.vim.macro.VimMacro
 import com.maddyhome.idea.vim.mark.VimMarkGroup
 import com.maddyhome.idea.vim.options.OptionService
 import com.maddyhome.idea.vim.put.VimPut
@@ -85,6 +87,8 @@ class IjVimInjector : VimInjector {
     get() = service<YankGroup>()
   override val file: VimFile
     get() = service<FileGroup>()
+  override val macro: VimMacro
+    get() = service<MacroGroup>()
   override val nativeActionManager: NativeActionManager
     get() = service<IjNativeActionManager>()
   override val messages: VimMessages
@@ -123,7 +127,7 @@ class IjVimInjector : VimInjector {
   override val vimrcFileState: VimrcFileState
     get() = VimRcFileState
   override val vimscriptExecutor: VimscriptExecutor
-    get() = Executor
+    get() = service<Executor>()
   override val vimscriptParser: VimscriptParser
     get() = com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 

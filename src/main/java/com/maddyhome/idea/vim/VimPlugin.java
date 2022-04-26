@@ -176,7 +176,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   }
 
   public static @NotNull MacroGroup getMacro() {
-    return ApplicationManager.getApplication().getService(MacroGroup.class);
+    return (MacroGroup)VimInjectorKt.getInjector().getMacro();
   }
 
   public static @NotNull DigraphGroup getDigraph() {

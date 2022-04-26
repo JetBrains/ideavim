@@ -18,9 +18,9 @@
 
 package org.jetbrains.plugins.ideavim.mock.vimscript.commands
 
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.TabService
 import com.maddyhome.idea.vim.newapi.ij
-import com.maddyhome.idea.vim.vimscript.Executor
 import org.jetbrains.plugins.ideavim.mock.MockTestCase
 import org.mockito.Mockito
 import org.mockito.kotlin.any
@@ -33,7 +33,7 @@ class TabmoveTest : MockTestCase() {
     val tabService = mockService(TabService::class.java)
     Mockito.`when`(tabService.getCurrentTabIndex(contextStub.ij)).thenReturn(2)
     Mockito.`when`(tabService.getTabCount(contextStub.ij)).thenReturn(5)
-    Executor.execute("tabmove 0", editorStub, contextStub, skipHistory = false)
+    injector.vimscriptExecutor.execute("tabmove 0", editorStub, contextStub, skipHistory = false)
 
     verify(tabService).moveCurrentTabToIndex(0, contextStub.ij)
   }
@@ -42,7 +42,7 @@ class TabmoveTest : MockTestCase() {
     val tabService = mockService(TabService::class.java)
     Mockito.`when`(tabService.getCurrentTabIndex(contextStub.ij)).thenReturn(2)
     Mockito.`when`(tabService.getTabCount(contextStub.ij)).thenReturn(5)
-    Executor.execute("tabmove $", editorStub, contextStub, skipHistory = false)
+    injector.vimscriptExecutor.execute("tabmove $", editorStub, contextStub, skipHistory = false)
 
     verify(tabService).moveCurrentTabToIndex(4, contextStub.ij)
   }
@@ -51,7 +51,7 @@ class TabmoveTest : MockTestCase() {
     val tabService = mockService(TabService::class.java)
     Mockito.`when`(tabService.getCurrentTabIndex(contextStub.ij)).thenReturn(4)
     Mockito.`when`(tabService.getTabCount(contextStub.ij)).thenReturn(5)
-    Executor.execute("tabmove 2", editorStub, contextStub, skipHistory = false)
+    injector.vimscriptExecutor.execute("tabmove 2", editorStub, contextStub, skipHistory = false)
 
     verify(tabService).moveCurrentTabToIndex(2, contextStub.ij)
   }
@@ -60,7 +60,7 @@ class TabmoveTest : MockTestCase() {
     val tabService = mockService(TabService::class.java)
     Mockito.`when`(tabService.getCurrentTabIndex(contextStub.ij)).thenReturn(1)
     Mockito.`when`(tabService.getTabCount(contextStub.ij)).thenReturn(5)
-    Executor.execute("tabmove 3", editorStub, contextStub, skipHistory = false)
+    injector.vimscriptExecutor.execute("tabmove 3", editorStub, contextStub, skipHistory = false)
 
     verify(tabService).moveCurrentTabToIndex(2, contextStub.ij)
   }
@@ -69,7 +69,7 @@ class TabmoveTest : MockTestCase() {
     val tabService = mockService(TabService::class.java)
     Mockito.`when`(tabService.getCurrentTabIndex(contextStub.ij)).thenReturn(2)
     Mockito.`when`(tabService.getTabCount(contextStub.ij)).thenReturn(5)
-    Executor.execute("tabmove 7", editorStub, contextStub, skipHistory = false)
+    injector.vimscriptExecutor.execute("tabmove 7", editorStub, contextStub, skipHistory = false)
 
     assertPluginError(true)
     assertPluginErrorMessageContains("E474: Invalid argument")
@@ -80,7 +80,7 @@ class TabmoveTest : MockTestCase() {
     val tabService = mockService(TabService::class.java)
     Mockito.`when`(tabService.getCurrentTabIndex(contextStub.ij)).thenReturn(2)
     Mockito.`when`(tabService.getTabCount(contextStub.ij)).thenReturn(5)
-    Executor.execute("tabmove +2", editorStub, contextStub, skipHistory = false)
+    injector.vimscriptExecutor.execute("tabmove +2", editorStub, contextStub, skipHistory = false)
 
     verify(tabService).moveCurrentTabToIndex(4, contextStub.ij)
   }
@@ -89,7 +89,7 @@ class TabmoveTest : MockTestCase() {
     val tabService = mockService(TabService::class.java)
     Mockito.`when`(tabService.getCurrentTabIndex(contextStub.ij)).thenReturn(4)
     Mockito.`when`(tabService.getTabCount(contextStub.ij)).thenReturn(5)
-    Executor.execute("tabmove -2", editorStub, contextStub, skipHistory = false)
+    injector.vimscriptExecutor.execute("tabmove -2", editorStub, contextStub, skipHistory = false)
 
     verify(tabService).moveCurrentTabToIndex(2, contextStub.ij)
   }
@@ -98,7 +98,7 @@ class TabmoveTest : MockTestCase() {
     val tabService = mockService(TabService::class.java)
     Mockito.`when`(tabService.getCurrentTabIndex(contextStub.ij)).thenReturn(2)
     Mockito.`when`(tabService.getTabCount(contextStub.ij)).thenReturn(5)
-    Executor.execute("tabmove +10", editorStub, contextStub, skipHistory = false)
+    injector.vimscriptExecutor.execute("tabmove +10", editorStub, contextStub, skipHistory = false)
 
     assertPluginError(true)
     assertPluginErrorMessageContains("E474: Invalid argument")
@@ -109,7 +109,7 @@ class TabmoveTest : MockTestCase() {
     val tabService = mockService(TabService::class.java)
     Mockito.`when`(tabService.getCurrentTabIndex(contextStub.ij)).thenReturn(2)
     Mockito.`when`(tabService.getTabCount(contextStub.ij)).thenReturn(5)
-    Executor.execute("tabmove -10", editorStub, contextStub, skipHistory = false)
+    injector.vimscriptExecutor.execute("tabmove -10", editorStub, contextStub, skipHistory = false)
 
     assertPluginError(true)
     assertPluginErrorMessageContains("E474: Invalid argument")
@@ -120,7 +120,7 @@ class TabmoveTest : MockTestCase() {
     val tabService = mockService(TabService::class.java)
     Mockito.`when`(tabService.getCurrentTabIndex(contextStub.ij)).thenReturn(2)
     Mockito.`when`(tabService.getTabCount(contextStub.ij)).thenReturn(5)
-    Executor.execute("tabmove +0", editorStub, contextStub, skipHistory = false)
+    injector.vimscriptExecutor.execute("tabmove +0", editorStub, contextStub, skipHistory = false)
 
     assertPluginError(true)
     assertPluginErrorMessageContains("E474: Invalid argument")
@@ -131,7 +131,7 @@ class TabmoveTest : MockTestCase() {
     val tabService = mockService(TabService::class.java)
     Mockito.`when`(tabService.getCurrentTabIndex(contextStub.ij)).thenReturn(2)
     Mockito.`when`(tabService.getTabCount(contextStub.ij)).thenReturn(5)
-    Executor.execute("tabmove +0", editorStub, contextStub, skipHistory = false)
+    injector.vimscriptExecutor.execute("tabmove +0", editorStub, contextStub, skipHistory = false)
 
     assertPluginError(true)
     assertPluginErrorMessageContains("E474: Invalid argument")

@@ -17,63 +17,60 @@
  */
 package com.maddyhome.idea.vim.action.macro
 
-import com.intellij.openapi.actionSystem.PlatformDataKeys
-import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.util.Ref
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.handler.VimActionHandler
-import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.register.RegisterConstants.LAST_COMMAND_REGISTER
-import com.maddyhome.idea.vim.vimscript.Executor
 
 class PlaybackRegisterAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 
   override val argumentType: Argument.Type = Argument.Type.CHARACTER
 
-  override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
+  override fun execute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
     val argument = cmd.argument ?: return false
     val reg = argument.character
-    val project = PlatformDataKeys.PROJECT.getData(context.ij)
-    val application = ApplicationManager.getApplication()
-    val res = Ref.create(false)
+    val application = injector.application
+    val res = arrayOf(false)
     when {
-      reg == LAST_COMMAND_REGISTER || (reg == '@' && VimPlugin.getMacro().lastRegister == LAST_COMMAND_REGISTER) -> { // No write action
+      reg == LAST_COMMAND_REGISTER || (reg == '@' && injector.macro.lastRegister == LAST_COMMAND_REGISTER) -> { // No write action
         try {
           var i = 0
           while (i < cmd.count) {
-            res.set(Executor.executeLastCommand(editor, context))
-            if (!res.get()) {
+            res[0] = injector.vimscriptExecutor.executeLastCommand(editor, context)
+            if (!res[0]) {
               break
             }
             i += 1
           }
-          VimPlugin.getMacro().lastRegister = reg
+          injector.macro.lastRegister = reg
         } catch (e: ExException) {
-          res.set(false)
+          res[0] = false
         }
       }
+
       reg == '@' -> {
         application.runWriteAction {
-          res.set(
-            VimPlugin.getMacro().playbackLastRegister(editor.ij, context.ij, project, cmd.count)
-          )
+          res[0] = injector.macro.playbackLastRegister(editor, context, cmd.count)
         }
       }
+
       else -> {
         application.runWriteAction {
-          res.set(
-            VimPlugin.getMacro().playbackRegister(editor.ij, context.ij, project, reg, cmd.count)
-          )
+          res[0] = injector.macro.playbackRegister(editor, context, reg, cmd.count)
         }
       }
     }
-    return res.get()
+    return res[0]
   }
 }

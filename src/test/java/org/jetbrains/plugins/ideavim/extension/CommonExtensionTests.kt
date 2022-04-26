@@ -24,6 +24,7 @@ import com.intellij.openapi.application.invokeLater
 import com.intellij.openapi.editor.Editor
 import com.intellij.testFramework.PlatformTestUtil
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.common.MappingMode
 import com.maddyhome.idea.vim.extension.Alias
@@ -40,8 +41,6 @@ import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.option.ToggleOption
-import com.maddyhome.idea.vim.vimscript.Executor
-import com.maddyhome.idea.vim.vimscript.Executor.executingVimscript
 import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -225,22 +224,22 @@ class PlugExtensionsTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test enable via plug`() {
-    Executor.execute("Plug 'MyTest'", false)
+    injector.vimscriptExecutor.execute("Plug 'MyTest'", false)
 
     assertTrue(extension.ext.initialized)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test enable via plugin`() {
-    Executor.execute("Plugin 'MyTest'", false)
+    injector.vimscriptExecutor.execute("Plugin 'MyTest'", false)
 
     assertTrue(extension.ext.initialized)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test enable via plug and disable via set`() {
-    Executor.execute("Plug 'MyTest'")
-    Executor.execute("set noTestExtension")
+    injector.vimscriptExecutor.execute("Plug 'MyTest'")
+    injector.vimscriptExecutor.execute("set noTestExtension")
     assertTrue(extension.ext.initialized)
     assertTrue(extension.ext.disposed)
   }
@@ -316,9 +315,9 @@ class PlugMissingKeysTest : VimTestCase() {
   }
 
   private fun executeLikeVimrc(vararg text: String) {
-    executingVimscript = true
-    Executor.execute(text.joinToString("\n"), false)
-    executingVimscript = false
+    injector.vimscriptExecutor.executingVimscript = true
+    injector.vimscriptExecutor.execute(text.joinToString("\n"), false)
+    injector.vimscriptExecutor.executingVimscript = false
     VimExtensionRegistrar.enableDelayedExtensions()
   }
 }

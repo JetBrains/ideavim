@@ -19,10 +19,10 @@
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.Executor
 import org.jetbrains.plugins.ideavim.OptionValueType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -891,7 +891,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcaseName, O
       val ch1 = tree.getChild(0)
       """.trimIndent()
     )
-    Executor.execute(
+    injector.vimscriptExecutor.execute(
       """
       function! IncrementWholeLine() range|
         execute ":" .. a:firstline .. "," .. a:lastline .. "s/\\d\\+/\\=submatch(0)+line('.')-a:firstline+1/g"|
