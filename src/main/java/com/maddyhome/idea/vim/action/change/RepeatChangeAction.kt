@@ -39,14 +39,14 @@ class RepeatChangeAction : VimActionHandler.SingleExecution() {
 
     // Save state
     val save = state.executingCommand
-    val lastFTCmd = VimPlugin.getMotion().lastFTCmd
-    val lastFTChar = VimPlugin.getMotion().lastFTChar
-    val reg = VimPlugin.getRegister().currentRegister
+    val lastFTCmd = injector.motion.lastFTCmd
+    val lastFTChar = injector.motion.lastFTChar
+    val reg = injector.registerGroup.currentRegister
     val lastHandler = Extension.lastExtensionHandler
     val repeatHandler = VimRepeater.repeatHandler
 
     state.isDotRepeatInProgress = true
-    VimPlugin.getRegister().selectRegister(VimRepeater.lastChangeRegister)
+    injector.registerGroup.selectRegister(VimRepeater.lastChangeRegister)
 
     try {
       if (repeatHandler && lastHandler != null) {

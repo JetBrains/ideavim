@@ -15,29 +15,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-package com.maddyhome.idea.vim.action.change.change
+package com.maddyhome.idea.vim.action.change
 
-import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.action.ComplicatedKeysAction
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.command.Argument
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.ex.ranges.LineRange
-import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
-import com.maddyhome.idea.vim.vimscript.model.Script
+import com.maddyhome.idea.vim.handler.VimActionHandler
+import java.awt.event.KeyEvent
+import javax.swing.KeyStroke
 
-class ChangeLastGlobalSearchReplaceAction : ChangeEditorActionHandler.SingleExecution() {
+class UndoAction : VimActionHandler.SingleExecution(), ComplicatedKeysAction {
+  override val keyStrokesSet: Set<List<KeyStroke>> = setOf(
+    injector.parser.parseKeys("u"),
+    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_UNDO, 0))
+  )
+
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 
   override fun execute(
     editor: VimEditor,
     context: ExecutionContext,
-    argument: Argument?,
+    cmd: Command,
     operatorArguments: OperatorArguments,
-  ): Boolean {
-    val range = LineRange(0, editor.lineCount() - 1)
-    return VimPlugin.getSearch()
-      .processSubstituteCommand(editor, editor.primaryCaret(), range, "s", "//~/&", Script(listOf()))
-  }
+  ): Boolean = injector.undo.undo(context)
 }

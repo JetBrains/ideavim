@@ -20,19 +20,20 @@ package com.maddyhome.idea.vim.helper
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.Service
-import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.action.change.Extension
-import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.ui.ModalEntry
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
 @Service
-class CommandLineHelper {
+class CommandLineHelper : VimCommandLineHelper {
 
-  fun inputString(editor: Editor, prompt: String, finishOn: Char?): String? {
-    if (editor.vim.commandState.isDotRepeatInProgress) {
+  override fun inputString(vimEditor: VimEditor, prompt: String, finishOn: Char?): String? {
+    val editor = vimEditor.ij
+    if (vimEditor.commandState.isDotRepeatInProgress) {
       val input = Extension.consumeString()
       return input ?: error("Not enough strings saved: ${Extension.lastExtensionHandler}")
     }

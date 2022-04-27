@@ -530,9 +530,14 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
    * @param exarg   The argument to the substitute command, such as `/{pattern}/{string}/[flags]`
    * @return        True if the substitution succeeds, false on error. Will succeed even if nothing is modified
    */
+  @Override
   @RWLockLabel.SelfSynchronized
-  public boolean processSubstituteCommand(@NotNull VimEditor editor, @NotNull VimCaret caret, @NotNull LineRange range,
-                                          @NotNull @NonNls String excmd, @NonNls String exarg, @NotNull VimLContext parent) {
+  public boolean processSubstituteCommand(@NotNull VimEditor editor,
+                                          @NotNull VimCaret caret,
+                                          @NotNull LineRange range,
+                                          @NotNull @NonNls String excmd,
+                                          @NotNull @NonNls String exarg,
+                                          @NotNull VimLContext parent) {
     // Explicitly exit visual mode here, so that visual mode marks don't change when we move the cursor to a match.
     List<ExException> exceptions = new ArrayList<>();
     if (CommandStateHelper.inVisualMode(((IjVimEditor) editor).getEditor())) {

@@ -21,15 +21,20 @@ package com.maddyhome.idea.vim.helper
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.command.undo.UndoManager
+import com.intellij.openapi.components.Service
+import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
+import com.maddyhome.idea.vim.undo.UndoRedoBase
 
 /**
  * @author oleg
  */
-object UndoRedoHelper {
-  fun undo(context: DataContext): Boolean {
-    val project = PlatformDataKeys.PROJECT.getData(context) ?: return false
-    val fileEditor = PlatformDataKeys.FILE_EDITOR.getData(context)
+@Service
+class UndoRedoHelper : UndoRedoBase() {
+  override fun undo(context: ExecutionContext): Boolean {
+    val ijContext = context.context as DataContext
+    val project = PlatformDataKeys.PROJECT.getData(ijContext) ?: return false
+    val fileEditor = PlatformDataKeys.FILE_EDITOR.getData(ijContext)
     val undoManager = UndoManager.getInstance(project)
     if (fileEditor != null && undoManager.isUndoAvailable(fileEditor)) {
       SelectionVimListenerSuppressor.lock().use { undoManager.undo(fileEditor) }
@@ -38,9 +43,10 @@ object UndoRedoHelper {
     return false
   }
 
-  fun redo(context: DataContext): Boolean {
-    val project = PlatformDataKeys.PROJECT.getData(context) ?: return false
-    val fileEditor = PlatformDataKeys.FILE_EDITOR.getData(context)
+  override fun redo(context: ExecutionContext): Boolean {
+    val ijContext = context.context as DataContext
+    val project = PlatformDataKeys.PROJECT.getData(ijContext) ?: return false
+    val fileEditor = PlatformDataKeys.FILE_EDITOR.getData(ijContext)
     val undoManager = UndoManager.getInstance(project)
     if (fileEditor != null && undoManager.isRedoAvailable(fileEditor)) {
       SelectionVimListenerSuppressor.lock().use { undoManager.redo(fileEditor) }

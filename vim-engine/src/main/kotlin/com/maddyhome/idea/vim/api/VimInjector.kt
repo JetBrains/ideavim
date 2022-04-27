@@ -4,11 +4,13 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.common.VimMachine
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.group.VimWindowGroup
+import com.maddyhome.idea.vim.helper.VimCommandLineHelper
 import com.maddyhome.idea.vim.macro.VimMacro
 import com.maddyhome.idea.vim.mark.VimMarkGroup
 import com.maddyhome.idea.vim.options.OptionService
 import com.maddyhome.idea.vim.put.VimPut
 import com.maddyhome.idea.vim.register.VimRegisterGroup
+import com.maddyhome.idea.vim.undo.VimUndoRedo
 import com.maddyhome.idea.vim.vimscript.services.VariableService
 import com.maddyhome.idea.vim.yank.VimYankGroup
 
@@ -49,6 +51,8 @@ interface VimInjector {
   val yank: VimYankGroup
   val file: VimFile
   val macro: VimMacro
+  val undo: VimUndoRedo
+  val commandLineHelper: VimCommandLineHelper
 
   val vimscriptExecutor: VimscriptExecutor
   val vimscriptParser: VimscriptParser

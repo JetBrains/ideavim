@@ -44,6 +44,10 @@ class IjVimApplication : VimApplication {
       .invokeLater(action, ModalityState.stateForComponent((editor as IjVimEditor).editor.component))
   }
 
+  override fun invokeLater(action: () -> Unit) {
+    ApplicationManager.getApplication().invokeLater(action)
+  }
+
   override fun isUnitTest(): Boolean {
     return ApplicationManager.getApplication().isUnitTestMode
   }

@@ -151,7 +151,7 @@ object VimExtensionFacade {
   /** Returns a string typed in the input box similar to 'input()'. */
   @JvmStatic
   fun inputString(editor: Editor, prompt: String, finishOn: Char?): String {
-    return service<CommandLineHelper>().inputString(editor, prompt, finishOn) ?: ""
+    return service<CommandLineHelper>().inputString(editor.vim, prompt, finishOn) ?: ""
   }
 
   /** Get the current contents of the given register similar to 'getreg()'. */

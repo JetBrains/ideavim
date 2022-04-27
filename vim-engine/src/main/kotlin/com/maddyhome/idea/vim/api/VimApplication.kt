@@ -23,6 +23,7 @@ import javax.swing.KeyStroke
 interface VimApplication {
   fun isMainThread(): Boolean
   fun invokeLater(action: () -> Unit, editor: VimEditor)
+  fun invokeLater(action: () -> Unit)
   fun isUnitTest(): Boolean
   fun postKey(stroke: KeyStroke, editor: VimEditor)
 

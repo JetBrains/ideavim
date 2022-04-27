@@ -45,9 +45,12 @@ import com.maddyhome.idea.vim.group.VimWindowGroup
 import com.maddyhome.idea.vim.group.WindowGroup
 import com.maddyhome.idea.vim.group.copy.PutGroup
 import com.maddyhome.idea.vim.group.copy.YankGroup
+import com.maddyhome.idea.vim.helper.CommandLineHelper
 import com.maddyhome.idea.vim.helper.IjActionExecutor
 import com.maddyhome.idea.vim.helper.IjEditorHelper
 import com.maddyhome.idea.vim.helper.IjVimStringParser
+import com.maddyhome.idea.vim.helper.UndoRedoHelper
+import com.maddyhome.idea.vim.helper.VimCommandLineHelper
 import com.maddyhome.idea.vim.helper.vimCommandState
 import com.maddyhome.idea.vim.macro.VimMacro
 import com.maddyhome.idea.vim.mark.VimMarkGroup
@@ -55,6 +58,7 @@ import com.maddyhome.idea.vim.options.OptionService
 import com.maddyhome.idea.vim.put.VimPut
 import com.maddyhome.idea.vim.register.VimRegisterGroup
 import com.maddyhome.idea.vim.ui.VimRcFileState
+import com.maddyhome.idea.vim.undo.VimUndoRedo
 import com.maddyhome.idea.vim.vimscript.Executor
 import com.maddyhome.idea.vim.vimscript.services.FunctionStorage
 import com.maddyhome.idea.vim.vimscript.services.VariableService
@@ -89,6 +93,10 @@ class IjVimInjector : VimInjector {
     get() = service<FileGroup>()
   override val macro: VimMacro
     get() = service<MacroGroup>()
+  override val undo: VimUndoRedo
+    get() = service<UndoRedoHelper>()
+  override val commandLineHelper: VimCommandLineHelper
+    get() = service<CommandLineHelper>()
   override val nativeActionManager: NativeActionManager
     get() = service<IjNativeActionManager>()
   override val messages: VimMessages

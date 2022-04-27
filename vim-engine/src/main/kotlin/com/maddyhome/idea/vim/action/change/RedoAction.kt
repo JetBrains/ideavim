@@ -15,34 +15,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-package com.maddyhome.idea.vim.action.change.change
+package com.maddyhome.idea.vim.action.change
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.command.Argument
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.ex.ranges.LineRange
-import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
-import com.maddyhome.idea.vim.vimscript.model.Script
+import com.maddyhome.idea.vim.handler.VimActionHandler
 
-class ChangeLastSearchReplaceAction : ChangeEditorActionHandler.SingleExecution() {
+class RedoAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 
   override fun execute(
     editor: VimEditor,
     context: ExecutionContext,
-    argument: Argument?,
+    cmd: Command,
     operatorArguments: OperatorArguments,
-  ): Boolean {
-    var result = true
-    for (caret in editor.carets()) {
-      val line = caret.getLogicalPosition().line
-      if (!VimPlugin.getSearch().processSubstituteCommand(editor, caret, LineRange(line, line), "s", "//~/", Script(listOf()))) {
-        result = false
-      }
-    }
-    return result
-  }
+  ): Boolean = injector.undo.redo(context)
 }
