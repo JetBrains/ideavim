@@ -27,7 +27,8 @@ usual beta standards.
 
 ### Features:
 * Add `gcu` command for Commentary plugin
-* Add `:Commentary` command, which works great for commands such as `:%s/fun/Commentary`
+* Add `:Commentary` command, which works great for commands such as `:%g/fun/Commentary`
+* Support `gc` – commentary text objects. E.g. `dgc`: delete commented text.
 
 ### Changes:
 * Uses the same mappings as Commentary, so custom bindings for the Vim plugin will work with IdeaVim, too.
