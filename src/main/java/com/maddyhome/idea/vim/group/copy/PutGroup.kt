@@ -75,8 +75,10 @@ class PutGroup : VimPutBase() {
   ) {
     val visualSelection = data.visualSelection
     val subMode = visualSelection?.typeInEditor?.toSubMode() ?: CommandState.SubMode.NONE
-    if (OptionConstants.clipboard_ideaput in (injector.optionService
-        .getOptionValue(OptionScope.GLOBAL, OptionConstants.clipboardName) as VimString).value
+    if (OptionConstants.clipboard_ideaput in (
+      injector.optionService
+        .getOptionValue(OptionScope.GLOBAL, OptionConstants.clipboardName) as VimString
+      ).value
     ) {
       val idePasteProvider = getProviderForPasteViaIde(context, text.typeInRegister, data)
       if (idePasteProvider != null) {
@@ -239,11 +241,13 @@ class PutGroup : VimPutBase() {
     val carets: MutableMap<Caret, RangeMarker> = mutableMapOf()
     EditorHelper.getOrderedCaretsList(editor).forEach { caret ->
       val startOffset =
-        prepareDocumentAndGetStartOffsets(vimEditor,
+        prepareDocumentAndGetStartOffsets(
+          vimEditor,
           IjVimCaret(caret),
           text.typeInRegister,
           data,
-          additionalData).first()
+          additionalData
+        ).first()
       val pointMarker = editor.document.createRangeMarker(startOffset, startOffset)
       caret.moveToInlayAwareOffset(startOffset)
       carets[caret] = pointMarker
@@ -253,8 +257,10 @@ class PutGroup : VimPutBase() {
     val sizeBeforeInsert = allContentsBefore.size
     val firstItemBefore = allContentsBefore.firstOrNull()
     val origTestContents = TestClipboardModel.contents
-    val origContent: TextBlockTransferable = injector.clipboardManager.setClipboardText(text.text,
-      transferableData = text.transferableData) as TextBlockTransferable
+    val origContent: TextBlockTransferable = injector.clipboardManager.setClipboardText(
+      text.text,
+      transferableData = text.transferableData
+    ) as TextBlockTransferable
     val allContentsAfter = CopyPasteManager.getInstance().allContents
     val sizeAfterInsert = allContentsAfter.size
     try {
@@ -306,18 +312,22 @@ class PutGroup : VimPutBase() {
     val startLineOffset = (editor as IjVimEditor).editor.document.getLineStartOffset(startLine)
     val endLineOffset = editor.editor.document.getLineEndOffset(endLine)
 
-    VimPlugin.getChange().autoIndentRange(editor,
+    VimPlugin.getChange().autoIndentRange(
+      editor,
       caret,
       context,
-      TextRange(startLineOffset, endLineOffset))
+      TextRange(startLineOffset, endLineOffset)
+    )
     return editor.getLineEndOffset(endLine, true)
   }
 
   override fun notifyAboutIdeaPut(editor: VimEditor?) {
     val project = editor?.ij?.project
     if (VimPlugin.getVimState().isIdeaPutNotified ||
-      OptionConstants.clipboard_ideaput in (VimPlugin.getOptionService()
-        .getOptionValue(OptionScope.GLOBAL, OptionConstants.clipboardName) as VimString).value ||
+      OptionConstants.clipboard_ideaput in (
+        VimPlugin.getOptionService()
+          .getOptionValue(OptionScope.GLOBAL, OptionConstants.clipboardName) as VimString
+        ).value ||
       ClipboardOptionHelper.ideaputDisabled
     ) return
 

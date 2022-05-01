@@ -124,9 +124,11 @@ class VimEmulationConfigurable : Configurable {
         add(label, BorderLayout.SOUTH)
       } else {
         val helpLine = JBLabel()
-        helpLine.text = message("configurable.noneditablehandler.helper.text.with.example",
+        helpLine.text = message(
+          "configurable.noneditablehandler.helper.text.with.example",
           (firstPerMode.owner as PerMode).toNotation(),
-          KeymapUtil.getShortcutText(KeyboardShortcut(firstPerMode.keyStroke, null)))
+          KeymapUtil.getShortcutText(KeyboardShortcut(firstPerMode.keyStroke, null))
+        )
         helpLine.foreground = UIUtil.getInactiveTextColor()
         add(helpLine, BorderLayout.SOUTH)
       }
@@ -302,9 +304,11 @@ class VimEmulationConfigurable : Configurable {
 
   private class CopyForRcAction(
     private val myModel: VimShortcutConflictsTable.Model,
-  ) : DumbAwareActionButton("Copy Config for .ideavimrc",
+  ) : DumbAwareActionButton(
+    "Copy Config for .ideavimrc",
     "Copy config for .ideavimrc in sethandler format",
-    AllIcons.Actions.Copy) {
+    AllIcons.Actions.Copy
+  ) {
 
     override fun updateButton(e: AnActionEvent) {
       val enabled: Boolean = myModel.rows.stream().anyMatch {
