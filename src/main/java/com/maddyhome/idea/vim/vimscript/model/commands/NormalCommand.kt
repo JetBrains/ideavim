@@ -28,11 +28,9 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.StringHelper.stringToKeys
 import com.maddyhome.idea.vim.helper.commandState
-import com.maddyhome.idea.vim.helper.exitInsertMode
 import com.maddyhome.idea.vim.helper.exitSelectMode
 import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.newapi.ij
-import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult

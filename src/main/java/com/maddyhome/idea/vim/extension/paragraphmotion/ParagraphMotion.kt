@@ -21,6 +21,8 @@ package com.maddyhome.idea.vim.extension.paragraphmotion
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.common.MappingMode
 import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.extension.VimExtensionFacade
@@ -30,6 +32,8 @@ import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.SearchHelper
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.helper.vimForEachCaret
+import com.maddyhome.idea.vim.newapi.ij
 
 class ParagraphMotion : VimExtension {
   override fun getName(): String = "vim-paragraph-motion"
@@ -43,11 +47,11 @@ class ParagraphMotion : VimExtension {
   }
 
   private class ParagraphMotionHandler(private val count: Int) : VimExtensionHandler {
-    override fun execute(editor: Editor, context: DataContext) {
-      editor.caretModel.runForEachCaret { caret ->
-        val motion = moveCaretToNextParagraph(editor, caret, count)
+    override fun execute(editor: VimEditor, context: ExecutionContext) {
+      editor.ij.vimForEachCaret { caret ->
+        val motion = moveCaretToNextParagraph(editor.ij, caret, count)
         if (motion >= 0) {
-          MotionGroup.moveCaret(editor, caret, motion)
+          MotionGroup.moveCaret(editor.ij, caret, motion)
         }
       }
     }

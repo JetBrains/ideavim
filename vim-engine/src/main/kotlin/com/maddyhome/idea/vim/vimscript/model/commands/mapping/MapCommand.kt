@@ -18,23 +18,20 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands.mapping
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.common.CommonStringHelper.parseKeys
 import com.maddyhome.idea.vim.common.MappingMode
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.Ranges
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.key.MappingOwner
-import com.maddyhome.idea.vim.newapi.ij
-import com.maddyhome.idea.vim.statistic.VimscriptState
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.commands.Command
 import com.maddyhome.idea.vim.vimscript.model.commands.mapping.MapCommand.SpecialArgument.EXPR
 import com.maddyhome.idea.vim.vimscript.model.commands.mapping.MapCommand.SpecialArgument.SCRIPT
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
-import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 import org.jetbrains.annotations.NonNls
 import java.util.*
 import javax.swing.KeyStroke
@@ -55,7 +52,7 @@ data class MapCommand(val ranges: Ranges, val argument: String, val cmd: String)
     val commandInfo = COMMAND_INFOS.find { cmd.startsWith(it.prefix) } ?: return false
     val modes = commandInfo.mappingModes
 
-    if (argument.isEmpty()) return editor != null && VimPlugin.getKey().showKeyMappings(modes, editor.ij)
+    if (argument.isEmpty()) return editor != null && injector.keyGroup.showKeyMappings(modes, editor)
 
     val arguments = try {
       parseCommandArguments(argument) ?: return false
@@ -70,12 +67,12 @@ data class MapCommand(val ranges: Ranges, val argument: String, val cmd: String)
     }
 
     if (arguments.specialArguments.contains(EXPR)) {
-      VimscriptState.isMapExprUsed = true
-      VimPlugin.getKey()
+      injector.statisticsService.setIfMapExprUsed(true)
+      injector.keyGroup
         .putKeyMapping(modes, arguments.fromKeys, MappingOwner.IdeaVim, arguments.toExpr, arguments.secondArgument, commandInfo.isRecursive)
     } else {
       val toKeys = parseKeys(arguments.secondArgument)
-      VimPlugin.getKey()
+      injector.keyGroup
         .putKeyMapping(modes, arguments.fromKeys, MappingOwner.IdeaVim, toKeys, commandInfo.isRecursive)
     }
 
@@ -169,7 +166,7 @@ data class MapCommand(val ranges: Ranges, val argument: String, val cmd: String)
     }
     return fromKeys?.let {
       val toExpr = if (specialArguments.contains(EXPR)) {
-        VimscriptParser.parseExpression(toKeysBuilder.toString().trim()) ?: throw ExException("E15: Invalid expression: ${toKeysBuilder.toString().trim()}")
+        injector.vimscriptParser.parseExpression(toKeysBuilder.toString().trim()) ?: throw ExException("E15: Invalid expression: ${toKeysBuilder.toString().trim()}")
       } else {
         SimpleExpression(toKeysBuilder.toString().trimStart())
       }

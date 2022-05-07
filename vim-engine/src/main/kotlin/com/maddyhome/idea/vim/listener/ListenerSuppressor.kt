@@ -18,10 +18,9 @@
 
 package com.maddyhome.idea.vim.listener
 
-import com.intellij.openapi.diagnostic.logger
-import com.intellij.openapi.diagnostic.trace
-import com.intellij.util.ExceptionUtil
-import com.maddyhome.idea.vim.option.StrictMode
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.diagnostic.vimLogger
+import com.maddyhome.idea.vim.options.OptionScope
 import java.io.Closeable
 
 /**
@@ -66,8 +65,8 @@ sealed class VimListenerSuppressor {
   private var caretListenerSuppressor = 0
 
   fun lock(): Locked {
-    LOG.trace { "Suppressor lock" }
-    LOG.trace { ExceptionUtil.currentStackTrace() }
+    LOG.trace("Suppressor lock")
+    LOG.trace(injector.application.currentStackTrace())
     caretListenerSuppressor++
     return Locked()
   }
@@ -75,14 +74,14 @@ sealed class VimListenerSuppressor {
   // Please try not to use lock/unlock without scoping
   // Prefer try-with-resources
   fun unlock() {
-    LOG.trace { "Suppressor unlock" }
-    LOG.trace { ExceptionUtil.currentStackTrace() }
+    LOG.trace("Suppressor unlock")
+    LOG.trace(injector.application.currentStackTrace())
     caretListenerSuppressor--
   }
 
   fun reset() {
-    if (caretListenerSuppressor != 0 && StrictMode.on) {
-      StrictMode.fail("Listener is not zero")
+    if (caretListenerSuppressor != 0 && injector.optionService.isSet(OptionScope.GLOBAL, "ideastrictmode")) {
+      error("Listener is not zero")
     }
     caretListenerSuppressor = 0
   }
@@ -95,7 +94,7 @@ sealed class VimListenerSuppressor {
   }
 
   companion object {
-    private val LOG = logger<VimListenerSuppressor>()
+    private val LOG = vimLogger<VimListenerSuppressor>()
   }
 }
 

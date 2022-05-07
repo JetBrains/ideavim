@@ -28,6 +28,8 @@ import com.intellij.openapi.editor.markup.HighlighterTargetArea
 import com.intellij.openapi.editor.markup.RangeHighlighter
 import com.intellij.openapi.util.Key
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.MappingMode
@@ -50,6 +52,7 @@ import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.mark.Mark
 import com.maddyhome.idea.vim.mark.VimMarkConstants
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.annotations.NonNls
 
@@ -111,28 +114,27 @@ class VimExchangeExtension : VimExtension {
   }
 
   private class ExchangeHandler(private val isLine: Boolean) : VimExtensionHandler {
+    override val isRepeatable = true
 
-    override fun isRepeatable() = true
-
-    override fun execute(editor: Editor, context: DataContext) {
+    override fun execute(editor: VimEditor, context: ExecutionContext) {
       setOperatorFunction(Operator(false))
-      executeNormalWithoutMapping(parseKeys(if (isLine) "g@_" else "g@"), editor)
+      executeNormalWithoutMapping(parseKeys(if (isLine) "g@_" else "g@"), editor.ij)
     }
   }
 
   private class ExchangeClearHandler : VimExtensionHandler {
-    override fun execute(editor: Editor, context: DataContext) {
-      clearExchange(editor)
+    override fun execute(editor: VimEditor, context: ExecutionContext) {
+      clearExchange(editor.ij)
     }
   }
 
   private class VExchangeHandler : VimExtensionHandler {
-    override fun execute(editor: Editor, context: DataContext) {
+    override fun execute(editor: VimEditor, context: ExecutionContext) {
       runWriteAction {
         val subMode = editor.subMode
         // Leave visual mode to create selection marks
-        executeNormalWithoutMapping(parseKeys("<Esc>"), editor)
-        Operator(true).apply(editor, context, SelectionType.fromSubMode(subMode))
+        executeNormalWithoutMapping(parseKeys("<Esc>"), editor.ij)
+        Operator(true).apply(editor.ij, context.ij, SelectionType.fromSubMode(subMode))
       }
     }
   }

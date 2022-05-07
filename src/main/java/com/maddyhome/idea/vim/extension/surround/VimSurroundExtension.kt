@@ -21,6 +21,8 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.MappingMode
@@ -41,6 +43,7 @@ import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.newapi.IjVimCaret
 import com.maddyhome.idea.vim.newapi.IjVimEditor
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.helpers.ClipboardOptionHelper
 import org.jetbrains.annotations.NonNls
@@ -78,41 +81,41 @@ class VimSurroundExtension : VimExtension {
   }
 
   private class YSurroundHandler : VimExtensionHandler {
-    override fun isRepeatable() = true
+    override val isRepeatable = true
 
-    override fun execute(editor: Editor, context: DataContext) {
+    override fun execute(editor: VimEditor, context: ExecutionContext) {
       setOperatorFunction(Operator())
-      executeNormalWithoutMapping(StringHelper.parseKeys("g@"), editor)
+      executeNormalWithoutMapping(StringHelper.parseKeys("g@"), editor.ij)
     }
   }
 
   private class VSurroundHandler : VimExtensionHandler {
-    override fun execute(editor: Editor, context: DataContext) {
-      val selectionStart = editor.caretModel.primaryCaret.selectionStart
+    override fun execute(editor: VimEditor, context: ExecutionContext) {
+      val selectionStart = editor.ij.caretModel.primaryCaret.selectionStart
       // NB: Operator ignores SelectionType anyway
-      if (!Operator().apply(editor, context, SelectionType.CHARACTER_WISE)) {
+      if (!Operator().apply(editor.ij, context.ij, SelectionType.CHARACTER_WISE)) {
         return
       }
       runWriteAction {
         // Leave visual mode
-        executeNormalWithoutMapping(StringHelper.parseKeys("<Esc>"), editor)
-        editor.caretModel.moveToOffset(selectionStart)
+        executeNormalWithoutMapping(StringHelper.parseKeys("<Esc>"), editor.ij)
+        editor.ij.caretModel.moveToOffset(selectionStart)
       }
     }
   }
 
   private class CSurroundHandler : VimExtensionHandler {
-    override fun isRepeatable() = true
+    override val isRepeatable = true
 
-    override fun execute(editor: Editor, context: DataContext) {
-      val charFrom = getChar(editor)
+    override fun execute(editor: VimEditor, context: ExecutionContext) {
+      val charFrom = getChar(editor.ij)
       if (charFrom.code == 0) return
 
-      val charTo = getChar(editor)
+      val charTo = getChar(editor.ij)
       if (charTo.code == 0) return
 
-      val newSurround = getOrInputPair(charTo, editor) ?: return
-      runWriteAction { change(editor, charFrom, newSurround) }
+      val newSurround = getOrInputPair(charTo, editor.ij) ?: return
+      runWriteAction { change(editor.ij, charFrom, newSurround) }
     }
 
     companion object {
@@ -165,14 +168,14 @@ class VimSurroundExtension : VimExtension {
   }
 
   private class DSurroundHandler : VimExtensionHandler {
-    override fun isRepeatable() = true
+    override val isRepeatable = true
 
-    override fun execute(editor: Editor, context: DataContext) {
+    override fun execute(editor: VimEditor, context: ExecutionContext) {
       // Deleting surround is just changing the surrounding to "nothing"
-      val charFrom = getChar(editor)
+      val charFrom = getChar(editor.ij)
       if (charFrom.code == 0) return
 
-      runWriteAction { CSurroundHandler.change(editor, charFrom, null) }
+      runWriteAction { CSurroundHandler.change(editor.ij, charFrom, null) }
     }
   }
 

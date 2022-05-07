@@ -36,10 +36,7 @@ import com.maddyhome.idea.vim.EventFacade;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.ComplicatedKeysAction;
 import com.maddyhome.idea.vim.action.VimShortcutKeyAction;
-import com.maddyhome.idea.vim.api.NativeAction;
-import com.maddyhome.idea.vim.api.VimActionsInitiator;
-import com.maddyhome.idea.vim.api.VimEditor;
-import com.maddyhome.idea.vim.api.VimKeyGroup;
+import com.maddyhome.idea.vim.api.*;
 import com.maddyhome.idea.vim.common.*;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
 import com.maddyhome.idea.vim.extension.VimExtensionHandler;
@@ -72,7 +69,7 @@ import static java.util.stream.Collectors.toList;
  * @author vlan
  */
 @State(name = "VimKeySettings", storages = {@Storage(value = "$APP_CONFIG$/vim_settings.xml")})
-public class KeyGroup implements PersistentStateComponent<Element>, VimKeyGroup {
+public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponent<Element>{
   public static final @NonNls String SHORTCUT_CONFLICTS_ELEMENT = "shortcut-conflicts";
   private static final @NonNls String SHORTCUT_CONFLICT_ELEMENT = "shortcut-conflict";
   private static final @NonNls String OWNER_ATTRIBUTE = "owner";
@@ -103,7 +100,7 @@ public class KeyGroup implements PersistentStateComponent<Element>, VimKeyGroup 
     EventFacade.getInstance().unregisterCustomShortcutSet(VimShortcutKeyAction.getInstance(), editor.getComponent());
   }
 
-  public boolean showKeyMappings(@NotNull Set<MappingMode> modes, @NotNull Editor editor) {
+  public boolean showKeyMappings(@NotNull Set<? extends MappingMode> modes, @NotNull Editor editor) {
     List<Pair<EnumSet<MappingMode>, MappingInfo>> rows = getKeyMappingRows(modes);
     final StringBuilder builder = new StringBuilder();
     for (Pair<EnumSet<MappingMode>, MappingInfo> row : rows) {
@@ -126,37 +123,37 @@ public class KeyGroup implements PersistentStateComponent<Element>, VimKeyGroup 
     unregisterKeyMapping(owner);
   }
 
-  public void removeKeyMapping(@NotNull Set<MappingMode> modes, @NotNull List<KeyStroke> keys) {
+  public void removeKeyMapping(@NotNull Set<? extends MappingMode> modes, @NotNull List<? extends KeyStroke> keys) {
     modes.stream().map(this::getKeyMapping).forEach(o -> o.delete(keys));
   }
 
-  public void removeKeyMapping(@NotNull Set<MappingMode> modes) {
+  public void removeKeyMapping(Set<? extends MappingMode> modes) {
     modes.stream().map(this::getKeyMapping).forEach(KeyMapping::delete);
   }
 
-  public void putKeyMapping(@NotNull Set<MappingMode> modes,
-                            @NotNull List<KeyStroke> fromKeys,
-                            @NotNull MappingOwner owner,
-                            @NotNull VimExtensionHandler extensionHandler,
+  public void putKeyMapping(Set<? extends MappingMode> modes,
+                            List<? extends KeyStroke> fromKeys,
+                            MappingOwner owner,
+                            VimExtensionHandler extensionHandler,
                             boolean recursive) {
     modes.stream().map(this::getKeyMapping).forEach(o -> o.put(fromKeys, owner, extensionHandler, recursive));
     registerKeyMapping(fromKeys, owner);
   }
 
-  public void putKeyMapping(@NotNull Set<MappingMode> modes,
-                            @NotNull List<KeyStroke> fromKeys,
-                            @NotNull MappingOwner owner,
-                            @NotNull List<KeyStroke> toKeys,
+  public void putKeyMapping(Set<? extends MappingMode> modes,
+                            List<? extends KeyStroke> fromKeys,
+                            MappingOwner owner,
+                            List<? extends KeyStroke> toKeys,
                             boolean recursive) {
     modes.stream().map(this::getKeyMapping).forEach(o -> o.put(fromKeys, toKeys, owner, recursive));
     registerKeyMapping(fromKeys, owner);
   }
 
-  public void putKeyMapping(@NotNull Set<MappingMode> modes,
-                            @NotNull List<KeyStroke> fromKeys,
-                            @NotNull MappingOwner owner,
-                            @NotNull Expression toExpr,
-                            @NotNull String originalString,
+  public void putKeyMapping(Set<? extends MappingMode> modes,
+                            List<? extends KeyStroke> fromKeys,
+                            MappingOwner owner,
+                            Expression toExpr,
+                            String originalString,
                             boolean recursive) {
     modes.stream().map(this::getKeyMapping).forEach(o -> o.put(fromKeys, toExpr, owner, originalString, recursive));
     registerKeyMapping(fromKeys, owner);
@@ -186,7 +183,7 @@ public class KeyGroup implements PersistentStateComponent<Element>, VimKeyGroup 
     }
   }
 
-  private void registerKeyMapping(@NotNull List<KeyStroke> fromKeys, MappingOwner owner) {
+  private void registerKeyMapping(@NotNull List<? extends KeyStroke> fromKeys, MappingOwner owner) {
     final int oldSize = requiredShortcutKeys.size();
     for (KeyStroke key : fromKeys) {
       if (key.getKeyChar() == KeyEvent.CHAR_UNDEFINED) {
@@ -482,11 +479,11 @@ public class KeyGroup implements PersistentStateComponent<Element>, VimKeyGroup 
     return new CustomShortcutSet(shortcuts.toArray(new Shortcut[0]));
   }
 
-  private static @NotNull List<Pair<EnumSet<MappingMode>, MappingInfo>> getKeyMappingRows(@NotNull Set<MappingMode> modes) {
+  private static @NotNull List<Pair<EnumSet<MappingMode>, MappingInfo>> getKeyMappingRows(@NotNull Set<? extends MappingMode> modes) {
     final Map<ImmutableList<KeyStroke>, EnumSet<MappingMode>> actualModes = new HashMap<>();
     for (MappingMode mode : modes) {
       final KeyMapping mapping = VimPlugin.getKey().getKeyMapping(mode);
-      for (List<KeyStroke> fromKeys : mapping) {
+      for (List<? extends KeyStroke> fromKeys : mapping) {
         final ImmutableList<KeyStroke> key = ImmutableList.copyOf(fromKeys);
         final EnumSet<MappingMode> value = actualModes.get(key);
         final EnumSet<MappingMode> newValue;
@@ -589,5 +586,10 @@ public class KeyGroup implements PersistentStateComponent<Element>, VimKeyGroup 
   @Override
   public void loadState(@NotNull Element state) {
     readData(state);
+  }
+
+  @Override
+  public boolean showKeyMappings(@NotNull Set<? extends MappingMode> modes, @NotNull VimEditor editor) {
+    return showKeyMappings(modes, ((IjVimEditor) editor).getEditor());
   }
 }

@@ -197,6 +197,11 @@ public class VimArgTextObjExtension implements VimExtension {
       this.isInner = isInner;
     }
 
+    @Override
+    public boolean isRepeatable() {
+      return false;
+    }
+
     static class ArgumentTextObjectHandler extends TextObjectActionHandler {
       private final boolean isInner;
 
@@ -257,17 +262,17 @@ public class VimArgTextObjExtension implements VimExtension {
     }
 
     @Override
-    public void execute(@NotNull Editor editor, @NotNull DataContext context) {
+    public void execute(@NotNull VimEditor editor, @NotNull ExecutionContext context) {
 
-      IjVimEditor vimEditor = new IjVimEditor(editor);
+      IjVimEditor vimEditor = (IjVimEditor) editor;
       @NotNull CommandState commandState = CommandState.getInstance(vimEditor);
       int count = Math.max(1, commandState.getCommandBuilder().getCount());
 
       final ArgumentTextObjectHandler textObjectHandler = new ArgumentTextObjectHandler(isInner);
       //noinspection DuplicatedCode
       if (!commandState.isOperatorPending()) {
-        editor.getCaretModel().runForEachCaret((Caret caret) -> {
-          final TextRange range = textObjectHandler.getRange(vimEditor, new IjVimCaret(caret), new IjExecutionContext(context), count, 0, null);
+        vimEditor.getEditor().getCaretModel().runForEachCaret((Caret caret) -> {
+          final TextRange range = textObjectHandler.getRange(vimEditor, new IjVimCaret(caret), context, count, 0, null);
           if (range != null) {
             try (VimListenerSuppressor.Locked ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
               if (commandState.getMode() == CommandState.Mode.VISUAL) {

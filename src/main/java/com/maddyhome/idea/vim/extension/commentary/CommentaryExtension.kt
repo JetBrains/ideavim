@@ -131,11 +131,11 @@ class CommentaryExtension : VimExtension {
    * invoke the operator. This object is both the mapping handler and the operator function.
    */
   private class CommentaryOperatorHandler : OperatorFunction, VimExtensionHandler {
-    override fun isRepeatable() = true
+    override val isRepeatable = true
 
-    override fun execute(editor: Editor, context: DataContext) {
+    override fun execute(editor: VimEditor, context: ExecutionContext) {
       setOperatorFunction(this)
-      executeNormalWithoutMapping(parseKeys("g@"), editor)
+      executeNormalWithoutMapping(parseKeys("g@"), editor.ij)
     }
 
     override fun apply(editor: Editor, context: DataContext, selectionType: SelectionType): Boolean {
@@ -150,10 +150,10 @@ class CommentaryExtension : VimExtension {
    * This object is both the `<Plug>Commentary` mapping handler and the text object handler
    */
   private class CommentaryTextObjectMotionHandler : TextObjectActionHandler(), VimExtensionHandler {
-    override fun isRepeatable() = true
+    override val isRepeatable = true
 
-    override fun execute(editor: Editor, context: DataContext) {
-      val commandState = editor.vim.commandState
+    override fun execute(editor: VimEditor, context: ExecutionContext) {
+      val commandState = editor.commandState
       val count = maxOf(1, commandState.commandBuilder.count)
 
       val textObjectHandler = this

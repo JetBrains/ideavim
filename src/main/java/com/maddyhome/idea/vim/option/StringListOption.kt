@@ -34,10 +34,10 @@ import java.util.regex.Pattern
 @Deprecated("was replaced by OptionService")
 @ApiStatus.ScheduledForRemoval(inVersion = "1.11")
 open class StringListOption @JvmOverloads constructor(
-  @VimNlsSafe name: String,
-  @VimNlsSafe abbrev: String,
-  @VimNlsSafe defaultValues: Array<String>,
-  @VimNlsSafe protected val pattern: String? = null
+    @VimNlsSafe name: String,
+    @VimNlsSafe abbrev: String,
+    @VimNlsSafe defaultValues: Array<String>,
+    @VimNlsSafe protected val pattern: String? = null
 ) :
   ListOption<String>(name, abbrev, defaultValues) {
 

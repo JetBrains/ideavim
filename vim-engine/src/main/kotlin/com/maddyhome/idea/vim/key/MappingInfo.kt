@@ -17,9 +17,6 @@
  */
 package com.maddyhome.idea.vim.key
 
-import com.intellij.openapi.application.invokeLater
-import com.intellij.openapi.diagnostic.logger
-import com.intellij.openapi.editor.actionSystem.CaretSpecificDataContext
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.action.change.Extension.clean
 import com.maddyhome.idea.vim.action.change.Extension.lastExtensionHandler
@@ -32,20 +29,19 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.command.SelectionType.Companion.fromSubMode
+import com.maddyhome.idea.vim.common.CommonStringHelper.parseKeys
+import com.maddyhome.idea.vim.common.CommonStringHelper.toKeyNotation
 import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.common.argumentCaptured
 import com.maddyhome.idea.vim.common.offset
+import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.extension.VimExtensionHandler
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.group.visual.VimSelection.Companion.create
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
-import com.maddyhome.idea.vim.helper.StringHelper.toKeyNotation
 import com.maddyhome.idea.vim.helper.VimNlsSafe
 import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
-import com.maddyhome.idea.vim.newapi.ij
-import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import java.awt.event.KeyEvent
@@ -114,7 +110,7 @@ class ToKeysMappingInfo(
   }
 
   companion object {
-    private val LOG = logger<ToKeysMappingInfo>()
+    private val LOG = vimLogger<ToKeysMappingInfo>()
   }
 }
 
@@ -142,7 +138,7 @@ class ToExpressionMappingInfo(
   }
 
   companion object {
-    private val LOG = logger<ToExpressionMappingInfo>()
+    private val LOG = vimLogger<ToExpressionMappingInfo>()
   }
 }
 
@@ -175,7 +171,7 @@ class ToHandlerMappingInfo(
         myFun(shouldCalculateOffsets, editor, startOffsets)
 
         if (shouldCalculateOffsets) {
-          invokeLater {
+          injector.application.invokeLater {
             KeyHandler.getInstance().finishedCommandPreparation(
               editor,
               context, CommandState.getInstance(editor), CommandState.getInstance(editor).commandBuilder, null, false
@@ -186,7 +182,7 @@ class ToHandlerMappingInfo(
     }
 
     injector.actionExecutor.executeCommand(
-      editor, { extensionHandler.execute(editor.ij, context.ij) },
+      editor, { extensionHandler.execute(editor, context) },
       "Vim " + extensionHandler.javaClass.simpleName, null
     )
 
@@ -202,7 +198,7 @@ class ToHandlerMappingInfo(
   }
 
   companion object {
-    private val LOG = logger<ToHandlerMappingInfo>()
+    private val LOG = vimLogger<ToHandlerMappingInfo>()
 
     private fun myFun(
       shouldCalculateOffsets: Boolean,
@@ -231,7 +227,7 @@ class ToHandlerMappingInfo(
             SelectionVimListenerSuppressor.lock().use {
               // Move caret to the initial offset for better undo action
               //  This is not a necessary thing, but without it undo action look less convenient
-              editor.ij.caretModel.moveToOffset(startOffset.point)
+              editor.currentCaret().moveToOffset(startOffset.point)
             }
           }
         }
@@ -254,11 +250,11 @@ class ToActionMappingInfo(
   override fun execute(editor: VimEditor, context: ExecutionContext) {
     LOG.debug("Executing 'ToAction' mapping...")
     val editorDataContext = injector.executionContextManager.onEditor(editor, context)
-    val dataContext = CaretSpecificDataContext(editorDataContext.ij, editor.ij.caretModel.currentCaret)
-    injector.actionExecutor.executeAction(action, dataContext.vim)
+    val dataContext = injector.executionContextManager.createCaretSpecificDataContext(editorDataContext, editor.currentCaret())
+    injector.actionExecutor.executeAction(action, dataContext)
   }
 
   companion object {
-    private val LOG = logger<ToActionMappingInfo>()
+    private val LOG = vimLogger<ToActionMappingInfo>()
   }
 }

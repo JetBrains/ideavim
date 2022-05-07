@@ -54,6 +54,10 @@ class IjStatisticsService : VimStatistics {
     VimscriptState.isLoopUsed = value
   }
 
+  override fun setIfMapExprUsed(value: Boolean) {
+    VimscriptState.isMapExprUsed = value
+  }
+
   override fun setIfFunctionCallUsed(value: Boolean) {
     VimscriptState.isFunctionCallUsed = value
   }

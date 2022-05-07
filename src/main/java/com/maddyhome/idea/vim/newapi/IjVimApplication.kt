@@ -22,6 +22,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.util.Computable
+import com.intellij.util.ExceptionUtil
 import com.maddyhome.idea.vim.api.VimApplication
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.diagnostic.vimLogger
@@ -81,6 +82,10 @@ class IjVimApplication : VimApplication {
 
   override fun <T> runReadAction(action: () -> T): T {
     return ApplicationManager.getApplication().runReadAction(Computable(action))
+  }
+
+  override fun currentStackTrace(): String {
+    return ExceptionUtil.currentStackTrace()
   }
 
   private fun createKeyEvent(stroke: KeyStroke, component: Component): KeyEvent {

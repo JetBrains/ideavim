@@ -32,4 +32,5 @@ interface ExecutionContext {
 interface ExecutionContextManager {
   fun onEditor(editor: VimEditor, prevContext: ExecutionContext? = null): ExecutionContext
   fun onCaret(caret: VimCaret, prevContext: ExecutionContext): ExecutionContext
+  fun createCaretSpecificDataContext(context: ExecutionContext, caret: VimCaret): ExecutionContext
 }

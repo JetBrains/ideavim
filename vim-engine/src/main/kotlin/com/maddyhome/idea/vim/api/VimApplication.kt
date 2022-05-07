@@ -34,4 +34,6 @@ interface VimApplication {
 
   fun <T> runWriteAction(action: () -> T): T
   fun <T> runReadAction(action: () -> T): T
+
+  fun currentStackTrace(): String
 }

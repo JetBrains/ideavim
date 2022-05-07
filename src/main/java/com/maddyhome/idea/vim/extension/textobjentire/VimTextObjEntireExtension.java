@@ -36,6 +36,7 @@ import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
 import com.maddyhome.idea.vim.newapi.IjExecutionContext;
 import com.maddyhome.idea.vim.newapi.IjVimCaret;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
+import org.apache.tools.ant.taskdefs.Exec;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -94,6 +95,11 @@ public class VimTextObjEntireExtension implements VimExtension {
       this.ignoreLeadingAndTrailing = ignoreLeadingAndTrailing;
     }
 
+    @Override
+    public boolean isRepeatable() {
+      return false;
+    }
+
     static class EntireTextObjectHandler extends TextObjectActionHandler {
       final boolean ignoreLeadingAndTrailing;
 
@@ -141,15 +147,15 @@ public class VimTextObjEntireExtension implements VimExtension {
     }
 
     @Override
-    public void execute(@NotNull Editor editor, @NotNull DataContext context) {
-      @NotNull CommandState commandState = CommandState.getInstance(new IjVimEditor(editor));
+    public void execute(@NotNull VimEditor editor, @NotNull ExecutionContext context) {
+      @NotNull CommandState commandState = CommandState.getInstance(editor);
       int count = Math.max(1, commandState.getCommandBuilder().getCount());
 
       final EntireTextObjectHandler textObjectHandler = new EntireTextObjectHandler(ignoreLeadingAndTrailing);
       //noinspection DuplicatedCode
       if (!commandState.isOperatorPending()) {
-        editor.getCaretModel().runForEachCaret((Caret caret) -> {
-          final TextRange range = textObjectHandler.getRange(new IjVimEditor(editor), new IjVimCaret(caret), new IjExecutionContext(context), count, 0, null);
+        ((IjVimEditor) editor).getEditor().getCaretModel().runForEachCaret((Caret caret) -> {
+          final TextRange range = textObjectHandler.getRange(editor, new IjVimCaret(caret), context, count, 0, null);
           if (range != null) {
             try (VimListenerSuppressor.Locked ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
               if (commandState.getMode() == CommandState.Mode.VISUAL) {

@@ -7,4 +7,5 @@ interface VimStatistics {
   fun setIfFunctionCallUsed(value: Boolean)
   fun setIfFunctionDeclarationUsed(value: Boolean)
   fun setIfLoopUsed(value: Boolean)
+  fun setIfMapExprUsed(value: Boolean)
 }

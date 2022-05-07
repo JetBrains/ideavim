@@ -26,6 +26,7 @@ import com.intellij.openapi.editor.VisualPosition
 import com.intellij.openapi.util.NlsSafe
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.common.MappingMode
@@ -48,6 +49,7 @@ import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
 import com.maddyhome.idea.vim.helper.userData
 import com.maddyhome.idea.vim.newapi.IjVimEditor
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
@@ -110,9 +112,9 @@ class VimMultipleCursorsExtension : VimExtension {
   }
 
   abstract class WriteActionHandler : VimExtensionHandler {
-    override fun execute(editor: Editor, context: DataContext) {
+    override fun execute(editor: VimEditor, context: ExecutionContext) {
       ApplicationManager.getApplication().runWriteAction {
-        executeInWriteAction(editor, context)
+        executeInWriteAction(editor.ij, context.ij)
       }
     }
 

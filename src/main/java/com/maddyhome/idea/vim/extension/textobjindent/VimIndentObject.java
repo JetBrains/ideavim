@@ -95,6 +95,11 @@ public class VimIndentObject implements VimExtension {
       this.includeBelow = includeBelow;
     }
 
+    @Override
+    public boolean isRepeatable() {
+      return false;
+    }
+
     static class IndentObjectHandler extends TextObjectActionHandler {
       final boolean includeAbove;
       final boolean includeBelow;
@@ -268,16 +273,16 @@ public class VimIndentObject implements VimExtension {
     }
 
     @Override
-    public void execute(@NotNull Editor editor, @NotNull DataContext context) {
-      IjVimEditor vimEditor = new IjVimEditor(editor);
+    public void execute(@NotNull VimEditor editor, @NotNull ExecutionContext context) {
+      IjVimEditor vimEditor = (IjVimEditor)editor;
       @NotNull CommandState commandState = CommandState.getInstance(vimEditor);
       int count = Math.max(1, commandState.getCommandBuilder().getCount());
 
       final IndentObjectHandler textObjectHandler = new IndentObjectHandler(includeAbove, includeBelow);
 
       if (!commandState.isOperatorPending()) {
-        editor.getCaretModel().runForEachCaret((Caret caret) -> {
-          final TextRange range = textObjectHandler.getRange(vimEditor, new IjVimCaret(caret), new IjExecutionContext(context), count, 0, null);
+        ((IjVimEditor)editor).getEditor().getCaretModel().runForEachCaret((Caret caret) -> {
+          final TextRange range = textObjectHandler.getRange(vimEditor, new IjVimCaret(caret), context, count, 0, null);
           if (range != null) {
             try (VimListenerSuppressor.Locked ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
               if (commandState.getMode() == CommandState.Mode.VISUAL) {

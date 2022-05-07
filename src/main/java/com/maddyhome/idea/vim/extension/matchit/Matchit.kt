@@ -30,6 +30,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
@@ -100,12 +101,12 @@ class Matchit : VimExtension {
 
   private class MatchitHandler(private val reverse: Boolean) : VimExtensionHandler {
 
-    override fun execute(editor: Editor, context: DataContext) {
-      val commandState = editor.vim.commandState
+    override fun execute(editor: VimEditor, context: ExecutionContext) {
+      val commandState = editor.commandState
       val count = commandState.commandBuilder.count
 
       // Reset the command count so it doesn't transfer onto subsequent commands.
-      editor.getTopLevelEditor().vim.commandState.commandBuilder.resetCount()
+      editor.commandState.commandBuilder.resetCount()
 
       // Normally we want to jump to the start of the matching pair. But when moving forward in operator
       // pending mode, we want to include the entire match. isInOpPending makes that distinction.
@@ -125,9 +126,9 @@ class Matchit : VimExtension {
           )
         )
       } else {
-        editor.vimForEachCaret { caret ->
-          VimPlugin.getMark().saveJumpLocation(editor.vim)
-          MotionGroup.moveCaret(editor, caret, getMatchitOffset(editor, caret, count, isInOpPending, reverse))
+        editor.forEachCaret { caret ->
+          VimPlugin.getMark().saveJumpLocation(editor)
+          injector.motion.moveCaret(editor, caret, getMatchitOffset(editor.ij, caret.ij, count, isInOpPending, reverse))
         }
       }
     }
