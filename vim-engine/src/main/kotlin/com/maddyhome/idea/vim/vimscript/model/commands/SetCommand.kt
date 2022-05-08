@@ -18,20 +18,15 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.ExException
-import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.ex.ranges.Ranges
-import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.Msg
-import com.maddyhome.idea.vim.newapi.ij
-import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
-import com.maddyhome.idea.vim.vimscript.services.OptionServiceImpl
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import java.util.*
 import kotlin.math.ceil
 import kotlin.math.min
@@ -43,18 +38,15 @@ data class SetCommand(val ranges: Ranges, val argument: String) : Command.Single
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   companion object {
-    internal var isExecutingCommand = false
+    @Deprecated("delete me after the OptionManager removal")
+    var isExecutingCommand = false
   }
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
     isExecutingCommand = true
-    try {
-      OptionsManager.parseOptionLine(editor.ij, argument, true)
-    } catch (e: ExException) {
-      // same exceptions will be thrown later, so we ignore them for now
-    }
+    val result = parseOptionLine(editor, argument, OptionScope.GLOBAL, failOnBad = true)
     isExecutingCommand = false
-    return if (parseOptionLine(editor, argument, OptionScope.GLOBAL, failOnBad = true)) {
+    return if (result) {
       ExecutionResult.Success
     } else {
       ExecutionResult.Error
@@ -101,7 +93,7 @@ data class SetLocalCommand(val ranges: Ranges, val argument: String) : Command.S
 // todo is failOnBad used anywhere?
 fun parseOptionLine(editor: VimEditor, args: String, scope: OptionScope, failOnBad: Boolean): Boolean {
   // No arguments so we show changed values
-  val optionService = (VimPlugin.getOptionService() as OptionServiceImpl)
+  val optionService = injector.optionService
   when {
     args.isEmpty() -> {
       val changedOptions = optionService.getOptions().filter { !optionService.isDefault(scope, it) }
@@ -171,7 +163,7 @@ fun parseOptionLine(editor: VimEditor, args: String, scope: OptionScope, failOnB
               '+' -> optionService.appendValue(scope, option, value, token)
               '-' -> optionService.removeValue(scope, option, value, token)
               '^' -> optionService.prependValue(scope, option, value, token)
-              else -> optionService.setOptionValue(scope, option, value, token)
+              else -> optionService.setOptionValue(scope, option, VimString(value), token)
             }
           } else {
             error = Msg.unkopt
@@ -190,14 +182,14 @@ fun parseOptionLine(editor: VimEditor, args: String, scope: OptionScope, failOnB
   }
 
   if (error != null) {
-    throw ExException(MessageHelper.message(error, token))
+    throw ExException(injector.messages.message(error, token))
   }
 
   return true
 }
 
 private fun showOptions(editor: VimEditor, nameAndToken: Collection<Pair<String, String>>, scope: OptionScope, showIntro: Boolean) {
-  val optionService = VimPlugin.getOptionService()
+  val optionService = injector.optionService
   val optionsToShow = mutableListOf<String>()
   var unknownOption: Pair<String, String>? = null
   val optionsAndAbbrevs = optionService.getOptions() + optionService.getAbbrevs()
@@ -213,7 +205,7 @@ private fun showOptions(editor: VimEditor, nameAndToken: Collection<Pair<String,
   val cols = mutableListOf<String>()
   val extra = mutableListOf<String>()
   for (option in optionsToShow) {
-    val optionAsString = optionToString(scope, option, editor)
+    val optionAsString = optionToString(scope, option)
     if (optionAsString.length > 19) extra.add(optionAsString) else cols.add(optionAsString)
   }
 
@@ -257,16 +249,16 @@ private fun showOptions(editor: VimEditor, nameAndToken: Collection<Pair<String,
       res.append("\n")
     }
   }
-  ExOutputModel.getInstance(editor.ij).output(res.toString())
+  injector.exOutputPanel.getPanel(editor).output(res.toString())
 
   if (unknownOption != null) {
     throw ExException("E518: Unknown option: ${unknownOption.second}")
   }
 }
 
-private fun optionToString(scope: OptionScope, name: String, editor: VimEditor): String {
-  val value = VimPlugin.getOptionService().getOptionValue(scope, name)
-  return if (VimPlugin.getOptionService().isToggleOption(name)) {
+private fun optionToString(scope: OptionScope, name: String): String {
+  val value = injector.optionService.getOptionValue(scope, name)
+  return if (injector.optionService.isToggleOption(name)) {
     if (value.asBoolean()) "  $name" else "no$name"
   } else {
     "$name=$value"

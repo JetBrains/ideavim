@@ -18,18 +18,15 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
-import com.intellij.openapi.diagnostic.Logger
-import com.intellij.openapi.diagnostic.debug
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.ex.ExOutputModel
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.history.HistoryConstants.COMMAND
 import com.maddyhome.idea.vim.history.HistoryConstants.EXPRESSION
 import com.maddyhome.idea.vim.history.HistoryConstants.INPUT
 import com.maddyhome.idea.vim.history.HistoryConstants.SEARCH
-import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
@@ -52,7 +49,7 @@ data class HistoryCommand(val ranges: Ranges, val argument: String) : Command.Si
       arg = ""
     }
 
-    logger.debug { "key='$key'" }
+    logger.debug("key='$key'")
 
     if (key.length == 1 && key[0] in ":/=@") {
       when (key[0]) {
@@ -69,7 +66,7 @@ data class HistoryCommand(val ranges: Ranges, val argument: String) : Command.Si
         !"all".startsWith(key)
       ) {
         // Invalid command
-        logger.debug { "invalid command $key" }
+        logger.debug("invalid command $key")
         return ExecutionResult.Error
       }
     } else {
@@ -111,21 +108,21 @@ data class HistoryCommand(val ranges: Ranges, val argument: String) : Command.Si
       else -> ""
     }
 
-    ExOutputModel.getInstance(editor.ij).output(res)
+    injector.exOutputPanel.getPanel(editor).output(res)
 
     return ExecutionResult.Success
   }
 
   private fun processKey(start: Int, end: Int) = { key: String ->
-    logger.debug { "process $key $start,$end" }
+    logger.debug("process $key $start,$end")
 
-    VimPlugin.getHistory().getEntries(key, start, end).joinToString("\n", prefix = "      #  $key history\n") { entry ->
+    injector.historyGroup.getEntries(key, start, end).joinToString("\n", prefix = "      #  $key history\n") { entry ->
       val num = entry.number.toString().padStart(7)
       "$num  ${entry.entry}"
     }
   }
 
   companion object {
-    private val logger = Logger.getInstance(HistoryCommand::class.java.name)
+    private val logger = vimLogger<HistoryCommand>()
   }
 }

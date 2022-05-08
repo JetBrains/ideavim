@@ -21,6 +21,7 @@ import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.extensions.ExtensionPointListener
 import com.intellij.openapi.extensions.PluginDescriptor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.VimExtensionRegistrator
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.key.MappingOwner.Plugin.Companion.remove
@@ -31,7 +32,7 @@ import com.maddyhome.idea.vim.statistic.PluginState
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.options.ToggleOption
 
-object VimExtensionRegistrar {
+object VimExtensionRegistrar: VimExtensionRegistrator {
   internal val registeredExtensions: MutableSet<String> = HashSet()
   internal val extensionAliases = HashMap<String, String>()
   private var extensionRegistered = false
@@ -119,7 +120,7 @@ object VimExtensionRegistrar {
     logger.info("IdeaVim extension '$name' disposed")
   }
 
-  fun setOptionByPluginAlias(alias: String): Boolean {
+  override fun setOptionByPluginAlias(alias: String): Boolean {
     val name = extensionAliases[alias] ?: return false
     try {
       VimPlugin.getOptionService().setOption(OptionScope.GLOBAL, name)
@@ -127,6 +128,10 @@ object VimExtensionRegistrar {
       return false
     }
     return true
+  }
+
+  override fun getExtensionNameByAlias(alias: String): String? {
+    return extensionAliases[alias]
   }
 
   private fun registerAliases(extension: ExtensionBeanClass) {

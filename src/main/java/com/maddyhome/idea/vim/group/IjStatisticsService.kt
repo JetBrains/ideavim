@@ -69,4 +69,12 @@ class IjStatisticsService : VimStatistics {
   override fun setIfIfUsed(value: Boolean) {
     VimscriptState.isIfUsed = value
   }
+
+  override fun addExtensionEnabledWithPlug(extension: String) {
+    VimscriptState.extensionsEnabledWithPlug.add(extension)
+  }
+
+  override fun addSourcedFile(path: String) {
+    VimscriptState.sourcedFiles.add(path)
+  }
 }

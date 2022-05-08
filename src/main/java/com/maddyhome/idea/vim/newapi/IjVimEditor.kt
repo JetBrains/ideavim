@@ -33,13 +33,16 @@ import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimCaretListener
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimLogicalPosition
+import com.maddyhome.idea.vim.api.VimSelectionModel
 import com.maddyhome.idea.vim.api.VimVisualPosition
+import com.maddyhome.idea.vim.api.VirtualFile
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.EditorLine
 import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.common.Pointer
+import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.common.VimScrollType
 import com.maddyhome.idea.vim.common.offset
 import com.maddyhome.idea.vim.group.visual.vimSetSystemBlockSelectionSilently
@@ -261,8 +264,41 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
     return editor.logicalPositionToOffset(logicalPosition)
   }
 
+  override fun getLineText(line: Int): String {
+    return EditorHelper.getLineText(this.editor, line)
+  }
+
+  override fun getVirtualFile(): VirtualFile? {
+    val vf = EditorHelper.getVirtualFile(editor)
+    return vf?.let {
+      object : VirtualFile {
+        override val path = vf.path
+      }
+    }
+  }
+
+  override fun deleteString(range: TextRange) {
+    editor.document.deleteString(range.startOffset, range.endOffset)
+  }
+
+  override fun getText(range: TextRange): String {
+    return editor.document.getText(com.intellij.openapi.util.TextRange(range.startOffset, range.endOffset))
+  }
+
   override fun lineLength(line: Int): Int {
     return EditorHelper.getLineLength(editor, line)
+  }
+
+  override fun getSelectionModel(): VimSelectionModel {
+    return object : VimSelectionModel {
+      private val sm = editor.selectionModel
+      override val selectionStart = sm.selectionStart
+      override val selectionEnd = sm.selectionEnd
+
+      override fun hasSelection(): Boolean {
+        return sm.hasSelection()
+      }
+    }
   }
 
   override fun removeCaret(caret: VimCaret) {

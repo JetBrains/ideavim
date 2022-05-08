@@ -3,6 +3,9 @@ package com.maddyhome.idea.vim.api
 import com.maddyhome.idea.vim.common.Direction
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ranges.LineRange
+import com.maddyhome.idea.vim.regexp.CharPointer
+import com.maddyhome.idea.vim.regexp.RegExp
+import com.maddyhome.idea.vim.regexp.RegExp.regmmatch_T
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 
 interface VimSearchGroup {
@@ -31,4 +34,19 @@ interface VimSearchGroup {
     exarg: String,
     parent: VimLContext,
   ): Boolean
+  // TODO rewrite this
+  fun search_regcomp(pat: CharPointer?, which_pat: Int, patSave: Int): Pair<Boolean, Triple<regmmatch_T, String, RegExp>>
+  fun findDecimalNumber(line: String): Int?
+  fun clearSearchHighlight()
+
+  // Matching the values defined in Vim. Do not change these values, they are used as indexes
+  companion object {
+    val RE_SEARCH = 0 // Save/use search pattern
+
+    val RE_SUBST = 1 // Save/use substitute pattern
+
+    val RE_BOTH = 2 // Save to both patterns
+
+    val RE_LAST = 2 // Use last used pattern if "pat" is NULL
+  }
 }

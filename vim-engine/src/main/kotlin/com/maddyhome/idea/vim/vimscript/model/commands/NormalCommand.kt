@@ -19,27 +19,28 @@
 package com.maddyhome.idea.vim.vimscript.model.commands
 
 import com.maddyhome.idea.vim.KeyHandler
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimLogicalPosition
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.OperatorArguments
+import com.maddyhome.idea.vim.common.CommonStringHelper.stringToKeys
 import com.maddyhome.idea.vim.ex.ranges.Ranges
-import com.maddyhome.idea.vim.helper.StringHelper.stringToKeys
 import com.maddyhome.idea.vim.helper.commandState
-import com.maddyhome.idea.vim.helper.exitSelectMode
 import com.maddyhome.idea.vim.helper.mode
-import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 data class NormalCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
-  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.WRITABLE, Flag.SAVE_VISUAL)
+  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL,
+    ArgumentFlag.ARGUMENT_OPTIONAL,
+    Access.WRITABLE,
+    Flag.SAVE_VISUAL)
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
-    if (VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.ideadelaymacroName)) {
+    if (injector.optionService.isSet(OptionScope.GLOBAL, OptionConstants.ideadelaymacroName)) {
       return ExecutionResult.Success
     }
 
@@ -56,13 +57,13 @@ data class NormalCommand(val ranges: Ranges, val argument: String) : Command.Sin
       CommandState.Mode.VISUAL -> {
         editor.exitVisualModeNative()
         if (!rangeUsed) {
-          val selectionStart = VimPlugin.getMark().getMark(editor, '<')!!
+          val selectionStart = injector.markGroup.getMark(editor, '<')!!
           editor.currentCaret().moveToLogicalPosition(VimLogicalPosition(selectionStart.logicalLine, selectionStart.col))
         }
       }
-      CommandState.Mode.CMD_LINE -> VimPlugin.getProcess().cancelExEntry(editor, false)
+      CommandState.Mode.CMD_LINE -> injector.processGroup.cancelExEntry(editor, false)
       CommandState.Mode.INSERT, CommandState.Mode.REPLACE -> editor.exitInsertMode(context, OperatorArguments(false, 1, commandState.mode, commandState.subMode))
-      CommandState.Mode.SELECT -> editor.exitSelectMode(false)
+      CommandState.Mode.SELECT -> editor.exitSelectModeNative(false)
       CommandState.Mode.OP_PENDING, CommandState.Mode.COMMAND -> Unit
     }
     val range = getLineRange(editor, editor.primaryCaret())
@@ -88,7 +89,7 @@ data class NormalCommand(val ranges: Ranges, val argument: String) : Command.Sin
       // Exit if state leaves as insert or cmd_line
       val mode = commandState.mode
       if (mode == CommandState.Mode.CMD_LINE) {
-        VimPlugin.getProcess().cancelExEntry(editor, false)
+        injector.processGroup.cancelExEntry(editor, false)
       }
       if (mode == CommandState.Mode.INSERT || mode == CommandState.Mode.REPLACE) {
         editor.exitInsertMode(context, OperatorArguments(false, 1, commandState.mode, commandState.subMode))

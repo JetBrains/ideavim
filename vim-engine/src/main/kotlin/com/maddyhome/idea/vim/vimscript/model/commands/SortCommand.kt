@@ -18,18 +18,14 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
-import com.intellij.openapi.util.text.StringUtil
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.inBlockSubMode
-import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
-import com.maddyhome.idea.vim.newapi.ij
-import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import java.util.*
 
@@ -53,9 +49,9 @@ data class SortCommand(val ranges: Ranges, val argument: String) : Command.Singl
     if (editor.inBlockSubMode) {
       val primaryCaret = editor.primaryCaret()
       val range = getSortLineRange(editor, primaryCaret)
-      val worked = VimPlugin.getChange().sortRange(editor, range, lineComparator)
+      val worked = injector.changeGroup.sortRange(editor, range, lineComparator)
       primaryCaret.moveToInlayAwareOffset(
-        VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, range.startLine)
+        injector.motion.moveCaretToLineStartSkipLeading(editor, range.startLine)
       )
       return if (worked) ExecutionResult.Success else ExecutionResult.Error
     }
@@ -63,10 +59,10 @@ data class SortCommand(val ranges: Ranges, val argument: String) : Command.Singl
     var worked = true
     for (caret in editor.nativeCarets()) {
       val range = getSortLineRange(editor, caret)
-      if (!VimPlugin.getChange().sortRange(editor, range, lineComparator)) {
+      if (!injector.changeGroup.sortRange(editor, range, lineComparator)) {
         worked = false
       }
-      caret.moveToInlayAwareOffset(VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, range.startLine))
+      caret.moveToInlayAwareOffset(injector.motion.moveCaretToLineStartSkipLeading(editor, range.startLine))
     }
 
     return if (worked) ExecutionResult.Success else ExecutionResult.Error
@@ -81,7 +77,7 @@ data class SortCommand(val ranges: Ranges, val argument: String) : Command.Singl
     // If we don't have a range, we either have "sort", a selection, or a block
     if (normalizedRange.endLine - normalizedRange.startLine == 0) {
       // If we have a selection.
-      val selectionModel = editor.ij.selectionModel
+      val selectionModel = editor.getSelectionModel()
       return if (selectionModel.hasSelection()) {
         val start = selectionModel.selectionStart
         val end = selectionModel.selectionEnd
@@ -116,7 +112,16 @@ data class SortCommand(val ranges: Ranges, val argument: String) : Command.Singl
         o1ToCompare = o1ToCompare.uppercase(Locale.getDefault())
         o2ToCompare = o2ToCompare.uppercase(Locale.getDefault())
       }
-      return if (myNumber) StringUtil.naturalCompare(o1ToCompare, o2ToCompare) else o1ToCompare.compareTo(o2ToCompare)
+      return if (myNumber) {
+        // About natural sort order - http://www.codinghorror.com/blog/2007/12/sorting-for-humans-natural-sort-order.html
+        val n1 = injector.searchGroup.findDecimalNumber(o1ToCompare)
+        val n2 = injector.searchGroup.findDecimalNumber(o2ToCompare)
+        if (n1 == null) {
+          if (n2 == null) 0 else -1
+        } else {
+          if (n2 == null) 1 else n1.compareTo(n2)
+        }
+      } else o1ToCompare.compareTo(o2ToCompare)
     }
   }
 }

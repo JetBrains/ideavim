@@ -120,7 +120,7 @@ public class NumberOption extends TextOption {
       this.value = num;
       onChanged(oldValue, getValue());
       // we won't use OptionService if the method was invoked during set command execution (set command will call OptionService by itself)
-      if (!SetCommand.Companion.isExecutingCommand$IdeaVIM()) {
+      if (!SetCommand.Companion.isExecutingCommand()) {
         try {
           if (!(((VimInt)VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL.INSTANCE, name, name)).getValue() == value)) {
             VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL.INSTANCE, name, new VimInt(value), name);

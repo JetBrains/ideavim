@@ -25,12 +25,12 @@ import com.maddyhome.idea.vim.common.EditorLine
 import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.common.OperatedRange
 import com.maddyhome.idea.vim.common.Pointer
+import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.common.VimRange
 import com.maddyhome.idea.vim.common.VimScrollType
 import com.maddyhome.idea.vim.common.offset
 import com.maddyhome.idea.vim.common.pointer
 import java.util.*
-import java.util.function.ToIntFunction
 
 /**
  * Every line in [VimEditor] ends with a new line TODO <- this is probably not true already
@@ -196,7 +196,14 @@ interface VimEditor {
   fun offsetToVisualPosition(offset: Int): VimVisualPosition
   fun visualPositionToOffset(position: VimVisualPosition): Offset
 
+  fun getVirtualFile(): VirtualFile?
+  fun deleteString(range: TextRange)
+  fun getText(range: TextRange): String
+
+  fun getLineText(line: Int): String
   fun lineLength(line: Int): Int
+
+  fun getSelectionModel(): VimSelectionModel
 
   fun removeCaret(caret: VimCaret)
   fun removeSecondaryCarets()

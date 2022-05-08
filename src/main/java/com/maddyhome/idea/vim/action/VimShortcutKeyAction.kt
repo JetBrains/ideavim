@@ -185,7 +185,7 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
           }
         }
       }
-      return when ((info as? ShortcutOwnerInfo)?.forEditor(editor)) {
+      return when ((info as? ShortcutOwnerInfo)?.forEditor(editor.vim)) {
         ShortcutOwner.VIM -> true
         ShortcutOwner.IDE -> !isShortcutConflict(keyStroke)
         else -> {

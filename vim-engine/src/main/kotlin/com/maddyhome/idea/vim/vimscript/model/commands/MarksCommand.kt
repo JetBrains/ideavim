@@ -18,50 +18,43 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.command.SelectionType
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.common.CommonStringHelper.stringToKeys
 import com.maddyhome.idea.vim.ex.ranges.Ranges
-import com.maddyhome.idea.vim.helper.StringHelper
-import com.maddyhome.idea.vim.put.PutData
+import com.maddyhome.idea.vim.helper.EngineStringHelper
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
- * see "h :put"
+ * see "h :marks"
  */
-data class PutLinesCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
+data class MarksCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
-    if (editor.isOneLineMode()) return ExecutionResult.Error
 
-    val registerGroup = VimPlugin.getRegister()
-    val arg = argument
-    if (arg.isNotEmpty()) {
-      if (!registerGroup.selectRegister(arg[0]))
-        return ExecutionResult.Error
-    } else {
-      registerGroup.selectRegister(registerGroup.defaultRegister)
-    }
+    // Yeah, lower case. Vim uses lower case here, but Title Case in :registers. Go figure.
+    val res = injector.markGroup.getMarks(editor)
+      .filter { argument.isEmpty() || argument.contains(it.key) }
+      .joinToString("\n", prefix = "mark line  col file/text\n") { mark ->
 
-    val line = if (ranges.size() == 0) -1 else getLine(editor)
-    val textData = registerGroup.lastRegister?.let {
-      PutData.TextData(
-        it.text ?: StringHelper.toKeyNotation(it.keys),
-        SelectionType.LINE_WISE,
-        it.transferableData
-      )
-    }
-    val putData = PutData(
-      textData,
-      null,
-      1,
-      insertTextBeforeCaret = false,
-      rawIndent = false,
-      caretAfterInsertedText = false,
-      putToLine = line
-    )
-    return if (VimPlugin.getPut().putText(editor, context, putData)) ExecutionResult.Success else ExecutionResult.Error
+        // Lines are 1 based, columns zero based. See :help :marks
+        val line = (mark.logicalLine + 1).toString().padStart(5)
+        val column = mark.col.toString().padStart(3)
+        val vf = editor.getVirtualFile()
+        val text = if (vf != null && vf.path == mark.filename) {
+          val lineText = editor.getLineText(mark.logicalLine).trim().take(200)
+          EngineStringHelper.toPrintableCharacters(stringToKeys(lineText)).take(200)
+        } else {
+          mark.filename
+        }
+
+        " ${mark.key}  $line  $column $text"
+      }
+
+    injector.exOutputPanel.getPanel(editor).output(res)
+
+    return ExecutionResult.Success
   }
 }

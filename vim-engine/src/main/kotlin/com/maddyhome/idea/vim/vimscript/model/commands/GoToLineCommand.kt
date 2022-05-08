@@ -18,31 +18,36 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.ranges.Ranges
-import com.maddyhome.idea.vim.helper.MessageHelper
-import com.maddyhome.idea.vim.helper.Msg
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
+import java.lang.Integer.min
 
 /**
- * see "h :mark"
+ * see "h :[range]"
  */
-data class MarkCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
-  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED, Access.READ_ONLY)
+data class GoToLineCommand(val ranges: Ranges) :
+  Command.ForEachCaret(ranges) {
 
-  override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
-    val mark = argument[0]
-    val line = getLine(editor)
-    val offset = editor.getLineStartOffset(line)
+  override val argFlags = flags(RangeFlag.RANGE_REQUIRED, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
-    val result = if (mark.isLetter() || mark in "'`") {
-      VimPlugin.getMark().setMark(editor, mark, offset)
-    } else {
-      VimPlugin.showMessage(MessageHelper.message(Msg.E191))
-      false
+  override fun processCommand(
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+  ): ExecutionResult {
+    val line = min(this.getLine(editor, caret), editor.lineCount() - 1)
+
+    if (line >= 0) {
+      val offset = injector.motion.moveCaretToLineWithStartOfLineOption(editor, line, caret)
+      injector.motion.moveCaret(editor, caret, offset)
+      return ExecutionResult.Success
     }
-    return if (result) ExecutionResult.Success else ExecutionResult.Error
+
+    injector.motion.moveCaret(editor, caret, 0)
+    return ExecutionResult.Error
   }
 }

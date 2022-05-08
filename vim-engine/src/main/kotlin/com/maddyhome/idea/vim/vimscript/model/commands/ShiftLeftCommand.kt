@@ -22,27 +22,24 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ranges.Ranges
-import com.maddyhome.idea.vim.helper.fileSize
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
-import kotlin.math.max
-import kotlin.math.min
 
 /**
- * see "h :goto"
+ * see "h :<"
  */
-data class GotoCharacterCommand(val ranges: Ranges, val argument: String) : Command.ForEachCaret(ranges, argument) {
-  override val argFlags = flags(RangeFlag.RANGE_IS_COUNT, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+data class ShiftLeftCommand(val ranges: Ranges, val argument: String, val length: Int) : Command.ForEachCaret(ranges, argument) {
+  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.WRITABLE)
 
   override fun processCommand(editor: VimEditor, caret: VimCaret, context: ExecutionContext): ExecutionResult {
-    val count = getCount(editor, caret, 1, true)
-    if (count <= 0) return ExecutionResult.Error
-
-    val offset = max(0, min(count - 1, editor.fileSize().toInt() - 1))
-    if (offset == -1) return ExecutionResult.Error
-
-    injector.motion.moveCaret(editor, caret, offset)
-
+    val range = getTextRange(editor, caret, true)
+    val endOffsets = range.endOffsets.map { it - 1 }.toIntArray()
+    injector.changeGroup.indentRange(
+      editor, caret, context,
+      TextRange(range.startOffsets, endOffsets),
+      length, -1
+    )
     return ExecutionResult.Success
   }
 }

@@ -18,7 +18,7 @@
 package com.maddyhome.idea.vim.key
 
 import com.google.common.collect.HashMultimap
-import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.mode
 import org.jetbrains.annotations.NonNls
@@ -76,7 +76,7 @@ sealed class ShortcutOwnerInfo {
     }
   }
 
-  fun forEditor(editor: Editor): ShortcutOwner {
+  fun forEditor(editor: VimEditor): ShortcutOwner {
     return when (this) {
       is AllModes -> this.owner
       is PerMode -> when (editor.mode) {

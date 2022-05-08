@@ -174,7 +174,7 @@ public abstract class ListOption<T> extends TextOption {
     this.value = vals;
     onChanged(oldValue, getValue());
     // we won't use OptionService if the method was invoked during set command execution (set command will call OptionService by itself)
-    if (!SetCommand.Companion.isExecutingCommand$IdeaVIM()) {
+    if (!SetCommand.Companion.isExecutingCommand()) {
       try {
         String joinedValue = getValue();
         if (!((VimString)VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL.INSTANCE, name, name)).getValue().equals(joinedValue)) {

@@ -8,4 +8,6 @@ interface VimStatistics {
   fun setIfFunctionDeclarationUsed(value: Boolean)
   fun setIfLoopUsed(value: Boolean)
   fun setIfMapExprUsed(value: Boolean)
+  fun addExtensionEnabledWithPlug(extension: String)
+  fun addSourcedFile(path: String)
 }

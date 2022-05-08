@@ -18,44 +18,28 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
- * see "h :@"
+ * see "h :>"
  */
-data class RepeatCommand(val ranges: Ranges, val argument: String) : Command.ForEachCaret(ranges, argument) {
-  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED, Access.SELF_SYNCHRONIZED)
+data class ShiftRightCommand(val ranges: Ranges, val argument: String, val length: Int) : Command.ForEachCaret(ranges, argument) {
+  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.WRITABLE)
 
-  private var lastArg = ':'
-
-  @Throws(ExException::class)
   override fun processCommand(editor: VimEditor, caret: VimCaret, context: ExecutionContext): ExecutionResult {
-    var arg = argument[0]
-    if (arg == '@') arg = lastArg
-    lastArg = arg
-
-    val line = getLine(editor, caret)
-    injector.motion.moveCaret(
-      editor,
-      caret,
-      VimPlugin.getMotion().moveCaretToLineWithSameColumn(editor, line, editor.primaryCaret())
+    val range = getTextRange(editor, caret, true)
+    val endOffsets = range.endOffsets.map { it - 1 }.toIntArray()
+    injector.changeGroup.indentRange(
+      editor, caret, context,
+      TextRange(range.startOffsets, endOffsets),
+      length, 1
     )
-
-    if (arg == ':') {
-      return if (injector.vimscriptExecutor.executeLastCommand(editor, context)) ExecutionResult.Success else ExecutionResult.Error
-    }
-
-    val reg = VimPlugin.getRegister().getPlaybackRegister(arg) ?: return ExecutionResult.Error
-    val text = reg.text ?: return ExecutionResult.Error
-
-    injector.vimscriptExecutor.execute(text, editor, context, skipHistory = false, indicateErrors = true, this.vimContext)
     return ExecutionResult.Success
   }
 }

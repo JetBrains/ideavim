@@ -63,6 +63,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression;
 import com.maddyhome.idea.vim.vimscript.model.functions.handlers.SubmatchFunctionHandler;
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser;
 import kotlin.Pair;
+import kotlin.Triple;
 import kotlin.jvm.functions.Function1;
 import org.jdom.Element;
 import org.jetbrains.annotations.*;
@@ -701,7 +702,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
       return false;
     }
 
-    Pair<Boolean, Trinity<RegExp.regmmatch_T, String, RegExp>> booleanregmmatch_tPair = search_regcomp(pat, which_pat,
+    Pair<Boolean, Triple<RegExp.regmmatch_T, String, RegExp>> booleanregmmatch_tPair = search_regcomp(pat, which_pat,
                                                                                                        RE_SUBST);
     if (!booleanregmmatch_tPair.getFirst()) {
       if (do_error) {
@@ -906,9 +907,9 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
     return processSearchRange(((IjVimEditor) editor).getEditor(), pattern, patternOffset, startOffset, direction);
   }
 
-  public Pair<Boolean, Trinity<RegExp.regmmatch_T, String, RegExp>> search_regcomp(CharPointer pat,
-                                                                                   int which_pat,
-                                                                                   int patSave) {
+  public Pair<Boolean, Triple<RegExp.regmmatch_T, String, RegExp>> search_regcomp(CharPointer pat,
+                                                                                  int which_pat,
+                                                                                  int patSave) {
     // We don't need to worry about lastIgnoreSmartCase, it's always false. Vim resets after checking, and it only sets
     // it to true when searching for a word with `*`, `#`, `g*`, etc.
     boolean isNewPattern = true;
@@ -955,7 +956,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
     if (regmatch.regprog == null) {
       return new Pair<>(false, null);
     }
-    return new Pair<>(true, new Trinity<>(regmatch, pattern, sp));
+    return new Pair<>(true, new Triple<>(regmatch, pattern, sp));
   }
 
   private static @NotNull ReplaceConfirmationChoice confirmChoice(@NotNull Editor editor, @NotNull String match, @NotNull Caret caret, int startoff) {
@@ -1124,6 +1125,16 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
    */
   public static void fileEditorManagerSelectionChangedCallback(@SuppressWarnings("unused") @NotNull FileEditorManagerEvent event) {
     VimPlugin.getSearch().updateSearchHighlights();
+  }
+
+  @Override
+  public Integer findDecimalNumber(@NotNull String line) {
+    Pair<TextRange, SearchHelper.NumberType> searchResult = SearchHelper.findNumberInText(line, 0, false, false, false);
+    if (searchResult != null) {
+      TextRange range = searchResult.component1();
+      return Integer.parseInt(line.substring(range.getStartOffset(), range.getEndOffset()));
+    }
+    return null;
   }
 
   /**

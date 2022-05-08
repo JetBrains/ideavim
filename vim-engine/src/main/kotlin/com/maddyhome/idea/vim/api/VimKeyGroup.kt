@@ -22,6 +22,7 @@ import com.maddyhome.idea.vim.common.MappingMode
 import com.maddyhome.idea.vim.extension.VimExtensionHandler
 import com.maddyhome.idea.vim.key.KeyMappingLayer
 import com.maddyhome.idea.vim.key.MappingOwner
+import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import javax.swing.KeyStroke
 
@@ -40,4 +41,7 @@ interface VimKeyGroup {
   fun removeKeyMapping(modes: Set<MappingMode>)
   fun removeKeyMapping(modes: Set<MappingMode>, keys: List<KeyStroke>)
   fun showKeyMappings(modes: Set<MappingMode>, editor: VimEditor): Boolean
+
+  val shortcutConflicts: MutableMap<KeyStroke, ShortcutOwnerInfo>
+  val savedShortcutConflicts: MutableMap<KeyStroke, Any>
 }

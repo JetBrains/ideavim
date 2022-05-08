@@ -18,31 +18,28 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ranges.Ranges
-import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
- * see "h :argument"
+ * see "h :print"
  */
-data class SelectFileCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
-  override val argFlags = flags(RangeFlag.RANGE_IS_COUNT, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+data class PrintCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
+  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
-    val count = getCount(editor, 0, true)
+    editor.removeSecondaryCarets()
+    val caret = editor.currentCaret()
+    val textRange = getTextRange(editor, caret, checkCount = true)
 
-    if (count > 0) {
-      val res = VimPlugin.getFile().selectFile(count - 1, context)
-      if (res) {
-        VimPlugin.getMark().saveJumpLocation(editor)
-      }
+    val text = editor.getText(TextRange(textRange.startOffset, textRange.endOffset))
 
-      return if (res) ExecutionResult.Success else ExecutionResult.Error
-    }
-
+    val exOutputModel = injector.exOutputPanel.getPanel(editor)
+    exOutputModel.output((exOutputModel.text ?: "") + text)
     return ExecutionResult.Success
   }
 }

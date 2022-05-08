@@ -23,6 +23,7 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import org.jetbrains.annotations.TestOnly
 import javax.swing.KeyStroke
@@ -144,6 +145,8 @@ interface VimChangeGroup {
   fun changeNumberVisualMode(editor: VimEditor, caret: VimCaret, selectedRange: TextRange, count: Int, avalanche: Boolean): Boolean
 
   fun changeNumber(editor: VimEditor, caret: VimCaret, count: Int): Boolean
+
+  fun sortRange(editor: VimEditor, range: LineRange, lineComparator: Comparator<String>): Boolean
 
   fun reset()
 

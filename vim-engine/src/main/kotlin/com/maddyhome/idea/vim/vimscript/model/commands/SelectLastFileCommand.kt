@@ -18,28 +18,22 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
- * see "h :>"
+ * see "h :last"
  */
-data class ShiftRightCommand(val ranges: Ranges, val argument: String, val length: Int) : Command.ForEachCaret(ranges, argument) {
-  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.WRITABLE)
-
-  override fun processCommand(editor: VimEditor, caret: VimCaret, context: ExecutionContext): ExecutionResult {
-    val range = getTextRange(editor, caret, true)
-    val endOffsets = range.endOffsets.map { it - 1 }.toIntArray()
-    VimPlugin.getChange().indentRange(
-      editor, caret, context,
-      TextRange(range.startOffsets, endOffsets),
-      length, 1
-    )
-    return ExecutionResult.Success
+data class SelectLastFileCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
+  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+  override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
+    val res = injector.file.selectFile(999, context)
+    if (res) {
+      injector.markGroup.saveJumpLocation(editor)
+    }
+    return if (res) ExecutionResult.Success else ExecutionResult.Error
   }
 }

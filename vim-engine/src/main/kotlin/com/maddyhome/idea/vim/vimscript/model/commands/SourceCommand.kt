@@ -22,7 +22,6 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.ranges.Ranges
-import com.maddyhome.idea.vim.statistic.VimscriptState
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import java.io.File
@@ -37,7 +36,7 @@ data class SourceCommand(val ranges: Ranges, val argument: String) : Command.Sin
     val path = expandUser(argument.trim())
     injector.vimscriptExecutor.executeFile(File(path), vimContext.getFirstParentContext() is CommandLineVimLContext)
 
-    VimscriptState.sourcedFiles.add(path)
+    injector.statisticsService.addSourcedFile(path)
     return ExecutionResult.Success
   }
 

@@ -95,7 +95,7 @@ public class ToggleOption extends Option<Boolean> {
       onChanged(old, val);
     }
     // we won't use OptionService if the method was invoked during set command execution (set command will call OptionService by itself)
-    if (!SetCommand.Companion.isExecutingCommand$IdeaVIM()) {
+    if (!SetCommand.Companion.isExecutingCommand()) {
       try {
         if (VimPlugin.getOptionService().isSet(OptionScope.GLOBAL.INSTANCE, name, name) != val) {
           VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL.INSTANCE, name, new VimInt(val ? 1 : 0), name);

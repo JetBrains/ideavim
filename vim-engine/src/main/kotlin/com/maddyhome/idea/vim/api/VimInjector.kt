@@ -5,6 +5,7 @@ import com.maddyhome.idea.vim.common.VimMachine
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.group.VimWindowGroup
 import com.maddyhome.idea.vim.helper.VimCommandLineHelper
+import com.maddyhome.idea.vim.history.VimHistory
 import com.maddyhome.idea.vim.macro.VimMacro
 import com.maddyhome.idea.vim.mark.VimMarkGroup
 import com.maddyhome.idea.vim.options.OptionService
@@ -41,6 +42,8 @@ interface VimInjector {
   val exEntryPanel: ExEntryPanel
   val exOutputPanel: VimExOutputPanelService
   val clipboardManager: VimClipboardManager
+  val historyGroup: VimHistory
+  val extensionRegistrator: VimExtensionRegistrator
 
   val searchHelper: VimSearchHelper
   val motion: VimMotionGroup

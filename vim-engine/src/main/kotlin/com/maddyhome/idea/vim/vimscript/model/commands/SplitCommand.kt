@@ -18,23 +18,30 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.ranges.Ranges
-import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
- * see "h :last"
+ * see "h :split" / "h :vsplit"
  */
-data class SelectLastFileCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
-  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+data class SplitCommand(val ranges: Ranges, val argument: String, val splitType: SplitType) : Command.SingleExecution(ranges, argument) {
+  override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+
   override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
-    val res = VimPlugin.getFile().selectFile(999, context)
-    if (res) {
-      VimPlugin.getMark().saveJumpLocation(editor)
+    if (splitType == SplitType.VERTICAL) {
+      injector.window.splitWindowVertical(context, argument)
+    } else {
+      injector.window.splitWindowHorizontal(context, argument)
     }
-    return if (res) ExecutionResult.Success else ExecutionResult.Error
+
+    return ExecutionResult.Success
   }
+}
+
+enum class SplitType {
+  VERTICAL,
+  HORIZONTAL
 }

@@ -18,15 +18,12 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.ex.ExOutputModel
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.common.CommonStringHelper.stringToKeys
 import com.maddyhome.idea.vim.ex.ranges.Ranges
-import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.EngineStringHelper
-import com.maddyhome.idea.vim.helper.StringHelper.stringToKeys
-import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import kotlin.math.absoluteValue
 
@@ -36,8 +33,8 @@ import kotlin.math.absoluteValue
 data class JumpsCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_FORBIDDEN, Access.READ_ONLY)
   override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
-    val jumps = VimPlugin.getMark().getJumps()
-    val spot = VimPlugin.getMark().getJumpSpot()
+    val jumps = injector.markGroup.getJumps()
+    val spot = injector.markGroup.getJumpSpot()
 
     val text = StringBuilder(" jump line  col file/text\n")
     jumps.forEachIndexed { idx, jump ->
@@ -51,9 +48,9 @@ data class JumpsCommand(val ranges: Ranges, val argument: String) : Command.Sing
       text.append(jump.col.toString().padStart(3))
 
       text.append(" ")
-      val vf = EditorHelper.getVirtualFile(editor.ij)
+      val vf = editor.getVirtualFile()
       if (vf != null && vf.path == jump.filepath) {
-        val line = EditorHelper.getLineText(editor.ij, jump.logicalLine).trim().take(200)
+        val line = editor.getLineText(jump.logicalLine).trim().take(200)
         val keys = stringToKeys(line)
         text.append(EngineStringHelper.toPrintableCharacters(keys).take(200))
       } else {
@@ -67,7 +64,7 @@ data class JumpsCommand(val ranges: Ranges, val argument: String) : Command.Sing
       text.append(">\n")
     }
 
-    ExOutputModel.getInstance(editor.ij).output(text.toString())
+    injector.exOutputPanel.getPanel(editor).output(text.toString())
 
     return ExecutionResult.Success
   }

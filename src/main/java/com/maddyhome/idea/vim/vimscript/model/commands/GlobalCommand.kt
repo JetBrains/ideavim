@@ -105,14 +105,14 @@ data class GlobalCommand(val ranges: Ranges, val argument: String, val invert: B
       }
     }
 
-    val (first, second) = VimPlugin.getSearch().search_regcomp(pat, whichPat, RE_BOTH)
+    val (first, second) = injector.searchGroup.search_regcomp(pat, whichPat, RE_BOTH)
     if (!first) {
       VimPlugin.showMessage(message(Msg.e_invcmd))
       VimPlugin.indicateError()
       return false
     }
-    val regmatch = second.getFirst()
-    val sp = second.getThird()
+    val regmatch = second.first
+    val sp = second.third
 
     var match: Int
     val lcount = editor.lineCount()
