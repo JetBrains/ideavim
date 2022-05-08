@@ -7,4 +7,8 @@ interface VimFile {
   fun selectPreviousTab(context: ExecutionContext)
   fun saveFile(context: ExecutionContext)
   fun closeFile(editor: VimEditor, context: ExecutionContext)
+  fun closeFile(number: Int, context: ExecutionContext)
+  fun selectFile(count: Int, context: ExecutionContext): Boolean
+  fun selectNextFile(count: Int, context: ExecutionContext)
+  fun openFile(filename: String, context: ExecutionContext): Boolean
 }

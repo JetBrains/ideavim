@@ -18,34 +18,27 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
-import com.intellij.openapi.application.ApplicationManager
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.ex.ranges.Ranges
-import com.maddyhome.idea.vim.newapi.ij
-import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
- * see "h :file"
+ * see "h :digraphs"
  */
-data class FindFileCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
-  override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+data class DigraphCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
+  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+
   override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
     val arg = argument
-    if (arg.isNotEmpty()) {
-      val res = VimPlugin.getFile().openFile(arg, context.ij)
-      if (res) {
-        VimPlugin.getMark().saveJumpLocation(editor)
-      }
+    logger.debug("arg=$arg")
 
-      return if (res) ExecutionResult.Success else ExecutionResult.Error
-    }
+    return if (injector.digraphGroup.parseCommandLine(editor, arg)) ExecutionResult.Success else ExecutionResult.Error
+  }
 
-    ApplicationManager.getApplication().invokeLater { injector.actionExecutor.executeAction("GotoFile", context) }
-
-    return ExecutionResult.Success
+  companion object {
+    private val logger = vimLogger<DigraphCommand>()
   }
 }

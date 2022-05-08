@@ -60,7 +60,7 @@ data class NormalCommand(val ranges: Ranges, val argument: String) : Command.Sin
           editor.currentCaret().moveToLogicalPosition(VimLogicalPosition(selectionStart.logicalLine, selectionStart.col))
         }
       }
-      CommandState.Mode.CMD_LINE -> VimPlugin.getProcess().cancelExEntry(editor.ij, false)
+      CommandState.Mode.CMD_LINE -> VimPlugin.getProcess().cancelExEntry(editor, false)
       CommandState.Mode.INSERT, CommandState.Mode.REPLACE -> editor.exitInsertMode(context, OperatorArguments(false, 1, commandState.mode, commandState.subMode))
       CommandState.Mode.SELECT -> editor.exitSelectMode(false)
       CommandState.Mode.OP_PENDING, CommandState.Mode.COMMAND -> Unit
@@ -88,7 +88,7 @@ data class NormalCommand(val ranges: Ranges, val argument: String) : Command.Sin
       // Exit if state leaves as insert or cmd_line
       val mode = commandState.mode
       if (mode == CommandState.Mode.CMD_LINE) {
-        VimPlugin.getProcess().cancelExEntry(editor.ij, false)
+        VimPlugin.getProcess().cancelExEntry(editor, false)
       }
       if (mode == CommandState.Mode.INSERT || mode == CommandState.Mode.REPLACE) {
         editor.exitInsertMode(context, OperatorArguments(false, 1, commandState.mode, commandState.subMode))

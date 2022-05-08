@@ -18,11 +18,10 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
-import com.intellij.openapi.diagnostic.Logger
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.ex.ranges.Ranges
-import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
@@ -31,19 +30,19 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 data class DumpLineCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
   override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
-    if (!logger.isDebugEnabled) return ExecutionResult.Error
+    if (!logger.isDebug()) return ExecutionResult.Error
 
     val range = getLineRange(editor)
-    val chars = editor.ij.document.charsSequence
+    val chars = editor.charsSequence()
     for (l in range.startLine..range.endLine) {
-      val start = editor.ij.document.getLineStartOffset(l)
-      val end = editor.ij.document.getLineEndOffset(l)
+      val start = editor.getLineStartOffset(l)
+      val end = editor.getLineEndOffset(l, true)
 
       logger.debug("Line $l, start offset=$start, end offset=$end")
 
       for (i in start..end) {
         logger.debug(
-          "Offset $i, char=${chars[i]}, lp=${editor.offsetToLogicalPosition(i)}, vp=${editor.ij.offsetToVisualPosition(i)}"
+          "Offset $i, char=${chars[i]}, lp=${editor.offsetToLogicalPosition(i)}, vp=${editor.offsetToVisualPosition(i)}"
         )
       }
     }
@@ -52,6 +51,6 @@ data class DumpLineCommand(val ranges: Ranges, val argument: String) : Command.S
   }
 
   companion object {
-    private val logger = Logger.getInstance(DumpLineCommand::class.java.name)
+    private val logger = vimLogger<DumpLineCommand>()
   }
 }

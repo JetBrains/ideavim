@@ -18,21 +18,30 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
- * see "h :file"
+ * see "h :class"
  */
-data class FileCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
-  override val argFlags = flags(RangeFlag.RANGE_IS_COUNT, ArgumentFlag.ARGUMENT_FORBIDDEN, Access.READ_ONLY)
-
+data class FindClassCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
+  override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
   override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
-    val count = getCount(editor, 0, false)
-    VimPlugin.getFile().displayFileInfo(editor, count > 0)
+    val arg = argument
+    if (arg.isNotEmpty()) {
+      val res = injector.file.openFile("$arg.java", context)
+      if (res) {
+        injector.markGroup.saveJumpLocation(editor)
+      }
+
+      return if (res) ExecutionResult.Success else ExecutionResult.Error
+    }
+
+    injector.application.invokeLater { injector.actionExecutor.executeAction("GotoClass", context) }
+
     return ExecutionResult.Success
   }
 }

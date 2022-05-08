@@ -29,6 +29,8 @@ import com.maddyhome.idea.vim.common.VimRange
 import com.maddyhome.idea.vim.common.VimScrollType
 import com.maddyhome.idea.vim.common.offset
 import com.maddyhome.idea.vim.common.pointer
+import java.util.*
+import java.util.function.ToIntFunction
 
 /**
  * Every line in [VimEditor] ends with a new line TODO <- this is probably not true already
@@ -141,8 +143,13 @@ interface VimEditor {
   fun getLineRange(line: EditorLine.Pointer): Pair<Offset, Offset>
   fun charAt(offset: Pointer): Char
   fun carets(): List<VimCaret>
+  fun sortedCarets(): List<VimCaret> = carets().sortedByOffset()
   fun nativeCarets(): List<VimCaret>
+  fun sortedNativeCarets(): List<VimCaret> = nativeCarets().sortedByOffset()
 
+  private fun List<VimCaret>.sortedByOffset(): List<VimCaret> {
+    return this.sortedWith(compareBy{ it.offset.point } ).reversed()
+  }
   /**
    * This method should perform caret merging after the operations. This is similar to IJ runForEachCaret
    * TODO review
@@ -161,6 +168,8 @@ interface VimEditor {
    */
   fun primaryCaret(): VimCaret
   fun currentCaret(): VimCaret
+
+  fun charsSequence(): CharSequence
 
   fun isWritable(): Boolean
   fun isDocumentWritable(): Boolean
@@ -183,6 +192,10 @@ interface VimEditor {
 
   fun offsetToLogicalPosition(offset: Int): VimLogicalPosition
   fun logicalPositionToOffset(position: VimLogicalPosition): Int
+
+  fun offsetToVisualPosition(offset: Int): VimVisualPosition
+  fun visualPositionToOffset(position: VimVisualPosition): Offset
+
   fun lineLength(line: Int): Int
 
   fun removeCaret(caret: VimCaret)
@@ -203,8 +216,6 @@ interface VimEditor {
   fun getPath(): String?
   fun extractProtocol(): String?
 
-  fun visualPositionToOffset(position: VimVisualPosition): Offset
-
   fun exitInsertMode(context: ExecutionContext, operatorArguments: OperatorArguments)
   fun exitSelectModeNative(adjustCaret: Boolean)
   fun exitVisualModeNative()
@@ -216,6 +227,8 @@ interface VimEditor {
 
   fun startGuardedBlockChecking()
   fun stopGuardedBlockChecking()
+
+  fun hasUnsavedChanges(): Boolean
 }
 
 interface MutableVimEditor : VimEditor {

@@ -20,24 +20,18 @@ package com.maddyhome.idea.vim.vimscript.model.commands
 
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.ex.ExOutputModel
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.ranges.Ranges
-import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
-import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 
 /**
- * see "h :echo"
+ * see "h :quitall"
  */
-data class EchoCommand(val ranges: Ranges, val args: List<Expression>) : Command.SingleExecution(ranges) {
+data class ExitCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
+  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
-  override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
-
-  override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult.Success {
-    val text = args.joinToString(separator = " ", postfix = "\n") {
-      it.evaluate(editor, context, this).toString()
-    }
-    ExOutputModel.getInstance(editor.ij).output(text)
+  override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
+    injector.window.closeAll(context)
     return ExecutionResult.Success
   }
 }

@@ -86,14 +86,14 @@ public class ProcessGroup implements VimProcessGroup {
     return panel.getText();
   }
 
-  public void startExCommand(@NotNull Editor editor, DataContext context, @NotNull Command cmd) {
+  public void startExCommand(@NotNull VimEditor editor, ExecutionContext context, @NotNull Command cmd) {
     // Don't allow ex commands in one line editors
     if (editor.isOneLineMode()) return;
 
-    String initText = getRange(editor, cmd);
-    CommandState.getInstance(new IjVimEditor(editor)).pushModes(CommandState.Mode.CMD_LINE, CommandState.SubMode.NONE);
+    String initText = getRange(((IjVimEditor) editor).getEditor(), cmd);
+    CommandState.getInstance(editor).pushModes(CommandState.Mode.CMD_LINE, CommandState.SubMode.NONE);
     ExEntryPanel panel = ExEntryPanel.getInstance();
-    panel.activate(editor, context, ":", initText, 1);
+    panel.activate(((IjVimEditor) editor).getEditor(), ((IjExecutionContext) context).getContext(), ":", initText, 1);
   }
 
   @Override
@@ -115,12 +115,12 @@ public class ProcessGroup implements VimProcessGroup {
     }
   }
 
-  public boolean processExEntry(final @NotNull Editor editor, final @NotNull DataContext context) {
+  public boolean processExEntry(final @NotNull VimEditor editor, final @NotNull ExecutionContext context) {
     ExEntryPanel panel = ExEntryPanel.getInstance();
     panel.deactivate(true);
     boolean res = true;
     try {
-      CommandState.getInstance(new IjVimEditor(editor)).popModes();
+      CommandState.getInstance(editor).popModes();
 
       logger.debug("processing command");
 
@@ -135,7 +135,7 @@ public class ProcessGroup implements VimProcessGroup {
 
       if (logger.isDebugEnabled()) logger.debug("swing=" + SwingUtilities.isEventDispatchThread());
 
-      VimInjectorKt.getInjector().getVimscriptExecutor().execute(text, new IjVimEditor(editor), new IjExecutionContext(context), false, true, CommandLineVimLContext.INSTANCE);
+      VimInjectorKt.getInjector().getVimscriptExecutor().execute(text, editor, context, false, true, CommandLineVimLContext.INSTANCE);
     }
     catch (ExException e) {
       VimPlugin.showMessage(e.getMessage());
@@ -151,9 +151,9 @@ public class ProcessGroup implements VimProcessGroup {
     return res;
   }
 
-  public void cancelExEntry(final @NotNull Editor editor, boolean resetCaret) {
-    CommandState.getInstance(new IjVimEditor(editor)).popModes();
-    KeyHandler.getInstance().reset(new IjVimEditor(editor));
+  public void cancelExEntry(final @NotNull VimEditor editor, boolean resetCaret) {
+    CommandState.getInstance(editor).popModes();
+    KeyHandler.getInstance().reset(editor);
     ExEntryPanel panel = ExEntryPanel.getInstance();
     panel.deactivate(true, resetCaret);
   }
@@ -183,7 +183,7 @@ public class ProcessGroup implements VimProcessGroup {
     return initText;
   }
 
-  public @Nullable String executeCommand(@NotNull Editor editor, @NotNull String command, @Nullable CharSequence input, @Nullable String currentDirectoryPath)
+  public @Nullable String executeCommand(@NotNull VimEditor editor, @NotNull String command, @Nullable CharSequence input, @Nullable String currentDirectoryPath)
     throws ExecutionException, ProcessCanceledException {
 
     // This is a much simplified version of how Vim does this. We're using stdin/stdout directly, while Vim will
@@ -262,7 +262,7 @@ public class ProcessGroup implements VimProcessGroup {
 
       // Get stderr; stdout and strip colors, which are not handles properly.
       return (output.getStderr() + output.getStdout()).replaceAll("\u001B\\[[;\\d]*m", "");
-    }, "IdeaVim - !" + command, true, editor.getProject());
+    }, "IdeaVim - !" + command, true, ((IjVimEditor) editor).getEditor().getProject());
   }
 
   private String doEscape(String original, String charsToEscape, String escapeChar) {

@@ -20,38 +20,28 @@ package com.maddyhome.idea.vim.vimscript.model.commands
 
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
-import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
-import com.maddyhome.idea.vim.vimscript.services.FunctionStorage
 
 /**
- * see "h :delfunction"
+ * see "h :file"
  */
-data class DelfunctionCommand(
-  val ranges: Ranges,
-  val scope: Scope?,
-  val name: String,
-  val ignoreIfMissing: Boolean,
-) : Command.SingleExecution(ranges) {
-
+data class FindFileCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
   override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
-
   override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
-    if (ignoreIfMissing) {
-      try {
-        FunctionStorage.deleteFunction(name, scope, this)
-      } catch (e: ExException) {
-        if (e.message != null && e.message!!.startsWith("E130")) {
-          // "ignoreIfMissing" flag handles the "E130: Unknown function" exception
-        } else {
-          throw e
-        }
+    val arg = argument
+    if (arg.isNotEmpty()) {
+      val res = injector.file.openFile(arg, context)
+      if (res) {
+        injector.markGroup.saveJumpLocation(editor)
       }
-    } else {
-      FunctionStorage.deleteFunction(name, scope, this)
+
+      return if (res) ExecutionResult.Success else ExecutionResult.Error
     }
+
+    injector.application.invokeLater { injector.actionExecutor.executeAction("GotoFile", context) }
+
     return ExecutionResult.Success
   }
 }

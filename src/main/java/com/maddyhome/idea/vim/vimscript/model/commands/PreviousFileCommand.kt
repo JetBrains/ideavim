@@ -34,7 +34,7 @@ data class PreviousFileCommand(val ranges: Ranges, val argument: String) : Comma
     val count = getCount(editor, 1, true)
 
     VimPlugin.getMark().saveJumpLocation(editor)
-    VimPlugin.getFile().selectNextFile(-count, context.ij)
+    VimPlugin.getFile().selectNextFile(-count, context)
 
     return ExecutionResult.Success
   }

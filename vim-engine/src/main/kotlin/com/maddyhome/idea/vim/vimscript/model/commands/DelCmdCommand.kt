@@ -18,39 +18,24 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
-import com.intellij.openapi.actionSystem.ActionManager
-import com.intellij.openapi.actionSystem.AnAction
-import com.intellij.openapi.application.ApplicationManager
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.Ranges
-import com.maddyhome.idea.vim.helper.MessageHelper
-import com.maddyhome.idea.vim.helper.runAfterGotFocus
-import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
- * @author smartbomb
+ * see "h :delcommand"
  */
-data class ActionCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges) {
-
-  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY, Flag.SAVE_VISUAL)
-
+data class DelCmdCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
+  override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_REQUIRED, Access.READ_ONLY)
   override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
-    val actionName = argument.trim()
-    val action = ActionManager.getInstance().getAction(actionName) ?: throw ExException(MessageHelper.message("action.not.found.0", actionName))
-    val application = ApplicationManager.getApplication()
-    if (application.isUnitTestMode) {
-      executeAction(action, context)
-    } else {
-      runAfterGotFocus { executeAction(action, context) }
+    if (!injector.commandGroup.hasAlias(argument)) {
+      injector.messages.showStatusBarMessage(injector.messages.message("e184.no.such.user.defined.command.0", argument))
+      return ExecutionResult.Error
     }
-    return ExecutionResult.Success
-  }
 
-  private fun executeAction(action: AnAction, context: ExecutionContext) {
-    injector.actionExecutor.executeAction(action.vim, context)
+    injector.commandGroup.removeAlias(argument)
+    return ExecutionResult.Success
   }
 }

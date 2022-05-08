@@ -35,9 +35,11 @@ interface VimInjector {
   fun commandStateFor(editor: VimEditor): CommandState
   val engineEditorHelper: EngineEditorHelper
   val editorGroup: VimEditorGroup
+  val commandGroup: VimCommandGroup
   val changeGroup: VimChangeGroup
   val actionExecutor: VimActionExecutor
   val exEntryPanel: ExEntryPanel
+  val exOutputPanel: VimExOutputPanelService
   val clipboardManager: VimClipboardManager
 
   val searchHelper: VimSearchHelper

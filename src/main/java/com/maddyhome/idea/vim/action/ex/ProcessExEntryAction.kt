@@ -43,6 +43,6 @@ class ProcessExEntryAction : VimActionHandler.SingleExecution(), ComplicatedKeys
   override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_COMPLETE_EX)
 
   override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
-    return VimPlugin.getProcess().processExEntry(editor.ij, context.ij)
+    return VimPlugin.getProcess().processExEntry(editor, context)
   }
 }

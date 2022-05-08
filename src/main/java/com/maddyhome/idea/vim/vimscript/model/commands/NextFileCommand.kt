@@ -34,7 +34,7 @@ data class NextFileCommand(val ranges: Ranges, val argument: String) : Command.S
   override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
     val count = getCount(editor, 1, true)
     VimPlugin.getMark().saveJumpLocation(editor)
-    VimPlugin.getFile().selectNextFile(count, context.ij)
+    VimPlugin.getFile().selectNextFile(count, context)
     return ExecutionResult.Success
   }
 }

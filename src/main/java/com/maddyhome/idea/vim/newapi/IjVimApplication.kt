@@ -88,6 +88,10 @@ class IjVimApplication : VimApplication {
     return ExceptionUtil.currentStackTrace()
   }
 
+  override fun runAfterGotFocus(runnable: Runnable) {
+    com.maddyhome.idea.vim.helper.runAfterGotFocus(runnable)
+  }
+
   private fun createKeyEvent(stroke: KeyStroke, component: Component): KeyEvent {
     return KeyEvent(
       component,

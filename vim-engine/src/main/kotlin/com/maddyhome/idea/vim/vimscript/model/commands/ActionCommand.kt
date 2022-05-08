@@ -18,25 +18,36 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.NativeAction
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.Ranges
-import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
- * see "h :delcommand"
+ * @author smartbomb
  */
-data class DelCmdCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
-  override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_REQUIRED, Access.READ_ONLY)
-  override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
-    if (!VimPlugin.getCommand().hasAlias(argument)) {
-      VimPlugin.showMessage(MessageHelper.message("e184.no.such.user.defined.command.0", argument))
-      return ExecutionResult.Error
-    }
+data class ActionCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges) {
 
-    VimPlugin.getCommand().removeAlias(argument)
+  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL,
+    ArgumentFlag.ARGUMENT_OPTIONAL,
+    Access.READ_ONLY,
+    Flag.SAVE_VISUAL)
+
+  override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
+    val actionName = argument.trim()
+    val action = injector.actionExecutor.getAction(actionName) ?: throw ExException(injector.messages.message("action.not.found.0", actionName))
+    if (injector.application.isUnitTest()) {
+      executeAction(action, context)
+    } else {
+      injector.application.runAfterGotFocus { executeAction(action, context) }
+    }
     return ExecutionResult.Success
+  }
+
+  private fun executeAction(action: NativeAction, context: ExecutionContext) {
+    injector.actionExecutor.executeAction(action, context)
   }
 }

@@ -63,4 +63,7 @@ interface VimActionExecutor {
     context: ExecutionContext,
     operatorArguments: OperatorArguments,
   )
+
+  fun getAction(actionId: String): NativeAction?
+  fun getActionIdList(idPrefix: String): List<String>
 }

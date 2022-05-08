@@ -155,6 +155,14 @@ class IjActionExecutor : VimActionExecutor {
       )
   }
 
+  override fun getAction(actionId: String): NativeAction? {
+    return ActionManager.getInstance().getAction(actionId)?.let { IjNativeAction(it) }
+  }
+
+  override fun getActionIdList(idPrefix: String): List<String> {
+    return ActionManager.getInstance().getActionIdList(idPrefix)
+  }
+
   // This method is copied from com.intellij.openapi.editor.actionSystem.EditorAction.getProjectAwareDataContext
   private fun getProjectAwareDataContext(
     editor: Editor,

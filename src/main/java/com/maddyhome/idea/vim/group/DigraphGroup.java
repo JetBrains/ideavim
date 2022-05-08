@@ -21,8 +21,10 @@ package com.maddyhome.idea.vim.group;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.api.VimDigraphGroupBase;
+import com.maddyhome.idea.vim.api.VimEditor;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
 import com.maddyhome.idea.vim.helper.EditorHelper;
+import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -49,9 +51,9 @@ public class DigraphGroup extends VimDigraphGroupBase {
     }
   }
 
-  public boolean parseCommandLine(@NotNull Editor editor, @NotNull String args) {
+  public boolean parseCommandLine(@NotNull VimEditor editor, @NotNull String args) {
     if (args.length() == 0) {
-      showDigraphs(editor);
+      showDigraphs(((IjVimEditor) editor).getEditor());
 
       return true;
     }

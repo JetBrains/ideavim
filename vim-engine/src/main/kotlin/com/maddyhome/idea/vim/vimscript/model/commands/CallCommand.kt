@@ -18,9 +18,9 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
@@ -31,7 +31,6 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.FunctionCallExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
 import com.maddyhome.idea.vim.vimscript.model.functions.DefinedFunctionHandler
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
-import com.maddyhome.idea.vim.vimscript.services.FunctionStorage
 
 /**
  * see "h :call"
@@ -42,7 +41,7 @@ class CallCommand(val ranges: Ranges, val functionCall: Expression) : Command.Si
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
     if (functionCall is FunctionCallExpression) {
-      val function = FunctionStorage.getFunctionHandlerOrNull(
+      val function = injector.functionService.getFunctionHandlerOrNull(
         functionCall.scope,
         functionCall.functionName.evaluate(editor, context, vimContext).value,
         vimContext
@@ -60,7 +59,7 @@ class CallCommand(val ranges: Ranges, val functionCall: Expression) : Command.Si
       }
 
       val name = (functionCall.scope?.toString() ?: "") + functionCall.functionName.evaluate(editor, context, vimContext)
-      val funcref = VimPlugin.getVariableService().getNullableVariableValue(Variable(functionCall.scope, functionCall.functionName), editor, context, vimContext)
+      val funcref = injector.variableService.getNullableVariableValue(Variable(functionCall.scope, functionCall.functionName), editor, context, vimContext)
       if (funcref is VimFuncref) {
         funcref.handler.ranges = ranges
         funcref.execute(name, functionCall.arguments, editor, context, vimContext)

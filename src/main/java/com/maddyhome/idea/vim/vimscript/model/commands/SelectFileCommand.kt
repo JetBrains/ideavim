@@ -35,7 +35,7 @@ data class SelectFileCommand(val ranges: Ranges, val argument: String) : Command
     val count = getCount(editor, 0, true)
 
     if (count > 0) {
-      val res = VimPlugin.getFile().selectFile(count - 1, context.ij)
+      val res = VimPlugin.getFile().selectFile(count - 1, context)
       if (res) {
         VimPlugin.getMark().saveJumpLocation(editor)
       }

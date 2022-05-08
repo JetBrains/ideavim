@@ -181,6 +181,10 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
     return IjVimCaret(editor.caretModel.currentCaret)
   }
 
+  override fun charsSequence(): CharSequence {
+    return editor.document.charsSequence
+  }
+
   override fun isWritable(): Boolean {
     val modificationAllowed = EditorModificationUtil.checkModificationAllowed(editor)
     val writeRequested = EditorModificationUtil.requestWriting(editor)
@@ -242,6 +246,10 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
 
   override fun lineStartForOffset(offset: Int): Int {
     return EditorHelper.getLineStartForOffset(editor, offset)
+  }
+
+  override fun offsetToVisualPosition(offset: Int): VimVisualPosition {
+    return editor.offsetToVisualPosition(offset).let { VimVisualPosition(it.line, it.column, it.leansRight) }
   }
 
   override fun offsetToLogicalPosition(offset: Int): VimLogicalPosition {
@@ -361,6 +369,10 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
 
   override fun isTemplateActive(): Boolean {
     return editor.isTemplateActive()
+  }
+
+  override fun hasUnsavedChanges(): Boolean {
+    return EditorHelper.hasUnsavedChanges(this.editor)
   }
 
   private fun Pair<Offset, Offset>.noGuard(editor: Editor): Boolean {

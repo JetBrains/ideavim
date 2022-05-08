@@ -31,7 +31,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 data class SelectFirstFileCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
   override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
-    val res = VimPlugin.getFile().selectFile(0, context.ij)
+    val res = VimPlugin.getFile().selectFile(0, context)
     if (res) {
       VimPlugin.getMark().saveJumpLocation(editor)
     }

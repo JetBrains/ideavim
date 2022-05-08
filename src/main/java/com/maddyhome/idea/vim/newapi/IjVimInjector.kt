@@ -11,10 +11,14 @@ import com.maddyhome.idea.vim.api.VimActionExecutor
 import com.maddyhome.idea.vim.api.VimApplication
 import com.maddyhome.idea.vim.api.VimChangeGroup
 import com.maddyhome.idea.vim.api.VimClipboardManager
+import com.maddyhome.idea.vim.api.VimCommandGroup
 import com.maddyhome.idea.vim.api.VimDigraphGroup
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimEditorGroup
 import com.maddyhome.idea.vim.api.VimEnabler
+import com.maddyhome.idea.vim.api.VimExOutputPanel
+import com.maddyhome.idea.vim.api.VimExOutputPanelService
+import com.maddyhome.idea.vim.api.VimExceptionUtil
 import com.maddyhome.idea.vim.api.VimFile
 import com.maddyhome.idea.vim.api.VimInjector
 import com.maddyhome.idea.vim.api.VimKeyGroup
@@ -35,6 +39,8 @@ import com.maddyhome.idea.vim.api.VimscriptParser
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.common.VimMachine
 import com.maddyhome.idea.vim.diagnostic.VimLogger
+import com.maddyhome.idea.vim.ex.ExOutputModel
+import com.maddyhome.idea.vim.group.CommandGroup
 import com.maddyhome.idea.vim.group.EditorGroup
 import com.maddyhome.idea.vim.group.FileGroup
 import com.maddyhome.idea.vim.group.MacroGroup
@@ -71,6 +77,12 @@ class IjVimInjector : VimInjector {
     get() = service<IjActionExecutor>()
   override val exEntryPanel: ExEntryPanel
     get() = service<IjExEntryPanel>()
+  override val exOutputPanel: VimExOutputPanelService
+    get() = object : VimExOutputPanelService {
+      override fun getPanel(editor: VimEditor): VimExOutputPanel {
+        return ExOutputModel.getInstance(editor.ij)
+      }
+    }
   override val clipboardManager: VimClipboardManager
     get() = service<IjClipboardManager>()
   override val searchHelper: VimSearchHelper
@@ -127,6 +139,8 @@ class IjVimInjector : VimInjector {
     get() = service()
   override val statisticsService: VimStatistics
     get() = service()
+  override val commandGroup: VimCommandGroup
+    get() = service<CommandGroup>()
 
   override val functionService: VimscriptFunctionService
     get() = FunctionStorage

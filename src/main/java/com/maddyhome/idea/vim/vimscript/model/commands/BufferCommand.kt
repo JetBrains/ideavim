@@ -48,7 +48,7 @@ data class BufferCommand(val ranges: Ranges, val argument: String) : Command.Sin
       if (buffer.matches(Regex("^\\d+$"))) {
         val bufNum = buffer.toInt() - 1
 
-        if (!VimPlugin.getFile().selectFile(bufNum, context.ij)) {
+        if (!VimPlugin.getFile().selectFile(bufNum, context)) {
           VimPlugin.showMessage(MessageHelper.message("buffer.0.does.not.exist", bufNum))
           result = false
         }
@@ -67,7 +67,7 @@ data class BufferCommand(val ranges: Ranges, val argument: String) : Command.Sin
               VimPlugin.showMessage(MessageHelper.message("no.write.since.last.change.add.to.override"))
               result = false
             } else {
-              VimPlugin.getFile().openFile(EditorHelper.getVirtualFile(editors[0].ij)!!.name, context.ij)
+              VimPlugin.getFile().openFile(EditorHelper.getVirtualFile(editors[0].ij)!!.name, context)
             }
           }
           else -> {

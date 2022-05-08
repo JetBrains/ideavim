@@ -18,16 +18,13 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
-import com.intellij.openapi.util.NlsSafe
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimCommandGroup.Companion.BLACKLISTED_ALIASES
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.CommandAlias
-import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.ex.ranges.Ranges
-import com.maddyhome.idea.vim.group.CommandGroup.Companion.BLACKLISTED_ALIASES
-import com.maddyhome.idea.vim.helper.MessageHelper
-import com.maddyhome.idea.vim.newapi.ij
+import com.maddyhome.idea.vim.helper.VimNlsSafe
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
@@ -41,7 +38,7 @@ data class CmdCommand(val ranges: Ranges, val argument: String) : Command.Single
   private companion object {
     const val overridePrefix = "!"
 
-    @NlsSafe
+    @VimNlsSafe
     const val argsPrefix = "-nargs"
 
     const val anyNumberOfArguments = "*"
@@ -59,13 +56,13 @@ data class CmdCommand(val ranges: Ranges, val argument: String) : Command.Single
 
   private fun listAlias(editor: VimEditor, filter: String): Boolean {
     val lineSeparator = "\n"
-    val allAliases = VimPlugin.getCommand().listAliases()
+    val allAliases = injector.commandGroup.listAliases()
     val aliases = allAliases.filter {
       (filter.isEmpty() || it.key.startsWith(filter))
     }.map {
       "${it.key.padEnd(12)}${it.value.numberOfArguments.padEnd(11)}${it.value.printValue()}"
     }.sortedWith(String.CASE_INSENSITIVE_ORDER).joinToString(lineSeparator)
-    ExOutputModel.getInstance(editor.ij).output("Name        Args       Definition$lineSeparator$aliases")
+    injector.exOutputPanel.getPanel(editor).output("Name        Args       Definition$lineSeparator$aliases")
     return true
   }
 
@@ -87,7 +84,7 @@ data class CmdCommand(val ranges: Ranges, val argument: String) : Command.Single
       // in the actual alias being created, and we don't want to parse that one.
       val trimmedInput = argument.takeWhile { it != ' ' }
       val pattern = Regex("(?>-nargs=((|[-])\\d+|[?]|[+]|[*]))").find(trimmedInput) ?: run {
-        VimPlugin.showMessage(MessageHelper.message("e176.invalid.number.of.arguments"))
+        injector.messages.showStatusBarMessage(injector.messages.message("e176.invalid.number.of.arguments"))
         return false
       }
       val nargForTrim = pattern.groupValues[0]
@@ -110,7 +107,7 @@ data class CmdCommand(val ranges: Ranges, val argument: String) : Command.Single
             // I missed something, since the regex limits the value to be ? + * or
             // a valid number, its not possible (as far as I know) to have another value
             // that regex would accept that is not valid.
-            VimPlugin.showMessage(MessageHelper.message("e176.invalid.number.of.arguments"))
+            injector.messages.showStatusBarMessage(injector.messages.message("e176.invalid.number.of.arguments"))
             return false
           }
         }
@@ -118,7 +115,7 @@ data class CmdCommand(val ranges: Ranges, val argument: String) : Command.Single
         // Not sure why this isn't documented, but if you try to create a command in vim
         // with an explicit number of arguments greater than 1 it returns this error.
         if (argNum > 1 || argNum < 0) {
-          VimPlugin.showMessage(MessageHelper.message("e176.invalid.number.of.arguments"))
+          injector.messages.showStatusBarMessage(injector.messages.message("e176.invalid.number.of.arguments"))
           return false
         }
         minNumberOfArgs = argNum
@@ -140,12 +137,12 @@ data class CmdCommand(val ranges: Ranges, val argument: String) : Command.Single
 
     // User-aliases need to begin with an uppercase character.
     if (!alias[0].isUpperCase()) {
-      VimPlugin.showMessage(MessageHelper.message("e183.user.defined.commands.must.start.with.an.uppercase.letter"))
+      injector.messages.showStatusBarMessage(injector.messages.message("e183.user.defined.commands.must.start.with.an.uppercase.letter"))
       return false
     }
 
     if (alias in BLACKLISTED_ALIASES) {
-      VimPlugin.showMessage(MessageHelper.message("e841.reserved.name.cannot.be.used.for.user.defined.command"))
+      injector.messages.showStatusBarMessage(injector.messages.message("e841.reserved.name.cannot.be.used.for.user.defined.command"))
       return false
     }
 
@@ -160,15 +157,15 @@ data class CmdCommand(val ranges: Ranges, val argument: String) : Command.Single
 
     // If we are not over-writing existing aliases, and an alias with the same command
     // already exists then we want to do nothing.
-    if (!overrideAlias && VimPlugin.getCommand().hasAlias(alias)) {
-      VimPlugin.showMessage(MessageHelper.message("e174.command.already.exists.add.to.replace.it"))
+    if (!overrideAlias && injector.commandGroup.hasAlias(alias)) {
+      injector.messages.showStatusBarMessage(injector.messages.message("e174.command.already.exists.add.to.replace.it"))
       return false
     }
 
     // Store the alias and the command. We don't need to parse the argument
     // at this time, if the syntax is wrong an error will be returned when
     // the alias is executed.
-    VimPlugin.getCommand().setAlias(alias, CommandAlias.Ex(minNumberOfArgs, maxNumberOfArgs, alias, argument))
+    injector.commandGroup.setAlias(alias, CommandAlias.Ex(minNumberOfArgs, maxNumberOfArgs, alias, argument))
 
     return true
   }

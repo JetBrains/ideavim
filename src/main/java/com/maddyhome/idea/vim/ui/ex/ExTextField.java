@@ -29,6 +29,7 @@ import com.maddyhome.idea.vim.group.EditorHolderService;
 import com.maddyhome.idea.vim.helper.UiHelper;
 import com.maddyhome.idea.vim.history.HistoryConstants;
 import com.maddyhome.idea.vim.history.HistoryEntry;
+import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.GuiCursorAttributes;
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.GuiCursorMode;
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.GuiCursorOptionHelper;
@@ -316,7 +317,7 @@ public class ExTextField extends JTextField {
    */
   void cancel() {
     clearCurrentAction();
-    VimPlugin.getProcess().cancelExEntry(EditorHolderService.getInstance().getEditor(), true);
+    VimPlugin.getProcess().cancelExEntry(new IjVimEditor(EditorHolderService.getInstance().getEditor()), true);
   }
 
   public void setCurrentAction(@NotNull MultiStepAction action, char pendingIndicator) {

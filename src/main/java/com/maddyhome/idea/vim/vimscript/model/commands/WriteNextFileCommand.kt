@@ -35,7 +35,7 @@ data class WriteNextFileCommand(val ranges: Ranges, val argument: String) : Comm
 
     VimPlugin.getFile().saveFile(context)
     VimPlugin.getMark().saveJumpLocation(editor)
-    VimPlugin.getFile().selectNextFile(count, context.ij)
+    VimPlugin.getFile().selectNextFile(count, context)
 
     return ExecutionResult.Success
   }

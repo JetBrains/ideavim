@@ -79,7 +79,7 @@ data class CmdFilterCommand(val ranges: Ranges, val argument: String) : Command.
     return try {
       if (ranges.size() == 0) {
         // Show command output in a window
-        VimPlugin.getProcess().executeCommand(editor.ij, command, null, workingDirectory)?.let {
+        VimPlugin.getProcess().executeCommand(editor, command, null, workingDirectory)?.let {
           ExOutputModel.getInstance(editor.ij).output(it)
         }
         ExecutionResult.Success
@@ -87,7 +87,7 @@ data class CmdFilterCommand(val ranges: Ranges, val argument: String) : Command.
         // Filter
         val range = this.getTextRange(editor, false)
         val input = editor.ij.document.charsSequence.subSequence(range.startOffset, range.endOffset)
-        VimPlugin.getProcess().executeCommand(editor.ij, command, input, workingDirectory)?.let {
+        VimPlugin.getProcess().executeCommand(editor, command, input, workingDirectory)?.let {
           ApplicationManager.getApplication().runWriteAction {
             val start = editor.offsetToLogicalPosition(range.startOffset)
             val end = editor.offsetToLogicalPosition(range.endOffset)

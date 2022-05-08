@@ -19,24 +19,27 @@ package com.maddyhome.idea.vim.ex
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.VimExOutputPanel
 import com.maddyhome.idea.vim.helper.vimExOutput
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.ui.ExOutputPanel
 
 /**
  * @author vlan
  */
-class ExOutputModel private constructor(private val myEditor: Editor) {
-  var text: String? = null
+class ExOutputModel private constructor(private val myEditor: Editor) : VimExOutputPanel {
+  override var text: String? = null
     private set
 
-  fun output(text: String) {
+  override fun output(text: String) {
     this.text = text
     if (!ApplicationManager.getApplication().isUnitTestMode) {
       ExOutputPanel.getInstance(myEditor).setText(text)
     }
   }
 
-  fun clear() {
+  override fun clear() {
     text = null
     if (!ApplicationManager.getApplication().isUnitTestMode) {
       ExOutputPanel.getInstance(myEditor).deactivate(false)

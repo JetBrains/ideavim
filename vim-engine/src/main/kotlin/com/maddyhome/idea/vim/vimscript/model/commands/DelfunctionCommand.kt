@@ -18,35 +18,40 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.command.SelectionType
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
+import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 
 /**
- * see "h :delete"
+ * see "h :delfunction"
  */
-data class DeleteLinesCommand(val ranges: Ranges, var argument: String) : Command.ForEachCaret(ranges, argument) {
-  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.WRITABLE)
+data class DelfunctionCommand(
+  val ranges: Ranges,
+  val scope: Scope?,
+  val name: String,
+  val ignoreIfMissing: Boolean,
+) : Command.SingleExecution(ranges) {
 
-  override fun processCommand(editor: VimEditor, caret: VimCaret, context: ExecutionContext): ExecutionResult {
-    val argument = this.argument
-    val register = if (argument.isNotEmpty() && !argument[0].isDigit()) {
-      this.argument = argument.substring(1)
-      argument[0]
+  override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+
+  override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
+    if (ignoreIfMissing) {
+      try {
+        injector.functionService.deleteFunction(name, scope, this)
+      } catch (e: ExException) {
+        if (e.message != null && e.message!!.startsWith("E130")) {
+          // "ignoreIfMissing" flag handles the "E130: Unknown function" exception
+        } else {
+          throw e
+        }
+      }
     } else {
-      VimPlugin.getRegister().defaultRegister
+      injector.functionService.deleteFunction(name, scope, this)
     }
-
-    if (!VimPlugin.getRegister().selectRegister(register)) return ExecutionResult.Error
-
-    val textRange = getTextRange(editor, caret, true)
-    return if (VimPlugin.getChange()
-      .deleteRange(editor, caret, textRange, SelectionType.LINE_WISE, false)
-    ) ExecutionResult.Success
-    else ExecutionResult.Error
+    return ExecutionResult.Success
   }
 }

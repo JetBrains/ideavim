@@ -28,4 +28,5 @@ interface VimWindowGroup {
   fun splitWindowVertical(context: ExecutionContext, filename: String)
   fun splitWindowHorizontal(context: ExecutionContext, filename: String)
   fun closeCurrentWindow(context: ExecutionContext)
+  fun closeAll(context: ExecutionContext)
 }

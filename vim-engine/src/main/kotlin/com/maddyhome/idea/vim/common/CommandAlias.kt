@@ -18,11 +18,10 @@
 
 package com.maddyhome.idea.vim.common
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.ranges.Ranges
-import com.maddyhome.idea.vim.helper.MessageHelper
 import org.jetbrains.annotations.NonNls
 
 /**
@@ -47,8 +46,8 @@ sealed class CommandAlias(
       var compiledCommand = this.command
       val cleanedInput = input.trim().removePrefix(name).trim()
       if (minimumNumberOfArguments > 0 && cleanedInput.isEmpty()) {
-        VimPlugin.showMessage(MessageHelper.message("e471.argument.required"))
-        VimPlugin.indicateError()
+        injector.messages.showStatusBarMessage(injector.messages.message("e471.argument.required"))
+        injector.messages.indicateError()
         return GoalCommand.Ex.EMPTY
       }
       for (symbol in arrayOf(Count, Arguments, QuotedArguments)) {
