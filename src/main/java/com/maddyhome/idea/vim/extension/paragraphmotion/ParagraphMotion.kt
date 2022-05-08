@@ -18,7 +18,6 @@
 
 package com.maddyhome.idea.vim.extension.paragraphmotion
 
-import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.api.ExecutionContext

@@ -19,9 +19,7 @@
 package org.jetbrains.plugins.ideavim.extension
 
 import com.intellij.ide.plugins.PluginManagerCore
-import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.application.invokeLater
-import com.intellij.openapi.editor.Editor
 import com.intellij.testFramework.PlatformTestUtil
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
