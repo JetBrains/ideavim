@@ -18,7 +18,6 @@ import com.maddyhome.idea.vim.api.VimEditorGroup
 import com.maddyhome.idea.vim.api.VimEnabler
 import com.maddyhome.idea.vim.api.VimExOutputPanel
 import com.maddyhome.idea.vim.api.VimExOutputPanelService
-import com.maddyhome.idea.vim.api.VimExceptionUtil
 import com.maddyhome.idea.vim.api.VimExtensionRegistrator
 import com.maddyhome.idea.vim.api.VimFile
 import com.maddyhome.idea.vim.api.VimInjector

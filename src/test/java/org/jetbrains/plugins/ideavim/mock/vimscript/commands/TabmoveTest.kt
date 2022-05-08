@@ -20,7 +20,6 @@ package org.jetbrains.plugins.ideavim.mock.vimscript.commands
 
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.TabService
-import com.maddyhome.idea.vim.newapi.ij
 import org.jetbrains.plugins.ideavim.mock.MockTestCase
 import org.mockito.Mockito
 import org.mockito.kotlin.any

@@ -19,10 +19,8 @@ package com.maddyhome.idea.vim.ex
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
-import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimExOutputPanel
 import com.maddyhome.idea.vim.helper.vimExOutput
-import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.ui.ExOutputPanel
 
 /**
