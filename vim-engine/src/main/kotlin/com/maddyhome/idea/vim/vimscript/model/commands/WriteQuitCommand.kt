@@ -16,13 +16,23 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.group
+package com.maddyhome.idea.vim.vimscript.model.commands
 
-import com.intellij.openapi.actionSystem.DataContext
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.ex.ranges.Ranges
+import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
-interface TabService {
+/**
+ * see "h :exit"
+ */
+data class WriteQuitCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
+  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+  override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
+    injector.file.saveFile(context)
+    injector.file.closeFile(editor, context)
 
-  fun getTabCount(context: DataContext): Int
-  fun getCurrentTabIndex(context: DataContext): Int
-  fun moveCurrentTabToIndex(index: Int, context: DataContext)
+    return ExecutionResult.Success
+  }
 }

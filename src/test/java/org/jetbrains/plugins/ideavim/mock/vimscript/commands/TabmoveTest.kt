@@ -31,44 +31,44 @@ class TabmoveTest : MockTestCase() {
 
   fun `test move to the first index`() {
     val tabService = mockService(TabService::class.java)
-    Mockito.`when`(tabService.getCurrentTabIndex(contextStub.ij)).thenReturn(2)
-    Mockito.`when`(tabService.getTabCount(contextStub.ij)).thenReturn(5)
+    Mockito.`when`(tabService.getCurrentTabIndex(contextStub)).thenReturn(2)
+    Mockito.`when`(tabService.getTabCount(contextStub)).thenReturn(5)
     injector.vimscriptExecutor.execute("tabmove 0", editorStub, contextStub, skipHistory = false)
 
-    verify(tabService).moveCurrentTabToIndex(0, contextStub.ij)
+    verify(tabService).moveCurrentTabToIndex(0, contextStub)
   }
 
   fun `test move to the last index`() {
     val tabService = mockService(TabService::class.java)
-    Mockito.`when`(tabService.getCurrentTabIndex(contextStub.ij)).thenReturn(2)
-    Mockito.`when`(tabService.getTabCount(contextStub.ij)).thenReturn(5)
+    Mockito.`when`(tabService.getCurrentTabIndex(contextStub)).thenReturn(2)
+    Mockito.`when`(tabService.getTabCount(contextStub)).thenReturn(5)
     injector.vimscriptExecutor.execute("tabmove $", editorStub, contextStub, skipHistory = false)
 
-    verify(tabService).moveCurrentTabToIndex(4, contextStub.ij)
+    verify(tabService).moveCurrentTabToIndex(4, contextStub)
   }
 
   fun `test move to index that is greater than current`() {
     val tabService = mockService(TabService::class.java)
-    Mockito.`when`(tabService.getCurrentTabIndex(contextStub.ij)).thenReturn(4)
-    Mockito.`when`(tabService.getTabCount(contextStub.ij)).thenReturn(5)
+    Mockito.`when`(tabService.getCurrentTabIndex(contextStub)).thenReturn(4)
+    Mockito.`when`(tabService.getTabCount(contextStub)).thenReturn(5)
     injector.vimscriptExecutor.execute("tabmove 2", editorStub, contextStub, skipHistory = false)
 
-    verify(tabService).moveCurrentTabToIndex(2, contextStub.ij)
+    verify(tabService).moveCurrentTabToIndex(2, contextStub)
   }
 
   fun `test move to index that is less than current`() {
     val tabService = mockService(TabService::class.java)
-    Mockito.`when`(tabService.getCurrentTabIndex(contextStub.ij)).thenReturn(1)
-    Mockito.`when`(tabService.getTabCount(contextStub.ij)).thenReturn(5)
+    Mockito.`when`(tabService.getCurrentTabIndex(contextStub)).thenReturn(1)
+    Mockito.`when`(tabService.getTabCount(contextStub)).thenReturn(5)
     injector.vimscriptExecutor.execute("tabmove 3", editorStub, contextStub, skipHistory = false)
 
-    verify(tabService).moveCurrentTabToIndex(2, contextStub.ij)
+    verify(tabService).moveCurrentTabToIndex(2, contextStub)
   }
 
   fun `test move to nonexistent index`() {
     val tabService = mockService(TabService::class.java)
-    Mockito.`when`(tabService.getCurrentTabIndex(contextStub.ij)).thenReturn(2)
-    Mockito.`when`(tabService.getTabCount(contextStub.ij)).thenReturn(5)
+    Mockito.`when`(tabService.getCurrentTabIndex(contextStub)).thenReturn(2)
+    Mockito.`when`(tabService.getTabCount(contextStub)).thenReturn(5)
     injector.vimscriptExecutor.execute("tabmove 7", editorStub, contextStub, skipHistory = false)
 
     assertPluginError(true)
@@ -78,26 +78,26 @@ class TabmoveTest : MockTestCase() {
 
   fun `test move to positive relative index`() {
     val tabService = mockService(TabService::class.java)
-    Mockito.`when`(tabService.getCurrentTabIndex(contextStub.ij)).thenReturn(2)
-    Mockito.`when`(tabService.getTabCount(contextStub.ij)).thenReturn(5)
+    Mockito.`when`(tabService.getCurrentTabIndex(contextStub)).thenReturn(2)
+    Mockito.`when`(tabService.getTabCount(contextStub)).thenReturn(5)
     injector.vimscriptExecutor.execute("tabmove +2", editorStub, contextStub, skipHistory = false)
 
-    verify(tabService).moveCurrentTabToIndex(4, contextStub.ij)
+    verify(tabService).moveCurrentTabToIndex(4, contextStub)
   }
 
   fun `test move to negative relative index`() {
     val tabService = mockService(TabService::class.java)
-    Mockito.`when`(tabService.getCurrentTabIndex(contextStub.ij)).thenReturn(4)
-    Mockito.`when`(tabService.getTabCount(contextStub.ij)).thenReturn(5)
+    Mockito.`when`(tabService.getCurrentTabIndex(contextStub)).thenReturn(4)
+    Mockito.`when`(tabService.getTabCount(contextStub)).thenReturn(5)
     injector.vimscriptExecutor.execute("tabmove -2", editorStub, contextStub, skipHistory = false)
 
-    verify(tabService).moveCurrentTabToIndex(2, contextStub.ij)
+    verify(tabService).moveCurrentTabToIndex(2, contextStub)
   }
 
   fun `test move to nonexistent positive relative index`() {
     val tabService = mockService(TabService::class.java)
-    Mockito.`when`(tabService.getCurrentTabIndex(contextStub.ij)).thenReturn(2)
-    Mockito.`when`(tabService.getTabCount(contextStub.ij)).thenReturn(5)
+    Mockito.`when`(tabService.getCurrentTabIndex(contextStub)).thenReturn(2)
+    Mockito.`when`(tabService.getTabCount(contextStub)).thenReturn(5)
     injector.vimscriptExecutor.execute("tabmove +10", editorStub, contextStub, skipHistory = false)
 
     assertPluginError(true)
@@ -107,8 +107,8 @@ class TabmoveTest : MockTestCase() {
 
   fun `test move to nonexistent negative relative index`() {
     val tabService = mockService(TabService::class.java)
-    Mockito.`when`(tabService.getCurrentTabIndex(contextStub.ij)).thenReturn(2)
-    Mockito.`when`(tabService.getTabCount(contextStub.ij)).thenReturn(5)
+    Mockito.`when`(tabService.getCurrentTabIndex(contextStub)).thenReturn(2)
+    Mockito.`when`(tabService.getTabCount(contextStub)).thenReturn(5)
     injector.vimscriptExecutor.execute("tabmove -10", editorStub, contextStub, skipHistory = false)
 
     assertPluginError(true)
@@ -118,8 +118,8 @@ class TabmoveTest : MockTestCase() {
 
   fun `test move to plus zero`() {
     val tabService = mockService(TabService::class.java)
-    Mockito.`when`(tabService.getCurrentTabIndex(contextStub.ij)).thenReturn(2)
-    Mockito.`when`(tabService.getTabCount(contextStub.ij)).thenReturn(5)
+    Mockito.`when`(tabService.getCurrentTabIndex(contextStub)).thenReturn(2)
+    Mockito.`when`(tabService.getTabCount(contextStub)).thenReturn(5)
     injector.vimscriptExecutor.execute("tabmove +0", editorStub, contextStub, skipHistory = false)
 
     assertPluginError(true)
@@ -129,8 +129,8 @@ class TabmoveTest : MockTestCase() {
 
   fun `test move to minus zero`() {
     val tabService = mockService(TabService::class.java)
-    Mockito.`when`(tabService.getCurrentTabIndex(contextStub.ij)).thenReturn(2)
-    Mockito.`when`(tabService.getTabCount(contextStub.ij)).thenReturn(5)
+    Mockito.`when`(tabService.getCurrentTabIndex(contextStub)).thenReturn(2)
+    Mockito.`when`(tabService.getTabCount(contextStub)).thenReturn(5)
     injector.vimscriptExecutor.execute("tabmove +0", editorStub, contextStub, skipHistory = false)
 
     assertPluginError(true)

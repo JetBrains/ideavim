@@ -50,6 +50,7 @@ import com.maddyhome.idea.vim.group.MacroGroup
 import com.maddyhome.idea.vim.group.MarkGroup
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.SearchGroup
+import com.maddyhome.idea.vim.group.TabService
 import com.maddyhome.idea.vim.group.VimWindowGroup
 import com.maddyhome.idea.vim.group.WindowGroup
 import com.maddyhome.idea.vim.group.copy.PutGroup
@@ -91,6 +92,8 @@ class IjVimInjector : VimInjector {
     get() = service<HistoryGroup>()
   override val extensionRegistrator: VimExtensionRegistrator
     get() = VimExtensionRegistrar
+  override val tabService: TabService
+    get() = service()
   override val clipboardManager: VimClipboardManager
     get() = service<IjClipboardManager>()
   override val searchHelper: VimSearchHelper

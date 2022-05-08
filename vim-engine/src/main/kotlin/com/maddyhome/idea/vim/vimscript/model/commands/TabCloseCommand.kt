@@ -18,14 +18,10 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
-import com.intellij.openapi.actionSystem.PlatformDataKeys
-import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.ranges.Ranges
-import com.maddyhome.idea.vim.helper.MessageHelper
-import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
@@ -37,23 +33,17 @@ data class TabCloseCommand(val ranges: Ranges, val argument: String) : Command.S
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
-
-    val project = PlatformDataKeys.PROJECT.getData(context.ij) ?: return ExecutionResult.Error
-    val fileEditorManager = FileEditorManagerEx.getInstanceEx(project)
-    val currentWindow = fileEditorManager.currentWindow
-    val tabbedPane = currentWindow.tabbedPane
-
-    val current = tabbedPane.selectedIndex
-    val tabCount = tabbedPane.tabCount
+    val current = injector.tabService.getCurrentTabIndex(context)
+    val tabCount = injector.tabService.getTabCount(context)
 
     val argument = argument
     val index = getTabIndexToClose(argument, current, tabCount - 1)
 
     if (index != null) {
       val select = if (index == current) index + 1 else current
-      tabbedPane.removeTabAt(index, select)
+      injector.tabService.removeTabAt(index, select, context)
     } else {
-      VimPlugin.showMessage(MessageHelper.message("error.invalid.command.argument"))
+      injector.messages.showStatusBarMessage(injector.messages.message("error.invalid.command.argument"))
     }
 
     return ExecutionResult.Success

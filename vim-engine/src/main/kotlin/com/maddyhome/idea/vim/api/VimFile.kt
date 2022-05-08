@@ -6,6 +6,7 @@ interface VimFile {
   fun displayLocationInfo(vimEditor: VimEditor)
   fun selectPreviousTab(context: ExecutionContext)
   fun saveFile(context: ExecutionContext)
+  fun saveFiles(context: ExecutionContext)
   fun closeFile(editor: VimEditor, context: ExecutionContext)
   fun closeFile(number: Int, context: ExecutionContext)
   fun selectFile(count: Int, context: ExecutionContext): Boolean

@@ -196,9 +196,8 @@ public class FileGroup extends VimFileBase {
   /**
    * Saves all files in the project.
    */
-  public void saveFiles(DataContext context) {
-    ExecuteExtensionKt.execute(VimInjectorKt.getInjector().getNativeActionManager().getSaveAll(),
-                               new IjExecutionContext(context));
+  public void saveFiles(ExecutionContext context) {
+    ExecuteExtensionKt.execute(VimInjectorKt.getInjector().getNativeActionManager().getSaveAll(), context);
   }
 
   /**

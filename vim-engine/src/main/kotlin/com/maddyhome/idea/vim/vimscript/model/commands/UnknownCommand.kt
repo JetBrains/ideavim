@@ -18,18 +18,16 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.GoalCommand
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.InvalidCommandException
 import com.maddyhome.idea.vim.ex.ranges.Ranges
-import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.Msg
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.commands.UnknownCommand.Constants.MAX_RECURSION
-import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 
 /**
  * any command with no parser rule. we assume that it is an alias
@@ -47,16 +45,16 @@ data class UnknownCommand(val ranges: Ranges, val name: String, val argument: St
   }
 
   private fun processPossiblyAliasCommand(name: String, editor: VimEditor, context: ExecutionContext, aliasCountdown: Int): ExecutionResult {
-    if (VimPlugin.getCommand().isAlias(name)) {
+    if (injector.commandGroup.isAlias(name)) {
       if (aliasCountdown > 0) {
-        val commandAlias = VimPlugin.getCommand().getAliasCommand(name, 1)
+        val commandAlias = injector.commandGroup.getAliasCommand(name, 1)
         when (commandAlias) {
           is GoalCommand.Ex -> {
             if (commandAlias.command.isEmpty()) {
-              val message = MessageHelper.message(Msg.NOT_EX_CMD, name)
+              val message = injector.messages.message(Msg.NOT_EX_CMD, name)
               throw InvalidCommandException(message, null)
             }
-            val parsedCommand = VimscriptParser.parseCommand(commandAlias.command) ?: throw ExException("E492: Not an editor command: ${commandAlias.command}")
+            val parsedCommand = injector.vimscriptParser.parseCommand(commandAlias.command) ?: throw ExException("E492: Not an editor command: ${commandAlias.command}")
             return if (parsedCommand is UnknownCommand) {
               processPossiblyAliasCommand(commandAlias.command, editor, context, aliasCountdown - 1)
             } else {
@@ -71,8 +69,8 @@ data class UnknownCommand(val ranges: Ranges, val name: String, val argument: St
           }
         }
       } else {
-        VimPlugin.showMessage(MessageHelper.message("recursion.detected.maximum.alias.depth.reached"))
-        VimPlugin.indicateError()
+        injector.messages.showStatusBarMessage(injector.messages.message("recursion.detected.maximum.alias.depth.reached"))
+        injector.messages.indicateError()
         return ExecutionResult.Error
       }
     } else {

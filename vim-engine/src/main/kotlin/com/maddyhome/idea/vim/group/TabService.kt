@@ -16,22 +16,15 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.vimscript.model.commands
+package com.maddyhome.idea.vim.group
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.ex.ranges.Ranges
-import com.maddyhome.idea.vim.newapi.ij
-import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
-/**
- * see "h :tabonly"
- */
-data class TabOnlyCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
-  override val argFlags = flags(RangeFlag.RANGE_IS_COUNT, ArgumentFlag.ARGUMENT_FORBIDDEN, Access.READ_ONLY)
-  override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
-    VimPlugin.getWindow().closeAllExceptCurrentTab(context.ij)
-    return ExecutionResult.Success
-  }
+interface TabService {
+
+  fun removeTabAt(indexToDelete: Int, indexToSelect: Int, context: ExecutionContext)
+  fun getTabCount(context: ExecutionContext): Int
+  fun getCurrentTabIndex(context: ExecutionContext): Int
+  fun moveCurrentTabToIndex(index: Int, context: ExecutionContext)
+  fun closeAllExceptCurrentTab(context: ExecutionContext)
 }
