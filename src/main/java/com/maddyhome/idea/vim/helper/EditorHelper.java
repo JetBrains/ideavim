@@ -807,7 +807,7 @@ public class EditorHelper {
     // of columns. It also works with inline inlays and folds. It is slightly inaccurate for proportional fonts, but is
     // still a good solution. Besides, what kind of monster uses Vim with proportional fonts?
     final int standardColumnWidth = EditorUtil.getPlainSpaceWidth(editor);
-    final int x = point.x - (screenWidth / standardColumnWidth / 2 * standardColumnWidth);
+    final int x = max(0, point.x - (screenWidth / standardColumnWidth / 2 * standardColumnWidth));
     scrollHorizontally(editor, x);
   }
 

@@ -740,7 +740,7 @@ public class MotionGroup extends VimMotionGroupBase {
     final boolean allowSidescroll = !flags.contains(CommandFlags.FLAG_IGNORE_SIDE_SCROLL_JUMP);
     int sidescroll = ((VimInt) VimPlugin.getOptionService().getOptionValue(new OptionScope.LOCAL(new IjVimEditor(editor)), OptionConstants.sidescrollName, OptionConstants.sidescrollName)).getValue();
 
-    final int offsetLeft = caretColumn - currentVisualLeftColumn - scrollOffset;
+    final int offsetLeft = caretColumn - (currentVisualLeftColumn + scrollOffset);
     final int offsetRight = caretColumn - (currentVisualRightColumn - scrollOffset);
     if (offsetLeft < 0 || offsetRight > 0) {
       int diff = offsetLeft < 0 ? -offsetLeft : offsetRight;
