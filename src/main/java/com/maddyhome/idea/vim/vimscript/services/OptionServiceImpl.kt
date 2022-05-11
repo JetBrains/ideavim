@@ -159,10 +159,11 @@ internal class OptionServiceImpl : OptionService {
       override fun getDefaultValue(): VimString {
         val shell = (getGlobalOptionValue(OptionConstants.shellName) as VimString).value
         return VimString(
-          if (SystemInfo.isWindows && !shell.contains("sh"))
-            "/c"
-          else
-            "-c"
+          when {
+              SystemInfo.isWindows && shell.contains("powershell") -> "-Command"
+              SystemInfo.isWindows && !shell.contains("sh") -> "/c"
+              else -> "-c"
+          }
         )
       }
     },
