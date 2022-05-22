@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.api.VimLookupManager
 import com.maddyhome.idea.vim.api.VimMessages
 import com.maddyhome.idea.vim.api.VimMotionGroup
 import com.maddyhome.idea.vim.api.VimProcessGroup
+import com.maddyhome.idea.vim.api.VimRegexpService
 import com.maddyhome.idea.vim.api.VimSearchGroup
 import com.maddyhome.idea.vim.api.VimSearchHelper
 import com.maddyhome.idea.vim.api.VimStatistics
@@ -71,6 +72,7 @@ import com.maddyhome.idea.vim.ui.VimRcFileState
 import com.maddyhome.idea.vim.undo.VimUndoRedo
 import com.maddyhome.idea.vim.vimscript.Executor
 import com.maddyhome.idea.vim.vimscript.services.FunctionStorage
+import com.maddyhome.idea.vim.vimscript.services.PatternService
 import com.maddyhome.idea.vim.vimscript.services.VariableService
 import com.maddyhome.idea.vim.yank.VimYankGroup
 
@@ -93,6 +95,8 @@ class IjVimInjector : VimInjector {
     get() = VimExtensionRegistrar
   override val tabService: TabService
     get() = service()
+  override val regexpService: VimRegexpService
+    get() = PatternService
   override val clipboardManager: VimClipboardManager
     get() = service<IjClipboardManager>()
   override val searchHelper: VimSearchHelper

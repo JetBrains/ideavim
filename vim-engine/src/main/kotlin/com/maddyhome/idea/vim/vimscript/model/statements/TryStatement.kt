@@ -20,12 +20,12 @@ package com.maddyhome.idea.vim.vimscript.model.statements
 
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.FinishException
 import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
-import com.maddyhome.idea.vim.vimscript.services.PatternService
 
 data class TryStatement(val tryBlock: TryBlock, val catchBlocks: List<CatchBlock>, val finallyBlock: FinallyBlock?) :
     Executable {
@@ -52,7 +52,7 @@ data class TryStatement(val tryBlock: TryBlock, val catchBlocks: List<CatchBlock
       var caught = false
       for (catchBlock in catchBlocks) {
         catchBlock.vimContext = this
-        if (PatternService.matches(catchBlock.pattern, e.message)) {
+        if (injector.regexpService.matches(catchBlock.pattern, e.message)) {
           caught = true
           result = catchBlock.execute(editor, context)
           if (result !is ExecutionResult.Success) {

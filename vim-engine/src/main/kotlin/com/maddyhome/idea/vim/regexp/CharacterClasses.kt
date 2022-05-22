@@ -21,7 +21,7 @@ import com.maddyhome.idea.vim.regexp.CharacterClasses
 import org.jetbrains.annotations.NonNls
 
 object CharacterClasses {
-    val CLASS_NAMES: @NonNls Array<String>? = arrayOf(
+    val CLASS_NAMES: @NonNls Array<String> = arrayOf(
         "alnum:]",
         "alpha:]",
         "blank:]",

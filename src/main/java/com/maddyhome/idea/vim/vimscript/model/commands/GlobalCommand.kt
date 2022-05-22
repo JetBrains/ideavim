@@ -111,8 +111,8 @@ data class GlobalCommand(val ranges: Ranges, val argument: String, val invert: B
       VimPlugin.indicateError()
       return false
     }
-    val regmatch = second.first
-    val sp = second.third
+    val regmatch = second.first as RegExp.regmmatch_T
+    val sp = second.third as RegExp
 
     var match: Int
     val lcount = editor.lineCount()

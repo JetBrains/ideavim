@@ -46,6 +46,7 @@ interface VimInjector {
   val historyGroup: VimHistory
   val extensionRegistrator: VimExtensionRegistrator
   val tabService: TabService
+  val regexpService: VimRegexpService
 
   val searchHelper: VimSearchHelper
   val motion: VimMotionGroup

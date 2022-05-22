@@ -1256,7 +1256,7 @@ class RegExp {
                 '^' ->           /* '^' is only magic as the very first character and if it's after
                      * "\(", "\|", "\&' or "\n" */if (reg_magic >= MAGIC_OFF &&
                     (at_start || reg_magic == MAGIC_ALL || prevchr == Magic.LPAREN || prevchr == Magic.PIPE || prevchr == Magic.AMP || prevchr == Magic.n || Magic.no_Magic(
-                        prevchr) == '('.code &&
+                      prevchr) == '('.code &&
                             prevprevchr == Magic.PERCENT)
                 ) {
                     curchr = Magic.HAT
@@ -1485,7 +1485,7 @@ class RegExp {
      * match otherwise.
      */
     fun vim_regexec_multi(
-        rmp: regmmatch_T,  /*win_T win,*/
+      rmp: regmmatch_T,  /*win_T win,*/
         buf: VimEditor?, lcount: Int, lnum: Int, col: Int
     ): Int /* window in which to search or null */ /* buffer in which to search */ /* nr of line to start looking for match */ /* column to start looking for match */ {
         val r: Int
@@ -1834,7 +1834,7 @@ class RegExp {
                         return false
                     } else {
                         if (!CharacterClasses.isWord(c) || reginput!!.pointer() > regline!!.pointer() &&
-                            CharacterClasses.isWord(reginput!!.charAt(-1))
+                          CharacterClasses.isWord(reginput!!.charAt(-1))
                         ) {
                             return false
                         }

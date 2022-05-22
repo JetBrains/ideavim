@@ -702,8 +702,8 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
       return false;
     }
 
-    Pair<Boolean, Triple<RegExp.regmmatch_T, String, RegExp>> booleanregmmatch_tPair = search_regcomp(pat, which_pat,
-                                                                                                       RE_SUBST);
+    Pair<Boolean, Triple<Object, String, Object>> booleanregmmatch_tPair = search_regcomp(pat, which_pat,
+                                                                                          RE_SUBST);
     if (!booleanregmmatch_tPair.getFirst()) {
       if (do_error) {
         VimPlugin.showMessage(MessageHelper.message(Msg.e_invcmd));
@@ -711,9 +711,9 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
       }
       return false;
     }
-    RegExp.regmmatch_T regmatch = booleanregmmatch_tPair.getSecond().getFirst();
+    RegExp.regmmatch_T regmatch = (RegExp.regmmatch_T) booleanregmmatch_tPair.getSecond().getFirst();
     String pattern = booleanregmmatch_tPair.getSecond().getSecond();
-    RegExp sp = booleanregmmatch_tPair.getSecond().getThird();
+    RegExp sp = (RegExp) booleanregmmatch_tPair.getSecond().getThird();
 
     /* the 'i' or 'I' flag overrules 'ignorecase' and 'smartcase' */
     if (do_ic == 'i') {
@@ -907,7 +907,8 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
     return processSearchRange(((IjVimEditor) editor).getEditor(), pattern, patternOffset, startOffset, direction);
   }
 
-  public Pair<Boolean, Triple<RegExp.regmmatch_T, String, RegExp>> search_regcomp(CharPointer pat,
+  //public Pair<Boolean, Triple<RegExp.regmmatch_T, String, RegExp>> search_regcomp(CharPointer pat,
+  public Pair<Boolean, Triple<Object, String, Object>> search_regcomp(CharPointer pat,
                                                                                   int which_pat,
                                                                                   int patSave) {
     // We don't need to worry about lastIgnoreSmartCase, it's always false. Vim resets after checking, and it only sets

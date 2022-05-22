@@ -132,7 +132,7 @@ class IjClipboardManager : VimClipboardManager {
     }
   }
 
-  private fun collectTransferableData(transferable: Transferable?): List<TextBlockTransferableData> {
+  private fun collectTransferableData(transferable: Transferable): List<TextBlockTransferableData> {
     val allValues: MutableList<TextBlockTransferableData> = ArrayList()
     for (processor in CopyPastePostProcessor.EP_NAME.extensionList) {
       val data = processor.extractTransferableData(transferable)

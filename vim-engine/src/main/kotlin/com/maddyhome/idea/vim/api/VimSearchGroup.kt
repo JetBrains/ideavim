@@ -4,8 +4,6 @@ import com.maddyhome.idea.vim.common.Direction
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.regexp.CharPointer
-import com.maddyhome.idea.vim.regexp.RegExp
-import com.maddyhome.idea.vim.regexp.RegExp.regmmatch_T
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 
 interface VimSearchGroup {
@@ -35,7 +33,7 @@ interface VimSearchGroup {
     parent: VimLContext,
   ): Boolean
   // TODO rewrite this
-  fun search_regcomp(pat: CharPointer?, which_pat: Int, patSave: Int): Pair<Boolean, Triple<regmmatch_T, String, RegExp>>
+  fun search_regcomp(pat: CharPointer?, which_pat: Int, patSave: Int): Pair<Boolean, Triple<Any, String, Any>>
   fun findDecimalNumber(line: String): Int?
   fun clearSearchHighlight()
 
