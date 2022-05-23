@@ -22,7 +22,7 @@ import com.maddyhome.idea.vim.api.VimRegexpService
 import com.maddyhome.idea.vim.regexp.RegExp
 import com.maddyhome.idea.vim.regexp.RegExp.regmmatch_T
 
-object PatternService: VimRegexpService {
+object PatternService : VimRegexpService {
 
   override fun matches(pattern: String, text: String?, ignoreCase: Boolean): Boolean {
     if (text == null) {
