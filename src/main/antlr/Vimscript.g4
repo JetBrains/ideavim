@@ -28,7 +28,7 @@ comment:                (WS | COLON)* QUOTE ~(NEW_LINE)* NEW_LINE;
 finishStatement:        (WS | COLON)* FINISH WS* (NEW_LINE | BAR);
 continueStatement:      (WS | COLON)* CONTINUE WS* (NEW_LINE | BAR);
 breakStatement:         (WS | COLON)* BREAK WS* (NEW_LINE | BAR);
-returnStatement:        (WS | COLON)* range? (WS | COLON)* RETURN WS+ expr WS* (NEW_LINE | BAR);
+returnStatement:        (WS | COLON)* range? (WS | COLON)* RETURN (WS+ expr)? WS* (NEW_LINE | BAR);
 throwStatement:         (WS | COLON)* THROW WS+ expr WS* (NEW_LINE | BAR);
 
 ifStatement:            ifBlock

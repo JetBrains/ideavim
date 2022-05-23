@@ -723,4 +723,19 @@ class FunctionDeclarationTest : VimTestCase() {
     assertPluginError(true)
     assertPluginErrorMessageContains("E117: Unknown function: g:abs")
   }
+
+  fun `test return with no expression`() {
+    configureByText("\n")
+    typeText(
+      commandToKeys(
+        "" +
+          "function ZeroGenerator() |" +
+          "  return | " +
+          "endfunction"
+      )
+    )
+    assertPluginError(false)
+    typeText(commandToKeys("echo ZeroGenerator()"))
+    assertExOutput("0\n")
+  }
 }

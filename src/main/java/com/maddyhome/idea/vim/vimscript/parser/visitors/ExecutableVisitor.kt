@@ -51,7 +51,7 @@ object ExecutableVisitor : VimscriptBaseVisitor<Executable>() {
       ctx.breakStatement() != null -> BreakStatement
       ctx.continueStatement() != null -> ContinueStatement
       ctx.finishStatement() != null -> FinishStatement
-      ctx.returnStatement() != null -> ReturnStatement(ExpressionVisitor.visit(ctx.returnStatement().expr()))
+      ctx.returnStatement() != null -> visitReturnStatement(ctx.returnStatement())
       ctx.ifStatement() != null -> visitIfStatement(ctx.ifStatement())
       ctx.forLoop() != null -> visitForLoop(ctx.forLoop())
       ctx.whileLoop() != null -> visitWhileLoop(ctx.whileLoop())
@@ -123,7 +123,7 @@ object ExecutableVisitor : VimscriptBaseVisitor<Executable>() {
   }
 
   override fun visitReturnStatement(ctx: VimscriptParser.ReturnStatementContext): Executable {
-    val expression: Expression = ExpressionVisitor.visit(ctx.expr())
+    val expression: Expression = ctx.expr()?.let { ExpressionVisitor.visit(ctx.expr()) } ?: SimpleExpression(0)
     return ReturnStatement(expression)
   }
 

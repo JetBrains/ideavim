@@ -18,12 +18,14 @@
 
 package org.jetbrains.plugins.ideavim.ex.parser.statements
 
+import com.intellij.testFramework.UsefulTestCase.assertEmpty
 import com.maddyhome.idea.vim.vimscript.model.commands.EchoCommand
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
 import com.maddyhome.idea.vim.vimscript.model.statements.ReturnStatement
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
+import com.maddyhome.idea.vim.vimscript.parser.errors.IdeavimErrorListener
 import org.junit.experimental.theories.DataPoints
 import org.junit.experimental.theories.FromDataPoints
 import org.junit.experimental.theories.Theories
@@ -185,4 +187,24 @@ class FunctionDeclarationTests {
     )
     assertEquals(1, script.units.size)
   }
+
+//  // https://youtrack.jetbrains.com/issue/VIM-2654
+//  @Theory
+//  fun `return with omitted expression`() {
+//    VimscriptParser.parse(
+//      """
+//        func! Paste_on_off()
+//           if g:paste_mode == 0
+//              set paste
+//              let g:paste_mode = 1
+//           else
+//              set nopaste
+//              let g:paste_mode = 0
+//           endif
+//           return
+//        endfunc
+//      """.trimIndent()
+//    )
+//    assertEmpty(IdeavimErrorListener.testLogger)
+//  }
 }
