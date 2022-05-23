@@ -1,8 +1,12 @@
 package com.maddyhome.idea.vim.common
 
 import com.maddyhome.idea.vim.api.LineDeleteShift
+import com.maddyhome.idea.vim.api.MutableVimEditor
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.toType
+import com.maddyhome.idea.vim.mark.VimMarkConstants
 import kotlin.math.max
 import kotlin.math.min
 
@@ -73,6 +77,46 @@ val Int.pointer: Pointer
 
 interface VimMachine {
   fun delete(range: VimRange, editor: VimEditor, caret: VimCaret): OperatedRange?
+}
+
+abstract class VimMachineBase : VimMachine {
+  /**
+   * The information I'd like to know after the deletion:
+   * - What range is deleted?
+   * - What text is deleted?
+   * - Does text have a new line character at the end?
+   * - At what offset?
+   * - What caret?
+   */
+  override fun delete(range: VimRange, editor: VimEditor, caret: VimCaret): OperatedRange? {
+    // Update the last column before we delete, or we might be retrieving the data for a line that no longer exists
+    caret.vimLastColumn = caret.inlayAwareVisualColumn
+
+    val operatedText = editor.deleteDryRun(range) ?: return null
+
+    val normalizedRange = operatedText.toNormalizedTextRange(editor)
+    injector.registerGroup.storeText(editor, normalizedRange, operatedText.toType(), true)
+    (editor as MutableVimEditor).delete(range)
+
+    val start = normalizedRange.startOffset
+    injector.markGroup.setMark(editor, VimMarkConstants.MARK_CHANGE_POS, start)
+    injector.markGroup.setChangeMarks(editor, TextRange(start, start + 1))
+
+    return operatedText
+  }
+}
+
+fun OperatedRange.toNormalizedTextRange(editor: VimEditor): TextRange {
+  return when (this) {
+    is OperatedRange.Block -> TODO()
+    is OperatedRange.Lines -> {
+      // TODO: 11.01.2022 This is unsafe
+      val startOffset = editor.getLineStartOffset(this.lineAbove.line)
+      val endOffset = editor.getLineEndOffset(lineAbove.line + linesOperated, true)
+      TextRange(startOffset, endOffset)
+    }
+    is OperatedRange.Characters -> TextRange(this.leftOffset.point, this.rightOffset.point)
+  }
 }
 
 sealed class EditorLine private constructor(val line: Int) {

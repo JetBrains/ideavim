@@ -42,7 +42,7 @@ sealed class PutTextBaseAction(
   ): Boolean {
     val lastRegister = injector.registerGroup.lastRegister
     val textData = if (lastRegister != null) TextData(
-      lastRegister.text ?: injector.parser.toKeyCodedString(lastRegister.keys),
+      lastRegister.text ?: injector.parser.toPrintableString(lastRegister.keys),
       lastRegister.type,
       lastRegister.transferableData
     ) else null

@@ -9,6 +9,7 @@ interface VimCaret {
   val editor: VimEditor
   val offset: Offset
   var vimLastColumn: Int
+  val inlayAwareVisualColumn: Int
   val selectionStart: Int
   val selectionEnd: Int
   var vimSelectionStart: Int

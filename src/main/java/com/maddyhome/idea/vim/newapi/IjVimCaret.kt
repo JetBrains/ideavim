@@ -33,6 +33,7 @@ import com.maddyhome.idea.vim.group.visual.VisualChange
 import com.maddyhome.idea.vim.group.visual.vimLeadSelectionOffset
 import com.maddyhome.idea.vim.group.visual.vimSetSelection
 import com.maddyhome.idea.vim.group.visual.vimSetSystemSelectionSilently
+import com.maddyhome.idea.vim.helper.inlayAwareVisualColumn
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.helper.vimLastVisualOperatorRange
@@ -49,6 +50,8 @@ class IjVimCaret(val caret: Caret) : VimCaret {
     set(value) {
       caret.vimLastColumn = value
     }
+  override val inlayAwareVisualColumn: Int
+    get() = caret.inlayAwareVisualColumn
   override val selectionStart: Int
     get() = caret.selectionStart
   override val selectionEnd: Int

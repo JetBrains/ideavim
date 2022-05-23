@@ -21,6 +21,7 @@ import com.maddyhome.idea.vim.api.VimExOutputPanelService
 import com.maddyhome.idea.vim.api.VimExtensionRegistrator
 import com.maddyhome.idea.vim.api.VimFile
 import com.maddyhome.idea.vim.api.VimInjector
+import com.maddyhome.idea.vim.api.VimInjectorBase
 import com.maddyhome.idea.vim.api.VimKeyGroup
 import com.maddyhome.idea.vim.api.VimLookupManager
 import com.maddyhome.idea.vim.api.VimMessages

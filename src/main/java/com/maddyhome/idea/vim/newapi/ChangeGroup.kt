@@ -235,9 +235,3 @@ fun toVimRange(range: TextRange, type: SelectionType): VimRange {
     SelectionType.BLOCK_WISE -> VimRange.Block(range.startOffset.offset, range.endOffset.offset)
   }
 }
-
-fun OperatedRange.toType() = when (this) {
-  is OperatedRange.Characters -> SelectionType.CHARACTER_WISE
-  is OperatedRange.Lines -> SelectionType.LINE_WISE
-  is OperatedRange.Block -> SelectionType.BLOCK_WISE
-}
