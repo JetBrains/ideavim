@@ -23,6 +23,12 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
+## To Be Released
+
+### Fixes:
+* [VIM-2654](https://youtrack.jetbrains.com/issue/VIM-2654) Add support for `return` without expression
+* [VIM-2630](https://youtrack.jetbrains.com/issue/VIM-2630/Please-fix-warning-Shall-not-be-called-on-a-template-presentatio) Fix IDE freeze
+
 ## 1.10.0, 2022-02-17
 
 ### Features:
