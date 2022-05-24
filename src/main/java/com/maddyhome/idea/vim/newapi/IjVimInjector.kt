@@ -20,7 +20,7 @@ import com.maddyhome.idea.vim.api.VimExOutputPanel
 import com.maddyhome.idea.vim.api.VimExOutputPanelService
 import com.maddyhome.idea.vim.api.VimExtensionRegistrator
 import com.maddyhome.idea.vim.api.VimFile
-import com.maddyhome.idea.vim.api.VimInjector
+import com.maddyhome.idea.vim.api.VimInjectorBase
 import com.maddyhome.idea.vim.api.VimKeyGroup
 import com.maddyhome.idea.vim.api.VimLookupManager
 import com.maddyhome.idea.vim.api.VimMessages
@@ -76,7 +76,7 @@ import com.maddyhome.idea.vim.vimscript.services.PatternService
 import com.maddyhome.idea.vim.vimscript.services.VariableService
 import com.maddyhome.idea.vim.yank.VimYankGroup
 
-class IjVimInjector : VimInjector {
+class IjVimInjector : VimInjectorBase() {
   override fun <T : Any> getLogger(clazz: Class<T>): VimLogger = IjVimLogger(Logger.getInstance(clazz::class.java))
 
   override val actionExecutor: VimActionExecutor
