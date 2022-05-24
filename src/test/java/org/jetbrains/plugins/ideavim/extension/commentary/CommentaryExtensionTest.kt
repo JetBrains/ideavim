@@ -477,7 +477,6 @@ class CommentaryExtensionTest : VimTestCase() {
   }
 
   @VimBehaviorDiffers(originalVimAfter = """
-        
         final Int value = 42;
   """)
   fun `test text object deletes single line comment from current line`() {
@@ -488,6 +487,7 @@ class CommentaryExtensionTest : VimTestCase() {
         final Int <caret>value = 42;
       """.trimIndent(),
       """
+        
         final Int value = 42;
       """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
