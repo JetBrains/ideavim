@@ -52,6 +52,7 @@ usual beta standards.
 * [488](https://github.com/JetBrains/ideavim/pull/488) by [Martin Yzeiri](https://github.com/myzeiri): Add Matchit support for the C family of languages
 * [493](https://github.com/JetBrains/ideavim/pull/493) by [Matt Ellis](https://github.com/citizenmatt): Improvements to Commentary extension
 * [494](https://github.com/JetBrains/ideavim/pull/494) by [Matt Ellis](https://github.com/citizenmatt): Cleanup pre-212 CaretVisualAttributes compatibility code
+* [504](https://github.com/JetBrains/ideavim/pull/504) by [Matt Ellis](https://github.com/citizenmatt): Minor bug fixes
 
 ## 1.10.0, 2022-02-17
 
