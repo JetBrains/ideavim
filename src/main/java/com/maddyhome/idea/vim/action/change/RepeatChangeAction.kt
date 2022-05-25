@@ -46,6 +46,13 @@ class RepeatChangeAction : VimActionHandler.SingleExecution() {
     val repeatHandler = VimRepeater.repeatHandler
 
     state.isDotRepeatInProgress = true
+
+    // A fancy 'redo-register' feature
+    // VIM-2643, :h redo-register
+    if (VimRepeater.lastChangeRegister in '1'..'8') {
+      VimRepeater.lastChangeRegister = VimRepeater.lastChangeRegister.inc()
+    }
+
     injector.registerGroup.selectRegister(VimRepeater.lastChangeRegister)
 
     try {

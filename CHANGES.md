@@ -29,6 +29,7 @@ usual beta standards.
 * Add `gcu` command for Commentary plugin
 * Add `:Commentary` command, which works great for commands such as `:%g/fun/Commentary`
 * Support `gc` – commentary text objects. E.g. `dgc`: delete commented text.
+* Support `redo-register feature` |µ [VIM-2643](https://youtrack.jetbrains.com/issue/VIM-2643/Dot-operator-doesn-t-increment-number-register-after-pasting-fro) | [viminfo](http://vimdoc.sourceforge.net/htmldoc/undo.html#redo-register)
 
 ### Changes:
 * Uses the same mappings as Commentary, so custom bindings for the Vim plugin will work with IdeaVim, too.

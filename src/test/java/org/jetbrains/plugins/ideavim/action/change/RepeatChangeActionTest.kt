@@ -316,4 +316,22 @@ class RepeatChangeActionTest : VimTestCase() {
     """.trimIndent()
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
+
+  fun `test redo register feature`() {
+    doTest(
+      listOf("dd", "dd", "dd", "\"1p", ".", "."),
+      """
+        One
+        Two
+        Three
+      """.trimIndent(),
+      """
+        Three
+        Two
+        One
+        
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+    )
+  }
 }

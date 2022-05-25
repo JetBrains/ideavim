@@ -9,7 +9,6 @@ object VimRepeater {
   var lastChangeCommand: Command? = null
     private set
   var lastChangeRegister = injector.registerGroup.defaultRegister
-    private set
 
   fun saveLastChange(command: Command) {
     lastChangeCommand = command
