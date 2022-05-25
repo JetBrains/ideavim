@@ -253,7 +253,7 @@ internal class OptionServiceImpl : OptionService {
     return option.split(getOptionValue(scope, optionName).asString())
   }
 
-  fun setOptionValue(scope: OptionScope, optionName: String, value: String, token: String) {
+  override fun setOptionValue(scope: OptionScope, optionName: String, value: String, token: String) {
     val vimValue: VimDataType = castToVimDataType(value, optionName, token)
     setOptionValue(scope, optionName, vimValue, token)
   }

@@ -33,6 +33,8 @@ interface OptionService {
 
   fun getValues(scope: OptionScope, optionName: String): List<String>?
 
+  fun setOptionValue(scope: OptionScope, optionName: String, value: String, token: String = optionName)
+
   fun appendValue(scope: OptionScope, optionName: String, value: String, token: String = optionName)
 
   fun prependValue(scope: OptionScope, optionName: String, value: String, token: String = optionName)

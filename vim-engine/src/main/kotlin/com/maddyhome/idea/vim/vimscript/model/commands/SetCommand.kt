@@ -163,7 +163,7 @@ fun parseOptionLine(editor: VimEditor, args: String, scope: OptionScope, failOnB
               '+' -> optionService.appendValue(scope, option, value, token)
               '-' -> optionService.removeValue(scope, option, value, token)
               '^' -> optionService.prependValue(scope, option, value, token)
-              else -> optionService.setOptionValue(scope, option, VimString(value), token)
+              else -> optionService.setOptionValue(scope, option, value, token)
             }
           } else {
             error = Msg.unkopt
