@@ -66,14 +66,17 @@ data class MapCommand(val ranges: Ranges, val argument: String, val cmd: String)
       }
     }
 
+    val mappingOwner =
+      if (injector.vimscriptExecutor.executingVimscript) MappingOwner.IdeaVim.InitScript
+      else MappingOwner.IdeaVim.Other
     if (arguments.specialArguments.contains(EXPR)) {
       injector.statisticsService.setIfMapExprUsed(true)
       injector.keyGroup
-        .putKeyMapping(modes, arguments.fromKeys, MappingOwner.IdeaVim, arguments.toExpr, arguments.secondArgument, commandInfo.isRecursive)
+        .putKeyMapping(modes, arguments.fromKeys, mappingOwner, arguments.toExpr, arguments.secondArgument, commandInfo.isRecursive)
     } else {
       val toKeys = parseKeys(arguments.secondArgument)
       injector.keyGroup
-        .putKeyMapping(modes, arguments.fromKeys, MappingOwner.IdeaVim, toKeys, commandInfo.isRecursive)
+        .putKeyMapping(modes, arguments.fromKeys, mappingOwner, toKeys, commandInfo.isRecursive)
     }
 
     return true

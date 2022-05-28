@@ -406,7 +406,7 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
     }
 
     for (List<KeyStroke> keyStrokes : actionKeys) {
-      registerRequiredShortcut(keyStrokes, MappingOwner.IdeaVim.INSTANCE);
+      registerRequiredShortcut(keyStrokes, MappingOwner.IdeaVim.System.INSTANCE);
 
       for (MappingMode mappingMode : actionModes) {
         Node<VimActionsInitiator> node = getKeyRoot(mappingMode);

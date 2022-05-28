@@ -23,7 +23,11 @@ import javax.swing.KeyStroke
 class RequiredShortcut(val keyStroke: KeyStroke, val owner: MappingOwner)
 
 sealed class MappingOwner {
-  object IdeaVim : MappingOwner()
+  interface IdeaVim {
+    object InitScript : MappingOwner()
+    object Other : MappingOwner()
+    object System : MappingOwner()
+  }
 
   @Suppress("DataClassPrivateConstructor")
   data class Plugin private constructor(val name: String) : MappingOwner() {

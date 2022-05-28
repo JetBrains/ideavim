@@ -31,8 +31,10 @@ import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.io.FileUtil
 import com.maddyhome.idea.vim.api.VimrcFileState
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.icons.VimIcons
+import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.ui.ReloadFloatingToolbarActionGroup.Companion.ACTION_GROUP
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 import com.maddyhome.idea.vim.vimscript.services.VimRcService
@@ -143,6 +145,7 @@ class ReloadVimRc : DumbAwareAction() {
   override fun actionPerformed(e: AnActionEvent) {
     val editor = e.getData(PlatformDataKeys.EDITOR) ?: return
     FileDocumentManager.getInstance().saveDocumentAsIs(editor.document)
+    injector.keyGroup.removeKeyMapping(MappingOwner.IdeaVim.InitScript)
     executeIdeaVimRc()
   }
 }

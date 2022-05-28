@@ -61,7 +61,7 @@ class KeyMapping : Iterable<List<KeyStroke?>?>, KeyMappingLayer {
                 for (i in 2 until keyStrokes.size - 1) {
                     builder.append(keyStrokes[i].keyChar)
                 }
-                return ToActionMappingInfo(builder.toString(), keyStrokes, false, MappingOwner.IdeaVim)
+                return ToActionMappingInfo(builder.toString(), keyStrokes, false, MappingOwner.IdeaVim.System)
             }
         }
         return null

@@ -407,7 +407,7 @@ abstract class VimTestCase : UsefulTestCase() {
   }
 
   fun putMapping(modes: Set<MappingMode>, from: String, to: String, recursive: Boolean) {
-    VimPlugin.getKey().putKeyMapping(modes, parseKeys(from), MappingOwner.IdeaVim, parseKeys(to), recursive)
+    VimPlugin.getKey().putKeyMapping(modes, parseKeys(from), MappingOwner.IdeaVim.System, parseKeys(to), recursive)
   }
 
   fun assertNoMapping(from: String) {
