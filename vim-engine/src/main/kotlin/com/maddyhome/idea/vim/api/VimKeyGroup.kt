@@ -20,6 +20,7 @@ package com.maddyhome.idea.vim.api
 import com.maddyhome.idea.vim.common.CommandPartNode
 import com.maddyhome.idea.vim.common.MappingMode
 import com.maddyhome.idea.vim.extension.VimExtensionHandler
+import com.maddyhome.idea.vim.key.KeyMapping
 import com.maddyhome.idea.vim.key.KeyMappingLayer
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
@@ -41,6 +42,7 @@ interface VimKeyGroup {
   fun removeKeyMapping(modes: Set<MappingMode>)
   fun removeKeyMapping(modes: Set<MappingMode>, keys: List<KeyStroke>)
   fun showKeyMappings(modes: Set<MappingMode>, editor: VimEditor): Boolean
+  fun getKeyMapping(mode: MappingMode): KeyMapping
 
   val shortcutConflicts: MutableMap<KeyStroke, ShortcutOwnerInfo>
   val savedShortcutConflicts: MutableMap<KeyStroke, Any>

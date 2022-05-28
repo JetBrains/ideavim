@@ -23,6 +23,7 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.actionSystem.PlatformDataKeys
+import com.intellij.openapi.components.service
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.toolbar.floating.AbstractFloatingToolbarProvider
 import com.intellij.openapi.editor.toolbar.floating.FloatingToolbarComponent
@@ -35,6 +36,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.icons.VimIcons
 import com.maddyhome.idea.vim.key.MappingOwner
+import com.maddyhome.idea.vim.troubleshooting.Troubleshooter
 import com.maddyhome.idea.vim.ui.ReloadFloatingToolbarActionGroup.Companion.ACTION_GROUP
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 import com.maddyhome.idea.vim.vimscript.services.VimRcService
@@ -146,6 +148,7 @@ class ReloadVimRc : DumbAwareAction() {
     val editor = e.getData(PlatformDataKeys.EDITOR) ?: return
     FileDocumentManager.getInstance().saveDocumentAsIs(editor.document)
     injector.keyGroup.removeKeyMapping(MappingOwner.IdeaVim.InitScript)
+    service<Troubleshooter>().removeByType("old-action-notation-in-mappings")
     executeIdeaVimRc()
   }
 }
