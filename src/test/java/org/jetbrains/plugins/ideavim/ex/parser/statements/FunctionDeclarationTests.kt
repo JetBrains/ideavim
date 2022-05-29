@@ -18,14 +18,12 @@
 
 package org.jetbrains.plugins.ideavim.ex.parser.statements
 
-import com.intellij.testFramework.UsefulTestCase.assertEmpty
 import com.maddyhome.idea.vim.vimscript.model.commands.EchoCommand
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
 import com.maddyhome.idea.vim.vimscript.model.statements.ReturnStatement
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
-import com.maddyhome.idea.vim.vimscript.parser.errors.IdeavimErrorListener
 import org.junit.experimental.theories.DataPoints
 import org.junit.experimental.theories.FromDataPoints
 import org.junit.experimental.theories.Theories

@@ -476,9 +476,11 @@ class CommentaryExtensionTest : VimTestCase() {
     )
   }
 
-  @VimBehaviorDiffers(originalVimAfter = """
+  @VimBehaviorDiffers(
+    originalVimAfter = """
         final Int value = 42;
-  """)
+  """
+  )
   fun `test text object deletes single line comment from current line`() {
     doTest(
       "dgc",

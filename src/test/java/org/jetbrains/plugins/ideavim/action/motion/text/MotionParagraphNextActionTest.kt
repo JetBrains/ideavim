@@ -10,7 +10,7 @@ class MotionParagraphNextActionTest : VimTestCase() {
       """
         void foo() {
         }
-        ${c}
+        $c
         void bar() {
         }
 
@@ -20,7 +20,7 @@ class MotionParagraphNextActionTest : VimTestCase() {
       """
         void foo() {
         }
-        ${c}
+        $c
         void baz() {
         }
       """.trimIndent(),
