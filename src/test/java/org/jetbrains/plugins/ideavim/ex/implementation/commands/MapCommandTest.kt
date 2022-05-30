@@ -889,4 +889,32 @@ n  ,f            <Plug>Foo
       }
     }
   }
+
+  fun `test autocast to action notation`() {
+    configureByText("\n")
+    typeText(commandToKeys("nmap ,a :action Back<CR>"))
+    typeText(commandToKeys("nmap ,b :action Back<Cr>"))
+    typeText(commandToKeys("nmap ,c :action Back<cr>"))
+    typeText(commandToKeys("nmap ,d :action Back<ENTER>"))
+    typeText(commandToKeys("nmap ,e :action Back<Enter>"))
+    typeText(commandToKeys("nmap ,f :action Back<enter>"))
+    typeText(commandToKeys("nmap ,g :action Back<C-M>"))
+    typeText(commandToKeys("nmap ,h :action Back<C-m>"))
+    typeText(commandToKeys("nmap ,i :action Back<c-m>"))
+    typeText(commandToKeys("nmap"))
+    assertExOutput(
+      """
+n  ,a            <Action>(Back)
+n  ,b            <Action>(Back)
+n  ,c            <Action>(Back)
+n  ,d            <Action>(Back)
+n  ,e            <Action>(Back)
+n  ,f            <Action>(Back)
+n  ,g            <Action>(Back)
+n  ,h            <Action>(Back)
+n  ,i            <Action>(Back)
+
+      """.trimIndent()
+    )
+  }
 }

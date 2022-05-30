@@ -34,6 +34,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
 import org.jetbrains.annotations.NonNls
 import java.util.*
+import java.util.stream.Collectors
 import javax.swing.KeyStroke
 
 /**
@@ -74,12 +75,27 @@ data class MapCommand(val ranges: Ranges, val argument: String, val cmd: String)
       injector.keyGroup
         .putKeyMapping(modes, arguments.fromKeys, mappingOwner, arguments.toExpr, arguments.secondArgument, commandInfo.isRecursive)
     } else {
-      val toKeys = parseKeys(arguments.secondArgument)
-      injector.keyGroup
-        .putKeyMapping(modes, arguments.fromKeys, mappingOwner, toKeys, commandInfo.isRecursive)
+      val actionId = extractActionId(arguments.secondArgument)
+      if (actionId != null) {
+        val toKeys = parseKeys("<Action>($actionId)")
+        injector.keyGroup.putKeyMapping(modes, arguments.fromKeys, mappingOwner, toKeys, true)
+      } else {
+        val toKeys = parseKeys(arguments.secondArgument)
+        injector.keyGroup.putKeyMapping(modes, arguments.fromKeys, mappingOwner, toKeys, commandInfo.isRecursive)
+      }
     }
 
     return true
+  }
+
+  private fun extractActionId(argument: String): String? {
+    val patternStart = "^:+\\s*action\\s+"
+    val patternEnd = "\\s*((<CR>)|(<Cr>)|(<cr>)|(<ENTER>)|(<Enter>)|(<enter>)|(<C-M>)|(<C-m>)|(<c-m>)|\n|\r|(\r\n))$"
+    return if (argument.matches(Regex("$patternStart\\w+$patternEnd"))) {
+      argument.replace(patternStart.toRegex(), "").replace(patternEnd.toRegex(), "")
+    } else {
+      null
+    }
   }
 
   @Suppress("unused")
