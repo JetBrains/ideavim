@@ -84,6 +84,7 @@ object VimscriptParser : com.maddyhome.idea.vim.api.VimscriptParser {
 
   // grammar expects that any command or script ends with a newline character
   private fun addNewlineIfMissing(text: String): String {
+    if (text.isEmpty()) return "\n"
     return if (text.last() == '\n') {
       text
     } else if (text.last() == '\r') {
