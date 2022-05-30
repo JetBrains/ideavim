@@ -87,6 +87,16 @@ tasks.register<Test>("testWithNeovim") {
     exclude("/ui/**")
 }
 
+tasks.register<Test>("testPropertyBased") {
+    group = "verification"
+//    include("**/propertybased/**")
+}
+
+tasks.register<Test>("testLongRunning") {
+    group = "verification"
+//    include("**/longrunning/**")
+}
+
 tasks {
     // Issue in gradle 7.3
     val test by getting(Test::class) {
@@ -105,6 +115,23 @@ tasks {
         include("**/*test.class")
         include("**/*Tests.class")
         exclude("**/ParserTest.class")
+    }
+
+    val testPropertyBased by getting(Test::class) {
+        isScanForTestClasses = false
+        // Only run tests from classes that end with "Test"
+        include("**/propertybased/*Test.class")
+        include("**/propertybased/*test.class")
+        include("**/propertybased/*Tests.class")
+    }
+
+    val testLongRunning by getting(Test::class) {
+        isScanForTestClasses = false
+        // Only run tests from classes that end with "Test"
+        include("**/longrunning/**/*Test.class")
+        include("**/longrunning/**/*test.class")
+        include("**/longrunning/**/*Tests.class")
+        exclude("**/longrunning/**/ParserTest.class")
     }
 
     compileJava {
@@ -200,16 +227,6 @@ tasks {
         exclude("**/longrunning/**")
         exclude("/ui/**")
     }
-}
-
-tasks.register<Test>("testPropertyBased") {
-    group = "verification"
-    include("**/propertybased/**")
-}
-
-tasks.register<Test>("testLongRunning") {
-    group = "verification"
-    include("**/longrunning/**")
 }
 
 tasks.register<Test>("testUi") {
