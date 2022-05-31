@@ -37,6 +37,8 @@
 package org.jetbrains.plugins.ideavim.action.change.insert
 
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.experimental.theories.DataPoints
 import org.junit.experimental.theories.Theories
@@ -80,6 +82,7 @@ class InsertCompletedLiteralActionTest : VimTestCase() {
   // todo parametrized
   // FYI space key after code will be sent via VimPlugin.getMacro().postKey(key, editor);, that's why we ignore the last space in tests
   // fun `octal codes`(@FromDataPoints("octalPrefix") prefix: String) {
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   @Theory
   fun `octal codes`() {
     for (prefix in octalPrefix) {
@@ -91,6 +94,7 @@ class InsertCompletedLiteralActionTest : VimTestCase() {
   }
 
   // FYI space key after code will be sent via VimPlugin.getMacro().postKey(key, editor);, that's why we ignore the last space in tests
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   @Theory
   fun `decimal codes`() {
     checkInsert("1 ", "${1.toChar()}")
@@ -99,6 +103,7 @@ class InsertCompletedLiteralActionTest : VimTestCase() {
   }
 
   // FYI space key after code will be sent via VimPlugin.getMacro().postKey(key, editor);, that's why we ignore the last space in tests
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   @Theory
   fun `hex codes`() {
     for (prefix in shortHexPrefix) {
@@ -214,6 +219,7 @@ class InsertCompletedLiteralActionTest : VimTestCase() {
     checkInsert("Z", "Z")
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   @Theory
   fun `control plus character`() {
     checkInsert("<C-a>", 1.toChar().toString())

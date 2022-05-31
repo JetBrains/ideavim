@@ -94,6 +94,7 @@ class MatchitGeneralTest : VimTestCase() {
     )
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from visual end of line to opening parenthesis`() {
     doTest(
       "v$%",
@@ -103,6 +104,7 @@ class MatchitGeneralTest : VimTestCase() {
     )
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from visual end of line to opening parenthesis then back to closing`() {
     doTest(
       "v$%%",
@@ -163,7 +165,7 @@ class MatchitGeneralTest : VimTestCase() {
   /*
    * Tests for visual mode and deleting on the new Matchit patterns.
    */
-
+  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from visual end of line to opening angle bracket`() {
     doTest(
       "v$%",
@@ -173,6 +175,7 @@ class MatchitGeneralTest : VimTestCase() {
     )
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from visual end of line to start of for loop`() {
     doTest(
       "v$%",

@@ -313,6 +313,7 @@ class CommandParserTest : VimTestCase() {
     assertEquals(SimpleExpression(10), let2.expression)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test bug with caret return symbol`() {
     configureByText("----------\n1234${c}567890\n----------\n")
     injector.vimscriptExecutor.execute(

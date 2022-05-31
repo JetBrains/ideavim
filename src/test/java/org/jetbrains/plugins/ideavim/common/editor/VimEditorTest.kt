@@ -22,9 +22,12 @@ import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.command.WriteCommandAction
 import com.maddyhome.idea.vim.common.offset
 import com.maddyhome.idea.vim.newapi.IjVimEditor
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class VimEditorTest : VimTestCase() {
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test delete string`() {
     configureByText("01234567890")
     val vimEditor = IjVimEditor(myFixture.editor)
