@@ -40,7 +40,7 @@ import javax.swing.KeyStroke
  *
  * See the log if this test fails, it contains the instructions on how to reproduce the test.
  */
-class RandomActionsPropertyTest : VimPropertyTest() {
+class RandomActionsPropertyTest : VimPropertyTestBase() {
   fun testRandomActions() {
     PropertyChecker.checkScenarios {
       ImperativeCommand { env ->

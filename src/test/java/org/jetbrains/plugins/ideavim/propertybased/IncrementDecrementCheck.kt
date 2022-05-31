@@ -36,7 +36,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 import kotlin.math.absoluteValue
 import kotlin.math.sign
 
-class IncrementDecrementTest : VimPropertyTest() {
+class IncrementDecrementTest : VimPropertyTestBase() {
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun testPlayingWithNumbers() {
     PropertyChecker.checkScenarios {

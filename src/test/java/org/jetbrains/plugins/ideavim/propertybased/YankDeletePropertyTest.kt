@@ -28,7 +28,7 @@ import org.jetbrains.jetCheck.PropertyChecker
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.propertybased.samples.loremText
 
-class YankDeletePropertyTest : VimPropertyTest() {
+class YankDeletePropertyTest : VimPropertyTestBase() {
   fun testYankDelete() {
     PropertyChecker.checkScenarios {
       ImperativeCommand { env ->

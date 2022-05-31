@@ -28,7 +28,7 @@ import org.jetbrains.jetCheck.Generator
 import org.jetbrains.jetCheck.ImperativeCommand
 import org.jetbrains.plugins.ideavim.VimTestCase
 
-abstract class VimPropertyTest : VimTestCase() {
+abstract class VimPropertyTestBase : VimTestCase() {
   protected fun moveCaretToRandomPlace(env: ImperativeCommand.Environment, editor: Editor) {
     val pos = env.generateValue(Generator.integers(0, editor.document.textLength - 1), "Put caret at position %s")
     MotionGroup.moveCaret(editor, editor.caretModel.currentCaret, pos)

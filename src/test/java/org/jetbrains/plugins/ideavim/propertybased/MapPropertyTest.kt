@@ -25,7 +25,7 @@ import org.jetbrains.jetCheck.PropertyChecker
 import org.jetbrains.plugins.ideavim.propertybased.samples.simpleText
 
 // TODO: 25.01.2021 Add neovim test integration
-class MapPropertyTest : VimPropertyTest() {
+class MapPropertyTest : VimPropertyTestBase() {
   // Disabled, it works too long
   @Suppress("TestFunctionName", "unused")
   fun /*test*/RandomMappings() {
