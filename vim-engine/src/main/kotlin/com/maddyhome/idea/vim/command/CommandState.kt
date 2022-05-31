@@ -72,6 +72,10 @@ class CommandState(private val editor: VimEditor?) {
   val isOperatorPending: Boolean
     get() = mappingState.mappingMode == MappingMode.OP_PENDING && !commandBuilder.isEmpty
 
+  init {
+    pushModes(defaultModeState.mode, defaultModeState.subMode)
+  }
+
   fun isDuplicateOperatorKeyStroke(key: KeyStroke?): Boolean {
     return isOperatorPending && commandBuilder.isDuplicateOperatorKeyStroke(key!!)
   }
@@ -129,6 +133,7 @@ class CommandState(private val editor: VimEditor?) {
 
   private fun resetModes() {
     modeStates.clear()
+    pushModes(defaultModeState.mode, defaultModeState.subMode)
     onModeChanged()
     setMappingMode()
   }
@@ -396,9 +401,5 @@ class CommandState(private val editor: VimEditor?) {
     private fun getKeyRootNode(mappingMode: MappingMode): CommandPartNode<VimActionsInitiator> {
       return injector.keyGroup.getKeyRoot(mappingMode)
     }
-  }
-
-  init {
-    pushModes(defaultModeState.mode, defaultModeState.subMode)
   }
 }
