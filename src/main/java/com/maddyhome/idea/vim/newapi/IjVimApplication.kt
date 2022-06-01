@@ -23,7 +23,7 @@ import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.util.Computable
 import com.intellij.util.ExceptionUtil
-import com.maddyhome.idea.vim.api.VimApplication
+import com.maddyhome.idea.vim.api.VimApplicationBase
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.helper.RunnableHelper
@@ -35,7 +35,7 @@ import javax.swing.KeyStroke
 import javax.swing.SwingUtilities
 
 @Service
-class IjVimApplication : VimApplication {
+class IjVimApplication : VimApplicationBase() {
   override fun isMainThread(): Boolean {
     return ApplicationManager.getApplication().isDispatchThread
   }

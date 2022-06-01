@@ -17,30 +17,35 @@ import com.maddyhome.idea.vim.vimscript.services.VariableService
 import com.maddyhome.idea.vim.yank.VimYankGroup
 
 interface VimInjector {
-  // Fully moved to vim-engine. Should we remove it from injector?
+  // [FINISHED] Fully moved to vim-engine. Should we remove it from injector?
   val parser: VimStringParser
-  // Can't be fully moved to vim-engine
+  // [FINISHED] Can't be fully moved to vim-engine
   val messages: VimMessages
-  // Only state left in the IJ
+  // [FINISHED] Fully moved to vim-engine. Only state left in the IJ
+  // Let's keep the state saver as is until we'll figure out how to implement this in fleet.
   val registerGroup: VimRegisterGroup
   val registerGroupIfCreated: VimRegisterGroup?
-  // Can't be fully moved to vim-engine.
+  // [FINISHED] Can't be fully moved to vim-engine.
+  // Lots of interaction with EX panel. Let's refactor it when figure out how it works in fleet.
   val processGroup: VimProcessGroup
-  // Can't be fully moved to vim-engine.
+  // [FINISHED] Can't be fully moved to vim-engine.
+  // A lot of interaction with IJ.
   val application: VimApplication
-  // Can't be fully moved to vim-engine.
+  // [FINISHED] Can't be fully moved to vim-engine.
+  // Getting contextes. Need to clarify how it works in fleet before refactoring.
   val executionContextManager: ExecutionContextManager
-  // !! in progress
+  // [FINISHED] Fully moved to vim-engine except one method that iterates with IJ.
+  // Need to check how it would work in fleet before moving this method.
   val digraphGroup: VimDigraphGroup
-  // Fully moved to vim-engine. Should we remove it from injector?
+  // [FINISHED] Fully moved to vim-engine. Should we remove it from injector?
   val vimMachine: VimMachine
-  // Can't be fully moved to vim-engine.
+  // [FINISHED] Can't be fully moved to vim-engine.
   val enabler: VimEnabler
 
   // TODO We should somehow state that [OptionServiceImpl] can be used from any implementation
-  // !! in progress
+  // [UNFINISHED] !! in progress
   val optionService: OptionService
-  // Can't be fully moved to vim-engine.
+  // [FINISHED] Can't be fully moved to vim-engine.
   val nativeActionManager: NativeActionManager
   // !! in progress
   val keyGroup: VimKeyGroup

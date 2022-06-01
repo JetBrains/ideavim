@@ -35,10 +35,7 @@ import com.intellij.util.execution.ParametersListUtil;
 import com.intellij.util.text.CharSequenceReader;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.api.ExecutionContext;
-import com.maddyhome.idea.vim.api.VimEditor;
-import com.maddyhome.idea.vim.api.VimInjectorKt;
-import com.maddyhome.idea.vim.api.VimProcessGroup;
+import com.maddyhome.idea.vim.api.*;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.ex.ExException;
@@ -59,7 +56,7 @@ import java.io.*;
 import java.util.ArrayList;
 
 
-public class ProcessGroup implements VimProcessGroup {
+public class ProcessGroup extends VimProcessGroupBase {
   public String getLastCommand() {
     return lastCommand;
   }
