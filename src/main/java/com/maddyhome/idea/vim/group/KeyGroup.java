@@ -75,8 +75,7 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
 
   private static final Logger logger = Logger.getInstance(KeyGroup.class);
 
-  // It should be ShortcutOwnerInfo, but we use Object to keep the compatibility with easymotion
-  private final @NotNull Map<KeyStroke, Object> shortcutConflicts = new LinkedHashMap<>();
+  private final @NotNull Map<KeyStroke, ShortcutOwnerInfo> shortcutConflicts = new LinkedHashMap<>();
   private final @NotNull Set<RequiredShortcut> requiredShortcutKeys = new HashSet<>(300);
   private final @NotNull Map<MappingMode, CommandPartNode<VimActionsInitiator>> keyRoots = new EnumMap<>(MappingMode.class);
   private final @NotNull Map<MappingMode, KeyMapping> keyMappings = new EnumMap<>(MappingMode.class);
@@ -206,21 +205,13 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
 
   public void saveData(@NotNull Element element) {
     final Element conflictsElement = new Element(SHORTCUT_CONFLICTS_ELEMENT);
-    for (Map.Entry<KeyStroke, Object> entry : shortcutConflicts.entrySet()) {
+    for (Map.Entry<KeyStroke, ShortcutOwnerInfo> entry : shortcutConflicts.entrySet()) {
       final ShortcutOwner owner;
-      Object myValue = entry.getValue();
-      ShortcutOwnerInfo value;
-      if (myValue instanceof ShortcutOwnerInfo) {
-        value = (ShortcutOwnerInfo)myValue;
-      } else if (myValue instanceof ShortcutOwner) {
-        value = new ShortcutOwnerInfo.AllModes((ShortcutOwner)myValue);
-      } else {
-        value = new ShortcutOwnerInfo.AllModes(ShortcutOwner.VIM);
+      ShortcutOwnerInfo myValue = entry.getValue();
+      if (myValue instanceof ShortcutOwnerInfo.AllModes) {
+        owner = ((ShortcutOwnerInfo.AllModes)myValue).getOwner();
       }
-      if (value instanceof ShortcutOwnerInfo.AllModes) {
-        owner = ((ShortcutOwnerInfo.AllModes)value).getOwner();
-      }
-      else if (value instanceof ShortcutOwnerInfo.PerMode) {
+      else if (myValue instanceof ShortcutOwnerInfo.PerMode) {
         owner = null;
       }
       else {
@@ -282,37 +273,25 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
 
   public @NotNull Map<KeyStroke, ShortcutOwnerInfo> getShortcutConflicts() {
     final Set<RequiredShortcut> requiredShortcutKeys = this.requiredShortcutKeys;
-    final Map<KeyStroke, Object> savedConflicts = getSavedShortcutConflicts();
+    final Map<KeyStroke, ShortcutOwnerInfo> savedConflicts = getSavedShortcutConflicts();
     final Map<KeyStroke, ShortcutOwnerInfo> results = new HashMap<>();
     for (RequiredShortcut requiredShortcut : requiredShortcutKeys) {
       KeyStroke keyStroke = requiredShortcut.getKeyStroke();
       if (!VimShortcutKeyAction.VIM_ONLY_EDITOR_KEYS.contains(keyStroke)) {
         final List<NativeAction> conflicts = getKeymapConflicts(keyStroke);
         if (!conflicts.isEmpty()) {
-          final Object owner = savedConflicts.get(keyStroke);
-          ShortcutOwnerInfo result;
-          if (owner != null) {
-            if (owner instanceof ShortcutOwnerInfo) {
-              result = (ShortcutOwnerInfo)owner;
-            }
-            else if (owner instanceof ShortcutOwner) {
-              result = new ShortcutOwnerInfo.AllModes((ShortcutOwner)owner);
-            }
-            else {
-              result = ShortcutOwnerInfo.allUndefined;
-            }
+          ShortcutOwnerInfo owner = savedConflicts.get(keyStroke);
+          if (owner == null) {
+            owner = ShortcutOwnerInfo.allUndefined;
           }
-          else {
-            result = ShortcutOwnerInfo.allUndefined;
-          }
-          results.put(keyStroke, result);
+          results.put(keyStroke, owner);
         }
       }
     }
     return results;
   }
 
-  public @NotNull Map<KeyStroke, Object> getSavedShortcutConflicts() {
+  public @NotNull Map<KeyStroke, ShortcutOwnerInfo> getSavedShortcutConflicts() {
     return shortcutConflicts;
   }
 

@@ -45,5 +45,5 @@ interface VimKeyGroup {
   fun getKeyMapping(mode: MappingMode): KeyMapping
 
   val shortcutConflicts: MutableMap<KeyStroke, ShortcutOwnerInfo>
-  val savedShortcutConflicts: MutableMap<KeyStroke, Any>
+  val savedShortcutConflicts: MutableMap<KeyStroke, ShortcutOwnerInfo>
 }
