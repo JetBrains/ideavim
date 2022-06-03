@@ -19,9 +19,9 @@
 package org.jetbrains.plugins.ideavim.extension.exchange
 
 import com.intellij.openapi.editor.markup.HighlighterTargetArea
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.extension.exchange.VimExchangeExtension
-import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -252,7 +252,7 @@ class VimExchangeExtensionTest : VimTestCase() {
          the lazy dog
     """.trimIndent()
     configureByText(before)
-    typeText(StringHelper.parseKeys("vlll", "X"))
+    typeText(injector.parser.parseKeys("vlll" + "X"))
 
     assertHighlighter(4, 8, HighlighterTargetArea.EXACT_RANGE)
 
@@ -269,7 +269,7 @@ class VimExchangeExtensionTest : VimTestCase() {
          the lazy dog
     """.trimIndent()
     configureByText(before)
-    typeText(StringHelper.parseKeys("Vj", "X"))
+    typeText(injector.parser.parseKeys("Vj" + "X"))
 
     assertHighlighter(4, 15, HighlighterTargetArea.LINES_IN_RANGE)
 
@@ -284,7 +284,7 @@ class VimExchangeExtensionTest : VimTestCase() {
          brown fox
     """.trimIndent()
     configureByText(before)
-    typeText(StringHelper.parseKeys("v$", "X"))
+    typeText(injector.parser.parseKeys("v$" + "X"))
 
     assertHighlighter(4, 10, HighlighterTargetArea.EXACT_RANGE)
 
@@ -299,7 +299,7 @@ class VimExchangeExtensionTest : VimTestCase() {
          brown fox
     """.trimIndent()
     configureByText(before)
-    typeText(StringHelper.parseKeys("v\$h", "X"))
+    typeText(injector.parser.parseKeys("v\$h" + "X"))
 
     assertHighlighter(4, 9, HighlighterTargetArea.EXACT_RANGE)
 
@@ -314,7 +314,7 @@ class VimExchangeExtensionTest : VimTestCase() {
          brown fox
     """.trimIndent()
     configureByText(before)
-    typeText(StringHelper.parseKeys("v\$hh", "X"))
+    typeText(injector.parser.parseKeys("v\$hh" + "X"))
 
     assertHighlighter(4, 8, HighlighterTargetArea.EXACT_RANGE)
 
@@ -329,7 +329,10 @@ class VimExchangeExtensionTest : VimTestCase() {
          brown ${c}fox
     """.trimIndent()
     configureByText(before)
-    typeText(StringHelper.parseKeys("v\$", "X"))
+    typeText(injector.parser.parseKeys(buildString {
+        append("v\$")
+        append("X")
+    }))
 
     assertHighlighter(16, 19, HighlighterTargetArea.EXACT_RANGE)
 
@@ -345,7 +348,10 @@ class VimExchangeExtensionTest : VimTestCase() {
          
     """.trimIndent()
     configureByText(before)
-    typeText(StringHelper.parseKeys("v\$", "X"))
+    typeText(injector.parser.parseKeys(buildString {
+        append("v\$")
+        append("X")
+    }))
 
     assertHighlighter(16, 20, HighlighterTargetArea.EXACT_RANGE)
 
@@ -361,7 +367,7 @@ class VimExchangeExtensionTest : VimTestCase() {
          
     """.trimIndent()
     configureByText(before)
-    typeText(StringHelper.parseKeys("vb", "X"))
+    typeText(injector.parser.parseKeys("vb" + "X"))
 
     assertHighlighter(10, 17, HighlighterTargetArea.EXACT_RANGE)
 
@@ -411,7 +417,7 @@ class VimExchangeExtensionTest : VimTestCase() {
          the lazy dog
     """.trimIndent()
     configureByText(before)
-    typeText(StringHelper.parseKeys("cxj"))
+    typeText(injector.parser.parseKeys("cxj"))
 
     // Note that this is the range of the motion. The implementation will select the text with linewise 'V', so the
     // correct text is yanked. The LINES_IN_RANGE means the highlight is drawn across the whole line
@@ -431,7 +437,7 @@ class VimExchangeExtensionTest : VimTestCase() {
          the lazy dog
     """.trimIndent()
     configureByText(before)
-    typeText(StringHelper.parseKeys("cxx"))
+    typeText(injector.parser.parseKeys("cxx"))
 
     // Note that this is the range of the motion. The implementation will select the text with linewise 'V', so the
     // correct text is yanked. The LINES_IN_RANGE means the highlight is drawn across the whole line
@@ -442,7 +448,7 @@ class VimExchangeExtensionTest : VimTestCase() {
   }
 
   private fun exitExchange() {
-    typeText(StringHelper.parseKeys("cxc"))
+    typeText(injector.parser.parseKeys("cxc"))
   }
 
   private fun assertHighlighter(start: Int, end: Int, area: HighlighterTargetArea) {

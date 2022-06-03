@@ -48,6 +48,7 @@ import com.intellij.testFramework.fixtures.impl.LightTempDirTestFixtureImpl
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.VimShortcutKeyAction
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.CommandState.SubMode
 import com.maddyhome.idea.vim.common.MappingMode
@@ -58,9 +59,6 @@ import com.maddyhome.idea.vim.helper.EditorDataContext
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.GuicursorChangeListener
 import com.maddyhome.idea.vim.helper.RunnableHelper.runWriteCommand
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
-import com.maddyhome.idea.vim.helper.StringHelper.stringToKeys
-import com.maddyhome.idea.vim.helper.StringHelper.toKeyNotation
 import com.maddyhome.idea.vim.helper.TestInputModel
 import com.maddyhome.idea.vim.helper.getGuiCursorMode
 import com.maddyhome.idea.vim.helper.inBlockSubMode
@@ -280,7 +278,7 @@ abstract class VimTestCase : UsefulTestCase() {
     VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(0))
     VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolljumpName, VimInt(1))
 
-    typeText(parseKeys("${scrollToLogicalLine + 1}z<CR>", "${caretLogicalLine + 1}G", "${caretLogicalColumn + 1}|"))
+    typeText(injector.parser.parseKeys("${scrollToLogicalLine + 1}z<CR>" + "${caretLogicalLine + 1}G" + "${caretLogicalColumn + 1}|"))
 
     VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(scrolloff))
     VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolljumpName, VimInt(scrolljump))
@@ -300,7 +298,7 @@ abstract class VimTestCase : UsefulTestCase() {
   }
 
   protected fun typeText(keys: List<KeyStroke?>): Editor {
-    NeovimTesting.typeCommand(keys.filterNotNull().joinToString(separator = "") { toKeyNotation(it) }, this)
+    NeovimTesting.typeCommand(keys.filterNotNull().joinToString(separator = "") { injector.parser.toKeyNotation(it) }, this)
     val editor = myFixture.editor
     val project = myFixture.project
     when (Checks.keyHandler) {
@@ -407,26 +405,26 @@ abstract class VimTestCase : UsefulTestCase() {
   }
 
   fun putMapping(modes: Set<MappingMode>, from: String, to: String, recursive: Boolean) {
-    VimPlugin.getKey().putKeyMapping(modes, parseKeys(from), MappingOwner.IdeaVim.System, parseKeys(to), recursive)
+    VimPlugin.getKey().putKeyMapping(modes, injector.parser.parseKeys(from), MappingOwner.IdeaVim.System, injector.parser.parseKeys(to), recursive)
   }
 
   fun assertNoMapping(from: String) {
-    val keys = parseKeys(from)
+    val keys = injector.parser.parseKeys(from)
     for (mode in MappingMode.ALL) {
       assertNull(VimPlugin.getKey().getKeyMapping(mode).get(keys))
     }
   }
 
   fun assertNoMapping(from: String, modes: Set<MappingMode>) {
-    val keys = parseKeys(from)
+    val keys = injector.parser.parseKeys(from)
     for (mode in modes) {
       assertNull(VimPlugin.getKey().getKeyMapping(mode).get(keys))
     }
   }
 
   fun assertMappingExists(from: String, to: String, modes: Set<MappingMode>) {
-    val keys = parseKeys(from)
-    val toKeys = parseKeys(to)
+    val keys = injector.parser.parseKeys(from)
+    val toKeys = injector.parser.parseKeys(to)
     for (mode in modes) {
       val info = VimPlugin.getKey().getKeyMapping(mode).get(keys)
       kotlin.test.assertNotNull(info)
@@ -572,7 +570,7 @@ abstract class VimTestCase : UsefulTestCase() {
   }
 
   protected fun performTest(keys: String, after: String, modeAfter: CommandState.Mode, subModeAfter: SubMode) {
-    typeText(parseKeys(keys))
+    typeText(injector.parser.parseKeys(keys))
     @Suppress("IdeaVimAssertState")
     myFixture.checkResult(after)
     assertState(modeAfter, subModeAfter)
@@ -595,7 +593,7 @@ abstract class VimTestCase : UsefulTestCase() {
   }
 
   protected fun setRegister(register: Char, keys: String) {
-    VimPlugin.getRegister().setKeys(register, stringToKeys(keys))
+    VimPlugin.getRegister().setKeys(register, injector.parser.stringToKeys(keys))
     NeovimTesting.setRegister(register, keys, this)
   }
 
@@ -691,9 +689,9 @@ abstract class VimTestCase : UsefulTestCase() {
     @JvmStatic
     fun commandToKeys(command: String): List<KeyStroke> {
       val keys: MutableList<KeyStroke> = ArrayList()
-      keys.addAll(parseKeys(":"))
-      keys.addAll(stringToKeys(command))
-      keys.addAll(parseKeys("<Enter>"))
+      keys.addAll(injector.parser.parseKeys(":"))
+      keys.addAll(injector.parser.stringToKeys(command))
+      keys.addAll(injector.parser.parseKeys("<Enter>"))
       return keys
     }
 
@@ -701,9 +699,9 @@ abstract class VimTestCase : UsefulTestCase() {
 
     fun searchToKeys(pattern: String, forwards: Boolean): List<KeyStroke> {
       val keys: MutableList<KeyStroke> = ArrayList()
-      keys.addAll(parseKeys(if (forwards) "/" else "?"))
-      keys.addAll(stringToKeys(pattern))
-      keys.addAll(parseKeys("<CR>"))
+      keys.addAll(injector.parser.parseKeys(if (forwards) "/" else "?"))
+      keys.addAll(injector.parser.stringToKeys(pattern))
+      keys.addAll(injector.parser.parseKeys("<CR>"))
       return keys
     }
 

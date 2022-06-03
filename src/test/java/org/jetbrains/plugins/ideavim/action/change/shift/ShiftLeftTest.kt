@@ -19,7 +19,7 @@
 package org.jetbrains.plugins.ideavim.action.change.shift
 
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.helper.StringHelper
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -37,7 +37,7 @@ class ShiftLeftTest : VimTestCase() {
               where it was settled on some sodden sand
               hard by the torrent of a mountain pass.
     """.trimIndent()
-    typeTextInFile(StringHelper.parseKeys("<W"), file)
+    typeTextInFile(injector.parser.parseKeys("<W"), file)
     assertState(
       """
             A Discovery
@@ -60,7 +60,7 @@ class ShiftLeftTest : VimTestCase() {
       |       where it was settled on some sodden sand
       |       hard by the torrent of a mountain pass.
     """.trimMargin()
-    typeTextInFile(StringHelper.parseKeys("<<"), file)
+    typeTextInFile(injector.parser.parseKeys("<<"), file)
     assertState(
       """
       |A Discovery
@@ -84,7 +84,7 @@ class ShiftLeftTest : VimTestCase() {
       |       where it was settled on some sodden sand
       |       hard by the torrent of a mountain pass.
     """.trimMargin()
-    typeTextInFile(StringHelper.parseKeys("<<"), file)
+    typeTextInFile(injector.parser.parseKeys("<<"), file)
     assertState(
       """
       |A Discovery
@@ -108,7 +108,7 @@ class ShiftLeftTest : VimTestCase() {
       |       where it was settled on some sodden sand
       |       hard by the torrent of a mountain pass.
     """.trimMargin()
-    typeTextInFile(StringHelper.parseKeys("<<"), file)
+    typeTextInFile(injector.parser.parseKeys("<<"), file)
     assertState(
       """
       |A Discovery
@@ -130,7 +130,7 @@ class ShiftLeftTest : VimTestCase() {
               where it was settled on some sodden sand
               hard by the torrent of a mountain pass.
     """.trimIndent()
-    typeTextInFile(StringHelper.parseKeys("i<C-D>"), file)
+    typeTextInFile(injector.parser.parseKeys("i<C-D>"), file)
     assertState(
       """
             A Discovery

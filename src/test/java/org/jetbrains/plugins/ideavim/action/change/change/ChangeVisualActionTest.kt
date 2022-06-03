@@ -20,8 +20,8 @@
 
 package org.jetbrains.plugins.ideavim.action.change.change
 
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -158,7 +158,7 @@ class ChangeVisualActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.MULTICARET)
   fun `test change visual action`() {
     typeTextInFile(
-      parseKeys("v2lc", "aaa", "<ESC>"),
+      injector.parser.parseKeys("v2lc" + "aaa" + "<ESC>"),
       "abcd${c}ffffff${c}abcde${c}aaaa\n"
     )
     assertMode(CommandState.Mode.COMMAND)

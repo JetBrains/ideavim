@@ -34,7 +34,6 @@ import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.util.Ref;
-import com.intellij.openapi.util.Trinity;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.*;
 import com.maddyhome.idea.vim.common.CharacterPosition;
@@ -1344,7 +1343,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
 
   private static void addOptionalTextElement(@NotNull Element element, @NotNull String name, @Nullable String text) {
     if (text != null) {
-      element.addContent(StringHelper.setSafeXmlText(new Element(name), text));
+      element.addContent(VimPlugin.getXML().setSafeXmlText(new Element(name), text));
     }
   }
 
@@ -1388,14 +1387,14 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
 
   private static @Nullable String getSafeChildText(@NotNull Element element, @NotNull String name) {
     final Element child = element.getChild(name);
-    return child != null ? StringHelper.getSafeXmlText(child) : null;
+    return child != null ? VimPlugin.getXML().getSafeXmlText(child) : null;
   }
 
   @SuppressWarnings("SameParameterValue")
   private static @NotNull String getSafeChildText(@NotNull Element element, @NotNull String name, @NotNull String defaultValue) {
     final Element child = element.getChild(name);
     if (child != null) {
-      final String value = StringHelper.getSafeXmlText(child);
+      final String value = VimPlugin.getXML().getSafeXmlText(child);
       return value != null ? value : defaultValue;
     }
     return defaultValue;

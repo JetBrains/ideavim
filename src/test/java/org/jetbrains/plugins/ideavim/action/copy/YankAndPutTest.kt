@@ -18,7 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.action.copy
 
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.options.OptionConstants
 import org.jetbrains.plugins.ideavim.OptionValueType
 import org.jetbrains.plugins.ideavim.VimOptionTestCase
@@ -36,11 +36,11 @@ class YankAndPutTest : VimOptionTestCase(OptionConstants.clipboardName) {
     """.trimIndent()
     configureByText(before)
     // Select and yank first word
-    typeText(parseKeys("vey"))
+    typeText(injector.parser.parseKeys("vey"))
     // Replace second word
-    typeText(parseKeys("wvep"))
+    typeText(injector.parser.parseKeys("wvep"))
     // Replace previous word
-    typeText(parseKeys("bbvep"))
+    typeText(injector.parser.parseKeys("bbvep"))
 
     assertState(
       """
@@ -64,11 +64,11 @@ class YankAndPutTest : VimOptionTestCase(OptionConstants.clipboardName) {
     """.trimIndent()
     configureByText(before)
     // Select and yank first word
-    typeText(parseKeys("vey"))
+    typeText(injector.parser.parseKeys("vey"))
     // Replace second word
-    typeText(parseKeys("wvep"))
+    typeText(injector.parser.parseKeys("wvep"))
     // Replace previous word
-    typeText(parseKeys("bbvep"))
+    typeText(injector.parser.parseKeys("bbvep"))
 
     assertState(
       """
@@ -86,11 +86,11 @@ class YankAndPutTest : VimOptionTestCase(OptionConstants.clipboardName) {
     """.trimIndent()
     configureByText(before)
     // Select and yank first word
-    typeText(parseKeys("vey"))
+    typeText(injector.parser.parseKeys("vey"))
     // Replace second word
-    typeText(parseKeys("wvep"))
+    typeText(injector.parser.parseKeys("wvep"))
     // Replace previous word
-    typeText(parseKeys("bbvep"))
+    typeText(injector.parser.parseKeys("bbvep"))
 
     assertState(
       """

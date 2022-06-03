@@ -18,8 +18,8 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -109,7 +109,7 @@ class JoinLinesCommandTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent()
     )
-    typeText(parseKeys("Vjj"))
+    typeText(injector.parser.parseKeys("Vjj"))
     typeText(commandToKeys("join"))
     assertState(
       """

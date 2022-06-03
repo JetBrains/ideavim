@@ -21,8 +21,8 @@
 package org.jetbrains.plugins.ideavim.action.change.delete
 
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
@@ -34,7 +34,7 @@ class DeleteMotionActionTest : VimTestCase() {
 
   fun `test delete last line`() {
     typeTextInFile(
-      parseKeys("dd"),
+      injector.parser.parseKeys("dd"),
       """
         def xxx():
           expression one
@@ -51,7 +51,7 @@ class DeleteMotionActionTest : VimTestCase() {
 
   fun `test delete single line`() {
     typeTextInFile(
-      parseKeys("dd"),
+      injector.parser.parseKeys("dd"),
       """
         def x${c}xx():
       """.trimIndent()
@@ -63,7 +63,7 @@ class DeleteMotionActionTest : VimTestCase() {
   fun `test delete last line with nostartofline`() {
     VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.startoflineName)
     typeTextInFile(
-      parseKeys("dd"),
+      injector.parser.parseKeys("dd"),
       """
         |def xxx():
         |  expression one
@@ -81,7 +81,7 @@ class DeleteMotionActionTest : VimTestCase() {
   @VimBehaviorDiffers(originalVimAfter = "  expression two\n")
   fun `test delete last line stored with new line`() {
     typeTextInFile(
-      parseKeys("dd"),
+      injector.parser.parseKeys("dd"),
       """
         def xxx():
           expression one
@@ -95,7 +95,7 @@ class DeleteMotionActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.MULTICARET)
   fun `test delete line action multicaret`() {
     typeTextInFile(
-      parseKeys("d3d"),
+      injector.parser.parseKeys("d3d"),
       """
         abc${c}de
         abcde
@@ -113,7 +113,7 @@ class DeleteMotionActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.MULTICARET)
   fun `test delete motion action multicaret`() {
     typeTextInFile(
-      parseKeys("dt)"),
+      injector.parser.parseKeys("dt)"),
       """|public class Foo {
          |  int foo(int a, int b) {
          |    boolean bar = (a < 0 && (b < 0 || a > 0)${c} || b != 0);
@@ -159,7 +159,7 @@ class DeleteMotionActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    typeTextInFile(parseKeys("dd"), file)
+    typeTextInFile(injector.parser.parseKeys("dd"), file)
     assertState(newFile)
   }
 

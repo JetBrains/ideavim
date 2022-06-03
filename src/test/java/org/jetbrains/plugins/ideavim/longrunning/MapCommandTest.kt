@@ -19,7 +19,7 @@
 package org.jetbrains.plugins.ideavim.longrunning
 
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.helper.StringHelper
+import com.maddyhome.idea.vim.api.injector
 import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.VimTestCase
 
@@ -35,7 +35,7 @@ class MapCommandTest : VimTestCase() {
     configureByJavaText(text)
 
     typeText(commandToKeys("map b wbb"))
-    typeText(StringHelper.parseKeys("b"))
+    typeText(injector.parser.parseKeys("b"))
 
     TestCase.assertTrue(VimPlugin.isError())
   }

@@ -21,8 +21,8 @@
 package org.jetbrains.plugins.ideavim.action.motion.leftright
 
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
@@ -139,9 +139,9 @@ class MotionShiftHomeActionTest : VimOptionTestCase(OptionConstants.keymodelName
             hard by the torrent of a mountain pass.
     """.trimIndent()
     configureByText(before)
-    typeText(parseKeys("<S-Home>"))
+    typeText(injector.parser.parseKeys("<S-Home>"))
     assertState(CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    typeText(parseKeys("\$v", "<S-Home>"))
+    typeText(injector.parser.parseKeys("\$v" + "<S-Home>"))
     assertState(after)
     assertState(CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
   }
@@ -169,9 +169,9 @@ class MotionShiftHomeActionTest : VimOptionTestCase(OptionConstants.keymodelName
             hard by the torrent of a mountain pass.
     """.trimIndent()
     configureByText(before)
-    typeText(parseKeys("<S-Home>"))
+    typeText(injector.parser.parseKeys("<S-Home>"))
     assertState(CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    typeText(parseKeys("\$gh", "<S-Home>"))
+    typeText(injector.parser.parseKeys("\$gh" + "<S-Home>"))
     assertState(after)
     assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
   }

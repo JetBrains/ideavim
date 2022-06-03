@@ -20,8 +20,8 @@ package org.jetbrains.plugins.ideavim.action.copy
 
 import com.intellij.notification.EventLog
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.SelectionType
-import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
 import org.jetbrains.plugins.ideavim.OptionValueType
@@ -42,7 +42,7 @@ class IdeaPutNotificationsTest : VimOptionTestCase(OptionConstants.clipboardName
     configureByText(before)
     appReadySetup(false)
     VimPlugin.getRegister().storeText(myFixture.editor, before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
-    typeText(StringHelper.parseKeys("p"))
+    typeText(injector.parser.parseKeys("p"))
 
     val notification = ActionCenter.getNotifications(myFixture.project, true).last()
     try {
@@ -69,7 +69,7 @@ class IdeaPutNotificationsTest : VimOptionTestCase(OptionConstants.clipboardName
     configureByText(before)
     appReadySetup(false)
     VimPlugin.getRegister().storeText(myFixture.editor, before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
-    typeText(StringHelper.parseKeys("p"))
+    typeText(injector.parser.parseKeys("p"))
 
     val notifications = ActionCenter.getNotifications(myFixture.project, true)
     assertTrue(notifications.isEmpty() || notifications.last().isExpired || OptionConstants.clipboard_ideaput !in notifications.last().content)
@@ -82,7 +82,7 @@ class IdeaPutNotificationsTest : VimOptionTestCase(OptionConstants.clipboardName
     configureByText(before)
     appReadySetup(true)
     VimPlugin.getRegister().storeText(myFixture.editor.vim, before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
-    typeText(StringHelper.parseKeys("p"))
+    typeText(injector.parser.parseKeys("p"))
 
     val notifications = EventLog.getLogModel(myFixture.project).notifications
     assertTrue(notifications.isEmpty() || notifications.last().isExpired || OptionConstants.clipboard_ideaput !in notifications.last().content)

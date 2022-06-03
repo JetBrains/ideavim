@@ -18,8 +18,8 @@
 
 package org.jetbrains.plugins.ideavim.extension.textobjindent
 
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper
 import org.jetbrains.plugins.ideavim.JavaVimTestCase
 
 /**
@@ -33,7 +33,7 @@ class VimIndentObjectTest : JavaVimTestCase() {
 
   fun testSingleLine() {
     doTest(
-      StringHelper.parseKeys("dii"),
+      injector.parser.parseKeys("dii"),
       """
         one
       """.trimIndent(),
@@ -45,7 +45,7 @@ class VimIndentObjectTest : JavaVimTestCase() {
 
   fun testDeleteFlatIndent() {
     doTest(
-      StringHelper.parseKeys("dii"),
+      injector.parser.parseKeys("dii"),
       """
         one
         two
@@ -60,7 +60,7 @@ class VimIndentObjectTest : JavaVimTestCase() {
 
   fun testDeleteOuterFlatIndent() {
     doTest(
-      StringHelper.parseKeys("dai"),
+      injector.parser.parseKeys("dai"),
       """
         one
         two
@@ -75,7 +75,7 @@ class VimIndentObjectTest : JavaVimTestCase() {
 
   fun testDeleteInnerIndent() {
     doTest(
-      StringHelper.parseKeys("2Gdii"),
+      injector.parser.parseKeys("2Gdii"),
       """
         one
           two
@@ -93,7 +93,7 @@ class VimIndentObjectTest : JavaVimTestCase() {
 
   fun testDeleteOuterIndent() {
     doTest(
-      StringHelper.parseKeys("2Gdai"),
+      injector.parser.parseKeys("2Gdai"),
       """
         one
           two
@@ -110,7 +110,7 @@ class VimIndentObjectTest : JavaVimTestCase() {
 
   fun testDeleteFarOuterIndent() {
     doTest(
-      StringHelper.parseKeys("2GdaI"),
+      injector.parser.parseKeys("2GdaI"),
       """
         one
           two
@@ -125,7 +125,7 @@ class VimIndentObjectTest : JavaVimTestCase() {
 
   fun testDeleteInnerIndentWithLinesAbove() {
     doTest(
-      StringHelper.parseKeys("5Gdii"),
+      injector.parser.parseKeys("5Gdii"),
       """
         all
         negatives
@@ -149,7 +149,7 @@ class VimIndentObjectTest : JavaVimTestCase() {
 
   fun testDeleteInnerIndentWithBlankLinesAbove() {
     doTest(
-      StringHelper.parseKeys("6Gdii"),
+      injector.parser.parseKeys("6Gdii"),
       """
         all
         negatives
@@ -175,7 +175,7 @@ class VimIndentObjectTest : JavaVimTestCase() {
 
   fun testNested1() {
     doTest(
-      StringHelper.parseKeys("2Gdii"),
+      injector.parser.parseKeys("2Gdii"),
       """
         one
           two
@@ -193,7 +193,7 @@ class VimIndentObjectTest : JavaVimTestCase() {
 
   fun testNested1a() {
     doTest(
-      StringHelper.parseKeys("3Gdai"),
+      injector.parser.parseKeys("3Gdai"),
       """
         one
           two
@@ -211,7 +211,7 @@ class VimIndentObjectTest : JavaVimTestCase() {
 
   fun testNested2() {
     doTest(
-      StringHelper.parseKeys("3Gdii"),
+      injector.parser.parseKeys("3Gdii"),
       """
         one
           two
@@ -230,7 +230,7 @@ class VimIndentObjectTest : JavaVimTestCase() {
 
   fun testNested3() {
     doTest(
-      StringHelper.parseKeys("3Gdii"),
+      injector.parser.parseKeys("3Gdii"),
       """
         one
           two
@@ -251,7 +251,7 @@ class VimIndentObjectTest : JavaVimTestCase() {
 
   fun testNested4() {
     doTest(
-      StringHelper.parseKeys("3Gdii"),
+      injector.parser.parseKeys("3Gdii"),
       """
         one
           two

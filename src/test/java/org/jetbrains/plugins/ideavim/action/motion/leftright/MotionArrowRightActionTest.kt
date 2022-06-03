@@ -20,8 +20,8 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.leftright
 
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.options.OptionConstants
 import org.jetbrains.plugins.ideavim.OptionValueType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -50,7 +50,7 @@ class MotionArrowRightActionTest : VimOptionTestCase(OptionConstants.keymodelNam
     // After:  "I fo«:test»|u|nd it in a legendary land"
     addInlay(4, true, 5)
 
-    typeText(parseKeys("<Right>"))
+    typeText(injector.parser.parseKeys("<Right>"))
     assertState(after)
 
     assertOffset(4)
@@ -72,7 +72,7 @@ class MotionArrowRightActionTest : VimOptionTestCase(OptionConstants.keymodelNam
     // After: "I fo«:test»u|n|d it in a legendary land."
     addInlay(4, true, 5)
 
-    typeText(parseKeys("<Right>"))
+    typeText(injector.parser.parseKeys("<Right>"))
     assertState(after)
 
     assertOffset(5)
@@ -96,13 +96,13 @@ class MotionArrowRightActionTest : VimOptionTestCase(OptionConstants.keymodelNam
     // After:  "I fo|«:test»und it in a legendary land"
     addInlay(4, true, 5)
 
-    typeText(parseKeys("i", "<Right>"))
+    typeText(injector.parser.parseKeys("i" + "<Right>"))
     assertState(after)
 
     assertOffset(4)
     assertVisualPosition(0, 4)
 
-    typeText(parseKeys("<Esc>"))
+    typeText(injector.parser.parseKeys("<Esc>"))
     assertOffset(3)
     assertVisualPosition(0, 3)
   }
@@ -128,16 +128,16 @@ class MotionArrowRightActionTest : VimOptionTestCase(OptionConstants.keymodelNam
     // <Esc>:               "I fo«:test»|u|nd it in a legendary land" (caret = vp5)
     addInlay(4, true, 5)
 
-    typeText(parseKeys("i"))
+    typeText(injector.parser.parseKeys("i"))
     assertVisualPosition(0, 4)
 
-    typeText(parseKeys("<Right>"))
+    typeText(injector.parser.parseKeys("<Right>"))
     myFixture.checkResult(after)
 
     assertOffset(5)
     assertVisualPosition(0, 6)
 
-    typeText(parseKeys("<Esc>"))
+    typeText(injector.parser.parseKeys("<Esc>"))
     assertOffset(4)
     assertVisualPosition(0, 5)
   }
@@ -159,7 +159,7 @@ class MotionArrowRightActionTest : VimOptionTestCase(OptionConstants.keymodelNam
     // After: "I fo«test:»|u|nd it in a legendary land."
     addInlay(4, false, 5)
 
-    typeText(parseKeys("<Right>"))
+    typeText(injector.parser.parseKeys("<Right>"))
     assertState(after)
 
     assertOffset(4)
@@ -182,13 +182,13 @@ class MotionArrowRightActionTest : VimOptionTestCase(OptionConstants.keymodelNam
     // After: "I fo«test:»|und it in a legendary land."
     addInlay(4, false, 5)
 
-    typeText(parseKeys("i", "<Right>"))
+    typeText(injector.parser.parseKeys("i" + "<Right>"))
     assertState(after)
 
     assertOffset(4)
     assertVisualPosition(0, 5)
 
-    typeText(parseKeys("<Esc>"))
+    typeText(injector.parser.parseKeys("<Esc>"))
     assertOffset(3)
     assertVisualPosition(0, 3)
   }

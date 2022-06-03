@@ -19,7 +19,7 @@
 package org.jetbrains.plugins.ideavim.action.change.insert
 
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
@@ -37,7 +37,7 @@ class InsertTabActionTest : VimTestCase() {
     val after = "I fo    ${c}und it in a legendary land"
     configureByText(before)
 
-    typeText(parseKeys("i", "<Tab>"))
+    typeText(injector.parser.parseKeys("i" + "<Tab>"))
 
     assertState(after)
   }
@@ -51,7 +51,7 @@ class InsertTabActionTest : VimTestCase() {
     configureByColumns(200)
 
     // TODO: This works for tests, but not in real life. See VimShortcutKeyAction.isEnabled
-    typeText(parseKeys("70|", "i", "<Tab>"))
+    typeText(injector.parser.parseKeys("70|" + "i" + "<Tab>"))
     assertVisibleLineBounds(0, 32, 111)
   }
 
@@ -59,7 +59,7 @@ class InsertTabActionTest : VimTestCase() {
   fun `test insert tab scrolls at end of line 2`() {
     VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.sidescrolloffName, VimInt(10))
     configureByColumns(200)
-    typeText(parseKeys("70|", "i", "<C-I>"))
+    typeText(injector.parser.parseKeys("70|" + "i" + "<C-I>"))
     assertVisibleLineBounds(0, 32, 111)
   }
 }

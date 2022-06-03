@@ -21,7 +21,7 @@
 package org.jetbrains.plugins.ideavim.group.motion
 
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
@@ -41,7 +41,7 @@ class MotionGroup_scrolloff_Test : VimOptionTestCase(OptionConstants.scrolloffNa
   fun `test move up shows no context with scrolloff=0`() {
     configureByPages(5)
     setPositionAndScroll(25, 25)
-    typeText(parseKeys("k"))
+    typeText(injector.parser.parseKeys("k"))
     assertPosition(24, 0)
     assertVisibleArea(24, 58)
   }
@@ -51,7 +51,7 @@ class MotionGroup_scrolloff_Test : VimOptionTestCase(OptionConstants.scrolloffNa
   fun `test move up shows context line with scrolloff=1`() {
     configureByPages(5)
     setPositionAndScroll(25, 26)
-    typeText(parseKeys("k"))
+    typeText(injector.parser.parseKeys("k"))
     assertPosition(25, 0)
     assertVisibleArea(24, 58)
   }
@@ -61,7 +61,7 @@ class MotionGroup_scrolloff_Test : VimOptionTestCase(OptionConstants.scrolloffNa
   fun `test move up shows context lines with scrolloff=10`() {
     configureByPages(5)
     setPositionAndScroll(25, 35)
-    typeText(parseKeys("k"))
+    typeText(injector.parser.parseKeys("k"))
     assertPosition(34, 0)
     assertVisibleArea(24, 58)
   }
@@ -73,24 +73,24 @@ class MotionGroup_scrolloff_Test : VimOptionTestCase(OptionConstants.scrolloffNa
     configureByPages(5)
     setPositionAndScroll(33, 52)
 
-    typeText(parseKeys("k"))
+    typeText(injector.parser.parseKeys("k"))
     assertPosition(51, 0)
     assertVisibleArea(33, 67)
 
-    typeText(parseKeys("k"))
+    typeText(injector.parser.parseKeys("k"))
     assertPosition(50, 0)
     assertVisibleArea(33, 67)
 
-    typeText(parseKeys("k"))
+    typeText(injector.parser.parseKeys("k"))
     assertPosition(49, 0)
     assertVisibleArea(33, 67)
 
-    typeText(parseKeys("k"))
+    typeText(injector.parser.parseKeys("k"))
     assertPosition(48, 0)
     assertVisibleArea(33, 67)
 
     // Scroll
-    typeText(parseKeys("k"))
+    typeText(injector.parser.parseKeys("k"))
     assertPosition(47, 0)
     assertVisibleArea(32, 66)
   }
@@ -102,16 +102,16 @@ class MotionGroup_scrolloff_Test : VimOptionTestCase(OptionConstants.scrolloffNa
     configureByPages(5)
     setPositionAndScroll(33, 51)
 
-    typeText(parseKeys("k"))
+    typeText(injector.parser.parseKeys("k"))
     assertPosition(50, 0)
     assertVisibleArea(33, 67)
 
-    typeText(parseKeys("k"))
+    typeText(injector.parser.parseKeys("k"))
     assertPosition(49, 0)
     assertVisibleArea(33, 67)
 
     // Scroll
-    typeText(parseKeys("k"))
+    typeText(injector.parser.parseKeys("k"))
     assertPosition(48, 0)
     assertVisibleArea(32, 66)
   }
@@ -125,12 +125,12 @@ class MotionGroup_scrolloff_Test : VimOptionTestCase(OptionConstants.scrolloffNa
     setEditorVisibleSize(screenWidth, 34)
     setPositionAndScroll(33, 50)
 
-    typeText(parseKeys("k"))
+    typeText(injector.parser.parseKeys("k"))
     assertPosition(49, 0)
     assertVisibleArea(33, 66)
 
     // Scroll
-    typeText(parseKeys("k"))
+    typeText(injector.parser.parseKeys("k"))
     assertPosition(48, 0)
     assertVisibleArea(32, 65)
   }
@@ -145,12 +145,12 @@ class MotionGroup_scrolloff_Test : VimOptionTestCase(OptionConstants.scrolloffNa
     setEditorVisibleSize(screenWidth, 34)
     setPositionAndScroll(33, 50)
 
-    typeText(parseKeys("k"))
+    typeText(injector.parser.parseKeys("k"))
     assertPosition(49, 0)
     assertVisibleArea(33, 66)
 
     // Scroll
-    typeText(parseKeys("k"))
+    typeText(injector.parser.parseKeys("k"))
     assertPosition(48, 0)
     assertVisibleArea(32, 65)
   }
@@ -162,7 +162,7 @@ class MotionGroup_scrolloff_Test : VimOptionTestCase(OptionConstants.scrolloffNa
     configureByPages(5)
     setPositionAndScroll(33, 50)
 
-    typeText(parseKeys("k"))
+    typeText(injector.parser.parseKeys("k"))
     assertPosition(49, 0)
     assertVisibleArea(32, 66)
   }
@@ -174,7 +174,7 @@ class MotionGroup_scrolloff_Test : VimOptionTestCase(OptionConstants.scrolloffNa
     configureByPages(5)
     setPositionAndScroll(33, 50)
 
-    typeText(parseKeys("k"))
+    typeText(injector.parser.parseKeys("k"))
     assertPosition(49, 0)
     assertVisibleArea(32, 66)
   }
@@ -184,7 +184,7 @@ class MotionGroup_scrolloff_Test : VimOptionTestCase(OptionConstants.scrolloffNa
   fun `test move down shows no context with scrolloff=0`() {
     configureByPages(5)
     setPositionAndScroll(25, 59)
-    typeText(parseKeys("j"))
+    typeText(injector.parser.parseKeys("j"))
     assertPosition(60, 0)
     assertVisibleArea(26, 60)
   }
@@ -194,7 +194,7 @@ class MotionGroup_scrolloff_Test : VimOptionTestCase(OptionConstants.scrolloffNa
   fun `test move down shows context line with scrolloff=1`() {
     configureByPages(5)
     setPositionAndScroll(25, 58)
-    typeText(parseKeys("j"))
+    typeText(injector.parser.parseKeys("j"))
     assertPosition(59, 0)
     assertVisibleArea(26, 60)
   }
@@ -204,7 +204,7 @@ class MotionGroup_scrolloff_Test : VimOptionTestCase(OptionConstants.scrolloffNa
   fun `test move down shows context lines with scrolloff=10`() {
     configureByPages(5)
     setPositionAndScroll(25, 49)
-    typeText(parseKeys("j"))
+    typeText(injector.parser.parseKeys("j"))
     assertPosition(50, 0)
     assertVisibleArea(26, 60)
   }
@@ -216,24 +216,24 @@ class MotionGroup_scrolloff_Test : VimOptionTestCase(OptionConstants.scrolloffNa
     configureByPages(5)
     setPositionAndScroll(33, 48)
 
-    typeText(parseKeys("j"))
+    typeText(injector.parser.parseKeys("j"))
     assertPosition(49, 0)
     assertVisibleArea(33, 67)
 
-    typeText(parseKeys("j"))
+    typeText(injector.parser.parseKeys("j"))
     assertPosition(50, 0)
     assertVisibleArea(33, 67)
 
-    typeText(parseKeys("j"))
+    typeText(injector.parser.parseKeys("j"))
     assertPosition(51, 0)
     assertVisibleArea(33, 67)
 
-    typeText(parseKeys("j"))
+    typeText(injector.parser.parseKeys("j"))
     assertPosition(52, 0)
     assertVisibleArea(33, 67)
 
     // Scroll
-    typeText(parseKeys("j"))
+    typeText(injector.parser.parseKeys("j"))
     assertPosition(53, 0)
     assertVisibleArea(34, 68)
   }
@@ -245,16 +245,16 @@ class MotionGroup_scrolloff_Test : VimOptionTestCase(OptionConstants.scrolloffNa
     configureByPages(5)
     setPositionAndScroll(33, 49)
 
-    typeText(parseKeys("j"))
+    typeText(injector.parser.parseKeys("j"))
     assertPosition(50, 0)
     assertVisibleArea(33, 67)
 
-    typeText(parseKeys("j"))
+    typeText(injector.parser.parseKeys("j"))
     assertPosition(51, 0)
     assertVisibleArea(33, 67)
 
     // Scroll
-    typeText(parseKeys("j"))
+    typeText(injector.parser.parseKeys("j"))
     assertPosition(52, 0)
     assertVisibleArea(34, 68)
   }
@@ -268,12 +268,12 @@ class MotionGroup_scrolloff_Test : VimOptionTestCase(OptionConstants.scrolloffNa
     setEditorVisibleSize(screenWidth, 34)
     setPositionAndScroll(33, 49)
 
-    typeText(parseKeys("j"))
+    typeText(injector.parser.parseKeys("j"))
     assertPosition(50, 0)
     assertVisibleArea(33, 66)
 
     // Scroll
-    typeText(parseKeys("j"))
+    typeText(injector.parser.parseKeys("j"))
     assertPosition(51, 0)
     assertVisibleArea(34, 67)
   }
@@ -287,12 +287,12 @@ class MotionGroup_scrolloff_Test : VimOptionTestCase(OptionConstants.scrolloffNa
     setEditorVisibleSize(screenWidth, 34)
     setPositionAndScroll(33, 49)
 
-    typeText(parseKeys("j"))
+    typeText(injector.parser.parseKeys("j"))
     assertPosition(50, 0)
     assertVisibleArea(33, 66)
 
     // Scroll. By 2 lines!
-    typeText(parseKeys("j"))
+    typeText(injector.parser.parseKeys("j"))
     assertPosition(51, 0)
     assertVisibleArea(35, 68)
   }
@@ -304,7 +304,7 @@ class MotionGroup_scrolloff_Test : VimOptionTestCase(OptionConstants.scrolloffNa
     configureByPages(5)
     setPositionAndScroll(33, 50)
 
-    typeText(parseKeys("j"))
+    typeText(injector.parser.parseKeys("j"))
     assertPosition(51, 0)
     assertVisibleArea(34, 68)
   }
@@ -316,7 +316,7 @@ class MotionGroup_scrolloff_Test : VimOptionTestCase(OptionConstants.scrolloffNa
     configureByPages(5)
     setPositionAndScroll(33, 50)
 
-    typeText(parseKeys("j"))
+    typeText(injector.parser.parseKeys("j"))
     assertPosition(51, 0)
     assertVisibleArea(34, 68)
   }
@@ -327,11 +327,11 @@ class MotionGroup_scrolloff_Test : VimOptionTestCase(OptionConstants.scrolloffNa
     configureByPages(5)
     setPositionAndScroll(25, 42)
 
-    typeText(parseKeys("j"))
+    typeText(injector.parser.parseKeys("j"))
     assertPosition(43, 0)
     assertVisibleArea(26, 60)
 
-    typeText(parseKeys("k"))
+    typeText(injector.parser.parseKeys("k"))
     assertPosition(42, 0)
     assertVisibleArea(25, 59)
   }
@@ -343,11 +343,11 @@ class MotionGroup_scrolloff_Test : VimOptionTestCase(OptionConstants.scrolloffNa
     setEditorVisibleSize(screenWidth, 34)
     setPositionAndScroll(26, 42)
 
-    typeText(parseKeys("j"))
+    typeText(injector.parser.parseKeys("j"))
     assertPosition(43, 0)
     assertVisibleArea(27, 60)
 
-    typeText(parseKeys("k"))
+    typeText(injector.parser.parseKeys("k"))
     assertPosition(42, 0)
     assertVisibleArea(26, 59)
   }
@@ -371,7 +371,7 @@ class MotionGroup_scrolljump_Test : VimOptionTestCase(OptionConstants.scrolljump
   fun `test move up scrolls single line with scrolljump=0`() {
     configureByPages(5)
     setPositionAndScroll(25, 25)
-    typeText(parseKeys("k"))
+    typeText(injector.parser.parseKeys("k"))
     assertPosition(24, 0)
     assertVisibleArea(24, 58)
   }
@@ -381,7 +381,7 @@ class MotionGroup_scrolljump_Test : VimOptionTestCase(OptionConstants.scrolljump
   fun `test move up scrolls single line with scrolljump=1`() {
     configureByPages(5)
     setPositionAndScroll(25, 25)
-    typeText(parseKeys("k"))
+    typeText(injector.parser.parseKeys("k"))
     assertPosition(24, 0)
     assertVisibleArea(24, 58)
   }
@@ -391,7 +391,7 @@ class MotionGroup_scrolljump_Test : VimOptionTestCase(OptionConstants.scrolljump
   fun `test move up scrolls multiple lines with scrolljump=10`() {
     configureByPages(5)
     setPositionAndScroll(25, 25)
-    typeText(parseKeys("k"))
+    typeText(injector.parser.parseKeys("k"))
     assertPosition(24, 0)
     assertVisibleArea(15, 49)
   }
@@ -401,7 +401,7 @@ class MotionGroup_scrolljump_Test : VimOptionTestCase(OptionConstants.scrolljump
   fun `test move down scrolls single line with scrolljump=0`() {
     configureByPages(5)
     setPositionAndScroll(25, 59)
-    typeText(parseKeys("j"))
+    typeText(injector.parser.parseKeys("j"))
     assertPosition(60, 0)
     assertVisibleArea(26, 60)
   }
@@ -411,7 +411,7 @@ class MotionGroup_scrolljump_Test : VimOptionTestCase(OptionConstants.scrolljump
   fun `test move down scrolls single line with scrolljump=1`() {
     configureByPages(5)
     setPositionAndScroll(25, 59)
-    typeText(parseKeys("j"))
+    typeText(injector.parser.parseKeys("j"))
     assertPosition(60, 0)
     assertVisibleArea(26, 60)
   }
@@ -421,7 +421,7 @@ class MotionGroup_scrolljump_Test : VimOptionTestCase(OptionConstants.scrolljump
   fun `test move down scrolls multiple lines with scrolljump=10`() {
     configureByPages(5)
     setPositionAndScroll(25, 59)
-    typeText(parseKeys("j"))
+    typeText(injector.parser.parseKeys("j"))
     assertPosition(60, 0)
     assertVisibleArea(35, 69)
   }
@@ -431,7 +431,7 @@ class MotionGroup_scrolljump_Test : VimOptionTestCase(OptionConstants.scrolljump
   fun `test negative scrolljump treated as percentage 1`() {
     configureByPages(5)
     setPositionAndScroll(39, 39)
-    typeText(parseKeys("k"))
+    typeText(injector.parser.parseKeys("k"))
     assertPosition(38, 0)
     assertVisibleArea(22, 56)
   }
@@ -441,7 +441,7 @@ class MotionGroup_scrolljump_Test : VimOptionTestCase(OptionConstants.scrolljump
   fun `test negative scrolljump treated as percentage 2`() {
     configureByPages(5)
     setPositionAndScroll(39, 39)
-    typeText(parseKeys("k"))
+    typeText(injector.parser.parseKeys("k"))
     assertPosition(38, 0)
     assertVisibleArea(36, 70)
   }
@@ -456,7 +456,7 @@ class MotionGroup_scrolloff_scrolljump_Test : VimOptionTestCase(OptionConstants.
   fun `test scroll up with scrolloff and scrolljump set`() {
     configureByPages(5)
     setPositionAndScroll(50, 55)
-    typeText(parseKeys("k"))
+    typeText(injector.parser.parseKeys("k"))
     assertPosition(54, 0)
     assertVisibleArea(40, 74)
   }
@@ -469,7 +469,7 @@ class MotionGroup_scrolloff_scrolljump_Test : VimOptionTestCase(OptionConstants.
   fun `test scroll down with scrolloff and scrolljump set`() {
     configureByPages(5)
     setPositionAndScroll(50, 79)
-    typeText(parseKeys("j"))
+    typeText(injector.parser.parseKeys("j"))
     assertPosition(80, 0)
     assertVisibleArea(60, 94)
   }

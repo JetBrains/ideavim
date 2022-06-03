@@ -20,12 +20,12 @@ package org.jetbrains.plugins.ideavim
 
 import com.maddyhome.idea.vim.RegisterActions.VIM_ACTIONS_EP
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.common.CommandNode
 import com.maddyhome.idea.vim.common.CommandPartNode
 import com.maddyhome.idea.vim.common.MappingMode
 import com.maddyhome.idea.vim.handler.ActionBeanClass
-import com.maddyhome.idea.vim.helper.StringHelper
 import junit.framework.TestCase
 import javax.swing.KeyStroke
 
@@ -41,7 +41,7 @@ class RegisterActionsTest : VimTestCase() {
     setupChecks {
       caretShape = false
     }
-    val keys = StringHelper.parseKeys("jklwB") // just random keys
+    val keys = injector.parser.parseKeys("jklwB") // just random keys
     val before = "I ${c}found it in a legendary land"
     val after = "I jklwB${c}found it in a legendary land"
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
@@ -51,7 +51,7 @@ class RegisterActionsTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.EDITOR_MODIFICATION)
   fun `test turn plugin off and on`() {
-    val keys = StringHelper.parseKeys("l")
+    val keys = injector.parser.parseKeys("l")
     val before = "I ${c}found it in a legendary land"
     val after = "I f${c}ound it in a legendary land"
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
@@ -62,7 +62,7 @@ class RegisterActionsTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.EDITOR_MODIFICATION)
   fun `test enable twice`() {
-    val keys = StringHelper.parseKeys("l")
+    val keys = injector.parser.parseKeys("l")
     val before = "I ${c}found it in a legendary land"
     val after = "I f${c}ound it in a legendary land"
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
@@ -74,7 +74,7 @@ class RegisterActionsTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.EDITOR_MODIFICATION)
   fun `test unregister extension`() {
-    val keys = StringHelper.parseKeys("l")
+    val keys = injector.parser.parseKeys("l")
     val before = "I ${c}found it in a legendary land"
     val after = "I f${c}ound it in a legendary land"
     var motionRightAction: ActionBeanClass? = null

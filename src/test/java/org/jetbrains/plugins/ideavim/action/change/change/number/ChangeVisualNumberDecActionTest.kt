@@ -18,8 +18,8 @@
 
 package org.jetbrains.plugins.ideavim.action.change.change.number
 
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -117,7 +117,7 @@ class ChangeVisualNumberDecActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.MULTICARET)
   fun `test change number dec visual action`() {
     typeTextInFile(
-      parseKeys("Vj<C-X>"),
+      injector.parser.parseKeys("Vj<C-X>"),
       """
                     ${c}1
                     2

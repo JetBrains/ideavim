@@ -53,7 +53,6 @@ import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.group.KeyGroup
 import com.maddyhome.idea.vim.helper.MessageHelper
-import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.runAfterGotFocus
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.RequiredShortcut
@@ -563,5 +562,5 @@ class NerdTree : VimExtension {
 }
 
 private fun <T> Node<T>.addLeafs(keys: String, actionHolder: T) {
-  addLeafs(StringHelper.parseKeys(keys), actionHolder)
+  addLeafs(injector.parser.parseKeys(keys), actionHolder)
 }

@@ -39,7 +39,6 @@ import com.intellij.util.ui.UIUtil
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.MessageHelper.message
-import com.maddyhome.idea.vim.helper.StringHelper.toKeyNotation
 import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo.AllModes
@@ -324,7 +323,7 @@ class VimEmulationConfigurable : Configurable {
         val owner = (ownerInfo as AllModes).owner
         if (owner === ShortcutOwner.UNDEFINED) continue
         stringBuilder.append("sethandler ")
-        stringBuilder.append(toKeyNotation(row.keyStroke))
+        stringBuilder.append(injector.parser.toKeyNotation(row.keyStroke))
         stringBuilder.append(" ")
         stringBuilder.append("a:")
         stringBuilder.append(owner.ownerName)

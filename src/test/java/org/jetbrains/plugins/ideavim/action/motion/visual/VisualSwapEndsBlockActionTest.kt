@@ -21,8 +21,8 @@
 package org.jetbrains.plugins.ideavim.action.motion.visual
 
 import com.intellij.openapi.editor.LogicalPosition
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -168,7 +168,7 @@ class VisualSwapEndsBlockActionTest : VimTestCase() {
 
   fun testVisualSwapEndsBlockActionInBlockMode() {
     typeTextInFile(
-      parseKeys("<C-V>", "2l", "j", "O"),
+      injector.parser.parseKeys("<C-V>" + "2l" + "j" + "O"),
       """
                     a${c}abcc
                     ddeff
@@ -186,7 +186,7 @@ class VisualSwapEndsBlockActionTest : VimTestCase() {
 
   fun testVisualBlockMovementAfterSwapEndsBlockAction() {
     typeTextInFile(
-      parseKeys("<C-V>", "2l", "j", "O", "k", "h", "j"),
+      injector.parser.parseKeys("<C-V>" + "2l" + "j" + "O" + "k" + "h" + "j"),
       """
                     aabcc
                     d${c}deff
@@ -204,7 +204,7 @@ class VisualSwapEndsBlockActionTest : VimTestCase() {
 
       """.trimIndent()
     )
-    typeText(parseKeys("j"))
+    typeText(injector.parser.parseKeys("j"))
     assertState(
       """
     aabcc

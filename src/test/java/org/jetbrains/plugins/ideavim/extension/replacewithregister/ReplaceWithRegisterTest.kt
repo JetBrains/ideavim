@@ -19,9 +19,9 @@
 package org.jetbrains.plugins.ideavim.extension.replacewithregister
 
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.SelectionType
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.register.RegisterConstants.UNNAMED_REGISTER
@@ -43,7 +43,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
     VimPlugin.getRegister().resetRegisters()
 
     configureByText(text)
-    typeText(parseKeys("griw"))
+    typeText(injector.parser.parseKeys("griw"))
     assertState(text)
   }
 
@@ -53,7 +53,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
 
     configureByText(text)
     VimPlugin.getRegister().storeText(myFixture.editor.vim, text rangeOf "one", SelectionType.CHARACTER_WISE, false)
-    typeText(parseKeys("griw"))
+    typeText(injector.parser.parseKeys("griw"))
     assertState("one on${c}e three")
     assertEquals("one", VimPlugin.getRegister().lastRegister?.text)
   }
@@ -64,7 +64,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
 
     configureByText(text)
     VimPlugin.getRegister().storeTextSpecial(UNNAMED_REGISTER, "one")
-    typeText(parseKeys("griw"))
+    typeText(injector.parser.parseKeys("griw"))
     assertState("on${c}e")
   }
 
@@ -74,7 +74,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
 
     configureByText(text)
     VimPlugin.getRegister().storeTextSpecial(UNNAMED_REGISTER, "")
-    typeText(parseKeys("griw"))
+    typeText(injector.parser.parseKeys("griw"))
     assertState(c)
   }
 
@@ -83,10 +83,10 @@ class ReplaceWithRegisterTest : VimTestCase() {
     val text = "one ${c}two three four"
 
     configureByText(text)
-    typeText(parseKeys("\"ayiw", "w", "\"agriw"))
+    typeText(injector.parser.parseKeys("\"ayiw" + "w" + "\"agriw"))
     assertState("one two tw${c}o four")
     assertEquals("two", VimPlugin.getRegister().lastRegister?.text)
-    typeText(parseKeys("w", "griw"))
+    typeText(injector.parser.parseKeys("w" + "griw"))
     assertState("one two two tw${c}o")
     assertEquals("two", VimPlugin.getRegister().lastRegister?.text)
   }
@@ -96,7 +96,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
     val text = "one ${c}two three four"
 
     configureByText(text)
-    typeText(parseKeys("\"+yiw", "w", "\"+griw", "w", "\"+griw"))
+    typeText(injector.parser.parseKeys("\"+yiw" + "w" + "\"+griw" + "w" + "\"+griw"))
     assertState("one two two tw${c}o")
     assertEquals("two", VimPlugin.getRegister().lastRegister?.text)
   }
@@ -106,7 +106,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
     val text = "one ${c}two three"
 
     configureByText(text)
-    typeText(parseKeys("\"ayiw", "\"bgriw"))
+    typeText(injector.parser.parseKeys("\"ayiw" + "\"bgriw"))
     assertState(text)
   }
 
@@ -118,7 +118,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
     """.trimIndent()
 
     configureByText(text)
-    typeText(parseKeys("yy", "j", "griw"))
+    typeText(injector.parser.parseKeys("yy" + "j" + "griw"))
     assertState(
       """
             |I found it in a legendary land|
@@ -135,7 +135,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
     """.trimIndent()
 
     configureByText(text)
-    typeText(parseKeys("\"+yy", "j", "\"+griw"))
+    typeText(injector.parser.parseKeys("\"+yy" + "j" + "\"+griw"))
     assertState(
       """
             |I found it in a legendary land|
@@ -154,7 +154,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
     """.trimIndent()
 
     configureByText(text)
-    typeText(parseKeys("<C-v>jjlly", "gg^w", "griw"))
+    typeText(injector.parser.parseKeys("<C-v>jjlly" + "gg^w" + "griw"))
     assertState(
       """
             one ${c}one three
@@ -171,7 +171,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
 
     configureByText(text)
     VimPlugin.getRegister().storeText(myFixture.editor.vim, text rangeOf "one", SelectionType.CHARACTER_WISE, false)
-    typeText(parseKeys("3griw"))
+    typeText(injector.parser.parseKeys("3griw"))
     assertState("one on${c}e four")
     assertEquals("one", VimPlugin.getRegister().lastRegister?.text)
   }
@@ -183,7 +183,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
 
     configureByText(text)
     VimPlugin.getRegister().storeText(myFixture.editor.vim, text rangeOf "one", SelectionType.CHARACTER_WISE, false)
-    typeText(parseKeys("griw"))
+    typeText(injector.parser.parseKeys("griw"))
     assertState("one two one four")
     assertEquals("one", VimPlugin.getRegister().lastRegister?.text)
   }
@@ -194,7 +194,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
 
     configureByText(text)
     VimPlugin.getRegister().storeText(myFixture.editor.vim, text rangeOf "one", SelectionType.CHARACTER_WISE, false)
-    typeText(parseKeys("griw", "w", "."))
+    typeText(injector.parser.parseKeys("griw" + "w" + "."))
     assertState("one one on${c}e four")
     assertEquals("one", VimPlugin.getRegister().lastRegister?.text)
   }
@@ -212,7 +212,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
 
     configureByText(text)
     VimPlugin.getRegister().storeText(myFixture.editor.vim, text rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
-    typeText(parseKeys("grr"))
+    typeText(injector.parser.parseKeys("grr"))
     assertState(
       """
             ${c}legendary
@@ -234,7 +234,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
     """.trimIndent()
 
     configureByText(text)
-    typeText(parseKeys("yyj", "grr"))
+    typeText(injector.parser.parseKeys("yyj" + "grr"))
     assertState(
       """
             I found it in a legendary land
@@ -256,7 +256,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
     """.trimIndent()
 
     configureByText(text)
-    typeText(parseKeys("yyj", "grr"))
+    typeText(injector.parser.parseKeys("yyj" + "grr"))
     assertState(
       """
             I found it in a legendary land
@@ -279,7 +279,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
     """.trimIndent()
 
     configureByText(text)
-    typeText(parseKeys("<C-V>lljjyj", "grr"))
+    typeText(injector.parser.parseKeys("<C-V>lljjyj" + "grr"))
     assertState(
       """
             one two three
@@ -310,7 +310,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
     """.trimIndent()
 
     configureByText(text)
-    typeText(parseKeys("yyj", "2grr"))
+    typeText(injector.parser.parseKeys("yyj" + "2grr"))
     assertState(
       """
             I found it in a legendary land
@@ -331,7 +331,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
     """.trimIndent()
 
     configureByText(text)
-    typeText(parseKeys("yyj", "grr", "j", "."))
+    typeText(injector.parser.parseKeys("yyj" + "grr" + "j" + "."))
     assertState(
       """
             I found it in a legendary land
@@ -360,7 +360,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
     """.trimIndent()
 
     configureByText(text)
-    typeText(parseKeys("yyj", "grr"))
+    typeText(injector.parser.parseKeys("yyj" + "grr"))
     assertState(
       """
             I found it in a legendary land
@@ -387,7 +387,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
 
     configureByText(text)
     VimPlugin.getRegister().storeText(myFixture.editor.vim, text rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
-    typeText(parseKeys("viw", "gr"))
+    typeText(injector.parser.parseKeys("viw" + "gr"))
     assertState(
       """
             I legendar${c}y it in a legendary land
@@ -410,7 +410,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
     """.trimIndent()
 
     configureByText(text)
-    typeText(parseKeys("yyj", "viw", "gr"))
+    typeText(injector.parser.parseKeys("yyj" + "viw" + "gr"))
     assertState(
       """
             |I found it in a legendary land|
@@ -432,7 +432,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
     """.trimIndent()
 
     configureByText(text)
-    typeText(parseKeys("Vjyjj3w", "viw", "gr"))
+    typeText(injector.parser.parseKeys("Vjyjj3w" + "viw" + "gr"))
     assertState(
       """
             |I found it in a legendary land|
@@ -456,7 +456,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
 
     configureByText(text)
     VimPlugin.getRegister().storeText(myFixture.editor.vim, text rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
-    typeText(parseKeys("V", "gr"))
+    typeText(injector.parser.parseKeys("V" + "gr"))
     assertState(
       """
             ${c}legendary
@@ -478,7 +478,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
     """.trimIndent()
 
     configureByText(text)
-    typeText(parseKeys("yyj", "V", "gr"))
+    typeText(injector.parser.parseKeys("yyj" + "V" + "gr"))
     assertState(
       """
             I found it in a legendary land

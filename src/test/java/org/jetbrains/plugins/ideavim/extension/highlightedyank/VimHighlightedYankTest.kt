@@ -20,9 +20,9 @@ package org.jetbrains.plugins.ideavim.extension.highlightedyank
 
 import com.intellij.openapi.editor.markup.RangeHighlighter
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.extension.highlightedyank.DEFAULT_HIGHLIGHT_DURATION
-import com.maddyhome.idea.vim.helper.StringHelper
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -52,7 +52,7 @@ class VimHighlightedYankTest : VimTestCase() {
 
   fun `test removing previous highlight when new range is yanked`() {
     configureByJavaText(code)
-    typeText(StringHelper.parseKeys("yyjyy"))
+    typeText(injector.parser.parseKeys("yyjyy"))
 
     assertAllHighlightersCount(1)
     assertHighlighterRange(40, 59, getFirstHighlighter())
@@ -67,8 +67,8 @@ class VimHighlightedYankTest : VimTestCase() {
 
   fun `test indicating error when incorrect highlight duration was provided by user`() {
     configureByJavaText(code)
-    typeText(StringHelper.parseKeys(":let g:highlightedyank_highlight_duration = \"500.15\"<CR>"))
-    typeText(StringHelper.parseKeys("yy"))
+    typeText(injector.parser.parseKeys(":let g:highlightedyank_highlight_duration = \"500.15\"<CR>"))
+    typeText(injector.parser.parseKeys("yy"))
 
     assertEquals(
       "highlightedyank: Invalid value of g:highlightedyank_highlight_duration -- For input string: \"500.15\"",
@@ -79,8 +79,8 @@ class VimHighlightedYankTest : VimTestCase() {
   fun `test not indicating error when correct highlight duration was provided by user`() {
 
     configureByJavaText(code)
-    typeText(StringHelper.parseKeys(":let g:highlightedyank_highlight_duration = \"-1\"<CR>"))
-    typeText(StringHelper.parseKeys("yy"))
+    typeText(injector.parser.parseKeys(":let g:highlightedyank_highlight_duration = \"-1\"<CR>"))
+    typeText(injector.parser.parseKeys("yy"))
 
     assertEquals(VimPlugin.getMessage(), "")
   }
@@ -89,8 +89,8 @@ class VimHighlightedYankTest : VimTestCase() {
     configureByJavaText(code)
 
     listOf("rgba(1,2,3)", "rgba(1, 2, 3, 0.1)", "rgb(1,2,3)", "rgba(260, 2, 5, 6)").forEach { color ->
-      typeText(StringHelper.parseKeys(":let g:highlightedyank_highlight_color = \"$color\"<CR>"))
-      typeText(StringHelper.parseKeys("yy"))
+      typeText(injector.parser.parseKeys(":let g:highlightedyank_highlight_color = \"$color\"<CR>"))
+      typeText(injector.parser.parseKeys("yy"))
 
       assertTrue(
         color,
@@ -103,8 +103,8 @@ class VimHighlightedYankTest : VimTestCase() {
     configureByJavaText(code)
 
     listOf("rgba(1,2,3,5)", "rgba1, 2, 3, 1", "rgba(1, 2, 3, 4").forEach { color ->
-      typeText(StringHelper.parseKeys(":let g:highlightedyank_highlight_color = \"$color\"<CR>"))
-      typeText(StringHelper.parseKeys("yy"))
+      typeText(injector.parser.parseKeys(":let g:highlightedyank_highlight_color = \"$color\"<CR>"))
+      typeText(injector.parser.parseKeys("yy"))
 
       assertEquals("", VimPlugin.getMessage())
     }
@@ -140,8 +140,8 @@ class VimHighlightedYankTest : VimTestCase() {
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test highlighting for a correct user provided amount of time`() {
     configureByJavaText(code)
-    typeText(StringHelper.parseKeys(":let g:highlightedyank_highlight_duration = \"1000\"<CR>"))
-    typeText(StringHelper.parseKeys("yiw"))
+    typeText(injector.parser.parseKeys(":let g:highlightedyank_highlight_duration = \"1000\"<CR>"))
+    typeText(injector.parser.parseKeys("yiw"))
 
     assertHappened(1000, 200) {
       getAllHighlightersCount() == 0

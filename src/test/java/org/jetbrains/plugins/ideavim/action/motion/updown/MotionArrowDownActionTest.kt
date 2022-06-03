@@ -21,8 +21,8 @@
 package org.jetbrains.plugins.ideavim.action.motion.updown
 
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
@@ -486,7 +486,7 @@ class MotionArrowDownActionTest : VimOptionTestCase(OptionConstants.keymodelName
     configureByPages(5)
     setPositionAndScroll(0, 29)
 
-    typeText(parseKeys("i", "<Down>"))
+    typeText(injector.parser.parseKeys("i" + "<Down>"))
     assertPosition(30, 0)
     assertVisibleArea(10, 44)
   }

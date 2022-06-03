@@ -19,8 +19,8 @@
 package org.jetbrains.plugins.ideavim.action.motion.screen
 
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -33,7 +33,7 @@ class MotionMiddleScreenLineActionTest : VimTestCase() {
     assertEquals(35, screenHeight)
     configureByLines(50, "    I found it in a legendary land")
     setPositionAndScroll(0, 0)
-    typeText(parseKeys("M"))
+    typeText(injector.parser.parseKeys("M"))
     assertPosition(17, 4)
   }
 
@@ -42,7 +42,7 @@ class MotionMiddleScreenLineActionTest : VimTestCase() {
     configureByLines(50, "    I found it in a legendary land")
     setEditorVisibleSize(screenWidth, 34)
     setPositionAndScroll(0, 0)
-    typeText(parseKeys("M"))
+    typeText(injector.parser.parseKeys("M"))
     assertPosition(17, 4)
   }
 
@@ -51,7 +51,7 @@ class MotionMiddleScreenLineActionTest : VimTestCase() {
     assertEquals(35, screenHeight)
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(50, 50)
-    typeText(parseKeys("M"))
+    typeText(injector.parser.parseKeys("M"))
     assertPosition(67, 4)
   }
 
@@ -60,7 +60,7 @@ class MotionMiddleScreenLineActionTest : VimTestCase() {
     assertEquals(35, screenHeight)
     configureByLines(20, "    I found it in a legendary land")
     setPositionAndScroll(0, 0)
-    typeText(parseKeys("M"))
+    typeText(injector.parser.parseKeys("M"))
     assertPosition(10, 4)
   }
 
@@ -69,7 +69,7 @@ class MotionMiddleScreenLineActionTest : VimTestCase() {
     assertEquals(35, screenHeight)
     configureByLines(21, "    I found it in a legendary land")
     setPositionAndScroll(0, 0)
-    typeText(parseKeys("M"))
+    typeText(injector.parser.parseKeys("M"))
     assertPosition(10, 4)
   }
 
@@ -78,7 +78,7 @@ class MotionMiddleScreenLineActionTest : VimTestCase() {
     configureByLines(20, "    I found it in a legendary land")
     setEditorVisibleSize(screenWidth, 34)
     setPositionAndScroll(0, 0)
-    typeText(parseKeys("M"))
+    typeText(injector.parser.parseKeys("M"))
     assertPosition(10, 4)
   }
 
@@ -87,7 +87,7 @@ class MotionMiddleScreenLineActionTest : VimTestCase() {
     configureByLines(21, "    I found it in a legendary land")
     setEditorVisibleSize(screenWidth, 34)
     setPositionAndScroll(0, 0)
-    typeText(parseKeys("M"))
+    typeText(injector.parser.parseKeys("M"))
     assertPosition(10, 4)
   }
 
@@ -96,7 +96,7 @@ class MotionMiddleScreenLineActionTest : VimTestCase() {
     configureByLines(30, "    I found it in a legendary land")
     setEditorVirtualSpace()
     setPositionAndScroll(20, 20)
-    typeText(parseKeys("M"))
+    typeText(injector.parser.parseKeys("M"))
     assertPosition(25, 4)
   }
 
@@ -105,7 +105,7 @@ class MotionMiddleScreenLineActionTest : VimTestCase() {
     VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.startoflineName)
     configureByLines(50, "    I found it in a legendary land")
     setPositionAndScroll(0, 0, 10)
-    typeText(parseKeys("M"))
+    typeText(injector.parser.parseKeys("M"))
     assertPosition(17, 10)
   }
 
@@ -114,8 +114,8 @@ class MotionMiddleScreenLineActionTest : VimTestCase() {
     VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.startoflineName)
     configureByLines(70, "    I found it in a legendary land")
     setPositionAndScroll(0, 0, 10)
-    typeText(parseKeys("A", " extra text", "<Esc>"))
-    typeText(parseKeys("M"))
+    typeText(injector.parser.parseKeys("A" + " extra text" + "<Esc>"))
+    typeText(injector.parser.parseKeys("M"))
     assertPosition(17, 33)
   }
 
@@ -123,7 +123,7 @@ class MotionMiddleScreenLineActionTest : VimTestCase() {
   fun `test operator pending acts to middle line`() {
     configureByLines(20, "    I found it in a legendary land")
     setPositionAndScroll(0, 4, 10)
-    typeText(parseKeys("dM"))
+    typeText(injector.parser.parseKeys("dM"))
     assertPosition(4, 4)
     assertLineCount(13)
   }
@@ -133,7 +133,7 @@ class MotionMiddleScreenLineActionTest : VimTestCase() {
     VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.startoflineName)
     configureByLines(20, "    I found it in a legendary land")
     setPositionAndScroll(0, 4, 10)
-    typeText(parseKeys("dM"))
+    typeText(injector.parser.parseKeys("dM"))
     assertPosition(4, 10)
     assertLineCount(13)
   }
@@ -143,7 +143,7 @@ class MotionMiddleScreenLineActionTest : VimTestCase() {
     // Move the caret to the line that is closest to the middle of the screen, rather than the numerically middle line
     configureByLines(50, "    I found it in a legendary land")
     addBlockInlay(EditorHelper.getOffset(myFixture.editor, 5, 5), true, 5)
-    typeText(parseKeys("M"))
+    typeText(injector.parser.parseKeys("M"))
     assertPosition(12, 4)
   }
 
@@ -152,7 +152,7 @@ class MotionMiddleScreenLineActionTest : VimTestCase() {
     // Move the caret to the line that is closest to the middle of the screen, rather than the numerically middle line
     configureByLines(50, "    I found it in a legendary land")
     addBlockInlay(EditorHelper.getOffset(myFixture.editor, 25, 5), true, 5)
-    typeText(parseKeys("M"))
+    typeText(injector.parser.parseKeys("M"))
     assertPosition(17, 4)
   }
 
@@ -162,7 +162,7 @@ class MotionMiddleScreenLineActionTest : VimTestCase() {
     configureByLines(50, "    I found it in a legendary land")
     addBlockInlay(EditorHelper.getOffset(myFixture.editor, 5, 5), true, 5)
     addBlockInlay(EditorHelper.getOffset(myFixture.editor, 25, 5), true, 5)
-    typeText(parseKeys("M"))
+    typeText(injector.parser.parseKeys("M"))
     assertPosition(12, 4)
   }
 
@@ -172,7 +172,7 @@ class MotionMiddleScreenLineActionTest : VimTestCase() {
     configureByLines(21, "    I found it in a legendary land")
     addBlockInlay(EditorHelper.getOffset(myFixture.editor, 5, 5), true, 5)
     setPositionAndScroll(0, 0)
-    typeText(parseKeys("M"))
+    typeText(injector.parser.parseKeys("M"))
     assertPosition(8, 4)
   }
 }

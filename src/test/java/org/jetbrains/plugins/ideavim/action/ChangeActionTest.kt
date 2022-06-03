@@ -19,8 +19,8 @@ package org.jetbrains.plugins.ideavim.action
 
 import com.intellij.codeInsight.folding.CodeFoldingManager
 import com.intellij.codeInsight.folding.impl.FoldingUtil
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -563,7 +563,7 @@ quux
   
       """.trimIndent()
     )
-    typeText(StringHelper.parseKeys("<C-V>", "j", "x"))
+    typeText(injector.parser.parseKeys("<C-V>" + "j" + "x"))
     assertState(
       """
   oo
@@ -723,7 +723,7 @@ foobaz
   
       """.trimIndent()
     )
-    typeText(StringHelper.parseKeys("o", "foo(\"<Right>, \"<Right><Right>;", "<Esc>", "."))
+    typeText(injector.parser.parseKeys("o" + "foo(\"<Right>, \"<Right><Right>;" + "<Esc>" + "."))
     assertState(
       """class C {
     foo("", "");
@@ -743,7 +743,7 @@ foobaz
   
       """.trimIndent()
     )
-    typeText(StringHelper.parseKeys("o", "C(", "<BS>", "(int i) {}", "<Esc>", "."))
+    typeText(injector.parser.parseKeys("o" + "C(" + "<BS>" + "(int i) {}" + "<Esc>" + "."))
     assertState(
       """class C {
     C(int i) {}
@@ -763,7 +763,7 @@ foobaz
   
       """.trimIndent()
     )
-    typeText(StringHelper.parseKeys("d$", "j", "."))
+    typeText(injector.parser.parseKeys("d$" + "j" + "."))
     assertState(
       """
   
@@ -784,7 +784,7 @@ foobaz
   
       """.trimIndent()
     )
-    typeText(StringHelper.parseKeys("o", "C(", "<BS>", "(int i) {", "<Enter>", "i = 3;", "<Esc>", "<Down>", "."))
+    typeText(injector.parser.parseKeys("o" + "C(" + "<BS>" + "(int i) {" + "<Enter>" + "i = 3;" + "<Esc>" + "<Down>" + "."))
     assertState(
       """class C {
     C(int i) {
@@ -810,7 +810,7 @@ foobaz
   
       """.trimIndent()
     )
-    typeText(StringHelper.parseKeys("A", "<BS>", "<Esc>", "j", "."))
+    typeText(injector.parser.parseKeys("A" + "<BS>" + "<Esc>" + "j" + "."))
     assertState(
       """
   - 
@@ -829,7 +829,7 @@ foobaz
   
       """.trimIndent()
     )
-    typeText(StringHelper.parseKeys("A", "4", "<BS>", "<Esc>", "j", "."))
+    typeText(injector.parser.parseKeys("A" + "4" + "<BS>" + "<Esc>" + "j" + "."))
     assertState(
       """
   - 1
@@ -848,7 +848,7 @@ foobaz
   
       """.trimIndent()
     )
-    typeText(StringHelper.parseKeys("A", "<BS>", "4", "<Esc>", "j", "."))
+    typeText(injector.parser.parseKeys("A" + "<BS>" + "4" + "<Esc>" + "j" + "."))
     assertState(
       """
   - 4
@@ -869,7 +869,7 @@ foobaz
  */
 and some text after"""
     )
-    typeText(StringHelper.parseKeys("zc", "G", "O"))
+    typeText(injector.parser.parseKeys("zc" + "G" + "O"))
     assertState(
       """/**
  * I should be fold
@@ -900,7 +900,7 @@ and some text after"""
       FoldingUtil.findFoldRegionStartingAtLine(myFixture.editor, 0)!!.isExpanded = false
     }
 
-    typeText(StringHelper.parseKeys("o"))
+    typeText(injector.parser.parseKeys("o"))
     assertState(
       """
             /**
@@ -923,9 +923,9 @@ and some text after"""
 
   fun testRepeatReplace() {
     configureByText("${c}foobarbaz spam\n")
-    typeText(StringHelper.parseKeys("R"))
+    typeText(injector.parser.parseKeys("R"))
     assertMode(CommandState.Mode.REPLACE)
-    typeText(StringHelper.parseKeys("FOO", "<Esc>", "l", "2."))
+    typeText(injector.parser.parseKeys("FOO" + "<Esc>" + "l" + "2."))
     assertState("FOOFOOFO${c}O spam\n")
     assertMode(CommandState.Mode.COMMAND)
   }

@@ -19,9 +19,9 @@
 package org.jetbrains.plugins.ideavim.action.copy
 
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.SelectionType
-import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -56,7 +56,7 @@ class PutTestAfterCursorActionTest : VimTestCase() {
     """.trimIndent()
     val editor = configureByText(before)
     VimPlugin.getRegister().storeText(editor.vim, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
-    typeText(StringHelper.parseKeys("p"))
+    typeText(injector.parser.parseKeys("p"))
     val after = """
             A Discovery
 

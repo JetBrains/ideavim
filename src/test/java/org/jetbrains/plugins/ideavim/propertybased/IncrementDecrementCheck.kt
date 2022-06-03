@@ -22,8 +22,7 @@ import com.intellij.ide.IdeEventQueue
 import com.intellij.openapi.editor.Editor
 import com.intellij.testFramework.PlatformTestUtil
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.helper.StringHelper
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import org.jetbrains.jetCheck.Generator
@@ -82,8 +81,8 @@ private class IncrementDecrementActions(private val editor: Editor, val test: Vi
   override fun performCommand(env: ImperativeCommand.Environment) {
     val generator = Generator.sampledFrom("<C-A>", "<C-X>")
     val key = env.generateValue(generator, null)
-    val action = parseKeys(key).single()
-    env.logMessage("Use command: ${StringHelper.toKeyNotation(action)}.")
+    val action = injector.parser.parseKeys(key).single()
+    env.logMessage("Use command: ${injector.parser.toKeyNotation(action)}.")
     VimTestCase.typeText(listOf(action), editor, editor.project)
     NeovimTesting.typeCommand(key, test)
 

@@ -19,9 +19,9 @@
 package org.jetbrains.plugins.ideavim.ex
 
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -217,7 +217,7 @@ class MultipleCaretsTest : VimTestCase() {
     val text = lastRegister!!.text
     assertNotNull(text)
 
-    typeText(parseKeys("p"))
+    typeText(injector.parser.parseKeys("p"))
     val after = """qwe
       |rty
       |${c}rty

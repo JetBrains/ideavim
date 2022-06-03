@@ -19,9 +19,9 @@
 package org.jetbrains.plugins.ideavim.action.copy
 
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -40,7 +40,7 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
     val before = "${c}I found it in a legendary land"
     val editor = configureByText(before)
     VimPlugin.getRegister().storeText(editor.vim, TextRange(16, 25), SelectionType.CHARACTER_WISE, false)
-    typeText(parseKeys("v2e", "2gp"))
+    typeText(injector.parser.parseKeys("v2e" + "2gp"))
     val after = "legendarylegendary$c in a legendary land"
     assertState(after)
   }
@@ -50,7 +50,7 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
     val before = "${c}I found it in a legendary land"
     val editor = configureByText(before)
     VimPlugin.getRegister().storeText(editor.vim, TextRange(16, 25), SelectionType.LINE_WISE, false)
-    typeText(parseKeys("v2e", "gp"))
+    typeText(injector.parser.parseKeys("v2e" + "gp"))
     val after = """
 
             legendary
@@ -64,7 +64,7 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
     val before = "${c}I found it in a legendary land"
     val editor = configureByText(before)
     VimPlugin.getRegister().storeText(editor.vim, TextRange(16, 25), SelectionType.CHARACTER_WISE, false)
-    typeText(parseKeys("V", "gp"))
+    typeText(injector.parser.parseKeys("V" + "gp"))
     val after = "legendary\n$c"
     assertState(after)
   }
@@ -89,7 +89,7 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
     """.trimIndent()
     val editor = configureByText(file)
     VimPlugin.getRegister().storeText(editor.vim, TextRange(2, 11), SelectionType.LINE_WISE, false)
-    typeText(parseKeys("V", "gp"))
+    typeText(injector.parser.parseKeys("V" + "gp"))
     assertState(newFile)
   }
 
@@ -123,7 +123,7 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
             A Discovery
             $c
     """.trimIndent()
-    typeTextInFile(parseKeys("Y", "2j", "<C-v>", "2l", "3j", "gp"), file)
+    typeTextInFile(injector.parser.parseKeys("Y" + "2j" + "<C-v>" + "2l" + "3j" + "gp"), file)
     assertState(newFile)
   }
 
@@ -132,7 +132,7 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
     val before = "${c}I found it in a legendary land"
     val editor = configureByText(before)
     VimPlugin.getRegister().storeText(editor.vim, TextRange(16, 25), SelectionType.LINE_WISE, false)
-    typeText(parseKeys("v2e", "gP"))
+    typeText(injector.parser.parseKeys("v2e" + "gP"))
     val after = """
 
             legendary
@@ -146,7 +146,7 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
     val before = "${c}I found it in a legendary land"
     val editor = configureByText(before)
     VimPlugin.getRegister().storeText(editor.vim, TextRange(16, 25), SelectionType.CHARACTER_WISE, false)
-    typeText(parseKeys("v2e", "2gP"))
+    typeText(injector.parser.parseKeys("v2e" + "2gP"))
     val after = "legendarylegendary$c in a legendary land"
     assertState(after)
   }
@@ -156,7 +156,7 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
     val before = "${c}I found it in a legendary land"
     val editor = configureByText(before)
     VimPlugin.getRegister().storeText(editor.vim, TextRange(16, 25), SelectionType.CHARACTER_WISE, false)
-    typeText(parseKeys("v$", "2gP"))
+    typeText(injector.parser.parseKeys("v$" + "2gP"))
     val after = "legendarylegendar${c}y"
     assertState(after)
   }
@@ -166,7 +166,7 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
     val before = "${c}I found it in a legendary land"
     val editor = configureByText(before)
     VimPlugin.getRegister().storeText(editor.vim, TextRange(16, 25), SelectionType.CHARACTER_WISE, false)
-    typeText(parseKeys("V", "gP"))
+    typeText(injector.parser.parseKeys("V" + "gP"))
     val after = "legendary\n$c"
     assertState(after)
   }
@@ -189,7 +189,7 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
             re it was settled on some sodden sand
             d by the torrent of a mountain pass.
     """.trimIndent()
-    typeTextInFile(parseKeys("Y", "2j", "<C-v>", "2l", "3j", "gP"), file)
+    typeTextInFile(injector.parser.parseKeys("Y" + "2j" + "<C-v>" + "2l" + "3j" + "gP"), file)
     assertState(newFile)
   }
 
@@ -204,7 +204,7 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
     """.trimIndent()
     val editor = configureByText(before)
     VimPlugin.getRegister().storeText(editor.vim, TextRange(14, 21), SelectionType.LINE_WISE, false)
-    typeText(parseKeys("vl", "gp"))
+    typeText(injector.parser.parseKeys("vl" + "gp"))
     val after = """
             q
             zxcvbn
@@ -233,7 +233,7 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
     """.trimIndent()
     val editor = configureByText(before)
     VimPlugin.getRegister().storeText(editor.vim, TextRange(16, 19), SelectionType.BLOCK_WISE, false)
-    typeText(parseKeys("<S-v>", "gp"))
+    typeText(injector.parser.parseKeys("<S-v>" + "gp"))
     val after = """
             ${c}fgh
             asd
@@ -257,7 +257,7 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
     """.trimIndent()
     val editor = configureByText(before)
     VimPlugin.getRegister().storeText(editor.vim, TextRange(16, 19), SelectionType.LINE_WISE, false)
-    typeText(parseKeys("<C-v>", "h", "gp"))
+    typeText(injector.parser.parseKeys("<C-v>" + "h" + "gp"))
     val after = """
             q
             fgh
@@ -277,7 +277,7 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
     val before = "${c}qwe asd ${c}zxc rty ${c}fgh vbn"
     val editor = configureByText(before)
     VimPlugin.getRegister().storeText(editor.vim, TextRange(16, 19), SelectionType.CHARACTER_WISE, false)
-    typeText(parseKeys("v2e", "2gp"))
+    typeText(injector.parser.parseKeys("v2e" + "2gp"))
     val after = "fghfgh$c fghfgh$c fghfgh$c"
     assertState(after)
   }

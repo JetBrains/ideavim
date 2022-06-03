@@ -19,7 +19,7 @@
 package org.jetbrains.plugins.ideavim.action.copy
 
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class YankLineActionTest : VimTestCase() {
@@ -29,7 +29,7 @@ class YankLineActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
     """.trimIndent()
     configureByText(before)
-    typeText(parseKeys("\"4yy"))
+    typeText(injector.parser.parseKeys("\"4yy"))
     val register = VimPlugin.getRegister().getRegister('4')!!
     assertEquals("I found it in a legendary land\n", register.text)
   }

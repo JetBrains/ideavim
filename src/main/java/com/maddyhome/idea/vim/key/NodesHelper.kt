@@ -18,10 +18,10 @@
 
 package com.maddyhome.idea.vim.key
 
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.Node
 import com.maddyhome.idea.vim.common.addLeafs
-import com.maddyhome.idea.vim.helper.StringHelper
 
 fun <T> Node<T>.addLeafs(keys: String, actionHolder: T) {
-  addLeafs(StringHelper.parseKeys(keys), actionHolder)
+  addLeafs(injector.parser.parseKeys(keys), actionHolder)
 }

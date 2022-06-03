@@ -18,7 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.longrunning
 
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class MacroTest : VimTestCase() {
@@ -26,8 +26,8 @@ class MacroTest : VimTestCase() {
   // was a problem on revision affec9bb61ea5e1e635673a0041d61f7af3722b2
   fun `test no StackOverflowException`() {
     configureByText("abc de${c}fg")
-    typeText(parseKeys("qahlq"))
-    typeText(parseKeys("1000000@a"))
+    typeText(injector.parser.parseKeys("qahlq"))
+    typeText(injector.parser.parseKeys("1000000@a"))
     assertState("abc de${c}fg")
   }
 }

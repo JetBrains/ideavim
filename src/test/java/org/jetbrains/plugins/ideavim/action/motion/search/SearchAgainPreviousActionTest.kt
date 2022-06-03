@@ -19,9 +19,9 @@
 package org.jetbrains.plugins.ideavim.action.motion.search
 
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.common.Direction
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -36,7 +36,7 @@ class SearchAgainPreviousActionTest : VimTestCase() {
   ...${c}all it was settled on some sodden sand
   ...all by the torrent of a mountain pass
     """.trimIndent().dotToTab()
-    val keys = parseKeys("N")
+    val keys = injector.parser.parseKeys("N")
     val after = """
   I found it in a legendary land
   ...${c}all rocks and lavender and tufted grass,
@@ -54,7 +54,7 @@ class SearchAgainPreviousActionTest : VimTestCase() {
   ...all it was .${c}all settled on some sodden sand
   ...all by the torrent of a mountain pass
     """.trimIndent().dotToTab()
-    val keys = parseKeys("N")
+    val keys = injector.parser.parseKeys("N")
     val after = """
   I found it in a legendary land
   ...all rocks and lavender and tufted grass,
@@ -72,7 +72,7 @@ class SearchAgainPreviousActionTest : VimTestCase() {
   ...all it was .all.${c}all settled on some sodden sand
   ...all by the torrent of a mountain pass
     """.trimIndent().dotToTab()
-    val keys = parseKeys("N")
+    val keys = injector.parser.parseKeys("N")
     val after = """
   I found it in a legendary land
   ...all rocks and lavender and tufted grass,
@@ -90,7 +90,7 @@ class SearchAgainPreviousActionTest : VimTestCase() {
   ...all it was settled on some sodden sand
   ...all by the torrent of a mountain pass
     """.trimIndent().dotToTab()
-    val keys = parseKeys("N")
+    val keys = injector.parser.parseKeys("N")
     val after = """
   I found it in a legendary land
   ...all rocks and lavender and tufted grass,

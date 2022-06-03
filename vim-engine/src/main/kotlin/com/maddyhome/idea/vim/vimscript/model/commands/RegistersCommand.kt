@@ -22,7 +22,6 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.SelectionType
-import com.maddyhome.idea.vim.common.CommonStringHelper.parseKeys
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.EngineStringHelper
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
@@ -43,7 +42,7 @@ data class RegistersCommand(val ranges: Ranges, val argument: String) : Command.
           SelectionType.CHARACTER_WISE -> "c"
           SelectionType.BLOCK_WISE -> "b"
         }
-        val text = reg.rawText?.let { parseKeys(it) } ?: reg.keys
+        val text = reg.rawText?.let { injector.parser.parseKeys(it) } ?: reg.keys
         "  $type  \"${reg.name}   ${EngineStringHelper.toPrintableCharacters(text).take(200)}"
       }
 

@@ -30,7 +30,7 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
  */
 class LookupUpAction : VimActionHandler.SingleExecution() {
 
-  private val keySet = injector.parser.parseKeysSet("<C-P>")
+  private val keySet = setOf(injector.parser.parseKeys("<C-P>"))
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 

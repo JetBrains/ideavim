@@ -18,7 +18,7 @@
 
 package com.maddyhome.idea.vim.vimscript.parser.visitors
 
-import com.maddyhome.idea.vim.helper.StringHelper
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.expressions.BinExpression
@@ -99,7 +99,7 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
     var text = ctx.text
     val firstSymbol = text[0]
     if (firstSymbol == '"') {
-      text = StringHelper.parseVimString(text.substring(1, text.length - 1))
+      text = injector.parser.parseVimScriptString(text.substring(1, text.length - 1))
     } else if (firstSymbol == '\'') {
       text = text
         .substring(1, text.length - 1)

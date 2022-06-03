@@ -19,7 +19,7 @@
 package org.jetbrains.plugins.ideavim.ui
 
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
@@ -45,44 +45,44 @@ class ShowCmdTest : VimTestCase() {
   fun `test showcmd shows nothing if disabled`() {
     VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.showcmdName)
 
-    typeText(parseKeys("3"))
+    typeText(injector.parser.parseKeys("3"))
     assertEquals("", getShowCmdText())
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SHOW_CMD)
   fun `test showcmd count`() {
-    typeText(parseKeys("3"))
+    typeText(injector.parser.parseKeys("3"))
     assertEquals("3", getShowCmdText())
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SHOW_CMD)
   fun `test showcmd multiple count`() {
-    typeText(parseKeys("320"))
+    typeText(injector.parser.parseKeys("320"))
     assertEquals("320", getShowCmdText())
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SHOW_CMD)
   fun `test showcmd incomplete command`() {
-    typeText(parseKeys("3d2"))
+    typeText(injector.parser.parseKeys("3d2"))
     assertEquals("3d2", getShowCmdText())
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SHOW_CMD)
   fun `test showcmd clears on completed command`() {
-    typeText(parseKeys("3d2w"))
+    typeText(injector.parser.parseKeys("3d2w"))
     assertEquals("", getShowCmdText())
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SHOW_CMD)
   fun `test showcmd clears on Escape`() {
-    typeText(parseKeys("3d2<Esc>"))
+    typeText(injector.parser.parseKeys("3d2<Esc>"))
     assertEquals("", getShowCmdText())
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SHOW_CMD)
   fun `test showcmd expands mapped keys`() {
     enterCommand("nmap rrrr d")
-    typeText(parseKeys("32rrrr"))
+    typeText(injector.parser.parseKeys("32rrrr"))
     assertEquals("32d", getShowCmdText())
   }
 
@@ -91,62 +91,62 @@ class ShowCmdTest : VimTestCase() {
   // `rrr` should timeout and replay `rr` which is mapped to `42`
 //    enterCommand("nmap rr 42")
 //    enterCommand("nmap rrr 55")
-//    typeText(parseKeys("12rr"))
+//    typeText(injector.parser.parseKeys("12rr"))
 //    waitAndAssert { "1242" == getShowCmdText() }
 //  }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SHOW_CMD)
   fun `test showcmd updates count when expanding mapped keys`() {
     enterCommand("nmap rrrr 55d")
-    typeText(parseKeys("32rrrr"))
+    typeText(injector.parser.parseKeys("32rrrr"))
     assertEquals("3255d", getShowCmdText())
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SHOW_CMD)
   fun `test showcmd removes count on Delete`() {
-    typeText(parseKeys("32<Del>"))
+    typeText(injector.parser.parseKeys("32<Del>"))
     assertEquals("3", getShowCmdText())
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SHOW_CMD)
   fun `test showcmd clears if Delete all count chars`() {
-    typeText(parseKeys("32<Del><Del>"))
+    typeText(injector.parser.parseKeys("32<Del><Del>"))
     assertEquals("", getShowCmdText())
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SHOW_CMD)
   fun `test showcmd removes motion count on Delete`() {
-    typeText(parseKeys("32d44<Del><Del>"))
+    typeText(injector.parser.parseKeys("32d44<Del><Del>"))
     assertEquals("32d", getShowCmdText())
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SHOW_CMD)
   fun `test showcmd clears if Delete on operator`() {
-    typeText(parseKeys("32d<Del>"))
+    typeText(injector.parser.parseKeys("32d<Del>"))
     assertEquals("", getShowCmdText())
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SHOW_CMD)
   fun `test showcmd shows nothing in insert mode`() {
-    typeText(parseKeys("i", "hello world"))
+    typeText(injector.parser.parseKeys("i" + "hello world"))
     assertEquals("", getShowCmdText())
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SHOW_CMD)
   fun `test showcmd shows digraph entry in insert mode`() {
-    typeText(parseKeys("i", "<C-K>O"))
+    typeText(injector.parser.parseKeys("i" + "<C-K>O"))
     assertEquals("^KO", getShowCmdText())
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SHOW_CMD)
   fun `test showcmd clears when cancelling digraph entry in insert mode`() {
-    typeText(parseKeys("i", "<C-K>O", "<Esc>"))
+    typeText(injector.parser.parseKeys("i" + "<C-K>O" + "<Esc>"))
     assertEquals("", getShowCmdText())
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SHOW_CMD)
   fun `test showcmd shows literal entry in insert mode`() {
-    typeText(parseKeys("i", "<C-V>12"))
+    typeText(injector.parser.parseKeys("i" + "<C-V>12"))
     assertEquals("^V12", getShowCmdText())
   }
 
@@ -154,25 +154,25 @@ class ShowCmdTest : VimTestCase() {
   @VimBehaviorDiffers("^V12")
   @TestWithoutNeovim(reason = SkipNeovimReason.SHOW_CMD)
   fun `test showcmd shows literal entry with CTRL-Q in insert mode`() {
-    typeText(parseKeys("i", "<C-Q>12"))
+    typeText(injector.parser.parseKeys("i" + "<C-Q>12"))
     assertEquals("^Q12", getShowCmdText())
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SHOW_CMD)
   fun `test showcmd clears when cancelling literal entry in insert mode`() {
-    typeText(parseKeys("i", "<C-V>1", "<Esc>"))
+    typeText(injector.parser.parseKeys("i" + "<C-V>1" + "<Esc>"))
     assertEquals("", getShowCmdText())
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SHOW_CMD)
   fun `test showcmd shows register entry in insert mode`() {
-    typeText(parseKeys("i", "<C-R>"))
+    typeText(injector.parser.parseKeys("i" + "<C-R>"))
     assertEquals("^R", getShowCmdText())
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SHOW_CMD)
   fun `test showcmd clears when cancelling registry entry in insert mode`() {
-    typeText(parseKeys("i", "<C-R>", "<Esc>"))
+    typeText(injector.parser.parseKeys("i" + "<C-R>" + "<Esc>"))
     assertEquals("", getShowCmdText())
   }
 
@@ -180,43 +180,43 @@ class ShowCmdTest : VimTestCase() {
   // shows this kind of information in the position panel
   @TestWithoutNeovim(reason = SkipNeovimReason.SHOW_CMD)
   fun `test showcmd works in visual mode`() {
-    typeText(parseKeys("v", "32f"))
+    typeText(injector.parser.parseKeys("v" + "32f"))
     assertEquals("32f", getShowCmdText())
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SHOW_CMD)
   fun `test showcmd works in single command mode`() {
-    typeText(parseKeys("i", "<C-O>", "32f"))
+    typeText(injector.parser.parseKeys("i" + "<C-O>" + "32f"))
     assertEquals("32f", getShowCmdText())
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SHOW_CMD)
   fun `test showcmd only shows last 10 characters of buffer`() {
-    typeText(parseKeys("12345678900987654321"))
+    typeText(injector.parser.parseKeys("12345678900987654321"))
     assertEquals("0987654321", getShowCmdText())
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SHOW_CMD)
   fun `test showcmd tooltip shows full buffer`() {
-    typeText(parseKeys("12345678900987654321"))
+    typeText(injector.parser.parseKeys("12345678900987654321"))
     assertEquals("12345678900987654321", getShowCmdTooltipText())
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SHOW_CMD)
   fun `test showcmd shows select register command`() {
-    typeText(parseKeys("\"a32d"))
+    typeText(injector.parser.parseKeys("\"a32d"))
     assertEquals("\"a32d", getShowCmdText())
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SHOW_CMD)
   fun `test showcmd shows count and select register command`() {
-    typeText(parseKeys("32\"ad"))
+    typeText(injector.parser.parseKeys("32\"ad"))
     assertEquals("32\"ad", getShowCmdText())
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SHOW_CMD)
   fun `test showcmd shows repeated select register with counts`() {
-    typeText(parseKeys("22\"a22\"a22\"a22\"a22d22"))
+    typeText(injector.parser.parseKeys("22\"a22\"a22\"a22\"a22d22"))
     assertEquals("a22\"a22d22", getShowCmdText())
     assertEquals("22\"a22\"a22\"a22\"a22d22", getShowCmdTooltipText())
   }

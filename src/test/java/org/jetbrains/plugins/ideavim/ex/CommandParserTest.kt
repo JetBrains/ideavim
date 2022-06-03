@@ -22,7 +22,6 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
 import com.maddyhome.idea.vim.vimscript.model.commands.EchoCommand
@@ -324,7 +323,7 @@ class CommandParserTest : VimTestCase() {
       """.trimIndent().replace("\n", "\r\n"),
       myFixture.editor.vim, DataContext.EMPTY_CONTEXT.vim, skipHistory = true, indicateErrors = true, CommandLineVimLContext
     )
-    typeText(StringHelper.parseKeys("Yp"))
+    typeText(injector.parser.parseKeys("Yp"))
     assertState("----------\n1234556789${c}067890\n----------\n")
     assertTrue(IdeavimErrorListener.testLogger.isEmpty())
   }

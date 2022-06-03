@@ -18,8 +18,8 @@
 
 package org.jetbrains.plugins.ideavim.action
 
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.experimentalApi
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -31,7 +31,7 @@ class GuardedBlocksTest : VimTestCase() {
     if (!experimentalApi()) return
     configureAndGuard("[123${c}4567890]")
     try {
-      typeText(parseKeys("x"))
+      typeText(injector.parser.parseKeys("x"))
     } catch (e: Throwable) {
       // Catch exception
       return
@@ -49,7 +49,7 @@ class GuardedBlocksTest : VimTestCase() {
       1234567890]
       """.trimIndent()
     )
-    typeText(parseKeys("dd"))
+    typeText(injector.parser.parseKeys("dd"))
     assertState(
       """
       1234567890
@@ -69,7 +69,7 @@ class GuardedBlocksTest : VimTestCase() {
       1]23${c}4567890[
       1234567890]
       """.trimIndent())
-    typeText(parseKeys("dd"))
+    typeText(injector.parser.parseKeys("dd"))
     assertState("""
       1234567890
       ${c}1
@@ -87,7 +87,7 @@ class GuardedBlocksTest : VimTestCase() {
       ]123${c}456789[0
       1234567890]
       """.trimIndent())
-    typeText(parseKeys("dd"))
+    typeText(injector.parser.parseKeys("dd"))
     assertState("""
       1234567890
       ${c}0
@@ -106,7 +106,7 @@ class GuardedBlocksTest : VimTestCase() {
       1234567890]
       """.trimIndent()
     )
-    typeText(parseKeys("dd"))
+    typeText(injector.parser.parseKeys("dd"))
     assertState(
       """
       123${c}4567890
@@ -126,7 +126,7 @@ class GuardedBlocksTest : VimTestCase() {
       123456${c}7890]
       """.trimIndent()
     )
-    typeText(parseKeys("dd"))
+    typeText(injector.parser.parseKeys("dd"))
     assertState(
       """
       1234567890
@@ -146,7 +146,7 @@ class GuardedBlocksTest : VimTestCase() {
       1234567890]
       """.trimIndent()
     )
-    typeText(parseKeys("cc"))
+    typeText(injector.parser.parseKeys("cc"))
     assertState(
       """
       1234567890
@@ -167,7 +167,7 @@ class GuardedBlocksTest : VimTestCase() {
       1234567890]
       """.trimIndent()
     )
-    typeText(parseKeys("O"))
+    typeText(injector.parser.parseKeys("O"))
     assertState(
       """
       1234567890
@@ -189,7 +189,7 @@ class GuardedBlocksTest : VimTestCase() {
       1234567890]
       """.trimIndent()
     )
-    typeText(parseKeys("o"))
+    typeText(injector.parser.parseKeys("o"))
     assertState(
       """
       1234567890
@@ -210,7 +210,7 @@ class GuardedBlocksTest : VimTestCase() {
       1]23${c}4567890[
       1234567890]
       """.trimIndent())
-    typeText(parseKeys("cc"))
+    typeText(injector.parser.parseKeys("cc"))
     assertState("""
       1234567890
       1${c}
@@ -229,7 +229,7 @@ class GuardedBlocksTest : VimTestCase() {
       ]123${c}456789[0
       1234567890]
       """.trimIndent())
-    typeText(parseKeys("cc"))
+    typeText(injector.parser.parseKeys("cc"))
     assertState("""
       1234567890
       ${c}0
@@ -248,7 +248,7 @@ class GuardedBlocksTest : VimTestCase() {
       ]12345${c}67890
       """.trimIndent()
     )
-    typeText(parseKeys("cc"))
+    typeText(injector.parser.parseKeys("cc"))
     assertState(
       """
       1234567890
@@ -267,7 +267,7 @@ class GuardedBlocksTest : VimTestCase() {
       1234567890]
       """.trimIndent()
     )
-    typeText(parseKeys("dd"))
+    typeText(injector.parser.parseKeys("dd"))
     assertState(
       """
       $c
@@ -287,7 +287,7 @@ class GuardedBlocksTest : VimTestCase() {
       1234567890]
       """.trimIndent()
     )
-    typeText(parseKeys("dd"))
+    typeText(injector.parser.parseKeys("dd"))
     assertState(
       """
       ${c}1234567890
@@ -307,7 +307,7 @@ class GuardedBlocksTest : VimTestCase() {
       1234567890]
       """.trimIndent()
     )
-    typeText(parseKeys("cc"))
+    typeText(injector.parser.parseKeys("cc"))
     assertState(
       """
       1234567890
@@ -328,7 +328,7 @@ class GuardedBlocksTest : VimTestCase() {
       1234567890]
       """.trimIndent()
     )
-    typeText(parseKeys("dd"))
+    typeText(injector.parser.parseKeys("dd"))
     assertState(
       """
       1234567890

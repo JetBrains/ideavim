@@ -19,7 +19,7 @@
 package org.jetbrains.plugins.ideavim.action.scroll
 
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
@@ -33,7 +33,7 @@ class ScrollLastScreenLineActionTest : VimTestCase() {
   fun `test scroll current line to bottom of screen`() {
     configureByPages(5)
     setPositionAndScroll(40, 60)
-    typeText(parseKeys("zb"))
+    typeText(injector.parser.parseKeys("zb"))
     assertPosition(60, 0)
     assertVisibleArea(26, 60)
   }
@@ -41,7 +41,7 @@ class ScrollLastScreenLineActionTest : VimTestCase() {
   fun `test scroll current line to bottom of screen and leave cursor in current column`() {
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(40, 60, 14)
-    typeText(parseKeys("zb"))
+    typeText(injector.parser.parseKeys("zb"))
     assertPosition(60, 14)
     assertVisibleArea(26, 60)
   }
@@ -50,7 +50,7 @@ class ScrollLastScreenLineActionTest : VimTestCase() {
     VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
     configureByPages(5)
     setPositionAndScroll(40, 60)
-    typeText(parseKeys("zb"))
+    typeText(injector.parser.parseKeys("zb"))
     assertPosition(60, 0)
     assertVisibleArea(36, 70)
   }
@@ -58,7 +58,7 @@ class ScrollLastScreenLineActionTest : VimTestCase() {
   fun `test scrolls count line to bottom of screen`() {
     configureByPages(5)
     setPositionAndScroll(40, 60)
-    typeText(parseKeys("100zb"))
+    typeText(injector.parser.parseKeys("100zb"))
     assertPosition(99, 0)
     assertVisibleArea(65, 99)
   }
@@ -67,7 +67,7 @@ class ScrollLastScreenLineActionTest : VimTestCase() {
     VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
     configureByPages(5)
     setPositionAndScroll(40, 60)
-    typeText(parseKeys("100zb"))
+    typeText(injector.parser.parseKeys("100zb"))
     assertPosition(99, 0)
     assertVisibleArea(75, 109)
   }
@@ -76,7 +76,7 @@ class ScrollLastScreenLineActionTest : VimTestCase() {
     VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolljumpName, VimInt(10))
     configureByPages(5)
     setPositionAndScroll(40, 60)
-    typeText(parseKeys("zb"))
+    typeText(injector.parser.parseKeys("zb"))
     assertPosition(60, 0)
     assertVisibleArea(26, 60)
   }
@@ -84,7 +84,7 @@ class ScrollLastScreenLineActionTest : VimTestCase() {
   fun `test scrolls correctly when less than a page to scroll`() {
     configureByPages(5)
     setPositionAndScroll(5, 15)
-    typeText(parseKeys("zb"))
+    typeText(injector.parser.parseKeys("zb"))
     assertPosition(15, 0)
     assertVisibleArea(0, 34)
   }
@@ -93,7 +93,7 @@ class ScrollLastScreenLineActionTest : VimTestCase() {
     configureByLines(100, "    I found it in a legendary land")
     setEditorVirtualSpace()
     setPositionAndScroll(80, 99, 4)
-    typeText(parseKeys("zb"))
+    typeText(injector.parser.parseKeys("zb"))
     assertPosition(99, 4)
     assertVisibleArea(65, 99)
   }
@@ -103,7 +103,7 @@ class ScrollLastScreenLineActionTest : VimTestCase() {
     configureByLines(100, "    I found it in a legendary land")
     setEditorVirtualSpace()
     setPositionAndScroll(80, 97, 4)
-    typeText(parseKeys("zb"))
+    typeText(injector.parser.parseKeys("zb"))
     assertPosition(97, 4)
     assertVisibleArea(65, 99)
   }

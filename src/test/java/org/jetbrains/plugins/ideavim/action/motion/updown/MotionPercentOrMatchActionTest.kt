@@ -19,8 +19,8 @@
 package org.jetbrains.plugins.ideavim.action.motion.updown
 
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -33,7 +33,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 class MotionPercentOrMatchActionTest : VimTestCase() {
   fun `test percent match simple`() {
     typeTextInFile(
-      parseKeys("%"),
+      injector.parser.parseKeys("%"),
       "foo(b${c}ar)\n"
     )
     assertOffset(3)
@@ -41,7 +41,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
 
   fun `test percent match multi line`() {
     typeTextInFile(
-      parseKeys("%"),
+      injector.parser.parseKeys("%"),
       """foo(bar,
                      |baz,
                      |${c}quux)
@@ -52,7 +52,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
 
   fun `test percent visual mode match multi line end of line`() {
     typeTextInFile(
-      parseKeys("v$%"),
+      injector.parser.parseKeys("v$%"),
       """${c}foo(
                   |bar)""".trimMargin()
     )
@@ -61,7 +61,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
 
   fun `test percent visual mode match from start multi line end of line`() {
     typeTextInFile(
-      parseKeys("v$%"),
+      injector.parser.parseKeys("v$%"),
       """$c(
                   |bar)""".trimMargin()
     )
@@ -70,7 +70,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
 
   fun `test percent visual mode find brackets on the end of line`() {
     typeTextInFile(
-      parseKeys("v$%"),
+      injector.parser.parseKeys("v$%"),
       """foo(${c}bar)"""
     )
     assertOffset(3)
@@ -78,7 +78,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
 
   fun `test percent twice visual mode find brackets on the end of line`() {
     typeTextInFile(
-      parseKeys("v$%%"),
+      injector.parser.parseKeys("v$%%"),
       """foo(${c}bar)"""
     )
     assertOffset(7)
@@ -86,7 +86,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
 
   fun `test percent match parens in string`() {
     typeTextInFile(
-      parseKeys("%"),
+      injector.parser.parseKeys("%"),
       """foo(bar, "foo(bar", ${c}baz)
                """
     )
@@ -96,63 +96,63 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test percent match xml comment start`() {
     configureByXmlText("$c<!-- foo -->")
-    typeText(parseKeys("%"))
+    typeText(injector.parser.parseKeys("%"))
     assertState("<!-- foo --$c>")
   }
 
   fun `test percent doesnt match partial xml comment`() {
     configureByXmlText("<!$c-- ")
-    typeText(parseKeys("%"))
+    typeText(injector.parser.parseKeys("%"))
     assertState("<!$c-- ")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test percent match xml comment end`() {
     configureByXmlText("<!-- foo --$c>")
-    typeText(parseKeys("%"))
+    typeText(injector.parser.parseKeys("%"))
     assertState("$c<!-- foo -->")
   }
 
   fun `test percent match java comment start`() {
     configureByJavaText("/$c* foo */")
-    typeText(parseKeys("%"))
+    typeText(injector.parser.parseKeys("%"))
     assertState("/* foo *$c/")
   }
 
   fun `test percent doesnt match partial java comment`() {
     configureByJavaText("$c/* ")
-    typeText(parseKeys("%"))
+    typeText(injector.parser.parseKeys("%"))
     assertState("$c/* ")
   }
 
   fun `test percent match java comment end`() {
     configureByJavaText("/* foo $c*/")
-    typeText(parseKeys("%"))
+    typeText(injector.parser.parseKeys("%"))
     assertState("$c/* foo */")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test percent match java doc comment start`() {
     configureByJavaText("/*$c* foo */")
-    typeText(parseKeys("%"))
+    typeText(injector.parser.parseKeys("%"))
     assertState("/** foo *$c/")
   }
 
   fun `test percent match java doc comment end`() {
     configureByJavaText("/** foo *$c/")
-    typeText(parseKeys("%"))
+    typeText(injector.parser.parseKeys("%"))
     assertState("$c/** foo */")
   }
 
   fun `test percent doesnt match after comment start`() {
     configureByJavaText("/*$c foo */")
-    typeText(parseKeys("%"))
+    typeText(injector.parser.parseKeys("%"))
     assertState("/*$c foo */")
   }
 
   fun `test percent doesnt match before comment end`() {
     configureByJavaText("/* foo $c */")
-    typeText(parseKeys("%"))
+    typeText(injector.parser.parseKeys("%"))
     assertState("/* foo $c */")
   }
 
@@ -242,19 +242,19 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
 
   fun `test count percent moves to line as percentage of file height`() {
     configureByLines(100, "    I found it in a legendary land")
-    typeText(parseKeys("25%"))
+    typeText(injector.parser.parseKeys("25%"))
     assertPosition(24, 4)
   }
 
   fun `test count percent moves to line as percentage of file height 2`() {
     configureByLines(50, "    I found it in a legendary land")
-    typeText(parseKeys("25%"))
+    typeText(injector.parser.parseKeys("25%"))
     assertPosition(12, 4)
   }
 
   fun `test count percent moves to line as percentage of file height 3`() {
     configureByLines(17, "    I found it in a legendary land")
-    typeText(parseKeys("25%"))
+    typeText(injector.parser.parseKeys("25%"))
     assertPosition(4, 4)
   }
 
@@ -263,7 +263,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
     VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.startoflineName)
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(0, 0, 14)
-    typeText(parseKeys("25%"))
+    typeText(injector.parser.parseKeys("25%"))
     assertPosition(24, 14)
   }
 
@@ -271,8 +271,8 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
   fun `test count percent handles shorter line with nostartline`() {
     VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.startoflineName)
     configureByLines(100, "    I found it in a legendary land")
-    typeText(parseKeys("A", " extra text", "<Esc>"))
-    typeText(parseKeys("25%"))
+    typeText(injector.parser.parseKeys("A" + " extra text" + "<Esc>"))
+    typeText(injector.parser.parseKeys("25%"))
     assertPosition(24, 33)
   }
 }

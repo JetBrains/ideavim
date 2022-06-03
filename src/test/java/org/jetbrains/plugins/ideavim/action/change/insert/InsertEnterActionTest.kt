@@ -19,8 +19,8 @@
 package org.jetbrains.plugins.ideavim.action.change.insert
 
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
@@ -60,7 +60,7 @@ class InsertEnterActionTest : VimTestCase() {
     VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
     configureByLines(50, "I found it in a legendary land")
     setPositionAndScroll(5, 29)
-    typeText(parseKeys("i", "<Enter>"))
+    typeText(injector.parser.parseKeys("i" + "<Enter>"))
     assertPosition(30, 0)
     assertVisibleArea(6, 40)
   }

@@ -20,8 +20,8 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.leftright
 
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.options.OptionConstants
 import org.jetbrains.plugins.ideavim.OptionValueType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -130,9 +130,9 @@ class MotionShiftEndActionTest : VimOptionTestCase(OptionConstants.keymodelName,
             hard by the torrent of a mountain pass.
     """.trimIndent()
     configureByText(before)
-    typeText(parseKeys("<S-End>"))
+    typeText(injector.parser.parseKeys("<S-End>"))
     assertState(CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    typeText(parseKeys("0v", "<S-End>"))
+    typeText(injector.parser.parseKeys("0v" + "<S-End>"))
     assertState(after)
     assertState(CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
   }
@@ -160,9 +160,9 @@ class MotionShiftEndActionTest : VimOptionTestCase(OptionConstants.keymodelName,
             hard by the torrent of a mountain pass.
     """.trimIndent()
     configureByText(before)
-    typeText(parseKeys("<S-End>"))
+    typeText(injector.parser.parseKeys("<S-End>"))
     assertState(CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    typeText(parseKeys("0gh", "<S-End>"))
+    typeText(injector.parser.parseKeys("0gh" + "<S-End>"))
     assertState(after)
     assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
   }

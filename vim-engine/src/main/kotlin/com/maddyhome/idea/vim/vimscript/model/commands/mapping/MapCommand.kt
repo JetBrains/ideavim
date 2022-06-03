@@ -21,7 +21,6 @@ package com.maddyhome.idea.vim.vimscript.model.commands.mapping
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.common.CommonStringHelper.parseKeys
 import com.maddyhome.idea.vim.common.MappingMode
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.Ranges
@@ -77,10 +76,10 @@ data class MapCommand(val ranges: Ranges, val argument: String, val cmd: String)
     } else {
       val actionId = extractActionId(arguments.secondArgument)
       if (actionId != null) {
-        val toKeys = parseKeys("<Action>($actionId)")
+        val toKeys = injector.parser.parseKeys("<Action>($actionId)")
         injector.keyGroup.putKeyMapping(modes, arguments.fromKeys, mappingOwner, toKeys, true)
       } else {
-        val toKeys = parseKeys(arguments.secondArgument)
+        val toKeys = injector.parser.parseKeys(arguments.secondArgument)
         injector.keyGroup.putKeyMapping(modes, arguments.fromKeys, mappingOwner, toKeys, commandInfo.isRecursive)
       }
     }
@@ -171,7 +170,7 @@ data class MapCommand(val ranges: Ranges, val argument: String, val cmd: String)
         if (specialArgument != null) {
           specialArguments.add(specialArgument)
         } else {
-          fromKeys = parseKeys(part)
+          fromKeys = injector.parser.parseKeys(part)
         }
       }
     }

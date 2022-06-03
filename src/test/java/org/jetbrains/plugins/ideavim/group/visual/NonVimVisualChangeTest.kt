@@ -22,8 +22,8 @@ import com.intellij.codeInsight.editorActions.BackspaceHandler
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.editor.LogicalPosition
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.listener.VimListenerManager
@@ -54,7 +54,7 @@ class NonVimVisualChangeTest : VimTestCase() {
       """.trimIndent()
     )
     VimListenerManager.EditorListeners.add(myFixture.editor)
-    typeText(parseKeys("i"))
+    typeText(injector.parser.parseKeys("i"))
     assertMode(CommandState.Mode.INSERT)
     ApplicationManager.getApplication().runWriteAction {
       CommandProcessor.getInstance().runUndoTransparentAction {
@@ -87,7 +87,7 @@ class NonVimVisualChangeTest : VimTestCase() {
       """.trimIndent()
     )
     VimListenerManager.EditorListeners.add(myFixture.editor)
-    typeText(parseKeys("i"))
+    typeText(injector.parser.parseKeys("i"))
     assertMode(CommandState.Mode.INSERT)
 
     // Fast add and remove selection
@@ -110,7 +110,7 @@ class NonVimVisualChangeTest : VimTestCase() {
       """.trimIndent()
     )
     VimListenerManager.EditorListeners.add(myFixture.editor)
-    typeText(parseKeys("i"))
+    typeText(injector.parser.parseKeys("i"))
     assertMode(CommandState.Mode.INSERT)
 
     // Fast add and remove selection
@@ -133,7 +133,7 @@ class NonVimVisualChangeTest : VimTestCase() {
     """.trimIndent()
     configureByText(text)
     VimListenerManager.EditorListeners.add(myFixture.editor)
-    typeText(parseKeys("i"))
+    typeText(injector.parser.parseKeys("i"))
     assertMode(CommandState.Mode.INSERT)
 
     val range = text.rangeOf("Discovery")

@@ -19,7 +19,7 @@
 package org.jetbrains.plugins.ideavim.action.scroll
 
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
@@ -38,7 +38,7 @@ class ScrollLineDownActionTest : VimTestCase() {
   fun `test scroll single line down`() {
     configureByPages(5)
     setPositionAndScroll(0, 34)
-    typeText(parseKeys("<C-E>"))
+    typeText(injector.parser.parseKeys("<C-E>"))
     assertPosition(34, 0)
     assertVisibleArea(1, 35)
   }
@@ -46,7 +46,7 @@ class ScrollLineDownActionTest : VimTestCase() {
   fun `test scroll line down will keep cursor on screen`() {
     configureByPages(5)
     setPositionAndScroll(0, 0)
-    typeText(parseKeys("<C-E>"))
+    typeText(injector.parser.parseKeys("<C-E>"))
     assertPosition(1, 0)
     assertVisibleArea(1, 35)
   }
@@ -55,7 +55,7 @@ class ScrollLineDownActionTest : VimTestCase() {
     VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
     configureByPages(5)
     setPositionAndScroll(30, 50, 5)
-    typeText(parseKeys("<C-E>"))
+    typeText(injector.parser.parseKeys("<C-E>"))
     assertPosition(50, 5)
     assertTopLogicalLine(31)
   }
@@ -63,7 +63,7 @@ class ScrollLineDownActionTest : VimTestCase() {
   fun `test scroll count lines down`() {
     configureByPages(5)
     setPositionAndScroll(0, 34)
-    typeText(parseKeys("10<C-E>"))
+    typeText(injector.parser.parseKeys("10<C-E>"))
     assertPosition(34, 0)
     assertVisibleArea(10, 44)
   }
@@ -71,7 +71,7 @@ class ScrollLineDownActionTest : VimTestCase() {
   fun `test scroll count lines down will keep cursor on screen`() {
     configureByPages(5)
     setPositionAndScroll(0, 0)
-    typeText(parseKeys("10<C-E>"))
+    typeText(injector.parser.parseKeys("10<C-E>"))
     assertPosition(10, 0)
     assertVisibleArea(10, 44)
   }
@@ -80,7 +80,7 @@ class ScrollLineDownActionTest : VimTestCase() {
   fun `test too many lines down stops at last line`() {
     configureByPages(5) // 5 * 35 = 175
     setPositionAndScroll(100, 100)
-    typeText(parseKeys("100<C-E>"))
+    typeText(injector.parser.parseKeys("100<C-E>"))
 
     // TODO: Enforce virtual space
     // Vim will put the caret on line 174, and put that line at the top of the screen
@@ -94,7 +94,7 @@ class ScrollLineDownActionTest : VimTestCase() {
     VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
     configureByPages(5)
     setPositionAndScroll(20, 30)
-    typeText(parseKeys("<C-E>"))
+    typeText(injector.parser.parseKeys("<C-E>"))
     assertPosition(31, 0)
     assertVisibleArea(21, 55)
   }
@@ -103,7 +103,7 @@ class ScrollLineDownActionTest : VimTestCase() {
     VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolljumpName, VimInt(10))
     configureByPages(5)
     setPositionAndScroll(20, 20)
-    typeText(parseKeys("<C-E>"))
+    typeText(injector.parser.parseKeys("<C-E>"))
     assertPosition(21, 0)
     assertVisibleArea(21, 55)
   }
@@ -111,7 +111,7 @@ class ScrollLineDownActionTest : VimTestCase() {
   fun `test scroll down in visual mode`() {
     configureByPages(5)
     setPositionAndScroll(20, 30)
-    typeText(parseKeys("Vjjjj", "<C-E>"))
+    typeText(injector.parser.parseKeys("Vjjjj" + "<C-E>"))
     assertVisibleArea(21, 55)
   }
 
@@ -119,7 +119,7 @@ class ScrollLineDownActionTest : VimTestCase() {
     configureByLines(100, "    I found it in a legendary land")
     setEditorVirtualSpace()
     setPositionAndScroll(75, 99, 4)
-    typeText(parseKeys("<C-E>"))
+    typeText(injector.parser.parseKeys("<C-E>"))
     assertPosition(99, 4)
     assertVisibleArea(76, 99)
   }
@@ -129,7 +129,7 @@ class ScrollLineDownActionTest : VimTestCase() {
     configureByLines(100, "    I found it in a legendary land")
     setEditorVirtualSpace()
     setPositionAndScroll(75, 95, 4)
-    typeText(parseKeys("<C-E>"))
+    typeText(injector.parser.parseKeys("<C-E>"))
     assertPosition(95, 4)
     assertVisibleArea(76, 99)
   }

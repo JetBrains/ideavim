@@ -20,7 +20,6 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import org.jetbrains.plugins.ideavim.OptionValueType
@@ -293,7 +292,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcaseName, O
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test visual substitute doesnt change visual marks`() {
     configureByText("foo\nbar\nbaz\n")
-    typeText(parseKeys("V", "j", ":'<,'>s/foo/fuu/<Enter>", "gv", "~"))
+    typeText(injector.parser.parseKeys("V" + "j" + ":'<,'>s/foo/fuu/<Enter>" + "gv" + "~"))
     assertState("FUU\nBAR\nbaz\n")
   }
 
@@ -364,7 +363,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcaseName, O
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test confirm all replaces all in range`() {
-    // Make sure the "a" is added as part of the same parseKeys as the <Enter>, as it needs to be available while the
+    // Make sure the "a" is added as part of the same injector.parser.parseKeys as the <Enter>, as it needs to be available while the
     // <Enter> is processed
     doTest(
       listOf(exCommand(".,\$s/and/AND/gc"), "a"),
@@ -382,7 +381,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcaseName, O
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test confirm all replaces all in rest of range`() {
-    // Make sure the "a" is added as part of the same parseKeys as the <Enter>, as it needs to be available while the
+    // Make sure the "a" is added as part of the same injector.parser.parseKeys as the <Enter>, as it needs to be available while the
     // <Enter> is processed
     doTest(
       listOf(exCommand("%s/and/AND/gc"), "n", "n", "a"),
@@ -400,7 +399,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcaseName, O
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test confirm options`() {
-    // Make sure the "a" is added as part of the same parseKeys as the <Enter>, as it needs to be available while the
+    // Make sure the "a" is added as part of the same injector.parser.parseKeys as the <Enter>, as it needs to be available while the
     // <Enter> is processed
     doTest(
       listOf(exCommand("%s/and/AND/gc"), "y", "n", "l"),
@@ -418,7 +417,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcaseName, O
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test confirm options with quit`() {
-    // Make sure the "a" is added as part of the same parseKeys as the <Enter>, as it needs to be available while the
+    // Make sure the "a" is added as part of the same injector.parser.parseKeys as the <Enter>, as it needs to be available while the
     // <Enter> is processed
     doTest(
       listOf(exCommand("%s/and/AND/gc"), "y", "n", "q"),
@@ -457,7 +456,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcaseName, O
         |hard by the torrent of a mountain pass.""".trimMargin()
     )
 
-    typeText(parseKeys(exCommand("%s/and/or/gc"), "n"))
+    typeText(injector.parser.parseKeys(exCommand("%s/and/or/gc") + "n"))
     assertPosition(1, 10)
   }
 

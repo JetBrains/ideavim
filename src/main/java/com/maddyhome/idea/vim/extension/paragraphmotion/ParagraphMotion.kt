@@ -22,6 +22,7 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.MappingMode
 import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.extension.VimExtensionFacade
@@ -30,7 +31,6 @@ import com.maddyhome.idea.vim.extension.VimExtensionHandler
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.SearchHelper
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.vimForEachCaret
 import com.maddyhome.idea.vim.newapi.ij
 
@@ -38,11 +38,11 @@ class ParagraphMotion : VimExtension {
   override fun getName(): String = "vim-paragraph-motion"
 
   override fun init() {
-    VimExtensionFacade.putExtensionHandlerMapping(MappingMode.NXO, parseKeys("<Plug>(ParagraphNextMotion)"), owner, ParagraphMotionHandler(1), false)
-    VimExtensionFacade.putExtensionHandlerMapping(MappingMode.NXO, parseKeys("<Plug>(ParagraphPrevMotion)"), owner, ParagraphMotionHandler(-1), false)
+    VimExtensionFacade.putExtensionHandlerMapping(MappingMode.NXO, injector.parser.parseKeys("<Plug>(ParagraphNextMotion)"), owner, ParagraphMotionHandler(1), false)
+    VimExtensionFacade.putExtensionHandlerMapping(MappingMode.NXO, injector.parser.parseKeys("<Plug>(ParagraphPrevMotion)"), owner, ParagraphMotionHandler(-1), false)
 
-    putKeyMappingIfMissing(MappingMode.NXO, parseKeys("}"), owner, parseKeys("<Plug>(ParagraphNextMotion)"), true)
-    putKeyMappingIfMissing(MappingMode.NXO, parseKeys("{"), owner, parseKeys("<Plug>(ParagraphPrevMotion)"), true)
+    putKeyMappingIfMissing(MappingMode.NXO, injector.parser.parseKeys("}"), owner, injector.parser.parseKeys("<Plug>(ParagraphNextMotion)"), true)
+    putKeyMappingIfMissing(MappingMode.NXO, injector.parser.parseKeys("{"), owner, injector.parser.parseKeys("<Plug>(ParagraphPrevMotion)"), true)
   }
 
   private class ParagraphMotionHandler(private val count: Int) : VimExtensionHandler {

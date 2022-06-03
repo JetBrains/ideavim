@@ -22,9 +22,9 @@ import com.intellij.ide.bookmark.BookmarksManager
 import com.intellij.ide.bookmark.LineBookmark
 import com.intellij.testFramework.PlatformTestUtil
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.createLineBookmark
 import com.maddyhome.idea.vim.group.mnemonic
-import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
 import junit.framework.TestCase
@@ -36,7 +36,7 @@ import org.jetbrains.plugins.ideavim.VimTestOption
 class MotionMarkActionTest : VimOptionTestCase(OptionConstants.ideamarksName) {
   @VimOptionTestConfiguration(VimTestOption(OptionConstants.ideamarksName, OptionValueType.NUMBER, "1"))
   fun `test simple add mark`() {
-    val keys = StringHelper.parseKeys("mA")
+    val keys = injector.parser.parseKeys("mA")
     val text = """
             A Discovery
 
@@ -52,7 +52,7 @@ class MotionMarkActionTest : VimOptionTestCase(OptionConstants.ideamarksName) {
 
   @VimOptionTestConfiguration(VimTestOption(OptionConstants.ideamarksName, OptionValueType.NUMBER, "1"))
   fun `test simple add multiple marks`() {
-    val keys = StringHelper.parseKeys("mAj", "mBj", "mC")
+    val keys = injector.parser.parseKeys("mAj" + "mBj" + "mC")
     val text = """
             A Discovery
 
@@ -68,7 +68,7 @@ class MotionMarkActionTest : VimOptionTestCase(OptionConstants.ideamarksName) {
 
   @VimOptionTestConfiguration(VimTestOption(OptionConstants.ideamarksName, OptionValueType.NUMBER, "1"))
   fun `test simple add multiple marks on same line`() {
-    val keys = StringHelper.parseKeys("mA", "mB", "mC")
+    val keys = injector.parser.parseKeys("mA" + "mB" + "mC")
     val text = """
             A Discovery
 
@@ -87,7 +87,7 @@ class MotionMarkActionTest : VimOptionTestCase(OptionConstants.ideamarksName) {
 
   @VimOptionTestConfiguration(VimTestOption(OptionConstants.ideamarksName, OptionValueType.NUMBER, "1"))
   fun `test move to another line`() {
-    val keys = StringHelper.parseKeys("mAjj", "mA")
+    val keys = injector.parser.parseKeys("mAjj" + "mA")
     val text = """
             A Discovery
 

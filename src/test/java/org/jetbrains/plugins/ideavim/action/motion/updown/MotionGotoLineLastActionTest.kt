@@ -19,8 +19,8 @@
 package org.jetbrains.plugins.ideavim.action.motion.updown
 
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
@@ -196,14 +196,14 @@ class MotionGotoLineLastActionTest : VimTestCase() {
 
   fun `test scrolling positions target line in middle of screen`() {
     configureByLines(100, "    I found it in a legendary land")
-    typeText(parseKeys("70G"))
+    typeText(injector.parser.parseKeys("70G"))
     assertPosition(69, 4)
     assertVisibleArea(52, 86)
   }
 
   fun `test go to last line of file puts target line at bottom of screen`() {
     configureByLines(100, "    I found it in a legendary land")
-    typeText(parseKeys("G"))
+    typeText(injector.parser.parseKeys("G"))
     assertPosition(99, 4)
     assertVisibleArea(65, 99)
   }
@@ -211,14 +211,14 @@ class MotionGotoLineLastActionTest : VimTestCase() {
   fun `test go to last line of file puts target line at bottom of screen with virtual space enabled`() {
     configureByLines(100, "    I found it in a legendary land")
     setEditorVirtualSpace()
-    typeText(parseKeys("G"))
+    typeText(injector.parser.parseKeys("G"))
     assertPosition(99, 4)
     assertVisibleArea(65, 99)
   }
 
   fun `test go to line in last half screen of file puts last line at bottom of screen`() {
     configureByLines(100, "    I found it in a legendary land")
-    typeText(parseKeys("90G"))
+    typeText(injector.parser.parseKeys("90G"))
     assertPosition(89, 4)
     assertVisibleArea(65, 99)
   }
@@ -226,7 +226,7 @@ class MotionGotoLineLastActionTest : VimTestCase() {
   fun `test go to line in last half screen of file puts last line at bottom of screen ignoring scrolloff`() {
     VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
     configureByLines(100, "    I found it in a legendary land")
-    typeText(parseKeys("95G"))
+    typeText(injector.parser.parseKeys("95G"))
     assertPosition(94, 4)
     assertVisibleArea(65, 99)
   }
@@ -235,7 +235,7 @@ class MotionGotoLineLastActionTest : VimTestCase() {
     // Editor has 5 lines of virtual space by default
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(69, 85)
-    typeText(parseKeys("G"))
+    typeText(injector.parser.parseKeys("G"))
     assertPosition(99, 4)
     assertVisibleArea(69, 99)
   }
@@ -244,7 +244,7 @@ class MotionGotoLineLastActionTest : VimTestCase() {
     configureByLines(100, "    I found it in a legendary land")
     setEditorVirtualSpace()
     setPositionAndScroll(85, 85)
-    typeText(parseKeys("G"))
+    typeText(injector.parser.parseKeys("G"))
     assertPosition(99, 4)
     assertVisibleArea(85, 99)
   }
@@ -254,7 +254,7 @@ class MotionGotoLineLastActionTest : VimTestCase() {
     configureByLines(100, "    I found it in a legendary land")
     setEditorVirtualSpace()
     setPositionAndScroll(67, 97)
-    typeText(parseKeys("G"))
+    typeText(injector.parser.parseKeys("G"))
     assertPosition(99, 4)
     assertVisibleArea(67, 99)
   }
@@ -263,9 +263,9 @@ class MotionGotoLineLastActionTest : VimTestCase() {
     VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
     configureByLines(100, "    I found it in a legendary land")
     setEditorVirtualSpace()
-    typeText(parseKeys("20G", "V10j", ":'<,'>action CollapseSelection<CR>", "V"))
+    typeText(injector.parser.parseKeys("20G" + "V10j" + ":'< +'>action CollapseSelection<CR>" + "V"))
     setPositionAndScroll(67, 97)
-    typeText(parseKeys("G"))
+    typeText(injector.parser.parseKeys("G"))
     assertPosition(99, 4)
     assertVisibleArea(67, 99)
   }

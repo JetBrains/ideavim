@@ -19,8 +19,7 @@ package org.jetbrains.plugins.ideavim.action
 
 import com.intellij.testFramework.PlatformTestUtil
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.helper.StringHelper
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
@@ -36,7 +35,7 @@ import org.jetbrains.plugins.ideavim.waitAndAssert
 class MacroActionTest : VimTestCase() {
   // |q|
   fun testRecordMacro() {
-    val editor = typeTextInFile(parseKeys("qa", "3l", "q"), "on<caret>e two three\n")
+    val editor = typeTextInFile(injector.parser.parseKeys("qa" + "3l" + "q"), "on<caret>e two three\n")
     val commandState = editor.vim.commandState
     assertFalse(commandState.isRecording)
     val registerGroup = VimPlugin.getRegister()
@@ -48,17 +47,17 @@ class MacroActionTest : VimTestCase() {
   fun testRecordMacroDoesNotExpandMap() {
     configureByText("")
     enterCommand("imap pp hello")
-    typeText(parseKeys("qa", "i", "pp<Esc>", "q"))
+    typeText(injector.parser.parseKeys("qa" + "i" + "pp<Esc>" + "q"))
     val register = VimPlugin.getRegister().getRegister('a')
     assertNotNull(register)
-    assertEquals("ipp<Esc>", StringHelper.toKeyNotation(register!!.keys))
+    assertEquals("ipp<Esc>", injector.parser.toKeyNotation(register!!.keys))
   }
 
   fun testRecordMacroWithDigraph() {
-    typeTextInFile(parseKeys("qa", "i", "<C-K>OK<Esc>", "q"), "")
+    typeTextInFile(injector.parser.parseKeys("qa" + "i" + "<C-K>OK<Esc>" + "q"), "")
     val register = VimPlugin.getRegister().getRegister('a')
     assertNotNull(register)
-    assertEquals("i<C-K>OK<Esc>", StringHelper.toKeyNotation(register!!.keys))
+    assertEquals("i<C-K>OK<Esc>", injector.parser.toKeyNotation(register!!.keys))
   }
 
   fun `test macro with search`() {
@@ -71,7 +70,7 @@ class MacroActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.
     """.trimIndent()
     configureByText(content)
-    typeText(parseKeys("qa", "/rocks<CR>", "q", "gg", "@a"))
+    typeText(injector.parser.parseKeys("qa" + "/rocks<CR>" + "q" + "gg" + "@a"))
 
     val startOffset = content.rangeOf("rocks").startOffset
 
@@ -90,7 +89,7 @@ class MacroActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.
     """.trimIndent()
     configureByText(content)
-    typeText(parseKeys("qa", ":map x y<CR>", "q"))
+    typeText(injector.parser.parseKeys("qa" + ":map x y<CR>" + "q"))
 
     val register = VimPlugin.getRegister().getRegister('a')
     val registerSize = register!!.keys.size
@@ -100,21 +99,21 @@ class MacroActionTest : VimTestCase() {
   fun `test last command`() {
     val content = "${c}0\n1\n2\n3\n"
     configureByText(content)
-    typeText(parseKeys(":d<CR>", "@:"))
+    typeText(injector.parser.parseKeys(":d<CR>" + "@:"))
     assertState("2\n3\n")
   }
 
   fun `test last command with count`() {
     val content = "${c}0\n1\n2\n3\n4\n5\n"
     configureByText(content)
-    typeText(parseKeys(":d<CR>", "4@:"))
+    typeText(injector.parser.parseKeys(":d<CR>" + "4@:"))
     assertState("5\n")
   }
 
   fun `test last command as last macro with count`() {
     val content = "${c}0\n1\n2\n3\n4\n5\n"
     configureByText(content)
-    typeText(parseKeys(":d<CR>", "@:", "3@@"))
+    typeText(injector.parser.parseKeys(":d<CR>" + "@:" + "3@@"))
     assertState("5\n")
   }
 
@@ -129,7 +128,7 @@ class MacroActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.
     """.trimIndent()
     configureByText(content)
-    typeText(parseKeys("qa", "l", "q", "qb", "10@a", "q", "2@b"))
+    typeText(injector.parser.parseKeys("qa" + "l" + "q" + "qb" + "10@a" + "q" + "2@b"))
 
     val startOffset = content.rangeOf("rocks").startOffset
 
@@ -143,7 +142,7 @@ class MacroActionTest : VimTestCase() {
 
   fun `test macro with count`() {
     configureByText("${c}0\n1\n2\n3\n4\n5\n")
-    typeText(parseKeys("qajq", "4@a"))
+    typeText(injector.parser.parseKeys("qajq" + "4@a"))
     if (VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.ideadelaymacroName)) {
       PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
     }

@@ -19,7 +19,7 @@
 package org.jetbrains.plugins.ideavim.action.change.insert
 
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
@@ -34,7 +34,7 @@ class InsertBackspaceActionTest : VimTestCase() {
     val after = "I f${c}und it in a legendary land"
     configureByText(before)
 
-    typeText(parseKeys("i", "<BS>"))
+    typeText(injector.parser.parseKeys("i" + "<BS>"))
 
     assertState(after)
   }
@@ -44,7 +44,7 @@ class InsertBackspaceActionTest : VimTestCase() {
     VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.sidescrolloffName, VimInt(10))
     configureByColumns(200)
 
-    typeText(parseKeys("70zl", "i", "<BS>"))
+    typeText(injector.parser.parseKeys("70zl" + "i" + "<BS>"))
     assertVisibleLineBounds(0, 39, 118)
   }
 }

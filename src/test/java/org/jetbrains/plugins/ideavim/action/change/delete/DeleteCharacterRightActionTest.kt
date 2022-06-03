@@ -18,13 +18,13 @@
 
 package org.jetbrains.plugins.ideavim.action.change.delete
 
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 // |x|
 class DeleteCharacterRightActionTest : VimTestCase() {
   fun `test delete single character`() {
-    val keys = parseKeys("x")
+    val keys = injector.parser.parseKeys("x")
     val before = "I ${c}found it in a legendary land"
     val after = "I ${c}ound it in a legendary land"
     configureByText(before)
@@ -33,7 +33,7 @@ class DeleteCharacterRightActionTest : VimTestCase() {
   }
 
   fun `test delete multiple characters`() {
-    val keys = parseKeys("5x")
+    val keys = injector.parser.parseKeys("5x")
     val before = "I ${c}found it in a legendary land"
     val after = "I $c it in a legendary land"
     configureByText(before)
@@ -42,7 +42,7 @@ class DeleteCharacterRightActionTest : VimTestCase() {
   }
 
   fun `test deletes min of count and end of line`() {
-    val keys = parseKeys("20x")
+    val keys = injector.parser.parseKeys("20x")
     val before = """
             A Discovery
 
@@ -65,7 +65,7 @@ class DeleteCharacterRightActionTest : VimTestCase() {
   }
 
   fun `test delete with inlay relating to preceding text`() {
-    val keys = parseKeys("x")
+    val keys = injector.parser.parseKeys("x")
     val before = "I f${c}ound it in a legendary land"
     val after = "I f${c}und it in a legendary land"
     configureByText(before)
@@ -93,7 +93,7 @@ class DeleteCharacterRightActionTest : VimTestCase() {
 
   fun `test delete with inlay relating to following text`() {
     // This should have the same behaviour as related to preceding text
-    val keys = parseKeys("x")
+    val keys = injector.parser.parseKeys("x")
     val before = "I f${c}ound it in a legendary land"
     val after = "I f${c}und it in a legendary land"
     configureByText(before)

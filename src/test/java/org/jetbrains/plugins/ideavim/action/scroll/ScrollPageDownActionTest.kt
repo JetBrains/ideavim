@@ -19,7 +19,7 @@
 package org.jetbrains.plugins.ideavim.action.scroll
 
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
@@ -44,7 +44,7 @@ class ScrollPageDownActionTest : VimTestCase() {
   fun `test scroll single page down with S-Down`() {
     configureByPages(5)
     setPositionAndScroll(0, 0)
-    typeText(parseKeys("<S-Down>"))
+    typeText(injector.parser.parseKeys("<S-Down>"))
     assertPosition(33, 0)
     assertVisibleArea(33, 67)
   }
@@ -53,7 +53,7 @@ class ScrollPageDownActionTest : VimTestCase() {
   fun `test scroll single page down with PageDown`() {
     configureByPages(5)
     setPositionAndScroll(0, 0)
-    typeText(parseKeys("<PageDown>"))
+    typeText(injector.parser.parseKeys("<PageDown>"))
     assertPosition(33, 0)
     assertVisibleArea(33, 67)
   }
@@ -62,7 +62,7 @@ class ScrollPageDownActionTest : VimTestCase() {
   fun `test scroll single page down with CTRL-F`() {
     configureByPages(5)
     setPositionAndScroll(0, 0)
-    typeText(parseKeys("<C-F>"))
+    typeText(injector.parser.parseKeys("<C-F>"))
     assertPosition(33, 0)
     assertVisibleArea(33, 67)
   }
@@ -71,7 +71,7 @@ class ScrollPageDownActionTest : VimTestCase() {
   fun `test scroll page down in insert mode with S-Down`() {
     configureByPages(5)
     setPositionAndScroll(0, 0)
-    typeText(parseKeys("i", "<S-Down>"))
+    typeText(injector.parser.parseKeys("i" + "<S-Down>"))
     assertPosition(33, 0)
     assertVisibleArea(33, 67)
   }
@@ -80,7 +80,7 @@ class ScrollPageDownActionTest : VimTestCase() {
   fun `test scroll page down in insert mode with PageDown`() {
     configureByPages(5)
     setPositionAndScroll(0, 0)
-    typeText(parseKeys("i", "<PageDown>"))
+    typeText(injector.parser.parseKeys("i" + "<PageDown>"))
     assertPosition(33, 0)
     assertVisibleArea(33, 67)
   }
@@ -89,7 +89,7 @@ class ScrollPageDownActionTest : VimTestCase() {
   fun `test scroll count pages down with S-Down`() {
     configureByPages(5)
     setPositionAndScroll(0, 0)
-    typeText(parseKeys("3<S-Down>"))
+    typeText(injector.parser.parseKeys("3<S-Down>"))
     assertPosition(99, 0)
     assertVisibleArea(99, 133)
   }
@@ -98,7 +98,7 @@ class ScrollPageDownActionTest : VimTestCase() {
   fun `test scroll count pages down with PageDown`() {
     configureByPages(5)
     setPositionAndScroll(0, 0)
-    typeText(parseKeys("3<PageDown>"))
+    typeText(injector.parser.parseKeys("3<PageDown>"))
     assertPosition(99, 0)
     assertVisibleArea(99, 133)
   }
@@ -107,7 +107,7 @@ class ScrollPageDownActionTest : VimTestCase() {
   fun `test scroll count pages down with CTRL-F`() {
     configureByPages(5)
     setPositionAndScroll(0, 0)
-    typeText(parseKeys("3<C-F>"))
+    typeText(injector.parser.parseKeys("3<C-F>"))
     assertPosition(99, 0)
     assertVisibleArea(99, 133)
   }
@@ -116,7 +116,7 @@ class ScrollPageDownActionTest : VimTestCase() {
   fun `test scroll page down moves cursor to top of screen`() {
     configureByPages(5)
     setPositionAndScroll(0, 20)
-    typeText(parseKeys("<C-F>"))
+    typeText(injector.parser.parseKeys("<C-F>"))
     assertPosition(33, 0)
     assertVisibleArea(33, 67)
   }
@@ -125,7 +125,7 @@ class ScrollPageDownActionTest : VimTestCase() {
   fun `test scroll page down in insert mode moves cursor`() {
     configureByPages(5)
     setPositionAndScroll(0, 20)
-    typeText(parseKeys("i", "<S-Down>"))
+    typeText(injector.parser.parseKeys("i" + "<S-Down>"))
     assertPosition(33, 0)
     assertVisibleArea(33, 67)
   }
@@ -135,7 +135,7 @@ class ScrollPageDownActionTest : VimTestCase() {
     VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
     configureByPages(5)
     setPositionAndScroll(0, 20)
-    typeText(parseKeys("<C-F>"))
+    typeText(injector.parser.parseKeys("<C-F>"))
     assertPosition(43, 0)
     assertVisibleArea(33, 67)
   }
@@ -145,7 +145,7 @@ class ScrollPageDownActionTest : VimTestCase() {
     VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
     configureByPages(5)
     setPositionAndScroll(0, 20)
-    typeText(parseKeys("i", "<S-Down>"))
+    typeText(injector.parser.parseKeys("i" + "<S-Down>"))
     assertPosition(43, 0)
     assertVisibleArea(33, 67)
   }
@@ -155,7 +155,7 @@ class ScrollPageDownActionTest : VimTestCase() {
     VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolljumpName, VimInt(10))
     configureByPages(5)
     setPositionAndScroll(0, 0)
-    typeText(parseKeys("<C-F>"))
+    typeText(injector.parser.parseKeys("<C-F>"))
     assertPosition(33, 0)
     assertVisibleArea(33, 67)
   }
@@ -165,7 +165,7 @@ class ScrollPageDownActionTest : VimTestCase() {
   fun `test scroll page down on last page moves cursor to end of file`() {
     configureByPages(5)
     setPositionAndScroll(145, 150)
-    typeText(parseKeys("<C-F>"))
+    typeText(injector.parser.parseKeys("<C-F>"))
     assertPosition(175, 0)
     assertVisibleArea(146, 175)
   }
@@ -176,7 +176,7 @@ class ScrollPageDownActionTest : VimTestCase() {
     configureByPages(5)
     setEditorVirtualSpace()
     setPositionAndScroll(145, 150)
-    typeText(parseKeys("<C-F>"))
+    typeText(injector.parser.parseKeys("<C-F>"))
     assertPosition(175, 0)
     assertVisibleArea(174, 175)
   }
@@ -185,7 +185,7 @@ class ScrollPageDownActionTest : VimTestCase() {
   fun `test scroll page down on penultimate page`() {
     configureByPages(5)
     setPositionAndScroll(110, 130)
-    typeText(parseKeys("<C-F>"))
+    typeText(injector.parser.parseKeys("<C-F>"))
     assertPosition(143, 0)
     assertVisibleArea(143, 175)
   }
@@ -194,7 +194,7 @@ class ScrollPageDownActionTest : VimTestCase() {
   fun `test scroll page down on last line scrolls up by default virtual space`() {
     configureByPages(5)
     setPositionAndScroll(146, 175)
-    typeText(parseKeys("<C-F>"))
+    typeText(injector.parser.parseKeys("<C-F>"))
     assertPosition(175, 0)
     // 146+35 = 181 -> 6 lines of virtual space
     assertVisibleArea(146, 175)
@@ -206,7 +206,7 @@ class ScrollPageDownActionTest : VimTestCase() {
     configureByPages(5)
     setEditorVirtualSpace()
     setPositionAndScroll(146, 175)
-    typeText(parseKeys("<C-F>"))
+    typeText(injector.parser.parseKeys("<C-F>"))
     assertPosition(175, 0)
     assertVisibleArea(174, 175)
   }
@@ -218,7 +218,7 @@ class ScrollPageDownActionTest : VimTestCase() {
     setEditorVirtualSpace()
     // This would be 175 in Vim
     setPositionAndScroll(174, 175)
-    typeText(parseKeys("<C-F>"))
+    typeText(injector.parser.parseKeys("<C-F>"))
     assertPosition(175, 0)
     assertVisibleArea(174, 175)
   }
@@ -228,7 +228,7 @@ class ScrollPageDownActionTest : VimTestCase() {
     configureByPages(5)
     // 146 is 5 lines of virtual space
     setPositionAndScroll(146, 175)
-    typeText(parseKeys("<C-F>"))
+    typeText(injector.parser.parseKeys("<C-F>"))
     assertPluginError(true)
   }
 
@@ -237,7 +237,7 @@ class ScrollPageDownActionTest : VimTestCase() {
     configureByPages(5)
     setEditorVirtualSpace()
     setPositionAndScroll(174, 175)
-    typeText(parseKeys("<C-F>"))
+    typeText(injector.parser.parseKeys("<C-F>"))
     assertPluginError(true)
   }
 
@@ -245,7 +245,7 @@ class ScrollPageDownActionTest : VimTestCase() {
   fun `test scroll page down too far causes error bell`() {
     configureByPages(5)
     setPositionAndScroll(146, 175)
-    typeText(parseKeys("10<C-F>"))
+    typeText(injector.parser.parseKeys("10<C-F>"))
     assertPluginError(true)
   }
 
@@ -253,7 +253,7 @@ class ScrollPageDownActionTest : VimTestCase() {
   fun `test scroll page down puts cursor on first non-blank column`() {
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(20, 25, 14)
-    typeText(parseKeys("<C-F>"))
+    typeText(injector.parser.parseKeys("<C-F>"))
     assertPosition(53, 4)
     assertVisibleArea(53, 87)
   }
@@ -263,7 +263,7 @@ class ScrollPageDownActionTest : VimTestCase() {
     VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.startoflineName)
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(20, 25, 14)
-    typeText(parseKeys("<C-F>"))
+    typeText(injector.parser.parseKeys("<C-F>"))
     assertPosition(53, 14)
     assertVisibleArea(53, 87)
   }

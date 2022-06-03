@@ -143,6 +143,10 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     return ApplicationManager.getApplication().getService(MotionGroup.class);
   }
 
+  public static @NotNull XMLGroup getXML() {
+    return ApplicationManager.getApplication().getService(XMLGroup.class);
+  }
+
   public static @NotNull ChangeGroup getChange() {
     return ((ChangeGroup)VimInjectorKt.getInjector().getChangeGroup());
   }

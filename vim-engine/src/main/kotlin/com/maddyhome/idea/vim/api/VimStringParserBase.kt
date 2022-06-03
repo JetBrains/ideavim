@@ -13,6 +13,10 @@ abstract class VimStringParserBase : VimStringParser {
   override val plugKeyStroke: KeyStroke
     get() = parseKeys("<Plug>")[0]
 
+  override val actionKeyStroke: KeyStroke
+    get() = parseKeys("<Action>")[0]
+
+  // todo what is the difference between this one and com.maddyhome.idea.vim.helper.EngineStringHelper#toPrintableCharacters
   override fun toPrintableString(keys: List<KeyStroke>): String {
     val builder = StringBuilder()
     for (key in keys) {
@@ -88,77 +92,75 @@ abstract class VimStringParserBase : VimStringParser {
     return if (name != null) "<$prefix$name>" else "<<$keyStroke>>"
   }
 
-  override fun parseKeys(vararg strings: String): List<KeyStroke> {
+  override fun parseKeys(string: String): List<KeyStroke> {
     val result: MutableList<KeyStroke> = ArrayList()
     var specialKeyStart = '<'
-    for (s in strings) {
-      var state = KeyParserState.INIT
-      var specialKeyBuilder = StringBuilder()
-      for (element in s) {
-        when (state) {
-          KeyParserState.INIT -> when (element) {
-            '\\' -> state = KeyParserState.ESCAPE
-            '<', '«' -> {
-              specialKeyStart = element
-              state = KeyParserState.SPECIAL
-              specialKeyBuilder = StringBuilder()
-            }
-            else -> {
-              val stroke: KeyStroke = if (element == '\t' || element == '\n') {
-                KeyStroke.getKeyStroke(element.code, 0)
-              } else if (isControlCharacter(element)) {
-                KeyStroke.getKeyStroke(element.code + 'A'.code - 1, InputEvent.CTRL_DOWN_MASK)
-              } else {
-                KeyStroke.getKeyStroke(element)
-              }
-              result.add(stroke)
-            }
+    var state = KeyParserState.INIT
+    var specialKeyBuilder = StringBuilder()
+    for (element in string) {
+      when (state) {
+        KeyParserState.INIT -> when (element) {
+          '\\' -> state = KeyParserState.ESCAPE
+          '<', '«' -> {
+            specialKeyStart = element
+            state = KeyParserState.SPECIAL
+            specialKeyBuilder = StringBuilder()
           }
-          KeyParserState.ESCAPE -> {
-            state = KeyParserState.INIT
-            if (element != '\\') {
-              result.add(KeyStroke.getKeyStroke('\\'))
-            }
-            result.add(KeyStroke.getKeyStroke(element))
-          }
-          KeyParserState.SPECIAL -> if (element == '>' || element == '»') {
-            state = KeyParserState.INIT
-            val specialKeyName = specialKeyBuilder.toString()
-            val lower = specialKeyName.lowercase(Locale.getDefault())
-            require("sid" != lower) { "<$specialKeyName> is not supported" }
-            if ("comma" == lower) {
-              result.add(KeyStroke.getKeyStroke(','))
-            } else if ("nop" != lower) {
-              val leader = parseMapLeader(specialKeyName)
-              val specialKey = parseSpecialKey(specialKeyName, 0)
-              if (leader != null) {
-                result.addAll(leader)
-              } else if (specialKey != null && specialKeyName.length > 1) {
-                result.add(specialKey)
-              } else {
-                result.add(KeyStroke.getKeyStroke('<'))
-                result.addAll(stringToKeys(specialKeyName))
-                result.add(KeyStroke.getKeyStroke('>'))
-              }
-            }
-          } else {
-            // e.g. move '<-2<CR> - the first part does not belong to any special key
-            if (element == '<' || element == '«') {
-              result.add(KeyStroke.getKeyStroke(specialKeyStart))
-              result.addAll(stringToKeys(specialKeyBuilder.toString()))
-              specialKeyBuilder = StringBuilder()
+          else -> {
+            val stroke: KeyStroke = if (element == '\t' || element == '\n') {
+              KeyStroke.getKeyStroke(element.code, 0)
+            } else if (isControlCharacter(element)) {
+              KeyStroke.getKeyStroke(element.code + 'A'.code - 1, InputEvent.CTRL_DOWN_MASK)
             } else {
-              specialKeyBuilder.append(element)
+              KeyStroke.getKeyStroke(element)
             }
+            result.add(stroke)
+          }
+        }
+        KeyParserState.ESCAPE -> {
+          state = KeyParserState.INIT
+          if (element != '\\') {
+            result.add(KeyStroke.getKeyStroke('\\'))
+          }
+          result.add(KeyStroke.getKeyStroke(element))
+        }
+        KeyParserState.SPECIAL -> if (element == '>' || element == '»') {
+          state = KeyParserState.INIT
+          val specialKeyName = specialKeyBuilder.toString()
+          val lower = specialKeyName.lowercase(Locale.getDefault())
+          require("sid" != lower) { "<$specialKeyName> is not supported" }
+          if ("comma" == lower) {
+            result.add(KeyStroke.getKeyStroke(','))
+          } else if ("nop" != lower) {
+            val leader = parseMapLeader(specialKeyName)
+            val specialKey = parseSpecialKey(specialKeyName, 0)
+            if (leader != null) {
+              result.addAll(leader)
+            } else if (specialKey != null && specialKeyName.length > 1) {
+              result.add(specialKey)
+            } else {
+              result.add(KeyStroke.getKeyStroke('<'))
+              result.addAll(stringToKeys(specialKeyName))
+              result.add(KeyStroke.getKeyStroke('>'))
+            }
+          }
+        } else {
+          // e.g. move '<-2<CR> - the first part does not belong to any special key
+          if (element == '<' || element == '«') {
+            result.add(KeyStroke.getKeyStroke(specialKeyStart))
+            result.addAll(stringToKeys(specialKeyBuilder.toString()))
+            specialKeyBuilder = StringBuilder()
+          } else {
+            specialKeyBuilder.append(element)
           }
         }
       }
-      if (state == KeyParserState.ESCAPE) {
-        result.add(KeyStroke.getKeyStroke('\\'))
-      } else if (state == KeyParserState.SPECIAL) {
-        result.add(KeyStroke.getKeyStroke(specialKeyStart))
-        result.addAll(stringToKeys(specialKeyBuilder.toString()))
-      }
+    }
+    if (state == KeyParserState.ESCAPE) {
+      result.add(KeyStroke.getKeyStroke('\\'))
+    } else if (state == KeyParserState.SPECIAL) {
+      result.add(KeyStroke.getKeyStroke(specialKeyStart))
+      result.addAll(stringToKeys(specialKeyBuilder.toString()))
     }
     return result
   }
@@ -175,9 +177,9 @@ abstract class VimStringParserBase : VimStringParser {
     return null
   }
 
-  override fun parseKeysSet(@NonNls vararg keys: String): Set<List<KeyStroke>> = List(keys.size) {
-    injector.parser.parseKeys(keys[it])
-  }.toSet()
+//  override fun parseKeysSet(@NonNls vararg keys: String): Set<List<KeyStroke>> = List(keys.size) {
+//    injector.parser.parseKeys(keys[it])
+//  }.toSet()
 
   override fun stringToKeys(string: @NonNls String): List<KeyStroke> {
     val res: MutableList<KeyStroke> = ArrayList()

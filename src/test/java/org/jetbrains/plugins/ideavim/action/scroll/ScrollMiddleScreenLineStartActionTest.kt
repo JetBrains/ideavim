@@ -19,7 +19,7 @@
 package org.jetbrains.plugins.ideavim.action.scroll
 
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
@@ -36,7 +36,7 @@ class ScrollMiddleScreenLineStartActionTest : VimTestCase() {
   fun `test scrolls current line to middle of screen`() {
     configureByPages(5)
     setPositionAndScroll(40, 45)
-    typeText(parseKeys("z."))
+    typeText(injector.parser.parseKeys("z."))
     assertPosition(45, 0)
     assertVisibleArea(28, 62)
   }
@@ -44,7 +44,7 @@ class ScrollMiddleScreenLineStartActionTest : VimTestCase() {
   fun `test scrolls current line to middle of screen and moves cursor to first non-blank`() {
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(40, 45, 14)
-    typeText(parseKeys("z."))
+    typeText(injector.parser.parseKeys("z."))
     assertPosition(45, 4)
     assertVisibleArea(28, 62)
   }
@@ -52,7 +52,7 @@ class ScrollMiddleScreenLineStartActionTest : VimTestCase() {
   fun `test scrolls count line to the middle of the screen`() {
     configureByPages(5)
     setPositionAndScroll(40, 45)
-    typeText(parseKeys("100z."))
+    typeText(injector.parser.parseKeys("100z."))
     assertPosition(99, 0)
     assertVisibleArea(82, 116)
   }
@@ -61,7 +61,7 @@ class ScrollMiddleScreenLineStartActionTest : VimTestCase() {
     VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolljumpName, VimInt(10))
     configureByPages(5)
     setPositionAndScroll(40, 45)
-    typeText(parseKeys("100z."))
+    typeText(injector.parser.parseKeys("100z."))
     assertPosition(99, 0)
     assertVisibleArea(82, 116)
   }
@@ -69,7 +69,7 @@ class ScrollMiddleScreenLineStartActionTest : VimTestCase() {
   fun `test scrolls correctly when count line is in first half of first page`() {
     configureByPages(5)
     setPositionAndScroll(40, 45)
-    typeText(parseKeys("10z."))
+    typeText(injector.parser.parseKeys("10z."))
     assertPosition(9, 0)
     assertVisibleArea(0, 34)
   }
@@ -78,7 +78,7 @@ class ScrollMiddleScreenLineStartActionTest : VimTestCase() {
   fun `test scrolls last line of file correctly`() {
     configureByPages(5)
     setPositionAndScroll(0, 0)
-    typeText(parseKeys("175z."))
+    typeText(injector.parser.parseKeys("175z."))
     assertPosition(174, 0)
     assertVisibleArea(146, 175)
   }

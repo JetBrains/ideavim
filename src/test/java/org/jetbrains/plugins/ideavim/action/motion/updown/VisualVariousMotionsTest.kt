@@ -20,7 +20,7 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.updown
 
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.api.injector
 import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.VimTestCase
 
@@ -46,7 +46,7 @@ class VisualVariousMotionsTest : VimTestCase() {
 
     configureByText(code)
 
-    typeText(parseKeys("<C-V>", "k".repeat(2), "l".repeat(2)))
+    typeText(injector.parser.parseKeys("<C-V>" + "k".repeat(2) + "l".repeat(2)))
 
     assertState(
       """
@@ -64,7 +64,7 @@ class VisualVariousMotionsTest : VimTestCase() {
       """.trimIndent().dotToTab()
     )
 
-    typeText(parseKeys("k".repeat(7), "l".repeat(3)))
+    typeText(injector.parser.parseKeys("k".repeat(7) + "l".repeat(3)))
 
     // Carets 2-4 have 0 column as logical position, but ${se} - 1 column as visual position
     assertState(
@@ -87,7 +87,7 @@ class VisualVariousMotionsTest : VimTestCase() {
     TestCase.assertEquals(3, myFixture.editor.caretModel.allCarets[2].visualPosition.column)
     TestCase.assertEquals(3, myFixture.editor.caretModel.allCarets[3].visualPosition.column)
 
-    typeText(parseKeys("l".repeat(2)))
+    typeText(injector.parser.parseKeys("l".repeat(2)))
 
     assertState(
       """

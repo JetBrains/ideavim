@@ -19,7 +19,7 @@
 package org.jetbrains.plugins.ideavim.action.scroll
 
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
@@ -44,7 +44,7 @@ class ScrollHalfWidthRightActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll half page width`() {
     configureByColumns(200)
-    typeText(parseKeys("200|", "ze", "zH"))
+    typeText(injector.parser.parseKeys("200|" + "ze" + "zH"))
     assertPosition(0, 159)
     assertVisibleLineBounds(0, 80, 159)
   }
@@ -52,7 +52,7 @@ class ScrollHalfWidthRightActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll keeps cursor in place if already in scrolled area`() {
     configureByColumns(200)
-    typeText(parseKeys("100|", "zs", "zH"))
+    typeText(injector.parser.parseKeys("100|" + "zs" + "zH"))
     assertPosition(0, 99)
     // Scroll right 40 characters 99 -> 59
     assertVisibleLineBounds(0, 59, 138)
@@ -61,7 +61,7 @@ class ScrollHalfWidthRightActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll moves cursor if moves off screen`() {
     configureByColumns(200)
-    typeText(parseKeys("100|", "ze", "zH"))
+    typeText(injector.parser.parseKeys("100|" + "ze" + "zH"))
     assertPosition(0, 79)
     assertVisibleLineBounds(0, 0, 79)
   }
@@ -69,7 +69,7 @@ class ScrollHalfWidthRightActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll count half page widths`() {
     configureByColumns(400)
-    typeText(parseKeys("350|", "ze", "3zH"))
+    typeText(injector.parser.parseKeys("350|" + "ze" + "3zH"))
     assertPosition(0, 229)
     assertVisibleLineBounds(0, 150, 229)
   }
@@ -78,7 +78,7 @@ class ScrollHalfWidthRightActionTest : VimTestCase() {
   fun `test scroll half page width with sidescrolloff`() {
     VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.sidescrolloffName, VimInt(10))
     configureByColumns(200)
-    typeText(parseKeys("150|", "ze", "zH"))
+    typeText(injector.parser.parseKeys("150|" + "ze" + "zH"))
     assertPosition(0, 109)
     assertVisibleLineBounds(0, 40, 119)
   }
@@ -87,7 +87,7 @@ class ScrollHalfWidthRightActionTest : VimTestCase() {
   fun `test scroll half page width ignores sidescroll`() {
     VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.sidescrollName, VimInt(10))
     configureByColumns(200)
-    typeText(parseKeys("200|", "ze", "zH"))
+    typeText(injector.parser.parseKeys("200|" + "ze" + "zH"))
     assertPosition(0, 159)
     assertVisibleLineBounds(0, 80, 159)
   }
@@ -95,7 +95,7 @@ class ScrollHalfWidthRightActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll at start of line does nothing`() {
     configureByColumns(200)
-    typeText(parseKeys("zH"))
+    typeText(injector.parser.parseKeys("zH"))
     assertPosition(0, 0)
     assertVisibleLineBounds(0, 0, 79)
   }
@@ -103,7 +103,7 @@ class ScrollHalfWidthRightActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll near start of line does nothing`() {
     configureByColumns(200)
-    typeText(parseKeys("10|", "zH"))
+    typeText(injector.parser.parseKeys("10|" + "zH"))
     assertPosition(0, 9)
     assertVisibleLineBounds(0, 0, 79)
   }
@@ -112,7 +112,7 @@ class ScrollHalfWidthRightActionTest : VimTestCase() {
   fun `test scroll includes inlay visual column in half page width`() {
     configureByColumns(200)
     addInlay(180, true, 5)
-    typeText(parseKeys("190|", "ze", "zH"))
+    typeText(injector.parser.parseKeys("190|" + "ze" + "zH"))
     // The inlay is included in the count of scrolled visual columns
     assertPosition(0, 150)
     assertVisibleLineBounds(0, 71, 150)
@@ -122,7 +122,7 @@ class ScrollHalfWidthRightActionTest : VimTestCase() {
   fun `test scroll with inlay and cursor in scrolled area`() {
     configureByColumns(200)
     addInlay(180, true, 5)
-    typeText(parseKeys("170|", "ze", "zH"))
+    typeText(injector.parser.parseKeys("170|" + "ze" + "zH"))
     // The inlay is after the cursor, and does not affect scrolling
     assertPosition(0, 129)
     assertVisibleLineBounds(0, 50, 129)

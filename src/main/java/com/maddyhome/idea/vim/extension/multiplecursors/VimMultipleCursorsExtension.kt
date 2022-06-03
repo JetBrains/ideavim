@@ -28,6 +28,7 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.common.MappingMode
 import com.maddyhome.idea.vim.common.TextRange
@@ -41,7 +42,6 @@ import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.SearchHelper
 import com.maddyhome.idea.vim.helper.SearchOptions
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.endOffsetInclusive
 import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.helper.exitVisualMode
@@ -86,29 +86,29 @@ class VimMultipleCursorsExtension : VimExtension {
   override fun getName() = "multiple-cursors"
 
   override fun init() {
-    putExtensionHandlerMapping(MappingMode.NXO, parseKeys(NEXT_WHOLE_OCCURRENCE), owner, NextOccurrenceHandler(), false)
+    putExtensionHandlerMapping(MappingMode.NXO, injector.parser.parseKeys(NEXT_WHOLE_OCCURRENCE), owner, NextOccurrenceHandler(), false)
     putExtensionHandlerMapping(
       MappingMode.NXO,
-      parseKeys(NEXT_OCCURRENCE),
+      injector.parser.parseKeys(NEXT_OCCURRENCE),
       owner,
       NextOccurrenceHandler(whole = false),
       false
     )
-    putExtensionHandlerMapping(MappingMode.NXO, parseKeys(ALL_WHOLE_OCCURRENCES), owner, AllOccurrencesHandler(), false)
+    putExtensionHandlerMapping(MappingMode.NXO, injector.parser.parseKeys(ALL_WHOLE_OCCURRENCES), owner, AllOccurrencesHandler(), false)
     putExtensionHandlerMapping(
       MappingMode.NXO,
-      parseKeys(ALL_OCCURRENCES),
+      injector.parser.parseKeys(ALL_OCCURRENCES),
       owner,
       AllOccurrencesHandler(whole = false),
       false
     )
-    putExtensionHandlerMapping(MappingMode.X, parseKeys(SKIP_OCCURRENCE), owner, SkipOccurrenceHandler(), false)
-    putExtensionHandlerMapping(MappingMode.X, parseKeys(REMOVE_OCCURRENCE), owner, RemoveOccurrenceHandler(), false)
+    putExtensionHandlerMapping(MappingMode.X, injector.parser.parseKeys(SKIP_OCCURRENCE), owner, SkipOccurrenceHandler(), false)
+    putExtensionHandlerMapping(MappingMode.X, injector.parser.parseKeys(REMOVE_OCCURRENCE), owner, RemoveOccurrenceHandler(), false)
 
-    putKeyMappingIfMissing(MappingMode.NXO, parseKeys("<A-n>"), owner, parseKeys(NEXT_WHOLE_OCCURRENCE), true)
-    putKeyMappingIfMissing(MappingMode.NXO, parseKeys("g<A-n>"), owner, parseKeys(NEXT_OCCURRENCE), true)
-    putKeyMappingIfMissing(MappingMode.X, parseKeys("<A-x>"), owner, parseKeys(SKIP_OCCURRENCE), true)
-    putKeyMappingIfMissing(MappingMode.X, parseKeys("<A-p>"), owner, parseKeys(REMOVE_OCCURRENCE), true)
+    putKeyMappingIfMissing(MappingMode.NXO, injector.parser.parseKeys("<A-n>"), owner, injector.parser.parseKeys(NEXT_WHOLE_OCCURRENCE), true)
+    putKeyMappingIfMissing(MappingMode.NXO, injector.parser.parseKeys("g<A-n>"), owner, injector.parser.parseKeys(NEXT_OCCURRENCE), true)
+    putKeyMappingIfMissing(MappingMode.X, injector.parser.parseKeys("<A-x>"), owner, injector.parser.parseKeys(SKIP_OCCURRENCE), true)
+    putKeyMappingIfMissing(MappingMode.X, injector.parser.parseKeys("<A-p>"), owner, injector.parser.parseKeys(REMOVE_OCCURRENCE), true)
   }
 
   abstract class WriteActionHandler : VimExtensionHandler {

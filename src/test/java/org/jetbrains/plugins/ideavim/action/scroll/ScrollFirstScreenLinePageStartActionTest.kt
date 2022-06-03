@@ -19,7 +19,7 @@
 package org.jetbrains.plugins.ideavim.action.scroll
 
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
@@ -40,7 +40,7 @@ class ScrollFirstScreenLinePageStartActionTest : VimTestCase() {
   fun `test scrolls first line on next page to top of screen`() {
     configureByPages(5)
     setPositionAndScroll(0, 20)
-    typeText(parseKeys("z+"))
+    typeText(injector.parser.parseKeys("z+"))
     assertPosition(35, 0)
     assertVisibleArea(35, 69)
   }
@@ -49,7 +49,7 @@ class ScrollFirstScreenLinePageStartActionTest : VimTestCase() {
   fun `test scrolls to first non-blank in line`() {
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(0, 20)
-    typeText(parseKeys("z+"))
+    typeText(injector.parser.parseKeys("z+"))
     assertPosition(35, 4)
     assertVisibleArea(35, 69)
   }
@@ -59,7 +59,7 @@ class ScrollFirstScreenLinePageStartActionTest : VimTestCase() {
     VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
     configureByPages(5)
     setPositionAndScroll(0, 20)
-    typeText(parseKeys("z+"))
+    typeText(injector.parser.parseKeys("z+"))
     assertPosition(35, 0)
     assertVisibleArea(25, 59)
   }
@@ -69,7 +69,7 @@ class ScrollFirstScreenLinePageStartActionTest : VimTestCase() {
     VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolljumpName, VimInt(10))
     configureByPages(5)
     setPositionAndScroll(0, 20)
-    typeText(parseKeys("z+"))
+    typeText(injector.parser.parseKeys("z+"))
     assertPosition(35, 0)
     assertVisibleArea(35, 69)
   }
@@ -77,7 +77,7 @@ class ScrollFirstScreenLinePageStartActionTest : VimTestCase() {
   fun `test count z+ scrolls count line to top of screen`() {
     configureByPages(5)
     setPositionAndScroll(0, 20)
-    typeText(parseKeys("100z+"))
+    typeText(injector.parser.parseKeys("100z+"))
     assertPosition(99, 0)
     assertVisibleArea(99, 133)
   }
@@ -86,7 +86,7 @@ class ScrollFirstScreenLinePageStartActionTest : VimTestCase() {
     VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
     configureByPages(5)
     setPositionAndScroll(0, 20)
-    typeText(parseKeys("100z+"))
+    typeText(injector.parser.parseKeys("100z+"))
     assertPosition(99, 0)
     assertVisibleArea(89, 123)
   }
@@ -95,7 +95,7 @@ class ScrollFirstScreenLinePageStartActionTest : VimTestCase() {
   fun `test scroll on penultimate page`() {
     configureByPages(5)
     setPositionAndScroll(130, 145)
-    typeText(parseKeys("z+"))
+    typeText(injector.parser.parseKeys("z+"))
     assertPosition(165, 0)
     assertVisibleArea(146, 175)
   }

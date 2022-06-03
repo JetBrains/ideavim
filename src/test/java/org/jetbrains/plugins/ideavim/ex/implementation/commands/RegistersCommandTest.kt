@@ -19,7 +19,7 @@
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.TestClipboardModel
 import org.jetbrains.plugins.ideavim.VimTestCase
 
@@ -41,7 +41,7 @@ class RegistersCommandTest : VimTestCase() {
 
     val registerGroup = VimPlugin.getRegister()
     for (i in 'a'..'z') {
-      registerGroup.setKeys(i, parseKeys("Content for register $i"))
+      registerGroup.setKeys(i, injector.parser.parseKeys("Content for register $i"))
     }
 
     enterCommand("registers abc")
@@ -59,7 +59,7 @@ class RegistersCommandTest : VimTestCase() {
 
     val registerGroup = VimPlugin.getRegister()
     for (i in 'a'..'z') {
-      registerGroup.setKeys(i, parseKeys("Content for register $i"))
+      registerGroup.setKeys(i, injector.parser.parseKeys("Content for register $i"))
     }
 
     enterCommand("registers hello world")
@@ -81,7 +81,7 @@ class RegistersCommandTest : VimTestCase() {
 
     val registerGroup = VimPlugin.getRegister()
     for (i in 'a'..'z') {
-      registerGroup.setKeys(i, parseKeys("Content for register $i"))
+      registerGroup.setKeys(i, injector.parser.parseKeys("Content for register $i"))
     }
 
     enterCommand("registers Z")
@@ -94,7 +94,7 @@ class RegistersCommandTest : VimTestCase() {
     val indent = " ".repeat(20)
     val text = "Really long line ".repeat(1000)
 
-    VimPlugin.getRegister().setKeys('a', parseKeys(indent + text))
+    VimPlugin.getRegister().setKeys('a', injector.parser.parseKeys(indent + text))
 
     // Does not trim whitespace
     enterCommand("registers a")
@@ -108,7 +108,7 @@ class RegistersCommandTest : VimTestCase() {
   fun `test correctly encodes non printable characters`() {
     configureByText("")
 
-    VimPlugin.getRegister().setKeys('a', parseKeys("<Tab>Hello<Space>World<CR><Esc>"))
+    VimPlugin.getRegister().setKeys('a', injector.parser.parseKeys("<Tab>Hello<Space>World<CR><Esc>"))
 
     enterCommand("registers")
     assertExOutput(
@@ -123,7 +123,7 @@ class RegistersCommandTest : VimTestCase() {
 
     val registerGroup = VimPlugin.getRegister()
     for (i in 'a'..'z') {
-      registerGroup.setKeys(i, parseKeys("Content for register $i"))
+      registerGroup.setKeys(i, injector.parser.parseKeys("Content for register $i"))
     }
 
     enterCommand("display abc")
@@ -155,19 +155,19 @@ class RegistersCommandTest : VimTestCase() {
 
     // Populate unnamed "" and numbered "1-9 registers - linewise
     for (i in 1..10) {
-      typeText(parseKeys("dd"))
+      typeText(injector.parser.parseKeys("dd"))
     }
 
     // Last yank register "0 - "last yank"
-    typeText(parseKeys("2yw", "<CR>"))
+    typeText(injector.parser.parseKeys("2yw" + "<CR>"))
 
     // Small delete register "- - deletes "s"
-    typeText(parseKeys("x"))
+    typeText(injector.parser.parseKeys("x"))
 
     // Populate named registers "a-z - characterwise
     val registerGroup = VimPlugin.getRegister()
     for (i in 'a'..'z') {
-      registerGroup.setKeys(i, parseKeys("Hello world $i"))
+      registerGroup.setKeys(i, injector.parser.parseKeys("Hello world $i"))
     }
 
     // Clipboard registers "* "+

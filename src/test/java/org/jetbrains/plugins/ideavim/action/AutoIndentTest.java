@@ -18,11 +18,10 @@
 
 package org.jetbrains.plugins.ideavim.action;
 
+import com.maddyhome.idea.vim.api.VimInjectorKt;
 import org.jetbrains.plugins.ideavim.SkipNeovimReason;
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim;
 import org.jetbrains.plugins.ideavim.VimTestCase;
-
-import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
 
 /**
  * @author Aleksey Lagoshin
@@ -32,7 +31,7 @@ public class AutoIndentTest extends VimTestCase {
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   public void testCaretPositionAfterAutoIndent() {
     configureByJavaText("class C {\n" + "   int a;\n" + "   int <caret>b;\n" + "   int c;\n" + "}\n");
-    typeText(parseKeys("=="));
+    typeText(VimInjectorKt.getInjector().getParser().parseKeys("=="));
     assertState("class C {\n" + "   int a;\n" + "    <caret>int b;\n" + "   int c;\n" + "}\n");
   }
 
@@ -40,7 +39,7 @@ public class AutoIndentTest extends VimTestCase {
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   public void testAutoIndentWithCount() {
     configureByJavaText("class C {\n" + "   int a;\n" + "   int <caret>b;\n" + "   int c;\n" + "   int d;\n" + "}\n");
-    typeText(parseKeys("2=="));
+    typeText(VimInjectorKt.getInjector().getParser().parseKeys("2=="));
     assertState("class C {\n" + "   int a;\n" + "    <caret>int b;\n" + "    int c;\n" + "   int d;\n" + "}\n");
   }
 
@@ -48,7 +47,7 @@ public class AutoIndentTest extends VimTestCase {
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   public void testAutoIndentWithUpMotion() {
     configureByJavaText("class C {\n" + "   int a;\n" + "   int b;\n" + "   int <caret>c;\n" + "   int d;\n" + "}\n");
-    typeText(parseKeys("=k"));
+    typeText(VimInjectorKt.getInjector().getParser().parseKeys("=k"));
     assertState("class C {\n" + "   int a;\n" + "    <caret>int b;\n" + "    int c;\n" + "   int d;\n" + "}\n");
   }
 
@@ -56,7 +55,7 @@ public class AutoIndentTest extends VimTestCase {
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   public void testAutoIndentWithRightMotion() {
     configureByJavaText("class C {\n" + "   int a;\n" + "   int <caret>b;\n" + "   int c;\n" + "}\n");
-    typeText(parseKeys("=l"));
+    typeText(VimInjectorKt.getInjector().getParser().parseKeys("=l"));
     assertState("class C {\n" + "   int a;\n" + "    <caret>int b;\n" + "   int c;\n" + "}\n");
   }
 
@@ -64,7 +63,7 @@ public class AutoIndentTest extends VimTestCase {
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   public void testAutoIndentWithCountsAndDownMotion() {
     configureByJavaText("class C {\n" + "   int <caret>a;\n" + "   int b;\n" + "   int c;\n" + "   int d;\n" + "}\n");
-    typeText(parseKeys("2=j"));
+    typeText(VimInjectorKt.getInjector().getParser().parseKeys("2=j"));
     assertState("class C {\n" + "    <caret>int a;\n" + "    int b;\n" + "    int c;\n" + "   int d;\n" + "}\n");
   }
 
@@ -72,7 +71,7 @@ public class AutoIndentTest extends VimTestCase {
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   public void testVisualAutoIndent() {
     configureByJavaText("class C {\n" + "   int a;\n" + "   int <caret>b;\n" + "   int c;\n" + "}\n");
-    typeText(parseKeys("v", "l", "="));
+    typeText(VimInjectorKt.getInjector().getParser().parseKeys("v" + "l" + "="));
     assertState("class C {\n" + "   int a;\n" + "    <caret>int b;\n" + "   int c;\n" + "}\n");
   }
 
@@ -80,7 +79,7 @@ public class AutoIndentTest extends VimTestCase {
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   public void testVisualMultilineAutoIndent() {
     configureByJavaText("class C {\n" + "   int a;\n" + "   int <caret>b;\n" + "   int c;\n" + "   int d;\n" + "}\n");
-    typeText(parseKeys("v", "j", "="));
+    typeText(VimInjectorKt.getInjector().getParser().parseKeys("v" + "j" + "="));
     assertState("class C {\n" + "   int a;\n" + "    <caret>int b;\n" + "    int c;\n" + "   int d;\n" + "}\n");
   }
 
@@ -88,7 +87,7 @@ public class AutoIndentTest extends VimTestCase {
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   public void testVisualBlockAutoIndent() {
     configureByJavaText("class C {\n" + "   int a;\n" + "   int <caret>b;\n" + "   int c;\n" + "   int d;\n" + "}\n");
-    typeText(parseKeys("<C-V>", "j", "="));
+    typeText(VimInjectorKt.getInjector().getParser().parseKeys("<C-V>" + "j" + "="));
     assertState("class C {\n" + "   int a;\n" + "    <caret>int b;\n" + "    int c;\n" + "   int d;\n" + "}\n");
   }
 }

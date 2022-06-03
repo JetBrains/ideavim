@@ -22,8 +22,6 @@ import com.intellij.openapi.editor.textarea.TextComponentEditorImpl
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.newapi.vim
 import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -48,7 +46,7 @@ class MapCommandTest : VimTestCase() {
     typeText(commandToKeys("nmap k j"))
     assertPluginError(false)
     assertOffset(0)
-    typeText(StringHelper.parseKeys("k"))
+    typeText(injector.parser.parseKeys("k"))
     assertOffset(4)
   }
 
@@ -57,7 +55,7 @@ class MapCommandTest : VimTestCase() {
     configureByText("${c}World!\n")
     typeText(commandToKeys("imap jk <Esc>"))
     assertPluginError(false)
-    typeText(StringHelper.parseKeys("i", "Hello, ", "jk"))
+    typeText(injector.parser.parseKeys("i" + "Hello, " + "jk"))
     assertState("Hello, World!\n")
     assertMode(CommandState.Mode.COMMAND)
     assertOffset(6)
@@ -67,7 +65,7 @@ class MapCommandTest : VimTestCase() {
     configureByText("\n")
     typeText(commandToKeys("imap foo\\ bar"))
     assertPluginError(false)
-    typeText(StringHelper.stringToKeys("ifoo\\"))
+    typeText(injector.parser.stringToKeys("ifoo\\"))
     assertState("bar\n")
   }
 
@@ -75,7 +73,7 @@ class MapCommandTest : VimTestCase() {
   fun testUnfinishedSpecialKey() {
     configureByText("\n")
     typeText(commandToKeys("imap <Esc foo"))
-    typeText(StringHelper.stringToKeys("i<Esc"))
+    typeText(injector.parser.stringToKeys("i<Esc"))
     assertState("foo\n")
   }
 
@@ -83,7 +81,7 @@ class MapCommandTest : VimTestCase() {
   fun testUnknownSpecialKey() {
     configureByText("\n")
     typeText(commandToKeys("imap <foo> bar"))
-    typeText(StringHelper.stringToKeys("i<foo>"))
+    typeText(injector.parser.stringToKeys("i<foo>"))
     assertState("bar\n")
   }
 
@@ -118,7 +116,7 @@ n  ,f            <Plug>Foo
     typeText(commandToKeys("imap foo bar"))
     typeText(commandToKeys("imap bar baz"))
     typeText(commandToKeys("imap baz quux"))
-    typeText(StringHelper.parseKeys("i", "foo"))
+    typeText(injector.parser.parseKeys("i" + "foo"))
     assertState("quux\n")
   }
 
@@ -127,7 +125,7 @@ n  ,f            <Plug>Foo
     typeText(commandToKeys("inoremap a b"))
     assertPluginError(false)
     typeText(commandToKeys("inoremap b a"))
-    typeText(StringHelper.parseKeys("i", "ab"))
+    typeText(injector.parser.parseKeys("i" + "ab"))
     assertState("ba\n")
   }
 
@@ -156,7 +154,7 @@ n  ,f            <Plug>Foo
     )
     typeText(commandToKeys("noremap <Right> <nop>"))
     assertPluginError(false)
-    typeText(StringHelper.parseKeys("l", "<Right>"))
+    typeText(injector.parser.parseKeys("l" + "<Right>"))
     assertPluginError(false)
     assertState(
       """
@@ -198,9 +196,9 @@ n  ,f            <Plug>Foo
   fun testMapSpace() {
     configureByText("foo\n")
     typeText(commandToKeys("nmap <space> dw"))
-    typeText(StringHelper.parseKeys(" "))
+    typeText(injector.parser.parseKeys(" "))
     assertState("\n")
-    typeText(StringHelper.parseKeys("i", " ", "<Esc>"))
+    typeText(injector.parser.parseKeys("i" + " " + "<Esc>"))
     assertState(" \n")
   }
 
@@ -208,7 +206,7 @@ n  ,f            <Plug>Foo
   fun testNoMappingInReplaceCharacterArgument() {
     configureByText("${c}foo\n")
     typeText(commandToKeys("noremap A Z"))
-    typeText(StringHelper.parseKeys("rA"))
+    typeText(injector.parser.parseKeys("rA"))
     assertState("Aoo\n")
   }
 
@@ -216,7 +214,7 @@ n  ,f            <Plug>Foo
   fun testNoMappingInNonFirstCharOfOperatorPendingMode() {
     configureByText("${c}foo, bar\n")
     typeText(commandToKeys("omap , ?"))
-    typeText(StringHelper.parseKeys("dt,"))
+    typeText(injector.parser.parseKeys("dt,"))
     assertState(", bar\n")
   }
 
@@ -225,7 +223,7 @@ n  ,f            <Plug>Foo
   fun testIgnoreEverythingAfterBar() {
     configureByText("${c}foo\n")
     typeText(commandToKeys("imap a b |c \" Something else"))
-    typeText(StringHelper.parseKeys("ia"))
+    typeText(injector.parser.parseKeys("ia"))
     assertState("b foo\n")
   }
 
@@ -233,7 +231,7 @@ n  ,f            <Plug>Foo
   fun testBarEscaped() {
     configureByText("${c}foo\n")
     typeText(commandToKeys("imap a b \\| c"))
-    typeText(StringHelper.parseKeys("ia"))
+    typeText(injector.parser.parseKeys("ia"))
     assertState("b | cfoo\n")
   }
 
@@ -242,7 +240,7 @@ n  ,f            <Plug>Foo
   fun testBarEscapedSeveralSpaces() {
     configureByText("${c}foo\n")
     typeText(commandToKeys("imap a b \\| c    |"))
-    typeText(StringHelper.parseKeys("ia"))
+    typeText(injector.parser.parseKeys("ia"))
     assertState("b | c    foo\n")
   }
 
@@ -250,7 +248,7 @@ n  ,f            <Plug>Foo
   fun testFirstCharIsNonRecursive() {
     configureByText("\n")
     typeText(commandToKeys("map ab abcd"))
-    typeText(StringHelper.parseKeys("ab"))
+    typeText(injector.parser.parseKeys("ab"))
     assertState("bcd\n")
   }
 
@@ -259,7 +257,7 @@ n  ,f            <Plug>Foo
   fun testBackspaceCharacterInVimRc() {
     configureByText("\n")
     injector.vimscriptExecutor.execute("inoremap # X\u0008#\n")
-    typeText(StringHelper.parseKeys("i", "#", "<Esc>"))
+    typeText(injector.parser.parseKeys("i" + "#" + "<Esc>"))
     assertState("#\n")
     assertMode(CommandState.Mode.COMMAND)
     typeText(commandToKeys("imap"))
@@ -277,7 +275,7 @@ n  ,f            <Plug>Foo
       """.trimIndent()
     )
     injector.vimscriptExecutor.execute("map \u0018i dd\n", true)
-    typeText(StringHelper.parseKeys("i", "#", "<Esc>"))
+    typeText(injector.parser.parseKeys("i" + "#" + "<Esc>"))
     assertState(
       """
   #foo
@@ -288,7 +286,7 @@ n  ,f            <Plug>Foo
     assertMode(CommandState.Mode.COMMAND)
     typeText(commandToKeys("map"))
     assertExOutput("   <C-X>i        dd\n")
-    typeText(StringHelper.parseKeys("<C-X>i"))
+    typeText(injector.parser.parseKeys("<C-X>i"))
     assertState("bar\n")
   }
 
@@ -297,7 +295,7 @@ n  ,f            <Plug>Foo
   fun testBarCtrlVEscaped() {
     configureByText("${c}foo\n")
     injector.vimscriptExecutor.execute("imap a b \u0016|\u0016| c |\n")
-    typeText(StringHelper.parseKeys("ia"))
+    typeText(injector.parser.parseKeys("ia"))
     assertState("b || c foo\n")
   }
 
@@ -306,7 +304,7 @@ n  ,f            <Plug>Foo
   fun testCtrlMCtrlLAsNewLine() {
     configureByText("${c}foo\n")
     injector.vimscriptExecutor.execute("map A :%s/foo/bar/g\r\u000C\n")
-    typeText(StringHelper.parseKeys("A"))
+    typeText(injector.parser.parseKeys("A"))
     assertState("bar\n")
   }
 
@@ -314,7 +312,7 @@ n  ,f            <Plug>Foo
   fun testRemappingZero() {
     configureByText("x${c}yz\n")
     typeText(commandToKeys("map 0 ~"))
-    typeText(StringHelper.parseKeys("0"))
+    typeText(injector.parser.parseKeys("0"))
     assertState("xYz\n")
   }
 
@@ -323,7 +321,7 @@ n  ,f            <Plug>Foo
   fun testRemappingZeroStillAllowsZeroToBeUsedInCount() {
     configureByText("a${c}bcdefghijklmnop\n")
     injector.vimscriptExecutor.execute("map 0 ^")
-    typeText(StringHelper.parseKeys("10~"))
+    typeText(injector.parser.parseKeys("10~"))
     assertState("aBCDEFGHIJKlmnop\n")
   }
 
@@ -332,7 +330,7 @@ n  ,f            <Plug>Foo
   fun testRemappingDeleteOverridesRemovingLastDigitFromCount() {
     configureByText("a${c}bcdefghijklmnop\n")
     typeText(commandToKeys("map <Del> ~"))
-    typeText(StringHelper.parseKeys("10<Del>"))
+    typeText(injector.parser.parseKeys("10<Del>"))
     assertState("aBCDEFGHIJKlmnop\n")
   }
 
@@ -342,7 +340,7 @@ n  ,f            <Plug>Foo
     configureByText("\n")
     typeText(commandToKeys("let mapleader = \",\""))
     typeText(commandToKeys("nmap <Leader>z izzz<Esc>"))
-    typeText(StringHelper.parseKeys(",z"))
+    typeText(injector.parser.parseKeys(",z"))
     assertState("zzz\n")
   }
 
@@ -352,7 +350,7 @@ n  ,f            <Plug>Foo
     configureByText("\n")
     typeText(commandToKeys("let mapleader = \"\\<SPACE>\""))
     typeText(commandToKeys("nmap <Leader>z izzz<Esc>"))
-    typeText(StringHelper.parseKeys(" z"))
+    typeText(injector.parser.parseKeys(" z"))
     assertState("zzz\n")
   }
 
@@ -362,7 +360,7 @@ n  ,f            <Plug>Foo
     configureByText("\n")
     typeText(commandToKeys("let mapleader = \" \""))
     typeText(commandToKeys("nmap <Leader>z izzz<Esc>"))
-    typeText(StringHelper.parseKeys(" z"))
+    typeText(injector.parser.parseKeys(" z"))
     assertState("zzz\n")
   }
 
@@ -371,11 +369,11 @@ n  ,f            <Plug>Foo
     configureByText("\n")
     typeText(commandToKeys("nmap ,f iHello<Esc>"))
     typeText(commandToKeys("nmap ,fc iBye<Esc>"))
-    typeText(StringHelper.parseKeys(",fdh"))
+    typeText(injector.parser.parseKeys(",fdh"))
     assertState("Helo\n")
-    typeText(StringHelper.parseKeys("diw"))
+    typeText(injector.parser.parseKeys("diw"))
     assertState("\n")
-    typeText(StringHelper.parseKeys(",fch"))
+    typeText(injector.parser.parseKeys(",fch"))
     assertState("Bye\n")
   }
 
@@ -384,11 +382,11 @@ n  ,f            <Plug>Foo
     configureByText("\n")
     typeText(commandToKeys("nmap ,foo iHello<Esc>"))
     typeText(commandToKeys("nmap ,fooc iBye<Esc>"))
-    typeText(StringHelper.parseKeys(",foodh"))
+    typeText(injector.parser.parseKeys(",foodh"))
     assertState("Helo\n")
-    typeText(StringHelper.parseKeys("diw"))
+    typeText(injector.parser.parseKeys("diw"))
     assertState("\n")
-    typeText(StringHelper.parseKeys(",fooch"))
+    typeText(injector.parser.parseKeys(",fooch"))
     assertState("Bye\n")
   }
 
@@ -397,7 +395,7 @@ n  ,f            <Plug>Foo
     configureByText("\n")
     typeText(commandToKeys("nmap ,f <Plug>Foo"))
     typeText(commandToKeys("nmap <Plug>Foo iHello<Esc>"))
-    typeText(StringHelper.parseKeys(",fa!<Esc>"))
+    typeText(injector.parser.parseKeys(",fa!<Esc>"))
     assertState("Hello!\n")
   }
 
@@ -405,7 +403,7 @@ n  ,f            <Plug>Foo
     configureByText("123${c}4567890")
     typeText(commandToKeys("map ds h"))
     typeText(commandToKeys("map I 3l"))
-    typeText(StringHelper.parseKeys("dI"))
+    typeText(injector.parser.parseKeys("dI"))
     assertState("123${c}7890")
   }
 
@@ -414,14 +412,14 @@ n  ,f            <Plug>Foo
     configureByText("123${c}4567890")
     typeText(commandToKeys("map <Plug>(Hi)l lll"))
     typeText(commandToKeys("map I <Plug>(Hi)"))
-    typeText(StringHelper.parseKeys("Ih"))
+    typeText(injector.parser.parseKeys("Ih"))
     assertState("12${c}34567890")
   }
 
   fun testIntersectingCommands2() {
     configureByText("123${c}4567890")
     typeText(commandToKeys("map as x"))
-    typeText(StringHelper.parseKeys("gas"))
+    typeText(injector.parser.parseKeys("gas"))
     assertState("123${c}567890")
   }
 
@@ -429,7 +427,7 @@ n  ,f            <Plug>Foo
   fun testMapZero() {
     configureByText("A quick ${c}brown fox jumps over the lazy dog")
     typeText(commandToKeys("nmap 0 w"))
-    typeText(StringHelper.parseKeys("0"))
+    typeText(injector.parser.parseKeys("0"))
     assertOffset(14)
   }
 
@@ -437,7 +435,7 @@ n  ,f            <Plug>Foo
   fun testMapZeroIgnoredInCount() {
     configureByText("A quick ${c}brown fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
     typeText(commandToKeys("nmap 0 w"))
-    typeText(StringHelper.parseKeys("10w"))
+    typeText(injector.parser.parseKeys("10w"))
     assertOffset(51)
   }
 
@@ -445,7 +443,7 @@ n  ,f            <Plug>Foo
   fun testMapNonZeroDigit() {
     configureByText("A quick ${c}brown fox jumps over the lazy dog")
     typeText(commandToKeys("nmap 2 w"))
-    typeText(StringHelper.parseKeys("2"))
+    typeText(injector.parser.parseKeys("2"))
     assertOffset(14)
   }
 
@@ -453,7 +451,7 @@ n  ,f            <Plug>Foo
   fun testMapNonZeroDigitNotIncludedInCount() {
     configureByText("A quick ${c}brown fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
     typeText(commandToKeys("nmap 2 w"))
-    typeText(StringHelper.parseKeys("92"))
+    typeText(injector.parser.parseKeys("92"))
     assertOffset(45)
   }
 
@@ -461,7 +459,7 @@ n  ,f            <Plug>Foo
   fun testShiftSpace() {
     configureByText("A quick ${c}brown fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
     typeText(commandToKeys("nmap <S-Space> w"))
-    typeText(StringHelper.parseKeys("<S-Space>"))
+    typeText(injector.parser.parseKeys("<S-Space>"))
     assertState("A quick brown ${c}fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
   }
 
@@ -469,7 +467,7 @@ n  ,f            <Plug>Foo
   fun testShiftSpaceAndWorkInInsertMode() {
     configureByText("A quick ${c}brown fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
     typeText(commandToKeys("nmap <S-Space> w"))
-    typeText(StringHelper.parseKeys("i<S-Space>"))
+    typeText(injector.parser.parseKeys("i<S-Space>"))
     assertState("A quick  ${c}brown fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
   }
 
@@ -477,14 +475,14 @@ n  ,f            <Plug>Foo
   fun testShiftLetter() {
     configureByText("A quick ${c}brown fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
     typeText(commandToKeys("nmap <S-D> w"))
-    typeText(StringHelper.parseKeys("<S-D>"))
+    typeText(injector.parser.parseKeys("<S-D>"))
     assertState("A quick brown ${c}fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
   }
 
   fun testUppercaseLetter() {
     configureByText("A quick ${c}brown fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
     typeText(commandToKeys("nmap D w"))
-    typeText(StringHelper.parseKeys("D"))
+    typeText(injector.parser.parseKeys("D"))
     assertState("A quick brown ${c}fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
   }
 
@@ -492,10 +490,10 @@ n  ,f            <Plug>Foo
   fun `test shift letter doesn't break insert mode`() {
     configureByText("A quick ${c}brown fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
     typeText(commandToKeys("nmap <S-D> w"))
-    typeText(StringHelper.parseKeys("<S-D>"))
+    typeText(injector.parser.parseKeys("<S-D>"))
     assertState("A quick brown ${c}fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
 
-    typeText(StringHelper.parseKeys("iD<Esc>"))
+    typeText(injector.parser.parseKeys("iD<Esc>"))
     assertState("A quick brown ${c}Dfox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
   }
 
@@ -510,7 +508,7 @@ n  ,f            <Plug>Foo
       """.trimIndent()
     )
     typeText(commandToKeys("map k <Action>(CommentByLineComment)"))
-    typeText(StringHelper.parseKeys("k"))
+    typeText(injector.parser.parseKeys("k"))
     assertState(
       """
         -----
@@ -532,7 +530,7 @@ n  ,f            <Plug>Foo
       """.trimIndent()
     )
     typeText(commandToKeys("map k <Action>(CommentByLineComment)"))
-    typeText(StringHelper.parseKeys("kk"))
+    typeText(injector.parser.parseKeys("kk"))
     assertState(
       """
           -----
@@ -554,7 +552,7 @@ n  ,f            <Plug>Foo
       """.trimIndent()
     )
     typeText(commandToKeys("map k <Action>(CommentByLineComment)<Action>(CommentByLineComment)"))
-    typeText(StringHelper.parseKeys("k"))
+    typeText(injector.parser.parseKeys("k"))
     assertState(
       """
           -----
@@ -576,7 +574,7 @@ n  ,f            <Plug>Foo
       """.trimIndent()
     )
     typeText(commandToKeys("map k <Action>(CommentByLineComment)<Action>(CommentByLineComment)<Action>(CommentByLineComment)"))
-    typeText(StringHelper.parseKeys("k"))
+    typeText(injector.parser.parseKeys("k"))
     assertState(
       """
           -----
@@ -598,7 +596,7 @@ n  ,f            <Plug>Foo
       """.trimIndent()
     )
     typeText(commandToKeys("imap k <Action>(CommentByLineComment)"))
-    typeText(StringHelper.parseKeys("ik"))
+    typeText(injector.parser.parseKeys("ik"))
     assertState(
       """
           -----
@@ -620,7 +618,7 @@ n  ,f            <Plug>Foo
     configureByJavaText(text)
 
     typeText(commandToKeys("map kk l"))
-    typeText(StringHelper.parseKeys("k"))
+    typeText(injector.parser.parseKeys("k"))
 
     checkDelayedMapping(
       text,
@@ -645,7 +643,7 @@ n  ,f            <Plug>Foo
 
     typeText(commandToKeys("map k j"))
     typeText(commandToKeys("map kk l"))
-    typeText(StringHelper.parseKeys("k"))
+    typeText(injector.parser.parseKeys("k"))
 
     checkDelayedMapping(
       text,
@@ -673,7 +671,7 @@ n  ,f            <Plug>Foo
     typeText(commandToKeys("map kk l"))
     typeText(commandToKeys("map j h"))
     typeText(commandToKeys("map jz w"))
-    typeText(StringHelper.parseKeys("k"))
+    typeText(injector.parser.parseKeys("k"))
 
     checkDelayedMapping(
       text,
@@ -699,7 +697,7 @@ n  ,f            <Plug>Foo
     typeText(commandToKeys("map kk l"))
     typeText(commandToKeys("map j h"))
     typeText(commandToKeys("map jz w"))
-    typeText(StringHelper.parseKeys("kz"))
+    typeText(injector.parser.parseKeys("kz"))
 
     assertState(
       """
@@ -722,7 +720,7 @@ n  ,f            <Plug>Foo
 
     typeText(commandToKeys("map x y"))
     typeText(commandToKeys("map y x"))
-    typeText(StringHelper.parseKeys("x"))
+    typeText(injector.parser.parseKeys("x"))
 
     TestCase.assertTrue(VimPlugin.isError())
   }
@@ -737,7 +735,7 @@ n  ,f            <Plug>Foo
     """.trimIndent()
     configureByJavaText(text)
     typeText(commandToKeys("inoremap <expr> jk col(\".\") == 1? '<Esc>' : '<Esc><Right>'"))
-    typeText(parseKeys("ijk"))
+    typeText(injector.parser.parseKeys("ijk"))
     assertState(text)
     val text2 = """
           -----
@@ -746,7 +744,7 @@ n  ,f            <Plug>Foo
           -----
     """.trimIndent()
     configureByJavaText(text2)
-    typeText(parseKeys("ijk"))
+    typeText(injector.parser.parseKeys("ijk"))
     assertState(text2)
   }
 
@@ -759,7 +757,7 @@ n  ,f            <Plug>Foo
     """.trimIndent()
     configureByJavaText(text)
     typeText(commandToKeys("nnoremap <expr> t ^f8a"))
-    typeText(parseKeys("t"))
+    typeText(injector.parser.parseKeys("t"))
     assertPluginErrorMessageContains("E15: Invalid expression: ^f8a")
   }
 
@@ -782,7 +780,7 @@ n  ,f            <Plug>Foo
       """.trimIndent(),
       editor.vim, context.vim, skipHistory = false, indicateErrors = true, null
     )
-    typeText(parseKeys("t"))
+    typeText(injector.parser.parseKeys("t"))
     assertPluginError(true)
     assertPluginErrorMessageContains("E121: Undefined variable: s:mapping")
   }
@@ -818,7 +816,7 @@ n  ,f            <Plug>Foo
     """.trimIndent()
     configureByJavaText(text)
     typeText(commandToKeys("inoremap <expr> <cr> unknownFunction() ? '\\<C-y>' : '\\<C-g>u\\<CR>'"))
-    typeText(parseKeys("i<CR>"))
+    typeText(injector.parser.parseKeys("i<CR>"))
     assertPluginError(true)
     assertPluginErrorMessageContains("E117: Unknown function: unknownFunction")
     assertState(text)
@@ -827,7 +825,7 @@ n  ,f            <Plug>Foo
   fun `test rhc with triangle brackets`() {
     configureByText("\n")
     typeText(commandToKeys("inoremap p <p>"))
-    typeText(parseKeys("ip"))
+    typeText(injector.parser.parseKeys("ip"))
     assertState("<p>\n")
   }
 
@@ -840,7 +838,7 @@ n  ,f            <Plug>Foo
       """.trimIndent()
     )
     typeText(commandToKeys("nnoremap ,f ?\\<fun\\><CR>"))
-    typeText(parseKeys(",f"))
+    typeText(injector.parser.parseKeys(",f"))
     assertState(
       """
       private ${c}fun myfun(funArg: String) {
@@ -862,7 +860,7 @@ n  ,f            <Plug>Foo
 
     typeText(commandToKeys("map kkk l"))
     typeText(commandToKeys("map kk h"))
-    typeText(StringHelper.parseKeys("kk"))
+    typeText(injector.parser.parseKeys("kk"))
 
     checkDelayedMapping(
       text,

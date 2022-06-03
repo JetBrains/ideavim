@@ -18,7 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.propertybased
 
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.jetCheck.Generator
 import org.jetbrains.jetCheck.ImperativeCommand
 import org.jetbrains.jetCheck.PropertyChecker
@@ -54,10 +54,10 @@ class MapPropertyTest : VimPropertyTestBase() {
           }.take(env.generateValue(Generator.integers(1, 10), null)).joinToString(separator = "")
 
           env.logMessage("Commands:\n${mappingCommands.joinToString("\n")}")
-          mappingCommands.forEach { typeText(parseKeys(exCommand(it))) }
+          mappingCommands.forEach { typeText(injector.parser.parseKeys(exCommand(it))) }
 
           env.logMessage("Enter keys: $enteringKeys")
-          typeText(parseKeys(enteringKeys))
+          typeText(injector.parser.parseKeys(enteringKeys))
         } finally {
           reset(editor)
         }

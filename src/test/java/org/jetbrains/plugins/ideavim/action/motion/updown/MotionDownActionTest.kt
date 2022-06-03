@@ -21,8 +21,8 @@
 package org.jetbrains.plugins.ideavim.action.motion.updown
 
 import com.intellij.codeInsight.daemon.impl.HintRenderer
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 /**
@@ -86,7 +86,7 @@ class MotionDownActionTest : VimTestCase() {
   }
 
   fun `test with inlays`() {
-    val keys = parseKeys("j")
+    val keys = injector.parser.parseKeys("j")
     val before = """
             I found it in a ${c}legendary land
             all rocks and lavender and tufted grass,
@@ -102,7 +102,7 @@ class MotionDownActionTest : VimTestCase() {
   }
 
   fun `test with inlays 2`() {
-    val keys = parseKeys("j")
+    val keys = injector.parser.parseKeys("j")
     val before = """
             I found it in a ${c}legendary land
             all rocks and lavender and tufted grass,
@@ -118,7 +118,7 @@ class MotionDownActionTest : VimTestCase() {
   }
 
   fun `test with inlays 3`() {
-    val keys = parseKeys("j")
+    val keys = injector.parser.parseKeys("j")
     val before = """
             I found it in a ${c}legendary land
             all rocks and lavender and tufted grass,
@@ -135,7 +135,7 @@ class MotionDownActionTest : VimTestCase() {
   }
 
   fun `test with inlays 4`() {
-    val keys = parseKeys("j")
+    val keys = injector.parser.parseKeys("j")
     val before = """
             I found it in a legendary ${c}land
             all rocks and lavender
@@ -151,7 +151,7 @@ class MotionDownActionTest : VimTestCase() {
   }
 
   fun `test with inlays 5`() {
-    val keys = parseKeys("jk")
+    val keys = injector.parser.parseKeys("jk")
     val before = """
             I found it in a legendary ${c}land
             all rocks and lavender
@@ -167,7 +167,7 @@ class MotionDownActionTest : VimTestCase() {
   }
 
   fun `test motion up down without inlays`() {
-    val keys = parseKeys("jk")
+    val keys = injector.parser.parseKeys("jk")
     val before = """
             I found ${c}it in a legendary land
             all rocks and lavender
@@ -182,7 +182,7 @@ class MotionDownActionTest : VimTestCase() {
   }
 
   fun `test with inlays 6`() {
-    val keys = parseKeys("j")
+    val keys = injector.parser.parseKeys("j")
     val before = """
             I found it in a legendary ${c}land
             all rocks and lavender
@@ -198,7 +198,7 @@ class MotionDownActionTest : VimTestCase() {
   }
 
   fun `test with inlays 7`() {
-    val keys = parseKeys("jk")
+    val keys = injector.parser.parseKeys("jk")
     val before = """
             I found it in a legendary ${c}land
             all rocks and lavender
@@ -214,7 +214,7 @@ class MotionDownActionTest : VimTestCase() {
   }
 
   fun `test with inlays 8`() {
-    val keys = parseKeys("lj")
+    val keys = injector.parser.parseKeys("lj")
     val before = """
             I found it in a ${c}legendary land
             all rocks and lavender and tufted grass,

@@ -19,7 +19,7 @@
 package org.jetbrains.plugins.ideavim.ex
 
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.helper.StringHelper
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
@@ -529,8 +529,8 @@ class ExEntryTest : VimTestCase() {
   }
 
   fun `test insert register`() {
-    VimPlugin.getRegister().setKeys('c', StringHelper.parseKeys("hello world"))
-    VimPlugin.getRegister().setKeys('5', StringHelper.parseKeys("greetings programs"))
+    VimPlugin.getRegister().setKeys('c', injector.parser.parseKeys("hello world"))
+    VimPlugin.getRegister().setKeys('5', injector.parser.parseKeys("greetings programs"))
 
     typeExInput(":<C-R>c")
     assertExText("hello world")
@@ -553,9 +553,9 @@ class ExEntryTest : VimTestCase() {
   fun `test insert multi-line register`() {
     // parseKeys parses <CR> in a way that Register#getText doesn't like
     val keys = mutableListOf<KeyStroke>()
-    keys.addAll(StringHelper.parseKeys("hello"))
+    keys.addAll(injector.parser.parseKeys("hello"))
     keys.add(KeyStroke.getKeyStroke('\n'))
-    keys.addAll(StringHelper.parseKeys("world"))
+    keys.addAll(injector.parser.parseKeys("world"))
     VimPlugin.getRegister().setKeys('c', keys)
 
     typeExInput(":<C-R>c")
@@ -594,13 +594,13 @@ class ExEntryTest : VimTestCase() {
   }
 
   fun `test cmap Ctrl`() {
-    typeText(StringHelper.stringToKeys(":cmap <C-B> b") + StringHelper.parseKeys("<CR>"))
+    typeText(injector.parser.stringToKeys(":cmap <C-B> b") + injector.parser.parseKeys("<CR>"))
     typeExInput(":<C-B>")
     assertExText("b")
     deactivateExEntry()
 
-    VimPlugin.getRegister().setKeys('e', StringHelper.parseKeys("hello world"))
-    typeText(StringHelper.stringToKeys(":cmap d <C-R>") + StringHelper.parseKeys("<CR>"))
+    VimPlugin.getRegister().setKeys('e', injector.parser.parseKeys("hello world"))
+    typeText(injector.parser.stringToKeys(":cmap d <C-R>") + injector.parser.parseKeys("<CR>"))
     typeExInput(":de")
     assertExText("hello world")
   }
@@ -612,7 +612,7 @@ class ExEntryTest : VimTestCase() {
     )
 
     val keys = mutableListOf<KeyStroke>()
-    StringHelper.parseKeys(text).forEach {
+    injector.parser.parseKeys(text).forEach {
       // <Left> doesn't work correctly in tests. The DefaultEditorKit.NextVisualPositionAction action is correctly
       // called, but fails to move the caret correctly because the text component has never been painted
       if (it.keyCode == KeyEvent.VK_LEFT && it.modifiers == 0) {
@@ -631,7 +631,7 @@ class ExEntryTest : VimTestCase() {
   }
 
   private fun typeText(text: String) {
-    typeText(StringHelper.parseKeys(text))
+    typeText(injector.parser.parseKeys(text))
   }
 
   private fun deactivateExEntry() {

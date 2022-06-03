@@ -19,8 +19,8 @@
 package org.jetbrains.plugins.ideavim.action.motion.screen
 
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
@@ -33,14 +33,14 @@ class MotionLastScreenLineActionTest : VimTestCase() {
   fun `test move caret to last line of screen`() {
     configureByLines(50, "    I found it in a legendary land")
     setPositionAndScroll(0, 20)
-    typeText(parseKeys("L"))
+    typeText(injector.parser.parseKeys("L"))
     assertPosition(34, 4)
   }
 
   fun `test move caret to last line when last line of file is less than screen`() {
     assertEquals(35, screenHeight)
     configureByLines(20, "    I found it in a legendary land")
-    typeText(parseKeys("L"))
+    typeText(injector.parser.parseKeys("L"))
     assertPosition(19, 4)
   }
 
@@ -49,7 +49,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
     assertEquals(35, screenHeight)
     configureByLines(38, "    I found it in a legendary land")
     setPositionAndScroll(3, 5)
-    typeText(parseKeys("L"))
+    typeText(injector.parser.parseKeys("L"))
     assertPosition(37, 4)
     assertTopLogicalLine(3)
   }
@@ -60,7 +60,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
     configureByLines(38, "    I found it in a legendary land")
     setEditorVirtualSpace()
     setPositionAndScroll(15, 20)
-    typeText(parseKeys("L"))
+    typeText(injector.parser.parseKeys("L"))
     assertPosition(37, 4)
     assertTopLogicalLine(15)
   }
@@ -69,21 +69,21 @@ class MotionLastScreenLineActionTest : VimTestCase() {
   fun `test move caret to count line from bottom of screen`() {
     configureByLines(50, "    I found it in a legendary land")
     setPositionAndScroll(0, 20)
-    typeText(parseKeys("10L"))
+    typeText(injector.parser.parseKeys("10L"))
     assertPosition(25, 4)
   }
 
   fun `test move caret to too large count line from bottom of screen`() {
     configureByLines(50, "    I found it in a legendary land")
     setPositionAndScroll(0, 20)
-    typeText(parseKeys("100L"))
+    typeText(injector.parser.parseKeys("100L"))
     assertPosition(0, 4)
   }
 
   fun `test move caret to too large count line from bottom of screen 2`() {
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(20, 40)
-    typeText(parseKeys("100L"))
+    typeText(injector.parser.parseKeys("100L"))
     assertPosition(20, 4)
   }
 
@@ -92,7 +92,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
     assertEquals(35, screenHeight)
     VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
     configureByLines(35, "    I found it in a legendary land")
-    typeText(parseKeys("L"))
+    typeText(injector.parser.parseKeys("L"))
     assertPosition(34, 4)
   }
 
@@ -101,7 +101,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
     assertEquals(35, screenHeight)
     VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
     configureByLines(50, "    I found it in a legendary land")
-    typeText(parseKeys("L"))
+    typeText(injector.parser.parseKeys("L"))
     assertPosition(24, 4)
   }
 
@@ -110,7 +110,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
     assertEquals(35, screenHeight)
     VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
     configureByLines(35, "    I found it in a legendary land")
-    typeText(parseKeys("5L"))
+    typeText(injector.parser.parseKeys("5L"))
     assertPosition(30, 4)
   }
 
@@ -119,7 +119,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
     assertEquals(35, screenHeight)
     VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
     configureByLines(50, "    I found it in a legendary land")
-    typeText(parseKeys("5L"))
+    typeText(injector.parser.parseKeys("5L"))
     assertPosition(24, 4)
   }
 
@@ -128,7 +128,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
     VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
     configureByLines(50, "    I found it in a legendary land")
     setPositionAndScroll(0, 20)
-    typeText(parseKeys("100L"))
+    typeText(injector.parser.parseKeys("100L"))
     assertPosition(0, 4)
     assertTopLogicalLine(0)
   }
@@ -139,7 +139,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
     VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(20, 40)
-    typeText(parseKeys("100L"))
+    typeText(injector.parser.parseKeys("100L"))
     assertPosition(30, 4)
     assertTopLogicalLine(20)
   }
@@ -147,7 +147,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
   fun `test operator pending acts to last screen line`() {
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(20, 40, 10)
-    typeText(parseKeys("dL"))
+    typeText(injector.parser.parseKeys("dL"))
     assertPosition(40, 4)
     assertLineCount(85)
   }
@@ -158,7 +158,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
     VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(20, 40, 10)
-    typeText(parseKeys("dL"))
+    typeText(injector.parser.parseKeys("dL"))
     assertTopLogicalLine(20)
     assertPosition(40, 4)
     assertLineCount(85)
@@ -168,7 +168,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
   fun `test operator pending acts on count line from bottom of screen`() {
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(20, 40, 10)
-    typeText(parseKeys("d5L"))
+    typeText(injector.parser.parseKeys("d5L"))
     assertPosition(40, 4)
     assertLineCount(89)
   }
@@ -180,7 +180,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
     // Range gets reversed, so we delete :29-40d. Caret stays at 40.
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(20, 40, 10)
-    typeText(parseKeys("d25L"))
+    typeText(injector.parser.parseKeys("d25L"))
     assertPosition(30, 4)
     assertLineCount(89)
   }
@@ -192,7 +192,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
     VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(20, 40, 10)
-    typeText(parseKeys("d5L"))
+    typeText(injector.parser.parseKeys("d5L"))
     assertTopLogicalLine(20)
     assertPosition(40, 4)
     assertLineCount(89)
@@ -205,7 +205,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
     VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(20, 40, 10)
-    typeText(parseKeys("d35L"))
+    typeText(injector.parser.parseKeys("d35L"))
     assertTopLogicalLine(10)
     assertPosition(20, 4)
     assertLineCount(79)
@@ -220,7 +220,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
     VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
     configureByLines(50, "    I found it in a legendary land")
     setPositionAndScroll(20, 40, 10)
-    typeText(parseKeys("d35L"))
+    typeText(injector.parser.parseKeys("d35L"))
     assertTopLogicalLine(0)
     assertPosition(15, 4)
     assertLineCount(24)
@@ -236,7 +236,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
     configureByLines(50, "    I found it in a legendary land")
     setEditorVirtualSpace()
     setPositionAndScroll(20, 40, 10)
-    typeText(parseKeys("d35L"))
+    typeText(injector.parser.parseKeys("d35L"))
     assertTopLogicalLine(5)
     assertPosition(15, 4)
     assertLineCount(24)
@@ -247,7 +247,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
     VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.startoflineName)
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(20, 40, 10)
-    typeText(parseKeys("dL"))
+    typeText(injector.parser.parseKeys("dL"))
     assertPosition(40, 10)
     assertLineCount(85)
   }
@@ -257,7 +257,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
     VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.startoflineName)
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(20, 40, 10)
-    typeText(parseKeys("d5L"))
+    typeText(injector.parser.parseKeys("d5L"))
     assertPosition(40, 10)
     assertLineCount(89)
   }
@@ -267,7 +267,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
     VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.startoflineName)
     configureByLines(50, "    I found it in a legendary land")
     setPositionAndScroll(10, 30, 10)
-    typeText(parseKeys("L"))
+    typeText(injector.parser.parseKeys("L"))
     assertPosition(44, 10)
   }
 
@@ -276,8 +276,8 @@ class MotionLastScreenLineActionTest : VimTestCase() {
     VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.startoflineName)
     configureByLines(50, "    I found it in a legendary land")
     setPositionAndScroll(10, 30, 10)
-    typeText(parseKeys("A", " extra text", "<Esc>"))
-    typeText(parseKeys("L"))
+    typeText(injector.parser.parseKeys("A" + " extra text" + "<Esc>"))
+    typeText(injector.parser.parseKeys("L"))
     assertPosition(44, 33)
   }
 
@@ -287,7 +287,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
     configureByLines(50, "    I found it in a legendary land")
     addBlockInlay(EditorHelper.getOffset(myFixture.editor, 20, 5), true, 10)
     setPositionAndScroll(0, 10, 10)
-    typeText(parseKeys("L"))
+    typeText(injector.parser.parseKeys("L"))
     assertPosition(24, 4)
     assertBottomLogicalLine(24)
   }
@@ -299,7 +299,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
     configureByLines(50, "    I found it in a legendary land")
     addBlockInlay(EditorHelper.getOffset(myFixture.editor, 20, 5), true, 10)
     setPositionAndScroll(0, 10, 10)
-    typeText(parseKeys("L"))
+    typeText(injector.parser.parseKeys("L"))
     assertPosition(14, 4)
     assertBottomLogicalLine(24)
   }
@@ -312,7 +312,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
     configureByLines(100, "    I found it in a legendary land")
     addBlockInlay(EditorHelper.getOffset(myFixture.editor, 25, 5), true, 10)
     setPositionAndScroll(20, 30, 10)
-    typeText(parseKeys("35L"))
+    typeText(injector.parser.parseKeys("35L"))
     assertPosition(20, 4)
     assertBottomLogicalLine(44)
   }

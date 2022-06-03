@@ -23,8 +23,8 @@ import com.intellij.openapi.components.RoamingType;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.diagnostic.Logger;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.SelectionType;
-import com.maddyhome.idea.vim.helper.StringHelper;
 import com.maddyhome.idea.vim.register.Register;
 import com.maddyhome.idea.vim.register.VimRegisterGroupBase;
 import org.jdom.Element;
@@ -65,7 +65,7 @@ public class RegisterGroup extends VimRegisterGroupBase implements PersistentSta
       if (text != null) {
         logger.trace("Save register as 'text'");
         final Element textElement = new Element("text");
-        StringHelper.setSafeXmlText(textElement, text);
+        VimPlugin.getXML().setSafeXmlText(textElement, text);
         registerElement.addContent(textElement);
       }
       else {
@@ -108,7 +108,7 @@ public class RegisterGroup extends VimRegisterGroupBase implements PersistentSta
         final SelectionType type = SelectionType.fromValue(Integer.parseInt(typeText));
         if (textElement != null) {
           logger.trace("Register has 'text' element");
-          final String text = StringHelper.getSafeXmlText(textElement);
+          final String text = VimPlugin.getXML().getSafeXmlText(textElement);
           if (text != null) {
             logger.trace("Register data parsed");
             register = new Register(key, type, text, Collections.emptyList());

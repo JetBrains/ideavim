@@ -24,6 +24,7 @@ import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.api.ExecutionContext;
 import com.maddyhome.idea.vim.api.VimCaret;
 import com.maddyhome.idea.vim.api.VimEditor;
+import com.maddyhome.idea.vim.api.VimInjectorKt;
 import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.common.MappingMode;
 import com.maddyhome.idea.vim.common.TextRange;
@@ -45,7 +46,6 @@ import java.util.EnumSet;
 import static com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping;
 import static com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing;
 import static com.maddyhome.idea.vim.group.visual.VisualGroupKt.vimSetSelection;
-import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
 
 /**
  * Port of vim-entire:
@@ -79,13 +79,13 @@ public class VimTextObjEntireExtension implements VimExtension {
 
   @Override
   public void init() {
-    putExtensionHandlerMapping(MappingMode.XO, parseKeys("<Plug>textobj-entire-a"), getOwner(),
-      new VimTextObjEntireExtension.EntireHandler(false), false);
-    putExtensionHandlerMapping(MappingMode.XO, parseKeys("<Plug>textobj-entire-i"), getOwner(),
+    putExtensionHandlerMapping(MappingMode.XO, VimInjectorKt.getInjector().getParser().parseKeys("<Plug>textobj-entire-a"), getOwner(),
+                               new VimTextObjEntireExtension.EntireHandler(false), false);
+    putExtensionHandlerMapping(MappingMode.XO, VimInjectorKt.getInjector().getParser().parseKeys("<Plug>textobj-entire-i"), getOwner(),
       new VimTextObjEntireExtension.EntireHandler(true), false);
 
-    putKeyMappingIfMissing(MappingMode.XO, parseKeys("ae"), getOwner(), parseKeys("<Plug>textobj-entire-a"), true);
-    putKeyMappingIfMissing(MappingMode.XO, parseKeys("ie"), getOwner(), parseKeys("<Plug>textobj-entire-i"), true);
+    putKeyMappingIfMissing(MappingMode.XO, VimInjectorKt.getInjector().getParser().parseKeys("ae"), getOwner(), VimInjectorKt.getInjector().getParser().parseKeys("<Plug>textobj-entire-a"), true);
+    putKeyMappingIfMissing(MappingMode.XO, VimInjectorKt.getInjector().getParser().parseKeys("ie"), getOwner(), VimInjectorKt.getInjector().getParser().parseKeys("<Plug>textobj-entire-i"), true);
   }
 
   static class EntireHandler implements VimExtensionHandler {

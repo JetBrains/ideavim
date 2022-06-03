@@ -18,7 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.action.change.insert
 
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -30,7 +30,7 @@ class InsertDeleteActionTest : VimTestCase() {
     val after = "I fo${c}nd it in a legendary land"
     configureByText(before)
 
-    typeText(parseKeys("i", "<Del>"))
+    typeText(injector.parser.parseKeys("i" + "<Del>"))
 
     assertState(after)
   }

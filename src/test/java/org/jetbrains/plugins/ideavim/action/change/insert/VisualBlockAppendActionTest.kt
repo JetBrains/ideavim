@@ -18,8 +18,8 @@
 
 package org.jetbrains.plugins.ideavim.action.change.insert
 
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -32,7 +32,7 @@ class VisualBlockAppendActionTest : VimTestCase() {
             int b;
             int c;
     """.trimIndent()
-    typeTextInFile(parseKeys("<C-V>", "2j", "e", "A", " const", "<Esc>"), before)
+    typeTextInFile(injector.parser.parseKeys("<C-V>" + "2j" + "e" + "A" + " const" + "<Esc>"), before)
     val after = """
             int const a;
             int const b;
@@ -48,7 +48,7 @@ class VisualBlockAppendActionTest : VimTestCase() {
             private String b;
             int c;
     """.trimIndent()
-    typeTextInFile(parseKeys("<C-V>", "2j", "$", "A", " // My variables", "<Esc>"), before)
+    typeTextInFile(injector.parser.parseKeys("<C-V>" + "2j" + "$" + "A" + " // My variables" + "<Esc>"), before)
     val after = """
             int a; // My variables
             private String b; // My variables

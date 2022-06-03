@@ -21,7 +21,7 @@ package org.jetbrains.plugins.ideavim.action.scroll
 import com.intellij.openapi.editor.Inlay
 import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.helper.StringHelper
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
@@ -37,33 +37,33 @@ ze                      Scroll the text horizontally to position the cursor
 class ScrollLastScreenColumnActionTest : VimTestCase() {
   fun `test scroll caret column to last screen column`() {
     configureByColumns(200)
-    typeText(StringHelper.parseKeys("100|", "ze"))
+    typeText(injector.parser.parseKeys("100|" + "ze"))
     assertVisibleLineBounds(0, 20, 99)
   }
 
   fun `test scroll caret column to last screen column with sidescrolloff`() {
     VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.sidescrolloffName, VimInt(10))
     configureByColumns(200)
-    typeText(StringHelper.parseKeys("100|", "ze"))
+    typeText(injector.parser.parseKeys("100|" + "ze"))
     assertVisibleLineBounds(0, 30, 109)
   }
 
   fun `test scroll at or near start of line does nothing`() {
     configureByColumns(200)
-    typeText(StringHelper.parseKeys("10|", "ze"))
+    typeText(injector.parser.parseKeys("10|" + "ze"))
     assertVisibleLineBounds(0, 0, 79)
   }
 
   fun `test scroll end of line to last screen column`() {
     configureByColumns(200)
-    typeText(StringHelper.parseKeys("$", "ze"))
+    typeText(injector.parser.parseKeys("$" + "ze"))
     assertVisibleLineBounds(0, 120, 199)
   }
 
   fun `test scroll end of line to last screen column with sidescrolloff`() {
     VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.sidescrolloffName, VimInt(10))
     configureByColumns(200)
-    typeText(StringHelper.parseKeys("$", "ze"))
+    typeText(injector.parser.parseKeys("$" + "ze"))
     // See myFixture.editor.settings.additionalColumnsCount
     assertVisibleLineBounds(0, 120, 199)
   }
@@ -73,7 +73,7 @@ class ScrollLastScreenColumnActionTest : VimTestCase() {
     VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.sidescrolloffName, VimInt(10))
     configureByColumns(200)
     val inlay = addInlay(101, true, 5)
-    typeText(StringHelper.parseKeys("100|", "ze"))
+    typeText(injector.parser.parseKeys("100|" + "ze"))
     val availableColumns = getAvailableColumns(inlay)
     // Rightmost text column will still be the same, even if it's offset by an inlay
     // TODO: Should the offset include the visual column taken up by the inlay?
@@ -88,7 +88,7 @@ class ScrollLastScreenColumnActionTest : VimTestCase() {
     // the last visible column
     configureByColumns(200)
     val inlay = addInlay(99, true, 5)
-    typeText(StringHelper.parseKeys("100|", "ze"))
+    typeText(injector.parser.parseKeys("100|" + "ze"))
     val availableColumns = getAvailableColumns(inlay)
     assertVisibleLineBounds(0, 99 - availableColumns + 1, 99)
   }
@@ -97,7 +97,7 @@ class ScrollLastScreenColumnActionTest : VimTestCase() {
     // The inlay is associated with the caret, but appears on the left, so does not affect the last visible column
     configureByColumns(200)
     val inlay = addInlay(99, false, 5)
-    typeText(StringHelper.parseKeys("100|", "ze"))
+    typeText(injector.parser.parseKeys("100|" + "ze"))
     val availableColumns = getAvailableColumns(inlay)
     assertVisibleLineBounds(0, 99 - availableColumns + 1, 99)
   }
@@ -106,7 +106,7 @@ class ScrollLastScreenColumnActionTest : VimTestCase() {
     // The inlay is inserted after the caret and relates to the caret column. It should still be visible
     configureByColumns(200)
     val inlay = addInlay(100, true, 5)
-    typeText(StringHelper.parseKeys("100|", "ze"))
+    typeText(injector.parser.parseKeys("100|" + "ze"))
     val visibleArea = myFixture.editor.scrollingModel.visibleArea
     val textWidth = visibleArea.width - inlay.widthInPixels
     val availableColumns = textWidth / EditorUtil.getPlainSpaceWidth(myFixture.editor)
@@ -124,7 +124,7 @@ class ScrollLastScreenColumnActionTest : VimTestCase() {
     // column
     configureByColumns(200)
     addInlay(100, false, 5)
-    typeText(StringHelper.parseKeys("100|", "ze"))
+    typeText(injector.parser.parseKeys("100|" + "ze"))
     assertVisibleLineBounds(0, 20, 99)
   }
 

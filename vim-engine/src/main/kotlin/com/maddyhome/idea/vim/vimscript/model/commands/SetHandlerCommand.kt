@@ -21,7 +21,6 @@ package com.maddyhome.idea.vim.vimscript.model.commands
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.common.CommonStringHelper.parseKeys
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
@@ -42,7 +41,7 @@ data class SetHandlerCommand(val ranges: Ranges, val argument: String) : Command
 
     val key = try {
       val shortcut = args[0]
-      if (shortcut.startsWith('<')) parseKeys(shortcut).first() else null
+      if (shortcut.startsWith('<')) injector.parser.parseKeys(shortcut).first() else null
     } catch (e: IllegalArgumentException) {
       null
     }

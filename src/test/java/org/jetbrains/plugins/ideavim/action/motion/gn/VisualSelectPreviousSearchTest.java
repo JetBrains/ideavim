@@ -21,18 +21,17 @@ package org.jetbrains.plugins.ideavim.action.motion.gn;
 import com.intellij.idea.TestFor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.motion.search.SearchWholeWordForwardAction;
+import com.maddyhome.idea.vim.api.VimInjectorKt;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.Direction;
 import org.jetbrains.plugins.ideavim.SkipNeovimReason;
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
-import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
-
 public class VisualSelectPreviousSearchTest extends VimTestCase {
   @TestFor(classes = {SearchWholeWordForwardAction.class})
   public void testSearch() {
-    typeTextInFile(parseKeys("*w", "gN"), "h<caret>ello world\nhello world hello world");
+    typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("*w" + "gN"), "h<caret>ello world\nhello world hello world");
 
     assertOffset(12);
     assertSelection("hello");
@@ -41,7 +40,7 @@ public class VisualSelectPreviousSearchTest extends VimTestCase {
 
   @TestFor(classes = {SearchWholeWordForwardAction.class})
   public void testSearchMulticaret() {
-    typeTextInFile(parseKeys("*", "b", "gN"), "h<caret>ello world\nh<caret>ello world hello world");
+    typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("*" + "b" + "gN"), "h<caret>ello world\nh<caret>ello world hello world");
 
     assertEquals(1, myFixture.getEditor().getCaretModel().getCaretCount());
     assertMode(CommandState.Mode.VISUAL);
@@ -49,7 +48,7 @@ public class VisualSelectPreviousSearchTest extends VimTestCase {
 
   @TestFor(classes = {SearchWholeWordForwardAction.class})
   public void testSearchWhenOnMatch() {
-    typeTextInFile(parseKeys("*", "gN"), "h<caret>ello world\nhello world hello world");
+    typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("*" + "gN"), "h<caret>ello world\nhello world hello world");
 
     assertOffset(12);
     assertSelection("hello");
@@ -60,7 +59,7 @@ public class VisualSelectPreviousSearchTest extends VimTestCase {
   public void testWithoutSpaces() {
     configureByText("tes<caret>ttest");
     VimPlugin.getSearch().setLastSearchState(myFixture.getEditor(), "test", "", Direction.FORWARDS);
-    typeText(parseKeys("gN"));
+    typeText(VimInjectorKt.getInjector().getParser().parseKeys("gN"));
 
     assertOffset(0);
     assertSelection("test");
@@ -69,7 +68,7 @@ public class VisualSelectPreviousSearchTest extends VimTestCase {
 
   @TestFor(classes = {SearchWholeWordForwardAction.class})
   public void testSearchTwice() {
-    typeTextInFile(parseKeys("*", "2gN"), "hello world\nh<caret>ello world hello");
+    typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("*" + "2gN"), "hello world\nh<caret>ello world hello");
 
     assertOffset(12);
     assertSelection("hello");
@@ -77,7 +76,7 @@ public class VisualSelectPreviousSearchTest extends VimTestCase {
 
   @TestFor(classes = {SearchWholeWordForwardAction.class})
   public void testTwoSearchesStayInVisualMode() {
-    typeTextInFile(parseKeys("*", "gN", "gN"), "hello world\nh<caret>ello world hello");
+    typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("*" + "gN" + "gN"), "hello world\nh<caret>ello world hello");
 
     assertOffset(12);
     assertSelection("hello world hello");
@@ -86,7 +85,7 @@ public class VisualSelectPreviousSearchTest extends VimTestCase {
 
   @TestFor(classes = {SearchWholeWordForwardAction.class})
   public void testCanExitVisualMode() {
-    typeTextInFile(parseKeys("*", "gN", "gN", "<Esc>"), "hello world\nh<caret>ello world hello");
+    typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("*" + "gN" + "gN" + "<Esc>"), "hello world\nh<caret>ello world hello");
 
     assertOffset(12);
     assertSelection(null);
@@ -95,7 +94,7 @@ public class VisualSelectPreviousSearchTest extends VimTestCase {
 
   @TestFor(classes = {SearchWholeWordForwardAction.class})
   public void testIfInMiddlePositionOfSearchAndInVisualModeThenSelectCurrent() {
-    typeTextInFile(parseKeys("*llv", "gN"), "hello hello");
+    typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("*llv" + "gN"), "hello hello");
 
     assertOffset(6);
     assertSelection("hel");
@@ -103,7 +102,7 @@ public class VisualSelectPreviousSearchTest extends VimTestCase {
   }
 
   public void testWithTabs() {
-    typeTextInFile(parseKeys("*", "gN", "gN"), "hello 1\n\thello 2\n\the<caret>llo 3\n\thello 4");
+    typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("*" + "gN" + "gN"), "hello 1\n\thello 2\n\the<caret>llo 3\n\thello 4");
 
     assertOffset(18);
     assertSelection("hello 3\n\thello");

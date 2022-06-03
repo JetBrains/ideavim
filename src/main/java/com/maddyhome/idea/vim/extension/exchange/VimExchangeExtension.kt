@@ -30,6 +30,7 @@ import com.intellij.openapi.util.Key
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.MappingMode
@@ -43,8 +44,6 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.setOperatorFunction
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setRegister
 import com.maddyhome.idea.vim.extension.VimExtensionHandler
 import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
-import com.maddyhome.idea.vim.helper.StringHelper.stringToKeys
 import com.maddyhome.idea.vim.helper.fileSize
 import com.maddyhome.idea.vim.helper.moveToInlayAwareLogicalPosition
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
@@ -72,15 +71,15 @@ class VimExchangeExtension : VimExtension {
   override fun getName() = "exchange"
 
   override fun init() {
-    putExtensionHandlerMapping(MappingMode.N, parseKeys(EXCHANGE_CMD), owner, ExchangeHandler(false), false)
-    putExtensionHandlerMapping(MappingMode.X, parseKeys(EXCHANGE_CMD), owner, VExchangeHandler(), false)
-    putExtensionHandlerMapping(MappingMode.N, parseKeys(EXCHANGE_CLEAR_CMD), owner, ExchangeClearHandler(), false)
-    putExtensionHandlerMapping(MappingMode.N, parseKeys(EXCHANGE_LINE_CMD), owner, ExchangeHandler(true), false)
+    putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys(EXCHANGE_CMD), owner, ExchangeHandler(false), false)
+    putExtensionHandlerMapping(MappingMode.X, injector.parser.parseKeys(EXCHANGE_CMD), owner, VExchangeHandler(), false)
+    putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys(EXCHANGE_CLEAR_CMD), owner, ExchangeClearHandler(), false)
+    putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys(EXCHANGE_LINE_CMD), owner, ExchangeHandler(true), false)
 
-    putKeyMappingIfMissing(MappingMode.N, parseKeys("cx"), owner, parseKeys(EXCHANGE_CMD), true)
-    putKeyMappingIfMissing(MappingMode.X, parseKeys("X"), owner, parseKeys(EXCHANGE_CMD), true)
-    putKeyMappingIfMissing(MappingMode.N, parseKeys("cxc"), owner, parseKeys(EXCHANGE_CLEAR_CMD), true)
-    putKeyMappingIfMissing(MappingMode.N, parseKeys("cxx"), owner, parseKeys(EXCHANGE_LINE_CMD), true)
+    putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("cx"), owner, injector.parser.parseKeys(EXCHANGE_CMD), true)
+    putKeyMappingIfMissing(MappingMode.X, injector.parser.parseKeys("X"), owner, injector.parser.parseKeys(EXCHANGE_CMD), true)
+    putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("cxc"), owner, injector.parser.parseKeys(EXCHANGE_CLEAR_CMD), true)
+    putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("cxx"), owner, injector.parser.parseKeys(EXCHANGE_LINE_CMD), true)
   }
 
   companion object {
@@ -118,7 +117,7 @@ class VimExchangeExtension : VimExtension {
 
     override fun execute(editor: VimEditor, context: ExecutionContext) {
       setOperatorFunction(Operator(false))
-      executeNormalWithoutMapping(parseKeys(if (isLine) "g@_" else "g@"), editor.ij)
+      executeNormalWithoutMapping(injector.parser.parseKeys(if (isLine) "g@_" else "g@"), editor.ij)
     }
   }
 
@@ -133,7 +132,7 @@ class VimExchangeExtension : VimExtension {
       runWriteAction {
         val subMode = editor.subMode
         // Leave visual mode to create selection marks
-        executeNormalWithoutMapping(parseKeys("<Esc>"), editor.ij)
+        executeNormalWithoutMapping(injector.parser.parseKeys("<Esc>"), editor.ij)
         Operator(true).apply(editor.ij, context.ij, SelectionType.fromSubMode(subMode))
       }
     }
@@ -209,8 +208,8 @@ class VimExchangeExtension : VimExtension {
           TextRange(editor.getMarkOffset(targetExchange.start), editor.getMarkOffset(targetExchange.end) + 1)
         )
         // do this instead of direct text manipulation to set change marks
-        setRegister('z', stringToKeys(sourceExchange.text), SelectionType.fromSubMode(sourceExchange.type))
-        executeNormalWithoutMapping(stringToKeys("`[${targetExchange.type.getString()}`]\"zp"), editor)
+        setRegister('z', injector.parser.stringToKeys(sourceExchange.text), SelectionType.fromSubMode(sourceExchange.type))
+        executeNormalWithoutMapping(injector.parser.stringToKeys("`[${targetExchange.type.getString()}`]\"zp"), editor)
       }
 
       fun fixCursor(ex1: Exchange, ex2: Exchange, reverse: Boolean) {
@@ -334,15 +333,15 @@ class VimExchangeExtension : VimExtension {
 
       val (selectionStart, selectionEnd) = getMarks(isVisual)
       if (isVisual) {
-        executeNormalWithoutMapping(parseKeys("gvy"), editor)
+        executeNormalWithoutMapping(injector.parser.parseKeys("gvy"), editor)
         // TODO: handle
         // if &selection ==# 'exclusive' && start != end
         // 			let end.column -= len(matchstr(@@, '\_.$'))
       } else {
         when (selectionType) {
-          SelectionType.LINE_WISE -> executeNormalWithoutMapping(stringToKeys("`[V`]y"), editor)
-          SelectionType.BLOCK_WISE -> executeNormalWithoutMapping(stringToKeys("""`[<C-V>`]y"""), editor)
-          SelectionType.CHARACTER_WISE -> executeNormalWithoutMapping(stringToKeys("`[v`]y"), editor)
+          SelectionType.LINE_WISE -> executeNormalWithoutMapping(injector.parser.stringToKeys("`[V`]y"), editor)
+          SelectionType.BLOCK_WISE -> executeNormalWithoutMapping(injector.parser.stringToKeys("""`[<C-V>`]y"""), editor)
+          SelectionType.CHARACTER_WISE -> executeNormalWithoutMapping(injector.parser.stringToKeys("`[v`]y"), editor)
         }
       }
 

@@ -18,7 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 /**
@@ -28,7 +28,7 @@ class PutCommandTest : VimTestCase() {
   // VIM-550 |:put|
   fun `test put creates new line`() {
     configureByText("Test\n" + "Hello <caret>World!\n")
-    typeText(parseKeys("\"ayw"))
+    typeText(injector.parser.parseKeys("\"ayw"))
     typeText(commandToKeys("put a"))
     assertState(
       "Test\n" +
@@ -40,7 +40,7 @@ class PutCommandTest : VimTestCase() {
   // VIM-551 |:put|
   fun `test put default`() {
     configureByText("<caret>Hello World!\n")
-    typeText(parseKeys("yw"))
+    typeText(injector.parser.parseKeys("yw"))
     typeText(commandToKeys("put"))
     assertState("Hello World!\n" + "<caret>Hello \n")
   }

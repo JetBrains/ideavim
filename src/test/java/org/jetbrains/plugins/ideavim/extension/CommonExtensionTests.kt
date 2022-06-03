@@ -36,7 +36,6 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissin
 import com.maddyhome.idea.vim.extension.VimExtensionHandler
 import com.maddyhome.idea.vim.extension.VimExtensionRegistrar
 import com.maddyhome.idea.vim.group.MotionGroup
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
@@ -129,63 +128,63 @@ class OpMappingTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test disable extension via set`() {
     configureByText("${c}I found it in a legendary land")
-    typeText(parseKeys("Q"))
+    typeText(injector.parser.parseKeys("Q"))
     assertState("I$c found it in a legendary land")
 
     enterCommand("set noTestExtension")
-    typeText(parseKeys("Q"))
+    typeText(injector.parser.parseKeys("Q"))
     assertState("I$c found it in a legendary land")
 
     enterCommand("set TestExtension")
-    typeText(parseKeys("Q"))
+    typeText(injector.parser.parseKeys("Q"))
     assertState("I ${c}found it in a legendary land")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test disable extension as extension point`() {
     configureByText("${c}I found it in a legendary land")
-    typeText(parseKeys("Q"))
+    typeText(injector.parser.parseKeys("Q"))
     assertState("I$c found it in a legendary land")
 
     @Suppress("DEPRECATION")
     VimExtension.EP_NAME.point.unregisterExtension(extension)
     assertEmpty(VimPlugin.getKey().getKeyMappingByOwner(extension.instance.owner))
-    typeText(parseKeys("Q"))
+    typeText(injector.parser.parseKeys("Q"))
     assertState("I$c found it in a legendary land")
 
     VimExtension.EP_NAME.point.registerExtension(extension, VimPlugin.getInstance())
     assertEmpty(VimPlugin.getKey().getKeyMappingByOwner(extension.instance.owner))
     enableExtensions("TestExtension")
-    typeText(parseKeys("Q"))
+    typeText(injector.parser.parseKeys("Q"))
     assertState("I ${c}found it in a legendary land")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test disable disposed extension`() {
     configureByText("${c}I found it in a legendary land")
-    typeText(parseKeys("Q"))
+    typeText(injector.parser.parseKeys("Q"))
     assertState("I$c found it in a legendary land")
 
     enterCommand("set noTestExtension")
     @Suppress("DEPRECATION")
     VimExtension.EP_NAME.point.unregisterExtension(extension)
-    typeText(parseKeys("Q"))
+    typeText(injector.parser.parseKeys("Q"))
     assertState("I$c found it in a legendary land")
 
     VimExtension.EP_NAME.point.registerExtension(extension, VimPlugin.getInstance())
     enableExtensions("TestExtension")
-    typeText(parseKeys("Q"))
+    typeText(injector.parser.parseKeys("Q"))
     assertState("I ${c}found it in a legendary land")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test delayed action`() {
     configureByText("${c}I found it in a legendary land")
-    typeText(parseKeys("R"))
+    typeText(injector.parser.parseKeys("R"))
     PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
     assertState("I fou${c}nd it in a legendary land")
 
-    typeText(parseKeys("dR"))
+    typeText(injector.parser.parseKeys("dR"))
     PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
     assertState("I fou$c in a legendary land")
   }
@@ -196,11 +195,11 @@ class OpMappingTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test delayed incorrect action`() {
     configureByText("${c}I found it in a legendary land")
-    typeText(parseKeys("E"))
+    typeText(injector.parser.parseKeys("E"))
     PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
     assertState("I fou${c}nd it in a legendary land")
 
-    typeText(parseKeys("dE"))
+    typeText(injector.parser.parseKeys("dE"))
     PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
     assertState("I found it$c in a legendary land")
   }
@@ -270,13 +269,13 @@ class PlugMissingKeysTest : VimTestCase() {
       "Plug 'MyTest'"
     )
 
-    val keyMappings = VimPlugin.getKey().getMapTo(MappingMode.NORMAL, parseKeys("<Plug>TestMissing"))
+    val keyMappings = VimPlugin.getKey().getMapTo(MappingMode.NORMAL, injector.parser.parseKeys("<Plug>TestMissing"))
     TestCase.assertEquals(1, keyMappings.size)
-    TestCase.assertEquals(parseKeys("myKey"), keyMappings.first().first)
+    TestCase.assertEquals(injector.parser.parseKeys("myKey"), keyMappings.first().first)
 
-    val iKeyMappings = VimPlugin.getKey().getMapTo(MappingMode.INSERT, parseKeys("<Plug>TestMissing"))
+    val iKeyMappings = VimPlugin.getKey().getMapTo(MappingMode.INSERT, injector.parser.parseKeys("<Plug>TestMissing"))
     TestCase.assertEquals(1, iKeyMappings.size)
-    TestCase.assertEquals(parseKeys("L"), iKeyMappings.first().first)
+    TestCase.assertEquals(injector.parser.parseKeys("L"), iKeyMappings.first().first)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
@@ -286,13 +285,13 @@ class PlugMissingKeysTest : VimTestCase() {
       "map myKey <Plug>TestMissing"
     )
 
-    val keyMappings = VimPlugin.getKey().getMapTo(MappingMode.NORMAL, parseKeys("<Plug>TestMissing"))
+    val keyMappings = VimPlugin.getKey().getMapTo(MappingMode.NORMAL, injector.parser.parseKeys("<Plug>TestMissing"))
     TestCase.assertEquals(1, keyMappings.size)
-    TestCase.assertEquals(parseKeys("myKey"), keyMappings.first().first)
+    TestCase.assertEquals(injector.parser.parseKeys("myKey"), keyMappings.first().first)
 
-    val iKeyMappings = VimPlugin.getKey().getMapTo(MappingMode.INSERT, parseKeys("<Plug>TestMissing"))
+    val iKeyMappings = VimPlugin.getKey().getMapTo(MappingMode.INSERT, injector.parser.parseKeys("<Plug>TestMissing"))
     TestCase.assertEquals(1, iKeyMappings.size)
-    TestCase.assertEquals(parseKeys("L"), iKeyMappings.first().first)
+    TestCase.assertEquals(injector.parser.parseKeys("L"), iKeyMappings.first().first)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
@@ -337,35 +336,35 @@ private class TestExtension : VimExtension {
     initialized = true
     putExtensionHandlerMapping(
       MappingMode.O,
-      parseKeys("<Plug>TestExtensionEmulateInclusive"),
+      injector.parser.parseKeys("<Plug>TestExtensionEmulateInclusive"),
       owner,
       MoveEmulateInclusive(),
       false
     )
     putExtensionHandlerMapping(
       MappingMode.O,
-      parseKeys("<Plug>TestExtensionBackwardsCharacter"),
+      injector.parser.parseKeys("<Plug>TestExtensionBackwardsCharacter"),
       owner,
       MoveBackwards(),
       false
     )
-    putExtensionHandlerMapping(MappingMode.O, parseKeys("<Plug>TestExtensionCharacter"), owner, Move(), false)
-    putExtensionHandlerMapping(MappingMode.O, parseKeys("<Plug>TestExtensionLinewise"), owner, MoveLinewise(), false)
-    putExtensionHandlerMapping(MappingMode.N, parseKeys("<Plug>TestMotion"), owner, MoveLinewiseInNormal(), false)
-    putExtensionHandlerMapping(MappingMode.N, parseKeys("<Plug>TestMissing"), owner, MoveLinewiseInNormal(), false)
-    putExtensionHandlerMapping(MappingMode.NO, parseKeys("<Plug>TestDelayed"), owner, DelayedAction(), false)
-    putExtensionHandlerMapping(MappingMode.NO, parseKeys("<Plug>TestIncorrectDelayed"), owner, DelayedIncorrectAction(), false)
+    putExtensionHandlerMapping(MappingMode.O, injector.parser.parseKeys("<Plug>TestExtensionCharacter"), owner, Move(), false)
+    putExtensionHandlerMapping(MappingMode.O, injector.parser.parseKeys("<Plug>TestExtensionLinewise"), owner, MoveLinewise(), false)
+    putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys("<Plug>TestMotion"), owner, MoveLinewiseInNormal(), false)
+    putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys("<Plug>TestMissing"), owner, MoveLinewiseInNormal(), false)
+    putExtensionHandlerMapping(MappingMode.NO, injector.parser.parseKeys("<Plug>TestDelayed"), owner, DelayedAction(), false)
+    putExtensionHandlerMapping(MappingMode.NO, injector.parser.parseKeys("<Plug>TestIncorrectDelayed"), owner, DelayedIncorrectAction(), false)
 
-    putKeyMapping(MappingMode.O, parseKeys("U"), owner, parseKeys("<Plug>TestExtensionEmulateInclusive"), true)
-    putKeyMapping(MappingMode.O, parseKeys("P"), owner, parseKeys("<Plug>TestExtensionBackwardsCharacter"), true)
-    putKeyMapping(MappingMode.O, parseKeys("I"), owner, parseKeys("<Plug>TestExtensionCharacter"), true)
-    putKeyMapping(MappingMode.O, parseKeys("O"), owner, parseKeys("<Plug>TestExtensionLinewise"), true)
-    putKeyMapping(MappingMode.N, parseKeys("Q"), owner, parseKeys("<Plug>TestMotion"), true)
-    putKeyMapping(MappingMode.NO, parseKeys("R"), owner, parseKeys("<Plug>TestDelayed"), true)
-    putKeyMapping(MappingMode.NO, parseKeys("E"), owner, parseKeys("<Plug>TestIncorrectDelayed"), true)
+    putKeyMapping(MappingMode.O, injector.parser.parseKeys("U"), owner, injector.parser.parseKeys("<Plug>TestExtensionEmulateInclusive"), true)
+    putKeyMapping(MappingMode.O, injector.parser.parseKeys("P"), owner, injector.parser.parseKeys("<Plug>TestExtensionBackwardsCharacter"), true)
+    putKeyMapping(MappingMode.O, injector.parser.parseKeys("I"), owner, injector.parser.parseKeys("<Plug>TestExtensionCharacter"), true)
+    putKeyMapping(MappingMode.O, injector.parser.parseKeys("O"), owner, injector.parser.parseKeys("<Plug>TestExtensionLinewise"), true)
+    putKeyMapping(MappingMode.N, injector.parser.parseKeys("Q"), owner, injector.parser.parseKeys("<Plug>TestMotion"), true)
+    putKeyMapping(MappingMode.NO, injector.parser.parseKeys("R"), owner, injector.parser.parseKeys("<Plug>TestDelayed"), true)
+    putKeyMapping(MappingMode.NO, injector.parser.parseKeys("E"), owner, injector.parser.parseKeys("<Plug>TestIncorrectDelayed"), true)
 
-    putKeyMappingIfMissing(MappingMode.N, parseKeys("Z"), owner, parseKeys("<Plug>TestMissing"), true)
-    putKeyMappingIfMissing(MappingMode.I, parseKeys("L"), owner, parseKeys("<Plug>TestMissing"), true)
+    putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("Z"), owner, injector.parser.parseKeys("<Plug>TestMissing"), true)
+    putKeyMappingIfMissing(MappingMode.I, injector.parser.parseKeys("L"), owner, injector.parser.parseKeys("<Plug>TestMissing"), true)
   }
 
   override fun dispose() {

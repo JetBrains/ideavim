@@ -22,7 +22,7 @@ package org.jetbrains.plugins.ideavim.action.change.delete
 
 import com.intellij.notification.EventLog
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.helper.StringHelper
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.options.OptionConstants
 import org.jetbrains.plugins.ideavim.OptionValueType
 import org.jetbrains.plugins.ideavim.VimOptionTestCase
@@ -40,7 +40,7 @@ class JoinNotificationTest : VimOptionTestCase(OptionConstants.ideajoinName) {
     val before = "I found${c} it\n in a legendary land"
     configureByText(before)
     appReadySetup(false)
-    typeText(StringHelper.parseKeys("J"))
+    typeText(injector.parser.parseKeys("J"))
 
     val notification = ActionCenter.getNotifications(myFixture.project, true).last()
     try {
@@ -60,7 +60,7 @@ class JoinNotificationTest : VimOptionTestCase(OptionConstants.ideajoinName) {
     val before = "I found${c} it\n in a legendary land"
     configureByText(before)
     appReadySetup(false)
-    typeText(StringHelper.parseKeys("J"))
+    typeText(injector.parser.parseKeys("J"))
 
     val notifications = ActionCenter.getNotifications(myFixture.project, true)
     assertTrue(notifications.isEmpty() || notifications.last().isExpired || OptionConstants.ideajoinName !in notifications.last().content)
@@ -72,7 +72,7 @@ class JoinNotificationTest : VimOptionTestCase(OptionConstants.ideajoinName) {
     val before = "I found${c} it\n in a legendary land"
     configureByText(before)
     appReadySetup(true)
-    typeText(StringHelper.parseKeys("J"))
+    typeText(injector.parser.parseKeys("J"))
 
     val notifications = EventLog.getLogModel(myFixture.project).notifications
     assertTrue(notifications.isEmpty() || notifications.last().isExpired || OptionConstants.ideajoinName !in notifications.last().content)

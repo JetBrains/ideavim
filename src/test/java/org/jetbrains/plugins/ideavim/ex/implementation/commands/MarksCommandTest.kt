@@ -19,7 +19,7 @@
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
@@ -34,7 +34,7 @@ class MarksCommandTest : VimTestCase() {
                       |hard by the torrent of a mountain pass.
                     """.trimMargin()
     )
-    typeText(parseKeys("VyjVpgv"))
+    typeText(injector.parser.parseKeys("VyjVpgv"))
     assertState(
       """I found it in a legendary land
                       |all rocks and lavender and tufted grass,
@@ -52,7 +52,7 @@ class MarksCommandTest : VimTestCase() {
       # (response.data.decode("utf-8"))
       """.trimIndent()
     )
-    typeText(parseKeys("vi)yjvi)pgv"))
+    typeText(injector.parser.parseKeys("vi)yjvi)pgv"))
     assertState(
       """
       # (response.get_data(as_text=True))
@@ -65,7 +65,7 @@ class MarksCommandTest : VimTestCase() {
   fun `test mapping with gv`() {
     configureByText("Oh, hi ${c}Andy Tom John")
     typeText(commandToKeys("xnoremap p pgvy"))
-    typeText(parseKeys("yewvepwvep"))
+    typeText(injector.parser.parseKeys("yewvepwvep"))
     assertState("Oh, hi Andy Andy Andy")
   }
 
@@ -83,7 +83,7 @@ class MarksCommandTest : VimTestCase() {
                       |hard by the torrent of a mountain pass.
                     """.trimMargin()
     )
-    typeText(parseKeys("ma"))
+    typeText(injector.parser.parseKeys("ma"))
 
     enterCommand("marks")
     assertExOutput(
@@ -101,7 +101,7 @@ class MarksCommandTest : VimTestCase() {
                       |hard by the torrent of a mountain pass.
                     """.trimMargin()
     )
-    typeText(parseKeys("ma"))
+    typeText(injector.parser.parseKeys("ma"))
 
     enterCommand("marks")
     assertExOutput(
@@ -119,10 +119,10 @@ class MarksCommandTest : VimTestCase() {
                          |hard by the torrent of a mountain pass.
                        """.trimMargin()
     )
-    typeText(parseKeys("ma", "jl"))
-    typeText(parseKeys("mb", "jl"))
-    typeText(parseKeys("mc", "jl"))
-    typeText(parseKeys("md"))
+    typeText(injector.parser.parseKeys("ma" + "jl"))
+    typeText(injector.parser.parseKeys("mb" + "jl"))
+    typeText(injector.parser.parseKeys("mc" + "jl"))
+    typeText(injector.parser.parseKeys("md"))
 
     enterCommand("marks")
     assertExOutput(
@@ -143,8 +143,8 @@ class MarksCommandTest : VimTestCase() {
                          |hard by the torrent of a mountain pass.
                        """.trimMargin()
     )
-    typeText(parseKeys("mA", "jll"))
-    typeText(parseKeys("mB"))
+    typeText(injector.parser.parseKeys("mA" + "jll"))
+    typeText(injector.parser.parseKeys("mB"))
 
     enterCommand("marks")
     assertExOutput(
@@ -163,10 +163,10 @@ class MarksCommandTest : VimTestCase() {
                          |hard by the torrent of a mountain pass.
                        """.trimMargin()
     )
-    typeText(parseKeys("ma", "jl"))
-    typeText(parseKeys("mb", "jl"))
-    typeText(parseKeys("mc", "jl"))
-    typeText(parseKeys("mD"))
+    typeText(injector.parser.parseKeys("ma" + "jl"))
+    typeText(injector.parser.parseKeys("mb" + "jl"))
+    typeText(injector.parser.parseKeys("mc" + "jl"))
+    typeText(injector.parser.parseKeys("mD"))
 
     enterCommand("marks bdD")
     assertExOutput(
@@ -185,7 +185,7 @@ class MarksCommandTest : VimTestCase() {
                          |hard by the torrent of a mountain pass.
                        """.trimMargin()
     )
-    typeText(parseKeys("ma", "jl"))
+    typeText(injector.parser.parseKeys("ma" + "jl"))
     enterCommand("marks b")
     assertExOutput("mark line  col file/text\n")
   }
@@ -209,7 +209,7 @@ class MarksCommandTest : VimTestCase() {
 
   fun `test correctly encodes non printable characters`() {
     configureByText("$c\u0009Hello world\n\u0006\n\u007f")
-    typeText(parseKeys("ma", "j", "mb", "j", "mc"))
+    typeText(injector.parser.parseKeys("ma" + "j" + "mb" + "j" + "mc"))
     enterCommand("marks abc")
     assertExOutput(
       """mark line  col file/text
@@ -224,7 +224,7 @@ class MarksCommandTest : VimTestCase() {
     val indent = " ".repeat(100)
     val text = "Really long line ".repeat(1000)
     configureByText(indent + c + text)
-    typeText(parseKeys("ma"))
+    typeText(injector.parser.parseKeys("ma"))
     enterCommand("marks a")
     assertExOutput(
       """mark line  col file/text
@@ -246,19 +246,19 @@ class MarksCommandTest : VimTestCase() {
                       |the dingy underside, the checquered fringe.
                       """.trimMargin()
     )
-    typeText(parseKeys("ma", "w", "mb", "2w", "j")) // a + b
-    typeText(parseKeys("v2b", "<Esc>", "j")) // < and > - last visual selection marks
-    typeText(parseKeys("2b", "mB", "j", "mA", "<CR><CR>w")) // A + B
+    typeText(injector.parser.parseKeys("ma" + "w" + "mb" + "2w" + "j")) // a + b
+    typeText(injector.parser.parseKeys("v2b" + "<Esc>" + "j")) // < and > - last visual selection marks
+    typeText(injector.parser.parseKeys("2b" + "mB" + "j" + "mA" + "<CR><CR>w")) // A + B
     typeText(
-      parseKeys(
-        "i",
-        "inserted text ",
-        "<Esc>",
+      injector.parser.parseKeys(
+        "i" +
+        "inserted text " +
+        "<Esc>" +
         "<CR><CR>"
       )
     ) // ^ - position of end of last insert. Also '.' for start of change
-    typeText(parseKeys("w", "c4w", "replaced content", "<Esc>")) // [ and ] - recently changed/yanked
-    typeText(parseKeys("gg")) // ' - position before last jump
+    typeText(injector.parser.parseKeys("w" + "c4w" + "replaced content" + "<Esc>")) // [ and ] - recently changed/yanked
+    typeText(injector.parser.parseKeys("gg")) // ' - position before last jump
 
     // Vim does not list the (, ), { or } marks. See :help :marks
     // Can't easily test 0-9 or " (locations of previously closed files from vim-info)

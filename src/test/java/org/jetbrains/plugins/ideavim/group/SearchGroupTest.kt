@@ -25,10 +25,10 @@ import com.intellij.openapi.editor.markup.EffectType
 import com.intellij.openapi.util.Ref
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.motion.search.SearchWholeWordForwardAction
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.common.Direction
 import com.maddyhome.idea.vim.helper.RunnableHelper
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
@@ -179,7 +179,7 @@ class SearchGroupTest : VimTestCase() {
 
   fun `test search motion`() {
     typeTextInFile(
-      parseKeys("/", "two", "<Enter>"),
+      injector.parser.parseKeys("/" + "two" + "<Enter>"),
       "${c}one two\n"
     )
     assertOffset(4)
@@ -188,7 +188,7 @@ class SearchGroupTest : VimTestCase() {
   // |/pattern/e|
   fun `test search e motion offset`() {
     typeTextInFile(
-      parseKeys("/", "two/e", "<Enter>"),
+      injector.parser.parseKeys("/" + "two/e" + "<Enter>"),
       "${c}one two three"
     )
     assertOffset(6)
@@ -197,7 +197,7 @@ class SearchGroupTest : VimTestCase() {
   // |/pattern/e|
   fun `test search e-1 motion offset`() {
     typeTextInFile(
-      parseKeys("/", "two/e-1", "<Enter>"),
+      injector.parser.parseKeys("/" + "two/e-1" + "<Enter>"),
       "${c}one two three"
     )
     assertOffset(5)
@@ -206,7 +206,7 @@ class SearchGroupTest : VimTestCase() {
   // |/pattern/e|
   fun `test search e+2 motion offset`() {
     typeTextInFile(
-      parseKeys("/", "two/e+2", "<Enter>"),
+      injector.parser.parseKeys("/" + "two/e+2" + "<Enter>"),
       "${c}one two three"
     )
     assertOffset(8)
@@ -214,7 +214,7 @@ class SearchGroupTest : VimTestCase() {
 
   fun `test reverse search e+2 motion offset finds next match when starting on matching offset`() {
     typeTextInFile(
-      parseKeys("?", "two?e+2", "<Enter>"),
+      injector.parser.parseKeys("?" + "two?e+2" + "<Enter>"),
       "one two three one two ${c}three"
     )
     assertOffset(8)
@@ -222,7 +222,7 @@ class SearchGroupTest : VimTestCase() {
 
   fun `test search e+10 motion offset at end of file`() {
     typeTextInFile(
-      parseKeys("/", "in/e+10", "<Enter>"),
+      injector.parser.parseKeys("/" + "in/e+10" + "<Enter>"),
       """I found it in a legendary land
         |${c}all rocks and lavender and tufted grass,
         |where it was settled on some sodden sand
@@ -233,7 +233,7 @@ class SearchGroupTest : VimTestCase() {
 
   fun `test search e+10 motion offset wraps at end of file`() {
     typeTextInFile(
-      parseKeys("/", "in/e+10", "<Enter>", "n"),
+      injector.parser.parseKeys("/" + "in/e+10" + "<Enter>" + "n"),
       """I found it in a legendary land
         |${c}all rocks and lavender and tufted grass,
         |where it was settled on some sodden sand
@@ -246,7 +246,7 @@ class SearchGroupTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test search e+10 motion offset wraps at exactly end of file`() {
     typeTextInFile(
-      parseKeys("/", "ass./e+10", "<Enter>", "n"),
+      injector.parser.parseKeys("/" + "ass./e+10" + "<Enter>" + "n"),
       """I found it in a legendary land
         |all rocks and lavender and tufted grass,
         |where it was settled on some sodden sand
@@ -259,7 +259,7 @@ class SearchGroupTest : VimTestCase() {
   // |/pattern/s|
   fun `test search s motion offset`() {
     typeTextInFile(
-      parseKeys("/", "two/s", "<Enter>"),
+      injector.parser.parseKeys("/" + "two/s" + "<Enter>"),
       "${c}one two three"
     )
     assertOffset(4)
@@ -268,7 +268,7 @@ class SearchGroupTest : VimTestCase() {
   // |/pattern/s|
   fun `test search s-2 motion offset`() {
     typeTextInFile(
-      parseKeys("/", "two/s-2", "<Enter>"),
+      injector.parser.parseKeys("/" + "two/s-2" + "<Enter>"),
       "${c}one two three"
     )
     assertOffset(2)
@@ -276,7 +276,7 @@ class SearchGroupTest : VimTestCase() {
 
   fun `test search s-2 motion offset finds next match when starting on matching offset`() {
     typeTextInFile(
-      parseKeys("/", "two/s-2", "<Enter>"),
+      injector.parser.parseKeys("/" + "two/s-2" + "<Enter>"),
       "on${c}e two three one two three"
     )
     assertOffset(16)
@@ -284,7 +284,7 @@ class SearchGroupTest : VimTestCase() {
 
   fun `test reverse search s-20 motion offset at beginning of file`() {
     typeTextInFile(
-      parseKeys("?", "it?s-20", "<Enter>"),
+      injector.parser.parseKeys("?" + "it?s-20" + "<Enter>"),
       """I found it in a legendary land
         |${c}all rocks and lavender and tufted grass,
         |where it was settled on some sodden sand
@@ -296,7 +296,7 @@ class SearchGroupTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test reverse search s-20 motion offset wraps at beginning of file`() {
     typeTextInFile(
-      parseKeys("?", "it?s-20", "<Enter>", "N"),
+      injector.parser.parseKeys("?" + "it?s-20" + "<Enter>" + "N"),
       """I found it in a legendary land
         |${c}all rocks and lavender and tufted grass,
         |where it was settled on some sodden sand
@@ -309,7 +309,7 @@ class SearchGroupTest : VimTestCase() {
   // |/pattern/s|
   fun `test search s+1 motion offset`() {
     typeTextInFile(
-      parseKeys("/", "two/s+1", "<Enter>"),
+      injector.parser.parseKeys("/" + "two/s+1" + "<Enter>"),
       "${c}one two three"
     )
     assertOffset(5)
@@ -317,7 +317,7 @@ class SearchGroupTest : VimTestCase() {
 
   fun `test reverse search s+2 motion offset finds next match when starting at matching offset`() {
     typeTextInFile(
-      parseKeys("?", "two?s+2", "<Enter>"),
+      injector.parser.parseKeys("?" + "two?s+2" + "<Enter>"),
       "one two three one tw${c}o three"
     )
     assertOffset(6)
@@ -326,7 +326,7 @@ class SearchGroupTest : VimTestCase() {
   // |/pattern/b|
   fun `test search b motion offset`() {
     typeTextInFile(
-      parseKeys("/", "two/b", "<Enter>"),
+      injector.parser.parseKeys("/" + "two/b" + "<Enter>"),
       "${c}one two three"
     )
     assertOffset(4)
@@ -335,7 +335,7 @@ class SearchGroupTest : VimTestCase() {
   // |/pattern/b|
   fun `test search b-2 motion offset`() {
     typeTextInFile(
-      parseKeys("/", "two/b-2", "<Enter>"),
+      injector.parser.parseKeys("/" + "two/b-2" + "<Enter>"),
       "${c}one two three"
     )
     assertOffset(2)
@@ -344,7 +344,7 @@ class SearchGroupTest : VimTestCase() {
   // |/pattern/b|
   fun `test search b+1 motion offset`() {
     typeTextInFile(
-      parseKeys("/", "two/b+1", "<Enter>"),
+      injector.parser.parseKeys("/" + "two/b+1" + "<Enter>"),
       "${c}one two three"
     )
     assertOffset(5)
@@ -352,7 +352,7 @@ class SearchGroupTest : VimTestCase() {
 
   fun `test search above line motion offset`() {
     typeTextInFile(
-      parseKeys("/", "rocks/-1", "<Enter>"),
+      injector.parser.parseKeys("/" + "rocks/-1" + "<Enter>"),
       """I found it in a legendary land
                  |${c}all rocks and lavender and tufted grass,
                  |where it was settled on some sodden sand
@@ -363,7 +363,7 @@ class SearchGroupTest : VimTestCase() {
 
   fun `test search below line motion offset`() {
     typeTextInFile(
-      parseKeys("/", "rocks/+2", "<Enter>"),
+      injector.parser.parseKeys("/" + "rocks/+2" + "<Enter>"),
       """I found it in a legendary land
                  |${c}all rocks and lavender and tufted grass,
                  |where it was settled on some sodden sand
@@ -375,7 +375,7 @@ class SearchGroupTest : VimTestCase() {
   // |i_CTRL-K|
   fun `test search digraph`() {
     typeTextInFile(
-      parseKeys("/", "<C-K>O:", "<Enter>"),
+      injector.parser.parseKeys("/" + "<C-K>O:" + "<Enter>"),
       "${c}Hallo Österreich!\n"
     )
     assertOffset(6)
@@ -384,7 +384,7 @@ class SearchGroupTest : VimTestCase() {
   @TestFor(classes = [SearchWholeWordForwardAction::class])
   fun `test search word matches case`() {
     typeTextInFile(
-      parseKeys("*"),
+      injector.parser.parseKeys("*"),
       "${c}Editor editor Editor"
     )
     assertOffset(14)
@@ -393,7 +393,7 @@ class SearchGroupTest : VimTestCase() {
   @TestFor(classes = [SearchWholeWordForwardAction::class])
   fun `test search next word matches case`() {
     typeTextInFile(
-      parseKeys("*", "n"),
+      injector.parser.parseKeys("*" + "n"),
       "${c}Editor editor Editor editor Editor"
     )
     assertOffset(28)
@@ -404,7 +404,7 @@ class SearchGroupTest : VimTestCase() {
   fun `test search word honours ignorecase`() {
     setIgnoreCase()
     typeTextInFile(
-      parseKeys("*"),
+      injector.parser.parseKeys("*"),
       "${c}editor Editor editor"
     )
     assertOffset(7)
@@ -415,7 +415,7 @@ class SearchGroupTest : VimTestCase() {
   fun `test search next word honours ignorecase`() {
     setIgnoreCase()
     typeTextInFile(
-      parseKeys("*", "n"),
+      injector.parser.parseKeys("*" + "n"),
       "${c}editor Editor editor"
     )
     assertOffset(14)
@@ -426,7 +426,7 @@ class SearchGroupTest : VimTestCase() {
   fun `test search word overrides smartcase`() {
     setIgnoreCaseAndSmartCase()
     typeTextInFile(
-      parseKeys("*"),
+      injector.parser.parseKeys("*"),
       "${c}Editor editor Editor"
     )
     assertOffset(7)
@@ -437,7 +437,7 @@ class SearchGroupTest : VimTestCase() {
   fun `test search next word overrides smartcase`() {
     setIgnoreCaseAndSmartCase()
     typeTextInFile(
-      parseKeys("*", "n"),
+      injector.parser.parseKeys("*" + "n"),
       "${c}Editor editor editor"
     )
     assertOffset(14)
@@ -452,7 +452,7 @@ class SearchGroupTest : VimTestCase() {
          |where it was settled on some sodden sand
          |hard by the torrent of a mountain pass.""".trimMargin()
     )
-    typeText(parseKeys("/", "la"))
+    typeText(injector.parser.parseKeys("/" + "la"))
     assertPosition(1, 14)
   }
 
@@ -466,7 +466,7 @@ class SearchGroupTest : VimTestCase() {
          |where it was settled on some sodden sand
          |hard by the torrent of a mountain pass.""".trimMargin()
     )
-    typeText(parseKeys("/", "la"))
+    typeText(injector.parser.parseKeys("/" + "la"))
     assertPosition(1, 14)
   }
 
@@ -479,7 +479,7 @@ class SearchGroupTest : VimTestCase() {
            |where it was settled on some sodden sand
            |hard by the torrent of a mountain pass.""".trimMargin()
     )
-    typeText(parseKeys("?", "la"))
+    typeText(injector.parser.parseKeys("?" + "la"))
     assertPosition(0, 26)
   }
 
@@ -493,7 +493,7 @@ class SearchGroupTest : VimTestCase() {
            |where it was settled on some sodden sand
            |hard by the torrent of a mountain pass.""".trimMargin()
     )
-    typeText(parseKeys("?", "la"))
+    typeText(injector.parser.parseKeys("?" + "la"))
     assertPosition(0, 26)
   }
 
@@ -505,7 +505,7 @@ class SearchGroupTest : VimTestCase() {
              |where it was settled on some sodden sand
              |hard by the torrent of a mountain pass.""".trimMargin()
     )
-    typeText(parseKeys("/", "lazzz"))
+    typeText(injector.parser.parseKeys("/" + "lazzz"))
     assertPosition(1, 0)
   }
 
@@ -518,7 +518,7 @@ class SearchGroupTest : VimTestCase() {
              |where it was settled on some sodden sand
              |hard by the torrent of a mountain pass.""".trimMargin()
     )
-    typeText(parseKeys("/", "lazzz"))
+    typeText(injector.parser.parseKeys("/" + "lazzz"))
     assertPosition(1, 0)
   }
 
@@ -530,8 +530,8 @@ class SearchGroupTest : VimTestCase() {
            |where it was settled on some sodden sand
            |hard by the torrent of a mountain pass.""".trimMargin()
     )
-    typeText(parseKeys("/", "la"))
-    typeText(parseKeys("<Esc>"))
+    typeText(injector.parser.parseKeys("/" + "la"))
+    typeText(injector.parser.parseKeys("<Esc>"))
     assertPosition(1, 0)
   }
 
@@ -544,8 +544,8 @@ class SearchGroupTest : VimTestCase() {
            |where it was settled on some sodden sand
            |hard by the torrent of a mountain pass.""".trimMargin()
     )
-    typeText(parseKeys("/", "la"))
-    typeText(parseKeys("<Esc>"))
+    typeText(injector.parser.parseKeys("/" + "la"))
+    typeText(injector.parser.parseKeys("<Esc>"))
     assertPosition(1, 0)
   }
 
@@ -558,9 +558,9 @@ class SearchGroupTest : VimTestCase() {
            |where it was settled on some sodden sand
            |hard by the torrent of a mountain pass.""".trimMargin()
     )
-    typeText(parseKeys("/", "wh"))
+    typeText(injector.parser.parseKeys("/" + "wh"))
     assertPosition(2, 0)
-    typeText(parseKeys("<BS><BS>"))
+    typeText(injector.parser.parseKeys("<BS><BS>"))
     assertPosition(1, 0)
   }
 
@@ -574,9 +574,9 @@ class SearchGroupTest : VimTestCase() {
            |where it was settled on some sodden sand
            |hard by the torrent of a mountain pass.""".trimMargin()
     )
-    typeText(parseKeys("/", "wh"))
+    typeText(injector.parser.parseKeys("/" + "wh"))
     assertPosition(2, 0)
-    typeText(parseKeys("<BS><BS>"))
+    typeText(injector.parser.parseKeys("<BS><BS>"))
     assertPosition(1, 0)
   }
 
@@ -588,7 +588,7 @@ class SearchGroupTest : VimTestCase() {
            |where it was settled on some sodden sand
            |hard by the torrent of a mountain pass.""".trimMargin()
     )
-    typeText(parseKeys("/", "and", "<CR>"))
+    typeText(injector.parser.parseKeys("/" + "and" + "<CR>"))
     assertPosition(1, 10)
   }
 
@@ -601,7 +601,7 @@ class SearchGroupTest : VimTestCase() {
            |where it was settled on some sodden sand
            |hard by the torrent of a mountain pass.""".trimMargin()
     )
-    typeText(parseKeys("/", "and", "<CR>"))
+    typeText(injector.parser.parseKeys("/" + "and" + "<CR>"))
     assertPosition(1, 10)
   }
 
@@ -614,7 +614,7 @@ class SearchGroupTest : VimTestCase() {
            |hard by the torrent of a mountain pass.""".trimMargin()
     )
 
-    typeText(parseKeys("/", "and"))
+    typeText(injector.parser.parseKeys("/" + "and"))
 
     assertSearchHighlights(
       "and",
@@ -634,7 +634,7 @@ class SearchGroupTest : VimTestCase() {
            |hard by the torrent of a mountain pass.""".trimMargin()
     )
 
-    typeText(parseKeys("?", "a"))
+    typeText(injector.parser.parseKeys("?" + "a"))
 
     assertSearchHighlights(
       "a",
@@ -655,7 +655,7 @@ class SearchGroupTest : VimTestCase() {
            |hard by the torrent of a mountain pass.""".trimMargin()
     )
 
-    typeText(parseKeys("/", "and"))
+    typeText(injector.parser.parseKeys("/" + "and"))
 
     assertSearchHighlights(
       "and",
@@ -676,7 +676,7 @@ class SearchGroupTest : VimTestCase() {
            |hard by the torrent of a mountain pass.""".trimMargin()
     )
 
-    typeText(parseKeys("/", "and"))
+    typeText(injector.parser.parseKeys("/" + "and"))
     assertSearchHighlights(
       "and",
       """I found it in a legendary l«and»
@@ -684,7 +684,7 @@ class SearchGroupTest : VimTestCase() {
            |where it was settled on some sodden s«and»
            |hard by the torrent of a mountain pass.""".trimMargin()
     )
-    typeText(parseKeys("zz"))
+    typeText(injector.parser.parseKeys("zz"))
 
     assertSearchHighlights(
       "and",
@@ -706,7 +706,7 @@ class SearchGroupTest : VimTestCase() {
     )
 
     enterSearch("and")
-    typeText(parseKeys("/"))
+    typeText(injector.parser.parseKeys("/"))
     assertSearchHighlights(
       "and",
       """I found it in a legendary l«and»
@@ -714,7 +714,7 @@ class SearchGroupTest : VimTestCase() {
            |where it was settled on some sodden s«and»
            |hard by the torrent of a mountain pass.""".trimMargin()
     )
-    typeText(parseKeys("v"))
+    typeText(injector.parser.parseKeys("v"))
 
     assertSearchHighlights(
       "v",
@@ -736,7 +736,7 @@ class SearchGroupTest : VimTestCase() {
     )
 
     enterSearch("and")
-    typeText(parseKeys("/", "grass", "<BS><BS><BS><BS><BS>"))
+    typeText(injector.parser.parseKeys("/" + "grass" + "<BS><BS><BS><BS><BS>"))
 
     assertSearchHighlights(
       "and",
@@ -758,7 +758,7 @@ class SearchGroupTest : VimTestCase() {
     )
 
     enterSearch("and")
-    typeText(parseKeys("/", "grass", "<Esc>"))
+    typeText(injector.parser.parseKeys("/" + "grass" + "<Esc>"))
 
     assertSearchHighlights(
       "and",
@@ -781,7 +781,7 @@ class SearchGroupTest : VimTestCase() {
 
     enterSearch("and")
     enterCommand("nohlsearch")
-    typeText(parseKeys("/", "grass", "<Esc>"))
+    typeText(injector.parser.parseKeys("/" + "grass" + "<Esc>"))
 
     assertSearchHighlights(
       "and",
@@ -802,7 +802,7 @@ class SearchGroupTest : VimTestCase() {
            |hard by the torrent of a mountain pass.""".trimMargin()
     )
 
-    typeText(parseKeys(":", "%s/and"))
+    typeText(injector.parser.parseKeys(":" + "%s/and"))
 
     assertSearchHighlights(
       "and",
@@ -825,7 +825,7 @@ class SearchGroupTest : VimTestCase() {
 
     // E.g. don't remove highlights when trying to type :set
     enterSearch("and")
-    typeText(parseKeys(":s"))
+    typeText(injector.parser.parseKeys(":s"))
 
     assertSearchHighlights(
       "and",
@@ -846,7 +846,7 @@ class SearchGroupTest : VimTestCase() {
            |${c}hard by the torrent and rush of a mountain pass.""".trimMargin()
     )
 
-    typeText(parseKeys(":", "2,3s/and"))
+    typeText(injector.parser.parseKeys(":" + "2,3s/and"))
 
     assertSearchHighlights(
       "and",
@@ -867,7 +867,7 @@ class SearchGroupTest : VimTestCase() {
            |hard by the torrent of a mountain pass.""".trimMargin()
     )
 
-    typeText(parseKeys(":", "s/and"))
+    typeText(injector.parser.parseKeys(":" + "s/and"))
 
     assertSearchHighlights(
       "and",
@@ -896,7 +896,7 @@ class SearchGroupTest : VimTestCase() {
            |hard by the torrent of a mountain pass.""".trimMargin()
     )
 
-    typeText(parseKeys(":", "2,8s/and"))
+    typeText(injector.parser.parseKeys(":" + "2,8s/and"))
 
     assertSearchHighlights(
       "and",
@@ -925,7 +925,7 @@ class SearchGroupTest : VimTestCase() {
              |hard by the torrent of a mountain pass.""".trimMargin()
     )
 
-    typeText(parseKeys(":", "%s/and", "<BS><BS><BS>"))
+    typeText(injector.parser.parseKeys(":" + "%s/and" + "<BS><BS><BS>"))
 
     assertSearchHighlights(
       "and",
@@ -947,7 +947,7 @@ class SearchGroupTest : VimTestCase() {
     )
 
     enterSearch("and")
-    typeText(parseKeys(":", "%s/roc", "<BS><BS><BS>"))
+    typeText(injector.parser.parseKeys(":" + "%s/roc" + "<BS><BS><BS>"))
 
     assertSearchHighlights(
       "and",
@@ -971,7 +971,7 @@ class SearchGroupTest : VimTestCase() {
     )
 
     enterSearch("and")
-    typeText(parseKeys(":", "%s/ass", "<Esc>"))
+    typeText(injector.parser.parseKeys(":" + "%s/ass" + "<Esc>"))
 
     assertSearchHighlights(
       "and",
@@ -1030,7 +1030,7 @@ class SearchGroupTest : VimTestCase() {
   fun `test no highlights for unmatched search`() {
     setHighlightSearch()
     typeTextInFile(
-      parseKeys("/", "zzzz", "<Enter>"),
+      injector.parser.parseKeys("/" + "zzzz" + "<Enter>"),
       """I found it in a legendary land
          |${c}all rocks and lavender and tufted grass,
          |where it was settled on some sodden sand
@@ -1064,7 +1064,7 @@ class SearchGroupTest : VimTestCase() {
     val pattern = "and"
     enterSearch(pattern)
     enterCommand("nohlsearch")
-    typeText(parseKeys("n"))
+    typeText(injector.parser.parseKeys("n"))
 
     assertSearchHighlights(
       pattern,
@@ -1089,10 +1089,10 @@ class SearchGroupTest : VimTestCase() {
 
     val pattern = "lavender"
     enterSearch(pattern)
-    typeText(parseKeys("dd"))
+    typeText(injector.parser.parseKeys("dd"))
     enterCommand("nohlsearch")
-    typeText(parseKeys("u"))
-    typeText(parseKeys("n"))
+    typeText(injector.parser.parseKeys("u"))
+    typeText(injector.parser.parseKeys("n"))
 
     assertSearchHighlights(
       pattern,
@@ -1148,7 +1148,7 @@ class SearchGroupTest : VimTestCase() {
 
     val pattern = "and"
     enterSearch(pattern)
-    typeText(parseKeys("b", "dw")) // deletes "rocks "
+    typeText(injector.parser.parseKeys("b" + "dw")) // deletes "rocks "
 
     assertSearchHighlights(
       pattern,
@@ -1170,7 +1170,7 @@ class SearchGroupTest : VimTestCase() {
 
     val pattern = "and"
     enterSearch(pattern)
-    typeText(parseKeys("dw")) // deletes first "and " on line 2
+    typeText(injector.parser.parseKeys("dw")) // deletes first "and " on line 2
 
     assertSearchHighlights(
       pattern,
@@ -1192,7 +1192,7 @@ class SearchGroupTest : VimTestCase() {
 
     val pattern = "and"
     enterSearch(pattern)
-    typeText(parseKeys("xx")) // deletes "an" from first "and" on line 2
+    typeText(injector.parser.parseKeys("xx")) // deletes "an" from first "and" on line 2
 
     assertSearchHighlights(
       pattern,
@@ -1214,7 +1214,7 @@ class SearchGroupTest : VimTestCase() {
 
     val pattern = """\<s\w*d\>""" // Should match "settled" and "sand"
     enterSearch(pattern)
-    typeText(parseKeys("l", "xxx")) // Change "settled" to "sled"
+    typeText(injector.parser.parseKeys("l" + "xxx")) // Change "settled" to "sled"
 
     assertSearchHighlights(
       pattern,
@@ -1236,7 +1236,7 @@ class SearchGroupTest : VimTestCase() {
 
     val pattern = "and"
     enterSearch(pattern)
-    typeText(parseKeys("h", "i", ", trees")) // inserts ", trees" before first "and" on line 2
+    typeText(injector.parser.parseKeys("h" + "i" + ", trees")) // inserts ", trees" before first "and" on line 2
 
     assertSearchHighlights(
       pattern,
@@ -1258,7 +1258,7 @@ class SearchGroupTest : VimTestCase() {
 
     val pattern = "and"
     enterSearch(pattern)
-    typeText(parseKeys("l", "i", "FOO")) // inserts "FOO" inside first "and" - "aFOOnd"
+    typeText(injector.parser.parseKeys("l" + "i" + "FOO")) // inserts "FOO" inside first "and" - "aFOOnd"
 
     assertSearchHighlights(
       pattern,
@@ -1280,7 +1280,7 @@ class SearchGroupTest : VimTestCase() {
 
     val pattern = """\<s\w*d\>""" // Should match "settled" and "sand"
     enterSearch(pattern)
-    typeText(parseKeys("l", "i", "FOO", "<Esc>")) // Change "settled" to "sFOOettled"
+    typeText(injector.parser.parseKeys("l" + "i" + "FOO" + "<Esc>")) // Change "settled" to "sFOOettled"
 
     assertSearchHighlights(
       pattern,
@@ -1302,7 +1302,7 @@ class SearchGroupTest : VimTestCase() {
 
     val pattern = "and"
     enterSearch(pattern)
-    typeText(parseKeys("o", "and then I saw a cat and a dog", "<Esc>"))
+    typeText(injector.parser.parseKeys("o" + "and then I saw a cat and a dog" + "<Esc>"))
 
     assertSearchHighlights(
       pattern,
@@ -1325,7 +1325,7 @@ class SearchGroupTest : VimTestCase() {
     )
 
     enterSearch(pattern)
-    typeText(parseKeys("b", "cw", "boulders", "<Esc>")) // Replaces "rocks" with "boulders" on line 2
+    typeText(injector.parser.parseKeys("b" + "cw" + "boulders" + "<Esc>")) // Replaces "rocks" with "boulders" on line 2
 
     assertSearchHighlights(
       pattern,
@@ -1347,7 +1347,7 @@ class SearchGroupTest : VimTestCase() {
 
     val pattern = "and"
     enterSearch(pattern)
-    typeText(parseKeys("l", "cw", "lso", "<Esc>")) // replaces "nd" in first "and" with "lso" on line 2
+    typeText(injector.parser.parseKeys("l" + "cw" + "lso" + "<Esc>")) // replaces "nd" in first "and" with "lso" on line 2
 
     assertSearchHighlights(
       pattern,
@@ -1369,7 +1369,7 @@ class SearchGroupTest : VimTestCase() {
 
     val pattern = "and"
     enterSearch(pattern)
-    typeText(parseKeys("w", "cw", "trees and boulders", "<Esc>"))
+    typeText(injector.parser.parseKeys("w" + "cw" + "trees and boulders" + "<Esc>"))
 
     assertSearchHighlights(
       pattern,
@@ -1391,7 +1391,7 @@ class SearchGroupTest : VimTestCase() {
 
     val pattern = """\<s\w*d\>""" // Should match "settled" and "sand"
     enterSearch(pattern)
-    typeText(parseKeys("l", "ctl", "huff", "<Esc>")) // Change "settled" to "shuffled"
+    typeText(injector.parser.parseKeys("l" + "ctl" + "huff" + "<Esc>")) // Change "settled" to "shuffled"
 
     assertSearchHighlights(
       pattern,

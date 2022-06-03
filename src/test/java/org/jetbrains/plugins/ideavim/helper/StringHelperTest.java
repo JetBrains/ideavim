@@ -18,7 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.helper;
 
-import com.maddyhome.idea.vim.helper.StringHelper;
+import com.maddyhome.idea.vim.api.VimInjectorKt;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
@@ -26,17 +26,15 @@ import javax.swing.*;
 import java.awt.event.InputEvent;
 import java.util.List;
 
-import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
-
 /**
  * @author vlan
  */
 public class StringHelperTest extends VimTestCase {
 
   public void testFalseSpecialKey() {
-    List<KeyStroke> expectedKeys = parseKeys("move '<-2");
-    expectedKeys.addAll(parseKeys("<CR>"));
-    assertEquals(expectedKeys, parseKeys("move '<-2<CR>"));
+    List<KeyStroke> expectedKeys = VimInjectorKt.getInjector().getParser().parseKeys("move '<-2");
+    expectedKeys.addAll(VimInjectorKt.getInjector().getParser().parseKeys("<CR>"));
+    assertEquals(expectedKeys, VimInjectorKt.getInjector().getParser().parseKeys("move '<-2<CR>"));
   }
 
   public void testParseKeyModifiers() {
@@ -126,8 +124,8 @@ public class StringHelperTest extends VimTestCase {
 
   @NotNull
   private KeyStroke parseKeyStroke(@NotNull String s) {
-    final List<KeyStroke> actualStrokes = parseKeys(s);
-    assertEquals(StringHelper.toKeyNotation(actualStrokes), 1, actualStrokes.size());
+    final List<KeyStroke> actualStrokes = VimInjectorKt.getInjector().getParser().parseKeys(s);
+    assertEquals(VimInjectorKt.getInjector().getParser().toKeyNotation(actualStrokes), 1, actualStrokes.size());
     return actualStrokes.get(0);
   }
 }

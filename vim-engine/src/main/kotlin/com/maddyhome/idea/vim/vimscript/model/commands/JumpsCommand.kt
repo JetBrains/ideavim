@@ -21,7 +21,6 @@ package com.maddyhome.idea.vim.vimscript.model.commands
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.common.CommonStringHelper.stringToKeys
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.EngineStringHelper
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
@@ -51,7 +50,7 @@ data class JumpsCommand(val ranges: Ranges, val argument: String) : Command.Sing
       val vf = editor.getVirtualFile()
       if (vf != null && vf.path == jump.filepath) {
         val line = editor.getLineText(jump.logicalLine).trim().take(200)
-        val keys = stringToKeys(line)
+        val keys = injector.parser.stringToKeys(line)
         text.append(EngineStringHelper.toPrintableCharacters(keys).take(200))
       } else {
         text.append(jump.filepath)

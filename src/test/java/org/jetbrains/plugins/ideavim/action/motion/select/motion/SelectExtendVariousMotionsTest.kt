@@ -20,7 +20,7 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.select.motion
 
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -50,7 +50,7 @@ class SelectExtendVariousMotionsTest : VimTestCase() {
 
     configureByText(code)
 
-    typeText(parseKeys("g<C-H>", "<S-UP>".repeat(2), "<S-Right>".repeat(2)))
+    typeText(injector.parser.parseKeys("g<C-H>" + "<S-UP>".repeat(2) + "<S-Right>".repeat(2)))
 
     assertState(
       """
@@ -68,7 +68,7 @@ class SelectExtendVariousMotionsTest : VimTestCase() {
       """.trimIndent().dotToTab()
     )
 
-    typeText(parseKeys("<S-UP>".repeat(7), "<S-Right>".repeat(3)))
+    typeText(injector.parser.parseKeys("<S-UP>".repeat(7) + "<S-Right>".repeat(3)))
 
     assertState(
       """
@@ -86,7 +86,7 @@ class SelectExtendVariousMotionsTest : VimTestCase() {
       """.trimIndent().dotToTab()
     )
 
-    typeText(parseKeys("<S-Right>".repeat(2)))
+    typeText(injector.parser.parseKeys("<S-Right>".repeat(2)))
 
     assertState(
       """

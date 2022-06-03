@@ -23,7 +23,7 @@ import com.intellij.openapi.components.RoamingType;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.diagnostic.Logger;
-import com.maddyhome.idea.vim.helper.StringHelper;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.history.HistoryBlock;
 import com.maddyhome.idea.vim.history.HistoryEntry;
 import com.maddyhome.idea.vim.history.VimHistoryBase;
@@ -63,7 +63,7 @@ public class HistoryGroup extends VimHistoryBase implements PersistentStateCompo
 
     for (HistoryEntry entry : block.getEntries()) {
       final Element entryElement = new Element("entry");
-      StringHelper.setSafeXmlText(entryElement, entry.getEntry());
+      VimPlugin.getXML().setSafeXmlText(entryElement, entry.getEntry());
       root.addContent(entryElement);
     }
 
@@ -96,7 +96,7 @@ public class HistoryGroup extends VimHistoryBase implements PersistentStateCompo
     if (root != null) {
       List<Element> items = root.getChildren("entry");
       for (Element item : items) {
-        final String text = StringHelper.getSafeXmlText(item);
+        final String text = VimPlugin.getXML().getSafeXmlText(item);
         if (text != null) {
           block.addEntry(text);
         }

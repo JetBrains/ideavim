@@ -18,8 +18,8 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.updown
 
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.vimLastColumn
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -41,7 +41,7 @@ class MotionUpActionTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.EDITOR_MODIFICATION)
   fun `test last column is incorrect`() {
-    val keys = StringHelper.parseKeys("k")
+    val keys = injector.parser.parseKeys("k")
     val before = """
             I found it in a legendary land
             all rocks and lave${c}nder and tufted grass,
@@ -74,7 +74,7 @@ class MotionUpActionTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.EDITOR_MODIFICATION)
   fun `test last column wrong lastColumn`() {
-    val keys = StringHelper.parseKeys("k")
+    val keys = injector.parser.parseKeys("k")
     val before = """
             I found it in a legendary land
             all rocks and lavender and tufted ${c}grass,

@@ -23,9 +23,9 @@ package org.jetbrains.plugins.ideavim.group.visual
 import com.intellij.codeInsight.template.TemplateManager
 import com.intellij.codeInsight.template.impl.ConstantNode
 import com.intellij.codeInsight.template.impl.TemplateManagerImpl
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.group.visual.IdeaSelectionControl
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.listener.VimListenerManager
@@ -84,7 +84,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
     assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
     assertCaretsVisualAttributes()
 
-    typeText(parseKeys("l"))
+    typeText(injector.parser.parseKeys("l"))
     assertState(
       """
             A Discovery
@@ -130,7 +130,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
     assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
     assertCaretsVisualAttributes()
 
-    typeText(parseKeys("l"))
+    typeText(injector.parser.parseKeys("l"))
     assertState(
       """
             A Discovery
@@ -166,7 +166,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
     assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
     assertCaretsVisualAttributes()
 
-    typeText(parseKeys("l"))
+    typeText(injector.parser.parseKeys("l"))
     assertState(
       """
             A Discovery
@@ -202,7 +202,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
     assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
     assertCaretsVisualAttributes()
 
-    typeText(parseKeys("l"))
+    typeText(injector.parser.parseKeys("l"))
     assertState(
       """
             A Discovery
@@ -238,7 +238,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
     assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
     assertCaretsVisualAttributes()
 
-    typeText(parseKeys("l"))
+    typeText(injector.parser.parseKeys("l"))
     assertState(
       """
             A Discovery
@@ -274,7 +274,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
     assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
     assertCaretsVisualAttributes()
 
-    typeText(parseKeys("l"))
+    typeText(injector.parser.parseKeys("l"))
     assertState(
       """
             A Discovery
@@ -310,7 +310,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
     assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
     assertCaretsVisualAttributes()
 
-    typeText(parseKeys("l"))
+    typeText(injector.parser.parseKeys("l"))
     assertState(
       """
             A Discovery
@@ -346,7 +346,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
     assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
     assertCaretsVisualAttributes()
 
-    typeText(parseKeys("l"))
+    typeText(injector.parser.parseKeys("l"))
     assertState(
       """
             A Discovery
@@ -382,7 +382,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
     assertSubMode(CommandState.SubMode.VISUAL_LINE)
     assertCaretsVisualAttributes()
 
-    typeText(parseKeys("l"))
+    typeText(injector.parser.parseKeys("l"))
     assertState(
       """
             A Discovery
@@ -397,7 +397,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
     assertSubMode(CommandState.SubMode.VISUAL_LINE)
     assertCaretsVisualAttributes()
 
-    typeText(parseKeys("j"))
+    typeText(injector.parser.parseKeys("j"))
     assertState(
       """
             A Discovery
@@ -433,7 +433,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
     assertSubMode(CommandState.SubMode.VISUAL_LINE)
     assertCaretsVisualAttributes()
 
-    typeText(parseKeys("j"))
+    typeText(injector.parser.parseKeys("j"))
     assertState(
       """
             A Discovery
@@ -469,7 +469,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
     assertSubMode(CommandState.SubMode.VISUAL_LINE)
     assertCaretsVisualAttributes()
 
-    typeText(parseKeys("j"))
+    typeText(injector.parser.parseKeys("j"))
     assertState(
       """
             A Discovery
@@ -505,7 +505,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
     assertSubMode(CommandState.SubMode.VISUAL_LINE)
     assertCaretsVisualAttributes()
 
-    typeText(parseKeys("j"))
+    typeText(injector.parser.parseKeys("j"))
     assertState(
       """
             A Discovery
@@ -541,7 +541,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
     assertSubMode(CommandState.SubMode.VISUAL_LINE)
     assertCaretsVisualAttributes()
 
-    typeText(parseKeys("j"))
+    typeText(injector.parser.parseKeys("j"))
     assertState(
       """
             A Discovery
@@ -577,7 +577,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
     assertSubMode(CommandState.SubMode.VISUAL_LINE)
     assertCaretsVisualAttributes()
 
-    typeText(parseKeys("k"))
+    typeText(injector.parser.parseKeys("k"))
     assertState(
       """
             A Discovery
@@ -634,7 +634,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
     assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
     assertCaretsVisualAttributes()
 
-    typeText(parseKeys("l"))
+    typeText(injector.parser.parseKeys("l"))
     assertState(
       """
             A Discovery
@@ -670,7 +670,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
     assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
     assertCaretsVisualAttributes()
 
-    typeText(parseKeys("j"))
+    typeText(injector.parser.parseKeys("j"))
     assertState(
       """
             A Discovery
@@ -706,7 +706,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
     assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
     assertCaretsVisualAttributes()
 
-    typeText(parseKeys("l"))
+    typeText(injector.parser.parseKeys("l"))
     assertState(
       """
             A Discovery
@@ -777,7 +777,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
             all rocks and lavender and tufted grass,
       """.trimIndent()
     )
-    typeText(parseKeys("V"))
+    typeText(injector.parser.parseKeys("V"))
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_LINE)
 
@@ -804,7 +804,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
 
     startDummyTemplate()
 
-    typeText(parseKeys("V"))
+    typeText(injector.parser.parseKeys("V"))
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_LINE)
 

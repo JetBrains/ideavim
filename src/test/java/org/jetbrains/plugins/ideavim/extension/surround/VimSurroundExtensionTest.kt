@@ -20,8 +20,8 @@
 
 package org.jetbrains.plugins.ideavim.extension.surround
 
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -90,7 +90,7 @@ class VimSurroundExtensionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun testSurroundTag() {
     configureByText("Hello ${c}World!\n")
-    typeText(parseKeys("ysiw<em>"))
+    typeText(injector.parser.parseKeys("ysiw<em>"))
     assertState("Hello <em>World</em>!\n")
   }
 
@@ -98,7 +98,7 @@ class VimSurroundExtensionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun testSurroundTagWithAttributes() {
     configureByText("Hello ${c}World!")
-    typeText(parseKeys("ysiw<span class=\"important\" data-foo=\"bar\">"))
+    typeText(injector.parser.parseKeys("ysiw<span class=\"important\" data-foo=\"bar\">"))
     assertState("Hello <span class=\"important\" data-foo=\"bar\">World</span>!")
   }
 
@@ -106,21 +106,21 @@ class VimSurroundExtensionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun testSurraungTagAsInIssue() {
     configureByText("<p>${c}Hello</p>")
-    typeText(parseKeys("VS<div class = \"container\">"))
+    typeText(injector.parser.parseKeys("VS<div class = \"container\">"))
     assertState("<div class = \"container\"><p>Hello</p></div>")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun testSurroundCustomElement() {
     configureByText("${c}Click me!")
-    typeText(parseKeys("VS<custom-button>"))
+    typeText(injector.parser.parseKeys("VS<custom-button>"))
     assertState("<custom-button>Click me!</custom-button>")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun testSurroundFunctionName() {
     configureByText("foo = b${c}ar")
-    typeText(parseKeys("ysiwfbaz"))
+    typeText(injector.parser.parseKeys("ysiwfbaz"))
     assertState("foo = ${c}baz(bar)")
   }
 
@@ -129,21 +129,21 @@ class VimSurroundExtensionTest : VimTestCase() {
     // The cursor does not move. This is different from Vim
     // where the cursor moves to the beginning of the text object.
     configureByText("foo = b${c}ar")
-    typeText(parseKeys("ysiwf"))
+    typeText(injector.parser.parseKeys("ysiwf"))
     assertState("foo = b${c}ar")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun testSurroundFunctionNameWithInnerSpacing() {
     configureByText("foo = b${c}ar")
-    typeText(parseKeys("ysiwFbaz"))
+    typeText(injector.parser.parseKeys("ysiwFbaz"))
     assertState("foo = ${c}baz( bar )")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun testSurroundSpace() {
     configureByText("foo(b${c}ar)")
-    typeText(parseKeys("csbs"))
+    typeText(injector.parser.parseKeys("csbs"))
     assertState("foo${c} bar")
   }
 
@@ -467,7 +467,7 @@ class VimSurroundExtensionTest : VimTestCase() {
     configureByText(before)
 
     typeText(commandToKeys("noremap d <C-d>"))
-    typeText(parseKeys("cs(]"))
+    typeText(injector.parser.parseKeys("cs(]"))
     assertState(after)
   }
 
@@ -478,7 +478,7 @@ class VimSurroundExtensionTest : VimTestCase() {
     """.trimIndent()
     configureByText(before)
 
-    typeText(parseKeys("cs\"'"))
+    typeText(injector.parser.parseKeys("cs\"'"))
     val after = """'\n'"""
     assertState(after)
   }

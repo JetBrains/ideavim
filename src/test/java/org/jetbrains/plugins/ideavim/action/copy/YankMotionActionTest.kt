@@ -19,8 +19,8 @@
 package org.jetbrains.plugins.ideavim.action.copy
 
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
@@ -37,7 +37,7 @@ class YankMotionActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    typeTextInFile(parseKeys("yW"), file)
+    typeTextInFile(injector.parser.parseKeys("yW"), file)
     val text = VimPlugin.getRegister().lastRegister?.text ?: kotlin.test.fail()
 
     TestCase.assertEquals("and", text)
@@ -55,7 +55,7 @@ class YankMotionActionTest : VimTestCase() {
     configureByText(file)
 
     val initialOffset = myFixture.editor.caretModel.offset
-    typeText(parseKeys("yy"))
+    typeText(injector.parser.parseKeys("yy"))
 
     TestCase.assertEquals(initialOffset, myFixture.editor.caretModel.offset)
   }
@@ -67,7 +67,7 @@ class YankMotionActionTest : VimTestCase() {
 
     try {
       configureByText("I found it in a ${c}legendary land")
-      typeText(parseKeys("yiw"))
+      typeText(injector.parser.parseKeys("yiw"))
 
       val starRegister = VimPlugin.getRegister().getRegister('*') ?: kotlin.test.fail("Register * is empty")
       assertEquals("legendary", starRegister.text)
@@ -82,7 +82,7 @@ class YankMotionActionTest : VimTestCase() {
   @Suppress("DANGEROUS_CHARACTERS")
   fun `test z saved to " register`() {
     configureByText("I found it in a ${c}legendary land")
-    typeText(parseKeys("\"zyiw"))
+    typeText(injector.parser.parseKeys("\"zyiw"))
 
     val starRegister = VimPlugin.getRegister().getRegister('z') ?: kotlin.test.fail("Register z is empty")
     assertEquals("legendary", starRegister.text)
@@ -94,7 +94,7 @@ class YankMotionActionTest : VimTestCase() {
   @Suppress("DANGEROUS_CHARACTERS")
   fun `test " saved to " register`() {
     configureByText("I found it in a ${c}legendary land")
-    typeText(parseKeys("\"zyiw"))
+    typeText(injector.parser.parseKeys("\"zyiw"))
 
     val quoteRegister = VimPlugin.getRegister().getRegister('"') ?: kotlin.test.fail("Register \" is empty")
     assertEquals("legendary", quoteRegister.text)
@@ -109,7 +109,7 @@ class YankMotionActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    typeTextInFile(parseKeys("yk"), file)
+    typeTextInFile(injector.parser.parseKeys("yk"), file)
 
     assertTrue(VimPlugin.isError())
   }
@@ -124,7 +124,7 @@ class YankMotionActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.
             $c
     """.trimIndent()
-    typeTextInFile(parseKeys("y$"), file)
+    typeTextInFile(injector.parser.parseKeys("y$"), file)
     val text = VimPlugin.getRegister().lastRegister?.text ?: kotlin.test.fail()
 
     TestCase.assertEquals("", text)
@@ -140,7 +140,7 @@ class YankMotionActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.
     """.trimIndent()
     typeTextInFile(commandToKeys("map * *zz"), file)
-    typeTextInFile(parseKeys("\"*yiw"), file)
+    typeTextInFile(injector.parser.parseKeys("\"*yiw"), file)
     val text = VimPlugin.getRegister().lastRegister?.text ?: kotlin.test.fail()
 
     TestCase.assertEquals("legendary", text)
@@ -156,7 +156,7 @@ class YankMotionActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.
     """.trimIndent()
     typeTextInFile(commandToKeys("map * *yiw"), file)
-    typeTextInFile(parseKeys("\"*"), file)
+    typeTextInFile(injector.parser.parseKeys("\"*"), file)
     assertNull(VimPlugin.getRegister().lastRegister?.text)
   }
 

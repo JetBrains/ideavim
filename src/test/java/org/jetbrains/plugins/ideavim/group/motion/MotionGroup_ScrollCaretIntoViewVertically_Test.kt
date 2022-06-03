@@ -19,8 +19,8 @@
 package org.jetbrains.plugins.ideavim.group.motion
 
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
@@ -35,7 +35,7 @@ class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
     configureByPages(5)
     setPositionAndScroll(19, 24)
 
-    typeText(parseKeys("12k"))
+    typeText(injector.parser.parseKeys("12k"))
     assertPosition(12, 0)
     assertVisibleArea(12, 46)
   }
@@ -46,7 +46,7 @@ class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
     configureByPages(5)
     setPositionAndScroll(19, 24)
 
-    typeText(parseKeys("12k"))
+    typeText(injector.parser.parseKeys("12k"))
     assertPosition(12, 0)
     assertVisibleArea(3, 37)
   }
@@ -57,7 +57,7 @@ class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
     configureByPages(5)
     setPositionAndScroll(19, 29)
 
-    typeText(parseKeys("12k"))
+    typeText(injector.parser.parseKeys("12k"))
     assertPosition(17, 0)
     assertVisibleArea(12, 46)
   }
@@ -69,7 +69,7 @@ class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
     configureByPages(5)
 
     setPositionAndScroll(19, 29)
-    typeText(parseKeys("12k"))
+    typeText(injector.parser.parseKeys("12k"))
     assertPosition(17, 0)
     assertVisibleArea(8, 42)
   }
@@ -81,7 +81,7 @@ class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
     configureByPages(5)
     setPositionAndScroll(29, 39)
 
-    typeText(parseKeys("20k"))
+    typeText(injector.parser.parseKeys("20k"))
     assertPosition(19, 0)
     assertVisibleArea(10, 44)
   }
@@ -90,10 +90,10 @@ class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
   fun `test scroll up with collapsed folds`() {
     configureByPages(5)
     // TODO: Implement zf
-    typeText(parseKeys("40G", "Vjjjj", ":'<,'>action CollapseSelection<CR>", "V"))
+    typeText(injector.parser.parseKeys("40G" + "Vjjjj" + ":'< +'>action CollapseSelection<CR>" + "V"))
     setPositionAndScroll(29, 49)
 
-    typeText(parseKeys("30k"))
+    typeText(injector.parser.parseKeys("30k"))
     assertPosition(15, 0)
     assertVisibleArea(15, 53)
   }
@@ -107,7 +107,7 @@ class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
     configureByPages(5)
     setPositionAndScroll(115, 149)
 
-    typeText(parseKeys("50k"))
+    typeText(injector.parser.parseKeys("50k"))
     assertPosition(99, 0)
     assertVisualLineAtMiddleOfScreen(99)
   }
@@ -120,7 +120,7 @@ class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
     setPositionAndScroll(99, 109)
     assertPosition(109, 0)
 
-    typeText(parseKeys("21k"))
+    typeText(injector.parser.parseKeys("21k"))
     assertPosition(88, 0)
     assertVisualLineAtMiddleOfScreen(88)
   }
@@ -132,7 +132,7 @@ class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
     VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(5))
     setPositionAndScroll(99, 109)
 
-    typeText(parseKeys("20k"))
+    typeText(injector.parser.parseKeys("20k"))
     assertPosition(89, 0)
     assertVisibleArea(80, 114)
   }
@@ -142,7 +142,7 @@ class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
     configureByPages(5)
     setPositionAndScroll(0, 29)
 
-    typeText(parseKeys("12j"))
+    typeText(injector.parser.parseKeys("12j"))
     assertPosition(41, 0)
     assertVisibleArea(7, 41)
   }
@@ -153,7 +153,7 @@ class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
     configureByPages(5)
     setPositionAndScroll(0, 29)
 
-    typeText(parseKeys("12j"))
+    typeText(injector.parser.parseKeys("12j"))
     assertPosition(41, 0)
     assertVisibleArea(11, 45)
   }
@@ -164,7 +164,7 @@ class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
     configureByPages(5)
     setPositionAndScroll(0, 24)
 
-    typeText(parseKeys("12j"))
+    typeText(injector.parser.parseKeys("12j"))
     assertPosition(36, 0)
     assertVisibleArea(7, 41)
   }
@@ -176,7 +176,7 @@ class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
     configureByPages(5)
     setPositionAndScroll(0, 24)
 
-    typeText(parseKeys("12j"))
+    typeText(injector.parser.parseKeys("12j"))
     assertPosition(36, 0)
     assertVisibleArea(10, 44)
   }
@@ -188,7 +188,7 @@ class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
     configureByPages(5)
     setPositionAndScroll(0, 24)
 
-    typeText(parseKeys("20j"))
+    typeText(injector.parser.parseKeys("20j"))
     assertPosition(44, 0)
     assertVisibleArea(17, 51)
   }
@@ -200,7 +200,7 @@ class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
     configureByPages(5)
     setPositionAndScroll(0, 24)
 
-    typeText(parseKeys("25j"))
+    typeText(injector.parser.parseKeys("25j"))
     assertPosition(49, 0)
     assertVisibleArea(24, 58)
   }
@@ -212,7 +212,7 @@ class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
     configureByPages(5)
     setPositionAndScroll(0, 24)
 
-    typeText(parseKeys("12j"))
+    typeText(injector.parser.parseKeys("12j"))
     assertPosition(36, 0)
     assertVisibleArea(11, 45)
   }
@@ -224,7 +224,7 @@ class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
     configureByPages(5)
     setPositionAndScroll(0, 29)
 
-    typeText(parseKeys("12j"))
+    typeText(injector.parser.parseKeys("12j"))
     assertPosition(41, 0)
     assertVisibleArea(12, 46)
   }
@@ -236,7 +236,7 @@ class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
     configureByPages(5)
     setPositionAndScroll(0, 24)
 
-    typeText(parseKeys("20j"))
+    typeText(injector.parser.parseKeys("20j"))
     assertPosition(44, 0)
     assertVisibleArea(15, 49)
   }
@@ -248,7 +248,7 @@ class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
     configureByPages(5)
     setPositionAndScroll(0, 19)
 
-    typeText(parseKeys("35j"))
+    typeText(injector.parser.parseKeys("35j"))
     assertPosition(54, 0)
     assertVisualLineAtMiddleOfScreen(54)
   }

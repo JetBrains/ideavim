@@ -18,7 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.action
 
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -29,7 +29,7 @@ class RepeatActionTest : VimTestCase() {
   @Test
   fun testSimpleRepeatLastCommand() {
     configureByText("foo foo")
-    typeText(parseKeys("cw", "bar", "<Esc>", "w", "."))
+    typeText(injector.parser.parseKeys("cw" + "bar" + "<Esc>" + "w" + "."))
     assertState("bar bar")
   }
 
@@ -41,7 +41,7 @@ class RepeatActionTest : VimTestCase() {
         "Third line here, with a comma.\n" +
         "Last line."
     )
-    typeText(parseKeys("j", "ct.", "Change the line to point", "<Esc>", "j0", "."))
+    typeText(injector.parser.parseKeys("j" + "ct." + "Change the line to point" + "<Esc>" + "j0" + "."))
     assertState(
       "The first line.\n" +
         "Change the line to point.\n" +
@@ -55,7 +55,7 @@ class RepeatActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun testRepeatChangeInVisualMode() {
     configureByText("foobar foobar")
-    typeText(parseKeys("<C-V>llc", "fu", "<Esc>", "w", "."))
+    typeText(injector.parser.parseKeys("<C-V>llc" + "fu" + "<Esc>" + "w" + "."))
     assertState("fubar fubar")
   }
 
@@ -69,7 +69,7 @@ class RepeatActionTest : VimTestCase() {
         "They have red windows.\n" +
         "Good."
     )
-    typeText(parseKeys("www", "<C-V>ec", "blue", "<Esc>", "j0w.", "j0ww."))
+    typeText(injector.parser.parseKeys("www" + "<C-V>ec" + "blue" + "<Esc>" + "j0w." + "j0ww."))
     assertState(
       "There is a blue house.\n" +
         "Another blue house there.\n" +

@@ -21,8 +21,8 @@
 package org.jetbrains.plugins.ideavim.action.change.delete
 
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import org.jetbrains.plugins.ideavim.OptionValueType
@@ -309,7 +309,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test delete visual lines end action`() {
     typeTextInFile(
-      parseKeys("v", "2j", "D"),
+      injector.parser.parseKeys("v" + "2j" + "D"),
       """
                     a${c}bcde
                     abcde
@@ -498,7 +498,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test line delete visual lines end action`() {
     typeTextInFile(
-      parseKeys("V", "2j", "D"),
+      injector.parser.parseKeys("V" + "2j" + "D"),
       """
                     a${c}bcde
                     abcde
@@ -650,7 +650,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
   @VimOptionDefaultAll
   fun `test delete visual block line end action`() {
     typeTextInFile(
-      parseKeys("<C-V>", "2j", "2l", "D"),
+      injector.parser.parseKeys("<C-V>" + "2j" + "2l" + "D"),
       """
                     abcde
                     a${c}bcde

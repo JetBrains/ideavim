@@ -19,7 +19,7 @@ package com.maddyhome.idea.vim.key
 
 import com.google.common.collect.HashMultiset
 import com.google.common.collect.Multiset
-import com.maddyhome.idea.vim.common.CommonStringHelper
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.extension.VimExtensionHandler
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import java.util.function.Consumer
@@ -56,7 +56,7 @@ class KeyMapping : Iterable<List<KeyStroke?>?>, KeyMappingLayer {
         val mappingInfo = myKeys[keys]
         if (mappingInfo != null) return mappingInfo
         if (keyStrokes.size > 3) {
-            if (keyStrokes[0].keyCode == CommonStringHelper.VK_ACTION && keyStrokes[1].keyChar == '(' && keyStrokes[keyStrokes.size - 1].keyChar == ')') {
+            if (keyStrokes[0].keyCode == injector.parser.actionKeyStroke.keyCode && keyStrokes[1].keyChar == '(' && keyStrokes[keyStrokes.size - 1].keyChar == ')') {
                 val builder = StringBuilder()
                 for (i in 2 until keyStrokes.size - 1) {
                     builder.append(keyStrokes[i].keyChar)
@@ -156,7 +156,7 @@ class KeyMapping : Iterable<List<KeyStroke?>?>, KeyMappingLayer {
         if (myPrefixes.contains(keys)) return true
         val firstChar = keyList[0].keyCode
         val lastChar = keyList[keyList.size - 1].keyChar
-        return firstChar == CommonStringHelper.VK_ACTION && lastChar != ')'
+        return firstChar == injector.parser.actionKeyStroke.keyCode && lastChar != ')'
     }
 
     fun hasmapto(toKeys: List<KeyStroke?>): Boolean {

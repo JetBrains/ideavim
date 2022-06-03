@@ -24,6 +24,7 @@ import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.api.ExecutionContext;
 import com.maddyhome.idea.vim.api.VimCaret;
 import com.maddyhome.idea.vim.api.VimEditor;
+import com.maddyhome.idea.vim.api.VimInjectorKt;
 import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.common.MappingMode;
 import com.maddyhome.idea.vim.common.TextRange;
@@ -44,7 +45,6 @@ import java.util.EnumSet;
 import static com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping;
 import static com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping;
 import static com.maddyhome.idea.vim.group.visual.VisualGroupKt.vimSetSelection;
-import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
 
 /**
  * Port of vim-indent-object:
@@ -74,16 +74,16 @@ public class VimIndentObject implements VimExtension {
 
   @Override
   public void init() {
-    putExtensionHandlerMapping(MappingMode.XO, parseKeys("<Plug>textobj-indent-ai"), getOwner(),
-      new IndentObject(true, false), false);
-    putExtensionHandlerMapping(MappingMode.XO, parseKeys("<Plug>textobj-indent-aI"), getOwner(),
+    putExtensionHandlerMapping(MappingMode.XO, VimInjectorKt.getInjector().getParser().parseKeys("<Plug>textobj-indent-ai"), getOwner(),
+                               new IndentObject(true, false), false);
+    putExtensionHandlerMapping(MappingMode.XO, VimInjectorKt.getInjector().getParser().parseKeys("<Plug>textobj-indent-aI"), getOwner(),
       new IndentObject(true, true), false);
-    putExtensionHandlerMapping(MappingMode.XO, parseKeys("<Plug>textobj-indent-ii"), getOwner(),
+    putExtensionHandlerMapping(MappingMode.XO, VimInjectorKt.getInjector().getParser().parseKeys("<Plug>textobj-indent-ii"), getOwner(),
       new IndentObject(false, false), false);
 
-    putKeyMapping(MappingMode.XO, parseKeys("ai"), getOwner(), parseKeys("<Plug>textobj-indent-ai"), true);
-    putKeyMapping(MappingMode.XO, parseKeys("aI"), getOwner(), parseKeys("<Plug>textobj-indent-aI"), true);
-    putKeyMapping(MappingMode.XO, parseKeys("ii"), getOwner(), parseKeys("<Plug>textobj-indent-ii"), true);
+    putKeyMapping(MappingMode.XO, VimInjectorKt.getInjector().getParser().parseKeys("ai"), getOwner(), VimInjectorKt.getInjector().getParser().parseKeys("<Plug>textobj-indent-ai"), true);
+    putKeyMapping(MappingMode.XO, VimInjectorKt.getInjector().getParser().parseKeys("aI"), getOwner(), VimInjectorKt.getInjector().getParser().parseKeys("<Plug>textobj-indent-aI"), true);
+    putKeyMapping(MappingMode.XO, VimInjectorKt.getInjector().getParser().parseKeys("ii"), getOwner(), VimInjectorKt.getInjector().getParser().parseKeys("<Plug>textobj-indent-ii"), true);
   }
 
   static class IndentObject implements VimExtensionHandler {

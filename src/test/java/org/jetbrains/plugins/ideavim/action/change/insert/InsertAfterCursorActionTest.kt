@@ -18,7 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.action.change.insert
 
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -30,7 +30,7 @@ class InsertAfterCursorActionTest : VimTestCase() {
     // Inlay is at vp 13. Preceding text is at 12. Caret should be between preceding and inlay = 13
     // I found it in|:<inlay> a legendary land
     addInlay(13, true, 5)
-    typeText(parseKeys("a"))
+    typeText(injector.parser.parseKeys("a"))
     assertVisualPosition(0, 13)
   }
 
@@ -40,7 +40,7 @@ class InsertAfterCursorActionTest : VimTestCase() {
     // Inlay is at offset 11, following text is at vp 12
     // I found it <inlay>:|in a legendary land
     addInlay(11, false, 5)
-    typeText(parseKeys("a"))
+    typeText(injector.parser.parseKeys("a"))
     assertVisualPosition(0, 12)
   }
 }

@@ -22,10 +22,10 @@ import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.KeyboardShortcut
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.MessageHelper
-import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import java.util.*
@@ -45,7 +45,7 @@ data class ActionListCommand(val ranges: Ranges, val argument: String) : Command
       .sortedWith(String.CASE_INSENSITIVE_ORDER)
       .map { actionName ->
         val shortcuts = actionManager.getAction(actionName).shortcutSet.shortcuts.joinToString(" ") {
-          if (it is KeyboardShortcut) StringHelper.toKeyNotation(it.firstKeyStroke) else it.toString()
+          if (it is KeyboardShortcut) injector.parser.toKeyNotation(it.firstKeyStroke) else it.toString()
         }
         if (shortcuts.isBlank()) actionName else "${actionName.padEnd(50)} $shortcuts"
       }

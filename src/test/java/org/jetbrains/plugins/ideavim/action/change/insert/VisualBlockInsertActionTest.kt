@@ -21,8 +21,8 @@ package org.jetbrains.plugins.ideavim.action.change.insert
 import com.intellij.codeInsight.daemon.impl.HintRenderer
 import com.intellij.codeInsight.folding.CodeFoldingManager
 import com.intellij.codeInsight.folding.impl.FoldingUtil
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -46,7 +46,7 @@ bar
       FoldingUtil.findFoldRegionStartingAtLine(myFixture.editor, 0)!!.isExpanded = false
     }
 
-    typeText(parseKeys("j", "<C-V>", "j", "I", "X", "<Esc>"))
+    typeText(injector.parser.parseKeys("j" + "<C-V>" + "j" + "I" + "X" + "<Esc>"))
     assertState(
       """/**
  * Something to fold.
@@ -109,7 +109,7 @@ Xbar
             int b;
             int c;
     """.trimIndent()
-    typeTextInFile(parseKeys("<C-V>", "2j", "I", "const ", "<Esc>"), before)
+    typeTextInFile(injector.parser.parseKeys("<C-V>" + "2j" + "I" + "const " + "<Esc>"), before)
     val after = """
             ${c}const int a;
             const int b;
@@ -179,7 +179,7 @@ Xbar
                 hard by the torrent of a mountain pass.
                     """
     doTest(
-      parseKeys("<C-V>", "jjI", " Hello ", "<ESC>"),
+      injector.parser.parseKeys("<C-V>" + "jjI" + " Hello " + "<ESC>"),
       before.trimIndent(),
       """
                 A Discovery

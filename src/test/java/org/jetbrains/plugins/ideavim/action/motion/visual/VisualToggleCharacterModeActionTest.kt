@@ -21,8 +21,8 @@
 package org.jetbrains.plugins.ideavim.action.motion.visual
 
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.helper.vimSelectionStart
 import com.maddyhome.idea.vim.options.OptionConstants
@@ -44,7 +44,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.
     """.trimIndent()
     configureByText(before)
-    typeText(parseKeys("v"))
+    typeText(injector.parser.parseKeys("v"))
     val startOffset = (before rangeOf "found").startOffset
     assertEquals(startOffset, myFixture.editor.caretModel.primaryCaret.vimSelectionStart)
   }
@@ -59,7 +59,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.
     """.trimIndent()
     configureByText(before)
-    typeText(parseKeys("vl"))
+    typeText(injector.parser.parseKeys("vl"))
     val startOffset = (before rangeOf "found").startOffset
     assertEquals(startOffset, myFixture.editor.caretModel.primaryCaret.vimSelectionStart)
   }
@@ -74,7 +74,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.
     """.trimIndent()
     configureByText(before)
-    typeText(parseKeys("vl"))
+    typeText(injector.parser.parseKeys("vl"))
     val startOffset1 = (before rangeOf "found").startOffset
     val startOffset2 = (before rangeOf "settled").startOffset
     assertEquals(startOffset1, myFixture.editor.caretModel.allCarets[0].vimSelectionStart)
@@ -91,7 +91,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.
     """.trimIndent()
     configureByText(before)
-    typeText(parseKeys("v2e"))
+    typeText(injector.parser.parseKeys("v2e"))
     val startOffset1 = (before rangeOf "legendary").startOffset
     val startOffset2 = (before rangeOf "settled").startOffset
     assertEquals(startOffset1, myFixture.editor.caretModel.allCarets[0].vimSelectionStart)
@@ -108,7 +108,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.
     """.trimIndent()
     configureByText(before)
-    typeText(parseKeys("v2b"))
+    typeText(injector.parser.parseKeys("v2b"))
     val startOffset1 = (before rangeOf "legendary").startOffset
     val startOffset2 = (before rangeOf "settled").startOffset
     assertEquals(startOffset1, myFixture.editor.caretModel.allCarets[0].vimSelectionStart)
@@ -731,7 +731,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
       """.trimIndent()
     )
     VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.selectmodeName, VimString("cmd"))
-    typeText(parseKeys("v"))
+    typeText(injector.parser.parseKeys("v"))
     assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
   }
 }

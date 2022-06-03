@@ -19,9 +19,9 @@
 package org.jetbrains.plugins.ideavim.extension.exchange
 
 import com.intellij.openapi.editor.markup.HighlighterTargetArea
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.extension.exchange.VimExchangeExtension
-import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.options.OptionConstants
 import org.jetbrains.plugins.ideavim.OptionValueType
@@ -267,7 +267,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
          the lazy dog
     """.trimIndent()
     configureByText(before)
-    typeText(StringHelper.parseKeys("vlll", "X"))
+    typeText(injector.parser.parseKeys("vlll" + "X"))
 
     assertHighlighter(4, 8, HighlighterTargetArea.EXACT_RANGE)
 
@@ -284,7 +284,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
          the lazy dog
     """.trimIndent()
     configureByText(before)
-    typeText(StringHelper.parseKeys("Vj", "X"))
+    typeText(injector.parser.parseKeys("Vj" + "X"))
 
     assertHighlighter(4, 15, HighlighterTargetArea.LINES_IN_RANGE)
 
@@ -299,7 +299,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
          brown fox
     """.trimIndent()
     configureByText(before)
-    typeText(StringHelper.parseKeys("v$", "X"))
+    typeText(injector.parser.parseKeys("v$" + "X"))
 
     assertHighlighter(4, 10, HighlighterTargetArea.EXACT_RANGE)
 
@@ -314,7 +314,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
          brown fox
     """.trimIndent()
     configureByText(before)
-    typeText(StringHelper.parseKeys("v\$h", "X"))
+    typeText(injector.parser.parseKeys("v\$h" + "X"))
 
     assertHighlighter(4, 9, HighlighterTargetArea.EXACT_RANGE)
 
@@ -329,7 +329,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
          brown fox
     """.trimIndent()
     configureByText(before)
-    typeText(StringHelper.parseKeys("v\$hh", "X"))
+    typeText(injector.parser.parseKeys("v\$hh" + "X"))
 
     assertHighlighter(4, 8, HighlighterTargetArea.EXACT_RANGE)
 
@@ -344,7 +344,10 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
          brown ${c}fox
     """.trimIndent()
     configureByText(before)
-    typeText(StringHelper.parseKeys("v\$", "X"))
+    typeText(injector.parser.parseKeys(buildString {
+        append("v\$")
+        append("X")
+    }))
 
     assertHighlighter(16, 19, HighlighterTargetArea.EXACT_RANGE)
 
@@ -360,7 +363,10 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
          
     """.trimIndent()
     configureByText(before)
-    typeText(StringHelper.parseKeys("v\$", "X"))
+    typeText(injector.parser.parseKeys(buildString {
+        append("v\$")
+        append("X")
+    }))
 
     assertHighlighter(16, 20, HighlighterTargetArea.EXACT_RANGE)
 
@@ -369,7 +375,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
   }
 
   private fun exitExchange() {
-    typeText(StringHelper.parseKeys("cxc"))
+    typeText(injector.parser.parseKeys("cxc"))
   }
 
   private fun assertHighlighter(start: Int, end: Int, area: HighlighterTargetArea) {

@@ -19,7 +19,7 @@
 package org.jetbrains.plugins.ideavim.action.scroll
 
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
@@ -44,7 +44,7 @@ class ScrollHalfPageUpActionTest : VimTestCase() {
   fun`test scroll half window upwards keeps cursor on same relative line`() {
     configureByPages(5)
     setPositionAndScroll(50, 60)
-    typeText(parseKeys("<C-U>"))
+    typeText(injector.parser.parseKeys("<C-U>"))
     assertPosition(43, 0)
     assertVisibleArea(33, 67)
   }
@@ -53,7 +53,7 @@ class ScrollHalfPageUpActionTest : VimTestCase() {
   fun`test scroll upwards on first line causes beep`() {
     configureByPages(5)
     setPositionAndScroll(0, 0)
-    typeText(parseKeys("<C-U>"))
+    typeText(injector.parser.parseKeys("<C-U>"))
     assertPosition(0, 0)
     assertVisibleArea(0, 34)
     assertTrue(VimPlugin.isError())
@@ -63,7 +63,7 @@ class ScrollHalfPageUpActionTest : VimTestCase() {
   fun`test scroll upwards in first half of first page moves to first line`() {
     configureByPages(5)
     setPositionAndScroll(5, 10)
-    typeText(parseKeys("<C-U>"))
+    typeText(injector.parser.parseKeys("<C-U>"))
     assertPosition(0, 0)
     assertVisibleArea(0, 34)
   }
@@ -73,7 +73,7 @@ class ScrollHalfPageUpActionTest : VimTestCase() {
     VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
     configureByPages(5)
     setPositionAndScroll(5, 15)
-    typeText(parseKeys("<C-U>"))
+    typeText(injector.parser.parseKeys("<C-U>"))
     assertPosition(0, 0)
     assertVisibleArea(0, 34)
   }
@@ -82,7 +82,7 @@ class ScrollHalfPageUpActionTest : VimTestCase() {
   fun`test scroll count lines upwards`() {
     configureByPages(5)
     setPositionAndScroll(50, 53)
-    typeText(parseKeys("10<C-U>"))
+    typeText(injector.parser.parseKeys("10<C-U>"))
     assertPosition(43, 0)
     assertVisibleArea(40, 74)
   }
@@ -91,7 +91,7 @@ class ScrollHalfPageUpActionTest : VimTestCase() {
   fun`test scroll count modifies scroll option`() {
     configureByPages(5)
     setPositionAndScroll(50, 53)
-    typeText(parseKeys("10<C-U>"))
+    typeText(injector.parser.parseKeys("10<C-U>"))
     assertEquals((VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, OptionConstants.scrollName) as VimInt).value, 10)
   }
 
@@ -100,7 +100,7 @@ class ScrollHalfPageUpActionTest : VimTestCase() {
     VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrollName, VimInt(10))
     configureByPages(5)
     setPositionAndScroll(50, 53)
-    typeText(parseKeys("<C-U>"))
+    typeText(injector.parser.parseKeys("<C-U>"))
     assertPosition(43, 0)
     assertVisibleArea(40, 74)
   }
@@ -109,7 +109,7 @@ class ScrollHalfPageUpActionTest : VimTestCase() {
   fun`test count scroll upwards is limited to a single page`() {
     configureByPages(5)
     setPositionAndScroll(100, 134)
-    typeText(parseKeys("50<C-U>"))
+    typeText(injector.parser.parseKeys("50<C-U>"))
     assertPosition(99, 0)
     assertVisibleArea(65, 99)
   }
@@ -118,7 +118,7 @@ class ScrollHalfPageUpActionTest : VimTestCase() {
   fun`test scroll up puts cursor on first non-blank column`() {
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(50, 60, 14)
-    typeText(parseKeys("<C-U>"))
+    typeText(injector.parser.parseKeys("<C-U>"))
     assertPosition(43, 4)
     assertVisibleArea(33, 67)
   }
@@ -128,7 +128,7 @@ class ScrollHalfPageUpActionTest : VimTestCase() {
     VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.startoflineName)
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(50, 60, 14)
-    typeText(parseKeys("<C-U>"))
+    typeText(injector.parser.parseKeys("<C-U>"))
     assertPosition(43, 14)
     assertVisibleArea(33, 67)
   }

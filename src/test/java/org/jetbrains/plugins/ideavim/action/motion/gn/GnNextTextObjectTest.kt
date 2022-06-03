@@ -21,9 +21,9 @@
 package org.jetbrains.plugins.ideavim.action.motion.gn
 
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.common.Direction
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -33,7 +33,7 @@ class GnNextTextObjectTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test delete word`() {
     doTestWithSearch(
-      parseKeys("dgn"),
+      injector.parser.parseKeys("dgn"),
       """
       Hello, ${c}this is a test here
       """.trimIndent(),
@@ -46,7 +46,7 @@ class GnNextTextObjectTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test delete second word`() {
     doTestWithSearch(
-      parseKeys("2dgn"),
+      injector.parser.parseKeys("2dgn"),
       """
       Hello, ${c}this is a test here
       Hello, this is a test here
@@ -61,7 +61,7 @@ class GnNextTextObjectTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test with repeat`() {
     doTestWithSearch(
-      parseKeys("cgnNewValue<ESC>..."),
+      injector.parser.parseKeys("cgnNewValue<ESC>..."),
       """
       Hello, ${c}this is a test here
       Hello, this is a test here

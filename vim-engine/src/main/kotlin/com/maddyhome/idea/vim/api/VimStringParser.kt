@@ -1,6 +1,7 @@
 package com.maddyhome.idea.vim.api
 
 import org.jetbrains.annotations.NonNls
+import java.util.*
 import javax.swing.KeyStroke
 
 interface VimStringParser {
@@ -8,6 +9,10 @@ interface VimStringParser {
    * Fake key for `<Plug>` mappings
    */
   val plugKeyStroke: KeyStroke
+  /**
+   * Fake key for `<Action>` mappings
+   */
+  val actionKeyStroke: KeyStroke
 
   /**
    * Parses Vim key notation strings.
@@ -15,12 +20,7 @@ interface VimStringParser {
    *
    * @throws java.lang.IllegalArgumentException if the mapping doesn't make sense for Vim emulation
    */
-  fun parseKeys(@NonNls vararg strings: String): List<KeyStroke>
-
-  /**
-   *
-   */
-  fun parseKeysSet(@NonNls vararg keys: String): Set<List<KeyStroke>>
+  fun parseKeys(@NonNls string: String): List<KeyStroke>
 
   /**
    * Transforms string of regular and control characters (e.g. "ihello") to list of keystrokes

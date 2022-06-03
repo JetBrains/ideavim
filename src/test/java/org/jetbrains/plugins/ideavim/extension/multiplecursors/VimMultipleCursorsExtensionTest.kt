@@ -18,8 +18,8 @@
 
 package org.jetbrains.plugins.ideavim.extension.multiplecursors
 
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.newapi.vim
@@ -53,7 +53,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
 }"""
     configureByJavaText(before)
 
-    typeText(parseKeys("<A-n>".repeat(3)))
+    typeText(injector.parser.parseKeys("<A-n>".repeat(3)))
 
     val after = """public class ChangeLineAction extends EditorAction {
   public ChangeLineAction() {
@@ -93,7 +93,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
 }"""
     configureByJavaText(before)
 
-    typeText(parseKeys("<A-n>".repeat(6)))
+    typeText(injector.parser.parseKeys("<A-n>".repeat(6)))
 
     val after = """public class ChangeLineAction extends EditorAction {
   public ChangeLineAction() {
@@ -126,7 +126,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     """.trimMargin()
     configureByText(before)
 
-    typeText(parseKeys("g<A-n>", "<A-n>".repeat(before.count { it == '\n' } - 1)))
+    typeText(injector.parser.parseKeys("g<A-n>" + "<A-n>".repeat(before.count { it == '\n' } - 1)))
 
     val after = """${s}Int$se
       |Integer
@@ -148,7 +148,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     """.trimMargin()
     configureByText(before)
 
-    typeText(parseKeys("g<A-n>".repeat(3)))
+    typeText(injector.parser.parseKeys("g<A-n>".repeat(3)))
 
     val after = """${s}qwe$se
       |asd${s}qwe${se}asd
@@ -169,7 +169,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     """.trimMargin()
     configureByText(before)
 
-    typeText(parseKeys("<A-n>".repeat(4)))
+    typeText(injector.parser.parseKeys("<A-n>".repeat(4)))
 
     val after = """${s}qwe$se
       |asd
@@ -191,7 +191,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     """.trimMargin()
     configureByText(before)
 
-    typeText(parseKeys("<A-n>"))
+    typeText(injector.parser.parseKeys("<A-n>"))
     assertState(before)
   }
 
@@ -205,7 +205,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     """.trimMargin()
     configureByText(before)
 
-    typeText(parseKeys("<Plug>AllWholeOccurrences"))
+    typeText(injector.parser.parseKeys("<Plug>AllWholeOccurrences"))
 
     val after = """${s}qwe$se
       |asd
@@ -228,7 +228,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     """.trimMargin()
     configureByText(before)
 
-    typeText(parseKeys("<Plug>AllOccurrences"))
+    typeText(injector.parser.parseKeys("<Plug>AllOccurrences"))
     val after = """${s}Int$se
       |${s}Int${se}eger
       |${s}Int$se
@@ -254,7 +254,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     """.trimMargin()
     configureByText(before)
 
-    typeText(parseKeys("<Plug>AllOccurrences"))
+    typeText(injector.parser.parseKeys("<Plug>AllOccurrences"))
 
     val after = before.replace("z${c}xc", "${s}zxc$se")
     assertState(after)
@@ -277,7 +277,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     val editor = configureByText(before)
     editor.vim.commandState.pushModes(CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
 
-    typeText(parseKeys("<A-p>"))
+    typeText(injector.parser.parseKeys("<A-p>"))
 
     val after = """qwe
       |dsgkldfjs ldfl gkjsdsl kj
@@ -295,7 +295,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     """.trimMargin()
     configureByText(before)
 
-    typeText(parseKeys("g<A-n>", "<A-n>".repeat(2), "<A-p>"))
+    typeText(injector.parser.parseKeys("g<A-n>" + "<A-n>".repeat(2) + "<A-p>"))
 
     val after = """${s}Int$se
       |kek${s}Int${se}eger
@@ -314,7 +314,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     """.trimMargin()
     configureByJavaText(before)
 
-    typeText(parseKeys("<A-n>", "<A-n>".repeat(3), "<A-p>"))
+    typeText(injector.parser.parseKeys("<A-n>" + "<A-n>".repeat(3) + "<A-p>"))
 
     val after = """private ${s}int$se a = 0;
       |private ${s}int$se b = 1;
@@ -333,7 +333,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     """.trimMargin()
     configureByJavaText(before)
 
-    typeText(parseKeys("<A-n>", "<A-x>", "<A-n>"))
+    typeText(injector.parser.parseKeys("<A-n>" + "<A-x>" + "<A-n>"))
 
     val after = """private int a = 0;
       |${s}private$se int b = 1;
@@ -351,7 +351,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     """.trimMargin()
     configureByJavaText(before)
 
-    typeText(parseKeys("<A-n>", "<A-x>", "<A-n>".repeat(3)))
+    typeText(injector.parser.parseKeys("<A-n>" + "<A-x>" + "<A-n>".repeat(3)))
 
     val after = """${s}private$se int a = 0;
       |${s}private$se int b = 1;
@@ -377,7 +377,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     """.trimMargin()
     configureByJavaText(before)
 
-    typeText(parseKeys("<A-n>", "<A-x>", "<A-n>", "<A-n>", "<A-n>", "<A-p>", "<A-n>", "<A-x>"))
+    typeText(injector.parser.parseKeys("<A-n>" + "<A-x>" + "<A-n>" + "<A-n>" + "<A-n>" + "<A-p>" + "<A-n>" + "<A-x>"))
 
     val after = """public class Main {
       |  public static void main(String[] args) {
@@ -394,7 +394,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
 
     assertState(after)
 
-    typeText(parseKeys("<Esc>"))
+    typeText(injector.parser.parseKeys("<Esc>"))
     val afterEscape = """public class Main {
       |  public static void main(String[] args) {
       |    final Integer a = 0;
@@ -411,7 +411,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     assertMode(CommandState.Mode.COMMAND)
     assertState(afterEscape)
 
-    typeText(parseKeys("I", "@NotNull ", "<Esc>"))
+    typeText(injector.parser.parseKeys("I" + "@NotNull " + "<Esc>"))
     assertMode(CommandState.Mode.COMMAND)
     val afterInsert = """public class Main {
       |  public static void main(String[] args) {
@@ -440,11 +440,11 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     """.trimMargin()
     configureByText(before)
 
-    typeText(parseKeys("<A-n>".repeat(3)))
+    typeText(injector.parser.parseKeys("<A-n>".repeat(3)))
     assertMode(CommandState.Mode.VISUAL)
-    typeText(parseKeys("<A-p>".repeat(3)))
+    typeText(injector.parser.parseKeys("<A-p>".repeat(3)))
     assertMode(CommandState.Mode.COMMAND)
-    typeText(parseKeys("<A-n>".repeat(2)))
+    typeText(injector.parser.parseKeys("<A-n>".repeat(2)))
 
     val after = """${s}qwe$se
       |asd
@@ -465,7 +465,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     """.trimMargin()
     configureByText(before)
 
-    typeText(parseKeys("g<A-n>", "<A-x>", "<A-n>".repeat(2)))
+    typeText(injector.parser.parseKeys("g<A-n>" + "<A-x>" + "<A-n>".repeat(2)))
 
     val after = """qwe
       |asd${s}qwe${se}asd
@@ -486,7 +486,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     val editor = configureByText(before)
     editor.vim.commandState.pushModes(CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
 
-    typeText(parseKeys("<A-x>"))
+    typeText(injector.parser.parseKeys("<A-x>"))
     assertMode(CommandState.Mode.VISUAL)
     assertState(before)
   }
@@ -499,7 +499,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     """.trimMargin()
     configureByText(before)
 
-    typeText(parseKeys("vjl", "<A-n>"))
+    typeText(injector.parser.parseKeys("vjl" + "<A-n>"))
     val after = """jdfsg sdf${c}dfkgjhfkgkldfjsg
                         |dfkjghdfs${c}gs
                         |dflsgsdfgh""".trimMargin()
@@ -523,7 +523,7 @@ fun getCellType(${c}pos: VisualPosition): CellType {
     configureByText(before)
 
     typeText(commandToKeys("set ignorecase"))
-    typeText(parseKeys("g<A-n><A-n><A-n>"))
+    typeText(injector.parser.parseKeys("g<A-n><A-n><A-n>"))
     val after = """@TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
 fun getCellType(${s}pos$se: VisualPosition): CellType {
     if (${s}pos$se in snakeCells) {
@@ -563,7 +563,7 @@ fun getCellType(${s}pos$se: VisualPosition): CellType {
     configureByText(before)
 
     typeText(commandToKeys("set ignorecase"))
-    typeText(parseKeys("<A-n><A-n><A-n><A-n>"))
+    typeText(injector.parser.parseKeys("<A-n><A-n><A-n><A-n>"))
     val after = """test ${s}Test$se tEst TeSt tEST ${s}Test$se test ${s}Test$se test"""
     assertState(after)
   }
@@ -574,7 +574,7 @@ fun getCellType(${s}pos$se: VisualPosition): CellType {
     val editor = configureByText(before)
     editor.vim.commandState.pushModes(CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
 
-    typeText(parseKeys("<A-n><A-n>"))
+    typeText(injector.parser.parseKeys("<A-n><A-n>"))
     val after = "test ${s}t.*st$se toast tallest ${s}t.*st$se"
     assertState(after)
   }

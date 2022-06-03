@@ -23,6 +23,7 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.MappingMode
@@ -38,7 +39,6 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.setOperatorFunction
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setRegister
 import com.maddyhome.idea.vim.extension.VimExtensionHandler
 import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.newapi.IjVimCaret
@@ -66,17 +66,17 @@ class VimSurroundExtension : VimExtension {
   private val NO_MAPPINGS = "surround_no_mappings"
 
   override fun init() {
-    putExtensionHandlerMapping(MappingMode.N, StringHelper.parseKeys("<Plug>YSurround"), owner, YSurroundHandler(), false)
-    putExtensionHandlerMapping(MappingMode.N, StringHelper.parseKeys("<Plug>CSurround"), owner, CSurroundHandler(), false)
-    putExtensionHandlerMapping(MappingMode.N, StringHelper.parseKeys("<Plug>DSurround"), owner, DSurroundHandler(), false)
-    putExtensionHandlerMapping(MappingMode.XO, StringHelper.parseKeys("<Plug>VSurround"), owner, VSurroundHandler(), false)
+    putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys("<Plug>YSurround"), owner, YSurroundHandler(), false)
+    putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys("<Plug>CSurround"), owner, CSurroundHandler(), false)
+    putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys("<Plug>DSurround"), owner, DSurroundHandler(), false)
+    putExtensionHandlerMapping(MappingMode.XO, injector.parser.parseKeys("<Plug>VSurround"), owner, VSurroundHandler(), false)
 
     val noMappings = VimPlugin.getVariableService().getGlobalVariableValue(NO_MAPPINGS)?.asBoolean() ?: false
     if (!noMappings) {
-      putKeyMappingIfMissing(MappingMode.N, StringHelper.parseKeys("ys"), owner, StringHelper.parseKeys("<Plug>YSurround"), true)
-      putKeyMappingIfMissing(MappingMode.N, StringHelper.parseKeys("cs"), owner, StringHelper.parseKeys("<Plug>CSurround"), true)
-      putKeyMappingIfMissing(MappingMode.N, StringHelper.parseKeys("ds"), owner, StringHelper.parseKeys("<Plug>DSurround"), true)
-      putKeyMappingIfMissing(MappingMode.XO, StringHelper.parseKeys("S"), owner, StringHelper.parseKeys("<Plug>VSurround"), true)
+      putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("ys"), owner, injector.parser.parseKeys("<Plug>YSurround"), true)
+      putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("cs"), owner, injector.parser.parseKeys("<Plug>CSurround"), true)
+      putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("ds"), owner, injector.parser.parseKeys("<Plug>DSurround"), true)
+      putKeyMappingIfMissing(MappingMode.XO, injector.parser.parseKeys("S"), owner, injector.parser.parseKeys("<Plug>VSurround"), true)
     }
   }
 
@@ -85,7 +85,7 @@ class VimSurroundExtension : VimExtension {
 
     override fun execute(editor: VimEditor, context: ExecutionContext) {
       setOperatorFunction(Operator())
-      executeNormalWithoutMapping(StringHelper.parseKeys("g@"), editor.ij)
+      executeNormalWithoutMapping(injector.parser.parseKeys("g@"), editor.ij)
     }
   }
 
@@ -98,7 +98,7 @@ class VimSurroundExtension : VimExtension {
       }
       runWriteAction {
         // Leave visual mode
-        executeNormalWithoutMapping(StringHelper.parseKeys("<Esc>"), editor.ij)
+        executeNormalWithoutMapping(injector.parser.parseKeys("<Esc>"), editor.ij)
         editor.ij.caretModel.moveToOffset(selectionStart)
       }
     }
@@ -129,19 +129,19 @@ class VimSurroundExtension : VimExtension {
         perform("da" + pick(charFrom), editor)
         // Insert the surrounding characters and paste
         if (newSurround != null) {
-          innerValue.addAll(0, StringHelper.parseKeys(newSurround.first))
-          innerValue.addAll(StringHelper.parseKeys(newSurround.second))
+          innerValue.addAll(0, injector.parser.parseKeys(newSurround.first))
+          innerValue.addAll(injector.parser.parseKeys(newSurround.second))
         }
         pasteSurround(innerValue, editor)
         // Restore the old value
         setRegister(REGISTER, oldValue)
         // Jump back to start
-        executeNormalWithoutMapping(StringHelper.parseKeys("`["), editor)
+        executeNormalWithoutMapping(injector.parser.parseKeys("`["), editor)
       }
 
       private fun perform(sequence: String, editor: Editor) {
         ClipboardOptionHelper.IdeaputDisabler()
-          .use { executeNormalWithoutMapping(StringHelper.parseKeys("\"" + REGISTER + sequence), editor) }
+          .use { executeNormalWithoutMapping(injector.parser.parseKeys("\"" + REGISTER + sequence), editor) }
       }
 
       private fun pasteSurround(
@@ -194,7 +194,7 @@ class VimSurroundExtension : VimExtension {
         change.insertText(IjVimEditor(editor), IjVimCaret(primaryCaret), range.startOffset, leftSurround)
         change.insertText(IjVimEditor(editor), IjVimCaret(primaryCaret), range.endOffset + leftSurround.length, pair.second)
         // Jump back to start
-        executeNormalWithoutMapping(StringHelper.parseKeys("`["), editor)
+        executeNormalWithoutMapping(injector.parser.parseKeys("`["), editor)
       }
       return true
     }

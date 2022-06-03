@@ -25,7 +25,6 @@ import com.maddyhome.idea.vim.api.VimLogicalPosition
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.common.CommonStringHelper.stringToKeys
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.helper.mode
@@ -79,7 +78,7 @@ data class NormalCommand(val ranges: Ranges, val argument: String) : Command.Sin
       }
 
       // Perform operations
-      val keys = stringToKeys(argument)
+      val keys = injector.parser.stringToKeys(argument)
       val keyHandler = KeyHandler.getInstance()
       keyHandler.reset(editor)
       for (key in keys) {

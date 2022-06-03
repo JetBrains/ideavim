@@ -29,8 +29,6 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.command.SelectionType.Companion.fromSubMode
-import com.maddyhome.idea.vim.common.CommonStringHelper.parseKeys
-import com.maddyhome.idea.vim.common.CommonStringHelper.toKeyNotation
 import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.common.argumentCaptured
 import com.maddyhome.idea.vim.common.offset
@@ -94,7 +92,7 @@ class ToKeysMappingInfo(
   isRecursive: Boolean,
   owner: MappingOwner,
 ) : MappingInfo(fromKeys, isRecursive, owner) {
-  override fun getPresentableString(): String = toKeyNotation(toKeys)
+  override fun getPresentableString(): String = injector.parser.toKeyNotation(toKeys)
 
   override fun execute(editor: VimEditor, context: ExecutionContext) {
     LOG.debug("Executing 'ToKeys' mapping info...")
@@ -126,7 +124,7 @@ class ToExpressionMappingInfo(
   override fun execute(editor: VimEditor, context: ExecutionContext) {
     LOG.debug("Executing 'ToExpression' mapping info...")
     val editorDataContext = injector.executionContextManager.onEditor(editor, context)
-    val toKeys = parseKeys(toExpression.evaluate(editor, context, CommandLineVimLContext).toString())
+    val toKeys = injector.parser.parseKeys(toExpression.evaluate(editor, context, CommandLineVimLContext).toString())
     val fromIsPrefix = KeyHandler.isPrefix(fromKeys, toKeys)
     var first = true
     for (keyStroke in toKeys) {

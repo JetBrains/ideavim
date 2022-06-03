@@ -19,7 +19,7 @@
 package org.jetbrains.plugins.ideavim.action
 
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -28,27 +28,27 @@ import org.jetbrains.plugins.ideavim.waitAndAssert
 class MacroWithEditingTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test print macro`() {
-    typeTextInFile(parseKeys("qa", "iHello<Esc>", "q"), "")
+    typeTextInFile(injector.parser.parseKeys("qa" + "iHello<Esc>" + "q"), "")
     setText("")
-    typeText(parseKeys("\"ap"))
+    typeText(injector.parser.parseKeys("\"ap"))
     assertState("iHello" + 27.toChar())
   }
 
   fun `test copy and perform macro`() {
-    typeTextInFile(parseKeys("^v\$h\"wy"), "iHello<Esc>")
+    typeTextInFile(injector.parser.parseKeys("^v\$h\"wy"), "iHello<Esc>")
     assertEquals("iHello<Esc>", VimPlugin.getRegister().getRegister('w')?.rawText)
     setText("")
-    typeText(parseKeys("@w"))
+    typeText(injector.parser.parseKeys("@w"))
     waitAndAssert {
       myFixture.editor.document.text == "Hello"
     }
   }
 
   fun `test copy and perform macro ctrl_a`() {
-    typeTextInFile(parseKeys("^v\$h\"wy"), "<C-A>")
+    typeTextInFile(injector.parser.parseKeys("^v\$h\"wy"), "<C-A>")
     assertEquals("<C-A>", VimPlugin.getRegister().getRegister('w')?.rawText)
     setText("1")
-    typeText(parseKeys("@w"))
+    typeText(injector.parser.parseKeys("@w"))
     waitAndAssert {
       myFixture.editor.document.text == "2"
     }

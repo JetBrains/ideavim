@@ -21,8 +21,8 @@
 package org.jetbrains.plugins.ideavim.action.copy
 
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.SelectionType
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -33,7 +33,7 @@ import javax.swing.KeyStroke
 class YankVisualActionTest : VimTestCase() {
   fun `test simple yank`() {
     doTest(
-      parseKeys("viw", "y"),
+      injector.parser.parseKeys("viw" + "y"),
       """
                             A Discovery
 
@@ -49,7 +49,7 @@ class YankVisualActionTest : VimTestCase() {
   @VimBehaviorDiffers("\n")
   fun `test yank empty line`() {
     doTest(
-      parseKeys("v", "y"),
+      injector.parser.parseKeys("v" + "y"),
       """
                             A Discovery
                             ${c}
@@ -65,7 +65,7 @@ class YankVisualActionTest : VimTestCase() {
   @VimBehaviorDiffers("land\n")
   fun `test yank to the end`() {
     doTest(
-      parseKeys("viwl", "y"),
+      injector.parser.parseKeys("viwl" + "y"),
       """
                             A Discovery
 
@@ -80,7 +80,7 @@ class YankVisualActionTest : VimTestCase() {
 
   fun `test yank multicaret`() {
     doTest(
-      parseKeys("viw", "y"),
+      injector.parser.parseKeys("viw" + "y"),
       """
                             A Discovery
 
@@ -102,14 +102,14 @@ class YankVisualActionTest : VimTestCase() {
 
     """.trimIndent()
     configureByText(before)
-    typeText(parseKeys("vey"))
+    typeText(injector.parser.parseKeys("vey"))
 
     val lastRegister = VimPlugin.getRegister().lastRegister
     TestCase.assertNotNull(lastRegister)
     val text = lastRegister!!.text
     TestCase.assertNotNull(text)
 
-    typeText(parseKeys("G", "$", "p"))
+    typeText(injector.parser.parseKeys("G" + "$" + "p"))
     val after = """
       qwerty
       asdfgh
@@ -123,7 +123,7 @@ class YankVisualActionTest : VimTestCase() {
 
   fun `test yank line`() {
     doTest(
-      parseKeys("V", "y"),
+      injector.parser.parseKeys("V" + "y"),
       """
                             A Discovery
 
@@ -138,7 +138,7 @@ class YankVisualActionTest : VimTestCase() {
 
   fun `test yank last line`() {
     doTest(
-      parseKeys("V", "y"),
+      injector.parser.parseKeys("V" + "y"),
       """
                             A Discovery
 
@@ -153,7 +153,7 @@ class YankVisualActionTest : VimTestCase() {
 
   fun `test yank multicaret line`() {
     doTest(
-      parseKeys("V", "y"),
+      injector.parser.parseKeys("V" + "y"),
       """
                             A Discovery
 
@@ -178,7 +178,7 @@ class YankVisualActionTest : VimTestCase() {
             
     """.trimIndent()
     configureByText(before)
-    typeText(parseKeys("Vy"))
+    typeText(injector.parser.parseKeys("Vy"))
 
     val lastRegister = VimPlugin.getRegister().lastRegister
     TestCase.assertNotNull(lastRegister)
@@ -194,7 +194,7 @@ class YankVisualActionTest : VimTestCase() {
       text
     )
 
-    typeText(parseKeys("p"))
+    typeText(injector.parser.parseKeys("p"))
     val after = """
             qwe
             ${c}qwe
@@ -218,7 +218,7 @@ class YankVisualActionTest : VimTestCase() {
 
   fun `test block yank`() {
     doTest(
-      parseKeys("<C-V>lj", "y"),
+      injector.parser.parseKeys("<C-V>lj" + "y"),
       """
                             A Discovery
 
@@ -233,7 +233,7 @@ class YankVisualActionTest : VimTestCase() {
 
   fun `test block yank with dollar motion`() {
     doTest(
-      parseKeys("<C-V>3j$", "y"),
+      injector.parser.parseKeys("<C-V>3j$" + "y"),
       """
                             A Discovery
 
@@ -254,7 +254,7 @@ class YankVisualActionTest : VimTestCase() {
 
   fun `test block yank with dollar motion backward`() {
     doTest(
-      parseKeys("<C-V>k$", "y"),
+      injector.parser.parseKeys("<C-V>k$" + "y"),
       """
                             A Discovery
 

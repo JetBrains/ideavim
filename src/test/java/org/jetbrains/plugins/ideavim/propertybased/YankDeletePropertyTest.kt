@@ -21,7 +21,7 @@ package org.jetbrains.plugins.ideavim.propertybased
 import com.intellij.ide.IdeEventQueue
 import com.intellij.openapi.editor.Editor
 import com.intellij.testFramework.PlatformTestUtil
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.jetCheck.Generator
 import org.jetbrains.jetCheck.ImperativeCommand
 import org.jetbrains.jetCheck.PropertyChecker
@@ -49,7 +49,7 @@ private class YankDeleteActions(private val editor: Editor) : ImperativeCommand 
     val key = env.generateValue(Generator.sampledFrom(keysList), null)
 
     env.logMessage("Use command: $key")
-    VimTestCase.typeText(parseKeys(key), editor, editor.project)
+    VimTestCase.typeText(injector.parser.parseKeys(key), editor, editor.project)
 
     IdeEventQueue.getInstance().flushQueue()
     PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()

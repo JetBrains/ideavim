@@ -19,14 +19,13 @@
 package org.jetbrains.plugins.ideavim.ex.implementation.commands;
 
 import com.google.common.collect.Lists;
+import com.maddyhome.idea.vim.api.VimInjectorKt;
 import org.jetbrains.plugins.ideavim.SkipNeovimReason;
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
 import javax.swing.*;
 import java.util.List;
-
-import static com.maddyhome.idea.vim.helper.StringHelper.stringToKeys;
 
 /**
  * @author Alex Selesse
@@ -35,7 +34,7 @@ public class SortCommandTest extends VimTestCase {
   public void testBasicSort() {
     configureByText("Test\n" + "Hello World!\n");
     final List<KeyStroke> keys = Lists.newArrayList(KeyStroke.getKeyStroke("control V"));
-    keys.addAll(stringToKeys("$j"));
+    keys.addAll(VimInjectorKt.getInjector().getParser().stringToKeys("$j"));
     typeText(keys);
     typeText(commandToKeys("sort"));
     assertState("Hello World!\n" + "Test\n");
@@ -44,7 +43,7 @@ public class SortCommandTest extends VimTestCase {
   public void testMultipleSortLine() {
     configureByText("zee\nyee\na\nb\n");
     final List<KeyStroke> keys = Lists.newArrayList(KeyStroke.getKeyStroke("control V"));
-    keys.addAll(stringToKeys("$3j"));
+    keys.addAll(VimInjectorKt.getInjector().getParser().stringToKeys("$3j"));
     typeText(keys);
     typeText(commandToKeys("sort"));
     assertState("a\nb\nyee\nzee\n");
@@ -54,7 +53,7 @@ public class SortCommandTest extends VimTestCase {
   public void testInverseSort() {
     configureByText("kay\nzee\nyee\na\nb\n");
     final List<KeyStroke> keys = Lists.newArrayList(KeyStroke.getKeyStroke("control V"));
-    keys.addAll(stringToKeys("$4j"));
+    keys.addAll(VimInjectorKt.getInjector().getParser().stringToKeys("$4j"));
     typeText(keys);
     typeText(commandToKeys("sort !"));
     assertState("zee\nyee\nkay\nb\na\n");
@@ -63,7 +62,7 @@ public class SortCommandTest extends VimTestCase {
   public void testCaseSensitiveSort() {
     configureByText("apple\nAppetite\nApp\napparition\n");
     final List<KeyStroke> keys = Lists.newArrayList(KeyStroke.getKeyStroke("control V"));
-    keys.addAll(stringToKeys("$3j"));
+    keys.addAll(VimInjectorKt.getInjector().getParser().stringToKeys("$3j"));
     typeText(keys);
     typeText(commandToKeys("sort"));
     assertState("App\nAppetite\napparition\napple\n");
@@ -72,7 +71,7 @@ public class SortCommandTest extends VimTestCase {
   public void testCaseInsensitiveSort() {
     configureByText("apple\nAppetite\nApp\napparition\n");
     final List<KeyStroke> keys = Lists.newArrayList(KeyStroke.getKeyStroke("control V"));
-    keys.addAll(stringToKeys("$3j"));
+    keys.addAll(VimInjectorKt.getInjector().getParser().stringToKeys("$3j"));
     typeText(keys);
     typeText(commandToKeys("sort i"));
     assertState("App\napparition\nAppetite\napple\n");

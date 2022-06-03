@@ -21,8 +21,8 @@
 package org.jetbrains.plugins.ideavim.action.motion.visual
 
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
@@ -133,7 +133,7 @@ class VisualToggleLineModeActionTest : VimTestCase() {
       """.trimIndent()
     )
     VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.selectmodeName, VimString("cmd"))
-    typeText(parseKeys("V"))
+    typeText(injector.parser.parseKeys("V"))
     assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_LINE)
   }
 }

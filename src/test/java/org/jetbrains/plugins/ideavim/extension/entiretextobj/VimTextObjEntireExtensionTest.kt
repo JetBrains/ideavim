@@ -18,8 +18,8 @@
 
 package org.jetbrains.plugins.ideavim.extension.entiretextobj
 
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.helper.experimentalApi
 import org.jetbrains.plugins.ideavim.JavaVimTestCase
@@ -36,35 +36,35 @@ class VimTextObjEntireExtensionTest : JavaVimTestCase() {
 
   // |gU| |ae|
   fun testUpperCaseEntireBuffer() {
-    doTest(StringHelper.parseKeys("gUae"), poem, "<caret>$poemUC")
+    doTest(injector.parser.parseKeys("gUae"), poem, "<caret>$poemUC")
     assertMode(CommandState.Mode.COMMAND)
     assertSelection(null)
   }
 
   // |gu| |ae|
   fun testLowerCaseEntireBuffer() {
-    doTest(StringHelper.parseKeys("guae"), poem, "<caret>$poemLC")
+    doTest(injector.parser.parseKeys("guae"), poem, "<caret>$poemLC")
     assertMode(CommandState.Mode.COMMAND)
     assertSelection(null)
   }
 
   // |c| |ae|
   fun testChangeEntireBuffer() {
-    doTest(StringHelper.parseKeys("cae"), poem, "<caret>")
+    doTest(injector.parser.parseKeys("cae"), poem, "<caret>")
     assertMode(CommandState.Mode.INSERT)
     assertSelection(null)
   }
 
   // |d| |ae|
   fun testDeleteEntireBuffer() {
-    doTest(StringHelper.parseKeys("dae"), poem, "<caret>")
+    doTest(injector.parser.parseKeys("dae"), poem, "<caret>")
     assertMode(CommandState.Mode.COMMAND)
     assertSelection(null)
   }
 
   // |y| |ae|
   fun testYankEntireBuffer() {
-    doTest(StringHelper.parseKeys("yae"), poem, "<caret>$poemNoCaret")
+    doTest(injector.parser.parseKeys("yae"), poem, "<caret>$poemNoCaret")
     assertMode(CommandState.Mode.COMMAND)
     myFixture.checkResult(poemNoCaret)
     assertSelection(null)
@@ -73,7 +73,7 @@ class VimTextObjEntireExtensionTest : JavaVimTestCase() {
   // |gU| |ie|
   fun testUpperCaseEntireBufferIgnoreLeadingTrailing() {
     doTest(
-      StringHelper.parseKeys("gUie"),
+      injector.parser.parseKeys("gUie"),
       "\n  \n \n${poem}\n \n  \n",
       "\n  \n \n<caret>${poemUC}\n \n  \n"
     )
@@ -84,7 +84,7 @@ class VimTextObjEntireExtensionTest : JavaVimTestCase() {
   // |gu| |ae|
   fun testLowerCaseEntireBufferIgnoreLeadingTrailing() {
     doTest(
-      StringHelper.parseKeys("guie"),
+      injector.parser.parseKeys("guie"),
       "\n  \n \n${poem}\n \n  \n",
       "\n  \n \n<caret>${poemLC}\n \n  \n"
     )
@@ -95,7 +95,7 @@ class VimTextObjEntireExtensionTest : JavaVimTestCase() {
   // |c| |ae|
   fun testChangeEntireBufferIgnoreLeadingTrailing() {
     doTest(
-      StringHelper.parseKeys("cie"),
+      injector.parser.parseKeys("cie"),
       "\n  \n \n${poem}\n  \n \n",
       "\n  \n \n<caret>\n\n  \n \n"
     ) // additional \n because poem ends with a \n
@@ -111,7 +111,7 @@ class VimTextObjEntireExtensionTest : JavaVimTestCase() {
   // |d| |ae|
   fun testDeleteEntireBufferIgnoreLeadingTrailing() {
     doTest(
-      StringHelper.parseKeys("die"),
+      injector.parser.parseKeys("die"),
       "\n  \n \n${poem}\n  \n \n",
       if (experimentalApi()) {
         "\n  \n \n<caret>\n  \n \n"
@@ -126,7 +126,7 @@ class VimTextObjEntireExtensionTest : JavaVimTestCase() {
   // |y| |ae|
   fun testYankEntireBufferIgnoreLeadingTrailing() {
     doTest(
-      StringHelper.parseKeys("yie"),
+      injector.parser.parseKeys("yie"),
       "\n  \n \n${poem}\n  \n \n",
       "\n  \n \n<caret>${poemNoCaret}\n  \n \n"
     )

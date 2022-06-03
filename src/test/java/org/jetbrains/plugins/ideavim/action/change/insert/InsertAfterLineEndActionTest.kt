@@ -18,8 +18,8 @@
 
 package org.jetbrains.plugins.ideavim.action.change.insert
 
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -28,7 +28,7 @@ class InsertAfterLineEndActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.MULTICARET)
   fun `test insert after line end action`() {
     typeTextInFile(
-      parseKeys("A", " four", "<ESC>"),
+      injector.parser.parseKeys("A" + " four" + "<ESC>"),
       """
                     one two ${c}three
                     sev${c}en si${c}x five

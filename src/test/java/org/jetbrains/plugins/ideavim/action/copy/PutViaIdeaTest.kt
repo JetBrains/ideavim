@@ -21,8 +21,8 @@ package org.jetbrains.plugins.ideavim.action.copy
 import com.intellij.codeInsight.editorActions.TextBlockTransferable
 import com.intellij.openapi.ide.CopyPasteManager
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.SelectionType
-import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
@@ -59,7 +59,7 @@ class PutViaIdeaTest : VimTestCase() {
     VimPlugin.getRegister()
       .storeText(myFixture.editor.vim, before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
 
-    typeText(StringHelper.parseKeys("ve", "p"))
+    typeText(injector.parser.parseKeys("ve" + "p"))
     val after = "legendar${c}y it in a legendary land"
     assertState(after)
   }
@@ -72,7 +72,7 @@ class PutViaIdeaTest : VimTestCase() {
     VimPlugin.getRegister()
       .storeText(myFixture.editor.vim, before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
 
-    typeText(StringHelper.parseKeys("ppp"))
+    typeText(injector.parser.parseKeys("ppp"))
     val after = "Ilegendarylegendarylegendar${c}y found it in a legendary land"
     assertState(after)
   }
@@ -89,7 +89,7 @@ class PutViaIdeaTest : VimTestCase() {
       .storeText(myFixture.editor.vim, before rangeOf "legendary$randomUUID", SelectionType.CHARACTER_WISE, false)
 
     val sizeBefore = CopyPasteManager.getInstance().allContents.size
-    typeText(StringHelper.parseKeys("ve", "p"))
+    typeText(injector.parser.parseKeys("ve" + "p"))
     assertEquals(sizeBefore, CopyPasteManager.getInstance().allContents.size)
   }
 
@@ -111,7 +111,7 @@ class PutViaIdeaTest : VimTestCase() {
       false
     )
 
-    typeText(StringHelper.parseKeys("p"))
+    typeText(injector.parser.parseKeys("p"))
     val after = """
             A Discovery
             

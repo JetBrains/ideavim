@@ -18,9 +18,8 @@
 package org.jetbrains.plugins.ideavim.action
 
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.vimCommandState
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -107,7 +106,7 @@ class MotionActionTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   fun testDeleteDigitsInCount() {
-    typeTextInFile(parseKeys("42<Delete>l"), "on${c}e two three four five six seven\n")
+    typeTextInFile(injector.parser.parseKeys("42<Delete>l"), "on${c}e two three four five six seven\n")
     assertOffset(6)
   }
 
@@ -120,7 +119,7 @@ class MotionActionTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   fun testIllegalCharArgument() {
-    typeTextInFile(parseKeys("f<Insert>"), "on${c}e two three four five six seven\n")
+    typeTextInFile(injector.parser.parseKeys("f<Insert>"), "on${c}e two three four five six seven\n")
     assertOffset(2)
     assertMode(CommandState.Mode.COMMAND)
   }
@@ -217,7 +216,7 @@ class MotionActionTest : VimTestCase() {
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   fun testChangeInnerCurlyBraceBlockMultiLine() {
     typeTextInFile(
-      parseKeys("ci{"),
+      injector.parser.parseKeys("ci{"),
       """foo {
     ${c}bar
 }
@@ -565,7 +564,7 @@ class MotionActionTest : VimTestCase() {
   // |[(|
   fun testUnmatchedOpenParenthesis() {
     typeTextInFile(
-      parseKeys("[("),
+      injector.parser.parseKeys("[("),
       """
      foo(bar, foo(bar, ${c}baz
      bar(foo)
@@ -578,7 +577,7 @@ class MotionActionTest : VimTestCase() {
   // |[{|
   fun testUnmatchedOpenBracketMultiLine() {
     typeTextInFile(
-      parseKeys("[{"),
+      injector.parser.parseKeys("[{"),
       """foo {
     bar,
     b${c}az
@@ -590,7 +589,7 @@ class MotionActionTest : VimTestCase() {
   // |])|
   fun testUnmatchedCloseParenthesisMultiLine() {
     typeTextInFile(
-      parseKeys("])"),
+      injector.parser.parseKeys("])"),
       """foo(bar, ${c}baz,
    quux)
 """
@@ -600,7 +599,7 @@ class MotionActionTest : VimTestCase() {
 
   // |]}|
   fun testUnmatchedCloseBracket() {
-    typeTextInFile(parseKeys("]}"), "{bar, ${c}baz}\n")
+    typeTextInFile(injector.parser.parseKeys("]}"), "{bar, ${c}baz}\n")
     assertOffset(9)
   }
 
@@ -608,126 +607,126 @@ class MotionActionTest : VimTestCase() {
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT, "File type specific")
   fun testMethodMovingInNonJavaFile() {
     configureByJsonText("{\"foo\": \"${c}bar\"}\n")
-    typeText(parseKeys("[m"))
+    typeText(injector.parser.parseKeys("[m"))
     assertState("{\"foo\": \"${c}bar\"}\n")
   }
 
   // VIM-331 |w|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   fun testNonAsciiLettersInWord() {
-    typeTextInFile(parseKeys("w"), "Če${c}ská republika")
+    typeTextInFile(injector.parser.parseKeys("w"), "Če${c}ská republika")
     assertOffset(6)
   }
 
   // VIM-58 |w|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   fun testHiraganaToPunctuation() {
-    typeTextInFile(parseKeys("w"), "は${c}はは!!!")
+    typeTextInFile(injector.parser.parseKeys("w"), "は${c}はは!!!")
     assertOffset(3)
   }
 
   // VIM-58 |w|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   fun testHiraganaToFullWidthPunctuation() {
-    typeTextInFile(parseKeys("w"), "は${c}はは！！！")
+    typeTextInFile(injector.parser.parseKeys("w"), "は${c}はは！！！")
     assertOffset(3)
   }
 
   // VIM-58 |w|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   fun testKatakanaToHiragana() {
-    typeTextInFile(parseKeys("w"), "チ${c}チチははは")
+    typeTextInFile(injector.parser.parseKeys("w"), "チ${c}チチははは")
     assertOffset(3)
   }
 
   // VIM-58 |w|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   fun testKatakanaToHalfWidthKana() {
-    typeTextInFile(parseKeys("w"), "チ${c}チチｳｳｳ")
+    typeTextInFile(injector.parser.parseKeys("w"), "チ${c}チチｳｳｳ")
     assertOffset(3)
   }
 
   // VIM-58 |w|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   fun testKatakanaToDigits() {
-    typeTextInFile(parseKeys("w"), "チ${c}チチ123")
+    typeTextInFile(injector.parser.parseKeys("w"), "チ${c}チチ123")
     assertOffset(3)
   }
 
   // VIM-58 |w|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   fun testKatakanaToLetters() {
-    typeTextInFile(parseKeys("w"), "チ${c}チチ123")
+    typeTextInFile(injector.parser.parseKeys("w"), "チ${c}チチ123")
     assertOffset(3)
   }
 
   // VIM-58 |w|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   fun testKatakanaToFullWidthLatin() {
-    typeTextInFile(parseKeys("w"), "チ${c}チチＡＡＡ")
+    typeTextInFile(injector.parser.parseKeys("w"), "チ${c}チチＡＡＡ")
     assertOffset(3)
   }
 
   // VIM-58 |w|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   fun testKatakanaToFullWidthDigits() {
-    typeTextInFile(parseKeys("w"), "チ${c}チチ３３３")
+    typeTextInFile(injector.parser.parseKeys("w"), "チ${c}チチ３３３")
     assertOffset(3)
   }
 
   // VIM-58 |w|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   fun testHiraganaToKatakana() {
-    typeTextInFile(parseKeys("w"), "は${c}ははチチチ")
+    typeTextInFile(injector.parser.parseKeys("w"), "は${c}ははチチチ")
     assertOffset(3)
   }
 
   // VIM-58 |w|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   fun testHalftWidthKanaToLetters() {
-    typeTextInFile(parseKeys("w"), "ｳｳｳAAA")
+    typeTextInFile(injector.parser.parseKeys("w"), "ｳｳｳAAA")
     assertOffset(3)
   }
 
   // |w|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   fun testCjkToPunctuation() {
-    typeTextInFile(parseKeys("w"), "测试${c}测试!!!")
+    typeTextInFile(injector.parser.parseKeys("w"), "测试${c}测试!!!")
     assertOffset(4)
   }
 
   // |w|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   fun testCjkToFullWidthPunctuation() {
-    typeTextInFile(parseKeys("w"), "测试${c}测试！！！")
+    typeTextInFile(injector.parser.parseKeys("w"), "测试${c}测试！！！")
     assertOffset(4)
   }
 
   // |w|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   fun testCjkToDigits() {
-    typeTextInFile(parseKeys("w"), "测试${c}测试123")
+    typeTextInFile(injector.parser.parseKeys("w"), "测试${c}测试123")
     assertOffset(4)
   }
 
   // |w|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   fun testCjkToFullWidthLatin() {
-    typeTextInFile(parseKeys("w"), "测试${c}测试ＡＡＡ")
+    typeTextInFile(injector.parser.parseKeys("w"), "测试${c}测试ＡＡＡ")
     assertOffset(4)
   }
 
   // |w|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   fun testCjkToFullWidthDigits() {
-    typeTextInFile(parseKeys("w"), "测试${c}测试３３３")
+    typeTextInFile(injector.parser.parseKeys("w"), "测试${c}测试３３３")
     assertOffset(4)
   }
 
   // |w|
   fun testEmptyLineIsWord() {
     typeTextInFile(
-      parseKeys("w"),
+      injector.parser.parseKeys("w"),
       """
      ${c}one
      
@@ -741,7 +740,7 @@ class MotionActionTest : VimTestCase() {
   // |w|
   fun testNotEmptyLineIsNotWord() {
     typeTextInFile(
-      parseKeys("w"),
+      injector.parser.parseKeys("w"),
       """${c}one
  
 two
@@ -753,25 +752,25 @@ two
   // VIM-312 |w|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   fun testLastWord() {
-    typeTextInFile(parseKeys("w"), "${c}one\n")
+    typeTextInFile(injector.parser.parseKeys("w"), "${c}one\n")
     assertOffset(2)
   }
 
   // |b|
   fun testWordBackwardsAtFirstLineWithWhitespaceInFront() {
-    typeTextInFile(parseKeys("b"), "    ${c}x\n")
+    typeTextInFile(injector.parser.parseKeys("b"), "    ${c}x\n")
     assertOffset(0)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   fun testRightToLastChar() {
-    typeTextInFile(parseKeys("i<Right>"), "on${c}e\n")
+    typeTextInFile(injector.parser.parseKeys("i<Right>"), "on${c}e\n")
     assertOffset(3)
   }
 
   fun testDownToLastEmptyLine() {
     typeTextInFile(
-      parseKeys("j"),
+      injector.parser.parseKeys("j"),
       """
      ${c}one
      
@@ -784,9 +783,9 @@ two
   // VIM-262 |c_CTRL-R|
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   fun testSearchFromRegister() {
-    VimPlugin.getRegister().setKeys('a', StringHelper.stringToKeys("two"))
+    VimPlugin.getRegister().setKeys('a', injector.parser.stringToKeys("two"))
     typeTextInFile(
-      parseKeys("/", "<C-R>a", "<Enter>"),
+      injector.parser.parseKeys("/" + "<C-R>a" + "<Enter>"),
       """
      ${c}one
      two
@@ -932,7 +931,7 @@ two
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "Complicated")
   fun testRestoreMultiLineSelectionAfterIndent() {
     typeTextInFile(
-      parseKeys("V", "2j"),
+      injector.parser.parseKeys("V" + "2j"),
       """
      ${c}foo
      bar
@@ -948,7 +947,7 @@ two
     
       """.trimIndent()
     )
-    typeText(parseKeys(">"))
+    typeText(injector.parser.parseKeys(">"))
     assertMode(CommandState.Mode.COMMAND)
     assertState(
       """    foo
@@ -956,14 +955,14 @@ two
     baz
 """
     )
-    typeText(parseKeys("gv"))
+    typeText(injector.parser.parseKeys("gv"))
     assertSelection(
       """    foo
     bar
     baz
 """
     )
-    typeText(parseKeys(">"))
+    typeText(injector.parser.parseKeys(">"))
     assertMode(CommandState.Mode.COMMAND)
     assertState(
       """        foo
@@ -971,7 +970,7 @@ two
         baz
 """
     )
-    typeText(parseKeys("gv"))
+    typeText(injector.parser.parseKeys("gv"))
     assertSelection(
       """        foo
         bar
@@ -998,7 +997,7 @@ two
 
   fun testVisualLineSelectDown() {
     typeTextInFile(
-      parseKeys("Vj"),
+      injector.parser.parseKeys("Vj"),
       """
      foo
      ${c}bar
@@ -1021,7 +1020,7 @@ two
   // VIM-784
   fun testVisualLineSelectUp() {
     typeTextInFile(
-      parseKeys("Vk"),
+      injector.parser.parseKeys("Vk"),
       """
      foo
      bar

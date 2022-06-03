@@ -36,7 +36,7 @@
 
 package org.jetbrains.plugins.ideavim.action.change.insert
 
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -73,9 +73,9 @@ class InsertCompletedLiteralActionTest : VimTestCase() {
   private fun checkInsert(code: String, result: String) {
     for (binding in insertDigraph) {
       configureByText("\n")
-      typeText(parseKeys("i$binding$code"))
+      typeText(injector.parser.parseKeys("i$binding$code"))
       assertState("$result\n")
-      typeText(parseKeys("<Esc>"))
+      typeText(injector.parser.parseKeys("<Esc>"))
     }
   }
 

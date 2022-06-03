@@ -20,8 +20,8 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.intellij.testFramework.PlatformTestUtil
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -248,7 +248,7 @@ class LetCommandTest : VimTestCase() {
     typeText(commandToKeys("echo @4"))
     assertExOutput("inumber register works\n")
 
-    typeText(parseKeys("@4"))
+    typeText(injector.parser.parseKeys("@4"))
     if (VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.ideadelaymacroName)) {
       PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
     }
@@ -261,7 +261,7 @@ class LetCommandTest : VimTestCase() {
     typeText(commandToKeys("echo @o"))
     assertExOutput("ilowercase letter register works\n")
 
-    typeText(parseKeys("@o"))
+    typeText(injector.parser.parseKeys("@o"))
     if (VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.ideadelaymacroName)) {
       PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
     }
@@ -274,12 +274,12 @@ class LetCommandTest : VimTestCase() {
     typeText(commandToKeys("echo @O"))
     assertExOutput("iuppercase letter register works\n")
 
-    typeText(parseKeys("@O"))
+    typeText(injector.parser.parseKeys("@O"))
     if (VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.ideadelaymacroName)) {
       PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
     }
     assertState("uppercase letter register works\n")
-    typeText(parseKeys("<Esc>"))
+    typeText(injector.parser.parseKeys("<Esc>"))
 
     typeText(commandToKeys("let @O = '!'"))
     typeText(commandToKeys("echo @O"))
@@ -292,7 +292,7 @@ class LetCommandTest : VimTestCase() {
     typeText(commandToKeys("echo @\""))
     assertExOutput("iunnamed register works\n")
 
-    typeText(parseKeys("@\""))
+    typeText(injector.parser.parseKeys("@\""))
     if (VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.ideadelaymacroName)) {
       PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
     }

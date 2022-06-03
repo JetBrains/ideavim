@@ -18,8 +18,8 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.ExOutputModel.Companion.getInstance
-import com.maddyhome.idea.vim.helper.StringHelper
 import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.VimTestCase
 
@@ -70,7 +70,7 @@ class BufferListCommandTest : VimTestCase() {
   fun testBuffersActionWithSupportedFilterMatch() {
     configureByFileName("aaa.txt")
     configureByFileName("bbb.txt")
-    typeText(StringHelper.parseKeys("aa<esc>:buffers +<enter>"))
+    typeText(injector.parser.parseKeys("aa<esc>:buffers +<enter>"))
 
     val output = getInstance(myFixture.editor).text
     TestCase.assertNotNull(output)
@@ -85,7 +85,7 @@ class BufferListCommandTest : VimTestCase() {
 
   fun testBuffersActionWithSupportedFilterDoesNotMatch() {
     configureByText("\n")
-    typeText(StringHelper.parseKeys("aa<esc>:buffers #<enter>"))
+    typeText(injector.parser.parseKeys("aa<esc>:buffers #<enter>"))
 
     val output = getInstance(myFixture.editor).text
     TestCase.assertNotNull(output)

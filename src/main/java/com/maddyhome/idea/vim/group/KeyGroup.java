@@ -42,7 +42,6 @@ import com.maddyhome.idea.vim.ex.ExOutputModel;
 import com.maddyhome.idea.vim.extension.VimExtensionHandler;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.helper.HelperKt;
-import com.maddyhome.idea.vim.helper.StringHelper;
 import com.maddyhome.idea.vim.key.*;
 import com.maddyhome.idea.vim.newapi.IjNativeAction;
 import com.maddyhome.idea.vim.newapi.IjVimActionsInitiator;
@@ -61,7 +60,6 @@ import java.awt.event.KeyEvent;
 import java.util.List;
 import java.util.*;
 
-import static com.maddyhome.idea.vim.helper.StringHelper.toKeyNotation;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
@@ -107,7 +105,7 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
       MappingInfo mappingInfo = row.getSecond();
       builder.append(StringsKt.padEnd(getModesStringCode(row.getFirst()), 2, ' '));
       builder.append(" ");
-      builder.append(StringsKt.padEnd(toKeyNotation(mappingInfo.getFromKeys()), 11, ' '));
+      builder.append(StringsKt.padEnd(VimInjectorKt.getInjector().getParser().toKeyNotation(mappingInfo.getFromKeys()), 11, ' '));
       builder.append(" ");
       builder.append(mappingInfo.isRecursive() ? " " : "*");
       builder.append(" ");
@@ -232,7 +230,7 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
         final Element conflictElement = new Element(SHORTCUT_CONFLICT_ELEMENT);
         conflictElement.setAttribute(OWNER_ATTRIBUTE, owner.getOwnerName());
         final Element textElement = new Element(TEXT_ELEMENT);
-        StringHelper.setSafeXmlText(textElement, entry.getKey().toString());
+        VimPlugin.getXML().setSafeXmlText(textElement, entry.getKey().toString());
         conflictElement.addContent(textElement);
         conflictsElement.addContent(conflictElement);
       }
@@ -254,7 +252,7 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
         }
         final Element textElement = conflictElement.getChild(TEXT_ELEMENT);
         if (textElement != null) {
-          final String text = StringHelper.getSafeXmlText(textElement);
+          final String text = VimPlugin.getXML().getSafeXmlText(textElement);
           if (text != null) {
             final KeyStroke keyStroke = KeyStroke.getKeyStroke(text);
             if (keyStroke != null) {

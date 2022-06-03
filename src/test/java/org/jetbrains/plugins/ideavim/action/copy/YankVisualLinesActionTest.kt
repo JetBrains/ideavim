@@ -19,8 +19,8 @@
 package org.jetbrains.plugins.ideavim.action.copy
 
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.VimTestCase
 
@@ -43,7 +43,7 @@ class YankVisualLinesActionTest : VimTestCase() {
             
     """.trimIndent()
     configureByText(text)
-    typeText(parseKeys("vjY"))
+    typeText(injector.parser.parseKeys("vjY"))
     val savedText = VimPlugin.getRegister().lastRegister?.text ?: kotlin.test.fail()
     TestCase.assertEquals(yankedTest, savedText)
   }
@@ -90,7 +90,7 @@ class YankVisualLinesActionTest : VimTestCase() {
             
     """.trimIndent()
     configureByText(text)
-    typeText(parseKeys("VjY"))
+    typeText(injector.parser.parseKeys("VjY"))
     val savedText = VimPlugin.getRegister().lastRegister?.text ?: kotlin.test.fail()
     TestCase.assertEquals(yankedTest, savedText)
   }

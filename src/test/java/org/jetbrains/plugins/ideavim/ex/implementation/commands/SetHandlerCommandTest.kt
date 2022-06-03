@@ -19,7 +19,7 @@
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.helper.StringHelper
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
 import com.maddyhome.idea.vim.vimscript.model.commands.SetHandlerCommand
@@ -163,7 +163,7 @@ class SetHandlerCommandTest : VimTestCase() {
     TestCase.assertTrue(VimPlugin.getKey().savedShortcutConflicts.isNotEmpty())
     val key = VimPlugin.getKey().savedShortcutConflicts.entries.single().key
     val owner = VimPlugin.getKey().savedShortcutConflicts.entries.single().value
-    TestCase.assertEquals("<C-C>", StringHelper.toKeyNotation(key))
+    TestCase.assertEquals("<C-C>", injector.parser.toKeyNotation(key))
     assertEquals(ShortcutOwnerInfo.allPerModeIde, owner)
   }
 
@@ -175,7 +175,7 @@ class SetHandlerCommandTest : VimTestCase() {
     TestCase.assertTrue(VimPlugin.getKey().savedShortcutConflicts.isNotEmpty())
     val key = VimPlugin.getKey().savedShortcutConflicts.entries.single().key
     val owner = VimPlugin.getKey().savedShortcutConflicts.entries.single().value
-    TestCase.assertEquals("<C-C>", StringHelper.toKeyNotation(key))
+    TestCase.assertEquals("<C-C>", injector.parser.toKeyNotation(key))
     assertEquals(ShortcutOwnerInfo.allPerModeIde, owner)
   }
 }

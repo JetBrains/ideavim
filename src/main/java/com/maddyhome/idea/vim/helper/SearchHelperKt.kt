@@ -181,5 +181,14 @@ private fun quoteChanges(chars: CharSequence, begin: Int) = sequence {
 fun shouldIgnoreCase(pattern: String, ignoreSmartCaseOption: Boolean): Boolean {
   val sc = VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.smartcaseName) &&
     !ignoreSmartCaseOption
-  return VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.ignorecaseName) && !(sc && StringHelper.containsUpperCase(pattern))
+  return VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.ignorecaseName) && !(sc && containsUpperCase(pattern))
+}
+
+private fun containsUpperCase(pattern: String): Boolean {
+  for (i in pattern.indices) {
+    if (Character.isUpperCase(pattern[i]) && (i == 0 || pattern[i - 1] != '\\')) {
+      return true
+    }
+  }
+  return false
 }

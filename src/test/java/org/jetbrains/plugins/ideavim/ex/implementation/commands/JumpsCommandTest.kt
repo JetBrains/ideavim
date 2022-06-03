@@ -18,7 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class JumpsCommandTest : VimTestCase() {
@@ -78,7 +78,7 @@ class JumpsCommandTest : VimTestCase() {
     enterSearch("rocks", false)
     enterSearch("underside")
 
-    typeText(parseKeys("<C-O>", "<C-O>"))
+    typeText(injector.parser.parseKeys("<C-O>" + "<C-O>"))
 
     enterCommand("jumps")
     assertExOutput(
@@ -111,7 +111,7 @@ class JumpsCommandTest : VimTestCase() {
   fun `test correctly encodes non-printable characters`() {
     configureByText("\u0009Hello\u0006World\u007f")
 
-    typeText(parseKeys("G"))
+    typeText(injector.parser.parseKeys("G"))
 
     enterCommand("jumps")
     assertExOutput(

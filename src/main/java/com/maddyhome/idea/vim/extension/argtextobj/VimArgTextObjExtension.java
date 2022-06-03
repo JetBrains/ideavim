@@ -23,9 +23,7 @@ import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.api.ExecutionContext;
-import com.maddyhome.idea.vim.api.VimCaret;
-import com.maddyhome.idea.vim.api.VimEditor;
+import com.maddyhome.idea.vim.api.*;
 import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.common.MappingMode;
 import com.maddyhome.idea.vim.common.TextRange;
@@ -52,7 +50,6 @@ import java.util.EnumSet;
 import static com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping;
 import static com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping;
 import static com.maddyhome.idea.vim.group.visual.VisualGroupKt.vimSetSelection;
-import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
 
 /**
  * @author igrekster
@@ -68,11 +65,11 @@ public class VimArgTextObjExtension implements VimExtension {
   @Override
   public void init() {
 
-    putExtensionHandlerMapping(MappingMode.XO, parseKeys("<Plug>InnerArgument"), getOwner(), new VimArgTextObjExtension.ArgumentHandler(true), false);
-    putExtensionHandlerMapping(MappingMode.XO, parseKeys("<Plug>OuterArgument"), getOwner(), new VimArgTextObjExtension.ArgumentHandler(false), false);
+    putExtensionHandlerMapping(MappingMode.XO, VimInjectorKt.getInjector().getParser().parseKeys("<Plug>InnerArgument"), getOwner(), new VimArgTextObjExtension.ArgumentHandler(true), false);
+    putExtensionHandlerMapping(MappingMode.XO, VimInjectorKt.getInjector().getParser().parseKeys("<Plug>OuterArgument"), getOwner(), new VimArgTextObjExtension.ArgumentHandler(false), false);
 
-    putKeyMapping(MappingMode.XO, parseKeys("ia"), getOwner(), parseKeys("<Plug>InnerArgument"), true);
-    putKeyMapping(MappingMode.XO, parseKeys("aa"), getOwner(), parseKeys("<Plug>OuterArgument"), true);
+    putKeyMapping(MappingMode.XO, VimInjectorKt.getInjector().getParser().parseKeys("ia"), getOwner(), VimInjectorKt.getInjector().getParser().parseKeys("<Plug>InnerArgument"), true);
+    putKeyMapping(MappingMode.XO, VimInjectorKt.getInjector().getParser().parseKeys("aa"), getOwner(), VimInjectorKt.getInjector().getParser().parseKeys("<Plug>OuterArgument"), true);
 
   }
 

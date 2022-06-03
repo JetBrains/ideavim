@@ -19,8 +19,8 @@
 package org.jetbrains.plugins.ideavim.group
 
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.MappingMode
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.key.MappingOwner
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -32,13 +32,13 @@ class KeyGroupTest : VimTestCase() {
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test remove key mapping`() {
     val keyGroup = VimPlugin.getKey()
-    val keys = parseKeys("<C-S-B>")
+    val keys = injector.parser.parseKeys("<C-S-B>")
 
     configureByText("I ${c}found it in a legendary land")
     typeText(keys)
     assertState("I ${c}found it in a legendary land")
 
-    keyGroup.putKeyMapping(MappingMode.N, keys, owner, parseKeys("h"), false)
+    keyGroup.putKeyMapping(MappingMode.N, keys, owner, injector.parser.parseKeys("h"), false)
     typeText(keys)
     assertState("I$c found it in a legendary land")
 
@@ -50,19 +50,19 @@ class KeyGroupTest : VimTestCase() {
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test remove and add key mapping`() {
     val keyGroup = VimPlugin.getKey()
-    val keys = parseKeys("<C-S-B>")
+    val keys = injector.parser.parseKeys("<C-S-B>")
 
     configureByText("I ${c}found it in a legendary land")
     typeText(keys)
     assertState("I ${c}found it in a legendary land")
 
-    keyGroup.putKeyMapping(MappingMode.N, keys, owner, parseKeys("h"), false)
+    keyGroup.putKeyMapping(MappingMode.N, keys, owner, injector.parser.parseKeys("h"), false)
     typeText(keys)
     assertState("I$c found it in a legendary land")
 
     repeat(10) {
       keyGroup.removeKeyMapping(owner)
-      keyGroup.putKeyMapping(MappingMode.N, keys, owner, parseKeys("h"), false)
+      keyGroup.putKeyMapping(MappingMode.N, keys, owner, injector.parser.parseKeys("h"), false)
     }
     typeText(keys)
     assertState("${c}I found it in a legendary land")

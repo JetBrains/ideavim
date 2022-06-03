@@ -17,7 +17,7 @@
  */
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
-import com.maddyhome.idea.vim.helper.StringHelper
+import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 /**
@@ -64,7 +64,7 @@ class BufferCommandTest : VimTestCase() {
   fun testBufferActionWithModifications() {
     configureByFileName("aaa.txt")
     configureByFileName("bbb.txt")
-    typeText(StringHelper.parseKeys("aa<esc>:buffer aaa<enter>"))
+    typeText(injector.parser.parseKeys("aa<esc>:buffer aaa<enter>"))
 
     assertPluginError(true)
   }
@@ -72,7 +72,7 @@ class BufferCommandTest : VimTestCase() {
   fun testBufferActionWithModificationsOverride() {
     configureByFileName("aaa.txt")
     configureByFileName("bbb.txt")
-    typeText(StringHelper.parseKeys("aa<esc>:buffer! aaa<enter>"))
+    typeText(injector.parser.parseKeys("aa<esc>:buffer! aaa<enter>"))
 
     assertPluginError(false)
   }

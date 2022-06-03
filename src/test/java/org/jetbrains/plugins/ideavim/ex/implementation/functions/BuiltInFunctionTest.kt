@@ -18,7 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.functions
 
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class BuiltInFunctionTest : VimTestCase() {
@@ -55,7 +55,7 @@ class BuiltInFunctionTest : VimTestCase() {
     typeText(commandToKeys("echo line('$')"))
     assertExOutput("5\n")
 
-    typeText(parseKeys("ma"))
+    typeText(injector.parser.parseKeys("ma"))
     typeText(commandToKeys("""echo line("'a") line("'x")"""))
     assertExOutput("3 0\n")
 
@@ -68,11 +68,11 @@ class BuiltInFunctionTest : VimTestCase() {
     typeText(commandToKeys("""echo line("v")"""))
     assertExOutput("3\n")
     // With selection
-    typeText(parseKeys("vj"))
+    typeText(injector.parser.parseKeys("vj"))
     typeText(commandToKeys("""echo line("v")"""))
     assertExOutput("3\n")
     // Remove selection and check again
-    typeText(parseKeys("<esc>"))
+    typeText(injector.parser.parseKeys("<esc>"))
     typeText(commandToKeys("""echo line("v")"""))
     assertExOutput("4\n")
 
@@ -103,7 +103,7 @@ class BuiltInFunctionTest : VimTestCase() {
     typeText(commandToKeys("echo col('$')"))
     assertExOutput("10\n")
 
-    typeText(parseKeys("ma"))
+    typeText(injector.parser.parseKeys("ma"))
     typeText(commandToKeys("""echo col("'a") col("'z")"""))
     assertExOutput("5 0\n")
 
@@ -111,11 +111,11 @@ class BuiltInFunctionTest : VimTestCase() {
     typeText(commandToKeys("""echo col("v")"""))
     assertExOutput("5\n")
     // With selection
-    typeText(parseKeys("vll"))
+    typeText(injector.parser.parseKeys("vll"))
     typeText(commandToKeys("""echo col("v")"""))
     assertExOutput("5\n")
     // Remove selection and check again
-    typeText(parseKeys("<esc>"))
+    typeText(injector.parser.parseKeys("<esc>"))
     typeText(commandToKeys("""echo col("v")"""))
     assertExOutput("7\n")
 

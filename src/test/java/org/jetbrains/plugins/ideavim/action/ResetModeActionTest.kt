@@ -19,9 +19,9 @@
 package org.jetbrains.plugins.ideavim.action
 
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.common.MappingMode
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.key.MappingOwner
 import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -122,7 +122,7 @@ class ResetModeActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.MAPPING)
   fun `test delete command after resetting operator-pending mode with mapping`() {
     VimPlugin.getKey()
-      .putKeyMapping(MappingMode.NVO, parseKeys("<C-D>"), owner, parseKeys("<Esc>"), false)
+      .putKeyMapping(MappingMode.NVO, injector.parser.parseKeys("<C-D>"), owner, injector.parser.parseKeys("<Esc>"), false)
 
     val keys = listOf("d", "<C-D>", "dw")
     val before = "A Discovery"

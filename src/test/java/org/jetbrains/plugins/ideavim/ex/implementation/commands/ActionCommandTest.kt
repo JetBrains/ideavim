@@ -19,8 +19,8 @@
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -50,7 +50,7 @@ class ActionCommandTest : VimTestCase() {
         "abcde\n" +
         "-----"
     )
-    typeText(parseKeys("vjl"))
+    typeText(injector.parser.parseKeys("vjl"))
     typeText(commandToKeys("'<,'>action CommentByBlockComment"))
     assertMode(CommandState.Mode.VISUAL)
     assertState(
@@ -71,7 +71,7 @@ class ActionCommandTest : VimTestCase() {
         "abcde\n" +
         "-----"
     )
-    typeText(parseKeys("vjl"))
+    typeText(injector.parser.parseKeys("vjl"))
     typeText(commandToKeys("'<,'>action CommentByBlockComment"))
     assertMode(CommandState.Mode.VISUAL)
     assertState(
@@ -87,7 +87,7 @@ class ActionCommandTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
   fun testExCommandInVisualCharacterModeSameLine() {
     configureByJavaText("1<caret>2345\n" + "abcde\n")
-    typeText(parseKeys("vl"))
+    typeText(injector.parser.parseKeys("vl"))
     typeText(commandToKeys("'<,'>action CommentByBlockComment"))
     assertMode(CommandState.Mode.VISUAL)
     assertState("1/*23*/45\n" + "abcde\n")
@@ -97,7 +97,7 @@ class ActionCommandTest : VimTestCase() {
   fun testExCommandInVisualCharacterModeSameLineWithIncsearch() {
     VimPlugin.getOptionService().setOption(OptionScope.GLOBAL, OptionConstants.incsearchName)
     configureByJavaText("1<caret>2345\n" + "abcde\n")
-    typeText(parseKeys("vl"))
+    typeText(injector.parser.parseKeys("vl"))
     typeText(commandToKeys("'<,'>action CommentByBlockComment"))
     assertMode(CommandState.Mode.VISUAL)
     assertState("1/*23*/45\n" + "abcde\n")
@@ -113,7 +113,7 @@ class ActionCommandTest : VimTestCase() {
         "abcde\n" +
         "-----"
     )
-    typeText(parseKeys("Vj"))
+    typeText(injector.parser.parseKeys("Vj"))
     typeText(commandToKeys("'<,'>action CommentByBlockComment"))
     assertMode(CommandState.Mode.VISUAL)
     assertState(
@@ -135,7 +135,7 @@ class ActionCommandTest : VimTestCase() {
         "abcde\n" +
         "-----"
     )
-    typeText(parseKeys("Vj"))
+    typeText(injector.parser.parseKeys("Vj"))
     typeText(commandToKeys("'<,'>action CommentByBlockComment"))
     assertMode(CommandState.Mode.VISUAL)
     assertState(
@@ -158,7 +158,7 @@ class ActionCommandTest : VimTestCase() {
         "abcde\n" +
         "-----"
     )
-    typeText(parseKeys("<C-V>lj"))
+    typeText(injector.parser.parseKeys("<C-V>lj"))
     typeText(commandToKeys("'<,'>action CommentByBlockComment"))
     assertMode(CommandState.Mode.VISUAL)
     assertState(
@@ -178,7 +178,7 @@ class ActionCommandTest : VimTestCase() {
         "abcde\n" +
         "-----"
     )
-    typeText(parseKeys("<C-V>lj"))
+    typeText(injector.parser.parseKeys("<C-V>lj"))
     typeText(commandToKeys("'<,'>action CommentByBlockComment"))
     assertMode(CommandState.Mode.VISUAL)
     assertState(
