@@ -117,6 +117,13 @@ class MacroActionTest : VimTestCase() {
     assertState("5\n")
   }
 
+  fun `test last command as last macro multiple times`() {
+    val content = "${c}0\n1\n2\n3\n4\n5\n"
+    configureByText(content)
+    typeText(injector.parser.parseKeys(":d<CR>" + "@:" + "@@" + "@@"))
+    assertState("4\n5\n")
+  }
+
   // Broken, see the resulting text
   fun `ignore test macro with macro`() {
     val content = """

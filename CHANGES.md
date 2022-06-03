@@ -47,6 +47,7 @@ usual beta standards.
 * [VIM-2604](https://youtrack.jetbrains.com/issue/VIM-2604) Update action execution rules
 * [VIM-2654](https://youtrack.jetbrains.com/issue/VIM-2654) Add support for `return` without expression
 * [VIM-2630](https://youtrack.jetbrains.com/issue/VIM-2630/Please-fix-warning-Shall-not-be-called-on-a-template-presentatio) Fix IDE freeze
+* [VIM-2661](https://youtrack.jetbrains.com/issue/VIM-2661/Spamming-does-not-work) Fix repeating the `@@` command
 
 ### Merged PRs:
 * [468](https://github.com/JetBrains/ideavim/pull/468) by [Thomas Schouten](https://github.com/PHPirates): Implement UserDataHolder for EditorDataContext

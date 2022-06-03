@@ -53,7 +53,9 @@ class PlaybackRegisterAction : VimActionHandler.SingleExecution() {
             }
             i += 1
           }
-          injector.macro.lastRegister = reg
+          if (reg != '@') { // @ is not a register itself, it just tells vim to use the last register
+            injector.macro.lastRegister = reg
+          }
         } catch (e: ExException) {
           res[0] = false
         }
