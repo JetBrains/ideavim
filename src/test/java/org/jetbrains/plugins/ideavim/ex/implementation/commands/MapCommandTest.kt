@@ -915,4 +915,32 @@ n  ,i            <Action>(Back)
       """.trimIndent()
     )
   }
+
+  fun `test autocast to action notation 2`() {
+    configureByText("\n")
+    typeText(commandToKeys("nnoremap ,a :action Back<CR>"))
+    typeText(commandToKeys("nnoremap ,b :action Back<Cr>"))
+    typeText(commandToKeys("nnoremap ,c :action Back<cr>"))
+    typeText(commandToKeys("nnoremap ,d :action Back<ENTER>"))
+    typeText(commandToKeys("nnoremap ,e :action Back<Enter>"))
+    typeText(commandToKeys("nnoremap ,f :action Back<enter>"))
+    typeText(commandToKeys("nnoremap ,g :action Back<C-M>"))
+    typeText(commandToKeys("nnoremap ,h :action Back<C-m>"))
+    typeText(commandToKeys("nnoremap ,i :action Back<c-m>"))
+    typeText(commandToKeys("nnoremap"))
+    assertExOutput(
+      """
+n  ,a            <Action>(Back)
+n  ,b            <Action>(Back)
+n  ,c            <Action>(Back)
+n  ,d            <Action>(Back)
+n  ,e            <Action>(Back)
+n  ,f            <Action>(Back)
+n  ,g            <Action>(Back)
+n  ,h            <Action>(Back)
+n  ,i            <Action>(Back)
+
+      """.trimIndent()
+    )
+  }
 }

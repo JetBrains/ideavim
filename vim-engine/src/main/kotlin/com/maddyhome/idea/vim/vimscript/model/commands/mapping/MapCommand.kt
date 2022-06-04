@@ -22,6 +22,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.MappingMode
+import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.key.MappingOwner
@@ -76,8 +77,11 @@ data class MapCommand(val ranges: Ranges, val argument: String, val cmd: String)
     } else {
       val actionId = extractActionId(arguments.secondArgument)
       if (actionId != null) {
-        val toKeys = injector.parser.parseKeys("<Action>($actionId)")
+        // workaround for https://youtrack.jetbrains.com/issue/VIM-2607/Action-BackForward-no-longer-work-the-same
+        val newMapping = "<Action>($actionId)"
+        val toKeys = injector.parser.parseKeys(newMapping)
         injector.keyGroup.putKeyMapping(modes, arguments.fromKeys, mappingOwner, toKeys, true)
+        logger.debug("Replaced ${arguments.secondArgument} with $newMapping")
       } else {
         val toKeys = injector.parser.parseKeys(arguments.secondArgument)
         injector.keyGroup.putKeyMapping(modes, arguments.fromKeys, mappingOwner, toKeys, commandInfo.isRecursive)
@@ -153,6 +157,7 @@ data class MapCommand(val ranges: Ranges, val argument: String, val cmd: String)
       CommandInfo("cno", "remap", MappingMode.C, false)
     )
     private val UNSUPPORTED_SPECIAL_ARGUMENTS = EnumSet.of(SCRIPT)
+    private val logger = vimLogger<MapCommand>()
   }
 
   private fun parseCommandArguments(input: String): CommandArguments? {
