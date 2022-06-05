@@ -252,9 +252,9 @@ class MarksCommandTest : VimTestCase() {
     typeText(
       injector.parser.parseKeys(
         "i" +
-        "inserted text " +
-        "<Esc>" +
-        "<CR><CR>"
+          "inserted text " +
+          "<Esc>" +
+          "<CR><CR>"
       )
     ) // ^ - position of end of last insert. Also '.' for start of change
     typeText(injector.parser.parseKeys("w" + "c4w" + "replaced content" + "<Esc>")) // [ and ] - recently changed/yanked

@@ -344,10 +344,14 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
          brown ${c}fox
     """.trimIndent()
     configureByText(before)
-    typeText(injector.parser.parseKeys(buildString {
-        append("v\$")
-        append("X")
-    }))
+    typeText(
+      injector.parser.parseKeys(
+        buildString {
+          append("v\$")
+          append("X")
+        }
+      )
+    )
 
     assertHighlighter(16, 19, HighlighterTargetArea.EXACT_RANGE)
 
@@ -363,10 +367,14 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
          
     """.trimIndent()
     configureByText(before)
-    typeText(injector.parser.parseKeys(buildString {
-        append("v\$")
-        append("X")
-    }))
+    typeText(
+      injector.parser.parseKeys(
+        buildString {
+          append("v\$")
+          append("X")
+        }
+      )
+    )
 
     assertHighlighter(16, 20, HighlighterTargetArea.EXACT_RANGE)
 

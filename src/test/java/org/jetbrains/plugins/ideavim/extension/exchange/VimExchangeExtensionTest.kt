@@ -329,10 +329,14 @@ class VimExchangeExtensionTest : VimTestCase() {
          brown ${c}fox
     """.trimIndent()
     configureByText(before)
-    typeText(injector.parser.parseKeys(buildString {
-        append("v\$")
-        append("X")
-    }))
+    typeText(
+      injector.parser.parseKeys(
+        buildString {
+          append("v\$")
+          append("X")
+        }
+      )
+    )
 
     assertHighlighter(16, 19, HighlighterTargetArea.EXACT_RANGE)
 
@@ -348,10 +352,14 @@ class VimExchangeExtensionTest : VimTestCase() {
          
     """.trimIndent()
     configureByText(before)
-    typeText(injector.parser.parseKeys(buildString {
-        append("v\$")
-        append("X")
-    }))
+    typeText(
+      injector.parser.parseKeys(
+        buildString {
+          append("v\$")
+          append("X")
+        }
+      )
+    )
 
     assertHighlighter(16, 20, HighlighterTargetArea.EXACT_RANGE)
 
