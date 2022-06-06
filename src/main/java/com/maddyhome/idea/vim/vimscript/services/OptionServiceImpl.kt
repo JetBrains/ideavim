@@ -22,12 +22,12 @@ import com.intellij.openapi.application.ApplicationNamesInfo
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.util.SystemInfo
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.helper.localEditors
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.IjVimLocalOptions
 import com.maddyhome.idea.vim.newapi.VimLocalOptions
-import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.options.OptionChangeListener
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
@@ -37,10 +37,10 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.datatypes.parseNumber
-import com.maddyhome.idea.vim.vimscript.model.options.NumberOption
-import com.maddyhome.idea.vim.vimscript.model.options.Option
-import com.maddyhome.idea.vim.vimscript.model.options.StringOption
-import com.maddyhome.idea.vim.vimscript.model.options.ToggleOption
+import com.maddyhome.idea.vim.options.NumberOption
+import com.maddyhome.idea.vim.options.Option
+import com.maddyhome.idea.vim.options.StringOption
+import com.maddyhome.idea.vim.options.ToggleOption
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.GuiCursorOptionHelper
 
 internal class OptionServiceImpl : OptionService {
@@ -107,7 +107,7 @@ internal class OptionServiceImpl : OptionService {
     object : StringOption(OptionConstants.matchpairsName, OptionConstants.matchpairsAlias, "(:),{:},[:]", isList = true) {
       override fun checkIfValueValid(value: VimDataType, token: String) {
         super.checkIfValueValid(value, token)
-        for (v in split((value as VimString).value)!!) {
+        for (v in split((value as VimString).value)) {
           if (!v.matches(Regex(".:."))) {
             throw ExException("E474: Invalid argument: $token")
           }
@@ -188,8 +188,14 @@ internal class OptionServiceImpl : OptionService {
         }
       }
 
-      override fun split(value: String): List<String>? {
-        return KeywordOptionHelper.parseValues(value)
+      override fun split(value: String): List<String> {
+        val result = KeywordOptionHelper.parseValues(value)
+        if (result == null) {
+          logger.error("KeywordOptionHelper failed to parse $value")
+          injector.messages.indicateError()
+          injector.messages.showStatusBarMessage("Failed to parse iskeyword option value")
+        }
+        return result ?: split(getDefaultValue().value)
       }
     },
     object : StringOption(
@@ -224,27 +230,11 @@ internal class OptionServiceImpl : OptionService {
       is OptionScope.GLOBAL -> setGlobalOptionValue(option.name, value)
     }
     option.onChanged(scope, oldValue)
-
-    if (scope !is OptionScope.LOCAL) {
-      val oldOption = OptionsManager.getOption(optionName)
-      when (oldOption) {
-        is com.maddyhome.idea.vim.option.ToggleOption -> {
-          if (value == VimInt(0)) {
-            oldOption.reset()
-          } else {
-            oldOption.set()
-          }
-        }
-        is com.maddyhome.idea.vim.option.TextOption -> {
-          oldOption.set(value.asString())
-        }
-      }
-    }
   }
 
   override fun contains(scope: OptionScope, optionName: String, value: String): Boolean {
     val option = options.get(optionName) as? StringOption ?: return false
-    return value in option.split(getOptionValue(scope, optionName, optionName).asString())!!
+    return value in option.split(getOptionValue(scope, optionName, optionName).asString())
   }
 
   override fun getValues(scope: OptionScope, optionName: String): List<String>? {
@@ -375,10 +365,7 @@ internal class OptionServiceImpl : OptionService {
     return options.secondaryKeys
   }
 
-  /**
-   * TODO this should be moved to the interface
-   */
-  fun addOption(option: Option<out VimDataType>) {
+  override fun addOption(option: Option<out VimDataType>) {
     options.put(option.name, option.abbrev, option)
   }
 

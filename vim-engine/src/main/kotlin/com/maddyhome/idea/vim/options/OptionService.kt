@@ -76,4 +76,6 @@ interface OptionService {
   fun addListener(optionName: String, listener: OptionChangeListener<VimDataType>, executeOnAdd: Boolean = false)
 
   fun removeListener(optionName: String, listener: OptionChangeListener<VimDataType>)
+
+  fun addOption(option: Option<out VimDataType>)
 }

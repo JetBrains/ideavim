@@ -26,7 +26,6 @@ import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.Msg
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import java.util.*
 import kotlin.math.ceil
 import kotlin.math.min
@@ -37,15 +36,8 @@ import kotlin.math.min
 data class SetCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
-  companion object {
-    @Deprecated("delete me after the OptionManager removal")
-    var isExecutingCommand = false
-  }
-
   override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
-    isExecutingCommand = true
     val result = parseOptionLine(editor, argument, OptionScope.GLOBAL, failOnBad = true)
-    isExecutingCommand = false
     return if (result) {
       ExecutionResult.Success
     } else {

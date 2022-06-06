@@ -74,7 +74,7 @@ If you are looking for:
 
 - Common features:
     - State machine. How every particular keystroke is parsed in IdeaVim: `KeyHandler.handleKey()`.
-    - Options (`incsearch`, `iskeyword`, `relativenumber`): `OptionsManager`.
+    - Options (`incsearch`, `iskeyword`, `relativenumber`): `OptionServiceImpl`.
     - Plugin startup: `PluginStartup`.
     - Notifications: `NotificationService`.
     - Status bar icon: `StatusBar.kt`.

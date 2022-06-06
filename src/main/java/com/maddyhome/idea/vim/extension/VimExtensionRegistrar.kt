@@ -25,12 +25,11 @@ import com.maddyhome.idea.vim.api.VimExtensionRegistrator
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.key.MappingOwner.Plugin.Companion.remove
-import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.options.OptionChangeListener
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.statistic.PluginState
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
-import com.maddyhome.idea.vim.vimscript.model.options.ToggleOption
+import com.maddyhome.idea.vim.options.ToggleOption
 
 object VimExtensionRegistrar : VimExtensionRegistrator {
   internal val registeredExtensions: MutableSet<String> = HashSet()
@@ -68,7 +67,6 @@ object VimExtensionRegistrar : VimExtensionRegistrator {
 
     registeredExtensions.add(name)
     registerAliases(extensionBean)
-    OptionsManager.addOption(com.maddyhome.idea.vim.option.ToggleOption(name, getAbbrev(name), false))
     VimPlugin.getOptionServiceImpl().addOption(ToggleOption(name, getAbbrev(name), false))
     VimPlugin.getOptionService().addListener(
       name,
@@ -115,7 +113,6 @@ object VimExtensionRegistrar : VimExtensionRegistrator {
     removeAliases(extension)
     extension.instance.dispose()
     VimPlugin.getOptionService().removeOption(name)
-    OptionsManager.removeOption(name)
     remove(name)
     logger.info("IdeaVim extension '$name' disposed")
   }

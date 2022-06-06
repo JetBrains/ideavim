@@ -48,7 +48,6 @@ import com.maddyhome.idea.vim.group.visual.VisualMotionGroup;
 import com.maddyhome.idea.vim.helper.MacKeyRepeat;
 import com.maddyhome.idea.vim.listener.VimListenerManager;
 import com.maddyhome.idea.vim.newapi.IjVimInjector;
-import com.maddyhome.idea.vim.option.OptionsManager;
 import com.maddyhome.idea.vim.options.OptionService;
 import com.maddyhome.idea.vim.ui.StatusBarIconFactory;
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable;
@@ -361,11 +360,6 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
 
     // 3.2) Initialize extensions. Always after 3.1
     VimExtensionRegistrar.enableDelayedExtensions();
-
-    // 4) Components initialization
-    // Some options' default values are based on values set in .ideavimrc, e.g. 'shellxquote' on Windows when 'shell'
-    // is cmd.exe has a different default to when 'shell' contains "sh"
-    OptionsManager.INSTANCE.completeInitialisation();
 
     // Turing on should be performed after all commands registration
     getSearch().turnOn();

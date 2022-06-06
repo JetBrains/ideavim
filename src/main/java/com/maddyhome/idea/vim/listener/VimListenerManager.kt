@@ -76,8 +76,8 @@ import com.maddyhome.idea.vim.listener.VimListenerManager.EditorListeners.add
 import com.maddyhome.idea.vim.listener.VimListenerManager.EditorListeners.remove
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.option.StrictMode
 import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.options.helpers.KeywordOptionChangeListener
 import com.maddyhome.idea.vim.ui.ShowCmdOptionChangeListener
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
@@ -110,7 +110,9 @@ object VimListenerManager {
         // Actually this if should always be true, but just as protection
         EventFacade.getInstance().setupTypedActionHandler(VimTypedActionHandler(typedAction.rawHandler))
       } else {
-        StrictMode.fail("typeAction expected to be non-vim.")
+        if (VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.ideastrictmodeName)) {
+          error("typeAction expected to be non-vim.")
+        }
       }
 
       VimPlugin.getOptionService().addListener(OptionConstants.numberName, EditorGroup.NumberChangeListener.INSTANCE)

@@ -39,8 +39,7 @@ import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.option.OptionsManager
-import com.maddyhome.idea.vim.option.ToggleOption
+import com.maddyhome.idea.vim.options.OptionScope
 import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -296,22 +295,22 @@ class PlugMissingKeysTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test packadd`() {
-    assertFalse((OptionsManager.getOption("matchit") as ToggleOption).isSet)
+    assertFalse(injector.optionService.isSet(OptionScope.GLOBAL, "matchit"))
     executeLikeVimrc(
       "packadd matchit",
     )
 
-    assertTrue((OptionsManager.getOption("matchit") as ToggleOption).isSet)
+    assertTrue(injector.optionService.isSet(OptionScope.GLOBAL, "matchit"))
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test packadd ex`() {
-    assertFalse((OptionsManager.getOption("matchit") as ToggleOption).isSet)
+    assertFalse(injector.optionService.isSet(OptionScope.GLOBAL, "matchit"))
     executeLikeVimrc(
       "packadd! matchit",
     )
 
-    assertTrue((OptionsManager.getOption("matchit") as ToggleOption).isSet)
+    assertTrue(injector.optionService.isSet(OptionScope.GLOBAL, "matchit"))
   }
 
   private fun executeLikeVimrc(vararg text: String) {

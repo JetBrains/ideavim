@@ -20,7 +20,7 @@ package com.maddyhome.idea.vim.vimscript.model.functions.handlers
 
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.option.OptionsManager
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
@@ -47,7 +47,7 @@ object ExistsFunctionHandler : FunctionHandler() {
     return if (expression is SimpleExpression && expression.data is VimString) {
       val parsedValue = VimscriptParser.parseExpression((expression.data as VimString).value)
       if (parsedValue is OptionExpression) {
-        if (OptionsManager.getOption(parsedValue.optionName) != null) {
+        if (injector.optionService.getOptions().any { it == parsedValue.optionName } || injector.optionService.getAbbrevs().any { it == parsedValue.optionName }) {
           VimInt.ONE
         } else {
           VimInt.ZERO

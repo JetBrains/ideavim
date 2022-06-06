@@ -61,7 +61,6 @@ import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor;
 import com.maddyhome.idea.vim.listener.VimInsertListener;
 import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
 import com.maddyhome.idea.vim.newapi.*;
-import com.maddyhome.idea.vim.option.StrictMode;
 import com.maddyhome.idea.vim.options.OptionConstants;
 import com.maddyhome.idea.vim.options.OptionScope;
 import com.maddyhome.idea.vim.register.Register;
@@ -1308,7 +1307,9 @@ public class ChangeGroup extends VimChangeGroupBase {
     int endOffset = range.getEndOffset();
     int fileSize = EditorHelperRt.getFileSize(((IjVimEditor) editor).getEditor());
     if (endOffset > fileSize) {
-      StrictMode.INSTANCE.fail("Incorrect offset. File size: " + fileSize + ", offset: " + endOffset);
+      if (injector.getOptionService().isSet(OptionScope.GLOBAL.INSTANCE, OptionConstants.ideastrictmodeName, OptionConstants.ideastrictmodeName)) {
+        throw new IllegalStateException("Incorrect offset. File size: " + fileSize + ", offset: " + endOffset);
+      }
       endOffset = fileSize;
     }
     return type == SelectionType.LINE_WISE &&
