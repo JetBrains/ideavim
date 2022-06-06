@@ -36,17 +36,20 @@ import com.maddyhome.idea.vim.EventFacade;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.ComplicatedKeysAction;
 import com.maddyhome.idea.vim.action.VimShortcutKeyAction;
-import com.maddyhome.idea.vim.api.*;
-import com.maddyhome.idea.vim.common.*;
+import com.maddyhome.idea.vim.api.NativeAction;
+import com.maddyhome.idea.vim.api.VimActionsInitiator;
+import com.maddyhome.idea.vim.api.VimEditor;
+import com.maddyhome.idea.vim.api.VimKeyGroupBase;
+import com.maddyhome.idea.vim.common.MappingMode;
+import com.maddyhome.idea.vim.common.Node;
+import com.maddyhome.idea.vim.common.NodesKt;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
-import com.maddyhome.idea.vim.extension.VimExtensionHandler;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.helper.HelperKt;
 import com.maddyhome.idea.vim.key.*;
 import com.maddyhome.idea.vim.newapi.IjNativeAction;
 import com.maddyhome.idea.vim.newapi.IjVimActionsInitiator;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
-import com.maddyhome.idea.vim.vimscript.model.expressions.Expression;
 import kotlin.Pair;
 import kotlin.text.StringsKt;
 import org.jdom.Element;
@@ -60,7 +63,6 @@ import java.awt.event.KeyEvent;
 import java.util.List;
 import java.util.*;
 
-import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
 /**
@@ -75,26 +77,23 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
 
   private static final Logger logger = Logger.getInstance(KeyGroup.class);
 
-  private final @NotNull Map<KeyStroke, ShortcutOwnerInfo> shortcutConflicts = new LinkedHashMap<>();
-  private final @NotNull Set<RequiredShortcut> requiredShortcutKeys = new HashSet<>(300);
-  private final @NotNull Map<MappingMode, CommandPartNode<VimActionsInitiator>> keyRoots = new EnumMap<>(MappingMode.class);
-  private final @NotNull Map<MappingMode, KeyMapping> keyMappings = new EnumMap<>(MappingMode.class);
   private @Nullable OperatorFunction operatorFunction = null;
 
-  void registerRequiredShortcutKeys(@NotNull Editor editor) {
+  public void registerRequiredShortcutKeys(@NotNull VimEditor editor) {
     EventFacade.getInstance()
-      .registerCustomShortcutSet(VimShortcutKeyAction.getInstance(), toShortcutSet(requiredShortcutKeys),
-                                 editor.getComponent());
+      .registerCustomShortcutSet(VimShortcutKeyAction.getInstance(), toShortcutSet(getRequiredShortcutKeys()),
+                                 ((IjVimEditor)editor).getEditor().getComponent());
   }
 
   public void registerShortcutsForLookup(@NotNull LookupImpl lookup) {
     EventFacade.getInstance()
-      .registerCustomShortcutSet(VimShortcutKeyAction.getInstance(), toShortcutSet(requiredShortcutKeys),
+      .registerCustomShortcutSet(VimShortcutKeyAction.getInstance(), toShortcutSet(getRequiredShortcutKeys()),
                                  lookup.getComponent(), lookup);
   }
 
-  void unregisterShortcutKeys(@NotNull Editor editor) {
-    EventFacade.getInstance().unregisterCustomShortcutSet(VimShortcutKeyAction.getInstance(), editor.getComponent());
+  void unregisterShortcutKeys(@NotNull VimEditor editor) {
+    EventFacade.getInstance().unregisterCustomShortcutSet(VimShortcutKeyAction.getInstance(),
+                                                          ((IjVimEditor)editor).getEditor().getComponent());
   }
 
   public boolean showKeyMappings(@NotNull Set<? extends MappingMode> modes, @NotNull Editor editor) {
@@ -115,83 +114,12 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
     return true;
   }
 
-  public void removeKeyMapping(@NotNull MappingOwner owner) {
-    Arrays.stream(MappingMode.values()).map(this::getKeyMapping).forEach(o -> o.delete(owner));
-    unregisterKeyMapping(owner);
-  }
 
-  public void removeKeyMapping(@NotNull Set<? extends MappingMode> modes, @NotNull List<? extends KeyStroke> keys) {
-    modes.stream().map(this::getKeyMapping).forEach(o -> o.delete(keys));
-  }
-
-  public void removeKeyMapping(Set<? extends MappingMode> modes) {
-    modes.stream().map(this::getKeyMapping).forEach(KeyMapping::delete);
-  }
-
-  public void putKeyMapping(Set<? extends MappingMode> modes,
-                            List<? extends KeyStroke> fromKeys,
-                            MappingOwner owner,
-                            VimExtensionHandler extensionHandler,
-                            boolean recursive) {
-    modes.stream().map(this::getKeyMapping).forEach(o -> o.put(fromKeys, owner, extensionHandler, recursive));
-    registerKeyMapping(fromKeys, owner);
-  }
-
-  public void putKeyMapping(Set<? extends MappingMode> modes,
-                            List<? extends KeyStroke> fromKeys,
-                            MappingOwner owner,
-                            List<? extends KeyStroke> toKeys,
-                            boolean recursive) {
-    modes.stream().map(this::getKeyMapping).forEach(o -> o.put(fromKeys, toKeys, owner, recursive));
-    registerKeyMapping(fromKeys, owner);
-  }
-
-  public void putKeyMapping(Set<? extends MappingMode> modes,
-                            List<? extends KeyStroke> fromKeys,
-                            MappingOwner owner,
-                            Expression toExpr,
-                            String originalString,
-                            boolean recursive) {
-    modes.stream().map(this::getKeyMapping).forEach(o -> o.put(fromKeys, toExpr, owner, originalString, recursive));
-    registerKeyMapping(fromKeys, owner);
-  }
-
-  public boolean hasmapto(@NotNull MappingMode mode, @NotNull List<KeyStroke> toKeys) {
-    return this.getKeyMapping(mode).hasmapto(toKeys);
-  }
-
-  public List<Pair<List<KeyStroke>, MappingInfo>> getMapTo(@NotNull MappingMode mode, @NotNull List<KeyStroke> toKeys) {
-    return this.getKeyMapping(mode).getMapTo(toKeys);
-  }
-
-  public List<Pair<List<KeyStroke>, MappingInfo>> getKeyMappingByOwner(@NotNull MappingOwner owner) {
-    return Arrays.stream(MappingMode.values()).map(this::getKeyMapping).flatMap(o -> o.getByOwner(owner).stream())
-      .collect(toList());
-  }
-
-  private void unregisterKeyMapping(MappingOwner owner) {
-    final int oldSize = requiredShortcutKeys.size();
-    requiredShortcutKeys.removeIf(requiredShortcut -> requiredShortcut.getOwner().equals(owner));
-    if (requiredShortcutKeys.size() != oldSize) {
-      for (Editor editor : HelperKt.localEditors()) {
-        unregisterShortcutKeys(editor);
-        registerRequiredShortcutKeys(editor);
-      }
-    }
-  }
-
-  private void registerKeyMapping(@NotNull List<? extends KeyStroke> fromKeys, MappingOwner owner) {
-    final int oldSize = requiredShortcutKeys.size();
-    for (KeyStroke key : fromKeys) {
-      if (key.getKeyChar() == KeyEvent.CHAR_UNDEFINED) {
-        requiredShortcutKeys.add(new RequiredShortcut(key, owner));
-      }
-    }
-    if (requiredShortcutKeys.size() != oldSize) {
-      for (Editor editor : HelperKt.localEditors()) {
-        unregisterShortcutKeys(editor);
-        registerRequiredShortcutKeys(editor);
-      }
+  @Override
+  public void updateShortcutKeysRegistration() {
+    for (Editor editor : HelperKt.localEditors()) {
+      unregisterShortcutKeys(new IjVimEditor(editor));
+      registerRequiredShortcutKeys(new IjVimEditor(editor));
     }
   }
 
@@ -205,7 +133,7 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
 
   public void saveData(@NotNull Element element) {
     final Element conflictsElement = new Element(SHORTCUT_CONFLICTS_ELEMENT);
-    for (Map.Entry<KeyStroke, ShortcutOwnerInfo> entry : shortcutConflicts.entrySet()) {
+    for (Map.Entry<KeyStroke, ShortcutOwnerInfo> entry : myShortcutConflicts.entrySet()) {
       final ShortcutOwner owner;
       ShortcutOwnerInfo myValue = entry.getValue();
       if (myValue instanceof ShortcutOwnerInfo.AllModes) {
@@ -247,7 +175,7 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
           if (text != null) {
             final KeyStroke keyStroke = KeyStroke.getKeyStroke(text);
             if (keyStroke != null) {
-              shortcutConflicts.put(keyStroke, new ShortcutOwnerInfo.AllModes(owner));
+              myShortcutConflicts.put(keyStroke, new ShortcutOwnerInfo.AllModes(owner));
             }
           }
         }
@@ -272,7 +200,7 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
   }
 
   public @NotNull Map<KeyStroke, ShortcutOwnerInfo> getShortcutConflicts() {
-    final Set<RequiredShortcut> requiredShortcutKeys = this.requiredShortcutKeys;
+    final Set<RequiredShortcut> requiredShortcutKeys = this.getRequiredShortcutKeys();
     final Map<KeyStroke, ShortcutOwnerInfo> savedConflicts = getSavedShortcutConflicts();
     final Map<KeyStroke, ShortcutOwnerInfo> results = new HashMap<>();
     for (RequiredShortcut requiredShortcut : requiredShortcutKeys) {
@@ -291,40 +219,6 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
     return results;
   }
 
-  public @NotNull Map<KeyStroke, ShortcutOwnerInfo> getSavedShortcutConflicts() {
-    return shortcutConflicts;
-  }
-
-  @Override
-  public @NotNull KeyMapping getKeyMapping(@NotNull MappingMode mode) {
-    KeyMapping mapping = keyMappings.get(mode);
-    if (mapping == null) {
-      mapping = new KeyMapping();
-      keyMappings.put(mode, mapping);
-    }
-    return mapping;
-  }
-
-  public void resetKeyMappings() {
-    keyMappings.clear();
-  }
-
-  /**
-   * Returns the root of the key mapping for the given mapping mode
-   *
-   * @param mappingMode The mapping mode
-   * @return The key mapping tree root
-   */
-  @Override
-  public @NotNull CommandPartNode<VimActionsInitiator> getKeyRoot(@NotNull MappingMode mappingMode) {
-    return keyRoots.computeIfAbsent(mappingMode, (key) -> new RootNode<>());
-  }
-
-  @Override
-  public @NotNull KeyMappingLayer getKeyMappingLayer(@NotNull MappingMode mode) {
-    return getKeyMapping(mode);
-  }
-
   /**
    * Registers a shortcut that is handled by KeyHandler#handleKey directly, rather than by an action
    *
@@ -337,13 +231,6 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
    */
   public void registerShortcutWithoutAction(KeyStroke keyStroke, MappingOwner owner) {
     registerRequiredShortcut(Collections.singletonList(keyStroke), owner);
-  }
-
-  public void unregisterCommandActions() {
-    requiredShortcutKeys.clear();
-    keyRoots.clear();
-    if (identityChecker != null) identityChecker.clear();
-    if (prefixes != null) prefixes.clear();
   }
 
   public void registerCommandAction(@NotNull VimActionsInitiator actionHolder) {
@@ -374,10 +261,7 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
     }
 
     if (ApplicationManager.getApplication().isUnitTestMode()) {
-      if (identityChecker == null) {
-        identityChecker = new HashMap<>();
-        prefixes = new HashMap<>();
-      }
+      initIdentityChecker();
       for (List<KeyStroke> keys : actionKeys) {
         checkCommand(actionModes, actionHolder.getInstance(), keys);
       }
@@ -396,58 +280,10 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
   private void registerRequiredShortcut(@NotNull List<KeyStroke> keys, MappingOwner owner) {
     for (KeyStroke key : keys) {
       if (key.getKeyChar() == KeyEvent.CHAR_UNDEFINED) {
-        requiredShortcutKeys.add(new RequiredShortcut(key, owner));
+        getRequiredShortcutKeys().add(new RequiredShortcut(key, owner));
       }
     }
   }
-
-  private void checkCommand(@NotNull Set<MappingMode> mappingModes,
-                            EditorActionHandlerBase action,
-                            List<KeyStroke> keys) {
-    for (MappingMode mappingMode : mappingModes) {
-      checkIdentity(mappingMode, action.getId(), keys);
-    }
-    checkCorrectCombination(action, keys);
-  }
-
-  private void checkIdentity(MappingMode mappingMode, String actName, List<KeyStroke> keys) {
-    Set<List<KeyStroke>> keySets = Objects.requireNonNull(identityChecker).computeIfAbsent(mappingMode, k -> new HashSet<>());
-    if (keySets.contains(keys)) {
-      throw new RuntimeException(
-        "This keymap already exists: " + mappingMode + " keys: " + keys + " action:" + actName);
-    }
-    keySets.add(keys);
-  }
-
-  private void checkCorrectCombination(EditorActionHandlerBase action, List<KeyStroke> keys) {
-    for (Map.Entry<List<KeyStroke>, String> entry : Objects.requireNonNull(prefixes).entrySet()) {
-      List<KeyStroke> prefix = entry.getKey();
-      if (prefix.size() == keys.size()) continue;
-      int shortOne = Math.min(prefix.size(), keys.size());
-      int i;
-      for (i = 0; i < shortOne; i++) {
-        if (!prefix.get(i).equals(keys.get(i))) break;
-      }
-
-      List<String> actionExceptions = Arrays
-        .asList("VimInsertDeletePreviousWordAction", "VimInsertAfterCursorAction", "VimInsertBeforeCursorAction",
-                "VimFilterVisualLinesAction", "VimAutoIndentMotionAction");
-      if (i == shortOne && !actionExceptions.contains(action.getId()) && !actionExceptions.contains(entry.getValue())) {
-        throw new RuntimeException("Prefix found! " +
-                                   keys +
-                                   " in command " +
-                                   action.getId() +
-                                   " is the same as " +
-                                   prefix.stream().map(Object::toString).collect(joining(", ")) +
-                                   " in " +
-                                   entry.getValue());
-      }
-    }
-    prefixes.put(keys, action.getId());
-  }
-
-  private @Nullable Map<MappingMode, Set<List<KeyStroke>>> identityChecker;
-  private @Nullable Map<List<KeyStroke>, String> prefixes;
 
   public static @NotNull ShortcutSet toShortcutSet(@NotNull Collection<RequiredShortcut> requiredShortcuts) {
     final List<Shortcut> shortcuts = new ArrayList<>();

@@ -217,7 +217,7 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
   public void editorCreated(@NotNull Editor editor) {
     isRefrainFromScrolling = editor.getSettings().isRefrainFromScrolling();
     DocumentManager.INSTANCE.addListeners(editor.getDocument());
-    VimPlugin.getKey().registerRequiredShortcutKeys(editor);
+    VimPlugin.getKey().registerRequiredShortcutKeys(new IjVimEditor(editor));
 
     initLineNumbers(editor);
     // Turn on insert mode if editor doesn't have any file
@@ -234,7 +234,7 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
   public void editorDeinit(@NotNull Editor editor, boolean isReleased) {
     deinitLineNumbers(editor, isReleased);
     UserDataManager.unInitializeEditor(editor);
-    VimPlugin.getKey().unregisterShortcutKeys(editor);
+    VimPlugin.getKey().unregisterShortcutKeys(new IjVimEditor(editor));
     editor.getSettings().setRefrainFromScrolling(isRefrainFromScrolling);
     DocumentManager.INSTANCE.removeListeners(editor.getDocument());
     CaretVisualAttributesHelperKt.removeCaretsVisualAttributes(editor);
