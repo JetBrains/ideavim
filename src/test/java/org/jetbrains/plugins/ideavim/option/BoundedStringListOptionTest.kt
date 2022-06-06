@@ -18,78 +18,147 @@
 
 package org.jetbrains.plugins.ideavim.option
 
-import com.maddyhome.idea.vim.option.BoundedStringListOption
-import junit.framework.TestCase
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.options.OptionScope.GLOBAL
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
+import com.maddyhome.idea.vim.options.StringOption
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
+import org.jetbrains.plugins.ideavim.VimTestCase
 
-class BoundedStringListOptionTest : TestCase() {
-  private val option =
-    BoundedStringListOption(
-      "myOpt", "myOpt", arrayOf("Monday", "Tuesday"),
-      arrayOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
-    )
+class BoundedStringListOptionTest : VimTestCase() {
+  private val optionName = "myOpt"
+  private val defaultValue = "Monday,Tuesday"
+  private val optionService = injector.optionService
 
+  init {
+    val option = StringOption(optionName, optionName, defaultValue, true, setOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))
+    optionService.addOption(option)
+  }
+
+  private fun assertEquals(val1: String, val2: VimDataType) {
+    assertEquals(VimString(val1), val2)
+  }
+
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test set valid list`() {
-    option.set("Thursday,Friday")
-    assertEquals("Thursday,Friday", option.value)
+    optionService.setOptionValue(GLOBAL, optionName, "Thursday,Friday")
+    assertEquals(VimString("Thursday,Friday"), optionService.getOptionValue(GLOBAL, optionName))
+    optionService.resetDefault(GLOBAL, optionName)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test set list with invalid value`() {
-    option.set("Blue")
-    assertEquals("Monday,Tuesday", option.value)
+    try {
+      optionService.setOptionValue(GLOBAL, optionName, "Blue")
+      fail("Missing exception")
+    } catch (e: ExException) {
+      assertEquals("E474: Invalid argument: $optionName", e.message)
+    }
+    assertEquals(defaultValue, injector.optionService.getOptionValue(GLOBAL, optionName))
+    optionService.resetDefault(GLOBAL, optionName)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test append single item`() {
-    option.append("Wednesday")
-    assertEquals("Monday,Tuesday,Wednesday", option.value)
+    optionService.appendValue(GLOBAL, optionName, "Wednesday")
+    assertEquals("Monday,Tuesday,Wednesday", optionService.getOptionValue(GLOBAL, optionName))
+    optionService.resetDefault(GLOBAL, optionName)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test append invalid item`() {
-    option.append("Blue")
-    assertEquals("Monday,Tuesday", option.value)
+    try {
+      optionService.appendValue(GLOBAL, optionName, "Blue")
+      fail("Missing exception")
+    } catch (e: ExException) {
+      assertEquals("E474: Invalid argument: $optionName", e.message)
+    }
+    assertEquals("Monday,Tuesday", optionService.getOptionValue(GLOBAL, optionName))
+    optionService.resetDefault(GLOBAL, optionName)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test append list`() {
-    option.append("Wednesday,Thursday")
-    assertEquals("Monday,Tuesday,Wednesday,Thursday", option.value)
+    optionService.appendValue(GLOBAL, optionName, "Wednesday,Thursday")
+    assertEquals("Monday,Tuesday,Wednesday,Thursday", optionService.getOptionValue(GLOBAL, optionName))
+    optionService.resetDefault(GLOBAL, optionName)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test append list with invalid item`() {
-    option.append("Wednesday,Blue")
-    assertEquals("Monday,Tuesday", option.value)
+    try {
+      optionService.appendValue(GLOBAL, optionName, "Wednesday,Blue")
+      fail("Missing exception")
+    } catch (e: ExException) {
+      assertEquals("E474: Invalid argument: $optionName", e.message)
+    }
+    assertEquals("Monday,Tuesday", optionService.getOptionValue(GLOBAL, optionName))
+    optionService.resetDefault(GLOBAL, optionName)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test prepend item`() {
-    option.prepend("Wednesday")
-    assertEquals("Wednesday,Monday,Tuesday", option.value)
+    optionService.prependValue(GLOBAL, optionName, "Wednesday")
+    assertEquals("Wednesday,Monday,Tuesday", optionService.getOptionValue(GLOBAL, optionName))
+    optionService.resetDefault(GLOBAL, optionName)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test prepend invalid item`() {
-    option.prepend("Blue")
-    assertEquals("Monday,Tuesday", option.value)
+    try {
+      optionService.prependValue(GLOBAL, optionName, "Blue")
+      fail("Missing exception")
+    } catch (e: ExException) {
+      assertEquals("E474: Invalid argument: $optionName", e.message)
+    }
+    assertEquals("Monday,Tuesday", optionService.getOptionValue(GLOBAL, optionName))
+    optionService.resetDefault(GLOBAL, optionName)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test prepend list`() {
-    option.prepend("Wednesday,Thursday")
-    assertEquals("Wednesday,Thursday,Monday,Tuesday", option.value)
+    optionService.prependValue(GLOBAL, optionName, "Wednesday,Thursday")
+    assertEquals("Wednesday,Thursday,Monday,Tuesday", optionService.getOptionValue(GLOBAL, optionName))
+    optionService.resetDefault(GLOBAL, optionName)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test prepend list with invalid item`() {
-    option.prepend("Wednesday,Blue")
-    assertEquals("Monday,Tuesday", option.value)
+    try {
+      optionService.prependValue(GLOBAL, optionName, "Wednesday,Blue")
+      fail("Missing exception")
+    } catch (e: ExException) {
+      assertEquals("E474: Invalid argument: $optionName", e.message)
+    }
+    assertEquals("Monday,Tuesday", optionService.getOptionValue(GLOBAL, optionName))
+    optionService.resetDefault(GLOBAL, optionName)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test remove item`() {
-    option.remove("Monday")
-    assertEquals("Tuesday", option.value)
+    optionService.removeValue(GLOBAL, optionName, "Monday")
+    assertEquals("Tuesday", optionService.getOptionValue(GLOBAL, optionName))
+    optionService.resetDefault(GLOBAL, optionName)
   }
 
   fun `test remove list`() {
-    option.remove("Monday,Tuesday")
-    assertEquals("", option.value)
+    optionService.removeValue(GLOBAL, optionName, "Monday,Tuesday")
+    assertEquals("", optionService.getOptionValue(GLOBAL, optionName))
+    optionService.resetDefault(GLOBAL, optionName)
+  }
+
+  fun `test remove list with wrong order`() {
+    optionService.removeValue(GLOBAL, optionName, "Tuesday,Monday")
+    assertEquals("Monday,Tuesday", optionService.getOptionValue(GLOBAL, optionName))
+    optionService.resetDefault(GLOBAL, optionName)
   }
 
   fun `test remove list with invalid value`() {
-    option.remove("Monday,Blue")
-    assertEquals("Monday,Tuesday", option.value)
+    optionService.removeValue(GLOBAL, optionName, "Monday,Blue")
+    assertEquals("Monday,Tuesday", optionService.getOptionValue(GLOBAL, optionName))
+    optionService.resetDefault(GLOBAL, optionName)
   }
 }

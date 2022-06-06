@@ -16,17 +16,14 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.vimscript.model.options
+package com.maddyhome.idea.vim.options
 
-import com.intellij.util.containers.ContainerUtil
 import com.maddyhome.idea.vim.ex.ExException
-import com.maddyhome.idea.vim.options.LocalOptionChangeListener
-import com.maddyhome.idea.vim.options.OptionChangeListener
-import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.datatypes.parseNumber
+import java.util.Collections
 
 sealed class Option<T : VimDataType>(val name: String, val abbrev: String, private val defaultValue: T) {
 
@@ -34,7 +31,7 @@ sealed class Option<T : VimDataType>(val name: String, val abbrev: String, priva
     return defaultValue
   }
 
-  private val listeners = ContainerUtil.createLockFreeCopyOnWriteList<OptionChangeListener<VimDataType>>()
+  private val listeners = mutableSetOf<OptionChangeListener<VimDataType>>()
 
   open fun addOptionChangeListener(listener: OptionChangeListener<VimDataType>) {
     listeners.add(listener)
@@ -126,28 +123,48 @@ open class StringOption(name: String, abbrev: String, defaultValue: VimString, p
       return
     }
 
-    if (boundedValues != null && split(value.value)!!.any { !boundedValues.contains(it) }) {
+    if (boundedValues != null && split(value.value).any { !boundedValues.contains(it) }) {
       throw ExException("E474: Invalid argument: $token")
     }
   }
 
   override fun getValueIfAppend(currentValue: VimDataType, value: String, token: String): VimString {
-    val separator = if (isList) "," else ""
-    val newValue = (currentValue as VimString).value + separator + value
-    return VimString(newValue)
+    val currentString = (currentValue as VimString).value
+    if (split(currentString).contains(value)) return currentValue
+
+    val builder = StringBuilder(currentString)
+    if (currentString.isNotEmpty()) {
+      val separator = if (isList) "," else ""
+      builder.append(separator)
+    }
+    builder.append(value)
+    return VimString(builder.toString())
   }
 
   override fun getValueIfPrepend(currentValue: VimDataType, value: String, token: String): VimString {
-    val separator = if (isList) "," else ""
-    val newValue = value + separator + (currentValue as VimString).value
-    return VimString(newValue)
+    val currentString = (currentValue as VimString).value
+    if (split(currentString).contains(value)) return currentValue
+
+    val builder = StringBuilder(value)
+    if (currentString.isNotEmpty()) {
+      val separator = if (isList) "," else ""
+      builder.append(separator).append(currentString)
+    }
+    return VimString(builder.toString())
   }
 
   override fun getValueIfRemove(currentValue: VimDataType, value: String, token: String): VimString {
     val currentValueAsString = (currentValue as VimString).value
     val newValue = if (isList) {
-      val elements = split(currentValueAsString)!!.toMutableList()
-      elements.remove(value)
+      val valuesToRemove = split(value)
+      val elements = split(currentValueAsString).toMutableList()
+      if (Collections.indexOfSubList(elements, valuesToRemove) != -1) {
+        // see `:help set`
+        // When the option is a list of flags, {value} must be
+        // exactly as they appear in the option.  Remove flags
+        // one by one to avoid problems.
+        elements.removeAll(valuesToRemove)
+      }
       elements.joinToString(separator = ",")
     } else {
       currentValueAsString.replace(value, "")
@@ -155,7 +172,7 @@ open class StringOption(name: String, abbrev: String, defaultValue: VimString, p
     return VimString(newValue)
   }
 
-  open fun split(value: String): List<String>? {
+  open fun split(value: String): List<String> {
     return if (isList) {
       value.split(",")
     } else {
