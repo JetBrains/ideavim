@@ -28,19 +28,19 @@ import com.maddyhome.idea.vim.helper.localEditors
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.IjVimLocalOptions
 import com.maddyhome.idea.vim.newapi.VimLocalOptions
+import com.maddyhome.idea.vim.options.NumberOption
+import com.maddyhome.idea.vim.options.Option
 import com.maddyhome.idea.vim.options.OptionChangeListener
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.options.OptionService
+import com.maddyhome.idea.vim.options.StringOption
+import com.maddyhome.idea.vim.options.ToggleOption
 import com.maddyhome.idea.vim.options.helpers.KeywordOptionHelper
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.datatypes.parseNumber
-import com.maddyhome.idea.vim.options.NumberOption
-import com.maddyhome.idea.vim.options.Option
-import com.maddyhome.idea.vim.options.StringOption
-import com.maddyhome.idea.vim.options.ToggleOption
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.GuiCursorOptionHelper
 
 internal class OptionServiceImpl : OptionService {

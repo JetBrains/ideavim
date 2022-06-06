@@ -30,7 +30,7 @@ class StringListOptionTest : VimTestCase() {
   private val optionName = "myOpt"
 
   init {
-      injector.optionService.addOption(StringOption(optionName, optionName, "", true, null))
+    injector.optionService.addOption(StringOption(optionName, optionName, "", true, null))
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
