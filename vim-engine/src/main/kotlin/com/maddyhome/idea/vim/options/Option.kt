@@ -96,17 +96,17 @@ open class NumberOption(name: String, abbrev: String, defaultValue: VimInt) : Op
   }
 
   override fun getValueIfAppend(currentValue: VimDataType, value: String, token: String): VimInt {
-    val valueToAdd = parseNumber(token) ?: throw ExException("E474: Invalid argument: $token")
+    val valueToAdd = parseNumber(token) ?: throw ExException("E521: Number required after =: $token")
     return VimInt((currentValue as VimInt).value + valueToAdd)
   }
 
   override fun getValueIfPrepend(currentValue: VimDataType, value: String, token: String): VimInt {
-    val valueToAdd = parseNumber(token) ?: throw ExException("E474: Invalid argument: $token")
+    val valueToAdd = parseNumber(token) ?: throw ExException("E521: Number required after =: $token")
     return VimInt((currentValue as VimInt).value * valueToAdd)
   }
 
   override fun getValueIfRemove(currentValue: VimDataType, value: String, token: String): VimInt {
-    val valueToAdd = parseNumber(token) ?: throw ExException("E474: Invalid argument: $token")
+    val valueToAdd = parseNumber(token) ?: throw ExException("E521: Number required after =: $token")
     return VimInt((currentValue as VimInt).value - valueToAdd)
   }
 }

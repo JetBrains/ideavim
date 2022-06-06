@@ -387,7 +387,8 @@ internal class OptionServiceImpl : OptionService {
   private fun castToVimDataType(value: String, optionName: String, token: String): VimDataType {
     val option = options.get(optionName) ?: throw ExException("E518: Unknown option: $token")
     return when (option) {
-      is NumberOption, is ToggleOption -> VimInt(parseNumber(value) ?: throw ExException("E474: Invalid argument: $token"))
+      is NumberOption -> VimInt(parseNumber(value) ?: throw ExException("E521: Number required after =: $token"))
+      is ToggleOption -> throw ExException("E474: Invalid argument: $token")
       is StringOption -> VimString(value)
     }
   }

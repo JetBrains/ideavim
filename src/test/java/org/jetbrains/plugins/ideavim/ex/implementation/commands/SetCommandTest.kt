@@ -72,6 +72,56 @@ class SetCommandTest : VimTestCase() {
     assertExOutput("  number            \n")
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
+  fun `test toggle option exceptions`() {
+    configureByText("\n")
+    typeText(commandToKeys("set number+=10"))
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E474: Invalid argument: number+=10")
+    typeText(commandToKeys("set number+=test"))
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E474: Invalid argument: number+=test")
+
+    typeText(commandToKeys("set number^=10"))
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E474: Invalid argument: number^=10")
+    typeText(commandToKeys("set number^=test"))
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E474: Invalid argument: number^=test")
+
+    typeText(commandToKeys("set number-=10"))
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E474: Invalid argument: number-=10")
+    typeText(commandToKeys("set number-=test"))
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E474: Invalid argument: number-=test")
+  }
+
+  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
+  fun `test number option exceptions`() {
+    configureByText("\n")
+    typeText(commandToKeys("set scrolloff+=10"))
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E521: Number required after =: scrolloff+=10")
+    typeText(commandToKeys("set scrolloff+=test"))
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E521: Number required after =: scrolloff+=test")
+
+    typeText(commandToKeys("set scrolloff^=10"))
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E521: Number required after =: scrolloff^=10")
+    typeText(commandToKeys("set scrolloff^=test"))
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E521: Number required after =: scrolloff^=test")
+
+    typeText(commandToKeys("set scrolloff-=10"))
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E521: Number required after =: scrolloff-=10")
+    typeText(commandToKeys("set scrolloff-=test"))
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E521: Number required after =: scrolloff-=test")
+  }
+
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test string option`() {
     configureByText("\n")
