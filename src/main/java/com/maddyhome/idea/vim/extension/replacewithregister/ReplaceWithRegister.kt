@@ -45,6 +45,7 @@ import com.maddyhome.idea.vim.newapi.IjExecutionContext
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.options.helpers.ClipboardOptionHelper
 import com.maddyhome.idea.vim.put.PutData
 import org.jetbrains.annotations.NonNls
 
@@ -168,7 +169,9 @@ class ReplaceWithRegister : VimExtension {
         caretAfterInsertedText = false,
         putToLine = -1
       )
-      VimPlugin.getPut().putText(IjVimEditor(editor), IjExecutionContext(EditorDataContext.init(editor)), putData)
+      ClipboardOptionHelper.IdeaputDisabler().use {
+        VimPlugin.getPut().putText(IjVimEditor(editor), IjExecutionContext(EditorDataContext.init(editor)), putData)
+      }
 
       VimPlugin.getRegister().saveRegister(savedRegister.name, savedRegister)
       VimPlugin.getRegister().saveRegister(VimPlugin.getRegister().defaultRegister, savedRegister)

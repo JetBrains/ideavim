@@ -20,6 +20,7 @@ package com.maddyhome.idea.vim.group.copy
 
 import com.intellij.codeInsight.editorActions.TextBlockTransferable
 import com.intellij.ide.CopyPasteManagerEx
+import com.intellij.ide.DataManager
 import com.intellij.ide.PasteProvider
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.PlatformDataKeys
@@ -80,7 +81,7 @@ class PutGroup : VimPutBase() {
         .getOptionValue(OptionScope.GLOBAL, OptionConstants.clipboardName) as VimString
       ).value
     ) {
-      val idePasteProvider = getProviderForPasteViaIde(context, text.typeInRegister, data)
+      val idePasteProvider = getProviderForPasteViaIde(editor, text.typeInRegister, data)
       if (idePasteProvider != null) {
         logger.debug("Perform put via idea paste")
         putTextViaIde(idePasteProvider, editor, context, text, subMode, data, additionalData)
@@ -213,16 +214,16 @@ class PutGroup : VimPutBase() {
   }
 
   private fun getProviderForPasteViaIde(
-    context: ExecutionContext,
+    editor: VimEditor,
     typeInRegister: SelectionType,
     data: PutData,
   ): PasteProvider? {
     val visualSelection = data.visualSelection
     if (visualSelection != null && visualSelection.typeInEditor.isBlock) return null
     if ((typeInRegister.isLine || typeInRegister.isChar) && data.count == 1) {
-      val ijContext = context.context as DataContext
-      val provider = PlatformDataKeys.PASTE_PROVIDER.getData(ijContext)
-      if (provider != null && provider.isPasteEnabled(ijContext)) return provider
+      val context = DataManager.getInstance().getDataContext(editor.ij.contentComponent)
+      val provider = PlatformDataKeys.PASTE_PROVIDER.getData(context)
+      if (provider != null && provider.isPasteEnabled(context)) return provider
     }
     return null
   }

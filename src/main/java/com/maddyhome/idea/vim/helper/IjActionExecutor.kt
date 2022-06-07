@@ -18,23 +18,18 @@
 
 package com.maddyhome.idea.vim.helper
 
-import com.intellij.ide.DataManager
 import com.intellij.openapi.actionSystem.ActionGroup
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.actionSystem.DataKey
 import com.intellij.openapi.actionSystem.IdeActions
-import com.intellij.openapi.actionSystem.PlatformCoreDataKeys
 import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.actionSystem.Presentation
 import com.intellij.openapi.actionSystem.ex.ActionUtil
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.command.UndoConfirmationPolicy
 import com.intellij.openapi.components.Service
-import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.actionSystem.DocCommandGroupId
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.openapi.util.NlsContexts
@@ -149,7 +144,7 @@ class IjActionExecutor : VimActionExecutor {
     CommandProcessor.getInstance()
       .executeCommand(
         editor.ij.project,
-        { cmd.execute(editor, getProjectAwareDataContext(editor.ij, context.ij).vim, operatorArguments) },
+        { cmd.execute(editor, EditorDataContext.init(editor.ij, context.ij).vim, operatorArguments) },
         cmd.id, DocCommandGroupId.noneGroupId(editor.ij.document), UndoConfirmationPolicy.DEFAULT,
         editor.ij.document
       )
@@ -162,53 +157,5 @@ class IjActionExecutor : VimActionExecutor {
   override fun getActionIdList(idPrefix: String): List<String> {
     return ActionManager.getInstance().getActionIdList(idPrefix)
   }
-
-  // This method is copied from com.intellij.openapi.editor.actionSystem.EditorAction.getProjectAwareDataContext
-  private fun getProjectAwareDataContext(
-    editor: Editor,
-    original: DataContext,
-  ): DataContext {
-    return if (CommonDataKeys.PROJECT.getData(original) === editor.project) {
-      DialogAwareDataContext(original)
-    } else DataContext { dataId: String? ->
-      if (CommonDataKeys.PROJECT.`is`(dataId)) {
-        val project = editor.project
-        if (project != null) {
-          return@DataContext project
-        }
-      }
-      original.getData(dataId!!)
-    }
-  }
-
-  // This class is copied from com.intellij.openapi.editor.actionSystem.DialogAwareDataContext.DialogAwareDataContext
-  private class DialogAwareDataContext(context: DataContext?) : DataContext {
-    private val values: MutableMap<String, Any?> = HashMap()
-
-    init {
-      for (key in keys) {
-        values[key.name] = key.getData(context!!)
-      }
-    }
-
-    override fun getData(dataId: @NonNls String): Any? {
-      if (values.containsKey(dataId)) {
-        return values[dataId]
-      }
-      val editor = values[CommonDataKeys.EDITOR.name] as Editor?
-      return if (editor != null) {
-        DataManager.getInstance().getDataContext(editor.contentComponent).getData(dataId)
-      } else null
-    }
-
-    companion object {
-      private val keys = arrayOf<DataKey<*>>(
-        CommonDataKeys.PROJECT,
-        PlatformCoreDataKeys.PROJECT_FILE_DIRECTORY,
-        CommonDataKeys.EDITOR,
-        CommonDataKeys.VIRTUAL_FILE,
-        CommonDataKeys.PSI_FILE
-      )
-    }
-  }
 }
+
