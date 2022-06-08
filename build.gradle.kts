@@ -56,7 +56,7 @@ dependencies {
 
     // https://mvnrepository.com/artifact/com.ensarsarajcic.neovim.java/neovim-api
     testImplementation("com.ensarsarajcic.neovim.java:neovim-api:0.2.3")
-    testImplementation("com.ensarsarajcic.neovim.java:core-rpc:0.2.3")
+    testImplementation("com.ensarsarajcic.neovim.java:core-rpc:0.4.4")
 
     // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-test
     testImplementation("org.jetbrains.kotlin:kotlin-test:$kotlinVersion")
