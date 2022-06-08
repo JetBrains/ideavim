@@ -47,12 +47,6 @@ class OptionConstants {
     const val ideacopypreprocessName = "ideacopypreprocess"
     const val ideacopypreprocessAlias = "ideacopypreprocess"
 
-    const val ideajoinName = "ideajoin"
-    const val ideajoinAlias = "ideajoin"
-
-    const val ideamarksName = "ideamarks"
-    const val ideamarksAlias = "ideamarks"
-
     const val ideastrictmodeName = "ideastrictmode"
     const val ideastrictmodeAlias = "ideastrictmode"
 
@@ -101,26 +95,6 @@ class OptionConstants {
     const val trackactionidsName = "trackactionids"
     const val trackactionidsAlias = "tai"
 
-    const val ideName = "ide"
-    const val ideAlias = "ide"
-
-    const val idearefactormodeName = "idearefactormode"
-    const val idearefactormodeAlias = "idearefactormode"
-    const val idearefactormode_keep = "keep"
-    const val idearefactormode_select = "select"
-    const val idearefactormode_visual = "visual"
-
-    const val ideastatusiconName = "ideastatusicon"
-    const val ideastatusiconAlias = "ideastatusicon"
-    const val ideastatusicon_enabled = "enabled"
-    const val ideastatusicon_gray = "gray"
-    const val ideastatusicon_disabled = "disabled"
-
-    const val ideawriteName = "ideawrite"
-    const val ideawriteAlias = "ideawrite"
-    const val ideawrite_all = "all"
-    const val ideawrite_file = "file"
-
     const val selectionName = "selection"
     const val selectionAlias = "sel"
 
@@ -154,9 +128,6 @@ class OptionConstants {
     const val selectmode_key = "key"
     const val selectmode_cmd = "cmd"
     const val selectmode_ideaselection = "ideaselection"
-
-    const val ideavimsupportName = "ideavimsupport"
-    const val ideavimsupportAlias = "ideavimsupport"
 
     const val keymodelName = "keymodel"
     const val keymodelAlias = "km"

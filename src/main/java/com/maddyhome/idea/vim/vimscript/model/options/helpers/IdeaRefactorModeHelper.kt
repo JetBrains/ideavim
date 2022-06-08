@@ -30,14 +30,14 @@ import com.maddyhome.idea.vim.helper.hasVisualSelection
 import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
-import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
+import com.maddyhome.idea.vim.vimscript.services.IjVimOptionService
 
 object IdeaRefactorModeHelper {
 
-  fun keepMode(): Boolean = (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, OptionConstants.idearefactormodeName) as VimString).value == OptionConstants.idearefactormode_keep
-  fun selectMode(): Boolean = (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, OptionConstants.idearefactormodeName) as VimString).value == OptionConstants.idearefactormode_select
+  fun keepMode(): Boolean = (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, IjVimOptionService.idearefactormodeName) as VimString).value == IjVimOptionService.idearefactormode_keep
+  fun selectMode(): Boolean = (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, IjVimOptionService.idearefactormodeName) as VimString).value == IjVimOptionService.idearefactormode_select
 
   fun correctSelection(editor: Editor) {
     val action: () -> Unit = {

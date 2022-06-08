@@ -27,14 +27,15 @@ import com.maddyhome.idea.vim.group.createLineBookmark
 import com.maddyhome.idea.vim.group.mnemonic
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.vimscript.services.IjVimOptionService
 import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.OptionValueType
 import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
 import org.jetbrains.plugins.ideavim.VimTestOption
 
-class MotionMarkActionTest : VimOptionTestCase(OptionConstants.ideamarksName) {
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.ideamarksName, OptionValueType.NUMBER, "1"))
+class MotionMarkActionTest : VimOptionTestCase(IjVimOptionService.ideamarksName) {
+  @VimOptionTestConfiguration(VimTestOption(IjVimOptionService.ideamarksName, OptionValueType.NUMBER, "1"))
   fun `test simple add mark`() {
     val keys = injector.parser.parseKeys("mA")
     val text = """
@@ -50,7 +51,7 @@ class MotionMarkActionTest : VimOptionTestCase(OptionConstants.ideamarksName) {
     checkMarks('A' to 2)
   }
 
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.ideamarksName, OptionValueType.NUMBER, "1"))
+  @VimOptionTestConfiguration(VimTestOption(IjVimOptionService.ideamarksName, OptionValueType.NUMBER, "1"))
   fun `test simple add multiple marks`() {
     val keys = injector.parser.parseKeys("mAj" + "mBj" + "mC")
     val text = """
@@ -66,7 +67,7 @@ class MotionMarkActionTest : VimOptionTestCase(OptionConstants.ideamarksName) {
     checkMarks('A' to 2, 'B' to 3, 'C' to 4)
   }
 
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.ideamarksName, OptionValueType.NUMBER, "1"))
+  @VimOptionTestConfiguration(VimTestOption(IjVimOptionService.ideamarksName, OptionValueType.NUMBER, "1"))
   fun `test simple add multiple marks on same line`() {
     val keys = injector.parser.parseKeys("mA" + "mB" + "mC")
     val text = """
@@ -85,7 +86,7 @@ class MotionMarkActionTest : VimOptionTestCase(OptionConstants.ideamarksName) {
 //    checkMarks('A' to 2, 'B' to 2, 'C' to 2)
   }
 
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.ideamarksName, OptionValueType.NUMBER, "1"))
+  @VimOptionTestConfiguration(VimTestOption(IjVimOptionService.ideamarksName, OptionValueType.NUMBER, "1"))
   fun `test move to another line`() {
     val keys = injector.parser.parseKeys("mAjj" + "mA")
     val text = """
@@ -101,7 +102,7 @@ class MotionMarkActionTest : VimOptionTestCase(OptionConstants.ideamarksName) {
     checkMarks('A' to 4)
   }
 
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.ideamarksName, OptionValueType.NUMBER, "1"))
+  @VimOptionTestConfiguration(VimTestOption(IjVimOptionService.ideamarksName, OptionValueType.NUMBER, "1"))
   fun `test simple system mark`() {
     val text = """
             A Discovery
@@ -119,7 +120,7 @@ class MotionMarkActionTest : VimOptionTestCase(OptionConstants.ideamarksName) {
     TestCase.assertEquals('A', vimMarks[0].key)
   }
 
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.ideamarksName, OptionValueType.NUMBER, "1"))
+  @VimOptionTestConfiguration(VimTestOption(IjVimOptionService.ideamarksName, OptionValueType.NUMBER, "1"))
   fun `test system mark move to another line`() {
     val text = """
             A Discovery

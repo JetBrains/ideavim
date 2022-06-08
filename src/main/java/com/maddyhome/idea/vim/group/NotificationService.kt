@@ -48,6 +48,7 @@ import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.statistic.ActionTracker
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable
+import com.maddyhome.idea.vim.vimscript.services.IjVimOptionService
 import com.maddyhome.idea.vim.vimscript.services.VimRcService
 import org.jetbrains.annotations.Nls
 import java.awt.datatransfer.StringSelection
@@ -98,8 +99,8 @@ class NotificationService(private val project: Project?) {
       AppendToIdeaVimRcAction(
         notification,
         "set ideajoin",
-        OptionConstants.ideajoinName
-      ) { VimPlugin.getOptionService().setOption(OptionScope.GLOBAL, OptionConstants.ideajoinName) }
+        IjVimOptionService.ideajoinName
+      ) { VimPlugin.getOptionService().setOption(OptionScope.GLOBAL, IjVimOptionService.ideajoinName) }
     )
 
     notification.addAction(HelpLink(ideajoinExamplesUrl))

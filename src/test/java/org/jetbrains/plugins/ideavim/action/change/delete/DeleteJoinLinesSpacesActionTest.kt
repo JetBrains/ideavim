@@ -20,6 +20,7 @@ package org.jetbrains.plugins.ideavim.action.change.delete
 
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.vimscript.services.IjVimOptionService
 import org.jetbrains.plugins.ideavim.OptionValueType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -27,8 +28,8 @@ import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
 import org.jetbrains.plugins.ideavim.VimTestOption
 
-class DeleteJoinLinesSpacesActionTest : VimOptionTestCase(OptionConstants.ideajoinName) {
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.ideajoinName, OptionValueType.NUMBER, "1"))
+class DeleteJoinLinesSpacesActionTest : VimOptionTestCase(IjVimOptionService.ideajoinName) {
+  @VimOptionTestConfiguration(VimTestOption(IjVimOptionService.ideajoinName, OptionValueType.NUMBER, "1"))
   fun `test join with idea`() {
     doTest(
       "J",
@@ -52,7 +53,7 @@ class DeleteJoinLinesSpacesActionTest : VimOptionTestCase(OptionConstants.ideajo
     )
   }
 
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.ideajoinName, OptionValueType.NUMBER, "1"))
+  @VimOptionTestConfiguration(VimTestOption(IjVimOptionService.ideajoinName, OptionValueType.NUMBER, "1"))
   fun `test join with idea with count`() {
     doTest(
       "3J",
@@ -76,7 +77,7 @@ class DeleteJoinLinesSpacesActionTest : VimOptionTestCase(OptionConstants.ideajo
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.ideajoinName, OptionValueType.NUMBER, "1"))
+  @VimOptionTestConfiguration(VimTestOption(IjVimOptionService.ideajoinName, OptionValueType.NUMBER, "1"))
   fun `test join with idea with large count`() {
     doTest(
       "10J",

@@ -1,33 +1,7 @@
-/*
- * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2022 The IdeaVim authors
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
- */
+package com.maddyhome.idea.vim.api
 
-package com.maddyhome.idea.vim.vimscript.services
-
-import com.intellij.openapi.application.ApplicationNamesInfo
-import com.intellij.openapi.diagnostic.logger
-import com.intellij.openapi.util.SystemInfo
-import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.ex.ExException
-import com.maddyhome.idea.vim.helper.localEditors
-import com.maddyhome.idea.vim.newapi.IjVimEditor
-import com.maddyhome.idea.vim.newapi.IjVimLocalOptions
-import com.maddyhome.idea.vim.newapi.VimLocalOptions
 import com.maddyhome.idea.vim.options.NumberOption
 import com.maddyhome.idea.vim.options.Option
 import com.maddyhome.idea.vim.options.OptionChangeListener
@@ -36,20 +10,17 @@ import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.options.OptionService
 import com.maddyhome.idea.vim.options.StringOption
 import com.maddyhome.idea.vim.options.ToggleOption
+import com.maddyhome.idea.vim.options.helpers.GuiCursorOptionHelper
 import com.maddyhome.idea.vim.options.helpers.KeywordOptionHelper
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.datatypes.parseNumber
-import com.maddyhome.idea.vim.vimscript.model.options.helpers.GuiCursorOptionHelper
 
-internal class OptionServiceImpl : OptionService {
+abstract class VimOptionServiceBase : OptionService {
+  private val localOptionsKey = Key<MutableMap<String, VimDataType>>("localOptions")
 
-  // This should be injected with some DI
-  private val localOptions: VimLocalOptions = IjVimLocalOptions()
-
-  // todo use me please :(
-  private val logger = logger<OptionServiceImpl>()
+  private val logger = vimLogger<VimOptionServiceBase>()
   private val options = MultikeyMap(
     NumberOption(OptionConstants.maxmapdepthName, OptionConstants.maxmapdepthAlias, 20),
     NumberOption(OptionConstants.scrollName, OptionConstants.scrollAlias, 0),
@@ -60,8 +31,6 @@ internal class OptionServiceImpl : OptionService {
     ToggleOption(OptionConstants.gdefaultName, OptionConstants.gdefaultAlias, false),
     ToggleOption(OptionConstants.hlsearchName, OptionConstants.hlsearchAlias, false),
     ToggleOption(OptionConstants.ideacopypreprocessName, OptionConstants.ideacopypreprocessAlias, false),
-    ToggleOption(OptionConstants.ideajoinName, OptionConstants.ideajoinAlias, false),
-    ToggleOption(OptionConstants.ideamarksName, OptionConstants.ideamarksAlias, true),
     ToggleOption(OptionConstants.ideastrictmodeName, OptionConstants.ideastrictmodeAlias, false),
     ToggleOption(OptionConstants.ideatracetimeName, OptionConstants.ideatracetimeAlias, false),
     ToggleOption(OptionConstants.ideaglobalmodeName, OptionConstants.ideaglobalmodeAlias, false),
@@ -79,24 +48,19 @@ internal class OptionServiceImpl : OptionService {
     ToggleOption(OptionConstants.wrapscanName, OptionConstants.wrapscanAlias, true),
     ToggleOption(OptionConstants.ideadelaymacroName, OptionConstants.ideadelaymacroAlias, true),
     ToggleOption(OptionConstants.trackactionidsName, OptionConstants.trackactionidsAlias, false),
-    StringOption(OptionConstants.ideName, OptionConstants.ideAlias, ApplicationNamesInfo.getInstance().fullProductNameWithEdition),
-    StringOption(OptionConstants.idearefactormodeName, OptionConstants.idearefactormodeAlias, "select", isList = false, ideaRefactorModeValues),
-    StringOption(OptionConstants.ideastatusiconName, OptionConstants.ideastatusiconAlias, "enabled", isList = false, ideaStatusIconValues),
-    StringOption(OptionConstants.ideawriteName, OptionConstants.ideawriteAlias, "all", isList = false, ideaWriteValues),
     StringOption(OptionConstants.selectionName, OptionConstants.selectionAlias, "inclusive", isList = false, setOf("old", "inclusive", "exclusive")),
-    StringOption(OptionConstants.shellName, OptionConstants.shellAlias, if (SystemInfo.isWindows) "cmd.exe" else System.getenv("SHELL") ?: "sh"),
-    StringOption(OptionConstants.shellxescapeName, OptionConstants.shellxescapeAlias, if (SystemInfo.isWindows) "\"&|<>()@^" else "", isList = false),
+    StringOption(OptionConstants.shellName, OptionConstants.shellAlias, if (injector.systemInfoService.isWindows) "cmd.exe" else System.getenv("SHELL") ?: "sh"),
+    StringOption(OptionConstants.shellxescapeName, OptionConstants.shellxescapeAlias, if (injector.systemInfoService.isWindows) "\"&|<>()@^" else "", isList = false),
     StringOption(OptionConstants.virtualeditName, OptionConstants.virtualeditAlias, "", isList = false, setOf("onemore", "block", "insert", "all")),
     StringOption(OptionConstants.viminfoName, OptionConstants.viminfoAlias, "'100,<50,s10,h", isList = true),
     StringOption(OptionConstants.nrformatsName, OptionConstants.nrformatsAlias, "hex", isList = true, setOf("octal", "hex", "alpha")),
-    StringOption(OptionConstants.clipboardName, OptionConstants.clipboardAlias, "ideaput,autoselect,exclude:cons\\|linux", isList = true),
+    StringOption(OptionConstants.clipboardName, OptionConstants.clipboardAlias, "autoselect,exclude:cons\\|linux", isList = true),
     StringOption(
       OptionConstants.selectmodeName, OptionConstants.selectmodeAlias, "", isList = true,
       setOf(
         OptionConstants.selectmode_mouse, OptionConstants.selectmode_key, OptionConstants.selectmode_cmd, OptionConstants.selectmode_ideaselection
       )
     ),
-    StringOption(OptionConstants.ideavimsupportName, OptionConstants.ideavimsupportAlias, "dialog", isList = true, ideavimsupportValues),
     StringOption(
       OptionConstants.keymodelName, OptionConstants.keymodelAlias, "${OptionConstants.keymodel_continueselect},${OptionConstants.keymodel_stopselect}", isList = true,
       setOf(
@@ -160,8 +124,8 @@ internal class OptionServiceImpl : OptionService {
         val shell = (getGlobalOptionValue(OptionConstants.shellName) as VimString).value
         return VimString(
           when {
-            SystemInfo.isWindows && shell.contains("powershell") -> "-Command"
-            SystemInfo.isWindows && !shell.contains("sh") -> "/c"
+            injector.systemInfoService.isWindows && shell.contains("powershell") -> "-Command"
+            injector.systemInfoService.isWindows && !shell.contains("sh") -> "/c"
             else -> "-c"
           }
         )
@@ -173,8 +137,8 @@ internal class OptionServiceImpl : OptionService {
         val shell = (getGlobalOptionValue(OptionConstants.shellName) as VimString).value
         return VimString(
           when {
-            SystemInfo.isWindows && shell == "cmd.exe" -> "("
-            SystemInfo.isWindows && shell.contains("sh") -> "\""
+            injector.systemInfoService.isWindows && shell == "cmd.exe" -> "("
+            injector.systemInfoService.isWindows && shell.contains("sh") -> "\""
             else -> ""
           }
         )
@@ -252,8 +216,20 @@ internal class OptionServiceImpl : OptionService {
     globalValues[optionName] = value
   }
 
+  private fun getLocalOptions(editor: VimEditor): MutableMap<String, VimDataType> {
+    val storageService = injector.vimEditorStorageService
+    val storedData = storageService.getDataFromEditor(editor, localOptionsKey)
+    if (storedData != null) {
+      return storedData
+    }
+    val localOptions = mutableMapOf<String, VimDataType>()
+    storageService.putDataToEditor(editor, localOptionsKey, localOptions)
+    return localOptions
+  }
+
   private fun setLocalOptionValue(optionName: String, value: VimDataType, editor: VimEditor) {
-    localOptions.setOption(editor, optionName, value)
+    val localOptions = getLocalOptions(editor)
+    localOptions[optionName] = value
   }
 
   private fun getGlobalOptionValue(optionName: String): VimDataType? {
@@ -262,8 +238,8 @@ internal class OptionServiceImpl : OptionService {
   }
 
   private fun getLocalOptionValue(optionName: String, editor: VimEditor): VimDataType? {
-    val option = options.get(optionName) ?: return null
-    return localOptions.getOptions(editor)[option.name] ?: getGlobalOptionValue(optionName)
+    val localOptions = getLocalOptions(editor)
+    return localOptions[optionName] ?: getGlobalOptionValue(optionName)
   }
 
   /**
@@ -348,9 +324,8 @@ internal class OptionServiceImpl : OptionService {
 
   override fun resetAllOptions() {
     globalValues.clear()
-    for (editor in localEditors()) {
-      localOptions.reset(IjVimEditor(editor))
-    }
+    injector.editorGroup.localEditors()
+      .forEach { injector.vimEditorStorageService.getDataFromEditor(it, localOptionsKey)?.clear() }
   }
 
   override fun isToggleOption(optionName: String): Boolean {
@@ -391,13 +366,6 @@ internal class OptionServiceImpl : OptionService {
       is ToggleOption -> throw ExException("E474: Invalid argument: $token")
       is StringOption -> VimString(value)
     }
-  }
-
-  companion object {
-    val ideaStatusIconValues = setOf("enabled", "gray", "disabled")
-    val ideaRefactorModeValues = setOf("keep", "select", "visual")
-    val ideaWriteValues = setOf("all", "file")
-    val ideavimsupportValues = setOf("dialog", "singleline", "dialoglegacy")
   }
 }
 

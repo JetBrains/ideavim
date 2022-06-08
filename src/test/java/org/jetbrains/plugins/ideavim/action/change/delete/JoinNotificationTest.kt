@@ -24,6 +24,7 @@ import com.intellij.notification.EventLog
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.vimscript.services.IjVimOptionService
 import org.jetbrains.plugins.ideavim.OptionValueType
 import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
@@ -32,10 +33,10 @@ import org.jetbrains.plugins.ideavim.VimTestOption
 /**
  * @author Alex Plate
  */
-class JoinNotificationTest : VimOptionTestCase(OptionConstants.ideajoinName) {
+class JoinNotificationTest : VimOptionTestCase(IjVimOptionService.ideajoinName) {
   // [VERSION UPDATE] 221+: Uncomment
 /*
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.ideajoinName, OptionValueType.NUMBER, "0"))
+  @VimOptionTestConfiguration(VimTestOption(IjVimOptionService.ideajoinName, OptionValueType.NUMBER, "0"))
   fun `test notification shown for no ideajoin`() {
     val before = "I found${c} it\n in a legendary land"
     configureByText(before)
@@ -67,7 +68,7 @@ class JoinNotificationTest : VimOptionTestCase(OptionConstants.ideajoinName) {
   }
 */
 
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.ideajoinName, OptionValueType.NUMBER, "0"))
+  @VimOptionTestConfiguration(VimTestOption(IjVimOptionService.ideajoinName, OptionValueType.NUMBER, "0"))
   fun `test notification not shown if was shown already`() {
     val before = "I found${c} it\n in a legendary land"
     configureByText(before)
@@ -75,7 +76,7 @@ class JoinNotificationTest : VimOptionTestCase(OptionConstants.ideajoinName) {
     typeText(injector.parser.parseKeys("J"))
 
     val notifications = EventLog.getLogModel(myFixture.project).notifications
-    assertTrue(notifications.isEmpty() || notifications.last().isExpired || OptionConstants.ideajoinName !in notifications.last().content)
+    assertTrue(notifications.isEmpty() || notifications.last().isExpired || IjVimOptionService.ideajoinName !in notifications.last().content)
   }
 
   private fun appReadySetup(notifierEnabled: Boolean) {

@@ -46,6 +46,7 @@ import com.maddyhome.idea.vim.mark.*;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.options.OptionConstants;
 import com.maddyhome.idea.vim.options.OptionScope;
+import com.maddyhome.idea.vim.vimscript.services.IjVimOptionService;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -126,7 +127,7 @@ public class MarkGroup extends VimMarkGroupBase implements PersistentStateCompon
 
   public void saveData(@NotNull Element element) {
     Element marksElem = new Element("globalmarks");
-    if (!VimPlugin.getOptionService().isSet(OptionScope.GLOBAL.INSTANCE, OptionConstants.ideamarksName, OptionConstants.ideamarksName)) {
+    if (!VimPlugin.getOptionService().isSet(OptionScope.GLOBAL.INSTANCE, IjVimOptionService.ideamarksName, IjVimOptionService.ideamarksName)) {
       for (Mark mark : globalMarks.values()) {
         if (!mark.isClear()) {
           Element markElem = new Element("mark");
@@ -199,7 +200,7 @@ public class MarkGroup extends VimMarkGroupBase implements PersistentStateCompon
     // (see com.intellij.openapi.application.Application.runReadAction())
 
     Element marksElem = element.getChild("globalmarks");
-    if (marksElem != null && !VimPlugin.getOptionService().isSet(OptionScope.GLOBAL.INSTANCE, OptionConstants.ideamarksName, OptionConstants.ideamarksName)) {
+    if (marksElem != null && !VimPlugin.getOptionService().isSet(OptionScope.GLOBAL.INSTANCE, IjVimOptionService.ideamarksName, IjVimOptionService.ideamarksName)) {
       List<Element> markList = marksElem.getChildren("mark");
       for (Element aMarkList : markList) {
         Mark mark = VimMark.create(aMarkList.getAttributeValue("key").charAt(0),
@@ -360,7 +361,7 @@ public class MarkGroup extends VimMarkGroupBase implements PersistentStateCompon
     @Override
     public void bookmarkAdded(@NotNull BookmarkGroup group, com.intellij.ide.bookmark.@NotNull Bookmark bookmark) {
       if (!VimPlugin.isEnabled()) return;
-      if (!VimPlugin.getOptionService().isSet(OptionScope.GLOBAL.INSTANCE, OptionConstants.ideamarksName, OptionConstants.ideamarksName)) return;
+      if (!VimPlugin.getOptionService().isSet(OptionScope.GLOBAL.INSTANCE, IjVimOptionService.ideamarksName, IjVimOptionService.ideamarksName)) return;
 
       if (!(bookmark instanceof LineBookmark)) return;
       BookmarksManager bookmarksManager = BookmarksManager.getInstance(myProject);
@@ -377,7 +378,7 @@ public class MarkGroup extends VimMarkGroupBase implements PersistentStateCompon
     @Override
     public void bookmarkRemoved(@NotNull BookmarkGroup group, com.intellij.ide.bookmark.@NotNull Bookmark bookmark) {
       if (!VimPlugin.isEnabled()) return;
-      if (!VimPlugin.getOptionService().isSet(OptionScope.GLOBAL.INSTANCE, OptionConstants.ideamarksName, OptionConstants.ideamarksName)) return;
+      if (!VimPlugin.getOptionService().isSet(OptionScope.GLOBAL.INSTANCE, IjVimOptionService.ideamarksName, IjVimOptionService.ideamarksName)) return;
 
       if (!(bookmark instanceof LineBookmark)) return;
       BookmarksManager bookmarksManager = BookmarksManager.getInstance(myProject);

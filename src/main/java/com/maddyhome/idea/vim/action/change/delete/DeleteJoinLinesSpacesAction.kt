@@ -21,44 +21,32 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.group.visual.VimSelection
-import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
-import com.maddyhome.idea.vim.helper.enumSetOf
+import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
-import java.util.*
+import com.maddyhome.idea.vim.vimscript.services.IjVimOptionService
 
-/**
- * @author vlan
- */
-class DeleteJoinVisualLinesSpacesAction : VisualOperatorActionHandler.SingleExecution() {
+class DeleteJoinLinesSpacesAction : ChangeEditorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.DELETE
 
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_EXIT_VISUAL)
-
-  override fun executeForAllCarets(
+  override fun execute(
     editor: VimEditor,
     context: ExecutionContext,
-    cmd: Command,
-    caretsAndSelections: Map<VimCaret, VimSelection>,
+    argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Boolean {
     if (editor.isOneLineMode()) return false
-    if (injector.optionService.isSet(OptionScope.LOCAL(editor), OptionConstants.ideajoinName)) {
-      injector.changeGroup.joinViaIdeaBySelections(editor, context, caretsAndSelections)
-      return true
+    if (injector.optionService.isSet(OptionScope.LOCAL(editor), IjVimOptionService.ideajoinName)) {
+      return injector.changeGroup.joinViaIdeaByCount(editor, context, operatorArguments.count1)
     }
+    injector.editorGroup.notifyIdeaJoin(editor)
     val res = arrayOf(true)
     editor.forEachNativeCaret(
       { caret: VimCaret ->
-        if (!caret.isValid) return@forEachNativeCaret
-        val range = caretsAndSelections[caret] ?: return@forEachNativeCaret
-        if (!injector.changeGroup.deleteJoinRange(editor, caret, range.toVimTextRange(true).normalize(), true)) {
-          res[0] = false
-        }
+        if (!injector.changeGroup.deleteJoinLines(editor, caret, operatorArguments.count1, true)) res[0] =false
       },
       true
     )

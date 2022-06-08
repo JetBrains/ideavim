@@ -8,6 +8,7 @@ import com.maddyhome.idea.vim.api.stubs.VimProcessGroupStub
 import com.maddyhome.idea.vim.common.VimMachine
 import com.maddyhome.idea.vim.common.VimMachineBase
 import com.maddyhome.idea.vim.diagnostic.vimLogger
+import com.maddyhome.idea.vim.options.OptionService
 import com.maddyhome.idea.vim.register.VimRegisterGroup
 import com.maddyhome.idea.vim.register.VimRegisterGroupBase
 
@@ -17,9 +18,10 @@ abstract class VimInjectorBase : VimInjector {
     val registerGroupStub by lazy { object : VimRegisterGroupBase() {} }
   }
 
-  // todo remove StringHelper & CommonStringHelper
   override val parser: VimStringParser = object : VimStringParserBase() {}
   override val vimMachine: VimMachine = object : VimMachineBase() {}
+  override val optionService: OptionService by lazy { object : VimOptionServiceBase(){} }
+
   override val registerGroup: VimRegisterGroup by lazy { registerGroupStub }
   override val registerGroupIfCreated: VimRegisterGroup? by lazy { registerGroupStub }
   override val messages: VimMessages by lazy { VimMessagesStub() }

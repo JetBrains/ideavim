@@ -27,8 +27,9 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.vimscript.services.IjVimOptionService
 
-class DeleteJoinLinesSpacesAction : ChangeEditorActionHandler.SingleExecution() {
+class DeleteJoinLinesAction : ChangeEditorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.DELETE
 
   override fun execute(
@@ -38,14 +39,14 @@ class DeleteJoinLinesSpacesAction : ChangeEditorActionHandler.SingleExecution() 
     operatorArguments: OperatorArguments,
   ): Boolean {
     if (editor.isOneLineMode()) return false
-    if (injector.optionService.isSet(OptionScope.LOCAL(editor), OptionConstants.ideajoinName)) {
+    if (injector.optionService.isSet(OptionScope.LOCAL(editor), IjVimOptionService.ideajoinName)) {
       return injector.changeGroup.joinViaIdeaByCount(editor, context, operatorArguments.count1)
     }
     injector.editorGroup.notifyIdeaJoin(editor)
     val res = arrayOf(true)
     editor.forEachNativeCaret(
       { caret: VimCaret ->
-        if (!injector.changeGroup.deleteJoinLines(editor, caret, operatorArguments.count1, true)) res[0] =false
+        if (!injector.changeGroup.deleteJoinLines(editor, caret, operatorArguments.count1, false)) res[0] = false
       },
       true
     )

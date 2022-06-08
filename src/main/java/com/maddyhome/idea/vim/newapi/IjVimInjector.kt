@@ -7,6 +7,7 @@ import com.maddyhome.idea.vim.api.EngineEditorHelper
 import com.maddyhome.idea.vim.api.ExEntryPanel
 import com.maddyhome.idea.vim.api.ExecutionContextManager
 import com.maddyhome.idea.vim.api.NativeActionManager
+import com.maddyhome.idea.vim.api.SystemInfoService
 import com.maddyhome.idea.vim.api.VimActionExecutor
 import com.maddyhome.idea.vim.api.VimApplication
 import com.maddyhome.idea.vim.api.VimChangeGroup
@@ -15,6 +16,7 @@ import com.maddyhome.idea.vim.api.VimCommandGroup
 import com.maddyhome.idea.vim.api.VimDigraphGroup
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimEditorGroup
+import com.maddyhome.idea.vim.api.VimEditorStorageService
 import com.maddyhome.idea.vim.api.VimEnabler
 import com.maddyhome.idea.vim.api.VimExOutputPanel
 import com.maddyhome.idea.vim.api.VimExOutputPanelService
@@ -58,7 +60,9 @@ import com.maddyhome.idea.vim.group.copy.YankGroup
 import com.maddyhome.idea.vim.helper.CommandLineHelper
 import com.maddyhome.idea.vim.helper.IjActionExecutor
 import com.maddyhome.idea.vim.helper.IjEditorHelper
+import com.maddyhome.idea.vim.group.IjVimEditorStorageService
 import com.maddyhome.idea.vim.helper.IjVimStringParser
+import com.maddyhome.idea.vim.group.IjVimSystemInfoService
 import com.maddyhome.idea.vim.helper.UndoRedoHelper
 import com.maddyhome.idea.vim.helper.VimCommandLineHelper
 import com.maddyhome.idea.vim.helper.vimCommandState
@@ -171,6 +175,11 @@ class IjVimInjector : VimInjectorBase() {
     get() = service()
   override val parser: VimStringParser
     get() = service<IjVimStringParser>()
+
+  override val systemInfoService: SystemInfoService
+    get() = service()
+  override val vimEditorStorageService: VimEditorStorageService
+    get() = service()
 
   override fun commandStateFor(editor: VimEditor): CommandState {
     var res = editor.ij.vimCommandState

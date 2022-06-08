@@ -42,11 +42,15 @@ import com.maddyhome.idea.vim.options.LocalOptionChangeListener;
 import com.maddyhome.idea.vim.options.OptionConstants;
 import com.maddyhome.idea.vim.options.OptionScope;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType;
+import com.maddyhome.idea.vim.vimscript.services.IjVimOptionService;
 import org.jdom.Element;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Collection;
+import java.util.stream.Collectors;
 
 import static com.maddyhome.idea.vim.helper.CaretVisualAttributesHelperKt.updateCaretsVisualAttributes;
 
@@ -242,7 +246,7 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
 
   public void notifyIdeaJoin(@Nullable Project project) {
     if (VimPlugin.getVimState().isIdeaJoinNotified()
-        || VimPlugin.getOptionService().isSet(OptionScope.GLOBAL.INSTANCE, OptionConstants.ideajoinName, OptionConstants.ideajoinName)) {
+        || VimPlugin.getOptionService().isSet(OptionScope.GLOBAL.INSTANCE, IjVimOptionService.ideajoinName, IjVimOptionService.ideajoinName)) {
       return;
     }
 
@@ -315,5 +319,13 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
     public Integer getMaxLineNumber(@NotNull Editor editor) {
       return editor.getDocument().getLineCount();
     }
+  }
+
+  @NotNull
+  @Override
+  public Collection<VimEditor> localEditors() {
+    return HelperKt.localEditors().stream()
+      .map(IjVimEditor::new)
+      .collect(Collectors.toList());
   }
 }

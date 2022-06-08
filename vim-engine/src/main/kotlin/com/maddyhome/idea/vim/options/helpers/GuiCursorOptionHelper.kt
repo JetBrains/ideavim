@@ -16,9 +16,9 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.vimscript.model.options.helpers
+package com.maddyhome.idea.vim.options.helpers
 
-import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.options.OptionConstants
@@ -93,7 +93,7 @@ object GuiCursorOptionHelper {
       var highlightGroup = ""
       var lmapHighlightGroup = ""
       var blinkModes = emptyList<String>()
-      (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, OptionConstants.guicursorName) as VimString).value
+      (injector.optionService.getOptionValue(OptionScope.GLOBAL, OptionConstants.guicursorName) as VimString).value
         .split(",")
         .map { convertToken(it) }
         .forEach { data ->

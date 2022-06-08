@@ -51,6 +51,7 @@ import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.options.OptionConstants;
 import com.maddyhome.idea.vim.options.OptionScope;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
+import com.maddyhome.idea.vim.vimscript.services.IjVimOptionService;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -184,7 +185,7 @@ public class FileGroup extends VimFileBase {
   @Override
   public void saveFile(@NotNull ExecutionContext context) {
     NativeAction action;
-    if (OptionConstants.ideawrite_all.equals(((VimString) VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL.INSTANCE, OptionConstants.ideawriteName, OptionConstants.ideawriteName)).getValue())) {
+    if (IjVimOptionService.ideawrite_all.equals(((VimString) VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL.INSTANCE, IjVimOptionService.ideawriteName, IjVimOptionService.ideawriteName)).getValue())) {
       action = VimInjectorKt.getInjector().getNativeActionManager().getSaveAll();
     }
     else {

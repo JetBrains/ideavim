@@ -118,6 +118,9 @@ interface VimInjector {
   // Can't be fully moved to vim-engine.
   val vimrcFileState: VimrcFileState
 
+  val systemInfoService: SystemInfoService
+  val vimEditorStorageService: VimEditorStorageService
+
   /**
    * Please use vimLogger() function
    */

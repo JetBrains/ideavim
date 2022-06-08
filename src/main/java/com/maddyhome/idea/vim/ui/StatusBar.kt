@@ -51,6 +51,7 @@ import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
+import com.maddyhome.idea.vim.vimscript.services.IjVimOptionService
 import org.jetbrains.annotations.NonNls
 import java.awt.Point
 import java.awt.event.MouseEvent
@@ -72,13 +73,13 @@ class StatusBarIconFactory : StatusBarWidgetFactory/*, LightEditCompatible*/ {
   }
 
   override fun isAvailable(project: Project): Boolean {
-    val ideaStatusIconValue = (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, OptionConstants.ideastatusiconName) as VimString).value
-    return ideaStatusIconValue != OptionConstants.ideastatusicon_disabled
+    val ideaStatusIconValue = (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, IjVimOptionService.ideastatusiconName) as VimString).value
+    return ideaStatusIconValue != IjVimOptionService.ideastatusicon_disabled
   }
 
   override fun createWidget(project: Project): StatusBarWidget {
     VimPlugin.getOptionService().addListener(
-      OptionConstants.ideastatusiconName,
+      IjVimOptionService.ideastatusiconName,
       object : OptionChangeListener<VimDataType> {
         override fun processGlobalValueChange(oldValue: VimDataType?) {
           updateAll()
@@ -130,8 +131,8 @@ class VimStatusBar : StatusBarWidget, StatusBarWidget.IconPresentation {
   override fun getTooltipText() = STATUS_BAR_DISPLAY_NAME
 
   override fun getIcon(): Icon {
-    val ideaStatusIconValue = (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, OptionConstants.ideastatusiconName) as VimString).value
-    if (ideaStatusIconValue == OptionConstants.ideastatusicon_gray) return VimIcons.IDEAVIM_DISABLED
+    val ideaStatusIconValue = (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, IjVimOptionService.ideastatusiconName) as VimString).value
+    if (ideaStatusIconValue == IjVimOptionService.ideastatusicon_gray) return VimIcons.IDEAVIM_DISABLED
     return if (VimPlugin.isEnabled()) VimIcons.IDEAVIM else VimIcons.IDEAVIM_DISABLED
   }
 
