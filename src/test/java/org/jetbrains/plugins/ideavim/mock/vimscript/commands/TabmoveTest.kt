@@ -136,4 +136,22 @@ class TabmoveTest : MockTestCase() {
     assertPluginErrorMessageContains("E474: Invalid argument")
     verify(tabService, never()).moveCurrentTabToIndex(any(), any())
   }
+
+  fun `test move left with omitted number`() {
+    val tabService = mockService(TabService::class.java)
+    Mockito.`when`(tabService.getCurrentTabIndex(contextStub)).thenReturn(2)
+    Mockito.`when`(tabService.getTabCount(contextStub)).thenReturn(5)
+    injector.vimscriptExecutor.execute("tabmove +", editorStub, contextStub, skipHistory = false)
+
+    verify(tabService).moveCurrentTabToIndex(3, contextStub)
+  }
+
+  fun `test move right with omitted number`() {
+    val tabService = mockService(TabService::class.java)
+    Mockito.`when`(tabService.getCurrentTabIndex(contextStub)).thenReturn(2)
+    Mockito.`when`(tabService.getTabCount(contextStub)).thenReturn(5)
+    injector.vimscriptExecutor.execute("tabmove -", editorStub, contextStub, skipHistory = false)
+
+    verify(tabService).moveCurrentTabToIndex(1, contextStub)
+  }
 }

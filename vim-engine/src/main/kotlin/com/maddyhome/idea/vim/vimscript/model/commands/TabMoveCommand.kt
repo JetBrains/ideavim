@@ -29,7 +29,7 @@ import java.lang.NumberFormatException
 /*
  * see "h :tabmove"
  */
-data class TabMoveCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
+data class TabMoveCommand(val ranges: Ranges, var argument: String) : Command.SingleExecution(ranges, argument) {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
@@ -43,6 +43,10 @@ data class TabMoveCommand(val ranges: Ranges, val argument: String) : Command.Si
     val index: Int
 
     try {
+      argument = argument.trim()
+      if (argument == "+" || argument == "-") {
+        argument += "1"
+      }
       index = if (argument.startsWith("+")) {
         val number = Integer.parseInt(argument.substring(1))
         if (number == 0) {
