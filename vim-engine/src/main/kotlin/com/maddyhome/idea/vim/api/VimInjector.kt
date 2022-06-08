@@ -49,7 +49,7 @@ interface VimInjector {
   val nativeActionManager: NativeActionManager
   // [FINISHED] Can't be fully moved to vim-engine.
   val keyGroup: VimKeyGroup
-  // Only state left in the IJ && some IJ specifics
+  // [FINISHED] Only state left in the IJ && some IJ specifics
   val markGroup: VimMarkGroup
   // !! in progress
   val visualMotionGroup: VimVisualMotionGroup

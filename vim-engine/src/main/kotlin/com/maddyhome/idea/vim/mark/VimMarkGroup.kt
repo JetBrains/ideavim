@@ -62,4 +62,27 @@ interface VimMarkGroup {
   fun getMarks(editor: VimEditor): List<Mark>
   fun getJumps(): List<Jump>
   fun getJumpSpot(): Int
+
+  /**
+   * This updates all the marks for a file whenever text is deleted from the file. If the line that contains a mark
+   * is completely deleted then the mark is deleted too. If the deleted text is before the marked line, the mark is
+   * moved up by the number of deleted lines.
+   *
+   * @param editor      The modified editor
+   * @param marks       The editor's marks to update
+   * @param delStartOff The offset within the editor where the deletion occurred
+   * @param delLength   The length of the deleted text
+   */
+  fun updateMarkFromDelete(editor: VimEditor?, marks: HashMap<Char, Mark>?, delStartOff: Int, delLength: Int)
+
+  /**
+   * This updates all the marks for a file whenever text is inserted into the file. If the line that contains a mark
+   * that is after the start of the insertion point, shift the mark by the number of new lines added.
+   *
+   * @param editor      The editor that was updated
+   * @param marks       The editor's marks
+   * @param insStartOff The insertion point
+   * @param insLength   The length of the insertion
+   */
+  fun updateMarkFromInsert(editor: VimEditor?, marks: java.util.HashMap<Char, Mark>?, insStartOff: Int, insLength: Int)
 }

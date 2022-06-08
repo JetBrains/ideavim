@@ -29,7 +29,6 @@ import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.editor.event.EditorFactoryEvent;
@@ -40,8 +39,7 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.VimEditor;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.CommandState;
+import com.maddyhome.idea.vim.api.VimInjectorKt;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.HelperKt;
 import com.maddyhome.idea.vim.mark.*;
@@ -53,9 +51,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
-import static com.maddyhome.idea.vim.mark.VimMarkConstants.*;
+import static com.maddyhome.idea.vim.mark.VimMarkConstants.GLOBAL_MARKS;
+import static com.maddyhome.idea.vim.mark.VimMarkConstants.SAVE_FILE_MARKS;
 
 /**
  * This class contains all the mark related functionality
@@ -272,94 +270,6 @@ public class MarkGroup extends VimMarkGroupBase implements PersistentStateCompon
     }
   }
 
-  /**
-   * This updates all the marks for a file whenever text is deleted from the file. If the line that contains a mark
-   * is completely deleted then the mark is deleted too. If the deleted text is before the marked line, the mark is
-   * moved up by the number of deleted lines.
-   *
-   * @param editor      The modified editor
-   * @param marks       The editor's marks to update
-   * @param delStartOff The offset within the editor where the deletion occurred
-   * @param delLength   The length of the deleted text
-   */
-  public static void updateMarkFromDelete(@Nullable Editor editor, @Nullable HashMap<Character, Mark> marks, int delStartOff, int delLength) {
-    // Skip all this work if there are no marks
-    if (marks != null && marks.size() > 0 && editor != null) {
-      // Calculate the logical position of the start and end of the deleted text
-      int delEndOff = delStartOff + delLength - 1;
-      LogicalPosition delStart = editor.offsetToLogicalPosition(delStartOff);
-      LogicalPosition delEnd = editor.offsetToLogicalPosition(delEndOff + 1);
-      if (logger.isDebugEnabled()) logger.debug("mark delete. delStart = " + delStart + ", delEnd = " + delEnd);
-
-      // Now analyze each mark to determine if it needs to be updated or removed
-      for (Character ch : marks.keySet()) {
-        Mark myMark = marks.get(ch);
-        if (!(myMark instanceof VimMark)) continue;
-        VimMark mark = (VimMark) myMark;
-
-        if (logger.isDebugEnabled()) logger.debug("mark = " + mark);
-        // If the end of the deleted text is prior to the marked line, simply shift the mark up by the
-        // proper number of lines.
-        if (delEnd.line < mark.getLogicalLine()) {
-          int lines = delEnd.line - delStart.line;
-          if (logger.isDebugEnabled()) logger.debug("Shifting mark by " + lines + " lines");
-          mark.setLogicalLine(mark.getLogicalLine() - lines);
-        }
-        // If the deleted text begins before the mark and ends after the mark then it may be shifted or deleted
-        else if (delStart.line <= mark.getLogicalLine() && delEnd.line >= mark.getLogicalLine()) {
-          int markLineStartOff = EditorHelper.getLineStartOffset(editor, mark.getLogicalLine());
-          int markLineEndOff = EditorHelper.getLineEndOffset(editor, mark.getLogicalLine(), true);
-
-          Command command = CommandState.getInstance(new IjVimEditor(editor)).getExecutingCommand();
-          // If text is being changed from the start of the mark line (a special case for mark deletion)
-          boolean changeFromMarkLineStart = command != null && command.getType() == Command.Type.CHANGE
-                                            && delStartOff == markLineStartOff;
-          // If the marked line is completely within the deleted text, remove the mark (except the special case)
-          if (delStartOff <= markLineStartOff && delEndOff >= markLineEndOff && !changeFromMarkLineStart) {
-            VimPlugin.getMark().removeMark(ch, mark);
-            logger.debug("Removed mark");
-          }
-          // The deletion only covers part of the marked line so shift the mark only if the deletion begins
-          // on a line prior to the marked line (which means the deletion must end on the marked line).
-          else if (delStart.line < mark.getLogicalLine()) {
-            // shift mark
-            mark.setLogicalLine(delStart.line);
-            if (logger.isDebugEnabled()) logger.debug("Shifting mark to line " + delStart.line);
-          }
-        }
-      }
-    }
-  }
-
-  /**
-   * This updates all the marks for a file whenever text is inserted into the file. If the line that contains a mark
-   * that is after the start of the insertion point, shift the mark by the number of new lines added.
-   *
-   * @param editor      The editor that was updated
-   * @param marks       The editor's marks
-   * @param insStartOff The insertion point
-   * @param insLength   The length of the insertion
-   */
-  public static void updateMarkFromInsert(@Nullable Editor editor, @Nullable HashMap<Character, Mark> marks, int insStartOff, int insLength) {
-    if (marks != null && marks.size() > 0 && editor != null) {
-      int insEndOff = insStartOff + insLength;
-      LogicalPosition insStart = editor.offsetToLogicalPosition(insStartOff);
-      LogicalPosition insEnd = editor.offsetToLogicalPosition(insEndOff);
-      if (logger.isDebugEnabled()) logger.debug("mark insert. insStart = " + insStart + ", insEnd = " + insEnd);
-      int lines = insEnd.line - insStart.line;
-      if (lines == 0) return;
-
-      for (VimMark mark : marks.values().stream().filter(VimMark.class::isInstance).map(VimMark.class::cast).collect(Collectors.toList())) {
-        if (logger.isDebugEnabled()) logger.debug("mark = " + mark);
-        // Shift the mark if the insertion began on a line prior to the marked line.
-        if (insStart.line < mark.getLogicalLine()) {
-          mark.setLogicalLine(mark.getLogicalLine() + lines);
-          if (logger.isDebugEnabled()) logger.debug("Shifting mark by " + lines + " lines");
-        }
-      }
-    }
-  }
-
   @Nullable
   @Override
   public Element getState() {
@@ -399,8 +309,11 @@ public class MarkGroup extends VimMarkGroupBase implements PersistentStateCompon
       if (event.getOldLength() == 0) return;
 
       Document doc = event.getDocument();
-      updateMarkFromDelete(getAnEditor(doc), VimPlugin.getMark().getAllFileMarks(doc), event.getOffset(),
-                           event.getOldLength());
+      Editor anEditor = getAnEditor(doc);
+      VimInjectorKt.getInjector().getMarkGroup()
+        .updateMarkFromDelete(anEditor == null ? null : new IjVimEditor(anEditor),
+                              VimPlugin.getMark().getAllFileMarks(doc),
+                              event.getOffset(), event.getOldLength());
       // TODO - update jumps
     }
 
@@ -418,8 +331,10 @@ public class MarkGroup extends VimMarkGroupBase implements PersistentStateCompon
       if (event.getNewLength() == 0 || (event.getNewLength() == 1 && event.getNewFragment().charAt(0) != '\n')) return;
 
       Document doc = event.getDocument();
-      updateMarkFromInsert(getAnEditor(doc), VimPlugin.getMark().getAllFileMarks(doc), event.getOffset(),
-                           event.getNewLength());
+      Editor anEditor = getAnEditor(doc);
+      VimInjectorKt.getInjector().getMarkGroup()
+        .updateMarkFromInsert(anEditor == null ? null : new IjVimEditor(anEditor),
+                              VimPlugin.getMark().getAllFileMarks(doc), event.getOffset(), event.getNewLength());
       // TODO - update jumps
     }
 

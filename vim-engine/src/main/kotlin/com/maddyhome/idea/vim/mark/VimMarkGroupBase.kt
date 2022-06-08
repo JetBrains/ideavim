@@ -2,7 +2,11 @@ package com.maddyhome.idea.vim.mark
 
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.diagnostic.debug
+import com.maddyhome.idea.vim.diagnostic.vimLogger
+import com.maddyhome.idea.vim.helper.commandState
 import java.util.*
 
 abstract class VimMarkGroupBase : VimMarkGroup {
@@ -28,7 +32,93 @@ abstract class VimMarkGroupBase : VimMarkGroup {
     }
   }
 
+  /**
+   * This updates all the marks for a file whenever text is deleted from the file. If the line that contains a mark
+   * is completely deleted then the mark is deleted too. If the deleted text is before the marked line, the mark is
+   * moved up by the number of deleted lines.
+   *
+   * @param editor      The modified editor
+   * @param marks       The editor's marks to update
+   * @param delStartOff The offset within the editor where the deletion occurred
+   * @param delLength   The length of the deleted text
+   */
+  override fun updateMarkFromDelete(editor: VimEditor?, marks: HashMap<Char, Mark>?, delStartOff: Int, delLength: Int) {
+    // Skip all this work if there are no marks
+    if (marks != null && marks.size > 0 && editor != null) {
+      // Calculate the logical position of the start and end of the deleted text
+      val delEndOff = delStartOff + delLength - 1
+      val delStart = editor.offsetToLogicalPosition(delStartOff)
+      val delEnd = editor.offsetToLogicalPosition(delEndOff + 1)
+      logger.debug { "mark delete. delStart = $delStart, delEnd = $delEnd" }
+
+      // Now analyze each mark to determine if it needs to be updated or removed
+      for (ch in marks.keys) {
+        val myMark = marks[ch]
+        if (myMark !is VimMark) continue
+
+        logger.debug { "mark = $myMark" }
+        // If the end of the deleted text is prior to the marked line, simply shift the mark up by the
+        // proper number of lines.
+        if (delEnd.line < myMark.logicalLine) {
+          val lines = delEnd.line - delStart.line
+          logger.debug { "Shifting mark by $lines lines" }
+          myMark.logicalLine = myMark.logicalLine - lines
+        } else if (delStart.line <= myMark.logicalLine/* && delEnd.line >= mark.logicalLine*/) {
+          // Regarding the commented out condition in if: This additional condition was here before moving to kotlin
+          // But now it's highlighted as "always true", so I commented it out for case of it's a bug
+
+          val markLineStartOff = injector.engineEditorHelper.getLineStartOffset(editor, myMark.logicalLine)
+          val markLineEndOff = injector.engineEditorHelper.getLineEndOffset(editor, myMark.logicalLine, true)
+
+          val command = editor.commandState.executingCommand
+          // If text is being changed from the start of the mark line (a special case for mark deletion)
+          val changeFromMarkLineStart = (command != null && command.type === Command.Type.CHANGE && delStartOff == markLineStartOff)
+          // If the marked line is completely within the deleted text, remove the mark (except the special case)
+          if (delStartOff <= markLineStartOff && delEndOff >= markLineEndOff && !changeFromMarkLineStart) {
+            injector.markGroup.removeMark(ch, myMark)
+            logger.debug("Removed mark")
+          } else if (delStart.line < myMark.logicalLine) {
+            // shift mark
+            myMark.logicalLine = delStart.line
+            logger.debug { "Shifting mark to line " + delStart.line }
+          }// The deletion only covers part of the marked line so shift the mark only if the deletion begins
+          // on a line prior to the marked line (which means the deletion must end on the marked line).
+        }// If the deleted text begins before the mark and ends after the mark then it may be shifted or deleted
+      }
+    }
+  }
+
+  /**
+   * This updates all the marks for a file whenever text is inserted into the file. If the line that contains a mark
+   * that is after the start of the insertion point, shift the mark by the number of new lines added.
+   *
+   * @param editor      The editor that was updated
+   * @param marks       The editor's marks
+   * @param insStartOff The insertion point
+   * @param insLength   The length of the insertion
+   */
+  override fun updateMarkFromInsert(editor: VimEditor?, marks: HashMap<Char, Mark>?, insStartOff: Int, insLength: Int) {
+    if (marks != null && marks.size > 0 && editor != null) {
+      val insEndOff = insStartOff + insLength
+      val insStart = editor.offsetToLogicalPosition(insStartOff)
+      val insEnd = editor.offsetToLogicalPosition(insEndOff)
+      logger.debug { "mark insert. insStart = $insStart, insEnd = $insEnd" }
+      val lines = insEnd.line - insStart.line
+      if (lines == 0) return
+
+      for (mark in marks.values.filterIsInstance<VimMark>()) {
+        logger.debug { "mark = $mark" }
+        // Shift the mark if the insertion began on a line prior to the marked line.
+        if (insStart.line < mark.logicalLine) {
+          mark.logicalLine = mark.logicalLine + lines
+          logger.debug { "Shifting mark by $lines lines" }
+        }
+      }
+    }
+  }
+
   companion object {
+    private val logger = vimLogger<VimMarkGroupBase>()
     const val SAVE_JUMP_COUNT = 100
   }
 
