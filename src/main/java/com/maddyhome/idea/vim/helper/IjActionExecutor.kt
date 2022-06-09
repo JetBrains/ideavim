@@ -158,4 +158,3 @@ class IjActionExecutor : VimActionExecutor {
     return ActionManager.getInstance().getActionIdList(idPrefix)
   }
 }
-

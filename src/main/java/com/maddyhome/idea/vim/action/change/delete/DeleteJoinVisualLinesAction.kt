@@ -27,7 +27,6 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
-import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.services.IjVimOptionService
 import java.util.*
@@ -55,13 +54,14 @@ class DeleteJoinVisualLinesAction : VisualOperatorActionHandler.SingleExecution(
     val res = arrayOf(true)
     editor.forEachNativeCaret(
       {
-          caret: VimCaret ->
+        caret: VimCaret ->
         if (!caret.isValid) return@forEachNativeCaret
         val range = caretsAndSelections[caret] ?: return@forEachNativeCaret
         if (!injector.changeGroup.deleteJoinRange(editor, caret, range.toVimTextRange(true).normalize(), false)) {
           res[0] = false
-      }
-    }, true)
+        }
+      }, true
+    )
     return res[0]
   }
 }
