@@ -482,4 +482,12 @@ class VimSurroundExtensionTest : VimTestCase() {
     val after = """'\n'"""
     assertState(after)
   }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  fun testMappingSurroundPlugin() {
+    val before = "if (condition) ${c}return;\n"
+    val after = "if (condition) \"return\";\n"
+
+    doTest(":map gw ysiw\"<CR>gw", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
 }

@@ -18,6 +18,7 @@
 
 package com.maddyhome.idea.vim.ui
 
+import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.helper.isCloseKeyStroke
 import java.awt.KeyEventDispatcher
 import java.awt.KeyboardFocusManager
@@ -30,6 +31,18 @@ import javax.swing.KeyStroke
  */
 object ModalEntry {
   inline fun activate(crossinline processor: (KeyStroke) -> Boolean) {
+
+    // Firstly we pull the unfinished keys of the current mapping
+    val mappingStack = KeyHandler.getInstance().mappingStack
+    while (mappingStack.hasStroke()) {
+      val keyStroke = mappingStack.getStroke()
+      val result = processor(keyStroke)
+      if (!result) {
+        return
+      }
+    }
+
+    // Then start to accept user input
     val systemQueue = Toolkit.getDefaultToolkit().systemEventQueue
     val loop = systemQueue.createSecondaryLoop()
 

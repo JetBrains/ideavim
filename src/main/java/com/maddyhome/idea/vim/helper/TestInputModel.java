@@ -20,6 +20,8 @@ package com.maddyhome.idea.vim.helper;
 
 import com.google.common.collect.Lists;
 import com.intellij.openapi.editor.Editor;
+import com.maddyhome.idea.vim.KeyHandler;
+import com.maddyhome.idea.vim.key.MappingStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -50,6 +52,13 @@ public class TestInputModel {
   }
 
   public @Nullable KeyStroke nextKeyStroke() {
+
+    // Return key from the unfinished mapping
+    MappingStack mappingStack = KeyHandler.getInstance().getMappingStack();
+    if (mappingStack.hasStroke()) {
+      return mappingStack.getStroke();
+    }
+
     if (!myKeyStrokes.isEmpty()) {
       return myKeyStrokes.remove(0);
     }

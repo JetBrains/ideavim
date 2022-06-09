@@ -47,6 +47,7 @@ import com.maddyhome.idea.vim.helper.inSingleNormalMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.isCloseKeyStroke
 import com.maddyhome.idea.vim.key.KeyMappingLayer
+import com.maddyhome.idea.vim.key.MappingStack
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
@@ -62,6 +63,8 @@ import javax.swing.KeyStroke
 class KeyHandler {
 
   private var handleKeyRecursionCount = 0
+
+  val mappingStack = MappingStack()
 
   /**
    * This is the main key handler for the Vim plugin. Every keystroke not handled directly by Idea is sent here for
