@@ -102,7 +102,7 @@ class ToKeysMappingInfo(
     keyHandler.mappingStack.addKeys(toKeys)
     var first = true
     while (keyHandler.mappingStack.hasStroke()) {
-      val keyStroke = keyHandler.mappingStack.getStroke()
+      val keyStroke = keyHandler.mappingStack.feedStroke()
       val recursive = isRecursive && !(first && fromIsPrefix)
       keyHandler.handleKey(editor, keyStroke, editorDataContext, recursive, false)
       first = false

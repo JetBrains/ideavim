@@ -56,7 +56,7 @@ public class TestInputModel {
     // Return key from the unfinished mapping
     MappingStack mappingStack = KeyHandler.getInstance().getMappingStack();
     if (mappingStack.hasStroke()) {
-      return mappingStack.getStroke();
+      return mappingStack.feedStroke();
     }
 
     if (!myKeyStrokes.isEmpty()) {

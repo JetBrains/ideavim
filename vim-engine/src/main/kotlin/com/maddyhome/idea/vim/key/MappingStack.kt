@@ -11,27 +11,38 @@ import javax.swing.KeyStroke
  *   However, some more advanced solution may be necessary in the future.
  */
 class MappingStack {
-  private val stack = ArrayDeque<List<KeyStroke>>()
+  private val stack = ArrayDeque<Frame>()
 
   fun hasStroke(): Boolean {
-    return stack.isNotEmpty() && stack.first().isNotEmpty()
+    return stack.isNotEmpty() && stack.first().hasStroke()
   }
 
-  fun getStroke(): KeyStroke {
-    val keysList = stack.first()
-    val keyStroke = keysList[0]
-    stack.removeFirst()
-    stack.addFirst(keysList.subList(1, keysList.size))
-    return keyStroke
+  fun feedStroke(): KeyStroke {
+    return stack.first().feed()
   }
 
   fun addKeys(keyStrokes: List<KeyStroke>) {
-    stack.addFirst(keyStrokes)
+    stack.addFirst(Frame(keyStrokes))
   }
 
   fun removeFirst() {
     if (stack.isNotEmpty()) {
       stack.removeFirst()
     }
+  }
+}
+
+private class Frame(
+  val keys: List<KeyStroke>,
+  var pointer: Int = 0,
+) {
+  fun hasStroke(): Boolean {
+    return pointer < keys.size
+  }
+
+  fun feed(): KeyStroke {
+    val key = keys[pointer]
+    pointer += 1
+    return key
   }
 }

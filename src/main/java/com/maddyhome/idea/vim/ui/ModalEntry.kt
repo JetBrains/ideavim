@@ -35,7 +35,7 @@ object ModalEntry {
     // Firstly we pull the unfinished keys of the current mapping
     val mappingStack = KeyHandler.getInstance().mappingStack
     while (mappingStack.hasStroke()) {
-      val keyStroke = mappingStack.getStroke()
+      val keyStroke = mappingStack.feedStroke()
       val result = processor(keyStroke)
       if (!result) {
         return
