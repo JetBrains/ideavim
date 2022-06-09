@@ -16,7 +16,7 @@ import com.maddyhome.idea.vim.api.VimCommandGroup
 import com.maddyhome.idea.vim.api.VimDigraphGroup
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimEditorGroup
-import com.maddyhome.idea.vim.api.VimEditorStorageService
+import com.maddyhome.idea.vim.api.VimStorageService
 import com.maddyhome.idea.vim.api.VimEnabler
 import com.maddyhome.idea.vim.api.VimExOutputPanel
 import com.maddyhome.idea.vim.api.VimExOutputPanelService
@@ -60,9 +60,7 @@ import com.maddyhome.idea.vim.group.copy.YankGroup
 import com.maddyhome.idea.vim.helper.CommandLineHelper
 import com.maddyhome.idea.vim.helper.IjActionExecutor
 import com.maddyhome.idea.vim.helper.IjEditorHelper
-import com.maddyhome.idea.vim.group.IjVimEditorStorageService
 import com.maddyhome.idea.vim.helper.IjVimStringParser
-import com.maddyhome.idea.vim.group.IjVimSystemInfoService
 import com.maddyhome.idea.vim.helper.UndoRedoHelper
 import com.maddyhome.idea.vim.helper.VimCommandLineHelper
 import com.maddyhome.idea.vim.helper.vimCommandState
@@ -77,7 +75,7 @@ import com.maddyhome.idea.vim.undo.VimUndoRedo
 import com.maddyhome.idea.vim.vimscript.Executor
 import com.maddyhome.idea.vim.vimscript.services.FunctionStorage
 import com.maddyhome.idea.vim.vimscript.services.PatternService
-import com.maddyhome.idea.vim.vimscript.services.VariableService
+import com.maddyhome.idea.vim.vimscript.services.VimVariableService
 import com.maddyhome.idea.vim.yank.VimYankGroup
 
 class IjVimInjector : VimInjectorBase() {
@@ -162,7 +160,7 @@ class IjVimInjector : VimInjectorBase() {
 
   override val functionService: VimscriptFunctionService
     get() = FunctionStorage
-  override val variableService: VariableService
+  override val variableService: VimVariableService
     get() = service()
   override val vimrcFileState: VimrcFileState
     get() = VimRcFileState
@@ -178,7 +176,7 @@ class IjVimInjector : VimInjectorBase() {
 
   override val systemInfoService: SystemInfoService
     get() = service()
-  override val vimEditorStorageService: VimEditorStorageService
+  override val vimStorageService: VimStorageService
     get() = service()
 
   override fun commandStateFor(editor: VimEditor): CommandState {

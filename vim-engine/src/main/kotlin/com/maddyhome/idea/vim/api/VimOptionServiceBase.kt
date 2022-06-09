@@ -217,7 +217,7 @@ abstract class VimOptionServiceBase : OptionService {
   }
 
   private fun getLocalOptions(editor: VimEditor): MutableMap<String, VimDataType> {
-    val storageService = injector.vimEditorStorageService
+    val storageService = injector.vimStorageService
     val storedData = storageService.getDataFromEditor(editor, localOptionsKey)
     if (storedData != null) {
       return storedData
@@ -325,7 +325,7 @@ abstract class VimOptionServiceBase : OptionService {
   override fun resetAllOptions() {
     globalValues.clear()
     injector.editorGroup.localEditors()
-      .forEach { injector.vimEditorStorageService.getDataFromEditor(it, localOptionsKey)?.clear() }
+      .forEach { injector.vimStorageService.getDataFromEditor(it, localOptionsKey)?.clear() }
   }
 
   override fun isToggleOption(optionName: String): Boolean {

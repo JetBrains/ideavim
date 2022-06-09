@@ -26,15 +26,15 @@
                         serviceInterface="com.maddyhome.idea.vim.api.VimVisualMotionGroup"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.copy.YankGroup"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.copy.PutGroup"/>
-    <applicationService serviceImplementation="com.maddyhome.idea.vim.vimscript.services.VariableServiceImpl"
-                        serviceInterface="com.maddyhome.idea.vim.vimscript.services.VariableService"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.vimscript.services.VimVariableServiceImpl"
+                        serviceInterface="com.maddyhome.idea.vim.vimscript.services.VimVariableService"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.IjStatisticsService"
                         serviceInterface="com.maddyhome.idea.vim.api.VimStatistics"/>
 
     <applicationService serviceImplementation="com.maddyhome.idea.vim.vimscript.services.IjVimOptionService"
                         serviceInterface="com.maddyhome.idea.vim.options.OptionService"/>
-    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.IjVimEditorStorageService"
-                        serviceInterface="com.maddyhome.idea.vim.api.VimEditorStorageService"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.IjVimStorageService"
+                        serviceInterface="com.maddyhome.idea.vim.api.VimStorageService"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.IjVimSystemInfoService"
                         serviceInterface="com.maddyhome.idea.vim.api.SystemInfoService"/>
 

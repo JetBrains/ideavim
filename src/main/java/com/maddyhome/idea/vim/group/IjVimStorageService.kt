@@ -19,17 +19,46 @@
 package com.maddyhome.idea.vim.group
 
 import com.intellij.openapi.util.Key
+import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.VimEditorStorageServiceBase
+import com.maddyhome.idea.vim.api.VimStorageServiceBase
+import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.newapi.ij
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 
-class IjVimEditorStorageService : VimEditorStorageServiceBase() {
+class IjVimStorageService : VimStorageServiceBase() {
+  val bufferToKey = mutableMapOf<String, MutableMap<String, Any?>>()
+
   override fun <T> getDataFromEditor(editor: VimEditor, key: com.maddyhome.idea.vim.api.Key<T>): T? {
     return editor.ij.getUserData(getOrCreateIjKey(key))
   }
 
   override fun <T> putDataToEditor(editor: VimEditor, key: com.maddyhome.idea.vim.api.Key<T>, data: T) {
     editor.ij.putUserData(getOrCreateIjKey(key), data)
+  }
+
+  override fun <T> getDataFromBuffer(editor: VimEditor, key: com.maddyhome.idea.vim.api.Key<T>): T? {
+    val buffer = EditorHelper.getVirtualFile(editor.ij)?.path ?: "empty path"
+    return bufferToKey[buffer]?.get(key.name) as T?
+  }
+
+  override fun <T> putDataToBuffer(editor: VimEditor, key: com.maddyhome.idea.vim.api.Key<T>, data: T) {
+    val buffer = EditorHelper.getVirtualFile(editor.ij)?.path ?: "empty path"
+    var bufferStorage = bufferToKey[buffer]
+    if (bufferStorage == null) {
+      bufferStorage = mutableMapOf()
+      bufferToKey[buffer] = bufferStorage
+    }
+    bufferStorage[key.name] = data
+  }
+
+  override fun <T> getDataFromTab(editor: VimEditor, key: com.maddyhome.idea.vim.api.Key<T>): T? {
+    throw ExException("Tab scope is not yet supported by IdeaVim :(")
+  }
+
+  override fun <T> putDataToTab(editor: VimEditor, key: com.maddyhome.idea.vim.api.Key<T>, data: T) {
+    throw ExException("Tab scope is not yet supported by IdeaVim :(")
   }
 
   private val ijKeys = mutableMapOf<String, Key<out Any?>>()
