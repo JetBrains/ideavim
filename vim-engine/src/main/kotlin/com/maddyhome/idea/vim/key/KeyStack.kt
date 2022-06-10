@@ -1,24 +1,36 @@
 package com.maddyhome.idea.vim.key
 
+import com.maddyhome.idea.vim.api.injector
 import javax.swing.KeyStroke
 
 /**
- * This class stacks ToKeys mappings
+ * This thing is used for keeping keys from ToKeys mappings and macros.
  * Previously, the mapping was directly sent to the [KeyHandler]. However, in this case it was impossible to
  *   pass the key to modal entry (for getChar function).
  * Original vim uses a typeahead buffer for that, but it's not implemented for IdeaVim and this mappingStack
  *   solves an issus of passing a keystroke to modal entry.
  *   However, some more advanced solution may be necessary in the future.
  */
-class MappingStack {
+class KeyStack {
   private val stack = ArrayDeque<Frame>()
 
   fun hasStroke(): Boolean {
     return stack.isNotEmpty() && stack.first().hasStroke()
   }
 
+  fun feedSomeStroke(): KeyStroke? {
+    stack.forEach {
+      if (it.hasStroke()) {
+        return it.feed()
+      }
+    }
+    return null
+  }
+
   fun feedStroke(): KeyStroke {
-    return stack.first().feed()
+    val frame = stack.first()
+    val key = frame.feed()
+    return key
   }
 
   fun addKeys(keyStrokes: List<KeyStroke>) {
@@ -28,6 +40,12 @@ class MappingStack {
   fun removeFirst() {
     if (stack.isNotEmpty()) {
       stack.removeFirst()
+    }
+  }
+
+  fun resetFirst() {
+    if (stack.isNotEmpty()) {
+      stack.first().resetPointer()
     }
   }
 }
@@ -44,5 +62,13 @@ private class Frame(
     val key = keys[pointer]
     pointer += 1
     return key
+  }
+
+  fun resetPointer() {
+    pointer = 0
+  }
+
+  override fun toString(): String {
+    return "" + pointer + " | " + injector.parser.toKeyNotation(keys)
   }
 }

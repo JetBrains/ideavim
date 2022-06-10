@@ -41,6 +41,7 @@ import com.intellij.openapi.fileTypes.PlainTextFileType
 import com.intellij.openapi.project.Project
 import com.intellij.testFramework.EditorTestUtil
 import com.intellij.testFramework.LightProjectDescriptor
+import com.intellij.testFramework.PlatformTestUtil
 import com.intellij.testFramework.UsefulTestCase
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
@@ -569,6 +570,7 @@ abstract class VimTestCase : UsefulTestCase() {
 
   protected fun performTest(keys: String, after: String, modeAfter: CommandState.Mode, subModeAfter: SubMode) {
     typeText(injector.parser.parseKeys(keys))
+    PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
     @Suppress("IdeaVimAssertState")
     myFixture.checkResult(after)
     assertState(modeAfter, subModeAfter)

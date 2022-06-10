@@ -995,7 +995,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
       final ExEntryPanel exEntryPanel = ExEntryPanel.getInstanceWithoutShortcuts();
       exEntryPanel.activate(editor, EditorDataContext.init(editor, null), MessageHelper.message("replace.with.0", match), "", 1);
       MotionGroup.moveCaret(editor, caret, startoff);
-      ModalEntry.INSTANCE.activate(keyStrokeProcessor);
+      ModalEntry.INSTANCE.activate(new IjVimEditor(editor), keyStrokeProcessor);
       exEntryPanel.deactivate(true, false);
     }
     return result.get();

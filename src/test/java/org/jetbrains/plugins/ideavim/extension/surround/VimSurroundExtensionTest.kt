@@ -490,4 +490,33 @@ class VimSurroundExtensionTest : VimTestCase() {
 
     doTest(":map gw ysiw\"<CR>gw", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  fun testSurroundPluginWithMacro() {
+    val before = """
+      if (con${c}dition) return;
+      if (condition) return;
+      """.trimIndent()
+    val after = """
+      if condition return;
+      if ${c}condition return;
+      """.trimIndent()
+
+    doTest("qqds)qj@q", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  fun testSurroundPluginWithMacroAndMapping() {
+    val before = """
+      if (con${c}dition) return;
+      if (condition) return;
+      """.trimIndent()
+    val after = """
+      if condition return;
+      if ${c}condition return;
+      """.trimIndent()
+
+    val keys = ":map gw ds)<CR>" + "qqgwqj@q"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
 }

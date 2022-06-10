@@ -1,5 +1,6 @@
 package com.maddyhome.idea.vim.macro
 
+import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -27,7 +28,8 @@ abstract class VimMacroBase : VimMacro {
     } else {
       injector.parser.parseKeys(register.rawText)
     }
-    playbackKeys(editor, context, keys, 0, 0, count)
+    KeyHandler.getInstance().keyStack.addKeys(keys)
+    playbackKeys(editor, context, 0, count)
 
     lastRegister = reg
 

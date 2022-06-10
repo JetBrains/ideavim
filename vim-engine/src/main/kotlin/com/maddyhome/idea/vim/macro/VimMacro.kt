@@ -2,16 +2,16 @@ package com.maddyhome.idea.vim.macro
 
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
-import javax.swing.KeyStroke
 
 interface VimMacro {
   var lastRegister: Char
 
+  /**
+   * Keys are taken from KeyHandler.mappingStack
+   */
   fun playbackKeys(
     editor: VimEditor,
     context: ExecutionContext,
-    keys: List<KeyStroke>,
-    pos: Int,
     cnt: Int,
     total: Int,
   )

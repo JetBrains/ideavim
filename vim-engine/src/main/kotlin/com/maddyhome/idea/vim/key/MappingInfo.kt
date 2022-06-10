@@ -99,15 +99,15 @@ class ToKeysMappingInfo(
     val editorDataContext = injector.executionContextManager.onEditor(editor, context)
     val fromIsPrefix = KeyHandler.isPrefix(fromKeys, toKeys)
     val keyHandler = KeyHandler.getInstance()
-    keyHandler.mappingStack.addKeys(toKeys)
+    keyHandler.keyStack.addKeys(toKeys)
     var first = true
-    while (keyHandler.mappingStack.hasStroke()) {
-      val keyStroke = keyHandler.mappingStack.feedStroke()
+    while (keyHandler.keyStack.hasStroke()) {
+      val keyStroke = keyHandler.keyStack.feedStroke()
       val recursive = isRecursive && !(first && fromIsPrefix)
       keyHandler.handleKey(editor, keyStroke, editorDataContext, recursive, false)
       first = false
     }
-    keyHandler.mappingStack.removeFirst()
+    keyHandler.keyStack.removeFirst()
   }
 
   companion object {

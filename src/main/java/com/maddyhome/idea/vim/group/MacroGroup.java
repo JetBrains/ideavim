@@ -30,6 +30,7 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.ExecutionContext;
 import com.maddyhome.idea.vim.api.VimEditor;
 import com.maddyhome.idea.vim.helper.MessageHelper;
+import com.maddyhome.idea.vim.key.KeyStack;
 import com.maddyhome.idea.vim.macro.VimMacroBase;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.options.OptionConstants;
@@ -37,7 +38,6 @@ import com.maddyhome.idea.vim.options.OptionScope;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
-import java.util.List;
 
 /**
  * Used to handle playback of macros
@@ -49,18 +49,14 @@ public class MacroGroup extends VimMacroBase {
    * This puts a single keystroke at the end of the event queue for playback
    */
   @Override
-  public void playbackKeys(final @NotNull VimEditor editor,
-                           final @NotNull ExecutionContext context,
-                           final @NotNull List<? extends KeyStroke> keys,
-                           final int pos,
-                           final int cnt,
+  public void playbackKeys(@NotNull final VimEditor editor,
+                           @NotNull final ExecutionContext context, final int cnt,
                            final int total) {
     Project project = ((IjVimEditor)editor).getEditor().getProject();
-    if (logger.isDebugEnabled()) {
-      logger.debug("playbackKeys " + pos);
-    }
-    if (pos >= keys.size() || cnt >= total) {
+    KeyStack keyStack = KeyHandler.getInstance().getKeyStack();
+    if (!keyStack.hasStroke() || cnt >= total) {
       logger.debug("done");
+      keyStack.removeFirst();
 
       return;
     }
@@ -75,25 +71,22 @@ public class MacroGroup extends VimMacroBase {
       // the keys one at a time. With the old loop approach, all the keys got queued, then any events they caused
       // were queued - after the keys. This is what caused the problem.
       final Runnable run = () -> {
-        if (logger.isDebugEnabled()) {
-          logger.debug("processing key " + pos);
-        }
         // Handle one keystroke then queue up the next key
-        KeyHandler.getInstance().handleKey(editor, keys.get(pos), context);
-        if (pos < keys.size() - 1) {
-          playbackKeys(editor, context, keys, pos + 1, cnt, total);
+        if (keyStack.hasStroke()) {
+          KeyHandler.getInstance().handleKey(editor, keyStack.feedStroke(), context);
+        }
+        if (keyStack.hasStroke()) {
+          playbackKeys(editor, context, cnt, total);
         }
         else {
-          playbackKeys(editor, context, keys, 0, cnt + 1, total);
+          keyStack.resetFirst();
+          playbackKeys(editor, context, cnt + 1, total);
         }
       };
 
       ApplicationManager.getApplication().invokeLater(() -> CommandProcessor.getInstance()
-        .executeCommand(project, run, MessageHelper.message("command.name.vim.macro.playback"), keys.get(pos)));
+        .executeCommand(project, run, MessageHelper.message("command.name.vim.macro.playback"), null));
     } else {
-      if (logger.isDebugEnabled()) {
-        logger.debug("processing key " + pos);
-      }
       PotemkinProgress potemkinProgress =
         new PotemkinProgress(MessageHelper.message("progress.title.macro.execution"), project, null,
                              MessageHelper.message("stop"));
@@ -103,7 +96,8 @@ public class MacroGroup extends VimMacroBase {
         // Handle one keystroke then queue up the next key
         for (int i = 0; i < total; ++i) {
           potemkinProgress.setFraction((double)(i + 1) / total);
-          for (KeyStroke key : keys) {
+          while (keyStack.hasStroke()) {
+            KeyStroke key = keyStack.feedStroke();
             try {
               potemkinProgress.checkCanceled();
             }

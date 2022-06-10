@@ -88,7 +88,7 @@ object VimExtensionFacade {
    */
   fun addCommand(
     name: String,
-    handler: CommandAliasHandler
+    handler: CommandAliasHandler,
   ) {
     addCommand(name, 0, 0, handler)
   }
@@ -101,9 +101,10 @@ object VimExtensionFacade {
     name: String,
     minimumNumberOfArguments: Int,
     maximumNumberOfArguments: Int,
-    handler: CommandAliasHandler
+    handler: CommandAliasHandler,
   ) {
-    VimPlugin.getCommand().setAlias(name, CommandAlias.Call(minimumNumberOfArguments, maximumNumberOfArguments, name, handler))
+    VimPlugin.getCommand()
+      .setAlias(name, CommandAlias.Call(minimumNumberOfArguments, maximumNumberOfArguments, name, handler))
   }
 
   /** Sets the value of 'operatorfunc' to be used as the operator function in 'g@'. */
@@ -134,10 +135,15 @@ object VimExtensionFacade {
     }
 
     val key: KeyStroke? = if (ApplicationManager.getApplication().isUnitTestMode) {
-      TestInputModel.getInstance(editor).nextKeyStroke()
+      val mappingStack = KeyHandler.getInstance().keyStack
+      mappingStack.feedSomeStroke() ?: TestInputModel.getInstance(editor).nextKeyStroke()?.also {
+        if (editor.vim.commandState.isRecording) {
+          KeyHandler.getInstance().modalEntryKeys += it
+        }
+      }
     } else {
       var ref: KeyStroke? = null
-      ModalEntry.activate { stroke: KeyStroke? ->
+      ModalEntry.activate(editor.vim) { stroke: KeyStroke? ->
         ref = stroke
         false
       }

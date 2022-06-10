@@ -19,6 +19,8 @@
 package com.maddyhome.idea.vim.ui
 
 import com.maddyhome.idea.vim.KeyHandler
+import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.helper.isCloseKeyStroke
 import java.awt.KeyEventDispatcher
 import java.awt.KeyboardFocusManager
@@ -30,16 +32,17 @@ import javax.swing.KeyStroke
  * @author dhleong
  */
 object ModalEntry {
-  inline fun activate(crossinline processor: (KeyStroke) -> Boolean) {
+  inline fun activate(editor: VimEditor, crossinline processor: (KeyStroke) -> Boolean) {
 
     // Firstly we pull the unfinished keys of the current mapping
-    val mappingStack = KeyHandler.getInstance().mappingStack
-    while (mappingStack.hasStroke()) {
-      val keyStroke = mappingStack.feedStroke()
-      val result = processor(keyStroke)
+    val mappingStack = KeyHandler.getInstance().keyStack
+    var stroke = mappingStack.feedSomeStroke()
+    while (stroke != null) {
+      val result = processor(stroke)
       if (!result) {
         return
       }
+      stroke = mappingStack.feedSomeStroke()
     }
 
     // Then start to accept user input
@@ -58,6 +61,9 @@ object ModalEntry {
           stroke = KeyStroke.getKeyStrokeForEvent(e)
         } else {
           return true
+        }
+        if (editor.commandState.isRecording) {
+          KeyHandler.getInstance().modalEntryKeys += stroke
         }
         if (!processor(stroke)) {
           KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(this)

@@ -47,7 +47,7 @@ import com.maddyhome.idea.vim.helper.inSingleNormalMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.isCloseKeyStroke
 import com.maddyhome.idea.vim.key.KeyMappingLayer
-import com.maddyhome.idea.vim.key.MappingStack
+import com.maddyhome.idea.vim.key.KeyStack
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
@@ -64,7 +64,8 @@ class KeyHandler {
 
   private var handleKeyRecursionCount = 0
 
-  val mappingStack = MappingStack()
+  val keyStack = KeyStack()
+  val modalEntryKeys: MutableList<KeyStroke> = ArrayList()
 
   /**
    * This is the main key handler for the Vim plugin. Every keystroke not handled directly by Idea is sent here for
@@ -212,6 +213,8 @@ class KeyHandler {
     // Don't record the keystroke that stops the recording (unmapped this is `q`)
     if (shouldRecord && editorState.isRecording && key != null) {
       injector.registerGroup.recordKeyStroke(key)
+      modalEntryKeys.forEach { injector.registerGroup.recordKeyStroke(it) }
+      modalEntryKeys.clear()
     }
 
     // This will update immediately, if we're on the EDT (which we are)
