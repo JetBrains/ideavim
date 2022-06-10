@@ -18,6 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.longrunning
 
+import com.intellij.testFramework.PlatformTestUtil
 import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.VimTestCase
 
@@ -28,6 +29,7 @@ class MacroTest : VimTestCase() {
     configureByText("abc de${c}fg")
     typeText(injector.parser.parseKeys("qahlq"))
     typeText(injector.parser.parseKeys("1000000@a"))
+    PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
     assertState("abc de${c}fg")
   }
 }
