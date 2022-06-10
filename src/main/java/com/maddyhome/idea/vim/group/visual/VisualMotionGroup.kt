@@ -21,12 +21,10 @@ package com.maddyhome.idea.vim.group.visual
 import com.intellij.find.FindManager
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.LogicalPosition
-import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimMotionGroupBase
 import com.maddyhome.idea.vim.api.VimVisualMotionGroupBase
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.helper.exitVisualMode
@@ -39,7 +37,6 @@ import com.maddyhome.idea.vim.helper.vimLastVisualOperatorRange
 import com.maddyhome.idea.vim.helper.vimSelectionStart
 import com.maddyhome.idea.vim.newapi.IjVimCaret
 import com.maddyhome.idea.vim.newapi.ij
-import com.maddyhome.idea.vim.newapi.vim
 
 /**
  * @author Alex Plate
@@ -93,38 +90,6 @@ class VisualMotionGroup : VimVisualMotionGroupBase() {
     }
 
     return true
-  }
-
-  @Deprecated("Use enterVisualMode or toggleVisual methods")
-  fun setVisualMode(editor: Editor) {
-    val autodetectedMode = autodetectVisualSubmode(editor)
-
-    if (editor.inVisualMode) {
-      editor.vim.commandState.popModes()
-    }
-    editor.vim.commandState.pushModes(CommandState.Mode.VISUAL, autodetectedMode)
-    if (autodetectedMode == CommandState.SubMode.VISUAL_BLOCK) {
-      val (start, end) = blockModeStartAndEnd(editor)
-      editor.caretModel.removeSecondaryCarets()
-      editor.caretModel.primaryCaret.vimSetSelection(start, (end - selectionAdj).coerceAtLeast(0), true)
-    } else {
-      editor.caretModel.allCarets.forEach {
-        if (!it.hasSelection()) {
-          it.vimSetSelection(it.offset)
-          MotionGroup.moveCaret(editor, it, it.offset)
-          return@forEach
-        }
-
-        val selectionStart = it.selectionStart
-        val selectionEnd = it.selectionEnd
-        if (selectionStart == it.offset) {
-          it.vimSetSelection((selectionEnd - selectionAdj).coerceAtLeast(0), selectionStart, true)
-        } else {
-          it.vimSetSelection(selectionStart, (selectionEnd - selectionAdj).coerceAtLeast(0), true)
-        }
-      }
-    }
-    KeyHandler.getInstance().reset(editor.vim)
   }
 
   /**
