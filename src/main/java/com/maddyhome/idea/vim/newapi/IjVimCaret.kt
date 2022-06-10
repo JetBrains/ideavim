@@ -33,6 +33,7 @@ import com.maddyhome.idea.vim.group.visual.VisualChange
 import com.maddyhome.idea.vim.group.visual.vimLeadSelectionOffset
 import com.maddyhome.idea.vim.group.visual.vimSetSelection
 import com.maddyhome.idea.vim.group.visual.vimSetSystemSelectionSilently
+import com.maddyhome.idea.vim.group.visual.vimUpdateEditorSelection
 import com.maddyhome.idea.vim.helper.inlayAwareVisualColumn
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.helper.vimLastColumn
@@ -121,6 +122,10 @@ class IjVimCaret(val caret: Caret) : VimCaret {
 
   override val visualLineStart: Int
     get() = caret.visualLineStart
+
+  override fun updateEditorSelection() {
+    caret.vimUpdateEditorSelection()
+  }
 
   override fun equals(other: Any?): Boolean = this.caret == (other as? IjVimCaret)?.caret
 

@@ -28,4 +28,5 @@ interface VimCaret {
   fun getLogicalPosition(): VimLogicalPosition
   fun getVisualPosition(): VimVisualPosition
   val visualLineStart: Int
+  fun updateEditorSelection()
 }

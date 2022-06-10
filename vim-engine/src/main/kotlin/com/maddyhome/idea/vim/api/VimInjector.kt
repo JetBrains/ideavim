@@ -51,7 +51,7 @@ interface VimInjector {
   val keyGroup: VimKeyGroup
   // [FINISHED] Only state left in the IJ && some IJ specifics
   val markGroup: VimMarkGroup
-  // !! in progress
+  // [FINISHED] Only IJ staff left
   val visualMotionGroup: VimVisualMotionGroup
   // !! in progress
   fun commandStateFor(editor: VimEditor): CommandState

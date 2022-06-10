@@ -49,4 +49,5 @@ interface VimVisualMotionGroup {
    * - DOES NOT check if carets actually have any selection
    */
   fun enterVisualMode(editor: VimEditor, subMode: CommandState.SubMode? = null): Boolean
+  fun autodetectVisualSubmode(editor: VimEditor): CommandState.SubMode
 }
