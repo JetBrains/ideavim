@@ -496,11 +496,11 @@ class VimSurroundExtensionTest : VimTestCase() {
     val before = """
       if (con${c}dition) return;
       if (condition) return;
-      """.trimIndent()
+    """.trimIndent()
     val after = """
       if condition return;
       if ${c}condition return;
-      """.trimIndent()
+    """.trimIndent()
 
     doTest("qqds)qj@q", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
@@ -510,11 +510,11 @@ class VimSurroundExtensionTest : VimTestCase() {
     val before = """
       if (con${c}dition) return;
       if (condition) return;
-      """.trimIndent()
+    """.trimIndent()
     val after = """
       if condition return;
       if ${c}condition return;
-      """.trimIndent()
+    """.trimIndent()
 
     val keys = ":map gw ds)<CR>" + "qqgwqj@q"
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
