@@ -496,7 +496,7 @@ class KeyHandler {
     // Make sure to avoid handling '0' as the start of a count.
     val commandBuilder = editorState.commandBuilder
     val notRegisterPendingCommand = editorState.mode.inNormalMode && !editorState.isRegisterPending
-    val visualMode = editorState.mode.inVisualMode
+    val visualMode = editorState.mode.inVisualMode && !editorState.isRegisterPending
     val opPendingMode = editorState.mode === CommandState.Mode.OP_PENDING
 
     if (notRegisterPendingCommand || visualMode || opPendingMode) {

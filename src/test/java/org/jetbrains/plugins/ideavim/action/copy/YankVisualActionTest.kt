@@ -271,6 +271,38 @@ class YankVisualActionTest : VimTestCase() {
     )
   }
 
+  fun `test yank to numbered register in visual`() {
+    doTest(
+      injector.parser.parseKeys("ve" + "\"2y"),
+      """
+                            A Discovery
+
+                            I found it in a legendary land
+                            all ${c}rocks and lavender and tufted grass,[ additional symbols]
+                            where it was settled on some sodden sand
+                            hard by the torrent of a mountain pass.
+      """.trimIndent(),
+      "rocks",
+      SelectionType.CHARACTER_WISE
+    )
+  }
+
+  fun `test yank to numbered register`() {
+    doTest(
+      injector.parser.parseKeys("\"2yy"),
+      """
+                            A Discovery
+
+                            I found it in a legendary land
+                            all ${c}rocks and lavender and tufted grass,[ additional symbols]
+                            where it was settled on some sodden sand
+                            hard by the torrent of a mountain pass.
+      """.trimIndent(),
+      "all rocks and lavender and tufted grass,[ additional symbols]\n",
+      SelectionType.LINE_WISE
+    )
+  }
+
   private fun doTest(keys: List<KeyStroke>, before: String, expectedText: String, expectedType: SelectionType) {
     configureByText(before)
     typeText(keys)
