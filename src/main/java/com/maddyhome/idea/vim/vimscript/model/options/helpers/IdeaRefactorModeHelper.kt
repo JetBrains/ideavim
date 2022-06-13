@@ -30,6 +30,7 @@ import com.maddyhome.idea.vim.helper.hasVisualSelection
 import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.services.IjVimOptionService
@@ -47,7 +48,7 @@ object IdeaRefactorModeHelper {
         }
       }
       if (editor.mode.hasVisualSelection && editor.selectionModel.hasSelection()) {
-        val autodetectedSubmode = VimPlugin.getVisualMotion().autodetectVisualSubmode(editor)
+        val autodetectedSubmode = VimPlugin.getVisualMotion().autodetectVisualSubmode(editor.vim)
         if (editor.subMode != autodetectedSubmode) {
           // Update the submode
           editor.subMode = autodetectedSubmode

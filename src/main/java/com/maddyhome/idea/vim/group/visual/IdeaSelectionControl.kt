@@ -122,9 +122,9 @@ object IdeaSelectionControl {
   private fun activateMode(editor: Editor, mode: CommandState.Mode) {
     when (mode) {
       CommandState.Mode.VISUAL -> VimPlugin.getVisualMotion()
-        .enterVisualMode(editor.vim, VimPlugin.getVisualMotion().autodetectVisualSubmode(editor))
+        .enterVisualMode(editor.vim, VimPlugin.getVisualMotion().autodetectVisualSubmode(editor.vim))
       CommandState.Mode.SELECT -> VimPlugin.getVisualMotion()
-        .enterSelectMode(editor.vim, VimPlugin.getVisualMotion().autodetectVisualSubmode(editor))
+        .enterSelectMode(editor.vim, VimPlugin.getVisualMotion().autodetectVisualSubmode(editor.vim))
       CommandState.Mode.INSERT -> VimPlugin.getChange().insertBeforeCursor(
         editor.vim,
         EditorDataContext.init(editor).vim
