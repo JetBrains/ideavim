@@ -51,6 +51,7 @@ usual beta standards.
 * [VIM-2668](https://youtrack.jetbrains.com/issue/VIM-2668/tabm-or-tabm-with-no-number-does-not-match-vim-behavior) Fix omitted numbers in `tabm` command
 * [VIM-2595](https://youtrack.jetbrains.com/issue/VIM-2595) Support plugins in macro execution
 * [VIM-2671](https://youtrack.jetbrains.com/issue/VIM-2671) Fix using plugins from mappings
+* [VIM-2675](https://youtrack.jetbrains.com/issue/VIM-2675) Fix numbering register in visual mode
 
 ### Merged PRs:
 * [468](https://github.com/JetBrains/ideavim/pull/468) by [Thomas Schouten](https://github.com/PHPirates): Implement UserDataHolder for EditorDataContext
