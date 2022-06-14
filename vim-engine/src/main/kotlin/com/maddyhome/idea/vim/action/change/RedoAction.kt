@@ -32,5 +32,12 @@ class RedoAction : VimActionHandler.SingleExecution() {
     context: ExecutionContext,
     cmd: Command,
     operatorArguments: OperatorArguments,
-  ): Boolean = injector.undo.redo(context)
+  ): Boolean {
+    var count = operatorArguments.count1
+    var result = injector.undo.redo(context)
+    while ((--count > 0) && result) {
+      result = injector.undo.redo(context)
+    }
+    return result
+  }
 }

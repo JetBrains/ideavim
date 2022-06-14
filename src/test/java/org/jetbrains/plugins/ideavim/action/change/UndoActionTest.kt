@@ -37,6 +37,7 @@ class UndoActionTest : VimTestCase() {
     val editor = myFixture.editor
     assertFalse(editor.caretModel.primaryCaret.hasSelection())
   }
+
   fun `test undo after selection`() {
     val keys = listOf("v3eld", "u")
     val before = """
@@ -48,6 +49,28 @@ class UndoActionTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
     """.trimIndent()
     val after = before
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    assertFalse(hasSelection())
+  }
+
+  fun `test undo with count`() {
+    val keys = listOf("dwdwdw", "2u")
+    val before = """
+                A Discovery
+
+                ${c}I found it in a legendary land
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass.
+    """.trimIndent()
+    val after = """
+                A Discovery
+
+                ${c}found it in a legendary land
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass.
+    """.trimIndent()
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     assertFalse(hasSelection())
   }
