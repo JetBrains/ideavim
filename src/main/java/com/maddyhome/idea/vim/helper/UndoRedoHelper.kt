@@ -18,12 +18,14 @@
 
 package com.maddyhome.idea.vim.helper
 
+import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.command.undo.UndoManager
 import com.intellij.openapi.components.Service
 import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
+import com.maddyhome.idea.vim.newapi.ij
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.undo.UndoRedoBase
 
 /**
@@ -37,7 +39,17 @@ class UndoRedoHelper : UndoRedoBase() {
     val fileEditor = PlatformDataKeys.FILE_EDITOR.getData(ijContext)
     val undoManager = UndoManager.getInstance(project)
     if (fileEditor != null && undoManager.isUndoAvailable(fileEditor)) {
-      SelectionVimListenerSuppressor.lock().use { undoManager.undo(fileEditor) }
+      val editor = CommonDataKeys.EDITOR.getData(context.ij)?.vim
+      undoManager.undo(fileEditor)
+      editor?.carets()?.forEach {
+        val ijCaret = it.ij
+        val hasSelection = ijCaret.hasSelection()
+        if (hasSelection) {
+          val selectionStart = ijCaret.selectionStart
+          it.ij.removeSelection()
+          it.ij.moveToOffset(selectionStart)
+        }
+      }
       return true
     }
     return false
@@ -49,7 +61,12 @@ class UndoRedoHelper : UndoRedoBase() {
     val fileEditor = PlatformDataKeys.FILE_EDITOR.getData(ijContext)
     val undoManager = UndoManager.getInstance(project)
     if (fileEditor != null && undoManager.isRedoAvailable(fileEditor)) {
-      SelectionVimListenerSuppressor.lock().use { undoManager.redo(fileEditor) }
+      val editor = CommonDataKeys.EDITOR.getData(context.ij)?.vim
+      undoManager.redo(fileEditor)
+      if (editor?.primaryCaret()?.ij?.hasSelection() == true) {
+        undoManager.redo(fileEditor)
+      }
+      editor?.carets()?.forEach { it.ij.removeSelection() }
       return true
     }
     return false

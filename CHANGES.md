@@ -52,6 +52,7 @@ usual beta standards.
 * [VIM-2595](https://youtrack.jetbrains.com/issue/VIM-2595) Support plugins in macro execution
 * [VIM-2671](https://youtrack.jetbrains.com/issue/VIM-2671) Fix using plugins from mappings
 * [VIM-2675](https://youtrack.jetbrains.com/issue/VIM-2675) Fix numbering register in visual mode
+* [VIM-696](https://youtrack.jetbrains.com/issue/VIM-696/vim-selection-issue-after-undo) Fix selection after undo
 
 ### Merged PRs:
 * [468](https://github.com/JetBrains/ideavim/pull/468) by [Thomas Schouten](https://github.com/PHPirates): Implement UserDataHolder for EditorDataContext
