@@ -10,6 +10,11 @@ import javax.swing.KeyStroke
 
 abstract class VimMacroBase : VimMacro {
   override var lastRegister: Char = 0.toChar()
+  private var macroDepth = 0
+
+  // Macro depth. 0 - if macro is not executing. 1 - macro in progress. 2+ - nested macro
+  override val isExecutingMacro: Boolean
+    get() = macroDepth > 0
 
   /**
    * This method is used to play the macro of keystrokes stored in the specified registers.
@@ -21,18 +26,23 @@ abstract class VimMacroBase : VimMacro {
    * @return true if able to play the macro, false if invalid or empty register
    */
   override fun playbackRegister(editor: VimEditor, context: ExecutionContext, reg: Char, count: Int): Boolean {
-    logger.debug { "play bakc register $reg $count times" }
+    logger.debug { "play back register $reg $count times" }
     val register = injector.registerGroup.getPlaybackRegister(reg) ?: return false
-    val keys: List<KeyStroke> = if (register.rawText == null) {
-      register.keys
-    } else {
-      injector.parser.parseKeys(register.rawText)
+    ++macroDepth
+    try {
+      val keys: List<KeyStroke> = if (register.rawText == null) {
+        register.keys
+      } else {
+        injector.parser.parseKeys(register.rawText)
+      }
+      KeyHandler.getInstance().keyStack.addKeys(keys)
+      playbackKeys(editor, context, 0, count)
+    } finally {
+      --macroDepth
     }
-    KeyHandler.getInstance().keyStack.addKeys(keys)
-    playbackKeys(editor, context, 0, count)
 
-    lastRegister = reg
 
+      lastRegister = reg
     return true
   }
 

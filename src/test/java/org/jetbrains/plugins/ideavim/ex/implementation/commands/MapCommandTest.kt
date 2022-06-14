@@ -22,6 +22,7 @@ import com.intellij.openapi.editor.textarea.TextComponentEditorImpl
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.history.HistoryConstants
 import com.maddyhome.idea.vim.newapi.vim
 import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -942,5 +943,13 @@ n  ,i            <Action>(Back)
 
       """.trimIndent()
     )
+  }
+
+  fun `test command from map isn't added to history`() {
+    configureByText("\n")
+    typeText(commandToKeys("map A :echo 42<CR>"))
+    typeText(injector.parser.parseKeys("A"))
+    assertExOutput("42\n")
+    assertEquals("map A :echo 42<CR>", injector.historyGroup.getEntries(HistoryConstants.COMMAND, 0, 0).last().entry)
   }
 }

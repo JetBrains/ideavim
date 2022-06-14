@@ -4,6 +4,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 
 interface VimMacro {
+  val isExecutingMacro: Boolean
   var lastRegister: Char
 
   /**

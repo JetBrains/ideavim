@@ -55,6 +55,8 @@ import javax.swing.*;
 import java.io.*;
 import java.util.ArrayList;
 
+import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
+
 
 public class ProcessGroup extends VimProcessGroupBase {
   public String getLastCommand() {
@@ -132,7 +134,7 @@ public class ProcessGroup extends VimProcessGroupBase {
 
       if (logger.isDebugEnabled()) logger.debug("swing=" + SwingUtilities.isEventDispatchThread());
 
-      VimInjectorKt.getInjector().getVimscriptExecutor().execute(text, editor, context, false, true, CommandLineVimLContext.INSTANCE);
+      VimInjectorKt.getInjector().getVimscriptExecutor().execute(text, editor, context, skipHistory(), true, CommandLineVimLContext.INSTANCE);
     }
     catch (ExException e) {
       VimPlugin.showMessage(e.getMessage());
@@ -146,6 +148,11 @@ public class ProcessGroup extends VimProcessGroupBase {
     }
 
     return res;
+  }
+
+  // commands executed from map command / macro should not be added to history
+  private boolean skipHistory() {
+    return KeyHandler.getInstance().isExecutingMap() || injector.getMacro().isExecutingMacro();
   }
 
   public void cancelExEntry(final @NotNull VimEditor editor, boolean resetCaret) {

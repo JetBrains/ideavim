@@ -63,6 +63,12 @@ import javax.swing.KeyStroke
 class KeyHandler {
 
   private var handleKeyRecursionCount = 0
+  // Map command depth. 0 - if it is not a map command. 1 - regular map command. 2+ - nested map commands
+  private var mapDepth = 0
+
+  fun isExecutingMap(): Boolean {
+    return mapDepth > 0
+  }
 
   val keyStack = KeyStack()
   val modalEntryKeys: MutableList<KeyStroke> = ArrayList()
@@ -410,6 +416,7 @@ class KeyHandler {
     val currentContext = context.updateEditor(editor)
     LOG.trace("Executing mapping info")
     try {
+      ++mapDepth
       mappingInfo.execute(editor, context)
     } catch (e: Exception) {
       injector.messages.showStatusBarMessage(e.message)
@@ -429,6 +436,8 @@ class KeyHandler {
                  ${e.message}
         """.trimIndent()
       )
+    } finally {
+      --mapDepth
     }
 
     // If we've just evaluated the previous key sequence, make sure to also handle the current key

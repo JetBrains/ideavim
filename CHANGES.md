@@ -54,6 +54,7 @@ usual beta standards.
 * [VIM-2675](https://youtrack.jetbrains.com/issue/VIM-2675) Fix numbering register in visual mode
 * [VIM-696](https://youtrack.jetbrains.com/issue/VIM-696/vim-selection-issue-after-undo) Fix selection after undo
 * [VIM-744](https://youtrack.jetbrains.com/issue/VIM-744/Use-undoredo-with-count-modifier) Add count to undo/redo
+* [VIM-1862](https://youtrack.jetbrains.com/issue/VIM-1862/Ex-commands-executed-in-keymaps-and-macros-are-added-to-the-command-history) Fix command history
 
 ### Merged PRs:
 * [468](https://github.com/JetBrains/ideavim/pull/468) by [Thomas Schouten](https://github.com/PHPirates): Implement UserDataHolder for EditorDataContext
