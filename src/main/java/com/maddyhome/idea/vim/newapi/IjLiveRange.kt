@@ -16,18 +16,16 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.api
+package com.maddyhome.idea.vim.newapi
 
-interface NativeAction {
-  val action: Any
+import com.intellij.openapi.editor.RangeMarker
+import com.maddyhome.idea.vim.common.LiveRange
+
+class IjLiveRange(val marker: RangeMarker) : LiveRange {
 }
 
-interface NativeActionManager {
-  val enterAction: NativeAction?
-  val createLineAboveCaret: NativeAction?
-  val joinLines: NativeAction?
-  val indentLines: NativeAction?
-  val saveAll: NativeAction?
-  val saveCurrent: NativeAction?
-  val deleteAction: NativeAction?
-}
+val RangeMarker.vim: LiveRange
+  get() = IjLiveRange(this)
+
+val LiveRange.ij: RangeMarker
+  get() = (this as IjLiveRange).marker

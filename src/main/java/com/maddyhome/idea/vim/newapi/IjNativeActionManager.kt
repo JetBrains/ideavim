@@ -33,6 +33,7 @@ class IjNativeActionManager : NativeActionManager {
   override val indentLines: NativeAction? by lazy { byName(IdeActions.ACTION_EDITOR_AUTO_INDENT_LINES) }
   override val saveAll: NativeAction? by lazy { byName("SaveAll") }
   override val saveCurrent: NativeAction? by lazy { byName("SaveDocument") }
+  override val deleteAction: NativeAction? by lazy { byName(IdeActions.ACTION_EDITOR_DELETE) }
 
   private fun byName(name: String): IjNativeAction? {
     val action: AnAction? = ActionManager.getInstance().getAction(name)

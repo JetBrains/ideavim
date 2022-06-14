@@ -22,6 +22,7 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.EditorLine
+import com.maddyhome.idea.vim.common.LiveRange
 import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.common.OperatedRange
 import com.maddyhome.idea.vim.common.Pointer
@@ -211,6 +212,7 @@ interface VimEditor {
 
   fun getLineStartOffset(line: Int): Int
   fun getLineEndOffset(line: Int, allowEnd: Boolean): Int
+  fun getLineEndOffset(line: Int): Int
   fun getLineEndForOffset(offset: Int): Int
 
   fun addCaretListener(listener: VimCaretListener)
@@ -236,6 +238,11 @@ interface VimEditor {
   fun stopGuardedBlockChecking()
 
   fun hasUnsavedChanges(): Boolean
+
+  fun createLiveMarker(start: Offset, end: Offset): LiveRange
+  fun setInsertMode(insert: Boolean)
+
+  val document: VimDocument
 }
 
 interface MutableVimEditor : VimEditor {
@@ -345,4 +352,4 @@ class VimLogicalPosition(
   }
 }
 
-class VimVisualPosition(val line: Int, val column: Int, val leansRight: Boolean = false)
+data class VimVisualPosition(val line: Int, val column: Int, val leansRight: Boolean = false)

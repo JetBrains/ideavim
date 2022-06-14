@@ -20,12 +20,14 @@ package com.maddyhome.idea.vim.newapi
 
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.LogicalPosition
+import com.intellij.openapi.editor.VisualPosition
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimLogicalPosition
 import com.maddyhome.idea.vim.api.VimVisualPosition
 import com.maddyhome.idea.vim.common.EditorLine
+import com.maddyhome.idea.vim.common.LiveRange
 import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.common.offset
 import com.maddyhome.idea.vim.group.MotionGroup
@@ -36,6 +38,7 @@ import com.maddyhome.idea.vim.group.visual.vimSetSystemSelectionSilently
 import com.maddyhome.idea.vim.group.visual.vimUpdateEditorSelection
 import com.maddyhome.idea.vim.helper.inlayAwareVisualColumn
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
+import com.maddyhome.idea.vim.helper.vimInsertStart
 import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.helper.vimLastVisualOperatorRange
 import com.maddyhome.idea.vim.helper.vimLine
@@ -125,6 +128,16 @@ class IjVimCaret(val caret: Caret) : VimCaret {
 
   override fun updateEditorSelection() {
     caret.vimUpdateEditorSelection()
+  }
+
+  override var vimInsertStart: LiveRange
+    get() = caret.vimInsertStart.vim
+    set(value) {
+      caret.vimInsertStart = value.ij
+    }
+
+  override fun moveToVisualPosition(position: VimVisualPosition) {
+    caret.moveToVisualPosition(VisualPosition(position.line, position.column, position.leansRight))
   }
 
   override fun equals(other: Any?): Boolean = this.caret == (other as? IjVimCaret)?.caret

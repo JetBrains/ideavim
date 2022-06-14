@@ -53,13 +53,13 @@ interface VimInjector {
   val markGroup: VimMarkGroup
   // [FINISHED] Only IJ staff left
   val visualMotionGroup: VimVisualMotionGroup
-  // !! in progress
+  // [FINISHED] Class moved to vim-engine, but it's attached to Editor using IJ things
   fun commandStateFor(editor: VimEditor): CommandState
   // !! in progress
   val engineEditorHelper: EngineEditorHelper
-  // !! in progress
+  // [FINISHED] Only IJ staff
   val editorGroup: VimEditorGroup
-  // Fully moved to vim-engine. Should we remove it from injector?
+  // [FINISHED] Fully moved to vim-engine. Should we remove it from injector?
   val commandGroup: VimCommandGroup
   // !! in progress
   val changeGroup: VimChangeGroup

@@ -64,6 +64,8 @@ interface VimActionExecutor {
     operatorArguments: OperatorArguments,
   )
 
+  fun findVimAction(id: String): EditorActionHandlerBase?
+
   fun getAction(actionId: String): NativeAction?
   fun getActionIdList(idPrefix: String): List<String>
 }

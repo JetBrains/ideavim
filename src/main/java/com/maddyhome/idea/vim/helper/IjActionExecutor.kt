@@ -33,6 +33,7 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.editor.actionSystem.DocCommandGroupId
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.openapi.util.NlsContexts
+import com.maddyhome.idea.vim.RegisterActions
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.NativeAction
 import com.maddyhome.idea.vim.api.VimActionExecutor
@@ -148,6 +149,10 @@ class IjActionExecutor : VimActionExecutor {
         cmd.id, DocCommandGroupId.noneGroupId(editor.ij.document), UndoConfirmationPolicy.DEFAULT,
         editor.ij.document
       )
+  }
+
+  override fun findVimAction(id: String): EditorActionHandlerBase? {
+    return RegisterActions.findAction(id)
   }
 
   override fun getAction(actionId: String): NativeAction? {

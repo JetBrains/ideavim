@@ -4,6 +4,7 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.editor.ReadOnlyFragmentModificationException
 import com.intellij.openapi.editor.VisualPosition
 import com.intellij.openapi.editor.actionSystem.EditorActionManager
+import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.intellij.openapi.util.text.StringUtil
 import com.maddyhome.idea.vim.api.EngineEditorHelper
 import com.maddyhome.idea.vim.api.ExecutionContext
@@ -14,6 +15,7 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.newapi.IjVimCaret
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
+import com.maddyhome.idea.vim.newapi.vim
 import java.nio.CharBuffer
 
 @Service
@@ -124,5 +126,13 @@ class IjEditorHelper : EngineEditorHelper {
 
   override fun getLineBreakCount(text: CharSequence): Int {
     return StringUtil.getLineBreakCount(text)
+  }
+
+  override fun inlayAwareOffsetToVisualPosition(editor: VimEditor, offset: Int): VimVisualPosition {
+    return EditorUtil.inlayAwareOffsetToVisualPosition(editor.ij, offset).vim
+  }
+
+  override fun getVisualLineLength(editor: VimEditor, line: Int): Int {
+    return EditorHelper.getVisualLineLength(editor.ij, line)
   }
 }

@@ -29,4 +29,6 @@ interface EngineEditorHelper {
   fun pad(editor: VimEditor, context: ExecutionContext, line: Int, to: Int): String
   fun getLineLength(editor: VimEditor, logicalLine: Int): Int
   fun getLineBreakCount(text: CharSequence): Int
+  fun inlayAwareOffsetToVisualPosition(editor: VimEditor, offset: Int): VimVisualPosition
+  fun getVisualLineLength(editor: VimEditor, line: Int): Int
 }

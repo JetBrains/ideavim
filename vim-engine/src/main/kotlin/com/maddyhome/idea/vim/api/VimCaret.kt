@@ -1,6 +1,7 @@
 package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.common.EditorLine
+import com.maddyhome.idea.vim.common.LiveRange
 import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.group.visual.VisualChange
 
@@ -29,4 +30,6 @@ interface VimCaret {
   fun getVisualPosition(): VimVisualPosition
   val visualLineStart: Int
   fun updateEditorSelection()
+  var vimInsertStart: LiveRange
+  fun moveToVisualPosition(position: VimVisualPosition)
 }

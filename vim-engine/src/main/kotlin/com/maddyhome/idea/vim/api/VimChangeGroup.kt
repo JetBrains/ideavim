@@ -154,4 +154,5 @@ interface VimChangeGroup {
 
   @TestOnly
   fun resetRepeat()
+  fun notifyListeners(editor: VimEditor)
 }

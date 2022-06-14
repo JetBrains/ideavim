@@ -25,12 +25,14 @@ import com.intellij.openapi.editor.ScrollType
 import com.intellij.openapi.editor.VisualPosition
 import com.intellij.openapi.editor.event.CaretEvent
 import com.intellij.openapi.editor.event.CaretListener
+import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.LineDeleteShift
 import com.maddyhome.idea.vim.api.MutableLinearEditor
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimCaretListener
+import com.maddyhome.idea.vim.api.VimDocument
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimLogicalPosition
 import com.maddyhome.idea.vim.api.VimSelectionModel
@@ -40,6 +42,7 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.EditorLine
+import com.maddyhome.idea.vim.common.LiveRange
 import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.common.Pointer
 import com.maddyhome.idea.vim.common.TextRange
@@ -323,6 +326,10 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
     return EditorHelper.getLineEndOffset(editor, line, allowEnd)
   }
 
+  override fun getLineEndOffset(line: Int): Int {
+    return editor.document.getLineEndOffset(line)
+  }
+
   override fun getLineEndForOffset(offset: Int): Int {
     return EditorHelper.getLineEndForOffset(editor, offset)
   }
@@ -410,6 +417,17 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
   override fun hasUnsavedChanges(): Boolean {
     return EditorHelper.hasUnsavedChanges(this.editor)
   }
+
+  override fun createLiveMarker(start: Offset, end: Offset): LiveRange {
+    return editor.document.createRangeMarker(start.point, end.point).vim
+  }
+
+  override fun setInsertMode(insert: Boolean) {
+    (editor as? EditorEx)?.isInsertMode = insert
+  }
+
+  override val document: VimDocument
+    get() = IjVimDocument(editor.document)
 
   private fun Pair<Offset, Offset>.noGuard(editor: Editor): Boolean {
     return editor.document.getRangeGuard(this.first.point, this.second.point) == null
