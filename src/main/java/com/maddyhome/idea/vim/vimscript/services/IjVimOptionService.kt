@@ -27,6 +27,7 @@ import com.maddyhome.idea.vim.options.ToggleOption
 internal class IjVimOptionService : VimOptionServiceBase() {
 
   private val customOptions = setOf(
+    ToggleOption(oldUndo, oldUndo, false),
     ToggleOption(ideajoinName, ideajoinAlias, false),
     ToggleOption(ideamarksName, ideamarksAlias, true),
     StringOption(ideName, ideAlias, ApplicationNamesInfo.getInstance().fullProductNameWithEdition),
@@ -46,6 +47,8 @@ internal class IjVimOptionService : VimOptionServiceBase() {
   }
 
   companion object {
+    const val oldUndo = "oldundo"
+
     const val ideName = "ide"
     const val ideAlias = "ide"
 
