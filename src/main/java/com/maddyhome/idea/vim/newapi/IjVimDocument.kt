@@ -23,6 +23,8 @@ import com.intellij.openapi.editor.event.DocumentEvent
 import com.intellij.openapi.editor.event.DocumentListener
 import com.maddyhome.idea.vim.api.VimDocument
 import com.maddyhome.idea.vim.common.ChangesListener
+import com.maddyhome.idea.vim.common.LiveRange
+import com.maddyhome.idea.vim.common.Offset
 
 class IjVimDocument(private val document: Document) : VimDocument {
 
@@ -47,5 +49,9 @@ class IjVimDocument(private val document: Document) : VimDocument {
   override fun removeChangeListener(listener: ChangesListener) {
     val nativeListener = changeListenersMap.remove(listener) ?: error("Existing listener expected")
     document.removeDocumentListener(nativeListener)
+  }
+
+  override fun getOffsetGuard(offset: Offset): LiveRange? {
+    return document.getOffsetGuard(offset.point)?.vim
   }
 }

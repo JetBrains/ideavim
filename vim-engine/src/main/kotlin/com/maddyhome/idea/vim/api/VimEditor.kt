@@ -240,7 +240,7 @@ interface VimEditor {
   fun hasUnsavedChanges(): Boolean
 
   fun createLiveMarker(start: Offset, end: Offset): LiveRange
-  fun setInsertMode(insert: Boolean)
+  var insertMode: Boolean
 
   val document: VimDocument
 }

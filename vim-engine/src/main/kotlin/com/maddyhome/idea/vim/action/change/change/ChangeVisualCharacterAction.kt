@@ -25,6 +25,9 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
+import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.diagnostic.debug
+import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
@@ -50,6 +53,31 @@ class ChangeVisualCharacterAction : VisualOperatorActionHandler.ForEachCaret() {
   ): Boolean {
     val argument = cmd.argument
     return argument != null &&
-      injector.changeGroup.changeCharacterRange(editor, range.toVimTextRange(false), argument.character)
+      changeCharacterRange(editor, range.toVimTextRange(false), argument.character)
   }
+}
+
+private val logger = vimLogger<ChangeVisualCharacterAction>()
+
+/**
+ * Each character in the supplied range gets replaced with the character ch
+ *
+ * @param editor The editor to change
+ * @param range  The range to change
+ * @param ch     The replacing character
+ * @return true if able to change the range, false if not
+ */
+private fun changeCharacterRange(editor: VimEditor, range: TextRange, ch: Char): Boolean {
+  logger.debug { "change range: $range to $ch" }
+  val chars = editor.text()
+  val starts = range.startOffsets
+  val ends = range.endOffsets
+  for (j in ends.indices.reversed()) {
+    for (i in starts[j] until ends[j]) {
+      if (i < chars.length && '\n' != chars[i]) {
+        injector.changeGroup.replaceText(editor, i, i + 1, Character.toString(ch))
+      }
+    }
+  }
+  return true
 }

@@ -25,7 +25,9 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.handler.VimActionHandler
+import com.maddyhome.idea.vim.register.Register
 import com.maddyhome.idea.vim.vimscript.model.Script
+import javax.swing.KeyStroke
 
 class InsertRegisterAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.INSERT
@@ -52,7 +54,7 @@ class InsertRegisterAction : VimActionHandler.SingleExecution() {
               val textToStore = expressionValue.toInsertableString()
               injector.registerGroup.storeTextSpecial('=', textToStore)
             }
-            injector.changeGroup.insertRegister(editor, context, argument.character)
+            insertRegister(editor, context, argument.character)
           }
         } catch (e: ExException) {
           injector.messages.indicateError()
@@ -61,11 +63,32 @@ class InsertRegisterAction : VimActionHandler.SingleExecution() {
       }
       return true
     } else {
-      return argument != null && injector.changeGroup.insertRegister(editor, context, argument.character)
+      return argument != null && insertRegister(editor, context, argument.character)
     }
   }
 
   private fun readExpression(editor: VimEditor): String? {
     return injector.commandLineHelper.inputString(editor, "=", null)
   }
+}
+
+
+/**
+ * Inserts the contents of the specified register
+ *
+ * @param editor  The editor to insert the text into
+ * @param context The data context
+ * @param key     The register name
+ * @return true if able to insert the register contents, false if not
+ */
+private fun insertRegister(editor: VimEditor, context: ExecutionContext, key: Char): Boolean {
+  val register: Register? = injector.registerGroup.getRegister(key)
+  if (register != null) {
+    val keys: List<KeyStroke> = register.keys
+    for (k in keys) {
+      injector.changeGroup.processKey(editor, context, k)
+    }
+    return true
+  }
+  return false
 }

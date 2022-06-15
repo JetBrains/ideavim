@@ -39,7 +39,22 @@ class InsertAtPreviousInsertAction : ChangeEditorActionHandler.SingleExecution()
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    injector.changeGroup.insertAtPreviousInsert(editor, context)
+    insertAtPreviousInsert(editor, context)
     return true
   }
+}
+
+/**
+ * Begin insert at the location of the previous insert
+ *
+ * @param editor The editor to insert into
+ */
+fun insertAtPreviousInsert(editor: VimEditor, context: ExecutionContext) {
+  editor.removeSecondaryCarets()
+  val caret = editor.primaryCaret()
+  val offset = injector.motion.moveCaretToMark(editor, '^', false)
+  if (offset != -1) {
+    caret.moveToOffset(offset)
+  }
+  injector.changeGroup.insertBeforeCursor(editor, context)
 }

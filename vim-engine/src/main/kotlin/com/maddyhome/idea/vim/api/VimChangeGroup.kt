@@ -41,19 +41,7 @@ interface VimChangeGroup {
 
   fun insertAfterLineEnd(editor: VimEditor, context: ExecutionContext)
 
-  fun insertNewLineAbove(editor: VimEditor, context: ExecutionContext)
-
-  fun insertNewLineBelow(editor: VimEditor, context: ExecutionContext)
-
-  fun insertAtPreviousInsert(editor: VimEditor, context: ExecutionContext)
-
   fun insertPreviousInsert(editor: VimEditor, context: ExecutionContext, exit: Boolean, operatorArguments: OperatorArguments)
-
-  fun insertRegister(editor: VimEditor, context: ExecutionContext, key: Char): Boolean
-
-  fun insertDeleteInsertedText(editor: VimEditor, caret: VimCaret): Boolean
-
-  fun insertDeletePreviousWord(editor: VimEditor, caret: VimCaret): Boolean
 
   fun insertLineAround(editor: VimEditor, context: ExecutionContext, shift: Int)
 
@@ -67,11 +55,7 @@ interface VimChangeGroup {
 
   fun processEnter(editor: VimEditor, context: ExecutionContext)
 
-  fun insertCharacterAroundCursor(editor: VimEditor, caret: VimCaret, dir: Int): Boolean
-
   fun processPostChangeModeSwitch(editor: VimEditor, context: ExecutionContext, toSwitch: CommandState.Mode)
-
-  fun processInsert(editor: VimEditor?)
 
   fun processCommand(editor: VimEditor, cmd: Command)
 
@@ -94,12 +78,6 @@ interface VimChangeGroup {
   fun joinViaIdeaByCount(editor: VimEditor, context: ExecutionContext, count: Int): Boolean
 
   fun joinViaIdeaBySelections(editor: VimEditor, context: ExecutionContext, caretsAndSelections: Map<VimCaret, VimSelection>)
-
-  fun changeReplace(editor: VimEditor, context: ExecutionContext)
-
-  fun changeCharacter(editor: VimEditor, caret: VimCaret, count: Int, ch: Char): Boolean
-
-  fun changeCharacterRange(editor: VimEditor, range: TextRange, ch: Char): Boolean
 
   fun getDeleteRangeAndType(editor: VimEditor, caret: VimCaret, context: ExecutionContext, argument: Argument, isChange: Boolean, operatorArguments: OperatorArguments): Pair<TextRange, SelectionType>?
 
@@ -155,4 +133,24 @@ interface VimChangeGroup {
   @TestOnly
   fun resetRepeat()
   fun notifyListeners(editor: VimEditor)
+  fun runEnterAction(editor: VimEditor, context: ExecutionContext)
+  fun runEnterAboveAction(editor: VimEditor, context: ExecutionContext)
+
+  /**
+   * This repeats the previous insert count times
+   *
+   * @param editor  The editor to insert into
+   * @param context The data context
+   * @param count   The number of times to repeat the previous insert
+   */
+  fun repeatInsert(
+    editor: VimEditor,
+    context: ExecutionContext,
+    count: Int,
+    started: Boolean,
+    operatorArguments: OperatorArguments,
+  )
+
+  fun type(vimEditor: VimEditor, context: ExecutionContext, key: Char)
+  fun replaceText(editor: VimEditor, start: Int, end: Int, str: String)
 }

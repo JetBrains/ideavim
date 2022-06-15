@@ -25,20 +25,20 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.command.UndoConfirmationPolicy;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.editor.*;
+import com.intellij.openapi.editor.Caret;
+import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.editor.event.EditorMouseEvent;
 import com.intellij.openapi.editor.event.EditorMouseListener;
-import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.editor.impl.TextRangeInterval;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.util.PsiUtilBase;
-import com.intellij.util.ObjectUtils;
 import com.intellij.util.containers.ContainerUtil;
 import com.maddyhome.idea.vim.EventFacade;
-import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.RegisterActions;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.*;
@@ -48,16 +48,12 @@ import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.ranges.LineRange;
 import com.maddyhome.idea.vim.group.visual.VimSelection;
 import com.maddyhome.idea.vim.group.visual.VisualModeHelperKt;
-import com.maddyhome.idea.vim.handler.Motion;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.key.KeyHandlerKeeper;
-import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor;
 import com.maddyhome.idea.vim.listener.VimInsertListener;
-import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
 import com.maddyhome.idea.vim.newapi.*;
 import com.maddyhome.idea.vim.options.OptionConstants;
 import com.maddyhome.idea.vim.options.OptionScope;
-import com.maddyhome.idea.vim.register.Register;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
 import kotlin.Pair;
 import kotlin.text.StringsKt;
@@ -66,14 +62,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.TestOnly;
 
-import javax.swing.*;
-import java.awt.event.KeyEvent;
 import java.math.BigInteger;
 import java.util.*;
 
 import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
-import static com.maddyhome.idea.vim.mark.VimMarkConstants.*;
-import static com.maddyhome.idea.vim.register.RegisterConstants.LAST_INSERTED_TEXT_REGISTER;
+import static com.maddyhome.idea.vim.mark.VimMarkConstants.MARK_CHANGE_POS;
 
 /**
  * Provides all the insert/replace related functionality
@@ -92,65 +85,6 @@ public class ChangeGroup extends VimChangeGroupBase {
   @NonNls private static final String MAX_HEX_INTEGER = "ffffffffffffffff";
 
   private final List<VimInsertListener> insertListeners = ContainerUtil.createLockFreeCopyOnWriteList();
-
-
-  /**
-   * Begin insert before the current line by creating a new blank line above the current line
-   * for all carets
-   *
-   * @param editor The editor to insert into
-   */
-  @Override
-  public void insertNewLineAbove(final @NotNull VimEditor editor, @NotNull ExecutionContext context) {
-    if (((IjVimEditor) editor).getEditor().isOneLineMode()) return;
-
-    // See also EditorStartNewLineBefore. That will move the caret to line start, call EditorEnter to create a new line,
-    //   and then move up and call EditorLineEnd. We get better indent positioning by going to the line end of the
-    //   previous line and hitting enter, especially with plain text files.
-    // However, we'll use EditorStartNewLineBefore in PyCharm notebooks where the last character of the previous line
-    //   may be locked with a guard
-
-    // Note that we're deliberately bypassing MotionGroup.moveCaret to avoid side effects, most notably unncessary
-    // scrolling
-    Set<Caret> firstLiners = new HashSet<>();
-    Set<Pair<Caret, Integer>> moves = new HashSet<>();
-    for (Caret caret : ((IjVimEditor) editor).getEditor().getCaretModel().getAllCarets()) {
-      final int offset;
-      if (caret.getVisualPosition().line == 0) {
-        // Fake indenting for the first line. Works well for plain text to match the existing indent
-        offset = VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, new IjVimCaret(caret));
-        firstLiners.add(caret);
-      }
-      else {
-        offset = VimPlugin.getMotion().moveCaretToLineEnd(editor, caret.getLogicalPosition().line - 1, true);
-      }
-      moves.add(new Pair<>(caret, offset));
-    }
-
-    // Check if the "last character on previous line" has a guard
-    // This is actively used in pycharm notebooks https://youtrack.jetbrains.com/issue/VIM-2495
-    boolean hasGuards = moves.stream().anyMatch(it -> ((IjVimEditor) editor).getEditor().getDocument().getOffsetGuard(it.getSecond()) != null);
-    if (!hasGuards) {
-      for (Pair<Caret, Integer> move : moves) {
-        move.getFirst().moveToOffset(move.getSecond());
-      }
-
-      initInsert(editor, context, CommandState.Mode.INSERT);
-      runEnterAction(editor, context);
-
-      for (Caret caret : ((IjVimEditor) editor).getEditor().getCaretModel().getAllCarets()) {
-        if (firstLiners.contains(caret)) {
-          final int offset = VimPlugin.getMotion().moveCaretToLineEnd(editor, 0, true);
-          injector.getMotion().moveCaret(editor, new IjVimCaret(caret), offset);
-        }
-      }
-    } else {
-      initInsert(editor, context, CommandState.Mode.INSERT);
-      runEnterAboveAction(editor, context);
-    }
-
-    MotionGroup.scrollCaretIntoView(((IjVimEditor) editor).getEditor());
-  }
 
   /**
    * Inserts a new line above the caret position
@@ -182,26 +116,6 @@ public class ChangeGroup extends VimChangeGroupBase {
   }
 
   /**
-   * Begin insert after the current line by creating a new blank line below the current line
-   * for all carets
-   *  @param editor  The editor to insert into
-   * @param context The data context
-   */
-  @Override
-  public void insertNewLineBelow(final @NotNull VimEditor editor, final @NotNull ExecutionContext context) {
-    if (((IjVimEditor) editor).getEditor().isOneLineMode()) return;
-
-    for (Caret caret : ((IjVimEditor) editor).getEditor().getCaretModel().getAllCarets()) {
-      injector.getMotion().moveCaret(editor, new IjVimCaret(caret), VimPlugin.getMotion().moveCaretToLineEnd(editor, new IjVimCaret(caret)));
-    }
-
-    initInsert(editor, context, CommandState.Mode.INSERT);
-    runEnterAction(editor, context);
-
-    MotionGroup.scrollCaretIntoView(((IjVimEditor) editor).getEditor());
-  }
-
-  /**
    * Inserts a new line below the caret position
    *
    * @param editor The editor to insert into
@@ -216,151 +130,7 @@ public class ChangeGroup extends VimChangeGroupBase {
     insertText(editor, caret, "\n" + IndentConfig.create(((IjVimEditor) editor).getEditor()).createIndentBySize(col));
   }
 
-  private void runEnterAction(VimEditor editor, @NotNull ExecutionContext context) {
-    CommandState state = CommandState.getInstance(editor);
-    if (!state.isDotRepeatInProgress()) {
-      // While repeating the enter action has been already executed because `initInsert` repeats the input
-      final NativeAction action = VimInjectorKt.getInjector().getNativeActionManager().getEnterAction();
-      if (action != null) {
-        strokes.add(action);
-        VimInjectorKt.getInjector().getActionExecutor().executeAction(action, context);
-      }
-    }
-  }
 
-  private void runEnterAboveAction(VimEditor editor, @NotNull ExecutionContext context) {
-    CommandState state = CommandState.getInstance(editor);
-    if (!state.isDotRepeatInProgress()) {
-      // While repeating the enter action has been already executed because `initInsert` repeats the input
-      final NativeAction action = VimInjectorKt.getInjector().getNativeActionManager().getCreateLineAboveCaret();
-      if (action != null) {
-        strokes.add(action);
-        VimInjectorKt.getInjector().getActionExecutor().executeAction(action, context);
-      }
-    }
-  }
-
-  /**
-   * Begin insert at the location of the previous insert
-   *
-   * @param editor The editor to insert into
-   */
-  @Override
-  public void insertAtPreviousInsert(@NotNull VimEditor editor, @NotNull ExecutionContext context) {
-    editor.removeSecondaryCarets();
-
-    final VimCaret caret = editor.primaryCaret();
-    final int offset = VimPlugin.getMotion().moveCaretToMark(editor, '^', false);
-    if (offset != -1) {
-      injector.getMotion().moveCaret(editor, caret, offset);
-    }
-
-    insertBeforeCursor(editor, context);
-  }
-
-  /**
-   * Inserts previously inserted text
-   *  @param editor  The editor to insert into
-   * @param context The data context
-   * @param exit    true if insert mode should be exited after the insert, false should stay in insert mode
-   */
-  @Override
-  public void insertPreviousInsert(@NotNull VimEditor editor,
-                                   @NotNull ExecutionContext context,
-                                   boolean exit,
-                                   @NotNull OperatorArguments operatorArguments) {
-    repeatInsertText(editor, context, 1, operatorArguments);
-    if (exit) {
-      ModeHelper.exitInsertMode(((IjVimEditor) editor).getEditor(), ((IjExecutionContext) context).getContext(), operatorArguments);
-    }
-  }
-
-  /**
-   * Inserts the contents of the specified register
-   *
-   * @param editor  The editor to insert the text into
-   * @param context The data context
-   * @param key     The register name
-   * @return true if able to insert the register contents, false if not
-   */
-  @Override
-  public boolean insertRegister(@NotNull VimEditor editor, @NotNull ExecutionContext context, char key) {
-    final Register register = VimPlugin.getRegister().getRegister(key);
-    if (register != null) {
-      final List<KeyStroke> keys = register.getKeys();
-      for (KeyStroke k : keys) {
-        processKey(editor, context, k);
-      }
-      return true;
-    }
-
-    return false;
-  }
-
-  /**
-   * If the cursor is currently after the start of the current insert this deletes all the newly inserted text.
-   * Otherwise it deletes all text from the cursor back to the first non-blank in the line.
-   *
-   * @param editor The editor to delete the text from
-   * @param caret  The caret on which the action is performed
-   * @return true if able to delete the text, false if not
-   */
-  @Override
-  public boolean insertDeleteInsertedText(@NotNull VimEditor editor, @NotNull VimCaret caret) {
-    int deleteTo = UserDataManager.getVimInsertStart(((IjVimCaret) caret).getCaret()).getStartOffset();
-    int offset = ((IjVimCaret) caret).getCaret().getOffset();
-    if (offset == deleteTo) {
-      deleteTo = VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor,
-                                                                       caret);
-    }
-
-    if (deleteTo != -1) {
-      deleteRange(editor, caret, new TextRange(deleteTo, offset), SelectionType.CHARACTER_WISE, false);
-
-      return true;
-    }
-
-    return false;
-  }
-
-  /**
-   * Deletes the text from the cursor to the start of the previous word
-   * <p>
-   * TODO This behavior should be configured via the `backspace` option
-   *
-   * @param editor The editor to delete the text from
-   * @return true if able to delete text, false if not
-   */
-  @Override
-  public boolean insertDeletePreviousWord(@NotNull VimEditor editor, @NotNull VimCaret caret) {
-    final int deleteTo;
-    if (((IjVimCaret) caret).getCaret().getLogicalPosition().column == 0) {
-      deleteTo = ((IjVimCaret) caret).getCaret().getOffset() - 1;
-    }
-    else {
-      int pointer = ((IjVimCaret) caret).getCaret().getOffset() - 1;
-      final CharSequence chars = ((IjVimEditor) editor).getEditor().getDocument().getCharsSequence();
-      while (pointer >= 0 && chars.charAt(pointer) == ' ' && chars.charAt(pointer) != '\n') pointer--;
-      if (chars.charAt(pointer) == '\n') {
-        deleteTo = pointer + 1;
-      }
-      else {
-        Motion motion = VimPlugin.getMotion().findOffsetOfNextWord(editor, pointer + 1, -1, false);
-        if (motion instanceof Motion.AbsoluteOffset) {
-          deleteTo = ((Motion.AbsoluteOffset)motion).getOffset();
-        }
-        else {
-          return false;
-        }
-      }
-    }
-    if (deleteTo < 0) {
-      return false;
-    }
-    final TextRange range = new TextRange(deleteTo, ((IjVimCaret) caret).getCaret().getOffset());
-    deleteRange(editor, caret, range, SelectionType.CHARACTER_WISE, true);
-    return true;
-  }
 
 
   private final @NotNull EditorMouseListener listener = new EditorMouseListener() {
@@ -383,279 +153,8 @@ public class ChangeGroup extends VimChangeGroupBase {
     EventFacade.getInstance().removeEditorMouseListener(((IjVimEditor) editor).getEditor(), listener);
   }
 
-
-  /**
-   * Terminate insert/replace mode after the user presses Escape or Ctrl-C
-   * <p>
-   * DEPRECATED. Please, don't use this function directly. Use ModeHelper.exitInsertMode in file ModeExtensions.kt
-   */
   @Override
-  public void processEscape(@NotNull VimEditor editor, @Nullable ExecutionContext context, @NotNull OperatorArguments operatorArguments) {
-    // Get the offset for marks before we exit insert mode - switching from insert to overtype subtracts one from the
-    // column offset.
-    int offset = ((IjVimEditor) editor).getEditor().getCaretModel().getPrimaryCaret().getOffset();
-    final MarkGroup markGroup = VimPlugin.getMark();
-    markGroup.setMark(editor, '^', offset);
-    markGroup.setMark(editor, MARK_CHANGE_END, offset);
-
-    if (CommandState.getInstance(editor).getMode() == CommandState.Mode.REPLACE) {
-      editor.setInsertMode(true);
-    }
-
-    int cnt = lastInsert != null ? lastInsert.getCount() : 0;
-    if (lastInsert != null && (lastInsert.getFlags().contains(CommandFlags.FLAG_NO_REPEAT_INSERT))) {
-      cnt = 1;
-    }
-
-    if (vimDocument != null && vimDocumentListener != null) {
-      vimDocument.removeChangeListener(vimDocumentListener);
-      vimDocumentListener = null;
-    }
-
-    lastStrokes = new ArrayList<>(strokes);
-    if (context != null) {
-      repeatInsert(editor, context, cnt == 0 ? 0 : cnt - 1, true, operatorArguments);
-    }
-
-    if (CommandState.getInstance(editor).getMode() == CommandState.Mode.INSERT) {
-      updateLastInsertedTextRegister();
-    }
-
-    // The change pos '.' mark is the offset AFTER processing escape, and after switching to overtype
-    offset = ((IjVimEditor) editor).getEditor().getCaretModel().getPrimaryCaret().getOffset();
-    markGroup.setMark(editor, MARK_CHANGE_POS, offset);
-
-    CommandState.getInstance(editor).popModes();
-    exitAllSingleCommandInsertModes(editor);
-  }
-
-  /**
-   * Processes the Enter key by running the first successful action registered for "ENTER" keystroke.
-   * <p>
-   * If this is REPLACE mode we need to turn off OVERWRITE before and then turn OVERWRITE back on after sending the
-   * "ENTER" key.
-   *
-   * @param editor  The editor to press "Enter" in
-   * @param context The data context
-   */
-  @Override
-  public void processEnter(@NotNull VimEditor editor, @NotNull ExecutionContext context) {
-    if (CommandState.getInstance(editor).getMode() == CommandState.Mode.REPLACE) {
-      editor.setInsertMode(true);
-    }
-    final KeyStroke enterKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
-    final List<NativeAction> actions = VimPlugin.getKey().getActions(editor, enterKeyStroke);
-    for (NativeAction action : actions) {
-      if (VimInjectorKt.getInjector().getActionExecutor().executeAction(action, context)) {
-        break;
-      }
-    }
-    if (CommandState.getInstance(editor).getMode() == CommandState.Mode.REPLACE) {
-      editor.setInsertMode(false);
-    }
-  }
-
-  /**
-   * Inserts the character above/below the cursor at the cursor location
-   *
-   * @param editor The editor to insert into
-   * @param caret  The caret to insert after
-   * @param dir    1 for getting from line below cursor, -1 for getting from line above cursor
-   * @return true if able to get the character and insert it, false if not
-   */
-  @Override
-  public boolean insertCharacterAroundCursor(@NotNull VimEditor editor, @NotNull VimCaret caret, int dir) {
-    boolean res = false;
-
-    VimVisualPosition vp = caret.getVisualPosition();
-    vp = new VimVisualPosition(vp.getLine() + dir, vp.getColumn(), false);
-    int len = EditorHelper.getLineLength(((IjVimEditor) editor).getEditor(), EditorHelper.visualLineToLogicalLine(((IjVimEditor) editor).getEditor(), vp.getLine()));
-    if (vp.getColumn() < len) {
-      int offset = EditorHelper.visualPositionToOffset(((IjVimEditor) editor).getEditor(), new VisualPosition(vp.getLine(), vp.getColumn()));
-      CharSequence charsSequence = ((IjVimEditor) editor).getEditor().getDocument().getCharsSequence();
-      if (offset < charsSequence.length()) {
-        char ch = charsSequence.charAt(offset);
-        ((IjVimEditor) editor).getEditor().getDocument().insertString(((IjVimCaret) caret).getCaret().getOffset(), Character.toString(ch));
-        injector.getMotion().moveCaret(editor, caret, VimPlugin.getMotion()
-          .getOffsetOfHorizontalMotion(editor, caret, 1, true));
-        res = true;
-      }
-    }
-
-    return res;
-  }
-
-  /**
-   * Performs a mode switch after change action
-   *  @param editor   The editor to switch mode in
-   * @param context  The data context
-   * @param toSwitch The mode to switch to
-   */
-  @Override
-  public void processPostChangeModeSwitch(@NotNull VimEditor editor,
-                                          @NotNull ExecutionContext context,
-                                          @NotNull CommandState.Mode toSwitch) {
-    if (toSwitch == CommandState.Mode.INSERT) {
-      initInsert(editor, context, CommandState.Mode.INSERT);
-    }
-  }
-
-
-  /**
-   * Processes the user pressing the Insert key while in INSERT or REPLACE mode. This simply toggles the
-   * Insert/Overwrite state which updates the status bar.
-   *
-   * @param editor The editor to toggle the state in
-   */
-  @Override
-  public void processInsert(VimEditor editor) {
-    final EditorEx editorEx = ObjectUtils.tryCast(((IjVimEditor) editor).getEditor(), EditorEx.class);
-    if (editorEx == null) return;
-    editorEx.setInsertMode(!editorEx.isInsertMode());
-    CommandState.getInstance(editor).toggleInsertOverwrite();
-  }
-
-  /**
-   * This processes all keystrokes in Insert/Replace mode that were converted into Commands. Some of these
-   * commands need to be saved off so the inserted/replaced text can be repeated properly later if needed.
-   *
-   * @param editor The editor the command was executed in
-   * @param cmd    The command that was executed
-   */
-  @Override
-  public void processCommand(@NotNull VimEditor editor, @NotNull Command cmd) {
-    // return value never used here
-    if (cmd.getFlags().contains(CommandFlags.FLAG_SAVE_STROKE)) {
-      strokes.add(cmd.getAction());
-    }
-    else if (cmd.getFlags().contains(CommandFlags.FLAG_CLEAR_STROKES)) {
-      clearStrokes(editor);
-    }
-  }
-
-  /**
-   * Clears all the keystrokes from the current insert command
-   *
-   * @param editor The editor to clear strokes from.
-   */
-  private void clearStrokes(@NotNull VimEditor editor) {
-    strokes.clear();
-    repeatCharsCount = 0;
-    for (Caret caret : ((IjVimEditor) editor).getEditor().getCaretModel().getAllCarets()) {
-      UserDataManager
-        .setVimInsertStart(caret, ((IjVimEditor) editor).getEditor().getDocument().createRangeMarker(caret.getOffset(), caret.getOffset()));
-    }
-  }
-
-  /**
-   * While in INSERT or REPLACE mode the user can enter a single NORMAL mode command and then automatically
-   * return to INSERT or REPLACE mode.
-   *
-   * @param editor The editor to put into NORMAL mode for one command
-   */
-  @Override
-  public void processSingleCommand(@NotNull VimEditor editor) {
-    CommandState.getInstance(editor).pushModes(CommandState.Mode.INSERT_NORMAL, CommandState.SubMode.NONE);
-    clearStrokes(editor);
-  }
-
-  /**
-   * Delete from the cursor to the end of count - 1 lines down
-   *
-   * @param editor The editor to delete from
-   * @param caret  VimCaret on the position to start
-   * @param count  The number of lines affected
-   * @return true if able to delete the text, false if not
-   */
-  @Override
-  public boolean deleteEndOfLine(@NotNull VimEditor editor, @NotNull VimCaret caret, int count) {
-    int initialOffset = ((IjVimCaret) caret).getCaret().getOffset();
-    int offset = VimPlugin.getMotion().moveCaretToLineEndOffset(editor,
-                                                                caret, count - 1, true);
-    int lineStart = VimPlugin.getMotion().moveCaretToLineStart(editor,
-                                                               caret);
-
-    int startOffset = initialOffset;
-    if (offset == initialOffset && offset != lineStart) startOffset--; // handle delete from virtual space
-
-    //noinspection ConstantConditions
-    if (offset != -1) {
-      final TextRange rangeToDelete = new TextRange(startOffset, offset);
-      editor.nativeCarets().stream().filter(c -> !c.equals(caret) && rangeToDelete.contains(c.getOffset().getPoint()))
-        .forEach(editor::removeCaret);
-      boolean res = deleteText(editor, rangeToDelete, SelectionType.CHARACTER_WISE);
-
-      if (EngineHelperKt.getUsesVirtualSpace()) {
-        injector.getMotion().moveCaret(editor, caret, startOffset);
-      }
-      else {
-        int pos = VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret, -1, false);
-        if (pos != -1) {
-          injector.getMotion().moveCaret(editor, caret, pos);
-        }
-      }
-
-      return res;
-    }
-
-    return false;
-  }
-
-  /**
-   * Joins count lines together starting at the cursor. No count or a count of one still joins two lines.
-   *
-   * @param editor The editor to join the lines in
-   * @param caret  The caret in the first line to be joined.
-   * @param count  The number of lines to join
-   * @param spaces If true the joined lines will have one space between them and any leading space on the second line
-   *               will be removed. If false, only the newline is removed to join the lines.
-   * @return true if able to join the lines, false if not
-   */
-  @Override
-  public boolean deleteJoinLines(@NotNull VimEditor editor, @NotNull VimCaret caret, int count, boolean spaces) {
-    if (count < 2) count = 2;
-    int lline = ((IjVimCaret) caret).getCaret().getLogicalPosition().line;
-    int total = EditorHelper.getLineCount(((IjVimEditor) editor).getEditor());
-    //noinspection SimplifiableIfStatement
-    if (lline + count > total) {
-      return false;
-    }
-
-    return deleteJoinNLines(editor, caret, lline, count, spaces);
-  }
-
-  /**
-   * This processes all "regular" keystrokes entered while in insert/replace mode
-   *
-   * @param editor  The editor the character was typed into
-   * @param context The data context
-   * @param key     The user entered keystroke
-   * @return true if this was a regular character, false if not
-   */
-  @Override
-  public boolean processKey(final @NotNull VimEditor editor,
-                            final @NotNull ExecutionContext context,
-                            final @NotNull KeyStroke key) {
-    if (logger.isDebugEnabled()) {
-      logger.debug("processKey(" + key + ")");
-    }
-
-    if (key.getKeyChar() != KeyEvent.CHAR_UNDEFINED) {
-      type(editor, context, key.getKeyChar());
-      return true;
-    }
-
-    // Shift-space
-    if (key.getKeyCode() == 32 && ((key.getModifiers() & KeyEvent.SHIFT_DOWN_MASK) != 0)) {
-      type(editor, context, ' ');
-      return true;
-    }
-
-
-    return false;
-  }
-
-  private void type(@NotNull VimEditor vimEditor, @NotNull ExecutionContext context, char key) {
+  public void type(@NotNull VimEditor vimEditor, @NotNull ExecutionContext context, char key) {
     Editor editor = ((IjVimEditor) vimEditor).getEditor();
     DataContext ijContext = IjExecutionContextKt.getIj(context);
     final Document doc = ((IjVimEditor) vimEditor).getEditor().getDocument();
@@ -665,261 +164,6 @@ public class ChangeGroup extends VimChangeGroupBase {
     MotionGroup.scrollCaretIntoView(editor);
   }
 
-  @Override
-  public boolean processKeyInSelectMode(final @NotNull VimEditor editor,
-                                        final @NotNull ExecutionContext context,
-                                        final @NotNull KeyStroke key) {
-    boolean res;
-    try (VimListenerSuppressor.Locked ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
-      res = processKey(editor, context, key);
-
-      ModeHelper.exitSelectMode(editor, false);
-      KeyHandler.getInstance().reset(editor);
-
-      if (isPrintableChar(key.getKeyChar()) || activeTemplateWithLeftRightMotion(editor, key)) {
-        VimPlugin.getChange().insertBeforeCursor(editor, context);
-      }
-    }
-
-    return res;
-  }
-
-  private boolean isPrintableChar(char c) {
-    Character.UnicodeBlock block = Character.UnicodeBlock.of(c);
-    return (!Character.isISOControl(c)) &&
-           c != KeyEvent.CHAR_UNDEFINED &&
-           block != null &&
-           block != Character.UnicodeBlock.SPECIALS;
-  }
-
-  private boolean activeTemplateWithLeftRightMotion(VimEditor editor, KeyStroke keyStroke) {
-    return HelperKt.isTemplateActive(((IjVimEditor) editor).getEditor()) &&
-           (keyStroke.getKeyCode() == KeyEvent.VK_LEFT || keyStroke.getKeyCode() == KeyEvent.VK_RIGHT);
-  }
-
-  /**
-   * Deletes count lines including the current line
-   *
-   * @param editor The editor to remove the lines from
-   * @param count  The number of lines to delete
-   * @return true if able to delete the lines, false if not
-   */
-
-  @Override
-  public boolean deleteLine(@NotNull VimEditor editor, @NotNull VimCaret caret, int count) {
-    int start = VimPlugin.getMotion().moveCaretToLineStart(editor,
-                                                           caret);
-    int offset = Math.min(VimPlugin.getMotion().moveCaretToLineEndOffset(editor,
-                                                                         caret, count - 1, true) + 1,
-                          EditorHelperRt.getFileSize(((IjVimEditor) editor).getEditor()));
-    if (logger.isDebugEnabled()) {
-      logger.debug("start=" + start);
-      logger.debug("offset=" + offset);
-    }
-    if (offset != -1) {
-      boolean res = deleteText(editor, new TextRange(start, offset), SelectionType.LINE_WISE);
-      if (res && ((IjVimCaret) caret).getCaret().getOffset() >= EditorHelperRt.getFileSize(((IjVimEditor) editor).getEditor()) && ((IjVimCaret) caret).getCaret().getOffset() != 0) {
-        injector.getMotion().moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineStartSkipLeadingOffset(editor,
-                                                                                                caret, -1));
-      }
-
-      return res;
-    }
-
-    return false;
-  }
-
-  /**
-   * Joins all the lines selected by the current visual selection.
-   *
-   * @param editor The editor to join the lines in
-   * @param caret  The caret to be moved after joining
-   * @param range  The range of the visual selection
-   * @param spaces If true the joined lines will have one space between them and any leading space on the second line
-   *               will be removed. If false, only the newline is removed to join the lines.
-   * @return true if able to join the lines, false if not
-   */
-  @Override
-  public boolean deleteJoinRange(@NotNull VimEditor editor, @NotNull VimCaret caret, @NotNull TextRange range, boolean spaces) {
-    int startLine = editor.offsetToLogicalPosition(range.getStartOffset()).getLine();
-    int endLine = editor.offsetToLogicalPosition(range.getEndOffset()).getLine();
-    int count = endLine - startLine + 1;
-    if (count < 2) count = 2;
-
-    return deleteJoinNLines(editor, caret, startLine, count, spaces);
-  }
-
-  /**
-   * This does the actual joining of the lines
-   *
-   * @param editor    The editor to join the lines in
-   * @param caret     The caret on the starting line (to be moved)
-   * @param startLine The starting logical line
-   * @param count     The number of lines to join including startLine
-   * @param spaces    If true the joined lines will have one space between them and any leading space on the second line
-   *                  will be removed. If false, only the newline is removed to join the lines.
-   * @return true if able to join the lines, false if not
-   */
-  private boolean deleteJoinNLines(@NotNull VimEditor editor,
-                                   @NotNull VimCaret caret,
-                                   int startLine,
-                                   int count,
-                                   boolean spaces) {
-    // start my moving the cursor to the very end of the first line
-    injector.getMotion().moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineEnd(editor, startLine, true));
-    for (int i = 1; i < count; i++) {
-      int start = VimPlugin.getMotion().moveCaretToLineEnd(editor, caret);
-      int trailingWhitespaceStart = VimPlugin.getMotion().moveCaretToLineEndSkipLeadingOffset(editor,
-                                                                                              caret, 0);
-      boolean hasTrailingWhitespace = start != trailingWhitespaceStart + 1;
-
-      injector.getMotion().moveCaret(editor, caret, start);
-      int offset;
-      if (spaces) {
-        offset = VimPlugin.getMotion().moveCaretToLineStartSkipLeadingOffset(editor,
-                                                                             caret, 1);
-      }
-      else {
-        offset = VimPlugin.getMotion().moveCaretToLineStart(editor, ((IjVimCaret) caret).getCaret().getLogicalPosition().line + 1);
-      }
-      deleteText(editor, new TextRange(((IjVimCaret) caret).getCaret().getOffset(), offset), null);
-      if (spaces && !hasTrailingWhitespace) {
-        insertText(editor, caret, " ");
-        injector.getMotion().moveCaret(editor, caret, VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor,
-                                                                                      caret, -1, true));
-      }
-    }
-
-    return true;
-  }
-
-  @Override
-  public boolean joinViaIdeaByCount(@NotNull VimEditor editor, @NotNull ExecutionContext context, int count) {
-    int executions = count > 1 ? count - 1 : 1;
-    final boolean allowedExecution = ((IjVimEditor) editor).getEditor().getCaretModel().getAllCarets().stream().anyMatch(caret -> {
-      int lline = caret.getLogicalPosition().line;
-      int total = EditorHelper.getLineCount(((IjVimEditor) editor).getEditor());
-      return lline + count <= total;
-    });
-    if (!allowedExecution) return false;
-    for (int i = 0; i < executions; i++) {
-      NativeAction joinLinesAction = VimInjectorKt.getInjector().getNativeActionManager().getJoinLines();
-      if (joinLinesAction != null) {
-        VimInjectorKt.getInjector().getActionExecutor().executeAction(joinLinesAction, context);
-      }
-    }
-    return true;
-  }
-
-  @Override
-  public void joinViaIdeaBySelections(@NotNull VimEditor editor,
-                                      @NotNull ExecutionContext context,
-                                      @NotNull Map<@NotNull VimCaret, @NotNull ? extends VimSelection> caretsAndSelections) {
-    caretsAndSelections.forEach((caret, range) -> {
-      if (!caret.isValid()) return;
-      final Pair<Integer, Integer> nativeRange = range.getNativeStartAndEnd();
-      ((IjVimCaret) caret).getCaret().setSelection(nativeRange.getFirst(), nativeRange.getSecond());
-    });
-    NativeAction joinLinesAction = VimInjectorKt.getInjector().getNativeActionManager().getJoinLines();
-    if (joinLinesAction != null) {
-      VimInjectorKt.getInjector().getActionExecutor().executeAction(joinLinesAction, context);
-    }
-    ((IjVimEditor) editor).getEditor().getCaretModel().getAllCarets().forEach(caret -> {
-      caret.removeSelection();
-      final VisualPosition currentVisualPosition = caret.getVisualPosition();
-      if (currentVisualPosition.line < 1) return;
-      final VisualPosition newVisualPosition =
-        new VisualPosition(currentVisualPosition.line - 1, currentVisualPosition.column);
-      caret.moveToVisualPosition(newVisualPosition);
-    });
-  }
-
-  /**
-   * Begin Replace mode
-   *  @param editor  The editor to replace in
-   * @param context The data context
-   */
-  @Override
-  public void changeReplace(@NotNull VimEditor editor, @NotNull ExecutionContext context) {
-    initInsert(editor, context, CommandState.Mode.REPLACE);
-  }
-
-  /**
-   * Replace each of the next count characters with the character ch
-   *
-   * @param editor The editor to change
-   * @param caret  The caret to perform action on
-   * @param count  The number of characters to change
-   * @param ch     The character to change to
-   * @return true if able to change count characters, false if not
-   */
-  @Override
-  public boolean changeCharacter(@NotNull VimEditor editor, @NotNull VimCaret caret, int count, char ch) {
-    int col = ((IjVimCaret) caret).getCaret().getLogicalPosition().column;
-    int len = EditorHelper.getLineLength(((IjVimEditor) editor).getEditor());
-    int offset = ((IjVimCaret) caret).getCaret().getOffset();
-    if (len - col < count) {
-      return false;
-    }
-
-    // Special case - if char is newline, only add one despite count
-    int num = count;
-    String space = null;
-    if (ch == '\n') {
-      num = 1;
-      space = EditorHelper.getLeadingWhitespace(((IjVimEditor) editor).getEditor(), editor.offsetToLogicalPosition(offset).getLine());
-      if (logger.isDebugEnabled()) {
-        logger.debug("space='" + space + "'");
-      }
-    }
-
-    StringBuilder repl = new StringBuilder(count);
-    for (int i = 0; i < num; i++) {
-      repl.append(ch);
-    }
-
-    replaceText(editor, offset, offset + count, repl.toString());
-
-    // Indent new line if we replaced with a newline
-    if (ch == '\n') {
-      insertText(editor, caret, offset + 1, space);
-      int slen = space.length();
-      if (slen == 0) {
-        slen++;
-      }
-      InlayHelperKt.moveToInlayAwareOffset(((IjVimCaret) caret).getCaret(), offset + slen);
-    }
-
-    return true;
-  }
-
-  /**
-   * Each character in the supplied range gets replaced with the character ch
-   *
-   * @param editor The editor to change
-   * @param range  The range to change
-   * @param ch     The replacing character
-   * @return true if able to change the range, false if not
-   */
-  @Override
-  public boolean changeCharacterRange(@NotNull VimEditor editor, @NotNull TextRange range, char ch) {
-    if (logger.isDebugEnabled()) {
-      logger.debug("change range: " + range + " to " + ch);
-    }
-
-    CharSequence chars = ((IjVimEditor) editor).getEditor().getDocument().getCharsSequence();
-    int[] starts = range.getStartOffsets();
-    int[] ends = range.getEndOffsets();
-    for (int j = ends.length - 1; j >= 0; j--) {
-      for (int i = starts[j]; i < ends[j]; i++) {
-        if (i < chars.length() && '\n' != chars.charAt(i)) {
-          replaceText(editor, i, i + 1, Character.toString(ch));
-        }
-      }
-    }
-
-    return true;
-  }
 
   @Override
   public @Nullable Pair<@NotNull TextRange, @NotNull SelectionType> getDeleteRangeAndType(@NotNull VimEditor editor,
@@ -1519,7 +763,8 @@ public class ChangeGroup extends VimChangeGroupBase {
    * @param end    The end offset to change
    * @param str    The new text
    */
-  private void replaceText(@NotNull VimEditor editor, int start, int end, @NotNull String str) {
+  @Override
+  public void replaceText(@NotNull VimEditor editor, int start, int end, @NotNull String str) {
     ((IjVimEditor) editor).getEditor().getDocument().replaceString(start, end, str);
 
     final int newEnd = start + str.length();
@@ -1699,14 +944,6 @@ public class ChangeGroup extends VimChangeGroupBase {
     return true;
   }
 
-  private void exitAllSingleCommandInsertModes(@NotNull VimEditor editor) {
-    while (CommandStateHelper.inSingleCommandMode(((IjVimEditor) editor).getEditor())) {
-      CommandState.getInstance(editor).popModes();
-      if (CommandStateHelper.inInsertMode(((IjVimEditor) editor).getEditor())) {
-        CommandState.getInstance(editor).popModes();
-      }
-    }
-  }
 
   @Override
   public boolean changeNumber(final @NotNull VimEditor editor, @NotNull VimCaret caret, final int count) {
@@ -1857,18 +1094,6 @@ public class ChangeGroup extends VimChangeGroupBase {
     setInsertRepeat(0, 0, false);
   }
 
-  private void updateLastInsertedTextRegister() {
-    StringBuilder textToPutRegister = new StringBuilder();
-    if (lastStrokes != null) {
-      for (Object lastStroke : lastStrokes) {
-        if (lastStroke instanceof char[]) {
-          final char[] chars = (char[])lastStroke;
-          textToPutRegister.append(new String(chars));
-        }
-      }
-    }
-    VimPlugin.getRegister().storeTextSpecial(LAST_INSERTED_TEXT_REGISTER, textToPutRegister.toString());
-  }
 
 
   private static final Logger logger = Logger.getInstance(ChangeGroup.class.getName());

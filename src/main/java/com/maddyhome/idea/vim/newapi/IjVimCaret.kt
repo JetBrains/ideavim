@@ -80,6 +80,10 @@ class IjVimCaret(val caret: Caret) : VimCaret {
     MotionGroup.moveCaret(caret.editor, caret, offset)
   }
 
+  override fun moveToOffsetNative(offset: Int) {
+    caret.moveToOffset(offset)
+  }
+
   override fun moveToLogicalPosition(logicalPosition: VimLogicalPosition) {
     this.caret.moveToLogicalPosition(LogicalPosition(logicalPosition.line, logicalPosition.column, logicalPosition.leansForward))
   }
@@ -138,6 +142,14 @@ class IjVimCaret(val caret: Caret) : VimCaret {
 
   override fun moveToVisualPosition(position: VimVisualPosition) {
     caret.moveToVisualPosition(VisualPosition(position.line, position.column, position.leansRight))
+  }
+
+  override fun setNativeSelection(start: Offset, end: Offset) {
+    caret.setSelection(start.point, end.point)
+  }
+
+  override fun removeNativeSelection() {
+    caret.removeSelection()
   }
 
   override fun equals(other: Any?): Boolean = this.caret == (other as? IjVimCaret)?.caret

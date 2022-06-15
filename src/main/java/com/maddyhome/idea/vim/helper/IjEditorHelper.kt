@@ -124,6 +124,10 @@ class IjEditorHelper : EngineEditorHelper {
     return EditorHelper.getLineLength(editor.ij, logicalLine)
   }
 
+  override fun getLineLength(editor: VimEditor): Int {
+    return EditorHelper.getLineLength(editor.ij)
+  }
+
   override fun getLineBreakCount(text: CharSequence): Int {
     return StringUtil.getLineBreakCount(text)
   }
@@ -134,5 +138,9 @@ class IjEditorHelper : EngineEditorHelper {
 
   override fun getVisualLineLength(editor: VimEditor, line: Int): Int {
     return EditorHelper.getVisualLineLength(editor.ij, line)
+  }
+
+  override fun getLeadingWhitespace(editor: VimEditor, line: Int): String {
+    return EditorHelper.getLeadingWhitespace(editor.ij, line)
   }
 }

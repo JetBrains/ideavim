@@ -422,9 +422,11 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
     return editor.document.createRangeMarker(start.point, end.point).vim
   }
 
-  override fun setInsertMode(insert: Boolean) {
-    (editor as? EditorEx)?.isInsertMode = insert
-  }
+  override var insertMode: Boolean
+    get() = (editor as? EditorEx)?.isInsertMode ?: false
+    set(value) {
+      (editor as? EditorEx)?.isInsertMode = value
+    }
 
   override val document: VimDocument
     get() = IjVimDocument(editor.document)

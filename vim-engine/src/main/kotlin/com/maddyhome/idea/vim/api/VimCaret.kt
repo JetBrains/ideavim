@@ -18,6 +18,7 @@ interface VimCaret {
   var vimLastVisualOperatorRange: VisualChange?
   val vimLine: Int
   fun moveToOffset(offset: Int)
+  fun moveToOffsetNative(offset: Int)
   fun moveToLogicalPosition(logicalPosition: VimLogicalPosition)
   fun offsetForLineStartSkipLeading(line: Int): Int
   fun getLine(): EditorLine.Pointer
@@ -32,4 +33,6 @@ interface VimCaret {
   fun updateEditorSelection()
   var vimInsertStart: LiveRange
   fun moveToVisualPosition(position: VimVisualPosition)
+  fun setNativeSelection(start: Offset, end: Offset)
+  fun removeNativeSelection()
 }

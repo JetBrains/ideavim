@@ -99,6 +99,9 @@ val VimEditor.inInsertMode
 val VimEditor.inSelectMode
   get() = this.mode == CommandState.Mode.SELECT || this.mode == CommandState.Mode.INSERT_SELECT
 
+val VimEditor.inSingleCommandMode
+  get() = this.mode.inSingleMode
+
 inline fun <reified T : Enum<T>> enumSetOf(vararg value: T): EnumSet<T> = when (value.size) {
   0 -> noneOfEnum()
   1 -> EnumSet.of(value[0])

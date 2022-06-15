@@ -28,7 +28,9 @@ interface EngineEditorHelper {
   fun getVisualLineAtBottomOfScreen(editor: VimEditor): Int
   fun pad(editor: VimEditor, context: ExecutionContext, line: Int, to: Int): String
   fun getLineLength(editor: VimEditor, logicalLine: Int): Int
+  fun getLineLength(editor: VimEditor): Int
   fun getLineBreakCount(text: CharSequence): Int
   fun inlayAwareOffsetToVisualPosition(editor: VimEditor, offset: Int): VimVisualPosition
   fun getVisualLineLength(editor: VimEditor, line: Int): Int
+  fun getLeadingWhitespace(editor: VimEditor, line: Int): String
 }
