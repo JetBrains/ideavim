@@ -134,7 +134,7 @@ public class ProcessGroup extends VimProcessGroupBase {
 
       if (logger.isDebugEnabled()) logger.debug("swing=" + SwingUtilities.isEventDispatchThread());
 
-      VimInjectorKt.getInjector().getVimscriptExecutor().execute(text, editor, context, skipHistory(), true, CommandLineVimLContext.INSTANCE);
+      VimInjectorKt.getInjector().getVimscriptExecutor().execute(text, editor, context, skipHistory(editor), true, CommandLineVimLContext.INSTANCE);
     }
     catch (ExException e) {
       VimPlugin.showMessage(e.getMessage());
@@ -151,8 +151,8 @@ public class ProcessGroup extends VimProcessGroupBase {
   }
 
   // commands executed from map command / macro should not be added to history
-  private boolean skipHistory() {
-    return KeyHandler.getInstance().isExecutingMap() || injector.getMacro().isExecutingMacro();
+  private boolean skipHistory(VimEditor editor) {
+    return CommandState.getInstance(editor).getMappingState().isExecutingMap() || injector.getMacro().isExecutingMacro();
   }
 
   public void cancelExEntry(final @NotNull VimEditor editor, boolean resetCaret) {

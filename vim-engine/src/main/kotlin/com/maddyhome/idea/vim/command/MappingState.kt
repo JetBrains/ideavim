@@ -30,6 +30,21 @@ import javax.swing.KeyStroke
 import javax.swing.Timer
 
 class MappingState {
+  // Map command depth. 0 - if it is not a map command. 1 - regular map command. 2+ - nested map commands
+  private var mapDepth = 0
+
+  fun isExecutingMap(): Boolean {
+    return mapDepth > 0
+  }
+
+  fun startMapExecution() {
+    ++mapDepth
+  }
+
+  fun stopMapExecution() {
+    --mapDepth
+  }
+
   val keys: Iterable<KeyStroke>
     get() = keyList
 
