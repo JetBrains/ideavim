@@ -55,7 +55,7 @@ dependencies {
     compileOnly("org.jetbrains:annotations:23.0.0")
 
     // https://mvnrepository.com/artifact/com.ensarsarajcic.neovim.java/neovim-api
-    testImplementation("com.ensarsarajcic.neovim.java:neovim-api:0.2.3")
+    testImplementation("com.ensarsarajcic.neovim.java:neovim-api:0.4.6")
     testImplementation("com.ensarsarajcic.neovim.java:core-rpc:0.2.3")
 
     // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-test
