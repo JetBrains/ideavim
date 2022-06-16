@@ -75,6 +75,15 @@ interface VimSearchHelper {
     bigWord: Boolean,
   ): Int
 
+  fun findNextWordEnd(
+    chars: CharSequence,
+    pos: Int,
+    size: Int,
+    count: Int,
+    bigWord: Boolean,
+    spaceWords: Boolean,
+  ): Int
+
   fun findNextWord(editor: VimEditor, searchFrom: Int, count: Int, bigWord: Boolean): Int
 
   fun findPattern(

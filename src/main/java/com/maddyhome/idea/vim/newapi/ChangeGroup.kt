@@ -28,6 +28,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.LineDeleteShift
 import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.VimChangeGroupBase
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimMotionGroupBase
 import com.maddyhome.idea.vim.api.injector
@@ -40,7 +41,6 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.common.VimRange
 import com.maddyhome.idea.vim.common.including
 import com.maddyhome.idea.vim.common.offset
-import com.maddyhome.idea.vim.group.ChangeGroup
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.inlayAwareVisualColumn
@@ -62,7 +62,7 @@ fun changeRange(
   var col = 0
   var lines = 0
   if (type === SelectionType.BLOCK_WISE) {
-    lines = ChangeGroup.getLinesCountInVisualBlock(IjVimEditor(editor), range)
+    lines = VimChangeGroupBase.getLinesCountInVisualBlock(IjVimEditor(editor), range)
     col = editor.offsetToLogicalPosition(range.startOffset).column
     if (caret.vimLastColumn == VimMotionGroupBase.LAST_COLUMN) {
       col = VimMotionGroupBase.LAST_COLUMN

@@ -39,7 +39,6 @@ import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.util.PsiUtilBase;
 import com.intellij.util.containers.ContainerUtil;
 import com.maddyhome.idea.vim.EventFacade;
-import com.maddyhome.idea.vim.RegisterActions;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.*;
 import com.maddyhome.idea.vim.command.*;
@@ -123,10 +122,10 @@ public class ChangeGroup extends VimChangeGroupBase {
    * @param col    The column to indent to
    */
   private void insertNewLineBelow(@NotNull VimEditor editor, @NotNull VimCaret caret, int col) {
-    if (((IjVimEditor) editor).getEditor().isOneLineMode()) return;
+    if (editor.isOneLineMode()) return;
 
-    injector.getMotion().moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineEnd(editor, caret));
-    UserDataManager.setVimChangeActionSwitchMode(((IjVimEditor) editor).getEditor(), CommandState.Mode.INSERT);
+    caret.moveToOffset(injector.getMotion().moveCaretToLineEnd(editor, caret));
+    editor.setVimChangeActionSwitchMode(CommandState.Mode.INSERT);
     insertText(editor, caret, "\n" + IndentConfig.create(((IjVimEditor) editor).getEditor()).createIndentBySize(col));
   }
 
@@ -165,41 +164,6 @@ public class ChangeGroup extends VimChangeGroupBase {
   }
 
 
-  @Override
-  public @Nullable Pair<@NotNull TextRange, @NotNull SelectionType> getDeleteRangeAndType(@NotNull VimEditor editor,
-                                                                        @NotNull VimCaret caret,
-                                                                        @NotNull ExecutionContext context,
-                                                                        final @NotNull Argument argument,
-                                                                        boolean isChange,
-                                                                        @NotNull OperatorArguments operatorArguments) {
-    final TextRange range =
-      injector.getMotion().getMotionRange(editor, caret, context, argument, operatorArguments);
-    if (range == null) return null;
-
-    // Delete motion commands that are not linewise become linewise if all the following are true:
-    // 1) The range is across multiple lines
-    // 2) There is only whitespace before the start of the range
-    // 3) There is only whitespace after the end of the range
-    SelectionType type;
-    if (argument.getMotion().isLinewiseMotion()) {
-      type = SelectionType.LINE_WISE;
-    }
-    else {
-      type = SelectionType.CHARACTER_WISE;
-    }
-    final Command motion = argument.getMotion();
-    if (!isChange && !motion.isLinewiseMotion()) {
-      VimLogicalPosition start = editor.offsetToLogicalPosition(range.getStartOffset());
-      VimLogicalPosition end = editor.offsetToLogicalPosition(range.getEndOffset());
-      if (start.getLine() != end.getLine()) {
-        if (!SearchHelper.anyNonWhitespace(((IjVimEditor) editor).getEditor(), range.getStartOffset(), -1) &&
-            !SearchHelper.anyNonWhitespace(((IjVimEditor) editor).getEditor(), range.getEndOffset(), 1)) {
-          type = SelectionType.LINE_WISE;
-        }
-      }
-    }
-    return new Pair<>(range, type);
-  }
 
   @Override
   public @Nullable Pair<@NotNull TextRange, @NotNull SelectionType> getDeleteRangeAndType2(@NotNull VimEditor editor,
@@ -236,60 +200,6 @@ public class ChangeGroup extends VimChangeGroupBase {
     return new Pair<>(range, type);
   }
 
-  /**
-   * Delete the range of text.
-   *
-   * @param editor   The editor to delete the text from
-   * @param caret    The caret to be moved after deletion
-   * @param range    The range to delete
-   * @param type     The type of deletion
-   * @param isChange Is from a change action
-   * @return true if able to delete the text, false if not
-   */
-  @Override
-  public boolean deleteRange(@NotNull VimEditor editor,
-                             @NotNull VimCaret caret,
-                             @NotNull TextRange range,
-                             @Nullable SelectionType type,
-                             boolean isChange) {
-
-    // Update the last column before we delete, or we might be retrieving the data for a line that no longer exists
-    UserDataManager.setVimLastColumn(((IjVimCaret) caret).getCaret(), InlayHelperKt.getInlayAwareVisualColumn(((IjVimCaret) caret).getCaret()));
-
-    boolean removeLastNewLine = removeLastNewLine(editor, range, type);
-    final boolean res = deleteText(editor, range, type);
-    if (removeLastNewLine) {
-      int textLength = ((IjVimEditor) editor).getEditor().getDocument().getTextLength();
-      ((IjVimEditor) editor).getEditor().getDocument().deleteString(textLength - 1, textLength);
-    }
-
-    if (res) {
-      int pos = EditorHelper.normalizeOffset(((IjVimEditor) editor).getEditor(), range.getStartOffset(), isChange);
-      if (type == SelectionType.LINE_WISE) {
-        pos = VimPlugin.getMotion()
-          .moveCaretToLineWithStartOfLineOption(editor, editor.offsetToLogicalPosition(pos).getLine(),
-                                                caret);
-      }
-      injector.getMotion().moveCaret(editor, caret, pos);
-    }
-    return res;
-  }
-
-  private boolean removeLastNewLine(@NotNull VimEditor editor, @NotNull TextRange range, @Nullable SelectionType type) {
-    int endOffset = range.getEndOffset();
-    int fileSize = EditorHelperRt.getFileSize(((IjVimEditor) editor).getEditor());
-    if (endOffset > fileSize) {
-      if (injector.getOptionService().isSet(OptionScope.GLOBAL.INSTANCE, OptionConstants.ideastrictmodeName, OptionConstants.ideastrictmodeName)) {
-        throw new IllegalStateException("Incorrect offset. File size: " + fileSize + ", offset: " + endOffset);
-      }
-      endOffset = fileSize;
-    }
-    return type == SelectionType.LINE_WISE &&
-           range.getStartOffset() != 0 &&
-           ((IjVimEditor) editor).getEditor().getDocument().getCharsSequence().charAt(endOffset - 1) != '\n' &&
-           endOffset == fileSize;
-  }
-
   @Override
   public void insertLineAround(@NotNull VimEditor editor, @NotNull ExecutionContext context, int shift) {
     com.maddyhome.idea.vim.newapi.ChangeGroupKt.insertLineAround(editor, context, shift);
@@ -303,48 +213,6 @@ public class ChangeGroup extends VimChangeGroupBase {
     return com.maddyhome.idea.vim.newapi.ChangeGroupKt.deleteRange(editor, caret, range, type);
   }
 
-  /**
-   * Delete count characters and then enter insert mode
-   *
-   * @param editor The editor to change
-   * @param caret  The caret to be moved
-   * @param count  The number of characters to change
-   * @return true if able to delete count characters, false if not
-   */
-  @Override
-  public boolean changeCharacters(@NotNull VimEditor editor, @NotNull VimCaret caret, int count) {
-    int len = EditorHelper.getLineLength(((IjVimEditor) editor).getEditor());
-    int col = ((IjVimCaret) caret).getCaret().getLogicalPosition().column;
-    if (col + count >= len) {
-      return changeEndOfLine(editor, caret, 1);
-    }
-
-    boolean res = deleteCharacter(editor, caret, count, true);
-    if (res) {
-      UserDataManager.setVimChangeActionSwitchMode(((IjVimEditor) editor).getEditor(), CommandState.Mode.INSERT);
-    }
-
-    return res;
-  }
-
-  /**
-   * Delete from the cursor to the end of count - 1 lines down and enter insert mode
-   *
-   * @param editor The editor to change
-   * @param caret  The caret to perform action on
-   * @param count  The number of lines to change
-   * @return true if able to delete count lines, false if not
-   */
-  @Override
-  public boolean changeEndOfLine(@NotNull VimEditor editor, @NotNull VimCaret caret, int count) {
-    boolean res = deleteEndOfLine(editor, caret, count);
-    if (res) {
-      injector.getMotion().moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineEnd(editor, caret));
-      UserDataManager.setVimChangeActionSwitchMode(((IjVimEditor) editor).getEditor(), CommandState.Mode.INSERT);
-    }
-
-    return res;
-  }
 
   /**
    * Delete the text covered by the motion command argument and enter insert mode
@@ -368,9 +236,9 @@ public class ChangeGroup extends VimChangeGroupBase {
     String id = motion.getAction().getId();
     boolean kludge = false;
     boolean bigWord = id.equals(VIM_MOTION_BIG_WORD_RIGHT);
-    final CharSequence chars = ((IjVimEditor) editor).getEditor().getDocument().getCharsSequence();
-    final int offset = ((IjVimCaret) caret).getCaret().getOffset();
-    int fileSize = EditorHelperRt.getFileSize(((IjVimEditor) editor).getEditor());
+    final CharSequence chars = editor.text();
+    final int offset = caret.getOffset().getPoint();
+    int fileSize = ((int)editor.fileSize());
     if (fileSize > 0 && offset < fileSize) {
       final CharacterHelper.CharacterType charType = CharacterHelper.charType(chars.charAt(offset), bigWord);
       if (charType != CharacterHelper.CharacterType.WHITESPACE) {
@@ -379,24 +247,24 @@ public class ChangeGroup extends VimChangeGroupBase {
         if (wordMotions.contains(id) && lastWordChar && motion.getCount() == 1) {
           final boolean res = deleteCharacter(editor, caret, 1, true);
           if (res) {
-            UserDataManager.setVimChangeActionSwitchMode(((IjVimEditor) editor).getEditor(), CommandState.Mode.INSERT);
+            editor.setVimChangeActionSwitchMode(CommandState.Mode.INSERT);
           }
           return res;
         }
         switch (id) {
           case VIM_MOTION_WORD_RIGHT:
             kludge = true;
-            motion.setAction(RegisterActions.findActionOrDie(VIM_MOTION_WORD_END_RIGHT));
+            motion.setAction(injector.getActionExecutor().findVimActionOrDie(VIM_MOTION_WORD_END_RIGHT));
 
             break;
           case VIM_MOTION_BIG_WORD_RIGHT:
             kludge = true;
-            motion.setAction(RegisterActions.findActionOrDie(VIM_MOTION_BIG_WORD_END_RIGHT));
+            motion.setAction(injector.getActionExecutor().findVimActionOrDie(VIM_MOTION_BIG_WORD_END_RIGHT));
 
             break;
           case VIM_MOTION_CAMEL_RIGHT:
             kludge = true;
-            motion.setAction(RegisterActions.findActionOrDie(VIM_MOTION_CAMEL_END_RIGHT));
+            motion.setAction(injector.getActionExecutor().findVimActionOrDie(VIM_MOTION_CAMEL_END_RIGHT));
 
             break;
         }
@@ -405,8 +273,8 @@ public class ChangeGroup extends VimChangeGroupBase {
 
     if (kludge) {
       int cnt = operatorArguments.getCount1() * motion.getCount();
-      int pos1 = SearchHelper.findNextWordEnd(chars, offset, fileSize, cnt, bigWord, false);
-      int pos2 = SearchHelper.findNextWordEnd(chars, pos1, fileSize, -cnt, bigWord, false);
+      int pos1 = injector.getSearchHelper().findNextWordEnd(chars, offset, fileSize, cnt, bigWord, false);
+      int pos2 = injector.getSearchHelper().findNextWordEnd(chars, pos1, fileSize, -cnt, bigWord, false);
       if (logger.isDebugEnabled()) {
         logger.debug("pos=" + offset);
         logger.debug("pos1=" + pos1);
@@ -427,11 +295,11 @@ public class ChangeGroup extends VimChangeGroupBase {
       }
     }
 
-    if (VimPlugin.getOptionService().isSet(OptionScope.GLOBAL.INSTANCE, OptionConstants.experimentalapiName, OptionConstants.experimentalapiName)) {
+    if (injector.getOptionService().isSet(OptionScope.GLOBAL.INSTANCE, OptionConstants.experimentalapiName, OptionConstants.experimentalapiName)) {
       Pair<TextRange, SelectionType> deleteRangeAndType =
         getDeleteRangeAndType2(editor, caret, context, argument, true, operatorArguments.withCount0(count0));
       if (deleteRangeAndType == null) return false;
-      ChangeGroupKt.changeRange(((IjVimEditor) editor).getEditor(), ((IjVimCaret) caret).getCaret(), deleteRangeAndType.getFirst(), deleteRangeAndType.getSecond(), ((IjExecutionContext) context).getContext());
+      //ChangeGroupKt.changeRange(((IjVimEditor) editor).getEditor(), ((IjVimCaret) caret).getCaret(), deleteRangeAndType.getFirst(), deleteRangeAndType.getSecond(), ((IjExecutionContext) context).getContext());
       return true;
     }
     else {
@@ -440,23 +308,6 @@ public class ChangeGroup extends VimChangeGroupBase {
       if (deleteRangeAndType == null) return false;
       return changeRange(editor, caret, deleteRangeAndType.getFirst(), deleteRangeAndType.getSecond(), context);
     }
-  }
-
-  /**
-   * Counts number of lines in the visual block.
-   * <p>
-   * The result includes empty and short lines which does not have explicit start position (caret).
-   *
-   * @param editor The editor the block was selected in
-   * @param range  The range corresponding to the selected block
-   * @return total number of lines
-   */
-  public static int getLinesCountInVisualBlock(@NotNull VimEditor editor, @NotNull TextRange range) {
-    final int[] startOffsets = range.getStartOffsets();
-    if (startOffsets.length == 0) return 0;
-    final VimLogicalPosition firstStart = editor.offsetToLogicalPosition(startOffsets[0]);
-    final VimLogicalPosition lastStart = editor.offsetToLogicalPosition(startOffsets[range.size() - 1]);
-    return lastStart.getLine() - firstStart.getLine() + 1;
   }
 
   /**
@@ -484,7 +335,7 @@ public class ChangeGroup extends VimChangeGroupBase {
                              @NotNull TextRange range,
                              boolean append,
                              @NotNull OperatorArguments operatorArguments) {
-    final int lines = getLinesCountInVisualBlock(editor, range);
+    final int lines = VimChangeGroupBase.Companion.getLinesCountInVisualBlock(editor, range);
     final VimLogicalPosition startPosition = editor.offsetToLogicalPosition(range.getStartOffset());
 
     boolean visualBlockMode = operatorArguments.getMode() == CommandState.Mode.VISUAL &&
@@ -589,24 +440,24 @@ public class ChangeGroup extends VimChangeGroupBase {
     int col = 0;
     int lines = 0;
     if (type == SelectionType.BLOCK_WISE) {
-      lines = getLinesCountInVisualBlock(editor, range);
+      lines = VimChangeGroupBase.Companion.getLinesCountInVisualBlock(editor, range);
       col = editor.offsetToLogicalPosition(range.getStartOffset()).getColumn();
-      if (UserDataManager.getVimLastColumn(((IjVimCaret) caret).getCaret()) == VimMotionGroupBase.LAST_COLUMN) {
+      if (caret.getVimLastColumn() == VimMotionGroupBase.LAST_COLUMN) {
         col = VimMotionGroupBase.LAST_COLUMN;
       }
     }
-    boolean after = range.getEndOffset() >= EditorHelperRt.getFileSize(((IjVimEditor) editor).getEditor());
+    boolean after = range.getEndOffset() >= editor.fileSize();
 
-    final VimLogicalPosition lp = editor.offsetToLogicalPosition(VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, caret));
+    final VimLogicalPosition lp = editor.offsetToLogicalPosition(injector.getMotion().moveCaretToLineStartSkipLeading(editor, caret));
 
     boolean res = deleteRange(editor, caret, range, type, true);
     if (res) {
       if (type == SelectionType.LINE_WISE) {
         // Please don't use `getDocument().getText().isEmpty()` because it converts CharSequence into String
-        if (((IjVimEditor) editor).getEditor().getDocument().getTextLength() == 0) {
+        if (editor.fileSize() == 0) {
           insertBeforeCursor(editor, context);
         }
-        else if (after && !EditorHelperRt.endsWithNewLine(((IjVimEditor) editor).getEditor())) {
+        else if (after && !EngineEditorHelperKt.endsWithNewLine(editor)) {
           insertNewLineBelow(editor, caret, lp.getColumn());
         }
         else {

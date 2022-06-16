@@ -33,4 +33,11 @@ interface EngineEditorHelper {
   fun inlayAwareOffsetToVisualPosition(editor: VimEditor, offset: Int): VimVisualPosition
   fun getVisualLineLength(editor: VimEditor, line: Int): Int
   fun getLeadingWhitespace(editor: VimEditor, line: Int): String
+  fun anyNonWhitespace(editor: VimEditor, offset: Int, dir: Int): Boolean
+}
+
+fun VimEditor.endsWithNewLine(): Boolean {
+  val textLength = this.fileSize().toInt()
+  if (textLength == 0) return false
+  return this.text()[textLength - 1] == '\n'
 }

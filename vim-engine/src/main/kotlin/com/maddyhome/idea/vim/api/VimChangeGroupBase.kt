@@ -1,6 +1,7 @@
 package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.KeyHandler
+import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.CommandState
@@ -24,6 +25,8 @@ import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.mark.VimMarkConstants.MARK_CHANGE_END
 import com.maddyhome.idea.vim.mark.VimMarkConstants.MARK_CHANGE_POS
 import com.maddyhome.idea.vim.mark.VimMarkConstants.MARK_CHANGE_START
+import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.register.RegisterConstants.LAST_INSERTED_TEXT_REGISTER
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
@@ -798,6 +801,134 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     }
   }
 
+  override fun getDeleteRangeAndType(
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    argument: Argument,
+    isChange: Boolean,
+    operatorArguments: OperatorArguments,
+  ): Pair<TextRange, SelectionType>? {
+    val range = injector.motion.getMotionRange(editor, caret, context, argument, operatorArguments) ?: return null
+
+    // Delete motion commands that are not linewise become linewise if all the following are true:
+    // 1) The range is across multiple lines
+    // 2) There is only whitespace before the start of the range
+    // 3) There is only whitespace after the end of the range
+    var type: SelectionType = if (argument.motion.isLinewiseMotion()) {
+      SelectionType.LINE_WISE
+    } else {
+      SelectionType.CHARACTER_WISE
+    }
+    val motion = argument.motion
+    if (!isChange && !motion.isLinewiseMotion()) {
+      val start = editor.offsetToLogicalPosition(range.startOffset)
+      val end = editor.offsetToLogicalPosition(range.endOffset)
+      if (start.line != end.line) {
+        if (!injector.engineEditorHelper.anyNonWhitespace(editor, range.startOffset, -1) &&
+          !injector.engineEditorHelper.anyNonWhitespace(editor, range.endOffset, 1)
+        ) {
+          type = SelectionType.LINE_WISE
+        }
+      }
+    }
+    return Pair(range, type)
+  }
+
+  /**
+   * Delete the range of text.
+   *
+   * @param editor   The editor to delete the text from
+   * @param caret    The caret to be moved after deletion
+   * @param range    The range to delete
+   * @param type     The type of deletion
+   * @param isChange Is from a change action
+   * @return true if able to delete the text, false if not
+   */
+  override fun deleteRange(
+    editor: VimEditor,
+    caret: VimCaret,
+    range: TextRange,
+    type: SelectionType?,
+    isChange: Boolean,
+  ): Boolean {
+
+    // Update the last column before we delete, or we might be retrieving the data for a line that no longer exists
+    caret.vimLastColumn = caret.inlayAwareVisualColumn
+    val removeLastNewLine = removeLastNewLine(editor, range, type)
+    val res = deleteText(editor, range, type)
+    if (removeLastNewLine) {
+      val textLength = editor.fileSize().toInt()
+      editor.deleteString(TextRange(textLength - 1, textLength))
+    }
+    if (res) {
+      var pos = injector.engineEditorHelper.normalizeOffset(editor, range.startOffset, isChange)
+      if (type === SelectionType.LINE_WISE) {
+        pos = injector.motion
+          .moveCaretToLineWithStartOfLineOption(
+            editor, editor.offsetToLogicalPosition(pos).line,
+            caret
+          )
+      }
+      injector.motion.moveCaret(editor, caret, pos)
+    }
+    return res
+  }
+
+  private fun removeLastNewLine(editor: VimEditor, range: TextRange, type: SelectionType?): Boolean {
+    var endOffset = range.endOffset
+    val fileSize = editor.fileSize().toInt()
+    if (endOffset > fileSize) {
+      check(
+        !injector.optionService.isSet(
+          OptionScope.GLOBAL,
+          OptionConstants.ideastrictmodeName,
+          OptionConstants.ideastrictmodeName
+        )
+      ) { "Incorrect offset. File size: $fileSize, offset: $endOffset" }
+      endOffset = fileSize
+    }
+    return (type === SelectionType.LINE_WISE) && range.startOffset != 0 && editor.text()[endOffset - 1] != '\n' && endOffset == fileSize
+  }
+
+  /**
+   * Delete from the cursor to the end of count - 1 lines down and enter insert mode
+   *
+   * @param editor The editor to change
+   * @param caret  The caret to perform action on
+   * @param count  The number of lines to change
+   * @return true if able to delete count lines, false if not
+   */
+  override fun changeEndOfLine(editor: VimEditor, caret: VimCaret, count: Int): Boolean {
+    val res = deleteEndOfLine(editor, caret, count)
+    if (res) {
+      caret.moveToOffset(injector.motion.moveCaretToLineEnd(editor, caret))
+      editor.vimChangeActionSwitchMode = CommandState.Mode.INSERT
+    }
+    return res
+  }
+
+  /**
+   * Delete count characters and then enter insert mode
+   *
+   * @param editor The editor to change
+   * @param caret  The caret to be moved
+   * @param count  The number of characters to change
+   * @return true if able to delete count characters, false if not
+   */
+  override fun changeCharacters(editor: VimEditor, caret: VimCaret, count: Int): Boolean {
+    val len = injector.engineEditorHelper.getLineLength(editor)
+    val col = caret.getLogicalPosition().column
+    if (col + count >= len) {
+      return changeEndOfLine(editor, caret, 1)
+    }
+    val res = deleteCharacter(editor, caret, count, true)
+    if (res) {
+      editor.vimChangeActionSwitchMode = CommandState.Mode.INSERT
+    }
+    return res
+  }
+
   /**
    * Clears all the keystrokes from the current insert command
    *
@@ -871,6 +1002,24 @@ abstract class VimChangeGroupBase : VimChangeGroup {
   companion object {
     private const val MAX_REPEAT_CHARS_COUNT = 10000
     private val logger = vimLogger<VimChangeGroupBase>()
+
+    /**
+     * Counts number of lines in the visual block.
+     *
+     *
+     * The result includes empty and short lines which does not have explicit start position (caret).
+     *
+     * @param editor The editor the block was selected in
+     * @param range  The range corresponding to the selected block
+     * @return total number of lines
+     */
+    fun getLinesCountInVisualBlock(editor: VimEditor, range: TextRange): Int {
+      val startOffsets = range.startOffsets
+      if (startOffsets.isEmpty()) return 0
+      val firstStart = editor.offsetToLogicalPosition(startOffsets[0])
+      val lastStart = editor.offsetToLogicalPosition(startOffsets[range.size() - 1])
+      return lastStart.line - firstStart.line + 1
+    }
   }
 }
 

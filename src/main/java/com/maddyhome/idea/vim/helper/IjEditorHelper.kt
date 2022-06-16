@@ -143,4 +143,8 @@ class IjEditorHelper : EngineEditorHelper {
   override fun getLeadingWhitespace(editor: VimEditor, line: Int): String {
     return EditorHelper.getLeadingWhitespace(editor.ij, line)
   }
+
+  override fun anyNonWhitespace(editor: VimEditor, offset: Int, dir: Int): Boolean {
+    return SearchHelper.anyNonWhitespace(editor.ij, offset, dir)
+  }
 }

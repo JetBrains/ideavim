@@ -65,6 +65,7 @@ interface VimActionExecutor {
   )
 
   fun findVimAction(id: String): EditorActionHandlerBase?
+  fun findVimActionOrDie(id: String): EditorActionHandlerBase
 
   fun getAction(actionId: String): NativeAction?
   fun getActionIdList(idPrefix: String): List<String>

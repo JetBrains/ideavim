@@ -155,6 +155,10 @@ class IjActionExecutor : VimActionExecutor {
     return RegisterActions.findAction(id)
   }
 
+  override fun findVimActionOrDie(id: String): EditorActionHandlerBase {
+    return RegisterActions.findActionOrDie(id)
+  }
+
   override fun getAction(actionId: String): NativeAction? {
     return ActionManager.getInstance().getAction(actionId)?.let { IjNativeAction(it) }
   }
