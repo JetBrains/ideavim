@@ -25,7 +25,9 @@ import com.intellij.openapi.command.undo.UndoManager
 import com.intellij.openapi.components.Service
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.common.ChangesListener
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
+import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionScope
@@ -47,7 +49,7 @@ class UndoRedoHelper : UndoRedoBase() {
         SelectionVimListenerSuppressor.lock().use { undoManager.undo(fileEditor) }
       } else {
         val editor = CommonDataKeys.EDITOR.getData(context.ij)?.vim
-        undoManager.undo(fileEditor)
+        performUntilFileChanges(editor, { undoManager.isUndoAvailable(fileEditor) }, { undoManager.undo(fileEditor) })
         editor?.carets()?.forEach {
           val ijCaret = it.ij
           val hasSelection = ijCaret.hasSelection()
@@ -73,14 +75,29 @@ class UndoRedoHelper : UndoRedoBase() {
         SelectionVimListenerSuppressor.lock().use { undoManager.redo(fileEditor) }
       } else {
         val editor = CommonDataKeys.EDITOR.getData(context.ij)?.vim
-        undoManager.redo(fileEditor)
-        if (editor?.primaryCaret()?.ij?.hasSelection() == true) {
-          undoManager.redo(fileEditor)
-        }
+        performUntilFileChanges(editor, { undoManager.isRedoAvailable(fileEditor) }, { undoManager.redo(fileEditor) })
         editor?.carets()?.forEach { it.ij.removeSelection() }
       }
       return true
     }
     return false
+  }
+
+  private fun performUntilFileChanges(editor: IjVimEditor?, check: () -> Boolean, action: Runnable) {
+    if (editor == null) return
+    val vimDocument = editor.document
+
+    val changeListener = object : ChangesListener {
+      var hasChanged = false
+
+      override fun documentChanged(change: ChangesListener.Change) {
+        hasChanged = true
+      }
+    }
+
+    vimDocument.addChangeListener(changeListener)
+    while (check() && !changeListener.hasChanged) {
+      action.run()
+    }
   }
 }
