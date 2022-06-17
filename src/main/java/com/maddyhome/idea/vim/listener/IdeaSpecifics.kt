@@ -19,8 +19,10 @@
 package com.maddyhome.idea.vim.listener
 
 import com.intellij.codeInsight.lookup.Lookup
+import com.intellij.codeInsight.lookup.LookupManager
 import com.intellij.codeInsight.lookup.LookupManagerListener
 import com.intellij.codeInsight.lookup.impl.LookupImpl
+import com.intellij.codeInsight.lookup.impl.actions.ChooseItemAction
 import com.intellij.codeInsight.template.Template
 import com.intellij.codeInsight.template.TemplateEditingAdapter
 import com.intellij.codeInsight.template.TemplateManagerListener
@@ -35,10 +37,10 @@ import com.intellij.openapi.actionSystem.ex.AnActionListener
 import com.intellij.openapi.actionSystem.impl.ProxyShortcutSet
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.DumbAwareToggleAction
+import com.intellij.openapi.util.TextRange
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.VimStateMachine
-import com.maddyhome.idea.vim.group.NotificationService
 import com.maddyhome.idea.vim.helper.EditorDataContext
 import com.maddyhome.idea.vim.helper.inNormalMode
 import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
@@ -49,6 +51,8 @@ import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.IdeaRefactorModeHelper
 import org.jetbrains.annotations.NonNls
+import java.awt.event.KeyEvent
+import javax.swing.KeyStroke
 
 /**
  * @author Alex Plate
@@ -60,6 +64,8 @@ object IdeaSpecifics {
     private val surrounderAction =
       "com.intellij.codeInsight.generation.surroundWith.SurroundWithHandler\$InvokeSurrounderAction"
     private var editor: Editor? = null
+    private var completionPrevDocumentLength: Int? = null
+    private var completionPrevDocumentOffset: Int? = null
     override fun beforeActionPerformed(action: AnAction, event: AnActionEvent) {
       if (!VimPlugin.isEnabled()) return
 
@@ -68,18 +74,51 @@ object IdeaSpecifics {
         editor = hostEditor
       }
 
-      //region Track action id
       if (VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.trackactionidsName)) {
-        if (action !is NotificationService.ActionIdNotifier.CopyActionId && action !is NotificationService.ActionIdNotifier.StopTracking) {
-          val id: String? = ActionManager.getInstance().getId(action) ?: (action.shortcutSet as? ProxyShortcutSet)?.actionId
-          VimPlugin.getNotifications(event.dataContext.getData(CommonDataKeys.PROJECT)).notifyActionId(id)
+        val id: String? = ActionManager.getInstance().getId(action) ?: (action.shortcutSet as? ProxyShortcutSet)?.actionId
+        VimPlugin.getNotifications(event.dataContext.getData(CommonDataKeys.PROJECT)).notifyActionId(id)
+      }
+
+      if (hostEditor != null && action is ChooseItemAction && hostEditor.vimStateMachine?.isRecording == true) {
+        val lookup = LookupManager.getActiveLookup(hostEditor)
+        if (lookup != null) {
+          val charsToRemove = hostEditor.caretModel.primaryCaret.offset - lookup.lookupStart
+
+          val register = VimPlugin.getRegister()
+          val backSpace = KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0)
+          repeat(charsToRemove) {
+            register.recordKeyStroke(backSpace)
+          }
+
+          completionPrevDocumentLength = hostEditor.document.textLength - charsToRemove
+          completionPrevDocumentOffset = lookup.lookupStart
         }
       }
-      //endregion
     }
 
     override fun afterActionPerformed(action: AnAction, event: AnActionEvent, result: AnActionResult) {
       if (!VimPlugin.isEnabled()) return
+
+      val editor = editor
+      if (editor != null && action is ChooseItemAction && editor.vimStateMachine?.isRecording == true) {
+        val prevDocumentLength = completionPrevDocumentLength
+        val prevDocumentOffset = completionPrevDocumentOffset
+
+        if (prevDocumentLength != null && prevDocumentOffset != null) {
+          val register = VimPlugin.getRegister()
+          val addedTextLength = editor.document.textLength - prevDocumentLength
+          val caretShift = addedTextLength - (editor.caretModel.primaryCaret.offset - prevDocumentOffset)
+          val leftArrow = KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0)
+
+          register.recordText(editor.document.getText(TextRange(prevDocumentOffset, prevDocumentOffset + addedTextLength)))
+          repeat(caretShift.coerceAtLeast(0)) {
+            register.recordKeyStroke(leftArrow)
+          }
+        }
+
+        this.completionPrevDocumentLength = null
+        this.completionPrevDocumentOffset = null
+      }
 
       //region Enter insert mode after surround with if
       if (surrounderAction == action.javaClass.name && surrounderItems.any {
@@ -99,7 +138,7 @@ object IdeaSpecifics {
       }
       //endregion
 
-      editor = null
+      this.editor = null
     }
   }
 
