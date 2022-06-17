@@ -22,6 +22,7 @@ package com.maddyhome.idea.vim.helper
 
 import com.intellij.codeWithMe.ClientId
 import com.intellij.openapi.editor.Caret
+import com.intellij.openapi.editor.CaretState
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
@@ -106,3 +107,41 @@ val Caret.vimLine: Int
  */
 val Editor.vimLine: Int
   get() = this.caretModel.currentCaret.vimLine
+
+inline fun Editor.runWithEveryCaretAndRestore(action: () -> Unit) {
+  val caretModel = this.caretModel
+  val carets = if (this.inBlockSubMode) null else caretModel.allCarets
+  if (carets == null || carets.size == 1) {
+    action()
+  }
+  else {
+    var initialDocumentSize = this.document.textLength
+    var documentSizeDifference = 0
+
+    val caretOffsets = carets.map { it.selectionStart to it.selectionEnd }
+    val restoredCarets = mutableListOf<CaretState>()
+
+    caretModel.removeSecondaryCarets()
+    
+    for ((selectionStart, selectionEnd) in caretOffsets) {
+      if (selectionStart == selectionEnd) {
+        caretModel.primaryCaret.moveToOffset(selectionStart + documentSizeDifference)
+      }
+      else {
+        caretModel.primaryCaret.setSelection(
+          selectionStart + documentSizeDifference,
+          selectionEnd + documentSizeDifference
+        )
+      }
+      
+      action()
+      restoredCarets.add(caretModel.caretsAndSelections.single())
+
+      val documentLength = this.document.textLength
+      documentSizeDifference += documentLength - initialDocumentSize
+      initialDocumentSize = documentLength
+    }
+
+    caretModel.caretsAndSelections = restoredCarets
+  } 
+}

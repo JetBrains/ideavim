@@ -22,6 +22,7 @@ import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimChangeGroup
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
@@ -40,6 +41,7 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.setRegister
 import com.maddyhome.idea.vim.extension.VimExtensionHandler
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.mode
+import com.maddyhome.idea.vim.helper.runWithEveryCaretAndRestore
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.newapi.IjVimCaret
 import com.maddyhome.idea.vim.newapi.IjVimEditor
@@ -84,22 +86,20 @@ class VimSurroundExtension : VimExtension {
     override val isRepeatable = true
 
     override fun execute(editor: VimEditor, context: ExecutionContext) {
-      setOperatorFunction(Operator())
+      setOperatorFunction(Operator(supportsMultipleCursors = false)) // TODO
       executeNormalWithoutMapping(injector.parser.parseKeys("g@"), editor.ij)
     }
   }
 
   private class VSurroundHandler : VimExtensionHandler {
     override fun execute(editor: VimEditor, context: ExecutionContext) {
-      val selectionStart = editor.ij.caretModel.primaryCaret.selectionStart
       // NB: Operator ignores SelectionType anyway
-      if (!Operator().apply(editor.ij, context.ij, SelectionType.CHARACTER_WISE)) {
+      if (!Operator(supportsMultipleCursors = true).apply(editor.ij, context.ij, SelectionType.CHARACTER_WISE)) {
         return
       }
       runWriteAction {
         // Leave visual mode
         executeNormalWithoutMapping(injector.parser.parseKeys("<Esc>"), editor.ij)
-        editor.ij.caretModel.moveToOffset(selectionStart)
       }
     }
   }
@@ -120,6 +120,10 @@ class VimSurroundExtension : VimExtension {
 
     companion object {
       fun change(editor: Editor, charFrom: Char, newSurround: Pair<String, String>?) {
+        editor.runWithEveryCaretAndRestore { changeAtCaret(editor, charFrom, newSurround) }
+      }
+      
+      fun changeAtCaret(editor: Editor, charFrom: Char, newSurround: Pair<String, String>?) {
         // We take over the " register, so preserve it
         val oldValue: List<KeyStroke>? = getRegister(REGISTER)
         // Empty the " register
@@ -184,24 +188,42 @@ class VimSurroundExtension : VimExtension {
     }
   }
 
-  private class Operator : OperatorFunction {
+  private class Operator(private val supportsMultipleCursors: Boolean) : OperatorFunction {
     override fun apply(editor: Editor, context: DataContext, selectionType: SelectionType): Boolean {
       val c = getChar(editor)
       if (c.code == 0) return true
 
       val pair = getOrInputPair(c, editor) ?: return false
-      // XXX: Will it work with line-wise or block-wise selections?
-      val range = getSurroundRange(editor) ?: return false
+
       runWriteAction {
         val change = VimPlugin.getChange()
-        val leftSurround = pair.first
-        val primaryCaret = editor.caretModel.primaryCaret
-        change.insertText(IjVimEditor(editor), IjVimCaret(primaryCaret), range.startOffset, leftSurround)
-        change.insertText(IjVimEditor(editor), IjVimCaret(primaryCaret), range.endOffset + leftSurround.length, pair.second)
-        // Jump back to start
-        executeNormalWithoutMapping(injector.parser.parseKeys("`["), editor)
+        if (supportsMultipleCursors) {
+          editor.runWithEveryCaretAndRestore {
+            applyOnce(editor, change, pair)
+          }
+        }
+        else {
+          applyOnce(editor, change, pair)
+          // Jump back to start
+          executeNormalWithoutMapping(injector.parser.parseKeys("`["), editor)
+        }
       }
       return true
+    }
+    
+    private fun applyOnce(editor: Editor, change: VimChangeGroup, pair: Pair<String, String>) {
+      // XXX: Will it work with line-wise or block-wise selections?
+      val range = getSurroundRange(editor)
+      if (range != null) {
+        val primaryCaret = editor.caretModel.primaryCaret
+        change.insertText(IjVimEditor(editor), IjVimCaret(primaryCaret), range.startOffset, pair.first)
+        change.insertText(
+          IjVimEditor(editor),
+          IjVimCaret(primaryCaret),
+          range.endOffset + pair.first.length,
+          pair.second
+        )
+      }
     }
 
     private fun getSurroundRange(editor: Editor): TextRange? = when (editor.mode) {
