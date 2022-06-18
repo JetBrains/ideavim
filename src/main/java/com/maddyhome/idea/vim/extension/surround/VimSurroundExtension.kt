@@ -122,21 +122,26 @@ class VimSurroundExtension : VimExtension {
       fun change(editor: Editor, charFrom: Char, newSurround: Pair<String, String>?) {
         // We take over the " register, so preserve it
         val oldValue: List<KeyStroke>? = getRegister(REGISTER)
+        // Empty the " register
+        setRegister(REGISTER, null)
         // Extract the inner value
         perform("di" + pick(charFrom), editor)
         val innerValue: MutableList<KeyStroke> = getRegister(REGISTER)?.toMutableList() ?: mutableListOf()
-        // Delete the surrounding
-        perform("da" + pick(charFrom), editor)
-        // Insert the surrounding characters and paste
-        if (newSurround != null) {
-          innerValue.addAll(0, injector.parser.parseKeys(newSurround.first))
-          innerValue.addAll(injector.parser.parseKeys(newSurround.second))
+        // If the surrounding characters were not found, the register will be empty
+        if (innerValue.isNotEmpty()) {
+          // Delete the surrounding
+          perform("da" + pick(charFrom), editor)
+          // Insert the surrounding characters and paste
+          if (newSurround != null) {
+            innerValue.addAll(0, injector.parser.parseKeys(newSurround.first))
+            innerValue.addAll(injector.parser.parseKeys(newSurround.second))
+          }
+          pasteSurround(innerValue, editor)
+          // Jump back to start
+          executeNormalWithoutMapping(injector.parser.parseKeys("`["), editor)
         }
-        pasteSurround(innerValue, editor)
         // Restore the old value
         setRegister(REGISTER, oldValue)
-        // Jump back to start
-        executeNormalWithoutMapping(injector.parser.parseKeys("`["), editor)
       }
 
       private fun perform(sequence: String, editor: Editor) {
