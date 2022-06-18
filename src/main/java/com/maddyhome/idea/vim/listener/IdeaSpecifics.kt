@@ -32,6 +32,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.ex.AnActionListener
+import com.intellij.openapi.actionSystem.impl.ProxyShortcutSet
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.DumbAwareToggleAction
 import com.maddyhome.idea.vim.KeyHandler
@@ -70,7 +71,7 @@ object IdeaSpecifics {
       //region Track action id
       if (VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.trackactionidsName)) {
         if (action !is NotificationService.ActionIdNotifier.CopyActionId && action !is NotificationService.ActionIdNotifier.StopTracking) {
-          val id: String? = ActionManager.getInstance().getId(action)
+          val id: String? = ActionManager.getInstance().getId(action) ?: (action.shortcutSet as? ProxyShortcutSet)?.actionId
           VimPlugin.getNotifications(dataContext.getData(CommonDataKeys.PROJECT)).notifyActionId(id)
         }
       }
