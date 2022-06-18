@@ -21,9 +21,11 @@ package com.maddyhome.idea.vim.vimscript.model.commands
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.register.RegisterConstants
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.Script
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
@@ -56,7 +58,11 @@ data class LetCommand(
   val isSyntaxSupported: Boolean,
 ) : Command.SingleExecution(ranges) {
 
+  companion object {
+    private val logger = vimLogger<LetCommand>()
+  }
   override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+
 
   @Throws(ExException::class)
   override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
@@ -194,13 +200,19 @@ data class LetCommand(
       is EnvVariableExpression -> TODO()
 
       is Register -> {
-        if (!(variable.char.isLetter() || variable.char.isDigit() || variable.char == '"')) {
-          throw ExException("Let command supports only 0-9a-zA-Z\" registers at the moment")
+        if (RegisterConstants.WRITABLE_REGISTERS.contains(variable.char)) {
+          val result = injector.registerGroup.storeText(variable.char, expression.evaluate(editor, context, vimContext).asString())
+          if (!result) {
+            logger.error("""
+              Error during `let ${variable.originalString} ${operator.value} ${expression.originalString}` command execution.
+              Could not set register value
+            """.trimIndent())
+          }
+        } else if (RegisterConstants.VALID_REGISTERS.contains(variable.char)) {
+          throw ExException("E354: Invalid register name: '${variable.char}'")
+        } else {
+          throw ExException("E18: Unexpected characters in :let")
         }
-
-        injector.registerGroup.startRecording(editor, variable.char)
-        injector.registerGroup.recordText(expression.evaluate(editor, context, vimContext).asString())
-        injector.registerGroup.finishRecording(editor)
       }
 
       else -> throw ExException("E121: Undefined variable")

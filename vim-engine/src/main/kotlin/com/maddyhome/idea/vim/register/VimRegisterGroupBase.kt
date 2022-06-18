@@ -18,6 +18,7 @@ import com.maddyhome.idea.vim.register.RegisterConstants.RECORDABLE_REGISTERS
 import com.maddyhome.idea.vim.register.RegisterConstants.SMALL_DELETION_REGISTER
 import com.maddyhome.idea.vim.register.RegisterConstants.UNNAMED_REGISTER
 import com.maddyhome.idea.vim.register.RegisterConstants.VALID_REGISTERS
+import com.maddyhome.idea.vim.register.RegisterConstants.WRITABLE_REGISTERS
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import javax.swing.KeyStroke
 
@@ -289,6 +290,24 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     }
     myRegisters[register] = Register(register, SelectionType.CHARACTER_WISE, text, ArrayList())
     logger.debug { "register '$register' contains: \"$text\"" }
+    return true
+  }
+
+  override fun storeText(register: Char, text: String): Boolean {
+    if (!WRITABLE_REGISTERS.contains(register)) {
+      return false
+    }
+    logger.debug { "register '$register' contains: \"$text\"" }
+    val textToStore = if (register.isUpperCase()) {
+      (getRegister(register.lowercaseChar())?.rawText ?: "") + text
+    } else {
+      text
+    }
+    val reg = Register(register, SelectionType.CHARACTER_WISE, textToStore, ArrayList())
+    saveRegister(register, reg)
+    if (register == '/') {
+      injector.searchGroup.lastSearchPattern = text // todo we should not have this field if we have the "/" register
+    }
     return true
   }
 

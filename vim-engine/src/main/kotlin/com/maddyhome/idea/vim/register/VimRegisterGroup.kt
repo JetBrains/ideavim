@@ -49,6 +49,11 @@ interface VimRegisterGroup {
   ): Boolean
 
   /**
+   * Stores text to any writable register (used for the let command)
+   */
+  fun storeText(register: Char, text: String): Boolean
+
+  /**
    * Stores text, character wise, in the given special register
    *
    *

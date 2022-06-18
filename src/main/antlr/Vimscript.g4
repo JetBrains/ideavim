@@ -146,13 +146,28 @@ rShift: GREATER+;
 
 letCommands:
     (WS | COLON)* range? (WS | COLON)* LET WS+ expr WS*
-        assignmentOperator =  (ASSIGN | PLUS_ASSIGN | MINUS_ASSIGN | STAR_ASSIGN | DIV_ASSIGN | MOD_ASSIGN | DOT_ASSIGN)
+        assignmentOperator
         WS* expr WS* ((inline_comment NEW_LINE) | (NEW_LINE | BAR)+)
     #Let1Command|
 
     (WS | COLON)* range? (WS | COLON)* LET WS+ commandArgument = ~(NEW_LINE)* NEW_LINE+
     #Let2Command
 ;
+
+assignmentOperator:
+    ASSIGN | plusAssign | minusAssign | startAssign | divAssign | modAssign | dotAssign;
+plusAssign:
+    PLUS ASSIGN;
+minusAssign:
+    MINUS ASSIGN;
+startAssign:
+    STAR ASSIGN;
+divAssign:
+    DIV ASSIGN;
+modAssign:
+    MOD ASSIGN;
+dotAssign:
+    DOT ASSIGN;
 
 shortRange:
     ((QUESTION (~QUESTION)* QUESTION?) | (DIV (~DIV)* DIV?));
@@ -778,12 +793,12 @@ IS_NOT_CS:              'isnot#';
 
 // Assignment operators
 ASSIGN:                 '=';
-PLUS_ASSIGN:            '+=';
-MINUS_ASSIGN:           '-=';
-STAR_ASSIGN:            '*=';
-DIV_ASSIGN:             '/=';
-MOD_ASSIGN:             '%=';
-DOT_ASSIGN:             '.=';
+//PLUS_ASSIGN:            '+=';
+//MINUS_ASSIGN:           '-=';
+//STAR_ASSIGN:            '*=';
+//DIV_ASSIGN:             '/=';
+//MOD_ASSIGN:             '%=';
+//DOT_ASSIGN:             '.=';
 
 // Escaped chars
 ESCAPED_QUESTION:       '\\?';

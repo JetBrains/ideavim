@@ -180,7 +180,7 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
   override fun visitLet1Command(ctx: VimscriptParser.Let1CommandContext): Command {
     val ranges: Ranges = parseRanges(ctx.range())
     val variable: Expression = expressionVisitor.visit(ctx.expr(0))
-    val operator = getByValue(ctx.assignmentOperator.text)
+    val operator = getByValue(ctx.assignmentOperator().text)
     val expression: Expression = expressionVisitor.visit(ctx.expr(1))
     return LetCommand(ranges, variable, operator, expression, true)
   }

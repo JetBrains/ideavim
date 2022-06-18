@@ -890,6 +890,10 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
   @Override
   public void setLastSearchPattern(@Nullable String lastSearchPattern) {
     this.lastSearch = lastSearchPattern;
+    if (showSearchHighlight) {
+      resetIncsearchHighlights();
+      updateSearchHighlights();
+    }
   }
 
   @Override
