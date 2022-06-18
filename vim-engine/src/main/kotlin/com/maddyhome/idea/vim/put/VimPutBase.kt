@@ -12,6 +12,7 @@ import com.maddyhome.idea.vim.command.isChar
 import com.maddyhome.idea.vim.command.isLine
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.helper.firstOrNull
+import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.mark.VimMarkConstants.MARK_CHANGE_POS
 import java.util.*
 import kotlin.math.abs
@@ -140,7 +141,9 @@ abstract class VimPutBase : VimPut {
       }
       "postEndOffset" -> caret.moveToOffset(endOffset + 1)
       "preLineEndOfEndOffset" -> {
-        val pos = min(endOffset, editor.getLineEndForOffset(endOffset - 1) - 1)
+        var rightestPosition = editor.getLineEndForOffset(endOffset - 1)
+        if (editor.mode != CommandState.Mode.INSERT) --rightestPosition // it's not possible to place a caret at the end of the line in any mode except insert
+        val pos = min(endOffset, rightestPosition)
         caret.moveToOffset(pos)
       }
     }

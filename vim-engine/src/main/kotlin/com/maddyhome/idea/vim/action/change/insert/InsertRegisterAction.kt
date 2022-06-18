@@ -23,11 +23,12 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
+import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.handler.VimActionHandler
+import com.maddyhome.idea.vim.put.PutData
 import com.maddyhome.idea.vim.register.Register
 import com.maddyhome.idea.vim.vimscript.model.Script
-import javax.swing.KeyStroke
 
 class InsertRegisterAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.INSERT
@@ -84,10 +85,10 @@ class InsertRegisterAction : VimActionHandler.SingleExecution() {
 private fun insertRegister(editor: VimEditor, context: ExecutionContext, key: Char): Boolean {
   val register: Register? = injector.registerGroup.getRegister(key)
   if (register != null) {
-    val keys: List<KeyStroke> = register.keys
-    for (k in keys) {
-      injector.changeGroup.processKey(editor, context, k)
-    }
+    val text = register.rawText ?: injector.parser.toPrintableString(register.keys)
+    val textData = PutData.TextData(text, SelectionType.CHARACTER_WISE, emptyList())
+    val putData = PutData(textData, null, 1, insertTextBeforeCaret = true, rawIndent = true, caretAfterInsertedText = true)
+    injector.put.putText(editor, context, putData)
     return true
   }
   return false
