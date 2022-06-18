@@ -88,7 +88,7 @@ class UndoActionTest : VimTestCase() {
     val after = """
                 A Discovery
 
-                I1 found${c} it in a legendary land
+                I1 found$c it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
