@@ -313,6 +313,17 @@ class VimSurroundExtensionTest : VimTestCase() {
     doTest(listOf("dsb"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
+  // VIM-2227
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  fun testDeleteInvalidSurroundingCharacter() {
+    val text = "if (${c}condition) {"
+    
+    doTest("yibds]", text, text, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest("yibds[", text, text, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest("yibds}", text, text, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest("yibds{", text, text, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
+
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun testRepeatDeleteSurroundParens() {
     val before = "if ((${c}condition)) {\n}\n"
@@ -369,6 +380,17 @@ class VimSurroundExtensionTest : VimTestCase() {
     val after = "foo[index][index2] = bar;"
 
     doTest(listOf("csbrE."), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
+
+  // VIM-2227
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  fun testChangeInvalidSurroundingCharacter() {
+    val text = "if (${c}condition) {"
+
+    doTest("yibcs]}", text, text, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest("yibcs[}", text, text, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest("yibcs}]", text, text, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest("yibcs{]", text, text, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   @VimBehaviorDiffers(
