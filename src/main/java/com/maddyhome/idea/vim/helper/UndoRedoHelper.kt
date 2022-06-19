@@ -99,5 +99,6 @@ class UndoRedoHelper : UndoRedoBase() {
     while (check() && !changeListener.hasChanged) {
       action.run()
     }
+    vimDocument.removeChangeListener(changeListener)
   }
 }
