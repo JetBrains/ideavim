@@ -19,3 +19,4 @@ exclude:
       - src/test/java/org/jetbrains/plugins/ideavim/propertybased/samples/JavaText.kt
       - src/test/java/org/jetbrains/plugins/ideavim/propertybased/samples/LoremText.kt
       - src/test/java/org/jetbrains/plugins/ideavim/propertybased/samples/SimpleText.kt
+      - src/main/java/com/maddyhome/idea/vim/vimscript/parser/generated/**
