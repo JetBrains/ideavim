@@ -61,7 +61,7 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) : FunctionH
         )
       )
     }
-    initializeFunctionVariables(argumentValues, editor, context)
+    initializeFunctionVariables(argumentValues, editor, context, vimContext)
 
     if (function.flags.contains(FunctionFlag.RANGE)) {
       val line = (injector.variableService.getNonNullVariableValue(Variable(Scope.FUNCTION_VARIABLE, "firstline"), editor, context, function) as VimInt).value
@@ -131,12 +131,12 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) : FunctionH
     return returnValue
   }
 
-  private fun initializeFunctionVariables(argumentValues: List<Expression>, editor: VimEditor, context: ExecutionContext) {
+  private fun initializeFunctionVariables(argumentValues: List<Expression>, editor: VimEditor, context: ExecutionContext, functionCallContext: VimLContext) {
     // non-optional function arguments
     for ((index, name) in function.args.withIndex()) {
       injector.variableService.storeVariable(
         Variable(Scope.FUNCTION_VARIABLE, name),
-        argumentValues[index].evaluate(editor, context, function.vimContext),
+        argumentValues[index].evaluate(editor, context, functionCallContext),
         editor,
         context,
         function
@@ -147,7 +147,7 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) : FunctionH
       val expressionToStore = if (index + function.args.size < argumentValues.size) argumentValues[index + function.args.size] else function.defaultArgs[index].second
       injector.variableService.storeVariable(
         Variable(Scope.FUNCTION_VARIABLE, function.defaultArgs[index].first),
-        expressionToStore.evaluate(editor, context, function.vimContext),
+        expressionToStore.evaluate(editor, context, functionCallContext),
         editor,
         context,
         function
@@ -158,7 +158,7 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) : FunctionH
       val remainingArgs = if (function.args.size + function.defaultArgs.size < argumentValues.size) {
         VimList(
           argumentValues.subList(function.args.size + function.defaultArgs.size, argumentValues.size)
-            .map { it.evaluate(editor, context, function.vimContext) }.toMutableList()
+            .map { it.evaluate(editor, context, functionCallContext) }.toMutableList()
         )
       } else {
         VimList(mutableListOf())
