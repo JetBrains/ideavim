@@ -64,6 +64,7 @@ usual beta standards.
 * [493](https://github.com/JetBrains/ideavim/pull/493) by [Matt Ellis](https://github.com/citizenmatt): Improvements to Commentary extension
 * [494](https://github.com/JetBrains/ideavim/pull/494) by [Matt Ellis](https://github.com/citizenmatt): Cleanup pre-212 CaretVisualAttributes compatibility code
 * [504](https://github.com/JetBrains/ideavim/pull/504) by [Matt Ellis](https://github.com/citizenmatt): Minor bug fixes
+* [519](https://github.com/JetBrains/ideavim/pull/519) by [chylex](https://github.com/chylex): Fix(VIM-2227): Wrong behavior when deleting / changing surround with invalid character
 
 ## 1.10.0, 2022-02-17
 
