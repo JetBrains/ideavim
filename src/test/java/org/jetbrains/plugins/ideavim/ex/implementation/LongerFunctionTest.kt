@@ -112,4 +112,8 @@ class LongerFunctionTest : VimTestCase() {
 //      val MY_CAMEL_CASE_VALUE${c} = "Hi, I'm a simple value"
 //    """.trimIndent())
 //  }
+
+  // Remove this test when tests above will be uncommented
+  fun `test mock`() {
+  }
 }
