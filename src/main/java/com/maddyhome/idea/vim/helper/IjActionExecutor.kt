@@ -21,18 +21,24 @@ package com.maddyhome.idea.vim.helper
 import com.intellij.openapi.actionSystem.ActionGroup
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.ActionPlaces
+import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.actionSystem.AnActionResult
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.IdeActions
+import com.intellij.openapi.actionSystem.PlatformCoreDataKeys
 import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.actionSystem.Presentation
+import com.intellij.openapi.actionSystem.ex.ActionManagerEx
 import com.intellij.openapi.actionSystem.ex.ActionUtil
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.command.UndoConfirmationPolicy
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.editor.actionSystem.DocCommandGroupId
+import com.intellij.openapi.project.IndexNotReadyException
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.openapi.util.NlsContexts
+import com.intellij.util.SlowOperations
 import com.maddyhome.idea.vim.RegisterActions
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.NativeAction
@@ -95,8 +101,45 @@ class IjActionExecutor : VimActionExecutor {
       popup.showInFocusCenter()
       return true
     } else {
-      ActionUtil.performActionDumbAwareWithCallbacks(ijAction, event)
+      performDumbAwareWithCallbacks(ijAction, event) { ijAction.actionPerformed(event) }
       return true
+    }
+  }
+
+  // This is taken directly from ActionUtil.performActionDumbAwareWithCallbacks
+  // But with one check removed. With this check some actions (like `:w` doesn't work)
+  // https://youtrack.jetbrains.com/issue/VIM-2691/File-is-not-saved-on-w
+  private fun performDumbAwareWithCallbacks(
+    action: AnAction,
+    event: AnActionEvent,
+    performRunnable: Runnable,
+  ) {
+    val project = event.project
+    var indexError: IndexNotReadyException? = null
+    val manager = ActionManagerEx.getInstanceEx()
+    manager.fireBeforeActionPerformed(action, event)
+    val component = event.getData(PlatformCoreDataKeys.CONTEXT_COMPONENT)
+    var result: AnActionResult? = null
+    try {
+      SlowOperations.allowSlowOperations(SlowOperations.ACTION_PERFORM).use { ignore ->
+        performRunnable.run()
+        result = AnActionResult.PERFORMED
+      }
+    } catch (ex: IndexNotReadyException) {
+      indexError = ex
+      result = AnActionResult.failed(ex)
+    } catch (ex: RuntimeException) {
+      result = AnActionResult.failed(ex)
+      throw ex
+    } catch (ex: Error) {
+      result = AnActionResult.failed(ex)
+      throw ex
+    } finally {
+      if (result == null) result = AnActionResult.failed(Throwable())
+      manager.fireAfterActionPerformed(action, event, result!!)
+    }
+    if (indexError != null) {
+      ActionUtil.showDumbModeWarning(project, event)
     }
   }
 
