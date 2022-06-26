@@ -18,9 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation
 
-import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.VimTestCase
-import org.junit.Ignore
 
 class LongerFunctionTest : VimTestCase() {
   val script = """
@@ -89,7 +87,7 @@ class LongerFunctionTest : VimTestCase() {
       
       vnoremap u :<C-u>call ToCamelCase()<CR>
       vnoremap U :<C-u>call ToSnakeCase()<CR>
-    """.trimIndent()
+  """.trimIndent()
 
   // todo normal required
 //  fun `test 1`() {

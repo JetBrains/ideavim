@@ -317,7 +317,7 @@ class VimSurroundExtensionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun testDeleteInvalidSurroundingCharacter() {
     val text = "if (${c}condition) {"
-    
+
     doTest("yibds]", text, text, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     doTest("yibds[", text, text, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     doTest("yibds}", text, text, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
