@@ -162,7 +162,7 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
     val ranges = createRange(valueAndOffset.first, valueAndOffset.second, move)
     if (ranges == null) {
       logger.warn("Could not create a range for node ${ctx.text}")
-      throw ExException("Could not create a range")
+      throw ExException("Could not create a range ${ctx.text}")
     }
     return ranges
   }
