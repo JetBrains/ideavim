@@ -211,6 +211,21 @@ tasks {
     named("compileKotlin") {
         dependsOn("generateGrammarSource")
     }
+
+    // Add plugin open API sources to the plugin ZIP
+    val createOpenApiSourceJar = register<Jar>("createOpenApiSourceJar") {
+        from(java.sourceSets["main"].java) {
+            include("**/com/maddyhome/idea/vim/**/*.java")
+            include("**/com/maddyhome/idea/vim/**/*.kt")
+        }
+        destinationDirectory.set(layout.buildDirectory.dir("source-jars"))
+        archiveClassifier.set("src")
+    }
+
+    named<Zip>("buildPlugin") {
+        dependsOn(createOpenApiSourceJar)
+        from(createOpenApiSourceJar.get().archiveFile) { into("lib/src") }
+    }
 }
 
 // --- Linting
