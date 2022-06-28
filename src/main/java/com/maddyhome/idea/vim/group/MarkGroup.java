@@ -44,7 +44,6 @@ import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.HelperKt;
 import com.maddyhome.idea.vim.mark.*;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
-import com.maddyhome.idea.vim.options.OptionConstants;
 import com.maddyhome.idea.vim.options.OptionScope;
 import com.maddyhome.idea.vim.vimscript.services.IjVimOptionService;
 import org.jdom.Element;
@@ -60,8 +59,7 @@ import static com.maddyhome.idea.vim.mark.VimMarkConstants.SAVE_FILE_MARKS;
  * This class contains all the mark related functionality
  */
 @State(name = "VimMarksSettings", storages = {
-  @Storage(value = "$APP_CONFIG$/vim_settings_local.xml", roamingType = RoamingType.DISABLED)
-})
+  @Storage(value = "$APP_CONFIG$/vim_settings_local.xml", roamingType = RoamingType.DISABLED)})
 public class MarkGroup extends VimMarkGroupBase implements PersistentStateComponent<Element> {
   public void editorReleased(@NotNull EditorFactoryEvent event) {
     // Save off the last caret position of the file before it is closed
@@ -92,7 +90,7 @@ public class MarkGroup extends VimMarkGroupBase implements PersistentStateCompon
    *
    * @param doc The editor to get the marks for
    * @return The map of marks. The keys are <code>Character</code>s of the mark names, the values are
-   *         <code>Mark</code>s.
+   * <code>Mark</code>s.
    */
   private @Nullable FileMarks<Character, Mark> getFileMarks(final @NotNull Document doc) {
     VirtualFile vf = FileDocumentManager.getInstance().getFile(doc);
@@ -127,7 +125,8 @@ public class MarkGroup extends VimMarkGroupBase implements PersistentStateCompon
 
   public void saveData(@NotNull Element element) {
     Element marksElem = new Element("globalmarks");
-    if (!VimPlugin.getOptionService().isSet(OptionScope.GLOBAL.INSTANCE, IjVimOptionService.ideamarksName, IjVimOptionService.ideamarksName)) {
+    if (!VimPlugin.getOptionService()
+      .isSet(OptionScope.GLOBAL.INSTANCE, IjVimOptionService.ideamarksName, IjVimOptionService.ideamarksName)) {
       for (Mark mark : globalMarks.values()) {
         if (!mark.isClear()) {
           Element markElem = new Element("mark");
@@ -165,8 +164,7 @@ public class MarkGroup extends VimMarkGroupBase implements PersistentStateCompon
         fileMarkElem.setAttribute("name", file);
         fileMarkElem.setAttribute("timestamp", Long.toString(marks.getMyTimestamp().getTime()));
         for (Mark mark : marks.values()) {
-          if (!mark.isClear() && !Character.isUpperCase(mark.getKey()) &&
-              SAVE_FILE_MARKS.indexOf(mark.getKey()) >= 0) {
+          if (!mark.isClear() && !Character.isUpperCase(mark.getKey()) && SAVE_FILE_MARKS.indexOf(mark.getKey()) >= 0) {
             Element markElem = new Element("mark");
             markElem.setAttribute("key", Character.toString(mark.getKey()));
             markElem.setAttribute("line", Integer.toString(mark.getLogicalLine()));
@@ -200,14 +198,15 @@ public class MarkGroup extends VimMarkGroupBase implements PersistentStateCompon
     // (see com.intellij.openapi.application.Application.runReadAction())
 
     Element marksElem = element.getChild("globalmarks");
-    if (marksElem != null && !VimPlugin.getOptionService().isSet(OptionScope.GLOBAL.INSTANCE, IjVimOptionService.ideamarksName, IjVimOptionService.ideamarksName)) {
+    if (marksElem != null &&
+        !VimPlugin.getOptionService()
+          .isSet(OptionScope.GLOBAL.INSTANCE, IjVimOptionService.ideamarksName, IjVimOptionService.ideamarksName)) {
       List<Element> markList = marksElem.getChildren("mark");
       for (Element aMarkList : markList) {
         Mark mark = VimMark.create(aMarkList.getAttributeValue("key").charAt(0),
                                    Integer.parseInt(aMarkList.getAttributeValue("line")),
                                    Integer.parseInt(aMarkList.getAttributeValue("column")),
-                                   aMarkList.getAttributeValue("filename"),
-                                   aMarkList.getAttributeValue("protocol"));
+                                   aMarkList.getAttributeValue("filename"), aMarkList.getAttributeValue("protocol"));
 
         if (mark != null) {
           globalMarks.put(mark.getKey(), mark);
@@ -239,8 +238,7 @@ public class MarkGroup extends VimMarkGroupBase implements PersistentStateCompon
         for (Element aMarkList : markList) {
           Mark mark = VimMark.create(aMarkList.getAttributeValue("key").charAt(0),
                                      Integer.parseInt(aMarkList.getAttributeValue("line")),
-                                     Integer.parseInt(aMarkList.getAttributeValue("column")),
-                                     filename,
+                                     Integer.parseInt(aMarkList.getAttributeValue("column")), filename,
                                      aMarkList.getAttributeValue("protocol"));
 
           if (mark != null) fmarks.put(mark.getKey(), mark);
@@ -290,6 +288,7 @@ public class MarkGroup extends VimMarkGroupBase implements PersistentStateCompon
   public static class MarkUpdater implements DocumentListener {
 
     public static MarkUpdater INSTANCE = new MarkUpdater();
+
     /**
      * Creates the listener for the supplied editor
      */
@@ -313,8 +312,7 @@ public class MarkGroup extends VimMarkGroupBase implements PersistentStateCompon
       Editor anEditor = getAnEditor(doc);
       VimInjectorKt.getInjector().getMarkGroup()
         .updateMarkFromDelete(anEditor == null ? null : new IjVimEditor(anEditor),
-                              VimPlugin.getMark().getAllFileMarks(doc),
-                              event.getOffset(), event.getOldLength());
+                              VimPlugin.getMark().getAllFileMarks(doc), event.getOffset(), event.getOldLength());
       // TODO - update jumps
     }
 
@@ -361,7 +359,10 @@ public class MarkGroup extends VimMarkGroupBase implements PersistentStateCompon
     @Override
     public void bookmarkAdded(@NotNull BookmarkGroup group, com.intellij.ide.bookmark.@NotNull Bookmark bookmark) {
       if (!VimPlugin.isEnabled()) return;
-      if (!VimPlugin.getOptionService().isSet(OptionScope.GLOBAL.INSTANCE, IjVimOptionService.ideamarksName, IjVimOptionService.ideamarksName)) return;
+      if (!VimPlugin.getOptionService()
+        .isSet(OptionScope.GLOBAL.INSTANCE, IjVimOptionService.ideamarksName, IjVimOptionService.ideamarksName)) {
+        return;
+      }
 
       if (!(bookmark instanceof LineBookmark)) return;
       BookmarksManager bookmarksManager = BookmarksManager.getInstance(myProject);
@@ -378,7 +379,10 @@ public class MarkGroup extends VimMarkGroupBase implements PersistentStateCompon
     @Override
     public void bookmarkRemoved(@NotNull BookmarkGroup group, com.intellij.ide.bookmark.@NotNull Bookmark bookmark) {
       if (!VimPlugin.isEnabled()) return;
-      if (!VimPlugin.getOptionService().isSet(OptionScope.GLOBAL.INSTANCE, IjVimOptionService.ideamarksName, IjVimOptionService.ideamarksName)) return;
+      if (!VimPlugin.getOptionService()
+        .isSet(OptionScope.GLOBAL.INSTANCE, IjVimOptionService.ideamarksName, IjVimOptionService.ideamarksName)) {
+        return;
+      }
 
       if (!(bookmark instanceof LineBookmark)) return;
       BookmarksManager bookmarksManager = BookmarksManager.getInstance(myProject);
@@ -387,7 +391,8 @@ public class MarkGroup extends VimMarkGroupBase implements PersistentStateCompon
       if (type == null) return;
       char ch = type.getMnemonic();
       if (GLOBAL_MARKS.indexOf(ch) != -1) {
-        FileMarks<Character, Mark> fmarks = VimPlugin.getMark().getFileMarks(((LineBookmark)bookmark).getFile().getPath());
+        FileMarks<Character, Mark> fmarks =
+          VimPlugin.getMark().getFileMarks(((LineBookmark)bookmark).getFile().getPath());
         fmarks.remove(ch);
         VimPlugin.getMark().globalMarks.remove(ch);
       }
@@ -402,6 +407,11 @@ public class MarkGroup extends VimMarkGroupBase implements PersistentStateCompon
       fmarks.put(mnemonic, mark);
       VimPlugin.getMark().globalMarks.put(mnemonic, mark);
     }
+  }
+
+  // COMPATIBILITY-LAYER
+  public void saveJumpLocation(Editor editor) {
+    this.saveJumpLocation(new IjVimEditor(editor));
   }
 
   private static final int SAVE_MARK_COUNT = 20;
