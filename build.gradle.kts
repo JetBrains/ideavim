@@ -70,7 +70,7 @@ dependencies {
     runtimeOnly("org.antlr:antlr4-runtime:$antlrVersion")
     antlr("org.antlr:antlr4:$antlrVersion")
 
-    implementation(project(":vim-engine"))
+    api(project(":vim-engine"))
 }
 
 configurations {
