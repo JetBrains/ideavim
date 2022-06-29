@@ -19,7 +19,6 @@
 package com.maddyhome.idea.vim.command
 
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.common.MappingMode
 import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.options.OptionConstants

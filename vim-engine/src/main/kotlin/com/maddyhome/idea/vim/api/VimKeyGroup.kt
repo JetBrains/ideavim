@@ -18,7 +18,7 @@
 package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.common.CommandPartNode
-import com.maddyhome.idea.vim.common.MappingMode
+import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.extension.VimExtensionHandler
 import com.maddyhome.idea.vim.key.KeyMapping
 import com.maddyhome.idea.vim.key.KeyMappingLayer
@@ -35,28 +35,28 @@ interface VimKeyGroup {
   fun getKeymapConflicts(keyStroke: KeyStroke): List<NativeAction>
 
   fun putKeyMapping(
-    modes: Set<MappingMode>,
-    fromKeys: List<KeyStroke>,
-    owner: MappingOwner,
-    extensionHandler: VimExtensionHandler,
-    recursive: Boolean,
+      modes: Set<MappingMode>,
+      fromKeys: List<KeyStroke>,
+      owner: MappingOwner,
+      extensionHandler: VimExtensionHandler,
+      recursive: Boolean,
   )
 
   fun putKeyMapping(
-    modes: Set<MappingMode>,
-    fromKeys: List<KeyStroke>,
-    owner: MappingOwner,
-    toKeys: List<KeyStroke>,
-    recursive: Boolean,
+      modes: Set<MappingMode>,
+      fromKeys: List<KeyStroke>,
+      owner: MappingOwner,
+      toKeys: List<KeyStroke>,
+      recursive: Boolean,
   )
 
   fun putKeyMapping(
-    modes: Set<MappingMode>,
-    fromKeys: List<KeyStroke>,
-    owner: MappingOwner,
-    toExpr: Expression,
-    originalString: String,
-    recursive: Boolean,
+      modes: Set<MappingMode>,
+      fromKeys: List<KeyStroke>,
+      owner: MappingOwner,
+      toExpr: Expression,
+      originalString: String,
+      recursive: Boolean,
   )
 
 

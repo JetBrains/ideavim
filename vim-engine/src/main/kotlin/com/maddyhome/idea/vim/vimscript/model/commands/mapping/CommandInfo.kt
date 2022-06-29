@@ -18,14 +18,14 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands.mapping
 
-import com.maddyhome.idea.vim.common.MappingMode
+import com.maddyhome.idea.vim.command.MappingMode
 import org.jetbrains.annotations.NonNls
 
 internal class CommandInfo(
-  @NonNls val prefix: String,
-  @NonNls suffix: String,
-  val mappingModes: Set<MappingMode>,
-  val isRecursive: Boolean,
+    @NonNls val prefix: String,
+    @NonNls suffix: String,
+    val mappingModes: Set<MappingMode>,
+    val isRecursive: Boolean,
 ) {
   val command = if (suffix.isBlank()) prefix else "$prefix[$suffix]"
 }

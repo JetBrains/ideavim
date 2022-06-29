@@ -15,12 +15,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-package com.maddyhome.idea.vim.common
+package com.maddyhome.idea.vim.command
 
 import java.util.*
 
 /**
  * @author vlan
+ *
+ * COMPATIBILITY-LAYER: Do not move this class to a different package
  */
 enum class MappingMode {
     /**
