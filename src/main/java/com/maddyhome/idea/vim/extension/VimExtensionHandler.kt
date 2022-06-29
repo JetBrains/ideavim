@@ -34,5 +34,5 @@ interface VimExtensionHandler : ExtensionHandler {
 
   fun execute(editor: Editor, context: DataContext)
 
-  abstract class WithCallback : ExtensionHandler.WithCallback()
+  abstract class WithCallback : ExtensionHandler.WithCallback(), VimExtensionHandler
 }
