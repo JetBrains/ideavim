@@ -20,5 +20,6 @@ create(DslContext.projectId, GitVcsRoot({
         password = "credentialsJSON:43afd6e5-6ad5-4d12-a218-cf1547717a7f"
     }
     param("oauthProviderId", "PROJECT_EXT_1")
+    param("useAlternates", "true")
 }))
 

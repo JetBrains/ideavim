@@ -16,17 +16,12 @@ changeBuildType(RelativeId("Qodana")) {
     expectSteps {
         qodana {
             name = "Qodana"
-            reportAsTests = true
-            inspectionProfile = customProfile {
-                path = ".idea/inspectionProfiles/Qodana.xml"
-            }
             param("clonefinder-enable", "true")
             param("clonefinder-languages", "Java")
             param("clonefinder-languages-container", "Java Kotlin")
             param("clonefinder-mode", "")
             param("clonefinder-queried-project", "src")
             param("clonefinder-reference-projects", "src")
-            param("fail-build-on-errors", "")
             param("licenseaudit-enable", "true")
             param("namesAndTagsCustom", "repo.labs.intellij.net/static-analyser/qodana")
             param("report-version", "")
