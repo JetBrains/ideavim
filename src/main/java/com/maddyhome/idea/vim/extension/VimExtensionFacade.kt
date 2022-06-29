@@ -58,14 +58,29 @@ object VimExtensionFacade {
     VimPlugin.getKey().putKeyMapping(modes, fromKeys, pluginOwner, extensionHandler, recursive)
   }
 
+  /**
+  * COMPATIBILITY-LAYER: Additional method
+  */
+  /** The 'map' command for mapping keys to handlers defined in extensions. */
+  @JvmStatic
+  fun putExtensionHandlerMapping(
+    modes: Set<MappingMode>,
+    fromKeys: List<KeyStroke>,
+    pluginOwner: MappingOwner,
+    extensionHandler: VimExtensionHandler,
+    recursive: Boolean,
+  ) {
+    VimPlugin.getKey().putKeyMapping(modes, fromKeys, pluginOwner, extensionHandler, recursive)
+  }
+
   /** The 'map' command for mapping keys to other keys. */
   @JvmStatic
   fun putKeyMapping(
-      modes: Set<MappingMode>,
-      fromKeys: List<KeyStroke>,
-      pluginOwner: MappingOwner,
-      toKeys: List<KeyStroke>,
-      recursive: Boolean,
+    modes: Set<MappingMode>,
+    fromKeys: List<KeyStroke>,
+    pluginOwner: MappingOwner,
+    toKeys: List<KeyStroke>,
+    recursive: Boolean,
   ) {
     VimPlugin.getKey().putKeyMapping(modes, fromKeys, pluginOwner, toKeys, recursive)
   }
@@ -73,11 +88,11 @@ object VimExtensionFacade {
   /** The 'map' command for mapping keys to other keys if there is no other mapping to these keys */
   @JvmStatic
   fun putKeyMappingIfMissing(
-      modes: Set<MappingMode>,
-      fromKeys: List<KeyStroke>,
-      pluginOwner: MappingOwner,
-      toKeys: List<KeyStroke>,
-      recursive: Boolean,
+    modes: Set<MappingMode>,
+    fromKeys: List<KeyStroke>,
+    pluginOwner: MappingOwner,
+    toKeys: List<KeyStroke>,
+    recursive: Boolean,
   ) {
     val filteredModes = modes.filterNotTo(HashSet()) { VimPlugin.getKey().hasmapto(it, toKeys) }
     VimPlugin.getKey().putKeyMapping(filteredModes, fromKeys, pluginOwner, toKeys, recursive)
