@@ -85,4 +85,5 @@ interface VimMarkGroup {
    * @param insLength   The length of the insertion
    */
   fun updateMarkFromInsert(editor: VimEditor?, marks: java.util.HashMap<Char, Mark>?, insStartOff: Int, insLength: Int)
+  fun dropLastJump()
 }

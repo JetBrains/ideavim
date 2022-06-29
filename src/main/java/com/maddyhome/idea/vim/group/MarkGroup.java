@@ -409,7 +409,12 @@ public class MarkGroup extends VimMarkGroupBase implements PersistentStateCompon
     }
   }
 
-  // COMPATIBILITY-LAYER
+  /**
+   * COMPATIBILITY-LAYER: Method added
+   *
+   * @deprecated Please use method with VimEditor
+   */
+  @Deprecated
   public void saveJumpLocation(Editor editor) {
     this.saveJumpLocation(new IjVimEditor(editor));
   }
