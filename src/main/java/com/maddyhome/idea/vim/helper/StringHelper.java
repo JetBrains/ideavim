@@ -27,7 +27,7 @@ import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
  * COMPATIBILITY-LAYER: Created a helper class
  */
 public class StringHelper {
-  List<KeyStroke> parseKeys(String string) {
+  static List<KeyStroke> parseKeys(String string) {
     return injector.getParser().parseKeys(string);
   }
 }
