@@ -20,7 +20,7 @@ package com.maddyhome.idea.vim.key
 import com.google.common.collect.HashMultiset
 import com.google.common.collect.Multiset
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.extension.VimExtensionHandler
+import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import java.util.function.Consumer
 import java.util.stream.Collectors
@@ -68,10 +68,10 @@ class KeyMapping : Iterable<List<KeyStroke?>?>, KeyMappingLayer {
     }
 
     fun put(
-        fromKeys: List<KeyStroke>,
-        owner: MappingOwner,
-        extensionHandler: VimExtensionHandler,
-        recursive: Boolean
+      fromKeys: List<KeyStroke>,
+      owner: MappingOwner,
+      extensionHandler: ExtensionHandler,
+      recursive: Boolean
     ) {
         myKeys[ArrayList(fromKeys)] = ToHandlerMappingInfo(extensionHandler, fromKeys, recursive, owner)
         fillPrefixes(fromKeys)

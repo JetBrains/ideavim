@@ -48,7 +48,7 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMa
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setOperatorFunction
-import com.maddyhome.idea.vim.extension.VimExtensionHandler
+import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.PsiHelper
@@ -129,7 +129,7 @@ class CommentaryExtension : VimExtension {
    * E.g. handles the `gc` in `gc_`, by setting the operator function, then invoking `g@` to receive the `_` motion to
    * invoke the operator. This object is both the mapping handler and the operator function.
    */
-  private class CommentaryOperatorHandler : OperatorFunction, VimExtensionHandler {
+  private class CommentaryOperatorHandler : OperatorFunction, ExtensionHandler {
     override val isRepeatable = true
 
     override fun execute(editor: VimEditor, context: ExecutionContext) {
@@ -148,7 +148,7 @@ class CommentaryExtension : VimExtension {
    *
    * This object is both the `<Plug>Commentary` mapping handler and the text object handler
    */
-  private class CommentaryTextObjectMotionHandler : TextObjectActionHandler(), VimExtensionHandler {
+  private class CommentaryTextObjectMotionHandler : TextObjectActionHandler(), ExtensionHandler {
     override val isRepeatable = true
 
     override fun execute(editor: VimEditor, context: ExecutionContext) {

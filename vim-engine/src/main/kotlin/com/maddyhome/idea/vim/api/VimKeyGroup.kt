@@ -19,7 +19,7 @@ package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.common.CommandPartNode
 import com.maddyhome.idea.vim.command.MappingMode
-import com.maddyhome.idea.vim.extension.VimExtensionHandler
+import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.key.KeyMapping
 import com.maddyhome.idea.vim.key.KeyMappingLayer
 import com.maddyhome.idea.vim.key.MappingInfo
@@ -38,7 +38,7 @@ interface VimKeyGroup {
       modes: Set<MappingMode>,
       fromKeys: List<KeyStroke>,
       owner: MappingOwner,
-      extensionHandler: VimExtensionHandler,
+      extensionHandler: ExtensionHandler,
       recursive: Boolean,
   )
 

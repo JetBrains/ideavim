@@ -35,7 +35,7 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.executeNormalWithoutMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setOperatorFunction
-import com.maddyhome.idea.vim.extension.VimExtensionHandler
+import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.helper.EditorDataContext
 import com.maddyhome.idea.vim.helper.mode
@@ -63,7 +63,7 @@ class ReplaceWithRegister : VimExtension {
     putKeyMappingIfMissing(MappingMode.X, injector.parser.parseKeys("gr"), owner, injector.parser.parseKeys(RWR_VISUAL), true)
   }
 
-  private class RwrVisual : VimExtensionHandler {
+  private class RwrVisual : ExtensionHandler {
     override fun execute(editor: VimEditor, context: ExecutionContext) {
       val caretsAndSelections = mutableMapOf<VimCaret, VimSelection>()
       val typeInEditor = SelectionType.fromSubMode(editor.subMode)
@@ -78,7 +78,7 @@ class ReplaceWithRegister : VimExtension {
     }
   }
 
-  private class RwrMotion : VimExtensionHandler {
+  private class RwrMotion : ExtensionHandler {
     override val isRepeatable: Boolean = true
 
     override fun execute(editor: VimEditor, context: ExecutionContext) {
@@ -87,7 +87,7 @@ class ReplaceWithRegister : VimExtension {
     }
   }
 
-  private class RwrLine : VimExtensionHandler {
+  private class RwrLine : ExtensionHandler {
     override val isRepeatable: Boolean = true
 
     override fun execute(editor: VimEditor, context: ExecutionContext) {

@@ -25,7 +25,7 @@ import com.maddyhome.idea.vim.api.VimEditor
  *
  * @author vlan
  */
-interface VimExtensionHandler {
+interface ExtensionHandler {
     /**
      * Executes the action.
      *
@@ -40,7 +40,7 @@ interface VimExtensionHandler {
     val isRepeatable: Boolean
         get() = false
 
-    abstract class WithCallback : VimExtensionHandler {
+    abstract class WithCallback : ExtensionHandler {
         var _backingFunction: Runnable? = null
         fun continueVimExecution() {
             if (_backingFunction != null) {

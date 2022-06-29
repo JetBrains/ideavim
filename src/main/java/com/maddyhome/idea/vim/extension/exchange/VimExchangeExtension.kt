@@ -42,7 +42,7 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMa
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setOperatorFunction
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setRegister
-import com.maddyhome.idea.vim.extension.VimExtensionHandler
+import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.fileSize
 import com.maddyhome.idea.vim.helper.moveToInlayAwareLogicalPosition
@@ -112,7 +112,7 @@ class VimExchangeExtension : VimExtension {
     }
   }
 
-  private class ExchangeHandler(private val isLine: Boolean) : VimExtensionHandler {
+  private class ExchangeHandler(private val isLine: Boolean) : ExtensionHandler {
     override val isRepeatable = true
 
     override fun execute(editor: VimEditor, context: ExecutionContext) {
@@ -121,13 +121,13 @@ class VimExchangeExtension : VimExtension {
     }
   }
 
-  private class ExchangeClearHandler : VimExtensionHandler {
+  private class ExchangeClearHandler : ExtensionHandler {
     override fun execute(editor: VimEditor, context: ExecutionContext) {
       clearExchange(editor.ij)
     }
   }
 
-  private class VExchangeHandler : VimExtensionHandler {
+  private class VExchangeHandler : ExtensionHandler {
     override fun execute(editor: VimEditor, context: ExecutionContext) {
       runWriteAction {
         val subMode = editor.subMode

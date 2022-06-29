@@ -16,24 +16,23 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.helper;
+package com.maddyhome.idea.vim.extension
 
-import javax.swing.*;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.newapi.ij
 
 /**
- * COMPATIBILITY-LAYER: Created a helper class
+ * COMPATIBILITY-LAYER: Created a class, renamed original class
  */
-public class StringHelper {
-  public static List<KeyStroke> parseKeys(String string) {
-    return injector.getParser().parseKeys(string);
+interface VimExtensionHandler : ExtensionHandler {
+  override fun execute(editor: VimEditor, context: ExecutionContext) {
+    execute(editor.ij, context.ij)
   }
 
-  public static List<KeyStroke> parseKeys(String... string) {
-    return Arrays.stream(string).flatMap(o -> injector.getParser().parseKeys(o).stream()).collect(Collectors.toList());
-  }
+  fun execute(editor: Editor, context: DataContext)
+
+  abstract class WithCallback : ExtensionHandler.WithCallback()
 }

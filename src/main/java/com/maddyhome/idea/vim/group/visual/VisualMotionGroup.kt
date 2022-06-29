@@ -19,10 +19,12 @@
 package com.maddyhome.idea.vim.group.visual
 
 import com.intellij.find.FindManager
+import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimVisualMotionGroupBase
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.newapi.ij
+import com.maddyhome.idea.vim.newapi.vim
 
 /**
  * @author Alex Plate
@@ -36,5 +38,13 @@ class VisualMotionGroup : VimVisualMotionGroupBase() {
     }
 
     return super.autodetectVisualSubmode(editor)
+  }
+
+  override fun enterVisualMode(editor: Any, subMode: CommandState.SubMode?): Boolean {
+    return when (editor) {
+      is VimEditor -> this.enterVisualMode(editor, subMode)
+      is Editor -> this.enterVisualMode(editor.vim, subMode)
+      else -> error("Unexpected type: $editor")
+    }
   }
 }

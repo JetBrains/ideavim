@@ -55,6 +55,11 @@ interface VimInjector {
   val visualMotionGroup: VimVisualMotionGroup
   // [FINISHED] Class moved to vim-engine, but it's attached to Editor using IJ things
   fun commandStateFor(editor: VimEditor): CommandState
+  // [FINISHED] Class moved to vim-engine, but it's attached to Editor using IJ things
+  /**
+   * COMPATIBILITY-LAYER: Added new method with Any
+   */
+  fun commandStateFor(editor: Any): CommandState
   // !! in progress
   val engineEditorHelper: EngineEditorHelper
   // [FINISHED] Only IJ staff

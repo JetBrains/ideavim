@@ -388,8 +388,11 @@ class CommandState(private val editor: VimEditor?) {
     private val defaultModeState = ModeState(Mode.COMMAND, SubMode.NONE)
     private val globalState = CommandState(null)
 
+    /**
+     * COMPATIBILITY-LAYER: Method switched to Any (was VimEditor)
+     */
     @JvmStatic
-    fun getInstance(editor: VimEditor?): CommandState {
+    fun getInstance(editor: Any?): CommandState {
       return if (editor == null || injector.optionService.isSet(OptionScope.GLOBAL, OptionConstants.ideaglobalmodeName)) {
         globalState
       } else {

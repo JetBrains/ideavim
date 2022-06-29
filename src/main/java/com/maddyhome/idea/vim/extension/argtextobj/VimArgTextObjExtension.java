@@ -26,7 +26,7 @@ import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.extension.VimExtension;
-import com.maddyhome.idea.vim.extension.VimExtensionHandler;
+import com.maddyhome.idea.vim.extension.ExtensionHandler;
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler;
 import com.maddyhome.idea.vim.helper.InlayHelperKt;
 import com.maddyhome.idea.vim.helper.MessageHelper;
@@ -183,7 +183,7 @@ public class VimArgTextObjExtension implements VimExtension {
   /**
    * A text object for an argument to a function definition or a call.
    */
-  static class ArgumentHandler implements VimExtensionHandler {
+  static class ArgumentHandler implements ExtensionHandler {
     final boolean isInner;
 
     ArgumentHandler(boolean isInner) {

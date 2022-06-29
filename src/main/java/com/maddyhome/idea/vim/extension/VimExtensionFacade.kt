@@ -23,10 +23,10 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.change.Extension
+import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.CommandAlias
 import com.maddyhome.idea.vim.common.CommandAliasHandler
-import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.helper.CommandLineHelper
 import com.maddyhome.idea.vim.helper.EditorDataContext
 import com.maddyhome.idea.vim.helper.TestInputModel
@@ -49,11 +49,11 @@ object VimExtensionFacade {
   /** The 'map' command for mapping keys to handlers defined in extensions. */
   @JvmStatic
   fun putExtensionHandlerMapping(
-      modes: Set<MappingMode>,
-      fromKeys: List<KeyStroke>,
-      pluginOwner: MappingOwner,
-      extensionHandler: VimExtensionHandler,
-      recursive: Boolean,
+    modes: Set<MappingMode>,
+    fromKeys: List<KeyStroke>,
+    pluginOwner: MappingOwner,
+    extensionHandler: ExtensionHandler,
+    recursive: Boolean,
   ) {
     VimPlugin.getKey().putKeyMapping(modes, fromKeys, pluginOwner, extensionHandler, recursive)
   }
