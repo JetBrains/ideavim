@@ -16,16 +16,24 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.vimscript.model.commands.mapping
+package com.maddyhome.idea.vim.helper;
 
-import com.maddyhome.idea.vim.command.MappingMode
-import org.jetbrains.annotations.NonNls
+import javax.swing.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
-internal class CommandInfo(
-    @NonNls val prefix: String,
-    @NonNls suffix: String,
-    val mappingModes: Set<MappingMode>,
-    val isRecursive: Boolean,
-) {
-  val command = if (suffix.isBlank()) prefix else "$prefix[$suffix]"
+import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
+
+/**
+ * COMPATIBILITY-LAYER: Created a helper class
+ */
+public class StringHelper {
+  public static List<KeyStroke> parseKeys(String string) {
+    return injector.getParser().parseKeys(string);
+  }
+
+  public static List<KeyStroke> parseKeys(String... string) {
+    return Arrays.stream(string).flatMap(o -> injector.getParser().parseKeys(o).stream()).collect(Collectors.toList());
+  }
 }

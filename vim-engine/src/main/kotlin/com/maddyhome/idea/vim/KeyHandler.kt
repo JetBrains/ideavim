@@ -33,7 +33,7 @@ import com.maddyhome.idea.vim.common.CommandNode
 import com.maddyhome.idea.vim.common.CommandPartNode
 import com.maddyhome.idea.vim.common.CurrentCommandState
 import com.maddyhome.idea.vim.common.DigraphResult
-import com.maddyhome.idea.vim.common.MappingMode
+import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.common.Node
 import com.maddyhome.idea.vim.common.argumentCaptured
 import com.maddyhome.idea.vim.diagnostic.VimLogger

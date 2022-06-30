@@ -16,16 +16,14 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.vimscript.model.commands.mapping
+package com.maddyhome.idea.vim.option
 
-import com.maddyhome.idea.vim.command.MappingMode
-import org.jetbrains.annotations.NonNls
+import com.maddyhome.idea.vim.options.helpers.KeywordOptionHelper
 
-internal class CommandInfo(
-    @NonNls val prefix: String,
-    @NonNls suffix: String,
-    val mappingModes: Set<MappingMode>,
-    val isRecursive: Boolean,
-) {
-  val command = if (suffix.isBlank()) prefix else "$prefix[$suffix]"
+/**
+ * COMPATIBILITY-LAYER: Added a class and package
+ */
+object OptionsManager {
+  val iskeyword: KeywordOptionHelper
+    get() = KeywordOptionHelper
 }

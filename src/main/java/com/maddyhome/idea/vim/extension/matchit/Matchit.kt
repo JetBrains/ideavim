@@ -36,11 +36,11 @@ import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.Direction
-import com.maddyhome.idea.vim.common.MappingMode
+import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.extension.VimExtensionFacade
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
-import com.maddyhome.idea.vim.extension.VimExtensionHandler
+import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotionOrError
@@ -94,7 +94,7 @@ class Matchit : VimExtension {
     override var motionType: MotionType = MotionType.INCLUSIVE
   }
 
-  private class MatchitHandler(private val reverse: Boolean) : VimExtensionHandler {
+  private class MatchitHandler(private val reverse: Boolean) : ExtensionHandler {
 
     override fun execute(editor: VimEditor, context: ExecutionContext) {
       val commandState = editor.commandState

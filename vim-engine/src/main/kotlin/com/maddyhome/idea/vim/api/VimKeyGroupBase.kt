@@ -1,9 +1,9 @@
 package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.common.CommandPartNode
-import com.maddyhome.idea.vim.common.MappingMode
+import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.common.RootNode
-import com.maddyhome.idea.vim.extension.VimExtensionHandler
+import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import com.maddyhome.idea.vim.key.KeyMapping
 import com.maddyhome.idea.vim.key.KeyMappingLayer
@@ -55,9 +55,9 @@ abstract class VimKeyGroupBase : VimKeyGroup {
   override fun getKeyMappingLayer(mode: MappingMode): KeyMappingLayer = getKeyMapping(mode)
 
   protected fun checkCommand(
-    mappingModes: Set<MappingMode>,
-    action: EditorActionHandlerBase,
-    keys: List<KeyStroke>,
+      mappingModes: Set<MappingMode>,
+      action: EditorActionHandlerBase,
+      keys: List<KeyStroke>,
   ) {
     for (mappingMode in mappingModes) {
       checkIdentity(mappingMode, action.id, keys)
@@ -139,23 +139,23 @@ abstract class VimKeyGroupBase : VimKeyGroup {
   }
 
   override fun putKeyMapping(
-    modes: Set<MappingMode>,
-    fromKeys: List<KeyStroke>,
-    owner: MappingOwner,
-    toKeys: List<KeyStroke>,
-    recursive: Boolean,
+      modes: Set<MappingMode>,
+      fromKeys: List<KeyStroke>,
+      owner: MappingOwner,
+      toKeys: List<KeyStroke>,
+      recursive: Boolean,
   ) {
     modes.map { getKeyMapping(it) }.forEach { it.put(fromKeys, toKeys, owner, recursive) }
     registerKeyMapping(fromKeys, owner)
   }
 
   override fun putKeyMapping(
-    modes: Set<MappingMode>,
-    fromKeys: List<KeyStroke>,
-    owner: MappingOwner,
-    toExpr: Expression,
-    originalString: String,
-    recursive: Boolean,
+      modes: Set<MappingMode>,
+      fromKeys: List<KeyStroke>,
+      owner: MappingOwner,
+      toExpr: Expression,
+      originalString: String,
+      recursive: Boolean,
   ) {
     modes.map { getKeyMapping(it) }.forEach { it.put(fromKeys, toExpr, owner, originalString, recursive) }
     registerKeyMapping(fromKeys, owner)
@@ -165,7 +165,7 @@ abstract class VimKeyGroupBase : VimKeyGroup {
     modes: Set<MappingMode>,
     fromKeys: List<KeyStroke>,
     owner: MappingOwner,
-    extensionHandler: VimExtensionHandler,
+    extensionHandler: ExtensionHandler,
     recursive: Boolean,
   ) {
     modes.map { getKeyMapping(it) }.forEach { it.put(fromKeys, owner, extensionHandler, recursive) }

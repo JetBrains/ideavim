@@ -15,7 +15,9 @@ abstract class VimMarkGroupBase : VimMarkGroup {
   @JvmField
   protected val globalMarks = HashMap<Char, Mark>()
   @JvmField
-  protected val jumps: MutableList<Jump> = ArrayList<Jump>()
+  // COMPATIBILITY-LAYER: Changed to public
+  // Use dropLastJump method instead of direct access
+  /*protected*/ val jumps: MutableList<Jump> = ArrayList<Jump>()
   @JvmField
   protected var jumpSpot = -1
 
@@ -398,5 +400,9 @@ abstract class VimMarkGroupBase : VimMarkGroup {
 
   override fun getJumpSpot(): Int {
     return jumpSpot
+  }
+
+  override fun dropLastJump() {
+    jumps.dropLast(1)
   }
 }

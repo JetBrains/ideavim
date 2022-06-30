@@ -3,6 +3,7 @@ package com.maddyhome.idea.vim.newapi
 import com.intellij.openapi.components.service
 import com.intellij.openapi.components.serviceIfCreated
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.api.EngineEditorHelper
 import com.maddyhome.idea.vim.api.ExEntryPanel
 import com.maddyhome.idea.vim.api.ExecutionContextManager
@@ -186,6 +187,14 @@ class IjVimInjector : VimInjectorBase() {
       editor.ij.vimCommandState = res
     }
     return res
+  }
+
+  override fun commandStateFor(editor: Any): CommandState {
+    return when (editor) {
+      is VimEditor -> this.commandStateFor(editor)
+      is Editor -> this.commandStateFor(IjVimEditor(editor))
+      else -> error("Unexpected type: $editor")
+    }
   }
 
   override val engineEditorHelper: EngineEditorHelper

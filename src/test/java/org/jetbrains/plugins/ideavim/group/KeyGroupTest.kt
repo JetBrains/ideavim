@@ -20,7 +20,7 @@ package org.jetbrains.plugins.ideavim.group
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.common.MappingMode
+import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.key.MappingOwner
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim

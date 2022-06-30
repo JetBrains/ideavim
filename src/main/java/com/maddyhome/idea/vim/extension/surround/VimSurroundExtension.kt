@@ -26,7 +26,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.SelectionType
-import com.maddyhome.idea.vim.common.MappingMode
+import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.executeNormalWithoutMapping
@@ -37,7 +37,7 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMa
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setOperatorFunction
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setRegister
-import com.maddyhome.idea.vim.extension.VimExtensionHandler
+import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.key.OperatorFunction
@@ -80,7 +80,7 @@ class VimSurroundExtension : VimExtension {
     }
   }
 
-  private class YSurroundHandler : VimExtensionHandler {
+  private class YSurroundHandler : ExtensionHandler {
     override val isRepeatable = true
 
     override fun execute(editor: VimEditor, context: ExecutionContext) {
@@ -89,7 +89,7 @@ class VimSurroundExtension : VimExtension {
     }
   }
 
-  private class VSurroundHandler : VimExtensionHandler {
+  private class VSurroundHandler : ExtensionHandler {
     override fun execute(editor: VimEditor, context: ExecutionContext) {
       val selectionStart = editor.ij.caretModel.primaryCaret.selectionStart
       // NB: Operator ignores SelectionType anyway
@@ -104,7 +104,7 @@ class VimSurroundExtension : VimExtension {
     }
   }
 
-  private class CSurroundHandler : VimExtensionHandler {
+  private class CSurroundHandler : ExtensionHandler {
     override val isRepeatable = true
 
     override fun execute(editor: VimEditor, context: ExecutionContext) {
@@ -172,7 +172,7 @@ class VimSurroundExtension : VimExtension {
     }
   }
 
-  private class DSurroundHandler : VimExtensionHandler {
+  private class DSurroundHandler : ExtensionHandler {
     override val isRepeatable = true
 
     override fun execute(editor: VimEditor, context: ExecutionContext) {

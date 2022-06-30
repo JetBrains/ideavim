@@ -18,7 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
-import com.maddyhome.idea.vim.common.MappingMode
+import com.maddyhome.idea.vim.command.MappingMode
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class MapClearCommandTest : VimTestCase() {

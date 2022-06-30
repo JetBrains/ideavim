@@ -23,7 +23,6 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.CommandPartNode
 import com.maddyhome.idea.vim.common.DigraphResult
 import com.maddyhome.idea.vim.common.DigraphSequence
-import com.maddyhome.idea.vim.common.MappingMode
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.helper.noneOfEnum
@@ -389,8 +388,11 @@ class CommandState(private val editor: VimEditor?) {
     private val defaultModeState = ModeState(Mode.COMMAND, SubMode.NONE)
     private val globalState = CommandState(null)
 
+    /**
+     * COMPATIBILITY-LAYER: Method switched to Any (was VimEditor)
+     */
     @JvmStatic
-    fun getInstance(editor: VimEditor?): CommandState {
+    fun getInstance(editor: Any?): CommandState {
       return if (editor == null || injector.optionService.isSet(OptionScope.GLOBAL, OptionConstants.ideaglobalmodeName)) {
         globalState
       } else {

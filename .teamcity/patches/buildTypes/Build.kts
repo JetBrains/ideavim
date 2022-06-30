@@ -14,7 +14,7 @@ in the root project, and delete the patch script.
 */
 create(DslContext.projectId, BuildType({
     id("Build")
-    name = "Build"
+    name = "IdeaVim compatibility with external plugins"
 
     vcs {
         root(RelativeId("HttpsGithubComAlexPl292IdeaVimCompatibilityRefsHeadsMaster"))

@@ -33,7 +33,7 @@ import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.common.argumentCaptured
 import com.maddyhome.idea.vim.common.offset
 import com.maddyhome.idea.vim.diagnostic.vimLogger
-import com.maddyhome.idea.vim.extension.VimExtensionHandler
+import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.group.visual.VimSelection.Companion.create
 import com.maddyhome.idea.vim.helper.VimNlsSafe
@@ -144,10 +144,10 @@ class ToExpressionMappingInfo(
 }
 
 class ToHandlerMappingInfo(
-  private val extensionHandler: VimExtensionHandler,
-  fromKeys: List<KeyStroke>,
-  isRecursive: Boolean,
-  owner: MappingOwner,
+    private val extensionHandler: ExtensionHandler,
+    fromKeys: List<KeyStroke>,
+    isRecursive: Boolean,
+    owner: MappingOwner,
 ) : MappingInfo(fromKeys, isRecursive, owner) {
   override fun getPresentableString(): String = "call ${extensionHandler.javaClass.canonicalName}"
 
@@ -167,7 +167,7 @@ class ToHandlerMappingInfo(
     }
 
     val handler = extensionHandler
-    if (handler is VimExtensionHandler.WithCallback) {
+    if (handler is ExtensionHandler.WithCallback) {
       handler._backingFunction = Runnable {
         myFun(shouldCalculateOffsets, editor, startOffsets)
 
@@ -193,7 +193,7 @@ class ToHandlerMappingInfo(
       repeatHandler = true
     }
 
-    if (handler !is VimExtensionHandler.WithCallback) {
+    if (handler !is ExtensionHandler.WithCallback) {
       myFun(shouldCalculateOffsets, editor, startOffsets)
     }
   }

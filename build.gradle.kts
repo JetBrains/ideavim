@@ -70,7 +70,7 @@ dependencies {
     runtimeOnly("org.antlr:antlr4-runtime:$antlrVersion")
     antlr("org.antlr:antlr4:$antlrVersion")
 
-    implementation(project(":vim-engine"))
+    api(project(":vim-engine"))
 }
 
 configurations {
@@ -210,6 +210,25 @@ tasks {
 
     named("compileKotlin") {
         dependsOn("generateGrammarSource")
+    }
+
+    // Add plugin open API sources to the plugin ZIP
+    val createOpenApiSourceJar by registering(Jar::class) {
+        // Java sources
+        from(sourceSets.main.get().java) {
+            include("**/com/maddyhome/idea/vim/**/*.java")
+        }
+        // Kotlin sources
+        from(kotlin.sourceSets.main.get().kotlin) {
+            include("**/com/maddyhome/idea/vim/**/*.kt")
+        }
+        destinationDirectory.set(layout.buildDirectory.dir("libs"))
+        archiveClassifier.set("src")
+    }
+
+    buildPlugin {
+        dependsOn(createOpenApiSourceJar)
+        from(createOpenApiSourceJar) { into("lib/src") }
     }
 }
 

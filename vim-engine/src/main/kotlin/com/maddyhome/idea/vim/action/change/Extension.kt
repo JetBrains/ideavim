@@ -18,11 +18,11 @@
 
 package com.maddyhome.idea.vim.action.change
 
-import com.maddyhome.idea.vim.extension.VimExtensionHandler
+import com.maddyhome.idea.vim.extension.ExtensionHandler
 import javax.swing.KeyStroke
 
 object Extension {
-  var lastExtensionHandler: VimExtensionHandler? = null
+  var lastExtensionHandler: ExtensionHandler? = null
 
   private val keyStrokes = mutableListOf<KeyStroke>()
   private val strings = mutableListOf<String>()

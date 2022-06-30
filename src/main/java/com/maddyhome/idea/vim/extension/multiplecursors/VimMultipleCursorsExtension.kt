@@ -30,12 +30,12 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.common.MappingMode
+import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
-import com.maddyhome.idea.vim.extension.VimExtensionHandler
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.visual.vimSetSelection
 import com.maddyhome.idea.vim.helper.EditorHelper
@@ -111,7 +111,7 @@ class VimMultipleCursorsExtension : VimExtension {
     putKeyMappingIfMissing(MappingMode.X, injector.parser.parseKeys("<A-p>"), owner, injector.parser.parseKeys(REMOVE_OCCURRENCE), true)
   }
 
-  abstract class WriteActionHandler : VimExtensionHandler {
+  abstract class WriteActionHandler : ExtensionHandler {
     override fun execute(editor: VimEditor, context: ExecutionContext) {
       ApplicationManager.getApplication().runWriteAction {
         executeInWriteAction(editor.ij, context.ij)

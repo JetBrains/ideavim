@@ -153,6 +153,13 @@ public class EditorHelper {
   }
 
   /**
+   * COMPATIBILITY-LAYER: Created a function
+   */
+  public static int getVisualLineCount(final @NotNull Editor editor) {
+    return getVisualLineCount(new IjVimEditor(editor));
+  }
+
+  /**
    * Gets the number of actual lines in the file
    *
    * @param editor The editor

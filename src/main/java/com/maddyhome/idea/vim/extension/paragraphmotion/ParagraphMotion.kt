@@ -23,11 +23,11 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.common.MappingMode
+import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.extension.VimExtensionFacade
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
-import com.maddyhome.idea.vim.extension.VimExtensionHandler
+import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.SearchHelper
@@ -45,7 +45,7 @@ class ParagraphMotion : VimExtension {
     putKeyMappingIfMissing(MappingMode.NXO, injector.parser.parseKeys("{"), owner, injector.parser.parseKeys("<Plug>(ParagraphPrevMotion)"), true)
   }
 
-  private class ParagraphMotionHandler(private val count: Int) : VimExtensionHandler {
+  private class ParagraphMotionHandler(private val count: Int) : ExtensionHandler {
     override fun execute(editor: VimEditor, context: ExecutionContext) {
       editor.ij.vimForEachCaret { caret ->
         val motion = moveCaretToNextParagraph(editor.ij, caret, count)

@@ -26,14 +26,14 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.common.MappingMode
+import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.extension.Alias
 import com.maddyhome.idea.vim.extension.ExtensionBeanClass
 import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
-import com.maddyhome.idea.vim.extension.VimExtensionHandler
+import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.extension.VimExtensionRegistrar
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.isEndAllowed
@@ -371,7 +371,7 @@ private class TestExtension : VimExtension {
     super.dispose()
   }
 
-  private class MoveEmulateInclusive : VimExtensionHandler {
+  private class MoveEmulateInclusive : ExtensionHandler {
     override fun execute(editor: VimEditor, context: ExecutionContext) {
       VimPlugin.getVisualMotion().enterVisualMode(editor, CommandState.SubMode.VISUAL_CHARACTER)
       val caret = editor.ij.caretModel.currentCaret
@@ -380,19 +380,19 @@ private class TestExtension : VimExtension {
     }
   }
 
-  private class MoveBackwards : VimExtensionHandler {
+  private class MoveBackwards : ExtensionHandler {
     override fun execute(editor: VimEditor, context: ExecutionContext) {
       editor.ij.caretModel.allCarets.forEach { it.moveToOffset(it.offset - 5) }
     }
   }
 
-  private class Move : VimExtensionHandler {
+  private class Move : ExtensionHandler {
     override fun execute(editor: VimEditor, context: ExecutionContext) {
       editor.ij.caretModel.allCarets.forEach { it.moveToOffset(it.offset + 5) }
     }
   }
 
-  private class MoveLinewise : VimExtensionHandler {
+  private class MoveLinewise : ExtensionHandler {
     override fun execute(editor: VimEditor, context: ExecutionContext) {
       VimPlugin.getVisualMotion().enterVisualMode(editor, CommandState.SubMode.VISUAL_LINE)
       val caret = editor.ij.caretModel.currentCaret
@@ -401,7 +401,7 @@ private class TestExtension : VimExtension {
     }
   }
 
-  private class MoveLinewiseInNormal : VimExtensionHandler {
+  private class MoveLinewiseInNormal : ExtensionHandler {
     override fun execute(editor: VimEditor, context: ExecutionContext) {
       val caret = editor.ij.caretModel.currentCaret
       val newOffset = VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret.vim, 1, true)
@@ -409,7 +409,7 @@ private class TestExtension : VimExtension {
     }
   }
 
-  private class DelayedAction : VimExtensionHandler.WithCallback() {
+  private class DelayedAction : ExtensionHandler.WithCallback() {
     override fun execute(editor: VimEditor, context: ExecutionContext) {
       invokeLater {
         invokeLater {
@@ -421,7 +421,7 @@ private class TestExtension : VimExtension {
   }
 
   // This action should be registered with WithCallback, but we intentionally made it incorrectly for tests
-  private class DelayedIncorrectAction : VimExtensionHandler {
+  private class DelayedIncorrectAction : ExtensionHandler {
     override fun execute(editor: VimEditor, context: ExecutionContext) {
       invokeLater {
         invokeLater {

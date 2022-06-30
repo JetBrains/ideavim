@@ -37,7 +37,7 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.ComplicatedKeysAction;
 import com.maddyhome.idea.vim.action.VimShortcutKeyAction;
 import com.maddyhome.idea.vim.api.*;
-import com.maddyhome.idea.vim.common.MappingMode;
+import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.common.Node;
 import com.maddyhome.idea.vim.common.NodesKt;
 import com.maddyhome.idea.vim.ex.ExOutputModel;

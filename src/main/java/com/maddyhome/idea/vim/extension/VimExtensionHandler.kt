@@ -16,16 +16,23 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.vimscript.model.commands.mapping
+package com.maddyhome.idea.vim.extension
 
-import com.maddyhome.idea.vim.command.MappingMode
-import org.jetbrains.annotations.NonNls
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.newapi.ij
 
-internal class CommandInfo(
-    @NonNls val prefix: String,
-    @NonNls suffix: String,
-    val mappingModes: Set<MappingMode>,
-    val isRecursive: Boolean,
-) {
-  val command = if (suffix.isBlank()) prefix else "$prefix[$suffix]"
+/**
+ * COMPATIBILITY-LAYER: Created a class, renamed original class
+ */
+interface VimExtensionHandler : ExtensionHandler {
+  override fun execute(editor: VimEditor, context: ExecutionContext) {
+    execute(editor.ij, context.ij)
+  }
+
+  fun execute(editor: Editor, context: DataContext)
+
+  abstract class WithCallback : ExtensionHandler.WithCallback(), VimExtensionHandler
 }

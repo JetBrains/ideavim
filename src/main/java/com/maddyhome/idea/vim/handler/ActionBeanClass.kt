@@ -21,7 +21,7 @@ package com.maddyhome.idea.vim.handler
 import com.intellij.serviceContainer.BaseKeyedLazyInstance
 import com.intellij.util.SmartList
 import com.intellij.util.xmlb.annotations.Attribute
-import com.maddyhome.idea.vim.common.MappingMode
+import com.maddyhome.idea.vim.command.MappingMode
 import javax.swing.KeyStroke
 
 /**

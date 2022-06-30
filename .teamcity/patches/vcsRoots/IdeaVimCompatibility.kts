@@ -18,5 +18,6 @@ create(DslContext.projectId, GitVcsRoot({
         userName = "git"
         uploadedKey = "Alex Plate TeamCity key"
     }
+    param("useAlternates", "true")
 }))
 
