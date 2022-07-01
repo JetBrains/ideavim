@@ -145,6 +145,7 @@ tasks {
         kotlinOptions {
             jvmTarget = javaVersion
             apiVersion = "1.5"
+            freeCompilerArgs = listOf("-Xjvm-default=all-compatibility")
 //            allWarningsAsErrors = true
         }
     }
