@@ -140,24 +140,20 @@ tasks {
 
         options.encoding = "UTF-8"
     }
-}
 
-allprojects {
-    tasks {
-        compileKotlin {
-            kotlinOptions {
-                jvmTarget = javaVersion
-                apiVersion = "1.5"
-                freeCompilerArgs = listOf("-Xjvm-default=all-compatibility")
+    compileKotlin {
+        kotlinOptions {
+            jvmTarget = javaVersion
+            apiVersion = "1.5"
+            freeCompilerArgs = listOf("-Xjvm-default=all-compatibility")
 //            allWarningsAsErrors = true
-            }
         }
-        compileTestKotlin {
-            kotlinOptions {
-                jvmTarget = javaVersion
-                apiVersion = "1.5"
+    }
+    compileTestKotlin {
+        kotlinOptions {
+            jvmTarget = javaVersion
+            apiVersion = "1.5"
 //            allWarningsAsErrors = true
-            }
         }
     }
 }
