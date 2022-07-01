@@ -24,7 +24,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.testFramework.fixtures.JavaCodeInsightFixtureTestCase;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.CommandState;
+import com.maddyhome.idea.vim.command.VimStateMachine;
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer;
 import com.maddyhome.idea.vim.helper.EditorDataContext;
 import com.maddyhome.idea.vim.helper.RunnableHelper;
@@ -107,8 +107,8 @@ public abstract class JavaVimTestCase extends JavaCodeInsightFixtureTestCase {
     return editor;
   }
 
-  public void assertMode(@NotNull CommandState.Mode expectedMode) {
-    final CommandState.Mode mode = CommandState.getInstance(new IjVimEditor(myFixture.getEditor())).getMode();
+  public void assertMode(@NotNull VimStateMachine.Mode expectedMode) {
+    final VimStateMachine.Mode mode = VimStateMachine.getInstance(new IjVimEditor(myFixture.getEditor())).getMode();
     assertEquals(expectedMode, mode);
   }
 

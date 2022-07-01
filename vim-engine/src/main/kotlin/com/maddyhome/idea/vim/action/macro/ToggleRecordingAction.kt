@@ -24,7 +24,7 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
-import com.maddyhome.idea.vim.helper.commandState
+import com.maddyhome.idea.vim.helper.vimStateMachine
 
 class ToggleRecordingAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
@@ -32,7 +32,7 @@ class ToggleRecordingAction : VimActionHandler.SingleExecution() {
   override val argumentType: Argument.Type = Argument.Type.CHARACTER
 
   override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
-    return if (!editor.commandState.isRecording) {
+    return if (!editor.vimStateMachine.isRecording) {
       val argument = cmd.argument ?: return false
       val reg = argument.character
       injector.registerGroup.startRecording(editor, reg)

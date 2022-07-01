@@ -18,7 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.action.change.change
 
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class ChangeLineActionTest : VimTestCase() {
@@ -26,14 +26,14 @@ class ChangeLineActionTest : VimTestCase() {
     setupChecks {
       this.neoVim.ignoredRegisters = setOf('1', '"')
     }
-    doTest("cc", "", "", CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    doTest("cc", "", "", VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 
   fun `test on empty file with S`() {
     setupChecks {
       this.neoVim.ignoredRegisters = setOf('1', '"')
     }
-    doTest("S", "", "", CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    doTest("S", "", "", VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 
   fun `test on last line with S`() {
@@ -47,7 +47,7 @@ class ChangeLineActionTest : VimTestCase() {
             I found it in a legendary land
             $c
       """.trimIndent(),
-      CommandState.Mode.INSERT, CommandState.SubMode.NONE
+      VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -64,7 +64,7 @@ class ChangeLineActionTest : VimTestCase() {
             $c
             
       """.trimIndent(),
-      CommandState.Mode.INSERT, CommandState.SubMode.NONE
+      VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -79,7 +79,7 @@ class ChangeLineActionTest : VimTestCase() {
             I found it in a legendary land
             $c
       """.trimIndent(),
-      CommandState.Mode.INSERT, CommandState.SubMode.NONE
+      VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -96,7 +96,7 @@ class ChangeLineActionTest : VimTestCase() {
             $c
             
       """.trimIndent(),
-      CommandState.Mode.INSERT, CommandState.SubMode.NONE
+      VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -111,7 +111,7 @@ class ChangeLineActionTest : VimTestCase() {
             $c
             all rocks and lavender and tufted grass,
       """.trimIndent(),
-      CommandState.Mode.INSERT, CommandState.SubMode.NONE
+      VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -128,7 +128,7 @@ class ChangeLineActionTest : VimTestCase() {
             $c
             
       """.trimIndent(),
-      CommandState.Mode.INSERT, CommandState.SubMode.NONE
+      VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -145,7 +145,7 @@ class ChangeLineActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             $c
       """.trimIndent(),
-      CommandState.Mode.INSERT, CommandState.SubMode.NONE
+      VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -182,7 +182,7 @@ class ChangeLineActionTest : VimTestCase() {
             that priceless mote now dimpling the convex
             and limpid teardrop on a lighted slide.
       """.trimIndent(),
-      CommandState.Mode.INSERT, CommandState.SubMode.NONE
+      VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
     )
   }
 }

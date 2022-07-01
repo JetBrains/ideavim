@@ -37,10 +37,10 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.DumbAwareToggleAction
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.group.NotificationService
 import com.maddyhome.idea.vim.helper.EditorDataContext
-import com.maddyhome.idea.vim.helper.commandState
+import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.helper.inNormalMode
 import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
 import com.maddyhome.idea.vim.newapi.vim
@@ -89,8 +89,8 @@ object IdeaSpecifics {
       }
       ) {
         editor?.let {
-          val commandState = it.vim.commandState
-          while (commandState.mode != CommandState.Mode.COMMAND) {
+          val commandState = it.vim.vimStateMachine
+          while (commandState.mode != VimStateMachine.Mode.COMMAND) {
             commandState.popModes()
           }
           VimPlugin.getChange().insertBeforeCursor(it.vim, dataContext.vim)

@@ -35,7 +35,7 @@ import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.group.visual.VimSimpleSelection
 import com.maddyhome.idea.vim.group.visual.VisualChange
 import com.maddyhome.idea.vim.group.visual.VisualOperation
-import com.maddyhome.idea.vim.helper.commandState
+import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.helper.inBlockSubMode
 import com.maddyhome.idea.vim.helper.inRepeatMode
 import com.maddyhome.idea.vim.helper.inVisualMode
@@ -217,7 +217,7 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
         )
       }
       else -> this.nativeCarets().associateWith { caret ->
-        val subMode = this.commandState.subMode
+        val subMode = this.vimStateMachine.subMode
         VimSimpleSelection.createWithNative(
           caret.vimSelectionStart,
           caret.offset.point,

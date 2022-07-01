@@ -21,7 +21,7 @@
 package org.jetbrains.plugins.ideavim.action.motion.leftright
 
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.options.OptionConstants
 import org.jetbrains.plugins.ideavim.OptionValueType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -52,7 +52,7 @@ class MotionShiftEndActionTest : VimOptionTestCase(OptionConstants.keymodelName,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
@@ -78,7 +78,7 @@ class MotionShiftEndActionTest : VimOptionTestCase(OptionConstants.keymodelName,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
+    doTest(keys, before, after, VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
@@ -104,7 +104,7 @@ class MotionShiftEndActionTest : VimOptionTestCase(OptionConstants.keymodelName,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
+    doTest(keys, before, after, VimStateMachine.Mode.SELECT, VimStateMachine.SubMode.VISUAL_CHARACTER)
   }
 
   @VimOptionTestConfiguration(
@@ -131,10 +131,10 @@ class MotionShiftEndActionTest : VimOptionTestCase(OptionConstants.keymodelName,
     """.trimIndent()
     configureByText(before)
     typeText(injector.parser.parseKeys("<S-End>"))
-    assertState(CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    assertState(VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
     typeText(injector.parser.parseKeys("0v" + "<S-End>"))
     assertState(after)
-    assertState(CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
+    assertState(VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER)
   }
 
   @VimOptionTestConfiguration(
@@ -161,9 +161,9 @@ class MotionShiftEndActionTest : VimOptionTestCase(OptionConstants.keymodelName,
     """.trimIndent()
     configureByText(before)
     typeText(injector.parser.parseKeys("<S-End>"))
-    assertState(CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    assertState(VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
     typeText(injector.parser.parseKeys("0gh" + "<S-End>"))
     assertState(after)
-    assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
+    assertState(VimStateMachine.Mode.SELECT, VimStateMachine.SubMode.VISUAL_CHARACTER)
   }
 }

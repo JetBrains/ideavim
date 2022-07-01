@@ -18,7 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.action.change.delete
 
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class DeleteEndOfLineActionTest : VimTestCase() {
@@ -37,8 +37,8 @@ class DeleteEndOfLineActionTest : VimTestCase() {
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
       """.trimIndent(),
-      CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE
     )
   }
 }

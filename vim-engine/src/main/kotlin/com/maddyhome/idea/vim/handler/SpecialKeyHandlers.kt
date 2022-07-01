@@ -24,7 +24,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.helper.inSelectMode
 import com.maddyhome.idea.vim.helper.inVisualMode
@@ -47,10 +47,10 @@ abstract class ShiftedSpecialKeyHandler : VimActionHandler.SingleExecution() {
     val startSel = OptionConstants.keymodel_startsel in (injector.optionService.getOptionValue(OptionScope.GLOBAL, OptionConstants.keymodelName) as VimString).value
     if (startSel && !editor.inVisualMode && !editor.inSelectMode) {
       if (OptionConstants.selectmode_key in (injector.optionService.getOptionValue(OptionScope.GLOBAL, OptionConstants.selectmodeName) as VimString).value) {
-        injector.visualMotionGroup.enterSelectMode(editor, CommandState.SubMode.VISUAL_CHARACTER)
+        injector.visualMotionGroup.enterSelectMode(editor, VimStateMachine.SubMode.VISUAL_CHARACTER)
       } else {
         injector.visualMotionGroup
-          .toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_CHARACTER)
+          .toggleVisual(editor, 1, 0, VimStateMachine.SubMode.VISUAL_CHARACTER)
       }
     }
     motion(editor, context, cmd)
@@ -83,10 +83,10 @@ abstract class ShiftedArrowKeyHandler : VimActionHandler.SingleExecution() {
     if (startSel || continueSelectSelection || continueVisualSelection) {
       if (!inVisualMode && !inSelectMode) {
         if (OptionConstants.selectmode_key in (injector.optionService.getOptionValue(OptionScope.GLOBAL, OptionConstants.selectmodeName) as VimString).value) {
-          injector.visualMotionGroup.enterSelectMode(editor, CommandState.SubMode.VISUAL_CHARACTER)
+          injector.visualMotionGroup.enterSelectMode(editor, VimStateMachine.SubMode.VISUAL_CHARACTER)
         } else {
           injector.visualMotionGroup
-            .toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_CHARACTER)
+            .toggleVisual(editor, 1, 0, VimStateMachine.SubMode.VISUAL_CHARACTER)
         }
       }
       motionWithKeyModel(editor, context, cmd)

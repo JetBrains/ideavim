@@ -20,7 +20,7 @@ package org.jetbrains.plugins.ideavim.action.copy
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
@@ -170,7 +170,7 @@ class YankMotionActionTest : VimTestCase() {
             hard by the torrent$c of a mountain pass.
     """.trimIndent()
 
-    doTest("yy", file, file, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest("yy", file, file, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
     val text = VimPlugin.getRegister().lastRegister?.text ?: kotlin.test.fail()
 
     TestCase.assertEquals("hard by the torrent of a mountain pass.\n", text)

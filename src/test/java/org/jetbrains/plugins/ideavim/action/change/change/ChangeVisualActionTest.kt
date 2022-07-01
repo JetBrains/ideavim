@@ -21,7 +21,7 @@
 package org.jetbrains.plugins.ideavim.action.change.change
 
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -45,7 +45,7 @@ class ChangeVisualActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   fun `test multiple line change in text middle`() {
@@ -65,7 +65,7 @@ class ChangeVisualActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 
   @VimBehaviorDiffers(
@@ -97,7 +97,7 @@ class ChangeVisualActionTest : VimTestCase() {
             ${c}
             
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 
   fun `test multiple line change till the end with two new lines`() {
@@ -123,7 +123,7 @@ class ChangeVisualActionTest : VimTestCase() {
             
             
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 
   @VimBehaviorDiffers(description = "Wrong caret position")
@@ -145,14 +145,14 @@ class ChangeVisualActionTest : VimTestCase() {
             wh|Hello
             ha|Hello
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   fun `test replace first line`() {
     val keys = "VcHello<esc>"
     val before = "${c}A Discovery"
     val after = "Hello"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.MULTICARET)
@@ -161,7 +161,7 @@ class ChangeVisualActionTest : VimTestCase() {
       injector.parser.parseKeys("v2lc" + "aaa" + "<ESC>"),
       "abcd${c}ffffff${c}abcde${c}aaaa\n"
     )
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
     assertState("abcdaa${c}afffaa${c}adeaa${c}aa\n")
   }
 
@@ -182,8 +182,8 @@ class ChangeVisualActionTest : VimTestCase() {
         ba_quux_bar
         
       """.trimIndent(),
-      CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE
     )
   }
 
@@ -204,8 +204,8 @@ class ChangeVisualActionTest : VimTestCase() {
         ba_quux_bar
         
       """.trimIndent(),
-      CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE
     )
   }
 }

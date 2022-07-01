@@ -19,7 +19,7 @@
 package org.jetbrains.plugins.ideavim.extension.matchit
 
 import com.intellij.ide.highlighter.HtmlFileType
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -41,7 +41,7 @@ class MatchitHtmlTest : VimTestCase() {
       """
         <h1>Heading<$c/h1>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -55,7 +55,7 @@ class MatchitHtmlTest : VimTestCase() {
       """
         <${c}h1>Heading</h1>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -73,7 +73,7 @@ class MatchitHtmlTest : VimTestCase() {
           <p>paragraph body</p>
         <$c/div>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -91,7 +91,7 @@ class MatchitHtmlTest : VimTestCase() {
           <p>paragraph body</p>
         </div>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -113,7 +113,7 @@ class MatchitHtmlTest : VimTestCase() {
           </div>
         <$c/div>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -131,7 +131,7 @@ class MatchitHtmlTest : VimTestCase() {
           <div>contents<$c/div>
         </div>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -153,7 +153,7 @@ class MatchitHtmlTest : VimTestCase() {
           </div>
         </div>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -171,7 +171,7 @@ class MatchitHtmlTest : VimTestCase() {
           <${c}div>contents</div>
         </div>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -185,7 +185,7 @@ class MatchitHtmlTest : VimTestCase() {
       """
         <h1 class="headline">Post HeadLine<$c/h1>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -203,7 +203,7 @@ class MatchitHtmlTest : VimTestCase() {
           <img src=$c"my-image.png" alt="my-image">
         </div>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -221,7 +221,7 @@ class MatchitHtmlTest : VimTestCase() {
         $c 
         </div>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -235,7 +235,7 @@ class MatchitHtmlTest : VimTestCase() {
       """
         <h1$c>Heading</h1>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -245,7 +245,7 @@ class MatchitHtmlTest : VimTestCase() {
       "%",
       "$c    <h1>Heading</h1>",
       "    <h1$c>Heading</h1>",
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -259,7 +259,7 @@ class MatchitHtmlTest : VimTestCase() {
       """
         <h1 class="headline">Post HeadLine</h1$c>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -273,7 +273,7 @@ class MatchitHtmlTest : VimTestCase() {
       """
         <h1>Heading</h1$c>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -287,7 +287,7 @@ class MatchitHtmlTest : VimTestCase() {
       """
         $c<h1>Heading</h1>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -301,7 +301,7 @@ class MatchitHtmlTest : VimTestCase() {
       """
         <h1>Heading$c</h1>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -315,7 +315,7 @@ class MatchitHtmlTest : VimTestCase() {
       """
         <div [ngIf$c]="someCondition()">{{displayValue}}</div>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -329,7 +329,7 @@ class MatchitHtmlTest : VimTestCase() {
       """
         <div [ngIf]="someCondition($c)">{{displayValue}}</div>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -343,7 +343,7 @@ class MatchitHtmlTest : VimTestCase() {
       """
         <div [ngIf]="someCondition()">{{displayValue}$c}</div>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -357,7 +357,7 @@ class MatchitHtmlTest : VimTestCase() {
       """
         <div [ngIf]="someCondition()">{{displayValue}}<$c/div>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -371,7 +371,7 @@ class MatchitHtmlTest : VimTestCase() {
       """
         <div [ngIf]="someCondition()">{$c{displayValue}}</div>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -385,7 +385,7 @@ class MatchitHtmlTest : VimTestCase() {
       """
         <img ${c}src={{imagePath}} alt={{imageDescription}}>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -415,7 +415,7 @@ class MatchitHtmlTest : VimTestCase() {
           <p>paragraph 2</p>
         <$c/div>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -445,7 +445,7 @@ class MatchitHtmlTest : VimTestCase() {
           <p>paragraph 2</p>
         <$c/div>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -463,7 +463,7 @@ class MatchitHtmlTest : VimTestCase() {
         <!--   This div is commented out -->
         <!-- <$c/div> -->
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -481,7 +481,7 @@ class MatchitHtmlTest : VimTestCase() {
         <!--   This div is commented out -->
         <!-- </div> -->
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -499,7 +499,7 @@ class MatchitHtmlTest : VimTestCase() {
         <!--   This div is commented out -->
         <!-- </div> -->
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -517,7 +517,7 @@ class MatchitHtmlTest : VimTestCase() {
         <!--   This div is commented out -->
         <!-- </div> -->
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -535,7 +535,7 @@ class MatchitHtmlTest : VimTestCase() {
         <!--   This div is commented out -->
         <!-- </div> -->
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -549,7 +549,7 @@ class MatchitHtmlTest : VimTestCase() {
       """
         <p *ngIf="count > 0"$c>Count is greater than zero</p>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -567,7 +567,7 @@ class MatchitHtmlTest : VimTestCase() {
       """
         <h1>Heading<$c/h1>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -581,7 +581,7 @@ class MatchitHtmlTest : VimTestCase() {
       """
         <${c}h1>Heading</h1>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -603,7 +603,7 @@ class MatchitHtmlTest : VimTestCase() {
           </div>
         <$c/div>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -621,7 +621,7 @@ class MatchitHtmlTest : VimTestCase() {
           <div>contents<$c/div>
         </div>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -643,7 +643,7 @@ class MatchitHtmlTest : VimTestCase() {
           </div>
         </div>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -661,7 +661,7 @@ class MatchitHtmlTest : VimTestCase() {
           <${c}div>contents</div>
         </div>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -675,7 +675,7 @@ class MatchitHtmlTest : VimTestCase() {
       """
         <h1 class="headline">Post HeadLine<$c/h1>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -693,7 +693,7 @@ class MatchitHtmlTest : VimTestCase() {
           <img src=$c"my-image.png" alt="my-image">
         </div>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -711,7 +711,7 @@ class MatchitHtmlTest : VimTestCase() {
         $c 
         </div>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -725,7 +725,7 @@ class MatchitHtmlTest : VimTestCase() {
       """
         <h1$c>Heading</h1>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -735,7 +735,7 @@ class MatchitHtmlTest : VimTestCase() {
       "g%",
       "$c    <h1>Heading</h1>",
       "    <h1$c>Heading</h1>",
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -749,7 +749,7 @@ class MatchitHtmlTest : VimTestCase() {
       """
         <h1 class="headline">Post HeadLine</h1$c>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -763,7 +763,7 @@ class MatchitHtmlTest : VimTestCase() {
       """
         $c<h1>Heading</h1>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -777,7 +777,7 @@ class MatchitHtmlTest : VimTestCase() {
       """
         <div [ngIf$c]="someCondition()">{{displayValue}}</div>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -791,7 +791,7 @@ class MatchitHtmlTest : VimTestCase() {
       """
         <div [ngIf]="someCondition($c)">{{displayValue}}</div>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -805,7 +805,7 @@ class MatchitHtmlTest : VimTestCase() {
       """
         <div [ngIf]="someCondition()">{{displayValue}$c}</div>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -819,7 +819,7 @@ class MatchitHtmlTest : VimTestCase() {
       """
         <div [ngIf]="someCondition()">{{displayValue}}<$c/div>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -833,7 +833,7 @@ class MatchitHtmlTest : VimTestCase() {
       """
         <div [ngIf]="someCondition()">{$c{displayValue}}</div>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -847,7 +847,7 @@ class MatchitHtmlTest : VimTestCase() {
       """
         <img ${c}src={{imagePath}} alt={{imageDescription}}>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -877,7 +877,7 @@ class MatchitHtmlTest : VimTestCase() {
           <p>paragraph 2</p>
         <$c/div>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -907,7 +907,7 @@ class MatchitHtmlTest : VimTestCase() {
           <p>paragraph 2</p>
         <$c/div>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -925,7 +925,7 @@ class MatchitHtmlTest : VimTestCase() {
         <!--   This div is commented out -->
         <!-- <$c/div> -->
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -943,7 +943,7 @@ class MatchitHtmlTest : VimTestCase() {
         <!--   This div is commented out -->
         <!-- </div> -->
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -961,7 +961,7 @@ class MatchitHtmlTest : VimTestCase() {
         <!--   This div is commented out -->
         <!-- </div> -->
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -979,7 +979,7 @@ class MatchitHtmlTest : VimTestCase() {
         <!--   This div is commented out -->
         <!-- </div> -->
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -997,7 +997,7 @@ class MatchitHtmlTest : VimTestCase() {
         <!--   This div is commented out -->
         <!-- </div> -->
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -1011,7 +1011,7 @@ class MatchitHtmlTest : VimTestCase() {
       """
         <p *ngIf="count > 0"$c>Count is greater than zero</p>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -1031,7 +1031,7 @@ class MatchitHtmlTest : VimTestCase() {
            Header Content
         <$c/h1>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 }

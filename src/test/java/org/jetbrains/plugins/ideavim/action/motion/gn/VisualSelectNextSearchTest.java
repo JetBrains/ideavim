@@ -22,7 +22,7 @@ import com.intellij.idea.TestFor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.motion.search.SearchWholeWordForwardAction;
 import com.maddyhome.idea.vim.api.VimInjectorKt;
-import com.maddyhome.idea.vim.command.CommandState;
+import com.maddyhome.idea.vim.command.VimStateMachine;
 import com.maddyhome.idea.vim.common.Direction;
 import org.jetbrains.plugins.ideavim.SkipNeovimReason;
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim;
@@ -35,7 +35,7 @@ public class VisualSelectNextSearchTest extends VimTestCase {
 
     assertOffset(16);
     assertSelection("hello");
-    assertMode(CommandState.Mode.VISUAL);
+    assertMode(VimStateMachine.Mode.VISUAL);
   }
 
   @TestFor(classes = {SearchWholeWordForwardAction.class})
@@ -43,7 +43,7 @@ public class VisualSelectNextSearchTest extends VimTestCase {
     typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("*" + "b" + "gn"), "h<caret>ello world\nh<caret>ello world hello world");
 
     assertEquals(1, myFixture.getEditor().getCaretModel().getCaretCount());
-    assertMode(CommandState.Mode.VISUAL);
+    assertMode(VimStateMachine.Mode.VISUAL);
   }
 
   @TestFor(classes = {SearchWholeWordForwardAction.class})
@@ -52,7 +52,7 @@ public class VisualSelectNextSearchTest extends VimTestCase {
 
     assertOffset(0);
     assertSelection("h");
-    assertMode(CommandState.Mode.VISUAL);
+    assertMode(VimStateMachine.Mode.VISUAL);
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
@@ -63,7 +63,7 @@ public class VisualSelectNextSearchTest extends VimTestCase {
 
     assertOffset(7);
     assertSelection("test");
-    assertMode(CommandState.Mode.VISUAL);
+    assertMode(VimStateMachine.Mode.VISUAL);
   }
 
   @TestFor(classes = {SearchWholeWordForwardAction.class})
@@ -72,7 +72,7 @@ public class VisualSelectNextSearchTest extends VimTestCase {
 
     assertOffset(16);
     assertSelection("hello");
-    assertMode(CommandState.Mode.VISUAL);
+    assertMode(VimStateMachine.Mode.VISUAL);
   }
 
   @TestFor(classes = {SearchWholeWordForwardAction.class})
@@ -97,7 +97,7 @@ public class VisualSelectNextSearchTest extends VimTestCase {
 
     assertOffset(28);
     assertSelection("hello world hello");
-    assertMode(CommandState.Mode.VISUAL);
+    assertMode(VimStateMachine.Mode.VISUAL);
   }
 
   @TestFor(classes = {SearchWholeWordForwardAction.class})
@@ -106,7 +106,7 @@ public class VisualSelectNextSearchTest extends VimTestCase {
 
     assertOffset(28);
     assertSelection(null);
-    assertMode(CommandState.Mode.COMMAND);
+    assertMode(VimStateMachine.Mode.COMMAND);
   }
 
   public void testNullSelectionDoesNothing() {
@@ -122,7 +122,7 @@ public class VisualSelectNextSearchTest extends VimTestCase {
 
     assertOffset(4);
     assertSelection("hello");
-    assertMode(CommandState.Mode.VISUAL);
+    assertMode(VimStateMachine.Mode.VISUAL);
   }
 
   @TestFor(classes = {SearchWholeWordForwardAction.class})
@@ -131,7 +131,7 @@ public class VisualSelectNextSearchTest extends VimTestCase {
 
     assertOffset(4);
     assertSelection("llo");
-    assertMode(CommandState.Mode.VISUAL);
+    assertMode(VimStateMachine.Mode.VISUAL);
   }
 
   @TestFor(classes = {SearchWholeWordForwardAction.class})
@@ -140,7 +140,7 @@ public class VisualSelectNextSearchTest extends VimTestCase {
 
     assertOffset(10);
     assertSelection("o hello");
-    assertMode(CommandState.Mode.VISUAL);
+    assertMode(VimStateMachine.Mode.VISUAL);
   }
 
   @TestFor(classes = {SearchWholeWordForwardAction.class})
@@ -149,7 +149,7 @@ public class VisualSelectNextSearchTest extends VimTestCase {
 
     assertOffset(28);
     assertSelection("hello world hello");
-    assertMode(CommandState.Mode.VISUAL);
+    assertMode(VimStateMachine.Mode.VISUAL);
   }
 
   @TestFor(classes = {SearchWholeWordForwardAction.class})
@@ -158,7 +158,7 @@ public class VisualSelectNextSearchTest extends VimTestCase {
 
     assertOffset(28);
     assertSelection("hello world hello");
-    assertMode(CommandState.Mode.VISUAL);
+    assertMode(VimStateMachine.Mode.VISUAL);
   }
 
   @TestFor(classes = {SearchWholeWordForwardAction.class})

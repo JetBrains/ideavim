@@ -18,7 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.extension.paragraphmotion
 
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -42,7 +42,7 @@ class ParagraphMotionTest : VimTestCase() {
         |$c
         |where it was settled on some sodden sand
         |hard by the torrent of a mountain pass.""".trimMargin()
-    doTest("}", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest("}", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
@@ -57,7 +57,7 @@ class ParagraphMotionTest : VimTestCase() {
         |$c....
         |where it was settled on some sodden sand
         |hard by the torrent of a mountain pass.""".trimMargin().dotToSpace()
-    doTest("}", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest("}", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
@@ -72,7 +72,7 @@ class ParagraphMotionTest : VimTestCase() {
         |$c.$se...
         |where it was settled on some sodden sand
         |hard by the torrent of a mountain pass.""".trimMargin().dotToSpace()
-    doTest("v}", before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
+    doTest("v}", before, after, VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
@@ -87,7 +87,7 @@ class ParagraphMotionTest : VimTestCase() {
         |....
         |where it was settled on some sodden sand
         |hard by the torrent of a mountain pass.""".trimMargin().dotToSpace()
-    doTest("d}", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest("d}", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
@@ -102,7 +102,7 @@ class ParagraphMotionTest : VimTestCase() {
         |$c
         |where it was settled on some sodden sand
         |hard by the torrent of a mountain pass.""".trimMargin()
-    doTest("{", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest("{", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
@@ -117,7 +117,7 @@ class ParagraphMotionTest : VimTestCase() {
         |$c....
         |where it was settled on some sodden sand
         |hard by the torrent of a mountain pass.""".trimMargin().dotToSpace()
-    doTest("{", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest("{", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
@@ -132,7 +132,7 @@ class ParagraphMotionTest : VimTestCase() {
         |${s}$c....
         |w${se}here it was settled on some sodden sand
         |hard by the torrent of a mountain pass.""".trimMargin().dotToSpace()
-    doTest("v{", before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
+    doTest("v{", before, after, VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
@@ -147,6 +147,6 @@ class ParagraphMotionTest : VimTestCase() {
         |$c
         |where it was settled on some sodden sand
         |hard by the torrent of a mountain pass.""".trimMargin().dotToSpace()
-    doTest("d{", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest("d{", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 }

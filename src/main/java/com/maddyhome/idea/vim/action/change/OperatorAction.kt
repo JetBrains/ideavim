@@ -34,7 +34,7 @@ import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
 import com.maddyhome.idea.vim.helper.MessageHelper
-import com.maddyhome.idea.vim.helper.commandState
+import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.newapi.ij
 import java.util.*
@@ -61,7 +61,7 @@ class OperatorAction : VimActionHandler.SingleExecution() {
 
   override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
     val argument = cmd.argument ?: return false
-    if (!editor.commandState.isDotRepeatInProgress) {
+    if (!editor.vimStateMachine.isDotRepeatInProgress) {
       argumentCaptured = argument
     }
     val range = getMotionRange(editor, context, argument, operatorArguments)

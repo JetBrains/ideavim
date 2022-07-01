@@ -22,7 +22,7 @@ package org.jetbrains.plugins.ideavim.action.motion.leftright
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
@@ -55,7 +55,7 @@ class MotionShiftHomeActionTest : VimOptionTestCase(OptionConstants.keymodelName
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @VimOptionDefaultAll
@@ -87,7 +87,7 @@ class MotionShiftHomeActionTest : VimOptionTestCase(OptionConstants.keymodelName
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
+    doTest(keys, before, after, VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
@@ -113,7 +113,7 @@ class MotionShiftHomeActionTest : VimOptionTestCase(OptionConstants.keymodelName
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
+    doTest(keys, before, after, VimStateMachine.Mode.SELECT, VimStateMachine.SubMode.VISUAL_CHARACTER)
   }
 
   @VimOptionTestConfiguration(
@@ -140,10 +140,10 @@ class MotionShiftHomeActionTest : VimOptionTestCase(OptionConstants.keymodelName
     """.trimIndent()
     configureByText(before)
     typeText(injector.parser.parseKeys("<S-Home>"))
-    assertState(CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    assertState(VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
     typeText(injector.parser.parseKeys("\$v" + "<S-Home>"))
     assertState(after)
-    assertState(CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
+    assertState(VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER)
   }
 
   @VimOptionTestConfiguration(
@@ -170,9 +170,9 @@ class MotionShiftHomeActionTest : VimOptionTestCase(OptionConstants.keymodelName
     """.trimIndent()
     configureByText(before)
     typeText(injector.parser.parseKeys("<S-Home>"))
-    assertState(CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    assertState(VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
     typeText(injector.parser.parseKeys("\$gh" + "<S-Home>"))
     assertState(after)
-    assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
+    assertState(VimStateMachine.Mode.SELECT, VimStateMachine.SubMode.VISUAL_CHARACTER)
   }
 }

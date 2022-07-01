@@ -50,8 +50,8 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.VimShortcutKeyAction
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.command.CommandState.SubMode
+import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.command.VimStateMachine.SubMode
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ExOutputModel.Companion.getInstance
@@ -63,7 +63,7 @@ import com.maddyhome.idea.vim.helper.RunnableHelper.runWriteCommand
 import com.maddyhome.idea.vim.helper.TestInputModel
 import com.maddyhome.idea.vim.helper.getGuiCursorMode
 import com.maddyhome.idea.vim.helper.inBlockSubMode
-import com.maddyhome.idea.vim.helper.mode
+import com.maddyhome.idea.vim.helper.editorMode
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.ToKeysMappingInfo
@@ -439,8 +439,8 @@ abstract class VimTestCase : UsefulTestCase() {
     }
   }
 
-  fun assertMode(expectedMode: CommandState.Mode) {
-    val mode = myFixture.editor.mode
+  fun assertMode(expectedMode: VimStateMachine.Mode) {
+    val mode = myFixture.editor.editorMode
     Assert.assertEquals(expectedMode, mode)
   }
 
@@ -505,25 +505,25 @@ abstract class VimTestCase : UsefulTestCase() {
     before: String,
     after: String,
   ) {
-    doTest(keys, before, after, CommandState.Mode.COMMAND, SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, SubMode.NONE)
   }
 
   fun doTest(
-    keys: List<String>,
-    before: String,
-    after: String,
-    modeAfter: CommandState.Mode,
-    subModeAfter: SubMode,
+      keys: List<String>,
+      before: String,
+      after: String,
+      modeAfter: VimStateMachine.Mode,
+      subModeAfter: SubMode,
   ) {
     doTest(keys.joinToString(separator = ""), before, after, modeAfter, subModeAfter)
   }
 
   fun doTest(
-    keys: String,
-    before: String,
-    after: String,
-    modeAfter: CommandState.Mode,
-    subModeAfter: SubMode,
+      keys: String,
+      before: String,
+      after: String,
+      modeAfter: VimStateMachine.Mode,
+      subModeAfter: SubMode,
   ) {
     configureByText(before)
 
@@ -533,12 +533,12 @@ abstract class VimTestCase : UsefulTestCase() {
   }
 
   fun doTest(
-    keys: String,
-    before: String,
-    after: String,
-    modeAfter: CommandState.Mode,
-    subModeAfter: SubMode,
-    fileType: FileType,
+      keys: String,
+      before: String,
+      after: String,
+      modeAfter: VimStateMachine.Mode,
+      subModeAfter: SubMode,
+      fileType: FileType,
   ) {
     configureByText(fileType, before)
 
@@ -551,12 +551,12 @@ abstract class VimTestCase : UsefulTestCase() {
   }
 
   fun doTest(
-    keys: String,
-    before: String,
-    after: String,
-    modeAfter: CommandState.Mode,
-    subModeAfter: SubMode,
-    fileName: String,
+      keys: String,
+      before: String,
+      after: String,
+      modeAfter: VimStateMachine.Mode,
+      subModeAfter: SubMode,
+      fileName: String,
   ) {
     configureByText(fileName, before)
 
@@ -568,7 +568,7 @@ abstract class VimTestCase : UsefulTestCase() {
     NeovimTesting.assertState(myFixture.editor, this)
   }
 
-  protected fun performTest(keys: String, after: String, modeAfter: CommandState.Mode, subModeAfter: SubMode) {
+  protected fun performTest(keys: String, after: String, modeAfter: VimStateMachine.Mode, subModeAfter: SubMode) {
     typeText(injector.parser.parseKeys(keys))
     PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
     @Suppress("IdeaVimAssertState")
@@ -577,12 +577,12 @@ abstract class VimTestCase : UsefulTestCase() {
   }
 
   fun doTest(
-    keys: List<KeyStroke>,
-    before: String,
-    after: String?,
-    modeAfter: CommandState.Mode,
-    subModeAfter: SubMode,
-    afterEditorInitialized: (Editor) -> Unit,
+      keys: List<KeyStroke>,
+      before: String,
+      after: String?,
+      modeAfter: VimStateMachine.Mode,
+      subModeAfter: SubMode,
+      afterEditorInitialized: (Editor) -> Unit,
   ) {
     configureByText(before)
     afterEditorInitialized(myFixture.editor)
@@ -597,7 +597,7 @@ abstract class VimTestCase : UsefulTestCase() {
     NeovimTesting.setRegister(register, keys, this)
   }
 
-  protected fun assertState(modeAfter: CommandState.Mode, subModeAfter: SubMode) {
+  protected fun assertState(modeAfter: VimStateMachine.Mode, subModeAfter: SubMode) {
     assertMode(modeAfter)
     assertSubMode(subModeAfter)
     assertCaretsVisualAttributes()

@@ -19,7 +19,7 @@
 package org.jetbrains.plugins.ideavim.extension.entiretextobj
 
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.helper.experimentalApi
 import org.jetbrains.plugins.ideavim.JavaVimTestCase
@@ -37,35 +37,35 @@ class VimTextObjEntireExtensionTest : JavaVimTestCase() {
   // |gU| |ae|
   fun testUpperCaseEntireBuffer() {
     doTest(injector.parser.parseKeys("gUae"), poem, "<caret>$poemUC")
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
     assertSelection(null)
   }
 
   // |gu| |ae|
   fun testLowerCaseEntireBuffer() {
     doTest(injector.parser.parseKeys("guae"), poem, "<caret>$poemLC")
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
     assertSelection(null)
   }
 
   // |c| |ae|
   fun testChangeEntireBuffer() {
     doTest(injector.parser.parseKeys("cae"), poem, "<caret>")
-    assertMode(CommandState.Mode.INSERT)
+    assertMode(VimStateMachine.Mode.INSERT)
     assertSelection(null)
   }
 
   // |d| |ae|
   fun testDeleteEntireBuffer() {
     doTest(injector.parser.parseKeys("dae"), poem, "<caret>")
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
     assertSelection(null)
   }
 
   // |y| |ae|
   fun testYankEntireBuffer() {
     doTest(injector.parser.parseKeys("yae"), poem, "<caret>$poemNoCaret")
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
     myFixture.checkResult(poemNoCaret)
     assertSelection(null)
   }
@@ -77,7 +77,7 @@ class VimTextObjEntireExtensionTest : JavaVimTestCase() {
       "\n  \n \n${poem}\n \n  \n",
       "\n  \n \n<caret>${poemUC}\n \n  \n"
     )
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
     assertSelection(null)
   }
 
@@ -88,7 +88,7 @@ class VimTextObjEntireExtensionTest : JavaVimTestCase() {
       "\n  \n \n${poem}\n \n  \n",
       "\n  \n \n<caret>${poemLC}\n \n  \n"
     )
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
     assertSelection(null)
   }
 
@@ -99,7 +99,7 @@ class VimTextObjEntireExtensionTest : JavaVimTestCase() {
       "\n  \n \n${poem}\n  \n \n",
       "\n  \n \n<caret>\n\n  \n \n"
     ) // additional \n because poem ends with a \n
-    assertMode(CommandState.Mode.INSERT)
+    assertMode(VimStateMachine.Mode.INSERT)
     assertSelection(null)
   }
 
@@ -119,7 +119,7 @@ class VimTextObjEntireExtensionTest : JavaVimTestCase() {
         "\n  \n \n<caret>\n\n  \n \n"
       }
     ) // additional \n because poem ends with a \n
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
     assertSelection(null)
   }
 
@@ -130,7 +130,7 @@ class VimTextObjEntireExtensionTest : JavaVimTestCase() {
       "\n  \n \n${poem}\n  \n \n",
       "\n  \n \n<caret>${poemNoCaret}\n  \n \n"
     )
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
     myFixture.checkResult("\n  \n \n${poemNoCaret}\n  \n \n")
     assertSelection(null)
   }

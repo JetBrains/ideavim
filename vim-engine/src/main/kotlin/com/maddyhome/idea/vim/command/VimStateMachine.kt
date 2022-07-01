@@ -37,7 +37,7 @@ import javax.swing.KeyStroke
  *
  * // TODO: 21.02.2022 This constructor should be empty
  */
-class CommandState(private val editor: VimEditor?) {
+class VimStateMachine(private val editor: VimEditor?) {
   val commandBuilder = CommandBuilder(getKeyRootNode(MappingMode.NORMAL))
   private val modeStates = Stack<ModeState>()
   val mappingState = MappingState()
@@ -384,15 +384,15 @@ class CommandState(private val editor: VimEditor?) {
   }
 
   companion object {
-    private val logger = vimLogger<CommandState>()
+    private val logger = vimLogger<VimStateMachine>()
     private val defaultModeState = ModeState(Mode.COMMAND, SubMode.NONE)
-    private val globalState = CommandState(null)
+    private val globalState = VimStateMachine(null)
 
     /**
      * COMPATIBILITY-LAYER: Method switched to Any (was VimEditor)
      */
     @JvmStatic
-    fun getInstance(editor: Any?): CommandState {
+    fun getInstance(editor: Any?): VimStateMachine {
       return if (editor == null || injector.optionService.isSet(OptionScope.GLOBAL, OptionConstants.ideaglobalmodeName)) {
         globalState
       } else {

@@ -21,7 +21,7 @@ package org.jetbrains.plugins.ideavim.action;
 import com.google.common.collect.Lists;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.VimInjectorKt;
-import com.maddyhome.idea.vim.command.CommandState;
+import com.maddyhome.idea.vim.command.VimStateMachine;
 import com.maddyhome.idea.vim.mark.Mark;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import org.jetbrains.plugins.ideavim.SkipNeovimReason;
@@ -148,6 +148,6 @@ public class MarkTest extends VimTestCase {
   // |i| |`]|
   public void testGotoLastChangePositionEnd() {
     doTest(Lists.newArrayList("yiw", "P", "gg", "`]"), "one two\n" + "<caret>three\n" + "four five\n",
-           "one two\n" + "thre<caret>ethree\n" + "four five\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+           "one two\n" + "thre<caret>ethree\n" + "four five\n", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE);
   }
 }

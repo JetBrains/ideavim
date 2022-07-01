@@ -34,7 +34,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.command.TextObjectVisualType
 import com.maddyhome.idea.vim.common.CommandAliasHandler
@@ -52,7 +52,7 @@ import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.PsiHelper
-import com.maddyhome.idea.vim.helper.commandState
+import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
@@ -63,8 +63,8 @@ class CommentaryExtension : VimExtension {
 
   companion object {
     fun doCommentary(editor: VimEditor, context: ExecutionContext, range: TextRange, selectionType: SelectionType, resetCaret: Boolean): Boolean {
-      val mode = editor.commandState.mode
-      if (mode !== CommandState.Mode.VISUAL) {
+      val mode = editor.vimStateMachine.mode
+      if (mode !== VimStateMachine.Mode.VISUAL) {
         editor.ij.selectionModel.setSelection(range.startOffset, range.endOffset)
       }
 
@@ -82,7 +82,7 @@ class CommentaryExtension : VimExtension {
             injector.actionExecutor.executeAction(actions[1], context)
         } finally {
           // Remove the selection, if we added it
-          if (mode !== CommandState.Mode.VISUAL) {
+          if (mode !== VimStateMachine.Mode.VISUAL) {
             editor.removeSelection()
           }
 
@@ -152,7 +152,7 @@ class CommentaryExtension : VimExtension {
     override val isRepeatable = true
 
     override fun execute(editor: VimEditor, context: ExecutionContext) {
-      val commandState = editor.commandState
+      val commandState = editor.vimStateMachine
       val count = maxOf(1, commandState.commandBuilder.count)
 
       val textObjectHandler = this

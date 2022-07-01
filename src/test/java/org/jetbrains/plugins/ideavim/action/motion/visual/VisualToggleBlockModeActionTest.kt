@@ -22,7 +22,7 @@ package org.jetbrains.plugins.ideavim.action.motion.visual
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
@@ -48,7 +48,7 @@ class VisualToggleBlockModeActionTest : VimTestCase() {
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
       """.trimIndent(),
-      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK
+      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_BLOCK
     )
   }
 
@@ -71,7 +71,7 @@ class VisualToggleBlockModeActionTest : VimTestCase() {
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
       """.trimIndent(),
-      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK
+      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_BLOCK
     )
   }
 
@@ -94,14 +94,14 @@ class VisualToggleBlockModeActionTest : VimTestCase() {
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
       """.trimIndent(),
-      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK
+      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_BLOCK
     )
   }
 
   fun `test on empty file`() {
     doTest(
       "<C-V>", "", "",
-      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK
+      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_BLOCK
     )
   }
 
@@ -118,6 +118,6 @@ class VisualToggleBlockModeActionTest : VimTestCase() {
     )
     VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.selectmodeName, VimString("cmd"))
     typeText(injector.parser.parseKeys("<C-V>"))
-    assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_BLOCK)
+    assertState(VimStateMachine.Mode.SELECT, VimStateMachine.SubMode.VISUAL_BLOCK)
   }
 }

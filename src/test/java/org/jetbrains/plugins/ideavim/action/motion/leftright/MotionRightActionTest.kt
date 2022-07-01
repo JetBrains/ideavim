@@ -20,7 +20,7 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.leftright
 
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.options.OptionConstants
 import org.jetbrains.plugins.ideavim.OptionValueType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -51,7 +51,7 @@ class MotionRightActionTest : VimOptionTestCase(OptionConstants.virtualeditName)
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -75,7 +75,7 @@ class MotionRightActionTest : VimOptionTestCase(OptionConstants.virtualeditName)
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -99,7 +99,7 @@ class MotionRightActionTest : VimOptionTestCase(OptionConstants.virtualeditName)
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -118,7 +118,7 @@ class MotionRightActionTest : VimOptionTestCase(OptionConstants.virtualeditName)
             Today it is not working
             The test is like that.
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -137,7 +137,7 @@ class MotionRightActionTest : VimOptionTestCase(OptionConstants.virtualeditName)
             Today it is not working
             The test is like that.
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -162,7 +162,7 @@ class MotionRightActionTest : VimOptionTestCase(OptionConstants.virtualeditName)
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -187,7 +187,7 @@ class MotionRightActionTest : VimOptionTestCase(OptionConstants.virtualeditName)
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -212,7 +212,7 @@ class MotionRightActionTest : VimOptionTestCase(OptionConstants.virtualeditName)
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -236,7 +236,7 @@ class MotionRightActionTest : VimOptionTestCase(OptionConstants.virtualeditName)
         where it was settled on some sodden sand
         hard by the torrent of a mountain pass
       """.trimIndent().dotToTab(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -260,7 +260,7 @@ class MotionRightActionTest : VimOptionTestCase(OptionConstants.virtualeditName)
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
       """.trimIndent(),
-      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER
+      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER
     )
   }
 
@@ -284,7 +284,7 @@ class MotionRightActionTest : VimOptionTestCase(OptionConstants.virtualeditName)
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
       """.trimIndent(),
-      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK
+      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_BLOCK
     )
   }
 }

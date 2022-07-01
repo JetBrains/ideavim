@@ -28,7 +28,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.CharacterPosition
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
-import com.maddyhome.idea.vim.helper.commandState
+import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.register.RegisterConstants.ALTERNATE_BUFFER_REGISTER
 import com.maddyhome.idea.vim.register.RegisterConstants.BLACK_HOLE_REGISTER
@@ -153,7 +153,7 @@ internal object NeovimTesting {
   }
 
   private fun assertMode(editor: Editor) {
-    val ideavimState = editor.vim.commandState.toVimNotation()
+    val ideavimState = editor.vim.vimStateMachine.toVimNotation()
     val neovimState = neovimApi.mode.get().mode
     assertEquals(neovimState, ideavimState)
   }

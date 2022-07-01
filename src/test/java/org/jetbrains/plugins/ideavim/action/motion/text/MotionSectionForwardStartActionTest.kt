@@ -1,6 +1,6 @@
 package org.jetbrains.plugins.ideavim.action.motion.text
 
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class MotionSectionForwardStartActionTest : VimTestCase() {
@@ -37,7 +37,7 @@ class MotionSectionForwardStartActionTest : VimTestCase() {
         }
       }
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -74,7 +74,7 @@ class MotionSectionForwardStartActionTest : VimTestCase() {
         }
       }
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -111,7 +111,7 @@ class MotionSectionForwardStartActionTest : VimTestCase() {
         }
       $c}
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 }

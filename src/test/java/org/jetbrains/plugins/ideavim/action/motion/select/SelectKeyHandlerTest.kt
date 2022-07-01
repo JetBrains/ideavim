@@ -18,7 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.select
 
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -49,8 +49,8 @@ class SelectKeyHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      CommandState.Mode.INSERT,
-      CommandState.SubMode.NONE
+      VimStateMachine.Mode.INSERT,
+      VimStateMachine.SubMode.NONE
     )
   }
 
@@ -75,8 +75,8 @@ class SelectKeyHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      CommandState.Mode.INSERT,
-      CommandState.SubMode.NONE
+      VimStateMachine.Mode.INSERT,
+      VimStateMachine.SubMode.NONE
     )
   }
 
@@ -100,8 +100,8 @@ class SelectKeyHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      CommandState.Mode.INSERT,
-      CommandState.SubMode.NONE
+      VimStateMachine.Mode.INSERT,
+      VimStateMachine.SubMode.NONE
     )
   }
 
@@ -125,8 +125,8 @@ class SelectKeyHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      CommandState.Mode.INSERT,
-      CommandState.SubMode.NONE
+      VimStateMachine.Mode.INSERT,
+      VimStateMachine.SubMode.NONE
     )
   }
 
@@ -151,8 +151,8 @@ class SelectKeyHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      CommandState.Mode.INSERT,
-      CommandState.SubMode.NONE
+      VimStateMachine.Mode.INSERT,
+      VimStateMachine.SubMode.NONE
     )
   }
 
@@ -177,8 +177,8 @@ class SelectKeyHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      CommandState.Mode.INSERT,
-      CommandState.SubMode.NONE
+      VimStateMachine.Mode.INSERT,
+      VimStateMachine.SubMode.NONE
     )
   }
 
@@ -203,8 +203,8 @@ class SelectKeyHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      CommandState.Mode.INSERT,
-      CommandState.SubMode.NONE
+      VimStateMachine.Mode.INSERT,
+      VimStateMachine.SubMode.NONE
     )
   }
 
@@ -229,8 +229,8 @@ class SelectKeyHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      CommandState.Mode.INSERT,
-      CommandState.SubMode.NONE
+      VimStateMachine.Mode.INSERT,
+      VimStateMachine.SubMode.NONE
     )
   }
 
@@ -255,8 +255,8 @@ class SelectKeyHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      CommandState.Mode.INSERT,
-      CommandState.SubMode.NONE
+      VimStateMachine.Mode.INSERT,
+      VimStateMachine.SubMode.NONE
     )
   }
 
@@ -291,8 +291,8 @@ class SelectKeyHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      CommandState.Mode.INSERT,
-      CommandState.SubMode.NONE
+      VimStateMachine.Mode.INSERT,
+      VimStateMachine.SubMode.NONE
     )
   }
 
@@ -317,8 +317,8 @@ class SelectKeyHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      CommandState.Mode.INSERT,
-      CommandState.SubMode.NONE
+      VimStateMachine.Mode.INSERT,
+      VimStateMachine.SubMode.NONE
     )
   }
 
@@ -343,10 +343,10 @@ class SelectKeyHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE
     )
     assertCaretsVisualAttributes()
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
   }
 }

@@ -27,7 +27,7 @@ import com.intellij.openapi.editor.RangeMarker
 import com.intellij.openapi.editor.markup.RangeHighlighter
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.UserDataHolder
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.group.visual.VisualChange
@@ -77,7 +77,7 @@ var Caret.vimInsertStart: RangeMarker by userDataOr {
 // ------------------ Editor
 fun unInitializeEditor(editor: Editor) {
   editor.vimLastSelectionType = null
-  editor.vimCommandState = null
+  editor.vimStateMachine = null
   editor.vimMorePanel = null
   editor.vimExOutput = null
   editor.vimLastHighlighters = null
@@ -91,7 +91,7 @@ var Editor.vimIncsearchCurrentMatchOffset: Int? by userData()
  * @see :help visualmode()
  */
 var Editor.vimLastSelectionType: SelectionType? by userData()
-var Editor.vimCommandState: CommandState? by userData()
+var Editor.vimStateMachine: VimStateMachine? by userData()
 var Editor.vimEditorGroup: Boolean by userDataOr { false }
 var Editor.vimLineNumbersInitialState: Boolean by userDataOr { false }
 var Editor.vimHasRelativeLineNumbersInstalled: Boolean by userDataOr { false }
@@ -103,7 +103,7 @@ var Editor.vimTestInputModel: TestInputModel? by userData()
  * Checks whether a keeping visual mode visual operator action is performed on editor.
  */
 var Editor.vimKeepingVisualOperatorAction: Boolean by userDataOr { false }
-var Editor.vimChangeActionSwitchMode: CommandState.Mode? by userData()
+var Editor.vimChangeActionSwitchMode: VimStateMachine.Mode? by userData()
 
 /**
  * Function for delegated properties.

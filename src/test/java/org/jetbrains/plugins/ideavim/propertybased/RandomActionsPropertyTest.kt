@@ -23,7 +23,7 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.testFramework.PlatformTestUtil
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.CommandNode
-import com.maddyhome.idea.vim.helper.commandState
+import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.jetCheck.Generator
@@ -95,7 +95,7 @@ class RandomActionsPropertyTest : VimPropertyTestBase() {
 
 private class AvailableActions(private val editor: Editor) : ImperativeCommand {
   override fun performCommand(env: ImperativeCommand.Environment) {
-    val currentNode = editor.vim.commandState.commandBuilder.getCurrentTrie()
+    val currentNode = editor.vim.vimStateMachine.commandBuilder.getCurrentTrie()
 
     val possibleKeys = currentNode.keys.toList().sortedBy { injector.parser.toKeyNotation(it) }
     val keyGenerator = Generator.integers(0, possibleKeys.lastIndex)

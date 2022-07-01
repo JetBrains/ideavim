@@ -20,7 +20,7 @@
 
 package org.jetbrains.plugins.ideavim.action.change.change
 
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 
@@ -43,7 +43,7 @@ class ChangeVisualLinesEndActionTest : VimTestCase() {
             where it was settled on some sodden sand
             ${c}
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 
   fun `test last empty line`() {
@@ -66,7 +66,7 @@ class ChangeVisualLinesEndActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.
             ${c}
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 
   @VimBehaviorDiffers(
@@ -99,6 +99,6 @@ class ChangeVisualLinesEndActionTest : VimTestCase() {
             ${c}
             
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 }

@@ -19,7 +19,7 @@
 package org.jetbrains.plugins.ideavim.extension.textobjindent
 
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.JavaVimTestCase
 
 /**
@@ -39,7 +39,7 @@ class VimIndentObjectTest : JavaVimTestCase() {
       """.trimIndent(),
       ""
     )
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
     assertSelection(null)
   }
 
@@ -54,7 +54,7 @@ class VimIndentObjectTest : JavaVimTestCase() {
       """.trimIndent(),
       ""
     )
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
     assertSelection(null)
   }
 
@@ -69,7 +69,7 @@ class VimIndentObjectTest : JavaVimTestCase() {
       """.trimIndent(),
       ""
     )
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
     assertSelection(null)
   }
 
@@ -87,7 +87,7 @@ class VimIndentObjectTest : JavaVimTestCase() {
         four
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
     assertSelection(null)
   }
 
@@ -104,7 +104,7 @@ class VimIndentObjectTest : JavaVimTestCase() {
         four
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
     assertSelection(null)
   }
 
@@ -119,7 +119,7 @@ class VimIndentObjectTest : JavaVimTestCase() {
       """.trimIndent(),
       ""
     )
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
     assertSelection(null)
   }
 
@@ -143,7 +143,7 @@ class VimIndentObjectTest : JavaVimTestCase() {
         four
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
     assertSelection(null)
   }
 
@@ -169,7 +169,7 @@ class VimIndentObjectTest : JavaVimTestCase() {
         four
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
     assertSelection(null)
   }
 
@@ -187,7 +187,7 @@ class VimIndentObjectTest : JavaVimTestCase() {
         four
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
     assertSelection(null)
   }
 
@@ -205,7 +205,7 @@ class VimIndentObjectTest : JavaVimTestCase() {
         four
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
     assertSelection(null)
   }
 
@@ -224,7 +224,7 @@ class VimIndentObjectTest : JavaVimTestCase() {
         four
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
     assertSelection(null)
   }
 
@@ -245,7 +245,7 @@ class VimIndentObjectTest : JavaVimTestCase() {
         five
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
     assertSelection(null)
   }
 
@@ -266,7 +266,7 @@ class VimIndentObjectTest : JavaVimTestCase() {
 
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
     assertSelection(null)
   }
 }

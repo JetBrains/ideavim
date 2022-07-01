@@ -1,13 +1,13 @@
 package com.maddyhome.idea.vim.api
 
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.group.visual.VisualChange
 import com.maddyhome.idea.vim.group.visual.VisualOperation
-import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.pushSelectMode
 import com.maddyhome.idea.vim.helper.pushVisualMode
 import com.maddyhome.idea.vim.helper.subMode
+import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
@@ -21,8 +21,8 @@ abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
   override val selectionAdj: Int
     get() = if (exclusiveSelection) 0 else 1
 
-  override fun enterSelectMode(editor: VimEditor, subMode: CommandState.SubMode): Boolean {
-    editor.commandState.pushSelectMode(subMode)
+  override fun enterSelectMode(editor: VimEditor, subMode: VimStateMachine.SubMode): Boolean {
+    editor.vimStateMachine.pushSelectMode(subMode)
     editor.forEachCaret { it.vimSelectionStart = it.vimLeadSelectionOffset }
     return true
   }
@@ -34,12 +34,12 @@ abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
    * If visual mode is enabled, but [subMode] differs, update visual according to new [subMode]
    * If visual mode is enabled with the same [subMode], disable it
    */
-  override fun toggleVisual(editor: VimEditor, count: Int, rawCount: Int, subMode: CommandState.SubMode): Boolean {
+  override fun toggleVisual(editor: VimEditor, count: Int, rawCount: Int, subMode: VimStateMachine.SubMode): Boolean {
     if (!editor.inVisualMode) {
       // Enable visual subMode
       if (rawCount > 0) {
         val primarySubMode = editor.primaryCaret().vimLastVisualOperatorRange?.type?.toSubMode() ?: subMode
-        editor.commandState.pushVisualMode(primarySubMode)
+        editor.vimStateMachine.pushVisualMode(primarySubMode)
 
         editor.forEachCaret {
           val range = it.vimLastVisualOperatorRange ?: VisualChange.default(subMode)
@@ -52,7 +52,7 @@ abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
           it.vimSetSelection(it.offset.point, end, true)
         }
       } else {
-        editor.commandState.pushVisualMode(subMode)
+        editor.vimStateMachine.pushVisualMode(subMode)
         editor.forEachCaret { it.vimSetSelection(it.offset.point) }
       }
       return true
@@ -101,9 +101,9 @@ abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
     return true
   }
 
-  override fun autodetectVisualSubmode(editor: VimEditor): CommandState.SubMode {
+  override fun autodetectVisualSubmode(editor: VimEditor): VimStateMachine.SubMode {
     if (editor.carets().size > 1 && seemsLikeBlockMode(editor)) {
-      return CommandState.SubMode.VISUAL_BLOCK
+      return VimStateMachine.SubMode.VISUAL_BLOCK
     }
     val all = editor.nativeCarets().all { caret ->
       // Detect if visual mode is character wise or line wise
@@ -116,8 +116,8 @@ abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
       val lineEndOfSelectionEnd = injector.engineEditorHelper.getLineEndOffset(editor, logicalEndLine, true)
       lineStartOfSelectionStart == selectionStart && (lineEndOfSelectionEnd + 1 == selectionEnd || lineEndOfSelectionEnd == selectionEnd)
     }
-    if (all) return CommandState.SubMode.VISUAL_LINE
-    return CommandState.SubMode.VISUAL_CHARACTER
+    if (all) return VimStateMachine.SubMode.VISUAL_LINE
+    return VimStateMachine.SubMode.VISUAL_CHARACTER
   }
 
   /**
@@ -134,10 +134,10 @@ abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
    * - DOES NOT move caret
    * - DOES NOT check if carets actually have any selection
    */
-  override fun enterVisualMode(editor: VimEditor, subMode: CommandState.SubMode?): Boolean {
+  override fun enterVisualMode(editor: VimEditor, subMode: VimStateMachine.SubMode?): Boolean {
     val autodetectedSubMode = subMode ?: autodetectVisualSubmode(editor)
-    editor.commandState.pushModes(CommandState.Mode.VISUAL, autodetectedSubMode)
-    if (autodetectedSubMode == CommandState.SubMode.VISUAL_BLOCK) {
+    editor.vimStateMachine.pushModes(VimStateMachine.Mode.VISUAL, autodetectedSubMode)
+    if (autodetectedSubMode == VimStateMachine.SubMode.VISUAL_BLOCK) {
       editor.primaryCaret().run { vimSelectionStart = vimLeadSelectionOffset }
     } else {
       editor.nativeCarets().forEach { it.vimSelectionStart = it.vimLeadSelectionOffset }

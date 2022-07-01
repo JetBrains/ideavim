@@ -18,7 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.extension.matchit
 
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -48,7 +48,7 @@ class MatchitCMakeTest : VimTestCase() {
           message("Non-linux system")
         endif()
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "CMakeLists.txt"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "CMakeLists.txt"
     )
   }
 
@@ -70,7 +70,7 @@ class MatchitCMakeTest : VimTestCase() {
           message("Non-linux system")
         ${c}endif()
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "CMakeLists.txt"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "CMakeLists.txt"
     )
   }
 
@@ -92,7 +92,7 @@ class MatchitCMakeTest : VimTestCase() {
           message("Non-linux system")
         endif()
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "CMakeLists.txt"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "CMakeLists.txt"
     )
   }
 
@@ -122,7 +122,7 @@ class MatchitCMakeTest : VimTestCase() {
           message("Unknown system")
         endif()
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "CMakeLists.txt"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "CMakeLists.txt"
     )
   }
 
@@ -152,7 +152,7 @@ class MatchitCMakeTest : VimTestCase() {
           message("Unknown system")
         endif()
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "CMakeLists.txt"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "CMakeLists.txt"
     )
   }
 
@@ -182,7 +182,7 @@ class MatchitCMakeTest : VimTestCase() {
           message("Unknown system")
         endif()
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "CMakeLists.txt"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "CMakeLists.txt"
     )
   }
 
@@ -212,7 +212,7 @@ class MatchitCMakeTest : VimTestCase() {
           message("Unknown system")
         ${c}endif()
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "CMakeLists.txt"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "CMakeLists.txt"
     )
   }
 
@@ -242,7 +242,7 @@ class MatchitCMakeTest : VimTestCase() {
           message("Unknown system")
         endif()
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "CMakeLists.txt"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "CMakeLists.txt"
     )
   }
 
@@ -260,7 +260,7 @@ class MatchitCMakeTest : VimTestCase() {
           message(STATUS "X=${"\${X}"}")
         ${c}endforeach()
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "CMakeLists.txt"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "CMakeLists.txt"
     )
   }
 
@@ -278,7 +278,7 @@ class MatchitCMakeTest : VimTestCase() {
           message(STATUS "X=${"\${X}"}")
         endforeach()
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "CMakeLists.txt"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "CMakeLists.txt"
     )
   }
 
@@ -302,7 +302,7 @@ class MatchitCMakeTest : VimTestCase() {
           message(STATUS "X=${"\${X}"}")
         endforeach()
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "CMakeLists.txt"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "CMakeLists.txt"
     )
   }
 
@@ -326,7 +326,7 @@ class MatchitCMakeTest : VimTestCase() {
           message(STATUS "X=${"\${X}"}")
         ${c}endforeach()
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "CMakeLists.txt"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "CMakeLists.txt"
     )
   }
 
@@ -344,7 +344,7 @@ class MatchitCMakeTest : VimTestCase() {
           MATH(EXPR VAR "${"\${index}"}+1")
         ${c}endwhile()
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "CMakeLists.txt"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "CMakeLists.txt"
     )
   }
 
@@ -362,7 +362,7 @@ class MatchitCMakeTest : VimTestCase() {
           MATH(EXPR VAR "${"\${index}"}+1")
         endwhile()
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "CMakeLists.txt"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "CMakeLists.txt"
     )
   }
 
@@ -386,7 +386,7 @@ class MatchitCMakeTest : VimTestCase() {
           endif()
         endwhile()
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "CMakeLists.txt"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "CMakeLists.txt"
     )
   }
 
@@ -410,7 +410,7 @@ class MatchitCMakeTest : VimTestCase() {
           endif()
         ${c}endwhile()
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "CMakeLists.txt"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "CMakeLists.txt"
     )
   }
 
@@ -428,7 +428,7 @@ class MatchitCMakeTest : VimTestCase() {
           bar(x y z)
         ${c}endfunction()
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "CMakeLists.txt"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "CMakeLists.txt"
     )
   }
 
@@ -446,7 +446,7 @@ class MatchitCMakeTest : VimTestCase() {
           bar(x y z)
         endfunction()
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "CMakeLists.txt"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "CMakeLists.txt"
     )
   }
 
@@ -464,7 +464,7 @@ class MatchitCMakeTest : VimTestCase() {
           message("arg = ${"\${arg}\""}")
         ${c}endmacro()
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "CMakeLists.txt"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "CMakeLists.txt"
     )
   }
 
@@ -482,7 +482,7 @@ class MatchitCMakeTest : VimTestCase() {
           message("arg = ${"\${arg}\""}")
         endmacro()
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "CMakeLists.txt"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "CMakeLists.txt"
     )
   }
 
@@ -506,7 +506,7 @@ class MatchitCMakeTest : VimTestCase() {
           message("Non-linux system")
         ${c}endif()
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "CMakeLists.txt"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "CMakeLists.txt"
     )
   }
 
@@ -528,7 +528,7 @@ class MatchitCMakeTest : VimTestCase() {
           message("Non-linux system")
         endif()
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "CMakeLists.txt"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "CMakeLists.txt"
     )
   }
 
@@ -550,7 +550,7 @@ class MatchitCMakeTest : VimTestCase() {
           message("Non-linux system")
         endif()
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "CMakeLists.txt"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "CMakeLists.txt"
     )
   }
 
@@ -580,7 +580,7 @@ class MatchitCMakeTest : VimTestCase() {
           message("Unknown system")
         ${c}endif()
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "CMakeLists.txt"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "CMakeLists.txt"
     )
   }
 
@@ -610,7 +610,7 @@ class MatchitCMakeTest : VimTestCase() {
           message("Unknown system")
         endif()
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "CMakeLists.txt"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "CMakeLists.txt"
     )
   }
 
@@ -640,7 +640,7 @@ class MatchitCMakeTest : VimTestCase() {
           message("Unknown system")
         endif()
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "CMakeLists.txt"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "CMakeLists.txt"
     )
   }
 
@@ -670,7 +670,7 @@ class MatchitCMakeTest : VimTestCase() {
           message("Unknown system")
         endif()
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "CMakeLists.txt"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "CMakeLists.txt"
     )
   }
 
@@ -700,7 +700,7 @@ class MatchitCMakeTest : VimTestCase() {
           message("Unknown system")
         endif()
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "CMakeLists.txt"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "CMakeLists.txt"
     )
   }
 
@@ -718,7 +718,7 @@ class MatchitCMakeTest : VimTestCase() {
           message(STATUS "X=${"\${X}"}")
         ${c}endforeach()
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "CMakeLists.txt"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "CMakeLists.txt"
     )
   }
 
@@ -736,7 +736,7 @@ class MatchitCMakeTest : VimTestCase() {
           message(STATUS "X=${"\${X}"}")
         endforeach()
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "CMakeLists.txt"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "CMakeLists.txt"
     )
   }
 
@@ -760,7 +760,7 @@ class MatchitCMakeTest : VimTestCase() {
           message(STATUS "X=${"\${X}"}")
         ${c}endforeach()
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "CMakeLists.txt"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "CMakeLists.txt"
     )
   }
 
@@ -784,7 +784,7 @@ class MatchitCMakeTest : VimTestCase() {
           message(STATUS "X=${"\${X}"}")
         endforeach()
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "CMakeLists.txt"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "CMakeLists.txt"
     )
   }
 
@@ -808,7 +808,7 @@ class MatchitCMakeTest : VimTestCase() {
           message(STATUS "X=${"\${X}"}")
         endforeach()
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "CMakeLists.txt"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "CMakeLists.txt"
     )
   }
 
@@ -826,7 +826,7 @@ class MatchitCMakeTest : VimTestCase() {
           MATH(EXPR VAR "${"\${index}"}+1")
         ${c}endwhile()
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "CMakeLists.txt"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "CMakeLists.txt"
     )
   }
 
@@ -844,7 +844,7 @@ class MatchitCMakeTest : VimTestCase() {
           MATH(EXPR VAR "${"\${index}"}+1")
         endwhile()
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "CMakeLists.txt"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "CMakeLists.txt"
     )
   }
 
@@ -868,7 +868,7 @@ class MatchitCMakeTest : VimTestCase() {
           endif()
         ${c}endwhile()
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "CMakeLists.txt"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "CMakeLists.txt"
     )
   }
 
@@ -892,7 +892,7 @@ class MatchitCMakeTest : VimTestCase() {
           endif()
         endwhile()
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "CMakeLists.txt"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "CMakeLists.txt"
     )
   }
 
@@ -916,7 +916,7 @@ class MatchitCMakeTest : VimTestCase() {
           endif()
         endwhile()
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "CMakeLists.txt"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "CMakeLists.txt"
     )
   }
 
@@ -934,7 +934,7 @@ class MatchitCMakeTest : VimTestCase() {
           bar(x y z)
         ${c}endfunction()
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "CMakeLists.txt"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "CMakeLists.txt"
     )
   }
 
@@ -952,7 +952,7 @@ class MatchitCMakeTest : VimTestCase() {
           bar(x y z)
         endfunction()
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "CMakeLists.txt"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "CMakeLists.txt"
     )
   }
 
@@ -970,7 +970,7 @@ class MatchitCMakeTest : VimTestCase() {
           message("arg = ${"\${arg}\""}")
         ${c}endmacro()
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "CMakeLists.txt"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "CMakeLists.txt"
     )
   }
 
@@ -988,7 +988,7 @@ class MatchitCMakeTest : VimTestCase() {
           message("arg = ${"\${arg}\""}")
         endmacro()
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "CMakeLists.txt"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "CMakeLists.txt"
     )
   }
 }

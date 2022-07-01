@@ -20,7 +20,7 @@ package org.jetbrains.plugins.ideavim.action.change.insert
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
@@ -39,7 +39,7 @@ class InsertEnterActionTest : VimTestCase() {
         |${c}all rocks and lavender and tufted grass,
         |where it was settled on some sodden sand
         |hard by the torrent of a mountain pass.""".trimMargin()
-    doTest(listOf("i", "<Enter>"), before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    doTest(listOf("i", "<Enter>"), before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 
   fun `test insert enter with C-M`() {
@@ -52,7 +52,7 @@ class InsertEnterActionTest : VimTestCase() {
         |${c}all rocks and lavender and tufted grass,
         |where it was settled on some sodden sand
         |hard by the torrent of a mountain pass.""".trimMargin()
-    doTest(listOf("i", "<C-M>"), before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    doTest(listOf("i", "<C-M>"), before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)

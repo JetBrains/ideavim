@@ -18,7 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.text
 
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 
@@ -34,7 +34,7 @@ class MotionSectionForwardEndActionTest : VimTestCase() {
           hard by the torrent of a mountain pass.
       """.trimIndent(),
       "$c.",
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -50,7 +50,7 @@ class MotionSectionForwardEndActionTest : VimTestCase() {
           
       """.trimIndent(),
       "$c.\n",
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -87,7 +87,7 @@ class MotionSectionForwardEndActionTest : VimTestCase() {
         }
       }
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -124,7 +124,7 @@ class MotionSectionForwardEndActionTest : VimTestCase() {
         }
       }
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -161,7 +161,7 @@ class MotionSectionForwardEndActionTest : VimTestCase() {
         }
       $c}
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 }

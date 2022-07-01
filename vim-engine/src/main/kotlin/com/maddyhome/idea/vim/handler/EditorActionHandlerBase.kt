@@ -25,7 +25,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.helper.noneOfEnum
@@ -88,7 +88,7 @@ abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
 
     logger.debug("Execute command with handler: " + this.javaClass.name)
 
-    val cmd = CommandState.getInstance(editor).executingCommand ?: run {
+    val cmd = VimStateMachine.getInstance(editor).executingCommand ?: run {
       injector.messages.indicateError()
       return
     }

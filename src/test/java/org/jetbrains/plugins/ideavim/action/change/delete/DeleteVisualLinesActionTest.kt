@@ -20,7 +20,7 @@
 
 package org.jetbrains.plugins.ideavim.action.change.delete
 
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class DeleteVisualLinesActionTest : VimTestCase() {
@@ -38,8 +38,8 @@ class DeleteVisualLinesActionTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE
     )
   }
 
@@ -57,8 +57,8 @@ class DeleteVisualLinesActionTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 ${c}where it was settled on some sodden sand
       """.trimIndent(),
-      CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE
     )
   }
 
@@ -76,8 +76,8 @@ class DeleteVisualLinesActionTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE
     )
   }
 
@@ -95,8 +95,8 @@ class DeleteVisualLinesActionTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 ${c}where it was settled on some sodden sand
       """.trimIndent(),
-      CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE
     )
   }
 
@@ -118,7 +118,7 @@ class DeleteVisualLinesActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             ${c}
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   fun `test multiple line delete till the end with a new line`() {
@@ -141,6 +141,6 @@ class DeleteVisualLinesActionTest : VimTestCase() {
             
             ${c}
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 }

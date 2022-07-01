@@ -20,7 +20,7 @@ package org.jetbrains.plugins.ideavim.action.motion.updown
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -177,7 +177,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
              }
             $c}
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -200,44 +200,44 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
             ""${'"'}
             )
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
   fun `test motion in text`() {
     doTest(
       "%", """ "I found ${c}it in a (legendary) land" """,
-      """ "I found it in a (legendary$c) land" """, CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      """ "I found it in a (legendary$c) land" """, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
   fun `test motion in text with quotes`() {
     doTest(
       "%", """ "I found ${c}it in \"a (legendary) land" """,
-      """ "I found it in \"a (legendary$c) land" """, CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      """ "I found it in \"a (legendary$c) land" """, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
   fun `test motion in text with quotes start before quote`() {
     doTest(
       "%", """ $c "I found it in \"a (legendary) land" """,
-      """  "I found it in \"a (legendary$c) land" """, CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      """  "I found it in \"a (legendary$c) land" """, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
   fun `test motion in text with quotes and double escape`() {
     doTest(
       "%", """ "I found ${c}it in \\\"a (legendary) land" """,
-      """ "I found it in \\\"a (legendary$c) land" """, CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      """ "I found it in \\\"a (legendary$c) land" """, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
   fun `test deleting with percent motion backward`() {
-    doTest("d%", "(foo bar$c)", c, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest("d%", "(foo bar$c)", c, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   fun `test deleting with percent motion`() {
-    doTest("d%", "$c(foo bar)", c, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest("d%", "$c(foo bar)", c, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   fun `test count percent moves to line as percentage of file height`() {

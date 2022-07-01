@@ -711,7 +711,7 @@ public class MotionGroup extends VimMotionGroupBase {
   }
 
   private static int getScrollJump(@NotNull Editor editor, int height) {
-    final EnumSet<CommandFlags> flags = CommandState.getInstance(new IjVimEditor(editor)).getExecutingCommandFlags();
+    final EnumSet<CommandFlags> flags = VimStateMachine.getInstance(new IjVimEditor(editor)).getExecutingCommandFlags();
     final boolean scrollJump = !flags.contains(CommandFlags.FLAG_IGNORE_SCROLL_JUMP);
 
     // Default value is 1. Zero is a valid value, but we normalise to 1 - we always want to scroll at least one line
@@ -736,7 +736,7 @@ public class MotionGroup extends VimMotionGroupBase {
     final int halfWidth = getApproximateScreenWidth(editor) / 2;
     final int scrollOffset = getNormalizedSideScrollOffset(editor);
 
-    final EnumSet<CommandFlags> flags = CommandState.getInstance(new IjVimEditor(editor)).getExecutingCommandFlags();
+    final EnumSet<CommandFlags> flags = VimStateMachine.getInstance(new IjVimEditor(editor)).getExecutingCommandFlags();
     final boolean allowSidescroll = !flags.contains(CommandFlags.FLAG_IGNORE_SIDE_SCROLL_JUMP);
     int sidescroll = ((VimInt) VimPlugin.getOptionService().getOptionValue(new OptionScope.LOCAL(new IjVimEditor(editor)), OptionConstants.sidescrollName, OptionConstants.sidescrollName)).getValue();
 
@@ -1200,7 +1200,7 @@ public class MotionGroup extends VimMotionGroupBase {
     if (fileEditor instanceof TextEditor) {
       final Editor editor = ((TextEditor)fileEditor).getEditor();
       ExOutputModel.getInstance(editor).clear();
-      if (CommandState.getInstance(new IjVimEditor(editor)).getMode() == CommandState.Mode.VISUAL) {
+      if (VimStateMachine.getInstance(new IjVimEditor(editor)).getMode() == VimStateMachine.Mode.VISUAL) {
         ModeHelper.exitVisualMode(editor);
         KeyHandler.getInstance().reset(new IjVimEditor(editor));
       }

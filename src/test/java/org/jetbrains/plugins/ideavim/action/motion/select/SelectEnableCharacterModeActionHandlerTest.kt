@@ -18,7 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.select
 
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -44,8 +44,8 @@ class SelectEnableCharacterModeActionHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      CommandState.Mode.SELECT,
-      CommandState.SubMode.VISUAL_CHARACTER
+      VimStateMachine.Mode.SELECT,
+      VimStateMachine.SubMode.VISUAL_CHARACTER
     )
   }
 
@@ -69,8 +69,8 @@ class SelectEnableCharacterModeActionHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass$s.$c$se
       """.trimIndent(),
-      CommandState.Mode.SELECT,
-      CommandState.SubMode.VISUAL_CHARACTER
+      VimStateMachine.Mode.SELECT,
+      VimStateMachine.SubMode.VISUAL_CHARACTER
     )
   }
 
@@ -93,8 +93,8 @@ class SelectEnableCharacterModeActionHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      CommandState.Mode.SELECT,
-      CommandState.SubMode.VISUAL_CHARACTER
+      VimStateMachine.Mode.SELECT,
+      VimStateMachine.SubMode.VISUAL_CHARACTER
     )
   }
 
@@ -118,8 +118,8 @@ class SelectEnableCharacterModeActionHandlerTest : VimTestCase() {
                 where it was ${s}s$c${se}ettled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      CommandState.Mode.SELECT,
-      CommandState.SubMode.VISUAL_CHARACTER
+      VimStateMachine.Mode.SELECT,
+      VimStateMachine.SubMode.VISUAL_CHARACTER
     )
   }
 }

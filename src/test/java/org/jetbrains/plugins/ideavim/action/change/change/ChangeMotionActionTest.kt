@@ -20,18 +20,18 @@
 
 package org.jetbrains.plugins.ideavim.action.change.change
 
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class ChangeMotionActionTest : VimTestCase() {
   // VIM-515 |c| |W|
   fun `test change big word with punctuation and alpha`() {
-    doTest("cW", "foo${c}(bar baz\n", "foo baz\n", CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    doTest("cW", "foo${c}(bar baz\n", "foo baz\n", VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 
   // VIM-300 |c| |w|
   fun testChangeWordTwoWordsWithoutWhitespace() {
-    doTest("cw", "${c}\$value\n", "value\n", CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    doTest("cw", "${c}\$value\n", "value\n", VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 
   // VIM-296 |cc|
@@ -39,7 +39,7 @@ class ChangeMotionActionTest : VimTestCase() {
     doTest(
       "cc",
       "foo\n" + "${c}bar\n",
-      "foo\n${c}" + "\n", CommandState.Mode.INSERT, CommandState.SubMode.NONE
+      "foo\n${c}" + "\n", VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -57,7 +57,7 @@ class ChangeMotionActionTest : VimTestCase() {
         ....${c}
         }
       """.trimIndent().dotToSpace(),
-      CommandState.Mode.INSERT, CommandState.SubMode.NONE
+      VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -66,7 +66,7 @@ class ChangeMotionActionTest : VimTestCase() {
     doTest(
       "ccbaz",
       "${c}foo\n" + "bar\n",
-      "baz\n" + "bar\n", CommandState.Mode.INSERT, CommandState.SubMode.NONE
+      "baz\n" + "bar\n", VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -83,7 +83,7 @@ class ChangeMotionActionTest : VimTestCase() {
         ${c}
         
       """.trimIndent(),
-      CommandState.Mode.INSERT, CommandState.SubMode.NONE
+      VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -91,23 +91,23 @@ class ChangeMotionActionTest : VimTestCase() {
     doTest(
       "c_baz",
       "${c}foo\n" + "bar\n",
-      "baz\n" + "bar\n", CommandState.Mode.INSERT, CommandState.SubMode.NONE
+      "baz\n" + "bar\n", VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
     )
   }
 
   // VIM-200 |c| |w|
   fun testChangeWordAtLastChar() {
     doTest(
-      "cw", "on${c}e two three\n", "on${c} two three\n", CommandState.Mode.INSERT,
-      CommandState.SubMode.NONE
+      "cw", "on${c}e two three\n", "on${c} two three\n", VimStateMachine.Mode.INSERT,
+      VimStateMachine.SubMode.NONE
     )
   }
 
   // VIM-1380 |c| |w| |count|
   fun testChangeTwoWordsAtLastChar() {
     doTest(
-      "c2w", "on${c}e two three\n", "on${c} three\n", CommandState.Mode.INSERT,
-      CommandState.SubMode.NONE
+      "c2w", "on${c}e two three\n", "on${c} three\n", VimStateMachine.Mode.INSERT,
+      VimStateMachine.SubMode.NONE
     )
   }
 
@@ -125,15 +125,15 @@ class ChangeMotionActionTest : VimTestCase() {
    }
    
       """.trimIndent(),
-      CommandState.Mode.INSERT, CommandState.SubMode.NONE
+      VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
     )
   }
 
   // VIM-276 |c| |T|
   fun testChangeLinesTillBackwards() {
     doTest(
-      "cT(", "if (condition) ${c}{\n" + "}\n", "if ({\n" + "}\n", CommandState.Mode.INSERT,
-      CommandState.SubMode.NONE
+      "cT(", "if (condition) ${c}{\n" + "}\n", "if ({\n" + "}\n", VimStateMachine.Mode.INSERT,
+      VimStateMachine.SubMode.NONE
     )
   }
 
@@ -143,7 +143,7 @@ class ChangeMotionActionTest : VimTestCase() {
     doTest(
       "cFc",
       "if (condition) {${c}\n" + "}\n",
-      "if (\n" + "}\n", CommandState.Mode.INSERT, CommandState.SubMode.NONE
+      "if (\n" + "}\n", VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -151,7 +151,7 @@ class ChangeMotionActionTest : VimTestCase() {
   fun testChangeLastWordInLine() {
     doTest(
       "cw",
-      "ab.${c}cd\n", "ab.${c}\n", CommandState.Mode.INSERT, CommandState.SubMode.NONE
+      "ab.${c}cd\n", "ab.${c}\n", VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -159,16 +159,16 @@ class ChangeMotionActionTest : VimTestCase() {
   fun testChangeLastInnerWordInLine() {
     doTest(
       listOf("c", "iw", "baz"),
-      "foo bar bo${c}o\n", "foo bar baz\n", CommandState.Mode.INSERT, CommandState.SubMode.NONE
+      "foo bar bo${c}o\n", "foo bar baz\n", VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
     )
   }
 
   // VIM-421 |c| |w|
   fun testChangeLastCharInLine() {
-    doTest("cw", "fo${c}o\n", "fo${c}\n", CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    doTest("cw", "fo${c}o\n", "fo${c}\n", VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 
   fun testLastSymbolInWord() {
-    doTest("cw", "fo${c}o", "fo${c}", CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    doTest("cw", "fo${c}o", "fo${c}", VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 }

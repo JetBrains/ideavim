@@ -18,7 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.leftright
 
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class MotionLeftTillMatchCharActionTest : VimTestCase() {
@@ -27,8 +27,8 @@ class MotionLeftTillMatchCharActionTest : VimTestCase() {
       "Tx;",
       "hello x hello x hello$c",
       "hello x$c hello x hello",
-      CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE
     )
   }
 
@@ -37,8 +37,8 @@ class MotionLeftTillMatchCharActionTest : VimTestCase() {
       "Tx;;",
       "hello x hello x hello x hello$c",
       "hello x$c hello x hello x hello",
-      CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE
     )
   }
 
@@ -47,8 +47,8 @@ class MotionLeftTillMatchCharActionTest : VimTestCase() {
       "Tx2;",
       "hello x hello x hello x hello$c",
       "hello x hello x$c hello x hello",
-      CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE
     )
   }
 
@@ -57,8 +57,8 @@ class MotionLeftTillMatchCharActionTest : VimTestCase() {
       "Tx3;",
       "hello x hello x hello x hello$c",
       "hello x$c hello x hello x hello",
-      CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE
     )
   }
 }

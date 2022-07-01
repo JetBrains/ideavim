@@ -17,7 +17,7 @@
  */
 package com.maddyhome.idea.vim.command
 
-import com.maddyhome.idea.vim.command.CommandState.SubMode
+import com.maddyhome.idea.vim.command.VimStateMachine.SubMode
 
 /**
  * @author vlan

@@ -31,7 +31,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.common.TextRange
@@ -95,7 +95,7 @@ class VimExchangeExtension : VimExtension {
     val EXCHANGE_KEY = Key<Exchange>("exchange")
 
     // End mark has always greater of eq offset than start mark
-    class Exchange(val type: CommandState.SubMode, val start: Mark, val end: Mark, val text: String) {
+    class Exchange(val type: VimStateMachine.SubMode, val start: Mark, val end: Mark, val text: String) {
       private var myHighlighter: RangeHighlighter? = null
       fun setHighlighter(highlighter: RangeHighlighter) {
         myHighlighter = highlighter
@@ -140,10 +140,10 @@ class VimExchangeExtension : VimExtension {
 
   private class Operator(private val isVisual: Boolean) : OperatorFunction {
     fun Editor.getMarkOffset(mark: Mark) = EditorHelper.getOffset(this, mark.logicalLine, mark.col)
-    fun CommandState.SubMode.getString() = when (this) {
-      CommandState.SubMode.VISUAL_CHARACTER -> "v"
-      CommandState.SubMode.VISUAL_LINE -> "V"
-      CommandState.SubMode.VISUAL_BLOCK -> "\\<C-V>"
+    fun VimStateMachine.SubMode.getString() = when (this) {
+      VimStateMachine.SubMode.VISUAL_CHARACTER -> "v"
+      VimStateMachine.SubMode.VISUAL_LINE -> "V"
+      VimStateMachine.SubMode.VISUAL_BLOCK -> "\\<C-V>"
       else -> error("Invalid SubMode: $this")
     }
 
@@ -151,7 +151,7 @@ class VimExchangeExtension : VimExtension {
       fun highlightExchange(ex: Exchange): RangeHighlighter {
         val attributes = editor.colorsScheme.getAttributes(EditorColors.TEXT_SEARCH_RESULT_ATTRIBUTES)
         val hlArea = when (ex.type) {
-          CommandState.SubMode.VISUAL_LINE -> HighlighterTargetArea.LINES_IN_RANGE
+          VimStateMachine.SubMode.VISUAL_LINE -> HighlighterTargetArea.LINES_IN_RANGE
           // TODO: handle other modes
           else -> HighlighterTargetArea.EXACT_RANGE
         }
@@ -274,7 +274,7 @@ class VimExchangeExtension : VimExtension {
           x.logicalLine - y.logicalLine
         }
 
-      return if (x.type == CommandState.SubMode.VISUAL_BLOCK && y.type == CommandState.SubMode.VISUAL_BLOCK) {
+      return if (x.type == VimStateMachine.SubMode.VISUAL_BLOCK && y.type == VimStateMachine.SubMode.VISUAL_BLOCK) {
         when {
           intersects(x, y) -> {
             ExchangeCompareResult.OVERLAP

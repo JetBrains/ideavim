@@ -20,7 +20,7 @@ package org.jetbrains.plugins.ideavim.action.copy
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.newapi.vim
@@ -31,7 +31,7 @@ import org.junit.Test
 class PutTestAfterCursorActionTest : VimTestCase() {
   fun `test put from number register`() {
     setRegister('4', "XXX ")
-    doTest("\"4p", "This is my$c text", "This is my XXX$c text", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest("\"4p", "This is my$c text", "This is my XXX$c text", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @VimBehaviorDiffers(

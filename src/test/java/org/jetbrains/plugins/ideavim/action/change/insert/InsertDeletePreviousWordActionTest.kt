@@ -21,7 +21,7 @@
 package org.jetbrains.plugins.ideavim.action.change.insert
 
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -38,7 +38,7 @@ class InsertDeletePreviousWordActionTest : VimTestCase() {
       """
             I found it in a i${c}t land
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -51,7 +51,7 @@ class InsertDeletePreviousWordActionTest : VimTestCase() {
       """
             I ${c} it in a legendary land
       """.trimIndent(),
-      CommandState.Mode.INSERT, CommandState.SubMode.NONE
+      VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -64,7 +64,7 @@ class InsertDeletePreviousWordActionTest : VimTestCase() {
       """
             I ${c} in a legendary land
       """.trimIndent(),
-      CommandState.Mode.INSERT, CommandState.SubMode.NONE
+      VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -79,7 +79,7 @@ class InsertDeletePreviousWordActionTest : VimTestCase() {
       """
             A Discovery${c} found it in a legendary land
       """.trimIndent(),
-      CommandState.Mode.INSERT, CommandState.SubMode.NONE
+      VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -108,7 +108,7 @@ class InsertDeletePreviousWordActionTest : VimTestCase() {
                   legendary
                ${c}
       """.trimIndent(),
-      CommandState.Mode.INSERT, CommandState.SubMode.NONE
+      VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -116,8 +116,8 @@ class InsertDeletePreviousWordActionTest : VimTestCase() {
   fun `test delete previous word dot eol`() {
     doTest(
       listOf("a", "<C-W>"),
-      "this is a sentence<caret>.\n", "this is a sentence<caret>\n", CommandState.Mode.INSERT,
-      CommandState.SubMode.NONE
+      "this is a sentence<caret>.\n", "this is a sentence<caret>\n", VimStateMachine.Mode.INSERT,
+      VimStateMachine.SubMode.NONE
     )
   }
 
@@ -125,7 +125,7 @@ class InsertDeletePreviousWordActionTest : VimTestCase() {
   fun `test delete previous word last after whitespace`() {
     doTest(
       listOf("A", "<C-W>"),
-      "<caret>this is a sentence\n", "this is a <caret>\n", CommandState.Mode.INSERT, CommandState.SubMode.NONE
+      "<caret>this is a sentence\n", "this is a <caret>\n", VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -133,7 +133,7 @@ class InsertDeletePreviousWordActionTest : VimTestCase() {
   fun `test delete previous word eol`() {
     doTest(
       listOf("A", "<C-W>"),
-      "<caret>\$variable\n", "$<caret>\n", CommandState.Mode.INSERT, CommandState.SubMode.NONE
+      "<caret>\$variable\n", "$<caret>\n", VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
     )
   }
 

@@ -21,7 +21,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.options.OptionConstants
@@ -40,8 +40,8 @@ class VisualToggleCharacterModeAction : VimActionHandler.SingleExecution() {
     val listOption = (injector.optionService
       .getOptionValue(OptionScope.LOCAL(editor), OptionConstants.selectmodeName) as VimString).value
     return if (listOption.contains("cmd")) {
-      injector.visualMotionGroup.enterSelectMode(editor, CommandState.SubMode.VISUAL_CHARACTER)
+      injector.visualMotionGroup.enterSelectMode(editor, VimStateMachine.SubMode.VISUAL_CHARACTER)
     } else injector.visualMotionGroup
-      .toggleVisual(editor, cmd.count, cmd.rawCount, CommandState.SubMode.VISUAL_CHARACTER)
+      .toggleVisual(editor, cmd.count, cmd.rawCount, VimStateMachine.SubMode.VISUAL_CHARACTER)
   }
 }

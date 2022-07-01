@@ -20,7 +20,7 @@ package org.jetbrains.plugins.ideavim.extension.replacewithregister
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.newapi.vim
@@ -397,7 +397,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
       """.trimIndent()
     )
     assertEquals("legendary", VimPlugin.getRegister().lastRegister?.text)
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
@@ -419,7 +419,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
             hard by the torrent of a mountain pass.
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
@@ -442,7 +442,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
             hard by the torrent of a mountain pass.
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
@@ -465,7 +465,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
             hard by the torrent of a mountain pass.
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
@@ -487,6 +487,6 @@ class ReplaceWithRegisterTest : VimTestCase() {
             hard by the torrent of a mountain pass.
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
   }
 }

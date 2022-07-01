@@ -22,7 +22,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.mode
@@ -39,7 +39,7 @@ class ResetModeAction : VimActionHandler.SingleExecution() {
     val modeBeforeReset = editor.mode
     KeyHandler.getInstance().fullReset(editor)
 
-    if (modeBeforeReset == CommandState.Mode.INSERT) {
+    if (modeBeforeReset == VimStateMachine.Mode.INSERT) {
       editor.forEachCaret { caret ->
         val position = injector.motion.getOffsetOfHorizontalMotion(editor, caret, -1, false)
         caret.moveToOffset(position)

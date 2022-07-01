@@ -19,7 +19,7 @@
 package org.jetbrains.plugins.ideavim.option
 
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -53,7 +53,7 @@ class DigraphTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
       """.trimIndent(),
-      CommandState.Mode.INSERT, CommandState.SubMode.NONE
+      VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -79,7 +79,7 @@ class DigraphTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
       """.trimIndent(),
-      CommandState.Mode.INSERT, CommandState.SubMode.NONE
+      VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -105,7 +105,7 @@ class DigraphTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
       """.trimIndent(),
-      CommandState.Mode.INSERT, CommandState.SubMode.NONE
+      VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -131,7 +131,7 @@ class DigraphTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
       """.trimIndent(),
-      CommandState.Mode.INSERT, CommandState.SubMode.NONE
+      VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
     )
   }
 }

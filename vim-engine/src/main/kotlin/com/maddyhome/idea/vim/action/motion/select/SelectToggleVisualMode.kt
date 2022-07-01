@@ -22,10 +22,10 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
-import com.maddyhome.idea.vim.helper.commandState
+import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.pushSelectMode
 import com.maddyhome.idea.vim.helper.pushVisualMode
@@ -50,13 +50,13 @@ class SelectToggleVisualMode : VimActionHandler.SingleExecution() {
 
   companion object {
     fun toggleMode(editor: VimEditor) {
-      val commandState = editor.commandState
+      val commandState = editor.vimStateMachine
       val subMode = commandState.subMode
       val mode = commandState.mode
       commandState.popModes()
       if (mode.inVisualMode) {
         commandState.pushSelectMode(subMode, mode)
-        if (subMode != CommandState.SubMode.VISUAL_LINE) {
+        if (subMode != VimStateMachine.SubMode.VISUAL_LINE) {
           editor.nativeCarets().forEach {
             if (it.offset.point + injector.visualMotionGroup.selectionAdj == it.selectionEnd) {
               it.moveToInlayAwareOffset(it.offset.point + injector.visualMotionGroup.selectionAdj)
@@ -65,7 +65,7 @@ class SelectToggleVisualMode : VimActionHandler.SingleExecution() {
         }
       } else {
         commandState.pushVisualMode(subMode, mode)
-        if (subMode != CommandState.SubMode.VISUAL_LINE) {
+        if (subMode != VimStateMachine.SubMode.VISUAL_LINE) {
           editor.nativeCarets().forEach {
             if (it.offset.point == it.selectionEnd && it.visualLineStart <= it.offset.point - injector.visualMotionGroup.selectionAdj) {
               it.moveToInlayAwareOffset(it.offset.point - injector.visualMotionGroup.selectionAdj)

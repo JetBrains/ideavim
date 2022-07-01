@@ -22,7 +22,7 @@ package org.jetbrains.plugins.ideavim.action.change.delete
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import org.jetbrains.plugins.ideavim.OptionValueType
@@ -52,7 +52,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
@@ -70,7 +70,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
             Today it is not working
             The test is like that.
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -89,7 +89,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
             Today it is not working
             The test is like that.
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -108,7 +108,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
             Today it is not working
             The test is like that.
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -130,7 +130,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @VimOptionDefaultAll
@@ -153,7 +153,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @VimOptionDefaultAll
@@ -174,7 +174,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @VimOptionDefaultAll
@@ -197,7 +197,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
             where it was settled on some sodden sand
             ${c}
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @VimOptionDefaultAll
@@ -218,7 +218,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @VimOptionDefaultAll
@@ -241,7 +241,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @VimOptionDefaultAll
@@ -262,7 +262,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
             all rocks and lavender and tufted grass,
             ${c}where it was settled on some sodden sand
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @VimOptionDefaultAll
@@ -282,7 +282,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
             ${c}where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @VimOptionDefaultAll
@@ -302,7 +302,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
             ${c}where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @VimOptionDefaultAll
@@ -342,7 +342,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @VimOptionDefaultAll
@@ -363,7 +363,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @VimOptionDefaultAll
@@ -386,7 +386,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @VimOptionDefaultAll
@@ -407,7 +407,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @VimOptionDefaultAll
@@ -430,7 +430,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
             where it was settled on some sodden sand
             ${c}
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @VimOptionDefaultAll
@@ -451,7 +451,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
             all rocks and lavender and tufted grass,
             ${c}where it was settled on some sodden sand
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @VimOptionDefaultAll
@@ -471,7 +471,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
             ${c}where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @VimOptionDefaultAll
@@ -491,7 +491,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
             ${c}where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @VimOptionDefaultAll
@@ -532,7 +532,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @VimOptionDefaultAll
@@ -554,7 +554,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @VimOptionDefaultAll
@@ -578,7 +578,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
             hard by the
 
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @VimOptionDefaultAll
@@ -600,7 +600,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
             where it was settled on some sodden sand
             hard by the
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @VimOptionDefaultAll
@@ -622,7 +622,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @VimOptionDefaultAll
@@ -644,7 +644,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @VimOptionDefaultAll
@@ -687,7 +687,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
             Today it is not working
             The test is like that.
       """.trimIndent(),
-      CommandState.Mode.INSERT, CommandState.SubMode.NONE
+      VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
     )
   }
 }

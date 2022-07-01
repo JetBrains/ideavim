@@ -21,7 +21,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.options.OptionConstants
@@ -42,8 +42,8 @@ class VisualToggleBlockModeAction : VimActionHandler.SingleExecution() {
       OptionConstants.selectmodeName
     ) as VimString).value
     return if (listOption.contains("cmd")) {
-      injector.visualMotionGroup.enterSelectMode(editor, CommandState.SubMode.VISUAL_BLOCK)
+      injector.visualMotionGroup.enterSelectMode(editor, VimStateMachine.SubMode.VISUAL_BLOCK)
     } else injector.visualMotionGroup
-      .toggleVisual(editor, cmd.count, cmd.rawCount, CommandState.SubMode.VISUAL_BLOCK)
+      .toggleVisual(editor, cmd.count, cmd.rawCount, VimStateMachine.SubMode.VISUAL_BLOCK)
   }
 }

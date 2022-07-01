@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
-import com.maddyhome.idea.vim.helper.commandState
+import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
@@ -45,5 +45,5 @@ class InsertInsertAction : VimActionHandler.SingleExecution() {
 
 private fun processInsert(editor: VimEditor) {
   editor.insertMode = !editor.insertMode
-  editor.commandState.toggleInsertOverwrite()
+  editor.vimStateMachine.toggleInsertOverwrite()
 }

@@ -20,7 +20,7 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -37,7 +37,7 @@ class ActionCommandTest : VimTestCase() {
   fun testEditorRightAction() {
     configureByText("<caret>foo\n" + "bar\n")
     typeText(commandToKeys("action EditorRight"))
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
     assertState("f<caret>oo\n" + "bar\n")
   }
 
@@ -52,7 +52,7 @@ class ActionCommandTest : VimTestCase() {
     )
     typeText(injector.parser.parseKeys("vjl"))
     typeText(commandToKeys("'<,'>action CommentByBlockComment"))
-    assertMode(CommandState.Mode.VISUAL)
+    assertMode(VimStateMachine.Mode.VISUAL)
     assertState(
       "-----\n" +
         "1/*2345\n" +
@@ -73,7 +73,7 @@ class ActionCommandTest : VimTestCase() {
     )
     typeText(injector.parser.parseKeys("vjl"))
     typeText(commandToKeys("'<,'>action CommentByBlockComment"))
-    assertMode(CommandState.Mode.VISUAL)
+    assertMode(VimStateMachine.Mode.VISUAL)
     assertState(
       "-----\n" +
         "1/*2345\n" +
@@ -89,7 +89,7 @@ class ActionCommandTest : VimTestCase() {
     configureByJavaText("1<caret>2345\n" + "abcde\n")
     typeText(injector.parser.parseKeys("vl"))
     typeText(commandToKeys("'<,'>action CommentByBlockComment"))
-    assertMode(CommandState.Mode.VISUAL)
+    assertMode(VimStateMachine.Mode.VISUAL)
     assertState("1/*23*/45\n" + "abcde\n")
   }
 
@@ -99,7 +99,7 @@ class ActionCommandTest : VimTestCase() {
     configureByJavaText("1<caret>2345\n" + "abcde\n")
     typeText(injector.parser.parseKeys("vl"))
     typeText(commandToKeys("'<,'>action CommentByBlockComment"))
-    assertMode(CommandState.Mode.VISUAL)
+    assertMode(VimStateMachine.Mode.VISUAL)
     assertState("1/*23*/45\n" + "abcde\n")
     VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.incsearchName)
   }
@@ -115,7 +115,7 @@ class ActionCommandTest : VimTestCase() {
     )
     typeText(injector.parser.parseKeys("Vj"))
     typeText(commandToKeys("'<,'>action CommentByBlockComment"))
-    assertMode(CommandState.Mode.VISUAL)
+    assertMode(VimStateMachine.Mode.VISUAL)
     assertState(
       "-----\n" +
         "/*\n" +
@@ -137,7 +137,7 @@ class ActionCommandTest : VimTestCase() {
     )
     typeText(injector.parser.parseKeys("Vj"))
     typeText(commandToKeys("'<,'>action CommentByBlockComment"))
-    assertMode(CommandState.Mode.VISUAL)
+    assertMode(VimStateMachine.Mode.VISUAL)
     assertState(
       "-----\n" +
         "/*\n" +
@@ -160,7 +160,7 @@ class ActionCommandTest : VimTestCase() {
     )
     typeText(injector.parser.parseKeys("<C-V>lj"))
     typeText(commandToKeys("'<,'>action CommentByBlockComment"))
-    assertMode(CommandState.Mode.VISUAL)
+    assertMode(VimStateMachine.Mode.VISUAL)
     assertState(
       "-----\n" +
         "1/*23*/45\n" +
@@ -180,7 +180,7 @@ class ActionCommandTest : VimTestCase() {
     )
     typeText(injector.parser.parseKeys("<C-V>lj"))
     typeText(commandToKeys("'<,'>action CommentByBlockComment"))
-    assertMode(CommandState.Mode.VISUAL)
+    assertMode(VimStateMachine.Mode.VISUAL)
     assertState(
       "-----\n" +
         "1/*23*/45\n" +

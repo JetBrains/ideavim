@@ -18,7 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.action.change.change.number
 
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 /**
@@ -38,8 +38,8 @@ class ChangeVisualNumberAvalancheDecActionTest : VimTestCase() {
                     number 1
                     number 1
       """.trimIndent(),
-      CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE
     )
   }
 
@@ -56,8 +56,8 @@ class ChangeVisualNumberAvalancheDecActionTest : VimTestCase() {
                     number 1
                     number 1
       """.trimIndent(),
-      CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE
     )
   }
 }

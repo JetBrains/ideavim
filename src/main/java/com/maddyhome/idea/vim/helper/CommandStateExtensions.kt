@@ -22,90 +22,94 @@ package com.maddyhome.idea.vim.helper
 
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.command.ij
 import com.maddyhome.idea.vim.newapi.vim
 
 val Editor.isEndAllowed: Boolean
-  get() = when (this.mode) {
-    CommandState.Mode.INSERT, CommandState.Mode.VISUAL, CommandState.Mode.SELECT, CommandState.Mode.INSERT_VISUAL, CommandState.Mode.INSERT_SELECT -> true
-    CommandState.Mode.COMMAND, CommandState.Mode.CMD_LINE, CommandState.Mode.REPLACE, CommandState.Mode.OP_PENDING, CommandState.Mode.INSERT_NORMAL -> {
+  get() = when (this.editorMode) {
+    VimStateMachine.Mode.INSERT, VimStateMachine.Mode.VISUAL, VimStateMachine.Mode.SELECT, VimStateMachine.Mode.INSERT_VISUAL, VimStateMachine.Mode.INSERT_SELECT -> true
+    VimStateMachine.Mode.COMMAND, VimStateMachine.Mode.CMD_LINE, VimStateMachine.Mode.REPLACE, VimStateMachine.Mode.OP_PENDING, VimStateMachine.Mode.INSERT_NORMAL -> {
       // One day we'll use a proper insert_normal mode
-      if (this.mode.inSingleMode) true else usesVirtualSpace
+      if (this.editorMode.inSingleMode) true else usesVirtualSpace
     }
   }
 
-val CommandState.Mode.isEndAllowedIgnoringOnemore: Boolean
+val VimStateMachine.Mode.isEndAllowedIgnoringOnemore: Boolean
   get() = when (this) {
-    CommandState.Mode.INSERT, CommandState.Mode.VISUAL, CommandState.Mode.SELECT -> true
-    CommandState.Mode.COMMAND, CommandState.Mode.CMD_LINE, CommandState.Mode.REPLACE, CommandState.Mode.OP_PENDING -> false
-    CommandState.Mode.INSERT_NORMAL -> false
-    CommandState.Mode.INSERT_VISUAL -> true
-    CommandState.Mode.INSERT_SELECT -> true
+    VimStateMachine.Mode.INSERT, VimStateMachine.Mode.VISUAL, VimStateMachine.Mode.SELECT -> true
+    VimStateMachine.Mode.COMMAND, VimStateMachine.Mode.CMD_LINE, VimStateMachine.Mode.REPLACE, VimStateMachine.Mode.OP_PENDING -> false
+    VimStateMachine.Mode.INSERT_NORMAL -> false
+    VimStateMachine.Mode.INSERT_VISUAL -> true
+    VimStateMachine.Mode.INSERT_SELECT -> true
   }
 
-val CommandState.Mode.hasVisualSelection
+val VimStateMachine.Mode.hasVisualSelection
   get() = when (this) {
-    CommandState.Mode.VISUAL, CommandState.Mode.SELECT -> true
-    CommandState.Mode.REPLACE, CommandState.Mode.CMD_LINE, CommandState.Mode.COMMAND, CommandState.Mode.INSERT, CommandState.Mode.OP_PENDING -> false
-    CommandState.Mode.INSERT_NORMAL -> false
-    CommandState.Mode.INSERT_VISUAL -> true
-    CommandState.Mode.INSERT_SELECT -> true
+    VimStateMachine.Mode.VISUAL, VimStateMachine.Mode.SELECT -> true
+    VimStateMachine.Mode.REPLACE, VimStateMachine.Mode.CMD_LINE, VimStateMachine.Mode.COMMAND, VimStateMachine.Mode.INSERT, VimStateMachine.Mode.OP_PENDING -> false
+    VimStateMachine.Mode.INSERT_NORMAL -> false
+    VimStateMachine.Mode.INSERT_VISUAL -> true
+    VimStateMachine.Mode.INSERT_SELECT -> true
   }
+
+val Editor.editorMode
+  get() = this.vim.vimStateMachine.mode
 
 val Editor.mode
-  get() = this.vim.commandState.mode
+  get() = this.vim.vimStateMachine.mode.ij
 
 var Editor.subMode
-  get() = this.vim.commandState.subMode
+  get() = this.vim.vimStateMachine.subMode
   set(value) {
-    this.vim.commandState.subMode = value
+    this.vim.vimStateMachine.subMode = value
   }
 
 @get:JvmName("inNormalMode")
 val Editor.inNormalMode
-  get() = this.mode.inNormalMode
+  get() = this.editorMode.inNormalMode
 
 @get:JvmName("inNormalMode")
-val CommandState.Mode.inNormalMode
-  get() = this == CommandState.Mode.COMMAND || this == CommandState.Mode.INSERT_NORMAL
+val VimStateMachine.Mode.inNormalMode
+  get() = this == VimStateMachine.Mode.COMMAND || this == VimStateMachine.Mode.INSERT_NORMAL
 
 @get:JvmName("inInsertMode")
 val Editor.inInsertMode
-  get() = this.mode == CommandState.Mode.INSERT || this.mode == CommandState.Mode.REPLACE
+  get() = this.editorMode == VimStateMachine.Mode.INSERT || this.editorMode == VimStateMachine.Mode.REPLACE
 
 @get:JvmName("inRepeatMode")
 val Editor.inRepeatMode
-  get() = this.vim.commandState.isDotRepeatInProgress
+  get() = this.vim.vimStateMachine.isDotRepeatInProgress
 
 @get:JvmName("inVisualMode")
 val Editor.inVisualMode
-  get() = this.mode.inVisualMode
+  get() = this.editorMode.inVisualMode
 
 @get:JvmName("inSelectMode")
 val Editor.inSelectMode
-  get() = this.mode == CommandState.Mode.SELECT || this.mode == CommandState.Mode.INSERT_SELECT
+  get() = this.editorMode == VimStateMachine.Mode.SELECT || this.editorMode == VimStateMachine.Mode.INSERT_SELECT
 
 val VimEditor.inSelectMode
-  get() = this.mode == CommandState.Mode.SELECT || this.mode == CommandState.Mode.INSERT_SELECT
+  get() = this.mode == VimStateMachine.Mode.SELECT || this.mode == VimStateMachine.Mode.INSERT_SELECT
 
 @get:JvmName("inBlockSubMode")
 val Editor.inBlockSubMode
-  get() = this.subMode == CommandState.SubMode.VISUAL_BLOCK
+  get() = this.subMode == VimStateMachine.SubMode.VISUAL_BLOCK
 
 @get:JvmName("inSingleCommandMode")
 val Editor.inSingleCommandMode: Boolean
-  get() = this.mode.inSingleMode
+  get() = this.editorMode.inSingleMode
 
 @get:JvmName("inSingleMode")
-val CommandState.Mode.inSingleMode: Boolean
+val VimStateMachine.Mode.inSingleMode: Boolean
   get() = when (this) {
-    CommandState.Mode.INSERT_NORMAL, CommandState.Mode.INSERT_SELECT, CommandState.Mode.INSERT_VISUAL -> true
+    VimStateMachine.Mode.INSERT_NORMAL, VimStateMachine.Mode.INSERT_SELECT, VimStateMachine.Mode.INSERT_VISUAL -> true
     else -> false
   }
 
 @get:JvmName("inSingleNormalMode")
-val CommandState.Mode.inSingleNormalMode: Boolean
+val VimStateMachine.Mode.inSingleNormalMode: Boolean
   get() = when (this) {
-    CommandState.Mode.INSERT_NORMAL -> true
+    VimStateMachine.Mode.INSERT_NORMAL -> true
     else -> false
   }

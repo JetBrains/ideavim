@@ -23,7 +23,7 @@ import com.intellij.openapi.editor.CaretVisualAttributes
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.editor.ex.EditorSettingsExternalizable
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionChangeListener
 import com.maddyhome.idea.vim.options.helpers.GuiCursorMode
@@ -75,7 +75,7 @@ object GuicursorChangeListener : OptionChangeListener<VimDataType> {
 }
 
 private fun Editor.guicursorMode(): GuiCursorMode {
-  if (this.vim.commandState.isReplaceCharacter) {
+  if (this.vim.vimStateMachine.isReplaceCharacter) {
     // Can be true for NORMAL and VISUAL
     return GuiCursorMode.REPLACE
   }
@@ -84,18 +84,18 @@ private fun Editor.guicursorMode(): GuiCursorMode {
   // makes much more use of SELECT than Vim does (e.g. it's the default for idearefactormode) so it makes sense for us
   // to more visually distinguish VISUAL and SELECT. So we use INSERT; a selection and the insert caret is intuitively
   // the same as SELECT
-  return when (mode) {
-    CommandState.Mode.COMMAND -> GuiCursorMode.NORMAL
-    CommandState.Mode.VISUAL -> GuiCursorMode.VISUAL // TODO: VISUAL_EXCLUSIVE
-    CommandState.Mode.SELECT -> GuiCursorMode.INSERT
-    CommandState.Mode.INSERT -> GuiCursorMode.INSERT
-    CommandState.Mode.OP_PENDING -> GuiCursorMode.OP_PENDING
-    CommandState.Mode.REPLACE -> GuiCursorMode.REPLACE
+  return when (editorMode) {
+    VimStateMachine.Mode.COMMAND -> GuiCursorMode.NORMAL
+    VimStateMachine.Mode.VISUAL -> GuiCursorMode.VISUAL // TODO: VISUAL_EXCLUSIVE
+    VimStateMachine.Mode.SELECT -> GuiCursorMode.INSERT
+    VimStateMachine.Mode.INSERT -> GuiCursorMode.INSERT
+    VimStateMachine.Mode.OP_PENDING -> GuiCursorMode.OP_PENDING
+    VimStateMachine.Mode.REPLACE -> GuiCursorMode.REPLACE
     // This doesn't handle ci and cr, but we don't care - our CMD_LINE will never call this
-    CommandState.Mode.CMD_LINE -> GuiCursorMode.CMD_LINE
-    CommandState.Mode.INSERT_NORMAL -> GuiCursorMode.NORMAL
-    CommandState.Mode.INSERT_VISUAL -> GuiCursorMode.VISUAL
-    CommandState.Mode.INSERT_SELECT -> GuiCursorMode.INSERT
+    VimStateMachine.Mode.CMD_LINE -> GuiCursorMode.CMD_LINE
+    VimStateMachine.Mode.INSERT_NORMAL -> GuiCursorMode.NORMAL
+    VimStateMachine.Mode.INSERT_VISUAL -> GuiCursorMode.VISUAL
+    VimStateMachine.Mode.INSERT_SELECT -> GuiCursorMode.INSERT
   }
 }
 

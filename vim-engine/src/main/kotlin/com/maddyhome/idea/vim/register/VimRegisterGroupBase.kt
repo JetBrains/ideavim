@@ -2,7 +2,7 @@ package com.maddyhome.idea.vim.register
 
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.diagnostic.debug
@@ -123,7 +123,7 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
   }
 
   protected fun isSmallDeletionSpecialCase(editor: VimEditor): Boolean {
-    val currentCommand = CommandState.getInstance(editor).executingCommand
+    val currentCommand = VimStateMachine.getInstance(editor).executingCommand
     if (currentCommand != null) {
       val argument = currentCommand.argument
       if (argument != null) {
@@ -368,7 +368,7 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
 
   override fun startRecording(editor: VimEditor, register: Char): Boolean {
     return if (RECORDABLE_REGISTERS.indexOf(register) != -1) {
-      CommandState.getInstance(editor).isRecording = true
+      VimStateMachine.getInstance(editor).isRecording = true
       recordRegister = register
       recordList = ArrayList()
       true
@@ -412,7 +412,7 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
           reg.addKeys(myRecordList)
         }
       }
-      CommandState.getInstance(editor).isRecording = false
+      VimStateMachine.getInstance(editor).isRecording = false
     }
 
     recordRegister = 0.toChar()

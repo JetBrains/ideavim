@@ -6,7 +6,7 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
-import com.maddyhome.idea.vim.helper.commandState
+import com.maddyhome.idea.vim.helper.vimStateMachine
 import java.util.*
 
 abstract class VimMarkGroupBase : VimMarkGroup {
@@ -72,7 +72,7 @@ abstract class VimMarkGroupBase : VimMarkGroup {
           val markLineStartOff = injector.engineEditorHelper.getLineStartOffset(editor, myMark.logicalLine)
           val markLineEndOff = injector.engineEditorHelper.getLineEndOffset(editor, myMark.logicalLine, true)
 
-          val command = editor.commandState.executingCommand
+          val command = editor.vimStateMachine.executingCommand
           // If text is being changed from the start of the mark line (a special case for mark deletion)
           val changeFromMarkLineStart = (command != null && command.type === Command.Type.CHANGE && delStartOff == markLineStartOff)
           // If the marked line is completely within the deleted text, remove the mark (except the special case)

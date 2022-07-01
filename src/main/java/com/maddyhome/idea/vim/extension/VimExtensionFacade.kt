@@ -30,7 +30,7 @@ import com.maddyhome.idea.vim.common.CommandAliasHandler
 import com.maddyhome.idea.vim.helper.CommandLineHelper
 import com.maddyhome.idea.vim.helper.EditorDataContext
 import com.maddyhome.idea.vim.helper.TestInputModel
-import com.maddyhome.idea.vim.helper.commandState
+import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.newapi.vim
@@ -144,7 +144,7 @@ object VimExtensionFacade {
   /** Returns a single key stroke from the user input similar to 'getchar()'. */
   @JvmStatic
   fun inputKeyStroke(editor: Editor): KeyStroke {
-    if (editor.vim.commandState.isDotRepeatInProgress) {
+    if (editor.vim.vimStateMachine.isDotRepeatInProgress) {
       val input = Extension.consumeKeystroke()
       return input ?: error("Not enough keystrokes saved: ${Extension.lastExtensionHandler}")
     }
@@ -152,7 +152,7 @@ object VimExtensionFacade {
     val key: KeyStroke? = if (ApplicationManager.getApplication().isUnitTestMode) {
       val mappingStack = KeyHandler.getInstance().keyStack
       mappingStack.feedSomeStroke() ?: TestInputModel.getInstance(editor).nextKeyStroke()?.also {
-        if (editor.vim.commandState.isRecording) {
+        if (editor.vim.vimStateMachine.isRecording) {
           KeyHandler.getInstance().modalEntryKeys += it
         }
       }

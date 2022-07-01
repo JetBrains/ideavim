@@ -38,8 +38,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileVisitor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.*;
-import com.maddyhome.idea.vim.command.CommandState;
-import com.maddyhome.idea.vim.common.GoalCommand;
+import com.maddyhome.idea.vim.command.VimStateMachine;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.EditorHelperRt;
@@ -48,7 +47,6 @@ import com.maddyhome.idea.vim.helper.SearchHelper;
 import com.maddyhome.idea.vim.newapi.ExecuteExtensionKt;
 import com.maddyhome.idea.vim.newapi.IjExecutionContext;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
-import com.maddyhome.idea.vim.options.OptionConstants;
 import com.maddyhome.idea.vim.options.OptionScope;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
 import com.maddyhome.idea.vim.vimscript.services.IjVimOptionService;
@@ -290,7 +288,7 @@ public class FileGroup extends VimFileBase {
     StringBuilder msg = new StringBuilder();
     Document doc = editor.getDocument();
 
-    if (CommandState.getInstance(new IjVimEditor(editor)).getMode() != CommandState.Mode.VISUAL) {
+    if (VimStateMachine.getInstance(new IjVimEditor(editor)).getMode() != VimStateMachine.Mode.VISUAL) {
       LogicalPosition lp = editor.getCaretModel().getLogicalPosition();
       int col = editor.getCaretModel().getOffset() - doc.getLineStartOffset(lp.line);
       int endoff = doc.getLineEndOffset(lp.line);

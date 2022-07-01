@@ -106,7 +106,7 @@ public class ChangeGroup extends VimChangeGroupBase {
       injector.getMotion().moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineEnd(editor, caret));
     }
 
-    UserDataManager.setVimChangeActionSwitchMode(((IjVimEditor) editor).getEditor(), CommandState.Mode.INSERT);
+    UserDataManager.setVimChangeActionSwitchMode(((IjVimEditor) editor).getEditor(), VimStateMachine.Mode.INSERT);
     insertText(editor, caret, "\n" + IndentConfig.create(((IjVimEditor) editor).getEditor()).createIndentBySize(col));
 
     if (firstLiner) {
@@ -125,7 +125,7 @@ public class ChangeGroup extends VimChangeGroupBase {
     if (editor.isOneLineMode()) return;
 
     caret.moveToOffset(injector.getMotion().moveCaretToLineEnd(editor, caret));
-    editor.setVimChangeActionSwitchMode(CommandState.Mode.INSERT);
+    editor.setVimChangeActionSwitchMode(VimStateMachine.Mode.INSERT);
     insertText(editor, caret, "\n" + IndentConfig.create(((IjVimEditor) editor).getEditor()).createIndentBySize(col));
   }
 
@@ -247,7 +247,7 @@ public class ChangeGroup extends VimChangeGroupBase {
         if (wordMotions.contains(id) && lastWordChar && motion.getCount() == 1) {
           final boolean res = deleteCharacter(editor, caret, 1, true);
           if (res) {
-            editor.setVimChangeActionSwitchMode(CommandState.Mode.INSERT);
+            editor.setVimChangeActionSwitchMode(VimStateMachine.Mode.INSERT);
           }
           return res;
         }
@@ -338,8 +338,8 @@ public class ChangeGroup extends VimChangeGroupBase {
     final int lines = VimChangeGroupBase.Companion.getLinesCountInVisualBlock(editor, range);
     final VimLogicalPosition startPosition = editor.offsetToLogicalPosition(range.getStartOffset());
 
-    boolean visualBlockMode = operatorArguments.getMode() == CommandState.Mode.VISUAL &&
-                              operatorArguments.getSubMode() == CommandState.SubMode.VISUAL_BLOCK;
+    boolean visualBlockMode = operatorArguments.getMode() == VimStateMachine.Mode.VISUAL &&
+                              operatorArguments.getSubMode() == VimStateMachine.SubMode.VISUAL_BLOCK;
     for (Caret caret : ((IjVimEditor) editor).getEditor().getCaretModel().getAllCarets()) {
       final int line = startPosition.getLine();
       int column = startPosition.getColumn();
@@ -468,7 +468,7 @@ public class ChangeGroup extends VimChangeGroupBase {
         if (type == SelectionType.BLOCK_WISE) {
           setInsertRepeat(lines, col, false);
         }
-        UserDataManager.setVimChangeActionSwitchMode(((IjVimEditor) editor).getEditor(), CommandState.Mode.INSERT);
+        UserDataManager.setVimChangeActionSwitchMode(((IjVimEditor) editor).getEditor(), VimStateMachine.Mode.INSERT);
       }
     }
     else {

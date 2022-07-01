@@ -860,7 +860,7 @@ public class EditorHelper {
     if (inlayAwareOffset == vimLastColumn) return vimLastColumn;
 
     Editor editor = caret.getEditor();
-    boolean isEndAllowed = CommandStateHelper.isEndAllowedIgnoringOnemore(CommandStateHelper.getMode(editor));
+    boolean isEndAllowed = CommandStateHelper.isEndAllowedIgnoringOnemore(CommandStateHelper.getEditorMode(editor));
     final LogicalPosition logicalPosition = caret.getLogicalPosition();
     int lastColumn = EditorHelper.lastColumnForLine(editor, logicalPosition.line, isEndAllowed);
 

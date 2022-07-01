@@ -21,7 +21,7 @@ package org.jetbrains.plugins.ideavim.action;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.VimInjectorKt;
-import com.maddyhome.idea.vim.command.CommandState;
+import com.maddyhome.idea.vim.command.VimStateMachine;
 import com.maddyhome.idea.vim.register.Register;
 import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
@@ -129,7 +129,7 @@ public class CopyActionTest extends VimTestCase {
   public void testStateAfterYankVisualBlock() {
     typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("<C-V>" + "jl" + "y"), "<caret>foo\n" + "bar\n");
     assertOffset(0);
-    assertMode(CommandState.Mode.COMMAND);
+    assertMode(VimStateMachine.Mode.COMMAND);
     assertSelection(null);
   }
 
