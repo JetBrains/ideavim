@@ -24,6 +24,12 @@ import com.maddyhome.idea.vim.options.helpers.KeywordOptionHelper
  * COMPATIBILITY-LAYER: Added a class and package
  */
 object OptionsManager {
-  val iskeyword: KeywordOptionHelper
-    get() = KeywordOptionHelper
+  val iskeyword: KeywordOption
+    get() = KeywordOption(KeywordOptionHelper)
+}
+
+class KeywordOption(val helper: KeywordOptionHelper) {
+  fun toRegex(): List<String> {
+    return helper.toRegex()
+  }
 }

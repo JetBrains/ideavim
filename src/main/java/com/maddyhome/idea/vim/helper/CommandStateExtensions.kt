@@ -22,7 +22,9 @@ package com.maddyhome.idea.vim.helper
 
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.command.engine
 import com.maddyhome.idea.vim.command.ij
 import com.maddyhome.idea.vim.newapi.vim
 
@@ -56,8 +58,17 @@ val VimStateMachine.Mode.hasVisualSelection
 val Editor.editorMode
   get() = this.vim.vimStateMachine.mode
 
+/**
+ * COMPATIBILITY-LAYER: New method
+ */
 val Editor.mode
   get() = this.vim.vimStateMachine.mode.ij
+
+/**
+ * COMPATIBILITY-LAYER: New method
+ */
+val CommandState.Mode.isEndAllowed: Boolean
+  get() = this.engine.isEndAllowed
 
 var Editor.subMode
   get() = this.vim.vimStateMachine.subMode

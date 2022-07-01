@@ -59,6 +59,21 @@ val CommandState.SubMode.engine: VimStateMachine.SubMode
     CommandState.SubMode.VISUAL_BLOCK -> VimStateMachine.SubMode.VISUAL_BLOCK
   }
 
+val CommandState.Mode.engine: VimStateMachine.Mode
+  get() = when (this) {
+    CommandState.Mode.COMMAND -> VimStateMachine.Mode.COMMAND
+    CommandState.Mode.VISUAL -> VimStateMachine.Mode.VISUAL
+    CommandState.Mode.SELECT -> VimStateMachine.Mode.SELECT
+    CommandState.Mode.INSERT -> VimStateMachine.Mode.INSERT
+    CommandState.Mode.CMD_LINE -> VimStateMachine.Mode.CMD_LINE
+    CommandState.Mode.OP_PENDING -> VimStateMachine.Mode.OP_PENDING
+    CommandState.Mode.REPLACE -> VimStateMachine.Mode.REPLACE
+    CommandState.Mode.INSERT_NORMAL -> VimStateMachine.Mode.INSERT_NORMAL
+    CommandState.Mode.INSERT_VISUAL -> VimStateMachine.Mode.INSERT_VISUAL
+    CommandState.Mode.INSERT_SELECT -> VimStateMachine.Mode.INSERT_SELECT
+  }
+
+
 val VimStateMachine.Mode.ij: CommandState.Mode
   get() = when (this) {
     VimStateMachine.Mode.COMMAND -> CommandState.Mode.COMMAND
