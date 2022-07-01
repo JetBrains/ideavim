@@ -18,12 +18,23 @@
 
 package com.maddyhome.idea.vim.option
 
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.options.OptionConstants.Companion.ignorecaseName
+import com.maddyhome.idea.vim.options.OptionConstants.Companion.smartcaseName
+import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.options.ToggleOption
 import com.maddyhome.idea.vim.options.helpers.KeywordOptionHelper
+import com.maddyhome.idea.vim.vimscript.services.IjVimOptionService
 
 /**
  * COMPATIBILITY-LAYER: Added a class and package
  */
 object OptionsManager {
+  val ignorecase: ToggleOption
+    get() = (injector.optionService as IjVimOptionService).getRawOption(ignorecaseName) as ToggleOption
+  val smartcase: ToggleOption
+    get() = (injector.optionService as IjVimOptionService).getRawOption(smartcaseName) as ToggleOption
   val iskeyword: KeywordOption
     get() = KeywordOption(KeywordOptionHelper)
 }
@@ -31,5 +42,13 @@ object OptionsManager {
 class KeywordOption(val helper: KeywordOptionHelper) {
   fun toRegex(): List<String> {
     return helper.toRegex()
+  }
+}
+
+object StrictMode {
+  fun fail(message: String) {
+    if (injector.optionService.isSet(OptionScope.GLOBAL, OptionConstants.ideastrictmodeName)) {
+      error(message)
+    }
   }
 }

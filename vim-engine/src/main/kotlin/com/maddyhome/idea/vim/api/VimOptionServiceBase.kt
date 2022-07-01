@@ -359,6 +359,10 @@ abstract class VimOptionServiceBase : OptionService {
     options.get(optionName)!!.removeOptionChangeListener(listener)
   }
 
+  fun getRawOption(key: String): Option<out VimDataType>? {
+    return options.get(key)
+  }
+
   private fun castToVimDataType(value: String, optionName: String, token: String): VimDataType {
     val option = options.get(optionName) ?: throw ExException("E518: Unknown option: $token")
     return when (option) {
