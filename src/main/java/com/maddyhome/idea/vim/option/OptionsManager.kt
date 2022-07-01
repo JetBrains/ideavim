@@ -23,7 +23,6 @@ import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionConstants.Companion.ignorecaseName
 import com.maddyhome.idea.vim.options.OptionConstants.Companion.smartcaseName
 import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.options.ToggleOption
 import com.maddyhome.idea.vim.options.helpers.KeywordOptionHelper
 import com.maddyhome.idea.vim.vimscript.services.IjVimOptionService
 
