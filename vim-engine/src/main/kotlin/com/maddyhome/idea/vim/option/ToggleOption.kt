@@ -1,7 +1,9 @@
 package com.maddyhome.idea.vim.option
 
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.options.Option
+import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 
@@ -27,5 +29,12 @@ class ToggleOption(name: String, abbrev: String, defaultValue: VimInt) : Option<
 
   override fun getValueIfRemove(currentValue: VimDataType, value: String, token: String): VimInt {
     throw ExException("E474: Invalid argument: $token")
+  }
+
+  /**
+   * COMPATIBILITY-LAYER: Method added
+   */
+  fun isSet(): Boolean {
+    return injector.optionService.getOptionValue(OptionScope.GLOBAL, name).asBoolean()
   }
 }
