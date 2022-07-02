@@ -175,7 +175,10 @@ class VimSurroundExtension : VimExtension {
 
         surroundings.forEach {
           it.restoreRegister()
-          it.moveCaret()
+        }
+
+        if (surroundings.size == 1) {
+          surroundings.first().moveCaret()
         }
       }
 
