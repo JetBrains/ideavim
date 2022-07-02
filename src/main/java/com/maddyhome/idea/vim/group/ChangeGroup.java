@@ -675,7 +675,7 @@ public class ChangeGroup extends VimChangeGroupBase {
               }
             }
             if (pos > wsoff) {
-              deleteText(editor, new TextRange(wsoff, pos), null);
+              deleteText(editor, new TextRange(wsoff, pos), null, caret);
             }
           }
         }

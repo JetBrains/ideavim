@@ -22,6 +22,7 @@ import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.VimStateMachine
@@ -30,15 +31,14 @@ import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.executeNormalWithoutMapping
-import com.maddyhome.idea.vim.extension.VimExtensionFacade.getRegister
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.inputKeyStroke
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.inputString
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setOperatorFunction
-import com.maddyhome.idea.vim.extension.VimExtensionFacade.setRegister
 import com.maddyhome.idea.vim.extension.ExtensionHandler
-import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.extension.VimExtensionFacade.getRegisterForCaret
+import com.maddyhome.idea.vim.extension.VimExtensionFacade.setRegisterForCaret
 import com.maddyhome.idea.vim.helper.editorMode
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.newapi.IjVimCaret
@@ -46,6 +46,7 @@ import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.helpers.ClipboardOptionHelper
+import com.maddyhome.idea.vim.put.PutData
 import org.jetbrains.annotations.NonNls
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
@@ -115,33 +116,67 @@ class VimSurroundExtension : VimExtension {
       if (charTo.code == 0) return
 
       val newSurround = getOrInputPair(charTo, editor.ij) ?: return
-      runWriteAction { change(editor.ij, charFrom, newSurround) }
+      runWriteAction { change(editor, context, charFrom, newSurround) }
     }
 
     companion object {
-      fun change(editor: Editor, charFrom: Char, newSurround: Pair<String, String>?) {
-        // We take over the " register, so preserve it
-        val oldValue: List<KeyStroke>? = getRegister(REGISTER)
-        // Empty the " register
-        setRegister(REGISTER, null)
-        // Extract the inner value
-        perform("di" + pick(charFrom), editor)
-        val innerValue: MutableList<KeyStroke> = getRegister(REGISTER)?.toMutableList() ?: mutableListOf()
-        // If the surrounding characters were not found, the register will be empty
-        if (innerValue.isNotEmpty()) {
-          // Delete the surrounding
-          perform("da" + pick(charFrom), editor)
-          // Insert the surrounding characters and paste
-          if (newSurround != null) {
-            innerValue.addAll(0, injector.parser.parseKeys(newSurround.first))
-            innerValue.addAll(injector.parser.parseKeys(newSurround.second))
+      fun change(editor: VimEditor, context: ExecutionContext, charFrom: Char, newSurround: Pair<String, String>?) {
+        // Save old register values for carets
+        val surroundings = editor.sortedCarets()
+          .map {
+            val oldValue: List<KeyStroke>? = getRegisterForCaret(REGISTER, it)
+            setRegisterForCaret(REGISTER, it, null)
+            SurroundingInfo(it, null, oldValue, null)
           }
-          pasteSurround(innerValue, editor)
-          // Jump back to start
-          executeNormalWithoutMapping(injector.parser.parseKeys("`["), editor)
+
+        // Delete surrounding's content
+        perform("di" + pick(charFrom), editor.ij)
+
+        // Add info about surrounding's inner text and location
+        surroundings.forEach {
+          val registerValue = getRegisterForCaret(REGISTER, it.caret)
+          val innerValue = if (registerValue.isNullOrEmpty()) null else registerValue
+          it.innerText = innerValue
+
+          val lineEndOffset = injector.engineEditorHelper.getLineEndOffset(editor, it.caret.getLine().line, false)
+          if (lineEndOffset == it.caret.offset.point) {
+            it.isLineEnd = true
+          }
         }
-        // Restore the old value
-        setRegister(REGISTER, oldValue)
+
+        // Remove surrounding
+        perform("da" + pick(charFrom), editor.ij)
+
+        surroundings.forEach {
+          if (it.innerText == null && getRegisterForCaret(REGISTER, it.caret)?.isNotEmpty() == true) {
+            it.innerText = emptyList()
+          }
+
+          // caret should be placed at the first char of inserted text
+          // the best solution would be using [ mark after the paste, but marks are not supported by multicaret
+          // todo
+          if (it.innerText != null) {
+            it.offset = it.caret.offset.point
+          }
+        }
+
+        surroundings
+          .filter { it.innerText != null } // we do nothing with carets that are not inside the surrounding
+          .map { surrounding ->
+            val innerValue = injector.parser.toPrintableString(surrounding.innerText!!)
+            val text = newSurround?.let {it.first + innerValue + it.second} ?: innerValue
+            val textData = PutData.TextData(text, SelectionType.CHARACTER_WISE, emptyList())
+            val putData = PutData(textData, null, 1, insertTextBeforeCaret = !surrounding.isLineEnd, rawIndent = true, caretAfterInsertedText = false)
+
+            surrounding.caret to putData
+          }.forEach {
+            injector.put.putTextForCaret(editor, it.first, context, it.second)
+          }
+
+        surroundings.forEach {
+          it.restoreRegister()
+          it.moveCaret()
+        }
       }
 
       private fun perform(sequence: String, editor: Editor) {
@@ -149,25 +184,22 @@ class VimSurroundExtension : VimExtension {
           .use { executeNormalWithoutMapping(injector.parser.parseKeys("\"" + REGISTER + sequence), editor) }
       }
 
-      private fun pasteSurround(
-        innerValue: List<KeyStroke?>,
-        editor: Editor,
-      ) { // This logic is direct from vim-surround
-        val offset = editor.caretModel.offset
-        val lineEndOffset = EditorHelper.getLineEndForOffset(editor, offset)
-        val motionEndMark = VimPlugin.getMark().getMark(editor.vim, ']')
-        val motionEndOffset = if (motionEndMark != null) {
-          EditorHelper.getOffset(editor, motionEndMark.logicalLine, motionEndMark.col)
-        } else -1
-        val pasteCommand = if (motionEndOffset == lineEndOffset && offset + 1 == lineEndOffset) "p" else "P"
-        setRegister(REGISTER, innerValue)
-        perform(pasteCommand, editor)
-      }
-
       private fun pick(charFrom: Char) = when (charFrom) {
         'a' -> '>'
         'r' -> ']'
         else -> charFrom
+      }
+    }
+  }
+
+  private data class SurroundingInfo(val caret: VimCaret, var innerText: List<KeyStroke>?, val oldRegisterContent: List<KeyStroke>?, var offset: Int?, var isLineEnd: Boolean = false) {
+    fun restoreRegister() {
+      setRegisterForCaret(REGISTER, caret, oldRegisterContent)
+    }
+
+    fun moveCaret() {
+      if (innerText != null && offset != null) {
+        caret.moveToOffset(offset!! + if (isLineEnd) 1 else 0)
       }
     }
   }
@@ -180,7 +212,7 @@ class VimSurroundExtension : VimExtension {
       val charFrom = getChar(editor.ij)
       if (charFrom.code == 0) return
 
-      runWriteAction { CSurroundHandler.change(editor.ij, charFrom, null) }
+      runWriteAction { CSurroundHandler.change(editor, context, charFrom, null) }
     }
   }
 

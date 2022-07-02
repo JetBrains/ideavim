@@ -56,8 +56,7 @@ class PutViaIdeaTest : VimTestCase() {
     val before = "${c}I found it in a legendary land"
     configureByText(before)
 
-    VimPlugin.getRegister()
-      .storeText(myFixture.editor.vim, before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
+    injector.registerGroup.storeText('"', "legendary", SelectionType.CHARACTER_WISE)
 
     typeText(injector.parser.parseKeys("ve" + "p"))
     val after = "legendar${c}y it in a legendary land"

@@ -65,15 +65,14 @@ class ReplaceWithRegister : VimExtension {
 
   private class RwrVisual : ExtensionHandler {
     override fun execute(editor: VimEditor, context: ExecutionContext) {
-      val caretsAndSelections = mutableMapOf<VimCaret, VimSelection>()
       val typeInEditor = SelectionType.fromSubMode(editor.subMode)
       editor.forEachCaret { caret ->
         val selectionStart = caret.selectionStart
         val selectionEnd = caret.selectionEnd
 
-        caretsAndSelections += caret to VimSelection.create(selectionStart, selectionEnd - 1, typeInEditor, editor)
+        val visualSelection = caret to VimSelection.create(selectionStart, selectionEnd - 1, typeInEditor, editor)
+        doReplace(editor.ij, caret, PutData.VisualSelection(mapOf(visualSelection), typeInEditor))
       }
-      doReplace(editor.ij, PutData.VisualSelection(caretsAndSelections, typeInEditor))
       editor.exitVisualModeNative()
     }
   }
@@ -97,11 +96,11 @@ class ReplaceWithRegister : VimExtension {
         val lineStart = editor.getLineStartOffset(logicalLine)
         val lineEnd = editor.getLineEndOffset(logicalLine, true)
 
-        caretsAndSelections += caret to VimSelection.create(lineStart, lineEnd, SelectionType.LINE_WISE, editor)
-      }
+        val visualSelection = caret to VimSelection.create(lineStart, lineEnd, SelectionType.LINE_WISE, editor)
+        caretsAndSelections += visualSelection
 
-      val visualSelection = PutData.VisualSelection(caretsAndSelections, SelectionType.LINE_WISE)
-      doReplace(editor.ij, visualSelection)
+        doReplace(editor.ij, caret, PutData.VisualSelection(mapOf(visualSelection), SelectionType.LINE_WISE))
+      }
 
       editor.forEachCaret { caret ->
         val vimStart = caretsAndSelections[caret]?.vimStart
@@ -126,7 +125,8 @@ class ReplaceWithRegister : VimExtension {
         ),
         selectionType
       )
-      doReplace(editor, visualSelection)
+      // todo multicaret
+      doReplace(editor, editor.vim.primaryCaret(), visualSelection)
       return true
     }
 
@@ -147,8 +147,9 @@ class ReplaceWithRegister : VimExtension {
     @NonNls
     private const val RWR_VISUAL = "<Plug>ReplaceWithRegisterVisual"
 
-    private fun doReplace(editor: Editor, visualSelection: PutData.VisualSelection) {
-      val savedRegister = VimPlugin.getRegister().lastRegister ?: return
+    private fun doReplace(editor: Editor, caret: VimCaret, visualSelection: PutData.VisualSelection) {
+      val lastRegisterChar = injector.registerGroup.lastRegisterChar
+      val savedRegister = caret.registerStorage.getRegister(lastRegisterChar) ?: return
 
       var usedType = savedRegister.type
       var usedText = savedRegister.text
@@ -173,8 +174,8 @@ class ReplaceWithRegister : VimExtension {
         VimPlugin.getPut().putText(IjVimEditor(editor), IjExecutionContext(EditorDataContext.init(editor)), putData)
       }
 
-      VimPlugin.getRegister().saveRegister(savedRegister.name, savedRegister)
-      VimPlugin.getRegister().saveRegister(VimPlugin.getRegister().defaultRegister, savedRegister)
+      caret.registerStorage.saveRegister(savedRegister.name, savedRegister)
+      caret.registerStorage.saveRegister(VimPlugin.getRegister().defaultRegister, savedRegister)
     }
   }
 }

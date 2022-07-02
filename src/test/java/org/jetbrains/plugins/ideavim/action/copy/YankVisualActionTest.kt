@@ -24,6 +24,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
+import com.maddyhome.idea.vim.newapi.vim
 import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -79,47 +80,48 @@ class YankVisualActionTest : VimTestCase() {
   }
 
   fun `test yank multicaret`() {
-    doTest(
-      injector.parser.parseKeys("viw" + "y"),
-      """
+    val text = """
                             A Discovery
 
                             I ${c}found it in a legendary land
                             all rocks and lavender and tufted grass,
                             where it ${c}was settled on some sodden sand
                             hard by the torrent of a mountain pass.
-      """.trimIndent(),
-      "found\nwas", SelectionType.BLOCK_WISE
-    )
+      """.trimIndent()
+    configureByText(text)
+    typeText(injector.parser.parseKeys("viw" + "y"))
+    val editor = myFixture.editor.vim
+    val lastRegister = injector.registerGroup.lastRegisterChar
+    val registers = editor.carets().map { it.registerStorage.getRegister(lastRegister)?.rawText }
+    assertEquals(listOf("found", "was"), registers)
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
-  fun testYankVisualRange() {
-    val before = """
-            q${c}werty
-            asdf${c}gh
-            ${c}zxcvbn
-
-    """.trimIndent()
-    configureByText(before)
-    typeText(injector.parser.parseKeys("vey"))
-
-    val lastRegister = VimPlugin.getRegister().lastRegister
-    TestCase.assertNotNull(lastRegister)
-    val text = lastRegister!!.text
-    TestCase.assertNotNull(text)
-
-    typeText(injector.parser.parseKeys("G" + "$" + "p"))
-    val after = """
-      qwerty
-      asdfgh
-      zxcvbn
-      ${c}werty
-      gh
-      zxcvbn
-    """.trimIndent()
-    assertState(after)
-  }
+  // todo multicaret
+//  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+//  fun testYankVisualRange() {
+//    val before = """
+//            q${c}werty
+//            asdf${c}gh
+//            ${c}zxcvbn
+//
+//    """.trimIndent()
+//    configureByText(before)
+//    typeText(injector.parser.parseKeys("vey"))
+//
+//    val lastRegister = VimPlugin.getRegister().lastRegister
+//    TestCase.assertNotNull(lastRegister)
+//    val text = lastRegister!!.text
+//    TestCase.assertNotNull(text)
+//
+//    typeText(injector.parser.parseKeys("G" + "$" + "p"))
+//    val after = """
+//      qwerty
+//      asdfgh
+//      zxcvbn
+//      wert${c}yg${c}hzxcvb${c}n
+//    """.trimIndent()
+//    assertState(after)
+//  }
 
   fun `test yank line`() {
     doTest(
@@ -152,17 +154,22 @@ class YankVisualActionTest : VimTestCase() {
   }
 
   fun `test yank multicaret line`() {
-    doTest(
-      injector.parser.parseKeys("V" + "y"),
-      """
+    val text = """
                             A Discovery
 
                             I found it in a legendary land
                             all ${c}rocks and lavender and tufted grass,
                             where it was settled on some sodden sand
                             hard by ${c}the torrent of a mountain pass.
-      """.trimIndent(),
-      "all rocks and lavender and tufted grass,\nhard by the torrent of a mountain pass.\n", SelectionType.LINE_WISE
+      """.trimIndent()
+    configureByText(text)
+    typeText(injector.parser.parseKeys("V" + "y"))
+    val editor = myFixture.editor.vim
+    val lastRegister = injector.registerGroup.lastRegisterChar
+    val registers = editor.carets().map { it.registerStorage.getRegister(lastRegister)?.rawText }
+    assertEquals(
+      listOf("all rocks and lavender and tufted grass,\n", "hard by the torrent of a mountain pass.\n"),
+      registers
     )
   }
 
@@ -180,35 +187,15 @@ class YankVisualActionTest : VimTestCase() {
     configureByText(before)
     typeText(injector.parser.parseKeys("Vy"))
 
-    val lastRegister = VimPlugin.getRegister().lastRegister
-    TestCase.assertNotNull(lastRegister)
-    val text = lastRegister!!.text
-    TestCase.assertNotNull(text)
-    TestCase.assertEquals(
-      """
-    qwe
-    zxc
-    rty
-
-      """.trimIndent(),
-      text
-    )
-
     typeText(injector.parser.parseKeys("p"))
     val after = """
             qwe
             ${c}qwe
-            zxc
-            rty
             asd
             zxc
-            ${c}qwe
-            zxc
+            ${c}zxc
             rty
-            rty
-            ${c}qwe
-            zxc
-            rty
+            ${c}rty
             fgh
             vbn
             

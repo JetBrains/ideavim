@@ -18,6 +18,7 @@
 package com.maddyhome.idea.vim.action.copy
 
 import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
@@ -40,14 +41,28 @@ sealed class PutTextBaseAction(
     argument: Argument?,
     operatorArguments: OperatorArguments
   ): Boolean {
-    val lastRegister = injector.registerGroup.lastRegister
-    val textData = if (lastRegister != null) TextData(
-      lastRegister.text ?: injector.parser.toPrintableString(lastRegister.keys),
-      lastRegister.type,
-      lastRegister.transferableData
-    ) else null
-    val putData = PutData(textData, null, operatorArguments.count1, insertTextBeforeCaret, indent, caretAfterInsertedText, -1)
-    return injector.put.putText(editor, context, putData)
+    val count = operatorArguments.count1
+    val caretToPutData = editor.sortedCarets().associateWith { getPutDataForCaret(it, count) }
+    var result = true
+    injector.application.runWriteAction {
+      caretToPutData.forEach {
+        result = injector.put.putTextForCaret(editor, it.key, context, it.value) && result
+      }
+    }
+    return result
+  }
+
+  private fun getPutDataForCaret(caret: VimCaret, count: Int): PutData {
+    val lastRegisterChar = injector.registerGroup.lastRegisterChar
+    val register = caret.registerStorage.getRegister(lastRegisterChar)
+    val textData = register?.let {
+      TextData(
+        register.text ?: injector.parser.toPrintableString(register.keys),
+        register.type,
+        register.transferableData
+      )
+    }
+    return PutData(textData, null, count, insertTextBeforeCaret, indent, caretAfterInsertedText, -1)
   }
 }
 

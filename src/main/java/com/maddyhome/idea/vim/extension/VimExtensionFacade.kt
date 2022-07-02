@@ -23,6 +23,7 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.change.Extension
+import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.CommandAlias
@@ -182,10 +183,22 @@ object VimExtensionFacade {
     return reg.keys
   }
 
+  @JvmStatic
+  fun getRegisterForCaret(register: Char, caret: VimCaret): List<KeyStroke>? {
+    val reg = caret.registerStorage.getRegister(register) ?: return null
+    return reg.keys
+  }
+
   /** Set the current contents of the given register */
   @JvmStatic
   fun setRegister(register: Char, keys: List<KeyStroke?>?) {
     VimPlugin.getRegister().setKeys(register, keys?.filterNotNull() ?: emptyList())
+  }
+
+  /** Set the current contents of the given register */
+  @JvmStatic
+  fun setRegisterForCaret(register: Char, caret: VimCaret, keys: List<KeyStroke?>?) {
+    caret.registerStorage.setKeys(register, keys?.filterNotNull() ?: emptyList())
   }
 
   /** Set the current contents of the given register */

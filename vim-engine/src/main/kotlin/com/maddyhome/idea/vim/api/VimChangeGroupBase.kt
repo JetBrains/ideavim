@@ -83,7 +83,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
   override fun deleteCharacter(editor: VimEditor, caret: VimCaret, count: Int, isChange: Boolean): Boolean {
     val endOffset = injector.motion.getOffsetOfHorizontalMotion(editor, caret, count, true)
     if (endOffset != -1) {
-      val res = deleteText(editor, TextRange(caret.offset.point, endOffset), SelectionType.CHARACTER_WISE)
+      val res = deleteText(editor, TextRange(caret.offset.point, endOffset), SelectionType.CHARACTER_WISE, caret)
       val pos = caret.offset.point
       val norm = injector.engineEditorHelper.normalizeOffset(editor, caret.getLogicalPosition().line, pos, isChange)
       if (norm != pos ||
@@ -132,6 +132,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     editor: VimEditor,
     range: TextRange,
     type: SelectionType?,
+    caret: VimCaret,
   ): Boolean {
     var updatedRange = range
     // Fix for https://youtrack.jetbrains.net/issue/VIM-35
@@ -145,7 +146,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       }
     }
     if (type == null ||
-      editor.inInsertMode || injector.registerGroup.storeText(editor, updatedRange, type, true)
+      editor.inInsertMode || caret.registerStorage.storeText(editor, updatedRange, type, true)
     ) {
       val startOffsets = updatedRange.startOffsets
       val endOffsets = updatedRange.endOffsets
@@ -154,8 +155,10 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       }
       if (type != null) {
         val start = updatedRange.startOffset
-        injector.markGroup.setMark(editor, MARK_CHANGE_POS, start)
-        injector.markGroup.setChangeMarks(editor, TextRange(start, start + 1))
+        if (editor.primaryCaret() == caret) {
+          injector.markGroup.setMark(editor, MARK_CHANGE_POS, start)
+          injector.markGroup.setChangeMarks(editor, TextRange(start, start + 1))
+        }
       }
       return true
     }
@@ -631,7 +634,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       val rangeToDelete = TextRange(startOffset, offset)
       editor.nativeCarets().filter { it != caret && rangeToDelete.contains(it.offset.point) }
         .forEach { editor.removeCaret(it) }
-      val res = deleteText(editor, rangeToDelete, SelectionType.CHARACTER_WISE)
+      val res = deleteText(editor, rangeToDelete, SelectionType.CHARACTER_WISE, caret)
       if (usesVirtualSpace) {
         injector.motion.moveCaret(editor, caret, startOffset)
       } else {
@@ -726,7 +729,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       logger.debug("offset=$offset")
     }
     if (offset != -1) {
-      val res = deleteText(editor, TextRange(start, offset), SelectionType.LINE_WISE)
+      val res = deleteText(editor, TextRange(start, offset), SelectionType.LINE_WISE, caret)
       if (res && caret.offset.point >= editor.fileSize() && caret.offset.point != 0) {
         injector.motion.moveCaret(
           editor, caret, injector.motion.moveCaretToLineStartSkipLeadingOffset(
@@ -856,7 +859,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     // Update the last column before we delete, or we might be retrieving the data for a line that no longer exists
     caret.vimLastColumn = caret.inlayAwareVisualColumn
     val removeLastNewLine = removeLastNewLine(editor, range, type)
-    val res = deleteText(editor, range, type)
+    val res = deleteText(editor, range, type, caret)
     if (removeLastNewLine) {
       val textLength = editor.fileSize().toInt()
       editor.deleteString(TextRange(textLength - 1, textLength))
@@ -975,7 +978,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       } else {
         injector.motion.moveCaretToLineStart(editor, caret.getLogicalPosition().line + 1)
       }
-      deleteText(editor, TextRange(caret.offset.point, offset), null)
+      deleteText(editor, TextRange(caret.offset.point, offset), null, caret)
       if (spaces && !hasTrailingWhitespace) {
         insertText(editor, caret, " ")
         injector.motion.moveCaret(

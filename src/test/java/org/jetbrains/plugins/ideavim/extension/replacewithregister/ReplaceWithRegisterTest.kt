@@ -367,9 +367,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
             I found it in a legendary land
             where it was settled on some sodden sand
             where it was settled on some sodden sand
-            I found it in a legendary land
-            where it was settled on some sodden sand
-
+            
       """.trimIndent()
     )
   }

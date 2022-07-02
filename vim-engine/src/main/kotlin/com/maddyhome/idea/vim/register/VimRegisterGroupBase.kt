@@ -36,8 +36,7 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
   @JvmField
   protected var defaultRegisterChar = UNNAMED_REGISTER
 
-  @JvmField
-  protected var lastRegisterChar = defaultRegisterChar
+  override var lastRegisterChar = defaultRegisterChar
 
   /**
    * Gets the last register name selected by the user
@@ -293,7 +292,7 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     return true
   }
 
-  override fun storeText(register: Char, text: String): Boolean {
+  override fun storeText(register: Char, text: String, selectionType: SelectionType): Boolean {
     if (!WRITABLE_REGISTERS.contains(register)) {
       return false
     }
@@ -303,12 +302,16 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     } else {
       text
     }
-    val reg = Register(register, SelectionType.CHARACTER_WISE, textToStore, ArrayList())
+    val reg = Register(register, selectionType, textToStore, ArrayList())
     saveRegister(register, reg)
     if (register == '/') {
       injector.searchGroup.lastSearchPattern = text // todo we should not have this field if we have the "/" register
     }
     return true
+  }
+
+  override fun storeText(register: Char, text: String): Boolean {
+    return storeText(register, text, SelectionType.CHARACTER_WISE)
   }
 
   private fun guessSelectionType(text: String): SelectionType {

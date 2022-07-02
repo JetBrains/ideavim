@@ -23,5 +23,5 @@ interface VimPut {
     updateVisualMarks: Boolean = false,
   ): Boolean
 
-  fun putTextForCaret(editor: VimEditor, caret: VimCaret, context: ExecutionContext, data: PutData): Boolean
+  fun putTextForCaret(editor: VimEditor, caret: VimCaret, context: ExecutionContext, data: PutData, updateVisualMarks: Boolean = false): Boolean
 }

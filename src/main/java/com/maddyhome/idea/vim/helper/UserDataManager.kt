@@ -27,6 +27,7 @@ import com.intellij.openapi.editor.RangeMarker
 import com.intellij.openapi.editor.markup.RangeHighlighter
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.UserDataHolder
+import com.maddyhome.idea.vim.api.CaretRegisterStorageBase
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.ex.ExOutputModel
@@ -73,6 +74,7 @@ var Caret.vimInsertStart: RangeMarker by userDataOr {
     this.offset
   )
 }
+var Caret.registerStorage: CaretRegisterStorageBase? by userDataCaretToEditor()
 
 // ------------------ Editor
 fun unInitializeEditor(editor: Editor) {

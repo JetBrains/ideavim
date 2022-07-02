@@ -202,9 +202,9 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
             ${c}zxcvbn
 
     """.trimIndent()
-    val editor = configureByText(before)
-    VimPlugin.getRegister().storeText(editor.vim, TextRange(14, 21), SelectionType.LINE_WISE, false)
-    typeText(injector.parser.parseKeys("vl" + "gp"))
+    configureByText(before)
+    injector.registerGroup.storeText('*', "zxcvbn\n", SelectionType.LINE_WISE)
+    typeText(injector.parser.parseKeys("vl" + "\"*gp"))
     val after = """
             q
             zxcvbn

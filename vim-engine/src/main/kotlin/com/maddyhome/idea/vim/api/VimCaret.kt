@@ -1,12 +1,17 @@
 package com.maddyhome.idea.vim.api
 
+import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.EditorLine
 import com.maddyhome.idea.vim.common.LiveRange
 import com.maddyhome.idea.vim.common.Offset
+import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.visual.VisualChange
+import com.maddyhome.idea.vim.register.Register
+import javax.swing.KeyStroke
 
 // TODO: 29.12.2021 Split interface to mutable and immutable
 interface VimCaret {
+  val registerStorage: CaretRegisterStorage
   val editor: VimEditor
   val offset: Offset
   var vimLastColumn: Int
@@ -35,4 +40,20 @@ interface VimCaret {
   fun moveToVisualPosition(position: VimVisualPosition)
   fun setNativeSelection(start: Offset, end: Offset)
   fun removeNativeSelection()
+}
+
+interface CaretRegisterStorage {
+  /**
+   * Stores text to caret's recordable (named/numbered/unnamed) register
+   */
+  fun storeText(editor: VimEditor, range: TextRange, type: SelectionType, isDelete: Boolean): Boolean
+
+  /**
+   * Gets text from caret's recordable register
+   * If the register is not recordable - global text state will be returned
+   */
+  fun getRegister(r: Char): Register?
+
+  fun setKeys(register: Char, keys: List<KeyStroke>)
+  fun saveRegister(r: Char, register: Register)
 }

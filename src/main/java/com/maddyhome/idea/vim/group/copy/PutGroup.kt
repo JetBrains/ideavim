@@ -60,10 +60,14 @@ import java.awt.datatransfer.DataFlavor
 import kotlin.math.min
 
 class PutGroup : VimPutBase() {
-  override fun putTextForCaret(editor: VimEditor, caret: VimCaret, context: ExecutionContext, data: PutData): Boolean {
+  override fun putTextForCaret(editor: VimEditor, caret: VimCaret, context: ExecutionContext, data: PutData, updateVisualMarks: Boolean): Boolean {
     val additionalData = collectPreModificationData(editor, data)
+    data.visualSelection?.let { deleteSelectedText(editor, data) }
     val processedText = processText(editor, data) ?: return false
     putForCaret(editor, caret, data, additionalData, context, processedText)
+    if (editor.primaryCaret() == caret && updateVisualMarks) {
+      wrapInsertedTextWithVisualMarks(editor, data, processedText)
+    }
     return true
   }
 
@@ -118,7 +122,9 @@ class PutGroup : VimPutBase() {
         editor, caret, context, text.text, text.typeInRegister, subMode,
         startOffset, data.count, data.indent, data.caretAfterInsertedText
       )
-      VimPlugin.getMark().setChangeMarks(editor, TextRange(startOffset, endOffset))
+      if (caret == editor.primaryCaret()) {
+        VimPlugin.getMark().setChangeMarks(editor, TextRange(startOffset, endOffset))
+      }
       moveCaretToEndPosition(
         editor,
         caret,

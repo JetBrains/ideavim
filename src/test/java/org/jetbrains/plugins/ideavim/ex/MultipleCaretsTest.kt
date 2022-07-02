@@ -221,11 +221,9 @@ class MultipleCaretsTest : VimTestCase() {
     val after = """qwe
       |rty
       |${c}rty
-      |fgh
       |asd
       |fgh
-      |${c}rty
-      |fgh
+      |${c}fgh
       |zxc
       |vbn
     """.trimMargin()

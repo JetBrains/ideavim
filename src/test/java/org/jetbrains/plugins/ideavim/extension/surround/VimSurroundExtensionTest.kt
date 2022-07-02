@@ -541,4 +541,32 @@ class VimSurroundExtensionTest : VimTestCase() {
     val keys = ":map gw ds)<CR>" + "qqgwqj@q"
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  fun `test change surround with multicaret`() {
+    val before = """
+                  (${c}abc)
+                  (${c}xyz)
+                    """
+    val after = """
+                  [abc]
+                  [xyz]
+                    """
+
+    doTest(listOf("cs(]"), before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  fun `test delete surround with multicaret`() {
+    val before = """
+                  (${c}abc)
+                  (${c}xyz)
+                    """
+    val after = """
+                  abc
+                  xyz
+                    """
+
+    doTest(listOf("ds("), before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+  }
 }

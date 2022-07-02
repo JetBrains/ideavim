@@ -20,6 +20,7 @@ package com.maddyhome.idea.vim.register
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
+import org.jetbrains.annotations.TestOnly
 import javax.swing.KeyStroke
 
 interface VimRegisterGroup {
@@ -30,6 +31,7 @@ interface VimRegisterGroup {
    * @return The register, null if no such register
    */
   val lastRegister: Register?
+  val lastRegisterChar: Char
   val currentRegister: Char
   val defaultRegister: Char
 
@@ -52,6 +54,13 @@ interface VimRegisterGroup {
    * Stores text to any writable register (used for the let command)
    */
   fun storeText(register: Char, text: String): Boolean
+
+  /**
+   * Stores text to any writable register (used for multicaret tests)
+   */
+  @TestOnly
+  // todo better tests
+  fun storeText(register: Char, text: String, selectionType: SelectionType): Boolean
 
   /**
    * Stores text, character wise, in the given special register

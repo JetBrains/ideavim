@@ -52,16 +52,30 @@ sealed class PutVisualTextBaseAction(
     operatorArguments: OperatorArguments,
   ): Boolean {
     if (caretsAndSelections.isEmpty()) return false
-    val textData = injector.registerGroup.lastRegister?.let { PutData.TextData(it.text, it.type, it.transferableData) }
+    val count = cmd.count
+    val caretToPutData = editor.sortedCarets().associateWith { getPutDataForCaret(it, caretsAndSelections[it], count) }
     injector.registerGroup.resetRegister()
+    var result = true
+    injector.application.runWriteAction {
+      caretToPutData.forEach {
+        result = injector.put.putTextForCaret(editor, it.key, context, it.value, true) && result
+      }
+    }
+    return result
+  }
 
-    val selection = PutData.VisualSelection(
-      caretsAndSelections,
-      caretsAndSelections.values.first().type
-    )
-    val putData = PutData(textData, selection, cmd.count, insertTextBeforeCaret, indent, caretAfterInsertedText)
-
-    return injector.put.putText(editor, context, putData, true)
+  private fun getPutDataForCaret(caret: VimCaret, selection: VimSelection?, count: Int): PutData {
+    val lastRegisterChar = injector.registerGroup.lastRegisterChar
+    val register = caret.registerStorage.getRegister(lastRegisterChar)
+    val textData = register?.let {
+      PutData.TextData(
+        register.text ?: injector.parser.toPrintableString(register.keys),
+        register.type,
+        register.transferableData
+      )
+    }
+    val visualSelection = selection?.let { PutData.VisualSelection(mapOf(caret to it), it.type) }
+    return PutData(textData, visualSelection, count, insertTextBeforeCaret, indent, caretAfterInsertedText)
   }
 }
 
