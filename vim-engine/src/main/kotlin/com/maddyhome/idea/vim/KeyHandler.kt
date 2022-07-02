@@ -25,8 +25,8 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandBuilder
 import com.maddyhome.idea.vim.command.CommandFlags
-import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.command.CommandState.Companion.getInstance
+import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.command.VimStateMachine.Companion.getInstance
 import com.maddyhome.idea.vim.command.MappingState
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.CommandNode
@@ -41,7 +41,7 @@ import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
-import com.maddyhome.idea.vim.helper.commandState
+import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.helper.inNormalMode
 import com.maddyhome.idea.vim.helper.inSingleNormalMode
 import com.maddyhome.idea.vim.helper.inVisualMode
@@ -116,7 +116,7 @@ class KeyHandler {
     }
 
     injector.messages.clearError()
-    val editorState = editor.commandState
+    val editorState = editor.vimStateMachine
     val commandBuilder = editorState.commandBuilder
 
     // If this is a "regular" character keystroke, get the character
@@ -166,10 +166,10 @@ class KeyHandler {
             LOG.trace("We are not able to find a node for this key")
 
             // If we are in insert/replace mode send this key in for processing
-            if (editorState.mode == CommandState.Mode.INSERT || editorState.mode == CommandState.Mode.REPLACE) {
+            if (editorState.mode == VimStateMachine.Mode.INSERT || editorState.mode == VimStateMachine.Mode.REPLACE) {
               LOG.trace("Process insert or replace")
               shouldRecord = injector.changeGroup.processKey(editor, context, key) && shouldRecord
-            } else if (editorState.mode == CommandState.Mode.SELECT) {
+            } else if (editorState.mode == VimStateMachine.Mode.SELECT) {
               LOG.trace("Process select")
               shouldRecord = injector.changeGroup.processKeyInSelectMode(editor, context, key) && shouldRecord
             } else if (editorState.mappingState.mappingMode == MappingMode.CMD_LINE) {
@@ -192,7 +192,7 @@ class KeyHandler {
   fun finishedCommandPreparation(
     editor: VimEditor,
     context: ExecutionContext,
-    editorState: CommandState,
+    editorState: VimStateMachine,
     commandBuilder: CommandBuilder,
     key: KeyStroke?,
     shouldRecord: Boolean,
@@ -228,7 +228,7 @@ class KeyHandler {
   private fun mapOpCommand(
     key: KeyStroke,
     node: Node<VimActionsInitiator>?,
-    editorState: CommandState,
+    editorState: VimStateMachine,
   ): Node<VimActionsInitiator>? {
     return if (editorState.isDuplicateOperatorKeyStroke(key)) {
       editorState.commandBuilder.getChildNode(KeyStroke.getKeyStroke('_'))
@@ -239,7 +239,7 @@ class KeyHandler {
     editor: VimEditor,
     key: KeyStroke,
     context: ExecutionContext,
-    editorState: CommandState,
+    editorState: VimStateMachine,
   ) {
     val commandBuilder = editorState.commandBuilder
     if (commandBuilder.isAwaitingCharOrDigraphArgument()) {
@@ -273,7 +273,7 @@ class KeyHandler {
     mappingCompleted: Boolean,
   ): Boolean {
     LOG.debug("Start processing key mappings.")
-    val commandState = editor.commandState
+    val commandState = editor.vimStateMachine
     val mappingState = commandState.mappingState
     val commandBuilder = commandState.commandBuilder
     if (commandBuilder.isAwaitingCharOrDigraphArgument() ||
@@ -303,11 +303,11 @@ class KeyHandler {
     return mappingProcessed
   }
 
-  private fun isMappingDisabledForKey(key: KeyStroke, commandState: CommandState): Boolean {
+  private fun isMappingDisabledForKey(key: KeyStroke, vimStateMachine: VimStateMachine): Boolean {
     // "0" can be mapped, but the mapping isn't applied when entering a count. Other digits are always mapped, even when
     // entering a count.
     // See `:help :map-modes`
-    val isMappingDisabled = key.keyChar == '0' && commandState.commandBuilder.count > 0
+    val isMappingDisabled = key.keyChar == '0' && vimStateMachine.commandBuilder.count > 0
     LOG.debug { "Mapping disabled for key: $isMappingDisabled" }
     return isMappingDisabled
   }
@@ -495,12 +495,12 @@ class KeyHandler {
     return unhandledKeyStrokes.isNotEmpty() && unhandledKeyStrokes[0] == injector.parser.plugKeyStroke
   }
 
-  private fun isCommandCountKey(chKey: Char, editorState: CommandState): Boolean {
+  private fun isCommandCountKey(chKey: Char, editorState: VimStateMachine): Boolean {
     // Make sure to avoid handling '0' as the start of a count.
     val commandBuilder = editorState.commandBuilder
     val notRegisterPendingCommand = editorState.mode.inNormalMode && !editorState.isRegisterPending
     val visualMode = editorState.mode.inVisualMode && !editorState.isRegisterPending
-    val opPendingMode = editorState.mode === CommandState.Mode.OP_PENDING
+    val opPendingMode = editorState.mode === VimStateMachine.Mode.OP_PENDING
 
     if (notRegisterPendingCommand || visualMode || opPendingMode) {
       if (commandBuilder.isExpectingCount && Character.isDigit(chKey) && (commandBuilder.count > 0 || chKey != '0')) {
@@ -512,25 +512,25 @@ class KeyHandler {
     return false
   }
 
-  private fun isDeleteCommandCountKey(key: KeyStroke, editorState: CommandState): Boolean {
+  private fun isDeleteCommandCountKey(key: KeyStroke, editorState: VimStateMachine): Boolean {
     // See `:help N<Del>`
     val commandBuilder = editorState.commandBuilder
     val isDeleteCommandKeyCount =
-      (editorState.mode === CommandState.Mode.COMMAND || editorState.mode === CommandState.Mode.VISUAL || editorState.mode === CommandState.Mode.OP_PENDING) &&
+      (editorState.mode === VimStateMachine.Mode.COMMAND || editorState.mode === VimStateMachine.Mode.VISUAL || editorState.mode === VimStateMachine.Mode.OP_PENDING) &&
         commandBuilder.isExpectingCount && commandBuilder.count > 0 && key.keyCode == KeyEvent.VK_DELETE
 
     LOG.debug { "This is a delete command key count: $isDeleteCommandKeyCount" }
     return isDeleteCommandKeyCount
   }
 
-  private fun isEditorReset(key: KeyStroke, editorState: CommandState): Boolean {
-    val editorReset = editorState.mode == CommandState.Mode.COMMAND && key.isCloseKeyStroke()
+  private fun isEditorReset(key: KeyStroke, editorState: VimStateMachine): Boolean {
+    val editorReset = editorState.mode == VimStateMachine.Mode.COMMAND && key.isCloseKeyStroke()
     LOG.debug { "This is editor reset: $editorReset" }
     return editorReset
   }
 
-  private fun isSelectRegister(key: KeyStroke, editorState: CommandState): Boolean {
-    if (editorState.mode != CommandState.Mode.COMMAND && editorState.mode != CommandState.Mode.VISUAL) {
+  private fun isSelectRegister(key: KeyStroke, editorState: VimStateMachine): Boolean {
+    if (editorState.mode != VimStateMachine.Mode.COMMAND && editorState.mode != VimStateMachine.Mode.VISUAL) {
       return false
     }
     return if (editorState.isRegisterPending) {
@@ -538,15 +538,15 @@ class KeyHandler {
     } else key.keyChar == '"' && !editorState.isOperatorPending && editorState.commandBuilder.expectedArgumentType == null
   }
 
-  private fun handleSelectRegister(commandState: CommandState, chKey: Char) {
+  private fun handleSelectRegister(vimStateMachine: VimStateMachine, chKey: Char) {
     LOG.trace("Handle select register")
-    commandState.resetRegisterPending()
+    vimStateMachine.resetRegisterPending()
     if (injector.registerGroup.isValid(chKey)) {
       LOG.trace("Valid register")
-      commandState.commandBuilder.pushCommandPart(chKey)
+      vimStateMachine.commandBuilder.pushCommandPart(chKey)
     } else {
       LOG.trace("Invalid register, set command state to BAD_COMMAND")
-      commandState.commandBuilder.commandState = CurrentCommandState.BAD_COMMAND
+      vimStateMachine.commandBuilder.commandState = CurrentCommandState.BAD_COMMAND
     }
   }
 
@@ -556,7 +556,7 @@ class KeyHandler {
     return expectingCharArgument
   }
 
-  private fun handleCharArgument(key: KeyStroke, chKey: Char, commandState: CommandState) {
+  private fun handleCharArgument(key: KeyStroke, chKey: Char, vimStateMachine: VimStateMachine) {
     var mutableChKey = chKey
     LOG.trace("Handling char argument")
     // We are expecting a character argument - is this a regular character the user typed?
@@ -567,7 +567,7 @@ class KeyHandler {
         KeyEvent.VK_ENTER -> mutableChKey = '\n'
       }
     }
-    val commandBuilder = commandState.commandBuilder
+    val commandBuilder = vimStateMachine.commandBuilder
     if (mutableChKey.code != 0) {
       LOG.trace("Add character argument to the current command")
       // Create the character argument, add it to the current command, and signal we are ready to process the command
@@ -577,14 +577,14 @@ class KeyHandler {
       // Oops - this isn't a valid character argument
       commandBuilder.commandState = CurrentCommandState.BAD_COMMAND
     }
-    commandState.resetReplaceCharacter()
+    vimStateMachine.resetReplaceCharacter()
   }
 
   private fun handleDigraph(
     editor: VimEditor,
     key: KeyStroke,
     context: ExecutionContext,
-    editorState: CommandState,
+    editorState: VimStateMachine,
   ): Boolean {
     LOG.debug("Handling digraph")
     // Support starting a digraph/literal sequence if the operator accepts one as an argument, e.g. 'r' or 'f'.
@@ -654,7 +654,7 @@ class KeyHandler {
   private fun executeCommand(
     editor: VimEditor,
     context: ExecutionContext,
-    editorState: CommandState,
+    editorState: VimStateMachine,
   ) {
     LOG.trace("Command execution")
     val command = editorState.commandBuilder.buildCommand()
@@ -696,7 +696,7 @@ class KeyHandler {
     context: ExecutionContext,
     key: KeyStroke,
     node: CommandNode<VimActionsInitiator>,
-    editorState: CommandState,
+    editorState: VimStateMachine,
   ) {
     LOG.trace("Handle command node")
     // The user entered a valid command. Create the command and add it to the stack.
@@ -746,7 +746,7 @@ class KeyHandler {
     }
   }
 
-  private fun stopMacroRecord(node: CommandNode<VimActionsInitiator>, editorState: CommandState): Boolean {
+  private fun stopMacroRecord(node: CommandNode<VimActionsInitiator>, editorState: VimStateMachine): Boolean {
     // TODO
 //    return editorState.isRecording && node.actionHolder.getInstance() is ToggleRecordingAction
     return editorState.isRecording && node.actionHolder.getInstance().id == "VimToggleRecordingAction"
@@ -758,7 +758,7 @@ class KeyHandler {
     key: Char,
     action: EditorActionHandlerBase,
     argument: Argument.Type,
-    editorState: CommandState,
+    editorState: VimStateMachine,
   ) {
     val commandBuilder = editorState.commandBuilder
     when (argument) {
@@ -766,7 +766,7 @@ class KeyHandler {
         if (editorState.isDotRepeatInProgress && argumentCaptured != null) {
           commandBuilder.completeCommandPart(argumentCaptured!!)
         }
-        editorState.pushModes(CommandState.Mode.OP_PENDING, CommandState.SubMode.NONE)
+        editorState.pushModes(VimStateMachine.Mode.OP_PENDING, VimStateMachine.SubMode.NONE)
       }
       Argument.Type.DIGRAPH -> // Command actions represent the completion of a command. Showcmd relies on this - if the action represents a
         // part of a command, the showcmd output is reset part way through. This means we need to special case entering
@@ -787,7 +787,7 @@ class KeyHandler {
         // state hits READY. Start the ex input field, push CMD_LINE mode and wait for the argument.
         injector.processGroup.startSearchCommand(editor, context, commandBuilder.count, key)
         commandBuilder.commandState = CurrentCommandState.NEW_COMMAND
-        editorState.pushModes(CommandState.Mode.CMD_LINE, CommandState.SubMode.NONE)
+        editorState.pushModes(VimStateMachine.Mode.CMD_LINE, VimStateMachine.SubMode.NONE)
       }
       else -> Unit
     }
@@ -872,7 +872,7 @@ class KeyHandler {
         injector.registerGroup.selectRegister(register)
       }
       injector.actionExecutor.executeVimAction(editor, cmd.action, context, operatorArguments)
-      if (editorState.mode === CommandState.Mode.INSERT || editorState.mode === CommandState.Mode.REPLACE) {
+      if (editorState.mode === VimStateMachine.Mode.INSERT || editorState.mode === VimStateMachine.Mode.REPLACE) {
         injector.changeGroup.processCommand(editor, cmd)
       }
 

@@ -24,7 +24,7 @@ import com.intellij.codeInsight.template.TemplateManager
 import com.intellij.codeInsight.template.impl.ConstantNode
 import com.intellij.codeInsight.template.impl.TemplateManagerImpl
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.group.visual.IdeaSelectionControl
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.helper.subMode
@@ -57,10 +57,10 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
             hard by the torrent of a mountain pass.
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
     IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    assertMode(CommandState.Mode.COMMAND)
-    assertSubMode(CommandState.SubMode.NONE)
+    assertMode(VimStateMachine.Mode.COMMAND)
+    assertSubMode(VimStateMachine.SubMode.NONE)
     assertCaretsVisualAttributes()
   }
 
@@ -77,11 +77,11 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
             hard by the torrent of a mountain pass.
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
     IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
-    assertMode(CommandState.Mode.VISUAL)
-    assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
+    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
+    assertMode(VimStateMachine.Mode.VISUAL)
+    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
     assertCaretsVisualAttributes()
 
     typeText(injector.parser.parseKeys("l"))
@@ -95,8 +95,8 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
             hard by the torrent of a mountain pass.
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.VISUAL)
-    assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
+    assertMode(VimStateMachine.Mode.VISUAL)
+    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
     assertCaretsVisualAttributes()
   }
 
@@ -123,11 +123,11 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
             hard by the torrent of a mountain pass.
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
     IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
-    assertMode(CommandState.Mode.VISUAL)
-    assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
+    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
+    assertMode(VimStateMachine.Mode.VISUAL)
+    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
     assertCaretsVisualAttributes()
 
     typeText(injector.parser.parseKeys("l"))
@@ -141,8 +141,8 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
             hard by the torrent of a mountain pass.
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.VISUAL)
-    assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
+    assertMode(VimStateMachine.Mode.VISUAL)
+    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
     assertCaretsVisualAttributes()
   }
 
@@ -159,11 +159,11 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
             hard by the torrent of a mountain pass.
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
     IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
-    assertMode(CommandState.Mode.VISUAL)
-    assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
+    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
+    assertMode(VimStateMachine.Mode.VISUAL)
+    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
     assertCaretsVisualAttributes()
 
     typeText(injector.parser.parseKeys("l"))
@@ -177,8 +177,8 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
             hard by the torrent of a mountain pass.
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.VISUAL)
-    assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
+    assertMode(VimStateMachine.Mode.VISUAL)
+    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
     assertCaretsVisualAttributes()
   }
 
@@ -195,11 +195,11 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
             hard by the torrent of a mountain pass.
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
     IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
-    assertMode(CommandState.Mode.VISUAL)
-    assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
+    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
+    assertMode(VimStateMachine.Mode.VISUAL)
+    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
     assertCaretsVisualAttributes()
 
     typeText(injector.parser.parseKeys("l"))
@@ -213,8 +213,8 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
             hard by the torrent of a mountain pass.
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.VISUAL)
-    assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
+    assertMode(VimStateMachine.Mode.VISUAL)
+    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
     assertCaretsVisualAttributes()
   }
 
@@ -231,11 +231,11 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
             hard by the torrent of a mountain pass.
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
     IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
-    assertMode(CommandState.Mode.VISUAL)
-    assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
+    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
+    assertMode(VimStateMachine.Mode.VISUAL)
+    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
     assertCaretsVisualAttributes()
 
     typeText(injector.parser.parseKeys("l"))
@@ -249,8 +249,8 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
             hard by the torrent of a mountain pass.
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.VISUAL)
-    assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
+    assertMode(VimStateMachine.Mode.VISUAL)
+    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
     assertCaretsVisualAttributes()
   }
 
@@ -267,11 +267,11 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
             hard by the torrent of a mountain pass.
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
     IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
-    assertMode(CommandState.Mode.VISUAL)
-    assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
+    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
+    assertMode(VimStateMachine.Mode.VISUAL)
+    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
     assertCaretsVisualAttributes()
 
     typeText(injector.parser.parseKeys("l"))
@@ -285,8 +285,8 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
             hard by the torrent of a mountain pass.
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.VISUAL)
-    assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
+    assertMode(VimStateMachine.Mode.VISUAL)
+    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
     assertCaretsVisualAttributes()
   }
 
@@ -303,11 +303,11 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
             hard by the torrent of a mountain pass.
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
     IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
-    assertMode(CommandState.Mode.VISUAL)
-    assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
+    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
+    assertMode(VimStateMachine.Mode.VISUAL)
+    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
     assertCaretsVisualAttributes()
 
     typeText(injector.parser.parseKeys("l"))
@@ -321,8 +321,8 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
             hard by the torrent of a mountain pass.
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.VISUAL)
-    assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
+    assertMode(VimStateMachine.Mode.VISUAL)
+    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
     assertCaretsVisualAttributes()
   }
 
@@ -339,11 +339,11 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
             hard by the torrent of a mountain ${s}pass.$c$se
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
     IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
-    assertMode(CommandState.Mode.VISUAL)
-    assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
+    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
+    assertMode(VimStateMachine.Mode.VISUAL)
+    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
     assertCaretsVisualAttributes()
 
     typeText(injector.parser.parseKeys("l"))
@@ -357,8 +357,8 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
             hard by the torrent of a mountain ${s}pass.$c$se
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.VISUAL)
-    assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
+    assertMode(VimStateMachine.Mode.VISUAL)
+    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
     assertCaretsVisualAttributes()
   }
 
@@ -375,11 +375,11 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
             hard by the torrent of a mountain pass.
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
     IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
-    assertMode(CommandState.Mode.VISUAL)
-    assertSubMode(CommandState.SubMode.VISUAL_LINE)
+    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
+    assertMode(VimStateMachine.Mode.VISUAL)
+    assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
     assertCaretsVisualAttributes()
 
     typeText(injector.parser.parseKeys("l"))
@@ -393,8 +393,8 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
             hard by the torrent of a mountain pass.
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.VISUAL)
-    assertSubMode(CommandState.SubMode.VISUAL_LINE)
+    assertMode(VimStateMachine.Mode.VISUAL)
+    assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
     assertCaretsVisualAttributes()
 
     typeText(injector.parser.parseKeys("j"))
@@ -408,8 +408,8 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
             hard by the torrent of a mountain pass.
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.VISUAL)
-    assertSubMode(CommandState.SubMode.VISUAL_LINE)
+    assertMode(VimStateMachine.Mode.VISUAL)
+    assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
     assertCaretsVisualAttributes()
   }
 
@@ -426,11 +426,11 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
             hard by the torrent of a mountain pass.
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
     IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
-    assertMode(CommandState.Mode.VISUAL)
-    assertSubMode(CommandState.SubMode.VISUAL_LINE)
+    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
+    assertMode(VimStateMachine.Mode.VISUAL)
+    assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
     assertCaretsVisualAttributes()
 
     typeText(injector.parser.parseKeys("j"))
@@ -444,8 +444,8 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
             hard by the torrent of a mountain pass.
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.VISUAL)
-    assertSubMode(CommandState.SubMode.VISUAL_LINE)
+    assertMode(VimStateMachine.Mode.VISUAL)
+    assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
     assertCaretsVisualAttributes()
   }
 
@@ -462,11 +462,11 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
             hard by the torrent of a mountain pass.
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
     IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
-    assertMode(CommandState.Mode.VISUAL)
-    assertSubMode(CommandState.SubMode.VISUAL_LINE)
+    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
+    assertMode(VimStateMachine.Mode.VISUAL)
+    assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
     assertCaretsVisualAttributes()
 
     typeText(injector.parser.parseKeys("j"))
@@ -480,8 +480,8 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
             hard by the torrent o${c}f a mountain pass.$se
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.VISUAL)
-    assertSubMode(CommandState.SubMode.VISUAL_LINE)
+    assertMode(VimStateMachine.Mode.VISUAL)
+    assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
     assertCaretsVisualAttributes()
   }
 
@@ -498,11 +498,11 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
             hard by the torrent of a mountain pass.
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
     IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
-    assertMode(CommandState.Mode.VISUAL)
-    assertSubMode(CommandState.SubMode.VISUAL_LINE)
+    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
+    assertMode(VimStateMachine.Mode.VISUAL)
+    assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
     assertCaretsVisualAttributes()
 
     typeText(injector.parser.parseKeys("j"))
@@ -516,8 +516,8 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
             ${se}hard by the torrent of a mountain pass.
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.VISUAL)
-    assertSubMode(CommandState.SubMode.VISUAL_LINE)
+    assertMode(VimStateMachine.Mode.VISUAL)
+    assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
     assertCaretsVisualAttributes()
   }
 
@@ -534,11 +534,11 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
             hard by the torrent of a mountain pass.$se
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
     IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
-    assertMode(CommandState.Mode.VISUAL)
-    assertSubMode(CommandState.SubMode.VISUAL_LINE)
+    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
+    assertMode(VimStateMachine.Mode.VISUAL)
+    assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
     assertCaretsVisualAttributes()
 
     typeText(injector.parser.parseKeys("j"))
@@ -552,8 +552,8 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
             ${s}hard by the torrent o${c}f a mountain pass.$se
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.VISUAL)
-    assertSubMode(CommandState.SubMode.VISUAL_LINE)
+    assertMode(VimStateMachine.Mode.VISUAL)
+    assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
     assertCaretsVisualAttributes()
   }
 
@@ -570,11 +570,11 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
             hard by the torrent of a mountain pass.
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
     IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
-    assertMode(CommandState.Mode.VISUAL)
-    assertSubMode(CommandState.SubMode.VISUAL_LINE)
+    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
+    assertMode(VimStateMachine.Mode.VISUAL)
+    assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
     assertCaretsVisualAttributes()
 
     typeText(injector.parser.parseKeys("k"))
@@ -588,8 +588,8 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
             hard by the torrent of a mountain pass.
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.VISUAL)
-    assertSubMode(CommandState.SubMode.VISUAL_LINE)
+    assertMode(VimStateMachine.Mode.VISUAL)
+    assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
     assertCaretsVisualAttributes()
   }
 
@@ -606,11 +606,11 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
             ha${s}rd by $c${se}the torrent of a mountain pass.
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
     IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
-    assertMode(CommandState.Mode.VISUAL)
-    assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
+    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
+    assertMode(VimStateMachine.Mode.VISUAL)
+    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
     assertCaretsVisualAttributes()
   }
 
@@ -627,11 +627,11 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
             hard by the torrent of a mountain pass.
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
     IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
-    assertMode(CommandState.Mode.VISUAL)
-    assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
+    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
+    assertMode(VimStateMachine.Mode.VISUAL)
+    assertSubMode(VimStateMachine.SubMode.VISUAL_BLOCK)
     assertCaretsVisualAttributes()
 
     typeText(injector.parser.parseKeys("l"))
@@ -645,8 +645,8 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
             hard by the torrent of a mountain pass.
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.VISUAL)
-    assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
+    assertMode(VimStateMachine.Mode.VISUAL)
+    assertSubMode(VimStateMachine.SubMode.VISUAL_BLOCK)
     assertCaretsVisualAttributes()
   }
 
@@ -663,11 +663,11 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
             hard by the torrent of a mountain pass.
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
     IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
-    assertMode(CommandState.Mode.VISUAL)
-    assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
+    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
+    assertMode(VimStateMachine.Mode.VISUAL)
+    assertSubMode(VimStateMachine.SubMode.VISUAL_BLOCK)
     assertCaretsVisualAttributes()
 
     typeText(injector.parser.parseKeys("j"))
@@ -681,8 +681,8 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
             ha${s}rd by the torrent of a mountain pass.${c}$se
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.VISUAL)
-    assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
+    assertMode(VimStateMachine.Mode.VISUAL)
+    assertSubMode(VimStateMachine.SubMode.VISUAL_BLOCK)
     assertCaretsVisualAttributes()
   }
 
@@ -699,11 +699,11 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
             hard by the torrent of a mountain pass.
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
     IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
-    assertMode(CommandState.Mode.VISUAL)
-    assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
+    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
+    assertMode(VimStateMachine.Mode.VISUAL)
+    assertSubMode(VimStateMachine.SubMode.VISUAL_BLOCK)
     assertCaretsVisualAttributes()
 
     typeText(injector.parser.parseKeys("l"))
@@ -717,8 +717,8 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
             hard by the torrent of a mountain pass.
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.VISUAL)
-    assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
+    assertMode(VimStateMachine.Mode.VISUAL)
+    assertSubMode(VimStateMachine.SubMode.VISUAL_BLOCK)
     assertCaretsVisualAttributes()
   }
 
@@ -740,11 +740,11 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
       """.trimIndent()
     )
     VimListenerManager.EditorListeners.addAll()
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
 
     myFixture.editor.selectionModel.setSelection(5, 10)
 
-    waitAndAssertMode(myFixture, CommandState.Mode.SELECT)
+    waitAndAssertMode(myFixture, VimStateMachine.Mode.SELECT)
   }
 
   @VimOptionTestConfiguration(VimTestOption(OptionConstants.selectmodeName, OptionValueType.STRING, ""))
@@ -759,11 +759,11 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
       """.trimIndent()
     )
     VimListenerManager.EditorListeners.addAll()
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
 
     myFixture.editor.selectionModel.setSelection(5, 10)
 
-    waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
+    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
   }
 
   @VimOptionTestConfiguration(VimTestOption(OptionConstants.selectmodeName, OptionValueType.STRING, ""))
@@ -778,15 +778,15 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
       """.trimIndent()
     )
     typeText(injector.parser.parseKeys("V"))
-    assertMode(CommandState.Mode.VISUAL)
-    assertSubMode(CommandState.SubMode.VISUAL_LINE)
+    assertMode(VimStateMachine.Mode.VISUAL)
+    assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
 
     myFixture.editor.selectionModel.setSelection(2, 5)
     IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
 
-    waitAndAssert { myFixture.editor.subMode == CommandState.SubMode.VISUAL_CHARACTER }
-    assertMode(CommandState.Mode.VISUAL)
-    assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
+    waitAndAssert { myFixture.editor.subMode == VimStateMachine.SubMode.VISUAL_CHARACTER }
+    assertMode(VimStateMachine.Mode.VISUAL)
+    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
     assertCaretsVisualAttributes()
   }
 
@@ -805,15 +805,15 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
     startDummyTemplate()
 
     typeText(injector.parser.parseKeys("V"))
-    assertMode(CommandState.Mode.VISUAL)
-    assertSubMode(CommandState.SubMode.VISUAL_LINE)
+    assertMode(VimStateMachine.Mode.VISUAL)
+    assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
 
     myFixture.editor.selectionModel.setSelection(2, 5)
     IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
 
-    waitAndAssert { myFixture.editor.subMode == CommandState.SubMode.VISUAL_CHARACTER }
-    assertMode(CommandState.Mode.VISUAL)
-    assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
+    waitAndAssert { myFixture.editor.subMode == VimStateMachine.SubMode.VISUAL_CHARACTER }
+    assertMode(VimStateMachine.Mode.VISUAL)
+    assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
     assertCaretsVisualAttributes()
   }
 

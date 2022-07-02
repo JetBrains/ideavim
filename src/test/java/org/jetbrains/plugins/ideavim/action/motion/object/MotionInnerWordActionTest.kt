@@ -18,14 +18,14 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.`object`
 
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class MotionInnerWordActionTest : VimTestCase() {
   fun `test empty text`() {
     doTest(
       "viw", "", "",
-      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER
+      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER
     )
   }
 }

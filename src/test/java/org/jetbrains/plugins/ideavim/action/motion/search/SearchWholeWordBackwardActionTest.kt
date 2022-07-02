@@ -18,7 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.search
 
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 /**
@@ -26,7 +26,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
  */
 class SearchWholeWordBackwardActionTest : VimTestCase() {
   fun `test backward search on empty string`() {
-    doTest("#", "", "", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest("#", "", "", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
     assertPluginError(false)
   }
 }

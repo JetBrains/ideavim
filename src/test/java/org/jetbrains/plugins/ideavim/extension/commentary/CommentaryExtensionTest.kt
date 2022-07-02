@@ -20,7 +20,7 @@ package org.jetbrains.plugins.ideavim.extension.commentary
 
 import com.intellij.ide.highlighter.HtmlFileType
 import com.intellij.ide.highlighter.JavaFileType
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.yaml.YAMLFileType
@@ -38,7 +38,7 @@ class CommentaryExtensionTest : VimTestCase() {
       "gcll",
       "<caret>if (condition) {\n" + "}\n",
       "/<caret>*i*/f (condition) {\n" + "}\n",
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, JavaFileType.INSTANCE
     )
     assertSelection(null)
   }
@@ -49,7 +49,7 @@ class CommentaryExtensionTest : VimTestCase() {
       "gciw",
       "<caret>if (condition) {\n" + "}\n",
       "<caret>/*if*/ (condition) {\n" + "}\n",
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, JavaFileType.INSTANCE
     )
     assertSelection(null)
   }
@@ -60,7 +60,7 @@ class CommentaryExtensionTest : VimTestCase() {
       "gct{",
       "<caret>if (condition) {\n" + "}\n",
       "<caret>/*if (condition) */{\n" + "}\n",
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
@@ -70,7 +70,7 @@ class CommentaryExtensionTest : VimTestCase() {
       "gcab",
       "if (<caret>condition) {\n" + "}\n",
       "if <caret>/*(condition)*/ {\n" + "}\n",
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
@@ -85,7 +85,7 @@ class CommentaryExtensionTest : VimTestCase() {
       "<caret>if (condition) {\n" + "}\n",
       "<caret>//if (condition) {\n" +
         "//}\n",
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
@@ -95,7 +95,7 @@ class CommentaryExtensionTest : VimTestCase() {
       "if (<caret>condition) {\n" + "}\n",
       "//if<caret> (condition) {\n" +
         "//}\n",
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
@@ -106,7 +106,7 @@ class CommentaryExtensionTest : VimTestCase() {
       "<caret>if (condition) {\n" + "}\n",
       "//if (condition) {\n" +
         "//}\n",
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
@@ -116,7 +116,7 @@ class CommentaryExtensionTest : VimTestCase() {
       "gcip",
       "${c}if (condition) {}",
       "//if (condition) {}",
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
@@ -127,7 +127,7 @@ class CommentaryExtensionTest : VimTestCase() {
       "<caret>//if (condition) {\n" + "//}\n",
       "if (condition) {\n" +
         "}\n",
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, JavaFileType.INSTANCE
     )
     assertSelection(null)
   }
@@ -138,7 +138,7 @@ class CommentaryExtensionTest : VimTestCase() {
       "gcip",
       "$c//if (condition) {}",
       "if (condition) {}",
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
@@ -149,7 +149,7 @@ class CommentaryExtensionTest : VimTestCase() {
       "<caret>if (condition) {\n" + "}\n",
       "//if (condition) {\n" +
         "//}\n",
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
@@ -160,7 +160,7 @@ class CommentaryExtensionTest : VimTestCase() {
       "<caret>//if (condition) {\n" + "//}\n",
       "if (condition) {\n" +
         "}\n",
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
@@ -171,7 +171,7 @@ class CommentaryExtensionTest : VimTestCase() {
       "<caret>if (condition) {\n" + "}\n",
       "//if (condition) {\n" +
         "<caret>}\n",
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, JavaFileType.INSTANCE
     )
     assertSelection(null)
   }
@@ -182,7 +182,7 @@ class CommentaryExtensionTest : VimTestCase() {
       "gcc",
       "if (<caret>condition) {\n" + "}\n",
       "<caret>//if (condition) {\n" + "}\n",
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, JavaFileType.INSTANCE
     )
     assertSelection(null)
   }
@@ -194,7 +194,7 @@ class CommentaryExtensionTest : VimTestCase() {
       "<caret>//if (condition) {\n" + "}\n",
       "<caret>if (condition) {\n" +
         "}\n",
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, JavaFileType.INSTANCE
     )
     assertSelection(null)
   }
@@ -205,8 +205,8 @@ class CommentaryExtensionTest : VimTestCase() {
       "gcc",
       "<div />",
       "<!--<div />-->",
-      CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE,
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
       HtmlFileType.INSTANCE
     )
     assertSelection(null)
@@ -227,7 +227,7 @@ class CommentaryExtensionTest : VimTestCase() {
                 //if (condition) {
                 //}
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
@@ -246,7 +246,7 @@ class CommentaryExtensionTest : VimTestCase() {
                 /*if*/ (condition) {
                 }
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
@@ -261,7 +261,7 @@ class CommentaryExtensionTest : VimTestCase() {
                 //if (condition) {
                 //}
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
@@ -281,7 +281,7 @@ class CommentaryExtensionTest : VimTestCase() {
          final Int value3 = 42;
         final Int value4 = 42;
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
@@ -301,7 +301,7 @@ class CommentaryExtensionTest : VimTestCase() {
          final Int value3 = 42;
         final Int value4 = 42;
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
@@ -325,7 +325,7 @@ class CommentaryExtensionTest : VimTestCase() {
         //final Int value5 = 42;
         final Int value6 = 42;
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
@@ -339,7 +339,7 @@ class CommentaryExtensionTest : VimTestCase() {
       """
         final Int value = 42;
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
@@ -357,7 +357,7 @@ class CommentaryExtensionTest : VimTestCase() {
       """
         final Int value = 42;
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
@@ -375,7 +375,7 @@ class CommentaryExtensionTest : VimTestCase() {
       """
         final Int value = 42;
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
@@ -389,7 +389,7 @@ class CommentaryExtensionTest : VimTestCase() {
       """
         final Int value = 42;
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
@@ -405,7 +405,7 @@ class CommentaryExtensionTest : VimTestCase() {
       """
         final Int value = 42;
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
@@ -423,7 +423,7 @@ class CommentaryExtensionTest : VimTestCase() {
         final Int value1 = 42;
         final Int value2 = 42;
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
@@ -440,7 +440,7 @@ class CommentaryExtensionTest : VimTestCase() {
       """
         final Int value = 42;
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
@@ -456,7 +456,7 @@ class CommentaryExtensionTest : VimTestCase() {
       """
         final Int value = 42;
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
@@ -472,7 +472,7 @@ class CommentaryExtensionTest : VimTestCase() {
       """
         final Int value = 42;
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
@@ -492,7 +492,7 @@ class CommentaryExtensionTest : VimTestCase() {
         
         final Int value = 42;
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
@@ -508,7 +508,7 @@ class CommentaryExtensionTest : VimTestCase() {
         final Int value = 42;
         final Int value2 = 42;
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
@@ -521,7 +521,7 @@ class CommentaryExtensionTest : VimTestCase() {
       """
         final Int value = 42; // Comment
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
@@ -535,7 +535,7 @@ class CommentaryExtensionTest : VimTestCase() {
       """
         final Int value = 42;
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
@@ -551,7 +551,7 @@ class CommentaryExtensionTest : VimTestCase() {
       """
         final Int value = 42;
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
@@ -570,7 +570,7 @@ class CommentaryExtensionTest : VimTestCase() {
       """
         final Int value = 42;
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
@@ -590,7 +590,7 @@ class CommentaryExtensionTest : VimTestCase() {
       """
         final Int value = 42;
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
@@ -603,7 +603,7 @@ class CommentaryExtensionTest : VimTestCase() {
       """
         final Int value /* Block comment */ = 42;
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
@@ -623,7 +623,7 @@ class CommentaryExtensionTest : VimTestCase() {
         public void something(int value, String name) {
         }
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
@@ -644,7 +644,7 @@ class CommentaryExtensionTest : VimTestCase() {
         public void something(int value, String name) {
         }
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
@@ -665,7 +665,7 @@ class CommentaryExtensionTest : VimTestCase() {
         public void something(int value, String name) {
         }
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
@@ -689,7 +689,7 @@ class CommentaryExtensionTest : VimTestCase() {
         public void something(int value, String name) {
         }
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
@@ -706,7 +706,7 @@ class CommentaryExtensionTest : VimTestCase() {
         //final int var <caret>value2 = 42;
         final int var value3 = 42;
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
@@ -723,7 +723,7 @@ class CommentaryExtensionTest : VimTestCase() {
         //final int var value2 = 42;
         final int var value3 = 42;
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
@@ -740,7 +740,7 @@ class CommentaryExtensionTest : VimTestCase() {
         //final int var value2 = 42;
         //final int var value3 = 42;
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
@@ -768,7 +768,7 @@ class CommentaryExtensionTest : VimTestCase() {
         //final int var value2 = 42;
         //final int var <caret>value3 = 42;
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
@@ -789,7 +789,7 @@ class CommentaryExtensionTest : VimTestCase() {
         //final int var value21 = 42;
         <caret>//final int var value22 = 42;
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
@@ -816,7 +816,7 @@ class CommentaryExtensionTest : VimTestCase() {
       - Chicago Cubs
       - Atlanta Braves
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, YAMLFileType.YML
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, YAMLFileType.YML
     )
   }
 }

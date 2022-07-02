@@ -21,7 +21,7 @@
 package org.jetbrains.plugins.ideavim.extension.surround
 
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -44,9 +44,9 @@ class VimSurroundExtensionTest : VimTestCase() {
     val before = "if ${c}condition {\n" + "}\n"
     val after = "if ${c}(condition) {\n" + "}\n"
 
-    doTest("yseb", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    doTest("yse)", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    doTest("yse(", before, "if ( condition ) {\n" + "}\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest("yseb", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("yse)", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("yse(", before, "if ( condition ) {\n" + "}\n", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
@@ -54,9 +54,9 @@ class VimSurroundExtensionTest : VimTestCase() {
     val before = "if (condition) ${c}return;\n"
     val after = "if (condition) {return;}\n"
 
-    doTest("ysEB", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    doTest("ysE}", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    doTest("ysE{", before, "if (condition) { return; }\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest("ysEB", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("ysE}", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("ysE{", before, "if (condition) { return; }\n", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
@@ -64,9 +64,9 @@ class VimSurroundExtensionTest : VimTestCase() {
     val before = "int foo = bar${c}index;"
     val after = "int foo = bar[index];"
 
-    doTest("yser", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    doTest("yse]", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    doTest("yse[", before, "int foo = bar[ index ];", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest("yser", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("yse]", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("yse[", before, "int foo = bar[ index ];", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
@@ -74,8 +74,8 @@ class VimSurroundExtensionTest : VimTestCase() {
     val before = "foo = new Bar${c}Baz();"
     val after = "foo = new Bar<Baz>();"
 
-    doTest("ysea", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    doTest("yse>", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest("ysea", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("yse>", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
@@ -83,8 +83,8 @@ class VimSurroundExtensionTest : VimTestCase() {
     val before = "foo = ${c}new Bar.Baz;"
     val after = "foo = \"new Bar.Baz\";"
 
-    doTest("yst;\"", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    doTest("ys4w\"", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest("yst;\"", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("ys4w\"", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
@@ -152,7 +152,7 @@ class VimSurroundExtensionTest : VimTestCase() {
     val before = "if ${c}condition {\n}\n"
     val after = "if ((condition)) {\n}\n"
 
-    doTest(listOf("ysiw)", "l", "."), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(listOf("ysiw)", "l", "."), before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
@@ -160,7 +160,7 @@ class VimSurroundExtensionTest : VimTestCase() {
     val before = "if ${c}condition {\n}\n"
     val after = "if (((condition))) {\n}\n"
 
-    doTest(listOf("ysiw)", "l", ".", "l", "."), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(listOf("ysiw)", "l", ".", "l", "."), before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
@@ -174,7 +174,7 @@ class VimSurroundExtensionTest : VimTestCase() {
                   if 'condition' { }
                     """
 
-    doTest(listOf("ysiw)", "cs\"'", "j", "."), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(listOf("ysiw)", "cs\"'", "j", "."), before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
@@ -192,8 +192,8 @@ class VimSurroundExtensionTest : VimTestCase() {
       listOf("ysiwf", "myFunction<CR>", "j", "."),
       before,
       after,
-      CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE
     )
   }
 
@@ -208,7 +208,7 @@ class VimSurroundExtensionTest : VimTestCase() {
                   <myTag>abc</myTag>
                     """
 
-    doTest(listOf("ysiwt", "myTag>", "j", "."), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(listOf("ysiwt", "myTag>", "j", "."), before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   /* visual surround */
@@ -218,15 +218,15 @@ class VimSurroundExtensionTest : VimTestCase() {
     val before = "if ${c}condition {\n" + "}\n"
     val after = "if ${c}(condition) {\n" + "}\n"
 
-    doTest("veSb", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    assertMode(CommandState.Mode.COMMAND)
-    doTest("veS)", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    assertMode(CommandState.Mode.COMMAND)
+    doTest("veSb", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    assertMode(VimStateMachine.Mode.COMMAND)
+    doTest("veS)", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    assertMode(VimStateMachine.Mode.COMMAND)
     doTest(
       "veS(", before,
-      "if ( condition ) {\n" + "}\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      "if ( condition ) {\n" + "}\n", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
   }
 
   /* Delete surroundings */
@@ -236,9 +236,9 @@ class VimSurroundExtensionTest : VimTestCase() {
     val before = "if (${c}condition) {\n" + "}\n"
     val after = "if condition {\n" + "}\n"
 
-    doTest("dsb", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    doTest("ds(", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    doTest("ds)", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest("dsb", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("ds(", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("ds)", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
@@ -246,7 +246,7 @@ class VimSurroundExtensionTest : VimTestCase() {
     val before = "if (\"${c}foo\".equals(foo)) {\n" + "}\n"
     val after = "if (${c}foo.equals(foo)) {\n" + "}\n"
 
-    doTest("ds\"", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest("ds\"", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
@@ -254,9 +254,9 @@ class VimSurroundExtensionTest : VimTestCase() {
     val before = "if (condition) {${c}return;}\n"
     val after = "if (condition) return;\n"
 
-    doTest(listOf("dsB"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    doTest("ds}", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    doTest("ds{", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(listOf("dsB"), before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("ds}", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("ds{", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
@@ -264,9 +264,9 @@ class VimSurroundExtensionTest : VimTestCase() {
     val before = "int foo = bar[${c}index];"
     val after = "int foo = barindex;"
 
-    doTest("dsr", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    doTest("ds]", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    doTest("ds[", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest("dsr", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("ds]", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("ds[", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
@@ -274,9 +274,9 @@ class VimSurroundExtensionTest : VimTestCase() {
     val before = "foo = new Bar<${c}Baz>();"
     val after = "foo = new BarBaz();"
 
-    doTest("dsa", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    doTest("ds>", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    doTest("ds<", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest("dsa", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("ds>", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("ds<", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
@@ -284,7 +284,7 @@ class VimSurroundExtensionTest : VimTestCase() {
     val before = "<div><p>${c}Foo</p></div>"
     val after = "<div>${c}Foo</div>"
 
-    doTest(listOf("dst"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(listOf("dst"), before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   // VIM-1085
@@ -293,7 +293,7 @@ class VimSurroundExtensionTest : VimTestCase() {
     val before = "Foo\n" + "Seq(\"-${c}Yrangepos\")\n"
     val after = "Foo\n" + "Seq\"-Yrangepos\"\n"
 
-    doTest(listOf("dsb"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(listOf("dsb"), before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   // VIM-1085
@@ -310,7 +310,7 @@ class VimSurroundExtensionTest : VimTestCase() {
       "    other\n" +
       "Baz\n"
 
-    doTest(listOf("dsb"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(listOf("dsb"), before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   // VIM-2227
@@ -318,10 +318,10 @@ class VimSurroundExtensionTest : VimTestCase() {
   fun testDeleteInvalidSurroundingCharacter() {
     val text = "if (${c}condition) {"
 
-    doTest("yibds]", text, text, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    doTest("yibds[", text, text, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    doTest("yibds}", text, text, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    doTest("yibds{", text, text, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest("yibds]", text, text, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("yibds[", text, text, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("yibds}", text, text, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("yibds{", text, text, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
@@ -329,7 +329,7 @@ class VimSurroundExtensionTest : VimTestCase() {
     val before = "if ((${c}condition)) {\n}\n"
     val after = "if condition {\n}\n"
 
-    doTest(listOf("dsb."), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(listOf("dsb."), before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
@@ -337,7 +337,7 @@ class VimSurroundExtensionTest : VimTestCase() {
     val before = "if (\"${c}condition\") {\n}\n"
     val after = "if (condition) {\n}\n"
 
-    doTest(listOf("ds\"."), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(listOf("ds\"."), before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   /* Change surroundings */
@@ -347,7 +347,7 @@ class VimSurroundExtensionTest : VimTestCase() {
     val before = "if (${c}condition) {\n" + "}\n"
     val after = "if [condition] {\n" + "}\n"
 
-    doTest(listOf("csbr"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(listOf("csbr"), before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
@@ -355,7 +355,7 @@ class VimSurroundExtensionTest : VimTestCase() {
     val before = "if (condition) {${c}return;}"
     val after = "if (condition) (return;)"
 
-    doTest(listOf("csBb"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(listOf("csBb"), before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
@@ -363,7 +363,7 @@ class VimSurroundExtensionTest : VimTestCase() {
     val before = "<div><p>${c}Foo</p></div>"
     val after = "<div>${c}(Foo)</div>"
 
-    doTest(listOf("cstb"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(listOf("cstb"), before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
@@ -371,7 +371,7 @@ class VimSurroundExtensionTest : VimTestCase() {
     val before = "<div><p>${c}Foo</p></div>"
     val after = "<div>${c}<b>Foo</b></div>"
 
-    doTest(listOf("cst<b>"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(listOf("cst<b>"), before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
@@ -379,7 +379,7 @@ class VimSurroundExtensionTest : VimTestCase() {
     val before = "foo(${c}index)(index2) = bar;"
     val after = "foo[index][index2] = bar;"
 
-    doTest(listOf("csbrE."), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(listOf("csbrE."), before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   // VIM-2227
@@ -387,10 +387,10 @@ class VimSurroundExtensionTest : VimTestCase() {
   fun testChangeInvalidSurroundingCharacter() {
     val text = "if (${c}condition) {"
 
-    doTest("yibcs]}", text, text, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    doTest("yibcs[}", text, text, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    doTest("yibcs}]", text, text, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    doTest("yibcs{]", text, text, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest("yibcs]}", text, text, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("yibcs[}", text, text, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("yibcs}]", text, text, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("yibcs{]", text, text, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @VimBehaviorDiffers(
@@ -422,7 +422,7 @@ class VimSurroundExtensionTest : VimTestCase() {
       </p>
       <p>Some text</p>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -455,7 +455,7 @@ class VimSurroundExtensionTest : VimTestCase() {
       </p>    <p>Some other paragraph</p>
       </div>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -477,7 +477,7 @@ class VimSurroundExtensionTest : VimTestCase() {
           <p>Some other paragraph</p>
       </div>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -510,7 +510,7 @@ class VimSurroundExtensionTest : VimTestCase() {
     val before = "if (condition) ${c}return;\n"
     val after = "if (condition) \"return\";\n"
 
-    doTest(":map gw ysiw\"<CR>gw", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(":map gw ysiw\"<CR>gw", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
@@ -524,7 +524,7 @@ class VimSurroundExtensionTest : VimTestCase() {
       if ${c}condition return;
     """.trimIndent()
 
-    doTest("qqds)qj@q", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest("qqds)qj@q", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
@@ -539,6 +539,6 @@ class VimSurroundExtensionTest : VimTestCase() {
     """.trimIndent()
 
     val keys = ":map gw ds)<CR>" + "qqgwqj@q"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 }

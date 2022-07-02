@@ -18,7 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.`object`
 
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 
@@ -46,7 +46,7 @@ class MotionOuterSentenceActionTest : VimTestCase() {
         where it was settled on some sodden sand
         
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -68,7 +68,7 @@ class MotionOuterSentenceActionTest : VimTestCase() {
         $c
       """.trimIndent(),
       "\n",
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 }

@@ -22,7 +22,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.Motion
@@ -70,7 +70,7 @@ private fun selectNextSearch(editor: VimEditor, count: Int, forwards: Boolean): 
   if (!editor.inVisualMode) {
     val startOffset = if (forwards) range.startOffset else max(range.endOffset - adj, 0)
     caret.moveToOffset(startOffset)
-    injector.visualMotionGroup.enterVisualMode(editor, CommandState.SubMode.VISUAL_CHARACTER)
+    injector.visualMotionGroup.enterVisualMode(editor, VimStateMachine.SubMode.VISUAL_CHARACTER)
   }
   return if (forwards) max(range.endOffset - adj, 0) else range.startOffset
 }

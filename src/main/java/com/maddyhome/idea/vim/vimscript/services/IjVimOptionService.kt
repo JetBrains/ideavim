@@ -22,7 +22,7 @@ import com.intellij.openapi.application.ApplicationNamesInfo
 import com.maddyhome.idea.vim.api.VimOptionServiceBase
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.StringOption
-import com.maddyhome.idea.vim.options.ToggleOption
+import com.maddyhome.idea.vim.option.ToggleOption
 
 internal class IjVimOptionService : VimOptionServiceBase() {
 

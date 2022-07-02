@@ -21,7 +21,7 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.textarea.TextComponentEditorImpl
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.history.HistoryConstants
 import com.maddyhome.idea.vim.newapi.vim
 import junit.framework.TestCase
@@ -58,7 +58,7 @@ class MapCommandTest : VimTestCase() {
     assertPluginError(false)
     typeText(injector.parser.parseKeys("i" + "Hello, " + "jk"))
     assertState("Hello, World!\n")
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
     assertOffset(6)
   }
 
@@ -260,7 +260,7 @@ n  ,f            <Plug>Foo
     injector.vimscriptExecutor.execute("inoremap # X\u0008#\n")
     typeText(injector.parser.parseKeys("i" + "#" + "<Esc>"))
     assertState("#\n")
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
     typeText(commandToKeys("imap"))
     assertExOutput("i  #           * X<C-H>#\n")
   }
@@ -284,7 +284,7 @@ n  ,f            <Plug>Foo
   
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
     typeText(commandToKeys("map"))
     assertExOutput("   <C-X>i        dd\n")
     typeText(injector.parser.parseKeys("<C-X>i"))
@@ -872,8 +872,8 @@ n  ,f            <Plug>Foo
               -----
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.COMMAND)
-    assertSubMode(CommandState.SubMode.NONE)
+    assertMode(VimStateMachine.Mode.COMMAND)
+    assertSubMode(VimStateMachine.SubMode.NONE)
   }
 
   private fun checkDelayedMapping(before: String, after: String) {

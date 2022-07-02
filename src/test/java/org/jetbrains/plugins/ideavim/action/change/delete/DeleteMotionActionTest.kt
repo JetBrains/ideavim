@@ -22,7 +22,7 @@ package org.jetbrains.plugins.ideavim.action.change.delete
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
@@ -179,7 +179,7 @@ class DeleteMotionActionTest : VimTestCase() {
             I found it in a legendary land
             ${c}all rocks and lavender and tufted grass,
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -203,7 +203,7 @@ class DeleteMotionActionTest : VimTestCase() {
             I found it in a legendary land
             all rocks and lavender and tufted grass,
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 }

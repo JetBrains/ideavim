@@ -18,15 +18,15 @@
 
 package org.jetbrains.plugins.ideavim.action.change.insert
 
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class InsertExitModeActionTest : VimTestCase() {
   fun `test exit visual mode`() {
-    doTest("i<Esc>", "12${c}3", "1${c}23", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest("i<Esc>", "12${c}3", "1${c}23", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   fun `test exit visual mode on line start`() {
-    doTest("i<Esc>", "${c}123", "${c}123", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest("i<Esc>", "${c}123", "${c}123", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 }

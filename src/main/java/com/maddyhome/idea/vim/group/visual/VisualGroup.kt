@@ -23,13 +23,13 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.VisualPosition
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.VimMotionGroupBase
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.inBlockSubMode
 import com.maddyhome.idea.vim.helper.inSelectMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.isEndAllowed
-import com.maddyhome.idea.vim.helper.mode
+import com.maddyhome.idea.vim.helper.editorMode
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
@@ -108,7 +108,7 @@ val Caret.vimLeadSelectionOffset: Int
         }
       }
 
-      return if (editor.subMode == CommandState.SubMode.VISUAL_LINE) {
+      return if (editor.subMode == VimStateMachine.SubMode.VISUAL_LINE) {
         val selectionStartLine = editor.offsetToLogicalPosition(selectionStart).line
         val caretLine = editor.offsetToLogicalPosition(this.offset).line
         if (caretLine == selectionStartLine) {
@@ -132,8 +132,8 @@ val Caret.vimLeadSelectionOffset: Int
     return caretOffset
   }
 
-fun moveCaretOneCharLeftFromSelectionEnd(editor: Editor, predictedMode: CommandState.Mode) {
-  if (predictedMode != CommandState.Mode.VISUAL) {
+fun moveCaretOneCharLeftFromSelectionEnd(editor: Editor, predictedMode: VimStateMachine.Mode) {
+  if (predictedMode != VimStateMachine.Mode.VISUAL) {
     if (!predictedMode.isEndAllowed) {
       editor.caretModel.allCarets.forEach { caret ->
         val lineEnd = EditorHelper.getLineEndForOffset(editor, caret.offset)
@@ -161,18 +161,18 @@ private fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: Ca
   val (start, end) = if (selectionStart > selectionEnd) selectionEnd to selectionStart else selectionStart to selectionEnd
   val editor = caret.editor
   val subMode = editor.subMode
-  val mode = editor.mode
+  val mode = editor.editorMode
   val vimEditor = IjVimEditor(editor)
   when (subMode) {
-    CommandState.SubMode.VISUAL_CHARACTER -> {
+    VimStateMachine.SubMode.VISUAL_CHARACTER -> {
       val (nativeStart, nativeEnd) = charToNativeSelection(vimEditor, start, end, mode)
       caret.vimSetSystemSelectionSilently(nativeStart, nativeEnd)
     }
-    CommandState.SubMode.VISUAL_LINE -> {
+    VimStateMachine.SubMode.VISUAL_LINE -> {
       val (nativeStart, nativeEnd) = lineToNativeSelection(vimEditor, start, end)
       caret.vimSetSystemSelectionSilently(nativeStart, nativeEnd)
     }
-    CommandState.SubMode.VISUAL_BLOCK -> {
+    VimStateMachine.SubMode.VISUAL_BLOCK -> {
       editor.caretModel.removeSecondaryCarets()
 
       // Set system selection
@@ -200,7 +200,7 @@ private fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: Ca
           // Put right caret position for tab character
           aCaret.moveToVisualPosition(visualPosition)
         }
-        if (mode != CommandState.Mode.SELECT &&
+        if (mode != VimStateMachine.Mode.SELECT &&
           !EditorHelper.isLineEmpty(editor, line, false) &&
           aCaret.offset == aCaret.selectionEnd &&
           aCaret.selectionEnd - 1 >= lineStartOffset &&

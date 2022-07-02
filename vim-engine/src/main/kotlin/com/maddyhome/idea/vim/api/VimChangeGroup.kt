@@ -19,7 +19,7 @@ package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
@@ -45,7 +45,7 @@ interface VimChangeGroup {
 
   fun insertLineAround(editor: VimEditor, context: ExecutionContext, shift: Int)
 
-  fun initInsert(editor: VimEditor, context: ExecutionContext, mode: CommandState.Mode)
+  fun initInsert(editor: VimEditor, context: ExecutionContext, mode: VimStateMachine.Mode)
 
   fun editorCreated(editor: VimEditor?)
 
@@ -55,7 +55,7 @@ interface VimChangeGroup {
 
   fun processEnter(editor: VimEditor, context: ExecutionContext)
 
-  fun processPostChangeModeSwitch(editor: VimEditor, context: ExecutionContext, toSwitch: CommandState.Mode)
+  fun processPostChangeModeSwitch(editor: VimEditor, context: ExecutionContext, toSwitch: VimStateMachine.Mode)
 
   fun processCommand(editor: VimEditor, cmd: Command)
 

@@ -21,7 +21,7 @@ package org.jetbrains.plugins.ideavim
 import com.maddyhome.idea.vim.RegisterActions.VIM_ACTIONS_EP
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.common.CommandNode
 import com.maddyhome.idea.vim.common.CommandPartNode
 import com.maddyhome.idea.vim.command.MappingMode
@@ -33,7 +33,7 @@ class RegisterActionsTest : VimTestCase() {
   fun `test simple action`() {
     val before = "I ${c}found it in a legendary land"
     val after = "I f${c}ound it in a legendary land"
-    doTest("l", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest("l", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.EDITOR_MODIFICATION)
@@ -44,7 +44,7 @@ class RegisterActionsTest : VimTestCase() {
     val keys = injector.parser.parseKeys("jklwB") // just random keys
     val before = "I ${c}found it in a legendary land"
     val after = "I jklwB${c}found it in a legendary land"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE) {
       VimPlugin.setEnabled(false)
     }
   }
@@ -54,7 +54,7 @@ class RegisterActionsTest : VimTestCase() {
     val keys = injector.parser.parseKeys("l")
     val before = "I ${c}found it in a legendary land"
     val after = "I f${c}ound it in a legendary land"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE) {
       VimPlugin.setEnabled(false)
       VimPlugin.setEnabled(true)
     }
@@ -65,7 +65,7 @@ class RegisterActionsTest : VimTestCase() {
     val keys = injector.parser.parseKeys("l")
     val before = "I ${c}found it in a legendary land"
     val after = "I f${c}ound it in a legendary land"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE) {
       VimPlugin.setEnabled(false)
       VimPlugin.setEnabled(true)
       VimPlugin.setEnabled(true)
@@ -78,7 +78,7 @@ class RegisterActionsTest : VimTestCase() {
     val before = "I ${c}found it in a legendary land"
     val after = "I f${c}ound it in a legendary land"
     var motionRightAction: ActionBeanClass? = null
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE) {
       motionRightAction = VIM_ACTIONS_EP.extensions().filter { it.actionId == "VimPreviousTabAction" }.findFirst().get()
 
       assertNotNull(getCommandNode())

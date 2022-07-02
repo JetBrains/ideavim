@@ -18,7 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.extension.matchit
 
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -42,7 +42,7 @@ class MatchitCTest : VimTestCase() {
         #if !defined (VAL_1)
         $c#endif
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "main.c"
     )
   }
 
@@ -58,7 +58,7 @@ class MatchitCTest : VimTestCase() {
            #if !defined (VAL_1)
         $c#endif
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "main.c"
     )
   }
 
@@ -78,7 +78,7 @@ class MatchitCTest : VimTestCase() {
         $c#elif !defined (VAL_2)
           #define VAL_2 2
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "main.c"
     )
   }
 
@@ -98,7 +98,7 @@ class MatchitCTest : VimTestCase() {
         $c#else
           #define VAL_2 2
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "main.c"
     )
   }
 
@@ -114,7 +114,7 @@ class MatchitCTest : VimTestCase() {
         #elif !defined (VAL_2)
         $c#else
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "main.c"
     )
   }
 
@@ -130,7 +130,7 @@ class MatchitCTest : VimTestCase() {
            #elif !defined (VAL_2)
         $c#else
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "main.c"
     )
   }
 
@@ -146,7 +146,7 @@ class MatchitCTest : VimTestCase() {
         #else
         $c#endif
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "main.c"
     )
   }
 
@@ -162,7 +162,7 @@ class MatchitCTest : VimTestCase() {
            #else !defined (VAL_2)
         $c#endif
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "main.c"
     )
   }
 
@@ -188,7 +188,7 @@ class MatchitCTest : VimTestCase() {
           #define VAL_3 3
         #endif
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "main.c"
     )
   }
 
@@ -204,7 +204,7 @@ class MatchitCTest : VimTestCase() {
         #ifdef DEBUG
         $c#endif
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "main.c"
     )
   }
 
@@ -220,7 +220,7 @@ class MatchitCTest : VimTestCase() {
         #ifdef DEBUG
         $c#elif PROD
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "main.c"
     )
   }
 
@@ -236,7 +236,7 @@ class MatchitCTest : VimTestCase() {
         #ifdef DEBUG
         $c#else
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "main.c"
     )
   }
 
@@ -252,7 +252,7 @@ class MatchitCTest : VimTestCase() {
         $c#ifdef DEBUG
         #endif
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "main.c"
     )
   }
 
@@ -268,7 +268,7 @@ class MatchitCTest : VimTestCase() {
         #ifndef DEBUG
         $c#endif
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "main.c"
     )
   }
 
@@ -284,7 +284,7 @@ class MatchitCTest : VimTestCase() {
         #ifndef DEBUG
         $c#elif PROD
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "main.c"
     )
   }
 
@@ -300,7 +300,7 @@ class MatchitCTest : VimTestCase() {
         #ifndef DEBUG
         $c#else
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "main.c"
     )
   }
 
@@ -316,7 +316,7 @@ class MatchitCTest : VimTestCase() {
         $c#ifndef DEBUG
         #endif
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "main.c"
     )
   }
 
@@ -332,7 +332,7 @@ class MatchitCTest : VimTestCase() {
         $c#ifff DEBUG
         #endif
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "main.c"
     )
   }
 
@@ -348,7 +348,7 @@ class MatchitCTest : VimTestCase() {
         #  if DEBUG
         $c#endif
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "main.c"
     )
   }
 
@@ -368,7 +368,7 @@ class MatchitCTest : VimTestCase() {
         $c#  endif
         #endif
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "main.c"
     )
   }
 
@@ -388,7 +388,7 @@ class MatchitCTest : VimTestCase() {
         #if !defined (VAL_1)
         $c#endif
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "main.c"
     )
   }
 
@@ -404,7 +404,7 @@ class MatchitCTest : VimTestCase() {
            #if !defined (VAL_1)
         $c#endif
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "main.c"
     )
   }
 
@@ -420,7 +420,7 @@ class MatchitCTest : VimTestCase() {
         $c#  if DEBUG
         #endif
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "main.c"
     )
   }
 
@@ -438,7 +438,7 @@ class MatchitCTest : VimTestCase() {
           #define VAL_3 3
         #endif
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "main.c"
     )
   }
 
@@ -460,7 +460,7 @@ class MatchitCTest : VimTestCase() {
           #define VAL_3 3
         #endif
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "main.c"
     )
   }
 
@@ -482,7 +482,7 @@ class MatchitCTest : VimTestCase() {
             #define VAL_3 3
         #endif
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "main.c"
     )
   }
 
@@ -502,7 +502,7 @@ class MatchitCTest : VimTestCase() {
         #elif !defined (VAL_2)
           #define VAL_2 2
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "main.c"
     )
   }
 
@@ -518,7 +518,7 @@ class MatchitCTest : VimTestCase() {
         #ifdef DEBUG
         $c#endif
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "main.c"
     )
   }
 
@@ -534,7 +534,7 @@ class MatchitCTest : VimTestCase() {
         $c#ifdef DEBUG
         #endif
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "main.c"
     )
   }
 
@@ -550,7 +550,7 @@ class MatchitCTest : VimTestCase() {
         $c#ifdef DEBUG
         #else
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "main.c"
     )
   }
 
@@ -566,7 +566,7 @@ class MatchitCTest : VimTestCase() {
         $c#ifdef DEBUG
         #elif PROD
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "main.c"
     )
   }
 
@@ -582,7 +582,7 @@ class MatchitCTest : VimTestCase() {
         #ifndef DEBUG
         $c#endif
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "main.c"
     )
   }
 
@@ -598,7 +598,7 @@ class MatchitCTest : VimTestCase() {
         $c#ifndef DEBUG
         #endif
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "main.c"
     )
   }
 
@@ -614,7 +614,7 @@ class MatchitCTest : VimTestCase() {
         $c#ifndef DEBUG
         #elif PROD
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "main.c"
     )
   }
 
@@ -630,7 +630,7 @@ class MatchitCTest : VimTestCase() {
         $c#ifndef DEBUG
         #else
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "main.c"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "main.c"
     )
   }
 }

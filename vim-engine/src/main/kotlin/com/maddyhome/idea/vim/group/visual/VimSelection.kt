@@ -20,7 +20,7 @@ package com.maddyhome.idea.vim.group.visual
 
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimLogicalPosition
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.command.SelectionType.BLOCK_WISE
 import com.maddyhome.idea.vim.command.SelectionType.CHARACTER_WISE
@@ -58,7 +58,7 @@ sealed class VimSelection {
   companion object {
     fun create(vimStart: Int, vimEnd: Int, type: SelectionType, editor: VimEditor) = when (type) {
       CHARACTER_WISE -> {
-        val nativeSelection = charToNativeSelection(editor, vimStart, vimEnd, CommandState.Mode.VISUAL)
+        val nativeSelection = charToNativeSelection(editor, vimStart, vimEnd, VimStateMachine.Mode.VISUAL)
         VimCharacterSelection(vimStart, vimEnd, nativeSelection.first, nativeSelection.second, editor)
       }
       LINE_WISE -> {
@@ -162,7 +162,7 @@ class VimBlockSelection(
   override val editor: VimEditor,
   private val toLineEnd: Boolean,
 ) : VimSelection() {
-  override fun getNativeStartAndEnd() = blockToNativeSelection(editor, vimStart, vimEnd, CommandState.Mode.VISUAL).let {
+  override fun getNativeStartAndEnd() = blockToNativeSelection(editor, vimStart, vimEnd, VimStateMachine.Mode.VISUAL).let {
     editor.logicalPositionToOffset(it.first) to editor.logicalPositionToOffset(it.second)
   }
 
@@ -179,7 +179,7 @@ class VimBlockSelection(
   }
 
   private fun forEachLine(action: (start: Int, end: Int) -> Unit) {
-    val (logicalStart, logicalEnd) = blockToNativeSelection(editor, vimStart, vimEnd, CommandState.Mode.VISUAL)
+    val (logicalStart, logicalEnd) = blockToNativeSelection(editor, vimStart, vimEnd, VimStateMachine.Mode.VISUAL)
     val lineRange =
       if (logicalStart.line > logicalEnd.line) logicalEnd.line..logicalStart.line else logicalStart.line..logicalEnd.line
     lineRange.map { line ->

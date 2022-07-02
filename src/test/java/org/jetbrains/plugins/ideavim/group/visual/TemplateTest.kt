@@ -32,7 +32,7 @@ import com.intellij.testFramework.PlatformTestUtil
 import com.intellij.testFramework.fixtures.CodeInsightTestUtil.doInlineRename
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.helper.inNormalMode
 import com.maddyhome.idea.vim.helper.inSelectMode
@@ -98,12 +98,12 @@ class TemplateTest : VimOptionTestCase(IjVimOptionService.idearefactormodeName) 
       """.trimIndent()
     )
     startRenaming(VariableInplaceRenameHandler())
-    waitAndAssertMode(myFixture, CommandState.Mode.SELECT)
-    assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
+    waitAndAssertMode(myFixture, VimStateMachine.Mode.SELECT)
+    assertState(VimStateMachine.Mode.SELECT, VimStateMachine.SubMode.VISUAL_CHARACTER)
 
     typeText(injector.parser.parseKeys("myNewVar" + "<CR>"))
 
-    assertState(CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    assertState(VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
     assertState(
       """
             class Hello {
@@ -134,8 +134,8 @@ class TemplateTest : VimOptionTestCase(IjVimOptionService.idearefactormodeName) 
       """.trimIndent()
     )
     startRenaming(VariableInplaceRenameHandler())
-    waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
-    assertState(CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
+    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
+    assertState(VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER)
     // Disable template
     typeText(injector.parser.parseKeys("<CR>"))
   }
@@ -153,15 +153,15 @@ class TemplateTest : VimOptionTestCase(IjVimOptionService.idearefactormodeName) 
       """.trimIndent()
     )
     startRenaming(VariableInplaceRenameHandler())
-    waitAndAssertMode(myFixture, CommandState.Mode.SELECT)
-    assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
+    waitAndAssertMode(myFixture, VimStateMachine.Mode.SELECT)
+    assertState(VimStateMachine.Mode.SELECT, VimStateMachine.SubMode.VISUAL_CHARACTER)
 
     LookupManager.hideActiveLookup(myFixture.project)
     typeText(injector.parser.parseKeys("<Left>"))
-    assertState(CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    assertState(VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
     typeText(injector.parser.parseKeys("pre" + "<CR>"))
 
-    assertState(CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    assertState(VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
     assertState(
       """
             class Hello {
@@ -186,12 +186,12 @@ class TemplateTest : VimOptionTestCase(IjVimOptionService.idearefactormodeName) 
       """.trimIndent()
     )
     startRenaming(VariableInplaceRenameHandler())
-    waitAndAssertMode(myFixture, CommandState.Mode.SELECT)
-    assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
+    waitAndAssertMode(myFixture, VimStateMachine.Mode.SELECT)
+    assertState(VimStateMachine.Mode.SELECT, VimStateMachine.SubMode.VISUAL_CHARACTER)
 
     LookupManager.hideActiveLookup(myFixture.project)
     typeText(injector.parser.parseKeys("<Right>"))
-    assertState(CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    assertState(VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
     assertState(
       """
             class Hello {
@@ -216,12 +216,12 @@ class TemplateTest : VimOptionTestCase(IjVimOptionService.idearefactormodeName) 
       """.trimIndent()
     )
     startRenaming(VariableInplaceRenameHandler())
-    waitAndAssertMode(myFixture, CommandState.Mode.SELECT)
-    assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
+    waitAndAssertMode(myFixture, VimStateMachine.Mode.SELECT)
+    assertState(VimStateMachine.Mode.SELECT, VimStateMachine.SubMode.VISUAL_CHARACTER)
 
     LookupManager.hideActiveLookup(myFixture.project)
     typeText(injector.parser.parseKeys("<Left>"))
-    assertState(CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    assertState(VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
     assertState(
       """
             class Hello {
@@ -246,12 +246,12 @@ class TemplateTest : VimOptionTestCase(IjVimOptionService.idearefactormodeName) 
       """.trimIndent()
     )
     startRenaming(VariableInplaceRenameHandler())
-    waitAndAssertMode(myFixture, CommandState.Mode.SELECT)
-    assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
+    waitAndAssertMode(myFixture, VimStateMachine.Mode.SELECT)
+    assertState(VimStateMachine.Mode.SELECT, VimStateMachine.SubMode.VISUAL_CHARACTER)
 
     LookupManager.hideActiveLookup(myFixture.project)
     typeText(injector.parser.parseKeys("<Right>"))
-    assertState(CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    assertState(VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
     assertState(
       """
             class Hello {
@@ -276,12 +276,12 @@ class TemplateTest : VimOptionTestCase(IjVimOptionService.idearefactormodeName) 
       """.trimIndent()
     )
     startRenaming(VariableInplaceRenameHandler())
-    waitAndAssertMode(myFixture, CommandState.Mode.SELECT)
-    assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
+    waitAndAssertMode(myFixture, VimStateMachine.Mode.SELECT)
+    assertState(VimStateMachine.Mode.SELECT, VimStateMachine.SubMode.VISUAL_CHARACTER)
 
     typeText(injector.parser.parseKeys("<ESC>"))
 
-    assertState(CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    assertState(VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
     assertState(
       """
             class Hello {
@@ -306,12 +306,12 @@ class TemplateTest : VimOptionTestCase(IjVimOptionService.idearefactormodeName) 
       """.trimIndent()
     )
     startRenaming(VariableInplaceRenameHandler())
-    waitAndAssertMode(myFixture, CommandState.Mode.SELECT)
-    assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
+    waitAndAssertMode(myFixture, VimStateMachine.Mode.SELECT)
+    assertState(VimStateMachine.Mode.SELECT, VimStateMachine.SubMode.VISUAL_CHARACTER)
 
     typeText(injector.parser.parseKeys("Hello" + "<ESC>"))
 
-    assertState(CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    assertState(VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
     assertState(
       """
             class Hello {
@@ -386,7 +386,7 @@ class TemplateTest : VimOptionTestCase(IjVimOptionService.idearefactormodeName) 
       """.trimIndent()
     )
     startRenaming(VariableInplaceRenameHandler())
-    waitAndAssertMode(myFixture, CommandState.Mode.SELECT)
+    waitAndAssertMode(myFixture, VimStateMachine.Mode.SELECT)
   }
 
   @VimOptionTestConfiguration(VimTestOption(IjVimOptionService.idearefactormodeName, OptionValueType.STRING, IjVimOptionService.idearefactormode_select))
@@ -403,7 +403,7 @@ class TemplateTest : VimOptionTestCase(IjVimOptionService.idearefactormodeName) 
     )
     typeText(injector.parser.parseKeys("i"))
     startRenaming(VariableInplaceRenameHandler())
-    waitAndAssertMode(myFixture, CommandState.Mode.SELECT)
+    waitAndAssertMode(myFixture, VimStateMachine.Mode.SELECT)
   }
 
   @VimOptionTestConfiguration(VimTestOption(IjVimOptionService.idearefactormodeName, OptionValueType.STRING, IjVimOptionService.idearefactormode_select))
@@ -453,7 +453,7 @@ class TemplateTest : VimOptionTestCase(IjVimOptionService.idearefactormodeName) 
       """.trimIndent()
     )
     startRenaming(VariableInplaceRenameHandler())
-    waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
+    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
   }
 
   @VimOptionTestConfiguration(VimTestOption(IjVimOptionService.idearefactormodeName, OptionValueType.STRING, IjVimOptionService.idearefactormode_visual))
@@ -470,7 +470,7 @@ class TemplateTest : VimOptionTestCase(IjVimOptionService.idearefactormodeName) 
     )
     typeText(injector.parser.parseKeys("i"))
     startRenaming(VariableInplaceRenameHandler())
-    waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
+    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
   }
 
   @VimOptionTestConfiguration(VimTestOption(IjVimOptionService.idearefactormodeName, OptionValueType.STRING, IjVimOptionService.idearefactormode_visual))
@@ -519,10 +519,10 @@ class TemplateTest : VimOptionTestCase(IjVimOptionService.idearefactormodeName) 
     manager.startTemplate(myFixture.editor, template)
     PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
 
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
     assertOffset(2)
     typeText(injector.parser.parseKeys("<CR>"))
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
     assertOffset(12)
     typeText(injector.parser.parseKeys("<CR>"))
     assertNull(TemplateManagerImpl.getTemplateState(myFixture.editor))

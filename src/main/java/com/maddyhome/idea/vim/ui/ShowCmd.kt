@@ -33,7 +33,7 @@ import com.intellij.util.Consumer
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.EngineStringHelper
 import com.maddyhome.idea.vim.helper.VimNlsSafe
-import com.maddyhome.idea.vim.helper.commandState
+import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionChangeListener
 import com.maddyhome.idea.vim.options.OptionConstants
@@ -70,7 +70,7 @@ object ShowCmd {
   fun getFullText(editor: Editor?): String {
     if (!VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.showcmdName) || editor == null || editor.isDisposed) return ""
 
-    val editorState = editor.vim.commandState
+    val editorState = editor.vim.vimStateMachine
     return EngineStringHelper.toPrintableCharacters(editorState.commandBuilder.keys + editorState.mappingState.keys)
   }
 }

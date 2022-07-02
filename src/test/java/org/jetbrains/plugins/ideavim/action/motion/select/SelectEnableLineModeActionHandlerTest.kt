@@ -18,7 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.select
 
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -43,8 +43,8 @@ class SelectEnableLineModeActionHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      CommandState.Mode.SELECT,
-      CommandState.SubMode.VISUAL_LINE
+      VimStateMachine.Mode.SELECT,
+      VimStateMachine.SubMode.VISUAL_LINE
     )
   }
 
@@ -67,8 +67,8 @@ class SelectEnableLineModeActionHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 ${s}hard by the torrent of a mountain pass$c.$se
       """.trimIndent(),
-      CommandState.Mode.SELECT,
-      CommandState.SubMode.VISUAL_LINE
+      VimStateMachine.Mode.SELECT,
+      VimStateMachine.SubMode.VISUAL_LINE
     )
   }
 
@@ -91,8 +91,8 @@ class SelectEnableLineModeActionHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      CommandState.Mode.SELECT,
-      CommandState.SubMode.VISUAL_LINE
+      VimStateMachine.Mode.SELECT,
+      VimStateMachine.SubMode.VISUAL_LINE
     )
   }
 
@@ -116,8 +116,8 @@ class SelectEnableLineModeActionHandlerTest : VimTestCase() {
                 ${s}where it was ${c}settled on some sodden sand$se
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      CommandState.Mode.SELECT,
-      CommandState.SubMode.VISUAL_LINE
+      VimStateMachine.Mode.SELECT,
+      VimStateMachine.SubMode.VISUAL_LINE
     )
   }
 }

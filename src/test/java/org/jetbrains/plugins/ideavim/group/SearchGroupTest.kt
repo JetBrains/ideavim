@@ -26,7 +26,7 @@ import com.intellij.openapi.util.Ref
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.motion.search.SearchWholeWordForwardAction
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.common.Direction
 import com.maddyhome.idea.vim.helper.RunnableHelper
 import com.maddyhome.idea.vim.newapi.vim
@@ -1448,7 +1448,7 @@ class SearchGroupTest : VimTestCase() {
 
     // Tests with neovim
     val keys = "/$pattern<CR>"
-    doTest(keys, input, input.replace(c, ""), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, input, input.replace(c, ""), VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
     assertEquals(expectedLocation, myFixture.editor.caretModel.offset)
 
     return ref.get()

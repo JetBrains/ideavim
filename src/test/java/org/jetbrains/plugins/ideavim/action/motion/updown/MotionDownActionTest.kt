@@ -22,7 +22,7 @@ package org.jetbrains.plugins.ideavim.action.motion.updown
 
 import com.intellij.codeInsight.daemon.impl.HintRenderer
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 /**
@@ -47,7 +47,7 @@ class MotionDownActionTest : VimTestCase() {
             wh|${s}e${se}re i|t was settled on some sodden sand
             ha|${s}r${se}d by| the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
+    doTest(keys, before, after, VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_BLOCK)
   }
 
   fun `test motion down in visual block mode with dollar motion`() {
@@ -68,7 +68,7 @@ class MotionDownActionTest : VimTestCase() {
             wh|${s}ere it was settled on some sodden sand[additional Chars]${c}${se}
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
+    doTest(keys, before, after, VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_BLOCK)
   }
 
   fun `test last column after line deletion`() {
@@ -82,7 +82,7 @@ class MotionDownActionTest : VimTestCase() {
             
             ${c}all rocks and lavender and tufted grass,
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   fun `test with inlays`() {
@@ -241,7 +241,7 @@ class MotionDownActionTest : VimTestCase() {
             I found it in a legendary land
             ${c}
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 }

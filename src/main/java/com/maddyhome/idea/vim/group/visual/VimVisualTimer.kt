@@ -19,7 +19,7 @@
 package com.maddyhome.idea.vim.group.visual
 
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer.mode
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer.singleTask
 import com.maddyhome.idea.vim.options.OptionScope
@@ -66,9 +66,9 @@ import javax.swing.Timer
 object VimVisualTimer {
 
   var swingTimer: Timer? = null
-  var mode: CommandState.Mode? = null
+  var mode: VimStateMachine.Mode? = null
 
-  inline fun singleTask(currentMode: CommandState.Mode, crossinline task: (initialMode: CommandState.Mode?) -> Unit) {
+  inline fun singleTask(currentMode: VimStateMachine.Mode, crossinline task: (initialMode: VimStateMachine.Mode?) -> Unit) {
     swingTimer?.stop()
 
     if (mode == null) mode = currentMode
@@ -92,7 +92,7 @@ object VimVisualTimer {
     }
   }
 
-  inline fun timerAction(task: (initialMode: CommandState.Mode?) -> Unit) {
+  inline fun timerAction(task: (initialMode: VimStateMachine.Mode?) -> Unit) {
     task(mode)
     swingTimer = null
     mode = null

@@ -1,3 +1,13 @@
+// Set repository for snapshot versions of gradle plugin
+pluginManagement {
+  repositories {
+    maven {
+      url 'https://oss.sonatype.org/content/repositories/snapshots/'
+    }
+    gradlePluginPortal()
+  }
+}
+
 rootProject.name = 'IdeaVIM'
 include 'vim-engine'
 

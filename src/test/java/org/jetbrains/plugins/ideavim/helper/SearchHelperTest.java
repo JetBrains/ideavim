@@ -18,7 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.helper;
 
-import com.maddyhome.idea.vim.command.CommandState;
+import com.maddyhome.idea.vim.command.VimStateMachine;
 import com.maddyhome.idea.vim.helper.SearchHelper;
 import com.maddyhome.idea.vim.helper.SearchHelperKtKt;
 import org.jetbrains.plugins.ideavim.SkipNeovimReason;
@@ -86,8 +86,8 @@ public class SearchHelperTest extends VimTestCase {
   }
 
   public void testMotionOuterWordAction() {
-    doTest("va(", "((int) nu<caret>m)", "<selection>((int) num)</selection>", CommandState.Mode.VISUAL,
-           CommandState.SubMode.VISUAL_CHARACTER);
+    doTest("va(", "((int) nu<caret>m)", "<selection>((int) num)</selection>", VimStateMachine.Mode.VISUAL,
+           VimStateMachine.SubMode.VISUAL_CHARACTER);
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)

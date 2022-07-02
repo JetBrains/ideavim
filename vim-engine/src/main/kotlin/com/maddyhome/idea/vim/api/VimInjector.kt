@@ -1,6 +1,6 @@
 package com.maddyhome.idea.vim.api
 
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.common.VimMachine
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.group.TabService
@@ -54,12 +54,12 @@ interface VimInjector {
   // [FINISHED] Only IJ staff left
   val visualMotionGroup: VimVisualMotionGroup
   // [FINISHED] Class moved to vim-engine, but it's attached to Editor using IJ things
-  fun commandStateFor(editor: VimEditor): CommandState
+  fun commandStateFor(editor: VimEditor): VimStateMachine
   // [FINISHED] Class moved to vim-engine, but it's attached to Editor using IJ things
   /**
    * COMPATIBILITY-LAYER: Added new method with Any
    */
-  fun commandStateFor(editor: Any): CommandState
+  fun commandStateFor(editor: Any): VimStateMachine
   // !! in progress
   val engineEditorHelper: EngineEditorHelper
   // [FINISHED] Only IJ staff

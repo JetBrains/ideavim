@@ -18,7 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.action.change
 
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class UndoActionTest : VimTestCase() {
@@ -33,7 +33,7 @@ class UndoActionTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
     """.trimIndent()
     val after = before
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
     val editor = myFixture.editor
     assertFalse(editor.caretModel.primaryCaret.hasSelection())
   }
@@ -49,7 +49,7 @@ class UndoActionTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
     """.trimIndent()
     val after = before
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
     assertFalse(hasSelection())
   }
 
@@ -71,7 +71,7 @@ class UndoActionTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
     assertFalse(hasSelection())
   }
 
@@ -93,7 +93,7 @@ class UndoActionTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
     assertFalse(hasSelection())
   }
 

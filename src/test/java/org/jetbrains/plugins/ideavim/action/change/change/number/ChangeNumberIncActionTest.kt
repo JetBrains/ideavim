@@ -18,13 +18,13 @@
 
 package org.jetbrains.plugins.ideavim.action.change.change.number
 
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class ChangeNumberIncActionTest : VimTestCase() {
   @VimBehaviorDiffers(originalVimAfter = "11X0")
   fun `test inc fancy number`() {
-    doTest("<C-A>", "1${c}0X0", "10X1", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest("<C-A>", "1${c}0X0", "10X1", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 }

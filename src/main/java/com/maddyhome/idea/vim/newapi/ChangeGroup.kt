@@ -32,7 +32,7 @@ import com.maddyhome.idea.vim.api.VimChangeGroupBase
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimMotionGroupBase
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.EditorLine
 import com.maddyhome.idea.vim.common.IndentConfig
@@ -103,7 +103,7 @@ fun changeRange(
       if (type == SelectionType.BLOCK_WISE) {
         VimPlugin.getChange().setInsertRepeat(lines, col, false)
       }
-      editor.vimChangeActionSwitchMode = CommandState.Mode.INSERT
+      editor.vimChangeActionSwitchMode = VimStateMachine.Mode.INSERT
     }
   } else {
     VimPlugin.getChange().insertBeforeCursor(editor.vim, context.vim)
@@ -158,9 +158,9 @@ fun deleteRange(
 fun insertLineAround(editor: VimEditor, context: ExecutionContext, shift: Int) {
   val project = (editor as IjVimEditor).editor.project
 
-  VimPlugin.getChange().initInsert(editor, context, CommandState.Mode.INSERT)
+  VimPlugin.getChange().initInsert(editor, context, VimStateMachine.Mode.INSERT)
 
-  if (!CommandState.getInstance(editor).isDotRepeatInProgress) {
+  if (!VimStateMachine.getInstance(editor).isDotRepeatInProgress) {
     for (vimCaret in editor.carets()) {
       val caret = (vimCaret as IjVimCaret).caret
       val line = vimCaret.getLine()

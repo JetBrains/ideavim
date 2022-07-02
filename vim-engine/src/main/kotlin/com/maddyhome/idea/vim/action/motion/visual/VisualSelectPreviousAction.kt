@@ -21,11 +21,11 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.VimScrollType
 import com.maddyhome.idea.vim.handler.VimActionHandler
-import com.maddyhome.idea.vim.helper.commandState
+import com.maddyhome.idea.vim.helper.vimStateMachine
 
 /**
  * @author vlan
@@ -49,7 +49,7 @@ private fun selectPreviousVisualMode(editor: VimEditor): Boolean {
 
   editor.removeSecondaryCarets()
 
-  editor.commandState.pushModes(CommandState.Mode.VISUAL, lastSelectionType.toSubMode())
+  editor.vimStateMachine.pushModes(VimStateMachine.Mode.VISUAL, lastSelectionType.toSubMode())
 
   val primaryCaret = editor.primaryCaret()
   primaryCaret.vimSetSelection(visualMarks.startOffset, visualMarks.endOffset - 1, true)

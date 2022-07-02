@@ -22,7 +22,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 
@@ -48,6 +48,6 @@ class SelectEnableCharacterModeAction : VimActionHandler.SingleExecution() {
         vimLastColumn = getVisualPosition().column
       }
     }
-    return injector.visualMotionGroup.enterSelectMode(editor, CommandState.SubMode.VISUAL_CHARACTER)
+    return injector.visualMotionGroup.enterSelectMode(editor, VimStateMachine.SubMode.VISUAL_CHARACTER)
   }
 }

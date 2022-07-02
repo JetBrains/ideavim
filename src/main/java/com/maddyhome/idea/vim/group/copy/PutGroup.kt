@@ -34,7 +34,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.command.isBlock
 import com.maddyhome.idea.vim.command.isChar
@@ -75,7 +75,7 @@ class PutGroup : VimPutBase() {
     additionalData: Map<String, Any>,
   ) {
     val visualSelection = data.visualSelection
-    val subMode = visualSelection?.typeInEditor?.toSubMode() ?: CommandState.SubMode.NONE
+    val subMode = visualSelection?.typeInEditor?.toSubMode() ?: VimStateMachine.SubMode.NONE
     if (OptionConstants.clipboard_ideaput in (
       injector.optionService
         .getOptionValue(OptionScope.GLOBAL, OptionConstants.clipboardName) as VimString
@@ -113,7 +113,7 @@ class PutGroup : VimPutBase() {
     val startOffsets = prepareDocumentAndGetStartOffsets(editor, caret, text.typeInRegister, data, additionalData)
 
     startOffsets.forEach { startOffset ->
-      val subMode = data.visualSelection?.typeInEditor?.toSubMode() ?: CommandState.SubMode.NONE
+      val subMode = data.visualSelection?.typeInEditor?.toSubMode() ?: VimStateMachine.SubMode.NONE
       val endOffset = putTextInternal(
         editor, caret, context, text.text, text.typeInRegister, subMode,
         startOffset, data.count, data.indent, data.caretAfterInsertedText
@@ -229,13 +229,13 @@ class PutGroup : VimPutBase() {
   }
 
   private fun putTextViaIde(
-    pasteProvider: PasteProvider,
-    vimEditor: VimEditor,
-    vimContext: ExecutionContext,
-    text: ProcessedTextData,
-    subMode: CommandState.SubMode,
-    data: PutData,
-    additionalData: Map<String, Any>,
+      pasteProvider: PasteProvider,
+      vimEditor: VimEditor,
+      vimContext: ExecutionContext,
+      text: ProcessedTextData,
+      subMode: VimStateMachine.SubMode,
+      data: PutData,
+      additionalData: Map<String, Any>,
   ) {
     val editor = (vimEditor as IjVimEditor).editor
     val context = vimContext.context as DataContext

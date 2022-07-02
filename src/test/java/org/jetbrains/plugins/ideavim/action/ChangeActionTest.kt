@@ -20,7 +20,7 @@ package org.jetbrains.plugins.ideavim.action
 import com.intellij.codeInsight.folding.CodeFoldingManager
 import com.intellij.codeInsight.folding.impl.FoldingUtil
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -33,8 +33,8 @@ class ChangeActionTest : VimTestCase() {
   // VIM-620 |i_CTRL-O|
   fun testInsertSingleCommandAndInserting() {
     doTest(
-      listOf("i", "<C-O>", "a", "123", "<Esc>", "x"), "abc${c}d\n", "abcd12\n", CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE
+      listOf("i", "<C-O>", "a", "123", "<Esc>", "x"), "abc${c}d\n", "abcd12\n", VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE
     )
   }
 
@@ -42,7 +42,7 @@ class ChangeActionTest : VimTestCase() {
   fun testInsertSingleCommandAndNewLineInserting() {
     doTest(
       listOf("i", "<C-O>", "o", "123", "<Esc>", "x"),
-      "abc${c}d\n", "abcd\n12\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      "abc${c}d\n", "abcd\n12\n", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -50,7 +50,7 @@ class ChangeActionTest : VimTestCase() {
   fun testInsertSingleCommandAndNewLineInserting2() {
     doTest(
       listOf("i", "<C-O>", "v"),
-      "12${c}345", "12${s}${c}3${se}45", CommandState.Mode.INSERT_VISUAL, CommandState.SubMode.VISUAL_CHARACTER
+      "12${c}345", "12${s}${c}3${se}45", VimStateMachine.Mode.INSERT_VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER
     )
   }
 
@@ -58,7 +58,7 @@ class ChangeActionTest : VimTestCase() {
   fun testInsertSingleCommandAndNewLineInserting3() {
     doTest(
       listOf("i", "<C-O>", "v", "<esc>"),
-      "12${c}345", "12${c}345", CommandState.Mode.INSERT, CommandState.SubMode.NONE
+      "12${c}345", "12${c}345", VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -66,7 +66,7 @@ class ChangeActionTest : VimTestCase() {
   fun testInsertSingleCommandAndNewLineInserting4() {
     doTest(
       listOf("i", "<C-O>", "v", "d"),
-      "12${c}345", "12${c}45", CommandState.Mode.INSERT, CommandState.SubMode.NONE
+      "12${c}345", "12${c}45", VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -74,7 +74,7 @@ class ChangeActionTest : VimTestCase() {
   fun testInsertSingleCommandAndNewLineInserting5() {
     doTest(
       listOf("i", "<C-O>", "v", "<C-G>"),
-      "12${c}345", "12${s}3${c}${se}45", CommandState.Mode.INSERT_SELECT, CommandState.SubMode.VISUAL_CHARACTER
+      "12${c}345", "12${s}3${c}${se}45", VimStateMachine.Mode.INSERT_SELECT, VimStateMachine.SubMode.VISUAL_CHARACTER
     )
   }
 
@@ -82,7 +82,7 @@ class ChangeActionTest : VimTestCase() {
   fun testInsertSingleCommandAndNewLineInserting6() {
     doTest(
       listOf("i", "<C-O>", "gh"),
-      "12${c}345", "12${s}3${c}${se}45", CommandState.Mode.INSERT_SELECT, CommandState.SubMode.VISUAL_CHARACTER
+      "12${c}345", "12${s}3${c}${se}45", VimStateMachine.Mode.INSERT_SELECT, VimStateMachine.SubMode.VISUAL_CHARACTER
     )
   }
 
@@ -90,7 +90,7 @@ class ChangeActionTest : VimTestCase() {
   fun testInsertSingleCommandAndNewLineInserting7() {
     doTest(
       listOf("i", "<C-O>", "gh", "<esc>"),
-      "12${c}345", "123${c}45", CommandState.Mode.INSERT, CommandState.SubMode.NONE
+      "12${c}345", "123${c}45", VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -109,58 +109,58 @@ class ChangeActionTest : VimTestCase() {
   fun testInsertSingleCommand() {
     doTest(
       listOf("i", "def", "<C-O>", "d2h", "x"),
-      "abc$c.\n", "abcdx.\n", CommandState.Mode.INSERT, CommandState.SubMode.NONE
+      "abc$c.\n", "abcdx.\n", VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
     )
   }
 
   // VIM-321 |d| |count|
   fun testDeleteEmptyRange() {
-    doTest("d0", "${c}hello\n", "hello\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest("d0", "${c}hello\n", "hello\n", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   // VIM-157 |~|
   fun testToggleCharCase() {
-    doTest("~~", "${c}hello world\n", "HEllo world\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest("~~", "${c}hello world\n", "HEllo world\n", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   // VIM-157 |~|
   fun testToggleCharCaseLineEnd() {
-    doTest("~~", "hello wor${c}ld\n", "hello worLD\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest("~~", "hello wor${c}ld\n", "hello worLD\n", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   fun testToggleCaseMotion() {
-    doTest("g~w", "${c}FooBar Baz\n", "fOObAR Baz\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest("g~w", "${c}FooBar Baz\n", "fOObAR Baz\n", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   fun testChangeUpperCase() {
     doTest(
-      "gUw", "${c}FooBar Baz\n", "FOOBAR Baz\n", CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE
+      "gUw", "${c}FooBar Baz\n", "FOOBAR Baz\n", VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE
     )
   }
 
   fun testChangeLowerCase() {
-    doTest("guw", "${c}FooBar Baz\n", "foobar Baz\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest("guw", "${c}FooBar Baz\n", "foobar Baz\n", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   fun testToggleCaseVisual() {
     doTest(
-      "ve~", "${c}FooBar Baz\n", "fOObAR Baz\n", CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE
+      "ve~", "${c}FooBar Baz\n", "fOObAR Baz\n", VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE
     )
   }
 
   fun testChangeUpperCaseVisual() {
     doTest(
-      "veU", "${c}FooBar Baz\n", "FOOBAR Baz\n", CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE
+      "veU", "${c}FooBar Baz\n", "FOOBAR Baz\n", VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE
     )
   }
 
   fun testChangeLowerCaseVisual() {
     doTest(
-      "veu", "${c}FooBar Baz\n", "foobar Baz\n", CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE
+      "veu", "${c}FooBar Baz\n", "foobar Baz\n", VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE
     )
   }
 
@@ -180,7 +180,7 @@ class ChangeActionTest : VimTestCase() {
    four
    
       """.trimIndent(),
-      CommandState.Mode.INSERT, CommandState.SubMode.NONE
+      VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -198,7 +198,7 @@ class ChangeActionTest : VimTestCase() {
         
         
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
     assertOffset(4)
   }
@@ -217,8 +217,8 @@ class ChangeActionTest : VimTestCase() {
    three
    
       """.trimIndent(),
-      CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE
     )
   }
 
@@ -238,7 +238,7 @@ class ChangeActionTest : VimTestCase() {
    three
    
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -252,7 +252,7 @@ class ChangeActionTest : VimTestCase() {
       """one 
  three
 """,
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
     assertOffset(3)
   }
@@ -266,16 +266,16 @@ class ChangeActionTest : VimTestCase() {
    three four
    
       """.trimIndent(),
-      "one four\n", CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE
+      "one four\n", VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE
     )
   }
 
   // VIM-1380 |d| |w| |count|
   fun testDeleteTwoWordsAtLastChar() {
     doTest(
-      "d2w", "on${c}e two three\n", "on${c}three\n", CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE
+      "d2w", "on${c}e two three\n", "on${c}three\n", VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE
     )
   }
 
@@ -289,8 +289,8 @@ class ChangeActionTest : VimTestCase() {
       """foo
   , baz
 """,
-      CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE
     )
   }
 
@@ -308,8 +308,8 @@ class ChangeActionTest : VimTestCase() {
    baz
    
       """.trimIndent(),
-      CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE
     )
   }
 
@@ -327,7 +327,7 @@ class ChangeActionTest : VimTestCase() {
         bar
         
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
     assertOffset(1)
   }
@@ -341,7 +341,7 @@ class ChangeActionTest : VimTestCase() {
    two
    
       """.trimIndent(),
-      "two\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      "two\n", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -349,8 +349,8 @@ class ChangeActionTest : VimTestCase() {
   fun testInsertFromRegister() {
     setRegister('a', "World")
     doTest(
-      listOf("A", ", ", "<C-R>", "a", "!"), "${c}Hello\n", "Hello, World!\n", CommandState.Mode.INSERT,
-      CommandState.SubMode.NONE
+      listOf("A", ", ", "<C-R>", "a", "!"), "${c}Hello\n", "Hello, World!\n", VimStateMachine.Mode.INSERT,
+      VimStateMachine.SubMode.NONE
     )
   }
 
@@ -358,7 +358,7 @@ class ChangeActionTest : VimTestCase() {
   fun testInsertNewLineAboveFirstLine() {
     doTest(
       listOf("O", "bar"),
-      "fo${c}o\n", "bar\nfoo\n", CommandState.Mode.INSERT, CommandState.SubMode.NONE
+      "fo${c}o\n", "bar\nfoo\n", VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -366,7 +366,7 @@ class ChangeActionTest : VimTestCase() {
   fun testVisualSelectionRightMargin() {
     doTest(
       listOf("v", "k\$d"),
-      "foo\n${c}bar\n", "fooar\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      "foo\n${c}bar\n", "fooar\n", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -388,7 +388,7 @@ class ChangeActionTest : VimTestCase() {
         quux
         
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -409,7 +409,7 @@ class ChangeActionTest : VimTestCase() {
         quux
         
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -424,7 +424,7 @@ quux
       """    a 1 b 2 c 3
 quux
 """,
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -439,7 +439,7 @@ quux
       """    a 1    b 2    c 3
 quux
 """,
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -451,7 +451,7 @@ quux
         
         bar
       """.trimIndent(),
-      "foo bar", CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      "foo bar", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -462,7 +462,7 @@ quux
         foo  
         bar
       """.trimIndent(),
-      "foo  bar", CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      "foo  bar", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -477,7 +477,7 @@ quux
       """    a 1 b 2 c 3
 quux
 """,
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -492,14 +492,14 @@ quux
       """    a 1    b 2    c 3
 quux
 """,
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
   fun testDeleteCharVisualBlockOnLastCharOfLine() {
     doTest(
       listOf("<C-V>", "x"),
-      "fo${c}o\n", "fo\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      "fo${c}o\n", "fo\n", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -509,7 +509,7 @@ quux
     }
     doTest(
       listOf("<C-V>", "j", "x"),
-      "\n\n", "\n\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      "\n\n", "\n\n", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -529,7 +529,7 @@ quux
         br
         
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -550,7 +550,7 @@ quux
         br
         
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -575,18 +575,18 @@ quux
 
   // |r|
   fun testReplaceOneChar() {
-    doTest("rx", "b${c}ar\n", "b${c}xr\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest("rx", "b${c}ar\n", "b${c}xr\n", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   // |r|
   @VimBehaviorDiffers(originalVimAfter = "foXX${c}Xr\n")
   fun testReplaceMultipleCharsWithCount() {
-    doTest("3rX", "fo${c}obar\n", "fo${c}XXXr\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest("3rX", "fo${c}obar\n", "fo${c}XXXr\n", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   // |r|
   fun testReplaceMultipleCharsWithCountPastEndOfLine() {
-    doTest("6rX", "fo${c}obar\n", "fo${c}obar\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest("6rX", "fo${c}obar\n", "fo${c}obar\n", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   // |r|
@@ -604,7 +604,7 @@ quux
         ZZZZZz
         
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -619,7 +619,7 @@ foobaz
     bar
 foobaz
 """,
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -635,20 +635,20 @@ foobaz
     r
 foobaz
 """,
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
   // |s|
   fun testReplaceOneCharWithText() {
-    doTest("sxy<Esc>", "b${c}ar\n", "bx${c}yr\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest("sxy<Esc>", "b${c}ar\n", "bx${c}yr\n", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   // |s|
   fun testReplaceMultipleCharsWithTextWithCount() {
     doTest(
       "3sxy<Esc>",
-      "fo${c}obar\n", "fox${c}yr\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      "fo${c}obar\n", "fox${c}yr\n", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -666,13 +666,13 @@ foobaz
         biff
         
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
   // |R|
   fun testReplaceMode() {
-    doTest("Rbaz<Esc>", "foo${c}bar\n", "fooba${c}z\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest("Rbaz<Esc>", "foo${c}bar\n", "fooba${c}z\n", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   // |R| |i_<Insert>|
@@ -680,7 +680,7 @@ foobaz
   fun testReplaceModeSwitchToInsertModeAndBack() {
     doTest(
       "RXXX<Ins>YYY<Ins>ZZZ<Esc>",
-      "aaa${c}bbbcccddd\n", "aaaXXXYYYZZ${c}Zddd\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      "aaa${c}bbbcccddd\n", "aaaXXXYYYZZ${c}Zddd\n", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -689,8 +689,8 @@ foobaz
   fun testInsertModeSwitchToReplaceModeAndBack() {
     doTest(
       "iXXX<Ins>YYY<Ins>ZZZ<Esc>",
-      "aaa${c}bbbcccddd\n", "aaaXXXYYYZZ${c}Zcccddd\n", CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE
+      "aaa${c}bbbcccddd\n", "aaaXXXYYYZZ${c}Zcccddd\n", VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE
     )
   }
 
@@ -709,7 +709,7 @@ foobaz
         fo${c}o quux
         
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -917,17 +917,17 @@ and some text after"""
   fun testRepeatChangeWordDoesNotBreakNextRepeatFind() {
     doTest(
       "fXcfYPATATA<Esc>fX.;.", "${c}aaaaXBBBBYaaaaaaaXBBBBYaaaaaaXBBBBYaaaaaaaa\n",
-      "aaaaPATATAaaaaaaaPATATAaaaaaaPATATAaaaaaaaa\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      "aaaaPATATAaaaaaaaPATATAaaaaaaPATATAaaaaaaaa\n", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
   fun testRepeatReplace() {
     configureByText("${c}foobarbaz spam\n")
     typeText(injector.parser.parseKeys("R"))
-    assertMode(CommandState.Mode.REPLACE)
+    assertMode(VimStateMachine.Mode.REPLACE)
     typeText(injector.parser.parseKeys("FOO" + "<Esc>" + "l" + "2."))
     assertState("FOOFOOFO${c}O spam\n")
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
   }
 
   fun testDownMovementAfterDeletionToStart() {
@@ -941,8 +941,8 @@ and some text after"""
         psum dolor sit amet
         ${c}lorem ipsum dolor sit amet
       """.trimIndent(),
-      CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE
     )
   }
 
@@ -957,8 +957,8 @@ and some text after"""
         ipsum dolor sit amet
         ${c}lorem ipsum dolor sit amet
       """.trimIndent(),
-      CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE
     )
   }
 
@@ -973,8 +973,8 @@ and some text after"""
         ipsum dolor sit amet
         ${c}lorem ipsum dolor sit amet
       """.trimIndent(),
-      CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE
     )
   }
 
@@ -989,8 +989,8 @@ and some text after"""
         ipsum dolor sit amet
         ${c}lorem ipsum dolor sit amet
       """.trimIndent(),
-      CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE
     )
   }
 
@@ -1005,8 +1005,8 @@ and some text after"""
         ${c}lorem ipsum dolor sit amet
         psum dolor sit amet
       """.trimIndent(),
-      CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE
     )
   }
 
@@ -1021,8 +1021,8 @@ and some text after"""
         ${c}lorem ipsum dolor sit amet
         ipsum dolor sit amet
       """.trimIndent(),
-      CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE
     )
   }
 
@@ -1040,7 +1040,7 @@ and some text after"""
         ${c}lorem ipsum dolor sit amet
         
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -1059,7 +1059,7 @@ and some text after"""
         gaganis ${c}gaganis gaganis
         
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -1075,7 +1075,7 @@ and some text after"""
         line 1
         ${c}line 3
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 }

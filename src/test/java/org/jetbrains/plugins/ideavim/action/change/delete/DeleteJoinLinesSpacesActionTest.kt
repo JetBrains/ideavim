@@ -18,7 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.action.change.delete
 
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.vimscript.services.IjVimOptionService
 import org.jetbrains.plugins.ideavim.OptionValueType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -47,8 +47,8 @@ class DeleteJoinLinesSpacesActionTest : VimOptionTestCase(IjVimOptionService.ide
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE
     )
   }
 
@@ -70,8 +70,8 @@ class DeleteJoinLinesSpacesActionTest : VimOptionTestCase(IjVimOptionService.ide
                 I found it in a legendary land all rocks and lavender and tufted grass,$c where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE
     )
   }
 
@@ -96,8 +96,8 @@ class DeleteJoinLinesSpacesActionTest : VimOptionTestCase(IjVimOptionService.ide
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE
     )
   }
 }

@@ -272,17 +272,17 @@ public class VimIndentObject implements VimExtension {
     @Override
     public void execute(@NotNull VimEditor editor, @NotNull ExecutionContext context) {
       IjVimEditor vimEditor = (IjVimEditor)editor;
-      @NotNull CommandState commandState = CommandState.getInstance(vimEditor);
-      int count = Math.max(1, commandState.getCommandBuilder().getCount());
+      @NotNull VimStateMachine vimStateMachine = VimStateMachine.getInstance(vimEditor);
+      int count = Math.max(1, vimStateMachine.getCommandBuilder().getCount());
 
       final IndentObjectHandler textObjectHandler = new IndentObjectHandler(includeAbove, includeBelow);
 
-      if (!commandState.isOperatorPending()) {
+      if (!vimStateMachine.isOperatorPending()) {
         ((IjVimEditor)editor).getEditor().getCaretModel().runForEachCaret((Caret caret) -> {
           final TextRange range = textObjectHandler.getRange(vimEditor, new IjVimCaret(caret), context, count, 0, null);
           if (range != null) {
             try (VimListenerSuppressor.Locked ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
-              if (commandState.getMode() == CommandState.Mode.VISUAL) {
+              if (vimStateMachine.getMode() == VimStateMachine.Mode.VISUAL) {
                 vimSetSelection(caret, range.getStartOffset(), range.getEndOffset() - 1, true);
               } else {
                 InlayHelperKt.moveToInlayAwareOffset(caret, range.getStartOffset());
@@ -292,9 +292,9 @@ public class VimIndentObject implements VimExtension {
 
         });
       } else {
-        commandState.getCommandBuilder().completeCommandPart(new Argument(new Command(count,
-          textObjectHandler, Command.Type.MOTION,
-          EnumSet.noneOf(CommandFlags.class))));
+        vimStateMachine.getCommandBuilder().completeCommandPart(new Argument(new Command(count,
+                                                                                         textObjectHandler, Command.Type.MOTION,
+                                                                                         EnumSet.noneOf(CommandFlags.class))));
       }
     }
   }

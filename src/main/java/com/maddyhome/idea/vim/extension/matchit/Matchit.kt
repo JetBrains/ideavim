@@ -46,7 +46,7 @@ import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotionOrError
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.PsiHelper
-import com.maddyhome.idea.vim.helper.commandState
+import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
@@ -97,11 +97,11 @@ class Matchit : VimExtension {
   private class MatchitHandler(private val reverse: Boolean) : ExtensionHandler {
 
     override fun execute(editor: VimEditor, context: ExecutionContext) {
-      val commandState = editor.commandState
+      val commandState = editor.vimStateMachine
       val count = commandState.commandBuilder.count
 
       // Reset the command count so it doesn't transfer onto subsequent commands.
-      editor.commandState.commandBuilder.resetCount()
+      editor.vimStateMachine.commandBuilder.resetCount()
 
       // Normally we want to jump to the start of the matching pair. But when moving forward in operator
       // pending mode, we want to include the entire match. isInOpPending makes that distinction.

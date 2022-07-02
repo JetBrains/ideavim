@@ -19,7 +19,7 @@
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.history.HistoryConstants
 import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -235,7 +235,7 @@ class GlobalCommandTest : VimTestCase() {
   }
 
   private fun doTest(command: String, before: String, after: String) {
-    doTest(listOf(exCommand(command)), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(listOf(exCommand(command)), before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   companion object {

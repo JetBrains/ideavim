@@ -22,7 +22,7 @@ import com.intellij.codeInsight.daemon.impl.HintRenderer
 import com.intellij.codeInsight.folding.CodeFoldingManager
 import com.intellij.codeInsight.folding.impl.FoldingUtil
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -74,8 +74,8 @@ Xbar
                     ba_quux_r
 
       """.trimIndent(),
-      CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE
     )
   }
 
@@ -98,8 +98,8 @@ Xbar
 
         """.trimIndent()
         ),
-      CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE
     )
   }
 
@@ -137,8 +137,8 @@ Xbar
 
         """.trimIndent()
         ),
-      CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE
     )
   }
 
@@ -162,10 +162,10 @@ Xbar
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE
     )
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.VISUAL_BLOCK_MODE)
@@ -189,14 +189,14 @@ Xbar
                 where it was s Hello ettled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE
     ) {
       it.inlayModel.addInlineElement(before.indexOf("found"), HintRenderer("Hello"))
       it.inlayModel.addInlineElement(before.indexOf("l rocks"), HintRenderer("Hello"))
       it.inlayModel.addInlineElement(before.indexOf("ere it"), HintRenderer("Hello"))
     }
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.VISUAL_BLOCK_MODE)
@@ -213,8 +213,8 @@ Xbar
       listOf("<C-V>", "lll", "I"),
       before.trimIndent(),
       before.trimIndent(),
-      CommandState.Mode.INSERT,
-      CommandState.SubMode.NONE
+      VimStateMachine.Mode.INSERT,
+      VimStateMachine.SubMode.NONE
     )
   }
 }

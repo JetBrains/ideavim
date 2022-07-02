@@ -18,7 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.search
 
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 
@@ -35,11 +35,11 @@ class SearchWholeWordForwardActionTest : VimTestCase() {
   .hello 2
   .${c}hello 3
     """.trimIndent().dotToTab()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   fun `test backward search on empty string`() {
-    doTest("*", "", "", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest("*", "", "", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
     assertPluginError(false)
   }
 
@@ -67,7 +67,7 @@ class SearchWholeWordForwardActionTest : VimTestCase() {
           where it was settled on some sodden sand
           hard by the torrent of a mountain pass.
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -86,7 +86,7 @@ class SearchWholeWordForwardActionTest : VimTestCase() {
           where it was settled on some sodden sand
           hard by the torrent of a mountain pass
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 }

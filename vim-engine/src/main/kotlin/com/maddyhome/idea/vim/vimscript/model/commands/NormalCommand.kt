@@ -23,10 +23,10 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimLogicalPosition
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ranges.Ranges
-import com.maddyhome.idea.vim.helper.commandState
+import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
@@ -50,20 +50,20 @@ data class NormalCommand(val ranges: Ranges, val argument: String) : Command.Sin
       argument = argument.substring(1)
     }
 
-    val commandState = editor.commandState
+    val commandState = editor.vimStateMachine
     val rangeUsed = ranges.size() != 0
     when (editor.mode) {
-      CommandState.Mode.VISUAL -> {
+      VimStateMachine.Mode.VISUAL -> {
         editor.exitVisualModeNative()
         if (!rangeUsed) {
           val selectionStart = injector.markGroup.getMark(editor, '<')!!
           editor.currentCaret().moveToLogicalPosition(VimLogicalPosition(selectionStart.logicalLine, selectionStart.col))
         }
       }
-      CommandState.Mode.CMD_LINE -> injector.processGroup.cancelExEntry(editor, false)
-      CommandState.Mode.INSERT, CommandState.Mode.REPLACE -> editor.exitInsertMode(context, OperatorArguments(false, 1, commandState.mode, commandState.subMode))
-      CommandState.Mode.SELECT -> editor.exitSelectModeNative(false)
-      CommandState.Mode.OP_PENDING, CommandState.Mode.COMMAND -> Unit
+      VimStateMachine.Mode.CMD_LINE -> injector.processGroup.cancelExEntry(editor, false)
+      VimStateMachine.Mode.INSERT, VimStateMachine.Mode.REPLACE -> editor.exitInsertMode(context, OperatorArguments(false, 1, commandState.mode, commandState.subMode))
+      VimStateMachine.Mode.SELECT -> editor.exitSelectModeNative(false)
+      VimStateMachine.Mode.OP_PENDING, VimStateMachine.Mode.COMMAND -> Unit
     }
     val range = getLineRange(editor, editor.primaryCaret())
 
@@ -87,10 +87,10 @@ data class NormalCommand(val ranges: Ranges, val argument: String) : Command.Sin
 
       // Exit if state leaves as insert or cmd_line
       val mode = commandState.mode
-      if (mode == CommandState.Mode.CMD_LINE) {
+      if (mode == VimStateMachine.Mode.CMD_LINE) {
         injector.processGroup.cancelExEntry(editor, false)
       }
-      if (mode == CommandState.Mode.INSERT || mode == CommandState.Mode.REPLACE) {
+      if (mode == VimStateMachine.Mode.INSERT || mode == VimStateMachine.Mode.REPLACE) {
         editor.exitInsertMode(context, OperatorArguments(false, 1, commandState.mode, commandState.subMode))
       }
     }

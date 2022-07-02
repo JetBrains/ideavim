@@ -21,7 +21,7 @@ package org.jetbrains.plugins.ideavim.extension.highlightedyank
 import com.intellij.openapi.editor.markup.RangeHighlighter
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.extension.highlightedyank.DEFAULT_HIGHLIGHT_DURATION
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -36,7 +36,7 @@ class VimHighlightedYankTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test highlighting whole line when whole line is yanked`() {
-    doTest("yy", code, code, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest("yy", code, code, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
 
     assertAllHighlightersCount(1)
     assertHighlighterRange(1, 40, getFirstHighlighter())
@@ -44,7 +44,7 @@ class VimHighlightedYankTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test highlighting single word when single word is yanked`() {
-    doTest("yiw", code, code, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest("yiw", code, code, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
 
     assertAllHighlightersCount(1)
     assertHighlighterRange(5, 8, getFirstHighlighter())
@@ -60,7 +60,7 @@ class VimHighlightedYankTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test removing previous highlight when entering insert mode`() {
-    doTest("yyi", code, code, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    doTest("yyi", code, code, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
 
     assertAllHighlightersCount(0)
   }
@@ -112,7 +112,7 @@ class VimHighlightedYankTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test highlighting with multiple cursors`() {
-    doTest("yiw", codeWithMultipleCurors, codeWithMultipleCurors, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest("yiw", codeWithMultipleCurors, codeWithMultipleCurors, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
 
     val highlighters = myFixture.editor.markupModel.allHighlighters
     assertAllHighlightersCount(3)
@@ -123,14 +123,14 @@ class VimHighlightedYankTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test clearing all highlighters with multiple cursors`() {
-    doTest("yiwi", codeWithMultipleCurors, codeWithMultipleCurors, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    doTest("yiwi", codeWithMultipleCurors, codeWithMultipleCurors, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
 
     assertAllHighlightersCount(0)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test highlighting for a correct default amount of time`() {
-    doTest("yiw", code, code, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest("yiw", code, code, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
 
     assertHappened(DEFAULT_HIGHLIGHT_DURATION.toInt(), 200) {
       getAllHighlightersCount() == 0

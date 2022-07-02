@@ -25,7 +25,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.extension.Alias
 import com.maddyhome.idea.vim.extension.ExtensionBeanClass
@@ -74,8 +74,8 @@ class OpMappingTest : VimTestCase() {
       "dI",
       "${c}I found it in a legendary land",
       "${c}nd it in a legendary land",
-      CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE
     )
   }
 
@@ -85,8 +85,8 @@ class OpMappingTest : VimTestCase() {
       "dP",
       "I found ${c}it in a legendary land",
       "I f${c}it in a legendary land",
-      CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE
     )
   }
 
@@ -96,8 +96,8 @@ class OpMappingTest : VimTestCase() {
       "dU",
       "${c}I found it in a legendary land",
       "${c}d it in a legendary land",
-      CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE
     )
   }
 
@@ -119,8 +119,8 @@ class OpMappingTest : VimTestCase() {
                 ${c}where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE
     )
   }
 
@@ -373,7 +373,7 @@ private class TestExtension : VimExtension {
 
   private class MoveEmulateInclusive : ExtensionHandler {
     override fun execute(editor: VimEditor, context: ExecutionContext) {
-      VimPlugin.getVisualMotion().enterVisualMode(editor, CommandState.SubMode.VISUAL_CHARACTER)
+      VimPlugin.getVisualMotion().enterVisualMode(editor, VimStateMachine.SubMode.VISUAL_CHARACTER)
       val caret = editor.ij.caretModel.currentCaret
       val newOffset = VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret.vim, 5, editor.isEndAllowed)
       MotionGroup.moveCaret(editor.ij, caret, newOffset)
@@ -394,7 +394,7 @@ private class TestExtension : VimExtension {
 
   private class MoveLinewise : ExtensionHandler {
     override fun execute(editor: VimEditor, context: ExecutionContext) {
-      VimPlugin.getVisualMotion().enterVisualMode(editor, CommandState.SubMode.VISUAL_LINE)
+      VimPlugin.getVisualMotion().enterVisualMode(editor, VimStateMachine.SubMode.VISUAL_LINE)
       val caret = editor.ij.caretModel.currentCaret
       val newOffset = VimPlugin.getMotion().getVerticalMotionOffset(editor, caret.vim, 1)
       MotionGroup.moveCaret(editor.ij, caret, newOffset)

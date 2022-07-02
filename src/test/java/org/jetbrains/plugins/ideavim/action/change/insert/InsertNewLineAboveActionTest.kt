@@ -20,7 +20,7 @@ package org.jetbrains.plugins.ideavim.action.change.insert
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
@@ -39,7 +39,7 @@ class InsertNewLineAboveActionTest : VimTestCase() {
         |all rocks and lavender and tufted grass,
         |where it was settled on some sodden sand
         |hard by the torrent of a mountain pass.""".trimMargin()
-    doTest("O", before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    doTest("O", before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 
   fun `test insert new line above with caret in middle of line`() {
@@ -52,7 +52,7 @@ class InsertNewLineAboveActionTest : VimTestCase() {
         |all rocks and lavender and tufted grass,
         |where it was settled on some sodden sand
         |hard by the torrent of a mountain pass.""".trimMargin()
-    doTest("O", before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    doTest("O", before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 
   fun `test insert new line above matches indent for plain text`() {
@@ -65,7 +65,7 @@ class InsertNewLineAboveActionTest : VimTestCase() {
         |    $c
         |    where it was settled on some sodden sand
         |    hard by the torrent of a mountain pass.""".trimMargin()
-    doTest("O", before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    doTest("O", before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 
   fun `test insert new line above matches indent for first line of plain text`() {
@@ -78,7 +78,7 @@ class InsertNewLineAboveActionTest : VimTestCase() {
         |    all rocks and lavender and tufted grass,
         |    where it was settled on some sodden sand
         |    hard by the torrent of a mountain pass.""".trimMargin()
-    doTest("O", before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    doTest("O", before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN) // Java support would be a neovim plugin
@@ -113,7 +113,7 @@ class InsertNewLineAboveActionTest : VimTestCase() {
         |    where it was settled on some sodden sand
         |    $c
         |    hard by the torrent of a mountain pass.""".trimMargin()
-    doTest("O", before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    doTest("O", before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
@@ -137,6 +137,6 @@ class InsertNewLineAboveActionTest : VimTestCase() {
         |all rocks and lavender and tufted grass,
         |where it was settled on some sodden sand
         |hard by the torrent of a mountain pass.""".trimMargin()
-    doTest("O", before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    doTest("O", before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 }

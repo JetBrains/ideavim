@@ -34,7 +34,7 @@ class CommandLineHelper : VimCommandLineHelper {
 
   override fun inputString(vimEditor: VimEditor, prompt: String, finishOn: Char?): String? {
     val editor = vimEditor.ij
-    if (vimEditor.commandState.isDotRepeatInProgress) {
+    if (vimEditor.vimStateMachine.isDotRepeatInProgress) {
       val input = Extension.consumeString()
       return input ?: error("Not enough strings saved: ${Extension.lastExtensionHandler}")
     }

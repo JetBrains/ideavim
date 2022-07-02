@@ -5,7 +5,7 @@ import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimLogicalPosition
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.command.isBlock
 import com.maddyhome.idea.vim.command.isChar
@@ -112,22 +112,22 @@ abstract class VimPutBase : VimPut {
   }
 
   protected fun moveCaretToEndPosition(
-    editor: VimEditor,
-    caret: VimCaret,
-    startOffset: Int,
-    endOffset: Int,
-    typeInRegister: SelectionType,
-    modeInEditor: CommandState.SubMode,
-    caretAfterInsertedText: Boolean,
+      editor: VimEditor,
+      caret: VimCaret,
+      startOffset: Int,
+      endOffset: Int,
+      typeInRegister: SelectionType,
+      modeInEditor: VimStateMachine.SubMode,
+      caretAfterInsertedText: Boolean,
   ) {
     val cursorMode = when (typeInRegister) {
       SelectionType.BLOCK_WISE -> when (modeInEditor) {
-        CommandState.SubMode.VISUAL_LINE -> if (caretAfterInsertedText) "postEndOffset" else "startOffset"
+        VimStateMachine.SubMode.VISUAL_LINE -> if (caretAfterInsertedText) "postEndOffset" else "startOffset"
         else -> if (caretAfterInsertedText) "preLineEndOfEndOffset" else "startOffset"
       }
       SelectionType.LINE_WISE -> if (caretAfterInsertedText) "postEndOffset" else "startOffsetSkipLeading"
       SelectionType.CHARACTER_WISE -> when (modeInEditor) {
-        CommandState.SubMode.VISUAL_LINE -> if (caretAfterInsertedText) "postEndOffset" else "startOffset"
+        VimStateMachine.SubMode.VISUAL_LINE -> if (caretAfterInsertedText) "postEndOffset" else "startOffset"
         else -> if (caretAfterInsertedText) "preLineEndOfEndOffset" else "preEndOffset"
       }
     }
@@ -142,7 +142,7 @@ abstract class VimPutBase : VimPut {
       "postEndOffset" -> caret.moveToOffset(endOffset + 1)
       "preLineEndOfEndOffset" -> {
         var rightestPosition = editor.getLineEndForOffset(endOffset - 1)
-        if (editor.mode != CommandState.Mode.INSERT) --rightestPosition // it's not possible to place a caret at the end of the line in any mode except insert
+        if (editor.mode != VimStateMachine.Mode.INSERT) --rightestPosition // it's not possible to place a caret at the end of the line in any mode except insert
         val pos = min(endOffset, rightestPosition)
         caret.moveToOffset(pos)
       }
@@ -160,16 +160,16 @@ abstract class VimPutBase : VimPut {
   }
 
   protected fun putTextCharacterwise(
-    editor: VimEditor,
-    caret: VimCaret,
-    context: ExecutionContext,
-    text: String,
-    type: SelectionType,
-    mode: CommandState.SubMode,
-    startOffset: Int,
-    count: Int,
-    indent: Boolean,
-    cursorAfter: Boolean,
+      editor: VimEditor,
+      caret: VimCaret,
+      context: ExecutionContext,
+      text: String,
+      type: SelectionType,
+      mode: VimStateMachine.SubMode,
+      startOffset: Int,
+      count: Int,
+      indent: Boolean,
+      cursorAfter: Boolean,
   ): Int {
     caret.moveToOffset(startOffset)
     val insertedText = text.repeat(count)
@@ -185,16 +185,16 @@ abstract class VimPutBase : VimPut {
   }
 
   protected fun putTextLinewise(
-    editor: VimEditor,
-    caret: VimCaret,
-    context: ExecutionContext,
-    text: String,
-    type: SelectionType,
-    mode: CommandState.SubMode,
-    startOffset: Int,
-    count: Int,
-    indent: Boolean,
-    cursorAfter: Boolean,
+      editor: VimEditor,
+      caret: VimCaret,
+      context: ExecutionContext,
+      text: String,
+      type: SelectionType,
+      mode: VimStateMachine.SubMode,
+      startOffset: Int,
+      count: Int,
+      indent: Boolean,
+      cursorAfter: Boolean,
   ): Int {
     val overlappedCarets = ArrayList<VimCaret>(editor.carets().size)
     for (possiblyOverlappedCaret in editor.carets()) {
@@ -231,19 +231,19 @@ abstract class VimPutBase : VimPut {
   }
 
   protected fun putTextBlockwise(
-    editor: VimEditor,
-    caret: VimCaret,
-    context: ExecutionContext,
-    text: String,
-    type: SelectionType,
-    mode: CommandState.SubMode,
-    startOffset: Int,
-    count: Int,
-    indent: Boolean,
-    cursorAfter: Boolean,
+      editor: VimEditor,
+      caret: VimCaret,
+      context: ExecutionContext,
+      text: String,
+      type: SelectionType,
+      mode: VimStateMachine.SubMode,
+      startOffset: Int,
+      count: Int,
+      indent: Boolean,
+      cursorAfter: Boolean,
   ): Int {
     val startPosition = editor.offsetToLogicalPosition(startOffset)
-    val currentColumn = if (mode == CommandState.SubMode.VISUAL_LINE) 0 else startPosition.column
+    val currentColumn = if (mode == VimStateMachine.SubMode.VISUAL_LINE) 0 else startPosition.column
     var currentLine = startPosition.line
 
     val lineCount = injector.engineEditorHelper.getLineBreakCount(text) + 1
@@ -278,7 +278,7 @@ abstract class VimPutBase : VimPut {
       injector.changeGroup.insertText(editor, caret, insertedText)
       endOffset += insertedText.length
 
-      if (mode == CommandState.SubMode.VISUAL_LINE) {
+      if (mode == VimStateMachine.SubMode.VISUAL_LINE) {
         caret.moveToOffset(endOffset)
         injector.changeGroup.insertText(editor, caret, "\n")
         ++endOffset
@@ -300,16 +300,16 @@ abstract class VimPutBase : VimPut {
   }
 
   protected fun putTextInternal(
-    editor: VimEditor,
-    caret: VimCaret,
-    context: ExecutionContext,
-    text: String,
-    type: SelectionType,
-    mode: CommandState.SubMode,
-    startOffset: Int,
-    count: Int,
-    indent: Boolean,
-    cursorAfter: Boolean,
+      editor: VimEditor,
+      caret: VimCaret,
+      context: ExecutionContext,
+      text: String,
+      type: SelectionType,
+      mode: VimStateMachine.SubMode,
+      startOffset: Int,
+      count: Int,
+      indent: Boolean,
+      cursorAfter: Boolean,
   ): Int {
     return when (type) {
       SelectionType.CHARACTER_WISE -> putTextCharacterwise(

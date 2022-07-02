@@ -18,7 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.extension.matchit
 
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -44,7 +44,7 @@ class MatchitRubyTest : VimTestCase() {
           puts "result is true"
         ${c}end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -54,7 +54,7 @@ class MatchitRubyTest : VimTestCase() {
       "%",
       """ $c  if some_boolean puts "result is true" end""",
       """   if some_boolean puts "result is true" ${c}end""",
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -64,7 +64,7 @@ class MatchitRubyTest : VimTestCase() {
       "%",
       """ $c class Foo end""",
       """  class Foo ${c}end""",
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -82,7 +82,7 @@ class MatchitRubyTest : VimTestCase() {
           puts "result is true"
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -104,7 +104,7 @@ class MatchitRubyTest : VimTestCase() {
           puts "result is false"
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -126,7 +126,7 @@ class MatchitRubyTest : VimTestCase() {
           puts "result is false"
         ${c}end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -148,7 +148,7 @@ class MatchitRubyTest : VimTestCase() {
           puts "result is false"
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -174,7 +174,7 @@ class MatchitRubyTest : VimTestCase() {
           puts "both values are false"
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -200,7 +200,7 @@ class MatchitRubyTest : VimTestCase() {
           puts "both values are false"
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -222,7 +222,7 @@ class MatchitRubyTest : VimTestCase() {
           puts "second value is true"
         ${c}end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -252,7 +252,7 @@ class MatchitRubyTest : VimTestCase() {
           puts "all values are false"
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -278,7 +278,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         ${c}end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -312,7 +312,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         ${c}end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -338,7 +338,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -364,7 +364,7 @@ class MatchitRubyTest : VimTestCase() {
           ${c}end
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -390,7 +390,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -416,7 +416,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -438,7 +438,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         ${c}end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -460,7 +460,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -482,7 +482,7 @@ class MatchitRubyTest : VimTestCase() {
           ${c}end
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -504,7 +504,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -542,7 +542,7 @@ class MatchitRubyTest : VimTestCase() {
 
         ${c}end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -572,7 +572,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         ${c}end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -594,7 +594,7 @@ class MatchitRubyTest : VimTestCase() {
           puts some_boolean
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -604,7 +604,7 @@ class MatchitRubyTest : VimTestCase() {
       "%",
       """puts "This line has two statements"; ${c}if true then puts "true" end""",
       """puts "This line has two statements"; if true then puts "true" ${c}end""",
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -614,7 +614,7 @@ class MatchitRubyTest : VimTestCase() {
       "%",
       """puts "This line has two statements"; if true then puts "true" ${c}end""",
       """puts "This line has two statements"; ${c}if true then puts "true" end""",
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -624,7 +624,7 @@ class MatchitRubyTest : VimTestCase() {
       "%",
       """puts "This line has ${c}two statements"; if true then puts "true" end""",
       """puts "This line has two statements"; if true then puts "true" ${c}end""",
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -634,7 +634,7 @@ class MatchitRubyTest : VimTestCase() {
       "%",
       """puts "This line has two statements"; ${c}unless nil then puts "not nil" end""",
       """puts "This line has two statements"; unless nil then puts "not nil" ${c}end""",
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -644,7 +644,7 @@ class MatchitRubyTest : VimTestCase() {
       "%",
       """if tr${c}ue puts "true" end""",
       """${c}if true puts "true" end""",
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -654,7 +654,7 @@ class MatchitRubyTest : VimTestCase() {
       "%",
       """puts "This line has two statements"; unless nil then puts "not nill" ${c}end""",
       """puts "This line has two statements"; ${c}unless nil then puts "not nill" end""",
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -676,7 +676,7 @@ class MatchitRubyTest : VimTestCase() {
        
         [1, 2, 3].each ${c}do |x| puts x end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -702,7 +702,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         ${c}end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -724,7 +724,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         ${c}end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -746,7 +746,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -770,7 +770,7 @@ class MatchitRubyTest : VimTestCase() {
           ${c}end        
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -800,7 +800,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -830,7 +830,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -860,7 +860,7 @@ class MatchitRubyTest : VimTestCase() {
           ${c}end
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -890,7 +890,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -914,7 +914,7 @@ class MatchitRubyTest : VimTestCase() {
           ${c}retry
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -938,7 +938,7 @@ class MatchitRubyTest : VimTestCase() {
           retry
         ${c}end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -962,7 +962,7 @@ class MatchitRubyTest : VimTestCase() {
           end        
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -990,7 +990,7 @@ class MatchitRubyTest : VimTestCase() {
             puts "Adult"
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -1018,7 +1018,7 @@ class MatchitRubyTest : VimTestCase() {
             puts "Adult"
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -1046,7 +1046,7 @@ class MatchitRubyTest : VimTestCase() {
             puts "Adult"
         ${c}end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -1074,7 +1074,7 @@ class MatchitRubyTest : VimTestCase() {
             puts "Adult"
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -1092,7 +1092,7 @@ class MatchitRubyTest : VimTestCase() {
           var = var + 1
         ${c}end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -1120,7 +1120,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -1148,7 +1148,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -1176,7 +1176,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -1204,7 +1204,7 @@ class MatchitRubyTest : VimTestCase() {
           ${c}end
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -1222,7 +1222,7 @@ class MatchitRubyTest : VimTestCase() {
           end comment
         =${c}end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -1240,7 +1240,7 @@ class MatchitRubyTest : VimTestCase() {
           begin comment
         =end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -1270,7 +1270,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         ${c}end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -1300,7 +1300,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -1322,7 +1322,7 @@ class MatchitRubyTest : VimTestCase() {
           puts "result is true"
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -1340,7 +1340,7 @@ class MatchitRubyTest : VimTestCase() {
           puts "result is true"
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -1362,7 +1362,7 @@ class MatchitRubyTest : VimTestCase() {
           puts "result is false"
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -1384,7 +1384,7 @@ class MatchitRubyTest : VimTestCase() {
           puts "result is false"
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -1406,7 +1406,7 @@ class MatchitRubyTest : VimTestCase() {
           puts "result is false"
         ${c}end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -1432,7 +1432,7 @@ class MatchitRubyTest : VimTestCase() {
           puts "both values are false"
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -1458,7 +1458,7 @@ class MatchitRubyTest : VimTestCase() {
           puts "both values are false"
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -1480,7 +1480,7 @@ class MatchitRubyTest : VimTestCase() {
           puts "second value is true"
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -1510,7 +1510,7 @@ class MatchitRubyTest : VimTestCase() {
           puts "all values are false"
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -1544,7 +1544,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -1570,7 +1570,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -1596,7 +1596,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -1622,7 +1622,7 @@ class MatchitRubyTest : VimTestCase() {
           ${c}end
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -1648,7 +1648,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         ${c}end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -1670,7 +1670,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -1692,7 +1692,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         ${c}end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -1714,7 +1714,7 @@ class MatchitRubyTest : VimTestCase() {
           ${c}end
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -1748,7 +1748,7 @@ class MatchitRubyTest : VimTestCase() {
           puts "I am func_three"
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -1770,7 +1770,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -1808,7 +1808,7 @@ class MatchitRubyTest : VimTestCase() {
 
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -1838,7 +1838,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -1860,7 +1860,7 @@ class MatchitRubyTest : VimTestCase() {
           puts some_boolean
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -1870,7 +1870,7 @@ class MatchitRubyTest : VimTestCase() {
       "g%",
       """if tr${c}ue puts "true" end""",
       """${c}if true puts "true" end""",
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -1896,7 +1896,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         ${c}end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -1918,7 +1918,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         ${c}end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -1940,7 +1940,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -1970,7 +1970,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -2000,7 +2000,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -2030,7 +2030,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -2060,7 +2060,7 @@ class MatchitRubyTest : VimTestCase() {
           ${c}end
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -2084,7 +2084,7 @@ class MatchitRubyTest : VimTestCase() {
           ${c}retry
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -2108,7 +2108,7 @@ class MatchitRubyTest : VimTestCase() {
           retry
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -2132,7 +2132,7 @@ class MatchitRubyTest : VimTestCase() {
           ${c}end        
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -2156,7 +2156,7 @@ class MatchitRubyTest : VimTestCase() {
           end        
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -2184,7 +2184,7 @@ class MatchitRubyTest : VimTestCase() {
             puts "Adult"
         ${c}end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -2212,7 +2212,7 @@ class MatchitRubyTest : VimTestCase() {
             puts "Adult"
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -2240,7 +2240,7 @@ class MatchitRubyTest : VimTestCase() {
             puts "Adult"
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -2268,7 +2268,7 @@ class MatchitRubyTest : VimTestCase() {
             puts "Adult"
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -2296,7 +2296,7 @@ class MatchitRubyTest : VimTestCase() {
             puts "Adult"
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -2314,7 +2314,7 @@ class MatchitRubyTest : VimTestCase() {
           var = var + 1
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -2332,7 +2332,7 @@ class MatchitRubyTest : VimTestCase() {
           var = var + 1
         ${c}end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -2360,7 +2360,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -2388,7 +2388,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -2416,7 +2416,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -2444,7 +2444,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -2462,7 +2462,7 @@ class MatchitRubyTest : VimTestCase() {
           end comment
         =${c}end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -2480,7 +2480,7 @@ class MatchitRubyTest : VimTestCase() {
           begin comment
         =end
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -2490,7 +2490,7 @@ class MatchitRubyTest : VimTestCase() {
       "g%",
       """puts "This line has ${c}two statements"; if true then puts "true" end""",
       """puts "This line has two statements"; if true then puts "true" ${c}end""",
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -2500,7 +2500,7 @@ class MatchitRubyTest : VimTestCase() {
       "g%",
       """ $c  class Foo end""",
       """   class Foo ${c}end""",
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -2520,7 +2520,7 @@ class MatchitRubyTest : VimTestCase() {
       """
         <div><div>contents<$c/div></div>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby-template.html.erb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby-template.html.erb"
     )
   }
 
@@ -2546,7 +2546,7 @@ class MatchitRubyTest : VimTestCase() {
           <%= render 'layouts/footer' %>
         <$c/div>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby-template.html.erb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby-template.html.erb"
     )
   }
 
@@ -2572,7 +2572,7 @@ class MatchitRubyTest : VimTestCase() {
           <%= render 'layouts/footer' %>
         </div>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby-template.html.erb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby-template.html.erb"
     )
   }
 
@@ -2598,7 +2598,7 @@ class MatchitRubyTest : VimTestCase() {
           <%= render 'layouts/footer' %>
         </div>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby-template.html.erb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby-template.html.erb"
     )
   }
 
@@ -2624,7 +2624,7 @@ class MatchitRubyTest : VimTestCase() {
           <%= render 'layouts/footer' %>
         </div>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby-template.html.erb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby-template.html.erb"
     )
   }
 
@@ -2634,7 +2634,7 @@ class MatchitRubyTest : VimTestCase() {
       "%",
       """<div class="alert alert-$c<%= message_type %>"><%= message %></div>""",
       """<div class="alert alert-<%= message_type %$c>"><%= message %></div>""",
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby-template.html.erb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby-template.html.erb"
     )
   }
 
@@ -2644,7 +2644,7 @@ class MatchitRubyTest : VimTestCase() {
       "g%",
       """<div class="alert alert-$c<%= message_type %>"><%= message %></div>""",
       """<div class="alert alert-<%= message_type %$c>"><%= message %></div>""",
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby-template.html.erb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby-template.html.erb"
     )
   }
 
@@ -2682,7 +2682,7 @@ class MatchitRubyTest : VimTestCase() {
           <% ${c}end %>
         </tbody>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby-template.html.erb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby-template.html.erb"
     )
   }
 
@@ -2720,7 +2720,7 @@ class MatchitRubyTest : VimTestCase() {
           <% end %>
         </tbody>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby-template.html.erb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby-template.html.erb"
     )
   }
 
@@ -2758,7 +2758,7 @@ class MatchitRubyTest : VimTestCase() {
           <% end %>
         </tbody>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby-template.html.erb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby-template.html.erb"
     )
   }
 
@@ -2796,7 +2796,7 @@ class MatchitRubyTest : VimTestCase() {
           <% end %>
         </tbody>
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby-template.html.erb"
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby-template.html.erb"
     )
   }
 }

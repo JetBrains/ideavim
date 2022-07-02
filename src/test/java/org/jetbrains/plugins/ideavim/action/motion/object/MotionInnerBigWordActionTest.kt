@@ -18,7 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.`object`
 
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class MotionInnerBigWordActionTest : VimTestCase() {
@@ -37,7 +37,7 @@ class MotionInnerBigWordActionTest : VimTestCase() {
           where it was settled on some sodden sand
           hard by the torrent of a mountain$c 
       """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 }

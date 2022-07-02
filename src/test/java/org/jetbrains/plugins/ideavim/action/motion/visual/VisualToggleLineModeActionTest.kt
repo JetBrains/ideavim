@@ -22,7 +22,7 @@ package org.jetbrains.plugins.ideavim.action.motion.visual
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
@@ -48,7 +48,7 @@ class VisualToggleLineModeActionTest : VimTestCase() {
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
       """.trimIndent(),
-      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_LINE
+      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_LINE
     )
   }
 
@@ -71,7 +71,7 @@ class VisualToggleLineModeActionTest : VimTestCase() {
                     ${s}where it ${c}was settled on some sodden sand
                     ${se}hard by the torrent of a mountain pass.
       """.trimIndent(),
-      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_LINE
+      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_LINE
     )
   }
 
@@ -94,7 +94,7 @@ class VisualToggleLineModeActionTest : VimTestCase() {
                     wh${c}ere it was settled on some sodden sand
                     ${se}hard by the torrent of a mountain pass.
       """.trimIndent(),
-      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_LINE
+      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_LINE
     )
   }
 
@@ -117,7 +117,7 @@ class VisualToggleLineModeActionTest : VimTestCase() {
                     where it was settled on some sodden sand
                     ha${c}rd by the torrent of a mountain pass.${se}
       """.trimIndent(),
-      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_LINE
+      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_LINE
     )
   }
 
@@ -134,6 +134,6 @@ class VisualToggleLineModeActionTest : VimTestCase() {
     )
     VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.selectmodeName, VimString("cmd"))
     typeText(injector.parser.parseKeys("V"))
-    assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_LINE)
+    assertState(VimStateMachine.Mode.SELECT, VimStateMachine.SubMode.VISUAL_LINE)
   }
 }

@@ -22,7 +22,7 @@ import com.intellij.idea.TestFor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.motion.search.SearchWholeWordForwardAction;
 import com.maddyhome.idea.vim.api.VimInjectorKt;
-import com.maddyhome.idea.vim.command.CommandState;
+import com.maddyhome.idea.vim.command.VimStateMachine;
 import com.maddyhome.idea.vim.common.Direction;
 import org.jetbrains.plugins.ideavim.SkipNeovimReason;
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim;
@@ -35,7 +35,7 @@ public class VisualSelectPreviousSearchTest extends VimTestCase {
 
     assertOffset(12);
     assertSelection("hello");
-    assertMode(CommandState.Mode.VISUAL);
+    assertMode(VimStateMachine.Mode.VISUAL);
   }
 
   @TestFor(classes = {SearchWholeWordForwardAction.class})
@@ -43,7 +43,7 @@ public class VisualSelectPreviousSearchTest extends VimTestCase {
     typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("*" + "b" + "gN"), "h<caret>ello world\nh<caret>ello world hello world");
 
     assertEquals(1, myFixture.getEditor().getCaretModel().getCaretCount());
-    assertMode(CommandState.Mode.VISUAL);
+    assertMode(VimStateMachine.Mode.VISUAL);
   }
 
   @TestFor(classes = {SearchWholeWordForwardAction.class})
@@ -52,7 +52,7 @@ public class VisualSelectPreviousSearchTest extends VimTestCase {
 
     assertOffset(12);
     assertSelection("hello");
-    assertMode(CommandState.Mode.VISUAL);
+    assertMode(VimStateMachine.Mode.VISUAL);
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
@@ -63,7 +63,7 @@ public class VisualSelectPreviousSearchTest extends VimTestCase {
 
     assertOffset(0);
     assertSelection("test");
-    assertMode(CommandState.Mode.VISUAL);
+    assertMode(VimStateMachine.Mode.VISUAL);
   }
 
   @TestFor(classes = {SearchWholeWordForwardAction.class})
@@ -80,7 +80,7 @@ public class VisualSelectPreviousSearchTest extends VimTestCase {
 
     assertOffset(12);
     assertSelection("hello world hello");
-    assertMode(CommandState.Mode.VISUAL);
+    assertMode(VimStateMachine.Mode.VISUAL);
   }
 
   @TestFor(classes = {SearchWholeWordForwardAction.class})
@@ -89,7 +89,7 @@ public class VisualSelectPreviousSearchTest extends VimTestCase {
 
     assertOffset(12);
     assertSelection(null);
-    assertMode(CommandState.Mode.COMMAND);
+    assertMode(VimStateMachine.Mode.COMMAND);
   }
 
   @TestFor(classes = {SearchWholeWordForwardAction.class})
@@ -98,7 +98,7 @@ public class VisualSelectPreviousSearchTest extends VimTestCase {
 
     assertOffset(6);
     assertSelection("hel");
-    assertMode(CommandState.Mode.VISUAL);
+    assertMode(VimStateMachine.Mode.VISUAL);
   }
 
   public void testWithTabs() {
@@ -106,6 +106,6 @@ public class VisualSelectPreviousSearchTest extends VimTestCase {
 
     assertOffset(18);
     assertSelection("hello 3\n\thello");
-    assertMode(CommandState.Mode.VISUAL);
+    assertMode(VimStateMachine.Mode.VISUAL);
   }
 }

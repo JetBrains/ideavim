@@ -19,7 +19,7 @@ package com.maddyhome.idea.vim.key
 
 import com.google.common.collect.HashMultimap
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.helper.mode
 import org.jetbrains.annotations.NonNls
 
@@ -80,16 +80,16 @@ sealed class ShortcutOwnerInfo {
     return when (this) {
       is AllModes -> this.owner
       is PerMode -> when (editor.mode) {
-        CommandState.Mode.COMMAND -> this.normal
-        CommandState.Mode.VISUAL -> this.visual
-        CommandState.Mode.SELECT -> this.visual
-        CommandState.Mode.INSERT -> this.insert
-        CommandState.Mode.CMD_LINE -> this.normal
-        CommandState.Mode.OP_PENDING -> this.normal
-        CommandState.Mode.REPLACE -> this.insert
-        CommandState.Mode.INSERT_NORMAL -> this.normal
-        CommandState.Mode.INSERT_VISUAL -> this.visual
-        CommandState.Mode.INSERT_SELECT -> this.select
+        VimStateMachine.Mode.COMMAND -> this.normal
+        VimStateMachine.Mode.VISUAL -> this.visual
+        VimStateMachine.Mode.SELECT -> this.visual
+        VimStateMachine.Mode.INSERT -> this.insert
+        VimStateMachine.Mode.CMD_LINE -> this.normal
+        VimStateMachine.Mode.OP_PENDING -> this.normal
+        VimStateMachine.Mode.REPLACE -> this.insert
+        VimStateMachine.Mode.INSERT_NORMAL -> this.normal
+        VimStateMachine.Mode.INSERT_VISUAL -> this.visual
+        VimStateMachine.Mode.INSERT_SELECT -> this.select
       }
     }
   }

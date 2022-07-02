@@ -19,7 +19,7 @@
 package org.jetbrains.plugins.ideavim.action
 
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.helper.experimentalApi
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -154,7 +154,7 @@ class GuardedBlocksTest : VimTestCase() {
       1234567890
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.INSERT)
+    assertMode(VimStateMachine.Mode.INSERT)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.GUARDED_BLOCKS)
@@ -176,7 +176,7 @@ class GuardedBlocksTest : VimTestCase() {
       1234567890
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.INSERT)
+    assertMode(VimStateMachine.Mode.INSERT)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.GUARDED_BLOCKS)
@@ -198,7 +198,7 @@ class GuardedBlocksTest : VimTestCase() {
       1234567890
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.INSERT)
+    assertMode(VimStateMachine.Mode.INSERT)
   }
 
 /*
@@ -255,7 +255,7 @@ class GuardedBlocksTest : VimTestCase() {
       $c
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.INSERT)
+    assertMode(VimStateMachine.Mode.INSERT)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.GUARDED_BLOCKS)
@@ -274,7 +274,7 @@ class GuardedBlocksTest : VimTestCase() {
       1234567890
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.GUARDED_BLOCKS)
@@ -294,7 +294,7 @@ class GuardedBlocksTest : VimTestCase() {
       1234567890
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.GUARDED_BLOCKS)
@@ -315,7 +315,7 @@ class GuardedBlocksTest : VimTestCase() {
       1234567890
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.INSERT)
+    assertMode(VimStateMachine.Mode.INSERT)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.GUARDED_BLOCKS)
@@ -335,6 +335,6 @@ class GuardedBlocksTest : VimTestCase() {
       1234567890
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
   }
 }

@@ -19,8 +19,8 @@ package org.jetbrains.plugins.ideavim.action
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.vimCommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.helper.vimStateMachine
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -31,7 +31,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 class MotionActionTest : VimTestCase() {
   fun testDoubleToggleVisual() {
     val contents = "one tw${c}o\n"
-    doTest("vv", contents, contents, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest("vv", contents, contents, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   // VIM-198 |v_iw|
@@ -41,8 +41,8 @@ class MotionActionTest : VimTestCase() {
       "viw",
       fileContents,
       "one ${s}two${se}\n",
-      CommandState.Mode.VISUAL,
-      CommandState.SubMode.VISUAL_CHARACTER
+      VimStateMachine.Mode.VISUAL,
+      VimStateMachine.SubMode.VISUAL_CHARACTER
     )
   }
 
@@ -50,7 +50,7 @@ class MotionActionTest : VimTestCase() {
   fun testVisualMotionInnerBigWord() {
     val fileContents = "one tw${c}o.three four\n"
     val fileContentsAfter = "one ${s}two.thre${c}e$se four\n"
-    doTest("viW", fileContents, fileContentsAfter, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
+    doTest("viW", fileContents, fileContentsAfter, VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER)
     assertSelection("two.three")
   }
 
@@ -60,7 +60,7 @@ class MotionActionTest : VimTestCase() {
      three
      
     """.trimIndent()
-    doTest(listOf("f", "<Esc>", "<Esc>"), content, content, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(listOf("f", "<Esc>", "<Esc>"), content, content, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
     assertPluginError(true)
     assertOffset(2)
   }
@@ -71,9 +71,9 @@ class MotionActionTest : VimTestCase() {
      three
      
     """.trimIndent()
-    doTest(listOf("12", "<Esc>"), content, content, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(listOf("12", "<Esc>"), content, content, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
     assertPluginError(false)
-    val vimCommandState = myFixture.editor.vimCommandState
+    val vimCommandState = myFixture.editor.vimStateMachine
     kotlin.test.assertNotNull(vimCommandState)
     assertEmpty(vimCommandState.commandBuilder.keys.toList())
   }
@@ -82,7 +82,7 @@ class MotionActionTest : VimTestCase() {
   fun testLeftRightMove() {
     val before = "on${c}e two three four five six seven\n"
     val after = "one two three ${c}four five six seven\n"
-    doTest(listOf("14l", "2h"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(listOf("14l", "2h"), before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   // |j| |k|
@@ -101,7 +101,7 @@ class MotionActionTest : VimTestCase() {
      four
      
     """.trimIndent()
-    doTest(listOf("2j", "k"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(listOf("2j", "k"), before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
@@ -114,14 +114,14 @@ class MotionActionTest : VimTestCase() {
   fun testForwardToTab() {
     val before = "on${c}e two\tthree\nfour\n"
     val after = "one two${c}\tthree\nfour\n"
-    doTest(listOf("f<Tab>"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(listOf("f<Tab>"), before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   fun testIllegalCharArgument() {
     typeTextInFile(injector.parser.parseKeys("f<Insert>"), "on${c}e two three four five six seven\n")
     assertOffset(2)
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
   }
 
   // |F| |i_CTRL-K|
@@ -129,7 +129,7 @@ class MotionActionTest : VimTestCase() {
     val before = "Hallo, Öster${c}reich!\n"
     val after = "Hallo, ${c}Österreich!\n"
     val keys = listOf("F<C-K>O:")
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   // VIM-771 |t| |;|
@@ -137,7 +137,7 @@ class MotionActionTest : VimTestCase() {
     val keys = listOf("t:;")
     val before = "$c 1:a 2:b 3:c \n"
     val after = " 1:a ${c}2:b 3:c \n"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   // VIM-771 |t| |;|
@@ -145,7 +145,7 @@ class MotionActionTest : VimTestCase() {
     val keys = listOf("t:;")
     val before = "$c 1:a 2:b 3:c \n"
     val after = " 1:a ${c}2:b 3:c \n"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   // VIM-771 |t| |;|
@@ -153,7 +153,7 @@ class MotionActionTest : VimTestCase() {
     val keys = listOf("t:2;")
     val before = "$c 1:a 2:b 3:c \n"
     val after = " 1:a ${c}2:b 3:c \n"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   // VIM-771 |t| |;|
@@ -161,7 +161,7 @@ class MotionActionTest : VimTestCase() {
     val keys = listOf("t:3;")
     val before = "$c 1:a 2:b 3:c \n"
     val after = " 1:a 2:b ${c}3:c \n"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   // VIM-771 |t| |,|
@@ -169,7 +169,7 @@ class MotionActionTest : VimTestCase() {
     val keys = listOf("t:,,")
     val before = " 1:a 2:b$c 3:c \n"
     val after = " 1:${c}a 2:b 3:c \n"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   // VIM-771 |t| |,|
@@ -177,7 +177,7 @@ class MotionActionTest : VimTestCase() {
     val keys = listOf("t:,2,")
     val before = " 1:a 2:b$c 3:c \n"
     val after = " 1:${c}a 2:b 3:c \n"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   // VIM-771 |t| |,|
@@ -185,7 +185,7 @@ class MotionActionTest : VimTestCase() {
     val keys = listOf("t:,3,")
     val before = " 0:_ 1:a 2:b$c 3:c \n"
     val after = " 0:${c}_ 1:a 2:b 3:c \n"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   // VIM-314 |d| |v_iB|
@@ -193,7 +193,7 @@ class MotionActionTest : VimTestCase() {
     val keys = listOf("di{")
     val before = "{foo, b${c}ar, baz}\n"
     val after = "{}\n"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   // VIM-314 |d| |v_iB|
@@ -201,7 +201,7 @@ class MotionActionTest : VimTestCase() {
     val keys = listOf("di{")
     val before = "{foo, ${c}\"bar\", baz}\n"
     val after = "{}\n"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   // |d| |v_aB|
@@ -209,7 +209,7 @@ class MotionActionTest : VimTestCase() {
     val keys = listOf("da{")
     val before = "x = {foo, b${c}ar, baz};\n"
     val after = "x = ;\n"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   // VIM-261 |c| |v_iB|
@@ -238,7 +238,7 @@ class MotionActionTest : VimTestCase() {
     val keys = listOf("daw")
     val before = "one t${c}wo three\n"
     val after = "one three\n"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   // |d| |v_aW|
@@ -246,7 +246,7 @@ class MotionActionTest : VimTestCase() {
     val keys = listOf("daW")
     val before = "one \"t${c}wo\" three\n"
     val after = "one three\n"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   // |d| |v_is|
@@ -254,7 +254,7 @@ class MotionActionTest : VimTestCase() {
     val keys = listOf("dis")
     val before = "Hello World! How a${c}re you? Bye.\n"
     val after = "Hello World!  Bye.\n"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   // |d| |v_as|
@@ -262,7 +262,7 @@ class MotionActionTest : VimTestCase() {
     val keys = listOf("das")
     val before = "Hello World! How a${c}re you? Bye.\n"
     val after = "Hello World! Bye.\n"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   // |v_as|
@@ -280,7 +280,7 @@ class MotionActionTest : VimTestCase() {
      P$c.
      
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   // |d| |v_ip|
@@ -302,7 +302,7 @@ class MotionActionTest : VimTestCase() {
     Bye.
     
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   // |d| |v_ap|
@@ -323,7 +323,7 @@ class MotionActionTest : VimTestCase() {
     Bye.
     
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   // |d| |v_a]|
@@ -336,7 +336,7 @@ class MotionActionTest : VimTestCase() {
 ];
 """
     val after = "foo = ;\n"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   // |d| |v_i]|
@@ -344,7 +344,7 @@ class MotionActionTest : VimTestCase() {
     val keys = listOf("di]")
     val before = "foo = [one, t${c}wo];\n"
     val after = "foo = [];\n"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   // VIM-1287 |d| |v_i(|
@@ -352,7 +352,7 @@ class MotionActionTest : VimTestCase() {
     val keys = listOf("di(")
     val before = "(text \"with quotes(and ${c}braces)\")"
     val after = "(text \"with quotes()\")"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   // VIM-1287 |d| |v_i{|
@@ -360,7 +360,7 @@ class MotionActionTest : VimTestCase() {
     val before = "{\"{foo, ${c}bar\", baz}}"
     val keys = listOf("di{")
     val after = "{\"{foo, ${c}bar\", baz}}"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   // VIM-1287 |d| |v_i{|
@@ -368,7 +368,7 @@ class MotionActionTest : VimTestCase() {
     val before = "a{\"{foo}, ${c}bar\", baz}b}"
     val keys = listOf("di{")
     val after = "a{$c}b}"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   // VIM-1008 |c| |v_i{|
@@ -376,7 +376,7 @@ class MotionActionTest : VimTestCase() {
     val before = "\"{do${c}esn't work}\""
     val keys = listOf("ci{")
     val after = "\"{$c}\""
-    doTest(keys, before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 
   // VIM-1008 |c| |v_i{|
@@ -384,7 +384,7 @@ class MotionActionTest : VimTestCase() {
     val keys = listOf("ci{")
     val before = "'{does n${c}ot work}'"
     val after = "'{$c}'"
-    doTest(keys, before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 
   // VIM-1008 |c| |v_i{|
@@ -392,7 +392,7 @@ class MotionActionTest : VimTestCase() {
     val before = "<p class=\"{{ \$ctrl.so${c}meClassName }}\"></p>"
     val keys = listOf("ci{")
     val after = "<p class=\"{{$c}}\"></p>"
-    doTest(keys, before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 
   // |d| |v_i>|
@@ -400,7 +400,7 @@ class MotionActionTest : VimTestCase() {
     val keys = listOf("di>")
     val before = "Foo<Foo, B${c}ar> bar\n"
     val after = "Foo<> bar\n"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   // |d| |v_a>|
@@ -408,7 +408,7 @@ class MotionActionTest : VimTestCase() {
     val keys = listOf("da>")
     val before = "Foo<Foo, B${c}ar> bar\n"
     val after = "Foo bar\n"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   // VIM-132 |d| |v_i"|
@@ -416,7 +416,7 @@ class MotionActionTest : VimTestCase() {
     val keys = listOf("di\"")
     val before = "foo = \"bar b${c}az\";\n"
     val after = "foo = \"\";\n"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   // VIM-132 |d| |v_a"|
@@ -425,7 +425,7 @@ class MotionActionTest : VimTestCase() {
     val keys = listOf("da\"")
     val before = "foo = \"bar b${c}az\";\n"
     val after = "foo = ;\n"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   // VIM-132 |d| |v_i"|
@@ -433,7 +433,7 @@ class MotionActionTest : VimTestCase() {
     val keys = listOf("di\"")
     val before = "foo = [\"one\", ${c}\"two\", \"three\"];\n"
     val after = "foo = [\"one\", \"\", \"three\"];\n"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   // VIM-132 |d| |v_i"|
@@ -441,7 +441,7 @@ class MotionActionTest : VimTestCase() {
     val keys = listOf("di\"")
     val before = "foo = [\"one\", \"two${c}\", \"three\"];\n"
     val after = "foo = [\"one\", \"\", \"three\"];\n"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   // VIM-132 |d| |v_i"|
@@ -449,7 +449,7 @@ class MotionActionTest : VimTestCase() {
     val keys = listOf("di\"")
     val before = "foo = \"fo\\\"o b${c}ar\";\n"
     val after = "foo = \"\";\n"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   // VIM-132 |d| |v_i"|
@@ -457,35 +457,35 @@ class MotionActionTest : VimTestCase() {
     val keys = listOf("di\"")
     val before = "f${c}oo = [\"one\", \"two\", \"three\"];\n"
     val after = "foo = [\"\", \"two\", \"three\"];\n"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   fun testDeleteDoubleQuotedStringOddNumberOfQuotes() {
     val keys = listOf("di\"")
     val before = "abc\"def${c}\"gh\"i"
     val after = "abc\"\"gh\"i"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   fun testDeleteDoubleQuotedStringBetweenEvenNumberOfQuotes() {
     val keys = listOf("di\"")
     val before = "abc\"def\"g${c}h\"ijk\"l"
     val after = "abc\"def\"\"ijk\"l"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   fun testDeleteDoubleQuotedStringOddNumberOfQuotesOnLast() {
     val keys = listOf("di\"")
     val before = "abcdef\"gh\"ij${c}\"kl"
     val after = "abcdef\"gh\"ij\"kl"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   fun testDeleteDoubleQuotedStringEvenNumberOfQuotesOnLast() {
     val keys = listOf("di\"")
     val before = "abc\"def\"gh\"ij${c}\"kl"
     val after = "abc\"def\"gh\"\"kl"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   // VIM-132 |v_i"|
@@ -493,7 +493,7 @@ class MotionActionTest : VimTestCase() {
     val keys = listOf("vi\"")
     val before = "foo = [\"o${c}ne\", \"two\"];\n"
     val after = "foo = [\"${s}on${c}e${se}\", \"two\"];\n"
-    doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
+    doTest(keys, before, after, VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER)
   }
 
   // |c| |v_i"|
@@ -501,7 +501,7 @@ class MotionActionTest : VimTestCase() {
     val keys = listOf("ci\"")
     val before = "foo = \"${c}\";\n"
     val after = "foo = \"\";\n"
-    doTest(keys, before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 
   // VIM-132 |d| |v_i'|
@@ -509,7 +509,7 @@ class MotionActionTest : VimTestCase() {
     val keys = listOf("di'")
     val before = "foo = 'bar b${c}az';\n"
     val after = "foo = '';\n"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   // VIM-132 |d| |v_i`|
@@ -517,7 +517,7 @@ class MotionActionTest : VimTestCase() {
     val keys = listOf("di`")
     val before = "foo = `bar b${c}az`;\n"
     val after = "foo = ``;\n"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   // VIM-132 |d| |v_a'|
@@ -526,7 +526,7 @@ class MotionActionTest : VimTestCase() {
     val keys = listOf("da'")
     val before = "foo = 'bar b${c}az';\n"
     val after = "foo = ;\n"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   // VIM-132 |d| |v_a`|
@@ -535,7 +535,7 @@ class MotionActionTest : VimTestCase() {
     val keys = listOf("da`")
     val before = "foo = `bar b${c}az`;\n"
     val after = "foo = ;\n"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   // VIM-1427
@@ -543,7 +543,7 @@ class MotionActionTest : VimTestCase() {
     val keys = listOf("d2at")
     val before = "<a><b><c>$c</c></b></a>"
     val after = "<a></a>"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   // VIM-2113
@@ -551,14 +551,14 @@ class MotionActionTest : VimTestCase() {
     val keys = listOf("cit")
     val before = "<a><c>$c</c></a>"
     val after = "<a><c></c></a>"
-    doTest(keys, before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 
   fun testDeleteToDigraph() {
     val keys = listOf("d/<C-K>O:<CR>")
     val before = "ab${c}cdÖef"
     val after = "abÖef"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   // |[(|
@@ -801,7 +801,7 @@ two
     val keys = listOf("viw", "<Esc>", "0", "viw", "gv", "d")
     val before = "foo ${c}bar\n"
     val after = "foo \n"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   // |CTRL-V|
@@ -817,7 +817,7 @@ two
     ${s}ba${se}r
     
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
+    doTest(keys, before, after, VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_BLOCK)
   }
 
   // |CTRL-V|
@@ -833,7 +833,7 @@ two
     b${s}ar$se
     
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
+    doTest(keys, before, after, VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_BLOCK)
   }
 
   // |CTRL-V|
@@ -851,7 +851,7 @@ two
     a${s}b$se
     
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
+    doTest(keys, before, after, VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_BLOCK)
   }
 
   // |v_o|
@@ -859,7 +859,7 @@ two
     val keys = listOf("v", "l", "o", "l", "d")
     val before = "${c}foo\n"
     val after = "fo\n"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   // VIM-564 |g_|
@@ -880,8 +880,8 @@ two
                 four  
                 
       """.trimIndent(),
-      CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE
     )
   }
 
@@ -903,8 +903,8 @@ two
                 four  
                 
       """.trimIndent(),
-      CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE
     )
   }
 
@@ -924,7 +924,7 @@ two
     bar
     
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   // |v_>| |gv|
@@ -948,7 +948,7 @@ two
       """.trimIndent()
     )
     typeText(injector.parser.parseKeys(">"))
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
     assertState(
       """    foo
     bar
@@ -963,7 +963,7 @@ two
 """
     )
     typeText(injector.parser.parseKeys(">"))
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(VimStateMachine.Mode.COMMAND)
     assertState(
       """        foo
         bar
@@ -992,7 +992,7 @@ two
     bar
     
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
+    doTest(keys, before, after, VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER)
   }
 
   fun testVisualLineSelectDown() {
@@ -1006,7 +1006,7 @@ two
      
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.VISUAL)
+    assertMode(VimStateMachine.Mode.VISUAL)
     assertSelection(
       """
     bar
@@ -1029,7 +1029,7 @@ two
      
       """.trimIndent()
     )
-    assertMode(CommandState.Mode.VISUAL)
+    assertMode(VimStateMachine.Mode.VISUAL)
     assertSelection(
       """
     bar

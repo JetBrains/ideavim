@@ -20,7 +20,7 @@ package com.maddyhome.idea.vim.ui
 
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.helper.commandState
+import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.helper.isCloseKeyStroke
 import java.awt.KeyEventDispatcher
 import java.awt.KeyboardFocusManager
@@ -62,7 +62,7 @@ object ModalEntry {
         } else {
           return true
         }
-        if (editor.commandState.isRecording) {
+        if (editor.vimStateMachine.isRecording) {
           KeyHandler.getInstance().modalEntryKeys += stroke
         }
         if (!processor(stroke)) {

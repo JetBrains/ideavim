@@ -24,7 +24,7 @@ plugins {
     java
     kotlin("jvm") version "1.6.21"
 
-    id("org.jetbrains.intellij") version "1.6.0"
+    id("org.jetbrains.intellij") version "1.7.0-SNAPSHOT"
     id("org.jetbrains.changelog") version "1.3.1"
 
     // ktlint linter - read more: https://github.com/JLLeitschuh/ktlint-gradle
@@ -145,6 +145,7 @@ tasks {
         kotlinOptions {
             jvmTarget = javaVersion
             apiVersion = "1.5"
+            freeCompilerArgs = listOf("-Xjvm-default=all-compatibility")
 //            allWarningsAsErrors = true
         }
     }

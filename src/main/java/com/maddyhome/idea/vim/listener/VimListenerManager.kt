@@ -44,7 +44,7 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimKeyListener
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.VimTypedActionHandler
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.group.EditorGroup
 import com.maddyhome.idea.vim.group.FileGroup
@@ -425,7 +425,7 @@ object VimListenerManager {
         ExOutputModel.getInstance(editor).clear()
 
         val caretModel = editor.caretModel
-        if (editor.subMode != CommandState.SubMode.NONE) {
+        if (editor.subMode != VimStateMachine.SubMode.NONE) {
           caretModel.removeSecondaryCarets()
         }
 

@@ -23,9 +23,12 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.datatypes.parseNumber
-import java.util.Collections
+import java.util.*
 
-sealed class Option<T : VimDataType>(val name: String, val abbrev: String, private val defaultValue: T) {
+/**
+ * COMPATIBILITY-LAYER: switched from sealed to abstract
+ */
+/*sealed*/abstract class Option<T : VimDataType>(val name: String, val abbrev: String, private val defaultValue: T) {
 
   open fun getDefaultValue(): T {
     return defaultValue
@@ -62,28 +65,6 @@ sealed class Option<T : VimDataType>(val name: String, val abbrev: String, priva
   abstract fun getValueIfAppend(currentValue: VimDataType, value: String, token: String): T
   abstract fun getValueIfPrepend(currentValue: VimDataType, value: String, token: String): T
   abstract fun getValueIfRemove(currentValue: VimDataType, value: String, token: String): T
-}
-
-class ToggleOption(name: String, abbrev: String, defaultValue: VimInt) : Option<VimInt>(name, abbrev, defaultValue) {
-  constructor(name: String, abbrev: String, defaultValue: Boolean) : this(name, abbrev, if (defaultValue) VimInt.ONE else VimInt.ZERO)
-
-  override fun checkIfValueValid(value: VimDataType, token: String) {
-    if (value !is VimInt) {
-      throw ExException("E474: Invalid argument: $token")
-    }
-  }
-
-  override fun getValueIfAppend(currentValue: VimDataType, value: String, token: String): VimInt {
-    throw ExException("E474: Invalid argument: $token")
-  }
-
-  override fun getValueIfPrepend(currentValue: VimDataType, value: String, token: String): VimInt {
-    throw ExException("E474: Invalid argument: $token")
-  }
-
-  override fun getValueIfRemove(currentValue: VimDataType, value: String, token: String): VimInt {
-    throw ExException("E474: Invalid argument: $token")
-  }
 }
 
 open class NumberOption(name: String, abbrev: String, defaultValue: VimInt) : Option<VimInt>(name, abbrev, defaultValue) {

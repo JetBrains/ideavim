@@ -18,7 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.text
 
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 
@@ -35,7 +35,7 @@ class MotionParagraphPreviousActionTest : VimTestCase() {
       hard by the torrent of a mountain pass$c.
       """.trimIndent(),
       ".",
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 }

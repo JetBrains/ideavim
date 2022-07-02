@@ -18,7 +18,7 @@
 
 package com.maddyhome.idea.vim.api
 
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.EditorLine
@@ -120,7 +120,7 @@ import java.util.*
 interface VimEditor {
 
   val lfMakesNewLine: Boolean
-  var vimChangeActionSwitchMode: CommandState.Mode?
+  var vimChangeActionSwitchMode: VimStateMachine.Mode?
   var vimKeepingVisualOperatorAction: Boolean
 
   fun deleteDryRun(range: VimRange): OperatedRange?

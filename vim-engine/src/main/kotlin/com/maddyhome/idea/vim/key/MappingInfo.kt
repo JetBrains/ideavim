@@ -26,7 +26,7 @@ import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.command.SelectionType.Companion.fromSubMode
 import com.maddyhome.idea.vim.common.Offset
@@ -37,7 +37,7 @@ import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.group.visual.VimSelection.Companion.create
 import com.maddyhome.idea.vim.helper.VimNlsSafe
-import com.maddyhome.idea.vim.helper.commandState
+import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
@@ -153,12 +153,12 @@ class ToHandlerMappingInfo(
 
   override fun execute(editor: VimEditor, context: ExecutionContext) {
     LOG.debug("Executing 'ToHandler' mapping info...")
-    val commandState = CommandState.getInstance(editor)
+    val vimStateMachine = VimStateMachine.getInstance(editor)
 
     // Cache isOperatorPending in case the extension changes the mode while moving the caret
     // See CommonExtensionTest
     // TODO: Is this legal? Should we assert in this case?
-    val shouldCalculateOffsets: Boolean = commandState.isOperatorPending
+    val shouldCalculateOffsets: Boolean = vimStateMachine.isOperatorPending
 
     val startOffsets: Map<VimCaret, Offset> = editor.carets().associateWith { it.offset }
 
@@ -175,7 +175,7 @@ class ToHandlerMappingInfo(
           injector.application.invokeLater {
             KeyHandler.getInstance().finishedCommandPreparation(
               editor,
-              context, CommandState.getInstance(editor), CommandState.getInstance(editor).commandBuilder, null, false
+              context, VimStateMachine.getInstance(editor), VimStateMachine.getInstance(editor).commandBuilder, null, false
             )
           }
         }
@@ -206,7 +206,7 @@ class ToHandlerMappingInfo(
       editor: VimEditor,
       startOffsets: Map<VimCaret, Offset>,
     ) {
-      val commandState = editor.commandState
+      val commandState = editor.vimStateMachine
       if (shouldCalculateOffsets && !commandState.commandBuilder.hasCurrentCommandPartArgument()) {
         val offsets: MutableMap<VimCaret, VimSelection> = HashMap()
         for (caret in editor.carets()) {

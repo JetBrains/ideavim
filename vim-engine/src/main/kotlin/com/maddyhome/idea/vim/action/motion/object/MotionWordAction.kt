@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.command.TextObjectVisualType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler
@@ -102,7 +102,7 @@ fun getWordRange(
 ): TextRange {
   var dir = 1
   var selection = false
-  if (editor.mode == CommandState.Mode.VISUAL) {
+  if (editor.mode == VimStateMachine.Mode.VISUAL) {
     if (caret.vimSelectionStart > caret.offset.point) {
       dir = -1
     }

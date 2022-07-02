@@ -19,7 +19,7 @@
 package org.jetbrains.plugins.ideavim.action.change.change.number
 
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -33,8 +33,8 @@ class ChangeVisualNumberDecActionTest : VimTestCase() {
       "V<C-X>",
       "${c}12345",
       "${c}12344",
-      CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE
     )
   }
 
@@ -43,8 +43,8 @@ class ChangeVisualNumberDecActionTest : VimTestCase() {
       "v10w<C-X>",
       "11 <- should not be decremented |${c}11| should not be decremented -> 12",
       "11 <- should not be decremented |${c}10| should not be decremented -> 12",
-      CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE
     )
   }
 
@@ -53,8 +53,8 @@ class ChangeVisualNumberDecActionTest : VimTestCase() {
       "v4l<C-X>",
       "11111${c}33333111111",
       "11111${c}33332111111",
-      CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE
     )
   }
 
@@ -81,8 +81,8 @@ class ChangeVisualNumberDecActionTest : VimTestCase() {
                     no dec 1
 
       """.trimIndent(),
-      CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE
     )
   }
 
@@ -99,8 +99,8 @@ class ChangeVisualNumberDecActionTest : VimTestCase() {
                     999
                     999
       """.trimIndent(),
-      CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE
     )
   }
 
@@ -109,8 +109,8 @@ class ChangeVisualNumberDecActionTest : VimTestCase() {
       "V<C-X>",
       "1 should$c not be decremented -> 2",
       "${c}0 should not be decremented -> 2",
-      CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE
     )
   }
 

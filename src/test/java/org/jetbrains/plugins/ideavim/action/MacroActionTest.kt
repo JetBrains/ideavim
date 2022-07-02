@@ -20,7 +20,7 @@ package org.jetbrains.plugins.ideavim.action
 import com.intellij.testFramework.PlatformTestUtil
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.helper.commandState
+import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
@@ -36,7 +36,7 @@ class MacroActionTest : VimTestCase() {
   // |q|
   fun testRecordMacro() {
     val editor = typeTextInFile(injector.parser.parseKeys("qa" + "3l" + "q"), "on<caret>e two three\n")
-    val commandState = editor.vim.commandState
+    val commandState = editor.vim.vimStateMachine
     assertFalse(commandState.isRecording)
     val registerGroup = VimPlugin.getRegister()
     val register = registerGroup.getRegister('a')

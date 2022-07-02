@@ -20,7 +20,7 @@ package org.jetbrains.plugins.ideavim.action.change.insert
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
@@ -39,7 +39,7 @@ class InsertNewLineBelowActionTest : VimTestCase() {
         |$c
         |where it was settled on some sodden sand
         |hard by the torrent of a mountain pass.""".trimMargin()
-    doTest("o", before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    doTest("o", before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 
   fun `test insert new line below with caret in middle of line`() {
@@ -52,7 +52,7 @@ class InsertNewLineBelowActionTest : VimTestCase() {
         |$c
         |where it was settled on some sodden sand
         |hard by the torrent of a mountain pass.""".trimMargin()
-    doTest("o", before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    doTest("o", before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 
   fun `test insert new line below matches indent for plain text`() {
@@ -65,7 +65,7 @@ class InsertNewLineBelowActionTest : VimTestCase() {
         |    $c
         |    where it was settled on some sodden sand
         |    hard by the torrent of a mountain pass.""".trimMargin()
-    doTest("o", before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    doTest("o", before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 
   fun `test insert new line below matches indent for plain text 1`() {
@@ -78,7 +78,7 @@ class InsertNewLineBelowActionTest : VimTestCase() {
         |    $c
         |    where it was settled on some sodden sand
         |    hard by the torrent of a mountain pass.""".trimMargin()
-    doTest("o", before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    doTest("o", before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN) // Java support would be a neovim plugin
@@ -131,7 +131,7 @@ class InsertNewLineBelowActionTest : VimTestCase() {
         |    $c
         |    hard by the torrent of a mountain pass.
         |    $c""".trimMargin()
-    doTest("o", before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    doTest("o", before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
@@ -154,7 +154,7 @@ class InsertNewLineBelowActionTest : VimTestCase() {
         |$c
         |where it was settled on some sodden sand
         |hard by the torrent of a mountain pass.""".trimMargin()
-    doTest("5o", before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    doTest("5o", before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 
   fun `test insert new line below with count and escape`() {
@@ -171,7 +171,7 @@ class InsertNewLineBelowActionTest : VimTestCase() {
         |12${c}3
         |where it was settled on some sodden sand
         |hard by the torrent of a mountain pass.""".trimMargin()
-    doTest("5o123<esc>", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest("5o123<esc>", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   fun `test insert new line below with folds`() {
@@ -187,7 +187,7 @@ class InsertNewLineBelowActionTest : VimTestCase() {
 
     configureAndFold(before, "")
 
-    performTest("o", after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    performTest("o", after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 
   fun `test insert new line below with folds 2`() {
@@ -203,7 +203,7 @@ class InsertNewLineBelowActionTest : VimTestCase() {
 
     configureAndFold(before, "")
 
-    performTest("o", after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    performTest("o", after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 
   fun `test pycharm notebook folders`() {
@@ -219,6 +219,6 @@ class InsertNewLineBelowActionTest : VimTestCase() {
 
     configureAndFold(before, "")
 
-    performTest("o", after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    performTest("o", after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 }

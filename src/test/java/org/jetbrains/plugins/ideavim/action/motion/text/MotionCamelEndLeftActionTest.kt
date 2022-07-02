@@ -18,11 +18,11 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.text
 
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class MotionCamelEndLeftActionTest : VimTestCase() {
   fun `test go with a single uppercase word`() {
-    doTest("]b", "TES${c}T", "TES${c}T", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest("]b", "TES${c}T", "TES${c}T", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 }

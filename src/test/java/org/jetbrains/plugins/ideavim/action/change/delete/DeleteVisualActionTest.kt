@@ -19,7 +19,7 @@
 package org.jetbrains.plugins.ideavim.action.change.delete
 
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.group.visual.IdeaSelectionControl
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -48,7 +48,7 @@ class DeleteVisualActionTest : VimTestCase() {
             wh||t was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   fun `test delete block SW direction`() {
@@ -69,7 +69,7 @@ class DeleteVisualActionTest : VimTestCase() {
             wh||t was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   fun `test delete block NW direction`() {
@@ -90,7 +90,7 @@ class DeleteVisualActionTest : VimTestCase() {
             wh||t was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   fun `test delete block NE direction`() {
@@ -111,7 +111,7 @@ class DeleteVisualActionTest : VimTestCase() {
             wh||t was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
@@ -129,7 +129,7 @@ class DeleteVisualActionTest : VimTestCase() {
       """.trimIndent()
     )
     IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
+    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
     typeText(injector.parser.parseKeys("d"))
     assertState(
       """
@@ -138,7 +138,7 @@ class DeleteVisualActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.
       """.trimIndent()
     )
-    assertState(CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    assertState(VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   fun `test delete with dollar motion`() {
@@ -159,6 +159,6 @@ class DeleteVisualActionTest : VimTestCase() {
             wh|
             ha|
     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 }

@@ -22,7 +22,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.options.OptionConstants
@@ -44,10 +44,10 @@ class VisualToggleLineModeAction : VimActionHandler.SingleExecution() {
       OptionConstants.selectmodeName
     ) as VimString).value
     return if ("cmd" in listOption) {
-      injector.visualMotionGroup.enterSelectMode(editor, CommandState.SubMode.VISUAL_LINE).also {
+      injector.visualMotionGroup.enterSelectMode(editor, VimStateMachine.SubMode.VISUAL_LINE).also {
         editor.forEachCaret { it.vimSetSelection(it.offset.point) }
       }
     } else injector.visualMotionGroup
-      .toggleVisual(editor, cmd.count, cmd.rawCount, CommandState.SubMode.VISUAL_LINE)
+      .toggleVisual(editor, cmd.count, cmd.rawCount, VimStateMachine.SubMode.VISUAL_LINE)
   }
 }

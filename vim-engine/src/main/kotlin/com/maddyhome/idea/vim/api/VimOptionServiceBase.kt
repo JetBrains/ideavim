@@ -2,6 +2,7 @@ package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.option.ToggleOption
 import com.maddyhome.idea.vim.options.NumberOption
 import com.maddyhome.idea.vim.options.Option
 import com.maddyhome.idea.vim.options.OptionChangeListener
@@ -9,7 +10,6 @@ import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.options.OptionService
 import com.maddyhome.idea.vim.options.StringOption
-import com.maddyhome.idea.vim.options.ToggleOption
 import com.maddyhome.idea.vim.options.helpers.GuiCursorOptionHelper
 import com.maddyhome.idea.vim.options.helpers.KeywordOptionHelper
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
@@ -359,12 +359,20 @@ abstract class VimOptionServiceBase : OptionService {
     options.get(optionName)!!.removeOptionChangeListener(listener)
   }
 
+  fun getRawOption(key: String): Option<out VimDataType>? {
+    return options.get(key)
+  }
+
   private fun castToVimDataType(value: String, optionName: String, token: String): VimDataType {
     val option = options.get(optionName) ?: throw ExException("E518: Unknown option: $token")
     return when (option) {
       is NumberOption -> VimInt(parseNumber(value) ?: throw ExException("E521: Number required after =: $token"))
       is ToggleOption -> throw ExException("E474: Invalid argument: $token")
       is StringOption -> VimString(value)
+      /**
+       * COMPATIBILITY-LAYER: New branch
+       */
+      else -> error("")
     }
   }
 }

@@ -2,7 +2,7 @@ package com.maddyhome.idea.vim.helper
 
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
@@ -15,40 +15,40 @@ val TextRange.endOffsetInclusive
   get() = if (this.endOffset > 0 && this.endOffset > this.startOffset) this.endOffset - 1 else this.endOffset
 
 val VimEditor.mode
-  get() = this.commandState.mode
+  get() = this.vimStateMachine.mode
 
 val VimEditor.inVisualMode
   get() = this.mode.inVisualMode
 
 val VimEditor.inRepeatMode
-  get() = this.commandState.isDotRepeatInProgress
+  get() = this.vimStateMachine.isDotRepeatInProgress
 
 var VimEditor.subMode
-  get() = this.commandState.subMode
+  get() = this.vimStateMachine.subMode
   set(value) {
-    this.commandState.subMode = value
+    this.vimStateMachine.subMode = value
   }
 
-val VimEditor.commandState
-  get() = CommandState.getInstance(this)
+val VimEditor.vimStateMachine
+  get() = VimStateMachine.getInstance(this)
 
-val CommandState.Mode.inVisualMode
-  get() = this == CommandState.Mode.VISUAL || this == CommandState.Mode.INSERT_VISUAL
+val VimStateMachine.Mode.inVisualMode
+  get() = this == VimStateMachine.Mode.VISUAL || this == VimStateMachine.Mode.INSERT_VISUAL
 
 val VimEditor.inBlockSubMode
-  get() = this.subMode == CommandState.SubMode.VISUAL_BLOCK
+  get() = this.subMode == VimStateMachine.SubMode.VISUAL_BLOCK
 
 /**
  * Please use `isEndAllowed` based on `Editor` (another extension function)
  * It takes "single command" into account.
  */
-val CommandState.Mode.isEndAllowed: Boolean
+val VimStateMachine.Mode.isEndAllowed: Boolean
   get() = when (this) {
-    CommandState.Mode.INSERT, CommandState.Mode.VISUAL, CommandState.Mode.SELECT -> true
-    CommandState.Mode.COMMAND, CommandState.Mode.CMD_LINE, CommandState.Mode.REPLACE, CommandState.Mode.OP_PENDING -> usesVirtualSpace
-    CommandState.Mode.INSERT_NORMAL -> usesVirtualSpace
-    CommandState.Mode.INSERT_VISUAL -> usesVirtualSpace
-    CommandState.Mode.INSERT_SELECT -> usesVirtualSpace
+    VimStateMachine.Mode.INSERT, VimStateMachine.Mode.VISUAL, VimStateMachine.Mode.SELECT -> true
+    VimStateMachine.Mode.COMMAND, VimStateMachine.Mode.CMD_LINE, VimStateMachine.Mode.REPLACE, VimStateMachine.Mode.OP_PENDING -> usesVirtualSpace
+    VimStateMachine.Mode.INSERT_NORMAL -> usesVirtualSpace
+    VimStateMachine.Mode.INSERT_VISUAL -> usesVirtualSpace
+    VimStateMachine.Mode.INSERT_SELECT -> usesVirtualSpace
   }
 
 val usesVirtualSpace
@@ -59,45 +59,45 @@ val usesVirtualSpace
 
 val VimEditor.isEndAllowed: Boolean
   get() = when (this.mode) {
-    CommandState.Mode.INSERT, CommandState.Mode.VISUAL, CommandState.Mode.SELECT, CommandState.Mode.INSERT_VISUAL, CommandState.Mode.INSERT_SELECT -> true
-    CommandState.Mode.COMMAND, CommandState.Mode.CMD_LINE, CommandState.Mode.REPLACE, CommandState.Mode.OP_PENDING, CommandState.Mode.INSERT_NORMAL -> {
+    VimStateMachine.Mode.INSERT, VimStateMachine.Mode.VISUAL, VimStateMachine.Mode.SELECT, VimStateMachine.Mode.INSERT_VISUAL, VimStateMachine.Mode.INSERT_SELECT -> true
+    VimStateMachine.Mode.COMMAND, VimStateMachine.Mode.CMD_LINE, VimStateMachine.Mode.REPLACE, VimStateMachine.Mode.OP_PENDING, VimStateMachine.Mode.INSERT_NORMAL -> {
       // One day we'll use a proper insert_normal mode
       if (this.mode.inSingleMode) true else usesVirtualSpace
     }
   }
 
-val CommandState.Mode.inSingleMode: Boolean
+val VimStateMachine.Mode.inSingleMode: Boolean
   get() = when (this) {
-    CommandState.Mode.INSERT_NORMAL, CommandState.Mode.INSERT_SELECT, CommandState.Mode.INSERT_VISUAL -> true
+    VimStateMachine.Mode.INSERT_NORMAL, VimStateMachine.Mode.INSERT_SELECT, VimStateMachine.Mode.INSERT_VISUAL -> true
     else -> false
   }
 
-val CommandState.Mode.inSingleNormalMode: Boolean
+val VimStateMachine.Mode.inSingleNormalMode: Boolean
   get() = when (this) {
-    CommandState.Mode.INSERT_NORMAL -> true
+    VimStateMachine.Mode.INSERT_NORMAL -> true
     else -> false
   }
 
 val VimEditor.inNormalMode
   get() = this.mode.inNormalMode
 
-val CommandState.Mode.inNormalMode
-  get() = this == CommandState.Mode.COMMAND || this == CommandState.Mode.INSERT_NORMAL
+val VimStateMachine.Mode.inNormalMode
+  get() = this == VimStateMachine.Mode.COMMAND || this == VimStateMachine.Mode.INSERT_NORMAL
 
-val CommandState.Mode.isEndAllowedIgnoringOnemore: Boolean
+val VimStateMachine.Mode.isEndAllowedIgnoringOnemore: Boolean
   get() = when (this) {
-    CommandState.Mode.INSERT, CommandState.Mode.VISUAL, CommandState.Mode.SELECT -> true
-    CommandState.Mode.COMMAND, CommandState.Mode.CMD_LINE, CommandState.Mode.REPLACE, CommandState.Mode.OP_PENDING -> false
-    CommandState.Mode.INSERT_NORMAL -> false
-    CommandState.Mode.INSERT_VISUAL -> true
-    CommandState.Mode.INSERT_SELECT -> true
+    VimStateMachine.Mode.INSERT, VimStateMachine.Mode.VISUAL, VimStateMachine.Mode.SELECT -> true
+    VimStateMachine.Mode.COMMAND, VimStateMachine.Mode.CMD_LINE, VimStateMachine.Mode.REPLACE, VimStateMachine.Mode.OP_PENDING -> false
+    VimStateMachine.Mode.INSERT_NORMAL -> false
+    VimStateMachine.Mode.INSERT_VISUAL -> true
+    VimStateMachine.Mode.INSERT_SELECT -> true
   }
 
 val VimEditor.inInsertMode
-  get() = this.mode == CommandState.Mode.INSERT || this.mode == CommandState.Mode.REPLACE
+  get() = this.mode == VimStateMachine.Mode.INSERT || this.mode == VimStateMachine.Mode.REPLACE
 
 val VimEditor.inSelectMode
-  get() = this.mode == CommandState.Mode.SELECT || this.mode == CommandState.Mode.INSERT_SELECT
+  get() = this.mode == VimStateMachine.Mode.SELECT || this.mode == VimStateMachine.Mode.INSERT_SELECT
 
 val VimEditor.inSingleCommandMode
   get() = this.mode.inSingleMode
@@ -108,21 +108,21 @@ inline fun <reified T : Enum<T>> enumSetOf(vararg value: T): EnumSet<T> = when (
   else -> EnumSet.of(value[0], *value.slice(1..value.lastIndex).toTypedArray())
 }
 
-fun CommandState.pushSelectMode(subMode: CommandState.SubMode, prevMode: CommandState.Mode = this.mode) {
+fun VimStateMachine.pushSelectMode(subMode: VimStateMachine.SubMode, prevMode: VimStateMachine.Mode = this.mode) {
   if (prevMode.inSingleMode) {
     popModes()
-    pushModes(CommandState.Mode.INSERT_SELECT, subMode)
+    pushModes(VimStateMachine.Mode.INSERT_SELECT, subMode)
   } else {
-    pushModes(CommandState.Mode.SELECT, subMode)
+    pushModes(VimStateMachine.Mode.SELECT, subMode)
   }
 }
 
-fun CommandState.pushVisualMode(subMode: CommandState.SubMode, prevMode: CommandState.Mode = this.mode) {
+fun VimStateMachine.pushVisualMode(subMode: VimStateMachine.SubMode, prevMode: VimStateMachine.Mode = this.mode) {
   if (prevMode.inSingleMode) {
     popModes()
-    pushModes(CommandState.Mode.INSERT_VISUAL, subMode)
+    pushModes(VimStateMachine.Mode.INSERT_VISUAL, subMode)
   } else {
-    pushModes(CommandState.Mode.VISUAL, subMode)
+    pushModes(VimStateMachine.Mode.VISUAL, subMode)
   }
 }
 

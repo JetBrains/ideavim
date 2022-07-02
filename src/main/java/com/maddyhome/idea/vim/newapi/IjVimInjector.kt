@@ -40,7 +40,7 @@ import com.maddyhome.idea.vim.api.VimrcFileState
 import com.maddyhome.idea.vim.api.VimscriptExecutor
 import com.maddyhome.idea.vim.api.VimscriptFunctionService
 import com.maddyhome.idea.vim.api.VimscriptParser
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.common.VimMachine
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.ex.ExOutputModel
@@ -64,7 +64,7 @@ import com.maddyhome.idea.vim.helper.IjEditorHelper
 import com.maddyhome.idea.vim.helper.IjVimStringParser
 import com.maddyhome.idea.vim.helper.UndoRedoHelper
 import com.maddyhome.idea.vim.helper.VimCommandLineHelper
-import com.maddyhome.idea.vim.helper.vimCommandState
+import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.history.VimHistory
 import com.maddyhome.idea.vim.macro.VimMacro
 import com.maddyhome.idea.vim.mark.VimMarkGroup
@@ -180,16 +180,16 @@ class IjVimInjector : VimInjectorBase() {
   override val vimStorageService: VimStorageService
     get() = service()
 
-  override fun commandStateFor(editor: VimEditor): CommandState {
-    var res = editor.ij.vimCommandState
+  override fun commandStateFor(editor: VimEditor): VimStateMachine {
+    var res = editor.ij.vimStateMachine
     if (res == null) {
-      res = CommandState(editor)
-      editor.ij.vimCommandState = res
+      res = VimStateMachine(editor)
+      editor.ij.vimStateMachine = res
     }
     return res
   }
 
-  override fun commandStateFor(editor: Any): CommandState {
+  override fun commandStateFor(editor: Any): VimStateMachine {
     return when (editor) {
       is VimEditor -> this.commandStateFor(editor)
       is Editor -> this.commandStateFor(IjVimEditor(editor))

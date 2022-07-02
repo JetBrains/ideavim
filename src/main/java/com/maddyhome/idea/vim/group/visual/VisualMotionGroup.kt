@@ -23,6 +23,8 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimVisualMotionGroupBase
 import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.command.engine
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 
@@ -30,21 +32,20 @@ import com.maddyhome.idea.vim.newapi.vim
  * @author Alex Plate
  */
 class VisualMotionGroup : VimVisualMotionGroupBase() {
-  override fun autodetectVisualSubmode(editor: VimEditor): CommandState.SubMode {
+  override fun autodetectVisualSubmode(editor: VimEditor): VimStateMachine.SubMode {
     // IJ specific. See https://youtrack.jetbrains.com/issue/VIM-1924.
     val project = editor.ij.project
     if (project != null && FindManager.getInstance(project).selectNextOccurrenceWasPerformed()) {
-      return CommandState.SubMode.VISUAL_CHARACTER
+      return VimStateMachine.SubMode.VISUAL_CHARACTER
     }
 
     return super.autodetectVisualSubmode(editor)
   }
 
-  override fun enterVisualMode(editor: Any, subMode: CommandState.SubMode?): Boolean {
-    return when (editor) {
-      is VimEditor -> this.enterVisualMode(editor, subMode)
-      is Editor -> this.enterVisualMode(editor.vim, subMode)
-      else -> error("Unexpected type: $editor")
-    }
+  /**
+   * COMPATIBILITY-LAYER: Added a method
+   */
+  fun enterVisualMode(editor: Editor, subMode: CommandState.SubMode? = null): Boolean {
+    return this.enterVisualMode(editor.vim, subMode?.engine)
   }
 }
