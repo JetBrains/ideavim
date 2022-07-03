@@ -32,8 +32,8 @@ import com.maddyhome.idea.vim.api.VimChangeGroupBase
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimMotionGroupBase
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.command.SelectionType
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.common.EditorLine
 import com.maddyhome.idea.vim.common.IndentConfig
 import com.maddyhome.idea.vim.common.OperatedRange

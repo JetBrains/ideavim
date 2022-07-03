@@ -21,7 +21,6 @@ package com.maddyhome.idea.vim.newapi
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.editor.VisualPosition
-import com.intellij.openapi.util.Key
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.CaretRegisterStorage
 import com.maddyhome.idea.vim.api.CaretRegisterStorageBase
@@ -50,15 +49,15 @@ import com.maddyhome.idea.vim.helper.vimLine
 import com.maddyhome.idea.vim.helper.vimSelectionStart
 
 class IjVimCaret(val caret: Caret) : VimCaretBase() {
-    override val registerStorage: CaretRegisterStorage
-      get() {
-        var storage = this.caret.registerStorage
-        if (storage == null) {
-          storage = CaretRegisterStorageBase(editor.primaryCaret().ij == caret)
-          this.caret.registerStorage = storage
-        }
-        return storage
+  override val registerStorage: CaretRegisterStorage
+    get() {
+      var storage = this.caret.registerStorage
+      if (storage == null) {
+        storage = CaretRegisterStorageBase(editor.primaryCaret().ij == caret)
+        this.caret.registerStorage = storage
       }
+      return storage
+    }
   override val editor: VimEditor
     get() = IjVimEditor(caret.editor)
   override val offset: Offset

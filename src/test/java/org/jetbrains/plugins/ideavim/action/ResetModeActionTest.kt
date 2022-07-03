@@ -20,8 +20,8 @@ package org.jetbrains.plugins.ideavim.action
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.key.MappingOwner
 import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.SkipNeovimReason

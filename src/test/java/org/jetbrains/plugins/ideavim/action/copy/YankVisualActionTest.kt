@@ -25,7 +25,6 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.newapi.vim
-import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -87,7 +86,7 @@ class YankVisualActionTest : VimTestCase() {
                             all rocks and lavender and tufted grass,
                             where it ${c}was settled on some sodden sand
                             hard by the torrent of a mountain pass.
-      """.trimIndent()
+    """.trimIndent()
     configureByText(text)
     typeText(injector.parser.parseKeys("viw" + "y"))
     val editor = myFixture.editor.vim
@@ -161,7 +160,7 @@ class YankVisualActionTest : VimTestCase() {
                             all ${c}rocks and lavender and tufted grass,
                             where it was settled on some sodden sand
                             hard by ${c}the torrent of a mountain pass.
-      """.trimIndent()
+    """.trimIndent()
     configureByText(text)
     typeText(injector.parser.parseKeys("V" + "y"))
     val editor = myFixture.editor.vim

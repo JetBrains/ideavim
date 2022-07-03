@@ -34,8 +34,8 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.command.SelectionType
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.command.isBlock
 import com.maddyhome.idea.vim.command.isChar
 import com.maddyhome.idea.vim.command.isLine
@@ -235,13 +235,13 @@ class PutGroup : VimPutBase() {
   }
 
   private fun putTextViaIde(
-      pasteProvider: PasteProvider,
-      vimEditor: VimEditor,
-      vimContext: ExecutionContext,
-      text: ProcessedTextData,
-      subMode: VimStateMachine.SubMode,
-      data: PutData,
-      additionalData: Map<String, Any>,
+    pasteProvider: PasteProvider,
+    vimEditor: VimEditor,
+    vimContext: ExecutionContext,
+    text: ProcessedTextData,
+    subMode: VimStateMachine.SubMode,
+    data: PutData,
+    additionalData: Map<String, Any>,
   ) {
     val editor = (vimEditor as IjVimEditor).editor
     val context = vimContext.context as DataContext

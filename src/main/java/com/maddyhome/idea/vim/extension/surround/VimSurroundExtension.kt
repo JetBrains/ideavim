@@ -25,19 +25,19 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.VimStateMachine
-import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.command.SelectionType
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.executeNormalWithoutMapping
+import com.maddyhome.idea.vim.extension.VimExtensionFacade.getRegisterForCaret
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.inputKeyStroke
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.inputString
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setOperatorFunction
-import com.maddyhome.idea.vim.extension.ExtensionHandler
-import com.maddyhome.idea.vim.extension.VimExtensionFacade.getRegisterForCaret
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setRegisterForCaret
 import com.maddyhome.idea.vim.helper.editorMode
 import com.maddyhome.idea.vim.key.OperatorFunction
@@ -164,7 +164,7 @@ class VimSurroundExtension : VimExtension {
           .filter { it.innerText != null } // we do nothing with carets that are not inside the surrounding
           .map { surrounding ->
             val innerValue = injector.parser.toPrintableString(surrounding.innerText!!)
-            val text = newSurround?.let {it.first + innerValue + it.second} ?: innerValue
+            val text = newSurround?.let { it.first + innerValue + it.second } ?: innerValue
             val textData = PutData.TextData(text, SelectionType.CHARACTER_WISE, emptyList())
             val putData = PutData(textData, null, 1, insertTextBeforeCaret = !surrounding.isLineEnd, rawIndent = true, caretAfterInsertedText = false)
 

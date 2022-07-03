@@ -50,7 +50,6 @@ class CommandState(private val machine: VimStateMachine) {
   }
 }
 
-
 val CommandState.SubMode.engine: VimStateMachine.SubMode
   get() = when (this) {
     CommandState.SubMode.NONE -> VimStateMachine.SubMode.NONE
@@ -72,7 +71,6 @@ val CommandState.Mode.engine: VimStateMachine.Mode
     CommandState.Mode.INSERT_VISUAL -> VimStateMachine.Mode.INSERT_VISUAL
     CommandState.Mode.INSERT_SELECT -> VimStateMachine.Mode.INSERT_SELECT
   }
-
 
 val VimStateMachine.Mode.ij: CommandState.Mode
   get() = when (this) {

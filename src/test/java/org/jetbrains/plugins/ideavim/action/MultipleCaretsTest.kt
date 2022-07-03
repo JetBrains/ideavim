@@ -38,7 +38,7 @@ class MultipleCaretsTest : VimTestCase() {
   // com.maddyhome.idea.vim.action.visual.leftright
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testMotionLeftAction() {
-    typeTextInFile(injector.parser.parseKeys("3h"), "abc${c}de${c}")
+    typeTextInFile(injector.parser.parseKeys("3h"), "abc${c}de$c")
     assertState("${c}ab${c}cde")
   }
 
@@ -58,32 +58,34 @@ class MultipleCaretsTest : VimTestCase() {
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testMotionColumnAction() {
     typeTextInFile(
-      injector.parser.parseKeys("4|"), """
-     one${c} two
+      injector.parser.parseKeys("4|"),
+      """
+     one$c two
      three four fiv${c}e
-     si${c}x seven${c}
-     ${c}eig${c}ht nine ten${c}
-     """.trimIndent()
+     si${c}x seven$c
+     ${c}eig${c}ht nine ten$c
+      """.trimIndent()
     )
     assertState(
       """
-    one${c} two
+    one$c two
     thr${c}ee four five
-    six${c} seven
+    six$c seven
     eig${c}ht nine ten
-    """.trimIndent()
+      """.trimIndent()
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testMotionFirstColumnAction() {
     typeTextInFile(
-      injector.parser.parseKeys("0"), """
-     one${c} two
+      injector.parser.parseKeys("0"),
+      """
+     one$c two
      three four fiv${c}e
-     si${c}x seven${c}
+     si${c}x seven$c
      ${c}eig${c}ht nine te${c}n
-     """.trimIndent()
+      """.trimIndent()
     )
     assertState(
       """
@@ -91,7 +93,7 @@ class MultipleCaretsTest : VimTestCase() {
     ${c}three four five
     ${c}six seven
     ${c}eight nine ten
-    """.trimIndent()
+      """.trimIndent()
     )
   }
 
@@ -99,10 +101,10 @@ class MultipleCaretsTest : VimTestCase() {
   fun testMotionFirstNonSpaceAction() {
     typeTextInFile(
       injector.parser.parseKeys("^"),
-      """     one${c} two
-three${c} four
-  five${c} six
- ${c}  seven eight"""
+      """     one$c two
+three$c four
+  five$c six
+ $c  seven eight"""
     )
     assertState(
       """     ${c}one two
@@ -115,10 +117,11 @@ ${c}three four
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testMotionLastNonSpaceAction() {
     typeTextInFile(
-      injector.parser.parseKeys("g_"), """one${c} two   
-three${c} four      
+      injector.parser.parseKeys("g_"),
+      """one$c two   
+three$c four      
  five si${c}x
-seven eight    ${c}  
+seven eight    $c  
 """
     )
     assertState(
@@ -133,16 +136,17 @@ seven eigh${c}t
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testMotionLastColumnAction() {
     typeTextInFile(
-      injector.parser.parseKeys("$"), """
+      injector.parser.parseKeys("$"),
+      """
      one ${c}two
      three fou${c}r
-     """.trimIndent()
+      """.trimIndent()
     )
     assertState(
       """
     one tw${c}o
     three fou${c}r
-    """.trimIndent()
+      """.trimIndent()
     )
   }
 
@@ -203,12 +207,13 @@ seven eigh${c}t
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testMotionLeftWrap() {
     typeTextInFile(
-      injector.parser.parseKeys("5<BS>"), """
+      injector.parser.parseKeys("5<BS>"),
+      """
      one
      t${c}wo three
      fo${c}ur
      
-     """.trimIndent()
+      """.trimIndent()
     )
     assertState("${c}one\ntwo thr${c}ee\nfour\n")
   }
@@ -216,12 +221,13 @@ seven eigh${c}t
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testMotionRightWrap() {
     typeTextInFile(
-      injector.parser.parseKeys("5<Space>"), """
+      injector.parser.parseKeys("5<Space>"),
+      """
      ${c}one
      two thr${c}ee
      four
      
-     """.trimIndent()
+      """.trimIndent()
     )
     assertState("one\nt${c}wo three\nfo${c}ur\n")
   }
@@ -230,18 +236,19 @@ seven eigh${c}t
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testMotionUpAction() {
     typeTextInFile(
-      injector.parser.parseKeys("k"), """
+      injector.parser.parseKeys("k"),
+      """
      o${c}ne
-     t${c}wo${c} 
-     t${c}hree${c} 
-     """.trimIndent()
+     t${c}wo$c 
+     t${c}hree$c 
+      """.trimIndent()
     )
     assertState(
       """
     o${c}n${c}e
-    t${c}wo${c} 
+    t${c}wo$c 
     three 
-    """.trimIndent()
+      """.trimIndent()
     )
   }
 
@@ -251,10 +258,10 @@ seven eigh${c}t
       injector.parser.parseKeys("2j"),
       """
                 o${c}n${c}e
-                ${c}tw${c}o          ${c} 
+                ${c}tw${c}o          $c 
                 three
                 four
-                """.trimIndent()
+      """.trimIndent()
     )
     assertState(
       """
@@ -262,20 +269,21 @@ seven eigh${c}t
     two           
     t${c}h${c}ree
     ${c}fo${c}u${c}r
-    """.trimIndent()
+      """.trimIndent()
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testLeftRightAndUpDownMovements() {
     typeTextInFile(
-      injector.parser.parseKeys("khj"), """
+      injector.parser.parseKeys("khj"),
+      """
      abcde
      ab${c}cde
      abc${c}de
      abcd${c}e
      
-     """.trimIndent()
+      """.trimIndent()
     )
     assertState(
       """
@@ -284,7 +292,7 @@ seven eigh${c}t
     ab${c}cde
     abc${c}de
     
-    """.trimIndent()
+      """.trimIndent()
     )
   }
 
@@ -292,8 +300,8 @@ seven eigh${c}t
   fun testMotionDownFirstNonSpaceAction() {
     typeTextInFile(
       injector.parser.parseKeys("+"),
-      """ ${c} on${c}e${c} two
-${c}   three${c} four
+      """ $c on${c}e$c two
+$c   three$c four
  five six
 """
     )
@@ -309,10 +317,10 @@ ${c}   three${c} four
   fun testMotionDownLess1FirstNonSpaceActionWithNoCount() {
     typeTextInFile(
       injector.parser.parseKeys("_"),
-      """     one${c} two
-three${c} four
-  five${c} six
- ${c}  seven eight"""
+      """     one$c two
+three$c four
+  five$c six
+ $c  seven eight"""
     )
     assertState(
       """     ${c}one two
@@ -325,7 +333,8 @@ ${c}three four
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testMotionDownLess1FirstNonSpaceActionWithCount() {
     typeTextInFile(
-      injector.parser.parseKeys("3_"), """x${c}y${c}z
+      injector.parser.parseKeys("3_"),
+      """x${c}y${c}z
   skip this ${c}line
    don't skip this line
     stop there
@@ -343,8 +352,9 @@ ${c}three four
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testMotionUpFirstNonSpaceAction() {
     typeTextInFile(
-      injector.parser.parseKeys("-"), """ one
-${c}  tw${c}o
+      injector.parser.parseKeys("-"),
+      """ one
+$c  tw${c}o
 """
     )
     assertState(
@@ -443,13 +453,13 @@ ${c}  tw${c}o
       """
                 <asdf1>qwer<asdf2>qwer<asdf3>qw${c}er</asdf3>qw${c}er</asdf2>qwer</asdf1>
                 <asdf1>qwer<asdf2>qw${c}er</asdf2>qwer</asdf1>
-                """.trimIndent()
+      """.trimIndent()
     )
     assertState(
       """
     <asdf1>qwer<asdf2><selection>qwer<asdf3>qwer</asdf3>qwer</selection></asdf2>qwer</asdf1>
     <asdf1>qwer<asdf2><selection>qwer</selection></asdf2>qwer</asdf1>
-    """.trimIndent()
+      """.trimIndent()
     )
   }
 
@@ -556,13 +566,13 @@ ${c}  tw${c}o
       """
                 <asdf1>qwer<asdf2>qwer<asdf3>qw${c}er</asdf3>qw${c}er</asdf2>qwer</asdf1>
                 <asdf1>qwer<asdf2>qw${c}er</asdf2>qwer</asdf1>
-                """.trimIndent()
+      """.trimIndent()
     )
     assertState(
       """
     <asdf1>qwer<selection><asdf2>qwer<asdf3>qwer</asdf3>qwer</asdf2></selection>qwer</asdf1>
     <asdf1>qwer<selection><asdf2>qwer</asdf2></selection>qwer</asdf1>
-    """.trimIndent()
+      """.trimIndent()
     )
   }
 
@@ -581,63 +591,63 @@ ${c}  tw${c}o
   // com.maddyhime.idea.vim.action.visual.text
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testMotionBigWordEndLeftAction() {
-    typeTextInFile(injector.parser.parseKeys("gE"), "a.asdf. a${c}sdf${c}.a a; as${c}df\n a${c}sdf")
-    assertState("a.asdf${c}. asdf.a a${c}; asd${c}f\n asdf")
+    typeTextInFile(injector.parser.parseKeys("gE"), "a.asdf. a${c}sdf$c.a a; as${c}df\n a${c}sdf")
+    assertState("a.asdf$c. asdf.a a$c; asd${c}f\n asdf")
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testMotionBigWordEndRightAction() {
     typeTextInFile(
       injector.parser.parseKeys("E"),
-      "a${c}.as${c}df. a${c}s${c}df.a ${c} a; as${c}df"
+      "a$c.as${c}df. a${c}s${c}df.a $c a; as${c}df"
     )
-    assertState("a.asdf${c}. asdf.${c}a  a${c}; asd${c}f")
+    assertState("a.asdf$c. asdf.${c}a  a$c; asd${c}f")
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testMotionBigWordLeftAction() {
-    typeTextInFile(injector.parser.parseKeys("B"), "a${c}.as${c}df. a${c}sdf.a ${c} a; as${c}df")
+    typeTextInFile(injector.parser.parseKeys("B"), "a$c.as${c}df. a${c}sdf.a $c a; as${c}df")
     assertState("${c}a.asdf. ${c}asdf.a  a; ${c}asdf")
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testMotionBigWordRightAction() {
-    typeTextInFile(injector.parser.parseKeys("W"), "a${c}.as${c}df. a${c}sdf.a ${c} a; as${c}df")
+    typeTextInFile(injector.parser.parseKeys("W"), "a$c.as${c}df. a${c}sdf.a $c a; as${c}df")
     assertState("a.asdf. ${c}asdf.a  ${c}a; asd${c}f")
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testMotionWordEndLeftAction() {
-    typeTextInFile(injector.parser.parseKeys("ge"), "a.asdf. a${c}sdf${c}.a a; as${c}df\n a${c}sdf")
-    assertState("a.asdf${c}. asd${c}f.a a${c}; asd${c}f\n asdf")
+    typeTextInFile(injector.parser.parseKeys("ge"), "a.asdf. a${c}sdf$c.a a; as${c}df\n a${c}sdf")
+    assertState("a.asdf$c. asd${c}f.a a$c; asd${c}f\n asdf")
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testMotionWordEndRightAction() {
     typeTextInFile(
       injector.parser.parseKeys("e"),
-      "a${c}.as${c}df. a${c}s${c}df.a ${c} a; as${c}df"
+      "a$c.as${c}df. a${c}s${c}df.a $c a; as${c}df"
     )
     assertState("a.asd${c}f. asd${c}f.a  ${c}a; asd${c}f")
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testMotionWordLeftAction() {
-    typeTextInFile(injector.parser.parseKeys("b"), "a${c}.as${c}df. a${c}sdf.a ${c} a; as${c}df")
+    typeTextInFile(injector.parser.parseKeys("b"), "a$c.as${c}df. a${c}sdf.a $c a; as${c}df")
     assertState("${c}a.${c}asdf. ${c}asdf.${c}a  a; ${c}asdf")
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testMotionWordRightAction() {
-    typeTextInFile(injector.parser.parseKeys("w"), "a${c}.as${c}df. a${c}sdf.a ${c} a; as${c}df")
-    assertState("a.${c}asdf${c}. asdf${c}.a  ${c}a; asd${c}f")
+    typeTextInFile(injector.parser.parseKeys("w"), "a$c.as${c}df. a${c}sdf.a $c a; as${c}df")
+    assertState("a.${c}asdf$c. asdf$c.a  ${c}a; asd${c}f")
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testMotionCamelEndLeftAction() {
     typeTextInFile(
       injector.parser.parseKeys("2]b"),
-      "ClassName.M${c}ethodN${c}ame(${c}Arg1Type arg1Na${c}me, Arg2Type arg2${c}Name) ${c}{"
+      "ClassName.M${c}ethodN${c}ame(${c}Arg1Type arg1Na${c}me, Arg2Type arg2${c}Name) $c{"
     )
     assertState(
       "Clas${c}sNam${c}e.Metho${c}dName(Arg1Type ar${c}g1Name, Arg2Type ar${c}g${c}2Name) {"
@@ -659,7 +669,7 @@ ${c}  tw${c}o
   fun testMotionCamelLeftAction() {
     typeTextInFile(
       injector.parser.parseKeys("2[b"),
-      "ClassName.M${c}ethodN${c}ame(${c}Arg1Type arg1Na${c}me, Arg2Type arg2${c}Name) ${c}{"
+      "ClassName.M${c}ethodN${c}ame(${c}Arg1Type arg1Na${c}me, Arg2Type arg2${c}Name) $c{"
     )
     assertState("Class${c}Name.${c}MethodName(Arg1Type arg${c}1Name, Arg2Type ${c}arg${c}2Name) {")
   }
@@ -682,8 +692,8 @@ ${c}  tw${c}o
     private static void firstMethod(int argument) {
         // Do som${c}ething...
     }
-    ${c}private static int x${c};    private static void secondMethod(String argument) {
-        // Do something.${c}..
+    ${c}private static int x$c;    private static void secondMethod(String argument) {
+        // Do something.$c..
     }
 }"""
     )
@@ -692,10 +702,10 @@ ${c}  tw${c}o
       """public class Foo {
     private static void firstMethod(int argument) {
         // Do something...
-    ${c}}
-    private static int x${c};    private static void secondMethod(String argument) {
+    $c}
+    private static int x$c;    private static void secondMethod(String argument) {
         // Do something...
-    ${c}}
+    $c}
 }"""
     )
   }
@@ -704,21 +714,21 @@ ${c}  tw${c}o
   fun testMotionMethodNextStartAction() {
     configureByJavaText(
       """public class Foo {
- ${c}   private static void firstMethod(int argument) {
+ $c   private static void firstMethod(int argument) {
         // Do som${c}ething...
     }
-    ${c}private static int x${c};    private static void secondMethod(String argument) {
-        // Do something.${c}..
+    ${c}private static int x$c;    private static void secondMethod(String argument) {
+        // Do something.$c..
     }
 }"""
     )
     typeText(injector.parser.parseKeys("]m"))
     assertState(
       """public class Foo {
-    private static void firstMethod(int argument) ${c}{
+    private static void firstMethod(int argument) $c{
         // Do something...
     }
-    ${c}private static int x;    private static void secondMethod(String argument) ${c}{
+    ${c}private static int x;    private static void secondMethod(String argument) $c{
         // Do something...
     }
 }"""
@@ -729,11 +739,11 @@ ${c}  tw${c}o
   fun testMotionMethodPreviousEndAction() {
     configureByJavaText(
       """public class Foo {
- ${c}   private static void firstMethod(int argument) {
+ $c   private static void firstMethod(int argument) {
         // Do som${c}ething...
     }
-    ${c}private static int x${c};    private static void secondMethod(String argument) {
-        // Do something.${c}..
+    ${c}private static int x$c;    private static void secondMethod(String argument) {
+        // Do something.$c..
     }
 }"""
     )
@@ -742,8 +752,8 @@ ${c}  tw${c}o
       """public class Foo {
     private static void firstMethod(int argument) {
         // Do something...
-    ${c}}
-    private static int x${c};    private static void secondMethod(String argument) {
+    $c}
+    private static int x$c;    private static void secondMethod(String argument) {
         // Do something...
     }
 }"""
@@ -754,21 +764,21 @@ ${c}  tw${c}o
   fun testMotionMethodPreviousStartAction() {
     configureByJavaText(
       """public class Foo {
- ${c}   private static void firstMethod(int argument) {
+ $c   private static void firstMethod(int argument) {
         // Do som${c}ething...
     }
-    ${c}private static int x${c};    private static void secondMethod(String argument) {
-        // Do something.${c}..
+    ${c}private static int x$c;    private static void secondMethod(String argument) {
+        // Do something.$c..
     }
 }"""
     )
     typeText(injector.parser.parseKeys("[m"))
     assertState(
-      """public class Foo ${c}{
-    private static void firstMethod(int argument) ${c}{
+      """public class Foo $c{
+    private static void firstMethod(int argument) $c{
         // Do something...
     }
-    ${c}private static int x;    private static void secondMethod(String argument) ${c}{
+    ${c}private static int x;    private static void secondMethod(String argument) $c{
         // Do something...
     }
 }"""
@@ -799,7 +809,8 @@ ${c}  tw${c}o
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testMotionSectionBackwardEndAction() {
     typeTextInFile(
-      injector.parser.parseKeys("[]"), """
+      injector.parser.parseKeys("[]"),
+      """
      no${c}t_a_brace
      {
      ${c}not_a_brace
@@ -808,103 +819,106 @@ ${c}  tw${c}o
      n${c}ot_a_brace
      }
      not_a_${c}brace
-     """.trimIndent()
+      """.trimIndent()
     )
     assertState(
       """
     ${c}not_a_brace
     {
     not_a_brace
-    ${c}}
+    $c}
     {
     not_a_brace
-    ${c}}
+    $c}
     not_a_brace
-    """.trimIndent()
+      """.trimIndent()
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testMotionSectionBackwardStartAction() {
     typeTextInFile(
-      injector.parser.parseKeys("[["), """
+      injector.parser.parseKeys("[["),
+      """
      n${c}ot_a_brace
      {
      not_a_${c}brace
-     ${c}}
+     $c}
      {
      not_a_b${c}race
-     ${c}}
+     $c}
      not_a_brace
-     """.trimIndent()
+      """.trimIndent()
     )
     assertState(
       """
     ${c}not_a_brace
-    ${c}{
+    $c{
     not_a_brace
     }
-    ${c}{
+    $c{
     not_a_brace
     }
     not_a_brace
-    """.trimIndent()
+      """.trimIndent()
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testMotionSectionForwardEndAction() {
     typeTextInFile(
-      injector.parser.parseKeys("]["), """
+      injector.parser.parseKeys("]["),
+      """
      n${c}ot_a_brace
      {
      n${c}ot_a_brace
-     ${c}}
+     $c}
      {
      not_${c}a_brace
      }
      not_a_brace
-     """.trimIndent()
+      """.trimIndent()
     )
     assertState(
       """
     not_a_brace
     {
     not_a_brace
-    ${c}}
+    $c}
     {
     not_a_brace
-    ${c}}
+    $c}
     not_a_brace
-    """.trimIndent()
+      """.trimIndent()
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testMotionSectionForwardStartAction() {
     typeTextInFile(
-      injector.parser.parseKeys("]]"), """
+      injector.parser.parseKeys("]]"),
+      """
      n${c}ot_a_brace
      {
      n${c}ot_a_brace
-     ${c}}
+     $c}
      {
      not_a_brace
      }
      not_a_brace
-     """.trimIndent()
+      """.trimIndent()
     )
     assertState(
       """
     not_a_brace
-    ${c}{
+    $c{
     not_a_brace
     }
-    ${c}{
+    $c{
     not_a_brace
     }
     not_a_brace
-    """.trimIndent()
+      """.trimIndent()
     )
   }
 
@@ -912,14 +926,14 @@ ${c}  tw${c}o
   fun testMotionSentenceNextEndAction() {
     typeTextInFile(
       injector.parser.parseKeys("g)"),
-      "a${c}sdf${c}. a${c}sdf. a${c}sdf.${c} asdf.${c} asdf."
+      "a${c}sdf$c. a${c}sdf. a${c}sdf.$c asdf.$c asdf."
     )
-    assertState("asdf${c}. asdf${c}. asdf${c}. asdf${c}. asdf${c}.")
+    assertState("asdf$c. asdf$c. asdf$c. asdf$c. asdf$c.")
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testMotionSentenceNextStartAction() {
-    typeTextInFile(injector.parser.parseKeys(")"), "a${c}sdf. ${c}asdf.${c} asdf. ${c}asdf. asdf.")
+    typeTextInFile(injector.parser.parseKeys(")"), "a${c}sdf. ${c}asdf.$c asdf. ${c}asdf. asdf.")
     assertState("asdf. ${c}asdf. ${c}asdf. asdf. ${c}asdf.")
   }
 
@@ -927,42 +941,42 @@ ${c}  tw${c}o
   fun testMotionSentencePreviousEndAction() {
     typeTextInFile(
       injector.parser.parseKeys("g("),
-      "asdf.${c} a${c}sdf${c}. as${c}df. asd${c}f. ${c}asdf."
+      "asdf.$c a${c}sdf$c. as${c}df. asd${c}f. ${c}asdf."
     )
-    assertState("asdf${c}. asdf${c}. asdf${c}. asdf${c}. asdf.")
+    assertState("asdf$c. asdf$c. asdf$c. asdf$c. asdf.")
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testMotionSentencePreviousStartAction() {
     typeTextInFile(
       injector.parser.parseKeys("("),
-      "asd${c}f. ${c}as${c}df. asdf${c}. asdf${c}. as${c}df."
+      "asd${c}f. ${c}as${c}df. asdf$c. asdf$c. as${c}df."
     )
     assertState("${c}asdf. ${c}asdf. ${c}asdf. ${c}asdf. ${c}asdf.")
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testMotionUnmatchedBraceCloseAction() {
-    typeTextInFile(injector.parser.parseKeys("]}"), "{{}${c} }${c} }${c} {}}${c}{}}")
-    assertState("{{} ${c}} ${c}} {}${c}}{${c}}}")
+    typeTextInFile(injector.parser.parseKeys("]}"), "{{}$c }$c }$c {}}$c{}}")
+    assertState("{{} $c} $c} {}$c}{$c}}")
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testMotionUnmatchedBraceOpenAction() {
-    typeTextInFile(injector.parser.parseKeys("[{"), "{${c} {{}${c} }{${c}}{${c}} ")
-    assertState("${c}{ ${c}{{} }${c}{}${c}{} ")
+    typeTextInFile(injector.parser.parseKeys("[{"), "{$c {{}$c }{$c}{$c} ")
+    assertState("$c{ $c{{} }$c{}$c{} ")
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testMotionUnmatchedParenCloseAction() {
-    typeTextInFile(injector.parser.parseKeys("])"), "(()${c} )${c} )${c} ())${c}())")
-    assertState("(() ${c}) ${c}) ()${c})(${c}))")
+    typeTextInFile(injector.parser.parseKeys("])"), "(()$c )$c )$c ())$c())")
+    assertState("(() $c) $c) ()$c)($c))")
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testMotionUnmatchedParenOpenAction() {
-    typeTextInFile(injector.parser.parseKeys("[("), "(${c} (()${c} )(${c})(${c}) ")
-    assertState("${c}( ${c}(() )${c}()${c}() ")
+    typeTextInFile(injector.parser.parseKeys("[("), "($c (()$c )($c)($c) ")
+    assertState("$c( $c(() )$c()$c() ")
   }
 
   // com.maddyhome.idea.vim.action.visual.visual
@@ -983,7 +997,8 @@ ${c}  tw${c}o
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testVisualToggleLineMode() {
     typeTextInFile(
-      injector.parser.parseKeys("V" + "2k"), """
+      injector.parser.parseKeys("V" + "2k"),
+      """
      one two
      three four
      fi${c}ve six
@@ -992,7 +1007,7 @@ ${c}  tw${c}o
      eleven twelve
      th${c}irteen fourteen
      
-     """.trimIndent()
+      """.trimIndent()
     )
     assertState(
       """
@@ -1004,19 +1019,20 @@ ${c}  tw${c}o
     eleven twelve
     thirteen fourteen
     </selection>
-    """.trimIndent()
+      """.trimIndent()
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testVisualModeMerging() {
     typeTextInFile(
-      injector.parser.parseKeys("V" + "j"), """
-     one${c} two
+      injector.parser.parseKeys("V" + "j"),
+      """
+     one$c two
      thr${c}ee four
      five six
      
-     """.trimIndent()
+      """.trimIndent()
     )
     assertState(
       """
@@ -1024,7 +1040,7 @@ ${c}  tw${c}o
     three four
     five six
     </selection>
-    """.trimIndent()
+      """.trimIndent()
     )
   }
 
@@ -1039,7 +1055,7 @@ ${c}  tw${c}o
                 seven eight
                 nine t${c}en
                 
-                """.trimIndent()
+      """.trimIndent()
     )
     assertState(
       """
@@ -1049,7 +1065,7 @@ ${c}  tw${c}o
     <selection>seven eight
     nine ten
     </selection>
-    """.trimIndent()
+      """.trimIndent()
     )
   }
 
@@ -1064,7 +1080,7 @@ ${c}  tw${c}o
                 seven eight
                 n${c}ine ten
                 
-                """.trimIndent()
+      """.trimIndent()
     )
     assertState(
       """
@@ -1074,7 +1090,7 @@ ${c}  tw${c}o
     s<selection>even eight
     ni</selection>ne ten
     
-    """.trimIndent()
+      """.trimIndent()
     )
   }
 
@@ -1086,20 +1102,21 @@ ${c}  tw${c}o
     <selection>abc</selection>
     <selection>def</selection>
     
-    """.trimIndent()
+      """.trimIndent()
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testVisualBlockDownMovementAfterShorterLineAction() {
     typeTextInFile(
-      injector.parser.parseKeys("<C-V>" + "kkjj"), """
+      injector.parser.parseKeys("<C-V>" + "kkjj"),
+      """
      one
      
      two three
      four fi${c}ve
      
-     """.trimIndent()
+      """.trimIndent()
     )
     assertState(
       """
@@ -1108,20 +1125,21 @@ ${c}  tw${c}o
     two three
     four fi<selection>${c}v</selection>e
     
-    """.trimIndent()
+      """.trimIndent()
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testVisualBlockDownMovementWithEmptyLineInMiddle() {
     typeTextInFile(
-      injector.parser.parseKeys("<C-V>" + "3k" + "j"), """
+      injector.parser.parseKeys("<C-V>" + "3k" + "j"),
+      """
      one
      
      two three
      four fi${c}ve
      
-     """.trimIndent()
+      """.trimIndent()
     )
     assertState(
       """
@@ -1130,21 +1148,22 @@ ${c}  tw${c}o
     <selection>two thre</selection>e
     <selection>four fiv</selection>e
     
-    """.trimIndent()
+      """.trimIndent()
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testVisualBlockDownMovementWithManyEmptyLinesInMiddle() {
     typeTextInFile(
-      injector.parser.parseKeys("<C-V>" + "4kjjj"), """
+      injector.parser.parseKeys("<C-V>" + "4kjjj"),
+      """
      one
      
      
      two three
      four fi${c}ve
      
-     """.trimIndent()
+      """.trimIndent()
     )
     assertState(
       """
@@ -1154,7 +1173,7 @@ ${c}  tw${c}o
     two thr<selection>e</selection>e
     four fi<selection>v</selection>e
     
-    """.trimIndent()
+      """.trimIndent()
     )
   }
 
@@ -1269,14 +1288,14 @@ y = true; // And this will not
 
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testChangeCaseToggleCharacterAction() {
-    typeTextInFile(injector.parser.parseKeys("5~"), "OnE t${c}Wo ${c}ThReE${c} fOuR fIvE\n")
-    assertState("OnE twO Th${c}rEe${c} FoUr${c} fIvE\n")
+    typeTextInFile(injector.parser.parseKeys("5~"), "OnE t${c}Wo ${c}ThReE$c fOuR fIvE\n")
+    assertState("OnE twO Th${c}rEe$c FoUr$c fIvE\n")
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testChangeCaseToggleMotionAction() {
-    typeTextInFile(injector.parser.parseKeys("g~e"), "${c}capitalize ${c}UNCAPITALIZE${c} ${c}sTaY\n")
-    assertState("${c}CAPITALIZE ${c}uncapitalize${c} ${c}sTaY\n")
+    typeTextInFile(injector.parser.parseKeys("g~e"), "${c}capitalize ${c}UNCAPITALIZE$c ${c}sTaY\n")
+    assertState("${c}CAPITALIZE ${c}uncapitalize$c ${c}sTaY\n")
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
@@ -1318,7 +1337,7 @@ y = true; // And this will not
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testChangeCharactersAction() {
     typeTextInFile(injector.parser.parseKeys("4s" + "<ESC>"), "on${c}e two ${c}th${c}ee four five\n")
-    assertState("o${c}no${c} r five\n")
+    assertState("o${c}no$c r five\n")
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
@@ -1332,7 +1351,7 @@ y = true; // And this will not
                 a${c}bcd${c}e
                 abcde
                 
-                """.trimIndent()
+      """.trimIndent()
     )
     assertState(
       """
@@ -1342,21 +1361,22 @@ y = true; // And this will not
     aab${c}c
     abcde
     
-    """.trimIndent()
+      """.trimIndent()
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testChangeLineAction() {
     typeTextInFile(
-      injector.parser.parseKeys("c2ca" + "<ESC>"), """
+      injector.parser.parseKeys("c2ca" + "<ESC>"),
+      """
      ab${c}cde
      abcde
      abcde
      abc${c}de
      abcde
      
-     """.trimIndent()
+      """.trimIndent()
     )
     assertState(
       """
@@ -1364,35 +1384,37 @@ y = true; // And this will not
     abcde
     ${c}a
     
-    """.trimIndent()
+      """.trimIndent()
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testOneCaretPositionAfterChangeLineAction() {
     typeTextInFile(
-      injector.parser.parseKeys("c2c" + "<ESC>"), """
+      injector.parser.parseKeys("c2c" + "<ESC>"),
+      """
      abcde
      ab${c}cde
      abcde
      abcde
      
-     """.trimIndent()
+      """.trimIndent()
     )
     assertState(
       """
     abcde
-    ${c}
+    $c
     abcde
     
-    """.trimIndent()
+      """.trimIndent()
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testCaretPositionAfterChangeLineAction() {
     typeTextInFile(
-      injector.parser.parseKeys("c2c" + "<ESC>"), """
+      injector.parser.parseKeys("c2c" + "<ESC>"),
+      """
      abcd${c}e
      abcde
      abcde
@@ -1402,17 +1424,17 @@ y = true; // And this will not
      ${c}abcde
      abcde
      
-     """.trimIndent()
+      """.trimIndent()
     )
     assertState(
       """
-    ${c}
+    $c
     abcde
-    ${c}
+    $c
     abcde
-    ${c}
+    $c
     
-    """.trimIndent()
+      """.trimIndent()
     )
   }
 
@@ -1452,13 +1474,13 @@ y = true; // And this will not
             ${c}qwe
             asd ${c}zxc
             qwe${c}asdzxc
-            """.trimIndent()
+    """.trimIndent()
     typeTextInFile(injector.parser.parseKeys("Rrty" + "<Esc>"), before)
     val after = """
             rt${c}y
             asd rt${c}y
             qwert${c}yzxc
-            """.trimIndent()
+    """.trimIndent()
     assertState(after)
   }
 
@@ -1479,7 +1501,7 @@ y = true; // And this will not
                 ghi${c}jk
                 ghijk
                 
-                """.trimIndent()
+      """.trimIndent()
     )
     assertState(
       """
@@ -1487,7 +1509,7 @@ y = true; // And this will not
     abcde
     abcd${c}e
     
-    """.trimIndent()
+      """.trimIndent()
     )
   }
 
@@ -1502,7 +1524,7 @@ y = true; // And this will not
                 ghi${c}jk
                 ghijk
                 
-                """.trimIndent()
+      """.trimIndent()
     )
     assertState(
       """
@@ -1510,7 +1532,7 @@ y = true; // And this will not
     abcde
     abcd${c}e
     
-    """.trimIndent()
+      """.trimIndent()
     )
   }
 
@@ -1518,12 +1540,13 @@ y = true; // And this will not
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testDeleteCharacterAction() {
     typeTextInFile(
-      injector.parser.parseKeys("<Del>"), """
+      injector.parser.parseKeys("<Del>"),
+      """
      a${c}bcde
      ${c}abcde
      abcd${c}e
      
-     """.trimIndent()
+      """.trimIndent()
     )
     assertState(
       """
@@ -1531,25 +1554,26 @@ y = true; // And this will not
     ${c}bcde
     abc${c}d
     
-    """.trimIndent()
+      """.trimIndent()
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testDeleteCharacterActionOrder() {
     typeTextInFile(injector.parser.parseKeys("<Del>"), "ab${c}c${c}d${c}e abcde\n")
-    assertState("ab${c} abcde\n")
+    assertState("ab$c abcde\n")
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testDeleteCharacterLeftAction() {
     typeTextInFile(
-      injector.parser.parseKeys("3X"), """
+      injector.parser.parseKeys("3X"),
+      """
      a${c}bcde
      ${c}abcde
      abcd${c}e
      
-     """.trimIndent()
+      """.trimIndent()
     )
     assertState(
       """
@@ -1557,7 +1581,7 @@ y = true; // And this will not
     ${c}abcde
     a${c}e
     
-    """.trimIndent()
+      """.trimIndent()
     )
   }
 
@@ -1570,12 +1594,13 @@ y = true; // And this will not
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testDeleteCharacterRightAction() {
     typeTextInFile(
-      injector.parser.parseKeys("3x"), """
+      injector.parser.parseKeys("3x"),
+      """
      a${c}bcde
      ${c}abcde
      abcd${c}e
      
-     """.trimIndent()
+      """.trimIndent()
     )
     assertState(
       """
@@ -1583,20 +1608,21 @@ y = true; // And this will not
     ${c}de
     abc${c}d
     
-    """.trimIndent()
+      """.trimIndent()
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testDeleteCharacterRightCaretMerging() {
     typeTextInFile(injector.parser.parseKeys("4x"), "o${c}ne ${c}two ${c}three four")
-    assertState("o${c} four")
+    assertState("o$c four")
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testDeleteEndOfLineAction() {
     typeTextInFile(
-      injector.parser.parseKeys("D"), """
+      injector.parser.parseKeys("D"),
+      """
      abcd${c}e
      abcde
      abc${c}de
@@ -1604,25 +1630,26 @@ y = true; // And this will not
      ab${c}cde
      ab${c}cd${c}e
      
-     """.trimIndent()
+      """.trimIndent()
     )
     assertState(
       """
     abc${c}d
     abcde
     ab${c}c
-    ${c}
+    $c
     a${c}b
     a${c}b
     
-    """.trimIndent()
+      """.trimIndent()
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testDeleteEndOfLineActionWithCount() {
     typeTextInFile(
-      injector.parser.parseKeys("3D"), """
+      injector.parser.parseKeys("3D"),
+      """
      ab${c}cde
      abcde
      abcde
@@ -1630,20 +1657,21 @@ y = true; // And this will not
      a${c}bcd${c}e
      abc${c}de
      
-     """.trimIndent()
+      """.trimIndent()
     )
     assertState(
       """
     ab
     abcd
-    """.trimIndent()
+      """.trimIndent()
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testDeleteJoinLinesAction() {
     typeTextInFile(
-      injector.parser.parseKeys("gJ"), """ab${c}cde
+      injector.parser.parseKeys("gJ"),
+      """ab${c}cde
 abcde
 ab${c}cde
 abcd${c}e
@@ -1656,20 +1684,21 @@ abc${c}de
       """
     abcde${c}abcde
     abcde${c}abcde${c}abcde
-    abcde${c}  abcde
+    abcde$c  abcde
     
-    """.trimIndent()
+      """.trimIndent()
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testDeleteJoinLinesSimpleAction() {
     typeTextInFile(
-      injector.parser.parseKeys("gJ"), """
+      injector.parser.parseKeys("gJ"),
+      """
      a${c}bcde
      abcde
      
-     """.trimIndent()
+      """.trimIndent()
     )
     assertState("abcde${c}abcde\n")
   }
@@ -1677,7 +1706,8 @@ abc${c}de
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testDeleteJoinLinesSpacesAction() {
     typeTextInFile(
-      injector.parser.parseKeys("J"), """ab${c}cde
+      injector.parser.parseKeys("J"),
+      """ab${c}cde
 abcde
 ab${c}cde
 abcd${c}e
@@ -1688,64 +1718,67 @@ abc${c}de
     )
     assertState(
       """
-    abcde${c} abcde
-    abcde${c} abcde${c} abcde
-    abcde${c} abcde
+    abcde$c abcde
+    abcde$c abcde$c abcde
+    abcde$c abcde
     
-    """.trimIndent()
+      """.trimIndent()
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testDeleteJoinVisualLinesAction() {
     typeTextInFile(
-      injector.parser.parseKeys("VkgJ"), """
+      injector.parser.parseKeys("VkgJ"),
+      """
      one
      tw${c}o
      three
      fo${c}ur
      
-     """.trimIndent()
+      """.trimIndent()
     )
     assertState(
       """
     one${c}two
     three${c}four
     
-    """.trimIndent()
+      """.trimIndent()
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testDeleteJoinVisualLinesSpacesAction() {
     typeTextInFile(
-      injector.parser.parseKeys("VkJ"), """
+      injector.parser.parseKeys("VkJ"),
+      """
      abcde
      abcd${c}e
      abcde
      ab${c}cde
      
-     """.trimIndent()
+      """.trimIndent()
     )
     assertState(
       """
-    abcde${c} abcde
-    abcde${c} abcde
+    abcde$c abcde
+    abcde$c abcde
     
-    """.trimIndent()
+      """.trimIndent()
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testDeleteVisualAction() {
     typeTextInFile(
-      injector.parser.parseKeys("vlj"), """
+      injector.parser.parseKeys("vlj"),
+      """
      abc${c}de
      ${c}abcde
      abc${c}de
      abcde
      
-     """.trimIndent()
+      """.trimIndent()
     )
     assertState(
       """
@@ -1754,7 +1787,7 @@ abc${c}de
                 a${c}b</selection>c<selection>de
                 abcd${c}e</selection>
                 
-                """.trimIndent()
+      """.trimIndent()
     )
     typeText(injector.parser.parseKeys("d"))
     assertState("abc${c}c\n")
@@ -1763,13 +1796,14 @@ abc${c}de
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testDeleteVisualActionWithMultipleCaretsLeft() {
     typeTextInFile(
-      injector.parser.parseKeys("v" + "fd" + "d"), """
+      injector.parser.parseKeys("v" + "fd" + "d"),
+      """
      a${c}bcde
      abcde
      ${c}abcde
      ab${c}cde
      
-     """.trimIndent()
+      """.trimIndent()
     )
     assertState(
       """
@@ -1778,23 +1812,24 @@ abc${c}de
     ${c}e
     ab${c}e
     
-    """.trimIndent()
+      """.trimIndent()
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testDeleteVisualLinesAction() {
     typeTextInFile(
-      injector.parser.parseKeys("Vjd"), """
+      injector.parser.parseKeys("Vjd"),
+      """
      abc${c}de
      abcde
      abcde
      a${c}bcde
      abcde
      
-     """.trimIndent()
+      """.trimIndent()
     )
-    assertState("${c}abcde\n${c}")
+    assertState("${c}abcde\n$c")
   }
 
   // com.maddyhome.idea.vim.action.change.insert
@@ -1819,18 +1854,19 @@ abc${c}de
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testInsertBeforeCursorAction() {
     typeTextInFile(
-      injector.parser.parseKeys("i" + "four" + "<ESC>"), """
-     one two three ${c} 
-     seven six five ${c} 
+      injector.parser.parseKeys("i" + "four" + "<ESC>"),
+      """
+     one two three $c 
+     seven six five $c 
      
-     """.trimIndent()
+      """.trimIndent()
     )
     assertState(
       """
     one two three fou${c}r 
     seven six five fou${c}r 
     
-    """.trimIndent()
+      """.trimIndent()
     )
   }
 
@@ -1839,12 +1875,12 @@ abc${c}de
     typeTextInFile(
       injector.parser.parseKeys("I" + "four " + "<ESC>"),
       """  three t${c}wo on${c}e
-${c} five six se${c}ven eight
+$c five six se${c}ven eight
 """
     )
     assertState(
-      """  four${c} three two one
- four${c} five six seven eight
+      """  four$c three two one
+ four$c five six seven eight
 """
     )
   }
@@ -1852,10 +1888,11 @@ ${c} five six se${c}ven eight
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testInsertCharacterAboveCursorAction() {
     typeTextInFile(
-      injector.parser.parseKeys("a" + "<C-Y>" + "<C-Y>" + "<C-Y>" + "<ESC>"), """ one two three four
-${c}  two three four
+      injector.parser.parseKeys("a" + "<C-Y>" + "<C-Y>" + "<C-Y>" + "<ESC>"),
+      """ one two three four
+$c  two three four
 four three two one
-four three two${c} 
+four three two$c 
 """
     )
     assertState(
@@ -1870,9 +1907,10 @@ four three two on${c}e
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testInsertCharacterBelowCursorAction() {
     typeTextInFile(
-      injector.parser.parseKeys("a" + "<C-E>" + "<C-E>" + "<C-E>" + "<ESC>"), """${c}  two three four
+      injector.parser.parseKeys("a" + "<C-E>" + "<C-E>" + "<C-E>" + "<ESC>"),
+      """$c  two three four
  one two three four
-four three two${c} 
+four three two$c 
 four three two one
 """
     )
@@ -1901,7 +1939,7 @@ four three two one
     ${c}three
     ${c}four
     
-    """.trimIndent()
+      """.trimIndent()
     )
   }
 
@@ -1910,15 +1948,15 @@ four three two one
     typeTextInFile(
       injector.parser.parseKeys("gI" + "four " + "<ESC>"),
       """  three t${c}wo on${c}e
-${c} five six se${c}ven eight
+$c five six se${c}ven eight
 """
     )
     assertState(
       """
-    four${c}   three two one
-    four${c}  five six seven eight
+    four$c   three two one
+    four$c  five six seven eight
     
-    """.trimIndent()
+      """.trimIndent()
     )
   }
 
@@ -1932,7 +1970,7 @@ ${c} five six se${c}ven eight
                 abcde
                 abc${c}de
                 
-                """.trimIndent()
+      """.trimIndent()
     )
     assertState(
       """
@@ -1944,7 +1982,7 @@ ${c} five six se${c}ven eight
     abcd${c}e
     abcde
     
-    """.trimIndent()
+      """.trimIndent()
     )
   }
 
@@ -1952,14 +1990,15 @@ ${c} five six se${c}ven eight
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testInsertNewLineAboveActionWithMultipleCaretsInLine() {
     typeTextInFile(
-      injector.parser.parseKeys("O" + "<ESC>"), """
+      injector.parser.parseKeys("O" + "<ESC>"),
+      """
      a${c}bcd${c}e
      abc${c}d${c}e
      
-     """.trimIndent()
+      """.trimIndent()
     )
     if (VimPlugin.getOptionService()
-        .isSet(OptionScope.GLOBAL, OptionConstants.experimentalapiName, OptionConstants.experimentalapiName)
+      .isSet(OptionScope.GLOBAL, OptionConstants.experimentalapiName, OptionConstants.experimentalapiName)
     ) {
       assertState("${c}\nabcde\n${c}\nabcde\n")
     } else {
@@ -1977,7 +2016,7 @@ ${c} five six se${c}ven eight
                 abcde
                 abc${c}de
                 
-                """.trimIndent()
+      """.trimIndent()
     )
     assertState(
       """
@@ -1989,7 +2028,7 @@ ${c} five six se${c}ven eight
     abcde
     abcd${c}e
     
-    """.trimIndent()
+      """.trimIndent()
     )
   }
 
@@ -2132,12 +2171,13 @@ abcde
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testMotionGoToLineFirst() {
     typeTextInFile(
-      injector.parser.parseKeys("i" + "<C-Home>"), """    sdfdsfa${c}dsf fg dsfg sd${c}fjgkfdgl jsdfnflgj sd
+      injector.parser.parseKeys("i" + "<C-Home>"),
+      """    sdfdsfa${c}dsf fg dsfg sd${c}fjgkfdgl jsdfnflgj sd
  dflgj dfdsfg
  dfsgj sdf${c}klgj"""
     )
     assertState(
-      """${c}    sdfdsfadsf fg dsfg sdfjgkfdgl jsdfnflgj sd
+      """$c    sdfdsfadsf fg dsfg sdfjgkfdgl jsdfnflgj sd
  dflgj dfdsfg
  dfsgj sdfklgj"""
     )
@@ -2146,7 +2186,8 @@ abcde
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testMotionGotoLineLastEnd() {
     typeTextInFile(
-      injector.parser.parseKeys("<C-End>"), """    sdfdsfa${c}dsf fg dsfg sd${c}fjgkfdgl jsdf
+      injector.parser.parseKeys("<C-End>"),
+      """    sdfdsfa${c}dsf fg dsfg sd${c}fjgkfdgl jsdf
 nflgj sd
  dflgj dfdsfg
  hdfsgj sdf${c}klgj
@@ -2157,14 +2198,15 @@ nflgj sd
 nflgj sd
  dflgj dfdsfg
  hdfsgj sdfklgj
-${c}"""
+$c"""
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testMotionGotoLineLastEndInsertMode() {
     typeTextInFile(
-      injector.parser.parseKeys("i" + "<C-End>"), """    sdfdsfa${c}dsf fg dsfg sd${c}fjgkfdgl jsdf
+      injector.parser.parseKeys("i" + "<C-End>"),
+      """    sdfdsfa${c}dsf fg dsfg sd${c}fjgkfdgl jsdf
 nflgj sd
  dflgj dfdsfg
  hdfsgj sdf${c}klgj
@@ -2175,7 +2217,7 @@ nflgj sd
 nflgj sd
  dflgj dfdsfg
  hdfsgj sdfklgj
-${c}"""
+$c"""
     )
   }
 
@@ -2204,19 +2246,20 @@ ${c}"""
       injector.parser.parseKeys("%"),
       "fdgkh${c}sjh thsth[ sd${c}k er{}gha re${c}ghrjae (ghoefgh kjfgh)sdgfh dgfh]"
     )
-    assertState("fdgkhsjh thsth[ sdk er{${c}}gha reghrjae (ghoefgh kjfgh${c})sdgfh dgfh${c}]")
+    assertState("fdgkhsjh thsth[ sdk er{$c}gha reghrjae (ghoefgh kjfgh$c)sdgfh dgfh$c]")
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testMotionGotoLineLastAction() {
     typeTextInFile(
-      injector.parser.parseKeys("G"), """
+      injector.parser.parseKeys("G"),
+      """
      dfgdfsg${c}gfdfgdfs dasgdfsk dfghsdfkj gh
-     lsdjf lsj${c} flk gjdlsadlsfj ${c}lksdgfj 
+     lsdjf lsj$c flk gjdlsadlsfj ${c}lksdgfj 
      dflgjdfsgk${c}d${c}flgjdfsklg
      
      
-     """.trimIndent()
+      """.trimIndent()
     )
     assertState(
       """
@@ -2224,21 +2267,22 @@ ${c}"""
     lsdjf lsj flk gjdlsadlsfj lksdgfj 
     dflgjdfsgkdflgjdfsklg
     
-    ${c}
-    """.trimIndent()
+    $c
+      """.trimIndent()
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testMotionGotoLineLastWithArgumentAction() {
     typeTextInFile(
-      injector.parser.parseKeys("1G"), """
+      injector.parser.parseKeys("1G"),
+      """
      dfgdfsg${c}gfdfgdfs dasgdfsk dfghsdfkj gh
-     lsdjf lsj${c} flk gjdlsadlsfj ${c}lksdgfj 
+     lsdjf lsj$c flk gjdlsadlsfj ${c}lksdgfj 
      dflgjdfsgk${c}d${c}flgjdfsklg
      
      
-     """.trimIndent()
+      """.trimIndent()
     )
     assertState(
       """
@@ -2247,7 +2291,7 @@ ${c}"""
     dflgjdfsgkdflgjdfsklg
     
     
-    """.trimIndent()
+      """.trimIndent()
     )
   }
 
@@ -2293,7 +2337,7 @@ rtyfg${c}hzxc"""
 
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testAutoIndentLines() {
-    val before = "class C {\n C${c}(int i) {\nmyI = i;\n}\n p${c}rivate int myI;\n}"
+    val before = "class C {\n C$c(int i) {\nmyI = i;\n}\n p${c}rivate int myI;\n}"
     configureByJavaText(before)
     typeText(injector.parser.parseKeys("=="))
     val after = "class C {\n    ${c}C(int i) {\nmyI = i;\n}\n    ${c}private int myI;\n}"
@@ -2348,7 +2392,7 @@ rtyfg${c}hzxc"""
             as${c}dfgh
             ${c}zxcvbn
             
-            """.trimIndent()
+    """.trimIndent()
     configureByText(before)
     injector.registerGroup.storeText('*', "zxcvbn\n", SelectionType.LINE_WISE)
     typeText(injector.parser.parseKeys("\"*P"))
@@ -2360,7 +2404,7 @@ rtyfg${c}hzxc"""
             ${c}zxcvbn
             zxcvbn
             
-            """.trimIndent()
+    """.trimIndent()
     assertState(after)
   }
 
@@ -2373,7 +2417,7 @@ rtyfg${c}hzxc"""
     asdfgh
     ${c}zxcvbn
     
-    """.trimIndent(),
+      """.trimIndent(),
       """
             ${c}zxcvbn
             ${c}zxcvbn
@@ -2382,7 +2426,8 @@ rtyfg${c}hzxc"""
             ${c}zxcvbn
             zxcvbn
             
-            """.trimIndent(), true
+      """.trimIndent(),
+      true
     )
     testPutOverlapLine(
       """
@@ -2390,7 +2435,7 @@ rtyfg${c}hzxc"""
     a${c}sd${c}fgh
     ${c}zxcvbn
     
-    """.trimIndent(),
+      """.trimIndent(),
       """
                 qwerty
                 ${c}zxcvbn
@@ -2399,7 +2444,8 @@ rtyfg${c}hzxc"""
                 ${c}zxcvbn
                 zxcvbn
                 
-                """.trimIndent(), true
+      """.trimIndent(),
+      true
     )
     testPutOverlapLine(
       """
@@ -2407,7 +2453,7 @@ rtyfg${c}hzxc"""
     asd${c}fgh
     ${c}zxcvb${c}n
     
-    """.trimIndent(),
+      """.trimIndent(),
       """
                 qwerty
                 ${c}zxcvbn
@@ -2416,7 +2462,8 @@ rtyfg${c}hzxc"""
                 ${c}zxcvbn
                 zxcvbn
                 
-                """.trimIndent(), true
+      """.trimIndent(),
+      true
     )
   }
 
@@ -2429,7 +2476,7 @@ rtyfg${c}hzxc"""
     asdfgh
     ${c}zxcvbn
     
-    """.trimIndent(),
+      """.trimIndent(),
       """
             qwerty
             ${c}zxcvbn
@@ -2438,7 +2485,8 @@ rtyfg${c}hzxc"""
             zxcvbn
             ${c}zxcvbn
             
-            """.trimIndent(), false
+      """.trimIndent(),
+      false
     )
     testPutOverlapLine(
       """
@@ -2446,7 +2494,7 @@ rtyfg${c}hzxc"""
     as${c}dfg${c}h
     ${c}zxcvbn
     
-    """.trimIndent(),
+      """.trimIndent(),
       """
                 qwerty
                 asdfgh
@@ -2455,7 +2503,8 @@ rtyfg${c}hzxc"""
                 zxcvbn
                 ${c}zxcvbn
                 
-                """.trimIndent(), false
+      """.trimIndent(),
+      false
     )
     testPutOverlapLine(
       """
@@ -2463,7 +2512,7 @@ rtyfg${c}hzxc"""
     asdfg${c}h
     ${c}zxcv${c}bn
     
-    """.trimIndent(),
+      """.trimIndent(),
       """
                 qwerty
                 asdfgh
@@ -2472,7 +2521,8 @@ rtyfg${c}hzxc"""
                 ${c}zxcvbn
                 ${c}zxcvbn
                 
-                """.trimIndent(), false
+      """.trimIndent(),
+      false
     )
   }
 
@@ -2490,7 +2540,7 @@ rtyfg${c}hzxc"""
             as${c}dfgh
             ${c}zxcvbn
             
-            """.trimIndent()
+    """.trimIndent()
     configureByText(before)
     injector.registerGroup.storeText('*', "zxcvbn", SelectionType.LINE_WISE)
     typeText(injector.parser.parseKeys("\"*p"))
@@ -2502,7 +2552,7 @@ rtyfg${c}hzxc"""
             zxcvbn
             ${c}zxcvbn
             
-            """.trimIndent()
+    """.trimIndent()
     assertState(after)
   }
 
@@ -2533,7 +2583,7 @@ rtyfg${c}hzxc"""
             ${c}asdfgh
             zxc${c}vbn
             
-            """.trimIndent()
+    """.trimIndent()
     configureByText(before)
     injector.registerGroup.storeText('*', "zxcvbn\n", SelectionType.LINE_WISE)
     typeText(injector.parser.parseKeys("\"*gP"))
@@ -2545,7 +2595,7 @@ rtyfg${c}hzxc"""
             zxcvbn
             ${c}zxcvbn
             
-            """.trimIndent()
+    """.trimIndent()
     assertState(after)
   }
 
@@ -2556,7 +2606,7 @@ rtyfg${c}hzxc"""
             ${c}asdfgh
             zxc${c}vbn
             
-            """.trimIndent()
+    """.trimIndent()
     configureByText(before)
     injector.registerGroup.storeText('*', "zxcvbn", SelectionType.LINE_WISE)
     typeText(injector.parser.parseKeys("\"*gp"))
@@ -2567,8 +2617,8 @@ rtyfg${c}hzxc"""
             zxcvbn
             ${c}zxcvbn
             zxcvbn
-            ${c}
-            """.trimIndent()
+            $c
+    """.trimIndent()
     assertState(after)
   }
 
@@ -2636,13 +2686,13 @@ rtyfg${c}hzxc"""
 
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testPutTextBeforeCursorBlockwise() {
-    val before = """ *${c} on${c}e
+    val before = """ *$c on${c}e
  * two
 """
     configureByText(before)
     injector.registerGroup.storeText('*', " *\n *\n", SelectionType.BLOCK_WISE)
     typeText(injector.parser.parseKeys("\"*p"))
-    val after = """ * ${c} *one${c} *
+    val after = """ * $c *one$c *
  *  *two *
 """
     assertState(after)
@@ -2650,13 +2700,13 @@ rtyfg${c}hzxc"""
 
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   fun testPutTextAfterCursorBlockwise() {
-    val before = """ *${c} on${c}e
+    val before = """ *$c on${c}e
  * two
 """
     configureByText(before)
     injector.registerGroup.storeText('*', " *\n \n", SelectionType.BLOCK_WISE)
     typeText(injector.parser.parseKeys("\"*P"))
-    val after = """ *${c} * on${c} *e
+    val after = """ *$c * on$c *e
  *   tw  o
 """
     assertState(after)
@@ -2714,7 +2764,7 @@ rtyfg${c}hzxc"""
             zxc
             vbn
             
-            """.trimIndent()
+    """.trimIndent()
     configureByText(before)
     typeText(injector.parser.parseKeys("yj"))
     val lastRegister = VimPlugin.getRegister().lastRegister
@@ -2734,7 +2784,7 @@ rtyfg${c}hzxc"""
             zxc
             vbn
             
-            """.trimIndent()
+    """.trimIndent()
     assertState(after)
   }
 
@@ -2748,7 +2798,7 @@ rtyfg${c}hzxc"""
             fgh
             vbn
             
-            """.trimIndent()
+    """.trimIndent()
     configureByText(before)
     typeText(injector.parser.parseKeys("2yy"))
     val lastRegister = VimPlugin.getRegister().lastRegister
@@ -2768,7 +2818,7 @@ rtyfg${c}hzxc"""
             fgh
             vbn
             
-            """.trimIndent()
+    """.trimIndent()
     assertState(after)
   }
 
@@ -2782,7 +2832,7 @@ rtyfg${c}hzxc"""
             fgh
             vbn
             
-            """.trimIndent()
+    """.trimIndent()
     configureByText(before)
     typeText(injector.parser.parseKeys("cwblabla<Esc>p"))
     val after = """
@@ -2793,7 +2843,7 @@ rtyfg${c}hzxc"""
             fgh
             vbn
             
-            """.trimIndent()
+    """.trimIndent()
     assertState(after)
   }
 }
