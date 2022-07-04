@@ -15,29 +15,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.maddyhome.idea.vim.helper
 
-package com.maddyhome.idea.vim.helper;
-
-import javax.swing.*;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
+import com.maddyhome.idea.vim.api.injector
+import java.util.*
+import java.util.stream.Collectors
+import javax.swing.KeyStroke
 
 /**
  * COMPATIBILITY-LAYER: Created a helper class
  */
-public class StringHelper {
-  public static List<KeyStroke> parseKeys(String string) {
-    return injector.getParser().parseKeys(string);
+object StringHelper {
+  @JvmStatic
+  fun parseKeys(string: String): List<KeyStroke> {
+    return injector.parser.parseKeys(string)
   }
 
-  public static List<KeyStroke> parseKeys(String... string) {
-    return Arrays.stream(string).flatMap(o -> injector.getParser().parseKeys(o).stream()).collect(Collectors.toList());
+  @JvmStatic
+  fun parseKeys(vararg string: String): List<KeyStroke> {
+    return Arrays.stream(string).flatMap { o: String -> injector.parser.parseKeys(o).stream() }
+      .collect(Collectors.toList())
   }
 
-  public static boolean isCloseKeyStroke(KeyStroke stroke) {
-    return StringAndKeysKt.isCloseKeyStroke(stroke);
+  @JvmStatic
+  fun isCloseKeyStroke(stroke: KeyStroke): Boolean {
+    return stroke.isCloseKeyStroke()
   }
 }
