@@ -8,7 +8,7 @@ import com.maddyhome.idea.vim.api.stubs.VimProcessGroupStub
 import com.maddyhome.idea.vim.common.VimMachine
 import com.maddyhome.idea.vim.common.VimMachineBase
 import com.maddyhome.idea.vim.diagnostic.vimLogger
-import com.maddyhome.idea.vim.options.OptionService
+import com.maddyhome.idea.vim.vimscript.services.OptionService
 import com.maddyhome.idea.vim.register.VimRegisterGroup
 import com.maddyhome.idea.vim.register.VimRegisterGroupBase
 import com.maddyhome.idea.vim.vimscript.services.VimVariableService

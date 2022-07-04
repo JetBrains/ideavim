@@ -8,7 +8,6 @@ import com.maddyhome.idea.vim.options.Option
 import com.maddyhome.idea.vim.options.OptionChangeListener
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.options.OptionService
 import com.maddyhome.idea.vim.options.StringOption
 import com.maddyhome.idea.vim.options.helpers.GuiCursorOptionHelper
 import com.maddyhome.idea.vim.options.helpers.KeywordOptionHelper
@@ -16,6 +15,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.datatypes.parseNumber
+import com.maddyhome.idea.vim.vimscript.services.OptionService
 
 abstract class VimOptionServiceBase : OptionService {
   private val localOptionsKey = Key<MutableMap<String, VimDataType>>("localOptions")
@@ -251,6 +251,14 @@ abstract class VimOptionServiceBase : OptionService {
       throw ExException("E474: Invalid argument: $token")
     }
     setOptionValue(scope, optionName, VimInt.ONE, token)
+  }
+
+  override fun setOption(scope: OptionService.OptionScope, optionName: String, token: String) {
+    val newScope = when (scope) {
+      is OptionService.OptionScope.GLOBAL -> OptionScope.GLOBAL
+      is OptionService.OptionScope.LOCAL -> OptionScope.LOCAL(scope.editor)
+    }
+    this.setOption(newScope, optionName, token)
   }
 
   /**

@@ -32,7 +32,7 @@
                         serviceInterface="com.maddyhome.idea.vim.api.VimStatistics"/>
 
     <applicationService serviceImplementation="com.maddyhome.idea.vim.vimscript.services.IjVimOptionService"
-                        serviceInterface="com.maddyhome.idea.vim.options.OptionService"/>
+                        serviceInterface="com.maddyhome.idea.vim.vimscript.services.OptionService"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.IjVimStorageService"
                         serviceInterface="com.maddyhome.idea.vim.api.VimStorageService"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.IjVimSystemInfoService"

@@ -16,11 +16,17 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.options
+package com.maddyhome.idea.vim.vimscript.services
 
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.options.Option
+import com.maddyhome.idea.vim.options.OptionChangeListener
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 
+/**
+ * COMPATIBILITY-LAYER: Moved to a different package
+ */
 interface OptionService {
 
   /**
@@ -30,7 +36,7 @@ interface OptionService {
    * @param token used in exception messages
    * @throws ExException("E518: Unknown option: $token")
    */
-  fun getOptionValue(scope: OptionScope, optionName: String, token: String = optionName): VimDataType
+  fun getOptionValue(scope: com.maddyhome.idea.vim.options.OptionScope, optionName: String, token: String = optionName): VimDataType
 
   /**
    * Sets option value.
@@ -40,7 +46,7 @@ interface OptionService {
    * @param token used in exception messages
    * @throws ExException("E518: Unknown option: $token")
    */
-  fun setOptionValue(scope: OptionScope, optionName: String, value: VimDataType, token: String = optionName)
+  fun setOptionValue(scope: com.maddyhome.idea.vim.options.OptionScope, optionName: String, value: VimDataType, token: String = optionName)
 
   /**
    * Checks if the [value] is contained in string option.
@@ -50,7 +56,7 @@ interface OptionService {
    * @param optionName option name or alias
    * @param value option value
    */
-  fun contains(scope: OptionScope, optionName: String, value: String): Boolean
+  fun contains(scope: com.maddyhome.idea.vim.options.OptionScope, optionName: String, value: String): Boolean
 
   /**
    * Splits a string option into flags
@@ -61,7 +67,7 @@ interface OptionService {
    * @param scope global/local option scope
    * @param optionName option name or alias
    */
-  fun getValues(scope: OptionScope, optionName: String): List<String>?
+  fun getValues(scope: com.maddyhome.idea.vim.options.OptionScope, optionName: String): List<String>?
 
   /**
    * Same as [setOptionValue], but automatically casts [value] to the required [VimDataType]
@@ -72,7 +78,7 @@ interface OptionService {
    * @throws ExException("E518: Unknown option: $token") in case the option is not found
    * @throws ExException("E474: Invalid argument: $token") in case the cast to VimDataType is impossible
    */
-  fun setOptionValue(scope: OptionScope, optionName: String, value: String, token: String = optionName)
+  fun setOptionValue(scope: com.maddyhome.idea.vim.options.OptionScope, optionName: String, value: String, token: String = optionName)
 
   /**
    * Same as `set {option}+={value}` in Vim documentation.
@@ -85,7 +91,7 @@ interface OptionService {
    * @throws ExException("E474: Invalid argument: $token") in case the method was called for the [StringOption] and the argument is invalid (does not satisfy the option bounded values)
    * @throws ExException("E521: Number required after =: $token") in case the cast to VimInt is impossible
    */
-  fun appendValue(scope: OptionScope, optionName: String, value: String, token: String = optionName)
+  fun appendValue(scope: com.maddyhome.idea.vim.options.OptionScope, optionName: String, value: String, token: String = optionName)
 
   /**
    * Same as `set {option}^={value}` in Vim documentation.
@@ -98,7 +104,7 @@ interface OptionService {
    * @throws ExException("E474: Invalid argument: $token") in case the method was called for the [StringOption] and the argument is invalid (does not satisfy the option bounded values)
    * @throws ExException("E521: Number required after =: $token") in case the cast to VimInt is impossible
    */
-  fun prependValue(scope: OptionScope, optionName: String, value: String, token: String = optionName)
+  fun prependValue(scope: com.maddyhome.idea.vim.options.OptionScope, optionName: String, value: String, token: String = optionName)
 
   /**
    * Same as `set {option}-={value}` in Vim documentation.
@@ -111,7 +117,7 @@ interface OptionService {
    * @throws ExException("E474: Invalid argument: $token") in case the method was called for the [StringOption] and the argument is invalid (does not satisfy the option bounded values)
    * @throws ExException("E521: Number required after =: $token") in case the cast to VimInt is impossible
    */
-  fun removeValue(scope: OptionScope, optionName: String, value: String, token: String = optionName)
+  fun removeValue(scope: com.maddyhome.idea.vim.options.OptionScope, optionName: String, value: String, token: String = optionName)
 
   /**
    * Checks if the toggle option on.
@@ -122,7 +128,7 @@ interface OptionService {
    * @param token used in exception messages
    * @throws ExException("E518: Unknown option: $token") in case the option is not found
    */
-  fun isSet(scope: OptionScope, optionName: String, token: String = optionName): Boolean
+  fun isSet(scope: com.maddyhome.idea.vim.options.OptionScope, optionName: String, token: String = optionName): Boolean
 
   /**
    * Checks if the option's value set to default.
@@ -132,7 +138,7 @@ interface OptionService {
    * @param token used in exception messages
    * @throws ExException("E518: Unknown option: $token") in case the option is not found
    */
-  fun isDefault(scope: OptionScope, optionName: String, token: String = optionName): Boolean
+  fun isDefault(scope: com.maddyhome.idea.vim.options.OptionScope, optionName: String, token: String = optionName): Boolean
 
   /**
    * Resets option's value to default.
@@ -142,7 +148,7 @@ interface OptionService {
    * @param token used in exception messages
    * @throws ExException("E518: Unknown option: $token") in case the option is not found
    */
-  fun resetDefault(scope: OptionScope, optionName: String, token: String = optionName)
+  fun resetDefault(scope: com.maddyhome.idea.vim.options.OptionScope, optionName: String, token: String = optionName)
 
   /**
    * Resets all options back to default values.
@@ -163,6 +169,11 @@ interface OptionService {
    * @throws ExException("E518: Unknown option: $token") in case the option is not found
    * @throws ExException("E474: Invalid argument: $token") in case the option is not a [ToggleOption]
    */
+  fun setOption(scope: com.maddyhome.idea.vim.options.OptionScope, optionName: String, token: String = optionName)
+
+  /**
+   * COMPATIBILITY-LAYER: New method added
+   */
   fun setOption(scope: OptionScope, optionName: String, token: String = optionName)
 
   /**
@@ -173,7 +184,7 @@ interface OptionService {
    * @throws ExException("E518: Unknown option: $token") in case the option is not found
    * @throws ExException("E474: Invalid argument: $token") in case the option is not a [ToggleOption]
    */
-  fun unsetOption(scope: OptionScope, optionName: String, token: String = optionName)
+  fun unsetOption(scope: com.maddyhome.idea.vim.options.OptionScope, optionName: String, token: String = optionName)
 
   /**
    * Inverts boolean option value true -> false / false -> true.
@@ -183,7 +194,7 @@ interface OptionService {
    * @throws ExException("E518: Unknown option: $token") in case the option is not found
    * @throws ExException("E474: Invalid argument: $token") in case the option is not a [ToggleOption]
    */
-  fun toggleOption(scope: OptionScope, optionName: String, token: String = optionName)
+  fun toggleOption(scope: com.maddyhome.idea.vim.options.OptionScope, optionName: String, token: String = optionName)
 
   /**
    * @return list of all option names
@@ -221,4 +232,12 @@ interface OptionService {
    * @param listener option listener
    */
   fun removeListener(optionName: String, listener: OptionChangeListener<VimDataType>)
+
+  /**
+   * COMPATIBILITY-LAYER: Added this class
+   */
+  sealed class OptionScope {
+    object GLOBAL : OptionScope()
+    class LOCAL(val editor: VimEditor) : OptionScope()
+  }
 }

@@ -9,7 +9,7 @@ import com.maddyhome.idea.vim.helper.VimCommandLineHelper
 import com.maddyhome.idea.vim.history.VimHistory
 import com.maddyhome.idea.vim.macro.VimMacro
 import com.maddyhome.idea.vim.mark.VimMarkGroup
-import com.maddyhome.idea.vim.options.OptionService
+import com.maddyhome.idea.vim.vimscript.services.OptionService
 import com.maddyhome.idea.vim.put.VimPut
 import com.maddyhome.idea.vim.register.VimRegisterGroup
 import com.maddyhome.idea.vim.undo.VimUndoRedo
