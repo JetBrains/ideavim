@@ -36,4 +36,8 @@ public class StringHelper {
   public static List<KeyStroke> parseKeys(String... string) {
     return Arrays.stream(string).flatMap(o -> injector.getParser().parseKeys(o).stream()).collect(Collectors.toList());
   }
+
+  public static boolean isCloseKeyStroke(KeyStroke stroke) {
+    return StringAndKeysKt.isCloseKeyStroke(stroke);
+  }
 }
