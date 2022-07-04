@@ -33,7 +33,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
 
-internal class VimVariableServiceImpl : VimVariableServiceBase() {
+class VariableService : VimVariableServiceBase() {
   override fun storeVariable(variable: Variable, value: VimDataType, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext) {
     super.storeVariable(variable, value, editor, context, vimContext)
 

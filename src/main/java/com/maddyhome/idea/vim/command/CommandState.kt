@@ -30,6 +30,9 @@ class CommandState(private val machine: VimStateMachine) {
   val isOperatorPending: Boolean
     get() = machine.isOperatorPending
 
+  val mode: CommandState.Mode
+    get() = machine.mode.ij
+
   enum class Mode {
     // Basic modes
     COMMAND, VISUAL, SELECT, INSERT, CMD_LINE, /*EX*/

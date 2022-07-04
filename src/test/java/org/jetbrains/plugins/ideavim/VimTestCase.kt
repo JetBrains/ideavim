@@ -77,7 +77,7 @@ import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.parser.errors.IdeavimErrorListener
-import com.maddyhome.idea.vim.vimscript.services.VimVariableServiceImpl
+import com.maddyhome.idea.vim.vimscript.services.VariableService
 import org.assertj.core.api.Assertions
 import org.junit.Assert
 import java.awt.event.KeyEvent
@@ -137,7 +137,7 @@ abstract class VimTestCase : UsefulTestCase() {
     }
     SelectionVimListenerSuppressor.lock().use { myFixture.tearDown() }
     ExEntryPanel.getInstance().deactivate(false)
-    (VimPlugin.getVariableService() as VimVariableServiceImpl).clear()
+    VimPlugin.getVariableService().clear()
     VimFuncref.lambdaCounter = 0
     VimFuncref.anonymousCounter = 0
     IdeavimErrorListener.testLogger.clear()
