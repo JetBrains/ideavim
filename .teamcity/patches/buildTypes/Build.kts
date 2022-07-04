@@ -16,6 +16,10 @@ create(DslContext.projectId, BuildType({
     id("Build")
     name = "IdeaVim compatibility with external plugins"
 
+    vcs {
+        root(DslContext.settingsRoot)
+    }
+
     steps {
         script {
             scriptContent = "go run test.go"
