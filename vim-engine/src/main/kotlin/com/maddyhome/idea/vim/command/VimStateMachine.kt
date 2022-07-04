@@ -20,7 +20,7 @@ package com.maddyhome.idea.vim.command
 import com.maddyhome.idea.vim.api.VimActionsInitiator
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.common.CommandPartNode
+import com.maddyhome.idea.vim.key.CommandPartNode
 import com.maddyhome.idea.vim.common.DigraphResult
 import com.maddyhome.idea.vim.common.DigraphSequence
 import com.maddyhome.idea.vim.diagnostic.debug

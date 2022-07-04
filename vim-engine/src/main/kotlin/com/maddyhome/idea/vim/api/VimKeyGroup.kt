@@ -17,7 +17,7 @@
  */
 package com.maddyhome.idea.vim.api
 
-import com.maddyhome.idea.vim.common.CommandPartNode
+import com.maddyhome.idea.vim.key.CommandPartNode
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.key.KeyMapping

@@ -23,8 +23,8 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.VimStateMachine
-import com.maddyhome.idea.vim.common.CommandNode
-import com.maddyhome.idea.vim.common.CommandPartNode
+import com.maddyhome.idea.vim.key.CommandNode
+import com.maddyhome.idea.vim.key.CommandPartNode
 import com.maddyhome.idea.vim.handler.ActionBeanClass
 import junit.framework.TestCase
 import javax.swing.KeyStroke

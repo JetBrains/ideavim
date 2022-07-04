@@ -44,11 +44,11 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.CommandAlias
 import com.maddyhome.idea.vim.common.CommandAliasHandler
-import com.maddyhome.idea.vim.common.CommandNode
-import com.maddyhome.idea.vim.common.CommandPartNode
-import com.maddyhome.idea.vim.common.Node
-import com.maddyhome.idea.vim.common.RootNode
-import com.maddyhome.idea.vim.common.addLeafs
+import com.maddyhome.idea.vim.key.CommandNode
+import com.maddyhome.idea.vim.key.CommandPartNode
+import com.maddyhome.idea.vim.key.Node
+import com.maddyhome.idea.vim.key.RootNode
+import com.maddyhome.idea.vim.key.addLeafs
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.group.KeyGroup

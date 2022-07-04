@@ -19,8 +19,6 @@
 package com.maddyhome.idea.vim.key
 
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.common.Node
-import com.maddyhome.idea.vim.common.addLeafs
 
 fun <T> Node<T>.addLeafs(keys: String, actionHolder: T) {
   addLeafs(injector.parser.parseKeys(keys), actionHolder)

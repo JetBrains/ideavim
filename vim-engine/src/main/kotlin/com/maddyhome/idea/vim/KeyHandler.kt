@@ -29,12 +29,12 @@ import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.command.VimStateMachine.Companion.getInstance
 import com.maddyhome.idea.vim.command.MappingState
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.common.CommandNode
-import com.maddyhome.idea.vim.common.CommandPartNode
+import com.maddyhome.idea.vim.key.CommandNode
+import com.maddyhome.idea.vim.key.CommandPartNode
 import com.maddyhome.idea.vim.common.CurrentCommandState
 import com.maddyhome.idea.vim.common.DigraphResult
 import com.maddyhome.idea.vim.command.MappingMode
-import com.maddyhome.idea.vim.common.Node
+import com.maddyhome.idea.vim.key.Node
 import com.maddyhome.idea.vim.common.argumentCaptured
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.diagnostic.debug
