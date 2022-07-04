@@ -23,7 +23,11 @@ create(DslContext.projectId, BuildType({
     steps {
         script {
             name = "Check"
-            scriptContent = "java -jar verifier/verifier-cli-dev-all.jar check-plugin '${'$'}org.jetbrains.IdeaVim-EasyMotion' [latest-IU] -team-city"
+            scriptContent = """
+                java -jar verifier/verifier-cli-dev-all.jar check-plugin '${'$'}org.jetbrains.IdeaVim-EasyMotion' [latest-IU] -team-city
+                java -jar verifier/verifier-cli-dev-all.jar check-plugin '${'$'}io.github.mishkun.ideavimsneak' [latest-IU] -team-city
+                java -jar verifier/verifier-cli-dev-all.jar check-plugin '${'$'}eu.theblob42.idea.whichkey' [latest-IU] -team-city
+            """.trimIndent()
         }
     }
 
