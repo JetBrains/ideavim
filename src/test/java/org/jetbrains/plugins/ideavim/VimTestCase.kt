@@ -34,7 +34,6 @@ import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.editor.VisualPosition
 import com.intellij.openapi.editor.colors.EditorColors
 import com.intellij.openapi.editor.ex.EditorEx
-import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.fileTypes.PlainTextFileType
@@ -82,6 +81,7 @@ import org.junit.Assert
 import java.awt.event.KeyEvent
 import java.util.*
 import javax.swing.KeyStroke
+import kotlin.math.roundToInt
 
 /**
  * @author vlan
@@ -169,7 +169,9 @@ abstract class VimTestCase : UsefulTestCase() {
     get() = 35
 
   protected fun setEditorVisibleSize(width: Int, height: Int) {
-    EditorTestUtil.setEditorVisibleSize(myFixture.editor, width, height)
+    val w = (width * EditorHelper.getPlainSpaceWidthFloat(myFixture.editor)).roundToInt()
+    val h = height * myFixture.editor.lineHeight
+    EditorTestUtil.setEditorVisibleSizeInPixels(myFixture.editor, w, h)
   }
 
   protected fun setEditorVirtualSpace() {
@@ -609,7 +611,7 @@ abstract class VimTestCase : UsefulTestCase() {
   // per platform (e.g. Windows is 7, Mac is 8) so we can't guarantee correct positioning for tests if we use hard coded
   // pixel widths
   protected fun addInlay(offset: Int, relatesToPrecedingText: Boolean, widthInColumns: Int): Inlay<*> {
-    val widthInPixels = EditorUtil.getPlainSpaceWidth(myFixture.editor) * widthInColumns
+    val widthInPixels = (EditorHelper.getPlainSpaceWidthFloat(myFixture.editor) * widthInColumns).roundToInt()
     return EditorTestUtil.addInlay(myFixture.editor, offset, relatesToPrecedingText, widthInPixels)
   }
 
@@ -619,7 +621,7 @@ abstract class VimTestCase : UsefulTestCase() {
   // float if necessary. We'd still be working scaled to the line height, so fractional values should still work.
   protected fun addBlockInlay(offset: Int, showAbove: Boolean, heightInRows: Int): Inlay<*> {
     val widthInColumns = 10 // Arbitrary width. We don't care.
-    val widthInPixels = EditorUtil.getPlainSpaceWidth(myFixture.editor) * widthInColumns
+    val widthInPixels = (EditorHelper.getPlainSpaceWidthFloat(myFixture.editor) * widthInColumns).roundToInt()
     val heightInPixels = myFixture.editor.lineHeight * heightInRows
     return EditorTestUtil.addBlockInlay(myFixture.editor, offset, false, showAbove, widthInPixels, heightInPixels)
   }
