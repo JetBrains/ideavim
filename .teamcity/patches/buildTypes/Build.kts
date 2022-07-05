@@ -38,6 +38,9 @@ create(DslContext.projectId, BuildType({
 
     triggers {
         schedule {
+            schedulingPolicy = daily {
+                hour = 4
+            }
             branchFilter = ""
             triggerBuild = always()
             withPendingChangesOnly = false
