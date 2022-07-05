@@ -60,7 +60,8 @@ import java.util.*
   /**
    * COMPATIBILITY-LAYER: Method added
    */
-  open val value: Boolean
+  @Suppress("PLATFORM_CLASS_MAPPED_TO_KOTLIN")
+  open val value: java.lang.Boolean
     get() = TODO()
 
   // todo 1.9 should return Result with exceptions
