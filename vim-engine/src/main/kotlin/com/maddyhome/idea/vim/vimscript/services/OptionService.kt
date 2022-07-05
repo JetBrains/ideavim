@@ -174,7 +174,7 @@ interface OptionService {
   /**
    * COMPATIBILITY-LAYER: New method added
    */
-  fun setOption(scope: OptionScope, optionName: String, token: String = optionName)
+  fun setOption(scope: Scope, optionName: String, token: String = optionName)
 
   /**
    * Unsets the option (false).
@@ -236,8 +236,8 @@ interface OptionService {
   /**
    * COMPATIBILITY-LAYER: Added this class
    */
-  sealed class OptionScope {
-    object GLOBAL : OptionScope()
-    class LOCAL(val editor: VimEditor) : OptionScope()
+  sealed class Scope {
+    object GLOBAL : Scope()
+    class LOCAL(val editor: VimEditor) : Scope()
   }
 }

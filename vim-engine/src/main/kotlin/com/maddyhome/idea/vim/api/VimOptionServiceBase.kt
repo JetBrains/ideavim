@@ -253,10 +253,10 @@ abstract class VimOptionServiceBase : OptionService {
     setOptionValue(scope, optionName, VimInt.ONE, token)
   }
 
-  override fun setOption(scope: OptionService.OptionScope, optionName: String, token: String) {
+  override fun setOption(scope: OptionService.Scope, optionName: String, token: String) {
     val newScope = when (scope) {
-      is OptionService.OptionScope.GLOBAL -> OptionScope.GLOBAL
-      is OptionService.OptionScope.LOCAL -> OptionScope.LOCAL(scope.editor)
+      is OptionService.Scope.GLOBAL -> OptionScope.GLOBAL
+      is OptionService.Scope.LOCAL -> OptionScope.LOCAL(scope.editor)
     }
     this.setOption(newScope, optionName, token)
   }
