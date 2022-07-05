@@ -33,6 +33,12 @@ class CommandState(private val machine: VimStateMachine) {
   val mode: CommandState.Mode
     get() = machine.mode.ij
 
+  val commandBuilder: CommandBuilder
+    get() = machine.commandBuilder
+
+  val mappingState: MappingState
+    get() = machine.mappingState
+
   enum class Mode {
     // Basic modes
     COMMAND, VISUAL, SELECT, INSERT, CMD_LINE, /*EX*/

@@ -19,10 +19,12 @@
 package com.maddyhome.idea.vim.option
 
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.options.NumberOption
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionConstants.Companion.ignorecaseName
 import com.maddyhome.idea.vim.options.OptionConstants.Companion.smartcaseName
 import com.maddyhome.idea.vim.options.OptionConstants.Companion.timeoutName
+import com.maddyhome.idea.vim.options.OptionConstants.Companion.timeoutlenName
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.options.helpers.KeywordOptionHelper
 import com.maddyhome.idea.vim.vimscript.services.IjVimOptionService
@@ -37,6 +39,8 @@ object OptionsManager {
     get() = (injector.optionService as IjVimOptionService).getRawOption(smartcaseName) as ToggleOption
   val timeout: ToggleOption
     get() = (injector.optionService as IjVimOptionService).getRawOption(timeoutName) as ToggleOption
+  val timeoutlen: NumberOption
+    get() = (injector.optionService as IjVimOptionService).getRawOption(timeoutlenName) as NumberOption
   val iskeyword: KeywordOption
     get() = KeywordOption(KeywordOptionHelper)
 }
