@@ -18,15 +18,16 @@
 
 package org.jetbrains.plugins.ideavim.group.motion
 
-import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import kotlin.math.roundToInt
 
 @Suppress("ClassName")
 class MotionGroup_ScrollCaretIntoViewHorizontally_Test : VimTestCase() {
@@ -110,7 +111,7 @@ class MotionGroup_ScrollCaretIntoViewHorizontally_Test : VimTestCase() {
     // These columns are hard to calculate, because the visible offset depends on the rendered width of the inlay
     // Also, because we're scrolling right (adding columns to the right) we make the right most column line up
     val textWidth = myFixture.editor.scrollingModel.visibleArea.width - inlay.widthInPixels
-    val availableColumns = textWidth / EditorUtil.getPlainSpaceWidth(myFixture.editor)
+    val availableColumns = (textWidth / EditorHelper.getPlainSpaceWidthFloat(myFixture.editor)).roundToInt()
     assertVisibleLineBounds(0, 119 - availableColumns + 1, 119)
   }
 
@@ -185,7 +186,7 @@ class MotionGroup_ScrollCaretIntoViewHorizontally_Test : VimTestCase() {
     typeText(injector.parser.parseKeys("120|zs" + "20h"))
     // These columns are hard to calculate, because the visible offset depends on the rendered width of the inlay
     val textWidth = myFixture.editor.scrollingModel.visibleArea.width - inlay.widthInPixels
-    val availableColumns = textWidth / EditorUtil.getPlainSpaceWidth(myFixture.editor)
+    val availableColumns = (textWidth / EditorHelper.getPlainSpaceWidthFloat(myFixture.editor)).roundToInt()
     assertVisibleLineBounds(0, 99, 99 + availableColumns - 1)
   }
 

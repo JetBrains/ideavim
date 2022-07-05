@@ -19,15 +19,16 @@
 package org.jetbrains.plugins.ideavim.action.scroll
 
 import com.intellij.openapi.editor.Inlay
-import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.Assert
+import kotlin.math.roundToInt
 
 /*
                                                        *zs*
@@ -77,7 +78,7 @@ class ScrollFirstScreenColumnActionTest : VimTestCase() {
     typeText(injector.parser.parseKeys("100|" + "zs"))
     val visibleArea = myFixture.editor.scrollingModel.visibleArea
     val textWidth = visibleArea.width - inlay.widthInPixels
-    val availableColumns = textWidth / EditorUtil.getPlainSpaceWidth(myFixture.editor)
+    val availableColumns = (textWidth / EditorHelper.getPlainSpaceWidthFloat(myFixture.editor)).roundToInt()
 
     // The first visible text column will be 99, with the inlay positioned to the left of it
     assertVisibleLineBounds(0, 99, 99 + availableColumns - 1)
@@ -112,6 +113,6 @@ class ScrollFirstScreenColumnActionTest : VimTestCase() {
 
   private fun getAvailableColumns(inlay: Inlay<*>): Int {
     val textWidth = myFixture.editor.scrollingModel.visibleArea.width - inlay.widthInPixels
-    return textWidth / EditorUtil.getPlainSpaceWidth(myFixture.editor)
+    return (textWidth / EditorHelper.getPlainSpaceWidthFloat(myFixture.editor)).roundToInt()
   }
 }

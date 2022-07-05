@@ -37,6 +37,7 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
 
 import java.awt.*;
+import java.awt.geom.Point2D;
 import java.nio.CharBuffer;
 import java.util.Collections;
 import java.util.Comparator;
@@ -245,12 +246,27 @@ public class EditorHelper {
    * font. It does not include inlays or folds.
    * <p>
    * Note that this value is only approximate and should be avoided whenever possible!
+   * </p>
    *
    * @param editor The editor
    * @return The number of screen columns
    */
   public static int getApproximateScreenWidth(final @NotNull Editor editor) {
-    return getVisibleArea(editor).width / EditorUtil.getPlainSpaceWidth(editor);
+    return (int)(getVisibleArea(editor).width / getPlainSpaceWidthFloat(editor));
+  }
+
+  /**
+   * Gets the width of the space character in the editor's plain font as a float.
+   * <p>
+   * Font width can be fractional, but {@link EditorUtil#getPlainSpaceWidth(Editor)} returns it as an int, which can
+   * lead to rounding errors.
+   * </p>
+   *
+   * @param editor The editor
+   * @return The width of the space character in the editor's plain font in pixels. It might be a fractional value.
+   */
+  public static float getPlainSpaceWidthFloat(final @NotNull Editor editor) {
+    return EditorUtil.fontForChar(' ', Font.PLAIN, editor).charWidth2D(' ');
   }
 
   /**
@@ -802,19 +818,20 @@ public class EditorHelper {
       }
     }
 
-    final int columnLeftX = editor.visualPositionToXY(new VisualPosition(visualLine, targetVisualColumn)).x;
+    final int columnLeftX = (int) Math.round(editor.visualPositionToPoint2D(new VisualPosition(visualLine, targetVisualColumn)).getX());
     scrollHorizontally(editor, columnLeftX);
   }
 
   public static void scrollColumnToMiddleOfScreen(@NotNull Editor editor, int visualLine, int visualColumn) {
-    final Point point = editor.visualPositionToXY(new VisualPosition(visualLine, visualColumn));
+    final Point2D point = editor.visualPositionToPoint2D(new VisualPosition(visualLine, visualColumn));
     final int screenWidth = getVisibleArea(editor).width;
 
     // Snap the column to the nearest standard column grid. This positions us nicely if there are an odd or even number
     // of columns. It also works with inline inlays and folds. It is slightly inaccurate for proportional fonts, but is
     // still a good solution. Besides, what kind of monster uses Vim with proportional fonts?
-    final int standardColumnWidth = EditorUtil.getPlainSpaceWidth(editor);
-    final int x = max(0, point.x - (screenWidth / standardColumnWidth / 2 * standardColumnWidth));
+    final float standardColumnWidth = EditorHelper.getPlainSpaceWidthFloat(editor);
+    final int screenMidColumn = (int) (screenWidth / standardColumnWidth / 2);
+    final int x = max(0, (int) Math.round(point.getX() - (screenMidColumn * standardColumnWidth)));
     scrollHorizontally(editor, x);
   }
 
@@ -839,7 +856,7 @@ public class EditorHelper {
     }
 
     // Scroll to the left edge of the target column, minus a screenwidth, and adjusted for inlays
-    final int targetColumnRightX = editor.visualPositionToXY(new VisualPosition(visualLine, targetVisualColumn + 1)).x;
+    final int targetColumnRightX = (int) Math.round(editor.visualPositionToPoint2D(new VisualPosition(visualLine, targetVisualColumn + 1)).getX());
     final int screenWidth = getVisibleArea(editor).width;
     scrollHorizontally(editor, targetColumnRightX - screenWidth);
   }
@@ -1001,18 +1018,18 @@ public class EditorHelper {
     // Note that visualPos.leansRight will be true for the right half side of the character grid
     VisualPosition closestVisualPosition = editor.xyToVisualPosition(new Point(x, y));
 
-    // Make sure we get the character that contains this XY, not the editor's decision about closest character. The
-    // editor will give us the next character if X is over half way through the character grid.
-    int xActualLeft = editor.visualPositionToXY(closestVisualPosition).x;
+    // Make sure we get the character that contains this XY, not the editor's decision about the closest character. The
+    // editor will give us the next character if X is over halfway through the character grid. Take into account that
+    // the font size might be fractional, but the editor's area is integer. Use floating point values and round.
+    long xActualLeft = Math.round(editor.visualPositionToPoint2D(closestVisualPosition).getX());
     if (xActualLeft > x) {
       closestVisualPosition = getPreviousNonInlayVisualPosition(editor, closestVisualPosition);
-      xActualLeft = editor.visualPositionToXY(closestVisualPosition).x;
+      xActualLeft = Math.round(editor.visualPositionToPoint2D(closestVisualPosition).getX());
     }
 
     if (xActualLeft >= leftBound) {
-      final int xActualRight =
-        editor.visualPositionToXY(new VisualPosition(closestVisualPosition.line, closestVisualPosition.column + 1)).x -
-        1;
+      final VisualPosition nextVisualPosition = new VisualPosition(closestVisualPosition.line, closestVisualPosition.column + 1);
+      final long xActualRight = Math.round(editor.visualPositionToPoint2D(nextVisualPosition).getX()) - 1;
       if (xActualRight <= rightBound) {
         return closestVisualPosition.column;
       }

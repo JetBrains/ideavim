@@ -23,6 +23,7 @@ import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.Assert
+import kotlin.math.roundToInt
 
 class EditorHelperTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
@@ -30,8 +31,8 @@ class EditorHelperTest : VimTestCase() {
     configureByColumns(100)
     EditorHelper.scrollColumnToLeftOfScreen(myFixture.editor, 0, 2)
     val visibleArea = myFixture.editor.scrollingModel.visibleArea
-    val columnWidth = visibleArea.width / screenWidth
-    Assert.assertEquals(2 * columnWidth, visibleArea.x)
+    val columnWidth = EditorHelper.getPlainSpaceWidthFloat(myFixture.editor)
+    Assert.assertEquals((2 * columnWidth).roundToInt(), visibleArea.x)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
@@ -40,8 +41,8 @@ class EditorHelperTest : VimTestCase() {
     val column = screenWidth + 2
     EditorHelper.scrollColumnToRightOfScreen(myFixture.editor, 0, column)
     val visibleArea = myFixture.editor.scrollingModel.visibleArea
-    val columnWidth = visibleArea.width / screenWidth
-    Assert.assertEquals((column - screenWidth + 1) * columnWidth, visibleArea.x)
+    val columnWidth = EditorHelper.getPlainSpaceWidthFloat(myFixture.editor)
+    Assert.assertEquals(((column - screenWidth + 1) * columnWidth).roundToInt(), visibleArea.x)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
@@ -52,8 +53,8 @@ class EditorHelperTest : VimTestCase() {
     // Put column 100 into position 41 -> offset is 59 columns
     EditorHelper.scrollColumnToMiddleOfScreen(myFixture.editor, 0, 99)
     val visibleArea = myFixture.editor.scrollingModel.visibleArea
-    val columnWidth = visibleArea.width / screenWidth
-    Assert.assertEquals(59 * columnWidth, visibleArea.x)
+    val columnWidth = EditorHelper.getPlainSpaceWidthFloat(myFixture.editor)
+    Assert.assertEquals((59 * columnWidth).roundToInt(), visibleArea.x)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
@@ -65,7 +66,7 @@ class EditorHelperTest : VimTestCase() {
     // Put column 100 into position 41 -> offset is 59 columns
     EditorHelper.scrollColumnToMiddleOfScreen(myFixture.editor, 0, 99)
     val visibleArea = myFixture.editor.scrollingModel.visibleArea
-    val columnWidth = visibleArea.width / screenWidth
-    Assert.assertEquals(59 * columnWidth, visibleArea.x)
+    val columnWidth = EditorHelper.getPlainSpaceWidthFloat(myFixture.editor)
+    Assert.assertEquals((59 * columnWidth).roundToInt(), visibleArea.x)
   }
 }
