@@ -19,7 +19,6 @@
 package com.maddyhome.idea.vim.option
 
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.options.NumberOption
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionConstants.Companion.ignorecaseName
 import com.maddyhome.idea.vim.options.OptionConstants.Companion.smartcaseName

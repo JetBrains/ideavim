@@ -3,7 +3,7 @@ package com.maddyhome.idea.vim.api
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.option.ToggleOption
-import com.maddyhome.idea.vim.options.NumberOption
+import com.maddyhome.idea.vim.option.NumberOption
 import com.maddyhome.idea.vim.options.Option
 import com.maddyhome.idea.vim.options.OptionChangeListener
 import com.maddyhome.idea.vim.options.OptionConstants
