@@ -13,7 +13,7 @@ import com.maddyhome.idea.vim.vimscript.services.OptionService
 import com.maddyhome.idea.vim.put.VimPut
 import com.maddyhome.idea.vim.register.VimRegisterGroup
 import com.maddyhome.idea.vim.undo.VimUndoRedo
-import com.maddyhome.idea.vim.vimscript.services.VimVariableService
+import com.maddyhome.idea.vim.vimscript.services.VariableService
 import com.maddyhome.idea.vim.yank.VimYankGroup
 
 interface VimInjector {
@@ -117,7 +117,7 @@ interface VimInjector {
   // Can't be fully moved to vim-engine.
   val vimscriptParser: VimscriptParser
   // !! in progress
-  val variableService: VimVariableService
+  val variableService: VariableService
   // !! in progress
   val functionService: VimscriptFunctionService
   // Can't be fully moved to vim-engine.

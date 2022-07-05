@@ -11,7 +11,7 @@ import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import com.maddyhome.idea.vim.register.VimRegisterGroup
 import com.maddyhome.idea.vim.register.VimRegisterGroupBase
-import com.maddyhome.idea.vim.vimscript.services.VimVariableService
+import com.maddyhome.idea.vim.vimscript.services.VariableService
 import com.maddyhome.idea.vim.vimscript.services.VimVariableServiceBase
 
 abstract class VimInjectorBase : VimInjector {
@@ -23,7 +23,7 @@ abstract class VimInjectorBase : VimInjector {
   override val parser: VimStringParser = object : VimStringParserBase() {}
   override val vimMachine: VimMachine = object : VimMachineBase() {}
   override val optionService: OptionService by lazy { object : VimOptionServiceBase(){} }
-  override val variableService: VimVariableService by lazy { object : VimVariableServiceBase(){} }
+  override val variableService: VariableService by lazy { object : VimVariableServiceBase(){} }
 
   override val registerGroup: VimRegisterGroup by lazy { registerGroupStub }
   override val registerGroupIfCreated: VimRegisterGroup? by lazy { registerGroupStub }

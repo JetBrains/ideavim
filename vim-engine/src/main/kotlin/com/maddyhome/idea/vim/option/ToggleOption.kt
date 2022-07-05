@@ -41,7 +41,6 @@ class ToggleOption(name: String, abbrev: String, defaultValue: VimInt) : Option<
   /**
    * COMPATIBILITY-LAYER: Method added
    */
-  override fun getValue(): Boolean {
-    return injector.optionService.getOptionValue(OptionScope.GLOBAL, name).asBoolean()
-  }
+  override val value: Boolean
+    get() = injector.optionService.getOptionValue(OptionScope.GLOBAL, name).asBoolean()
 }

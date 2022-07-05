@@ -48,14 +48,13 @@ import com.maddyhome.idea.vim.group.visual.VisualMotionGroup;
 import com.maddyhome.idea.vim.helper.MacKeyRepeat;
 import com.maddyhome.idea.vim.listener.VimListenerManager;
 import com.maddyhome.idea.vim.newapi.IjVimInjector;
-import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import com.maddyhome.idea.vim.ui.StatusBarIconFactory;
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable;
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
 import com.maddyhome.idea.vim.vimscript.services.FunctionStorage;
 import com.maddyhome.idea.vim.vimscript.services.IjVimOptionService;
+import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import com.maddyhome.idea.vim.vimscript.services.VariableService;
-import com.maddyhome.idea.vim.vimscript.services.VimVariableService;
 import org.jdom.Element;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
@@ -228,7 +227,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   }
 
   public static @NotNull VariableService getVariableService() {
-    return (VariableService)ApplicationManager.getApplication().getService(VimVariableService.class);
+    return ApplicationManager.getApplication().getService(VariableService.class);
   }
 
   public static @NotNull OptionService getOptionService() {

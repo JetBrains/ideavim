@@ -26,7 +26,11 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
 import org.jetbrains.annotations.TestOnly
 
-interface VimVariableService {
+
+/**
+ * COMPATIBILITY-LAYER: Renamed from VimVariableService
+ */
+interface VariableService {
   /**
    * Stores variable.
    *

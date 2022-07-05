@@ -77,7 +77,6 @@ import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.parser.errors.IdeavimErrorListener
-import com.maddyhome.idea.vim.vimscript.services.VariableService
 import org.assertj.core.api.Assertions
 import org.junit.Assert
 import java.awt.event.KeyEvent

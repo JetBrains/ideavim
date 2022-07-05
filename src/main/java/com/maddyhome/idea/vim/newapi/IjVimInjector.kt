@@ -76,7 +76,7 @@ import com.maddyhome.idea.vim.undo.VimUndoRedo
 import com.maddyhome.idea.vim.vimscript.Executor
 import com.maddyhome.idea.vim.vimscript.services.FunctionStorage
 import com.maddyhome.idea.vim.vimscript.services.PatternService
-import com.maddyhome.idea.vim.vimscript.services.VimVariableService
+import com.maddyhome.idea.vim.vimscript.services.VariableService
 import com.maddyhome.idea.vim.yank.VimYankGroup
 
 class IjVimInjector : VimInjectorBase() {
@@ -161,7 +161,7 @@ class IjVimInjector : VimInjectorBase() {
 
   override val functionService: VimscriptFunctionService
     get() = FunctionStorage
-  override val variableService: VimVariableService
+  override val variableService: VariableService
     get() = service()
   override val vimrcFileState: VimrcFileState
     get() = VimRcFileState

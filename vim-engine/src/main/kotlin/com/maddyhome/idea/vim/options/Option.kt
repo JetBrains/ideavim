@@ -60,9 +60,8 @@ import java.util.*
   /**
    * COMPATIBILITY-LAYER: Method added
    */
-  open fun getValue(): Boolean {
-    TODO()
-  }
+  open val value: Boolean
+    get() = TODO()
 
   // todo 1.9 should return Result with exceptions
   abstract fun checkIfValueValid(value: VimDataType, token: String)
