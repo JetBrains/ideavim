@@ -327,7 +327,8 @@ tasks.register("updateAuthors") {
             "aleksei.plate@jetbrains.com",
             "aleksei.plate@teamcity",
             "aleksei.plate@TeamCity",
-            "alex.plate@192.168.0.109"
+            "alex.plate@192.168.0.109",
+            "nikita.koshcheev@TeamCity",
         )
         updateAuthors(uncheckedEmails)
     }
