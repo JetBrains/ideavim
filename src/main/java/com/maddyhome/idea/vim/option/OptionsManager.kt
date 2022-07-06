@@ -30,6 +30,7 @@ import com.maddyhome.idea.vim.vimscript.services.IjVimOptionService
 
 /**
  * COMPATIBILITY-LAYER: Added a class and package
+ * Please see: https://jb.gg/zo8n0r
  */
 object OptionsManager {
   val ignorecase: ToggleOption

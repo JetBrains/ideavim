@@ -24,6 +24,7 @@ import com.maddyhome.idea.vim.newapi.vim
 
 /**
  * COMPATIBILITY-LAYER: Additional class
+ * Please see: https://jb.gg/zo8n0r
  */
 class CommandState(private val machine: VimStateMachine) {
 

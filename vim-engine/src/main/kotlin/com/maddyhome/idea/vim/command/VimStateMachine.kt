@@ -390,6 +390,7 @@ class VimStateMachine(private val editor: VimEditor?) {
 
     /**
      * COMPATIBILITY-LAYER: Method switched to Any (was VimEditor)
+     * Please see: https://jb.gg/zo8n0r
      */
     @JvmStatic
     fun getInstance(editor: Any?): VimStateMachine {

@@ -25,6 +25,7 @@ import java.util.*
 
 /**
  * COMPATIBILITY-LAYER: switched from sealed to abstract
+ * Please see: https://jb.gg/zo8n0r
  */
 /*sealed*/abstract class Option<T : VimDataType>(val name: String, val abbrev: String, private val defaultValue: T) {
 
@@ -59,6 +60,7 @@ import java.util.*
 
   /**
    * COMPATIBILITY-LAYER: Method added
+   * Please see: https://jb.gg/zo8n0r
    */
   @Suppress("PLATFORM_CLASS_MAPPED_TO_KOTLIN")
   open val value: java.lang.Boolean

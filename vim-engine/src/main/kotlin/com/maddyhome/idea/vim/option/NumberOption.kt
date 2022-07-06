@@ -10,6 +10,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.parseNumber
 
 /**
  * COMPATIBILITY-LAYER: Moved out of class and to a different package
+ * Please see: https://jb.gg/zo8n0r
  */
 open class NumberOption(name: String, abbrev: String, defaultValue: VimInt) :
   Option<VimInt>(name, abbrev, defaultValue) {

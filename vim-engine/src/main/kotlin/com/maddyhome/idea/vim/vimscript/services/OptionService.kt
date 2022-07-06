@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 
 /**
  * COMPATIBILITY-LAYER: Moved to a different package
+ * Please see: https://jb.gg/zo8n0r
  */
 interface OptionService {
 
@@ -173,6 +174,7 @@ interface OptionService {
 
   /**
    * COMPATIBILITY-LAYER: New method added
+   * Please see: https://jb.gg/zo8n0r
    */
   fun setOption(scope: Scope, optionName: String, token: String = optionName)
 
@@ -235,6 +237,7 @@ interface OptionService {
 
   /**
    * COMPATIBILITY-LAYER: Added this class
+   * Please see: https://jb.gg/zo8n0r
    */
   sealed class Scope {
     object GLOBAL : Scope()

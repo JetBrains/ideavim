@@ -60,12 +60,14 @@ val Editor.editorMode
 
 /**
  * COMPATIBILITY-LAYER: New method
+ * Please see: https://jb.gg/zo8n0r
  */
 val Editor.mode
   get() = this.vim.vimStateMachine.mode.ij
 
 /**
  * COMPATIBILITY-LAYER: New method
+ * Please see: https://jb.gg/zo8n0r
  */
 val CommandState.Mode.isEndAllowed: Boolean
   get() = this.engine.isEndAllowed

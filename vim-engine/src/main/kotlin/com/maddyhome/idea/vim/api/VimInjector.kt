@@ -9,10 +9,10 @@ import com.maddyhome.idea.vim.helper.VimCommandLineHelper
 import com.maddyhome.idea.vim.history.VimHistory
 import com.maddyhome.idea.vim.macro.VimMacro
 import com.maddyhome.idea.vim.mark.VimMarkGroup
-import com.maddyhome.idea.vim.vimscript.services.OptionService
 import com.maddyhome.idea.vim.put.VimPut
 import com.maddyhome.idea.vim.register.VimRegisterGroup
 import com.maddyhome.idea.vim.undo.VimUndoRedo
+import com.maddyhome.idea.vim.vimscript.services.OptionService
 import com.maddyhome.idea.vim.vimscript.services.VariableService
 import com.maddyhome.idea.vim.yank.VimYankGroup
 
@@ -58,6 +58,7 @@ interface VimInjector {
   // [FINISHED] Class moved to vim-engine, but it's attached to Editor using IJ things
   /**
    * COMPATIBILITY-LAYER: Added new method with Any
+   * Please see: https://jb.gg/zo8n0r
    */
   fun commandStateFor(editor: Any): VimStateMachine
   // !! in progress

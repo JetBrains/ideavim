@@ -22,6 +22,7 @@ import javax.swing.KeyStroke
 
 /**
  * COMPATIBILITY-LAYER: Moved from common package to this one
+ * Please see: https://jb.gg/zo8n0r
  */
 
 /**

@@ -44,6 +44,7 @@ class VisualMotionGroup : VimVisualMotionGroupBase() {
 
   /**
    * COMPATIBILITY-LAYER: Added a method
+   * Please see: https://jb.gg/zo8n0r
    */
   fun enterVisualMode(editor: Editor, subMode: CommandState.SubMode? = null): Boolean {
     return this.enterVisualMode(editor.vim, subMode?.engine)

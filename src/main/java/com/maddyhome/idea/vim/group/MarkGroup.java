@@ -411,6 +411,7 @@ public class MarkGroup extends VimMarkGroupBase implements PersistentStateCompon
 
   /**
    * COMPATIBILITY-LAYER: Method added
+   * Please see: <a href="https://jb.gg/zo8n0r">doc</a>
    *
    * @deprecated Please use method with VimEditor
    */

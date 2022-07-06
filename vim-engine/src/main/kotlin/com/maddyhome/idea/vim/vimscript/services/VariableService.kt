@@ -29,6 +29,7 @@ import org.jetbrains.annotations.TestOnly
 
 /**
  * COMPATIBILITY-LAYER: Renamed from VimVariableService
+ * Please see: https://jb.gg/zo8n0r
  */
 interface VariableService {
   /**

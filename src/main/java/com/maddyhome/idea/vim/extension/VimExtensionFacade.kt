@@ -61,6 +61,7 @@ object VimExtensionFacade {
 
   /**
    * COMPATIBILITY-LAYER: Additional method
+   * Please see: https://jb.gg/zo8n0r
    */
   /** The 'map' command for mapping keys to handlers defined in extensions. */
   @JvmStatic

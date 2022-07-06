@@ -24,6 +24,7 @@ import javax.swing.KeyStroke
 
 /**
  * COMPATIBILITY-LAYER: Created a helper class
+ * Please see: https://jb.gg/zo8n0r
  */
 object StringHelper {
   @JvmStatic

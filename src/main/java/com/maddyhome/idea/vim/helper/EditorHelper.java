@@ -155,6 +155,7 @@ public class EditorHelper {
 
   /**
    * COMPATIBILITY-LAYER: Created a function
+   * Please see: <a href="https://jb.gg/zo8n0r">doc</a>
    */
   public static int getVisualLineCount(final @NotNull Editor editor) {
     return getVisualLineCount(new IjVimEditor(editor));

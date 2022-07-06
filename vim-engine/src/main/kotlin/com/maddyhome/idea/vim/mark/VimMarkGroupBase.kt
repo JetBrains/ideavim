@@ -16,6 +16,7 @@ abstract class VimMarkGroupBase : VimMarkGroup {
   protected val globalMarks = HashMap<Char, Mark>()
   @JvmField
   // COMPATIBILITY-LAYER: Changed to public
+  // Please see: https://jb.gg/zo8n0r
   // Use dropLastJump method instead of direct access
   /*protected*/ val jumps: MutableList<Jump> = ArrayList<Jump>()
   @JvmField

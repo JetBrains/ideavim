@@ -379,6 +379,7 @@ abstract class VimOptionServiceBase : OptionService {
       is StringOption -> VimString(value)
       /**
        * COMPATIBILITY-LAYER: New branch
+       * Please see: https://jb.gg/zo8n0r
        */
       else -> error("")
     }
