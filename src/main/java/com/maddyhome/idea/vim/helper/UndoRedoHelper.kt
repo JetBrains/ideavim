@@ -21,6 +21,7 @@ package com.maddyhome.idea.vim.helper
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.PlatformDataKeys
+import com.intellij.openapi.command.impl.UndoManagerImpl
 import com.intellij.openapi.command.undo.UndoManager
 import com.intellij.openapi.components.Service
 import com.maddyhome.idea.vim.api.ExecutionContext
@@ -39,6 +40,10 @@ import com.maddyhome.idea.vim.vimscript.services.IjVimOptionService
  */
 @Service
 class UndoRedoHelper : UndoRedoBase() {
+  init {
+    injector.optionService.addListener(IjVimOptionService.oldUndo, { UndoManagerImpl.ourNeverAskUser = !injector.optionService.isSet(OptionScope.GLOBAL, IjVimOptionService.oldUndo) }, true)
+  }
+
   override fun undo(context: ExecutionContext): Boolean {
     val ijContext = context.context as DataContext
     val project = PlatformDataKeys.PROJECT.getData(ijContext) ?: return false
@@ -95,10 +100,15 @@ class UndoRedoHelper : UndoRedoBase() {
       }
     }
 
+    val oldPath = editor.getPath()
     vimDocument.addChangeListener(changeListener)
-    while (check() && !changeListener.hasChanged) {
+    while (check() && !changeListener.hasChanged && !ifFilePathChanged(editor, oldPath)) {
       action.run()
     }
     vimDocument.removeChangeListener(changeListener)
+  }
+
+  private fun ifFilePathChanged(editor: IjVimEditor, oldPath: String?): Boolean {
+    return editor.getPath() != oldPath
   }
 }

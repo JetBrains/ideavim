@@ -27,7 +27,7 @@ import com.maddyhome.idea.vim.options.StringOption
 internal class IjVimOptionService : VimOptionServiceBase() {
 
   private val customOptions = setOf(
-    ToggleOption(oldUndo, oldUndo, false),
+    ToggleOption(oldUndo, oldUndo, true),
     ToggleOption(ideajoinName, ideajoinAlias, false),
     ToggleOption(ideamarksName, ideamarksAlias, true),
     StringOption(ideName, ideAlias, ApplicationNamesInfo.getInstance().fullProductNameWithEdition),
