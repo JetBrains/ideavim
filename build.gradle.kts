@@ -85,6 +85,8 @@ tasks.register<Test>("testWithNeovim") {
     group = "verification"
     systemProperty("ideavim.nvim.test", "true")
     exclude("/ui/**")
+    exclude("**/longrunning/**")
+    exclude("**/propertybased/**")
 }
 
 tasks.register<Test>("testPropertyBased") {
@@ -115,6 +117,8 @@ tasks {
         include("**/*test.class")
         include("**/*Tests.class")
         exclude("**/ParserTest.class")
+        exclude("**/longrunning/**")
+        exclude("**/propertybased/**")
     }
 
     val testPropertyBased by getting(Test::class) {

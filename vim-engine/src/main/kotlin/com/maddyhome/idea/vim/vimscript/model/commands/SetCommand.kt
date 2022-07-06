@@ -21,6 +21,7 @@ package com.maddyhome.idea.vim.vimscript.model.commands
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.Msg
@@ -36,7 +37,7 @@ import kotlin.math.min
 data class SetCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
-  override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
+  override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     val result = parseOptionLine(editor, argument, OptionScope.GLOBAL, failOnBad = true)
     return if (result) {
       ExecutionResult.Success
@@ -49,7 +50,7 @@ data class SetCommand(val ranges: Ranges, val argument: String) : Command.Single
 data class SetLocalCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
-  override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
+  override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     return if (parseOptionLine(editor, argument, OptionScope.LOCAL(editor), failOnBad = true)) {
       ExecutionResult.Success
     } else {

@@ -43,6 +43,6 @@ class ChangeEndOfLineAction : ChangeEditorActionHandler.ForEachCaret() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    return injector.changeGroup.changeEndOfLine(editor, caret, operatorArguments.count1)
+    return injector.changeGroup.changeEndOfLine(editor, caret, operatorArguments.count1, operatorArguments)
   }
 }

@@ -4,10 +4,10 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
-import com.maddyhome.idea.vim.command.VimStateMachine
-import com.maddyhome.idea.vim.command.VimStateMachine.Companion.getInstance
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.command.SelectionType
+import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.command.VimStateMachine.Companion.getInstance
 import com.maddyhome.idea.vim.common.ChangesListener
 import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.common.OperatedRange
@@ -17,10 +17,10 @@ import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
-import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.helper.inSingleCommandMode
 import com.maddyhome.idea.vim.helper.usesVirtualSpace
+import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.mark.VimMarkConstants.MARK_CHANGE_END
 import com.maddyhome.idea.vim.mark.VimMarkConstants.MARK_CHANGE_POS
@@ -80,10 +80,22 @@ abstract class VimChangeGroupBase : VimChangeGroup {
    * @param count  The numbers of characters to delete.
    * @return true if able to delete, false if not
    */
-  override fun deleteCharacter(editor: VimEditor, caret: VimCaret, count: Int, isChange: Boolean): Boolean {
+  override fun deleteCharacter(
+    editor: VimEditor,
+    caret: VimCaret,
+    count: Int,
+    isChange: Boolean,
+    operatorArguments: OperatorArguments
+  ): Boolean {
     val endOffset = injector.motion.getOffsetOfHorizontalMotion(editor, caret, count, true)
     if (endOffset != -1) {
-      val res = deleteText(editor, TextRange(caret.offset.point, endOffset), SelectionType.CHARACTER_WISE, caret)
+      val res = deleteText(
+        editor,
+        TextRange(caret.offset.point, endOffset),
+        SelectionType.CHARACTER_WISE,
+        caret,
+        operatorArguments
+      )
       val pos = caret.offset.point
       val norm = injector.engineEditorHelper.normalizeOffset(editor, caret.getLogicalPosition().line, pos, isChange)
       if (norm != pos ||
@@ -133,6 +145,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     range: TextRange,
     type: SelectionType?,
     caret: VimCaret,
+    operatorArguments: OperatorArguments,
   ): Boolean {
     var updatedRange = range
     // Fix for https://youtrack.jetbrains.net/issue/VIM-35
@@ -146,7 +159,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       }
     }
     if (type == null ||
-      editor.inInsertMode || caret.registerStorage.storeText(editor, updatedRange, type, true)
+      operatorArguments.mode.inInsertMode || caret.registerStorage.storeText(editor, updatedRange, type, true)
     ) {
       val startOffsets = updatedRange.startOffsets
       val endOffsets = updatedRange.endOffsets
@@ -580,9 +593,9 @@ abstract class VimChangeGroupBase : VimChangeGroup {
    * @param toSwitch The mode to switch to
    */
   override fun processPostChangeModeSwitch(
-      editor: VimEditor,
-      context: ExecutionContext,
-      toSwitch: VimStateMachine.Mode,
+    editor: VimEditor,
+    context: ExecutionContext,
+    toSwitch: VimStateMachine.Mode,
   ) {
     if (toSwitch === VimStateMachine.Mode.INSERT) {
       initInsert(editor, context, VimStateMachine.Mode.INSERT)
@@ -624,7 +637,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
    * @param count  The number of lines affected
    * @return true if able to delete the text, false if not
    */
-  override fun deleteEndOfLine(editor: VimEditor, caret: VimCaret, count: Int): Boolean {
+  override fun deleteEndOfLine(editor: VimEditor, caret: VimCaret, count: Int, operatorArguments: OperatorArguments): Boolean {
     val initialOffset = caret.offset.point
     val offset = injector.motion.moveCaretToLineEndOffset(editor, caret, count - 1, true)
     val lineStart = injector.motion.moveCaretToLineStart(editor, caret)
@@ -634,7 +647,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       val rangeToDelete = TextRange(startOffset, offset)
       editor.nativeCarets().filter { it != caret && rangeToDelete.contains(it.offset.point) }
         .forEach { editor.removeCaret(it) }
-      val res = deleteText(editor, rangeToDelete, SelectionType.CHARACTER_WISE, caret)
+      val res = deleteText(editor, rangeToDelete, SelectionType.CHARACTER_WISE, caret, operatorArguments)
       if (usesVirtualSpace) {
         injector.motion.moveCaret(editor, caret, startOffset)
       } else {
@@ -658,14 +671,20 @@ abstract class VimChangeGroupBase : VimChangeGroup {
    * will be removed. If false, only the newline is removed to join the lines.
    * @return true if able to join the lines, false if not
    */
-  override fun deleteJoinLines(editor: VimEditor, caret: VimCaret, count: Int, spaces: Boolean): Boolean {
+  override fun deleteJoinLines(
+    editor: VimEditor,
+    caret: VimCaret,
+    count: Int,
+    spaces: Boolean,
+    operatorArguments: OperatorArguments
+  ): Boolean {
     var myCount = count
     if (myCount < 2) myCount = 2
     val lline = caret.getLogicalPosition().line
     val total = editor.lineCount()
     return if (lline + myCount > total) {
       false
-    } else deleteJoinNLines(editor, caret, lline, myCount, spaces)
+    } else deleteJoinNLines(editor, caret, lline, myCount, spaces, operatorArguments)
   }
 
   /**
@@ -719,7 +738,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
    * @param count  The number of lines to delete
    * @return true if able to delete the lines, false if not
    */
-  override fun deleteLine(editor: VimEditor, caret: VimCaret, count: Int): Boolean {
+  override fun deleteLine(editor: VimEditor, caret: VimCaret, count: Int, operatorArguments: OperatorArguments): Boolean {
     val start = injector.motion.moveCaretToLineStart(editor, caret)
     val offset =
       min(injector.motion.moveCaretToLineEndOffset(editor, caret, count - 1, true) + 1, editor.fileSize().toInt())
@@ -729,7 +748,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       logger.debug("offset=$offset")
     }
     if (offset != -1) {
-      val res = deleteText(editor, TextRange(start, offset), SelectionType.LINE_WISE, caret)
+      val res = deleteText(editor, TextRange(start, offset), SelectionType.LINE_WISE, caret, operatorArguments)
       if (res && caret.offset.point >= editor.fileSize() && caret.offset.point != 0) {
         injector.motion.moveCaret(
           editor, caret, injector.motion.moveCaretToLineStartSkipLeadingOffset(
@@ -770,12 +789,18 @@ abstract class VimChangeGroupBase : VimChangeGroup {
    * will be removed. If false, only the newline is removed to join the lines.
    * @return true if able to join the lines, false if not
    */
-  override fun deleteJoinRange(editor: VimEditor, caret: VimCaret, range: TextRange, spaces: Boolean): Boolean {
+  override fun deleteJoinRange(
+    editor: VimEditor,
+    caret: VimCaret,
+    range: TextRange,
+    spaces: Boolean,
+    operatorArguments: OperatorArguments
+  ): Boolean {
     val startLine = editor.offsetToLogicalPosition(range.startOffset).line
     val endLine = editor.offsetToLogicalPosition(range.endOffset).line
     var count = endLine - startLine + 1
     if (count < 2) count = 2
-    return deleteJoinNLines(editor, caret, startLine, count, spaces)
+    return deleteJoinNLines(editor, caret, startLine, count, spaces, operatorArguments)
   }
 
   override fun joinViaIdeaBySelections(
@@ -854,12 +879,13 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     range: TextRange,
     type: SelectionType?,
     isChange: Boolean,
+    operatorArguments: OperatorArguments,
   ): Boolean {
 
     // Update the last column before we delete, or we might be retrieving the data for a line that no longer exists
     caret.vimLastColumn = caret.inlayAwareVisualColumn
     val removeLastNewLine = removeLastNewLine(editor, range, type)
-    val res = deleteText(editor, range, type, caret)
+    val res = deleteText(editor, range, type, caret, operatorArguments)
     if (removeLastNewLine) {
       val textLength = editor.fileSize().toInt()
       editor.deleteString(TextRange(textLength - 1, textLength))
@@ -902,8 +928,8 @@ abstract class VimChangeGroupBase : VimChangeGroup {
    * @param count  The number of lines to change
    * @return true if able to delete count lines, false if not
    */
-  override fun changeEndOfLine(editor: VimEditor, caret: VimCaret, count: Int): Boolean {
-    val res = deleteEndOfLine(editor, caret, count)
+  override fun changeEndOfLine(editor: VimEditor, caret: VimCaret, count: Int, operatorArguments: OperatorArguments): Boolean {
+    val res = deleteEndOfLine(editor, caret, count, operatorArguments)
     if (res) {
       caret.moveToOffset(injector.motion.moveCaretToLineEnd(editor, caret))
       editor.vimChangeActionSwitchMode = VimStateMachine.Mode.INSERT
@@ -919,13 +945,14 @@ abstract class VimChangeGroupBase : VimChangeGroup {
    * @param count  The number of characters to change
    * @return true if able to delete count characters, false if not
    */
-  override fun changeCharacters(editor: VimEditor, caret: VimCaret, count: Int): Boolean {
+  override fun changeCharacters(editor: VimEditor, caret: VimCaret, operatorArguments: OperatorArguments): Boolean {
+    val count = operatorArguments.count1
     val len = injector.engineEditorHelper.getLineLength(editor)
     val col = caret.getLogicalPosition().column
     if (col + count >= len) {
-      return changeEndOfLine(editor, caret, 1)
+      return changeEndOfLine(editor, caret, 1, operatorArguments)
     }
-    val res = deleteCharacter(editor, caret, count, true)
+    val res = deleteCharacter(editor, caret, count, true, operatorArguments)
     if (res) {
       editor.vimChangeActionSwitchMode = VimStateMachine.Mode.INSERT
     }
@@ -962,6 +989,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     startLine: Int,
     count: Int,
     spaces: Boolean,
+    operatorArguments: OperatorArguments,
   ): Boolean {
     // start my moving the cursor to the very end of the first line
     injector.motion.moveCaret(editor, caret, injector.motion.moveCaretToLineEnd(editor, startLine, true))
@@ -978,7 +1006,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       } else {
         injector.motion.moveCaretToLineStart(editor, caret.getLogicalPosition().line + 1)
       }
-      deleteText(editor, TextRange(caret.offset.point, offset), null, caret)
+      deleteText(editor, TextRange(caret.offset.point, offset), null, caret, operatorArguments)
       if (spaces && !hasTrailingWhitespace) {
         insertText(editor, caret, " ")
         injector.motion.moveCaret(

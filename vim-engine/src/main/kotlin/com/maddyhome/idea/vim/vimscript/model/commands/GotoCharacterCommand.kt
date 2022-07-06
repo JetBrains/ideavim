@@ -22,6 +22,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import kotlin.math.max
@@ -33,7 +34,12 @@ import kotlin.math.min
 data class GotoCharacterCommand(val ranges: Ranges, val argument: String) : Command.ForEachCaret(ranges, argument) {
   override val argFlags = flags(RangeFlag.RANGE_IS_COUNT, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
-  override fun processCommand(editor: VimEditor, caret: VimCaret, context: ExecutionContext): ExecutionResult {
+  override fun processCommand(
+      editor: VimEditor,
+      caret: VimCaret,
+      context: ExecutionContext,
+      operatorArguments: OperatorArguments
+  ): ExecutionResult {
     val count = getCount(editor, caret, 1, true)
     if (count <= 0) return ExecutionResult.Error
 

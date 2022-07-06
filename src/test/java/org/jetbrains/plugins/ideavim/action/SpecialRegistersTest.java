@@ -140,7 +140,7 @@ public class SpecialRegistersTest extends VimTestCase {
 
     // Small deletes (less than a line) with register specified go to that register and to numbered registers
     assertRegisterChanged('a');
-    assertRegisterChanged('1');
+    assertRegisterNotChanged('1');
     assertRegisterNotChanged(SMALL_DELETION_REGISTER);
   }
 
@@ -155,7 +155,7 @@ public class SpecialRegistersTest extends VimTestCase {
     typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("\"add"), "one <caret>two three\n");
 
     assertRegisterChanged('a');
-    assertRegisterChanged('1');
+    assertRegisterNotChanged('1');
   }
 
   public void testNumberedRegistersShifting() {

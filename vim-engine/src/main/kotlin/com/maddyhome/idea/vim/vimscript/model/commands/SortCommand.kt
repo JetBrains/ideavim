@@ -22,6 +22,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.ex.ranges.Ranges
@@ -37,7 +38,7 @@ data class SortCommand(val ranges: Ranges, val argument: String) : Command.Singl
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.WRITABLE)
 
   @Throws(ExException::class)
-  override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
+  override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     val arg = argument
     val nonEmptyArg = arg.trim().isNotEmpty()
 

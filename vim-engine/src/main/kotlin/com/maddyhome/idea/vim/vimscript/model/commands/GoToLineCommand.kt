@@ -22,6 +22,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import java.lang.Integer.min
@@ -35,9 +36,10 @@ data class GoToLineCommand(val ranges: Ranges) :
   override val argFlags = flags(RangeFlag.RANGE_REQUIRED, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   override fun processCommand(
-    editor: VimEditor,
-    caret: VimCaret,
-    context: ExecutionContext,
+      editor: VimEditor,
+      caret: VimCaret,
+      context: ExecutionContext,
+      operatorArguments: OperatorArguments,
   ): ExecutionResult {
     val line = min(this.getLine(editor, caret), editor.lineCount() - 1)
 

@@ -2,8 +2,8 @@ package com.maddyhome.idea.vim.register
 
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.command.SelectionType
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
@@ -206,7 +206,7 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
         ).line == editor.offsetToLogicalPosition(end).line))
 
       // Deletes go into numbered registers only if text is smaller than a line, register is used or it's a special case
-      if (!smallInlineDeletion || register != defaultRegister || isSmallDeletionSpecialCase(editor)) {
+      if (!smallInlineDeletion && register == defaultRegister || isSmallDeletionSpecialCase(editor)) {
         // Old 1 goes to 2, etc. Old 8 to 9, old 9 is lost
         var d = '8'
         while (d >= '1') {

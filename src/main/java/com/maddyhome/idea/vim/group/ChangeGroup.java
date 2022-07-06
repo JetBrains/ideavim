@@ -245,7 +245,7 @@ public class ChangeGroup extends VimChangeGroupBase {
         final boolean lastWordChar =
           offset >= fileSize - 1 || CharacterHelper.charType(chars.charAt(offset + 1), bigWord) != charType;
         if (wordMotions.contains(id) && lastWordChar && motion.getCount() == 1) {
-          final boolean res = deleteCharacter(editor, caret, 1, true);
+          final boolean res = deleteCharacter(editor, caret, 1, true, operatorArguments);
           if (res) {
             editor.setVimChangeActionSwitchMode(VimStateMachine.Mode.INSERT);
           }
@@ -306,7 +306,8 @@ public class ChangeGroup extends VimChangeGroupBase {
       Pair<TextRange, SelectionType> deleteRangeAndType =
         getDeleteRangeAndType(editor, caret, context, argument, true, operatorArguments.withCount0(count0));
       if (deleteRangeAndType == null) return false;
-      return changeRange(editor, caret, deleteRangeAndType.getFirst(), deleteRangeAndType.getSecond(), context);
+      return changeRange(editor, caret, deleteRangeAndType.getFirst(), deleteRangeAndType.getSecond(), context,
+                         operatorArguments);
     }
   }
 
@@ -425,10 +426,11 @@ public class ChangeGroup extends VimChangeGroupBase {
   /**
    * Deletes the range of text and enters insert mode
    *
-   * @param editor The editor to change
-   * @param caret  The caret to be moved after range deletion
-   * @param range  The range to change
-   * @param type   The type of the range
+   * @param editor            The editor to change
+   * @param caret             The caret to be moved after range deletion
+   * @param range             The range to change
+   * @param type              The type of the range
+   * @param operatorArguments
    * @return true if able to delete the range, false if not
    */
   @Override
@@ -436,7 +438,8 @@ public class ChangeGroup extends VimChangeGroupBase {
                              @NotNull VimCaret caret,
                              @NotNull TextRange range,
                              @NotNull SelectionType type,
-                             ExecutionContext context) {
+                             @Nullable ExecutionContext context,
+                             @NotNull OperatorArguments operatorArguments) {
     int col = 0;
     int lines = 0;
     if (type == SelectionType.BLOCK_WISE) {
@@ -450,7 +453,7 @@ public class ChangeGroup extends VimChangeGroupBase {
 
     final VimLogicalPosition lp = editor.offsetToLogicalPosition(injector.getMotion().moveCaretToLineStartSkipLeading(editor, caret));
 
-    boolean res = deleteRange(editor, caret, range, type, true);
+    boolean res = deleteRange(editor, caret, range, type, true, operatorArguments);
     if (res) {
       if (type == SelectionType.LINE_WISE) {
         // Please don't use `getDocument().getText().isEmpty()` because it converts CharSequence into String
@@ -586,10 +589,11 @@ public class ChangeGroup extends VimChangeGroupBase {
                           @NotNull VimCaret caret,
                           @NotNull ExecutionContext context,
                           int lines,
-                          int dir) {
+                          int dir,
+                          @NotNull OperatorArguments operatorArguments) {
     int start = ((IjVimCaret) caret).getCaret().getOffset();
     int end = VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret, lines - 1, true);
-    indentRange(editor, caret, context, new TextRange(start, end), 1, dir);
+    indentRange(editor, caret, context, new TextRange(start, end), 1, dir, operatorArguments);
   }
 
   @Override
@@ -602,7 +606,7 @@ public class ChangeGroup extends VimChangeGroupBase {
     final TextRange range =
       injector.getMotion().getMotionRange(editor, caret, context, argument, operatorArguments);
     if (range != null) {
-      indentRange(editor, caret, context, range, 1, dir);
+      indentRange(editor, caret, context, range, 1, dir, operatorArguments);
     }
   }
 
@@ -629,7 +633,8 @@ public class ChangeGroup extends VimChangeGroupBase {
                           @NotNull ExecutionContext context,
                           @NotNull TextRange range,
                           int count,
-                          int dir) {
+                          int dir,
+                          @NotNull OperatorArguments operatorArguments) {
     if (logger.isDebugEnabled()) {
       logger.debug("count=" + count);
     }
@@ -675,7 +680,7 @@ public class ChangeGroup extends VimChangeGroupBase {
               }
             }
             if (pos > wsoff) {
-              deleteText(editor, new TextRange(wsoff, pos), null, caret);
+              deleteText(editor, new TextRange(wsoff, pos), null, caret, operatorArguments);
             }
           }
         }

@@ -71,6 +71,7 @@ class ChangeActionTest : VimTestCase() {
   }
 
   // VIM-620 |i_CTRL-O|
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun testInsertSingleCommandAndNewLineInserting5() {
     doTest(
       listOf("i", "<C-O>", "v", "<C-G>"),
@@ -79,6 +80,7 @@ class ChangeActionTest : VimTestCase() {
   }
 
   // VIM-620 |i_CTRL-O|
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun testInsertSingleCommandAndNewLineInserting6() {
     doTest(
       listOf("i", "<C-O>", "gh"),
@@ -87,6 +89,7 @@ class ChangeActionTest : VimTestCase() {
   }
 
   // VIM-620 |i_CTRL-O|
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun testInsertSingleCommandAndNewLineInserting7() {
     doTest(
       listOf("i", "<C-O>", "gh", "<esc>"),
@@ -443,14 +446,15 @@ quux
     )
   }
 
+  @VimBehaviorDiffers(originalVimAfter = "foo  bar")
   fun testDeleteJoinLinesWithTrailingSpaceThenEmptyLine() {
     doTest(
       "3J",
       """
-        foo 
+        foo.
         
         bar
-      """.trimIndent(),
+      """.dotToSpace().trimIndent(),
       "foo bar", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
@@ -459,9 +463,9 @@ quux
     doTest(
       "J",
       """
-        foo  
+        foo..
         bar
-      """.trimIndent(),
+      """.dotToSpace().trimIndent(),
       "foo  bar", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }

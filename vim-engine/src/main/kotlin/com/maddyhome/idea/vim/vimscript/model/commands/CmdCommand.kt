@@ -22,6 +22,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCommandGroup.Companion.BLACKLISTED_ALIASES
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.CommandAlias
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.VimNlsSafe
@@ -45,7 +46,7 @@ data class CmdCommand(val ranges: Ranges, val argument: String) : Command.Single
     const val zeroOrOneArguments = "?"
     const val moreThanZeroArguments = "+"
   }
-  override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
+  override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     val result: Boolean = if (argument.trim().isEmpty()) {
       this.listAlias(editor, "")
     } else {

@@ -46,7 +46,7 @@ class ShiftLeftLinesAction : ChangeEditorActionHandler.ForEachCaret() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    injector.changeGroup.indentLines(editor, caret, context, operatorArguments.count1, -1)
+    injector.changeGroup.indentLines(editor, caret, context, operatorArguments.count1, -1, operatorArguments)
 
     return true
   }
@@ -86,7 +86,15 @@ class ShiftLeftVisualAction : VisualOperatorActionHandler.ForEachCaret() {
     range: VimSelection,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    injector.changeGroup.indentRange(editor, caret, context, range.toVimTextRange(false), cmd.count, -1)
+    injector.changeGroup.indentRange(
+        editor,
+        caret,
+        context,
+        range.toVimTextRange(false),
+        cmd.count,
+        -1,
+        operatorArguments
+    )
     return true
   }
 }

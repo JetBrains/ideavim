@@ -43,6 +43,6 @@ class ChangeCharactersAction : ChangeEditorActionHandler.ForEachCaret() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    return injector.changeGroup.changeCharacters(editor, caret, operatorArguments.count1)
+    return injector.changeGroup.changeCharacters(editor, caret, operatorArguments)
   }
 }

@@ -5,8 +5,9 @@ import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimLogicalPosition
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.command.SelectionType
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.command.isBlock
 import com.maddyhome.idea.vim.command.isChar
 import com.maddyhome.idea.vim.command.isLine
@@ -25,9 +26,10 @@ abstract class VimPutBase : VimPut {
     context: ExecutionContext,
     data: PutData,
     updateVisualMarks: Boolean,
+    operatorArguments: OperatorArguments,
   ): Boolean {
     val additionalData = collectPreModificationData(editor, data)
-    deleteSelectedText(editor, data)
+    deleteSelectedText(editor, data, operatorArguments)
     val processedText = processText(editor, data) ?: return false
     putTextAndSetCaretPosition(editor, context, processedText, data, additionalData)
 
@@ -76,7 +78,7 @@ abstract class VimPutBase : VimPut {
     injector.markGroup.setVisualSelectionMarks(editor, TextRange(fistIndex, lastIndex))
   }
 
-  protected fun deleteSelectedText(editor: VimEditor, data: PutData) {
+  protected fun deleteSelectedText(editor: VimEditor, data: PutData, operatorArguments: OperatorArguments) {
     if (data.visualSelection == null) return
 
     data.visualSelection.caretsAndSelections.entries.sortedByDescending { it.key.getLogicalPosition() }
@@ -85,7 +87,7 @@ abstract class VimPutBase : VimPut {
         val range = selection.toVimTextRange(false).normalize()
 
         injector.application.runWriteAction {
-          injector.changeGroup.deleteRange(editor, caret, range, selection.type, false)
+          injector.changeGroup.deleteRange(editor, caret, range, selection.type, false, operatorArguments)
         }
         caret.moveToInlayAwareOffset(range.startOffset)
       }

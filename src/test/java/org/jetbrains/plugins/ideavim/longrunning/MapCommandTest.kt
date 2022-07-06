@@ -21,10 +21,13 @@ package org.jetbrains.plugins.ideavim.longrunning
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import junit.framework.TestCase
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class MapCommandTest : VimTestCase() {
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test double recursion`() {
     val text = """
           -----

@@ -50,7 +50,8 @@ class ChangeVisualAction : VisualOperatorActionHandler.ForEachCaret() {
       caret,
       range.toVimTextRange(false),
       range.type,
-      context
+      context,
+      operatorArguments
     )
   }
 }

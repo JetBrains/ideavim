@@ -55,7 +55,7 @@ class InsertRegisterAction : VimActionHandler.SingleExecution() {
               val textToStore = expressionValue.toInsertableString()
               injector.registerGroup.storeTextSpecial('=', textToStore)
             }
-            insertRegister(editor, context, argument.character)
+            insertRegister(editor, context, argument.character, operatorArguments)
           }
         } catch (e: ExException) {
           injector.messages.indicateError()
@@ -64,7 +64,7 @@ class InsertRegisterAction : VimActionHandler.SingleExecution() {
       }
       return true
     } else {
-      return argument != null && insertRegister(editor, context, argument.character)
+      return argument != null && insertRegister(editor, context, argument.character, operatorArguments)
     }
   }
 
@@ -82,13 +82,18 @@ class InsertRegisterAction : VimActionHandler.SingleExecution() {
  * @param key     The register name
  * @return true if able to insert the register contents, false if not
  */
-private fun insertRegister(editor: VimEditor, context: ExecutionContext, key: Char): Boolean {
+private fun insertRegister(
+  editor: VimEditor,
+  context: ExecutionContext,
+  key: Char,
+  operatorArguments: OperatorArguments
+): Boolean {
   val register: Register? = injector.registerGroup.getRegister(key)
   if (register != null) {
     val text = register.rawText ?: injector.parser.toPrintableString(register.keys)
     val textData = PutData.TextData(text, SelectionType.CHARACTER_WISE, emptyList())
     val putData = PutData(textData, null, 1, insertTextBeforeCaret = true, rawIndent = true, caretAfterInsertedText = true)
-    injector.put.putText(editor, context, putData)
+    injector.put.putText(editor, context, putData, operatorArguments = operatorArguments)
     return true
   }
   return false

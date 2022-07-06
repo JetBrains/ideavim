@@ -45,7 +45,7 @@ class DeleteJoinLinesSpacesAction : ChangeEditorActionHandler.SingleExecution() 
     val res = arrayOf(true)
     editor.forEachNativeCaret(
       { caret: VimCaret ->
-        if (!injector.changeGroup.deleteJoinLines(editor, caret, operatorArguments.count1, true)) res[0] = false
+        if (!injector.changeGroup.deleteJoinLines(editor, caret, operatorArguments.count1, true, operatorArguments)) res[0] = false
       },
       true
     )

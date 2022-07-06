@@ -22,6 +22,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.NativeAction
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
@@ -36,7 +37,7 @@ data class ActionCommand(val ranges: Ranges, val argument: String) : Command.Sin
     Access.READ_ONLY,
     Flag.SAVE_VISUAL)
 
-  override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
+  override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     val actionName = argument.trim()
     val action = injector.actionExecutor.getAction(actionName) ?: throw ExException(injector.messages.message("action.not.found.0", actionName))
     if (injector.application.isUnitTest()) {

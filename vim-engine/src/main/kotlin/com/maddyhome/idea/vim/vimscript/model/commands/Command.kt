@@ -19,10 +19,11 @@
 package com.maddyhome.idea.vim.vimscript.model.commands
 
 import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.ex.ExException
@@ -34,7 +35,10 @@ import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.Msg
 import com.maddyhome.idea.vim.helper.inVisualMode
+import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.noneOfEnum
+import com.maddyhome.idea.vim.helper.subMode
+import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
@@ -48,11 +52,20 @@ sealed class Command(var commandRanges: Ranges, val commandArgument: String) : E
   private val logger = vimLogger<Command>()
 
   abstract class ForEachCaret(ranges: Ranges, argument: String = "") : Command(ranges, argument) {
-    abstract fun processCommand(editor: VimEditor, caret: VimCaret, context: ExecutionContext): ExecutionResult
+    abstract fun processCommand(
+      editor: VimEditor,
+      caret: VimCaret,
+      context: ExecutionContext,
+      operatorArguments: OperatorArguments
+    ): ExecutionResult
   }
 
   abstract class SingleExecution(ranges: Ranges, argument: String = "") : Command(ranges, argument) {
-    abstract fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult
+    abstract fun processCommand(
+      editor: VimEditor,
+      context: ExecutionContext,
+      operatorArguments: OperatorArguments,
+    ): ExecutionResult
   }
 
   @Throws(ExException::class)
@@ -67,7 +80,14 @@ sealed class Command(var commandRanges: Ranges, val commandArgument: String) : E
       return ExecutionResult.Error
     }
 
-    val runCommand = { runCommand(editor, context) }
+    val operatorArguments = OperatorArguments(
+      editor.vimStateMachine.isOperatorPending,
+      0,
+      editor.mode,
+      editor.subMode,
+    )
+
+    val runCommand = { runCommand(editor, context, operatorArguments) }
     return when (argFlags.access) {
       Access.WRITABLE -> injector.application.runWriteAction(runCommand)
       Access.READ_ONLY -> injector.application.runReadAction(runCommand)
@@ -75,20 +95,20 @@ sealed class Command(var commandRanges: Ranges, val commandArgument: String) : E
     }
   }
 
-  private fun runCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
+  private fun runCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     var result: ExecutionResult = ExecutionResult.Success
     when (this) {
       is ForEachCaret -> {
         editor.forEachNativeCaret(
           { caret ->
             if (result is ExecutionResult.Success) {
-              result = processCommand(editor, caret, context)
+              result = processCommand(editor, caret, context, operatorArguments)
             }
           },
           true
         )
       }
-      is SingleExecution -> result = processCommand(editor, context)
+      is SingleExecution -> result = processCommand(editor, context, operatorArguments)
     }
     return result
   }

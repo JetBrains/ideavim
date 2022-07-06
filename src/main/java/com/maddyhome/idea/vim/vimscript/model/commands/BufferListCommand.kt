@@ -26,6 +26,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.EditorHelper
@@ -48,7 +49,7 @@ data class BufferListCommand(val ranges: Ranges, val argument: String) : Command
     val SUPPORTED_FILTERS = setOf('+', '=', 'a', '%', '#')
   }
 
-  override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
+  override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     val arg = argument.trim()
     val filter = pruneUnsupportedFilters(arg)
     val bufferList = getBufferList(context, filter)

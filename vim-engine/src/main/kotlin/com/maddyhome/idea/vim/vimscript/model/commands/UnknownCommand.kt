@@ -21,6 +21,7 @@ package com.maddyhome.idea.vim.vimscript.model.commands
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.GoalCommand
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.InvalidCommandException
@@ -40,7 +41,7 @@ data class UnknownCommand(val ranges: Ranges, val name: String, val argument: St
     const val MAX_RECURSION = 100
   }
 
-  override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
+  override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     return processPossiblyAliasCommand("$name $argument", editor, context, MAX_RECURSION)
   }
 

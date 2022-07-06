@@ -20,12 +20,12 @@ package com.maddyhome.idea.vim.command
 import com.maddyhome.idea.vim.api.VimActionsInitiator
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.key.CommandPartNode
 import com.maddyhome.idea.vim.common.DigraphResult
 import com.maddyhome.idea.vim.common.DigraphSequence
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.helper.noneOfEnum
+import com.maddyhome.idea.vim.key.CommandPartNode
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import org.jetbrains.annotations.Contract
@@ -291,7 +291,14 @@ class VimStateMachine(private val editor: VimEditor?) {
         SubMode.VISUAL_BLOCK -> "\u0013"
         else -> error("Unexpected state")
       }
+
       Mode.REPLACE -> "R"
+      Mode.INSERT_VISUAL -> when (subMode) {
+        SubMode.VISUAL_CHARACTER -> "v"
+        SubMode.VISUAL_LINE -> "V"
+        SubMode.VISUAL_BLOCK -> "\u0016"
+        else -> error("Unexpected state")
+      }
       else -> error("Unexpected state")
     }
   }

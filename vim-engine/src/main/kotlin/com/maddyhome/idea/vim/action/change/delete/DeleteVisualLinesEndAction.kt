@@ -57,7 +57,14 @@ class DeleteVisualLinesEndAction : VisualOperatorActionHandler.ForEachCaret() {
         }
       }
       val blockRange = TextRange(starts, ends)
-      injector.changeGroup.deleteRange(editor, editor.primaryCaret(), blockRange, SelectionType.BLOCK_WISE, false)
+      injector.changeGroup.deleteRange(
+          editor,
+          editor.primaryCaret(),
+          blockRange,
+          SelectionType.BLOCK_WISE,
+          false,
+          operatorArguments
+      )
     } else {
       val lineEndForOffset = injector.engineEditorHelper.getLineEndForOffset(editor, vimTextRange.endOffset)
       val endsWithNewLine = if (lineEndForOffset.toLong() == editor.fileSize()) 0 else 1
@@ -65,7 +72,7 @@ class DeleteVisualLinesEndAction : VisualOperatorActionHandler.ForEachCaret() {
         injector.engineEditorHelper.getLineStartForOffset(editor, vimTextRange.startOffset),
         lineEndForOffset + endsWithNewLine
       )
-      injector.changeGroup.deleteRange(editor, caret, lineRange, SelectionType.LINE_WISE, false)
+      injector.changeGroup.deleteRange(editor, caret, lineRange, SelectionType.LINE_WISE, false, operatorArguments)
     }
   }
 }

@@ -46,6 +46,13 @@ class DeleteVisualAction : VisualOperatorActionHandler.ForEachCaret() {
     operatorArguments: OperatorArguments,
   ): Boolean {
     val selectionType = range.type
-    return injector.changeGroup.deleteRange(editor, caret, range.toVimTextRange(false), selectionType, false)
+    return injector.changeGroup.deleteRange(
+      editor,
+      caret,
+      range.toVimTextRange(false),
+      selectionType,
+      false,
+      operatorArguments
+    )
   }
 }

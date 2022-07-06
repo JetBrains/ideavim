@@ -53,7 +53,7 @@ class DeleteMotionAction : ChangeEditorActionHandler.ForEachCaret(), DuplicableO
       val (first, second) = injector.changeGroup
         .getDeleteRangeAndType(editor, caret, context, argument, false, operatorArguments)
         ?: return false
-      return injector.changeGroup.deleteRange(editor, caret, first, second, false)
+      return injector.changeGroup.deleteRange(editor, caret, first, second, false, operatorArguments)
     }
   }
 }

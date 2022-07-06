@@ -72,6 +72,9 @@ val VimStateMachine.Mode.inSingleMode: Boolean
     else -> false
   }
 
+val VimStateMachine.Mode.inInsertMode: Boolean
+  get() = this == VimStateMachine.Mode.INSERT || this == VimStateMachine.Mode.REPLACE
+
 val VimStateMachine.Mode.inSingleNormalMode: Boolean
   get() = when (this) {
     VimStateMachine.Mode.INSERT_NORMAL -> true
@@ -94,7 +97,7 @@ val VimStateMachine.Mode.isEndAllowedIgnoringOnemore: Boolean
   }
 
 val VimEditor.inInsertMode
-  get() = this.mode == VimStateMachine.Mode.INSERT || this.mode == VimStateMachine.Mode.REPLACE
+  get() = this.mode.inInsertMode
 
 val VimEditor.inSelectMode
   get() = this.mode == VimStateMachine.Mode.SELECT || this.mode == VimStateMachine.Mode.INSERT_SELECT

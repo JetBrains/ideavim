@@ -38,7 +38,7 @@ data class NormalCommand(val ranges: Ranges, val argument: String) : Command.Sin
     Access.WRITABLE,
     Flag.SAVE_VISUAL)
 
-  override fun processCommand(editor: VimEditor, context: ExecutionContext): ExecutionResult {
+  override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     if (injector.optionService.isSet(OptionScope.GLOBAL, OptionConstants.ideadelaymacroName)) {
       return ExecutionResult.Success
     }

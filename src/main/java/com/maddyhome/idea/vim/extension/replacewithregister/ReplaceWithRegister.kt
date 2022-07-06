@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.command.isLine
@@ -38,8 +39,10 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissin
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setOperatorFunction
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.helper.EditorDataContext
+import com.maddyhome.idea.vim.helper.editorMode
 import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.subMode
+import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.newapi.IjExecutionContext
 import com.maddyhome.idea.vim.newapi.IjVimEditor
@@ -171,7 +174,15 @@ class ReplaceWithRegister : VimExtension {
         putToLine = -1
       )
       ClipboardOptionHelper.IdeaputDisabler().use {
-        VimPlugin.getPut().putText(IjVimEditor(editor), IjExecutionContext(EditorDataContext.init(editor)), putData)
+        VimPlugin.getPut().putText(
+            IjVimEditor(editor),
+            IjExecutionContext(EditorDataContext.init(editor)),
+            putData,
+            operatorArguments = OperatorArguments(
+              editor.vimStateMachine?.isOperatorPending ?: false,
+              0, editor.editorMode, editor.subMode
+            )
+        )
       }
 
       caret.registerStorage.saveRegister(savedRegister.name, savedRegister)

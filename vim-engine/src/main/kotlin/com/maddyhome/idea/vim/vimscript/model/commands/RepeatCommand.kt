@@ -22,6 +22,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
@@ -35,7 +36,12 @@ data class RepeatCommand(val ranges: Ranges, val argument: String) : Command.For
   private var lastArg = ':'
 
   @Throws(ExException::class)
-  override fun processCommand(editor: VimEditor, caret: VimCaret, context: ExecutionContext): ExecutionResult {
+  override fun processCommand(
+      editor: VimEditor,
+      caret: VimCaret,
+      context: ExecutionContext,
+      operatorArguments: OperatorArguments
+  ): ExecutionResult {
     var arg = argument[0]
     if (arg == '@') arg = lastArg
     lastArg = arg

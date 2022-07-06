@@ -19,9 +19,9 @@ package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.command.SelectionType
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.group.visual.VimSelection
@@ -59,21 +59,39 @@ interface VimChangeGroup {
 
   fun processCommand(editor: VimEditor, cmd: Command)
 
-  fun deleteCharacter(editor: VimEditor, caret: VimCaret, count: Int, isChange: Boolean): Boolean
+  fun deleteCharacter(
+    editor: VimEditor,
+    caret: VimCaret,
+    count: Int,
+    isChange: Boolean,
+    operatorArguments: OperatorArguments
+  ): Boolean
 
   fun processSingleCommand(editor: VimEditor)
 
-  fun deleteEndOfLine(editor: VimEditor, caret: VimCaret, count: Int): Boolean
+  fun deleteEndOfLine(editor: VimEditor, caret: VimCaret, count: Int, operatorArguments: OperatorArguments): Boolean
 
-  fun deleteJoinLines(editor: VimEditor, caret: VimCaret, count: Int, spaces: Boolean): Boolean
+  fun deleteJoinLines(
+    editor: VimEditor,
+    caret: VimCaret,
+    count: Int,
+    spaces: Boolean,
+    operatorArguments: OperatorArguments
+  ): Boolean
 
   fun processKey(editor: VimEditor, context: ExecutionContext, key: KeyStroke): Boolean
 
   fun processKeyInSelectMode(editor: VimEditor, context: ExecutionContext, key: KeyStroke): Boolean
 
-  fun deleteLine(editor: VimEditor, caret: VimCaret, count: Int): Boolean
+  fun deleteLine(editor: VimEditor, caret: VimCaret, count: Int, operatorArguments: OperatorArguments): Boolean
 
-  fun deleteJoinRange(editor: VimEditor, caret: VimCaret, range: TextRange, spaces: Boolean): Boolean
+  fun deleteJoinRange(
+    editor: VimEditor,
+    caret: VimCaret,
+    range: TextRange,
+    spaces: Boolean,
+    operatorArguments: OperatorArguments
+  ): Boolean
 
   fun joinViaIdeaByCount(editor: VimEditor, context: ExecutionContext, count: Int): Boolean
 
@@ -83,12 +101,19 @@ interface VimChangeGroup {
 
   fun getDeleteRangeAndType2(editor: VimEditor, caret: VimCaret, context: ExecutionContext, argument: Argument, isChange: Boolean, operatorArguments: OperatorArguments): Pair<TextRange, SelectionType>?
 
-  fun deleteRange(editor: VimEditor, caret: VimCaret, range: TextRange, type: SelectionType?, isChange: Boolean): Boolean
+  fun deleteRange(
+    editor: VimEditor,
+    caret: VimCaret,
+    range: TextRange,
+    type: SelectionType?,
+    isChange: Boolean,
+    operatorArguments: OperatorArguments
+  ): Boolean
   fun deleteRange2(editor: VimEditor, caret: VimCaret, range: TextRange, type: SelectionType): Boolean
 
-  fun changeCharacters(editor: VimEditor, caret: VimCaret, count: Int): Boolean
+  fun changeCharacters(editor: VimEditor, caret: VimCaret, operatorArguments: OperatorArguments): Boolean
 
-  fun changeEndOfLine(editor: VimEditor, caret: VimCaret, count: Int): Boolean
+  fun changeEndOfLine(editor: VimEditor, caret: VimCaret, count: Int, operatorArguments: OperatorArguments): Boolean
 
   fun changeMotion(editor: VimEditor, caret: VimCaret, context: ExecutionContext, argument: Argument, operatorArguments: OperatorArguments): Boolean
 
@@ -98,7 +123,14 @@ interface VimChangeGroup {
 
   fun changeCaseRange(editor: VimEditor, caret: VimCaret, range: TextRange, type: Char): Boolean
 
-  fun changeRange(editor: VimEditor, caret: VimCaret, range: TextRange, type: SelectionType, context: ExecutionContext?): Boolean
+  fun changeRange(
+    editor: VimEditor,
+    caret: VimCaret,
+    range: TextRange,
+    type: SelectionType,
+    context: ExecutionContext?,
+    operatorArguments: OperatorArguments
+  ): Boolean
 
   fun changeCaseMotion(editor: VimEditor, caret: VimCaret, context: ExecutionContext?, type: Char, argument: Argument, operatorArguments: OperatorArguments): Boolean
 
@@ -110,7 +142,14 @@ interface VimChangeGroup {
 
   fun autoIndentRange(editor: VimEditor, caret: VimCaret, context: ExecutionContext, range: TextRange)
 
-  fun indentLines(editor: VimEditor, caret: VimCaret, context: ExecutionContext, lines: Int, dir: Int)
+  fun indentLines(
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    lines: Int,
+    dir: Int,
+    operatorArguments: OperatorArguments
+  )
 
   fun insertText(editor: VimEditor, caret: VimCaret, offset: Int, str: String)
 
@@ -118,7 +157,15 @@ interface VimChangeGroup {
 
   fun indentMotion(editor: VimEditor, caret: VimCaret, context: ExecutionContext, argument: Argument, dir: Int, operatorArguments: OperatorArguments)
 
-  fun indentRange(editor: VimEditor, caret: VimCaret, context: ExecutionContext, range: TextRange, count: Int, dir: Int)
+  fun indentRange(
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    range: TextRange,
+    count: Int,
+    dir: Int,
+    operatorArguments: OperatorArguments
+  )
 
   fun changeNumberVisualMode(editor: VimEditor, caret: VimCaret, selectedRange: TextRange, count: Int, avalanche: Boolean): Boolean
 

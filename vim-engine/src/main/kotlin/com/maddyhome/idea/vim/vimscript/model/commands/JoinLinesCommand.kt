@@ -22,6 +22,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
@@ -32,20 +33,26 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 data class JoinLinesCommand(val ranges: Ranges, val argument: String) : Command.ForEachCaret(ranges, argument) {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.WRITABLE)
 
-  override fun processCommand(editor: VimEditor, caret: VimCaret, context: ExecutionContext): ExecutionResult {
+  override fun processCommand(
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    operatorArguments: OperatorArguments
+  ): ExecutionResult {
     val arg = argument
     val spaces = arg.isEmpty() || arg[0] != '!'
 
     val textRange = getTextRange(editor, caret, true)
 
     return if (injector.changeGroup.deleteJoinRange(
-        editor, caret,
-        TextRange(
-            textRange.startOffset,
-            textRange.endOffset - 1
-          ),
-        spaces
-      )
+            editor, caret,
+            TextRange(
+                textRange.startOffset,
+                textRange.endOffset - 1
+              ),
+            spaces,
+            operatorArguments
+        )
     ) ExecutionResult.Success else ExecutionResult.Error
   }
 }

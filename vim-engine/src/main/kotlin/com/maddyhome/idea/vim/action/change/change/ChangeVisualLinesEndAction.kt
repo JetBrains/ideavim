@@ -60,7 +60,7 @@ class ChangeVisualLinesEndAction : VisualOperatorActionHandler.ForEachCaret() {
         }
       }
       val blockRange = TextRange(starts, ends)
-      injector.changeGroup.changeRange(editor, caret, blockRange, SelectionType.BLOCK_WISE, context)
+      injector.changeGroup.changeRange(editor, caret, blockRange, SelectionType.BLOCK_WISE, context, operatorArguments)
     } else {
       val lineEndForOffset = injector.engineEditorHelper.getLineEndForOffset(editor, vimTextRange.endOffset)
       val endsWithNewLine = if (lineEndForOffset.toLong() == editor.fileSize()) 0 else 1
@@ -68,7 +68,7 @@ class ChangeVisualLinesEndAction : VisualOperatorActionHandler.ForEachCaret() {
         injector.engineEditorHelper.getLineStartForOffset(editor, vimTextRange.startOffset),
         lineEndForOffset + endsWithNewLine
       )
-      injector.changeGroup.changeRange(editor, caret, lineRange, SelectionType.LINE_WISE, context)
+      injector.changeGroup.changeRange(editor, caret, lineRange, SelectionType.LINE_WISE, context, operatorArguments)
     }
   }
 }

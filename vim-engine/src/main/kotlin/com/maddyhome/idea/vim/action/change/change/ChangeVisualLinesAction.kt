@@ -58,11 +58,12 @@ class ChangeVisualLinesAction : VisualOperatorActionHandler.ForEachCaret() {
       lineEndForOffset + endsWithNewLine
     )
     return injector.changeGroup.changeRange(
-      editor,
-      caret,
-      lineRange,
-      SelectionType.LINE_WISE,
-      context
+        editor,
+        caret,
+        lineRange,
+        SelectionType.LINE_WISE,
+        context,
+        operatorArguments
     )
   }
 }

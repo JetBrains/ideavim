@@ -3,6 +3,7 @@ package com.maddyhome.idea.vim.put
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.command.OperatorArguments
 
 interface VimPut {
   fun doIndent(editor: VimEditor, caret: VimCaret, context: ExecutionContext, startOffset: Int, endOffset: Int): Int
@@ -21,6 +22,7 @@ interface VimPut {
     context: ExecutionContext,
     data: PutData,
     updateVisualMarks: Boolean = false,
+    operatorArguments: OperatorArguments,
   ): Boolean
 
   fun putTextForCaret(editor: VimEditor, caret: VimCaret, context: ExecutionContext, data: PutData, updateVisualMarks: Boolean = false): Boolean

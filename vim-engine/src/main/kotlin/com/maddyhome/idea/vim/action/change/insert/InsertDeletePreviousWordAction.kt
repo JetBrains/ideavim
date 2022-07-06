@@ -44,7 +44,7 @@ class InsertDeletePreviousWordAction : ChangeEditorActionHandler.ForEachCaret() 
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    return insertDeletePreviousWord(editor, caret)
+    return insertDeletePreviousWord(editor, caret, operatorArguments)
   }
 }
 
@@ -57,7 +57,7 @@ class InsertDeletePreviousWordAction : ChangeEditorActionHandler.ForEachCaret() 
  * @param editor The editor to delete the text from
  * @return true if able to delete text, false if not
  */
-fun insertDeletePreviousWord(editor: VimEditor, caret: VimCaret): Boolean {
+fun insertDeletePreviousWord(editor: VimEditor, caret: VimCaret, operatorArguments: OperatorArguments): Boolean {
   val deleteTo: Int = if (caret.getLogicalPosition().column == 0) {
     caret.offset.point - 1
   } else {
@@ -81,6 +81,6 @@ fun insertDeletePreviousWord(editor: VimEditor, caret: VimCaret): Boolean {
     return false
   }
   val range = TextRange(deleteTo, caret.offset.point)
-  injector.changeGroup.deleteRange(editor, caret, range, SelectionType.CHARACTER_WISE, true)
+  injector.changeGroup.deleteRange(editor, caret, range, SelectionType.CHARACTER_WISE, true, operatorArguments)
   return true
 }

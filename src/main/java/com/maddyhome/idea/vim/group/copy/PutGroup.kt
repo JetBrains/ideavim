@@ -34,6 +34,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.command.isBlock
@@ -43,7 +44,9 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.TestClipboardModel
 import com.maddyhome.idea.vim.helper.fileSize
+import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
+import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.mark.VimMarkConstants.MARK_CHANGE_POS
 import com.maddyhome.idea.vim.newapi.IjVimCaret
 import com.maddyhome.idea.vim.newapi.IjVimEditor
@@ -62,7 +65,13 @@ import kotlin.math.min
 class PutGroup : VimPutBase() {
   override fun putTextForCaret(editor: VimEditor, caret: VimCaret, context: ExecutionContext, data: PutData, updateVisualMarks: Boolean): Boolean {
     val additionalData = collectPreModificationData(editor, data)
-    data.visualSelection?.let { deleteSelectedText(editor, data) }
+    data.visualSelection?.let {
+      deleteSelectedText(
+        editor,
+        data,
+        OperatorArguments(false, 0, editor.mode, editor.subMode)
+      )
+    }
     val processedText = processText(editor, data) ?: return false
     putForCaret(editor, caret, data, additionalData, context, processedText)
     if (editor.primaryCaret() == caret && updateVisualMarks) {
