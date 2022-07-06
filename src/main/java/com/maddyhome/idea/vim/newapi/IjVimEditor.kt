@@ -62,7 +62,9 @@ import com.maddyhome.idea.vim.helper.updateCaretsVisualPosition
 import com.maddyhome.idea.vim.helper.vimChangeActionSwitchMode
 import com.maddyhome.idea.vim.helper.vimKeepingVisualOperatorAction
 import com.maddyhome.idea.vim.helper.vimLastSelectionType
+import org.jetbrains.annotations.ApiStatus
 
+@ApiStatus.Internal
 class IjVimEditor(editor: Editor) : MutableLinearEditor() {
 
   // All the editor actions should be performed with top level editor!!!

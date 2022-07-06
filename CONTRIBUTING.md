@@ -5,7 +5,7 @@ IdeaVim is an open source project created by 80+ contributors. Would you like to
 This page is created to help you start contributing. And who knows, maybe in a few days this project will be brighter than ever!
 
 :warning: The plugin is currently under a huge refactoring aiming to split into vim-engine and IdeaVim in order to
-support the new [Fleet IDE](https://www.jetbrains.com/fleet/).
+support the new [Fleet IDE](https://www.jetbrains.com/fleet/). Please see [Fleet refactoring](#Fleet-refactoring).
 
 ## Before you begin
 
@@ -119,6 +119,17 @@ And we also translate it to `d_` and `y_`: `KeyHandler.mapOpCommand()`.
 so you can reuse your `.vimrc` settings. 
 We also support proper command mappings (functions are mapped to `<Plug>...`), the operator function (`OperatorFunction`), and so on.
 - Magic is supported as well. See `Magic`.
+
+
+## Fleet refactoring
+At the moment, IdeaVim is under an active refactoring aiming to split IdeaVim into two modules: vim-engine and IdeaVim.
+
+If you develop a plugin that depends on IdeaVim: We have an instrument to check that our changes don't affect
+the plugins in the marketplace. Also, we commit to support currently used API at least till the end of 2022.
+If you still encounter any issues with the newer versions of IdeaVim, please [contact maintainers](https://github.com/JetBrains/ideavim#contact-maintainers).
+We kindly ask you not to use anything from the new API (like `VimEditor`, `injector`) because at the moment we don't
+guarantee the compatibility of this API in the future versions.
+
 
 -----
 
