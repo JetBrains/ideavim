@@ -18,7 +18,10 @@
 
 package org.jetbrains.plugins.ideavim.action.change
 
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.vimscript.services.IjVimOptionService
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class UndoActionTest : VimTestCase() {
@@ -76,8 +79,9 @@ class UndoActionTest : VimTestCase() {
   }
 
   fun `test cursor movements do not require additional undo`() {
-    val keys = listOf("a1<Esc>ea2<Esc>ea3<Esc>", "uu")
-    val before = """
+    if (!injector.optionService.isSet(OptionScope.GLOBAL, IjVimOptionService.oldUndo)) {
+      val keys = listOf("a1<Esc>ea2<Esc>ea3<Esc>", "uu")
+      val before = """
                 A Discovery
 
                 ${c}I found it in a legendary land
@@ -85,7 +89,7 @@ class UndoActionTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
     """.trimIndent()
-    val after = """
+      val after = """
                 A Discovery
 
                 I1 found$c it in a legendary land
@@ -93,8 +97,9 @@ class UndoActionTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
-    assertFalse(hasSelection())
+      doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+      assertFalse(hasSelection())
+    }
   }
 
   private fun hasSelection(): Boolean {
