@@ -88,7 +88,7 @@ class UndoActionTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-    """.trimIndent()
+      """.trimIndent()
       val after = """
                 A Discovery
 
@@ -96,7 +96,7 @@ class UndoActionTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-    """.trimIndent()
+      """.trimIndent()
       doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
       assertFalse(hasSelection())
     }

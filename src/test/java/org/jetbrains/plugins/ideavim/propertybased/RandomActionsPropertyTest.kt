@@ -22,8 +22,8 @@ import com.intellij.ide.IdeEventQueue
 import com.intellij.openapi.editor.Editor
 import com.intellij.testFramework.PlatformTestUtil
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.key.CommandNode
 import com.maddyhome.idea.vim.helper.vimStateMachine
+import com.maddyhome.idea.vim.key.CommandNode
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.jetCheck.Generator
