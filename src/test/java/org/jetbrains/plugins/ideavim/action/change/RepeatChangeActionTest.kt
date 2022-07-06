@@ -317,6 +317,12 @@ class RepeatChangeActionTest : VimTestCase() {
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
+  @VimBehaviorDiffers(originalVimAfter = """
+    
+        Three
+        Two
+        One
+  """)
   fun `test redo register feature`() {
     doTest(
       listOf("dd", "dd", "dd", "\"1p", ".", "."),

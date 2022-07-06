@@ -111,6 +111,7 @@ class ResetModeActionTest : VimTestCase() {
     TestCase.assertFalse(myFixture.editor.selectionModel.hasSelection())
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.CTRL_CODES)
   fun `test delete command after resetting operator-pending mode with ctrl open bracket`() {
     val keys = listOf("d", "<C-[>", "dw")
     val before = "A Discovery"

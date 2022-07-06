@@ -171,6 +171,7 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
     assertState(after)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.CTRL_CODES)
   fun `test Put line in block selection`() {
     val file = """
             ${c}A Discovery

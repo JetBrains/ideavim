@@ -42,6 +42,7 @@ class InsertEnterActionTest : VimTestCase() {
     doTest(listOf("i", "<Enter>"), before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.CTRL_CODES)
   fun `test insert enter with C-M`() {
     val before = """I found it in a legendary land
         |${c}all rocks and lavender and tufted grass,

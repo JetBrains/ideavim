@@ -112,7 +112,10 @@ internal object NeovimTesting {
     when {
       keys.equals("<esc>", ignoreCase = true) -> neovimApi.input(escapeCommand).get()
       keys.equals("<C-C>", ignoreCase = true) -> neovimApi.input(ctrlcCommand).get()
-      else -> neovimApi.input(neovimApi.replaceTermcodes(keys, true, false, true).get()).get()
+      else -> {
+        val replacedCodes = neovimApi.replaceTermcodes(keys, true, false, true).get()
+        neovimApi.input(replacedCodes).get()
+      }
     }
   }
 
@@ -228,6 +231,7 @@ enum class SkipNeovimReason {
   VIM_SCRIPT,
 
   GUARDED_BLOCKS,
+  CTRL_CODES,
 }
 
 fun LogicalPosition.toVimCoords(): VimCoords {

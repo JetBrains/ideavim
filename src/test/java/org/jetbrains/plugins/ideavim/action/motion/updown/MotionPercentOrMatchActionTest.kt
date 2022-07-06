@@ -84,6 +84,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
     assertOffset(7)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN, description = "Matchit plugin affects neovim")
   fun `test percent match parens in string`() {
     typeTextInFile(
       injector.parser.parseKeys("%"),
@@ -113,6 +114,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
     assertState("$c<!-- foo -->")
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN, description = "Matchit plugin affects neovim")
   fun `test percent match java comment start`() {
     configureByJavaText("/$c* foo */")
     typeText(injector.parser.parseKeys("%"))
@@ -144,12 +146,14 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
     assertState("$c/** foo */")
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN, description = "Matchit plugin affects neovim")
   fun `test percent doesnt match after comment start`() {
     configureByJavaText("/*$c foo */")
     typeText(injector.parser.parseKeys("%"))
     assertState("/*$c foo */")
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.UNCLEAR)
   fun `test percent doesnt match before comment end`() {
     configureByJavaText("/* foo $c */")
     typeText(injector.parser.parseKeys("%"))
@@ -232,10 +236,12 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
     )
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN, description = "Matchit plugin affects neovim")
   fun `test deleting with percent motion backward`() {
     doTest("d%", "(foo bar$c)", c, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN, description = "Matchit plugin affects neovim")
   fun `test deleting with percent motion`() {
     doTest("d%", "$c(foo bar)", c, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }

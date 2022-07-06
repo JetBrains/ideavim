@@ -22,6 +22,8 @@ package org.jetbrains.plugins.ideavim.action.motion.leftright
 
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class MotionLastColumnActionTest : VimTestCase() {
@@ -140,6 +142,7 @@ class MotionLastColumnActionTest : VimTestCase() {
     doTest(keys, before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.CTRL_CODES)
   fun `test dollar motion from insert mode with deletion`() {
     val keys = "i<C-O>d$"
     val before = """
