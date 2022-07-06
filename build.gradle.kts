@@ -348,6 +348,7 @@ val prId: String by project
 tasks.register("updateMergedPr") {
     doLast {
         if (project.hasProperty("prId")) {
+            println("Got pr id: $prId")
             updateMergedPr(prId.toInt())
         } else {
             error("Cannot get prId")
@@ -511,7 +512,9 @@ data class Change(val id: String, val text: String)
 
 fun updateMergedPr(number: Int) {
     val gitHub = org.kohsuke.github.GitHub.connect()
+    println("Connecting to the repo...")
     val repository = gitHub.getRepository("JetBrains/ideavim")
+    println("Getting pull requests...")
     val pullRequest = repository.getPullRequest(number)
     if (pullRequest.user.login == "dependabot[bot]") return
 
