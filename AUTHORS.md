@@ -416,6 +416,10 @@ Contributors:
   [![icon][github]](https://github.com/Vvalter)
   &nbsp;
   Simon Rainer
+* [![icon][mail]](mailto:filipp.vakhitov@jetbrains.com)
+  [![icon][github]](https://github.com/lippfi)
+  &nbsp;
+  lippfi
                         
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainers.
