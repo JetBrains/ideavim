@@ -10,6 +10,7 @@ accordingly, and delete the patch script.
 */
 changeBuildType(RelativeId("TestsForIntelliJ20213")) {
     vcs {
+        remove(DslContext.settingsRoot.id!!)
         add(RelativeId("HttpsGithubComJetBrainsIdeavimBranch213221"))
     }
 }
