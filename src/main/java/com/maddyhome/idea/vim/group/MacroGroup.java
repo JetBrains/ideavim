@@ -108,7 +108,9 @@ public class MacroGroup extends VimMacroBase {
               KeyHandler.getInstance().handleKey(editor, key, context);
             });
           }
+          keyStack.resetFirst();
         }
+        keyStack.removeFirst();
       });
     }
   }
