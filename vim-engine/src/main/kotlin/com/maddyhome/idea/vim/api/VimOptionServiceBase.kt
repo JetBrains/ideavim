@@ -2,8 +2,8 @@ package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.ex.ExException
-import com.maddyhome.idea.vim.option.ToggleOption
 import com.maddyhome.idea.vim.option.NumberOption
+import com.maddyhome.idea.vim.option.ToggleOption
 import com.maddyhome.idea.vim.options.Option
 import com.maddyhome.idea.vim.options.OptionChangeListener
 import com.maddyhome.idea.vim.options.OptionConstants
@@ -46,7 +46,7 @@ abstract class VimOptionServiceBase : OptionService {
     ToggleOption(OptionConstants.timeoutName, OptionConstants.timeoutAlias, true),
     ToggleOption(OptionConstants.visualbellName, OptionConstants.visualbellAlias, false),
     ToggleOption(OptionConstants.wrapscanName, OptionConstants.wrapscanAlias, true),
-    ToggleOption(OptionConstants.ideadelaymacroName, OptionConstants.ideadelaymacroAlias, true),
+    ToggleOption(OptionConstants.ideadelaymacroName, OptionConstants.ideadelaymacroAlias, false),
     ToggleOption(OptionConstants.trackactionidsName, OptionConstants.trackactionidsAlias, false),
     StringOption(OptionConstants.selectionName, OptionConstants.selectionAlias, "inclusive", isList = false, setOf("old", "inclusive", "exclusive")),
     StringOption(OptionConstants.shellName, OptionConstants.shellAlias, if (injector.systemInfoService.isWindows) "cmd.exe" else System.getenv("SHELL") ?: "sh"),
