@@ -4,6 +4,7 @@ import _Self.Constants.QODANA_TESTS
 import jetbrains.buildServer.configs.kotlin.v2019_2.BuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
 import jetbrains.buildServer.configs.kotlin.v2019_2.DslContext
+import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.Qodana
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.qodana
 import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.BuildFailureOnMetric
 import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.failOnMetricChange
@@ -46,12 +47,15 @@ object Qodana : BuildType({
       param("clonefinder-enable", "true")
       param("clonefinder-reference-projects", "src")
       param("yaml-configuration", "")
+      linter = jvm {
+        version = Qodana.JVMVersion.LATEST
+      }
     }
   }
 
   triggers {
     vcs {
-      enabled = false
+      enabled = true
       branchFilter = ""
     }
     schedule {

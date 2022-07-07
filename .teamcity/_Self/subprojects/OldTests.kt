@@ -11,6 +11,7 @@ import _Self.buildTypes.TestsForIntelliJ20202
 import _Self.buildTypes.TestsForIntelliJ20203
 import _Self.buildTypes.TestsForIntelliJ20211
 import _Self.buildTypes.TestsForIntelliJ20212
+import _Self.buildTypes.TestsForIntelliJ20213
 import jetbrains.buildServer.configs.kotlin.v2019_2.Project
 
 object OldTests : Project({
@@ -28,4 +29,5 @@ object OldTests : Project({
   buildType(TestsForIntelliJ20203)
   buildType(TestsForIntelliJ20211)
   buildType(TestsForIntelliJ20212)
+  buildType(TestsForIntelliJ20213)
 })
