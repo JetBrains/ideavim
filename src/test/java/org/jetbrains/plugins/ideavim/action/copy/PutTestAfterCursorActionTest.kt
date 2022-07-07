@@ -31,7 +31,13 @@ import org.junit.Test
 class PutTestAfterCursorActionTest : VimTestCase() {
   fun `test put from number register`() {
     setRegister('4', "XXX ")
-    doTest("\"4p", "This is my$c text", "This is my XXX$c text", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest(
+      "\"4p",
+      "This is my$c text",
+      "This is my XXX$c text",
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE
+    )
   }
 
   @VimBehaviorDiffers(
@@ -66,6 +72,30 @@ class PutTestAfterCursorActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.
             ${c}A Discovery
 
+    """.trimIndent()
+    assertState(after)
+  }
+
+  @Test
+  fun `test in visual mode`() {
+    val before = """
+            A Discovery
+
+            ${c}I found it in a legendary land
+            ${c}all rocks and lavender and tufted grass,
+            ${c}where it was settled on some sodden sand
+            ${c}hard by the torrent of a mountain pass.
+    """.trimIndent()
+    val editor = configureByText(before)
+    VimPlugin.getRegister().storeText(editor.vim, before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
+    typeText(injector.parser.parseKeys("vep"))
+    val after = """
+            A Discovery
+
+            Discovery it in a legendary land
+            Discovery rocks and lavender and tufted grass,
+            Discovery it was settled on some sodden sand
+            Discovery by the torrent of a mountain pass.
     """.trimIndent()
     assertState(after)
   }

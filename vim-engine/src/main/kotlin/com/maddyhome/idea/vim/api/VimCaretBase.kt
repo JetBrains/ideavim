@@ -31,7 +31,7 @@ open class CaretRegisterStorageBase(private val isCaretPrimary: Boolean) : Caret
     if (isCaretPrimary || !RegisterConstants.RECORDABLE_REGISTERS.contains(r)) {
       return injector.registerGroup.getRegister(r)
     }
-    return super.getRegister(r)
+    return super.getRegister(r) ?: injector.registerGroup.getRegister(r)
   }
 
   override fun setKeys(register: Char, keys: List<KeyStroke>) {
