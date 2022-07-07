@@ -28,7 +28,6 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.IdeActions
 import com.intellij.openapi.actionSystem.PlatformCoreDataKeys
 import com.intellij.openapi.actionSystem.PlatformDataKeys
-import com.intellij.openapi.actionSystem.Presentation
 import com.intellij.openapi.actionSystem.ex.ActionManagerEx
 import com.intellij.openapi.actionSystem.ex.ActionUtil
 import com.intellij.openapi.command.CommandProcessor
@@ -144,14 +143,7 @@ class IjActionExecutor : VimActionExecutor {
   }
 
   private fun canBePerformed(event: AnActionEvent, action: ActionGroup, context: DataContext): Boolean {
-    val presentation = event.presentation
-    return try {
-      // [VERSION UPDATE] 221+ Just use Presentation.isPerformGroup
-      val method = Presentation::class.java.getMethod("isPerformGroup")
-      method.invoke(presentation) as Boolean
-    } catch (e: Exception) {
-      action.canBePerformed(context)
-    }
+    return event.presentation.isPerformGroup
   }
 
   /**

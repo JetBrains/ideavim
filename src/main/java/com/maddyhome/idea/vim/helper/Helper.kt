@@ -22,6 +22,7 @@ import com.intellij.codeInsight.template.TemplateManager
 import com.intellij.codeWithMe.ClientId
 import com.intellij.injected.editor.EditorWindow
 import com.intellij.openapi.editor.Caret
+import com.intellij.openapi.editor.ClientEditorManager
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorFactory
@@ -30,6 +31,7 @@ import com.intellij.openapi.util.Key
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
+import kotlin.streams.toList
 
 /**
  * This annotation is created for test functions (methods).
@@ -83,10 +85,9 @@ fun Editor.getTopLevelEditor() = if (this is EditorWindow) this.delegate else th
 
 /**
  * Return list of editors for local host (for code with me plugin)
- * [VERSION UPDATE] 212+ ClientEditorManager.editors()
  */
 fun localEditors(): List<Editor> {
-  return EditorFactory.getInstance().allEditors.filter { editor -> editor.editorClientId.let { it == null || it == ClientId.currentOrNull } }
+  return ClientEditorManager.getCurrentInstance().editors().toList()
 }
 
 fun localEditors(doc: Document): List<Editor> {

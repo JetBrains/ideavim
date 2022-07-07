@@ -102,7 +102,6 @@ class PutGroup : VimPutBase() {
       }
     }
 
-    notifyAboutIdeaPut(editor)
     logger.debug("Perform put via plugin")
     val myCarets = if (visualSelection != null) {
       visualSelection.caretsAndSelections.keys.sortedByDescending { it.getLogicalPosition() }
@@ -122,6 +121,7 @@ class PutGroup : VimPutBase() {
     context: ExecutionContext,
     text: ProcessedTextData,
   ) {
+    notifyAboutIdeaPut(editor)
     if (data.visualSelection?.typeInEditor?.isLine == true && editor.isOneLineMode()) return
     val startOffsets = prepareDocumentAndGetStartOffsets(editor, caret, text.typeInRegister, data, additionalData)
 

@@ -18,10 +18,12 @@
 
 package org.jetbrains.plugins.ideavim.action.copy
 
+import com.intellij.notification.ActionCenter
 import com.intellij.notification.EventLog
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.SelectionType
+import com.maddyhome.idea.vim.group.NotificationService
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
 import org.jetbrains.plugins.ideavim.OptionValueType
@@ -34,14 +36,12 @@ import org.jetbrains.plugins.ideavim.rangeOf
  * @author Alex Plate
  */
 class IdeaPutNotificationsTest : VimOptionTestCase(OptionConstants.clipboardName) {
-  // [VERSION UPDATE] 221+: Uncomment
-/*
   @VimOptionTestConfiguration(VimTestOption(OptionConstants.clipboardName, OptionValueType.STRING, ""))
   fun `test notification exists if no ideaput`() {
     val before = "${c}I found it in a legendary land"
     configureByText(before)
     appReadySetup(false)
-    VimPlugin.getRegister().storeText(myFixture.editor, before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
+    VimPlugin.getRegister().storeText(myFixture.editor.vim, before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
     typeText(injector.parser.parseKeys("p"))
 
     val notification = ActionCenter.getNotifications(myFixture.project, true).last()
@@ -53,10 +53,7 @@ class IdeaPutNotificationsTest : VimOptionTestCase(OptionConstants.clipboardName
       notification.expire()
     }
   }
-*/
 
-  // [VERSION UPDATE] 221+: Uncomment
-/*
   @VimOptionTestConfiguration(
     VimTestOption(
       OptionConstants.clipboardName,
@@ -68,13 +65,12 @@ class IdeaPutNotificationsTest : VimOptionTestCase(OptionConstants.clipboardName
     val before = "${c}I found it in a legendary land"
     configureByText(before)
     appReadySetup(false)
-    VimPlugin.getRegister().storeText(myFixture.editor, before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
+    VimPlugin.getRegister().storeText(myFixture.editor.vim, before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
     typeText(injector.parser.parseKeys("p"))
 
     val notifications = ActionCenter.getNotifications(myFixture.project, true)
     assertTrue(notifications.isEmpty() || notifications.last().isExpired || OptionConstants.clipboard_ideaput !in notifications.last().content)
   }
-*/
 
   @VimOptionTestConfiguration(VimTestOption(OptionConstants.clipboardName, OptionValueType.STRING, ""))
   fun `test no notification if already was`() {

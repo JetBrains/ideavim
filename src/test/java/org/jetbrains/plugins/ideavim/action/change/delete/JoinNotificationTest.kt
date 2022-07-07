@@ -20,9 +20,11 @@
 
 package org.jetbrains.plugins.ideavim.action.change.delete
 
+import com.intellij.notification.ActionCenter
 import com.intellij.notification.EventLog
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.group.NotificationService
 import com.maddyhome.idea.vim.vimscript.services.IjVimOptionService
 import org.jetbrains.plugins.ideavim.OptionValueType
 import org.jetbrains.plugins.ideavim.VimOptionTestCase
@@ -33,8 +35,6 @@ import org.jetbrains.plugins.ideavim.VimTestOption
  * @author Alex Plate
  */
 class JoinNotificationTest : VimOptionTestCase(IjVimOptionService.ideajoinName) {
-  // [VERSION UPDATE] 221+: Uncomment
-/*
   @VimOptionTestConfiguration(VimTestOption(IjVimOptionService.ideajoinName, OptionValueType.NUMBER, "0"))
   fun `test notification shown for no ideajoin`() {
     val before = "I found${c} it\n in a legendary land"
@@ -45,17 +45,14 @@ class JoinNotificationTest : VimOptionTestCase(IjVimOptionService.ideajoinName) 
     val notification = ActionCenter.getNotifications(myFixture.project, true).last()
     try {
       assertEquals(NotificationService.IDEAVIM_NOTIFICATION_TITLE, notification.title)
-      assertTrue(OptionConstants.ideajoinName in notification.content)
+      assertTrue(IjVimOptionService.ideajoinName in notification.content)
       assertEquals(3, notification.actions.size)
     } finally {
       notification.expire()
     }
   }
-*/
 
-  // [VERSION UPDATE] 221+: Uncomment
-/*
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.ideajoinName, OptionValueType.NUMBER, "1"))
+  @VimOptionTestConfiguration(VimTestOption(IjVimOptionService.ideajoinName, OptionValueType.NUMBER, "1"))
   fun `test notification not shown for ideajoin`() {
     val before = "I found${c} it\n in a legendary land"
     configureByText(before)
@@ -63,9 +60,8 @@ class JoinNotificationTest : VimOptionTestCase(IjVimOptionService.ideajoinName) 
     typeText(injector.parser.parseKeys("J"))
 
     val notifications = ActionCenter.getNotifications(myFixture.project, true)
-    assertTrue(notifications.isEmpty() || notifications.last().isExpired || OptionConstants.ideajoinName !in notifications.last().content)
+    assertTrue(notifications.isEmpty() || notifications.last().isExpired || IjVimOptionService.ideajoinName !in notifications.last().content)
   }
-*/
 
   @VimOptionTestConfiguration(VimTestOption(IjVimOptionService.ideajoinName, OptionValueType.NUMBER, "0"))
   fun `test notification not shown if was shown already`() {
