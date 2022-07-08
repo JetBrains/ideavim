@@ -52,10 +52,12 @@ val VimStateMachine.Mode.isEndAllowed: Boolean
   }
 
 val usesVirtualSpace
-  get() = (injector.optionService.getOptionValue(
-    OptionScope.GLOBAL,
-    OptionConstants.virtualeditName
-  ) as VimString).value == "onemore"
+  get() = (
+    injector.optionService.getOptionValue(
+      OptionScope.GLOBAL,
+      OptionConstants.virtualeditName
+    ) as VimString
+    ).value == "onemore"
 
 val VimEditor.isEndAllowed: Boolean
   get() = when (this.mode) {

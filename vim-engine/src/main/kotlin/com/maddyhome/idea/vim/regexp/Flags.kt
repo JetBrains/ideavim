@@ -18,40 +18,40 @@
 package com.maddyhome.idea.vim.regexp
 
 class Flags {
-    private var flags: Int
+  private var flags: Int
 
-    constructor() {
-        flags = 0
-    }
+  constructor() {
+    flags = 0
+  }
 
-    constructor(flags: Int) {
-        this.flags = flags
-    }
+  constructor(flags: Int) {
+    this.flags = flags
+  }
 
-    fun get(): Int {
-        return flags
-    }
+  fun get(): Int {
+    return flags
+  }
 
-    fun isSet(flag: Int): Boolean {
-        return flags and flag != 0
-    }
+  fun isSet(flag: Int): Boolean {
+    return flags and flag != 0
+  }
 
-    fun allSet(flags: Int): Boolean {
-        return this.flags and flags == flags
-    }
+  fun allSet(flags: Int): Boolean {
+    return this.flags and flags == flags
+  }
 
-    fun init(flags: Int): Int {
-        this.flags = flags
-        return this.flags
-    }
+  fun init(flags: Int): Int {
+    this.flags = flags
+    return this.flags
+  }
 
-    fun set(flags: Int): Int {
-        this.flags = this.flags or flags
-        return this.flags
-    }
+  fun set(flags: Int): Int {
+    this.flags = this.flags or flags
+    return this.flags
+  }
 
-    fun unset(flags: Int): Int {
-        this.flags = this.flags and flags.inv()
-        return this.flags
-    }
+  fun unset(flags: Int): Int {
+    this.flags = this.flags and flags.inv()
+    return this.flags
+  }
 }

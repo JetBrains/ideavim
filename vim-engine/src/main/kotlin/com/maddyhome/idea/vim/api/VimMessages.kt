@@ -32,4 +32,3 @@ interface VimMessages {
     showStatusBarMessage(msg)
   }
 }
-

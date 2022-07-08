@@ -47,8 +47,15 @@ data class LambdaExpression(val args: List<String>, val expr: Expression) : Expr
   private fun buildBody(): List<Executable> {
     val body = mutableListOf<Executable>()
     for (argument in args) {
-      body.add(LetCommand(Ranges(), Variable(Scope.LOCAL_VARIABLE, argument), AssignmentOperator.ASSIGNMENT, Variable(
-        Scope.FUNCTION_VARIABLE, argument), true))
+      body.add(
+        LetCommand(
+          Ranges(), Variable(Scope.LOCAL_VARIABLE, argument), AssignmentOperator.ASSIGNMENT,
+          Variable(
+            Scope.FUNCTION_VARIABLE, argument
+          ),
+          true
+        )
+      )
     }
     body.add(ReturnStatement(expr))
     return body

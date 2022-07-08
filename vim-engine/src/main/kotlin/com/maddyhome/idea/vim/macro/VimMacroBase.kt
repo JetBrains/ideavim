@@ -41,8 +41,7 @@ abstract class VimMacroBase : VimMacro {
       --macroDepth
     }
 
-
-      lastRegister = reg
+    lastRegister = reg
     return true
   }
 

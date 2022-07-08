@@ -47,7 +47,6 @@ abstract class VimChangeGroupBase : VimChangeGroup {
   @JvmField
   protected var lastStrokes: MutableList<Any>? = null
 
-
   @JvmField
   protected var oldOffset = -1
 
@@ -151,7 +150,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     // Fix for https://youtrack.jetbrains.net/issue/VIM-35
     if (!range.normalize(editor.fileSize().toInt())) {
       updatedRange = if (range.startOffset == range.endOffset && range.startOffset == editor.fileSize()
-          .toInt() && range.startOffset != 0
+        .toInt() && range.startOffset != 0
       ) {
         TextRange(range.startOffset - 1, range.endOffset)
       } else {
@@ -260,9 +259,9 @@ abstract class VimChangeGroupBase : VimChangeGroup {
         val logicalLine = caret.getLogicalPosition().line
         val position = editor.logicalPositionToOffset(VimLogicalPosition(logicalLine, repeatColumn, false))
         for (i in 0 until repeatLines) {
-          if (repeatAppend
-            && (repeatColumn < VimMotionGroupBase.LAST_COLUMN)
-            && (injector.engineEditorHelper.getVisualLineLength(editor, visualLine + i) < repeatColumn)
+          if (repeatAppend &&
+            (repeatColumn < VimMotionGroupBase.LAST_COLUMN) &&
+            (injector.engineEditorHelper.getVisualLineLength(editor, visualLine + i) < repeatColumn)
           ) {
             val pad = injector.engineEditorHelper.pad(editor, context, logicalLine + i, repeatColumn)
             if (pad.isNotEmpty()) {
@@ -751,7 +750,8 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       val res = deleteText(editor, TextRange(start, offset), SelectionType.LINE_WISE, caret, operatorArguments)
       if (res && caret.offset.point >= editor.fileSize() && caret.offset.point != 0) {
         injector.motion.moveCaret(
-          editor, caret, injector.motion.moveCaretToLineStartSkipLeadingOffset(
+          editor, caret,
+          injector.motion.moveCaretToLineStartSkipLeadingOffset(
             editor,
             caret, -1
           )
@@ -1019,10 +1019,10 @@ abstract class VimChangeGroupBase : VimChangeGroup {
 
   private fun isPrintableChar(c: Char): Boolean {
     val block = Character.UnicodeBlock.of(c)
-    return !Character.isISOControl(c)
-      && (c != KeyEvent.CHAR_UNDEFINED)
-      && (block != null)
-      && block !== Character.UnicodeBlock.SPECIALS
+    return !Character.isISOControl(c) &&
+      (c != KeyEvent.CHAR_UNDEFINED) &&
+      (block != null) &&
+      block !== Character.UnicodeBlock.SPECIALS
   }
 
   private fun activeTemplateWithLeftRightMotion(editor: VimEditor, keyStroke: KeyStroke): Boolean {

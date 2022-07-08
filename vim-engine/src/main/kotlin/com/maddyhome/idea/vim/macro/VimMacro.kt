@@ -38,6 +38,7 @@ interface VimMacro {
    */
   fun playbackLastRegister(
     editor: VimEditor,
-    context: ExecutionContext, count: Int
+    context: ExecutionContext,
+    count: Int
   ): Boolean
 }

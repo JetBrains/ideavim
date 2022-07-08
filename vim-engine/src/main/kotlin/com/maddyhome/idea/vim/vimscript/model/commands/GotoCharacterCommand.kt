@@ -35,10 +35,10 @@ data class GotoCharacterCommand(val ranges: Ranges, val argument: String) : Comm
   override val argFlags = flags(RangeFlag.RANGE_IS_COUNT, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   override fun processCommand(
-      editor: VimEditor,
-      caret: VimCaret,
-      context: ExecutionContext,
-      operatorArguments: OperatorArguments
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    operatorArguments: OperatorArguments
   ): ExecutionResult {
     val count = getCount(editor, caret, 1, true)
     if (count <= 0) return ExecutionResult.Error

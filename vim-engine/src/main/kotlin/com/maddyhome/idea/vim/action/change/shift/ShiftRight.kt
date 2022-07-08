@@ -87,13 +87,13 @@ class ShiftRightVisualAction : VisualOperatorActionHandler.ForEachCaret() {
     operatorArguments: OperatorArguments,
   ): Boolean {
     injector.changeGroup.indentRange(
-        editor,
-        caret,
-        context,
-        range.toVimTextRange(false),
-        cmd.count,
-        1,
-        operatorArguments
+      editor,
+      caret,
+      context,
+      range.toVimTextRange(false),
+      cmd.count,
+      1,
+      operatorArguments
     )
     return true
   }

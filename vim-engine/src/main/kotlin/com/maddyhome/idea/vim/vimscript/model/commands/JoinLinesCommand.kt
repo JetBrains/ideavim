@@ -45,14 +45,14 @@ data class JoinLinesCommand(val ranges: Ranges, val argument: String) : Command.
     val textRange = getTextRange(editor, caret, true)
 
     return if (injector.changeGroup.deleteJoinRange(
-            editor, caret,
-            TextRange(
-                textRange.startOffset,
-                textRange.endOffset - 1
-              ),
-            spaces,
-            operatorArguments
-        )
+        editor, caret,
+        TextRange(
+            textRange.startOffset,
+            textRange.endOffset - 1
+          ),
+        spaces,
+        operatorArguments
+      )
     ) ExecutionResult.Success else ExecutionResult.Error
   }
 }

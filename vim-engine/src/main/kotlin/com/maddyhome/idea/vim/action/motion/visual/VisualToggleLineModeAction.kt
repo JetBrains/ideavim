@@ -22,8 +22,8 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.command.OperatorArguments
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
@@ -39,10 +39,12 @@ class VisualToggleLineModeAction : VimActionHandler.SingleExecution() {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    val listOption = (injector.optionService.getOptionValue(
-      OptionScope.LOCAL(editor),
-      OptionConstants.selectmodeName
-    ) as VimString).value
+    val listOption = (
+      injector.optionService.getOptionValue(
+        OptionScope.LOCAL(editor),
+        OptionConstants.selectmodeName
+      ) as VimString
+      ).value
     return if ("cmd" in listOption) {
       injector.visualMotionGroup.enterSelectMode(editor, VimStateMachine.SubMode.VISUAL_LINE).also {
         editor.forEachCaret { it.vimSetSelection(it.offset.point) }

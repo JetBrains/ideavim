@@ -68,12 +68,12 @@ private fun insertDeleteInsertedText(
   }
   if (deleteTo.point != -1) {
     injector.changeGroup.deleteRange(
-        editor,
-        caret,
-        TextRange(deleteTo.point, offset.point),
-        SelectionType.CHARACTER_WISE,
-        false,
-        operatorArguments
+      editor,
+      caret,
+      TextRange(deleteTo.point, offset.point),
+      SelectionType.CHARACTER_WISE,
+      false,
+      operatorArguments
     )
     return true
   }

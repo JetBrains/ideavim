@@ -1,10 +1,11 @@
 plugins {
     java
     kotlin("jvm")
+    id("org.jlleitschuh.gradle.ktlint")
 }
 
-//group 'org.jetbrains.ideavim'
-//version 'SNAPSHOT'
+// group 'org.jetbrains.ideavim'
+// version 'SNAPSHOT'
 
 repositories {
     mavenCentral()
@@ -34,4 +35,10 @@ tasks {
             freeCompilerArgs = listOf("-Xjvm-default=all-compatibility")
         }
     }
+}
+
+// --- Linting
+
+ktlint {
+    disabledRules.add("no-wildcard-imports")
 }

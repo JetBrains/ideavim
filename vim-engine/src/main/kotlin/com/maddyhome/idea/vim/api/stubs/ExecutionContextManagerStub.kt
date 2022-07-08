@@ -8,7 +8,7 @@ import com.maddyhome.idea.vim.diagnostic.vimLogger
 
 class ExecutionContextManagerStub : ExecutionContextManager {
   init {
-      vimLogger<ExecutionContextManagerStub>().warn("ExecutionContextManagerStub is used. Please replace it with your own implementation of ExecutionContextManager.")
+    vimLogger<ExecutionContextManagerStub>().warn("ExecutionContextManagerStub is used. Please replace it with your own implementation of ExecutionContextManager.")
   }
 
   override fun onEditor(editor: VimEditor, prevContext: ExecutionContext?): ExecutionContext {

@@ -84,9 +84,9 @@ abstract class VimMarkGroupBase : VimMarkGroup {
             // shift mark
             myMark.logicalLine = delStart.line
             logger.debug { "Shifting mark to line " + delStart.line }
-          }// The deletion only covers part of the marked line so shift the mark only if the deletion begins
+          } // The deletion only covers part of the marked line so shift the mark only if the deletion begins
           // on a line prior to the marked line (which means the deletion must end on the marked line).
-        }// If the deleted text begins before the mark and ends after the mark then it may be shifted or deleted
+        } // If the deleted text begins before the mark and ends after the mark then it may be shifted or deleted
       }
     }
   }
@@ -194,7 +194,8 @@ abstract class VimMarkGroupBase : VimMarkGroup {
       mark = VimMark(myCh, lp.line, lp.column, editorPath, editor.extractProtocol())
     } else if ("()".indexOf(myCh) >= 0 && editorPath != null) {
       var offset = injector.searchHelper
-        .findNextSentenceStart(editor, editor.primaryCaret(), if (myCh == '(') -1 else 1,
+        .findNextSentenceStart(
+          editor, editor.primaryCaret(), if (myCh == '(') -1 else 1,
           countCurrent = false,
           requireAll = true
         )
@@ -221,7 +222,7 @@ abstract class VimMarkGroupBase : VimMarkGroup {
         globalMarks.remove(myCh)
         mark = null
       }
-    }// This is a mark from another file
+    } // This is a mark from another file
     // If this is a file mark, get the mark from this file
 
     return mark
@@ -276,7 +277,7 @@ abstract class VimMarkGroupBase : VimMarkGroup {
       if (oldMark is VimMark) {
         oldMark.clear()
       }
-    }// Global marks get set to both the file and the global list of marks
+    } // Global marks get set to both the file and the global list of marks
 
     return true
   }

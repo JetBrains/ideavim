@@ -62,7 +62,8 @@ class DeleteJoinVisualLinesSpacesAction : VisualOperatorActionHandler.SingleExec
             range.toVimTextRange(true).normalize(),
             true,
             operatorArguments
-          )) {
+          )
+        ) {
           res[0] = false
         }
       },

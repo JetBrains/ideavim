@@ -21,10 +21,10 @@ package com.maddyhome.idea.vim.api
 import com.maddyhome.idea.vim.command.VimStateMachine
 
 interface VimVisualMotionGroup {
-    val exclusiveSelection: Boolean
-    val selectionAdj: Int
+  val exclusiveSelection: Boolean
+  val selectionAdj: Int
 
-    /**
+  /**
    * This function toggles visual mode.
    *
    * If visual mode is disabled, enable it

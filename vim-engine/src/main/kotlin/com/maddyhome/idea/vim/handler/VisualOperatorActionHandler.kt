@@ -35,10 +35,10 @@ import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.group.visual.VimSimpleSelection
 import com.maddyhome.idea.vim.group.visual.VisualChange
 import com.maddyhome.idea.vim.group.visual.VisualOperation
-import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.helper.inBlockSubMode
 import com.maddyhome.idea.vim.helper.inRepeatMode
 import com.maddyhome.idea.vim.helper.inVisualMode
+import com.maddyhome.idea.vim.helper.vimStateMachine
 
 /**
  * @author Alex Plate
@@ -270,7 +270,7 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
             caret.vimLastVisualOperatorRange = visualChange
           }
         }
-        editor.forEachCaret( { it.vimLastColumn = it.getVisualPosition().column })
+        editor.forEachCaret({ it.vimLastColumn = it.getVisualPosition().column })
       }
 
       editor.vimKeepingVisualOperatorAction = false

@@ -44,7 +44,7 @@ interface VimMarkGroup {
    * @return True if a valid, writable mark, false if not
    */
   fun setMark(editor: VimEditor, ch: Char): Boolean
-    fun includeCurrentCommandAsNavigation(editor: VimEditor)
+  fun includeCurrentCommandAsNavigation(editor: VimEditor)
 
   /**
    * Get's a mark from the file

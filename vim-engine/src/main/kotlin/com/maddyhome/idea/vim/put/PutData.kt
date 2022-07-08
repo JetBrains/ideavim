@@ -20,13 +20,13 @@ data class PutData(
     if (rawIndent && textData?.typeInRegister != SelectionType.LINE_WISE && visualSelection?.typeInEditor != SelectionType.LINE_WISE) false else rawIndent
 
   data class VisualSelection(
-      val caretsAndSelections: Map<VimCaret, VimSelection>,
-      val typeInEditor: SelectionType,
+    val caretsAndSelections: Map<VimCaret, VimSelection>,
+    val typeInEditor: SelectionType,
   )
 
   data class TextData(
-      val rawText: String?,
-      val typeInRegister: SelectionType,
-      val transferableData: List<Any>,
+    val rawText: String?,
+    val typeInRegister: SelectionType,
+    val transferableData: List<Any>,
   )
 }

@@ -36,10 +36,10 @@ data class GoToLineCommand(val ranges: Ranges) :
   override val argFlags = flags(RangeFlag.RANGE_REQUIRED, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   override fun processCommand(
-      editor: VimEditor,
-      caret: VimCaret,
-      context: ExecutionContext,
-      operatorArguments: OperatorArguments,
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    operatorArguments: OperatorArguments,
   ): ExecutionResult {
     val line = min(this.getLine(editor, caret), editor.lineCount() - 1)
 

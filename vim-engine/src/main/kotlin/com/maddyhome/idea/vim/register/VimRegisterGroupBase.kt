@@ -61,11 +61,13 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     injector.optionService.addListener(
       OptionConstants.clipboardName,
       {
-        val clipboardOptionValue = (injector.optionService.getOptionValue(
-          OptionScope.GLOBAL,
-          OptionConstants.clipboardName,
-          OptionConstants.clipboardName
-        ) as VimString).value
+        val clipboardOptionValue = (
+          injector.optionService.getOptionValue(
+            OptionScope.GLOBAL,
+            OptionConstants.clipboardName,
+            OptionConstants.clipboardName
+          ) as VimString
+          ).value
         defaultRegisterChar = when {
           "unnamed" in clipboardOptionValue -> '*'
           "unnamedplus" in clipboardOptionValue -> '+'
@@ -145,8 +147,12 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
   }
 
   fun storeTextInternal(
-    editor: VimEditor, range: TextRange, text: String,
-    type: SelectionType, register: Char, isDelete: Boolean,
+    editor: VimEditor,
+    range: TextRange,
+    text: String,
+    type: SelectionType,
+    register: Char,
+    isDelete: Boolean,
   ): Boolean {
     // Null register doesn't get saved, but acts like it was
     if (lastRegisterChar == BLACK_HOLE_REGISTER) return true
@@ -183,11 +189,11 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
       } else {
         myRegisters[lreg] = Register(lreg, type, processedText, ArrayList(transferableData))
         logger.debug { "register '$register' contains: \"$processedText\"" }
-      }// Set the text if the lowercase register didn't exist yet
+      } // Set the text if the lowercase register didn't exist yet
     } else {
       myRegisters[register] = Register(register, type, processedText, ArrayList(transferableData))
       logger.debug { "register '$register' contains: \"$processedText\"" }
-    }// Put the text in the specified register
+    } // Put the text in the specified register
 
     if (CLIPBOARD_REGISTERS.indexOf(register) >= 0) {
       injector.clipboardManager.setClipboardText(processedText, text, ArrayList(transferableData))
@@ -201,9 +207,13 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
 
     if (isDelete) {
       val smallInlineDeletion =
-        ((type === SelectionType.CHARACTER_WISE || type === SelectionType.BLOCK_WISE) && (editor.offsetToLogicalPosition(
-          start
-        ).line == editor.offsetToLogicalPosition(end).line))
+        (
+          (type === SelectionType.CHARACTER_WISE || type === SelectionType.BLOCK_WISE) && (
+            editor.offsetToLogicalPosition(
+              start
+            ).line == editor.offsetToLogicalPosition(end).line
+            )
+          )
 
       // Deletes go into numbered registers only if text is smaller than a line, register is used or it's a special case
       if (!smallInlineDeletion && register == defaultRegister || isSmallDeletionSpecialCase(editor)) {
@@ -228,7 +238,7 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     } else if (register == defaultRegister) {
       myRegisters['0'] = Register('0', type, processedText, ArrayList(transferableData))
       logger.debug { "register '0' contains: \"$processedText\"" }
-    }// Yanks also go to register 0 if the default register was used
+    } // Yanks also go to register 0 if the default register was used
 
     if (start != -1) {
       injector.markGroup.setChangeMarks(editor, TextRange(start, end))
@@ -281,7 +291,7 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
    *
    * @param register  The register to use for storing the text. Cannot be a normal text register
    * @param text      The text to store, without further processing
-   * @return          True if the text is stored, false if the passed register is not supported
+   * @return True if the text is stored, false if the passed register is not supported
    */
   override fun storeTextSpecial(register: Char, text: String): Boolean {
     if (READONLY_REGISTERS.indexOf(register) == -1 && register != LAST_SEARCH_REGISTER && register != UNNAMED_REGISTER) {

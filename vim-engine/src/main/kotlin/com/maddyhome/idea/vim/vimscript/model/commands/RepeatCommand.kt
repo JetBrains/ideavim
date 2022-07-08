@@ -37,10 +37,10 @@ data class RepeatCommand(val ranges: Ranges, val argument: String) : Command.For
 
   @Throws(ExException::class)
   override fun processCommand(
-      editor: VimEditor,
-      caret: VimCaret,
-      context: ExecutionContext,
-      operatorArguments: OperatorArguments
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    operatorArguments: OperatorArguments
   ): ExecutionResult {
     var arg = argument[0]
     if (arg == '@') arg = lastArg

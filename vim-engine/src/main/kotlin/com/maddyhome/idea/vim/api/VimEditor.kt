@@ -18,9 +18,9 @@
 
 package com.maddyhome.idea.vim.api
 
-import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.command.SelectionType
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.common.EditorLine
 import com.maddyhome.idea.vim.common.LiveRange
 import com.maddyhome.idea.vim.common.Offset
@@ -149,7 +149,7 @@ interface VimEditor {
   fun sortedNativeCarets(): List<VimCaret> = nativeCarets().sortedByOffset()
 
   private fun List<VimCaret>.sortedByOffset(): List<VimCaret> {
-    return this.sortedWith(compareBy{ it.offset.point } ).reversed()
+    return this.sortedWith(compareBy { it.offset.point }).reversed()
   }
   /**
    * This method should perform caret merging after the operations. This is similar to IJ runForEachCaret
@@ -327,10 +327,12 @@ abstract class MutableLinearEditor : MutableVimEditor, LinearEditor() {
         val (newStart, newEnd) = data.first
         shiftType = data.second
         val textToDelete = getText(newStart, newEnd)
-        OperatedRange.Lines(textToDelete,
+        OperatedRange.Lines(
+          textToDelete,
           EditorLine.Offset.init(lineAbove.line, this),
           lineBelow.line - lineAbove.line,
-          shiftType)
+          shiftType
+        )
       }
     }
   }

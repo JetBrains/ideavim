@@ -1,15 +1,15 @@
 package com.maddyhome.idea.vim.api
 
-import com.maddyhome.idea.vim.key.CommandPartNode
 import com.maddyhome.idea.vim.command.MappingMode
-import com.maddyhome.idea.vim.key.RootNode
 import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
+import com.maddyhome.idea.vim.key.CommandPartNode
 import com.maddyhome.idea.vim.key.KeyMapping
 import com.maddyhome.idea.vim.key.KeyMappingLayer
 import com.maddyhome.idea.vim.key.MappingInfo
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.RequiredShortcut
+import com.maddyhome.idea.vim.key.RootNode
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import java.awt.event.KeyEvent
@@ -55,9 +55,9 @@ abstract class VimKeyGroupBase : VimKeyGroup {
   override fun getKeyMappingLayer(mode: MappingMode): KeyMappingLayer = getKeyMapping(mode)
 
   protected fun checkCommand(
-      mappingModes: Set<MappingMode>,
-      action: EditorActionHandlerBase,
-      keys: List<KeyStroke>,
+    mappingModes: Set<MappingMode>,
+    action: EditorActionHandlerBase,
+    keys: List<KeyStroke>,
   ) {
     for (mappingMode in mappingModes) {
       checkIdentity(mappingMode, action.id, keys)
@@ -108,7 +108,6 @@ abstract class VimKeyGroupBase : VimKeyGroup {
   var identityChecker: MutableMap<MappingMode, MutableSet<MutableList<KeyStroke>>>? = null
   var prefixes: MutableMap<MutableList<KeyStroke>, String>? = null
 
-
   override fun getKeyMappingByOwner(owner: MappingOwner): List<Pair<List<KeyStroke>, MappingInfo>> {
     return MappingMode.values().map { getKeyMapping(it) }.flatMap { it.getByOwner(owner) }
   }
@@ -139,23 +138,23 @@ abstract class VimKeyGroupBase : VimKeyGroup {
   }
 
   override fun putKeyMapping(
-      modes: Set<MappingMode>,
-      fromKeys: List<KeyStroke>,
-      owner: MappingOwner,
-      toKeys: List<KeyStroke>,
-      recursive: Boolean,
+    modes: Set<MappingMode>,
+    fromKeys: List<KeyStroke>,
+    owner: MappingOwner,
+    toKeys: List<KeyStroke>,
+    recursive: Boolean,
   ) {
     modes.map { getKeyMapping(it) }.forEach { it.put(fromKeys, toKeys, owner, recursive) }
     registerKeyMapping(fromKeys, owner)
   }
 
   override fun putKeyMapping(
-      modes: Set<MappingMode>,
-      fromKeys: List<KeyStroke>,
-      owner: MappingOwner,
-      toExpr: Expression,
-      originalString: String,
-      recursive: Boolean,
+    modes: Set<MappingMode>,
+    fromKeys: List<KeyStroke>,
+    owner: MappingOwner,
+    toExpr: Expression,
+    originalString: String,
+    recursive: Boolean,
   ) {
     modes.map { getKeyMapping(it) }.forEach { it.put(fromKeys, toExpr, owner, originalString, recursive) }
     registerKeyMapping(fromKeys, owner)

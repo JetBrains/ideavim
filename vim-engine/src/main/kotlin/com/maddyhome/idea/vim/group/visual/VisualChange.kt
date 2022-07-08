@@ -18,8 +18,8 @@
 
 package com.maddyhome.idea.vim.group.visual
 
-import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.command.SelectionType
+import com.maddyhome.idea.vim.command.VimStateMachine
 
 data class VisualChange(val lines: Int, val columns: Int, val type: SelectionType) {
   companion object {
@@ -30,4 +30,3 @@ data class VisualChange(val lines: Int, val columns: Int, val type: SelectionTyp
       }
   }
 }
-

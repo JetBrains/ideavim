@@ -32,7 +32,7 @@ object VisualOperation {
     if (CommandFlags.FLAG_MOT_LINEWISE in cmdFlags) return VisualChange(lines, ep.column, SelectionType.LINE_WISE)
 
     val chars = if (editor.primaryCaret().vimLastColumn == VimMotionGroupBase.LAST_COLUMN) {
-        VimMotionGroupBase.LAST_COLUMN
+      VimMotionGroupBase.LAST_COLUMN
     } else when (type) {
       SelectionType.LINE_WISE -> ep.column
       SelectionType.CHARACTER_WISE -> if (lines > 1) ep.column - injector.visualMotionGroup.selectionAdj else ep.column - sp.column

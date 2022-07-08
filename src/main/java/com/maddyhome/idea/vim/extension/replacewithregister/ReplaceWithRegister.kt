@@ -175,13 +175,13 @@ class ReplaceWithRegister : VimExtension {
       )
       ClipboardOptionHelper.IdeaputDisabler().use {
         VimPlugin.getPut().putText(
-            IjVimEditor(editor),
-            IjExecutionContext(EditorDataContext.init(editor)),
-            putData,
-            operatorArguments = OperatorArguments(
-              editor.vimStateMachine?.isOperatorPending ?: false,
-              0, editor.editorMode, editor.subMode
-            )
+          IjVimEditor(editor),
+          IjExecutionContext(EditorDataContext.init(editor)),
+          putData,
+          operatorArguments = OperatorArguments(
+            editor.vimStateMachine?.isOperatorPending ?: false,
+            0, editor.editorMode, editor.subMode
+          )
         )
       }
 

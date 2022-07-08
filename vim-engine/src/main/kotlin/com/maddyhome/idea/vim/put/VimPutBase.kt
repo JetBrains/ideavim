@@ -114,13 +114,13 @@ abstract class VimPutBase : VimPut {
   }
 
   protected fun moveCaretToEndPosition(
-      editor: VimEditor,
-      caret: VimCaret,
-      startOffset: Int,
-      endOffset: Int,
-      typeInRegister: SelectionType,
-      modeInEditor: VimStateMachine.SubMode,
-      caretAfterInsertedText: Boolean,
+    editor: VimEditor,
+    caret: VimCaret,
+    startOffset: Int,
+    endOffset: Int,
+    typeInRegister: SelectionType,
+    modeInEditor: VimStateMachine.SubMode,
+    caretAfterInsertedText: Boolean,
   ) {
     val cursorMode = when (typeInRegister) {
       SelectionType.BLOCK_WISE -> when (modeInEditor) {
@@ -162,16 +162,16 @@ abstract class VimPutBase : VimPut {
   }
 
   protected fun putTextCharacterwise(
-      editor: VimEditor,
-      caret: VimCaret,
-      context: ExecutionContext,
-      text: String,
-      type: SelectionType,
-      mode: VimStateMachine.SubMode,
-      startOffset: Int,
-      count: Int,
-      indent: Boolean,
-      cursorAfter: Boolean,
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    text: String,
+    type: SelectionType,
+    mode: VimStateMachine.SubMode,
+    startOffset: Int,
+    count: Int,
+    indent: Boolean,
+    cursorAfter: Boolean,
   ): Int {
     caret.moveToOffset(startOffset)
     val insertedText = text.repeat(count)
@@ -187,16 +187,16 @@ abstract class VimPutBase : VimPut {
   }
 
   protected fun putTextLinewise(
-      editor: VimEditor,
-      caret: VimCaret,
-      context: ExecutionContext,
-      text: String,
-      type: SelectionType,
-      mode: VimStateMachine.SubMode,
-      startOffset: Int,
-      count: Int,
-      indent: Boolean,
-      cursorAfter: Boolean,
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    text: String,
+    type: SelectionType,
+    mode: VimStateMachine.SubMode,
+    startOffset: Int,
+    count: Int,
+    indent: Boolean,
+    cursorAfter: Boolean,
   ): Int {
     val overlappedCarets = ArrayList<VimCaret>(editor.carets().size)
     for (possiblyOverlappedCaret in editor.carets()) {
@@ -233,16 +233,16 @@ abstract class VimPutBase : VimPut {
   }
 
   protected fun putTextBlockwise(
-      editor: VimEditor,
-      caret: VimCaret,
-      context: ExecutionContext,
-      text: String,
-      type: SelectionType,
-      mode: VimStateMachine.SubMode,
-      startOffset: Int,
-      count: Int,
-      indent: Boolean,
-      cursorAfter: Boolean,
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    text: String,
+    type: SelectionType,
+    mode: VimStateMachine.SubMode,
+    startOffset: Int,
+    count: Int,
+    indent: Boolean,
+    cursorAfter: Boolean,
   ): Int {
     val startPosition = editor.offsetToLogicalPosition(startOffset)
     val currentColumn = if (mode == VimStateMachine.SubMode.VISUAL_LINE) 0 else startPosition.column
@@ -302,16 +302,16 @@ abstract class VimPutBase : VimPut {
   }
 
   protected fun putTextInternal(
-      editor: VimEditor,
-      caret: VimCaret,
-      context: ExecutionContext,
-      text: String,
-      type: SelectionType,
-      mode: VimStateMachine.SubMode,
-      startOffset: Int,
-      count: Int,
-      indent: Boolean,
-      cursorAfter: Boolean,
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    text: String,
+    type: SelectionType,
+    mode: VimStateMachine.SubMode,
+    startOffset: Int,
+    count: Int,
+    indent: Boolean,
+    cursorAfter: Boolean,
   ): Int {
     return when (type) {
       SelectionType.CHARACTER_WISE -> putTextCharacterwise(

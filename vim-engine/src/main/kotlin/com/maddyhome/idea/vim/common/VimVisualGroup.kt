@@ -33,17 +33,19 @@ fun lineToNativeSelection(editor: VimEditor, start: Int, end: Int): Pair<Int, In
 fun <T : Comparable<T>> sort(a: T, b: T) = if (a > b) b to a else a to b
 
 private fun isExclusiveSelection(): Boolean {
-  return (injector.optionService.getOptionValue(
-    OptionScope.GLOBAL,
-    OptionConstants.selectionName
-  ) as VimString).value == "exclusive"
+  return (
+    injector.optionService.getOptionValue(
+      OptionScope.GLOBAL,
+      OptionConstants.selectionName
+    ) as VimString
+    ).value == "exclusive"
 }
 
 fun blockToNativeSelection(
-    editor: VimEditor,
-    start: Int,
-    end: Int,
-    mode: VimStateMachine.Mode,
+  editor: VimEditor,
+  start: Int,
+  end: Int,
+  mode: VimStateMachine.Mode,
 ): Pair<VimLogicalPosition, VimLogicalPosition> {
   var blockStart = editor.offsetToLogicalPosition(start)
   var blockEnd = editor.offsetToLogicalPosition(end)

@@ -34,10 +34,10 @@ data class ShiftLeftCommand(val ranges: Ranges, val argument: String, val length
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.WRITABLE)
 
   override fun processCommand(
-      editor: VimEditor,
-      caret: VimCaret,
-      context: ExecutionContext,
-      operatorArguments: OperatorArguments
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    operatorArguments: OperatorArguments
   ): ExecutionResult {
     val range = getTextRange(editor, caret, true)
     val endOffsets = range.endOffsets.map { it - 1 }.toIntArray()

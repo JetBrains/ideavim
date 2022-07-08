@@ -99,12 +99,12 @@ interface VimMotionGroup {
   fun moveCaretToLineWithSameColumn(editor: VimEditor, logicalLine: Int, caret: VimCaret): Int
   fun scrollLineToFirstScreenLine(editor: VimEditor, rawCount: Int, start: Boolean): Boolean
   fun scrollCaretColumnToFirstScreenColumn(vimEditor: VimEditor): Boolean
-    fun moveCaretToFirstScreenLine(
-        editor: VimEditor,
-        caret: VimCaret,
-        count: Int,
-        normalizeToScreen: Boolean
-    ): Int
+  fun moveCaretToFirstScreenLine(
+    editor: VimEditor,
+    caret: VimCaret,
+    count: Int,
+    normalizeToScreen: Boolean
+  ): Int
 
   fun moveCaretToLastScreenLine(
     editor: VimEditor,
@@ -117,6 +117,6 @@ interface VimMotionGroup {
   fun moveCaretToFileMark(editor: VimEditor, ch: Char, toLineStart: Boolean): Int
   fun moveCaretToMark(editor: VimEditor, ch: Char, toLineStart: Boolean): Int
   fun moveCaretToJump(editor: VimEditor, count: Int): Int
-    fun moveCaretGotoNextTab(editor: VimEditor, context: ExecutionContext, rawCount: Int): Int
+  fun moveCaretGotoNextTab(editor: VimEditor, context: ExecutionContext, rawCount: Int): Int
   fun moveCaretGotoPreviousTab(editor: VimEditor, context: ExecutionContext, rawCount: Int): Int
 }

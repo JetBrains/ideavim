@@ -18,8 +18,6 @@
 package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.command.Command
-import org.jetbrains.annotations.NotNull
-import org.jetbrains.annotations.Nullable
 import javax.swing.KeyStroke
 
 interface VimProcessGroup {

@@ -32,10 +32,12 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  */
 data class ActionCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges) {
 
-  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL,
+  override val argFlags = flags(
+    RangeFlag.RANGE_OPTIONAL,
     ArgumentFlag.ARGUMENT_OPTIONAL,
     Access.READ_ONLY,
-    Flag.SAVE_VISUAL)
+    Flag.SAVE_VISUAL
+  )
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     val actionName = argument.trim()

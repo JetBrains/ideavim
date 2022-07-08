@@ -58,12 +58,12 @@ class DeleteVisualLinesEndAction : VisualOperatorActionHandler.ForEachCaret() {
       }
       val blockRange = TextRange(starts, ends)
       injector.changeGroup.deleteRange(
-          editor,
-          editor.primaryCaret(),
-          blockRange,
-          SelectionType.BLOCK_WISE,
-          false,
-          operatorArguments
+        editor,
+        editor.primaryCaret(),
+        blockRange,
+        SelectionType.BLOCK_WISE,
+        false,
+        operatorArguments
       )
     } else {
       val lineEndForOffset = injector.engineEditorHelper.getLineEndForOffset(editor, vimTextRange.endOffset)

@@ -28,7 +28,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 
 data class TryStatement(val tryBlock: TryBlock, val catchBlocks: List<CatchBlock>, val finallyBlock: FinallyBlock?) :
-    Executable {
+  Executable {
   override lateinit var vimContext: VimLContext
 
   override fun execute(editor: VimEditor, context: ExecutionContext): ExecutionResult {
@@ -101,9 +101,9 @@ data class FinallyBlock(val body: List<Executable>) : Executable {
 }
 
 fun executeBody(
-    body: List<Executable>,
-    editor: VimEditor,
-    context: ExecutionContext,
+  body: List<Executable>,
+  editor: VimEditor,
+  context: ExecutionContext,
 ): ExecutionResult {
   var result: ExecutionResult = ExecutionResult.Success
   for (statement in body) {

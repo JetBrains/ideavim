@@ -31,7 +31,6 @@ interface VimActionExecutor {
   val ACTION_EXPAND_REGION: String
   val ACTION_EXPAND_REGION_RECURSIVELY: String
 
-
   /**
    * Execute an action
    *

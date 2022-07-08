@@ -30,11 +30,13 @@ class HistoryBlock {
 
   companion object {
     private fun maxLength(): Int {
-      return (injector.optionService
-        .getOptionValue(
-          OptionScope.GLOBAL, OptionConstants.historyName,
-          OptionConstants.historyName
-        ) as VimInt).value
+      return (
+        injector.optionService
+          .getOptionValue(
+            OptionScope.GLOBAL, OptionConstants.historyName,
+            OptionConstants.historyName
+          ) as VimInt
+        ).value
     }
   }
 }

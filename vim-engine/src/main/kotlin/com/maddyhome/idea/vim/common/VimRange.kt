@@ -150,10 +150,10 @@ sealed class EditorLine private constructor(val line: Int) {
 
 sealed class OperatedRange {
   class Lines(
-      val text: CharSequence,
-      val lineAbove: EditorLine.Offset,
-      val linesOperated: Int,
-      val shiftType: LineDeleteShift,
+    val text: CharSequence,
+    val lineAbove: EditorLine.Offset,
+    val linesOperated: Int,
+    val shiftType: LineDeleteShift,
   ) : OperatedRange()
 
   class Characters(val text: CharSequence, val leftOffset: Offset, val rightOffset: Offset) : OperatedRange()

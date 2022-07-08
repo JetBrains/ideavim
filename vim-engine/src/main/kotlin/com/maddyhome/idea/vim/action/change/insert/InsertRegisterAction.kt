@@ -73,7 +73,6 @@ class InsertRegisterAction : VimActionHandler.SingleExecution() {
   }
 }
 
-
 /**
  * Inserts the contents of the specified register
  *

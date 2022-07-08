@@ -205,8 +205,9 @@ abstract class VimMotionGroupBase : VimMotionGroup {
     val startPos = editor.currentCaret().offset.point
     when (lastFTCmd) {
       TillCharacterMotionType.LAST_F -> res = moveCaretToNextCharacterOnLine(editor, caret, -count, lastFTChar)
-      TillCharacterMotionType.LAST_SMALL_F -> res =
-        moveCaretToNextCharacterOnLine(editor, caret, count, lastFTChar)
+      TillCharacterMotionType.LAST_SMALL_F ->
+        res =
+          moveCaretToNextCharacterOnLine(editor, caret, count, lastFTChar)
 
       TillCharacterMotionType.LAST_T -> {
         res = moveCaretToBeforeNextCharacterOnLine(editor, caret, -count, lastFTChar)

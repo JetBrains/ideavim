@@ -1,4 +1,3 @@
 package com.maddyhome.idea.vim.api
 
-abstract class VimSearchGroupBase : VimSearchGroup {
-}
+abstract class VimSearchGroupBase : VimSearchGroup

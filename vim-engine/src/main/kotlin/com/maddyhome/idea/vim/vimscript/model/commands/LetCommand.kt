@@ -64,7 +64,6 @@ data class LetCommand(
   }
   override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
-
   @Throws(ExException::class)
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     if (!isSyntaxSupported) return ExecutionResult.Error
@@ -204,10 +203,12 @@ data class LetCommand(
         if (RegisterConstants.WRITABLE_REGISTERS.contains(variable.char)) {
           val result = injector.registerGroup.storeText(variable.char, expression.evaluate(editor, context, vimContext).asString())
           if (!result) {
-            logger.error("""
+            logger.error(
+              """
               Error during `let ${variable.originalString} ${operator.value} ${expression.originalString}` command execution.
               Could not set register value
-            """.trimIndent())
+              """.trimIndent()
+            )
           }
         } else if (RegisterConstants.VALID_REGISTERS.contains(variable.char)) {
           throw ExException("E354: Invalid register name: '${variable.char}'")

@@ -14,10 +14,12 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
 abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
   override val exclusiveSelection: Boolean
-    get() = (injector.optionService.getOptionValue(
-      OptionScope.GLOBAL,
-      OptionConstants.selectionName
-    ) as VimString).value == "exclusive"
+    get() = (
+      injector.optionService.getOptionValue(
+        OptionScope.GLOBAL,
+        OptionConstants.selectionName
+      ) as VimString
+      ).value == "exclusive"
   override val selectionAdj: Int
     get() = if (exclusiveSelection) 0 else 1
 

@@ -13,17 +13,17 @@ import java.util.*
  * an argument if appropriate for the command. The command has a count and a type.
  */
 data class Command(
-    var rawCount: Int,
-    var action: EditorActionHandlerBase,
-    val type: Type,
-    var flags: EnumSet<CommandFlags>,
+  var rawCount: Int,
+  var action: EditorActionHandlerBase,
+  val type: Type,
+  var flags: EnumSet<CommandFlags>,
 ) {
 
   constructor(rawCount: Int, register: Char) : this(
     rawCount,
     NonExecutableActionHandler,
     Type.SELECT_REGISTER,
-      EnumSet.of(CommandFlags.FLAG_EXPECT_MORE)
+    EnumSet.of(CommandFlags.FLAG_EXPECT_MORE)
   ) {
     this.register = register
   }
