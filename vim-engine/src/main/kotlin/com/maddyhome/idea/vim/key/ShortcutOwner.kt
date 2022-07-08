@@ -33,10 +33,10 @@ sealed class ShortcutOwnerInfo {
   ) : ShortcutOwnerInfo() {
     fun toNotation(): String {
       val owners = HashMap<ShortcutOwner, MutableList<String>>()
-      owners[normal] =(owners[normal] ?: mutableListOf()).also { it.add("n") }
-      owners[insert] =(owners[insert] ?: mutableListOf()).also { it.add("i") }
-      owners[visual] =(owners[visual] ?: mutableListOf()).also { it.add("x") }
-      owners[select] =(owners[select] ?: mutableListOf()).also { it.add("s") }
+      owners[normal] = (owners[normal] ?: mutableListOf()).also { it.add("n") }
+      owners[insert] = (owners[insert] ?: mutableListOf()).also { it.add("i") }
+      owners[visual] = (owners[visual] ?: mutableListOf()).also { it.add("x") }
+      owners[select] = (owners[select] ?: mutableListOf()).also { it.add("s") }
 
       if ("x" in (owners[ShortcutOwner.VIM] ?: emptyList()) && "s" in (owners[ShortcutOwner.VIM] ?: emptyList())) {
         val existing = owners[ShortcutOwner.VIM] ?: mutableListOf()
