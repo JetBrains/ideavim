@@ -17,8 +17,6 @@
  */
 package com.maddyhome.idea.vim.key
 
-import com.google.common.collect.HashMultiset
-import com.google.common.collect.Multiset
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
@@ -43,7 +41,7 @@ class KeyMapping : Iterable<List<KeyStroke?>?>, KeyMappingLayer {
    * E.g. if there is mapping for "hello", this set will contain "h", "he", "hel", etc.
    * Multiset is used to correctly remove the mappings.
    */
-  private val myPrefixes: Multiset<List<KeyStroke>> = HashMultiset.create()
+  private val myPrefixes: MutableMap<List<KeyStroke>, Int> = HashMap()
   override fun iterator(): MutableIterator<List<KeyStroke>> {
     return ArrayList(myKeys.keys).iterator()
   }
@@ -104,7 +102,7 @@ class KeyMapping : Iterable<List<KeyStroke?>?>, KeyMappingLayer {
     val prefixLength = fromKeys.size - 1
     for (i in 0 until prefixLength) {
       prefix.add(fromKeys[i])
-      myPrefixes.add(ArrayList(prefix))
+      myPrefixes[ArrayList(prefix)] = (myPrefixes[ArrayList(prefix)] ?: 0) + 1
     }
   }
 
@@ -137,7 +135,12 @@ class KeyMapping : Iterable<List<KeyStroke?>?>, KeyMappingLayer {
     val prefixLength = keys.size - 1
     for (i in 0 until prefixLength) {
       prefix.add(keys[i])
-      myPrefixes.remove(prefix)
+      val existingCount = myPrefixes[prefix]
+      if (existingCount == 1 || existingCount == null) {
+        myPrefixes.remove(prefix)
+      } else {
+        myPrefixes[prefix] = existingCount - 1
+      }
     }
   }
 

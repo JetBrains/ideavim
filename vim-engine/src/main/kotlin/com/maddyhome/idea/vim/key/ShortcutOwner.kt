@@ -17,7 +17,6 @@
  */
 package com.maddyhome.idea.vim.key
 
-import com.google.common.collect.HashMultimap
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.helper.mode
@@ -33,36 +32,40 @@ sealed class ShortcutOwnerInfo {
     val select: ShortcutOwner,
   ) : ShortcutOwnerInfo() {
     fun toNotation(): String {
-      val owners = HashMultimap.create<ShortcutOwner, String>()
-      owners.put(normal, "n")
-      owners.put(insert, "i")
-      owners.put(visual, "x")
-      owners.put(select, "s")
+      val owners = HashMap<ShortcutOwner, MutableList<String>>()
+      owners.put(normal, mutableListOf("n"))
+      owners.put(insert, mutableListOf("i"))
+      owners.put(visual, mutableListOf("x"))
+      owners.put(select, mutableListOf("s"))
 
-      if ("x" in owners[ShortcutOwner.VIM] && "s" in owners[ShortcutOwner.VIM]) {
-        owners.remove(ShortcutOwner.VIM, "x")
-        owners.remove(ShortcutOwner.VIM, "s")
-        owners.put(ShortcutOwner.VIM, "v")
+      if ("x" in (owners[ShortcutOwner.VIM] ?: emptyList()) && "s" in (owners[ShortcutOwner.VIM] ?: emptyList())) {
+        val existing = owners[ShortcutOwner.VIM] ?: mutableListOf()
+        existing.remove("x")
+        existing.remove("s")
+        existing.add("v")
+        owners[ShortcutOwner.VIM] = existing
       }
 
-      if ("x" in owners[ShortcutOwner.IDE] && "s" in owners[ShortcutOwner.IDE]) {
-        owners.remove(ShortcutOwner.IDE, "x")
-        owners.remove(ShortcutOwner.IDE, "s")
-        owners.put(ShortcutOwner.IDE, "v")
+      if ("x" in (owners[ShortcutOwner.IDE] ?: emptyList()) && "s" in (owners[ShortcutOwner.IDE] ?: emptyList())) {
+        val existing = owners[ShortcutOwner.IDE] ?: mutableListOf()
+        existing.remove("x")
+        existing.remove("s")
+        existing.add("v")
+        owners[ShortcutOwner.IDE] = existing
       }
 
-      if (owners[ShortcutOwner.IDE].isEmpty()) {
-        owners.removeAll(ShortcutOwner.VIM)
-        owners.put(ShortcutOwner.VIM, "a")
+      if ((owners[ShortcutOwner.IDE] ?: emptyList()).isEmpty()) {
+        owners.remove(ShortcutOwner.VIM)
+        owners[ShortcutOwner.VIM] = mutableListOf("a")
       }
 
-      if (owners[ShortcutOwner.VIM].isEmpty()) {
-        owners.removeAll(ShortcutOwner.IDE)
-        owners.put(ShortcutOwner.IDE, "a")
+      if ((owners[ShortcutOwner.VIM] ?: emptyList()).isEmpty()) {
+        owners.remove(ShortcutOwner.IDE)
+        owners[ShortcutOwner.IDE] = mutableListOf("a")
       }
 
-      val ideOwners = owners[ShortcutOwner.IDE].sortedBy { wights[it] ?: 1000 }.joinToString(separator = "-")
-      val vimOwners = owners[ShortcutOwner.VIM].sortedBy { wights[it] ?: 1000 }.joinToString(separator = "-")
+      val ideOwners = (owners[ShortcutOwner.IDE] ?: emptyList()).sortedBy { wights[it] ?: 1000 }.joinToString(separator = "-")
+      val vimOwners = (owners[ShortcutOwner.VIM] ?: emptyList()).sortedBy { wights[it] ?: 1000 }.joinToString(separator = "-")
 
       return if (ideOwners.isNotEmpty() && vimOwners.isNotEmpty()) {
         ideOwners + ":" + ShortcutOwner.IDE.ownerName + " " + vimOwners + ":" + ShortcutOwner.VIM.ownerName

@@ -24,7 +24,6 @@ import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
-import org.apache.commons.lang3.math.NumberUtils
 import java.util.regex.Pattern
 
 object KeywordOptionHelper {
@@ -169,11 +168,8 @@ object KeywordOptionHelper {
     }
 
     private fun toUnicode(str: String): Int {
-      return if (NumberUtils.isNumber(str)) {
-        str.toInt() // If we have a number, it represents the Unicode code point of a letter
-      } else {
-        str[0].code // If it's not a number we should only have strings consisting of one char
-      }
+      return str.toIntOrNull() // If we have a number, it represents the Unicode code point of a letter
+        ?: str[0].code // If it's not a number we should only have strings consisting of one char
     }
 
     override fun equals(other: Any?): Boolean {
