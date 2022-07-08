@@ -36,6 +36,7 @@ class IjVimStorageService : VimStorageServiceBase() {
     editor.ij.putUserData(getOrCreateIjKey(key), data)
   }
 
+  @Suppress("UNCHECKED_CAST")
   override fun <T> getDataFromBuffer(editor: VimEditor, key: com.maddyhome.idea.vim.api.Key<T>): T? {
     val buffer = EditorHelper.getVirtualFile(editor.ij)?.path ?: "empty path"
     return bufferToKey[buffer]?.get(key.name) as T?
@@ -60,6 +61,7 @@ class IjVimStorageService : VimStorageServiceBase() {
   }
 
   private val ijKeys = mutableMapOf<String, Key<out Any?>>()
+  @Suppress("UNCHECKED_CAST")
   private fun <T> getOrCreateIjKey(key: com.maddyhome.idea.vim.api.Key<T>): Key<T> {
     val storedIjKey = ijKeys[key.name]
     if (storedIjKey != null) {

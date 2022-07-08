@@ -37,19 +37,19 @@ class IjVimMessages : VimMessagesBase() {
   private var error = false
   private var lastBeepTimeMillis = 0L
 
-  override fun showStatusBarMessage(msg: String?) {
+  override fun showStatusBarMessage(message: String?) {
     if (ApplicationManager.getApplication().isUnitTestMode) {
-      message = msg
+      this.message = message
     }
     val pm = ProjectManager.getInstance()
     val projects = pm.openProjects
     for (project in projects) {
       val bar = WindowManager.getInstance().getStatusBar(project)
       if (bar != null) {
-        if (msg.isNullOrEmpty()) {
+        if (message.isNullOrEmpty()) {
           bar.info = ""
         } else {
-          bar.info = "VIM - $msg"
+          bar.info = "VIM - $message"
         }
       }
     }

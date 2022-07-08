@@ -33,11 +33,11 @@ class IjExecutionContextManager : ExecutionContextManagerBase() {
   }
 
   override fun onCaret(caret: VimCaret, prevContext: ExecutionContext): ExecutionContext {
-    return IjExecutionContext(CaretSpecificDataContext(prevContext.ij, caret.ij))
+    return IjExecutionContext(CaretSpecificDataContext.create(prevContext.ij, caret.ij))
   }
 
   override fun createCaretSpecificDataContext(context: ExecutionContext, caret: VimCaret): ExecutionContext {
-    return IjExecutionContext(CaretSpecificDataContext(context.ij, caret.ij))
+    return IjExecutionContext(CaretSpecificDataContext.create(context.ij, caret.ij))
   }
 
   override fun createEditorDataContext(editor: VimEditor, context: ExecutionContext): ExecutionContext {

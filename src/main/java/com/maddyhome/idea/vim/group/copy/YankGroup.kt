@@ -32,7 +32,6 @@ import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.fileSize
 import com.maddyhome.idea.vim.listener.VimYankListener
 import com.maddyhome.idea.vim.newapi.ij
-import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.yank.YankGroupBase
 import org.jetbrains.annotations.Contract
 import kotlin.math.min
@@ -211,8 +210,8 @@ class YankGroup : YankGroupBase() {
     notifyListeners(editor, range)
 
     var result = true
-    for ((caret, range) in caretToRange) {
-      result = caret.registerStorage.storeText(editor, range, type, false) && result
+    for ((caret, myRange) in caretToRange) {
+      result = caret.registerStorage.storeText(editor, myRange, type, false) && result
     }
     return result
   }

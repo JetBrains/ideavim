@@ -24,9 +24,7 @@ import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.AnActionResult
-import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.IdeActions
-import com.intellij.openapi.actionSystem.PlatformCoreDataKeys
 import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.actionSystem.ex.ActionManagerEx
 import com.intellij.openapi.actionSystem.ex.ActionUtil
@@ -85,7 +83,7 @@ class IjActionExecutor : VimActionExecutor {
     // This method executes inside of lastUpdateAndCheckDumb
     // Another related issue: VIM-2604
     if (!ActionUtil.lastUpdateAndCheckDumb(ijAction, event, false)) return false
-    if (ijAction is ActionGroup && !canBePerformed(event, ijAction, context.ij)) {
+    if (ijAction is ActionGroup && !event.presentation.isPerformGroup) {
       // Some ActionGroups should not be performed, but shown as a popup
       val popup = JBPopupFactory.getInstance()
         .createActionGroupPopup(event.presentation.text, ijAction, context.ij, false, null, -1)
@@ -117,10 +115,9 @@ class IjActionExecutor : VimActionExecutor {
     var indexError: IndexNotReadyException? = null
     val manager = ActionManagerEx.getInstanceEx()
     manager.fireBeforeActionPerformed(action, event)
-    val component = event.getData(PlatformCoreDataKeys.CONTEXT_COMPONENT)
     var result: AnActionResult? = null
     try {
-      SlowOperations.allowSlowOperations(SlowOperations.ACTION_PERFORM).use { ignore ->
+      SlowOperations.allowSlowOperations(SlowOperations.ACTION_PERFORM).use {
         performRunnable.run()
         result = AnActionResult.PERFORMED
       }
@@ -140,10 +137,6 @@ class IjActionExecutor : VimActionExecutor {
     if (indexError != null) {
       ActionUtil.showDumbModeWarning(project, event)
     }
-  }
-
-  private fun canBePerformed(event: AnActionEvent, action: ActionGroup, context: DataContext): Boolean {
-    return event.presentation.isPerformGroup
   }
 
   /**

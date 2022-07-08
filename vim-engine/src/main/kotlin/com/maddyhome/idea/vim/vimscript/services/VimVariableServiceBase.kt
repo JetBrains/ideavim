@@ -105,7 +105,7 @@ abstract class VimVariableServiceBase : VariableService {
     return getNullableVariableValue(variable, editor, context, vimContext)
       ?: throw ExException(
         "E121: Undefined variable: " +
-          (if (variable.scope != null) variable.scope!!.c + ":" else "") +
+          (if (variable.scope != null) variable.scope.c + ":" else "") +
           variable.name.evaluate(editor, context, vimContext).value
       )
   }

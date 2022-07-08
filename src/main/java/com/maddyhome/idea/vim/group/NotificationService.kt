@@ -26,13 +26,11 @@ import com.intellij.notification.ActionCenter
 import com.intellij.notification.Notification
 import com.intellij.notification.NotificationGroup
 import com.intellij.notification.NotificationGroupManager
-import com.intellij.notification.NotificationListener
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.KeyboardShortcut
 import com.intellij.openapi.ide.CopyPasteManager
-import com.intellij.openapi.keymap.Keymap
 import com.intellij.openapi.keymap.KeymapUtil
 import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.project.DumbAwareAction
@@ -112,23 +110,6 @@ class NotificationService(private val project: Project?) {
     IDEAVIM_NOTIFICATION_TITLE,
     Messages.getQuestionIcon()
   )
-
-  fun specialKeymap(keymap: Keymap, listener: NotificationListener.Adapter) {
-    val notification = IDEAVIM_STICKY_GROUP.createNotification(
-      IDEAVIM_NOTIFICATION_TITLE,
-      "IdeaVim plugin doesn't use the special \"Vim\" keymap any longer. " +
-        "Switching to \"${keymap.presentableName}\" keymap.<br/><br/>" +
-        "Now it is possible to set up:<br/>" +
-        "<ul>" +
-        "<li>Vim keys in your ~/.ideavimrc file using key mapping commands</li>" +
-        "<li>IDE action shortcuts in \"File | Settings | Keymap\"</li>" +
-        "<li>Vim or IDE handlers for conflicting shortcuts in <a href='#settings'>Vim Emulation</a> settings</li>" +
-        "</ul>",
-      NotificationType.INFORMATION
-    )
-    notification.setListener(listener)
-    notification.notify(project)
-  }
 
   fun noVimrcAsDefault() {
     val notification = IDEAVIM_STICKY_GROUP.createNotification(

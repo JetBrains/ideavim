@@ -14,7 +14,7 @@ open class CaretRegisterStorageBase(private val isCaretPrimary: Boolean) : Caret
     get() {
       return injector.registerGroup.lastRegisterChar
     }
-    set(value) {}
+    set(_) {}
 
   override fun storeText(editor: VimEditor, range: TextRange, type: SelectionType, isDelete: Boolean): Boolean {
     if (isCaretPrimary) {

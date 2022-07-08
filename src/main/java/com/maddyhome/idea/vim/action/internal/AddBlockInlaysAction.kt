@@ -18,6 +18,7 @@
 package com.maddyhome.idea.vim.action.internal
 
 import com.intellij.ide.ui.AntialiasingType
+import com.intellij.ide.ui.UISettings
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
@@ -124,7 +125,7 @@ class AddBlockInlaysAction : AnAction() {
         val editorContext = FontInfo.getFontRenderContext(editor.contentComponent)
         return FontRenderContext(
           editorContext.transform, AntialiasingType.getKeyForCurrentScope(false),
-          if (editor is EditorImpl) editor.myFractionalMetricsHintValue else RenderingHints.VALUE_FRACTIONALMETRICS_OFF
+          if (editor is EditorImpl) UISettings.editorFractionalMetricsHint else RenderingHints.VALUE_FRACTIONALMETRICS_OFF
         )
       }
 

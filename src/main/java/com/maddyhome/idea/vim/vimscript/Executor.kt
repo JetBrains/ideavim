@@ -48,13 +48,13 @@ class Executor : VimScriptExecutorBase() {
   override var executingVimscript = false
 
   @Throws(ExException::class)
-  override fun execute(scriptString: String, editor: VimEditor, context: ExecutionContext, skipHistory: Boolean, indicateErrors: Boolean, vimContext: VimLContext?): ExecutionResult {
+  override fun execute(script: String, editor: VimEditor, context: ExecutionContext, skipHistory: Boolean, indicateErrors: Boolean, vimContext: VimLContext?): ExecutionResult {
     var finalResult: ExecutionResult = ExecutionResult.Success
 
-    val script = VimscriptParser.parse(scriptString)
-    script.units.forEach { it.vimContext = vimContext ?: script }
+    val myScript = VimscriptParser.parse(script)
+    myScript.units.forEach { it.vimContext = vimContext ?: myScript }
 
-    for (unit in script.units) {
+    for (unit in myScript.units) {
       try {
         val result = unit.execute(editor, context)
         if (result is ExecutionResult.Error) {
@@ -89,18 +89,18 @@ class Executor : VimScriptExecutorBase() {
     }
 
     if (!skipHistory) {
-      VimPlugin.getHistory().addEntry(HistoryConstants.COMMAND, scriptString)
-      if (script.units.size == 1 && script.units[0] is Command && script.units[0] !is RepeatCommand) {
-        VimPlugin.getRegister().storeTextSpecial(LAST_COMMAND_REGISTER, scriptString)
+      VimPlugin.getHistory().addEntry(HistoryConstants.COMMAND, script)
+      if (myScript.units.size == 1 && myScript.units[0] is Command && myScript.units[0] !is RepeatCommand) {
+        VimPlugin.getRegister().storeTextSpecial(LAST_COMMAND_REGISTER, script)
       }
     }
     return finalResult
   }
 
-  override fun execute(scriptString: String, skipHistory: Boolean) {
+  override fun execute(script: String, skipHistory: Boolean) {
     val editor = TextComponentEditorImpl(null, JTextArea()).vim
     val context = DataContext.EMPTY_CONTEXT.vim
-    execute(scriptString, editor, context, skipHistory, indicateErrors = true, CommandLineVimLContext)
+    execute(script, editor, context, skipHistory, indicateErrors = true, CommandLineVimLContext)
   }
 
   override fun executeFile(file: File, indicateErrors: Boolean) {

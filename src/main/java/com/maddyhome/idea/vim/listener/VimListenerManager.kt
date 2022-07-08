@@ -137,8 +137,6 @@ object VimListenerManager {
       VimPlugin.getOptionService().removeListener(OptionConstants.guicursorName, GuicursorChangeListener)
       VimPlugin.getOptionService().removeListener(OptionConstants.iskeywordName, KeywordOptionChangeListener)
 
-      EventFacade.getInstance().removeEditorFactoryListener(VimEditorFactoryListener)
-
       EditorFactory.getInstance().eventMulticaster.removeCaretListener(VimCaretListener)
     }
   }

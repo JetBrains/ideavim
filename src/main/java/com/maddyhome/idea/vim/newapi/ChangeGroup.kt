@@ -99,6 +99,7 @@ fun changeRange(
           vimCaret.moveToOffset(deletedInfo.leftOffset.point)
         }
         is OperatedRange.Block -> TODO()
+        else -> TODO()
       }
       if (type == SelectionType.BLOCK_WISE) {
         VimPlugin.getChange().setInsertRepeat(lines, col, false)
@@ -179,7 +180,7 @@ fun insertLineAround(editor: VimEditor, context: ExecutionContext, shift: Int) {
       }
       val position = EditorLine.Offset.init(editor.offsetToLogicalPosition(lineEndOffset).line + shift, editor)
 
-      val insertedLine = editor.addLine(position) ?: continue
+      val insertedLine = editor.addLine(position)
       VimPlugin.getChange().saveStrokes("\n")
 
       var lineStart = editor.getLineRange(insertedLine).first

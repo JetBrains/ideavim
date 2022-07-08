@@ -307,7 +307,7 @@ abstract class MutableLinearEditor : MutableVimEditor, LinearEditor() {
       is VimRange.Line.Range -> {
         val startOffset = getLineRange(range.lineAbove()).first
         val endOffset = getLineRange(range.lineBelow()).second
-        val textToDelete = getText(startOffset, endOffset)
+        @Suppress("UNUSED_VARIABLE") val textToDelete = getText(startOffset, endOffset)
         TODO()
       }
       is VimRange.Line.Offsets -> {

@@ -66,6 +66,9 @@ data class NormalCommand(val ranges: Ranges, val argument: String) : Command.Sin
       VimStateMachine.Mode.INSERT, VimStateMachine.Mode.REPLACE -> editor.exitInsertMode(context, OperatorArguments(false, 1, commandState.mode, commandState.subMode))
       VimStateMachine.Mode.SELECT -> editor.exitSelectModeNative(false)
       VimStateMachine.Mode.OP_PENDING, VimStateMachine.Mode.COMMAND -> Unit
+      VimStateMachine.Mode.INSERT_NORMAL -> Unit
+      VimStateMachine.Mode.INSERT_VISUAL -> Unit
+      VimStateMachine.Mode.INSERT_SELECT -> Unit
     }
     val range = getLineRange(editor, editor.primaryCaret())
 

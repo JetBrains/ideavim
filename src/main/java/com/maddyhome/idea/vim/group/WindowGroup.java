@@ -21,8 +21,8 @@ package com.maddyhome.idea.vim.group;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx;
+import com.intellij.openapi.fileEditor.impl.EditorComposite;
 import com.intellij.openapi.fileEditor.impl.EditorWindow;
-import com.intellij.openapi.fileEditor.impl.EditorWithProviderComposite;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.concurrency.annotations.RequiresReadLock;
@@ -183,7 +183,7 @@ public class WindowGroup extends WindowGroupBase {
   }
 
   private static @Nullable Rectangle getEditorWindowRectangle(@NotNull EditorWindow window) {
-    final EditorWithProviderComposite editor = window.getSelectedEditor();
+    final EditorComposite editor = window.getSelectedComposite();
     if (editor != null) {
       final Point point = editor.getComponent().getLocationOnScreen();
       final Dimension dimension = editor.getComponent().getSize();

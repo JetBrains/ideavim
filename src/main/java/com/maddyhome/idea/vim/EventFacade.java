@@ -101,12 +101,6 @@ public class EventFacade {
     EditorFactory.getInstance().addEditorFactoryListener(listener, parentDisposable);
   }
 
-  @SuppressWarnings("deprecation")
-  public void removeEditorFactoryListener(@NotNull EditorFactoryListener listener) {
-    // Listener is removed not only if application is disposed
-    EditorFactory.getInstance().removeEditorFactoryListener(listener);
-  }
-
   public void addEditorMouseListener(@NotNull Editor editor, @NotNull EditorMouseListener listener) {
     editor.addEditorMouseListener(listener);
   }

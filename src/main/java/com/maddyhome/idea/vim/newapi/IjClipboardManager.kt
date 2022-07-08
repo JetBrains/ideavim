@@ -49,6 +49,7 @@ class IjClipboardManager : VimClipboardManager {
     return Pair(res, transferableData)
   }
 
+  @Suppress("UNCHECKED_CAST")
   override fun setClipboardText(text: String, rawText: String, transferableData: List<Any>): Any? {
     val transferableData1 = (transferableData as List<TextBlockTransferableData>).toMutableList()
     try {
@@ -97,6 +98,7 @@ class IjClipboardManager : VimClipboardManager {
     return transferableData
   }
 
+  @Suppress("UNCHECKED_CAST")
   override fun preprocessText(
     vimEditor: VimEditor,
     textRange: TextRange,
