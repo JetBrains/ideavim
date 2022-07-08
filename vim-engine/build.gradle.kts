@@ -41,4 +41,5 @@ tasks {
 
 ktlint {
     disabledRules.add("no-wildcard-imports")
+    version.set("0.43.0")
 }

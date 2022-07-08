@@ -148,7 +148,7 @@ tasks {
     compileKotlin {
         kotlinOptions {
             jvmTarget = javaVersion
-            apiVersion = "1.5"
+            apiVersion = "1.6"
             freeCompilerArgs = listOf("-Xjvm-default=all-compatibility")
 //            allWarningsAsErrors = true
         }
@@ -156,7 +156,7 @@ tasks {
     compileTestKotlin {
         kotlinOptions {
             jvmTarget = javaVersion
-            apiVersion = "1.5"
+            apiVersion = "1.6"
 //            allWarningsAsErrors = true
         }
     }
@@ -246,6 +246,7 @@ tasks {
 
 ktlint {
     disabledRules.add("no-wildcard-imports")
+    version.set("0.43.0")
 }
 
 // --- Tests

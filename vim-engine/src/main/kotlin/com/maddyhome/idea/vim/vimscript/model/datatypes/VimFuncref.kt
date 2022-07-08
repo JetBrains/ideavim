@@ -90,35 +90,34 @@ data class VimFuncref(
     }
 
     val allArguments = listOf(this.arguments.values.map { SimpleExpression(it) }, args).flatten()
-      if (handler is DefinedFunctionHandler && handler.function.isDeleted) {
-        throw ExException("E933: Function was deleted: ${handler.name}")
+    if (handler is DefinedFunctionHandler && handler.function.isDeleted) {
+      throw ExException("E933: Function was deleted: ${handler.name}")
+    }
+    val handler = when (type) {
+      Type.LAMBDA, Type.FUNCREF -> this.handler
+      Type.FUNCTION -> {
+        injector.functionService.getFunctionHandlerOrNull(handler.scope, handler.name, vimContext)
+          ?: throw ExException("E117: Unknown function: ${handler.name}")
       }
-      val handler = when (type) {
-        Type.LAMBDA, Type.FUNCREF -> this.handler
-        Type.FUNCTION -> {
-          injector.functionService.getFunctionHandlerOrNull(handler.scope, handler.name, vimContext)
-            ?: throw ExException("E117: Unknown function: ${handler.name}")
-        }
-      }
-      return handler.executeFunction(allArguments, editor, context, vimContext)
     }
-
-    override fun deepCopy(level: Int): VimFuncref {
-      return copy()
-    }
-
-    override fun lockVar(depth: Int) {
-      this.isLocked = true
-    }
-
-    override fun unlockVar(depth: Int) {
-      this.isLocked = false
-    }
-
-    enum class Type {
-      LAMBDA,
-      FUNCREF,
-      FUNCTION,
-    }
+    return handler.executeFunction(allArguments, editor, context, vimContext)
   }
-  
+
+  override fun deepCopy(level: Int): VimFuncref {
+    return copy()
+  }
+
+  override fun lockVar(depth: Int) {
+    this.isLocked = true
+  }
+
+  override fun unlockVar(depth: Int) {
+    this.isLocked = false
+  }
+
+  enum class Type {
+    LAMBDA,
+    FUNCREF,
+    FUNCTION,
+  }
+}
