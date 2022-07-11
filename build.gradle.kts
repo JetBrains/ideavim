@@ -71,6 +71,8 @@ dependencies {
     antlr("org.antlr:antlr4:$antlrVersion")
 
     api(project(":vim-engine"))
+
+    testApi("com.squareup.okhttp3:okhttp:4.10.0")
 }
 
 configurations {

@@ -21,9 +21,7 @@ package ui
 import com.automation.remarks.junit.VideoRule
 import com.automation.remarks.video.annotations.Video
 import com.intellij.remoterobot.RemoteRobot
-import com.intellij.remoterobot.fixtures.ComponentFixture
 import com.intellij.remoterobot.fixtures.ContainerFixture
-import com.intellij.remoterobot.search.locators.byXpath
 import com.intellij.remoterobot.stepsProcessing.step
 import com.intellij.remoterobot.utils.keyboard
 import org.assertj.swing.core.MouseButton
@@ -50,7 +48,6 @@ import ui.utils.tripleClickOnRight
 import ui.utils.uiTest
 import ui.utils.vimExit
 import java.awt.Point
-import java.awt.event.KeyEvent
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -136,13 +133,8 @@ class UiTests {
       createNewProjectLink.click()
       dialog("New Project") {
         findText("Java").click()
-        find(
-          ComponentFixture::class.java,
-          byXpath("//div[@class='FrameworksTree']")
-        ).findText("Kotlin/JVM").click()
-        runJs("robot.pressAndReleaseKey(${KeyEvent.VK_SPACE})")
-        button("Next").click()
-        button("Finish").click()
+        checkBox("Add sample code").select()
+        button("Create").click()
       }
     }
   }

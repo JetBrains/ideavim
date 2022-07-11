@@ -122,9 +122,9 @@ object VimListenerManager {
       VimPlugin.getOptionService().addListener(OptionConstants.guicursorName, GuicursorChangeListener)
       VimPlugin.getOptionService().addListener(OptionConstants.iskeywordName, KeywordOptionChangeListener, true)
 
-      EventFacade.getInstance().addEditorFactoryListener(VimEditorFactoryListener, VimPlugin.getInstance())
+      EventFacade.getInstance().addEditorFactoryListener(VimEditorFactoryListener, VimPlugin.getInstance().onOffDisposable)
 
-      EditorFactory.getInstance().eventMulticaster.addCaretListener(VimCaretListener, VimPlugin.getInstance())
+      EditorFactory.getInstance().eventMulticaster.addCaretListener(VimCaretListener, VimPlugin.getInstance().onOffDisposable)
     }
 
     fun disable() {
@@ -136,8 +136,6 @@ object VimListenerManager {
       VimPlugin.getOptionService().removeListener(OptionConstants.showcmdName, ShowCmdOptionChangeListener)
       VimPlugin.getOptionService().removeListener(OptionConstants.guicursorName, GuicursorChangeListener)
       VimPlugin.getOptionService().removeListener(OptionConstants.iskeywordName, KeywordOptionChangeListener)
-
-      EditorFactory.getInstance().eventMulticaster.removeCaretListener(VimCaretListener)
     }
   }
 

@@ -38,14 +38,18 @@ class RegisterActionsTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.EDITOR_MODIFICATION)
   fun `test action in disabled plugin`() {
-    setupChecks {
-      caretShape = false
-    }
-    val keys = injector.parser.parseKeys("jklwB") // just random keys
-    val before = "I ${c}found it in a legendary land"
-    val after = "I jklwB${c}found it in a legendary land"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE) {
-      VimPlugin.setEnabled(false)
+    try {
+      setupChecks {
+        caretShape = false
+      }
+      val keys = injector.parser.parseKeys("jklwB") // just random keys
+      val before = "I ${c}found it in a legendary land"
+      val after = "I jklwB${c}found it in a legendary land"
+      doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE) {
+        VimPlugin.setEnabled(false)
+      }
+    } finally {
+      VimPlugin.setEnabled(true)
     }
   }
 

@@ -72,6 +72,6 @@ private fun saveFile(url: String, folder: String, name: String): File {
   return File(folder).apply {
     mkdirs()
   }.resolve(name).apply {
-    writeText(response.body()?.string() ?: "")
+    writeText(response.body?.string() ?: "")
   }
 }

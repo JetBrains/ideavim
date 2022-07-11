@@ -32,6 +32,7 @@ import com.intellij.openapi.keymap.ex.KeymapManagerEx;
 import com.intellij.openapi.keymap.impl.DefaultKeymap;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.SystemInfo;
 import com.maddyhome.idea.vim.api.VimInjectorKt;
 import com.maddyhome.idea.vim.api.VimKeyGroup;
@@ -87,6 +88,8 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   private static final Logger LOG = Logger.getInstance(VimPlugin.class);
 
   private final @NotNull VimState state = new VimState();
+
+  public Disposable onOffDisposable;
 
   VimPlugin() {
     ApplicationConfigurationMigrator.getInstance().migrate();
@@ -335,6 +338,8 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
    *      execution, what theoretically may cause bugs (e.g. VIM-2540)
    */
   private void turnOnPlugin() {
+    onOffDisposable = Disposer.newDisposable(this, "IdeaVimOnOffDisposer");
+
     // 1) Update state
     ApplicationManager.getApplication().invokeLater(this::updateState);
 
@@ -370,6 +375,8 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
 
     // Unregister vim actions in command mode
     RegisterActions.unregisterActions();
+
+    Disposer.dispose(onOffDisposable);
   }
 
   private boolean stateUpdated = false;
