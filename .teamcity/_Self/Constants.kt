@@ -13,11 +13,8 @@ object Constants {
   const val PROPERTY_TESTS = "LATEST-EAP-SNAPSHOT"
   const val LONG_RUNNING_TESTS = "LATEST-EAP-SNAPSHOT"
   const val QODANA_TESTS = "LATEST-EAP-SNAPSHOT"
-  const val RELEASE = "2022.1.3"
+  const val RELEASE = "LATEST-EAP-SNAPSHOT"
 
-
-  // Use LATEST-EAP-SNAPSHOT only when we'll update the minimum version of IJ to 222+
-  // Because of some API inconcistincies, IdeaVim built on 2022+ won't run on older versions of IJ
-  const val RELEASE_DEV = "2022.1.3"
-  const val RELEASE_EAP = "2022.1.3"
+  const val RELEASE_DEV = "LATEST-EAP-SNAPSHOT"
+  const val RELEASE_EAP = "LATEST-EAP-SNAPSHOT"
 }
