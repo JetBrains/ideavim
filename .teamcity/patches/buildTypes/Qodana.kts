@@ -32,7 +32,7 @@ changeBuildType(RelativeId("Qodana")) {
     steps {
         update<Qodana>(0) {
             clearConditions()
-            argumentsCommandDocker = "--baseline qodana.sarif.json"
+            argumentsEntryPointDocker = "--baseline qodana.sarif.json"
             param("clonefinder-languages", "")
             param("collect-anonymous-statistics", "")
             param("licenseaudit-enable", "")
