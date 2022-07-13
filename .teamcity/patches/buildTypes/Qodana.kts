@@ -2,6 +2,7 @@ package patches.buildTypes
 
 import jetbrains.buildServer.configs.kotlin.v2019_2.*
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.Qodana
+import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.gradle
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.qodana
 import jetbrains.buildServer.configs.kotlin.v2019_2.ui.*
 
@@ -30,8 +31,16 @@ changeBuildType(RelativeId("Qodana")) {
         }
     }
     steps {
-        update<Qodana>(0) {
+        insert(0) {
+            gradle {
+                name = "Generate grammar"
+                tasks = "generateGrammarSource"
+                param("org.jfrog.artifactory.selectedDeployableServer.defaultModuleVersionConfiguration", "GLOBAL")
+            }
+        }
+        update<Qodana>(1) {
             clearConditions()
+            reportAsTests = true
             argumentsEntryPointDocker = "--baseline qodana.sarif.json"
             param("clonefinder-languages", "")
             param("collect-anonymous-statistics", "")
@@ -39,7 +48,6 @@ changeBuildType(RelativeId("Qodana")) {
             param("clonefinder-languages-container", "")
             param("clonefinder-queried-project", "")
             param("clonefinder-enable", "")
-            param("report-as-test", "")
             param("clonefinder-reference-projects", "")
         }
     }
