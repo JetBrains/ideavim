@@ -21,8 +21,8 @@ package com.maddyhome.idea.vim.listener
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.actionSystem.AnActionResult
 import com.intellij.openapi.actionSystem.CommonDataKeys
-import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.IdeActions
 import com.intellij.openapi.actionSystem.ex.AnActionListener
 import com.intellij.openapi.editor.Editor
@@ -36,16 +36,16 @@ import com.maddyhome.idea.vim.helper.getTopLevelEditor
 class RiderActionListener : AnActionListener {
 
   private var editor: Editor? = null
-  override fun beforeActionPerformed(action: AnAction, dataContext: DataContext, event: AnActionEvent) {
+  override fun beforeActionPerformed(action: AnAction, event: AnActionEvent) {
     if (!VimPlugin.isEnabled()) return
 
-    val hostEditor = dataContext.getData(CommonDataKeys.HOST_EDITOR)
+    val hostEditor = event.dataContext.getData(CommonDataKeys.HOST_EDITOR)
     if (hostEditor != null) {
       editor = hostEditor
     }
   }
 
-  override fun afterActionPerformed(action: AnAction, dataContext: DataContext, event: AnActionEvent) {
+  override fun afterActionPerformed(action: AnAction, event: AnActionEvent, result: AnActionResult) {
     if (!VimPlugin.isEnabled()) return
 
     //region Extend Selection for Rider
