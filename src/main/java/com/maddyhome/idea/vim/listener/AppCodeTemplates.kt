@@ -35,7 +35,6 @@ import com.maddyhome.idea.vim.group.visual.VimVisualTimer
 import com.maddyhome.idea.vim.helper.fileSize
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.newapi.vim
-import org.jetbrains.annotations.NotNull
 
 /**
  * A collection of hacks to improve the interaction with fancy AppCode templates
@@ -77,8 +76,8 @@ object AppCodeTemplates {
 
   @JvmStatic
   fun onMovement(
-    editor: @NotNull Editor,
-    caret: @NotNull Caret,
+    editor: Editor,
+    caret: Caret,
     toRight: Boolean,
   ) {
     val offset = caret.offset
