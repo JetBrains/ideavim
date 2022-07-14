@@ -529,6 +529,9 @@ public class SearchHelper {
         CharSequence subSequence = chars.subSequence(startOffset, endOffset);
         int inQuotePos = pos - startOffset;
         int inQuoteStart = findBlockLocation(subSequence, close, type, Direction.BACKWARDS, inQuotePos, count, false);
+        if (inQuoteStart == -1) {
+          inQuoteStart = findBlockLocation(subSequence, close, type, Direction.FORWARDS, inQuotePos, count, false);
+        }
         if (inQuoteStart != -1) {
           startPosInStringFound = true;
           int inQuoteEnd = findBlockLocation(subSequence, type, close, Direction.FORWARDS, inQuoteStart, 1, false);
@@ -542,6 +545,9 @@ public class SearchHelper {
 
     if (!startPosInStringFound) {
       bstart = findBlockLocation(chars, close, type, Direction.BACKWARDS, pos, count, false);
+      if (bstart == -1) {
+        bstart = findBlockLocation(chars, close, type, Direction.FORWARDS, pos, count, false);
+      }
       if (bstart != -1) {
         bend = findBlockLocation(chars, type, close, Direction.FORWARDS, bstart, 1, false);
       }

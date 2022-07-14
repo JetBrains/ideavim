@@ -198,4 +198,28 @@ class MotionInnerBlockParenActionTest : VimTestCase() {
     )
     assertState("foo()\n")
   }
+
+  fun testOutside() {
+    typeTextInFile(
+      injector.parser.parseKeys("di)"),
+      "${c}foo(bar)\n"
+    )
+    assertState("foo()\n")
+  }
+
+  fun testOutsideInString() {
+    typeTextInFile(
+      injector.parser.parseKeys("di)"),
+      "\"1${c}23\"foo(bar)\n"
+    )
+    assertState("\"123\"foo()\n")
+  }
+
+  fun testOutsideInString2() {
+    typeTextInFile(
+      injector.parser.parseKeys("di)"),
+      "\"1${c}23(dsa)d\"foo(bar)\n"
+    )
+    assertState("\"123()d\"foo(bar)\n")
+  }
 }

@@ -36,6 +36,7 @@ usual beta standards.
   E.g. `<Plug>Commentary` instead of `<Plug>(CommentMotion)`. Old mappings are maintained for compatibility.
 * If you open `~/.ideavimrc` in IDE, remove a mapping, and reload the config using the reload button,
   the mapping will actually be unmapped.
+* New vim (and IdeaVim) behaviour: `ci(`& friends searches for the brackets in the line.
 
 ### Fixes:
 * [VIM-2587](https://youtrack.jetbrains.com/issue/VIM-2587) Use ctrl-6 as ctrl-^
