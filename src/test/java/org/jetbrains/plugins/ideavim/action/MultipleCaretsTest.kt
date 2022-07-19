@@ -2846,4 +2846,30 @@ rtyfg${c}hzxc"""
     """.trimIndent()
     assertState(after)
   }
+
+  // VIM-2703
+  @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
+  fun `test multicaret with unnamed clipboard`() {
+    injector.optionService.appendValue(OptionScope.GLOBAL, OptionConstants.clipboardName, OptionConstants.clipboard_unnamed)
+    val before = """
+            attach${c}Download(null)
+            attach${c}Download(null)
+            attach${c}Download(null)
+            attach${c}Download(null)
+            attach${c}Download(null)
+            
+    """.trimIndent()
+    configureByText(before)
+    typeText(injector.parser.parseKeys("diw"))
+    val after = """
+            ${c}(null)
+            ${c}(null)
+            ${c}(null)
+            ${c}(null)
+            ${c}(null)
+            
+    """.trimIndent()
+    assertState(after)
+    injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.clipboardName)
+  }
 }
