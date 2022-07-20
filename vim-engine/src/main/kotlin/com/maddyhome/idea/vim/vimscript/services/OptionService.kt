@@ -236,6 +236,11 @@ interface OptionService {
   fun removeListener(optionName: String, listener: OptionChangeListener<VimDataType>)
 
   /**
+   * Get the [Option] by its name or abbreviation
+   */
+  fun getOptionByNameOrAbbr(key: String): Option<out VimDataType>?
+
+  /**
    * COMPATIBILITY-LAYER: Added this class
    * Please see: https://jb.gg/zo8n0r
    */

@@ -134,4 +134,18 @@ class SetCommandTest : VimTestCase() {
     typeText(commandToKeys("set selection?"))
     assertExOutput("selection=exclusive \n")
   }
+
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  fun `test show numbered value`() {
+    configureByText("\n")
+    typeText(commandToKeys("set so"))
+    assertExOutput("scrolloff=0         \n")
+  }
+
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  fun `test show numbered value with questionmark`() {
+    configureByText("\n")
+    typeText(commandToKeys("set so?"))
+    assertExOutput("scrolloff=0         \n")
+  }
 }

@@ -25,6 +25,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.Msg
+import com.maddyhome.idea.vim.option.ToggleOption
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import java.util.*
@@ -133,12 +134,11 @@ fun parseOptionLine(editor: VimEditor, args: String, scope: OptionScope, failOnB
         }
         // No operator so only the option name was given
         if (eq == -1) {
-          if (optionService.isToggleOption(token)) {
-            optionService.setOption(scope, token, token)
-          } else if (!optionService.getOptions().contains(token)) {
-            error = Msg.unkopt
-          } else {
-            toShow.add(Pair(token, token))
+          val option = optionService.getOptionByNameOrAbbr(token)
+          when (option) {
+            null -> error = Msg.unkopt
+            is ToggleOption -> optionService.setOption(scope, token, token)
+            else -> toShow.add(Pair(option.name, option.abbrev))
           }
         } else {
           // Make sure there is an option name
@@ -185,10 +185,10 @@ private fun showOptions(editor: VimEditor, nameAndToken: Collection<Pair<String,
   val optionService = injector.optionService
   val optionsToShow = mutableListOf<String>()
   var unknownOption: Pair<String, String>? = null
-  val optionsAndAbbrevs = optionService.getOptions() + optionService.getAbbrevs()
   for (pair in nameAndToken) {
-    if (optionsAndAbbrevs.contains(pair.first)) {
-      optionsToShow.add(pair.first)
+    val myOption = optionService.getOptionByNameOrAbbr(pair.first)
+    if (myOption != null) {
+      optionsToShow.add(myOption.name)
     } else {
       unknownOption = pair
       break

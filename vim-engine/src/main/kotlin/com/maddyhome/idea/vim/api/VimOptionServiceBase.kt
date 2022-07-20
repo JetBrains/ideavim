@@ -367,7 +367,7 @@ abstract class VimOptionServiceBase : OptionService {
     options.get(optionName)!!.removeOptionChangeListener(listener)
   }
 
-  fun getRawOption(key: String): Option<out VimDataType>? {
+  override fun getOptionByNameOrAbbr(key: String): Option<out VimDataType>? {
     return options.get(key)
   }
 
