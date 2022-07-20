@@ -58,6 +58,7 @@ usual beta standards.
 * [VIM-1862](https://youtrack.jetbrains.com/issue/VIM-1862/Ex-commands-executed-in-keymaps-and-macros-are-added-to-the-command-history) Fix command history
 * [VIM-2227](https://youtrack.jetbrains.com/issue/VIM-2227) Wrong behavior when deleting / changing surround with invalid character
 * [VIM-2691](https://youtrack.jetbrains.com/issue/VIM-2691) Save file on :w
+* [VIM-2710](https://youtrack.jetbrains.com/issue/VIM-2710) Show options value on `set opt`
 
 ### Merged PRs:
 * [468](https://github.com/JetBrains/ideavim/pull/468) by [Thomas Schouten](https://github.com/PHPirates): Implement UserDataHolder for EditorDataContext
