@@ -38,7 +38,7 @@ class AddInlineInlaysAction : AnAction() {
       @VimNlsSafe
       val text = "a".repeat(max(1, random.nextInt(7)))
 
-      val offset = EditorHelper.visualPositionToOffset(editor, VisualPosition(currentVisualLine, i))
+      val offset = editor.visualPositionToOffset(VisualPosition(currentVisualLine, i))
       // We don't need a custom renderer, just use the standard parameter hint renderer
       inlayModel.addInlineElement(
         offset,

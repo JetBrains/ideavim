@@ -316,7 +316,7 @@ public class MotionGroup extends VimMotionGroupBase {
     newColumn = normalizeVisualColumn(editor, newVisualLine, newColumn, CommandStateHelper.isEndAllowed(editor));
 
     if (newVisualLine != caretVisualLine || newColumn != oldColumn) {
-      int offset = visualPositionToOffset(editor, new VisualPosition(newVisualLine, newColumn));
+      int offset = editor.visualPositionToOffset(new VisualPosition(newVisualLine, newColumn));
       moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), offset);
 
       UserDataManager.setVimLastColumn(editor.getCaretModel().getPrimaryCaret(), col);
