@@ -510,18 +510,6 @@ public class EditorHelper {
   }
 
   /**
-   * Converts a visual position to a file offset
-   *
-   * @param editor The editor
-   * @param pos    The visual position to convert
-   * @return The file offset of the visual position
-   */
-  public static int visualPositionToOffset(final @NotNull Editor editor, final @NotNull VisualPosition pos) {
-    // [202] return editor.visualPositionToOffset(pos);
-    return editor.logicalPositionToOffset(editor.visualToLogicalPosition(pos));
-  }
-
-  /**
    * Gets a string representation of the file for the supplied offset range
    *
    * @param editor The editor
