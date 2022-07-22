@@ -59,6 +59,7 @@ usual beta standards.
 * [VIM-2227](https://youtrack.jetbrains.com/issue/VIM-2227) Wrong behavior when deleting / changing surround with invalid character
 * [VIM-2691](https://youtrack.jetbrains.com/issue/VIM-2691) Save file on :w
 * [VIM-2710](https://youtrack.jetbrains.com/issue/VIM-2710) Show options value on `set opt`
+* [VIM-913](https://youtrack.jetbrains.com/issue/VIM-913) Partially fix the issue with macros and autocompletion
 
 ### Merged PRs:
 * [468](https://github.com/JetBrains/ideavim/pull/468) by [Thomas Schouten](https://github.com/PHPirates): Implement UserDataHolder for EditorDataContext
@@ -70,6 +71,7 @@ usual beta standards.
 * [519](https://github.com/JetBrains/ideavim/pull/519) by [chylex](https://github.com/chylex): Fix(VIM-2227): Wrong behavior when deleting / changing surround with invalid character
 * [525](https://github.com/JetBrains/ideavim/pull/525) by [Matt Ellis](https://github.com/citizenmatt): Improve handling of fractional width fonts
 * [526](https://github.com/JetBrains/ideavim/pull/526) by [Alex Pláte](https://github.com/AlexPl292): Create gradle.properties
+* [528](https://github.com/JetBrains/ideavim/pull/528) by [chylex](https://github.com/chylex): Implement partial code completion support in macros
 
 ## 1.10.0, 2022-02-17
 
