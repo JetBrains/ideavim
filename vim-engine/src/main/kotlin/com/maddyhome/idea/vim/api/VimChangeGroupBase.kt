@@ -158,8 +158,8 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       }
     }
     if (type == null ||
-      operatorArguments.mode.inInsertMode || caret.registerStorage.storeText(editor, updatedRange, type, true)
-      || caret != editor.primaryCaret() // sticky tape for VIM-2703 todo remove in the next release
+      operatorArguments.mode.inInsertMode || caret.registerStorage.storeText(editor, updatedRange, type, true) ||
+      caret != editor.primaryCaret() // sticky tape for VIM-2703 todo remove in the next release
     ) {
       val startOffsets = updatedRange.startOffsets
       val endOffsets = updatedRange.endOffsets

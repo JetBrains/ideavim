@@ -2862,11 +2862,11 @@ rtyfg${c}hzxc"""
     configureByText(before)
     typeText(injector.parser.parseKeys("diw"))
     val after = """
-            ${c}(null)
-            ${c}(null)
-            ${c}(null)
-            ${c}(null)
-            ${c}(null)
+            $c(null)
+            $c(null)
+            $c(null)
+            $c(null)
+            $c(null)
             
     """.trimIndent()
     assertState(after)
