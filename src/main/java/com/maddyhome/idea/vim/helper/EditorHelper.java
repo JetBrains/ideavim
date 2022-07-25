@@ -267,7 +267,7 @@ public class EditorHelper {
    * @param visualLine The visual line to use to check for inlays and support non-proportional fonts
    * @return The visual column number
    */
-  public static int getVisualColumnAtLeftOfScreen(final @NotNull Editor editor, int visualLine) {
+  public static int getVisualColumnAtLeftOfDisplay(final @NotNull Editor editor, int visualLine) {
     final Rectangle area = getVisibleArea(editor);
     return getFullVisualColumn(editor, area.x, editor.visualLineToY(visualLine), area.x, area.x + area.width);
   }
@@ -279,7 +279,7 @@ public class EditorHelper {
    * @param visualLine The visual line to use to check for inlays and support non-proportional fonts
    * @return The visual column number
    */
-  public static int getVisualColumnAtRightOfScreen(final @NotNull Editor editor, int visualLine) {
+  public static int getVisualColumnAtRightOfDisplay(final @NotNull Editor editor, int visualLine) {
     final Rectangle area = getVisibleArea(editor);
     return getFullVisualColumn(editor, area.x + area.width - 1, editor.visualLineToY(visualLine), area.x,
                                area.x + area.width);

@@ -25,7 +25,7 @@ class MotionFirstScreenColumnAction : MotionActionHandler.ForEachCaret() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    return injector.motion.moveCaretToLineScreenStart(editor, caret)
+    return injector.motion.moveCaretToCurrentDisplayLineStart(editor, caret)
   }
 
   override val motionType: MotionType = MotionType.EXCLUSIVE

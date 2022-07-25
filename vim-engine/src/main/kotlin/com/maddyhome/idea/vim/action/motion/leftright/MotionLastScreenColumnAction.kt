@@ -46,7 +46,7 @@ class MotionLastScreenColumnAction : MotionActionHandler.ForEachCaret() {
         allow = true
       }
     }
-    return injector.motion.moveCaretToLineScreenEnd(editor, caret, allow)
+    return injector.motion.moveCaretToCurrentDisplayLineEnd(editor, caret, allow)
   }
 
   override fun postMove(
