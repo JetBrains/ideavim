@@ -296,8 +296,8 @@ public class MotionGroup extends VimMotionGroupBase {
       col = UserDataManager.getVimLastColumn(editor.getCaretModel().getPrimaryCaret());
     }
 
-    final int leftVisualColumn = getVisualColumnAtLeftOfScreen(editor, newVisualLine);
-    final int rightVisualColumn = getVisualColumnAtRightOfScreen(editor, newVisualLine);
+    final int leftVisualColumn = getVisualColumnAtLeftOfDisplay(editor, newVisualLine);
+    final int rightVisualColumn = getVisualColumnAtRightOfDisplay(editor, newVisualLine);
     int caretColumn = col;
     int newColumn = caretColumn;
 
@@ -709,8 +709,8 @@ public class MotionGroup extends VimMotionGroupBase {
   }
 
   private static void scrollCaretIntoViewHorizontally(@NotNull Editor editor, @NotNull VisualPosition position) {
-    final int currentVisualLeftColumn = getVisualColumnAtLeftOfScreen(editor, position.line);
-    final int currentVisualRightColumn = getVisualColumnAtRightOfScreen(editor, position.line);
+    final int currentVisualLeftColumn = getVisualColumnAtLeftOfDisplay(editor, position.line);
+    final int currentVisualRightColumn = getVisualColumnAtRightOfDisplay(editor, position.line);
     final int caretColumn = position.column;
 
     final int halfWidth = getApproximateScreenWidth(editor) / 2;
@@ -870,7 +870,7 @@ public class MotionGroup extends VimMotionGroupBase {
   }
 
   @Override
-  public @NotNull Motion moveCaretToMiddleColumn(@NotNull VimEditor editor, @NotNull VimCaret caret) {
+  public @NotNull Motion moveCaretToCurrentDisplayLineMiddle(@NotNull VimEditor editor, @NotNull VimCaret caret) {
     final int width = getApproximateScreenWidth(((IjVimEditor)editor).getEditor()) / 2;
     final int len = getLineLength(((IjVimEditor)editor).getEditor());
 
@@ -905,7 +905,7 @@ public class MotionGroup extends VimMotionGroupBase {
     if (columns > 0) {
       // TODO: Don't add columns to visual position. This includes inlays and folds
       int visualColumn = normalizeVisualColumn(ijEditor, caretVisualPosition.line,
-                                               getVisualColumnAtLeftOfScreen(ijEditor, caretVisualPosition.line) +
+                                               getVisualColumnAtLeftOfDisplay(ijEditor, caretVisualPosition.line) +
                                                columns, false);
 
       // If the target column has an inlay preceding it, move passed it. This inlay will have been (incorrectly)
@@ -922,7 +922,7 @@ public class MotionGroup extends VimMotionGroupBase {
     }
     else {
       // Don't normalise the rightmost column, or we break virtual space
-      final int visualColumn = getVisualColumnAtRightOfScreen(ijEditor, caretVisualPosition.line) + columns;
+      final int visualColumn = getVisualColumnAtRightOfDisplay(ijEditor, caretVisualPosition.line) + columns;
       scrollColumnToRightOfScreen(ijEditor, caretVisualPosition.line, visualColumn);
     }
     moveCaretToView(ijEditor);
@@ -930,26 +930,26 @@ public class MotionGroup extends VimMotionGroupBase {
   }
 
   @Override
-  public @NotNull Motion moveCaretToLineScreenStart(@NotNull VimEditor editor, @NotNull VimCaret caret) {
+  public @NotNull Motion moveCaretToCurrentDisplayLineStart(@NotNull VimEditor editor, @NotNull VimCaret caret) {
     final int col =
-      getVisualColumnAtLeftOfScreen(((IjVimEditor)editor).getEditor(), caret.getVisualPosition().getLine());
+      getVisualColumnAtLeftOfDisplay(((IjVimEditor)editor).getEditor(), caret.getVisualPosition().getLine());
     return moveCaretToColumn(editor, caret, col, false);
   }
 
   @Override
-  public @Range(from = 0, to = Integer.MAX_VALUE) int moveCaretToLineScreenStartSkipLeading(@NotNull VimEditor editor,
-                                                                                            @NotNull VimCaret caret) {
-    final int col = getVisualColumnAtLeftOfScreen(((IjVimEditor)editor).getEditor(), caret.getVisualPosition().getLine());
+  public @Range(from = 0, to = Integer.MAX_VALUE) int moveCaretToCurrentDisplayLineStartSkipLeading(@NotNull VimEditor editor,
+                                                                                                    @NotNull VimCaret caret) {
+    final int col = getVisualColumnAtLeftOfDisplay(((IjVimEditor)editor).getEditor(), caret.getVisualPosition().getLine());
     final int logicalLine = caret.getLine().getLine();
     return getLeadingCharacterOffset(((IjVimEditor)editor).getEditor(), logicalLine, col);
   }
 
   @Override
-  public @NotNull Motion moveCaretToLineScreenEnd(@NotNull VimEditor editor,
-                                                  @NotNull VimCaret caret,
-                                                  boolean allowEnd) {
+  public @NotNull Motion moveCaretToCurrentDisplayLineEnd(@NotNull VimEditor editor,
+                                                          @NotNull VimCaret caret,
+                                                          boolean allowEnd) {
     final int col =
-      getVisualColumnAtRightOfScreen(((IjVimEditor)editor).getEditor(), caret.getVisualPosition().getLine());
+      getVisualColumnAtRightOfDisplay(((IjVimEditor)editor).getEditor(), caret.getVisualPosition().getLine());
     return moveCaretToColumn(editor, caret, col, allowEnd);
   }
 

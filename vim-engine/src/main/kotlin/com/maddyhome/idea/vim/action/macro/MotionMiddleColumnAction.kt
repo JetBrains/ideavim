@@ -25,7 +25,7 @@ class MotionMiddleColumnAction : MotionActionHandler.ForEachCaret() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    return injector.motion.moveCaretToMiddleColumn(editor, caret)
+    return injector.motion.moveCaretToCurrentDisplayLineMiddle(editor, caret)
   }
 
   override val motionType: MotionType = MotionType.INCLUSIVE

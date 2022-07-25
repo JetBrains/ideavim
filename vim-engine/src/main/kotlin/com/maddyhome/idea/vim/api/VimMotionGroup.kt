@@ -53,10 +53,10 @@ interface VimMotionGroup {
   fun moveCaretToColumn(editor: VimEditor, caret: VimCaret, count: Int, allowEnd: Boolean): Motion
 
   // Move caret to column relative to the bounds of the display (aka window)
-  fun moveCaretToLineScreenStart(editor: VimEditor, caret: VimCaret): Motion
-  fun moveCaretToLineScreenStartSkipLeading(editor: VimEditor, caret: VimCaret): Int
-  fun moveCaretToMiddleColumn(editor: VimEditor, caret: VimCaret): Motion // Middle of screen
-  fun moveCaretToLineScreenEnd(editor: VimEditor, caret: VimCaret, allowEnd: Boolean): Motion
+  fun moveCaretToCurrentDisplayLineStart(editor: VimEditor, caret: VimCaret): Motion
+  fun moveCaretToCurrentDisplayLineStartSkipLeading(editor: VimEditor, caret: VimCaret): Int
+  fun moveCaretToCurrentDisplayLineMiddle(editor: VimEditor, caret: VimCaret): Motion
+  fun moveCaretToCurrentDisplayLineEnd(editor: VimEditor, caret: VimCaret, allowEnd: Boolean): Motion
 
   // Move caret to other
   fun moveCaretToMark(editor: VimEditor, ch: Char, toLineStart: Boolean): Int
