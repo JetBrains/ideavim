@@ -27,6 +27,7 @@ import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.fileEditor.*;
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx;
 import com.intellij.openapi.fileEditor.impl.EditorWindow;
+import com.intellij.openapi.fileEditor.impl.EditorsSplitters;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.openapi.project.Project;
@@ -159,6 +160,7 @@ public class FileGroup extends VimFileBase {
       if (virtualFile != null && window != null) {
         window.closeFile(virtualFile);
       }
+      EditorsSplitters.focusDefaultComponentInSplittersIfPresent(project);
     }
   }
 
@@ -175,6 +177,7 @@ public class FileGroup extends VimFileBase {
     if (number >= 0 && number < editors.length) {
       fileEditorManager.closeFile(editors[number], window);
     }
+    EditorsSplitters.focusDefaultComponentInSplittersIfPresent(project);
   }
 
   /**
