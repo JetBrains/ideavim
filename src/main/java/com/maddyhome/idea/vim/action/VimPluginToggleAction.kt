@@ -19,6 +19,7 @@
 package com.maddyhome.idea.vim.action
 
 import com.intellij.openapi.actionSystem.ActionPlaces
+import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.project.DumbAwareToggleAction
 import com.maddyhome.idea.vim.VimPlugin
@@ -42,4 +43,6 @@ class VimPluginToggleAction : DumbAwareToggleAction()/*, LightEditCompatible*/ {
       if (VimPlugin.isEnabled()) MessageHelper.message("action.VimPluginToggle.enabled") else MessageHelper.message("action.VimPluginToggle.enable")
     } else MessageHelper.message("action.VimPluginToggle.text")
   }
+
+  override fun getActionUpdateThread() = ActionUpdateThread.BGT
 }

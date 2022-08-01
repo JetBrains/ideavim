@@ -20,6 +20,7 @@ package com.maddyhome.idea.vim.action
 import com.google.common.collect.ImmutableSet
 import com.intellij.codeInsight.lookup.LookupManager
 import com.intellij.openapi.actionSystem.ActionManager
+import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.EmptyAction
@@ -94,6 +95,10 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
       }
     }
   }
+
+  // There is a chance that we can use BGT, but we call for isCell inside the update.
+  // Not sure if can can use BGT with this call. Let's use EDT for now.
+  override fun getActionUpdateThread() = ActionUpdateThread.EDT
 
   override fun update(e: AnActionEvent) {
     val start = if (traceTime) System.currentTimeMillis() else null

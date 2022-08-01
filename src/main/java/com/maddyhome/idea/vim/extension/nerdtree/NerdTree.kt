@@ -21,6 +21,7 @@ package com.maddyhome.idea.vim.extension.nerdtree
 import com.intellij.ide.projectView.ProjectView
 import com.intellij.ide.projectView.impl.ProjectViewImpl
 import com.intellij.openapi.actionSystem.ActionManager
+import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.application.ApplicationManager
@@ -172,7 +173,7 @@ class NerdTree : VimExtension {
   }
 
   class ProjectViewListener(private val project: Project) : ToolWindowManagerListener {
-    override fun toolWindowShown(id: String, toolWindow: ToolWindow) {
+    override fun toolWindowShown(toolWindow: ToolWindow) {
       if (ToolWindowId.PROJECT_VIEW != toolWindow.id) return
 
       val dispatcher = NerdDispatcher.getInstance(project)
@@ -241,6 +242,8 @@ class NerdTree : VimExtension {
       }
       e.presentation.isEnabled = !speedSearchIsHere(project)
     }
+
+    override fun getActionUpdateThread() = ActionUpdateThread.BGT
 
     private fun speedSearchIsHere(project: Project): Boolean {
       val component = ProjectView.getInstance(project).currentProjectViewPane.tree ?: return false
@@ -559,8 +562,4 @@ class NerdTree : VimExtension {
       )
     }
   }
-}
-
-private fun <T> Node<T>.addLeafs(keys: String, actionHolder: T) {
-  addLeafs(injector.parser.parseKeys(keys), actionHolder)
 }

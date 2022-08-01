@@ -23,6 +23,7 @@ import com.intellij.ide.BrowserUtil
 import com.intellij.ide.DataManager
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.ActionPlaces
+import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.DefaultActionGroup
@@ -158,6 +159,8 @@ class VimActions : DumbAwareAction() {
     val project = e.project
     e.presentation.isEnabledAndVisible = project != null && !project.isDisposed
   }
+
+  override fun getActionUpdateThread() = ActionUpdateThread.BGT
 }
 
 private object VimActionsPopup {
@@ -264,4 +267,6 @@ internal object JoinEap : DumbAwareAction()/*, LightEditCompatible*/ {
       e.presentation.text = MessageHelper.message("action.subscribe.to.eap.text")
     }
   }
+
+  override fun getActionUpdateThread() = ActionUpdateThread.BGT
 }

@@ -27,6 +27,7 @@ import com.intellij.notification.Notification
 import com.intellij.notification.NotificationGroup
 import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
+import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.KeyboardShortcut
@@ -221,6 +222,8 @@ class NotificationService(private val project: Project?) {
       override fun update(e: AnActionEvent) {
         e.presentation.isEnabled = id != null
       }
+
+      override fun getActionUpdateThread() = ActionUpdateThread.BGT
     }
 
     class StopTracking : DumbAwareAction("Stop Tracking") {
@@ -257,6 +260,8 @@ class NotificationService(private val project: Project?) {
       val actionText = if (VimRcService.findIdeaVimRc() != null) "Open ~/.ideavimrc" else "Create ~/.ideavimrc"
       e.presentation.text = actionText
     }
+
+    override fun getActionUpdateThread() = ActionUpdateThread.BGT
   }
 
   @Suppress("DialogTitleCapitalization")
