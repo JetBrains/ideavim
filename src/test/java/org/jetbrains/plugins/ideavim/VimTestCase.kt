@@ -229,6 +229,7 @@ abstract class VimTestCase : UsefulTestCase() {
   private fun configureByText(fileName: String, content: String): Editor {
     @Suppress("IdeaVimAssertState")
     myFixture.configureByText(fileName, content)
+    NeovimTesting.setupEditor(myFixture.editor, this)
     setEditorVisibleSize(screenWidth, screenHeight)
     return myFixture.editor
   }
@@ -236,6 +237,7 @@ abstract class VimTestCase : UsefulTestCase() {
   protected fun configureByFileName(fileName: String): Editor {
     @Suppress("IdeaVimAssertState")
     myFixture.configureByText(fileName, "\n")
+    NeovimTesting.setupEditor(myFixture.editor, this)
     setEditorVisibleSize(screenWidth, screenHeight)
     return myFixture.editor
   }
@@ -326,6 +328,12 @@ abstract class VimTestCase : UsefulTestCase() {
     @Suppress("IdeaVimAssertState")
     myFixture.checkResult(textAfter)
     NeovimTesting.assertState(myFixture.editor, this)
+  }
+
+  protected fun assertState(modeAfter: VimStateMachine.Mode, subModeAfter: SubMode) {
+    assertMode(modeAfter)
+    assertSubMode(subModeAfter)
+    assertCaretsVisualAttributes()
   }
 
   fun assertPosition(line: Int, column: Int) {
@@ -501,107 +509,54 @@ abstract class VimTestCase : UsefulTestCase() {
     }
   }
 
+  @JvmOverloads
   fun doTest(
     keys: List<String>,
     before: String,
     after: String,
+    modeAfter: VimStateMachine.Mode = VimStateMachine.Mode.COMMAND,
+    subModeAfter: SubMode = SubMode.NONE,
+    fileType: FileType? = null,
+    fileName: String? = null,
+    afterEditorInitialized: ((Editor) -> Unit)? = null,
   ) {
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, SubMode.NONE)
+    doTest(keys.joinToString(separator = ""), before, after, modeAfter, subModeAfter, fileType, fileName, afterEditorInitialized)
   }
 
-  fun doTest(
-    keys: List<String>,
-    before: String,
-    after: String,
-    modeAfter: VimStateMachine.Mode,
-    subModeAfter: SubMode,
-  ) {
-    doTest(keys.joinToString(separator = ""), before, after, modeAfter, subModeAfter)
-  }
-
+  @JvmOverloads
   fun doTest(
     keys: String,
     before: String,
     after: String,
-    modeAfter: VimStateMachine.Mode,
-    subModeAfter: SubMode,
+    modeAfter: VimStateMachine.Mode = VimStateMachine.Mode.COMMAND,
+    subModeAfter: SubMode = SubMode.NONE,
+    fileType: FileType? = null,
+    fileName: String? = null,
+    afterEditorInitialized: ((Editor) -> Unit)? = null,
   ) {
-    configureByText(before)
-
+    if (fileName != null) {
+      configureByText(fileName, before)
+    }
+    else if (fileType != null) {
+      configureByText(fileType, before)
+    }
+    else {
+      configureByText(before)
+    }
+    afterEditorInitialized?.invoke(myFixture.editor)
     performTest(keys, after, modeAfter, subModeAfter)
-
-    NeovimTesting.assertState(myFixture.editor, this)
-  }
-
-  fun doTest(
-    keys: String,
-    before: String,
-    after: String,
-    modeAfter: VimStateMachine.Mode,
-    subModeAfter: SubMode,
-    fileType: FileType,
-  ) {
-    configureByText(fileType, before)
-
-    NeovimTesting.setupEditor(myFixture.editor, this)
-    NeovimTesting.typeCommand(keys, this)
-
-    performTest(keys, after, modeAfter, subModeAfter)
-
-    NeovimTesting.assertState(myFixture.editor, this)
-  }
-
-  fun doTest(
-    keys: String,
-    before: String,
-    after: String,
-    modeAfter: VimStateMachine.Mode,
-    subModeAfter: SubMode,
-    fileName: String,
-  ) {
-    configureByText(fileName, before)
-
-    NeovimTesting.setupEditor(myFixture.editor, this)
-    NeovimTesting.typeCommand(keys, this)
-
-    performTest(keys, after, modeAfter, subModeAfter)
-
-    NeovimTesting.assertState(myFixture.editor, this)
   }
 
   protected fun performTest(keys: String, after: String, modeAfter: VimStateMachine.Mode, subModeAfter: SubMode) {
     typeText(injector.parser.parseKeys(keys))
     PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
-    @Suppress("IdeaVimAssertState")
-    myFixture.checkResult(after)
-    assertState(modeAfter, subModeAfter)
-  }
-
-  fun doTest(
-    keys: List<KeyStroke>,
-    before: String,
-    after: String?,
-    modeAfter: VimStateMachine.Mode,
-    subModeAfter: SubMode,
-    afterEditorInitialized: (Editor) -> Unit,
-  ) {
-    configureByText(before)
-    afterEditorInitialized(myFixture.editor)
-    typeText(keys)
-    @Suppress("IdeaVimAssertState")
-    myFixture.checkResult(after!!)
+    assertState(after)
     assertState(modeAfter, subModeAfter)
   }
 
   protected fun setRegister(register: Char, keys: String) {
     VimPlugin.getRegister().setKeys(register, injector.parser.stringToKeys(keys))
     NeovimTesting.setRegister(register, keys, this)
-  }
-
-  protected fun assertState(modeAfter: VimStateMachine.Mode, subModeAfter: SubMode) {
-    assertMode(modeAfter)
-    assertSubMode(subModeAfter)
-    assertCaretsVisualAttributes()
   }
 
   protected val fileManager: FileEditorManagerEx

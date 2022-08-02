@@ -73,9 +73,7 @@ Xbar
 
                     ba_quux_r
 
-      """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      """.trimIndent()
     )
   }
 
@@ -97,9 +95,7 @@ Xbar
                     quux spam eggs
 
         """.trimIndent()
-        ),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+        )
     )
   }
 
@@ -136,9 +132,7 @@ Xbar
                     ba_quux_r
 
         """.trimIndent()
-        ),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+        )
     )
   }
 
@@ -162,10 +156,7 @@ Xbar
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.VISUAL_BLOCK_MODE)
@@ -179,7 +170,7 @@ Xbar
                 hard by the torrent of a mountain pass.
                     """
     doTest(
-      injector.parser.parseKeys("<C-V>" + "jjI" + " Hello " + "<ESC>"),
+      listOf("<C-V>" + "jjI" + " Hello " + "<ESC>"),
       before.trimIndent(),
       """
                 A Discovery
@@ -189,14 +180,11 @@ Xbar
                 where it was s Hello ettled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
     ) {
       it.inlayModel.addInlineElement(before.indexOf("found"), HintRenderer("Hello"))
       it.inlayModel.addInlineElement(before.indexOf("l rocks"), HintRenderer("Hello"))
       it.inlayModel.addInlineElement(before.indexOf("ere it"), HintRenderer("Hello"))
     }
-    assertMode(VimStateMachine.Mode.COMMAND)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.VISUAL_BLOCK_MODE)

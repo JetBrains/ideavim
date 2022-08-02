@@ -20,7 +20,6 @@ package org.jetbrains.plugins.ideavim
 
 import com.maddyhome.idea.vim.RegisterActions.VIM_ACTIONS_EP
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.handler.ActionBeanClass
@@ -42,10 +41,9 @@ class RegisterActionsTest : VimTestCase() {
       setupChecks {
         caretShape = false
       }
-      val keys = injector.parser.parseKeys("jklwB") // just random keys
       val before = "I ${c}found it in a legendary land"
       val after = "I jklwB${c}found it in a legendary land"
-      doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE) {
+      doTest("jklwB", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE) {
         VimPlugin.setEnabled(false)
       }
     } finally {
@@ -55,10 +53,9 @@ class RegisterActionsTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.EDITOR_MODIFICATION)
   fun `test turn plugin off and on`() {
-    val keys = injector.parser.parseKeys("l")
     val before = "I ${c}found it in a legendary land"
     val after = "I f${c}ound it in a legendary land"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE) {
+    doTest("l", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE) {
       VimPlugin.setEnabled(false)
       VimPlugin.setEnabled(true)
     }
@@ -66,10 +63,9 @@ class RegisterActionsTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.EDITOR_MODIFICATION)
   fun `test enable twice`() {
-    val keys = injector.parser.parseKeys("l")
     val before = "I ${c}found it in a legendary land"
     val after = "I f${c}ound it in a legendary land"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE) {
+    doTest("l", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE) {
       VimPlugin.setEnabled(false)
       VimPlugin.setEnabled(true)
       VimPlugin.setEnabled(true)
@@ -78,11 +74,10 @@ class RegisterActionsTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.EDITOR_MODIFICATION)
   fun `test unregister extension`() {
-    val keys = injector.parser.parseKeys("l")
     val before = "I ${c}found it in a legendary land"
     val after = "I f${c}ound it in a legendary land"
     var motionRightAction: ActionBeanClass? = null
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE) {
+    doTest("l", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE) {
       motionRightAction = VIM_ACTIONS_EP.extensions().filter { it.actionId == "VimPreviousTabAction" }.findFirst().get()
 
       assertNotNull(getCommandNode())

@@ -19,13 +19,10 @@
 package org.jetbrains.plugins.ideavim.action.motion.search
 
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.common.Direction
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
-import javax.swing.KeyStroke
 
 class SearchAgainPreviousActionTest : VimTestCase() {
   @TestWithoutNeovim(reason = SkipNeovimReason.EDITOR_MODIFICATION)
@@ -36,14 +33,13 @@ class SearchAgainPreviousActionTest : VimTestCase() {
   ...${c}all it was settled on some sodden sand
   ...all by the torrent of a mountain pass
     """.trimIndent().dotToTab()
-    val keys = injector.parser.parseKeys("N")
     val after = """
   I found it in a legendary land
   ...${c}all rocks and lavender and tufted grass,
   ...all it was settled on some sodden sand
   ...all by the torrent of a mountain pass
     """.trimIndent().dotToTab()
-    doTestWithSearch(keys, before, after)
+    doTestWithSearch("N", before, after)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.EDITOR_MODIFICATION)
@@ -54,14 +50,13 @@ class SearchAgainPreviousActionTest : VimTestCase() {
   ...all it was .${c}all settled on some sodden sand
   ...all by the torrent of a mountain pass
     """.trimIndent().dotToTab()
-    val keys = injector.parser.parseKeys("N")
     val after = """
   I found it in a legendary land
   ...all rocks and lavender and tufted grass,
   ...${c}all it was .all settled on some sodden sand
   ...all by the torrent of a mountain pass
     """.trimIndent().dotToTab()
-    doTestWithSearch(keys, before, after)
+    doTestWithSearch("N", before, after)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.EDITOR_MODIFICATION)
@@ -72,14 +67,13 @@ class SearchAgainPreviousActionTest : VimTestCase() {
   ...all it was .all.${c}all settled on some sodden sand
   ...all by the torrent of a mountain pass
     """.trimIndent().dotToTab()
-    val keys = injector.parser.parseKeys("N")
     val after = """
   I found it in a legendary land
   ...all rocks and lavender and tufted grass,
   ...all it was .${c}all.all settled on some sodden sand
   ...all by the torrent of a mountain pass
     """.trimIndent().dotToTab()
-    doTestWithSearch(keys, before, after)
+    doTestWithSearch("N", before, after)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.EDITOR_MODIFICATION)
@@ -90,14 +84,13 @@ class SearchAgainPreviousActionTest : VimTestCase() {
   ...all it was settled on some sodden sand
   ...all by the torrent of a mountain pass
     """.trimIndent().dotToTab()
-    val keys = injector.parser.parseKeys("N")
     val after = """
   I found it in a legendary land
   ...all rocks and lavender and tufted grass,
   ...all it was settled on some sodden sand
   ...${c}all by the torrent of a mountain pass
     """.trimIndent().dotToTab()
-    doTestWithSearch(keys, before, after)
+    doTestWithSearch("N", before, after)
   }
 
   fun `test search previous after search command with offset`() {
@@ -174,8 +167,8 @@ class SearchAgainPreviousActionTest : VimTestCase() {
     doTest(listOf(searchCommand("/land/1"), exCommand("s/and/or"), "G", "N"), before, after)
   }
 
-  private fun doTestWithSearch(keys: List<KeyStroke>, before: String, after: String) {
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE) {
+  private fun doTestWithSearch(keys: String, before: String, after: String) {
+    doTest(keys, before, after) {
       VimPlugin.getSearch().setLastSearchState(it, "all", "", Direction.FORWARDS)
     }
   }
