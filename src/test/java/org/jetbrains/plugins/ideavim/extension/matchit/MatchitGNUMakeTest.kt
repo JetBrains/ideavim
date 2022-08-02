@@ -18,7 +18,6 @@
 
 package org.jetbrains.plugins.ideavim.extension.matchit
 
-import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -46,7 +45,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           second line
         ${c}endef
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "Makefile"
+      fileName = "Makefile"
     )
   }
 
@@ -66,7 +65,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           second line
         endef
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "Makefile"
+      fileName = "Makefile"
     )
   }
 
@@ -84,7 +83,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info defined)
         ${c}endif
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "Makefile"
+      fileName = "Makefile"
     )
   }
 
@@ -102,7 +101,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info defined)
         endif
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "Makefile"
+      fileName = "Makefile"
     )
   }
 
@@ -120,7 +119,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not defined)
         ${c}endif
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "Makefile"
+      fileName = "Makefile"
     )
   }
 
@@ -138,7 +137,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not defined)
         endif
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "Makefile"
+      fileName = "Makefile"
     )
   }
 
@@ -156,7 +155,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info empty)
         ${c}endif
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "Makefile"
+      fileName = "Makefile"
     )
   }
 
@@ -174,7 +173,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info empty)
         endif
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "Makefile"
+      fileName = "Makefile"
     )
   }
 
@@ -192,7 +191,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not empty)
         ${c}endif
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "Makefile"
+      fileName = "Makefile"
     )
   }
 
@@ -210,7 +209,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not empty)
         endif
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "Makefile"
+      fileName = "Makefile"
     )
   }
 
@@ -228,7 +227,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not empty)
         endif
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "Makefile"
+      fileName = "Makefile"
     )
   }
 
@@ -254,7 +253,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not x86 based)
         endif
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "Makefile"
+      fileName = "Makefile"
     )
   }
 
@@ -280,7 +279,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not x86 based)
         endif
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "Makefile"
+      fileName = "Makefile"
     )
   }
 
@@ -306,7 +305,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not x86 based)
         endif
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "Makefile"
+      fileName = "Makefile"
     )
   }
 
@@ -332,7 +331,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not x86 based)
         ${c}endif
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "Makefile"
+      fileName = "Makefile"
     )
   }
 
@@ -358,7 +357,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not x86 based)
         endif
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "Makefile"
+      fileName = "Makefile"
     )
   }
 
@@ -384,7 +383,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info x86 based)
         endif
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "Makefile"
+      fileName = "Makefile"
     )
   }
 
@@ -410,7 +409,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info x86 based)
         endif
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "Makefile"
+      fileName = "Makefile"
     )
   }
 
@@ -436,7 +435,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info x86 based)
         endif
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "Makefile"
+      fileName = "Makefile"
     )
   }
 
@@ -462,7 +461,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info x86 based)
         ${c}endif
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "Makefile"
+      fileName = "Makefile"
     )
   }
 
@@ -488,7 +487,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info x86 based)
         endif
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "Makefile"
+      fileName = "Makefile"
     )
   }
 
@@ -510,7 +509,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           second line
         ${c}endef
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "Makefile"
+      fileName = "Makefile"
     )
   }
 
@@ -530,7 +529,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           second line
         endef
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "Makefile"
+      fileName = "Makefile"
     )
   }
 
@@ -548,7 +547,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info defined)
         ${c}endif
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "Makefile"
+      fileName = "Makefile"
     )
   }
 
@@ -566,7 +565,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info defined)
         endif
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "Makefile"
+      fileName = "Makefile"
     )
   }
 
@@ -584,7 +583,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not defined)
         ${c}endif
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "Makefile"
+      fileName = "Makefile"
     )
   }
 
@@ -602,7 +601,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not defined)
         endif
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "Makefile"
+      fileName = "Makefile"
     )
   }
 
@@ -620,7 +619,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info empty)
         ${c}endif
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "Makefile"
+      fileName = "Makefile"
     )
   }
 
@@ -638,7 +637,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info empty)
         endif
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "Makefile"
+      fileName = "Makefile"
     )
   }
 
@@ -656,7 +655,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not empty)
         ${c}endif
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "Makefile"
+      fileName = "Makefile"
     )
   }
 
@@ -674,7 +673,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not empty)
         endif
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "Makefile"
+      fileName = "Makefile"
     )
   }
 
@@ -692,7 +691,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not empty)
         else
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "Makefile"
+      fileName = "Makefile"
     )
   }
 
@@ -718,7 +717,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not x86 based)
         ${c}endif
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "Makefile"
+      fileName = "Makefile"
     )
   }
 
@@ -744,7 +743,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not x86 based)
         endif
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "Makefile"
+      fileName = "Makefile"
     )
   }
 
@@ -770,7 +769,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not x86 based)
         endif
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "Makefile"
+      fileName = "Makefile"
     )
   }
 
@@ -796,7 +795,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not x86 based)
         endif
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "Makefile"
+      fileName = "Makefile"
     )
   }
 
@@ -822,7 +821,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not x86 based)
         endif
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "Makefile"
+      fileName = "Makefile"
     )
   }
 
@@ -848,7 +847,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info x86 based)
         ${c}endif
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "Makefile"
+      fileName = "Makefile"
     )
   }
 
@@ -874,7 +873,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info x86 based)
         endif
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "Makefile"
+      fileName = "Makefile"
     )
   }
 
@@ -900,7 +899,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info x86 based)
         endif
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "Makefile"
+      fileName = "Makefile"
     )
   }
 
@@ -926,7 +925,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info x86 based)
         endif
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "Makefile"
+      fileName = "Makefile"
     )
   }
 
@@ -952,7 +951,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info x86 based)
         endif
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "Makefile"
+      fileName = "Makefile"
     )
   }
 }

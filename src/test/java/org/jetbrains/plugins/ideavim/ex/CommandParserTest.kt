@@ -54,20 +54,18 @@ class CommandParserTest : VimTestCase() {
     setupChecks {
       caretShape = false
     }
-    val keys = commandToKeys(">>")
     val before = "I ${c}found it in a legendary land"
     val after = "I :>>${c}found it in a legendary land"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE) {
+    doTest(exCommand(">>"), before, after) {
       VimPlugin.setEnabled(false)
     }
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.EDITOR_MODIFICATION)
   fun `test turn off and on`() {
-    val keys = commandToKeys(">>")
     val before = "I ${c}found it in a legendary land"
     val after = "        ${c}I found it in a legendary land"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE) {
+    doTest(exCommand(">>"), before, after) {
       VimPlugin.setEnabled(false)
       VimPlugin.setEnabled(true)
     }
@@ -75,10 +73,9 @@ class CommandParserTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.EDITOR_MODIFICATION)
   fun `test turn off and on twice`() {
-    val keys = commandToKeys(">>")
     val before = "I ${c}found it in a legendary land"
     val after = "        ${c}I found it in a legendary land"
-    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE) {
+    doTest(exCommand(">>"), before, after) {
       VimPlugin.setEnabled(false)
       VimPlugin.setEnabled(true)
       VimPlugin.setEnabled(true)

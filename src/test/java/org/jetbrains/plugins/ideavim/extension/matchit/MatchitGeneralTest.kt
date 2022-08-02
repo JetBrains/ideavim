@@ -52,7 +52,7 @@ class MatchitGeneralTest : VimTestCase() {
          *
          *$c/
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, JavaFileType.INSTANCE
+      fileType = JavaFileType.INSTANCE
     )
   }
 
@@ -70,7 +70,7 @@ class MatchitGeneralTest : VimTestCase() {
          *
          */
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, JavaFileType.INSTANCE
+      fileType = JavaFileType.INSTANCE
     )
   }
 
@@ -90,7 +90,7 @@ class MatchitGeneralTest : VimTestCase() {
         int c;
         int d;
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      fileType = HtmlFileType.INSTANCE
     )
   }
 
@@ -118,7 +118,7 @@ class MatchitGeneralTest : VimTestCase() {
   fun `test delete everything from opening parenthesis to closing parenthesis`() {
     doTest(
       "d%",
-      "$c(x == 123)", "", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      "$c(x == 123)", "", fileType = HtmlFileType.INSTANCE
     )
   }
 
@@ -189,7 +189,7 @@ class MatchitGeneralTest : VimTestCase() {
           puts n
         en${se}d
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER, "ruby.rb"
+      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER, fileName = "ruby.rb"
     )
   }
 
@@ -232,7 +232,7 @@ class MatchitGeneralTest : VimTestCase() {
               end
         """.trimIndent()
       },
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
+      fileName = "ruby.rb"
     )
   }
 
@@ -256,7 +256,7 @@ class MatchitGeneralTest : VimTestCase() {
           puts "Positive"
         end
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
+      fileName = "ruby.rb"
     )
   }
 
@@ -280,7 +280,7 @@ class MatchitGeneralTest : VimTestCase() {
           puts "Positive"
         end
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
+      fileName = "ruby.rb"
     )
   }
 
@@ -293,7 +293,8 @@ class MatchitGeneralTest : VimTestCase() {
           <img src="fff">
         </div>
       """.trimIndent(),
-      "$c<", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      "$c<",
+      fileType = HtmlFileType.INSTANCE
     )
   }
 
@@ -304,7 +305,8 @@ class MatchitGeneralTest : VimTestCase() {
       """
         $c<div></div>
       """.trimIndent(),
-      "$c</div>", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      "$c</div>",
+      fileType = HtmlFileType.INSTANCE
     )
   }
 
@@ -317,7 +319,8 @@ class MatchitGeneralTest : VimTestCase() {
           puts "hello"
         end
       """.trimIndent(),
-      "", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
+      "",
+      fileName = "ruby.rb"
     )
   }
 
@@ -330,7 +333,8 @@ class MatchitGeneralTest : VimTestCase() {
           puts "hello"
         end
       """.trimIndent(),
-      "", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
+      "",
+      fileName = "ruby.rb"
     )
   }
 
@@ -343,7 +347,8 @@ class MatchitGeneralTest : VimTestCase() {
           puts "hello"
         en${c}d
       """.trimIndent(),
-      "", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
+      "",
+      fileName = "ruby.rb"
     )
   }
 
@@ -356,7 +361,8 @@ class MatchitGeneralTest : VimTestCase() {
           puts "hello"
         en${c}d
       """.trimIndent(),
-      "", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, "ruby.rb"
+      "",
+      fileName ="ruby.rb"
     )
   }
 }
