@@ -60,6 +60,7 @@ usual beta standards.
 * [VIM-2691](https://youtrack.jetbrains.com/issue/VIM-2691) Save file on :w
 * [VIM-2710](https://youtrack.jetbrains.com/issue/VIM-2710) Show options value on `set opt`
 * [VIM-913](https://youtrack.jetbrains.com/issue/VIM-913) Partially fix the issue with macros and autocompletion
+* [VIM-2723](https://youtrack.jetbrains.com/issue/VIM-2723) Move focus to editor after :q
 
 ### Merged PRs:
 * [468](https://github.com/JetBrains/ideavim/pull/468) by [Thomas Schouten](https://github.com/PHPirates): Implement UserDataHolder for EditorDataContext
