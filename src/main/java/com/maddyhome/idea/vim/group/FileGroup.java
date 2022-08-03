@@ -20,6 +20,7 @@ package com.maddyhome.idea.vim.group;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
@@ -160,7 +161,10 @@ public class FileGroup extends VimFileBase {
       if (virtualFile != null && window != null) {
         window.closeFile(virtualFile);
       }
-      EditorsSplitters.focusDefaultComponentInSplittersIfPresent(project);
+      if (!ApplicationManager.getApplication().isUnitTestMode()) {
+        // This thing doesn't have an implementation in test mode
+        EditorsSplitters.focusDefaultComponentInSplittersIfPresent(project);
+      }
     }
   }
 
@@ -177,7 +181,10 @@ public class FileGroup extends VimFileBase {
     if (number >= 0 && number < editors.length) {
       fileEditorManager.closeFile(editors[number], window);
     }
-    EditorsSplitters.focusDefaultComponentInSplittersIfPresent(project);
+    if (!ApplicationManager.getApplication().isUnitTestMode()) {
+      // This thing doesn't have an implementation in test mode
+      EditorsSplitters.focusDefaultComponentInSplittersIfPresent(project);
+    }
   }
 
   /**
