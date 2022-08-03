@@ -8,14 +8,16 @@
 
 package org.jetbrains.plugins.ideavim.extension.textobjindent
 
-import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.VimStateMachine
-import org.jetbrains.plugins.ideavim.JavaVimTestCase
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
+import org.jetbrains.plugins.ideavim.VimTestCase
 
 /**
  * @author Shrikant Sharat Kandula (@sharat87)
  */
-class VimIndentObjectTest : JavaVimTestCase() {
+@TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
+class VimIndentObjectTest : VimTestCase() {
   override fun setUp() {
     super.setUp()
     enableExtensions("textobj-indent")
@@ -23,19 +25,17 @@ class VimIndentObjectTest : JavaVimTestCase() {
 
   fun testSingleLine() {
     doTest(
-      injector.parser.parseKeys("dii"),
+      "dii",
       """
         one
       """.trimIndent(),
       ""
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
-    assertSelection(null)
   }
 
   fun testDeleteFlatIndent() {
     doTest(
-      injector.parser.parseKeys("dii"),
+      "dii",
       """
         one
         two
@@ -44,13 +44,11 @@ class VimIndentObjectTest : JavaVimTestCase() {
       """.trimIndent(),
       ""
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
-    assertSelection(null)
   }
 
   fun testDeleteOuterFlatIndent() {
     doTest(
-      injector.parser.parseKeys("dai"),
+      "dai",
       """
         one
         two
@@ -59,13 +57,11 @@ class VimIndentObjectTest : JavaVimTestCase() {
       """.trimIndent(),
       ""
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
-    assertSelection(null)
   }
 
   fun testDeleteInnerIndent() {
     doTest(
-      injector.parser.parseKeys("2Gdii"),
+      "2Gdii",
       """
         one
           two
@@ -77,13 +73,11 @@ class VimIndentObjectTest : JavaVimTestCase() {
         four
       """.trimIndent()
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
-    assertSelection(null)
   }
 
   fun testDeleteOuterIndent() {
     doTest(
-      injector.parser.parseKeys("2Gdai"),
+      "2Gdai",
       """
         one
           two
@@ -94,13 +88,11 @@ class VimIndentObjectTest : JavaVimTestCase() {
         four
       """.trimIndent()
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
-    assertSelection(null)
   }
 
   fun testDeleteFarOuterIndent() {
     doTest(
-      injector.parser.parseKeys("2GdaI"),
+      "2GdaI",
       """
         one
           two
@@ -109,13 +101,11 @@ class VimIndentObjectTest : JavaVimTestCase() {
       """.trimIndent(),
       ""
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
-    assertSelection(null)
   }
 
   fun testDeleteInnerIndentWithLinesAbove() {
     doTest(
-      injector.parser.parseKeys("5Gdii"),
+      "5Gdii",
       """
         all
         negatives
@@ -133,13 +123,11 @@ class VimIndentObjectTest : JavaVimTestCase() {
         four
       """.trimIndent()
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
-    assertSelection(null)
   }
 
   fun testDeleteInnerIndentWithBlankLinesAbove() {
     doTest(
-      injector.parser.parseKeys("6Gdii"),
+      "6Gdii",
       """
         all
         negatives
@@ -159,13 +147,11 @@ class VimIndentObjectTest : JavaVimTestCase() {
         four
       """.trimIndent()
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
-    assertSelection(null)
   }
 
   fun testNested1() {
     doTest(
-      injector.parser.parseKeys("2Gdii"),
+      "2Gdii",
       """
         one
           two
@@ -177,13 +163,11 @@ class VimIndentObjectTest : JavaVimTestCase() {
         four
       """.trimIndent()
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
-    assertSelection(null)
   }
 
   fun testNested1a() {
     doTest(
-      injector.parser.parseKeys("3Gdai"),
+      "3Gdai",
       """
         one
           two
@@ -195,13 +179,11 @@ class VimIndentObjectTest : JavaVimTestCase() {
         four
       """.trimIndent()
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
-    assertSelection(null)
   }
 
   fun testNested2() {
     doTest(
-      injector.parser.parseKeys("3Gdii"),
+      "3Gdii",
       """
         one
           two
@@ -214,13 +196,11 @@ class VimIndentObjectTest : JavaVimTestCase() {
         four
       """.trimIndent()
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
-    assertSelection(null)
   }
 
   fun testNested3() {
     doTest(
-      injector.parser.parseKeys("3Gdii"),
+      "3Gdii",
       """
         one
           two
@@ -241,7 +221,7 @@ class VimIndentObjectTest : JavaVimTestCase() {
 
   fun testNested4() {
     doTest(
-      injector.parser.parseKeys("3Gdii"),
+      "3Gdii",
       """
         one
           two
@@ -256,7 +236,5 @@ class VimIndentObjectTest : JavaVimTestCase() {
 
       """.trimIndent()
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
-    assertSelection(null)
   }
 }
