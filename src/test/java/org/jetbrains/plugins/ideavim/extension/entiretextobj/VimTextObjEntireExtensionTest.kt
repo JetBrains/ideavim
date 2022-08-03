@@ -8,17 +8,19 @@
 
 package org.jetbrains.plugins.ideavim.extension.entiretextobj
 
-import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.helper.experimentalApi
-import org.jetbrains.plugins.ideavim.JavaVimTestCase
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
+import org.jetbrains.plugins.ideavim.VimTestCase
 import java.util.*
 
 /**
  * @author Alexandre Grison (@agrison)
  */
-class VimTextObjEntireExtensionTest : JavaVimTestCase() {
+@TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
+class VimTextObjEntireExtensionTest : VimTestCase() {
   override fun setUp() {
     super.setUp()
     enableExtensions("textobj-entire")
@@ -26,71 +28,55 @@ class VimTextObjEntireExtensionTest : JavaVimTestCase() {
 
   // |gU| |ae|
   fun testUpperCaseEntireBuffer() {
-    doTest(injector.parser.parseKeys("gUae"), poem, "<caret>$poemUC")
-    assertMode(VimStateMachine.Mode.COMMAND)
-    assertSelection(null)
+    doTest("gUae", poem, "<caret>$poemUC")
   }
 
   // |gu| |ae|
   fun testLowerCaseEntireBuffer() {
-    doTest(injector.parser.parseKeys("guae"), poem, "<caret>$poemLC")
-    assertMode(VimStateMachine.Mode.COMMAND)
-    assertSelection(null)
+    doTest("guae", poem, "<caret>$poemLC")
   }
 
   // |c| |ae|
   fun testChangeEntireBuffer() {
-    doTest(injector.parser.parseKeys("cae"), poem, "<caret>")
-    assertMode(VimStateMachine.Mode.INSERT)
-    assertSelection(null)
+    doTest("cae", poem, "<caret>", VimStateMachine.Mode.INSERT)
   }
 
   // |d| |ae|
   fun testDeleteEntireBuffer() {
-    doTest(injector.parser.parseKeys("dae"), poem, "<caret>")
-    assertMode(VimStateMachine.Mode.COMMAND)
-    assertSelection(null)
+    doTest("dae", poem, "<caret>")
   }
 
   // |y| |ae|
   fun testYankEntireBuffer() {
-    doTest(injector.parser.parseKeys("yae"), poem, "<caret>$poemNoCaret")
-    assertMode(VimStateMachine.Mode.COMMAND)
-    myFixture.checkResult(poemNoCaret)
-    assertSelection(null)
+    doTest("yae", poem, "<caret>$poemNoCaret")
   }
 
   // |gU| |ie|
   fun testUpperCaseEntireBufferIgnoreLeadingTrailing() {
     doTest(
-      injector.parser.parseKeys("gUie"),
+      "gUie",
       "\n  \n \n${poem}\n \n  \n",
       "\n  \n \n<caret>${poemUC}\n \n  \n"
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
-    assertSelection(null)
   }
 
   // |gu| |ae|
   fun testLowerCaseEntireBufferIgnoreLeadingTrailing() {
     doTest(
-      injector.parser.parseKeys("guie"),
+      "guie",
       "\n  \n \n${poem}\n \n  \n",
       "\n  \n \n<caret>${poemLC}\n \n  \n"
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
-    assertSelection(null)
   }
 
   // |c| |ae|
   fun testChangeEntireBufferIgnoreLeadingTrailing() {
     doTest(
-      injector.parser.parseKeys("cie"),
+      "cie",
       "\n  \n \n${poem}\n  \n \n",
-      "\n  \n \n<caret>\n\n  \n \n"
+      "\n  \n \n<caret>\n\n  \n \n",
+      VimStateMachine.Mode.INSERT
     ) // additional \n because poem ends with a \n
-    assertMode(VimStateMachine.Mode.INSERT)
-    assertSelection(null)
   }
 
   @VimBehaviorDiffers(
@@ -101,7 +87,7 @@ class VimTextObjEntireExtensionTest : JavaVimTestCase() {
   // |d| |ae|
   fun testDeleteEntireBufferIgnoreLeadingTrailing() {
     doTest(
-      injector.parser.parseKeys("die"),
+      "die",
       "\n  \n \n${poem}\n  \n \n",
       if (experimentalApi()) {
         "\n  \n \n<caret>\n  \n \n"
@@ -109,20 +95,15 @@ class VimTextObjEntireExtensionTest : JavaVimTestCase() {
         "\n  \n \n<caret>\n\n  \n \n"
       }
     ) // additional \n because poem ends with a \n
-    assertMode(VimStateMachine.Mode.COMMAND)
-    assertSelection(null)
   }
 
   // |y| |ae|
   fun testYankEntireBufferIgnoreLeadingTrailing() {
     doTest(
-      injector.parser.parseKeys("yie"),
+      "yie",
       "\n  \n \n${poem}\n  \n \n",
       "\n  \n \n<caret>${poemNoCaret}\n  \n \n"
     )
-    assertMode(VimStateMachine.Mode.COMMAND)
-    myFixture.checkResult("\n  \n \n${poemNoCaret}\n  \n \n")
-    assertSelection(null)
   }
 
   private val poem: String = """Two roads diverged in a yellow wood,
