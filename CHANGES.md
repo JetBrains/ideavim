@@ -73,6 +73,7 @@ usual beta standards.
 * [525](https://github.com/JetBrains/ideavim/pull/525) by [Matt Ellis](https://github.com/citizenmatt): Improve handling of fractional width fonts
 * [526](https://github.com/JetBrains/ideavim/pull/526) by [Alex Pláte](https://github.com/AlexPl292): Create gradle.properties
 * [528](https://github.com/JetBrains/ideavim/pull/528) by [chylex](https://github.com/chylex): Implement partial code completion support in macros
+* [531](https://github.com/JetBrains/ideavim/pull/531) by [Matt Ellis](https://github.com/citizenmatt): Consolidate doTest methods
 
 ## 1.10.0, 2022-02-17
 
