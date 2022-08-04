@@ -18,8 +18,6 @@
 
 package org.jetbrains.plugins.ideavim.extension.matchit
 
-import org.jetbrains.plugins.ideavim.SkipNeovimReason
-import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class MatchitCTest : VimTestCase() {
@@ -29,7 +27,6 @@ class MatchitCTest : VimTestCase() {
     enableExtensions("matchit")
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from #if to #endif`() {
     doTest(
       "%",
@@ -45,7 +42,6 @@ class MatchitCTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from whitespace before #if to #endif`() {
     doTest(
       "%",
@@ -61,7 +57,6 @@ class MatchitCTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from #if to #elif`() {
     doTest(
       "%",
@@ -81,7 +76,6 @@ class MatchitCTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from #if to #else`() {
     doTest(
       "%",
@@ -101,7 +95,6 @@ class MatchitCTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from #elif to #else`() {
     doTest(
       "%",
@@ -117,7 +110,6 @@ class MatchitCTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from whitespace before #elif to #else`() {
     doTest(
       "%",
@@ -133,7 +125,6 @@ class MatchitCTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from #else to #endif`() {
     doTest(
       "%",
@@ -149,7 +140,6 @@ class MatchitCTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from whitespace before #else to #endif`() {
     doTest(
       "%",
@@ -165,7 +155,6 @@ class MatchitCTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from #endif to #if`() {
     doTest(
       "%",
@@ -191,7 +180,6 @@ class MatchitCTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from #ifdef to #endif`() {
     doTest(
       "%",
@@ -207,7 +195,6 @@ class MatchitCTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from #ifdef to #elif`() {
     doTest(
       "%",
@@ -223,7 +210,6 @@ class MatchitCTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from #ifdef to #else`() {
     doTest(
       "%",
@@ -239,7 +225,6 @@ class MatchitCTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from #endif to #ifdef`() {
     doTest(
       "%",
@@ -255,7 +240,6 @@ class MatchitCTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from #ifndef to #endif`() {
     doTest(
       "%",
@@ -271,7 +255,6 @@ class MatchitCTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from #ifndef to #elif`() {
     doTest(
       "%",
@@ -287,7 +270,6 @@ class MatchitCTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from #ifndef to #else`() {
     doTest(
       "%",
@@ -303,7 +285,6 @@ class MatchitCTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from #endif to #ifndef`() {
     doTest(
       "%",
@@ -319,7 +300,6 @@ class MatchitCTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test don't jump from malformed #if`() {
     doTest(
       "%",
@@ -335,7 +315,6 @@ class MatchitCTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from #if with whitespace to #endif`() {
     doTest(
       "%",
@@ -351,7 +330,6 @@ class MatchitCTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from nested #if to #endif`() {
     doTest(
       "%",
@@ -375,7 +353,6 @@ class MatchitCTest : VimTestCase() {
    * Tests for reverse g% motion
    */
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from #if to #endif`() {
     doTest(
       "g%",
@@ -391,7 +368,6 @@ class MatchitCTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from whitespace before #if to #endif`() {
     doTest(
       "g%",
@@ -407,7 +383,6 @@ class MatchitCTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from #endif to #if with whitespace`() {
     doTest(
       "g%",
@@ -423,7 +398,6 @@ class MatchitCTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from #endif to #else`() {
     doTest(
       "g%",
@@ -441,7 +415,6 @@ class MatchitCTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from #else to #elif`() {
     doTest(
       "g%",
@@ -463,7 +436,6 @@ class MatchitCTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from whitespace before #else to #elif`() {
     doTest(
       "g%",
@@ -485,7 +457,6 @@ class MatchitCTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from #elif to #if`() {
     doTest(
       "g%",
@@ -505,7 +476,6 @@ class MatchitCTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from #ifdef to #endif`() {
     doTest(
       "g%",
@@ -521,7 +491,6 @@ class MatchitCTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from #endif to #ifdef`() {
     doTest(
       "g%",
@@ -537,7 +506,6 @@ class MatchitCTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from #else to #ifdef`() {
     doTest(
       "g%",
@@ -553,7 +521,6 @@ class MatchitCTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from #elif to #ifdef`() {
     doTest(
       "g%",
@@ -569,7 +536,6 @@ class MatchitCTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from #ifndef to #endif`() {
     doTest(
       "g%",
@@ -585,7 +551,6 @@ class MatchitCTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from #endif to #ifndef`() {
     doTest(
       "g%",
@@ -601,7 +566,6 @@ class MatchitCTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from #elif to #ifndef`() {
     doTest(
       "g%",
@@ -617,7 +581,6 @@ class MatchitCTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from #else to #ifndef`() {
     doTest(
       "g%",

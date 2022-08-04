@@ -146,7 +146,6 @@ class InsertDeletePreviousWordActionTest : VimTestCase() {
     assertState("hello\n" + "one two \n")
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.MULTICARET)
   fun `test insert delete previous word action`() {
     typeTextInFile(
       injector.parser.parseKeys("i" + "<C-W>" + "<ESC>"),

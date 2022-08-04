@@ -78,7 +78,6 @@ class PutTestAfterCursorActionTest : VimTestCase() {
     assertState(after)
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.MULTICARET)
   @Test
   fun `test inserting same content to multiple carets`() {
     val before = """

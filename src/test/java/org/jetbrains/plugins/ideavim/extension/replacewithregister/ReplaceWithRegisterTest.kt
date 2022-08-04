@@ -25,8 +25,6 @@ import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.register.RegisterConstants.UNNAMED_REGISTER
-import org.jetbrains.plugins.ideavim.SkipNeovimReason
-import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.rangeOf
 
@@ -37,7 +35,6 @@ class ReplaceWithRegisterTest : VimTestCase() {
     enableExtensions("ReplaceWithRegister")
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test replace with empty register`() {
     val text = "one ${c}two three"
     VimPlugin.getRegister().resetRegisters()
@@ -47,7 +44,6 @@ class ReplaceWithRegisterTest : VimTestCase() {
     assertState(text)
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test simple replace`() {
     val text = "one ${c}two three"
 
@@ -58,7 +54,6 @@ class ReplaceWithRegisterTest : VimTestCase() {
     assertEquals("one", VimPlugin.getRegister().lastRegister?.text)
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test empty text`() {
     val text = ""
 
@@ -68,7 +63,6 @@ class ReplaceWithRegisterTest : VimTestCase() {
     assertState("on${c}e")
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test replace with empty text`() {
     val text = "${c}one"
 
@@ -78,7 +72,6 @@ class ReplaceWithRegisterTest : VimTestCase() {
     assertState(c)
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test replace use different register`() {
     val text = "one ${c}two three four"
 
@@ -91,7 +84,6 @@ class ReplaceWithRegisterTest : VimTestCase() {
     assertEquals("two", VimPlugin.getRegister().lastRegister?.text)
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test replace use clipboard register`() {
     val text = "one ${c}two three four"
 
@@ -101,7 +93,6 @@ class ReplaceWithRegisterTest : VimTestCase() {
     assertEquals("two", VimPlugin.getRegister().lastRegister?.text)
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test replace use wrong register`() {
     val text = "one ${c}two three"
 
@@ -110,7 +101,6 @@ class ReplaceWithRegisterTest : VimTestCase() {
     assertState(text)
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test replace with line`() {
     val text = """
             |I fou${c}nd it in a legendary land|
@@ -127,7 +117,6 @@ class ReplaceWithRegisterTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test replace with line with clipboard register`() {
     val text = """
             |I fou${c}nd it in a legendary land|
@@ -144,7 +133,6 @@ class ReplaceWithRegisterTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test replace block selection`() {
     val text = """
             ${c}one two three
@@ -165,7 +153,6 @@ class ReplaceWithRegisterTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test replace with number`() {
     val text = "one ${c}two three four"
 
@@ -177,7 +164,6 @@ class ReplaceWithRegisterTest : VimTestCase() {
   }
 
   @VimBehaviorDiffers("one on${c}e on${c}e four")
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test replace with multiple carets`() {
     val text = "one ${c}two ${c}three four"
 
@@ -188,7 +174,6 @@ class ReplaceWithRegisterTest : VimTestCase() {
     assertEquals("one", VimPlugin.getRegister().lastRegister?.text)
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test dot repeat`() {
     val text = "one ${c}two three four"
 
@@ -201,7 +186,6 @@ class ReplaceWithRegisterTest : VimTestCase() {
 
   // --------------------------------------- grr --------------------------
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test line replace`() {
     val text = """
             I found it in ${c}a legendary land
@@ -224,7 +208,6 @@ class ReplaceWithRegisterTest : VimTestCase() {
     assertEquals("legendary", VimPlugin.getRegister().lastRegister?.text)
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test line replace with line`() {
     val text = """
             I found it in ${c}a legendary land
@@ -245,7 +228,6 @@ class ReplaceWithRegisterTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test line replace with line empty line`() {
     val text = """
             I found it in ${c}a legendary land
@@ -269,7 +251,6 @@ class ReplaceWithRegisterTest : VimTestCase() {
   }
 
   @VimBehaviorDiffers(description = "Where is the new line comes from?...")
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test line replace with block`() {
     val text = """
             ${c}one two three
@@ -300,7 +281,6 @@ class ReplaceWithRegisterTest : VimTestCase() {
             hard by the torrent of a mountain pass.
   """
   )
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test line with number`() {
     val text = """
             I found it in ${c}a legendary land
@@ -321,7 +301,6 @@ class ReplaceWithRegisterTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test line dot repeat`() {
     val text = """
             I found it in ${c}a legendary land
@@ -350,7 +329,6 @@ class ReplaceWithRegisterTest : VimTestCase() {
             ${c}where it was settled on some sodden sand
   """
   )
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test line multicaret`() {
     val text = """
             I found it in ${c}a legendary land
@@ -374,7 +352,6 @@ class ReplaceWithRegisterTest : VimTestCase() {
 
   // ------------------------------------- gr + visual ----------------------
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test visual replace`() {
     val text = """
             I ${c}found it in a legendary land
@@ -398,7 +375,6 @@ class ReplaceWithRegisterTest : VimTestCase() {
     assertMode(VimStateMachine.Mode.COMMAND)
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test visual replace with line`() {
     val text = """
             |I fo${c}und it in a legendary land|
@@ -420,7 +396,6 @@ class ReplaceWithRegisterTest : VimTestCase() {
     assertMode(VimStateMachine.Mode.COMMAND)
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test visual replace with two lines`() {
     val text = """
             |I found it in ${c}a legendary land|
@@ -443,7 +418,6 @@ class ReplaceWithRegisterTest : VimTestCase() {
     assertMode(VimStateMachine.Mode.COMMAND)
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test visual line replace`() {
     val text = """
             I fo${c}und it in a legendary land
@@ -466,7 +440,6 @@ class ReplaceWithRegisterTest : VimTestCase() {
     assertMode(VimStateMachine.Mode.COMMAND)
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test visual line replace with line`() {
     val text = """
             I fo${c}und it in a legendary land

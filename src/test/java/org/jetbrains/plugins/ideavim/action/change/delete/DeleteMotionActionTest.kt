@@ -92,7 +92,6 @@ class DeleteMotionActionTest : VimTestCase() {
     assertEquals("  expression two\n", savedText)
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.MULTICARET)
   fun `test delete line action multicaret`() {
     typeTextInFile(
       injector.parser.parseKeys("d3d"),
@@ -110,7 +109,6 @@ class DeleteMotionActionTest : VimTestCase() {
     assertState("${c}abcde\n${c}")
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.MULTICARET)
   fun `test delete motion action multicaret`() {
     typeTextInFile(
       injector.parser.parseKeys("dt)"),

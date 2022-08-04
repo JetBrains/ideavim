@@ -34,7 +34,6 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     enableExtensions("multiple-cursors")
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun testNextOccurrence() {
     val before = """public class ChangeLineAction extends EditorAction {
   public ChangeLineAction() {
@@ -74,7 +73,6 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     assertState(after)
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun testAllOccurrencesIterative() {
     val before = """public class ChangeLineAction extends EditorAction {
   public ChangeLineAction() {
@@ -114,7 +112,6 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     assertState(after)
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun testNotWholeOccurrence() {
     val before = """Int
       |Integer
@@ -139,7 +136,6 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     assertState(after)
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun testSelectSubstring() {
     val before = """q${c}we
       |asdqweasd
@@ -158,7 +154,6 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     assertState(after)
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun testSelectSingleOccurrence() {
     val before = """q${c}we
       |asd
@@ -181,7 +176,6 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     assertState(after)
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun testSelectionWithMultipleCarets() {
     val before = """qwe
       |sdfgdfs${c}fdasfg
@@ -195,7 +189,6 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     assertState(before)
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun testSelectAll() {
     val before = """qwe
       |asd
@@ -216,7 +209,6 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     assertState(after)
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun testSelectAllNotWhole() {
     val before = """Int
       |Integer
@@ -240,7 +232,6 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     assertState(after)
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun testSelectAllSingleOccurrence() {
     val before = """qwe
       |asd
@@ -267,7 +258,6 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
       "additional cursors. IdeaVim has native support, so doesn't track if a selection is due to an additional cursor " +
       "so IdeaVim will remove arbitrary selections, while vim-multiple-cursors do not."
   )
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun testRemoveSelectionVisualMode() {
     val before = """q${s}we
       |dsgkldfjs ldfl gkjsdsl kj
@@ -287,7 +277,6 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     assertState(after)
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun testRemoveSubSelection() {
     val before = """Int
       |kekInteger
@@ -304,7 +293,6 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     assertState(after)
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun testRemoveOccurrence() {
     val before = """private i${c}nt a = 0;
       |private int b = 1;
@@ -325,7 +313,6 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     assertState(after)
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun testSkipOccurrence() {
     val before = """pr${c}ivate int a = 0;
       |private int b = 1;
@@ -343,7 +330,6 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     assertState(after)
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun testSkipAndThenSelectAllOccurrences() {
     val before = """pr${c}ivate int a = 0;
       |private int b = 1;
@@ -361,7 +347,6 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     assertState(after)
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun testSeveralActions() {
     val before = """public class Main {
       |  public static void main(String[] args) {
@@ -430,7 +415,6 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     assertState(afterInsert)
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun testSelectTwice() {
     val before = """qwe
       |asd
@@ -455,7 +439,6 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     assertState(after)
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun testSkipSelectionSubstring() {
     val before = """qw${c}e
       |asdqweasd
@@ -476,7 +459,6 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     assertState(after)
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun testSkipSelectionVisualMode() {
     val before = """q${s}we
       |dsgkldfjs ldfl gkjsdsl kj
@@ -491,7 +473,6 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     assertState(before)
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun testAddSelectionVisualMode() {
     val before = """jdfsg sdf${c}dfkgjhfkgkldfjsg
       |dfkjghdfsgs
@@ -506,7 +487,6 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     assertState(after)
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun testNextOccurrenceCaseSensitive() {
     val before = """@TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
 fun getCellType(${c}pos: VisualPosition): CellType {
@@ -557,7 +537,6 @@ fun getCellType(${s}pos$se: VisualPosition): CellType {
     doTest(keys, before, after, VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER)
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test pattern is always case sensitive`() {
     val before = """test ${c}Test tEst TeSt tEST Test test Test test"""
     configureByText(before)
@@ -568,7 +547,6 @@ fun getCellType(${s}pos$se: VisualPosition): CellType {
     assertState(after)
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test ignores regex in search pattern`() {
     val before = "test ${s}t.*st${c}$se toast tallest t.*st"
     val editor = configureByText(before)

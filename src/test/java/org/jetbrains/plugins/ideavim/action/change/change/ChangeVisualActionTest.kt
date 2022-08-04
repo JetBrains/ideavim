@@ -155,7 +155,6 @@ class ChangeVisualActionTest : VimTestCase() {
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.MULTICARET)
   fun `test change visual action`() {
     typeTextInFile(
       injector.parser.parseKeys("v2lc" + "aaa" + "<ESC>"),

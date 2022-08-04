@@ -64,7 +64,7 @@ class IncrementDecrementTest : VimPropertyTestBase() {
           moveCaretToRandomPlace(env, editor)
 
           NeovimTesting.setupEditor(editor, this)
-          NeovimTesting.typeCommand(":set nrformats+=octal<CR>", this)
+          NeovimTesting.typeCommand(":set nrformats+=octal<CR>", this, editor)
 
           env.executeCommands(Generator.sampledFrom(IncrementDecrementActions(editor, this)))
 
@@ -84,7 +84,7 @@ private class IncrementDecrementActions(private val editor: Editor, val test: Vi
     val action = injector.parser.parseKeys(key).single()
     env.logMessage("Use command: ${injector.parser.toKeyNotation(action)}.")
     VimTestCase.typeText(listOf(action), editor, editor.project)
-    NeovimTesting.typeCommand(key, test)
+    NeovimTesting.typeCommand(key, test, editor)
 
     IdeEventQueue.getInstance().flushQueue()
     PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()

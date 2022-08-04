@@ -99,7 +99,6 @@ class InsertNewLineAboveActionTest : VimTestCase() {
     assertState(after)
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.MULTICARET)
   fun `test insert new line above with multiple carets`() {
     val before = """    I fou${c}nd it in a legendary land
         |    all rocks and laven${c}der and tufted grass,

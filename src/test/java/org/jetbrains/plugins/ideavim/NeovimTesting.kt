@@ -53,6 +53,8 @@ internal object NeovimTesting {
   private lateinit var escapeCommand: String
   private lateinit var ctrlcCommand: String
 
+  private var singleCaret = true
+
   fun setUp(test: VimTestCase) {
     if (!neovimEnabled(test)) return
     val nvimPath = System.getenv("ideavim.nvim.path") ?: "nvim"
@@ -90,25 +92,35 @@ internal object NeovimTesting {
     }
   }
 
-  private fun neovimEnabled(test: VimTestCase): Boolean {
+  private fun neovimEnabled(test: VimTestCase, editor: Editor? = null): Boolean {
     val method = test.javaClass.getMethod(test.name)
     val noBehaviourDiffers = !method.isAnnotationPresent(VimBehaviorDiffers::class.java)
     val noTestingWithoutNeovim = !method.isAnnotationPresent(TestWithoutNeovim::class.java)
     val neovimTestingEnabled = System.getProperty("ideavim.nvim.test", "false")!!.toBoolean()
     val notParserTest = "org.jetbrains.plugins.ideavim.ex.parser" !in test.javaClass.packageName
     val notScriptImplementation = "org.jetbrains.plugins.ideavim.ex.implementation" !in test.javaClass.packageName
-    return noBehaviourDiffers && noTestingWithoutNeovim && neovimTestingEnabled && notParserTest && notScriptImplementation
+    val notExtension = "org.jetbrains.plugins.ideavim.extension" !in test.javaClass.packageName
+    if (singleCaret) {
+      singleCaret = editor == null ||  editor.caretModel.caretCount == 1
+    }
+    return noBehaviourDiffers
+      && noTestingWithoutNeovim
+      && neovimTestingEnabled
+      && notParserTest
+      && notScriptImplementation
+      && notExtension
+      && singleCaret
   }
 
   fun setupEditor(editor: Editor, test: VimTestCase) {
-    if (!neovimEnabled(test)) return
+    if (!neovimEnabled(test, editor)) return
     neovimApi.currentBuffer.get().setLines(0, -1, false, editor.document.text.split("\n")).get()
     val charPosition = CharacterPosition.fromOffset(editor, editor.caretModel.offset)
     neovimApi.currentWindow.get().setCursor(VimCoords(charPosition.line + 1, charPosition.column)).get()
   }
 
-  fun typeCommand(keys: String, test: VimTestCase) {
-    if (!neovimEnabled(test)) return
+  fun typeCommand(keys: String, test: VimTestCase, editor: Editor) {
+    if (!neovimEnabled(test, editor)) return
     when {
       keys.equals("<esc>", ignoreCase = true) -> neovimApi.input(escapeCommand).get()
       keys.equals("<C-C>", ignoreCase = true) -> neovimApi.input(ctrlcCommand).get()
@@ -120,7 +132,7 @@ internal object NeovimTesting {
   }
 
   fun assertState(editor: Editor, test: VimTestCase) {
-    if (!neovimEnabled(test)) return
+    if (!neovimEnabled(test, editor)) return
     if (currentTestName != "") {
       currentTestName = ""
       neovimTestsCounter++
@@ -140,7 +152,7 @@ internal object NeovimTesting {
   private fun getText(): String = neovimApi.currentBuffer.get().getLines(0, -1, false).get().joinToString("\n")
 
   fun assertCaret(editor: Editor, test: VimTestCase) {
-    if (!neovimEnabled(test)) return
+    if (!neovimEnabled(test, editor)) return
     if (currentTestName != "") {
       currentTestName = ""
       neovimTestsCounter++
@@ -200,7 +212,6 @@ annotation class TestWithoutNeovim(val reason: SkipNeovimReason, val description
 
 enum class SkipNeovimReason {
   PLUGIN,
-  MULTICARET,
 
   @Suppress("unused")
   INLAYS,
@@ -221,7 +232,6 @@ enum class SkipNeovimReason {
   EDITOR_MODIFICATION,
 
   CMD,
-  IDEAVIMRC,
   ACTION_COMMAND,
   PLUG,
   FOLDING,

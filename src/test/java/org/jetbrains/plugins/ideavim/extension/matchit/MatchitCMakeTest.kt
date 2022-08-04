@@ -18,8 +18,6 @@
 
 package org.jetbrains.plugins.ideavim.extension.matchit
 
-import org.jetbrains.plugins.ideavim.SkipNeovimReason
-import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class MatchitCMakeTest : VimTestCase() {
@@ -29,7 +27,6 @@ class MatchitCMakeTest : VimTestCase() {
     enableExtensions("matchit")
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from if to else`() {
     doTest(
       "%",
@@ -51,7 +48,6 @@ class MatchitCMakeTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from else to endif`() {
     doTest(
       "%",
@@ -73,7 +69,6 @@ class MatchitCMakeTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from endif to if`() {
     doTest(
       "%",
@@ -95,7 +90,6 @@ class MatchitCMakeTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from if to elseif in if-else structure`() {
     doTest(
       "%",
@@ -125,7 +119,6 @@ class MatchitCMakeTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from elseif to elseif`() {
     doTest(
       "%",
@@ -155,7 +148,6 @@ class MatchitCMakeTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from elseif to else`() {
     doTest(
       "%",
@@ -185,7 +177,6 @@ class MatchitCMakeTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from else to endif in if-else structure`() {
     doTest(
       "%",
@@ -215,7 +206,6 @@ class MatchitCMakeTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from endif to if in if-else structure`() {
     doTest(
       "%",
@@ -245,7 +235,6 @@ class MatchitCMakeTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from foreach to endforeach`() {
     doTest(
       "%",
@@ -263,7 +252,6 @@ class MatchitCMakeTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from endforeach to foreach`() {
     doTest(
       "%",
@@ -281,7 +269,6 @@ class MatchitCMakeTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from foreach to break`() {
     doTest(
       "%",
@@ -305,7 +292,6 @@ class MatchitCMakeTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from break to endforeach`() {
     doTest(
       "%",
@@ -329,7 +315,6 @@ class MatchitCMakeTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from while to endwhile`() {
     doTest(
       "%",
@@ -347,7 +332,6 @@ class MatchitCMakeTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from endwhile to while`() {
     doTest(
       "%",
@@ -365,7 +349,6 @@ class MatchitCMakeTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from while to break`() {
     doTest(
       "%",
@@ -389,7 +372,6 @@ class MatchitCMakeTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from break to endwhile`() {
     doTest(
       "%",
@@ -413,7 +395,6 @@ class MatchitCMakeTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from function to endfunction`() {
     doTest(
       "%",
@@ -431,7 +412,6 @@ class MatchitCMakeTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from endfunction to function`() {
     doTest(
       "%",
@@ -449,7 +429,6 @@ class MatchitCMakeTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from macro to endmacro`() {
     doTest(
       "%",
@@ -467,7 +446,6 @@ class MatchitCMakeTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from endmacro to macro`() {
     doTest(
       "%",
@@ -487,7 +465,6 @@ class MatchitCMakeTest : VimTestCase() {
 
   // Tests for reverse motion
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from if to endif`() {
     doTest(
       "g%",
@@ -509,7 +486,6 @@ class MatchitCMakeTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from else to if`() {
     doTest(
       "g%",
@@ -531,7 +507,6 @@ class MatchitCMakeTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from endif to else`() {
     doTest(
       "g%",
@@ -553,7 +528,6 @@ class MatchitCMakeTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from if to endif in if-else block`() {
     doTest(
       "g%",
@@ -583,7 +557,6 @@ class MatchitCMakeTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from elseif to if`() {
     doTest(
       "g%",
@@ -613,7 +586,6 @@ class MatchitCMakeTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from elseif in else block to elseif`() {
     doTest(
       "g%",
@@ -643,7 +615,6 @@ class MatchitCMakeTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from else to elseif`() {
     doTest(
       "g%",
@@ -673,7 +644,6 @@ class MatchitCMakeTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from endif to else in if-else block`() {
     doTest(
       "g%",
@@ -703,7 +673,6 @@ class MatchitCMakeTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from foreach to endforeach`() {
     doTest(
       "g%",
@@ -721,7 +690,6 @@ class MatchitCMakeTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from endforeach to foreach`() {
     doTest(
       "g%",
@@ -739,7 +707,6 @@ class MatchitCMakeTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from foreach to endforeach over a break`() {
     doTest(
       "g%",
@@ -763,7 +730,6 @@ class MatchitCMakeTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from endforeach to break`() {
     doTest(
       "g%",
@@ -787,7 +753,6 @@ class MatchitCMakeTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from break to foreach`() {
     doTest(
       "g%",
@@ -811,7 +776,6 @@ class MatchitCMakeTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from while to endwhile`() {
     doTest(
       "g%",
@@ -829,7 +793,6 @@ class MatchitCMakeTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from endwhile to while`() {
     doTest(
       "g%",
@@ -847,7 +810,6 @@ class MatchitCMakeTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from while to endwhile over a break`() {
     doTest(
       "g%",
@@ -871,7 +833,6 @@ class MatchitCMakeTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from endwhile to break`() {
     doTest(
       "g%",
@@ -895,7 +856,6 @@ class MatchitCMakeTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from break to while`() {
     doTest(
       "g%",
@@ -919,7 +879,6 @@ class MatchitCMakeTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from function to endfunction`() {
     doTest(
       "g%",
@@ -937,7 +896,6 @@ class MatchitCMakeTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from endfunction to function`() {
     doTest(
       "g%",
@@ -955,7 +913,6 @@ class MatchitCMakeTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from macro to endmacro`() {
     doTest(
       "g%",
@@ -973,7 +930,6 @@ class MatchitCMakeTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from endmacro to macro`() {
     doTest(
       "g%",

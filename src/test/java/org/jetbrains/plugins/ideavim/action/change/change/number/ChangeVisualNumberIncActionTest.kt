@@ -114,7 +114,6 @@ class ChangeVisualNumberIncActionTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.MULTICARET)
   fun `test change number inc visual multiple cursor`() {
     typeTextInFile(
       injector.parser.parseKeys("Vj<C-A>"),

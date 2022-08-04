@@ -114,7 +114,6 @@ class ChangeVisualNumberDecActionTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.MULTICARET)
   fun `test change number dec visual action`() {
     typeTextInFile(
       injector.parser.parseKeys("Vj<C-X>"),

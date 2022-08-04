@@ -25,8 +25,6 @@ import com.maddyhome.idea.vim.extension.exchange.VimExchangeExtension
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.options.OptionConstants
 import org.jetbrains.plugins.ideavim.OptionValueType
-import org.jetbrains.plugins.ideavim.SkipNeovimReason
-import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
 import org.jetbrains.plugins.ideavim.VimTestOption
@@ -40,7 +38,6 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
 
   // |cx|
   @VimOptionTestConfiguration(VimTestOption(OptionConstants.clipboardName, OptionValueType.STRING, "unnamed"))
-  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test exchange words left to right`() {
     doTest(
       listOf("cxe", "w", "cxe"),
@@ -53,7 +50,6 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
 
   // |cx|
   @VimOptionTestConfiguration(VimTestOption(OptionConstants.clipboardName, OptionValueType.STRING, "unnamed"))
-  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test exchange words dot repeat`() {
     doTest(
       listOf("cxiw", "w", "."),
@@ -66,7 +62,6 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
 
   // |cx|
   @VimOptionTestConfiguration(VimTestOption(OptionConstants.clipboardName, OptionValueType.STRING, "unnamed"))
-  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test exchange words right to left`() {
     doTest(
       listOf("cxe", "b", "cxe"),
@@ -79,7 +74,6 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
 
   // |cx|
   @VimOptionTestConfiguration(VimTestOption(OptionConstants.clipboardName, OptionValueType.STRING, "unnamed"))
-  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test exchange words right to left with dot`() {
     doTest(
       listOf("cxe", "b", "."),
@@ -92,7 +86,6 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
 
   // |X|
   @VimOptionTestConfiguration(VimTestOption(OptionConstants.clipboardName, OptionValueType.STRING, "unnamed"))
-  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test visual exchange words left to right`() {
     doTest(
       listOf("veX", "w", "veX"),
@@ -109,7 +102,6 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
     originalVimAfter = "The ${c}brown catch over the lazy dog",
     shouldBeFixed = true
   )
-  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test visual exchange words from inside`() {
     doTest(
       listOf("veX", "b", "v3e", "X"),
@@ -126,7 +118,6 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
     originalVimAfter = "The brown ${c}catch over the lazy dog",
     shouldBeFixed = true
   )
-  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test visual exchange words from outside`() {
     doTest(
       listOf("v3e", "X", "w", "veX"),
@@ -148,7 +139,6 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
        """,
     shouldBeFixed = true
   )
-  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test exchange lines top down`() {
     doTest(
       listOf("cxx", "j", "cxx"),
@@ -178,7 +168,6 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
        """,
     shouldBeFixed = true
   )
-  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test exchange lines top down with dot`() {
     doTest(
       listOf("cxx", "j", "."),
@@ -206,7 +195,6 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
           lazy dog
     """
   )
-  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test exchange to the line end`() {
     doTest(
       listOf("v$", "X", "jj^ve", "X"),
@@ -236,7 +224,6 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
       """,
     shouldBeFixed = true
   )
-  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test exchange visual lines`() {
     doTest(
       listOf("Vj", "X", "jj", "Vj", "X"),

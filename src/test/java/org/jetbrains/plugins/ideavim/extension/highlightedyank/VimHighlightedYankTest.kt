@@ -23,8 +23,6 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.extension.highlightedyank.DEFAULT_HIGHLIGHT_DURATION
-import org.jetbrains.plugins.ideavim.SkipNeovimReason
-import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.assertHappened
 
@@ -34,7 +32,6 @@ class VimHighlightedYankTest : VimTestCase() {
     enableExtensions("highlightedyank")
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test highlighting whole line when whole line is yanked`() {
     doTest("yy", code, code, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
 
@@ -42,7 +39,6 @@ class VimHighlightedYankTest : VimTestCase() {
     assertHighlighterRange(1, 40, getFirstHighlighter())
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test highlighting single word when single word is yanked`() {
     doTest("yiw", code, code, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
 
@@ -58,7 +54,6 @@ class VimHighlightedYankTest : VimTestCase() {
     assertHighlighterRange(40, 59, getFirstHighlighter())
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test removing previous highlight when entering insert mode`() {
     doTest("yyi", code, code, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
 
@@ -110,7 +105,6 @@ class VimHighlightedYankTest : VimTestCase() {
     }
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test highlighting with multiple cursors`() {
     doTest("yiw", codeWithMultipleCurors, codeWithMultipleCurors, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
 
@@ -121,14 +115,12 @@ class VimHighlightedYankTest : VimTestCase() {
     assertHighlighterRange(28, 31, highlighters[2])
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test clearing all highlighters with multiple cursors`() {
     doTest("yiwi", codeWithMultipleCurors, codeWithMultipleCurors, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
 
     assertAllHighlightersCount(0)
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test highlighting for a correct default amount of time`() {
     doTest("yiw", code, code, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
 
@@ -137,7 +129,6 @@ class VimHighlightedYankTest : VimTestCase() {
     }
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test highlighting for a correct user provided amount of time`() {
     configureByJavaText(code)
     typeText(injector.parser.parseKeys(":let g:highlightedyank_highlight_duration = \"1000\"<CR>"))

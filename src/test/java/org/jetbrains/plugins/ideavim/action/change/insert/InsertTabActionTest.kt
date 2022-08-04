@@ -28,7 +28,6 @@ import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class InsertTabActionTest : VimTestCase() {
-  @TestWithoutNeovim(SkipNeovimReason.MULTICARET)
   fun `test insert tab`() {
     setupChecks {
       keyHandler = Checks.KeyHandlerMethod.DIRECT_TO_VIM

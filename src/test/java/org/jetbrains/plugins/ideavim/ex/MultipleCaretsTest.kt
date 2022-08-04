@@ -68,7 +68,6 @@ class MultipleCaretsTest : VimTestCase() {
     assertState(after)
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.MULTICARET)
   fun testJoinLines() {
     val before = "qwe\n" + "r${c}ty\n" + "asd\n" + "fg${c}h\n" + "zxc\n" + "vbn\n"
     configureByText(before)
@@ -86,7 +85,6 @@ class MultipleCaretsTest : VimTestCase() {
 //    myFixture.checkResult(after)
 //  }
 
-  @TestWithoutNeovim(SkipNeovimReason.MULTICARET)
   fun testCopyText() {
     val before = "qwe\n" + "rty\n" + "a${c}sd\n" + "fg${c}h\n" + "zxc\n" + "vbn\n"
     configureByText(before)
@@ -104,7 +102,6 @@ class MultipleCaretsTest : VimTestCase() {
 //    myFixture.checkResult(after)
 //  }
 
-  @TestWithoutNeovim(SkipNeovimReason.MULTICARET)
   fun testPutText() {
     // This test produces double ${c}zxc on 3rd line if non-idea paste is used
     val before = """
@@ -173,7 +170,6 @@ class MultipleCaretsTest : VimTestCase() {
 //    myFixture.checkResult(after)
 //  }
 
-  @TestWithoutNeovim(SkipNeovimReason.MULTICARET)
   fun testMoveTextBeforeCarets() {
     val before = "qwe\n" + "rty\n" + "${c}asd\n" + "fgh\n" + "z${c}xc\n" + "vbn\n"
     configureByText(before)
@@ -182,7 +178,6 @@ class MultipleCaretsTest : VimTestCase() {
     assertState(after)
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.MULTICARET)
   fun testMoveTextAfterCarets() {
     val before = "q${c}we\n" + "rty\n" + "${c}asd\n" + "fgh\n" + "zxc\n" + "vbn\n"
     configureByText(before)
@@ -191,7 +186,6 @@ class MultipleCaretsTest : VimTestCase() {
     assertState(after)
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.MULTICARET)
   fun testMoveTextBetweenCarets() {
     val before = "q${c}we\n" + "rty\n" + "${c}asd\n" + "fgh\n" + "zxc\n" + "vbn\n"
     configureByText(before)
@@ -200,7 +194,6 @@ class MultipleCaretsTest : VimTestCase() {
     assertState(after)
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.MULTICARET)
   fun testYankLines() {
     val before = """qwe
       |rt${c}y
@@ -230,7 +223,6 @@ class MultipleCaretsTest : VimTestCase() {
     assertState(after)
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.MULTICARET)
   fun testDeleteLines() {
     val before = """qwe
       |r${c}ty

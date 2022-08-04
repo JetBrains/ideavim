@@ -97,7 +97,6 @@ class JoinLinesCommandTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.MULTICARET)
   fun `test join multicaret`() {
     configureByText(
       """

@@ -19,8 +19,6 @@
 package org.jetbrains.plugins.ideavim.extension.paragraphmotion
 
 import com.maddyhome.idea.vim.command.VimStateMachine
-import org.jetbrains.plugins.ideavim.SkipNeovimReason
-import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class ParagraphMotionTest : VimTestCase() {
@@ -30,7 +28,6 @@ class ParagraphMotionTest : VimTestCase() {
     enableExtensions("vim-paragraph-motion")
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test paragraph next without whitespace`() {
     val before = """I found it in a legendary land
         |${c}all rocks and lavender and tufted grass,
@@ -45,7 +42,6 @@ class ParagraphMotionTest : VimTestCase() {
     doTest("}", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test paragraph next with whitespace`() {
     val before = """I found it in a legendary land
         |${c}all rocks and lavender and tufted grass,
@@ -60,7 +56,6 @@ class ParagraphMotionTest : VimTestCase() {
     doTest("}", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test paragraph next with whitespace visual`() {
     val before = """I found it in a legendary land
         |${c}all rocks and lavender and tufted grass,
@@ -75,7 +70,6 @@ class ParagraphMotionTest : VimTestCase() {
     doTest("v}", before, after, VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER)
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test paragraph next with whitespace delete`() {
     val before = """I found it in a legendary land
         |${c}all rocks and lavender and tufted grass,
@@ -90,7 +84,6 @@ class ParagraphMotionTest : VimTestCase() {
     doTest("d}", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test paragraph prev without whitespace`() {
     val before = """I found it in a legendary land
         |all rocks and lavender and tufted grass,
@@ -105,7 +98,6 @@ class ParagraphMotionTest : VimTestCase() {
     doTest("{", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test paragraph prev with whitespace`() {
     val before = """I found it in a legendary land
         |all rocks and lavender and tufted grass,
@@ -120,7 +112,6 @@ class ParagraphMotionTest : VimTestCase() {
     doTest("{", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test paragraph prev with whitespace visual`() {
     val before = """I found it in a legendary land
         |all rocks and lavender and tufted grass,
@@ -135,7 +126,6 @@ class ParagraphMotionTest : VimTestCase() {
     doTest("v{", before, after, VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER)
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test paragraph prev with whitespace delete`() {
     val before = """I found it in a legendary land
         |all rocks and lavender and tufted grass,

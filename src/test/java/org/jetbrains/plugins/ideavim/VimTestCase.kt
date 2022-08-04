@@ -300,8 +300,12 @@ abstract class VimTestCase : UsefulTestCase() {
   }
 
   protected fun typeText(keys: List<KeyStroke?>): Editor {
-    NeovimTesting.typeCommand(keys.filterNotNull().joinToString(separator = "") { injector.parser.toKeyNotation(it) }, this)
     val editor = myFixture.editor
+    NeovimTesting.typeCommand(
+      keys.filterNotNull().joinToString(separator = "") { injector.parser.toKeyNotation(it) },
+      this,
+      editor
+    )
     val project = myFixture.project
     when (Checks.keyHandler) {
       Checks.KeyHandlerMethod.DIRECT_TO_VIM -> typeText(keys, editor, project)
@@ -467,7 +471,7 @@ abstract class VimTestCase : UsefulTestCase() {
     val actual = getInstance(myFixture.editor).text
     Assert.assertNotNull("No Ex output", actual)
     Assert.assertEquals(expected, actual)
-    NeovimTesting.typeCommand("<esc>", this)
+    NeovimTesting.typeCommand("<esc>", this, myFixture.editor)
   }
 
   fun assertNoExOutput() {

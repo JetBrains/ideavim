@@ -57,7 +57,6 @@ class VisualBlockAppendActionTest : VimTestCase() {
     assertState(after)
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.MULTICARET)
   fun `test append in non block mode`() {
     doTest(
       "vwAHello<esc>",

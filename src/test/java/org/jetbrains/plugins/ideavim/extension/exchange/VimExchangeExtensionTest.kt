@@ -35,7 +35,6 @@ class VimExchangeExtensionTest : VimTestCase() {
   }
 
   // |cx|
-  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test exchange words left to right`() {
     doTest(
       listOf("cxe", "w", "cxe"),
@@ -47,7 +46,6 @@ class VimExchangeExtensionTest : VimTestCase() {
   }
 
   // |cx|
-  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test exchange words dot repeat`() {
     doTest(
       listOf("cxiw", "w", "."),
@@ -59,7 +57,6 @@ class VimExchangeExtensionTest : VimTestCase() {
   }
 
   // |cx|
-  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test exchange words right to left`() {
     doTest(
       listOf("cxe", "b", "cxe"),
@@ -71,7 +68,6 @@ class VimExchangeExtensionTest : VimTestCase() {
   }
 
   // |cx|
-  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test exchange words right to left with dot`() {
     doTest(
       listOf("cxe", "b", "."),
@@ -83,7 +79,6 @@ class VimExchangeExtensionTest : VimTestCase() {
   }
 
   // |X|
-  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test visual exchange words left to right`() {
     doTest(
       listOf("veX", "w", "veX"),
@@ -99,7 +94,6 @@ class VimExchangeExtensionTest : VimTestCase() {
     originalVimAfter = "The ${c}brown catch over the lazy dog",
     shouldBeFixed = true
   )
-  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test visual exchange words from inside`() {
     doTest(
       listOf("veX", "b", "v3e", "X"),
@@ -115,7 +109,6 @@ class VimExchangeExtensionTest : VimTestCase() {
     originalVimAfter = "The brown ${c}catch over the lazy dog",
     shouldBeFixed = true
   )
-  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test visual exchange words from outside`() {
     doTest(
       listOf("v3e", "X", "w", "veX"),
@@ -136,7 +129,6 @@ class VimExchangeExtensionTest : VimTestCase() {
        """,
     shouldBeFixed = true
   )
-  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test exchange lines top down`() {
     doTest(
       listOf("cxx", "j", "cxx"),
@@ -165,7 +157,6 @@ class VimExchangeExtensionTest : VimTestCase() {
        """,
     shouldBeFixed = true
   )
-  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test exchange lines top down with dot`() {
     doTest(
       listOf("cxx", "j", "."),
@@ -192,7 +183,6 @@ class VimExchangeExtensionTest : VimTestCase() {
           lazy dog
     """
   )
-  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test exchange to the line end`() {
     doTest(
       listOf("v$", "X", "jj^ve", "X"),
@@ -221,7 +211,6 @@ class VimExchangeExtensionTest : VimTestCase() {
       """,
     shouldBeFixed = true
   )
-  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test exchange visual lines`() {
     doTest(
       listOf("Vj", "X", "jj", "Vj", "X"),
@@ -243,7 +232,6 @@ class VimExchangeExtensionTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test visual char highlighter`() {
     val before = """
          The ${c}quick
@@ -260,7 +248,6 @@ class VimExchangeExtensionTest : VimTestCase() {
     exitExchange()
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test visual line highdhitligthhter`() {
     val before = """
          The ${c}quick
@@ -277,7 +264,6 @@ class VimExchangeExtensionTest : VimTestCase() {
     exitExchange()
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test till the line end highlighter`() {
     val before = """
          The ${c}quick
@@ -292,7 +278,6 @@ class VimExchangeExtensionTest : VimTestCase() {
     exitExchange()
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test pre line end highlighter`() {
     val before = """
          The ${c}quick
@@ -307,7 +292,6 @@ class VimExchangeExtensionTest : VimTestCase() {
     exitExchange()
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test pre pre line end highlighter`() {
     val before = """
          The ${c}quick
@@ -322,7 +306,6 @@ class VimExchangeExtensionTest : VimTestCase() {
     exitExchange()
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test to file end highlighter`() {
     val before = """
          The quick
@@ -344,7 +327,6 @@ class VimExchangeExtensionTest : VimTestCase() {
     exitExchange()
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test to file end with new line highlighter`() {
     val before = """
          The quick
@@ -367,7 +349,6 @@ class VimExchangeExtensionTest : VimTestCase() {
     exitExchange()
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test back selection`() {
     val before = """
          The quick
@@ -383,7 +364,6 @@ class VimExchangeExtensionTest : VimTestCase() {
     exitExchange()
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test back selection exchange 1`() {
     doTest(
       listOf("vb", "X", "bevb", "X"),
@@ -394,7 +374,6 @@ class VimExchangeExtensionTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test back selection exchange 2`() {
     doTest(
       listOf("vb", "X", "wve", "X"),
@@ -405,7 +384,6 @@ class VimExchangeExtensionTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test back selection exchange 3`() {
     doTest(
       listOf("ve", "X", "wevb", "X"),
@@ -416,7 +394,6 @@ class VimExchangeExtensionTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test change with down motion`() {
     val before = """
          The ${c}quick
@@ -436,7 +413,6 @@ class VimExchangeExtensionTest : VimTestCase() {
     exitExchange()
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test cxx`() {
     val before = """
          The ${c}quick

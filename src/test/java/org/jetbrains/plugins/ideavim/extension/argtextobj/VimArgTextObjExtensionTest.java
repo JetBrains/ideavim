@@ -22,8 +22,6 @@ import com.google.common.collect.Lists;
 import com.maddyhome.idea.vim.api.VimInjectorKt;
 import com.maddyhome.idea.vim.command.VimStateMachine;
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers;
-import org.jetbrains.plugins.ideavim.SkipNeovimReason;
-import org.jetbrains.plugins.ideavim.TestWithoutNeovim;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
 import java.util.Collections;
@@ -41,7 +39,7 @@ public class VimArgTextObjExtensionTest extends VimTestCase {
     VimInjectorKt.getInjector().getVimscriptExecutor().execute("let argtextobj_pairs='" + value + "'", true);
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
+
   public void testDeleteAnArgument() {
     doTest(Lists.newArrayList("daa"), "function(int arg1,    char<caret>* arg2=\"a,b,c(d,e)\")",
            "function(int arg1<caret>)", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE);
@@ -49,13 +47,11 @@ public class VimArgTextObjExtensionTest extends VimTestCase {
            VimStateMachine.SubMode.NONE);
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   public void testChangeInnerArgument() {
     doTest(Lists.newArrayList("cia"), "function(int arg1,    char<caret>* arg2=\"a,b,c(d,e)\")",
            "function(int arg1,    <caret>)", VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE);
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   public void testSmartArgumentRecognition() {
     doTest(Lists.newArrayList("dia"), "function(1, (20<caret>*30)+40, somefunc2(3, 4))",
            "function(1, <caret>, somefunc2(3, 4))", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE);
@@ -63,7 +59,6 @@ public class VimArgTextObjExtensionTest extends VimTestCase {
            "function(1, (20*30)+40, somefunc2(<caret>4))", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE);
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   public void testIgnoreQuotedArguments() {
     doTest(Lists.newArrayList("daa"), "function(int arg1,    char* arg2=a,b,c(<caret>arg,e))",
            "function(int arg1,    char* arg2=a,b,c(<caret>e))", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE);
@@ -75,7 +70,6 @@ public class VimArgTextObjExtensionTest extends VimTestCase {
            "function(int arg1<caret>)", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE);
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   public void testDeleteTwoArguments() {
     doTest(Lists.newArrayList("d2aa"), "function(int <caret>arg1,    char* arg2=\"a,b,c(d,e)\")", "function(<caret>)",
            VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE);
@@ -91,7 +85,6 @@ public class VimArgTextObjExtensionTest extends VimTestCase {
            "function(int arg1,    <caret>)", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE);
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   public void testSelectTwoArguments() {
     doTest(Lists.newArrayList("v2aa"), "function(int <caret>arg1,    char* arg2=\"a,b,c(d,e)\", bool arg3)",
            "function(<selection>int arg1,    char* arg2=\"a,b,c(d,e)\", </selection>bool arg3)",
@@ -101,14 +94,12 @@ public class VimArgTextObjExtensionTest extends VimTestCase {
            VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER);
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   public void testArgumentsInsideAngleBrackets() {
     setArgTextObjPairsVariable("(:),<:>");
     doTest(Lists.newArrayList("dia"), "std::vector<int, std::unique_p<caret>tr<bool>> v{};",
            "std::vector<int, <caret>> v{};", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE);
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   public void testWhenUnbalancedHigherPriorityPairIsUsed() {
     setArgTextObjPairsVariable("{:},(:)");
     doTest(Lists.newArrayList("dia"), "namespace foo { void foo(int arg1, bool arg2<caret> { body }\n}",
@@ -117,7 +108,6 @@ public class VimArgTextObjExtensionTest extends VimTestCase {
            "namespace foo { <caret>, bool arg2 { body }\n}", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE);
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   public void testBracketPriorityToHangleShiftOperators() {
     doTest(Lists.newArrayList("dia"), "foo(30 << 10, 20 << <caret>3) >> 17", "foo(30 << 10, <caret>) >> 17",
            VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE);
@@ -127,7 +117,6 @@ public class VimArgTextObjExtensionTest extends VimTestCase {
            VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE);
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   public void testEmptyFile() {
     assertPluginError(false);
     doTest(Lists.newArrayList("daa"), "<caret>", "<caret>", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE);
@@ -136,7 +125,6 @@ public class VimArgTextObjExtensionTest extends VimTestCase {
     assertPluginError(true);
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   public void testEmptyLine() {
     assertPluginError(false);
     doTest(Lists.newArrayList("daa"), "<caret>\n", "<caret>\n", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE);
@@ -145,7 +133,6 @@ public class VimArgTextObjExtensionTest extends VimTestCase {
     assertPluginError(true);
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   public void testEmptyArg() {
     assertPluginError(false);
     doTest(Lists.newArrayList("daa"), "foo(<caret>)", "foo(<caret>)", VimStateMachine.Mode.COMMAND,
@@ -156,7 +143,6 @@ public class VimArgTextObjExtensionTest extends VimTestCase {
     assertPluginError(true);
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   public void testSkipCommasInsideNestedPairs() {
     final String before =
       "void foo(int arg1)\n{" + "   methodCall(arg1, \"{ arg1 , 2\");\n" + "   otherMeth<caret>odcall(arg, 3);\n" + "}";
@@ -164,19 +150,16 @@ public class VimArgTextObjExtensionTest extends VimTestCase {
     assertPluginError(true);
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   public void testHandleNestedPairs() {
     doTest(Lists.newArrayList("dia"), "foo(arg1, arr<caret>ay[someexpr(Class{arg1 << 3, arg2})] + 3)\n{",
            "foo(arg1, <caret>)\n{", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE);
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   public void testHandleNestedParenthesisForASingleArgument() {
     doTest(Lists.newArrayList("dia"), "foo((20*<caret>30))", "foo(<caret>)", VimStateMachine.Mode.COMMAND,
            VimStateMachine.SubMode.NONE);
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   public void testHandleImbalancedPairs() {
     doTest(Lists.newArrayList("dia"), "foo(arg1, ba<caret>r(not-an-arg{body", "foo(arg1, ba<caret>r(not-an-arg{body",
            VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE);
@@ -192,14 +175,12 @@ public class VimArgTextObjExtensionTest extends VimTestCase {
     assertPluginError(true);
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   public void testArgumentBoundsSearchIsLimitedByLineCount() {
     final String before = "foo(\n" + String.join("", Collections.nCopies(10, "   arg,\n")) + "   last<caret>Arg" + ")";
     doTest(Lists.newArrayList("dia"), before, before, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE);
     assertPluginError(true);
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   public void testExtendVisualSelection() {
     doTest(Lists.newArrayList("vllia"), "function(int arg1,    ch<caret>ar* arg2=\"a,b,c(d,e)\")",
            "function(int arg1,    <selection>char* arg2=\"a,b,c(d,e)\"</selection>)", VimStateMachine.Mode.VISUAL,
@@ -209,13 +190,11 @@ public class VimArgTextObjExtensionTest extends VimTestCase {
            VimStateMachine.SubMode.VISUAL_CHARACTER);
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   public void testExtendVisualSelectionUsesCaretPos() {
     doTest(Lists.newArrayList("vllia"), "fu<caret>n(arg)", "fun(<selection>arg</selection>)", VimStateMachine.Mode.VISUAL,
            VimStateMachine.SubMode.VISUAL_CHARACTER);
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   public void testDeleteArrayArgument() {
     setArgTextObjPairsVariable("[:],(:)");
     doTest(Lists.newArrayList("dia"), "function(int a, String[<caret>] b)", "function(int a, <caret>)",
@@ -224,7 +203,6 @@ public class VimArgTextObjExtensionTest extends VimTestCase {
            VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE);
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   public void testDeleteInClass() {
     doTest(Lists.newArrayList("dia"), "class MyClass{ public int myFun() { some<caret>Call(); } }",
            "class MyClass{ public int myFun() { some<caret>Call(); } }", VimStateMachine.Mode.COMMAND,
@@ -234,7 +212,6 @@ public class VimArgTextObjExtensionTest extends VimTestCase {
            VimStateMachine.SubMode.NONE);
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   public void testFunctionWithSpaceAfterName() {
     doTest(Lists.newArrayList("dia"), "function (int <caret>a)", "function (int <caret>a)", VimStateMachine.Mode.COMMAND,
            VimStateMachine.SubMode.NONE);
@@ -243,7 +220,6 @@ public class VimArgTextObjExtensionTest extends VimTestCase {
   }
 
   @VimBehaviorDiffers(originalVimAfter = "function (int <caret>a, int b)", description = "Should work the same as testFunctionWithSpaceAfterName")
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   public void testFunctionWithSpaceAfterNameWithTwoArgs() {
     doTest(Lists.newArrayList("dia"), "function (int <caret>a, int b)", "function (, int b)", VimStateMachine.Mode.COMMAND,
            VimStateMachine.SubMode.NONE);
@@ -251,7 +227,6 @@ public class VimArgTextObjExtensionTest extends VimTestCase {
            VimStateMachine.SubMode.NONE);
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   public void testDeleteInIf() {
     doTest(Lists.newArrayList("dia"), "class MyClass{ public int myFun() { if (tr<caret>ue) { somFunction(); } } }",
            "class MyClass{ public int myFun() { if (tr<caret>ue) { somFunction(); } } }", VimStateMachine.Mode.COMMAND,
@@ -261,7 +236,6 @@ public class VimArgTextObjExtensionTest extends VimTestCase {
            VimStateMachine.SubMode.NONE);
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   public void testParseVariablePairs() {
     assertPluginError(false);
     setArgTextObjPairsVariable("[:], (:)");
@@ -306,7 +280,6 @@ public class VimArgTextObjExtensionTest extends VimTestCase {
 
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   public void testCppLambaArguments() {
     setArgTextObjPairsVariable("[:],(:),{:},<:>");
     doTest(Lists.newArrayList("daa"),

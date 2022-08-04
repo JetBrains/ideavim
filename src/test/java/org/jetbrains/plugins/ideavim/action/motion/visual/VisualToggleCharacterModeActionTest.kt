@@ -230,7 +230,6 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.MULTICARET)
   fun `test enter visual with count after visual operation multicaret`() {
     doTest(
       listOf("vedx", "1v"),
