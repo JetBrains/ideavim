@@ -35,6 +35,18 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 data class CmdCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges) {
   override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
+  private val unsupportedArgs = listOf(
+    Regex("-range(=[^ ])?") to "-range",
+    Regex("-complete=[^ ]*") to "-complete",
+    Regex("-count=[^ ]*") to "-count",
+    Regex("-addr=[^ ]*") to "-addr",
+    Regex("-bang") to "-bang",
+    Regex("-bar") to "-bar",
+    Regex("-register") to "-register",
+    Regex("-buffer") to "-buffer",
+    Regex("-keepscript") to "-keepscript",
+  )
+
   // Static definitions needed for aliases.
   private companion object {
     const val overridePrefix = "!"
@@ -74,6 +86,14 @@ data class CmdCommand(val ranges: Ranges, val argument: String) : Command.Single
     val overrideAlias = argument.startsWith(overridePrefix)
     if (overrideAlias) {
       argument = argument.removePrefix(overridePrefix).trim()
+    }
+
+    for ((arg, message) in unsupportedArgs) {
+      val match = arg.find(argument)
+      match?.range?.let {
+        argument = argument.removeRange(it)
+        injector.messages.showStatusBarMessage("'$message' is not supported by `command`")
+      }
     }
 
     // Handle alias arguments

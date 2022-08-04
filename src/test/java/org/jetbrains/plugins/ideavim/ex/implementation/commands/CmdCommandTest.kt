@@ -19,6 +19,7 @@
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 /**
@@ -128,6 +129,22 @@ class CmdCommandTest : VimTestCase() {
     configureByText("\n")
     typeText(commandToKeys("command -nargs=* Error echo <args>"))
     assertPluginError(false)
+  }
+
+  fun `test add command with range`() {
+    VimPlugin.getCommand().resetAliases()
+    configureByText("\n")
+    typeText(commandToKeys("command! -range Error echo <args>"))
+    assertPluginError(false)
+    assertEquals("'-range' is not supported by `command`", injector.messages.getStatusBarMessage())
+  }
+
+  fun `test add command with complete`() {
+    VimPlugin.getCommand().resetAliases()
+    configureByText("\n")
+    typeText(commandToKeys("command! -complete=color Error echo <args>"))
+    assertPluginError(false)
+    assertEquals("'-complete' is not supported by `command`", injector.messages.getStatusBarMessage())
   }
 
   fun `test add command with arguments short`() {
