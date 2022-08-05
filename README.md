@@ -228,7 +228,7 @@ Ex commands or via `:map` command mappings:
         <summary><strong>"Track action Ids" Details</strong> (click to see)</summary>
         <picture>
             <source media="(prefers-color-scheme: dark)" srcset="assets/readme/track_action_id.gif">
-            <img src="assets/readme/track_action_light.mp4" alt="track action ids"/>
+            <img src="assets/readme/track_action_light.gif" alt="track action ids"/>
         </picture>
     </details>
 
