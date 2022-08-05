@@ -32,7 +32,7 @@ OK, ready to do some coding?
 Yoo hoo! You’re all set to begin contributing.
 We've prepared some useful configurations for you:
 
-![Prepared configurations](assets/contributing/configurations.png)
+![Prepared configurations light](assets/contributing/configs-light.png#gh-light-mode-only)![Prepared configurations dark](assets/contributing/configs-dark.png#gh-dark-mode-only)
 
 And here are useful gradle commands:
 
