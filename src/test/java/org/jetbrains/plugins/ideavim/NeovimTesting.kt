@@ -101,15 +101,15 @@ internal object NeovimTesting {
     val notScriptImplementation = "org.jetbrains.plugins.ideavim.ex.implementation" !in test.javaClass.packageName
     val notExtension = "org.jetbrains.plugins.ideavim.extension" !in test.javaClass.packageName
     if (singleCaret) {
-      singleCaret = editor == null ||  editor.caretModel.caretCount == 1
+      singleCaret = editor == null || editor.caretModel.caretCount == 1
     }
-    return noBehaviourDiffers
-      && noTestingWithoutNeovim
-      && neovimTestingEnabled
-      && notParserTest
-      && notScriptImplementation
-      && notExtension
-      && singleCaret
+    return noBehaviourDiffers &&
+      noTestingWithoutNeovim &&
+      neovimTestingEnabled &&
+      notParserTest &&
+      notScriptImplementation &&
+      notExtension &&
+      singleCaret
   }
 
   fun setupEditor(editor: Editor, test: VimTestCase) {

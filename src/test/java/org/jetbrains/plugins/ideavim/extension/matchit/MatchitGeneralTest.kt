@@ -338,7 +338,7 @@ class MatchitGeneralTest : VimTestCase() {
         en${c}d
       """.trimIndent(),
       "",
-      fileName ="ruby.rb"
+      fileName = "ruby.rb"
     )
   }
 }

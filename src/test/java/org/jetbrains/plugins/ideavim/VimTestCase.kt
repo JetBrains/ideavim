@@ -540,11 +540,9 @@ abstract class VimTestCase : UsefulTestCase() {
   ) {
     if (fileName != null) {
       configureByText(fileName, before)
-    }
-    else if (fileType != null) {
+    } else if (fileType != null) {
       configureByText(fileType, before)
-    }
-    else {
+    } else {
       configureByText(before)
     }
     afterEditorInitialized?.invoke(myFixture.editor)

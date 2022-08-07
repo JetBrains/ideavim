@@ -71,6 +71,6 @@ class ExShortcutKeyAction(private val exEntryPanel: ExEntryPanel) : DumbAwareAct
     registerCustomShortcutSet({ shortcuts }, exEntryPanel)
   }
 
-  /// Or EDT? We access ExEntryPanel actually. But seems to work with BGT
+  // / Or EDT? We access ExEntryPanel actually. But seems to work with BGT
   override fun getActionUpdateThread() = ActionUpdateThread.BGT
 }
