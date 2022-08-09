@@ -2,7 +2,110 @@
   <name>IdeaVim</name>
   <id>IdeaVIM</id>
   <change-notes><![CDATA[
-      <a href="https://github.com/JetBrains/ideavim/blob/master/CHANGES.md#1110-2022-08-09">Changes</a>
+    <h3>Features:</h3>
+    <ul>
+      <li>Add <code>gcu</code> command for Commentary plugin</li>
+      <li>Add <code>:Commentary</code> command, which works great for commands such as <code>:%g/fun/Commentary</code></li>
+      <li>Support <code>gc</code> – commentary text objects. E.g. <code>dgc</code>: delete commented text.</li>
+      <li>Support <code>redo-register feature</code> | <a
+          href="https://youtrack.jetbrains.com/issue/VIM-2643/Dot-operator-doesn-t-increment-number-register-after-pasting-fro">VIM-2643</a>
+        | <a href="http://vimdoc.sourceforge.net/htmldoc/undo.html#redo-register">viminfo</a></li>
+    </ul>
+
+    <h3>Changes:</h3>
+    <ul>
+      <li>Uses the same mappings as Commentary, so custom bindings for the Vim plugin will work with IdeaVim, too.
+        E.g. <code>&lt;Plug&gt;Commentary</code> instead of <code>&lt;Plug&gt;(CommentMotion)</code>. Old mappings are
+        maintained for compatibility.
+      </li>
+      <li>If you open <code>~/.ideavimrc</code> in IDE, remove a mapping, and reload the config using the reload button,
+        the mapping will actually be unmapped.
+      </li>
+      <li>New vim (and IdeaVim) behaviour: <code>ci(</code>&amp; friends searches for the brackets in the line.</li>
+    </ul>
+
+    <h3>Fixes:</h3>
+    <ul>
+      <li><a href="https://youtrack.jetbrains.com/issue/VIM-2587">VIM-2587</a> Use ctrl-6 as ctrl-^</li>
+      <li><a href="https://youtrack.jetbrains.com/issue/VIM-2590">VIM-2590</a> Fix caret shape in PyCharm</li>
+      <li><a href="https://youtrack.jetbrains.com/issue/VIM-2553">VIM-2553</a> Substitute consecutive matches</li>
+      <li><a href="https://youtrack.jetbrains.com/issue/VIM-1687">VIM-1687</a> Support count for <code>gcc</code></li>
+      <li><a href="https://youtrack.jetbrains.com/issue/VIM-2381">VIM-2381</a> Fall back to line comment if block comment is
+        not available
+      </li>
+      <li><a href="https://youtrack.jetbrains.com/issue/VIM-2589">VIM-2589</a> Add <code>gc</code> text object</li>
+      <li><a href="https://youtrack.jetbrains.com/issue/VIM-2604">VIM-2604</a> Update action execution rules</li>
+      <li><a href="https://youtrack.jetbrains.com/issue/VIM-2654">VIM-2654</a> Add support for <code>return</code> without
+        expression
+      </li>
+      <li><a
+          href="https://youtrack.jetbrains.com/issue/VIM-2630/Please-fix-warning-Shall-not-be-called-on-a-template-presentatio">VIM-2630</a>
+        Fix IDE freeze
+      </li>
+      <li><a href="https://youtrack.jetbrains.com/issue/VIM-2661/Spamming-does-not-work">VIM-2661</a> Fix repeating the
+        <code>@@</code> command
+      </li>
+      <li><a href="https://youtrack.jetbrains.com/issue/VIM-2668/tabm-or-tabm-with-no-number-does-not-match-vim-behavior">VIM-2668</a>
+        Fix omitted numbers in <code>tabm</code> command
+      </li>
+      <li><a href="https://youtrack.jetbrains.com/issue/VIM-2595">VIM-2595</a> Support plugins in macro execution</li>
+      <li><a href="https://youtrack.jetbrains.com/issue/VIM-2671">VIM-2671</a> Fix using plugins from mappings</li>
+      <li><a href="https://youtrack.jetbrains.com/issue/VIM-2675">VIM-2675</a> Fix numbering register in visual mode</li>
+      <li><a href="https://youtrack.jetbrains.com/issue/VIM-744/Use-undoredo-with-count-modifier">VIM-744</a> Add count to
+        undo/redo
+      </li>
+      <li><a
+          href="https://youtrack.jetbrains.com/issue/VIM-1862/Ex-commands-executed-in-keymaps-and-macros-are-added-to-the-command-history">VIM-1862</a>
+        Fix command history
+      </li>
+      <li><a href="https://youtrack.jetbrains.com/issue/VIM-2227">VIM-2227</a> Wrong behavior when deleting / changing
+        surround with invalid character
+      </li>
+      <li><a href="https://youtrack.jetbrains.com/issue/VIM-2691">VIM-2691</a> Save file on :w</li>
+      <li><a href="https://youtrack.jetbrains.com/issue/VIM-2710">VIM-2710</a> Show options value on <code>set opt</code>
+      </li>
+      <li><a href="https://youtrack.jetbrains.com/issue/VIM-913">VIM-913</a> Partially fix the issue with macros and
+        autocompletion
+      </li>
+      <li><a href="https://youtrack.jetbrains.com/issue/VIM-2723">VIM-2723</a> Move focus to editor after :q</li>
+    </ul>
+
+    <h3>Merged PRs:</h3>
+    <ul>
+      <li><a href="https://github.com/JetBrains/ideavim/pull/468">468</a> by <a href="https://github.com/PHPirates">Thomas
+        Schouten</a>: Implement UserDataHolder for EditorDataContext
+      </li>
+      <li><a href="https://github.com/JetBrains/ideavim/pull/483">483</a> by <a href="https://github.com/Vvalter">Simon
+        Rainer</a>: Fix(VIM-2553): Substitute consecutive matches
+      </li>
+      <li><a href="https://github.com/JetBrains/ideavim/pull/488">488</a> by <a href="https://github.com/myzeiri">Martin
+        Yzeiri</a>: Add Matchit support for the C family of languages
+      </li>
+      <li><a href="https://github.com/JetBrains/ideavim/pull/493">493</a> by <a href="https://github.com/citizenmatt">Matt
+        Ellis</a>: Improvements to Commentary extension
+      </li>
+      <li><a href="https://github.com/JetBrains/ideavim/pull/494">494</a> by <a href="https://github.com/citizenmatt">Matt
+        Ellis</a>: Cleanup pre-212 CaretVisualAttributes compatibility code
+      </li>
+      <li><a href="https://github.com/JetBrains/ideavim/pull/504">504</a> by <a href="https://github.com/citizenmatt">Matt
+        Ellis</a>: Minor bug fixes
+      </li>
+      <li><a href="https://github.com/JetBrains/ideavim/pull/519">519</a> by <a href="https://github.com/chylex">chylex</a>:
+        Fix(VIM-2227): Wrong behavior when deleting / changing surround with invalid character
+      </li>
+      <li><a href="https://github.com/JetBrains/ideavim/pull/525">525</a> by <a href="https://github.com/citizenmatt">Matt
+        Ellis</a>: Improve handling of fractional width fonts
+      </li>
+      <li><a href="https://github.com/JetBrains/ideavim/pull/526">526</a> by <a href="https://github.com/AlexPl292">Alex
+        Pláte</a>: Create gradle.properties
+      </li>
+      <li><a href="https://github.com/JetBrains/ideavim/pull/528">528</a> by <a href="https://github.com/chylex">chylex</a>:
+        Implement partial code completion support in macros
+      </li>
+      <li><a href="https://github.com/JetBrains/ideavim/pull/531">531</a> by <a href="https://github.com/citizenmatt">Matt
+        Ellis</a>: Consolidate doTest methods
+      </li>
+    </ul>
     ]]>
   </change-notes>
   <description><![CDATA[
