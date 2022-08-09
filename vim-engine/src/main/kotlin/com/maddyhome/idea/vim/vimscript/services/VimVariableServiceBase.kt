@@ -71,6 +71,10 @@ abstract class VimVariableServiceBase : VariableService {
     value.unlockVar(depth)
   }
 
+  override fun getGlobalVariables(): Map<String, VimDataType> {
+    return globalVariables
+  }
+
   override fun storeVariable(variable: Variable, value: VimDataType, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext) {
     val scope = variable.scope ?: getDefaultVariableScope(vimContext)
     val name = variable.name.evaluate(editor, context, vimContext).value
