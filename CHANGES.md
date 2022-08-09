@@ -23,7 +23,7 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
-## To Be Released
+## 1.11.0, 2022-08-09
 
 ### Features:
 * Add `gcu` command for Commentary plugin
