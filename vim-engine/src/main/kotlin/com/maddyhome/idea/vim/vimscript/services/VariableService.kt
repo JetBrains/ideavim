@@ -112,6 +112,8 @@ interface VariableService {
    */
   fun unlockVariable(variable: Variable, depth: Int, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext)
 
+  fun getGlobalVariables(): Map<String, VimDataType>
+
   /**
    * Clears all global variables
    */
