@@ -56,19 +56,20 @@ class UndoRedoHelper : UndoRedoBase() {
         SelectionVimListenerSuppressor.lock().use { undoManager.undo(fileEditor) }
       } else {
         performUntilFileChanges(editor, { undoManager.isUndoAvailable(fileEditor) }, { undoManager.undo(fileEditor) })
-      }
 
-      editor?.carets()?.forEach {
-        val ijCaret = it.ij
-        val hasSelection = ijCaret.hasSelection()
-        if (hasSelection) {
-          val selectionStart = ijCaret.selectionStart
-          CommandProcessor.getInstance().runUndoTransparentAction {
-            it.ij.removeSelection()
-            it.ij.moveToOffset(selectionStart)
+        editor?.carets()?.forEach {
+          val ijCaret = it.ij
+          val hasSelection = ijCaret.hasSelection()
+          if (hasSelection) {
+            val selectionStart = ijCaret.selectionStart
+            CommandProcessor.getInstance().runUndoTransparentAction {
+              it.ij.removeSelection()
+              it.ij.moveToOffset(selectionStart)
+            }
           }
         }
       }
+
       return true
     }
     return false
@@ -85,9 +86,9 @@ class UndoRedoHelper : UndoRedoBase() {
         SelectionVimListenerSuppressor.lock().use { undoManager.redo(fileEditor) }
       } else {
         performUntilFileChanges(editor, { undoManager.isRedoAvailable(fileEditor) }, { undoManager.redo(fileEditor) })
-      }
-      CommandProcessor.getInstance().runUndoTransparentAction {
-        editor?.carets()?.forEach { it.ij.removeSelection() }
+        CommandProcessor.getInstance().runUndoTransparentAction {
+          editor?.carets()?.forEach { it.ij.removeSelection() }
+        }
       }
       return true
     }
