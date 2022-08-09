@@ -53,7 +53,6 @@ usual beta standards.
 * [VIM-2595](https://youtrack.jetbrains.com/issue/VIM-2595) Support plugins in macro execution
 * [VIM-2671](https://youtrack.jetbrains.com/issue/VIM-2671) Fix using plugins from mappings
 * [VIM-2675](https://youtrack.jetbrains.com/issue/VIM-2675) Fix numbering register in visual mode
-* [VIM-696](https://youtrack.jetbrains.com/issue/VIM-696/vim-selection-issue-after-undo) Fix selection after undo
 * [VIM-744](https://youtrack.jetbrains.com/issue/VIM-744/Use-undoredo-with-count-modifier) Add count to undo/redo
 * [VIM-1862](https://youtrack.jetbrains.com/issue/VIM-1862/Ex-commands-executed-in-keymaps-and-macros-are-added-to-the-command-history) Fix command history
 * [VIM-2227](https://youtrack.jetbrains.com/issue/VIM-2227) Wrong behavior when deleting / changing surround with invalid character
