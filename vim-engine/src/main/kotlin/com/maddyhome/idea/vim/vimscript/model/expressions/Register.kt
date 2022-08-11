@@ -30,7 +30,6 @@ data class Register(val char: Char) : Expression() {
 
   override fun evaluate(editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType {
     val register = injector.registerGroup.getRegister(char) ?: throw ExException("Register is not supported yet")
-    // todo Esc like keys should be one char
-    return VimString(injector.parser.toKeyNotation(register.keys))
+    return VimString(injector.parser.toPrintableString(register.keys))
   }
 }
