@@ -275,7 +275,7 @@ changelog {
     itemPrefix.set("*")
     path.set("${project.projectDir}/CHANGES.md")
     unreleasedTerm.set("To Be Released")
-    headerParserRegex.set("\\d\\.\\d+(.\\d+)?".toRegex())
+    headerParserRegex.set("(\\d\\.\\d+(.\\d+)?)".toRegex())
 //    header = { "${project.version}" }
 //    version = "0.60"
 }
