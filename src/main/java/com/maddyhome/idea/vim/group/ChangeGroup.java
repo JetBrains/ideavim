@@ -33,10 +33,13 @@ import com.intellij.openapi.editor.event.EditorMouseEvent;
 import com.intellij.openapi.editor.event.EditorMouseListener;
 import com.intellij.openapi.editor.impl.TextRangeInterval;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.popup.Balloon;
+import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.util.PsiUtilBase;
+import com.intellij.ui.JBColor;
 import com.intellij.util.containers.ContainerUtil;
 import com.maddyhome.idea.vim.EventFacade;
 import com.maddyhome.idea.vim.VimPlugin;
@@ -48,9 +51,13 @@ import com.maddyhome.idea.vim.ex.ranges.LineRange;
 import com.maddyhome.idea.vim.group.visual.VimSelection;
 import com.maddyhome.idea.vim.group.visual.VisualModeHelperKt;
 import com.maddyhome.idea.vim.helper.*;
+import com.maddyhome.idea.vim.icons.VimIcons;
 import com.maddyhome.idea.vim.key.KeyHandlerKeeper;
 import com.maddyhome.idea.vim.listener.VimInsertListener;
-import com.maddyhome.idea.vim.newapi.*;
+import com.maddyhome.idea.vim.newapi.IjExecutionContext;
+import com.maddyhome.idea.vim.newapi.IjExecutionContextKt;
+import com.maddyhome.idea.vim.newapi.IjVimCaret;
+import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.options.OptionConstants;
 import com.maddyhome.idea.vim.options.OptionScope;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
@@ -84,6 +91,8 @@ public class ChangeGroup extends VimChangeGroupBase {
   @NonNls private static final String MAX_HEX_INTEGER = "ffffffffffffffff";
 
   private final List<VimInsertListener> insertListeners = ContainerUtil.createLockFreeCopyOnWriteList();
+
+  private long lastShownTime = 0L;
 
   /**
    * Inserts a new line above the caret position
@@ -773,6 +782,22 @@ public class ChangeGroup extends VimChangeGroupBase {
                                         @NotNull TextRange selectedRange,
                                         final int count,
                                         boolean avalanche) {
+
+    // Just an easter egg
+    if (avalanche) {
+      long currentTime = System.currentTimeMillis();
+      if (currentTime - lastShownTime > 60_000) {
+        lastShownTime = currentTime;
+        ApplicationManager.getApplication().invokeLater(() -> {
+          final Balloon balloon = JBPopupFactory.getInstance()
+            .createHtmlTextBalloonBuilder("Wow, nice vim knowledge!", VimIcons.IDEAVIM, JBColor.background(), null)
+            .createBalloon();
+          balloon.show(JBPopupFactory.getInstance().guessBestPopupLocation(((IjVimEditor)editor).getEditor()),
+                       Balloon.Position.below);
+        });
+      }
+    }
+
     String nf = ((VimString) VimPlugin.getOptionService().getOptionValue(new OptionScope.LOCAL(editor), OptionConstants.nrformatsName, OptionConstants.nrformatsName)).getValue();
     boolean alpha = nf.contains("alpha");
     boolean hex = nf.contains("hex");
