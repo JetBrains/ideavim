@@ -139,6 +139,11 @@
   <depends optional="true" config-file="ides/ideavim-withAppCode.xml">com.intellij.modules.appcode</depends>
   <depends optional="true" config-file="ideavim-withAceJump.xml">AceJump</depends>
 
+  <applicationListeners>
+    <listener class="com.maddyhome.idea.vim.PyNotebooksCloseWorkaround"
+              topic="com.intellij.openapi.project.ProjectManagerListener"/>
+  </applicationListeners>
+
   <application-components>
     <component>
       <implementation-class>com.maddyhome.idea.vim.DynamicLoaderStopper</implementation-class>

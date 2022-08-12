@@ -179,7 +179,8 @@ abstract class VimOptionServiceBase : OptionService {
       }
     },
 
-    ToggleOption(OptionConstants.experimentalapiName, OptionConstants.experimentalapiAlias, false)
+    ToggleOption(OptionConstants.experimentalapiName, OptionConstants.experimentalapiAlias, false),
+    ToggleOption("closenotebooks", "closenotebooks", true),
   )
   private val globalValues = mutableMapOf<String, VimDataType>()
 
