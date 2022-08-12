@@ -326,9 +326,7 @@ tasks.register("slackNotification") {
 
             val postRc = responseCode
             println("Response code: $postRc")
-            if (postRc == 200) {
-                println(inputStream.bufferedReader().use { it.readText() })
-            }
+            println(inputStream.bufferedReader().use { it.readText() })
         }
     }
 }
