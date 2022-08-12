@@ -790,7 +790,7 @@ public class ChangeGroup extends VimChangeGroupBase {
         lastShownTime = currentTime;
         ApplicationManager.getApplication().invokeLater(() -> {
           final Balloon balloon = JBPopupFactory.getInstance()
-            .createHtmlTextBalloonBuilder("Wow, nice vim knowledge!", VimIcons.IDEAVIM, JBColor.background(), null)
+            .createHtmlTextBalloonBuilder("Wow, nice vim skills!", VimIcons.IDEAVIM, JBColor.background(), null)
             .createBalloon();
           balloon.show(JBPopupFactory.getInstance().guessBestPopupLocation(((IjVimEditor)editor).getEditor()),
                        Balloon.Position.below);
