@@ -18,8 +18,8 @@
 
 package org.jetbrains.plugins.ideavim.action.change.change
 
-//class InsertRegisterTest : VimTestCase() {
-  // todo test cursor position VIM-2732
+// class InsertRegisterTest : VimTestCase() {
+// todo test cursor position VIM-2732
 //  fun `test multiline insert from expression register`() {
 //    val keys = "VjyGo<C-r>=@\"<CR>"
 //    val before = """
@@ -43,4 +43,4 @@ package org.jetbrains.plugins.ideavim.action.change.change
 //    """.trimIndent()
 //    doTest(keys, before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
 //  }
-//}
+// }

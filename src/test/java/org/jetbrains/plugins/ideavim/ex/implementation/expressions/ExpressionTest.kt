@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Register
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.ex.evaluate
 
-class ExpressionTest: VimTestCase() {
+class ExpressionTest : VimTestCase() {
 
   fun `test multiline register content`() {
     configureByText("${c}Oh\nHi\nMark\n")
