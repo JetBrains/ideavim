@@ -38,6 +38,7 @@ import com.maddyhome.idea.vim.action.ComplicatedKeysAction;
 import com.maddyhome.idea.vim.action.VimShortcutKeyAction;
 import com.maddyhome.idea.vim.api.*;
 import com.maddyhome.idea.vim.command.MappingMode;
+import com.maddyhome.idea.vim.key.Node;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.helper.HelperKt;
@@ -275,9 +276,7 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
   private void registerRequiredShortcut(@NotNull List<KeyStroke> keys, MappingOwner owner) {
     for (KeyStroke key : keys) {
       if (key.getKeyChar() == KeyEvent.CHAR_UNDEFINED) {
-        if (!VimKeyGroupBase.Companion.getSpecialKeys().contains(key)) {
-          getRequiredShortcutKeys().add(new RequiredShortcut(key, owner));
-        }
+        getRequiredShortcutKeys().add(new RequiredShortcut(key, owner));
       }
     }
   }

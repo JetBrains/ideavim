@@ -116,9 +116,7 @@ abstract class VimKeyGroupBase : VimKeyGroup {
     val oldSize = requiredShortcutKeys.size
     for (key in fromKeys) {
       if (key.keyChar == KeyEvent.CHAR_UNDEFINED) {
-        if (key !in specialKeys) {
-          requiredShortcutKeys.add(RequiredShortcut(key, owner))
-        }
+        requiredShortcutKeys.add(RequiredShortcut(key, owner))
       }
     }
     if (requiredShortcutKeys.size != oldSize) {
@@ -182,23 +180,5 @@ abstract class VimKeyGroupBase : VimKeyGroup {
     keyRoots.clear()
     identityChecker?.clear()
     prefixes?.clear()
-  }
-
-  companion object {
-    val leftKey: KeyStroke = injector.parser.parseKeys("<Left>").single()
-    val rightKey: KeyStroke = injector.parser.parseKeys("<Right>").single()
-    val downKey: KeyStroke = injector.parser.parseKeys("<Down>").single()
-    val upKey: KeyStroke = injector.parser.parseKeys("<Up>").single()
-    val enterKey: KeyStroke = injector.parser.parseKeys("<Enter>").single()
-    val escKey: KeyStroke = injector.parser.parseKeys("<Esc>").single()
-
-    val specialKeys: Set<KeyStroke> = setOf(
-      leftKey,
-      rightKey,
-      downKey,
-      upKey,
-      enterKey,
-      escKey,
-    )
   }
 }

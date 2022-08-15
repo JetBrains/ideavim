@@ -23,7 +23,6 @@ import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.EmptyAction
 import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.application.invokeLater
@@ -32,6 +31,7 @@ import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.project.DumbAware
+import com.intellij.openapi.util.Key
 import com.intellij.ui.KeyStrokeAdapter
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
@@ -68,13 +68,31 @@ import javax.swing.KeyStroke
  * These keys are not passed to [com.maddyhome.idea.vim.VimTypedActionHandler] and should be handled by actions.
  */
 class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
+  private val traceTime = VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.ideatracetimeName)
 
   override fun actionPerformed(e: AnActionEvent) {
     LOG.trace("Executing shortcut key action")
     val editor = getEditor(e)
     val keyStroke = getKeyStroke(e)
     if (editor != null && keyStroke != null) {
-      executeAction(keyStroke, editor, e.dataContext)
+      val owner = VimPlugin.getKey().savedShortcutConflicts[keyStroke]
+      if ((owner as? ShortcutOwnerInfo.AllModes)?.owner == ShortcutOwner.UNDEFINED) {
+        VimPlugin.getNotifications(editor.project).notifyAboutShortcutConflict(keyStroke)
+      }
+      // Should we use HelperKt.getTopLevelEditor(editor) here, as we did in former EditorKeyHandler?
+      try {
+        val start = if (traceTime) System.currentTimeMillis() else null
+        KeyHandler.getInstance().handleKey(editor.vim, keyStroke, EditorDataContext.init(editor, e.dataContext).vim)
+        if (start != null) {
+          val duration = System.currentTimeMillis() - start
+          LOG.info("VimShortcut update '$keyStroke': $duration ms")
+        }
+      } catch (ignored: ProcessCanceledException) {
+        // Control-flow exceptions (like ProcessCanceledException) should never be logged
+        // See {@link com.intellij.openapi.diagnostic.Logger.checkException}
+      } catch (throwable: Throwable) {
+        LOG.error(throwable)
+      }
     }
   }
 
@@ -84,13 +102,106 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
 
   override fun update(e: AnActionEvent) {
     val start = if (traceTime) System.currentTimeMillis() else null
-    e.presentation.isEnabled = isEnabled(getEditor(e), getKeyStroke(e))
+    e.presentation.isEnabled = isEnabled(e)
     LOG.debug { "Shortcut key. Enabled: ${e.presentation.isEnabled}" }
     if (start != null) {
       val keyStroke = getKeyStroke(e)
       val duration = System.currentTimeMillis() - start
       LOG.info("VimShortcut update '$keyStroke': $duration ms")
     }
+  }
+
+  private fun isEnabled(e: AnActionEvent): Boolean {
+    if (!VimPlugin.isEnabled()) return false
+    val editor = getEditor(e)
+    val keyStroke = getKeyStroke(e)
+    if (editor != null && keyStroke != null) {
+      if (editor.isIdeaVimDisabledHere) {
+        LOG.trace("Do not execute shortcut because it's disabled here")
+        return false
+      }
+      // Workaround for smart step into
+      @Suppress("DEPRECATION", "LocalVariableName", "VariableNaming")
+      val SMART_STEP_INPLACE_DATA = Key.findKeyByName("SMART_STEP_INPLACE_DATA")
+      if (SMART_STEP_INPLACE_DATA != null && editor.getUserData(SMART_STEP_INPLACE_DATA) != null) {
+        LOG.trace("Do not execute shortcut because of smart step")
+        return false
+      }
+
+      val keyCode = keyStroke.keyCode
+
+      if (HandlerInjector.notebookCommandMode(editor)) {
+        LOG.debug("Python Notebook command mode")
+        if (keyCode == KeyEvent.VK_RIGHT || keyCode == KeyEvent.VK_KP_RIGHT || keyCode == KeyEvent.VK_ENTER) {
+          invokeLater { editor.updateCaretsVisualAttributes() }
+        }
+        return false
+      }
+
+      if (AceJumpService.getInstance()?.isActive(editor) == true) {
+        LOG.trace("Do not execute shortcut because AceJump is active")
+        return false
+      }
+
+      if (LookupManager.getActiveLookup(editor) != null && !LookupKeys.isEnabledForLookup(keyStroke)) {
+        LOG.trace("Do not execute shortcut because of lookup keys")
+        return false
+      }
+
+      if (keyCode == KeyEvent.VK_ESCAPE) return isEnabledForEscape(editor)
+
+      if (keyCode == KeyEvent.VK_TAB && editor.isTemplateActive()) return false
+
+      if ((keyCode == KeyEvent.VK_TAB || keyCode == KeyEvent.VK_ENTER) && editor.appCodeTemplateCaptured()) return false
+
+      if (editor.inInsertMode) {
+        if (keyCode == KeyEvent.VK_TAB) {
+          // TODO: This stops VimEditorTab seeing <Tab> in insert mode and correctly scrolling the view
+          // There are multiple actions registered for VK_TAB. The important items, in order, are this, the Live
+          // Templates action and TabAction. Returning false in insert mode means that the Live Template action gets to
+          // execute, and this allows Emmet to work (VIM-674). But it also means that the VimEditorTab handle is never
+          // called, so we can't scroll the caret into view correctly.
+          // If we do return true, VimEditorTab handles the Vim side of things and then invokes
+          // IdeActions.ACTION_EDITOR_TAB, which inserts the tab. It also bypasses the Live Template action, and Emmet
+          // no longer works.
+          // This flag is used when recording text entry/keystrokes for repeated insertion. Because we return false and
+          // don't execute the VimEditorTab handler, we don't record tab as an action. Instead, we see an incoming text
+          // change of multiple whitespace characters, which is normally ignored because it's auto-indent content from
+          // hitting <Enter>. When this flag is set, we record the whitespace as the output of the <Tab>
+          VimPlugin.getChange().tabAction = true
+          return false
+        }
+        // Debug watch, Python console, etc.
+        if (keyStroke in NON_FILE_EDITOR_KEYS && !EditorHelper.isFileEditor(editor)) return false
+      }
+
+      if (keyStroke in VIM_ONLY_EDITOR_KEYS) return true
+
+      val savedShortcutConflicts = VimPlugin.getKey().savedShortcutConflicts
+      val info = savedShortcutConflicts[keyStroke]
+      return when (info?.forEditor(editor.vim)) {
+        ShortcutOwner.VIM -> true
+        ShortcutOwner.IDE -> !isShortcutConflict(keyStroke)
+        else -> {
+          if (isShortcutConflict(keyStroke)) {
+            savedShortcutConflicts[keyStroke] = ShortcutOwnerInfo.allUndefined
+          }
+          true
+        }
+      }
+    }
+    return false
+  }
+
+  private fun isEnabledForEscape(editor: Editor): Boolean {
+    val ideaVimSupportValue = (VimPlugin.getOptionService().getOptionValue(OptionScope.LOCAL(IjVimEditor(editor)), IjVimOptionService.ideavimsupportName) as VimString).value
+    return editor.isPrimaryEditor() ||
+      EditorHelper.isFileEditor(editor) && !editor.inNormalMode ||
+      ideaVimSupportValue.contains(IjVimOptionService.ideavimsupport_dialog) && !editor.inNormalMode
+  }
+
+  private fun isShortcutConflict(keyStroke: KeyStroke): Boolean {
+    return VimPlugin.getKey().getKeymapConflicts(keyStroke).isNotEmpty()
   }
 
   /**
@@ -234,113 +345,5 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
 
     private fun getKeyStrokes(keyCode: Int, vararg modifiers: Int) =
       modifiers.map { KeyStroke.getKeyStroke(keyCode, it) }
-
-    internal fun isEnabled(editor: Editor?, keyStroke: KeyStroke?): Boolean {
-      if (!VimPlugin.isEnabled()) return false
-      if (editor != null && keyStroke != null) {
-        if (editor.isIdeaVimDisabledHere) {
-          LOG.trace("Do not execute shortcut because it's disabled here")
-          return false
-        }
-
-        val keyCode = keyStroke.keyCode
-
-        if (HandlerInjector.notebookCommandMode(editor)) {
-          LOG.debug("Python Notebook command mode")
-          if (keyCode == KeyEvent.VK_RIGHT || keyCode == KeyEvent.VK_KP_RIGHT || keyCode == KeyEvent.VK_ENTER) {
-            invokeLater { editor.updateCaretsVisualAttributes() }
-          }
-          return false
-        }
-
-        if (AceJumpService.getInstance()?.isActive(editor) == true) {
-          LOG.trace("Do not execute shortcut because AceJump is active")
-          return false
-        }
-
-        if (LookupManager.getActiveLookup(editor) != null && !LookupKeys.isEnabledForLookup(keyStroke)) {
-          LOG.trace("Do not execute shortcut because of lookup keys")
-          return false
-        }
-
-        if (keyCode == KeyEvent.VK_ESCAPE) return isEnabledForEscape(editor)
-
-        if (keyCode == KeyEvent.VK_TAB && editor.isTemplateActive()) return false
-
-        if ((keyCode == KeyEvent.VK_TAB || keyCode == KeyEvent.VK_ENTER) && editor.appCodeTemplateCaptured()) return false
-
-        if (editor.inInsertMode) {
-          if (keyCode == KeyEvent.VK_TAB) {
-            // TODO: This stops VimEditorTab seeing <Tab> in insert mode and correctly scrolling the view
-            // There are multiple actions registered for VK_TAB. The important items, in order, are this, the Live
-            // Templates action and TabAction. Returning false in insert mode means that the Live Template action gets to
-            // execute, and this allows Emmet to work (VIM-674). But it also means that the VimEditorTab handle is never
-            // called, so we can't scroll the caret into view correctly.
-            // If we do return true, VimEditorTab handles the Vim side of things and then invokes
-            // IdeActions.ACTION_EDITOR_TAB, which inserts the tab. It also bypasses the Live Template action, and Emmet
-            // no longer works.
-            // This flag is used when recording text entry/keystrokes for repeated insertion. Because we return false and
-            // don't execute the VimEditorTab handler, we don't record tab as an action. Instead, we see an incoming text
-            // change of multiple whitespace characters, which is normally ignored because it's auto-indent content from
-            // hitting <Enter>. When this flag is set, we record the whitespace as the output of the <Tab>
-            VimPlugin.getChange().tabAction = true
-            return false
-          }
-          // Debug watch, Python console, etc.
-          if (keyStroke in NON_FILE_EDITOR_KEYS && !EditorHelper.isFileEditor(editor)) return false
-        }
-
-        if (keyStroke in VIM_ONLY_EDITOR_KEYS) return true
-
-        val savedShortcutConflicts = VimPlugin.getKey().savedShortcutConflicts
-        val info = savedShortcutConflicts[keyStroke]
-        return when (info?.forEditor(editor.vim)) {
-          ShortcutOwner.VIM -> true
-          ShortcutOwner.IDE -> !isShortcutConflict(keyStroke)
-          else -> {
-            if (isShortcutConflict(keyStroke)) {
-              savedShortcutConflicts[keyStroke] = ShortcutOwnerInfo.allUndefined
-            }
-            true
-          }
-        }
-      }
-      return false
-    }
-
-    private fun isEnabledForEscape(editor: Editor): Boolean {
-      val ideaVimSupportValue = (VimPlugin.getOptionService().getOptionValue(OptionScope.LOCAL(IjVimEditor(editor)), IjVimOptionService.ideavimsupportName) as VimString).value
-      return editor.isPrimaryEditor() ||
-        EditorHelper.isFileEditor(editor) && !editor.inNormalMode ||
-        ideaVimSupportValue.contains(IjVimOptionService.ideavimsupport_dialog) && !editor.inNormalMode
-    }
-
-    private fun isShortcutConflict(keyStroke: KeyStroke): Boolean {
-      return VimPlugin.getKey().getKeymapConflicts(keyStroke).isNotEmpty()
-    }
-
-    internal fun executeAction(keyStroke: KeyStroke, editor: Editor, dataContext: DataContext?) {
-      val owner = VimPlugin.getKey().savedShortcutConflicts[keyStroke]
-      if ((owner as? ShortcutOwnerInfo.AllModes)?.owner == ShortcutOwner.UNDEFINED) {
-        VimPlugin.getNotifications(editor.project).notifyAboutShortcutConflict(keyStroke)
-      }
-      // Should we use HelperKt.getTopLevelEditor(editor) here, as we did in former EditorKeyHandler?
-      try {
-        val start = if (traceTime) System.currentTimeMillis() else null
-        KeyHandler.getInstance().handleKey(editor.vim, keyStroke, EditorDataContext.init(editor, dataContext).vim)
-        if (start != null) {
-          val duration = System.currentTimeMillis() - start
-          LOG.info("VimShortcut update '$keyStroke': $duration ms")
-        }
-      } catch (ignored: ProcessCanceledException) {
-        // Control-flow exceptions (like ProcessCanceledException) should never be logged
-        // See {@link com.intellij.openapi.diagnostic.Logger.checkException}
-      } catch (throwable: Throwable) {
-        LOG.error(throwable)
-      }
-    }
-
-    private val traceTime: Boolean
-      get() = VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.ideatracetimeName)
   }
 }
