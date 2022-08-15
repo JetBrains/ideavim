@@ -117,7 +117,7 @@ command:
         | MARK_COMMAND | JUMPS | J_LOWERCASE | JOIN_LINES | HISTORY | GO_TO_CHAR | SYMBOL | FIND | CLASS | F_LOWERCASE
         | FILE | EXIT | E_LOWERCASE | EDIT_FILE | DUMP_LINE | DIGRAPH | DEL_MARKS | D_LOWERCASE | DEL_LINES | DELCMD
         | T_LOWERCASE | COPY | CMD_CLEAR | BUFFER_LIST | BUFFER_CLOSE | B_LOWERCASE | BUFFER | ASCII
-        | ACTIONLIST | ACTION | LOCKVAR | UNLOCKVAR | PACKADD | TABMOVE | NEOVIM
+        | ACTIONLIST | ACTION | LOCKVAR | UNLOCKVAR | PACKADD | TABMOVE | HIDDENGEM
       )
     WS* ((commandArgumentWithoutBars? inline_comment NEW_LINE) | (commandArgumentWithoutBars? NEW_LINE) | (commandArgumentWithoutBars? BAR)) (NEW_LINE | BAR)*
     #CommandWithComment|
@@ -477,7 +477,7 @@ existingCommands:       RETURN
                     |   PROMPT_FIND
                     |   PROMPT_REPLACE
                     |   PUT_LINES
-                    |   NEOVIM
+                    |   HIDDENGEM
                     |   QUIT
                     |   REDO
                     |   REGISTERS
@@ -650,7 +650,7 @@ PRINT:                  'pr' | 'pri' | 'prin' | 'print' | 'Pr' | 'Pri' | 'Prin' 
 PROMPT_FIND:            'pro' | 'prom' | 'promp' | 'prompt' | 'promptf' | 'promptfi' | 'promptfin' | 'promptfind';
 PROMPT_REPLACE:         'promptr' | 'promptre' | 'promptrep' | 'promptrepl';
 PUT_LINES:              'pu' | 'put';
-NEOVIM  :               'neovim';
+HIDDENGEM:               'hiddengem';
 QUIT:                   'qu' | 'qui' | 'quit' | 'clo' | 'clos' | 'close' | 'hid' | 'hide';
 REDO:                   'red' | 'redo';
 REGISTERS:              'di' | 'dis' | 'disp' | 'displ' | 'displa' | 'display' | 'reg' | 'regi' | 'regis' | 'regist' | 'registe' | 'register' | 'registers';

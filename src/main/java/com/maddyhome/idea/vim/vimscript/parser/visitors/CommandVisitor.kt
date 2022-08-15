@@ -53,7 +53,6 @@ import com.maddyhome.idea.vim.vimscript.model.commands.GlobalCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.GoToLineCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.GotoCharacterCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.HelpCommand
-import com.maddyhome.idea.vim.vimscript.model.commands.HiddenGem
 import com.maddyhome.idea.vim.vimscript.model.commands.HistoryCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.JoinLinesCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.JumpsCommand
@@ -79,6 +78,7 @@ import com.maddyhome.idea.vim.vimscript.model.commands.QuitCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.RedoCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.RegistersCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.RepeatCommand
+import com.maddyhome.idea.vim.vimscript.model.commands.HiddenGem
 import com.maddyhome.idea.vim.vimscript.model.commands.SelectFileCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.SelectFirstFileCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.SelectLastFileCommand
@@ -562,7 +562,7 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
     "promptreplace" to PromptReplaceCommand::class,
     "pu" to PutLinesCommand::class,
     "put" to PutLinesCommand::class,
-    "neovim" to HiddenGem::class,
+    "hiddengem" to HiddenGem::class,
     "q" to QuitCommand::class,
     "qu" to QuitCommand::class,
     "qui" to QuitCommand::class,
