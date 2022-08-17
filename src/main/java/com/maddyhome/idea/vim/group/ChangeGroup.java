@@ -20,7 +20,9 @@ package com.maddyhome.idea.vim.group;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import com.intellij.codeInsight.actions.AsyncActionExecutionService;
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.actionSystem.IdeActions;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.command.UndoConfirmationPolicy;
@@ -62,6 +64,8 @@ import com.maddyhome.idea.vim.options.OptionConstants;
 import com.maddyhome.idea.vim.options.OptionScope;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
 import kotlin.Pair;
+import kotlin.Unit;
+import kotlin.jvm.functions.Function0;
 import kotlin.text.StringsKt;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -580,17 +584,31 @@ public class ChangeGroup extends VimChangeGroupBase {
     final int startOffset = injector.getEngineEditorHelper().getLineStartForOffset(editor, range.getStartOffset());
     final int endOffset = injector.getEngineEditorHelper().getLineEndForOffset(editor, range.getEndOffset());
 
-    VisualModeHelperKt.vimSetSystemSelectionSilently(((IjVimEditor) editor).getEditor().getSelectionModel(), startOffset, endOffset);
+    Editor ijEditor = ((IjVimEditor)editor).getEditor();
+    VisualModeHelperKt.vimSetSystemSelectionSilently(ijEditor.getSelectionModel(), startOffset, endOffset);
 
-    NativeAction joinLinesAction = VimInjectorKt.getInjector().getNativeActionManager().getIndentLines();
-    if (joinLinesAction != null) {
-      VimInjectorKt.getInjector().getActionExecutor().executeAction(joinLinesAction, context);
+    Project project = ijEditor.getProject();
+    Function0<Unit> actionExecution = () -> {
+      NativeAction joinLinesAction = VimInjectorKt.getInjector().getNativeActionManager().getIndentLines();
+      if (joinLinesAction != null) {
+        VimInjectorKt.getInjector().getActionExecutor().executeAction(joinLinesAction, context);
+      }
+      return null;
+    };
+    Function0<Unit> afterAction = () -> {
+      final int firstLine = editor.offsetToLogicalPosition(Math.min(startOffset, endOffset)).getLine();
+      final int newOffset = VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, firstLine);
+      injector.getMotion().moveCaret(editor, caret, newOffset);
+      restoreCursor(editor, caret, ((IjVimCaret)caret).getCaret().getLogicalPosition().line);
+      return null;
+    };
+    if (project != null) {
+      AsyncActionExecutionService.Companion.getInstance(project)
+        .withExecutionAfterAction(IdeActions.ACTION_EDITOR_AUTO_INDENT_LINES, actionExecution, afterAction);
+    } else {
+      actionExecution.invoke();
+      afterAction.invoke();
     }
-
-    final int firstLine = editor.offsetToLogicalPosition(Math.min(startOffset, endOffset)).getLine();
-    final int newOffset = VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, firstLine);
-    injector.getMotion().moveCaret(editor, caret, newOffset);
-    restoreCursor(editor, caret, ((IjVimCaret) caret).getCaret().getLogicalPosition().line);
   }
 
   @Override
