@@ -127,7 +127,7 @@ object VimExtensionFacade {
   /** Sets the value of 'operatorfunc' to be used as the operator function in 'g@'. */
   @JvmStatic
   fun setOperatorFunction(function: OperatorFunction) {
-    VimPlugin.getKey().setOperatorFunction(function)
+    VimPlugin.getKey().operatorFunction = function
   }
 
   /**

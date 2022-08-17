@@ -17,7 +17,6 @@
  */
 package com.maddyhome.idea.vim.extension.surround
 
-import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
@@ -94,7 +93,7 @@ class VimSurroundExtension : VimExtension {
     override fun execute(editor: VimEditor, context: ExecutionContext) {
       val selectionStart = editor.ij.caretModel.primaryCaret.selectionStart
       // NB: Operator ignores SelectionType anyway
-      if (!Operator().apply(editor.ij, context.ij, SelectionType.CHARACTER_WISE)) {
+      if (!Operator().apply(editor, context, SelectionType.CHARACTER_WISE)) {
         return
       }
       runWriteAction {
@@ -220,7 +219,8 @@ class VimSurroundExtension : VimExtension {
   }
 
   private class Operator : OperatorFunction {
-    override fun apply(editor: Editor, context: DataContext, selectionType: SelectionType): Boolean {
+    override fun apply(vimEditor: VimEditor, context: ExecutionContext, selectionType: SelectionType): Boolean {
+      val editor = vimEditor.ij
       val c = getChar(editor)
       if (c.code == 0) return true
 

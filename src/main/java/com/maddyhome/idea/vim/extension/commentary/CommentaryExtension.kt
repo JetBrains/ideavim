@@ -17,10 +17,11 @@
  */
 package com.maddyhome.idea.vim.extension.commentary
 
-import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.codeInsight.actions.AsyncActionExecutionService
 import com.intellij.openapi.actionSystem.IdeActions
 import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.util.Ref
 import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
@@ -56,7 +57,6 @@ import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
-import com.maddyhome.idea.vim.newapi.vim
 import java.util.*
 
 class CommentaryExtension : VimExtension {
@@ -69,7 +69,6 @@ class CommentaryExtension : VimExtension {
       }
 
       return runWriteAction {
-        try {
           // Treat block- and character-wise selections as block comments. Be ready to fall back to if the first action
           // isn't available
           val actions = if (selectionType === SelectionType.LINE_WISE) {
@@ -78,25 +77,39 @@ class CommentaryExtension : VimExtension {
             listOf(IdeActions.ACTION_COMMENT_BLOCK, IdeActions.ACTION_COMMENT_LINE)
           }
 
-          injector.actionExecutor.executeAction(actions[0], context) ||
-            injector.actionExecutor.executeAction(actions[1], context)
-        } finally {
-          // Remove the selection, if we added it
-          if (mode !== VimStateMachine.Mode.VISUAL) {
-            editor.removeSelection()
-          }
-
-          // Put the caret back at the start of the range, as though it was moved by the operator's motion argument.
-          // This is what Vim does. If IntelliJ is configured to add comments at the start of the line, this might put
-          // the caret in the "wrong" place. E.g. gc_ should put the caret on the first non-whitespace character. This
-          // is calculated by the motion, saved in the marks, and then we insert the comment. If it's inserted at the
-          // first non-whitespace character, then the caret is in the right place. If it's inserted at the first column,
-          // then the caret is now in a bit of a weird place. We can't detect this scenario, so we just have to accept
-          // the difference
-          if (resetCaret) {
-            editor.primaryCaret().moveToOffset(range.startOffset)
-          }
+        val res = Ref.create<Boolean>(true)
+        AsyncActionExecutionService.getInstance(editor.ij.project!!).withExecutionAfterAction(actions[0], {
+          res.set(injector.actionExecutor.executeAction(actions[0], context))
+        }, { afterCommenting(mode, editor, resetCaret, range) })
+        if (!res.get()) {
+          AsyncActionExecutionService.getInstance(editor.ij.project!!).withExecutionAfterAction(actions[1], {
+            res.set(injector.actionExecutor.executeAction(actions[1], context))
+          }, { afterCommenting(mode, editor, resetCaret, range) })
         }
+        res.get()
+      }
+    }
+
+    private fun afterCommenting(
+      mode: VimStateMachine.Mode,
+      editor: VimEditor,
+      resetCaret: Boolean,
+      range: TextRange,
+    ) {
+      // Remove the selection, if we added it
+      if (mode !== VimStateMachine.Mode.VISUAL) {
+        editor.removeSelection()
+      }
+
+      // Put the caret back at the start of the range, as though it was moved by the operator's motion argument.
+      // This is what Vim does. If IntelliJ is configured to add comments at the start of the line, this might put
+      // the caret in the "wrong" place. E.g. gc_ should put the caret on the first non-whitespace character. This
+      // is calculated by the motion, saved in the marks, and then we insert the comment. If it's inserted at the
+      // first non-whitespace character, then the caret is in the right place. If it's inserted at the first column,
+      // then the caret is now in a bit of a weird place. We can't detect this scenario, so we just have to accept
+      // the difference
+      if (resetCaret) {
+        editor.primaryCaret().moveToOffset(range.startOffset)
       }
     }
   }
@@ -132,14 +145,19 @@ class CommentaryExtension : VimExtension {
   private class CommentaryOperatorHandler : OperatorFunction, ExtensionHandler {
     override val isRepeatable = true
 
+    // In this operator we process selection by ourselves. This is necessary for rider, VIM-1758
+    override fun postProcessSelection(): Boolean {
+      return false
+    }
+
     override fun execute(editor: VimEditor, context: ExecutionContext) {
       setOperatorFunction(this)
       executeNormalWithoutMapping(injector.parser.parseKeys("g@"), editor.ij)
     }
 
-    override fun apply(editor: Editor, context: DataContext, selectionType: SelectionType): Boolean {
-      val range = VimPlugin.getMark().getChangeMarks(editor.vim) ?: return false
-      return doCommentary(editor.vim, context.vim, range, selectionType, true)
+    override fun apply(editor: VimEditor, context: ExecutionContext, selectionType: SelectionType): Boolean {
+      val range = VimPlugin.getMark().getChangeMarks(editor) ?: return false
+      return doCommentary(editor, context, range, selectionType, true)
     }
   }
 

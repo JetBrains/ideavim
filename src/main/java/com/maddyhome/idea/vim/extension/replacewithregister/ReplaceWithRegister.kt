@@ -18,7 +18,6 @@
 
 package com.maddyhome.idea.vim.extension.replacewithregister
 
-import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
@@ -115,21 +114,22 @@ class ReplaceWithRegister : VimExtension {
   }
 
   private class Operator : OperatorFunction {
-    override fun apply(editor: Editor, context: DataContext, selectionType: SelectionType): Boolean {
+    override fun apply(vimEditor: VimEditor, context: ExecutionContext, selectionType: SelectionType): Boolean {
+      val editor = (vimEditor as IjVimEditor).editor
       val range = getRange(editor) ?: return false
       val visualSelection = PutData.VisualSelection(
         mapOf(
-          editor.caretModel.primaryCaret.vim to VimSelection.create(
+          vimEditor.primaryCaret() to VimSelection.create(
             range.startOffset,
             range.endOffset - 1,
             selectionType,
-            IjVimEditor(editor)
+            vimEditor
           )
         ),
         selectionType
       )
       // todo multicaret
-      doReplace(editor, editor.vim.primaryCaret(), visualSelection)
+      doReplace(editor, vimEditor.primaryCaret(), visualSelection)
       return true
     }
 

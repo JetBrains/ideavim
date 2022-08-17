@@ -15,22 +15,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.maddyhome.idea.vim.key
 
-package com.maddyhome.idea.vim.key;
-
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.command.SelectionType;
-import org.jetbrains.annotations.NotNull;
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.command.SelectionType
 
 /**
  * @author vlan
  */
-public interface OperatorFunction {
+interface OperatorFunction {
   /**
    * The value of 'operatorfunc' to be used as the operator function in 'g@'.
-   * <p>
+   *
+   *
    * Make sure to synchronize your function properly using read/write actions.
    */
-  boolean apply(@NotNull Editor editor, @NotNull DataContext context, @NotNull SelectionType selectionType);
+  fun apply(editor: VimEditor, context: ExecutionContext, selectionType: SelectionType): Boolean
+
+  fun postProcessSelection(): Boolean = true
 }

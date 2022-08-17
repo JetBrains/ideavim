@@ -22,6 +22,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
@@ -40,7 +41,7 @@ import com.maddyhome.idea.vim.newapi.ij
 import java.util.*
 
 private fun doOperatorAction(editor: VimEditor, context: ExecutionContext, textRange: TextRange, selectionType: SelectionType): Boolean {
-  val operatorFunction = VimPlugin.getKey().operatorFunction
+  val operatorFunction = injector.keyGroup.operatorFunction
   if (operatorFunction == null) {
     VimPlugin.showMessage(MessageHelper.message("E774"))
     return false
@@ -49,7 +50,7 @@ private fun doOperatorAction(editor: VimEditor, context: ExecutionContext, textR
   val saveRepeatHandler = VimRepeater.repeatHandler
   VimPlugin.getMark().setChangeMarks(editor, textRange)
   KeyHandler.getInstance().reset(editor)
-  val result = operatorFunction.apply(editor.ij, context.ij, selectionType)
+  val result = operatorFunction.apply(editor, context, selectionType)
   VimRepeater.repeatHandler = saveRepeatHandler
   return result
 }

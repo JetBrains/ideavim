@@ -18,7 +18,6 @@
 
 package com.maddyhome.idea.vim.extension.exchange
 
-import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.LogicalPosition
@@ -133,7 +132,7 @@ class VimExchangeExtension : VimExtension {
         val subMode = editor.subMode
         // Leave visual mode to create selection marks
         executeNormalWithoutMapping(injector.parser.parseKeys("<Esc>"), editor.ij)
-        Operator(true).apply(editor.ij, context.ij, SelectionType.fromSubMode(subMode))
+        Operator(true).apply(editor, context, SelectionType.fromSubMode(subMode))
       }
     }
   }
@@ -147,7 +146,8 @@ class VimExchangeExtension : VimExtension {
       else -> error("Invalid SubMode: $this")
     }
 
-    override fun apply(editor: Editor, context: DataContext, selectionType: SelectionType): Boolean {
+    override fun apply(vimEditor: VimEditor, context: ExecutionContext, selectionType: SelectionType): Boolean {
+      val editor = vimEditor.ij
       fun highlightExchange(ex: Exchange): RangeHighlighter {
         val attributes = editor.colorsScheme.getAttributes(EditorColors.TEXT_SEARCH_RESULT_ATTRIBUTES)
         val hlArea = when (ex.type) {

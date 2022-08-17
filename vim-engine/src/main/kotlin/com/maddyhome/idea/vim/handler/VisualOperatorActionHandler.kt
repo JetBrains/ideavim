@@ -132,7 +132,7 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
     logger.debug { "Count of selection segments: ${selections.size}" }
     logger.debug { selections.values.joinToString("\n") { vimSelection -> "Caret: $vimSelection" } }
 
-    val commandWrapper = VisualStartFinishWrapper(editor, cmd)
+    val commandWrapper = VisualStartFinishWrapper(editor, cmd, this)
     commandWrapper.start()
 
     val res = arrayOf(true)
@@ -230,7 +230,11 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
     }
   }
 
-  private class VisualStartFinishWrapper(private val editor: VimEditor, private val cmd: Command) {
+  private class VisualStartFinishWrapper(
+    private val editor: VimEditor,
+    private val cmd: Command,
+    private val visualOperatorActionHandler: VisualOperatorActionHandler
+  ) {
     private val visualChanges = mutableMapOf<VimCaret, VisualChange?>()
 
     fun start() {
@@ -256,9 +260,12 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
     fun finish(res: Boolean) {
       logger.debug("Finish visual command. Result: $res")
 
-      if (CommandFlags.FLAG_MULTIKEY_UNDO !in cmd.flags && CommandFlags.FLAG_EXPECT_MORE !in cmd.flags) {
-        logger.debug("Not multikey undo - exit visual")
-        editor.exitVisualModeNative()
+      if (visualOperatorActionHandler.id != "VimVisualOperatorAction"
+        || injector.keyGroup.operatorFunction?.postProcessSelection() != false) {
+        if (CommandFlags.FLAG_MULTIKEY_UNDO !in cmd.flags && CommandFlags.FLAG_EXPECT_MORE !in cmd.flags) {
+          logger.debug("Not multikey undo - exit visual")
+          editor.exitVisualModeNative()
+        }
       }
 
       if (res) {

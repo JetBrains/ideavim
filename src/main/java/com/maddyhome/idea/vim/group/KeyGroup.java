@@ -73,8 +73,6 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
 
   private static final Logger logger = Logger.getInstance(KeyGroup.class);
 
-  private @Nullable OperatorFunction operatorFunction = null;
-
   public void registerRequiredShortcutKeys(@NotNull VimEditor editor) {
     EventFacade.getInstance()
       .registerCustomShortcutSet(VimShortcutKeyAction.getInstance(), toShortcutSet(getRequiredShortcutKeys()),
@@ -117,14 +115,6 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
       unregisterShortcutKeys(new IjVimEditor(editor));
       registerRequiredShortcutKeys(new IjVimEditor(editor));
     }
-  }
-
-  public @Nullable OperatorFunction getOperatorFunction() {
-    return operatorFunction;
-  }
-
-  public void setOperatorFunction(@NotNull OperatorFunction function) {
-    operatorFunction = function;
   }
 
   public void saveData(@NotNull Element element) {
