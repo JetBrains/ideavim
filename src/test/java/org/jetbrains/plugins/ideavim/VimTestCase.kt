@@ -94,7 +94,7 @@ abstract class VimTestCase : UsefulTestCase() {
     super.setUp()
     val factory = IdeaTestFixtureFactory.getFixtureFactory()
     val projectDescriptor = LightProjectDescriptor.EMPTY_PROJECT_DESCRIPTOR
-    val fixtureBuilder = factory.createLightFixtureBuilder(projectDescriptor)
+    val fixtureBuilder = factory.createLightFixtureBuilder(projectDescriptor, "IdeaVim")
     val fixture = fixtureBuilder.fixture
     myFixture = IdeaTestFixtureFactory.getFixtureFactory().createCodeInsightFixture(
       fixture,
