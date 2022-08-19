@@ -62,7 +62,13 @@ import java.util.*
 class CommentaryExtension : VimExtension {
 
   companion object {
-    fun doCommentary(editor: VimEditor, context: ExecutionContext, range: TextRange, selectionType: SelectionType, resetCaret: Boolean): Boolean {
+    fun doCommentary(
+      editor: VimEditor,
+      context: ExecutionContext,
+      range: TextRange,
+      selectionType: SelectionType,
+      resetCaret: Boolean,
+    ): Boolean {
       val mode = editor.vimStateMachine.mode
       if (mode !== VimStateMachine.Mode.VISUAL) {
         editor.ij.selectionModel.setSelection(range.startOffset, range.endOffset)
@@ -125,7 +131,13 @@ class CommentaryExtension : VimExtension {
 
     putKeyMappingIfMissing(MappingMode.NXO, injector.parser.parseKeys("gc"), owner, plugCommentaryKeys, true)
     putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("gcc"), owner, plugCommentaryLineKeys, true)
-    putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("gcu"), owner, injector.parser.parseKeys("<Plug>Commentary<Plug>Commentary"), true)
+    putKeyMappingIfMissing(
+      MappingMode.N,
+      injector.parser.parseKeys("gcu"),
+      owner,
+      injector.parser.parseKeys("<Plug>Commentary<Plug>Commentary"),
+      true
+    )
 
     // Previous versions of IdeaVim used different mappings to Vim's Commentary. Make sure everything works if someone
     // is still using the old mapping
@@ -192,7 +204,7 @@ class CommentaryExtension : VimExtension {
       context: ExecutionContext,
       count: Int,
       rawCount: Int,
-      argument: Argument?
+      argument: Argument?,
     ): TextRange? {
 
       val nativeEditor = (editor as IjVimEditor).editor
