@@ -25,8 +25,8 @@ abstract class VimPutBase : VimPut {
     editor: VimEditor,
     context: ExecutionContext,
     data: PutData,
-    updateVisualMarks: Boolean,
     operatorArguments: OperatorArguments,
+    updateVisualMarks: Boolean,
   ): Boolean {
     val additionalData = collectPreModificationData(editor, data)
     deleteSelectedText(editor, data, operatorArguments)

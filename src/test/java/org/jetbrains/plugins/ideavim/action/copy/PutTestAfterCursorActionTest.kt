@@ -18,6 +18,13 @@
 
 package org.jetbrains.plugins.ideavim.action.copy
 
+import com.intellij.codeInsight.editorActions.CopyPastePostProcessor
+import com.intellij.codeInsight.editorActions.CopyPastePreProcessor
+import com.intellij.codeInsight.editorActions.TextBlockTransferableData
+import com.intellij.openapi.editor.CaretStateTransferableData
+import com.intellij.openapi.editor.Editor
+import com.intellij.psi.PsiFile
+import com.intellij.testFramework.ExtensionTestUtil
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.SelectionType
@@ -27,8 +34,32 @@ import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.rangeOf
 import org.junit.Test
+import java.awt.datatransfer.Transferable
 
 class PutTestAfterCursorActionTest : VimTestCase() {
+  fun `test platform handlers are called`() {
+    val extension = TestExtension()
+    ExtensionTestUtil.maskExtensions(
+      CopyPastePostProcessor.EP_NAME,
+      listOf(extension),
+      myFixture.testRootDisposable
+    )
+    ExtensionTestUtil.maskExtensions(
+      CopyPastePreProcessor.EP_NAME,
+      listOf(),
+      myFixture.testRootDisposable
+    )
+    setRegister('4', "XXX ")
+    doTest(
+      "\"4p",
+      "This is my$c text",
+      "This is my XXX$c text",
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE
+    )
+    assertEquals(1, extension.calledExtractTransferableData)
+  }
+
   fun `test put from number register`() {
     setRegister('4', "XXX ")
     doTest(
@@ -98,5 +129,25 @@ class PutTestAfterCursorActionTest : VimTestCase() {
             Discovery by the torrent of a mountain pass.
     """.trimIndent()
     assertState(after)
+  }
+
+  private class TestExtension : CopyPastePostProcessor<TextBlockTransferableData>() {
+    var calledExtractTransferableData = 0
+    override fun collectTransferableData(
+      file: PsiFile,
+      editor: Editor,
+      startOffsets: IntArray?,
+      endOffsets: IntArray?,
+    ): List<TextBlockTransferableData> {
+      return emptyList()
+    }
+
+    override fun extractTransferableData(content: Transferable): List<TextBlockTransferableData> {
+      calledExtractTransferableData += 1
+      return listOf(
+        // Just some random data
+        CaretStateTransferableData(intArrayOf(), intArrayOf())
+      )
+    }
   }
 }

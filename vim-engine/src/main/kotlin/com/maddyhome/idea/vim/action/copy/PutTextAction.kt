@@ -42,14 +42,20 @@ sealed class PutTextBaseAction(
     operatorArguments: OperatorArguments
   ): Boolean {
     val count = operatorArguments.count1
-    val caretToPutData = editor.sortedCarets().associateWith { getPutDataForCaret(it, count) }
-    var result = true
-    injector.application.runWriteAction {
-      caretToPutData.forEach {
-        result = injector.put.putTextForCaret(editor, it.key, context, it.value) && result
+    val sortedCarets = editor.sortedCarets()
+    return if (sortedCarets.size > 1) {
+      val caretToPutData = sortedCarets.associateWith { getPutDataForCaret(it, count) }
+      var result = true
+      injector.application.runWriteAction {
+        caretToPutData.forEach {
+          result = injector.put.putTextForCaret(editor, it.key, context, it.value) && result
+        }
       }
+      result
+    } else {
+      val putData = getPutDataForCaret(sortedCarets.single(), count)
+      injector.put.putText(editor, context, putData, operatorArguments)
     }
-    return result
   }
 
   private fun getPutDataForCaret(caret: VimCaret, count: Int): PutData {

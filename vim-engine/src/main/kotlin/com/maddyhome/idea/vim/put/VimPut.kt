@@ -21,8 +21,8 @@ interface VimPut {
     editor: VimEditor,
     context: ExecutionContext,
     data: PutData,
-    updateVisualMarks: Boolean = false,
     operatorArguments: OperatorArguments,
+    updateVisualMarks: Boolean = false,
   ): Boolean
 
   fun putTextForCaret(editor: VimEditor, caret: VimCaret, context: ExecutionContext, data: PutData, updateVisualMarks: Boolean = false): Boolean
