@@ -31,6 +31,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.api.VimSearchHelperBase;
 import com.maddyhome.idea.vim.command.VimStateMachine;
 import com.maddyhome.idea.vim.common.CharacterPosition;
 import com.maddyhome.idea.vim.common.Direction;
@@ -1201,7 +1202,7 @@ public class SearchHelper {
     int last = -1;
     int res = start;
     while (true) {
-      res = findNextWordOne(chars, res, end, 1, true, false);
+      res = (int)VimSearchHelperBase.Companion.findNextWordOne(chars, res, end, 1, true, false);
       if (res == start || res == 0 || res > end || res == last) {
         break;
       }
@@ -1228,105 +1229,6 @@ public class SearchHelper {
     }
 
     return new CountPosition(count, position);
-  }
-
-  public static int findNextWord(@NotNull Editor editor, int searchFrom, int count, boolean bigWord) {
-    CharSequence chars = editor.getDocument().getCharsSequence();
-    final int size = EditorHelperRt.getFileSize(editor);
-
-    return findNextWord(chars, searchFrom, size, count, bigWord, false);
-  }
-
-  public static int findNextWord(@NotNull CharSequence chars,
-                                 int pos,
-                                 int size,
-                                 int count,
-                                 boolean bigWord,
-                                 boolean spaceWords) {
-    int step = count >= 0 ? 1 : -1;
-    count = Math.abs(count);
-
-    int res = pos;
-    for (int i = 0; i < count; i++) {
-      res = findNextWordOne(chars, res, size, step, bigWord, spaceWords);
-      if (res == pos || res == 0 || res == size - 1) {
-        break;
-      }
-    }
-
-    return res;
-  }
-
-  private static int findNextWordOne(@NotNull CharSequence chars,
-                                     int pos,
-                                     int size,
-                                     int step,
-                                     boolean bigWord,
-                                     boolean spaceWords) {
-    boolean found = false;
-    pos = pos < size ? pos : Math.min(size, chars.length() - 1);
-    // For back searches, skip any current whitespace so we start at the end of a word
-    if (step < 0 && pos > 0) {
-      if (CharacterHelper.charType(chars.charAt(pos - 1), bigWord) == CharacterHelper.CharacterType.WHITESPACE &&
-          !spaceWords) {
-        pos = skipSpace(chars, pos - 1, step, size) + 1;
-      }
-      if (pos > 0 &&
-          CharacterHelper.charType(chars.charAt(pos), bigWord) !=
-          CharacterHelper.charType(chars.charAt(pos - 1), bigWord)) {
-        pos += step;
-      }
-    }
-    int res = pos;
-    if (pos < 0 || pos >= size) {
-      return pos;
-    }
-
-    CharacterHelper.CharacterType type = CharacterHelper.charType(chars.charAt(pos), bigWord);
-    if (type == CharacterHelper.CharacterType.WHITESPACE && step < 0 && pos > 0 && !spaceWords) {
-      type = CharacterHelper.charType(chars.charAt(pos - 1), bigWord);
-    }
-
-    pos += step;
-    while (pos >= 0 && pos < size && !found) {
-      CharacterHelper.CharacterType newType = CharacterHelper.charType(chars.charAt(pos), bigWord);
-      if (newType != type) {
-        if (newType == CharacterHelper.CharacterType.WHITESPACE && step >= 0 && !spaceWords) {
-          pos = skipSpace(chars, pos, step, size);
-          res = pos;
-        }
-        else if (step < 0) {
-          res = pos + 1;
-        }
-        else {
-          res = pos;
-        }
-
-        type = CharacterHelper.charType(chars.charAt(res), bigWord);
-        found = true;
-      }
-
-      pos += step;
-    }
-
-    if (found) {
-      if (res < 0) //(pos <= 0)
-      {
-        res = 0;
-      }
-      else if (res >= size) //(pos >= size)
-      {
-        res = size - 1;
-      }
-    }
-    else if (pos <= 0) {
-      res = 0;
-    }
-    else if (pos >= size) {
-      res = size;
-    }
-
-    return res;
   }
 
   public static @NotNull List<Pair<TextRange, NumberType>> findNumbersInRange(final @NotNull Editor editor,
@@ -1654,10 +1556,10 @@ public class SearchHelper {
 
     if ((!onWordStart && !(startSpace && isOuter)) || hasSelection || (count > 1 && dir == -1)) {
       if (dir == 1) {
-        start = findNextWord(chars, pos, max, -1, isBig, !isOuter);
+        start = (int)VimSearchHelperBase.Companion.findNextWord(chars, pos, max, -1, isBig, !isOuter);
       }
       else {
-        start = findNextWord(chars, pos, max, -(count - (onWordStart && !hasSelection ? 1 : 0)), isBig, !isOuter);
+        start = (int)VimSearchHelperBase.Companion.findNextWord(chars, pos, max, -(count - (onWordStart && !hasSelection ? 1 : 0)), isBig, !isOuter);
       }
 
       start = EditorHelper.normalizeOffset(editor, start, false);
@@ -1805,7 +1707,7 @@ public class SearchHelper {
     if (step > 0 && pos < size - 1) {
       if (CharacterHelper.charType(chars.charAt(pos + 1), bigWord) == CharacterHelper.CharacterType.WHITESPACE &&
           !spaceWords) {
-        pos = skipSpace(chars, pos + 1, step, size) - 1;
+        pos = (int)(VimSearchHelperBase.Companion.skipSpace(chars, pos + 1, step, size) - 1);
       }
       if (pos < size - 1 &&
           CharacterHelper.charType(chars.charAt(pos), bigWord) !=
@@ -1830,7 +1732,7 @@ public class SearchHelper {
           res = pos - 1;
         }
         else if (newType == CharacterHelper.CharacterType.WHITESPACE && step < 0 && !spaceWords) {
-          pos = skipSpace(chars, pos, step, size);
+          pos = (int)VimSearchHelperBase.Companion.skipSpace(chars, pos, step, size);
           res = pos;
         }
         else {
@@ -1856,34 +1758,6 @@ public class SearchHelper {
     }
 
     return res;
-  }
-
-  /**
-   * Skip whitespace starting with the supplied position.
-   * <p>
-   * An empty line is considered a whitespace break.
-   *
-   * @param chars  The text as a character array
-   * @param offset The starting position
-   * @param step   The direction to move
-   * @param size   The size of the document
-   * @return The new position. This will be the first non-whitespace character found or an empty line
-   */
-  private static int skipSpace(@NotNull CharSequence chars, int offset, int step, int size) {
-    char prev = 0;
-    while (offset >= 0 && offset < size) {
-      final char c = chars.charAt(offset);
-      if (c == '\n' && c == prev) {
-        break;
-      }
-      if (CharacterHelper.charType(c, false) != CharacterHelper.CharacterType.WHITESPACE) {
-        break;
-      }
-      prev = c;
-      offset += step;
-    }
-
-    return offset < size ? offset : size - 1;
   }
 
   /**

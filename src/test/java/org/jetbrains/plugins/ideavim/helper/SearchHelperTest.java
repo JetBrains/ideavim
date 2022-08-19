@@ -18,8 +18,8 @@
 
 package org.jetbrains.plugins.ideavim.helper;
 
+import com.maddyhome.idea.vim.api.VimSearchHelperBase;
 import com.maddyhome.idea.vim.command.VimStateMachine;
-import com.maddyhome.idea.vim.helper.SearchHelper;
 import com.maddyhome.idea.vim.helper.SearchHelperKtKt;
 import org.jetbrains.plugins.ideavim.SkipNeovimReason;
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim;
@@ -29,7 +29,7 @@ public class SearchHelperTest extends VimTestCase {
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   public void testFindNextWord() {
     String text = "first second";
-    int nextWordPosition = SearchHelper.findNextWord(text, 0, text.length(), 1, true, false);
+    int nextWordPosition = (int)VimSearchHelperBase.Companion.findNextWord(text, 0, text.length(), 1, true, false);
 
     assertEquals(nextWordPosition, text.indexOf("second"));
   }
@@ -37,7 +37,7 @@ public class SearchHelperTest extends VimTestCase {
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   public void testFindSecondNextWord() {
     String text = "first second third";
-    int nextWordPosition = SearchHelper.findNextWord(text, 0, text.length(), 2, true, false);
+    int nextWordPosition = (int)VimSearchHelperBase.Companion.findNextWord(text, 0, text.length(), 2, true, false);
 
     assertEquals(nextWordPosition, text.indexOf("third"));
   }
@@ -45,7 +45,7 @@ public class SearchHelperTest extends VimTestCase {
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   public void testFindAfterLastWord() {
     String text = "first second";
-    int nextWordPosition = SearchHelper.findNextWord(text, 0, text.length(), 3, true, false);
+    int nextWordPosition = (int)VimSearchHelperBase.Companion.findNextWord(text, 0, text.length(), 3, true, false);
 
     assertEquals(nextWordPosition, text.length());
   }
@@ -53,7 +53,8 @@ public class SearchHelperTest extends VimTestCase {
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   public void testFindPreviousWord() {
     String text = "first second";
-    int previousWordPosition = SearchHelper.findNextWord(text, text.indexOf("second"), text.length(), -1, true, false);
+    int previousWordPosition =
+      (int)VimSearchHelperBase.Companion.findNextWord(text, text.indexOf("second"), text.length(), -1, true, false);
 
     //noinspection ConstantConditions
     assertEquals(previousWordPosition, text.indexOf("first"));
@@ -62,7 +63,8 @@ public class SearchHelperTest extends VimTestCase {
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   public void testFindSecondPreviousWord() {
     String text = "first second third";
-    int previousWordPosition = SearchHelper.findNextWord(text, text.indexOf("third"), text.length(), -2, true, false);
+    int previousWordPosition =
+      (int)VimSearchHelperBase.Companion.findNextWord(text, text.indexOf("third"), text.length(), -2, true, false);
 
     //noinspection ConstantConditions
     assertEquals(previousWordPosition, text.indexOf("first"));
@@ -71,7 +73,8 @@ public class SearchHelperTest extends VimTestCase {
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   public void testFindBeforeFirstWord() {
     String text = "first second";
-    int previousWordPosition = SearchHelper.findNextWord(text, text.indexOf("second"), text.length(), -3, true, false);
+    int previousWordPosition =
+      (int)VimSearchHelperBase.Companion.findNextWord(text, text.indexOf("second"), text.length(), -3, true, false);
 
     //noinspection ConstantConditions
     assertEquals(previousWordPosition, text.indexOf("first"));
@@ -80,7 +83,8 @@ public class SearchHelperTest extends VimTestCase {
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   public void testFindPreviousWordWhenCursorOutOfBound() {
     String text = "first second";
-    int previousWordPosition = SearchHelper.findNextWord(text, text.length(), text.length(), -1, true, false);
+    int previousWordPosition =
+      (int)VimSearchHelperBase.Companion.findNextWord(text, text.length(), text.length(), -1, true, false);
 
     assertEquals(previousWordPosition, text.indexOf("second"));
   }

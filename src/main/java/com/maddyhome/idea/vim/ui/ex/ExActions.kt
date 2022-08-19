@@ -21,7 +21,7 @@ package com.maddyhome.idea.vim.ui.ex
 import com.intellij.openapi.diagnostic.logger
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.helper.SearchHelper
+import com.maddyhome.idea.vim.api.VimSearchHelperBase
 import com.maddyhome.idea.vim.newapi.vim
 import java.awt.event.ActionEvent
 import java.awt.event.KeyEvent
@@ -238,14 +238,14 @@ class DeletePreviousWordAction : TextAction(DefaultEditorKit.deletePrevWordActio
     target.saveLastEntry()
     val doc = target.document
     val caret = target.caret
-    val offset = SearchHelper.findNextWord(
-      target.actualText, caret.dot, target.actualText.length,
+    val offset = VimSearchHelperBase.Companion.findNextWord(
+      target.actualText, caret.dot.toLong(), target.actualText.length.toLong(),
       -1, false, false
     )
     if (logger.isDebugEnabled) logger.debug("offset=$offset")
     try {
       val pos = caret.dot
-      doc.remove(offset, pos - offset)
+      doc.remove(offset.toInt(), (pos - offset).toInt())
     } catch (ex: BadLocationException) {
       // ignore
     }

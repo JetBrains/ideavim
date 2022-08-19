@@ -3,14 +3,14 @@ package com.maddyhome.idea.vim.newapi
 import com.intellij.openapi.components.Service
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.VimSearchHelper
+import com.maddyhome.idea.vim.api.VimSearchHelperBase
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.helper.SearchHelper
 import com.maddyhome.idea.vim.helper.SearchOptions
 import java.util.*
 
 @Service
-class IjVimSearchHelper : VimSearchHelper {
+class IjVimSearchHelper : VimSearchHelperBase() {
   override fun findNextParagraph(editor: VimEditor, caret: VimCaret, count: Int, allowBlanks: Boolean): Int {
     return SearchHelper.findNextParagraph(
       (editor as IjVimEditor).editor,
@@ -119,15 +119,6 @@ class IjVimSearchHelper : VimSearchHelper {
     spaceWords: Boolean,
   ): Int {
     return SearchHelper.findNextWordEnd(chars, pos, size, count, bigWord, spaceWords)
-  }
-
-  override fun findNextWord(editor: VimEditor, searchFrom: Int, count: Int, bigWord: Boolean): Int {
-    return SearchHelper.findNextWord(
-      (editor as IjVimEditor).editor,
-      searchFrom,
-      count,
-      bigWord
-    )
   }
 
   override fun findPattern(

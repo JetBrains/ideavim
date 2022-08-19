@@ -83,7 +83,7 @@ interface VimSearchHelper {
     spaceWords: Boolean,
   ): Int
 
-  fun findNextWord(editor: VimEditor, searchFrom: Int, count: Int, bigWord: Boolean): Int
+  fun findNextWord(editor: VimEditor, searchFrom: Int, count: Int, bigWord: Boolean): Long
 
   fun findPattern(
     editor: VimEditor,
