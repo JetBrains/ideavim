@@ -260,8 +260,9 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
     fun finish(res: Boolean) {
       logger.debug("Finish visual command. Result: $res")
 
-      if (visualOperatorActionHandler.id != "VimVisualOperatorAction"
-        || injector.keyGroup.operatorFunction?.postProcessSelection() != false) {
+      if (visualOperatorActionHandler.id != "VimVisualOperatorAction" ||
+        injector.keyGroup.operatorFunction?.postProcessSelection() != false
+      ) {
         if (CommandFlags.FLAG_MULTIKEY_UNDO !in cmd.flags && CommandFlags.FLAG_EXPECT_MORE !in cmd.flags) {
           logger.debug("Not multikey undo - exit visual")
           editor.exitVisualModeNative()

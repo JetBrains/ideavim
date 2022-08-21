@@ -69,13 +69,13 @@ class CommentaryExtension : VimExtension {
       }
 
       return runWriteAction {
-          // Treat block- and character-wise selections as block comments. Be ready to fall back to if the first action
-          // isn't available
-          val actions = if (selectionType === SelectionType.LINE_WISE) {
-            listOf(IdeActions.ACTION_COMMENT_LINE, IdeActions.ACTION_COMMENT_BLOCK)
-          } else {
-            listOf(IdeActions.ACTION_COMMENT_BLOCK, IdeActions.ACTION_COMMENT_LINE)
-          }
+        // Treat block- and character-wise selections as block comments. Be ready to fall back to if the first action
+        // isn't available
+        val actions = if (selectionType === SelectionType.LINE_WISE) {
+          listOf(IdeActions.ACTION_COMMENT_LINE, IdeActions.ACTION_COMMENT_BLOCK)
+        } else {
+          listOf(IdeActions.ACTION_COMMENT_BLOCK, IdeActions.ACTION_COMMENT_LINE)
+        }
 
         val res = Ref.create<Boolean>(true)
         AsyncActionExecutionService.getInstance(editor.ij.project!!).withExecutionAfterAction(actions[0], {
