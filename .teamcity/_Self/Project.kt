@@ -39,6 +39,7 @@ object Project : Project({
 
   // Builds
   buildType(TestsForIntelliJEAP)
+  buildType(TestsForIntelliJ20222)
 
   buildType(PropertyBased)
   buildType(LongRunning)

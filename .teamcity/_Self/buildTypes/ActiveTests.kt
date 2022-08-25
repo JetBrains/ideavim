@@ -55,4 +55,4 @@ sealed class ActiveTests(buildName: String, ijVersion: String) : BuildType({
 })
 
 object TestsForIntelliJEAP : ActiveTests("Tests for IntelliJ Latest EAP", "LATEST-EAP-SNAPSHOT")
-//object TestsForIntelliJ20213 : ActiveTests("Tests for IntelliJ 2021.3", "2021.3.2")
+object TestsForIntelliJ20222 : ActiveTests("Tests for IntelliJ 2022.2", "2022.2.1")
