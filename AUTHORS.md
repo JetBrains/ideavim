@@ -32,6 +32,38 @@ Contributors:
   [![icon][github]](https://github.com/yole)
   &nbsp;
   Dmitry Jemerov
+* [![icon][mail]](mailto:tony.kay@gmail.com)
+  [![icon][github-off]](#)
+  &nbsp;
+  Tony Kay
+* [![icon][mail]](mailto:jamescmartinez@gmail.com)
+  [![icon][github-off]](#)
+  &nbsp;
+  James Martinez
+* [![icon][mail]](mailto:almas337519@gmail.com)
+  [![icon][github-off]](#)
+  &nbsp;
+  strogiyotec
+* [![icon][mail]](mailto:raimon49@hotmail.com)
+  [![icon][github-off]](#)
+  &nbsp;
+  raimon
+* [![icon][mail]](mailto:agrsbm@gmail.com)
+  [![icon][github-off]](#)
+  &nbsp;
+  Alexander Griesbaum
+* [![icon][mail]](mailto:manwe64@gmail.com)
+  [![icon][github-off]](#)
+  &nbsp;
+  Baldrs
+* [![icon][mail]](mailto:yury@shurup.com)
+  [![icon][github-off]](#)
+  &nbsp;
+  Yury V. Zaytsev
+* [![icon][mail]](mailto:jflorian@doubledog.org)
+  [![icon][github-off]](#)
+  &nbsp;
+  John Florian
 * [![icon][mail]](mailto:marquis@marquiswang.com)
   [![icon][github]](https://github.com/marquiswang)
   &nbsp;
@@ -41,7 +73,7 @@ Contributors:
   &nbsp;
   Julien Hoarau  
 * [![icon][mail]](mailto:masanobu.imai@gmail.com)
-  [![icon][github-off]](#)
+  [![icon][github]](https://github.com/masanobuimai)
   &nbsp;
   Masanobu Imai
 * [![icon][mail]](mailto:poxvuibr@gmail.com)
@@ -57,7 +89,7 @@ Contributors:
   &nbsp;
   John Lindquist
 * [![icon][mail]](mailto:iklotzko@ltech.com)
-  [![icon][github-off]](#)
+  [![icon][github]](https://github.com/iklotzko)
   &nbsp;
   Ira Klotzko
 * [![icon][mail]](mailto:alex@selesse.com)
@@ -193,7 +225,7 @@ Contributors:
   &nbsp;
   Marcel Hild
 * [![icon][mail]](mailto:vedranb@gmail.com)
-  [![icon][github-off]](#)
+  [![icon][github]](https://github.com/vedran)
   &nbsp;
   Vedran Budimcic
 * [![icon][mail]](mailto:andreigasparovici1@gmail.com)
