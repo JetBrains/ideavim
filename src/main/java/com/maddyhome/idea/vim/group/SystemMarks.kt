@@ -61,7 +61,10 @@ internal fun Project.createLineBookmark(editor: Editor, line: Int, mnemonic: Cha
   val type = BookmarkType.get(mnemonic)
   if (type == BookmarkType.DEFAULT) return null
 
-  val group = bookmarksManager.defaultGroup ?: bookmarksManager.addGroup("IdeaVim", true) ?: return null
+  val group = bookmarksManager.defaultGroup
+    ?: bookmarksManager.getGroup("IdeaVim")
+    ?: bookmarksManager.addGroup("IdeaVim", true)
+    ?: return null
   if (group.canAdd(bookmark)) {
     group.add(bookmark, type)
     return bookmark
