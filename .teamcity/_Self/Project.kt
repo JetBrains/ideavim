@@ -6,6 +6,7 @@ import _Self.buildTypes.Nvim
 import _Self.buildTypes.PluginVerifier
 import _Self.buildTypes.PropertyBased
 import _Self.buildTypes.Qodana
+import _Self.buildTypes.TestsForIntelliJ20222
 import _Self.buildTypes.TestsForIntelliJEAP
 import _Self.subprojects.GitHub
 import _Self.subprojects.OldTests
