@@ -73,7 +73,7 @@ public class MacroGroup extends VimMacroBase {
       final Runnable run = () -> {
         // Handle one keystroke then queue up the next key
         if (keyStack.hasStroke()) {
-          KeyHandler.getInstance().handleKey(editor, keyStack.feedStroke(), context);
+          KeyHandler.getInstance().handleKey(editor, keyStack.feedStroke(), context, true, false, true);
         }
         if (keyStack.hasStroke()) {
           playbackKeys(editor, context, cnt, total);
@@ -105,7 +105,7 @@ public class MacroGroup extends VimMacroBase {
               return;
             }
             ProgressManager.getInstance().executeNonCancelableSection(() -> {
-              KeyHandler.getInstance().handleKey(editor, key, context);
+              KeyHandler.getInstance().handleKey(editor, key, context, true, false, true);
             });
           }
           keyStack.resetFirst();

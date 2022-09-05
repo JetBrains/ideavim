@@ -18,6 +18,7 @@
 
 package com.maddyhome.idea.vim.command
 
+import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimActionsInitiator
 import com.maddyhome.idea.vim.common.CurrentCommandState
 import com.maddyhome.idea.vim.diagnostic.debug
@@ -156,13 +157,14 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode<VimActi
     return commandParts.peek()?.argument != null
   }
 
-  fun buildCommand(): Command {
+  fun buildCommand(context: ExecutionContext): Command {
     if (commandParts.last.action.id == "VimInsertCompletedDigraphAction" || commandParts.last.action.id == "VimResetModeAction") {
       expectedArgumentType = prevExpectedArgumentType
       prevExpectedArgumentType = null
       return commandParts.removeLast()
     }
 
+    val original = ArrayDeque(commandParts)
     var command: Command = commandParts.removeFirst()
     while (commandParts.size > 0) {
       val next = commandParts.removeFirst()
@@ -174,17 +176,22 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode<VimActi
         command = next
       } else {
         command.argument = Argument(next)
-        assert(commandParts.size == 0)
+//        assert(commandParts.size == 0)
       }
+    }
+    if (context.isNewDelegate()) {
+      commandParts.addAll(original)
     }
     expectedArgumentType = null
     return command
   }
 
-  fun resetAll(commandPartNode: CommandPartNode<VimActionsInitiator>) {
+  fun resetAll(commandPartNode: CommandPartNode<VimActionsInitiator>, setNewCommand: Boolean = true) {
     resetInProgressCommandPart(commandPartNode)
-    commandState = CurrentCommandState.NEW_COMMAND
-    commandParts.clear()
+    if (setNewCommand) {
+      commandState = CurrentCommandState.NEW_COMMAND
+      commandParts.clear()
+    }
     keyList.clear()
     expectedArgumentType = null
     prevExpectedArgumentType = null

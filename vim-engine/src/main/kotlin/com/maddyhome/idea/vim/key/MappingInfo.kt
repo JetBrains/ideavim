@@ -175,7 +175,9 @@ class ToHandlerMappingInfo(
           injector.application.invokeLater {
             KeyHandler.getInstance().finishedCommandPreparation(
               editor,
-              context, VimStateMachine.getInstance(editor), VimStateMachine.getInstance(editor).commandBuilder, null, false
+              context,
+              null,
+              false
             )
           }
         }

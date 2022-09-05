@@ -29,6 +29,36 @@ import org.jetbrains.plugins.ideavim.VimTestCase
  * @author Alex Plate
  */
 class MotionDownActionTest : VimTestCase() {
+  fun `test simple motion down`() {
+    val keys = injector.parser.parseKeys("j")
+    val before = """
+            I found it in a ${c}legendary land
+            all rocks and lavender and tufted grass,
+    """.trimIndent()
+    val after = """
+            I found it in a legendary land
+            all rocks and la${c}vender and tufted grass,
+    """.trimIndent()
+    configureByText(before)
+    typeText(keys)
+    assertState(after)
+  }
+
+  fun `test simple motion down multicaret`() {
+    val keys = injector.parser.parseKeys("j")
+    val before = """
+            I found it in a ${c}legendary ${c}land
+            all rocks and lavender and tufted grass,
+    """.trimIndent()
+    val after = """
+            I found it in a legendary land
+            all rocks and la${c}vender and${c} tufted grass,
+    """.trimIndent()
+    configureByText(before)
+    typeText(keys)
+    assertState(after)
+  }
+
   fun `test motion down in visual block mode`() {
     val keys = "<C-V>2kjjj"
     val before = """

@@ -76,10 +76,14 @@ abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
 
   fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
     val action = { caret: VimCaret -> doExecute(editor, caret, context, operatorArguments) }
-    if (myRunForEachCaret) {
-      editor.forEachCaret(action)
+    if (!context.isNewDelegate()) {
+      if (myRunForEachCaret) {
+        editor.forEachCaret(action)
+      } else {
+        action(editor.primaryCaret())
+      }
     } else {
-      action(editor.primaryCaret())
+      action(editor.currentCaret())
     }
   }
 

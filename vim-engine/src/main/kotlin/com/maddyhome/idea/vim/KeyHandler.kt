@@ -56,6 +56,11 @@ import java.awt.event.KeyEvent
 import java.util.function.Consumer
 import javax.swing.KeyStroke
 
+
+data class KeyRoundInfo(
+  var commandState: CurrentCommandState,
+)
+
 /**
  * This handles every keystroke that the user can argType except those that are still valid hotkeys for various Idea
  * actions. This is a singleton.
@@ -67,6 +72,13 @@ class KeyHandler {
   val keyStack = KeyStack()
   val modalEntryKeys: MutableList<KeyStroke> = ArrayList()
 
+  fun handleKeyInitial(editor: VimEditor, key: KeyStroke, context: ExecutionContext, execute: Boolean = true): StateUpdateResult {
+    if (editor.vimStateMachine.commandBuilder.isReady) {
+      editor.vimStateMachine.commandBuilder.resetAll(getKeyRoot(editor.vimStateMachine.mappingState.mappingMode))
+    }
+    return handleKey(editor, key, context, execute)
+  }
+
   /**
    * This is the main key handler for the Vim plugin. Every keystroke not handled directly by Idea is sent here for
    * processing.
@@ -75,9 +87,14 @@ class KeyHandler {
    * @param key     The keystroke typed by the user
    * @param context The data context
    */
-  fun handleKey(editor: VimEditor, key: KeyStroke, context: ExecutionContext) {
-    handleKey(editor, key, context, allowKeyMappings = true, mappingCompleted = false)
+  fun handleKey(editor: VimEditor, key: KeyStroke, context: ExecutionContext, execute: Boolean = true): StateUpdateResult {
+    return handleKey(editor, key, context, allowKeyMappings = true, mappingCompleted = false, execute)
   }
+
+  data class StateUpdateResult(
+    val continueExecution: Boolean,
+    val shouldRecord: Boolean,
+  )
 
   /**
    * Handling input keys with additional parameters
@@ -93,7 +110,8 @@ class KeyHandler {
     context: ExecutionContext,
     allowKeyMappings: Boolean,
     mappingCompleted: Boolean,
-  ) {
+    execute: Boolean = true,
+  ): StateUpdateResult {
     LOG.trace {
       """
         ------- Key Handler -------
@@ -112,7 +130,7 @@ class KeyHandler {
       injector.messages.showStatusBarMessage(injector.messages.message("E223"))
       injector.messages.indicateError()
       LOG.warn("Key handling, maximum recursion of the key received. maxdepth=$mapMapDepth")
-      return
+      return StateUpdateResult(false, false)
     }
 
     injector.messages.clearError()
@@ -186,17 +204,20 @@ class KeyHandler {
     } finally {
       handleKeyRecursionCount--
     }
-    finishedCommandPreparation(editor, context, editorState, commandBuilder, key, shouldRecord)
+    if (execute) {
+      finishedCommandPreparation(editor, context, key, shouldRecord)
+    }
+    return StateUpdateResult(true, shouldRecord)
   }
 
   fun finishedCommandPreparation(
     editor: VimEditor,
     context: ExecutionContext,
-    editorState: VimStateMachine,
-    commandBuilder: CommandBuilder,
     key: KeyStroke?,
     shouldRecord: Boolean,
   ) {
+    val editorState = editor.vimStateMachine
+    val commandBuilder = editorState.commandBuilder
     // Do we have a fully entered command at this point? If so, let's execute it.
     if (commandBuilder.isReady) {
       LOG.trace("Ready command builder. Execute command.")
@@ -657,7 +678,7 @@ class KeyHandler {
     editorState: VimStateMachine,
   ) {
     LOG.trace("Command execution")
-    val command = editorState.commandBuilder.buildCommand()
+    val command = editorState.commandBuilder.buildCommand(context)
     val operatorArguments = OperatorArguments(
       editorState.mappingState.mappingMode == MappingMode.OP_PENDING,
       command.rawCount, editorState.mode, editorState.subMode
@@ -866,7 +887,9 @@ class KeyHandler {
   ) : Runnable {
     override fun run() {
       val editorState = getInstance(editor)
-      editorState.commandBuilder.commandState = CurrentCommandState.NEW_COMMAND
+      if (!context.isNewDelegate()) {
+        editorState.commandBuilder.commandState = CurrentCommandState.NEW_COMMAND
+      }
       val register = cmd.register
       if (register != null) {
         injector.registerGroup.selectRegister(register)
