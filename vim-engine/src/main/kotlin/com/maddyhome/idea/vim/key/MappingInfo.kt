@@ -96,7 +96,7 @@ class ToKeysMappingInfo(
 
   override fun execute(editor: VimEditor, context: ExecutionContext) {
     LOG.debug("Executing 'ToKeys' mapping info...")
-    val editorDataContext = injector.executionContextManager.onEditor(editor, context)
+    val editorDataContext = injector.executionContextManager.onEditor(editor, context).withOldDelegate(editor)
     val fromIsPrefix = KeyHandler.isPrefix(fromKeys, toKeys)
     val keyHandler = KeyHandler.getInstance()
     keyHandler.keyStack.addKeys(toKeys)
@@ -104,7 +104,7 @@ class ToKeysMappingInfo(
     while (keyHandler.keyStack.hasStroke()) {
       val keyStroke = keyHandler.keyStack.feedStroke()
       val recursive = isRecursive && !(first && fromIsPrefix)
-      keyHandler.handleKey(editor, keyStroke, editorDataContext, recursive, false)
+      keyHandler.handleKey(editor, keyStroke, editorDataContext, recursive, false, directTyping = true)
       first = false
     }
     keyHandler.keyStack.removeFirst()

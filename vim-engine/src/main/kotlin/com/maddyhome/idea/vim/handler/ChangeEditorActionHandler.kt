@@ -87,18 +87,28 @@ sealed class ChangeEditorActionHandler : EditorActionHandlerBase(false) {
     try {
       when (this) {
         is ForEachCaret -> {
-          editor.forEachNativeCaret(
-            { current ->
-              if (!current.isValid) return@forEachNativeCaret
-              if (!execute(editor, current, context, cmd.argument, operatorArguments)) {
-                worked[0] = false
-              }
-            },
-            true
-          )
+          if (!context.isNewDelegate()) {
+            editor.forEachNativeCaret(
+              { current ->
+                if (!current.isValid) return@forEachNativeCaret
+                if (!execute(editor, current, context, cmd.argument, operatorArguments)) {
+                  worked[0] = false
+                }
+              },
+              true
+            )
+          } else {
+            worked[0] = execute(editor, caret, context, cmd.argument, operatorArguments)
+          }
         }
         is SingleExecution -> {
-          worked[0] = execute(editor, context, cmd.argument, operatorArguments)
+          if (!context.isNewDelegate()) {
+            worked[0] = execute(editor, context, cmd.argument, operatorArguments)
+          } else {
+            if (caret == editor.primaryCaret()) {
+              worked[0] = execute(editor, context, cmd.argument, operatorArguments)
+            }
+          }
         }
       }
     } catch (e: java.lang.Exception) {
@@ -114,7 +124,9 @@ sealed class ChangeEditorActionHandler : EditorActionHandlerBase(false) {
     if (worked[0]) {
       VimRepeater.saveLastChange(cmd)
       VimRepeater.repeatHandler = false
-      editor.forEachNativeCaret({ it.vimLastColumn = it.getVisualPosition().column })
+      editor.carets().forEach {
+        it.vimLastColumn = it.getVisualPosition().column
+      }
     }
 
     val toSwitch = editor.vimChangeActionSwitchMode

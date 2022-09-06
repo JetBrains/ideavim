@@ -28,6 +28,7 @@ interface ExecutionContext {
   // TODO: 10.02.2022 Not sure about this method
   fun updateEditor(editor: VimEditor): ExecutionContext
   fun isNewDelegate(): Boolean
+  fun withOldDelegate(editor: VimEditor): ExecutionContext
 }
 
 interface ExecutionContextManager {

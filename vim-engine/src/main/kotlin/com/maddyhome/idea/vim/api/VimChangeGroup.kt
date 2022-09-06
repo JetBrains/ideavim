@@ -79,7 +79,7 @@ interface VimChangeGroup {
     operatorArguments: OperatorArguments
   ): Boolean
 
-  fun processKey(editor: VimEditor, context: ExecutionContext, key: KeyStroke): Boolean
+  fun processKey(editor: VimEditor, context: ExecutionContext, key: KeyStroke, directTyping: Boolean): Boolean
 
   fun processKeyInSelectMode(editor: VimEditor, context: ExecutionContext, key: KeyStroke): Boolean
 
@@ -199,5 +199,6 @@ interface VimChangeGroup {
   )
 
   fun type(vimEditor: VimEditor, context: ExecutionContext, key: Char)
+  fun typeDirectly(vimEditor: VimEditor, context: ExecutionContext, key: Char)
   fun replaceText(editor: VimEditor, start: Int, end: Int, str: String)
 }
