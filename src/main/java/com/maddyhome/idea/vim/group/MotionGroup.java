@@ -23,8 +23,10 @@ import com.intellij.openapi.editor.ex.util.EditorUtil;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.fileEditor.TextEditor;
+import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx;
 import com.intellij.openapi.fileEditor.impl.EditorTabbedContainer;
 import com.intellij.openapi.fileEditor.impl.EditorWindow;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
@@ -1168,15 +1170,25 @@ public class MotionGroup extends VimMotionGroupBase {
 
   @Override
   public int moveCaretGotoPreviousTab(@NotNull VimEditor editor, @NotNull ExecutionContext context, int rawCount) {
-    switchEditorTab(EditorWindow.DATA_KEY.getData((DataContext)context.getContext()), rawCount >= 1 ? -rawCount : -1, false);
+    Project project = ((IjVimEditor)editor).getEditor().getProject();
+    if (project == null) {
+      return editor.currentCaret().getOffset().getPoint();
+    }
+    EditorWindow currentWindow = FileEditorManagerEx.getInstanceEx(project).getSplitters().getCurrentWindow();
+    switchEditorTab(currentWindow, rawCount >= 1 ? -rawCount : -1, false);
     return editor.currentCaret().getOffset().getPoint();
   }
 
   @Override
   public int moveCaretGotoNextTab(@NotNull VimEditor editor, @NotNull ExecutionContext context, int rawCount) {
     final boolean absolute = rawCount >= 1;
-    switchEditorTab(EditorWindow.DATA_KEY.getData((DataContext)context.getContext()), absolute ? rawCount - 1 : 1,
-                    absolute);
+
+    Project project = ((IjVimEditor)editor).getEditor().getProject();
+    if (project == null) {
+      return editor.currentCaret().getOffset().getPoint();
+    }
+    EditorWindow currentWindow = FileEditorManagerEx.getInstanceEx(project).getSplitters().getCurrentWindow();
+    switchEditorTab(currentWindow, absolute ? rawCount - 1 : 1, absolute);
     return editor.currentCaret().getOffset().getPoint();
   }
 
