@@ -9,7 +9,7 @@ import javax.swing.KeyStroke
 
 abstract class VimCaretBase : VimCaret
 
-open class CaretRegisterStorageBase(private val isCaretPrimary: Boolean) : CaretRegisterStorage, VimRegisterGroupBase() {
+open class CaretRegisterStorageBase(private val caret: VimCaret) : CaretRegisterStorage, VimRegisterGroupBase() {
   override var lastRegisterChar: Char
     get() {
       return injector.registerGroup.lastRegisterChar
@@ -17,7 +17,7 @@ open class CaretRegisterStorageBase(private val isCaretPrimary: Boolean) : Caret
     set(_) {}
 
   override fun storeText(editor: VimEditor, range: TextRange, type: SelectionType, isDelete: Boolean): Boolean {
-    if (isCaretPrimary) {
+    if (caret.isPrimary) {
       return injector.registerGroup.storeText(editor, range, type, isDelete)
     }
     val register = lastRegisterChar
@@ -28,14 +28,14 @@ open class CaretRegisterStorageBase(private val isCaretPrimary: Boolean) : Caret
   }
 
   override fun getRegister(r: Char): Register? {
-    if (isCaretPrimary || !RegisterConstants.RECORDABLE_REGISTERS.contains(r)) {
+    if (caret.isPrimary || !RegisterConstants.RECORDABLE_REGISTERS.contains(r)) {
       return injector.registerGroup.getRegister(r)
     }
     return super.getRegister(r) ?: injector.registerGroup.getRegister(r)
   }
 
   override fun setKeys(register: Char, keys: List<KeyStroke>) {
-    if (isCaretPrimary) {
+    if (caret.isPrimary) {
       injector.registerGroup.setKeys(register, keys)
     }
     if (!RegisterConstants.RECORDABLE_REGISTERS.contains(register)) {
@@ -45,7 +45,7 @@ open class CaretRegisterStorageBase(private val isCaretPrimary: Boolean) : Caret
   }
 
   override fun saveRegister(r: Char, register: Register) {
-    if (isCaretPrimary) {
+    if (caret.isPrimary) {
       injector.registerGroup.saveRegister(r, register)
     }
     if (!RegisterConstants.RECORDABLE_REGISTERS.contains(r)) {

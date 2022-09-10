@@ -22,6 +22,7 @@ interface VimCaret {
   val vimLeadSelectionOffset: Int
   var vimLastVisualOperatorRange: VisualChange?
   val vimLine: Int
+  val isPrimary: Boolean
   fun moveToOffset(offset: Int)
   fun moveToOffsetNative(offset: Int)
   fun moveToLogicalPosition(logicalPosition: VimLogicalPosition)

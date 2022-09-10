@@ -53,7 +53,7 @@ class IjVimCaret(val caret: Caret) : VimCaretBase() {
     get() {
       var storage = this.caret.registerStorage
       if (storage == null) {
-        storage = CaretRegisterStorageBase(editor.primaryCaret().ij == caret)
+        storage = CaretRegisterStorageBase(this)
         this.caret.registerStorage = storage
       }
       return storage
@@ -87,6 +87,8 @@ class IjVimCaret(val caret: Caret) : VimCaretBase() {
     }
   override val vimLine: Int
     get() = this.caret.vimLine
+  override val isPrimary: Boolean
+    get() = editor.primaryCaret().ij == this.caret
 
   override fun moveToOffset(offset: Int) {
     // TODO: 17.12.2021 Unpack internal actions
