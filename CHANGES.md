@@ -30,6 +30,7 @@ usual beta standards.
 * [VIM-1903](https://youtrack.jetbrains.com/issue/VIM-1903) Autoindent now works in rider
 * [VIM-2744](https://youtrack.jetbrains.com/issue/VIM-2744) Fix undo from ex line
 * [VIM-2749](https://youtrack.jetbrains.com/issue/VIM-2749) Fix :tabn and :tabN commands
+* [VIM-2718](https://youtrack.jetbrains.com/issue/VIM-2718) Fixed case where the primary caret was changed
 
 ## 1.11.0, 2022-08-09
 
