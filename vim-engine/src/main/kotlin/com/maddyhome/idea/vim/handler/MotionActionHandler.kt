@@ -201,8 +201,7 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
               }
             }
           }
-        }
-        else {
+        } else {
           doExecuteForEach(
             editor,
             caret,

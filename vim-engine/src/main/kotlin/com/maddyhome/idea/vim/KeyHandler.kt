@@ -56,7 +56,6 @@ import java.awt.event.KeyEvent
 import java.util.function.Consumer
 import javax.swing.KeyStroke
 
-
 data class KeyRoundInfo(
   var commandState: CurrentCommandState,
 )
