@@ -152,7 +152,6 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
 
     when (this) {
       is SingleExecution -> run {
-        if (context.isNewDelegate() && !(caret == editor.currentCaret())) return@run
         if (!preOffsetComputation(editor, context, cmd)) return@run
 
         val offset = getOffset(editor, context, cmd.argument, operatorArguments)
@@ -178,74 +177,32 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
         }
       }
       is ForEachCaret -> run {
-        if (!context.isNewDelegate()) {
-          when {
-            blockSubmodeActive || editor.carets().size == 1 -> {
-              val primaryCaret = editor.primaryCaret()
-              doExecuteForEach(editor, primaryCaret, context, cmd, operatorArguments)
-            }
-            else -> {
-              try {
-                editor.addCaretListener(CaretMergingWatcher)
-                editor.forEachCaret { caret ->
-                  doExecuteForEach(
-                    editor,
-                    caret,
-                    context,
-                    cmd,
-                    operatorArguments
-                  )
-                }
-              } finally {
-                editor.removeCaretListener(CaretMergingWatcher)
+        when {
+          blockSubmodeActive || editor.carets().size == 1 -> {
+            val primaryCaret = editor.primaryCaret()
+            doExecuteForEach(editor, primaryCaret, context, cmd, operatorArguments)
+          }
+          else -> {
+            try {
+              editor.addCaretListener(CaretMergingWatcher)
+              editor.forEachCaret { caret ->
+                doExecuteForEach(
+                  editor,
+                  caret,
+                  context,
+                  cmd,
+                  operatorArguments
+                )
               }
+            } finally {
+              editor.removeCaretListener(CaretMergingWatcher)
             }
           }
-        } else {
-          doExecuteForEach(
-            editor,
-            caret,
-            context,
-            cmd,
-            operatorArguments
-          )
         }
       }
     }
 
     return true
-  }
-
-  private fun SingleExecution.singleAction(
-    editor: VimEditor,
-    context: ExecutionContext,
-    cmd: Command,
-    operatorArguments: OperatorArguments,
-  ) {
-    if (!preOffsetComputation(editor, context, cmd)) return
-
-    val offset = getOffset(editor, context, cmd.argument, operatorArguments)
-
-    when (offset) {
-      is Motion.AbsoluteOffset -> {
-        var resultOffset = offset.offset
-        if (resultOffset < 0) {
-          logger.error("Offset is less than 0. $resultOffset. ${this.javaClass.name}")
-        }
-        if (CommandFlags.FLAG_SAVE_JUMP in cmd.flags) {
-          injector.markGroup.saveJumpLocation(editor)
-        }
-        if (!editor.isEndAllowed) {
-          resultOffset = injector.engineEditorHelper.normalizeOffset(editor, resultOffset, false)
-        }
-        preMove(editor, context, cmd)
-        editor.primaryCaret().moveToOffset(resultOffset)
-        postMove(editor, context, cmd)
-      }
-
-      is Motion.Error -> injector.messages.indicateError()
-      is Motion.NoMotion -> Unit
-    }
   }
 
   private fun doExecuteForEach(

@@ -82,7 +82,7 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
       // Should we use HelperKt.getTopLevelEditor(editor) here, as we did in former EditorKeyHandler?
       try {
         val start = if (traceTime) System.currentTimeMillis() else null
-        KeyHandler.getInstance().handleKeyInitial(editor.vim, keyStroke, EditorDataContext.init(editor, e.dataContext).vim)
+        KeyHandler.getInstance().handleKey(editor.vim, keyStroke, EditorDataContext.init(editor, e.dataContext).vim)
         if (start != null) {
           val duration = System.currentTimeMillis() - start
           LOG.info("VimShortcut update '$keyStroke': $duration ms")

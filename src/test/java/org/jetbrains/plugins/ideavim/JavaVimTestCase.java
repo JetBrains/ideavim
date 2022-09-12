@@ -99,7 +99,7 @@ public abstract class JavaVimTestCase extends JavaCodeInsightFixtureTestCase {
           exEntryPanel.handleKey(key);
         }
         else {
-          keyHandler.handleKey(new IjVimEditor(editor), key, new IjExecutionContext(dataContext), true);
+          keyHandler.handleKey(new IjVimEditor(editor), key, new IjExecutionContext(dataContext));
         }
       }
     }, null, null);

@@ -18,7 +18,6 @@
 package com.maddyhome.idea.vim.helper
 
 import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.actionSystem.DataKey
 import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.util.Key
@@ -28,9 +27,6 @@ class EditorDataContext @Deprecated("Please use `init` method") constructor(
   private val editor: Editor,
   private val contextDelegate: DataContext? = null,
 ) : DataContext, UserDataHolder {
-
-  internal var newTypingDelegate = false
-
   /**
    * Returns the object corresponding to the specified data identifier. Some of the supported data identifiers are
    * defined in the [PlatformDataKeys] class.
@@ -42,7 +38,6 @@ class EditorDataContext @Deprecated("Please use `init` method") constructor(
     PlatformDataKeys.EDITOR.name == dataId -> editor
     PlatformDataKeys.PROJECT.name == dataId -> editor.project
     PlatformDataKeys.VIRTUAL_FILE.name == dataId -> EditorHelper.getVirtualFile(editor)
-    NEW_DELEGATE.name == dataId -> newTypingDelegate
     else -> contextDelegate?.getData(dataId)
   }
 
@@ -76,5 +71,3 @@ class EditorDataContext @Deprecated("Please use `init` method") constructor(
     }
   }
 }
-
-internal val NEW_DELEGATE = DataKey.create<Boolean>("IdeaVim.NEW_DELEGATE")

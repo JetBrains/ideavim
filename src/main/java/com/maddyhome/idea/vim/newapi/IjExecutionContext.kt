@@ -22,15 +22,10 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.helper.EditorDataContext
-import com.maddyhome.idea.vim.helper.NEW_DELEGATE
 
 class IjExecutionContext(override val context: DataContext) : ExecutionContext {
   override fun updateEditor(editor: VimEditor): ExecutionContext {
     return IjExecutionContext(EditorDataContext.init((editor as IjVimEditor).editor, context))
-  }
-
-  override fun isNewDelegate(): Boolean {
-    return context.getData(NEW_DELEGATE) ?: false
   }
 }
 
