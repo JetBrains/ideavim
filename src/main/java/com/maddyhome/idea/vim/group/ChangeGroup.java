@@ -27,7 +27,10 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.command.UndoConfirmationPolicy;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.editor.*;
+import com.intellij.openapi.editor.Caret;
+import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.editor.event.EditorMouseEvent;
 import com.intellij.openapi.editor.event.EditorMouseListener;
 import com.intellij.openapi.editor.impl.TextRangeInterval;
@@ -173,15 +176,6 @@ public class ChangeGroup extends VimChangeGroupBase {
     MotionGroup.scrollCaretIntoView(editor);
   }
 
-  @Override
-  public void typeDirectly(@NotNull VimEditor vimEditor, @NotNull ExecutionContext context, char key) {
-    Editor editor = ((IjVimEditor)vimEditor).getEditor();
-    final Document doc = ((IjVimEditor)vimEditor).getEditor().getDocument();
-    CommandProcessor.getInstance().executeCommand(editor.getProject(), () -> ApplicationManager.getApplication()
-                                                    .runWriteAction(() -> EditorModificationUtilEx.insertStringAtCaret(editor, Character.toString(key))), "", doc,
-                                                  UndoConfirmationPolicy.DEFAULT, doc);
-    MotionGroup.scrollCaretIntoView(editor);
-  }
 
 
   @Override

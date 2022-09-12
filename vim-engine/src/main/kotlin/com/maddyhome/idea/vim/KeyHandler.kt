@@ -110,7 +110,6 @@ class KeyHandler {
     allowKeyMappings: Boolean,
     mappingCompleted: Boolean,
     execute: Boolean = true,
-    directTyping: Boolean = false
   ): StateUpdateResult {
     LOG.trace {
       """
@@ -186,7 +185,7 @@ class KeyHandler {
             // If we are in insert/replace mode send this key in for processing
             if (editorState.mode == VimStateMachine.Mode.INSERT || editorState.mode == VimStateMachine.Mode.REPLACE) {
               LOG.trace("Process insert or replace")
-              shouldRecord = injector.changeGroup.processKey(editor, context, key, directTyping) && shouldRecord
+              shouldRecord = injector.changeGroup.processKey(editor, context, key) && shouldRecord
             } else if (editorState.mode == VimStateMachine.Mode.SELECT) {
               LOG.trace("Process select")
               shouldRecord = injector.changeGroup.processKeyInSelectMode(editor, context, key) && shouldRecord

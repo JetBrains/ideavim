@@ -25,12 +25,10 @@ import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.helper.EditorDataContext
 import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.helper.inNormalMode
 import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
-import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.newapi.vim
 import javax.swing.KeyStroke
 
@@ -94,8 +92,8 @@ class VimTypedDelegateHandler : TypedHandlerDelegate() {
   }
 }
 
-internal val charsByDelegate = setOf('j', 'd')
+internal val charsByDelegate = setOf('j')
 
 internal fun useNewHandler(editor: VimEditor, c: Char): Boolean {
-  return c in charsByDelegate && (editor.inNormalMode || editor.mode == VimStateMachine.Mode.OP_PENDING)
+  return c in charsByDelegate && editor.inNormalMode
 }

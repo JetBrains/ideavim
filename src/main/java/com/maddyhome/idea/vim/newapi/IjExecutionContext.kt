@@ -32,12 +32,6 @@ class IjExecutionContext(override val context: DataContext) : ExecutionContext {
   override fun isNewDelegate(): Boolean {
     return context.getData(NEW_DELEGATE) ?: false
   }
-
-  override fun withOldDelegate(editor: VimEditor): ExecutionContext {
-    val context1 = EditorDataContext((editor as IjVimEditor).editor, context)
-    context1.newTypingDelegate = false
-    return IjExecutionContext(context1)
-  }
 }
 
 val DataContext.vim

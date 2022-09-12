@@ -699,25 +699,16 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     editor: VimEditor,
     context: ExecutionContext,
     key: KeyStroke,
-    directTyping: Boolean,
   ): Boolean {
     logger.debug { "processKey($key)" }
     if (key.keyChar != KeyEvent.CHAR_UNDEFINED) {
-      if (directTyping) {
-        typeDirectly(editor, context, key.keyChar)
-      } else {
-        type(editor, context, key.keyChar)
-      }
+      type(editor, context, key.keyChar)
       return true
     }
 
     // Shift-space
     if (key.keyCode == 32 && key.modifiers and KeyEvent.SHIFT_DOWN_MASK != 0) {
-      if (directTyping) {
-        typeDirectly(editor, context, ' ')
-      } else {
-        type(editor, context, ' ')
-      }
+      type(editor, context, ' ')
       return true
     }
     return false
@@ -730,7 +721,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
   ): Boolean {
     var res: Boolean
     SelectionVimListenerSuppressor.lock().use {
-      res = processKey(editor, context, key, false)
+      res = processKey(editor, context, key)
       editor.exitSelectModeNative(false)
       KeyHandler.getInstance().reset(editor)
       if (isPrintableChar(key.keyChar) || activeTemplateWithLeftRightMotion(editor, key)) {
