@@ -121,6 +121,20 @@ n  ,f            <Plug>Foo
     assertState("quux\n")
   }
 
+  fun testddWithMapping() {
+    configureByText("""
+      Hello${c} 1
+      Hello 2
+    """.trimIndent())
+    typeText(commandToKeys("nmap dc k"))
+    typeText(injector.parser.parseKeys("dd"))
+    assertState(
+      """
+      Hello 2
+        """.trimIndent()
+    )
+  }
+
   fun testNonRecursiveMapping() {
     configureByText("\n")
     typeText(commandToKeys("inoremap a b"))

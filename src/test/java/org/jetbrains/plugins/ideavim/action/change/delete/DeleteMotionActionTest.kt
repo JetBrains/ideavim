@@ -49,6 +49,23 @@ class DeleteMotionActionTest : VimTestCase() {
     )
   }
 
+  fun `test on line in middle`() {
+    typeTextInFile(
+      injector.parser.parseKeys("dd"),
+      """
+        def xxx():
+          expression${c} one
+          expression two
+      """.trimIndent()
+    )
+    assertState(
+      """
+        def xxx():
+          ${c}expression two
+      """.trimIndent()
+    )
+  }
+
   fun `test delete single line`() {
     typeTextInFile(
       injector.parser.parseKeys("dd"),
