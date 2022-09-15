@@ -92,26 +92,6 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
       argument: Argument?,
       operatorArguments: OperatorArguments
     ): Motion
-
-    /**
-     * This method is called before [getOffset].
-     * The method executes only once.
-     */
-    open fun preOffsetComputation(editor: VimEditor, context: ExecutionContext, cmd: Command): Boolean = true
-
-    /**
-     * This method is called after [getOffset], but before caret motion.
-     *
-     * The method executes only once.
-     */
-    open fun preMove(editor: VimEditor, context: ExecutionContext, cmd: Command) = Unit
-
-    /**
-     * This method is called after [getOffset] and after caret motion.
-     *
-     * The method executes only once it there is block selection.
-     */
-    open fun postMove(editor: VimEditor, context: ExecutionContext, cmd: Command) = Unit
   }
 
   abstract val motionType: MotionType
@@ -142,12 +122,10 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
 
     when (this) {
       is SingleExecution -> run {
-        if (!preOffsetComputation(editor, context, cmd)) return@run
-
         val offset = getOffset(editor, context, cmd.argument, operatorArguments)
 
         when (offset) {
-          is Motion.AbsoluteOffset -> moveToAbsoluteOffset(editor, context, cmd, offset)
+          is Motion.AbsoluteOffset -> moveToAbsoluteOffset(editor, cmd, offset)
           is Motion.Error -> injector.messages.indicateError()
           is Motion.NoMotion -> Unit
         }
@@ -200,13 +178,11 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
   }
 
   private fun SingleExecution.moveToAbsoluteOffset(editor: VimEditor,
-                                                   context: ExecutionContext,
+
                                                    cmd: Command,
                                                    offset: Motion.AbsoluteOffset) {
     val normalisedOffset = prepareMoveToAbsoluteOffset(editor, cmd, offset)
-    preMove(editor, context, cmd)
     editor.primaryCaret().moveToOffset(normalisedOffset)
-    postMove(editor, context, cmd)
   }
 
   private fun ForEachCaret.moveToAbsoluteOffset(editor: VimEditor,
