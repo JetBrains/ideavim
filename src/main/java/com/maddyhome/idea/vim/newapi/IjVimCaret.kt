@@ -11,7 +11,6 @@ package com.maddyhome.idea.vim.newapi
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.editor.VisualPosition
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.CaretRegisterStorage
 import com.maddyhome.idea.vim.api.CaretRegisterStorageBase
 import com.maddyhome.idea.vim.api.VimCaret
@@ -91,10 +90,6 @@ class IjVimCaret(val caret: Caret) : VimCaretBase() {
 
   override fun moveToLogicalPosition(logicalPosition: VimLogicalPosition) {
     this.caret.moveToLogicalPosition(LogicalPosition(logicalPosition.line, logicalPosition.column, logicalPosition.leansForward))
-  }
-
-  override fun offsetForLineStartSkipLeading(line: Int): Int {
-    return VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, line)
   }
 
   override fun getLine(): EditorLine.Pointer {
