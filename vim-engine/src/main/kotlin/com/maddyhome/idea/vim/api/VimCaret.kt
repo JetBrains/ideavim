@@ -28,6 +28,10 @@ interface VimCaret {
   fun getVisualPosition(): VimVisualPosition
 
   fun getLine(): EditorLine.Pointer
+
+  /**
+   * Return the buffer line of the caret as a 1-based value, as used by VimScript
+   */
   val vimLine: Int
 
   var vimLastColumn: Int
@@ -50,9 +54,6 @@ interface VimCaret {
   fun moveToInlayAwareOffset(newOffset: Int)
   fun moveToVisualPosition(position: VimVisualPosition)
   fun moveToLogicalPosition(logicalPosition: VimLogicalPosition)
-
-  // TODO: This doesn't belong in caret
-  fun offsetForLineStartSkipLeading(line: Int): Int
 
   val visualLineStart: Int
   var vimInsertStart: LiveRange

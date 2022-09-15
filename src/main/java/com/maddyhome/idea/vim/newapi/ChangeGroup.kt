@@ -36,8 +36,6 @@ import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.inlayAwareVisualColumn
 import com.maddyhome.idea.vim.helper.vimChangeActionSwitchMode
 import com.maddyhome.idea.vim.helper.vimLastColumn
-import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
 
 fun changeRange(
   editor: Editor,
@@ -76,7 +74,7 @@ fun changeRange(
         EditorLine.Pointer.init(0, vimEditor)
       }
 
-      val offset = vimCaret.offsetForLineWithStartOfLineOption(existingLine)
+      val offset = injector.motion.moveCaretToLineWithStartOfLineOption(vimEditor, existingLine.line, vimCaret)
       // TODO: 29.12.2021 IndentConfig is not abstract
       val indentText = IndentConfig.create(editor).createIndentBySize(indent)
       vimEditor.insertText(offset.offset, indentText)
@@ -121,11 +119,11 @@ fun deleteRange(
       is OperatedRange.Lines -> {
         if (deletedInfo.shiftType != LineDeleteShift.NL_ON_START) {
           val line = deletedInfo.lineAbove.toPointer(editor)
-          val offset = caret.offsetForLineWithStartOfLineOption(line)
+          val offset = injector.motion.moveCaretToLineWithStartOfLineOption(editor, line.line, caret)
           caret.moveToOffset(offset)
         } else {
           val logicalLine = EditorLine.Pointer.init((deletedInfo.lineAbove.line - 1).coerceAtLeast(0), editor)
-          val offset = caret.offsetForLineWithStartOfLineOption(logicalLine)
+          val offset = injector.motion.moveCaretToLineWithStartOfLineOption(editor, logicalLine.line, caret)
           caret.moveToOffset(offset)
         }
       }
@@ -202,14 +200,6 @@ fun insertLineAround(editor: VimEditor, context: ExecutionContext, shift: Int) {
   }
 
   MotionGroup.scrollCaretIntoView(editor.editor)
-}
-
-fun VimCaret.offsetForLineWithStartOfLineOption(logicalLine: EditorLine.Pointer): Int {
-  return if (VimPlugin.getOptionService().isSet(OptionScope.LOCAL(editor), OptionConstants.startoflineName)) {
-    offsetForLineStartSkipLeading(logicalLine.line)
-  } else {
-    VimPlugin.getMotion().moveCaretToLineWithSameColumn(editor, logicalLine.line, this)
-  }
 }
 
 fun VimEditor.indentForLine(line: Int): Int {
