@@ -10,7 +10,7 @@ package com.maddyhome.idea.vim.listener
 
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.diagnostic.vimLogger
-import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.options.helpers.StrictMode
 import java.io.Closeable
 
 /**
@@ -70,9 +70,7 @@ sealed class VimListenerSuppressor {
   }
 
   fun reset() {
-    if (caretListenerSuppressor != 0 && injector.optionService.isSet(OptionScope.GLOBAL, "ideastrictmode")) {
-      error("Listener is not zero")
-    }
+    StrictMode.assert(caretListenerSuppressor == 0, "Listener is not zero")
     caretListenerSuppressor = 0
   }
 

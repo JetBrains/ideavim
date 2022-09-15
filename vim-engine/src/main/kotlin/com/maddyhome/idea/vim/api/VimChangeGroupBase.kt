@@ -917,13 +917,9 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     var endOffset = range.endOffset
     val fileSize = editor.fileSize().toInt()
     if (endOffset > fileSize) {
-      check(
-        !injector.optionService.isSet(
-          OptionScope.GLOBAL,
-          OptionConstants.ideastrictmodeName,
-          OptionConstants.ideastrictmodeName
-        )
-      ) { "Incorrect offset. File size: $fileSize, offset: $endOffset" }
+      check(!injector.optionService.isSet(OptionScope.GLOBAL, OptionConstants.ideastrictmodeName)) {
+        "Incorrect offset. File size: $fileSize, offset: $endOffset"
+      }
       endOffset = fileSize
     }
     return (type === SelectionType.LINE_WISE) && range.startOffset != 0 && editor.text()[endOffset - 1] != '\n' && endOffset == fileSize

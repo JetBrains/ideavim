@@ -21,15 +21,13 @@ import com.intellij.openapi.editor.markup.TextAttributes
 import com.intellij.openapi.util.Disposer
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.VimProjectService
-import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.VimNlsSafe
 import com.maddyhome.idea.vim.listener.VimInsertListener
 import com.maddyhome.idea.vim.listener.VimYankListener
-import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.options.helpers.StrictMode
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import org.jetbrains.annotations.NonNls
 import java.awt.Color
@@ -129,16 +127,10 @@ class VimHighlightedYank : VimExtension, VimYankListener, VimInsertListener {
 
     fun clearAllYankHighlighters() {
       yankHighlighters.forEach { highlighter ->
-        editor?.markupModel?.removeHighlighter(highlighter) ?: failIfStrictMode("Highlighters without an editor")
+        editor?.markupModel?.removeHighlighter(highlighter) ?: StrictMode.fail("Highlighters without an editor")
       }
 
       yankHighlighters.clear()
-    }
-
-    private fun failIfStrictMode(value: String) {
-      if (injector.optionService.isSet(OptionScope.GLOBAL, OptionConstants.ideastrictmodeName)) {
-        error(value)
-      }
     }
 
     private fun highlightSingleRange(editor: Editor, range: ClosedRange<Int>) {
@@ -163,7 +155,7 @@ class VimHighlightedYank : VimExtension, VimYankListener, VimInsertListener {
         Executors.newSingleThreadScheduledExecutor().schedule(
           {
             ApplicationManager.getApplication().invokeLater {
-              editor?.markupModel?.removeHighlighter(highlighter) ?: failIfStrictMode("Highlighters without an editor")
+              editor?.markupModel?.removeHighlighter(highlighter) ?: StrictMode.fail("Highlighters without an editor")
             }
           },
           timeout, TimeUnit.MILLISECONDS
