@@ -19,36 +19,46 @@ import javax.swing.KeyStroke
 
 // TODO: 29.12.2021 Split interface to mutable and immutable
 interface VimCaret {
-  val registerStorage: CaretRegisterStorage
   val editor: VimEditor
   val offset: Offset
+  val isValid: Boolean
+  val isPrimary: Boolean
+
+  fun getLogicalPosition(): VimLogicalPosition
+  fun getVisualPosition(): VimVisualPosition
+
+  fun getLine(): EditorLine.Pointer
+  val vimLine: Int
+
   var vimLastColumn: Int
   val inlayAwareVisualColumn: Int
+
+  fun hasSelection(): Boolean
   val selectionStart: Int
   val selectionEnd: Int
   var vimSelectionStart: Int
   val vimLeadSelectionOffset: Int
-  var vimLastVisualOperatorRange: VisualChange?
-  val vimLine: Int
-  val isPrimary: Boolean
-  fun moveToOffset(offset: Int)
-  fun moveToOffsetNative(offset: Int)
-  fun moveToLogicalPosition(logicalPosition: VimLogicalPosition)
-  fun offsetForLineStartSkipLeading(line: Int): Int
-  fun getLine(): EditorLine.Pointer
-  fun hasSelection(): Boolean
-  fun vimSetSystemSelectionSilently(start: Int, end: Int)
-  val isValid: Boolean
-  fun moveToInlayAwareOffset(newOffset: Int)
   fun vimSetSelection(start: Int, end: Int = start, moveCaretToSelectionEnd: Boolean = false)
-  fun getLogicalPosition(): VimLogicalPosition
-  fun getVisualPosition(): VimVisualPosition
-  val visualLineStart: Int
+  fun vimSetSystemSelectionSilently(start: Int, end: Int)
   fun updateEditorSelection()
-  var vimInsertStart: LiveRange
-  fun moveToVisualPosition(position: VimVisualPosition)
+
   fun setNativeSelection(start: Offset, end: Offset)
   fun removeNativeSelection()
+
+  fun moveToOffset(offset: Int)
+  fun moveToOffsetNative(offset: Int)
+  fun moveToInlayAwareOffset(newOffset: Int)
+  fun moveToVisualPosition(position: VimVisualPosition)
+  fun moveToLogicalPosition(logicalPosition: VimLogicalPosition)
+
+  // TODO: This doesn't belong in caret
+  fun offsetForLineStartSkipLeading(line: Int): Int
+
+  val visualLineStart: Int
+  var vimInsertStart: LiveRange
+  var vimLastVisualOperatorRange: VisualChange?
+
+  val registerStorage: CaretRegisterStorage
 }
 
 interface CaretRegisterStorage {
