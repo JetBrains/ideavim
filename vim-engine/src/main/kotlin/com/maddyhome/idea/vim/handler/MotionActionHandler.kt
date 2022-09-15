@@ -147,21 +147,7 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
         val offset = getOffset(editor, context, cmd.argument, operatorArguments)
 
         when (offset) {
-          is Motion.AbsoluteOffset -> {
-            var resultOffset = offset.offset
-            if (resultOffset < 0) {
-              logger.error("Offset is less than 0. $resultOffset. ${this.javaClass.name}")
-            }
-            if (CommandFlags.FLAG_SAVE_JUMP in cmd.flags) {
-              injector.markGroup.saveJumpLocation(editor)
-            }
-            if (!editor.isEndAllowed) {
-              resultOffset = injector.engineEditorHelper.normalizeOffset(editor, resultOffset, false)
-            }
-            preMove(editor, context, cmd)
-            editor.primaryCaret().moveToOffset(resultOffset)
-            postMove(editor, context, cmd)
-          }
+          is Motion.AbsoluteOffset -> moveToAbsoluteOffset(editor, context, cmd, offset)
           is Motion.Error -> injector.messages.indicateError()
           is Motion.NoMotion -> Unit
         }
@@ -195,38 +181,60 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
     return true
   }
 
-  private fun doExecuteForEach(
+  private fun ForEachCaret.doExecuteForEach(
     editor: VimEditor,
     caret: VimCaret,
     context: ExecutionContext,
     cmd: Command,
     operatorArguments: OperatorArguments
   ) {
-    this as ForEachCaret
     if (!preOffsetComputation(editor, caret, context, cmd)) return
 
     val offset = getOffset(editor, caret, context, cmd.argument, operatorArguments)
 
     when (offset) {
-      is Motion.AbsoluteOffset -> {
-        var resultMotion = offset.offset
-        if (resultMotion < 0) {
-          logger.error("Offset is less than 0. $resultMotion. ${this.javaClass.name}")
-        }
-        if (CommandFlags.FLAG_SAVE_JUMP in cmd.flags) {
-          injector.markGroup.saveJumpLocation(editor)
-        }
-        if (!editor.isEndAllowed) {
-          resultMotion = injector.engineEditorHelper.normalizeOffset(editor, resultMotion, false)
-        }
-        preMove(editor, caret, context, cmd)
-        caret.moveToOffset(resultMotion)
-        val postMoveCaret = if (editor.inBlockSubMode) editor.primaryCaret() else caret
-        postMove(editor, postMoveCaret, context, cmd)
-      }
+      is Motion.AbsoluteOffset -> moveToAbsoluteOffset(editor, caret, context, cmd, offset)
       is Motion.Error -> injector.messages.indicateError()
       is Motion.NoMotion -> Unit
     }
+  }
+
+  private fun SingleExecution.moveToAbsoluteOffset(editor: VimEditor,
+                                                   context: ExecutionContext,
+                                                   cmd: Command,
+                                                   offset: Motion.AbsoluteOffset) {
+    val normalisedOffset = prepareMoveToAbsoluteOffset(editor, cmd, offset)
+    preMove(editor, context, cmd)
+    editor.primaryCaret().moveToOffset(normalisedOffset)
+    postMove(editor, context, cmd)
+  }
+
+  private fun ForEachCaret.moveToAbsoluteOffset(editor: VimEditor,
+                                                caret: VimCaret,
+                                                context: ExecutionContext,
+                                                cmd: Command,
+                                                offset: Motion.AbsoluteOffset) {
+    val normalisedOffset = prepareMoveToAbsoluteOffset(editor, cmd, offset)
+    preMove(editor, caret, context, cmd)
+    caret.moveToOffset(normalisedOffset)
+    val postMoveCaret = if (editor.inBlockSubMode) editor.primaryCaret() else caret
+    postMove(editor, postMoveCaret, context, cmd)
+  }
+
+  private fun prepareMoveToAbsoluteOffset(editor: VimEditor,
+                                          cmd: Command,
+                                          offset: Motion.AbsoluteOffset): Int {
+    var resultOffset = offset.offset
+    if (resultOffset < 0) {
+      logger.error("Offset is less than 0. $resultOffset. ${this.javaClass.name}")
+    }
+    if (CommandFlags.FLAG_SAVE_JUMP in cmd.flags) {
+      injector.markGroup.saveJumpLocation(editor)
+    }
+    if (!editor.isEndAllowed) {
+      resultOffset = injector.engineEditorHelper.normalizeOffset(editor, resultOffset, false)
+    }
+    return resultOffset
   }
 
   private object CaretMergingWatcher : VimCaretListener {
