@@ -122,16 +122,18 @@ n  ,f            <Plug>Foo
   }
 
   fun testddWithMapping() {
-    configureByText("""
-      Hello${c} 1
+    configureByText(
+      """
+      Hello$c 1
       Hello 2
-    """.trimIndent())
+      """.trimIndent()
+    )
     typeText(commandToKeys("nmap dc k"))
     typeText(injector.parser.parseKeys("dd"))
     assertState(
       """
       Hello 2
-        """.trimIndent()
+      """.trimIndent()
     )
   }
 
