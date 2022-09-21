@@ -53,7 +53,7 @@ class IjVimCaret(val caret: Caret) : VimCaretBase() {
     get() {
       var storage = this.caret.registerStorage
       if (storage == null) {
-        storage = CaretRegisterStorageBase(this)
+        storage = CaretRegisterStorageBase()
         this.caret.registerStorage = storage
       }
       return storage

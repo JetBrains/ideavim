@@ -44,17 +44,18 @@ interface VimCaret {
 }
 
 interface CaretRegisterStorage {
+  // todo methods shouldn't have caret in signature
   /**
    * Stores text to caret's recordable (named/numbered/unnamed) register
    */
-  fun storeText(editor: VimEditor, range: TextRange, type: SelectionType, isDelete: Boolean): Boolean
+  fun storeText(caret: VimCaret, editor: VimEditor, range: TextRange, type: SelectionType, isDelete: Boolean): Boolean
 
   /**
    * Gets text from caret's recordable register
    * If the register is not recordable - global text state will be returned
    */
-  fun getRegister(r: Char): Register?
+  fun getRegister(caret: VimCaret, r: Char): Register?
 
-  fun setKeys(register: Char, keys: List<KeyStroke>)
-  fun saveRegister(r: Char, register: Register)
+  fun setKeys(caret: VimCaret, register: Char, keys: List<KeyStroke>)
+  fun saveRegister(caret: VimCaret, r: Char, register: Register)
 }

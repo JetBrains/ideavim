@@ -152,7 +152,7 @@ class ReplaceWithRegister : VimExtension {
 
     private fun doReplace(editor: Editor, caret: VimCaret, visualSelection: PutData.VisualSelection) {
       val lastRegisterChar = injector.registerGroup.lastRegisterChar
-      val savedRegister = caret.registerStorage.getRegister(lastRegisterChar) ?: return
+      val savedRegister = caret.registerStorage.getRegister(caret, lastRegisterChar) ?: return
 
       var usedType = savedRegister.type
       var usedText = savedRegister.text
@@ -185,8 +185,8 @@ class ReplaceWithRegister : VimExtension {
         )
       }
 
-      caret.registerStorage.saveRegister(savedRegister.name, savedRegister)
-      caret.registerStorage.saveRegister(VimPlugin.getRegister().defaultRegister, savedRegister)
+      caret.registerStorage.saveRegister(caret, savedRegister.name, savedRegister)
+      caret.registerStorage.saveRegister(caret, VimPlugin.getRegister().defaultRegister, savedRegister)
     }
   }
 }
