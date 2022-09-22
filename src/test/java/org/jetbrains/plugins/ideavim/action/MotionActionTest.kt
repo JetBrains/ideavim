@@ -20,6 +20,7 @@ package org.jetbrains.plugins.ideavim.action
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -1038,5 +1039,17 @@ two
       """.trimIndent()
     )
     assertOffset(4)
+  }
+
+  fun `test gv after backwards selection`() {
+    configureByText("${c}Oh, hi Mark\n")
+    typeText(parseKeys("yw" + "$"+ "vb" + "p" + "gv"))
+    assertSelection("Oh")
+  }
+
+  fun `test gv after linewise selection`() {
+    configureByText("${c}Oh, hi Mark\nOh, hi Markus\n")
+    typeText(parseKeys("V" + "y"+ "j" + "V" + "p" + "gv"))
+    assertSelection("Oh, hi Mark")
   }
 }

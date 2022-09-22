@@ -190,7 +190,12 @@ class PutGroup : VimPutBase() {
           }
         }
         visualSelection.typeInEditor.isLine -> {
-          if (caret.offset == editor.fileSize && editor.fileSize != 0) {
+          val lastChar = if (editor.fileSize > 0) {
+            editor.document.getText(com.intellij.openapi.util.TextRange(editor.fileSize - 1, editor.fileSize))[0]
+          } else {
+            null
+          }
+          if (caret.offset == editor.fileSize && editor.fileSize != 0 && lastChar != '\n') {
             application.runWriteAction { editor.document.insertString(caret.offset, "\n") }
             listOf(caret.offset + 1)
           } else listOf(caret.offset)

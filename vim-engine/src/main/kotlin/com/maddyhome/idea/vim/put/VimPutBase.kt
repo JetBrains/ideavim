@@ -67,15 +67,18 @@ abstract class VimPutBase : VimPut {
     val caretsAndSelections = data.visualSelection?.caretsAndSelections ?: return
     val selection = caretsAndSelections[currentCaret] ?: caretsAndSelections.firstOrNull()?.value ?: return
 
-    var fistIndex = selection.vimStart
-    val lastIndex = fistIndex + textLength - 1
+    val leftIndex = min(selection.vimStart, selection.vimEnd)
+    val rightIndex = leftIndex + textLength - 1
 
-    if (wasTextInsertedLineWise(text)) {
-      // here we skip the \n char before the inserted text
-      fistIndex += 1
+    val rangeForMarks = if (wasTextInsertedLineWise(text)) {
+      // here we skip the \n char after the inserted text
+      TextRange(leftIndex, rightIndex - 1)
+    } else {
+      TextRange(leftIndex, rightIndex)
     }
 
-    injector.markGroup.setVisualSelectionMarks(editor, TextRange(fistIndex, lastIndex))
+    editor.vimLastSelectionType = SelectionType.CHARACTER_WISE
+    injector.markGroup.setVisualSelectionMarks(editor, rangeForMarks)
   }
 
   protected fun deleteSelectedText(editor: VimEditor, data: PutData, operatorArguments: OperatorArguments) {

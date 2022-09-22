@@ -38,8 +38,8 @@ class MarksCommandTest : VimTestCase() {
     assertState(
       """I found it in a legendary land
                       |all rocks and lavender and tufted grass,
-                      |${s}all rocks and lavender and tufted grass,
-                      |${se}hard by the torrent of a mountain pass.
+                      |${s}all rocks and lavender and tufted grass,${se}
+                      |hard by the torrent of a mountain pass.
                     """.trimMargin()
     )
   }
