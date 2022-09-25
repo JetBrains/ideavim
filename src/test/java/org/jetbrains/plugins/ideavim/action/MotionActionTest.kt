@@ -1043,13 +1043,13 @@ two
 
   fun `test gv after backwards selection`() {
     configureByText("${c}Oh, hi Mark\n")
-    typeText(parseKeys("yw" + "$"+ "vb" + "p" + "gv"))
+    typeText(parseKeys("yw" + "$" + "vb" + "p" + "gv"))
     assertSelection("Oh")
   }
 
   fun `test gv after linewise selection`() {
     configureByText("${c}Oh, hi Mark\nOh, hi Markus\n")
-    typeText(parseKeys("V" + "y"+ "j" + "V" + "p" + "gv"))
+    typeText(parseKeys("V" + "y" + "j" + "V" + "p" + "gv"))
     assertSelection("Oh, hi Mark")
   }
 }
