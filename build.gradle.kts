@@ -335,8 +335,15 @@ tasks.register("slackNotification") {
     }
 }
 
-// --- Update authors
+// Uncomment to enable FUS testing mode
+//tasks {
+//    withType<org.jetbrains.intellij.tasks.RunIdeTask> {
+//        jvmArgs("-Didea.is.internal=true")
+//        jvmArgs("-Dfus.internal.test.mode=true")
+//    }
+//}
 
+// --- Update authors
 tasks.register("updateAuthors") {
     doLast {
         val uncheckedEmails = setOf(

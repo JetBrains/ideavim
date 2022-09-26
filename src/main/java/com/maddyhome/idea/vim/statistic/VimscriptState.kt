@@ -59,8 +59,8 @@ internal class VimscriptState : ApplicationUsagesCollector() {
     var isFunctionDeclarationUsed = false
     var isFunctionCallUsed = false
 
-    private val SOURCED_FILES = EventFields.Int("number_of_sourced_files")
-    private val IDEAVIMRC_SIZE = EventFields.Int("ideavimrc_size")
+    private val SOURCED_FILES = EventFields.RoundedInt("number_of_sourced_files")
+    private val IDEAVIMRC_SIZE = EventFields.RoundedInt("ideavimrc_size")
     private val EXTENSIONS_ENABLED_BY_SET = EventFields.StringList("extensions_enabled_by_set", PluginState.extensionNames)
     private val EXTENSIONS_ENABLED_BY_PLUG = EventFields.StringList("extensions_enabled_by_plug", PluginState.extensionNames)
     private val IS_IDE_SPECIFIC_CONFIGURATION_USED = EventFields.Boolean("is_IDE-specific_configuration_used")
