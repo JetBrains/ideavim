@@ -240,10 +240,13 @@ Contributors:
   [![icon][github]](https://github.com/TonyArra)
   &nbsp;
   Tony Arra
-* [![icon][mail]](mailto:bradziolko@gmail.com)
-  [![icon][github]](https://github.com/bradziolko)
+* [![icon][mail]](mailto:mj@ziolko.dev)
+  [![icon][github]](https://github.com/mjziolko)
   &nbsp;
-  Brad Ziolko
+  Madeline Ziolko
+  [Original contribution from:
+  [![icon][mail]](mailto:bradziolko@gmail.com)
+  [![icon][github]](https://github.com/bradziolko)]
 * [![icon][mail]](mailto:sumoooru2@gmail.com)
   [![icon][github]](https://github.com/sumoooru2)
   &nbsp;
