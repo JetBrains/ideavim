@@ -23,7 +23,6 @@ import com.intellij.internal.statistic.eventLog.EventLogGroup
 import com.intellij.internal.statistic.eventLog.events.EventFields
 import com.intellij.internal.statistic.eventLog.events.EventPair
 import com.intellij.internal.statistic.eventLog.events.StringListEventField
-import com.intellij.internal.statistic.eventLog.events.VarargEventId
 import com.intellij.internal.statistic.service.fus.collectors.ApplicationUsagesCollector
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
@@ -47,7 +46,7 @@ internal class ShortcutConflictState : ApplicationUsagesCollector() {
     return metrics
   }
 
-fun StringListEventField.withKeyStroke(ks: KeyStroke): EventPair<List<String>> {
+  fun StringListEventField.withKeyStroke(ks: KeyStroke): EventPair<List<String>> {
     return this.with(getHandlersForShortcut(ks).map { it.name })
   }
 
