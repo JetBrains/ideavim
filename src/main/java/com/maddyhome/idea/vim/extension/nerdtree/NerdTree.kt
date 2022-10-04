@@ -345,7 +345,7 @@ class NerdTree : VimExtension {
         if (file.isDirectory) return@Code
         val splitters = FileEditorManagerEx.getInstanceEx(project).splitters
         val currentWindow = splitters.currentWindow
-        currentWindow.split(SwingConstants.HORIZONTAL, true, file, true)
+        currentWindow?.split(SwingConstants.HORIZONTAL, true, file, true)
       }
     )
     registerCommand(
@@ -354,7 +354,7 @@ class NerdTree : VimExtension {
         val file = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return@Code
         val splitters = FileEditorManagerEx.getInstanceEx(project).splitters
         val currentWindow = splitters.currentWindow
-        currentWindow.split(SwingConstants.VERTICAL, true, file, true)
+        currentWindow?.split(SwingConstants.VERTICAL, true, file, true)
 
         // FIXME: 22.01.2021 This solution bouncing a bit
         callAction("ActivateProjectToolWindow", context.vim)
@@ -366,7 +366,7 @@ class NerdTree : VimExtension {
         val file = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return@Code
         val splitters = FileEditorManagerEx.getInstanceEx(project).splitters
         val currentWindow = splitters.currentWindow
-        currentWindow.split(SwingConstants.HORIZONTAL, true, file, true)
+        currentWindow?.split(SwingConstants.HORIZONTAL, true, file, true)
 
         callAction("ActivateProjectToolWindow", context.vim)
       }
