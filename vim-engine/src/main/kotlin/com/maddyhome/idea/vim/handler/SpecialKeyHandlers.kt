@@ -183,18 +183,18 @@ abstract class NonShiftedSpecialKeyHandler : MotionActionHandler.ForEachCaret() 
       editor.exitVisualModeNative()
     }
 
-    return offset(editor, caret, context, operatorArguments.count1, operatorArguments.count0, argument).toMotionOrError()
+    return motion(editor, caret, context, operatorArguments.count1, operatorArguments.count0, argument)
   }
 
   /**
    * Calculate new offset for current [caret]
    */
-  abstract fun offset(
+  abstract fun motion(
     editor: VimEditor,
     caret: VimCaret,
     context: ExecutionContext,
     count: Int,
     rawCount: Int,
     argument: Argument?,
-  ): Int
+  ): Motion
 }
