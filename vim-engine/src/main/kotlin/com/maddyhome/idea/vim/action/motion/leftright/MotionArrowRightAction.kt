@@ -15,7 +15,9 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.MotionType
+import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.NonShiftedSpecialKeyHandler
+import com.maddyhome.idea.vim.handler.toMotionOrError
 import com.maddyhome.idea.vim.helper.isEndAllowed
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
@@ -28,15 +30,15 @@ class MotionArrowRightAction : NonShiftedSpecialKeyHandler(), ComplicatedKeysAct
     listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_RIGHT, 0))
   )
 
-  override fun offset(
+  override fun motion(
     editor: VimEditor,
     caret: VimCaret,
     context: ExecutionContext,
     count: Int,
     rawCount: Int,
     argument: Argument?,
-  ): Int {
+  ): Motion {
     val allowPastEnd = editor.isEndAllowed
-    return injector.motion.getOffsetOfHorizontalMotion(editor, caret, count, allowPastEnd)
+    return injector.motion.getOffsetOfHorizontalMotion(editor, caret, count, allowPastEnd).toMotionOrError()
   }
 }

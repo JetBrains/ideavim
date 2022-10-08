@@ -15,7 +15,9 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.MotionType
+import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.NonShiftedSpecialKeyHandler
+import com.maddyhome.idea.vim.handler.toMotionOrError
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
@@ -25,14 +27,14 @@ class MotionArrowLeftAction : NonShiftedSpecialKeyHandler(), ComplicatedKeysActi
   override val keyStrokesSet: Set<List<KeyStroke>> =
     setOf(injector.parser.parseKeys("<Left>"), listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_LEFT, 0)))
 
-  override fun offset(
+  override fun motion(
     editor: VimEditor,
     caret: VimCaret,
     context: ExecutionContext,
     count: Int,
     rawCount: Int,
     argument: Argument?,
-  ): Int {
-    return injector.motion.getOffsetOfHorizontalMotion(editor, caret, -count, false)
+  ): Motion {
+    return injector.motion.getOffsetOfHorizontalMotion(editor, caret, -count, false).toMotionOrError()
   }
 }

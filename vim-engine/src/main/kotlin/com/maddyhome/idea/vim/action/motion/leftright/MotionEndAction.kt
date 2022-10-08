@@ -16,6 +16,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.MotionType
+import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.NonShiftedSpecialKeyHandler
 import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.helper.inSelectMode
@@ -27,14 +28,14 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 class MotionEndAction : NonShiftedSpecialKeyHandler() {
   override val motionType: MotionType = MotionType.INCLUSIVE
 
-  override fun offset(
+  override fun motion(
     editor: VimEditor,
     caret: VimCaret,
     context: ExecutionContext,
     count: Int,
     rawCount: Int,
     argument: Argument?,
-  ): Int {
+  ): Motion {
     var allow = false
     if (editor.inInsertMode) {
       allow = true
@@ -48,14 +49,11 @@ class MotionEndAction : NonShiftedSpecialKeyHandler() {
       }
     }
 
-    return injector.motion.moveCaretToRelativeLineEnd(editor, caret, count - 1, allow)
+    val offset = injector.motion.moveCaretToRelativeLineEnd(editor, caret, count - 1, allow)
+    return Motion.AdjustedOffset(offset, VimMotionGroupBase.LAST_COLUMN)
   }
 
   override fun preMove(editor: VimEditor, caret: VimCaret, context: ExecutionContext, cmd: Command) {
-    caret.vimLastColumn = VimMotionGroupBase.LAST_COLUMN
-  }
-
-  override fun postMove(editor: VimEditor, caret: VimCaret, context: ExecutionContext, cmd: Command) {
     caret.vimLastColumn = VimMotionGroupBase.LAST_COLUMN
   }
 }

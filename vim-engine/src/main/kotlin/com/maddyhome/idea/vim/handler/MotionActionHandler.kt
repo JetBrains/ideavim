@@ -22,6 +22,7 @@ import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.helper.inBlockSubMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.isEndAllowed
+import com.maddyhome.idea.vim.options.helpers.StrictMode
 
 /**
  * @author Alex Plate
@@ -125,6 +126,7 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
         val offset = getOffset(editor, context, cmd.argument, operatorArguments)
 
         when (offset) {
+          is Motion.AdjustedOffset -> moveToAdjustedOffset(editor, caret, cmd, offset)
           is Motion.AbsoluteOffset -> moveToAbsoluteOffset(editor, cmd, offset)
           is Motion.Error -> injector.messages.indicateError()
           is Motion.NoMotion -> Unit
@@ -171,16 +173,30 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
     val offset = getOffset(editor, caret, context, cmd.argument, operatorArguments)
 
     when (offset) {
+      is Motion.AdjustedOffset -> moveToAdjustedOffset(editor, caret, cmd, offset)
       is Motion.AbsoluteOffset -> moveToAbsoluteOffset(editor, caret, context, cmd, offset)
       is Motion.Error -> injector.messages.indicateError()
       is Motion.NoMotion -> Unit
     }
   }
 
-  private fun SingleExecution.moveToAbsoluteOffset(editor: VimEditor,
+  private fun moveToAdjustedOffset(
+    editor: VimEditor,
+    caret: VimCaret,
+    cmd: Command,
+    offset: Motion.AdjustedOffset,
+  ) {
+    val normalisedOffset = prepareMoveToAbsoluteOffset(editor, cmd, offset)
+    StrictMode.assert(normalisedOffset == offset.offset, "Adjusted offset should be normalised by action")
+    caret.moveToOffset(normalisedOffset)
+    caret.vimLastColumn = offset.intendedColumn
+  }
 
-                                                   cmd: Command,
-                                                   offset: Motion.AbsoluteOffset) {
+  private fun moveToAbsoluteOffset(
+    editor: VimEditor,
+    cmd: Command,
+    offset: Motion.AbsoluteOffset
+  ) {
     val normalisedOffset = prepareMoveToAbsoluteOffset(editor, cmd, offset)
     editor.primaryCaret().moveToOffset(normalisedOffset)
   }
@@ -207,6 +223,8 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
     if (CommandFlags.FLAG_SAVE_JUMP in cmd.flags) {
       injector.markGroup.saveJumpLocation(editor)
     }
+
+    // TODO: This should be normalised by the action
     if (!editor.isEndAllowed) {
       resultOffset = injector.engineEditorHelper.normalizeOffset(editor, resultOffset, false)
     }
