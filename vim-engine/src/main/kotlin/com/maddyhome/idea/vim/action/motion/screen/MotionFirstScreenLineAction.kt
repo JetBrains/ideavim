@@ -12,7 +12,6 @@ import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
-import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
@@ -51,13 +50,6 @@ abstract class MotionFirstScreenLineActionBase(private val operatorPending: Bool
     // This is inside scrolloff, so Vim scrolls
     return injector.motion.moveCaretToFirstDisplayLine(editor, caret, operatorArguments.count1, !operatorPending)
       .toMotion()
-  }
-
-  override fun postMove(editor: VimEditor, caret: VimCaret, context: ExecutionContext, cmd: Command) {
-    if (operatorPending) {
-      // Convert current caret line from a 0-based logical line to a 1-based logical line
-      injector.motion.scrollCurrentLineToDisplayTop(editor, caret.vimLine, false)
-    }
   }
 }
 
