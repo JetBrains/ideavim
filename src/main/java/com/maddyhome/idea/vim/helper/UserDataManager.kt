@@ -31,6 +31,10 @@ import kotlin.reflect.KProperty
  * @author Alex Plate
  */
 
+// NOTE: Carets, including the primary caret, can be replaced when the caret is moved in visual block mode.
+// No attempt is made to maintain this user data (apart from vimLastColum which is set during caret movement)
+// Non-transient data will be lost!
+
 //region Vim selection start ----------------------------------------------------
 /**
  * Caret's offset when entering visual mode
@@ -55,15 +59,18 @@ fun Caret.vimSelectionStartClear() {
 private var Caret._vimSelectionStart: Int? by userDataCaretToEditor()
 //endregion ----------------------------------------------------
 
-// Last column excluding inlays before the caret
+// Last column excluding inlays before the caret. Reset during visual block motion
 var Caret.vimLastColumn: Int by userDataCaretToEditorOr { (this as Caret).inlayAwareVisualColumn }
+
+// TODO: Is this a per-caret setting? This data is non-transient, so could be lost during visual block motion
 var Caret.vimLastVisualOperatorRange: VisualChange? by userDataCaretToEditor()
+
+// Transient data. Does not need to be restored during visual block motion
 var Caret.vimInsertStart: RangeMarker by userDataOr {
-  (this as Caret).editor.document.createRangeMarker(
-    this.offset,
-    this.offset
-  )
+  (this as Caret).editor.document.createRangeMarker(this.offset, this.offset)
 }
+
+// TODO: Data could be lost during visual block motion
 var Caret.registerStorage: CaretRegisterStorageBase? by userDataCaretToEditor()
 
 // ------------------ Editor

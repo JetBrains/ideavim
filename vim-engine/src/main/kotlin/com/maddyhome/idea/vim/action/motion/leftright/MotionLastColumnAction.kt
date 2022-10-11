@@ -20,7 +20,6 @@ import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
-import com.maddyhome.idea.vim.handler.toMotion
 import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.isEndAllowed
@@ -55,11 +54,8 @@ open class MotionLastColumnAction : MotionActionHandler.ForEachCaret() {
       if (operatorArguments.isOperatorPending) false else editor.isEndAllowed
     }
 
-    return injector.motion.moveCaretToRelativeLineEnd(editor, caret, operatorArguments.count1 - 1, allow).toMotion()
-  }
-
-  override fun postMove(editor: VimEditor, caret: VimCaret, context: ExecutionContext, cmd: Command) {
-    caret.vimLastColumn = VimMotionGroupBase.LAST_COLUMN
+    val offset = injector.motion.moveCaretToRelativeLineEnd(editor, caret, operatorArguments.count1 - 1, allow)
+    return Motion.AdjustedOffset(offset, VimMotionGroupBase.LAST_COLUMN)
   }
 
   override fun preMove(editor: VimEditor, caret: VimCaret, context: ExecutionContext, cmd: Command) {

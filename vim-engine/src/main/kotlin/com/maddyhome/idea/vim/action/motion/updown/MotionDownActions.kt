@@ -24,6 +24,28 @@ import com.maddyhome.idea.vim.handler.toMotionOrError
 sealed class MotionDownBase : MotionActionHandler.ForEachCaret() {
   private var col: Int = 0
 
+  final override fun getOffset(
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    argument: Argument?,
+    operatorArguments: OperatorArguments
+  ): Motion {
+    val motion = getMotion(editor, caret, context, argument, operatorArguments)
+    return when (motion) {
+      is Motion.AbsoluteOffset -> Motion.AdjustedOffset(motion.offset, col)
+      else -> motion
+    }
+  }
+
+  abstract fun getMotion(
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    argument: Argument?,
+    operatorArguments: OperatorArguments
+  ): Motion
+
   override fun preOffsetComputation(
     editor: VimEditor,
     caret: VimCaret,
@@ -33,17 +55,13 @@ sealed class MotionDownBase : MotionActionHandler.ForEachCaret() {
     col = injector.engineEditorHelper.prepareLastColumn(caret)
     return true
   }
-
-  override fun postMove(editor: VimEditor, caret: VimCaret, context: ExecutionContext, cmd: Command) {
-    injector.engineEditorHelper.updateLastColumn(caret, col)
-  }
 }
 
 open class MotionDownAction : MotionDownBase() {
 
   override val motionType: MotionType = MotionType.LINE_WISE
 
-  override fun getOffset(
+  override fun getMotion(
     editor: VimEditor,
     caret: VimCaret,
     context: ExecutionContext,
@@ -55,7 +73,7 @@ open class MotionDownAction : MotionDownBase() {
 }
 
 class MotionDownCtrlNAction : MotionDownAction() {
-  override fun getOffset(
+  override fun getMotion(
     editor: VimEditor,
     caret: VimCaret,
     context: ExecutionContext,
@@ -79,7 +97,7 @@ class MotionDownNotLineWiseAction : MotionDownBase() {
 
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
-  override fun getOffset(
+  override fun getMotion(
     editor: VimEditor,
     caret: VimCaret,
     context: ExecutionContext,
