@@ -59,13 +59,6 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
      * The method executes only once it there is block selection.
      */
     open fun preOffsetComputation(editor: VimEditor, caret: VimCaret, context: ExecutionContext, cmd: Command): Boolean = true
-
-    /**
-     * This method is called after [getOffset] and after caret motion.
-     *
-     * The method executes for each caret, but only once it there is block selection.
-     */
-    open fun postMove(editor: VimEditor, caret: VimCaret, context: ExecutionContext, cmd: Command) {}
   }
 
   /**
@@ -220,10 +213,6 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
                                                 offset: Motion.AbsoluteOffset) {
     val normalisedOffset = prepareMoveToAbsoluteOffset(editor, cmd, offset)
     caret.moveToOffset(normalisedOffset)
-
-    // Block selection mode might cause IntelliJ to invalidate/replace/add a new primary caret. Refresh if necessary
-    val postMoveCaret = if (editor.inBlockSubMode) editor.primaryCaret() else caret
-    postMove(editor, postMoveCaret, context, cmd)
   }
 
   private fun prepareMoveToAbsoluteOffset(editor: VimEditor,
