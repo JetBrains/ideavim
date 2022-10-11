@@ -111,9 +111,10 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
       is SingleExecution -> run {
         val offset = getOffset(editor, context, cmd.argument, operatorArguments)
 
+        // In this scenario, caret is the primary caret
         when (offset) {
           is Motion.AdjustedOffset -> moveToAdjustedOffset(editor, caret, cmd, offset)
-          is Motion.AbsoluteOffset -> moveToAbsoluteOffset(editor, cmd, offset)
+          is Motion.AbsoluteOffset -> moveToAbsoluteOffset(editor, caret, cmd, offset)
           is Motion.Error -> injector.messages.indicateError()
           is Motion.NoMotion -> Unit
         }
@@ -160,7 +161,7 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
 
     when (offset) {
       is Motion.AdjustedOffset -> moveToAdjustedOffset(editor, caret, cmd, offset)
-      is Motion.AbsoluteOffset -> moveToAbsoluteOffset(editor, caret, context, cmd, offset)
+      is Motion.AbsoluteOffset -> moveToAbsoluteOffset(editor, caret, cmd, offset)
       is Motion.Error -> injector.messages.indicateError()
       is Motion.NoMotion -> Unit
     }
@@ -197,20 +198,7 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
     }
   }
 
-  private fun moveToAbsoluteOffset(
-    editor: VimEditor,
-    cmd: Command,
-    offset: Motion.AbsoluteOffset
-  ) {
-    val normalisedOffset = prepareMoveToAbsoluteOffset(editor, cmd, offset)
-    editor.primaryCaret().moveToOffset(normalisedOffset)
-  }
-
-  private fun ForEachCaret.moveToAbsoluteOffset(editor: VimEditor,
-                                                caret: VimCaret,
-                                                context: ExecutionContext,
-                                                cmd: Command,
-                                                offset: Motion.AbsoluteOffset) {
+  private fun moveToAbsoluteOffset(editor: VimEditor, caret: VimCaret, cmd: Command, offset: Motion.AbsoluteOffset) {
     val normalisedOffset = prepareMoveToAbsoluteOffset(editor, cmd, offset)
     caret.moveToOffset(normalisedOffset)
   }
