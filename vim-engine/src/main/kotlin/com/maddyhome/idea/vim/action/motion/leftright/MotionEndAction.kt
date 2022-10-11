@@ -14,7 +14,6 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimMotionGroupBase
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
-import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.NonShiftedSpecialKeyHandler
@@ -51,9 +50,5 @@ class MotionEndAction : NonShiftedSpecialKeyHandler() {
 
     val offset = injector.motion.moveCaretToRelativeLineEnd(editor, caret, count - 1, allow)
     return Motion.AdjustedOffset(offset, VimMotionGroupBase.LAST_COLUMN)
-  }
-
-  override fun preMove(editor: VimEditor, caret: VimCaret, context: ExecutionContext, cmd: Command) {
-    caret.vimLastColumn = VimMotionGroupBase.LAST_COLUMN
   }
 }
