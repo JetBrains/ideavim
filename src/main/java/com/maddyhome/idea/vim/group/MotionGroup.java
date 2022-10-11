@@ -43,6 +43,7 @@ import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.options.LocalOptionChangeListener;
 import com.maddyhome.idea.vim.options.OptionConstants;
 import com.maddyhome.idea.vim.options.OptionScope;
+import com.maddyhome.idea.vim.options.helpers.StrictMode;
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt;
@@ -370,7 +371,12 @@ public class MotionGroup extends VimMotionGroupBase {
     if (offset < 0 || offset > editor.getDocument().getTextLength() || !caret.isValid()) return;
 
     if (CommandStateHelper.inBlockSubMode(editor)) {
+      StrictMode.INSTANCE.assertTrue(caret == editor.getCaretModel().getPrimaryCaret(),
+                                     "Block selection can only be moved with primary caret!");
+
+      // Note that this call replaces ALL carets, so any local caret instances will be invalid!
       VisualGroupKt.vimMoveBlockSelectionToOffset(editor, offset);
+
       Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
       UserDataManager.setVimLastColumn(primaryCaret, primaryCaret.getVisualPosition().column);
       scrollCaretIntoView(editor);
@@ -381,6 +387,11 @@ public class MotionGroup extends VimMotionGroupBase {
     // changes in surrounding text, especially with inline inlays.
     final int oldOffset = caret.getOffset();
     InlayHelperKt.moveToInlayAwareOffset(caret, offset);
+
+    // TODO: Remove this. If setting LAST_COLUMN, we have to set it both before and after moveCaret
+    // But not all handlers set vimLastColumn (e.g. ShiftedArrowKeyHandler). It would be better if all handlers reset
+    // vimLastColumn so that it is either calculated on demand (current column) or explicitly set by a handler that needs
+    // special handling
     if (oldOffset != offset) {
       UserDataManager.setVimLastColumn(caret, InlayHelperKt.getInlayAwareVisualColumn(caret));
     }

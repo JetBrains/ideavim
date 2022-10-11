@@ -5,6 +5,7 @@ import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 
 object StrictMode {
+  @JvmName("assertTrue")
   fun assert(condition: Boolean, message: String) {
     if (!condition) {
       fail(message)

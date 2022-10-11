@@ -58,7 +58,9 @@ fun Caret.vimMoveSelectionToCaret() {
 
 /**
  * Move selection end to current primary caret position
- * This method is created only for block mode
+ *
+ * This method is created only for block mode. Note that this method will invalidate all carets!
+ *
  * @see vimMoveSelectionToCaret for character and line selection
  */
 fun vimMoveBlockSelectionToOffset(editor: Editor, offset: Int) {
@@ -163,11 +165,18 @@ private fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: Ca
       caret.vimSetSystemSelectionSilently(nativeStart, nativeEnd)
     }
     VimStateMachine.SubMode.VISUAL_BLOCK -> {
+      // This will invalidate any secondary carets, but we shouldn't have any of these cached in local variables, etc.
       editor.caretModel.removeSecondaryCarets()
 
       // Set system selection
       val (blockStart, blockEnd) = blockToNativeSelection(vimEditor, selectionStart, selectionEnd, mode)
       val lastColumn = editor.caretModel.primaryCaret.vimLastColumn
+
+      // WARNING! This can invalidate the primary caret! I.e. the `caret` parameter will no longer be the primary caret.
+      // Given an existing visual block selection, moving the caret will first remove all secondary carets (above) then
+      // this method will ask IntelliJ to create a new multi-caret block selection. If we're moving up (`k`) a new caret
+      // is added, and becomes the new primary caret. The current `caret` parameter remains valid, but is no longer the
+      // primary caret. Make sure to fetch the new primary caret if necessary.
       vimEditor.vimSetSystemBlockSelectionSilently(blockStart, blockEnd)
 
       // We've just added secondary carets again, hide them to better emulate block selection

@@ -12,13 +12,14 @@ import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
-import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 
 class MotionColumnAction : MotionActionHandler.ForEachCaret() {
+  override val motionType: MotionType = MotionType.EXCLUSIVE
+
   override fun getOffset(
     editor: VimEditor,
     caret: VimCaret,
@@ -26,17 +27,10 @@ class MotionColumnAction : MotionActionHandler.ForEachCaret() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    return injector.motion.moveCaretToColumn(editor, caret, operatorArguments.count1 - 1, false)
+    val motion = injector.motion.moveCaretToColumn(editor, caret, operatorArguments.count1 - 1, false)
+    return when (motion) {
+      is Motion.AbsoluteOffset -> Motion.AdjustedOffset(motion.offset, operatorArguments.count1 - 1)
+      else -> motion
+    }
   }
-
-  override fun postMove(
-    editor: VimEditor,
-    caret: VimCaret,
-    context: ExecutionContext,
-    cmd: Command,
-  ) {
-    caret.vimLastColumn = cmd.count - 1
-  }
-
-  override val motionType: MotionType = MotionType.EXCLUSIVE
 }

@@ -13,7 +13,6 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimMotionGroupBase
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
-import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.Motion
@@ -46,16 +45,11 @@ class MotionLastScreenColumnAction : MotionActionHandler.ForEachCaret() {
         allow = true
       }
     }
-    return injector.motion.moveCaretToCurrentDisplayLineEnd(editor, caret, allow)
-  }
-
-  override fun postMove(
-    editor: VimEditor,
-    caret: VimCaret,
-    context: ExecutionContext,
-    cmd: Command,
-  ) {
-    caret.vimLastColumn = VimMotionGroupBase.LAST_COLUMN
+    val motion = injector.motion.moveCaretToCurrentDisplayLineEnd(editor, caret, allow)
+    return when (motion) {
+      is Motion.AbsoluteOffset -> Motion.AdjustedOffset(motion.offset, VimMotionGroupBase.LAST_COLUMN)
+      else -> motion
+    }
   }
 
   override val motionType: MotionType = MotionType.INCLUSIVE

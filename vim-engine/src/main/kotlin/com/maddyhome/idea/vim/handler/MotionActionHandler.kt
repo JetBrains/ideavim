@@ -186,10 +186,29 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
     cmd: Command,
     offset: Motion.AdjustedOffset,
   ) {
+    // Block selection mode is emulated with multiple carets, but we only ever operate on the primary caret. Changing
+    // the selection (by moving the primary caret) can result in IntelliJ invalidating, replacing or adding a new
+    // primary caret
+    if (editor.inBlockSubMode) {
+      StrictMode.assert(caret.isPrimary, "Block selection mode must only operate on primary caret")
+    }
+
     val normalisedOffset = prepareMoveToAbsoluteOffset(editor, cmd, offset)
     StrictMode.assert(normalisedOffset == offset.offset, "Adjusted offset should be normalised by action")
-    caret.moveToOffset(normalisedOffset)
+
+    // Set before moving, so it can be applied during move, especially important for LAST_COLUMN and visual block mode
     caret.vimLastColumn = offset.intendedColumn
+
+    caret.moveToOffset(normalisedOffset)
+
+    // Visual block movement can replace the primary caret when moving the selection up, so reset the last column
+    if (editor.inBlockSubMode) {
+      editor.primaryCaret().vimLastColumn = offset.intendedColumn
+    }
+    else {
+      // TODO: Remove this - we've already set it before moving the caret, but currently moving the caret sets last col
+      caret.vimLastColumn = offset.intendedColumn
+    }
   }
 
   private fun moveToAbsoluteOffset(
@@ -209,6 +228,8 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
     val normalisedOffset = prepareMoveToAbsoluteOffset(editor, cmd, offset)
     preMove(editor, caret, context, cmd)
     caret.moveToOffset(normalisedOffset)
+
+    // Block selection mode might cause IntelliJ to invalidate/replace/add a new primary caret. Refresh if necessary
     val postMoveCaret = if (editor.inBlockSubMode) editor.primaryCaret() else caret
     postMove(editor, postMoveCaret, context, cmd)
   }
