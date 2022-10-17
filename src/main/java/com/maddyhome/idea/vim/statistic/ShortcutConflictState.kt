@@ -39,15 +39,13 @@ internal class ShortcutConflictState : ApplicationUsagesCollector() {
   override fun getMetrics(): Set<MetricEvent> {
     val metrics = mutableSetOf<MetricEvent>()
     keyStrokes.forEach { keystroke ->
-      getHandlersForShortcut(keystroke).forEach { mode ->
+      getHandlersForShortcut(keystroke)
+        .filter { !setOf(HandledModes.INSERT_UNDEFINED, HandledModes.NORMAL_UNDEFINED, HandledModes.VISUAL_AND_SELECT_UNDEFINED).contains(it) }
+        .forEach { mode ->
         metrics += HANDLER.metric(injector.parser.toKeyNotation(keystroke), mode)
       }
     }
     return metrics
-  }
-
-  fun StringListEventField.withKeyStroke(ks: KeyStroke): EventPair<List<String>> {
-    return this.with(getHandlersForShortcut(ks).map { it.name })
   }
 
   private fun getHandlersForShortcut(shortcut: KeyStroke): List<HandledModes> {
