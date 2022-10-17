@@ -19,30 +19,10 @@ import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotion
 
-sealed class MotionUpBase : MotionActionHandler.ForEachCaret() {
-  final override fun getOffset(
-    editor: VimEditor,
-    caret: VimCaret,
-    context: ExecutionContext,
-    argument: Argument?,
-    operatorArguments: OperatorArguments
-  ): Motion {
-    return getMotion(editor, caret, context, argument, operatorArguments)
-  }
-
-  abstract fun getMotion(
-    editor: VimEditor,
-    caret: VimCaret,
-    context: ExecutionContext,
-    argument: Argument?,
-    operatorArguments: OperatorArguments
-  ): Motion
-}
-
-open class MotionUpAction : MotionUpBase() {
+open class MotionUpAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.LINE_WISE
 
-  override fun getMotion(
+  override fun getOffset(
     editor: VimEditor,
     caret: VimCaret,
     context: ExecutionContext,
@@ -54,7 +34,7 @@ open class MotionUpAction : MotionUpBase() {
 }
 
 class MotionUpCtrlPAction : MotionUpAction() {
-  override fun getMotion(
+  override fun getOffset(
     editor: VimEditor,
     caret: VimCaret,
     context: ExecutionContext,
@@ -74,10 +54,10 @@ class MotionUpCtrlPAction : MotionUpAction() {
   }
 }
 
-class MotionUpNotLineWiseAction : MotionUpBase() {
+class MotionUpNotLineWiseAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
-  override fun getMotion(
+  override fun getOffset(
     editor: VimEditor,
     caret: VimCaret,
     context: ExecutionContext,

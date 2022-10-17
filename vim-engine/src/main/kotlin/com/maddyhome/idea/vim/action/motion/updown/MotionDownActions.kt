@@ -19,31 +19,10 @@ import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotion
 
-sealed class MotionDownBase : MotionActionHandler.ForEachCaret() {
-  final override fun getOffset(
-    editor: VimEditor,
-    caret: VimCaret,
-    context: ExecutionContext,
-    argument: Argument?,
-    operatorArguments: OperatorArguments
-  ): Motion {
-    return getMotion(editor, caret, context, argument, operatorArguments)
-  }
-
-  abstract fun getMotion(
-    editor: VimEditor,
-    caret: VimCaret,
-    context: ExecutionContext,
-    argument: Argument?,
-    operatorArguments: OperatorArguments
-  ): Motion
-}
-
-open class MotionDownAction : MotionDownBase() {
-
+open class MotionDownAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.LINE_WISE
 
-  override fun getMotion(
+  override fun getOffset(
     editor: VimEditor,
     caret: VimCaret,
     context: ExecutionContext,
@@ -55,7 +34,7 @@ open class MotionDownAction : MotionDownBase() {
 }
 
 class MotionDownCtrlNAction : MotionDownAction() {
-  override fun getMotion(
+  override fun getOffset(
     editor: VimEditor,
     caret: VimCaret,
     context: ExecutionContext,
@@ -75,11 +54,10 @@ class MotionDownCtrlNAction : MotionDownAction() {
   }
 }
 
-class MotionDownNotLineWiseAction : MotionDownBase() {
-
+class MotionDownNotLineWiseAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
-  override fun getMotion(
+  override fun getOffset(
     editor: VimEditor,
     caret: VimCaret,
     context: ExecutionContext,
