@@ -398,7 +398,6 @@ object VimListenerManager {
 
           // Reset caret after forceBarShape while dragging
           editor.updateCaretsVisualAttributes()
-          caret.vimLastColumn = editor.caretModel.visualPosition.column
         }
 
         mouseDragging = false
@@ -439,9 +438,6 @@ object VimListenerManager {
             KeyHandler.getInstance().reset(editor.vim)
           }
         }
-
-        // TODO: 2019-03-22 Multi?
-        caretModel.primaryCaret.vimLastColumn = caretModel.visualPosition.column
       } else if (event.area != EditorMouseEventArea.ANNOTATIONS_AREA &&
         event.area != EditorMouseEventArea.FOLDING_OUTLINE_AREA &&
         event.mouseEvent.button != MouseEvent.BUTTON3

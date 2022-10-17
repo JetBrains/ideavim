@@ -33,7 +33,6 @@ import com.maddyhome.idea.vim.common.including
 import com.maddyhome.idea.vim.common.offset
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.helper.inlayAwareVisualColumn
 import com.maddyhome.idea.vim.helper.vimChangeActionSwitchMode
 import com.maddyhome.idea.vim.helper.vimLastColumn
 
@@ -107,7 +106,6 @@ fun deleteRange(
 ): Boolean {
   val vimRange = toVimRange(range, type)
 
-  (caret as IjVimCaret).caret.vimLastColumn = caret.caret.inlayAwareVisualColumn
   val deletedInfo = injector.vimMachine.delete(vimRange, editor, caret)
   if (deletedInfo != null) {
     when (deletedInfo) {

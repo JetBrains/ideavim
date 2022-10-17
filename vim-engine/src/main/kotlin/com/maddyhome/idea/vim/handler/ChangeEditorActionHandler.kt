@@ -144,7 +144,6 @@ sealed class ChangeEditorActionHandler : EditorActionHandlerBase(false) {
     if (worked[0]) {
       VimRepeater.saveLastChange(cmd)
       VimRepeater.repeatHandler = false
-      editor.forEachNativeCaret({ it.vimLastColumn = it.getVisualPosition().column })
     }
 
     val toSwitch = editor.vimChangeActionSwitchMode

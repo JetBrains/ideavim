@@ -31,6 +31,7 @@ import com.maddyhome.idea.vim.group.visual.vimUpdateEditorSelection
 import com.maddyhome.idea.vim.helper.inlayAwareVisualColumn
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.helper.registerStorage
+import com.maddyhome.idea.vim.helper.resetVimLastColumn
 import com.maddyhome.idea.vim.helper.vimInsertStart
 import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.helper.vimLastVisualOperatorRange
@@ -56,6 +57,7 @@ class IjVimCaret(val caret: Caret) : VimCaretBase() {
     set(value) {
       caret.vimLastColumn = value
     }
+  override fun resetLastColumn() = caret.resetVimLastColumn()
   override val inlayAwareVisualColumn: Int
     get() = caret.inlayAwareVisualColumn
   override val selectionStart: Int

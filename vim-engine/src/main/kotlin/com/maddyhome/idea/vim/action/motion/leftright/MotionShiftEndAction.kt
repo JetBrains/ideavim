@@ -43,7 +43,7 @@ class MotionShiftEndAction : ShiftedSpecialKeyHandler() {
     }
 
     val newOffset = injector.motion.moveCaretToRelativeLineEnd(editor, caret, cmd.count - 1, allow)
-    caret.vimLastColumn = VimMotionGroupBase.LAST_COLUMN
+
     caret.moveToOffset(newOffset)
     caret.vimLastColumn = VimMotionGroupBase.LAST_COLUMN
   }

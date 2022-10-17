@@ -97,9 +97,6 @@ abstract class VimMachineBase : VimMachine {
    * - What caret?
    */
   override fun delete(range: VimRange, editor: VimEditor, caret: VimCaret): OperatedRange? {
-    // Update the last column before we delete, or we might be retrieving the data for a line that no longer exists
-    caret.vimLastColumn = caret.inlayAwareVisualColumn
-
     val operatedText = editor.deleteDryRun(range) ?: return null
 
     val normalizedRange = operatedText.toNormalizedTextRange(editor)

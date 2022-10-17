@@ -368,6 +368,12 @@ public class MotionGroup extends VimMotionGroupBase {
     moveCaret(((IjVimEditor) editor).getEditor(), ((IjVimCaret) caret).getCaret(), offset);
   }
 
+  /** Move the caret to the given offset
+   * <p>
+   * Note that <code>Caret.vimLastColumn</code> might be valid for visual block mode, if moving the primary caret after
+   * using the end of line motion (<code>$</code>).
+   * </p>
+   */
   public static void moveCaret(@NotNull Editor editor, @NotNull Caret caret, int offset) {
     if (offset < 0 || offset > editor.getDocument().getTextLength() || !caret.isValid()) return;
 
@@ -377,9 +383,6 @@ public class MotionGroup extends VimMotionGroupBase {
 
       // Note that this call replaces ALL carets, so any local caret instances will be invalid!
       VisualGroupKt.vimMoveBlockSelectionToOffset(editor, offset);
-
-      Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
-      UserDataManager.setVimLastColumn(primaryCaret, primaryCaret.getVisualPosition().column);
       scrollCaretIntoView(editor);
       return;
     }
