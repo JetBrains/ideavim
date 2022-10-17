@@ -28,7 +28,6 @@ import com.maddyhome.idea.vim.group.visual.vimLeadSelectionOffset
 import com.maddyhome.idea.vim.group.visual.vimSetSelection
 import com.maddyhome.idea.vim.group.visual.vimSetSystemSelectionSilently
 import com.maddyhome.idea.vim.group.visual.vimUpdateEditorSelection
-import com.maddyhome.idea.vim.helper.inlayAwareVisualColumn
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.helper.registerStorage
 import com.maddyhome.idea.vim.helper.resetVimLastColumn
@@ -58,8 +57,6 @@ class IjVimCaret(val caret: Caret) : VimCaretBase() {
       caret.vimLastColumn = value
     }
   override fun resetLastColumn() = caret.resetVimLastColumn()
-  override val inlayAwareVisualColumn: Int
-    get() = caret.inlayAwareVisualColumn
   override val selectionStart: Int
     get() = caret.selectionStart
   override val selectionEnd: Int

@@ -36,7 +36,6 @@ interface VimCaret {
 
   var vimLastColumn: Int
   fun resetLastColumn()
-  val inlayAwareVisualColumn: Int
 
   fun hasSelection(): Boolean
   val selectionStart: Int
