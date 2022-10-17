@@ -13,6 +13,7 @@ import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.ShiftedArrowKeyHandler
 
 /**
@@ -25,10 +26,16 @@ class MotionShiftUpAction : ShiftedArrowKeyHandler(false) {
 
   override fun motionWithKeyModel(editor: VimEditor, caret: VimCaret, context: ExecutionContext, cmd: Command) {
     val vertical = injector.motion.getVerticalMotionOffset(editor, caret, -cmd.count)
-    val col = injector.engineEditorHelper.prepareLastColumn(caret)
-    caret.moveToOffset(vertical)
+    when (vertical) {
+      is Motion.AdjustedOffset -> {
+        caret.moveToOffset(vertical.offset)
+        caret.vimLastColumn = vertical.intendedColumn
+      }
 
-    injector.engineEditorHelper.updateLastColumn(caret, col)
+      is Motion.AbsoluteOffset -> caret.moveToOffset(vertical.offset)
+      is Motion.NoMotion -> {}
+      is Motion.Error -> injector.messages.indicateError()
+    }
   }
 
   override fun motionWithoutKeyModel(editor: VimEditor, context: ExecutionContext, cmd: Command) {

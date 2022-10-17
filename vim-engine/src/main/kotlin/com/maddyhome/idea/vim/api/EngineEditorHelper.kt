@@ -21,8 +21,6 @@ interface EngineEditorHelper {
   fun normalizeVisualColumn(editor: VimEditor, line: Int, col: Int, allowEnd: Boolean): Int
   fun amountOfInlaysBeforeVisualPosition(editor: VimEditor, pos: VimVisualPosition): Int
   fun getVisualLineCount(editor: VimEditor): Int
-  fun prepareLastColumn(caret: VimCaret): Int
-  fun updateLastColumn(caret: VimCaret, prevLastColumn: Int)
   fun getLineEndOffset(editor: VimEditor, line: Int, allowEnd: Boolean): Int
   fun getLineStartOffset(editor: VimEditor, line: Int): Int
   fun getLineStartForOffset(editor: VimEditor, line: Int): Int

@@ -8,7 +8,6 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.updown
 
-import com.maddyhome.idea.vim.helper.vimLastColumn
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -25,21 +24,6 @@ class MotionUpActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
     """.trimIndent()
     doTest(keys, before, after)
-  }
-
-  @TestWithoutNeovim(reason = SkipNeovimReason.EDITOR_MODIFICATION)
-  fun `test last column is incorrect`() {
-    val before = """
-            I found it in a legendary land
-            all rocks and lave${c}nder and tufted grass,
-    """.trimIndent()
-    val after = """
-            I found it in a le${c}gendary land
-            all rocks and lavender and tufted grass,
-    """.trimIndent()
-    doTest("k", before, after) {
-      it.caretModel.primaryCaret.vimLastColumn = 5
-    }
   }
 
   fun `test last column to shorter line`() {
@@ -60,17 +44,21 @@ class MotionUpActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.EDITOR_MODIFICATION)
-  fun `test last column wrong lastColumn`() {
-    val before = """
-            I found it in a legendary land
-            all rocks and lavender and tufted ${c}grass,
-    """.trimIndent()
-    val after = """
-            I found it in a legendary lan${c}d
-            all rocks and lavender and tufted grass,
-    """.trimIndent()
-    doTest("k", before, after) {
-      it.caretModel.primaryCaret.vimLastColumn = 0
+  fun `test caret moved outside of IdeaVim control`() {
+    doTest(
+      "k",
+      """
+        I found it in a legendary land
+        all rock${c}s and lavender and tufted grass,
+      """.trimIndent(),
+      """
+        I found it in a le${c}gendary land
+        all rocks and lavender and tufted grass,
+      """.trimIndent()
+    ) {
+      // Simulate the caret being moved without IdeaVim knowing and therefore without vimLastColumn being updated
+      // This offset is effectively "lave${c}nder"
+      it.caretModel.primaryCaret.moveToOffset(49)
     }
   }
 }

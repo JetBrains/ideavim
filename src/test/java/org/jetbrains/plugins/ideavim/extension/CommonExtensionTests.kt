@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
 import com.maddyhome.idea.vim.extension.VimExtensionRegistrar
 import com.maddyhome.idea.vim.group.MotionGroup
+import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
@@ -369,7 +370,7 @@ private class TestExtension : VimExtension {
       VimPlugin.getVisualMotion().enterVisualMode(editor, VimStateMachine.SubMode.VISUAL_LINE)
       val caret = editor.ij.caretModel.currentCaret
       val newOffset = VimPlugin.getMotion().getVerticalMotionOffset(editor, caret.vim, 1)
-      MotionGroup.moveCaret(editor.ij, caret, newOffset)
+      MotionGroup.moveCaret(editor.ij, caret, (newOffset as Motion.AbsoluteOffset).offset)
     }
   }
 
