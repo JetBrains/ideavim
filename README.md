@@ -11,7 +11,7 @@ IdeaVim
 [![Gitter][gitter-svg]][gitter]
 [![Twitter][twitter-svg]][twitter]
 
-IdeaVim is a Vim emulation plugin for IntelliJ Platform-based IDEs.
+IdeaVim is a Vim engine for JetBrains IDEs.
 
 ##### Contact maintainers:
 * [Bug tracker](https://youtrack.jetbrains.com/issues/VIM)
@@ -36,7 +36,7 @@ Setup
 - IdeaVim can be installed via `Settings | Plugins`.
 See the [detailed instructions](https://www.jetbrains.com/help/idea/managing-plugins.html#).
 
-- Use `Tools | Vim Emulator` in the menu to enable or disable emulation.
+- Use `Tools | Vim` in the menu to enable or disable vim.
 
 - Use the `~/.ideavimrc` file as an analog of `~/.vimrc` ([learn more](#Files)). The XDG standard is supported, as well.
 
@@ -88,7 +88,7 @@ Here are some examples of supported vim features and commands:
 * Vim web help
 * `~/.ideavimrc` configuration file
 
-[Emulated Vim plugins](https://github.com/JetBrains/ideavim/wiki/Emulated-plugins):
+[IdeaVim plugins](https://github.com/JetBrains/ideavim/wiki/Emulated-plugins):
 
 * vim-easymotion
 * NERDTree
@@ -198,7 +198,7 @@ Alternatively, you can set up initialization commands using [XDG](https://specif
 Put your settings to `$XDG_CONFIG_HOME/ideavim/ideavimrc` file.
 
 
-Emulated Vim Plugins
+IdeaVim Plugins
 --------------------
 
 See [doc/emulated-plugins.md](https://github.com/JetBrains/ideavim/wiki/Emulated-plugins)
