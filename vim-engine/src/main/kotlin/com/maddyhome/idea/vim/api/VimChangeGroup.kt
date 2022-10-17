@@ -47,10 +47,6 @@ interface VimChangeGroup {
 
   fun initInsert(editor: VimEditor, context: ExecutionContext, mode: VimStateMachine.Mode)
 
-  fun editorCreated(editor: VimEditor?)
-
-  fun editorReleased(editor: VimEditor?)
-
   fun processEscape(editor: VimEditor, context: ExecutionContext?, operatorArguments: OperatorArguments)
 
   fun processEnter(editor: VimEditor, context: ExecutionContext)

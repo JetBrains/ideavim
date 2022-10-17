@@ -36,9 +36,14 @@ import com.intellij.openapi.editor.event.SelectionEvent
 import com.intellij.openapi.editor.event.SelectionListener
 import com.intellij.openapi.editor.ex.DocumentEx
 import com.intellij.openapi.editor.impl.EditorComponentImpl
+import com.intellij.openapi.editor.impl.EditorImpl
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent
 import com.intellij.openapi.fileEditor.FileEditorManagerListener
+import com.intellij.openapi.rd.createLifetime
+import com.intellij.openapi.rd.createNestedDisposable
+import com.intellij.openapi.util.Disposer
 import com.intellij.util.ExceptionUtil
+import com.jetbrains.rd.util.lifetime.intersect
 import com.maddyhome.idea.vim.EventFacade
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimKeyListener
@@ -73,8 +78,6 @@ import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.listener.MouseEventsDataHolder.skipEvents
 import com.maddyhome.idea.vim.listener.MouseEventsDataHolder.skipNDragEvents
 import com.maddyhome.idea.vim.listener.VimListenerManager.EditorListeners.add
-import com.maddyhome.idea.vim.listener.VimListenerManager.EditorListeners.remove
-import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
@@ -153,17 +156,26 @@ object VimListenerManager {
     }
 
     fun add(editor: Editor) {
+      val pluginLifetime = VimPlugin.getInstance().createLifetime()
+      val editorLifetime = (editor as EditorImpl).disposable.createLifetime()
+      val disposable = editorLifetime.intersect(pluginLifetime).createNestedDisposable("MyLifetimedDisposable")
 
       editor.contentComponent.addKeyListener(VimKeyListener)
+      Disposer.register(disposable) { editor.contentComponent.removeKeyListener(VimKeyListener) }
+
       val eventFacade = EventFacade.getInstance()
-      eventFacade.addEditorMouseListener(editor, EditorMouseHandler)
-      eventFacade.addEditorMouseMotionListener(editor, EditorMouseHandler)
-      eventFacade.addEditorSelectionListener(editor, EditorSelectionHandler)
-      eventFacade.addComponentMouseListener(editor.contentComponent, ComponentMouseListener)
+      eventFacade.addEditorMouseListener(editor, EditorMouseHandler, disposable)
+      eventFacade.addEditorMouseMotionListener(editor, EditorMouseHandler, disposable)
+      eventFacade.addEditorSelectionListener(editor, EditorSelectionHandler, disposable)
+      eventFacade.addComponentMouseListener(editor.contentComponent, ComponentMouseListener, disposable)
 
       VimPlugin.getEditor().editorCreated(editor)
 
-      VimPlugin.getChange().editorCreated(IjVimEditor(editor))
+      VimPlugin.getChange().editorCreated(editor, disposable)
+
+      Disposer.register(disposable) {
+        VimPlugin.getEditorIfCreated()?.editorDeinit(editor, true)
+      }
     }
 
     fun remove(editor: Editor, isReleased: Boolean) {
@@ -177,7 +189,7 @@ object VimListenerManager {
 
       VimPlugin.getEditorIfCreated()?.editorDeinit(editor, isReleased)
 
-      VimPlugin.getChange().editorReleased(IjVimEditor(editor))
+      VimPlugin.getChange().editorReleased(editor)
     }
   }
 
@@ -209,7 +221,6 @@ object VimListenerManager {
     }
 
     override fun editorReleased(event: EditorFactoryEvent) {
-      remove(event.editor, true)
       VimPlugin.getMark().editorReleased(event)
     }
   }

@@ -21,6 +21,7 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.intellij.codeInsight.actions.AsyncActionExecutionService;
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.IdeActions;
 import com.intellij.openapi.application.ApplicationManager;
@@ -155,14 +156,12 @@ public class ChangeGroup extends VimChangeGroupBase {
     }
   };
 
-  @Override
-  public void editorCreated(VimEditor editor) {
-    EventFacade.getInstance().addEditorMouseListener(((IjVimEditor) editor).getEditor(), listener);
+  public void editorCreated(Editor editor, @NotNull Disposable disposable) {
+    EventFacade.getInstance().addEditorMouseListener(editor, listener, disposable);
   }
 
-  @Override
-  public void editorReleased(VimEditor editor) {
-    EventFacade.getInstance().removeEditorMouseListener(((IjVimEditor) editor).getEditor(), listener);
+  public void editorReleased(Editor editor) {
+    EventFacade.getInstance().removeEditorMouseListener(editor, listener);
   }
 
   @Override

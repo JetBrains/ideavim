@@ -27,6 +27,7 @@ import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.actionSystem.TypedAction;
 import com.intellij.openapi.editor.actionSystem.TypedActionHandler;
 import com.intellij.openapi.editor.event.*;
+import com.intellij.openapi.util.Disposer;
 import com.maddyhome.idea.vim.helper.HandlerInjector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -101,32 +102,41 @@ public class EventFacade {
     EditorFactory.getInstance().addEditorFactoryListener(listener, parentDisposable);
   }
 
-  public void addEditorMouseListener(@NotNull Editor editor, @NotNull EditorMouseListener listener) {
-    editor.addEditorMouseListener(listener);
+  public void addEditorMouseListener(@NotNull Editor editor,
+                                     @NotNull EditorMouseListener listener,
+                                     @NotNull Disposable disposable) {
+    editor.addEditorMouseListener(listener, disposable);
   }
 
   public void removeEditorMouseListener(@NotNull Editor editor, @NotNull EditorMouseListener listener) {
     editor.removeEditorMouseListener(listener);
   }
 
-  public void addComponentMouseListener(@NotNull Component component, @NotNull MouseListener mouseListener) {
+  public void addComponentMouseListener(@NotNull Component component,
+                                        @NotNull MouseListener mouseListener,
+                                        @NotNull Disposable disposable) {
     component.addMouseListener(mouseListener);
+    Disposer.register(disposable, () -> component.removeMouseListener(mouseListener));
   }
 
   public void removeComponentMouseListener(@NotNull Component component, @NotNull MouseListener mouseListener) {
     component.removeMouseListener(mouseListener);
   }
 
-  public void addEditorMouseMotionListener(@NotNull Editor editor, @NotNull EditorMouseMotionListener listener) {
-    editor.addEditorMouseMotionListener(listener);
+  public void addEditorMouseMotionListener(@NotNull Editor editor,
+                                           @NotNull EditorMouseMotionListener listener,
+                                           @NotNull Disposable disposable) {
+    editor.addEditorMouseMotionListener(listener, disposable);
   }
 
   public void removeEditorMouseMotionListener(@NotNull Editor editor, @NotNull EditorMouseMotionListener listener) {
     editor.removeEditorMouseMotionListener(listener);
   }
 
-  public void addEditorSelectionListener(@NotNull Editor editor, @NotNull SelectionListener listener) {
-    editor.getSelectionModel().addSelectionListener(listener);
+  public void addEditorSelectionListener(@NotNull Editor editor,
+                                         @NotNull SelectionListener listener,
+                                         @NotNull Disposable disposable) {
+    editor.getSelectionModel().addSelectionListener(listener, disposable);
   }
 
   public void removeEditorSelectionListener(@NotNull Editor editor, @NotNull SelectionListener listener) {

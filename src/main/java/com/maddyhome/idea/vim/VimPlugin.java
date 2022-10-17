@@ -114,7 +114,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   @Override
   public void dispose() {
     LOG.debug("disposeComponent");
-    turnOffPlugin();
+    turnOffPlugin(false);
     LOG.debug("done");
   }
 
@@ -272,7 +272,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     if (isEnabled() == enabled) return;
 
     if (!enabled) {
-      getInstance().turnOffPlugin();
+      getInstance().turnOffPlugin(true);
     }
 
     getInstance().enabled = enabled;
@@ -365,12 +365,14 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     VimListenerManager.INSTANCE.turnOn();
   }
 
-  private void turnOffPlugin() {
+  private void turnOffPlugin(boolean unsubscribe) {
     SearchGroup searchGroup = getSearchIfCreated();
     if (searchGroup != null) {
       searchGroup.turnOff();
     }
-    VimListenerManager.INSTANCE.turnOff();
+    if (unsubscribe) {
+      VimListenerManager.INSTANCE.turnOff();
+    }
     ExEntryPanel.fullReset();
 
     // Unregister vim actions in command mode
