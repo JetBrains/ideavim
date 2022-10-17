@@ -35,7 +35,6 @@ class SelectEnableCharacterModeAction : VimActionHandler.SingleExecution() {
       caret.run {
         vimSetSystemSelectionSilently(offset.point, (offset.point + 1).coerceAtMost(lineEnd))
         moveToInlayAwareOffset((offset.point + 1).coerceAtMost(lineEnd))
-        vimLastColumn = getVisualPosition().column
       }
     }
     return injector.visualMotionGroup.enterSelectMode(editor, VimStateMachine.SubMode.VISUAL_CHARACTER)

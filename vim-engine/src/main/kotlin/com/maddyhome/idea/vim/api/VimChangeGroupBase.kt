@@ -903,7 +903,8 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     if (res) {
       var pos = injector.engineEditorHelper.normalizeOffset(editor, range.startOffset, isChange)
       if (type === SelectionType.LINE_WISE) {
-        // Deleting text will move the caret, which invalidates the last column. Reset it before trying to use it
+        // Reset the saved intended column cache, which has been invalidated by the caret moving due to deleted text.
+        // This value will be used to reposition the caret if 'startofline' is false
         caret.vimLastColumn = intendedColumn
         pos = injector.motion
           .moveCaretToLineWithStartOfLineOption(
@@ -912,6 +913,10 @@ abstract class VimChangeGroupBase : VimChangeGroup {
           )
       }
       injector.motion.moveCaret(editor, caret, pos)
+
+      // Ensure the intended column cache is invalidated - it will only happen automatically if the caret actually moves
+      // If 'startofline' is true and we've just deleted text, it's likely we haven't moved
+      caret.resetLastColumn()
     }
     return res
   }

@@ -735,8 +735,6 @@ public class ChangeGroup extends VimChangeGroupBase {
         injector.getMotion().moveCaret(editor, caret, range.getStartOffset());
       }
     }
-
-    UserDataManager.setVimLastColumn(((IjVimCaret) caret).getCaret(), caret.getVisualPosition().getColumn());
   }
 
 
