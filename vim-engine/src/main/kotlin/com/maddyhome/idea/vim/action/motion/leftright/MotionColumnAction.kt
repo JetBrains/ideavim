@@ -27,10 +27,6 @@ class MotionColumnAction : MotionActionHandler.ForEachCaret() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    val motion = injector.motion.moveCaretToColumn(editor, caret, operatorArguments.count1 - 1, false)
-    return when (motion) {
-      is Motion.AbsoluteOffset -> Motion.AdjustedOffset(motion.offset, operatorArguments.count1 - 1)
-      else -> motion
-    }
+    return injector.motion.moveCaretToColumn(editor, caret, operatorArguments.count1 - 1, false)
   }
 }
