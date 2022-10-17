@@ -14,11 +14,9 @@ import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
-import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.NonShiftedSpecialKeyHandler
-import com.maddyhome.idea.vim.handler.toAdjustedMotionOrError
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
@@ -28,8 +26,6 @@ class MotionArrowUpAction : NonShiftedSpecialKeyHandler(), ComplicatedKeysAction
   override val keyStrokesSet: Set<List<KeyStroke>> =
     setOf(injector.parser.parseKeys("<Up>"), listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_UP, 0)))
 
-  private var col: Int = 0
-
   override fun motion(
     editor: VimEditor,
     caret: VimCaret,
@@ -38,12 +34,6 @@ class MotionArrowUpAction : NonShiftedSpecialKeyHandler(), ComplicatedKeysAction
     rawCount: Int,
     argument: Argument?,
   ): Motion {
-    val offset = injector.motion.getVerticalMotionOffset(editor, caret, -count)
-    return offset.toAdjustedMotionOrError(col)
-  }
-
-  override fun preOffsetComputation(editor: VimEditor, caret: VimCaret, context: ExecutionContext, cmd: Command): Boolean {
-    col = injector.engineEditorHelper.prepareLastColumn(caret)
-    return true
+    return injector.motion.getVerticalMotionOffset(editor, caret, -count)
   }
 }

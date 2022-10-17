@@ -24,7 +24,7 @@ interface VimMotionGroup {
 
   // Note that the following methods require the caret to access the intended vertical position, such as "end of line"
   fun getOffsetOfHorizontalMotion(editor: VimEditor, caret: VimCaret, count: Int, allowPastEnd: Boolean): Int
-  fun getVerticalMotionOffset(editor: VimEditor, caret: VimCaret, count: Int): Int
+  fun getVerticalMotionOffset(editor: VimEditor, caret: VimCaret, count: Int): Motion
 
   // TODO: Consider naming. These don't move the caret, but calculate offsets. Also consider returning Motion
 

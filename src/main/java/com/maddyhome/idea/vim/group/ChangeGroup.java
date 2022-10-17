@@ -43,6 +43,7 @@ import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.ranges.LineRange;
 import com.maddyhome.idea.vim.group.visual.VimSelection;
 import com.maddyhome.idea.vim.group.visual.VisualModeHelperKt;
+import com.maddyhome.idea.vim.handler.Motion;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.icons.VimIcons;
 import com.maddyhome.idea.vim.key.KeyHandlerKeeper;
@@ -106,7 +107,10 @@ public class ChangeGroup extends VimChangeGroupBase {
       firstLiner = true;
     }
     else {
-      injector.getMotion().moveCaret(editor, caret, VimPlugin.getMotion().getVerticalMotionOffset(editor, caret, -1));
+      // TODO: getVerticalMotionOffset returns a visual line, not the expected logical line
+      // Also address the unguarded upcast
+      final Motion motion = VimPlugin.getMotion().getVerticalMotionOffset(editor, caret, -1);
+      injector.getMotion().moveCaret(editor, caret, ((Motion.AbsoluteOffset)motion).getOffset());
       injector.getMotion().moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToCurrentLineEnd(editor, caret));
     }
 
@@ -114,7 +118,10 @@ public class ChangeGroup extends VimChangeGroupBase {
     insertText(editor, caret, "\n" + IndentConfig.create(((IjVimEditor) editor).getEditor()).createIndentBySize(col));
 
     if (firstLiner) {
-      injector.getMotion().moveCaret(editor, caret, VimPlugin.getMotion().getVerticalMotionOffset(editor, caret, -1));
+      // TODO: getVerticalMotionOffset returns a visual line, not the expected logical line
+      // Also address the unguarded upcast
+      final Motion motion = VimPlugin.getMotion().getVerticalMotionOffset(editor, caret, -1);
+      injector.getMotion().moveCaret(editor, caret, ((Motion.AbsoluteOffset)motion).getOffset());
     }
   }
 
@@ -655,8 +662,8 @@ public class ChangeGroup extends VimChangeGroupBase {
       logger.debug("count=" + count);
     }
 
-    // Update the last column before we indent, or we might be retrieving the data for a line that no longer exists
-    UserDataManager.setVimLastColumn(((IjVimCaret) caret).getCaret(), InlayHelperKt.getInlayAwareVisualColumn(((IjVimCaret) caret).getCaret()));
+    // Remember the current caret column
+    final int intendedColumn = UserDataManager.getVimLastColumn(((IjVimCaret)caret).getCaret());
 
     IndentConfig indentConfig = IndentConfig.create(((IjVimEditor) editor).getEditor(), ((IjExecutionContext) context).getContext());
 
@@ -719,7 +726,10 @@ public class ChangeGroup extends VimChangeGroupBase {
 
     if (!CommandStateHelper.inInsertMode(((IjVimEditor) editor).getEditor())) {
       if (!range.isMultiple()) {
-        injector.getMotion().moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineWithStartOfLineOption(editor, sline, caret));
+        // The caret has moved, so reset the intended column before trying to get the expected offset
+        UserDataManager.setVimLastColumn(((IjVimCaret) caret).getCaret(), intendedColumn);
+        final int offset = VimPlugin.getMotion().moveCaretToLineWithStartOfLineOption(editor, sline, caret);
+        injector.getMotion().moveCaret(editor, caret, offset);
       }
       else {
         injector.getMotion().moveCaret(editor, caret, range.getStartOffset());

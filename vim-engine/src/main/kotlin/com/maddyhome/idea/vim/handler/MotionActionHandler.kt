@@ -53,12 +53,6 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
       argument: Argument?,
       operatorArguments: OperatorArguments,
     ): Motion
-
-    /**
-     * This method is called before [getOffset] once for each [caret].
-     * The method executes only once it there is block selection.
-     */
-    open fun preOffsetComputation(editor: VimEditor, caret: VimCaret, context: ExecutionContext, cmd: Command): Boolean = true
   }
 
   /**
@@ -155,10 +149,7 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
     cmd: Command,
     operatorArguments: OperatorArguments
   ) {
-    if (!preOffsetComputation(editor, caret, context, cmd)) return
-
     val offset = getOffset(editor, caret, context, cmd.argument, operatorArguments)
-
     when (offset) {
       is Motion.AdjustedOffset -> moveToAdjustedOffset(editor, caret, cmd, offset)
       is Motion.AbsoluteOffset -> moveToAbsoluteOffset(editor, caret, cmd, offset)
@@ -173,8 +164,8 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
     cmd: Command,
     offset: Motion.AdjustedOffset,
   ) {
-    // Block selection mode is emulated with multiple carets, but we only ever operate on the primary caret. Changing
-    // the selection (by moving the primary caret) can result in IntelliJ invalidating, replacing or adding a new
+    // Block selection mode is emulated with multiple carets. We should only be operating on the primary caret. Note
+    // that moving the primary caret to modify the selection can cause IntelliJ to invalidate, replace or add a new
     // primary caret
     if (editor.inBlockSubMode) {
       StrictMode.assert(caret.isPrimary, "Block selection mode must only operate on primary caret")
@@ -188,14 +179,10 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
 
     caret.moveToOffset(normalisedOffset)
 
-    // Visual block movement can replace the primary caret when moving the selection up, so reset the last column
-    if (editor.inBlockSubMode) {
-      editor.primaryCaret().vimLastColumn = offset.intendedColumn
-    }
-    else {
-      // TODO: Remove this - we've already set it before moving the caret, but currently moving the caret sets last col
-      caret.vimLastColumn = offset.intendedColumn
-    }
+    // We've moved the caret, so reset the intended column. Visual block movement can replace the primary caret when
+    // moving the selection up, so make sure we've got a valid caret
+    val validCaret = if (editor.inBlockSubMode) editor.primaryCaret() else caret
+    validCaret.vimLastColumn = offset.intendedColumn
   }
 
   private fun moveToAbsoluteOffset(editor: VimEditor, caret: VimCaret, cmd: Command, offset: Motion.AbsoluteOffset) {

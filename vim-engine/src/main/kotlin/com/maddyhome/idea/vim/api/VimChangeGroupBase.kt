@@ -891,17 +891,20 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     operatorArguments: OperatorArguments,
   ): Boolean {
 
-    // Update the last column before we delete, or we might be retrieving the data for a line that no longer exists
-    caret.vimLastColumn = caret.inlayAwareVisualColumn
+    val intendedColumn = caret.vimLastColumn
+
     val removeLastNewLine = removeLastNewLine(editor, range, type)
     val res = deleteText(editor, range, type, caret, operatorArguments)
     if (removeLastNewLine) {
       val textLength = editor.fileSize().toInt()
       editor.deleteString(TextRange(textLength - 1, textLength))
     }
+
     if (res) {
       var pos = injector.engineEditorHelper.normalizeOffset(editor, range.startOffset, isChange)
       if (type === SelectionType.LINE_WISE) {
+        // Deleting text will move the caret, which invalidates the last column. Reset it before trying to use it
+        caret.vimLastColumn = intendedColumn
         pos = injector.motion
           .moveCaretToLineWithStartOfLineOption(
             editor, editor.offsetToLogicalPosition(pos).line,

@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.action.motion.leftright.TillCharacterMotionType
 import com.maddyhome.idea.vim.handler.Motion
+import com.maddyhome.idea.vim.handler.toAdjustedMotionOrError
 import com.maddyhome.idea.vim.handler.toMotionOrError
 import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.helper.isEndAllowedIgnoringOnemore
@@ -21,35 +22,44 @@ abstract class VimMotionGroupBase : VimMotionGroup {
   override var lastFTCmd = TillCharacterMotionType.LAST_SMALL_T
   override var lastFTChar: Char = ' '
 
-  override fun getVerticalMotionOffset(editor: VimEditor, caret: VimCaret, count: Int): Int {
+  override fun getVerticalMotionOffset(editor: VimEditor, caret: VimCaret, count: Int): Motion {
     val pos = caret.getVisualPosition()
     if ((pos.line == 0 && count < 0) || (pos.line >= injector.engineEditorHelper.getVisualLineCount(editor) - 1 && count > 0)) {
-      return -1
-    } else {
-      var col = caret.vimLastColumn
-      val line = injector.engineEditorHelper.normalizeVisualLine(editor, pos.line + count)
+      return Motion.Error
+    }
 
-      if (col == LAST_COLUMN) {
-        col = injector.engineEditorHelper.normalizeVisualColumn(
-          editor, line, col,
-          editor.mode.isEndAllowedIgnoringOnemore
-        )
-      } else {
-        if (line < 0) {
-          // https://web.ea.pages.jetbrains.team/#/issue/266279
-          // There is a weird exception for line < 0, but I don't understand how this may happen
-          throw RuntimeException("Line is " + line + " , pos.line=" + pos.line + ", count=" + count)
-        }
-        val newInlineElements = injector.engineEditorHelper
-          .amountOfInlaysBeforeVisualPosition(editor, VimVisualPosition(line, col, false))
+    val intendedColumn = caret.vimLastColumn
+    val line = injector.engineEditorHelper.normalizeVisualLine(editor, pos.line + count)
 
-        col = injector.engineEditorHelper
-          .normalizeVisualColumn(editor, line, col, (editor).isEndAllowed)
-        col += newInlineElements
-      }
+    if (intendedColumn == LAST_COLUMN) {
+      val normalisedColumn = injector.engineEditorHelper.normalizeVisualColumn(
+        editor, line, intendedColumn,
+        editor.mode.isEndAllowedIgnoringOnemore
+      )
+      val newPos = VimVisualPosition(line, normalisedColumn, false)
+      return editor.visualPositionToOffset(newPos).point.toAdjustedMotionOrError(intendedColumn)
+    }
 
-      val newPos = VimVisualPosition(line, col, false)
-      return editor.visualPositionToOffset(newPos).point
+    if (line < 0) {
+      // https://web.ea.pages.jetbrains.team/#/issue/266279
+      // There is a weird exception for line < 0, but I don't understand how this may happen
+      throw RuntimeException("Line is " + line + " , pos.line=" + pos.line + ", count=" + count)
+    }
+
+    val additionalVisualColumns = injector.engineEditorHelper
+      .amountOfInlaysBeforeVisualPosition(editor, VimVisualPosition(line, intendedColumn, false))
+
+    val normalisedColumn = injector.engineEditorHelper
+      .normalizeVisualColumn(editor, line, intendedColumn, editor.isEndAllowed)
+    val adjustedColumn = normalisedColumn + additionalVisualColumns
+
+    val newPos = VimVisualPosition(line, adjustedColumn, false)
+    val offset = editor.visualPositionToOffset(newPos).point
+    return if (intendedColumn != adjustedColumn) {
+      offset.toAdjustedMotionOrError(intendedColumn)
+    }
+    else {
+      offset.toMotionOrError()
     }
   }
 

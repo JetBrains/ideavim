@@ -840,46 +840,6 @@ public class EditorHelper {
     scrollHorizontally(editor, targetColumnRightX - screenWidth);
   }
 
-  public static int lastColumnForLine(final @NotNull Editor editor, int line, boolean allowEnd) {
-    return editor.offsetToVisualPosition(EditorHelper.getLineEndOffset(editor, line, allowEnd)).column;
-  }
-
-  public static int prepareLastColumn(@NotNull Caret caret) {
-    // In most cases vimLastColumn contains a correct value. But it would be incorrect if IJ will move the caret
-    //   and IdeaVim won't catch that. Here we try to detect and process this case.
-
-    int vimLastColumn = UserDataManager.getVimLastColumn(caret);
-    VisualPosition visualPosition = caret.getVisualPosition();
-
-    // Current column equals to vimLastColumn. It's great, everything is okay.
-    int inlayAwareOffset = InlayHelperKt.toInlayAwareOffset(visualPosition, caret);
-    if (inlayAwareOffset == vimLastColumn) return vimLastColumn;
-
-    Editor editor = caret.getEditor();
-    boolean isEndAllowed = CommandStateHelper.isEndAllowedIgnoringOnemore(CommandStateHelper.getEditorMode(editor));
-    final LogicalPosition logicalPosition = caret.getLogicalPosition();
-    int lastColumn = EditorHelper.lastColumnForLine(editor, logicalPosition.line, isEndAllowed);
-
-    // Current column is somewhere at the end and vimLastColumn is greater than last column. This might be because
-    //  the previous vertical motion was from a longer line. In this case we just return vimLastColumn. But it
-    //  also might be the case decribed above: IJ did move the caret and IdeaVim didn't catch that. We don't process
-    //  this case and just return vimLastColumn with the hope that this won't be a big pain for the user.
-    // This logic can be polished in the future.
-    if ((lastColumn == visualPosition.column || lastColumn + 1 == visualPosition.column) &&
-        vimLastColumn > visualPosition.column) {
-      return vimLastColumn;
-    }
-
-    // Okay here we know that something is definitely wrong. We set vimLastColumn to the current column.
-    int updatedCol = InlayHelperKt.getInlayAwareVisualColumn(caret);
-    UserDataManager.setVimLastColumn(caret, updatedCol);
-    return updatedCol;
-  }
-
-  public static void updateLastColumn(@NotNull Caret caret, int prevLastColumn) {
-    UserDataManager.setVimLastColumn(caret, prevLastColumn);
-  }
-
   /**
    * Scroll page down, moving text up.
    *

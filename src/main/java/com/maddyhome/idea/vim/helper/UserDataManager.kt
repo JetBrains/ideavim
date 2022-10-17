@@ -14,6 +14,7 @@ package com.maddyhome.idea.vim.helper
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.RangeMarker
+import com.intellij.openapi.editor.VisualPosition
 import com.intellij.openapi.editor.markup.RangeHighlighter
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.UserDataHolder
@@ -59,8 +60,22 @@ fun Caret.vimSelectionStartClear() {
 private var Caret._vimSelectionStart: Int? by userDataCaretToEditor()
 //endregion ----------------------------------------------------
 
-// Last column excluding inlays before the caret. Reset during visual block motion
-var Caret.vimLastColumn: Int by userDataCaretToEditorOr { (this as Caret).inlayAwareVisualColumn }
+// Keep a track of the column that we intended to navigate to but were unable to. This might be because of inlays,
+// virtual indent or moving from the end of a long line to the end of a short line. Keep a track of the position when
+// the value is set, if it's not the same during get, we've been moved by IJ and so no longer valid
+var Caret.vimLastColumn: Int
+  get() {
+    if (visualPosition != _vimLastColumnPos) {
+      vimLastColumn = inlayAwareVisualColumn
+    }
+    return _vimLastColumn
+  }
+  set(value) {
+    _vimLastColumn = value
+    _vimLastColumnPos = visualPosition
+  }
+private var Caret._vimLastColumn: Int by userDataCaretToEditorOr { (this as Caret).inlayAwareVisualColumn }
+private var Caret._vimLastColumnPos: VisualPosition? by userDataCaretToEditor()
 
 // TODO: Is this a per-caret setting? This data is non-transient, so could be lost during visual block motion
 var Caret.vimLastVisualOperatorRange: VisualChange? by userDataCaretToEditor()

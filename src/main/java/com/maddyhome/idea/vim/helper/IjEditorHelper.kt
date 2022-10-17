@@ -16,11 +16,9 @@ import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.intellij.openapi.util.text.StringUtil
 import com.maddyhome.idea.vim.api.EngineEditorHelper
 import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimVisualPosition
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.newapi.IjVimCaret
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
@@ -68,14 +66,6 @@ class IjEditorHelper : EngineEditorHelper {
 
   override fun getVisualLineCount(editor: VimEditor): Int {
     return EditorHelper.getVisualLineCount(editor)
-  }
-
-  override fun prepareLastColumn(caret: VimCaret): Int {
-    return EditorHelper.prepareLastColumn((caret as IjVimCaret).caret)
-  }
-
-  override fun updateLastColumn(caret: VimCaret, prevLastColumn: Int) {
-    EditorHelper.updateLastColumn((caret as IjVimCaret).caret, prevLastColumn)
   }
 
   override fun getLineEndOffset(editor: VimEditor, line: Int, allowEnd: Boolean): Int {

@@ -74,6 +74,7 @@ public class MotionGroup extends VimMotionGroupBase {
                                             @NotNull OperatorArguments operatorArguments) {
     return getMotionRange(((IjVimEditor) editor).getEditor(), ((IjVimCaret) caret).getCaret(), ((IjExecutionContext) context).getContext(), argument, operatorArguments);
   }
+
   /**
    * This helper method calculates the complete range a motion will move over taking into account whether
    * the motion is FLAG_MOT_LINEWISE or FLAG_MOT_CHARACTERWISE (FLAG_MOT_INCLUSIVE or FLAG_MOT_EXCLUSIVE).
@@ -387,14 +388,6 @@ public class MotionGroup extends VimMotionGroupBase {
     // changes in surrounding text, especially with inline inlays.
     final int oldOffset = caret.getOffset();
     InlayHelperKt.moveToInlayAwareOffset(caret, offset);
-
-    // TODO: Remove this. If setting LAST_COLUMN, we have to set it both before and after moveCaret
-    // But not all handlers set vimLastColumn (e.g. ShiftedArrowKeyHandler). It would be better if all handlers reset
-    // vimLastColumn so that it is either calculated on demand (current column) or explicitly set by a handler that needs
-    // special handling
-    if (oldOffset != offset) {
-      UserDataManager.setVimLastColumn(caret, InlayHelperKt.getInlayAwareVisualColumn(caret));
-    }
 
     // Similarly, always make sure the caret is positioned within the view. Adding or removing text could move the caret
     // position relative to the view, without changing offset.
@@ -1132,9 +1125,9 @@ public class MotionGroup extends VimMotionGroupBase {
         offset = moveCaretToLineStartSkipLeading(new IjVimEditor(editor), visualLineToLogicalLine(editor, visualLine));
       }
       else {
-        offset = getVerticalMotionOffset(new IjVimEditor(editor), new IjVimCaret(editor.getCaretModel().getPrimaryCaret()),
-                                   visualLineToLogicalLine(editor, visualLine) -
-                                   editor.getCaretModel().getLogicalPosition().line);
+        offset = moveCaretToLineWithSameColumn(new IjVimEditor(editor),
+                                               visualLineToLogicalLine(editor, visualLine),
+                                               new IjVimCaret(editor.getCaretModel().getPrimaryCaret()));
       }
 
       moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), offset);

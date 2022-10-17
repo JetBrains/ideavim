@@ -54,12 +54,15 @@ abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
         editor.forEachCaret {
           val range = it.vimLastVisualOperatorRange ?: VisualChange.default(subMode)
           val end = VisualOperation.calculateRange(editor, range, count, it)
-          val lastColumn =
-            if (range.columns == VimMotionGroupBase.LAST_COLUMN) VimMotionGroupBase.LAST_COLUMN else editor.offsetToLogicalPosition(
-              end
-            ).column
-          it.vimLastColumn = lastColumn
+          val intendedColumn = if (range.columns == VimMotionGroupBase.LAST_COLUMN) {
+            VimMotionGroupBase.LAST_COLUMN
+          } else {
+            editor.offsetToLogicalPosition(end).column
+          }
+          // Set the intended column before moving the caret, then reset because we've moved the caret
+          it.vimLastColumn = intendedColumn
           it.vimSetSelection(it.offset.point, end, true)
+          it.vimLastColumn = intendedColumn
         }
       } else {
         editor.vimStateMachine.pushVisualMode(subMode)
@@ -136,7 +139,7 @@ abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
    *
    * it:
    * - Updates command state
-   * - Updates [vimSelectionStart] property
+   * - Updates [VimCaret.vimSelectionStart] property
    * - Updates caret colors
    * - Updates care shape
    *
