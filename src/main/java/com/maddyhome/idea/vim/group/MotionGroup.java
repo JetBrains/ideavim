@@ -886,10 +886,13 @@ public class MotionGroup extends VimMotionGroupBase {
 
   @Override
   public Motion moveCaretToColumn(@NotNull VimEditor editor, @NotNull VimCaret caret, int count, boolean allowEnd) {
-    int line = caret.getLine().getLine();
-    int pos = normalizeColumn(((IjVimEditor)editor).getEditor(), line, count, allowEnd);
-
-    return new Motion.AbsoluteOffset(editor.logicalPositionToOffset(new VimLogicalPosition(line, pos, false)));
+    final int line = caret.getLine().getLine();
+    final int column = normalizeColumn(((IjVimEditor)editor).getEditor(), line, count, allowEnd);
+    final int offset = editor.logicalPositionToOffset(new VimLogicalPosition(line, column, false));
+    if (column != count) {
+      return new Motion.AdjustedOffset(offset, count);
+    }
+    return new Motion.AbsoluteOffset(offset);
   }
 
   @Override
