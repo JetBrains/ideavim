@@ -109,7 +109,7 @@
     ]]>
   </change-notes>
   <description><![CDATA[
-      <p>Vim emulation plugin for IntelliJ Platform-based IDEs.</p>
+      <p>Vim engine for JetBrains IDEs</p>
       <br/>
       <p>IdeaVim supports many Vim features including normal/insert/visual modes, motion keys, deletion/changing,
       marks, registers, some Ex commands, Vim regexps, configuration via ~/.ideavimrc, macros, Vim plugins, etc.</p>
