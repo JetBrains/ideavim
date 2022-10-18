@@ -71,16 +71,16 @@ abstract class ShiftedSpecialKeyHandler : VimActionHandler.SingleExecution() {
  *
  * Handler is called once for all carets
  */
-abstract class ShiftedArrowKeyHandler : VimActionHandler.SingleExecution() {
-  final override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
-    val keymodelOption = (injector.optionService.getOptionValue(OptionScope.GLOBAL, OptionConstants.keymodelName) as VimString).value
-    val startSel = OptionConstants.keymodel_startsel in keymodelOption
-    val inVisualMode = editor.inVisualMode
-    val inSelectMode = editor.inSelectMode
+abstract class ShiftedArrowKeyHandler(private val runBothCommandsAsMulticaret: Boolean) : VimActionHandler.ConditionalMulticaret() {
 
-    val continueSelectSelection = OptionConstants.keymodel_continueselect in keymodelOption && inSelectMode
-    val continueVisualSelection = OptionConstants.keymodel_continuevisual in keymodelOption && inVisualMode
-    if (startSel || continueSelectSelection || continueVisualSelection) {
+  override fun runAsMulticaret(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
+    val (inVisualMode, inSelectMode, withKey) = withKeyOrNot(editor)
+    if (withKey) {
       if (!inVisualMode && !inSelectMode) {
         if (OptionConstants.selectmode_key in (injector.optionService.getOptionValue(OptionScope.GLOBAL, OptionConstants.selectmodeName) as VimString).value) {
           injector.visualMotionGroup.enterSelectMode(editor, VimStateMachine.SubMode.VISUAL_CHARACTER)
@@ -89,17 +89,54 @@ abstract class ShiftedArrowKeyHandler : VimActionHandler.SingleExecution() {
             .toggleVisual(editor, 1, 0, VimStateMachine.SubMode.VISUAL_CHARACTER)
         }
       }
-      motionWithKeyModel(editor, context, cmd)
+      return true
     } else {
-      motionWithoutKeyModel(editor, context, cmd)
+      return runBothCommandsAsMulticaret
     }
+  }
+
+  private fun withKeyOrNot(editor: VimEditor): Triple<Boolean, Boolean, Boolean> {
+    val keymodelOption =
+      (injector.optionService.getOptionValue(OptionScope.GLOBAL, OptionConstants.keymodelName) as VimString).value
+    val startSel = OptionConstants.keymodel_startsel in keymodelOption
+    val inVisualMode = editor.inVisualMode
+    val inSelectMode = editor.inSelectMode
+
+    val continueSelectSelection = OptionConstants.keymodel_continueselect in keymodelOption && inSelectMode
+    val continueVisualSelection = OptionConstants.keymodel_continuevisual in keymodelOption && inVisualMode
+    val withKey = startSel || continueSelectSelection || continueVisualSelection
+    return Triple(inVisualMode, inSelectMode, withKey)
+  }
+
+  override fun execute(
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
+    if (runBothCommandsAsMulticaret) {
+      val (_, _, withKey) = withKeyOrNot(editor)
+      if (withKey) {
+        motionWithKeyModel(editor, caret, context, cmd)
+      } else {
+        motionWithoutKeyModel(editor, context, cmd)
+      }
+    } else {
+      motionWithKeyModel(editor, caret, context, cmd)
+    }
+    return true
+  }
+
+  final override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
+    motionWithoutKeyModel(editor, context, cmd)
     return true
   }
 
   /**
    * This method is called when `keymodel` contains `startsel`, or one of `continue*` values in corresponding mode
    */
-  abstract fun motionWithKeyModel(editor: VimEditor, context: ExecutionContext, cmd: Command)
+  abstract fun motionWithKeyModel(editor: VimEditor, caret: VimCaret, context: ExecutionContext, cmd: Command)
 
   /**
    * This method is called when `keymodel` doesn't contain `startsel`,

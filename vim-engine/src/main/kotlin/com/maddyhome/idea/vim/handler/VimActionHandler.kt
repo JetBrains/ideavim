@@ -61,6 +61,30 @@ sealed class VimActionHandler(myRunForEachCaret: Boolean) : EditorActionHandlerB
     ): Boolean
   }
 
+  abstract class ConditionalMulticaret : VimActionHandler(false) {
+    abstract fun runAsMulticaret(
+      editor: VimEditor,
+      context: ExecutionContext,
+      cmd: Command,
+      operatorArguments: OperatorArguments,
+    ): Boolean
+
+    abstract fun execute(
+      editor: VimEditor,
+      caret: VimCaret,
+      context: ExecutionContext,
+      cmd: Command,
+      operatorArguments: OperatorArguments,
+    ): Boolean
+
+    abstract fun execute(
+      editor: VimEditor,
+      context: ExecutionContext,
+      cmd: Command,
+      operatorArguments: OperatorArguments,
+    ): Boolean
+  }
+
   final override fun baseExecute(
     editor: VimEditor,
     caret: VimCaret,
@@ -71,6 +95,16 @@ sealed class VimActionHandler(myRunForEachCaret: Boolean) : EditorActionHandlerB
     return when (this) {
       is ForEachCaret -> execute(editor, caret, context, cmd, operatorArguments)
       is SingleExecution -> execute(editor, context, cmd, operatorArguments)
+      is ConditionalMulticaret -> {
+        val runAsMulticaret = runAsMulticaret(editor, context, cmd, operatorArguments)
+        return if (runAsMulticaret) {
+          var res = true
+          editor.forEachCaret { res = execute(editor, it, context, cmd, operatorArguments) && res }
+          res
+        } else {
+          execute(editor, context, cmd, operatorArguments)
+        }
+      }
     }
   }
 }
