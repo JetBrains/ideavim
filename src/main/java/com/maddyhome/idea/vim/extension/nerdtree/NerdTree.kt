@@ -243,7 +243,7 @@ class NerdTree : VimExtension {
       e.presentation.isEnabled = !speedSearchIsHere(project)
     }
 
-    override fun getActionUpdateThread() = ActionUpdateThread.BGT
+    override fun getActionUpdateThread() = ActionUpdateThread.EDT
 
     private fun speedSearchIsHere(project: Project): Boolean {
       val component = ProjectView.getInstance(project).currentProjectViewPane.tree ?: return false
