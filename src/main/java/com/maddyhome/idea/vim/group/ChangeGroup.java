@@ -36,13 +36,13 @@ import com.intellij.openapi.editor.event.EditorMouseEvent;
 import com.intellij.openapi.editor.event.EditorMouseListener;
 import com.intellij.openapi.editor.impl.TextRangeInterval;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.popup.Balloon;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.util.PsiUtilBase;
-import com.intellij.ui.JBColor;
 import com.intellij.util.containers.ContainerUtil;
 import com.maddyhome.idea.vim.EventFacade;
 import com.maddyhome.idea.vim.VimPlugin;
@@ -807,8 +807,9 @@ public class ChangeGroup extends VimChangeGroupBase {
         lastShownTime = currentTime;
         ApplicationManager.getApplication().invokeLater(() -> {
           final Balloon balloon = JBPopupFactory.getInstance()
-            .createHtmlTextBalloonBuilder("Wow, nice vim skills!", VimIcons.IDEAVIM, JBColor.background(), null)
-            .createBalloon();
+            .createHtmlTextBalloonBuilder("Wow, nice vim skills!", VimIcons.IDEAVIM,
+                                          MessageType.INFO.getTitleForeground(), MessageType.INFO.getPopupBackground(),
+                                          null).createBalloon();
           balloon.show(JBPopupFactory.getInstance().guessBestPopupLocation(((IjVimEditor)editor).getEditor()),
                        Balloon.Position.below);
         });
