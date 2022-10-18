@@ -31,6 +31,8 @@ usual beta standards.
 * [VIM-2744](https://youtrack.jetbrains.com/issue/VIM-2744) Fix undo from ex line
 * [VIM-2749](https://youtrack.jetbrains.com/issue/VIM-2749) Fix :tabn and :tabN commands
 * [VIM-2718](https://youtrack.jetbrains.com/issue/VIM-2718) Fixed case where the primary caret was changed
+* [VIM-2766](https://youtrack.jetbrains.com/issue/VIM-2766) Move NERDTree update to background thread
+* [VIM-2768](https://youtrack.jetbrains.com/issue/VIM-2768) Refactor listeners
 
 ## 1.11.0, 2022-08-09
 
