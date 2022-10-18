@@ -19,6 +19,7 @@
 package com.maddyhome.idea.vim.action.motion.leftright
 
 import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimMotionGroupBase
 import com.maddyhome.idea.vim.api.injector
@@ -35,27 +36,25 @@ class MotionShiftEndAction : ShiftedSpecialKeyHandler() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
-  override fun motion(editor: VimEditor, context: ExecutionContext, cmd: Command) {
-    editor.forEachCaret { caret ->
-      var allow = false
-      if (editor.inInsertMode) {
+  override fun motion(editor: VimEditor, context: ExecutionContext, cmd: Command, caret: VimCaret) {
+    var allow = false
+    if (editor.inInsertMode) {
+      allow = true
+    } else if (editor.inVisualMode || editor.inSelectMode) {
+      val opt = (
+        injector.optionService.getOptionValue(
+          OptionScope.LOCAL(editor),
+          OptionConstants.selectionName
+        ) as VimString
+        ).value
+      if (opt != "old") {
         allow = true
-      } else if (editor.inVisualMode || editor.inSelectMode) {
-        val opt = (
-          injector.optionService.getOptionValue(
-            OptionScope.LOCAL(editor),
-            OptionConstants.selectionName
-          ) as VimString
-          ).value
-        if (opt != "old") {
-          allow = true
-        }
       }
-
-      val newOffset = injector.motion.moveCaretToLineEndOffset(editor, caret, cmd.count - 1, allow)
-      caret.vimLastColumn = VimMotionGroupBase.LAST_COLUMN
-      caret.moveToOffset(newOffset)
-      caret.vimLastColumn = VimMotionGroupBase.LAST_COLUMN
     }
+
+    val newOffset = injector.motion.moveCaretToLineEndOffset(editor, caret, cmd.count - 1, allow)
+    caret.vimLastColumn = VimMotionGroupBase.LAST_COLUMN
+    caret.moveToOffset(newOffset)
+    caret.vimLastColumn = VimMotionGroupBase.LAST_COLUMN
   }
 }

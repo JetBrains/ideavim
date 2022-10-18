@@ -42,8 +42,28 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
  *
  * Handler is called once for all carets
  */
-abstract class ShiftedSpecialKeyHandler : VimActionHandler.SingleExecution() {
+abstract class ShiftedSpecialKeyHandler : VimActionHandler.ConditionalMulticaret() {
   final override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
+    error("This method should not be executed")
+  }
+
+  override fun execute(
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
+    motion(editor, context, cmd, caret)
+    return true
+  }
+
+  override fun runAsMulticaret(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
     val startSel = OptionConstants.keymodel_startsel in (injector.optionService.getOptionValue(OptionScope.GLOBAL, OptionConstants.keymodelName) as VimString).value
     if (startSel && !editor.inVisualMode && !editor.inSelectMode) {
       if (OptionConstants.selectmode_key in (injector.optionService.getOptionValue(OptionScope.GLOBAL, OptionConstants.selectmodeName) as VimString).value) {
@@ -53,7 +73,6 @@ abstract class ShiftedSpecialKeyHandler : VimActionHandler.SingleExecution() {
           .toggleVisual(editor, 1, 0, VimStateMachine.SubMode.VISUAL_CHARACTER)
       }
     }
-    motion(editor, context, cmd)
     return true
   }
 
@@ -61,7 +80,7 @@ abstract class ShiftedSpecialKeyHandler : VimActionHandler.SingleExecution() {
    * This method is called when `keymodel` doesn't contain `startsel`,
    * or contains one of `continue*` values but in different mode.
    */
-  abstract fun motion(editor: VimEditor, context: ExecutionContext, cmd: Command)
+  abstract fun motion(editor: VimEditor, context: ExecutionContext, cmd: Command, caret: VimCaret)
 }
 
 /**
