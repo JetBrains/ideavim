@@ -30,20 +30,17 @@ import com.maddyhome.idea.vim.helper.inBlockSubMode
 /**
  * @author vlan
  */
-class VisualSwapEndsAction : VimActionHandler.SingleExecution() {
+class VisualSwapEndsAction : VimActionHandler.ForEachCaret() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override fun execute(
     editor: VimEditor,
+    caret: VimCaret,
     context: ExecutionContext,
     cmd: Command,
-    operatorArguments: OperatorArguments,
-  ): Boolean {
-    var ret = true
-    editor.forEachCaret { ret = ret and swapVisualEnds(it) }
-    return ret
-  }
+    operatorArguments: OperatorArguments
+  ): Boolean = swapVisualEnds(caret)
 }
 
 /**
