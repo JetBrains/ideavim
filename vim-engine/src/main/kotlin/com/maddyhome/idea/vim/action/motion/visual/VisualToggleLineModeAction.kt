@@ -19,6 +19,7 @@
 package com.maddyhome.idea.vim.action.motion.visual
 
 import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
@@ -29,11 +30,10 @@ import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
-class VisualToggleLineModeAction : VimActionHandler.SingleExecution() {
+class VisualToggleLineModeAction : VimActionHandler.ConditionalMulticaret() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
-
-  override fun execute(
+  override fun runAsMulticaret(
     editor: VimEditor,
     context: ExecutionContext,
     cmd: Command,
@@ -46,10 +46,29 @@ class VisualToggleLineModeAction : VimActionHandler.SingleExecution() {
       ) as VimString
       ).value
     return if ("cmd" in listOption) {
-      injector.visualMotionGroup.enterSelectMode(editor, VimStateMachine.SubMode.VISUAL_LINE).also {
-        editor.forEachCaret { it.vimSetSelection(it.offset.point) }
-      }
-    } else injector.visualMotionGroup
+      injector.visualMotionGroup.enterSelectMode(editor, VimStateMachine.SubMode.VISUAL_LINE)
+      true
+    } else false
+  }
+
+  override fun execute(
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
+    caret.vimSetSelection(caret.offset.point)
+    return true
+  }
+
+  override fun execute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
+    return injector.visualMotionGroup
       .toggleVisual(editor, cmd.count, cmd.rawCount, VimStateMachine.SubMode.VISUAL_LINE)
   }
 }
