@@ -21,15 +21,14 @@ package com.maddyhome.idea.vim.statistic
 import com.intellij.internal.statistic.beans.MetricEvent
 import com.intellij.internal.statistic.eventLog.EventLogGroup
 import com.intellij.internal.statistic.eventLog.events.EventFields
-import com.intellij.internal.statistic.eventLog.events.EventPair
-import com.intellij.internal.statistic.eventLog.events.StringListEventField
 import com.intellij.internal.statistic.service.fus.collectors.ApplicationUsagesCollector
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
+import java.awt.event.InputEvent
 import java.awt.event.InputEvent.CTRL_DOWN_MASK
 import java.awt.event.InputEvent.SHIFT_DOWN_MASK
+import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
 internal class ShortcutConflictState : ApplicationUsagesCollector() {
@@ -42,7 +41,7 @@ internal class ShortcutConflictState : ApplicationUsagesCollector() {
       getHandlersForShortcut(keystroke)
         .filter { !setOf(HandledModes.INSERT_UNDEFINED, HandledModes.NORMAL_UNDEFINED, HandledModes.VISUAL_AND_SELECT_UNDEFINED).contains(it) }
         .forEach { mode ->
-        metrics += HANDLER.metric(injector.parser.toKeyNotation(keystroke), mode)
+        metrics += HANDLER.metric(keystroke.toReadableString(), mode)
       }
     }
     return metrics
@@ -166,10 +165,21 @@ internal class ShortcutConflictState : ApplicationUsagesCollector() {
       KeyStroke.getKeyStroke('['.code, CTRL_DOWN_MASK + SHIFT_DOWN_MASK),
       KeyStroke.getKeyStroke(']'.code, CTRL_DOWN_MASK + SHIFT_DOWN_MASK),
     )
-    private val KEY_STROKE = EventFields.String("key_stroke", keyStrokes.map { injector.parser.toKeyNotation(it) })
+    private val KEY_STROKE = EventFields.String("key_stroke", keyStrokes.map { it.toReadableString() })
     private val HANDLER_MODE = EventFields.Enum<HandledModes>("handler")
     private val HANDLER = GROUP.registerEvent("vim.handler", KEY_STROKE, HANDLER_MODE)
   }
+}
+
+private fun KeyStroke.toReadableString(): String {
+  val result = StringBuilder()
+  val modifiers = this.modifiers
+  if (modifiers > 0) {
+    result.append(InputEvent.getModifiersExText(modifiers))
+      .append("+")
+  }
+  result.append(KeyEvent.getKeyText(this.keyCode))
+  return result.toString()
 }
 
 private enum class HandledModes {
