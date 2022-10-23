@@ -41,8 +41,8 @@ internal class ShortcutConflictState : ApplicationUsagesCollector() {
       getHandlersForShortcut(keystroke)
         .filter { !setOf(HandledModes.INSERT_UNDEFINED, HandledModes.NORMAL_UNDEFINED, HandledModes.VISUAL_AND_SELECT_UNDEFINED).contains(it) }
         .forEach { mode ->
-        metrics += HANDLER.metric(keystroke.toReadableString(), mode)
-      }
+          metrics += HANDLER.metric(keystroke.toReadableString(), mode)
+        }
     }
     return metrics
   }
