@@ -33,6 +33,7 @@ usual beta standards.
 * [VIM-2718](https://youtrack.jetbrains.com/issue/VIM-2718) Fixed case where the primary caret was changed
 * [VIM-2766](https://youtrack.jetbrains.com/issue/VIM-2766) Move NERDTree update to background thread
 * [VIM-2768](https://youtrack.jetbrains.com/issue/VIM-2768) Refactor listeners
+* [VIM-2776](https://youtrack.jetbrains.com/issue/VIM-2776) Use filename index for file search
 
 ## 1.11.0, 2022-08-09
 
