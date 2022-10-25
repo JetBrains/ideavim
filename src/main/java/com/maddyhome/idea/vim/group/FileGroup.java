@@ -33,11 +33,11 @@ import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectRootManager;
-import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.vfs.LocalFileSystem;
-import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.vfs.VirtualFileVisitor;
+import com.intellij.psi.search.FilenameIndex;
+import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.psi.search.ProjectScope;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.*;
 import com.maddyhome.idea.vim.command.VimStateMachine;
@@ -56,6 +56,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.util.Collection;
 
 public class FileGroup extends VimFileBase {
   public boolean openFile(@NotNull String filename, @NotNull ExecutionContext context) {
@@ -107,44 +108,44 @@ public class FileGroup extends VimFileBase {
       found = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(new File(dir, homefile));
     }
     else {
-      ProjectRootManager prm = ProjectRootManager.getInstance(project);
-      VirtualFile[] roots = prm.getContentRoots();
-      for (int i = 0; i < roots.length; i++) {
-        if (logger.isDebugEnabled()) {
-          logger.debug("root[" + i + "] = " + roots[i].getPath());
-        }
-        found = findFile(roots[i], filename);
-        if (found != null) {
-          break;
-        }
-      }
+      found = LocalFileSystem.getInstance().findFileByIoFile(new File(filename));
 
       if (found == null) {
-        found = LocalFileSystem.getInstance().findFileByIoFile(new File(filename));
+        found = findByNameInContentRoots(filename, project);
+        if (found == null) {
+          found = findByNameInProject(filename, project);
+        }
       }
     }
 
     return found;
   }
 
-  private @Nullable VirtualFile findFile(@NotNull VirtualFile root, @NotNull String filename) {
-    VirtualFile res = root.findFileByRelativePath(filename);
-    if (res != null) {
-      return res;
-    }
-    final Ref<VirtualFile> result = Ref.create();
-    final VirtualFileVisitor<Object> visitor = new VirtualFileVisitor<>() {
-      @Override
-      public boolean visitFile(@NotNull VirtualFile file) {
-        if (file.getName().equals(filename)) {
-          result.set(file);
-          return false;
-        }
-        return true;
+  @Nullable
+  private VirtualFile findByNameInContentRoots(@NotNull String filename, @NotNull Project project) {
+    VirtualFile found = null;
+    ProjectRootManager prm = ProjectRootManager.getInstance(project);
+    VirtualFile[] roots = prm.getContentRoots();
+    for (int i = 0; i < roots.length; i++) {
+      if (logger.isDebugEnabled()) {
+        logger.debug("root[" + i + "] = " + roots[i].getPath());
       }
-    };
-    VfsUtilCore.visitChildrenRecursively(root, visitor);
-    return result.get();
+      found = roots[i].findFileByRelativePath(filename);
+      if (found != null) {
+        break;
+      }
+    }
+    return found;
+  }
+
+  @Nullable
+  private static VirtualFile findByNameInProject(@NotNull String filename, @NotNull Project project) {
+    GlobalSearchScope projectScope = ProjectScope.getProjectScope(project);
+    Collection<VirtualFile> names = FilenameIndex.getVirtualFilesByName(filename, projectScope);
+    if (!names.isEmpty()) {
+      return names.stream().findFirst().get();
+    }
+    return null;
   }
 
   /**
