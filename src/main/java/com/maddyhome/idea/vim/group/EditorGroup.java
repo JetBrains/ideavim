@@ -59,10 +59,8 @@ import static com.maddyhome.idea.vim.helper.CaretVisualAttributesHelperKt.update
  */
 @State(name = "VimEditorSettings", storages = {@Storage(value = "$APP_CONFIG$/vim_settings.xml")})
 public class EditorGroup implements PersistentStateComponent<Element>, VimEditorGroup {
-  private static final boolean REFRAIN_FROM_SCROLLING_VIM_VALUE = true;
   public static final @NonNls String EDITOR_STORE_ELEMENT = "editor";
 
-  private boolean isRefrainFromScrolling = false;
   private Boolean isKeyRepeat = null;
 
   private final CaretListener myLineNumbersCaretListener = new CaretListener() {
@@ -219,7 +217,6 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
   }
 
   public void editorCreated(@NotNull Editor editor) {
-    isRefrainFromScrolling = editor.getSettings().isRefrainFromScrolling();
     DocumentManager.INSTANCE.addListeners(editor.getDocument());
     VimPlugin.getKey().registerRequiredShortcutKeys(new IjVimEditor(editor));
 
@@ -232,14 +229,12 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
       KeyHandler.getInstance().reset(new IjVimEditor(editor));
     }
     updateCaretsVisualAttributes(editor);
-    editor.getSettings().setRefrainFromScrolling(REFRAIN_FROM_SCROLLING_VIM_VALUE);
   }
 
   public void editorDeinit(@NotNull Editor editor, boolean isReleased) {
     deinitLineNumbers(editor, isReleased);
     UserDataManager.unInitializeEditor(editor);
     VimPlugin.getKey().unregisterShortcutKeys(new IjVimEditor(editor));
-    editor.getSettings().setRefrainFromScrolling(isRefrainFromScrolling);
     DocumentManager.INSTANCE.removeListeners(editor.getDocument());
     CaretVisualAttributesHelperKt.removeCaretsVisualAttributes(editor);
   }
