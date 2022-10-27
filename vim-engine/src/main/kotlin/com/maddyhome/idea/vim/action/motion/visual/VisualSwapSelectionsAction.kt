@@ -24,7 +24,6 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.common.VimScrollType
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.subMode
 
@@ -59,7 +58,7 @@ private fun swapVisualSelections(editor: VimEditor): Boolean {
   editor.subMode = lastSelectionType.toSubMode()
   primaryCaret.vimSetSelection(lastVisualRange.startOffset, lastVisualRange.endOffset, true)
 
-  editor.scrollToCaret(VimScrollType.CENTER)
+  injector.motion.scrollCaretIntoView(editor)
 
   return true
 }
