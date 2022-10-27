@@ -174,8 +174,8 @@ public class VimArgTextObjExtension implements VimExtension {
   @Nullable
   private static String bracketPairsVariable() {
     final Object value = VimPlugin.getVariableService().getGlobalVariableValue("argtextobj_pairs");
-    if (value instanceof VimString) {
-      return ((VimString)value).getValue();
+    if (value instanceof VimString vimValue) {
+      return vimValue.getValue();
     }
     return null;
   }
