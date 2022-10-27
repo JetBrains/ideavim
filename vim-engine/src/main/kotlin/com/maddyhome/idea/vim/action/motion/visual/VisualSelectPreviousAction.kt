@@ -23,7 +23,6 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.command.VimStateMachine
-import com.maddyhome.idea.vim.common.VimScrollType
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.vimStateMachine
 
@@ -54,7 +53,7 @@ private fun selectPreviousVisualMode(editor: VimEditor): Boolean {
   val primaryCaret = editor.primaryCaret()
   primaryCaret.vimSetSelection(visualMarks.startOffset, visualMarks.endOffset - 1, true)
 
-  editor.scrollToCaret(VimScrollType.CENTER)
+  injector.motion.scrollCaretIntoView(editor)
 
   return true
 }

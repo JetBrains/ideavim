@@ -21,7 +21,6 @@ package com.maddyhome.idea.vim.newapi
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorModificationUtil
 import com.intellij.openapi.editor.LogicalPosition
-import com.intellij.openapi.editor.ScrollType
 import com.intellij.openapi.editor.VisualPosition
 import com.intellij.openapi.editor.event.CaretEvent
 import com.intellij.openapi.editor.event.CaretListener
@@ -46,7 +45,6 @@ import com.maddyhome.idea.vim.common.LiveRange
 import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.common.Pointer
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.common.VimScrollType
 import com.maddyhome.idea.vim.common.offset
 import com.maddyhome.idea.vim.group.visual.vimSetSystemBlockSelectionSilently
 import com.maddyhome.idea.vim.helper.EditorHelper
@@ -400,17 +398,6 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
     set(value) {
       editor.vimLastSelectionType = value
     }
-
-  override fun scrollToCaret(type: VimScrollType) {
-    val scrollType = when (type) {
-      VimScrollType.RELATIVE -> ScrollType.RELATIVE
-      VimScrollType.CENTER -> ScrollType.CENTER
-      VimScrollType.MAKE_VISIBLE -> ScrollType.MAKE_VISIBLE
-      VimScrollType.CENTER_UP -> ScrollType.CENTER_UP
-      VimScrollType.CENTER_DOWN -> ScrollType.CENTER_DOWN
-    }
-    editor.scrollingModel.scrollToCaret(scrollType)
-  }
 
   override fun isTemplateActive(): Boolean {
     return editor.isTemplateActive()

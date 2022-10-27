@@ -28,7 +28,6 @@ import com.maddyhome.idea.vim.common.OperatedRange
 import com.maddyhome.idea.vim.common.Pointer
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.common.VimRange
-import com.maddyhome.idea.vim.common.VimScrollType
 import com.maddyhome.idea.vim.common.offset
 import com.maddyhome.idea.vim.common.pointer
 import java.util.*
@@ -231,7 +230,6 @@ interface VimEditor {
 
   var vimLastSelectionType: SelectionType?
 
-  fun scrollToCaret(type: VimScrollType)
   fun isTemplateActive(): Boolean
 
   fun startGuardedBlockChecking()
