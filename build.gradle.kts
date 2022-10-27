@@ -254,7 +254,7 @@ tasks {
 
     // Don't forget to update plugin.xml
     patchPluginXml {
-        sinceBuild.set("222")
+        sinceBuild.set("223")
     }
 }
 

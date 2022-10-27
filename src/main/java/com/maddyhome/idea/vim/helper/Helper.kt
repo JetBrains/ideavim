@@ -31,7 +31,7 @@ import com.intellij.openapi.util.Key
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
-import kotlin.streams.toList
+import java.util.stream.Collectors
 
 /**
  * This annotation is created for test functions (methods).
@@ -87,7 +87,7 @@ fun Editor.getTopLevelEditor() = if (this is EditorWindow) this.delegate else th
  * Return list of editors for local host (for code with me plugin)
  */
 fun localEditors(): List<Editor> {
-  return ClientEditorManager.getCurrentInstance().editors().toList()
+  return ClientEditorManager.getCurrentInstance().editors().collect(Collectors.toList())
 }
 
 fun localEditors(doc: Document): List<Editor> {
