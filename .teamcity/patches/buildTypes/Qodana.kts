@@ -41,8 +41,8 @@ changeBuildType(RelativeId("Qodana")) {
         update<Qodana>(1) {
             clearConditions()
             reportAsTests = true
-            argumentsCommandDocker = "-e QODANA_TOKEN=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJvcmdhbml6YXRpb24iOiIzUFZrQSIsInByb2plY3QiOiIzN1FlQSIsInRva2VuIjoiM0t2bXoifQ.uohp81tM7iAfvvB6k8faarfpV-OjusAaEbWQ8iNrOgs"
-            argumentsEntryPointDocker = "--baseline qodana.sarif.json"
+            additionalDockerArguments = "-e QODANA_TOKEN=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJvcmdhbml6YXRpb24iOiIzUFZrQSIsInByb2plY3QiOiIzN1FlQSIsInRva2VuIjoiM0t2bXoifQ.uohp81tM7iAfvvB6k8faarfpV-OjusAaEbWQ8iNrOgs"
+            additionalQodanaArguments = "--baseline qodana.sarif.json"
             param("clonefinder-languages", "")
             param("collect-anonymous-statistics", "")
             param("licenseaudit-enable", "")
