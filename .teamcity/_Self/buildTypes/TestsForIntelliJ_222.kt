@@ -17,7 +17,6 @@ sealed class TestsForIntelliJ_222_branch(private val version: String) : BuildTyp
     param("env.ORG_GRADLE_PROJECT_legacyNoJavaPlugin", "true")
     param("env.ORG_GRADLE_PROJECT_ideaVersion", "IC-$version")
     param("env.ORG_GRADLE_PROJECT_instrumentPluginCode", "false")
-    param("env.ORG_GRADLE_PROJECT_javaVersion", "17")
   }
 
   vcs {
@@ -39,10 +38,6 @@ sealed class TestsForIntelliJ_222_branch(private val version: String) : BuildTyp
     vcs {
       branchFilter = ""
     }
-  }
-
-  requirements {
-    noLessThanVer("teamcity.agent.jvm.version", "17")
   }
 
   failureConditions {
