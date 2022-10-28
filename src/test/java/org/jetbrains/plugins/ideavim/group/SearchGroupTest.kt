@@ -195,15 +195,6 @@ class SearchGroupTest : VimTestCase() {
   }
 
   // |/pattern/e|
-  fun `test search e-1 motion offset`() {
-    typeTextInFile(
-      injector.parser.parseKeys("/" + "two/e-1" + "<Enter>"),
-      "${c}one two three"
-    )
-    assertOffset(5)
-  }
-
-  // |/pattern/e|
   fun `test search e+2 motion offset`() {
     typeTextInFile(
       injector.parser.parseKeys("/" + "two/e+2" + "<Enter>"),

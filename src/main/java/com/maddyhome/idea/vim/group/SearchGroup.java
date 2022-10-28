@@ -289,13 +289,8 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
         if (logger.isDebugEnabled()) logger.debug("pattern=" + pattern);
 
         if (p.charAt() != type) {
-          if (end.charAt() == type) {
-            end.inc();
-            patternOffset = end.toString();
-          } else {
-            logger.debug("no offset");
-            patternOffset = "";
-          }
+          logger.debug("no offset");
+          patternOffset = "";
         }
         else {
           p.inc();
