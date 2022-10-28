@@ -35,6 +35,9 @@ usual beta standards.
 * [VIM-2768](https://youtrack.jetbrains.com/issue/VIM-2768) Refactor listeners
 * [VIM-2776](https://youtrack.jetbrains.com/issue/VIM-2776) Use filename index for file search
 
+### Merged PRs:
+* [550](https://github.com/JetBrains/ideavim/pull/550) by [Matt Ellis](https://github.com/citizenmatt): Fix(VIM-2778) Remove override of editor scroll setting
+
 ## 1.11.0, 2022-08-09
 
 ### Features:
