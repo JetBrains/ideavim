@@ -510,18 +510,6 @@ public class MotionGroup extends VimMotionGroupBase {
     }
   }
 
-  public int moveCaretToNextSentenceStart(@NotNull Editor editor, @NotNull Caret caret, int count) {
-    int res = SearchHelper.findNextSentenceStart(editor, caret, count, false, true);
-    if (res >= 0) {
-      res = normalizeOffset(editor, res, true);
-    }
-    else {
-      res = -1;
-    }
-
-    return res;
-  }
-
   @Override
   public boolean scrollLineToFirstScreenLine(@NotNull VimEditor editor, int rawCount, boolean start) {
     scrollLineToScreenLocation(((IjVimEditor)editor).getEditor(), ScreenLocation.TOP, rawCount, start);
