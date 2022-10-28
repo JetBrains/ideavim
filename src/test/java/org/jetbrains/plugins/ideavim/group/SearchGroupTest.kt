@@ -194,6 +194,14 @@ class SearchGroupTest : VimTestCase() {
     assertOffset(6)
   }
 
+  fun `test search e-1 motion offset`() {
+    doTest(
+      "/two/e-1<Enter>",
+      "${c}one two three",
+      "one t${c}wo three",
+    )
+  }
+
   // |/pattern/e|
   fun `test search e+2 motion offset`() {
     typeTextInFile(
