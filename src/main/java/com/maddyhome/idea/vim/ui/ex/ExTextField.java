@@ -26,6 +26,7 @@ import com.intellij.ui.paint.PaintUtil;
 import com.intellij.util.ui.JBUI;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.group.EditorHolderService;
+import com.maddyhome.idea.vim.helper.UiHelper;
 import com.maddyhome.idea.vim.history.HistoryConstants;
 import com.maddyhome.idea.vim.history.HistoryEntry;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
@@ -203,6 +204,7 @@ public class ExTextField extends JTextField {
 
   private void updateText(String string) {
     super.setText(string);
+    setFontToJField(string);
   }
 
   @Override
@@ -210,6 +212,12 @@ public class ExTextField extends JTextField {
     super.setText(string);
 
     saveLastEntry();
+    setFontToJField(string);
+  }
+
+  // VIM-570
+  private void setFontToJField(String stringToDisplay) {
+    super.setFont(UiHelper.selectFont(stringToDisplay));
   }
 
   @NotNull
