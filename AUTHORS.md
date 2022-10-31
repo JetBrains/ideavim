@@ -165,7 +165,7 @@ Contributors:
   &nbsp;
   Pavel Fatin
 * [![icon][mail]](mailto:tietyt@gmail.com)
-  [![icon][github-off]](#)
+  [![icon][github-off]](https://github.com/DanKaplanSES)
   &nbsp;
   tieTYT
 * [![icon][mail]](mailto:nickgieschen@gmail.com)
@@ -185,7 +185,7 @@ Contributors:
   &nbsp;
   Vladimir Parfinenko
 * [![icon][mail]](mailto:hassmann@hwdev.de)
-  [![icon][github-off]](#)
+  [![icon][github-off]](https://github.com/lumie1337)
   &nbsp;
   Florian Hassmann
 * [![icon][mail]](mailto:jpalus@fastmail.com)
@@ -193,7 +193,7 @@ Contributors:
   &nbsp;
   Jan Palus
 * [![icon][mail]](mailto:kpetrov@ripe.net)
-  [![icon][github-off]](#)
+  [![icon][github-off]](https://github.com/constpetrov)
   &nbsp;
   Konstantin Petrov
 * [![icon][mail]](mailto:ya-ikmik2012@yandex.ru)
