@@ -40,6 +40,7 @@ import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.VimStateMachine;
 import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.ex.InvalidCommandException;
+import com.maddyhome.idea.vim.helper.EngineStringHelperKt;
 import com.maddyhome.idea.vim.helper.UiHelper;
 import com.maddyhome.idea.vim.newapi.IjExecutionContext;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
@@ -262,10 +263,9 @@ public class ProcessGroup extends VimProcessGroupBase {
       if (exitCode != null && exitCode != 0) {
         VimPlugin.showMessage("shell returned " + exitCode);
         VimPlugin.indicateError();
-        return output.getStderr() + output.getStdout();
       }
 
-      return output.getStdout();
+      return EngineStringHelperKt.removeAsciiColorCodes(output.getStderr() + output.getStdout());
     }, "IdeaVim - !" + command, true, ((IjVimEditor) editor).getEditor().getProject());
   }
 
