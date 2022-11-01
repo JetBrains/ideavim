@@ -16,6 +16,13 @@
       <li><a href="https://youtrack.jetbrains.com/issue/VIM-2768">VIM-2768</a> Refactor listeners</li>
       <li><a href="https://youtrack.jetbrains.com/issue/VIM-2776">VIM-2776</a> Use filename index for file search</li>
     </ul>
+
+    <h3>Merged PRs:</h3>
+    <ul>
+      <li><a href="https://github.com/JetBrains/ideavim/pull/550">550</a> by <a href="https://github.com/citizenmatt">Matt
+        Ellis</a>: Fix(VIM-2778) Remove override of editor scroll setting
+      </li>
+    </ul>
     ]]>
   </change-notes>
   <description><![CDATA[
