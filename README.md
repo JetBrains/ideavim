@@ -364,8 +364,7 @@ is the full list of synonyms.
 License
 -------
 
-IdeaVim is licensed under the terms of the GNU Public License version 2
-or any later version.
+IdeaVim is licensed under the MIT license.
 
 
 <!-- Badges -->
