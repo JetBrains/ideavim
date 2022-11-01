@@ -64,10 +64,6 @@ Contributors:
   [![icon][github]](https://github.com/jflorian)
   &nbsp;
   John Florian
-* [![icon][mail]](mailto:marquis@marquiswang.com)
-  [![icon][github]](https://github.com/marquiswang)
-  &nbsp;
-  Marquis Wang
 * [![icon][mail]](mailto:madgnome@gmail.com)
   [![icon][github]](https://github.com/madgnome)
   &nbsp;
@@ -220,10 +216,6 @@ Contributors:
   [![icon][github]](https://github.com/johngrib)
   &nbsp;
   John Grib
-* [![icon][mail]](mailto:hild@b4mad.net)
-  [![icon][github-off]](#)
-  &nbsp;
-  Marcel Hild
 * [![icon][mail]](mailto:vedranb@gmail.com)
   [![icon][github]](https://github.com/vedran)
   &nbsp;
@@ -319,10 +311,6 @@ Contributors:
   [![icon][github]](https://github.com/angelbot)
   &nbsp;
   John Weigel
-* [![icon][mail]](mailto:kevinz@weghst.com)
-  [![icon][github]](https://github.com/kevin70)
-  &nbsp;
-  kk
 * [![icon][mail]](mailto:runforprogram@163.com)
   [![icon][github]](https://github.com/runforprogram)
   &nbsp;
@@ -331,10 +319,6 @@ Contributors:
   [![icon][github]](https://github.com/valis)
   &nbsp;
   valis
-* [![icon][mail]](mailto:pmikulski@voleon.com)
-  [![icon][github]](https://github.com/pmnoxx)
-  &nbsp;
-  Piotr Mikulski
 * [![icon][mail]](mailto:14farresa@gmail.com)
   [![icon][github]](https://github.com/adriafarres)
   &nbsp;
@@ -455,6 +439,26 @@ Contributors:
   [![icon][github]](https://github.com/lippfi)
   &nbsp;
   lippfi
+
+Previous contributors:
+
+* [![icon][mail]](mailto:hild@b4mad.net)
+  [![icon][github-off]](#)
+  &nbsp;
+  Marcel Hild
+* [![icon][mail]](mailto:marquis@marquiswang.com)
+  [![icon][github]](https://github.com/marquiswang)
+  &nbsp;
+  Marquis Wang
+* [![icon][mail]](mailto:kevinz@weghst.com)
+  [![icon][github]](https://github.com/kevin70)
+  &nbsp;
+  kk
+* [![icon][mail]](mailto:pmikulski@voleon.com)
+  [![icon][github]](https://github.com/pmnoxx)
+  &nbsp;
+  Piotr Mikulski
+
                         
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainers.

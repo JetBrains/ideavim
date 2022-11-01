@@ -23,6 +23,11 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
+## 2.0.0, 2022-11-01
+
+### Changes:
+* IdeaVim changes license from GPL-2.0 or later to MIT. [VIM-2782](https://youtrack.jetbrains.com/issue/VIM-2782)
+
 ## 1.12.0, 2022-11-01
 
 ### Fixes:
