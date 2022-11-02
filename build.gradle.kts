@@ -428,16 +428,11 @@ tasks.register("integrationsTest") {
     group = "other"
     doLast {
         // YouTrack set to Ready To Release on Fix commit
-        val currentState = getYoutrackStatus("VIM-2784")
-        val newState = when (currentState) {
-            "Fixed" -> "Ready To Release"
-            "Ready To Release" -> "Fixed"
-            else -> error("Unexpected state: $currentState")
-        }
-        setYoutrackStatus(listOf("VIM-2784"), newState)
-        if (newState != getYoutrackStatus("VIM-2784")) {
+        setYoutrackStatus(listOf("VIM-2784"), "Ready To Release")
+        if ("Ready To Release" != getYoutrackStatus("VIM-2784")) {
             error("Ticket status was not updated")
         }
+        setYoutrackStatus(listOf("VIM-2784"), "Open")
 
         // TODO: test Ticket parsing
         // TODO: test Update CHANGES
