@@ -1,5 +1,27 @@
 
 import dev.feedforward.markdownto.DownParser
+import io.ktor.client.*
+import io.ktor.client.call.*
+import io.ktor.client.engine.cio.*
+import io.ktor.client.plugins.auth.*
+import io.ktor.client.plugins.auth.providers.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.request.*
+import io.ktor.http.*
+import io.ktor.serialization.kotlinx.json.*
+import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.addJsonObject
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.put
+import kotlinx.serialization.json.putJsonArray
+import kotlinx.serialization.json.putJsonObject
+import org.eclipse.jgit.api.Git
+import org.eclipse.jgit.lib.RepositoryBuilder
 import org.intellij.markdown.ast.getTextInNode
 import java.net.HttpURLConnection
 import java.net.URL
@@ -15,6 +37,12 @@ buildscript {
         classpath("com.github.AlexPl292:mark-down-to-slack:1.1.2")
         classpath("org.eclipse.jgit:org.eclipse.jgit:6.1.0.202203080745-r")
         classpath("org.kohsuke:github-api:1.305")
+
+        classpath("io.ktor:ktor-client-core:2.1.3")
+        classpath("io.ktor:ktor-client-cio:2.1.3")
+        classpath("io.ktor:ktor-client-auth:2.1.3")
+        classpath("io.ktor:ktor-client-content-negotiation:2.1.3")
+        classpath("io.ktor:ktor-serialization-kotlinx-json:2.1.3")
 
         // This comes from the changelog plugin
 //        classpath("org.jetbrains:markdown:0.3.1")
@@ -46,6 +74,7 @@ val publishChannels: String by project
 val publishToken: String by project
 
 val slackUrl: String by project
+val youtrackToken: String by project
 
 repositories {
     mavenCentral()
@@ -388,6 +417,28 @@ tasks.register("updateChangelog") {
     }
 }
 
+tasks.register("updateYoutrackOnCommit") {
+    doLast {
+        updateChangelog()
+    }
+}
+
+tasks.register("integrationsTest") {
+    group = "other"
+    doLast {
+        val currentState = getYoutrackStatus("VIM-2784")
+        val newState = when (currentState) {
+            "Fixed" -> "Ready To Release"
+            "Ready To Release" -> "Fixed"
+            else -> error("Unexpected state: $currentState")
+        }
+        setYoutrackStatus(listOf("VIM-2784"), newState)
+        if (newState != getYoutrackStatus("VIM-2784")) {
+            error("Ticket status was not updated")
+        }
+    }
+}
+
 tasks.register("testUpdateChangelog") {
     group = "verification"
     description = "This is a task to manually assert the correctness of the update tasks"
@@ -404,37 +455,67 @@ tasks.register("testUpdateChangelog") {
     }
 }
 
+fun updateYoutrackOnCommit() {
+    println("Start updating youtrack")
+    println(projectDir)
+
+    val newFixes = changes()
+    val newTickets = newFixes.map { it.id }
+    println("Set new status for $newTickets")
+    setYoutrackStatus(newTickets, "Ready To Release")
+}
+
+fun setYoutrackStatus(tickets: List<String>, status: String) {
+    val client = httpClient()
+
+    runBlocking {
+        for (ticket in tickets) {
+            val response = client.post("https://youtrack.jetbrains.com/api/issues/$ticket?fields=customFields(id,name,value(id,name))") {
+                contentType(ContentType.Application.Json)
+                accept(ContentType.Application.Json)
+                val request = buildJsonObject {
+                    putJsonArray("customFields") {
+                        addJsonObject {
+                            put("name", "State")
+                            put("\$type", "SingleEnumIssueCustomField")
+                            putJsonObject("value") {
+                                put("name", status)
+                            }
+                        }
+                    }
+                }
+                setBody(request)
+            }
+            println(response)
+            println(response.body<String>())
+            if (!response.status.isSuccess()) {
+                error("Request failed. $ticket, ${response.body<String>()}")
+            }
+            val finalState = response.body<JsonObject>()["customFields"]!!.jsonArray
+                .single { it.jsonObject["name"]!!.jsonPrimitive.content == "State" }
+                .jsonObject["value"]!!
+                .jsonObject["name"]!!
+                .jsonPrimitive.content
+            if (finalState != status) {
+                error("Ticket $ticket is not updated! Expected status $status, but actually $finalState")
+            }
+        }
+    }
+}
+
+fun getYoutrackStatus(ticket: String): String {
+    val client = httpClient()
+
+    return runBlocking {
+        val response = client.get("https://youtrack.jetbrains.com/api/issues/$ticket/customFields/123-129?fields=value(name)")
+        response.body<JsonObject>()["value"]!!.jsonObject.getValue("name").jsonPrimitive.content
+    }
+}
+
 fun updateChangelog() {
     println("Start update authors")
     println(projectDir)
-    val repository = org.eclipse.jgit.lib.RepositoryBuilder().setGitDir(File("$projectDir/.git")).build()
-    val git = org.eclipse.jgit.api.Git(repository)
-    val lastSuccessfulCommit = System.getenv("SUCCESS_COMMIT")!!
-    val messages = git.log().call()
-        .takeWhile {
-            !it.id.name.equals(lastSuccessfulCommit, ignoreCase = true)
-        }
-        .map { it.shortMessage }
-
-    // Collect fixes
-    val newFixes = mutableListOf<Change>()
-    println("Last successful commit: $lastSuccessfulCommit")
-    println("Amount of commits: ${messages.size}")
-    println("Start emails processing")
-    for (message in messages) {
-        println("Processing '$message'...")
-        val lowercaseMessage = message.toLowerCase()
-        val regex = "^fix\\((vim-\\d+)\\):".toRegex()
-        val findResult = regex.find(lowercaseMessage)
-        if (findResult != null) {
-            println("Message matches")
-            val value = findResult.groups[1]!!.value.toUpperCase()
-            val shortMessage = message.drop(findResult.range.last + 1).trim()
-            newFixes += Change(value, shortMessage)
-        } else {
-            println("Message doesn't match")
-        }
-    }
+    val newFixes = changes()
 
     // Update changes file
     val changesFile = File("$projectDir/CHANGES.md")
@@ -460,8 +541,8 @@ fun updateChangelog() {
 fun updateAuthors(uncheckedEmails: Set<String>) {
     println("Start update authors")
     println(projectDir)
-    val repository = org.eclipse.jgit.lib.RepositoryBuilder().setGitDir(File("$projectDir/.git")).build()
-    val git = org.eclipse.jgit.api.Git(repository)
+    val repository = RepositoryBuilder().setGitDir(File("$projectDir/.git")).build()
+    val git = Git(repository)
     val lastSuccessfulCommit = System.getenv("SUCCESS_COMMIT")!!
     val hashesAndEmailes = git.log().call()
         .takeWhile {
@@ -632,3 +713,54 @@ val sections = listOf(
     "### Fixes:",
     "### Merged PRs:",
 )
+
+fun changes(): List<Change> {
+    val repository = RepositoryBuilder().setGitDir(File("$projectDir/.git")).build()
+    val git = Git(repository)
+    val lastSuccessfulCommit = System.getenv("SUCCESS_COMMIT")!!
+    val messages = git.log().call()
+        .takeWhile {
+            !it.id.name.equals(lastSuccessfulCommit, ignoreCase = true)
+        }
+        .map { it.shortMessage }
+
+    // Collect fixes
+    val newFixes = mutableListOf<Change>()
+    println("Last successful commit: $lastSuccessfulCommit")
+    println("Amount of commits: ${messages.size}")
+    println("Start emails processing")
+    for (message in messages) {
+        println("Processing '$message'...")
+        val lowercaseMessage = message.toLowerCase()
+        val regex = "^fix\\((vim-\\d+)\\):".toRegex()
+        val findResult = regex.find(lowercaseMessage)
+        if (findResult != null) {
+            println("Message matches")
+            val value = findResult.groups[1]!!.value.toUpperCase()
+            val shortMessage = message.drop(findResult.range.last + 1).trim()
+            newFixes += Change(value, shortMessage)
+        } else {
+            println("Message doesn't match")
+        }
+    }
+    return newFixes
+}
+
+fun httpClient(): HttpClient {
+    return HttpClient(CIO) {
+        expectSuccess = true
+        install(Auth) {
+            bearer {
+                loadTokens {
+                    BearerTokens(youtrackToken, "")
+                }
+            }
+        }
+        install(ContentNegotiation) {
+            json(Json {
+                prettyPrint = true
+                isLenient = true
+            })
+        }
+    }
+}
