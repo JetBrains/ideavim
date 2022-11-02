@@ -74,7 +74,7 @@ val publishChannels: String by project
 val publishToken: String by project
 
 val slackUrl: String by project
-val youtrackToken: String? by project
+val youtrackToken: String by project
 
 repositories {
     mavenCentral()
@@ -758,7 +758,8 @@ fun httpClient(): HttpClient {
         install(Auth) {
             bearer {
                 loadTokens {
-                    BearerTokens(youtrackToken ?: System.getenv("YOUTRACK_TOKEN")!!, "")
+                    val accessToken = youtrackToken.ifBlank { System.getenv("YOUTRACK_TOKEN")!! }
+                    BearerTokens(accessToken, "")
                 }
             }
         }
