@@ -74,7 +74,7 @@ val publishChannels: String by project
 val publishToken: String by project
 
 val slackUrl: String by project
-val youtrackToken: String by project
+val youtrackToken: String? by project
 
 repositories {
     mavenCentral()
@@ -419,7 +419,7 @@ tasks.register("updateChangelog") {
 
 tasks.register("updateYoutrackOnCommit") {
     doLast {
-        updateChangelog()
+        updateYoutrackOnCommit()
     }
 }
 
@@ -752,7 +752,7 @@ fun httpClient(): HttpClient {
         install(Auth) {
             bearer {
                 loadTokens {
-                    BearerTokens(youtrackToken, "")
+                    BearerTokens(youtrackToken ?: System.getenv("YOUTRACK_TOKEN")!!, "")
                 }
             }
         }
