@@ -393,6 +393,7 @@ tasks.register("updateAuthors") {
             "aleksei.plate@TeamCity",
             "alex.plate@192.168.0.109",
             "nikita.koshcheev@TeamCity",
+            "TeamCity@TeamCity",
         )
         updateAuthors(uncheckedEmails)
     }
@@ -442,6 +443,7 @@ tasks.register("integrationsTest") {
         // TODO: test Update CHANGES
         // TODO: test Update AUTHORS
         // TODO: Update YouTrack on release
+        // TODO: test Slack notification
     }
 }
 
