@@ -426,6 +426,7 @@ tasks.register("updateYoutrackOnCommit") {
 tasks.register("integrationsTest") {
     group = "other"
     doLast {
+        // YouTrack set to Ready To Release on Fix commit
         val currentState = getYoutrackStatus("VIM-2784")
         val newState = when (currentState) {
             "Fixed" -> "Ready To Release"
@@ -436,6 +437,11 @@ tasks.register("integrationsTest") {
         if (newState != getYoutrackStatus("VIM-2784")) {
             error("Ticket status was not updated")
         }
+
+        // TODO: test Ticket parsing
+        // TODO: test Update CHANGES
+        // TODO: test Update AUTHORS
+        // TODO: Update YouTrack on release
     }
 }
 
