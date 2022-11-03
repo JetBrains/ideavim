@@ -11,6 +11,7 @@ import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.addJsonObject
 import kotlinx.serialization.json.buildJsonObject
@@ -424,21 +425,65 @@ tasks.register("updateYoutrackOnCommit") {
     }
 }
 
+val vimProjectId = "22-43"
+val fixVersionsFieldId = "123-285"
+val fixVersionsFieldType = "VersionProjectCustomField"
+val fixVersionsElementType = "VersionBundleElement"
+
+tasks.register("releaseActions") {
+    doLast {
+        if (!project.hasProperty("release_version")) error("Property release_version is not set")
+        val tickets = getYoutrackTicketsByQuery("%23%7BReady+To+Release%7D")
+        setYoutrackStatus(tickets, "Fixed")
+        val version = project.property("release_version").toString()
+        addReleaseToYoutrack(version)
+        setYoutrackFixVersion(tickets, version)
+    }
+}
+
 tasks.register("integrationsTest") {
     group = "other"
     doLast {
+        val testTicketId = "VIM-2784"
+
         // YouTrack set to Ready To Release on Fix commit
-        setYoutrackStatus(listOf("VIM-2784"), "Ready To Release")
-        if ("Ready To Release" != getYoutrackStatus("VIM-2784")) {
+        setYoutrackStatus(listOf(testTicketId), "Ready To Release")
+        if ("Ready To Release" != getYoutrackStatus(testTicketId)) {
             error("Ticket status was not updated")
         }
-        setYoutrackStatus(listOf("VIM-2784"), "Open")
+        setYoutrackStatus(listOf(testTicketId), "Open")
+
+        // Check YouTrack requests
+        val prevStatus = getYoutrackStatus(testTicketId)
+        setYoutrackStatus(listOf(testTicketId), "Ready To Release")
+        val tickets = getYoutrackTicketsByQuery("%23%7BReady+To+Release%7D")
+        if (testTicketId !in tickets) {
+            error("Test ticket is not found in request")
+        }
+        setYoutrackStatus(listOf(testTicketId), prevStatus)
+
+        // Check adding and removing release
+        guard(!checkReleaseVersionExists("TEST_VERSION")) { "Test version already exists" }
+        val versionId = addReleaseToYoutrack("TEST_VERSION")
+        guard(checkReleaseVersionExists("TEST_VERSION")) { "Test version isn't created" }
+        setYoutrackStatus(listOf(testTicketId), "Fixed")
+        setYoutrackFixVersion(listOf(testTicketId), "TEST_VERSION")
+        deleteVersionById(versionId)
+        setYoutrackStatus(listOf(testTicketId), "Open")
+        guard(!checkReleaseVersionExists("TEST_VERSION")) { "Test version isn't deleted" }
+
 
         // TODO: test Ticket parsing
         // TODO: test Update CHANGES
         // TODO: test Update AUTHORS
-        // TODO: Update YouTrack on release
         // TODO: test Slack notification
+        // TODO: Add a comment on EAP release
+    }
+}
+
+fun guard(check: Boolean, ifWrong: () -> String) {
+    if (!check) {
+        error(ifWrong())
     }
 }
 
@@ -458,6 +503,40 @@ tasks.register("testUpdateChangelog") {
     }
 }
 
+fun addReleaseToYoutrack(name: String): String {
+    val client = httpClient()
+
+    return runBlocking {
+        val response = client.post("https://youtrack.jetbrains.com/api/admin/projects/$vimProjectId/customFields/$fixVersionsFieldId/bundle/values?fields=id,name") {
+            contentType(ContentType.Application.Json)
+            accept(ContentType.Application.Json)
+            val request = buildJsonObject {
+                put("name", name)
+                put("\$type", fixVersionsElementType)
+            }
+            setBody(request)
+        }
+        response.body<JsonObject>().getValue("id").jsonPrimitive.content
+    }
+}
+
+fun checkReleaseVersionExists(name: String): Boolean {
+    val client = httpClient()
+
+    return runBlocking {
+        val response = client.get("https://youtrack.jetbrains.com/api/admin/projects/$vimProjectId/customFields/$fixVersionsFieldId/bundle/values?fields=id,name&query=$name")
+        response.body<JsonArray>().isNotEmpty()
+    }
+}
+
+fun deleteVersionById(id: String) {
+    val client = httpClient()
+
+    runBlocking {
+        client.delete("https://youtrack.jetbrains.com/api/admin/projects/$vimProjectId/customFields/$fixVersionsFieldId/bundle/values/$id")
+    }
+}
+
 fun updateYoutrackOnCommit() {
     println("Start updating youtrack")
     println(projectDir)
@@ -468,7 +547,16 @@ fun updateYoutrackOnCommit() {
     setYoutrackStatus(newTickets, "Ready To Release")
 }
 
-fun setYoutrackStatus(tickets: List<String>, status: String) {
+fun getYoutrackTicketsByQuery(query: String): Set<String> {
+    val client = httpClient()
+
+    return runBlocking {
+        val response = client.get("https://youtrack.jetbrains.com/api/issues/?fields=idReadable&query=project:VIM+$query")
+        response.body<JsonArray>().mapTo(HashSet()) { it.jsonObject.getValue("idReadable").jsonPrimitive.content }
+    }
+}
+
+fun setYoutrackStatus(tickets: Collection<String>, status: String) {
     val client = httpClient()
 
     runBlocking {
@@ -501,6 +589,45 @@ fun setYoutrackStatus(tickets: List<String>, status: String) {
                 .jsonPrimitive.content
             if (finalState != status) {
                 error("Ticket $ticket is not updated! Expected status $status, but actually $finalState")
+            }
+        }
+    }
+}
+
+fun setYoutrackFixVersion(tickets: Collection<String>, version: String) {
+    val client = httpClient()
+
+    runBlocking {
+        for (ticket in tickets) {
+            val response = client.post("https://youtrack.jetbrains.com/api/issues/$ticket?fields=customFields(id,name,value(id,name))") {
+                contentType(ContentType.Application.Json)
+                accept(ContentType.Application.Json)
+                val request = buildJsonObject {
+                    putJsonArray("customFields") {
+                        addJsonObject {
+                            put("name", "Fix versions")
+                            put("\$type", "MultiVersionIssueCustomField")
+                            putJsonArray("value") {
+                                addJsonObject { put("name", version) }
+                            }
+                        }
+                    }
+                }
+                setBody(request)
+            }
+            println(response)
+            println(response.body<String>())
+            if (!response.status.isSuccess()) {
+                error("Request failed. $ticket, ${response.body<String>()}")
+            }
+            val finalState = response.body<JsonObject>()["customFields"]!!.jsonArray
+                .single { it.jsonObject["name"]!!.jsonPrimitive.content == "Fix versions" }
+                .jsonObject["value"]!!
+                .jsonArray[0]
+                .jsonObject["name"]!!
+                .jsonPrimitive.content
+            if (finalState != version) {
+                error("Ticket $ticket is not updated! Expected fix version $version, but actually $finalState")
             }
         }
     }
