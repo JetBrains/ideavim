@@ -34,7 +34,7 @@ changeBuildType(RelativeId("Release")) {
         insert(1) {
             gradle {
                 name = "Run Integrations"
-                tasks = "-Prelease_version=%system.teamcity.buildType.id%  releaseActions"
+                tasks = "releaseActions"
                 param("org.jfrog.artifactory.selectedDeployableServer.defaultModuleVersionConfiguration", "GLOBAL")
             }
         }
