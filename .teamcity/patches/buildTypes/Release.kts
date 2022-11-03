@@ -11,6 +11,12 @@ To apply the patch, change the buildType with id = 'Release'
 accordingly, and delete the patch script.
 */
 changeBuildType(RelativeId("Release")) {
+    params {
+        add {
+            param("ORG_GRADLE_PROJECT_youtrackToken", "perm:QWxla3NlaS5QbGF0ZQ==.OTItNjk0Mw==.gbyYTVTfjjwhYlUidVZwxJQK2vEkdD")
+        }
+    }
+
     expectSteps {
         gradle {
             tasks = "clean publishPlugin slackNotification"
