@@ -35,6 +35,7 @@ changeBuildType(RelativeId("Release")) {
         insert(2) {
             gradle {
                 name = "Slack Notification"
+                enabled = false
                 tasks = "slackNotification"
                 param("org.jfrog.artifactory.selectedDeployableServer.defaultModuleVersionConfiguration", "GLOBAL")
             }
