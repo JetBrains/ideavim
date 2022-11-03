@@ -27,7 +27,7 @@ changeBuildType(RelativeId("Release")) {
         insert(1) {
             gradle {
                 name = "Run Integrations"
-                tasks = "slackNotification -Prelease_version=%system.teamcity.buildType.id%  releaseActions"
+                tasks = "-Prelease_version=%system.teamcity.buildType.id%  releaseActions"
                 param("org.jfrog.artifactory.selectedDeployableServer.defaultModuleVersionConfiguration", "GLOBAL")
             }
         }
