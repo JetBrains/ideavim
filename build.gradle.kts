@@ -434,11 +434,18 @@ tasks.register("releaseActions") {
     group = "other"
     doLast {
         val tickets = getYoutrackTicketsByQuery("%23%7BReady+To+Release%7D")
-        setYoutrackStatus(tickets, "Fixed")
-        if (!checkReleaseVersionExists(version.toString())) {
-            addReleaseToYoutrack(version.toString())
+        if (tickets.isNotEmpty()) {
+            println("Updating statuses for tickets: $tickets")
+            setYoutrackStatus(tickets, "Fixed")
+            if (!checkReleaseVersionExists(version.toString())) {
+                addReleaseToYoutrack(version.toString())
+            } else {
+                println("Version $version is already exists in YouTrack")
+            }
+            setYoutrackFixVersion(tickets, version.toString())
+        } else {
+            println("No tickets to update statuses")
         }
-        setYoutrackFixVersion(tickets, version.toString())
     }
 }
 
@@ -506,6 +513,7 @@ tasks.register("testUpdateChangelog") {
 
 fun addReleaseToYoutrack(name: String): String {
     val client = httpClient()
+    println("Creating new release version in YouTrack: $name")
 
     return runBlocking {
         val response = client.post("https://youtrack.jetbrains.com/api/admin/projects/$vimProjectId/customFields/$fixVersionsFieldId/bundle/values?fields=id,name") {
@@ -562,6 +570,7 @@ fun setYoutrackStatus(tickets: Collection<String>, status: String) {
 
     runBlocking {
         for (ticket in tickets) {
+            println("Try to set $ticket to $status")
             val response = client.post("https://youtrack.jetbrains.com/api/issues/$ticket?fields=customFields(id,name,value(id,name))") {
                 contentType(ContentType.Application.Json)
                 accept(ContentType.Application.Json)
@@ -600,6 +609,7 @@ fun setYoutrackFixVersion(tickets: Collection<String>, version: String) {
 
     runBlocking {
         for (ticket in tickets) {
+            println("Try to set fix version $version for $ticket")
             val response = client.post("https://youtrack.jetbrains.com/api/issues/$ticket?fields=customFields(id,name,value(id,name))") {
                 contentType(ContentType.Application.Json)
                 accept(ContentType.Application.Json)
