@@ -431,6 +431,7 @@ val fixVersionsFieldType = "VersionProjectCustomField"
 val fixVersionsElementType = "VersionBundleElement"
 
 tasks.register("releaseActions") {
+    group = "other"
     doLast {
         val tickets = getYoutrackTicketsByQuery("%23%7BReady+To+Release%7D")
         setYoutrackStatus(tickets, "Fixed")
