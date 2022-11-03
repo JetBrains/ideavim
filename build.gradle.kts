@@ -432,12 +432,12 @@ val fixVersionsElementType = "VersionBundleElement"
 
 tasks.register("releaseActions") {
     doLast {
-        if (!project.hasProperty("release_version")) error("Property release_version is not set")
         val tickets = getYoutrackTicketsByQuery("%23%7BReady+To+Release%7D")
         setYoutrackStatus(tickets, "Fixed")
-        val version = project.property("release_version").toString()
-        addReleaseToYoutrack(version)
-        setYoutrackFixVersion(tickets, version)
+        if (!checkReleaseVersionExists(version.toString())) {
+            addReleaseToYoutrack(version.toString())
+        }
+        setYoutrackFixVersion(tickets, version.toString())
     }
 }
 
