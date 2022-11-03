@@ -21,6 +21,7 @@ changeBuildType(RelativeId("Release")) {
     }
     steps {
         update<GradleBuildStep>(0) {
+            enabled = false
             clearConditions()
             tasks = "clean publishPlugin"
         }
