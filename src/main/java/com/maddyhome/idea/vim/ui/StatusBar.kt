@@ -175,45 +175,39 @@ private object VimActionsPopup {
     actionGroup.addSeparator()
     actionGroup.add(NotificationService.OpenIdeaVimRcAction(null))
     actionGroup.add(ShortcutConflictsSettings)
-    actionGroup.addSeparator()
+    actionGroup.addSeparator(MessageHelper.message("action.eap.choice.active.text"))
 
-    val eapGroup = DefaultActionGroup(MessageHelper.message("action.eap.choice.active.text"), true)
-    if (JoinEap.eapActive()) {
-      eapGroup.templatePresentation.icon = LafIconLookup.getIcon("checkmark")
-    }
-    eapGroup.add(JoinEap)
-    eapGroup.add(
+    actionGroup.add(JoinEap)
+    actionGroup.add(
       HelpLink(
         MessageHelper.message("action.about.eap.text"),
         "https://github.com/JetBrains/ideavim#get-early-access",
         null
       )
     )
-    actionGroup.add(eapGroup)
 
-    val helpGroup = DefaultActionGroup(MessageHelper.message("action.contacts.help.text"), true)
-    helpGroup.add(
+    actionGroup.addSeparator(MessageHelper.message("action.contacts.help.text"))
+    actionGroup.add(
       HelpLink(
         MessageHelper.message("action.contact.on.twitter.text"),
         "https://twitter.com/ideavim",
         VimIcons.TWITTER
       )
     )
-    helpGroup.add(
+    actionGroup.add(
       HelpLink(
         MessageHelper.message("action.create.issue.text"),
         "https://youtrack.jetbrains.com/issues/VIM",
         VimIcons.YOUTRACK
       )
     )
-    helpGroup.add(
+    actionGroup.add(
       HelpLink(
         MessageHelper.message("action.contribute.on.github.text"),
         "https://github.com/JetBrains/ideavim",
         AllIcons.Vcs.Vendors.Github
       )
     )
-    actionGroup.add(helpGroup)
 
     return actionGroup
   }
@@ -252,6 +246,7 @@ internal object JoinEap : DumbAwareAction()/*, LightEditCompatible*/ {
 
   override fun update(e: AnActionEvent) {
     if (eapActive()) {
+      e.presentation.icon = LafIconLookup.getIcon("checkmark")
       e.presentation.text = MessageHelper.message("action.finish.eap.text")
     } else {
       e.presentation.text = MessageHelper.message("action.subscribe.to.eap.text")
