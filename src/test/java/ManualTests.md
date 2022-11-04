@@ -3,7 +3,7 @@
 ## #8 [Last run: 2020-11-12
 
 _Action:_  
-Start up IJ with disabled emulator, turn it on
+Start up IJ with disabled plugin, turn it on
 
 _Result:_  
-Vim emulator works as expected
+Vim plugin works as expected

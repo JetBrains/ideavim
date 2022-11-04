@@ -10,7 +10,7 @@ package org.jetbrains.plugins.ideavim.propertybased.samples
 
 internal val javaText = """
 /*
- * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
+ * IdeaVim - Vim engine for IDEs based on the IntelliJ platform
  * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
