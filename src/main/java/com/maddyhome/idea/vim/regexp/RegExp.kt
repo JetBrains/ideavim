@@ -1,10 +1,3 @@
-/*
- * Copyright 2003-2022 The IdeaVim authors
- *
- * Use of this source code is governed by an MIT-style
- * license that can be found in the LICENSE.txt file or at
- * https://opensource.org/licenses/MIT.
- */
 package com.maddyhome.idea.vim.regexp
 
 import com.maddyhome.idea.vim.api.VimEditor
@@ -12,8 +5,6 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.helper.Msg
 import org.jetbrains.annotations.NonNls
-import java.lang.StringBuffer
-import java.lang.StringBuilder
 import java.util.*
 
 class RegExp {

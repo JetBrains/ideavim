@@ -366,6 +366,12 @@ License
 
 IdeaVim is licensed under the MIT license.
 
+Third-party components and licenses are listed in [ThirdPartyLicenses.md](ThirdPartyLicenses.md).
+
+All releases before 2.0.0 were licensed under terms of GPL-2.0 or later.
+The last commit before switch to MIT is 05852b07c6090ad40fde7d3cafe0b074604f7ac5.
+You can read more about the license change here: https://github.com/JetBrains/ideavim/discussions/543
+
 
 <!-- Badges -->
 [jb-official]: https://confluence.jetbrains.com/display/ALL/JetBrains+on+GitHub
