@@ -1,3 +1,11 @@
+<!--
+  - Copyright 2003-2022 The IdeaVim authors
+  -
+  - Use of this source code is governed by an MIT-style
+  - license that can be found in the LICENSE.txt file or at
+  - https://opensource.org/licenses/MIT.
+  -->
+
 <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
   <defs>
     <linearGradient id="ideavim_plugin-a" x1="-6.748%" x2="47.286%" y1="33.61%" y2="85.907%">
