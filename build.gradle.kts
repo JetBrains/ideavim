@@ -6,7 +6,6 @@
  * https://opensource.org/licenses/MIT.
  */
 
-
 import dev.feedforward.markdownto.DownParser
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -488,7 +487,6 @@ tasks.register("integrationsTest") {
         setYoutrackStatus(listOf(testTicketId), "Open")
         guard(!checkReleaseVersionExists("TEST_VERSION")) { "Test version isn't deleted" }
 
-
         // TODO: test Ticket parsing
         // TODO: test Update CHANGES
         // TODO: test Update AUTHORS
@@ -907,10 +905,12 @@ fun httpClient(): HttpClient {
             }
         }
         install(ContentNegotiation) {
-            json(Json {
-                prettyPrint = true
-                isLenient = true
-            })
+            json(
+                Json {
+                    prettyPrint = true
+                    isLenient = true
+                }
+            )
         }
     }
 }

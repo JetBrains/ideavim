@@ -66,4 +66,3 @@ object EngineStringHelper {
 fun String.removeAsciiColorCodes(): String {
   return this.replace("\u001B\\[[;\\d]*m".toRegex(), "")
 }
-
