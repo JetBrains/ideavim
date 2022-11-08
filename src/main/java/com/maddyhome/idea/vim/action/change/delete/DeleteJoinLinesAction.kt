@@ -18,8 +18,28 @@ import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.services.IjVimOptionService
 
-class DeleteJoinLinesAction : ChangeEditorActionHandler.SingleExecution() {
+class DeleteJoinLinesAction : ChangeEditorActionHandler.ConditionalSingleExecution() {
   override val type: Command.Type = Command.Type.DELETE
+  override fun runAsMulticaret(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
+    return !injector.optionService.isSet(OptionScope.LOCAL(editor), IjVimOptionService.ideajoinName)
+  }
+
+  override fun execute(
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    argument: Argument?,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
+    injector.editorGroup.notifyIdeaJoin(editor)
+
+    return injector.changeGroup.deleteJoinLines(editor, caret, operatorArguments.count1, false, operatorArguments)
+  }
 
   override fun execute(
     editor: VimEditor,
@@ -28,17 +48,6 @@ class DeleteJoinLinesAction : ChangeEditorActionHandler.SingleExecution() {
     operatorArguments: OperatorArguments,
   ): Boolean {
     if (editor.isOneLineMode()) return false
-    if (injector.optionService.isSet(OptionScope.LOCAL(editor), IjVimOptionService.ideajoinName)) {
-      return injector.changeGroup.joinViaIdeaByCount(editor, context, operatorArguments.count1)
-    }
-    injector.editorGroup.notifyIdeaJoin(editor)
-    val res = arrayOf(true)
-    editor.forEachNativeCaret(
-      { caret: VimCaret ->
-        if (!injector.changeGroup.deleteJoinLines(editor, caret, operatorArguments.count1, false, operatorArguments)) res[0] = false
-      },
-      true
-    )
-    return res[0]
+    return injector.changeGroup.joinViaIdeaByCount(editor, context, operatorArguments.count1)
   }
 }

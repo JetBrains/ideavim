@@ -56,6 +56,30 @@ sealed class ChangeEditorActionHandler : EditorActionHandlerBase(false) {
     ): Boolean
   }
 
+  abstract class ConditionalSingleExecution : ChangeEditorActionHandler() {
+    abstract fun runAsMulticaret(
+      editor: VimEditor,
+      context: ExecutionContext,
+      cmd: Command,
+      operatorArguments: OperatorArguments,
+    ): Boolean
+
+    abstract fun execute(
+      editor: VimEditor,
+      caret: VimCaret,
+      context: ExecutionContext,
+      argument: Argument?,
+      operatorArguments: OperatorArguments,
+    ): Boolean
+
+    abstract fun execute(
+      editor: VimEditor,
+      context: ExecutionContext,
+      argument: Argument?,
+      operatorArguments: OperatorArguments,
+    ): Boolean
+  }
+
   final override fun baseExecute(
     editor: VimEditor,
     caret: VimCaret,
@@ -89,6 +113,22 @@ sealed class ChangeEditorActionHandler : EditorActionHandlerBase(false) {
         }
         is SingleExecution -> {
           worked[0] = execute(editor, context, cmd.argument, operatorArguments)
+        }
+        is ConditionalSingleExecution -> {
+          val runAsMulticaret = this.runAsMulticaret(editor, context, cmd, operatorArguments)
+          if (runAsMulticaret) {
+            editor.forEachNativeCaret(
+              { current ->
+                if (!current.isValid) return@forEachNativeCaret
+                if (!execute(editor, current, context, cmd.argument, operatorArguments)) {
+                  worked[0] = false
+                }
+              },
+              true
+            )
+          } else {
+            worked[0] = execute(editor, context, cmd.argument, operatorArguments)
+          }
         }
       }
     } catch (e: java.lang.Exception) {
