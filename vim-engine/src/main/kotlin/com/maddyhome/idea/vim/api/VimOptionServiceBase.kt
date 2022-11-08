@@ -54,7 +54,6 @@ abstract class VimOptionServiceBase : OptionService {
     ToggleOption(OptionConstants.timeoutName, OptionConstants.timeoutAlias, true),
     ToggleOption(OptionConstants.visualbellName, OptionConstants.visualbellAlias, false),
     ToggleOption(OptionConstants.wrapscanName, OptionConstants.wrapscanAlias, true),
-    ToggleOption(OptionConstants.ideadelaymacroName, OptionConstants.ideadelaymacroAlias, false),
     ToggleOption(OptionConstants.trackactionidsName, OptionConstants.trackactionidsAlias, false),
     StringOption(OptionConstants.selectionName, OptionConstants.selectionAlias, "inclusive", isList = false, setOf("old", "inclusive", "exclusive")),
     StringOption(OptionConstants.shellName, OptionConstants.shellAlias, if (injector.systemInfoService.isWindows) "cmd.exe" else System.getenv("SHELL") ?: "sh"),

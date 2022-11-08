@@ -8,7 +8,6 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
-import com.intellij.testFramework.PlatformTestUtil
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment
@@ -239,9 +238,6 @@ class LetCommandTest : VimTestCase() {
     assertExOutput("inumber register works\n")
 
     typeText(injector.parser.parseKeys("@4"))
-    if (VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.ideadelaymacroName)) {
-      PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
-    }
     assertState("number register works\n")
   }
 
@@ -252,9 +248,6 @@ class LetCommandTest : VimTestCase() {
     assertExOutput("ilowercase letter register works\n")
 
     typeText(injector.parser.parseKeys("@o"))
-    if (VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.ideadelaymacroName)) {
-      PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
-    }
     assertState("lowercase letter register works\n")
   }
 
@@ -265,9 +258,6 @@ class LetCommandTest : VimTestCase() {
     assertExOutput("iuppercase letter register works\n")
 
     typeText(injector.parser.parseKeys("@O"))
-    if (VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.ideadelaymacroName)) {
-      PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
-    }
     assertState("uppercase letter register works\n")
     typeText(injector.parser.parseKeys("<Esc>"))
 
@@ -283,9 +273,6 @@ class LetCommandTest : VimTestCase() {
     assertExOutput("iunnamed register works\n")
 
     typeText(injector.parser.parseKeys("@\""))
-    if (VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.ideadelaymacroName)) {
-      PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
-    }
     assertState("unnamed register works\n")
   }
 

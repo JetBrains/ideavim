@@ -7,13 +7,10 @@
  */
 package org.jetbrains.plugins.ideavim.action
 
-import com.intellij.testFramework.PlatformTestUtil
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
 import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.rangeOf
@@ -140,9 +137,6 @@ class MacroActionTest : VimTestCase() {
   fun `test macro with count`() {
     configureByText("${c}0\n1\n2\n3\n4\n5\n")
     typeText(injector.parser.parseKeys("qajq" + "4@a"))
-    if (VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.ideadelaymacroName)) {
-      PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
-    }
     assertState("0\n1\n2\n3\n4\n${c}5\n")
   }
 }

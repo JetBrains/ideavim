@@ -79,9 +79,6 @@ class OptionConstants {
     const val wrapscanName = "wrapscan"
     const val wrapscanAlias = "ws"
 
-    const val ideadelaymacroName = "ideadelaymacro"
-    const val ideadelaymacroAlias = "ideadelaymacro"
-
     const val trackactionidsName = "trackactionids"
     const val trackactionidsAlias = "tai"
 

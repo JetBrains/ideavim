@@ -18,8 +18,6 @@ import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.vimStateMachine
-import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 data class NormalCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
@@ -31,10 +29,6 @@ data class NormalCommand(val ranges: Ranges, val argument: String) : Command.Sin
   )
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
-    if (injector.optionService.isSet(OptionScope.GLOBAL, OptionConstants.ideadelaymacroName)) {
-      return ExecutionResult.Success
-    }
-
     var useMappings = true
     var argument = argument
     if (argument.startsWith("!")) {
