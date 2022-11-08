@@ -14,6 +14,7 @@ import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
+import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
@@ -230,14 +231,14 @@ class NerdTree : VimExtension {
         e.presentation.isEnabled = false
         return
       }
-      e.presentation.isEnabled = !speedSearchIsHere(project)
+      e.presentation.isEnabled = !speedSearchIsHere(e)
     }
 
-    override fun getActionUpdateThread() = ActionUpdateThread.EDT
+    override fun getActionUpdateThread() = ActionUpdateThread.BGT
 
-    private fun speedSearchIsHere(project: Project): Boolean {
-      val component = ProjectView.getInstance(project).currentProjectViewPane.tree ?: return false
-      return SpeedSearchSupply.getSupply(component) != null
+    private fun speedSearchIsHere(e: AnActionEvent): Boolean {
+      val searchText = e.getData(PlatformDataKeys.SPEED_SEARCH_TEXT)
+      return !searchText.isNullOrEmpty()
     }
 
     companion object {
