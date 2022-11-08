@@ -33,6 +33,14 @@ Available extensions:
 * Emulates [vim-easymotion](https://github.com/easymotion/vim-easymotion)
 * Commands: All commands with the mappings are supported. See the [full list of supported commands](https://github.com/AlexPl292/IdeaVim-EasyMotion#supported-commands).
 
+## sneak
+
+* Setup:
+    * Install [IdeaVim-sneak](https://plugins.jetbrains.com/plugin/15348-ideavim-sneak) plugin.
+    * `set sneak`
+* Emulates [vim-sneak](https://github.com/justinmk/vim-sneak)
+* Commands: See the [docs](https://github.com/Mishkun/ideavim-sneak#usage).
+
 ## NERDTree
 * Setup: `Plug 'preservim/nerdtree'`
     * <details>
