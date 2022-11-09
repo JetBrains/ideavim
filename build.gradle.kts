@@ -211,7 +211,7 @@ java {
 
 kotlin {
     jvmToolchain {
-        (this as JavaToolchainSpec).languageVersion.set(JavaLanguageVersion.of(javaVersion))
+        languageVersion.set(JavaLanguageVersion.of(javaVersion))
     }
 }
 
@@ -269,9 +269,13 @@ tasks {
     named("compileKotlin") {
         dependsOn("generateGrammarSource")
     }
+    named("compileTestKotlin") {
+        dependsOn("generateGrammarSource")
+    }
 
     // Add plugin open API sources to the plugin ZIP
     val createOpenApiSourceJar by registering(Jar::class) {
+        dependsOn("generateGrammarSource")
         // Java sources
         from(sourceSets.main.get().java) {
             include("**/com/maddyhome/idea/vim/**/*.java")
