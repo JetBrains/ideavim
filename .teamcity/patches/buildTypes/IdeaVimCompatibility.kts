@@ -11,6 +11,10 @@ To apply the patch, change the buildType with id = 'IdeaVimCompatibility'
 accordingly, and delete the patch script.
 */
 changeBuildType(RelativeId("IdeaVimCompatibility")) {
+    vcs {
+        remove(DslContext.settingsRoot.id!!)
+    }
+
     expectSteps {
         script {
             name = "Check"
