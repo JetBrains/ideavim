@@ -4,6 +4,8 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.*
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.Qodana
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.gradle
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.qodana
+import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.BuildFailureOnMetric
+import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.failOnMetricChange
 import jetbrains.buildServer.configs.kotlin.v2019_2.ui.*
 
 /*
@@ -50,6 +52,21 @@ changeBuildType(RelativeId("Qodana")) {
             param("clonefinder-queried-project", "")
             param("clonefinder-enable", "")
             param("clonefinder-reference-projects", "")
+        }
+    }
+
+    failureConditions {
+        val feature1 = find<BuildFailureOnMetric> {
+            failOnMetricChange {
+                metric = BuildFailureOnMetric.MetricType.QODANA_TOTAL_PROBLEMS_COUNT
+                threshold = 0
+                units = BuildFailureOnMetric.MetricUnit.DEFAULT_UNIT
+                comparison = BuildFailureOnMetric.MetricComparison.MORE
+                compareTo = value()
+            }
+        }
+        feature1.apply {
+            param("metricKey", "QodanaProblemsNew")
         }
     }
 }
