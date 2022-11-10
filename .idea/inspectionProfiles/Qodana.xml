@@ -33,6 +33,7 @@
       <option name="ignoreToString" value="false" />
       <option name="nonNlsCommentPattern" value="NON-NLS" />
     </inspection_tool>
+    <inspection_tool class="MagicConstant" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="MissortedModifiers" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="m_requireAnnotationsFirst" value="true" />
     </inspection_tool>
