@@ -27,7 +27,19 @@ changeBuildType(RelativeId("IdeaVimCompatibility")) {
         }
     }
     steps {
-        update<ScriptBuildStep>(0) {
+        insert(0) {
+            step {
+                name = "Download Verifier"
+                type = "MRPP_DownloadFile"
+                executionMode = BuildStep.ExecutionMode.DEFAULT
+                param("system.url", "https://packages.jetbrains.team/files/p/ideavim/plugin-verifier/verifier-cli-dev-all-1.jar")
+                param("system.username", "")
+                param("system.dest.dir", "verifier1")
+                param("system.clean.dest.dir", "false")
+                param("system.password", "credentialsJSON:c42fdcd2-8e8d-4313-99d0-db62f5dfc514")
+            }
+        }
+        update<ScriptBuildStep>(1) {
             name = "Check (1)"
             clearConditions()
             scriptContent = """
@@ -43,18 +55,6 @@ changeBuildType(RelativeId("IdeaVimCompatibility")) {
                 java -jar verifier1/verifier-cli-dev-all-1.jar check-plugin '${'$'}com.github.dankinsoid.multicursor' [latest-IU] -team-city
                 java -jar verifier1/verifier-cli-dev-all-1.jar check-plugin '${'$'}com.joshestein.ideavim-quickscope' [latest-IU] -team-city
             """.trimIndent()
-        }
-        insert(1) {
-            step {
-                name = "Download Verifier"
-                type = "MRPP_DownloadFile"
-                executionMode = BuildStep.ExecutionMode.DEFAULT
-                param("system.url", "https://packages.jetbrains.team/files/p/ideavim/plugin-verifier/verifier-cli-dev-all-1.jar")
-                param("system.username", "")
-                param("system.dest.dir", "verifier1")
-                param("system.clean.dest.dir", "false")
-                param("system.password", "credentialsJSON:c42fdcd2-8e8d-4313-99d0-db62f5dfc514")
-            }
         }
     }
 }
