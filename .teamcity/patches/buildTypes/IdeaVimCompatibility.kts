@@ -40,7 +40,6 @@ changeBuildType(RelativeId("IdeaVimCompatibility")) {
             }
         }
         update<ScriptBuildStep>(1) {
-            name = "Check (1)"
             clearConditions()
             scriptContent = """
                 # We use a custom build of verifier that downloads IdeaVim from dev channel
