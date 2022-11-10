@@ -745,25 +745,25 @@ public class MotionGroup extends VimMotionGroupBase {
   }
 
   @Override
-  public int moveCaretToFirstScreenLine(@NotNull VimEditor editor,
-                                        @NotNull VimCaret caret,
-                                        int count,
-                                        boolean normalizeToScreen) {
+  public int moveCaretToFirstDisplayLine(@NotNull VimEditor editor,
+                                         @NotNull VimCaret caret,
+                                         int count,
+                                         boolean normalizeToScreen) {
     return moveCaretToScreenLocation(((IjVimEditor)editor).getEditor(), ((IjVimCaret)caret).getCaret(),
                                      ScreenLocation.TOP, count - 1, normalizeToScreen);
   }
 
   @Override
-  public int moveCaretToLastScreenLine(@NotNull VimEditor editor,
-                                       @NotNull VimCaret caret,
-                                       int count,
-                                       boolean normalizeToScreen) {
+  public int moveCaretToLastDisplayLine(@NotNull VimEditor editor,
+                                        @NotNull VimCaret caret,
+                                        int count,
+                                        boolean normalizeToScreen) {
     return moveCaretToScreenLocation(((IjVimEditor)editor).getEditor(), ((IjVimCaret)caret).getCaret(),
                                      ScreenLocation.BOTTOM, count - 1, normalizeToScreen);
   }
 
   @Override
-  public int moveCaretToMiddleScreenLine(@NotNull VimEditor editor, @NotNull VimCaret caret) {
+  public int moveCaretToMiddleDisplayLine(@NotNull VimEditor editor, @NotNull VimCaret caret) {
     return moveCaretToScreenLocation(((IjVimEditor)editor).getEditor(), ((IjVimCaret)caret).getCaret(),
                                      ScreenLocation.MIDDLE, 0, false);
   }

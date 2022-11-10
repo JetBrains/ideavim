@@ -49,7 +49,7 @@ abstract class MotionFirstScreenLineActionBase(private val operatorPending: Bool
     // Only apply scrolloff for NX motions. For op pending, use the actual first line and apply scrolloff after.
     // E.g. yH will yank from first visible line to current line, but it also moves the caret to the first visible line.
     // This is inside scrolloff, so Vim scrolls
-    return injector.motion.moveCaretToFirstScreenLine(editor, caret, operatorArguments.count1, !operatorPending)
+    return injector.motion.moveCaretToFirstDisplayLine(editor, caret, operatorArguments.count1, !operatorPending)
       .toMotion()
   }
 

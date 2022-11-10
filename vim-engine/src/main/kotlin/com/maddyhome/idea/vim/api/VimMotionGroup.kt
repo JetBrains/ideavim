@@ -45,9 +45,9 @@ interface VimMotionGroup {
   // Move caret to (IntelliJ visual) line relative to the bounds of the display (aka window)
   // (This describes what these functions *currently* do, not what they are *supposed* to do)
   // TODO: These should move to the Vim logical line at the top/bottom/middle of the display
-  fun moveCaretToFirstScreenLine(editor: VimEditor, caret: VimCaret, count: Int, normalizeToScreen: Boolean): Int
-  fun moveCaretToLastScreenLine(editor: VimEditor, caret: VimCaret, count: Int, normalizeToScreen: Boolean): Int
-  fun moveCaretToMiddleScreenLine(editor: VimEditor, caret: VimCaret): Int
+  fun moveCaretToFirstDisplayLine(editor: VimEditor, caret: VimCaret, count: Int, normalizeToScreen: Boolean): Int
+  fun moveCaretToMiddleDisplayLine(editor: VimEditor, caret: VimCaret): Int
+  fun moveCaretToLastDisplayLine(editor: VimEditor, caret: VimCaret, count: Int, normalizeToScreen: Boolean): Int
 
   // Move caret to buffer column
   fun moveCaretToColumn(editor: VimEditor, caret: VimCaret, count: Int, allowEnd: Boolean): Motion
