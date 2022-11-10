@@ -45,7 +45,7 @@ changeBuildType(RelativeId("IdeaVimCompatibility")) {
             clearConditions()
             scriptContent = """
                 mkdir verifier1
-                curl -f -L -o verifier1 "https://packages.jetbrains.team/files/p/ideavim/plugin-verifier/verifier-cli-dev-all-1.jar"
+                curl -f -L -o verifier1/verifier-cli-dev-all-1.jar "https://packages.jetbrains.team/files/p/ideavim/plugin-verifier/verifier-cli-dev-all-1.jar"
             """.trimIndent()
         }
         insert(2) {
