@@ -21,3 +21,8 @@ exclude:
       - src/test/java/org/jetbrains/plugins/ideavim/propertybased/samples/SimpleText.kt
       - src/main/java/com/maddyhome/idea/vim/vimscript/parser/generated
       - src/main/java/com/maddyhome/idea/vim/package-info.java
+dependencyIgnores:
+  - name: "acejump"
+  - name: "icu4j"
+  - name: "antlr-runtime"
+  - name: "javax.json"
