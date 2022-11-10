@@ -16,6 +16,7 @@ import com.intellij.codeInsight.template.impl.TemplateManagerImpl
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.group.visual.IdeaSelectionControl
+import com.maddyhome.idea.vim.group.visual.VimVisualTimer
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.listener.VimListenerManager
@@ -794,7 +795,9 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
 
     startDummyTemplate()
 
-    typeText(injector.parser.parseKeys("V"))
+    VimVisualTimer.doNow()
+
+    typeText(injector.parser.parseKeys("<esc>V"))
     assertMode(VimStateMachine.Mode.VISUAL)
     assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
 
