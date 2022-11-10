@@ -38,6 +38,6 @@ class MotionMiddleScreenLineAction : MotionActionHandler.ForEachCaret() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    return injector.motion.moveCaretToMiddleScreenLine(editor, caret).toMotion()
+    return injector.motion.moveCaretToMiddleDisplayLine(editor, caret).toMotion()
   }
 }

@@ -45,7 +45,7 @@ abstract class MotionLastScreenLineActionBase(private val operatorPending: Boole
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    return injector.motion.moveCaretToLastScreenLine(editor, caret, operatorArguments.count1, !operatorPending)
+    return injector.motion.moveCaretToLastDisplayLine(editor, caret, operatorArguments.count1, !operatorPending)
       .toMotion()
   }
 
