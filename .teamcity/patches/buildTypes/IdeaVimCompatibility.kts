@@ -31,6 +31,7 @@ changeBuildType(RelativeId("IdeaVimCompatibility")) {
             step {
                 name = "Download Verifier"
                 type = "MRPP_DownloadFile"
+                enabled = false
                 executionMode = BuildStep.ExecutionMode.DEFAULT
                 param("system.url", "https://packages.jetbrains.team/files/p/ideavim/plugin-verifier/verifier-cli-dev-all-1.jar")
                 param("system.username", "")
