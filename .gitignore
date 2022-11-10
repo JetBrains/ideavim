@@ -9,6 +9,7 @@
 !/.idea/fileTemplates
 !/.idea/runConfigurations
 !/.idea/codeStyles
+!/.idea/vcs.xml
 
 **/build/
 **/out/
