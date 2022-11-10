@@ -55,5 +55,14 @@ changeBuildType(RelativeId("IdeaVimCompatibility")) {
                 java -jar verifier1/verifier-cli-dev-all-1.jar check-plugin '${'$'}com.joshestein.ideavim-quickscope' [latest-IU] -team-city
             """.trimIndent()
         }
+        insert(2) {
+            script {
+                name = "Load Verifier"
+                scriptContent = """
+                    mkdir verifier1
+                    curl -f -L -o verifier1 "https://packages.jetbrains.team/files/p/ideavim/plugin-verifier/verifier-cli-dev-all-1.jar"
+                """.trimIndent()
+            }
+        }
     }
 }
