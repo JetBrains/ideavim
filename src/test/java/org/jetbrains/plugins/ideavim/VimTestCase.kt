@@ -173,7 +173,7 @@ abstract class VimTestCase : UsefulTestCase() {
   protected fun configureByText(content: String) = configureByText(PlainTextFileType.INSTANCE, content)
   protected fun configureByJavaText(content: String) = configureByText(JavaFileType.INSTANCE, content)
   protected fun configureByXmlText(content: String) = configureByText(XmlFileType.INSTANCE, content)
-  protected fun configureByJsonText(content: String) = configureByText(JsonFileType.INSTANCE, content)
+  protected fun configureByJsonText(@Suppress("SameParameterValue") content: String) = configureByText(JsonFileType.INSTANCE, content)
 
   protected fun configureAndGuard(content: String) {
     val ranges = extractBrackets(content)
@@ -182,7 +182,7 @@ abstract class VimTestCase : UsefulTestCase() {
     }
   }
 
-  protected fun configureAndFold(content: String, placeholder: String) {
+  protected fun configureAndFold(content: String, @Suppress("SameParameterValue") placeholder: String) {
     val ranges = extractBrackets(content)
     myFixture.editor.foldingModel.runBatchFoldingOperation {
       for ((start, end) in ranges) {
@@ -557,7 +557,7 @@ abstract class VimTestCase : UsefulTestCase() {
   // Specify width in columns, not pixels, just like we do for visible screen size. The default text char width differs
   // per platform (e.g. Windows is 7, Mac is 8) so we can't guarantee correct positioning for tests if we use hard coded
   // pixel widths
-  protected fun addInlay(offset: Int, relatesToPrecedingText: Boolean, widthInColumns: Int): Inlay<*> {
+  protected fun addInlay(offset: Int, relatesToPrecedingText: Boolean, @Suppress("SameParameterValue") widthInColumns: Int): Inlay<*> {
     val widthInPixels = (EditorHelper.getPlainSpaceWidthFloat(myFixture.editor) * widthInColumns).roundToInt()
     return EditorTestUtil.addInlay(myFixture.editor, offset, relatesToPrecedingText, widthInPixels)
   }
@@ -566,7 +566,7 @@ abstract class VimTestCase : UsefulTestCase() {
   // height on all platforms, so can't guarantee correct positioning for tests if we use pixels. This currently limits
   // us to integer multiples of line heights. I don't think this will cause any issues, but we can change this to a
   // float if necessary. We'd still be working scaled to the line height, so fractional values should still work.
-  protected fun addBlockInlay(offset: Int, showAbove: Boolean, heightInRows: Int): Inlay<*> {
+  protected fun addBlockInlay(offset: Int, @Suppress("SameParameterValue") showAbove: Boolean, heightInRows: Int): Inlay<*> {
     val widthInColumns = 10 // Arbitrary width. We don't care.
     val widthInPixels = (EditorHelper.getPlainSpaceWidthFloat(myFixture.editor) * widthInColumns).roundToInt()
     val heightInPixels = myFixture.editor.lineHeight * heightInRows
