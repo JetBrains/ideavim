@@ -40,27 +40,28 @@ changeBuildType(RelativeId("IdeaVimCompatibility")) {
             }
         }
         update<ScriptBuildStep>(1) {
+            name = "Load Verifier"
             clearConditions()
             scriptContent = """
-                # We use a custom build of verifier that downloads IdeaVim from dev channel
-                
-                java --version
-                java -jar verifier1/verifier-cli-dev-all-1.jar check-plugin '${'$'}org.jetbrains.IdeaVim-EasyMotion' [latest-IU] -team-city
-                java -jar verifier1/verifier-cli-dev-all-1.jar check-plugin '${'$'}io.github.mishkun.ideavimsneak' [latest-IU] -team-city
-                java -jar verifier1/verifier-cli-dev-all-1.jar check-plugin '${'$'}eu.theblob42.idea.whichkey' [latest-IU] -team-city
-                java -jar verifier1/verifier-cli-dev-all-1.jar check-plugin '${'$'}IdeaVimExtension' [latest-IU] -team-city
-                # Outdated java -jar verifier/verifier-cli-dev-all.jar check-plugin '${'$'}github.zgqq.intellij-enhance' [latest-IU] -team-city
-                java -jar verifier1/verifier-cli-dev-all-1.jar check-plugin '${'$'}com.github.copilot' [latest-IU] -team-city
-                java -jar verifier1/verifier-cli-dev-all-1.jar check-plugin '${'$'}com.github.dankinsoid.multicursor' [latest-IU] -team-city
-                java -jar verifier1/verifier-cli-dev-all-1.jar check-plugin '${'$'}com.joshestein.ideavim-quickscope' [latest-IU] -team-city
+                mkdir verifier1
+                curl -f -L -o verifier1 "https://packages.jetbrains.team/files/p/ideavim/plugin-verifier/verifier-cli-dev-all-1.jar"
             """.trimIndent()
         }
         insert(2) {
             script {
-                name = "Load Verifier"
+                name = "Check"
                 scriptContent = """
-                    mkdir verifier1
-                    curl -f -L -o verifier1 "https://packages.jetbrains.team/files/p/ideavim/plugin-verifier/verifier-cli-dev-all-1.jar"
+                    # We use a custom build of verifier that downloads IdeaVim from dev channel
+                    
+                    java --version
+                    java -jar verifier1/verifier-cli-dev-all-1.jar check-plugin '${'$'}org.jetbrains.IdeaVim-EasyMotion' [latest-IU] -team-city
+                    java -jar verifier1/verifier-cli-dev-all-1.jar check-plugin '${'$'}io.github.mishkun.ideavimsneak' [latest-IU] -team-city
+                    java -jar verifier1/verifier-cli-dev-all-1.jar check-plugin '${'$'}eu.theblob42.idea.whichkey' [latest-IU] -team-city
+                    java -jar verifier1/verifier-cli-dev-all-1.jar check-plugin '${'$'}IdeaVimExtension' [latest-IU] -team-city
+                    # Outdated java -jar verifier/verifier-cli-dev-all.jar check-plugin '${'$'}github.zgqq.intellij-enhance' [latest-IU] -team-city
+                    java -jar verifier1/verifier-cli-dev-all-1.jar check-plugin '${'$'}com.github.copilot' [latest-IU] -team-city
+                    java -jar verifier1/verifier-cli-dev-all-1.jar check-plugin '${'$'}com.github.dankinsoid.multicursor' [latest-IU] -team-city
+                    java -jar verifier1/verifier-cli-dev-all-1.jar check-plugin '${'$'}com.joshestein.ideavim-quickscope' [latest-IU] -team-city
                 """.trimIndent()
             }
         }
