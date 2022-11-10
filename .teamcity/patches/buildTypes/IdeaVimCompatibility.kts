@@ -44,25 +44,5 @@ changeBuildType(RelativeId("IdeaVimCompatibility")) {
                 java -jar verifier1/verifier-cli-dev-all-1.jar check-plugin '${'$'}com.joshestein.ideavim-quickscope' [latest-IU] -team-city
             """.trimIndent()
         }
-        insert(1) {
-            script {
-                name = "Check"
-                scriptContent = """
-                    # We use a custom build of verifier that downloads IdeaVim from dev channel
-                    
-                    curl -f -L -o verifier1/verifier-cli-dev-all.jar "https://packages.jetbrains.team/files/p/ideavim/plugin-verifier/verifier-cli-dev-all-1.jar"
-                    
-                    java --version
-                    java -jar verifier1/verifier-cli-dev-all.jar check-plugin '${'$'}org.jetbrains.IdeaVim-EasyMotion' [latest-IU] -team-city
-                    java -jar verifier1/verifier-cli-dev-all.jar check-plugin '${'$'}io.github.mishkun.ideavimsneak' [latest-IU] -team-city
-                    java -jar verifier1/verifier-cli-dev-all.jar check-plugin '${'$'}eu.theblob42.idea.whichkey' [latest-IU] -team-city
-                    java -jar verifier1/verifier-cli-dev-all.jar check-plugin '${'$'}IdeaVimExtension' [latest-IU] -team-city
-                    # Outdated java -jar verifier/verifier-cli-dev-all.jar check-plugin '${'$'}github.zgqq.intellij-enhance' [latest-IU] -team-city
-                    java -jar verifier1/verifier-cli-dev-all.jar check-plugin '${'$'}com.github.copilot' [latest-IU] -team-city
-                    java -jar verifier1/verifier-cli-dev-all.jar check-plugin '${'$'}com.github.dankinsoid.multicursor' [latest-IU] -team-city
-                    java -jar verifier1/verifier-cli-dev-all.jar check-plugin '${'$'}com.joshestein.ideavim-quickscope' [latest-IU] -team-city
-                """.trimIndent()
-            }
-        }
     }
 }
