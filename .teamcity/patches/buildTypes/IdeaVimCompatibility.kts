@@ -30,6 +30,8 @@ changeBuildType(RelativeId("IdeaVimCompatibility")) {
         update<ScriptBuildStep>(0) {
             clearConditions()
             scriptContent = """
+                # We use a custom build of verifier that downloads IdeaVim from dev channel
+                
                 java --version
                 java -jar verifier/verifier-cli-dev-all.jar -runtime-dir /usr/lib/jvm/java-17-amazon-corretto check-plugin '${'$'}org.jetbrains.IdeaVim-EasyMotion' [latest-IU] -team-city
                 java -jar verifier/verifier-cli-dev-all.jar -runtime-dir /usr/lib/jvm/java-17-amazon-corretto check-plugin '${'$'}io.github.mishkun.ideavimsneak' [latest-IU] -team-city
