@@ -37,7 +37,7 @@ changeBuildType(RelativeId("IdeaVimCompatibility")) {
         }
         insert(1) {
             script {
-                name = "Check (1)"
+                name = "Check"
                 scriptContent = """
                     # We use a custom build of verifier that downloads IdeaVim from dev channel
                     # To create a custom build: Download plugin verifier repo, add an if that switches to dev channel for IdeaVim repo
