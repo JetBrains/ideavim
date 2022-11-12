@@ -9,6 +9,7 @@
 package org.jetbrains.plugins.ideavim.action;
 
 import com.google.common.collect.Lists;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.VimEditor;
 import com.maddyhome.idea.vim.api.VimInjectorKt;
 import com.maddyhome.idea.vim.command.VimStateMachine;
