@@ -264,8 +264,8 @@ class MarksCommandTest : VimTestCase() {
                      | ]      8   21 akin replaced content its blue,
                      | ^      8   21 akin replaced content its blue,
                      | .      8   20 akin replaced content its blue,
-                     | <      2   16 all rocks and lavender and tufted grass,
-                     | >      2   10 all rocks and lavender and tufted grass,
+                     | <      2   10 all rocks and lavender and tufted grass,
+                     | >      2   16 all rocks and lavender and tufted grass,
                      """.trimMargin()
     )
   }
