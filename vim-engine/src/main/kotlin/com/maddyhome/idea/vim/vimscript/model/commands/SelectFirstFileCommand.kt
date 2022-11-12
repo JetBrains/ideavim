@@ -23,7 +23,7 @@ data class SelectFirstFileCommand(val ranges: Ranges, val argument: String) : Co
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     val res = injector.file.selectFile(0, context)
     if (res) {
-      injector.markGroup.saveJumpLocation(editor)
+      injector.jumpService.saveJumpLocation(editor)
     }
     return if (res) ExecutionResult.Success else ExecutionResult.Error
   }

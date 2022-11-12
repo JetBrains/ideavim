@@ -1040,6 +1040,6 @@ two
   fun `test gv after linewise selection`() {
     configureByText("${c}Oh, hi Mark\nOh, hi Markus\n")
     typeText(parseKeys("V" + "y" + "j" + "V" + "p" + "gv"))
-    assertSelection("Oh, hi Mark")
+    assertSelection("Oh, hi Mark\n")
   }
 }

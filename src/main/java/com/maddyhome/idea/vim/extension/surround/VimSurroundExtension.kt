@@ -223,17 +223,26 @@ class VimSurroundExtension : VimExtension {
         val leftSurround = pair.first
         val primaryCaret = editor.caretModel.primaryCaret
         change.insertText(IjVimEditor(editor), IjVimCaret(primaryCaret), range.startOffset, leftSurround)
-        change.insertText(IjVimEditor(editor), IjVimCaret(primaryCaret), range.endOffset + leftSurround.length, pair.second)
+        change.insertText(
+          IjVimEditor(editor),
+          IjVimCaret(primaryCaret),
+          range.endOffset + leftSurround.length,
+          pair.second
+        )
         // Jump back to start
         executeNormalWithoutMapping(injector.parser.parseKeys("`["), editor)
       }
       return true
     }
 
-    private fun getSurroundRange(editor: Editor): TextRange? = when (editor.editorMode) {
-      VimStateMachine.Mode.COMMAND -> VimPlugin.getMark().getChangeMarks(editor.vim)
-      VimStateMachine.Mode.VISUAL -> editor.caretModel.primaryCaret.run { TextRange(selectionStart, selectionEnd) }
-      else -> null
+    // todo make it multicaret
+    private fun getSurroundRange(editor: Editor): TextRange? {
+      val vimEditor = editor.vim
+      return when (editor.editorMode) {
+        VimStateMachine.Mode.COMMAND -> injector.markService.getChangeMarks(vimEditor.primaryCaret())
+        VimStateMachine.Mode.VISUAL -> editor.caretModel.primaryCaret.run { TextRange(selectionStart, selectionEnd) }
+        else -> null
+      }
     }
   }
 

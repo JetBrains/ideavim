@@ -31,7 +31,8 @@ class IdeaPutNotificationsTest : VimOptionTestCase(OptionConstants.clipboardName
     val before = "${c}I found it in a legendary land"
     configureByText(before)
     appReadySetup(false)
-    VimPlugin.getRegister().storeText(myFixture.editor.vim, before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
+    val vimEditor = myFixture.editor.vim
+    VimPlugin.getRegister().storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
     typeText(injector.parser.parseKeys("p"))
 
     val notification = ActionCenter.getNotifications(myFixture.project, true).last()
@@ -55,7 +56,8 @@ class IdeaPutNotificationsTest : VimOptionTestCase(OptionConstants.clipboardName
     val before = "${c}I found it in a legendary land"
     configureByText(before)
     appReadySetup(false)
-    VimPlugin.getRegister().storeText(myFixture.editor.vim, before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
+    val vimEditor = myFixture.editor.vim
+    VimPlugin.getRegister().storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
     typeText(injector.parser.parseKeys("p"))
 
     val notifications = ActionCenter.getNotifications(myFixture.project, true)
@@ -67,7 +69,8 @@ class IdeaPutNotificationsTest : VimOptionTestCase(OptionConstants.clipboardName
     val before = "${c}I found it in a legendary land"
     configureByText(before)
     appReadySetup(true)
-    VimPlugin.getRegister().storeText(myFixture.editor.vim, before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
+    val vimEditor = myFixture.editor.vim
+    VimPlugin.getRegister().storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
     typeText(injector.parser.parseKeys("p"))
 
     val notifications = EventLog.getLogModel(myFixture.project).notifications

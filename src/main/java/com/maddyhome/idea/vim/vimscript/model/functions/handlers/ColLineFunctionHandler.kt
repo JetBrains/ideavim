@@ -11,6 +11,7 @@ package com.maddyhome.idea.vim.vimscript.model.functions.handlers
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.lineLength
 import com.maddyhome.idea.vim.api.visualLineToBufferLine
 import com.maddyhome.idea.vim.helper.EditorHelper
@@ -122,7 +123,8 @@ private fun variableToPosition(editor: VimEditor, variable: VimDataType, dollarF
 
   // Mark
   if (name.length >= 2 && name[0] == '\'') {
-    val mark = VimPlugin.getMark().getMark(editor, name[1]) ?: return null
+    // todo make it multicaret
+    val mark = injector.markService.getMark(editor.primaryCaret(), name[1]) ?: return null
     val markLogicalLine = (mark.line + 1).asVimInt()
     val markLogicalCol = (mark.col + 1).asVimInt()
     return markLogicalLine to markLogicalCol

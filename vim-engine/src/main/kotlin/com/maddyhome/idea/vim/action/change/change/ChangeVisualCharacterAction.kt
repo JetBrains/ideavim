@@ -43,7 +43,7 @@ class ChangeVisualCharacterAction : VisualOperatorActionHandler.ForEachCaret() {
   ): Boolean {
     val argument = cmd.argument
     return argument != null &&
-      changeCharacterRange(editor, range.toVimTextRange(false), argument.character)
+      changeCharacterRange(editor, caret, range.toVimTextRange(false), argument.character)
   }
 }
 
@@ -57,7 +57,7 @@ private val logger = vimLogger<ChangeVisualCharacterAction>()
  * @param ch     The replacing character
  * @return true if able to change the range, false if not
  */
-private fun changeCharacterRange(editor: VimEditor, range: TextRange, ch: Char): Boolean {
+private fun changeCharacterRange(editor: VimEditor, caret: VimCaret, range: TextRange, ch: Char): Boolean {
   logger.debug { "change range: $range to $ch" }
   val chars = editor.text()
   val starts = range.startOffsets
@@ -65,7 +65,7 @@ private fun changeCharacterRange(editor: VimEditor, range: TextRange, ch: Char):
   for (j in ends.indices.reversed()) {
     for (i in starts[j] until ends[j]) {
       if (i < chars.length && '\n' != chars[i]) {
-        injector.changeGroup.replaceText(editor, i, i + 1, Character.toString(ch))
+        injector.changeGroup.replaceText(editor, caret, i, i + 1, Character.toString(ch))
       }
     }
   }

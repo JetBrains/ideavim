@@ -8,7 +8,6 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -28,8 +27,8 @@ class MarksCommandTest : VimTestCase() {
     assertState(
       """I found it in a legendary land
                       |all rocks and lavender and tufted grass,
-                      |${s}all rocks and lavender and tufted grass,$se
-                      |hard by the torrent of a mountain pass.
+                      |${s}all rocks and lavender and tufted grass,
+                      |${se}hard by the torrent of a mountain pass.
                     """.trimMargin()
     )
   }
@@ -188,7 +187,8 @@ class MarksCommandTest : VimTestCase() {
                       |hard by the torrent of a mountain pass.
                       """.trimMargin()
     )
-    VimPlugin.getMark().setMark(myFixture.editor.vim, 'a', 100000)
+    val vimEditor = myFixture.editor.vim
+    injector.markService.setMark(vimEditor.primaryCaret(), 'a', 100000)
     enterCommand("marks")
     assertExOutput(
       """mark line  col file/text

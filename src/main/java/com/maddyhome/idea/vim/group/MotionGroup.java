@@ -263,7 +263,7 @@ public class MotionGroup extends VimMotionGroupBase {
   private @Nullable VirtualFile markToVirtualFile(@NotNull Mark mark) {
     String protocol = mark.getProtocol();
     VirtualFileSystem fileSystem = VirtualFileManager.getInstance().getFileSystem(protocol);
-    return fileSystem.findFileByPath(mark.getFilename());
+    return fileSystem.findFileByPath(mark.getFilepath());
   }
 
   private @Nullable Editor selectEditor(@NotNull Editor editor, @NotNull VirtualFile file) {
@@ -608,8 +608,8 @@ public class MotionGroup extends VimMotionGroupBase {
   }
 
   @Override
-  public int moveCaretToFileMark(@NotNull VimEditor editor, char ch, boolean toLineStart) {
-    final Mark mark = VimPlugin.getMark().getFileMark(editor, ch);
+  public int moveCaretToFileMark(@NotNull VimEditor editor, @NotNull VimCaret caret, char ch, boolean toLineStart) {
+    final Mark mark = VimInjectorKt.injector.getMarkService().getMark(caret, ch);
     if (mark == null) return -1;
 
     final int line = mark.getLine();
@@ -618,16 +618,17 @@ public class MotionGroup extends VimMotionGroupBase {
            : editor.bufferPositionToOffset(new BufferPosition(line, mark.getCol(), false));
   }
 
+
   @Override
-  public int moveCaretToMark(@NotNull VimEditor editor, char ch, boolean toLineStart) {
-    final Mark mark = VimPlugin.getMark().getMark(editor, ch);
+  public int moveCaretToMark(@NotNull VimEditor editor, @NotNull VimCaret caret, char ch, boolean toLineStart) {
+    final Mark mark = VimInjectorKt.injector.getMarkService().getMark(caret, ch);
     if (mark == null) return -1;
 
     final VirtualFile vf = getVirtualFile(((IjVimEditor)editor).getEditor());
     if (vf == null) return -1;
 
     final int line = mark.getLine();
-    if (vf.getPath().equals(mark.getFilename())) {
+    if (vf.getPath().equals(mark.getFilepath())) {
       return toLineStart
              ? moveCaretToLineStartSkipLeading(editor, line)
              : editor.bufferPositionToOffset(new BufferPosition(line, mark.getCol(), false));
@@ -635,8 +636,8 @@ public class MotionGroup extends VimMotionGroupBase {
 
     final Editor selectedEditor = selectEditor(((IjVimEditor)editor).getEditor(), mark);
     if (selectedEditor != null) {
-      for (Caret caret : selectedEditor.getCaretModel().getAllCarets()) {
-        new IjVimCaret(caret).moveToOffset(toLineStart
+      for (Caret carett : selectedEditor.getCaretModel().getAllCarets()) {
+        new IjVimCaret(carett).moveToOffset(toLineStart
                                            ? moveCaretToLineStartSkipLeading(new IjVimEditor(selectedEditor), line)
                                            : selectedEditor.logicalPositionToOffset(
                                              new LogicalPosition(line, mark.getCol())));
@@ -647,8 +648,8 @@ public class MotionGroup extends VimMotionGroupBase {
 
   @Override
   public int moveCaretToJump(@NotNull VimEditor editor, int count) {
-    final int spot = VimPlugin.getMark().getJumpSpot();
-    final Jump jump = VimPlugin.getMark().getJump(count);
+    final int spot = VimInjectorKt.injector.getJumpService().getJumpSpot();
+    final Jump jump = VimInjectorKt.injector.getJumpService().getJump(count);
 
     if (jump == null) {
       return -1;
@@ -672,7 +673,7 @@ public class MotionGroup extends VimMotionGroupBase {
       final Editor newEditor = selectEditor(((IjVimEditor)editor).getEditor(), newFile);
       if (newEditor != null) {
         if (spot == -1) {
-          VimPlugin.getMark().addJump(editor, false);
+          VimInjectorKt.injector.getJumpService().addJump(editor, false);
         }
         new IjVimCaret(newEditor.getCaretModel().getCurrentCaret()).moveToOffset(
           EngineEditorHelperKt.normalizeOffset(new IjVimEditor(newEditor), newEditor.logicalPositionToOffset(lpnative),
@@ -683,7 +684,7 @@ public class MotionGroup extends VimMotionGroupBase {
     }
     else {
       if (spot == -1) {
-        VimPlugin.getMark().addJump(editor, false);
+        VimInjectorKt.injector.getJumpService().addJump(editor, false);
       }
 
       return editor.bufferPositionToOffset(lp);

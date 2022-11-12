@@ -31,8 +31,10 @@ import com.maddyhome.idea.vim.api.VimExOutputPanelService
 import com.maddyhome.idea.vim.api.VimExtensionRegistrator
 import com.maddyhome.idea.vim.api.VimFile
 import com.maddyhome.idea.vim.api.VimInjectorBase
+import com.maddyhome.idea.vim.api.VimJumpService
 import com.maddyhome.idea.vim.api.VimKeyGroup
 import com.maddyhome.idea.vim.api.VimLookupManager
+import com.maddyhome.idea.vim.api.VimMarkService
 import com.maddyhome.idea.vim.api.VimMessages
 import com.maddyhome.idea.vim.api.VimMotionGroup
 import com.maddyhome.idea.vim.api.VimProcessGroup
@@ -58,7 +60,6 @@ import com.maddyhome.idea.vim.group.EditorGroup
 import com.maddyhome.idea.vim.group.FileGroup
 import com.maddyhome.idea.vim.group.HistoryGroup
 import com.maddyhome.idea.vim.group.MacroGroup
-import com.maddyhome.idea.vim.group.MarkGroup
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.SearchGroup
 import com.maddyhome.idea.vim.group.TabService
@@ -86,6 +87,7 @@ import com.maddyhome.idea.vim.vimscript.services.PatternService
 import com.maddyhome.idea.vim.vimscript.services.VariableService
 import com.maddyhome.idea.vim.yank.VimYankGroup
 import com.maddyhome.idea.vim.yank.YankGroupBase
+import org.jetbrains.annotations.ApiStatus
 
 class IjVimInjector : VimInjectorBase() {
   override fun <T : Any> getLogger(clazz: Class<T>): VimLogger = IjVimLogger(Logger.getInstance(clazz::class.java))
@@ -148,8 +150,15 @@ class IjVimInjector : VimInjectorBase() {
     get() = service()
   override val keyGroup: VimKeyGroup
     get() = service()
+
+  @get:Deprecated("Please use VimMarkService instead")
+  @get:ApiStatus.ScheduledForRemoval(inVersion = "2.3")
   override val markGroup: VimMarkGroup
-    get() = service<MarkGroup>()
+    get() = service()
+  override val markService: VimMarkService
+    get() = service()
+  override val jumpService: VimJumpService
+    get() = service()
   override val application: VimApplication
     get() = service<IjVimApplication>()
   override val executionContextManager: ExecutionContextManager

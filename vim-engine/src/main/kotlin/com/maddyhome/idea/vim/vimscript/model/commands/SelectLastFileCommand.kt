@@ -23,7 +23,7 @@ data class SelectLastFileCommand(val ranges: Ranges, val argument: String) : Com
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     val res = injector.file.selectFile(999, context)
     if (res) {
-      injector.markGroup.saveJumpLocation(editor)
+      injector.jumpService.saveJumpLocation(editor)
     }
     return if (res) ExecutionResult.Success else ExecutionResult.Error
   }

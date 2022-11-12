@@ -24,6 +24,7 @@ import java.util.*
  * @author Alex Selesse
  * see "h :sort"
  */
+// todo make it multicaret
 data class SortCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.WRITABLE)
 
@@ -40,7 +41,7 @@ data class SortCommand(val ranges: Ranges, val argument: String) : Command.Singl
     if (editor.inBlockSubMode) {
       val primaryCaret = editor.primaryCaret()
       val range = getSortLineRange(editor, primaryCaret)
-      val worked = injector.changeGroup.sortRange(editor, range, lineComparator)
+      val worked = injector.changeGroup.sortRange(editor, primaryCaret, range, lineComparator)
       primaryCaret.moveToInlayAwareOffset(
         injector.motion.moveCaretToLineStartSkipLeading(editor, range.startLine)
       )
@@ -50,7 +51,7 @@ data class SortCommand(val ranges: Ranges, val argument: String) : Command.Singl
     var worked = true
     for (caret in editor.nativeCarets()) {
       val range = getSortLineRange(editor, caret)
-      if (!injector.changeGroup.sortRange(editor, range, lineComparator)) {
+      if (!injector.changeGroup.sortRange(editor, caret, range, lineComparator)) {
         worked = false
       }
       caret.moveToInlayAwareOffset(injector.motion.moveCaretToLineStartSkipLeading(editor, range.startLine))

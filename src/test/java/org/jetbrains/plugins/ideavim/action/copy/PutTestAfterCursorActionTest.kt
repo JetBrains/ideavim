@@ -82,7 +82,8 @@ class PutTestAfterCursorActionTest : VimTestCase() {
             hard by the ${c}torrent of a mountain pass.
     """.trimIndent()
     val editor = configureByText(before)
-    VimPlugin.getRegister().storeText(editor.vim, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
+    val vimEditor = editor.vim
+    VimPlugin.getRegister().storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
     typeText(injector.parser.parseKeys("p"))
     val after = """
             A Discovery
@@ -142,7 +143,8 @@ class PutTestAfterCursorActionTest : VimTestCase() {
             ${c}hard by the torrent of a mountain pass.
     """.trimIndent()
     val editor = configureByText(before)
-    VimPlugin.getRegister().storeText(editor.vim, before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
+    val vimEditor = editor.vim
+    VimPlugin.getRegister().storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
     typeText(injector.parser.parseKeys("vep"))
     val after = """
             A Discovery

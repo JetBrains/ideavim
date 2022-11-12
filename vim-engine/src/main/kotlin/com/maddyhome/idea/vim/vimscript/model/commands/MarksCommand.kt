@@ -23,9 +23,11 @@ data class MarksCommand(val ranges: Ranges, val argument: String) : Command.Sing
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
+    val localMarks = injector.markService.getAllLocalMarks(editor.primaryCaret())
+    val globalMarks = injector.markService.getAllGlobalMarks()
 
     // Yeah, lower case. Vim uses lower case here, but Title Case in :registers. Go figure.
-    val res = injector.markGroup.getMarks(editor)
+    val res = (localMarks + globalMarks)
       .filter { argument.isEmpty() || argument.contains(it.key) }
       .joinToString("\n", prefix = "mark line  col file/text\n") { mark ->
 
@@ -33,11 +35,11 @@ data class MarksCommand(val ranges: Ranges, val argument: String) : Command.Sing
         val line = (mark.line + 1).toString().padStart(5)
         val column = mark.col.toString().padStart(3)
         val vf = editor.getVirtualFile()
-        val text = if (vf != null && vf.path == mark.filename) {
+        val text = if (vf != null && vf.path == mark.filepath) {
           val lineText = editor.getLineText(mark.line).trim().take(200)
           EngineStringHelper.toPrintableCharacters(injector.parser.stringToKeys(lineText)).take(200)
         } else {
-          mark.filename
+          mark.filepath
         }
 
         " ${mark.key}  $line  $column $text"

@@ -16,7 +16,6 @@ import com.intellij.openapi.editor.markup.HighlighterLayer
 import com.intellij.openapi.editor.markup.HighlighterTargetArea
 import com.intellij.openapi.editor.markup.RangeHighlighter
 import com.intellij.openapi.util.Key
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getOffset
@@ -192,10 +191,12 @@ class VimExchangeExtension : VimExtension {
       }
     }
 
+    // todo make it multicaret
     private fun exchange(editor: Editor, ex1: Exchange, ex2: Exchange, reverse: Boolean, expand: Boolean) {
       fun pasteExchange(sourceExchange: Exchange, targetExchange: Exchange) {
-        VimPlugin.getMark().setChangeMarks(
-          editor.vim,
+        val vimEditor = editor.vim
+        injector.markService.setChangeMarks(
+          vimEditor.primaryCaret(),
           TextRange(editor.getMarkOffset(targetExchange.start), editor.getMarkOffset(targetExchange.end) + 1)
         )
         // do this instead of direct text manipulation to set change marks
@@ -314,8 +315,10 @@ class VimExchangeExtension : VimExtension {
           } else {
             Pair(VimMarkConstants.MARK_CHANGE_START, VimMarkConstants.MARK_CHANGE_END)
           }
-        val marks = VimPlugin.getMark()
-        return Pair(marks.getMark(editor.vim, startMark)!!, marks.getMark(editor.vim, endMark)!!)
+        val marks = injector.markService
+        val vimEditor = editor.vim
+        // todo make it multicaret
+        return Pair(marks.getMark(vimEditor.primaryCaret(), startMark)!!, marks.getMark(vimEditor.primaryCaret(), endMark)!!)
       }
 
       val unnRegText = getRegister('"')

@@ -51,17 +51,9 @@ data class DeleteMarksCommand(val ranges: Ranges, val argument: String) : Comman
       }
     }
 
-    processedArg.forEach { character -> deleteMark(editor, character) }
+    processedArg.forEach { character -> injector.markService.removeMark(editor, character) }
 
     return ExecutionResult.Success
-  }
-}
-
-private fun deleteMark(editor: VimEditor, character: Char) {
-  if (character != ' ') {
-    val markGroup = injector.markGroup
-    val mark = markGroup.getMark(editor, character) ?: return
-    markGroup.removeMark(character, mark)
   }
 }
 

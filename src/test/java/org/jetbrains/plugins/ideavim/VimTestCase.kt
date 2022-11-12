@@ -134,7 +134,7 @@ abstract class VimTestCase : UsefulTestCase() {
     IdeavimErrorListener.testLogger.clear()
     VimPlugin.getRegister().resetRegisters()
     VimPlugin.getSearch().resetState()
-    VimPlugin.getMark().resetAllMarks()
+    injector.markService.resetAllMarks()
     VimPlugin.getChange().resetRepeat()
     VimPlugin.getKey().savedShortcutConflicts.clear()
 

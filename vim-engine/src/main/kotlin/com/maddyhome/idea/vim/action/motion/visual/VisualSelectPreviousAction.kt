@@ -8,6 +8,7 @@
 package com.maddyhome.idea.vim.action.motion.visual
 
 import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
@@ -20,31 +21,31 @@ import com.maddyhome.idea.vim.helper.vimStateMachine
 /**
  * @author vlan
  */
-class VisualSelectPreviousAction : VimActionHandler.SingleExecution() {
+class VisualSelectPreviousAction : VimActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override fun execute(
     editor: VimEditor,
+    caret: VimCaret,
     context: ExecutionContext,
     cmd: Command,
     operatorArguments: OperatorArguments,
-  ): Boolean { // FIXME: 2019-03-05 Make it multicaret
-    return selectPreviousVisualMode(editor)
+  ): Boolean {
+    return selectPreviousVisualMode(editor, caret)
   }
 }
 
-private fun selectPreviousVisualMode(editor: VimEditor): Boolean {
+private fun selectPreviousVisualMode(editor: VimEditor, caret: VimCaret): Boolean {
   val lastSelectionType = editor.vimLastSelectionType ?: return false
-  val visualMarks = injector.markGroup.getVisualSelectionMarks(editor) ?: return false
-
-  editor.removeSecondaryCarets()
+  val visualMarks = injector.markService.getVisualSelectionMarks(caret) ?: return false
 
   editor.vimStateMachine.pushModes(VimStateMachine.Mode.VISUAL, lastSelectionType.toSubMode())
 
-  val primaryCaret = editor.primaryCaret()
-  primaryCaret.vimSetSelection(visualMarks.startOffset, visualMarks.endOffset - 1, true)
+  caret.vimSetSelection(visualMarks.startOffset, visualMarks.endOffset - 1, true)
 
-  injector.motion.scrollCaretIntoView(editor)
+  if (caret.isPrimary) {
+    injector.motion.scrollCaretIntoView(editor)
+  }
 
   return true
 }

@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.register
 
+import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getText
 import com.maddyhome.idea.vim.api.injector
@@ -157,6 +158,7 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
 
   fun storeTextInternal(
     editor: VimEditor,
+    caret: VimCaret,
     range: TextRange,
     text: String,
     type: SelectionType,
@@ -250,7 +252,8 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     } // Yanks also go to register 0 if the default register was used
 
     if (start != -1) {
-      injector.markGroup.setChangeMarks(editor, TextRange(start, end))
+      // todo it's the worst place to do it, setting mark and storing something to register are two different things
+      injector.markService.setChangeMarks(caret, TextRange(start, end))
     }
 
     return true
@@ -267,6 +270,7 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
    */
   override fun storeText(
     editor: VimEditor,
+    caret: VimCaret,
     range: TextRange,
     type: SelectionType,
     isDelete: Boolean,
@@ -279,7 +283,7 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
         text += '\n'.toString()
       }
 
-      return storeTextInternal(editor, range, text, type, lastRegisterChar, isDelete)
+      return storeTextInternal(editor, caret, range, text, type, lastRegisterChar, isDelete)
     }
 
     return false

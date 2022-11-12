@@ -58,8 +58,9 @@ class PutViaIdeaTest : VimTestCase() {
     val before = "${c}I found it in a legendary land"
     configureByText(before)
 
+    val vimEditor = myFixture.editor.vim
     VimPlugin.getRegister()
-      .storeText(myFixture.editor.vim, before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
+      .storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
 
     typeText(injector.parser.parseKeys("ppp"))
     val after = "Ilegendarylegendarylegendar${c}y found it in a legendary land"
@@ -74,8 +75,9 @@ class PutViaIdeaTest : VimTestCase() {
     CopyPasteManager.getInstance().setContents(TextBlockTransferable("Fill", emptyList(), null))
     CopyPasteManager.getInstance().setContents(TextBlockTransferable("Buffer", emptyList(), null))
 
+    val vimEditor = myFixture.editor.vim
     VimPlugin.getRegister()
-      .storeText(myFixture.editor.vim, before rangeOf "legendary$randomUUID", SelectionType.CHARACTER_WISE, false)
+      .storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "legendary$randomUUID", SelectionType.CHARACTER_WISE, false)
 
     val sizeBefore = CopyPasteManager.getInstance().allContents.size
     typeText(injector.parser.parseKeys("ve" + "p"))
@@ -93,8 +95,10 @@ class PutViaIdeaTest : VimTestCase() {
     """.trimIndent()
     configureByText(before)
 
+    val vimEditor = myFixture.editor.vim
     VimPlugin.getRegister().storeText(
-      myFixture.editor.vim,
+      vimEditor,
+      vimEditor.primaryCaret(),
       before rangeOf "\nI found it in a legendary land\n",
       SelectionType.CHARACTER_WISE,
       false

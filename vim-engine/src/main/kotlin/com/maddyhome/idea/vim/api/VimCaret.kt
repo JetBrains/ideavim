@@ -61,6 +61,7 @@ interface ImmutableVimCaret {
   fun hasSelection(): Boolean
 
   val registerStorage: CaretRegisterStorage
+  val markStorage: LocalMarkStorage
 }
 
 interface VimCaret : ImmutableVimCaret {

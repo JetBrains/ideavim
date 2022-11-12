@@ -23,7 +23,7 @@ data class NextFileCommand(val ranges: Ranges, val argument: String) : Command.S
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     val count = getCount(editor, 1, true)
-    injector.markGroup.saveJumpLocation(editor)
+    injector.jumpService.saveJumpLocation(editor)
     injector.file.selectNextFile(count, context)
     return ExecutionResult.Success
   }

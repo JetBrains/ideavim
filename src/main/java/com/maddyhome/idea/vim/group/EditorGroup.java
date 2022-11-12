@@ -13,10 +13,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
-import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.EditorGutter;
-import com.intellij.openapi.editor.EditorSettings;
-import com.intellij.openapi.editor.LineNumberConverter;
+import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.event.CaretEvent;
 import com.intellij.openapi.editor.event.CaretListener;
 import com.intellij.openapi.editor.ex.EditorGutterComponentEx;
@@ -39,6 +36,7 @@ import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
@@ -255,6 +253,14 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
   @Override
   public void notifyIdeaJoin(@NotNull VimEditor editor) {
     notifyIdeaJoin(((IjVimEditor) editor).getEditor().getProject());
+  }
+
+  @NotNull
+  @Override
+  public Collection<VimEditor> getAllEditors() {
+    return Arrays.stream(EditorFactory.getInstance().getAllEditors())
+      .map(IjVimEditor::new)
+      .collect(Collectors.toList());
   }
 
   public static class NumberChangeListener implements LocalOptionChangeListener<VimDataType> {

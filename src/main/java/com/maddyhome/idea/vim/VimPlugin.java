@@ -43,6 +43,7 @@ import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import com.maddyhome.idea.vim.vimscript.services.VariableService;
 import com.maddyhome.idea.vim.yank.YankGroupBase;
 import org.jdom.Element;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -141,8 +142,10 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     return ApplicationManager.getApplication().getService(CommandGroup.class);
   }
 
-  public static @NotNull MarkGroup getMark() {
-    return ((MarkGroup)VimInjectorKt.getInjector().getMarkGroup());
+  @Deprecated // "Please use `injector.markService` instead"
+  @ApiStatus.ScheduledForRemoval(inVersion = "2.3")
+  public static @NotNull VimMarkServiceImpl getMark() {
+    return ((VimMarkServiceImpl)VimInjectorKt.getInjector().getMarkService());
   }
 
   public static @NotNull RegisterGroup getRegister() {
@@ -442,7 +445,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   private void legacyStateLoading(@NotNull Element element) {
     if (previousStateVersion > 0 && previousStateVersion < 5) {
       // Migrate settings from 4 to 5 version
-      getMark().readData(element);
+      //((MarkGroup) getMark()).readData(element); todo
       getRegister().readData(element);
       getSearch().readData(element);
       getHistory().readData(element);

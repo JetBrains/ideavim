@@ -12,6 +12,8 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.api.BufferPosition
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.VimLogicalPosition
+import com.maddyhome.idea.vim.api.VimMarkService
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.command.VimStateMachine
@@ -21,6 +23,7 @@ import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
+// todo make it for each caret
 data class NormalCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
   override val argFlags = flags(
     RangeFlag.RANGE_OPTIONAL,
@@ -43,7 +46,7 @@ data class NormalCommand(val ranges: Ranges, val argument: String) : Command.Sin
       VimStateMachine.Mode.VISUAL -> {
         editor.exitVisualMode()
         if (!rangeUsed) {
-          val selectionStart = injector.markGroup.getMark(editor, '<')!!
+          val selectionStart = injector.markService.getMark(editor.primaryCaret(), VimMarkService.SELECTION_START_MARK)!!
           editor.currentCaret().moveToBufferPosition(BufferPosition(selectionStart.line, selectionStart.col))
         }
       }

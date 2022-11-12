@@ -10,6 +10,7 @@ package org.jetbrains.plugins.ideavim.action;
 
 import com.google.common.collect.Lists;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.api.VimEditor;
 import com.maddyhome.idea.vim.api.VimInjectorKt;
 import com.maddyhome.idea.vim.command.VimStateMachine;
 import com.maddyhome.idea.vim.mark.Mark;
@@ -18,6 +19,8 @@ import org.jetbrains.plugins.ideavim.SkipNeovimReason;
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
+import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
+
 /**
  * @author Tuomas Tynkkynen
  */
@@ -25,7 +28,8 @@ public class MarkTest extends VimTestCase {
   // |m|
   public void testLocalMark() {
     typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("ma"), "    foo\n" + "    ba<caret>r\n" + "    baz\n");
-    Mark mark = VimPlugin.getMark().getMark(new IjVimEditor(myFixture.getEditor()), 'a');
+    VimEditor vimEditor = new IjVimEditor(myFixture.getEditor());
+    Mark mark = injector.getMarkService().getMark(vimEditor.primaryCaret(), 'a');
     assertNotNull(mark);
     assertEquals(1, mark.getLine());
     assertEquals(6, mark.getCol());
@@ -34,7 +38,8 @@ public class MarkTest extends VimTestCase {
   // |m|
   public void testGlobalMark() {
     typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("mG"), "    foo\n" + "    ba<caret>r\n" + "    baz\n");
-    Mark mark = VimPlugin.getMark().getMark(new IjVimEditor(myFixture.getEditor()), 'G');
+    VimEditor vimEditor = new IjVimEditor(myFixture.getEditor());
+    Mark mark = injector.getMarkService().getMark(vimEditor.primaryCaret(), 'G');
     assertNotNull(mark);
     assertEquals(1, mark.getLine());
     assertEquals(6, mark.getCol());
@@ -43,28 +48,32 @@ public class MarkTest extends VimTestCase {
   // |m|
   public void testMarkIsDeletedWhenLineIsDeleted() {
     typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("mx" + "dd"), "    foo\n" + "    ba<caret>r\n" + "    baz\n");
-    Mark mark = VimPlugin.getMark().getMark(new IjVimEditor(myFixture.getEditor()), 'x');
+    VimEditor vimEditor = new IjVimEditor(myFixture.getEditor());
+    Mark mark = injector.getMarkService().getMark(vimEditor.primaryCaret(), 'x');
     assertNull(mark);
   }
 
   // |m|
   public void testMarkIsNotDeletedWhenLineIsOneCharAndReplaced() {
     typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("ma" + "r1"), "foo\n" + "<caret>0\n" + "bar\n");
-    Mark mark = VimPlugin.getMark().getMark(new IjVimEditor(myFixture.getEditor()), 'a');
+    VimEditor vimEditor = new IjVimEditor(myFixture.getEditor());
+    Mark mark = injector.getMarkService().getMark(vimEditor.primaryCaret(), 'a');
     assertNotNull(mark);
   }
 
   // |m|
   public void testMarkIsNotDeletedWhenLineIsChanged() {
     typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("ma" + "cc"), "    foo\n" + "    ba<caret>r\n" + "    baz\n");
-    Mark mark = VimPlugin.getMark().getMark(new IjVimEditor(myFixture.getEditor()), 'a');
+    VimEditor vimEditor = new IjVimEditor(myFixture.getEditor());
+    Mark mark = injector.getMarkService().getMark(vimEditor.primaryCaret(), 'a');
     assertNotNull(mark);
   }
 
   // |m|
   public void testMarkIsMovedUpWhenLinesArePartiallyDeletedAbove() {
     typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("mx" + "2k" + "dd" + "0dw"), "    foo\n" + "    bar\n" + "    ba<caret>z\n");
-    Mark mark = VimPlugin.getMark().getMark(new IjVimEditor(myFixture.getEditor()), 'x');
+    VimEditor vimEditor = new IjVimEditor(myFixture.getEditor());
+    Mark mark = injector.getMarkService().getMark(vimEditor.primaryCaret(), 'x');
     assertNotNull(mark);
     assertEquals(1, mark.getLine());
     assertEquals(6, mark.getCol());
@@ -73,7 +82,8 @@ public class MarkTest extends VimTestCase {
   // |m|
   public void testMarkIsMovedUpWhenLinesAreDeletedAbove() {
     typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("mx" + "2k" + "2dd"), "    foo\n" + "    bar\n" + "    ba<caret>z\n");
-    Mark mark = VimPlugin.getMark().getMark(new IjVimEditor(myFixture.getEditor()), 'x');
+    VimEditor vimEditor = new IjVimEditor(myFixture.getEditor());
+    Mark mark = injector.getMarkService().getMark(vimEditor.primaryCaret(), 'x');
     assertNotNull(mark);
     assertEquals(0, mark.getLine());
     assertEquals(6, mark.getCol());
@@ -82,7 +92,8 @@ public class MarkTest extends VimTestCase {
   // |m|
   public void testMarkIsMovedDownWhenLinesAreInsertedAbove() {
     typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("mY" + "Obiff"), "foo\n" + "ba<caret>r\n" + "baz\n");
-    Mark mark = VimPlugin.getMark().getMark(new IjVimEditor(myFixture.getEditor()), 'Y');
+    VimEditor vimEditor = new IjVimEditor(myFixture.getEditor());
+    Mark mark = injector.getMarkService().getMark(vimEditor.primaryCaret(), 'Y');
     assertNotNull(mark);
     assertEquals(2, mark.getLine());
     assertEquals(2, mark.getCol());
@@ -91,7 +102,8 @@ public class MarkTest extends VimTestCase {
   // |m|
   public void testMarkIsMovedDownWhenLinesAreInsertedAboveWithIndentation() {
     typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("mY" + "Obiff"), "    foo\n" + "    ba<caret>r\n" + "    baz\n");
-    Mark mark = VimPlugin.getMark().getMark(new IjVimEditor(myFixture.getEditor()), 'Y');
+    VimEditor vimEditor = new IjVimEditor(myFixture.getEditor());
+    Mark mark = injector.getMarkService().getMark(vimEditor.primaryCaret(), 'Y');
     assertNotNull(mark);
     assertEquals(2, mark.getLine());
     assertEquals(6, mark.getCol());

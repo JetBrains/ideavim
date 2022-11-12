@@ -23,13 +23,13 @@ data class EditFileCommand(val ranges: Ranges, val argument: String) : Command.S
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     val arg = argument
     if (arg == "#") {
-      injector.markGroup.saveJumpLocation(editor)
+      injector.jumpService.saveJumpLocation(editor)
       injector.file.selectPreviousTab(context)
       return ExecutionResult.Success
     } else if (arg.isNotEmpty()) {
       val res = injector.file.openFile(arg, context)
       if (res) {
-        injector.markGroup.saveJumpLocation(editor)
+        injector.jumpService.saveJumpLocation(editor)
       }
       return if (res) ExecutionResult.Success else ExecutionResult.Error
     }

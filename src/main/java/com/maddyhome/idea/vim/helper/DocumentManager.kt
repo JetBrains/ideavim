@@ -12,7 +12,7 @@ import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.event.DocumentListener
 import com.intellij.openapi.util.Key
 import com.maddyhome.idea.vim.EventFacade
-import com.maddyhome.idea.vim.group.MarkGroup
+import com.maddyhome.idea.vim.group.VimMarkServiceImpl
 import com.maddyhome.idea.vim.group.SearchGroup
 
 object DocumentManager {
@@ -20,7 +20,7 @@ object DocumentManager {
   private val LISTENER_MARKER = Key<String>("VimlistenerMarker")
 
   init {
-    docListeners += MarkGroup.MarkUpdater.INSTANCE
+    docListeners += VimMarkServiceImpl.MarkUpdater
     docListeners += SearchGroup.DocumentSearchListener.INSTANCE
   }
 
