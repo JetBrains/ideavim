@@ -23,6 +23,7 @@ import com.maddyhome.idea.vim.undo.VimUndoRedo
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import com.maddyhome.idea.vim.vimscript.services.VariableService
 import com.maddyhome.idea.vim.yank.VimYankGroup
+import org.jetbrains.annotations.ApiStatus.ScheduledForRemoval
 
 interface VimInjector {
   // [FINISHED] Fully moved to vim-engine. Should we remove it from injector?
@@ -58,7 +59,14 @@ interface VimInjector {
   // [FINISHED] Can't be fully moved to vim-engine.
   val keyGroup: VimKeyGroup
   // [FINISHED] Only state left in the IJ && some IJ specifics
+  val markService: VimMarkService
+
+  @get:Deprecated("Please use markService instead")
+  @get:ScheduledForRemoval(inVersion = "2.3")
   val markGroup: VimMarkGroup
+
+  val jumpService: VimJumpService
+
   // [FINISHED] Only IJ staff left
   val visualMotionGroup: VimVisualMotionGroup
   // [FINISHED] Class moved to vim-engine, but it's attached to Editor using IJ things

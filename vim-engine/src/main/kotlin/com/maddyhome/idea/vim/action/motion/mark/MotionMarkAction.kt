@@ -22,6 +22,6 @@ class MotionMarkAction : VimActionHandler.SingleExecution() {
 
   override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
     val argument = cmd.argument
-    return argument != null && injector.markGroup.setMark(editor, argument.character)
+    return argument != null && injector.markService.setMark(editor, argument.character)
   }
 }

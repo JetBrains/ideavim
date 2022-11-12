@@ -73,7 +73,7 @@ private fun changeCharacter(editor: VimEditor, caret: VimCaret, count: Int, ch: 
   for (i in 0 until num) {
     repl.append(ch)
   }
-  injector.changeGroup.replaceText(editor, offset, offset + count, repl.toString())
+  injector.changeGroup.replaceText(editor, caret, offset, offset + count, repl.toString())
 
   // Indent new line if we replaced with a newline
   if (ch == '\n') {

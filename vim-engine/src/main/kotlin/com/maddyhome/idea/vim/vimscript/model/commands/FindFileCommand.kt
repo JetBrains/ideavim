@@ -25,7 +25,7 @@ data class FindFileCommand(val ranges: Ranges, val argument: String) : Command.S
     if (arg.isNotEmpty()) {
       val res = injector.file.openFile(arg, context)
       if (res) {
-        injector.markGroup.saveJumpLocation(editor)
+        injector.jumpService.saveJumpLocation(editor)
       }
 
       return if (res) ExecutionResult.Success else ExecutionResult.Error

@@ -27,7 +27,7 @@ data class SelectFileCommand(val ranges: Ranges, val argument: String) : Command
     if (count > 0) {
       val res = injector.file.selectFile(count - 1, context)
       if (res) {
-        injector.markGroup.saveJumpLocation(editor)
+        injector.jumpService.saveJumpLocation(editor)
       }
 
       return if (res) ExecutionResult.Success else ExecutionResult.Error

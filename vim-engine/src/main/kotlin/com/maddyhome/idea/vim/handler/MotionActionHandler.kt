@@ -206,7 +206,7 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
       logger.error("Offset is less than 0. $resultOffset. ${this.javaClass.name}")
     }
     if (CommandFlags.FLAG_SAVE_JUMP in cmd.flags) {
-      injector.markGroup.saveJumpLocation(editor)
+      injector.jumpService.saveJumpLocation(editor)
     }
 
     // TODO: This should be normalised by the action

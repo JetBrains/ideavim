@@ -105,8 +105,8 @@ abstract class VimMachineBase : VimMachine {
     (editor as MutableVimEditor).delete(range)
 
     val start = normalizedRange.startOffset
-    injector.markGroup.setMark(editor, VimMarkConstants.MARK_CHANGE_POS, start)
-    injector.markGroup.setChangeMarks(editor, TextRange(start, start + 1))
+    injector.markService.setMark(caret, VimMarkConstants.MARK_CHANGE_POS, start)
+    injector.markService.setChangeMarks(caret, TextRange(start, start + 1))
 
     return operatedText
   }

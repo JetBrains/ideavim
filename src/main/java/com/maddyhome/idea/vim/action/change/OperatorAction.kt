@@ -30,6 +30,7 @@ import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.newapi.ij
 import java.util.*
 
+// todo make it multicaret
 private fun doOperatorAction(editor: VimEditor, context: ExecutionContext, textRange: TextRange, selectionType: SelectionType): Boolean {
   val operatorFunction = injector.keyGroup.operatorFunction
   if (operatorFunction == null) {
@@ -38,7 +39,7 @@ private fun doOperatorAction(editor: VimEditor, context: ExecutionContext, textR
   }
 
   val saveRepeatHandler = VimRepeater.repeatHandler
-  VimPlugin.getMark().setChangeMarks(editor, textRange)
+  injector.markService.setChangeMarks(editor.primaryCaret(), textRange)
   KeyHandler.getInstance().reset(editor)
   val result = operatorFunction.apply(editor, context, selectionType)
   VimRepeater.repeatHandler = saveRepeatHandler

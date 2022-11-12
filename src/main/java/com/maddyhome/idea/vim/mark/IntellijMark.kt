@@ -22,13 +22,12 @@ class IntellijMark(bookmark: LineBookmark, override val col: Int, project: Proje
   override val key = BookmarksManager.getInstance(project)?.getType(bookmark)?.mnemonic!!
   override val line: Int
     get() = getMark()?.line ?: 0
-  override val filename: String
+  override val filepath: String
     get() = getMark()?.file?.path ?: ""
   override val protocol: String?
     get() = getMark()?.file?.let { VirtualFileManager.extractProtocol(it.url) } ?: ""
 
-  override fun isClear(): Boolean = getMark() == null
-  override fun clear() {
+  fun clear() {
     val mark = getMark() ?: return
     getProject()?.let { project -> BookmarksManager.getInstance(project)?.remove(mark) }
   }

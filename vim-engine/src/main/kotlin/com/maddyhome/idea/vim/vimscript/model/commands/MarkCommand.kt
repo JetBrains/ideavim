@@ -22,13 +22,14 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 data class MarkCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED, Access.READ_ONLY)
 
+  // todo make it multicaret
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     val mark = argument[0]
     val line = getLine(editor)
     val offset = editor.getLineStartOffset(line)
 
     val result = if (mark.isLetter() || mark in "'`") {
-      injector.markGroup.setMark(editor, mark, offset)
+      injector.markService.setMark(editor.primaryCaret(), mark, offset)
     } else {
       injector.messages.showStatusBarMessage(editor, injector.messages.message(Msg.E191))
       false

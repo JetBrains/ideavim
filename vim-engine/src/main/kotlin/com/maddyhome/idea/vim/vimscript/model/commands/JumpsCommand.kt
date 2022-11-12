@@ -23,8 +23,8 @@ import kotlin.math.absoluteValue
 data class JumpsCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_FORBIDDEN, Access.READ_ONLY)
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
-    val jumps = injector.markGroup.getJumps()
-    val spot = injector.markGroup.getJumpSpot()
+    val jumps = injector.jumpService.getJumps()
+    val spot = injector.jumpService.getJumpSpot()
 
     val text = StringBuilder(" jump line  col file/text\n")
     jumps.forEachIndexed { idx, jump ->

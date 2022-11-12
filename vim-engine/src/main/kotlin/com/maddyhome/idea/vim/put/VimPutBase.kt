@@ -54,7 +54,7 @@ abstract class VimPutBase : VimPut {
   ): Boolean {
     val additionalData = collectPreModificationData(editor, data)
     deleteSelectedText(editor, data, operatorArguments)
-    val processedText = processText(editor, data) ?: return false
+    val processedText = processText(editor, null, data) ?: return false
     putTextAndSetCaretPosition(editor, context, processedText, data, additionalData)
 
     if (updateVisualMarks) {
@@ -93,16 +93,9 @@ abstract class VimPutBase : VimPut {
 
     val leftIndex = min(selection.vimStart, selection.vimEnd)
     val rightIndex = leftIndex + textLength - 1
+    val rangeForMarks = TextRange(leftIndex, rightIndex)
 
-    val rangeForMarks = if (wasTextInsertedLineWise(text)) {
-      // here we skip the \n char after the inserted text
-      TextRange(leftIndex, rightIndex - 1)
-    } else {
-      TextRange(leftIndex, rightIndex)
-    }
-
-    editor.vimLastSelectionType = SelectionType.CHARACTER_WISE
-    injector.markGroup.setVisualSelectionMarks(editor, rangeForMarks)
+    injector.markService.setVisualSelectionMarks(currentCaret, rangeForMarks)
   }
 
   @RWLockLabel.SelfSynchronized
@@ -121,12 +114,13 @@ abstract class VimPutBase : VimPut {
       }
   }
 
-  private fun processText(editor: VimEditor, data: PutData): ProcessedTextData? {
+  private fun processText(editor: VimEditor, caret: VimCaret?, data: PutData): ProcessedTextData? {
     var text = data.textData?.rawText ?: run {
+      if (caret == null) return null
       if (data.visualSelection != null) {
-        val offset = editor.primaryCaret().offset.point
-        injector.markGroup.setMark(editor, MARK_CHANGE_POS, offset)
-        injector.markGroup.setChangeMarks(editor, TextRange(offset, offset + 1))
+        val offset = caret.offset.point
+        injector.markService.setMark(caret, MARK_CHANGE_POS, offset)
+        injector.markService.setChangeMarks(caret, TextRange(offset, offset + 1))
       }
       return null
     }

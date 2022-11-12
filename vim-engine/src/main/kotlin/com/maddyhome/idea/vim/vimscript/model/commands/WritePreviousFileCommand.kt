@@ -24,7 +24,7 @@ data class WritePreviousFileCommand(val ranges: Ranges, val argument: String) : 
     val count = getCount(editor, 1, true)
 
     injector.file.saveFile(context)
-    injector.markGroup.saveJumpLocation(editor)
+    injector.jumpService.saveJumpLocation(editor)
     injector.file.selectNextFile(-count, context)
 
     return ExecutionResult.Success

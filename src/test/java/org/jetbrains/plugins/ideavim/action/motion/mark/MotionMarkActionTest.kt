@@ -104,9 +104,9 @@ class MotionMarkActionTest : VimOptionTestCase(IjVimOptionService.ideamarksName)
     configureByText(text)
     myFixture.project.createLineBookmark(myFixture.editor, 2, 'A')
     PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
-    val vimMarks = VimPlugin.getMark().getMarks(myFixture.editor.vim)
+    val vimMarks = injector.markService.getAllGlobalMarks()
     TestCase.assertEquals(1, vimMarks.size)
-    TestCase.assertEquals('A', vimMarks[0].key)
+    TestCase.assertEquals('A', vimMarks.first().key)
   }
 
   @VimOptionTestConfiguration(VimTestOption(IjVimOptionService.ideamarksName, OptionValueType.NUMBER, "1"))
@@ -126,10 +126,11 @@ class MotionMarkActionTest : VimOptionTestCase(IjVimOptionService.ideamarksName)
     BookmarksManager.getInstance(myFixture.project)?.remove(bookmark!!)
     myFixture.project.createLineBookmark(myFixture.editor, 4, 'A')
     PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
-    val vimMarks = VimPlugin.getMark().getMarks(myFixture.editor.vim)
+    val vimMarks = injector.markService.getAllGlobalMarks()
     TestCase.assertEquals(1, vimMarks.size)
-    TestCase.assertEquals('A', vimMarks[0].key)
-    TestCase.assertEquals(4, vimMarks[0].line)
+    val mark = vimMarks.first()
+    TestCase.assertEquals('A', mark.key)
+    TestCase.assertEquals(4, mark.line)
   }
 
   private fun checkMarks(vararg marks: Pair<Char, Int>) {

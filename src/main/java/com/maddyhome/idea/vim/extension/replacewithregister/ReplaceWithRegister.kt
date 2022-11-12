@@ -125,8 +125,9 @@ class ReplaceWithRegister : VimExtension {
       return true
     }
 
+    // todo make it work with multiple carets
     private fun getRange(editor: Editor): TextRange? = when (editor.vim.mode) {
-      VimStateMachine.Mode.COMMAND -> VimPlugin.getMark().getChangeMarks(editor.vim)
+      VimStateMachine.Mode.COMMAND -> injector.markService.getChangeMarks(editor.caretModel.primaryCaret.vim)
       VimStateMachine.Mode.VISUAL -> editor.caretModel.primaryCaret.run { TextRange(selectionStart, selectionEnd) }
       else -> null
     }

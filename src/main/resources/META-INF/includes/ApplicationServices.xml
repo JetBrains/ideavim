@@ -14,7 +14,12 @@
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.ChangeGroup"
                         serviceInterface="com.maddyhome.idea.vim.api.VimChangeGroup"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.CommandGroup"/>
-    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.MarkGroup"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.VimMarkServiceImpl"
+                        serviceInterface="com.maddyhome.idea.vim.api.VimMarkService"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.MarkGroup"
+                        serviceInterface="com.maddyhome.idea.vim.mark.VimMarkGroup"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.VimJumpServiceImpl"
+                        serviceInterface="com.maddyhome.idea.vim.api.VimJumpService"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.RegisterGroup"
                         serviceInterface="com.maddyhome.idea.vim.register.VimRegisterGroup"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.XMLGroup"/>

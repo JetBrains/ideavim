@@ -38,13 +38,13 @@ class VisualSwapSelectionsAction : VimActionHandler.SingleExecution() {
 private fun swapVisualSelections(editor: VimEditor): Boolean {
   val lastSelectionType = editor.vimLastSelectionType ?: return false
 
-  val lastVisualRange = injector.markGroup.getVisualSelectionMarks(editor) ?: return false
   val primaryCaret = editor.primaryCaret()
+  val lastVisualRange = injector.markService.getVisualSelectionMarks(primaryCaret) ?: return false
   editor.removeSecondaryCarets()
   val vimSelectionStart = primaryCaret.vimSelectionStart
 
   editor.vimLastSelectionType = SelectionType.fromSubMode(editor.subMode)
-  injector.markGroup.setVisualSelectionMarks(editor, TextRange(vimSelectionStart, primaryCaret.offset.point))
+  injector.markService.setVisualSelectionMarks(primaryCaret, TextRange(vimSelectionStart, primaryCaret.offset.point))
 
   editor.subMode = lastSelectionType.toSubMode()
   primaryCaret.vimSetSelection(lastVisualRange.startOffset, lastVisualRange.endOffset, true)

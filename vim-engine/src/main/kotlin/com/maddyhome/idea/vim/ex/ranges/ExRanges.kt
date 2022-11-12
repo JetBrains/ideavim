@@ -196,7 +196,7 @@ class MarkRange(private val mark: Char, offset: Int, move: Boolean) : Range(offs
    * @return The zero based line number, -1 if there is no such mark set in the file
    */
   override fun getRangeLine(editor: VimEditor, lastZero: Boolean): Int {
-    val mark = injector.markGroup.getFileMark(editor, mark)
+    val mark = injector.markService.getMark(editor.currentCaret(), mark)
     return mark?.line ?: -1
   }
 

@@ -16,11 +16,8 @@ interface Mark {
   val key: Char
   val line: Int
   val col: Int
-  val filename: String
+  val filepath: String
   val protocol: String?
-
-  fun isClear(): Boolean
-  fun clear()
 
   fun offset(editor: VimEditor): Int = editor.bufferPositionToOffset(BufferPosition(line, col))
 
@@ -38,18 +35,9 @@ data class VimMark(
   override val key: Char,
   override var line: Int,
   override val col: Int,
-  override val filename: String,
+  override val filepath: String,
   override val protocol: String?,
 ) : Mark {
-
-  private var cleared = false
-
-  override fun isClear(): Boolean = cleared
-
-  override fun clear() {
-    cleared = true
-  }
-
   companion object {
     @JvmStatic
     fun create(key: Char?, line: Int?, col: Int?, filename: String?, protocol: String?): VimMark? {

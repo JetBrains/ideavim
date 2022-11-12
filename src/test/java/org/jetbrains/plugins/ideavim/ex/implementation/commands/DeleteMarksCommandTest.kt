@@ -10,6 +10,7 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.intellij.openapi.editor.LogicalPosition
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.mark.Mark
 import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -39,14 +40,16 @@ class DeleteMarksCommandTest : VimTestCase() {
          """.trimMargin()
     )
 
+    val vimEditor = myFixture.editor.vim
     marks.forEachIndexed { index, c ->
-      VimPlugin.getMark()
-        .setMark(myFixture.editor.vim, c, myFixture.editor.logicalPositionToOffset(LogicalPosition(index, 0)))
+      injector.markService
+        .setMark(vimEditor.primaryCaret(), c, myFixture.editor.logicalPositionToOffset(LogicalPosition(index, 0)))
     }
   }
 
   private fun getMark(ch: Char): Mark? {
-    return VimPlugin.getMark().getMark(myFixture.editor.vim, ch)
+    val vimEditor = myFixture.editor.vim
+    return injector.markService.getMark(vimEditor.primaryCaret(), ch)
   }
 
   fun `test delete single mark`() {

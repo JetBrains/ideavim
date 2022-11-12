@@ -26,13 +26,13 @@ open class CaretRegisterStorageBase : CaretRegisterStorage, VimRegisterGroupBase
 
   override fun storeText(caret: ImmutableVimCaret, editor: VimEditor, range: TextRange, type: SelectionType, isDelete: Boolean): Boolean {
     if (caret.isPrimary) {
-      return injector.registerGroup.storeText(editor, range, type, isDelete)
+      return injector.registerGroup.storeText(editor, caret, range, type, isDelete)
     }
     val register = lastRegisterChar
     if (!RegisterConstants.RECORDABLE_REGISTERS.contains(register)) {
       return false
     }
-    return super.storeText(editor, range, type, isDelete)
+    return super.storeText(editor, caret, range, type, isDelete)
   }
 
   override fun getRegister(caret: ImmutableVimCaret, r: Char): Register? {

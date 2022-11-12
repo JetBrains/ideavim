@@ -17,7 +17,6 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiWhiteSpace
 import com.intellij.psi.util.PsiTreeUtil
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -158,8 +157,9 @@ class CommentaryExtension : VimExtension {
       executeNormalWithoutMapping(injector.parser.parseKeys("g@"), editor.ij)
     }
 
+    // todo make it multicaret
     override fun apply(editor: VimEditor, context: ExecutionContext, selectionType: SelectionType): Boolean {
-      val range = VimPlugin.getMark().getChangeMarks(editor) ?: return false
+      val range = injector.markService.getChangeMarks(editor.primaryCaret()) ?: return false
       return doCommentary(editor, context, range, selectionType, true)
     }
   }

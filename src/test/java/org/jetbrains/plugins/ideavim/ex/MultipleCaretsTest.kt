@@ -104,7 +104,8 @@ class MultipleCaretsTest : VimTestCase() {
 
     """.trimIndent()
     val editor = configureByText(before)
-    VimPlugin.getRegister().storeText(editor.vim, TextRange(16, 19), SelectionType.CHARACTER_WISE, false)
+    val vimEditor = editor.vim
+    VimPlugin.getRegister().storeText(vimEditor, vimEditor.primaryCaret(), TextRange(16, 19), SelectionType.CHARACTER_WISE, false)
     typeText(commandToKeys("pu"))
     val after = """
           qwe
@@ -133,7 +134,8 @@ class MultipleCaretsTest : VimTestCase() {
 
     """.trimIndent()
     val editor = configureByText(before)
-    VimPlugin.getRegister().storeText(editor.vim, TextRange(16, 19), SelectionType.CHARACTER_WISE, false)
+    val vimEditor = editor.vim
+    VimPlugin.getRegister().storeText(vimEditor, vimEditor.primaryCaret(), TextRange(16, 19), SelectionType.CHARACTER_WISE, false)
     typeText(commandToKeys("4pu"))
     val after = """
           qwe

@@ -173,7 +173,7 @@ public class ChangeGroup extends VimChangeGroupBase {
     if (offset == -1) {
       return false;
     }
-    changeCase(editor, editor.currentCaret().getOffset().getPoint(), offset, CharacterHelper.CASE_TOGGLE);
+    changeCase(editor, caret, caret.getOffset().getPoint(), offset, CharacterHelper.CASE_TOGGLE);
     caret.moveToOffset(EngineEditorHelperKt.normalizeOffset(editor, offset, false));
     return true;
   }
@@ -241,7 +241,7 @@ public class ChangeGroup extends VimChangeGroupBase {
     int[] starts = range.getStartOffsets();
     int[] ends = range.getEndOffsets();
     for (int i = ends.length - 1; i >= 0; i--) {
-      changeCase(editor, starts[i], ends[i], type);
+      changeCase(editor, caret, starts[i], ends[i], type);
     }
     caret.moveToOffset(range.getStartOffset());
     return true;
@@ -255,7 +255,7 @@ public class ChangeGroup extends VimChangeGroupBase {
    * @param end    The end offset to change
    * @param type   The type of change (TOGGLE, UPPER, LOWER)
    */
-  private void changeCase(@NotNull VimEditor editor, int start, int end, char type) {
+  private void changeCase(@NotNull VimEditor editor, @NotNull VimCaret caret, int start, int end, char type) {
     if (start > end) {
       int t = end;
       end = start;
@@ -268,7 +268,7 @@ public class ChangeGroup extends VimChangeGroupBase {
     for (int i = start; i < end; i++) {
       sb.append(CharacterHelper.changeCase(chars.charAt(i), type));
     }
-    replaceText(editor, start, end, sb.toString());
+    replaceText(editor, caret, start, end, sb.toString());
   }
 
   private void restoreCursor(@NotNull VimEditor editor, @NotNull VimCaret caret, int startLine) {
@@ -484,7 +484,7 @@ public class ChangeGroup extends VimChangeGroupBase {
         final int limit = Math.max(0, col + dir * indentConfig.getTotalIndent(count));
         if (col > 0 || soff != eoff) {
           final String indent = indentConfig.createIndentBySize(limit);
-          replaceText(editor, soff, woff, indent);
+          replaceText(editor, caret, soff, woff, indent);
         }
       }
     }
@@ -511,7 +511,7 @@ public class ChangeGroup extends VimChangeGroupBase {
    * @param lineComparator The comparator to use to sort
    * @return true if able to sort the text, false if not
    */
-  public boolean sortRange(@NotNull VimEditor editor, @NotNull LineRange range, @NotNull Comparator<String> lineComparator) {
+  public boolean sortRange(@NotNull VimEditor editor, @NotNull VimCaret caret, @NotNull LineRange range, @NotNull Comparator<String> lineComparator) {
     final int startLine = range.startLine;
     final int endLine = range.endLine;
     final int count = endLine - startLine + 1;
@@ -522,7 +522,7 @@ public class ChangeGroup extends VimChangeGroupBase {
     final int startOffset = editor.getLineStartOffset(startLine);
     final int endOffset = editor.getLineEndOffset(endLine);
 
-    return sortTextRange(editor, startOffset, endOffset, lineComparator);
+    return sortTextRange(editor, caret, startOffset, endOffset, lineComparator);
   }
 
   /**
@@ -535,6 +535,7 @@ public class ChangeGroup extends VimChangeGroupBase {
    * @return true if able to sort the text, false if not
    */
   private boolean sortTextRange(@NotNull VimEditor editor,
+                                @NotNull VimCaret caret,
                                 int start,
                                 int end,
                                 @NotNull Comparator<String> lineComparator) {
@@ -544,7 +545,7 @@ public class ChangeGroup extends VimChangeGroupBase {
       return false;
     }
     lines.sort(lineComparator);
-    replaceText(editor, start, end, StringUtil.join(lines, "\n"));
+    replaceText(editor, caret, start, end, StringUtil.join(lines, "\n"));
     return true;
   }
 
@@ -599,7 +600,7 @@ public class ChangeGroup extends VimChangeGroupBase {
       // Replace text bottom up. In other direction ranges will be desynchronized after inc numbers like 99
       Pair<TextRange, NumberType> rangeToReplace = numberRanges.get(i);
       String newNumber = newNumbers.get(i);
-      replaceText(editor, rangeToReplace.getFirst().getStartOffset(), rangeToReplace.getFirst().getEndOffset(), newNumber);
+      replaceText(editor, caret, rangeToReplace.getFirst().getStartOffset(), rangeToReplace.getFirst().getEndOffset(), newNumber);
     }
 
     InlayHelperKt.moveToInlayAwareOffset(((IjVimCaret) caret).getCaret(), selectedRange.getStartOffset());
@@ -626,7 +627,7 @@ public class ChangeGroup extends VimChangeGroupBase {
       return false;
     }
     else {
-      replaceText(editor, range.getFirst().getStartOffset(), range.getFirst().getEndOffset(), newNumber);
+      replaceText(editor, caret, range.getFirst().getStartOffset(), range.getFirst().getEndOffset(), newNumber);
       InlayHelperKt.moveToInlayAwareOffset(((IjVimCaret) caret).getCaret(), range.getFirst().getStartOffset() + newNumber.length() - 1);
       return true;
     }

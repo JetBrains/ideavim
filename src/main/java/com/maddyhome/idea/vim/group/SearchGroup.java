@@ -758,7 +758,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
       int nmatch = sp.vim_regexec_multi(regmatch, editor, lcount, lnum, searchcol);
       if (nmatch > 0) {
         if (firstMatch) {
-          VimPlugin.getMark().saveJumpLocation(editor);
+          injector.getJumpService().saveJumpLocation(editor);
           firstMatch = false;
         }
 

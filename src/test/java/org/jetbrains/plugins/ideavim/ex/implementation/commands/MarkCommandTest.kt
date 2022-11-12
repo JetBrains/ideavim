@@ -8,7 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
-import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim
 import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -26,7 +26,8 @@ class MarkCommandTest : VimTestCase() {
                        """.trimMargin()
     )
     typeText(commandToKeys("mark a"))
-    VimPlugin.getMark().getMark(myFixture.editor.vim, 'a')?.let {
+    val vimEditor = myFixture.editor.vim
+    injector.markService.getMark(vimEditor.primaryCaret(), 'a')?.let {
       assertEquals(2, it.line)
       assertEquals(0, it.col)
     } ?: TestCase.fail("Mark is null")
@@ -41,7 +42,8 @@ class MarkCommandTest : VimTestCase() {
                        """.trimMargin()
     )
     typeText(commandToKeys("mark G"))
-    VimPlugin.getMark().getMark(myFixture.editor.vim, 'G')?.let {
+    val vimEditor = myFixture.editor.vim
+    injector.markService.getMark(vimEditor.primaryCaret(), 'G')?.let {
       assertEquals(2, it.line)
       assertEquals(0, it.col)
     } ?: TestCase.fail("Mark is null")
@@ -56,7 +58,8 @@ class MarkCommandTest : VimTestCase() {
                        """.trimMargin()
     )
     typeText(commandToKeys("k a"))
-    VimPlugin.getMark().getMark(myFixture.editor.vim, 'a')?.let {
+    val vimEditor = myFixture.editor.vim
+    injector.markService.getMark(vimEditor.primaryCaret(), 'a')?.let {
       assertEquals(2, it.line)
       assertEquals(0, it.col)
     } ?: TestCase.fail("Mark is null")
@@ -71,7 +74,8 @@ class MarkCommandTest : VimTestCase() {
                        """.trimMargin()
     )
     typeText(commandToKeys("1,2 mark a"))
-    VimPlugin.getMark().getMark(myFixture.editor.vim, 'a')?.let {
+    val vimEditor = myFixture.editor.vim
+    injector.markService.getMark(vimEditor.primaryCaret(), 'a')?.let {
       assertEquals(1, it.line)
       assertEquals(0, it.col)
     } ?: TestCase.fail("Mark is null")

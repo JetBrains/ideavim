@@ -166,7 +166,7 @@ interface VimChangeGroup {
 
   fun changeNumber(editor: VimEditor, caret: VimCaret, count: Int): Boolean
 
-  fun sortRange(editor: VimEditor, range: LineRange, lineComparator: Comparator<String>): Boolean
+  fun sortRange(editor: VimEditor, caret: VimCaret, range: LineRange, lineComparator: Comparator<String>): Boolean
 
   fun reset()
 
@@ -194,5 +194,5 @@ interface VimChangeGroup {
   )
 
   fun type(vimEditor: VimEditor, context: ExecutionContext, key: Char)
-  fun replaceText(editor: VimEditor, start: Int, end: Int, str: String)
+  fun replaceText(editor: VimEditor, caret: VimCaret, start: Int, end: Int, str: String)
 }

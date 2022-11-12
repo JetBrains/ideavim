@@ -132,9 +132,9 @@ class PutGroup : VimPutBase() {
         startOffset,
         caretPossibleEndOffset
       ) else caretPossibleEndOffset
-
-      VimPlugin.getMark().setChangeMarks(editor.vim, TextRange(startOffset, endOffset))
-      VimPlugin.getMark().setMark(editor.vim, MARK_CHANGE_POS, startOffset)
+      val vimCaret = caret.vim
+      injector.markService.setChangeMarks(vimCaret, TextRange(startOffset, endOffset))
+      injector.markService.setMark(vimCaret, MARK_CHANGE_POS, startOffset)
       moveCaretToEndPosition(
         vimEditor,
         IjVimCaret(caret),

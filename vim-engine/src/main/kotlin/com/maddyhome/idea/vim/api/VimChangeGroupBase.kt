@@ -182,8 +182,8 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       if (type != null) {
         val start = updatedRange.startOffset
         if (editor.primaryCaret() == caret) {
-          injector.markGroup.setMark(editor, MARK_CHANGE_POS, start)
-          injector.markGroup.setChangeMarks(editor, TextRange(start, start + 1))
+          injector.markService.setMark(caret, MARK_CHANGE_POS, start)
+          injector.markService.setChangeMarks(caret, TextRange(start, start + 1))
         }
       }
       return true
@@ -202,7 +202,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     (editor as MutableVimEditor).insertText(Offset(offset), str)
     val newCaret = caret.moveToInlayAwareOffset(offset + str.length)
 
-    injector.markGroup.setMark(editor, MARK_CHANGE_POS, offset)
+    injector.markService.setMark(newCaret, MARK_CHANGE_POS, offset)
     return newCaret
   }
 
@@ -427,7 +427,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     for (caret in editor.nativeCarets()) {
       caret.vimInsertStart = editor.createLiveMarker(caret.offset, caret.offset)
       if (caret == editor.primaryCaret()) {
-        injector.markGroup.setMark(editor, MARK_CHANGE_START, caret.offset.point)
+        injector.markService.setMark(caret, MARK_CHANGE_START, caret.offset.point)
       }
     }
     val cmd = state.executingCommand
@@ -523,10 +523,9 @@ abstract class VimChangeGroupBase : VimChangeGroup {
   override fun processEscape(editor: VimEditor, context: ExecutionContext?, operatorArguments: OperatorArguments) {
     // Get the offset for marks before we exit insert mode - switching from insert to overtype subtracts one from the
     // column offset.
-    var offset = editor.primaryCaret().offset.point
-    val markGroup = injector.markGroup
-    markGroup.setMark(editor, '^', offset)
-    markGroup.setMark(editor, MARK_CHANGE_END, offset)
+    val markGroup = injector.markService
+    markGroup.setMark(editor, VimMarkService.INSERT_EXIT_MARK)
+    markGroup.setMark(editor, MARK_CHANGE_END)
     if (getInstance(editor).mode === VimStateMachine.Mode.REPLACE) {
       editor.insertMode = true
     }
@@ -547,8 +546,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     }
 
     // The change pos '.' mark is the offset AFTER processing escape, and after switching to overtype
-    offset = editor.primaryCaret().offset.point
-    markGroup.setMark(editor, MARK_CHANGE_POS, offset)
+    markGroup.setMark(editor, MARK_CHANGE_POS)
     getInstance(editor).popModes()
     exitAllSingleCommandInsertModes(editor)
   }
