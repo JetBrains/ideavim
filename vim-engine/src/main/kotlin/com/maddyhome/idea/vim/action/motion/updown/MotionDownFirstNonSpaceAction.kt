@@ -29,7 +29,7 @@ class MotionDownFirstNonSpaceAction : MotionActionHandler.ForEachCaret() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    return injector.motion.moveCaretToLineStartSkipLeadingOffset(editor, caret, operatorArguments.count1).toMotion()
+    return injector.motion.moveCaretToRelativeLineStartSkipLeading(editor, caret, operatorArguments.count1).toMotion()
   }
 }
 
@@ -48,7 +48,7 @@ class EnterNormalAction : MotionActionHandler.ForEachCaret() {
       injector.actionExecutor.executeAction(injector.actionExecutor.ACTION_EDITOR_NEXT_TEMPLATE_VARIABLE, context)
       Motion.NoMotion
     } else {
-      injector.motion.moveCaretToLineStartSkipLeadingOffset(editor, caret, operatorArguments.count1).toMotion()
+      injector.motion.moveCaretToRelativeLineStartSkipLeading(editor, caret, operatorArguments.count1).toMotion()
     }
   }
 }

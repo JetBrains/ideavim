@@ -150,7 +150,7 @@ abstract class VimPutBase : VimPut {
       "preEndOffset" -> caret.moveToOffset(endOffset - 1)
       "startOffsetSkipLeading" -> {
         caret.moveToOffset(startOffset)
-        caret.moveToOffset(injector.motion.moveCaretToLineStartSkipLeading(editor, caret))
+        caret.moveToOffset(injector.motion.moveCaretToCurrentLineStartSkipLeading(editor, caret))
       }
       "postEndOffset" -> caret.moveToOffset(endOffset + 1)
       "preLineEndOfEndOffset" -> {

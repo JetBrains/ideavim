@@ -110,7 +110,7 @@ abstract class VimMotionGroupBase : VimMotionGroup {
     return if (offset == oldOffset) -1 else offset
   }
 
-  override fun moveCaretToLineStartSkipLeadingOffset(
+  override fun moveCaretToRelativeLineStartSkipLeading(
     editor: VimEditor,
     caret: VimCaret,
     linesOffset: Int,
@@ -171,12 +171,12 @@ abstract class VimMotionGroupBase : VimMotionGroup {
     this.lastFTChar = lastChar
   }
 
-  override fun moveCaretToLineStart(editor: VimEditor, caret: VimCaret): Int {
+  override fun moveCaretToCurrentLineStart(editor: VimEditor, caret: VimCaret): Int {
     val logicalLine = caret.getLine().line
     return moveCaretToLineStart(editor, logicalLine)
   }
 
-  override fun moveCaretToLineEndOffset(
+  override fun moveCaretToRelativeLineEnd(
     editor: VimEditor,
     caret: VimCaret,
     cntForward: Int,
@@ -189,7 +189,7 @@ abstract class VimMotionGroupBase : VimMotionGroup {
     }
   }
 
-  override fun moveCaretToLineEndSkipLeadingOffset(editor: VimEditor, caret: VimCaret, linesOffset: Int): Int {
+  override fun moveCaretToRelativeLineEndSkipTrailing(editor: VimEditor, caret: VimCaret, linesOffset: Int): Int {
     val line = injector.engineEditorHelper.visualLineToLogicalLine(
       editor,
       injector.engineEditorHelper.normalizeVisualLine(editor, caret.getVisualPosition().line + linesOffset)
@@ -239,7 +239,7 @@ abstract class VimMotionGroupBase : VimMotionGroup {
     return res
   }
 
-  override fun moveCaretToLineStartSkipLeading(editor: VimEditor, caret: VimCaret): Int {
+  override fun moveCaretToCurrentLineStartSkipLeading(editor: VimEditor, caret: VimCaret): Int {
     val logicalLine = caret.getLine().line
     return moveCaretToLineStartSkipLeading(editor, logicalLine)
   }

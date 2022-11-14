@@ -84,7 +84,7 @@ private fun insertNewLineAbove(editor: VimEditor, context: ExecutionContext) {
     val offset: Int
     if (caret.getVisualPosition().line == 0) {
       // Fake indenting for the first line. Works well for plain text to match the existing indent
-      offset = injector.motion.moveCaretToLineStartSkipLeading(editor, caret)
+      offset = injector.motion.moveCaretToCurrentLineStartSkipLeading(editor, caret)
       firstLiners.add(caret)
     } else {
       offset = injector.motion.moveCaretToLineEnd(editor, caret.getLogicalPosition().line - 1, true)
@@ -129,7 +129,7 @@ private fun insertNewLineAbove(editor: VimEditor, context: ExecutionContext) {
 private fun insertNewLineBelow(editor: VimEditor, context: ExecutionContext) {
   if (editor.isOneLineMode()) return
   for (caret in editor.nativeCarets()) {
-    caret.moveToOffset(injector.motion.moveCaretToLineEnd(editor, caret))
+    caret.moveToOffset(injector.motion.moveCaretToCurrentLineEnd(editor, caret))
   }
 
   injector.changeGroup.initInsert(editor, context, VimStateMachine.Mode.INSERT)

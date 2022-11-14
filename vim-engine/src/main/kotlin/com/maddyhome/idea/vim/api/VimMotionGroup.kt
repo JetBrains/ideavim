@@ -29,16 +29,16 @@ interface VimMotionGroup {
   // TODO: Consider naming. These don't move the caret, but calculate offsets. Also consider returning Motion
 
   // Move caret to buffer line
-  fun moveCaretToLineStart(editor: VimEditor, caret: VimCaret): Int
+  fun moveCaretToCurrentLineStart(editor: VimEditor, caret: VimCaret): Int
+  fun moveCaretToCurrentLineStartSkipLeading(editor: VimEditor, caret: VimCaret): Int
   fun moveCaretToLineStart(editor: VimEditor, line: Int): Int
-  fun moveCaretToLineStartSkipLeading(editor: VimEditor, caret: VimCaret): Int
   fun moveCaretToLineStartSkipLeading(editor: VimEditor, line: Int): Int
-  fun moveCaretToLineStartSkipLeadingOffset(editor: VimEditor, caret: VimCaret, linesOffset: Int): Int
+  fun moveCaretToRelativeLineStartSkipLeading(editor: VimEditor, caret: VimCaret, linesOffset: Int): Int
   fun moveCaretToLineWithStartOfLineOption(editor: VimEditor, logicalLine: Int, caret: VimCaret): Int
-  fun moveCaretToLineEnd(editor: VimEditor, caret: VimCaret): Int
+  fun moveCaretToCurrentLineEnd(editor: VimEditor, caret: VimCaret): Int
   fun moveCaretToLineEnd(editor: VimEditor, line: Int, allowPastEnd: Boolean): Int
-  fun moveCaretToLineEndOffset(editor: VimEditor, caret: VimCaret, cntForward: Int, allowPastEnd: Boolean): Int
-  fun moveCaretToLineEndSkipLeadingOffset(editor: VimEditor, caret: VimCaret, linesOffset: Int): Int
+  fun moveCaretToRelativeLineEnd(editor: VimEditor, caret: VimCaret, cntForward: Int, allowPastEnd: Boolean): Int
+  fun moveCaretToRelativeLineEndSkipTrailing(editor: VimEditor, caret: VimCaret, linesOffset: Int): Int
   fun moveCaretToLineWithSameColumn(editor: VimEditor, logicalLine: Int, caret: VimCaret): Int
   fun moveCaretToLinePercent(editor: VimEditor, caret: VimCaret, count: Int): Int
 

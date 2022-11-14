@@ -26,7 +26,7 @@ class MotionFirstNonSpaceAction : MotionActionHandler.ForEachCaret() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    return injector.motion.moveCaretToLineStartSkipLeading(editor, caret).toMotion()
+    return injector.motion.moveCaretToCurrentLineStartSkipLeading(editor, caret).toMotion()
   }
 
   override val motionType: MotionType = MotionType.EXCLUSIVE

@@ -32,7 +32,7 @@ class MotionFirstColumnAction : MotionActionHandler.ForEachCaret() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    return injector.motion.moveCaretToLineStart(editor, caret).toMotion()
+    return injector.motion.moveCaretToCurrentLineStart(editor, caret).toMotion()
   }
 }
 
@@ -48,6 +48,6 @@ class MotionFirstColumnInsertModeAction : MotionActionHandler.ForEachCaret() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    return injector.motion.moveCaretToLineStart(editor, caret).toMotion()
+    return injector.motion.moveCaretToCurrentLineStart(editor, caret).toMotion()
   }
 }

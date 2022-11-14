@@ -369,7 +369,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
 
   override fun insertAfterLineEnd(editor: VimEditor, context: ExecutionContext) {
     for (caret in editor.nativeCarets()) {
-      caret.moveToOffset(injector.motion.moveCaretToLineEnd(editor, caret))
+      caret.moveToOffset(injector.motion.moveCaretToCurrentLineEnd(editor, caret))
     }
     initInsert(editor, context, VimStateMachine.Mode.INSERT)
   }
@@ -393,7 +393,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
    */
   override fun insertLineStart(editor: VimEditor, context: ExecutionContext) {
     for (caret in editor.nativeCarets()) {
-      caret.moveToOffset(injector.motion.moveCaretToLineStart(editor, caret))
+      caret.moveToOffset(injector.motion.moveCaretToCurrentLineStart(editor, caret))
     }
     initInsert(editor, context, VimStateMachine.Mode.INSERT)
   }
@@ -405,7 +405,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
    */
   override fun insertBeforeFirstNonBlank(editor: VimEditor, context: ExecutionContext) {
     for (caret in editor.nativeCarets()) {
-      caret.moveToOffset(injector.motion.moveCaretToLineStartSkipLeading(editor, caret))
+      caret.moveToOffset(injector.motion.moveCaretToCurrentLineStartSkipLeading(editor, caret))
     }
     initInsert(editor, context, VimStateMachine.Mode.INSERT)
   }
@@ -647,8 +647,8 @@ abstract class VimChangeGroupBase : VimChangeGroup {
    */
   override fun deleteEndOfLine(editor: VimEditor, caret: VimCaret, count: Int, operatorArguments: OperatorArguments): Boolean {
     val initialOffset = caret.offset.point
-    val offset = injector.motion.moveCaretToLineEndOffset(editor, caret, count - 1, true)
-    val lineStart = injector.motion.moveCaretToLineStart(editor, caret)
+    val offset = injector.motion.moveCaretToRelativeLineEnd(editor, caret, count - 1, true)
+    val lineStart = injector.motion.moveCaretToCurrentLineStart(editor, caret)
     var startOffset = initialOffset
     if (offset == initialOffset && offset != lineStart) startOffset-- // handle delete from virtual space
     if (offset != -1) {
@@ -747,9 +747,9 @@ abstract class VimChangeGroupBase : VimChangeGroup {
    * @return true if able to delete the lines, false if not
    */
   override fun deleteLine(editor: VimEditor, caret: VimCaret, count: Int, operatorArguments: OperatorArguments): Boolean {
-    val start = injector.motion.moveCaretToLineStart(editor, caret)
+    val start = injector.motion.moveCaretToCurrentLineStart(editor, caret)
     val offset =
-      min(injector.motion.moveCaretToLineEndOffset(editor, caret, count - 1, true) + 1, editor.fileSize().toInt())
+      min(injector.motion.moveCaretToRelativeLineEnd(editor, caret, count - 1, true) + 1, editor.fileSize().toInt())
 
     if (logger.isDebug()) {
       logger.debug("start=$start")
@@ -760,7 +760,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       if (res && caret.offset.point >= editor.fileSize() && caret.offset.point != 0) {
         injector.motion.moveCaret(
           editor, caret,
-          injector.motion.moveCaretToLineStartSkipLeadingOffset(
+          injector.motion.moveCaretToRelativeLineStartSkipLeading(
             editor,
             caret, -1
           )
@@ -936,7 +936,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
   override fun changeEndOfLine(editor: VimEditor, caret: VimCaret, count: Int, operatorArguments: OperatorArguments): Boolean {
     val res = deleteEndOfLine(editor, caret, count, operatorArguments)
     if (res) {
-      caret.moveToOffset(injector.motion.moveCaretToLineEnd(editor, caret))
+      caret.moveToOffset(injector.motion.moveCaretToCurrentLineEnd(editor, caret))
       editor.vimChangeActionSwitchMode = VimStateMachine.Mode.INSERT
     }
     return res
@@ -999,15 +999,15 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     // start my moving the cursor to the very end of the first line
     injector.motion.moveCaret(editor, caret, injector.motion.moveCaretToLineEnd(editor, startLine, true))
     for (i in 1 until count) {
-      val start = injector.motion.moveCaretToLineEnd(editor, caret)
-      val trailingWhitespaceStart = injector.motion.moveCaretToLineEndSkipLeadingOffset(
+      val start = injector.motion.moveCaretToCurrentLineEnd(editor, caret)
+      val trailingWhitespaceStart = injector.motion.moveCaretToRelativeLineEndSkipTrailing(
         editor,
         caret, 0
       )
       val hasTrailingWhitespace = start != trailingWhitespaceStart + 1
       caret.moveToOffset(start)
       val offset: Int = if (spaces) {
-        injector.motion.moveCaretToLineStartSkipLeadingOffset(editor, caret, 1)
+        injector.motion.moveCaretToRelativeLineStartSkipLeading(editor, caret, 1)
       } else {
         injector.motion.moveCaretToLineStart(editor, caret.getLogicalPosition().line + 1)
       }

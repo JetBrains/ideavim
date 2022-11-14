@@ -28,7 +28,7 @@ class MotionDownLess1FirstNonSpaceAction : MotionActionHandler.ForEachCaret() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    return injector.motion.moveCaretToLineStartSkipLeadingOffset(editor, caret, operatorArguments.count1 - 1)
+    return injector.motion.moveCaretToRelativeLineStartSkipLeading(editor, caret, operatorArguments.count1 - 1)
       .toMotion()
   }
 }

@@ -28,6 +28,6 @@ class MotionUpFirstNonSpaceAction : MotionActionHandler.ForEachCaret() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    return injector.motion.moveCaretToLineStartSkipLeadingOffset(editor, caret, -operatorArguments.count1).toMotion()
+    return injector.motion.moveCaretToRelativeLineStartSkipLeading(editor, caret, -operatorArguments.count1).toMotion()
   }
 }

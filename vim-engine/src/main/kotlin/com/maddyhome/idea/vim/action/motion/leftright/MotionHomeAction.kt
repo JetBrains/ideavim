@@ -27,6 +27,6 @@ class MotionHomeAction : NonShiftedSpecialKeyHandler() {
     rawCount: Int,
     argument: Argument?,
   ): Int {
-    return injector.motion.moveCaretToLineStart(editor, caret)
+    return injector.motion.moveCaretToCurrentLineStart(editor, caret)
   }
 }

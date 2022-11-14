@@ -48,7 +48,7 @@ class MotionEndAction : NonShiftedSpecialKeyHandler() {
       }
     }
 
-    return injector.motion.moveCaretToLineEndOffset(editor, caret, count - 1, allow)
+    return injector.motion.moveCaretToRelativeLineEnd(editor, caret, count - 1, allow)
   }
 
   override fun preMove(editor: VimEditor, caret: VimCaret, context: ExecutionContext, cmd: Command) {

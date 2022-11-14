@@ -891,7 +891,7 @@ public class MotionGroup extends VimMotionGroupBase {
     return getLeadingCharacterOffset(((IjVimEditor)editor).getEditor(), line);
   }
 
-  public int moveCaretToLineEnd(@NotNull VimEditor editor, @NotNull VimCaret caret) {
+  public int moveCaretToCurrentLineEnd(@NotNull VimEditor editor, @NotNull VimCaret caret) {
     final VisualPosition visualPosition = ((IjVimCaret) caret).getCaret().getVisualPosition();
     final int lastVisualLineColumn = EditorUtil.getLastVisualLineColumnNumber(((IjVimEditor) editor).getEditor(), visualPosition.line);
     final VisualPosition visualEndOfLine = new VisualPosition(visualPosition.line, lastVisualLineColumn, true);
