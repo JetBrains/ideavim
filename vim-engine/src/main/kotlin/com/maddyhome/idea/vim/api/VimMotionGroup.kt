@@ -67,16 +67,14 @@ interface VimMotionGroup {
   // Scrolling
   fun scrollCaretIntoView(editor: VimEditor)
   fun scrollFullPage(editor: VimEditor, caret: VimCaret, pages: Int): Boolean
-  fun scrollFullPageDown(editor: VimEditor, caret: VimCaret, pages: Int): Boolean
-  fun scrollFullPageUp(editor: VimEditor, caret: VimCaret, pages: Int): Boolean
-  fun scrollScreen(editor: VimEditor, caret: VimCaret, rawCount: Int, down: Boolean): Boolean
-  fun scrollLine(editor: VimEditor, lines: Int): Boolean
-  fun scrollLineToFirstScreenLine(editor: VimEditor, rawCount: Int, start: Boolean): Boolean
-  fun scrollLineToMiddleScreenLine(editor: VimEditor, rawCount: Int, start: Boolean): Boolean
-  fun scrollLineToLastScreenLine(editor: VimEditor, rawCount: Int, start: Boolean): Boolean
+  fun scrollHalfPage(editor: VimEditor, caret: VimCaret, rawCount: Int, down: Boolean): Boolean
+  fun scrollLines(editor: VimEditor, lines: Int): Boolean
+  fun scrollCurrentLineToDisplayTop(editor: VimEditor, rawCount: Int, start: Boolean): Boolean
+  fun scrollCurrentLineToDisplayMiddle(editor: VimEditor, rawCount: Int, start: Boolean): Boolean
+  fun scrollCurrentLineToDisplayBottom(editor: VimEditor, rawCount: Int, start: Boolean): Boolean
   fun scrollColumns(editor: VimEditor, columns: Int): Boolean
-  fun scrollCaretColumnToFirstScreenColumn(vimEditor: VimEditor): Boolean
-  fun scrollCaretColumnToLastScreenColumn(editor: VimEditor): Boolean
+  fun scrollCaretColumnToDisplayLeftEdge(vimEditor: VimEditor): Boolean
+  fun scrollCaretColumnToDisplayRightEdge(editor: VimEditor): Boolean
 
   /**
    * Find the offset of the start of the next/previous word/WORD
@@ -88,7 +86,6 @@ interface VimMotionGroup {
    * @return a [Motion] representing the offset to move to, or [Motion.Error] if not found
    */
   fun findOffsetOfNextWord(editor: VimEditor, searchFrom: Int, count: Int, bigWord: Boolean): Motion
-
 
 
   // Next/previous matching character - f/F and t/T motions

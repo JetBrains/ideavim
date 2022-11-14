@@ -501,25 +501,25 @@ public class MotionGroup extends VimMotionGroupBase {
   }
 
   @Override
-  public boolean scrollLineToFirstScreenLine(@NotNull VimEditor editor, int rawCount, boolean start) {
+  public boolean scrollCurrentLineToDisplayTop(@NotNull VimEditor editor, int rawCount, boolean start) {
     scrollLineToScreenLocation(((IjVimEditor)editor).getEditor(), ScreenLocation.TOP, rawCount, start);
     return true;
   }
 
   @Override
-  public boolean scrollLineToMiddleScreenLine(@NotNull VimEditor editor, int rawCount, boolean start) {
+  public boolean scrollCurrentLineToDisplayMiddle(@NotNull VimEditor editor, int rawCount, boolean start) {
     scrollLineToScreenLocation(((IjVimEditor)editor).getEditor(), ScreenLocation.MIDDLE, rawCount, start);
     return true;
   }
 
   @Override
-  public boolean scrollLineToLastScreenLine(@NotNull VimEditor editor, int rawCount, boolean start) {
+  public boolean scrollCurrentLineToDisplayBottom(@NotNull VimEditor editor, int rawCount, boolean start) {
     scrollLineToScreenLocation(((IjVimEditor)editor).getEditor(), ScreenLocation.BOTTOM, rawCount, start);
     return true;
   }
 
   @Override
-  public boolean scrollCaretColumnToFirstScreenColumn(@NotNull VimEditor vimEditor) {
+  public boolean scrollCaretColumnToDisplayLeftEdge(@NotNull VimEditor vimEditor) {
     Editor editor = ((IjVimEditor)vimEditor).getEditor();
     final VisualPosition caretVisualPosition = editor.getCaretModel().getVisualPosition();
     final int scrollOffset = getNormalizedSideScrollOffset(editor);
@@ -530,7 +530,7 @@ public class MotionGroup extends VimMotionGroupBase {
   }
 
   @Override
-  public boolean scrollCaretColumnToLastScreenColumn(@NotNull VimEditor editor) {
+  public boolean scrollCaretColumnToDisplayRightEdge(@NotNull VimEditor editor) {
     Editor ijEditor = ((IjVimEditor)editor).getEditor();
     final VisualPosition caretVisualPosition = ijEditor.getCaretModel().getVisualPosition();
     final int scrollOffset = getNormalizedSideScrollOffset(ijEditor);
@@ -769,7 +769,7 @@ public class MotionGroup extends VimMotionGroupBase {
   }
 
   @Override
-  public boolean scrollLine(@NotNull VimEditor editor, int lines) {
+  public boolean scrollLines(@NotNull VimEditor editor, int lines) {
     assert lines != 0 : "lines cannot be 0";
     Editor ijEditor = ((IjVimEditor)editor).getEditor();
 
@@ -1035,7 +1035,7 @@ public class MotionGroup extends VimMotionGroupBase {
   }
 
   @Override
-  public boolean scrollScreen(final @NotNull VimEditor editor, final @NotNull VimCaret caret, int rawCount, boolean down) {
+  public boolean scrollHalfPage(final @NotNull VimEditor editor, final @NotNull VimCaret caret, int rawCount, boolean down) {
     Editor ijEditor = ((IjVimEditor)editor).getEditor();
     Caret ijCaret = ((IjVimCaret)caret).getCaret();
     final CaretModel caretModel = ijEditor.getCaretModel();

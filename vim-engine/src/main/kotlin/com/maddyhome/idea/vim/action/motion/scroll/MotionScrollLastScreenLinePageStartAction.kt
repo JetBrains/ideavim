@@ -38,18 +38,18 @@ class MotionScrollLastScreenLinePageStartAction : VimActionHandler.SingleExecuti
         injector.engineEditorHelper.getVisualLineAtTopOfScreen(editor) - 1
       )
       val logicalLine = injector.engineEditorHelper.visualLineToLogicalLine(editor, prevVisualLine)
-      return motion.scrollLineToLastScreenLine(editor, logicalLine + 1, true)
+      return motion.scrollCurrentLineToDisplayBottom(editor, logicalLine + 1, true)
     }
 
     // [count]z^ first scrolls [count] to the bottom of the window, then moves the caret to the line that is now at
     // the top, and then move that line to the bottom of the window
     var logicalLine = injector.engineEditorHelper.normalizeLine(editor, cmd.rawCount - 1)
-    if (motion.scrollLineToLastScreenLine(editor, logicalLine + 1, false)) {
+    if (motion.scrollCurrentLineToDisplayBottom(editor, logicalLine + 1, false)) {
       logicalLine = injector.engineEditorHelper.visualLineToLogicalLine(
         editor,
         injector.engineEditorHelper.getVisualLineAtTopOfScreen(editor)
       )
-      return motion.scrollLineToLastScreenLine(editor, logicalLine + 1, true)
+      return motion.scrollCurrentLineToDisplayBottom(editor, logicalLine + 1, true)
     }
 
     return false
