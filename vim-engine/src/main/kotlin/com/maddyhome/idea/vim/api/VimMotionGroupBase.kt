@@ -20,6 +20,7 @@ import kotlin.math.sign
 abstract class VimMotionGroupBase : VimMotionGroup {
   override var lastFTCmd = TillCharacterMotionType.LAST_SMALL_T
   override var lastFTChar: Char = ' '
+
   override fun getVerticalMotionOffset(editor: VimEditor, caret: VimCaret, count: Int): Int {
     val pos = caret.getVisualPosition()
     if ((pos.line == 0 && count < 0) || (pos.line >= injector.engineEditorHelper.getVisualLineCount(editor) - 1 && count > 0)) {
@@ -122,6 +123,9 @@ abstract class VimMotionGroupBase : VimMotionGroup {
     assert(pages != 0)
     return if (pages > 0) scrollFullPageDown(editor, caret, pages) else scrollFullPageUp(editor, caret, abs(pages))
   }
+
+  protected abstract fun scrollFullPageDown(editor: VimEditor, caret: VimCaret, pages: Int): Boolean
+  protected abstract fun scrollFullPageUp(editor: VimEditor, caret: VimCaret, pages: Int): Boolean
 
   /**
    * This moves the caret next to the next/previous matching character on the current line

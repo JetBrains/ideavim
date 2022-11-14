@@ -36,6 +36,6 @@ class MotionScrollFirstScreenLinePageStartAction : VimActionHandler.SingleExecut
       )
       rawCount = injector.engineEditorHelper.visualLineToLogicalLine(editor, nextVisualLine) + 1 // rawCount is 1 based
     }
-    return injector.motion.scrollLineToFirstScreenLine(editor, rawCount, true)
+    return injector.motion.scrollCurrentLineToDisplayTop(editor, rawCount, true)
   }
 }

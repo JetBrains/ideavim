@@ -28,7 +28,7 @@ class MotionScrollMiddleScreenLineAction : VimActionHandler.SingleExecution() {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    return injector.motion.scrollLineToMiddleScreenLine(editor, cmd.rawCount, false)
+    return injector.motion.scrollCurrentLineToDisplayMiddle(editor, cmd.rawCount, false)
   }
 }
 
@@ -43,6 +43,6 @@ class MotionScrollMiddleScreenLineStartAction : VimActionHandler.SingleExecution
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    return injector.motion.scrollLineToMiddleScreenLine(editor, cmd.rawCount, true)
+    return injector.motion.scrollCurrentLineToDisplayMiddle(editor, cmd.rawCount, true)
   }
 }

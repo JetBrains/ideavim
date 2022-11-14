@@ -56,7 +56,7 @@ abstract class MotionFirstScreenLineActionBase(private val operatorPending: Bool
   override fun postMove(editor: VimEditor, caret: VimCaret, context: ExecutionContext, cmd: Command) {
     if (operatorPending) {
       // Convert current caret line from a 0-based logical line to a 1-based logical line
-      injector.motion.scrollLineToFirstScreenLine(editor, caret.vimLine, false)
+      injector.motion.scrollCurrentLineToDisplayTop(editor, caret.vimLine, false)
     }
   }
 }

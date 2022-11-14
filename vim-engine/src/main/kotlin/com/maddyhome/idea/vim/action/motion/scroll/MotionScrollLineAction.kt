@@ -28,7 +28,7 @@ class MotionScrollLineDownAction : VimActionHandler.SingleExecution() {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    return injector.motion.scrollLine(editor, cmd.count)
+    return injector.motion.scrollLines(editor, cmd.count)
   }
 }
 
@@ -43,6 +43,6 @@ class MotionScrollLineUpAction : VimActionHandler.SingleExecution() {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    return injector.motion.scrollLine(editor, -cmd.count)
+    return injector.motion.scrollLines(editor, -cmd.count)
   }
 }

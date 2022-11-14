@@ -23,6 +23,6 @@ class MotionScrollFirstScreenColumnAction : VimActionHandler.SingleExecution() {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    return injector.motion.scrollCaretColumnToFirstScreenColumn(editor)
+    return injector.motion.scrollCaretColumnToDisplayLeftEdge(editor)
   }
 }

@@ -28,6 +28,6 @@ class MotionScrollFirstScreenLineStartAction : VimActionHandler.SingleExecution(
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    return injector.motion.scrollLineToFirstScreenLine(editor, cmd.rawCount, true)
+    return injector.motion.scrollCurrentLineToDisplayTop(editor, cmd.rawCount, true)
   }
 }
