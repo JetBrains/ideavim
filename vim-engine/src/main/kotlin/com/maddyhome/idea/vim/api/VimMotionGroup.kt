@@ -28,19 +28,18 @@ interface VimMotionGroup {
 
   // TODO: Consider naming. These don't move the caret, but calculate offsets. Also consider returning Motion
 
-  // Move caret to buffer line
-  fun moveCaretToCurrentLineStart(editor: VimEditor, caret: VimCaret): Int
-  fun moveCaretToCurrentLineStartSkipLeading(editor: VimEditor, caret: VimCaret): Int
+  // Move caret to specific buffer line
   fun moveCaretToLineStart(editor: VimEditor, line: Int): Int
   fun moveCaretToLineStartSkipLeading(editor: VimEditor, line: Int): Int
-  fun moveCaretToRelativeLineStartSkipLeading(editor: VimEditor, caret: VimCaret, linesOffset: Int): Int
   fun moveCaretToLineWithStartOfLineOption(editor: VimEditor, logicalLine: Int, caret: VimCaret): Int
-  fun moveCaretToCurrentLineEnd(editor: VimEditor, caret: VimCaret): Int
   fun moveCaretToLineEnd(editor: VimEditor, line: Int, allowPastEnd: Boolean): Int
-  fun moveCaretToRelativeLineEnd(editor: VimEditor, caret: VimCaret, cntForward: Int, allowPastEnd: Boolean): Int
-  fun moveCaretToRelativeLineEndSkipTrailing(editor: VimEditor, caret: VimCaret, linesOffset: Int): Int
   fun moveCaretToLineWithSameColumn(editor: VimEditor, logicalLine: Int, caret: VimCaret): Int
   fun moveCaretToLinePercent(editor: VimEditor, caret: VimCaret, count: Int): Int
+
+  // Move caret relative to current line
+  fun moveCaretToRelativeLineStartSkipLeading(editor: VimEditor, caret: VimCaret, linesOffset: Int): Int
+  fun moveCaretToRelativeLineEnd(editor: VimEditor, caret: VimCaret, cntForward: Int, allowPastEnd: Boolean): Int
+  fun moveCaretToRelativeLineEndSkipTrailing(editor: VimEditor, caret: VimCaret, linesOffset: Int): Int
 
   // Move caret to (IntelliJ visual) line relative to the bounds of the display (aka window)
   // (This describes what these functions *currently* do, not what they are *supposed* to do)
@@ -51,6 +50,11 @@ interface VimMotionGroup {
 
   // Move caret to buffer column
   fun moveCaretToColumn(editor: VimEditor, caret: VimCaret, count: Int, allowEnd: Boolean): Motion
+
+  // Move caret to buffer column on current line
+  fun moveCaretToCurrentLineStart(editor: VimEditor, caret: VimCaret): Int
+  fun moveCaretToCurrentLineStartSkipLeading(editor: VimEditor, caret: VimCaret): Int
+  fun moveCaretToCurrentLineEnd(editor: VimEditor, caret: VimCaret): Int
 
   // Move caret to column relative to the bounds of the display (aka window)
   fun moveCaretToCurrentDisplayLineStart(editor: VimEditor, caret: VimCaret): Motion
