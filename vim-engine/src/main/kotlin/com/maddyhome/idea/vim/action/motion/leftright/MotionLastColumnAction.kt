@@ -55,7 +55,7 @@ open class MotionLastColumnAction : MotionActionHandler.ForEachCaret() {
       if (operatorArguments.isOperatorPending) false else editor.isEndAllowed
     }
 
-    return injector.motion.moveCaretToLineEndOffset(editor, caret, operatorArguments.count1 - 1, allow).toMotion()
+    return injector.motion.moveCaretToRelativeLineEnd(editor, caret, operatorArguments.count1 - 1, allow).toMotion()
   }
 
   override fun postMove(editor: VimEditor, caret: VimCaret, context: ExecutionContext, cmd: Command) {

@@ -26,7 +26,7 @@ class MotionLastNonSpaceAction : MotionActionHandler.ForEachCaret() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    return injector.motion.moveCaretToLineEndSkipLeadingOffset(editor, caret, operatorArguments.count1 - 1)
+    return injector.motion.moveCaretToRelativeLineEndSkipTrailing(editor, caret, operatorArguments.count1 - 1)
       .toMotion()
   }
 

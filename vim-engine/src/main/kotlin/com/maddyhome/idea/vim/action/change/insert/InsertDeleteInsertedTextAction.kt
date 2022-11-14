@@ -54,7 +54,7 @@ private fun insertDeleteInsertedText(
   var deleteTo = caret.vimInsertStart.startOffset
   val offset = caret.offset
   if (offset == deleteTo) {
-    deleteTo = Offset(injector.motion.moveCaretToLineStartSkipLeading(editor, caret))
+    deleteTo = Offset(injector.motion.moveCaretToCurrentLineStartSkipLeading(editor, caret))
   }
   if (deleteTo.point != -1) {
     injector.changeGroup.deleteRange(

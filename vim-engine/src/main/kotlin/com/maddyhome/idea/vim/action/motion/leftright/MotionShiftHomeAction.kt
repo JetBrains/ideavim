@@ -23,7 +23,7 @@ class MotionShiftHomeAction : ShiftedSpecialKeyHandler() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override fun motion(editor: VimEditor, context: ExecutionContext, cmd: Command, caret: VimCaret) {
-    val newOffset = injector.motion.moveCaretToLineStart(editor, caret)
+    val newOffset = injector.motion.moveCaretToCurrentLineStart(editor, caret)
     caret.moveToOffset(newOffset)
   }
 }

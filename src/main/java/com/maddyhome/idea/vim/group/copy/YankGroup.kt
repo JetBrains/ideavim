@@ -100,8 +100,8 @@ class YankGroup : YankGroupBase() {
     val ranges = ArrayList<Pair<Int, Int>>(caretCount)
     val caretToRange = HashMap<VimCaret, TextRange>(caretCount)
     for (caret in editor.nativeCarets()) {
-      val start = injector.motion.moveCaretToLineStart(editor, caret)
-      val end = min(injector.motion.moveCaretToLineEndOffset(editor, caret, count - 1, true) + 1, editor.fileSize().toInt())
+      val start = injector.motion.moveCaretToCurrentLineStart(editor, caret)
+      val end = min(injector.motion.moveCaretToRelativeLineEnd(editor, caret, count - 1, true) + 1, editor.fileSize().toInt())
 
       if (end == -1) continue
 

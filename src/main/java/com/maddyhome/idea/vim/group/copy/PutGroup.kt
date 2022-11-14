@@ -195,7 +195,7 @@ class PutGroup : VimPutBase() {
     } else {
       if (data.insertTextBeforeCaret) {
         return when (typeInRegister) {
-          SelectionType.LINE_WISE -> listOf(VimPlugin.getMotion().moveCaretToLineStart(editor.vim, caret.vim))
+          SelectionType.LINE_WISE -> listOf(VimPlugin.getMotion().moveCaretToCurrentLineStart(editor.vim, caret.vim))
           else -> listOf(caret.offset)
         }
       }

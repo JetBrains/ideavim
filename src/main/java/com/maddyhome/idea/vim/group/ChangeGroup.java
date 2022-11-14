@@ -101,13 +101,13 @@ public class ChangeGroup extends VimChangeGroupBase {
 
     boolean firstLiner = false;
     if (((IjVimCaret) caret).getCaret().getVisualPosition().line == 0) {
-      injector.getMotion().moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineStart(editor,
-                                                                                      caret));
+      injector.getMotion().moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToCurrentLineStart(editor,
+                                                                                                      caret));
       firstLiner = true;
     }
     else {
       injector.getMotion().moveCaret(editor, caret, VimPlugin.getMotion().getVerticalMotionOffset(editor, caret, -1));
-      injector.getMotion().moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineEnd(editor, caret));
+      injector.getMotion().moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToCurrentLineEnd(editor, caret));
     }
 
     UserDataManager.setVimChangeActionSwitchMode(((IjVimEditor) editor).getEditor(), VimStateMachine.Mode.INSERT);
@@ -128,7 +128,7 @@ public class ChangeGroup extends VimChangeGroupBase {
   private void insertNewLineBelow(@NotNull VimEditor editor, @NotNull VimCaret caret, int col) {
     if (editor.isOneLineMode()) return;
 
-    caret.moveToOffset(injector.getMotion().moveCaretToLineEnd(editor, caret));
+    caret.moveToOffset(injector.getMotion().moveCaretToCurrentLineEnd(editor, caret));
     editor.setVimChangeActionSwitchMode(VimStateMachine.Mode.INSERT);
     insertText(editor, caret, "\n" + IndentConfig.create(((IjVimEditor) editor).getEditor()).createIndentBySize(col));
   }
@@ -453,7 +453,7 @@ public class ChangeGroup extends VimChangeGroupBase {
     }
     boolean after = range.getEndOffset() >= editor.fileSize();
 
-    final VimLogicalPosition lp = editor.offsetToLogicalPosition(injector.getMotion().moveCaretToLineStartSkipLeading(editor, caret));
+    final VimLogicalPosition lp = editor.offsetToLogicalPosition(injector.getMotion().moveCaretToCurrentLineStartSkipLeading(editor, caret));
 
     boolean res = deleteRange(editor, caret, range, type, true, operatorArguments);
     if (res) {
@@ -608,7 +608,7 @@ public class ChangeGroup extends VimChangeGroupBase {
                           int dir,
                           @NotNull OperatorArguments operatorArguments) {
     int start = ((IjVimCaret) caret).getCaret().getOffset();
-    int end = VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret, lines - 1, true);
+    int end = VimPlugin.getMotion().moveCaretToRelativeLineEnd(editor, caret, lines - 1, true);
     indentRange(editor, caret, context, new TextRange(start, end), 1, dir, operatorArguments);
   }
 

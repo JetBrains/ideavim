@@ -162,9 +162,9 @@ fun insertLineAround(editor: VimEditor, context: ExecutionContext, shift: Int) {
 
       // Calculating next line with minding folders
       val lineEndOffset = if (shift == 1) {
-        VimPlugin.getMotion().moveCaretToLineEnd(editor, IjVimCaret(caret))
+        VimPlugin.getMotion().moveCaretToCurrentLineEnd(editor, IjVimCaret(caret))
       } else {
-        VimPlugin.getMotion().moveCaretToLineStart(editor, caret.vim)
+        VimPlugin.getMotion().moveCaretToCurrentLineStart(editor, caret.vim)
       }
       val position = EditorLine.Offset.init(editor.offsetToLogicalPosition(lineEndOffset).line + shift, editor)
 
