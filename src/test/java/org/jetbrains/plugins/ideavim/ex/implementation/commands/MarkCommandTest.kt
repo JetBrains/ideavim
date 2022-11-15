@@ -27,7 +27,7 @@ class MarkCommandTest : VimTestCase() {
     )
     typeText(commandToKeys("mark a"))
     VimPlugin.getMark().getMark(myFixture.editor.vim, 'a')?.let {
-      assertEquals(2, it.logicalLine)
+      assertEquals(2, it.line)
       assertEquals(0, it.col)
     } ?: TestCase.fail("Mark is null")
   }
@@ -42,7 +42,7 @@ class MarkCommandTest : VimTestCase() {
     )
     typeText(commandToKeys("mark G"))
     VimPlugin.getMark().getMark(myFixture.editor.vim, 'G')?.let {
-      assertEquals(2, it.logicalLine)
+      assertEquals(2, it.line)
       assertEquals(0, it.col)
     } ?: TestCase.fail("Mark is null")
   }
@@ -57,7 +57,7 @@ class MarkCommandTest : VimTestCase() {
     )
     typeText(commandToKeys("k a"))
     VimPlugin.getMark().getMark(myFixture.editor.vim, 'a')?.let {
-      assertEquals(2, it.logicalLine)
+      assertEquals(2, it.line)
       assertEquals(0, it.col)
     } ?: TestCase.fail("Mark is null")
   }
@@ -72,7 +72,7 @@ class MarkCommandTest : VimTestCase() {
     )
     typeText(commandToKeys("1,2 mark a"))
     VimPlugin.getMark().getMark(myFixture.editor.vim, 'a')?.let {
-      assertEquals(1, it.logicalLine)
+      assertEquals(1, it.line)
       assertEquals(0, it.col)
     } ?: TestCase.fail("Mark is null")
   }

@@ -27,7 +27,7 @@ public class MarkTest extends VimTestCase {
     typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("ma"), "    foo\n" + "    ba<caret>r\n" + "    baz\n");
     Mark mark = VimPlugin.getMark().getMark(new IjVimEditor(myFixture.getEditor()), 'a');
     assertNotNull(mark);
-    assertEquals(1, mark.getLogicalLine());
+    assertEquals(1, mark.getLine());
     assertEquals(6, mark.getCol());
   }
 
@@ -36,7 +36,7 @@ public class MarkTest extends VimTestCase {
     typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("mG"), "    foo\n" + "    ba<caret>r\n" + "    baz\n");
     Mark mark = VimPlugin.getMark().getMark(new IjVimEditor(myFixture.getEditor()), 'G');
     assertNotNull(mark);
-    assertEquals(1, mark.getLogicalLine());
+    assertEquals(1, mark.getLine());
     assertEquals(6, mark.getCol());
   }
 
@@ -66,7 +66,7 @@ public class MarkTest extends VimTestCase {
     typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("mx" + "2k" + "dd" + "0dw"), "    foo\n" + "    bar\n" + "    ba<caret>z\n");
     Mark mark = VimPlugin.getMark().getMark(new IjVimEditor(myFixture.getEditor()), 'x');
     assertNotNull(mark);
-    assertEquals(1, mark.getLogicalLine());
+    assertEquals(1, mark.getLine());
     assertEquals(6, mark.getCol());
   }
 
@@ -75,7 +75,7 @@ public class MarkTest extends VimTestCase {
     typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("mx" + "2k" + "2dd"), "    foo\n" + "    bar\n" + "    ba<caret>z\n");
     Mark mark = VimPlugin.getMark().getMark(new IjVimEditor(myFixture.getEditor()), 'x');
     assertNotNull(mark);
-    assertEquals(0, mark.getLogicalLine());
+    assertEquals(0, mark.getLine());
     assertEquals(6, mark.getCol());
   }
 
@@ -84,7 +84,7 @@ public class MarkTest extends VimTestCase {
     typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("mY" + "Obiff"), "foo\n" + "ba<caret>r\n" + "baz\n");
     Mark mark = VimPlugin.getMark().getMark(new IjVimEditor(myFixture.getEditor()), 'Y');
     assertNotNull(mark);
-    assertEquals(2, mark.getLogicalLine());
+    assertEquals(2, mark.getLine());
     assertEquals(2, mark.getCol());
   }
 
@@ -93,7 +93,7 @@ public class MarkTest extends VimTestCase {
     typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("mY" + "Obiff"), "    foo\n" + "    ba<caret>r\n" + "    baz\n");
     Mark mark = VimPlugin.getMark().getMark(new IjVimEditor(myFixture.getEditor()), 'Y');
     assertNotNull(mark);
-    assertEquals(2, mark.getLogicalLine());
+    assertEquals(2, mark.getLine());
     assertEquals(6, mark.getCol());
   }
 

@@ -653,7 +653,7 @@ public class MotionGroup extends VimMotionGroupBase {
     final Mark mark = VimPlugin.getMark().getFileMark(editor, ch);
     if (mark == null) return -1;
 
-    final int line = mark.getLogicalLine();
+    final int line = mark.getLine();
     return toLineStart
            ? moveCaretToLineStartSkipLeading(editor, line)
            : editor.bufferPositionToOffset(new BufferPosition(line, mark.getCol(), false));
@@ -667,7 +667,7 @@ public class MotionGroup extends VimMotionGroupBase {
     final VirtualFile vf = getVirtualFile(((IjVimEditor)editor).getEditor());
     if (vf == null) return -1;
 
-    final int line = mark.getLogicalLine();
+    final int line = mark.getLine();
     if (vf.getPath().equals(mark.getFilename())) {
       return toLineStart
              ? moveCaretToLineStartSkipLeading(editor, line)
@@ -700,8 +700,8 @@ public class MotionGroup extends VimMotionGroupBase {
       return -1;
     }
 
-    final BufferPosition lp = new BufferPosition(jump.getLogicalLine(), jump.getCol(), false);
-    final LogicalPosition lpnative = new LogicalPosition(jump.getLogicalLine(), jump.getCol(), false);
+    final BufferPosition lp = new BufferPosition(jump.getLine(), jump.getCol(), false);
+    final LogicalPosition lpnative = new LogicalPosition(jump.getLine(), jump.getCol(), false);
     final String fileName = jump.getFilepath();
     if (!vf.getPath().equals(fileName)) {
       final VirtualFile newFile =

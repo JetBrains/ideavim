@@ -129,7 +129,7 @@ class MotionMarkActionTest : VimOptionTestCase(IjVimOptionService.ideamarksName)
     val vimMarks = VimPlugin.getMark().getMarks(myFixture.editor.vim)
     TestCase.assertEquals(1, vimMarks.size)
     TestCase.assertEquals('A', vimMarks[0].key)
-    TestCase.assertEquals(4, vimMarks[0].logicalLine)
+    TestCase.assertEquals(4, vimMarks[0].line)
   }
 
   private fun checkMarks(vararg marks: Pair<Char, Int>) {

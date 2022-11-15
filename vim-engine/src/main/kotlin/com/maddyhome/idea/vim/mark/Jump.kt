@@ -8,4 +8,4 @@
 
 package com.maddyhome.idea.vim.mark
 
-data class Jump(var logicalLine: Int, val col: Int, var filepath: String)
+data class Jump(var line: Int, val col: Int, var filepath: String)

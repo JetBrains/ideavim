@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NonNls
 
 interface Mark {
   val key: Char
-  val logicalLine: Int
+  val line: Int
   val col: Int
   val filename: String
   val protocol: String?
@@ -22,7 +22,7 @@ interface Mark {
   fun isClear(): Boolean
   fun clear()
 
-  fun offset(editor: VimEditor): Int = editor.bufferPositionToOffset(BufferPosition(logicalLine, col))
+  fun offset(editor: VimEditor): Int = editor.bufferPositionToOffset(BufferPosition(line, col))
 
   object KeySorter : Comparator<Mark> {
     @NonNls
@@ -36,7 +36,7 @@ interface Mark {
 
 data class VimMark(
   override val key: Char,
-  override var logicalLine: Int,
+  override var line: Int,
   override val col: Int,
   override val filename: String,
   override val protocol: String?,
@@ -52,10 +52,10 @@ data class VimMark(
 
   companion object {
     @JvmStatic
-    fun create(key: Char?, logicalLine: Int?, col: Int?, filename: String?, protocol: String?): VimMark? {
+    fun create(key: Char?, line: Int?, col: Int?, filename: String?, protocol: String?): VimMark? {
       return VimMark(
         key ?: return null,
-        logicalLine ?: return null,
+        line ?: return null,
         col ?: 0,
         filename ?: return null,
         protocol ?: ""
