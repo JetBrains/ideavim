@@ -42,7 +42,7 @@ import java.util.*
  * # Offset and range deletion
  *
  * [Offset] is a position between characters.
- * [delete] method, that works on offset-offset, deltes the character *between* two offsets. That means that:
+ * A `delete` method, that works on offset-offset, deletes the character *between* two offsets. That means that:
  * - It's possible and simply applicable when the start offset is larger than end offset
  * - Inclusive/Exclusive words are not applicable to such operation. So we don't define the operation
  *      like "... with end offset exclusive". However, technically, the "right" or the "larger" offset is exclusive.
@@ -56,7 +56,7 @@ import java.util.*
  *   This approach is convenient for direction switching, however, makes the situation that empty range cannot be
  *     specified. E.g. range 1:1 would delete the character under `1`, however it looks like that nothing should be
  *     deleted.
- *  Also, during the development it turned out that using such appriach causes a lot of `+1` and `-1` operations that
+ *  Also, during the development it turned out that using such approach causes a lot of `+1` and `-1` operations that
  *     seem to be redundant.
  *
  * ---
@@ -105,6 +105,28 @@ import java.util.*
  *
  * TODO We should check if we can keep the same VimEditor instance between edits.
  *   For example, can we store local options right in the editor implementation?
+ *
+ * ## Line kinds
+ *
+ * See `:help definitions`. Vim has the following types of lines:
+ *
+ * * "buffer lines" - the lines of the text buffer, as stored on disk. Equivalent to IntelliJ's `LogicalPosition`.
+ *   Represented with [BufferPosition].
+ * * "logical lines" - the lines of the text buffer, with folds applied. Folds in Vim are complete lines, but can be
+ *   arbitrary ranges in IntelliJ, meaning a Vim logical line in IdeaVim can start and end on different buffer lines.
+ * * "window lines" (sometimes referred to as "display" in the help) - the lines displayed in a window, including soft
+ *   wrapped lines. These lines provide the character grid of the window, and the top left corner of the window is
+ *   always `(0,0)`, regardless of the scroll state or wrap setting of the window's text. There is no representation in
+ *   IdeaVim. IntelliJ's `VisualPosition` is similar, but is relative to the top of the text buffer, not the window. As
+ *   such, IntelliJ does not have a direct equivalent. To avoid confusion with GUI windows, IdeaVim's API will use the
+ *   word "display".
+ * * "screen lines" - the lines of all windows, as well as status lines and the command line. IdeaVim does not support
+ *   this and has no such representation.
+ *
+ * Unless otherwise noted, the vim-engine API will use buffer lines. Any parameter or variable called `line` will be a
+ * buffer line. When required, Vim logical lines will use an appropriate type to represent a buffer start and end line,
+ * and IntelliJ visual lines will be clearly marked in the parameter or variable name, e.g. `visualLine`.
+ * ([VimVisualPosition] should be phased out if possible, as it is an IntelliJ concept, not a Vim concept.)
  */
 interface VimEditor {
 
@@ -343,6 +365,12 @@ enum class LineDeleteShift {
   NO_NL,
 }
 
+/**
+ * Zero based line and column position within the text buffer.
+ *
+ * See `:help definitions` for terminology. Equivalent to IntelliJ's `LogicalPosition` which should not be confused for
+ * Vim's "logical lines", which don't have an IntelliJ equivalent.
+ */
 class BufferPosition(
   val line: Int,
   val column: Int,
