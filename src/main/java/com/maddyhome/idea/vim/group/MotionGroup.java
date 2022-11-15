@@ -744,12 +744,6 @@ public class MotionGroup extends VimMotionGroupBase {
     return new Motion.AbsoluteOffset(offset);
   }
 
-  @Override
-  public @Range(from = 0, to = Integer.MAX_VALUE) int moveCaretToLineStartSkipLeading(@NotNull VimEditor editor,
-                                                                                      int line) {
-    return getLeadingCharacterOffset(((IjVimEditor)editor).getEditor(), line);
-  }
-
 
   @Override
   public boolean scrollColumns(@NotNull VimEditor editor, int columns) {
@@ -794,7 +788,7 @@ public class MotionGroup extends VimMotionGroupBase {
                                                                                                     @NotNull VimCaret caret) {
     final int col = getVisualColumnAtLeftOfDisplay(((IjVimEditor)editor).getEditor(), caret.getVisualPosition().getLine());
     final int logicalLine = caret.getLine().getLine();
-    return getLeadingCharacterOffset(((IjVimEditor)editor).getEditor(), logicalLine, col);
+    return EngineEditorHelperKt.getLeadingCharacterOffset(editor, logicalLine, col);
   }
 
   @Override

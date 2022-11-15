@@ -356,7 +356,11 @@ abstract class VimMotionGroupBase : VimMotionGroup {
     return moveCaretToLineEnd(editor, editor.visualToLogicalPosition(visualEndOfLine).line, true)
   }
 
-  companion object {
-    const val LAST_COLUMN = 9999
-  }
+    override fun moveCaretToLineStartSkipLeading(editor: VimEditor, line: Int): Int {
+        return editor.getLeadingCharacterOffset(line)
+    }
+
+    companion object {
+        const val LAST_COLUMN = 9999
+    }
 }

@@ -21,6 +21,7 @@ import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimChangeGroupBase
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimMotionGroupBase
+import com.maddyhome.idea.vim.api.getLeadingCharacterOffset
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.command.VimStateMachine
@@ -33,6 +34,7 @@ import com.maddyhome.idea.vim.common.including
 import com.maddyhome.idea.vim.common.offset
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.inlayAwareVisualColumn
 import com.maddyhome.idea.vim.helper.vimChangeActionSwitchMode
 import com.maddyhome.idea.vim.helper.vimLastColumn
 
@@ -58,7 +60,7 @@ fun changeRange(
 
   // Remove the range
   val vimCaret = IjVimCaret(caret)
-  val indent = editor.offsetToLogicalPosition(vimEditor.indentForLine(vimCaret.getLine().line)).column
+  val indent = editor.offsetToLogicalPosition(vimEditor.getLeadingCharacterOffset(vimCaret.getLine().line)).column
   val deletedInfo = injector.vimMachine.delete(vimRange, vimEditor, vimCaret)
   if (deletedInfo != null) {
     if (deletedInfo is OperatedRange.Lines) {
@@ -198,11 +200,6 @@ fun insertLineAround(editor: VimEditor, context: ExecutionContext, shift: Int) {
   }
 
   MotionGroup.scrollCaretIntoView(editor.editor)
-}
-
-fun VimEditor.indentForLine(line: Int): Int {
-  val editor = (this as IjVimEditor).editor
-  return EditorHelper.getLeadingCharacterOffset(editor, line)
 }
 
 fun toVimRange(range: TextRange, type: SelectionType): VimRange {

@@ -15,6 +15,7 @@ import com.intellij.openapi.editor.impl.EditorImpl;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.testFramework.LightVirtualFile;
+import com.maddyhome.idea.vim.api.EngineEditorHelperKt;
 import com.maddyhome.idea.vim.api.VimEditor;
 import com.maddyhome.idea.vim.api.VimInjectorKt;
 import com.maddyhome.idea.vim.common.IndentConfig;
@@ -455,33 +456,9 @@ public class EditorHelper {
     return normalizeOffset(editor, line, offset, allowEnd);
   }
 
-
-  public static int getLeadingCharacterOffset(final @NotNull Editor editor, final int line) {
-    return getLeadingCharacterOffset(editor, line, 0);
-  }
-
-  public static @Range(from = 0, to = Integer.MAX_VALUE) int getLeadingCharacterOffset(final @NotNull Editor editor, final int line, final int col) {
-    int start = getLineStartOffset(editor, line) + col;
-    int end = getLineEndOffset(editor, line, true);
-    CharSequence chars = editor.getDocument().getCharsSequence();
-    int pos = end;
-    for (int offset = start; offset < end; offset++) {
-      if (offset >= chars.length()) {
-        break;
-      }
-
-      if (!Character.isWhitespace(chars.charAt(offset))) {
-        pos = offset;
-        break;
-      }
-    }
-
-    return pos;
-  }
-
   public static @NotNull String getLeadingWhitespace(final @NotNull Editor editor, final int line) {
     int start = getLineStartOffset(editor, line);
-    int end = getLeadingCharacterOffset(editor, line);
+    int end = EngineEditorHelperKt.getLeadingCharacterOffset(new IjVimEditor(editor), line, 0);
 
     return editor.getDocument().getCharsSequence().subSequence(start, end).toString();
   }

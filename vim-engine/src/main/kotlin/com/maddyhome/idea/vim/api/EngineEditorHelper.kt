@@ -47,3 +47,20 @@ fun VimEditor.endsWithNewLine(): Boolean {
   if (textLength == 0) return false
   return this.text()[textLength - 1] == '\n'
 }
+
+fun VimEditor.getLeadingCharacterOffset(line: Int, col: Int = 0): Int {
+    val start = getLineStartOffset(line) + col
+    val end = getLineEndOffset(line)
+    val chars = text()
+    var pos = end
+    for (offset in start until end) {
+        if (offset >= chars.length) {
+            break
+        }
+        if (!Character.isWhitespace(chars[offset])) {
+            pos = offset
+            break
+        }
+    }
+    return pos
+}
