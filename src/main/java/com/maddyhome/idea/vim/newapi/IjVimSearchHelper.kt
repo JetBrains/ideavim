@@ -109,17 +109,6 @@ class IjVimSearchHelper : VimSearchHelperBase() {
     )
   }
 
-  override fun findNextWordEnd(
-    chars: CharSequence,
-    pos: Int,
-    size: Int,
-    count: Int,
-    bigWord: Boolean,
-    spaceWords: Boolean,
-  ): Int {
-    return VimSearchHelperBase.findNextWordEnd(chars, pos, size, count, bigWord, spaceWords)
-  }
-
   override fun findPattern(
     editor: VimEditor,
     pattern: String?,

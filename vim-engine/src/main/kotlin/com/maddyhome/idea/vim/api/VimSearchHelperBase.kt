@@ -25,6 +25,17 @@ abstract class VimSearchHelperBase : VimSearchHelper {
         return findNextWordEnd(chars, pos, size, count, bigWord, false)
     }
 
+    override fun findNextWordEnd(
+        chars: CharSequence,
+        pos: Int,
+        size: Int,
+        count: Int,
+        bigWord: Boolean,
+        spaceWords: Boolean,
+    ): Int {
+      return VimSearchHelperBase.findNextWordEnd(chars, pos, size, count, bigWord, spaceWords)
+    }
+
   companion object {
     fun findNextWord(
       chars: CharSequence,
