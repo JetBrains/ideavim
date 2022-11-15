@@ -27,13 +27,13 @@ import com.maddyhome.idea.vim.common.CharacterPosition;
 import com.maddyhome.idea.vim.common.Direction;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
+import com.maddyhome.idea.vim.options.OptionChangeListener;
+import com.maddyhome.idea.vim.options.OptionConstants;
+import com.maddyhome.idea.vim.options.OptionScope;
 import com.maddyhome.idea.vim.regexp.CharPointer;
 import com.maddyhome.idea.vim.regexp.RegExp;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
-import com.maddyhome.idea.vim.options.OptionChangeListener;
-import com.maddyhome.idea.vim.options.OptionConstants;
-import com.maddyhome.idea.vim.options.OptionScope;
 import kotlin.Pair;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -1495,7 +1495,7 @@ public class SearchHelper {
       end = start + 1;
     }
     else {
-      end = findNextWordEnd(chars, start, stop, 1, false, false) + 1;
+      end = VimSearchHelperBase.Companion.findNextWordEnd(chars, start, stop, 1, false, false) + 1;
     }
 
     return new TextRange(start, end);
@@ -1567,14 +1567,14 @@ public class SearchHelper {
     int end = pos;
     if (!onWordEnd || hasSelection || (count > 1 && dir == 1) || (startSpace && isOuter)) {
       if (dir == 1) {
-        end = findNextWordEnd(chars, pos, max, count -
+        end = VimSearchHelperBase.Companion.findNextWordEnd(chars, pos, max, count -
                                                (onWordEnd &&
                                                 !hasSelection &&
                                                 (!(startSpace && isOuter) || (startSpace && !isOuter)) ? 1 : 0), isBig,
                               !isOuter);
       }
       else {
-        end = findNextWordEnd(chars, pos, max, 1, isBig, !isOuter);
+        end = VimSearchHelperBase.Companion.findNextWordEnd(chars, pos, max, 1, isBig, !isOuter);
       }
     }
 
@@ -1584,7 +1584,7 @@ public class SearchHelper {
     if (dir == 1 && isOuter) {
       int firstEnd = end;
       if (count > 1) {
-        firstEnd = findNextWordEnd(chars, pos, max, 1, isBig, false);
+        firstEnd = VimSearchHelperBase.Companion.findNextWordEnd(chars, pos, max, 1, isBig, false);
       }
       if (firstEnd < max - 1) {
         if (CharacterHelper.charType(chars.charAt(firstEnd + 1), false) != CharacterHelper.CharacterType.WHITESPACE) {
@@ -1605,7 +1605,7 @@ public class SearchHelper {
     if (!goForward && dir == 1 && isOuter) {
       int firstEnd = end;
       if (count > 1) {
-        firstEnd = findNextWordEnd(chars, pos, max, 1, isBig, false);
+        firstEnd = VimSearchHelperBase.Companion.findNextWordEnd(chars, pos, max, 1, isBig, false);
       }
       if (firstEnd < max - 1) {
         if (CharacterHelper.charType(chars.charAt(firstEnd + 1), false) != CharacterHelper.CharacterType.WHITESPACE) {
@@ -1647,107 +1647,6 @@ public class SearchHelper {
 
     // End offset is exclusive
     return new TextRange(start, end + 1);
-  }
-
-  /**
-   * This finds the offset to the end of the next/previous word/WORD.
-   *
-   * @param editor  The editor to search in
-   * @param caret   The caret to start search from
-   * @param count   The number of words to skip. Negative for backward searches
-   * @param bigWord If true then find WORD, if false then find word
-   * @return The offset of match
-   */
-  public static int findNextWordEnd(@NotNull Editor editor, @NotNull Caret caret, int count, boolean bigWord) {
-    CharSequence chars = editor.getDocument().getCharsSequence();
-    int pos = caret.getOffset();
-    int size = EditorHelperRt.getFileSize(editor);
-
-    return findNextWordEnd(chars, pos, size, count, bigWord, false);
-  }
-
-  public static int findNextWordEnd(@NotNull CharSequence chars,
-                                    int pos,
-                                    int size,
-                                    int count,
-                                    boolean bigWord,
-                                    boolean spaceWords) {
-    int step = count >= 0 ? 1 : -1;
-    count = Math.abs(count);
-
-    int res = pos;
-    for (int i = 0; i < count; i++) {
-      res = findNextWordEndOne(chars, res, size, step, bigWord, spaceWords);
-      if (res == pos || res == 0 || res == size - 1) {
-        break;
-      }
-    }
-
-    return res;
-  }
-
-  private static int findNextWordEndOne(@NotNull CharSequence chars,
-                                        int pos,
-                                        int size,
-                                        int step,
-                                        boolean bigWord,
-                                        boolean spaceWords) {
-    boolean found = false;
-    // For forward searches, skip any current whitespace so we start at the start of a word
-    if (step > 0 && pos < size - 1) {
-      if (CharacterHelper.charType(chars.charAt(pos + 1), bigWord) == CharacterHelper.CharacterType.WHITESPACE &&
-          !spaceWords) {
-        pos = (int)(VimSearchHelperBase.Companion.skipSpace(chars, pos + 1, step, size) - 1);
-      }
-      if (pos < size - 1 &&
-          CharacterHelper.charType(chars.charAt(pos), bigWord) !=
-          CharacterHelper.charType(chars.charAt(pos + 1), bigWord)) {
-        pos += step;
-      }
-    }
-    int res = pos;
-    if (pos < 0 || pos >= size) {
-      return pos;
-    }
-    CharacterHelper.CharacterType type = CharacterHelper.charType(chars.charAt(pos), bigWord);
-    if (type == CharacterHelper.CharacterType.WHITESPACE && step >= 0 && pos < size - 1 && !spaceWords) {
-      type = CharacterHelper.charType(chars.charAt(pos + 1), bigWord);
-    }
-
-    pos += step;
-    while (pos >= 0 && pos < size && !found) {
-      CharacterHelper.CharacterType newType = CharacterHelper.charType(chars.charAt(pos), bigWord);
-      if (newType != type) {
-        if (step >= 0) {
-          res = pos - 1;
-        }
-        else if (newType == CharacterHelper.CharacterType.WHITESPACE && step < 0 && !spaceWords) {
-          pos = (int)VimSearchHelperBase.Companion.skipSpace(chars, pos, step, size);
-          res = pos;
-        }
-        else {
-          res = pos;
-        }
-
-        found = true;
-      }
-
-      pos += step;
-    }
-
-    if (found) {
-      if (res < 0) {
-        res = 0;
-      }
-      else if (res >= size) {
-        res = size - 1;
-      }
-    }
-    else if (pos == size) {
-      res = size - 1;
-    }
-
-    return res;
   }
 
   /**

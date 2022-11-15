@@ -18,6 +18,13 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     return findNextWord(editor.charsSequence(), searchFrom.toLong(), editor.fileSize(), count, bigWord, false)
   }
 
+    override fun findNextWordEnd(editor: VimEditor, caret: VimCaret, count: Int, bigWord: Boolean): Int {
+        val chars = editor.text()
+        val pos = caret.offset.point
+        val size = editor.fileSize().toInt()
+        return findNextWordEnd(chars, pos, size, count, bigWord, false)
+    }
+
   companion object {
     fun findNextWord(
       chars: CharSequence,
@@ -121,5 +128,86 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     operator fun CharSequence.get(index: Long): Char {
       return this[index.toInt()]
     }
+
+
+       fun findNextWordEndOne(
+          chars: CharSequence,
+          pos: Int,
+          size: Int,
+          step: Int,
+          bigWord: Boolean,
+          spaceWords: Boolean,
+      ): Int {
+          var pos = pos
+          var found = false
+          // For forward searches, skip any current whitespace so we start at the start of a word
+          if (step > 0 && pos < size - 1) {
+              if (charType(chars[pos + 1], bigWord) === CharacterHelper.CharacterType.WHITESPACE &&
+                  !spaceWords
+              ) {
+                  pos = (skipSpace(chars, (pos + 1).toLong(), step, size.toLong()) - 1).toInt()
+              }
+              if (pos < size - 1 &&
+                  charType(chars[pos], bigWord) !==
+                  charType(chars[pos + 1], bigWord)
+              ) {
+                  pos += step
+              }
+          }
+          var res = pos
+          if (pos < 0 || pos >= size) {
+              return pos
+          }
+          var type = charType(chars[pos], bigWord)
+          if (type === CharacterHelper.CharacterType.WHITESPACE && step >= 0 && pos < size - 1 && !spaceWords) {
+              type = charType(chars[pos + 1], bigWord)
+          }
+          pos += step
+          while (pos >= 0 && pos < size && !found) {
+              val newType = charType(chars[pos], bigWord)
+              if (newType !== type) {
+                  if (step >= 0) {
+                      res = pos - 1
+                  } else if (newType === CharacterHelper.CharacterType.WHITESPACE && step < 0 && !spaceWords) {
+                      pos = skipSpace(chars, pos.toLong(), step, size.toLong()).toInt()
+                      res = pos
+                  } else {
+                      res = pos
+                  }
+                  found = true
+              }
+              pos += step
+          }
+          if (found) {
+              if (res < 0) {
+                  res = 0
+              } else if (res >= size) {
+                  res = size - 1
+              }
+          } else if (pos == size) {
+              res = size - 1
+          }
+          return res
+      }
+      fun findNextWordEnd(
+          chars: CharSequence,
+          pos: Int,
+          size: Int,
+          count: Int,
+          bigWord: Boolean,
+          spaceWords: Boolean,
+      ): Int {
+          var count = count
+          val step = if (count >= 0) 1 else -1
+          count = abs(count)
+          var res = pos
+          for (i in 0 until count) {
+              res = findNextWordEndOne(chars, res, size, step, bigWord, spaceWords)
+              if (res == pos || res == 0 || res == size - 1) {
+                  break
+              }
+          }
+          return res
+      }
   }
 }

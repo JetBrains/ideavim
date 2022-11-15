@@ -9,7 +9,6 @@ package com.maddyhome.idea.vim.group;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.*;
-import com.intellij.openapi.editor.ex.util.EditorUtil;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.fileEditor.TextEditor;
@@ -354,38 +353,6 @@ public class MotionGroup extends VimMotionGroupBase {
     }
     else {
       return SearchHelper.findNextCamelEnd(editor, caret, count);
-    }
-  }
-
-  /**
-   * This moves the caret to the end of the next/previous word/WORD.
-   *
-   * @param editor  The editor to move in
-   * @param caret   The caret to be moved
-   * @param count   The number of words to skip
-   * @param bigWord If true then find WORD, if false then find word
-   * @return position
-   */
-  public Motion moveCaretToNextWordEnd(@NotNull Editor editor, @NotNull Caret caret, int count, boolean bigWord) {
-    if ((caret.getOffset() == 0 && count < 0) ||
-        (caret.getOffset() >= EditorHelperRt.getFileSize(editor) - 1 && count > 0)) {
-      return Motion.Error.INSTANCE;
-    }
-
-    // If we are doing this move as part of a change command (e.q. cw), we need to count the current end of
-    // word if the cursor happens to be on the end of a word already. If this is a normal move, we don't count
-    // the current word.
-    int pos = SearchHelper.findNextWordEnd(editor, caret, count, bigWord);
-    if (pos == -1) {
-      if (count < 0) {
-        return new Motion.AbsoluteOffset(moveCaretToLineStart(new IjVimEditor(editor), 0));
-      }
-      else {
-        return new Motion.AbsoluteOffset(moveCaretToLineEnd(new IjVimEditor(editor), getLineCount(editor) - 1, false));
-      }
-    }
-    else {
-      return new Motion.AbsoluteOffset(pos);
     }
   }
 
@@ -783,12 +750,6 @@ public class MotionGroup extends VimMotionGroupBase {
     return getLeadingCharacterOffset(((IjVimEditor)editor).getEditor(), line);
   }
 
-  public int moveCaretToCurrentLineEnd(@NotNull VimEditor editor, @NotNull VimCaret caret) {
-    final VisualPosition visualPosition = ((IjVimCaret) caret).getCaret().getVisualPosition();
-    final int lastVisualLineColumn = EditorUtil.getLastVisualLineColumnNumber(((IjVimEditor) editor).getEditor(), visualPosition.line);
-    final VisualPosition visualEndOfLine = new VisualPosition(visualPosition.line, lastVisualLineColumn, true);
-    return moveCaretToLineEnd(editor, ((IjVimEditor) editor).getEditor().visualToLogicalPosition(visualEndOfLine).line, true);
-  }
 
   @Override
   public boolean scrollColumns(@NotNull VimEditor editor, int columns) {

@@ -227,6 +227,10 @@ interface VimEditor {
 
   fun hasUnsavedChanges(): Boolean
 
+  fun getLastVisualLineColumnNumber(line: Int): Int
+
+  fun visualToLogicalPosition(visualPosition: VimVisualPosition): VimLogicalPosition
+
   fun createLiveMarker(start: Offset, end: Offset): LiveRange
   var insertMode: Boolean
 

@@ -15,6 +15,7 @@ import com.intellij.openapi.editor.VisualPosition
 import com.intellij.openapi.editor.event.CaretEvent
 import com.intellij.openapi.editor.event.CaretListener
 import com.intellij.openapi.editor.ex.EditorEx
+import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.LineDeleteShift
@@ -395,6 +396,21 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
 
   override fun hasUnsavedChanges(): Boolean {
     return EditorHelper.hasUnsavedChanges(this.editor)
+  }
+
+  override fun getLastVisualLineColumnNumber(line: Int): Int {
+      return EditorUtil.getLastVisualLineColumnNumber(this.ij, line)
+  }
+
+  override fun visualToLogicalPosition(visualPosition: VimVisualPosition): VimLogicalPosition {
+      val logPosition = editor.visualToLogicalPosition(
+          VisualPosition(
+              visualPosition.line,
+              visualPosition.column,
+              visualPosition.leansRight
+          )
+      )
+      return VimLogicalPosition(logPosition.line, logPosition.column, logPosition.leansForward)
   }
 
   override fun createLiveMarker(start: Offset, end: Offset): LiveRange {
