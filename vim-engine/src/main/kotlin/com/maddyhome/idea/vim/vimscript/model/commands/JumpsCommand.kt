@@ -32,7 +32,7 @@ data class JumpsCommand(val ranges: Ranges, val argument: String) : Command.Sing
       text.append(if (jumpSizeMinusSpot == 0) ">" else " ")
       text.append(jumpSizeMinusSpot.absoluteValue.toString().padStart(3))
       text.append(" ")
-      text.append((jump.logicalLine + 1).toString().padStart(5))
+      text.append((jump.line + 1).toString().padStart(5))
 
       text.append("  ")
       text.append(jump.col.toString().padStart(3))
@@ -40,7 +40,7 @@ data class JumpsCommand(val ranges: Ranges, val argument: String) : Command.Sing
       text.append(" ")
       val vf = editor.getVirtualFile()
       if (vf != null && vf.path == jump.filepath) {
-        val line = editor.getLineText(jump.logicalLine).trim().take(200)
+        val line = editor.getLineText(jump.line).trim().take(200)
         val keys = injector.parser.stringToKeys(line)
         text.append(EngineStringHelper.toPrintableCharacters(keys).take(200))
       } else {

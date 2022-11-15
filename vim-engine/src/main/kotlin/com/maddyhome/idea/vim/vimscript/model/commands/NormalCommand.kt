@@ -43,7 +43,7 @@ data class NormalCommand(val ranges: Ranges, val argument: String) : Command.Sin
         editor.exitVisualModeNative()
         if (!rangeUsed) {
           val selectionStart = injector.markGroup.getMark(editor, '<')!!
-          editor.currentCaret().moveToBufferPosition(BufferPosition(selectionStart.logicalLine, selectionStart.col))
+          editor.currentCaret().moveToBufferPosition(BufferPosition(selectionStart.line, selectionStart.col))
         }
       }
       VimStateMachine.Mode.CMD_LINE -> injector.processGroup.cancelExEntry(editor, false)

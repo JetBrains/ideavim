@@ -129,7 +129,7 @@ class VimExchangeExtension : VimExtension {
   }
 
   private class Operator(private val isVisual: Boolean) : OperatorFunction {
-    fun Editor.getMarkOffset(mark: Mark) = IjVimEditor(this).getOffset(mark.logicalLine, mark.col)
+    fun Editor.getMarkOffset(mark: Mark) = IjVimEditor(this).getOffset(mark.line, mark.col)
     fun VimStateMachine.SubMode.getString() = when (this) {
       VimStateMachine.SubMode.VISUAL_CHARACTER -> "v"
       VimStateMachine.SubMode.VISUAL_LINE -> "V"
@@ -208,19 +208,19 @@ class VimExchangeExtension : VimExtension {
         if (reverse) {
           primaryCaret.moveToInlayAwareOffset(editor.getMarkOffset(ex1.start))
         } else {
-          if (ex1.start.logicalLine == ex2.start.logicalLine) {
+          if (ex1.start.line == ex2.start.line) {
             val horizontalOffset = ex1.end.col - ex2.end.col
             primaryCaret.moveToInlayAwareLogicalPosition(
               LogicalPosition(
-                ex1.start.logicalLine,
+                ex1.start.line,
                 ex1.start.col - horizontalOffset
               )
             )
-          } else if (ex1.end.logicalLine - ex1.start.logicalLine != ex2.end.logicalLine - ex2.start.logicalLine) {
-            val verticalOffset = ex1.end.logicalLine - ex2.end.logicalLine
+          } else if (ex1.end.line - ex1.start.line != ex2.end.line - ex2.start.line) {
+            val verticalOffset = ex1.end.line - ex2.end.line
             primaryCaret.moveToInlayAwareLogicalPosition(
               LogicalPosition(
-                ex1.start.logicalLine - verticalOffset,
+                ex1.start.line - verticalOffset,
                 ex1.start.col
               )
             )
@@ -253,16 +253,16 @@ class VimExchangeExtension : VimExtension {
 
     private fun compareExchanges(x: Exchange, y: Exchange): ExchangeCompareResult {
       fun intersects(x: Exchange, y: Exchange) =
-        x.end.logicalLine < y.start.logicalLine ||
-          x.start.logicalLine > y.end.logicalLine ||
+        x.end.line < y.start.line ||
+          x.start.line > y.end.line ||
           x.end.col < y.start.col ||
           x.start.col > y.end.col
 
       fun comparePos(x: Mark, y: Mark): Int =
-        if (x.logicalLine == y.logicalLine) {
+        if (x.line == y.line) {
           x.col - y.col
         } else {
-          x.logicalLine - y.logicalLine
+          x.line - y.line
         }
 
       return if (x.type == VimStateMachine.SubMode.VISUAL_BLOCK && y.type == VimStateMachine.SubMode.VISUAL_BLOCK) {

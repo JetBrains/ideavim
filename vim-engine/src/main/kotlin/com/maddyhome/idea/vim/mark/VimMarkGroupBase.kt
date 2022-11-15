@@ -73,16 +73,16 @@ abstract class VimMarkGroupBase : VimMarkGroup {
         logger.debug { "mark = $myMark" }
         // If the end of the deleted text is prior to the marked line, simply shift the mark up by the
         // proper number of lines.
-        if (delEnd.line < myMark.logicalLine) {
+        if (delEnd.line < myMark.line) {
           val lines = delEnd.line - delStart.line
           logger.debug { "Shifting mark by $lines lines" }
-          myMark.logicalLine = myMark.logicalLine - lines
-        } else if (delStart.line <= myMark.logicalLine/* && delEnd.line >= mark.logicalLine*/) {
+          myMark.line = myMark.line - lines
+        } else if (delStart.line <= myMark.line/* && delEnd.line >= mark.line*/) {
           // Regarding the commented out condition in if: This additional condition was here before moving to kotlin
           // But now it's highlighted as "always true", so I commented it out for case of it's a bug
 
-          val markLineStartOff = editor.getLineStartOffset(myMark.logicalLine)
-          val markLineEndOff = editor.getLineEndOffset(myMark.logicalLine, true)
+          val markLineStartOff = editor.getLineStartOffset(myMark.line)
+          val markLineEndOff = editor.getLineEndOffset(myMark.line, true)
 
           val command = editor.vimStateMachine.executingCommand
           // If text is being changed from the start of the mark line (a special case for mark deletion)
@@ -91,9 +91,9 @@ abstract class VimMarkGroupBase : VimMarkGroup {
           if (delStartOff <= markLineStartOff && delEndOff >= markLineEndOff && !changeFromMarkLineStart) {
             injector.markGroup.removeMark(ch, myMark)
             logger.debug("Removed mark")
-          } else if (delStart.line < myMark.logicalLine) {
+          } else if (delStart.line < myMark.line) {
             // shift mark
-            myMark.logicalLine = delStart.line
+            myMark.line = delStart.line
             logger.debug { "Shifting mark to line " + delStart.line }
           } // The deletion only covers part of the marked line so shift the mark only if the deletion begins
           // on a line prior to the marked line (which means the deletion must end on the marked line).
@@ -123,8 +123,8 @@ abstract class VimMarkGroupBase : VimMarkGroup {
       for (mark in marks.values.filterIsInstance<VimMark>()) {
         logger.debug { "mark = $mark" }
         // Shift the mark if the insertion began on a line prior to the marked line.
-        if (insStart.line < mark.logicalLine) {
-          mark.logicalLine = mark.logicalLine + lines
+        if (insStart.line < mark.line) {
+          mark.line = mark.line + lines
           logger.debug { "Shifting mark by $lines lines" }
         }
       }
@@ -149,7 +149,7 @@ abstract class VimMarkGroupBase : VimMarkGroup {
 
     for (i in jumps.indices) {
       val j = jumps[i]
-      if (filename == j.filepath && j.logicalLine == jump.logicalLine) {
+      if (filename == j.filepath && j.line == jump.line) {
         jumps.removeAt(i)
         break
       }
@@ -355,8 +355,8 @@ abstract class VimMarkGroupBase : VimMarkGroup {
     val start = getMark(editor, startMark)
     val end = getMark(editor, endMark)
     if (start != null && end != null) {
-      val startOffset = editor.getOffset(start.logicalLine, start.col)
-      val endOffset = editor.getOffset(end.logicalLine, end.col)
+      val startOffset = editor.getOffset(start.line, start.col)
+      val endOffset = editor.getOffset(end.line, end.col)
       return TextRange(startOffset, endOffset + 1)
     }
     return null

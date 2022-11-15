@@ -197,7 +197,7 @@ class MarkRange(private val mark: Char, offset: Int, move: Boolean) : Range(offs
    */
   override fun getRangeLine(editor: VimEditor, lastZero: Boolean): Int {
     val mark = injector.markGroup.getFileMark(editor, mark)
-    return mark?.logicalLine ?: -1
+    return mark?.line ?: -1
   }
 
   override fun getRangeLine(editor: VimEditor, caret: VimCaret, lastZero: Boolean): Int = getRangeLine(editor, lastZero)

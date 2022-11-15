@@ -121,7 +121,7 @@ public class MarkGroup extends VimMarkGroupBase implements PersistentStateCompon
         if (!mark.isClear()) {
           Element markElem = new Element("mark");
           markElem.setAttribute("key", Character.toString(mark.getKey()));
-          markElem.setAttribute("line", Integer.toString(mark.getLogicalLine()));
+          markElem.setAttribute("line", Integer.toString(mark.getLine()));
           markElem.setAttribute("column", Integer.toString(mark.getCol()));
           markElem.setAttribute("filename", StringUtil.notNullize(mark.getFilename()));
           markElem.setAttribute("protocol", StringUtil.notNullize(mark.getProtocol(), "file"));
@@ -157,7 +157,7 @@ public class MarkGroup extends VimMarkGroupBase implements PersistentStateCompon
           if (!mark.isClear() && !Character.isUpperCase(mark.getKey()) && SAVE_FILE_MARKS.indexOf(mark.getKey()) >= 0) {
             Element markElem = new Element("mark");
             markElem.setAttribute("key", Character.toString(mark.getKey()));
-            markElem.setAttribute("line", Integer.toString(mark.getLogicalLine()));
+            markElem.setAttribute("line", Integer.toString(mark.getLine()));
             markElem.setAttribute("column", Integer.toString(mark.getCol()));
             fileMarkElem.addContent(markElem);
           }
@@ -170,7 +170,7 @@ public class MarkGroup extends VimMarkGroupBase implements PersistentStateCompon
     Element jumpsElem = new Element("jumps");
     for (Jump jump : jumps) {
       Element jumpElem = new Element("jump");
-      jumpElem.setAttribute("line", Integer.toString(jump.getLogicalLine()));
+      jumpElem.setAttribute("line", Integer.toString(jump.getLine()));
       jumpElem.setAttribute("column", Integer.toString(jump.getCol()));
       jumpElem.setAttribute("filename", StringUtil.notNullize(jump.getFilepath()));
       jumpsElem.addContent(jumpElem);

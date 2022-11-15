@@ -123,7 +123,7 @@ private fun variableToPosition(editor: VimEditor, variable: VimDataType, dollarF
   // Mark
   if (name.length >= 2 && name[0] == '\'') {
     val mark = VimPlugin.getMark().getMark(editor, name[1]) ?: return null
-    val markLogicalLine = (mark.logicalLine + 1).asVimInt()
+    val markLogicalLine = (mark.line + 1).asVimInt()
     val markLogicalCol = (mark.col + 1).asVimInt()
     return markLogicalLine to markLogicalCol
   }

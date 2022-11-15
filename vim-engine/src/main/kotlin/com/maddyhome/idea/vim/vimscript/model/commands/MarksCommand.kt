@@ -30,11 +30,11 @@ data class MarksCommand(val ranges: Ranges, val argument: String) : Command.Sing
       .joinToString("\n", prefix = "mark line  col file/text\n") { mark ->
 
         // Lines are 1 based, columns zero based. See :help :marks
-        val line = (mark.logicalLine + 1).toString().padStart(5)
+        val line = (mark.line + 1).toString().padStart(5)
         val column = mark.col.toString().padStart(3)
         val vf = editor.getVirtualFile()
         val text = if (vf != null && vf.path == mark.filename) {
-          val lineText = editor.getLineText(mark.logicalLine).trim().take(200)
+          val lineText = editor.getLineText(mark.line).trim().take(200)
           EngineStringHelper.toPrintableCharacters(injector.parser.stringToKeys(lineText)).take(200)
         } else {
           mark.filename
