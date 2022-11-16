@@ -11,7 +11,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.normalizeVisualLine
-import com.maddyhome.idea.vim.api.visualLineToLogicalLine
+import com.maddyhome.idea.vim.api.visualLineToBufferLine
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
@@ -35,7 +35,7 @@ class MotionScrollFirstScreenLinePageStartAction : VimActionHandler.SingleExecut
       val nextVisualLine = editor.normalizeVisualLine(
         injector.engineEditorHelper.getVisualLineAtBottomOfScreen(editor) + 1
       )
-      rawCount = editor.visualLineToLogicalLine(nextVisualLine) + 1 // rawCount is 1 based
+      rawCount = editor.visualLineToBufferLine(nextVisualLine) + 1 // rawCount is 1 based
     }
     return injector.motion.scrollCurrentLineToDisplayTop(editor, rawCount, true)
   }

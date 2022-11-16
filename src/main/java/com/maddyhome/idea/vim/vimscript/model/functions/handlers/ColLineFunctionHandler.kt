@@ -12,7 +12,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.lineLength
-import com.maddyhome.idea.vim.api.visualLineToLogicalLine
+import com.maddyhome.idea.vim.api.visualLineToBufferLine
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.vimLine
@@ -132,7 +132,7 @@ private fun variableToPosition(editor: VimEditor, variable: VimDataType, dollarF
   if (name.length >= 2 && name[0] == 'w' && name[1] == '0') {
     if (!dollarForLine) return null
     val actualVisualTop = EditorHelper.getVisualLineAtTopOfScreen(editor.ij)
-    val actualLogicalTop = editor.visualLineToLogicalLine(actualVisualTop)
+    val actualLogicalTop = editor.visualLineToBufferLine(actualVisualTop)
     return (actualLogicalTop + 1).asVimInt() to currentCol(editor)
   }
 
@@ -140,7 +140,7 @@ private fun variableToPosition(editor: VimEditor, variable: VimDataType, dollarF
   if (name.length >= 2 && name[0] == 'w' && name[1] == '$') {
     if (!dollarForLine) return null
     val actualVisualBottom = EditorHelper.getVisualLineAtBottomOfScreen(editor.ij)
-    val actualLogicalBottom = editor.visualLineToLogicalLine(actualVisualBottom)
+    val actualLogicalBottom = editor.visualLineToBufferLine(actualVisualBottom)
     return (actualLogicalBottom + 1).asVimInt() to currentCol(editor)
   }
 

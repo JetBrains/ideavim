@@ -39,7 +39,7 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.VimShortcutKeyAction
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.api.visualLineToLogicalLine
+import com.maddyhome.idea.vim.api.visualLineToBufferLine
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.command.VimStateMachine.SubMode
@@ -283,7 +283,7 @@ abstract class VimTestCase : UsefulTestCase() {
     assertPosition(caretLogicalLine, caretLogicalColumn)
 
     // Belt and braces. Let's make sure that the caret is fully onscreen
-    val bottomLogicalLine = myFixture.editor.vim.visualLineToLogicalLine(
+    val bottomLogicalLine = myFixture.editor.vim.visualLineToBufferLine(
       EditorHelper.getVisualLineAtBottomOfScreen(myFixture.editor)
     )
     assertTrue(bottomLogicalLine >= caretLogicalLine)
@@ -377,14 +377,14 @@ abstract class VimTestCase : UsefulTestCase() {
 
   fun assertTopLogicalLine(topLogicalLine: Int) {
     val actualVisualTop = EditorHelper.getVisualLineAtTopOfScreen(myFixture.editor)
-    val actualLogicalTop = myFixture.editor.vim.visualLineToLogicalLine(actualVisualTop)
+    val actualLogicalTop = myFixture.editor.vim.visualLineToBufferLine(actualVisualTop)
 
     Assert.assertEquals("Top logical lines don't match", topLogicalLine, actualLogicalTop)
   }
 
   fun assertBottomLogicalLine(bottomLogicalLine: Int) {
     val actualVisualBottom = EditorHelper.getVisualLineAtBottomOfScreen(myFixture.editor)
-    val actualLogicalBottom = myFixture.editor.vim.visualLineToLogicalLine(actualVisualBottom)
+    val actualLogicalBottom = myFixture.editor.vim.visualLineToBufferLine(actualVisualBottom)
 
     Assert.assertEquals("Bottom logical lines don't match", bottomLogicalLine, actualLogicalBottom)
   }
