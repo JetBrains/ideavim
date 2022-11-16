@@ -9,8 +9,9 @@
 package org.jetbrains.plugins.ideavim.action.motion.screen
 
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.getOffset
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -132,7 +133,7 @@ class MotionMiddleScreenLineActionTest : VimTestCase() {
   fun `test move caret to middle line of screen with block inlays above`() {
     // Move the caret to the line that is closest to the middle of the screen, rather than the numerically middle line
     configureByLines(50, "    I found it in a legendary land")
-    addBlockInlay(EditorHelper.getOffset(myFixture.editor, 5, 5), true, 5)
+    addBlockInlay(IjVimEditor(myFixture.editor).getOffset(5, 5), true, 5)
     typeText(injector.parser.parseKeys("M"))
     assertPosition(12, 4)
   }
@@ -141,7 +142,7 @@ class MotionMiddleScreenLineActionTest : VimTestCase() {
   fun `test move caret to middle line of screen with block inlays below`() {
     // Move the caret to the line that is closest to the middle of the screen, rather than the numerically middle line
     configureByLines(50, "    I found it in a legendary land")
-    addBlockInlay(EditorHelper.getOffset(myFixture.editor, 25, 5), true, 5)
+    addBlockInlay(IjVimEditor(myFixture.editor).getOffset(25, 5), true, 5)
     typeText(injector.parser.parseKeys("M"))
     assertPosition(17, 4)
   }
@@ -150,8 +151,8 @@ class MotionMiddleScreenLineActionTest : VimTestCase() {
   fun `test move caret to middle line of screen with block inlays above and below`() {
     // Move the caret to the line that is closest to the middle of the screen, rather than the numerically middle line
     configureByLines(50, "    I found it in a legendary land")
-    addBlockInlay(EditorHelper.getOffset(myFixture.editor, 5, 5), true, 5)
-    addBlockInlay(EditorHelper.getOffset(myFixture.editor, 25, 5), true, 5)
+    addBlockInlay(IjVimEditor(myFixture.editor).getOffset(5, 5), true, 5)
+    addBlockInlay(IjVimEditor(myFixture.editor).getOffset(25, 5), true, 5)
     typeText(injector.parser.parseKeys("M"))
     assertPosition(12, 4)
   }
@@ -160,7 +161,7 @@ class MotionMiddleScreenLineActionTest : VimTestCase() {
   fun `test move caret to middle line of screen with block inlays and a file shorter than the screen`() {
     assertEquals(35, screenHeight)
     configureByLines(21, "    I found it in a legendary land")
-    addBlockInlay(EditorHelper.getOffset(myFixture.editor, 5, 5), true, 5)
+    addBlockInlay(IjVimEditor(myFixture.editor).getOffset(5, 5), true, 5)
     setPositionAndScroll(0, 0)
     typeText(injector.parser.parseKeys("M"))
     assertPosition(8, 4)

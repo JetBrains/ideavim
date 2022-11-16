@@ -241,14 +241,6 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
     editor.updateCaretsVisualPosition()
   }
 
-  override fun lineEndForOffset(offset: Int): Int {
-    return EditorHelper.getLineEndForOffset(editor, offset)
-  }
-
-  override fun lineStartForOffset(offset: Int): Int {
-    return EditorHelper.getLineStartForOffset(editor, offset)
-  }
-
   override fun offsetToVisualPosition(offset: Int): VimVisualPosition {
     return editor.offsetToVisualPosition(offset).let { VimVisualPosition(it.line, it.column, it.leansRight) }
   }
@@ -277,10 +269,6 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
 
   override fun deleteString(range: TextRange) {
     editor.document.deleteString(range.startOffset, range.endOffset)
-  }
-
-  override fun getText(range: TextRange): String {
-    return editor.document.getText(com.intellij.openapi.util.TextRange(range.startOffset, range.endOffset))
   }
 
   override fun getSelectionModel(): VimSelectionModel {
@@ -325,10 +313,6 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
 
   override fun getLineEndOffset(line: Int): Int {
     return editor.document.getLineEndOffset(line)
-  }
-
-  override fun getLineEndForOffset(offset: Int): Int {
-    return EditorHelper.getLineEndForOffset(editor, offset)
   }
 
   val listenersMap: MutableMap<VimCaretListener, CaretListener> = mutableMapOf()

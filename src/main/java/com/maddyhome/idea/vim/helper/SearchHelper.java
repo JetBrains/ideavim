@@ -409,10 +409,10 @@ public class SearchHelper {
     int fileSize = EditorHelperRt.getFileSize(editor);
     if (dir > 0) {
       start = Math.min(offset + 1, fileSize - 1);
-      end = Math.min(EditorHelper.getLineEndForOffset(editor, offset), fileSize - 1);
+      end = Math.min(EngineEditorHelperKt.getLineEndForOffset(new IjVimEditor(editor), offset), fileSize - 1);
     }
     else {
-      start = EditorHelper.getLineStartForOffset(editor, offset);
+      start = EngineEditorHelperKt.getLineStartForOffset(new IjVimEditor(editor), offset);
       end = Math.max(offset - 1, 0);
     }
 
@@ -555,7 +555,7 @@ public class SearchHelper {
         bstart++;
       }
 
-      int o = EditorHelper.getLineStartForOffset(editor, bend);
+      int o = EngineEditorHelperKt.getLineStartForOffset(new IjVimEditor(editor), bend);
       boolean allWhite = true;
       for (int i = o; i < bend; i++) {
         if (!Character.isWhitespace(chars.charAt(i))) {
@@ -767,7 +767,7 @@ public class SearchHelper {
   }
 
   private static int findFirstQuoteInLine(@NotNull Editor editor, int pos, char quote) {
-    final int start = EditorHelper.getLineStartForOffset(editor, pos);
+    final int start = EngineEditorHelperKt.getLineStartForOffset(new IjVimEditor(editor), pos);
     return findNextQuoteInLine(editor.getDocument().getCharsSequence(), start, quote);
   }
 
@@ -1232,7 +1232,8 @@ public class SearchHelper {
 
     for (int i = 0; i < textRange.size(); i++) {
       int startOffset = textRange.getStartOffsets()[i];
-      String text = EditorHelper.getText(editor, startOffset, textRange.getEndOffsets()[i]);
+      final int end = textRange.getEndOffsets()[i];
+      String text = EngineEditorHelperKt.getText(new IjVimEditor(editor), startOffset, end);
       String[] textChunks = text.split("\\n");
       int chunkStart = 0;
       for (String chunk : textChunks) {

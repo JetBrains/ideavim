@@ -542,8 +542,11 @@ public class ChangeGroup extends VimChangeGroupBase {
     int[] ends = range.getEndOffsets();
     final int firstLine = editor.offsetToLogicalPosition(range.getStartOffset()).getLine();
     for (int i = ends.length - 1; i >= 0; i--) {
-      final int startOffset = EditorHelper.getLineStartForOffset(((IjVimEditor) editor).getEditor(), starts[i]);
-      final int endOffset = EditorHelper.getLineEndForOffset(((IjVimEditor) editor).getEditor(), ends[i] - (startOffset == ends[i] ? 0 : 1));
+      @NotNull final Editor editor1 = ((IjVimEditor) editor).getEditor();
+      final int startOffset = EngineEditorHelperKt.getLineStartForOffset(new IjVimEditor(editor1), starts[i]);
+      @NotNull final Editor editor2 = ((IjVimEditor) editor).getEditor();
+      final int offset = ends[i] - (startOffset == ends[i] ? 0 : 1);
+      final int endOffset = EngineEditorHelperKt.getLineEndForOffset(new IjVimEditor(editor2), offset);
       reformatCode(editor, startOffset, endOffset);
     }
     final int newOffset = VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, firstLine);
@@ -578,8 +581,8 @@ public class ChangeGroup extends VimChangeGroupBase {
                               @NotNull VimCaret caret,
                               @NotNull ExecutionContext context,
                               @NotNull TextRange range) {
-    final int startOffset = injector.getEngineEditorHelper().getLineStartForOffset(editor, range.getStartOffset());
-    final int endOffset = injector.getEngineEditorHelper().getLineEndForOffset(editor, range.getEndOffset());
+    final int startOffset = EngineEditorHelperKt.getLineStartForOffset(editor, range.getStartOffset());
+    final int endOffset = EngineEditorHelperKt.getLineEndForOffset(editor, range.getEndOffset());
 
     Editor ijEditor = ((IjVimEditor)editor).getEditor();
     VisualModeHelperKt.vimSetSystemSelectionSilently(ijEditor.getSelectionModel(), startOffset, endOffset);
@@ -889,7 +892,8 @@ public class ChangeGroup extends VimChangeGroupBase {
                                               boolean alpha,
                                               boolean hex,
                                               boolean octal) {
-    String text = EditorHelper.getText(((IjVimEditor) editor).getEditor(), range.getFirst());
+    @NotNull final Editor editor1 = ((IjVimEditor) editor).getEditor();
+    String text = EngineEditorHelperKt.getText(new IjVimEditor(editor1), range.getFirst());
     SearchHelper.NumberType numberType = range.getSecond();
     if (logger.isDebugEnabled()) {
       logger.debug("found range " + range);

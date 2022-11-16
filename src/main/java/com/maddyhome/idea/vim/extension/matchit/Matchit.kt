@@ -19,7 +19,9 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.getLineEndForOffset
 import com.maddyhome.idea.vim.api.getLineEndOffset
+import com.maddyhome.idea.vim.api.getLineStartForOffset
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.normalizeOffset
 import com.maddyhome.idea.vim.command.Argument
@@ -40,6 +42,7 @@ import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.PsiHelper
 import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.helper.vimStateMachine
+import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import java.util.*
@@ -366,8 +369,8 @@ private fun findMatchingPair(
 ): Int {
   // For better performance, we limit our search to the current line. This way we don't have to scan the entire file
   // to determine if we're on a pattern or not. The original plugin behaves the same way.
-  val currentLineStart = EditorHelper.getLineStartForOffset(editor, caretOffset)
-  val currentLineEnd = EditorHelper.getLineEndForOffset(editor, caretOffset)
+  val currentLineStart = IjVimEditor(editor).getLineStartForOffset(caretOffset)
+  val currentLineEnd = IjVimEditor(editor).getLineEndForOffset(caretOffset)
   val currentLineChars = editor.document.charsSequence.subSequence(currentLineStart, currentLineEnd)
   val offset = caretOffset - currentLineStart
 

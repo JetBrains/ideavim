@@ -51,4 +51,7 @@ interface VimYankGroup {
    * @return true if able to yank the range, false if not
    */
   fun yankRange(editor: VimEditor, range: TextRange?, type: SelectionType, moveCursor: Boolean): Boolean
+  fun notifyListeners(editor: VimEditor, textRange: TextRange)
+  fun addListener(listener: com.maddyhome.idea.vim.listener.VimYankListener): Boolean
+  fun removeListener(listener: com.maddyhome.idea.vim.listener.VimYankListener): Boolean
 }

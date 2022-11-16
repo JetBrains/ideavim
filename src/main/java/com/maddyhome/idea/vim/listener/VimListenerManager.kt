@@ -39,6 +39,8 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimKeyListener
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.VimTypedActionHandler
+import com.maddyhome.idea.vim.api.getLineEndForOffset
+import com.maddyhome.idea.vim.api.getLineStartForOffset
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.group.EditorGroup
@@ -49,7 +51,6 @@ import com.maddyhome.idea.vim.group.visual.IdeaSelectionControl
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer
 import com.maddyhome.idea.vim.group.visual.moveCaretOneCharLeftFromSelectionEnd
 import com.maddyhome.idea.vim.group.visual.vimSetSystemSelectionSilently
-import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.GuicursorChangeListener
 import com.maddyhome.idea.vim.helper.UpdatesChecker
 import com.maddyhome.idea.vim.helper.exitSelectMode
@@ -64,10 +65,10 @@ import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
 import com.maddyhome.idea.vim.helper.vimDisabled
-import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.listener.MouseEventsDataHolder.skipEvents
 import com.maddyhome.idea.vim.listener.MouseEventsDataHolder.skipNDragEvents
 import com.maddyhome.idea.vim.listener.VimListenerManager.EditorListeners.add
+import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.helpers.KeywordOptionChangeListener
@@ -232,8 +233,8 @@ object VimListenerManager {
       //  move to the left, the last character remains unselected.
       //  It's not clear why this happens, but this code fixes it.
       val caret = editor.caretModel.currentCaret
-      val lineEnd = EditorHelper.getLineEndForOffset(editor, caret.offset)
-      val lineStart = EditorHelper.getLineStartForOffset(editor, caret.offset)
+      val lineEnd = IjVimEditor(editor).getLineEndForOffset(caret.offset)
+      val lineStart = IjVimEditor(editor).getLineStartForOffset(caret.offset)
       if (skipNDragEvents < skipEvents &&
         lineEnd != lineStart &&
         selectionEvent.newRange.startOffset == selectionEvent.newRange.endOffset &&
@@ -361,8 +362,8 @@ object VimListenerManager {
 
     private fun onLineEnd(caret: Caret): Boolean {
       val editor = caret.editor
-      val lineEnd = EditorHelper.getLineEndForOffset(editor, caret.offset)
-      val lineStart = EditorHelper.getLineStartForOffset(editor, caret.offset)
+      val lineEnd = IjVimEditor(editor).getLineEndForOffset(caret.offset)
+      val lineStart = IjVimEditor(editor).getLineStartForOffset(caret.offset)
       return caret.offset == lineEnd && lineEnd != lineStart && caret.offset - 1 == caret.selectionStart && caret.offset == caret.selectionEnd
     }
 
@@ -467,8 +468,8 @@ object VimListenerManager {
           if (!predictedMode.isEndAllowed) {
             @Suppress("ideavimRunForEachCaret")
             editor.caretModel.runForEachCaret { caret ->
-              val lineEnd = EditorHelper.getLineEndForOffset(editor, caret.offset)
-              val lineStart = EditorHelper.getLineStartForOffset(editor, caret.offset)
+              val lineEnd = IjVimEditor(editor).getLineEndForOffset(caret.offset)
+              val lineStart = IjVimEditor(editor).getLineStartForOffset(caret.offset)
               cutOffEnd = if (caret.offset == lineEnd && lineEnd != lineStart) {
                 caret.moveToInlayAwareOffset(caret.offset - 1)
                 true

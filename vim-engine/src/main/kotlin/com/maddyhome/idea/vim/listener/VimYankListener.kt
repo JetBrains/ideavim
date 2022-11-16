@@ -8,9 +8,9 @@
 
 package com.maddyhome.idea.vim.listener
 
-import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.common.TextRange
 
 interface VimYankListener {
-  fun yankPerformed(editor: Editor, range: TextRange)
+  fun yankPerformed(editor: VimEditor, range: TextRange)
 }

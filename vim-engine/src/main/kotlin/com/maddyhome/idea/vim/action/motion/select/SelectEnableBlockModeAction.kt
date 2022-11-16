@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.action.motion.select
 
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.getLineEndForOffset
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
@@ -31,7 +32,7 @@ class SelectEnableBlockModeAction : VimActionHandler.SingleExecution() {
     operatorArguments: OperatorArguments,
   ): Boolean {
     editor.removeSecondaryCarets()
-    val lineEnd = injector.engineEditorHelper.getLineEndForOffset(editor, editor.primaryCaret().offset.point)
+    val lineEnd = editor.getLineEndForOffset(editor.primaryCaret().offset.point)
     editor.primaryCaret().run {
       vimSetSystemSelectionSilently(offset.point, (offset.point + 1).coerceAtMost(lineEnd))
       moveToInlayAwareOffset((offset.point + 1).coerceAtMost(lineEnd))

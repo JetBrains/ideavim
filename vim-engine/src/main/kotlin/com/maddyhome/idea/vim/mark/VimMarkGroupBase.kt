@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.mark
 
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getLineEndOffset
+import com.maddyhome.idea.vim.api.getOffset
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.normalizeOffset
 import com.maddyhome.idea.vim.command.Command
@@ -354,8 +355,8 @@ abstract class VimMarkGroupBase : VimMarkGroup {
     val start = getMark(editor, startMark)
     val end = getMark(editor, endMark)
     if (start != null && end != null) {
-      val startOffset = injector.engineEditorHelper.getOffset(editor, start.logicalLine, start.col)
-      val endOffset = injector.engineEditorHelper.getOffset(editor, end.logicalLine, end.col)
+      val startOffset = editor.getOffset(start.logicalLine, start.col)
+      val endOffset = editor.getOffset(end.logicalLine, end.col)
       return TextRange(startOffset, endOffset + 1)
     }
     return null

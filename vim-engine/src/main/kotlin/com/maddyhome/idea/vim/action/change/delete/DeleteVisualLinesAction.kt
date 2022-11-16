@@ -10,6 +10,8 @@ package com.maddyhome.idea.vim.action.change.delete
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.getLineEndForOffset
+import com.maddyhome.idea.vim.api.getLineStartForOffset
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
@@ -42,10 +44,10 @@ class DeleteVisualLinesAction : VisualOperatorActionHandler.ForEachCaret() {
       SelectionType.BLOCK_WISE -> Triple(editor.primaryCaret(), textRange, range.type)
       SelectionType.LINE_WISE -> Triple(caret, textRange, SelectionType.LINE_WISE)
       SelectionType.CHARACTER_WISE -> {
-        val lineEndForOffset = injector.engineEditorHelper.getLineEndForOffset(editor, textRange.endOffset)
+        val lineEndForOffset = editor.getLineEndForOffset(textRange.endOffset)
         val endsWithNewLine = if (lineEndForOffset.toLong() == editor.fileSize()) 0 else 1
         val lineRange = TextRange(
-          injector.engineEditorHelper.getLineStartForOffset(editor, textRange.startOffset),
+          editor.getLineStartForOffset(textRange.startOffset),
           lineEndForOffset + endsWithNewLine
         )
         Triple(caret, lineRange, SelectionType.LINE_WISE)

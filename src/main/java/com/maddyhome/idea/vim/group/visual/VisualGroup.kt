@@ -13,7 +13,9 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.VisualPosition
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.VimMotionGroupBase
+import com.maddyhome.idea.vim.api.getLineEndForOffset
 import com.maddyhome.idea.vim.api.getLineEndOffset
+import com.maddyhome.idea.vim.api.getLineStartForOffset
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.editorMode
@@ -130,8 +132,8 @@ fun moveCaretOneCharLeftFromSelectionEnd(editor: Editor, predictedMode: VimState
   if (predictedMode != VimStateMachine.Mode.VISUAL) {
     if (!predictedMode.isEndAllowed) {
       editor.caretModel.allCarets.forEach { caret ->
-        val lineEnd = EditorHelper.getLineEndForOffset(editor, caret.offset)
-        val lineStart = EditorHelper.getLineStartForOffset(editor, caret.offset)
+        val lineEnd = IjVimEditor(editor).getLineEndForOffset(caret.offset)
+        val lineStart = IjVimEditor(editor).getLineStartForOffset(caret.offset)
         if (caret.offset == lineEnd && lineEnd != lineStart) caret.moveToInlayAwareOffset(caret.offset - 1)
       }
     }
@@ -140,7 +142,7 @@ fun moveCaretOneCharLeftFromSelectionEnd(editor: Editor, predictedMode: VimState
   editor.caretModel.allCarets.forEach { caret ->
     if (caret.hasSelection() && caret.selectionEnd == caret.offset) {
       if (caret.selectionEnd <= 0) return@forEach
-      if (EditorHelper.getLineStartForOffset(editor, caret.selectionEnd - 1) != caret.selectionEnd - 1 &&
+      if (IjVimEditor(editor).getLineStartForOffset(caret.selectionEnd - 1) != caret.selectionEnd - 1 &&
         caret.selectionEnd > 1 && editor.document.text[caret.selectionEnd - 1] == '\n'
       ) {
         caret.moveToInlayAwareOffset(caret.selectionEnd - 2)

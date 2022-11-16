@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.register
 
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.getText
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.command.VimStateMachine
@@ -271,7 +272,7 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     isDelete: Boolean,
   ): Boolean {
     if (isRegisterWritable()) {
-      var text = injector.engineEditorHelper.getText(editor, range)
+      var text = editor.getText(range)
 
       if (type == SelectionType.LINE_WISE && (text.isEmpty() || text[text.length - 1] != '\n')) {
         // Linewise selection always has a new line at the end

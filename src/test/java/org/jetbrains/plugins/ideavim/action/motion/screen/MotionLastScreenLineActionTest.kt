@@ -9,8 +9,9 @@
 package org.jetbrains.plugins.ideavim.action.motion.screen
 
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.getOffset
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
@@ -275,7 +276,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
   fun `test move caret to last line of screen with inlays`() {
     // 35 high, with an inlay that is 10 rows high. Bottom line will be 25 (1 based)
     configureByLines(50, "    I found it in a legendary land")
-    addBlockInlay(EditorHelper.getOffset(myFixture.editor, 20, 5), true, 10)
+    addBlockInlay(IjVimEditor(myFixture.editor).getOffset(20, 5), true, 10)
     setPositionAndScroll(0, 10, 10)
     typeText(injector.parser.parseKeys("L"))
     assertPosition(24, 4)
@@ -287,7 +288,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
     // 35 high, with an inlay that is 10 rows high. Bottom line will be 25 (1 based), scrolloff of 10 puts caret at 15
     VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
     configureByLines(50, "    I found it in a legendary land")
-    addBlockInlay(EditorHelper.getOffset(myFixture.editor, 20, 5), true, 10)
+    addBlockInlay(IjVimEditor(myFixture.editor).getOffset(20, 5), true, 10)
     setPositionAndScroll(0, 10, 10)
     typeText(injector.parser.parseKeys("L"))
     assertPosition(14, 4)
@@ -300,7 +301,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
     // screen. Screen doesn't scroll, caret remains on screen at existing top line - 21
     assertEquals(35, screenHeight)
     configureByLines(100, "    I found it in a legendary land")
-    addBlockInlay(EditorHelper.getOffset(myFixture.editor, 25, 5), true, 10)
+    addBlockInlay(IjVimEditor(myFixture.editor).getOffset(25, 5), true, 10)
     setPositionAndScroll(20, 30, 10)
     typeText(injector.parser.parseKeys("35L"))
     assertPosition(20, 4)

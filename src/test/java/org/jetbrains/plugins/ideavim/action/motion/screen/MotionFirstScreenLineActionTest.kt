@@ -9,8 +9,9 @@
 package org.jetbrains.plugins.ideavim.action.motion.screen
 
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.getOffset
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
@@ -163,7 +164,7 @@ class MotionFirstScreenLineActionTest : VimTestCase() {
   fun `test move caret to first line of screen with inlays`() {
     // We're not scrolling, so inlays don't affect anything. Just place the caret on the first visible line
     configureByLines(50, "    I found it in a legendary land")
-    addBlockInlay(EditorHelper.getOffset(myFixture.editor, 5, 5), true, 10)
+    addBlockInlay(IjVimEditor(myFixture.editor).getOffset(5, 5), true, 10)
     setPositionAndScroll(0, 20, 10)
     typeText(injector.parser.parseKeys("H"))
     assertPosition(0, 4)
@@ -173,7 +174,7 @@ class MotionFirstScreenLineActionTest : VimTestCase() {
   fun `test keep caret on screen when count is greater than visible lines plus inlays`() {
     assertEquals(35, screenHeight)
     configureByLines(50, "    I found it in a legendary land")
-    addBlockInlay(EditorHelper.getOffset(myFixture.editor, 5, 5), true, 10)
+    addBlockInlay(IjVimEditor(myFixture.editor).getOffset(5, 5), true, 10)
     setPositionAndScroll(0, 20, 10)
     // Should move to the 34th visible line. We have space for 35 lines, but we're using some of that for inlays
     typeText(injector.parser.parseKeys("34H"))

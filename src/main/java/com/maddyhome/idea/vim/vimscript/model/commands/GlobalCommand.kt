@@ -12,6 +12,7 @@ import com.intellij.openapi.editor.RangeMarker
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.getLineStartForOffset
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ranges.LineRange
@@ -110,7 +111,7 @@ data class GlobalCommand(val ranges: Ranges, val argument: String, val invert: B
     val searchcol = 0
     if (globalBusy) {
       val offset = editor.currentCaret().offset
-      val lineStartOffset = editor.lineStartForOffset(offset.point)
+      val lineStartOffset = editor.getLineStartForOffset(offset.point)
       match = sp.vim_regexec_multi(regmatch, editor, lcount, lineStartOffset, searchcol)
       if ((!invert && match > 0) || (invert && match <= 0)) {
         globalExecuteOne(editor, context, lineStartOffset, cmd.toString())

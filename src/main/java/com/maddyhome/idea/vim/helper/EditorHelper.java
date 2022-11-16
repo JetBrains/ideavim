@@ -18,7 +18,6 @@ import com.intellij.testFramework.LightVirtualFile;
 import com.maddyhome.idea.vim.api.EngineEditorHelperKt;
 import com.maddyhome.idea.vim.api.VimEditor;
 import com.maddyhome.idea.vim.common.IndentConfig;
-import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
 import kotlin.Pair;
@@ -221,10 +220,6 @@ public class EditorHelper {
     return editor.logicalToVisualPosition(new LogicalPosition(line, 0)).line;
   }
 
-  public static int getOffset(final @NotNull Editor editor, final int line, final int column) {
-    return editor.logicalPositionToOffset(new LogicalPosition(line, column));
-  }
-
   /**
    * Returns the offset of the end of the requested line.
    *
@@ -277,75 +272,6 @@ public class EditorHelper {
     return null;
   }
 
-  /**
-   * Gets a string representation of the file for the supplied offset range
-   *
-   * @param editor The editor
-   * @param start  The starting offset (inclusive)
-   * @param end    The ending offset (exclusive)
-   * @return The string, never null but empty if start == end
-   */
-  public static @NotNull String getText(final @NotNull Editor editor, final int start, final int end) {
-    if (start == end) return "";
-    final CharSequence documentChars = editor.getDocument().getCharsSequence();
-    return documentChars.subSequence(EngineEditorHelperKt.normalizeOffset(new IjVimEditor(editor), start, true),
-                                     EngineEditorHelperKt.normalizeOffset(new IjVimEditor(editor), end, true)).toString();
-  }
-
-  public static @NotNull String getText(final @NotNull Editor editor, final @NotNull TextRange range) {
-    int len = range.size();
-    if (len == 1) {
-      return getText(editor, range.getStartOffset(), range.getEndOffset());
-    }
-    else {
-      StringBuilder res = new StringBuilder();
-      int max = range.getMaxLength();
-
-      for (int i = 0; i < len; i++) {
-        if (i > 0 && res.length() > 0 && res.charAt(res.length() - 1) != '\n') {
-          res.append('\n');
-        }
-        String line = getText(editor, range.getStartOffsets()[i], range.getEndOffsets()[i]);
-        if (line.length() == 0) {
-          for (int j = 0; j < max; j++) {
-            res.append(' ');
-          }
-        }
-        else {
-          res.append(line);
-        }
-      }
-
-      return res.toString();
-    }
-  }
-
-  /**
-   * Gets the offset of the start of the line containing the supplied offset
-   *
-   * @param editor The editor
-   * @param offset The offset within the line
-   * @return The offset of the line start
-   */
-  public static int getLineStartForOffset(final @NotNull Editor editor, final int offset) {
-    LogicalPosition pos = editor.offsetToLogicalPosition(
-      EngineEditorHelperKt.normalizeOffset(new IjVimEditor(editor), offset, true));
-    return editor.getDocument().getLineStartOffset(pos.line);
-  }
-
-  /**
-   * Gets the offset of the end of the line containing the supplied offset
-   *
-   * @param editor The editor
-   * @param offset The offset within the line
-   * @return The offset of the line end
-   */
-  public static int getLineEndForOffset(final @NotNull Editor editor, final int offset) {
-    LogicalPosition pos = editor.offsetToLogicalPosition(
-      EngineEditorHelperKt.normalizeOffset(new IjVimEditor(editor), offset, true));
-    return editor.getDocument().getLineEndOffset(pos.line);
-  }
-
   private static int getLineCharCount(final @NotNull Editor editor, final int line) {
     return EngineEditorHelperKt.getLineEndOffset(new IjVimEditor(editor), line, true) - new IjVimEditor(editor).getLineStartOffset(line);
   }
@@ -358,7 +284,9 @@ public class EditorHelper {
    * @return The requested line
    */
   public static @NotNull String getLineText(final @NotNull Editor editor, final int line) {
-    return getText(editor, new IjVimEditor(editor).getLineStartOffset(line), EngineEditorHelperKt.getLineEndOffset(new IjVimEditor(editor), line, true));
+    final int start = new IjVimEditor(editor).getLineStartOffset(line);
+    final int end = EngineEditorHelperKt.getLineEndOffset(new IjVimEditor(editor), line, true);
+    return EngineEditorHelperKt.getText(new IjVimEditor(editor), start, end);
   }
 
   public static @NotNull CharBuffer getLineBuffer(final @NotNull Editor editor, final int line) {

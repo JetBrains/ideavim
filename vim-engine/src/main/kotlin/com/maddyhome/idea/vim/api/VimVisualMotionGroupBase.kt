@@ -103,7 +103,7 @@ abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
         return false
       }
       val lineEnd =
-        editor.offsetToLogicalPosition(injector.engineEditorHelper.getLineEndForOffset(editor, it.second)).column
+        editor.offsetToLogicalPosition(editor.getLineEndForOffset(it.second)).column
       if (editor.offsetToLogicalPosition(it.second).column != maxColumn.coerceAtMost(lineEnd)) {
         return false
       }

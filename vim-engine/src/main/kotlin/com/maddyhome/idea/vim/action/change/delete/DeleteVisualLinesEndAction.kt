@@ -10,6 +10,8 @@ package com.maddyhome.idea.vim.action.change.delete
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.getLineEndForOffset
+import com.maddyhome.idea.vim.api.getLineStartForOffset
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
@@ -43,7 +45,7 @@ class DeleteVisualLinesEndAction : VisualOperatorActionHandler.ForEachCaret() {
       val ends = vimTextRange.endOffsets
       for (i in starts.indices) {
         if (ends[i] > starts[i]) {
-          ends[i] = injector.engineEditorHelper.getLineEndForOffset(editor, starts[i])
+          ends[i] = editor.getLineEndForOffset(starts[i])
         }
       }
       val blockRange = TextRange(starts, ends)
@@ -56,10 +58,10 @@ class DeleteVisualLinesEndAction : VisualOperatorActionHandler.ForEachCaret() {
         operatorArguments
       )
     } else {
-      val lineEndForOffset = injector.engineEditorHelper.getLineEndForOffset(editor, vimTextRange.endOffset)
+      val lineEndForOffset = editor.getLineEndForOffset(vimTextRange.endOffset)
       val endsWithNewLine = if (lineEndForOffset.toLong() == editor.fileSize()) 0 else 1
       val lineRange = TextRange(
-        injector.engineEditorHelper.getLineStartForOffset(editor, vimTextRange.startOffset),
+        editor.getLineStartForOffset(vimTextRange.startOffset),
         lineEndForOffset + endsWithNewLine
       )
       injector.changeGroup.deleteRange(editor, caret, lineRange, SelectionType.LINE_WISE, false, operatorArguments)

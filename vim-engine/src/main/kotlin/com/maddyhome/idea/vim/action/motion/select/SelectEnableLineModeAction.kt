@@ -10,6 +10,8 @@ package com.maddyhome.idea.vim.action.motion.select
 
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.getLineEndForOffset
+import com.maddyhome.idea.vim.api.getLineStartForOffset
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
@@ -31,8 +33,8 @@ class SelectEnableLineModeAction : VimActionHandler.SingleExecution() {
     operatorArguments: OperatorArguments,
   ): Boolean {
     editor.forEachNativeCaret { caret ->
-      val lineEnd = injector.engineEditorHelper.getLineEndForOffset(editor, caret.offset.point)
-      val lineStart = injector.engineEditorHelper.getLineStartForOffset(editor, caret.offset.point)
+      val lineEnd = editor.getLineEndForOffset(caret.offset.point)
+      val lineStart = editor.getLineStartForOffset(caret.offset.point)
       caret.vimSetSystemSelectionSilently(lineStart, lineEnd)
     }
     return injector.visualMotionGroup.enterSelectMode(editor, VimStateMachine.SubMode.VISUAL_LINE)

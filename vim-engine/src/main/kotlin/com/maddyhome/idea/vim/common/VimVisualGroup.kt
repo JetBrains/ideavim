@@ -10,6 +10,8 @@ package com.maddyhome.idea.vim.group.visual
 
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimLogicalPosition
+import com.maddyhome.idea.vim.api.getLineEndForOffset
+import com.maddyhome.idea.vim.api.getLineStartForOffset
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.lineLength
 import com.maddyhome.idea.vim.command.VimStateMachine
@@ -19,7 +21,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
 fun charToNativeSelection(editor: VimEditor, start: Int, end: Int, mode: VimStateMachine.Mode): Pair<Int, Int> {
   val (nativeStart, nativeEnd) = sort(start, end)
-  val lineEnd = editor.lineEndForOffset(nativeEnd)
+  val lineEnd = editor.getLineEndForOffset(nativeEnd)
   val adj =
     if (isExclusiveSelection() || nativeEnd == lineEnd || mode == VimStateMachine.Mode.SELECT) 0 else 1
   val adjEnd = (nativeEnd + adj).coerceAtMost(editor.fileSize().toInt())
@@ -33,9 +35,9 @@ fun charToNativeSelection(editor: VimEditor, start: Int, end: Int, mode: VimStat
  */
 fun lineToNativeSelection(editor: VimEditor, start: Int, end: Int): Pair<Int, Int> {
   val (nativeStart, nativeEnd) = sort(start, end)
-  val lineStart = editor.lineStartForOffset(nativeStart)
+  val lineStart = editor.getLineStartForOffset(nativeStart)
   // Extend to \n char of line to fill full line with selection
-  val lineEnd = (editor.lineEndForOffset(nativeEnd) + 1).coerceAtMost(editor.fileSize().toInt())
+  val lineEnd = (editor.getLineEndForOffset(nativeEnd) + 1).coerceAtMost(editor.fileSize().toInt())
   return lineStart to lineEnd
 }
 

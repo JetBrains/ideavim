@@ -428,7 +428,11 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
       return -1;
     }
 
-    final String pattern = SearchHelper.makeSearchPattern(EditorHelper.getText(((IjVimEditor)editor).getEditor(), range.getStartOffset(), range.getEndOffset()), whole);
+    @NotNull final Editor editor1 = ((IjVimEditor)editor).getEditor();
+    final int start = range.getStartOffset();
+    final int end = range.getEndOffset();
+    final String pattern = SearchHelper.makeSearchPattern(
+      EngineEditorHelperKt.getText(new IjVimEditor(editor1), start, end), whole);
 
     // Updates RE_LAST, ready for findItOffset
     // Direction is always saved

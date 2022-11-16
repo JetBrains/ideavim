@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.action.motion.select
 
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.getLineEndForOffset
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
@@ -31,7 +32,7 @@ class SelectEnableCharacterModeAction : VimActionHandler.SingleExecution() {
     operatorArguments: OperatorArguments,
   ): Boolean {
     editor.forEachNativeCaret { caret ->
-      val lineEnd = injector.engineEditorHelper.getLineEndForOffset(editor, caret.offset.point)
+      val lineEnd = editor.getLineEndForOffset(caret.offset.point)
       caret.run {
         vimSetSystemSelectionSilently(offset.point, (offset.point + 1).coerceAtMost(lineEnd))
         moveToInlayAwareOffset((offset.point + 1).coerceAtMost(lineEnd))

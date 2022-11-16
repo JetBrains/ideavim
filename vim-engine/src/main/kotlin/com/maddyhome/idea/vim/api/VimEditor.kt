@@ -177,9 +177,6 @@ interface VimEditor {
   fun updateCaretsVisualAttributes()
   fun updateCaretsVisualPosition()
 
-  fun lineEndForOffset(offset: Int): Int
-  fun lineStartForOffset(offset: Int): Int
-
   fun offsetToLogicalPosition(offset: Int): VimLogicalPosition
   fun logicalPositionToOffset(position: VimLogicalPosition): Int
 
@@ -188,7 +185,6 @@ interface VimEditor {
 
   fun getVirtualFile(): VirtualFile?
   fun deleteString(range: TextRange)
-  fun getText(range: TextRange): String
 
   fun getLineText(line: Int): String
 
@@ -200,7 +196,6 @@ interface VimEditor {
 
   fun getLineStartOffset(line: Int): Int
   fun getLineEndOffset(line: Int): Int
-  fun getLineEndForOffset(offset: Int): Int
 
   fun addCaretListener(listener: VimCaretListener)
   fun removeCaretListener(listener: VimCaretListener)

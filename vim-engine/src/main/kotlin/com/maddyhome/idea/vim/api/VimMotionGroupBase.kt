@@ -323,11 +323,11 @@ abstract class VimMotionGroupBase : VimMotionGroup {
       // of the line and move the end to the end of the line.
       if (cmd.isLinewiseMotion()) {
         if (caret.getLogicalPosition().line != editor.lineCount() - 1) {
-          start = editor.lineStartForOffset(start)
-          end = min((editor.lineEndForOffset(end) + 1).toLong(), editor.fileSize()).toInt()
+          start = editor.getLineStartForOffset(start)
+          end = min((editor.getLineEndForOffset(end) + 1).toLong(), editor.fileSize()).toInt()
         } else {
-          start = editor.lineStartForOffset(start)
-          end = editor.lineEndForOffset(end)
+          start = editor.getLineStartForOffset(start)
+          end = editor.getLineEndForOffset(end)
         }
       }
     }

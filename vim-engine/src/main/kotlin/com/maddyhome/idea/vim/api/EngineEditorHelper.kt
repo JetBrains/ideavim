@@ -12,12 +12,9 @@ import com.maddyhome.idea.vim.common.TextRange
 import java.nio.CharBuffer
 
 interface EngineEditorHelper {
-  fun getText(editor: VimEditor, range: TextRange): String
-  fun getOffset(editor: VimEditor, line: Int, column: Int): Int
+  // Keep it for now. See the IJ implementation, there are some hacks regarding that
   fun logicalLineToVisualLine(editor: VimEditor, line: Int): Int
   fun amountOfInlaysBeforeVisualPosition(editor: VimEditor, pos: VimVisualPosition): Int
-  fun getLineStartForOffset(editor: VimEditor, line: Int): Int
-  fun getLineEndForOffset(editor: VimEditor, offset: Int): Int
   fun getVisualLineAtTopOfScreen(editor: VimEditor): Int
   fun getApproximateScreenWidth(editor: VimEditor): Int
   fun handleWithReadonlyFragmentModificationHandler(editor: VimEditor, exception: java.lang.Exception)
@@ -210,4 +207,68 @@ fun VimEditor.normalizeVisualLine(line: Int): Int {
 fun VimEditor.getVisualLineCount(): Int {
   val count = lineCount()
   return if (count == 0) 0 else injector.engineEditorHelper.logicalLineToVisualLine(this, count - 1) + 1
+}
+
+fun VimEditor.getLineStartForOffset(offset: Int): Int {
+  val pos = offsetToLogicalPosition(normalizeOffset(offset, true))
+  return getLineStartOffset(pos.line)
+}
+
+/**
+ * Gets the offset of the end of the line containing the supplied offset
+ *
+ * @param this@getLineEndForOffset The editor
+ * @param offset The offset within the line
+ * @return The offset of the line end
+ */
+fun VimEditor.getLineEndForOffset(offset: Int): Int {
+  val pos = offsetToLogicalPosition(normalizeOffset(offset, true))
+  return getLineEndOffset(pos.line)
+}
+
+
+/**
+ * Gets a string representation of the file for the supplied offset range
+ *
+ * @param this@getText The editor
+ * @param start  The starting offset (inclusive)
+ * @param end    The ending offset (exclusive)
+ * @return The string, never null but empty if start == end
+ */
+fun VimEditor.getText(start: Int, end: Int): String {
+  if (start == end) return ""
+  val documentChars: CharSequence = text()
+  return documentChars.subSequence(normalizeOffset(start), normalizeOffset(end)).toString()
+}
+
+fun VimEditor.getText(range: TextRange): String {
+  val len = range.size()
+  return if (len == 1) {
+    val start = range.startOffset
+    val end = range.endOffset
+    getText(start, end)
+  } else {
+    val res = StringBuilder()
+    val max = range.maxLength
+    for (i in 0 until len) {
+      if (i > 0 && res.isNotEmpty() && res[res.length - 1] != '\n') {
+        res.append('\n')
+      }
+      val start = range.startOffsets[i]
+      val end = range.endOffsets[i]
+      val line = getText(start, end)
+      if (line.isEmpty()) {
+        for (j in 0 until max) {
+          res.append(' ')
+        }
+      } else {
+        res.append(line)
+      }
+    }
+    res.toString()
+  }
+}
+
+fun VimEditor.getOffset(line: Int, column: Int): Int {
+  return logicalPositionToOffset(VimLogicalPosition(line, column))
 }

@@ -10,9 +10,9 @@ package com.maddyhome.idea.vim.vimscript.model.commands
 
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.getText
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
@@ -27,7 +27,7 @@ data class PrintCommand(val ranges: Ranges, val argument: String) : Command.Sing
     val caret = editor.currentCaret()
     val textRange = getTextRange(editor, caret, checkCount = true)
 
-    val text = editor.getText(TextRange(textRange.startOffset, textRange.endOffset))
+    val text = editor.getText(textRange)
 
     val exOutputModel = injector.exOutputPanel.getPanel(editor)
     exOutputModel.output((exOutputModel.text ?: "") + text)

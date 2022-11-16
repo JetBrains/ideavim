@@ -9,6 +9,7 @@ package com.maddyhome.idea.vim.action.motion.visual
 
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.getLineEndForOffset
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
@@ -29,7 +30,7 @@ class VisualExitModeAction : VimActionHandler.SingleExecution() {
     editor.exitVisualModeNative()
 
     editor.forEachCaret { caret ->
-      val lineEnd = editor.lineEndForOffset(caret.offset.point)
+      val lineEnd = editor.getLineEndForOffset(caret.offset.point)
       if (lineEnd == caret.offset.point) {
         val position = injector.motion.getOffsetOfHorizontalMotion(editor, caret, -1, false)
         caret.moveToOffset(position)
@@ -37,7 +38,7 @@ class VisualExitModeAction : VimActionHandler.SingleExecution() {
     }
     // Should it be in [exitVisualMode]?
     editor.forEachCaret { caret ->
-      val lineEnd = injector.engineEditorHelper.getLineEndForOffset(editor, caret.offset.point)
+      val lineEnd = editor.getLineEndForOffset(caret.offset.point)
       if (lineEnd == caret.offset.point) {
         val position = injector.motion.getOffsetOfHorizontalMotion(editor, caret, -1, false)
         caret.moveToOffset(position)

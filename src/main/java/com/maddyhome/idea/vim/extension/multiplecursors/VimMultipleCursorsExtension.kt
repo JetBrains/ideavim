@@ -18,6 +18,7 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.getText
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.VimStateMachine
@@ -28,7 +29,6 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMa
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.visual.vimSetSelection
-import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.SearchHelper
 import com.maddyhome.idea.vim.helper.SearchOptions
@@ -195,7 +195,7 @@ class VimMultipleCursorsExtension : VimExtension {
 
         // Always work on the text in the last visual selection range, so we work with any changed text, even if it's no
         // longer selected
-        val pattern = EditorHelper.getText(editor, lastSelection)
+        val pattern = editor.vim.getText(lastSelection)
 
         val primaryCaret = editor.caretModel.primaryCaret
         val nextOffset = findNextOccurrence(editor, primaryCaret.offset, pattern, wholeWord)
@@ -228,7 +228,7 @@ class VimMultipleCursorsExtension : VimExtension {
       } else {
         val range = SearchHelper.findWordUnderCursor(editor, primaryCaret) ?: return
         if (range.startOffset > primaryCaret.offset) return
-        EditorHelper.getText(editor, range)
+          IjVimEditor(editor).getText(range)
       }
 
       if (!editor.inVisualMode) {

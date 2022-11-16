@@ -65,7 +65,6 @@ import com.maddyhome.idea.vim.group.TabService
 import com.maddyhome.idea.vim.group.VimWindowGroup
 import com.maddyhome.idea.vim.group.WindowGroup
 import com.maddyhome.idea.vim.group.copy.PutGroup
-import com.maddyhome.idea.vim.group.copy.YankGroup
 import com.maddyhome.idea.vim.helper.CommandLineHelper
 import com.maddyhome.idea.vim.helper.IjActionExecutor
 import com.maddyhome.idea.vim.helper.IjEditorHelper
@@ -86,6 +85,7 @@ import com.maddyhome.idea.vim.vimscript.services.OptionService
 import com.maddyhome.idea.vim.vimscript.services.PatternService
 import com.maddyhome.idea.vim.vimscript.services.VariableService
 import com.maddyhome.idea.vim.yank.VimYankGroup
+import com.maddyhome.idea.vim.yank.YankGroupBase
 
 class IjVimInjector : VimInjectorBase() {
   override fun <T : Any> getLogger(clazz: Class<T>): VimLogger = IjVimLogger(Logger.getInstance(clazz::class.java))
@@ -125,7 +125,7 @@ class IjVimInjector : VimInjectorBase() {
   override val window: VimWindowGroup
     get() = service<WindowGroup>()
   override val yank: VimYankGroup
-    get() = service<YankGroup>()
+    get() = service<YankGroupBase>()
   override val file: VimFile
     get() = service<FileGroup>()
   override val macro: VimMacro

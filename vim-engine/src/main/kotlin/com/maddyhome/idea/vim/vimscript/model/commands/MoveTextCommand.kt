@@ -11,6 +11,7 @@ package com.maddyhome.idea.vim.vimscript.model.commands
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.getText
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.command.SelectionType
@@ -46,7 +47,7 @@ data class MoveTextCommand(val ranges: Ranges, val argument: String) : Command.S
       val lineRange = getLineRange(editor, caret)
 
       line = min(line, normalizeLine(editor, caret, goToLineCommand, lineRange))
-      texts.add(injector.engineEditorHelper.getText(editor, range))
+      texts.add(editor.getText(range))
 
       if (lastRange == null || lastRange.startOffset != range.startOffset && lastRange.endOffset != range.endOffset) {
         ranges.add(range)

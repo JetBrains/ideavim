@@ -31,7 +31,6 @@ import com.maddyhome.idea.vim.config.migration.ApplicationConfigurationMigrator;
 import com.maddyhome.idea.vim.extension.VimExtensionRegistrar;
 import com.maddyhome.idea.vim.group.*;
 import com.maddyhome.idea.vim.group.copy.PutGroup;
-import com.maddyhome.idea.vim.group.copy.YankGroup;
 import com.maddyhome.idea.vim.group.visual.VisualMotionGroup;
 import com.maddyhome.idea.vim.helper.MacKeyRepeat;
 import com.maddyhome.idea.vim.listener.VimListenerManager;
@@ -42,6 +41,7 @@ import com.maddyhome.idea.vim.vimscript.services.FunctionStorage;
 import com.maddyhome.idea.vim.vimscript.services.IjVimOptionService;
 import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import com.maddyhome.idea.vim.vimscript.services.VariableService;
+import com.maddyhome.idea.vim.yank.YankGroupBase;
 import org.jdom.Element;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
@@ -205,8 +205,8 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     return (VisualMotionGroup)VimInjectorKt.getInjector().getVisualMotionGroup();
   }
 
-  public static @NotNull YankGroup getYank() {
-    return (YankGroup)VimInjectorKt.getInjector().getYank();
+  public static @NotNull YankGroupBase getYank() {
+    return (YankGroupBase)VimInjectorKt.getInjector().getYank();
   }
 
   public static @NotNull PutGroup getPut() {

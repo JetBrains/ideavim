@@ -21,12 +21,14 @@ import com.intellij.openapi.editor.markup.TextAttributes
 import com.intellij.openapi.util.Disposer
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.VimProjectService
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.VimNlsSafe
 import com.maddyhome.idea.vim.listener.VimInsertListener
 import com.maddyhome.idea.vim.listener.VimYankListener
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.options.helpers.StrictMode
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import org.jetbrains.annotations.NonNls
@@ -89,8 +91,8 @@ class VimHighlightedYank : VimExtension, VimYankListener, VimInsertListener {
     VimPlugin.getChange().removeInsertListener(this)
   }
 
-  override fun yankPerformed(editor: Editor, range: TextRange) {
-    highlightHandler.highlightYankRange(editor, range)
+  override fun yankPerformed(editor: VimEditor, range: TextRange) {
+    highlightHandler.highlightYankRange(editor.ij, range)
   }
 
   override fun insertModeStarted(editor: Editor) {

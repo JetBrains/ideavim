@@ -19,6 +19,7 @@ import com.intellij.openapi.util.Key
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.getOffset
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.SelectionType
@@ -32,7 +33,6 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMa
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setOperatorFunction
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setRegister
-import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.fileSize
 import com.maddyhome.idea.vim.helper.moveToInlayAwareLogicalPosition
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
@@ -40,6 +40,7 @@ import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.mark.Mark
 import com.maddyhome.idea.vim.mark.VimMarkConstants
+import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.annotations.NonNls
@@ -128,7 +129,7 @@ class VimExchangeExtension : VimExtension {
   }
 
   private class Operator(private val isVisual: Boolean) : OperatorFunction {
-    fun Editor.getMarkOffset(mark: Mark) = EditorHelper.getOffset(this, mark.logicalLine, mark.col)
+    fun Editor.getMarkOffset(mark: Mark) = IjVimEditor(this).getOffset(mark.logicalLine, mark.col)
     fun VimStateMachine.SubMode.getString() = when (this) {
       VimStateMachine.SubMode.VISUAL_CHARACTER -> "v"
       VimStateMachine.SubMode.VISUAL_LINE -> "V"

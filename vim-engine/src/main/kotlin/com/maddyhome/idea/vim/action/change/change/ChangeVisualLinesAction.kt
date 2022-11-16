@@ -10,6 +10,8 @@ package com.maddyhome.idea.vim.action.change.change
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.getLineEndForOffset
+import com.maddyhome.idea.vim.api.getLineStartForOffset
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
@@ -41,10 +43,10 @@ class ChangeVisualLinesAction : VisualOperatorActionHandler.ForEachCaret() {
     operatorArguments: OperatorArguments,
   ): Boolean {
     val textRange = range.toVimTextRange(true)
-    val lineEndForOffset = injector.engineEditorHelper.getLineEndForOffset(editor, textRange.endOffset)
+    val lineEndForOffset = editor.getLineEndForOffset(textRange.endOffset)
     val endsWithNewLine = if (lineEndForOffset.toLong() == editor.fileSize()) 0 else 1
     val lineRange = TextRange(
-      injector.engineEditorHelper.getLineStartForOffset(editor, textRange.startOffset),
+      editor.getLineStartForOffset(textRange.startOffset),
       lineEndForOffset + endsWithNewLine
     )
     return injector.changeGroup.changeRange(

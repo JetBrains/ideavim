@@ -15,6 +15,8 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.getLineEndForOffset
+import com.maddyhome.idea.vim.api.getLineStartForOffset
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.command.VimStateMachine
@@ -67,8 +69,8 @@ fun Editor.exitSelectMode(adjustCaretPosition: Boolean) {
       it.removeSelection()
       it.vimSelectionStartClear()
       if (adjustCaretPosition) {
-        val lineEnd = EditorHelper.getLineEndForOffset(this, it.offset)
-        val lineStart = EditorHelper.getLineStartForOffset(this, it.offset)
+        val lineEnd = IjVimEditor(this).getLineEndForOffset(it.offset)
+        val lineStart = IjVimEditor(this).getLineStartForOffset(it.offset)
         if (it.offset == lineEnd && it.offset != lineStart) {
           it.moveToInlayAwareOffset(it.offset - 1)
         }
@@ -88,8 +90,8 @@ fun VimEditor.exitSelectMode(adjustCaretPosition: Boolean) {
       caret.removeSelection()
       caret.vimSelectionStartClear()
       if (adjustCaretPosition) {
-        val lineEnd = EditorHelper.getLineEndForOffset((this as IjVimEditor).editor, caret.offset)
-        val lineStart = EditorHelper.getLineStartForOffset(this.editor, caret.offset)
+        val lineEnd = IjVimEditor((this as IjVimEditor).editor).getLineEndForOffset(caret.offset)
+        val lineStart = IjVimEditor(this.editor).getLineStartForOffset(caret.offset)
         if (caret.offset == lineEnd && caret.offset != lineStart) {
           caret.moveToInlayAwareOffset(caret.offset - 1)
         }
