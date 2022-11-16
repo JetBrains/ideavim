@@ -350,7 +350,7 @@ abstract class VimMotionGroupBase : VimMotionGroup {
     val (line) = caret.getVisualPosition()
     val lastVisualLineColumn = editor.getLastVisualLineColumnNumber(line)
     val visualEndOfLine = VimVisualPosition(line, lastVisualLineColumn, true)
-    return moveCaretToLineEnd(editor, editor.visualToLogicalPosition(visualEndOfLine).line, true)
+    return moveCaretToLineEnd(editor, editor.visualPositionToBufferPosition(visualEndOfLine).line, true)
   }
 
     override fun moveCaretToLineStartSkipLeading(editor: VimEditor, line: Int): Int {

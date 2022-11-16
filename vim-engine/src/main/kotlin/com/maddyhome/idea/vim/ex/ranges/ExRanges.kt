@@ -303,7 +303,7 @@ class SearchRange(pattern: String, offset: Int, move: Boolean) : Range(offset, m
       searchOffset = getSearchOffset(editor, line, direction, lastZero)
       searchOffset = injector.searchGroup.processSearchRange(editor, pattern!!, patternOffset, searchOffset, direction)
       if (searchOffset == -1) break
-      line = editor.offsetToLogicalPosition(searchOffset).line
+      line = editor.offsetToBufferPosition(searchOffset).line
     }
     return if (searchOffset != -1) line else -1
   }

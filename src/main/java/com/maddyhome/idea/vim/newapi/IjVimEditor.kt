@@ -229,11 +229,11 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
     return editor.offsetToVisualPosition(offset).let { VimVisualPosition(it.line, it.column, it.leansRight) }
   }
 
-  override fun offsetToLogicalPosition(offset: Int): BufferPosition {
+  override fun offsetToBufferPosition(offset: Int): BufferPosition {
     return editor.offsetToLogicalPosition(offset).let { BufferPosition(it.line, it.column, it.leansForward) }
   }
 
-  override fun logicalPositionToOffset(position: BufferPosition): Int {
+  override fun bufferPositionToOffset(position: BufferPosition): Int {
     val logicalPosition = LogicalPosition(position.line, position.column, position.leansForward)
     return editor.logicalPositionToOffset(logicalPosition)
   }
@@ -372,7 +372,7 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
       return EditorUtil.getLastVisualLineColumnNumber(this.ij, line)
   }
 
-  override fun visualToLogicalPosition(visualPosition: VimVisualPosition): BufferPosition {
+  override fun visualPositionToBufferPosition(visualPosition: VimVisualPosition): BufferPosition {
       val logPosition = editor.visualToLogicalPosition(
           VisualPosition(
               visualPosition.line,
@@ -383,9 +383,9 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
       return BufferPosition(logPosition.line, logPosition.column, logPosition.leansForward)
   }
 
-  override fun logicalToVisualPosition(logicalPosition: BufferPosition): VimVisualPosition {
+  override fun bufferPositionToVisualPosition(position: BufferPosition): VimVisualPosition {
     val visualPosition =
-      editor.logicalToVisualPosition(logicalPosition.run { LogicalPosition(line, column, leansForward) })
+      editor.logicalToVisualPosition(position.run { LogicalPosition(line, column, leansForward) })
     return visualPosition.run { VimVisualPosition(line, column, leansRight) }
   }
 
@@ -397,12 +397,12 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
    * Converts a logical line number to a visual line number. Several logical lines can map to the same
    * visual line when there are collapsed fold regions.
    */
-  override fun logicalLineToVisualLine(line: Int): Int {
+  override fun bufferLineToVisualLine(line: Int): Int {
     if (editor is EditorImpl) {
       // This is faster than simply calling Editor#logicalToVisualPosition
       return editor.offsetToVisualLine(editor.document.getLineStartOffset(line))
     }
-    return super.logicalLineToVisualLine(line)
+    return super.bufferLineToVisualLine(line)
   }
 
   override var insertMode: Boolean

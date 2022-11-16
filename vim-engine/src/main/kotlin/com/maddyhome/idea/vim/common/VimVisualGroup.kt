@@ -58,8 +58,8 @@ fun blockToNativeSelection(
   end: Int,
   mode: VimStateMachine.Mode,
 ): Pair<BufferPosition, BufferPosition> {
-  var blockStart = editor.offsetToLogicalPosition(start)
-  var blockEnd = editor.offsetToLogicalPosition(end)
+  var blockStart = editor.offsetToBufferPosition(start)
+  var blockEnd = editor.offsetToBufferPosition(end)
   if (!isExclusiveSelection() && mode != VimStateMachine.Mode.SELECT) {
     if (blockStart.column > blockEnd.column) {
       if (blockStart.column < editor.lineLength(blockStart.line)) {

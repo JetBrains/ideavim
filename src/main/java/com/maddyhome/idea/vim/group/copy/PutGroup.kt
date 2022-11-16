@@ -319,8 +319,8 @@ class PutGroup : VimPutBase() {
     startOffset: Int,
     endOffset: Int,
   ): Int {
-    val startLine = editor.offsetToLogicalPosition(startOffset).line
-    val endLine = editor.offsetToLogicalPosition(endOffset - 1).line
+    val startLine = editor.offsetToBufferPosition(startOffset).line
+    val endLine = editor.offsetToBufferPosition(endOffset - 1).line
     val startLineOffset = (editor as IjVimEditor).editor.document.getLineStartOffset(startLine)
     val endLineOffset = editor.editor.document.getLineEndOffset(endLine)
 

@@ -57,7 +57,7 @@ abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
           val intendedColumn = if (range.columns == VimMotionGroupBase.LAST_COLUMN) {
             VimMotionGroupBase.LAST_COLUMN
           } else {
-            editor.offsetToLogicalPosition(end).column
+            editor.offsetToBufferPosition(end).column
           }
           // Set the intended column before moving the caret, then reset because we've moved the caret
           it.vimLastColumn = intendedColumn
@@ -88,26 +88,26 @@ abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
 
   protected fun seemsLikeBlockMode(editor: VimEditor): Boolean {
     val selections = editor.nativeCarets().map {
-      val adj = if (editor.offsetToLogicalPosition(it.selectionEnd).column == 0) 1 else 0
+      val adj = if (editor.offsetToBufferPosition(it.selectionEnd).column == 0) 1 else 0
       it.selectionStart to (it.selectionEnd - adj).coerceAtLeast(0)
     }.sortedBy { it.first }
-    val selectionStartColumn = editor.offsetToLogicalPosition(selections.first().first).column
-    val selectionStartLine = editor.offsetToLogicalPosition(selections.first().first).line
+    val selectionStartColumn = editor.offsetToBufferPosition(selections.first().first).column
+    val selectionStartLine = editor.offsetToBufferPosition(selections.first().first).line
 
-    val maxColumn = selections.maxOfOrNull { editor.offsetToLogicalPosition(it.second).column } ?: return false
+    val maxColumn = selections.maxOfOrNull { editor.offsetToBufferPosition(it.second).column } ?: return false
     selections.forEachIndexed { i, it ->
-      if (editor.offsetToLogicalPosition(it.first).line != editor.offsetToLogicalPosition(it.second).line) {
+      if (editor.offsetToBufferPosition(it.first).line != editor.offsetToBufferPosition(it.second).line) {
         return false
       }
-      if (editor.offsetToLogicalPosition(it.first).column != selectionStartColumn) {
+      if (editor.offsetToBufferPosition(it.first).column != selectionStartColumn) {
         return false
       }
       val lineEnd =
-        editor.offsetToLogicalPosition(editor.getLineEndForOffset(it.second)).column
-      if (editor.offsetToLogicalPosition(it.second).column != maxColumn.coerceAtMost(lineEnd)) {
+        editor.offsetToBufferPosition(editor.getLineEndForOffset(it.second)).column
+      if (editor.offsetToBufferPosition(it.second).column != maxColumn.coerceAtMost(lineEnd)) {
         return false
       }
-      if (editor.offsetToLogicalPosition(it.first).line != selectionStartLine + i) {
+      if (editor.offsetToBufferPosition(it.first).line != selectionStartLine + i) {
         return false
       }
     }
@@ -122,8 +122,8 @@ abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
       // Detect if visual mode is character wise or line wise
       val selectionStart = caret.selectionStart
       val selectionEnd = caret.selectionEnd
-      val logicalStartLine = editor.offsetToLogicalPosition(selectionStart).line
-      val logicalEnd = editor.offsetToLogicalPosition(selectionEnd)
+      val logicalStartLine = editor.offsetToBufferPosition(selectionStart).line
+      val logicalEnd = editor.offsetToBufferPosition(selectionEnd)
       val logicalEndLine = if (logicalEnd.column == 0) (logicalEnd.line - 1).coerceAtLeast(0) else logicalEnd.line
       val lineStartOfSelectionStart = editor.getLineStartOffset(logicalStartLine)
       val lineEndOfSelectionEnd = editor.getLineEndOffset(logicalEndLine, true)

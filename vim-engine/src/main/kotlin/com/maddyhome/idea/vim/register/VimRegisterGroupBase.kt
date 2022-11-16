@@ -218,9 +218,9 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
       val smallInlineDeletion =
         (
           (type === SelectionType.CHARACTER_WISE || type === SelectionType.BLOCK_WISE) && (
-            editor.offsetToLogicalPosition(
+            editor.offsetToBufferPosition(
               start
-            ).line == editor.offsetToLogicalPosition(end).line
+            ).line == editor.offsetToBufferPosition(end).line
             )
           )
 

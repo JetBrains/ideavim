@@ -177,11 +177,19 @@ interface VimEditor {
   fun updateCaretsVisualAttributes()
   fun updateCaretsVisualPosition()
 
-  fun offsetToLogicalPosition(offset: Int): BufferPosition
-  fun logicalPositionToOffset(position: BufferPosition): Int
+  fun offsetToBufferPosition(offset: Int): BufferPosition
+  fun bufferPositionToOffset(position: BufferPosition): Int
 
+  // TODO: [visual] Try to remove these. Visual position is an IntelliJ concept and doesn't have a Vim equivalent
   fun offsetToVisualPosition(offset: Int): VimVisualPosition
   fun visualPositionToOffset(position: VimVisualPosition): Offset
+
+  fun visualPositionToBufferPosition(position: VimVisualPosition): BufferPosition
+  fun bufferPositionToVisualPosition(position: BufferPosition): VimVisualPosition
+
+  fun bufferLineToVisualLine(line: Int): Int {
+    return bufferPositionToVisualPosition(BufferPosition(line, 0)).line
+  }
 
   fun getVirtualFile(): VirtualFile?
   fun deleteString(range: TextRange)
@@ -226,17 +234,10 @@ interface VimEditor {
 
   fun getLastVisualLineColumnNumber(line: Int): Int
 
-  fun visualToLogicalPosition(visualPosition: VimVisualPosition): BufferPosition
-  fun logicalToVisualPosition(logicalPosition: BufferPosition): VimVisualPosition
-
   fun createLiveMarker(start: Offset, end: Offset): LiveRange
   var insertMode: Boolean
 
   val document: VimDocument
-
-  fun logicalLineToVisualLine(line: Int): Int {
-    return logicalToVisualPosition(BufferPosition(line, 0)).line
-  }
 
   fun charAt(offset: Pointer): Char {
     return text()[offset.point]

@@ -114,8 +114,8 @@ private fun variableToPosition(editor: VimEditor, variable: VimDataType, dollarF
     }
 
     val vimStart = editor.currentCaret().vimSelectionStart
-    val visualLine = (editor.offsetToLogicalPosition(vimStart).line + 1).asVimInt()
-    val visualCol = (editor.offsetToLogicalPosition(vimStart).column + 1).asVimInt()
+    val visualLine = (editor.offsetToBufferPosition(vimStart).line + 1).asVimInt()
+    val visualCol = (editor.offsetToBufferPosition(vimStart).column + 1).asVimInt()
 
     return visualLine to visualCol
   }
