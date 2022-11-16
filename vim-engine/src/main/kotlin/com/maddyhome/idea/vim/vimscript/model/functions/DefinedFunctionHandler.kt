@@ -10,7 +10,7 @@ package com.maddyhome.idea.vim.vimscript.model.functions
 
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.VimLogicalPosition
+import com.maddyhome.idea.vim.api.BufferPosition
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.ex.ExException
@@ -74,7 +74,7 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) : FunctionH
   private fun executeBodyForLine(line: Int, isRangeGiven: Boolean, exceptionsCaught: MutableList<ExException>, editor: VimEditor, context: ExecutionContext): VimDataType? {
     var returnValue: VimDataType? = null
     if (isRangeGiven) {
-      editor.currentCaret().moveToLogicalPosition(VimLogicalPosition(line - 1, 0))
+      editor.currentCaret().moveToLogicalPosition(BufferPosition(line - 1, 0))
     }
     var result: ExecutionResult = ExecutionResult.Success
     if (function.flags.contains(FunctionFlag.ABORT)) {

@@ -9,7 +9,7 @@
 package com.maddyhome.idea.vim.group.visual
 
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.VimLogicalPosition
+import com.maddyhome.idea.vim.api.BufferPosition
 import com.maddyhome.idea.vim.api.getLineEndOffset
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.command.SelectionType.BLOCK_WISE
@@ -174,11 +174,11 @@ class VimBlockSelection(
     val lineRange =
       if (logicalStart.line > logicalEnd.line) logicalEnd.line..logicalStart.line else logicalStart.line..logicalEnd.line
     lineRange.map { line ->
-      val start = editor.logicalPositionToOffset(VimLogicalPosition(line, logicalStart.column))
+      val start = editor.logicalPositionToOffset(BufferPosition(line, logicalStart.column))
       val end = if (toLineEnd) {
         editor.getLineEndOffset(line, true)
       } else {
-        editor.logicalPositionToOffset(VimLogicalPosition(line, logicalEnd.column))
+        editor.logicalPositionToOffset(BufferPosition(line, logicalEnd.column))
       }
       action(start, end)
     }

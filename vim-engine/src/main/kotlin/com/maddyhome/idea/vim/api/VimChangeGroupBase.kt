@@ -203,7 +203,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     insertText(editor, caret, caret.offset.point, str)
   }
 
-  open fun insertText(editor: VimEditor, caret: VimCaret, start: VimLogicalPosition, str: String) {
+  open fun insertText(editor: VimEditor, caret: VimCaret, start: BufferPosition, str: String) {
     insertText(editor, caret, editor.logicalPositionToOffset(start), str)
   }
 
@@ -265,7 +265,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       if (repeatLines > 0) {
         val visualLine = caret.getVisualPosition().line
         val logicalLine = caret.getLogicalPosition().line
-        val position = editor.logicalPositionToOffset(VimLogicalPosition(logicalLine, repeatColumn, false))
+        val position = editor.logicalPositionToOffset(BufferPosition(logicalLine, repeatColumn, false))
         for (i in 0 until repeatLines) {
           if (repeatAppend &&
             (repeatColumn < VimMotionGroupBase.LAST_COLUMN) &&

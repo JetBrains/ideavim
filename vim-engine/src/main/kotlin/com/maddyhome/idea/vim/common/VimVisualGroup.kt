@@ -9,7 +9,7 @@
 package com.maddyhome.idea.vim.group.visual
 
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.VimLogicalPosition
+import com.maddyhome.idea.vim.api.BufferPosition
 import com.maddyhome.idea.vim.api.getLineEndForOffset
 import com.maddyhome.idea.vim.api.getLineStartForOffset
 import com.maddyhome.idea.vim.api.injector
@@ -57,17 +57,17 @@ fun blockToNativeSelection(
   start: Int,
   end: Int,
   mode: VimStateMachine.Mode,
-): Pair<VimLogicalPosition, VimLogicalPosition> {
+): Pair<BufferPosition, BufferPosition> {
   var blockStart = editor.offsetToLogicalPosition(start)
   var blockEnd = editor.offsetToLogicalPosition(end)
   if (!isExclusiveSelection() && mode != VimStateMachine.Mode.SELECT) {
     if (blockStart.column > blockEnd.column) {
       if (blockStart.column < editor.lineLength(blockStart.line)) {
-        blockStart = VimLogicalPosition(blockStart.line, blockStart.column + 1)
+        blockStart = BufferPosition(blockStart.line, blockStart.column + 1)
       }
     } else {
       if (blockEnd.column < editor.lineLength(blockEnd.line)) {
-        blockEnd = VimLogicalPosition(blockEnd.line, blockEnd.column + 1)
+        blockEnd = BufferPosition(blockEnd.line, blockEnd.column + 1)
       }
     }
   }

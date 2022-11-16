@@ -25,7 +25,7 @@ import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimCaretListener
 import com.maddyhome.idea.vim.api.VimDocument
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.VimLogicalPosition
+import com.maddyhome.idea.vim.api.BufferPosition
 import com.maddyhome.idea.vim.api.VimSelectionModel
 import com.maddyhome.idea.vim.api.VimVisualPosition
 import com.maddyhome.idea.vim.api.VirtualFile
@@ -229,11 +229,11 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
     return editor.offsetToVisualPosition(offset).let { VimVisualPosition(it.line, it.column, it.leansRight) }
   }
 
-  override fun offsetToLogicalPosition(offset: Int): VimLogicalPosition {
-    return editor.offsetToLogicalPosition(offset).let { VimLogicalPosition(it.line, it.column, it.leansForward) }
+  override fun offsetToLogicalPosition(offset: Int): BufferPosition {
+    return editor.offsetToLogicalPosition(offset).let { BufferPosition(it.line, it.column, it.leansForward) }
   }
 
-  override fun logicalPositionToOffset(position: VimLogicalPosition): Int {
+  override fun logicalPositionToOffset(position: BufferPosition): Int {
     val logicalPosition = LogicalPosition(position.line, position.column, position.leansForward)
     return editor.logicalPositionToOffset(logicalPosition)
   }
@@ -271,7 +271,7 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
     editor.caretModel.removeSecondaryCarets()
   }
 
-  override fun vimSetSystemBlockSelectionSilently(start: VimLogicalPosition, end: VimLogicalPosition) {
+  override fun vimSetSystemBlockSelectionSilently(start: BufferPosition, end: BufferPosition) {
     val startPosition = LogicalPosition(start.line, start.column, start.leansForward)
     val endPosition = LogicalPosition(end.line, end.column, end.leansForward)
     editor.selectionModel.vimSetSystemBlockSelectionSilently(startPosition, endPosition)
@@ -372,7 +372,7 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
       return EditorUtil.getLastVisualLineColumnNumber(this.ij, line)
   }
 
-  override fun visualToLogicalPosition(visualPosition: VimVisualPosition): VimLogicalPosition {
+  override fun visualToLogicalPosition(visualPosition: VimVisualPosition): BufferPosition {
       val logPosition = editor.visualToLogicalPosition(
           VisualPosition(
               visualPosition.line,
@@ -380,10 +380,10 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
               visualPosition.leansRight
           )
       )
-      return VimLogicalPosition(logPosition.line, logPosition.column, logPosition.leansForward)
+      return BufferPosition(logPosition.line, logPosition.column, logPosition.leansForward)
   }
 
-  override fun logicalToVisualPosition(logicalPosition: VimLogicalPosition): VimVisualPosition {
+  override fun logicalToVisualPosition(logicalPosition: BufferPosition): VimVisualPosition {
     val visualPosition =
       editor.logicalToVisualPosition(logicalPosition.run { LogicalPosition(line, column, leansForward) })
     return visualPosition.run { VimVisualPosition(line, column, leansRight) }

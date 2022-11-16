@@ -197,8 +197,8 @@ public class ChangeGroup extends VimChangeGroupBase {
     }
     final Command motion = argument.getMotion();
     if (!isChange && !motion.isLinewiseMotion()) {
-      VimLogicalPosition start = editor.offsetToLogicalPosition(range.getStartOffset());
-      VimLogicalPosition end = editor.offsetToLogicalPosition(range.getEndOffset());
+      BufferPosition start = editor.offsetToLogicalPosition(range.getStartOffset());
+      BufferPosition end = editor.offsetToLogicalPosition(range.getEndOffset());
       if (start.getLine() != end.getLine()) {
         @NotNull Editor editor2 = ((IjVimEditor)editor).getEditor();
         int offset1 = range.getStartOffset();
@@ -351,7 +351,7 @@ public class ChangeGroup extends VimChangeGroupBase {
                              boolean append,
                              @NotNull OperatorArguments operatorArguments) {
     final int lines = VimChangeGroupBase.Companion.getLinesCountInVisualBlock(editor, range);
-    final VimLogicalPosition startPosition = editor.offsetToLogicalPosition(range.getStartOffset());
+    final BufferPosition startPosition = editor.offsetToLogicalPosition(range.getStartOffset());
 
     boolean visualBlockMode = operatorArguments.getMode() == VimStateMachine.Mode.VISUAL &&
                               operatorArguments.getSubMode() == VimStateMachine.SubMode.VISUAL_BLOCK;
@@ -466,7 +466,7 @@ public class ChangeGroup extends VimChangeGroupBase {
     }
     boolean after = range.getEndOffset() >= editor.fileSize();
 
-    final VimLogicalPosition lp = editor.offsetToLogicalPosition(injector.getMotion().moveCaretToCurrentLineStartSkipLeading(editor, caret));
+    final BufferPosition lp = editor.offsetToLogicalPosition(injector.getMotion().moveCaretToCurrentLineStartSkipLeading(editor, caret));
 
     boolean res = deleteRange(editor, caret, range, type, true, operatorArguments);
     if (res) {
@@ -677,7 +677,7 @@ public class ChangeGroup extends VimChangeGroupBase {
     IndentConfig indentConfig = IndentConfig.create(((IjVimEditor) editor).getEditor(), ((IjExecutionContext) context).getContext());
 
     final int sline = editor.offsetToLogicalPosition(range.getStartOffset()).getLine();
-    final VimLogicalPosition endLogicalPosition = editor.offsetToLogicalPosition(range.getEndOffset());
+    final BufferPosition endLogicalPosition = editor.offsetToLogicalPosition(range.getEndOffset());
     final int eline =
       endLogicalPosition.getColumn() == 0 ? Math.max(endLogicalPosition.getLine() - 1, 0) : endLogicalPosition.getLine();
 
@@ -690,7 +690,7 @@ public class ChangeGroup extends VimChangeGroupBase {
         for (int l = sline; l <= eline; l++) {
           int len = EngineEditorHelperKt.lineLength(editor, l);
           if (len > from) {
-            VimLogicalPosition spos = new VimLogicalPosition(l, from, false);
+            BufferPosition spos = new BufferPosition(l, from, false);
             insertText(editor, caret, spos, indent);
           }
         }
@@ -701,8 +701,8 @@ public class ChangeGroup extends VimChangeGroupBase {
         for (int l = sline; l <= eline; l++) {
           int len = EngineEditorHelperKt.lineLength(editor, l);
           if (len > from) {
-            VimLogicalPosition spos = new VimLogicalPosition(l, from, false);
-            VimLogicalPosition epos = new VimLogicalPosition(l, from + indentConfig.getTotalIndent(count) - 1, false);
+            BufferPosition spos = new BufferPosition(l, from, false);
+            BufferPosition epos = new BufferPosition(l, from + indentConfig.getTotalIndent(count) - 1, false);
             int wsoff = editor.logicalPositionToOffset(spos);
             int weoff = editor.logicalPositionToOffset(epos);
             int pos;

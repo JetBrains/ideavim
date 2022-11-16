@@ -11,7 +11,7 @@ package com.maddyhome.idea.vim.put
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.VimLogicalPosition
+import com.maddyhome.idea.vim.api.BufferPosition
 import com.maddyhome.idea.vim.api.getLineEndForOffset
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.lineLength
@@ -287,7 +287,7 @@ abstract class VimPutBase : VimPut {
 
       val pad = injector.engineEditorHelper.pad(editor, context, currentLine, currentColumn)
 
-      val insertOffset = editor.logicalPositionToOffset(VimLogicalPosition(currentLine, currentColumn))
+      val insertOffset = editor.logicalPositionToOffset(BufferPosition(currentLine, currentColumn))
       caret.moveToOffset(insertOffset)
       val insertedText = origSegment + segment.repeat(count - 1)
       injector.changeGroup.insertText(editor, caret, insertedText)
