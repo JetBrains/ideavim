@@ -95,7 +95,7 @@ class PutGroup : VimPutBase() {
 
     logger.debug("Perform put via plugin")
     val myCarets = if (visualSelection != null) {
-      visualSelection.caretsAndSelections.keys.sortedByDescending { it.getLogicalPosition() }
+      visualSelection.caretsAndSelections.keys.sortedByDescending { it.getBufferPosition() }
     } else {
       EditorHelper.getOrderedCaretsList(editor.ij).map { IjVimCaret(it) }
     }

@@ -31,7 +31,7 @@ class FilterMotionAction : VimActionHandler.SingleExecution(), DuplicableOperato
     val range = injector.motion.getMotionRange(editor, editor.primaryCaret(), context, argument, operatorArguments)
       ?: return false
 
-    val current = editor.currentCaret().getLogicalPosition()
+    val current = editor.currentCaret().getBufferPosition()
     val start = editor.offsetToBufferPosition(range.startOffset)
     val end = editor.offsetToBufferPosition(range.endOffsetInclusive)
     if (current.line != start.line) {

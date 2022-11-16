@@ -87,8 +87,8 @@ class IjVimCaret(val caret: Caret) : VimCaretBase() {
     caret.moveToOffset(offset)
   }
 
-  override fun moveToLogicalPosition(logicalPosition: BufferPosition) {
-    this.caret.moveToLogicalPosition(LogicalPosition(logicalPosition.line, logicalPosition.column, logicalPosition.leansForward))
+  override fun moveToBufferPosition(position: BufferPosition) {
+    this.caret.moveToLogicalPosition(LogicalPosition(position.line, position.column, position.leansForward))
   }
 
   override fun getLine(): EditorLine.Pointer {
@@ -116,7 +116,7 @@ class IjVimCaret(val caret: Caret) : VimCaretBase() {
     caret.vimSetSelection(start, end, moveCaretToSelectionEnd)
   }
 
-  override fun getLogicalPosition(): BufferPosition {
+  override fun getBufferPosition(): BufferPosition {
     val logicalPosition = caret.logicalPosition
     return BufferPosition(logicalPosition.line, logicalPosition.column, logicalPosition.leansForward)
   }

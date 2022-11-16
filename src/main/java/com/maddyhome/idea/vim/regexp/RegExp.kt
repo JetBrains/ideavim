@@ -1822,7 +1822,7 @@ class RegExp {
           CURSOR -> {
                         /* Check if the buffer is in a window and compare the
                          * reg_win->w_cursor position to the match position. */
-            val curpos = reg_buf!!.currentCaret().getLogicalPosition()
+            val curpos = reg_buf!!.currentCaret().getBufferPosition()
             if (reglnum + reg_firstlnum != curpos.line ||
               reginput!!.pointer() - regline!!.pointer() != curpos.column
             ) {

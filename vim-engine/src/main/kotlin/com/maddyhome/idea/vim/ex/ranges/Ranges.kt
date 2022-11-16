@@ -131,7 +131,7 @@ class Ranges {
     // Already done
     if (done) return
     // Start with the range being the current line
-    startLine = if (defaultLine == -1) editor.currentCaret().getLogicalPosition().line else defaultLine
+    startLine = if (defaultLine == -1) editor.currentCaret().getBufferPosition().line else defaultLine
     endLine = startLine
     var lastZero = false
     // Now process each range, moving the cursor if appropriate
@@ -156,7 +156,7 @@ class Ranges {
   }
 
   private fun processRange(editor: VimEditor, caret: VimCaret) {
-    startLine = if (defaultLine == -1) caret.getLogicalPosition().line else defaultLine
+    startLine = if (defaultLine == -1) caret.getBufferPosition().line else defaultLine
     endLine = startLine
     var lastZero = false
     for (range in ranges) {

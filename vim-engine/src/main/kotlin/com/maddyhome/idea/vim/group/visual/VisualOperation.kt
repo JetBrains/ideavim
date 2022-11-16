@@ -63,7 +63,7 @@ object VisualOperation {
     if (type == SelectionType.CHARACTER_WISE && lines == 1 || type == SelectionType.BLOCK_WISE) {
       chars *= count
     }
-    val sp = caret.getLogicalPosition()
+    val sp = caret.getBufferPosition()
     val linesDiff = (lines - 1).coerceAtLeast(0)
     val endLine = (sp.line + linesDiff).coerceAtMost(editor.lineCount() - 1)
 

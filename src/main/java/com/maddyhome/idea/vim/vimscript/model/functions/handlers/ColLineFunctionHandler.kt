@@ -64,7 +64,7 @@ object ColFunctionHandler : FunctionHandler() {
 }
 
 private fun currentCol(editor: VimEditor): VimInt {
-  val logicalPosition = editor.currentCaret().getLogicalPosition()
+  val logicalPosition = editor.currentCaret().getBufferPosition()
   var lineLength = editor.lineLength(logicalPosition.line)
 
   // If virtualedit is set, the col is one more
@@ -149,7 +149,7 @@ private fun variableToPosition(editor: VimEditor, variable: VimDataType, dollarF
     return if (dollarForLine) {
       editor.lineCount().asVimInt() to VimInt.ZERO
     } else {
-      val line = editor.currentCaret().getLogicalPosition().line
+      val line = editor.currentCaret().getBufferPosition().line
       val lineLength = editor.lineLength(line)
       (line + 1).asVimInt() to lineLength.asVimInt()
     }
