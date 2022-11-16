@@ -252,10 +252,10 @@ public class ProcessGroup extends VimProcessGroupBase {
       if (exitCode != null && exitCode != 0) {
         VimPlugin.showMessage("shell returned " + exitCode);
         VimPlugin.indicateError();
-        return output.getStderr() + output.getStdout();
       }
 
-      return output.getStdout();
+      // Get stderr; stdout and strip colors, which are not handles properly.
+      return (output.getStderr() + output.getStdout()).replaceAll("\u001B\\[[;\\d]*m", "");
     }, "IdeaVim - !" + command, true, ((IjVimEditor) editor).getEditor().getProject());
   }
 
