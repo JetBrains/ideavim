@@ -264,22 +264,22 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     for (caret in editor.nativeCarets()) {
       if (repeatLines > 0) {
         val visualLine = caret.getVisualPosition().line
-        val logicalLine = caret.getBufferPosition().line
-        val position = editor.bufferPositionToOffset(BufferPosition(logicalLine, repeatColumn, false))
+        val bufferLine = caret.getBufferPosition().line
+        val position = editor.bufferPositionToOffset(BufferPosition(bufferLine, repeatColumn, false))
         for (i in 0 until repeatLines) {
           if (repeatAppend &&
             (repeatColumn < VimMotionGroupBase.LAST_COLUMN) &&
             (editor.getVisualLineLength(visualLine + i) < repeatColumn)
           ) {
-            val pad = injector.engineEditorHelper.pad(editor, context, logicalLine + i, repeatColumn)
+            val pad = injector.engineEditorHelper.pad(editor, context, bufferLine + i, repeatColumn)
             if (pad.isNotEmpty()) {
-              val offset = editor.getLineEndOffset(logicalLine + i)
+              val offset = editor.getLineEndOffset(bufferLine + i)
               insertText(editor, caret, offset, pad)
             }
           }
           val updatedCount = if (started) (if (i == 0) count else count + 1) else count
           if (repeatColumn >= VimMotionGroupBase.LAST_COLUMN) {
-            caret.moveToOffset(injector.motion.moveCaretToLineEnd(editor, logicalLine + i, true))
+            caret.moveToOffset(injector.motion.moveCaretToLineEnd(editor, bufferLine + i, true))
             repeatInsertText(editor, context, updatedCount, operatorArguments)
           } else if (editor.getVisualLineLength(visualLine + i) >= repeatColumn) {
             val visualPosition = VimVisualPosition(visualLine + i, repeatColumn, false)
@@ -988,7 +988,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
    *
    * @param editor    The editor to join the lines in
    * @param caret     The caret on the starting line (to be moved)
-   * @param startLine The starting logical line
+   * @param startLine The starting buffer line
    * @param count     The number of lines to join including startLine
    * @param spaces    If true the joined lines will have one space between them and any leading space on the second line
    * will be removed. If false, only the newline is removed to join the lines.

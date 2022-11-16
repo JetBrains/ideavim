@@ -170,15 +170,15 @@ class VimBlockSelection(
   }
 
   private fun forEachLine(action: (start: Int, end: Int) -> Unit) {
-    val (logicalStart, logicalEnd) = blockToNativeSelection(editor, vimStart, vimEnd, VimStateMachine.Mode.VISUAL)
+    val (startPosition, endPosition) = blockToNativeSelection(editor, vimStart, vimEnd, VimStateMachine.Mode.VISUAL)
     val lineRange =
-      if (logicalStart.line > logicalEnd.line) logicalEnd.line..logicalStart.line else logicalStart.line..logicalEnd.line
+      if (startPosition.line > endPosition.line) endPosition.line..startPosition.line else startPosition.line..endPosition.line
     lineRange.map { line ->
-      val start = editor.bufferPositionToOffset(BufferPosition(line, logicalStart.column))
+      val start = editor.bufferPositionToOffset(BufferPosition(line, startPosition.column))
       val end = if (toLineEnd) {
         editor.getLineEndOffset(line, true)
       } else {
-        editor.bufferPositionToOffset(BufferPosition(line, logicalEnd.column))
+        editor.bufferPositionToOffset(BufferPosition(line, endPosition.column))
       }
       action(start, end)
     }

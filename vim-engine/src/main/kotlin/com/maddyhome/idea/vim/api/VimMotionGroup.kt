@@ -31,9 +31,9 @@ interface VimMotionGroup {
   // Move caret to specific buffer line
   fun moveCaretToLineStart(editor: VimEditor, line: Int): Int
   fun moveCaretToLineStartSkipLeading(editor: VimEditor, line: Int): Int
-  fun moveCaretToLineWithStartOfLineOption(editor: VimEditor, logicalLine: Int, caret: VimCaret): Int
+  fun moveCaretToLineWithStartOfLineOption(editor: VimEditor, line: Int, caret: VimCaret): Int
   fun moveCaretToLineEnd(editor: VimEditor, line: Int, allowPastEnd: Boolean): Int
-  fun moveCaretToLineWithSameColumn(editor: VimEditor, logicalLine: Int, caret: VimCaret): Int
+  fun moveCaretToLineWithSameColumn(editor: VimEditor, line: Int, caret: VimCaret): Int
   fun moveCaretToLinePercent(editor: VimEditor, caret: VimCaret, count: Int): Int
 
   // Move caret relative to current line

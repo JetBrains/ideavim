@@ -878,13 +878,13 @@ public class MotionGroup extends VimMotionGroupBase {
 
   @Override
   public @Range(from = 0, to = Integer.MAX_VALUE) int moveCaretToLineWithStartOfLineOption(@NotNull VimEditor editor,
-                                                                                           int logicalLine,
+                                                                                           int line,
                                                                                            @NotNull VimCaret caret) {
     if (VimPlugin.getOptionService().isSet(new OptionScope.LOCAL(editor), OptionConstants.startoflineName, OptionConstants.startoflineName)) {
-      return moveCaretToLineStartSkipLeading(editor, logicalLine);
+      return moveCaretToLineStartSkipLeading(editor, line);
     }
     else {
-      return moveCaretToLineWithSameColumn(editor, logicalLine, caret);
+      return moveCaretToLineWithSameColumn(editor, line, caret);
     }
   }
 

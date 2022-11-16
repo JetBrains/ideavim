@@ -59,7 +59,7 @@ abstract class VimMarkGroupBase : VimMarkGroup {
   override fun updateMarkFromDelete(editor: VimEditor?, marks: HashMap<Char, Mark>?, delStartOff: Int, delLength: Int) {
     // Skip all this work if there are no marks
     if (marks != null && marks.size > 0 && editor != null) {
-      // Calculate the logical position of the start and end of the deleted text
+      // Calculate the buffer position of the start and end of the deleted text
       val delEndOff = delStartOff + delLength - 1
       val delStart = editor.offsetToBufferPosition(delStartOff)
       val delEnd = editor.offsetToBufferPosition(delEndOff + 1)
@@ -143,8 +143,8 @@ abstract class VimMarkGroupBase : VimMarkGroup {
   private fun addJump(editor: VimEditor, offset: Int, reset: Boolean) {
     val path = editor.getPath() ?: return
 
-    val lp = editor.offsetToBufferPosition(offset)
-    val jump = Jump(lp.line, lp.column, path)
+    val position = editor.offsetToBufferPosition(offset)
+    val jump = Jump(position.line, position.column, path)
     val filename = jump.filepath
 
     for (i in jumps.indices) {
@@ -201,8 +201,8 @@ abstract class VimMarkGroupBase : VimMarkGroup {
         false
       )
       offset = editor.normalizeOffset(offset, false)
-      val lp = editor.offsetToBufferPosition(offset)
-      mark = VimMark(myCh, lp.line, lp.column, editorPath, editor.extractProtocol())
+      val position = editor.offsetToBufferPosition(offset)
+      mark = VimMark(myCh, position.line, position.column, editorPath, editor.extractProtocol())
     } else if ("()".indexOf(myCh) >= 0 && editorPath != null) {
       var offset = injector.searchHelper
         .findNextSentenceStart(
@@ -212,8 +212,8 @@ abstract class VimMarkGroupBase : VimMarkGroup {
         )
 
       offset = editor.normalizeOffset(offset, false)
-      val lp = editor.offsetToBufferPosition(offset)
-      mark = VimMark(myCh, lp.line, lp.column, editorPath, editor.extractProtocol())
+      val position = editor.offsetToBufferPosition(offset)
+      mark = VimMark(myCh, position.line, position.column, editorPath, editor.extractProtocol())
     } else if (VimMarkConstants.FILE_MARKS.indexOf(myCh) >= 0) {
       var fmarks: FileMarks<Char, Mark>? = null
       if (editorPath != null) {
@@ -266,7 +266,7 @@ abstract class VimMarkGroupBase : VimMarkGroup {
   override fun setMark(editor: VimEditor, ch: Char, offset: Int): Boolean {
     var myCh = ch
     if (myCh == '`') myCh = '\''
-    val lp = editor.offsetToBufferPosition(offset)
+    val position = editor.offsetToBufferPosition(offset)
 
     val path = editor.getPath() ?: return false
 
@@ -274,14 +274,14 @@ abstract class VimMarkGroupBase : VimMarkGroup {
     if (VimMarkConstants.FILE_MARKS.indexOf(myCh) >= 0) {
       val fmarks = getFileMarks(path)
 
-      val mark = VimMark(myCh, lp.line, lp.column, path, editor.extractProtocol())
+      val mark = VimMark(myCh, position.line, position.column, path, editor.extractProtocol())
       fmarks[myCh] = mark
     } else if (VimMarkConstants.GLOBAL_MARKS.indexOf(myCh) >= 0) {
       val fmarks = getFileMarks(path)
 
-      var mark = createSystemMark(myCh, lp.line, lp.column, editor)
+      var mark = createSystemMark(myCh, position.line, position.column, editor)
       if (mark == null) {
-        mark = VimMark(myCh, lp.line, lp.column, path, editor.extractProtocol())
+        mark = VimMark(myCh, position.line, position.column, path, editor.extractProtocol())
       }
       fmarks[myCh] = mark
       val oldMark = globalMarks.put(myCh, mark)
