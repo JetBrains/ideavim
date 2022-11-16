@@ -13,6 +13,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.getLineEndOffset
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.SelectionType
@@ -127,7 +128,7 @@ class VimSurroundExtension : VimExtension {
           val innerValue = if (registerValue.isNullOrEmpty()) null else registerValue
           it.innerText = innerValue
 
-          val lineEndOffset = injector.engineEditorHelper.getLineEndOffset(editor, it.caret.getLine().line, false)
+          val lineEndOffset = editor.getLineEndOffset(it.caret.getLine().line, false)
           if (lineEndOffset == it.caret.offset.point) {
             it.isLineEnd = true
           }

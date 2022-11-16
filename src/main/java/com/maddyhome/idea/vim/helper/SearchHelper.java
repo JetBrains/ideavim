@@ -21,6 +21,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.api.EngineEditorHelperKt;
 import com.maddyhome.idea.vim.api.VimSearchHelperBase;
 import com.maddyhome.idea.vim.command.VimStateMachine;
 import com.maddyhome.idea.vim.common.CharacterPosition;
@@ -123,7 +124,7 @@ public class SearchHelper {
     //int         submatch = 0;
     boolean first_match = true;
 
-    int lineCount = EditorHelper.getLineCount(editor);
+    int lineCount = new IjVimEditor(editor).lineCount();
     int startLine = 0;
     int endLine = lineCount;
 
@@ -149,7 +150,7 @@ public class SearchHelper {
         lnum = pos.lnum;
       }
 
-      int lcount = EditorHelper.getLineCount(editor);
+      int lcount = new IjVimEditor(editor).lineCount();
       for (loop = 0; loop <= 1; ++loop)   /* loop twice if 'wrapscan' set */ {
         if (!searchOptions.contains(SearchOptions.WHOLE_FILE)) {
           startLine = lnum;
@@ -360,7 +361,7 @@ public class SearchHelper {
                                                  int endLine,
                                                  boolean ignoreCase) {
     final List<TextRange> results = Lists.newArrayList();
-    final int lineCount = EditorHelper.getLineCount(editor);
+    final int lineCount = new IjVimEditor(editor).lineCount();
     final int actualEndLine = endLine == -1 ? lineCount : endLine;
 
     final RegExp.regmmatch_T regMatch = new RegExp.regmmatch_T();
@@ -428,11 +429,11 @@ public class SearchHelper {
   public static int findSection(@NotNull Editor editor, @NotNull Caret caret, char type, int dir, int count) {
     CharSequence chars = editor.getDocument().getCharsSequence();
     int line = caret.getLogicalPosition().line + dir;
-    int maxline = EditorHelper.getLineCount(editor);
+    int maxline = new IjVimEditor(editor).lineCount();
     int res = -1;
 
     while (line > 0 && line < maxline && count > 0) {
-      int offset = EditorHelper.getLineStartOffset(editor, line);
+      int offset = new IjVimEditor(editor).getLineStartOffset(line);
       if (offset < chars.length()) { // This if was added because of exception and here might be different logic
         char ch = chars.charAt(offset);
         if (ch == type || ch == '\u000C') {
@@ -632,7 +633,7 @@ public class SearchHelper {
     }
 
     int line = caret.getLogicalPosition().line;
-    int end = EditorHelper.getLineEndOffset(editor, line, true);
+    int end = EngineEditorHelperKt.getLineEndOffset(new IjVimEditor(editor), line, true);
 
     // To handle the case where visual mode allows the user to go past the end of the line,
     // which will prevent loc from finding a pairable character below
@@ -1279,7 +1280,7 @@ public class SearchHelper {
                                                                             final boolean octal) {
     int lline = caret.getLogicalPosition().line;
     String text = EditorHelper.getLineText(editor, lline).toLowerCase();
-    int startLineOffset = EditorHelper.getLineStartOffset(editor, lline);
+    int startLineOffset = new IjVimEditor(editor).getLineStartOffset(lline);
     int posOnLine = caret.getOffset() - startLineOffset;
 
     Pair<TextRange, NumberType> numberTextRange = findNumberInText(text, posOnLine, alpha, hex, octal);
@@ -1452,7 +1453,7 @@ public class SearchHelper {
    */
   public static @Nullable TextRange findWordUnderCursor(@NotNull Editor editor, @NotNull Caret caret) {
     CharSequence chars = editor.getDocument().getCharsSequence();
-    int stop = EditorHelper.getLineEndOffset(editor, caret.getLogicalPosition().line, true);
+    int stop = EngineEditorHelperKt.getLineEndOffset(new IjVimEditor(editor), caret.getLogicalPosition().line, true);
 
     int pos = caret.getOffset();
     // Technically the first condition is covered by the second one, but let it be
@@ -1660,8 +1661,8 @@ public class SearchHelper {
    */
   public static int findNextCharacterOnLine(@NotNull Editor editor, @NotNull Caret caret, int count, char ch) {
     int line = caret.getLogicalPosition().line;
-    int start = EditorHelper.getLineStartOffset(editor, line);
-    int end = EditorHelper.getLineEndOffset(editor, line, true);
+    int start = new IjVimEditor(editor).getLineStartOffset(line);
+    int end = EngineEditorHelperKt.getLineEndOffset(new IjVimEditor(editor), line, true);
     CharSequence chars = editor.getDocument().getCharsSequence();
     int found = 0;
     int step = count >= 0 ? 1 : -1;
@@ -2177,9 +2178,9 @@ public class SearchHelper {
   public static int findNextParagraph(@NotNull Editor editor, @NotNull Caret caret, int count, boolean allowBlanks) {
     int line = findNextParagraphLine(editor, caret, count, allowBlanks);
 
-    int maxline = EditorHelper.getLineCount(editor);
+    int maxline = new IjVimEditor(editor).lineCount();
     if (line >= 0 && line < maxline) {
-      return EditorHelper.getLineStartOffset(editor, line);
+      return new IjVimEditor(editor).getLineStartOffset(line);
     }
     else if (line == maxline) {
       return count > 0 ? EditorHelperRt.getFileSize(editor) - 1 : 0;
@@ -2197,7 +2198,7 @@ public class SearchHelper {
     int line = findNextParagraphLine(editor, lline, dir, allowBlanks, skipLines);
 
     if (line >= 0) {
-      return EditorHelper.getLineStartOffset(editor, line);
+      return new IjVimEditor(editor).getLineStartOffset(line);
     }
     else {
       return dir > 0 ? EditorHelperRt.getFileSize(editor) - 1 : 0;
@@ -2210,7 +2211,7 @@ public class SearchHelper {
                                            boolean allowBlanks) {
     int line = caret.getLogicalPosition().line;
 
-    int maxline = EditorHelper.getLineCount(editor);
+    int maxline = new IjVimEditor(editor).lineCount();
     int dir = count > 0 ? 1 : -1;
     boolean skipLines = count > 1;
     count = Math.abs(count);
@@ -2235,7 +2236,7 @@ public class SearchHelper {
                                            int dir,
                                            boolean allowBlanks,
                                            boolean skipLines) {
-    int maxline = EditorHelper.getLineCount(editor);
+    int maxline = new IjVimEditor(editor).lineCount();
     int res = -1;
 
     line = skipEmptyLines(editor, line, dir, allowBlanks);
@@ -2254,7 +2255,7 @@ public class SearchHelper {
   }
 
   private static int skipEmptyLines(@NotNull Editor editor, int line, int dir, boolean allowBlanks) {
-    int maxline = EditorHelper.getLineCount(editor);
+    int maxline = new IjVimEditor(editor).lineCount();
     while (line >= 0 && line < maxline) {
       if (!EditorHelper.isLineEmpty(editor, line, allowBlanks)) {
         return line;
@@ -2271,7 +2272,7 @@ public class SearchHelper {
                                                        int count,
                                                        boolean isOuter) {
     int line = caret.getLogicalPosition().line;
-    int maxline = EditorHelper.getLineCount(editor);
+    int maxline = new IjVimEditor(editor).lineCount();
     if (logger.isDebugEnabled()) logger.debug("starting on line " + line);
     int sline;
     int eline;
@@ -2374,8 +2375,8 @@ public class SearchHelper {
       logger.debug("final sline=" + sline);
       logger.debug("final eline=" + eline);
     }
-    int start = EditorHelper.getLineStartOffset(editor, sline);
-    int end = EditorHelper.getLineStartOffset(editor, eline);
+    int start = new IjVimEditor(editor).getLineStartOffset(sline);
+    int end = new IjVimEditor(editor).getLineStartOffset(eline);
 
     return new TextRange(start, end + 1);
   }

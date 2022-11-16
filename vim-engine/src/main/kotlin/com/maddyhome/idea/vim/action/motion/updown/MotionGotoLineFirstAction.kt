@@ -12,6 +12,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.normalizeLine
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
@@ -34,7 +35,7 @@ class MotionGotoLineFirstAction : MotionActionHandler.ForEachCaret() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    val line = injector.engineEditorHelper.normalizeLine(editor, operatorArguments.count1 - 1)
+    val line = editor.normalizeLine(operatorArguments.count1 - 1)
     return injector.motion.moveCaretToLineWithStartOfLineOption(editor, line, caret).toMotion()
   }
 }
@@ -51,7 +52,7 @@ class MotionGotoLineFirstInsertAction : MotionActionHandler.ForEachCaret() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    val line = injector.engineEditorHelper.normalizeLine(editor, operatorArguments.count1 - 1)
+    val line = editor.normalizeLine(operatorArguments.count1 - 1)
     return injector.motion.moveCaretToLineStart(editor, line).toMotion()
   }
 }

@@ -39,6 +39,7 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.VimShortcutKeyAction
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.visualLineToLogicalLine
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.command.VimStateMachine.SubMode
@@ -281,8 +282,7 @@ abstract class VimTestCase : UsefulTestCase() {
     assertPosition(caretLogicalLine, caretLogicalColumn)
 
     // Belt and braces. Let's make sure that the caret is fully onscreen
-    val bottomLogicalLine = EditorHelper.visualLineToLogicalLine(
-      myFixture.editor,
+    val bottomLogicalLine = myFixture.editor.vim.visualLineToLogicalLine(
       EditorHelper.getVisualLineAtBottomOfScreen(myFixture.editor)
     )
     assertTrue(bottomLogicalLine >= caretLogicalLine)
@@ -376,14 +376,14 @@ abstract class VimTestCase : UsefulTestCase() {
 
   fun assertTopLogicalLine(topLogicalLine: Int) {
     val actualVisualTop = EditorHelper.getVisualLineAtTopOfScreen(myFixture.editor)
-    val actualLogicalTop = EditorHelper.visualLineToLogicalLine(myFixture.editor, actualVisualTop)
+    val actualLogicalTop = myFixture.editor.vim.visualLineToLogicalLine(actualVisualTop)
 
     Assert.assertEquals("Top logical lines don't match", topLogicalLine, actualLogicalTop)
   }
 
   fun assertBottomLogicalLine(bottomLogicalLine: Int) {
     val actualVisualBottom = EditorHelper.getVisualLineAtBottomOfScreen(myFixture.editor)
-    val actualLogicalBottom = EditorHelper.visualLineToLogicalLine(myFixture.editor, actualVisualBottom)
+    val actualLogicalBottom = myFixture.editor.vim.visualLineToLogicalLine(actualVisualBottom)
 
     Assert.assertEquals("Bottom logical lines don't match", bottomLogicalLine, actualLogicalBottom)
   }
@@ -403,7 +403,7 @@ abstract class VimTestCase : UsefulTestCase() {
   }
 
   fun assertLineCount(expected: Int) {
-    assertEquals(expected, EditorHelper.getLineCount(myFixture.editor))
+    assertEquals(expected, myFixture.editor.vim.lineCount())
   }
 
   fun putMapping(modes: Set<MappingMode>, from: String, to: String, recursive: Boolean) {

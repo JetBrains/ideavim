@@ -12,6 +12,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.normalizeLine
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
@@ -95,7 +96,7 @@ private fun moveCaretGotoLineLastEnd(
 ): Int {
   return injector.motion.moveCaretToLineEnd(
     editor,
-    if (rawCount == 0) injector.engineEditorHelper.normalizeLine(editor, editor.lineCount() - 1) else line,
+    if (rawCount == 0) editor.normalizeLine(editor.lineCount() - 1) else line,
     pastEnd
   )
 }

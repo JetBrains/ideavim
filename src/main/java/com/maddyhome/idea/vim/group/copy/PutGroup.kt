@@ -23,6 +23,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.getLineEndOffset
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.command.SelectionType
@@ -160,9 +161,9 @@ class PutGroup : VimPutBase() {
           val line = if (data.insertTextBeforeCaret) firstSelectedLine else firstSelectedLine + selectedLines
           when (typeInRegister) {
             SelectionType.LINE_WISE -> when {
-              data.insertTextBeforeCaret -> listOf(EditorHelper.getLineStartOffset(editor, line))
+              data.insertTextBeforeCaret -> listOf(editor.vim.getLineStartOffset(line))
               else -> {
-                val pos = EditorHelper.getLineEndOffset(editor, line, true)
+                val pos = editor.vim.getLineEndOffset(line, true)
                 application.runWriteAction { editor.document.insertString(pos, "\n") }
                 listOf(pos + 1)
               }

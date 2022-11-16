@@ -30,10 +30,6 @@ class IjEditorHelper : EngineEditorHelper {
     return EditorHelper.normalizeOffset((editor as IjVimEditor).editor, offset, allowEnd)
   }
 
-  override fun normalizeOffset(editor: VimEditor, line: Int, offset: Int, allowEnd: Boolean): Int {
-    return EditorHelper.normalizeOffset((editor as IjVimEditor).editor, line, offset, allowEnd)
-  }
-
   override fun getText(editor: VimEditor, range: TextRange): String {
     return EditorHelper.getText((editor as IjVimEditor).editor, range)
   }
@@ -50,10 +46,6 @@ class IjEditorHelper : EngineEditorHelper {
     return EditorHelper.normalizeVisualLine((editor as IjVimEditor).editor, line)
   }
 
-  override fun normalizeVisualColumn(editor: VimEditor, line: Int, col: Int, allowEnd: Boolean): Int {
-    return EditorHelper.normalizeVisualColumn((editor as IjVimEditor).editor, line, col, allowEnd)
-  }
-
   override fun amountOfInlaysBeforeVisualPosition(editor: VimEditor, pos: VimVisualPosition): Int {
     return (editor as IjVimEditor).editor.amountOfInlaysBeforeVisualPosition(
       VisualPosition(
@@ -68,28 +60,12 @@ class IjEditorHelper : EngineEditorHelper {
     return EditorHelper.getVisualLineCount(editor)
   }
 
-  override fun getLineEndOffset(editor: VimEditor, line: Int, allowEnd: Boolean): Int {
-    return EditorHelper.getLineEndOffset((editor as IjVimEditor).editor, line, allowEnd)
-  }
-
-  override fun getLineStartOffset(editor: VimEditor, line: Int): Int {
-    return EditorHelper.getLineStartOffset((editor as IjVimEditor).editor, line)
-  }
-
   override fun getLineStartForOffset(editor: VimEditor, line: Int): Int {
     return EditorHelper.getLineStartForOffset((editor as IjVimEditor).editor, line)
   }
 
   override fun getLineEndForOffset(editor: VimEditor, offset: Int): Int {
     return EditorHelper.getLineEndForOffset((editor as IjVimEditor).editor, offset)
-  }
-
-  override fun visualLineToLogicalLine(editor: VimEditor, line: Int): Int {
-    return EditorHelper.visualLineToLogicalLine(editor.ij, line)
-  }
-
-  override fun normalizeLine(editor: VimEditor, line: Int): Int {
-    return EditorHelper.normalizeLine(editor.ij, line)
   }
 
   override fun getVisualLineAtTopOfScreen(editor: VimEditor): Int {
@@ -118,10 +94,6 @@ class IjEditorHelper : EngineEditorHelper {
     return EditorHelper.pad(editor.ij, context.ij, line, to)
   }
 
-  override fun getLineLength(editor: VimEditor, logicalLine: Int): Int {
-    return EditorHelper.getLineLength(editor.ij, logicalLine)
-  }
-
   override fun getLineLength(editor: VimEditor): Int {
     return EditorHelper.getLineLength(editor.ij)
   }
@@ -132,10 +104,6 @@ class IjEditorHelper : EngineEditorHelper {
 
   override fun inlayAwareOffsetToVisualPosition(editor: VimEditor, offset: Int): VimVisualPosition {
     return EditorUtil.inlayAwareOffsetToVisualPosition(editor.ij, offset).vim
-  }
-
-  override fun getVisualLineLength(editor: VimEditor, line: Int): Int {
-    return EditorHelper.getVisualLineLength(editor.ij, line)
   }
 
   override fun getLeadingWhitespace(editor: VimEditor, line: Int): String {

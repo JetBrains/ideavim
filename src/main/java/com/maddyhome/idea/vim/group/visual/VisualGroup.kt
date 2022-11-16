@@ -13,6 +13,7 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.VisualPosition
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.VimMotionGroupBase
+import com.maddyhome.idea.vim.api.getLineEndOffset
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.editorMode
@@ -26,6 +27,7 @@ import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
 import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.helper.vimSelectionStart
 import com.maddyhome.idea.vim.newapi.IjVimEditor
+import com.maddyhome.idea.vim.newapi.vim
 
 /**
  * @author Alex Plate
@@ -185,8 +187,8 @@ private fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: Ca
       for (aCaret in editor.caretModel.allCarets) {
         if (!aCaret.isValid) continue
         val line = aCaret.logicalPosition.line
-        val lineEndOffset = EditorHelper.getLineEndOffset(editor, line, true)
-        val lineStartOffset = EditorHelper.getLineStartOffset(editor, line)
+        val lineEndOffset = editor.vim.getLineEndOffset(line, true)
+        val lineStartOffset = editor.vim.getLineStartOffset(line)
 
         // Extend selection to line end if it was made with `$` command
         if (lastColumn >= VimMotionGroupBase.LAST_COLUMN) {

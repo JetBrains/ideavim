@@ -9,6 +9,7 @@ package com.maddyhome.idea.vim.ex.ranges
 
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.getLineEndOffset
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.TextRange
 import org.jetbrains.annotations.NonNls
@@ -109,15 +110,15 @@ class Ranges {
    */
   fun getTextRange(editor: VimEditor, count: Int): TextRange {
     val lr = getLineRange(editor, count)
-    val start = injector.engineEditorHelper.getLineStartOffset(editor, lr.startLine)
-    val end = injector.engineEditorHelper.getLineEndOffset(editor, lr.endLine, true) + 1
+    val start = editor.getLineStartOffset(lr.startLine)
+    val end = editor.getLineEndOffset(lr.endLine, true) + 1
     return TextRange(start, min(end, editor.fileSize().toInt()))
   }
 
   fun getTextRange(editor: VimEditor, caret: VimCaret, count: Int): TextRange {
     val lineRange = getLineRange(editor, caret, count)
-    val start = injector.engineEditorHelper.getLineStartOffset(editor, lineRange.startLine)
-    val end = injector.engineEditorHelper.getLineEndOffset(editor, lineRange.endLine, true) + 1
+    val start = editor.getLineStartOffset(lineRange.startLine)
+    val end = editor.getLineEndOffset(lineRange.endLine, true) + 1
     return TextRange(start, min(end, editor.fileSize().toInt()))
   }
 

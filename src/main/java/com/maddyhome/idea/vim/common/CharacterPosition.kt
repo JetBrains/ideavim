@@ -10,16 +10,16 @@ package com.maddyhome.idea.vim.common
 
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.LogicalPosition
-import com.maddyhome.idea.vim.helper.EditorHelper.getLineStartOffset
+import com.maddyhome.idea.vim.newapi.vim
 
 class CharacterPosition(line: Int, col: Int) : LogicalPosition(line, col) {
-  fun toOffset(editor: Editor) = getLineStartOffset(editor, line) + column
+  fun toOffset(editor: Editor) = editor.vim.getLineStartOffset(line) + column
 
   companion object {
     fun fromOffset(editor: Editor, offset: Int): CharacterPosition {
       // logical position "expands" tabs
       val logicalPosition = editor.offsetToLogicalPosition(offset)
-      val lineStartOffset = getLineStartOffset(editor, logicalPosition.line)
+      val lineStartOffset = editor.vim.getLineStartOffset(logicalPosition.line)
       return CharacterPosition(logicalPosition.line, offset - lineStartOffset)
     }
 

@@ -10,6 +10,8 @@ package com.maddyhome.idea.vim.action.motion.scroll
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.normalizeLine
+import com.maddyhome.idea.vim.api.visualLineToLogicalLine
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
@@ -37,18 +39,15 @@ class MotionScrollLastScreenLinePageStartAction : VimActionHandler.SingleExecuti
         editor,
         injector.engineEditorHelper.getVisualLineAtTopOfScreen(editor) - 1
       )
-      val logicalLine = injector.engineEditorHelper.visualLineToLogicalLine(editor, prevVisualLine)
+      val logicalLine = editor.visualLineToLogicalLine(prevVisualLine)
       return motion.scrollCurrentLineToDisplayBottom(editor, logicalLine + 1, true)
     }
 
     // [count]z^ first scrolls [count] to the bottom of the window, then moves the caret to the line that is now at
     // the top, and then move that line to the bottom of the window
-    var logicalLine = injector.engineEditorHelper.normalizeLine(editor, cmd.rawCount - 1)
+    var logicalLine = editor.normalizeLine(cmd.rawCount - 1)
     if (motion.scrollCurrentLineToDisplayBottom(editor, logicalLine + 1, false)) {
-      logicalLine = injector.engineEditorHelper.visualLineToLogicalLine(
-        editor,
-        injector.engineEditorHelper.getVisualLineAtTopOfScreen(editor)
-      )
+      logicalLine = editor.visualLineToLogicalLine(injector.engineEditorHelper.getVisualLineAtTopOfScreen(editor))
       return motion.scrollCurrentLineToDisplayBottom(editor, logicalLine + 1, true)
     }
 

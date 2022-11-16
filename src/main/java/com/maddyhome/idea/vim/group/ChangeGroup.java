@@ -363,7 +363,7 @@ public class ChangeGroup extends VimChangeGroupBase {
         }
       }
 
-      final int lineLength = EditorHelper.getLineLength(((IjVimEditor) editor).getEditor(), line);
+      final int lineLength = EngineEditorHelperKt.lineLength(editor, line);
       if (column < VimMotionGroupBase.LAST_COLUMN && lineLength < column) {
         final String pad = EditorHelper.pad(((IjVimEditor) editor).getEditor(), ((IjExecutionContext) context).getContext(), line, column);
         final int offset = ((IjVimEditor) editor).getEditor().getDocument().getLineEndOffset(line);
@@ -679,7 +679,7 @@ public class ChangeGroup extends VimChangeGroupBase {
         final String indent = indentConfig.createIndentByCount(count);
 
         for (int l = sline; l <= eline; l++) {
-          int len = EditorHelper.getLineLength(((IjVimEditor) editor).getEditor(), l);
+          int len = EngineEditorHelperKt.lineLength(editor, l);
           if (len > from) {
             VimLogicalPosition spos = new VimLogicalPosition(l, from, false);
             insertText(editor, caret, spos, indent);
@@ -690,7 +690,7 @@ public class ChangeGroup extends VimChangeGroupBase {
         // Left shift blockwise selection
         CharSequence chars = ((IjVimEditor) editor).getEditor().getDocument().getCharsSequence();
         for (int l = sline; l <= eline; l++) {
-          int len = EditorHelper.getLineLength(((IjVimEditor) editor).getEditor(), l);
+          int len = EngineEditorHelperKt.lineLength(editor, l);
           if (len > from) {
             VimLogicalPosition spos = new VimLogicalPosition(l, from, false);
             VimLogicalPosition epos = new VimLogicalPosition(l, from + indentConfig.getTotalIndent(count) - 1, false);
@@ -712,8 +712,8 @@ public class ChangeGroup extends VimChangeGroupBase {
     else {
       // Shift non-blockwise selection
       for (int l = sline; l <= eline; l++) {
-        final int soff = injector.getEngineEditorHelper().getLineStartOffset(editor, l);
-        final int eoff = injector.getEngineEditorHelper().getLineEndOffset(editor, l, true);
+        final int soff = editor.getLineStartOffset(l);
+        final int eoff = EngineEditorHelperKt.getLineEndOffset(editor, l, true);
         final int woff = VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, l);
         final int col = ((IjVimEditor) editor).getEditor().offsetToVisualPosition(woff).getColumn();
         final int limit = Math.max(0, col + dir * indentConfig.getTotalIndent(count));

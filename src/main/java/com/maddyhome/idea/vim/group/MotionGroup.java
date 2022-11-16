@@ -196,7 +196,7 @@ public class MotionGroup extends VimMotionGroupBase {
       col = newColumn;
     }
 
-    newColumn = normalizeVisualColumn(editor, newVisualLine, newColumn, CommandStateHelper.isEndAllowed(editor));
+    newColumn = EngineEditorHelperKt.normalizeVisualColumn(new IjVimEditor(editor), newVisualLine, newColumn, CommandStateHelper.isEndAllowed(editor));
 
     if (newVisualLine != caretVisualLine || newColumn != oldColumn) {
       int offset = editor.visualPositionToOffset(new VisualPosition(newVisualLine, newColumn));
@@ -392,7 +392,7 @@ public class MotionGroup extends VimMotionGroupBase {
     final int scrollOffset = getNormalizedSideScrollOffset(ijEditor);
     // TODO: Should the offset be applied to visual columns? This includes inline inlays and folds
     final int column =
-      normalizeVisualColumn(ijEditor, caretVisualPosition.line, caretVisualPosition.column + scrollOffset, false);
+      EngineEditorHelperKt.normalizeVisualColumn(editor, caretVisualPosition.line, caretVisualPosition.column + scrollOffset, false);
     scrollColumnToRightOfScreen(ijEditor, caretVisualPosition.line, column);
     return true;
   }
@@ -593,7 +593,7 @@ public class MotionGroup extends VimMotionGroupBase {
         }
         else {
           scrollColumnToRightOfScreen(editor, position.line,
-                                      normalizeVisualColumn(editor, position.line, currentVisualRightColumn + diff,
+                                      EngineEditorHelperKt.normalizeVisualColumn(new IjVimEditor(editor), position.line, currentVisualRightColumn + diff,
                                                             false));
         }
       }
@@ -736,7 +736,7 @@ public class MotionGroup extends VimMotionGroupBase {
   @Override
   public Motion moveCaretToColumn(@NotNull VimEditor editor, @NotNull VimCaret caret, int count, boolean allowEnd) {
     final int line = caret.getLine().getLine();
-    final int column = normalizeColumn(((IjVimEditor)editor).getEditor(), line, count, allowEnd);
+    final int column = EngineEditorHelperKt.normalizeColumn(editor, line, count, allowEnd);
     final int offset = editor.logicalPositionToOffset(new VimLogicalPosition(line, column, false));
     if (column != count) {
       return new Motion.AdjustedOffset(offset, count);
@@ -751,7 +751,7 @@ public class MotionGroup extends VimMotionGroupBase {
     final VisualPosition caretVisualPosition = ijEditor.getCaretModel().getVisualPosition();
     if (columns > 0) {
       // TODO: Don't add columns to visual position. This includes inlays and folds
-      int visualColumn = normalizeVisualColumn(ijEditor, caretVisualPosition.line,
+      int visualColumn = EngineEditorHelperKt.normalizeVisualColumn(editor, caretVisualPosition.line,
                                                getVisualColumnAtLeftOfDisplay(ijEditor, caretVisualPosition.line) +
                                                columns, false);
 
@@ -815,7 +815,7 @@ public class MotionGroup extends VimMotionGroupBase {
 
     if (caretVisualLine != ijCaret.getVisualPosition().line) {
       final int offset =
-        moveCaretToLineWithStartOfLineOption(editor, visualLineToLogicalLine(ijEditor, caretVisualLine), caret);
+        moveCaretToLineWithStartOfLineOption(editor, EngineEditorHelperKt.visualLineToLogicalLine(editor, caretVisualLine), caret);
       moveCaret(ijEditor, ijCaret, offset);
       return result.getFirst();
     }
@@ -838,7 +838,7 @@ public class MotionGroup extends VimMotionGroupBase {
 
     if (caretVisualLine != ijCaret.getVisualPosition().line && caretVisualLine != -1) {
       final int offset =
-        moveCaretToLineWithStartOfLineOption(editor, visualLineToLogicalLine(ijEditor, caretVisualLine), caret);
+        moveCaretToLineWithStartOfLineOption(editor, EngineEditorHelperKt.visualLineToLogicalLine(editor, caretVisualLine), caret);
       moveCaret(ijEditor, ijCaret, offset);
       return result.getFirst();
     }
@@ -860,11 +860,11 @@ public class MotionGroup extends VimMotionGroupBase {
       col = 0;
     }
     else if (logicalLine >= editor.lineCount()) {
-      line = normalizeLine(((IjVimEditor) editor).getEditor(), editor.lineCount() - 1);
-      col = getLineLength(((IjVimEditor) editor).getEditor(), line);
+      line = EngineEditorHelperKt.normalizeLine(editor, editor.lineCount() - 1);
+      col = EngineEditorHelperKt.lineLength(editor, line);
     }
 
-    LogicalPosition newPos = new LogicalPosition(line, normalizeColumn(((IjVimEditor) editor).getEditor(), line, col, false));
+    LogicalPosition newPos = new LogicalPosition(line, EngineEditorHelperKt.normalizeColumn(editor, line, col, false));
 
     return ((IjVimEditor) editor).getEditor().logicalPositionToOffset(newPos);
   }
@@ -888,7 +888,7 @@ public class MotionGroup extends VimMotionGroupBase {
     final CaretModel caretModel = ijEditor.getCaretModel();
     final int currentLogicalLine = caretModel.getLogicalPosition().line;
 
-    if ((!down && currentLogicalLine <= 0) || (down && currentLogicalLine >= getLineCount(ijEditor) - 1)) {
+    if ((!down && currentLogicalLine <= 0) || (down && currentLogicalLine >= editor.lineCount() - 1)) {
       return false;
     }
 
@@ -928,7 +928,7 @@ public class MotionGroup extends VimMotionGroupBase {
       targetCaretVisualLine = max(visualTop, min(visualBottom, targetCaretVisualLine));
     }
 
-    int logicalLine = visualLineToLogicalLine(ijEditor, targetCaretVisualLine);
+    int logicalLine = EngineEditorHelperKt.visualLineToLogicalLine(editor, targetCaretVisualLine);
     int caretOffset = moveCaretToLineWithStartOfLineOption(editor, logicalLine, caret);
     moveCaret(ijEditor, ijCaret, caretOffset);
 
@@ -945,7 +945,7 @@ public class MotionGroup extends VimMotionGroupBase {
 
     int visualLine = rawCount == 0
                      ? editor.getCaretModel().getVisualPosition().line
-                     : logicalLineToVisualLine(editor, normalizeLine(editor, rawCount - 1));
+                     : logicalLineToVisualLine(editor, EngineEditorHelperKt.normalizeLine(new IjVimEditor(editor), rawCount - 1));
 
     // This method moves the current (or [count]) line to the specified screen location
     // Scroll offset is applicable, but scroll jump isn't. Offset is applied to screen lines (visual lines)
@@ -965,11 +965,12 @@ public class MotionGroup extends VimMotionGroupBase {
     if (visualLine != editor.getCaretModel().getVisualPosition().line || start) {
       int offset;
       if (start) {
-        offset = moveCaretToLineStartSkipLeading(new IjVimEditor(editor), visualLineToLogicalLine(editor, visualLine));
+        offset = moveCaretToLineStartSkipLeading(new IjVimEditor(editor), EngineEditorHelperKt.visualLineToLogicalLine(
+          new IjVimEditor(editor), visualLine));
       }
       else {
         offset = moveCaretToLineWithSameColumn(new IjVimEditor(editor),
-                                               visualLineToLogicalLine(editor, visualLine),
+                                               EngineEditorHelperKt.visualLineToLogicalLine(new IjVimEditor(editor), visualLine),
                                                new IjVimCaret(editor.getCaretModel().getPrimaryCaret()));
       }
 
@@ -1022,7 +1023,7 @@ public class MotionGroup extends VimMotionGroupBase {
                                                                              @NotNull VimCaret caret,
                                                                              int count) {
     return moveCaretToLineWithStartOfLineOption(editor,
-                                                normalizeLine(((IjVimEditor)editor).getEditor(),
+                                                EngineEditorHelperKt.normalizeLine(editor,
                                                               (editor.lineCount() * MathUtil.clamp(count, 0, 100) +
                                                                99) / 100 - 1), caret);
   }
@@ -1081,7 +1082,7 @@ public class MotionGroup extends VimMotionGroupBase {
         break;
     }
 
-    final int targetLogicalLine = visualLineToLogicalLine(editor, targetVisualLine);
+    final int targetLogicalLine = EngineEditorHelperKt.visualLineToLogicalLine(new IjVimEditor(editor), targetVisualLine);
     return moveCaretToLineWithStartOfLineOption(new IjVimEditor(editor), targetLogicalLine, new IjVimCaret(caret));
   }
 

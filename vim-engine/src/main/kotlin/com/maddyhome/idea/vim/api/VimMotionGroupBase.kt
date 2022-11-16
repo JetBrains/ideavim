@@ -14,10 +14,10 @@ import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.handler.Motion
-import com.maddyhome.idea.vim.handler.toAdjustedMotionOrError
 import com.maddyhome.idea.vim.handler.Motion.AbsoluteOffset
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler
+import com.maddyhome.idea.vim.handler.toAdjustedMotionOrError
 import com.maddyhome.idea.vim.handler.toMotionOrError
 import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.helper.isEndAllowedIgnoringOnemore
@@ -40,8 +40,7 @@ abstract class VimMotionGroupBase : VimMotionGroup {
     val line = injector.engineEditorHelper.normalizeVisualLine(editor, pos.line + count)
 
     if (intendedColumn == LAST_COLUMN) {
-      val normalisedColumn = injector.engineEditorHelper.normalizeVisualColumn(
-        editor, line, intendedColumn,
+      val normalisedColumn = editor.normalizeVisualColumn(line, intendedColumn,
         editor.mode.isEndAllowedIgnoringOnemore
       )
       val newPos = VimVisualPosition(line, normalisedColumn, false)
@@ -57,8 +56,8 @@ abstract class VimMotionGroupBase : VimMotionGroup {
     val additionalVisualColumns = injector.engineEditorHelper
       .amountOfInlaysBeforeVisualPosition(editor, VimVisualPosition(line, intendedColumn, false))
 
-    val normalisedColumn = injector.engineEditorHelper
-      .normalizeVisualColumn(editor, line, intendedColumn, editor.isEndAllowed)
+    val normalisedColumn = editor
+      .normalizeVisualColumn(line, intendedColumn, editor.isEndAllowed)
     val adjustedColumn = normalisedColumn + additionalVisualColumns
 
     val newPos = VimVisualPosition(line, adjustedColumn, false)
@@ -72,10 +71,9 @@ abstract class VimMotionGroupBase : VimMotionGroup {
   }
 
   override fun moveCaretToLineEnd(editor: VimEditor, line: Int, allowPastEnd: Boolean): Int {
-    return injector.engineEditorHelper.normalizeOffset(
-      editor,
+    return editor.normalizeOffset(
       line,
-      injector.engineEditorHelper.getLineEndOffset(editor, line, allowPastEnd),
+      editor.getLineEndOffset(line, allowPastEnd),
       allowPastEnd
     )
   }
@@ -84,7 +82,7 @@ abstract class VimMotionGroupBase : VimMotionGroup {
     if (line >= editor.lineCount()) {
       return editor.fileSize().toInt()
     }
-    return injector.engineEditorHelper.getLineStartOffset(editor, line)
+    return editor.getLineStartOffset(line)
   }
 
   /**
@@ -122,8 +120,8 @@ abstract class VimMotionGroupBase : VimMotionGroup {
         1
       }
     }
-    val offset = injector.engineEditorHelper
-      .normalizeOffset(editor, caret.getLine().line, oldOffset + (sign * diff), allowPastEnd)
+    val offset = editor
+      .normalizeOffset(caret.getLine().line, oldOffset + (sign * diff), allowPastEnd)
 
     return if (offset == oldOffset) -1 else offset
   }
@@ -134,7 +132,7 @@ abstract class VimMotionGroupBase : VimMotionGroup {
     linesOffset: Int,
   ): Int {
     val line = injector.engineEditorHelper.normalizeVisualLine(editor, caret.getVisualPosition().line + linesOffset)
-    return moveCaretToLineStartSkipLeading(editor, injector.engineEditorHelper.visualLineToLogicalLine(editor, line))
+    return moveCaretToLineStartSkipLeading(editor, editor.visualLineToLogicalLine(line))
   }
 
   override fun scrollFullPage(editor: VimEditor, caret: VimCaret, pages: Int): Boolean {
@@ -203,17 +201,16 @@ abstract class VimMotionGroupBase : VimMotionGroup {
     val line = injector.engineEditorHelper.normalizeVisualLine(editor, caret.getVisualPosition().line + cntForward)
 
     return if (line < 0) 0 else {
-      moveCaretToLineEnd(editor, injector.engineEditorHelper.visualLineToLogicalLine(editor, line), allowPastEnd)
+      moveCaretToLineEnd(editor, editor.visualLineToLogicalLine(line), allowPastEnd)
     }
   }
 
   override fun moveCaretToRelativeLineEndSkipTrailing(editor: VimEditor, caret: VimCaret, linesOffset: Int): Int {
-    val line = injector.engineEditorHelper.visualLineToLogicalLine(
-      editor,
+    val line = editor.visualLineToLogicalLine(
       injector.engineEditorHelper.normalizeVisualLine(editor, caret.getVisualPosition().line + linesOffset)
     )
-    val start = injector.engineEditorHelper.getLineStartOffset(editor, line)
-    val end = injector.engineEditorHelper.getLineEndOffset(editor, line, true)
+    val start = editor.getLineStartOffset(line)
+    val end = editor.getLineEndOffset(line, true)
     val chars = editor.text()
     var pos = start
     for (offset in end downTo start + 1) {

@@ -19,6 +19,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.getLineEndOffset
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
@@ -316,7 +317,7 @@ private fun getMatchitOffset(editor: Editor, caret: Caret, count: Int, isInOpPen
   var caretOffset = caret.offset
 
   // Handle the case where visual mode has brought the cursor past the end of the line.
-  val lineEndOffset = EditorHelper.getLineEndOffset(editor, caret.logicalPosition.line, true)
+  val lineEndOffset = editor.vim.getLineEndOffset(caret.logicalPosition.line, true)
   if (caretOffset > 0 && caretOffset == lineEndOffset) {
     caretOffset--
   }

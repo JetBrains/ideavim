@@ -125,8 +125,8 @@ abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
       val logicalStartLine = editor.offsetToLogicalPosition(selectionStart).line
       val logicalEnd = editor.offsetToLogicalPosition(selectionEnd)
       val logicalEndLine = if (logicalEnd.column == 0) (logicalEnd.line - 1).coerceAtLeast(0) else logicalEnd.line
-      val lineStartOfSelectionStart = injector.engineEditorHelper.getLineStartOffset(editor, logicalStartLine)
-      val lineEndOfSelectionEnd = injector.engineEditorHelper.getLineEndOffset(editor, logicalEndLine, true)
+      val lineStartOfSelectionStart = editor.getLineStartOffset(logicalStartLine)
+      val lineEndOfSelectionEnd = editor.getLineEndOffset(logicalEndLine, true)
       lineStartOfSelectionStart == selectionStart && (lineEndOfSelectionEnd + 1 == selectionEnd || lineEndOfSelectionEnd == selectionEnd)
     }
     if (all) return VimStateMachine.SubMode.VISUAL_LINE

@@ -51,6 +51,7 @@ import com.maddyhome.idea.vim.helper.updateCaretsVisualPosition
 import com.maddyhome.idea.vim.helper.vimChangeActionSwitchMode
 import com.maddyhome.idea.vim.helper.vimKeepingVisualOperatorAction
 import com.maddyhome.idea.vim.helper.vimLastSelectionType
+import com.maddyhome.idea.vim.options.helpers.StrictMode
 import org.jetbrains.annotations.ApiStatus
 
 @ApiStatus.Internal
@@ -82,7 +83,10 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
 
   override fun lineCount(): Int {
     val lineCount = editor.document.lineCount
-    return lineCount.coerceAtLeast(1)
+    return lineCount
+
+    // Note: As I understand, vim editor has always at least one line
+//    return lineCount.coerceAtLeast(1)
   }
 
   override fun nativeLineCount(): Int {
@@ -279,10 +283,6 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
     return editor.document.getText(com.intellij.openapi.util.TextRange(range.startOffset, range.endOffset))
   }
 
-  override fun lineLength(line: Int): Int {
-    return EditorHelper.getLineLength(editor, line)
-  }
-
   override fun getSelectionModel(): VimSelectionModel {
     return object : VimSelectionModel {
       private val sm = editor.selectionModel
@@ -310,11 +310,15 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
   }
 
   override fun getLineStartOffset(line: Int): Int {
-    return EditorHelper.getLineStartOffset(editor, line)
-  }
-
-  override fun getLineEndOffset(line: Int, allowEnd: Boolean): Int {
-    return EditorHelper.getLineEndOffset(editor, line, allowEnd)
+    return if (line < 0) {
+      StrictMode.fail("Incorrect line: $line")
+      0
+    } else if (line >= this.lineCount()) {
+      StrictMode.fail("Incorrect line: $line")
+      editor.fileSize
+    } else {
+      editor.document.getLineStartOffset(line)
+    }
   }
 
   override fun getLineEndOffset(line: Int): Int {

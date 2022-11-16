@@ -13,6 +13,8 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimLogicalPosition
 import com.maddyhome.idea.vim.api.VimMotionGroupBase
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.lineLength
+import com.maddyhome.idea.vim.api.normalizeOffset
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.helper.inBlockSubMode
@@ -69,7 +71,7 @@ object VisualOperation {
       SelectionType.LINE_WISE -> injector.motion.moveCaretToLineWithSameColumn(editor, endLine, caret)
       SelectionType.CHARACTER_WISE -> when {
         lines > 1 -> injector.motion.moveCaretToLineStart(editor, endLine) + min(editor.lineLength(endLine), chars)
-        else -> injector.engineEditorHelper.normalizeOffset(editor, sp.line, caret.offset.point + chars - 1, true)
+        else -> editor.normalizeOffset(sp.line, caret.offset.point + chars - 1, true)
       }
       SelectionType.BLOCK_WISE -> {
         val endColumn = min(editor.lineLength(endLine), sp.column + chars - 1)

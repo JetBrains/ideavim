@@ -104,7 +104,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
         operatorArguments
       )
       val pos = caret.offset.point
-      val norm = injector.engineEditorHelper.normalizeOffset(editor, caret.getLogicalPosition().line, pos, isChange)
+      val norm = editor.normalizeOffset(caret.getLogicalPosition().line, pos, isChange)
       if (norm != pos ||
         editor.offsetToVisualPosition(norm) !==
         injector.engineEditorHelper.inlayAwareOffsetToVisualPosition(editor, norm)
@@ -114,8 +114,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       // Always move the caret. Our position might or might not have changed, but an inlay might have been moved to our
       // location, or deleting the character(s) might have caused us to scroll sideways in long files. Moving the caret
       // will make sure it's in the right place, and visible
-      val offset = injector.engineEditorHelper.normalizeOffset(
-        editor,
+      val offset = editor.normalizeOffset(
         caret.getLogicalPosition().line,
         caret.offset.point,
         isChange
@@ -270,7 +269,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
         for (i in 0 until repeatLines) {
           if (repeatAppend &&
             (repeatColumn < VimMotionGroupBase.LAST_COLUMN) &&
-            (injector.engineEditorHelper.getVisualLineLength(editor, visualLine + i) < repeatColumn)
+            (editor.getVisualLineLength(visualLine + i) < repeatColumn)
           ) {
             val pad = injector.engineEditorHelper.pad(editor, context, logicalLine + i, repeatColumn)
             if (pad.isNotEmpty()) {
@@ -282,7 +281,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
           if (repeatColumn >= VimMotionGroupBase.LAST_COLUMN) {
             caret.moveToOffset(injector.motion.moveCaretToLineEnd(editor, logicalLine + i, true))
             repeatInsertText(editor, context, updatedCount, operatorArguments)
-          } else if (injector.engineEditorHelper.getVisualLineLength(editor, visualLine + i) >= repeatColumn) {
+          } else if (editor.getVisualLineLength(visualLine + i) >= repeatColumn) {
             val visualPosition = VimVisualPosition(visualLine + i, repeatColumn, false)
             val inlaysCount = injector.engineEditorHelper.amountOfInlaysBeforeVisualPosition(editor, visualPosition)
             caret.moveToVisualPosition(VimVisualPosition(visualLine + i, repeatColumn + inlaysCount, false))

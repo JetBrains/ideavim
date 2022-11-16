@@ -310,7 +310,7 @@ public class FileGroup extends VimFileBase {
       }
 
       int lline = editor.getCaretModel().getLogicalPosition().line;
-      int total = EditorHelper.getLineCount(editor);
+      int total = new IjVimEditor(editor).lineCount();
 
       msg.append("; Line ").append(lline + 1).append(" of ").append(total);
 
@@ -355,7 +355,7 @@ public class FileGroup extends VimFileBase {
         word = cp.getCount();
       }
 
-      int total = EditorHelper.getLineCount(editor);
+      int total = new IjVimEditor(editor).lineCount();
 
       msg.append(lines).append(" of ").append(total).append(" Lines");
 
@@ -407,7 +407,7 @@ public class FileGroup extends VimFileBase {
     }
 
     int lline = editor.getCaretModel().getLogicalPosition().line;
-    int total = EditorHelper.getLineCount(editor);
+    int total = new IjVimEditor(editor).lineCount();
     int pct = (int)((float)lline / (float)total * 100f + 0.5);
 
     msg.append("line ").append(lline + 1).append(" of ").append(total);

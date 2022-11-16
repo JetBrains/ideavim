@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.group.visual
 
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimLogicalPosition
+import com.maddyhome.idea.vim.api.getLineEndOffset
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.command.SelectionType.BLOCK_WISE
 import com.maddyhome.idea.vim.command.SelectionType.CHARACTER_WISE

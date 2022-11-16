@@ -191,7 +191,6 @@ interface VimEditor {
   fun getText(range: TextRange): String
 
   fun getLineText(line: Int): String
-  fun lineLength(line: Int): Int
 
   fun getSelectionModel(): VimSelectionModel
 
@@ -200,7 +199,6 @@ interface VimEditor {
   fun vimSetSystemBlockSelectionSilently(start: VimLogicalPosition, end: VimLogicalPosition)
 
   fun getLineStartOffset(line: Int): Int
-  fun getLineEndOffset(line: Int, allowEnd: Boolean): Int
   fun getLineEndOffset(line: Int): Int
   fun getLineEndForOffset(offset: Int): Int
 

@@ -21,6 +21,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.getLineEndOffset
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
@@ -41,12 +42,12 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setOperatorFunction
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler
-import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.PsiHelper
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
+import com.maddyhome.idea.vim.newapi.vim
 import java.util.*
 
 class CommentaryExtension : VimExtension {
@@ -207,8 +208,8 @@ class CommentaryExtension : VimExtension {
       while (endLine < lastLine && isCommentLine(file, nativeEditor, endLine + 1)) endLine++
 
       if (startLine <= endLine) {
-        val startOffset = EditorHelper.getLineStartOffset(nativeEditor, startLine)
-        val endOffset = EditorHelper.getLineStartOffset(nativeEditor, endLine + 1)
+        val startOffset = editor.getLineStartOffset(startLine)
+        val endOffset = editor.getLineStartOffset(endLine + 1)
         return TextRange(startOffset, endOffset)
       }
 
@@ -217,8 +218,8 @@ class CommentaryExtension : VimExtension {
 
     // Check all leaf nodes in the given line are whitespace, comments, or are owned by comments
     private fun isCommentLine(file: PsiFile, editor: Editor, logicalLine: Int): Boolean {
-      val startOffset = EditorHelper.getLineStartOffset(editor, logicalLine)
-      val endOffset = EditorHelper.getLineEndOffset(editor, logicalLine, true)
+      val startOffset = editor.vim.getLineStartOffset(logicalLine)
+      val endOffset = editor.vim.getLineEndOffset(logicalLine, true)
       val startElement = file.findElementAt(startOffset) ?: return false
       var next: PsiElement? = startElement
       while (next != null && next.textRange.startOffset <= endOffset) {

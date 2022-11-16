@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.action.motion.scroll
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.visualLineToLogicalLine
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
@@ -34,7 +35,7 @@ class MotionScrollFirstScreenLinePageStartAction : VimActionHandler.SingleExecut
         editor,
         injector.engineEditorHelper.getVisualLineAtBottomOfScreen(editor) + 1
       )
-      rawCount = injector.engineEditorHelper.visualLineToLogicalLine(editor, nextVisualLine) + 1 // rawCount is 1 based
+      rawCount = editor.visualLineToLogicalLine(nextVisualLine) + 1 // rawCount is 1 based
     }
     return injector.motion.scrollCurrentLineToDisplayTop(editor, rawCount, true)
   }

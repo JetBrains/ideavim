@@ -13,6 +13,7 @@ import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimLogicalPosition
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.lineLength
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.command.VimStateMachine
@@ -278,7 +279,7 @@ abstract class VimPutBase : VimPut {
       if (segment.length < maxLen) {
         segment += " ".repeat(maxLen - segment.length)
 
-        if (currentColumn != 0 && currentColumn < injector.engineEditorHelper.getLineLength(editor, currentLine)) {
+        if (currentColumn != 0 && currentColumn < editor.lineLength(currentLine)) {
           origSegment = segment
         }
       }

@@ -678,7 +678,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
         return false;
       }
       line1 = line2;
-      line2 = EditorHelper.normalizeLine(((IjVimEditor) editor).getEditor(), line1 + i - 1);
+      line2 = EngineEditorHelperKt.normalizeLine(editor, line1 + i - 1);
     }
 
     /*
@@ -748,7 +748,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
     int searchcol = 0;
     boolean firstMatch = true;
     boolean got_quit = false;
-    int lcount = EditorHelper.getLineCount(((IjVimEditor) editor).getEditor());
+    int lcount = editor.lineCount();
     Expression expression = null;
     for (int lnum = line1; lnum <= line2 && !got_quit; ) {
       CharacterPosition newpos = null;
@@ -1281,7 +1281,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
 
     if (offsetIsLineOffset) {
       int line = editor.offsetToLogicalPosition(range.getStartOffset()).line;
-      int newLine = EditorHelper.normalizeLine(editor, line + offset);
+      int newLine = EngineEditorHelperKt.normalizeLine(new IjVimEditor(editor), line + offset);
 
       // TODO: Don't move the caret!
       res = VimPlugin.getMotion().moveCaretToLineStart(new IjVimEditor(editor), newLine);

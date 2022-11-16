@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.mark
 
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.getLineEndOffset
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.common.TextRange
@@ -78,8 +79,8 @@ abstract class VimMarkGroupBase : VimMarkGroup {
           // Regarding the commented out condition in if: This additional condition was here before moving to kotlin
           // But now it's highlighted as "always true", so I commented it out for case of it's a bug
 
-          val markLineStartOff = injector.engineEditorHelper.getLineStartOffset(editor, myMark.logicalLine)
-          val markLineEndOff = injector.engineEditorHelper.getLineEndOffset(editor, myMark.logicalLine, true)
+          val markLineStartOff = editor.getLineStartOffset(myMark.logicalLine)
+          val markLineEndOff = editor.getLineEndOffset(myMark.logicalLine, true)
 
           val command = editor.vimStateMachine.executingCommand
           // If text is being changed from the start of the mark line (a special case for mark deletion)
