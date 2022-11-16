@@ -861,7 +861,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
     if (!got_quit) {
       if (lastMatch != -1) {
         injector.getMotion().moveCaret(editor, caret,
-          VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, editor.offsetToLogicalPosition(lastMatch).getLine()));
+          VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, editor.offsetToBufferPosition(lastMatch).getLine()));
       }
       else {
         VimPlugin.showMessage(MessageHelper.message(Msg.e_patnotf2, pattern));

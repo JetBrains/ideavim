@@ -53,8 +53,8 @@ abstract class VimPutBase : VimPut {
   protected fun collectPreModificationData(editor: VimEditor, data: PutData): Map<String, Any> {
     return if (data.visualSelection != null && data.visualSelection.typeInEditor.isBlock) {
       val vimSelection = data.visualSelection.caretsAndSelections.getValue(editor.primaryCaret())
-      val selStart = editor.offsetToLogicalPosition(vimSelection.vimStart)
-      val selEnd = editor.offsetToLogicalPosition(vimSelection.vimEnd)
+      val selStart = editor.offsetToBufferPosition(vimSelection.vimStart)
+      val selEnd = editor.offsetToBufferPosition(vimSelection.vimEnd)
       mapOf(
         "startColumnOfSelection" to min(selStart.column, selEnd.column),
         "selectedLines" to abs(selStart.line - selEnd.line),
@@ -257,7 +257,7 @@ abstract class VimPutBase : VimPut {
     indent: Boolean,
     cursorAfter: Boolean,
   ): Int {
-    val startPosition = editor.offsetToLogicalPosition(startOffset)
+    val startPosition = editor.offsetToBufferPosition(startOffset)
     val currentColumn = if (mode == VimStateMachine.SubMode.VISUAL_LINE) 0 else startPosition.column
     var currentLine = startPosition.line
 
@@ -287,7 +287,7 @@ abstract class VimPutBase : VimPut {
 
       val pad = injector.engineEditorHelper.pad(editor, context, currentLine, currentColumn)
 
-      val insertOffset = editor.logicalPositionToOffset(BufferPosition(currentLine, currentColumn))
+      val insertOffset = editor.bufferPositionToOffset(BufferPosition(currentLine, currentColumn))
       caret.moveToOffset(insertOffset)
       val insertedText = origSegment + segment.repeat(count - 1)
       injector.changeGroup.insertText(editor, caret, insertedText)

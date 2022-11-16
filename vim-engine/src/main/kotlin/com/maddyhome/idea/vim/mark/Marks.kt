@@ -22,7 +22,7 @@ interface Mark {
   fun isClear(): Boolean
   fun clear()
 
-  fun offset(editor: VimEditor): Int = editor.logicalPositionToOffset(BufferPosition(logicalLine, col))
+  fun offset(editor: VimEditor): Int = editor.bufferPositionToOffset(BufferPosition(logicalLine, col))
 
   object KeySorter : Comparator<Mark> {
     @NonNls

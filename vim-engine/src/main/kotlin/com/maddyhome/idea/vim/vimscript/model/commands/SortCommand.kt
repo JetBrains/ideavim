@@ -73,8 +73,8 @@ data class SortCommand(val ranges: Ranges, val argument: String) : Command.Singl
         val start = selectionModel.selectionStart
         val end = selectionModel.selectionEnd
 
-        val startLine = editor.offsetToLogicalPosition(start).line
-        val endLine = editor.offsetToLogicalPosition(end).line
+        val startLine = editor.offsetToBufferPosition(start).line
+        val endLine = editor.offsetToBufferPosition(end).line
 
         LineRange(startLine, endLine)
       } else {

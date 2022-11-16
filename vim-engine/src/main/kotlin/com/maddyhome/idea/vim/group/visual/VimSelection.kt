@@ -62,8 +62,8 @@ sealed class VimSelection {
 
   @NonNls
   override fun toString(): String {
-    val startLogPosition = editor.offsetToLogicalPosition(vimStart)
-    val endLogPosition = editor.offsetToLogicalPosition(vimEnd)
+    val startLogPosition = editor.offsetToBufferPosition(vimStart)
+    val endLogPosition = editor.offsetToBufferPosition(vimEnd)
     return "Selection [$type]: vim start[offset: $vimStart : col ${startLogPosition.column} line ${startLogPosition.line}]" +
       " vim end[offset: $vimEnd : col ${endLogPosition.column} line ${endLogPosition.line}]"
   }
@@ -154,7 +154,7 @@ class VimBlockSelection(
   private val toLineEnd: Boolean,
 ) : VimSelection() {
   override fun getNativeStartAndEnd() = blockToNativeSelection(editor, vimStart, vimEnd, VimStateMachine.Mode.VISUAL).let {
-    editor.logicalPositionToOffset(it.first) to editor.logicalPositionToOffset(it.second)
+    editor.bufferPositionToOffset(it.first) to editor.bufferPositionToOffset(it.second)
   }
 
   override val type = BLOCK_WISE
@@ -174,11 +174,11 @@ class VimBlockSelection(
     val lineRange =
       if (logicalStart.line > logicalEnd.line) logicalEnd.line..logicalStart.line else logicalStart.line..logicalEnd.line
     lineRange.map { line ->
-      val start = editor.logicalPositionToOffset(BufferPosition(line, logicalStart.column))
+      val start = editor.bufferPositionToOffset(BufferPosition(line, logicalStart.column))
       val end = if (toLineEnd) {
         editor.getLineEndOffset(line, true)
       } else {
-        editor.logicalPositionToOffset(BufferPosition(line, logicalEnd.column))
+        editor.bufferPositionToOffset(BufferPosition(line, logicalEnd.column))
       }
       action(start, end)
     }

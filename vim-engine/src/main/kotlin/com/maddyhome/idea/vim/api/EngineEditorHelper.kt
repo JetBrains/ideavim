@@ -86,7 +86,7 @@ fun VimEditor.lineLength(logicalLine: Int): Int {
     return if (lineCount() == 0) {
         0
     } else {
-        offsetToLogicalPosition(getLineEndOffset(logicalLine)).column.coerceAtLeast(0)
+        offsetToBufferPosition(getLineEndOffset(logicalLine)).column.coerceAtLeast(0)
     }
 }
 
@@ -98,7 +98,7 @@ fun VimEditor.lineLength(logicalLine: Int): Int {
  * @return The logical line number
  */
 fun VimEditor.visualLineToLogicalLine(line: Int): Int {
-    val logicalLine: Int = visualToLogicalPosition(VimVisualPosition(line, 0)).line
+    val logicalLine: Int = visualPositionToBufferPosition(VimVisualPosition(line, 0)).line
     return normalizeLine(logicalLine)
 }
 
@@ -175,7 +175,7 @@ fun VimEditor.normalizeOffset(offset: Int, allowEnd: Boolean = true): Int {
   if (offset > textLength) {
     offset = textLength
   }
-  val line: Int = offsetToLogicalPosition(offset).line
+  val line: Int = offsetToBufferPosition(offset).line
   return normalizeOffset(line, offset, allowEnd)
 }
 
@@ -200,11 +200,11 @@ fun VimEditor.normalizeVisualLine(line: Int): Int {
  */
 fun VimEditor.getVisualLineCount(): Int {
   val count = lineCount()
-  return if (count == 0) 0 else this.logicalLineToVisualLine(count - 1) + 1
+  return if (count == 0) 0 else this.bufferLineToVisualLine(count - 1) + 1
 }
 
 fun VimEditor.getLineStartForOffset(offset: Int): Int {
-  val pos = offsetToLogicalPosition(normalizeOffset(offset, true))
+  val pos = offsetToBufferPosition(normalizeOffset(offset, true))
   return getLineStartOffset(pos.line)
 }
 
@@ -216,7 +216,7 @@ fun VimEditor.getLineStartForOffset(offset: Int): Int {
  * @return The offset of the line end
  */
 fun VimEditor.getLineEndForOffset(offset: Int): Int {
-  val pos = offsetToLogicalPosition(normalizeOffset(offset, true))
+  val pos = offsetToBufferPosition(normalizeOffset(offset, true))
   return getLineEndOffset(pos.line)
 }
 
@@ -264,7 +264,7 @@ fun VimEditor.getText(range: TextRange): String {
 }
 
 fun VimEditor.getOffset(line: Int, column: Int): Int {
-  return logicalPositionToOffset(BufferPosition(line, column))
+  return bufferPositionToOffset(BufferPosition(line, column))
 }
 fun VimEditor.getLineBuffer(line: Int): CharBuffer {
   val start: Int = getLineStartOffset(line)

@@ -656,7 +656,7 @@ public class MotionGroup extends VimMotionGroupBase {
     final int line = mark.getLogicalLine();
     return toLineStart
            ? moveCaretToLineStartSkipLeading(editor, line)
-           : editor.logicalPositionToOffset(new BufferPosition(line, mark.getCol(), false));
+           : editor.bufferPositionToOffset(new BufferPosition(line, mark.getCol(), false));
   }
 
   @Override
@@ -671,7 +671,7 @@ public class MotionGroup extends VimMotionGroupBase {
     if (vf.getPath().equals(mark.getFilename())) {
       return toLineStart
              ? moveCaretToLineStartSkipLeading(editor, line)
-             : editor.logicalPositionToOffset(new BufferPosition(line, mark.getCol(), false));
+             : editor.bufferPositionToOffset(new BufferPosition(line, mark.getCol(), false));
     }
 
     final Editor selectedEditor = selectEditor(((IjVimEditor)editor).getEditor(), mark);
@@ -726,7 +726,7 @@ public class MotionGroup extends VimMotionGroupBase {
         VimPlugin.getMark().addJump(editor, false);
       }
 
-      return editor.logicalPositionToOffset(lp);
+      return editor.bufferPositionToOffset(lp);
     }
   }
 
@@ -742,7 +742,7 @@ public class MotionGroup extends VimMotionGroupBase {
   public Motion moveCaretToColumn(@NotNull VimEditor editor, @NotNull VimCaret caret, int count, boolean allowEnd) {
     final int line = caret.getLine().getLine();
     final int column = EngineEditorHelperKt.normalizeColumn(editor, line, count, allowEnd);
-    final int offset = editor.logicalPositionToOffset(new BufferPosition(line, column, false));
+    final int offset = editor.bufferPositionToOffset(new BufferPosition(line, column, false));
     if (column != count) {
       return new Motion.AdjustedOffset(offset, count);
     }
@@ -956,7 +956,7 @@ public class MotionGroup extends VimMotionGroupBase {
     }
     else {
       final int line = EngineEditorHelperKt.normalizeLine(new IjVimEditor(editor), rawCount - 1);
-      visualLine = new IjVimEditor(editor).logicalLineToVisualLine(line);
+      visualLine = new IjVimEditor(editor).bufferLineToVisualLine(line);
     }
 
     // This method moves the current (or [count]) line to the specified screen location

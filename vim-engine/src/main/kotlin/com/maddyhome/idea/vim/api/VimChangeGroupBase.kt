@@ -204,7 +204,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
   }
 
   open fun insertText(editor: VimEditor, caret: VimCaret, start: BufferPosition, str: String) {
-    insertText(editor, caret, editor.logicalPositionToOffset(start), str)
+    insertText(editor, caret, editor.bufferPositionToOffset(start), str)
   }
 
   /**
@@ -265,7 +265,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       if (repeatLines > 0) {
         val visualLine = caret.getVisualPosition().line
         val logicalLine = caret.getLogicalPosition().line
-        val position = editor.logicalPositionToOffset(BufferPosition(logicalLine, repeatColumn, false))
+        val position = editor.bufferPositionToOffset(BufferPosition(logicalLine, repeatColumn, false))
         for (i in 0 until repeatLines) {
           if (repeatAppend &&
             (repeatColumn < VimMotionGroupBase.LAST_COLUMN) &&
@@ -804,8 +804,8 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     spaces: Boolean,
     operatorArguments: OperatorArguments
   ): Boolean {
-    val startLine = editor.offsetToLogicalPosition(range.startOffset).line
-    val endLine = editor.offsetToLogicalPosition(range.endOffset).line
+    val startLine = editor.offsetToBufferPosition(range.startOffset).line
+    val endLine = editor.offsetToBufferPosition(range.endOffset).line
     var count = endLine - startLine + 1
     if (count < 2) count = 2
     return deleteJoinNLines(editor, caret, startLine, count, spaces, operatorArguments)
@@ -858,8 +858,8 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     }
     val motion = argument.motion
     if (!isChange && !motion.isLinewiseMotion()) {
-      val start = editor.offsetToLogicalPosition(range.startOffset)
-      val end = editor.offsetToLogicalPosition(range.endOffset)
+      val start = editor.offsetToBufferPosition(range.startOffset)
+      val end = editor.offsetToBufferPosition(range.endOffset)
       if (start.line != end.line) {
         if (!editor.anyNonWhitespace(range.startOffset, -1) && !editor.anyNonWhitespace(range.endOffset, 1)) {
           type = SelectionType.LINE_WISE
@@ -905,7 +905,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
         caret.vimLastColumn = intendedColumn
         pos = injector.motion
           .moveCaretToLineWithStartOfLineOption(
-            editor, editor.offsetToLogicalPosition(pos).line,
+            editor, editor.offsetToBufferPosition(pos).line,
             caret
           )
       }
@@ -1058,8 +1058,8 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     fun getLinesCountInVisualBlock(editor: VimEditor, range: TextRange): Int {
       val startOffsets = range.startOffsets
       if (startOffsets.isEmpty()) return 0
-      val firstStart = editor.offsetToLogicalPosition(startOffsets[0])
-      val lastStart = editor.offsetToLogicalPosition(startOffsets[range.size() - 1])
+      val firstStart = editor.offsetToBufferPosition(startOffsets[0])
+      val lastStart = editor.offsetToBufferPosition(startOffsets[range.size() - 1])
       return lastStart.line - firstStart.line + 1
     }
   }

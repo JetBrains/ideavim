@@ -163,10 +163,10 @@ open class YankGroupBase : VimYankGroup {
 
     if (type == SelectionType.LINE_WISE) {
       for (i in 0 until range.size()) {
-        if (editor.offsetToLogicalPosition(range.startOffsets[i]).column != 0) {
+        if (editor.offsetToBufferPosition(range.startOffsets[i]).column != 0) {
           range.startOffsets[i] = editor.getLineStartForOffset(range.startOffsets[i])
         }
-        if (editor.offsetToLogicalPosition(range.endOffsets[i]).column != 0) {
+        if (editor.offsetToBufferPosition(range.endOffsets[i]).column != 0) {
           range.endOffsets[i] =
             (editor.getLineEndForOffset(range.endOffsets[i]) + 1).coerceAtMost(editor.fileSize().toInt())
         }

@@ -66,7 +66,7 @@ private fun changeCharacter(editor: VimEditor, caret: VimCaret, count: Int, ch: 
   var space: String? = null
   if (ch == '\n') {
     num = 1
-    space = editor.getLeadingWhitespace(editor.offsetToLogicalPosition(offset).line)
+    space = editor.getLeadingWhitespace(editor.offsetToBufferPosition(offset).line)
     logger.debug { "space='$space'" }
   }
   val repl = StringBuilder(count)

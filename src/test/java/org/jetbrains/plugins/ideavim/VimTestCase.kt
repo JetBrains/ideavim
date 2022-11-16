@@ -390,7 +390,7 @@ abstract class VimTestCase : UsefulTestCase() {
   }
 
   fun assertVisibleLineBounds(logicalLine: Int, leftLogicalColumn: Int, rightLogicalColumn: Int) {
-    val visualLine = IjVimEditor(myFixture.editor).logicalLineToVisualLine(logicalLine)
+    val visualLine = IjVimEditor(myFixture.editor).bufferLineToVisualLine(logicalLine)
     val actualLeftVisualColumn = EditorHelper.getVisualColumnAtLeftOfDisplay(myFixture.editor, visualLine)
     val actualLeftLogicalColumn =
       myFixture.editor.visualToLogicalPosition(VisualPosition(visualLine, actualLeftVisualColumn)).column

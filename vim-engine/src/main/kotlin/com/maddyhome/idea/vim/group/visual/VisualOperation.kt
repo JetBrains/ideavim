@@ -34,8 +34,8 @@ object VisualOperation {
 
     start = editor.normalizeOffset(start, false)
     end = editor.normalizeOffset(end, false)
-    val sp = editor.offsetToLogicalPosition(start)
-    val ep = editor.offsetToLogicalPosition(end)
+    val sp = editor.offsetToBufferPosition(start)
+    val ep = editor.offsetToBufferPosition(end)
     var lines = ep.line - sp.line + 1
     if (type == SelectionType.LINE_WISE && ep.column == 0 && lines > 0) lines--
 
@@ -75,7 +75,7 @@ object VisualOperation {
       }
       SelectionType.BLOCK_WISE -> {
         val endColumn = min(editor.lineLength(endLine), sp.column + chars - 1)
-        editor.logicalPositionToOffset(BufferPosition(endLine, endColumn))
+        editor.bufferPositionToOffset(BufferPosition(endLine, endColumn))
       }
     }
   }

@@ -80,8 +80,8 @@ data class CmdFilterCommand(val ranges: Ranges, val argument: String) : Command.
         val input = editor.ij.document.charsSequence.subSequence(range.startOffset, range.endOffset)
         VimPlugin.getProcess().executeCommand(editor, command, input, workingDirectory)?.let {
           ApplicationManager.getApplication().runWriteAction {
-            val start = editor.offsetToLogicalPosition(range.startOffset)
-            val end = editor.offsetToLogicalPosition(range.endOffset)
+            val start = editor.offsetToBufferPosition(range.startOffset)
+            val end = editor.offsetToBufferPosition(range.endOffset)
             editor.ij.document.replaceString(range.startOffset, range.endOffset, it)
             val linesFiltered = end.line - start.line
             if (linesFiltered > 2) {
