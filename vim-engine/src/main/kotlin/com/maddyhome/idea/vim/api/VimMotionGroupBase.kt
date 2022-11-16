@@ -188,8 +188,8 @@ abstract class VimMotionGroupBase : VimMotionGroup {
   }
 
   override fun moveCaretToCurrentLineStart(editor: VimEditor, caret: VimCaret): Int {
-    val logicalLine = caret.getLine().line
-    return moveCaretToLineStart(editor, logicalLine)
+    val line = caret.getLine().line
+    return moveCaretToLineStart(editor, line)
   }
 
   override fun moveCaretToRelativeLineEnd(
@@ -255,8 +255,8 @@ abstract class VimMotionGroupBase : VimMotionGroup {
   }
 
   override fun moveCaretToCurrentLineStartSkipLeading(editor: VimEditor, caret: VimCaret): Int {
-    val logicalLine = caret.getLine().line
-    return moveCaretToLineStartSkipLeading(editor, logicalLine)
+    val line = caret.getLine().line
+    return moveCaretToLineStartSkipLeading(editor, line)
   }
 
   override fun getMotionRange(

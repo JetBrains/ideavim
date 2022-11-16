@@ -122,11 +122,11 @@ abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
       // Detect if visual mode is character wise or line wise
       val selectionStart = caret.selectionStart
       val selectionEnd = caret.selectionEnd
-      val logicalStartLine = editor.offsetToBufferPosition(selectionStart).line
-      val logicalEnd = editor.offsetToBufferPosition(selectionEnd)
-      val logicalEndLine = if (logicalEnd.column == 0) (logicalEnd.line - 1).coerceAtLeast(0) else logicalEnd.line
-      val lineStartOfSelectionStart = editor.getLineStartOffset(logicalStartLine)
-      val lineEndOfSelectionEnd = editor.getLineEndOffset(logicalEndLine, true)
+      val startLine = editor.offsetToBufferPosition(selectionStart).line
+      val endPosition = editor.offsetToBufferPosition(selectionEnd)
+      val endLine = if (endPosition.column == 0) (endPosition.line - 1).coerceAtLeast(0) else endPosition.line
+      val lineStartOfSelectionStart = editor.getLineStartOffset(startLine)
+      val lineEndOfSelectionEnd = editor.getLineEndOffset(endLine, true)
       lineStartOfSelectionStart == selectionStart && (lineEndOfSelectionEnd + 1 == selectionEnd || lineEndOfSelectionEnd == selectionEnd)
     }
     if (all) return VimStateMachine.SubMode.VISUAL_LINE
