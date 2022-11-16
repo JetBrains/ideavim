@@ -202,9 +202,9 @@ class CommentaryExtension : VimExtension {
       val file = PsiHelper.getFile(nativeEditor) ?: return null
       val lastLine = editor.lineCount()
 
-      var startLine = caret.getLogicalPosition().line
+      var startLine = caret.getBufferPosition().line
       while (startLine > 0 && isCommentLine(file, nativeEditor, startLine - 1)) startLine--
-      var endLine = caret.getLogicalPosition().line - 1
+      var endLine = caret.getBufferPosition().line - 1
       while (endLine < lastLine && isCommentLine(file, nativeEditor, endLine + 1)) endLine++
 
       if (startLine <= endLine) {

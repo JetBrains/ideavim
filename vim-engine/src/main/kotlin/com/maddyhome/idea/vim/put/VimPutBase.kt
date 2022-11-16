@@ -94,7 +94,7 @@ abstract class VimPutBase : VimPut {
   protected fun deleteSelectedText(editor: VimEditor, data: PutData, operatorArguments: OperatorArguments) {
     if (data.visualSelection == null) return
 
-    data.visualSelection.caretsAndSelections.entries.sortedByDescending { it.key.getLogicalPosition() }
+    data.visualSelection.caretsAndSelections.entries.sortedByDescending { it.key.getBufferPosition() }
       .forEach { (caret, selection) ->
         if (!caret.isValid) return@forEach
         val range = selection.toVimTextRange(false).normalize()

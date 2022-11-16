@@ -53,9 +53,9 @@ private val logger = vimLogger<ChangeCharacterAction>()
  * @return true if able to change count characters, false if not
  */
 private fun changeCharacter(editor: VimEditor, caret: VimCaret, count: Int, ch: Char): Boolean {
-  val col = caret.getLogicalPosition().column
+  val col = caret.getBufferPosition().column
   // TODO: Is this correct? Should we really use only current caret? We have a caret as an argument
-  val len = editor.lineLength(editor.currentCaret().getLogicalPosition().line)
+  val len = editor.lineLength(editor.currentCaret().getBufferPosition().line)
   val offset = caret.offset.point
   if (len - col < count) {
     return false

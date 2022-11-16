@@ -141,7 +141,7 @@ class LineNumberRange : Range {
    */
   override fun getRangeLine(editor: VimEditor, lastZero: Boolean): Int {
     if (line == CURRENT_LINE) {
-      line = editor.currentCaret().getLogicalPosition().line
+      line = editor.currentCaret().getBufferPosition().line
     } else if (line == LAST_LINE) {
       line = editor.lineCount() - 1
     }
@@ -153,7 +153,7 @@ class LineNumberRange : Range {
     caret: VimCaret,
     lastZero: Boolean,
   ): Int {
-    line = if (line == LAST_LINE) editor.lineCount() - 1 else caret.getLogicalPosition().line
+    line = if (line == LAST_LINE) editor.lineCount() - 1 else caret.getBufferPosition().line
     return line
   }
 
@@ -288,7 +288,7 @@ class SearchRange(pattern: String, offset: Int, move: Boolean) : Range(offset, m
     caret: VimCaret,
     lastZero: Boolean,
   ): Int {
-    var line = caret.getLogicalPosition().line
+    var line = caret.getBufferPosition().line
     var searchOffset = -1
     for (i in patterns.indices) {
       val pattern = patterns[i]

@@ -28,7 +28,7 @@ class ChangeLastSearchReplaceAction : ChangeEditorActionHandler.SingleExecution(
   ): Boolean {
     var result = true
     for (caret in editor.carets()) {
-      val line = caret.getLogicalPosition().line
+      val line = caret.getBufferPosition().line
       if (!injector.searchGroup
         .processSubstituteCommand(editor, caret, LineRange(line, line), "s", "//~/", Script(listOf()))
       ) {

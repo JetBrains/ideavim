@@ -42,7 +42,7 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) : FunctionH
     val isRangeGiven = (ranges?.size() ?: 0) > 0
 
     if (!isRangeGiven) {
-      val currentLine = editor.currentCaret().getLogicalPosition().line
+      val currentLine = editor.currentCaret().getBufferPosition().line
       ranges = Ranges()
       ranges!!.addRange(
         arrayOf(
@@ -74,7 +74,7 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) : FunctionH
   private fun executeBodyForLine(line: Int, isRangeGiven: Boolean, exceptionsCaught: MutableList<ExException>, editor: VimEditor, context: ExecutionContext): VimDataType? {
     var returnValue: VimDataType? = null
     if (isRangeGiven) {
-      editor.currentCaret().moveToLogicalPosition(BufferPosition(line - 1, 0))
+      editor.currentCaret().moveToBufferPosition(BufferPosition(line - 1, 0))
     }
     var result: ExecutionResult = ExecutionResult.Success
     if (function.flags.contains(FunctionFlag.ABORT)) {

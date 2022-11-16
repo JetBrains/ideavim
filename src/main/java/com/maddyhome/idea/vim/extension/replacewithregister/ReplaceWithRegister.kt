@@ -85,7 +85,7 @@ class ReplaceWithRegister : VimExtension {
     override fun execute(editor: VimEditor, context: ExecutionContext) {
       val caretsAndSelections = mutableMapOf<VimCaret, VimSelection>()
       editor.forEachCaret { caret ->
-        val logicalLine = caret.getLogicalPosition().line
+        val logicalLine = caret.getBufferPosition().line
         val lineStart = editor.getLineStartOffset(logicalLine)
         val lineEnd = editor.getLineEndOffset(logicalLine, true)
 

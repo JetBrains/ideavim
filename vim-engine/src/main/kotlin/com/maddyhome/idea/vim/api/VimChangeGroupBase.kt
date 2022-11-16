@@ -104,7 +104,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
         operatorArguments
       )
       val pos = caret.offset.point
-      val norm = editor.normalizeOffset(caret.getLogicalPosition().line, pos, isChange)
+      val norm = editor.normalizeOffset(caret.getBufferPosition().line, pos, isChange)
       if (norm != pos ||
         editor.offsetToVisualPosition(norm) !==
         injector.engineEditorHelper.inlayAwareOffsetToVisualPosition(editor, norm)
@@ -115,7 +115,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       // location, or deleting the character(s) might have caused us to scroll sideways in long files. Moving the caret
       // will make sure it's in the right place, and visible
       val offset = editor.normalizeOffset(
-        caret.getLogicalPosition().line,
+        caret.getBufferPosition().line,
         caret.offset.point,
         isChange
       )
@@ -264,7 +264,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     for (caret in editor.nativeCarets()) {
       if (repeatLines > 0) {
         val visualLine = caret.getVisualPosition().line
-        val logicalLine = caret.getLogicalPosition().line
+        val logicalLine = caret.getBufferPosition().line
         val position = editor.bufferPositionToOffset(BufferPosition(logicalLine, repeatColumn, false))
         for (i in 0 until repeatLines) {
           if (repeatAppend &&
@@ -687,7 +687,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
   ): Boolean {
     var myCount = count
     if (myCount < 2) myCount = 2
-    val lline = caret.getLogicalPosition().line
+    val lline = caret.getBufferPosition().line
     val total = editor.lineCount()
     return if (lline + myCount > total) {
       false
@@ -773,7 +773,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
   override fun joinViaIdeaByCount(editor: VimEditor, context: ExecutionContext, count: Int): Boolean {
     val executions = if (count > 1) count - 1 else 1
     val allowedExecution = editor.nativeCarets().any { caret: VimCaret ->
-      val lline = caret.getLogicalPosition().line
+      val lline = caret.getBufferPosition().line
       val total = editor.lineCount()
       lline + count <= total
     }
@@ -958,8 +958,8 @@ abstract class VimChangeGroupBase : VimChangeGroup {
   override fun changeCharacters(editor: VimEditor, caret: VimCaret, operatorArguments: OperatorArguments): Boolean {
     val count = operatorArguments.count1
     // TODO  is it correct to use primary caret? There is a caret as an argument
-    val len = editor.lineLength(editor.primaryCaret().getLogicalPosition().line)
-    val col = caret.getLogicalPosition().column
+    val len = editor.lineLength(editor.primaryCaret().getBufferPosition().line)
+    val col = caret.getBufferPosition().column
     if (col + count >= len) {
       return changeEndOfLine(editor, caret, 1, operatorArguments)
     }
@@ -1015,7 +1015,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       val offset: Int = if (spaces) {
         injector.motion.moveCaretToRelativeLineStartSkipLeading(editor, caret, 1)
       } else {
-        injector.motion.moveCaretToLineStart(editor, caret.getLogicalPosition().line + 1)
+        injector.motion.moveCaretToLineStart(editor, caret.getBufferPosition().line + 1)
       }
       deleteText(editor, TextRange(caret.offset.point, offset), null, caret, operatorArguments)
       if (spaces && !hasTrailingWhitespace) {

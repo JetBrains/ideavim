@@ -48,7 +48,7 @@ class InsertDeletePreviousWordAction : ChangeEditorActionHandler.ForEachCaret() 
  * @return true if able to delete text, false if not
  */
 fun insertDeletePreviousWord(editor: VimEditor, caret: VimCaret, operatorArguments: OperatorArguments): Boolean {
-  val deleteTo: Int = if (caret.getLogicalPosition().column == 0) {
+  val deleteTo: Int = if (caret.getBufferPosition().column == 0) {
     caret.offset.point - 1
   } else {
     var pointer = caret.offset.point - 1

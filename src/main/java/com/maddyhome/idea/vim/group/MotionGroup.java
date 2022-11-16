@@ -177,7 +177,7 @@ public class MotionGroup extends VimMotionGroupBase {
 
     final int oldColumn = editor.getCaretModel().getVisualPosition().column;
     int col = oldColumn;
-    if (col >= EngineEditorHelperKt.lineLength(new IjVimEditor(editor), new IjVimEditor(editor).currentCaret().getLogicalPosition().getLine()) - 1) {
+    if (col >= EngineEditorHelperKt.lineLength(new IjVimEditor(editor), new IjVimEditor(editor).currentCaret().getBufferPosition().getLine()) - 1) {
       col = UserDataManager.getVimLastColumn(editor.getCaretModel().getPrimaryCaret());
     }
 
@@ -733,7 +733,7 @@ public class MotionGroup extends VimMotionGroupBase {
   @Override
   public @NotNull Motion moveCaretToCurrentDisplayLineMiddle(@NotNull VimEditor editor, @NotNull VimCaret caret) {
     final int width = getApproximateScreenWidth(((IjVimEditor)editor).getEditor()) / 2;
-    final int len = EngineEditorHelperKt.lineLength(editor, editor.currentCaret().getLogicalPosition().getLine());
+    final int len = EngineEditorHelperKt.lineLength(editor, editor.currentCaret().getBufferPosition().getLine());
 
     return moveCaretToColumn(editor, caret, max(0, min(len - 1, width)), false);
   }

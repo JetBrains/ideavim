@@ -87,7 +87,7 @@ private fun insertNewLineAbove(editor: VimEditor, context: ExecutionContext) {
       offset = injector.motion.moveCaretToCurrentLineStartSkipLeading(editor, caret)
       firstLiners.add(caret)
     } else {
-      offset = injector.motion.moveCaretToLineEnd(editor, caret.getLogicalPosition().line - 1, true)
+      offset = injector.motion.moveCaretToLineEnd(editor, caret.getBufferPosition().line - 1, true)
     }
     moves.add(Pair(caret, offset))
   }
