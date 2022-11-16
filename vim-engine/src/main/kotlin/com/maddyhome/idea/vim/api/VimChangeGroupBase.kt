@@ -900,7 +900,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     }
 
     if (res) {
-      var pos = injector.engineEditorHelper.normalizeOffset(editor, range.startOffset, isChange)
+      var pos = editor.normalizeOffset(range.startOffset, isChange)
       if (type === SelectionType.LINE_WISE) {
         // Reset the saved intended column cache, which has been invalidated by the caret moving due to deleted text.
         // This value will be used to reposition the caret if 'startofline' is false

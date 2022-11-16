@@ -32,12 +32,12 @@ abstract class VimMotionGroupBase : VimMotionGroup {
 
   override fun getVerticalMotionOffset(editor: VimEditor, caret: VimCaret, count: Int): Motion {
     val pos = caret.getVisualPosition()
-    if ((pos.line == 0 && count < 0) || (pos.line >= injector.engineEditorHelper.getVisualLineCount(editor) - 1 && count > 0)) {
+    if ((pos.line == 0 && count < 0) || (pos.line >= editor.getVisualLineCount() - 1 && count > 0)) {
       return Motion.Error
     }
 
     val intendedColumn = caret.vimLastColumn
-    val line = injector.engineEditorHelper.normalizeVisualLine(editor, pos.line + count)
+    val line = editor.normalizeVisualLine(pos.line + count)
 
     if (intendedColumn == LAST_COLUMN) {
       val normalisedColumn = editor.normalizeVisualColumn(line, intendedColumn,
@@ -131,7 +131,7 @@ abstract class VimMotionGroupBase : VimMotionGroup {
     caret: VimCaret,
     linesOffset: Int,
   ): Int {
-    val line = injector.engineEditorHelper.normalizeVisualLine(editor, caret.getVisualPosition().line + linesOffset)
+    val line = editor.normalizeVisualLine(caret.getVisualPosition().line + linesOffset)
     return moveCaretToLineStartSkipLeading(editor, editor.visualLineToLogicalLine(line))
   }
 
@@ -198,7 +198,7 @@ abstract class VimMotionGroupBase : VimMotionGroup {
     cntForward: Int,
     allowPastEnd: Boolean,
   ): Int {
-    val line = injector.engineEditorHelper.normalizeVisualLine(editor, caret.getVisualPosition().line + cntForward)
+    val line = editor.normalizeVisualLine(caret.getVisualPosition().line + cntForward)
 
     return if (line < 0) 0 else {
       moveCaretToLineEnd(editor, editor.visualLineToLogicalLine(line), allowPastEnd)
@@ -207,7 +207,7 @@ abstract class VimMotionGroupBase : VimMotionGroup {
 
   override fun moveCaretToRelativeLineEndSkipTrailing(editor: VimEditor, caret: VimCaret, linesOffset: Int): Int {
     val line = editor.visualLineToLogicalLine(
-      injector.engineEditorHelper.normalizeVisualLine(editor, caret.getVisualPosition().line + linesOffset)
+      editor.normalizeVisualLine(caret.getVisualPosition().line + linesOffset)
     )
     val start = editor.getLineStartOffset(line)
     val end = editor.getLineEndOffset(line, true)

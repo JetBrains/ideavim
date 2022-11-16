@@ -17,7 +17,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.testFramework.LightVirtualFile;
 import com.maddyhome.idea.vim.api.EngineEditorHelperKt;
 import com.maddyhome.idea.vim.api.VimEditor;
-import com.maddyhome.idea.vim.api.VimInjectorKt;
 import com.maddyhome.idea.vim.common.IndentConfig;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
@@ -86,7 +85,8 @@ public class EditorHelper {
   }
 
   public static int getVisualLineAtBottomOfScreen(final @NotNull Editor editor) {
-    return normalizeVisualLine(editor, getNonNormalizedVisualLineAtBottomOfScreen(editor));
+    final int line = getNonNormalizedVisualLineAtBottomOfScreen(editor);
+    return EngineEditorHelperKt.normalizeVisualLine(new IjVimEditor(editor), line);
   }
 
   /**
@@ -101,25 +101,12 @@ public class EditorHelper {
   }
 
   /**
-   * Gets the number of visible lines in the editor. This will less then the actual number of lines in the file
-   * if there are any collapsed folds.
-   *
-   * @param editor The editor
-   * @return The number of visible lines in the file
-   */
-  public static int getVisualLineCount(final @NotNull VimEditor editor) {
-    int count = editor.lineCount();
-    return count == 0
-           ? 0
-           : VimInjectorKt.getInjector().getEngineEditorHelper().logicalLineToVisualLine(editor, count - 1) + 1;
-  }
-
-  /**
    * COMPATIBILITY-LAYER: Created a function
    * Please see: <a href="https://jb.gg/zo8n0r">doc</a>
    */
   public static int getVisualLineCount(final @NotNull Editor editor) {
-    return getVisualLineCount(new IjVimEditor(editor));
+    @NotNull final VimEditor editor1 = new IjVimEditor(editor);
+    return EngineEditorHelperKt.getVisualLineCount(editor1);
   }
 
   /**
@@ -260,34 +247,6 @@ public class EditorHelper {
     }
   }
 
-  /**
-   * Ensures that the supplied visual line is within the range 0 (incl) and the number of visual lines in the file
-   * (excl).
-   *
-   * @param editor The editor
-   * @param line   The visual line number to normalize
-   * @return The normalized visual line number
-   */
-  public static int normalizeVisualLine(final @NotNull Editor editor, final int line) {
-    return Math.max(0, Math.min(line, getVisualLineCount(new IjVimEditor(editor)) - 1));
-  }
-
-  public static int normalizeOffset(final @NotNull Editor editor, final int offset) {
-    return normalizeOffset(editor, offset, true);
-  }
-
-  public static int normalizeOffset(final @NotNull Editor editor, int offset, final boolean allowEnd) {
-    if (offset <= 0) {
-      offset = 0;
-    }
-    final int textLength = editor.getDocument().getTextLength();
-    if (offset > textLength) {
-      offset = textLength;
-    }
-    final int line = editor.offsetToLogicalPosition(offset).line;
-    return EngineEditorHelperKt.normalizeOffset(new IjVimEditor(editor), line, offset, allowEnd);
-  }
-
   public static @NotNull String getLeadingWhitespace(final @NotNull Editor editor, final int line) {
     int start = new IjVimEditor(editor).getLineStartOffset(line);
     int end = EngineEditorHelperKt.getLeadingCharacterOffset(new IjVimEditor(editor), line, 0);
@@ -329,7 +288,8 @@ public class EditorHelper {
   public static @NotNull String getText(final @NotNull Editor editor, final int start, final int end) {
     if (start == end) return "";
     final CharSequence documentChars = editor.getDocument().getCharsSequence();
-    return documentChars.subSequence(normalizeOffset(editor, start), normalizeOffset(editor, end)).toString();
+    return documentChars.subSequence(EngineEditorHelperKt.normalizeOffset(new IjVimEditor(editor), start, true),
+                                     EngineEditorHelperKt.normalizeOffset(new IjVimEditor(editor), end, true)).toString();
   }
 
   public static @NotNull String getText(final @NotNull Editor editor, final @NotNull TextRange range) {
@@ -368,7 +328,8 @@ public class EditorHelper {
    * @return The offset of the line start
    */
   public static int getLineStartForOffset(final @NotNull Editor editor, final int offset) {
-    LogicalPosition pos = editor.offsetToLogicalPosition(normalizeOffset(editor, offset));
+    LogicalPosition pos = editor.offsetToLogicalPosition(
+      EngineEditorHelperKt.normalizeOffset(new IjVimEditor(editor), offset, true));
     return editor.getDocument().getLineStartOffset(pos.line);
   }
 
@@ -380,7 +341,8 @@ public class EditorHelper {
    * @return The offset of the line end
    */
   public static int getLineEndForOffset(final @NotNull Editor editor, final int offset) {
-    LogicalPosition pos = editor.offsetToLogicalPosition(normalizeOffset(editor, offset));
+    LogicalPosition pos = editor.offsetToLogicalPosition(
+      EngineEditorHelperKt.normalizeOffset(new IjVimEditor(editor), offset, true));
     return editor.getDocument().getLineEndOffset(pos.line);
   }
 
@@ -487,7 +449,8 @@ public class EditorHelper {
 
     // Scroll the given visual line to the caret location, but do not scroll down passed the end of file, or the current
     // virtual space at the bottom of the screen
-    final int lastVisualLine = EditorHelper.getVisualLineCount(new IjVimEditor(editor)) - 1;
+    @NotNull final VimEditor editor1 = new IjVimEditor(editor);
+    final int lastVisualLine = EngineEditorHelperKt.getVisualLineCount(editor1) - 1;
     final int yBottomLineOffset = max(getOffsetToScrollVisualLineToBottomOfScreen(editor, lastVisualLine), visibleArea.y);
     scrollVertically(editor, min(yVisualLine - caretScreenOffset - inlayOffset, yBottomLineOffset));
   }
@@ -532,13 +495,14 @@ public class EditorHelper {
    * @param visualLine The visual line to place in the middle of the current window
    */
   public static void scrollVisualLineToMiddleOfScreen(@NotNull Editor editor, int visualLine, boolean allowVirtualSpace) {
-    final int y = editor.visualLineToY(normalizeVisualLine(editor, visualLine));
+    final int y = editor.visualLineToY(EngineEditorHelperKt.normalizeVisualLine(new IjVimEditor(editor), visualLine));
     final Rectangle visibleArea = getVisibleArea(editor);
     final int screenHeight = visibleArea.height;
     final int lineHeight = editor.getLineHeight();
 
     final int offset = y - ((screenHeight - lineHeight) / lineHeight / 2 * lineHeight);
-    final int lastVisualLine = EditorHelper.getVisualLineCount(new IjVimEditor(editor)) - 1;
+    @NotNull final VimEditor editor1 = new IjVimEditor(editor);
+    final int lastVisualLine = EngineEditorHelperKt.getVisualLineCount(editor1) - 1;
     final int offsetForLastLineAtBottom = getOffsetToScrollVisualLineToBottomOfScreen(editor, lastVisualLine);
 
     // For `zz`, we want to use virtual space and move any line, including the last one, to the middle of the screen.
@@ -658,7 +622,8 @@ public class EditorHelper {
    */
   public static Pair<Boolean, Integer> scrollFullPageDown(final @NotNull Editor editor, int pages) {
     final Rectangle visibleArea = getVisibleArea(editor);
-    final int lastVisualLine = getVisualLineCount(new IjVimEditor(editor)) - 1;
+    @NotNull final VimEditor editor2 = new IjVimEditor(editor);
+    final int lastVisualLine = EngineEditorHelperKt.getVisualLineCount(editor2) - 1;
 
     int y = visibleArea.y + visibleArea.height;
     int topBound = visibleArea.y;
@@ -675,7 +640,8 @@ public class EditorHelper {
           caretVisualLine = lastVisualLine;
         }
         else {
-          caretVisualLine = getVisualLineCount(new IjVimEditor(editor)) - 1;
+          @NotNull final VimEditor editor1 = new IjVimEditor(editor);
+          caretVisualLine = EngineEditorHelperKt.getVisualLineCount(editor1) - 1;
           completed = false;
         }
         targetTopVisualLine = lastVisualLine;
@@ -709,7 +675,8 @@ public class EditorHelper {
   public static Pair<Boolean, Integer> scrollFullPageUp(final @NotNull Editor editor, int pages) {
     final Rectangle visibleArea = getVisibleArea(editor);
     final int lineHeight = editor.getLineHeight();
-    final int lastVisualLine = getVisualLineCount(new IjVimEditor(editor)) - 1;
+    @NotNull final VimEditor editor1 = new IjVimEditor(editor);
+    final int lastVisualLine = EngineEditorHelperKt.getVisualLineCount(editor1) - 1;
 
     int y = visibleArea.y;
     int topBound = visibleArea.y;

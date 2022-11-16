@@ -13,6 +13,7 @@ import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimCaretListener
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.normalizeOffset
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
@@ -203,7 +204,7 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
 
     // TODO: This should be normalised by the action
     if (!editor.isEndAllowed) {
-      resultOffset = injector.engineEditorHelper.normalizeOffset(editor, resultOffset, false)
+      resultOffset = editor.normalizeOffset(resultOffset, false)
     }
     return resultOffset
   }

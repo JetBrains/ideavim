@@ -335,7 +335,7 @@ public class ChangeGroup extends VimChangeGroupBase {
       return false;
     }
     changeCase(editor, ((IjVimCaret) caret).getCaret().getOffset(), offset, CharacterHelper.CASE_TOGGLE);
-    injector.getMotion().moveCaret(editor, caret, EditorHelper.normalizeOffset(((IjVimEditor) editor).getEditor(), offset, false));
+    injector.getMotion().moveCaret(editor, caret, EngineEditorHelperKt.normalizeOffset(editor, offset, false));
     return true;
   }
 
@@ -422,7 +422,8 @@ public class ChangeGroup extends VimChangeGroupBase {
       end = start;
       start = t;
     }
-    end = EditorHelper.normalizeOffset(((IjVimEditor) editor).getEditor(), end);
+    @NotNull final Editor editor1 = ((IjVimEditor) editor).getEditor();
+    end = EngineEditorHelperKt.normalizeOffset(new IjVimEditor(editor1), end, true);
 
     CharSequence chars = ((IjVimEditor) editor).getEditor().getDocument().getCharsSequence();
     StringBuilder sb = new StringBuilder();

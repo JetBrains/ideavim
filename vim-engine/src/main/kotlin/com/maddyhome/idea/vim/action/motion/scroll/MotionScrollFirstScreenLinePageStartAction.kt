@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.action.motion.scroll
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.normalizeVisualLine
 import com.maddyhome.idea.vim.api.visualLineToLogicalLine
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
@@ -31,8 +32,7 @@ class MotionScrollFirstScreenLinePageStartAction : VimActionHandler.SingleExecut
   ): Boolean {
     var rawCount = cmd.rawCount
     if (rawCount == 0) {
-      val nextVisualLine = injector.engineEditorHelper.normalizeVisualLine(
-        editor,
+      val nextVisualLine = editor.normalizeVisualLine(
         injector.engineEditorHelper.getVisualLineAtBottomOfScreen(editor) + 1
       )
       rawCount = editor.visualLineToLogicalLine(nextVisualLine) + 1 // rawCount is 1 based

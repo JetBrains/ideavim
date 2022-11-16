@@ -11,6 +11,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.normalizeOffset
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
@@ -44,7 +45,7 @@ sealed class MotionSentenceEndAction(val direction: Direction) : MotionActionHan
 private fun moveCaretToNextSentenceEnd(editor: VimEditor, caret: VimCaret, count: Int): Int {
   var res = injector.searchHelper.findNextSentenceEnd(editor, caret, count, false, true)
   res = if (res >= 0) {
-    injector.engineEditorHelper.normalizeOffset(editor, res, false)
+    editor.normalizeOffset(res, false)
   } else {
     -1
   }

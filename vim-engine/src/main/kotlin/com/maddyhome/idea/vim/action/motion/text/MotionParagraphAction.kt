@@ -11,6 +11,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.normalizeOffset
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
@@ -44,7 +45,7 @@ class MotionParagraphPreviousAction : MotionParagraphAction(Direction.BACKWARDS)
 private fun moveCaretToNextParagraph(editor: VimEditor, caret: VimCaret, count: Int): Int {
   var res = injector.searchHelper.findNextParagraph(editor, caret, count, false)
   res = if (res >= 0) {
-    injector.engineEditorHelper.normalizeOffset(editor, res, true)
+    editor.normalizeOffset(res, true)
   } else {
     -1
   }

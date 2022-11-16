@@ -11,6 +11,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.normalizeOffset
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
@@ -49,7 +50,7 @@ private fun moveCaretToUnmatchedBlock(editor: VimEditor, caret: VimCaret, count:
   } else {
     var res = injector.searchHelper.findUnmatchedBlock(editor, caret, type, count)
     if (res != -1) {
-      res = injector.engineEditorHelper.normalizeOffset(editor, res, false)
+      res = editor.normalizeOffset(res, false)
     }
     res
   }

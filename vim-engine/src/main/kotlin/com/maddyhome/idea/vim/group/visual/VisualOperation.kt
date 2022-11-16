@@ -32,8 +32,8 @@ object VisualOperation {
     }
     val type = SelectionType.fromSubMode(editor.subMode)
 
-    start = injector.engineEditorHelper.normalizeOffset(editor, start, false)
-    end = injector.engineEditorHelper.normalizeOffset(editor, end, false)
+    start = editor.normalizeOffset(start, false)
+    end = editor.normalizeOffset(end, false)
     val sp = editor.offsetToLogicalPosition(start)
     val ep = editor.offsetToLogicalPosition(end)
     var lines = ep.line - sp.line + 1

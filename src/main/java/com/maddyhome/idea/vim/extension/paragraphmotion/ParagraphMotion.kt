@@ -13,16 +13,17 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.normalizeOffset
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.extension.VimExtensionFacade
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
 import com.maddyhome.idea.vim.group.MotionGroup
-import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.SearchHelper
 import com.maddyhome.idea.vim.helper.vimForEachCaret
 import com.maddyhome.idea.vim.newapi.ij
+import com.maddyhome.idea.vim.newapi.vim
 
 class ParagraphMotion : VimExtension {
   override fun getName(): String = "vim-paragraph-motion"
@@ -48,7 +49,7 @@ class ParagraphMotion : VimExtension {
     fun moveCaretToNextParagraph(editor: Editor, caret: Caret, count: Int): Int {
       var res = SearchHelper.findNextParagraph(editor, caret, count, true)
       res = if (res >= 0) {
-        EditorHelper.normalizeOffset(editor, res, true)
+        editor.vim.normalizeOffset(res, true)
       } else {
         -1
       }

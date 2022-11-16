@@ -26,10 +26,6 @@ import java.nio.CharBuffer
 
 @Service
 class IjEditorHelper : EngineEditorHelper {
-  override fun normalizeOffset(editor: VimEditor, offset: Int, allowEnd: Boolean): Int {
-    return EditorHelper.normalizeOffset((editor as IjVimEditor).editor, offset, allowEnd)
-  }
-
   override fun getText(editor: VimEditor, range: TextRange): String {
     return EditorHelper.getText((editor as IjVimEditor).editor, range)
   }
@@ -42,10 +38,6 @@ class IjEditorHelper : EngineEditorHelper {
     return EditorHelper.logicalLineToVisualLine((editor as IjVimEditor).editor, line)
   }
 
-  override fun normalizeVisualLine(editor: VimEditor, line: Int): Int {
-    return EditorHelper.normalizeVisualLine((editor as IjVimEditor).editor, line)
-  }
-
   override fun amountOfInlaysBeforeVisualPosition(editor: VimEditor, pos: VimVisualPosition): Int {
     return (editor as IjVimEditor).editor.amountOfInlaysBeforeVisualPosition(
       VisualPosition(
@@ -54,10 +46,6 @@ class IjEditorHelper : EngineEditorHelper {
         pos.leansRight
       )
     )
-  }
-
-  override fun getVisualLineCount(editor: VimEditor): Int {
-    return EditorHelper.getVisualLineCount(editor)
   }
 
   override fun getLineStartForOffset(editor: VimEditor, line: Int): Int {

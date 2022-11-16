@@ -12,13 +12,10 @@ import com.maddyhome.idea.vim.common.TextRange
 import java.nio.CharBuffer
 
 interface EngineEditorHelper {
-  fun normalizeOffset(editor: VimEditor, offset: Int, allowEnd: Boolean): Int
   fun getText(editor: VimEditor, range: TextRange): String
   fun getOffset(editor: VimEditor, line: Int, column: Int): Int
   fun logicalLineToVisualLine(editor: VimEditor, line: Int): Int
-  fun normalizeVisualLine(editor: VimEditor, line: Int): Int
   fun amountOfInlaysBeforeVisualPosition(editor: VimEditor, pos: VimVisualPosition): Int
-  fun getVisualLineCount(editor: VimEditor): Int
   fun getLineStartForOffset(editor: VimEditor, line: Int): Int
   fun getLineEndForOffset(editor: VimEditor, offset: Int): Int
   fun getVisualLineAtTopOfScreen(editor: VimEditor): Int
@@ -176,4 +173,41 @@ fun VimEditor.getLineEndOffset(line: Int, allowEnd: Boolean): Int {
 fun VimEditor.getFileSize(includeEndNewLine: Boolean): Int {
   val len: Int = text().length
   return if (includeEndNewLine || len == 0 || text()[len - 1] != '\n') len else len - 1
+}
+
+fun VimEditor.normalizeOffset(offset: Int, allowEnd: Boolean = true): Int {
+  var offset = offset
+  if (offset <= 0) {
+    offset = 0
+  }
+  val textLength: Int = text().length
+  if (offset > textLength) {
+    offset = textLength
+  }
+  val line: Int = offsetToLogicalPosition(offset).line
+  return normalizeOffset(line, offset, allowEnd)
+}
+
+/**
+ * Ensures that the supplied visual line is within the range 0 (incl) and the number of visual lines in the file
+ * (excl).
+ *
+ * @param this@normalizeVisualLine The editor
+ * @param line   The visual line number to normalize
+ * @return The normalized visual line number
+ */
+fun VimEditor.normalizeVisualLine(line: Int): Int {
+  return (getVisualLineCount() - 1).coerceIn(0..line)
+}
+
+/**
+ * Gets the number of visible lines in the editor. This will less then the actual number of lines in the file
+ * if there are any collapsed folds.
+ *
+ * @param this@getVisualLineCount The editor
+ * @return The number of visible lines in the file
+ */
+fun VimEditor.getVisualLineCount(): Int {
+  val count = lineCount()
+  return if (count == 0) 0 else injector.engineEditorHelper.logicalLineToVisualLine(this, count - 1) + 1
 }

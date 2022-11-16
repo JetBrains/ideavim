@@ -11,6 +11,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.normalizeLine
+import com.maddyhome.idea.vim.api.normalizeVisualLine
 import com.maddyhome.idea.vim.api.visualLineToLogicalLine
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
@@ -35,10 +36,7 @@ class MotionScrollLastScreenLinePageStartAction : VimActionHandler.SingleExecuti
     // Without [count]: Redraw with the line just above the window at the bottom of the window. Put the cursor in that
     // line, at the first non-blank in the line.
     if (cmd.rawCount == 0) {
-      val prevVisualLine = injector.engineEditorHelper.normalizeVisualLine(
-        editor,
-        injector.engineEditorHelper.getVisualLineAtTopOfScreen(editor) - 1
-      )
+      val prevVisualLine = editor.normalizeVisualLine(injector.engineEditorHelper.getVisualLineAtTopOfScreen(editor) - 1)
       val logicalLine = editor.visualLineToLogicalLine(prevVisualLine)
       return motion.scrollCurrentLineToDisplayBottom(editor, logicalLine + 1, true)
     }

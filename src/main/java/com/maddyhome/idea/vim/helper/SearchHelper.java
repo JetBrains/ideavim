@@ -1553,7 +1553,7 @@ public class SearchHelper {
         start = (int)VimSearchHelperBase.Companion.findNextWord(chars, pos, max, -(count - (onWordStart && !hasSelection ? 1 : 0)), isBig, !isOuter);
       }
 
-      start = EditorHelper.normalizeOffset(editor, start, false);
+      start = EngineEditorHelperKt.normalizeOffset(new IjVimEditor(editor), start, false);
     }
 
     if (logger.isDebugEnabled()) logger.debug("start=" + start);

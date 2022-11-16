@@ -23,6 +23,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimMotionGroupBase
 import com.maddyhome.idea.vim.api.getLeadingCharacterOffset
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.normalizeOffset
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.common.EditorLine
@@ -33,8 +34,6 @@ import com.maddyhome.idea.vim.common.VimRange
 import com.maddyhome.idea.vim.common.including
 import com.maddyhome.idea.vim.common.offset
 import com.maddyhome.idea.vim.group.MotionGroup
-import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.helper.inlayAwareVisualColumn
 import com.maddyhome.idea.vim.helper.vimChangeActionSwitchMode
 import com.maddyhome.idea.vim.helper.vimLastColumn
 
@@ -112,7 +111,7 @@ fun deleteRange(
   if (deletedInfo != null) {
     when (deletedInfo) {
       is OperatedRange.Characters -> {
-        val newOffset = injector.engineEditorHelper.normalizeOffset(editor, deletedInfo.leftOffset.point, false)
+        val newOffset = editor.normalizeOffset(deletedInfo.leftOffset.point, false)
         caret.moveToOffset(newOffset)
       }
       is OperatedRange.Block -> TODO()

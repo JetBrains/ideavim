@@ -11,6 +11,7 @@ package com.maddyhome.idea.vim.mark
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getLineEndOffset
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.normalizeOffset
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.diagnostic.debug
@@ -198,7 +199,7 @@ abstract class VimMarkGroupBase : VimMarkGroup {
         editor, editor.primaryCaret(), if (myCh == '{') -1 else 1,
         false
       )
-      offset = injector.engineEditorHelper.normalizeOffset(editor, offset, false)
+      offset = editor.normalizeOffset(offset, false)
       val lp = editor.offsetToLogicalPosition(offset)
       mark = VimMark(myCh, lp.line, lp.column, editorPath, editor.extractProtocol())
     } else if ("()".indexOf(myCh) >= 0 && editorPath != null) {
@@ -209,7 +210,7 @@ abstract class VimMarkGroupBase : VimMarkGroup {
           requireAll = true
         )
 
-      offset = injector.engineEditorHelper.normalizeOffset(editor, offset, false)
+      offset = editor.normalizeOffset(offset, false)
       val lp = editor.offsetToLogicalPosition(offset)
       mark = VimMark(myCh, lp.line, lp.column, editorPath, editor.extractProtocol())
     } else if (VimMarkConstants.FILE_MARKS.indexOf(myCh) >= 0) {
