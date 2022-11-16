@@ -120,7 +120,7 @@ fun VimEditor.visualLineToLogicalLine(line: Int): Int {
  * @return The normalized logical line number
  */
 fun VimEditor.normalizeLine(line: Int): Int {
-    return line.coerceIn(0 until lineCount())
+  return line.coerceIn(0 until lineCount().coerceAtLeast(1))
 }
 
 /**
@@ -139,7 +139,7 @@ fun VimEditor.normalizeOffset(line: Int, offset: Int, allowEnd: Boolean): Int {
   }
   val min: Int = getLineStartOffset(line)
   val max: Int = getLineEndOffset(line, allowEnd)
-  return offset.coerceIn(max..min)
+  return offset.coerceIn(min..max)
 }
 
 /**

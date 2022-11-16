@@ -314,7 +314,9 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
       StrictMode.fail("Incorrect line: $line")
       0
     } else if (line >= this.lineCount()) {
-      StrictMode.fail("Incorrect line: $line")
+      if (lineCount() != 0) {
+        StrictMode.fail("Incorrect line: $line")
+      }
       editor.fileSize
     } else {
       editor.document.getLineStartOffset(line)
