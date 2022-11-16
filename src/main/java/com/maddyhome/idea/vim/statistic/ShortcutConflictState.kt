@@ -32,6 +32,7 @@ internal class ShortcutConflictState : ApplicationUsagesCollector() {
         .filter { !setOf(HandledModes.INSERT_UNDEFINED, HandledModes.NORMAL_UNDEFINED, HandledModes.VISUAL_AND_SELECT_UNDEFINED).contains(it) }
         .forEach { mode ->
           metrics += HANDLER.metric(keystroke.toReadableString(), mode)
+          println(keystroke.toReadableString())
         }
     }
     return metrics
@@ -165,11 +166,15 @@ private fun KeyStroke.toReadableString(): String {
   val result = StringBuilder()
   val modifiers = this.modifiers
   if (modifiers > 0) {
-    result.append(InputEvent.getModifiersExText(modifiers))
+    result.append(preprocessKeys(InputEvent.getModifiersExText(modifiers)))
       .append("+")
   }
   result.append(KeyEvent.getKeyText(this.keyCode))
   return result.toString()
+}
+
+private fun preprocessKeys(string: String): String {
+  return string.replace("⌃", "Ctrl").replace("⇧", "Shift")
 }
 
 private enum class HandledModes {
