@@ -64,6 +64,10 @@ Contributors:
   [![icon][github]](https://github.com/jflorian)
   &nbsp;
   John Florian
+* [![icon][mail]](mailto:marquis@marquiswang.com)
+  [![icon][github]](https://github.com/marquiswang)
+  &nbsp;
+  Marquis Wang
 * [![icon][mail]](mailto:madgnome@gmail.com)
   [![icon][github]](https://github.com/madgnome)
   &nbsp;
@@ -450,10 +454,6 @@ Previous contributors:
   [![icon][github-off]](#)
   &nbsp;
   Marcel Hild
-* [![icon][mail]](mailto:marquis@marquiswang.com)
-  [![icon][github]](https://github.com/marquiswang)
-  &nbsp;
-  Marquis Wang
 * [![icon][mail]](mailto:kevinz@weghst.com)
   [![icon][github]](https://github.com/kevin70)
   &nbsp;
