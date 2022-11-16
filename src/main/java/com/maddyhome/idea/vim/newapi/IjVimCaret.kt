@@ -16,7 +16,7 @@ import com.maddyhome.idea.vim.api.CaretRegisterStorageBase
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimCaretBase
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.VimLogicalPosition
+import com.maddyhome.idea.vim.api.BufferPosition
 import com.maddyhome.idea.vim.api.VimVisualPosition
 import com.maddyhome.idea.vim.common.EditorLine
 import com.maddyhome.idea.vim.common.LiveRange
@@ -87,7 +87,7 @@ class IjVimCaret(val caret: Caret) : VimCaretBase() {
     caret.moveToOffset(offset)
   }
 
-  override fun moveToLogicalPosition(logicalPosition: VimLogicalPosition) {
+  override fun moveToLogicalPosition(logicalPosition: BufferPosition) {
     this.caret.moveToLogicalPosition(LogicalPosition(logicalPosition.line, logicalPosition.column, logicalPosition.leansForward))
   }
 
@@ -116,9 +116,9 @@ class IjVimCaret(val caret: Caret) : VimCaretBase() {
     caret.vimSetSelection(start, end, moveCaretToSelectionEnd)
   }
 
-  override fun getLogicalPosition(): VimLogicalPosition {
+  override fun getLogicalPosition(): BufferPosition {
     val logicalPosition = caret.logicalPosition
-    return VimLogicalPosition(logicalPosition.line, logicalPosition.column, logicalPosition.leansForward)
+    return BufferPosition(logicalPosition.line, logicalPosition.column, logicalPosition.leansForward)
   }
 
   override fun getVisualPosition(): VimVisualPosition {

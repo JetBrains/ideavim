@@ -10,7 +10,7 @@ package com.maddyhome.idea.vim.group.visual
 
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.VimLogicalPosition
+import com.maddyhome.idea.vim.api.BufferPosition
 import com.maddyhome.idea.vim.api.VimMotionGroupBase
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.lineLength
@@ -75,7 +75,7 @@ object VisualOperation {
       }
       SelectionType.BLOCK_WISE -> {
         val endColumn = min(editor.lineLength(endLine), sp.column + chars - 1)
-        editor.logicalPositionToOffset(VimLogicalPosition(endLine, endColumn))
+        editor.logicalPositionToOffset(BufferPosition(endLine, endColumn))
       }
     }
   }

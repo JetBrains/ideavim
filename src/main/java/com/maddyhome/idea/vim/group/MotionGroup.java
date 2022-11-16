@@ -656,7 +656,7 @@ public class MotionGroup extends VimMotionGroupBase {
     final int line = mark.getLogicalLine();
     return toLineStart
            ? moveCaretToLineStartSkipLeading(editor, line)
-           : editor.logicalPositionToOffset(new VimLogicalPosition(line, mark.getCol(), false));
+           : editor.logicalPositionToOffset(new BufferPosition(line, mark.getCol(), false));
   }
 
   @Override
@@ -671,7 +671,7 @@ public class MotionGroup extends VimMotionGroupBase {
     if (vf.getPath().equals(mark.getFilename())) {
       return toLineStart
              ? moveCaretToLineStartSkipLeading(editor, line)
-             : editor.logicalPositionToOffset(new VimLogicalPosition(line, mark.getCol(), false));
+             : editor.logicalPositionToOffset(new BufferPosition(line, mark.getCol(), false));
     }
 
     final Editor selectedEditor = selectEditor(((IjVimEditor)editor).getEditor(), mark);
@@ -700,7 +700,7 @@ public class MotionGroup extends VimMotionGroupBase {
       return -1;
     }
 
-    final VimLogicalPosition lp = new VimLogicalPosition(jump.getLogicalLine(), jump.getCol(), false);
+    final BufferPosition lp = new BufferPosition(jump.getLogicalLine(), jump.getCol(), false);
     final LogicalPosition lpnative = new LogicalPosition(jump.getLogicalLine(), jump.getCol(), false);
     final String fileName = jump.getFilepath();
     if (!vf.getPath().equals(fileName)) {
@@ -742,7 +742,7 @@ public class MotionGroup extends VimMotionGroupBase {
   public Motion moveCaretToColumn(@NotNull VimEditor editor, @NotNull VimCaret caret, int count, boolean allowEnd) {
     final int line = caret.getLine().getLine();
     final int column = EngineEditorHelperKt.normalizeColumn(editor, line, count, allowEnd);
-    final int offset = editor.logicalPositionToOffset(new VimLogicalPosition(line, column, false));
+    final int offset = editor.logicalPositionToOffset(new BufferPosition(line, column, false));
     if (column != count) {
       return new Motion.AdjustedOffset(offset, count);
     }

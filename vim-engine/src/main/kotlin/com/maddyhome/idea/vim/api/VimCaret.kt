@@ -24,7 +24,7 @@ interface VimCaret {
   val isValid: Boolean
   val isPrimary: Boolean
 
-  fun getLogicalPosition(): VimLogicalPosition
+  fun getLogicalPosition(): BufferPosition
   fun getVisualPosition(): VimVisualPosition
 
   fun getLine(): EditorLine.Pointer
@@ -53,7 +53,7 @@ interface VimCaret {
   fun moveToOffsetNative(offset: Int)
   fun moveToInlayAwareOffset(newOffset: Int)
   fun moveToVisualPosition(position: VimVisualPosition)
-  fun moveToLogicalPosition(logicalPosition: VimLogicalPosition)
+  fun moveToLogicalPosition(logicalPosition: BufferPosition)
 
   val visualLineStart: Int
   var vimInsertStart: LiveRange

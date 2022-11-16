@@ -264,7 +264,7 @@ fun VimEditor.getText(range: TextRange): String {
 }
 
 fun VimEditor.getOffset(line: Int, column: Int): Int {
-  return logicalPositionToOffset(VimLogicalPosition(line, column))
+  return logicalPositionToOffset(BufferPosition(line, column))
 }
 fun VimEditor.getLineBuffer(line: Int): CharBuffer {
   val start: Int = getLineStartOffset(line)

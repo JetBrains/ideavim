@@ -11,7 +11,7 @@ package com.maddyhome.idea.vim.vimscript.model.commands
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.VimLogicalPosition
+import com.maddyhome.idea.vim.api.BufferPosition
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.command.VimStateMachine
@@ -43,7 +43,7 @@ data class NormalCommand(val ranges: Ranges, val argument: String) : Command.Sin
         editor.exitVisualModeNative()
         if (!rangeUsed) {
           val selectionStart = injector.markGroup.getMark(editor, '<')!!
-          editor.currentCaret().moveToLogicalPosition(VimLogicalPosition(selectionStart.logicalLine, selectionStart.col))
+          editor.currentCaret().moveToLogicalPosition(BufferPosition(selectionStart.logicalLine, selectionStart.col))
         }
       }
       VimStateMachine.Mode.CMD_LINE -> injector.processGroup.cancelExEntry(editor, false)

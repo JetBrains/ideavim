@@ -9,7 +9,7 @@
 package com.maddyhome.idea.vim.mark
 
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.VimLogicalPosition
+import com.maddyhome.idea.vim.api.BufferPosition
 import org.jetbrains.annotations.NonNls
 
 interface Mark {
@@ -22,7 +22,7 @@ interface Mark {
   fun isClear(): Boolean
   fun clear()
 
-  fun offset(editor: VimEditor): Int = editor.logicalPositionToOffset(VimLogicalPosition(logicalLine, col))
+  fun offset(editor: VimEditor): Int = editor.logicalPositionToOffset(BufferPosition(logicalLine, col))
 
   object KeySorter : Comparator<Mark> {
     @NonNls

@@ -177,8 +177,8 @@ interface VimEditor {
   fun updateCaretsVisualAttributes()
   fun updateCaretsVisualPosition()
 
-  fun offsetToLogicalPosition(offset: Int): VimLogicalPosition
-  fun logicalPositionToOffset(position: VimLogicalPosition): Int
+  fun offsetToLogicalPosition(offset: Int): BufferPosition
+  fun logicalPositionToOffset(position: BufferPosition): Int
 
   fun offsetToVisualPosition(offset: Int): VimVisualPosition
   fun visualPositionToOffset(position: VimVisualPosition): Offset
@@ -196,7 +196,7 @@ interface VimEditor {
 
   fun removeCaret(caret: VimCaret)
   fun removeSecondaryCarets()
-  fun vimSetSystemBlockSelectionSilently(start: VimLogicalPosition, end: VimLogicalPosition)
+  fun vimSetSystemBlockSelectionSilently(start: BufferPosition, end: BufferPosition)
 
   fun getLineStartOffset(line: Int): Int
   fun getLineEndOffset(line: Int): Int
@@ -226,8 +226,8 @@ interface VimEditor {
 
   fun getLastVisualLineColumnNumber(line: Int): Int
 
-  fun visualToLogicalPosition(visualPosition: VimVisualPosition): VimLogicalPosition
-  fun logicalToVisualPosition(logicalPosition: VimLogicalPosition): VimVisualPosition
+  fun visualToLogicalPosition(visualPosition: VimVisualPosition): BufferPosition
+  fun logicalToVisualPosition(logicalPosition: BufferPosition): VimVisualPosition
 
   fun createLiveMarker(start: Offset, end: Offset): LiveRange
   var insertMode: Boolean
@@ -235,7 +235,7 @@ interface VimEditor {
   val document: VimDocument
 
   fun logicalLineToVisualLine(line: Int): Int {
-    return logicalToVisualPosition(VimLogicalPosition(line, 0)).line
+    return logicalToVisualPosition(BufferPosition(line, 0)).line
   }
 
   fun charAt(offset: Pointer): Char {
@@ -342,14 +342,15 @@ enum class LineDeleteShift {
   NO_NL,
 }
 
-class VimLogicalPosition(
+class BufferPosition(
   val line: Int,
   val column: Int,
   val leansForward: Boolean = false,
-) : Comparable<VimLogicalPosition> {
-  override fun compareTo(other: VimLogicalPosition): Int {
+) : Comparable<BufferPosition> {
+  override fun compareTo(other: BufferPosition): Int {
     return if (line != other.line) line - other.line else column - other.column
   }
 }
 
+// TODO: [visual] Try to remove this. It's an IntelliJ concept and doesn't have a Vim equivalent
 data class VimVisualPosition(val line: Int, val column: Int, val leansRight: Boolean = false)
