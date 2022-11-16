@@ -319,6 +319,10 @@ Contributors:
   [![icon][github]](https://github.com/valis)
   &nbsp;
   valis
+* [![icon][mail]](mailto:pmikulski@voleon.com)
+  [![icon][github]](https://github.com/pmnoxx)
+  &nbsp;
+  Piotr Mikulski
 * [![icon][mail]](mailto:14farresa@gmail.com)
   [![icon][github]](https://github.com/adriafarres)
   &nbsp;
@@ -454,10 +458,6 @@ Previous contributors:
   [![icon][github]](https://github.com/kevin70)
   &nbsp;
   kk
-* [![icon][mail]](mailto:pmikulski@voleon.com)
-  [![icon][github]](https://github.com/pmnoxx)
-  &nbsp;
-  Piotr Mikulski
 
                         
 If you are a contributor and your name is not listed here, feel free to
