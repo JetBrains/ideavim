@@ -23,6 +23,12 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
+## To Be Released
+
+### Merged PRs:
+* [554](https://github.com/JetBrains/ideavim/pull/554) by [Matt Ellis](https://github.com/citizenmatt): Refactor "last column" calculations
+* [553](https://github.com/JetBrains/ideavim/pull/553) by [Matt Ellis](https://github.com/citizenmatt): Rearrange and rename some code in engine
+
 ## 2.0.0, 2022-11-01
 
 ### Changes:
