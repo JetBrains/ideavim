@@ -132,7 +132,7 @@ abstract class VimMotionGroupBase : VimMotionGroup {
     linesOffset: Int,
   ): Int {
     val line = editor.normalizeVisualLine(caret.getVisualPosition().line + linesOffset)
-    return moveCaretToLineStartSkipLeading(editor, editor.visualLineToLogicalLine(line))
+    return moveCaretToLineStartSkipLeading(editor, editor.visualLineToBufferLine(line))
   }
 
   override fun scrollFullPage(editor: VimEditor, caret: VimCaret, pages: Int): Boolean {
@@ -201,12 +201,12 @@ abstract class VimMotionGroupBase : VimMotionGroup {
     val line = editor.normalizeVisualLine(caret.getVisualPosition().line + cntForward)
 
     return if (line < 0) 0 else {
-      moveCaretToLineEnd(editor, editor.visualLineToLogicalLine(line), allowPastEnd)
+      moveCaretToLineEnd(editor, editor.visualLineToBufferLine(line), allowPastEnd)
     }
   }
 
   override fun moveCaretToRelativeLineEndSkipTrailing(editor: VimEditor, caret: VimCaret, linesOffset: Int): Int {
-    val line = editor.visualLineToLogicalLine(
+    val line = editor.visualLineToBufferLine(
       editor.normalizeVisualLine(caret.getVisualPosition().line + linesOffset)
     )
     val start = editor.getLineStartOffset(line)

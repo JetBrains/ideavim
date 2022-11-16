@@ -16,7 +16,7 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.VisualPosition
 import com.maddyhome.idea.vim.api.lineLength
-import com.maddyhome.idea.vim.api.visualLineToLogicalLine
+import com.maddyhome.idea.vim.api.visualLineToBufferLine
 import com.maddyhome.idea.vim.helper.VimNlsSafe
 import com.maddyhome.idea.vim.newapi.vim
 import java.util.*
@@ -34,7 +34,7 @@ class AddInlineInlaysAction : AnAction() {
     val inlayModel = editor.inlayModel
     val currentVisualLine = editor.caretModel.primaryCaret.visualPosition.line
     var i = random.nextInt(10)
-    val lineLength = vimEditor.lineLength(vimEditor.visualLineToLogicalLine(currentVisualLine))
+    val lineLength = vimEditor.lineLength(vimEditor.visualLineToBufferLine(currentVisualLine))
     while (i < lineLength) {
       val relatesToPrecedingText = random.nextInt(10) > 7
 

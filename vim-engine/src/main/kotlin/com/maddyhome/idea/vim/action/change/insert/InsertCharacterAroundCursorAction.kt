@@ -14,7 +14,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimVisualPosition
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.lineLength
-import com.maddyhome.idea.vim.api.visualLineToLogicalLine
+import com.maddyhome.idea.vim.api.visualLineToBufferLine
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
@@ -64,7 +64,7 @@ private fun insertCharacterAroundCursor(editor: VimEditor, caret: VimCaret, dir:
   var res = false
   var vp = caret.getVisualPosition()
   vp = VimVisualPosition(vp.line + dir, vp.column, false)
-  val len = editor.lineLength(editor.visualLineToLogicalLine(vp.line))
+  val len = editor.lineLength(editor.visualLineToBufferLine(vp.line))
   if (vp.column < len) {
     val offset = editor.visualPositionToOffset(VimVisualPosition(vp.line, vp.column, false)).point
     val charsSequence = editor.text()

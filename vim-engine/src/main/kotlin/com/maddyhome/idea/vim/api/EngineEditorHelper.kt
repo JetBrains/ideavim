@@ -11,13 +11,14 @@ package com.maddyhome.idea.vim.api
 import com.maddyhome.idea.vim.common.TextRange
 import java.nio.CharBuffer
 
+// TODO: [visual] try to remove all uses of visual line/position. This is an IntelliJ concept
 interface EngineEditorHelper {
   // Keep it for now. See the IJ implementation, there are some hacks regarding that
   fun amountOfInlaysBeforeVisualPosition(editor: VimEditor, pos: VimVisualPosition): Int
   fun getVisualLineAtTopOfScreen(editor: VimEditor): Int
+  fun getVisualLineAtBottomOfScreen(editor: VimEditor): Int
   fun getApproximateScreenWidth(editor: VimEditor): Int
   fun handleWithReadonlyFragmentModificationHandler(editor: VimEditor, exception: java.lang.Exception)
-  fun getVisualLineAtBottomOfScreen(editor: VimEditor): Int
   fun pad(editor: VimEditor, context: ExecutionContext, line: Int, to: Int): String
   fun inlayAwareOffsetToVisualPosition(editor: VimEditor, offset: Int): VimVisualPosition
 }
@@ -65,15 +66,19 @@ fun VimEditor.normalizeColumn(line: Int, col: Int, allowEnd: Boolean): Int {
 }
 
 /**
- * Gets the number of characters on the specified visual line. This will be different than the number of visual
- * characters if there are "real" tabs in the line.
+ * Gets the number of characters on the buffer line equivalent to the specified visual line.
+ *
+ * This will be different than the number of visual characters if there are "real" tabs in the line.
  *
  * @param this@getVisualLineLength The editor
  * @param line   The visual line within the file
  * @return The number of characters in the specified line
  */
+// TODO: [visual] try to get rid of this. It's probably not doing what you think it's doing
+// This gets the length of the visual line's buffer line, not the length of the visual line. With soft wraps, these can
+// be very different values.
 fun VimEditor.getVisualLineLength(line: Int): Int {
-    return lineLength(visualLineToLogicalLine(line))
+    return lineLength(visualLineToBufferLine(line))
 }
 
 /**
@@ -91,13 +96,13 @@ fun VimEditor.lineLength(logicalLine: Int): Int {
 }
 
 /**
- * Converts a visual line number to a logical line number.
+ * Converts a visual line number to a buffer line number.
  *
- * @param this@visualLineToLogicalLine The editor
+ * @param this@visualLineToBufferLine The editor
  * @param line   The visual line number to convert
- * @return The logical line number
+ * @return The buffer line number
  */
-fun VimEditor.visualLineToLogicalLine(line: Int): Int {
+fun VimEditor.visualLineToBufferLine(line: Int): Int {
     val logicalLine: Int = visualPositionToBufferPosition(VimVisualPosition(line, 0)).line
     return normalizeLine(logicalLine)
 }

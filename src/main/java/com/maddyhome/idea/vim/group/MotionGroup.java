@@ -821,7 +821,7 @@ public class MotionGroup extends VimMotionGroupBase {
 
     if (caretVisualLine != ijCaret.getVisualPosition().line) {
       final int offset =
-        moveCaretToLineWithStartOfLineOption(editor, EngineEditorHelperKt.visualLineToLogicalLine(editor, caretVisualLine), caret);
+        moveCaretToLineWithStartOfLineOption(editor, EngineEditorHelperKt.visualLineToBufferLine(editor, caretVisualLine), caret);
       moveCaret(ijEditor, ijCaret, offset);
       return result.getFirst();
     }
@@ -845,7 +845,7 @@ public class MotionGroup extends VimMotionGroupBase {
 
     if (caretVisualLine != ijCaret.getVisualPosition().line && caretVisualLine != -1) {
       final int offset =
-        moveCaretToLineWithStartOfLineOption(editor, EngineEditorHelperKt.visualLineToLogicalLine(editor, caretVisualLine), caret);
+        moveCaretToLineWithStartOfLineOption(editor, EngineEditorHelperKt.visualLineToBufferLine(editor, caretVisualLine), caret);
       moveCaret(ijEditor, ijCaret, offset);
       return result.getFirst();
     }
@@ -935,7 +935,7 @@ public class MotionGroup extends VimMotionGroupBase {
       targetCaretVisualLine = max(visualTop, min(visualBottom, targetCaretVisualLine));
     }
 
-    int logicalLine = EngineEditorHelperKt.visualLineToLogicalLine(editor, targetCaretVisualLine);
+    int logicalLine = EngineEditorHelperKt.visualLineToBufferLine(editor, targetCaretVisualLine);
     int caretOffset = moveCaretToLineWithStartOfLineOption(editor, logicalLine, caret);
     moveCaret(ijEditor, ijCaret, caretOffset);
 
@@ -978,12 +978,12 @@ public class MotionGroup extends VimMotionGroupBase {
     if (visualLine != editor.getCaretModel().getVisualPosition().line || start) {
       int offset;
       if (start) {
-        offset = moveCaretToLineStartSkipLeading(new IjVimEditor(editor), EngineEditorHelperKt.visualLineToLogicalLine(
+        offset = moveCaretToLineStartSkipLeading(new IjVimEditor(editor), EngineEditorHelperKt.visualLineToBufferLine(
           new IjVimEditor(editor), visualLine));
       }
       else {
         offset = moveCaretToLineWithSameColumn(new IjVimEditor(editor),
-                                               EngineEditorHelperKt.visualLineToLogicalLine(new IjVimEditor(editor), visualLine),
+                                               EngineEditorHelperKt.visualLineToBufferLine(new IjVimEditor(editor), visualLine),
                                                new IjVimCaret(editor.getCaretModel().getPrimaryCaret()));
       }
 
@@ -1096,7 +1096,7 @@ public class MotionGroup extends VimMotionGroupBase {
         break;
     }
 
-    final int targetLogicalLine = EngineEditorHelperKt.visualLineToLogicalLine(new IjVimEditor(editor), targetVisualLine);
+    final int targetLogicalLine = EngineEditorHelperKt.visualLineToBufferLine(new IjVimEditor(editor), targetVisualLine);
     return moveCaretToLineWithStartOfLineOption(new IjVimEditor(editor), targetLogicalLine, new IjVimCaret(caret));
   }
 
