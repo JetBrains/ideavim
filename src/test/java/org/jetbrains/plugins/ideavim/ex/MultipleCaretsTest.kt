@@ -162,29 +162,29 @@ class MultipleCaretsTest : VimTestCase() {
 //    myFixture.checkResult(after)
 //  }
 
-  fun testMoveTextBeforeCarets() {
-    val before = "qwe\n" + "rty\n" + "${c}asd\n" + "fgh\n" + "z${c}xc\n" + "vbn\n"
-    configureByText(before)
-    typeText(commandToKeys("m 1"))
-    val after = "qwe\n" + "${c}asd\n" + "${c}zxc\n" + "rty\n" + "fgh\n" + "vbn\n"
-    assertState(after)
-  }
-
-  fun testMoveTextAfterCarets() {
-    val before = "q${c}we\n" + "rty\n" + "${c}asd\n" + "fgh\n" + "zxc\n" + "vbn\n"
-    configureByText(before)
-    typeText(commandToKeys("m 4"))
-    val after = "rty\n" + "fgh\n" + "zxc\n" + "${c}qwe\n" + "${c}asd\n" + "vbn\n"
-    assertState(after)
-  }
-
-  fun testMoveTextBetweenCarets() {
-    val before = "q${c}we\n" + "rty\n" + "${c}asd\n" + "fgh\n" + "zxc\n" + "vbn\n"
-    configureByText(before)
-    typeText(commandToKeys("m 2"))
-    val after = "rty\n" + "${c}qwe\n" + "${c}asd\n" + "fgh\n" + "zxc\n" + "vbn\n"
-    assertState(after)
-  }
+//  fun testMoveTextBeforeCarets() {
+//    val before = "qwe\n" + "rty\n" + "${c}asd\n" + "fgh\n" + "z${c}xc\n" + "vbn\n"
+//    configureByText(before)
+//    typeText(commandToKeys("m 1"))
+//    val after = "qwe\n" + "${c}asd\n" + "${c}zxc\n" + "rty\n" + "fgh\n" + "vbn\n"
+//    assertState(after)
+//  }
+//
+//  fun testMoveTextAfterCarets() {
+//    val before = "q${c}we\n" + "rty\n" + "${c}asd\n" + "fgh\n" + "zxc\n" + "vbn\n"
+//    configureByText(before)
+//    typeText(commandToKeys("m 4"))
+//    val after = "rty\n" + "fgh\n" + "zxc\n" + "${c}qwe\n" + "${c}asd\n" + "vbn\n"
+//    assertState(after)
+//  }
+//
+//  fun testMoveTextBetweenCarets() {
+//    val before = "q${c}we\n" + "rty\n" + "${c}asd\n" + "fgh\n" + "zxc\n" + "vbn\n"
+//    configureByText(before)
+//    typeText(commandToKeys("m 2"))
+//    val after = "rty\n" + "${c}qwe\n" + "${c}asd\n" + "fgh\n" + "zxc\n" + "vbn\n"
+//    assertState(after)
+//  }
 
   fun testYankLines() {
     val before = """qwe
