@@ -112,7 +112,7 @@ data class GlobalCommand(val ranges: Ranges, val argument: String, val invert: B
     if (globalBusy) {
       val offset = editor.currentCaret().offset
       val lineStartOffset = editor.getLineStartForOffset(offset.point)
-      match = sp.vim_regexec_multi(regmatch, editor, lcount, lineStartOffset, searchcol)
+      match = sp.vim_regexec_multi(regmatch, editor, lcount, editor.currentCaret().getLine().line, searchcol)
       if ((!invert && match > 0) || (invert && match <= 0)) {
         globalExecuteOne(editor, context, lineStartOffset, cmd.toString())
       }

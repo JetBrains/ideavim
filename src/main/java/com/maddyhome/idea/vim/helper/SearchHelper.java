@@ -362,7 +362,7 @@ public class SearchHelper {
                                                  boolean ignoreCase) {
     final List<TextRange> results = Lists.newArrayList();
     final int lineCount = new IjVimEditor(editor).lineCount();
-    final int actualEndLine = endLine == -1 ? lineCount : endLine;
+    final int actualEndLine = endLine == -1 ? lineCount - 1 : endLine;
 
     final RegExp.regmmatch_T regMatch = new RegExp.regmmatch_T();
     final RegExp regExp = new RegExp();

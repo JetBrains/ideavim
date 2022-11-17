@@ -188,7 +188,7 @@ fun VimEditor.normalizeOffset(offset: Int, allowEnd: Boolean = true): Int {
  * @return The normalized visual line number
  */
 fun VimEditor.normalizeVisualLine(line: Int): Int {
-  return (getVisualLineCount() - 1).coerceIn(0..line)
+  return line.coerceIn(0 until getVisualLineCount().coerceAtLeast(1))
 }
 
 /**
