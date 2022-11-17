@@ -1,6 +1,7 @@
 package com.maddyhome.idea.vim.regexp
 
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.getLineBuffer
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.helper.Msg
@@ -1455,10 +1456,7 @@ class RegExp {
     return if (reg_firstlnum + lnum < 0) {
       null
     } else CharPointer(
-      injector.engineEditorHelper.getLineBuffer(
-        reg_buf!!,
-        reg_firstlnum + lnum
-      )
+      reg_buf!!.getLineBuffer(reg_firstlnum + lnum)
     )
 
     // return ml_get_buf(reg_buf, reg_firstlnum + lnum, false);

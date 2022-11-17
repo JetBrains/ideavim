@@ -143,7 +143,7 @@ public class MotionGroup extends VimMotionGroupBase {
       String text = editor.getDocument().getCharsSequence().subSequence(start, end).toString();
       final int lastNewLine = text.lastIndexOf('\n');
       if (lastNewLine > 0) {
-        if (!SearchHelper.anyNonWhitespace(editor, end, -1)) {
+        if (!EngineEditorHelperKt.anyNonWhitespace(new IjVimEditor(editor), end, -1)) {
           end = start + lastNewLine;
         }
       }
@@ -177,7 +177,7 @@ public class MotionGroup extends VimMotionGroupBase {
 
     final int oldColumn = editor.getCaretModel().getVisualPosition().column;
     int col = oldColumn;
-    if (col >= getLineLength(editor) - 1) {
+    if (col >= EngineEditorHelperKt.lineLength(new IjVimEditor(editor), new IjVimEditor(editor).currentCaret().getLogicalPosition().getLine()) - 1) {
       col = UserDataManager.getVimLastColumn(editor.getCaretModel().getPrimaryCaret());
     }
 
@@ -733,7 +733,7 @@ public class MotionGroup extends VimMotionGroupBase {
   @Override
   public @NotNull Motion moveCaretToCurrentDisplayLineMiddle(@NotNull VimEditor editor, @NotNull VimCaret caret) {
     final int width = getApproximateScreenWidth(((IjVimEditor)editor).getEditor()) / 2;
-    final int len = getLineLength(((IjVimEditor)editor).getEditor());
+    final int len = EngineEditorHelperKt.lineLength(editor, editor.currentCaret().getLogicalPosition().getLine());
 
     return moveCaretToColumn(editor, caret, max(0, min(len - 1, width)), false);
   }
@@ -950,9 +950,14 @@ public class MotionGroup extends VimMotionGroupBase {
                                           boolean start) {
     final int scrollOffset = getNormalizedScrollOffset(editor);
 
-    int visualLine = rawCount == 0
-                     ? editor.getCaretModel().getVisualPosition().line
-                     : logicalLineToVisualLine(editor, EngineEditorHelperKt.normalizeLine(new IjVimEditor(editor), rawCount - 1));
+    int visualLine;
+    if (rawCount == 0) {
+      visualLine = editor.getCaretModel().getVisualPosition().line;
+    }
+    else {
+      final int line = EngineEditorHelperKt.normalizeLine(new IjVimEditor(editor), rawCount - 1);
+      visualLine = new IjVimEditor(editor).logicalLineToVisualLine(line);
+    }
 
     // This method moves the current (or [count]) line to the specified screen location
     // Scroll offset is applicable, but scroll jump isn't. Offset is applied to screen lines (visual lines)

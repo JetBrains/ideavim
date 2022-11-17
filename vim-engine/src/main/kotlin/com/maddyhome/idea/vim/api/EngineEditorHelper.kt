@@ -13,19 +13,13 @@ import java.nio.CharBuffer
 
 interface EngineEditorHelper {
   // Keep it for now. See the IJ implementation, there are some hacks regarding that
-  fun logicalLineToVisualLine(editor: VimEditor, line: Int): Int
   fun amountOfInlaysBeforeVisualPosition(editor: VimEditor, pos: VimVisualPosition): Int
   fun getVisualLineAtTopOfScreen(editor: VimEditor): Int
   fun getApproximateScreenWidth(editor: VimEditor): Int
   fun handleWithReadonlyFragmentModificationHandler(editor: VimEditor, exception: java.lang.Exception)
-  fun getLineBuffer(editor: VimEditor, line: Int): CharBuffer
   fun getVisualLineAtBottomOfScreen(editor: VimEditor): Int
   fun pad(editor: VimEditor, context: ExecutionContext, line: Int, to: Int): String
-  fun getLineLength(editor: VimEditor): Int
-  fun getLineBreakCount(text: CharSequence): Int
   fun inlayAwareOffsetToVisualPosition(editor: VimEditor, offset: Int): VimVisualPosition
-  fun getLeadingWhitespace(editor: VimEditor, line: Int): String
-  fun anyNonWhitespace(editor: VimEditor, offset: Int, dir: Int): Boolean
 }
 
 fun VimEditor.endsWithNewLine(): Boolean {
@@ -206,7 +200,7 @@ fun VimEditor.normalizeVisualLine(line: Int): Int {
  */
 fun VimEditor.getVisualLineCount(): Int {
   val count = lineCount()
-  return if (count == 0) 0 else injector.engineEditorHelper.logicalLineToVisualLine(this, count - 1) + 1
+  return if (count == 0) 0 else this.logicalLineToVisualLine(count - 1) + 1
 }
 
 fun VimEditor.getLineStartForOffset(offset: Int): Int {
@@ -271,4 +265,27 @@ fun VimEditor.getText(range: TextRange): String {
 
 fun VimEditor.getOffset(line: Int, column: Int): Int {
   return logicalPositionToOffset(VimLogicalPosition(line, column))
+}
+fun VimEditor.getLineBuffer(line: Int): CharBuffer {
+  val start: Int = getLineStartOffset(line)
+  return CharBuffer.wrap(text(), start, start + getLineEndOffset(line, true) - getLineStartOffset(line))
+}
+fun VimEditor.anyNonWhitespace(offset: Int, dir: Int): Boolean {
+  val start: Int
+  val end: Int
+  val fileSize = fileSize().toInt()
+  if (dir > 0) {
+    start = (offset + 1).coerceAtMost(fileSize - 1)
+    end = getLineEndForOffset(offset).coerceAtMost(fileSize - 1)
+  } else {
+    start = getLineStartForOffset(offset)
+    end = (offset - 1).coerceAtLeast(0)
+  }
+  val chars: CharSequence = text()
+  for (i in start..end) {
+    if (!Character.isWhitespace(chars[i])) {
+      return true
+    }
+  }
+  return false
 }

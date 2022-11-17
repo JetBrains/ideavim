@@ -16,6 +16,7 @@ import com.intellij.openapi.editor.event.CaretEvent
 import com.intellij.openapi.editor.event.CaretListener
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.editor.ex.util.EditorUtil
+import com.intellij.openapi.editor.impl.EditorImpl
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.LineDeleteShift
@@ -34,7 +35,6 @@ import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.common.EditorLine
 import com.maddyhome.idea.vim.common.LiveRange
 import com.maddyhome.idea.vim.common.Offset
-import com.maddyhome.idea.vim.common.Pointer
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.common.offset
 import com.maddyhome.idea.vim.group.visual.vimSetSystemBlockSelectionSilently
@@ -79,14 +79,6 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
 
   override fun text(): CharSequence {
     return editor.document.charsSequence
-  }
-
-  override fun lineCount(): Int {
-    val lineCount = editor.document.lineCount
-    return lineCount
-
-    // Note: As I understand, vim editor has always at least one line
-//    return lineCount.coerceAtLeast(1)
   }
 
   override fun nativeLineCount(): Int {
@@ -137,10 +129,6 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
     return EditorLine.Pointer.init(editor.offsetToLogicalPosition(offset.point).line, this)
   }
 
-  override fun charAt(offset: Pointer): Char {
-    return editor.document.charsSequence[offset.point]
-  }
-
   override fun carets(): List<VimCaret> {
     return if (editor.inBlockSubMode) {
       listOf(IjVimCaret(editor.caretModel.primaryCaret))
@@ -180,10 +168,6 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
 
   override fun currentCaret(): VimCaret {
     return IjVimCaret(editor.caretModel.currentCaret)
-  }
-
-  override fun charsSequence(): CharSequence {
-    return editor.document.charsSequence
   }
 
   override fun isWritable(): Boolean {
@@ -252,10 +236,6 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
   override fun logicalPositionToOffset(position: VimLogicalPosition): Int {
     val logicalPosition = LogicalPosition(position.line, position.column, position.leansForward)
     return editor.logicalPositionToOffset(logicalPosition)
-  }
-
-  override fun getLineText(line: Int): String {
-    return EditorHelper.getLineText(this.editor, line)
   }
 
   override fun getVirtualFile(): VirtualFile? {
@@ -403,8 +383,26 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
       return VimLogicalPosition(logPosition.line, logPosition.column, logPosition.leansForward)
   }
 
+  override fun logicalToVisualPosition(logicalPosition: VimLogicalPosition): VimVisualPosition {
+    val visualPosition =
+      editor.logicalToVisualPosition(logicalPosition.run { LogicalPosition(line, column, leansForward) })
+    return visualPosition.run { VimVisualPosition(line, column, leansRight) }
+  }
+
   override fun createLiveMarker(start: Offset, end: Offset): LiveRange {
     return editor.document.createRangeMarker(start.point, end.point).vim
+  }
+
+  /**
+   * Converts a logical line number to a visual line number. Several logical lines can map to the same
+   * visual line when there are collapsed fold regions.
+   */
+  override fun logicalLineToVisualLine(line: Int): Int {
+    if (editor is EditorImpl) {
+      // This is faster than simply calling Editor#logicalToVisualPosition
+      return editor.offsetToVisualLine(editor.document.getLineStartOffset(line))
+    }
+    return super.logicalLineToVisualLine(line)
   }
 
   override var insertMode: Boolean

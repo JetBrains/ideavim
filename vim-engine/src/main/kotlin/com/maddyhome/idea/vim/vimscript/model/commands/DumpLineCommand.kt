@@ -25,7 +25,7 @@ data class DumpLineCommand(val ranges: Ranges, val argument: String) : Command.S
     if (!logger.isDebug()) return ExecutionResult.Error
 
     val range = getLineRange(editor)
-    val chars = editor.charsSequence()
+    val chars = editor.text()
     for (l in range.startLine..range.endLine) {
       val start = editor.getLineStartOffset(l)
       val end = editor.getLineEndOffset(l, true)

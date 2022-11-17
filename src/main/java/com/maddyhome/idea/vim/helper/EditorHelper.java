@@ -11,7 +11,6 @@ package com.maddyhome.idea.vim.helper;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.ex.util.EditorUtil;
-import com.intellij.openapi.editor.impl.EditorImpl;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.testFramework.LightVirtualFile;
@@ -26,7 +25,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
-import java.nio.CharBuffer;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -86,17 +84,6 @@ public class EditorHelper {
   public static int getVisualLineAtBottomOfScreen(final @NotNull Editor editor) {
     final int line = getNonNormalizedVisualLineAtBottomOfScreen(editor);
     return EngineEditorHelperKt.normalizeVisualLine(new IjVimEditor(editor), line);
-  }
-
-  /**
-   * Gets the number of characters on the current line. This will be different than the number of visual
-   * characters if there are "real" tabs in the line.
-   *
-   * @param editor The editor
-   * @return The number of characters in the current line
-   */
-  public static int getLineLength(final @NotNull Editor editor) {
-    return EngineEditorHelperKt.lineLength(new IjVimEditor(editor), editor.getCaretModel().getLogicalPosition().line);
   }
 
   /**
@@ -205,22 +192,6 @@ public class EditorHelper {
   }
 
   /**
-   * Converts a logical line number to a visual line number. Several logical lines can map to the same
-   * visual line when there are collapsed fold regions.
-   *
-   * @param editor The editor
-   * @param line   The logical line number to convert
-   * @return The visual line number
-   */
-  public static int logicalLineToVisualLine(final @NotNull Editor editor, final int line) {
-    if (editor instanceof EditorImpl) {
-      // This is faster than simply calling Editor#logicalToVisualPosition
-      return ((EditorImpl)editor).offsetToVisualLine(editor.getDocument().getLineStartOffset(line));
-    }
-    return editor.logicalToVisualPosition(new LogicalPosition(line, 0)).line;
-  }
-
-  /**
    * Returns the offset of the end of the requested line.
    *
    * @param editor   The editor
@@ -240,13 +211,6 @@ public class EditorHelper {
       final int endOffset = editor.getDocument().getLineEndOffset(line);
       return endOffset - (startOffset == endOffset || allowEnd ? 0 : 1);
     }
-  }
-
-  public static @NotNull String getLeadingWhitespace(final @NotNull Editor editor, final int line) {
-    int start = new IjVimEditor(editor).getLineStartOffset(line);
-    int end = EngineEditorHelperKt.getLeadingCharacterOffset(new IjVimEditor(editor), line, 0);
-
-    return editor.getDocument().getCharsSequence().subSequence(start, end).toString();
   }
 
   /**
@@ -270,28 +234,6 @@ public class EditorHelper {
     }
 
     return null;
-  }
-
-  private static int getLineCharCount(final @NotNull Editor editor, final int line) {
-    return EngineEditorHelperKt.getLineEndOffset(new IjVimEditor(editor), line, true) - new IjVimEditor(editor).getLineStartOffset(line);
-  }
-
-  /**
-   * Returns the text of the requested logical line
-   *
-   * @param editor The editor
-   * @param line   The logical line to get the text for
-   * @return The requested line
-   */
-  public static @NotNull String getLineText(final @NotNull Editor editor, final int line) {
-    final int start = new IjVimEditor(editor).getLineStartOffset(line);
-    final int end = EngineEditorHelperKt.getLineEndOffset(new IjVimEditor(editor), line, true);
-    return EngineEditorHelperKt.getText(new IjVimEditor(editor), start, end);
-  }
-
-  public static @NotNull CharBuffer getLineBuffer(final @NotNull Editor editor, final int line) {
-    int start = new IjVimEditor(editor).getLineStartOffset(line);
-    return CharBuffer.wrap(editor.getDocument().getCharsSequence(), start, start + getLineCharCount(editor, line));
   }
 
   public static boolean isLineEmpty(final @NotNull Editor editor, final int line, final boolean allowBlanks) {

@@ -166,7 +166,7 @@ public class SearchHelper {
             matchpos = new RegExp.lpos_T(regmatch.startpos[0]);
             endpos = new RegExp.lpos_T(regmatch.endpos[0]);
 
-            ptr = new CharPointer(EditorHelper.getLineBuffer(editor, lnum + matchpos.lnum));
+            ptr = new CharPointer(EngineEditorHelperKt.getLineBuffer(new IjVimEditor(editor), lnum + matchpos.lnum));
 
             /*
              * Forward search in the first line: match should be after
@@ -205,7 +205,7 @@ public class SearchHelper {
 
                 /* Need to get the line pointer again, a
                  * multi-line search may have made it invalid. */
-                ptr = new CharPointer(EditorHelper.getLineBuffer(editor, lnum));
+                ptr = new CharPointer(EngineEditorHelperKt.getLineBuffer(new IjVimEditor(editor), lnum));
               }
               if (!match_ok) {
                 continue;
@@ -257,7 +257,7 @@ public class SearchHelper {
 
                 /* Need to get the line pointer again, a
                  * multi-line search may have made it invalid. */
-                ptr = new CharPointer(EditorHelper.getLineBuffer(editor, lnum + matchpos.lnum));
+                ptr = new CharPointer(EngineEditorHelperKt.getLineBuffer(new IjVimEditor(editor), lnum + matchpos.lnum));
               }
 
               /*
@@ -401,29 +401,6 @@ public class SearchHelper {
     }
 
     return results;
-  }
-
-  public static boolean anyNonWhitespace(@NotNull Editor editor, int offset, int dir) {
-    int start;
-    int end;
-    int fileSize = EditorHelperRt.getFileSize(editor);
-    if (dir > 0) {
-      start = Math.min(offset + 1, fileSize - 1);
-      end = Math.min(EngineEditorHelperKt.getLineEndForOffset(new IjVimEditor(editor), offset), fileSize - 1);
-    }
-    else {
-      start = EngineEditorHelperKt.getLineStartForOffset(new IjVimEditor(editor), offset);
-      end = Math.max(offset - 1, 0);
-    }
-
-    CharSequence chars = editor.getDocument().getCharsSequence();
-    for (int i = start; i <= end; i++) {
-      if (!Character.isWhitespace(chars.charAt(i))) {
-        return true;
-      }
-    }
-
-    return false;
   }
 
   public static int findSection(@NotNull Editor editor, @NotNull Caret caret, char type, int dir, int count) {
@@ -1280,7 +1257,7 @@ public class SearchHelper {
                                                                             final boolean hex,
                                                                             final boolean octal) {
     int lline = caret.getLogicalPosition().line;
-    String text = EditorHelper.getLineText(editor, lline).toLowerCase();
+    String text = new IjVimEditor(editor).getLineText(lline).toLowerCase();
     int startLineOffset = new IjVimEditor(editor).getLineStartOffset(lline);
     int posOnLine = caret.getOffset() - startLineOffset;
 
@@ -1629,16 +1606,20 @@ public class SearchHelper {
       logger.debug("goForward=" + goForward);
     }
 
-    if (goForward && anyNonWhitespace(editor, end, 1)) {
-      while (end + 1 < max &&
-             CharacterHelper.charType(chars.charAt(end + 1), false) == CharacterHelper.CharacterType.WHITESPACE) {
-        end++;
+    if (goForward) {
+      if (EngineEditorHelperKt.anyNonWhitespace(new IjVimEditor(editor), end, 1)) {
+        while (end + 1 < max &&
+               CharacterHelper.charType(chars.charAt(end + 1), false) == CharacterHelper.CharacterType.WHITESPACE) {
+          end++;
+        }
       }
     }
-    if (goBack && anyNonWhitespace(editor, start, -1)) {
-      while (start > min &&
-             CharacterHelper.charType(chars.charAt(start - 1), false) == CharacterHelper.CharacterType.WHITESPACE) {
-        start--;
+    if (goBack) {
+      if (EngineEditorHelperKt.anyNonWhitespace(new IjVimEditor(editor), start, -1)) {
+        while (start > min &&
+               CharacterHelper.charType(chars.charAt(start - 1), false) == CharacterHelper.CharacterType.WHITESPACE) {
+          start--;
+        }
       }
     }
 

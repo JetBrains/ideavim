@@ -200,9 +200,14 @@ public class ChangeGroup extends VimChangeGroupBase {
       VimLogicalPosition start = editor.offsetToLogicalPosition(range.getStartOffset());
       VimLogicalPosition end = editor.offsetToLogicalPosition(range.getEndOffset());
       if (start.getLine() != end.getLine()) {
-        if (!SearchHelper.anyNonWhitespace(((IjVimEditor) editor).getEditor(), range.getStartOffset(), -1) &&
-            !SearchHelper.anyNonWhitespace(((IjVimEditor) editor).getEditor(), range.getEndOffset(), 1)) {
-          type = SelectionType.LINE_WISE;
+        @NotNull Editor editor2 = ((IjVimEditor)editor).getEditor();
+        int offset1 = range.getStartOffset();
+        if (!EngineEditorHelperKt.anyNonWhitespace(new IjVimEditor(editor2), offset1, -1)) {
+          @NotNull Editor editor1 = ((IjVimEditor) editor).getEditor();
+          int offset = range.getEndOffset();
+          if (!EngineEditorHelperKt.anyNonWhitespace(new IjVimEditor(editor1), offset, 1)) {
+            type = SelectionType.LINE_WISE;
+          }
         }
       }
     }

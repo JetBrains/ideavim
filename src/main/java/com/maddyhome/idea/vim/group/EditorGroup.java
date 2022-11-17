@@ -294,8 +294,8 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
         return lineNumber;
       }
       else {
-        final int visualLine = EditorHelper.logicalLineToVisualLine(editor, lineNumber - 1);
-        final int currentVisualLine = EditorHelper.logicalLineToVisualLine(editor, caretLine);
+        final int visualLine = new IjVimEditor(editor).logicalLineToVisualLine(lineNumber - 1);
+        final int currentVisualLine = new IjVimEditor(editor).logicalLineToVisualLine(caretLine);
         return Math.abs(currentVisualLine - visualLine);
       }
     }

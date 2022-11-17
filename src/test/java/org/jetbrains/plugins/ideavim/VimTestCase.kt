@@ -58,6 +58,7 @@ import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.ToKeysMappingInfo
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
+import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
@@ -389,7 +390,7 @@ abstract class VimTestCase : UsefulTestCase() {
   }
 
   fun assertVisibleLineBounds(logicalLine: Int, leftLogicalColumn: Int, rightLogicalColumn: Int) {
-    val visualLine = EditorHelper.logicalLineToVisualLine(myFixture.editor, logicalLine)
+    val visualLine = IjVimEditor(myFixture.editor).logicalLineToVisualLine(logicalLine)
     val actualLeftVisualColumn = EditorHelper.getVisualColumnAtLeftOfDisplay(myFixture.editor, visualLine)
     val actualLeftLogicalColumn =
       myFixture.editor.visualToLogicalPosition(VisualPosition(visualLine, actualLeftVisualColumn)).column

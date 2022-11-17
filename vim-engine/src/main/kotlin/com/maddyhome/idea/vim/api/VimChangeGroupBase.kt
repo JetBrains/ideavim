@@ -861,9 +861,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       val start = editor.offsetToLogicalPosition(range.startOffset)
       val end = editor.offsetToLogicalPosition(range.endOffset)
       if (start.line != end.line) {
-        if (!injector.engineEditorHelper.anyNonWhitespace(editor, range.startOffset, -1) &&
-          !injector.engineEditorHelper.anyNonWhitespace(editor, range.endOffset, 1)
-        ) {
+        if (!editor.anyNonWhitespace(range.startOffset, -1) && !editor.anyNonWhitespace(range.endOffset, 1)) {
           type = SelectionType.LINE_WISE
         }
       }
@@ -959,7 +957,8 @@ abstract class VimChangeGroupBase : VimChangeGroup {
    */
   override fun changeCharacters(editor: VimEditor, caret: VimCaret, operatorArguments: OperatorArguments): Boolean {
     val count = operatorArguments.count1
-    val len = injector.engineEditorHelper.getLineLength(editor)
+    // TODO  is it correct to use primary caret? There is a caret as an argument
+    val len = editor.lineLength(editor.primaryCaret().getLogicalPosition().line)
     val col = caret.getLogicalPosition().column
     if (col + count >= len) {
       return changeEndOfLine(editor, caret, 1, operatorArguments)

@@ -127,11 +127,13 @@ interface VimEditor {
    *   that this variable doesn't present the line count, so I may be wrong and line count can return zero.
    * I've explored this question by looking at the implementation of ctrl-g command in normal mode.
    */
-  fun lineCount(): Int
+  fun lineCount(): Int {
+    return nativeLineCount().coerceAtLeast(1)
+  }
+
   fun nativeLineCount(): Int
 
   fun getLineRange(line: EditorLine.Pointer): Pair<Offset, Offset>
-  fun charAt(offset: Pointer): Char
   fun carets(): List<VimCaret>
   fun sortedCarets(): List<VimCaret> = carets().sortedByOffset()
   fun nativeCarets(): List<VimCaret>
@@ -159,8 +161,6 @@ interface VimEditor {
   fun primaryCaret(): VimCaret
   fun currentCaret(): VimCaret
 
-  fun charsSequence(): CharSequence
-
   fun isWritable(): Boolean
   fun isDocumentWritable(): Boolean
   fun isOneLineMode(): Boolean
@@ -186,7 +186,11 @@ interface VimEditor {
   fun getVirtualFile(): VirtualFile?
   fun deleteString(range: TextRange)
 
-  fun getLineText(line: Int): String
+  fun getLineText(line: Int): String {
+    val start: Int = getLineStartOffset(line)
+    val end: Int = getLineEndOffset(line, true)
+    return getText(start, end)
+  }
 
   fun getSelectionModel(): VimSelectionModel
 
@@ -223,11 +227,20 @@ interface VimEditor {
   fun getLastVisualLineColumnNumber(line: Int): Int
 
   fun visualToLogicalPosition(visualPosition: VimVisualPosition): VimLogicalPosition
+  fun logicalToVisualPosition(logicalPosition: VimLogicalPosition): VimVisualPosition
 
   fun createLiveMarker(start: Offset, end: Offset): LiveRange
   var insertMode: Boolean
 
   val document: VimDocument
+
+  fun logicalLineToVisualLine(line: Int): Int {
+    return logicalToVisualPosition(VimLogicalPosition(line, 0)).line
+  }
+
+  fun charAt(offset: Pointer): Char {
+    return text()[offset.point]
+  }
 }
 
 interface MutableVimEditor : VimEditor {

@@ -15,7 +15,7 @@ import kotlin.math.min
 
 abstract class VimSearchHelperBase : VimSearchHelper {
   override fun findNextWord(editor: VimEditor, searchFrom: Int, count: Int, bigWord: Boolean): Long {
-    return findNextWord(editor.charsSequence(), searchFrom.toLong(), editor.fileSize(), count, bigWord, false)
+    return findNextWord(editor.text(), searchFrom.toLong(), editor.fileSize(), count, bigWord, false)
   }
 
     override fun findNextWordEnd(editor: VimEditor, caret: VimCaret, count: Int, bigWord: Boolean): Int {

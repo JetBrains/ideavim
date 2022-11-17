@@ -261,7 +261,7 @@ abstract class VimPutBase : VimPut {
     val currentColumn = if (mode == VimStateMachine.SubMode.VISUAL_LINE) 0 else startPosition.column
     var currentLine = startPosition.line
 
-    val lineCount = injector.engineEditorHelper.getLineBreakCount(text) + 1
+    val lineCount = text.getLineBreakCount() + 1
     if (currentLine + lineCount >= editor.nativeLineCount()) {
       val limit = currentLine + lineCount - editor.nativeLineCount()
       for (i in 0 until limit) {
@@ -354,4 +354,23 @@ abstract class VimPutBase : VimPut {
       else -> putTextBlockwise(editor, caret, context, text, type, mode, startOffset, count, indent, cursorAfter)
     }
   }
+}
+
+// This is taken from StringUtil of IntelliJ IDEA
+private fun CharSequence.getLineBreakCount(): Int {
+  var count = 0
+  var i = 0
+  while (i < length) {
+    val c = this[i]
+    if (c == '\n') {
+      count++
+    } else if (c == '\r') {
+      if (i + 1 < length && this[i + 1] == '\n') {
+        i++
+      }
+      count++
+    }
+    i++
+  }
+  return count
 }

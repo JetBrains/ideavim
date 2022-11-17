@@ -10,7 +10,9 @@ package com.maddyhome.idea.vim.action.change.change
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.getLeadingCharacterOffset
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.lineLength
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
@@ -52,7 +54,8 @@ private val logger = vimLogger<ChangeCharacterAction>()
  */
 private fun changeCharacter(editor: VimEditor, caret: VimCaret, count: Int, ch: Char): Boolean {
   val col = caret.getLogicalPosition().column
-  val len = injector.engineEditorHelper.getLineLength(editor)
+  // TODO: Is this correct? Should we really use only current caret? We have a caret as an argument
+  val len = editor.lineLength(editor.currentCaret().getLogicalPosition().line)
   val offset = caret.offset.point
   if (len - col < count) {
     return false
@@ -63,7 +66,7 @@ private fun changeCharacter(editor: VimEditor, caret: VimCaret, count: Int, ch: 
   var space: String? = null
   if (ch == '\n') {
     num = 1
-    space = injector.engineEditorHelper.getLeadingWhitespace(editor, editor.offsetToLogicalPosition(offset).line)
+    space = editor.getLeadingWhitespace(editor.offsetToLogicalPosition(offset).line)
     logger.debug { "space='$space'" }
   }
   val repl = StringBuilder(count)
@@ -82,4 +85,10 @@ private fun changeCharacter(editor: VimEditor, caret: VimCaret, count: Int, ch: 
     caret.moveToInlayAwareOffset(offset + slen)
   }
   return true
+}
+
+private fun VimEditor.getLeadingWhitespace(line: Int): String {
+  val start: Int = getLineStartOffset(line)
+  val end: Int = getLeadingCharacterOffset(line, 0)
+  return text().subSequence(start, end).toString()
 }

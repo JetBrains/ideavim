@@ -338,7 +338,7 @@ abstract class VimMotionGroupBase : VimMotionGroup {
     if (lastNewLine > 0) {
       val id = argument.motion.action.id
       if (id == "VimMotionWordRightAction" || id == "VimMotionBigWordRightAction" || id == "VimMotionCamelRightAction") {
-        if (!injector.engineEditorHelper.anyNonWhitespace(editor, end, -1)) {
+        if (!editor.anyNonWhitespace(end, -1)) {
           end = start + lastNewLine
         }
       }
