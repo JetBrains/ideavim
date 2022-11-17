@@ -18,7 +18,6 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.command.UndoConfirmationPolicy;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.LogicalPosition;
@@ -35,7 +34,6 @@ import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.util.PsiUtilBase;
 import com.intellij.util.containers.ContainerUtil;
 import com.maddyhome.idea.vim.EventFacade;
-import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.*;
 import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.common.IndentConfig;
@@ -96,20 +94,20 @@ public class ChangeGroup extends VimChangeGroupBase {
    * @param col    The column to indent to
    */
   private void insertNewLineAbove(@NotNull VimEditor editor, @NotNull VimCaret caret, int col) {
-    if (((IjVimEditor) editor).getEditor().isOneLineMode()) return;
+    if (editor.isOneLineMode()) return;
 
     boolean firstLiner = false;
-    if (((IjVimCaret) caret).getCaret().getVisualPosition().line == 0) {
-      injector.getMotion().moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToCurrentLineStart(editor,
+    if (caret.getVisualPosition().getLine() == 0) {
+      injector.getMotion().moveCaret(editor, caret, injector.getMotion().moveCaretToCurrentLineStart(editor,
                                                                                                       caret));
       firstLiner = true;
     }
     else {
       // TODO: getVerticalMotionOffset returns a visual line, not the expected logical line
       // Also address the unguarded upcast
-      final Motion motion = VimPlugin.getMotion().getVerticalMotionOffset(editor, caret, -1);
+      final Motion motion = injector.getMotion().getVerticalMotionOffset(editor, caret, -1);
       injector.getMotion().moveCaret(editor, caret, ((Motion.AbsoluteOffset)motion).getOffset());
-      injector.getMotion().moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToCurrentLineEnd(editor, caret));
+      injector.getMotion().moveCaret(editor, caret, injector.getMotion().moveCaretToCurrentLineEnd(editor, caret));
     }
 
     UserDataManager.setVimChangeActionSwitchMode(((IjVimEditor) editor).getEditor(), VimStateMachine.Mode.INSERT);
@@ -118,7 +116,7 @@ public class ChangeGroup extends VimChangeGroupBase {
     if (firstLiner) {
       // TODO: getVerticalMotionOffset returns a visual line, not the expected logical line
       // Also address the unguarded upcast
-      final Motion motion = VimPlugin.getMotion().getVerticalMotionOffset(editor, caret, -1);
+      final Motion motion = injector.getMotion().getVerticalMotionOffset(editor, caret, -1);
       injector.getMotion().moveCaret(editor, caret, ((Motion.AbsoluteOffset)motion).getOffset());
     }
   }
@@ -198,12 +196,10 @@ public class ChangeGroup extends VimChangeGroupBase {
       BufferPosition start = editor.offsetToBufferPosition(range.getStartOffset());
       BufferPosition end = editor.offsetToBufferPosition(range.getEndOffset());
       if (start.getLine() != end.getLine()) {
-        @NotNull Editor editor2 = ((IjVimEditor)editor).getEditor();
         int offset1 = range.getStartOffset();
-        if (!EngineEditorHelperKt.anyNonWhitespace(new IjVimEditor(editor2), offset1, -1)) {
-          @NotNull Editor editor1 = ((IjVimEditor) editor).getEditor();
+        if (!EngineEditorHelperKt.anyNonWhitespace(editor, offset1, -1)) {
           int offset = range.getEndOffset();
-          if (!EngineEditorHelperKt.anyNonWhitespace(new IjVimEditor(editor1), offset, 1)) {
+          if (!EngineEditorHelperKt.anyNonWhitespace(editor, offset, 1)) {
             type = SelectionType.LINE_WISE;
           }
         }
@@ -333,11 +329,11 @@ public class ChangeGroup extends VimChangeGroupBase {
    */
   @Override
   public boolean changeCaseToggleCharacter(@NotNull VimEditor editor, @NotNull VimCaret caret, int count) {
-    final int offset = VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret, count, true);
+    final int offset = injector.getMotion().getOffsetOfHorizontalMotion(editor, caret, count, true);
     if (offset == -1) {
       return false;
     }
-    changeCase(editor, ((IjVimCaret) caret).getCaret().getOffset(), offset, CharacterHelper.CASE_TOGGLE);
+    changeCase(editor, editor.currentCaret().getOffset().getPoint(), offset, CharacterHelper.CASE_TOGGLE);
     injector.getMotion().moveCaret(editor, caret, EngineEditorHelperKt.normalizeOffset(editor, offset, false));
     return true;
   }
@@ -353,7 +349,7 @@ public class ChangeGroup extends VimChangeGroupBase {
 
     boolean visualBlockMode = operatorArguments.getMode() == VimStateMachine.Mode.VISUAL &&
                               operatorArguments.getSubMode() == VimStateMachine.SubMode.VISUAL_BLOCK;
-    for (Caret caret : ((IjVimEditor) editor).getEditor().getCaretModel().getAllCarets()) {
+    for (VimCaret caret : editor.carets()) {
       final int line = startPosition.getLine();
       int column = startPosition.getColumn();
       if (!visualBlockMode) {
@@ -361,7 +357,7 @@ public class ChangeGroup extends VimChangeGroupBase {
       }
       else if (append) {
         column += range.getMaxLength();
-        if (UserDataManager.getVimLastColumn(caret) == VimMotionGroupBase.LAST_COLUMN) {
+        if (caret.getVimLastColumn() == VimMotionGroupBase.LAST_COLUMN) {
           column = VimMotionGroupBase.LAST_COLUMN;
         }
       }
@@ -369,12 +365,12 @@ public class ChangeGroup extends VimChangeGroupBase {
       final int lineLength = EngineEditorHelperKt.lineLength(editor, line);
       if (column < VimMotionGroupBase.LAST_COLUMN && lineLength < column) {
         final String pad = EditorHelper.pad(((IjVimEditor) editor).getEditor(), ((IjExecutionContext) context).getContext(), line, column);
-        final int offset = ((IjVimEditor) editor).getEditor().getDocument().getLineEndOffset(line);
-        insertText(editor, new IjVimCaret(caret), offset, pad);
+        final int offset = editor.getLineEndOffset(line);
+        insertText(editor, caret, offset, pad);
       }
 
       if (visualBlockMode || !append) {
-        InlayHelperKt.moveToInlayAwareLogicalPosition(caret, new LogicalPosition(line, column));
+        InlayHelperKt.moveToInlayAwareLogicalPosition(((IjVimCaret)caret).getCaret(), new LogicalPosition(line, column));
       }
       if (visualBlockMode) {
         setInsertRepeat(lines, column, append);
@@ -425,10 +421,9 @@ public class ChangeGroup extends VimChangeGroupBase {
       end = start;
       start = t;
     }
-    @NotNull final Editor editor1 = ((IjVimEditor) editor).getEditor();
-    end = EngineEditorHelperKt.normalizeOffset(new IjVimEditor(editor1), end, true);
+    end = EngineEditorHelperKt.normalizeOffset(editor, end, true);
 
-    CharSequence chars = ((IjVimEditor) editor).getEditor().getDocument().getCharsSequence();
+    CharSequence chars = editor.text();
     StringBuilder sb = new StringBuilder();
     for (int i = start; i < end; i++) {
       sb.append(CharacterHelper.changeCase(chars.charAt(i), type));
@@ -484,7 +479,7 @@ public class ChangeGroup extends VimChangeGroupBase {
         if (type == SelectionType.BLOCK_WISE) {
           setInsertRepeat(lines, col, false);
         }
-        UserDataManager.setVimChangeActionSwitchMode(((IjVimEditor) editor).getEditor(), VimStateMachine.Mode.INSERT);
+        editor.setVimChangeActionSwitchMode(VimStateMachine.Mode.INSERT);
       }
     }
     else {
@@ -497,7 +492,7 @@ public class ChangeGroup extends VimChangeGroupBase {
   private void restoreCursor(@NotNull VimEditor editor, @NotNull VimCaret caret, int startLine) {
     if (!caret.equals(editor.primaryCaret())) {
       ((IjVimEditor) editor).getEditor().getCaretModel().addCaret(
-        ((IjVimEditor) editor).getEditor().offsetToVisualPosition(VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, startLine)), false);
+        ((IjVimEditor) editor).getEditor().offsetToVisualPosition(injector.getMotion().moveCaretToLineStartSkipLeading(editor, startLine)), false);
     }
   }
 
@@ -545,14 +540,12 @@ public class ChangeGroup extends VimChangeGroupBase {
     int[] ends = range.getEndOffsets();
     final int firstLine = editor.offsetToBufferPosition(range.getStartOffset()).getLine();
     for (int i = ends.length - 1; i >= 0; i--) {
-      @NotNull final Editor editor1 = ((IjVimEditor) editor).getEditor();
-      final int startOffset = EngineEditorHelperKt.getLineStartForOffset(new IjVimEditor(editor1), starts[i]);
-      @NotNull final Editor editor2 = ((IjVimEditor) editor).getEditor();
+      final int startOffset = EngineEditorHelperKt.getLineStartForOffset(editor, starts[i]);
       final int offset = ends[i] - (startOffset == ends[i] ? 0 : 1);
-      final int endOffset = EngineEditorHelperKt.getLineEndForOffset(new IjVimEditor(editor2), offset);
+      final int endOffset = EngineEditorHelperKt.getLineEndForOffset(editor, offset);
       reformatCode(editor, startOffset, endOffset);
     }
-    final int newOffset = VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, firstLine);
+    final int newOffset = injector.getMotion().moveCaretToLineStartSkipLeading(editor, firstLine);
     injector.getMotion().moveCaret(editor, caret, newOffset);
     return true;
   }
@@ -600,7 +593,7 @@ public class ChangeGroup extends VimChangeGroupBase {
     };
     Function0<Unit> afterAction = () -> {
       final int firstLine = editor.offsetToBufferPosition(Math.min(startOffset, endOffset)).getLine();
-      final int newOffset = VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, firstLine);
+      final int newOffset = injector.getMotion().moveCaretToLineStartSkipLeading(editor, firstLine);
       injector.getMotion().moveCaret(editor, caret, newOffset);
       restoreCursor(editor, caret, ((IjVimCaret)caret).getCaret().getLogicalPosition().line);
       return null;
@@ -621,8 +614,8 @@ public class ChangeGroup extends VimChangeGroupBase {
                           int lines,
                           int dir,
                           @NotNull OperatorArguments operatorArguments) {
-    int start = ((IjVimCaret) caret).getCaret().getOffset();
-    int end = VimPlugin.getMotion().moveCaretToRelativeLineEnd(editor, caret, lines - 1, true);
+    int start = caret.getOffset().getPoint();
+    int end = injector.getMotion().moveCaretToRelativeLineEnd(editor, caret, lines - 1, true);
     indentRange(editor, caret, context, new TextRange(start, end), 1, dir, operatorArguments);
   }
 
@@ -653,7 +646,7 @@ public class ChangeGroup extends VimChangeGroupBase {
     }
 
     // Remember the current caret column
-    final int intendedColumn = UserDataManager.getVimLastColumn(((IjVimCaret)caret).getCaret());
+    final int intendedColumn = caret.getVimLastColumn();
 
     IndentConfig indentConfig = IndentConfig.create(((IjVimEditor) editor).getEditor(), ((IjExecutionContext) context).getContext());
 
@@ -678,7 +671,7 @@ public class ChangeGroup extends VimChangeGroupBase {
       }
       else {
         // Left shift blockwise selection
-        CharSequence chars = ((IjVimEditor) editor).getEditor().getDocument().getCharsSequence();
+        CharSequence chars = editor.text();
         for (int l = sline; l <= eline; l++) {
           int len = EngineEditorHelperKt.lineLength(editor, l);
           if (len > from) {
@@ -704,8 +697,8 @@ public class ChangeGroup extends VimChangeGroupBase {
       for (int l = sline; l <= eline; l++) {
         final int soff = editor.getLineStartOffset(l);
         final int eoff = EngineEditorHelperKt.getLineEndOffset(editor, l, true);
-        final int woff = VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, l);
-        final int col = ((IjVimEditor) editor).getEditor().offsetToVisualPosition(woff).getColumn();
+        final int woff = injector.getMotion().moveCaretToLineStartSkipLeading(editor, l);
+        final int col = editor.offsetToVisualPosition(woff).getColumn();
         final int limit = Math.max(0, col + dir * indentConfig.getTotalIndent(count));
         if (col > 0 || soff != eoff) {
           final String indent = indentConfig.createIndentBySize(limit);
@@ -717,8 +710,8 @@ public class ChangeGroup extends VimChangeGroupBase {
     if (!CommandStateHelper.inInsertMode(((IjVimEditor) editor).getEditor())) {
       if (!range.isMultiple()) {
         // The caret has moved, so reset the intended column before trying to get the expected offset
-        UserDataManager.setVimLastColumn(((IjVimCaret) caret).getCaret(), intendedColumn);
-        final int offset = VimPlugin.getMotion().moveCaretToLineWithStartOfLineOption(editor, sline, caret);
+        caret.setVimLastColumn(intendedColumn);
+        final int offset = injector.getMotion().moveCaretToLineWithStartOfLineOption(editor, sline, caret);
         injector.getMotion().moveCaret(editor, caret, offset);
       }
       else {
@@ -744,8 +737,8 @@ public class ChangeGroup extends VimChangeGroupBase {
       return false;
     }
 
-    final int startOffset = ((IjVimEditor) editor).getEditor().getDocument().getLineStartOffset(startLine);
-    final int endOffset = ((IjVimEditor) editor).getEditor().getDocument().getLineEndOffset(endLine);
+    final int startOffset = editor.getLineStartOffset(startLine);
+    final int endOffset = editor.getLineEndOffset(endLine);
 
     return sortTextRange(editor, startOffset, endOffset, lineComparator);
   }
@@ -804,7 +797,7 @@ public class ChangeGroup extends VimChangeGroupBase {
       }
     }
 
-    String nf = ((VimString) VimPlugin.getOptionService().getOptionValue(new OptionScope.LOCAL(editor), OptionConstants.nrformatsName, OptionConstants.nrformatsName)).getValue();
+    String nf = ((VimString) injector.getOptionService().getOptionValue(new OptionScope.LOCAL(editor), OptionConstants.nrformatsName, OptionConstants.nrformatsName)).getValue();
     boolean alpha = nf.contains("alpha");
     boolean hex = nf.contains("hex");
     boolean octal = nf.contains("octal");
@@ -834,7 +827,7 @@ public class ChangeGroup extends VimChangeGroupBase {
 
   @Override
   public boolean changeNumber(final @NotNull VimEditor editor, @NotNull VimCaret caret, final int count) {
-    final String nf = ((VimString) VimPlugin.getOptionService().getOptionValue(new OptionScope.LOCAL(editor), OptionConstants.nrformatsName, OptionConstants.nrformatsName)).getValue();
+    final String nf = ((VimString) injector.getOptionService().getOptionValue(new OptionScope.LOCAL(editor), OptionConstants.nrformatsName, OptionConstants.nrformatsName)).getValue();
     final boolean alpha = nf.contains("alpha");
     final boolean hex = nf.contains("hex");
     final boolean octal = nf.contains("octal");
