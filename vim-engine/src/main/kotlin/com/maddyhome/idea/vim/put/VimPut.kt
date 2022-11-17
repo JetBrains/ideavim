@@ -12,6 +12,8 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.OperatorArguments
+import com.maddyhome.idea.vim.command.SelectionType
+import com.maddyhome.idea.vim.command.VimStateMachine
 
 interface VimPut {
   fun doIndent(editor: VimEditor, caret: VimCaret, context: ExecutionContext, startOffset: Int, endOffset: Int): Int
@@ -34,4 +36,22 @@ interface VimPut {
   ): Boolean
 
   fun putTextForCaret(editor: VimEditor, caret: VimCaret, context: ExecutionContext, data: PutData, updateVisualMarks: Boolean = false): Boolean
+
+  fun putTextViaIde(
+    pasteProvider: VimPasteProvider,
+    vimEditor: VimEditor,
+    vimContext: ExecutionContext,
+    text: ProcessedTextData,
+    subMode: VimStateMachine.SubMode,
+    data: PutData,
+    additionalData: Map<String, Any>,
+  )
+
+  fun getProviderForPasteViaIde(
+    editor: VimEditor,
+    typeInRegister: SelectionType,
+    data: PutData,
+  ): VimPasteProvider?
 }
+
+interface VimPasteProvider

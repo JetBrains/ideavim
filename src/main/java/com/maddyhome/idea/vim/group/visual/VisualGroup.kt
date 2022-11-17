@@ -16,8 +16,8 @@ import com.maddyhome.idea.vim.api.VimMotionGroupBase
 import com.maddyhome.idea.vim.api.getLineEndForOffset
 import com.maddyhome.idea.vim.api.getLineEndOffset
 import com.maddyhome.idea.vim.api.getLineStartForOffset
+import com.maddyhome.idea.vim.api.isLineEmpty
 import com.maddyhome.idea.vim.command.VimStateMachine
-import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.editorMode
 import com.maddyhome.idea.vim.helper.inBlockSubMode
 import com.maddyhome.idea.vim.helper.inSelectMode
@@ -204,7 +204,7 @@ private fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: Ca
           aCaret.moveToVisualPosition(visualPosition)
         }
         if (mode != VimStateMachine.Mode.SELECT &&
-          !EditorHelper.isLineEmpty(editor, line, false) &&
+          !IjVimEditor(editor).isLineEmpty(line, false) &&
           aCaret.offset == aCaret.selectionEnd &&
           aCaret.selectionEnd - 1 >= lineStartOffset &&
           aCaret.selectionEnd - aCaret.selectionStart != 0

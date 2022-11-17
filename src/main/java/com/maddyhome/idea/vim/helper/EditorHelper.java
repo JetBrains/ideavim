@@ -236,27 +236,6 @@ public class EditorHelper {
     return null;
   }
 
-  public static boolean isLineEmpty(final @NotNull Editor editor, final int line, final boolean allowBlanks) {
-    CharSequence chars = editor.getDocument().getCharsSequence();
-    if (chars.length() == 0) return true;
-    int offset = new IjVimEditor(editor).getLineStartOffset(line);
-    if (offset >= chars.length() || chars.charAt(offset) == '\n') {
-      return true;
-    }
-    else if (allowBlanks) {
-      for (; offset < chars.length(); offset++) {
-        if (chars.charAt(offset) == '\n') {
-          return true;
-        }
-        else if (!Character.isWhitespace(chars.charAt(offset))) {
-          return false;
-        }
-      }
-    }
-
-    return false;
-  }
-
   public static @NotNull String pad(final @NotNull Editor editor,
                                     @NotNull DataContext context,
                                     int line,

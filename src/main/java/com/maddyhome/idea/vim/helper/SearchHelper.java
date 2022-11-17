@@ -2219,7 +2219,7 @@ public class SearchHelper {
 
     line = skipEmptyLines(editor, line, dir, allowBlanks);
     while (line >= 0 && line < maxline && res == -1) {
-      if (EditorHelper.isLineEmpty(editor, line, allowBlanks)) {
+      if (EngineEditorHelperKt.isLineEmpty(new IjVimEditor(editor), line, allowBlanks)) {
         res = line;
         if (skipLines) {
           line = skipEmptyLines(editor, line, dir, allowBlanks);
@@ -2235,7 +2235,7 @@ public class SearchHelper {
   private static int skipEmptyLines(@NotNull Editor editor, int line, int dir, boolean allowBlanks) {
     int maxline = new IjVimEditor(editor).lineCount();
     while (line >= 0 && line < maxline) {
-      if (!EditorHelper.isLineEmpty(editor, line, allowBlanks)) {
+      if (!EngineEditorHelperKt.isLineEmpty(new IjVimEditor(editor), line, allowBlanks)) {
         return line;
       }
 
@@ -2257,7 +2257,7 @@ public class SearchHelper {
     boolean fixstart = false;
     boolean fixend = false;
     if (isOuter) {
-      if (EditorHelper.isLineEmpty(editor, line, true)) {
+      if (EngineEditorHelperKt.isLineEmpty(new IjVimEditor(editor), line, true)) {
         sline = line;
       }
       else {
@@ -2269,7 +2269,8 @@ public class SearchHelper {
         return null;
       }
 
-      if (EditorHelper.isLineEmpty(editor, sline, true) && EditorHelper.isLineEmpty(editor, eline, true)) {
+      if (EngineEditorHelperKt.isLineEmpty(new IjVimEditor(editor), sline, true) &&
+          EngineEditorHelperKt.isLineEmpty(new IjVimEditor(editor), eline, true)) {
         if (sline == line) {
           eline--;
           fixstart = true;
@@ -2279,24 +2280,28 @@ public class SearchHelper {
           fixend = true;
         }
       }
-      else if (!EditorHelper.isLineEmpty(editor, eline, true) &&
-               !EditorHelper.isLineEmpty(editor, sline, true) &&
+      else if (!EngineEditorHelperKt.isLineEmpty(new IjVimEditor(editor), eline, true) &&
+               !EngineEditorHelperKt.isLineEmpty(new IjVimEditor(editor), sline, true) &&
                sline > 0) {
         sline--;
         fixstart = true;
       }
-      else if (EditorHelper.isLineEmpty(editor, eline, true)) {
-        fixend = true;
-      }
-      else if (EditorHelper.isLineEmpty(editor, sline, true)) {
-        fixstart = true;
+      else {
+        if (EngineEditorHelperKt.isLineEmpty(new IjVimEditor(editor), eline, true)) {
+          fixend = true;
+        }
+        else {
+          if (EngineEditorHelperKt.isLineEmpty(new IjVimEditor(editor), sline, true)) {
+            fixstart = true;
+          }
+        }
       }
     }
     else {
       sline = line;
-      if (!EditorHelper.isLineEmpty(editor, sline, true)) {
+      if (!EngineEditorHelperKt.isLineEmpty(new IjVimEditor(editor), sline, true)) {
         sline = findNextParagraphLine(editor, caret, -1, true);
-        if (EditorHelper.isLineEmpty(editor, sline, true)) {
+        if (EngineEditorHelperKt.isLineEmpty(new IjVimEditor(editor), sline, true)) {
           sline++;
         }
         eline = line;
@@ -2305,7 +2310,7 @@ public class SearchHelper {
         eline = line - 1;
       }
 
-      int which = EditorHelper.isLineEmpty(editor, sline, true) ? 0 : 1;
+      int which = EngineEditorHelperKt.isLineEmpty(new IjVimEditor(editor), sline, true) ? 0 : 1;
       for (int i = 0; i < count; i++) {
         if (which % 2 == 1) {
           eline = findNextParagraphLine(editor, eline, 1, true, false) - 1;
@@ -2327,24 +2332,28 @@ public class SearchHelper {
       fixend = true;
     }
 
-    if (fixstart && EditorHelper.isLineEmpty(editor, sline, true)) {
-      while (sline > 0) {
-        if (EditorHelper.isLineEmpty(editor, sline - 1, true)) {
-          sline--;
-        }
-        else {
-          break;
+    if (fixstart) {
+      if (EngineEditorHelperKt.isLineEmpty(new IjVimEditor(editor), sline, true)) {
+        while (sline > 0) {
+          if (EngineEditorHelperKt.isLineEmpty(new IjVimEditor(editor), sline - 1, true)) {
+            sline--;
+          }
+          else {
+            break;
+          }
         }
       }
     }
 
-    if (fixend && EditorHelper.isLineEmpty(editor, eline, true)) {
-      while (eline < maxline - 1) {
-        if (EditorHelper.isLineEmpty(editor, eline + 1, true)) {
-          eline++;
-        }
-        else {
-          break;
+    if (fixend) {
+      if (EngineEditorHelperKt.isLineEmpty(new IjVimEditor(editor), eline, true)) {
+        while (eline < maxline - 1) {
+          if (EngineEditorHelperKt.isLineEmpty(new IjVimEditor(editor), eline + 1, true)) {
+            eline++;
+          }
+          else {
+            break;
+          }
         }
       }
     }

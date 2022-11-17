@@ -293,3 +293,22 @@ fun VimEditor.anyNonWhitespace(offset: Int, dir: Int): Boolean {
   }
   return false
 }
+
+fun VimEditor.isLineEmpty(line: Int, allowBlanks: Boolean): Boolean {
+  val chars: CharSequence = text()
+  if (chars.isEmpty()) return true
+  var offset: Int = getLineStartOffset(line)
+  if (offset >= chars.length || chars[offset] == '\n') {
+    return true
+  } else if (allowBlanks) {
+    while (offset < chars.length) {
+      if (chars[offset] == '\n') {
+        return true
+      } else if (!Character.isWhitespace(chars[offset])) {
+        return false
+      }
+      offset++
+    }
+  }
+  return false
+}
