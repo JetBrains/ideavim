@@ -114,7 +114,7 @@ interface VimChangeGroup {
     caret: VimCaret,
     range: TextRange,
     type: SelectionType,
-    context: ExecutionContext?,
+    context: ExecutionContext,
     operatorArguments: OperatorArguments
   ): Boolean
 

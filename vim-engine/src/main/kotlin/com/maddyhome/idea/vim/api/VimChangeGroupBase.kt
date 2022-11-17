@@ -1198,6 +1198,72 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     }
   }
 
+  /**
+   * Inserts a new line below the caret position
+   *
+   * @param editor The editor to insert into
+   * @param caret  The caret to insert after
+   * @param col    The column to indent to
+   */
+  private fun insertNewLineBelow(editor: VimEditor, caret: VimCaret, col: Int) {
+    if (editor.isOneLineMode()) return
+    caret.moveToOffset(injector.motion.moveCaretToCurrentLineEnd(editor, caret))
+    editor.vimChangeActionSwitchMode = VimStateMachine.Mode.INSERT
+    insertText(editor, caret, "\n${editor.createIndentBySize(col)}")
+  }
+
+    /**
+     * Deletes the range of text and enters insert mode
+     *
+     * @param editor            The editor to change
+     * @param caret             The caret to be moved after range deletion
+     * @param range             The range to change
+     * @param type              The type of the range
+     * @param operatorArguments
+     * @return true if able to delete the range, false if not
+     */
+    override fun changeRange(
+        editor: VimEditor,
+        caret: VimCaret,
+        range: TextRange,
+        type: SelectionType,
+        context: ExecutionContext,
+        operatorArguments: OperatorArguments,
+    ): Boolean {
+        var col = 0
+        var lines = 0
+        if (type === SelectionType.BLOCK_WISE) {
+            lines = getLinesCountInVisualBlock(editor, range)
+            col = editor.offsetToBufferPosition(range.startOffset).column
+            if (caret.vimLastColumn == VimMotionGroupBase.LAST_COLUMN) {
+                col = VimMotionGroupBase.LAST_COLUMN
+            }
+        }
+        val after = range.endOffset >= editor.fileSize()
+        val lp = editor.offsetToBufferPosition(injector.motion.moveCaretToCurrentLineStartSkipLeading(editor, caret))
+        val res = deleteRange(editor, caret, range, type, true, operatorArguments)
+        if (res) {
+            if (type === SelectionType.LINE_WISE) {
+                // Please don't use `getDocument().getText().isEmpty()` because it converts CharSequence into String
+                if (editor.fileSize() == 0L) {
+                    insertBeforeCursor(editor, context)
+                } else if (after && !editor.endsWithNewLine()) {
+                    insertNewLineBelow(editor, caret, lp.column)
+                } else {
+                    insertNewLineAbove(editor, caret, lp.column)
+                }
+            } else {
+                if (type === SelectionType.BLOCK_WISE) {
+                    setInsertRepeat(lines, col, false)
+                }
+                editor.vimChangeActionSwitchMode = VimStateMachine.Mode.INSERT
+            }
+        } else {
+            insertBeforeCursor(editor, context)
+        }
+        return true
+    }
+
   companion object {
     private const val MAX_REPEAT_CHARS_COUNT = 10000
     private val logger = vimLogger<VimChangeGroupBase>()

@@ -77,21 +77,6 @@ public class ChangeGroup extends VimChangeGroupBase {
   private long lastShownTime = 0L;
 
 
-  /**
-   * Inserts a new line below the caret position
-   *
-   * @param editor The editor to insert into
-   * @param caret  The caret to insert after
-   * @param col    The column to indent to
-   */
-  private void insertNewLineBelow(@NotNull VimEditor editor, @NotNull VimCaret caret, int col) {
-    if (editor.isOneLineMode()) return;
-
-    caret.moveToOffset(injector.getMotion().moveCaretToCurrentLineEnd(editor, caret));
-    editor.setVimChangeActionSwitchMode(VimStateMachine.Mode.INSERT);
-    insertText(editor, caret, "\n" + IndentConfig.create(((IjVimEditor) editor).getEditor()).createIndentBySize(col));
-  }
-
 
 
 
@@ -298,64 +283,6 @@ public class ChangeGroup extends VimChangeGroupBase {
       sb.append(CharacterHelper.changeCase(chars.charAt(i), type));
     }
     replaceText(editor, start, end, sb.toString());
-  }
-
-  /**
-   * Deletes the range of text and enters insert mode
-   *
-   * @param editor            The editor to change
-   * @param caret             The caret to be moved after range deletion
-   * @param range             The range to change
-   * @param type              The type of the range
-   * @param operatorArguments
-   * @return true if able to delete the range, false if not
-   */
-  @Override
-  public boolean changeRange(@NotNull VimEditor editor,
-                             @NotNull VimCaret caret,
-                             @NotNull TextRange range,
-                             @NotNull SelectionType type,
-                             @Nullable ExecutionContext context,
-                             @NotNull OperatorArguments operatorArguments) {
-    int col = 0;
-    int lines = 0;
-    if (type == SelectionType.BLOCK_WISE) {
-      lines = VimChangeGroupBase.Companion.getLinesCountInVisualBlock(editor, range);
-      col = editor.offsetToBufferPosition(range.getStartOffset()).getColumn();
-      if (caret.getVimLastColumn() == VimMotionGroupBase.LAST_COLUMN) {
-        col = VimMotionGroupBase.LAST_COLUMN;
-      }
-    }
-    boolean after = range.getEndOffset() >= editor.fileSize();
-
-    final BufferPosition lp = editor.offsetToBufferPosition(injector.getMotion().moveCaretToCurrentLineStartSkipLeading(editor, caret));
-
-    boolean res = deleteRange(editor, caret, range, type, true, operatorArguments);
-    if (res) {
-      if (type == SelectionType.LINE_WISE) {
-        // Please don't use `getDocument().getText().isEmpty()` because it converts CharSequence into String
-        if (editor.fileSize() == 0) {
-          insertBeforeCursor(editor, context);
-        }
-        else if (after && !EngineEditorHelperKt.endsWithNewLine(editor)) {
-          insertNewLineBelow(editor, caret, lp.getColumn());
-        }
-        else {
-          insertNewLineAbove(editor, caret, lp.getColumn());
-        }
-      }
-      else {
-        if (type == SelectionType.BLOCK_WISE) {
-          setInsertRepeat(lines, col, false);
-        }
-        editor.setVimChangeActionSwitchMode(VimStateMachine.Mode.INSERT);
-      }
-    }
-    else {
-      insertBeforeCursor(editor, context);
-    }
-
-    return true;
   }
 
   private void restoreCursor(@NotNull VimEditor editor, @NotNull VimCaret caret, int startLine) {
