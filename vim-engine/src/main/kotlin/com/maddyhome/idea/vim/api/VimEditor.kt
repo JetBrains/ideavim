@@ -276,6 +276,7 @@ interface MutableVimEditor : VimEditor {
   fun delete(range: VimRange)
   fun addLine(atPosition: EditorLine.Offset): EditorLine.Pointer?
   fun insertText(atPosition: Offset, text: CharSequence)
+  fun replaceString(start: Int, end: Int, newString: String)
 }
 
 abstract class LinearEditor : VimEditor {

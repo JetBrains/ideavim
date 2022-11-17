@@ -731,10 +731,6 @@ public class SearchHelper {
     return backslashCounter % 2 == 0;
   }
 
-  public enum NumberType {
-    BIN, OCT, DEC, HEX, ALPHA
-  }
-
   private static int findNextQuoteInLine(@NotNull CharSequence chars, int pos, char quote) {
     return findQuoteInLine(chars, pos, quote, Direction.FORWARDS);
   }

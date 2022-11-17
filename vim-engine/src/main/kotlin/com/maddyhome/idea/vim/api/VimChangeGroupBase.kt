@@ -36,6 +36,7 @@ import com.maddyhome.idea.vim.mark.VimMarkConstants.MARK_CHANGE_START
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.register.RegisterConstants.LAST_INSERTED_TEXT_REGISTER
+import org.jetbrains.annotations.NonNls
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 import kotlin.math.abs
@@ -92,7 +93,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     caret: VimCaret,
     count: Int,
     isChange: Boolean,
-    operatorArguments: OperatorArguments
+    operatorArguments: OperatorArguments,
   ): Boolean {
     val endOffset = injector.motion.getOffsetOfHorizontalMotion(editor, caret, count, true)
     if (endOffset != -1) {
@@ -683,7 +684,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     caret: VimCaret,
     count: Int,
     spaces: Boolean,
-    operatorArguments: OperatorArguments
+    operatorArguments: OperatorArguments,
   ): Boolean {
     var myCount = count
     if (myCount < 2) myCount = 2
@@ -802,7 +803,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     caret: VimCaret,
     range: TextRange,
     spaces: Boolean,
-    operatorArguments: OperatorArguments
+    operatorArguments: OperatorArguments,
   ): Boolean {
     val startLine = editor.offsetToBufferPosition(range.startOffset).line
     val endLine = editor.offsetToBufferPosition(range.endOffset).line
@@ -1041,6 +1042,23 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       (keyStroke.keyCode == KeyEvent.VK_LEFT || keyStroke.keyCode == KeyEvent.VK_RIGHT)
   }
 
+
+  /**
+   * Replace text in the editor
+   *
+   * @param editor The editor to replace text in
+   * @param start  The start offset to change
+   * @param end    The end offset to change
+   * @param str    The new text
+   */
+  override fun replaceText(editor: VimEditor, start: Int, end: Int, str: String) {
+    (editor as MutableVimEditor).replaceString(start, end, str)
+
+    val newEnd = start + str.length
+    injector.markGroup.setChangeMarks(editor, TextRange(start, newEnd))
+    injector.markGroup.setMark(editor, MARK_CHANGE_POS, newEnd)
+  }
+
   companion object {
     private const val MAX_REPEAT_CHARS_COUNT = 10000
     private val logger = vimLogger<VimChangeGroupBase>()
@@ -1062,6 +1080,8 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       val lastStart = editor.offsetToBufferPosition(startOffsets[range.size() - 1])
       return lastStart.line - firstStart.line + 1
     }
+
+    protected const val HEX_START: @NonNls String = "0x"
   }
 }
 

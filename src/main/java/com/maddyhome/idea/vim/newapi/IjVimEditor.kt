@@ -119,6 +119,10 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
     editor.document.insertString(atPosition.point, text)
   }
 
+  override fun replaceString(start: Int, end: Int, newString: String) {
+    editor.document.replaceString(start, end, newString)
+  }
+
   // TODO: 30.12.2021 Is end offset inclusive?
   override fun getLineRange(line: EditorLine.Pointer): Pair<Offset, Offset> {
     // TODO: 30.12.2021 getLineEndOffset returns the same value for "xyz" and "xyz\n"

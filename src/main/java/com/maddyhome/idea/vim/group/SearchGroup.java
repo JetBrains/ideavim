@@ -1127,7 +1127,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
 
   @Override
   public Integer findDecimalNumber(@NotNull String line) {
-    Pair<TextRange, SearchHelper.NumberType> searchResult = SearchHelper.findNumberInText(line, 0, false, false, false);
+    Pair<TextRange, NumberType> searchResult = SearchHelper.findNumberInText(line, 0, false, false, false);
     if (searchResult != null) {
       TextRange range = searchResult.component1();
       return Integer.parseInt(line.substring(range.getStartOffset(), range.getEndOffset()));

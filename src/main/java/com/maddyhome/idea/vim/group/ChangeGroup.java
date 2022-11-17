@@ -68,7 +68,6 @@ import java.math.BigInteger;
 import java.util.*;
 
 import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
-import static com.maddyhome.idea.vim.mark.VimMarkConstants.MARK_CHANGE_POS;
 
 /**
  * Provides all the insert/replace related functionality
@@ -83,7 +82,6 @@ public class ChangeGroup extends VimChangeGroupBase {
   private static final String VIM_MOTION_CAMEL_END_RIGHT = "VimMotionCamelEndRightAction";
   private static final ImmutableSet<String> wordMotions = ImmutableSet.of(VIM_MOTION_WORD_RIGHT, VIM_MOTION_BIG_WORD_RIGHT, VIM_MOTION_CAMEL_RIGHT);
 
-  @NonNls private static final String HEX_START = "0x";
   @NonNls private static final String MAX_HEX_INTEGER = "ffffffffffffffff";
 
   private final List<VimInsertListener> insertListeners = ContainerUtil.createLockFreeCopyOnWriteList();
@@ -642,23 +640,6 @@ public class ChangeGroup extends VimChangeGroupBase {
     }
   }
 
-  /**
-   * Replace text in the editor
-   *
-   * @param editor The editor to replace text in
-   * @param start  The start offset to change
-   * @param end    The end offset to change
-   * @param str    The new text
-   */
-  @Override
-  public void replaceText(@NotNull VimEditor editor, int start, int end, @NotNull String str) {
-    ((IjVimEditor) editor).getEditor().getDocument().replaceString(start, end, str);
-
-    final int newEnd = start + str.length();
-    VimPlugin.getMark().setChangeMarks(editor, new TextRange(start, newEnd));
-    VimPlugin.getMark().setMark(editor, MARK_CHANGE_POS, newEnd);
-  }
-
   @Override
   public void indentRange(@NotNull VimEditor editor,
                           @NotNull VimCaret caret,
@@ -828,12 +809,12 @@ public class ChangeGroup extends VimChangeGroupBase {
     boolean hex = nf.contains("hex");
     boolean octal = nf.contains("octal");
 
-    @NotNull List<Pair<TextRange, SearchHelper.NumberType>> numberRanges =
+    @NotNull List<Pair<TextRange, NumberType>> numberRanges =
       SearchHelper.findNumbersInRange(((IjVimEditor) editor).getEditor(), selectedRange, alpha, hex, octal);
 
     List<String> newNumbers = new ArrayList<>();
     for (int i = 0; i < numberRanges.size(); i++) {
-      Pair<TextRange, SearchHelper.NumberType> numberRange = numberRanges.get(i);
+      Pair<TextRange, NumberType> numberRange = numberRanges.get(i);
       int iCount = avalanche ? (i + 1) * count : count;
       String newNumber = changeNumberInRange(editor, numberRange, iCount, alpha, hex, octal);
       newNumbers.add(newNumber);
@@ -841,7 +822,7 @@ public class ChangeGroup extends VimChangeGroupBase {
 
     for (int i = newNumbers.size() - 1; i >= 0; i--) {
       // Replace text bottom up. In other direction ranges will be desynchronized after inc numbers like 99
-      Pair<TextRange, SearchHelper.NumberType> rangeToReplace = numberRanges.get(i);
+      Pair<TextRange, NumberType> rangeToReplace = numberRanges.get(i);
       String newNumber = newNumbers.get(i);
       replaceText(editor, rangeToReplace.getFirst().getStartOffset(), rangeToReplace.getFirst().getEndOffset(), newNumber);
     }
@@ -858,7 +839,7 @@ public class ChangeGroup extends VimChangeGroupBase {
     final boolean hex = nf.contains("hex");
     final boolean octal = nf.contains("octal");
 
-    @Nullable Pair<TextRange, SearchHelper.NumberType> range =
+    @Nullable Pair<TextRange, NumberType> range =
       SearchHelper.findNumberUnderCursor(((IjVimEditor) editor).getEditor(), ((IjVimCaret) caret).getCaret(), alpha, hex, octal);
     if (range == null) {
       logger.debug("no number on line");
@@ -891,15 +872,14 @@ public class ChangeGroup extends VimChangeGroupBase {
     strokes.add(chars);
   }
 
-  public @Nullable String changeNumberInRange(final @NotNull VimEditor editor,
-                                              Pair<TextRange, SearchHelper.NumberType> range,
+  private @Nullable String changeNumberInRange(final @NotNull VimEditor editor,
+                                              Pair<TextRange, NumberType> range,
                                               final int count,
                                               boolean alpha,
                                               boolean hex,
                                               boolean octal) {
-    @NotNull final Editor editor1 = ((IjVimEditor) editor).getEditor();
-    String text = EngineEditorHelperKt.getText(new IjVimEditor(editor1), range.getFirst());
-    SearchHelper.NumberType numberType = range.getSecond();
+    String text = EngineEditorHelperKt.getText(editor, range.getFirst());
+    NumberType numberType = range.getSecond();
     if (logger.isDebugEnabled()) {
       logger.debug("found range " + range);
       logger.debug("text=" + text);
@@ -910,7 +890,7 @@ public class ChangeGroup extends VimChangeGroupBase {
     }
 
     char ch = text.charAt(0);
-    if (hex && SearchHelper.NumberType.HEX.equals(numberType)) {
+    if (hex && NumberType.HEX.equals(numberType)) {
       if (!text.toLowerCase().startsWith(HEX_START)) {
         throw new RuntimeException("Hex number should start with 0x: " + text);
       }
@@ -936,7 +916,7 @@ public class ChangeGroup extends VimChangeGroupBase {
 
       number = text.substring(0, 2) + number;
     }
-    else if (octal && SearchHelper.NumberType.OCT.equals(numberType) && text.length() > 1) {
+    else if (octal && NumberType.OCT.equals(numberType) && text.length() > 1) {
       if (!text.startsWith("0")) throw new RuntimeException("Oct number should start with 0: " + text);
       BigInteger num = new BigInteger(text, 8).add(BigInteger.valueOf(count));
 
@@ -946,14 +926,14 @@ public class ChangeGroup extends VimChangeGroupBase {
       number = num.toString(8);
       number = "0" + StringsKt.padStart(number, text.length() - 1, '0');
     }
-    else if (alpha && SearchHelper.NumberType.ALPHA.equals(numberType)) {
+    else if (alpha && NumberType.ALPHA.equals(numberType)) {
       if (!Character.isLetter(ch)) throw new RuntimeException("Not alpha number : " + text);
       ch += count;
       if (Character.isLetter(ch)) {
         number = String.valueOf(ch);
       }
     }
-    else if (SearchHelper.NumberType.DEC.equals(numberType)) {
+    else if (NumberType.DEC.equals(numberType)) {
       if (ch != '-' && !Character.isDigit(ch)) throw new RuntimeException("Not dec number : " + text);
       boolean pad = ch == '0';
       int len = text.length();
