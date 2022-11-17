@@ -21,6 +21,8 @@ import com.maddyhome.idea.vim.register.VimRegisterGroupBase
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import com.maddyhome.idea.vim.vimscript.services.VariableService
 import com.maddyhome.idea.vim.vimscript.services.VimVariableServiceBase
+import com.maddyhome.idea.vim.yank.VimYankGroup
+import com.maddyhome.idea.vim.yank.YankGroupBase
 
 abstract class VimInjectorBase : VimInjector {
   companion object {
@@ -40,4 +42,5 @@ abstract class VimInjectorBase : VimInjector {
   override val application: VimApplication by lazy { VimApplicationStub() }
   override val executionContextManager: ExecutionContextManager by lazy { ExecutionContextManagerStub() }
   override val enabler: VimEnabler by lazy { VimEnablerStub() }
+  override val yank: VimYankGroup by lazy { YankGroupBase() }
 }
