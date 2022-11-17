@@ -192,28 +192,6 @@ public class EditorHelper {
   }
 
   /**
-   * Returns the offset of the end of the requested line.
-   *
-   * @param editor   The editor
-   * @param line     The logical line to get the end offset for
-   * @param allowEnd True include newline
-   * @return 0 if line is &lt 0, file size of line is bigger than file, else the end offset for the line
-   */
-  public static int getLineEndOffset(final @NotNull Editor editor, final int line, final boolean allowEnd) {
-    if (line < 0) {
-      return 0;
-    }
-    else if (line >= new IjVimEditor(editor).lineCount()) {
-      return EngineEditorHelperKt.getFileSize(new IjVimEditor(editor), allowEnd);
-    }
-    else {
-      final int startOffset = editor.getDocument().getLineStartOffset(line);
-      final int endOffset = editor.getDocument().getLineEndOffset(line);
-      return endOffset - (startOffset == endOffset || allowEnd ? 0 : 1);
-    }
-  }
-
-  /**
    * Gets the editor for the virtual file within the editor manager.
    *
    * @param file The virtual file get the editor for
