@@ -270,7 +270,7 @@ tasks {
         dependsOn("generateGrammarSource")
     }
     named("compileTestKotlin") {
-        dependsOn("generateGrammarSource")
+        dependsOn("generateTestGrammarSource")
     }
 
     // Add plugin open API sources to the plugin ZIP
