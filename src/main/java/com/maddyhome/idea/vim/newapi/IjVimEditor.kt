@@ -18,6 +18,7 @@ import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.intellij.openapi.editor.impl.EditorImpl
 import com.intellij.openapi.vfs.VirtualFileManager
+import com.maddyhome.idea.vim.api.BufferPosition
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.LineDeleteShift
 import com.maddyhome.idea.vim.api.MutableLinearEditor
@@ -25,7 +26,6 @@ import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimCaretListener
 import com.maddyhome.idea.vim.api.VimDocument
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.BufferPosition
 import com.maddyhome.idea.vim.api.VimSelectionModel
 import com.maddyhome.idea.vim.api.VimVisualPosition
 import com.maddyhome.idea.vim.api.VirtualFile
@@ -33,6 +33,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.common.EditorLine
+import com.maddyhome.idea.vim.common.IndentConfig
 import com.maddyhome.idea.vim.common.LiveRange
 import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.common.TextRange
@@ -417,6 +418,10 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
 
   override val document: VimDocument
     get() = IjVimDocument(editor.document)
+
+  override fun createIndentBySize(size: Int): String {
+    return IndentConfig.create(editor).createIndentBySize(size)
+  }
 
   private fun Pair<Offset, Offset>.noGuard(editor: Editor): Boolean {
     return editor.document.getRangeGuard(this.first.point, this.second.point) == null

@@ -25,6 +25,9 @@ import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
+import com.maddyhome.idea.vim.handler.Motion.AbsoluteOffset
+import com.maddyhome.idea.vim.helper.CharacterHelper
+import com.maddyhome.idea.vim.helper.CharacterHelper.charType
 import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.helper.inSingleCommandMode
 import com.maddyhome.idea.vim.helper.usesVirtualSpace
@@ -38,6 +41,7 @@ import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.register.RegisterConstants.LAST_INSERTED_TEXT_REGISTER
 import org.jetbrains.annotations.NonNls
 import java.awt.event.KeyEvent
+import java.util.*
 import javax.swing.KeyStroke
 import kotlin.math.abs
 import kotlin.math.min
@@ -345,7 +349,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     private fun getAdjustCaretActions(change: ChangesListener.Change): List<EditorActionHandlerBase> {
       val delta: Int = change.offset - oldOffset
       if (oldOffset >= 0 && delta != 0) {
-        val positionCaretActions: MutableList<EditorActionHandlerBase> = java.util.ArrayList()
+        val positionCaretActions: MutableList<EditorActionHandlerBase> = ArrayList()
         val motionName = if (delta < 0) "VimMotionLeftAction" else "VimMotionRightAction"
         val action = injector.actionExecutor.findVimAction(motionName)!!
         val count = abs(delta)
@@ -532,7 +536,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       vimDocument!!.removeChangeListener(vimDocumentListener!!)
       vimDocumentListener = null
     }
-    lastStrokes = java.util.ArrayList(strokes)
+    lastStrokes = ArrayList(strokes)
     if (context != null) {
       injector.changeGroup.repeatInsert(editor, context, if (cnt == 0) 0 else cnt - 1, true, operatorArguments)
     }
@@ -953,7 +957,6 @@ abstract class VimChangeGroupBase : VimChangeGroup {
    *
    * @param editor The editor to change
    * @param caret  The caret to be moved
-   * @param count  The number of characters to change
    * @return true if able to delete count characters, false if not
    */
   override fun changeCharacters(editor: VimEditor, caret: VimCaret, operatorArguments: OperatorArguments): Boolean {
@@ -1059,6 +1062,142 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     injector.markGroup.setMark(editor, MARK_CHANGE_POS, newEnd)
   }
 
+  /**
+   * Inserts a new line above the caret position
+   *
+   * @param editor The editor to insert into
+   * @param caret  The caret to insert above
+   * @param col    The column to indent to
+   */
+  protected open fun insertNewLineAbove(editor: VimEditor, caret: VimCaret, col: Int) {
+    if (editor.isOneLineMode()) return
+    var firstLiner = false
+    if (caret.getVisualPosition().line == 0) {
+      injector.motion.moveCaret(
+        editor, caret, injector.motion.moveCaretToCurrentLineStart(
+          editor,
+          caret
+        )
+      )
+      firstLiner = true
+    } else {
+      // TODO: getVerticalMotionOffset returns a visual line, not the expected logical line
+      // Also address the unguarded upcast
+      val motion = injector.motion.getVerticalMotionOffset(editor, caret, -1)
+      injector.motion.moveCaret(editor, caret, (motion as AbsoluteOffset).offset)
+      injector.motion.moveCaret(editor, caret, injector.motion.moveCaretToCurrentLineEnd(editor, caret))
+    }
+    editor.vimChangeActionSwitchMode = VimStateMachine.Mode.INSERT
+    insertText(
+      editor, caret, "\n${editor.createIndentBySize(col)}"
+    )
+    if (firstLiner) {
+      // TODO: getVerticalMotionOffset returns a visual line, not the expected logical line
+      // Also address the unguarded upcast
+      val motion = injector.motion.getVerticalMotionOffset(editor, caret, -1)
+      injector.motion.moveCaret(editor, caret, (motion as AbsoluteOffset).offset)
+    }
+  }
+
+  override fun changeMotion(
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    argument: Argument,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
+    var count0 = operatorArguments.count0
+    // Vim treats cw as ce and cW as cE if cursor is on a non-blank character
+    val motion = argument.motion
+    val id = motion.action.id
+    var kludge = false
+    val bigWord = id == VIM_MOTION_BIG_WORD_RIGHT
+    val chars = editor.text()
+    val offset = caret.offset.point
+    val fileSize = editor.fileSize().toInt()
+    if (fileSize > 0 && offset < fileSize) {
+      val charType = charType(chars[offset], bigWord)
+      if (charType !== CharacterHelper.CharacterType.WHITESPACE) {
+        val lastWordChar = offset >= fileSize - 1 || charType(chars[offset + 1], bigWord) !== charType
+        if (wordMotions.contains(id) && lastWordChar && motion.count == 1) {
+          val res = deleteCharacter(editor, caret, 1, true, operatorArguments)
+          if (res) {
+            editor.vimChangeActionSwitchMode = VimStateMachine.Mode.INSERT
+          }
+          return res
+        }
+        when (id) {
+          VIM_MOTION_WORD_RIGHT -> {
+            kludge = true
+            motion.action = injector.actionExecutor.findVimActionOrDie(VIM_MOTION_WORD_END_RIGHT)
+          }
+
+          VIM_MOTION_BIG_WORD_RIGHT -> {
+            kludge = true
+            motion.action = injector.actionExecutor.findVimActionOrDie(VIM_MOTION_BIG_WORD_END_RIGHT)
+          }
+
+          VIM_MOTION_CAMEL_RIGHT -> {
+            kludge = true
+            motion.action = injector.actionExecutor.findVimActionOrDie(VIM_MOTION_CAMEL_END_RIGHT)
+          }
+        }
+      }
+    }
+    if (kludge) {
+      val cnt = operatorArguments.count1 * motion.count
+      val pos1 = injector.searchHelper.findNextWordEnd(chars, offset, fileSize, cnt, bigWord, false)
+      val pos2 = injector.searchHelper.findNextWordEnd(chars, pos1, fileSize, -cnt, bigWord, false)
+      if (logger.isDebug()) {
+        logger.debug("pos=$offset")
+        logger.debug("pos1=$pos1")
+        logger.debug("pos2=$pos2")
+        logger.debug("count=" + operatorArguments.count1)
+        logger.debug("arg.count=" + motion.count)
+      }
+      if (pos2 == offset) {
+        if (operatorArguments.count1 > 1) {
+          count0--
+        } else if (motion.count > 1) {
+          motion.count = motion.count - 1
+        } else {
+          motion.flags = EnumSet.noneOf(CommandFlags::class.java)
+        }
+      }
+    }
+    return if (injector.optionService.isSet(
+        OptionScope.GLOBAL,
+        OptionConstants.experimentalapiName,
+        OptionConstants.experimentalapiName
+      )
+    ) {
+      val (first, second) = getDeleteRangeAndType2(
+        editor,
+        caret,
+        context,
+        argument,
+        true,
+        operatorArguments.withCount0(count0)
+      )
+        ?: return false
+      //ChangeGroupKt.changeRange(((IjVimEditor) editor).getEditor(), ((IjVimCaret) caret).getCaret(), deleteRangeAndType.getFirst(), deleteRangeAndType.getSecond(), ((IjExecutionContext) context).getContext());
+      true
+    } else {
+        val (first, second) = getDeleteRangeAndType(
+            editor,
+            caret,
+            context,
+            argument,
+            true,
+            operatorArguments.withCount0(count0)
+        ) ?: return false
+      changeRange(
+        editor, caret, first, second, context,
+        operatorArguments
+      )
+    }
+  }
+
   companion object {
     private const val MAX_REPEAT_CHARS_COUNT = 10000
     private val logger = vimLogger<VimChangeGroupBase>()
@@ -1082,6 +1221,14 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     }
 
     protected const val HEX_START: @NonNls String = "0x"
+    const val VIM_MOTION_BIG_WORD_RIGHT = "VimMotionBigWordRightAction"
+    const val VIM_MOTION_WORD_RIGHT = "VimMotionWordRightAction"
+    const val VIM_MOTION_CAMEL_RIGHT = "VimMotionCamelRightAction"
+    const val VIM_MOTION_WORD_END_RIGHT = "VimMotionWordEndRightAction"
+    const val VIM_MOTION_BIG_WORD_END_RIGHT = "VimMotionBigWordEndRightAction"
+    const val VIM_MOTION_CAMEL_END_RIGHT = "VimMotionCamelEndRightAction"
+    const val MAX_HEX_INTEGER: @NonNls String = "ffffffffffffffff"
+    val wordMotions: Set<String> = setOf(VIM_MOTION_WORD_RIGHT, VIM_MOTION_BIG_WORD_RIGHT, VIM_MOTION_CAMEL_RIGHT)
   }
 }
 

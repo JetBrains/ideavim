@@ -264,6 +264,8 @@ interface VimEditor {
   fun charAt(offset: Pointer): Char {
     return text()[offset.point]
   }
+
+  fun createIndentBySize(size: Int): String
 }
 
 interface MutableVimEditor : VimEditor {

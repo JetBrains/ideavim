@@ -8,7 +8,6 @@
 package com.maddyhome.idea.vim.group;
 
 import com.google.common.base.Splitter;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.intellij.codeInsight.actions.AsyncActionExecutionService;
 import com.intellij.openapi.Disposable;
@@ -41,7 +40,6 @@ import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.ranges.LineRange;
 import com.maddyhome.idea.vim.group.visual.VimSelection;
 import com.maddyhome.idea.vim.group.visual.VisualModeHelperKt;
-import com.maddyhome.idea.vim.handler.Motion;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.icons.VimIcons;
 import com.maddyhome.idea.vim.key.KeyHandlerKeeper;
@@ -57,13 +55,15 @@ import kotlin.Pair;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function0;
 import kotlin.text.StringsKt;
-import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.TestOnly;
 
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
 
@@ -72,54 +72,10 @@ import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
  */
 public class ChangeGroup extends VimChangeGroupBase {
 
-  public static final String VIM_MOTION_BIG_WORD_RIGHT = "VimMotionBigWordRightAction";
-  public static final String VIM_MOTION_WORD_RIGHT = "VimMotionWordRightAction";
-  public static final String VIM_MOTION_CAMEL_RIGHT = "VimMotionCamelRightAction";
-  private static final String VIM_MOTION_WORD_END_RIGHT = "VimMotionWordEndRightAction";
-  private static final String VIM_MOTION_BIG_WORD_END_RIGHT = "VimMotionBigWordEndRightAction";
-  private static final String VIM_MOTION_CAMEL_END_RIGHT = "VimMotionCamelEndRightAction";
-  private static final ImmutableSet<String> wordMotions = ImmutableSet.of(VIM_MOTION_WORD_RIGHT, VIM_MOTION_BIG_WORD_RIGHT, VIM_MOTION_CAMEL_RIGHT);
-
-  @NonNls private static final String MAX_HEX_INTEGER = "ffffffffffffffff";
-
   private final List<VimInsertListener> insertListeners = ContainerUtil.createLockFreeCopyOnWriteList();
 
   private long lastShownTime = 0L;
 
-  /**
-   * Inserts a new line above the caret position
-   *
-   * @param editor The editor to insert into
-   * @param caret  The caret to insert above
-   * @param col    The column to indent to
-   */
-  private void insertNewLineAbove(@NotNull VimEditor editor, @NotNull VimCaret caret, int col) {
-    if (editor.isOneLineMode()) return;
-
-    boolean firstLiner = false;
-    if (caret.getVisualPosition().getLine() == 0) {
-      injector.getMotion().moveCaret(editor, caret, injector.getMotion().moveCaretToCurrentLineStart(editor,
-                                                                                                      caret));
-      firstLiner = true;
-    }
-    else {
-      // TODO: getVerticalMotionOffset returns a visual line, not the expected logical line
-      // Also address the unguarded upcast
-      final Motion motion = injector.getMotion().getVerticalMotionOffset(editor, caret, -1);
-      injector.getMotion().moveCaret(editor, caret, ((Motion.AbsoluteOffset)motion).getOffset());
-      injector.getMotion().moveCaret(editor, caret, injector.getMotion().moveCaretToCurrentLineEnd(editor, caret));
-    }
-
-    UserDataManager.setVimChangeActionSwitchMode(((IjVimEditor) editor).getEditor(), VimStateMachine.Mode.INSERT);
-    insertText(editor, caret, "\n" + IndentConfig.create(((IjVimEditor) editor).getEditor()).createIndentBySize(col));
-
-    if (firstLiner) {
-      // TODO: getVerticalMotionOffset returns a visual line, not the expected logical line
-      // Also address the unguarded upcast
-      final Motion motion = injector.getMotion().getVerticalMotionOffset(editor, caret, -1);
-      injector.getMotion().moveCaret(editor, caret, ((Motion.AbsoluteOffset)motion).getOffset());
-    }
-  }
 
   /**
    * Inserts a new line below the caret position
@@ -231,93 +187,6 @@ public class ChangeGroup extends VimChangeGroupBase {
    * @param argument The motion command
    * @return true if able to delete the text, false if not
    */
-  @Override
-  public boolean changeMotion(@NotNull VimEditor editor,
-                              @NotNull VimCaret caret,
-                              @NotNull ExecutionContext context,
-                              @NotNull Argument argument,
-                              @NotNull OperatorArguments operatorArguments) {
-    int count0 = operatorArguments.getCount0();
-    // Vim treats cw as ce and cW as cE if cursor is on a non-blank character
-    final Command motion = argument.getMotion();
-
-    String id = motion.getAction().getId();
-    boolean kludge = false;
-    boolean bigWord = id.equals(VIM_MOTION_BIG_WORD_RIGHT);
-    final CharSequence chars = editor.text();
-    final int offset = caret.getOffset().getPoint();
-    int fileSize = ((int)editor.fileSize());
-    if (fileSize > 0 && offset < fileSize) {
-      final CharacterHelper.CharacterType charType = CharacterHelper.charType(chars.charAt(offset), bigWord);
-      if (charType != CharacterHelper.CharacterType.WHITESPACE) {
-        final boolean lastWordChar =
-          offset >= fileSize - 1 || CharacterHelper.charType(chars.charAt(offset + 1), bigWord) != charType;
-        if (wordMotions.contains(id) && lastWordChar && motion.getCount() == 1) {
-          final boolean res = deleteCharacter(editor, caret, 1, true, operatorArguments);
-          if (res) {
-            editor.setVimChangeActionSwitchMode(VimStateMachine.Mode.INSERT);
-          }
-          return res;
-        }
-        switch (id) {
-          case VIM_MOTION_WORD_RIGHT:
-            kludge = true;
-            motion.setAction(injector.getActionExecutor().findVimActionOrDie(VIM_MOTION_WORD_END_RIGHT));
-
-            break;
-          case VIM_MOTION_BIG_WORD_RIGHT:
-            kludge = true;
-            motion.setAction(injector.getActionExecutor().findVimActionOrDie(VIM_MOTION_BIG_WORD_END_RIGHT));
-
-            break;
-          case VIM_MOTION_CAMEL_RIGHT:
-            kludge = true;
-            motion.setAction(injector.getActionExecutor().findVimActionOrDie(VIM_MOTION_CAMEL_END_RIGHT));
-
-            break;
-        }
-      }
-    }
-
-    if (kludge) {
-      int cnt = operatorArguments.getCount1() * motion.getCount();
-      int pos1 = injector.getSearchHelper().findNextWordEnd(chars, offset, fileSize, cnt, bigWord, false);
-      int pos2 = injector.getSearchHelper().findNextWordEnd(chars, pos1, fileSize, -cnt, bigWord, false);
-      if (logger.isDebugEnabled()) {
-        logger.debug("pos=" + offset);
-        logger.debug("pos1=" + pos1);
-        logger.debug("pos2=" + pos2);
-        logger.debug("count=" + operatorArguments.getCount1());
-        logger.debug("arg.count=" + motion.getCount());
-      }
-      if (pos2 == offset) {
-        if (operatorArguments.getCount1() > 1) {
-          count0--;
-        }
-        else if (motion.getCount() > 1) {
-          motion.setCount(motion.getCount() - 1);
-        }
-        else {
-          motion.setFlags(EnumSet.noneOf(CommandFlags.class));
-        }
-      }
-    }
-
-    if (injector.getOptionService().isSet(OptionScope.GLOBAL.INSTANCE, OptionConstants.experimentalapiName, OptionConstants.experimentalapiName)) {
-      Pair<TextRange, SelectionType> deleteRangeAndType =
-        getDeleteRangeAndType2(editor, caret, context, argument, true, operatorArguments.withCount0(count0));
-      if (deleteRangeAndType == null) return false;
-      //ChangeGroupKt.changeRange(((IjVimEditor) editor).getEditor(), ((IjVimCaret) caret).getCaret(), deleteRangeAndType.getFirst(), deleteRangeAndType.getSecond(), ((IjExecutionContext) context).getContext());
-      return true;
-    }
-    else {
-      Pair<TextRange, SelectionType> deleteRangeAndType =
-        getDeleteRangeAndType(editor, caret, context, argument, true, operatorArguments.withCount0(count0));
-      if (deleteRangeAndType == null) return false;
-      return changeRange(editor, caret, deleteRangeAndType.getFirst(), deleteRangeAndType.getSecond(), context,
-                         operatorArguments);
-    }
-  }
 
   /**
    * Toggles the case of count characters
