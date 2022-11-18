@@ -14,10 +14,10 @@ import com.maddyhome.idea.vim.api.VimCaret;
 import com.maddyhome.idea.vim.api.VimEditor;
 import com.maddyhome.idea.vim.api.VimInjectorKt;
 import com.maddyhome.idea.vim.command.*;
-import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.extension.VimExtension;
 import com.maddyhome.idea.vim.extension.ExtensionHandler;
+import com.maddyhome.idea.vim.extension.VimExtension;
+import com.maddyhome.idea.vim.group.visual.EngineVisualGroupKt;
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler;
 import com.maddyhome.idea.vim.helper.InlayHelperKt;
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor;
@@ -31,7 +31,6 @@ import java.util.EnumSet;
 
 import static com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping;
 import static com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping;
-import static com.maddyhome.idea.vim.group.visual.VisualGroupKt.vimSetSelection;
 
 /**
  * Port of vim-indent-object:
@@ -273,7 +272,7 @@ public class VimIndentObject implements VimExtension {
           if (range != null) {
             try (VimListenerSuppressor.Locked ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
               if (vimStateMachine.getMode() == VimStateMachine.Mode.VISUAL) {
-                vimSetSelection(caret, range.getStartOffset(), range.getEndOffset() - 1, true);
+                EngineVisualGroupKt.vimSetSelection(new IjVimCaret(caret), range.getStartOffset(), range.getEndOffset() - 1, true);
               } else {
                 InlayHelperKt.moveToInlayAwareOffset(caret, range.getStartOffset());
               }

@@ -8,15 +8,16 @@
 
 package com.maddyhome.idea.vim.extension.argtextobj;
 
-import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Document;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.api.*;
+import com.maddyhome.idea.vim.api.ExecutionContext;
+import com.maddyhome.idea.vim.api.VimCaret;
+import com.maddyhome.idea.vim.api.VimEditor;
+import com.maddyhome.idea.vim.api.VimInjectorKt;
 import com.maddyhome.idea.vim.command.*;
-import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.extension.VimExtension;
 import com.maddyhome.idea.vim.extension.ExtensionHandler;
+import com.maddyhome.idea.vim.extension.VimExtension;
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler;
 import com.maddyhome.idea.vim.helper.InlayHelperKt;
 import com.maddyhome.idea.vim.helper.MessageHelper;
@@ -26,6 +27,7 @@ import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
 import com.maddyhome.idea.vim.newapi.IjVimCaret;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
+import kotlin.Unit;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -36,7 +38,6 @@ import java.util.EnumSet;
 
 import static com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping;
 import static com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping;
-import static com.maddyhome.idea.vim.group.visual.VisualGroupKt.vimSetSelection;
 
 /**
  * @author igrekster
@@ -255,18 +256,18 @@ public class VimArgTextObjExtension implements VimExtension {
       final ArgumentTextObjectHandler textObjectHandler = new ArgumentTextObjectHandler(isInner);
       //noinspection DuplicatedCode
       if (!vimStateMachine.isOperatorPending()) {
-        vimEditor.getEditor().getCaretModel().runForEachCaret((Caret caret) -> {
-          final TextRange range = textObjectHandler.getRange(vimEditor, new IjVimCaret(caret), context, count, 0, null);
+        editor.forEachNativeCaret((VimCaret caret) -> {
+          final TextRange range = textObjectHandler.getRange(editor, caret, context, count, 0, null);
           if (range != null) {
             try (VimListenerSuppressor.Locked ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
               if (vimStateMachine.getMode() == VimStateMachine.Mode.VISUAL) {
-                vimSetSelection(caret, range.getStartOffset(), range.getEndOffset() - 1, true);
+                com.maddyhome.idea.vim.group.visual.EngineVisualGroupKt.vimSetSelection(caret, range.getStartOffset(), range.getEndOffset() - 1, true);
               } else {
-                InlayHelperKt.moveToInlayAwareOffset(caret, range.getStartOffset());
+                InlayHelperKt.moveToInlayAwareOffset(((IjVimCaret)caret).getCaret(), range.getStartOffset());
               }
             }
           }
-
+          return Unit.INSTANCE;
         });
       } else {
         vimStateMachine.getCommandBuilder().completeCommandPart(new Argument(new Command(count,

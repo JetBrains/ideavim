@@ -824,7 +824,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     caretsAndSelections.forEach { (caret: VimCaret, range: VimSelection) ->
       if (!caret.isValid) return@forEach
       val (first, second) = range.getNativeStartAndEnd()
-      caret.setNativeSelection(
+      caret.setSelection(
         first.offset,
         second.offset
       )
@@ -834,7 +834,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       injector.actionExecutor.executeAction(joinLinesAction, context)
     }
     editor.nativeCarets().forEach { caret: VimCaret ->
-      caret.removeNativeSelection()
+      caret.removeSelection()
       val (line, column) = caret.getVisualPosition()
       if (line < 1) return@forEach
       val newVisualPosition = VimVisualPosition(line - 1, column, false)

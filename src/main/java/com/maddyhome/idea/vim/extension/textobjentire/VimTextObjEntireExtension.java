@@ -31,7 +31,6 @@ import java.util.EnumSet;
 
 import static com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping;
 import static com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing;
-import static com.maddyhome.idea.vim.group.visual.VisualGroupKt.vimSetSelection;
 
 /**
  * Port of vim-entire:
@@ -145,7 +144,7 @@ public class VimTextObjEntireExtension implements VimExtension {
           if (range != null) {
             try (VimListenerSuppressor.Locked ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
               if (vimStateMachine.getMode() == VimStateMachine.Mode.VISUAL) {
-                vimSetSelection(caret, range.getStartOffset(), range.getEndOffset() - 1, true);
+                com.maddyhome.idea.vim.group.visual.EngineVisualGroupKt.vimSetSelection(new IjVimCaret(caret), range.getStartOffset(), range.getEndOffset() - 1, true);
               } else {
                 InlayHelperKt.moveToInlayAwareOffset(caret, range.getStartOffset());
               }

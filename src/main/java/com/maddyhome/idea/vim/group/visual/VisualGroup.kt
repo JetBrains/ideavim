@@ -10,77 +10,28 @@ package com.maddyhome.idea.vim.group.visual
 
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.editor.VisualPosition
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.api.VimMotionGroupBase
+import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.getLineEndForOffset
-import com.maddyhome.idea.vim.api.getLineEndOffset
 import com.maddyhome.idea.vim.api.getLineStartForOffset
-import com.maddyhome.idea.vim.api.isLineEmpty
 import com.maddyhome.idea.vim.command.VimStateMachine
-import com.maddyhome.idea.vim.helper.editorMode
 import com.maddyhome.idea.vim.helper.inBlockSubMode
-import com.maddyhome.idea.vim.helper.inSelectMode
-import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.helper.subMode
-import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
-import com.maddyhome.idea.vim.helper.vimLastColumn
-import com.maddyhome.idea.vim.helper.vimSelectionStart
 import com.maddyhome.idea.vim.newapi.IjVimEditor
-import com.maddyhome.idea.vim.newapi.vim
 
 /**
  * @author Alex Plate
  */
 
 /**
- * Set selection for caret
- * This method doesn't change CommandState and operates only with caret and it's properties
- * if [moveCaretToSelectionEnd] is true, caret movement to [end] will be performed
- */
-fun Caret.vimSetSelection(start: Int, end: Int = start, moveCaretToSelectionEnd: Boolean = false) {
-  vimSelectionStart = start
-  setVisualSelection(start, end, this)
-  if (moveCaretToSelectionEnd && !editor.inBlockSubMode) moveToInlayAwareOffset(end)
-}
-
-/**
- * Move selection end to current caret position
- * This method is created only for Character and Line mode
- * @see vimMoveBlockSelectionToOffset for blockwise selection
- */
-fun Caret.vimMoveSelectionToCaret() {
-  if (!editor.inVisualMode && !editor.inSelectMode) error("Attempt to extent selection in non-visual mode")
-  if (editor.inBlockSubMode) error("Move caret with [vimMoveBlockSelectionToOffset]")
-
-  val startOffsetMark = vimSelectionStart
-
-  setVisualSelection(startOffsetMark, offset, this)
-}
-
-/**
- * Move selection end to current primary caret position
- *
- * This method is created only for block mode. Note that this method will invalidate all carets!
- *
- * @see vimMoveSelectionToCaret for character and line selection
- */
-fun vimMoveBlockSelectionToOffset(editor: Editor, offset: Int) {
-  val primaryCaret = editor.caretModel.primaryCaret
-  val startOffsetMark = primaryCaret.vimSelectionStart
-
-  setVisualSelection(startOffsetMark, offset, primaryCaret)
-}
-
-/**
  * Update selection according to new CommandState
  * This method should be used for switching from character to line wise selection and so on
  */
-fun Caret.vimUpdateEditorSelection() {
+fun VimCaret.vimUpdateEditorSelection() {
   val startOffsetMark = vimSelectionStart
-  setVisualSelection(startOffsetMark, offset, this)
+  setVisualSelection(startOffsetMark, offset.point, this)
 }
 
 /**
@@ -150,72 +101,5 @@ fun moveCaretOneCharLeftFromSelectionEnd(editor: Editor, predictedMode: VimState
         caret.moveToInlayAwareOffset(caret.selectionEnd - 1)
       }
     }
-  }
-}
-
-private fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: Caret) {
-  val (start, end) = if (selectionStart > selectionEnd) selectionEnd to selectionStart else selectionStart to selectionEnd
-  val editor = caret.editor
-  val subMode = editor.subMode
-  val mode = editor.editorMode
-  val vimEditor = IjVimEditor(editor)
-  when (subMode) {
-    VimStateMachine.SubMode.VISUAL_CHARACTER -> {
-      val (nativeStart, nativeEnd) = charToNativeSelection(vimEditor, start, end, mode)
-      caret.vimSetSystemSelectionSilently(nativeStart, nativeEnd)
-    }
-    VimStateMachine.SubMode.VISUAL_LINE -> {
-      val (nativeStart, nativeEnd) = lineToNativeSelection(vimEditor, start, end)
-      caret.vimSetSystemSelectionSilently(nativeStart, nativeEnd)
-    }
-    VimStateMachine.SubMode.VISUAL_BLOCK -> {
-      // This will invalidate any secondary carets, but we shouldn't have any of these cached in local variables, etc.
-      editor.caretModel.removeSecondaryCarets()
-
-      // Set system selection
-      val (blockStart, blockEnd) = blockToNativeSelection(vimEditor, selectionStart, selectionEnd, mode)
-      val lastColumn = editor.caretModel.primaryCaret.vimLastColumn
-
-      // WARNING! This can invalidate the primary caret! I.e. the `caret` parameter will no longer be the primary caret.
-      // Given an existing visual block selection, moving the caret will first remove all secondary carets (above) then
-      // this method will ask IntelliJ to create a new multi-caret block selection. If we're moving up (`k`) a new caret
-      // is added, and becomes the new primary caret. The current `caret` parameter remains valid, but is no longer the
-      // primary caret. Make sure to fetch the new primary caret if necessary.
-      vimEditor.vimSetSystemBlockSelectionSilently(blockStart, blockEnd)
-
-      // We've just added secondary carets again, hide them to better emulate block selection
-      editor.updateCaretsVisualAttributes()
-
-      for (aCaret in editor.caretModel.allCarets) {
-        if (!aCaret.isValid) continue
-        val line = aCaret.logicalPosition.line
-        val lineEndOffset = editor.vim.getLineEndOffset(line, true)
-        val lineStartOffset = editor.vim.getLineStartOffset(line)
-
-        // Extend selection to line end if it was made with `$` command
-        if (lastColumn >= VimMotionGroupBase.LAST_COLUMN) {
-          aCaret.vimSetSystemSelectionSilently(aCaret.selectionStart, lineEndOffset)
-          val newOffset = (lineEndOffset - VimPlugin.getVisualMotion().selectionAdj).coerceAtLeast(lineStartOffset)
-          aCaret.moveToInlayAwareOffset(newOffset)
-        }
-        val visualPosition = editor.offsetToVisualPosition(aCaret.selectionEnd)
-        if (aCaret.offset == aCaret.selectionEnd && visualPosition != aCaret.visualPosition) {
-          // Put right caret position for tab character
-          aCaret.moveToVisualPosition(visualPosition)
-        }
-        if (mode != VimStateMachine.Mode.SELECT &&
-          !IjVimEditor(editor).isLineEmpty(line, false) &&
-          aCaret.offset == aCaret.selectionEnd &&
-          aCaret.selectionEnd - 1 >= lineStartOffset &&
-          aCaret.selectionEnd - aCaret.selectionStart != 0
-        ) {
-          // Move all carets one char left in case if it's on selection end
-          aCaret.moveToVisualPosition(VisualPosition(visualPosition.line, visualPosition.column - 1))
-        }
-      }
-
-      editor.caretModel.primaryCaret.moveToInlayAwareOffset(selectionEnd)
-    }
-    else -> Unit
   }
 }

@@ -11,12 +11,12 @@ package com.maddyhome.idea.vim.newapi
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.editor.VisualPosition
+import com.maddyhome.idea.vim.api.BufferPosition
 import com.maddyhome.idea.vim.api.CaretRegisterStorage
 import com.maddyhome.idea.vim.api.CaretRegisterStorageBase
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimCaretBase
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.BufferPosition
 import com.maddyhome.idea.vim.api.VimVisualPosition
 import com.maddyhome.idea.vim.common.EditorLine
 import com.maddyhome.idea.vim.common.LiveRange
@@ -25,8 +25,6 @@ import com.maddyhome.idea.vim.common.offset
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.visual.VisualChange
 import com.maddyhome.idea.vim.group.visual.vimLeadSelectionOffset
-import com.maddyhome.idea.vim.group.visual.vimSetSelection
-import com.maddyhome.idea.vim.group.visual.vimSetSystemSelectionSilently
 import com.maddyhome.idea.vim.group.visual.vimUpdateEditorSelection
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.helper.registerStorage
@@ -99,10 +97,6 @@ class IjVimCaret(val caret: Caret) : VimCaretBase() {
     return caret.hasSelection()
   }
 
-  override fun vimSetSystemSelectionSilently(start: Int, end: Int) {
-    caret.vimSetSystemSelectionSilently(start, end)
-  }
-
   override val isValid: Boolean
     get() {
       return caret.isValid
@@ -110,10 +104,6 @@ class IjVimCaret(val caret: Caret) : VimCaretBase() {
 
   override fun moveToInlayAwareOffset(newOffset: Int) {
     caret.moveToInlayAwareOffset(newOffset)
-  }
-
-  override fun vimSetSelection(start: Int, end: Int, moveCaretToSelectionEnd: Boolean) {
-    caret.vimSetSelection(start, end, moveCaretToSelectionEnd)
   }
 
   override fun getBufferPosition(): BufferPosition {
@@ -130,7 +120,7 @@ class IjVimCaret(val caret: Caret) : VimCaretBase() {
     get() = caret.visualLineStart
 
   override fun updateEditorSelection() {
-    caret.vimUpdateEditorSelection()
+    this.vimUpdateEditorSelection()
   }
 
   override var vimInsertStart: LiveRange
@@ -143,11 +133,11 @@ class IjVimCaret(val caret: Caret) : VimCaretBase() {
     caret.moveToVisualPosition(VisualPosition(position.line, position.column, position.leansRight))
   }
 
-  override fun setNativeSelection(start: Offset, end: Offset) {
+  override fun setSelection(start: Offset, end: Offset) {
     caret.setSelection(start.point, end.point)
   }
 
-  override fun removeNativeSelection() {
+  override fun removeSelection() {
     caret.removeSelection()
   }
 

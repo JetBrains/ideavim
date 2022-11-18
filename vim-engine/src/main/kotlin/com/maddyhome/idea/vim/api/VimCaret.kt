@@ -44,12 +44,10 @@ interface VimCaret {
   val selectionEnd: Int
   var vimSelectionStart: Int
   val vimLeadSelectionOffset: Int
-  fun vimSetSelection(start: Int, end: Int = start, moveCaretToSelectionEnd: Boolean = false)
-  fun vimSetSystemSelectionSilently(start: Int, end: Int)
   fun updateEditorSelection()
 
-  fun setNativeSelection(start: Offset, end: Offset)
-  fun removeNativeSelection()
+  fun setSelection(start: Offset, end: Offset)
+  fun removeSelection()
 
   fun moveToOffset(offset: Int)
   fun moveToOffsetNative(offset: Int)

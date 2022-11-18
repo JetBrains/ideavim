@@ -28,7 +28,7 @@ import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
 import com.maddyhome.idea.vim.group.visual.VimSelection;
-import com.maddyhome.idea.vim.group.visual.VisualGroupKt;
+import com.maddyhome.idea.vim.group.visual.EngineVisualGroupKt;
 import com.maddyhome.idea.vim.handler.Motion;
 import com.maddyhome.idea.vim.handler.MotionActionHandler;
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler;
@@ -265,7 +265,7 @@ public class MotionGroup extends VimMotionGroupBase {
                                      "Block selection can only be moved with primary caret!");
 
       // Note that this call replaces ALL carets, so any local caret instances will be invalid!
-      VisualGroupKt.vimMoveBlockSelectionToOffset(editor, offset);
+      EngineVisualGroupKt.vimMoveBlockSelectionToOffset(new IjVimEditor(editor), offset);
       scrollCaretIntoView(editor);
       return;
     }
@@ -282,7 +282,7 @@ public class MotionGroup extends VimMotionGroupBase {
     }
 
     if (CommandStateHelper.inVisualMode(editor) || CommandStateHelper.inSelectMode(editor)) {
-      VisualGroupKt.vimMoveSelectionToCaret(caret);
+      EngineVisualGroupKt.vimMoveSelectionToCaret(new IjVimCaret(caret));
     }
     else {
       ModeHelper.exitVisualMode(editor);

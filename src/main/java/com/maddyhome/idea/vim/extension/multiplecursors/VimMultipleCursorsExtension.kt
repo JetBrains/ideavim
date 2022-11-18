@@ -285,7 +285,7 @@ class VimMultipleCursorsExtension : VimExtension {
 
   private fun selectText(caret: Caret, text: String, offset: Int): TextRange? {
     if (text.isEmpty()) return null
-    caret.vimSetSelection(offset, offset + text.length - 1, true)
+    caret.vim.vimSetSelection(offset, offset + text.length - 1, true)
     MotionGroup.scrollCaretIntoView(caret.editor)
     return TextRange(caret.selectionStart, caret.selectionEnd)
   }
@@ -297,7 +297,7 @@ class VimMultipleCursorsExtension : VimExtension {
     enterVisualMode(editor.vim)
 
     // Select the word under the caret, moving the caret to the end of the selection
-    caret.vimSetSelection(range.startOffset, range.endOffsetInclusive, true)
+    caret.vim.vimSetSelection(range.startOffset, range.endOffsetInclusive, true)
     return TextRange(caret.selectionStart, caret.selectionEnd)
   }
 
