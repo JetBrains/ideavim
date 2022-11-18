@@ -11,7 +11,6 @@
 package com.maddyhome.idea.vim.helper
 
 import com.intellij.openapi.editor.Editor
-import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.command.engine
@@ -91,9 +90,6 @@ val Editor.inVisualMode
 @get:JvmName("inSelectMode")
 val Editor.inSelectMode
   get() = this.editorMode == VimStateMachine.Mode.SELECT || this.editorMode == VimStateMachine.Mode.INSERT_SELECT
-
-val VimEditor.inSelectMode
-  get() = this.mode == VimStateMachine.Mode.SELECT || this.mode == VimStateMachine.Mode.INSERT_SELECT
 
 @get:JvmName("inBlockSubMode")
 val Editor.inBlockSubMode
