@@ -118,7 +118,7 @@ class Matchit : VimExtension {
       } else {
         editor.forEachCaret { caret ->
           VimPlugin.getMark().saveJumpLocation(editor)
-          injector.motion.moveCaret(editor, caret, getMatchitOffset(editor.ij, caret.ij, count, isInOpPending, reverse))
+          caret.moveToOffset(getMatchitOffset(editor.ij, caret.ij, count, isInOpPending, reverse))
         }
       }
     }

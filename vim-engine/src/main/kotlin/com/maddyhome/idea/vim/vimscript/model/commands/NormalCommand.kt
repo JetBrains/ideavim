@@ -9,13 +9,14 @@
 package com.maddyhome.idea.vim.vimscript.model.commands
 
 import com.maddyhome.idea.vim.KeyHandler
+import com.maddyhome.idea.vim.api.BufferPosition
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.BufferPosition
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.ex.ranges.Ranges
+import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
@@ -40,7 +41,7 @@ data class NormalCommand(val ranges: Ranges, val argument: String) : Command.Sin
     val rangeUsed = ranges.size() != 0
     when (editor.mode) {
       VimStateMachine.Mode.VISUAL -> {
-        editor.exitVisualModeNative()
+        editor.exitVisualMode()
         if (!rangeUsed) {
           val selectionStart = injector.markGroup.getMark(editor, '<')!!
           editor.currentCaret().moveToBufferPosition(BufferPosition(selectionStart.line, selectionStart.col))

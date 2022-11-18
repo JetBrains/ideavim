@@ -11,7 +11,6 @@ package com.maddyhome.idea.vim.group.visual
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.getLineEndForOffset
 import com.maddyhome.idea.vim.api.getLineStartForOffset
 import com.maddyhome.idea.vim.command.VimStateMachine
@@ -24,15 +23,6 @@ import com.maddyhome.idea.vim.newapi.IjVimEditor
 /**
  * @author Alex Plate
  */
-
-/**
- * Update selection according to new CommandState
- * This method should be used for switching from character to line wise selection and so on
- */
-fun VimCaret.vimUpdateEditorSelection() {
-  val startOffsetMark = vimSelectionStart
-  setVisualSelection(startOffsetMark, offset.point, this)
-}
 
 /**
  * This works almost like [Caret.getLeadSelectionOffset], but vim-specific

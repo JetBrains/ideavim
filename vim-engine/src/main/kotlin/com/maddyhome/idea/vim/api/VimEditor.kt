@@ -243,7 +243,6 @@ interface VimEditor {
 
   fun exitInsertMode(context: ExecutionContext, operatorArguments: OperatorArguments)
   fun exitSelectModeNative(adjustCaret: Boolean)
-  fun exitVisualModeNative()
 
   var vimLastSelectionType: SelectionType?
 

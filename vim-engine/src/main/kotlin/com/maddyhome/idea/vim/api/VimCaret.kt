@@ -14,6 +14,13 @@ import com.maddyhome.idea.vim.common.LiveRange
 import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.visual.VisualChange
+import com.maddyhome.idea.vim.group.visual.vimMoveBlockSelectionToOffset
+import com.maddyhome.idea.vim.group.visual.vimMoveSelectionToCaret
+import com.maddyhome.idea.vim.helper.exitVisualMode
+import com.maddyhome.idea.vim.helper.inBlockSubMode
+import com.maddyhome.idea.vim.helper.inSelectMode
+import com.maddyhome.idea.vim.helper.inVisualMode
+import com.maddyhome.idea.vim.options.helpers.StrictMode
 import com.maddyhome.idea.vim.register.Register
 import javax.swing.KeyStroke
 
@@ -44,12 +51,41 @@ interface VimCaret {
   val selectionEnd: Int
   var vimSelectionStart: Int
   val vimLeadSelectionOffset: Int
-  fun updateEditorSelection()
+
+  fun vimSelectionStartClear()
 
   fun setSelection(start: Offset, end: Offset)
   fun removeSelection()
 
-  fun moveToOffset(offset: Int)
+  fun moveToOffset(offset: Int) {
+    if (offset < 0 || offset > editor.text().length || !isValid) return
+    if (editor.inBlockSubMode) {
+      StrictMode.assert(this == editor.primaryCaret(), "Block selection can only be moved with primary caret!")
+
+      // Note that this call replaces ALL carets, so any local caret instances will be invalid!
+      vimMoveBlockSelectionToOffset(editor, offset)
+      injector.motion.scrollCaretIntoView(editor)
+      return
+    }
+
+    // Make sure to always reposition the caret, even if the offset hasn't changed. We might need to reposition due to
+    // changes in surrounding text, especially with inline inlays.
+    val oldOffset = this.offset.point
+    moveToInlayAwareOffset(offset)
+
+    // Similarly, always make sure the caret is positioned within the view. Adding or removing text could move the caret
+    // position relative to the view, without changing offset.
+    if (this == editor.primaryCaret()) {
+      injector.motion.scrollCaretIntoView(editor)
+    }
+    if (editor.inVisualMode || editor.inSelectMode) {
+      vimMoveSelectionToCaret()
+    } else {
+      editor.exitVisualMode()
+    }
+    injector.motion.onAppCodeMovement(editor, this, offset, oldOffset)
+  }
+
   fun moveToOffsetNative(offset: Int)
   fun moveToInlayAwareOffset(newOffset: Int)
   fun moveToBufferPosition(position: BufferPosition)

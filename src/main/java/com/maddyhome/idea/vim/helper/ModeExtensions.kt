@@ -11,16 +11,13 @@
 package com.maddyhome.idea.vim.helper
 
 import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getLineEndForOffset
 import com.maddyhome.idea.vim.api.getLineStartForOffset
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.command.VimStateMachine
-import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.newapi.IjExecutionContext
 import com.maddyhome.idea.vim.newapi.IjVimCaret
@@ -34,28 +31,6 @@ fun Editor.popAllModes() {
   val commandState = this.vim.vimStateMachine
   while (commandState.mode != VimStateMachine.Mode.COMMAND) {
     commandState.popModes()
-  }
-}
-
-@RWLockLabel.NoLockRequired
-fun Editor.exitVisualMode() {
-  val selectionType = SelectionType.fromSubMode(this.subMode)
-  SelectionVimListenerSuppressor.lock().use {
-    if (inBlockSubMode) {
-      this.caretModel.removeSecondaryCarets()
-    }
-    if (!this.vimKeepingVisualOperatorAction) {
-      this.caretModel.allCarets.forEach(Caret::removeSelection)
-    }
-  }
-  if (this.inVisualMode) {
-    this.vimLastSelectionType = selectionType
-    val primaryCaret = this.caretModel.primaryCaret
-    val vimSelectionStart = primaryCaret.vimSelectionStart
-    VimPlugin.getMark().setVisualSelectionMarks(this.vim, TextRange(vimSelectionStart, primaryCaret.offset))
-    this.caretModel.allCarets.forEach { it.vimSelectionStartClear() }
-
-    this.vim.vimStateMachine.popModes()
   }
 }
 

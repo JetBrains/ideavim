@@ -35,11 +35,11 @@ data class GoToLineCommand(val ranges: Ranges) :
 
     if (line >= 0) {
       val offset = injector.motion.moveCaretToLineWithStartOfLineOption(editor, line, caret)
-      injector.motion.moveCaret(editor, caret, offset)
+      caret.moveToOffset(offset)
       return ExecutionResult.Success
     }
 
-    injector.motion.moveCaret(editor, caret, 0)
+    caret.moveToOffset(0)
     return ExecutionResult.Error
   }
 }

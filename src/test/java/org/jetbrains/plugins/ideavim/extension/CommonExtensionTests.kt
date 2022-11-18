@@ -25,7 +25,6 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMa
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
 import com.maddyhome.idea.vim.extension.VimExtensionRegistrar
-import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.newapi.ij
@@ -349,7 +348,7 @@ private class TestExtension : VimExtension {
       VimPlugin.getVisualMotion().enterVisualMode(editor, VimStateMachine.SubMode.VISUAL_CHARACTER)
       val caret = editor.ij.caretModel.currentCaret
       val newOffset = VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret.vim, 5, editor.isEndAllowed)
-      MotionGroup.moveCaret(editor.ij, caret, newOffset)
+      caret.vim.moveToOffset(newOffset)
     }
   }
 
@@ -370,7 +369,7 @@ private class TestExtension : VimExtension {
       VimPlugin.getVisualMotion().enterVisualMode(editor, VimStateMachine.SubMode.VISUAL_LINE)
       val caret = editor.ij.caretModel.currentCaret
       val newOffset = VimPlugin.getMotion().getVerticalMotionOffset(editor, caret.vim, 1)
-      MotionGroup.moveCaret(editor.ij, caret, (newOffset as Motion.AbsoluteOffset).offset)
+      caret.vim.moveToOffset((newOffset as Motion.AbsoluteOffset).offset)
     }
   }
 
@@ -378,7 +377,7 @@ private class TestExtension : VimExtension {
     override fun execute(editor: VimEditor, context: ExecutionContext) {
       val caret = editor.ij.caretModel.currentCaret
       val newOffset = VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret.vim, 1, true)
-      MotionGroup.moveCaret(editor.ij, caret, newOffset)
+      caret.vim.moveToOffset(newOffset)
     }
   }
 

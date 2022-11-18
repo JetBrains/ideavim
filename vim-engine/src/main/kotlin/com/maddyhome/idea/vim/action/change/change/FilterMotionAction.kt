@@ -35,7 +35,7 @@ class FilterMotionAction : VimActionHandler.SingleExecution(), DuplicableOperato
     val start = editor.offsetToBufferPosition(range.startOffset)
     val end = editor.offsetToBufferPosition(range.endOffsetInclusive)
     if (current.line != start.line) {
-      injector.motion.moveCaret(editor, editor.primaryCaret(), range.startOffset)
+      editor.primaryCaret().moveToOffset(range.startOffset)
     }
 
     val count = if (start.line < end.line) end.line - start.line + 1 else 1

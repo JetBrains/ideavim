@@ -15,6 +15,7 @@ import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
+import com.maddyhome.idea.vim.helper.exitVisualMode
 import java.util.*
 
 /**
@@ -27,7 +28,7 @@ class FilterVisualLinesAction : VimActionHandler.SingleExecution() {
 
   override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
     injector.processGroup.startFilterCommand(editor, context, cmd)
-    editor.exitVisualModeNative()
+    editor.exitVisualMode()
     return true
   }
 }

@@ -139,8 +139,7 @@ class Ranges {
       startLine = endLine
       endLine = range.getLine(editor, lastZero)
       if (range.isMove) {
-        injector.motion.moveCaret(
-          editor, editor.primaryCaret(),
+        editor.primaryCaret().moveToOffset(
           injector.motion.moveCaretToLineWithSameColumn(editor, endLine, editor.primaryCaret())
         )
       }
@@ -162,9 +161,7 @@ class Ranges {
     for (range in ranges) {
       startLine = endLine
       endLine = range.getLine(editor, caret, lastZero)
-      if (range.isMove) injector.motion.moveCaret(
-        editor,
-        caret,
+      if (range.isMove) caret.moveToOffset(
         injector.motion.moveCaretToLineWithSameColumn(editor, endLine, editor.primaryCaret())
       )
       lastZero = endLine < 0

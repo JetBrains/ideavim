@@ -62,7 +62,6 @@ import java.text.NumberFormat;
 import java.text.ParsePosition;
 import java.util.*;
 
-import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
 import static com.maddyhome.idea.vim.helper.HelperKt.localEditors;
 import static com.maddyhome.idea.vim.helper.SearchHelperKtKt.shouldIgnoreCase;
 import static com.maddyhome.idea.vim.register.RegisterConstants.LAST_SEARCH_REGISTER;
@@ -535,7 +534,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
     // Explicitly exit visual mode here, so that visual mode marks don't change when we move the cursor to a match.
     List<ExException> exceptions = new ArrayList<>();
     if (CommandStateHelper.inVisualMode(((IjVimEditor) editor).getEditor())) {
-      ModeHelper.exitVisualMode(((IjVimEditor) editor).getEditor());
+      EngineModeExtensionsKt.exitVisualMode(editor);
     }
 
     CharPointer cmd = new CharPointer(new StringBuffer(exarg));
@@ -811,7 +810,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
           }
           if (doReplace) {
             SubmatchFunctionHandler.INSTANCE.setLatestMatch(((IjVimEditor) editor).getEditor().getDocument().getText(new com.intellij.openapi.util.TextRange(startoff, endoff)));
-            injector.getMotion().moveCaret(editor, caret, startoff);
+            caret.moveToOffset(startoff);
             if (expression != null) {
               try {
               match = expression
@@ -860,7 +859,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
 
     if (!got_quit) {
       if (lastMatch != -1) {
-        injector.getMotion().moveCaret(editor, caret,
+        caret.moveToOffset(
           VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, editor.offsetToBufferPosition(lastMatch).getLine()));
       }
       else {
@@ -980,7 +979,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
       return false;
     };
     if (ApplicationManager.getApplication().isUnitTestMode()) {
-      MotionGroup.moveCaret(editor, caret, startoff);
+      new IjVimCaret(caret).moveToOffset(startoff);
       final TestInputModel inputModel = TestInputModel.getInstance(editor);
       for (KeyStroke key = inputModel.nextKeyStroke(); key != null; key = inputModel.nextKeyStroke()) {
         if (!keyStrokeProcessor.invoke(key)) {
@@ -992,7 +991,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
       // XXX: The Ex entry panel is used only for UI here, its logic might be inappropriate for this method
       final ExEntryPanel exEntryPanel = ExEntryPanel.getInstanceWithoutShortcuts();
       exEntryPanel.activate(editor, EditorDataContext.init(editor, null), MessageHelper.message("replace.with.0", match), "", 1);
-      MotionGroup.moveCaret(editor, caret, startoff);
+      new IjVimCaret(caret).moveToOffset(startoff);
       ModalEntry.INSTANCE.activate(new IjVimEditor(editor), keyStrokeProcessor);
       exEntryPanel.deactivate(true, false);
     }

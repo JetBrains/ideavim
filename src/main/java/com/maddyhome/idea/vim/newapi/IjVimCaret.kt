@@ -22,10 +22,8 @@ import com.maddyhome.idea.vim.common.EditorLine
 import com.maddyhome.idea.vim.common.LiveRange
 import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.common.offset
-import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.visual.VisualChange
 import com.maddyhome.idea.vim.group.visual.vimLeadSelectionOffset
-import com.maddyhome.idea.vim.group.visual.vimUpdateEditorSelection
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.helper.registerStorage
 import com.maddyhome.idea.vim.helper.resetVimLastColumn
@@ -34,6 +32,7 @@ import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.helper.vimLastVisualOperatorRange
 import com.maddyhome.idea.vim.helper.vimLine
 import com.maddyhome.idea.vim.helper.vimSelectionStart
+import com.maddyhome.idea.vim.helper.vimSelectionStartClear
 
 class IjVimCaret(val caret: Caret) : VimCaretBase() {
   override val registerStorage: CaretRegisterStorage
@@ -66,6 +65,11 @@ class IjVimCaret(val caret: Caret) : VimCaretBase() {
     }
   override val vimLeadSelectionOffset: Int
     get() = this.caret.vimLeadSelectionOffset
+
+  override fun vimSelectionStartClear() {
+    this.caret.vimSelectionStartClear()
+  }
+
   override var vimLastVisualOperatorRange: VisualChange?
     get() = this.caret.vimLastVisualOperatorRange
     set(value) {
@@ -75,11 +79,6 @@ class IjVimCaret(val caret: Caret) : VimCaretBase() {
     get() = this.caret.vimLine
   override val isPrimary: Boolean
     get() = editor.primaryCaret().ij == this.caret
-
-  override fun moveToOffset(offset: Int) {
-    // TODO: 17.12.2021 Unpack internal actions
-    MotionGroup.moveCaret(caret.editor, caret, offset)
-  }
 
   override fun moveToOffsetNative(offset: Int) {
     caret.moveToOffset(offset)
@@ -118,10 +117,6 @@ class IjVimCaret(val caret: Caret) : VimCaretBase() {
 
   override val visualLineStart: Int
     get() = caret.visualLineStart
-
-  override fun updateEditorSelection() {
-    this.vimUpdateEditorSelection()
-  }
 
   override var vimInsertStart: LiveRange
     get() = caret.vimInsertStart.vim

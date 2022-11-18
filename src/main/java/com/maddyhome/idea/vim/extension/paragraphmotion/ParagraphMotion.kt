@@ -19,7 +19,6 @@ import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.extension.VimExtensionFacade
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
-import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.SearchHelper
 import com.maddyhome.idea.vim.helper.vimForEachCaret
 import com.maddyhome.idea.vim.newapi.ij
@@ -41,7 +40,7 @@ class ParagraphMotion : VimExtension {
       editor.ij.vimForEachCaret { caret ->
         val motion = moveCaretToNextParagraph(editor.ij, caret, count)
         if (motion >= 0) {
-          MotionGroup.moveCaret(editor.ij, caret, motion)
+          caret.vim.moveToOffset(motion)
         }
       }
     }

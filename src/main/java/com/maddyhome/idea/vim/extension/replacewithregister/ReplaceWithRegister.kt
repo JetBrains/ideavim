@@ -30,6 +30,7 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.setOperatorFunction
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.helper.EditorDataContext
 import com.maddyhome.idea.vim.helper.editorMode
+import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.helper.vimStateMachine
@@ -66,7 +67,7 @@ class ReplaceWithRegister : VimExtension {
         val visualSelection = caret to VimSelection.create(selectionStart, selectionEnd - 1, typeInEditor, editor)
         doReplace(editor.ij, caret, PutData.VisualSelection(mapOf(visualSelection), typeInEditor))
       }
-      editor.exitVisualModeNative()
+      editor.exitVisualMode()
     }
   }
 

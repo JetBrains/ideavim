@@ -25,6 +25,7 @@ import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.group.visual.VimSimpleSelection
 import com.maddyhome.idea.vim.group.visual.VisualChange
 import com.maddyhome.idea.vim.group.visual.VisualOperation
+import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.inBlockSubMode
 import com.maddyhome.idea.vim.helper.inRepeatMode
 import com.maddyhome.idea.vim.helper.inVisualMode
@@ -243,7 +244,7 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
       // If this is a mutli key change then exit visual now
       if (CommandFlags.FLAG_MULTIKEY_UNDO in cmd.flags || CommandFlags.FLAG_EXIT_VISUAL in cmd.flags) {
         logger.debug("Exit visual before command executing")
-        editor.exitVisualModeNative()
+        editor.exitVisualMode()
       }
     }
 
@@ -255,7 +256,7 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
       ) {
         if (CommandFlags.FLAG_MULTIKEY_UNDO !in cmd.flags && CommandFlags.FLAG_EXPECT_MORE !in cmd.flags) {
           logger.debug("Not multikey undo - exit visual")
-          editor.exitVisualModeNative()
+          editor.exitVisualMode()
         }
       }
 

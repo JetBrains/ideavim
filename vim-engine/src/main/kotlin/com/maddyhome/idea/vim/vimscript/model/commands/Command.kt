@@ -24,6 +24,7 @@ import com.maddyhome.idea.vim.ex.NoRangeAllowedException
 import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.Msg
+import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.noneOfEnum
@@ -63,7 +64,7 @@ sealed class Command(var commandRanges: Ranges, val commandArgument: String) : E
     checkRanges()
     checkArgument()
     if (editor.inVisualMode && Flag.SAVE_VISUAL !in argFlags.flags) {
-      editor.exitVisualModeNative()
+      editor.exitVisualMode()
     }
     if (argFlags.access == Access.WRITABLE && !editor.isDocumentWritable()) {
       logger.info("Trying to modify readonly document")

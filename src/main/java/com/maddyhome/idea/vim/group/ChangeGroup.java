@@ -188,7 +188,7 @@ public class ChangeGroup extends VimChangeGroupBase {
       return false;
     }
     changeCase(editor, editor.currentCaret().getOffset().getPoint(), offset, CharacterHelper.CASE_TOGGLE);
-    injector.getMotion().moveCaret(editor, caret, EngineEditorHelperKt.normalizeOffset(editor, offset, false));
+    caret.moveToOffset(EngineEditorHelperKt.normalizeOffset(editor, offset, false));
     return true;
   }
 
@@ -257,7 +257,7 @@ public class ChangeGroup extends VimChangeGroupBase {
     for (int i = ends.length - 1; i >= 0; i--) {
       changeCase(editor, starts[i], ends[i], type);
     }
-    injector.getMotion().moveCaret(editor, caret, range.getStartOffset());
+    caret.moveToOffset(range.getStartOffset());
     return true;
   }
 
@@ -342,7 +342,7 @@ public class ChangeGroup extends VimChangeGroupBase {
       reformatCode(editor, startOffset, endOffset);
     }
     final int newOffset = injector.getMotion().moveCaretToLineStartSkipLeading(editor, firstLine);
-    injector.getMotion().moveCaret(editor, caret, newOffset);
+    caret.moveToOffset(newOffset);
     return true;
   }
 
@@ -390,7 +390,7 @@ public class ChangeGroup extends VimChangeGroupBase {
     Function0<Unit> afterAction = () -> {
       final int firstLine = editor.offsetToBufferPosition(Math.min(startOffset, endOffset)).getLine();
       final int newOffset = injector.getMotion().moveCaretToLineStartSkipLeading(editor, firstLine);
-      injector.getMotion().moveCaret(editor, caret, newOffset);
+      caret.moveToOffset(newOffset);
       restoreCursor(editor, caret, ((IjVimCaret)caret).getCaret().getLogicalPosition().line);
       return null;
     };
@@ -508,10 +508,10 @@ public class ChangeGroup extends VimChangeGroupBase {
         // The caret has moved, so reset the intended column before trying to get the expected offset
         caret.setVimLastColumn(intendedColumn);
         final int offset = injector.getMotion().moveCaretToLineWithStartOfLineOption(editor, sline, caret);
-        injector.getMotion().moveCaret(editor, caret, offset);
+        caret.moveToOffset(offset);
       }
       else {
-        injector.getMotion().moveCaret(editor, caret, range.getStartOffset());
+        caret.moveToOffset(range.getStartOffset());
       }
     }
   }

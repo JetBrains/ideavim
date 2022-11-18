@@ -157,12 +157,12 @@ class VimMultipleCursorsExtension : VimExtension {
             for (line in startPosition.line + 1..startPosition.line + lines) {
               newPositions.add(VisualPosition(line, startPosition.column))
             }
-            MotionGroup.moveCaret(editor, caret, selectionStart)
+            caret.vim.moveToOffset(selectionStart)
           }
         }
 
         if (newPositions.size > 0) {
-          editor.exitVisualMode()
+          editor.vim.exitVisualMode()
           newPositions.forEach { editor.caretModel.addCaret(it, true) ?: return }
           editor.updateCaretsVisualAttributes()
           return
@@ -240,7 +240,7 @@ class VimMultipleCursorsExtension : VimExtension {
       val matches = SearchHelper.findAll(editor, pattern, 0, -1, false)
       for (match in matches) {
         if (match.contains(primaryCaret.offset)) {
-          MotionGroup.moveCaret(editor, primaryCaret, match.startOffset)
+          primaryCaret.vim.moveToOffset(match.startOffset)
           selectText(primaryCaret, text, match.startOffset)
         } else {
           val caret = editor.caretModel.addCaret(editor.offsetToVisualPosition(match.startOffset), true) ?: return
@@ -277,7 +277,7 @@ class VimMultipleCursorsExtension : VimExtension {
       val caret = editor.caretModel.primaryCaret
       if (caret.selectedText == null) return
       if (!editor.caretModel.removeCaret(caret)) {
-        editor.exitVisualMode()
+        editor.vim.exitVisualMode()
       }
       MotionGroup.scrollCaretIntoView(caret.editor)
     }

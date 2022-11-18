@@ -33,7 +33,9 @@ open class YankGroupBase : VimYankGroup {
     type: SelectionType,
     startOffsets: Map<VimCaret, Int>?,
   ): Boolean {
-    startOffsets?.forEach { (caret, offset) -> injector.motion.moveCaret(editor, caret, offset) }
+    startOffsets?.forEach { (caret, offset) ->
+      caret.moveToOffset(offset)
+    }
 
     notifyListeners(editor, range)
 

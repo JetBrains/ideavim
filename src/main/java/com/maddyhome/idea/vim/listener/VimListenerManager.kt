@@ -433,7 +433,7 @@ object VimListenerManager {
         //   https://youtrack.jetbrains.com/issue/VIM-2368
         if (event.mouseEvent.clickCount == 1 && !SwingUtilities.isRightMouseButton(event.mouseEvent)) {
           if (editor.inVisualMode) {
-            editor.exitVisualMode()
+            editor.vim.exitVisualMode()
           } else if (editor.inSelectMode) {
             editor.exitSelectMode(false)
             KeyHandler.getInstance().reset(editor.vim)

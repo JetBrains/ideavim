@@ -15,12 +15,6 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.handler.Motion
 
 interface VimMotionGroup {
-  /**
-   * Move the caret to the given buffer offset.
-   *
-   * Also updates/resets selection, updates visual block, remembers last vertical position, etc.
-   */
-  fun moveCaret(editor: VimEditor, caret: VimCaret, offset: Int)
 
   // Note that the following methods require the caret to access the intended vertical position, such as "end of line"
   fun getOffsetOfHorizontalMotion(editor: VimEditor, caret: VimCaret, count: Int, allowPastEnd: Boolean): Int
@@ -129,4 +123,5 @@ interface VimMotionGroup {
   // TODO: These aren't caret motions. Should be moved to VimWindowGroup?
   fun moveCaretGotoNextTab(editor: VimEditor, context: ExecutionContext, rawCount: Int): Int
   fun moveCaretGotoPreviousTab(editor: VimEditor, context: ExecutionContext, rawCount: Int): Int
+  fun onAppCodeMovement(editor: VimEditor, caret: VimCaret, offset: Int, oldOffset: Int)
 }

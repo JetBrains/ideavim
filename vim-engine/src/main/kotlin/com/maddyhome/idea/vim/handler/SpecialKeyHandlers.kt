@@ -16,6 +16,7 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.inSelectMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.options.OptionConstants
@@ -180,7 +181,7 @@ abstract class NonShiftedSpecialKeyHandler : MotionActionHandler.ForEachCaret() 
       editor.exitSelectModeNative(false)
     }
     if (editor.inVisualMode && (OptionConstants.keymodel_stopsel in keymodel || OptionConstants.keymodel_stopvisual in keymodel)) {
-      editor.exitVisualModeNative()
+      editor.exitVisualMode()
     }
 
     return motion(editor, caret, context, operatorArguments.count1, operatorArguments.count0, argument)

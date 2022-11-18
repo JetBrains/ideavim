@@ -11,7 +11,6 @@ package org.jetbrains.plugins.ideavim.propertybased
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.jetCheck.Generator
@@ -21,7 +20,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 abstract class VimPropertyTestBase : VimTestCase() {
   protected fun moveCaretToRandomPlace(env: ImperativeCommand.Environment, editor: Editor) {
     val pos = env.generateValue(Generator.integers(0, editor.document.textLength - 1), "Put caret at position %s")
-    MotionGroup.moveCaret(editor, editor.caretModel.currentCaret, pos)
+    editor.caretModel.currentCaret.vim.moveToOffset(pos)
   }
 
   protected fun reset(editor: Editor) {

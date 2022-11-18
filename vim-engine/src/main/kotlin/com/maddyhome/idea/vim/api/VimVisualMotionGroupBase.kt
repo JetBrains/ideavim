@@ -12,6 +12,8 @@ import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.group.visual.VisualChange
 import com.maddyhome.idea.vim.group.visual.VisualOperation
 import com.maddyhome.idea.vim.group.visual.vimSetSelection
+import com.maddyhome.idea.vim.group.visual.vimUpdateEditorSelection
+import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.pushSelectMode
 import com.maddyhome.idea.vim.helper.pushVisualMode
@@ -74,14 +76,14 @@ abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
 
     if (subMode == editor.subMode) {
       // Disable visual subMode
-      editor.exitVisualModeNative()
+      editor.exitVisualMode()
       return true
     }
 
     // Update visual subMode with new sub subMode
     editor.subMode = subMode
     for (caret in editor.carets()) {
-      caret.updateEditorSelection()
+      caret.vimUpdateEditorSelection()
     }
 
     return true

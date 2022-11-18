@@ -20,18 +20,18 @@ import com.intellij.ui.DocumentAdapter;
 import com.intellij.util.IJSwingUtilities;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.ex.ranges.LineRange;
-import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.helper.SearchHighlightsHelper;
 import com.maddyhome.idea.vim.helper.UiHelper;
+import com.maddyhome.idea.vim.newapi.IjVimCaret;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
+import com.maddyhome.idea.vim.options.OptionConstants;
+import com.maddyhome.idea.vim.options.OptionScope;
 import com.maddyhome.idea.vim.regexp.CharPointer;
 import com.maddyhome.idea.vim.regexp.RegExp;
 import com.maddyhome.idea.vim.ui.ExPanelBorder;
 import com.maddyhome.idea.vim.vimscript.model.commands.Command;
 import com.maddyhome.idea.vim.vimscript.model.commands.SubstituteCommand;
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser;
-import com.maddyhome.idea.vim.options.OptionConstants;
-import com.maddyhome.idea.vim.options.OptionScope;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -230,7 +230,7 @@ public class ExEntryPanel extends JPanel {
     // Reset the original caret, with original scroll offsets
     final Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
     if (primaryCaret.getOffset() != caretOffset) {
-      MotionGroup.moveCaret(editor, primaryCaret, caretOffset);
+      new IjVimCaret(primaryCaret).moveToOffset(caretOffset);
     }
     final ScrollingModel scrollingModel = editor.getScrollingModel();
     if (scrollingModel.getHorizontalScrollOffset() != horizontalOffset ||
@@ -293,7 +293,7 @@ public class ExEntryPanel extends JPanel {
         VimPlugin.getEditor().closeEditorSearchSession(editor);
         final int matchOffset = SearchHighlightsHelper.updateIncsearchHighlights(editor, pattern, forwards, caretOffset, searchRange);
         if (matchOffset != -1) {
-          MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), matchOffset);
+          editor.getCaretModel().getPrimaryCaret().moveToOffset(matchOffset);
         }
         else {
           resetCaretOffset(editor);

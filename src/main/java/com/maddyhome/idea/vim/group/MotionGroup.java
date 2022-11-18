@@ -28,7 +28,6 @@ import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
 import com.maddyhome.idea.vim.group.visual.VimSelection;
-import com.maddyhome.idea.vim.group.visual.EngineVisualGroupKt;
 import com.maddyhome.idea.vim.handler.Motion;
 import com.maddyhome.idea.vim.handler.MotionActionHandler;
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler;
@@ -42,7 +41,6 @@ import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.options.LocalOptionChangeListener;
 import com.maddyhome.idea.vim.options.OptionConstants;
 import com.maddyhome.idea.vim.options.OptionScope;
-import com.maddyhome.idea.vim.options.helpers.StrictMode;
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt;
@@ -202,7 +200,7 @@ public class MotionGroup extends VimMotionGroupBase {
 
     if (newVisualLine != caretVisualLine || newColumn != oldColumn) {
       int offset = editor.visualPositionToOffset(new VisualPosition(newVisualLine, newColumn));
-      moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), offset);
+      new IjVimCaret(editor.getCaretModel().getPrimaryCaret()).moveToOffset(offset);
 
       UserDataManager.setVimLastColumn(editor.getCaretModel().getPrimaryCaret(), col);
     }
@@ -247,48 +245,9 @@ public class MotionGroup extends VimMotionGroupBase {
     return normalizeSideScrollOffset(editor, sideScrollOffset);
   }
 
-  public void moveCaret(@NotNull VimEditor editor, @NotNull VimCaret caret, int offset) {
-    moveCaret(((IjVimEditor) editor).getEditor(), ((IjVimCaret) caret).getCaret(), offset);
-  }
-
-  /** Move the caret to the given offset
-   * <p>
-   * Note that <code>Caret.vimLastColumn</code> might be valid for visual block mode, if moving the primary caret after
-   * using the end of line motion (<code>$</code>).
-   * </p>
-   */
-  public static void moveCaret(@NotNull Editor editor, @NotNull Caret caret, int offset) {
-    if (offset < 0 || offset > editor.getDocument().getTextLength() || !caret.isValid()) return;
-
-    if (CommandStateHelper.inBlockSubMode(editor)) {
-      StrictMode.INSTANCE.assertTrue(caret == editor.getCaretModel().getPrimaryCaret(),
-                                     "Block selection can only be moved with primary caret!");
-
-      // Note that this call replaces ALL carets, so any local caret instances will be invalid!
-      EngineVisualGroupKt.vimMoveBlockSelectionToOffset(new IjVimEditor(editor), offset);
-      scrollCaretIntoView(editor);
-      return;
-    }
-
-    // Make sure to always reposition the caret, even if the offset hasn't changed. We might need to reposition due to
-    // changes in surrounding text, especially with inline inlays.
-    final int oldOffset = caret.getOffset();
-    InlayHelperKt.moveToInlayAwareOffset(caret, offset);
-
-    // Similarly, always make sure the caret is positioned within the view. Adding or removing text could move the caret
-    // position relative to the view, without changing offset.
-    if (caret == editor.getCaretModel().getPrimaryCaret()) {
-      scrollCaretIntoView(editor);
-    }
-
-    if (CommandStateHelper.inVisualMode(editor) || CommandStateHelper.inSelectMode(editor)) {
-      EngineVisualGroupKt.vimMoveSelectionToCaret(new IjVimCaret(caret));
-    }
-    else {
-      ModeHelper.exitVisualMode(editor);
-    }
-
-    AppCodeTemplates.onMovement(editor, caret, oldOffset < offset);
+  @Override
+  public void onAppCodeMovement(@NotNull VimEditor editor, @NotNull VimCaret caret, int offset, int oldOffset) {
+    AppCodeTemplates.onMovement(((IjVimEditor)editor).getEditor(), ((IjVimCaret)caret).getCaret(), oldOffset < offset);
   }
 
   private @Nullable Editor selectEditor(@NotNull Editor editor, @NotNull Mark mark) {
@@ -677,10 +636,10 @@ public class MotionGroup extends VimMotionGroupBase {
     final Editor selectedEditor = selectEditor(((IjVimEditor)editor).getEditor(), mark);
     if (selectedEditor != null) {
       for (Caret caret : selectedEditor.getCaretModel().getAllCarets()) {
-        moveCaret(selectedEditor, caret, toLineStart
-                                         ? moveCaretToLineStartSkipLeading(new IjVimEditor(selectedEditor), line)
-                                         : selectedEditor.logicalPositionToOffset(
-                                           new LogicalPosition(line, mark.getCol())));
+        new IjVimCaret(caret).moveToOffset(toLineStart
+                                           ? moveCaretToLineStartSkipLeading(new IjVimEditor(selectedEditor), line)
+                                           : selectedEditor.logicalPositionToOffset(
+                                             new LogicalPosition(line, mark.getCol())));
       }
     }
     return -2;
@@ -715,8 +674,9 @@ public class MotionGroup extends VimMotionGroupBase {
         if (spot == -1) {
           VimPlugin.getMark().addJump(editor, false);
         }
-        moveCaret(newEditor, newEditor.getCaretModel().getCurrentCaret(),
-                  EngineEditorHelperKt.normalizeOffset(new IjVimEditor(newEditor), newEditor.logicalPositionToOffset(lpnative), false));
+        new IjVimCaret(newEditor.getCaretModel().getCurrentCaret()).moveToOffset(
+          EngineEditorHelperKt.normalizeOffset(new IjVimEditor(newEditor), newEditor.logicalPositionToOffset(lpnative),
+                                               false));
       }
 
       return -2;
@@ -822,7 +782,7 @@ public class MotionGroup extends VimMotionGroupBase {
     if (caretVisualLine != ijCaret.getVisualPosition().line) {
       final int offset =
         moveCaretToLineWithStartOfLineOption(editor, EngineEditorHelperKt.visualLineToBufferLine(editor, caretVisualLine), caret);
-      moveCaret(ijEditor, ijCaret, offset);
+      caret.moveToOffset(offset);
       return result.getFirst();
     }
 
@@ -846,7 +806,7 @@ public class MotionGroup extends VimMotionGroupBase {
     if (caretVisualLine != ijCaret.getVisualPosition().line && caretVisualLine != -1) {
       final int offset =
         moveCaretToLineWithStartOfLineOption(editor, EngineEditorHelperKt.visualLineToBufferLine(editor, caretVisualLine), caret);
-      moveCaret(ijEditor, ijCaret, offset);
+      caret.moveToOffset(offset);
       return result.getFirst();
     }
 
@@ -937,7 +897,7 @@ public class MotionGroup extends VimMotionGroupBase {
 
     int logicalLine = EngineEditorHelperKt.visualLineToBufferLine(editor, targetCaretVisualLine);
     int caretOffset = moveCaretToLineWithStartOfLineOption(editor, logicalLine, caret);
-    moveCaret(ijEditor, ijCaret, caretOffset);
+    caret.moveToOffset(caretOffset);
 
     return true;
   }
@@ -987,7 +947,7 @@ public class MotionGroup extends VimMotionGroupBase {
                                                new IjVimCaret(editor.getCaretModel().getPrimaryCaret()));
       }
 
-      moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), offset);
+      new IjVimCaret(editor.getCaretModel().getPrimaryCaret()).moveToOffset(offset);
     }
   }
 
@@ -1052,7 +1012,7 @@ public class MotionGroup extends VimMotionGroupBase {
       final Editor editor = ((TextEditor)fileEditor).getEditor();
       ExOutputModel.getInstance(editor).clear();
       if (VimStateMachine.getInstance(new IjVimEditor(editor)).getMode() == VimStateMachine.Mode.VISUAL) {
-        ModeHelper.exitVisualMode(editor);
+        EngineModeExtensionsKt.exitVisualMode(new IjVimEditor(editor));
         KeyHandler.getInstance().reset(new IjVimEditor(editor));
       }
     }

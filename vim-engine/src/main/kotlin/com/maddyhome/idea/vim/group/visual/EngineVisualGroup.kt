@@ -126,3 +126,12 @@ fun VimCaret.vimMoveSelectionToCaret() {
 
   setVisualSelection(startOffsetMark, offset.point, this)
 }
+
+/**
+ * Update selection according to new CommandState
+ * This method should be used for switching from character to line wise selection and so on
+ */
+fun VimCaret.vimUpdateEditorSelection() {
+  val startOffsetMark = vimSelectionStart
+  setVisualSelection(startOffsetMark, offset.point, this)
+}

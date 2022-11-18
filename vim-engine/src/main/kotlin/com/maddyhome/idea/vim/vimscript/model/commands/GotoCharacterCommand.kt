@@ -36,7 +36,7 @@ data class GotoCharacterCommand(val ranges: Ranges, val argument: String) : Comm
     val offset = max(0, min(count - 1, editor.fileSize().toInt() - 1))
     if (offset == -1) return ExecutionResult.Error
 
-    injector.motion.moveCaret(editor, caret, offset)
+    caret.moveToOffset(offset)
 
     return ExecutionResult.Success
   }
