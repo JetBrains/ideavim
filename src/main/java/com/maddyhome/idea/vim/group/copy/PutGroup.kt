@@ -49,7 +49,6 @@ import java.awt.datatransfer.DataFlavor
 
 class PutGroup : VimPutBase() {
 
-
   override fun getProviderForPasteViaIde(
     editor: VimEditor,
     typeInRegister: SelectionType,

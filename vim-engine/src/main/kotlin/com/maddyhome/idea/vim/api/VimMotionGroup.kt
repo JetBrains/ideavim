@@ -85,7 +85,6 @@ interface VimMotionGroup {
    */
   fun findOffsetOfNextWord(editor: VimEditor, searchFrom: Int, count: Int, bigWord: Boolean): Motion
 
-
   // Next/previous matching character - f/F and t/T motions
   val lastFTCmd: TillCharacterMotionType
   val lastFTChar: Char
@@ -116,9 +115,7 @@ interface VimMotionGroup {
 
   fun repeatLastMatchChar(editor: VimEditor, caret: VimCaret, count: Int): Int
 
-
   fun getMotionRange(editor: VimEditor, caret: VimCaret, context: ExecutionContext, argument: Argument, operatorArguments: OperatorArguments): TextRange?
-
 
   // TODO: These aren't caret motions. Should be moved to VimWindowGroup?
   fun moveCaretGotoNextTab(editor: VimEditor, context: ExecutionContext, rawCount: Int): Int

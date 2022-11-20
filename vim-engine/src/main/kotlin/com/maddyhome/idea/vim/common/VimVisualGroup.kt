@@ -8,8 +8,8 @@
 
 package com.maddyhome.idea.vim.group.visual
 
-import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.BufferPosition
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getLineEndForOffset
 import com.maddyhome.idea.vim.api.getLineStartForOffset
 import com.maddyhome.idea.vim.api.injector

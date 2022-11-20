@@ -85,8 +85,8 @@ internal object NeovimTesting {
   private fun neovimEnabled(test: VimTestCase, editor: Editor? = null): Boolean {
     val method = test.javaClass.getMethod(test.name)
     val noBehaviourDiffers = !method.isAnnotationPresent(VimBehaviorDiffers::class.java)
-    val noTestingWithoutNeovim = !method.isAnnotationPresent(TestWithoutNeovim::class.java)
-      && !test.javaClass.isAnnotationPresent(TestWithoutNeovim::class.java)
+    val noTestingWithoutNeovim = !method.isAnnotationPresent(TestWithoutNeovim::class.java) &&
+      !test.javaClass.isAnnotationPresent(TestWithoutNeovim::class.java)
     val neovimTestingEnabled = System.getProperty("ideavim.nvim.test", "false")!!.toBoolean()
     val notParserTest = "org.jetbrains.plugins.ideavim.ex.parser" !in test.javaClass.packageName
     val notScriptImplementation = "org.jetbrains.plugins.ideavim.ex.implementation" !in test.javaClass.packageName

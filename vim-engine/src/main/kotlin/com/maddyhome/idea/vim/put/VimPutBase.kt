@@ -524,7 +524,7 @@ abstract class VimPutBase : VimPut {
 
     logger.debug("Perform put via plugin")
     val myCarets = visualSelection?.caretsAndSelections?.keys?.sortedByDescending { it.getBufferPosition() }
-        ?: editor.sortedNativeCarets().reversed()
+      ?: editor.sortedNativeCarets().reversed()
     injector.application.runWriteAction {
       myCarets.forEach { caret -> putForCaret(editor, caret, data, additionalData, context, text) }
     }

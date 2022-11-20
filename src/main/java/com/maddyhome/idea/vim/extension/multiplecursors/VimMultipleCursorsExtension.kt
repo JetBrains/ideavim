@@ -228,7 +228,7 @@ class VimMultipleCursorsExtension : VimExtension {
       } else {
         val range = SearchHelper.findWordUnderCursor(editor, primaryCaret) ?: return
         if (range.startOffset > primaryCaret.offset) return
-          IjVimEditor(editor).getText(range)
+        IjVimEditor(editor).getText(range)
       }
 
       if (!editor.inVisualMode) {

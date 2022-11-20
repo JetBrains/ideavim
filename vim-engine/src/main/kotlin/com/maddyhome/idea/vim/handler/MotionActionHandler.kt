@@ -191,9 +191,11 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
     caret.moveToOffset(normalisedOffset)
   }
 
-  private fun prepareMoveToAbsoluteOffset(editor: VimEditor,
-                                          cmd: Command,
-                                          offset: Motion.AbsoluteOffset): Int {
+  private fun prepareMoveToAbsoluteOffset(
+    editor: VimEditor,
+    cmd: Command,
+    offset: Motion.AbsoluteOffset
+  ): Int {
     var resultOffset = offset.offset
     if (resultOffset < 0) {
       logger.error("Offset is less than 0. $resultOffset. ${this.javaClass.name}")

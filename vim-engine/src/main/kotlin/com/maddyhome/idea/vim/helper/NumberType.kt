@@ -8,5 +8,5 @@
 package com.maddyhome.idea.vim.helper
 
 enum class NumberType {
-    BIN, OCT, DEC, HEX, ALPHA
+  BIN, OCT, DEC, HEX, ALPHA
 }

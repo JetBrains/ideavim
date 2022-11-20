@@ -27,4 +27,3 @@ fun SelectionModel.vimSetSystemSelectionSilently(start: Int, end: Int) =
  */
 fun SelectionModel.vimSetSystemBlockSelectionSilently(start: LogicalPosition, end: LogicalPosition) =
   SelectionVimListenerSuppressor.lock().use { setBlockSelection(start, end) }
-

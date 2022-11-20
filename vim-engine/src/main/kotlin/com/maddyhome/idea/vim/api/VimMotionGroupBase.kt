@@ -40,7 +40,8 @@ abstract class VimMotionGroupBase : VimMotionGroup {
     val line = editor.normalizeVisualLine(pos.line + count)
 
     if (intendedColumn == LAST_COLUMN) {
-      val normalisedColumn = editor.normalizeVisualColumn(line, intendedColumn,
+      val normalisedColumn = editor.normalizeVisualColumn(
+        line, intendedColumn,
         editor.mode.isEndAllowedIgnoringOnemore
       )
       val newPos = VimVisualPosition(line, normalisedColumn, false)
@@ -64,8 +65,7 @@ abstract class VimMotionGroupBase : VimMotionGroup {
     val offset = editor.visualPositionToOffset(newPos).point
     return if (intendedColumn != adjustedColumn) {
       offset.toAdjustedMotionOrError(intendedColumn)
-    }
-    else {
+    } else {
       offset.toMotionOrError()
     }
   }
@@ -353,11 +353,11 @@ abstract class VimMotionGroupBase : VimMotionGroup {
     return moveCaretToLineEnd(editor, editor.visualPositionToBufferPosition(visualEndOfLine).line, true)
   }
 
-    override fun moveCaretToLineStartSkipLeading(editor: VimEditor, line: Int): Int {
-        return editor.getLeadingCharacterOffset(line)
-    }
+  override fun moveCaretToLineStartSkipLeading(editor: VimEditor, line: Int): Int {
+    return editor.getLeadingCharacterOffset(line)
+  }
 
-    companion object {
-        const val LAST_COLUMN = 9999
-    }
+  companion object {
+    const val LAST_COLUMN = 9999
+  }
 }

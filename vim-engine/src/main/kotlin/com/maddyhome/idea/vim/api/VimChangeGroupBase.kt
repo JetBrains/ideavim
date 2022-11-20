@@ -162,7 +162,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     // Fix for https://youtrack.jetbrains.net/issue/VIM-35
     if (!range.normalize(editor.fileSize().toInt())) {
       updatedRange = if (range.startOffset == range.endOffset && range.startOffset == editor.fileSize()
-          .toInt() && range.startOffset != 0
+        .toInt() && range.startOffset != 0
       ) {
         TextRange(range.startOffset - 1, range.endOffset)
       } else {
@@ -1059,7 +1059,6 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       (keyStroke.keyCode == KeyEvent.VK_LEFT || keyStroke.keyCode == KeyEvent.VK_RIGHT)
   }
 
-
   /**
    * Replace text in the editor
    *
@@ -1194,7 +1193,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
         operatorArguments.withCount0(count0)
       )
         ?: return false
-      //ChangeGroupKt.changeRange(((IjVimEditor) editor).getEditor(), ((IjVimCaret) caret).getCaret(), deleteRangeAndType.getFirst(), deleteRangeAndType.getSecond(), ((IjExecutionContext) context).getContext());
+      // ChangeGroupKt.changeRange(((IjVimEditor) editor).getEditor(), ((IjVimCaret) caret).getCaret(), deleteRangeAndType.getFirst(), deleteRangeAndType.getSecond(), ((IjExecutionContext) context).getContext());
       true
     } else {
       val (first, second) = getDeleteRangeAndType(
