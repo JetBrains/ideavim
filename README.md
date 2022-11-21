@@ -10,6 +10,7 @@ IdeaVim
 [![Version][plugin-version-svg]][plugin-repo]
 [![Gitter][gitter-svg]][gitter]
 [![Twitter][twitter-svg]][twitter]
+[![codecov](https://codecov.io/gh/JetBrains/ideavim/branch/master/graph/badge.svg)](https://codecov.io/gh/JetBrains/ideavim)
 
 IdeaVim is a Vim engine for JetBrains IDEs.
 
