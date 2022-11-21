@@ -67,6 +67,9 @@ plugins {
 
     // ktlint linter - read more: https://github.com/JLLeitschuh/ktlint-gradle
     id("org.jlleitschuh.gradle.ktlint") version "10.3.0"
+
+    id("org.jetbrains.kotlinx.kover") version "0.6.1"
+    id("com.dorongold.task-tree") version "2.1.0"
 }
 
 // Import variables from gradle.properties file
@@ -338,6 +341,22 @@ tasks.register("getUnreleasedChangelog") {
     doLast {
         val log = changelog.getUnreleased().toHTML()
         println(log)
+    }
+}
+
+// --- Kover
+
+koverMerged {
+    enable()
+}
+
+kover {
+    instrumentation {
+        // set of test tasks names to exclude from instrumentation. The results of their execution will not be presented in the report
+        excludeTasks += "testPropertyBased"
+        excludeTasks += "testLongRunning"
+        excludeTasks += "testWithNeovim"
+        excludeTasks += "testUi"
     }
 }
 
