@@ -75,7 +75,7 @@ class MotionDownActionTest : VimTestCase() {
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
-  fun `test with inlays`() {
+  fun `test with inlays - move down from line with preceding inlay`() {
     val keys = injector.parser.parseKeys("j")
     val before = """
             I found it in a ${c}legendary land
@@ -91,7 +91,7 @@ class MotionDownActionTest : VimTestCase() {
     assertState(after)
   }
 
-  fun `test with inlays 2`() {
+  fun `test with inlays - move down to correct column on line with preceding inlay`() {
     val keys = injector.parser.parseKeys("j")
     val before = """
             I found it in a ${c}legendary land
@@ -107,7 +107,7 @@ class MotionDownActionTest : VimTestCase() {
     assertState(after)
   }
 
-  fun `test with inlays 3`() {
+  fun `test with inlays - move down from line with preceding inlay to line with preceding inlay`() {
     val keys = injector.parser.parseKeys("j")
     val before = """
             I found it in a ${c}legendary land
@@ -124,7 +124,7 @@ class MotionDownActionTest : VimTestCase() {
     assertState(after)
   }
 
-  fun `test with inlays 4`() {
+  fun `test with inlays - move down from long line with inlay to correct column`() {
     val keys = injector.parser.parseKeys("j")
     val before = """
             I found it in a legendary ${c}land
@@ -140,7 +140,7 @@ class MotionDownActionTest : VimTestCase() {
     assertState(after)
   }
 
-  fun `test with inlays 5`() {
+  fun `test with inlays - move down from line with inlay and back to correct column`() {
     val keys = injector.parser.parseKeys("jk")
     val before = """
             I found it in a legendary ${c}land
@@ -171,7 +171,7 @@ class MotionDownActionTest : VimTestCase() {
     assertState(after)
   }
 
-  fun `test with inlays 6`() {
+  fun `test with inlays - long line moving onto shorter line with inlay before caret`() {
     val keys = injector.parser.parseKeys("j")
     val before = """
             I found it in a legendary ${c}land
@@ -187,7 +187,26 @@ class MotionDownActionTest : VimTestCase() {
     assertState(after)
   }
 
-  fun `test with inlays 7`() {
+  fun `test with inlays - long line moving onto shorter line with trailing inlay`() {
+    val keys = injector.parser.parseKeys("j")
+    val before = """
+            I found it in a legendary la${c}nd
+            all rocks and lavender
+            and tufted grass,
+    """.trimIndent()
+    val after = """
+            I found it in a legendary land
+            all rocks and lavende${c}r
+            and tufted grass,
+    """.trimIndent()
+    configureByText(before)
+    val inlayOffset = myFixture.editor.document.getLineEndOffset(1)
+    myFixture.editor.inlayModel.addInlineElement(inlayOffset, HintRenderer("Hello"))
+    typeText(keys)
+    assertState(after)
+  }
+
+  fun `test with inlays - move down onto line with inlay and back to correct column`() {
     val keys = injector.parser.parseKeys("jk")
     val before = """
             I found it in a legendary ${c}land
@@ -199,23 +218,6 @@ class MotionDownActionTest : VimTestCase() {
     """.trimIndent()
     configureByText(before)
     myFixture.editor.inlayModel.addInlineElement(before.indexOf("rocks"), HintRenderer("Hello"))
-    typeText(keys)
-    assertState(after)
-  }
-
-  fun `test with inlays 8`() {
-    val keys = injector.parser.parseKeys("lj")
-    val before = """
-            I found it in a ${c}legendary land
-            all rocks and lavender and tufted grass,
-    """.trimIndent()
-    val after = """
-            I found it in a legendary land
-            all rocks and lav${c}ender and tufted grass,
-    """.trimIndent()
-    configureByText(before)
-    myFixture.editor.inlayModel.addInlineElement(before.indexOf("rocks"), HintRenderer("Hello"))
-    myFixture.editor.inlayModel.addInlineElement(before.indexOf("found"), HintRenderer("Hello"))
     typeText(keys)
     assertState(after)
   }

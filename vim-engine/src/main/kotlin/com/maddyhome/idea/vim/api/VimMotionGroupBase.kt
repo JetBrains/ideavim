@@ -58,15 +58,16 @@ abstract class VimMotionGroupBase : VimMotionGroup {
       .amountOfInlaysBeforeVisualPosition(editor, VimVisualPosition(line, intendedColumn, false))
 
     val normalisedColumn = editor
-      .normalizeVisualColumn(line, intendedColumn, editor.isEndAllowed)
-    val adjustedColumn = normalisedColumn + additionalVisualColumns
+      .normalizeVisualColumn(line, intendedColumn + additionalVisualColumns, editor.isEndAllowed)
 
-    val newPos = VimVisualPosition(line, adjustedColumn, false)
+    val newPos = VimVisualPosition(line, intendedColumn + additionalVisualColumns, false)
     val offset = editor.visualPositionToOffset(newPos).point
-    return if (intendedColumn != adjustedColumn) {
-      offset.toAdjustedMotionOrError(intendedColumn)
+    val bufferLine = editor.offsetToBufferPosition(offset).line
+    val normalisedOffset = editor.normalizeOffset(bufferLine, offset, editor.isEndAllowed)
+    return if (intendedColumn != normalisedColumn) {
+      normalisedOffset.toAdjustedMotionOrError(intendedColumn)
     } else {
-      offset.toMotionOrError()
+      normalisedOffset.toMotionOrError()
     }
   }
 
