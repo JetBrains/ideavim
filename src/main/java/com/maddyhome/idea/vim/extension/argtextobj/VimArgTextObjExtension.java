@@ -37,7 +37,7 @@ import java.util.Deque;
 import java.util.EnumSet;
 
 import static com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping;
-import static com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping;
+import static com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing;
 
 /**
  * @author igrekster
@@ -56,9 +56,8 @@ public class VimArgTextObjExtension implements VimExtension {
     putExtensionHandlerMapping(MappingMode.XO, VimInjectorKt.getInjector().getParser().parseKeys("<Plug>InnerArgument"), getOwner(), new VimArgTextObjExtension.ArgumentHandler(true), false);
     putExtensionHandlerMapping(MappingMode.XO, VimInjectorKt.getInjector().getParser().parseKeys("<Plug>OuterArgument"), getOwner(), new VimArgTextObjExtension.ArgumentHandler(false), false);
 
-    putKeyMapping(MappingMode.XO, VimInjectorKt.getInjector().getParser().parseKeys("ia"), getOwner(), VimInjectorKt.getInjector().getParser().parseKeys("<Plug>InnerArgument"), true);
-    putKeyMapping(MappingMode.XO, VimInjectorKt.getInjector().getParser().parseKeys("aa"), getOwner(), VimInjectorKt.getInjector().getParser().parseKeys("<Plug>OuterArgument"), true);
-
+    putKeyMappingIfMissing(MappingMode.XO, VimInjectorKt.getInjector().getParser().parseKeys("ia"), getOwner(), VimInjectorKt.getInjector().getParser().parseKeys("<Plug>InnerArgument"), true);
+    putKeyMappingIfMissing(MappingMode.XO, VimInjectorKt.getInjector().getParser().parseKeys("aa"), getOwner(), VimInjectorKt.getInjector().getParser().parseKeys("<Plug>OuterArgument"), true);
   }
 
   /**
