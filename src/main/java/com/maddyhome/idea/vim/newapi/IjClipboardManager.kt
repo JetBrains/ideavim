@@ -84,6 +84,7 @@ class IjClipboardManager : VimClipboardManager {
     DumbService.getInstance(project).withAlternativeResolveEnabled {
       for (processor in CopyPastePostProcessor.EP_NAME.extensionList) {
         try {
+          logger.debug { "Copy paste processor: ${processor.javaClass.name}" }
           transferableData.addAll(
             processor.collectTransferableData(
               file,
@@ -103,6 +104,7 @@ class IjClipboardManager : VimClipboardManager {
     // See https://youtrack.jetbrains.com/issue/VIM-1785
     // See https://youtrack.jetbrains.com/issue/VIM-1731
     transferableData.removeIf { it: TextBlockTransferableData? -> it is RtfTransferableData || it is HtmlTransferableData }
+    logger.debug { "Transferable data collected: ${transferableData.joinToString { it.javaClass.name }}" }
     return transferableData
   }
 

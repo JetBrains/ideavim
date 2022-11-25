@@ -29,6 +29,7 @@ import com.maddyhome.idea.vim.command.isBlock
 import com.maddyhome.idea.vim.command.isChar
 import com.maddyhome.idea.vim.command.isLine
 import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.TestClipboardModel
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
@@ -94,6 +95,7 @@ class PutGroup : VimPutBase() {
     val sizeBeforeInsert = allContentsBefore.size
     val firstItemBefore = allContentsBefore.firstOrNull()
     val origTestContents = TestClipboardModel.contents
+    logger.debug { "Transferable classes: ${text.transferableData.joinToString { it.javaClass.name }}" }
     val origContent: TextBlockTransferable = injector.clipboardManager.setClipboardText(
       text.text,
       transferableData = text.transferableData
