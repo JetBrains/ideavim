@@ -27,6 +27,7 @@ usual beta standards.
 
 ### Fixes:
 * [VIM-2797](https://youtrack.jetbrains.com/issue/VIM-2797) Introduce variable to mute default argtextobj mappings
+* [VIM-758](https://youtrack.jetbrains.com/issue/VIM-758) Support d mappings
 
 ### Merged PRs:
 * [558](https://github.com/JetBrains/ideavim/pull/558) by [Matt Ellis](https://github.com/citizenmatt): Fix incorrect normalising for trailing inlay
