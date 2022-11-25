@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.options.helpers
 
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.options.OptionConstants
@@ -131,6 +132,29 @@ enum class GuiCursorMode(val token: String) {
 
   companion object {
     fun fromString(s: String) = values().firstOrNull { it.token == s }
+
+    // Used in FleetVim
+    @Suppress("unused")
+    fun fromMode(mode: VimStateMachine.Mode, isReplaceCharacter: Boolean): GuiCursorMode {
+      if (isReplaceCharacter) {
+        // Can be true for NORMAL and VISUAL
+        return REPLACE
+      }
+
+      return when (mode) {
+        VimStateMachine.Mode.COMMAND -> NORMAL
+        VimStateMachine.Mode.VISUAL -> VISUAL // TODO: VISUAL_EXCLUSIVE
+        VimStateMachine.Mode.SELECT -> VISUAL
+        VimStateMachine.Mode.INSERT -> INSERT
+        VimStateMachine.Mode.OP_PENDING -> OP_PENDING
+        VimStateMachine.Mode.REPLACE -> REPLACE
+        // TODO: ci and cr
+        VimStateMachine.Mode.CMD_LINE -> CMD_LINE
+        VimStateMachine.Mode.INSERT_NORMAL -> NORMAL
+        VimStateMachine.Mode.INSERT_VISUAL -> VISUAL
+        VimStateMachine.Mode.INSERT_SELECT -> INSERT
+      }
+    }
   }
 }
 
