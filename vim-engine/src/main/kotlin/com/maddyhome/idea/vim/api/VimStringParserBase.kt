@@ -15,7 +15,6 @@ import java.awt.event.InputEvent
 import java.awt.event.KeyEvent
 import java.util.*
 import javax.swing.KeyStroke
-import kotlin.collections.ArrayList
 
 abstract class VimStringParserBase : VimStringParser {
   override val plugKeyStroke: KeyStroke
@@ -456,6 +455,7 @@ abstract class VimStringParserBase : VimStringParser {
     return null
   }
 
+  // See https://vimdoc.sourceforge.net/htmldoc/intro.html#key-notation
   private fun parseSpecialKey(s: String, modifiers: Int): KeyStroke? {
     val lower = s.lowercase(Locale.getDefault())
     val keyCode = getVimKeyName(lower)
@@ -464,8 +464,11 @@ abstract class VimStringParserBase : VimStringParser {
       return KeyStroke.getKeyStroke(keyCode, modifiers)
     } else if (typedChar != null) {
       return getTypedOrPressedKeyStroke(typedChar, modifiers)
+    } else if (lower.startsWith(CMD_PREFIX)) {
+      return parseSpecialKey(s.substring(CMD_PREFIX.length), modifiers or InputEvent.META_DOWN_MASK)
     } else if (lower.startsWith(META_PREFIX)) {
-      return parseSpecialKey(s.substring(META_PREFIX.length), modifiers or InputEvent.META_DOWN_MASK)
+      // Meta and alt prefixes are the same thing. See the key notation of vim
+      return parseSpecialKey(s.substring(META_PREFIX.length), modifiers or InputEvent.ALT_DOWN_MASK)
     } else if (lower.startsWith(ALT_PREFIX)) {
       return parseSpecialKey(s.substring(ALT_PREFIX.length), modifiers or InputEvent.ALT_DOWN_MASK)
     } else if (lower.startsWith(CTRL_PREFIX)) {
@@ -537,6 +540,7 @@ abstract class VimStringParserBase : VimStringParser {
   }
 
   companion object {
+    private const val CMD_PREFIX = "d-"
     private const val META_PREFIX = "m-"
     private const val ALT_PREFIX = "a-"
     private const val CTRL_PREFIX = "c-"
