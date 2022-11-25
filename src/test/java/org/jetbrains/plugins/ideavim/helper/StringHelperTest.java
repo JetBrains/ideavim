@@ -38,13 +38,16 @@ public class StringHelperTest extends VimTestCase {
     assertPressedKeyStroke("alt C", "<A-C>");
     assertPressedKeyStroke("alt C", "<a-c>");
 
-    assertPressedKeyStroke("meta C", "<M-C>");
+    assertPressedKeyStroke("alt C", "<M-C>");
+
+    assertPressedKeyStroke("meta C", "<D-C>");
 
     assertPressedKeyStroke("control shift C", "<C-S-C>");
     assertPressedKeyStroke("alt shift C", "<A-S-C>");
     assertPressedKeyStroke("control alt C", "<C-A-C>");
     assertPressedKeyStroke("control alt shift C", "<C-A-S-C>");
-    assertPressedKeyStroke("meta control alt shift C", "<M-C-A-S-C>");
+    assertPressedKeyStroke("control alt shift C", "<C-A-S-C>");
+    assertPressedKeyStroke("meta control alt shift C", "<D-C-A-S-C>");
   }
 
   public void testParseSpecialKeys() {
