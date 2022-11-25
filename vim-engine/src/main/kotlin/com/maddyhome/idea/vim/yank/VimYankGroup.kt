@@ -21,8 +21,6 @@ interface VimYankGroup {
    *
    * @param editor   The editor to yank from
    * @param context  The data context
-   * @param count    The number of times to yank
-   * @param rawCount The actual count entered by the user
    * @param argument The motion command argument
    * @return true if able to yank the text, false if not
    */

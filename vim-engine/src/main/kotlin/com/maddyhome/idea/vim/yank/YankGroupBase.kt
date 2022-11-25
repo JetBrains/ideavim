@@ -26,7 +26,7 @@ import kotlin.math.min
 open class YankGroupBase : VimYankGroup {
   private val yankListeners: MutableList<VimYankListener> = ArrayList()
 
-  protected fun yankRange(
+  private fun yankRange(
     editor: VimEditor,
     caretToRange: Map<VimCaret, TextRange>,
     range: TextRange,
@@ -75,13 +75,6 @@ open class YankGroupBase : VimYankGroup {
 
   /**
    * This yanks the text moved over by the motion command argument.
-   *
-   * @param editor   The editor to yank from
-   * @param context  The data context
-   * @param count    The number of times to yank
-   * @param rawCount The actual count entered by the user
-   * @param argument The motion command argument
-   * @return true if able to yank the text, false if not
    */
   override fun yankMotion(
     editor: VimEditor,
@@ -95,7 +88,7 @@ open class YankGroupBase : VimYankGroup {
     val nativeCaretCount = editor.nativeCarets().size
     if (nativeCaretCount <= 0) return false
 
-    val carretToRange = HashMap<VimCaret, TextRange>(nativeCaretCount)
+    val caretToRange = HashMap<VimCaret, TextRange>(nativeCaretCount)
     val ranges = ArrayList<Pair<Int, Int>>(nativeCaretCount)
 
     // This logic is from original vim
@@ -108,7 +101,7 @@ open class YankGroupBase : VimYankGroup {
       assert(motionRange.size() == 1)
       ranges.add(motionRange.startOffset to motionRange.endOffset)
       startOffsets?.put(caret, motionRange.normalize().startOffset)
-      carretToRange[caret] = TextRange(motionRange.startOffset, motionRange.endOffset)
+      caretToRange[caret] = TextRange(motionRange.startOffset, motionRange.endOffset)
     }
 
     val range = getTextRange(ranges, type) ?: return false
@@ -117,7 +110,7 @@ open class YankGroupBase : VimYankGroup {
 
     return yankRange(
       editor,
-      carretToRange,
+      caretToRange,
       range,
       type,
       startOffsets
