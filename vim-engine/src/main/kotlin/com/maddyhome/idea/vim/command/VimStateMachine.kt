@@ -144,21 +144,6 @@ class VimStateMachine(private val editor: VimEditor?) {
     mappingState.mappingMode = modeToMappingMode(mode)
   }
 
-  @Contract(pure = true)
-  private fun modeToMappingMode(mode: Mode): MappingMode {
-    return when (mode) {
-      Mode.COMMAND -> MappingMode.NORMAL
-      Mode.INSERT, Mode.REPLACE -> MappingMode.INSERT
-      Mode.VISUAL -> MappingMode.VISUAL
-      Mode.SELECT -> MappingMode.SELECT
-      Mode.CMD_LINE -> MappingMode.CMD_LINE
-      Mode.OP_PENDING -> MappingMode.OP_PENDING
-      Mode.INSERT_NORMAL -> MappingMode.NORMAL
-      Mode.INSERT_VISUAL -> MappingMode.VISUAL
-      Mode.INSERT_SELECT -> MappingMode.SELECT
-    }
-  }
-
   val mode: Mode
     get() = currentModeState().mode
 
@@ -400,6 +385,21 @@ class VimStateMachine(private val editor: VimEditor?) {
 
     private fun getKeyRootNode(mappingMode: MappingMode): CommandPartNode<VimActionsInitiator> {
       return injector.keyGroup.getKeyRoot(mappingMode)
+    }
+
+    @Contract(pure = true)
+    fun modeToMappingMode(mode: Mode): MappingMode {
+      return when (mode) {
+        Mode.COMMAND -> MappingMode.NORMAL
+        Mode.INSERT, Mode.REPLACE -> MappingMode.INSERT
+        Mode.VISUAL -> MappingMode.VISUAL
+        Mode.SELECT -> MappingMode.SELECT
+        Mode.CMD_LINE -> MappingMode.CMD_LINE
+        Mode.OP_PENDING -> MappingMode.OP_PENDING
+        Mode.INSERT_NORMAL -> MappingMode.NORMAL
+        Mode.INSERT_VISUAL -> MappingMode.VISUAL
+        Mode.INSERT_SELECT -> MappingMode.SELECT
+      }
     }
   }
 }
