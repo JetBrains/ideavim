@@ -12,6 +12,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimCaretListener
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.getOffset
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.normalizeOffset
 import com.maddyhome.idea.vim.command.Argument
@@ -178,11 +179,14 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
     // Set before moving, so it can be applied during move, especially important for LAST_COLUMN and visual block mode
     caret.vimLastColumn = offset.intendedColumn
 
-    caret.moveToOffset(normalisedOffset)
+    // In Fleet the caret is immutable, so we get a new version of the caret in order to update it
+    // The whole caret movement system should be actually rewritten to restrict the iteration with carets at any moment
+    //   of time. In this way we would have a better integration with Fleet.
+    val caretAfterMove = caret.moveToOffset(normalisedOffset)
 
     // We've moved the caret, so reset the intended column. Visual block movement can replace the primary caret when
     // moving the selection up, so make sure we've got a valid caret
-    val validCaret = if (editor.inBlockSubMode) editor.primaryCaret() else caret
+    val validCaret = if (editor.inBlockSubMode) editor.primaryCaret() else caretAfterMove
     validCaret.vimLastColumn = offset.intendedColumn
   }
 

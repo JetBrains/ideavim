@@ -101,8 +101,9 @@ class IjVimCaret(val caret: Caret) : VimCaretBase() {
       return caret.isValid
     }
 
-  override fun moveToInlayAwareOffset(newOffset: Int) {
+  override fun moveToInlayAwareOffset(newOffset: Int): VimCaret {
     caret.moveToInlayAwareOffset(newOffset)
+    return this
   }
 
   override fun getBufferPosition(): BufferPosition {

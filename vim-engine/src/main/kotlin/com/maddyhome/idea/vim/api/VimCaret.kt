@@ -57,21 +57,21 @@ interface VimCaret {
   fun setSelection(start: Offset, end: Offset)
   fun removeSelection()
 
-  fun moveToOffset(offset: Int) {
-    if (offset < 0 || offset > editor.text().length || !isValid) return
+  fun moveToOffset(offset: Int): VimCaret {
+    if (offset < 0 || offset > editor.text().length || !isValid) return this
     if (editor.inBlockSubMode) {
       StrictMode.assert(this == editor.primaryCaret(), "Block selection can only be moved with primary caret!")
 
       // Note that this call replaces ALL carets, so any local caret instances will be invalid!
       vimMoveBlockSelectionToOffset(editor, offset)
       injector.motion.scrollCaretIntoView(editor)
-      return
+      return this
     }
 
     // Make sure to always reposition the caret, even if the offset hasn't changed. We might need to reposition due to
     // changes in surrounding text, especially with inline inlays.
     val oldOffset = this.offset.point
-    moveToInlayAwareOffset(offset)
+    val caretAfterMove = moveToInlayAwareOffset(offset)
 
     // Similarly, always make sure the caret is positioned within the view. Adding or removing text could move the caret
     // position relative to the view, without changing offset.
@@ -84,10 +84,15 @@ interface VimCaret {
       editor.exitVisualMode()
     }
     injector.motion.onAppCodeMovement(editor, this, offset, oldOffset)
+    return caretAfterMove
   }
 
   fun moveToOffsetNative(offset: Int)
-  fun moveToInlayAwareOffset(newOffset: Int)
+
+  /**
+   * We return here an instance of the caret because the caret implementation may be immutable
+   */
+  fun moveToInlayAwareOffset(newOffset: Int): VimCaret
   fun moveToBufferPosition(position: BufferPosition)
 
   // TODO: [visual] Try to remove this. Visual position is an IntelliJ concept and Vim doesn't have a direct equivalent
