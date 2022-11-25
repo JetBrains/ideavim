@@ -22,6 +22,6 @@ data class UndoCommand(val ranges: Ranges, val argument: String) : Command.Singl
   override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_FORBIDDEN, Access.WRITABLE)
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
-    return if (injector.undo.undo(context)) ExecutionResult.Success else ExecutionResult.Error
+    return if (injector.undo.undo(editor, context)) ExecutionResult.Success else ExecutionResult.Error
   }
 }

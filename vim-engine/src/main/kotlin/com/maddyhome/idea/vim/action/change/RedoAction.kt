@@ -24,9 +24,9 @@ class RedoAction : VimActionHandler.SingleExecution() {
     operatorArguments: OperatorArguments,
   ): Boolean {
     var count = operatorArguments.count1
-    var result = injector.undo.redo(context)
+    var result = injector.undo.redo(editor, context)
     while ((--count > 0) && result) {
-      result = injector.undo.redo(context)
+      result = injector.undo.redo(editor, context)
     }
     return result
   }

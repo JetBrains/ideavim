@@ -21,6 +21,6 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 data class RedoCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
   override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_FORBIDDEN, Access.WRITABLE)
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
-    return if (injector.undo.redo(context)) ExecutionResult.Success else ExecutionResult.Error
+    return if (injector.undo.redo(editor, context)) ExecutionResult.Success else ExecutionResult.Error
   }
 }

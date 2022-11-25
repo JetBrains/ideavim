@@ -32,9 +32,9 @@ class UndoAction : VimActionHandler.SingleExecution(), ComplicatedKeysAction {
     operatorArguments: OperatorArguments,
   ): Boolean {
     var count = operatorArguments.count1
-    var result = injector.undo.undo(context)
+    var result = injector.undo.undo(editor, context)
     while ((--count > 0) && result) {
-      result = injector.undo.undo(context)
+      result = injector.undo.undo(editor, context)
     }
     return result
   }
