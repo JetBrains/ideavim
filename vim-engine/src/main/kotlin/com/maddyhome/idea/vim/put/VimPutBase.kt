@@ -25,6 +25,7 @@ import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.command.isBlock
 import com.maddyhome.idea.vim.command.isChar
 import com.maddyhome.idea.vim.command.isLine
+import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.common.offset
 import com.maddyhome.idea.vim.diagnostic.vimLogger
@@ -433,6 +434,11 @@ abstract class VimPutBase : VimPut {
         SelectionType.LINE_WISE -> {
           startOffset =
             min(vimEditor.text().length, injector.motion.moveCaretToLineEnd(vimEditor, line, true) + 1)
+          // At the end of a notebook cell the next symbol is a guard,
+          // so we add a newline to be able to paste. Fixes VIM-2577
+          if (vimEditor.document.getOffsetGuard(Offset(startOffset))!= null) {
+            application.runWriteAction { (vimEditor as MutableVimEditor).insertText((startOffset-1).offset, "\n") }
+          }
           if (startOffset > 0 && startOffset == vimEditor.text().length && vimEditor.text()[startOffset - 1] != '\n') {
             application.runWriteAction { (vimEditor as MutableVimEditor).insertText(startOffset.offset, "\n") }
             startOffset++
