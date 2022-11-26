@@ -293,7 +293,7 @@ public class ExEntryPanel extends JPanel {
         VimPlugin.getEditor().closeEditorSearchSession(editor);
         final int matchOffset = SearchHighlightsHelper.updateIncsearchHighlights(editor, pattern, forwards, caretOffset, searchRange);
         if (matchOffset != -1) {
-          editor.getCaretModel().getPrimaryCaret().moveToOffset(matchOffset);
+          new IjVimCaret(editor.getCaretModel().getPrimaryCaret()).moveToOffset(matchOffset);
         }
         else {
           resetCaretOffset(editor);
