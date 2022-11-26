@@ -59,6 +59,9 @@ object ExEditorKit : DefaultEditorKit() {
   @NonNls
   val StartLiteral: String = "start-literal"
 
+  @NonNls
+  val Autocomplete: String = "autocomplete"
+
   private val logger = logger<ExEditorKit>()
 
   /**
@@ -108,7 +111,8 @@ object ExEditorKit : DefaultEditorKit() {
     HistoryUpFilterAction(),
     HistoryDownFilterAction(),
     ToggleInsertReplaceAction(),
-    InsertRegisterAction()
+    InsertRegisterAction(),
+    AutocompleteAction(),
   )
 
   class DefaultExKeyHandler : DefaultKeyTypedAction() {

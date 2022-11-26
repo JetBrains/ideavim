@@ -73,6 +73,8 @@ object ExKeyBindings {
 
       KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_R, KeyEvent.CTRL_DOWN_MASK), ExEditorKit.InsertRegister),
 
+      KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0), ExEditorKit.Autocomplete),
+
       // These appear to be non-Vim shortcuts
       KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_V, KeyEvent.META_DOWN_MASK), DefaultEditorKit.pasteAction),
       KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_INSERT, KeyEvent.SHIFT_DOWN_MASK), DefaultEditorKit.pasteAction)
