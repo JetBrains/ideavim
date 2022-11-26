@@ -80,6 +80,28 @@ class MotionLastColumnActionTest : VimTestCase() {
     doTest(keys, before, after, VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_BLOCK)
   }
 
+  fun `test dollar motion resets intended location after motion`() {
+    doTest(
+      "\$hlj",
+      """
+          A Discovery
+
+          I ${c}found it in a legendary land
+          all rocks and lavender and tufted grass,[ additional symbols]
+          where it was settled on some sodden sand
+          hard by the torrent of a mountain pass.
+      """.trimIndent(),
+      """
+          A Discovery
+
+          I found it in a legendary land
+          all rocks and lavender and tu${c}fted grass,[ additional symbols]
+          where it was settled on some sodden sand
+          hard by the torrent of a mountain pass.
+      """.trimIndent()
+    )
+  }
+
   @VimBehaviorDiffers(
     originalVimAfter = """
             A Discovery

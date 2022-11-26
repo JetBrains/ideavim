@@ -62,6 +62,7 @@ import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
 import com.maddyhome.idea.vim.helper.localEditors
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
+import com.maddyhome.idea.vim.helper.resetVimLastColumn
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
 import com.maddyhome.idea.vim.helper.vimDisabled
@@ -157,6 +158,7 @@ object VimListenerManager {
       eventFacade.addEditorMouseMotionListener(editor, EditorMouseHandler, disposable)
       eventFacade.addEditorSelectionListener(editor, EditorSelectionHandler, disposable)
       eventFacade.addComponentMouseListener(editor.contentComponent, ComponentMouseListener, disposable)
+      eventFacade.addCaretListener(editor, EditorCaretHandler, disposable)
 
       VimPlugin.getEditor().editorCreated(editor)
 
@@ -175,6 +177,7 @@ object VimListenerManager {
       eventFacade.removeEditorMouseMotionListener(editor, EditorMouseHandler)
       eventFacade.removeEditorSelectionListener(editor, EditorSelectionHandler)
       eventFacade.removeComponentMouseListener(editor.contentComponent, ComponentMouseListener)
+      eventFacade.removeCaretListener(editor, EditorCaretHandler)
 
       VimPlugin.getEditorIfCreated()?.editorDeinit(editor, isReleased)
 
@@ -491,6 +494,12 @@ object VimListenerManager {
         // TODO: Modify this to support 'selection' set to "exclusive"
         2 -> moveCaretOneCharLeftFromSelectionEnd(editor, predictedMode)
       }
+    }
+  }
+
+  private object EditorCaretHandler : CaretListener {
+    override fun caretPositionChanged(event: CaretEvent) {
+      event.caret?.resetVimLastColumn()
     }
   }
 

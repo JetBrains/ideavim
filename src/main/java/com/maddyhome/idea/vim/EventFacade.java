@@ -92,6 +92,16 @@ public class EventFacade {
     EditorFactory.getInstance().addEditorFactoryListener(listener, parentDisposable);
   }
 
+  public void addCaretListener(@NotNull Editor editor,
+                               @NotNull CaretListener listener,
+                               @NotNull Disposable disposable) {
+    editor.getCaretModel().addCaretListener(listener, disposable);
+  }
+
+  public void removeCaretListener(@NotNull Editor editor, @NotNull CaretListener listener) {
+    editor.getCaretModel().removeCaretListener(listener);
+  }
+
   public void addEditorMouseListener(@NotNull Editor editor,
                                      @NotNull EditorMouseListener listener,
                                      @NotNull Disposable disposable) {

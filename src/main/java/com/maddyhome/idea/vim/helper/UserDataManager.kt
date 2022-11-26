@@ -63,7 +63,9 @@ private var Caret._vimSelectionStart: Int? by userDataCaretToEditor()
 
 // Keep a track of the column that we intended to navigate to but were unable to. This might be because of inlays,
 // virtual indent or moving from the end of a long line to the end of a short line. Keep a track of the position when
-// the value is set, if it's not the same during get, we've been moved by IJ and so no longer valid
+// the value is set, if it's not the same during get, we've been moved by IJ and so no longer valid. We also invalidate
+// the cached value through a caret listener handler, to prevent issues with the caret being moved and returned before
+// the cache is checked/invalidated
 var Caret.vimLastColumn: Int
   get() {
     if (visualPosition != _vimLastColumnPos) {
