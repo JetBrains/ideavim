@@ -175,6 +175,13 @@ private object VimActionsPopup {
     actionGroup.addSeparator()
     actionGroup.add(NotificationService.OpenIdeaVimRcAction(null))
     actionGroup.add(ShortcutConflictsSettings)
+    actionGroup.add(
+      HelpLink(
+        MessageHelper.message("action.plugins"),
+        "https://jb.gg/ideavim-plugins",
+        null
+      )
+    )
     actionGroup.addSeparator(MessageHelper.message("action.eap.choice.active.text"))
 
     actionGroup.add(JoinEap)
