@@ -75,6 +75,7 @@ class UiTests {
           )
         }
       }
+      testTrackActionId(editor)
       testSelectTextWithDelay(editor)
       testExtendSelection(editor)
       testLargerDragSelection(editor)
@@ -188,6 +189,25 @@ class UiTests {
       enterText("v")
     }
     assertEquals("u", editor.selectedText)
+
+    vimExit()
+  }
+
+  private fun IdeaFrame.testTrackActionId(editor: Editor) {
+    remoteRobot.invokeActionJs("GotoAction")
+    editor.keyboard {
+      enterText("IdeaVim: Track Action Ids")
+      enter()
+      escape()
+    }
+
+    findText("Copy Action Id").click()
+    findText("Stop Tracking").click()
+
+    editor.findText("One").click()
+    remoteRobot.invokeActionJs("EditorPaste")
+
+    assertEquals("123", editor.text)
 
     vimExit()
   }

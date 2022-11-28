@@ -31,6 +31,7 @@ import com.intellij.openapi.util.TextRange
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.group.NotificationService
 import com.maddyhome.idea.vim.helper.EditorDataContext
 import com.maddyhome.idea.vim.helper.inNormalMode
 import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
@@ -65,8 +66,10 @@ object IdeaSpecifics {
       }
 
       if (VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.trackactionidsName)) {
-        val id: String? = ActionManager.getInstance().getId(action) ?: (action.shortcutSet as? ProxyShortcutSet)?.actionId
-        VimPlugin.getNotifications(event.dataContext.getData(CommonDataKeys.PROJECT)).notifyActionId(id)
+        if (action !is NotificationService.ActionIdNotifier.CopyActionId && action !is NotificationService.ActionIdNotifier.StopTracking) {
+          val id: String? = ActionManager.getInstance().getId(action) ?: (action.shortcutSet as? ProxyShortcutSet)?.actionId
+          VimPlugin.getNotifications(event.dataContext.getData(CommonDataKeys.PROJECT)).notifyActionId(id)
+        }
       }
 
       if (hostEditor != null && action is ChooseItemAction && hostEditor.vimStateMachine?.isRecording == true) {
