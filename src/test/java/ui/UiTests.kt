@@ -107,7 +107,7 @@ class UiTests {
       }
 
       // This is a hack to wait till inline hints will appear
-      Thread.sleep(1000)
+      Thread.sleep(5000)
       wrapWithIf(javaEditor)
     }
   }
