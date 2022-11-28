@@ -50,13 +50,13 @@ class HandlerInjector {
     fun notebookCommandMode(editor: Editor?): Boolean {
       return if (editor != null) {
         val inEditor = EditorHelper.getVirtualFile(editor)?.extension == "ipynb"
-        return if (TypedAction.getInstance().rawHandler::class.java.simpleName.equals("JupyterCommandModeTypingBlocker")){
+        return if (TypedAction.getInstance().rawHandler::class.java.simpleName.equals("JupyterCommandModeTypingBlocker")) {
           inEditor
         } else {
           // only true in command mode.
           // Set by `org.jetbrains.plugins.notebooks.ui.editor.actions.command.mode.NotebookEditorModeListenerAdapter`
           // appears to be null in non Notebook editors
-          val allow_plain_letter_shortcuts =  editor.contentComponent.getClientProperty(ActionUtil.ALLOW_PlAIN_LETTER_SHORTCUTS)
+          val allow_plain_letter_shortcuts = editor.contentComponent.getClientProperty(ActionUtil.ALLOW_PlAIN_LETTER_SHORTCUTS)
           inEditor && (allow_plain_letter_shortcuts != null && allow_plain_letter_shortcuts as Boolean)
         }
       } else {
