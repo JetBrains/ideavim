@@ -75,8 +75,8 @@ class UiTests {
           )
         }
       }
-      testTrackActionId(editor)
       testSelectTextWithDelay(editor)
+      testTrackActionId(editor)
       testExtendSelection(editor)
       testLargerDragSelection(editor)
       testSelectLastCharacter(editor)
