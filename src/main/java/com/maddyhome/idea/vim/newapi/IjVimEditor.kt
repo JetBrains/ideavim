@@ -418,6 +418,10 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
     return IndentConfig.create(editor).createIndentBySize(size)
   }
 
+  override fun getCollapsedRegionAtOffset(offset: Int): TextRange? {
+    return editor.foldingModel.getCollapsedRegionAtOffset(offset)?.let { TextRange(it.startOffset, it.endOffset) }
+  }
+
   private fun Pair<Offset, Offset>.noGuard(editor: Editor): Boolean {
     return editor.document.getRangeGuard(this.first.point, this.second.point) == null
   }

@@ -23,7 +23,6 @@ import com.maddyhome.idea.vim.common.LiveRange
 import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.common.offset
 import com.maddyhome.idea.vim.group.visual.VisualChange
-import com.maddyhome.idea.vim.group.visual.vimLeadSelectionOffset
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.helper.registerStorage
 import com.maddyhome.idea.vim.helper.resetVimLastColumn
@@ -63,8 +62,6 @@ class IjVimCaret(val caret: Caret) : VimCaretBase() {
     set(value) {
       this.caret.vimSelectionStart = value
     }
-  override val vimLeadSelectionOffset: Int
-    get() = this.caret.vimLeadSelectionOffset
 
   override fun vimSelectionStartClear() {
     this.caret.vimSelectionStartClear()

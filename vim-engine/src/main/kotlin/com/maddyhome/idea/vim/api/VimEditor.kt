@@ -265,6 +265,7 @@ interface VimEditor {
   }
 
   fun createIndentBySize(size: Int): String
+  fun getCollapsedRegionAtOffset(offset: Int): TextRange?
 }
 
 interface MutableVimEditor : VimEditor {

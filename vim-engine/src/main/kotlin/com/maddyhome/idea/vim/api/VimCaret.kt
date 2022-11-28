@@ -50,7 +50,6 @@ interface VimCaret {
   val selectionStart: Int
   val selectionEnd: Int
   var vimSelectionStart: Int
-  val vimLeadSelectionOffset: Int
 
   fun vimSelectionStartClear()
 

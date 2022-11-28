@@ -24,6 +24,7 @@ import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.group.visual.VisualChange
 import com.maddyhome.idea.vim.group.visual.vimLeadSelectionOffset
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.ui.ExOutputPanel
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
@@ -44,8 +45,8 @@ var Caret.vimSelectionStart: Int
   get() {
     val selectionStart = _vimSelectionStart
     if (selectionStart == null) {
-      vimSelectionStart = vimLeadSelectionOffset
-      return vimLeadSelectionOffset
+      vimSelectionStart = this.vim.vimLeadSelectionOffset
+      return this.vim.vimLeadSelectionOffset
     }
     return selectionStart
   }
