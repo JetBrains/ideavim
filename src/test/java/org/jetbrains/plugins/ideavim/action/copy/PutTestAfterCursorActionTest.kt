@@ -19,6 +19,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -93,6 +94,40 @@ class PutTestAfterCursorActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.
             ${c}A Discovery
 
+    """.trimIndent()
+    assertState(after)
+  }
+
+  @VimBehaviorDiffers(
+    originalVimAfter = """
+            A Discovery
+            ${c}I found it in a legendary land
+            GUARD
+            I found it in a legendary land
+            all rocks and lavender and tufted grass,
+    """
+  )
+  @Test
+  fun `test put visual text line before Guard`() {
+    val before = """
+            A ${c}Discovery
+            GUARD
+            I found it in a legendary land
+            all rocks and lavender and tufted grass,
+    """.trimIndent()
+    val editor = configureByText(before)
+    // Add Guard to simulate Notebook behaviour. See (VIM-2577)
+    val guardRange = before rangeOf "\nGUARD\n"
+    editor.document.createGuardedBlock(guardRange.startOffset, guardRange.endOffset)
+    VimPlugin.getRegister().storeText(editor.vim, before rangeOf "I found it in a legendary land\n", SelectionType.LINE_WISE, false)
+    typeText(injector.parser.parseKeys("p"))
+    val after = """
+            A Discovery
+            ${c}I found it in a legendary land
+            
+            GUARD
+            I found it in a legendary land
+            all rocks and lavender and tufted grass,
     """.trimIndent()
     assertState(after)
   }
