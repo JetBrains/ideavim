@@ -49,6 +49,11 @@ interface VimCaret {
   fun hasSelection(): Boolean
   val selectionStart: Int
   val selectionEnd: Int
+
+  /*
+This variable shoul not exist. This is actually `< mark in visual selection. It should be refactored as we'll get
+per-caret marks.
+*/
   var vimSelectionStart: Int
 
   fun vimSelectionStartClear()
@@ -78,7 +83,8 @@ interface VimCaret {
       injector.motion.scrollCaretIntoView(editor)
     }
     if (editor.inVisualMode || editor.inSelectMode) {
-      vimMoveSelectionToCaret()
+      // Another inconsistency with immutable caret. This method should be called on the new caret instance.
+      caretAfterMove.vimMoveSelectionToCaret(this.vimSelectionStart)
     } else {
       editor.exitVisualMode()
     }

@@ -118,7 +118,7 @@ fun vimMoveBlockSelectionToOffset(editor: VimEditor, offset: Int) {
  * This method is created only for Character and Line mode
  * @see vimMoveBlockSelectionToOffset for blockwise selection
  */
-fun VimCaret.vimMoveSelectionToCaret() {
+fun VimCaret.vimMoveSelectionToCaret(vimSelectionStart: Int = this.vimSelectionStart) {
   if (!editor.inVisualMode && !editor.inSelectMode) error("Attempt to extent selection in non-visual mode")
   if (editor.inBlockSubMode) error("Move caret with [vimMoveBlockSelectionToOffset]")
 
