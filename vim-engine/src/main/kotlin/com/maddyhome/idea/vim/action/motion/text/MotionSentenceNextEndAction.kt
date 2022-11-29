@@ -8,7 +8,7 @@
 package com.maddyhome.idea.vim.action.motion.text
 
 import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.normalizeOffset
@@ -30,11 +30,11 @@ sealed class MotionSentenceEndAction(val direction: Direction) : MotionActionHan
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
 
   override fun getOffset(
-    editor: VimEditor,
-    caret: VimCaret,
-    context: ExecutionContext,
-    argument: Argument?,
-    operatorArguments: OperatorArguments,
+      editor: VimEditor,
+      caret: ImmutableVimCaret,
+      context: ExecutionContext,
+      argument: Argument?,
+      operatorArguments: OperatorArguments,
   ): Motion {
     return moveCaretToNextSentenceEnd(editor, caret, direction.toInt() * operatorArguments.count1).toMotionOrError()
   }
@@ -42,7 +42,7 @@ sealed class MotionSentenceEndAction(val direction: Direction) : MotionActionHan
   override val motionType: MotionType = MotionType.EXCLUSIVE
 }
 
-private fun moveCaretToNextSentenceEnd(editor: VimEditor, caret: VimCaret, count: Int): Int {
+private fun moveCaretToNextSentenceEnd(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Int {
   var res = injector.searchHelper.findNextSentenceEnd(editor, caret, count, false, true)
   res = if (res >= 0) {
     editor.normalizeOffset(res, false)

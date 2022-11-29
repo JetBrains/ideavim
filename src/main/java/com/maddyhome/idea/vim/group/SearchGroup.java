@@ -420,7 +420,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
    * @return        The offset of the result or the start of the word under the caret if not found. Returns -1 on error
    */
   @Override
-  public int searchWord(@NotNull VimEditor editor, @NotNull VimCaret caret, int count, boolean whole, Direction dir) {
+  public int searchWord(@NotNull VimEditor editor, @NotNull ImmutableVimCaret caret, int count, boolean whole, @NotNull Direction dir) {
     TextRange range = SearchHelper.findWordUnderCursor(((IjVimEditor)editor).getEditor(), ((IjVimCaret)caret).getCaret());
     if (range == null) {
       logger.warn("No range was found");
@@ -461,7 +461,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
    * @return        The offset of the next match, or -1 if not found
    */
   @Override
-  public int searchNext(@NotNull VimEditor editor, @NotNull VimCaret caret, int count) {
+  public int searchNext(@NotNull VimEditor editor, @NotNull ImmutableVimCaret caret, int count) {
     return searchNextWithDirection(((IjVimEditor)editor).getEditor(), ((IjVimCaret)caret).getCaret(), count, lastDir);
   }
 
@@ -477,7 +477,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
    * @return        The offset of the next match, or -1 if not found
    */
   @Override
-  public int searchPrevious(@NotNull VimEditor editor, @NotNull VimCaret caret, int count) {
+  public int searchPrevious(@NotNull VimEditor editor, @NotNull ImmutableVimCaret caret, int count) {
     return searchNextWithDirection(((IjVimEditor)editor).getEditor(), ((IjVimCaret)caret).getCaret(), count,
                                    lastDir.reverse());
   }

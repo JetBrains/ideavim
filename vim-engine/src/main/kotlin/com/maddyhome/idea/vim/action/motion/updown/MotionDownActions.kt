@@ -9,7 +9,7 @@
 package com.maddyhome.idea.vim.action.motion.updown
 
 import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
@@ -23,11 +23,11 @@ open class MotionDownAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.LINE_WISE
 
   override fun getOffset(
-    editor: VimEditor,
-    caret: VimCaret,
-    context: ExecutionContext,
-    argument: Argument?,
-    operatorArguments: OperatorArguments,
+      editor: VimEditor,
+      caret: ImmutableVimCaret,
+      context: ExecutionContext,
+      argument: Argument?,
+      operatorArguments: OperatorArguments,
   ): Motion {
     return injector.motion.getVerticalMotionOffset(editor, caret, operatorArguments.count1)
   }
@@ -35,11 +35,11 @@ open class MotionDownAction : MotionActionHandler.ForEachCaret() {
 
 class MotionDownCtrlNAction : MotionDownAction() {
   override fun getOffset(
-    editor: VimEditor,
-    caret: VimCaret,
-    context: ExecutionContext,
-    argument: Argument?,
-    operatorArguments: OperatorArguments,
+      editor: VimEditor,
+      caret: ImmutableVimCaret,
+      context: ExecutionContext,
+      argument: Argument?,
+      operatorArguments: OperatorArguments,
   ): Motion {
     val activeLookup = injector.lookupManager.getActiveLookup(editor)
     return if (activeLookup != null) {
@@ -58,11 +58,11 @@ class MotionDownNotLineWiseAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
   override fun getOffset(
-    editor: VimEditor,
-    caret: VimCaret,
-    context: ExecutionContext,
-    argument: Argument?,
-    operatorArguments: OperatorArguments,
+      editor: VimEditor,
+      caret: ImmutableVimCaret,
+      context: ExecutionContext,
+      argument: Argument?,
+      operatorArguments: OperatorArguments,
   ): Motion {
     return injector.motion.getVerticalMotionOffset(editor, caret, operatorArguments.count1)
   }

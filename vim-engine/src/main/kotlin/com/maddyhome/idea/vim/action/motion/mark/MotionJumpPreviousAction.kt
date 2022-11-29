@@ -8,7 +8,7 @@
 package com.maddyhome.idea.vim.action.motion.mark
 
 import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
@@ -20,11 +20,11 @@ import com.maddyhome.idea.vim.handler.toMotionOrError
 
 class MotionJumpPreviousAction : MotionActionHandler.ForEachCaret() {
   override fun getOffset(
-    editor: VimEditor,
-    caret: VimCaret,
-    context: ExecutionContext,
-    argument: Argument?,
-    operatorArguments: OperatorArguments,
+      editor: VimEditor,
+      caret: ImmutableVimCaret,
+      context: ExecutionContext,
+      argument: Argument?,
+      operatorArguments: OperatorArguments,
   ): Motion {
     return injector.motion.moveCaretToJump(editor, -operatorArguments.count1).toMotionOrError()
   }

@@ -17,50 +17,50 @@ import com.maddyhome.idea.vim.handler.Motion
 interface VimMotionGroup {
 
   // Note that the following methods require the caret to access the intended vertical position, such as "end of line"
-  fun getOffsetOfHorizontalMotion(editor: VimEditor, caret: VimCaret, count: Int, allowPastEnd: Boolean): Int
-  fun getVerticalMotionOffset(editor: VimEditor, caret: VimCaret, count: Int): Motion
+  fun getOffsetOfHorizontalMotion(editor: VimEditor, caret: ImmutableVimCaret, count: Int, allowPastEnd: Boolean): Int
+  fun getVerticalMotionOffset(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Motion
 
   // TODO: Consider naming. These don't move the caret, but calculate offsets. Also consider returning Motion
 
   // Move caret to specific buffer line
   fun moveCaretToLineStart(editor: VimEditor, line: Int): Int
   fun moveCaretToLineStartSkipLeading(editor: VimEditor, line: Int): Int
-  fun moveCaretToLineWithStartOfLineOption(editor: VimEditor, line: Int, caret: VimCaret): Int
+  fun moveCaretToLineWithStartOfLineOption(editor: VimEditor, line: Int, caret: ImmutableVimCaret): Int
   fun moveCaretToLineEnd(editor: VimEditor, line: Int, allowPastEnd: Boolean): Int
-  fun moveCaretToLineWithSameColumn(editor: VimEditor, line: Int, caret: VimCaret): Int
-  fun moveCaretToLinePercent(editor: VimEditor, caret: VimCaret, count: Int): Int
+  fun moveCaretToLineWithSameColumn(editor: VimEditor, line: Int, caret: ImmutableVimCaret): Int
+  fun moveCaretToLinePercent(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Int
 
   // Move caret relative to current line
-  fun moveCaretToRelativeLineStartSkipLeading(editor: VimEditor, caret: VimCaret, linesOffset: Int): Int
-  fun moveCaretToRelativeLineEnd(editor: VimEditor, caret: VimCaret, cntForward: Int, allowPastEnd: Boolean): Int
-  fun moveCaretToRelativeLineEndSkipTrailing(editor: VimEditor, caret: VimCaret, linesOffset: Int): Int
+  fun moveCaretToRelativeLineStartSkipLeading(editor: VimEditor, caret: ImmutableVimCaret, linesOffset: Int): Int
+  fun moveCaretToRelativeLineEnd(editor: VimEditor, caret: ImmutableVimCaret, cntForward: Int, allowPastEnd: Boolean): Int
+  fun moveCaretToRelativeLineEndSkipTrailing(editor: VimEditor, caret: ImmutableVimCaret, linesOffset: Int): Int
 
   // Move caret to (IntelliJ visual) line relative to the bounds of the display (aka window)
   // (This describes what these functions *currently* do, not what they are *supposed* to do)
   // TODO: These should move to the Vim logical line at the top/bottom/middle of the display
-  fun moveCaretToFirstDisplayLine(editor: VimEditor, caret: VimCaret, count: Int, normalizeToScreen: Boolean): Int
-  fun moveCaretToMiddleDisplayLine(editor: VimEditor, caret: VimCaret): Int
-  fun moveCaretToLastDisplayLine(editor: VimEditor, caret: VimCaret, count: Int, normalizeToScreen: Boolean): Int
+  fun moveCaretToFirstDisplayLine(editor: VimEditor, caret: ImmutableVimCaret, count: Int, normalizeToScreen: Boolean): Int
+  fun moveCaretToMiddleDisplayLine(editor: VimEditor, caret: ImmutableVimCaret): Int
+  fun moveCaretToLastDisplayLine(editor: VimEditor, caret: ImmutableVimCaret, count: Int, normalizeToScreen: Boolean): Int
 
   // Move caret to buffer column
-  fun moveCaretToColumn(editor: VimEditor, caret: VimCaret, count: Int, allowEnd: Boolean): Motion
+  fun moveCaretToColumn(editor: VimEditor, caret: ImmutableVimCaret, count: Int, allowEnd: Boolean): Motion
 
   // Move caret to buffer column on current line
-  fun moveCaretToCurrentLineStart(editor: VimEditor, caret: VimCaret): Int
-  fun moveCaretToCurrentLineStartSkipLeading(editor: VimEditor, caret: VimCaret): Int
+  fun moveCaretToCurrentLineStart(editor: VimEditor, caret: ImmutableVimCaret): Int
+  fun moveCaretToCurrentLineStartSkipLeading(editor: VimEditor, caret: ImmutableVimCaret): Int
   fun moveCaretToCurrentLineEnd(editor: VimEditor, caret: VimCaret): Int
 
   // Move caret to column relative to the bounds of the display (aka window)
-  fun moveCaretToCurrentDisplayLineStart(editor: VimEditor, caret: VimCaret): Motion
-  fun moveCaretToCurrentDisplayLineStartSkipLeading(editor: VimEditor, caret: VimCaret): Int
-  fun moveCaretToCurrentDisplayLineMiddle(editor: VimEditor, caret: VimCaret): Motion
-  fun moveCaretToCurrentDisplayLineEnd(editor: VimEditor, caret: VimCaret, allowEnd: Boolean): Motion
+  fun moveCaretToCurrentDisplayLineStart(editor: VimEditor, caret: ImmutableVimCaret): Motion
+  fun moveCaretToCurrentDisplayLineStartSkipLeading(editor: VimEditor, caret: ImmutableVimCaret): Int
+  fun moveCaretToCurrentDisplayLineMiddle(editor: VimEditor, caret: ImmutableVimCaret): Motion
+  fun moveCaretToCurrentDisplayLineEnd(editor: VimEditor, caret: ImmutableVimCaret, allowEnd: Boolean): Motion
 
   // Move caret to other
   fun moveCaretToMark(editor: VimEditor, ch: Char, toLineStart: Boolean): Int
   fun moveCaretToFileMark(editor: VimEditor, ch: Char, toLineStart: Boolean): Int
   fun moveCaretToJump(editor: VimEditor, count: Int): Int
-  fun moveCaretToMatchingPair(editor: VimEditor, caret: VimCaret): Int
+  fun moveCaretToMatchingPair(editor: VimEditor, caret: ImmutableVimCaret): Int
 
   // Scrolling
   fun scrollCaretIntoView(editor: VimEditor)
@@ -99,7 +99,7 @@ interface VimMotionGroup {
    * @param ch     The character to search for
    * @return the buffer offset to move to, or -1 if not found
    */
-  fun moveCaretToNextCharacterOnLine(editor: VimEditor, caret: VimCaret, count: Int, ch: Char): Int
+  fun moveCaretToNextCharacterOnLine(editor: VimEditor, caret: ImmutableVimCaret, count: Int, ch: Char): Int
 
   /**
    * Get the offset of the character preceding (in direction of travel) the next/previous matching character on the
@@ -111,9 +111,9 @@ interface VimMotionGroup {
    * @param ch     The character to search for
    * @return the buffer offset to move to, or -1 if not found
    */
-  fun moveCaretToBeforeNextCharacterOnLine(editor: VimEditor, caret: VimCaret, count: Int, ch: Char): Int
+  fun moveCaretToBeforeNextCharacterOnLine(editor: VimEditor, caret: ImmutableVimCaret, count: Int, ch: Char): Int
 
-  fun repeatLastMatchChar(editor: VimEditor, caret: VimCaret, count: Int): Int
+  fun repeatLastMatchChar(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Int
 
   fun getMotionRange(editor: VimEditor, caret: VimCaret, context: ExecutionContext, argument: Argument, operatorArguments: OperatorArguments): TextRange?
 

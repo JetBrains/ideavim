@@ -8,7 +8,7 @@
 package com.maddyhome.idea.vim.action.motion.text
 
 import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.normalizeOffset
@@ -26,11 +26,11 @@ class MotionSentenceNextStartAction : MotionActionHandler.ForEachCaret() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
 
   override fun getOffset(
-    editor: VimEditor,
-    caret: VimCaret,
-    context: ExecutionContext,
-    argument: Argument?,
-    operatorArguments: OperatorArguments,
+      editor: VimEditor,
+      caret: ImmutableVimCaret,
+      context: ExecutionContext,
+      argument: Argument?,
+      operatorArguments: OperatorArguments,
   ): Motion {
     return moveCaretToNextSentenceStart(editor, caret, operatorArguments.count1).toMotionOrError()
   }
@@ -42,11 +42,11 @@ class MotionSentencePreviousStartAction : MotionActionHandler.ForEachCaret() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
 
   override fun getOffset(
-    editor: VimEditor,
-    caret: VimCaret,
-    context: ExecutionContext,
-    argument: Argument?,
-    operatorArguments: OperatorArguments,
+      editor: VimEditor,
+      caret: ImmutableVimCaret,
+      context: ExecutionContext,
+      argument: Argument?,
+      operatorArguments: OperatorArguments,
   ): Motion {
     return moveCaretToNextSentenceStart(editor, caret, -operatorArguments.count1).toMotionOrError()
   }
@@ -54,7 +54,7 @@ class MotionSentencePreviousStartAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 }
 
-private fun moveCaretToNextSentenceStart(editor: VimEditor, caret: VimCaret, count: Int): Int {
+private fun moveCaretToNextSentenceStart(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Int {
   var res = injector.searchHelper.findNextSentenceStart(editor, caret, count, countCurrent = false, requireAll = true)
   res = if (res >= 0) {
     editor.normalizeOffset(res, true)

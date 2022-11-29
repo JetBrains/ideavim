@@ -15,14 +15,14 @@ import java.util.*
 interface VimSearchHelper {
   fun findNextParagraph(
     editor: VimEditor,
-    caret: VimCaret,
+    caret: ImmutableVimCaret,
     count: Int,
     allowBlanks: Boolean,
   ): Int
 
   fun findNextSentenceStart(
     editor: VimEditor,
-    caret: VimCaret,
+    caret: ImmutableVimCaret,
     count: Int,
     countCurrent: Boolean,
     requireAll: Boolean,
@@ -30,7 +30,7 @@ interface VimSearchHelper {
 
   fun findSection(
     editor: VimEditor,
-    caret: VimCaret,
+    caret: ImmutableVimCaret,
     type: Char,
     dir: Int,
     count: Int,
@@ -38,13 +38,13 @@ interface VimSearchHelper {
 
   fun findNextCamelEnd(
     editor: VimEditor,
-    caret: VimCaret,
+    caret: ImmutableVimCaret,
     count: Int,
   ): Int
 
   fun findNextSentenceEnd(
     editor: VimEditor,
-    caret: VimCaret,
+    caret: ImmutableVimCaret,
     count: Int,
     countCurrent: Boolean,
     requireAll: Boolean,
@@ -52,32 +52,32 @@ interface VimSearchHelper {
 
   fun findNextCamelStart(
     editor: VimEditor,
-    caret: VimCaret,
+    caret: ImmutableVimCaret,
     count: Int,
   ): Int
 
   fun findMethodEnd(
-    editor: VimEditor,
-    caret: VimCaret,
-    count: Int,
+      editor: VimEditor,
+      caret: ImmutableVimCaret,
+      count: Int,
   ): Int
 
   fun findMethodStart(
     editor: VimEditor,
-    caret: VimCaret,
+    caret: ImmutableVimCaret,
     count: Int,
   ): Int
 
   fun findUnmatchedBlock(
     editor: VimEditor,
-    caret: VimCaret,
+    caret: ImmutableVimCaret,
     type: Char,
     count: Int,
   ): Int
 
   fun findNextWordEnd(
     editor: VimEditor,
-    caret: VimCaret,
+    caret: ImmutableVimCaret,
     count: Int,
     bigWord: Boolean,
   ): Int
@@ -103,7 +103,7 @@ interface VimSearchHelper {
 
   fun findNextCharacterOnLine(
     editor: VimEditor,
-    caret: VimCaret,
+    caret: ImmutableVimCaret,
     count: Int,
     ch: Char,
   ): Int

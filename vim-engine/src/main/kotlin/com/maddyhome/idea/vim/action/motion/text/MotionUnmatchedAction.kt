@@ -8,7 +8,7 @@
 package com.maddyhome.idea.vim.action.motion.text
 
 import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.normalizeOffset
@@ -28,11 +28,11 @@ sealed class MotionUnmatchedAction(private val motionChar: Char) : MotionActionH
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
   override fun getOffset(
-    editor: VimEditor,
-    caret: VimCaret,
-    context: ExecutionContext,
-    argument: Argument?,
-    operatorArguments: OperatorArguments,
+      editor: VimEditor,
+      caret: ImmutableVimCaret,
+      context: ExecutionContext,
+      argument: Argument?,
+      operatorArguments: OperatorArguments,
   ): Motion {
     return moveCaretToUnmatchedBlock(editor, caret, operatorArguments.count1, motionChar)
       .toMotionOrError()
@@ -44,7 +44,7 @@ class MotionUnmatchedBraceOpenAction : MotionUnmatchedAction('{')
 class MotionUnmatchedParenCloseAction : MotionUnmatchedAction(')')
 class MotionUnmatchedParenOpenAction : MotionUnmatchedAction('(')
 
-private fun moveCaretToUnmatchedBlock(editor: VimEditor, caret: VimCaret, count: Int, type: Char): Int {
+private fun moveCaretToUnmatchedBlock(editor: VimEditor, caret: ImmutableVimCaret, count: Int, type: Char): Int {
   return if (editor.currentCaret().offset.point == 0 && count < 0 || editor.currentCaret().offset.point >= editor.fileSize() - 1 && count > 0) {
     -1
   } else {

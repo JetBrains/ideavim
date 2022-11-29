@@ -271,7 +271,7 @@ public class MotionGroup extends VimMotionGroupBase {
   }
 
   @Override
-  public int moveCaretToMatchingPair(@NotNull VimEditor editor, @NotNull VimCaret caret) {
+  public int moveCaretToMatchingPair(@NotNull VimEditor editor, @NotNull ImmutableVimCaret caret) {
     int pos = SearchHelper.findMatchingPairOnCurrentLine(((IjVimEditor)editor).getEditor(), ((IjVimCaret)caret).getCaret());
     if (pos >= 0) {
       return pos;
@@ -566,7 +566,7 @@ public class MotionGroup extends VimMotionGroupBase {
 
   @Override
   public int moveCaretToFirstDisplayLine(@NotNull VimEditor editor,
-                                         @NotNull VimCaret caret,
+                                         @NotNull ImmutableVimCaret caret,
                                          int count,
                                          boolean normalizeToScreen) {
     return moveCaretToScreenLocation(((IjVimEditor)editor).getEditor(), ((IjVimCaret)caret).getCaret(),
@@ -575,7 +575,7 @@ public class MotionGroup extends VimMotionGroupBase {
 
   @Override
   public int moveCaretToLastDisplayLine(@NotNull VimEditor editor,
-                                        @NotNull VimCaret caret,
+                                        @NotNull ImmutableVimCaret caret,
                                         int count,
                                         boolean normalizeToScreen) {
     return moveCaretToScreenLocation(((IjVimEditor)editor).getEditor(), ((IjVimCaret)caret).getCaret(),
@@ -583,7 +583,7 @@ public class MotionGroup extends VimMotionGroupBase {
   }
 
   @Override
-  public int moveCaretToMiddleDisplayLine(@NotNull VimEditor editor, @NotNull VimCaret caret) {
+  public int moveCaretToMiddleDisplayLine(@NotNull VimEditor editor, @NotNull ImmutableVimCaret caret) {
     return moveCaretToScreenLocation(((IjVimEditor)editor).getEditor(), ((IjVimCaret)caret).getCaret(),
                                      ScreenLocation.MIDDLE, 0, false);
   }
@@ -691,7 +691,7 @@ public class MotionGroup extends VimMotionGroupBase {
   }
 
   @Override
-  public @NotNull Motion moveCaretToCurrentDisplayLineMiddle(@NotNull VimEditor editor, @NotNull VimCaret caret) {
+  public @NotNull Motion moveCaretToCurrentDisplayLineMiddle(@NotNull VimEditor editor, @NotNull ImmutableVimCaret caret) {
     final int width = getApproximateScreenWidth(((IjVimEditor)editor).getEditor()) / 2;
     final int len = EngineEditorHelperKt.lineLength(editor, editor.currentCaret().getBufferPosition().getLine());
 
@@ -699,7 +699,7 @@ public class MotionGroup extends VimMotionGroupBase {
   }
 
   @Override
-  public Motion moveCaretToColumn(@NotNull VimEditor editor, @NotNull VimCaret caret, int count, boolean allowEnd) {
+  public Motion moveCaretToColumn(@NotNull VimEditor editor, @NotNull ImmutableVimCaret caret, int count, boolean allowEnd) {
     final int line = caret.getLine().getLine();
     final int column = EngineEditorHelperKt.normalizeColumn(editor, line, count, allowEnd);
     final int offset = editor.bufferPositionToOffset(new BufferPosition(line, column, false));
@@ -742,7 +742,7 @@ public class MotionGroup extends VimMotionGroupBase {
   }
 
   @Override
-  public @NotNull Motion moveCaretToCurrentDisplayLineStart(@NotNull VimEditor editor, @NotNull VimCaret caret) {
+  public @NotNull Motion moveCaretToCurrentDisplayLineStart(@NotNull VimEditor editor, ImmutableVimCaret caret) {
     final int col =
       getVisualColumnAtLeftOfDisplay(((IjVimEditor)editor).getEditor(), caret.getVisualPosition().getLine());
     return moveCaretToColumn(editor, caret, col, false);
@@ -750,7 +750,7 @@ public class MotionGroup extends VimMotionGroupBase {
 
   @Override
   public @Range(from = 0, to = Integer.MAX_VALUE) int moveCaretToCurrentDisplayLineStartSkipLeading(@NotNull VimEditor editor,
-                                                                                                    @NotNull VimCaret caret) {
+                                                                                                    ImmutableVimCaret caret) {
     final int col = getVisualColumnAtLeftOfDisplay(((IjVimEditor)editor).getEditor(), caret.getVisualPosition().getLine());
     final int logicalLine = caret.getLine().getLine();
     return EngineEditorHelperKt.getLeadingCharacterOffset(editor, logicalLine, col);
@@ -758,7 +758,7 @@ public class MotionGroup extends VimMotionGroupBase {
 
   @Override
   public @NotNull Motion moveCaretToCurrentDisplayLineEnd(@NotNull VimEditor editor,
-                                                          @NotNull VimCaret caret,
+                                                          ImmutableVimCaret caret,
                                                           boolean allowEnd) {
     final int col =
       getVisualColumnAtRightOfDisplay(((IjVimEditor)editor).getEditor(), caret.getVisualPosition().getLine());
@@ -819,7 +819,7 @@ public class MotionGroup extends VimMotionGroupBase {
 
   public @Range(from = 0, to = Integer.MAX_VALUE) int moveCaretToLineWithSameColumn(@NotNull VimEditor editor,
                                                                                     int logicalLine,
-                                                                                    @NotNull VimCaret caret) {
+                                                                                    @NotNull ImmutableVimCaret caret) {
     int col = UserDataManager.getVimLastColumn(((IjVimCaret) caret).getCaret());
     int line = logicalLine;
     if (logicalLine < 0) {
@@ -839,7 +839,7 @@ public class MotionGroup extends VimMotionGroupBase {
   @Override
   public @Range(from = 0, to = Integer.MAX_VALUE) int moveCaretToLineWithStartOfLineOption(@NotNull VimEditor editor,
                                                                                            int line,
-                                                                                           @NotNull VimCaret caret) {
+                                                                                           @NotNull ImmutableVimCaret caret) {
     if (VimPlugin.getOptionService().isSet(new OptionScope.LOCAL(editor), OptionConstants.startoflineName, OptionConstants.startoflineName)) {
       return moveCaretToLineStartSkipLeading(editor, line);
     }
@@ -993,7 +993,7 @@ public class MotionGroup extends VimMotionGroupBase {
 
   @Override
   public @Range(from = 0, to = Integer.MAX_VALUE) int moveCaretToLinePercent(@NotNull VimEditor editor,
-                                                                             @NotNull VimCaret caret,
+                                                                             @NotNull ImmutableVimCaret caret,
                                                                              int count) {
     return moveCaretToLineWithStartOfLineOption(editor,
                                                 EngineEditorHelperKt.normalizeLine(editor,

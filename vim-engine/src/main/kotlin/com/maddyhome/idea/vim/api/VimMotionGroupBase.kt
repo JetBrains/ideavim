@@ -30,7 +30,7 @@ abstract class VimMotionGroupBase : VimMotionGroup {
   override var lastFTCmd = TillCharacterMotionType.LAST_SMALL_T
   override var lastFTChar: Char = ' '
 
-  override fun getVerticalMotionOffset(editor: VimEditor, caret: VimCaret, count: Int): Motion {
+  override fun getVerticalMotionOffset(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Motion {
     val pos = caret.getVisualPosition()
     if ((pos.line == 0 && count < 0) || (pos.line >= editor.getVisualLineCount() - 1 && count > 0)) {
       return Motion.Error
@@ -104,7 +104,7 @@ abstract class VimMotionGroupBase : VimMotionGroup {
 
   override fun getOffsetOfHorizontalMotion(
     editor: VimEditor,
-    caret: VimCaret,
+    caret: ImmutableVimCaret,
     count: Int,
     allowPastEnd: Boolean,
   ): Int {
@@ -129,7 +129,7 @@ abstract class VimMotionGroupBase : VimMotionGroup {
 
   override fun moveCaretToRelativeLineStartSkipLeading(
     editor: VimEditor,
-    caret: VimCaret,
+    caret: ImmutableVimCaret,
     linesOffset: Int,
   ): Int {
     val line = editor.normalizeVisualLine(caret.getVisualPosition().line + linesOffset)
@@ -153,7 +153,7 @@ abstract class VimMotionGroupBase : VimMotionGroup {
    * @param editor The editor to search in
    * @return True if [count] character matches were found, false if not
    */
-  override fun moveCaretToBeforeNextCharacterOnLine(editor: VimEditor, caret: VimCaret, count: Int, ch: Char): Int {
+  override fun moveCaretToBeforeNextCharacterOnLine(editor: VimEditor, caret: ImmutableVimCaret, count: Int, ch: Char): Int {
     val pos = injector.searchHelper.findNextCharacterOnLine(editor, caret, count, ch)
 
     return if (pos >= 0) {
@@ -173,7 +173,7 @@ abstract class VimMotionGroupBase : VimMotionGroup {
    * @param editor The editor to search in
    * @return True if [count] character matches were found, false if not
    */
-  override fun moveCaretToNextCharacterOnLine(editor: VimEditor, caret: VimCaret, count: Int, ch: Char): Int {
+  override fun moveCaretToNextCharacterOnLine(editor: VimEditor, caret: ImmutableVimCaret, count: Int, ch: Char): Int {
     val pos = injector.searchHelper.findNextCharacterOnLine(editor, caret, count, ch)
 
     return if (pos >= 0) {
@@ -188,14 +188,14 @@ abstract class VimMotionGroupBase : VimMotionGroup {
     this.lastFTChar = lastChar
   }
 
-  override fun moveCaretToCurrentLineStart(editor: VimEditor, caret: VimCaret): Int {
+  override fun moveCaretToCurrentLineStart(editor: VimEditor, caret: ImmutableVimCaret): Int {
     val line = caret.getLine().line
     return moveCaretToLineStart(editor, line)
   }
 
   override fun moveCaretToRelativeLineEnd(
     editor: VimEditor,
-    caret: VimCaret,
+    caret: ImmutableVimCaret,
     cntForward: Int,
     allowPastEnd: Boolean,
   ): Int {
@@ -206,7 +206,7 @@ abstract class VimMotionGroupBase : VimMotionGroup {
     }
   }
 
-  override fun moveCaretToRelativeLineEndSkipTrailing(editor: VimEditor, caret: VimCaret, linesOffset: Int): Int {
+  override fun moveCaretToRelativeLineEndSkipTrailing(editor: VimEditor, caret: ImmutableVimCaret, linesOffset: Int): Int {
     val line = editor.visualLineToBufferLine(
       editor.normalizeVisualLine(caret.getVisualPosition().line + linesOffset)
     )
@@ -228,7 +228,7 @@ abstract class VimMotionGroupBase : VimMotionGroup {
     return pos
   }
 
-  override fun repeatLastMatchChar(editor: VimEditor, caret: VimCaret, count: Int): Int {
+  override fun repeatLastMatchChar(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Int {
     var res = -1
     val startPos = editor.currentCaret().offset.point
     when (lastFTCmd) {
@@ -255,7 +255,7 @@ abstract class VimMotionGroupBase : VimMotionGroup {
     return res
   }
 
-  override fun moveCaretToCurrentLineStartSkipLeading(editor: VimEditor, caret: VimCaret): Int {
+  override fun moveCaretToCurrentLineStartSkipLeading(editor: VimEditor, caret: ImmutableVimCaret): Int {
     val line = caret.getLine().line
     return moveCaretToLineStartSkipLeading(editor, line)
   }

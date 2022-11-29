@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.handler
 
 import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimCaretListener
 import com.maddyhome.idea.vim.api.VimEditor
@@ -50,7 +51,7 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
      */
     abstract fun getOffset(
       editor: VimEditor,
-      caret: VimCaret,
+      caret: ImmutableVimCaret,
       context: ExecutionContext,
       argument: Argument?,
       operatorArguments: OperatorArguments,

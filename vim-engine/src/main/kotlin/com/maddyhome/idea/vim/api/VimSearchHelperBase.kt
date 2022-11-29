@@ -18,7 +18,7 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     return findNextWord(editor.text(), searchFrom.toLong(), editor.fileSize(), count, bigWord, false)
   }
 
-  override fun findNextWordEnd(editor: VimEditor, caret: VimCaret, count: Int, bigWord: Boolean): Int {
+  override fun findNextWordEnd(editor: VimEditor, caret: ImmutableVimCaret, count: Int, bigWord: Boolean): Int {
     val chars = editor.text()
     val pos = caret.offset.point
     val size = editor.fileSize().toInt()

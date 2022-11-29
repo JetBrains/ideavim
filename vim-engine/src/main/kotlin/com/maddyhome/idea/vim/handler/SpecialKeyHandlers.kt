@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.handler
 
 import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -165,11 +166,11 @@ abstract class ShiftedArrowKeyHandler(private val runBothCommandsAsMulticaret: B
  */
 abstract class NonShiftedSpecialKeyHandler : MotionActionHandler.ForEachCaret() {
   final override fun getOffset(
-    editor: VimEditor,
-    caret: VimCaret,
-    context: ExecutionContext,
-    argument: Argument?,
-    operatorArguments: OperatorArguments,
+      editor: VimEditor,
+      caret: ImmutableVimCaret,
+      context: ExecutionContext,
+      argument: Argument?,
+      operatorArguments: OperatorArguments,
   ): Motion {
     val keymodel = (
       injector.optionService.getOptionValue(
@@ -192,7 +193,7 @@ abstract class NonShiftedSpecialKeyHandler : MotionActionHandler.ForEachCaret() 
    */
   abstract fun motion(
     editor: VimEditor,
-    caret: VimCaret,
+    caret: ImmutableVimCaret,
     context: ExecutionContext,
     count: Int,
     rawCount: Int,

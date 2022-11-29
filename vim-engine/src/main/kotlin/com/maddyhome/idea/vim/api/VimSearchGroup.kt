@@ -28,10 +28,10 @@ interface VimSearchGroup {
     direction: Direction,
   ): Int
 
-  fun searchNext(editor: VimEditor, caret: VimCaret, count: Int): Int
-  fun searchPrevious(editor: VimEditor, caret: VimCaret, count: Int): Int
+  fun searchNext(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Int
+  fun searchPrevious(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Int
   fun processSearchCommand(editor: VimEditor, command: String, startOffset: Int, dir: Direction): Int
-  fun searchWord(editor: VimEditor, caret: VimCaret, count: Int, whole: Boolean, dir: Direction): Int
+  fun searchWord(editor: VimEditor, caret: ImmutableVimCaret, count: Int, whole: Boolean, dir: Direction): Int
   fun processSubstituteCommand(
     editor: VimEditor,
     caret: VimCaret,

@@ -8,7 +8,7 @@
 package com.maddyhome.idea.vim.action.motion.screen
 
 import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
@@ -38,11 +38,11 @@ abstract class MotionLastScreenLineActionBase(private val operatorPending: Boole
   override val motionType: MotionType = MotionType.LINE_WISE
 
   override fun getOffset(
-    editor: VimEditor,
-    caret: VimCaret,
-    context: ExecutionContext,
-    argument: Argument?,
-    operatorArguments: OperatorArguments,
+      editor: VimEditor,
+      caret: ImmutableVimCaret,
+      context: ExecutionContext,
+      argument: Argument?,
+      operatorArguments: OperatorArguments,
   ): Motion {
     return injector.motion.moveCaretToLastDisplayLine(editor, caret, operatorArguments.count1, !operatorPending)
       .toMotion()

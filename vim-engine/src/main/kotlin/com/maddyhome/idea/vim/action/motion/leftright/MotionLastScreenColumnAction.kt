@@ -8,7 +8,7 @@
 package com.maddyhome.idea.vim.action.motion.leftright
 
 import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimMotionGroupBase
 import com.maddyhome.idea.vim.api.injector
@@ -25,11 +25,11 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
 class MotionLastScreenColumnAction : MotionActionHandler.ForEachCaret() {
   override fun getOffset(
-    editor: VimEditor,
-    caret: VimCaret,
-    context: ExecutionContext,
-    argument: Argument?,
-    operatorArguments: OperatorArguments,
+      editor: VimEditor,
+      caret: ImmutableVimCaret,
+      context: ExecutionContext,
+      argument: Argument?,
+      operatorArguments: OperatorArguments,
   ): Motion {
     var allow = false
     if (editor.inInsertMode) {

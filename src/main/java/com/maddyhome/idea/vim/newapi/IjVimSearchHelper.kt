@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.newapi
 
 import com.intellij.openapi.components.Service
+import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimSearchHelperBase
@@ -19,7 +20,7 @@ import java.util.*
 
 @Service
 class IjVimSearchHelper : VimSearchHelperBase() {
-  override fun findNextParagraph(editor: VimEditor, caret: VimCaret, count: Int, allowBlanks: Boolean): Int {
+  override fun findNextParagraph(editor: VimEditor, caret: ImmutableVimCaret, count: Int, allowBlanks: Boolean): Int {
     return SearchHelper.findNextParagraph(
       (editor as IjVimEditor).editor,
       (caret as IjVimCaret).caret,
@@ -30,7 +31,7 @@ class IjVimSearchHelper : VimSearchHelperBase() {
 
   override fun findNextSentenceStart(
     editor: VimEditor,
-    caret: VimCaret,
+    caret: ImmutableVimCaret,
     count: Int,
     countCurrent: Boolean,
     requireAll: Boolean,
@@ -42,7 +43,7 @@ class IjVimSearchHelper : VimSearchHelperBase() {
     )
   }
 
-  override fun findSection(editor: VimEditor, caret: VimCaret, type: Char, dir: Int, count: Int): Int {
+  override fun findSection(editor: VimEditor, caret: ImmutableVimCaret, type: Char, dir: Int, count: Int): Int {
     return SearchHelper.findSection(
       (editor as IjVimEditor).editor,
       (caret as IjVimCaret).caret,
@@ -52,7 +53,7 @@ class IjVimSearchHelper : VimSearchHelperBase() {
     )
   }
 
-  override fun findNextCamelEnd(editor: VimEditor, caret: VimCaret, count: Int): Int {
+  override fun findNextCamelEnd(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Int {
     return SearchHelper.findNextCamelEnd(
       (editor as IjVimEditor).editor,
       (caret as IjVimCaret).caret,
@@ -62,7 +63,7 @@ class IjVimSearchHelper : VimSearchHelperBase() {
 
   override fun findNextSentenceEnd(
     editor: VimEditor,
-    caret: VimCaret,
+    caret: ImmutableVimCaret,
     count: Int,
     countCurrent: Boolean,
     requireAll: Boolean,
@@ -76,7 +77,7 @@ class IjVimSearchHelper : VimSearchHelperBase() {
     )
   }
 
-  override fun findNextCamelStart(editor: VimEditor, caret: VimCaret, count: Int): Int {
+  override fun findNextCamelStart(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Int {
     return SearchHelper.findNextCamelStart(
       (editor as IjVimEditor).editor,
       (caret as IjVimCaret).caret,
@@ -84,7 +85,7 @@ class IjVimSearchHelper : VimSearchHelperBase() {
     )
   }
 
-  override fun findMethodEnd(editor: VimEditor, caret: VimCaret, count: Int): Int {
+  override fun findMethodEnd(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Int {
     return SearchHelper.findMethodEnd(
       (editor as IjVimEditor).editor,
       (caret as IjVimCaret).caret,
@@ -92,7 +93,7 @@ class IjVimSearchHelper : VimSearchHelperBase() {
     )
   }
 
-  override fun findMethodStart(editor: VimEditor, caret: VimCaret, count: Int): Int {
+  override fun findMethodStart(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Int {
     return SearchHelper.findMethodStart(
       (editor as IjVimEditor).editor,
       (caret as IjVimCaret).caret,
@@ -100,7 +101,7 @@ class IjVimSearchHelper : VimSearchHelperBase() {
     )
   }
 
-  override fun findUnmatchedBlock(editor: VimEditor, caret: VimCaret, type: Char, count: Int): Int {
+  override fun findUnmatchedBlock(editor: VimEditor, caret: ImmutableVimCaret, type: Char, count: Int): Int {
     return SearchHelper.findUnmatchedBlock(
       (editor as IjVimEditor).editor,
       (caret as IjVimCaret).caret,
@@ -119,7 +120,7 @@ class IjVimSearchHelper : VimSearchHelperBase() {
     return SearchHelper.findPattern(editor.ij, pattern, startOffset, count, searchOptions)
   }
 
-  override fun findNextCharacterOnLine(editor: VimEditor, caret: VimCaret, count: Int, ch: Char): Int {
+  override fun findNextCharacterOnLine(editor: VimEditor, caret: ImmutableVimCaret, count: Int, ch: Char): Int {
     return SearchHelper.findNextCharacterOnLine(editor.ij, caret.ij, count, ch)
   }
 

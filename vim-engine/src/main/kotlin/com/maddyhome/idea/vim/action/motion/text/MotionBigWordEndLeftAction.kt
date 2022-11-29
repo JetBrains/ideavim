@@ -8,7 +8,7 @@
 package com.maddyhome.idea.vim.action.motion.text
 
 import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
@@ -27,7 +27,7 @@ class MotionWordEndRightAction : WordEndAction(Direction.FORWARDS, false)
 sealed class WordEndAction(val direction: Direction, val bigWord: Boolean) : MotionActionHandler.ForEachCaret() {
   override fun getOffset(
     editor: VimEditor,
-    caret: VimCaret,
+    caret: ImmutableVimCaret,
     context: ExecutionContext,
     argument: Argument?,
     operatorArguments: OperatorArguments,
@@ -38,7 +38,7 @@ sealed class WordEndAction(val direction: Direction, val bigWord: Boolean) : Mot
   override val motionType: MotionType = MotionType.INCLUSIVE
 }
 
-fun moveCaretToNextWordEnd(editor: VimEditor, caret: VimCaret, count: Int, bigWord: Boolean): Motion {
+fun moveCaretToNextWordEnd(editor: VimEditor, caret: ImmutableVimCaret, count: Int, bigWord: Boolean): Motion {
   if (caret.offset.point == 0 && count < 0 || caret.offset.point >= editor.fileSize() - 1 && count > 0) {
     return Motion.Error
   }

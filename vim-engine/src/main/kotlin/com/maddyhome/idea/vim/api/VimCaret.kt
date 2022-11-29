@@ -24,12 +24,26 @@ import com.maddyhome.idea.vim.options.helpers.StrictMode
 import com.maddyhome.idea.vim.register.Register
 import javax.swing.KeyStroke
 
-// TODO: 29.12.2021 Split interface to mutable and immutable
-interface VimCaret {
+/**
+ * Immutable interface of the caret. Immutable caret is an important concept of Fleet.
+ * This interface is not yet actively adapted around vim-engine.
+ *
+ * I'll be needed to understand how can we merge mutable IJ carets and fully immutable Fleet carets.
+ * This interface exposes immutable functions of the caret, but doesn't solve this issue completely.
+ *
+ * TODO: Switch names: ImmutableVimCaret -> VimCaret & VimCaret -> MutableVimCaret
+ *       to be consistent with VimEditor
+ */
+interface ImmutableVimCaret {
   val editor: VimEditor
   val offset: Offset
   val isValid: Boolean
   val isPrimary: Boolean
+
+  val selectionStart: Int
+  val selectionEnd: Int
+
+  val vimLastColumn: Int
 
   fun getBufferPosition(): BufferPosition
 
@@ -42,13 +56,17 @@ interface VimCaret {
    * Return the buffer line of the caret as a 1-based value, as used by VimScript
    */
   val vimLine: Int
-
-  var vimLastColumn: Int
-  fun resetLastColumn()
-
+  val visualLineStart: Int
   fun hasSelection(): Boolean
-  val selectionStart: Int
-  val selectionEnd: Int
+
+  val registerStorage: CaretRegisterStorage
+}
+
+// TODO: 29.12.2021 Split interface to mutable and immutable
+interface VimCaret : ImmutableVimCaret {
+
+  override var vimLastColumn: Int
+  fun resetLastColumn()
 
   /*
 This variable shoul not exist. This is actually `< mark in visual selection. It should be refactored as we'll get
@@ -103,11 +121,8 @@ per-caret marks.
   // TODO: [visual] Try to remove this. Visual position is an IntelliJ concept and Vim doesn't have a direct equivalent
   fun moveToVisualPosition(position: VimVisualPosition)
 
-  val visualLineStart: Int
   var vimInsertStart: LiveRange
   var vimLastVisualOperatorRange: VisualChange?
-
-  val registerStorage: CaretRegisterStorage
 }
 
 interface CaretRegisterStorage {

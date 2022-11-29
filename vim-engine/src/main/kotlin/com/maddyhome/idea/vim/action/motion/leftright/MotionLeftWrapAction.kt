@@ -8,7 +8,7 @@
 package com.maddyhome.idea.vim.action.motion.leftright
 
 import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.MotionType
@@ -21,11 +21,11 @@ import kotlin.math.min
 
 class MotionLeftWrapAction : MotionActionHandler.ForEachCaret() {
   override fun getOffset(
-    editor: VimEditor,
-    caret: VimCaret,
-    context: ExecutionContext,
-    argument: Argument?,
-    operatorArguments: OperatorArguments,
+      editor: VimEditor,
+      caret: ImmutableVimCaret,
+      context: ExecutionContext,
+      argument: Argument?,
+      operatorArguments: OperatorArguments,
   ): Motion {
     val moveCaretHorizontalWrap = moveCaretHorizontalWrap(editor, caret, -operatorArguments.count1)
     return if (moveCaretHorizontalWrap < 0) Motion.Error else Motion.AbsoluteOffset(moveCaretHorizontalWrap)
@@ -36,11 +36,11 @@ class MotionLeftWrapAction : MotionActionHandler.ForEachCaret() {
 
 class MotionRightWrapAction : MotionActionHandler.ForEachCaret() {
   override fun getOffset(
-    editor: VimEditor,
-    caret: VimCaret,
-    context: ExecutionContext,
-    argument: Argument?,
-    operatorArguments: OperatorArguments,
+      editor: VimEditor,
+      caret: ImmutableVimCaret,
+      context: ExecutionContext,
+      argument: Argument?,
+      operatorArguments: OperatorArguments,
   ): Motion {
     return moveCaretHorizontalWrap(editor, caret, operatorArguments.count1).toMotionOrError()
   }
@@ -48,7 +48,7 @@ class MotionRightWrapAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 }
 
-fun moveCaretHorizontalWrap(editor: VimEditor, caret: VimCaret, count: Int): Int {
+fun moveCaretHorizontalWrap(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Int {
   // FIX - allows cursor over newlines
   val oldOffset = caret.offset.point
   val offset = min(max(0, caret.offset.point + count), editor.fileSize().toInt())
