@@ -510,6 +510,7 @@ tasks.register("integrationsTest") {
         setYoutrackStatus(listOf(testTicketId), "Open")
         guard(!checkReleaseVersionExists("TEST_VERSION")) { "Test version isn't deleted" }
 
+        updateMergedPr(560)
         // TODO: test Ticket parsing
         // TODO: test Update CHANGES
         // TODO: test Update AUTHORS
