@@ -9,3 +9,7 @@
   - Also, we can move the caret to any position at any moment of time. This would be better if the actions were only
     calculating the new position and this change was applied at once. This is already work very similar to that,
     but this approach should be reviewed with the fact that we create a new caret instead of moving the old one.
+- Tests sharing: IdeaVim has over 3500 tests. We should find a way to efficently share tests between different
+  implementations that run tests on different editors.
+  - To read: https://stackoverflow.com/a/67535682/3124227
+- Motion group has a lot of `move..` methods that don't actually move anything

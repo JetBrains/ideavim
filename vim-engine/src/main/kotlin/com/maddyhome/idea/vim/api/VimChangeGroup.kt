@@ -137,9 +137,9 @@ interface VimChangeGroup {
     operatorArguments: OperatorArguments
   )
 
-  fun insertText(editor: VimEditor, caret: VimCaret, offset: Int, str: String)
+  fun insertText(editor: VimEditor, caret: VimCaret, offset: Int, str: String): VimCaret
 
-  fun insertText(editor: VimEditor, caret: VimCaret, str: String)
+  fun insertText(editor: VimEditor, caret: VimCaret, str: String): VimCaret
 
   fun indentMotion(editor: VimEditor, caret: VimCaret, context: ExecutionContext, argument: Argument, dir: Int, operatorArguments: OperatorArguments)
 

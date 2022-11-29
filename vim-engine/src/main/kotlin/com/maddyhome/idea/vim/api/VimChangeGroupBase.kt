@@ -162,7 +162,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     // Fix for https://youtrack.jetbrains.net/issue/VIM-35
     if (!range.normalize(editor.fileSize().toInt())) {
       updatedRange = if (range.startOffset == range.endOffset && range.startOffset == editor.fileSize()
-        .toInt() && range.startOffset != 0
+          .toInt() && range.startOffset != 0
       ) {
         TextRange(range.startOffset - 1, range.endOffset)
       } else {
@@ -197,15 +197,16 @@ abstract class VimChangeGroupBase : VimChangeGroup {
    * @param caret  The caret to start insertion in
    * @param str    The text to insert
    */
-  override fun insertText(editor: VimEditor, caret: VimCaret, offset: Int, str: String) {
+  override fun insertText(editor: VimEditor, caret: VimCaret, offset: Int, str: String): VimCaret {
     (editor as MutableVimEditor).insertText(Offset(offset), str)
-    caret.moveToInlayAwareOffset(offset + str.length)
+    val newCaret = caret.moveToInlayAwareOffset(offset + str.length)
 
     injector.markGroup.setMark(editor, MARK_CHANGE_POS, offset)
+    return newCaret
   }
 
-  override fun insertText(editor: VimEditor, caret: VimCaret, str: String) {
-    insertText(editor, caret, caret.offset.point, str)
+  override fun insertText(editor: VimEditor, caret: VimCaret, str: String): VimCaret {
+    return insertText(editor, caret, caret.offset.point, str)
   }
 
   open fun insertText(editor: VimEditor, caret: VimCaret, start: BufferPosition, str: String) {
@@ -1085,30 +1086,31 @@ abstract class VimChangeGroupBase : VimChangeGroup {
   protected open fun insertNewLineAbove(editor: VimEditor, caret: VimCaret, col: Int) {
     if (editor.isOneLineMode()) return
     var firstLiner = false
-    if (caret.getVisualPosition().line == 0) {
-      caret.moveToOffset(
+    var newCaret = if (caret.getVisualPosition().line == 0) {
+      val newCaret = caret.moveToOffset(
         injector.motion.moveCaretToCurrentLineStart(
           editor,
           caret
         )
       )
       firstLiner = true
+      newCaret
     } else {
       // TODO: getVerticalMotionOffset returns a visual line, not the expected logical line
       // Also address the unguarded upcast
       val motion = injector.motion.getVerticalMotionOffset(editor, caret, -1)
-      caret.moveToOffset((motion as AbsoluteOffset).offset)
-      caret.moveToOffset(injector.motion.moveCaretToCurrentLineEnd(editor, caret))
+      val updated = caret.moveToOffset((motion as AbsoluteOffset).offset)
+      updated.moveToOffset(injector.motion.moveCaretToCurrentLineEnd(editor, updated))
     }
     editor.vimChangeActionSwitchMode = VimStateMachine.Mode.INSERT
-    insertText(
-      editor, caret, "\n${editor.createIndentBySize(col)}"
+    newCaret = insertText(
+      editor, newCaret, "\n${editor.createIndentBySize(col)}"
     )
     if (firstLiner) {
       // TODO: getVerticalMotionOffset returns a visual line, not the expected logical line
       // Also address the unguarded upcast
-      val motion = injector.motion.getVerticalMotionOffset(editor, caret, -1)
-      caret.moveToOffset((motion as AbsoluteOffset).offset)
+      val motion = injector.motion.getVerticalMotionOffset(editor, newCaret, -1)
+      newCaret.moveToOffset((motion as AbsoluteOffset).offset)
     }
   }
 
