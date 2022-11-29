@@ -28,11 +28,13 @@ usual beta standards.
 ### Fixes:
 * [VIM-2797](https://youtrack.jetbrains.com/issue/VIM-2797) Introduce variable to mute default argtextobj mappings
 * [VIM-758](https://youtrack.jetbrains.com/issue/VIM-758) Support d mappings
+* [VIM-2577](https://youtrack.jetbrains.com/issue/VIM-2577) Fix paste at the end of notebook cell
 
 ### Merged PRs:
 * [558](https://github.com/JetBrains/ideavim/pull/558) by [Matt Ellis](https://github.com/citizenmatt): Fix incorrect normalising for trailing inlay
 * [554](https://github.com/JetBrains/ideavim/pull/554) by [Matt Ellis](https://github.com/citizenmatt): Refactor "last column" calculations
 * [553](https://github.com/JetBrains/ideavim/pull/553) by [Matt Ellis](https://github.com/citizenmatt): Rearrange and rename some code in engine
+* [560](https://github.com/JetBrains/ideavim/pull/560) by [Runinho](https://github.com/Runinho): Fix(VIM-2577) paste not working at end of notebook cell
 
 ## 2.0.0, 2022-11-01
 
