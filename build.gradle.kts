@@ -789,7 +789,7 @@ data class Author(val name: String, val url: String, val mail: String)
 data class Change(val id: String, val text: String)
 
 fun updateMergedPr(number: Int) {
-    val token = System.getenv("MERGE_PR")
+    val token = System.getenv("GITHUB_OAUTH")
     println("Token size: ${token.length}")
     val gitHub = org.kohsuke.github.GitHubBuilder().withOAuthToken(token).build()
     println("Connecting to the repo...")
