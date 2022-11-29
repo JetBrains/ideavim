@@ -795,7 +795,6 @@ fun updateMergedPr(number: Int) {
     println("Connecting to the repo...")
     val repository = gitHub.getRepository("JetBrains/ideavim")
     println("Getting pull requests...")
-
     val pullRequest = repository.getPullRequest(number)
     if (pullRequest.user.login == "dependabot[bot]") return
 

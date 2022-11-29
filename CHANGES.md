@@ -35,7 +35,6 @@ usual beta standards.
 * [554](https://github.com/JetBrains/ideavim/pull/554) by [Matt Ellis](https://github.com/citizenmatt): Refactor "last column" calculations
 * [553](https://github.com/JetBrains/ideavim/pull/553) by [Matt Ellis](https://github.com/citizenmatt): Rearrange and rename some code in engine
 * [560](https://github.com/JetBrains/ideavim/pull/560) by [Runinho](https://github.com/Runinho): Fix(VIM-2577) paste not working at end of notebook cell
-* [562](https://github.com/JetBrains/ideavim/pull/562) by [Alex Pláte](https://github.com/AlexPl292): Useless commit
 
 ## 2.0.0, 2022-11-01
 
