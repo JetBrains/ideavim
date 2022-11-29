@@ -510,7 +510,7 @@ tasks.register("integrationsTest") {
         setYoutrackStatus(listOf(testTicketId), "Open")
         guard(!checkReleaseVersionExists("TEST_VERSION")) { "Test version isn't deleted" }
 
-        updateMergedPr(560)
+        updateMergedPr(525)
         // TODO: test Ticket parsing
         // TODO: test Update CHANGES
         // TODO: test Update AUTHORS
@@ -789,7 +789,9 @@ data class Author(val name: String, val url: String, val mail: String)
 data class Change(val id: String, val text: String)
 
 fun updateMergedPr(number: Int) {
-    val gitHub = org.kohsuke.github.GitHubBuilder().withOAuthToken(System.getenv("MERGE_PR")).build()
+    val token = System.getenv("MERGE_PR")
+    println("Token size: ${token.length}")
+    val gitHub = org.kohsuke.github.GitHubBuilder().withOAuthToken(token).build()
     println("Connecting to the repo...")
     val repository = gitHub.getRepository("JetBrains/ideavim")
     println("Getting pull requests...")
