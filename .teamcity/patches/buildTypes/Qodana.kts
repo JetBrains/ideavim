@@ -6,6 +6,8 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.gradle
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.qodana
 import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.BuildFailureOnMetric
 import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.failOnMetricChange
+import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.VcsTrigger
+import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
 import jetbrains.buildServer.configs.kotlin.v2019_2.ui.*
 
 /*
@@ -52,6 +54,18 @@ changeBuildType(RelativeId("Qodana")) {
             param("clonefinder-queried-project", "")
             param("clonefinder-enable", "")
             param("clonefinder-reference-projects", "")
+        }
+    }
+
+    triggers {
+        val trigger1 = find<VcsTrigger> {
+            vcs {
+                branchFilter = ""
+            }
+        }
+        trigger1.apply {
+            enabled = false
+
         }
     }
 
