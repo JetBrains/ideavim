@@ -76,7 +76,6 @@ class UiTests {
         }
       }
       testSelectTextWithDelay(editor)
-      testTrackActionId(editor)
       testExtendSelection(editor)
       testLargerDragSelection(editor)
       testSelectLastCharacter(editor)
@@ -110,6 +109,7 @@ class UiTests {
       // This is a hack to wait till inline hints will appear
       Thread.sleep(5000)
       wrapWithIf(javaEditor)
+      testTrackActionId(editor)
     }
   }
 
@@ -202,12 +202,22 @@ class UiTests {
     }
 
     findText("Copy Action Id").click()
+    Thread.sleep(1000)
     findText("Stop Tracking").click()
 
-    editor.findText("One").click()
+    editor.findText("class").click()
     remoteRobot.invokeActionJs("EditorPaste")
 
-    assertEquals("123", editor.text)
+    assertEquals(            """
+                |GotoActionclass Main {
+                |  public static void main() {
+                |    System.out.println("Hello");
+                |  }
+                |}
+            """.trimMargin(), editor.text)
+
+    remoteRobot.invokeActionJs("GotoAction")
+    assertFalse(hasText("Copy Action Id"))
 
     vimExit()
   }
