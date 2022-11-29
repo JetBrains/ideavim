@@ -789,7 +789,7 @@ data class Author(val name: String, val url: String, val mail: String)
 data class Change(val id: String, val text: String)
 
 fun updateMergedPr(number: Int) {
-    val gitHub = org.kohsuke.github.GitHub.connect()
+    val gitHub = org.kohsuke.github.GitHubBuilder().withOAuthToken(System.getenv("MERGE_PR")).build()
     println("Connecting to the repo...")
     val repository = gitHub.getRepository("JetBrains/ideavim")
     println("Getting pull requests...")
