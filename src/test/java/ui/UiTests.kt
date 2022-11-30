@@ -109,7 +109,7 @@ class UiTests {
       // This is a hack to wait till inline hints will appear
       Thread.sleep(5000)
       wrapWithIf(javaEditor)
-      testTrackActionId(editor)
+      testTrackActionId(javaEditor)
     }
   }
 
@@ -210,9 +210,11 @@ class UiTests {
     remoteRobot.invokeActionJs("EditorPaste")
 
     assertEquals(            """
-                |GotoActionclass Main {
+                |EditorEscapeclass Main {
                 |  public static void main() {
-                |    System.out.println("Hello");
+                |      if (true) {
+                |          System.out.println("Hello");
+                |      }
                 |  }
                 |}
             """.trimMargin(), editor.text)
