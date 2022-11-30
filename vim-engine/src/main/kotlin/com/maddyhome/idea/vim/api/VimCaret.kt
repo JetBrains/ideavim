@@ -121,6 +121,13 @@ per-caret marks.
   // TODO: [visual] Try to remove this. Visual position is an IntelliJ concept and Vim doesn't have a direct equivalent
   fun moveToVisualPosition(position: VimVisualPosition)
 
+  /**
+   * Same as setter for [vimLastColumn] but returns the new version of the caret.
+   * As the common strategies for caret processing are not yet created, there is no need to adapt
+   *   this method around IdeaVim right now
+   */
+  fun setVimLastColumn(col: Int): VimCaret
+
   var vimInsertStart: LiveRange
   var vimLastVisualOperatorRange: VisualChange?
 }

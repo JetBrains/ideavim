@@ -907,28 +907,31 @@ abstract class VimChangeGroupBase : VimChangeGroup {
 
     val removeLastNewLine = removeLastNewLine(editor, range, type)
     val res = deleteText(editor, range, type, caret, operatorArguments)
+    var processedCaret = caret
     if (removeLastNewLine) {
       val textLength = editor.fileSize().toInt()
       editor.deleteString(TextRange(textLength - 1, textLength))
+      processedCaret = editor.findLastVersionOfCaret(caret) ?: caret
     }
 
     if (res) {
       var pos = editor.normalizeOffset(range.startOffset, isChange)
-      if (type === SelectionType.LINE_WISE) {
+      processedCaret = if (type === SelectionType.LINE_WISE) {
         // Reset the saved intended column cache, which has been invalidated by the caret moving due to deleted text.
         // This value will be used to reposition the caret if 'startofline' is false
-        caret.vimLastColumn = intendedColumn
+        val updated = processedCaret.setVimLastColumn(intendedColumn)
         pos = injector.motion
           .moveCaretToLineWithStartOfLineOption(
             editor, editor.offsetToBufferPosition(pos).line,
             caret
           )
-      }
-      caret.moveToOffset(pos)
+        updated
+      } else caret
+      processedCaret = processedCaret.moveToOffset(pos)
 
       // Ensure the intended column cache is invalidated - it will only happen automatically if the caret actually moves
       // If 'startofline' is true and we've just deleted text, it's likely we haven't moved
-      caret.resetLastColumn()
+      processedCaret.resetLastColumn()
     }
     return res
   }

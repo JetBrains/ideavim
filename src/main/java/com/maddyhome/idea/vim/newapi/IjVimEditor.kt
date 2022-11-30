@@ -422,6 +422,10 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
     return editor.foldingModel.getCollapsedRegionAtOffset(offset)?.let { TextRange(it.startOffset, it.endOffset) }
   }
 
+  override fun findLastVersionOfCaret(caret: VimCaret): VimCaret {
+    return caret
+  }
+
   private fun Pair<Offset, Offset>.noGuard(editor: Editor): Boolean {
     return editor.document.getRangeGuard(this.first.point, this.second.point) == null
   }

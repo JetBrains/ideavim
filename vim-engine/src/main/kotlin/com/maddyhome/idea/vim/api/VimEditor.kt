@@ -266,6 +266,12 @@ interface VimEditor {
 
   fun createIndentBySize(size: Int): String
   fun getCollapsedRegionAtOffset(offset: Int): TextRange?
+
+  /**
+   * Mostly related to Fleet. After the editor is modified, the carets are modified. You can't use the old caret
+   *   instance and need to search for a new version.
+   */
+  fun findLastVersionOfCaret(caret: VimCaret): VimCaret?
 }
 
 interface MutableVimEditor : VimEditor {
