@@ -67,6 +67,7 @@ enum class MappingMode {
 
     @JvmField
     val NVO: EnumSet<MappingMode> = EnumSet.of(NORMAL, VISUAL, OP_PENDING, SELECT)
+    val INV: EnumSet<MappingMode> = EnumSet.of(INSERT, NORMAL, VISUAL, SELECT)
     val ALL: EnumSet<MappingMode> = EnumSet.allOf(MappingMode::class.java)
   }
 }
