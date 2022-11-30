@@ -1,6 +1,6 @@
 # NERDTree
 
-IdeaVim supports emulation of the NERDTree plugin. Update your `~/.ideavimrc` to turn it on:
+IdeaVim supports the NERDTree plugin. Update your `~/.ideavimrc` to turn it on:
 ```vim
 Plug 'preservim/nerdtree`
 ```
