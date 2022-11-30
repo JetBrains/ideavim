@@ -204,6 +204,7 @@ class UiTests {
     findText("Copy Action Id").click()
     Thread.sleep(1000)
     findText("Stop Tracking").click()
+    Thread.sleep(1000)
 
     editor.findText("class").click()
     remoteRobot.invokeActionJs("EditorPaste")
