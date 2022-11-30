@@ -48,7 +48,7 @@ interface VimMotionGroup {
   // Move caret to buffer column on current line
   fun moveCaretToCurrentLineStart(editor: VimEditor, caret: ImmutableVimCaret): Int
   fun moveCaretToCurrentLineStartSkipLeading(editor: VimEditor, caret: ImmutableVimCaret): Int
-  fun moveCaretToCurrentLineEnd(editor: VimEditor, caret: VimCaret): Int
+  fun moveCaretToCurrentLineEnd(editor: VimEditor, caret: ImmutableVimCaret): Int
 
   // Move caret to column relative to the bounds of the display (aka window)
   fun moveCaretToCurrentDisplayLineStart(editor: VimEditor, caret: ImmutableVimCaret): Motion

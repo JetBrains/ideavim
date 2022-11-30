@@ -127,7 +127,7 @@ class IjVimCaret(val caret: Caret) : VimCaretBase() {
     caret.moveToVisualPosition(VisualPosition(position.line, position.column, position.leansRight))
   }
 
-  override fun setVimLastColumn(col: Int): VimCaret {
+  override fun setVimLastColumnAndGetCaret(col: Int): VimCaret {
     caret.vimLastColumn = col
     return this
   }

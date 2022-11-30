@@ -907,7 +907,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
 
     val removeLastNewLine = removeLastNewLine(editor, range, type)
     val res = deleteText(editor, range, type, caret, operatorArguments)
-    var processedCaret = caret
+    var processedCaret = editor.findLastVersionOfCaret(caret) ?: caret
     if (removeLastNewLine) {
       val textLength = editor.fileSize().toInt()
       editor.deleteString(TextRange(textLength - 1, textLength))
@@ -919,7 +919,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       processedCaret = if (type === SelectionType.LINE_WISE) {
         // Reset the saved intended column cache, which has been invalidated by the caret moving due to deleted text.
         // This value will be used to reposition the caret if 'startofline' is false
-        val updated = processedCaret.setVimLastColumn(intendedColumn)
+        val updated = processedCaret.setVimLastColumnAndGetCaret(intendedColumn)
         pos = injector.motion
           .moveCaretToLineWithStartOfLineOption(
             editor, editor.offsetToBufferPosition(pos).line,
@@ -1225,9 +1225,9 @@ abstract class VimChangeGroupBase : VimChangeGroup {
    */
   private fun insertNewLineBelow(editor: VimEditor, caret: VimCaret, col: Int) {
     if (editor.isOneLineMode()) return
-    caret.moveToOffset(injector.motion.moveCaretToCurrentLineEnd(editor, caret))
+    val newCaret = caret.moveToOffset(injector.motion.moveCaretToCurrentLineEnd(editor, caret))
     editor.vimChangeActionSwitchMode = VimStateMachine.Mode.INSERT
-    insertText(editor, caret, "\n${editor.createIndentBySize(col)}")
+    insertText(editor, newCaret, "\n${editor.createIndentBySize(col)}")
   }
 
   /**
@@ -1260,15 +1260,16 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     val after = range.endOffset >= editor.fileSize()
     val lp = editor.offsetToBufferPosition(injector.motion.moveCaretToCurrentLineStartSkipLeading(editor, caret))
     val res = deleteRange(editor, caret, range, type, true, operatorArguments)
+    val updatedCaret = editor.findLastVersionOfCaret(caret) ?: caret
     if (res) {
       if (type === SelectionType.LINE_WISE) {
         // Please don't use `getDocument().getText().isEmpty()` because it converts CharSequence into String
         if (editor.fileSize() == 0L) {
           insertBeforeCursor(editor, context)
         } else if (after && !editor.endsWithNewLine()) {
-          insertNewLineBelow(editor, caret, lp.column)
+          insertNewLineBelow(editor, updatedCaret, lp.column)
         } else {
-          insertNewLineAbove(editor, caret, lp.column)
+          insertNewLineAbove(editor, updatedCaret, lp.column)
         }
       } else {
         if (type === SelectionType.BLOCK_WISE) {

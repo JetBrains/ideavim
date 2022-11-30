@@ -506,9 +506,9 @@ public class ChangeGroup extends VimChangeGroupBase {
     if (!CommandStateHelper.inInsertMode(((IjVimEditor) editor).getEditor())) {
       if (!range.isMultiple()) {
         // The caret has moved, so reset the intended column before trying to get the expected offset
-        caret.setVimLastColumn(intendedColumn);
+        VimCaret newCaret = caret.setVimLastColumnAndGetCaret(intendedColumn);
         final int offset = injector.getMotion().moveCaretToLineWithStartOfLineOption(editor, sline, caret);
-        caret.moveToOffset(offset);
+        newCaret.moveToOffset(offset);
       }
       else {
         caret.moveToOffset(range.getStartOffset());

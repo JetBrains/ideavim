@@ -126,7 +126,7 @@ per-caret marks.
    * As the common strategies for caret processing are not yet created, there is no need to adapt
    *   this method around IdeaVim right now
    */
-  fun setVimLastColumn(col: Int): VimCaret
+  fun setVimLastColumnAndGetCaret(col: Int): VimCaret
 
   var vimInsertStart: LiveRange
   var vimLastVisualOperatorRange: VisualChange?

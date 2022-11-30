@@ -347,7 +347,7 @@ abstract class VimMotionGroupBase : VimMotionGroup {
     return TextRange(start, end)
   }
 
-  override fun moveCaretToCurrentLineEnd(editor: VimEditor, caret: VimCaret): Int {
+  override fun moveCaretToCurrentLineEnd(editor: VimEditor, caret: ImmutableVimCaret): Int {
     val (line) = caret.getVisualPosition()
     val lastVisualLineColumn = editor.getLastVisualLineColumnNumber(line)
     val visualEndOfLine = VimVisualPosition(line, lastVisualLineColumn, true)
