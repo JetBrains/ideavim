@@ -28,7 +28,7 @@ class VimStateMachineTest : VimTestCase() {
     configureByText("123")
     typeText(injector.parser.parseKeys("i"))
     val statusString = myFixture.editor.vim.vimStateMachine.getStatusString()
-    assertEquals("INSERT", statusString)
+    assertEquals("-- INSERT --", statusString)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
@@ -36,7 +36,7 @@ class VimStateMachineTest : VimTestCase() {
     configureByText("123")
     typeText(injector.parser.parseKeys("R"))
     val statusString = myFixture.editor.vim.vimStateMachine.getStatusString()
-    assertEquals("REPLACE", statusString)
+    assertEquals("-- REPLACE --", statusString)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
