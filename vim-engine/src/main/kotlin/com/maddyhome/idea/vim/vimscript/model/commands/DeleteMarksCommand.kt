@@ -46,7 +46,7 @@ data class DeleteMarksCommand(val ranges: Ranges, val argument: String) : Comman
       if (index != -1) {
         val invalidIndex = if (processedArg[index] == '-') (index - 1).coerceAtLeast(0) else index
 
-        injector.messages.showStatusBarMessage(injector.messages.message(Msg.E475, processedArg.substring(invalidIndex)))
+        injector.messages.showStatusBarMessage(editor, injector.messages.message(Msg.E475, processedArg.substring(invalidIndex)))
         return ExecutionResult.Error
       }
     }

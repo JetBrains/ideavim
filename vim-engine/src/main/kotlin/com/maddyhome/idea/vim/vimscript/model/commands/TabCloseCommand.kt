@@ -34,7 +34,7 @@ data class TabCloseCommand(val ranges: Ranges, val argument: String) : Command.S
       val select = if (index == current) index + 1 else current
       injector.tabService.removeTabAt(index, select, context)
     } else {
-      injector.messages.showStatusBarMessage(injector.messages.message("error.invalid.command.argument"))
+      injector.messages.showStatusBarMessage(editor, injector.messages.message("error.invalid.command.argument"))
     }
 
     return ExecutionResult.Success

@@ -35,6 +35,7 @@ abstract class VimDigraphGroupBase() : VimDigraphGroup {
 
     if (ch.code < 0x100) {
       injector.messages.showStatusBarMessage(
+        editor,
         String.format(
           "<%s>  %d,  Hex %02x,  Oct %03o%s",
           EngineStringHelper.toPrintableCharacter(KeyStroke.getKeyStroke(ch)),
@@ -46,6 +47,7 @@ abstract class VimDigraphGroupBase() : VimDigraphGroup {
       )
     } else {
       injector.messages.showStatusBarMessage(
+        editor,
         String.format(
           "<%s> %d, Hex %04x, Oct %o%s",
           EngineStringHelper.toPrintableCharacter(KeyStroke.getKeyStroke(ch)),

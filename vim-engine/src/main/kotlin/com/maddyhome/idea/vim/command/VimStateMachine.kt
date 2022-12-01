@@ -293,7 +293,7 @@ class VimStateMachine(private val editor: VimEditor?) {
       }
       msg.append(injector.messages.message("show.mode.recording"))
     }
-    injector.messages.showMode(msg.toString())
+    injector.messages.showMode(editor, msg.toString())
   }
 
   fun getStatusString(): String {

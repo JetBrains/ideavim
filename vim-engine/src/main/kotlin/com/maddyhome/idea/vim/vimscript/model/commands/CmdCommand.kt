@@ -69,7 +69,7 @@ data class CmdCommand(val ranges: Ranges, val argument: String) : Command.Single
     return true
   }
 
-  private fun addAlias(editor: VimEditor?): Boolean {
+  private fun addAlias(editor: VimEditor): Boolean {
     var argument = argument.trim()
 
     // Handle overwriting of aliases
@@ -82,7 +82,7 @@ data class CmdCommand(val ranges: Ranges, val argument: String) : Command.Single
       val match = arg.find(argument)
       match?.range?.let {
         argument = argument.removeRange(it)
-        injector.messages.showStatusBarMessage("'$message' is not supported by `command`")
+        injector.messages.showStatusBarMessage(editor, "'$message' is not supported by `command`")
       }
     }
 
@@ -95,7 +95,7 @@ data class CmdCommand(val ranges: Ranges, val argument: String) : Command.Single
       // in the actual alias being created, and we don't want to parse that one.
       val trimmedInput = argument.takeWhile { it != ' ' }
       val pattern = Regex("(?>-nargs=((|[-])\\d+|[?]|[+]|[*]))").find(trimmedInput) ?: run {
-        injector.messages.showStatusBarMessage(injector.messages.message("e176.invalid.number.of.arguments"))
+        injector.messages.showStatusBarMessage(editor, injector.messages.message("e176.invalid.number.of.arguments"))
         return false
       }
       val nargForTrim = pattern.groupValues[0]
@@ -118,7 +118,7 @@ data class CmdCommand(val ranges: Ranges, val argument: String) : Command.Single
             // I missed something, since the regex limits the value to be ? + * or
             // a valid number, its not possible (as far as I know) to have another value
             // that regex would accept that is not valid.
-            injector.messages.showStatusBarMessage(injector.messages.message("e176.invalid.number.of.arguments"))
+            injector.messages.showStatusBarMessage(editor, injector.messages.message("e176.invalid.number.of.arguments"))
             return false
           }
         }
@@ -126,7 +126,7 @@ data class CmdCommand(val ranges: Ranges, val argument: String) : Command.Single
         // Not sure why this isn't documented, but if you try to create a command in vim
         // with an explicit number of arguments greater than 1 it returns this error.
         if (argNum > 1 || argNum < 0) {
-          injector.messages.showStatusBarMessage(injector.messages.message("e176.invalid.number.of.arguments"))
+          injector.messages.showStatusBarMessage(editor, injector.messages.message("e176.invalid.number.of.arguments"))
           return false
         }
         minNumberOfArgs = argNum
@@ -148,12 +148,12 @@ data class CmdCommand(val ranges: Ranges, val argument: String) : Command.Single
 
     // User-aliases need to begin with an uppercase character.
     if (!alias[0].isUpperCase()) {
-      injector.messages.showStatusBarMessage(injector.messages.message("e183.user.defined.commands.must.start.with.an.uppercase.letter"))
+      injector.messages.showStatusBarMessage(editor, injector.messages.message("e183.user.defined.commands.must.start.with.an.uppercase.letter"))
       return false
     }
 
     if (alias in BLACKLISTED_ALIASES) {
-      injector.messages.showStatusBarMessage(injector.messages.message("e841.reserved.name.cannot.be.used.for.user.defined.command"))
+      injector.messages.showStatusBarMessage(editor, injector.messages.message("e841.reserved.name.cannot.be.used.for.user.defined.command"))
       return false
     }
 
@@ -169,7 +169,7 @@ data class CmdCommand(val ranges: Ranges, val argument: String) : Command.Single
     // If we are not over-writing existing aliases, and an alias with the same command
     // already exists then we want to do nothing.
     if (!overrideAlias && injector.commandGroup.hasAlias(alias)) {
-      injector.messages.showStatusBarMessage(injector.messages.message("e174.command.already.exists.add.to.replace.it"))
+      injector.messages.showStatusBarMessage(editor, injector.messages.message("e174.command.already.exists.add.to.replace.it"))
       return false
     }
 

@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.api.stubs
 
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimMessagesBase
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 
@@ -16,7 +17,7 @@ class VimMessagesStub : VimMessagesBase() {
     vimLogger<ExecutionContextManagerStub>().warn("VimMessagesStub is used. Please replace it with your own implementation of VimMessages.")
   }
 
-  override fun showStatusBarMessage(message: String?) {
+  override fun showStatusBarMessage(editor: VimEditor?, message: String?) {
     TODO("Not yet implemented")
   }
 

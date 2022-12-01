@@ -49,7 +49,7 @@ class InsertRegisterAction : VimActionHandler.SingleExecution() {
           }
         } catch (e: ExException) {
           injector.messages.indicateError()
-          injector.messages.showStatusBarMessage(e.message)
+          injector.messages.showStatusBarMessage(editor, e.message)
         }
       }
       return true

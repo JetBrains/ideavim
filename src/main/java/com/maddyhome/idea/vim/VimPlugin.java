@@ -189,10 +189,6 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     return ((WindowGroup)VimInjectorKt.getInjector().getWindow());
   }
 
-  public static @NotNull TabService getTabService() {
-    return ApplicationManager.getApplication().getService(TabService.class);
-  }
-
   public static @NotNull EditorGroup getEditor() {
     return ApplicationManager.getApplication().getService(EditorGroup.class);
   }
@@ -293,12 +289,8 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     VimInjectorKt.getInjector().getMessages().clearError();
   }
 
-  public static void showMode(String msg) {
-    VimInjectorKt.getInjector().getMessages().showMode(msg);
-  }
-
   public static void showMessage(@Nls(capitalization = Nls.Capitalization.Sentence) @Nullable String msg) {
-    VimInjectorKt.getInjector().getMessages().showStatusBarMessage(msg);
+    VimInjectorKt.getInjector().getMessages().showStatusBarMessage(null, msg);
   }
 
   public static @NotNull VimPlugin getInstance() {

@@ -30,7 +30,7 @@ data class MarkCommand(val ranges: Ranges, val argument: String) : Command.Singl
     val result = if (mark.isLetter() || mark in "'`") {
       injector.markGroup.setMark(editor, mark, offset)
     } else {
-      injector.messages.showStatusBarMessage(injector.messages.message(Msg.E191))
+      injector.messages.showStatusBarMessage(editor, injector.messages.message(Msg.E191))
       false
     }
     return if (result) ExecutionResult.Success else ExecutionResult.Error

@@ -164,7 +164,7 @@ abstract class VimOptionServiceBase : OptionService {
         if (result == null) {
           logger.error("KeywordOptionHelper failed to parse $value")
           injector.messages.indicateError()
-          injector.messages.showStatusBarMessage("Failed to parse iskeyword option value")
+          injector.messages.showStatusBarMessage(editor = null, "Failed to parse iskeyword option value")
         }
         return result ?: split(getDefaultValue().value)
       }

@@ -84,12 +84,12 @@ class RegExp {
     */
   // EMSG_M_RET_null("E369: invalid item in %s%%[]", reg_magic == MAGIC_ALL)
   private fun EMSG_RET_null(key: String) {
-    injector.messages.showStatusBarMessage(injector.messages.message(key))
+    injector.messages.showStatusBarMessage(null, injector.messages.message(key))
   }
 
   private fun EMSG_M_RET_null(key: String, isMagic: Boolean) {
     val `val` = if (isMagic) "" else "\\"
-    injector.messages.showStatusBarMessage(injector.messages.message(key, `val`))
+    injector.messages.showStatusBarMessage(null, injector.messages.message(key, `val`))
   }
 
   private fun EMSG_ONE_RET_null() {
@@ -155,7 +155,7 @@ class RegExp {
     var len: Int
     val flags = Flags()
     if (expr == null) {
-      injector.messages.showStatusBarMessage(injector.messages.message(Msg.e_null))
+      injector.messages.showStatusBarMessage(null, injector.messages.message(Msg.e_null))
       return null
     }
     r = regprog_T()
@@ -274,7 +274,7 @@ class RegExp {
     if (paren == REG_ZPAREN) {
       /* Make a ZOPEN node. */
       if (regnzpar >= NSUBEXP) {
-        injector.messages.showStatusBarMessage(injector.messages.message(Msg.E50))
+        injector.messages.showStatusBarMessage(null, injector.messages.message(Msg.E50))
         return null
       }
       parno = regnzpar
@@ -336,7 +336,7 @@ class RegExp {
 
     /* Check for proper termination. */if (paren != REG_NOPAREN && getchr() != Magic.RPAREN) {
       return if (paren == REG_ZPAREN) {
-        injector.messages.showStatusBarMessage(injector.messages.message(Msg.E52))
+        injector.messages.showStatusBarMessage(null, injector.messages.message(Msg.E52))
         null
       } else if (paren == REG_NPAREN) {
         EMSG_M_RET_null(Msg.E53, reg_magic == MAGIC_ALL)
@@ -350,7 +350,7 @@ class RegExp {
         EMSG_M_RET_null(Msg.E55, reg_magic == MAGIC_ALL)
         null
       } else {
-        injector.messages.showStatusBarMessage(injector.messages.message(Msg.e_trailing))
+        injector.messages.showStatusBarMessage(null, injector.messages.message(Msg.e_trailing))
         null
       }
       /* NOTREACHED */
@@ -581,11 +581,11 @@ class RegExp {
       /* Can't have a multi follow a multi. */
       if (peekchr() == Magic.STAR) {
         val `val` = if (reg_magic >= MAGIC_ON) "" else "\\"
-        injector.messages.showStatusBarMessage(injector.messages.message(Msg.E61, `val`))
+        injector.messages.showStatusBarMessage(null, injector.messages.message(Msg.E61, `val`))
       } else {
         val `val` = if (reg_magic >= MAGIC_ON) "" else "\\"
         injector.messages.showStatusBarMessage(
-          injector.messages.message(
+          null, injector.messages.message(
             Msg.E62,
             `val`,
             Character.toString(Magic.no_Magic(peekchr()).toChar())
@@ -651,7 +651,7 @@ class RegExp {
         }
         val i = classchars.indexOf(Magic.no_Magic(c).toChar())
         if (i == -1) {
-          injector.messages.showStatusBarMessage(injector.messages.message(Msg.E63))
+          injector.messages.showStatusBarMessage(null, injector.messages.message(Msg.E63))
           return null
         }
         ret = regnode(classcodes[i] + extra)
@@ -660,7 +660,7 @@ class RegExp {
       Magic.DOT, Magic.i, Magic.I, Magic.k, Magic.K, Magic.f, Magic.F, Magic.p, Magic.P, Magic.s, Magic.S, Magic.d, Magic.D, Magic.x, Magic.X, Magic.o, Magic.O, Magic.w, Magic.W, Magic.h, Magic.H, Magic.a, Magic.A, Magic.l, Magic.L, Magic.u, Magic.U -> {
         val i = classchars.indexOf(Magic.no_Magic(c).toChar())
         if (i == -1) {
-          injector.messages.showStatusBarMessage(injector.messages.message(Msg.E63))
+          injector.messages.showStatusBarMessage(null, injector.messages.message(Msg.E63))
           return null
         }
         ret = regnode(classcodes[i] + extra)
@@ -689,7 +689,7 @@ class RegExp {
         c = Magic.no_Magic(c)
         val `val` = if (if (c == '*'.code) reg_magic >= MAGIC_ON else reg_magic == MAGIC_ALL) "" else "\\"
         injector.messages.showStatusBarMessage(
-          injector.messages.message(
+          null,injector.messages.message(
             Msg.E64,
             `val`,
             Character.toString(c.toChar())
@@ -713,7 +713,7 @@ class RegExp {
           }
         }
       } else {
-        injector.messages.showStatusBarMessage(injector.messages.message(Msg.e_nopresub))
+        injector.messages.showStatusBarMessage(null, injector.messages.message(Msg.e_nopresub))
         return null
       }
       Magic.N1, Magic.N2, Magic.N3, Magic.N4, Magic.N5, Magic.N6, Magic.N7, Magic.N8, Magic.N9 -> {
@@ -747,7 +747,7 @@ class RegExp {
         when (c) {
           '('.code -> {
             if (reg_do_extmatch != REX_SET) {
-              injector.messages.showStatusBarMessage(injector.messages.message(Msg.E66))
+              injector.messages.showStatusBarMessage(null, injector.messages.message(Msg.E66))
               return null
             }
             if (one_exactly) {
@@ -763,7 +763,7 @@ class RegExp {
           }
           '1'.code, '2'.code, '3'.code, '4'.code, '5'.code, '6'.code, '7'.code, '8'.code, '9'.code -> {
             if (reg_do_extmatch != REX_USE) {
-              injector.messages.showStatusBarMessage(injector.messages.message(Msg.E67))
+              injector.messages.showStatusBarMessage(null, injector.messages.message(Msg.E67))
               return null
             }
             ret = regnode(ZREF + c - '0'.code)
@@ -772,7 +772,7 @@ class RegExp {
           's'.code -> ret = regnode(MOPEN)
           'e'.code -> ret = regnode(MCLOSE)
           else -> {
-            injector.messages.showStatusBarMessage(injector.messages.message(Msg.E68))
+            injector.messages.showStatusBarMessage(null, injector.messages.message(Msg.E68))
             return null
           }
         }
@@ -914,7 +914,7 @@ class RegExp {
               endc = regparse!!.charAt().code
               regparse!!.inc()
               if (startc > endc) {
-                injector.messages.showStatusBarMessage(injector.messages.message(Msg.e_invrange))
+                injector.messages.showStatusBarMessage(null, injector.messages.message(Msg.e_invrange))
                 return null
               }
               while (++startc <= endc) {
@@ -1071,7 +1071,7 @@ class RegExp {
         regc('\u0000'.code)
         prevchr_len = 1 /* last char was the ']' */
         if (regparse!!.charAt() != ']') {
-          injector.messages.showStatusBarMessage(injector.messages.message(Msg.e_toomsbra))
+          injector.messages.showStatusBarMessage(null, injector.messages.message(Msg.e_toomsbra))
           return null
         }
         skipchr() /* let's be friends with the lexer again */
@@ -1408,7 +1408,7 @@ class RegExp {
     }
     if (regparse!!.charAt() != '}' || maxval == 0 && minval == 0) {
       val `val` = if (reg_magic == MAGIC_ALL) "" else "\\"
-      injector.messages.showStatusBarMessage(injector.messages.message(Msg.synerror, `val`))
+      injector.messages.showStatusBarMessage(null, injector.messages.message(Msg.synerror, `val`))
       return null
     }
 
@@ -1524,7 +1524,7 @@ class RegExp {
     reg_endpos = reg_mmatch!!.endpos
 
     /* Be paranoid... */if (prog == null) {
-      injector.messages.showStatusBarMessage(injector.messages.message(Msg.e_null))
+      injector.messages.showStatusBarMessage(null, injector.messages.message(Msg.e_null))
       return false
     }
 
@@ -1566,7 +1566,7 @@ class RegExp {
       retval = regtry(prog, col)
     }
     if (out_of_stack) {
-      injector.messages.showStatusBarMessage(injector.messages.message(Msg.E363))
+      injector.messages.showStatusBarMessage(null, injector.messages.message(Msg.E363))
     }
     return retval > 0
   }
@@ -1595,7 +1595,7 @@ class RegExp {
     }
 
     /* Be paranoid... */if (prog == null || line == null) {
-      injector.messages.showStatusBarMessage(injector.messages.message(Msg.e_null))
+      injector.messages.showStatusBarMessage(null, injector.messages.message(Msg.e_null))
       return retval
     }
 
@@ -1666,7 +1666,7 @@ class RegExp {
       }
     }
     if (out_of_stack) {
-      injector.messages.showStatusBarMessage(injector.messages.message(Msg.E363))
+      injector.messages.showStatusBarMessage(null, injector.messages.message(Msg.E363))
     }
 
     /* Didn't find a match. */
@@ -2232,7 +2232,7 @@ class RegExp {
               brace_max[no] = scan.OPERAND_MAX()
               brace_count[no] = 0
             } else {
-              injector.messages.showStatusBarMessage(injector.messages.message(Msg.e_internal))
+              injector.messages.showStatusBarMessage(null, injector.messages.message(Msg.e_internal))
               return false
             }
           }
@@ -2485,7 +2485,7 @@ class RegExp {
           }
           END -> return true /* Success! */
           else -> {
-            injector.messages.showStatusBarMessage(injector.messages.message(Msg.e_re_corr))
+            injector.messages.showStatusBarMessage(null, injector.messages.message(Msg.e_re_corr))
             return false
           }
         }
@@ -2496,7 +2496,7 @@ class RegExp {
         /*
          * We get here only if there's trouble -- normally "case END" is the
          * terminating point.
-         */injector.messages.showStatusBarMessage(injector.messages.message(Msg.e_re_corr))
+         */injector.messages.showStatusBarMessage(null, injector.messages.message(Msg.e_re_corr))
     return false
   }
 
@@ -2798,7 +2798,7 @@ class RegExp {
           break
         }
       }
-      else -> injector.messages.showStatusBarMessage(injector.messages.message(Msg.e_re_corr))
+      else -> injector.messages.showStatusBarMessage(null, injector.messages.message(Msg.e_re_corr))
     }
     if (mask != 0) {
       while (count < maxcount) {
@@ -2845,7 +2845,7 @@ class RegExp {
      */
   private fun prog_magic_wrong(): Boolean {
     if ((if (reg_match == null) reg_mmatch!!.regprog!!.program else reg_match!!.regprog!!.program)[0].code != REGMAGIC) {
-      injector.messages.showStatusBarMessage(injector.messages.message(Msg.e_re_corr))
+      injector.messages.showStatusBarMessage(null, injector.messages.message(Msg.e_re_corr))
       return true
     }
     return false
@@ -3183,7 +3183,7 @@ class RegExp {
     var mode = 0
 
     /* Be paranoid... */if (source == null) {
-      injector.messages.showStatusBarMessage(injector.messages.message(Msg.e_null))
+      injector.messages.showStatusBarMessage(null, injector.messages.message(Msg.e_null))
       return null
     }
     if (prog_magic_wrong()) {
@@ -3302,7 +3302,7 @@ class RegExp {
                   break
                 }
               } else if (s!!.isNul) /* we hit '\u0000'. */ {
-                injector.messages.showStatusBarMessage(injector.messages.message(Msg.e_re_damg))
+                injector.messages.showStatusBarMessage(null, injector.messages.message(Msg.e_re_damg))
                 return dst.toString()
               } else {
                 if (backslash && (s.charAt() == '\r' || s.charAt() == '\\')) {

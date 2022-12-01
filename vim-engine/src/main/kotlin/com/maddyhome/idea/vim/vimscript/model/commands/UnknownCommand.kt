@@ -60,7 +60,7 @@ data class UnknownCommand(val ranges: Ranges, val name: String, val argument: St
           }
         }
       } else {
-        injector.messages.showStatusBarMessage(injector.messages.message("recursion.detected.maximum.alias.depth.reached"))
+        injector.messages.showStatusBarMessage(editor, injector.messages.message("recursion.detected.maximum.alias.depth.reached"))
         injector.messages.indicateError()
         return ExecutionResult.Error
       }

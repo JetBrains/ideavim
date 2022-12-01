@@ -12,6 +12,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.wm.WindowManager
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimMessagesBase
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.MessageHelper
@@ -27,7 +28,7 @@ class IjVimMessages : VimMessagesBase() {
   private var error = false
   private var lastBeepTimeMillis = 0L
 
-  override fun showStatusBarMessage(message: String?) {
+  override fun showStatusBarMessage(editor: VimEditor?, message: String?) {
     if (ApplicationManager.getApplication().isUnitTestMode) {
       this.message = message
     }

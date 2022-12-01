@@ -36,7 +36,7 @@ sealed class CommandAlias(
       var compiledCommand = this.command
       val cleanedInput = input.trim().removePrefix(name).trim()
       if (minimumNumberOfArguments > 0 && cleanedInput.isEmpty()) {
-        injector.messages.showStatusBarMessage(injector.messages.message("e471.argument.required"))
+        injector.messages.showStatusBarMessage(editor = null, injector.messages.message("e471.argument.required"))
         injector.messages.indicateError()
         return GoalCommand.Ex.EMPTY
       }

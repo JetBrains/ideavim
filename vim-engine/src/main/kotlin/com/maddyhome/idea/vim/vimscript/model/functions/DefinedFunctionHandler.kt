@@ -66,7 +66,7 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) : FunctionH
 
     if (exceptionsCaught.isNotEmpty()) {
       injector.messages.indicateError()
-      injector.messages.showStatusBarMessage(exceptionsCaught.last().message)
+      injector.messages.showStatusBarMessage(editor, exceptionsCaught.last().message)
     }
     return returnValue ?: VimInt(0)
   }

@@ -9,7 +9,7 @@
 package com.maddyhome.idea.vim.api
 
 interface VimMessages {
-  fun showStatusBarMessage(message: String?)
+  fun showStatusBarMessage(editor: VimEditor?, message: String?)
   fun getStatusBarMessage(): String?
   fun indicateError()
   fun clearError()
@@ -18,7 +18,7 @@ interface VimMessages {
 
   fun updateStatusBar()
 
-  fun showMode(msg: String) {
-    showStatusBarMessage(msg)
+  fun showMode(editor: VimEditor?, msg: String) {
+    showStatusBarMessage(editor, msg)
   }
 }

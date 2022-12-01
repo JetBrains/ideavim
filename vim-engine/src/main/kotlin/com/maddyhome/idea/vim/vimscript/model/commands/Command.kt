@@ -61,8 +61,8 @@ sealed class Command(var commandRanges: Ranges, val commandArgument: String) : E
 
   @Throws(ExException::class)
   override fun execute(editor: VimEditor, context: ExecutionContext): ExecutionResult {
-    checkRanges()
-    checkArgument()
+    checkRanges(editor)
+    checkArgument(editor)
     if (editor.inVisualMode && Flag.SAVE_VISUAL !in argFlags.flags) {
       editor.exitVisualMode()
     }
@@ -104,14 +104,14 @@ sealed class Command(var commandRanges: Ranges, val commandArgument: String) : E
     return result
   }
 
-  private fun checkRanges() {
+  private fun checkRanges(editor: VimEditor) {
     if (RangeFlag.RANGE_FORBIDDEN == argFlags.rangeFlag && commandRanges.size() != 0) {
-      injector.messages.showStatusBarMessage(injector.messages.message(Msg.e_norange))
+      injector.messages.showStatusBarMessage(editor, injector.messages.message(Msg.e_norange))
       throw NoRangeAllowedException()
     }
 
     if (RangeFlag.RANGE_REQUIRED == argFlags.rangeFlag && commandRanges.size() == 0) {
-      injector.messages.showStatusBarMessage(injector.messages.message(Msg.e_rangereq))
+      injector.messages.showStatusBarMessage(editor, injector.messages.message(Msg.e_rangereq))
       throw MissingRangeException()
     }
 
@@ -120,14 +120,14 @@ sealed class Command(var commandRanges: Ranges, val commandArgument: String) : E
     }
   }
 
-  private fun checkArgument() {
+  private fun checkArgument(editor: VimEditor) {
     if (ArgumentFlag.ARGUMENT_FORBIDDEN == argFlags.argumentFlag && commandArgument.isNotBlank()) {
-      injector.messages.showStatusBarMessage(injector.messages.message(Msg.e_argforb))
+      injector.messages.showStatusBarMessage(editor, injector.messages.message(Msg.e_argforb))
       throw NoArgumentAllowedException()
     }
 
     if (ArgumentFlag.ARGUMENT_REQUIRED == argFlags.argumentFlag && commandArgument.isBlank()) {
-      injector.messages.showStatusBarMessage(injector.messages.message(Msg.e_argreq))
+      injector.messages.showStatusBarMessage(editor, injector.messages.message(Msg.e_argreq))
       throw MissingArgumentException()
     }
   }

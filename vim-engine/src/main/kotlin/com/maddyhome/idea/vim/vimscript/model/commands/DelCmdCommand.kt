@@ -22,7 +22,7 @@ data class DelCmdCommand(val ranges: Ranges, val argument: String) : Command.Sin
   override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_REQUIRED, Access.READ_ONLY)
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     if (!injector.commandGroup.hasAlias(argument)) {
-      injector.messages.showStatusBarMessage(injector.messages.message("e184.no.such.user.defined.command.0", argument))
+      injector.messages.showStatusBarMessage(editor, injector.messages.message("e184.no.such.user.defined.command.0", argument))
       return ExecutionResult.Error
     }
 

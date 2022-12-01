@@ -8,19 +8,9 @@
 
 package com.maddyhome.idea.vim.group.visual
 
-import com.maddyhome.idea.vim.api.VimCaret
-import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.VimMotionGroupBase
-import com.maddyhome.idea.vim.api.VimVisualPosition
-import com.maddyhome.idea.vim.api.getLineEndOffset
-import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.api.isLineEmpty
+import com.maddyhome.idea.vim.api.*
 import com.maddyhome.idea.vim.command.VimStateMachine
-import com.maddyhome.idea.vim.helper.inBlockSubMode
-import com.maddyhome.idea.vim.helper.inSelectMode
-import com.maddyhome.idea.vim.helper.inVisualMode
-import com.maddyhome.idea.vim.helper.mode
-import com.maddyhome.idea.vim.helper.subMode
+import com.maddyhome.idea.vim.helper.*
 
 fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: VimCaret) {
   val (start, end) = if (selectionStart > selectionEnd) selectionEnd to selectionStart else selectionStart to selectionEnd

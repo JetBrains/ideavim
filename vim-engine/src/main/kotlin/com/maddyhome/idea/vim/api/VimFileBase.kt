@@ -15,6 +15,6 @@ abstract class VimFileBase : VimFile {
     val offset = editor.currentCaret().offset.point
     val ch = editor.text()[offset]
 
-    injector.messages.showStatusBarMessage(toHexString(ch.code.toLong()))
+    injector.messages.showStatusBarMessage(editor, toHexString(ch.code.toLong()))
   }
 }
