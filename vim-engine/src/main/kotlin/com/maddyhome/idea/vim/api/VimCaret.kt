@@ -42,6 +42,7 @@ interface ImmutableVimCaret {
 
   val selectionStart: Int
   val selectionEnd: Int
+  val vimSelectionStart: Int
 
   val vimLastColumn: Int
 
@@ -72,7 +73,7 @@ interface VimCaret : ImmutableVimCaret {
 This variable shoul not exist. This is actually `< mark in visual selection. It should be refactored as we'll get
 per-caret marks.
 */
-  var vimSelectionStart: Int
+  override var vimSelectionStart: Int
 
   fun vimSelectionStartClear()
 

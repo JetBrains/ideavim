@@ -9,7 +9,7 @@
 package com.maddyhome.idea.vim.action.motion.`object`
 
 import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
@@ -27,12 +27,12 @@ class MotionInnerBlockAngleAction : TextObjectActionHandler() {
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
 
   override fun getRange(
-    editor: VimEditor,
-    caret: VimCaret,
-    context: ExecutionContext,
-    count: Int,
-    rawCount: Int,
-    argument: Argument?,
+      editor: VimEditor,
+      caret: ImmutableVimCaret,
+      context: ExecutionContext,
+      count: Int,
+      rawCount: Int,
+      argument: Argument?,
   ): TextRange? {
     return injector.searchHelper.findBlockRange(editor, caret, '<', count, false)
   }
@@ -45,12 +45,12 @@ class MotionInnerBlockBraceAction : TextObjectActionHandler() {
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
 
   override fun getRange(
-    editor: VimEditor,
-    caret: VimCaret,
-    context: ExecutionContext,
-    count: Int,
-    rawCount: Int,
-    argument: Argument?,
+      editor: VimEditor,
+      caret: ImmutableVimCaret,
+      context: ExecutionContext,
+      count: Int,
+      rawCount: Int,
+      argument: Argument?,
   ): TextRange? {
     return injector.searchHelper.findBlockRange(editor, caret, '{', count, false)
   }
@@ -63,12 +63,12 @@ class MotionInnerBlockBracketAction : TextObjectActionHandler() {
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
 
   override fun getRange(
-    editor: VimEditor,
-    caret: VimCaret,
-    context: ExecutionContext,
-    count: Int,
-    rawCount: Int,
-    argument: Argument?,
+      editor: VimEditor,
+      caret: ImmutableVimCaret,
+      context: ExecutionContext,
+      count: Int,
+      rawCount: Int,
+      argument: Argument?,
   ): TextRange? {
     return injector.searchHelper.findBlockRange(editor, caret, '[', count, false)
   }
@@ -81,12 +81,12 @@ class MotionInnerBlockParenAction : TextObjectActionHandler() {
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
 
   override fun getRange(
-    editor: VimEditor,
-    caret: VimCaret,
-    context: ExecutionContext,
-    count: Int,
-    rawCount: Int,
-    argument: Argument?,
+      editor: VimEditor,
+      caret: ImmutableVimCaret,
+      context: ExecutionContext,
+      count: Int,
+      rawCount: Int,
+      argument: Argument?,
   ): TextRange? {
     return injector.searchHelper.findBlockRange(editor, caret, '(', count, false)
   }
@@ -99,12 +99,12 @@ class MotionOuterBlockAngleAction : TextObjectActionHandler() {
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
 
   override fun getRange(
-    editor: VimEditor,
-    caret: VimCaret,
-    context: ExecutionContext,
-    count: Int,
-    rawCount: Int,
-    argument: Argument?,
+      editor: VimEditor,
+      caret: ImmutableVimCaret,
+      context: ExecutionContext,
+      count: Int,
+      rawCount: Int,
+      argument: Argument?,
   ): TextRange? {
     return injector.searchHelper.findBlockRange(editor, caret, '<', count, true)
   }
@@ -117,12 +117,12 @@ class MotionOuterBlockBraceAction : TextObjectActionHandler() {
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
 
   override fun getRange(
-    editor: VimEditor,
-    caret: VimCaret,
-    context: ExecutionContext,
-    count: Int,
-    rawCount: Int,
-    argument: Argument?,
+      editor: VimEditor,
+      caret: ImmutableVimCaret,
+      context: ExecutionContext,
+      count: Int,
+      rawCount: Int,
+      argument: Argument?,
   ): TextRange? {
     return injector.searchHelper.findBlockRange(editor, caret, '{', count, true)
   }
@@ -135,12 +135,12 @@ class MotionOuterBlockBracketAction : TextObjectActionHandler() {
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
 
   override fun getRange(
-    editor: VimEditor,
-    caret: VimCaret,
-    context: ExecutionContext,
-    count: Int,
-    rawCount: Int,
-    argument: Argument?,
+      editor: VimEditor,
+      caret: ImmutableVimCaret,
+      context: ExecutionContext,
+      count: Int,
+      rawCount: Int,
+      argument: Argument?,
   ): TextRange? {
     return injector.searchHelper.findBlockRange(editor, caret, '[', count, true)
   }
@@ -153,12 +153,12 @@ class MotionOuterBlockParenAction : TextObjectActionHandler() {
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
 
   override fun getRange(
-    editor: VimEditor,
-    caret: VimCaret,
-    context: ExecutionContext,
-    count: Int,
-    rawCount: Int,
-    argument: Argument?,
+      editor: VimEditor,
+      caret: ImmutableVimCaret,
+      context: ExecutionContext,
+      count: Int,
+      rawCount: Int,
+      argument: Argument?,
   ): TextRange? {
     return injector.searchHelper.findBlockRange(editor, caret, '(', count, true)
   }

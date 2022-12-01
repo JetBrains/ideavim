@@ -84,7 +84,7 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
 
   fun getHandlerOffset(
     editor: VimEditor,
-    caret: VimCaret,
+    caret: ImmutableVimCaret,
     context: ExecutionContext,
     argument: Argument?,
     operatorArguments: OperatorArguments,

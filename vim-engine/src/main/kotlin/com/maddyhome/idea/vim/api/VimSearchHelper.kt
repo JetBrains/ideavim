@@ -110,7 +110,7 @@ interface VimSearchHelper {
 
   fun findWordUnderCursor(
     editor: VimEditor,
-    caret: VimCaret,
+    caret: ImmutableVimCaret,
     count: Int,
     dir: Int,
     isOuter: Boolean,
@@ -120,35 +120,35 @@ interface VimSearchHelper {
 
   fun findSentenceRange(
     editor: VimEditor,
-    caret: VimCaret,
+    caret: ImmutableVimCaret,
     count: Int,
     isOuter: Boolean,
   ): TextRange
 
   fun findParagraphRange(
     editor: VimEditor,
-    caret: VimCaret,
+    caret: ImmutableVimCaret,
     count: Int,
     isOuter: Boolean,
   ): TextRange?
 
   fun findBlockTagRange(
     editor: VimEditor,
-    caret: VimCaret,
+    caret: ImmutableVimCaret,
     count: Int,
     isOuter: Boolean,
   ): TextRange?
 
   fun findBlockQuoteInLineRange(
     editor: VimEditor,
-    caret: VimCaret,
+    caret: ImmutableVimCaret,
     quote: Char,
     isOuter: Boolean,
   ): TextRange?
 
   fun findBlockRange(
     editor: VimEditor,
-    caret: VimCaret,
+    caret: ImmutableVimCaret,
     type: Char,
     count: Int,
     isOuter: Boolean,

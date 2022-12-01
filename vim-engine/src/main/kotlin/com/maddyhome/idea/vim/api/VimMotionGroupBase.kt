@@ -262,7 +262,7 @@ abstract class VimMotionGroupBase : VimMotionGroup {
 
   override fun getMotionRange(
     editor: VimEditor,
-    caret: VimCaret,
+    caret: ImmutableVimCaret,
     context: ExecutionContext,
     argument: Argument,
     operatorArguments: OperatorArguments,

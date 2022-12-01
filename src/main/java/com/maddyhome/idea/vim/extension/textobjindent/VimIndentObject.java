@@ -9,10 +9,7 @@
 package com.maddyhome.idea.vim.extension.textobjindent;
 
 import com.intellij.openapi.editor.Caret;
-import com.maddyhome.idea.vim.api.ExecutionContext;
-import com.maddyhome.idea.vim.api.VimCaret;
-import com.maddyhome.idea.vim.api.VimEditor;
-import com.maddyhome.idea.vim.api.VimInjectorKt;
+import com.maddyhome.idea.vim.api.*;
 import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.extension.ExtensionHandler;
@@ -98,7 +95,7 @@ public class VimIndentObject implements VimExtension {
       @Nullable
       @Override
       public TextRange getRange(@NotNull VimEditor editor,
-                                @NotNull VimCaret caret,
+                                @NotNull ImmutableVimCaret caret,
                                 @NotNull ExecutionContext context,
                                 int count,
                                 int rawCount,

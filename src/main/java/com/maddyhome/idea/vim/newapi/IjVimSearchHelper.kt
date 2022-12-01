@@ -10,7 +10,6 @@ package com.maddyhome.idea.vim.newapi
 
 import com.intellij.openapi.components.Service
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
-import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimSearchHelperBase
 import com.maddyhome.idea.vim.common.TextRange
@@ -126,7 +125,7 @@ class IjVimSearchHelper : VimSearchHelperBase() {
 
   override fun findWordUnderCursor(
     editor: VimEditor,
-    caret: VimCaret,
+    caret: ImmutableVimCaret,
     count: Int,
     dir: Int,
     isOuter: Boolean,
@@ -136,21 +135,21 @@ class IjVimSearchHelper : VimSearchHelperBase() {
     return SearchHelper.findWordUnderCursor(editor.ij, caret.ij, count, dir, isOuter, isBig, hasSelection)
   }
 
-  override fun findSentenceRange(editor: VimEditor, caret: VimCaret, count: Int, isOuter: Boolean): TextRange {
+  override fun findSentenceRange(editor: VimEditor, caret: ImmutableVimCaret, count: Int, isOuter: Boolean): TextRange {
     return SearchHelper.findSentenceRange(editor.ij, caret.ij, count, isOuter)
   }
 
-  override fun findParagraphRange(editor: VimEditor, caret: VimCaret, count: Int, isOuter: Boolean): TextRange? {
+  override fun findParagraphRange(editor: VimEditor, caret: ImmutableVimCaret, count: Int, isOuter: Boolean): TextRange? {
     return SearchHelper.findParagraphRange(editor.ij, caret.ij, count, isOuter)
   }
 
-  override fun findBlockTagRange(editor: VimEditor, caret: VimCaret, count: Int, isOuter: Boolean): TextRange? {
+  override fun findBlockTagRange(editor: VimEditor, caret: ImmutableVimCaret, count: Int, isOuter: Boolean): TextRange? {
     return SearchHelper.findBlockTagRange(editor.ij, caret.ij, count, isOuter)
   }
 
   override fun findBlockQuoteInLineRange(
     editor: VimEditor,
-    caret: VimCaret,
+    caret: ImmutableVimCaret,
     quote: Char,
     isOuter: Boolean,
   ): TextRange? {
@@ -159,7 +158,7 @@ class IjVimSearchHelper : VimSearchHelperBase() {
 
   override fun findBlockRange(
     editor: VimEditor,
-    caret: VimCaret,
+    caret: ImmutableVimCaret,
     type: Char,
     count: Int,
     isOuter: Boolean,

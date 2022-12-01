@@ -115,7 +115,7 @@ interface VimMotionGroup {
 
   fun repeatLastMatchChar(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Int
 
-  fun getMotionRange(editor: VimEditor, caret: VimCaret, context: ExecutionContext, argument: Argument, operatorArguments: OperatorArguments): TextRange?
+  fun getMotionRange(editor: VimEditor, caret: ImmutableVimCaret, context: ExecutionContext, argument: Argument, operatorArguments: OperatorArguments): TextRange?
 
   // TODO: These aren't caret motions. Should be moved to VimWindowGroup?
   fun moveCaretGotoNextTab(editor: VimEditor, context: ExecutionContext, rawCount: Int): Int

@@ -19,7 +19,7 @@ import com.intellij.psi.PsiWhiteSpace
 import com.intellij.psi.util.PsiTreeUtil
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getLineEndOffset
 import com.maddyhome.idea.vim.api.injector
@@ -190,12 +190,12 @@ class CommentaryExtension : VimExtension {
     override val visualType: TextObjectVisualType = TextObjectVisualType.LINE_WISE
 
     override fun getRange(
-      editor: VimEditor,
-      caret: VimCaret,
-      context: ExecutionContext,
-      count: Int,
-      rawCount: Int,
-      argument: Argument?,
+        editor: VimEditor,
+        caret: ImmutableVimCaret,
+        context: ExecutionContext,
+        count: Int,
+        rawCount: Int,
+        argument: Argument?,
     ): TextRange? {
 
       val nativeEditor = (editor as IjVimEditor).editor

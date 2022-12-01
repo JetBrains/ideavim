@@ -9,7 +9,7 @@
 package com.maddyhome.idea.vim.action.motion.`object`
 
 import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
@@ -27,12 +27,12 @@ class MotionInnerBlockBackQuoteAction : TextObjectActionHandler() {
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
 
   override fun getRange(
-    editor: VimEditor,
-    caret: VimCaret,
-    context: ExecutionContext,
-    count: Int,
-    rawCount: Int,
-    argument: Argument?,
+      editor: VimEditor,
+      caret: ImmutableVimCaret,
+      context: ExecutionContext,
+      count: Int,
+      rawCount: Int,
+      argument: Argument?,
   ): TextRange? {
     return injector.searchHelper.findBlockQuoteInLineRange(editor, caret, '`', false)
   }
@@ -45,12 +45,12 @@ class MotionInnerBlockDoubleQuoteAction : TextObjectActionHandler() {
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
 
   override fun getRange(
-    editor: VimEditor,
-    caret: VimCaret,
-    context: ExecutionContext,
-    count: Int,
-    rawCount: Int,
-    argument: Argument?,
+      editor: VimEditor,
+      caret: ImmutableVimCaret,
+      context: ExecutionContext,
+      count: Int,
+      rawCount: Int,
+      argument: Argument?,
   ): TextRange? {
     return injector.searchHelper.findBlockQuoteInLineRange(editor, caret, '"', false)
   }
@@ -63,12 +63,12 @@ class MotionInnerBlockSingleQuoteAction : TextObjectActionHandler() {
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
 
   override fun getRange(
-    editor: VimEditor,
-    caret: VimCaret,
-    context: ExecutionContext,
-    count: Int,
-    rawCount: Int,
-    argument: Argument?,
+      editor: VimEditor,
+      caret: ImmutableVimCaret,
+      context: ExecutionContext,
+      count: Int,
+      rawCount: Int,
+      argument: Argument?,
   ): TextRange? {
     return injector.searchHelper.findBlockQuoteInLineRange(editor, caret, '\'', false)
   }
@@ -81,12 +81,12 @@ class MotionOuterBlockBackQuoteAction : TextObjectActionHandler() {
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
 
   override fun getRange(
-    editor: VimEditor,
-    caret: VimCaret,
-    context: ExecutionContext,
-    count: Int,
-    rawCount: Int,
-    argument: Argument?,
+      editor: VimEditor,
+      caret: ImmutableVimCaret,
+      context: ExecutionContext,
+      count: Int,
+      rawCount: Int,
+      argument: Argument?,
   ): TextRange? {
     return injector.searchHelper.findBlockQuoteInLineRange(editor, caret, '`', true)
   }
@@ -99,12 +99,12 @@ class MotionOuterBlockDoubleQuoteAction : TextObjectActionHandler() {
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
 
   override fun getRange(
-    editor: VimEditor,
-    caret: VimCaret,
-    context: ExecutionContext,
-    count: Int,
-    rawCount: Int,
-    argument: Argument?,
+      editor: VimEditor,
+      caret: ImmutableVimCaret,
+      context: ExecutionContext,
+      count: Int,
+      rawCount: Int,
+      argument: Argument?,
   ): TextRange? {
     return injector.searchHelper.findBlockQuoteInLineRange(editor, caret, '"', true)
   }
@@ -117,12 +117,12 @@ class MotionOuterBlockSingleQuoteAction : TextObjectActionHandler() {
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
 
   override fun getRange(
-    editor: VimEditor,
-    caret: VimCaret,
-    context: ExecutionContext,
-    count: Int,
-    rawCount: Int,
-    argument: Argument?,
+      editor: VimEditor,
+      caret: ImmutableVimCaret,
+      context: ExecutionContext,
+      count: Int,
+      rawCount: Int,
+      argument: Argument?,
   ): TextRange? {
     return injector.searchHelper.findBlockQuoteInLineRange(editor, caret, '\'', true)
   }
