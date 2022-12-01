@@ -94,18 +94,20 @@ per-caret marks.
     // Make sure to always reposition the caret, even if the offset hasn't changed. We might need to reposition due to
     // changes in surrounding text, especially with inline inlays.
     val oldOffset = this.offset.point
-    val caretAfterMove = moveToInlayAwareOffset(offset)
+    var caretAfterMove = moveToInlayAwareOffset(offset)
 
     // Similarly, always make sure the caret is positioned within the view. Adding or removing text could move the caret
     // position relative to the view, without changing offset.
     if (this == editor.primaryCaret()) {
       injector.motion.scrollCaretIntoView(editor)
     }
-    if (editor.inVisualMode || editor.inSelectMode) {
+    caretAfterMove = if (editor.inVisualMode || editor.inSelectMode) {
       // Another inconsistency with immutable caret. This method should be called on the new caret instance.
       caretAfterMove.vimMoveSelectionToCaret(this.vimSelectionStart)
+      editor.findLastVersionOfCaret(caretAfterMove) ?: caretAfterMove
     } else {
       editor.exitVisualMode()
+      caretAfterMove
     }
     injector.motion.onAppCodeMovement(editor, this, offset, oldOffset)
     return caretAfterMove
