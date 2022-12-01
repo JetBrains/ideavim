@@ -306,8 +306,8 @@ class VimStateMachine(private val editor: VimEditor?) {
     return buildString {
       when (modeState.mode) {
         Mode.INSERT_NORMAL -> append("-- (insert) --")
-        Mode.INSERT -> append("INSERT")
-        Mode.REPLACE -> append("REPLACE")
+        Mode.INSERT -> append("-- INSERT --")
+        Mode.REPLACE -> append("-- REPLACE --")
         Mode.VISUAL -> {
           append("-- VISUAL")
           when (modeState.subMode) {
