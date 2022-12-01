@@ -48,7 +48,7 @@ abstract class VimOptionServiceBase : OptionService {
     ToggleOption(OptionConstants.numberName, OptionConstants.numberAlias, false),
     ToggleOption(OptionConstants.relativenumberName, OptionConstants.relativenumberAlias, false),
     ToggleOption(OptionConstants.showcmdName, OptionConstants.showcmdAlias, true),
-    ToggleOption(OptionConstants.showmodeName, OptionConstants.showmodeAlias, false),
+    ToggleOption(OptionConstants.showmodeName, OptionConstants.showmodeAlias, true),
     ToggleOption(OptionConstants.smartcaseName, OptionConstants.smartcaseAlias, false),
     ToggleOption(OptionConstants.startoflineName, OptionConstants.startoflineAlias, true),
     ToggleOption(OptionConstants.timeoutName, OptionConstants.timeoutAlias, true),
