@@ -13,3 +13,4 @@
   implementations that run tests on different editors.
   - To read: https://stackoverflow.com/a/67535682/3124227
 - Motion group has a lot of `move..` methods that don't actually move anything
+- Make non-null editor in `executeAction` method
