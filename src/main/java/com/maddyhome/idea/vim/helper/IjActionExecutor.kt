@@ -62,7 +62,7 @@ class IjActionExecutor : VimActionExecutor {
    * @param ijAction  The action to execute
    * @param context The context to run it in
    */
-  override fun executeAction(action: NativeAction, context: ExecutionContext): Boolean {
+  override fun executeAction(editor: VimEditor?, action: NativeAction, context: ExecutionContext): Boolean {
     val ijAction = (action as IjNativeAction).action
     val event = AnActionEvent(
       null, context.ij, ActionPlaces.KEYBOARD_SHORTCUT, ijAction.templatePresentation.clone(),
@@ -138,7 +138,7 @@ class IjActionExecutor : VimActionExecutor {
   override fun executeAction(name: @NonNls String, context: ExecutionContext): Boolean {
     val aMgr = ActionManager.getInstance()
     val action = aMgr.getAction(name)
-    return action != null && executeAction(IjNativeAction(action), context)
+    return action != null && executeAction(null, IjNativeAction(action), context)
   }
 
   override fun executeCommand(

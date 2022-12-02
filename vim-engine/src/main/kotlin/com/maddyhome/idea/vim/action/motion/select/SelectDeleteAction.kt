@@ -34,7 +34,7 @@ class SelectDeleteAction : VimActionHandler.SingleExecution() {
     val enterKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0)
     val actions = injector.keyGroup.getActions(editor, enterKeyStroke)
     for (action in actions) {
-      if (injector.actionExecutor.executeAction(action, context)) {
+      if (injector.actionExecutor.executeAction(editor, action, context)) {
         break
       }
     }

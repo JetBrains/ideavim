@@ -383,7 +383,7 @@ public class ChangeGroup extends VimChangeGroupBase {
     Function0<Unit> actionExecution = () -> {
       NativeAction joinLinesAction = VimInjectorKt.getInjector().getNativeActionManager().getIndentLines();
       if (joinLinesAction != null) {
-        VimInjectorKt.getInjector().getActionExecutor().executeAction(joinLinesAction, context);
+        VimInjectorKt.getInjector().getActionExecutor().executeAction(editor, joinLinesAction, context);
       }
       return null;
     };

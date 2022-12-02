@@ -231,7 +231,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
         for (lastStroke in myLastStrokes) {
           when (lastStroke) {
             is NativeAction -> {
-              injector.actionExecutor.executeAction(lastStroke, context)
+              injector.actionExecutor.executeAction(editor, lastStroke, context)
               strokes.add(lastStroke)
             }
 
@@ -478,7 +478,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       val action = injector.nativeActionManager.enterAction
       if (action != null) {
         strokes.add(action)
-        injector.actionExecutor.executeAction(action, context)
+        injector.actionExecutor.executeAction(editor, action, context)
       }
     }
   }
@@ -490,7 +490,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       val action = injector.nativeActionManager.createLineAboveCaret
       if (action != null) {
         strokes.add(action)
-        injector.actionExecutor.executeAction(action, context)
+        injector.actionExecutor.executeAction(editor, action, context)
       }
     }
   }
@@ -590,7 +590,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     val enterKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0)
     val actions = injector.keyGroup.getActions(editor, enterKeyStroke)
     for (action in actions) {
-      if (injector.actionExecutor.executeAction(action, context)) {
+      if (injector.actionExecutor.executeAction(editor, action, context)) {
         break
       }
     }
@@ -796,7 +796,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     for (i in 0 until executions) {
       val joinLinesAction = injector.nativeActionManager.joinLines
       if (joinLinesAction != null) {
-        injector.actionExecutor.executeAction(joinLinesAction, context)
+        injector.actionExecutor.executeAction(editor, joinLinesAction, context)
       }
     }
     return true
@@ -841,7 +841,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     }
     val joinLinesAction = injector.nativeActionManager.joinLines
     if (joinLinesAction != null) {
-      injector.actionExecutor.executeAction(joinLinesAction, context)
+      injector.actionExecutor.executeAction(editor, joinLinesAction, context)
     }
     editor.nativeCarets().forEach { caret: VimCaret ->
       caret.removeSelection()

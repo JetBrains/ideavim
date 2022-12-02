@@ -33,14 +33,14 @@ data class ActionCommand(val ranges: Ranges, val argument: String) : Command.Sin
     val actionName = argument.trim()
     val action = injector.actionExecutor.getAction(actionName) ?: throw ExException(injector.messages.message("action.not.found.0", actionName))
     if (injector.application.isUnitTest()) {
-      executeAction(action, context)
+      executeAction(editor, action, context)
     } else {
-      injector.application.runAfterGotFocus { executeAction(action, context) }
+      injector.application.runAfterGotFocus { executeAction(editor, action, context) }
     }
     return ExecutionResult.Success
   }
 
-  private fun executeAction(action: NativeAction, context: ExecutionContext) {
-    injector.actionExecutor.executeAction(action, context)
+  private fun executeAction(editor: VimEditor, action: NativeAction, context: ExecutionContext) {
+    injector.actionExecutor.executeAction(editor, action, context)
   }
 }

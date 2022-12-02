@@ -27,7 +27,7 @@ interface VimActionExecutor {
    * @param action  The action to execute
    * @param context The context to run it in
    */
-  fun executeAction(action: NativeAction, context: ExecutionContext): Boolean
+  fun executeAction(editor: VimEditor?, action: NativeAction, context: ExecutionContext): Boolean
 
   /**
    * Execute an action by name

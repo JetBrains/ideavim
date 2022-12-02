@@ -34,7 +34,7 @@ class CtrlDownAction : VimActionHandler.SingleExecution() {
     val keyStroke = keySet.first().first()
     val actions = injector.keyGroup.getKeymapConflicts(keyStroke)
     for (action in actions) {
-      if (injector.actionExecutor.executeAction(action, context)) break
+      if (injector.actionExecutor.executeAction(editor, action, context)) break
     }
     return true
   }
@@ -55,7 +55,7 @@ class CtrlUpAction : VimActionHandler.SingleExecution() {
     val keyStroke = keySet.first().first()
     val actions = injector.keyGroup.getKeymapConflicts(keyStroke)
     for (action in actions) {
-      if (injector.actionExecutor.executeAction(action, context)) break
+      if (injector.actionExecutor.executeAction(editor, action, context)) break
     }
     return true
   }

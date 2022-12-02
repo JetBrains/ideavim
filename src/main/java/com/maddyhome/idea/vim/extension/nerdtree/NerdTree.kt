@@ -137,7 +137,7 @@ class NerdTree : VimExtension {
 
   class IjCommandHandler(private val actionId: String) : CommandAliasHandler {
     override fun execute(command: String, ranges: Ranges, editor: VimEditor, context: ExecutionContext) {
-      callAction(actionId, context)
+      callAction(editor, actionId, context)
     }
   }
 
@@ -148,7 +148,7 @@ class NerdTree : VimExtension {
       if (toolWindow.isVisible) {
         toolWindow.hide()
       } else {
-        callAction("ActivateProjectToolWindow", context)
+        callAction(editor, "ActivateProjectToolWindow", context)
       }
     }
   }
@@ -210,7 +210,7 @@ class NerdTree : VimExtension {
 
           val action = nextNode.actionHolder
           when (action) {
-            is NerdAction.ToIj -> callAction(action.name, e.dataContext.vim)
+            is NerdAction.ToIj -> callAction(null, action.name, e.dataContext.vim)
             is NerdAction.Code -> e.project?.let { action.action(it, e.dataContext, e) }
           }
         }
@@ -348,7 +348,7 @@ class NerdTree : VimExtension {
         currentWindow?.split(SwingConstants.VERTICAL, true, file, true)
 
         // FIXME: 22.01.2021 This solution bouncing a bit
-        callAction("ActivateProjectToolWindow", context.vim)
+        callAction(null, "ActivateProjectToolWindow", context.vim)
       }
     )
     registerCommand(
@@ -359,7 +359,7 @@ class NerdTree : VimExtension {
         val currentWindow = splitters.currentWindow
         currentWindow?.split(SwingConstants.HORIZONTAL, true, file, true)
 
-        callAction("ActivateProjectToolWindow", context.vim)
+        callAction(null, "ActivateProjectToolWindow", context.vim)
       }
     )
     registerCommand(
@@ -497,20 +497,17 @@ class NerdTree : VimExtension {
 
     private val LOG = logger<NerdTree>()
 
-    fun callAction(name: String, context: ExecutionContext) {
+    fun callAction(editor: VimEditor?, name: String, context: ExecutionContext) {
       val action = ActionManager.getInstance().getAction(name) ?: run {
         VimPlugin.showMessage(MessageHelper.message("action.not.found.0", name))
         return
       }
       val application = ApplicationManager.getApplication()
       if (application.isUnitTestMode) {
-        injector.actionExecutor.executeAction(action.vim, context)
+        injector.actionExecutor.executeAction(editor, action.vim, context)
       } else {
         runAfterGotFocus {
-          injector.actionExecutor.executeAction(
-            action.vim,
-            context,
-          )
+          injector.actionExecutor.executeAction(editor, action.vim, context)
         }
       }
     }

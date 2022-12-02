@@ -16,7 +16,7 @@ import com.maddyhome.idea.vim.api.injector
 
 fun NativeAction?.execute(context: ExecutionContext) {
   if (this == null) return
-  injector.actionExecutor.executeAction(this, context)
+  injector.actionExecutor.executeAction(null, this, context)
 }
 
 val VisualPosition.vim: VimVisualPosition
