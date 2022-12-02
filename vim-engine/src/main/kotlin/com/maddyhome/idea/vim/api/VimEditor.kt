@@ -271,7 +271,7 @@ interface VimEditor {
    * Mostly related to Fleet. After the editor is modified, the carets are modified. You can't use the old caret
    *   instance and need to search for a new version.
    */
-  fun findLastVersionOfCaret(caret: VimCaret): VimCaret?
+  fun <T : ImmutableVimCaret> findLastVersionOfCaret(caret: T): T?
 }
 
 interface MutableVimEditor : VimEditor {

@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.yank
 
 import com.maddyhome.idea.vim.action.motion.updown.MotionDownLess1FirstNonSpaceAction
 import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getLineEndForOffset
@@ -28,7 +29,7 @@ open class YankGroupBase : VimYankGroup {
 
   private fun yankRange(
     editor: VimEditor,
-    caretToRange: Map<VimCaret, TextRange>,
+    caretToRange: Map<ImmutableVimCaret, TextRange>,
     range: TextRange,
     type: SelectionType,
     startOffsets: Map<VimCaret, Int>?,
@@ -88,7 +89,7 @@ open class YankGroupBase : VimYankGroup {
     val nativeCaretCount = editor.nativeCarets().size
     if (nativeCaretCount <= 0) return false
 
-    val caretToRange = HashMap<VimCaret, TextRange>(nativeCaretCount)
+    val caretToRange = HashMap<ImmutableVimCaret, TextRange>(nativeCaretCount)
     val ranges = ArrayList<Pair<Int, Int>>(nativeCaretCount)
 
     // This logic is from original vim
@@ -127,7 +128,7 @@ open class YankGroupBase : VimYankGroup {
   override fun yankLine(editor: VimEditor, count: Int): Boolean {
     val caretCount = editor.nativeCarets().size
     val ranges = ArrayList<Pair<Int, Int>>(caretCount)
-    val caretToRange = HashMap<VimCaret, TextRange>(caretCount)
+    val caretToRange = HashMap<ImmutableVimCaret, TextRange>(caretCount)
     for (caret in editor.nativeCarets()) {
       val start = injector.motion.moveCaretToCurrentLineStart(editor, caret)
       val end = min(injector.motion.moveCaretToRelativeLineEnd(editor, caret, count - 1, true) + 1, editor.fileSize().toInt())
@@ -153,7 +154,7 @@ open class YankGroupBase : VimYankGroup {
   override fun yankRange(editor: VimEditor, range: TextRange?, type: SelectionType, moveCursor: Boolean): Boolean {
     range ?: return false
 
-    val caretToRange = HashMap<VimCaret, TextRange>()
+    val caretToRange = HashMap<ImmutableVimCaret, TextRange>()
     val selectionType = if (type == SelectionType.CHARACTER_WISE && range.isMultiple) SelectionType.BLOCK_WISE else type
 
     if (type == SelectionType.LINE_WISE) {

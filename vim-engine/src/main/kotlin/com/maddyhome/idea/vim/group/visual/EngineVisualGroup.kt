@@ -129,7 +129,7 @@ fun VimCaret.vimUpdateEditorSelection() {
 /**
  * This works almost like [Caret.getLeadSelectionOffset] in IJ, but vim-specific
  */
-val VimCaret.vimLeadSelectionOffset: Int
+val ImmutableVimCaret.vimLeadSelectionOffset: Int
   get() {
     val caretOffset = offset.point
     if (hasSelection()) {

@@ -9,7 +9,7 @@
 package com.maddyhome.idea.vim.group.visual
 
 import com.maddyhome.idea.vim.api.BufferPosition
-import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimMotionGroupBase
 import com.maddyhome.idea.vim.api.injector
@@ -26,7 +26,7 @@ object VisualOperation {
   /**
    * Get [VisualChange] of current visual operation
    */
-  fun getRange(editor: VimEditor, caret: VimCaret, cmdFlags: EnumSet<CommandFlags>): VisualChange {
+  fun getRange(editor: VimEditor, caret: ImmutableVimCaret, cmdFlags: EnumSet<CommandFlags>): VisualChange {
     var (start, end) = caret.run {
       if (editor.inBlockSubMode) sort(vimSelectionStart, offset.point) else sort(selectionStart, selectionEnd)
     }
@@ -55,7 +55,7 @@ object VisualOperation {
   /**
    * Calculate end offset of [VisualChange]
    */
-  fun calculateRange(editor: VimEditor, range: VisualChange, count: Int, caret: VimCaret): Int {
+  fun calculateRange(editor: VimEditor, range: VisualChange, count: Int, caret: ImmutableVimCaret): Int {
     var (lines, chars, type) = range
     if (type == SelectionType.LINE_WISE || type == SelectionType.BLOCK_WISE || lines > 1) {
       lines *= count

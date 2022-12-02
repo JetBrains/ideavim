@@ -787,7 +787,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
 
   override fun joinViaIdeaByCount(editor: VimEditor, context: ExecutionContext, count: Int): Boolean {
     val executions = if (count > 1) count - 1 else 1
-    val allowedExecution = editor.nativeCarets().any { caret: VimCaret ->
+    val allowedExecution = editor.nativeCarets().any { caret: ImmutableVimCaret ->
       val lline = caret.getBufferPosition().line
       val total = editor.lineCount()
       lline + count <= total
@@ -854,7 +854,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
 
   override fun getDeleteRangeAndType(
     editor: VimEditor,
-    caret: VimCaret,
+    caret: ImmutableVimCaret,
     context: ExecutionContext,
     argument: Argument,
     isChange: Boolean,

@@ -143,7 +143,7 @@ abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
    *
    * it:
    * - Updates command state
-   * - Updates [VimCaret.vimSelectionStart] property
+   * - Updates [ImmutableVimCaret.vimSelectionStart] property
    * - Updates caret colors
    * - Updates care shape
    *

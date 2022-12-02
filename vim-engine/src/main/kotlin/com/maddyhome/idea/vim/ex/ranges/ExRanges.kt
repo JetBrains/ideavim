@@ -7,7 +7,7 @@
  */
 package com.maddyhome.idea.vim.ex.ranges
 
-import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.Direction
@@ -35,7 +35,7 @@ sealed class Range(
     return line + offset
   }
 
-  fun getLine(editor: VimEditor, caret: VimCaret, lastZero: Boolean): Int {
+  fun getLine(editor: VimEditor, caret: ImmutableVimCaret, lastZero: Boolean): Int {
     return if (offset == 0) getRangeLine(editor, lastZero) else getRangeLine(editor, caret, lastZero) + offset
   }
 
@@ -50,7 +50,7 @@ sealed class Range(
    */
   protected abstract fun getRangeLine(editor: VimEditor, lastZero: Boolean): Int
 
-  protected abstract fun getRangeLine(editor: VimEditor, caret: VimCaret, lastZero: Boolean): Int
+  protected abstract fun getRangeLine(editor: VimEditor, caret: ImmutableVimCaret, lastZero: Boolean): Int
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
@@ -150,7 +150,7 @@ class LineNumberRange : Range {
 
   override fun getRangeLine(
     editor: VimEditor,
-    caret: VimCaret,
+    caret: ImmutableVimCaret,
     lastZero: Boolean,
   ): Int {
     line = if (line == LAST_LINE) editor.lineCount() - 1 else caret.getBufferPosition().line
@@ -200,7 +200,7 @@ class MarkRange(private val mark: Char, offset: Int, move: Boolean) : Range(offs
     return mark?.line ?: -1
   }
 
-  override fun getRangeLine(editor: VimEditor, caret: VimCaret, lastZero: Boolean): Int = getRangeLine(editor, lastZero)
+  override fun getRangeLine(editor: VimEditor, caret: ImmutableVimCaret, lastZero: Boolean): Int = getRangeLine(editor, lastZero)
 
   override fun toString(): String = "MarkRange[mark=$mark, ${super.toString()}]"
   override fun equals(other: Any?): Boolean {
@@ -285,7 +285,7 @@ class SearchRange(pattern: String, offset: Int, move: Boolean) : Range(offset, m
 
   override fun getRangeLine(
     editor: VimEditor,
-    caret: VimCaret,
+    caret: ImmutableVimCaret,
     lastZero: Boolean,
   ): Int {
     var line = caret.getBufferPosition().line

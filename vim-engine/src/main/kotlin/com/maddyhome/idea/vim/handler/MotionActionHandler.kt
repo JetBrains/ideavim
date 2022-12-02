@@ -217,7 +217,7 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
   }
 
   private object CaretMergingWatcher : VimCaretListener {
-    override fun caretRemoved(caret: VimCaret?) {
+    override fun caretRemoved(caret: ImmutableVimCaret?) {
       caret ?: return
       val editor = caret.editor
       val caretToDelete = caret

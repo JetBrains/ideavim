@@ -8,7 +8,7 @@
 package com.maddyhome.idea.vim.action.copy
 
 import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
@@ -48,7 +48,7 @@ sealed class PutTextBaseAction(
     }
   }
 
-  private fun getPutDataForCaret(caret: VimCaret, count: Int): PutData {
+  private fun getPutDataForCaret(caret: ImmutableVimCaret, count: Int): PutData {
     val lastRegisterChar = injector.registerGroup.lastRegisterChar
     val register = caret.registerStorage.getRegister(caret, lastRegisterChar)
     val textData = register?.let {

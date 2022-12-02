@@ -12,7 +12,7 @@ import com.maddyhome.idea.vim.action.change.Extension.clean
 import com.maddyhome.idea.vim.action.change.Extension.lastExtensionHandler
 import com.maddyhome.idea.vim.action.change.VimRepeater.repeatHandler
 import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
@@ -150,7 +150,7 @@ class ToHandlerMappingInfo(
     // TODO: Is this legal? Should we assert in this case?
     val shouldCalculateOffsets: Boolean = vimStateMachine.isOperatorPending
 
-    val startOffsets: Map<VimCaret, Offset> = editor.carets().associateWith { it.offset }
+    val startOffsets: Map<ImmutableVimCaret, Offset> = editor.carets().associateWith { it.offset }
 
     if (extensionHandler.isRepeatable) {
       clean()
@@ -194,11 +194,11 @@ class ToHandlerMappingInfo(
     private fun myFun(
       shouldCalculateOffsets: Boolean,
       editor: VimEditor,
-      startOffsets: Map<VimCaret, Offset>,
+      startOffsets: Map<ImmutableVimCaret, Offset>,
     ) {
       val commandState = editor.vimStateMachine
       if (shouldCalculateOffsets && !commandState.commandBuilder.hasCurrentCommandPartArgument()) {
-        val offsets: MutableMap<VimCaret, VimSelection> = HashMap()
+        val offsets: MutableMap<ImmutableVimCaret, VimSelection> = HashMap()
         for (caret in editor.carets()) {
           var startOffset = startOffsets[caret]
           if (caret.hasSelection()) {

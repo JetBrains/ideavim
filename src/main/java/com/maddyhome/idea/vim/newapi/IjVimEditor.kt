@@ -20,6 +20,7 @@ import com.intellij.openapi.editor.impl.EditorImpl
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.maddyhome.idea.vim.api.BufferPosition
 import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.LineDeleteShift
 import com.maddyhome.idea.vim.api.MutableLinearEditor
 import com.maddyhome.idea.vim.api.VimCaret
@@ -422,7 +423,7 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
     return editor.foldingModel.getCollapsedRegionAtOffset(offset)?.let { TextRange(it.startOffset, it.endOffset) }
   }
 
-  override fun findLastVersionOfCaret(caret: VimCaret): VimCaret {
+  override fun <T : ImmutableVimCaret> findLastVersionOfCaret(caret: T): T {
     return caret
   }
 

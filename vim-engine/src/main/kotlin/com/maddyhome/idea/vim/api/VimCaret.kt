@@ -63,14 +63,12 @@ interface ImmutableVimCaret {
   val registerStorage: CaretRegisterStorage
 }
 
-// TODO: 29.12.2021 Split interface to mutable and immutable
 interface VimCaret : ImmutableVimCaret {
-
   override var vimLastColumn: Int
   fun resetLastColumn()
 
   /*
-This variable shoul not exist. This is actually `< mark in visual selection. It should be refactored as we'll get
+This variable should not exist. This is actually `< mark in visual selection. It should be refactored as we'll get
 per-caret marks.
 */
   override var vimSelectionStart: Int
@@ -140,14 +138,14 @@ interface CaretRegisterStorage {
   /**
    * Stores text to caret's recordable (named/numbered/unnamed) register
    */
-  fun storeText(caret: VimCaret, editor: VimEditor, range: TextRange, type: SelectionType, isDelete: Boolean): Boolean
+  fun storeText(caret: ImmutableVimCaret, editor: VimEditor, range: TextRange, type: SelectionType, isDelete: Boolean): Boolean
 
   /**
    * Gets text from caret's recordable register
    * If the register is not recordable - global text state will be returned
    */
-  fun getRegister(caret: VimCaret, r: Char): Register?
+  fun getRegister(caret: ImmutableVimCaret, r: Char): Register?
 
-  fun setKeys(caret: VimCaret, register: Char, keys: List<KeyStroke>)
-  fun saveRegister(caret: VimCaret, r: Char, register: Register)
+  fun setKeys(caret: ImmutableVimCaret, register: Char, keys: List<KeyStroke>)
+  fun saveRegister(caret: ImmutableVimCaret, r: Char, register: Register)
 }

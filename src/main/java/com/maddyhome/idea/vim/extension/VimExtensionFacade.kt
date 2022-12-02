@@ -13,6 +13,7 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.change.Extension
+import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.SelectionType
@@ -188,7 +189,7 @@ object VimExtensionFacade {
 
   /** Set the current contents of the given register */
   @JvmStatic
-  fun setRegisterForCaret(register: Char, caret: VimCaret, keys: List<KeyStroke?>?) {
+  fun setRegisterForCaret(register: Char, caret: ImmutableVimCaret, keys: List<KeyStroke?>?) {
     caret.registerStorage.setKeys(caret, register, keys?.filterNotNull() ?: emptyList())
   }
 

@@ -8,9 +8,9 @@
 
 package com.maddyhome.idea.vim.common
 
+import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.LineDeleteShift
 import com.maddyhome.idea.vim.api.MutableVimEditor
-import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getLineEndOffset
 import com.maddyhome.idea.vim.api.injector
@@ -85,7 +85,7 @@ val Int.pointer: Pointer
   get() = Pointer(this)
 
 interface VimMachine {
-  fun delete(range: VimRange, editor: VimEditor, caret: VimCaret): OperatedRange?
+  fun delete(range: VimRange, editor: VimEditor, caret: ImmutableVimCaret): OperatedRange?
 }
 
 abstract class VimMachineBase : VimMachine {
@@ -97,7 +97,7 @@ abstract class VimMachineBase : VimMachine {
    * - At what offset?
    * - What caret?
    */
-  override fun delete(range: VimRange, editor: VimEditor, caret: VimCaret): OperatedRange? {
+  override fun delete(range: VimRange, editor: VimEditor, caret: ImmutableVimCaret): OperatedRange? {
     val operatedText = editor.deleteDryRun(range) ?: return null
 
     val normalizedRange = operatedText.toNormalizedTextRange(editor)

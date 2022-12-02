@@ -11,7 +11,7 @@ package com.maddyhome.idea.vim.extension.replacewithregister
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getLineEndOffset
 import com.maddyhome.idea.vim.api.injector
@@ -84,7 +84,7 @@ class ReplaceWithRegister : VimExtension {
     override val isRepeatable: Boolean = true
 
     override fun execute(editor: VimEditor, context: ExecutionContext) {
-      val caretsAndSelections = mutableMapOf<VimCaret, VimSelection>()
+      val caretsAndSelections = mutableMapOf<ImmutableVimCaret, VimSelection>()
       editor.forEachCaret { caret ->
         val logicalLine = caret.getBufferPosition().line
         val lineStart = editor.getLineStartOffset(logicalLine)
@@ -142,7 +142,7 @@ class ReplaceWithRegister : VimExtension {
     @NonNls
     private const val RWR_VISUAL = "<Plug>ReplaceWithRegisterVisual"
 
-    private fun doReplace(editor: Editor, caret: VimCaret, visualSelection: PutData.VisualSelection) {
+    private fun doReplace(editor: Editor, caret: ImmutableVimCaret, visualSelection: PutData.VisualSelection) {
       val lastRegisterChar = injector.registerGroup.lastRegisterChar
       val savedRegister = caret.registerStorage.getRegister(caret, lastRegisterChar) ?: return
 
