@@ -20,11 +20,11 @@ import com.maddyhome.idea.vim.handler.toMotion
 
 class MotionFirstNonSpaceAction : MotionActionHandler.ForEachCaret() {
   override fun getOffset(
-      editor: VimEditor,
-      caret: ImmutableVimCaret,
-      context: ExecutionContext,
-      argument: Argument?,
-      operatorArguments: OperatorArguments,
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    context: ExecutionContext,
+    argument: Argument?,
+    operatorArguments: OperatorArguments,
   ): Motion {
     return injector.motion.moveCaretToCurrentLineStartSkipLeading(editor, caret).toMotion()
   }

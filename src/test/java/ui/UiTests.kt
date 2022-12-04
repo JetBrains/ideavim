@@ -209,7 +209,8 @@ class UiTests {
     editor.findText("class").click()
     remoteRobot.invokeActionJs("EditorPaste")
 
-    assertEquals(            """
+    assertEquals(
+      """
                 |EditorEscapeclass Main {
                 |  public static void main() {
                 |      if (true) {
@@ -217,7 +218,9 @@ class UiTests {
                 |      }
                 |  }
                 |}
-            """.trimMargin(), editor.text)
+            """.trimMargin(),
+      editor.text
+    )
 
     remoteRobot.invokeActionJs("GotoAction")
     assertFalse(hasText("Copy Action Id"))

@@ -25,11 +25,11 @@ class MotionLeftAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
   override fun getOffset(
-      editor: VimEditor,
-      caret: ImmutableVimCaret,
-      context: ExecutionContext,
-      argument: Argument?,
-      operatorArguments: OperatorArguments,
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    context: ExecutionContext,
+    argument: Argument?,
+    operatorArguments: OperatorArguments,
   ): Motion {
     val offsetOfHorizontalMotion =
       injector.motion.getOffsetOfHorizontalMotion(editor, caret, -operatorArguments.count1, false)
@@ -46,11 +46,11 @@ class MotionLeftInsertModeAction : MotionActionHandler.ForEachCaret(), Complicat
   )
 
   override fun getOffset(
-      editor: VimEditor,
-      caret: ImmutableVimCaret,
-      context: ExecutionContext,
-      argument: Argument?,
-      operatorArguments: OperatorArguments,
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    context: ExecutionContext,
+    argument: Argument?,
+    operatorArguments: OperatorArguments,
   ): Motion {
     val offsetOfHorizontalMotion =
       injector.motion.getOffsetOfHorizontalMotion(editor, caret, -operatorArguments.count1, false)

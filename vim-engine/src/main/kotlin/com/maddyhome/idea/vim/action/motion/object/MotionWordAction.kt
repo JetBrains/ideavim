@@ -24,12 +24,12 @@ class MotionInnerBigWordAction : TextObjectActionHandler() {
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
 
   override fun getRange(
-      editor: VimEditor,
-      caret: ImmutableVimCaret,
-      context: ExecutionContext,
-      count: Int,
-      rawCount: Int,
-      argument: Argument?,
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    context: ExecutionContext,
+    count: Int,
+    rawCount: Int,
+    argument: Argument?,
   ): TextRange {
     return getWordRange(editor, caret, count, isOuter = false, isBig = true)
   }
@@ -40,12 +40,12 @@ class MotionOuterBigWordAction : TextObjectActionHandler() {
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
 
   override fun getRange(
-      editor: VimEditor,
-      caret: ImmutableVimCaret,
-      context: ExecutionContext,
-      count: Int,
-      rawCount: Int,
-      argument: Argument?,
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    context: ExecutionContext,
+    count: Int,
+    rawCount: Int,
+    argument: Argument?,
   ): TextRange {
     return getWordRange(editor, caret, count, isOuter = true, isBig = true)
   }
@@ -56,12 +56,12 @@ class MotionInnerWordAction : TextObjectActionHandler() {
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
 
   override fun getRange(
-      editor: VimEditor,
-      caret: ImmutableVimCaret,
-      context: ExecutionContext,
-      count: Int,
-      rawCount: Int,
-      argument: Argument?,
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    context: ExecutionContext,
+    count: Int,
+    rawCount: Int,
+    argument: Argument?,
   ): TextRange {
     return getWordRange(editor, caret, count, isOuter = false, isBig = false)
   }
@@ -72,12 +72,12 @@ class MotionOuterWordAction : TextObjectActionHandler() {
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
 
   override fun getRange(
-      editor: VimEditor,
-      caret: ImmutableVimCaret,
-      context: ExecutionContext,
-      count: Int,
-      rawCount: Int,
-      argument: Argument?,
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    context: ExecutionContext,
+    count: Int,
+    rawCount: Int,
+    argument: Argument?,
   ): TextRange {
     return getWordRange(editor, caret, count, isOuter = true, isBig = false)
   }

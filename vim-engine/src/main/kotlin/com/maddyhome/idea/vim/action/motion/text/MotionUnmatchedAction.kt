@@ -28,11 +28,11 @@ sealed class MotionUnmatchedAction(private val motionChar: Char) : MotionActionH
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
   override fun getOffset(
-      editor: VimEditor,
-      caret: ImmutableVimCaret,
-      context: ExecutionContext,
-      argument: Argument?,
-      operatorArguments: OperatorArguments,
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    context: ExecutionContext,
+    argument: Argument?,
+    operatorArguments: OperatorArguments,
   ): Motion {
     return moveCaretToUnmatchedBlock(editor, caret, operatorArguments.count1, motionChar)
       .toMotionOrError()

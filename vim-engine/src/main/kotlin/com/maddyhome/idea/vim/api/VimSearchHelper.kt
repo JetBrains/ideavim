@@ -57,9 +57,9 @@ interface VimSearchHelper {
   ): Int
 
   fun findMethodEnd(
-      editor: VimEditor,
-      caret: ImmutableVimCaret,
-      count: Int,
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    count: Int,
   ): Int
 
   fun findMethodStart(

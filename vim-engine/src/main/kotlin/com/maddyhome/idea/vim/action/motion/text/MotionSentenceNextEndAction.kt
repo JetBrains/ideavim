@@ -30,11 +30,11 @@ sealed class MotionSentenceEndAction(val direction: Direction) : MotionActionHan
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
 
   override fun getOffset(
-      editor: VimEditor,
-      caret: ImmutableVimCaret,
-      context: ExecutionContext,
-      argument: Argument?,
-      operatorArguments: OperatorArguments,
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    context: ExecutionContext,
+    argument: Argument?,
+    operatorArguments: OperatorArguments,
   ): Motion {
     return moveCaretToNextSentenceEnd(editor, caret, direction.toInt() * operatorArguments.count1).toMotionOrError()
   }

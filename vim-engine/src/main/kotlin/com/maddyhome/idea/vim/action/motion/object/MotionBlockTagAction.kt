@@ -27,12 +27,12 @@ class MotionInnerBlockTagAction : TextObjectActionHandler() {
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
 
   override fun getRange(
-      editor: VimEditor,
-      caret: ImmutableVimCaret,
-      context: ExecutionContext,
-      count: Int,
-      rawCount: Int,
-      argument: Argument?,
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    context: ExecutionContext,
+    count: Int,
+    rawCount: Int,
+    argument: Argument?,
   ): TextRange? {
     return injector.searchHelper.findBlockTagRange(editor, caret, count, false)
   }
@@ -45,12 +45,12 @@ class MotionOuterBlockTagAction : TextObjectActionHandler() {
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
 
   override fun getRange(
-      editor: VimEditor,
-      caret: ImmutableVimCaret,
-      context: ExecutionContext,
-      count: Int,
-      rawCount: Int,
-      argument: Argument?,
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    context: ExecutionContext,
+    count: Int,
+    rawCount: Int,
+    argument: Argument?,
   ): TextRange? {
     return injector.searchHelper.findBlockTagRange(editor, caret, count, true)
   }

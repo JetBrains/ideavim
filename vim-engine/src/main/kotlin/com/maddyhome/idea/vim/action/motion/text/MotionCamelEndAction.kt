@@ -24,11 +24,11 @@ class MotionCamelEndRightAction : MotionCamelEndAction(Direction.FORWARDS)
 
 sealed class MotionCamelEndAction(val direction: Direction) : MotionActionHandler.ForEachCaret() {
   override fun getOffset(
-      editor: VimEditor,
-      caret: ImmutableVimCaret,
-      context: ExecutionContext,
-      argument: Argument?,
-      operatorArguments: OperatorArguments,
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    context: ExecutionContext,
+    argument: Argument?,
+    operatorArguments: OperatorArguments,
   ): Motion {
     return moveCaretToNextCamelEnd(editor, caret, direction.toInt() * operatorArguments.count1).toMotionOrError()
   }

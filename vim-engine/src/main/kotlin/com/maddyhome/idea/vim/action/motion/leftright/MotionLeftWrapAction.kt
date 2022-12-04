@@ -21,11 +21,11 @@ import kotlin.math.min
 
 class MotionLeftWrapAction : MotionActionHandler.ForEachCaret() {
   override fun getOffset(
-      editor: VimEditor,
-      caret: ImmutableVimCaret,
-      context: ExecutionContext,
-      argument: Argument?,
-      operatorArguments: OperatorArguments,
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    context: ExecutionContext,
+    argument: Argument?,
+    operatorArguments: OperatorArguments,
   ): Motion {
     val moveCaretHorizontalWrap = moveCaretHorizontalWrap(editor, caret, -operatorArguments.count1)
     return if (moveCaretHorizontalWrap < 0) Motion.Error else Motion.AbsoluteOffset(moveCaretHorizontalWrap)
@@ -36,11 +36,11 @@ class MotionLeftWrapAction : MotionActionHandler.ForEachCaret() {
 
 class MotionRightWrapAction : MotionActionHandler.ForEachCaret() {
   override fun getOffset(
-      editor: VimEditor,
-      caret: ImmutableVimCaret,
-      context: ExecutionContext,
-      argument: Argument?,
-      operatorArguments: OperatorArguments,
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    context: ExecutionContext,
+    argument: Argument?,
+    operatorArguments: OperatorArguments,
   ): Motion {
     return moveCaretHorizontalWrap(editor, caret, operatorArguments.count1).toMotionOrError()
   }

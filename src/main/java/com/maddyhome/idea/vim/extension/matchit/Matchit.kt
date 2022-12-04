@@ -73,11 +73,11 @@ class Matchit : VimExtension {
     override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
 
     override fun getOffset(
-        editor: VimEditor,
-        caret: ImmutableVimCaret,
-        context: ExecutionContext,
-        argument: Argument?,
-        operatorArguments: OperatorArguments,
+      editor: VimEditor,
+      caret: ImmutableVimCaret,
+      context: ExecutionContext,
+      argument: Argument?,
+      operatorArguments: OperatorArguments,
     ): Motion {
       return getMatchitOffset(editor.ij, caret.ij, operatorArguments.count0, isInOpPending, reverse).toMotionOrError()
     }

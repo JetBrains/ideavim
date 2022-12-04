@@ -25,11 +25,11 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
 class MotionLastScreenColumnAction : MotionActionHandler.ForEachCaret() {
   override fun getOffset(
-      editor: VimEditor,
-      caret: ImmutableVimCaret,
-      context: ExecutionContext,
-      argument: Argument?,
-      operatorArguments: OperatorArguments,
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    context: ExecutionContext,
+    argument: Argument?,
+    operatorArguments: OperatorArguments,
   ): Motion {
     var allow = false
     if (editor.inInsertMode) {

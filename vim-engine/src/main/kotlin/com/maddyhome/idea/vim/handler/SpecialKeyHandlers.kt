@@ -166,11 +166,11 @@ abstract class ShiftedArrowKeyHandler(private val runBothCommandsAsMulticaret: B
  */
 abstract class NonShiftedSpecialKeyHandler : MotionActionHandler.ForEachCaret() {
   final override fun getOffset(
-      editor: VimEditor,
-      caret: ImmutableVimCaret,
-      context: ExecutionContext,
-      argument: Argument?,
-      operatorArguments: OperatorArguments,
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    context: ExecutionContext,
+    argument: Argument?,
+    operatorArguments: OperatorArguments,
   ): Motion {
     val keymodel = (
       injector.optionService.getOptionValue(

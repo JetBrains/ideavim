@@ -162,7 +162,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     // Fix for https://youtrack.jetbrains.net/issue/VIM-35
     if (!range.normalize(editor.fileSize().toInt())) {
       updatedRange = if (range.startOffset == range.endOffset && range.startOffset == editor.fileSize()
-          .toInt() && range.startOffset != 0
+        .toInt() && range.startOffset != 0
       ) {
         TextRange(range.startOffset - 1, range.endOffset)
       } else {

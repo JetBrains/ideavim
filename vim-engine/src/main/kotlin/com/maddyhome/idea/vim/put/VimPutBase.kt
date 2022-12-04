@@ -205,8 +205,7 @@ abstract class VimPutBase : VimPut {
 
     val endOffset = if (indent) {
       doIndent(editor, updatedCaret, context, startOffset, startOffset + insertedText.length)
-    }
-    else {
+    } else {
       startOffset + insertedText.length
     }
     updatedCaret = moveCaretToEndPosition(editor, updatedCaret, startOffset, endOffset, type, mode, cursorAfter)
@@ -441,8 +440,8 @@ abstract class VimPutBase : VimPut {
             min(vimEditor.text().length, injector.motion.moveCaretToLineEnd(vimEditor, line, true) + 1)
           // At the end of a notebook cell the next symbol is a guard,
           // so we add a newline to be able to paste. Fixes VIM-2577
-          if (startOffset > 0 && vimEditor.document.getOffsetGuard(Offset(startOffset))!= null) {
-            application.runWriteAction { (vimEditor as MutableVimEditor).insertText((startOffset-1).offset, "\n") }
+          if (startOffset > 0 && vimEditor.document.getOffsetGuard(Offset(startOffset)) != null) {
+            application.runWriteAction { (vimEditor as MutableVimEditor).insertText((startOffset - 1).offset, "\n") }
           }
           if (startOffset > 0 && startOffset == vimEditor.text().length && vimEditor.text()[startOffset - 1] != '\n') {
             application.runWriteAction { (vimEditor as MutableVimEditor).insertText(startOffset.offset, "\n") }

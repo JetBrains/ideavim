@@ -22,12 +22,12 @@ class MotionHomeAction : NonShiftedSpecialKeyHandler() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
   override fun motion(
-      editor: VimEditor,
-      caret: ImmutableVimCaret,
-      context: ExecutionContext,
-      count: Int,
-      rawCount: Int,
-      argument: Argument?,
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    context: ExecutionContext,
+    count: Int,
+    rawCount: Int,
+    argument: Argument?,
   ): Motion {
     return injector.motion.moveCaretToCurrentLineStart(editor, caret).toMotionOrError()
   }

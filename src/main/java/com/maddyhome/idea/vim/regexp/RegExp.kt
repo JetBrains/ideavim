@@ -585,7 +585,8 @@ class RegExp {
       } else {
         val `val` = if (reg_magic >= MAGIC_ON) "" else "\\"
         injector.messages.showStatusBarMessage(
-          null, injector.messages.message(
+          null,
+          injector.messages.message(
             Msg.E62,
             `val`,
             Character.toString(Magic.no_Magic(peekchr()).toChar())
@@ -689,7 +690,8 @@ class RegExp {
         c = Magic.no_Magic(c)
         val `val` = if (if (c == '*'.code) reg_magic >= MAGIC_ON else reg_magic == MAGIC_ALL) "" else "\\"
         injector.messages.showStatusBarMessage(
-          null,injector.messages.message(
+          null,
+          injector.messages.message(
             Msg.E64,
             `val`,
             Character.toString(c.toChar())

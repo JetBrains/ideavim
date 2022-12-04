@@ -27,12 +27,12 @@ class MotionArrowUpAction : NonShiftedSpecialKeyHandler(), ComplicatedKeysAction
     setOf(injector.parser.parseKeys("<Up>"), listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_UP, 0)))
 
   override fun motion(
-      editor: VimEditor,
-      caret: ImmutableVimCaret,
-      context: ExecutionContext,
-      count: Int,
-      rawCount: Int,
-      argument: Argument?,
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    context: ExecutionContext,
+    count: Int,
+    rawCount: Int,
+    argument: Argument?,
   ): Motion {
     return injector.motion.getVerticalMotionOffset(editor, caret, -count)
   }

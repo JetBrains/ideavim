@@ -190,12 +190,12 @@ class CommentaryExtension : VimExtension {
     override val visualType: TextObjectVisualType = TextObjectVisualType.LINE_WISE
 
     override fun getRange(
-        editor: VimEditor,
-        caret: ImmutableVimCaret,
-        context: ExecutionContext,
-        count: Int,
-        rawCount: Int,
-        argument: Argument?,
+      editor: VimEditor,
+      caret: ImmutableVimCaret,
+      context: ExecutionContext,
+      count: Int,
+      rawCount: Int,
+      argument: Argument?,
     ): TextRange? {
 
       val nativeEditor = (editor as IjVimEditor).editor

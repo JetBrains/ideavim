@@ -38,11 +38,11 @@ abstract class MotionFirstScreenLineActionBase(private val operatorPending: Bool
   override val motionType: MotionType = MotionType.LINE_WISE
 
   override fun getOffset(
-      editor: VimEditor,
-      caret: ImmutableVimCaret,
-      context: ExecutionContext,
-      argument: Argument?,
-      operatorArguments: OperatorArguments,
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    context: ExecutionContext,
+    argument: Argument?,
+    operatorArguments: OperatorArguments,
   ): Motion {
 
     // Only apply scrolloff for NX motions. For op pending, use the actual first line and apply scrolloff after.

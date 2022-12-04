@@ -27,12 +27,12 @@ class MotionArrowDownAction : NonShiftedSpecialKeyHandler(), ComplicatedKeysActi
     setOf(injector.parser.parseKeys("<Down>"), listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_DOWN, 0)))
 
   override fun motion(
-      editor: VimEditor,
-      caret: ImmutableVimCaret,
-      context: ExecutionContext,
-      count: Int,
-      rawCount: Int,
-      argument: Argument?,
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    context: ExecutionContext,
+    count: Int,
+    rawCount: Int,
+    argument: Argument?,
   ): Motion {
     return injector.motion.getVerticalMotionOffset(editor, caret, count)
   }

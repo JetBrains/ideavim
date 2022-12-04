@@ -29,11 +29,11 @@ class MotionGotoFileMarkAction : MotionActionHandler.ForEachCaret() {
   override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_SAVE_JUMP)
 
   override fun getOffset(
-      editor: VimEditor,
-      caret: ImmutableVimCaret,
-      context: ExecutionContext,
-      argument: Argument?,
-      operatorArguments: OperatorArguments,
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    context: ExecutionContext,
+    argument: Argument?,
+    operatorArguments: OperatorArguments,
   ): Motion {
     if (argument == null) return Motion.Error
 
@@ -48,11 +48,11 @@ class MotionGotoFileMarkNoSaveJumpAction : MotionActionHandler.ForEachCaret() {
   override val argumentType: Argument.Type = Argument.Type.CHARACTER
 
   override fun getOffset(
-      editor: VimEditor,
-      caret: ImmutableVimCaret,
-      context: ExecutionContext,
-      argument: Argument?,
-      operatorArguments: OperatorArguments,
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    context: ExecutionContext,
+    argument: Argument?,
+    operatorArguments: OperatorArguments,
   ): Motion {
     if (argument == null) return Motion.Error
 

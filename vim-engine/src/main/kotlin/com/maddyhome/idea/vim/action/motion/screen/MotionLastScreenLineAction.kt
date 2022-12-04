@@ -38,11 +38,11 @@ abstract class MotionLastScreenLineActionBase(private val operatorPending: Boole
   override val motionType: MotionType = MotionType.LINE_WISE
 
   override fun getOffset(
-      editor: VimEditor,
-      caret: ImmutableVimCaret,
-      context: ExecutionContext,
-      argument: Argument?,
-      operatorArguments: OperatorArguments,
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    context: ExecutionContext,
+    argument: Argument?,
+    operatorArguments: OperatorArguments,
   ): Motion {
     return injector.motion.moveCaretToLastDisplayLine(editor, caret, operatorArguments.count1, !operatorPending)
       .toMotion()

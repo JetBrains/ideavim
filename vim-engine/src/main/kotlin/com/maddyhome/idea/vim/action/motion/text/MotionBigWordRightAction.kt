@@ -19,11 +19,11 @@ import com.maddyhome.idea.vim.handler.MotionActionHandler
 
 class MotionBigWordRightAction : MotionActionHandler.ForEachCaret() {
   override fun getOffset(
-      editor: VimEditor,
-      caret: ImmutableVimCaret,
-      context: ExecutionContext,
-      argument: Argument?,
-      operatorArguments: OperatorArguments,
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    context: ExecutionContext,
+    argument: Argument?,
+    operatorArguments: OperatorArguments,
   ): Motion {
     return injector.motion.findOffsetOfNextWord(editor, caret.offset.point, operatorArguments.count1, true)
   }

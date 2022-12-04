@@ -27,12 +27,12 @@ class MotionOuterParagraphAction : TextObjectActionHandler() {
   override val visualType: TextObjectVisualType = TextObjectVisualType.LINE_WISE
 
   override fun getRange(
-      editor: VimEditor,
-      caret: ImmutableVimCaret,
-      context: ExecutionContext,
-      count: Int,
-      rawCount: Int,
-      argument: Argument?,
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    context: ExecutionContext,
+    count: Int,
+    rawCount: Int,
+    argument: Argument?,
   ): TextRange? {
     return injector.searchHelper.findParagraphRange(editor, caret, count, true)
   }
@@ -45,12 +45,12 @@ class MotionInnerParagraphAction : TextObjectActionHandler() {
   override val visualType: TextObjectVisualType = TextObjectVisualType.LINE_WISE
 
   override fun getRange(
-      editor: VimEditor,
-      caret: ImmutableVimCaret,
-      context: ExecutionContext,
-      count: Int,
-      rawCount: Int,
-      argument: Argument?,
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    context: ExecutionContext,
+    count: Int,
+    rawCount: Int,
+    argument: Argument?,
   ): TextRange? {
     return injector.searchHelper.findParagraphRange(editor, caret, count, false)
   }
