@@ -366,7 +366,7 @@ By [Martin Yzeiri](https://github.com/myzeiri)
 Original plugin: [matchit.vim](https://github.com/chrisbra/matchit).
    
 ### Setup:
-- Add the following command to `~/.ideavimrc`: `packadd matchit'`
+- Add the following command to `~/.ideavimrc`: `packadd matchit`
     <details>
       <summary>Alternative syntax</summary>
       <code>Plug 'vim-matchit'</code>
