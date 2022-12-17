@@ -505,7 +505,7 @@ abstract class VimPutBase : VimPut {
         OperatorArguments(false, 0, editor.mode, editor.subMode)
       )
     }
-    val processedText = processText(editor, data) ?: return false
+    val processedText = processText(editor, caret, data) ?: return false
     val updatedCaret = putForCaret(editor, caret, data, additionalData, context, processedText)
     if (editor.primaryCaret() == updatedCaret && updateVisualMarks) {
       wrapInsertedTextWithVisualMarks(editor, data, processedText)

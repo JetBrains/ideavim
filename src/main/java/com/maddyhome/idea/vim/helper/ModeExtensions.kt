@@ -35,26 +35,6 @@ fun Editor.popAllModes() {
   }
 }
 
-@RWLockLabel.NoLockRequired
-fun Editor.exitVisualMode() {
-  val selectionType = SelectionType.fromSubMode(this.subMode)
-  SelectionVimListenerSuppressor.lock().use {
-    if (inBlockSubMode) {
-      this.caretModel.removeSecondaryCarets()
-    }
-    if (!this.vimKeepingVisualOperatorAction) {
-      this.caretModel.allCarets.forEach(Caret::removeSelection)
-    }
-  }
-  if (this.inVisualMode) {
-    this.vimLastSelectionType = selectionType
-    injector.markService.setVisualSelectionMarks(this.vim)
-    this.caretModel.allCarets.forEach { it.vimSelectionStartClear() }
-
-    this.vim.vimStateMachine.popModes()
-  }
-}
-
 /** [adjustCaretPosition] - if true, caret will be moved one char left if it's on the line end */
 fun Editor.exitSelectMode(adjustCaretPosition: Boolean) {
   if (!this.inSelectMode) return

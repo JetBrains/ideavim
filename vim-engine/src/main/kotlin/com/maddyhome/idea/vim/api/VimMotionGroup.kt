@@ -57,9 +57,8 @@ interface VimMotionGroup {
   fun moveCaretToCurrentDisplayLineEnd(editor: VimEditor, caret: ImmutableVimCaret, allowEnd: Boolean): Motion
 
   // Move caret to other
-  fun moveCaretToMark(editor: VimEditor, ch: Char, toLineStart: Boolean): Int
-  fun moveCaretToFileMark(editor: VimEditor, ch: Char, toLineStart: Boolean): Int
-  fun moveCaretToJump(editor: VimEditor, count: Int): Int
+  fun moveCaretToMark(caret: ImmutableVimCaret, ch: Char, toLineStart: Boolean): Int
+  fun moveCaretToJump(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Int
   fun moveCaretToMatchingPair(editor: VimEditor, caret: ImmutableVimCaret): Int
 
   /**
@@ -106,10 +105,6 @@ interface VimMotionGroup {
   fun getMotionRange(editor: VimEditor, caret: ImmutableVimCaret, context: ExecutionContext, argument: Argument, operatorArguments: OperatorArguments): TextRange?
 
   // TODO: These aren't caret motions. Should be moved to VimWindowGroup?
-  fun moveCaretToMiddleScreenLine(editor: VimEditor, caret: VimCaret): Int
-  fun moveCaretToFileMark(editor: VimEditor, caret: VimCaret, ch: Char, toLineStart: Boolean): Int
-  fun moveCaretToMark(editor: VimEditor, caret: VimCaret, ch: Char, toLineStart: Boolean): Int
-  fun moveCaretToJump(editor: VimEditor, count: Int): Int
   fun moveCaretGotoNextTab(editor: VimEditor, context: ExecutionContext, rawCount: Int): Int
   fun moveCaretGotoPreviousTab(editor: VimEditor, context: ExecutionContext, rawCount: Int): Int
   fun onAppCodeMovement(editor: VimEditor, caret: VimCaret, offset: Int, oldOffset: Int)

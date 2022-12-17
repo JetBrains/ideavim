@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.register
 
+import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getText
@@ -158,7 +159,7 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
 
   fun storeTextInternal(
     editor: VimEditor,
-    caret: VimCaret,
+    caret: ImmutableVimCaret,
     range: TextRange,
     text: String,
     type: SelectionType,
@@ -270,7 +271,7 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
    */
   override fun storeText(
     editor: VimEditor,
-    caret: VimCaret,
+    caret: ImmutableVimCaret,
     range: TextRange,
     type: SelectionType,
     isDelete: Boolean,

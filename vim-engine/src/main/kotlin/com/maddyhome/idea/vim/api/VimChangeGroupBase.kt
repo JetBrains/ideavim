@@ -1070,12 +1070,12 @@ abstract class VimChangeGroupBase : VimChangeGroup {
    * @param end    The end offset to change
    * @param str    The new text
    */
-  override fun replaceText(editor: VimEditor, start: Int, end: Int, str: String) {
+  override fun replaceText(editor: VimEditor, caret: VimCaret, start: Int, end: Int, str: String) {
     (editor as MutableVimEditor).replaceString(start, end, str)
 
     val newEnd = start + str.length
-    injector.markGroup.setChangeMarks(editor, TextRange(start, newEnd))
-    injector.markGroup.setMark(editor, MARK_CHANGE_POS, newEnd)
+    injector.markService.setChangeMarks(caret, TextRange(start, newEnd))
+    injector.markService.setMark(caret, VimMarkService.LAST_CHANGE_MARK, newEnd)
   }
 
   /**

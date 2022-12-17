@@ -8,10 +8,10 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
+import com.maddyhome.idea.vim.api.BufferPosition
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.VimLogicalPosition
 import com.maddyhome.idea.vim.api.getText
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
@@ -46,7 +46,7 @@ data class MoveTextCommand(val ranges: Ranges, val argument: String) : Command.S
 
     val line = min(editor.fileSize().toInt(), normalizeLine(editor, caret, goToLineCommand, lineRange))
     val range = getTextRange(editor, caret, false)
-    val shift = line + 1 - editor.offsetToLogicalPosition(range.startOffset).line
+    val shift = line + 1 - editor.offsetToBufferPosition(range.startOffset).line
 
     val text = editor.getText(range)
 
@@ -55,7 +55,7 @@ data class MoveTextCommand(val ranges: Ranges, val argument: String) : Command.S
       .toSet()
     val globalMarks = injector.markService.getGlobalMarks(editor)
       .filter { range.contains(it.offset(editor)) }
-      .map { Pair(it, it.logicalLine) } // we save logical line because it will be cleared after text deletion
+      .map { Pair(it, it.line) } // we save logical line because it will be cleared after text deletion
       .toSet()
 
     editor.deleteString(range)
@@ -79,14 +79,14 @@ data class MoveTextCommand(val ranges: Ranges, val argument: String) : Command.S
   }
 
   private fun shiftGlobalMark(editor: VimEditor, markAndLine: Pair<Mark, Int>, shift: Int) {
-    val newOffset = editor.logicalPositionToOffset(VimLogicalPosition(markAndLine.second + shift, markAndLine.first.col))
+    val newOffset = editor.bufferPositionToOffset(BufferPosition(markAndLine.second + shift, markAndLine.first.col))
     injector.markService.setGlobalMark(editor, markAndLine.first.key, newOffset)
   }
 
   private fun shiftLocalMark(caret: VimCaret, mark: Mark, shift: Int) {
     val editor = caret.editor
     val path = editor.getPath() ?: return
-    val mark = VimMark(mark.key, mark.logicalLine + shift, mark.col, path, editor.extractProtocol())
+    val mark = VimMark(mark.key, mark.line + shift, mark.col, path, editor.extractProtocol())
     injector.markService.setMark(caret, mark)
   }
 

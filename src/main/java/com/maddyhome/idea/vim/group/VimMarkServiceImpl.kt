@@ -66,7 +66,7 @@ class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateComponent<Elemen
             for (mark in globalMarks.values) {
                 val markElem = Element("mark")
                 markElem.setAttribute("key", mark.key.toString())
-                markElem.setAttribute("line", mark.logicalLine.toString())
+                markElem.setAttribute("line", mark.line.toString())
                 markElem.setAttribute("column", mark.col.toString())
                 markElem.setAttribute("filename", StringUtil.notNullize(mark.filepath))
                 markElem.setAttribute("protocol", StringUtil.notNullize(mark.protocol, "file"))
@@ -95,7 +95,7 @@ class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateComponent<Elemen
                     if (!Character.isUpperCase(mark.key) && injector.markService.isValidMark(mark.key, VimMarkService.Operation.SAVE, true)) {
                         val markElem = Element("mark")
                         markElem.setAttribute("key", mark.key.toString())
-                        markElem.setAttribute("line", mark.logicalLine.toString())
+                        markElem.setAttribute("line", mark.line.toString())
                         markElem.setAttribute("column", mark.col.toString())
                         fileMarkElem.addContent(markElem)
                     }
@@ -183,7 +183,7 @@ class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateComponent<Elemen
         ) {
             return super.createGlobalMark(editor, ch, offset)
         }
-        val lp = editor.offsetToLogicalPosition(offset)
+        val lp = editor.offsetToBufferPosition(offset)
         val line = lp.line
         val col = lp.column
         return createOrGetSystemMark(ch, line, col, editor)
