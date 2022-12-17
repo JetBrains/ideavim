@@ -78,7 +78,7 @@ abstract class VimMarkServiceBase : VimMarkService {
     return null
   }
 
-  protected fun getLocalMark(caret: VimCaret, char: Char): Mark? {
+  protected fun getLocalMark(caret: ImmutableVimCaret, char: Char): Mark? {
     val markChar = if (char == '`') '\'' else char
     if (!markChar.isLocalMark()) return null
     val editor = caret.editor
@@ -94,7 +94,7 @@ abstract class VimMarkServiceBase : VimMarkService {
     }
   }
 
-  override fun getMark(caret: VimCaret, char: Char): Mark? {
+  override fun getMark(caret: ImmutableVimCaret, char: Char): Mark? {
     val markChar = if (char == '`') '\'' else char
     if (!markChar.isValid(VimMarkService.Operation.GET, caret)) return null
 
@@ -113,7 +113,7 @@ abstract class VimMarkServiceBase : VimMarkService {
     }
   }
 
-  override fun getAllLocalMarks(caret: VimCaret): Set<Mark> {
+  override fun getAllLocalMarks(caret: ImmutableVimCaret): Set<Mark> {
     val path = caret.editor.getPath() ?: return emptySet()
     return if (caret.isPrimary) {
       getLocalMarks(path).values.toSet()
@@ -162,7 +162,7 @@ abstract class VimMarkServiceBase : VimMarkService {
     }
   }
 
-  override fun setMark(caret: VimCaret, mark: Mark): Boolean {
+  override fun setMark(caret: ImmutableVimCaret, mark: Mark): Boolean {
     val markChar = mark.key
 
     if (!markChar.isValid(VimMarkService.Operation.SET, caret)) return false
@@ -184,10 +184,10 @@ abstract class VimMarkServiceBase : VimMarkService {
     return false
   }
 
-  override fun setMark(caret: VimCaret, char: Char, offset: Int): Boolean {
+  override fun setMark(caret: ImmutableVimCaret, char: Char, offset: Int): Boolean {
     val markChar = if (char == '`') '\'' else char
     val editor = caret.editor
-    val position = editor.offsetToLogicalPosition(offset)
+    val position = editor.offsetToBufferPosition(offset)
     val path = editor.getPath() ?: return false
     val mark = VimMark(markChar, position.line, position.column, path, editor.extractProtocol())
     return setMark(caret, mark)
@@ -197,7 +197,7 @@ abstract class VimMarkServiceBase : VimMarkService {
     val markChar = if (char == '`') '\'' else char
     if (!markChar.isGlobalMark()) return null
     if (!markChar.isValid(VimMarkService.Operation.SET, editor.primaryCaret())) return null
-    val position = editor.offsetToLogicalPosition(offset)
+    val position = editor.offsetToBufferPosition(offset)
     val path = editor.getPath() ?: return null
     return VimMark(markChar, position.line, position.column, path, editor.extractProtocol())
   }
@@ -213,7 +213,7 @@ abstract class VimMarkServiceBase : VimMarkService {
     return true
   }
 
-  override fun setMarkForCaret(caret: VimCaret, char: Char, offset: Int): Boolean {
+  override fun setMarkForCaret(caret: ImmutableVimCaret, char: Char, offset: Int): Boolean {
     val markChar = if (char == '`') '\'' else char
     if (!markChar.isValid(VimMarkService.Operation.SET, caret)) return false
     return when {
@@ -234,25 +234,25 @@ abstract class VimMarkServiceBase : VimMarkService {
       .forEach { setVisualSelectionMarks(it.first, it.second) }
   }
 
-  override fun setVisualSelectionMarks(caret: VimCaret, range: TextRange) {
+  override fun setVisualSelectionMarks(caret: ImmutableVimCaret, range: TextRange) {
     setMark(caret, SELECTION_START_MARK, range.startOffset)
     setMark(caret, SELECTION_END_MARK, range.endOffset)
   }
 
-  override fun getVisualSelectionMarks(caret: VimCaret): TextRange? {
+  override fun getVisualSelectionMarks(caret: ImmutableVimCaret): TextRange? {
     return getMarksRange(caret, SELECTION_START_MARK, SELECTION_END_MARK)
   }
 
-  override fun setChangeMarks(caret: VimCaret, range: TextRange) {
+  override fun setChangeMarks(caret: ImmutableVimCaret, range: TextRange) {
     setMark(caret, CHANGE_START_MARK, range.startOffset)
     setMark(caret, CHANGE_END_MARK, range.endOffset - 1)
   }
 
-  override fun getChangeMarks(caret: VimCaret): TextRange? {
+  override fun getChangeMarks(caret: ImmutableVimCaret): TextRange? {
     return getMarksRange(caret, CHANGE_START_MARK, CHANGE_END_MARK)
   }
 
-  private fun getMarksRange(caret: VimCaret, startMark: Char, endMark: Char): TextRange? {
+  private fun getMarksRange(caret: ImmutableVimCaret, startMark: Char, endMark: Char): TextRange? {
     val editor = caret.editor
     val startOffset = getLocalMark(caret, startMark)
       ?.offset(editor) ?: return null
@@ -272,7 +272,7 @@ abstract class VimMarkServiceBase : VimMarkService {
     }
   }
 
-  override fun removeLocalMark(caret: VimCaret, char: Char) {
+  override fun removeLocalMark(caret: ImmutableVimCaret, char: Char) {
     val markChar = if (char == '`') '\'' else char
     if (!markChar.isLocalMark()) return
 
@@ -296,16 +296,16 @@ abstract class VimMarkServiceBase : VimMarkService {
     if (marks.isEmpty()) return
 
     val insertEndOffset = insertStartOffset + insertLength
-    val insStart = editor.offsetToLogicalPosition(insertStartOffset)
-    val insEnd = editor.offsetToLogicalPosition(insertEndOffset)
+    val insStart = editor.offsetToBufferPosition(insertStartOffset)
+    val insEnd = editor.offsetToBufferPosition(insertEndOffset)
     logger.debug { "mark insert. insStart = $insertStartOffset, insEnd = $insertEndOffset" }
     val lines = insEnd.line - insStart.line
     if (lines == 0) return
 
     for (mark in marks.filterIsInstance<VimMark>()) {
       logger.debug { "mark = $mark" }
-      if (insStart.line < mark.logicalLine) {
-        mark.logicalLine = mark.logicalLine + lines
+      if (insStart.line < mark.line) {
+        mark.line = mark.line + lines
         logger.debug { "Shifting mark by $lines lines" }
       }
     }
@@ -316,19 +316,19 @@ abstract class VimMarkServiceBase : VimMarkService {
     if (marks.isEmpty()) return
 
     val delEndOffset = delStartOffset + delLength - 1
-    val delStart = editor.offsetToLogicalPosition(delStartOffset)
-    val delEnd = editor.offsetToLogicalPosition(delEndOffset + 1)
+    val delStart = editor.offsetToBufferPosition(delStartOffset)
+    val delEnd = editor.offsetToBufferPosition(delEndOffset + 1)
     logger.debug { "mark delete. delStart = $delStart, delEnd = $delEnd" }
 
     for (mark in marks.filterIsInstance<VimMark>()) {
       logger.debug { "mark = $mark" }
-      if (delEnd.line < mark.logicalLine) {
+      if (delEnd.line < mark.line) {
         val lines = delEnd.line - delStart.line
         logger.debug { "Shifting mark by $lines lines" }
-        mark.logicalLine = mark.logicalLine - lines
-      } else if (delStart.line <= mark.logicalLine) {
-        val markLineStartOffset = injector.engineEditorHelper.getLineStartOffset(editor, mark.logicalLine)
-        val markLineEndOffset = injector.engineEditorHelper.getLineEndOffset(editor, mark.logicalLine, true)
+        mark.line = mark.line - lines
+      } else if (delStart.line <= mark.line) {
+        val markLineStartOffset = editor.getLineStartOffset(mark.line)
+        val markLineEndOffset = editor.getLineEndOffset(mark.line, true)
 
         val command = editor.vimStateMachine.executingCommand
         // If text is being changed from the start of the mark line (a special case for mark deletion)
@@ -337,9 +337,9 @@ abstract class VimMarkServiceBase : VimMarkService {
         if (delStartOffset <= markLineStartOffset && delEndOffset >= markLineEndOffset && !changeFromMarkLineStart) {
           injector.markService.removeMark(editor, mark.key)
           logger.debug("Removed mark")
-        } else if (delStart.line < mark.logicalLine) {
+        } else if (delStart.line < mark.line) {
           // shift mark
-          mark.logicalLine = delStart.line
+          mark.line = delStart.line
           logger.debug { "Shifting mark to line " + delStart.line }
         } // The deletion only covers part of the marked line so shift the mark only if the deletion begins
         // on a line prior to the marked line (which means the deletion must end on the marked line).
@@ -348,10 +348,10 @@ abstract class VimMarkServiceBase : VimMarkService {
   }
 
   override fun editorReleased(editor: VimEditor) {
-    setMark(editor.primaryCaret(), VimMarkService.LAST_BUFFER_POSITION, editor.primaryCaret().offset.point)
+    setMark(editor.primaryCaret(), LAST_BUFFER_POSITION, editor.primaryCaret().offset.point)
   }
 
-  override fun resetAllMarksForCaret(caret: VimCaret) {
+  override fun resetAllMarksForCaret(caret: ImmutableVimCaret) {
     if (caret.isPrimary) {
       filepathToLocalMarks.clear()
     } else {
@@ -408,7 +408,7 @@ abstract class VimMarkServiceBase : VimMarkService {
     }
   }
 
-  private fun Char.isValid(operation: VimMarkService.Operation, caret: VimCaret): Boolean {
+  private fun Char.isValid(operation: VimMarkService.Operation, caret: ImmutableVimCaret): Boolean {
     return isValidMark(this, operation, caret.isPrimary)
   }
 
@@ -430,34 +430,34 @@ abstract class VimMarkServiceBase : VimMarkService {
   }
 
 
-  private fun getParagraphMark(editor: VimEditor, caret: VimCaret, char: Char): VimMark? {
+  private fun getParagraphMark(editor: VimEditor, caret: ImmutableVimCaret, char: Char): VimMark? {
     val path = editor.getPath() ?: return null
     val count = when (char) {
-      VimMarkService.PARAGRAPH_START_MARK -> -1
-      VimMarkService.PARAGRAPH_END_MARK -> 1
+      PARAGRAPH_START_MARK -> -1
+      PARAGRAPH_END_MARK -> 1
       else -> throw IllegalArgumentException("Invalid paragraph mark char")
     }
     var offset = injector.searchHelper.findNextParagraph(editor, caret, count, allowBlanks = false)
-    offset = injector.engineEditorHelper.normalizeOffset(editor, offset, false)
-    val lp = editor.offsetToLogicalPosition(offset)
+    offset = editor.normalizeOffset(offset, false)
+    val lp = editor.offsetToBufferPosition(offset)
     return VimMark(char, lp.line, lp.column, path, editor.extractProtocol())
   }
 
-  private fun getSentenceMark(editor: VimEditor, caret: VimCaret, char: Char): VimMark? {
+  private fun getSentenceMark(editor: VimEditor, caret: ImmutableVimCaret, char: Char): VimMark? {
     val path = editor.getPath() ?: return null
     val count = when (char) {
-      VimMarkService.SENTENCE_START_MARK -> -1
-      VimMarkService.SENTENCE_END_MARK -> 1
+      SENTENCE_START_MARK -> -1
+      SENTENCE_END_MARK -> 1
       else -> throw IllegalArgumentException("Invalid sentence mark char")
     }
     var offset = injector.searchHelper.findNextSentenceStart(editor, caret, count, countCurrent = false, requireAll = true)
-    offset = injector.engineEditorHelper.normalizeOffset(editor, offset, false)
-    val lp = editor.offsetToLogicalPosition(offset)
+    offset = editor.normalizeOffset(offset, false)
+    val lp = editor.offsetToBufferPosition(offset)
     return VimMark(char, lp.line, lp.column, path, editor.extractProtocol())
   }
 }
 
-class LocalMarkStorage(var caret: VimCaret) {
+class LocalMarkStorage(var caret: ImmutableVimCaret) {
   private val marks = HashMap<Char, Mark>()
 
   fun getMarks(): Map<Char, Mark> {
@@ -466,7 +466,6 @@ class LocalMarkStorage(var caret: VimCaret) {
 
   fun getMark(char: Char): Mark? {
     if (caret.isPrimary) {
-      val editor = caret.editor
       return injector.markService.getMark(caret, char)
     }
     return marks[char]
@@ -482,7 +481,7 @@ class LocalMarkStorage(var caret: VimCaret) {
     return true
   }
 
-  fun removeMark(char: Char, caret: VimCaret) {
+  fun removeMark(char: Char, caret: ImmutableVimCaret) {
     // todo avoid this because of the stackOverflow
     if (caret.isPrimary) {
       val editor = caret.editor
@@ -492,7 +491,7 @@ class LocalMarkStorage(var caret: VimCaret) {
     }
   }
 
-  fun clear(caret: VimCaret) {
+  fun clear(caret: ImmutableVimCaret) {
     if (caret.isPrimary) {
       injector.markService.resetAllMarksForCaret(caret)
     } else {

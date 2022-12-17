@@ -44,12 +44,12 @@ interface VimMarkService {
   /**
    * Get mark for specified caret
    */
-  fun getMark(caret: VimCaret, char: Char): Mark?
+  fun getMark(caret: ImmutableVimCaret, char: Char): Mark?
 
   /**
    * Gets all marks for caret
    */
-  fun getAllLocalMarks(caret: VimCaret): Set<Mark>
+  fun getAllLocalMarks(caret: ImmutableVimCaret): Set<Mark>
 
   /**
    * Get all marks for specified filepath (for all carets in all editors)
@@ -75,17 +75,17 @@ interface VimMarkService {
    * @return        True if a valid, writable mark, false if not
    */
   fun setMark(editor: VimEditor, char: Char): Boolean
-  fun setMark(caret: VimCaret, mark: Mark): Boolean
-  fun setMark(caret: VimCaret, char: Char, offset: Int): Boolean
+  fun setMark(caret: ImmutableVimCaret, mark: Mark): Boolean
+  fun setMark(caret: ImmutableVimCaret, char: Char, offset: Int): Boolean
   fun setGlobalMark(editor: VimEditor, char: Char, offset: Int): Boolean
   fun setGlobalMark(editor: VimEditor, mark: Mark): Boolean
 
   fun setVisualSelectionMarks(editor: VimEditor)
-  fun setVisualSelectionMarks(caret: VimCaret, range: TextRange)
-  fun getVisualSelectionMarks(caret: VimCaret): TextRange?
+  fun setVisualSelectionMarks(caret: ImmutableVimCaret, range: TextRange)
+  fun getVisualSelectionMarks(caret: ImmutableVimCaret): TextRange?
 
-  fun setChangeMarks(caret: VimCaret, range: TextRange)
-  fun getChangeMarks(caret: VimCaret): TextRange?
+  fun setChangeMarks(caret: ImmutableVimCaret, range: TextRange)
+  fun getChangeMarks(caret: ImmutableVimCaret): TextRange?
 
   /**
    * Sets the specified mark to the specified location
@@ -95,7 +95,7 @@ interface VimMarkService {
    * @param offset  The offset to set the mark to
    * @return        True if a valid, writable mark, false if not
    */
-  fun setMarkForCaret(caret: VimCaret, char: Char, offset: Int): Boolean
+  fun setMarkForCaret(caret: ImmutableVimCaret, char: Char, offset: Int): Boolean
 
   /**
    * Removes mark for all carets in the editor
@@ -105,7 +105,7 @@ interface VimMarkService {
   /**
    * Removes mark for the given caret
    */
-  fun removeLocalMark(caret: VimCaret, char: Char)
+  fun removeLocalMark(caret: ImmutableVimCaret, char: Char)
 
   // used to override it with IDE marks logic
   // or make it protected in base class?
@@ -134,7 +134,7 @@ interface VimMarkService {
 
   fun editorReleased(editor: VimEditor)
 
-  fun resetAllMarksForCaret(caret: VimCaret)
+  fun resetAllMarksForCaret(caret: ImmutableVimCaret)
 
   fun resetAllMarks()
 

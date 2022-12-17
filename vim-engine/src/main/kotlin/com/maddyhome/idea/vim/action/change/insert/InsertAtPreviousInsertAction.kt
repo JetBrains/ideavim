@@ -9,6 +9,7 @@ package com.maddyhome.idea.vim.action.change.insert
 
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.VimMarkService
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
@@ -43,7 +44,7 @@ class InsertAtPreviousInsertAction : ChangeEditorActionHandler.SingleExecution()
 fun insertAtPreviousInsert(editor: VimEditor, context: ExecutionContext) {
   editor.removeSecondaryCarets()
   val caret = editor.primaryCaret()
-  val offset = injector.motion.moveCaretToMark(editor, editor.primaryCaret(), '^', false)
+  val offset = injector.motion.moveCaretToMark(editor.primaryCaret(), VimMarkService.INSERT_EXIT_MARK, false)
   if (offset != -1) {
     caret.moveToOffset(offset)
   }

@@ -250,10 +250,10 @@ public class MotionGroup extends VimMotionGroupBase {
     AppCodeTemplates.onMovement(((IjVimEditor)editor).getEditor(), ((IjVimCaret)caret).getCaret(), oldOffset < offset);
   }
 
-  private @Nullable Editor selectEditor(@NotNull Editor editor, @NotNull Mark mark) {
+  private @Nullable Editor selectEditor(@NotNull Project project, @NotNull Mark mark) {
     final VirtualFile virtualFile = markToVirtualFile(mark);
     if (virtualFile != null) {
-      return selectEditor(editor, virtualFile);
+      return selectEditor(project, virtualFile);
     }
     else {
       return null;
@@ -266,8 +266,8 @@ public class MotionGroup extends VimMotionGroupBase {
     return fileSystem.findFileByPath(mark.getFilepath());
   }
 
-  private @Nullable Editor selectEditor(@NotNull Editor editor, @NotNull VirtualFile file) {
-    return VimPlugin.getFile().selectEditor(editor.getProject(), file);
+  private @Nullable Editor selectEditor(@NotNull Project project, @NotNull VirtualFile file) {
+    return VimPlugin.getFile().selectEditor(project, file);
   }
 
   @Override
@@ -608,46 +608,39 @@ public class MotionGroup extends VimMotionGroupBase {
   }
 
   @Override
-  public int moveCaretToFileMark(@NotNull VimEditor editor, @NotNull VimCaret caret, char ch, boolean toLineStart) {
-    final Mark mark = VimInjectorKt.injector.getMarkService().getMark(caret, ch);
+  public int moveCaretToMark(@NotNull ImmutableVimCaret caret, char ch, boolean toLineStart) {
+    VimMarkService markService = VimInjectorKt.injector.getMarkService();
+    final Mark mark = markService.getMark(caret, ch);
     if (mark == null) return -1;
 
-    final int line = mark.getLine();
-    return toLineStart
-           ? moveCaretToLineStartSkipLeading(editor, line)
-           : editor.bufferPositionToOffset(new BufferPosition(line, mark.getCol(), false));
-  }
-
-
-  @Override
-  public int moveCaretToMark(@NotNull VimEditor editor, @NotNull VimCaret caret, char ch, boolean toLineStart) {
-    final Mark mark = VimInjectorKt.injector.getMarkService().getMark(caret, ch);
-    if (mark == null) return -1;
-
-    final VirtualFile vf = getVirtualFile(((IjVimEditor)editor).getEditor());
-    if (vf == null) return -1;
+    final VimEditor caretEditor = caret.getEditor();
+    final VirtualFile caretVirtualFile = getVirtualFile(((IjVimEditor)caretEditor).getEditor());
 
     final int line = mark.getLine();
-    if (vf.getPath().equals(mark.getFilepath())) {
+
+    if (caretVirtualFile.getPath().equals(mark.getFilepath())) {
       return toLineStart
-             ? moveCaretToLineStartSkipLeading(editor, line)
-             : editor.bufferPositionToOffset(new BufferPosition(line, mark.getCol(), false));
+             ? moveCaretToLineStartSkipLeading(caretEditor, line)
+             : caretEditor.bufferPositionToOffset(new BufferPosition(line, mark.getCol(), false));
     }
 
-    final Editor selectedEditor = selectEditor(((IjVimEditor)editor).getEditor(), mark);
-    if (selectedEditor != null) {
-      for (Caret carett : selectedEditor.getCaretModel().getAllCarets()) {
+    final Project project = ((IjVimEditor) caretEditor).getEditor().getProject();
+    final Editor markEditor = selectEditor(project, mark);
+    if (markEditor != null) {
+      // todo should we move all the carets or only one?
+      for (Caret carett : markEditor.getCaretModel().getAllCarets()) {
         new IjVimCaret(carett).moveToOffset(toLineStart
-                                           ? moveCaretToLineStartSkipLeading(new IjVimEditor(selectedEditor), line)
-                                           : selectedEditor.logicalPositionToOffset(
-                                             new LogicalPosition(line, mark.getCol())));
+                                            ? moveCaretToLineStartSkipLeading(new IjVimEditor(markEditor), line)
+                                            : markEditor.logicalPositionToOffset(
+                                              new LogicalPosition(line, mark.getCol())));
       }
     }
-    return -2;
+
+    return -1;
   }
 
   @Override
-  public int moveCaretToJump(@NotNull VimEditor editor, int count) {
+  public int moveCaretToJump(@NotNull VimEditor editor, @NotNull ImmutableVimCaret vimCaret, int count) { // todo
     final int spot = VimInjectorKt.injector.getJumpService().getJumpSpot();
     final Jump jump = VimInjectorKt.injector.getJumpService().getJump(count);
 
@@ -670,7 +663,7 @@ public class MotionGroup extends VimMotionGroupBase {
         return -2;
       }
 
-      final Editor newEditor = selectEditor(((IjVimEditor)editor).getEditor(), newFile);
+      final Editor newEditor = selectEditor(((IjVimEditor)editor).getEditor().getProject(), newFile);
       if (newEditor != null) {
         if (spot == -1) {
           VimInjectorKt.injector.getJumpService().addJump(editor, false);

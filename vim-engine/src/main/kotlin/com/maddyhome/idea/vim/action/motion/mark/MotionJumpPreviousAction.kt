@@ -26,7 +26,7 @@ class MotionJumpPreviousAction : MotionActionHandler.ForEachCaret() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    return injector.motion.moveCaretToJump(editor, -operatorArguments.count1).toMotionOrError()
+    return injector.motion.moveCaretToJump(editor, caret, -operatorArguments.count1).toMotionOrError()
   }
 
   override val motionType: MotionType = MotionType.EXCLUSIVE

@@ -7,6 +7,7 @@
  */
 package com.maddyhome.idea.vim.register
 
+import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.SelectionType
@@ -36,7 +37,7 @@ interface VimRegisterGroup {
   /** Store text into the last register. */
   fun storeText(
     editor: VimEditor,
-    caret: VimCaret,
+    caret: ImmutableVimCaret,
     range: TextRange,
     type: SelectionType,
     isDelete: Boolean,

@@ -27,9 +27,7 @@ fun VimEditor.exitVisualMode() {
   }
   if (this.inVisualMode) {
     this.vimLastSelectionType = selectionType
-    val primaryCaret = this.primaryCaret()
-    val vimSelectionStart = primaryCaret.vimSelectionStart
-    injector.markGroup.setVisualSelectionMarks(this, TextRange(vimSelectionStart, primaryCaret.offset.point))
+    injector.markService.setVisualSelectionMarks(this)
     this.nativeCarets().forEach { it.vimSelectionStartClear() }
 
     this.vimStateMachine.popModes()
