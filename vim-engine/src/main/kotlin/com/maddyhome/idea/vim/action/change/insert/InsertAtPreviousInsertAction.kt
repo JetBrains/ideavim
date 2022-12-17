@@ -44,7 +44,7 @@ class InsertAtPreviousInsertAction : ChangeEditorActionHandler.SingleExecution()
 fun insertAtPreviousInsert(editor: VimEditor, context: ExecutionContext) {
   editor.removeSecondaryCarets()
   val caret = editor.primaryCaret()
-  val offset = injector.motion.moveCaretToMark(editor, editor.primaryCaret(), '^', false)
+  val offset = injector.motion.moveCaretToMark(editor.primaryCaret(), VimMarkService.INSERT_EXIT_MARK, false)
   if (offset != -1) {
     caret.moveToOffset(offset)
   }
