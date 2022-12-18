@@ -11,11 +11,9 @@ package org.jetbrains.plugins.ideavim.action.motion.mark
 import com.intellij.ide.bookmark.BookmarksManager
 import com.intellij.ide.bookmark.LineBookmark
 import com.intellij.testFramework.PlatformTestUtil
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.createLineBookmark
 import com.maddyhome.idea.vim.group.mnemonic
-import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.services.IjVimOptionService
 import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.OptionValueType

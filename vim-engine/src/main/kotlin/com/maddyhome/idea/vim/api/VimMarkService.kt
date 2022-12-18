@@ -72,7 +72,7 @@ interface VimMarkService {
    *
    * @param editor  The editor to get the current position from
    * @param char    The mark to set
-   * @return        True if a valid, writable mark, false if not
+   * @return True if a valid, writable mark, false if not
    */
   fun setMark(editor: VimEditor, char: Char): Boolean
   fun setMark(caret: ImmutableVimCaret, mark: Mark): Boolean
@@ -93,7 +93,7 @@ interface VimMarkService {
    * @param caret   The caret for which the mark should be saved
    * @param char    The mark to set
    * @param offset  The offset to set the mark to
-   * @return        True if a valid, writable mark, false if not
+   * @return True if a valid, writable mark, false if not
    */
   fun setMarkForCaret(caret: ImmutableVimCaret, char: Char, offset: Int): Boolean
 

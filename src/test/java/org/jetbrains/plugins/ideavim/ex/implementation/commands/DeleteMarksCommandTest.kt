@@ -9,7 +9,6 @@
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.intellij.openapi.editor.LogicalPosition
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.mark.Mark
 import com.maddyhome.idea.vim.newapi.vim

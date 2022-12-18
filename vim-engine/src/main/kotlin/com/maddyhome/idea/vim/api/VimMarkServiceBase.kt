@@ -25,8 +25,6 @@ import com.maddyhome.idea.vim.api.VimMarkService.Companion.SENTENCE_START_MARK
 import com.maddyhome.idea.vim.api.VimMarkService.Companion.UPPERCASE_MARKS
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.SelectionType
-import com.maddyhome.idea.vim.command.VimStateMachine
-import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
@@ -136,7 +134,7 @@ abstract class VimMarkServiceBase : VimMarkService {
 
   override fun getAllMarksForFile(editor: VimEditor): Set<Mark> {
     val localMarks = injector.editorGroup.getAllEditors()
-      .filter {  it.getPath() == editor.getPath() }
+      .filter { it.getPath() == editor.getPath() }
       .flatMap { it.carets() }
       .flatMap { getAllLocalMarks(it) }
       .toSet()
@@ -386,34 +384,37 @@ abstract class VimMarkServiceBase : VimMarkService {
         char.isLocalMark() || char.isGlobalMark()
       }
       VimMarkService.Operation.SET -> {
-        (LOWERCASE_MARKS +
-          CHANGE_START_MARK + CHANGE_END_MARK +
-          SELECTION_START_MARK + SELECTION_END_MARK +
-          BEFORE_JUMP_MARK +
-          LAST_CHANGE_MARK +
-          LAST_BUFFER_POSITION +
-          INSERT_EXIT_MARK
-        ).contains(char) ||
-        (isCaretPrimary && (UPPERCASE_MARKS + NUMBERED_MARKS).contains(char))
+        (
+          LOWERCASE_MARKS +
+            CHANGE_START_MARK + CHANGE_END_MARK +
+            SELECTION_START_MARK + SELECTION_END_MARK +
+            BEFORE_JUMP_MARK +
+            LAST_CHANGE_MARK +
+            LAST_BUFFER_POSITION +
+            INSERT_EXIT_MARK
+          ).contains(char) ||
+          (isCaretPrimary && (UPPERCASE_MARKS + NUMBERED_MARKS).contains(char))
       }
       VimMarkService.Operation.REMOVE -> {
-        (LOWERCASE_MARKS +
-          CHANGE_START_MARK + CHANGE_END_MARK +
-          SELECTION_START_MARK + SELECTION_END_MARK +
-          LAST_CHANGE_MARK +
-          LAST_BUFFER_POSITION +
-          INSERT_EXIT_MARK
+        (
+          LOWERCASE_MARKS +
+            CHANGE_START_MARK + CHANGE_END_MARK +
+            SELECTION_START_MARK + SELECTION_END_MARK +
+            LAST_CHANGE_MARK +
+            LAST_BUFFER_POSITION +
+            INSERT_EXIT_MARK
           ).contains(char) ||
           (isCaretPrimary && (UPPERCASE_MARKS + NUMBERED_MARKS).contains(char))
       }
       VimMarkService.Operation.SAVE -> {
         isCaretPrimary &&
-          (LOWERCASE_MARKS +
-            BEFORE_JUMP_MARK +
-            LAST_CHANGE_MARK +
-            INSERT_EXIT_MARK +
-            LAST_BUFFER_POSITION +
-            CHANGE_START_MARK + CHANGE_END_MARK
+          (
+            LOWERCASE_MARKS +
+              BEFORE_JUMP_MARK +
+              LAST_CHANGE_MARK +
+              INSERT_EXIT_MARK +
+              LAST_BUFFER_POSITION +
+              CHANGE_START_MARK + CHANGE_END_MARK
             ).contains(char)
       }
     }
@@ -428,18 +429,18 @@ abstract class VimMarkServiceBase : VimMarkService {
   }
 
   protected fun Char.isLocalMark(): Boolean {
-    return (LOWERCASE_MARKS +
-      CHANGE_START_MARK + CHANGE_END_MARK +
-      SELECTION_START_MARK + SELECTION_END_MARK +
-      SENTENCE_START_MARK + SENTENCE_END_MARK +
-      PARAGRAPH_START_MARK + PARAGRAPH_END_MARK +
-      BEFORE_JUMP_MARK +
-      LAST_CHANGE_MARK +
-      LAST_BUFFER_POSITION +
-      INSERT_EXIT_MARK
+    return (
+      LOWERCASE_MARKS +
+        CHANGE_START_MARK + CHANGE_END_MARK +
+        SELECTION_START_MARK + SELECTION_END_MARK +
+        SENTENCE_START_MARK + SENTENCE_END_MARK +
+        PARAGRAPH_START_MARK + PARAGRAPH_END_MARK +
+        BEFORE_JUMP_MARK +
+        LAST_CHANGE_MARK +
+        LAST_BUFFER_POSITION +
+        INSERT_EXIT_MARK
       ).contains(this)
   }
-
 
   private fun getParagraphMark(editor: VimEditor, caret: ImmutableVimCaret, char: Char): VimMark? {
     val path = editor.getPath() ?: return null
@@ -510,7 +511,7 @@ abstract class VimMarkServiceBase : VimMarkService {
   private fun createMark(caret: ImmutableVimCaret, char: Char, offset: Int): Mark? {
     val editor = caret.editor
     val position = editor.offsetToBufferPosition(offset)
-    return VimMark(char, position.line, position.column, editor.getPath() ?: return null, editor.extractProtocol());
+    return VimMark(char, position.line, position.column, editor.getPath() ?: return null, editor.extractProtocol())
   }
 }
 
