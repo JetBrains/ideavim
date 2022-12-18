@@ -15,6 +15,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.EngineStringHelper
+import com.maddyhome.idea.vim.mark.Mark
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
@@ -23,20 +24,6 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 data class MarksCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
-  companion object {
-    private val correctMarkOrder = VimMarkService.BEFORE_JUMP_MARK +
-      VimMarkService.LOWERCASE_MARKS +
-      VimMarkService.UPPERCASE_MARKS +
-      VimMarkService.NUMBERED_MARKS +
-      VimMarkService.LAST_BUFFER_POSITION +
-      VimMarkService.CHANGE_START_MARK +
-      VimMarkService.CHANGE_END_MARK +
-      VimMarkService.INSERT_EXIT_MARK +
-      VimMarkService.LAST_CHANGE_MARK +
-      VimMarkService.SELECTION_START_MARK +
-      VimMarkService.SELECTION_END_MARK
-  }
-
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     val localMarks = injector.markService.getAllLocalMarks(editor.primaryCaret())
     val globalMarks = injector.markService.getAllGlobalMarks()
@@ -44,7 +31,7 @@ data class MarksCommand(val ranges: Ranges, val argument: String) : Command.Sing
     // Yeah, lower case. Vim uses lower case here, but Title Case in :registers. Go figure.
     val res = (localMarks + globalMarks)
       .filter { argument.isEmpty() || argument.contains(it.key) }
-      .sortedBy { correctMarkOrder.indexOf(it.key) }
+      .sortedWith(Mark.KeySorter)
       .joinToString("\n", prefix = "mark line  col file/text\n") { mark ->
 
         // Lines are 1 based, columns zero based. See :help :marks
