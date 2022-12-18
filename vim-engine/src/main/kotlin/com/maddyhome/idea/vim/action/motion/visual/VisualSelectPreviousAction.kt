@@ -33,13 +33,13 @@ class VisualSelectPreviousAction : VimActionHandler.SingleExecution() {
     val caretToSelectionInfo = editor.carets()
       .map { it to it.lastSelectionInfo }
 
-    if (caretToSelectionInfo.any { it.second.startOffset == null || it.second.endOffset == null }) return false
+    if (caretToSelectionInfo.any { it.second.start == null || it.second.end == null }) return false
 
     editor.vimStateMachine.pushModes(VimStateMachine.Mode.VISUAL, selectionType.toSubMode())
 
     for ((caret, selectionInfo) in caretToSelectionInfo) {
-      val startOffset = selectionInfo.startOffset!!
-      val endOffset = selectionInfo.endOffset!!
+      val startOffset = editor.bufferPositionToOffset(selectionInfo.start!!)
+      val endOffset = editor.bufferPositionToOffset(selectionInfo.end!!)
       caret.vimSetSelection(startOffset, endOffset, true)
     }
 

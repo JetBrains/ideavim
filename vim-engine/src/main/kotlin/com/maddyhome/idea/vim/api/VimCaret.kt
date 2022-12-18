@@ -152,4 +152,4 @@ interface CaretRegisterStorage {
   fun saveRegister(caret: ImmutableVimCaret, r: Char, register: Register)
 }
 
-data class SelectionInfo(val startOffset: Int?, val endOffset: Int?, val type: SelectionType)
+data class SelectionInfo(val start: BufferPosition?, val end: BufferPosition?, val type: SelectionType)
