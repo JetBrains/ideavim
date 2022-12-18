@@ -21,31 +21,31 @@ import com.maddyhome.idea.vim.helper.vimStateMachine
 /**
  * @author vlan
  */
-class VisualSelectPreviousAction : VimActionHandler.ForEachCaret() {
+class VisualSelectPreviousAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override fun execute(
     editor: VimEditor,
-    caret: VimCaret,
     context: ExecutionContext,
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    return selectPreviousVisualMode(editor, caret)
-  }
-}
+    val selectionType = editor.primaryCaret().lastSelectionInfo.type
+    val caretToSelectionInfo = editor.carets()
+      .map { it to it.lastSelectionInfo }
 
-private fun selectPreviousVisualMode(editor: VimEditor, caret: VimCaret): Boolean {
-  val lastSelectionType = editor.vimLastSelectionType ?: return false
-  val visualMarks = injector.markService.getVisualSelectionMarks(caret) ?: return false
+    if (caretToSelectionInfo.any { it.second.startOffset == null || it.second.endOffset == null }) return false
 
-  editor.vimStateMachine.pushModes(VimStateMachine.Mode.VISUAL, lastSelectionType.toSubMode())
+    editor.vimStateMachine.pushModes(VimStateMachine.Mode.VISUAL, selectionType.toSubMode())
 
-  caret.vimSetSelection(visualMarks.startOffset, visualMarks.endOffset - 1, true)
+    for ((caret, selectionInfo) in caretToSelectionInfo) {
+      val startOffset = selectionInfo.startOffset!!
+      val endOffset = selectionInfo.endOffset!!
+      caret.vimSetSelection(startOffset, endOffset, true)
+    }
 
-  if (caret.isPrimary) {
     injector.scroll.scrollCaretIntoView(editor)
-  }
 
-  return true
+    return true
+  }
 }
