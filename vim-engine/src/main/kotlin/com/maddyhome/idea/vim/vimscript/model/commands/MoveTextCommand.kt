@@ -64,8 +64,8 @@ data class MoveTextCommand(val ranges: Ranges, val argument: String) : Command.S
       .map { Pair(it, it.line) } // we save logical line because it will be cleared by Platform after text deletion
       .toSet()
     val lastSelectionInfo = caret.lastSelectionInfo
-    val selectionStartBufferPosition = lastSelectionInfo.startOffset?.let { editor.offsetToBufferPosition(it) }
-    val selectionEndBufferPosition = lastSelectionInfo.endOffset?.let { editor.offsetToBufferPosition(it) }
+    val selectionStartOffset = lastSelectionInfo.start?.let { editor.bufferPositionToOffset(it) }
+    val selectionEndOffset = lastSelectionInfo.end?.let { editor.bufferPositionToOffset(it) }
 
     editor.deleteString(range)
 
@@ -83,7 +83,7 @@ data class MoveTextCommand(val ranges: Ranges, val argument: String) : Command.S
 
     globalMarks.forEach { shiftGlobalMark(editor, it, shift) }
     localMarks.forEach { shiftLocalMark(caret, it, shift) }
-    shiftSelectionInfo(caret, selectionStartBufferPosition, selectionEndBufferPosition, lastSelectionInfo, shift, range)
+    shiftSelectionInfo(caret, selectionStartOffset, selectionEndOffset, lastSelectionInfo, shift, range)
 
     val newCaretPosition = shiftBufferPosition(caretPosition, shift)
     caret.moveToBufferPosition(newCaretPosition)
@@ -105,27 +105,24 @@ data class MoveTextCommand(val ranges: Ranges, val argument: String) : Command.S
 
   private fun shiftSelectionInfo(
     caret: ImmutableVimCaret,
-    startBufferPosition: BufferPosition?,
-    endBufferPosition: BufferPosition?,
+    startOffset: Int?,
+    endOffset: Int?,
     selectionInfo: SelectionInfo,
     shift: Int,
     range: TextRange,
   ) {
-    var newStartOffset = selectionInfo.startOffset
-    var newEndOffset = selectionInfo.endOffset
-    val editor = caret.editor
-
-    if (selectionInfo.startOffset != null && startBufferPosition != null && range.contains(selectionInfo.startOffset)) {
-      val newBufferPosition = shiftBufferPosition(startBufferPosition, shift)
-      newStartOffset = editor.bufferPositionToOffset(newBufferPosition)
-    }
-    if (selectionInfo.endOffset != null && endBufferPosition != null && range.contains(selectionInfo.endOffset)) {
-      val newBufferPosition = shiftBufferPosition(endBufferPosition, shift)
-      newEndOffset = editor.bufferPositionToOffset(newBufferPosition)
+    var newStartPosition = selectionInfo.start
+    if (startOffset != null && selectionInfo.start != null && range.contains(startOffset)) {
+      newStartPosition = shiftBufferPosition(selectionInfo.start, shift)
     }
 
-    if (newStartOffset != selectionInfo.startOffset || newEndOffset != selectionInfo.endOffset) {
-      caret.lastSelectionInfo = SelectionInfo(newStartOffset, newEndOffset, selectionInfo.type)
+    var newEndPosition = selectionInfo.end
+    if (endOffset != null && selectionInfo.end != null && range.contains(endOffset)) {
+      newEndPosition = shiftBufferPosition(selectionInfo.end, shift)
+    }
+
+    if (newStartPosition != selectionInfo.start || newEndPosition != selectionInfo.end) {
+      caret.lastSelectionInfo = SelectionInfo(newStartPosition, newEndPosition, selectionInfo.type)
     }
   }
 

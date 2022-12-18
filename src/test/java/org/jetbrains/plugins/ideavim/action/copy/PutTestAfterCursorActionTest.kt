@@ -119,7 +119,8 @@ class PutTestAfterCursorActionTest : VimTestCase() {
     // Add Guard to simulate Notebook behaviour. See (VIM-2577)
     val guardRange = before rangeOf "\nGUARD\n"
     editor.document.createGuardedBlock(guardRange.startOffset, guardRange.endOffset)
-    VimPlugin.getRegister().storeText(editor.vim, before rangeOf "I found it in a legendary land\n", SelectionType.LINE_WISE, false)
+    val vimEditor = editor.vim
+    injector.registerGroup.storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "I found it in a legendary land\n", SelectionType.LINE_WISE, false)
     typeText(injector.parser.parseKeys("p"))
     val after = """
             A Discovery

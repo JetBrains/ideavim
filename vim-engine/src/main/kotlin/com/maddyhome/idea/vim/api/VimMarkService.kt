@@ -54,8 +54,9 @@ interface VimMarkService {
   /**
    * Get all marks for specified filepath (for all carets in all editors)
    * @param editor  The editor with required file
+   * @return list or pairs caret to mark (caret is null for global marks)
    */
-  fun getAllMarksForFile(editor: VimEditor): Set<Mark>
+  fun getAllMarksForFile(editor: VimEditor): List<Pair<ImmutableVimCaret?, Set<Mark>>>
 
   /**
    * Gets all global marks
