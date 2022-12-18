@@ -12,7 +12,6 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.common.TextRange
 import org.jetbrains.annotations.ApiStatus
 
-
 @Deprecated("Please use VimMarkService instead")
 @ApiStatus.ScheduledForRemoval(inVersion = "2.3")
 interface VimMarkGroup {

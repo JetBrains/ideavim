@@ -12,8 +12,8 @@ import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.event.DocumentListener
 import com.intellij.openapi.util.Key
 import com.maddyhome.idea.vim.EventFacade
-import com.maddyhome.idea.vim.group.VimMarkServiceImpl
 import com.maddyhome.idea.vim.group.SearchGroup
+import com.maddyhome.idea.vim.group.VimMarkServiceImpl
 
 object DocumentManager {
   private val docListeners = mutableSetOf<DocumentListener>()
