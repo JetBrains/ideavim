@@ -14,8 +14,8 @@ import org.jetbrains.annotations.NonNls
 
 interface Mark {
   val key: Char
-  val line: Int
-  val col: Int
+  val line: Int // 0-based
+  val col: Int // 0-based
   val filepath: String
   val protocol: String?
 

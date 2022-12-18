@@ -60,6 +60,7 @@ interface ImmutableVimCaret {
   val visualLineStart: Int
   fun hasSelection(): Boolean
 
+  var lastSelectionInfo: SelectionInfo
   val registerStorage: CaretRegisterStorage
   val markStorage: LocalMarkStorage
 }
@@ -150,3 +151,5 @@ interface CaretRegisterStorage {
   fun setKeys(caret: ImmutableVimCaret, register: Char, keys: List<KeyStroke>)
   fun saveRegister(caret: ImmutableVimCaret, r: Char, register: Register)
 }
+
+data class SelectionInfo(val startOffset: Int?, val endOffset: Int?, val type: SelectionType)

@@ -16,10 +16,12 @@ import com.maddyhome.idea.vim.api.CaretRegisterStorage
 import com.maddyhome.idea.vim.api.CaretRegisterStorageBase
 import com.maddyhome.idea.vim.api.LocalMarkStorage
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
+import com.maddyhome.idea.vim.api.SelectionInfo
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimCaretBase
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimVisualPosition
+import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.EditorLine
 import com.maddyhome.idea.vim.common.LiveRange
 import com.maddyhome.idea.vim.common.Offset
@@ -30,6 +32,7 @@ import com.maddyhome.idea.vim.group.visual.vimSetSelection
 import com.maddyhome.idea.vim.group.visual.vimSetSystemSelectionSilently
 import com.maddyhome.idea.vim.group.visual.vimUpdateEditorSelection
 import com.maddyhome.idea.vim.helper.inlayAwareVisualColumn
+import com.maddyhome.idea.vim.helper.lastSelectionInfo
 import com.maddyhome.idea.vim.helper.markStorage
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.helper.registerStorage
@@ -44,7 +47,7 @@ import com.maddyhome.idea.vim.helper.vimSelectionStartClear
 class IjVimCaret(val caret: Caret) : VimCaretBase() {
   override val registerStorage: CaretRegisterStorage
     get() {
-      // todo
+      // todo update caret in getter to simplify signature
       var storage = this.caret.registerStorage
       if (storage == null) {
         storage = CaretRegisterStorageBase()
@@ -62,6 +65,19 @@ class IjVimCaret(val caret: Caret) : VimCaretBase() {
         storage.caret = this
       }
       return storage
+    }
+  override var lastSelectionInfo: SelectionInfo
+    get() {
+      val lastSelection = this.caret.lastSelectionInfo
+      if (lastSelection == null) {
+        val defaultValue = SelectionInfo(null, null, SelectionType.CHARACTER_WISE)
+        this.caret.lastSelectionInfo = defaultValue
+        return defaultValue
+      }
+      return lastSelection
+    }
+    set(value) {
+      this.caret.lastSelectionInfo = value
     }
   override val editor: VimEditor
     get() = IjVimEditor(caret.editor)
