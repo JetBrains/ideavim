@@ -24,10 +24,14 @@ import com.maddyhome.idea.vim.api.VimMarkService.Companion.SENTENCE_END_MARK
 import com.maddyhome.idea.vim.api.VimMarkService.Companion.SENTENCE_START_MARK
 import com.maddyhome.idea.vim.api.VimMarkService.Companion.UPPERCASE_MARKS
 import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.SelectionType
+import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.helper.inVisualMode
+import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.mark.Mark
 import com.maddyhome.idea.vim.mark.VimMark
@@ -81,12 +85,19 @@ abstract class VimMarkServiceBase : VimMarkService {
   protected fun getLocalMark(caret: ImmutableVimCaret, char: Char): Mark? {
     val markChar = if (char == '`') '\'' else char
     if (!markChar.isLocalMark()) return null
+
+    if (markChar == SELECTION_START_MARK) {
+      return getSelectionStartMark(caret)
+    } else if (markChar == SELECTION_END_MARK) {
+      return getSelectionEndMark(caret)
+    }
+
     val editor = caret.editor
     val path = editor.getPath() ?: return null
     return if (caret.isPrimary) {
       val mark = getLocalMarks(path)[markChar]
       when (markChar) {
-        VimMarkService.LAST_BUFFER_POSITION -> mark ?: VimMark('"', 1, 1, path, editor.extractProtocol())
+        LAST_BUFFER_POSITION -> mark ?: createMark(caret, LAST_BUFFER_POSITION, 0)
         else -> mark
       }
     } else {
@@ -100,9 +111,9 @@ abstract class VimMarkServiceBase : VimMarkService {
 
     val editor = caret.editor
     val path = editor.getPath()
-    return if (path != null && setOf(VimMarkService.PARAGRAPH_START_MARK, VimMarkService.PARAGRAPH_END_MARK).contains(markChar)) {
+    return if (path != null && setOf(PARAGRAPH_START_MARK, PARAGRAPH_END_MARK).contains(markChar)) {
       getParagraphMark(editor, caret, markChar)
-    } else if (path != null && setOf(VimMarkService.SENTENCE_START_MARK, VimMarkService.SENTENCE_END_MARK).contains(markChar)) {
+    } else if (path != null && setOf(SENTENCE_START_MARK, SENTENCE_END_MARK).contains(markChar)) {
       getSentenceMark(editor, caret, markChar)
     } else if (markChar.isLocalMark()) {
       getLocalMark(caret, markChar)
@@ -115,11 +126,12 @@ abstract class VimMarkServiceBase : VimMarkService {
 
   override fun getAllLocalMarks(caret: ImmutableVimCaret): Set<Mark> {
     val path = caret.editor.getPath() ?: return emptySet()
-    return if (caret.isPrimary) {
-      getLocalMarks(path).values.toSet()
+    val marks = if (caret.isPrimary) {
+      getLocalMarks(path).values
     } else {
       caret.markStorage.getMarks().values.toSet()
     }
+    return (marks + getLocalMark(caret, SELECTION_START_MARK) + getLocalMark(caret, SELECTION_END_MARK)).filterNotNull().toSet()
   }
 
   override fun getAllMarksForFile(editor: VimEditor): Set<Mark> {
@@ -169,27 +181,26 @@ abstract class VimMarkServiceBase : VimMarkService {
 
     if (markChar.isGlobalMark()) {
       setGlobalMark(caret.editor, mark)
-      return true
-    }
-
-    if (markChar.isLocalMark()) {
+    } else if (markChar == SELECTION_START_MARK || markChar == SELECTION_END_MARK) {
+      when (markChar) {
+        SELECTION_START_MARK -> setSelectionStartMark(caret, mark.offset(caret.editor))
+        SELECTION_END_MARK -> setSelectionEndMark(caret, mark.offset(caret.editor))
+      }
+    } else if (markChar.isLocalMark()) {
       if (caret.isPrimary) {
         getLocalMarks(mark.filepath)[markChar] = mark
       } else {
         caret.markStorage.setMark(mark)
       }
-      return true
+    } else {
+      return false
     }
-
-    return false
+    return true
   }
 
   override fun setMark(caret: ImmutableVimCaret, char: Char, offset: Int): Boolean {
     val markChar = if (char == '`') '\'' else char
-    val editor = caret.editor
-    val position = editor.offsetToBufferPosition(offset)
-    val path = editor.getPath() ?: return false
-    val mark = VimMark(markChar, position.line, position.column, path, editor.extractProtocol())
+    val mark = createMark(caret, markChar, offset) ?: return false
     return setMark(caret, mark)
   }
 
@@ -225,13 +236,13 @@ abstract class VimMarkServiceBase : VimMarkService {
 
   override fun setVisualSelectionMarks(editor: VimEditor) {
     if (!editor.inVisualMode) return
+    val selectionType = SelectionType.fromSubMode(editor.subMode)
     editor.carets()
-      .map {
-        val startOffset = min(it.vimSelectionStart, it.offset.point)
-        val endOffset = max(it.vimSelectionStart, it.offset.point)
-        it to TextRange(startOffset, endOffset)
+      .forEach {
+        val startOffset = it.vimSelectionStart
+        val endOffset = it.offset.point
+        it.lastSelectionInfo = SelectionInfo(startOffset, endOffset, selectionType)
       }
-      .forEach { setVisualSelectionMarks(it.first, it.second) }
   }
 
   override fun setVisualSelectionMarks(caret: ImmutableVimCaret, range: TextRange) {
@@ -454,6 +465,52 @@ abstract class VimMarkServiceBase : VimMarkService {
     offset = editor.normalizeOffset(offset, false)
     val lp = editor.offsetToBufferPosition(offset)
     return VimMark(char, lp.line, lp.column, path, editor.extractProtocol())
+  }
+
+  protected fun getSelectionStartMark(caret: ImmutableVimCaret): Mark? {
+    val selectionInfo = caret.lastSelectionInfo
+    var offset = if (selectionInfo.startOffset != null && selectionInfo.endOffset != null) {
+      min(selectionInfo.startOffset!!, selectionInfo.endOffset!!)
+    } else {
+      selectionInfo.startOffset
+    } ?: return null
+
+    if (selectionInfo.type == SelectionType.LINE_WISE) {
+      offset = caret.editor.getLineStartForOffset(offset)
+    }
+
+    return createMark(caret, SELECTION_START_MARK, offset)
+  }
+
+  protected fun getSelectionEndMark(caret: ImmutableVimCaret): Mark? {
+    val selectionInfo = caret.lastSelectionInfo
+    var offset = if (selectionInfo.startOffset != null && selectionInfo.endOffset != null) {
+      max(selectionInfo.startOffset!!, selectionInfo.endOffset!!)
+    } else {
+      selectionInfo.endOffset
+    } ?: return null
+
+    if (selectionInfo.type == SelectionType.LINE_WISE) {
+      offset = caret.editor.getLineEndForOffset(offset)
+    }
+
+    return createMark(caret, SELECTION_END_MARK, offset)
+  }
+
+  protected fun setSelectionStartMark(caret: ImmutableVimCaret, offset: Int) {
+    val selectionInfo = caret.lastSelectionInfo
+    caret.lastSelectionInfo = SelectionInfo(offset, selectionInfo.endOffset, selectionInfo.type)
+  }
+
+  protected fun setSelectionEndMark(caret: ImmutableVimCaret, offset: Int) {
+    val selectionInfo = caret.lastSelectionInfo
+    caret.lastSelectionInfo = SelectionInfo(selectionInfo.startOffset, offset, selectionInfo.type)
+  }
+
+  private fun createMark(caret: ImmutableVimCaret, char: Char, offset: Int): Mark? {
+    val editor = caret.editor
+    val position = editor.offsetToBufferPosition(offset)
+    return VimMark(char, position.line, position.column, editor.getPath() ?: return null, editor.extractProtocol());
   }
 }
 
