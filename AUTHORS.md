@@ -451,6 +451,10 @@ Contributors:
   [![icon][github]](https://github.com/Runinho)
   &nbsp;
   Runinho
+* [![icon][mail]](mailto:me@yuhaowen.com)
+  [![icon][github]](https://github.com/adaext)
+  &nbsp;
+  Ada
 
 Previous contributors:
 
