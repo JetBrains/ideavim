@@ -42,14 +42,10 @@ import java.util.*
 
 // todo remove marks from register group
 
-// todo rename to markService (have markService and deprecated markGroup)
-
-// todo jump service
 // todo save jumps after IDE close
-// todo sync with ide jumps
-// todo compatibility (leave MarkGroup as it was, but change body)
+// todo sync vim jumps with ide jumps
 
-// todo bookmarkRemoved does not work
+// todo exception after moving to global mark after deleting it via IDE (impossible to receive markChar)
 @State(name = "VimMarksSettings", storages = [Storage(value = "\$APP_CONFIG$/vim_settings_local.xml", roamingType = RoamingType.DISABLED)])
 class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateComponent<Element?> {
   private fun createOrGetSystemMark(ch: Char, line: Int, col: Int, editor: VimEditor): Mark? {
