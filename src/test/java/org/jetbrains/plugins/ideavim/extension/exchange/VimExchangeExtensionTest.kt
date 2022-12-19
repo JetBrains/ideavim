@@ -246,7 +246,7 @@ class VimExchangeExtensionTest : VimTestCase() {
     configureByText(before)
     typeText(injector.parser.parseKeys("Vj" + "X"))
 
-    assertHighlighter(4, 15, HighlighterTargetArea.LINES_IN_RANGE)
+    assertHighlighter(0, 19, HighlighterTargetArea.LINES_IN_RANGE)
 
     // Exit vim-exchange
     exitExchange()

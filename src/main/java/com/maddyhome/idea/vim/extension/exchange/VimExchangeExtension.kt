@@ -145,7 +145,8 @@ class VimExchangeExtension : VimExtension {
           // TODO: handle other modes
           else -> HighlighterTargetArea.EXACT_RANGE
         }
-        val endAdj = if (hlArea == HighlighterTargetArea.EXACT_RANGE || (isVisual)) 1 else 0
+        val isVisualLine = ex.type == VimStateMachine.SubMode.VISUAL_LINE
+        val endAdj = if (!(isVisualLine) && (hlArea == HighlighterTargetArea.EXACT_RANGE || (isVisual))) 1 else 0
         return editor.markupModel.addRangeHighlighter(
           editor.getMarkOffset(ex.start),
           (editor.getMarkOffset(ex.end) + endAdj).coerceAtMost(editor.fileSize),
