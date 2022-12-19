@@ -35,6 +35,7 @@ usual beta standards.
 * [554](https://github.com/JetBrains/ideavim/pull/554) by [Matt Ellis](https://github.com/citizenmatt): Refactor "last column" calculations
 * [553](https://github.com/JetBrains/ideavim/pull/553) by [Matt Ellis](https://github.com/citizenmatt): Rearrange and rename some code in engine
 * [560](https://github.com/JetBrains/ideavim/pull/560) by [Runinho](https://github.com/Runinho): Fix(VIM-2577) paste not working at end of notebook cell
+* [571](https://github.com/JetBrains/ideavim/pull/571) by [Ada](https://github.com/adaext): Remove the redundant quotation mark at the end of "packadd matchit" command
 
 ## 2.0.0, 2022-11-01
 
