@@ -4,7 +4,7 @@ IdeaVim Plugins
 IdeaVim plugins work like the original Vim plugins. If you want to turn of any of them, you have to enable it via this command in your `~/.ideavimrc`:
 
 ```
-Plug '<extension-github-reference>'
+Plug '<plugin-github-reference>'
 ```
 
 If you reuse your existing `.vimrc` file using `source ~/.vimrc`, IdeaVim can parse and enable plugins that are defined
