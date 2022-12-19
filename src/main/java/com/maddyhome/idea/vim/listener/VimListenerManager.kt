@@ -52,7 +52,7 @@ import com.maddyhome.idea.vim.group.visual.VimVisualTimer
 import com.maddyhome.idea.vim.group.visual.moveCaretOneCharLeftFromSelectionEnd
 import com.maddyhome.idea.vim.group.visual.vimSetSystemSelectionSilently
 import com.maddyhome.idea.vim.helper.GuicursorChangeListener
-import com.maddyhome.idea.vim.helper.UpdatesChecker
+import com.maddyhome.idea.vim.helper.VimStandalonePluginUpdateChecker
 import com.maddyhome.idea.vim.helper.exitSelectMode
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.forceBarCursor
@@ -206,7 +206,7 @@ object VimListenerManager {
   private object VimEditorFactoryListener : EditorFactoryListener {
     override fun editorCreated(event: EditorFactoryEvent) {
       add(event.editor)
-      UpdatesChecker.check()
+      VimStandalonePluginUpdateChecker.instance.pluginUsed()
     }
 
     override fun editorReleased(event: EditorFactoryEvent) {
