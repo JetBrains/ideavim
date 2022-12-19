@@ -135,6 +135,7 @@ abstract class VimTestCase : UsefulTestCase() {
     VimPlugin.getRegister().resetRegisters()
     VimPlugin.getSearch().resetState()
     injector.markService.resetAllMarks()
+    injector.jumpService.resetJumps()
     VimPlugin.getChange().resetRepeat()
     VimPlugin.getKey().savedShortcutConflicts.clear()
 

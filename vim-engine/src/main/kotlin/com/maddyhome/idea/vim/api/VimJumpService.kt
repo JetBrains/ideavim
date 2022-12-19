@@ -11,6 +11,7 @@ package com.maddyhome.idea.vim.api
 import com.maddyhome.idea.vim.mark.Jump
 
 // todo should it be multicaret?
+// todo docs
 interface VimJumpService {
   fun includeCurrentCommandAsNavigation(editor: VimEditor)
   fun getJumpSpot(): Int
@@ -21,4 +22,5 @@ interface VimJumpService {
   fun dropLastJump()
   fun updateJumpsFromInsert(editor: VimEditor, startOffset: Int, length: Int)
   fun updateJumpsFromDelete(editor: VimEditor, startOffset: Int, length: Int)
+  fun resetJumps()
 }
