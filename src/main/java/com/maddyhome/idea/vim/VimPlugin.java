@@ -445,7 +445,8 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   private void legacyStateLoading(@NotNull Element element) {
     if (previousStateVersion > 0 && previousStateVersion < 5) {
       // Migrate settings from 4 to 5 version
-      //((MarkGroup) getMark()).readData(element); todo
+      ((VimMarkServiceImpl) VimInjectorKt.getInjector().getMarkService()).loadState(element);
+      ((VimJumpServiceImpl) VimInjectorKt.getInjector().getJumpService()).loadState(element);
       getRegister().readData(element);
       getSearch().readData(element);
       getHistory().readData(element);
