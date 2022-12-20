@@ -620,10 +620,6 @@ class ExEntryTest : VimTestCase() {
       typeText(keys)
   }
 
-  private fun typeText(text: String) {
-    typeText(injector.parser.parseKeys(text))
-  }
-
   private fun deactivateExEntry() {
     // We don't need to reset text, that's handled by #active
     if (exEntryPanel.isActive)

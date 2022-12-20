@@ -291,6 +291,10 @@ abstract class VimTestCase : UsefulTestCase() {
     assertTrue(caretLogicalLine >= scrollToLogicalLine)
   }
 
+  protected fun typeText(keys: String): Editor {
+    return typeText(injector.parser.parseKeys(keys))
+  }
+
   protected fun typeText(keys: List<KeyStroke?>): Editor {
     val editor = myFixture.editor
     NeovimTesting.typeCommand(
