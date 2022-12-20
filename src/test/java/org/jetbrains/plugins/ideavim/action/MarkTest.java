@@ -334,4 +334,42 @@ public class MarkTest extends VimTestCase {
     typeText(injector.getParser().parseKeys("`>"));
     assertOffset(199);
   }
+
+  public void testMulticaretMark() {
+    configureByText("My mother <caret>taught me this trick:\n" +
+                    "if you repeat something <caret>over and over again it loses its meaning.\n" +
+                    "For example: homework, homework, homework, homework, <caret>homework, homework, homework, homework, homework.\n" +
+                    "See, nothing.\n");
+
+    typeText("ma$");
+    assertState("My mother taught me this trick<caret>:\n" +
+                    "if you repeat something over and over again it loses its meaning<caret>.\n" +
+                    "For example: homework, homework, homework, homework, homework, homework, homework, homework, homework<caret>.\n" +
+                    "See, nothing.\n");
+
+    typeText("`a");
+    assertState("My mother <caret>taught me this trick:\n" +
+                    "if you repeat something <caret>over and over again it loses its meaning.\n" +
+                    "For example: homework, homework, homework, homework, <caret>homework, homework, homework, homework, homework.\n" +
+                    "See, nothing.\n");
+  }
+
+  public void testMulticaretSelectionMarks() {
+    configureByText("My mother <caret>taught me this trick:\n" +
+                    "if you repeat something <caret>over and over again it loses its meaning.\n" +
+                    "For example: homework, homework, homework, homework, <caret>homework, homework, homework, homework, homework.\n" +
+                    "See, nothing.\n");
+
+    typeText("vey$p");
+    assertState("My mother taught me this trick:taught\n" +
+                "if you repeat something over and over again it loses its meaning.over\n" +
+                "For example: homework, homework, homework, homework, homework, homework, homework, homework, homework.homework\n" +
+                "See, nothing.\n");
+
+    typeText("gv");
+    assertState("My mother <selection>taugh<caret>t</selection> me this trick:taught\n" +
+                "if you repeat something <selection>ove<caret>r</selection> and over again it loses its meaning.over\n" +
+                "For example: homework, homework, homework, homework, <selection>homewor<caret>k</selection>, homework, homework, homework, homework.homework\n" +
+                "See, nothing.\n");
+  }
 }
