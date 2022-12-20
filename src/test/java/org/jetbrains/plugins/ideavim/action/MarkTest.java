@@ -9,7 +9,6 @@
 package org.jetbrains.plugins.ideavim.action;
 
 import com.google.common.collect.Lists;
-import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.VimEditor;
 import com.maddyhome.idea.vim.api.VimInjectorKt;
 import com.maddyhome.idea.vim.command.VimStateMachine;
@@ -151,5 +150,188 @@ public class MarkTest extends VimTestCase {
   public void testGotoLastChangePositionEnd() {
     doTest(Lists.newArrayList("yiw", "P", "gg", "`]"), "one two\n" + "<caret>three\n" + "four five\n",
            "one two\n" + "thre<caret>ethree\n" + "four five\n", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE);
+  }
+
+  public void testVisualMarks() {
+    configureByText("Oh, <caret>hi Mark");
+    typeText(injector.getParser().parseKeys("vw<Esc>"));
+
+    typeText(injector.getParser().parseKeys("`<"));
+    assertOffset(4);
+    typeText(injector.getParser().parseKeys("`>"));
+    assertOffset(7);
+  }
+
+
+  public void testVisualMarksForBackwardsSelection() {
+    configureByText("Oh, hi <caret>Mark");
+    typeText(injector.getParser().parseKeys("vb<Esc>"));
+
+    typeText(injector.getParser().parseKeys("`<"));
+    assertOffset(4);
+    typeText(injector.getParser().parseKeys("`>"));
+    assertOffset(7);
+  }
+
+  // we change start mark, but actually the start and end has changed
+  public void testChangeSelectionStartMarkToBelowPosition() {
+    configureByText("lala\nl<caret>alala\nlala\n");
+    typeText(injector.getParser().parseKeys("v3l<Esc>"));
+
+    typeText(injector.getParser().parseKeys("`<"));
+    assertOffset(6);
+    typeText(injector.getParser().parseKeys("`>"));
+    assertOffset(9);
+
+    typeText(injector.getParser().parseKeys("jhm<"));
+    typeText(injector.getParser().parseKeys("`<"));
+    assertOffset(9);
+    typeText(injector.getParser().parseKeys("`>"));
+    assertOffset(14);
+  }
+
+  // we change end mark and only end changes
+  public void testChangeSelectionEndMarkToBelowPosition() {
+    configureByText("lala\nl<caret>alala\nlala\n");
+    typeText(injector.getParser().parseKeys("v3l<Esc>"));
+
+    typeText(injector.getParser().parseKeys("`<"));
+    assertOffset(6);
+    typeText(injector.getParser().parseKeys("`>"));
+    assertOffset(9);
+
+    typeText(injector.getParser().parseKeys("jhm>"));
+    typeText(injector.getParser().parseKeys("`<"));
+    assertOffset(6);
+    typeText(injector.getParser().parseKeys("`>"));
+    assertOffset(14);
+  }
+
+  // we change start mark, but end changes
+  public void testChangeReversedSelectionStartMarkToBelowPosition() {
+    configureByText("lala\nlala<caret>la\nlala\n");
+    typeText(injector.getParser().parseKeys("v3h<Esc>"));
+
+    typeText(injector.getParser().parseKeys("`<"));
+    assertOffset(6);
+    typeText(injector.getParser().parseKeys("`>"));
+    assertOffset(9);
+
+    typeText(injector.getParser().parseKeys("jhm<"));
+    typeText(injector.getParser().parseKeys("`<"));
+    assertOffset(6);
+    typeText(injector.getParser().parseKeys("`>"));
+    assertOffset(14);
+  }
+
+  // we change end mark, but start and end are changed
+  public void testChangeReversedSelectionEndMarkToBelowPosition() {
+    configureByText("lala\nlala<caret>la\nlala\n");
+    typeText(injector.getParser().parseKeys("v3h<Esc>"));
+
+    typeText(injector.getParser().parseKeys("`<"));
+    assertOffset(6);
+    typeText(injector.getParser().parseKeys("`>"));
+    assertOffset(9);
+
+    typeText(injector.getParser().parseKeys("jhm>"));
+    typeText(injector.getParser().parseKeys("`<"));
+    assertOffset(9);
+    typeText(injector.getParser().parseKeys("`>"));
+    assertOffset(14);
+  }
+
+  // we change start mark and only it changes
+  public void testChangeSelectionStartMarkToUpperPosition() {
+    configureByText("lala\nl<caret>alala\nlala\n");
+    typeText(injector.getParser().parseKeys("v3l<Esc>"));
+
+    typeText(injector.getParser().parseKeys("`<"));
+    assertOffset(6);
+    typeText(injector.getParser().parseKeys("`>"));
+    assertOffset(9);
+
+    typeText(injector.getParser().parseKeys("khhm<"));
+    typeText(injector.getParser().parseKeys("`<"));
+    assertOffset(1);
+    typeText(injector.getParser().parseKeys("`>"));
+    assertOffset(9);
+  }
+
+  // we change end mark, but both start and end marks are changed
+  public void testChangeSelectionEndMarkToUpperPosition() {
+    configureByText("lala\nl<caret>alala\nlala\n");
+    typeText(injector.getParser().parseKeys("v3l<Esc>"));
+
+    typeText(injector.getParser().parseKeys("`<"));
+    assertOffset(6);
+    typeText(injector.getParser().parseKeys("`>"));
+    assertOffset(9);
+
+    typeText(injector.getParser().parseKeys("khhm>"));
+    typeText(injector.getParser().parseKeys("`<"));
+    assertOffset(1);
+    typeText(injector.getParser().parseKeys("`>"));
+    assertOffset(6);
+  }
+
+  // we change end mark, but both start and end marks are changed
+  public void testChangeReversedSelectionStartMarkToUpperPosition() {
+    configureByText("lala\nlala<caret>la\nlala\n");
+    typeText(injector.getParser().parseKeys("v3h<Esc>"));
+
+    typeText(injector.getParser().parseKeys("`<"));
+    assertOffset(6);
+    typeText(injector.getParser().parseKeys("`>"));
+    assertOffset(9);
+
+    typeText(injector.getParser().parseKeys("khhm<"));
+    typeText(injector.getParser().parseKeys("`<"));
+    assertOffset(1);
+    typeText(injector.getParser().parseKeys("`>"));
+    assertOffset(6);
+  }
+
+  // we change end mark, but both start and end marks are changed
+  public void testChangeReversedSelectionEndMarkToUpperPosition() {
+    configureByText("lala\nlala<caret>la\nlala\n");
+    typeText(injector.getParser().parseKeys("v3h<Esc>"));
+
+    typeText(injector.getParser().parseKeys("`<"));
+    assertOffset(6);
+    typeText(injector.getParser().parseKeys("`>"));
+    assertOffset(9);
+
+    typeText(injector.getParser().parseKeys("khhm>"));
+    typeText(injector.getParser().parseKeys("`<"));
+    assertOffset(1);
+    typeText(injector.getParser().parseKeys("`>"));
+    assertOffset(9);
+  }
+
+  public void testVisualLineSelectionMarks() {
+    configureByText("My mother taught me this trick:\n" +
+                    "if you repeat something <caret>over and over again it loses its meaning.\n" +
+                    "For example: homework, homework, homework, homework, homework, homework, homework, homework, homework.\n" +
+                    "See, nothing.\n");
+    typeText(injector.getParser().parseKeys("Vj<Esc>"));
+
+    typeText(injector.getParser().parseKeys("`<"));
+    assertOffset(32);
+    typeText(injector.getParser().parseKeys("`>"));
+    assertOffset(199);
+  }
+
+  public void testReversedVisualLineSelectionMarks() {
+    configureByText("My mother taught me this trick:\n" +
+                    "if you repeat something over and over again it loses its meaning.\n" +
+                    "For example: homework, homework, homework, homework, <caret>homework, homework, homework, homework, homework.\n" +
+                    "See, nothing.\n");
+    typeText(injector.getParser().parseKeys("Vk<Esc>"));
+
+    typeText(injector.getParser().parseKeys("`<"));
+    assertOffset(32);
+    typeText(injector.getParser().parseKeys("`>"));
+    assertOffset(199);
   }
 }
