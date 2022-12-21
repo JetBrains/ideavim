@@ -89,7 +89,7 @@ Here are some examples of supported vim features and commands:
 * Vim web help
 * `~/.ideavimrc` configuration file
 
-[IdeaVim plugins](https://github.com/JetBrains/ideavim/wiki/Emulated-plugins):
+[IdeaVim plugins](https://github.com/JetBrains/ideavim/wiki/IdeaVim-Plugins):
 
 * vim-easymotion
 * NERDTree
@@ -104,6 +104,7 @@ Here are some examples of supported vim features and commands:
 * vim-paragraph-motion
 * vim-indent-object
 * match.it
+etc
 
 See also:
 
@@ -202,7 +203,7 @@ Put your settings to `$XDG_CONFIG_HOME/ideavim/ideavimrc` file.
 IdeaVim Plugins
 --------------------
 
-See [doc/emulated-plugins.md](https://github.com/JetBrains/ideavim/wiki/Emulated-plugins)
+See [doc/emulated-plugins.md](https://github.com/JetBrains/ideavim/wiki/IdeaVim-Plugins)
 
 Executing IDE Actions
 ---------------------
