@@ -8,13 +8,17 @@
 
 package com.maddyhome.idea.vim.group.visual
 
+import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.api.getLineEndForOffset
 import com.maddyhome.idea.vim.api.getLineStartForOffset
 import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.helper.inBlockSubMode
 import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
+import com.maddyhome.idea.vim.helper.vimSelectionStart
 import com.maddyhome.idea.vim.newapi.IjVimEditor
+import com.maddyhome.idea.vim.newapi.vim
 
 fun moveCaretOneCharLeftFromSelectionEnd(editor: Editor, predictedMode: VimStateMachine.Mode) {
   if (predictedMode != VimStateMachine.Mode.VISUAL) {
@@ -39,4 +43,11 @@ fun moveCaretOneCharLeftFromSelectionEnd(editor: Editor, predictedMode: VimState
       }
     }
   }
+}
+
+@Deprecated("Use same method on VimCaret")
+fun Caret.vimSetSelection(start: Int, end: Int = start, moveCaretToSelectionEnd: Boolean = false) {
+  vimSelectionStart = start
+  setVisualSelection(start, end, this.vim)
+  if (moveCaretToSelectionEnd && !editor.inBlockSubMode) moveToInlayAwareOffset(end)
 }
