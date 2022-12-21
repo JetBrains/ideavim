@@ -10,30 +10,34 @@
   <name>IdeaVim</name>
   <id>IdeaVIM</id>
   <change-notes><![CDATA[
-    <h3>Changes:</h3>
-    <ul>
-      <li>IdeaVim changes license from GPL-2.0 or later to MIT. <a href="https://youtrack.jetbrains.com/issue/VIM-2782">VIM-2782</a>
-      </li>
-    </ul>
     <h3>Fixes:</h3>
     <ul>
-      <li><a href="https://youtrack.jetbrains.com/issue/VIM-1758">VIM-1758</a> Commentary plugin in rider</li>
-      <li><a href="https://youtrack.jetbrains.com/issue/VIM-1903">VIM-1903</a> Autoindent now works in rider</li>
-      <li><a href="https://youtrack.jetbrains.com/issue/VIM-2744">VIM-2744</a> Fix undo from ex line</li>
-      <li><a href="https://youtrack.jetbrains.com/issue/VIM-2749">VIM-2749</a> Fix :tabn and :tabN commands</li>
-      <li><a href="https://youtrack.jetbrains.com/issue/VIM-2718">VIM-2718</a> Fixed case where the primary caret was
-        changed
+      <li><a href="https://youtrack.jetbrains.com/issue/VIM-2797">VIM-2797</a> Introduce variable to mute default argtextobj
+        mappings
       </li>
-      <li><a href="https://youtrack.jetbrains.com/issue/VIM-2766">VIM-2766</a> Move NERDTree update to background thread
+      <li><a href="https://youtrack.jetbrains.com/issue/VIM-758">VIM-758</a> Support d mappings</li>
+      <li><a href="https://youtrack.jetbrains.com/issue/VIM-2577">VIM-2577</a> Fix paste at the end of notebook cell</li>
+      <li><a href="https://youtrack.jetbrains.com/issue/VIM-2813">VIM-2813</a> Migrate update checker to
+        VimStandalonePluginUpdateChecker
       </li>
-      <li><a href="https://youtrack.jetbrains.com/issue/VIM-2768">VIM-2768</a> Refactor listeners</li>
-      <li><a href="https://youtrack.jetbrains.com/issue/VIM-2776">VIM-2776</a> Use filename index for file search</li>
     </ul>
 
     <h3>Merged PRs:</h3>
     <ul>
-      <li><a href="https://github.com/JetBrains/ideavim/pull/550">550</a> by <a href="https://github.com/citizenmatt">Matt
-        Ellis</a>: Fix(VIM-2778) Remove override of editor scroll setting
+      <li><a href="https://github.com/JetBrains/ideavim/pull/558">558</a> by <a href="https://github.com/citizenmatt">Matt
+        Ellis</a>: Fix incorrect normalising for trailing inlay
+      </li>
+      <li><a href="https://github.com/JetBrains/ideavim/pull/554">554</a> by <a href="https://github.com/citizenmatt">Matt
+        Ellis</a>: Refactor &quot;last column&quot; calculations
+      </li>
+      <li><a href="https://github.com/JetBrains/ideavim/pull/553">553</a> by <a href="https://github.com/citizenmatt">Matt
+        Ellis</a>: Rearrange and rename some code in engine
+      </li>
+      <li><a href="https://github.com/JetBrains/ideavim/pull/560">560</a> by <a
+          href="https://github.com/Runinho">Runinho</a>: Fix(VIM-2577) paste not working at end of notebook cell
+      </li>
+      <li><a href="https://github.com/JetBrains/ideavim/pull/571">571</a> by <a href="https://github.com/adaext">Ada</a>:
+        Remove the redundant quotation mark at the end of &quot;packadd matchit&quot; command
       </li>
     </ul>
     ]]>
