@@ -103,7 +103,7 @@ Here are some examples of supported vim features and commands:
 * vim-highlightedyank
 * vim-paragraph-motion
 * vim-indent-object
-* match.it
+* match.it  
 etc
 
 See also:
