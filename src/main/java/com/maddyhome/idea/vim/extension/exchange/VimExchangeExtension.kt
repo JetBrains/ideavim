@@ -20,6 +20,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getOffset
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.setChangeMarks
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.command.VimStateMachine

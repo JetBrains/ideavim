@@ -30,6 +30,7 @@ import com.maddyhome.idea.vim.ex.ExOutputModel;
 import com.maddyhome.idea.vim.group.visual.VimSelection;
 import com.maddyhome.idea.vim.handler.Motion;
 import com.maddyhome.idea.vim.handler.MotionActionHandler;
+import com.maddyhome.idea.vim.handler.MotionKt;
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.listener.AppCodeTemplates;
@@ -608,10 +609,10 @@ public class MotionGroup extends VimMotionGroupBase {
   }
 
   @Override
-  public int moveCaretToMark(@NotNull ImmutableVimCaret caret, char ch, boolean toLineStart) {
+  public Motion moveCaretToMark(@NotNull ImmutableVimCaret caret, char ch, boolean toLineStart) {
     VimMarkService markService = VimInjectorKt.injector.getMarkService();
     final Mark mark = markService.getMark(caret, ch);
-    if (mark == null) return -1;
+    if (mark == null) return Motion.Error.INSTANCE;
 
     final VimEditor caretEditor = caret.getEditor();
     final VirtualFile caretVirtualFile = getVirtualFile(((IjVimEditor)caretEditor).getEditor());
@@ -619,9 +620,10 @@ public class MotionGroup extends VimMotionGroupBase {
     final int line = mark.getLine();
 
     if (caretVirtualFile.getPath().equals(mark.getFilepath())) {
-      return toLineStart
+      int offset = toLineStart
              ? moveCaretToLineStartSkipLeading(caretEditor, line)
              : caretEditor.bufferPositionToOffset(new BufferPosition(line, mark.getCol(), false));
+      return MotionKt.toMotionOrError(offset);
     }
 
     final Project project = ((IjVimEditor) caretEditor).getEditor().getProject();
@@ -636,7 +638,7 @@ public class MotionGroup extends VimMotionGroupBase {
       }
     }
 
-    return -1;
+    return Motion.Error.INSTANCE;
   }
 
   @Override

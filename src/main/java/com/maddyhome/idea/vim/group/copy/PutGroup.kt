@@ -23,6 +23,7 @@ import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getLineEndOffset
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.setChangeMarks
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.command.isBlock

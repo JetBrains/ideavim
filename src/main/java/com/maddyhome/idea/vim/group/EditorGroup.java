@@ -255,14 +255,6 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
     notifyIdeaJoin(((IjVimEditor) editor).getEditor().getProject());
   }
 
-  @NotNull
-  @Override
-  public Collection<VimEditor> getAllEditors() {
-    return Arrays.stream(EditorFactory.getInstance().getAllEditors())
-      .map(IjVimEditor::new)
-      .collect(Collectors.toList());
-  }
-
   public static class NumberChangeListener implements LocalOptionChangeListener<VimDataType> {
     public static NumberChangeListener INSTANCE = new NumberChangeListener();
 

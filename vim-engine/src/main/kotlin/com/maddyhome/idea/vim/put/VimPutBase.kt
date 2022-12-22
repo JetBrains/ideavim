@@ -20,6 +20,8 @@ import com.maddyhome.idea.vim.api.getText
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.isLineEmpty
 import com.maddyhome.idea.vim.api.lineLength
+import com.maddyhome.idea.vim.api.setChangeMarks
+import com.maddyhome.idea.vim.api.setVisualSelectionMarks
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.command.VimStateMachine
@@ -475,7 +477,7 @@ abstract class VimPutBase : VimPut {
       )
       updated = updatedCaret
       if (updatedCaret == editor.primaryCaret()) {
-        injector.markGroup.setChangeMarks(editor, TextRange(startOffset, endOffset))
+        injector.markService.setChangeMarks(updatedCaret, TextRange(startOffset, endOffset))
       }
       updated = moveCaretToEndPosition(
         editor,

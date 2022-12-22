@@ -16,6 +16,7 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
+import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
@@ -44,9 +45,9 @@ class InsertAtPreviousInsertAction : ChangeEditorActionHandler.SingleExecution()
 fun insertAtPreviousInsert(editor: VimEditor, context: ExecutionContext) {
   editor.removeSecondaryCarets()
   val caret = editor.primaryCaret()
-  val offset = injector.motion.moveCaretToMark(editor.primaryCaret(), VimMarkService.INSERT_EXIT_MARK, false)
-  if (offset != -1) {
-    caret.moveToOffset(offset)
+  val motion = injector.motion.moveCaretToMark(editor.primaryCaret(), VimMarkService.INSERT_EXIT_MARK, false)
+  if (motion is Motion.AbsoluteOffset) {
+    caret.moveToOffset(motion.offset)
   }
   injector.changeGroup.insertBeforeCursor(editor, context)
 }

@@ -38,7 +38,7 @@ class MotionGotoMarkLineAction : MotionActionHandler.ForEachCaret() {
     if (argument == null) return Motion.Error
 
     val mark = argument.character
-    return injector.motion.moveCaretToMark(caret, mark, true).toMotionOrError()
+    return injector.motion.moveCaretToMark(caret, mark, true)
   }
 }
 
@@ -57,6 +57,6 @@ class MotionGotoMarkLineNoSaveJumpAction : MotionActionHandler.ForEachCaret() {
     if (argument == null) return Motion.Error
 
     val mark = argument.character
-    return injector.motion.moveCaretToMark(caret, mark, true).toMotionOrError()
+    return injector.motion.moveCaretToMark(caret, mark, true)
   }
 }

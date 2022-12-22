@@ -16,7 +16,6 @@ import com.maddyhome.idea.vim.group.VimWindowGroup
 import com.maddyhome.idea.vim.helper.VimCommandLineHelper
 import com.maddyhome.idea.vim.history.VimHistory
 import com.maddyhome.idea.vim.macro.VimMacro
-import com.maddyhome.idea.vim.mark.VimMarkGroup
 import com.maddyhome.idea.vim.put.VimPut
 import com.maddyhome.idea.vim.register.VimRegisterGroup
 import com.maddyhome.idea.vim.undo.VimUndoRedo
@@ -60,10 +59,6 @@ interface VimInjector {
   val keyGroup: VimKeyGroup
   // [FINISHED] Only state left in the IJ && some IJ specifics
   val markService: VimMarkService
-
-  @get:Deprecated("Please use markService instead")
-  @get:ScheduledForRemoval(inVersion = "2.3")
-  val markGroup: VimMarkGroup
 
   val jumpService: VimJumpService
 

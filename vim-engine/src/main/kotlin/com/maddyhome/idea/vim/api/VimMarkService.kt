@@ -82,10 +82,8 @@ interface VimMarkService {
   fun setGlobalMark(editor: VimEditor, mark: Mark): Boolean
 
   fun setVisualSelectionMarks(editor: VimEditor)
-  fun setVisualSelectionMarks(caret: ImmutableVimCaret, range: TextRange)
   fun getVisualSelectionMarks(caret: ImmutableVimCaret): TextRange?
 
-  fun setChangeMarks(caret: ImmutableVimCaret, range: TextRange)
   fun getChangeMarks(caret: ImmutableVimCaret): TextRange?
 
   /**
@@ -152,4 +150,14 @@ interface VimMarkService {
     REMOVE,
     SAVE,
   }
+}
+
+fun VimMarkService.setChangeMarks(caret: ImmutableVimCaret, range: TextRange) {
+  setMark(caret, VimMarkService.CHANGE_START_MARK, range.startOffset)
+  setMark(caret, VimMarkService.CHANGE_END_MARK, range.endOffset - 1)
+}
+
+fun VimMarkService.setVisualSelectionMarks(caret: ImmutableVimCaret, range: TextRange) {
+  setMark(caret, VimMarkService.SELECTION_START_MARK, range.startOffset)
+  setMark(caret, VimMarkService.SELECTION_END_MARK, range.endOffset)
 }

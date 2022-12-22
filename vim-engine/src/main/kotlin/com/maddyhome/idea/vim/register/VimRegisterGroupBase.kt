@@ -253,7 +253,7 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
 
     if (start != -1) {
       // todo it's the worst place to do it, setting mark and storing something to register are two different things
-      injector.markService.setChangeMarks(caret, TextRange(start, end))
+//      injector.markService.setChangeMarks(caret, TextRange(start, end))
     }
 
     return true
