@@ -5,7 +5,7 @@ name: Update Changelog On PR
 
 on:
   workflow_dispatch:
-  pull_request:
+  pull_request_target:
     types: [ closed ]
 
 jobs:
@@ -30,7 +30,7 @@ jobs:
         id: update_authors
         run: ./gradlew updateMergedPr -PprId=${{ github.event.number }}
         env:
-          GITHUB_OAUTH: ${{ secrets.MERGE_PR }}
+          GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v4
