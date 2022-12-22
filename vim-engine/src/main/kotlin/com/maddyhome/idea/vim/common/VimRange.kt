@@ -14,6 +14,7 @@ import com.maddyhome.idea.vim.api.MutableVimEditor
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getLineEndOffset
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.setChangeMarks
 import com.maddyhome.idea.vim.api.toType
 import com.maddyhome.idea.vim.mark.VimMarkConstants
 import kotlin.math.max

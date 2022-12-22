@@ -57,7 +57,7 @@ interface VimMotionGroup {
   fun moveCaretToCurrentDisplayLineEnd(editor: VimEditor, caret: ImmutableVimCaret, allowEnd: Boolean): Motion
 
   // Move caret to other
-  fun moveCaretToMark(caret: ImmutableVimCaret, ch: Char, toLineStart: Boolean): Int
+  fun moveCaretToMark(caret: ImmutableVimCaret, ch: Char, toLineStart: Boolean): Motion
   fun moveCaretToJump(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Int
   fun moveCaretToMatchingPair(editor: VimEditor, caret: ImmutableVimCaret): Int
 

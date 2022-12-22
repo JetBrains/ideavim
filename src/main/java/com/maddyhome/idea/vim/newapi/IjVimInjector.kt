@@ -61,6 +61,7 @@ import com.maddyhome.idea.vim.group.EditorGroup
 import com.maddyhome.idea.vim.group.FileGroup
 import com.maddyhome.idea.vim.group.HistoryGroup
 import com.maddyhome.idea.vim.group.MacroGroup
+import com.maddyhome.idea.vim.group.MarkGroup
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.SearchGroup
 import com.maddyhome.idea.vim.group.TabService
@@ -76,7 +77,6 @@ import com.maddyhome.idea.vim.helper.VimCommandLineHelper
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.history.VimHistory
 import com.maddyhome.idea.vim.macro.VimMacro
-import com.maddyhome.idea.vim.mark.VimMarkGroup
 import com.maddyhome.idea.vim.put.VimPut
 import com.maddyhome.idea.vim.register.VimRegisterGroup
 import com.maddyhome.idea.vim.ui.VimRcFileState
@@ -154,10 +154,6 @@ class IjVimInjector : VimInjectorBase() {
   override val keyGroup: VimKeyGroup
     get() = service()
 
-  @get:Deprecated("Please use VimMarkService instead")
-  @get:ApiStatus.ScheduledForRemoval(inVersion = "2.3")
-  override val markGroup: VimMarkGroup
-    get() = service()
   override val markService: VimMarkService
     get() = service()
   override val jumpService: VimJumpService

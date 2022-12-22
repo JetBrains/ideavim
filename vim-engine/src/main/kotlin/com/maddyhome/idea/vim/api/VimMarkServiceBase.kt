@@ -81,11 +81,11 @@ abstract class VimMarkServiceBase : VimMarkService {
   }
 
   protected fun getLocalMark(caret: ImmutableVimCaret, char: Char): Mark? {
-    val markChar = if (char == '`') '\'' else char
+    val markChar = char.normalizeMarkChar()
     if (!markChar.isLocalMark()) return null
 
     if (markChar == SELECTION_START_MARK) {
-      return getSelectionStartMark(caret)
+      return createSelectionStartMark(caret)
     } else if (markChar == SELECTION_END_MARK) {
       return getSelectionEndMark(caret)
     }
@@ -104,14 +104,14 @@ abstract class VimMarkServiceBase : VimMarkService {
   }
 
   override fun getMark(caret: ImmutableVimCaret, char: Char): Mark? {
-    val markChar = if (char == '`') '\'' else char
-    if (!markChar.isValid(VimMarkService.Operation.GET, caret)) return null
+    val markChar = char.normalizeMarkChar()
+    if (!markChar.isOperationValidOnMark(VimMarkService.Operation.GET, caret)) return null
 
     val editor = caret.editor
     val path = editor.getPath()
-    return if (path != null && setOf(PARAGRAPH_START_MARK, PARAGRAPH_END_MARK).contains(markChar)) {
+    return if (path != null && (markChar == PARAGRAPH_START_MARK || markChar == PARAGRAPH_END_MARK)) {
       getParagraphMark(editor, caret, markChar)
-    } else if (path != null && setOf(SENTENCE_START_MARK, SENTENCE_END_MARK).contains(markChar)) {
+    } else if (path != null && (markChar == SENTENCE_START_MARK || markChar == SENTENCE_END_MARK)) {
       getSentenceMark(editor, caret, markChar)
     } else if (markChar.isLocalMark()) {
       getLocalMark(caret, markChar)
@@ -133,7 +133,7 @@ abstract class VimMarkServiceBase : VimMarkService {
   }
 
   override fun getAllMarksForFile(editor: VimEditor): List<Pair<ImmutableVimCaret?, Set<Mark>>> {
-    val localMarks = injector.editorGroup.getAllEditors()
+    val localMarks = injector.editorGroup.localEditors()
       .filter { it.getPath() == editor.getPath() }
       .flatMap { it.carets() }
       .map { Pair(it, getAllLocalMarks(it)) }
@@ -147,15 +147,14 @@ abstract class VimMarkServiceBase : VimMarkService {
 
   override fun getGlobalMarks(editor: VimEditor): Set<Mark> {
     val filePath = editor.getPath() ?: return emptySet()
-    return globalMarks
-      .map { it.value }
+    return globalMarks.values
       .filter { it.filepath == filePath }
       .toSet()
   }
 
   override fun setMark(editor: VimEditor, char: Char): Boolean {
-    val markChar = if (char == '`') '\'' else char
-    if (!markChar.isValid(VimMarkService.Operation.SET, editor.primaryCaret())) return false
+    val markChar = char.normalizeMarkChar()
+    if (!markChar.isOperationValidOnMark(VimMarkService.Operation.SET, editor.primaryCaret())) return false
 
     return when {
       markChar.isGlobalMark() -> {
@@ -173,38 +172,35 @@ abstract class VimMarkServiceBase : VimMarkService {
 
   override fun setMark(caret: ImmutableVimCaret, mark: Mark): Boolean {
     val markChar = mark.key
+    val editor = caret.editor
 
-    if (!markChar.isValid(VimMarkService.Operation.SET, caret)) return false
-
-    if (markChar.isGlobalMark()) {
-      setGlobalMark(caret.editor, mark)
-    } else if (markChar == SELECTION_START_MARK || markChar == SELECTION_END_MARK) {
-      when (markChar) {
-        SELECTION_START_MARK -> setSelectionStartMark(caret, mark.offset(caret.editor))
-        SELECTION_END_MARK -> setSelectionEndMark(caret, mark.offset(caret.editor))
+    when {
+      !markChar.isOperationValidOnMark(VimMarkService.Operation.SET, caret) -> return false
+      markChar.isGlobalMark() -> setGlobalMark(editor, mark)
+      markChar == SELECTION_START_MARK -> setSelectionStartMark(caret, mark.offset(editor))
+      markChar == SELECTION_END_MARK -> setSelectionEndMark(caret, mark.offset(editor))
+      markChar.isLocalMark() -> {
+        if (caret.isPrimary) {
+          getLocalMarks(mark.filepath)[markChar] = mark
+        } else {
+          caret.markStorage.setMark(mark)
+        }
       }
-    } else if (markChar.isLocalMark()) {
-      if (caret.isPrimary) {
-        getLocalMarks(mark.filepath)[markChar] = mark
-      } else {
-        caret.markStorage.setMark(mark)
-      }
-    } else {
-      return false
+      else -> return false
     }
     return true
   }
 
   override fun setMark(caret: ImmutableVimCaret, char: Char, offset: Int): Boolean {
-    val markChar = if (char == '`') '\'' else char
+    val markChar = char.normalizeMarkChar()
     val mark = createMark(caret, markChar, offset) ?: return false
     return setMark(caret, mark)
   }
 
   protected open fun createGlobalMark(editor: VimEditor, char: Char, offset: Int): Mark? {
-    val markChar = if (char == '`') '\'' else char
+    val markChar = char.normalizeMarkChar()
     if (!markChar.isGlobalMark()) return null
-    if (!markChar.isValid(VimMarkService.Operation.SET, editor.primaryCaret())) return null
+    if (!markChar.isOperationValidOnMark(VimMarkService.Operation.SET, editor.primaryCaret())) return null
     val position = editor.offsetToBufferPosition(offset)
     val path = editor.getPath() ?: return null
     return VimMark(markChar, position.line, position.column, path, editor.extractProtocol())
@@ -216,14 +212,14 @@ abstract class VimMarkServiceBase : VimMarkService {
   }
 
   override fun setGlobalMark(editor: VimEditor, mark: Mark): Boolean {
-    if (!mark.key.isValid(VimMarkService.Operation.SET, editor.primaryCaret())) return false
+    if (!mark.key.isOperationValidOnMark(VimMarkService.Operation.SET, editor.primaryCaret())) return false
     globalMarks[mark.key] = mark
     return true
   }
 
   override fun setMarkForCaret(caret: ImmutableVimCaret, char: Char, offset: Int): Boolean {
-    val markChar = if (char == '`') '\'' else char
-    if (!markChar.isValid(VimMarkService.Operation.SET, caret)) return false
+    val markChar = char.normalizeMarkChar()
+    if (!markChar.isOperationValidOnMark(VimMarkService.Operation.SET, caret)) return false
     return when {
       markChar.isGlobalMark() -> if (caret.isPrimary) setGlobalMark(caret.editor, char, offset) else false
       markChar.isLocalMark() -> setMark(caret, char, offset)
@@ -242,18 +238,8 @@ abstract class VimMarkServiceBase : VimMarkService {
       }
   }
 
-  override fun setVisualSelectionMarks(caret: ImmutableVimCaret, range: TextRange) {
-    setMark(caret, SELECTION_START_MARK, range.startOffset)
-    setMark(caret, SELECTION_END_MARK, range.endOffset)
-  }
-
   override fun getVisualSelectionMarks(caret: ImmutableVimCaret): TextRange? {
     return getMarksRange(caret, SELECTION_START_MARK, SELECTION_END_MARK)
-  }
-
-  override fun setChangeMarks(caret: ImmutableVimCaret, range: TextRange) {
-    setMark(caret, CHANGE_START_MARK, range.startOffset)
-    setMark(caret, CHANGE_END_MARK, range.endOffset - 1)
   }
 
   override fun getChangeMarks(caret: ImmutableVimCaret): TextRange? {
@@ -270,7 +256,7 @@ abstract class VimMarkServiceBase : VimMarkService {
   }
 
   override fun removeMark(editor: VimEditor, char: Char) {
-    val markChar = if (char == '`') '\'' else char
+    val markChar = char.normalizeMarkChar()
     if (markChar.isLocalMark()) {
       editor.carets()
         .forEach { removeLocalMark(it, char) }
@@ -281,29 +267,35 @@ abstract class VimMarkServiceBase : VimMarkService {
   }
 
   override fun removeLocalMark(caret: ImmutableVimCaret, char: Char) {
-    val markChar = if (char == '`') '\'' else char
+    val markChar = char.normalizeMarkChar()
     if (!markChar.isLocalMark()) return
 
-    if (caret.isPrimary) {
-      if (markChar == SELECTION_START_MARK) {
-        val selectionInfo = caret.lastSelectionInfo
-        val startPosition = selectionInfo.start
-        if (startPosition != null) caret.lastSelectionInfo = SelectionInfo(null, selectionInfo.end, selectionInfo.type)
-      } else if (markChar == SELECTION_END_MARK) {
-        val selectionInfo = caret.lastSelectionInfo
-        val endPosition = selectionInfo.end
-        if (endPosition != null) caret.lastSelectionInfo = SelectionInfo(selectionInfo.start, null, selectionInfo.type)
-      } else {
-        val path = caret.editor.getPath() ?: return
-        getLocalMarks(path).remove(markChar)
-      }
+    if (markChar == SELECTION_START_MARK) {
+      removeSelectionStartMark(caret)
+    } else if (markChar == SELECTION_END_MARK) {
+      removeSelectionEndMark(caret)
+    } else if (caret.isPrimary) {
+      val path = caret.editor.getPath() ?: return
+      getLocalMarks(path).remove(markChar)
     } else {
-      caret.markStorage.removeMark(markChar, caret)
+      caret.markStorage.removeMark(markChar)
     }
   }
 
+  private fun removeSelectionStartMark(caret: ImmutableVimCaret) {
+    val selectionInfo = caret.lastSelectionInfo
+    val startPosition = selectionInfo.start
+    if (startPosition != null) caret.lastSelectionInfo = SelectionInfo(null, selectionInfo.end, selectionInfo.type)
+  }
+
+  private fun removeSelectionEndMark(caret: ImmutableVimCaret) {
+    val selectionInfo = caret.lastSelectionInfo
+    val endPosition = selectionInfo.end
+    if (endPosition != null) caret.lastSelectionInfo = SelectionInfo(selectionInfo.start, null, selectionInfo.type)
+  }
+
   override fun removeGlobalMark(char: Char) {
-    val markChar = if (char == '`') '\'' else char
+    val markChar = char.normalizeMarkChar()
     if (markChar.isGlobalMark()) {
       globalMarks.remove(markChar)
     }
@@ -411,7 +403,7 @@ abstract class VimMarkServiceBase : VimMarkService {
   }
 
   override fun resetAllMarks() {
-    for (editor in injector.editorGroup.getAllEditors()) {
+    for (editor in injector.editorGroup.localEditors()) {
       editor.carets().forEach {
         resetAllMarksForCaret(it)
       }
@@ -462,7 +454,7 @@ abstract class VimMarkServiceBase : VimMarkService {
     }
   }
 
-  private fun Char.isValid(operation: VimMarkService.Operation, caret: ImmutableVimCaret): Boolean {
+  private fun Char.isOperationValidOnMark(operation: VimMarkService.Operation, caret: ImmutableVimCaret): Boolean {
     return isValidMark(this, operation, caret.isPrimary)
   }
 
@@ -510,7 +502,7 @@ abstract class VimMarkServiceBase : VimMarkService {
     return VimMark(char, lp.line, lp.column, path, editor.extractProtocol())
   }
 
-  protected fun getSelectionStartMark(caret: ImmutableVimCaret): Mark? {
+  protected fun createSelectionStartMark(caret: ImmutableVimCaret): Mark? {
     val selectionInfo = caret.lastSelectionInfo
     val startOffset = selectionInfo.start?.let { caret.editor.bufferPositionToOffset(it) }
     val endOffset = selectionInfo.end?.let { caret.editor.bufferPositionToOffset(it) }
@@ -544,12 +536,12 @@ abstract class VimMarkServiceBase : VimMarkService {
     return createMark(caret, SELECTION_END_MARK, offset)
   }
 
-  protected fun setSelectionStartMark(caret: ImmutableVimCaret, offset: Int) {
+  private fun setSelectionStartMark(caret: ImmutableVimCaret, offset: Int) {
     val selectionInfo = caret.lastSelectionInfo
     caret.lastSelectionInfo = SelectionInfo(caret.editor.offsetToBufferPosition(offset), selectionInfo.end, selectionInfo.type)
   }
 
-  protected fun setSelectionEndMark(caret: ImmutableVimCaret, offset: Int) {
+  private fun setSelectionEndMark(caret: ImmutableVimCaret, offset: Int) {
     val selectionInfo = caret.lastSelectionInfo
     caret.lastSelectionInfo = SelectionInfo(selectionInfo.start, caret.editor.offsetToBufferPosition(offset), selectionInfo.type)
   }
@@ -559,6 +551,8 @@ abstract class VimMarkServiceBase : VimMarkService {
     val position = editor.offsetToBufferPosition(offset)
     return VimMark(char, position.line, position.column, editor.getPath() ?: return null, editor.extractProtocol())
   }
+
+  protected fun Char.normalizeMarkChar() = if (this == '`') '\'' else this
 }
 
 class LocalMarkStorage(var caret: ImmutableVimCaret) {
@@ -585,10 +579,8 @@ class LocalMarkStorage(var caret: ImmutableVimCaret) {
     return true
   }
 
-  fun removeMark(char: Char, caret: ImmutableVimCaret) {
-    // todo avoid this because of the stackOverflow
+  fun removeMark(char: Char) {
     if (caret.isPrimary) {
-      val editor = caret.editor
       return injector.markService.removeLocalMark(caret, char)
     } else {
       marks.remove(char)
