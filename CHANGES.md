@@ -25,6 +25,9 @@ usual beta standards.
 
 ## To Be Released
 
+### Features:
+* Add IdeaVim tutor. You can access it via the status bar icon.
+
 ### Fixes:
 * [VIM-2797](https://youtrack.jetbrains.com/issue/VIM-2797) Introduce variable to mute default argtextobj mappings
 * [VIM-758](https://youtrack.jetbrains.com/issue/VIM-758) Support d mappings

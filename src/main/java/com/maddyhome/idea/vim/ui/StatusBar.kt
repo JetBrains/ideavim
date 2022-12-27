@@ -11,12 +11,17 @@ package com.maddyhome.idea.vim.ui
 import com.intellij.icons.AllIcons
 import com.intellij.ide.BrowserUtil
 import com.intellij.ide.DataManager
+import com.intellij.ide.projectView.ProjectView
+import com.intellij.ide.scratch.ScratchRootType
+import com.intellij.ide.util.PsiNavigationSupport
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.DefaultActionGroup
+import com.intellij.openapi.application.impl.LaterInvocator
+import com.intellij.openapi.fileTypes.PlainTextLanguage
 import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.project.Project
@@ -30,6 +35,7 @@ import com.intellij.openapi.wm.StatusBarWidget
 import com.intellij.openapi.wm.StatusBarWidgetFactory
 import com.intellij.openapi.wm.WindowManager
 import com.intellij.openapi.wm.impl.status.widget.StatusBarWidgetsManager
+import com.intellij.psi.PsiManager
 import com.intellij.ui.awt.RelativePoint
 import com.intellij.util.Consumer
 import com.intellij.util.ui.LafIconLookup
@@ -193,6 +199,10 @@ private object VimActionsPopup {
       )
     )
 
+    actionGroup.addSeparator("Learn")
+
+    actionGroup.add(TutorAction())
+
     actionGroup.addSeparator(MessageHelper.message("action.contacts.help.text"))
     actionGroup.add(
       HelpLink(
@@ -217,6 +227,22 @@ private object VimActionsPopup {
     )
 
     return actionGroup
+  }
+}
+
+private class TutorAction() : DumbAwareAction("Tutor") {
+  override fun actionPerformed(e: AnActionEvent) {
+    val project = e.project ?: return
+    val file = ScratchRootType.getInstance()
+      .createScratchFile(project, "Tutor.txt", PlainTextLanguage.INSTANCE, tutor) ?: return
+
+    PsiNavigationSupport.getInstance()
+      .createNavigatable(project, file, 0)
+      .navigate(!LaterInvocator.isInModalContextForProject(project))
+
+    PsiManager.getInstance(project).findFile(file)?.let {
+      ProjectView.getInstance(project).selectPsiElement(it, false)
+    }
   }
 }
 
