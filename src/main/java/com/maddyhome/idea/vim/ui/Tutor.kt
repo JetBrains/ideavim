@@ -20,13 +20,13 @@ internal val tutor = """
        explain in a tutor such as this.  This tutor is designed to describe
        enough of the commands that you will be able to easily use Vim as
        an all-purpose editor.
+       
+       IdeaVim is a Vim engine for JetBrains IDEs, such as IntelliJ IDEA, PyCharm,
+       and more. It allows you to use Vim-style editing inside of a full-fledged IDE.
 
-       IdeaVim is a Vim engine for JetBrains IDEs, such as IntelliJ IDEA, PyCharm, etc.
-       It allows you to use a Vim-style editing inside of a full-fledged IDE.
-
-       This tutorial misses a few things that are explained in Vim tutor, but aren’t
-       relevant to IdeaVim (for example, how to exit vim). If you’re still interested
-       in them, see the last section.
+       This tutorial doesn't cover a few things that are explained in Vim tutor,
+       but aren’t relevant to IdeaVim (for example, how to exit Vim). If you’re
+       still interested in them, see the last section.
 
        The approximate time required to complete the tutor is 30 minutes,
        depending upon how much time is spent with experimentation.
@@ -687,30 +687,29 @@ internal val tutor = """
 
 
               ** Enable IdeaVim features **
-
+              
     IdeaVim and Vim have many more features than Vi, but most of them are disabled
-    by default. To start using more features you should create an "ideavimrc" file.
-    For Vim it’s a “vimrc” file.
+    by default. To start using more features, first create an "ideavimrc" file.
+    For Vim it’s a "vimrc" file.
 
-    Start editing the “ideavimrc” file. For that click the IdeaVim status bar icon
-    (the green V letter) and click “Create ~/.ideavimrc”. This will create a
-    “.ideavimrc” file in your home directory.
+    To do so, click the IdeaVim status bar icon
+    (the green V letter) and click "Create ~/.ideavimrc". This will create a
+    ".ideavimrc" file in your home directory.
 
     Add the following lines to the file:
     
           Plug 'machakann/vim-highlightedyank'
           set incsearch
 
-    Click the reload icon in the right upper corner on the editor.
+    Click on the reload icon in the upper-right corner of the editor.
 
-    With these commands you’ve enable the “highlightedyank” plugin and incremental
-    search. The “highlightedyank” plugin highlights the text that was yanked.
+    With these commands, you've enable the "highlightedyank" plugin and incremental
+    search. The "highlightedyank" plugin highlights the text that was yanked.
     The incremental search feature shows search matches as you type the query.
 
     You can find more plugins by clicking “Status bar icon | Plugins…”.
 
-    You can add all your preferred settings to this "ideavimrc" file.
-
+    You can add all of your preferred settings to this "ideavimrc" file.
 
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                          Lesson 6 SUMMARY
@@ -751,10 +750,9 @@ internal val tutor = """
 
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    Removed VIM Tutor sections:
-         
-    They are related to the Vim editor, but not really applicable for the IdeaVim plugin.
-    It's recommended to run these steps in an actual vim editor.
+    We removed the Vim Tutor sections that are related to the Vim editor,
+    but not really applicable to the IdeaVim plugin.
+    We recommend running these steps in an actual Vim editor.
 
             Lesson 1.2: EXITING VIM
       
