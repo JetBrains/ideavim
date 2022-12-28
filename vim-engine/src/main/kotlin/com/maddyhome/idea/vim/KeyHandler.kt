@@ -213,7 +213,7 @@ class KeyHandler {
   }
 
   /**
-   * See the description for [com.maddyhome.idea.vim.action.DuplicableOperatorAction]
+   * See the description for [com.maddyhome.idea.vim.command.DuplicableOperatorAction]
    */
   private fun mapOpCommand(
     key: KeyStroke,
