@@ -808,7 +808,7 @@ fun updateMergedPr(number: Int) {
     if (pullRequest.user.login == "dependabot[bot]") return
 
     val prNumber = pullRequest.number
-    val userName = pullRequest.user.name
+    val userName = pullRequest.user.name ?: pullRequest.user.login
     val login = pullRequest.user.login
     val title = pullRequest.title
     val section =
