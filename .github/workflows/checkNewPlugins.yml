@@ -1,0 +1,25 @@
+# This workflow will build a package using Gradle and then publish it to GitHub packages when a release is created
+# For more information see: https://github.com/actions/setup-java/blob/main/docs/advanced-usage.md#Publishing-using-gradle
+
+# This workflow syncs changes from the docs folder of IdeaVim to the IdeaVim.wiki repository
+
+name: Check new plugin dependencies
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 5 * * *'
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Fetch origin repo
+        uses: actions/checkout@v3
+        with:
+          path: origin
+
+      - name: Check new plugins
+        run: ./gradlew checkNewPluginDependencies

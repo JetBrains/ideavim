@@ -541,6 +541,23 @@ tasks.register("testUpdateChangelog") {
     }
 }
 
+tasks.register("checkNewPluginDependencies") {
+    group = "verification"
+    description = "This job tracks if there are any new plugins in marketplace we don't know about"
+    doLast {
+        val client = HttpClient(CIO)
+
+        runBlocking {
+            val res = client.get("https://plugins.jetbrains.com/api/plugins/?dependency=IdeaVIM&includeOptional=true")
+            val output = res.body<String>()
+            println(output)
+            val pluginList =
+                """["IdeaVimExtension","github.zgqq.intellij-enhance","org.jetbrains.IdeaVim-EasyMotion","io.github.mishkun.ideavimsneak","eu.theblob42.idea.whichkey","com.github.copilot","com.github.dankinsoid.multicursor","com.joshestein.ideavim-quickscope"]"""
+            if (pluginList != output) error("Unknown plugins list: ${output}")
+        }
+    }
+}
+
 fun addReleaseToYoutrack(name: String): String {
     val client = httpClient()
     println("Creating new release version in YouTrack: $name")
