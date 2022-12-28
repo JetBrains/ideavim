@@ -61,6 +61,7 @@ plugins {
     antlr
     java
     kotlin("jvm") version "1.7.20"
+    application
 
     id("org.jetbrains.intellij") version "1.11.1-SNAPSHOT"
     id("org.jetbrains.changelog") version "1.3.1"
@@ -539,6 +540,12 @@ tasks.register("testUpdateChangelog") {
 
         changesFile.writeText(changesBuilder.toString())
     }
+}
+
+tasks.register("generateIdeaVimConfigurations", JavaExec::class) {
+    description = "This task generates lists of actions and commands for IdeaVim"
+    mainClass.set("scripts.MainKt")
+    classpath = sourceSets["main"].runtimeClasspath
 }
 
 tasks.register("checkNewPluginDependencies") {
