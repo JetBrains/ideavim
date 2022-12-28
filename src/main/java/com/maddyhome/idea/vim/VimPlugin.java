@@ -242,12 +242,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
 
   public static @NotNull String getVersion() {
     final IdeaPluginDescriptor plugin = PluginManagerCore.getPlugin(getPluginId());
-    if (!ApplicationManager.getApplication().isInternal()) {
-      return plugin != null ? plugin.getVersion() : "SNAPSHOT";
-    }
-    else {
-      return "INTERNAL" + (plugin != null ? " - " + plugin.getVersion() : "");
-    }
+    return plugin != null ? plugin.getVersion() : "SNAPSHOT";
   }
 
   public static boolean isEnabled() {
