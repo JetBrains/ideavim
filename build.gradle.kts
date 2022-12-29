@@ -88,6 +88,25 @@ val publishToken: String by project
 val slackUrl: String by project
 val youtrackToken: String by project
 
+/**
+ * Okay, now meet the magic of gradle.
+ *
+ * The task: I'd like to have a separate folder with several kotlin scripts. These scripts are not
+ *   supposed to be used in IdeaVim plugin, but will provide some handy actions for code maintenance.
+ *
+ * As I don't know how to do it perfectly and I didn't find an answer on google, now such scripts
+ *   are called as a separate java applications, what seems fine for me. However, there is a problem
+ *   that the dependencies of the scripts where included in the plugin destribution, what increased the
+ *   package size in 2.5 times.
+ *   To solve this problem and having only "my script scoped dependencies", I found a feature of gradle
+ *   called "configurations". So, here I declare the configuration.
+ *   The scipt-specific dependencies are defined using this configuration.
+ *   The dependencies are added in task using `configurations["scriptsVim"]` syntax.
+ *
+ * There is no other goal for this thing except defining script-specific dependencies.
+ */
+val scriptsVim: Configuration by configurations.creating
+
 repositories {
     mavenCentral()
     maven { url = uri("https://cache-redirector.jetbrains.com/intellij-dependencies") }
@@ -116,6 +135,19 @@ dependencies {
     api(project(":vim-engine"))
 
     testApi("com.squareup.okhttp3:okhttp:4.10.0")
+
+    // Script specific dependencies.
+    // As IJ doesn't catch these dependencies and shows them as red (must probably because of my misconfiguration)
+    //   I specified the same dependencies twice with a different configuration.
+    //   It seems like it doesn't affect the plugin size or anything else, but just enabled a highlighting in IJ
+    scriptsVim("io.ktor:ktor-client-core:2.1.3")
+    scriptsVim("io.ktor:ktor-client-cio:2.1.3")
+    scriptsVim("io.ktor:ktor-client-content-negotiation:2.1.3")
+    scriptsVim("io.ktor:ktor-serialization-kotlinx-json:2.1.3")
+    compileOnly("io.ktor:ktor-client-core:2.1.3")
+    compileOnly("io.ktor:ktor-client-cio:2.1.3")
+    compileOnly("io.ktor:ktor-client-content-negotiation:2.1.3")
+    compileOnly("io.ktor:ktor-serialization-kotlinx-json:2.1.3")
 }
 
 configurations {
@@ -548,21 +580,11 @@ tasks.register("generateIdeaVimConfigurations", JavaExec::class) {
     classpath = sourceSets["main"].runtimeClasspath
 }
 
-tasks.register("checkNewPluginDependencies") {
+tasks.register("checkNewPluginDependencies", JavaExec::class) {
     group = "verification"
     description = "This job tracks if there are any new plugins in marketplace we don't know about"
-    doLast {
-        val client = HttpClient(CIO)
-
-        runBlocking {
-            val res = client.get("https://plugins.jetbrains.com/api/plugins/?dependency=IdeaVIM&includeOptional=true")
-            val output = res.body<String>()
-            println(output)
-            val pluginList =
-                """["IdeaVimExtension","github.zgqq.intellij-enhance","org.jetbrains.IdeaVim-EasyMotion","io.github.mishkun.ideavimsneak","eu.theblob42.idea.whichkey","com.github.copilot","com.github.dankinsoid.multicursor","com.joshestein.ideavim-quickscope"]"""
-            if (pluginList != output) error("Unknown plugins list: ${output}")
-        }
-    }
+    mainClass.set("scripts.CheckNewPluginDependenciesKt")
+    classpath = configurations["scriptsVim"] + sourceSets["main"].runtimeClasspath
 }
 
 fun addReleaseToYoutrack(name: String): String {
