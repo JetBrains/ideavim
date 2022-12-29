@@ -42,6 +42,7 @@ usual beta standards.
 * [571](https://github.com/JetBrains/ideavim/pull/571) by [Ada](https://github.com/adaext): Remove the redundant quotation mark at the end of "packadd matchit" command
 * [561](https://github.com/JetBrains/ideavim/pull/561) by [Matt Ellis](https://github.com/citizenmatt): Fix incremental search not scrolling to current match
 * [559](https://github.com/JetBrains/ideavim/pull/559) by [Runinho](https://github.com/Runinho): Fix(VIM-2760) notebookCommandMode detection
+* [579](https://github.com/JetBrains/ideavim/pull/579) by [Martin Yzeiri](https://github.com/myzeiri): VIM-2799: Add Matchit support for cshtml files
 
 ## 2.0.0, 2022-11-01
 
