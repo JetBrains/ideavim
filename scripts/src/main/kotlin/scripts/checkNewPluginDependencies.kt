@@ -43,7 +43,10 @@ fun main() {
   }
 
   runBlocking {
-    val res = client.get("https://plugins.jetbrains.com/api/plugins/?dependency=IdeaVIM&includeOptional=true")
+    val res = client.get("https://plugins.jetbrains.com/api/plugins/") {
+      parameter("dependency", "IdeaVIM")
+      parameter("includeOptional", true)
+    }
     val output = res.body<List<String>>()
     println(output)
     if (knownPlugins != output) error("Unknown plugins list: ${output}")
