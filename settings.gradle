@@ -10,4 +10,5 @@ pluginManagement {
 
 rootProject.name = 'IdeaVIM'
 include 'vim-engine'
+include 'scripts'
 

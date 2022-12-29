@@ -28,4 +28,4 @@ jobs:
           settings-path: ${{ github.workspace }} # location for the settings.xml file
 
       - name: Check new plugins
-        run: ./gradlew checkNewPluginDependencies
+        run: ./gradlew scripts:checkNewPluginDependencies
