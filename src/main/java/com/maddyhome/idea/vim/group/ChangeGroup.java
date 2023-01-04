@@ -77,9 +77,6 @@ public class ChangeGroup extends VimChangeGroupBase {
   private long lastShownTime = 0L;
 
 
-
-
-
   private final @NotNull EditorMouseListener listener = new EditorMouseListener() {
     @Override
     public void mouseClicked(@NotNull EditorMouseEvent event) {
@@ -161,17 +158,6 @@ public class ChangeGroup extends VimChangeGroupBase {
                               @NotNull SelectionType type) {
     return com.maddyhome.idea.vim.newapi.ChangeGroupKt.deleteRange(editor, caret, range, type);
   }
-
-
-  /**
-   * Delete the text covered by the motion command argument and enter insert mode
-   *
-   * @param editor   The editor to change
-   * @param caret    The caret on which the motion is supposed to be performed
-   * @param context  The data context
-   * @param argument The motion command
-   * @return true if able to delete the text, false if not
-   */
 
   /**
    * Toggles the case of count characters
