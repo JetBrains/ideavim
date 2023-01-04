@@ -286,11 +286,11 @@ abstract class VimMotionGroupBase : VimMotionGroup {
         end = (motion as AbsoluteOffset).offset
 
         // If inclusive, add the last character to the range
-        if (cmdAction.motionType === MotionType.INCLUSIVE && end < editor.fileSize()) {
+        if (cmdAction.motionType === MotionType.INCLUSIVE) {
           if (start > end) {
-            start++
+            if (start < editor.fileSize()) start++
           } else {
-            end++
+            if (end < editor.fileSize()) end++
           }
         }
       } else if (cmdAction is TextObjectActionHandler) {
