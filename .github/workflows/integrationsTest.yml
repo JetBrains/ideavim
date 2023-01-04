@@ -29,4 +29,4 @@ jobs:
         run: ./gradlew integrationsTest
         env:
           YOUTRACK_TOKEN: ${{ secrets.YOUTRACK_TOKEN }}
-          GITHUB_OAUTH: ${{ secrets.MERGE_PR }}
+          GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
