@@ -101,6 +101,15 @@ interface VimChangeGroup {
 
   fun changeEndOfLine(editor: VimEditor, caret: VimCaret, count: Int, operatorArguments: OperatorArguments): Boolean
 
+  /**
+   * Delete the text covered by the motion command argument and enter insert mode
+   *
+   * @param editor   The editor to change
+   * @param caret    The caret on which the motion is supposed to be performed
+   * @param context  The data context
+   * @param argument The motion command
+   * @return true if able to delete the text, false if not
+   */
   fun changeMotion(editor: VimEditor, caret: VimCaret, context: ExecutionContext, argument: Argument, operatorArguments: OperatorArguments): Boolean
 
   fun changeCaseToggleCharacter(editor: VimEditor, caret: VimCaret, count: Int): Boolean
