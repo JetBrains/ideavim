@@ -214,7 +214,7 @@ private object VimActionsPopup {
     actionGroup.add(
       HelpLink(
         MessageHelper.message("action.create.issue.text"),
-        "https://youtrack.jetbrains.com/issues/VIM",
+        "https://youtrack.jetbrains.com/newIssue?project=VIM&description=%0A%0A-----------%0AYou%20can%20improve%20the%20issue%20description%20by%20providing%3A%0A1)%20Your%20%60~%2F.ideavimrc%60%20configuration%20if%20you%20use%20it.%0A2)%20The%20%5Blog%5D(https%3A%2F%2Fintellij-support.jetbrains.com%2Fhc%2Fen-us%2Farticles%2F207241085-Locating-IDE-log-files)%20from%20your%20IDE.%0A%0AVersion:%20${VimPlugin.getVersion()}&c=Affected%20versions%20${VimPlugin.getVersion()}",
         VimIcons.YOUTRACK
       )
     )
