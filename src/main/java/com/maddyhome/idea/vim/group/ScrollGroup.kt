@@ -12,7 +12,6 @@ import com.intellij.openapi.editor.VisualPosition
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.VimMotionGroup
 import com.maddyhome.idea.vim.api.VimScrollGroup
 import com.maddyhome.idea.vim.api.getVisualLineCount
 import com.maddyhome.idea.vim.api.injector
@@ -20,48 +19,57 @@ import com.maddyhome.idea.vim.api.normalizeLine
 import com.maddyhome.idea.vim.api.normalizeVisualColumn
 import com.maddyhome.idea.vim.api.normalizeVisualLine
 import com.maddyhome.idea.vim.api.visualLineToBufferLine
-import com.maddyhome.idea.vim.helper.EditorHelper.*
+import com.maddyhome.idea.vim.helper.EditorHelper.getNonNormalizedVisualLineAtBottomOfScreen
+import com.maddyhome.idea.vim.helper.EditorHelper.getVisibleArea
+import com.maddyhome.idea.vim.helper.EditorHelper.getVisualColumnAtLeftOfDisplay
+import com.maddyhome.idea.vim.helper.EditorHelper.getVisualColumnAtRightOfDisplay
+import com.maddyhome.idea.vim.helper.EditorHelper.getVisualLineAtBottomOfScreen
+import com.maddyhome.idea.vim.helper.EditorHelper.getVisualLineAtTopOfScreen
+import com.maddyhome.idea.vim.helper.EditorHelper.scrollColumnToLeftOfScreen
+import com.maddyhome.idea.vim.helper.EditorHelper.scrollColumnToRightOfScreen
+import com.maddyhome.idea.vim.helper.EditorHelper.scrollFullPageDown
+import com.maddyhome.idea.vim.helper.EditorHelper.scrollFullPageUp
+import com.maddyhome.idea.vim.helper.EditorHelper.scrollVisualLineToBottomOfScreen
+import com.maddyhome.idea.vim.helper.EditorHelper.scrollVisualLineToCaretLocation
+import com.maddyhome.idea.vim.helper.EditorHelper.scrollVisualLineToMiddleOfScreen
+import com.maddyhome.idea.vim.helper.EditorHelper.scrollVisualLineToTopOfScreen
 import com.maddyhome.idea.vim.helper.ScrollViewHelper.scrollCaretIntoView
 import com.maddyhome.idea.vim.helper.getNormalizedScrollOffset
 import com.maddyhome.idea.vim.helper.getNormalizedSideScrollOffset
 import com.maddyhome.idea.vim.helper.localEditors
 import com.maddyhome.idea.vim.helper.vimEditorGroup
-import com.maddyhome.idea.vim.newapi.IjVimCaret
-import com.maddyhome.idea.vim.newapi.IjVimEditor
+import com.maddyhome.idea.vim.newapi.ij
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.LocalOptionChangeListener
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.options.helpers.StrictMode.assert
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
+import kotlin.math.abs
+import kotlin.math.max
 
 class ScrollGroup : VimScrollGroup {
   override fun scrollCaretIntoView(editor: VimEditor) {
-    scrollCaretIntoView((editor as IjVimEditor).editor)
+    scrollCaretIntoView(editor.ij)
   }
 
   override fun scrollFullPage(editor: VimEditor, caret: VimCaret, pages: Int): Boolean {
     assert(pages != 0, "pages != 0")
-    return if (pages > 0) scrollFullPageDown(editor, caret, pages) else scrollFullPageUp(
-      editor,
-      caret,
-      Math.abs(pages)
-    )
+    return if (pages > 0) scrollFullPageDown(editor, caret, pages) else scrollFullPageUp(editor, caret, abs(pages))
   }
 
   private fun scrollFullPageDown(editor: VimEditor, caret: VimCaret, pages: Int): Boolean {
-    val ijEditor = (editor as IjVimEditor).editor
-    val ijCaret = (caret as IjVimCaret).caret
+    val ijEditor = editor.ij
     val result = scrollFullPageDown(ijEditor, pages)
     val scrollOffset = getNormalizedScrollOffset(ijEditor)
     val topVisualLine = getVisualLineAtTopOfScreen(ijEditor)
     var caretVisualLine = result.second
     if (caretVisualLine < topVisualLine + scrollOffset) {
-      caretVisualLine = IjVimEditor(ijEditor).normalizeVisualLine(caretVisualLine + scrollOffset)
+      caretVisualLine = editor.normalizeVisualLine(caretVisualLine + scrollOffset)
     }
-    if (caretVisualLine != ijCaret.visualPosition.line) {
-      val motion: VimMotionGroup = injector.motion
-      val offset = motion.moveCaretToLineWithStartOfLineOption(
+    if (caretVisualLine != caret.ij.visualPosition.line) {
+      val offset = injector.motion.moveCaretToLineWithStartOfLineOption(
         editor,
         editor.visualLineToBufferLine(caretVisualLine),
         caret
@@ -73,18 +81,16 @@ class ScrollGroup : VimScrollGroup {
   }
 
   private fun scrollFullPageUp(editor: VimEditor, caret: VimCaret, pages: Int): Boolean {
-    val ijEditor = (editor as IjVimEditor).editor
-    val ijCaret = (caret as IjVimCaret).caret
+    val ijEditor = editor.ij
     val result = scrollFullPageUp(ijEditor, pages)
     val scrollOffset = getNormalizedScrollOffset(ijEditor)
     val bottomVisualLine = getVisualLineAtBottomOfScreen(ijEditor)
     var caretVisualLine = result.second
     if (caretVisualLine > bottomVisualLine - scrollOffset) {
-      caretVisualLine = IjVimEditor(ijEditor).normalizeVisualLine(caretVisualLine - scrollOffset)
+      caretVisualLine = editor.normalizeVisualLine(caretVisualLine - scrollOffset)
     }
-    if (caretVisualLine != ijCaret.visualPosition.line && caretVisualLine != -1) {
-      val motion: VimMotionGroup = injector.motion
-      val offset = motion.moveCaretToLineWithStartOfLineOption(
+    if (caretVisualLine != caret.ij.visualPosition.line && caretVisualLine != -1) {
+      val offset = injector.motion.moveCaretToLineWithStartOfLineOption(
         editor,
         editor.visualLineToBufferLine(caretVisualLine),
         caret
@@ -93,16 +99,15 @@ class ScrollGroup : VimScrollGroup {
       return result.first
     }
 
-    // We normally error if we didn't move the caret, but we have a special case for a page showing only the last two
-    // lines of the file and virtual space. Vim normally scrolls window height minus two, but when the caret is on last
-    // line minus one, this becomes window height minus one, meaning the top line of the current page becomes the bottom
-    // line of the new page, and the caret doesn't move. Make sure we don't beep in this scenario.
+    // We normally report an error if we didn't move the caret, but we have a special case for a page showing only the
+    // last two lines of the file and virtual space. Vim normally scrolls window height minus two, but when the caret is
+    // on last line minus one, this becomes window height minus one, meaning the top line of the current page becomes
+    // the bottom line of the new page, and the caret doesn't move. Make sure we don't beep in this scenario.
     return caretVisualLine == editor.getVisualLineCount() - 2
   }
 
   override fun scrollHalfPage(editor: VimEditor, caret: VimCaret, rawCount: Int, down: Boolean): Boolean {
-    val ijEditor = (editor as IjVimEditor).editor
-    val ijCaret = (caret as IjVimCaret).caret
+    val ijEditor = editor.ij
     val caretModel = ijEditor.caretModel
     val currentLogicalLine = caretModel.logicalPosition.line
     if (!down && currentLogicalLine <= 0 || down && currentLogicalLine >= editor.lineCount() - 1) {
@@ -117,7 +122,7 @@ class ScrollGroup : VimScrollGroup {
     // Scroll at most one screen height
     val yInitialCaret = ijEditor.visualLineToY(caretModel.visualPosition.line)
     val yTargetVisualLine = ijEditor.visualLineToY(targetCaretVisualLine)
-    if (Math.abs(yTargetVisualLine - yInitialCaret) > visibleArea.height) {
+    if (abs(yTargetVisualLine - yInitialCaret) > visibleArea.height) {
       val yPrevious = visibleArea.y
       val moved: Boolean
       if (down) {
@@ -129,25 +134,24 @@ class ScrollGroup : VimScrollGroup {
       }
       if (moved) {
         // We'll keep the caret at the same position, although that might not be the same line offset as previously
-        targetCaretVisualLine =
-          ijEditor.yToVisualLine(yInitialCaret + getVisibleArea(ijEditor).y - yPrevious)
+        targetCaretVisualLine = ijEditor.yToVisualLine(yInitialCaret + getVisibleArea(ijEditor).y - yPrevious)
       }
     } else {
       scrollVisualLineToCaretLocation(ijEditor, targetCaretVisualLine)
       val scrollOffset = getNormalizedScrollOffset(ijEditor)
       val visualTop = getVisualLineAtTopOfScreen(ijEditor) + if (down) scrollOffset else 0
       val visualBottom = getVisualLineAtBottomOfScreen(ijEditor) - if (down) 0 else scrollOffset
-      targetCaretVisualLine = Math.max(visualTop, Math.min(visualBottom, targetCaretVisualLine))
+      targetCaretVisualLine = targetCaretVisualLine.coerceIn(visualTop, visualBottom)
     }
     val logicalLine = editor.visualLineToBufferLine(targetCaretVisualLine)
-    val caretOffset: Int = injector.motion.moveCaretToLineWithStartOfLineOption(editor, logicalLine, caret)
+    val caretOffset = injector.motion.moveCaretToLineWithStartOfLineOption(editor, logicalLine, caret)
     caret.moveToOffset(caretOffset)
     return true
   }
 
   override fun scrollLines(editor: VimEditor, lines: Int): Boolean {
     assert(lines != 0) { "lines cannot be 0" }
-    val ijEditor = (editor as IjVimEditor).editor
+    val ijEditor = editor.ij
     if (lines > 0) {
       val visualLine = getVisualLineAtTopOfScreen(ijEditor)
       scrollVisualLineToTopOfScreen(ijEditor, visualLine + lines)
@@ -160,66 +164,58 @@ class ScrollGroup : VimScrollGroup {
   }
 
   override fun scrollCurrentLineToDisplayTop(editor: VimEditor, rawCount: Int, start: Boolean): Boolean {
-    scrollLineToScreenLocation((editor as IjVimEditor).editor, ScreenLocation.TOP, rawCount, start)
+    scrollLineToScreenLocation(editor, ScreenLocation.TOP, rawCount, start)
     return true
   }
 
   override fun scrollCurrentLineToDisplayMiddle(editor: VimEditor, rawCount: Int, start: Boolean): Boolean {
-    scrollLineToScreenLocation((editor as IjVimEditor).editor, ScreenLocation.MIDDLE, rawCount, start)
+    scrollLineToScreenLocation(editor, ScreenLocation.MIDDLE, rawCount, start)
     return true
   }
 
   override fun scrollCurrentLineToDisplayBottom(editor: VimEditor, rawCount: Int, start: Boolean): Boolean {
-    scrollLineToScreenLocation((editor as IjVimEditor).editor, ScreenLocation.BOTTOM, rawCount, start)
+    scrollLineToScreenLocation(editor, ScreenLocation.BOTTOM, rawCount, start)
     return true
   }
 
   // Scrolls current or [count] line to given screen location
   // In Vim, [count] refers to a file line, so it's a one-based logical line
-  private fun scrollLineToScreenLocation(
-    editor: Editor,
+  private fun scrollLineToScreenLocation(editor: VimEditor,
     screenLocation: ScreenLocation,
     rawCount: Int,
     start: Boolean
   ) {
-    val scrollOffset = getNormalizedScrollOffset(editor)
-    val visualLine: Int
-    visualLine = if (rawCount == 0) {
-      editor.caretModel.visualPosition.line
+    val scrollOffset = getNormalizedScrollOffset(editor.ij)
+    val visualLine = if (rawCount == 0) {
+      editor.primaryCaret().getVisualPosition().line
     } else {
-      val line = IjVimEditor(editor).normalizeLine(rawCount - 1)
-      IjVimEditor(editor).bufferLineToVisualLine(line)
+      editor.bufferLineToVisualLine(editor.normalizeLine(rawCount - 1))
     }
     when (screenLocation) {
-      ScreenLocation.TOP -> scrollVisualLineToTopOfScreen(editor, visualLine - scrollOffset)
-      ScreenLocation.MIDDLE -> scrollVisualLineToMiddleOfScreen(editor, visualLine, true)
-      ScreenLocation.BOTTOM ->         // Make sure we scroll to an actual line, not virtual space
+      ScreenLocation.TOP -> scrollVisualLineToTopOfScreen(editor.ij, visualLine - scrollOffset)
+      ScreenLocation.MIDDLE -> scrollVisualLineToMiddleOfScreen(editor.ij, visualLine, true)
+      ScreenLocation.BOTTOM -> {
+        // Make sure we scroll to an actual line, not virtual space
         scrollVisualLineToBottomOfScreen(
-          editor,
-          IjVimEditor(editor).normalizeVisualLine(visualLine + scrollOffset)
-        )
-    }
-    if (visualLine != editor.caretModel.visualPosition.line || start) {
-      val motion: VimMotionGroup = injector.motion
-      val offset: Int
-      offset = if (start) {
-        motion.moveCaretToLineStartSkipLeading(
-          IjVimEditor(editor),
-          IjVimEditor(editor).visualLineToBufferLine(visualLine)
-        )
-      } else {
-        motion.moveCaretToLineWithSameColumn(
-          IjVimEditor(editor),
-          IjVimEditor(editor).visualLineToBufferLine(visualLine),
-          IjVimCaret(editor.caretModel.primaryCaret)
+          editor.ij,
+          editor.normalizeVisualLine(visualLine + scrollOffset)
         )
       }
-      IjVimCaret(editor.caretModel.primaryCaret).moveToOffset(offset)
+    }
+    if (visualLine != editor.primaryCaret().getVisualPosition().line || start) {
+      val offset = injector.motion.run {
+        if (start) {
+          moveCaretToLineStartSkipLeading(editor, editor.visualLineToBufferLine(visualLine))
+        } else {
+          moveCaretToLineWithSameColumn(editor, editor.visualLineToBufferLine(visualLine), editor.primaryCaret())
+        }
+      }
+      editor.primaryCaret().moveToOffset(offset)
     }
   }
 
   override fun scrollColumns(editor: VimEditor, columns: Int): Boolean {
-    val ijEditor = (editor as IjVimEditor).editor
+    val ijEditor = editor.ij
     val caretVisualPosition = ijEditor.caretModel.visualPosition
     if (columns > 0) {
       // TODO: Don't add columns to visual position. This includes inlays and folds
@@ -251,17 +247,17 @@ class ScrollGroup : VimScrollGroup {
   }
 
   override fun scrollCaretColumnToDisplayLeftEdge(vimEditor: VimEditor): Boolean {
-    val editor = (vimEditor as IjVimEditor).editor
+    val editor = vimEditor.ij
     val caretVisualPosition = editor.caretModel.visualPosition
     val scrollOffset = getNormalizedSideScrollOffset(editor)
     // TODO: Should the offset be applied to visual columns? This includes inline inlays and folds
-    val column = Math.max(0, caretVisualPosition.column - scrollOffset)
+    val column = max(0, caretVisualPosition.column - scrollOffset)
     scrollColumnToLeftOfScreen(editor, caretVisualPosition.line, column)
     return true
   }
 
   override fun scrollCaretColumnToDisplayRightEdge(editor: VimEditor): Boolean {
-    val ijEditor = (editor as IjVimEditor).editor
+    val ijEditor = editor.ij
     val caretVisualPosition = ijEditor.caretModel.visualPosition
     val scrollOffset = getNormalizedSideScrollOffset(ijEditor)
     // TODO: Should the offset be applied to visual columns? This includes inline inlays and folds
@@ -285,9 +281,10 @@ class ScrollGroup : VimScrollGroup {
     }
 
     override fun processLocalValueChange(oldValue: VimDataType?, editor: VimEditor) {
-      val ijEditor = (editor as IjVimEditor).editor
-      if (ijEditor.vimEditorGroup) {
-        scrollCaretIntoView(ijEditor)
+      editor.ij.apply {
+        if (vimEditorGroup) {
+          scrollCaretIntoView(this)
+        }
       }
     }
   }
@@ -299,15 +296,14 @@ class ScrollGroup : VimScrollGroup {
       val visibleArea = getVisibleArea(editor)
       val caretVisualLine = editor.caretModel.visualPosition.line
       val scrollOption = getScrollOption(rawCount)
-      val targetCaretVisualLine: Int
-      targetCaretVisualLine = if (scrollOption == 0) {
+      val targetCaretVisualLine = if (scrollOption == 0) {
         // Scroll up/down half window size by default. We can't use line count here because of block inlays
         val offset = if (down) visibleArea.height / 2 else editor.lineHeight - visibleArea.height / 2
         editor.yToVisualLine(editor.visualLineToY(caretVisualLine) + offset)
       } else {
         if (down) caretVisualLine + scrollOption else caretVisualLine - scrollOption
       }
-      return IjVimEditor(editor).normalizeVisualLine(targetCaretVisualLine)
+      return editor.vim.normalizeVisualLine(targetCaretVisualLine)
     }
 
     private fun getScrollOption(rawCount: Int): Int {
