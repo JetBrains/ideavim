@@ -1,7 +1,8 @@
 IdeaVim project is licensed under MIT license except the following parts of it:
 
-File [RegExp.kt](src/main/java/com/maddyhome/idea/vim/regexp/RegExp.kt) is licensed under Vim License.  
-File [Tutor.kt](src/main/java/com/maddyhome/idea/vim/ui/Tutor.kt) is licensed under Vim License.
+* File [RegExp.kt](src/main/java/com/maddyhome/idea/vim/regexp/RegExp.kt) is licensed under Vim License.  
+* File [ScrollViewHelper.kt](com/maddyhome/idea/vim/helper/ScrollViewHelper.kt) is licensed under Vim License.
+* File [Tutor.kt](src/main/java/com/maddyhome/idea/vim/ui/Tutor.kt) is licensed under Vim License.
 
 ```
 VIM LICENSE
