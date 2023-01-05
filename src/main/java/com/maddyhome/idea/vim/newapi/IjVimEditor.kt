@@ -449,7 +449,7 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
   }
 }
 
-val Editor.vim: IjVimEditor
+inline val Editor.vim: IjVimEditor
   get() = IjVimEditor(this)
-val VimEditor.ij: Editor
+inline val VimEditor.ij: Editor
   get() = (this as IjVimEditor).editor

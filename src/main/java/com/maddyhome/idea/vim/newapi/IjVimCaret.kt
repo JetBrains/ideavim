@@ -145,10 +145,10 @@ class IjVimCaret(val caret: Caret) : VimCaretBase() {
   override fun hashCode(): Int = this.caret.hashCode()
 }
 
-val VimCaret.ij: Caret
+inline val VimCaret.ij: Caret
   get() = (this as IjVimCaret).caret
-val ImmutableVimCaret.ij: Caret
+inline val ImmutableVimCaret.ij: Caret
   get() = (this as IjVimCaret).caret
 
-val Caret.vim: VimCaret
+inline val Caret.vim: VimCaret
   get() = IjVimCaret(this)
