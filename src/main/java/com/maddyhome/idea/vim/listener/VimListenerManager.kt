@@ -111,7 +111,7 @@ object VimListenerManager {
 
       VimPlugin.getOptionService().addListener(OptionConstants.numberName, EditorGroup.NumberChangeListener.INSTANCE)
       VimPlugin.getOptionService().addListener(OptionConstants.relativenumberName, EditorGroup.NumberChangeListener.INSTANCE)
-      VimPlugin.getOptionService().addListener(OptionConstants.scrolloffName, ScrollGroup.ScrollOptionsChangeListener.INSTANCE)
+      VimPlugin.getOptionService().addListener(OptionConstants.scrolloffName, ScrollGroup.ScrollOptionsChangeListener)
       VimPlugin.getOptionService().addListener(OptionConstants.showcmdName, ShowCmdOptionChangeListener)
       VimPlugin.getOptionService().addListener(OptionConstants.guicursorName, GuicursorChangeListener)
       VimPlugin.getOptionService().addListener(OptionConstants.iskeywordName, KeywordOptionChangeListener, true)
@@ -126,7 +126,7 @@ object VimListenerManager {
 
       VimPlugin.getOptionService().removeListener(OptionConstants.numberName, EditorGroup.NumberChangeListener.INSTANCE)
       VimPlugin.getOptionService().removeListener(OptionConstants.relativenumberName, EditorGroup.NumberChangeListener.INSTANCE)
-      VimPlugin.getOptionService().removeListener(OptionConstants.scrolloffName, ScrollGroup.ScrollOptionsChangeListener.INSTANCE)
+      VimPlugin.getOptionService().removeListener(OptionConstants.scrolloffName, ScrollGroup.ScrollOptionsChangeListener)
       VimPlugin.getOptionService().removeListener(OptionConstants.showcmdName, ShowCmdOptionChangeListener)
       VimPlugin.getOptionService().removeListener(OptionConstants.guicursorName, GuicursorChangeListener)
       VimPlugin.getOptionService().removeListener(OptionConstants.iskeywordName, KeywordOptionChangeListener)
