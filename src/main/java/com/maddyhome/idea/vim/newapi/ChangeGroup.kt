@@ -197,7 +197,7 @@ fun insertLineAround(editor: VimEditor, context: ExecutionContext, shift: Int) {
     }
   }
 
-  injector.motion.scrollCaretIntoView(editor)
+  injector.scroll.scrollCaretIntoView(editor)
 }
 
 fun toVimRange(range: TextRange, type: SelectionType): VimRange {

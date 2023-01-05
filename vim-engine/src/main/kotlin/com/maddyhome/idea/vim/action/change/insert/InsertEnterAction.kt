@@ -24,7 +24,7 @@ class InsertEnterAction : VimActionHandler.SingleExecution() {
 
   override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
     injector.changeGroup.processEnter(editor, context)
-    injector.motion.scrollCaretIntoView(editor)
+    injector.scroll.scrollCaretIntoView(editor)
     return true
   }
 }

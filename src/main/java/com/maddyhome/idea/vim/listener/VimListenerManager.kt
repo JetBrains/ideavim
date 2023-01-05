@@ -46,6 +46,7 @@ import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.group.EditorGroup
 import com.maddyhome.idea.vim.group.FileGroup
 import com.maddyhome.idea.vim.group.MotionGroup
+import com.maddyhome.idea.vim.group.ScrollGroup
 import com.maddyhome.idea.vim.group.SearchGroup
 import com.maddyhome.idea.vim.group.visual.IdeaSelectionControl
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer
@@ -110,7 +111,7 @@ object VimListenerManager {
 
       VimPlugin.getOptionService().addListener(OptionConstants.numberName, EditorGroup.NumberChangeListener.INSTANCE)
       VimPlugin.getOptionService().addListener(OptionConstants.relativenumberName, EditorGroup.NumberChangeListener.INSTANCE)
-      VimPlugin.getOptionService().addListener(OptionConstants.scrolloffName, MotionGroup.ScrollOptionsChangeListener.INSTANCE)
+      VimPlugin.getOptionService().addListener(OptionConstants.scrolloffName, ScrollGroup.ScrollOptionsChangeListener.INSTANCE)
       VimPlugin.getOptionService().addListener(OptionConstants.showcmdName, ShowCmdOptionChangeListener)
       VimPlugin.getOptionService().addListener(OptionConstants.guicursorName, GuicursorChangeListener)
       VimPlugin.getOptionService().addListener(OptionConstants.iskeywordName, KeywordOptionChangeListener, true)
@@ -125,7 +126,7 @@ object VimListenerManager {
 
       VimPlugin.getOptionService().removeListener(OptionConstants.numberName, EditorGroup.NumberChangeListener.INSTANCE)
       VimPlugin.getOptionService().removeListener(OptionConstants.relativenumberName, EditorGroup.NumberChangeListener.INSTANCE)
-      VimPlugin.getOptionService().removeListener(OptionConstants.scrolloffName, MotionGroup.ScrollOptionsChangeListener.INSTANCE)
+      VimPlugin.getOptionService().removeListener(OptionConstants.scrolloffName, ScrollGroup.ScrollOptionsChangeListener.INSTANCE)
       VimPlugin.getOptionService().removeListener(OptionConstants.showcmdName, ShowCmdOptionChangeListener)
       VimPlugin.getOptionService().removeListener(OptionConstants.guicursorName, GuicursorChangeListener)
       VimPlugin.getOptionService().removeListener(OptionConstants.iskeywordName, KeywordOptionChangeListener)
@@ -393,7 +394,6 @@ object VimListenerManager {
       if (mouseDragging) {
         logger.debug("Release mouse after dragging")
         val editor = event.editor
-        val caret = editor.caretModel.primaryCaret
         SelectionVimListenerSuppressor.lock().use {
           val predictedMode = IdeaSelectionControl.predictMode(editor, SelectionSource.MOUSE)
           IdeaSelectionControl.controlNonVimSelectionChange(editor, SelectionSource.MOUSE)

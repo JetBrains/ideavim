@@ -31,22 +31,22 @@ class MotionScrollLastScreenLinePageStartAction : VimActionHandler.SingleExecuti
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    val motion = injector.motion
+    val scroll = injector.scroll
 
     // Without [count]: Redraw with the line just above the window at the bottom of the window. Put the cursor in that
     // line, at the first non-blank in the line.
     if (cmd.rawCount == 0) {
       val prevVisualLine = editor.normalizeVisualLine(injector.engineEditorHelper.getVisualLineAtTopOfScreen(editor) - 1)
       val bufferLine = editor.visualLineToBufferLine(prevVisualLine)
-      return motion.scrollCurrentLineToDisplayBottom(editor, bufferLine + 1, true)
+      return scroll.scrollCurrentLineToDisplayBottom(editor, bufferLine + 1, true)
     }
 
     // [count]z^ first scrolls [count] to the bottom of the window, then moves the caret to the line that is now at
     // the top, and then move that line to the bottom of the window
     var bufferLine = editor.normalizeLine(cmd.rawCount - 1)
-    if (motion.scrollCurrentLineToDisplayBottom(editor, bufferLine + 1, false)) {
+    if (scroll.scrollCurrentLineToDisplayBottom(editor, bufferLine + 1, false)) {
       bufferLine = editor.visualLineToBufferLine(injector.engineEditorHelper.getVisualLineAtTopOfScreen(editor))
-      return motion.scrollCurrentLineToDisplayBottom(editor, bufferLine + 1, true)
+      return scroll.scrollCurrentLineToDisplayBottom(editor, bufferLine + 1, true)
     }
 
     return false

@@ -136,14 +136,6 @@ abstract class VimMotionGroupBase : VimMotionGroup {
     return moveCaretToLineStartSkipLeading(editor, editor.visualLineToBufferLine(line))
   }
 
-  override fun scrollFullPage(editor: VimEditor, caret: VimCaret, pages: Int): Boolean {
-    assert(pages != 0)
-    return if (pages > 0) scrollFullPageDown(editor, caret, pages) else scrollFullPageUp(editor, caret, abs(pages))
-  }
-
-  protected abstract fun scrollFullPageDown(editor: VimEditor, caret: VimCaret, pages: Int): Boolean
-  protected abstract fun scrollFullPageUp(editor: VimEditor, caret: VimCaret, pages: Int): Boolean
-
   /**
    * This moves the caret next to the next/previous matching character on the current line
    *

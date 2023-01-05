@@ -9,6 +9,8 @@
 <idea-plugin>
   <extensions defaultExtensionNs="com.intellij">
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.MotionGroup"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.ScrollGroup"
+                        serviceInterface="com.maddyhome.idea.vim.api.VimScrollGroup"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.ChangeGroup"
                         serviceInterface="com.maddyhome.idea.vim.api.VimChangeGroup"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.CommandGroup"/>

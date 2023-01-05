@@ -49,7 +49,7 @@ private fun swapVisualSelections(editor: VimEditor): Boolean {
   editor.subMode = lastSelectionType.toSubMode()
   primaryCaret.vimSetSelection(lastVisualRange.startOffset, lastVisualRange.endOffset, true)
 
-  injector.motion.scrollCaretIntoView(editor)
+  injector.scroll.scrollCaretIntoView(editor)
 
   return true
 }

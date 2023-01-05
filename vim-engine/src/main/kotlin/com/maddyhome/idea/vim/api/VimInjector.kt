@@ -98,6 +98,7 @@ interface VimInjector {
   val searchHelper: VimSearchHelper
   // !! in progress
   val motion: VimMotionGroup
+  val scroll: VimScrollGroup
   // Can't be fully moved to vim-engine.
   val lookupManager: VimLookupManager
   // Can't be fully moved to vim-engine.

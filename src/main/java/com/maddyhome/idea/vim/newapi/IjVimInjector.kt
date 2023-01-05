@@ -37,6 +37,7 @@ import com.maddyhome.idea.vim.api.VimMessages
 import com.maddyhome.idea.vim.api.VimMotionGroup
 import com.maddyhome.idea.vim.api.VimProcessGroup
 import com.maddyhome.idea.vim.api.VimRegexpService
+import com.maddyhome.idea.vim.api.VimScrollGroup
 import com.maddyhome.idea.vim.api.VimSearchGroup
 import com.maddyhome.idea.vim.api.VimSearchHelper
 import com.maddyhome.idea.vim.api.VimStatistics
@@ -114,6 +115,8 @@ class IjVimInjector : VimInjectorBase() {
     get() = service<IjVimSearchHelper>()
   override val motion: VimMotionGroup
     get() = service<MotionGroup>()
+  override val scroll: VimScrollGroup
+    get() = service()
   override val lookupManager: VimLookupManager
     get() = service<IjVimLookupManager>()
   override val templateManager: VimTemplateManager

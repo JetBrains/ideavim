@@ -117,7 +117,7 @@ private fun insertNewLineAbove(editor: VimEditor, context: ExecutionContext) {
     injector.changeGroup.initInsert(editor, context, VimStateMachine.Mode.INSERT)
     injector.changeGroup.runEnterAboveAction(editor, context)
   }
-  injector.motion.scrollCaretIntoView(editor)
+  injector.scroll.scrollCaretIntoView(editor)
 }
 
 /**
@@ -134,5 +134,5 @@ private fun insertNewLineBelow(editor: VimEditor, context: ExecutionContext) {
 
   injector.changeGroup.initInsert(editor, context, VimStateMachine.Mode.INSERT)
   injector.changeGroup.runEnterAction(editor, context)
-  injector.motion.scrollCaretIntoView(editor)
+  injector.scroll.scrollCaretIntoView(editor)
 }

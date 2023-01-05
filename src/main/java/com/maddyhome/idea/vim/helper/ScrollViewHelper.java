@@ -23,6 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.EnumSet;
 
 import static com.maddyhome.idea.vim.helper.EditorHelper.*;
+import static com.maddyhome.idea.vim.helper.ScrollHelperKt.getNormalizedSideScrollOffset;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
@@ -230,10 +231,5 @@ public class ScrollViewHelper {
         }
       }
     }
-  }
-
-  private static int getNormalizedSideScrollOffset(final @NotNull Editor editor) {
-    final int sideScrollOffset = ((VimInt) VimPlugin.getOptionService().getOptionValue(new OptionScope.LOCAL(new IjVimEditor(editor)), OptionConstants.sidescrolloffName, OptionConstants.sidescrolloffName)).getValue();
-    return normalizeSideScrollOffset(editor, sideScrollOffset);
   }
 }
