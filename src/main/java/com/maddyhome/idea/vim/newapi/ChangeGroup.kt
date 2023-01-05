@@ -33,7 +33,6 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.common.VimRange
 import com.maddyhome.idea.vim.common.including
 import com.maddyhome.idea.vim.common.offset
-import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.vimChangeActionSwitchMode
 import com.maddyhome.idea.vim.helper.vimLastColumn
 
@@ -198,7 +197,7 @@ fun insertLineAround(editor: VimEditor, context: ExecutionContext, shift: Int) {
     }
   }
 
-  MotionGroup.scrollCaretIntoView(editor.editor)
+  injector.motion.scrollCaretIntoView(editor)
 }
 
 fun toVimRange(range: TextRange, type: SelectionType): VimRange {
