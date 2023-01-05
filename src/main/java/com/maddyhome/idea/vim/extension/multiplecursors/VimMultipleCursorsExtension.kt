@@ -27,7 +27,6 @@ import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
-import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.visual.vimSetSelection
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.SearchHelper
@@ -279,14 +278,14 @@ class VimMultipleCursorsExtension : VimExtension {
       if (!editor.caretModel.removeCaret(caret)) {
         editor.vim.exitVisualMode()
       }
-      MotionGroup.scrollCaretIntoView(caret.editor)
+      injector.motion.scrollCaretIntoView(editor.vim)
     }
   }
 
   private fun selectText(caret: Caret, text: String, offset: Int): TextRange? {
     if (text.isEmpty()) return null
     caret.vim.vimSetSelection(offset, offset + text.length - 1, true)
-    MotionGroup.scrollCaretIntoView(caret.editor)
+    injector.motion.scrollCaretIntoView(caret.editor.vim)
     return TextRange(caret.selectionStart, caret.selectionEnd)
   }
 
