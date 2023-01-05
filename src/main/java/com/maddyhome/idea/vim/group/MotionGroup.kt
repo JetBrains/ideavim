@@ -5,574 +5,553 @@
  * license that can be found in the LICENSE.txt file or at
  * https://opensource.org/licenses/MIT.
  */
-package com.maddyhome.idea.vim.group;
+package com.maddyhome.idea.vim.group
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Caret;
-import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.LogicalPosition;
-import com.intellij.openapi.editor.VisualPosition;
-import com.intellij.openapi.fileEditor.FileEditor;
-import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
-import com.intellij.openapi.fileEditor.TextEditor;
-import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx;
-import com.intellij.openapi.fileEditor.impl.EditorTabbedContainer;
-import com.intellij.openapi.fileEditor.impl.EditorWindow;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.LocalFileSystem;
-import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.vfs.VirtualFileManager;
-import com.intellij.openapi.vfs.VirtualFileSystem;
-import com.intellij.util.MathUtil;
-import com.maddyhome.idea.vim.KeyHandler;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.api.*;
-import com.maddyhome.idea.vim.command.*;
-import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.ex.ExOutputModel;
-import com.maddyhome.idea.vim.group.visual.VimSelection;
-import com.maddyhome.idea.vim.handler.Motion;
-import com.maddyhome.idea.vim.handler.MotionActionHandler;
-import com.maddyhome.idea.vim.handler.TextObjectActionHandler;
-import com.maddyhome.idea.vim.helper.*;
-import com.maddyhome.idea.vim.listener.AppCodeTemplates;
-import com.maddyhome.idea.vim.mark.Jump;
-import com.maddyhome.idea.vim.mark.Mark;
-import com.maddyhome.idea.vim.newapi.IjExecutionContext;
-import com.maddyhome.idea.vim.newapi.IjVimCaret;
-import com.maddyhome.idea.vim.newapi.IjVimEditor;
-import com.maddyhome.idea.vim.options.OptionConstants;
-import com.maddyhome.idea.vim.options.OptionScope;
-import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt;
-import kotlin.Pair;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.jetbrains.annotations.Range;
-
-import java.io.File;
-
-import static com.maddyhome.idea.vim.group.ChangeGroup.*;
-import static com.maddyhome.idea.vim.helper.EditorHelper.*;
-import static java.lang.Math.max;
-import static java.lang.Math.min;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Caret
+import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.LogicalPosition
+import com.intellij.openapi.editor.VisualPosition
+import com.intellij.openapi.fileEditor.FileEditorManagerEvent
+import com.intellij.openapi.fileEditor.TextEditor
+import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
+import com.intellij.openapi.fileEditor.impl.EditorWindow
+import com.intellij.openapi.vfs.LocalFileSystem
+import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.openapi.vfs.VirtualFileManager
+import com.intellij.util.MathUtil
+import com.maddyhome.idea.vim.KeyHandler.Companion.getInstance
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.BufferPosition
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.ImmutableVimCaret
+import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.VimChangeGroupBase
+import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.VimMotionGroupBase
+import com.maddyhome.idea.vim.api.anyNonWhitespace
+import com.maddyhome.idea.vim.api.getLeadingCharacterOffset
+import com.maddyhome.idea.vim.api.getVisualLineCount
+import com.maddyhome.idea.vim.api.lineLength
+import com.maddyhome.idea.vim.api.normalizeColumn
+import com.maddyhome.idea.vim.api.normalizeLine
+import com.maddyhome.idea.vim.api.normalizeOffset
+import com.maddyhome.idea.vim.api.normalizeVisualColumn
+import com.maddyhome.idea.vim.api.normalizeVisualLine
+import com.maddyhome.idea.vim.api.visualLineToBufferLine
+import com.maddyhome.idea.vim.command.Argument
+import com.maddyhome.idea.vim.command.MotionType
+import com.maddyhome.idea.vim.command.OperatorArguments
+import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.command.VimStateMachine.Companion.getInstance
+import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.ex.ExOutputModel.Companion.getInstance
+import com.maddyhome.idea.vim.handler.Motion
+import com.maddyhome.idea.vim.handler.Motion.AbsoluteOffset
+import com.maddyhome.idea.vim.handler.Motion.AdjustedOffset
+import com.maddyhome.idea.vim.handler.MotionActionHandler
+import com.maddyhome.idea.vim.handler.TextObjectActionHandler
+import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.SearchHelper
+import com.maddyhome.idea.vim.helper.exitVisualMode
+import com.maddyhome.idea.vim.helper.fileSize
+import com.maddyhome.idea.vim.helper.isEndAllowed
+import com.maddyhome.idea.vim.helper.vimLastColumn
+import com.maddyhome.idea.vim.listener.AppCodeTemplates.onMovement
+import com.maddyhome.idea.vim.mark.Mark
+import com.maddyhome.idea.vim.newapi.IjExecutionContext
+import com.maddyhome.idea.vim.newapi.IjVimCaret
+import com.maddyhome.idea.vim.newapi.IjVimEditor
+import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
+import org.jetbrains.annotations.Range
+import java.io.File
 
 /**
  * This handles all motion related commands and marks
  */
-public class MotionGroup extends VimMotionGroupBase {
-
-
-  public static @Nullable TextRange getMotionRange2(@NotNull Editor editor,
-  @NotNull Caret caret,
-  DataContext context,
-  @NotNull Argument argument,
-  @NotNull OperatorArguments operatorArguments) {
-    int start;
-    int end;
-    if (argument.getType() == Argument.Type.OFFSETS) {
-      final VimSelection offsets = argument.getOffsets().get(new IjVimCaret(caret));
-      if (offsets == null) return null;
-
-      final Pair<Integer, Integer> nativeStartAndEnd = offsets.getNativeStartAndEnd();
-      start = nativeStartAndEnd.getFirst();
-      end = nativeStartAndEnd.getSecond();
+class MotionGroup : VimMotionGroupBase() {
+    override fun onAppCodeMovement(editor: VimEditor, caret: VimCaret, offset: Int, oldOffset: Int) {
+        onMovement((editor as IjVimEditor).editor, (caret as IjVimCaret).caret, oldOffset < offset)
     }
-    else {
-      final Command cmd = argument.getMotion();
-      // Normalize the counts between the command and the motion argument
-      int cnt = cmd.getCount() * operatorArguments.getCount1();
-      int raw = operatorArguments.getCount0() == 0 && cmd.getRawCount() == 0 ? 0 : cnt;
-      if (cmd.getAction() instanceof MotionActionHandler) {
-        MotionActionHandler action = (MotionActionHandler)cmd.getAction();
 
-        // This is where we are now
-        start = caret.getOffset();
+    private fun selectEditor(editor: Editor, mark: Mark): Editor? {
+        val virtualFile = markToVirtualFile(mark)
+        return virtualFile?.let { selectEditor(editor, it) }
+    }
 
-        // Execute the motion (without moving the cursor) and get where we end
-        Motion motion =
-        action.getHandlerOffset(new IjVimEditor(editor), new IjVimCaret(caret), new IjExecutionContext(context), cmd.getArgument(), operatorArguments.withCount0(raw));
+    private fun markToVirtualFile(mark: Mark): VirtualFile? {
+        val protocol = mark.protocol
+        val fileSystem = VirtualFileManager.getInstance().getFileSystem(protocol)
+        return fileSystem.findFileByPath(mark.filename)
+    }
 
-        // Invalid motion
-        if (Motion.Error.INSTANCE.equals(motion)) return null;
-        if (Motion.NoMotion.INSTANCE.equals(motion)) return null;
-        end = ((Motion.AbsoluteOffset)motion).getOffset();
+    private fun selectEditor(editor: Editor, file: VirtualFile): Editor? {
+        return VimPlugin.getFile().selectEditor(editor.project, file)
+    }
 
-        // If inclusive, add the last character to the range
-        if (action.getMotionType() == MotionType.INCLUSIVE && end < EditorHelperRt.getFileSize(editor)) {
-          if (start > end) {
-            start++;
-          }
-          else {
-            end++;
-          }
+    override fun moveCaretToMatchingPair(editor: VimEditor, caret: ImmutableVimCaret): Int {
+        val pos =
+            SearchHelper.findMatchingPairOnCurrentLine((editor as IjVimEditor).editor, (caret as IjVimCaret).caret)
+        return if (pos >= 0) {
+            pos
+        } else {
+            -1
         }
-      }
-      else if (cmd.getAction() instanceof TextObjectActionHandler) {
-        TextObjectActionHandler action = (TextObjectActionHandler)cmd.getAction();
-
-        TextRange range = action.getRange(
-          new IjVimEditor(editor),
-        new IjVimCaret(caret),
-        new IjExecutionContext(context),
-        cnt,
-        raw,
-        cmd.getArgument()
-        );
-
-        if (range == null) return null;
-
-        start = range.getStartOffset();
-        end = range.getEndOffset();
-
-        if (cmd.isLinewiseMotion()) end--;
-      }
-      else {
-        throw new RuntimeException(
-          "Commands doesn't take " + cmd.getAction().getClass().getSimpleName() + " as an operator");
-      }
     }
 
-    // This is a kludge for dw, dW, and d[w. Without this kludge, an extra newline is operated when it shouldn't be.
-    String id = argument.getMotion().getAction().getId();
-    if (id.equals(VIM_MOTION_WORD_RIGHT) || id.equals(VIM_MOTION_BIG_WORD_RIGHT) || id.equals(VIM_MOTION_CAMEL_RIGHT)) {
-      String text = editor.getDocument().getCharsSequence().subSequence(start, end).toString();
-      final int lastNewLine = text.lastIndexOf('\n');
-      if (lastNewLine > 0) {
-        if (!EngineEditorHelperKt.anyNonWhitespace(new IjVimEditor(editor), end, -1)) {
-          end = start + lastNewLine;
+    /**
+     * This moves the caret to the start of the next/previous camel word.
+     *
+     * @param editor The editor to move in
+     * @param caret  The caret to be moved
+     * @param count  The number of words to skip
+     * @return position
+     */
+    fun moveCaretToNextCamel(editor: Editor, caret: Caret, count: Int): Int {
+        return if (caret.offset == 0 && count < 0 || caret.offset >= editor.fileSize - 1 && count > 0
+        ) {
+            -1
+        } else {
+            SearchHelper.findNextCamelStart(editor, caret, count)
         }
-      }
     }
 
-    return new TextRange(start, end);
-  }
-
-  public static void moveCaretToView(@NotNull Editor editor) {
-    final int scrollOffset = getNormalizedScrollOffset(editor);
-
-    final int topVisualLine = getVisualLineAtTopOfScreen(editor);
-    final int bottomVisualLine = getVisualLineAtBottomOfScreen(editor);
-    final int caretVisualLine = editor.getCaretModel().getVisualPosition().line;
-    @NotNull final VimEditor editor1 = new IjVimEditor(editor);
-    final int lastVisualLine = EngineEditorHelperKt.getVisualLineCount(editor1) - 1;
-
-    final int newVisualLine;
-    if (caretVisualLine < topVisualLine + scrollOffset) {
-      newVisualLine = EngineEditorHelperKt.normalizeVisualLine(new IjVimEditor(editor), topVisualLine + scrollOffset);
-    }
-    else if (bottomVisualLine < lastVisualLine && caretVisualLine > bottomVisualLine - scrollOffset) {
-      newVisualLine =
-        EngineEditorHelperKt.normalizeVisualLine(new IjVimEditor(editor), bottomVisualLine - scrollOffset);
-    }
-    else {
-      newVisualLine = caretVisualLine;
-    }
-
-    final int sideScrollOffset = getNormalizedSideScrollOffset(editor);
-
-    final int oldColumn = editor.getCaretModel().getVisualPosition().column;
-    int col = oldColumn;
-    if (col >= EngineEditorHelperKt.lineLength(new IjVimEditor(editor), new IjVimEditor(editor).currentCaret().getBufferPosition().getLine()) - 1) {
-      col = UserDataManager.getVimLastColumn(editor.getCaretModel().getPrimaryCaret());
-    }
-
-    final int leftVisualColumn = getVisualColumnAtLeftOfDisplay(editor, newVisualLine);
-    final int rightVisualColumn = getVisualColumnAtRightOfDisplay(editor, newVisualLine);
-    int caretColumn = col;
-    int newColumn = caretColumn;
-
-    // TODO: Visual column arithmetic will be inaccurate as it include columns for inlays and folds
-    if (leftVisualColumn > 0 && caretColumn < leftVisualColumn + sideScrollOffset) {
-      newColumn = leftVisualColumn + sideScrollOffset;
-    }
-    else if (caretColumn > rightVisualColumn - sideScrollOffset) {
-      newColumn = rightVisualColumn - sideScrollOffset;
-    }
-
-    if (newVisualLine == caretVisualLine && newColumn != caretColumn) {
-      col = newColumn;
-    }
-
-    newColumn = EngineEditorHelperKt.normalizeVisualColumn(new IjVimEditor(editor), newVisualLine, newColumn, CommandStateHelper.isEndAllowed(editor));
-
-    if (newVisualLine != caretVisualLine || newColumn != oldColumn) {
-      int offset = editor.visualPositionToOffset(new VisualPosition(newVisualLine, newColumn));
-      new IjVimCaret(editor.getCaretModel().getPrimaryCaret()).moveToOffset(offset);
-
-      UserDataManager.setVimLastColumn(editor.getCaretModel().getPrimaryCaret(), col);
-    }
-  }
-
-  private static int getNormalizedScrollOffset(final @NotNull Editor editor) {
-    final int scrollOffset = ((VimInt) VimPlugin.getOptionService().getOptionValue(new OptionScope.LOCAL(new IjVimEditor(editor)), OptionConstants.scrolloffName, OptionConstants.scrolloffName)).getValue();
-    return normalizeScrollOffset(editor, scrollOffset);
-  }
-
-  private static int getNormalizedSideScrollOffset(final @NotNull Editor editor) {
-    final int sideScrollOffset = ((VimInt) VimPlugin.getOptionService().getOptionValue(new OptionScope.LOCAL(new IjVimEditor(editor)), OptionConstants.sidescrolloffName, OptionConstants.sidescrolloffName)).getValue();
-    return normalizeSideScrollOffset(editor, sideScrollOffset);
-  }
-
-  @Override
-  public void onAppCodeMovement(@NotNull VimEditor editor, @NotNull VimCaret caret, int offset, int oldOffset) {
-    AppCodeTemplates.onMovement(((IjVimEditor)editor).getEditor(), ((IjVimCaret)caret).getCaret(), oldOffset < offset);
-  }
-
-  private @Nullable Editor selectEditor(@NotNull Editor editor, @NotNull Mark mark) {
-    final VirtualFile virtualFile = markToVirtualFile(mark);
-    if (virtualFile != null) {
-      return selectEditor(editor, virtualFile);
-    }
-    else {
-      return null;
-    }
-  }
-
-  private @Nullable VirtualFile markToVirtualFile(@NotNull Mark mark) {
-    String protocol = mark.getProtocol();
-    VirtualFileSystem fileSystem = VirtualFileManager.getInstance().getFileSystem(protocol);
-    return fileSystem.findFileByPath(mark.getFilename());
-  }
-
-  private @Nullable Editor selectEditor(@NotNull Editor editor, @NotNull VirtualFile file) {
-    return VimPlugin.getFile().selectEditor(editor.getProject(), file);
-  }
-
-  @Override
-  public int moveCaretToMatchingPair(@NotNull VimEditor editor, @NotNull ImmutableVimCaret caret) {
-    int pos = SearchHelper.findMatchingPairOnCurrentLine(((IjVimEditor)editor).getEditor(), ((IjVimCaret)caret).getCaret());
-    if (pos >= 0) {
-      return pos;
-    }
-    else {
-      return -1;
-    }
-  }
-
-  /**
-   * This moves the caret to the start of the next/previous camel word.
-   *
-   * @param editor The editor to move in
-   * @param caret  The caret to be moved
-   * @param count  The number of words to skip
-   * @return position
-   */
-  public int moveCaretToNextCamel(@NotNull Editor editor, @NotNull Caret caret, int count) {
-    if ((caret.getOffset() == 0 && count < 0) ||
-      (caret.getOffset() >= EditorHelperRt.getFileSize(editor) - 1 && count > 0)) {
-      return -1;
-    }
-    else {
-      return SearchHelper.findNextCamelStart(editor, caret, count);
-    }
-  }
-
-  /**
-   * This moves the caret to the start of the next/previous camel word.
-   *
-   * @param editor The editor to move in
-   * @param caret  The caret to be moved
-   * @param count  The number of words to skip
-   * @return position
-   */
-  public int moveCaretToNextCamelEnd(@NotNull Editor editor, @NotNull Caret caret, int count) {
-    if ((caret.getOffset() == 0 && count < 0) ||
-      (caret.getOffset() >= EditorHelperRt.getFileSize(editor) - 1 && count > 0)) {
-      return -1;
-    }
-    else {
-      return SearchHelper.findNextCamelEnd(editor, caret, count);
-    }
-  }
-
-  @Override
-  public int moveCaretToFirstDisplayLine(@NotNull VimEditor editor,
-    @NotNull ImmutableVimCaret caret,
-    int count,
-    boolean normalizeToScreen) {
-    return moveCaretToScreenLocation(((IjVimEditor)editor).getEditor(), ((IjVimCaret)caret).getCaret(),
-      ScreenLocation.TOP, count - 1, normalizeToScreen);
-  }
-
-  @Override
-  public int moveCaretToLastDisplayLine(@NotNull VimEditor editor,
-    @NotNull ImmutableVimCaret caret,
-    int count,
-    boolean normalizeToScreen) {
-    return moveCaretToScreenLocation(((IjVimEditor)editor).getEditor(), ((IjVimCaret)caret).getCaret(),
-      ScreenLocation.BOTTOM, count - 1, normalizeToScreen);
-  }
-
-  @Override
-  public int moveCaretToMiddleDisplayLine(@NotNull VimEditor editor, @NotNull ImmutableVimCaret caret) {
-    return moveCaretToScreenLocation(((IjVimEditor)editor).getEditor(), ((IjVimCaret)caret).getCaret(),
-      ScreenLocation.MIDDLE, 0, false);
-  }
-
-  @Override
-  public int moveCaretToFileMark(@NotNull VimEditor editor, char ch, boolean toLineStart) {
-    final Mark mark = VimPlugin.getMark().getFileMark(editor, ch);
-    if (mark == null) return -1;
-
-    final int line = mark.getLine();
-    return toLineStart
-    ? moveCaretToLineStartSkipLeading(editor, line)
-    : editor.bufferPositionToOffset(new BufferPosition(line, mark.getCol(), false));
-  }
-
-  @Override
-  public int moveCaretToMark(@NotNull VimEditor editor, char ch, boolean toLineStart) {
-    final Mark mark = VimPlugin.getMark().getMark(editor, ch);
-    if (mark == null) return -1;
-
-    final VirtualFile vf = getVirtualFile(((IjVimEditor)editor).getEditor());
-    if (vf == null) return -1;
-
-    final int line = mark.getLine();
-    if (vf.getPath().equals(mark.getFilename())) {
-      return toLineStart
-      ? moveCaretToLineStartSkipLeading(editor, line)
-      : editor.bufferPositionToOffset(new BufferPosition(line, mark.getCol(), false));
-    }
-
-    final Editor selectedEditor = selectEditor(((IjVimEditor)editor).getEditor(), mark);
-    if (selectedEditor != null) {
-      for (Caret caret : selectedEditor.getCaretModel().getAllCarets()) {
-        new IjVimCaret(caret).moveToOffset(toLineStart
-          ? moveCaretToLineStartSkipLeading(new IjVimEditor(selectedEditor), line)
-        : selectedEditor.logicalPositionToOffset(
-        new LogicalPosition(line, mark.getCol())));
-      }
-    }
-    return -2;
-  }
-
-  @Override
-  public int moveCaretToJump(@NotNull VimEditor editor, int count) {
-    final int spot = VimPlugin.getMark().getJumpSpot();
-    final Jump jump = VimPlugin.getMark().getJump(count);
-
-    if (jump == null) {
-      return -1;
-    }
-
-    final VirtualFile vf = getVirtualFile(((IjVimEditor)editor).getEditor());
-    if (vf == null) {
-      return -1;
-    }
-
-    final BufferPosition lp = new BufferPosition(jump.getLine(), jump.getCol(), false);
-    final LogicalPosition lpnative = new LogicalPosition(jump.getLine(), jump.getCol(), false);
-    final String fileName = jump.getFilepath();
-    if (!vf.getPath().equals(fileName)) {
-      final VirtualFile newFile =
-        LocalFileSystem.getInstance().findFileByPath(fileName.replace(File.separatorChar, '/'));
-      if (newFile == null) {
-        return -2;
-      }
-
-      final Editor newEditor = selectEditor(((IjVimEditor)editor).getEditor(), newFile);
-      if (newEditor != null) {
-        if (spot == -1) {
-          VimPlugin.getMark().addJump(editor, false);
+    /**
+     * This moves the caret to the start of the next/previous camel word.
+     *
+     * @param editor The editor to move in
+     * @param caret  The caret to be moved
+     * @param count  The number of words to skip
+     * @return position
+     */
+    fun moveCaretToNextCamelEnd(editor: Editor, caret: Caret, count: Int): Int {
+        return if (caret.offset == 0 && count < 0 || caret.offset >= editor.fileSize - 1 && count > 0
+        ) {
+            -1
+        } else {
+            SearchHelper.findNextCamelEnd(editor, caret, count)
         }
-        new IjVimCaret(newEditor.getCaretModel().getCurrentCaret()).moveToOffset(
-          EngineEditorHelperKt.normalizeOffset(new IjVimEditor(newEditor), newEditor.logicalPositionToOffset(lpnative),
-            false));
-      }
-
-      return -2;
-    }
-    else {
-      if (spot == -1) {
-        VimPlugin.getMark().addJump(editor, false);
-      }
-
-      return editor.bufferPositionToOffset(lp);
-    }
-  }
-
-  @Override
-  public @NotNull Motion moveCaretToCurrentDisplayLineMiddle(@NotNull VimEditor editor, @NotNull ImmutableVimCaret caret) {
-    final int width = getApproximateScreenWidth(((IjVimEditor)editor).getEditor()) / 2;
-    final int len = EngineEditorHelperKt.lineLength(editor, editor.currentCaret().getBufferPosition().getLine());
-
-    return moveCaretToColumn(editor, caret, max(0, min(len - 1, width)), false);
-  }
-
-  @Override
-  public Motion moveCaretToColumn(@NotNull VimEditor editor, @NotNull ImmutableVimCaret caret, int count, boolean allowEnd) {
-    final int line = caret.getLine().getLine();
-    final int column = EngineEditorHelperKt.normalizeColumn(editor, line, count, allowEnd);
-    final int offset = editor.bufferPositionToOffset(new BufferPosition(line, column, false));
-    if (column != count) {
-      return new Motion.AdjustedOffset(offset, count);
-    }
-    return new Motion.AbsoluteOffset(offset);
-  }
-
-  @Override
-  public @NotNull Motion moveCaretToCurrentDisplayLineStart(@NotNull VimEditor editor, ImmutableVimCaret caret) {
-    final int col =
-      getVisualColumnAtLeftOfDisplay(((IjVimEditor)editor).getEditor(), caret.getVisualPosition().getLine());
-    return moveCaretToColumn(editor, caret, col, false);
-  }
-
-  @Override
-  public @Range(from = 0, to = Integer.MAX_VALUE) int moveCaretToCurrentDisplayLineStartSkipLeading(@NotNull VimEditor editor,
-  ImmutableVimCaret caret) {
-    final int col = getVisualColumnAtLeftOfDisplay(((IjVimEditor)editor).getEditor(), caret.getVisualPosition().getLine());
-    final int logicalLine = caret.getLine().getLine();
-    return EngineEditorHelperKt.getLeadingCharacterOffset(editor, logicalLine, col);
-  }
-
-  @Override
-  public @NotNull Motion moveCaretToCurrentDisplayLineEnd(@NotNull VimEditor editor,
-  ImmutableVimCaret caret,
-  boolean allowEnd) {
-    final int col =
-      getVisualColumnAtRightOfDisplay(((IjVimEditor)editor).getEditor(), caret.getVisualPosition().getLine());
-    return moveCaretToColumn(editor, caret, col, allowEnd);
-  }
-
-  public @Range(from = 0, to = Integer.MAX_VALUE) int moveCaretToLineWithSameColumn(@NotNull VimEditor editor,
-  int logicalLine,
-  @NotNull ImmutableVimCaret caret) {
-    int col = UserDataManager.getVimLastColumn(((IjVimCaret) caret).getCaret());
-    int line = logicalLine;
-    if (logicalLine < 0) {
-      line = 0;
-      col = 0;
-    }
-    else if (logicalLine >= editor.lineCount()) {
-      line = EngineEditorHelperKt.normalizeLine(editor, editor.lineCount() - 1);
-      col = EngineEditorHelperKt.lineLength(editor, line);
     }
 
-    LogicalPosition newPos = new LogicalPosition(line, EngineEditorHelperKt.normalizeColumn(editor, line, col, false));
-
-    return ((IjVimEditor) editor).getEditor().logicalPositionToOffset(newPos);
-  }
-
-  @Override
-  public @Range(from = 0, to = Integer.MAX_VALUE) int moveCaretToLineWithStartOfLineOption(@NotNull VimEditor editor,
-  int line,
-  @NotNull ImmutableVimCaret caret) {
-    if (VimPlugin.getOptionService().isSet(new OptionScope.LOCAL(editor), OptionConstants.startoflineName, OptionConstants.startoflineName)) {
-      return moveCaretToLineStartSkipLeading(editor, line);
-    }
-    else {
-      return moveCaretToLineWithSameColumn(editor, line, caret);
-    }
-  }
-
-  /**
-   * If 'absolute' is true, then set tab index to 'value', otherwise add 'value' to tab index with wraparound.
-   */
-  private void switchEditorTab(@Nullable EditorWindow editorWindow, int value, boolean absolute) {
-    if (editorWindow != null) {
-      final EditorTabbedContainer tabbedPane = editorWindow.getTabbedPane();
-      if (absolute) {
-        tabbedPane.setSelectedIndex(value);
-      }
-      else {
-        int tabIndex = (value + tabbedPane.getSelectedIndex()) % tabbedPane.getTabCount();
-        tabbedPane.setSelectedIndex(tabIndex < 0 ? tabIndex + tabbedPane.getTabCount() : tabIndex);
-      }
-    }
-  }
-
-  @Override
-  public int moveCaretGotoPreviousTab(@NotNull VimEditor editor, @NotNull ExecutionContext context, int rawCount) {
-    Project project = ((IjVimEditor)editor).getEditor().getProject();
-    if (project == null) {
-      return editor.currentCaret().getOffset().getPoint();
-    }
-    EditorWindow currentWindow = FileEditorManagerEx.getInstanceEx(project).getSplitters().getCurrentWindow();
-    switchEditorTab(currentWindow, rawCount >= 1 ? -rawCount : -1, false);
-    return editor.currentCaret().getOffset().getPoint();
-  }
-
-  @Override
-  public int moveCaretGotoNextTab(@NotNull VimEditor editor, @NotNull ExecutionContext context, int rawCount) {
-    final boolean absolute = rawCount >= 1;
-
-    Project project = ((IjVimEditor)editor).getEditor().getProject();
-    if (project == null) {
-      return editor.currentCaret().getOffset().getPoint();
-    }
-    EditorWindow currentWindow = FileEditorManagerEx.getInstanceEx(project).getSplitters().getCurrentWindow();
-    switchEditorTab(currentWindow, absolute ? rawCount - 1 : 1, absolute);
-    return editor.currentCaret().getOffset().getPoint();
-  }
-
-  @Override
-  public @Range(from = 0, to = Integer.MAX_VALUE) int moveCaretToLinePercent(@NotNull VimEditor editor,
-  @NotNull ImmutableVimCaret caret,
-  int count) {
-    return moveCaretToLineWithStartOfLineOption(editor,
-      EngineEditorHelperKt.normalizeLine(editor,
-        (editor.lineCount() * MathUtil.clamp(count, 0, 100) +
-          99) / 100 - 1), caret);
-  }
-
-  private enum ScreenLocation {
-      TOP, MIDDLE, BOTTOM
-  }
-
-  public static void fileEditorManagerSelectionChangedCallback(@NotNull FileEditorManagerEvent event) {
-    ExEntryPanel.deactivateAll();
-    final FileEditor fileEditor = event.getOldEditor();
-    if (fileEditor instanceof TextEditor) {
-      final Editor editor = ((TextEditor)fileEditor).getEditor();
-      ExOutputModel.getInstance(editor).clear();
-      if (VimStateMachine.getInstance(new IjVimEditor(editor)).getMode() == VimStateMachine.Mode.VISUAL) {
-        EngineModeExtensionsKt.exitVisualMode(new IjVimEditor(editor));
-        KeyHandler.getInstance().reset(new IjVimEditor(editor));
-      }
-    }
-  }
-
-  // visualLineOffset is a zero based offset to subtract from the direction of travel, where zero is the same as a count
-  // of 1. I.e. 1L = L, which is an offset of zero. 2L is an offset of 1 extra line
-  // When normalizeToScreen is true, the offset is bounded to the current screen dimensions, and scrolloff is applied.
-  // When false, the offset is used directly, and scrolloff is not applied. This is used for op pending motions
-  // (scrolloff is applied after)
-  private @Range(from = 0, to = Integer.MAX_VALUE) int moveCaretToScreenLocation(@NotNull Editor editor,
-  @NotNull Caret caret,
-  @NotNull ScreenLocation screenLocation,
-  int visualLineOffset,
-  boolean normalizeToScreen) {
-
-    final int scrollOffset = normalizeToScreen ? getNormalizedScrollOffset(editor) : 0;
-
-    @NotNull final VimEditor editor1 = new IjVimEditor(editor);
-    final int maxVisualLine = EngineEditorHelperKt.getVisualLineCount(editor1);
-
-    final int topVisualLine = getVisualLineAtTopOfScreen(editor);
-    final int topScrollOff = topVisualLine > 0 ? scrollOffset : 0;
-
-    final int bottomVisualLine = getVisualLineAtBottomOfScreen(editor);
-    final int bottomScrollOff = bottomVisualLine < (maxVisualLine - 1) ? scrollOffset : 0;
-
-    final int topMaxVisualLine = normalizeToScreen ? bottomVisualLine - bottomScrollOff : maxVisualLine;
-    final int bottomMinVisualLine = normalizeToScreen ? topVisualLine + topScrollOff : 0;
-
-    int targetVisualLine = 0;
-    switch (screenLocation) {
-      case TOP:
-      targetVisualLine = min(topVisualLine + max(topScrollOff, visualLineOffset), topMaxVisualLine);
-      break;
-      case MIDDLE:
-      targetVisualLine = getVisualLineAtMiddleOfScreen(editor);
-      break;
-      case BOTTOM:
-      targetVisualLine = max(bottomVisualLine - max(bottomScrollOff, visualLineOffset), bottomMinVisualLine);
-      break;
+    override fun moveCaretToFirstDisplayLine(
+        editor: VimEditor,
+        caret: ImmutableVimCaret,
+        count: Int,
+        normalizeToScreen: Boolean
+    ): Int {
+        return moveCaretToScreenLocation(
+            (editor as IjVimEditor).editor, (caret as IjVimCaret).caret,
+            ScreenLocation.TOP, count - 1, normalizeToScreen
+        )
     }
 
-    final int targetLogicalLine = EngineEditorHelperKt.visualLineToBufferLine(new IjVimEditor(editor), targetVisualLine);
-    return moveCaretToLineWithStartOfLineOption(new IjVimEditor(editor), targetLogicalLine, new IjVimCaret(caret));
-  }
+    override fun moveCaretToLastDisplayLine(
+        editor: VimEditor,
+        caret: ImmutableVimCaret,
+        count: Int,
+        normalizeToScreen: Boolean
+    ): Int {
+        return moveCaretToScreenLocation(
+            (editor as IjVimEditor).editor, (caret as IjVimCaret).caret,
+            ScreenLocation.BOTTOM, count - 1, normalizeToScreen
+        )
+    }
+
+    override fun moveCaretToMiddleDisplayLine(editor: VimEditor, caret: ImmutableVimCaret): Int {
+        return moveCaretToScreenLocation(
+            (editor as IjVimEditor).editor, (caret as IjVimCaret).caret,
+            ScreenLocation.MIDDLE, 0, false
+        )
+    }
+
+    override fun moveCaretToFileMark(editor: VimEditor, ch: Char, toLineStart: Boolean): Int {
+        val mark = VimPlugin.getMark().getFileMark(editor, ch) ?: return -1
+        val line = mark.line
+        return if (toLineStart) moveCaretToLineStartSkipLeading(editor, line) else editor.bufferPositionToOffset(
+            BufferPosition(line, mark.col, false)
+        )
+    }
+
+    override fun moveCaretToMark(editor: VimEditor, ch: Char, toLineStart: Boolean): Int {
+        val mark = VimPlugin.getMark().getMark(editor, ch) ?: return -1
+        val vf = EditorHelper.getVirtualFile((editor as IjVimEditor).editor) ?: return -1
+        val line = mark.line
+        if (vf.path == mark.filename) {
+            return if (toLineStart) moveCaretToLineStartSkipLeading(editor, line) else editor.bufferPositionToOffset(
+                BufferPosition(line, mark.col, false)
+            )
+        }
+        val selectedEditor = selectEditor(editor.editor, mark)
+        if (selectedEditor != null) {
+            for (caret in selectedEditor.caretModel.allCarets) {
+                IjVimCaret(caret!!).moveToOffset(
+                    if (toLineStart) moveCaretToLineStartSkipLeading(
+                        IjVimEditor(selectedEditor),
+                        line
+                    ) else selectedEditor.logicalPositionToOffset(
+                        LogicalPosition(line, mark.col)
+                    )
+                )
+            }
+        }
+        return -2
+    }
+
+    override fun moveCaretToJump(editor: VimEditor, count: Int): Int {
+        val spot = VimPlugin.getMark().getJumpSpot()
+        val (line, col, fileName) = VimPlugin.getMark().getJump(count) ?: return -1
+        val vf = EditorHelper.getVirtualFile((editor as IjVimEditor).editor) ?: return -1
+        val lp = BufferPosition(line, col, false)
+        val lpnative = LogicalPosition(line, col, false)
+        return if (vf.path != fileName) {
+            val newFile = LocalFileSystem.getInstance().findFileByPath(fileName.replace(File.separatorChar, '/'))
+                ?: return -2
+            val newEditor = selectEditor(editor.editor, newFile)
+            if (newEditor != null) {
+                if (spot == -1) {
+                    VimPlugin.getMark().addJump(editor, false)
+                }
+                IjVimCaret(newEditor.caretModel.currentCaret).moveToOffset(
+                    IjVimEditor(newEditor).normalizeOffset(newEditor.logicalPositionToOffset(lpnative), false)
+                )
+            }
+            -2
+        } else {
+            if (spot == -1) {
+                VimPlugin.getMark().addJump(editor, false)
+            }
+            editor.bufferPositionToOffset(lp)
+        }
+    }
+
+    override fun moveCaretToCurrentDisplayLineMiddle(editor: VimEditor, caret: ImmutableVimCaret): Motion {
+        val width = EditorHelper.getApproximateScreenWidth((editor as IjVimEditor).editor) / 2
+        val len = editor.lineLength(editor.currentCaret().getBufferPosition().line)
+        return moveCaretToColumn(editor, caret, Math.max(0, Math.min(len - 1, width)), false)
+    }
+
+    override fun moveCaretToColumn(editor: VimEditor, caret: ImmutableVimCaret, count: Int, allowEnd: Boolean): Motion {
+        val line = caret.getLine().line
+        val column = editor.normalizeColumn(line, count, allowEnd)
+        val offset = editor.bufferPositionToOffset(BufferPosition(line, column, false))
+        return if (column != count) {
+            AdjustedOffset(offset, count)
+        } else AbsoluteOffset(offset)
+    }
+
+    override fun moveCaretToCurrentDisplayLineStart(editor: VimEditor, caret: ImmutableVimCaret): Motion {
+        val col =
+            EditorHelper.getVisualColumnAtLeftOfDisplay((editor as IjVimEditor).editor, caret.getVisualPosition().line)
+        return moveCaretToColumn(editor, caret, col, false)
+    }
+
+    override fun moveCaretToCurrentDisplayLineStartSkipLeading(
+        editor: VimEditor,
+        caret: ImmutableVimCaret
+    ): @Range(from = 0, to = Int.MAX_VALUE.toLong()) Int {
+        val col =
+            EditorHelper.getVisualColumnAtLeftOfDisplay((editor as IjVimEditor).editor, caret.getVisualPosition().line)
+        val logicalLine = caret.getLine().line
+        return editor.getLeadingCharacterOffset(logicalLine, col)
+    }
+
+    override fun moveCaretToCurrentDisplayLineEnd(
+        editor: VimEditor,
+        caret: ImmutableVimCaret,
+        allowEnd: Boolean
+    ): Motion {
+        val col =
+            EditorHelper.getVisualColumnAtRightOfDisplay((editor as IjVimEditor).editor, caret.getVisualPosition().line)
+        return moveCaretToColumn(editor, caret, col, allowEnd)
+    }
+
+    override fun moveCaretToLineWithSameColumn(
+        editor: VimEditor,
+        logicalLine: Int,
+        caret: ImmutableVimCaret
+    ): @Range(from = 0, to = Int.MAX_VALUE.toLong()) Int {
+        var col = (caret as IjVimCaret).caret.vimLastColumn
+        var line = logicalLine
+        if (logicalLine < 0) {
+            line = 0
+            col = 0
+        } else if (logicalLine >= editor.lineCount()) {
+            line = editor.normalizeLine(editor.lineCount() - 1)
+            col = editor.lineLength(line)
+        }
+        val newPos = LogicalPosition(line, editor.normalizeColumn(line, col, false))
+        return (editor as IjVimEditor).editor.logicalPositionToOffset(newPos)
+    }
+
+    override fun moveCaretToLineWithStartOfLineOption(
+        editor: VimEditor,
+        line: Int,
+        caret: ImmutableVimCaret
+    ): @Range(from = 0, to = Int.MAX_VALUE.toLong()) Int {
+        return if (VimPlugin.getOptionService().isSet(
+                OptionScope.LOCAL(editor),
+                OptionConstants.startoflineName,
+                OptionConstants.startoflineName
+            )
+        ) {
+            moveCaretToLineStartSkipLeading(editor, line)
+        } else {
+            moveCaretToLineWithSameColumn(editor, line, caret)
+        }
+    }
+
+    /**
+     * If 'absolute' is true, then set tab index to 'value', otherwise add 'value' to tab index with wraparound.
+     */
+    private fun switchEditorTab(editorWindow: EditorWindow?, value: Int, absolute: Boolean) {
+        if (editorWindow != null) {
+            val tabbedPane = editorWindow.tabbedPane
+            if (absolute) {
+                tabbedPane.selectedIndex = value
+            } else {
+                val tabIndex = (value + tabbedPane.selectedIndex) % tabbedPane.tabCount
+                tabbedPane.selectedIndex = if (tabIndex < 0) tabIndex + tabbedPane.tabCount else tabIndex
+            }
+        }
+    }
+
+    override fun moveCaretGotoPreviousTab(editor: VimEditor, context: ExecutionContext, rawCount: Int): Int {
+        val project = (editor as IjVimEditor).editor.project ?: return editor.currentCaret().offset.point
+        val currentWindow = FileEditorManagerEx.getInstanceEx(project).splitters.currentWindow
+        switchEditorTab(currentWindow, if (rawCount >= 1) -rawCount else -1, false)
+        return editor.currentCaret().offset.point
+    }
+
+    override fun moveCaretGotoNextTab(editor: VimEditor, context: ExecutionContext, rawCount: Int): Int {
+        val absolute = rawCount >= 1
+        val project = (editor as IjVimEditor).editor.project ?: return editor.currentCaret().offset.point
+        val currentWindow = FileEditorManagerEx.getInstanceEx(project).splitters.currentWindow
+        switchEditorTab(currentWindow, if (absolute) rawCount - 1 else 1, absolute)
+        return editor.currentCaret().offset.point
+    }
+
+    override fun moveCaretToLinePercent(
+        editor: VimEditor,
+        caret: ImmutableVimCaret,
+        count: Int
+    ): @Range(from = 0, to = Int.MAX_VALUE.toLong()) Int {
+        return moveCaretToLineWithStartOfLineOption(
+            editor,
+            editor.normalizeLine(
+                (editor.lineCount() * MathUtil.clamp(count, 0, 100) +
+                        99) / 100 - 1
+            ), caret
+        )
+    }
+
+    private enum class ScreenLocation {
+        TOP, MIDDLE, BOTTOM
+    }
+
+    // visualLineOffset is a zero based offset to subtract from the direction of travel, where zero is the same as a count
+    // of 1. I.e. 1L = L, which is an offset of zero. 2L is an offset of 1 extra line
+    // When normalizeToScreen is true, the offset is bounded to the current screen dimensions, and scrolloff is applied.
+    // When false, the offset is used directly, and scrolloff is not applied. This is used for op pending motions
+    // (scrolloff is applied after)
+    private fun moveCaretToScreenLocation(
+        editor: Editor,
+        caret: Caret,
+        screenLocation: ScreenLocation,
+        visualLineOffset: Int,
+        normalizeToScreen: Boolean
+    ): @Range(from = 0, to = Int.MAX_VALUE.toLong()) Int {
+        val scrollOffset = if (normalizeToScreen) getNormalizedScrollOffset(editor) else 0
+        val editor1: VimEditor = IjVimEditor(editor)
+        val maxVisualLine = editor1.getVisualLineCount()
+        val topVisualLine = EditorHelper.getVisualLineAtTopOfScreen(editor)
+        val topScrollOff = if (topVisualLine > 0) scrollOffset else 0
+        val bottomVisualLine = EditorHelper.getVisualLineAtBottomOfScreen(editor)
+        val bottomScrollOff = if (bottomVisualLine < maxVisualLine - 1) scrollOffset else 0
+        val topMaxVisualLine = if (normalizeToScreen) bottomVisualLine - bottomScrollOff else maxVisualLine
+        val bottomMinVisualLine = if (normalizeToScreen) topVisualLine + topScrollOff else 0
+        var targetVisualLine = 0
+        targetVisualLine = when (screenLocation) {
+            ScreenLocation.TOP -> Math.min(
+                topVisualLine + Math.max(
+                    topScrollOff,
+                    visualLineOffset
+                ), topMaxVisualLine
+            )
+
+            ScreenLocation.MIDDLE -> EditorHelper.getVisualLineAtMiddleOfScreen(
+                editor
+            )
+
+            ScreenLocation.BOTTOM -> Math.max(
+                bottomVisualLine - Math.max(
+                    bottomScrollOff,
+                    visualLineOffset
+                ), bottomMinVisualLine
+            )
+        }
+        val targetLogicalLine = IjVimEditor(editor).visualLineToBufferLine(targetVisualLine)
+        return moveCaretToLineWithStartOfLineOption(IjVimEditor(editor), targetLogicalLine, IjVimCaret(caret))
+    }
+
+    companion object {
+        @JvmStatic
+        fun getMotionRange2(
+            editor: Editor,
+            caret: Caret,
+            context: DataContext?,
+            argument: Argument,
+            operatorArguments: OperatorArguments
+        ): TextRange? {
+            var start: Int
+            var end: Int
+            if (argument.type === Argument.Type.OFFSETS) {
+                val offsets = argument.offsets[IjVimCaret(caret)] ?: return null
+                val (first, second) = offsets.getNativeStartAndEnd()
+                start = first
+                end = second
+            } else {
+                val cmd = argument.motion
+                // Normalize the counts between the command and the motion argument
+                val cnt = cmd.count * operatorArguments.count1
+                val raw = if (operatorArguments.count0 == 0 && cmd.rawCount == 0) 0 else cnt
+                if (cmd.action is MotionActionHandler) {
+                    val action = cmd.action as MotionActionHandler
+
+                    // This is where we are now
+                    start = caret.offset
+
+                    // Execute the motion (without moving the cursor) and get where we end
+                    val motion = action.getHandlerOffset(
+                        IjVimEditor(editor), IjVimCaret(caret), IjExecutionContext(
+                            context!!
+                        ), cmd.argument, operatorArguments.withCount0(raw)
+                    )
+
+                    // Invalid motion
+                    if (Motion.Error == motion) return null
+                    if (Motion.NoMotion == motion) return null
+                    end = (motion as AbsoluteOffset).offset
+
+                    // If inclusive, add the last character to the range
+                    if (action.motionType === MotionType.INCLUSIVE && end < editor.fileSize) {
+                        if (start > end) {
+                            start++
+                        } else {
+                            end++
+                        }
+                    }
+                } else if (cmd.action is TextObjectActionHandler) {
+                    val action = cmd.action as TextObjectActionHandler
+                    val range = action.getRange(
+                        IjVimEditor(editor),
+                        IjVimCaret(caret),
+                        IjExecutionContext(context!!),
+                        cnt,
+                        raw,
+                        cmd.argument
+                    ) ?: return null
+                    start = range.startOffset
+                    end = range.endOffset
+                    if (cmd.isLinewiseMotion()) end--
+                } else {
+                    throw RuntimeException(
+                        "Commands doesn't take " + cmd.action.javaClass.simpleName + " as an operator"
+                    )
+                }
+            }
+
+            // This is a kludge for dw, dW, and d[w. Without this kludge, an extra newline is operated when it shouldn't be.
+            val id = argument.motion.action.id
+            if (id == VimChangeGroupBase.VIM_MOTION_WORD_RIGHT || id == VimChangeGroupBase.VIM_MOTION_BIG_WORD_RIGHT || id == VimChangeGroupBase.VIM_MOTION_CAMEL_RIGHT) {
+                val text = editor.document.charsSequence.subSequence(start, end).toString()
+                val lastNewLine = text.lastIndexOf('\n')
+                if (lastNewLine > 0) {
+                    if (!IjVimEditor(editor).anyNonWhitespace(end, -1)) {
+                        end = start + lastNewLine
+                    }
+                }
+            }
+            return TextRange(start, end)
+        }
+
+        fun moveCaretToView(editor: Editor) {
+            val scrollOffset = getNormalizedScrollOffset(editor)
+            val topVisualLine = EditorHelper.getVisualLineAtTopOfScreen(editor)
+            val bottomVisualLine = EditorHelper.getVisualLineAtBottomOfScreen(editor)
+            val caretVisualLine = editor.caretModel.visualPosition.line
+            val editor1: VimEditor = IjVimEditor(editor)
+            val lastVisualLine = editor1.getVisualLineCount() - 1
+            val newVisualLine: Int
+            newVisualLine = if (caretVisualLine < topVisualLine + scrollOffset) {
+                IjVimEditor(editor).normalizeVisualLine(topVisualLine + scrollOffset)
+            } else if (bottomVisualLine < lastVisualLine && caretVisualLine > bottomVisualLine - scrollOffset) {
+                IjVimEditor(editor).normalizeVisualLine(bottomVisualLine - scrollOffset)
+            } else {
+                caretVisualLine
+            }
+            val sideScrollOffset = getNormalizedSideScrollOffset(editor)
+            val oldColumn = editor.caretModel.visualPosition.column
+            var col = oldColumn
+            if (col >= IjVimEditor(editor).lineLength(
+                    IjVimEditor(editor).currentCaret().getBufferPosition().line
+                ) - 1
+            ) {
+                col = editor.caretModel.primaryCaret.vimLastColumn
+            }
+            val leftVisualColumn = EditorHelper.getVisualColumnAtLeftOfDisplay(editor, newVisualLine)
+            val rightVisualColumn = EditorHelper.getVisualColumnAtRightOfDisplay(editor, newVisualLine)
+            val caretColumn = col
+            var newColumn = caretColumn
+
+            // TODO: Visual column arithmetic will be inaccurate as it include columns for inlays and folds
+            if (leftVisualColumn > 0 && caretColumn < leftVisualColumn + sideScrollOffset) {
+                newColumn = leftVisualColumn + sideScrollOffset
+            } else if (caretColumn > rightVisualColumn - sideScrollOffset) {
+                newColumn = rightVisualColumn - sideScrollOffset
+            }
+            if (newVisualLine == caretVisualLine && newColumn != caretColumn) {
+                col = newColumn
+            }
+            newColumn = IjVimEditor(editor).normalizeVisualColumn(newVisualLine, newColumn, editor.isEndAllowed)
+            if (newVisualLine != caretVisualLine || newColumn != oldColumn) {
+                val offset = editor.visualPositionToOffset(VisualPosition(newVisualLine, newColumn))
+                IjVimCaret(editor.caretModel.primaryCaret).moveToOffset(offset)
+                editor.caretModel.primaryCaret.vimLastColumn = col
+            }
+        }
+
+        private fun getNormalizedScrollOffset(editor: Editor): Int {
+            val scrollOffset = (VimPlugin.getOptionService().getOptionValue(
+                OptionScope.LOCAL(IjVimEditor(editor)),
+                OptionConstants.scrolloffName,
+                OptionConstants.scrolloffName
+            ) as VimInt).value
+            return EditorHelper.normalizeScrollOffset(editor, scrollOffset)
+        }
+
+        private fun getNormalizedSideScrollOffset(editor: Editor): Int {
+            val sideScrollOffset = (VimPlugin.getOptionService().getOptionValue(
+                OptionScope.LOCAL(IjVimEditor(editor)),
+                OptionConstants.sidescrolloffName,
+                OptionConstants.sidescrolloffName
+            ) as VimInt).value
+            return EditorHelper.normalizeSideScrollOffset(editor, sideScrollOffset)
+        }
+
+        fun fileEditorManagerSelectionChangedCallback(event: FileEditorManagerEvent) {
+            ExEntryPanel.deactivateAll()
+            val fileEditor = event.oldEditor
+            if (fileEditor is TextEditor) {
+                val editor = fileEditor.editor
+                getInstance(editor).clear()
+                if (getInstance(IjVimEditor(editor)).mode === VimStateMachine.Mode.VISUAL) {
+                    IjVimEditor(editor).exitVisualMode()
+                    getInstance().reset(IjVimEditor(editor))
+                }
+            }
+        }
+    }
 }
