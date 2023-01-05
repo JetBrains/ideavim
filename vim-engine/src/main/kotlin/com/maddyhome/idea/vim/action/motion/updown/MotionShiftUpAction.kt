@@ -39,6 +39,6 @@ class MotionShiftUpAction : ShiftedArrowKeyHandler(false) {
   }
 
   override fun motionWithoutKeyModel(editor: VimEditor, context: ExecutionContext, cmd: Command) {
-    injector.motion.scrollFullPage(editor, editor.primaryCaret(), -cmd.count)
+    injector.scroll.scrollFullPage(editor, editor.primaryCaret(), -cmd.count)
   }
 }

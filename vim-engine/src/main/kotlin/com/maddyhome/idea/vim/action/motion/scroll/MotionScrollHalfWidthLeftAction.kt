@@ -43,7 +43,7 @@ class MotionScrollHalfWidthLeftAction : VimActionHandler.SingleExecution() {
     operatorArguments: OperatorArguments,
   ): Boolean {
     // Vim's screen width is the full screen width, including columns used for gutters.
-    return injector.motion.scrollColumns(
+    return injector.scroll.scrollColumns(
       editor,
       cmd.count * (injector.engineEditorHelper.getApproximateScreenWidth(editor) / 2)
     )

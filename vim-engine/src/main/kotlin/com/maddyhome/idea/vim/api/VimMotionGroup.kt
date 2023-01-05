@@ -62,18 +62,6 @@ interface VimMotionGroup {
   fun moveCaretToJump(editor: VimEditor, count: Int): Int
   fun moveCaretToMatchingPair(editor: VimEditor, caret: ImmutableVimCaret): Int
 
-  // Scrolling
-  fun scrollCaretIntoView(editor: VimEditor)
-  fun scrollFullPage(editor: VimEditor, caret: VimCaret, pages: Int): Boolean
-  fun scrollHalfPage(editor: VimEditor, caret: VimCaret, rawCount: Int, down: Boolean): Boolean
-  fun scrollLines(editor: VimEditor, lines: Int): Boolean
-  fun scrollCurrentLineToDisplayTop(editor: VimEditor, rawCount: Int, start: Boolean): Boolean
-  fun scrollCurrentLineToDisplayMiddle(editor: VimEditor, rawCount: Int, start: Boolean): Boolean
-  fun scrollCurrentLineToDisplayBottom(editor: VimEditor, rawCount: Int, start: Boolean): Boolean
-  fun scrollColumns(editor: VimEditor, columns: Int): Boolean
-  fun scrollCaretColumnToDisplayLeftEdge(vimEditor: VimEditor): Boolean
-  fun scrollCaretColumnToDisplayRightEdge(editor: VimEditor): Boolean
-
   /**
    * Find the offset of the start of the next/previous word/WORD
    *

@@ -20,7 +20,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 abstract class IdeActionHandler(private val actionName: String) : VimActionHandler.SingleExecution() {
   override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
     injector.actionExecutor.executeAction(actionName, context)
-    injector.motion.scrollCaretIntoView(editor)
+    injector.scroll.scrollCaretIntoView(editor)
     return true
   }
 }

@@ -278,14 +278,14 @@ class VimMultipleCursorsExtension : VimExtension {
       if (!editor.caretModel.removeCaret(caret)) {
         editor.vim.exitVisualMode()
       }
-      injector.motion.scrollCaretIntoView(editor.vim)
+      injector.scroll.scrollCaretIntoView(editor.vim)
     }
   }
 
   private fun selectText(caret: Caret, text: String, offset: Int): TextRange? {
     if (text.isEmpty()) return null
     caret.vim.vimSetSelection(offset, offset + text.length - 1, true)
-    injector.motion.scrollCaretIntoView(caret.editor.vim)
+    injector.scroll.scrollCaretIntoView(caret.editor.vim)
     return TextRange(caret.selectionStart, caret.selectionEnd)
   }
 

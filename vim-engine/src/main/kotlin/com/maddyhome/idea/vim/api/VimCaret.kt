@@ -85,7 +85,7 @@ per-caret marks.
 
       // Note that this call replaces ALL carets, so any local caret instances will be invalid!
       vimMoveBlockSelectionToOffset(editor, offset)
-      injector.motion.scrollCaretIntoView(editor)
+      injector.scroll.scrollCaretIntoView(editor)
       return this
     }
 
@@ -97,7 +97,7 @@ per-caret marks.
     // Similarly, always make sure the caret is positioned within the view. Adding or removing text could move the caret
     // position relative to the view, without changing offset.
     if (this == editor.primaryCaret()) {
-      injector.motion.scrollCaretIntoView(editor)
+      injector.scroll.scrollCaretIntoView(editor)
     }
     caretAfterMove = if (editor.inVisualMode || editor.inSelectMode) {
       // Another inconsistency with immutable caret. This method should be called on the new caret instance.

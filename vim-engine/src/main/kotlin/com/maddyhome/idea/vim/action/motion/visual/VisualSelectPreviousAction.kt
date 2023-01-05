@@ -44,7 +44,7 @@ private fun selectPreviousVisualMode(editor: VimEditor): Boolean {
   val primaryCaret = editor.primaryCaret()
   primaryCaret.vimSetSelection(visualMarks.startOffset, visualMarks.endOffset - 1, true)
 
-  injector.motion.scrollCaretIntoView(editor)
+  injector.scroll.scrollCaretIntoView(editor)
 
   return true
 }

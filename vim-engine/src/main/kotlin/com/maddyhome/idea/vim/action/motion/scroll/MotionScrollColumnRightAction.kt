@@ -27,6 +27,6 @@ class MotionScrollColumnRightAction : VimActionHandler.SingleExecution() {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    return injector.motion.scrollColumns(editor, -cmd.count)
+    return injector.scroll.scrollColumns(editor, -cmd.count)
   }
 }

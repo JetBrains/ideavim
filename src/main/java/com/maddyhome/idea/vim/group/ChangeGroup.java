@@ -103,7 +103,7 @@ public class ChangeGroup extends VimChangeGroupBase {
     CommandProcessor.getInstance().executeCommand(editor.getProject(), () -> ApplicationManager.getApplication()
                                                     .runWriteAction(() -> KeyHandlerKeeper.getInstance().getOriginalHandler().execute(editor, key, ijContext)), "", doc,
                                                   UndoConfirmationPolicy.DEFAULT, doc);
-    injector.getMotion().scrollCaretIntoView(vimEditor);
+    injector.getScroll().scrollCaretIntoView(vimEditor);
   }
 
 
