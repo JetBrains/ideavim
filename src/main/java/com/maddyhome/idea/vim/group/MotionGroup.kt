@@ -19,8 +19,8 @@ import com.intellij.openapi.fileEditor.impl.EditorWindow
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
-import com.intellij.util.MathUtil
-import com.maddyhome.idea.vim.KeyHandler.Companion.getInstance
+import com.intellij.util.MathUtil.clamp
+import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.BufferPosition
 import com.maddyhome.idea.vim.api.ExecutionContext
@@ -43,9 +43,8 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.command.VimStateMachine
-import com.maddyhome.idea.vim.command.VimStateMachine.Companion.getInstance
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.ex.ExOutputModel.Companion.getInstance
+import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.Motion.AbsoluteOffset
 import com.maddyhome.idea.vim.handler.Motion.AdjustedOffset
@@ -55,32 +54,33 @@ import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.SearchHelper
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.fileSize
+import com.maddyhome.idea.vim.helper.getNormalizedScrollOffset
+import com.maddyhome.idea.vim.helper.getNormalizedSideScrollOffset
 import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.helper.vimLastColumn
-import com.maddyhome.idea.vim.listener.AppCodeTemplates.onMovement
+import com.maddyhome.idea.vim.listener.AppCodeTemplates
 import com.maddyhome.idea.vim.mark.Mark
 import com.maddyhome.idea.vim.newapi.IjExecutionContext
-import com.maddyhome.idea.vim.newapi.IjVimCaret
-import com.maddyhome.idea.vim.newapi.IjVimEditor
+import com.maddyhome.idea.vim.newapi.ij
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import org.jetbrains.annotations.Range
 import java.io.File
+import kotlin.math.max
+import kotlin.math.min
 
 /**
  * This handles all motion related commands and marks
  */
 class MotionGroup : VimMotionGroupBase() {
   override fun onAppCodeMovement(editor: VimEditor, caret: VimCaret, offset: Int, oldOffset: Int) {
-    onMovement((editor as IjVimEditor).editor, (caret as IjVimCaret).caret, oldOffset < offset)
+    AppCodeTemplates.onMovement(editor.ij, caret.ij, oldOffset < offset)
   }
 
-  private fun selectEditor(editor: Editor, mark: Mark): Editor? {
-    val virtualFile = markToVirtualFile(mark)
-    return virtualFile?.let { selectEditor(editor, it) }
-  }
+  private fun selectEditor(editor: Editor, mark: Mark) =
+    markToVirtualFile(mark)?.let { selectEditor(editor, it) }
 
   private fun markToVirtualFile(mark: Mark): VirtualFile? {
     val protocol = mark.protocol
@@ -88,18 +88,12 @@ class MotionGroup : VimMotionGroupBase() {
     return fileSystem.findFileByPath(mark.filename)
   }
 
-  private fun selectEditor(editor: Editor, file: VirtualFile): Editor? {
-    return VimPlugin.getFile().selectEditor(editor.project, file)
-  }
+  private fun selectEditor(editor: Editor, file: VirtualFile) =
+    VimPlugin.getFile().selectEditor(editor.project, file)
 
   override fun moveCaretToMatchingPair(editor: VimEditor, caret: ImmutableVimCaret): Int {
-    val pos =
-      SearchHelper.findMatchingPairOnCurrentLine((editor as IjVimEditor).editor, (caret as IjVimCaret).caret)
-    return if (pos >= 0) {
-      pos
-    } else {
-      -1
-    }
+    val pos = SearchHelper.findMatchingPairOnCurrentLine(editor.ij, caret.ij)
+    return if (pos >= 0) pos else -1
   }
 
   /**
@@ -140,13 +134,7 @@ class MotionGroup : VimMotionGroupBase() {
     count: Int,
     normalizeToScreen: Boolean
   ): Int {
-    return moveCaretToScreenLocation(
-      (editor as IjVimEditor).editor,
-      (caret as IjVimCaret).caret,
-      ScreenLocation.TOP,
-      count - 1,
-      normalizeToScreen
-    )
+    return moveCaretToScreenLocation(editor.ij, caret.ij, ScreenLocation.TOP, count - 1, normalizeToScreen)
   }
 
   override fun moveCaretToLastDisplayLine(
@@ -155,54 +143,39 @@ class MotionGroup : VimMotionGroupBase() {
     count: Int,
     normalizeToScreen: Boolean
   ): Int {
-    return moveCaretToScreenLocation(
-      (editor as IjVimEditor).editor,
-      (caret as IjVimCaret).caret,
-      ScreenLocation.BOTTOM,
-      count - 1,
-      normalizeToScreen
-    )
+    return moveCaretToScreenLocation(editor.ij, caret.ij, ScreenLocation.BOTTOM, count - 1, normalizeToScreen)
   }
 
   override fun moveCaretToMiddleDisplayLine(editor: VimEditor, caret: ImmutableVimCaret): Int {
-    return moveCaretToScreenLocation(
-      (editor as IjVimEditor).editor,
-      (caret as IjVimCaret).caret,
-      ScreenLocation.MIDDLE,
-      0,
-      false
-    )
+    return moveCaretToScreenLocation(editor.ij, caret.ij, ScreenLocation.MIDDLE, 0, false)
   }
 
   override fun moveCaretToFileMark(editor: VimEditor, ch: Char, toLineStart: Boolean): Int {
     val mark = VimPlugin.getMark().getFileMark(editor, ch) ?: return -1
-    val line = mark.line
     return if (toLineStart) {
-      moveCaretToLineStartSkipLeading(editor, line)
+      moveCaretToLineStartSkipLeading(editor, mark.line)
     } else {
-      editor.bufferPositionToOffset(BufferPosition(line, mark.col, false))
+      editor.bufferPositionToOffset(BufferPosition(mark.line, mark.col, false))
     }
   }
 
   override fun moveCaretToMark(editor: VimEditor, ch: Char, toLineStart: Boolean): Int {
     val mark = VimPlugin.getMark().getMark(editor, ch) ?: return -1
-    val vf = EditorHelper.getVirtualFile((editor as IjVimEditor).editor) ?: return -1
-    val line = mark.line
+    val vf = EditorHelper.getVirtualFile(editor.ij) ?: return -1
     if (vf.path == mark.filename) {
       return if (toLineStart) {
-        moveCaretToLineStartSkipLeading(editor, line)
+        moveCaretToLineStartSkipLeading(editor, mark.line)
       } else {
-        editor.bufferPositionToOffset(BufferPosition(line, mark.col, false))
+        editor.bufferPositionToOffset(BufferPosition(mark.line, mark.col, false))
       }
     }
-    val selectedEditor = selectEditor(editor.editor, mark)
-    if (selectedEditor != null) {
+    selectEditor(editor.ij, mark)?.let { selectedEditor ->
       for (caret in selectedEditor.caretModel.allCarets) {
-        IjVimCaret(caret!!).moveToOffset(
+        caret.vim.moveToOffset(
           if (toLineStart) {
-            moveCaretToLineStartSkipLeading(IjVimEditor(selectedEditor), line)
+            moveCaretToLineStartSkipLeading(selectedEditor.vim, mark.line)
           } else {
-            selectedEditor.logicalPositionToOffset(LogicalPosition(line, mark.col))
+            selectedEditor.logicalPositionToOffset(LogicalPosition(mark.line, mark.col))
           }
         )
       }
@@ -213,20 +186,19 @@ class MotionGroup : VimMotionGroupBase() {
   override fun moveCaretToJump(editor: VimEditor, count: Int): Int {
     val spot = VimPlugin.getMark().getJumpSpot()
     val (line, col, fileName) = VimPlugin.getMark().getJump(count) ?: return -1
-    val vf = EditorHelper.getVirtualFile((editor as IjVimEditor).editor) ?: return -1
+    val vf = EditorHelper.getVirtualFile(editor.ij) ?: return -1
     val lp = BufferPosition(line, col, false)
-    val lpnative = LogicalPosition(line, col, false)
+    val lpNative = LogicalPosition(line, col, false)
     return if (vf.path != fileName) {
       val newFile = LocalFileSystem.getInstance().findFileByPath(fileName.replace(File.separatorChar, '/'))
         ?: return -2
-      val newEditor = selectEditor(editor.editor, newFile)
-      if (newEditor != null) {
+      selectEditor(editor.ij, newFile)?.let { newEditor ->
         if (spot == -1) {
           VimPlugin.getMark().addJump(editor, false)
         }
-        IjVimCaret(newEditor.caretModel.currentCaret).moveToOffset(
-          IjVimEditor(newEditor).normalizeOffset(newEditor.logicalPositionToOffset(lpnative), false)
-        )
+        newEditor.vim.let {
+          it.currentCaret().moveToOffset(it.normalizeOffset(newEditor.logicalPositionToOffset(lpNative), false))
+        }
       }
       -2
     } else {
@@ -238,9 +210,9 @@ class MotionGroup : VimMotionGroupBase() {
   }
 
   override fun moveCaretToCurrentDisplayLineMiddle(editor: VimEditor, caret: ImmutableVimCaret): Motion {
-    val width = EditorHelper.getApproximateScreenWidth((editor as IjVimEditor).editor) / 2
+    val width = EditorHelper.getApproximateScreenWidth(editor.ij) / 2
     val len = editor.lineLength(editor.currentCaret().getBufferPosition().line)
-    return moveCaretToColumn(editor, caret, Math.max(0, Math.min(len - 1, width)), false)
+    return moveCaretToColumn(editor, caret, max(0, min(len - 1, width)), false)
   }
 
   override fun moveCaretToColumn(editor: VimEditor, caret: ImmutableVimCaret, count: Int, allowEnd: Boolean): Motion {
@@ -255,8 +227,7 @@ class MotionGroup : VimMotionGroupBase() {
   }
 
   override fun moveCaretToCurrentDisplayLineStart(editor: VimEditor, caret: ImmutableVimCaret): Motion {
-    val col =
-      EditorHelper.getVisualColumnAtLeftOfDisplay((editor as IjVimEditor).editor, caret.getVisualPosition().line)
+    val col = EditorHelper.getVisualColumnAtLeftOfDisplay(editor.ij, caret.getVisualPosition().line)
     return moveCaretToColumn(editor, caret, col, false)
   }
 
@@ -264,10 +235,9 @@ class MotionGroup : VimMotionGroupBase() {
     editor: VimEditor,
     caret: ImmutableVimCaret
   ): @Range(from = 0, to = Int.MAX_VALUE.toLong()) Int {
-    val col =
-      EditorHelper.getVisualColumnAtLeftOfDisplay((editor as IjVimEditor).editor, caret.getVisualPosition().line)
-    val logicalLine = caret.getLine().line
-    return editor.getLeadingCharacterOffset(logicalLine, col)
+    val col = EditorHelper.getVisualColumnAtLeftOfDisplay(editor.ij, caret.getVisualPosition().line)
+    val bufferLine = caret.getLine().line
+    return editor.getLeadingCharacterOffset(bufferLine, col)
   }
 
   override fun moveCaretToCurrentDisplayLineEnd(
@@ -275,27 +245,26 @@ class MotionGroup : VimMotionGroupBase() {
     caret: ImmutableVimCaret,
     allowEnd: Boolean
   ): Motion {
-    val col =
-      EditorHelper.getVisualColumnAtRightOfDisplay((editor as IjVimEditor).editor, caret.getVisualPosition().line)
+    val col = EditorHelper.getVisualColumnAtRightOfDisplay(editor.ij, caret.getVisualPosition().line)
     return moveCaretToColumn(editor, caret, col, allowEnd)
   }
 
   override fun moveCaretToLineWithSameColumn(
     editor: VimEditor,
-    logicalLine: Int,
+    line: Int,
     caret: ImmutableVimCaret
   ): @Range(from = 0, to = Int.MAX_VALUE.toLong()) Int {
-    var col = (caret as IjVimCaret).caret.vimLastColumn
-    var line = logicalLine
-    if (logicalLine < 0) {
-      line = 0
-      col = 0
-    } else if (logicalLine >= editor.lineCount()) {
-      line = editor.normalizeLine(editor.lineCount() - 1)
-      col = editor.lineLength(line)
+    var c = caret.vimLastColumn
+    var l = line
+    if (l < 0) {
+      l = 0
+      c = 0
+    } else if (l >= editor.lineCount()) {
+      l = editor.normalizeLine(editor.lineCount() - 1)
+      c = editor.lineLength(l)
     }
-    val newPos = LogicalPosition(line, editor.normalizeColumn(line, col, false))
-    return (editor as IjVimEditor).editor.logicalPositionToOffset(newPos)
+    val newPos = BufferPosition(l, editor.normalizeColumn(l, c, false))
+    return editor.bufferPositionToOffset(newPos)
   }
 
   override fun moveCaretToLineWithStartOfLineOption(
@@ -331,7 +300,7 @@ class MotionGroup : VimMotionGroupBase() {
   }
 
   override fun moveCaretGotoPreviousTab(editor: VimEditor, context: ExecutionContext, rawCount: Int): Int {
-    val project = (editor as IjVimEditor).editor.project ?: return editor.currentCaret().offset.point
+    val project = editor.ij.project ?: return editor.currentCaret().offset.point
     val currentWindow = FileEditorManagerEx.getInstanceEx(project).splitters.currentWindow
     switchEditorTab(currentWindow, if (rawCount >= 1) -rawCount else -1, false)
     return editor.currentCaret().offset.point
@@ -339,7 +308,7 @@ class MotionGroup : VimMotionGroupBase() {
 
   override fun moveCaretGotoNextTab(editor: VimEditor, context: ExecutionContext, rawCount: Int): Int {
     val absolute = rawCount >= 1
-    val project = (editor as IjVimEditor).editor.project ?: return editor.currentCaret().offset.point
+    val project = editor.ij.project ?: return editor.currentCaret().offset.point
     val currentWindow = FileEditorManagerEx.getInstanceEx(project).splitters.currentWindow
     switchEditorTab(currentWindow, if (absolute) rawCount - 1 else 1, absolute)
     return editor.currentCaret().offset.point
@@ -352,7 +321,7 @@ class MotionGroup : VimMotionGroupBase() {
   ): @Range(from = 0, to = Int.MAX_VALUE.toLong()) Int {
     return moveCaretToLineWithStartOfLineOption(
       editor,
-      editor.normalizeLine((editor.lineCount() * MathUtil.clamp(count, 0, 100) + 99) / 100 - 1),
+      editor.normalizeLine((editor.lineCount() * clamp(count, 0, 100) + 99) / 100 - 1),
       caret
     )
   }
@@ -373,26 +342,22 @@ class MotionGroup : VimMotionGroupBase() {
     visualLineOffset: Int,
     normalizeToScreen: Boolean
   ): @Range(from = 0, to = Int.MAX_VALUE.toLong()) Int {
+    val vimEditor = editor.vim
     val scrollOffset = if (normalizeToScreen) getNormalizedScrollOffset(editor) else 0
-    val editor1: VimEditor = IjVimEditor(editor)
-    val maxVisualLine = editor1.getVisualLineCount()
+    val maxVisualLine = vimEditor.getVisualLineCount()
     val topVisualLine = EditorHelper.getVisualLineAtTopOfScreen(editor)
     val topScrollOff = if (topVisualLine > 0) scrollOffset else 0
     val bottomVisualLine = EditorHelper.getVisualLineAtBottomOfScreen(editor)
     val bottomScrollOff = if (bottomVisualLine < maxVisualLine - 1) scrollOffset else 0
     val topMaxVisualLine = if (normalizeToScreen) bottomVisualLine - bottomScrollOff else maxVisualLine
     val bottomMinVisualLine = if (normalizeToScreen) topVisualLine + topScrollOff else 0
-    var targetVisualLine = 0
-    targetVisualLine = when (screenLocation) {
-      ScreenLocation.TOP -> Math.min(topVisualLine + Math.max(topScrollOff, visualLineOffset), topMaxVisualLine)
+    val targetVisualLine = when (screenLocation) {
+      ScreenLocation.TOP -> min(topVisualLine + max(topScrollOff, visualLineOffset), topMaxVisualLine)
       ScreenLocation.MIDDLE -> EditorHelper.getVisualLineAtMiddleOfScreen(editor)
-      ScreenLocation.BOTTOM -> Math.max(
-        bottomVisualLine - Math.max(bottomScrollOff, visualLineOffset),
-        bottomMinVisualLine
-      )
+      ScreenLocation.BOTTOM -> max(bottomVisualLine - max(bottomScrollOff, visualLineOffset), bottomMinVisualLine)
     }
-    val targetLogicalLine = IjVimEditor(editor).visualLineToBufferLine(targetVisualLine)
-    return moveCaretToLineWithStartOfLineOption(IjVimEditor(editor), targetLogicalLine, IjVimCaret(caret))
+    val targetLogicalLine = vimEditor.visualLineToBufferLine(targetVisualLine)
+    return moveCaretToLineWithStartOfLineOption(vimEditor, targetLogicalLine, caret.vim)
   }
 
   companion object {
@@ -407,7 +372,7 @@ class MotionGroup : VimMotionGroupBase() {
       var start: Int
       var end: Int
       if (argument.type === Argument.Type.OFFSETS) {
-        val offsets = argument.offsets[IjVimCaret(caret)] ?: return null
+        val offsets = argument.offsets[caret.vim] ?: return null
         val (first, second) = offsets.getNativeStartAndEnd()
         start = first
         end = second
@@ -424,8 +389,8 @@ class MotionGroup : VimMotionGroupBase() {
 
           // Execute the motion (without moving the cursor) and get where we end
           val motion = action.getHandlerOffset(
-            IjVimEditor(editor),
-            IjVimCaret(caret),
+            editor.vim,
+            caret.vim,
             IjExecutionContext(context!!),
             cmd.argument,
             operatorArguments.withCount0(raw)
@@ -446,14 +411,8 @@ class MotionGroup : VimMotionGroupBase() {
           }
         } else if (cmd.action is TextObjectActionHandler) {
           val action = cmd.action as TextObjectActionHandler
-          val range = action.getRange(
-            IjVimEditor(editor),
-            IjVimCaret(caret),
-            IjExecutionContext(context!!),
-            cnt,
-            raw,
-            cmd.argument
-          ) ?: return null
+          val range =
+            action.getRange(editor.vim, caret.vim, IjExecutionContext(context!!), cnt, raw, cmd.argument) ?: return null
           start = range.startOffset
           end = range.endOffset
           if (cmd.isLinewiseMotion()) end--
@@ -470,7 +429,7 @@ class MotionGroup : VimMotionGroupBase() {
         val text = editor.document.charsSequence.subSequence(start, end).toString()
         val lastNewLine = text.lastIndexOf('\n')
         if (lastNewLine > 0) {
-          if (!IjVimEditor(editor).anyNonWhitespace(end, -1)) {
+          if (!editor.vim.anyNonWhitespace(end, -1)) {
             end = start + lastNewLine
           }
         }
@@ -479,24 +438,23 @@ class MotionGroup : VimMotionGroupBase() {
     }
 
     fun moveCaretToView(editor: Editor) {
+      val vimEditor: VimEditor = editor.vim
       val scrollOffset = getNormalizedScrollOffset(editor)
       val topVisualLine = EditorHelper.getVisualLineAtTopOfScreen(editor)
       val bottomVisualLine = EditorHelper.getVisualLineAtBottomOfScreen(editor)
       val caretVisualLine = editor.caretModel.visualPosition.line
-      val editor1: VimEditor = IjVimEditor(editor)
-      val lastVisualLine = editor1.getVisualLineCount() - 1
-      val newVisualLine: Int
-      newVisualLine = if (caretVisualLine < topVisualLine + scrollOffset) {
-        IjVimEditor(editor).normalizeVisualLine(topVisualLine + scrollOffset)
+      val lastVisualLine = vimEditor.getVisualLineCount() - 1
+      val newVisualLine = if (caretVisualLine < topVisualLine + scrollOffset) {
+        vimEditor.normalizeVisualLine(topVisualLine + scrollOffset)
       } else if (bottomVisualLine < lastVisualLine && caretVisualLine > bottomVisualLine - scrollOffset) {
-        IjVimEditor(editor).normalizeVisualLine(bottomVisualLine - scrollOffset)
+        vimEditor.normalizeVisualLine(bottomVisualLine - scrollOffset)
       } else {
         caretVisualLine
       }
       val sideScrollOffset = getNormalizedSideScrollOffset(editor)
       val oldColumn = editor.caretModel.visualPosition.column
       var col = oldColumn
-      if (col >= IjVimEditor(editor).lineLength(IjVimEditor(editor).currentCaret().getBufferPosition().line) - 1) {
+      if (col >= vimEditor.lineLength(vimEditor.currentCaret().getBufferPosition().line) - 1) {
         col = editor.caretModel.primaryCaret.vimLastColumn
       }
       val leftVisualColumn = EditorHelper.getVisualColumnAtLeftOfDisplay(editor, newVisualLine)
@@ -513,30 +471,12 @@ class MotionGroup : VimMotionGroupBase() {
       if (newVisualLine == caretVisualLine && newColumn != caretColumn) {
         col = newColumn
       }
-      newColumn = IjVimEditor(editor).normalizeVisualColumn(newVisualLine, newColumn, editor.isEndAllowed)
+      newColumn = vimEditor.normalizeVisualColumn(newVisualLine, newColumn, editor.isEndAllowed)
       if (newVisualLine != caretVisualLine || newColumn != oldColumn) {
         val offset = editor.visualPositionToOffset(VisualPosition(newVisualLine, newColumn))
-        IjVimCaret(editor.caretModel.primaryCaret).moveToOffset(offset)
+        vimEditor.primaryCaret().moveToOffset(offset)
         editor.caretModel.primaryCaret.vimLastColumn = col
       }
-    }
-
-    private fun getNormalizedScrollOffset(editor: Editor): Int {
-      val scrollOffset = (VimPlugin.getOptionService().getOptionValue(
-        OptionScope.LOCAL(IjVimEditor(editor)),
-        OptionConstants.scrolloffName,
-        OptionConstants.scrolloffName
-      ) as VimInt).value
-      return EditorHelper.normalizeScrollOffset(editor, scrollOffset)
-    }
-
-    private fun getNormalizedSideScrollOffset(editor: Editor): Int {
-      val sideScrollOffset = (VimPlugin.getOptionService().getOptionValue(
-        OptionScope.LOCAL(IjVimEditor(editor)),
-        OptionConstants.sidescrolloffName,
-        OptionConstants.sidescrolloffName
-      ) as VimInt).value
-      return EditorHelper.normalizeSideScrollOffset(editor, sideScrollOffset)
     }
 
     fun fileEditorManagerSelectionChangedCallback(event: FileEditorManagerEvent) {
@@ -544,10 +484,12 @@ class MotionGroup : VimMotionGroupBase() {
       val fileEditor = event.oldEditor
       if (fileEditor is TextEditor) {
         val editor = fileEditor.editor
-        getInstance(editor).clear()
-        if (getInstance(IjVimEditor(editor)).mode === VimStateMachine.Mode.VISUAL) {
-          IjVimEditor(editor).exitVisualMode()
-          getInstance().reset(IjVimEditor(editor))
+        ExOutputModel.getInstance(editor).clear()
+        editor.vim.let { vimEditor ->
+          if (VimStateMachine.getInstance(vimEditor).mode === VimStateMachine.Mode.VISUAL) {
+            vimEditor.exitVisualMode()
+            KeyHandler.getInstance().reset(vimEditor)
+          }
         }
       }
     }
