@@ -221,9 +221,9 @@ public class ScrollGroup implements VimScrollGroup {
   // Scrolls current or [count] line to given screen location
   // In Vim, [count] refers to a file line, so it's a one-based logical line
   private void scrollLineToScreenLocation(@NotNull Editor editor,
-                                          @NotNull ScreenLocation screenLocation,
-                                          int rawCount,
-                                          boolean start) {
+    @NotNull ScreenLocation screenLocation,
+    int rawCount,
+    boolean start) {
     final int scrollOffset = getNormalizedScrollOffset(editor);
 
     int visualLine;
@@ -239,16 +239,16 @@ public class ScrollGroup implements VimScrollGroup {
     // Scroll offset is applicable, but scroll jump isn't. Offset is applied to screen lines (visual lines)
     switch (screenLocation) {
       case TOP:
-        scrollVisualLineToTopOfScreen(editor, visualLine - scrollOffset);
-        break;
+      scrollVisualLineToTopOfScreen(editor, visualLine - scrollOffset);
+      break;
       case MIDDLE:
-        scrollVisualLineToMiddleOfScreen(editor, visualLine, true);
-        break;
+      scrollVisualLineToMiddleOfScreen(editor, visualLine, true);
+      break;
       case BOTTOM:
-        // Make sure we scroll to an actual line, not virtual space
-        scrollVisualLineToBottomOfScreen(editor, normalizeVisualLine(new IjVimEditor(editor),
-                                                                                          visualLine + scrollOffset));
-        break;
+      // Make sure we scroll to an actual line, not virtual space
+      scrollVisualLineToBottomOfScreen(editor, normalizeVisualLine(new IjVimEditor(editor),
+        visualLine + scrollOffset));
+      break;
     }
 
     if (visualLine != editor.getCaretModel().getVisualPosition().line || start) {
@@ -256,12 +256,12 @@ public class ScrollGroup implements VimScrollGroup {
       int offset;
       if (start) {
         offset = motion.moveCaretToLineStartSkipLeading(new IjVimEditor(editor),
-                                                        visualLineToBufferLine(new IjVimEditor(editor), visualLine));
+          visualLineToBufferLine(new IjVimEditor(editor), visualLine));
       }
       else {
         offset = motion.moveCaretToLineWithSameColumn(new IjVimEditor(editor),
-                                                      visualLineToBufferLine(new IjVimEditor(editor), visualLine),
-                                                      new IjVimCaret(editor.getCaretModel().getPrimaryCaret()));
+          visualLineToBufferLine(new IjVimEditor(editor), visualLine),
+          new IjVimCaret(editor.getCaretModel().getPrimaryCaret()));
       }
 
       new IjVimCaret(editor.getCaretModel().getPrimaryCaret()).moveToOffset(offset);
@@ -275,15 +275,15 @@ public class ScrollGroup implements VimScrollGroup {
     if (columns > 0) {
       // TODO: Don't add columns to visual position. This includes inlays and folds
       int visualColumn = normalizeVisualColumn(editor, caretVisualPosition.line,
-                                                                    getVisualColumnAtLeftOfDisplay(ijEditor, caretVisualPosition.line) +
-                                                                    columns, false);
+      getVisualColumnAtLeftOfDisplay(ijEditor, caretVisualPosition.line) +
+        columns, false);
 
       // If the target column has an inlay preceding it, move passed it. This inlay will have been (incorrectly)
       // included in the simple visual position, so it's ok to step over. If we don't do this, scrollColumnToLeftOfScreen
       // can get stuck trying to make sure the inlay is visible.
       // A better solution is to not use VisualPosition everywhere, especially for arithmetic
       final Inlay<?> inlay =
-        ijEditor.getInlayModel().getInlineElementAt(new VisualPosition(caretVisualPosition.line, visualColumn - 1));
+      ijEditor.getInlayModel().getInlineElementAt(new VisualPosition(caretVisualPosition.line, visualColumn - 1));
       if (inlay != null && !inlay.isRelatedToPrecedingText()) {
         visualColumn++;
       }
@@ -324,7 +324,7 @@ public class ScrollGroup implements VimScrollGroup {
 
 
   private enum ScreenLocation {
-    TOP, MIDDLE, BOTTOM
+      TOP, MIDDLE, BOTTOM
   }
 
   public static class ScrollOptionsChangeListener implements LocalOptionChangeListener<VimDataType> {
@@ -337,10 +337,10 @@ public class ScrollGroup implements VimScrollGroup {
     @Override
     public void processGlobalValueChange(@Nullable VimDataType oldValue) {
       for (Editor editor : HelperKt.localEditors()) {
-        if (UserDataManager.getVimEditorGroup(editor)) {
-          ScrollViewHelper.scrollCaretIntoView(editor);
-        }
+      if (UserDataManager.getVimEditorGroup(editor)) {
+        ScrollViewHelper.scrollCaretIntoView(editor);
       }
+    }
     }
 
     @Override
