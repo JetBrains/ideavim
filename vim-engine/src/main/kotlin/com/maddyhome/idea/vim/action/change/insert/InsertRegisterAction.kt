@@ -16,12 +16,13 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.handler.VimActionHandler
+import com.maddyhome.idea.vim.helper.RWLockLabel
 import com.maddyhome.idea.vim.put.PutData
 import com.maddyhome.idea.vim.register.Register
 import com.maddyhome.idea.vim.vimscript.model.Script
 
 class InsertRegisterAction : VimActionHandler.SingleExecution() {
-  override val type: Command.Type = Command.Type.INSERT
+  override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 
   override val argumentType: Argument.Type = Argument.Type.CHARACTER
 
@@ -71,6 +72,7 @@ class InsertRegisterAction : VimActionHandler.SingleExecution() {
  * @param key     The register name
  * @return true if able to insert the register contents, false if not
  */
+@RWLockLabel.SelfSynchronized
 private fun insertRegister(
   editor: VimEditor,
   context: ExecutionContext,

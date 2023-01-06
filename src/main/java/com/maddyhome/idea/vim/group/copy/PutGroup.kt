@@ -32,6 +32,7 @@ import com.maddyhome.idea.vim.command.isLine
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.RWLockLabel
 import com.maddyhome.idea.vim.helper.TestClipboardModel
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.mark.VimMarkConstants.MARK_CHANGE_POS
@@ -66,6 +67,7 @@ class PutGroup : VimPutBase() {
     return null
   }
 
+  @RWLockLabel.SelfSynchronized
   override fun putTextViaIde(
     pasteProvider: VimPasteProvider,
     vimEditor: VimEditor,

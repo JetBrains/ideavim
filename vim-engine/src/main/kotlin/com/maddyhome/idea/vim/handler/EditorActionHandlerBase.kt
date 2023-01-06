@@ -43,6 +43,16 @@ import javax.swing.KeyStroke
 abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
   val id: String = getActionId(this::class.java.name)
 
+  /**
+   * Note: I don't like this field because it controls RW lock. In case we process RW lock inside the command,
+   *   we change this type to OTHER_SELF_SYNCHRONIZED. This may cause problems because some logic may depend on,
+   *   let's say, INSERT type of the command.
+   * At the moment of this comment writing I discovered a deadlock inside the
+   *   [com.maddyhome.idea.vim.action.change.insert.InsertRegisterAction] and I have to change this from INSERT to
+   *   OTHER_SELF_SYNCHRONIZED. This should cause no problems because I don't see any logic depending on INSERT,
+   *   but there is some logic depending on other command types and such change may cause bugs.
+   * It looks like it'll be needed to split command type and synchronization type.
+   */
   abstract val type: Command.Type
 
   open val argumentType: Argument.Type? = null

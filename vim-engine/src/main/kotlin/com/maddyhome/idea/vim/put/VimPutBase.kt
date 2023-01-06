@@ -30,6 +30,7 @@ import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.common.offset
 import com.maddyhome.idea.vim.diagnostic.vimLogger
+import com.maddyhome.idea.vim.helper.RWLockLabel
 import com.maddyhome.idea.vim.helper.firstOrNull
 import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.subMode
@@ -43,6 +44,7 @@ import kotlin.math.max
 import kotlin.math.min
 
 abstract class VimPutBase : VimPut {
+  @RWLockLabel.SelfSynchronized
   override fun putText(
     editor: VimEditor,
     context: ExecutionContext,
@@ -103,6 +105,7 @@ abstract class VimPutBase : VimPut {
     injector.markGroup.setVisualSelectionMarks(editor, rangeForMarks)
   }
 
+  @RWLockLabel.SelfSynchronized
   private fun deleteSelectedText(editor: VimEditor, data: PutData, operatorArguments: OperatorArguments) {
     if (data.visualSelection == null) return
 
@@ -370,6 +373,7 @@ abstract class VimPutBase : VimPut {
     }
   }
 
+  @RWLockLabel.SelfSynchronized
   protected fun prepareDocumentAndGetStartOffsets(
     vimEditor: VimEditor,
     vimCaret: ImmutableVimCaret,
@@ -460,6 +464,7 @@ abstract class VimPutBase : VimPut {
     }
   }
 
+  @RWLockLabel.SelfSynchronized
   private fun putForCaret(
     editor: VimEditor,
     caret: VimCaret,
@@ -496,6 +501,7 @@ abstract class VimPutBase : VimPut {
     return updated
   }
 
+  @RWLockLabel.SelfSynchronized
   override fun putTextForCaret(editor: VimEditor, caret: VimCaret, context: ExecutionContext, data: PutData, updateVisualMarks: Boolean): Boolean {
     val additionalData = collectPreModificationData(editor, data)
     data.visualSelection?.let {
@@ -513,6 +519,7 @@ abstract class VimPutBase : VimPut {
     return true
   }
 
+  @RWLockLabel.SelfSynchronized
   override fun putTextAndSetCaretPosition(
     editor: VimEditor,
     context: ExecutionContext,
