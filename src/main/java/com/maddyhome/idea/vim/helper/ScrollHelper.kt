@@ -16,19 +16,23 @@ import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 
 fun getNormalizedScrollOffset(editor: Editor): Int {
-  val scrollOffset = (VimPlugin.getOptionService().getOptionValue(
-    OptionScope.LOCAL(editor.vim),
-    OptionConstants.scrolloffName,
-    OptionConstants.scrolloffName
-  ) as VimInt).value
+  val scrollOffset = (
+    VimPlugin.getOptionService().getOptionValue(
+      OptionScope.LOCAL(editor.vim),
+      OptionConstants.scrolloffName,
+      OptionConstants.scrolloffName
+    ) as VimInt
+    ).value
   return EditorHelper.normalizeScrollOffset(editor, scrollOffset)
 }
 
 fun getNormalizedSideScrollOffset(editor: Editor): Int {
-  val sideScrollOffset = (VimPlugin.getOptionService().getOptionValue(
-    OptionScope.LOCAL(editor.vim),
-    OptionConstants.sidescrolloffName,
-    OptionConstants.sidescrolloffName
-  ) as VimInt).value
+  val sideScrollOffset = (
+    VimPlugin.getOptionService().getOptionValue(
+      OptionScope.LOCAL(editor.vim),
+      OptionConstants.sidescrolloffName,
+      OptionConstants.sidescrolloffName
+    ) as VimInt
+    ).value
   return EditorHelper.normalizeSideScrollOffset(editor, sideScrollOffset)
 }

@@ -14,7 +14,19 @@ import com.maddyhome.idea.vim.api.getVisualLineCount
 import com.maddyhome.idea.vim.api.normalizeVisualColumn
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.VimStateMachine
-import com.maddyhome.idea.vim.helper.EditorHelper.*
+import com.maddyhome.idea.vim.helper.EditorHelper.getApproximateScreenHeight
+import com.maddyhome.idea.vim.helper.EditorHelper.getApproximateScreenWidth
+import com.maddyhome.idea.vim.helper.EditorHelper.getNonNormalizedVisualLineAtBottomOfScreen
+import com.maddyhome.idea.vim.helper.EditorHelper.getVisualColumnAtLeftOfDisplay
+import com.maddyhome.idea.vim.helper.EditorHelper.getVisualColumnAtRightOfDisplay
+import com.maddyhome.idea.vim.helper.EditorHelper.getVisualLineAtBottomOfScreen
+import com.maddyhome.idea.vim.helper.EditorHelper.getVisualLineAtTopOfScreen
+import com.maddyhome.idea.vim.helper.EditorHelper.scrollColumnToLeftOfScreen
+import com.maddyhome.idea.vim.helper.EditorHelper.scrollColumnToMiddleOfScreen
+import com.maddyhome.idea.vim.helper.EditorHelper.scrollColumnToRightOfScreen
+import com.maddyhome.idea.vim.helper.EditorHelper.scrollVisualLineToBottomOfScreen
+import com.maddyhome.idea.vim.helper.EditorHelper.scrollVisualLineToMiddleOfScreen
+import com.maddyhome.idea.vim.helper.EditorHelper.scrollVisualLineToTopOfScreen
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
@@ -49,11 +61,13 @@ internal object ScrollViewHelper {
     val lastLine = vimEditor.getVisualLineCount() - 1
 
     // We need the non-normalised value here, so we can handle cases such as so=999 to keep the current line centred
-    val scrollOffset = (VimPlugin.getOptionService().getOptionValue(
-      OptionScope.LOCAL(vimEditor),
-      OptionConstants.scrolloffName,
-      OptionConstants.scrolloffName
-    ) as VimInt).value
+    val scrollOffset = (
+      VimPlugin.getOptionService().getOptionValue(
+        OptionScope.LOCAL(vimEditor),
+        OptionConstants.scrolloffName,
+        OptionConstants.scrolloffName
+      ) as VimInt
+      ).value
     val topBound = topLine + scrollOffset
     val bottomBound = max(topBound, bottomLine - scrollOffset)
 
@@ -176,11 +190,13 @@ internal object ScrollViewHelper {
     // Default value is 1. Zero is a valid value, but we normalise to 1 - we always want to scroll at least one line
     // If the value is negative, it's a percentage of the height.
     if (scrollJump) {
-      val scrollJumpSize = (VimPlugin.getOptionService().getOptionValue(
-        OptionScope.LOCAL(editor),
-        OptionConstants.scrolljumpName,
-        OptionConstants.scrolljumpName
-      ) as VimInt).value
+      val scrollJumpSize = (
+        VimPlugin.getOptionService().getOptionValue(
+          OptionScope.LOCAL(editor),
+          OptionConstants.scrolljumpName,
+          OptionConstants.scrolljumpName
+        ) as VimInt
+        ).value
       return if (scrollJumpSize < 0) {
         (height * (min(100, -scrollJumpSize) / 100.0)).toInt()
       } else {
@@ -199,11 +215,13 @@ internal object ScrollViewHelper {
     val scrollOffset = getNormalizedSideScrollOffset(editor)
     val flags = VimStateMachine.getInstance(vimEditor).executingCommandFlags
     val allowSidescroll = !flags.contains(CommandFlags.FLAG_IGNORE_SIDE_SCROLL_JUMP)
-    val sidescroll = (VimPlugin.getOptionService().getOptionValue(
-      OptionScope.LOCAL(vimEditor),
-      OptionConstants.sidescrollName,
-      OptionConstants.sidescrollName
-    ) as VimInt).value
+    val sidescroll = (
+      VimPlugin.getOptionService().getOptionValue(
+        OptionScope.LOCAL(vimEditor),
+        OptionConstants.sidescrollName,
+        OptionConstants.sidescrollName
+      ) as VimInt
+      ).value
     val offsetLeft = caretColumn - (currentVisualLeftColumn + scrollOffset)
     val offsetRight = caretColumn - (currentVisualRightColumn - scrollOffset)
     if (offsetLeft < 0 || offsetRight > 0) {
