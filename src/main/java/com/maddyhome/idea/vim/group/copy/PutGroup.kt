@@ -16,6 +16,7 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.RangeMarker
+import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.ide.CopyPasteManager
 import com.intellij.util.PlatformUtils
 import com.maddyhome.idea.vim.VimPlugin
@@ -117,17 +118,21 @@ class PutGroup : VimPutBase() {
       }
     }
 
+    val lastPastedRegion = if (carets.size == 1) editor.getUserData(EditorEx.LAST_PASTED_REGION) else null
     carets.forEach { (caret, point) ->
       val startOffset = point.startOffset
       point.dispose()
       if (!caret.isValid) return@forEach
+
+      val caretPossibleEndOffset = lastPastedRegion?.endOffset ?: (startOffset + text.text.length)
       val endOffset = if (data.indent) doIndent(
         vimEditor,
         IjVimCaret(caret),
         vimContext,
         startOffset,
-        startOffset + text.text.length
-      ) else startOffset + text.text.length
+        caretPossibleEndOffset
+      ) else caretPossibleEndOffset
+
       VimPlugin.getMark().setChangeMarks(editor.vim, TextRange(startOffset, endOffset))
       VimPlugin.getMark().setMark(editor.vim, MARK_CHANGE_POS, startOffset)
       moveCaretToEndPosition(
