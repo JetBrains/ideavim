@@ -13,18 +13,24 @@ import com.maddyhome.idea.vim.api.VimOptionServiceBase
 import com.maddyhome.idea.vim.option.ToggleOption
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.StringOption
+import com.maddyhome.idea.vim.options.UnsignedNumberOption
 
 internal class IjVimOptionService : VimOptionServiceBase() {
 
   private val customOptions = setOf(
+    ToggleOption("closenotebooks", "closenotebooks", true),
     StringOption(ideName, ideAlias, ApplicationNamesInfo.getInstance().fullProductNameWithEdition),
+    ToggleOption(ideacopypreprocessName, ideacopypreprocessAlias, false),
     ToggleOption(ideajoinName, ideajoinAlias, false),
     ToggleOption(ideamarksName, ideamarksAlias, true),
     StringOption(idearefactormodeName, idearefactormodeAlias, "select", isList = false, ideaRefactorModeValues),
     StringOption(ideastatusiconName, ideastatusiconAlias, "enabled", isList = false, ideaStatusIconValues),
     StringOption(ideavimsupportName, ideavimsupportAlias, "dialog", isList = true, ideavimsupportValues),
     StringOption(ideawriteName, ideawriteAlias, "all", isList = false, ideaWriteValues),
+    StringOption(lookupkeysName, lookupkeysAlias, "<Tab>,<Down>,<Up>,<Enter>,<Left>,<Right>,<C-Down>,<C-Up>,<PageUp>,<PageDown>,<C-J>,<C-Q>", isList = true),
     ToggleOption(oldUndo, oldUndo, true),
+    ToggleOption(trackactionidsName, trackactionidsAlias, false),
+    UnsignedNumberOption(visualdelayName, visualdelayAlias, 100),
 
     // This options overrides Vim's default value, so we keep it here
     StringOption(OptionConstants.clipboardName, OptionConstants.clipboardAlias, "ideaput,autoselect,exclude:cons\\|linux", isList = true),
@@ -41,6 +47,9 @@ internal class IjVimOptionService : VimOptionServiceBase() {
 
     const val ideName = "ide"
     const val ideAlias = "ide"
+
+    const val ideacopypreprocessName = "ideacopypreprocess"
+    const val ideacopypreprocessAlias = "ideacopypreprocess"
 
     const val ideajoinName = "ideajoin"
     const val ideajoinAlias = "ideajoin"
@@ -70,6 +79,15 @@ internal class IjVimOptionService : VimOptionServiceBase() {
     const val ideavimsupport_dialog = "dialog"
     const val ideavimsupport_singleline = "singleline"
     const val ideavimsupport_dialoglegacy = "dialoglegacy"
+
+    const val lookupkeysName = "lookupkeys"
+    const val lookupkeysAlias = "lookupkeys"
+
+    const val trackactionidsName = "trackactionids"
+    const val trackactionidsAlias = "tai"
+
+    const val visualdelayName = "visualdelay"
+    const val visualdelayAlias = "visualdelay"
 
     val ideaStatusIconValues = setOf(ideastatusicon_enabled, ideastatusicon_gray, ideastatusicon_disabled)
     val ideaRefactorModeValues = setOf(idearefactormode_keep, idearefactormode_select, idearefactormode_visual)

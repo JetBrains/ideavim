@@ -218,7 +218,7 @@ class NotificationService(private val project: Project?) {
 
     class StopTracking : DumbAwareAction("Stop Tracking") {
       override fun actionPerformed(e: AnActionEvent) {
-        VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.trackactionidsName)
+        VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, IjVimOptionService.trackactionidsName)
         notification?.expire()
       }
     }

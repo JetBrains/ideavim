@@ -34,9 +34,6 @@ class OptionConstants {
     const val hlsearchName = "hlsearch"
     const val hlsearchAlias = "hls"
 
-    const val ideacopypreprocessName = "ideacopypreprocess"
-    const val ideacopypreprocessAlias = "ideacopypreprocess"
-
     const val ideastrictmodeName = "ideastrictmode"
     const val ideastrictmodeAlias = "ideastrictmode"
 
@@ -78,9 +75,6 @@ class OptionConstants {
 
     const val wrapscanName = "wrapscan"
     const val wrapscanAlias = "ws"
-
-    const val trackactionidsName = "trackactionids"
-    const val trackactionidsAlias = "tai"
 
     const val selectionName = "selection"
     const val selectionAlias = "sel"
@@ -125,9 +119,6 @@ class OptionConstants {
     const val keymodel_continueselect = "continueselect"
     const val keymodel_continuevisual = "continuevisual"
 
-    const val lookupkeysName = "lookupkeys"
-    const val lookupkeysAlias = "lookupkeys"
-
     const val matchpairsName = "matchpairs"
     const val matchpairsAlias = "mps"
 
@@ -142,9 +133,6 @@ class OptionConstants {
 
     const val undolevelsName = "undolevels"
     const val undolevelsAlias = "ul"
-
-    const val visualdelayName = "visualdelay"
-    const val visualdelayAlias = "visualdelay"
 
     const val shellcmdflagName = "shellcmdflag"
     const val shellcmdflagAlias = "shcf"
