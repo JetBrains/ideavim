@@ -17,6 +17,7 @@ import com.maddyhome.idea.vim.options.OptionChangeListener
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.options.StringOption
+import com.maddyhome.idea.vim.options.UnsignedNumberOption
 import com.maddyhome.idea.vim.options.helpers.GuiCursorOptionHelper
 import com.maddyhome.idea.vim.options.helpers.KeywordOptionHelper
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
@@ -93,38 +94,10 @@ abstract class VimOptionServiceBase : OptionService {
         }
       }
     },
-    object : NumberOption(OptionConstants.historyName, OptionConstants.historyAlias, 50) {
-      override fun checkIfValueValid(value: VimDataType, token: String) {
-        super.checkIfValueValid(value, token)
-        if ((value as VimInt).value < 0) {
-          throw ExException("E487: Argument must be positive: $token")
-        }
-      }
-    },
-    object : NumberOption(OptionConstants.timeoutlenName, OptionConstants.timeoutlenAlias, 1000) {
-      override fun checkIfValueValid(value: VimDataType, token: String) {
-        super.checkIfValueValid(value, token)
-        if ((value as VimInt).value < 0) {
-          throw ExException("E487: Argument must be positive: $token")
-        }
-      }
-    },
-    object : NumberOption(OptionConstants.undolevelsName, OptionConstants.undolevelsAlias, 1000) {
-      override fun checkIfValueValid(value: VimDataType, token: String) {
-        super.checkIfValueValid(value, token)
-        if ((value as VimInt).value < 0) {
-          throw ExException("E487: Argument must be positive: $token")
-        }
-      }
-    },
-    object : NumberOption(OptionConstants.visualdelayName, OptionConstants.visualdelayAlias, 100) {
-      override fun checkIfValueValid(value: VimDataType, token: String) {
-        super.checkIfValueValid(value, token)
-        if ((value as VimInt).value < 0) {
-          throw ExException("E487: Argument must be positive: $token")
-        }
-      }
-    },
+    UnsignedNumberOption(OptionConstants.historyName, OptionConstants.historyAlias, 50),
+    UnsignedNumberOption(OptionConstants.timeoutlenName, OptionConstants.timeoutlenAlias, 1000),
+    UnsignedNumberOption(OptionConstants.undolevelsName, OptionConstants.undolevelsAlias, 1000),
+    UnsignedNumberOption(OptionConstants.visualdelayName, OptionConstants.visualdelayAlias, 100),
     object : StringOption(OptionConstants.shellcmdflagName, OptionConstants.shellcmdflagAlias, "") {
       // default value changes if so does the "shell" option
       override fun getDefaultValue(): VimString {

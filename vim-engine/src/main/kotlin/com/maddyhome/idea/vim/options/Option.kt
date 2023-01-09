@@ -9,7 +9,9 @@
 package com.maddyhome.idea.vim.options
 
 import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.option.NumberOption
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import java.util.*
 
@@ -130,6 +132,19 @@ open class StringOption(name: String, abbrev: String, defaultValue: VimString, p
       value.split(",")
     } else {
       listOf(value)
+    }
+  }
+}
+
+open class UnsignedNumberOption(name: String, abbrev: String, defaultValue: VimInt) :
+  NumberOption(name, abbrev, defaultValue) {
+
+  constructor(name: String, abbrev: String, defaultValue: Int) : this(name, abbrev, VimInt(defaultValue))
+
+  override fun checkIfValueValid(value: VimDataType, token: String) {
+    super.checkIfValueValid(value, token)
+    if ((value as VimInt).value < 0) {
+      throw ExException("E487: Argument must be positive: $token")
     }
   }
 }
