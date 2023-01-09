@@ -17,14 +17,14 @@ import com.maddyhome.idea.vim.options.StringOption
 internal class IjVimOptionService : VimOptionServiceBase() {
 
   private val customOptions = setOf(
-    ToggleOption(oldUndo, oldUndo, true),
+    StringOption(ideName, ideAlias, ApplicationNamesInfo.getInstance().fullProductNameWithEdition),
     ToggleOption(ideajoinName, ideajoinAlias, false),
     ToggleOption(ideamarksName, ideamarksAlias, true),
-    StringOption(ideName, ideAlias, ApplicationNamesInfo.getInstance().fullProductNameWithEdition),
     StringOption(idearefactormodeName, idearefactormodeAlias, "select", isList = false, ideaRefactorModeValues),
     StringOption(ideastatusiconName, ideastatusiconAlias, "enabled", isList = false, ideaStatusIconValues),
-    StringOption(ideawriteName, ideawriteAlias, "all", isList = false, ideaWriteValues),
     StringOption(ideavimsupportName, ideavimsupportAlias, "dialog", isList = true, ideavimsupportValues),
+    StringOption(ideawriteName, ideawriteAlias, "all", isList = false, ideaWriteValues),
+    ToggleOption(oldUndo, oldUndo, true),
 
     // This options overrides Vim's default value, so we keep it here
     StringOption(OptionConstants.clipboardName, OptionConstants.clipboardAlias, "ideaput,autoselect,exclude:cons\\|linux", isList = true),
