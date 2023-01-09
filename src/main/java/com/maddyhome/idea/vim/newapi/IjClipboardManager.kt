@@ -122,7 +122,7 @@ class IjClipboardManager : VimClipboardManager {
       text, "\n",
       transferableData as Collection<TextBlockTransferableData?>
     )
-    if (VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, IjVimOptionService.ideacopypreprocessName)) {
+    if (VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, IjVimOptionService.ideacopypreprocess)) {
       for (processor in CopyPastePreProcessor.EP_NAME.extensionList) {
         val escapedText = processor.preprocessOnCopy(file, textRange.startOffsets, textRange.endOffsets, rawText)
         if (escapedText != null) {

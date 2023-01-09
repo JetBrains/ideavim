@@ -34,7 +34,7 @@ class ScrollFirstScreenColumnActionTest : VimTestCase() {
   }
 
   fun `test scroll caret column to first screen column with sidescrolloff`() {
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.sidescrolloffName, VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.sidescrolloff, VimInt(10))
     configureByColumns(200)
     typeText(injector.parser.parseKeys("100|" + "zs"))
     assertVisibleLineBounds(0, 89, 168)
@@ -47,7 +47,7 @@ class ScrollFirstScreenColumnActionTest : VimTestCase() {
   }
 
   fun `test scroll at or near start of line with sidescrolloff does nothing`() {
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.sidescrolloffName, VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.sidescrolloff, VimInt(10))
     configureByColumns(200)
     typeText(injector.parser.parseKeys("5|" + "zs"))
     assertVisibleLineBounds(0, 0, 79)

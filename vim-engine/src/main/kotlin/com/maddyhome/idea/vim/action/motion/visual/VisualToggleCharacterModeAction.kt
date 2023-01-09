@@ -29,7 +29,7 @@ class VisualToggleCharacterModeAction : VimActionHandler.SingleExecution() {
   ): Boolean {
     val listOption = (
       injector.optionService
-        .getOptionValue(OptionScope.LOCAL(editor), OptionConstants.selectmodeName) as VimString
+        .getOptionValue(OptionScope.LOCAL(editor), OptionConstants.selectmode) as VimString
       ).value
     return if (listOption.contains("cmd")) {
       injector.visualMotionGroup.enterSelectMode(editor, VimStateMachine.SubMode.VISUAL_CHARACTER)

@@ -184,7 +184,7 @@ public class FileGroup extends VimFileBase {
   @Override
   public void saveFile(@NotNull ExecutionContext context) {
     NativeAction action;
-    if (IjVimOptionService.ideawrite_all.equals(((VimString) VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL.INSTANCE, IjVimOptionService.ideawriteName, IjVimOptionService.ideawriteName)).getValue())) {
+    if (IjVimOptionService.ideawrite_all.equals(((VimString) VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL.INSTANCE, IjVimOptionService.ideawrite, IjVimOptionService.ideawrite)).getValue())) {
       action = VimInjectorKt.getInjector().getNativeActionManager().getSaveAll();
     }
     else {

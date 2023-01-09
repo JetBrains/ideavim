@@ -1837,7 +1837,7 @@ $c five six se${c}ven eight
       """.trimIndent()
     )
     if (VimPlugin.getOptionService()
-      .isSet(OptionScope.GLOBAL, OptionConstants.experimentalapiName, OptionConstants.experimentalapiName)
+      .isSet(OptionScope.GLOBAL, OptionConstants.experimentalapi, OptionConstants.experimentalapi)
     ) {
       assertState("${c}\nabcde\n${c}\nabcde\n")
     } else {
@@ -2647,7 +2647,7 @@ rtyfg${c}hzxc"""
 
   // VIM-2703
   fun `test multicaret with unnamed clipboard`() {
-    injector.optionService.appendValue(OptionScope.GLOBAL, OptionConstants.clipboardName, OptionConstants.clipboard_unnamed)
+    injector.optionService.appendValue(OptionScope.GLOBAL, OptionConstants.clipboard, OptionConstants.clipboard_unnamed)
     val before = """
             attach${c}Download(null)
             attach${c}Download(null)
@@ -2667,6 +2667,6 @@ rtyfg${c}hzxc"""
             
     """.trimIndent()
     assertState(after)
-    injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.clipboardName)
+    injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.clipboard)
   }
 }

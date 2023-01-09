@@ -68,7 +68,7 @@ inline fun waitAndAssert(timeInMillis: Int = 1000, condition: () -> Boolean) {
 fun waitAndAssertMode(
   fixture: CodeInsightTestFixture,
   mode: VimStateMachine.Mode,
-  timeInMillis: Int = (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, IjVimOptionService.visualdelayName) as VimInt).value + 1000,
+  timeInMillis: Int = (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, IjVimOptionService.visualdelay) as VimInt).value + 1000,
 ) {
   waitAndAssert(timeInMillis) { fixture.editor.editorMode == mode }
 }

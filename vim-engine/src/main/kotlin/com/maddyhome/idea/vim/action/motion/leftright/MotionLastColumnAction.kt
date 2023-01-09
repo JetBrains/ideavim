@@ -45,7 +45,7 @@ open class MotionLastColumnAction : MotionActionHandler.ForEachCaret() {
       val opt = (
         injector.optionService.getOptionValue(
           OptionScope.LOCAL(editor),
-          OptionConstants.selectionName
+          OptionConstants.selection
         ) as VimString
         ).value
       opt != "old"

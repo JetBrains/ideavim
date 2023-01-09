@@ -58,7 +58,7 @@ object ShowCmd {
   }
 
   fun getFullText(editor: Editor?): String {
-    if (!VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.showcmdName) || editor == null || editor.isDisposed) return ""
+    if (!VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.showcmd) || editor == null || editor.isDisposed) return ""
 
     val editorState = editor.vim.vimStateMachine
     return EngineStringHelper.toPrintableCharacters(editorState.commandBuilder.keys + editorState.mappingState.keys)
@@ -87,7 +87,7 @@ class ShowCmdStatusBarWidgetFactory : StatusBarWidgetFactory/*, LightEditCompati
     // Nothing
   }
 
-  override fun isAvailable(project: Project): Boolean = VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.showcmdName)
+  override fun isAvailable(project: Project): Boolean = VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.showcmd)
 
   override fun createWidget(project: Project): StatusBarWidget = Widget(project)
 

@@ -33,40 +33,40 @@ abstract class VimOptionServiceBase : OptionService {
   private val globalValues = mutableMapOf<String, VimDataType>()
   private val options = MultikeyMap(
     // Simple options, sorted by name
-    StringOption(OptionConstants.clipboardName, OptionConstants.clipboardAlias, "autoselect,exclude:cons\\|linux", isList = true),
-    ToggleOption(OptionConstants.digraphName, OptionConstants.digraphAlias, false),
-    ToggleOption(OptionConstants.gdefaultName, OptionConstants.gdefaultAlias, false),
-    UnsignedNumberOption(OptionConstants.historyName, OptionConstants.historyAlias, 50),
-    ToggleOption(OptionConstants.hlsearchName, OptionConstants.hlsearchAlias, false),
-    ToggleOption(OptionConstants.ignorecaseName, OptionConstants.ignorecaseAlias, false),
-    ToggleOption(OptionConstants.incsearchName, OptionConstants.incsearchAlias, false),
-    NumberOption(OptionConstants.maxmapdepthName, OptionConstants.maxmapdepthAlias, 20),
-    ToggleOption(OptionConstants.moreName, OptionConstants.moreAlias, true),
-    StringOption(OptionConstants.nrformatsName, OptionConstants.nrformatsAlias, "hex", isList = true, setOf("octal", "hex", "alpha")),
-    ToggleOption(OptionConstants.numberName, OptionConstants.numberAlias, false),
-    ToggleOption(OptionConstants.relativenumberName, OptionConstants.relativenumberAlias, false),
-    NumberOption(OptionConstants.scrollName, OptionConstants.scrollAlias, 0),
-    NumberOption(OptionConstants.scrolloffName, OptionConstants.scrolloffAlias, 0),
-    StringOption(OptionConstants.selectionName, OptionConstants.selectionAlias, "inclusive", isList = false, setOf("old", "inclusive", "exclusive")),
-    StringOption(OptionConstants.shellName, OptionConstants.shellAlias, if (injector.systemInfoService.isWindows) "cmd.exe" else System.getenv("SHELL") ?: "sh"),
-    StringOption(OptionConstants.shellxescapeName, OptionConstants.shellxescapeAlias, if (injector.systemInfoService.isWindows) "\"&|<>()@^" else "", isList = false),
-    ToggleOption(OptionConstants.showcmdName, OptionConstants.showcmdAlias, true),
-    ToggleOption(OptionConstants.showmodeName, OptionConstants.showmodeAlias, true),
-    NumberOption(OptionConstants.sidescrollName, OptionConstants.sidescrollAlias, 0),
-    NumberOption(OptionConstants.sidescrolloffName, OptionConstants.sidescrolloffAlias, 0),
-    ToggleOption(OptionConstants.smartcaseName, OptionConstants.smartcaseAlias, false),
-    ToggleOption(OptionConstants.startoflineName, OptionConstants.startoflineAlias, true),
-    ToggleOption(OptionConstants.timeoutName, OptionConstants.timeoutAlias, true),
-    UnsignedNumberOption(OptionConstants.timeoutlenName, OptionConstants.timeoutlenAlias, 1000),
-    UnsignedNumberOption(OptionConstants.undolevelsName, OptionConstants.undolevelsAlias, 1000),
-    StringOption(OptionConstants.viminfoName, OptionConstants.viminfoAlias, "'100,<50,s10,h", isList = true),
-    StringOption(OptionConstants.virtualeditName, OptionConstants.virtualeditAlias, "", isList = false, setOf("onemore", "block", "insert", "all")),
-    ToggleOption(OptionConstants.visualbellName, OptionConstants.visualbellAlias, false),
-    ToggleOption(OptionConstants.wrapscanName, OptionConstants.wrapscanAlias, true),
+    StringOption(OptionConstants.clipboard, OptionConstants.clipboardAlias, "autoselect,exclude:cons\\|linux", isList = true),
+    ToggleOption(OptionConstants.digraph, "dg", false),
+    ToggleOption(OptionConstants.gdefault, "gd", false),
+    UnsignedNumberOption(OptionConstants.history, "hi", 50),
+    ToggleOption(OptionConstants.hlsearch, "hls", false),
+    ToggleOption(OptionConstants.ignorecase, "ic", false),
+    ToggleOption(OptionConstants.incsearch, "is", false),
+    NumberOption(OptionConstants.maxmapdepth, "mmd", 20),
+    ToggleOption(OptionConstants.more, "more", true),
+    StringOption(OptionConstants.nrformats, "nf", "hex", isList = true, setOf("octal", "hex", "alpha")),
+    ToggleOption(OptionConstants.number, "nu", false),
+    ToggleOption(OptionConstants.relativenumber, "rnu", false),
+    NumberOption(OptionConstants.scroll, "scr", 0),
+    NumberOption(OptionConstants.scrolloff, "so", 0),
+    StringOption(OptionConstants.selection, "sel", "inclusive", isList = false, setOf("old", "inclusive", "exclusive")),
+    StringOption(OptionConstants.shell, "sh", if (injector.systemInfoService.isWindows) "cmd.exe" else System.getenv("SHELL") ?: "sh"),
+    StringOption(OptionConstants.shellxescape, "sxe", if (injector.systemInfoService.isWindows) "\"&|<>()@^" else "", isList = false),
+    ToggleOption(OptionConstants.showcmd, "sc", true),
+    ToggleOption(OptionConstants.showmode, "smd", true),
+    NumberOption(OptionConstants.sidescroll, "ss", 0),
+    NumberOption(OptionConstants.sidescrolloff, "siso", 0),
+    ToggleOption(OptionConstants.smartcase, "scs", false),
+    ToggleOption(OptionConstants.startofline, "sol", true),
+    ToggleOption(OptionConstants.timeout, "to", true),
+    UnsignedNumberOption(OptionConstants.timeoutlen, "tm", 1000),
+    UnsignedNumberOption(OptionConstants.undolevels, "ul", 1000),
+    StringOption(OptionConstants.viminfo, "vi", "'100,<50,s10,h", isList = true),
+    StringOption(OptionConstants.virtualedit, "ve", "", isList = false, setOf("onemore", "block", "insert", "all")),
+    ToggleOption(OptionConstants.visualbell, "vb", false),
+    ToggleOption(OptionConstants.wrapscan, "ws", true),
 
     // Options with longer defaults or additional validation, sorted by name
     object : StringOption(
-      OptionConstants.guicursorName, OptionConstants.guicursorAlias,
+      OptionConstants.guicursor, "gcr",
       "n-v-c:block-Cursor/lCursor," +
         "ve:ver35-Cursor," +
         "o:hor50-Cursor," +
@@ -81,7 +81,7 @@ abstract class VimOptionServiceBase : OptionService {
         valueAsString.split(",").forEach { GuiCursorOptionHelper.convertToken(it) }
       }
     },
-    object : StringOption(OptionConstants.iskeywordName, OptionConstants.iskeywordAlias, "@,48-57,_", isList = true) {
+    object : StringOption(OptionConstants.iskeyword, "isk", "@,48-57,_", isList = true) {
       override fun checkIfValueValid(value: VimDataType, token: String) {
         super.checkIfValueValid(value, token)
         if (KeywordOptionHelper.isValueInvalid((value as VimString).value)) {
@@ -100,12 +100,20 @@ abstract class VimOptionServiceBase : OptionService {
       }
     },
     StringOption(
-      OptionConstants.keymodelName, OptionConstants.keymodelAlias, "${OptionConstants.keymodel_continueselect},${OptionConstants.keymodel_stopselect}", isList = true,
+      OptionConstants.keymodel,
+      "km",
+      "${OptionConstants.keymodel_continueselect},${OptionConstants.keymodel_stopselect}",
+      isList = true,
       setOf(
-        OptionConstants.keymodel_startsel, OptionConstants.keymodel_stopsel, OptionConstants.keymodel_stopselect, OptionConstants.keymodel_stopvisual, OptionConstants.keymodel_continueselect, OptionConstants.keymodel_continuevisual
+        OptionConstants.keymodel_startsel,
+        OptionConstants.keymodel_stopsel,
+        OptionConstants.keymodel_stopselect,
+        OptionConstants.keymodel_stopvisual,
+        OptionConstants.keymodel_continueselect,
+        OptionConstants.keymodel_continuevisual
       )
     ),
-    object : StringOption(OptionConstants.matchpairsName, OptionConstants.matchpairsAlias, "(:),{:},[:]", isList = true) {
+    object : StringOption(OptionConstants.matchpairs, "mps", "(:),{:},[:]", isList = true) {
       override fun checkIfValueValid(value: VimDataType, token: String) {
         super.checkIfValueValid(value, token)
         for (v in split((value as VimString).value)) {
@@ -115,7 +123,7 @@ abstract class VimOptionServiceBase : OptionService {
         }
       }
     },
-    object : NumberOption(OptionConstants.scrolljumpName, OptionConstants.scrolljumpAlias, 1) {
+    object : NumberOption(OptionConstants.scrolljump, "sj", 1) {
       override fun checkIfValueValid(value: VimDataType, token: String) {
         super.checkIfValueValid(value, token)
         if ((value as VimInt).value < -100) {
@@ -124,15 +132,18 @@ abstract class VimOptionServiceBase : OptionService {
       }
     },
     StringOption(
-      OptionConstants.selectmodeName, OptionConstants.selectmodeAlias, "", isList = true,
+      OptionConstants.selectmode, "slm", "", isList = true,
       setOf(
-        OptionConstants.selectmode_mouse, OptionConstants.selectmode_key, OptionConstants.selectmode_cmd, OptionConstants.selectmode_ideaselection
+        OptionConstants.selectmode_mouse,
+        OptionConstants.selectmode_key,
+        OptionConstants.selectmode_cmd,
+        OptionConstants.selectmode_ideaselection
       )
     ),
-    object : StringOption(OptionConstants.shellcmdflagName, OptionConstants.shellcmdflagAlias, "") {
+    object : StringOption(OptionConstants.shellcmdflag, "shcf", "") {
       // default value changes if so does the "shell" option
       override fun getDefaultValue(): VimString {
-        val shell = (getGlobalOptionValue(OptionConstants.shellName) as VimString).value
+        val shell = (getGlobalOptionValue(OptionConstants.shell) as VimString).value
         return VimString(
           when {
             injector.systemInfoService.isWindows && shell.contains("powershell") -> "-Command"
@@ -142,10 +153,10 @@ abstract class VimOptionServiceBase : OptionService {
         )
       }
     },
-    object : StringOption(OptionConstants.shellxquoteName, OptionConstants.shellxquoteAlias, "") {
+    object : StringOption(OptionConstants.shellxquote, "sxq", "") {
       // default value changes if so does the "shell" option
       override fun getDefaultValue(): VimString {
-        val shell = (getGlobalOptionValue(OptionConstants.shellName) as VimString).value
+        val shell = (getGlobalOptionValue(OptionConstants.shell) as VimString).value
         return VimString(
           when {
             injector.systemInfoService.isWindows && shell == "cmd.exe" -> "("
@@ -157,10 +168,10 @@ abstract class VimOptionServiceBase : OptionService {
     },
 
     // IdeaVim specific options. Put any editor/IDE specific options in IjVimOptionService
-    ToggleOption(OptionConstants.experimentalapiName, OptionConstants.experimentalapiAlias, false),
-    ToggleOption(OptionConstants.ideaglobalmodeName, OptionConstants.ideaglobalmodeAlias, false),
-    ToggleOption(OptionConstants.ideastrictmodeName, OptionConstants.ideastrictmodeAlias, false),
-    ToggleOption(OptionConstants.ideatracetimeName, OptionConstants.ideatracetimeAlias, false),
+    ToggleOption(OptionConstants.experimentalapi, OptionConstants.experimentalapi, false),
+    ToggleOption(OptionConstants.ideaglobalmode, OptionConstants.ideaglobalmode, false),
+    ToggleOption(OptionConstants.ideastrictmode, OptionConstants.ideastrictmode, false),
+    ToggleOption(OptionConstants.ideatracetime, OptionConstants.ideatracetime, false),
   )
 
   override fun setOptionValue(scope: OptionScope, optionName: String, value: VimDataType, token: String) {

@@ -109,7 +109,7 @@ class DeleteCharacterLeftActionTest : VimTestCase() {
   }
 
   fun `test deleting characters scrolls caret into view`() {
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.sidescrolloffName, VimInt(5))
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.sidescrolloff, VimInt(5))
     configureByText("Hello world".repeat(200))
 
     // Scroll 70 characters to the left. First character on line should now be 71. sidescrolloff puts us at 76

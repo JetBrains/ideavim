@@ -199,7 +199,7 @@ class GotoLineCommandTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test goto line moves to same column with nostartofline option`() {
-    VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.startoflineName)
+    VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.startofline)
     val before = """
       A Discovery
 
@@ -223,7 +223,7 @@ class GotoLineCommandTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test goto zero relative line with nostartofline option does not move caret`() {
-    VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.startoflineName)
+    VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.startofline)
     val before = """
       A Discovery
 
@@ -246,7 +246,7 @@ class GotoLineCommandTest : VimTestCase() {
   }
 
   fun `test goto line with scrolloff`() {
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloff, VimInt(10))
     configureByLines(100, "    I found it in a legendary land")
     enterCommand("30")
     assertPosition(29, 4)
@@ -254,7 +254,7 @@ class GotoLineCommandTest : VimTestCase() {
   }
 
   fun `test goto relative line with scrolloff`() {
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloff, VimInt(10))
     configureByLines(100, "    I found it in a legendary land")
     enterCommand("+30")
     assertPosition(30, 4)

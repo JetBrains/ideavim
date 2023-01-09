@@ -29,7 +29,7 @@ abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
     get() = (
       injector.optionService.getOptionValue(
         OptionScope.GLOBAL,
-        OptionConstants.selectionName
+        OptionConstants.selection
       ) as VimString
       ).value == "exclusive"
   override val selectionAdj: Int

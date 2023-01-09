@@ -24,7 +24,7 @@ import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
 import org.jetbrains.plugins.ideavim.VimTestOption
 
-class MotionArrowUpActionTest : VimOptionTestCase(OptionConstants.keymodelName) {
+class MotionArrowUpActionTest : VimOptionTestCase(OptionConstants.keymodel) {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionDefaultAll
   fun `test visual default options`() {
@@ -53,7 +53,7 @@ class MotionArrowUpActionTest : VimOptionTestCase(OptionConstants.keymodelName) 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(
-      OptionConstants.keymodelName,
+      OptionConstants.keymodel,
       OptionValueType.STRING,
       OptionConstants.keymodel_stopsel
     )
@@ -84,7 +84,7 @@ class MotionArrowUpActionTest : VimOptionTestCase(OptionConstants.keymodelName) 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(
-      OptionConstants.keymodelName,
+      OptionConstants.keymodel,
       OptionValueType.STRING,
       OptionConstants.keymodel_stopselect
     )
@@ -115,7 +115,7 @@ class MotionArrowUpActionTest : VimOptionTestCase(OptionConstants.keymodelName) 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(
-      OptionConstants.keymodelName,
+      OptionConstants.keymodel,
       OptionValueType.STRING,
       OptionConstants.keymodel_stopvisual
     )
@@ -146,7 +146,7 @@ class MotionArrowUpActionTest : VimOptionTestCase(OptionConstants.keymodelName) 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(
-      OptionConstants.keymodelName,
+      OptionConstants.keymodel,
       OptionValueType.STRING,
       OptionConstants.keymodel_stopvisual
     )
@@ -177,7 +177,7 @@ class MotionArrowUpActionTest : VimOptionTestCase(OptionConstants.keymodelName) 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(
-      OptionConstants.keymodelName,
+      OptionConstants.keymodel,
       OptionValueType.STRING,
       OptionConstants.keymodel_stopselect
     )
@@ -207,7 +207,7 @@ class MotionArrowUpActionTest : VimOptionTestCase(OptionConstants.keymodelName) 
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, ""))
+  @VimOptionTestConfiguration(VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, ""))
   fun `test char select stopsel`() {
     doTest(
       listOf("gh", "<Up>"),
@@ -235,7 +235,7 @@ class MotionArrowUpActionTest : VimOptionTestCase(OptionConstants.keymodelName) 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(
-      OptionConstants.keymodelName,
+      OptionConstants.keymodel,
       OptionValueType.STRING,
       OptionConstants.keymodel_stopselect
     )
@@ -267,8 +267,8 @@ class MotionArrowUpActionTest : VimOptionTestCase(OptionConstants.keymodelName) 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionDefaultAll
   fun `test arrow up in insert mode scrolls caret at scrolloff`() {
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolljumpName, VimInt(10))
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(5))
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolljump, VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloff, VimInt(5))
     configureByPages(5)
     setPositionAndScroll(19, 24)
 

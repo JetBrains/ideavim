@@ -94,8 +94,8 @@ class KeyHandler {
     val mapMapDepth = (
       injector.optionService.getOptionValue(
         OptionScope.GLOBAL,
-        OptionConstants.maxmapdepthName,
-        OptionConstants.maxmapdepthName
+        OptionConstants.maxmapdepth,
+        OptionConstants.maxmapdepth
       ) as VimInt
       ).value
     if (handleKeyRecursionCount >= mapMapDepth) {
@@ -329,7 +329,7 @@ class KeyHandler {
     // user has typed "dw" wait for the timeout, and then replay "d" and "w" without any mapping (which will of course
     // delete a word)
     if (injector.optionService
-      .isSet(OptionScope.LOCAL(editor), OptionConstants.timeoutName, OptionConstants.timeoutName)
+      .isSet(OptionScope.LOCAL(editor), OptionConstants.timeout, OptionConstants.timeout)
     ) {
       LOG.trace("Timeout is set. Schedule a mapping timer")
       // XXX There is a strange issue that reports that mapping state is empty at the moment of the function call.

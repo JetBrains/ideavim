@@ -308,7 +308,7 @@ class VimMultipleCursorsExtension : VimExtension {
 
   private fun findNextOccurrence(editor: Editor, startOffset: Int, text: String, whole: Boolean): Int {
     val searchOptions = enumSetOf(SearchOptions.WHOLE_FILE)
-    if (VimPlugin.getOptionService().isSet(OptionScope.LOCAL(IjVimEditor(editor)), OptionConstants.wrapscanName)) {
+    if (VimPlugin.getOptionService().isSet(OptionScope.LOCAL(IjVimEditor(editor)), OptionConstants.wrapscan)) {
       searchOptions.add(SearchOptions.WRAP)
     }
 

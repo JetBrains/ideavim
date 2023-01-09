@@ -47,7 +47,7 @@ class MotionGotoLineLastEndAction : MotionActionHandler.ForEachCaret() {
       val opt = (
         injector.optionService.getOptionValue(
           OptionScope.LOCAL(editor),
-          OptionConstants.selectionName
+          OptionConstants.selection
         ) as VimString
         ).value
       if (opt != "old") {
@@ -77,7 +77,7 @@ class MotionGotoLineLastEndInsertAction : MotionActionHandler.ForEachCaret() {
     } else if (editor.inVisualMode) {
       val opt = (
         injector.optionService
-          .getOptionValue(OptionScope.LOCAL(editor), OptionConstants.selectionName) as VimString
+          .getOptionValue(OptionScope.LOCAL(editor), OptionConstants.selection) as VimString
         ).value
       if (opt != "old") {
         allow = true

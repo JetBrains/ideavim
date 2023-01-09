@@ -150,7 +150,7 @@ class ShiftRightTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.TABS)
   fun `test shift right does not move caret with nostartofline`() {
-    VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.startoflineName)
+    VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.startofline)
     val file = """
       |A Discovery
       |

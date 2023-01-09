@@ -140,7 +140,7 @@ object IdeaSelectionControl {
     selectionSource: VimListenerManager.SelectionSource,
     logReason: Boolean,
   ): VimStateMachine.Mode {
-    val selectmode = (VimPlugin.getOptionService().getOptionValue(OptionScope.LOCAL(IjVimEditor(editor)), OptionConstants.selectmodeName) as VimString).value
+    val selectmode = (VimPlugin.getOptionService().getOptionValue(OptionScope.LOCAL(IjVimEditor(editor)), OptionConstants.selectmode) as VimString).value
     return when {
       editor.isOneLineMode -> {
         if (logReason) logger.debug("Enter select mode. Reason: one line mode")
@@ -155,7 +155,7 @@ object IdeaSelectionControl {
         VimStateMachine.Mode.SELECT
       }
       selectionSource == VimListenerManager.SelectionSource.OTHER &&
-        OptionConstants.selectmode_ideaselection in (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, OptionConstants.selectmodeName) as VimString).value -> {
+        OptionConstants.selectmode_ideaselection in (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, OptionConstants.selectmode) as VimString).value -> {
         if (logReason) logger.debug("Enter select mode. Selection source is OTHER and selectMode has refactoring")
         VimStateMachine.Mode.SELECT
       }

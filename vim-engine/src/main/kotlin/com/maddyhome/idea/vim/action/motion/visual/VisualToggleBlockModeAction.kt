@@ -30,7 +30,7 @@ class VisualToggleBlockModeAction : VimActionHandler.SingleExecution() {
     val listOption = (
       injector.optionService.getOptionValue(
         OptionScope.LOCAL(editor),
-        OptionConstants.selectmodeName
+        OptionConstants.selectmode
       ) as VimString
       ).value
     return if (listOption.contains("cmd")) {

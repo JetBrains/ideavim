@@ -39,7 +39,7 @@ class ScrollLastScreenLineStartActionTest : VimTestCase() {
   }
 
   fun `test scroll current line to bottom of screen minus scrolloff`() {
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloff, VimInt(10))
     configureByPages(5)
     setPositionAndScroll(40, 60)
     typeText(injector.parser.parseKeys("z-"))
@@ -56,7 +56,7 @@ class ScrollLastScreenLineStartActionTest : VimTestCase() {
   }
 
   fun `test scrolls count line to bottom of screen minus scrolloff`() {
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloff, VimInt(10))
     configureByPages(5)
     setPositionAndScroll(40, 60)
     typeText(injector.parser.parseKeys("100z-"))
@@ -65,7 +65,7 @@ class ScrollLastScreenLineStartActionTest : VimTestCase() {
   }
 
   fun `test scrolls current line to bottom of screen ignoring scrolljump`() {
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolljumpName, VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolljump, VimInt(10))
     configureByPages(5)
     setPositionAndScroll(40, 60)
     typeText(injector.parser.parseKeys("z-"))

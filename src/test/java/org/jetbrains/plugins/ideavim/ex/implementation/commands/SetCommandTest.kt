@@ -30,9 +30,9 @@ class SetCommandTest : VimTestCase() {
   fun `test toggle option`() {
     configureByText("\n")
     typeText(commandToKeys("set rnu"))
-    assertTrue(VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.relativenumberName))
+    assertTrue(VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.relativenumber))
     typeText(commandToKeys("set rnu!"))
-    assertFalse(VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.relativenumberName))
+    assertFalse(VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.relativenumber))
   }
 
   // todo we have spaces in assertExOutput because of pad(20) in the com.maddyhome.idea.vim.vimscript.model.commands.SetCommandKt#showOptions method
@@ -40,11 +40,11 @@ class SetCommandTest : VimTestCase() {
   fun `test number option`() {
     configureByText("\n")
     typeText(commandToKeys("set scrolloff&"))
-    assertEquals(VimInt(0), injector.optionService.getOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName))
+    assertEquals(VimInt(0), injector.optionService.getOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloff))
     typeText(commandToKeys("set scrolloff?"))
     assertExOutput("scrolloff=0         \n")
     typeText(commandToKeys("set scrolloff=5"))
-    assertEquals(VimInt(5), injector.optionService.getOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName))
+    assertEquals(VimInt(5), injector.optionService.getOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloff))
     typeText(commandToKeys("set scrolloff?"))
     assertExOutput("scrolloff=5         \n")
   }
@@ -53,11 +53,11 @@ class SetCommandTest : VimTestCase() {
   fun `test toggle option as a number`() {
     configureByText("\n")
     typeText(commandToKeys("set number&"))
-    assertEquals(VimInt(0), injector.optionService.getOptionValue(OptionScope.GLOBAL, OptionConstants.numberName))
+    assertEquals(VimInt(0), injector.optionService.getOptionValue(OptionScope.GLOBAL, OptionConstants.number))
     typeText(commandToKeys("set number?"))
     assertExOutput("nonumber            \n")
     typeText(commandToKeys("let &nu=1000"))
-    assertEquals(VimInt(1000), injector.optionService.getOptionValue(OptionScope.GLOBAL, OptionConstants.numberName))
+    assertEquals(VimInt(1000), injector.optionService.getOptionValue(OptionScope.GLOBAL, OptionConstants.number))
     typeText(commandToKeys("set number?"))
     assertExOutput("  number            \n")
   }
@@ -116,11 +116,11 @@ class SetCommandTest : VimTestCase() {
   fun `test string option`() {
     configureByText("\n")
     typeText(commandToKeys("set selection&"))
-    assertEquals(VimString("inclusive"), injector.optionService.getOptionValue(OptionScope.GLOBAL, OptionConstants.selectionName))
+    assertEquals(VimString("inclusive"), injector.optionService.getOptionValue(OptionScope.GLOBAL, OptionConstants.selection))
     typeText(commandToKeys("set selection?"))
     assertExOutput("selection=inclusive \n")
     typeText(commandToKeys("set selection=exclusive"))
-    assertEquals(VimString("exclusive"), injector.optionService.getOptionValue(OptionScope.GLOBAL, OptionConstants.selectionName))
+    assertEquals(VimString("exclusive"), injector.optionService.getOptionValue(OptionScope.GLOBAL, OptionConstants.selection))
     typeText(commandToKeys("set selection?"))
     assertExOutput("selection=exclusive \n")
   }

@@ -26,7 +26,7 @@ class DeleteJoinLinesAction : ChangeEditorActionHandler.ConditionalSingleExecuti
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    return !injector.optionService.isSet(OptionScope.LOCAL(editor), IjVimOptionService.ideajoinName)
+    return !injector.optionService.isSet(OptionScope.LOCAL(editor), IjVimOptionService.ideajoin)
   }
 
   override fun execute(

@@ -28,12 +28,12 @@ public class KeywordOptionTest extends VimTestCase {
 
   private String getOptionValue() {
     return ((VimString)VimPlugin.getOptionService()
-      .getOptionValue(OptionScope.GLOBAL.INSTANCE, OptionConstants.iskeywordName, OptionConstants.iskeywordName)).getValue();
+      .getOptionValue(OptionScope.GLOBAL.INSTANCE, OptionConstants.iskeyword, OptionConstants.iskeyword)).getValue();
   }
 
   private void setKeyword(String val) {
     VimPlugin.getOptionService()
-      .setOptionValue(OptionScope.GLOBAL.INSTANCE, OptionConstants.iskeywordName, new VimString(val), "testToken");
+      .setOptionValue(OptionScope.GLOBAL.INSTANCE, OptionConstants.iskeyword, new VimString(val), "testToken");
   }
 
   private void assertIsKeyword(char c) {

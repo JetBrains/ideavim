@@ -84,7 +84,7 @@ object GuiCursorOptionHelper {
       var highlightGroup = ""
       var lmapHighlightGroup = ""
       var blinkModes = emptyList<String>()
-      (injector.optionService.getOptionValue(OptionScope.GLOBAL, OptionConstants.guicursorName) as VimString).value
+      (injector.optionService.getOptionValue(OptionScope.GLOBAL, OptionConstants.guicursor) as VimString).value
         .split(",")
         .map { convertToken(it) }
         .forEach { data ->

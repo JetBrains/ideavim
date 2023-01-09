@@ -53,8 +53,8 @@ class IjVimMessages : VimMessagesBase() {
       error = true
     } else if (!injector.optionService.isSet(
         OptionScope.GLOBAL,
-        OptionConstants.visualbellName,
-        OptionConstants.visualbellName
+        OptionConstants.visualbell,
+        OptionConstants.visualbell
       )
     ) {
       // Vim only allows a beep once every half second - :help 'visualbell'

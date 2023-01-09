@@ -34,7 +34,7 @@ import org.jetbrains.plugins.ideavim.waitAndAssertMode
 /**
  * @author Alex Plate
  */
-class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) {
+class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable character selection no selection`() {
@@ -715,7 +715,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
 
   @VimOptionTestConfiguration(
     VimTestOption(
-      OptionConstants.selectmodeName,
+      OptionConstants.selectmode,
       OptionValueType.STRING,
       OptionConstants.selectmode_ideaselection
     )
@@ -738,7 +738,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
     waitAndAssertMode(myFixture, VimStateMachine.Mode.SELECT)
   }
 
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.selectmodeName, OptionValueType.STRING, ""))
+  @VimOptionTestConfiguration(VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""))
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test control selection to visual mode`() {
     configureByText(
@@ -757,7 +757,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
     waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
   }
 
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.selectmodeName, OptionValueType.STRING, ""))
+  @VimOptionTestConfiguration(VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""))
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test control selection from line to char visual modes`() {
     configureByText(
@@ -781,7 +781,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmodeName) 
     assertCaretsVisualAttributes()
   }
 
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.selectmodeName, OptionValueType.STRING, ""))
+  @VimOptionTestConfiguration(VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""))
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test control selection from line to char visual modes in keep mode`() {
     configureByText(

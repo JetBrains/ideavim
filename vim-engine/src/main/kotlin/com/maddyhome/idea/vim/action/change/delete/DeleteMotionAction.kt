@@ -34,7 +34,7 @@ class DeleteMotionAction : ChangeEditorActionHandler.ForEachCaret(), DuplicableO
     operatorArguments: OperatorArguments,
   ): Boolean {
     if (argument == null) return false
-    if (injector.optionService.isSet(OptionScope.GLOBAL, OptionConstants.experimentalapiName)) {
+    if (injector.optionService.isSet(OptionScope.GLOBAL, OptionConstants.experimentalapi)) {
       val (first, second) = injector.changeGroup
         .getDeleteRangeAndType2(editor, caret, context, argument, false, operatorArguments)
         ?: return false

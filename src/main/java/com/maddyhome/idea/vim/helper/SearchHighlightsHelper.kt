@@ -51,7 +51,7 @@ fun updateIncsearchHighlights(
 ): Int {
   val searchStartOffset =
     if (searchRange != null) editor.vim.getLineStartOffset(searchRange.startLine) else caretOffset
-  val showHighlights = VimPlugin.getOptionService().isSet(OptionScope.LOCAL(IjVimEditor(editor)), OptionConstants.hlsearchName)
+  val showHighlights = VimPlugin.getOptionService().isSet(OptionScope.LOCAL(IjVimEditor(editor)), OptionConstants.hlsearch)
   return updateSearchHighlights(pattern, false, showHighlights, searchStartOffset, searchRange, forwards, false)
 }
 
@@ -111,7 +111,7 @@ private fun updateSearchHighlights(
       } else if (shouldAddCurrentMatchSearchHighlight(pattern, showHighlights, initialOffset)) {
         // nohlsearch + incsearch
         val searchOptions = EnumSet.of(SearchOptions.WHOLE_FILE)
-        if (VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.wrapscanName)) {
+        if (VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.wrapscan)) {
           searchOptions.add(SearchOptions.WRAP)
         }
         if (shouldIgnoreSmartCase) searchOptions.add(SearchOptions.IGNORE_SMARTCASE)
@@ -173,7 +173,7 @@ private fun findClosestMatch(editor: Editor, results: List<TextRange>, initialOf
     }
     d2 - d1
   }
-  if (!VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.wrapscanName)) {
+  if (!VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.wrapscan)) {
     val start = max.startOffset
     if (forwards && start < initialOffset) {
       return -1

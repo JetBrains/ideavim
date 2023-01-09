@@ -2379,7 +2379,7 @@ public class SearchHelper {
   private static @NotNull String getPairChars() {
     if (pairsChars == null) {
       VimPlugin.getOptionService().addListener(
-        OptionConstants.matchpairsName,
+        OptionConstants.matchpairs,
         new OptionChangeListener<VimDataType>() {
           @Override
           public void processGlobalValueChange(@Nullable VimDataType oldValue) {
@@ -2395,7 +2395,7 @@ public class SearchHelper {
 
   private static @NotNull String parseMatchPairsOption() {
     String[] vals = ((VimString) VimPlugin.getOptionService()
-      .getOptionValue(OptionScope.GLOBAL.INSTANCE, OptionConstants.matchpairsName, OptionConstants.matchpairsName))
+      .getOptionValue(OptionScope.GLOBAL.INSTANCE, OptionConstants.matchpairs, OptionConstants.matchpairs))
       .getValue()
       .split(",");
     StringBuilder res = new StringBuilder();

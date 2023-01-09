@@ -47,7 +47,7 @@ private fun isExclusiveSelection(): Boolean {
   return (
     injector.optionService.getOptionValue(
       OptionScope.GLOBAL,
-      OptionConstants.selectionName
+      OptionConstants.selection
     ) as VimString
     ).value == "exclusive"
 }

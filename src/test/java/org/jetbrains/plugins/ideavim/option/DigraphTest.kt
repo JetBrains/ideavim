@@ -23,7 +23,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 class DigraphTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.UNCLEAR, "backspace works strange")
   fun `test digraph`() {
-    VimPlugin.getOptionService().setOption(OptionScope.GLOBAL, OptionConstants.digraphName)
+    VimPlugin.getOptionService().setOption(OptionScope.GLOBAL, OptionConstants.digraph)
 
     doTest(
       "i B<BS>B",
@@ -49,7 +49,7 @@ class DigraphTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.UNCLEAR, "backspace works strange")
   fun `test digraph stops`() {
-    VimPlugin.getOptionService().setOption(OptionScope.GLOBAL, OptionConstants.digraphName)
+    VimPlugin.getOptionService().setOption(OptionScope.GLOBAL, OptionConstants.digraph)
 
     doTest(
       "i B<BS>BHello",
@@ -75,7 +75,7 @@ class DigraphTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.UNCLEAR, "backspace works strange")
   fun `test digraph double backspace`() {
-    VimPlugin.getOptionService().setOption(OptionScope.GLOBAL, OptionConstants.digraphName)
+    VimPlugin.getOptionService().setOption(OptionScope.GLOBAL, OptionConstants.digraph)
 
     doTest(
       "i B<BS><BS>B",
@@ -101,7 +101,7 @@ class DigraphTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.UNCLEAR, "backspace works strange")
   fun `test digraph backspace digraph`() {
-    VimPlugin.getOptionService().setOption(OptionScope.GLOBAL, OptionConstants.digraphName)
+    VimPlugin.getOptionService().setOption(OptionScope.GLOBAL, OptionConstants.digraph)
 
     doTest(
       "i B<BS>B<BS>B",

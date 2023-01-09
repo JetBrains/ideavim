@@ -118,19 +118,19 @@ class LetCommandTest : VimTestCase() {
   fun `test let option`() {
     configureByText("\n")
     typeText(commandToKeys("set noincsearch"))
-    assertFalse(VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.incsearchName))
+    assertFalse(VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.incsearch))
     typeText(commandToKeys("let &incsearch = 12"))
-    assertTrue(VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.incsearchName))
+    assertTrue(VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.incsearch))
     typeText(commandToKeys("set noincsearch"))
-    assertFalse(VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.incsearchName))
+    assertFalse(VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.incsearch))
   }
 
   fun `test let option2`() {
     configureByText("\n")
     typeText(commandToKeys("set incsearch"))
-    assertTrue(VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.incsearchName))
+    assertTrue(VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.incsearch))
     typeText(commandToKeys("let &incsearch = 0"))
-    assertFalse(VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.incsearchName))
+    assertFalse(VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.incsearch))
   }
 
   fun `test comment`() {

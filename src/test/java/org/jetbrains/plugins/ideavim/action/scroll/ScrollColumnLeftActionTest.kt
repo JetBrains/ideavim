@@ -67,7 +67,7 @@ class ScrollColumnLeftActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun`test scrolls column to left with sidescrolloff moves cursor`() {
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.sidescrolloffName, VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.sidescrolloff, VimInt(10))
     configureByColumns(200)
     typeText(injector.parser.parseKeys("100|" + "zs" + "zl"))
     assertPosition(0, 100)
@@ -76,7 +76,7 @@ class ScrollColumnLeftActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun`test scroll column to left ignores sidescroll`() {
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.sidescrollName, VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.sidescroll, VimInt(10))
     configureByColumns(200)
     typeText(injector.parser.parseKeys("100|"))
     // Assert we got initial scroll correct

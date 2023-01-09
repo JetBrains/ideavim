@@ -128,7 +128,7 @@ public class CopyActionTest extends VimTestCase {
   // This doesn't use the system clipboard, but the TestClipboardModel
   public void testClipboardUnnamed() throws ExException {
     assertEquals('\"', VimPlugin.getRegister().getDefaultRegister());
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL.INSTANCE, OptionConstants.clipboardName, new VimString("unnamed"), OptionConstants.clipboardName);
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL.INSTANCE, OptionConstants.clipboard, new VimString("unnamed"), OptionConstants.clipboard);
     assertEquals('*', VimPlugin.getRegister().getDefaultRegister());
     typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("yy"), "foo\n" + "<caret>bar\n" + "baz\n");
     final Register starRegister = VimPlugin.getRegister().getRegister('*');

@@ -187,10 +187,10 @@ public class ProcessGroup extends VimProcessGroupBase {
     // Finally, we're also not bothering with the crazy space and backslash handling of the 'shell' options content.
     return ProgressManager.getInstance().runProcessWithProgressSynchronously(() -> {
 
-      final String shell = ((VimString) VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL.INSTANCE, OptionConstants.shellName, OptionConstants.shellName)).getValue();
-      final String shellcmdflag = ((VimString) VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL.INSTANCE, OptionConstants.shellcmdflagName, OptionConstants.shellcmdflagName)).getValue();
-      final String shellxescape = ((VimString) VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL.INSTANCE, OptionConstants.shellxescapeName, OptionConstants.shellxescapeName)).getValue();
-      final String shellxquote = ((VimString) VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL.INSTANCE, OptionConstants.shellxquoteName, OptionConstants.shellxquoteName)).getValue();
+      final String shell = ((VimString) VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL.INSTANCE, OptionConstants.shell, OptionConstants.shell)).getValue();
+      final String shellcmdflag = ((VimString) VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL.INSTANCE, OptionConstants.shellcmdflag, OptionConstants.shellcmdflag)).getValue();
+      final String shellxescape = ((VimString) VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL.INSTANCE, OptionConstants.shellxescape, OptionConstants.shellxescape)).getValue();
+      final String shellxquote = ((VimString) VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL.INSTANCE, OptionConstants.shellxquote, OptionConstants.shellxquote)).getValue();
 
       // For Win32. See :help 'shellxescape'
       final String escapedCommand = shellxquote.equals("(")

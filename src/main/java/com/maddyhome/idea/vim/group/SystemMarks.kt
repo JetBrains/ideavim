@@ -24,7 +24,7 @@ class SystemMarks {
   companion object {
     @JvmStatic
     fun createOrGetSystemMark(ch: Char, line: Int, editor: Editor): LineBookmark? {
-      if (!VimPlugin.getOptionService().isSet(LOCAL(IjVimEditor(editor)), IjVimOptionService.ideamarksName, IjVimOptionService.ideamarksName)) return null
+      if (!VimPlugin.getOptionService().isSet(LOCAL(IjVimEditor(editor)), IjVimOptionService.ideamarks, IjVimOptionService.ideamarks)) return null
 
       val project = editor.project ?: return null
       val type = BookmarkType.get(ch)

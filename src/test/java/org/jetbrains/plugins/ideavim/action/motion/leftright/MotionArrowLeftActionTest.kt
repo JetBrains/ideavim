@@ -21,7 +21,7 @@ import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
 import org.jetbrains.plugins.ideavim.VimTestOption
 
-class MotionArrowLeftActionTest : VimOptionTestCase(OptionConstants.keymodelName) {
+class MotionArrowLeftActionTest : VimOptionTestCase(OptionConstants.keymodel) {
 
   // Kotlin type hints should be an obvious example of an inlay related to preceding text, but they are actually
   // related to following (KTIJ-3768). The inline rename options inlay is a better example
@@ -253,7 +253,7 @@ class MotionArrowLeftActionTest : VimOptionTestCase(OptionConstants.keymodelName
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(
-      OptionConstants.keymodelName,
+      OptionConstants.keymodel,
       OptionValueType.STRING,
       OptionConstants.keymodel_stopsel
     )
@@ -284,7 +284,7 @@ class MotionArrowLeftActionTest : VimOptionTestCase(OptionConstants.keymodelName
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(
-      OptionConstants.keymodelName,
+      OptionConstants.keymodel,
       OptionValueType.STRING,
       OptionConstants.keymodel_stopselect
     )
@@ -315,7 +315,7 @@ class MotionArrowLeftActionTest : VimOptionTestCase(OptionConstants.keymodelName
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(
-      OptionConstants.keymodelName,
+      OptionConstants.keymodel,
       OptionValueType.STRING,
       OptionConstants.keymodel_stopvisual
     )
@@ -346,7 +346,7 @@ class MotionArrowLeftActionTest : VimOptionTestCase(OptionConstants.keymodelName
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(
-      OptionConstants.keymodelName,
+      OptionConstants.keymodel,
       OptionValueType.STRING,
       OptionConstants.keymodel_stopvisual
     )
