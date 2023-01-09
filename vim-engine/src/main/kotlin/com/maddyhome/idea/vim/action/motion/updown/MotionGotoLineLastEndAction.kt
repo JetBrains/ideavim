@@ -24,8 +24,6 @@ import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import java.util.*
 
 class MotionGotoLineLastEndAction : MotionActionHandler.ForEachCaret() {
@@ -44,15 +42,7 @@ class MotionGotoLineLastEndAction : MotionActionHandler.ForEachCaret() {
     if (editor.inInsertMode) {
       allow = true
     } else if (editor.inVisualMode) {
-      val opt = (
-        injector.optionService.getOptionValue(
-          OptionScope.LOCAL(editor),
-          OptionConstants.selection
-        ) as VimString
-        ).value
-      if (opt != "old") {
-        allow = true
-      }
+      allow = !injector.options(editor).hasValue(OptionConstants.selection, "old")
     }
 
     return moveCaretGotoLineLastEnd(editor, operatorArguments.count0, operatorArguments.count1 - 1, allow).toMotion()
@@ -75,13 +65,7 @@ class MotionGotoLineLastEndInsertAction : MotionActionHandler.ForEachCaret() {
     if (editor.inInsertMode) {
       allow = true
     } else if (editor.inVisualMode) {
-      val opt = (
-        injector.optionService
-          .getOptionValue(OptionScope.LOCAL(editor), OptionConstants.selection) as VimString
-        ).value
-      if (opt != "old") {
-        allow = true
-      }
+      allow = !injector.options(editor).hasValue(OptionConstants.selection, "old")
     }
 
     return moveCaretGotoLineLastEnd(editor, operatorArguments.count0, operatorArguments.count1 - 1, allow).toMotion()

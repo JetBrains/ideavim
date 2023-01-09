@@ -40,11 +40,10 @@ import com.intellij.ui.awt.RelativePoint
 import com.intellij.util.Consumer
 import com.intellij.util.ui.LafIconLookup
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.NotificationService
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.icons.VimIcons
-import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.services.IjOptionConstants
 import org.jetbrains.annotations.NonNls
 import java.awt.Point
@@ -67,8 +66,7 @@ class StatusBarIconFactory : StatusBarWidgetFactory/*, LightEditCompatible*/ {
   }
 
   override fun isAvailable(project: Project): Boolean {
-    val ideaStatusIconValue = (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, IjOptionConstants.ideastatusicon) as VimString).value
-    return ideaStatusIconValue != IjOptionConstants.ideastatusicon_disabled
+    return !injector.globalOptions().hasValue(IjOptionConstants.ideastatusicon, IjOptionConstants.ideastatusicon_disabled)
   }
 
   override fun createWidget(project: Project): StatusBarWidget {
@@ -118,8 +116,9 @@ class VimStatusBar : StatusBarWidget, StatusBarWidget.IconPresentation {
   override fun getTooltipText() = STATUS_BAR_DISPLAY_NAME
 
   override fun getIcon(): Icon {
-    val ideaStatusIconValue = (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, IjOptionConstants.ideastatusicon) as VimString).value
-    if (ideaStatusIconValue == IjOptionConstants.ideastatusicon_gray) return VimIcons.IDEAVIM_DISABLED
+    if (injector.globalOptions().hasValue(IjOptionConstants.ideastatusicon, IjOptionConstants.ideastatusicon_gray)) {
+      return VimIcons.IDEAVIM_DISABLED
+    }
     return if (VimPlugin.isEnabled()) VimIcons.IDEAVIM else VimIcons.IDEAVIM_DISABLED
   }
 

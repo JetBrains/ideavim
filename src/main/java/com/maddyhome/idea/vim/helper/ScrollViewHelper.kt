@@ -8,9 +8,9 @@ package com.maddyhome.idea.vim.helper
 
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.VisualPosition
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getVisualLineCount
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.normalizeVisualColumn
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.VimStateMachine
@@ -29,8 +29,6 @@ import com.maddyhome.idea.vim.helper.EditorHelper.scrollVisualLineToMiddleOfScre
 import com.maddyhome.idea.vim.helper.EditorHelper.scrollVisualLineToTopOfScreen
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -61,13 +59,7 @@ internal object ScrollViewHelper {
     val lastLine = vimEditor.getVisualLineCount() - 1
 
     // We need the non-normalised value here, so we can handle cases such as so=999 to keep the current line centred
-    val scrollOffset = (
-      VimPlugin.getOptionService().getOptionValue(
-        OptionScope.LOCAL(vimEditor),
-        OptionConstants.scrolloff,
-        OptionConstants.scrolloff
-      ) as VimInt
-      ).value
+    val scrollOffset = injector.options(vimEditor).getIntValue(OptionConstants.scrolloff)
     val topBound = topLine + scrollOffset
     val bottomBound = max(topBound, bottomLine - scrollOffset)
 
@@ -164,7 +156,7 @@ internal object ScrollViewHelper {
         val scrolled = scrolledAbove + extra
 
         // "used" is the count of lines expanded above and below. We expand below until we hit EOF (or when we've
-        // expanded over a screen full) or until we've scrolled enough and we've expanded at least linesAbove
+        // expanded over a screen full) or until we've scrolled enough, and we've expanded at least linesAbove
         // We expand above until usedAbove + usedBelow >= height. Or until we've scrolled enough (scrolled > sj and extra > so)
         // and we've expanded at least linesAbove (and at most, linesAbove - scrolled - scrolledAbove - 1)
         // The minus one is for the current line
@@ -190,13 +182,7 @@ internal object ScrollViewHelper {
     // Default value is 1. Zero is a valid value, but we normalise to 1 - we always want to scroll at least one line
     // If the value is negative, it's a percentage of the height.
     if (scrollJump) {
-      val scrollJumpSize = (
-        VimPlugin.getOptionService().getOptionValue(
-          OptionScope.LOCAL(editor),
-          OptionConstants.scrolljump,
-          OptionConstants.scrolljump
-        ) as VimInt
-        ).value
+      val scrollJumpSize = injector.options(editor).getIntValue(OptionConstants.scrolljump)
       return if (scrollJumpSize < 0) {
         (height * (min(100, -scrollJumpSize) / 100.0)).toInt()
       } else {
@@ -215,13 +201,7 @@ internal object ScrollViewHelper {
     val scrollOffset = getNormalizedSideScrollOffset(editor)
     val flags = VimStateMachine.getInstance(vimEditor).executingCommandFlags
     val allowSidescroll = !flags.contains(CommandFlags.FLAG_IGNORE_SIDE_SCROLL_JUMP)
-    val sidescroll = (
-      VimPlugin.getOptionService().getOptionValue(
-        OptionScope.LOCAL(vimEditor),
-        OptionConstants.sidescroll,
-        OptionConstants.sidescroll
-      ) as VimInt
-      ).value
+    val sidescroll = injector.options(vimEditor).getIntValue(OptionConstants.sidescroll)
     val offsetLeft = caretColumn - (currentVisualLeftColumn + scrollOffset)
     val offsetRight = caretColumn - (currentVisualRightColumn - scrollOffset)
     if (offsetLeft < 0 || offsetRight > 0) {

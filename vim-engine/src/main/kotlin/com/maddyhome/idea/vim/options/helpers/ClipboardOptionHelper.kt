@@ -11,7 +11,6 @@ package com.maddyhome.idea.vim.options.helpers
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
 object ClipboardOptionHelper {
   var ideaputDisabled = false
@@ -21,8 +20,7 @@ object ClipboardOptionHelper {
     private val containedBefore: Boolean
 
     init {
-      val optionValue = (injector.optionService.getOptionValue(OptionScope.GLOBAL, OptionConstants.clipboard) as VimString).value
-      containedBefore = optionValue.contains(OptionConstants.clipboard_ideaput)
+      containedBefore = injector.globalOptions().hasValue(OptionConstants.clipboard, OptionConstants.clipboard_ideaput)
       injector.optionService.removeValue(
         OptionScope.GLOBAL,
         OptionConstants.clipboard,

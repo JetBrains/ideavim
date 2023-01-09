@@ -15,8 +15,6 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
 class VisualToggleBlockModeAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
@@ -27,13 +25,7 @@ class VisualToggleBlockModeAction : VimActionHandler.SingleExecution() {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    val listOption = (
-      injector.optionService.getOptionValue(
-        OptionScope.LOCAL(editor),
-        OptionConstants.selectmode
-      ) as VimString
-      ).value
-    return if (listOption.contains("cmd")) {
+    return if (injector.options(editor).hasValue(OptionConstants.selectmode, OptionConstants.selectmode_cmd)) {
       injector.visualMotionGroup.enterSelectMode(editor, VimStateMachine.SubMode.VISUAL_BLOCK)
     } else injector.visualMotionGroup
       .toggleVisual(editor, cmd.count, cmd.rawCount, VimStateMachine.SubMode.VISUAL_BLOCK)

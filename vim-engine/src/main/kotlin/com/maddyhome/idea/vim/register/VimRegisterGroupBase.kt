@@ -18,7 +18,6 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.register.RegisterConstants.BLACK_HOLE_REGISTER
 import com.maddyhome.idea.vim.register.RegisterConstants.CLIPBOARD_REGISTERS
 import com.maddyhome.idea.vim.register.RegisterConstants.LAST_SEARCH_REGISTER
@@ -29,7 +28,6 @@ import com.maddyhome.idea.vim.register.RegisterConstants.SMALL_DELETION_REGISTER
 import com.maddyhome.idea.vim.register.RegisterConstants.UNNAMED_REGISTER
 import com.maddyhome.idea.vim.register.RegisterConstants.VALID_REGISTERS
 import com.maddyhome.idea.vim.register.RegisterConstants.WRITABLE_REGISTERS
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import javax.swing.KeyStroke
 
 abstract class VimRegisterGroupBase : VimRegisterGroup {
@@ -71,13 +69,7 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     injector.optionService.addListener(
       OptionConstants.clipboard,
       {
-        val clipboardOptionValue = (
-          injector.optionService.getOptionValue(
-            OptionScope.GLOBAL,
-            OptionConstants.clipboard,
-            OptionConstants.clipboard
-          ) as VimString
-          ).value
+        val clipboardOptionValue = injector.globalOptions().getStringListValues(OptionConstants.clipboard)
         defaultRegisterChar = when {
           "unnamed" in clipboardOptionValue -> '*'
           "unnamedplus" in clipboardOptionValue -> '+'

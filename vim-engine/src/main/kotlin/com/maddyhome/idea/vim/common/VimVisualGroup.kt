@@ -16,8 +16,6 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.lineLength
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
 fun charToNativeSelection(editor: VimEditor, start: Int, end: Int, mode: VimStateMachine.Mode): Pair<Int, Int> {
   val (nativeStart, nativeEnd) = sort(start, end)
@@ -43,14 +41,7 @@ fun lineToNativeSelection(editor: VimEditor, start: Int, end: Int): Pair<Int, In
 
 fun <T : Comparable<T>> sort(a: T, b: T) = if (a > b) b to a else a to b
 
-private fun isExclusiveSelection(): Boolean {
-  return (
-    injector.optionService.getOptionValue(
-      OptionScope.GLOBAL,
-      OptionConstants.selection
-    ) as VimString
-    ).value == "exclusive"
-}
+private fun isExclusiveSelection() = injector.globalOptions().hasValue(OptionConstants.selection, "exclusive")
 
 fun blockToNativeSelection(
   editor: VimEditor,

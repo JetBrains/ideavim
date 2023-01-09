@@ -298,13 +298,7 @@ class ScrollGroup : VimScrollGroup {
 
     private fun getScrollOption(rawCount: Int): Int {
       if (rawCount == 0) {
-        return (
-          VimPlugin.getOptionService().getOptionValue(
-            OptionScope.GLOBAL,
-            OptionConstants.scroll,
-            OptionConstants.scroll
-          ) as VimInt
-          ).value
+        return injector.globalOptions().getIntValue(OptionConstants.scroll)
       }
       // TODO: This needs to be reset whenever the window size changes
       VimPlugin.getOptionService().setOptionValue(

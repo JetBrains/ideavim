@@ -49,8 +49,6 @@ import com.maddyhome.idea.vim.newapi.IjExecutionContextKt;
 import com.maddyhome.idea.vim.newapi.IjVimCaret;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.options.OptionConstants;
-import com.maddyhome.idea.vim.options.OptionScope;
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
 import kotlin.Pair;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function0;
@@ -580,7 +578,7 @@ public class ChangeGroup extends VimChangeGroupBase {
       }
     }
 
-    String nf = ((VimString) injector.getOptionService().getOptionValue(new OptionScope.LOCAL(editor), OptionConstants.nrformats, OptionConstants.nrformats)).getValue();
+    List<String> nf = injector.options(editor).getStringListValues(OptionConstants.nrformats);
     boolean alpha = nf.contains("alpha");
     boolean hex = nf.contains("hex");
     boolean octal = nf.contains("octal");
@@ -610,7 +608,7 @@ public class ChangeGroup extends VimChangeGroupBase {
 
   @Override
   public boolean changeNumber(final @NotNull VimEditor editor, @NotNull VimCaret caret, final int count) {
-    final String nf = ((VimString) injector.getOptionService().getOptionValue(new OptionScope.LOCAL(editor), OptionConstants.nrformats, OptionConstants.nrformats)).getValue();
+    final List<String> nf = injector.options(editor).getStringListValues(OptionConstants.nrformats);
     final boolean alpha = nf.contains("alpha");
     final boolean hex = nf.contains("hex");
     final boolean octal = nf.contains("octal");

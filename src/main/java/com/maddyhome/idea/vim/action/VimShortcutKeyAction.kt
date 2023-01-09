@@ -39,11 +39,9 @@ import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
 import com.maddyhome.idea.vim.listener.AceJumpService
 import com.maddyhome.idea.vim.listener.AppCodeTemplates.appCodeTemplateCaptured
-import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.services.IjOptionConstants
 import java.awt.event.InputEvent
 import java.awt.event.KeyEvent
@@ -182,10 +180,10 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
   }
 
   private fun isEnabledForEscape(editor: Editor): Boolean {
-    val ideaVimSupportValue = (VimPlugin.getOptionService().getOptionValue(OptionScope.LOCAL(IjVimEditor(editor)), IjOptionConstants.ideavimsupport) as VimString).value
+    val ideaVimSupportDialog = injector.options(editor.vim).hasValue(IjOptionConstants.ideavimsupport, IjOptionConstants.ideavimsupport_dialog)
     return editor.isPrimaryEditor() ||
       EditorHelper.isFileEditor(editor) && !editor.inNormalMode ||
-      ideaVimSupportValue.contains(IjOptionConstants.ideavimsupport_dialog) && !editor.inNormalMode
+      ideaVimSupportDialog && !editor.inNormalMode
   }
 
   private fun isShortcutConflict(keyStroke: KeyStroke): Boolean {
@@ -238,8 +236,7 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
 
     fun isEnabledForLookup(keyStroke: KeyStroke): Boolean = keyStroke !in parsedLookupKeys
 
-    private fun parseLookupKeys() = (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, IjOptionConstants.lookupkeys) as VimString).value
-      .split(",")
+    private fun parseLookupKeys() = injector.globalOptions().getStringListValues(IjOptionConstants.lookupkeys)
       .map { injector.parser.parseKeys(it) }
       .filter { it.isNotEmpty() }
       .map { it.first() }

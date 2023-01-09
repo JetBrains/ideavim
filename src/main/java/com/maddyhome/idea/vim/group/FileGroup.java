@@ -39,14 +39,14 @@ import com.maddyhome.idea.vim.helper.SearchHelper;
 import com.maddyhome.idea.vim.newapi.ExecuteExtensionKt;
 import com.maddyhome.idea.vim.newapi.IjExecutionContext;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
-import com.maddyhome.idea.vim.options.OptionScope;
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
 import com.maddyhome.idea.vim.vimscript.services.IjOptionConstants;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.Collection;
+
+import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
 
 public class FileGroup extends VimFileBase {
   public boolean openFile(@NotNull String filename, @NotNull ExecutionContext context) {
@@ -87,7 +87,7 @@ public class FileGroup extends VimFileBase {
   }
 
   @Nullable VirtualFile findFile(@NotNull String filename, @NotNull Project project) {
-    VirtualFile found = null;
+    VirtualFile found;
     if (filename.length() > 2 && filename.charAt(0) == '~' && filename.charAt(1) == File.separatorChar) {
       String homefile = filename.substring(2);
       String dir = System.getProperty("user.home");
@@ -184,7 +184,7 @@ public class FileGroup extends VimFileBase {
   @Override
   public void saveFile(@NotNull ExecutionContext context) {
     NativeAction action;
-    if (IjOptionConstants.ideawrite_all.equals(((VimString) VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL.INSTANCE, IjOptionConstants.ideawrite, IjOptionConstants.ideawrite)).getValue())) {
+    if (injector.globalOptions().hasValue(IjOptionConstants.ideawrite, IjOptionConstants.ideawrite_all)) {
       action = VimInjectorKt.getInjector().getNativeActionManager().getSaveAll();
     }
     else {
@@ -196,7 +196,7 @@ public class FileGroup extends VimFileBase {
   /**
    * Saves all files in the project.
    */
-  public void saveFiles(ExecutionContext context) {
+  public void saveFiles(@NotNull ExecutionContext context) {
     ExecuteExtensionKt.execute(VimInjectorKt.getInjector().getNativeActionManager().getSaveAll(), context);
   }
 

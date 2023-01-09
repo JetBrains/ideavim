@@ -21,8 +21,6 @@ import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.inSelectMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
 /**
  * @author Alex Plate
@@ -56,9 +54,9 @@ abstract class ShiftedSpecialKeyHandler : VimActionHandler.ConditionalMulticaret
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    val startSel = OptionConstants.keymodel_startsel in (injector.optionService.getOptionValue(OptionScope.GLOBAL, OptionConstants.keymodel) as VimString).value
+    val startSel = injector.globalOptions().hasValue(OptionConstants.keymodel, OptionConstants.keymodel_startsel)
     if (startSel && !editor.inVisualMode && !editor.inSelectMode) {
-      if (OptionConstants.selectmode_key in (injector.optionService.getOptionValue(OptionScope.GLOBAL, OptionConstants.selectmode) as VimString).value) {
+      if (injector.globalOptions().hasValue(OptionConstants.selectmode, OptionConstants.selectmode_key)) {
         injector.visualMotionGroup.enterSelectMode(editor, VimStateMachine.SubMode.VISUAL_CHARACTER)
       } else {
         injector.visualMotionGroup
@@ -93,7 +91,7 @@ abstract class ShiftedArrowKeyHandler(private val runBothCommandsAsMulticaret: B
     val (inVisualMode, inSelectMode, withKey) = withKeyOrNot(editor)
     if (withKey) {
       if (!inVisualMode && !inSelectMode) {
-        if (OptionConstants.selectmode_key in (injector.optionService.getOptionValue(OptionScope.GLOBAL, OptionConstants.selectmode) as VimString).value) {
+        if (injector.globalOptions().hasValue(OptionConstants.selectmode, OptionConstants.selectmode_key)) {
           injector.visualMotionGroup.enterSelectMode(editor, VimStateMachine.SubMode.VISUAL_CHARACTER)
         } else {
           injector.visualMotionGroup
@@ -107,8 +105,7 @@ abstract class ShiftedArrowKeyHandler(private val runBothCommandsAsMulticaret: B
   }
 
   private fun withKeyOrNot(editor: VimEditor): Triple<Boolean, Boolean, Boolean> {
-    val keymodelOption =
-      (injector.optionService.getOptionValue(OptionScope.GLOBAL, OptionConstants.keymodel) as VimString).value
+    val keymodelOption = injector.globalOptions().getStringListValues(OptionConstants.keymodel)
     val startSel = OptionConstants.keymodel_startsel in keymodelOption
     val inVisualMode = editor.inVisualMode
     val inSelectMode = editor.inSelectMode
@@ -172,12 +169,7 @@ abstract class NonShiftedSpecialKeyHandler : MotionActionHandler.ForEachCaret() 
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    val keymodel = (
-      injector.optionService.getOptionValue(
-        OptionScope.GLOBAL,
-        OptionConstants.keymodel
-      ) as VimString
-      ).value.split(",")
+    val keymodel = injector.globalOptions().getStringListValues(OptionConstants.keymodel)
     if (editor.inSelectMode && (OptionConstants.keymodel_stopsel in keymodel || OptionConstants.keymodel_stopselect in keymodel)) {
       editor.exitSelectModeNative(false)
     }
