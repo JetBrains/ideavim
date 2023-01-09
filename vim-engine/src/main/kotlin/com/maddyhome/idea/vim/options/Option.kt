@@ -86,26 +86,13 @@ open class StringOption(name: String, abbrev: String, defaultValue: VimString, p
   override fun getValueIfAppend(currentValue: VimDataType, value: String, token: String): VimString {
     val currentString = (currentValue as VimString).value
     if (split(currentString).contains(value)) return currentValue
-
-    val builder = StringBuilder(currentString)
-    if (currentString.isNotEmpty()) {
-      val separator = if (isList) "," else ""
-      builder.append(separator)
-    }
-    builder.append(value)
-    return VimString(builder.toString())
+    return VimString(joinValues(currentString, value))
   }
 
   override fun getValueIfPrepend(currentValue: VimDataType, value: String, token: String): VimString {
     val currentString = (currentValue as VimString).value
     if (split(currentString).contains(value)) return currentValue
-
-    val builder = StringBuilder(value)
-    if (currentString.isNotEmpty()) {
-      val separator = if (isList) "," else ""
-      builder.append(separator).append(currentString)
-    }
-    return VimString(builder.toString())
+    return VimString(joinValues(value, currentString))
   }
 
   override fun getValueIfRemove(currentValue: VimDataType, value: String, token: String): VimString {
@@ -133,6 +120,11 @@ open class StringOption(name: String, abbrev: String, defaultValue: VimString, p
     } else {
       listOf(value)
     }
+  }
+
+  private fun joinValues(first: String, second: String): String {
+    val separator = if (isList && first.isNotEmpty()) "," else ""
+    return first + separator + second
   }
 }
 
