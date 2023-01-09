@@ -161,14 +161,6 @@ abstract class VimOptionServiceBase : OptionService {
     ToggleOption(OptionConstants.ideaglobalmodeName, OptionConstants.ideaglobalmodeAlias, false),
     ToggleOption(OptionConstants.ideastrictmodeName, OptionConstants.ideastrictmodeAlias, false),
     ToggleOption(OptionConstants.ideatracetimeName, OptionConstants.ideatracetimeAlias, false),
-
-    // IDEA specific items
-    // TODO: Move to IjVimOptionService
-    ToggleOption("closenotebooks", "closenotebooks", true),
-    ToggleOption(OptionConstants.ideacopypreprocessName, OptionConstants.ideacopypreprocessAlias, false),
-    StringOption(OptionConstants.lookupkeysName, OptionConstants.lookupkeysAlias, "<Tab>,<Down>,<Up>,<Enter>,<Left>,<Right>,<C-Down>,<C-Up>,<PageUp>,<PageDown>,<C-J>,<C-Q>", isList = true),
-    ToggleOption(OptionConstants.trackactionidsName, OptionConstants.trackactionidsAlias, false),
-    UnsignedNumberOption(OptionConstants.visualdelayName, OptionConstants.visualdelayAlias, 100),
   )
 
   override fun setOptionValue(scope: OptionScope, optionName: String, value: VimDataType, token: String) {

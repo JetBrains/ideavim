@@ -41,10 +41,8 @@ import com.maddyhome.idea.vim.listener.AceJumpService
 import com.maddyhome.idea.vim.listener.AppCodeTemplates.appCodeTemplateCaptured
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.options.OptionChangeListener
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.services.IjVimOptionService
 import java.awt.event.InputEvent
@@ -233,18 +231,14 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
 
     init {
       VimPlugin.getOptionService().addListener(
-        OptionConstants.lookupkeysName,
-        object : OptionChangeListener<VimDataType> {
-          override fun processGlobalValueChange(oldValue: VimDataType?) {
-            parsedLookupKeys = parseLookupKeys()
-          }
-        }
+        IjVimOptionService.lookupkeysName,
+        { parsedLookupKeys = parseLookupKeys() }
       )
     }
 
     fun isEnabledForLookup(keyStroke: KeyStroke): Boolean = keyStroke !in parsedLookupKeys
 
-    private fun parseLookupKeys() = (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, OptionConstants.lookupkeysName) as VimString).value
+    private fun parseLookupKeys() = (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, IjVimOptionService.lookupkeysName) as VimString).value
       .split(",")
       .map { injector.parser.parseKeys(it) }
       .filter { it.isNotEmpty() }
