@@ -52,8 +52,8 @@ class YankMotionActionTest : VimTestCase() {
 
   @Suppress("DANGEROUS_CHARACTERS")
   fun `test unnamed saved to " register`() {
-    val clipboardValue = (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, OptionConstants.clipboardName) as VimString).value
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.clipboardName, VimString("unnamed"))
+    val clipboardValue = (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, OptionConstants.clipboard) as VimString).value
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.clipboard, VimString("unnamed"))
 
     try {
       configureByText("I found it in a ${c}legendary land")
@@ -65,7 +65,7 @@ class YankMotionActionTest : VimTestCase() {
       val quoteRegister = VimPlugin.getRegister().getRegister('"') ?: kotlin.test.fail("Register \" is empty")
       assertEquals("legendary", quoteRegister.text)
     } finally {
-      VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.clipboardName, VimString(clipboardValue))
+      VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.clipboard, VimString(clipboardValue))
     }
   }
 

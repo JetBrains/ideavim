@@ -37,7 +37,7 @@ class DeleteJoinVisualLinesSpacesAction : VisualOperatorActionHandler.SingleExec
     operatorArguments: OperatorArguments,
   ): Boolean {
     if (editor.isOneLineMode()) return false
-    if (injector.optionService.isSet(OptionScope.LOCAL(editor), IjVimOptionService.ideajoinName)) {
+    if (injector.optionService.isSet(OptionScope.LOCAL(editor), IjVimOptionService.ideajoin)) {
       injector.changeGroup.joinViaIdeaBySelections(editor, context, caretsAndSelections)
       return true
     }

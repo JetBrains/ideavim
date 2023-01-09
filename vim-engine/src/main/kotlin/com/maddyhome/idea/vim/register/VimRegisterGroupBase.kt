@@ -69,13 +69,13 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
 
   init {
     injector.optionService.addListener(
-      OptionConstants.clipboardName,
+      OptionConstants.clipboard,
       {
         val clipboardOptionValue = (
           injector.optionService.getOptionValue(
             OptionScope.GLOBAL,
-            OptionConstants.clipboardName,
-            OptionConstants.clipboardName
+            OptionConstants.clipboard,
+            OptionConstants.clipboard
           ) as VimString
           ).value
         defaultRegisterChar = when {

@@ -19,8 +19,8 @@ fun getNormalizedScrollOffset(editor: Editor): Int {
   val scrollOffset = (
     VimPlugin.getOptionService().getOptionValue(
       OptionScope.LOCAL(editor.vim),
-      OptionConstants.scrolloffName,
-      OptionConstants.scrolloffName
+      OptionConstants.scrolloff,
+      OptionConstants.scrolloff
     ) as VimInt
     ).value
   return EditorHelper.normalizeScrollOffset(editor, scrollOffset)
@@ -30,8 +30,8 @@ fun getNormalizedSideScrollOffset(editor: Editor): Int {
   val sideScrollOffset = (
     VimPlugin.getOptionService().getOptionValue(
       OptionScope.LOCAL(editor.vim),
-      OptionConstants.sidescrolloffName,
-      OptionConstants.sidescrolloffName
+      OptionConstants.sidescrolloff,
+      OptionConstants.sidescrolloff
     ) as VimInt
     ).value
   return EditorHelper.normalizeSideScrollOffset(editor, sideScrollOffset)

@@ -136,7 +136,7 @@ class MotionGotoLineLastActionTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test moves caret to same column with nostartofline`() {
-    VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.startoflineName)
+    VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.startofline)
     doTest(
       "G",
       """
@@ -214,7 +214,7 @@ class MotionGotoLineLastActionTest : VimTestCase() {
   }
 
   fun `test go to line in last half screen of file puts last line at bottom of screen ignoring scrolloff`() {
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloff, VimInt(10))
     configureByLines(100, "    I found it in a legendary land")
     typeText(injector.parser.parseKeys("95G"))
     assertPosition(94, 4)
@@ -240,7 +240,7 @@ class MotionGotoLineLastActionTest : VimTestCase() {
   }
 
   fun `test go to line does not scroll when last line is less than scrolloff above bottom of file`() {
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloff, VimInt(10))
     configureByLines(100, "    I found it in a legendary land")
     setEditorVirtualSpace()
     setPositionAndScroll(67, 97)
@@ -250,7 +250,7 @@ class MotionGotoLineLastActionTest : VimTestCase() {
   }
 
   fun `test go to line does not scroll when last line is less than scrolloff above bottom of file with folds`() {
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloff, VimInt(10))
     configureByLines(100, "    I found it in a legendary land")
     setEditorVirtualSpace()
     typeText(injector.parser.parseKeys("20G" + "V10j" + ":'< +'>action CollapseSelection<CR>" + "V"))

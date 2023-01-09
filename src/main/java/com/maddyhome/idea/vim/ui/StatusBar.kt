@@ -69,13 +69,13 @@ class StatusBarIconFactory : StatusBarWidgetFactory/*, LightEditCompatible*/ {
   }
 
   override fun isAvailable(project: Project): Boolean {
-    val ideaStatusIconValue = (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, IjVimOptionService.ideastatusiconName) as VimString).value
+    val ideaStatusIconValue = (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, IjVimOptionService.ideastatusicon) as VimString).value
     return ideaStatusIconValue != IjVimOptionService.ideastatusicon_disabled
   }
 
   override fun createWidget(project: Project): StatusBarWidget {
     VimPlugin.getOptionService().addListener(
-      IjVimOptionService.ideastatusiconName,
+      IjVimOptionService.ideastatusicon,
       object : OptionChangeListener<VimDataType> {
         override fun processGlobalValueChange(oldValue: VimDataType?) {
           updateAll()
@@ -127,7 +127,7 @@ class VimStatusBar : StatusBarWidget, StatusBarWidget.IconPresentation {
   override fun getTooltipText() = STATUS_BAR_DISPLAY_NAME
 
   override fun getIcon(): Icon {
-    val ideaStatusIconValue = (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, IjVimOptionService.ideastatusiconName) as VimString).value
+    val ideaStatusIconValue = (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, IjVimOptionService.ideastatusicon) as VimString).value
     if (ideaStatusIconValue == IjVimOptionService.ideastatusicon_gray) return VimIcons.IDEAVIM_DISABLED
     return if (VimPlugin.isEnabled()) VimIcons.IDEAVIM else VimIcons.IDEAVIM_DISABLED
   }

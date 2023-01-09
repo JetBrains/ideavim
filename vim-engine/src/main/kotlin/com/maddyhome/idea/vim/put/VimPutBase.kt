@@ -527,7 +527,7 @@ abstract class VimPutBase : VimPut {
     val subMode = visualSelection?.typeInEditor?.toSubMode() ?: VimStateMachine.SubMode.NONE
     if (OptionConstants.clipboard_ideaput in (
       injector.optionService
-        .getOptionValue(OptionScope.GLOBAL, OptionConstants.clipboardName) as VimString
+        .getOptionValue(OptionScope.GLOBAL, OptionConstants.clipboard) as VimString
       ).value
     ) {
       val idePasteProvider = getProviderForPasteViaIde(editor, text.typeInRegister, data)

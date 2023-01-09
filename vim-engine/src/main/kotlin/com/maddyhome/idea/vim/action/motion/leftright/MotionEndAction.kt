@@ -41,7 +41,7 @@ class MotionEndAction : NonShiftedSpecialKeyHandler() {
     } else if (editor.inVisualMode || editor.inSelectMode) {
       val opt = (
         injector.optionService
-          .getOptionValue(OptionScope.LOCAL(editor), OptionConstants.selectionName) as VimString
+          .getOptionValue(OptionScope.LOCAL(editor), OptionConstants.selection) as VimString
         ).value
       if (opt != "old") {
         allow = true

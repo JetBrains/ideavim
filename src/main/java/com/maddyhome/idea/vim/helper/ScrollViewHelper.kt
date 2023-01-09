@@ -64,8 +64,8 @@ internal object ScrollViewHelper {
     val scrollOffset = (
       VimPlugin.getOptionService().getOptionValue(
         OptionScope.LOCAL(vimEditor),
-        OptionConstants.scrolloffName,
-        OptionConstants.scrolloffName
+        OptionConstants.scrolloff,
+        OptionConstants.scrolloff
       ) as VimInt
       ).value
     val topBound = topLine + scrollOffset
@@ -193,8 +193,8 @@ internal object ScrollViewHelper {
       val scrollJumpSize = (
         VimPlugin.getOptionService().getOptionValue(
           OptionScope.LOCAL(editor),
-          OptionConstants.scrolljumpName,
-          OptionConstants.scrolljumpName
+          OptionConstants.scrolljump,
+          OptionConstants.scrolljump
         ) as VimInt
         ).value
       return if (scrollJumpSize < 0) {
@@ -218,8 +218,8 @@ internal object ScrollViewHelper {
     val sidescroll = (
       VimPlugin.getOptionService().getOptionValue(
         OptionScope.LOCAL(vimEditor),
-        OptionConstants.sidescrollName,
-        OptionConstants.sidescrollName
+        OptionConstants.sidescroll,
+        OptionConstants.sidescroll
       ) as VimInt
       ).value
     val offsetLeft = caretColumn - (currentVisualLeftColumn + scrollOffset)

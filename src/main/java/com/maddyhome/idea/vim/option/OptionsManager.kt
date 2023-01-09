@@ -9,10 +9,7 @@
 package com.maddyhome.idea.vim.option
 
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.options.OptionConstants.Companion.ignorecaseName
-import com.maddyhome.idea.vim.options.OptionConstants.Companion.smartcaseName
-import com.maddyhome.idea.vim.options.OptionConstants.Companion.timeoutName
-import com.maddyhome.idea.vim.options.OptionConstants.Companion.timeoutlenName
+import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.helpers.KeywordOptionHelper
 import com.maddyhome.idea.vim.vimscript.services.IjVimOptionService
 
@@ -22,13 +19,13 @@ import com.maddyhome.idea.vim.vimscript.services.IjVimOptionService
  */
 object OptionsManager {
   val ignorecase: ToggleOption
-    get() = (injector.optionService as IjVimOptionService).getOptionByNameOrAbbr(ignorecaseName) as ToggleOption
+    get() = (injector.optionService as IjVimOptionService).getOptionByNameOrAbbr(OptionConstants.ignorecase) as ToggleOption
   val smartcase: ToggleOption
-    get() = (injector.optionService as IjVimOptionService).getOptionByNameOrAbbr(smartcaseName) as ToggleOption
+    get() = (injector.optionService as IjVimOptionService).getOptionByNameOrAbbr(OptionConstants.smartcase) as ToggleOption
   val timeout: ToggleOption
-    get() = (injector.optionService as IjVimOptionService).getOptionByNameOrAbbr(timeoutName) as ToggleOption
+    get() = (injector.optionService as IjVimOptionService).getOptionByNameOrAbbr(OptionConstants.timeout) as ToggleOption
   val timeoutlen: NumberOption
-    get() = (injector.optionService as IjVimOptionService).getOptionByNameOrAbbr(timeoutlenName) as NumberOption
+    get() = (injector.optionService as IjVimOptionService).getOptionByNameOrAbbr(OptionConstants.timeoutlen) as NumberOption
   val iskeyword: KeywordOption
     get() = KeywordOption(KeywordOptionHelper)
 }

@@ -717,7 +717,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     hard by the torrent of a mountain pass.
       """.trimIndent()
     )
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.selectmodeName, VimString("cmd"))
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.selectmode, VimString("cmd"))
     typeText(injector.parser.parseKeys("v"))
     assertState(VimStateMachine.Mode.SELECT, VimStateMachine.SubMode.VISUAL_CHARACTER)
   }

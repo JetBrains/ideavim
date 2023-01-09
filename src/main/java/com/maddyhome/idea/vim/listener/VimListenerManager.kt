@@ -111,12 +111,12 @@ object VimListenerManager {
         StrictMode.fail("typeAction expected to be non-vim.")
       }
 
-      VimPlugin.getOptionService().addListener(OptionConstants.numberName, EditorGroup.NumberChangeListener.INSTANCE)
-      VimPlugin.getOptionService().addListener(OptionConstants.relativenumberName, EditorGroup.NumberChangeListener.INSTANCE)
-      VimPlugin.getOptionService().addListener(OptionConstants.scrolloffName, ScrollGroup.ScrollOptionsChangeListener)
-      VimPlugin.getOptionService().addListener(OptionConstants.showcmdName, ShowCmdOptionChangeListener)
-      VimPlugin.getOptionService().addListener(OptionConstants.guicursorName, GuicursorChangeListener)
-      VimPlugin.getOptionService().addListener(OptionConstants.iskeywordName, KeywordOptionChangeListener, true)
+      VimPlugin.getOptionService().addListener(OptionConstants.number, EditorGroup.NumberChangeListener.INSTANCE)
+      VimPlugin.getOptionService().addListener(OptionConstants.relativenumber, EditorGroup.NumberChangeListener.INSTANCE)
+      VimPlugin.getOptionService().addListener(OptionConstants.scrolloff, ScrollGroup.ScrollOptionsChangeListener)
+      VimPlugin.getOptionService().addListener(OptionConstants.showcmd, ShowCmdOptionChangeListener)
+      VimPlugin.getOptionService().addListener(OptionConstants.guicursor, GuicursorChangeListener)
+      VimPlugin.getOptionService().addListener(OptionConstants.iskeyword, KeywordOptionChangeListener, true)
 
       EventFacade.getInstance().addEditorFactoryListener(VimEditorFactoryListener, VimPlugin.getInstance().onOffDisposable)
 
@@ -126,12 +126,12 @@ object VimListenerManager {
     fun disable() {
       EventFacade.getInstance().restoreTypedActionHandler()
 
-      VimPlugin.getOptionService().removeListener(OptionConstants.numberName, EditorGroup.NumberChangeListener.INSTANCE)
-      VimPlugin.getOptionService().removeListener(OptionConstants.relativenumberName, EditorGroup.NumberChangeListener.INSTANCE)
-      VimPlugin.getOptionService().removeListener(OptionConstants.scrolloffName, ScrollGroup.ScrollOptionsChangeListener)
-      VimPlugin.getOptionService().removeListener(OptionConstants.showcmdName, ShowCmdOptionChangeListener)
-      VimPlugin.getOptionService().removeListener(OptionConstants.guicursorName, GuicursorChangeListener)
-      VimPlugin.getOptionService().removeListener(OptionConstants.iskeywordName, KeywordOptionChangeListener)
+      VimPlugin.getOptionService().removeListener(OptionConstants.number, EditorGroup.NumberChangeListener.INSTANCE)
+      VimPlugin.getOptionService().removeListener(OptionConstants.relativenumber, EditorGroup.NumberChangeListener.INSTANCE)
+      VimPlugin.getOptionService().removeListener(OptionConstants.scrolloff, ScrollGroup.ScrollOptionsChangeListener)
+      VimPlugin.getOptionService().removeListener(OptionConstants.showcmd, ShowCmdOptionChangeListener)
+      VimPlugin.getOptionService().removeListener(OptionConstants.guicursor, GuicursorChangeListener)
+      VimPlugin.getOptionService().removeListener(OptionConstants.iskeyword, KeywordOptionChangeListener)
     }
   }
 

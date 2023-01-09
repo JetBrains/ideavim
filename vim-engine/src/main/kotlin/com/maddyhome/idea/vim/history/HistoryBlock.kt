@@ -41,8 +41,8 @@ class HistoryBlock {
       return (
         injector.optionService
           .getOptionValue(
-            OptionScope.GLOBAL, OptionConstants.historyName,
-            OptionConstants.historyName
+            OptionScope.GLOBAL, OptionConstants.history,
+            OptionConstants.history
           ) as VimInt
         ).value
     }

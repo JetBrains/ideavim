@@ -46,7 +46,7 @@ class ScrollLastScreenLinePageStartActionTest : VimTestCase() {
   }
 
   fun `test scrolls last line on previous page to scrolloff`() {
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloff, VimInt(10))
     configureByPages(5)
     setPositionAndScroll(99, 119)
     typeText(injector.parser.parseKeys("z^"))
@@ -55,7 +55,7 @@ class ScrollLastScreenLinePageStartActionTest : VimTestCase() {
   }
 
   fun `test scrolls last line on previous page ignores scrolljump`() {
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolljumpName, VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolljump, VimInt(10))
     configureByPages(5)
     setPositionAndScroll(99, 119)
     typeText(injector.parser.parseKeys("z^"))
@@ -91,7 +91,7 @@ class ScrollLastScreenLinePageStartActionTest : VimTestCase() {
   }
 
   fun `test z^ on first page ignores scrolloff and puts cursor on last line of previous page`() {
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloff, VimInt(10))
     configureByLines(50, "    I found it in a legendary land")
     setPositionAndScroll(0, 6)
     typeText(injector.parser.parseKeys("z^"))

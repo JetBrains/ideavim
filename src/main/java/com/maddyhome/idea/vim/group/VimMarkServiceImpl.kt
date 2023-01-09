@@ -57,7 +57,7 @@ class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateComponent<Elemen
   private fun saveData(element: Element) {
     val globalMarksElement = Element("globalmarks")
     if (!VimPlugin.getOptionService()
-      .isSet(OptionScope.GLOBAL, IjVimOptionService.ideamarksName, IjVimOptionService.ideamarksName)
+      .isSet(OptionScope.GLOBAL, IjVimOptionService.ideamarks, IjVimOptionService.ideamarks)
     ) {
       for (mark in globalMarks.values) {
         val markElem = Element("mark")
@@ -110,7 +110,7 @@ class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateComponent<Elemen
     val marksElem = element.getChild("globalmarks")
     if (marksElem != null &&
       !VimPlugin.getOptionService()
-        .isSet(OptionScope.GLOBAL, IjVimOptionService.ideamarksName, IjVimOptionService.ideamarksName)
+        .isSet(OptionScope.GLOBAL, IjVimOptionService.ideamarks, IjVimOptionService.ideamarks)
     ) {
       val markList = marksElem.getChildren("mark")
       for (aMarkList in markList) {
@@ -163,7 +163,7 @@ class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateComponent<Elemen
     }
   }
 
-  override fun getState(): Element? {
+  override fun getState(): Element {
     val element = Element("marks")
     saveData(element)
     return element
@@ -175,7 +175,7 @@ class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateComponent<Elemen
 
   override fun createGlobalMark(editor: VimEditor, ch: Char, offset: Int): Mark? {
     if (!VimPlugin.getOptionService()
-      .isSet(OptionScope.GLOBAL, IjVimOptionService.ideamarksName, IjVimOptionService.ideamarksName)
+      .isSet(OptionScope.GLOBAL, IjVimOptionService.ideamarks, IjVimOptionService.ideamarks)
     ) {
       return super.createGlobalMark(editor, ch, offset)
     }
@@ -251,7 +251,7 @@ class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateComponent<Elemen
     override fun bookmarkAdded(group: BookmarkGroup, bookmark: Bookmark) {
       if (!VimPlugin.isEnabled()) return
       if (!VimPlugin.getOptionService()
-        .isSet(OptionScope.GLOBAL, IjVimOptionService.ideamarksName, IjVimOptionService.ideamarksName)
+        .isSet(OptionScope.GLOBAL, IjVimOptionService.ideamarks, IjVimOptionService.ideamarks)
       ) {
         return
       }
@@ -266,7 +266,7 @@ class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateComponent<Elemen
     override fun bookmarkRemoved(group: BookmarkGroup, bookmark: Bookmark) {
       if (!VimPlugin.isEnabled()) return
       if (!VimPlugin.getOptionService()
-        .isSet(OptionScope.GLOBAL, IjVimOptionService.ideamarksName, IjVimOptionService.ideamarksName)
+        .isSet(OptionScope.GLOBAL, IjVimOptionService.ideamarks, IjVimOptionService.ideamarks)
       ) {
         return
       }

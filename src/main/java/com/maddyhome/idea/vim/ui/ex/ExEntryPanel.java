@@ -421,7 +421,7 @@ public class ExEntryPanel extends JPanel {
   }
 
   private boolean isIncSearchEnabled() {
-    return VimPlugin.getOptionService().isSet(OptionScope.GLOBAL.INSTANCE, OptionConstants.incsearchName, OptionConstants.incsearchName);
+    return VimPlugin.getOptionService().isSet(OptionScope.GLOBAL.INSTANCE, OptionConstants.incsearch, OptionConstants.incsearch);
   }
 
   private boolean active;

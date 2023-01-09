@@ -54,7 +54,7 @@ class DigraphSequence {
       DIG_STATE_PENDING -> {
         logger.debug("DIG_STATE_PENDING")
         if (key.keyCode == KeyEvent.VK_BACK_SPACE &&
-          injector.optionService.isSet(OptionScope.LOCAL(editor), OptionConstants.digraphName)
+          injector.optionService.isSet(OptionScope.LOCAL(editor), OptionConstants.digraph)
         ) {
           digraphState = DIG_STATE_BACK_SPACE
         } else if (key.keyChar != KeyEvent.CHAR_UNDEFINED) {

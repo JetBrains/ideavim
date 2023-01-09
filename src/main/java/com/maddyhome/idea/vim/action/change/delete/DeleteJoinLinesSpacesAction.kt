@@ -27,7 +27,7 @@ class DeleteJoinLinesSpacesAction : ChangeEditorActionHandler.SingleExecution() 
     operatorArguments: OperatorArguments,
   ): Boolean {
     if (editor.isOneLineMode()) return false
-    if (injector.optionService.isSet(OptionScope.LOCAL(editor), IjVimOptionService.ideajoinName)) {
+    if (injector.optionService.isSet(OptionScope.LOCAL(editor), IjVimOptionService.ideajoin)) {
       return injector.changeGroup.joinViaIdeaByCount(editor, context, operatorArguments.count1)
     }
     injector.editorGroup.notifyIdeaJoin(editor)

@@ -70,7 +70,7 @@ class UndoActionTest : VimTestCase() {
   }
 
   fun `test cursor movements do not require additional undo`() {
-    if (!injector.optionService.isSet(OptionScope.GLOBAL, IjVimOptionService.oldUndo)) {
+    if (!injector.optionService.isSet(OptionScope.GLOBAL, IjVimOptionService.oldundo)) {
       val keys = listOf("a1<Esc>ea2<Esc>ea3<Esc>", "uu")
       val before = """
                 A Discovery

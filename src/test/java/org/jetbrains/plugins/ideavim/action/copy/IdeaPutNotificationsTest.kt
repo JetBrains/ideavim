@@ -25,8 +25,8 @@ import org.jetbrains.plugins.ideavim.rangeOf
 /**
  * @author Alex Plate
  */
-class IdeaPutNotificationsTest : VimOptionTestCase(OptionConstants.clipboardName) {
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.clipboardName, OptionValueType.STRING, ""))
+class IdeaPutNotificationsTest : VimOptionTestCase(OptionConstants.clipboard) {
+  @VimOptionTestConfiguration(VimTestOption(OptionConstants.clipboard, OptionValueType.STRING, ""))
   fun `test notification exists if no ideaput`() {
     val before = "${c}I found it in a legendary land"
     configureByText(before)
@@ -47,7 +47,7 @@ class IdeaPutNotificationsTest : VimOptionTestCase(OptionConstants.clipboardName
 
   @VimOptionTestConfiguration(
     VimTestOption(
-      OptionConstants.clipboardName,
+      OptionConstants.clipboard,
       OptionValueType.STRING,
       OptionConstants.clipboard_ideaput
     )
@@ -64,7 +64,7 @@ class IdeaPutNotificationsTest : VimOptionTestCase(OptionConstants.clipboardName
     assertTrue(notifications.isEmpty() || notifications.last().isExpired || OptionConstants.clipboard_ideaput !in notifications.last().content)
   }
 
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.clipboardName, OptionValueType.STRING, ""))
+  @VimOptionTestConfiguration(VimTestOption(OptionConstants.clipboard, OptionValueType.STRING, ""))
   fun `test no notification if already was`() {
     val before = "${c}I found it in a legendary land"
     configureByText(before)

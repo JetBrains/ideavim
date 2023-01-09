@@ -25,7 +25,7 @@ import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
 import org.jetbrains.plugins.ideavim.VimTestOption
 
-class MotionArrowDownActionTest : VimOptionTestCase(OptionConstants.keymodelName, OptionConstants.virtualeditName) {
+class MotionArrowDownActionTest : VimOptionTestCase(OptionConstants.keymodel, OptionConstants.virtualedit) {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionDefaultAll
   fun `test visual default options`() {
@@ -54,12 +54,12 @@ class MotionArrowDownActionTest : VimOptionTestCase(OptionConstants.keymodelName
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(
-      OptionConstants.keymodelName,
+      OptionConstants.keymodel,
       OptionValueType.STRING,
       OptionConstants.keymodel_stopsel
     )
   )
-  @VimOptionDefault(OptionConstants.virtualeditName)
+  @VimOptionDefault(OptionConstants.virtualedit)
   fun `test visual stopsel`() {
     doTest(
       listOf("v", "<Down>"),
@@ -86,12 +86,12 @@ class MotionArrowDownActionTest : VimOptionTestCase(OptionConstants.keymodelName
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(
-      OptionConstants.keymodelName,
+      OptionConstants.keymodel,
       OptionValueType.STRING,
       OptionConstants.keymodel_stopselect
     )
   )
-  @VimOptionDefault(OptionConstants.virtualeditName)
+  @VimOptionDefault(OptionConstants.virtualedit)
   fun `test visual stopselect`() {
     doTest(
       listOf("v", "<Down>"),
@@ -118,12 +118,12 @@ class MotionArrowDownActionTest : VimOptionTestCase(OptionConstants.keymodelName
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(
-      OptionConstants.keymodelName,
+      OptionConstants.keymodel,
       OptionValueType.STRING,
       OptionConstants.keymodel_stopvisual
     )
   )
-  @VimOptionDefault(OptionConstants.virtualeditName)
+  @VimOptionDefault(OptionConstants.virtualedit)
   fun `test visual stopvisual`() {
     doTest(
       listOf("v", "<Down>"),
@@ -150,12 +150,12 @@ class MotionArrowDownActionTest : VimOptionTestCase(OptionConstants.keymodelName
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(
-      OptionConstants.keymodelName,
+      OptionConstants.keymodel,
       OptionValueType.STRING,
       OptionConstants.keymodel_stopvisual
     )
   )
-  @VimOptionDefault(OptionConstants.virtualeditName)
+  @VimOptionDefault(OptionConstants.virtualedit)
   fun `test visual stopvisual multicaret`() {
     doTest(
       listOf("v", "<Down>"),
@@ -180,8 +180,8 @@ class MotionArrowDownActionTest : VimOptionTestCase(OptionConstants.keymodelName
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, ""))
-  @VimOptionDefault(OptionConstants.virtualeditName)
+  @VimOptionTestConfiguration(VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, ""))
+  @VimOptionDefault(OptionConstants.virtualedit)
   fun `test char select stopsel`() {
     doTest(
       listOf("gh", "<Down>"),
@@ -208,8 +208,8 @@ class MotionArrowDownActionTest : VimOptionTestCase(OptionConstants.keymodelName
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, ""),
-    VimTestOption(OptionConstants.virtualeditName, OptionValueType.STRING, OptionConstants.virtualedit_onemore)
+    VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, ""),
+    VimTestOption(OptionConstants.virtualedit, OptionValueType.STRING, OptionConstants.virtualedit_onemore)
   )
   fun `test virtual edit down to shorter line`() {
     doTest(
@@ -228,8 +228,8 @@ class MotionArrowDownActionTest : VimOptionTestCase(OptionConstants.keymodelName
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, ""),
-    VimTestOption(OptionConstants.virtualeditName, OptionValueType.STRING, OptionConstants.virtualedit_onemore)
+    VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, ""),
+    VimTestOption(OptionConstants.virtualedit, OptionValueType.STRING, OptionConstants.virtualedit_onemore)
   )
   fun `test virtual edit down to shorter line after dollar`() {
     doTest(
@@ -257,8 +257,8 @@ class MotionArrowDownActionTest : VimOptionTestCase(OptionConstants.keymodelName
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, ""),
-    VimTestOption(OptionConstants.virtualeditName, OptionValueType.STRING, OptionConstants.virtualedit_onemore)
+    VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, ""),
+    VimTestOption(OptionConstants.virtualedit, OptionValueType.STRING, OptionConstants.virtualedit_onemore)
   )
   fun `test up and down after dollar`() {
     // Arrow keys
@@ -276,8 +276,8 @@ class MotionArrowDownActionTest : VimOptionTestCase(OptionConstants.keymodelName
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, ""),
-    VimTestOption(OptionConstants.virtualeditName, OptionValueType.STRING, OptionConstants.virtualedit_onemore)
+    VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, ""),
+    VimTestOption(OptionConstants.virtualedit, OptionValueType.STRING, OptionConstants.virtualedit_onemore)
   )
   fun `test up and down after dollar1`() {
     doTest(
@@ -294,8 +294,8 @@ class MotionArrowDownActionTest : VimOptionTestCase(OptionConstants.keymodelName
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, ""),
-    VimTestOption(OptionConstants.virtualeditName, OptionValueType.STRING, OptionConstants.virtualedit_onemore)
+    VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, ""),
+    VimTestOption(OptionConstants.virtualedit, OptionValueType.STRING, OptionConstants.virtualedit_onemore)
   )
   fun `test up and down after dollar2`() {
     doTest(
@@ -312,8 +312,8 @@ class MotionArrowDownActionTest : VimOptionTestCase(OptionConstants.keymodelName
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, ""),
-    VimTestOption(OptionConstants.virtualeditName, OptionValueType.STRING, OptionConstants.virtualedit_onemore)
+    VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, ""),
+    VimTestOption(OptionConstants.virtualedit, OptionValueType.STRING, OptionConstants.virtualedit_onemore)
   )
   fun `test up and down after dollar3`() {
     doTest(
@@ -330,8 +330,8 @@ class MotionArrowDownActionTest : VimOptionTestCase(OptionConstants.keymodelName
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, ""),
-    VimTestOption(OptionConstants.virtualeditName, OptionValueType.STRING, OptionConstants.virtualedit_onemore)
+    VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, ""),
+    VimTestOption(OptionConstants.virtualedit, OptionValueType.STRING, OptionConstants.virtualedit_onemore)
   )
   fun `test up and down after dollar4`() {
     // j k keys
@@ -350,8 +350,8 @@ class MotionArrowDownActionTest : VimOptionTestCase(OptionConstants.keymodelName
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, ""),
-    VimTestOption(OptionConstants.virtualeditName, OptionValueType.STRING, OptionConstants.virtualedit_onemore)
+    VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, ""),
+    VimTestOption(OptionConstants.virtualedit, OptionValueType.STRING, OptionConstants.virtualedit_onemore)
   )
   fun `test up and down after dollar5`() {
     doTest(
@@ -368,8 +368,8 @@ class MotionArrowDownActionTest : VimOptionTestCase(OptionConstants.keymodelName
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, ""),
-    VimTestOption(OptionConstants.virtualeditName, OptionValueType.STRING, OptionConstants.virtualedit_onemore)
+    VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, ""),
+    VimTestOption(OptionConstants.virtualedit, OptionValueType.STRING, OptionConstants.virtualedit_onemore)
   )
   fun `test up and down after dollar6`() {
     doTest(
@@ -386,8 +386,8 @@ class MotionArrowDownActionTest : VimOptionTestCase(OptionConstants.keymodelName
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, ""),
-    VimTestOption(OptionConstants.virtualeditName, OptionValueType.STRING, OptionConstants.virtualedit_onemore)
+    VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, ""),
+    VimTestOption(OptionConstants.virtualedit, OptionValueType.STRING, OptionConstants.virtualedit_onemore)
   )
   fun `test up and down after dollar7`() {
     doTest(
@@ -405,12 +405,12 @@ class MotionArrowDownActionTest : VimOptionTestCase(OptionConstants.keymodelName
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(
-      OptionConstants.keymodelName,
+      OptionConstants.keymodel,
       OptionValueType.STRING,
       OptionConstants.keymodel_stopselect
     )
   )
-  @VimOptionDefault(OptionConstants.virtualeditName)
+  @VimOptionDefault(OptionConstants.virtualedit)
   fun `test char select simple move`() {
     doTest(
       listOf("gH", "<Down>"),
@@ -438,12 +438,12 @@ class MotionArrowDownActionTest : VimOptionTestCase(OptionConstants.keymodelName
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(
-      OptionConstants.keymodelName,
+      OptionConstants.keymodel,
       OptionValueType.STRING,
       OptionConstants.keymodel_stopselect
     )
   )
-  @VimOptionDefault(OptionConstants.virtualeditName)
+  @VimOptionDefault(OptionConstants.virtualedit)
   fun `test select multiple carets`() {
     doTest(
       listOf("gH", "<Down>"),
@@ -471,8 +471,8 @@ class MotionArrowDownActionTest : VimOptionTestCase(OptionConstants.keymodelName
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionDefaultAll
   fun `test arrow down in insert mode scrolls caret at scrolloff`() {
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolljumpName, VimInt(10))
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(5))
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolljump, VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloff, VimInt(5))
     configureByPages(5)
     setPositionAndScroll(0, 29)
 

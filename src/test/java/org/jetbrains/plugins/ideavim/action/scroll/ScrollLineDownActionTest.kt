@@ -42,7 +42,7 @@ class ScrollLineDownActionTest : VimTestCase() {
   }
 
   fun `test scroll line down will maintain current column at start of line with sidescrolloff`() {
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloff, VimInt(10))
     configureByPages(5)
     setPositionAndScroll(30, 50, 5)
     typeText(injector.parser.parseKeys("<C-E>"))
@@ -81,7 +81,7 @@ class ScrollLineDownActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll down uses scrolloff and moves cursor`() {
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloff, VimInt(10))
     configureByPages(5)
     setPositionAndScroll(20, 30)
     typeText(injector.parser.parseKeys("<C-E>"))
@@ -90,7 +90,7 @@ class ScrollLineDownActionTest : VimTestCase() {
   }
 
   fun `test scroll down is not affected by scrolljump`() {
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolljumpName, VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolljump, VimInt(10))
     configureByPages(5)
     setPositionAndScroll(20, 20)
     typeText(injector.parser.parseKeys("<C-E>"))
@@ -115,7 +115,7 @@ class ScrollLineDownActionTest : VimTestCase() {
   }
 
   fun `test scroll line down at end of file with virtual space and scrolloff`() {
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloff, VimInt(10))
     configureByLines(100, "    I found it in a legendary land")
     setEditorVirtualSpace()
     setPositionAndScroll(75, 95, 4)

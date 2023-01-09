@@ -118,5 +118,5 @@ fun vimEnabled(editor: Editor?): Boolean {
 fun vimDisabled(editor: Editor?): Boolean = !vimEnabled(editor)
 
 fun experimentalApi(): Boolean {
-  return VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.experimentalapiName)
+  return VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.experimentalapi)
 }

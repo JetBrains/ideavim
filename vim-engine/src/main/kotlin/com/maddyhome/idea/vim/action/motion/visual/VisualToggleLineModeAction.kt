@@ -33,7 +33,7 @@ class VisualToggleLineModeAction : VimActionHandler.ConditionalMulticaret() {
     val listOption = (
       injector.optionService.getOptionValue(
         OptionScope.LOCAL(editor),
-        OptionConstants.selectmodeName
+        OptionConstants.selectmode
       ) as VimString
       ).value
     return if ("cmd" in listOption) {

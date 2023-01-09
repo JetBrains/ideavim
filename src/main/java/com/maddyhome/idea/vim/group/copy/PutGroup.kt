@@ -177,7 +177,7 @@ class PutGroup : VimPutBase() {
     if (VimPlugin.getVimState().isIdeaPutNotified ||
       OptionConstants.clipboard_ideaput in (
         VimPlugin.getOptionService()
-          .getOptionValue(OptionScope.GLOBAL, OptionConstants.clipboardName) as VimString
+          .getOptionValue(OptionScope.GLOBAL, OptionConstants.clipboard) as VimString
         ).value ||
       ClipboardOptionHelper.ideaputDisabled
     ) return

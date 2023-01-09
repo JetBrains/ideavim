@@ -37,7 +37,7 @@ class ScrollLastScreenLineActionTest : VimTestCase() {
   }
 
   fun `test scroll current line to bottom of screen minus scrolloff`() {
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloff, VimInt(10))
     configureByPages(5)
     setPositionAndScroll(40, 60)
     typeText(injector.parser.parseKeys("zb"))
@@ -54,7 +54,7 @@ class ScrollLastScreenLineActionTest : VimTestCase() {
   }
 
   fun `test scrolls count line to bottom of screen minus scrolloff`() {
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloff, VimInt(10))
     configureByPages(5)
     setPositionAndScroll(40, 60)
     typeText(injector.parser.parseKeys("100zb"))
@@ -63,7 +63,7 @@ class ScrollLastScreenLineActionTest : VimTestCase() {
   }
 
   fun `test scrolls current line to bottom of screen ignoring scrolljump`() {
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolljumpName, VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolljump, VimInt(10))
     configureByPages(5)
     setPositionAndScroll(40, 60)
     typeText(injector.parser.parseKeys("zb"))
@@ -89,7 +89,7 @@ class ScrollLastScreenLineActionTest : VimTestCase() {
   }
 
   fun `test scrolls last line to bottom of screen with virtual space when caret less than scrolloff from bottom`() {
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloff, VimInt(10))
     configureByLines(100, "    I found it in a legendary land")
     setEditorVirtualSpace()
     setPositionAndScroll(80, 97, 4)

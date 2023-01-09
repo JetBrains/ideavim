@@ -56,9 +56,9 @@ abstract class ShiftedSpecialKeyHandler : VimActionHandler.ConditionalMulticaret
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    val startSel = OptionConstants.keymodel_startsel in (injector.optionService.getOptionValue(OptionScope.GLOBAL, OptionConstants.keymodelName) as VimString).value
+    val startSel = OptionConstants.keymodel_startsel in (injector.optionService.getOptionValue(OptionScope.GLOBAL, OptionConstants.keymodel) as VimString).value
     if (startSel && !editor.inVisualMode && !editor.inSelectMode) {
-      if (OptionConstants.selectmode_key in (injector.optionService.getOptionValue(OptionScope.GLOBAL, OptionConstants.selectmodeName) as VimString).value) {
+      if (OptionConstants.selectmode_key in (injector.optionService.getOptionValue(OptionScope.GLOBAL, OptionConstants.selectmode) as VimString).value) {
         injector.visualMotionGroup.enterSelectMode(editor, VimStateMachine.SubMode.VISUAL_CHARACTER)
       } else {
         injector.visualMotionGroup
@@ -93,7 +93,7 @@ abstract class ShiftedArrowKeyHandler(private val runBothCommandsAsMulticaret: B
     val (inVisualMode, inSelectMode, withKey) = withKeyOrNot(editor)
     if (withKey) {
       if (!inVisualMode && !inSelectMode) {
-        if (OptionConstants.selectmode_key in (injector.optionService.getOptionValue(OptionScope.GLOBAL, OptionConstants.selectmodeName) as VimString).value) {
+        if (OptionConstants.selectmode_key in (injector.optionService.getOptionValue(OptionScope.GLOBAL, OptionConstants.selectmode) as VimString).value) {
           injector.visualMotionGroup.enterSelectMode(editor, VimStateMachine.SubMode.VISUAL_CHARACTER)
         } else {
           injector.visualMotionGroup
@@ -108,7 +108,7 @@ abstract class ShiftedArrowKeyHandler(private val runBothCommandsAsMulticaret: B
 
   private fun withKeyOrNot(editor: VimEditor): Triple<Boolean, Boolean, Boolean> {
     val keymodelOption =
-      (injector.optionService.getOptionValue(OptionScope.GLOBAL, OptionConstants.keymodelName) as VimString).value
+      (injector.optionService.getOptionValue(OptionScope.GLOBAL, OptionConstants.keymodel) as VimString).value
     val startSel = OptionConstants.keymodel_startsel in keymodelOption
     val inVisualMode = editor.inVisualMode
     val inSelectMode = editor.inSelectMode
@@ -175,7 +175,7 @@ abstract class NonShiftedSpecialKeyHandler : MotionActionHandler.ForEachCaret() 
     val keymodel = (
       injector.optionService.getOptionValue(
         OptionScope.GLOBAL,
-        OptionConstants.keymodelName
+        OptionConstants.keymodel
       ) as VimString
       ).value.split(",")
     if (editor.inSelectMode && (OptionConstants.keymodel_stopsel in keymodel || OptionConstants.keymodel_stopselect in keymodel)) {

@@ -93,7 +93,7 @@ class MotionMiddleScreenLineActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test move caret to same column with nostartofline`() {
-    VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.startoflineName)
+    VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.startofline)
     configureByLines(50, "    I found it in a legendary land")
     setPositionAndScroll(0, 0, 10)
     typeText(injector.parser.parseKeys("M"))
@@ -102,7 +102,7 @@ class MotionMiddleScreenLineActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test move caret to end of shorter line with nostartofline`() {
-    VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.startoflineName)
+    VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.startofline)
     configureByLines(70, "    I found it in a legendary land")
     setPositionAndScroll(0, 0, 10)
     typeText(injector.parser.parseKeys("A" + " extra text" + "<Esc>"))
@@ -121,7 +121,7 @@ class MotionMiddleScreenLineActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test operator pending acts to middle line with nostartofline`() {
-    VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.startoflineName)
+    VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.startofline)
     configureByLines(20, "    I found it in a legendary land")
     setPositionAndScroll(0, 4, 10)
     typeText(injector.parser.parseKeys("dM"))

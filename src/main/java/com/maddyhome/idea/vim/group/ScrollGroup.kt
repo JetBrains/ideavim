@@ -301,17 +301,17 @@ class ScrollGroup : VimScrollGroup {
         return (
           VimPlugin.getOptionService().getOptionValue(
             OptionScope.GLOBAL,
-            OptionConstants.scrollName,
-            OptionConstants.scrollName
+            OptionConstants.scroll,
+            OptionConstants.scroll
           ) as VimInt
           ).value
       }
       // TODO: This needs to be reset whenever the window size changes
       VimPlugin.getOptionService().setOptionValue(
         OptionScope.GLOBAL,
-        OptionConstants.scrollName,
+        OptionConstants.scroll,
         VimInt(rawCount),
-        OptionConstants.scrollName
+        OptionConstants.scroll
       )
       return rawCount
     }

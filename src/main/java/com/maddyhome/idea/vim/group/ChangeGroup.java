@@ -580,7 +580,7 @@ public class ChangeGroup extends VimChangeGroupBase {
       }
     }
 
-    String nf = ((VimString) injector.getOptionService().getOptionValue(new OptionScope.LOCAL(editor), OptionConstants.nrformatsName, OptionConstants.nrformatsName)).getValue();
+    String nf = ((VimString) injector.getOptionService().getOptionValue(new OptionScope.LOCAL(editor), OptionConstants.nrformats, OptionConstants.nrformats)).getValue();
     boolean alpha = nf.contains("alpha");
     boolean hex = nf.contains("hex");
     boolean octal = nf.contains("octal");
@@ -610,7 +610,7 @@ public class ChangeGroup extends VimChangeGroupBase {
 
   @Override
   public boolean changeNumber(final @NotNull VimEditor editor, @NotNull VimCaret caret, final int count) {
-    final String nf = ((VimString) injector.getOptionService().getOptionValue(new OptionScope.LOCAL(editor), OptionConstants.nrformatsName, OptionConstants.nrformatsName)).getValue();
+    final String nf = ((VimString) injector.getOptionService().getOptionValue(new OptionScope.LOCAL(editor), OptionConstants.nrformats, OptionConstants.nrformats)).getValue();
     final boolean alpha = nf.contains("alpha");
     final boolean hex = nf.contains("hex");
     final boolean octal = nf.contains("octal");

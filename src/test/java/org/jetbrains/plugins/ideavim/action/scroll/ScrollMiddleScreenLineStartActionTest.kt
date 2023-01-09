@@ -48,7 +48,7 @@ class ScrollMiddleScreenLineStartActionTest : VimTestCase() {
   }
 
   fun `test scrolls count line ignoring scrolljump`() {
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolljumpName, VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolljump, VimInt(10))
     configureByPages(5)
     setPositionAndScroll(40, 45)
     typeText(injector.parser.parseKeys("100z."))

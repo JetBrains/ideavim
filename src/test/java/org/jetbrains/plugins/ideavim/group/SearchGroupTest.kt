@@ -1406,17 +1406,17 @@ class SearchGroupTest : VimTestCase() {
     assertEquals(9, res)
   }
 
-  private fun setIgnoreCase() = VimPlugin.getOptionService().setOption(OptionScope.GLOBAL, OptionConstants.ignorecaseName)
-  private fun setSmartCase() = VimPlugin.getOptionService().setOption(OptionScope.GLOBAL, OptionConstants.smartcaseName)
+  private fun setIgnoreCase() = VimPlugin.getOptionService().setOption(OptionScope.GLOBAL, OptionConstants.ignorecase)
+  private fun setSmartCase() = VimPlugin.getOptionService().setOption(OptionScope.GLOBAL, OptionConstants.smartcase)
 
   private fun setIgnoreCaseAndSmartCase() {
     setIgnoreCase()
     setSmartCase()
   }
 
-  private fun setHighlightSearch() = VimPlugin.getOptionService().setOption(OptionScope.GLOBAL, OptionConstants.hlsearchName)
-  private fun clearHighlightSearch() = VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.hlsearchName)
-  private fun setIncrementalSearch() = VimPlugin.getOptionService().setOption(OptionScope.GLOBAL, OptionConstants.incsearchName)
+  private fun setHighlightSearch() = VimPlugin.getOptionService().setOption(OptionScope.GLOBAL, OptionConstants.hlsearch)
+  private fun clearHighlightSearch() = VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.hlsearch)
+  private fun setIncrementalSearch() = VimPlugin.getOptionService().setOption(OptionScope.GLOBAL, OptionConstants.incsearch)
 
   // TODO: Remove these search methods and test by invoking VIM commands rather than calling APIs
   private fun search(pattern: String, input: String, expectedLocation: Int): Int {

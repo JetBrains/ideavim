@@ -939,7 +939,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     var endOffset = range.endOffset
     val fileSize = editor.fileSize().toInt()
     if (endOffset > fileSize) {
-      check(!injector.optionService.isSet(OptionScope.GLOBAL, OptionConstants.ideastrictmodeName)) {
+      check(!injector.optionService.isSet(OptionScope.GLOBAL, OptionConstants.ideastrictmode)) {
         "Incorrect offset. File size: $fileSize, offset: $endOffset"
       }
       endOffset = fileSize
@@ -1184,8 +1184,8 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     }
     return if (injector.optionService.isSet(
         OptionScope.GLOBAL,
-        OptionConstants.experimentalapiName,
-        OptionConstants.experimentalapiName
+        OptionConstants.experimentalapi,
+        OptionConstants.experimentalapi
       )
     ) {
       val (first, second) = getDeleteRangeAndType2(

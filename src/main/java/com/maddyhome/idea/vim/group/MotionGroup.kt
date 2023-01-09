@@ -284,8 +284,8 @@ class MotionGroup : VimMotionGroupBase() {
   ): @Range(from = 0, to = Int.MAX_VALUE.toLong()) Int {
     return if (VimPlugin.getOptionService().isSet(
         OptionScope.LOCAL(editor),
-        OptionConstants.startoflineName,
-        OptionConstants.startoflineName
+        OptionConstants.startofline,
+        OptionConstants.startofline
       )
     ) {
       moveCaretToLineStartSkipLeading(editor, line)

@@ -63,7 +63,7 @@ val usesVirtualSpace
   get() = (
     injector.optionService.getOptionValue(
       OptionScope.GLOBAL,
-      OptionConstants.virtualeditName
+      OptionConstants.virtualedit
     ) as VimString
     ).value == "onemore"
 

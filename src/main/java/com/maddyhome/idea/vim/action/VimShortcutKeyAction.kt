@@ -56,7 +56,7 @@ import javax.swing.KeyStroke
  * These keys are not passed to [com.maddyhome.idea.vim.VimTypedActionHandler] and should be handled by actions.
  */
 class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
-  private val traceTime = VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.ideatracetimeName)
+  private val traceTime = VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.ideatracetime)
 
   override fun actionPerformed(e: AnActionEvent) {
     LOG.trace("Executing shortcut key action")
@@ -182,7 +182,7 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
   }
 
   private fun isEnabledForEscape(editor: Editor): Boolean {
-    val ideaVimSupportValue = (VimPlugin.getOptionService().getOptionValue(OptionScope.LOCAL(IjVimEditor(editor)), IjVimOptionService.ideavimsupportName) as VimString).value
+    val ideaVimSupportValue = (VimPlugin.getOptionService().getOptionValue(OptionScope.LOCAL(IjVimEditor(editor)), IjVimOptionService.ideavimsupport) as VimString).value
     return editor.isPrimaryEditor() ||
       EditorHelper.isFileEditor(editor) && !editor.inNormalMode ||
       ideaVimSupportValue.contains(IjVimOptionService.ideavimsupport_dialog) && !editor.inNormalMode
@@ -231,14 +231,14 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
 
     init {
       VimPlugin.getOptionService().addListener(
-        IjVimOptionService.lookupkeysName,
+        IjVimOptionService.lookupkeys,
         { parsedLookupKeys = parseLookupKeys() }
       )
     }
 
     fun isEnabledForLookup(keyStroke: KeyStroke): Boolean = keyStroke !in parsedLookupKeys
 
-    private fun parseLookupKeys() = (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, IjVimOptionService.lookupkeysName) as VimString).value
+    private fun parseLookupKeys() = (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, IjVimOptionService.lookupkeys) as VimString).value
       .split(",")
       .map { injector.parser.parseKeys(it) }
       .filter { it.isNotEmpty() }

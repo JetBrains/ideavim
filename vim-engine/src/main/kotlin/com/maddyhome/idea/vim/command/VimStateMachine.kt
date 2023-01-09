@@ -284,7 +284,7 @@ class VimStateMachine(private val editor: VimEditor?) {
 
   private fun doShowMode() {
     val msg = StringBuilder()
-    if (injector.optionService.isSet(OptionScope.GLOBAL, OptionConstants.showmodeName)) {
+    if (injector.optionService.isSet(OptionScope.GLOBAL, OptionConstants.showmode)) {
       msg.append(getStatusString())
     }
     if (isRecording) {
@@ -376,7 +376,7 @@ class VimStateMachine(private val editor: VimEditor?) {
      */
     @JvmStatic
     fun getInstance(editor: Any?): VimStateMachine {
-      return if (editor == null || injector.optionService.isSet(OptionScope.GLOBAL, OptionConstants.ideaglobalmodeName)) {
+      return if (editor == null || injector.optionService.isSet(OptionScope.GLOBAL, OptionConstants.ideaglobalmode)) {
         globalState
       } else {
         injector.commandStateFor(editor)

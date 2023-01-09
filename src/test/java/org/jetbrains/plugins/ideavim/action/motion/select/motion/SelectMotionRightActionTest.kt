@@ -19,11 +19,11 @@ import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
 import org.jetbrains.plugins.ideavim.VimTestOption
 
-class SelectMotionRightActionTest : VimOptionTestCase(OptionConstants.keymodelName) {
+class SelectMotionRightActionTest : VimOptionTestCase(OptionConstants.keymodel) {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(
-      OptionConstants.keymodelName,
+      OptionConstants.keymodel,
       OptionValueType.STRING,
       OptionConstants.keymodel_stopselect
     )
@@ -55,7 +55,7 @@ class SelectMotionRightActionTest : VimOptionTestCase(OptionConstants.keymodelNa
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(
-      OptionConstants.keymodelName,
+      OptionConstants.keymodel,
       OptionValueType.STRING,
       OptionConstants.keymodel_stopselect
     )
@@ -85,7 +85,7 @@ class SelectMotionRightActionTest : VimOptionTestCase(OptionConstants.keymodelNa
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, ""))
+  @VimOptionTestConfiguration(VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, ""))
   fun `test without stopsel`() {
     doTest(
       listOf("viw", "<C-G>", "<Right>"),

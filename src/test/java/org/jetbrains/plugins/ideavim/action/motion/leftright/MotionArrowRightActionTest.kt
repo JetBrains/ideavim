@@ -21,7 +21,7 @@ import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
 import org.jetbrains.plugins.ideavim.VimTestOption
 
-class MotionArrowRightActionTest : VimOptionTestCase(OptionConstants.keymodelName) {
+class MotionArrowRightActionTest : VimOptionTestCase(OptionConstants.keymodel) {
 
   @TestWithoutNeovim(SkipNeovimReason.INLAYS)
   @VimOptionDefaultAll
@@ -211,7 +211,7 @@ class MotionArrowRightActionTest : VimOptionTestCase(OptionConstants.keymodelNam
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(
-      OptionConstants.keymodelName,
+      OptionConstants.keymodel,
       OptionValueType.STRING,
       OptionConstants.keymodel_stopsel
     )
@@ -242,7 +242,7 @@ class MotionArrowRightActionTest : VimOptionTestCase(OptionConstants.keymodelNam
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(
-      OptionConstants.keymodelName,
+      OptionConstants.keymodel,
       OptionValueType.STRING,
       OptionConstants.keymodel_stopselect
     )
@@ -273,7 +273,7 @@ class MotionArrowRightActionTest : VimOptionTestCase(OptionConstants.keymodelNam
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(
-      OptionConstants.keymodelName,
+      OptionConstants.keymodel,
       OptionValueType.STRING,
       OptionConstants.keymodel_stopvisual
     )
@@ -304,7 +304,7 @@ class MotionArrowRightActionTest : VimOptionTestCase(OptionConstants.keymodelNam
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(
-      OptionConstants.keymodelName,
+      OptionConstants.keymodel,
       OptionValueType.STRING,
       OptionConstants.keymodel_stopvisual
     )

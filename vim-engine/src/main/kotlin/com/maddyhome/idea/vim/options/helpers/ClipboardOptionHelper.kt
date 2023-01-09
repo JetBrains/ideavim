@@ -21,13 +21,13 @@ object ClipboardOptionHelper {
     private val containedBefore: Boolean
 
     init {
-      val optionValue = (injector.optionService.getOptionValue(OptionScope.GLOBAL, OptionConstants.clipboardName) as VimString).value
+      val optionValue = (injector.optionService.getOptionValue(OptionScope.GLOBAL, OptionConstants.clipboard) as VimString).value
       containedBefore = optionValue.contains(OptionConstants.clipboard_ideaput)
       injector.optionService.removeValue(
         OptionScope.GLOBAL,
-        OptionConstants.clipboardName,
+        OptionConstants.clipboard,
         OptionConstants.clipboard_ideaput,
-        OptionConstants.clipboardName
+        OptionConstants.clipboard
       )
       ideaputDisabled = true
     }
@@ -35,9 +35,9 @@ object ClipboardOptionHelper {
     override fun close() {
       if (containedBefore) injector.optionService.appendValue(
         OptionScope.GLOBAL,
-        OptionConstants.clipboardName,
+        OptionConstants.clipboard,
         OptionConstants.clipboard_ideaput,
-        OptionConstants.clipboardName
+        OptionConstants.clipboard
       )
       ideaputDisabled = false
     }

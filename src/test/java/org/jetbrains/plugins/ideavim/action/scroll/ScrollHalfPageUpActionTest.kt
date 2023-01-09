@@ -60,7 +60,7 @@ class ScrollHalfPageUpActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun`test scroll upwards in first half of first page moves to first line with scrolloff`() {
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloffName, VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloff, VimInt(10))
     configureByPages(5)
     setPositionAndScroll(5, 15)
     typeText(injector.parser.parseKeys("<C-U>"))
@@ -82,12 +82,12 @@ class ScrollHalfPageUpActionTest : VimTestCase() {
     configureByPages(5)
     setPositionAndScroll(50, 53)
     typeText(injector.parser.parseKeys("10<C-U>"))
-    assertEquals((VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, OptionConstants.scrollName) as VimInt).value, 10)
+    assertEquals((VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, OptionConstants.scroll) as VimInt).value, 10)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun`test scroll upwards uses scroll option`() {
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrollName, VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scroll, VimInt(10))
     configureByPages(5)
     setPositionAndScroll(50, 53)
     typeText(injector.parser.parseKeys("<C-U>"))
@@ -115,7 +115,7 @@ class ScrollHalfPageUpActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun`test scroll upwards keeps same column with nostartofline`() {
-    VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.startoflineName)
+    VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.startofline)
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(50, 60, 14)
     typeText(injector.parser.parseKeys("<C-U>"))

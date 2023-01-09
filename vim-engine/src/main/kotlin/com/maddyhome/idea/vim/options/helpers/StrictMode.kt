@@ -21,7 +21,7 @@ object StrictMode {
   }
 
   fun fail(message: String) {
-    if (injector.optionService.isSet(OptionScope.GLOBAL, OptionConstants.ideastrictmodeName)) {
+    if (injector.optionService.isSet(OptionScope.GLOBAL, OptionConstants.ideastrictmode)) {
       error(message)
     }
   }

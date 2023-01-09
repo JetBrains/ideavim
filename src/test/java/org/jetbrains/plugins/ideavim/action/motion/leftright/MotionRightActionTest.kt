@@ -20,7 +20,7 @@ import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
 import org.jetbrains.plugins.ideavim.VimTestOption
 
-class MotionRightActionTest : VimOptionTestCase(OptionConstants.virtualeditName) {
+class MotionRightActionTest : VimOptionTestCase(OptionConstants.virtualedit) {
   @VimOptionDefaultAll
   fun `test simple motion`() {
     doTest(
@@ -94,7 +94,7 @@ class MotionRightActionTest : VimOptionTestCase(OptionConstants.virtualeditName)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.virtualeditName, OptionValueType.STRING, OptionConstants.virtualedit_onemore))
+  @VimOptionTestConfiguration(VimTestOption(OptionConstants.virtualedit, OptionValueType.STRING, OptionConstants.virtualedit_onemore))
   fun `test virtual edit motion to the end`() {
     doTest(
       "3l",
@@ -113,7 +113,7 @@ class MotionRightActionTest : VimOptionTestCase(OptionConstants.virtualeditName)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.virtualeditName, OptionValueType.STRING, OptionConstants.virtualedit_onemore))
+  @VimOptionTestConfiguration(VimTestOption(OptionConstants.virtualedit, OptionValueType.STRING, OptionConstants.virtualedit_onemore))
   fun `test virtual edit motion after dollar`() {
     doTest(
       "\$l",

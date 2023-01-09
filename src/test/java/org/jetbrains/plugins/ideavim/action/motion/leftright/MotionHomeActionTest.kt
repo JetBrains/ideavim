@@ -23,7 +23,7 @@ import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
 import org.jetbrains.plugins.ideavim.VimTestOption
 
-class MotionHomeActionTest : VimOptionTestCase(OptionConstants.keymodelName) {
+class MotionHomeActionTest : VimOptionTestCase(OptionConstants.keymodel) {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionDefaultAll
   fun `test motion home`() {
@@ -49,12 +49,12 @@ class MotionHomeActionTest : VimOptionTestCase(OptionConstants.keymodelName) {
 
   @VimOptionDefaultAll
   fun `test default stop select`() {
-    val keymodel = (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, OptionConstants.keymodelName) as VimString).value
+    val keymodel = (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, OptionConstants.keymodel) as VimString).value
     assertTrue(OptionConstants.keymodel_stopselect in keymodel)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, ""))
+  @VimOptionTestConfiguration(VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, ""))
   fun `test continue visual`() {
     val keys = listOf("v", "<Home>")
     val before = """
@@ -77,7 +77,7 @@ class MotionHomeActionTest : VimOptionTestCase(OptionConstants.keymodelName) {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.keymodelName, OptionValueType.STRING, ""))
+  @VimOptionTestConfiguration(VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, ""))
   fun `test continue select`() {
     val keys = listOf("gh", "<Home>")
     val before = """
@@ -102,7 +102,7 @@ class MotionHomeActionTest : VimOptionTestCase(OptionConstants.keymodelName) {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(
-      OptionConstants.keymodelName,
+      OptionConstants.keymodel,
       OptionValueType.STRING,
       OptionConstants.keymodel_stopvisual
     )
@@ -131,7 +131,7 @@ class MotionHomeActionTest : VimOptionTestCase(OptionConstants.keymodelName) {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(
-      OptionConstants.keymodelName,
+      OptionConstants.keymodel,
       OptionValueType.STRING,
       OptionConstants.keymodel_stopselect
     )

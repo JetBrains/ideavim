@@ -45,7 +45,7 @@ class IncrementDecrementTest : VimPropertyTestBase() {
     setupChecks {
       this.neoVim.ignoredRegisters = setOf(':')
     }
-    VimPlugin.getOptionService().appendValue(OptionScope.GLOBAL, OptionConstants.nrformatsName, "octal", OptionConstants.nrformatsName)
+    VimPlugin.getOptionService().appendValue(OptionScope.GLOBAL, OptionConstants.nrformats, "octal", OptionConstants.nrformats)
     PropertyChecker.checkScenarios {
       ImperativeCommand { env ->
         val number = env.generateValue(testNumberGenerator, "Generate %s number")

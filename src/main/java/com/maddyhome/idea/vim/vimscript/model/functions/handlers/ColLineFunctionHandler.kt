@@ -70,7 +70,7 @@ private fun currentCol(editor: VimEditor): VimInt {
 
   // If virtualedit is set, the col is one more
   // XXX Should we also check the current mode?
-  if ((VimPlugin.getOptionService().getOptionValue(OptionScope.LOCAL(editor), OptionConstants.virtualeditName) as VimString).value.isNotEmpty()) {
+  if ((VimPlugin.getOptionService().getOptionValue(OptionScope.LOCAL(editor), OptionConstants.virtualedit) as VimString).value.isNotEmpty()) {
     lineLength += 1
   }
 
