@@ -36,7 +36,7 @@ import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.statistic.ActionTracker
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable
-import com.maddyhome.idea.vim.vimscript.services.IjVimOptionService
+import com.maddyhome.idea.vim.vimscript.services.IjOptionConstants
 import com.maddyhome.idea.vim.vimscript.services.VimRcService
 import java.awt.datatransfer.StringSelection
 import java.io.File
@@ -86,8 +86,8 @@ class NotificationService(private val project: Project?) {
       AppendToIdeaVimRcAction(
         notification,
         "set ideajoin",
-        IjVimOptionService.ideajoin
-      ) { VimPlugin.getOptionService().setOption(OptionScope.GLOBAL, IjVimOptionService.ideajoin) }
+        IjOptionConstants.ideajoin
+      ) { VimPlugin.getOptionService().setOption(OptionScope.GLOBAL, IjOptionConstants.ideajoin) }
     )
 
     notification.addAction(HelpLink(ideajoinExamplesUrl))
@@ -218,7 +218,7 @@ class NotificationService(private val project: Project?) {
 
     class StopTracking : DumbAwareAction("Stop Tracking") {
       override fun actionPerformed(e: AnActionEvent) {
-        VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, IjVimOptionService.trackactionids)
+        VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, IjOptionConstants.trackactionids)
         notification?.expire()
       }
     }

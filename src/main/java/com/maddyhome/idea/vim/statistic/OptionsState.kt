@@ -19,7 +19,7 @@ import com.intellij.internal.statistic.service.fus.collectors.ApplicationUsagesC
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.services.IjVimOptionService
+import com.maddyhome.idea.vim.vimscript.services.IjOptionConstants
 
 internal class OptionsState : ApplicationUsagesCollector() {
 
@@ -30,14 +30,14 @@ internal class OptionsState : ApplicationUsagesCollector() {
 
     return setOf(
       OPTIONS.metric(
-        IDEAJOIN withOption IjVimOptionService.ideajoin,
-        IDEAMARKS withOption IjVimOptionService.ideamarks,
-        IDEAREFACTOR withOption IjVimOptionService.idearefactormode,
+        IDEAJOIN withOption IjOptionConstants.ideajoin,
+        IDEAMARKS withOption IjOptionConstants.ideamarks,
+        IDEAREFACTOR withOption IjOptionConstants.idearefactormode,
         IDEAPUT with optionService.contains(OptionScope.GLOBAL, OptionConstants.clipboard, OptionConstants.clipboard_ideaput),
-        IDEASTATUSICON withOption IjVimOptionService.ideastatusicon,
-        IDEAWRITE withOption IjVimOptionService.ideawrite,
+        IDEASTATUSICON withOption IjOptionConstants.ideastatusicon,
+        IDEAWRITE withOption IjOptionConstants.ideawrite,
         IDEASELECTION with optionService.contains(OptionScope.GLOBAL, OptionConstants.selectmode, "ideaselection"),
-        IDEAVIMSUPPORT with optionService.getValues(OptionScope.GLOBAL, IjVimOptionService.ideavimsupport)!!
+        IDEAVIMSUPPORT with optionService.getValues(OptionScope.GLOBAL, IjOptionConstants.ideavimsupport)!!
       )
     )
   }
@@ -53,14 +53,14 @@ internal class OptionsState : ApplicationUsagesCollector() {
   companion object {
     private val GROUP = EventLogGroup("vim.options", 1)
 
-    private val IDEAJOIN = BooleanEventField(IjVimOptionService.ideajoin)
-    private val IDEAMARKS = BooleanEventField(IjVimOptionService.ideamarks)
-    private val IDEAREFACTOR = EventFields.String(IjVimOptionService.ideamarks, IjVimOptionService.ideaRefactorModeValues.toList())
+    private val IDEAJOIN = BooleanEventField(IjOptionConstants.ideajoin)
+    private val IDEAMARKS = BooleanEventField(IjOptionConstants.ideamarks)
+    private val IDEAREFACTOR = EventFields.String(IjOptionConstants.ideamarks, IjOptionConstants.ideaRefactorModeValues.toList())
     private val IDEAPUT = BooleanEventField("ideaput")
-    private val IDEASTATUSICON = EventFields.String(IjVimOptionService.ideastatusicon, IjVimOptionService.ideaStatusIconValues.toList())
-    private val IDEAWRITE = EventFields.String(IjVimOptionService.ideawrite, IjVimOptionService.ideaWriteValues.toList())
+    private val IDEASTATUSICON = EventFields.String(IjOptionConstants.ideastatusicon, IjOptionConstants.ideaStatusIconValues.toList())
+    private val IDEAWRITE = EventFields.String(IjOptionConstants.ideawrite, IjOptionConstants.ideaWriteValues.toList())
     private val IDEASELECTION = BooleanEventField("ideaselection")
-    private val IDEAVIMSUPPORT = EventFields.StringList(IjVimOptionService.ideavimsupport, IjVimOptionService.ideavimsupportValues.toList())
+    private val IDEAVIMSUPPORT = EventFields.StringList(IjOptionConstants.ideavimsupport, IjOptionConstants.ideavimsupportValues.toList())
 
     private val OPTIONS: VarargEventId = GROUP.registerVarargEvent(
       "vim.options",

@@ -18,7 +18,7 @@ import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.services.IjVimOptionService
+import com.maddyhome.idea.vim.vimscript.services.IjOptionConstants
 import java.util.*
 
 /**
@@ -37,7 +37,7 @@ class DeleteJoinVisualLinesSpacesAction : VisualOperatorActionHandler.SingleExec
     operatorArguments: OperatorArguments,
   ): Boolean {
     if (editor.isOneLineMode()) return false
-    if (injector.optionService.isSet(OptionScope.LOCAL(editor), IjVimOptionService.ideajoin)) {
+    if (injector.optionService.isSet(OptionScope.LOCAL(editor), IjOptionConstants.ideajoin)) {
       injector.changeGroup.joinViaIdeaBySelections(editor, context, caretsAndSelections)
       return true
     }

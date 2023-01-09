@@ -18,13 +18,13 @@ import com.intellij.openapi.project.Project
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.options.OptionScope.LOCAL
-import com.maddyhome.idea.vim.vimscript.services.IjVimOptionService
+import com.maddyhome.idea.vim.vimscript.services.IjOptionConstants
 
 class SystemMarks {
   companion object {
     @JvmStatic
     fun createOrGetSystemMark(ch: Char, line: Int, editor: Editor): LineBookmark? {
-      if (!VimPlugin.getOptionService().isSet(LOCAL(IjVimEditor(editor)), IjVimOptionService.ideamarks, IjVimOptionService.ideamarks)) return null
+      if (!VimPlugin.getOptionService().isSet(LOCAL(IjVimEditor(editor)), IjOptionConstants.ideamarks, IjOptionConstants.ideamarks)) return null
 
       val project = editor.project ?: return null
       val type = BookmarkType.get(ch)
