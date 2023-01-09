@@ -46,6 +46,7 @@ usual beta standards.
 * [579](https://github.com/JetBrains/ideavim/pull/579) by [Martin Yzeiri](https://github.com/myzeiri): VIM-2799: Add Matchit support for cshtml files
 * [580](https://github.com/JetBrains/ideavim/pull/580) by [Martin Yzeiri](https://github.com/myzeiri): Matchit: Add more Rider file types
 * [583](https://github.com/JetBrains/ideavim/pull/583) by [Matt Ellis](https://github.com/citizenmatt): Introduce ScrollGroup
+* [586](https://github.com/JetBrains/ideavim/pull/586) by [Patrick Elmquist](https://github.com/patrick-elmquist): Fixed number references in Tutor
 
 ## 2.0.0, 2022-11-01
 
