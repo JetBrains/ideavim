@@ -20,8 +20,6 @@ import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
 class MotionLastScreenColumnAction : MotionActionHandler.ForEachCaret() {
   override fun getOffset(
@@ -35,15 +33,7 @@ class MotionLastScreenColumnAction : MotionActionHandler.ForEachCaret() {
     if (editor.inInsertMode) {
       allow = true
     } else if (editor.inVisualMode) {
-      val opt = (
-        injector.optionService.getOptionValue(
-          OptionScope.LOCAL(editor),
-          OptionConstants.selection
-        ) as VimString
-        ).value
-      if (opt != "old") {
-        allow = true
-      }
+      allow = !injector.options(editor).hasValue(OptionConstants.selection, "old")
     }
     val motion = injector.motion.moveCaretToCurrentDisplayLineEnd(editor, caret, allow)
     return when (motion) {

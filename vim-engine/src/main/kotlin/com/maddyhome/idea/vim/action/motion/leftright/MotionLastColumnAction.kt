@@ -23,8 +23,6 @@ import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import java.util.*
 
 class MotionLastColumnInsertAction : MotionLastColumnAction() {
@@ -42,13 +40,7 @@ open class MotionLastColumnAction : MotionActionHandler.ForEachCaret() {
     operatorArguments: OperatorArguments,
   ): Motion {
     val allow = if (editor.inVisualMode) {
-      val opt = (
-        injector.optionService.getOptionValue(
-          OptionScope.LOCAL(editor),
-          OptionConstants.selection
-        ) as VimString
-        ).value
-      opt != "old"
+      !injector.options(editor).hasValue(OptionConstants.selection, "old")
     } else {
       if (operatorArguments.isOperatorPending) false else editor.isEndAllowed
     }

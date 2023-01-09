@@ -13,6 +13,7 @@ import com.intellij.openapi.diagnostic.trace
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.helper.EditorDataContext
 import com.maddyhome.idea.vim.helper.editorMode
@@ -28,11 +29,8 @@ import com.maddyhome.idea.vim.helper.isTemplateActive
 import com.maddyhome.idea.vim.helper.popAllModes
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.listener.VimListenerManager
-import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.IdeaRefactorModeHelper
 
 object IdeaSelectionControl {
@@ -140,7 +138,7 @@ object IdeaSelectionControl {
     selectionSource: VimListenerManager.SelectionSource,
     logReason: Boolean,
   ): VimStateMachine.Mode {
-    val selectmode = (VimPlugin.getOptionService().getOptionValue(OptionScope.LOCAL(IjVimEditor(editor)), OptionConstants.selectmode) as VimString).value
+    val selectmode = injector.options(editor.vim).getStringListValues(OptionConstants.selectmode)
     return when {
       editor.isOneLineMode -> {
         if (logReason) logger.debug("Enter select mode. Reason: one line mode")
@@ -154,8 +152,7 @@ object IdeaSelectionControl {
         if (logReason) logger.debug("Enter select mode. Template is active and selectMode has template")
         VimStateMachine.Mode.SELECT
       }
-      selectionSource == VimListenerManager.SelectionSource.OTHER &&
-        OptionConstants.selectmode_ideaselection in (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, OptionConstants.selectmode) as VimString).value -> {
+      selectionSource == VimListenerManager.SelectionSource.OTHER && OptionConstants.selectmode_ideaselection in selectmode -> {
         if (logReason) logger.debug("Enter select mode. Selection source is OTHER and selectMode has refactoring")
         VimStateMachine.Mode.SELECT
       }

@@ -15,20 +15,21 @@ import com.intellij.codeInsight.lookup.impl.LookupImpl
 import com.intellij.codeInsight.template.impl.TemplateManagerImpl
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.editorMode
 import com.maddyhome.idea.vim.helper.hasBlockOrUnderscoreCaret
 import com.maddyhome.idea.vim.helper.hasVisualSelection
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.services.IjOptionConstants
 
 object IdeaRefactorModeHelper {
 
-  fun keepMode(): Boolean = (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, IjOptionConstants.idearefactormode) as VimString).value == IjOptionConstants.idearefactormode_keep
-  fun selectMode(): Boolean = (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, IjOptionConstants.idearefactormode) as VimString).value == IjOptionConstants.idearefactormode_select
+  fun keepMode() =
+    injector.globalOptions().hasValue(IjOptionConstants.idearefactormode, IjOptionConstants.idearefactormode_keep)
+  fun selectMode() =
+    injector.globalOptions().hasValue(IjOptionConstants.idearefactormode, IjOptionConstants.idearefactormode_select)
 
   fun correctSelection(editor: Editor) {
     val action: () -> Unit = {

@@ -62,6 +62,7 @@ import java.text.NumberFormat;
 import java.text.ParsePosition;
 import java.util.*;
 
+import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
 import static com.maddyhome.idea.vim.helper.HelperKt.localEditors;
 import static com.maddyhome.idea.vim.helper.SearchHelperKtKt.shouldIgnoreCase;
 import static com.maddyhome.idea.vim.register.RegisterConstants.LAST_SEARCH_REGISTER;
@@ -71,27 +72,16 @@ import static com.maddyhome.idea.vim.register.RegisterConstants.LAST_SEARCH_REGI
 })
 public class SearchGroup extends VimSearchGroupBase implements PersistentStateComponent<Element> {
   public SearchGroup() {
-    VimPlugin.getOptionService().addListener(
-      OptionConstants.hlsearch,
-      new OptionChangeListener<VimDataType>() {
-        @Override
-        public void processGlobalValueChange(@Nullable VimDataType oldValue) {
-          resetShowSearchHighlight();
-          forceUpdateSearchHighlights();
-        }
-      },
-      false
-    );
+    VimPlugin.getOptionService().addListener(OptionConstants.hlsearch, oldValue -> {
+      resetShowSearchHighlight();
+      forceUpdateSearchHighlights();
+    }, false);
 
-    final OptionChangeListener<VimDataType> updateHighlightsIfVisible =
-      new OptionChangeListener<VimDataType>() {
-        @Override
-        public void processGlobalValueChange(@Nullable VimDataType oldValue) {
-            if (showSearchHighlight) {
-              forceUpdateSearchHighlights();
-            }
-        }
-      };
+    final OptionChangeListener<VimDataType> updateHighlightsIfVisible = oldValue -> {
+      if (showSearchHighlight) {
+        forceUpdateSearchHighlights();
+      }
+    };
     VimPlugin.getOptionService().addListener(OptionConstants.ignorecase, updateHighlightsIfVisible, false);
     VimPlugin.getOptionService().addListener(OptionConstants.smartcase, updateHighlightsIfVisible, false);
   }
@@ -1373,8 +1363,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
     }
 
     Element show = search.getChild("show-last");
-    final String vimInfo = ((VimString) VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL.INSTANCE, OptionConstants.viminfo, OptionConstants.viminfo)).getValue();
-    final boolean disableHighlight = Set.of(vimInfo.split(",")).contains("h");
+    final boolean disableHighlight = injector.globalOptions().hasValue(OptionConstants.viminfo, "h");
     showSearchHighlight = !disableHighlight && Boolean.parseBoolean(show.getText());
     if (logger.isDebugEnabled()) {
       logger.debug("show=" + show + "(" + show.getText() + ")");

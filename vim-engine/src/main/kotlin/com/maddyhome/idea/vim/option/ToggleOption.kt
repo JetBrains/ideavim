@@ -54,7 +54,7 @@ class ToggleOption(name: String, abbrev: String, defaultValue: VimInt) : Option<
    */
   @Suppress("DEPRECATION", "PLATFORM_CLASS_MAPPED_TO_KOTLIN")
   override val value: java.lang.Boolean
-    get() = if (injector.optionService.getOptionValue(OptionScope.GLOBAL, name).asBoolean()) {
+    get() = if (isSet()) {
       java.lang.Boolean(true)
     } else {
       java.lang.Boolean(false)

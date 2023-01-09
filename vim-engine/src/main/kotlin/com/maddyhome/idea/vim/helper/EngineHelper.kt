@@ -13,8 +13,6 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import java.util.*
 
 inline fun <reified T : Enum<T>> noneOfEnum(): EnumSet<T> = EnumSet.noneOf(T::class.java)
@@ -60,12 +58,7 @@ val VimStateMachine.Mode.isEndAllowed: Boolean
   }
 
 val usesVirtualSpace
-  get() = (
-    injector.optionService.getOptionValue(
-      OptionScope.GLOBAL,
-      OptionConstants.virtualedit
-    ) as VimString
-    ).value == "onemore"
+  get() = injector.globalOptions().hasValue(OptionConstants.virtualedit, OptionConstants.virtualedit_onemore)
 
 val VimEditor.isEndAllowed: Boolean
   get() = when (this.mode) {

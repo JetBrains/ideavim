@@ -20,8 +20,6 @@ import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotion
 import com.maddyhome.idea.vim.handler.toMotionOrError
 import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
 /**
  * @author Alex Plate
@@ -38,8 +36,7 @@ class SelectMotionRightAction : MotionActionHandler.ForEachCaret() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    val keymodel =
-      (injector.optionService.getOptionValue(OptionScope.GLOBAL, OptionConstants.keymodel) as VimString).value
+    val keymodel = injector.globalOptions().getStringListValues(OptionConstants.keymodel)
     if (OptionConstants.keymodel_stopsel in keymodel || OptionConstants.keymodel_stopselect in keymodel) {
       logger.debug("Keymodel option has stopselect. Exiting select mode")
       val startSelection = caret.selectionStart

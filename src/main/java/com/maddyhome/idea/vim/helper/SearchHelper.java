@@ -30,11 +30,9 @@ import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.options.OptionChangeListener;
 import com.maddyhome.idea.vim.options.OptionConstants;
-import com.maddyhome.idea.vim.options.OptionScope;
 import com.maddyhome.idea.vim.regexp.CharPointer;
 import com.maddyhome.idea.vim.regexp.RegExp;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType;
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
 import kotlin.Pair;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -45,6 +43,7 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
 import static com.maddyhome.idea.vim.helper.SearchHelperKtKt.checkInString;
 import static com.maddyhome.idea.vim.helper.SearchHelperKtKt.shouldIgnoreCase;
 
@@ -2394,12 +2393,9 @@ public class SearchHelper {
   }
 
   private static @NotNull String parseMatchPairsOption() {
-    String[] vals = ((VimString) VimPlugin.getOptionService()
-      .getOptionValue(OptionScope.GLOBAL.INSTANCE, OptionConstants.matchpairs, OptionConstants.matchpairs))
-      .getValue()
-      .split(",");
+    List<String> pairs = injector.globalOptions().getStringListValues(OptionConstants.matchpairs);
     StringBuilder res = new StringBuilder();
-    for (String s : vals) {
+    for (String s : pairs) {
       if (s.length() == 3) {
         res.append(s.charAt(0)).append(s.charAt(2));
       }

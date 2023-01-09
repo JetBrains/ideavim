@@ -17,6 +17,7 @@ import com.intellij.internal.statistic.eventLog.events.StringEventField
 import com.intellij.internal.statistic.eventLog.events.VarargEventId
 import com.intellij.internal.statistic.service.fus.collectors.ApplicationUsagesCollector
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.services.IjOptionConstants
@@ -47,7 +48,7 @@ internal class OptionsState : ApplicationUsagesCollector() {
   }
 
   private infix fun StringEventField.withOption(name: String): EventPair<String?> {
-    return this.with(VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, name).asString())
+    return this.with(injector.globalOptions().getStringValue(name))
   }
 
   companion object {

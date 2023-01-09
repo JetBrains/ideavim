@@ -19,8 +19,6 @@ import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.helper.inSelectMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
 class MotionShiftEndAction : ShiftedSpecialKeyHandler() {
 
@@ -31,15 +29,7 @@ class MotionShiftEndAction : ShiftedSpecialKeyHandler() {
     if (editor.inInsertMode) {
       allow = true
     } else if (editor.inVisualMode || editor.inSelectMode) {
-      val opt = (
-        injector.optionService.getOptionValue(
-          OptionScope.LOCAL(editor),
-          OptionConstants.selection
-        ) as VimString
-        ).value
-      if (opt != "old") {
-        allow = true
-      }
+      allow = !injector.options(editor).hasValue(OptionConstants.selection, "old")
     }
 
     val newOffset = injector.motion.moveCaretToRelativeLineEnd(editor, caret, cmd.count - 1, allow)

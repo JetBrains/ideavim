@@ -18,8 +18,6 @@ import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.group.visual.vimSetSelection
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
 class VisualToggleLineModeAction : VimActionHandler.ConditionalMulticaret() {
 
@@ -30,16 +28,13 @@ class VisualToggleLineModeAction : VimActionHandler.ConditionalMulticaret() {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    val listOption = (
-      injector.optionService.getOptionValue(
-        OptionScope.LOCAL(editor),
-        OptionConstants.selectmode
-      ) as VimString
-      ).value
-    return if ("cmd" in listOption) {
+    return if (injector.options(editor).hasValue(OptionConstants.selectmode, OptionConstants.selectmode_cmd)) {
       injector.visualMotionGroup.enterSelectMode(editor, VimStateMachine.SubMode.VISUAL_LINE)
       true
-    } else false
+    }
+    else {
+      false
+    }
   }
 
   override fun execute(

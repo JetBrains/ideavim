@@ -38,8 +38,6 @@ import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.mark.VimMarkConstants.MARK_CHANGE_POS
 import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import java.util.*
 import kotlin.math.abs
 import kotlin.math.max
@@ -525,11 +523,7 @@ abstract class VimPutBase : VimPut {
   ) {
     val visualSelection = data.visualSelection
     val subMode = visualSelection?.typeInEditor?.toSubMode() ?: VimStateMachine.SubMode.NONE
-    if (OptionConstants.clipboard_ideaput in (
-      injector.optionService
-        .getOptionValue(OptionScope.GLOBAL, OptionConstants.clipboard) as VimString
-      ).value
-    ) {
+    if (injector.globalOptions().hasValue(OptionConstants.clipboard, OptionConstants.clipboard_ideaput)) {
       val idePasteProvider = getProviderForPasteViaIde(editor, text.typeInRegister, data)
       if (idePasteProvider != null) {
         logger.debug("Perform put via idea paste")

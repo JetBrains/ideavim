@@ -10,8 +10,6 @@ package com.maddyhome.idea.vim.history
 
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 
 class HistoryBlock {
   private val entries: MutableList<HistoryEntry> = ArrayList()
@@ -37,14 +35,6 @@ class HistoryBlock {
   }
 
   companion object {
-    private fun maxLength(): Int {
-      return (
-        injector.optionService
-          .getOptionValue(
-            OptionScope.GLOBAL, OptionConstants.history,
-            OptionConstants.history
-          ) as VimInt
-        ).value
-    }
+    private fun maxLength() = injector.globalOptions().getIntValue(OptionConstants.history)
   }
 }

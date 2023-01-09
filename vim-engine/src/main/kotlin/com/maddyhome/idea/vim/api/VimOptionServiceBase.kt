@@ -25,8 +25,12 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.datatypes.parseNumber
 import com.maddyhome.idea.vim.vimscript.services.OptionService
+import com.maddyhome.idea.vim.vimscript.services.OptionValueAccessor
 
 abstract class VimOptionServiceBase : OptionService {
+
+  private lateinit var globalOptions: OptionValueAccessor
+
   private val localOptionsKey = Key<MutableMap<String, VimDataType>>("localOptions")
 
   private val logger = vimLogger<VimOptionServiceBase>()
@@ -360,6 +364,18 @@ abstract class VimOptionServiceBase : OptionService {
 
   override fun getOptionByNameOrAbbr(key: String): Option<out VimDataType>? {
     return options.get(key)
+  }
+
+  override fun getValueAccessor(editor: VimEditor?): OptionValueAccessor {
+    return if (editor == null) {
+      if (!::globalOptions.isInitialized) {
+        globalOptions = OptionValueAccessor(this, OptionScope.GLOBAL)
+      }
+      globalOptions
+    } else {
+      // Maybe cache in editor's user data?
+      OptionValueAccessor(this, OptionScope.LOCAL(editor))
+    }
   }
 
   private fun castToVimDataType(value: String, optionName: String, token: String): VimDataType {

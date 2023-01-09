@@ -43,13 +43,11 @@ import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.options.helpers.ClipboardOptionHelper
 import com.maddyhome.idea.vim.put.ProcessedTextData
 import com.maddyhome.idea.vim.put.PutData
 import com.maddyhome.idea.vim.put.VimPasteProvider
 import com.maddyhome.idea.vim.put.VimPutBase
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import java.awt.datatransfer.DataFlavor
 
 class PutGroup : VimPutBase() {
@@ -174,13 +172,10 @@ class PutGroup : VimPutBase() {
 
   override fun notifyAboutIdeaPut(editor: VimEditor?) {
     val project = editor?.ij?.project
-    if (VimPlugin.getVimState().isIdeaPutNotified ||
-      OptionConstants.clipboard_ideaput in (
-        VimPlugin.getOptionService()
-          .getOptionValue(OptionScope.GLOBAL, OptionConstants.clipboard) as VimString
-        ).value ||
-      ClipboardOptionHelper.ideaputDisabled
-    ) return
+    if (VimPlugin.getVimState().isIdeaPutNotified || ClipboardOptionHelper.ideaputDisabled
+      || injector.globalOptions().hasValue(OptionConstants.clipboard, OptionConstants.clipboard_ideaput)) {
+      return
+    }
 
     VimPlugin.getVimState().isIdeaPutNotified = true
 

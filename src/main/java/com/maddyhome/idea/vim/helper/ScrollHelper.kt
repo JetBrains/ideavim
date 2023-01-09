@@ -9,30 +9,16 @@
 package com.maddyhome.idea.vim.helper
 
 import com.intellij.openapi.editor.Editor
-import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 
 fun getNormalizedScrollOffset(editor: Editor): Int {
-  val scrollOffset = (
-    VimPlugin.getOptionService().getOptionValue(
-      OptionScope.LOCAL(editor.vim),
-      OptionConstants.scrolloff,
-      OptionConstants.scrolloff
-    ) as VimInt
-    ).value
+  val scrollOffset = injector.options(editor.vim).getIntValue(OptionConstants.scrolloff)
   return EditorHelper.normalizeScrollOffset(editor, scrollOffset)
 }
 
 fun getNormalizedSideScrollOffset(editor: Editor): Int {
-  val sideScrollOffset = (
-    VimPlugin.getOptionService().getOptionValue(
-      OptionScope.LOCAL(editor.vim),
-      OptionConstants.sidescrolloff,
-      OptionConstants.sidescrolloff
-    ) as VimInt
-    ).value
+  val sideScrollOffset = injector.options(editor.vim).getIntValue(OptionConstants.sidescrolloff)
   return EditorHelper.normalizeSideScrollOffset(editor, sideScrollOffset)
 }

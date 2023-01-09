@@ -40,7 +40,6 @@ import com.maddyhome.idea.vim.key.KeyStack
 import com.maddyhome.idea.vim.key.Node
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import java.awt.event.InputEvent
 import java.awt.event.KeyEvent
 import java.util.function.Consumer
@@ -91,17 +90,11 @@ class KeyHandler {
         Key: $key
       """.trimIndent()
     }
-    val mapMapDepth = (
-      injector.optionService.getOptionValue(
-        OptionScope.GLOBAL,
-        OptionConstants.maxmapdepth,
-        OptionConstants.maxmapdepth
-      ) as VimInt
-      ).value
-    if (handleKeyRecursionCount >= mapMapDepth) {
+    val maxMapDepth = injector.globalOptions().getIntValue(OptionConstants.maxmapdepth)
+    if (handleKeyRecursionCount >= maxMapDepth) {
       injector.messages.showStatusBarMessage(editor, injector.messages.message("E223"))
       injector.messages.indicateError()
-      LOG.warn("Key handling, maximum recursion of the key received. maxdepth=$mapMapDepth")
+      LOG.warn("Key handling, maximum recursion of the key received. maxdepth=$maxMapDepth")
       return
     }
 
