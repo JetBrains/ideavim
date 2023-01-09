@@ -19,19 +19,19 @@ import com.maddyhome.idea.vim.options.UnsignedNumberOption
 internal class IjVimOptionService : VimOptionServiceBase() {
 
   private val customOptions = setOf(
-    ToggleOption(closenotebooks, closenotebooks, true),
-    StringOption(ide, ide, ApplicationNamesInfo.getInstance().fullProductNameWithEdition),
-    ToggleOption(ideacopypreprocess, ideacopypreprocess, false),
-    ToggleOption(ideajoin, ideajoin, false),
-    ToggleOption(ideamarks, ideamarks, true),
-    StringOption(idearefactormode, idearefactormode, "select", isList = false, ideaRefactorModeValues),
-    StringOption(ideastatusicon, ideastatusicon, "enabled", isList = false, ideaStatusIconValues),
-    StringOption(ideavimsupport, ideavimsupport, "dialog", isList = true, ideavimsupportValues),
-    StringOption(ideawrite, ideawrite, "all", isList = false, ideaWriteValues),
-    StringOption(lookupkeys, lookupkeys, "<Tab>,<Down>,<Up>,<Enter>,<Left>,<Right>,<C-Down>,<C-Up>,<PageUp>,<PageDown>,<C-J>,<C-Q>", isList = true),
-    ToggleOption(oldundo, oldundo, true),
-    ToggleOption(trackactionids, "tai", false),
-    UnsignedNumberOption(visualdelay, visualdelay, 100),
+    ToggleOption(IjOptionConstants.closenotebooks, IjOptionConstants.closenotebooks, true),
+    StringOption(IjOptionConstants.ide, IjOptionConstants.ide, ApplicationNamesInfo.getInstance().fullProductNameWithEdition),
+    ToggleOption(IjOptionConstants.ideacopypreprocess, IjOptionConstants.ideacopypreprocess, false),
+    ToggleOption(IjOptionConstants.ideajoin, IjOptionConstants.ideajoin, false),
+    ToggleOption(IjOptionConstants.ideamarks, IjOptionConstants.ideamarks, true),
+    StringOption(IjOptionConstants.idearefactormode, IjOptionConstants.idearefactormode, "select", isList = false, IjOptionConstants.ideaRefactorModeValues),
+    StringOption(IjOptionConstants.ideastatusicon, IjOptionConstants.ideastatusicon, "enabled", isList = false, IjOptionConstants.ideaStatusIconValues),
+    StringOption(IjOptionConstants.ideavimsupport, IjOptionConstants.ideavimsupport, "dialog", isList = true, IjOptionConstants.ideavimsupportValues),
+    StringOption(IjOptionConstants.ideawrite, IjOptionConstants.ideawrite, "all", isList = false, IjOptionConstants.ideaWriteValues),
+    StringOption(IjOptionConstants.lookupkeys, IjOptionConstants.lookupkeys, "<Tab>,<Down>,<Up>,<Enter>,<Left>,<Right>,<C-Down>,<C-Up>,<PageUp>,<PageDown>,<C-J>,<C-Q>", isList = true),
+    ToggleOption(IjOptionConstants.oldundo, IjOptionConstants.oldundo, true),
+    ToggleOption(IjOptionConstants.trackactionids, "tai", false),
+    UnsignedNumberOption(IjOptionConstants.visualdelay, IjOptionConstants.visualdelay, 100),
 
     // This options overrides Vim's default value, so we keep it here
     StringOption(OptionConstants.clipboard, OptionConstants.clipboardAlias, "ideaput,autoselect,exclude:cons\\|linux", isList = true),
@@ -42,7 +42,9 @@ internal class IjVimOptionService : VimOptionServiceBase() {
       addOption(it)
     }
   }
+}
 
+internal class IjOptionConstants {
   @Suppress("SpellCheckingInspection", "MemberVisibilityCanBePrivate")
   companion object {
 

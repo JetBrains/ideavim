@@ -40,7 +40,7 @@ import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.IdeaRefactorModeHelper
-import com.maddyhome.idea.vim.vimscript.services.IjVimOptionService
+import com.maddyhome.idea.vim.vimscript.services.IjOptionConstants
 import org.jetbrains.annotations.NonNls
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
@@ -65,7 +65,7 @@ object IdeaSpecifics {
         editor = hostEditor
       }
 
-      if (VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, IjVimOptionService.trackactionids)) {
+      if (VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, IjOptionConstants.trackactionids)) {
         if (action !is NotificationService.ActionIdNotifier.CopyActionId && action !is NotificationService.ActionIdNotifier.StopTracking) {
           val id: String? = ActionManager.getInstance().getId(action) ?: (action.shortcutSet as? ProxyShortcutSet)?.actionId
           VimPlugin.getNotifications(event.dataContext.getData(CommonDataKeys.PROJECT)).notifyActionId(id)
@@ -205,10 +205,10 @@ object IdeaSpecifics {
 
 //region Find action ID
 class FindActionIdAction : DumbAwareToggleAction() {
-  override fun isSelected(e: AnActionEvent): Boolean = VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, IjVimOptionService.trackactionids)
+  override fun isSelected(e: AnActionEvent): Boolean = VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, IjOptionConstants.trackactionids)
 
   override fun setSelected(e: AnActionEvent, state: Boolean) {
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, IjVimOptionService.trackactionids, VimInt(if (state) 1 else 0))
+    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, IjOptionConstants.trackactionids, VimInt(if (state) 1 else 0))
   }
 }
 //endregion

@@ -11,7 +11,7 @@ package org.jetbrains.plugins.ideavim.action.change
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.services.IjVimOptionService
+import com.maddyhome.idea.vim.vimscript.services.IjOptionConstants
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class UndoActionTest : VimTestCase() {
@@ -70,7 +70,7 @@ class UndoActionTest : VimTestCase() {
   }
 
   fun `test cursor movements do not require additional undo`() {
-    if (!injector.optionService.isSet(OptionScope.GLOBAL, IjVimOptionService.oldundo)) {
+    if (!injector.optionService.isSet(OptionScope.GLOBAL, IjOptionConstants.oldundo)) {
       val keys = listOf("a1<Esc>ea2<Esc>ea3<Esc>", "uu")
       val before = """
                 A Discovery

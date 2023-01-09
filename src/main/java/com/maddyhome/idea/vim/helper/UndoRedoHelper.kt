@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.undo.UndoRedoBase
-import com.maddyhome.idea.vim.vimscript.services.IjVimOptionService
+import com.maddyhome.idea.vim.vimscript.services.IjOptionConstants
 
 /**
  * @author oleg
@@ -31,7 +31,7 @@ import com.maddyhome.idea.vim.vimscript.services.IjVimOptionService
 @Service
 class UndoRedoHelper : UndoRedoBase() {
   init {
-    injector.optionService.addListener(IjVimOptionService.oldundo, { UndoManagerImpl.ourNeverAskUser = !injector.optionService.isSet(OptionScope.GLOBAL, IjVimOptionService.oldundo) }, true)
+    injector.optionService.addListener(IjOptionConstants.oldundo, { UndoManagerImpl.ourNeverAskUser = !injector.optionService.isSet(OptionScope.GLOBAL, IjOptionConstants.oldundo) }, true)
   }
 
   override fun undo(editor: VimEditor, context: ExecutionContext): Boolean {
@@ -40,7 +40,7 @@ class UndoRedoHelper : UndoRedoBase() {
     val fileEditor = TextEditorProvider.getInstance().getTextEditor(editor.ij)
     val undoManager = UndoManager.getInstance(project)
     if (undoManager.isUndoAvailable(fileEditor)) {
-      if (injector.optionService.isSet(OptionScope.GLOBAL, IjVimOptionService.oldundo)) {
+      if (injector.optionService.isSet(OptionScope.GLOBAL, IjOptionConstants.oldundo)) {
         SelectionVimListenerSuppressor.lock().use { undoManager.undo(fileEditor) }
       } else {
         performUntilFileChanges(editor, { undoManager.isUndoAvailable(fileEditor) }, { undoManager.undo(fileEditor) })
@@ -69,7 +69,7 @@ class UndoRedoHelper : UndoRedoBase() {
     val fileEditor = TextEditorProvider.getInstance().getTextEditor(editor.ij)
     val undoManager = UndoManager.getInstance(project)
     if (undoManager.isRedoAvailable(fileEditor)) {
-      if (injector.optionService.isSet(OptionScope.GLOBAL, IjVimOptionService.oldundo)) {
+      if (injector.optionService.isSet(OptionScope.GLOBAL, IjOptionConstants.oldundo)) {
         SelectionVimListenerSuppressor.lock().use { undoManager.redo(fileEditor) }
       } else {
         performUntilFileChanges(editor, { undoManager.isRedoAvailable(fileEditor) }, { undoManager.redo(fileEditor) })

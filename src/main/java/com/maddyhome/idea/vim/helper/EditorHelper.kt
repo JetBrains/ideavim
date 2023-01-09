@@ -19,7 +19,7 @@ import com.intellij.util.ui.table.JBTableRowEditor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
-import com.maddyhome.idea.vim.vimscript.services.IjVimOptionService
+import com.maddyhome.idea.vim.vimscript.services.IjOptionConstants
 import java.awt.Component
 import javax.swing.JComponent
 import javax.swing.JTable
@@ -33,11 +33,11 @@ val Editor.fileSize: Int
  */
 val Editor.isIdeaVimDisabledHere: Boolean
   get() {
-    val ideaVimSupportValue = (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, IjVimOptionService.ideavimsupport) as VimString).value
+    val ideaVimSupportValue = (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, IjOptionConstants.ideavimsupport) as VimString).value
     return disabledInDialog ||
       (!ClientId.isCurrentlyUnderLocalId) || // CWM-927
-      (!ideaVimSupportValue.contains(IjVimOptionService.ideavimsupport_singleline) && isDatabaseCell()) ||
-      (!ideaVimSupportValue.contains(IjVimOptionService.ideavimsupport_singleline) && isOneLineMode)
+      (!ideaVimSupportValue.contains(IjOptionConstants.ideavimsupport_singleline) && isDatabaseCell()) ||
+      (!ideaVimSupportValue.contains(IjOptionConstants.ideavimsupport_singleline) && isOneLineMode)
   }
 
 private fun Editor.isDatabaseCell(): Boolean {
@@ -46,8 +46,8 @@ private fun Editor.isDatabaseCell(): Boolean {
 
 private val Editor.disabledInDialog: Boolean
   get() {
-    val ideaVimSupportValue = (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, IjVimOptionService.ideavimsupport) as VimString).value
-    return (!ideaVimSupportValue.contains(IjVimOptionService.ideavimsupport_dialog) && !ideaVimSupportValue.contains(IjVimOptionService.ideavimsupport_dialoglegacy)) &&
+    val ideaVimSupportValue = (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, IjOptionConstants.ideavimsupport) as VimString).value
+    return (!ideaVimSupportValue.contains(IjOptionConstants.ideavimsupport_dialog) && !ideaVimSupportValue.contains(IjOptionConstants.ideavimsupport_dialoglegacy)) &&
       (!this.isPrimaryEditor() && !EditorHelper.isFileEditor(this))
   }
 

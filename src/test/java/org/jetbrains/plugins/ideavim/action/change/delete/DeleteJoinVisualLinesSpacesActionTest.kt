@@ -9,7 +9,7 @@
 package org.jetbrains.plugins.ideavim.action.change.delete
 
 import com.maddyhome.idea.vim.command.VimStateMachine
-import com.maddyhome.idea.vim.vimscript.services.IjVimOptionService
+import com.maddyhome.idea.vim.vimscript.services.IjOptionConstants
 import org.jetbrains.plugins.ideavim.OptionValueType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -17,9 +17,9 @@ import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
 import org.jetbrains.plugins.ideavim.VimTestOption
 
-class DeleteJoinVisualLinesSpacesActionTest : VimOptionTestCase(IjVimOptionService.ideajoin) {
+class DeleteJoinVisualLinesSpacesActionTest : VimOptionTestCase(IjOptionConstants.ideajoin) {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(IjVimOptionService.ideajoin, OptionValueType.NUMBER, "1"))
+  @VimOptionTestConfiguration(VimTestOption(IjOptionConstants.ideajoin, OptionValueType.NUMBER, "1"))
   fun `test join via idea`() {
     doTest(
       "VjJ",

@@ -29,7 +29,7 @@ import com.maddyhome.idea.vim.options.LocalOptionChangeListener;
 import com.maddyhome.idea.vim.options.OptionConstants;
 import com.maddyhome.idea.vim.options.OptionScope;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType;
-import com.maddyhome.idea.vim.vimscript.services.IjVimOptionService;
+import com.maddyhome.idea.vim.vimscript.services.IjOptionConstants;
 import org.jdom.Element;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NonNls;
@@ -229,7 +229,7 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
 
   public void notifyIdeaJoin(@Nullable Project project) {
     if (VimPlugin.getVimState().isIdeaJoinNotified()
-        || VimPlugin.getOptionService().isSet(OptionScope.GLOBAL.INSTANCE, IjVimOptionService.ideajoin, IjVimOptionService.ideajoin)) {
+        || VimPlugin.getOptionService().isSet(OptionScope.GLOBAL.INSTANCE, IjOptionConstants.ideajoin, IjOptionConstants.ideajoin)) {
       return;
     }
 
