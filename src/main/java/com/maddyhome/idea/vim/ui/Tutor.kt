@@ -70,7 +70,7 @@ internal val tutor = """
 
   ---> The ccow jumpedd ovverr thhe mooon.
 
-    5. Now that the line is correct, go on to lesson 1.4.
+    5. Now that the line is correct, go on to lesson 1.3.
 
   NOTE: As you go through this tutor, do not try to memorize, learn by usage.
 
@@ -95,7 +95,7 @@ internal val tutor = """
   ---> There is text misng this .
   ---> There is some text missing from this line.
 
-    5. When you are comfortable inserting text move to lesson 1.5.
+    5. When you are comfortable inserting text move to lesson 1.4.
 
 
 
@@ -120,7 +120,7 @@ internal val tutor = """
   ---> There is also some text miss
        There is also some text missing here.
 
-    5. When you are comfortable appending text move to lesson 1.6.
+    5. When you are comfortable appending text move to the summary below.
 
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
