@@ -45,12 +45,14 @@ internal class IjVimOptionService : VimOptionServiceBase() {
 
   @Suppress("SpellCheckingInspection", "MemberVisibilityCanBePrivate")
   companion object {
+
+    // IJ specific options
     const val closenotebooks = "closenotebooks"
-    const val oldundo = "oldundo"
     const val ide = "ide"
     const val ideacopypreprocess = "ideacopypreprocess"
     const val ideajoin = "ideajoin"
     const val ideamarks = "ideamarks"
+
     const val idearefactormode = "idearefactormode"
     const val idearefactormode_keep = "keep"
     const val idearefactormode_select = "select"
@@ -61,16 +63,17 @@ internal class IjVimOptionService : VimOptionServiceBase() {
     const val ideastatusicon_gray = "gray"
     const val ideastatusicon_disabled = "disabled"
 
-    const val ideawrite = "ideawrite"
-    const val ideawrite_all = "all"
-    const val ideawrite_file = "file"
-
     const val ideavimsupport = "ideavimsupport"
     const val ideavimsupport_dialog = "dialog"
     const val ideavimsupport_singleline = "singleline"
     const val ideavimsupport_dialoglegacy = "dialoglegacy"
 
+    const val ideawrite = "ideawrite"
+    const val ideawrite_all = "all"
+    const val ideawrite_file = "file"
+
     const val lookupkeys = "lookupkeys"
+    const val oldundo = "oldundo"
     const val trackactionids = "trackactionids"
     const val visualdelay = "visualdelay"
 
