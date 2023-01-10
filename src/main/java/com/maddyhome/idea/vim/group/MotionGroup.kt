@@ -70,7 +70,6 @@ import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import org.jetbrains.annotations.Range
 import java.io.File
@@ -282,12 +281,7 @@ class MotionGroup : VimMotionGroupBase() {
     line: Int,
     caret: ImmutableVimCaret
   ): @Range(from = 0, to = Int.MAX_VALUE.toLong()) Int {
-    return if (VimPlugin.getOptionService().isSet(
-        OptionScope.LOCAL(editor),
-        OptionConstants.startofline,
-        OptionConstants.startofline
-      )
-    ) {
+    return if (injector.options(editor).isSet(OptionConstants.startofline)) {
       moveCaretToLineStartSkipLeading(editor, line)
     } else {
       moveCaretToLineWithSameColumn(editor, line, caret)

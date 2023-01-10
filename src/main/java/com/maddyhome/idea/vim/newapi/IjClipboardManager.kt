@@ -22,15 +22,14 @@ import com.intellij.openapi.editor.richcopy.view.RtfTransferableData
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.IndexNotReadyException
 import com.intellij.psi.PsiDocumentManager
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.VimClipboardManager
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.helper.TestClipboardModel
 import com.maddyhome.idea.vim.helper.TestClipboardModel.contents
-import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.services.IjOptionConstants
 import java.awt.HeadlessException
 import java.awt.datatransfer.DataFlavor
@@ -122,7 +121,7 @@ class IjClipboardManager : VimClipboardManager {
       text, "\n",
       transferableData as Collection<TextBlockTransferableData?>
     )
-    if (VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, IjOptionConstants.ideacopypreprocess)) {
+    if (injector.globalOptions().isSet(IjOptionConstants.ideacopypreprocess)) {
       for (processor in CopyPastePreProcessor.EP_NAME.extensionList) {
         val escapedText = processor.preprocessOnCopy(file, textRange.startOffsets, textRange.endOffsets, rawText)
         if (escapedText != null) {

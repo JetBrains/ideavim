@@ -17,7 +17,6 @@ import com.maddyhome.idea.vim.command.DuplicableOperatorAction
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
 
 class DeleteMotionAction : ChangeEditorActionHandler.ForEachCaret(), DuplicableOperatorAction {
   override val type: Command.Type = Command.Type.DELETE
@@ -34,7 +33,7 @@ class DeleteMotionAction : ChangeEditorActionHandler.ForEachCaret(), DuplicableO
     operatorArguments: OperatorArguments,
   ): Boolean {
     if (argument == null) return false
-    if (injector.optionService.isSet(OptionScope.GLOBAL, OptionConstants.experimentalapi)) {
+    if (injector.globalOptions().isSet(OptionConstants.experimentalapi)) {
       val (first, second) = injector.changeGroup
         .getDeleteRangeAndType2(editor, caret, context, argument, false, operatorArguments)
         ?: return false

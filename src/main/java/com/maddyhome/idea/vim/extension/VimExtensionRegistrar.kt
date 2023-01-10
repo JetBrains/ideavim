@@ -62,7 +62,7 @@ object VimExtensionRegistrar : VimExtensionRegistrator {
       name,
       object : OptionChangeListener<VimDataType> {
         override fun processGlobalValueChange(oldValue: VimDataType?) {
-          if (VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, name)) {
+          if (injector.globalOptions().isSet(name)) {
             initExtension(extensionBean, name)
             PluginState.enabledExtensions.add(name)
           } else {

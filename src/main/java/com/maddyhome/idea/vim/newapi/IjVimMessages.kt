@@ -17,7 +17,6 @@ import com.maddyhome.idea.vim.api.VimMessagesBase
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.ui.ShowCmd
 import java.awt.Toolkit
 
@@ -51,12 +50,8 @@ class IjVimMessages : VimMessagesBase() {
   override fun indicateError() {
     if (ApplicationManager.getApplication().isUnitTestMode) {
       error = true
-    } else if (!injector.optionService.isSet(
-        OptionScope.GLOBAL,
-        OptionConstants.visualbell,
-        OptionConstants.visualbell
-      )
-    ) {
+    }
+    else if (!injector.globalOptions().isSet(OptionConstants.visualbell)) {
       // Vim only allows a beep once every half second - :help 'visualbell'
       val currentTimeMillis = System.currentTimeMillis()
       if (currentTimeMillis - lastBeepTimeMillis > 500) {

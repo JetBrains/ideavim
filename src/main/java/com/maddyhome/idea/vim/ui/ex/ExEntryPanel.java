@@ -25,7 +25,6 @@ import com.maddyhome.idea.vim.helper.UiHelper;
 import com.maddyhome.idea.vim.newapi.IjVimCaret;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.options.OptionConstants;
-import com.maddyhome.idea.vim.options.OptionScope;
 import com.maddyhome.idea.vim.regexp.CharPointer;
 import com.maddyhome.idea.vim.regexp.RegExp;
 import com.maddyhome.idea.vim.ui.ExPanelBorder;
@@ -43,6 +42,8 @@ import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+
+import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
 
 /**
  * This is used to enter ex commands such as searches and "colon" commands
@@ -421,7 +422,7 @@ public class ExEntryPanel extends JPanel {
   }
 
   private boolean isIncSearchEnabled() {
-    return VimPlugin.getOptionService().isSet(OptionScope.GLOBAL.INSTANCE, OptionConstants.incsearch, OptionConstants.incsearch);
+    return injector.globalOptions().isSet(OptionConstants.incsearch);
   }
 
   private boolean active;

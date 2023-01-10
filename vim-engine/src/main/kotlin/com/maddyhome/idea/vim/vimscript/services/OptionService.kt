@@ -122,6 +122,8 @@ interface OptionService {
    * @param token used in exception messages
    * @throws ExException("E518: Unknown option: $token") in case the option is not found
    */
+  // COMPATIBILITY-LAYER: Used by (older versions of?) plugins
+  @Deprecated("Use OptionValueAccessor.isSet or OptionService.getOptionValue")
   fun isSet(scope: OptionScope, optionName: String, token: String = optionName): Boolean
 
   /**
