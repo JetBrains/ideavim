@@ -63,8 +63,8 @@ plugins {
     kotlin("jvm") version "1.7.20"
     application
 
-    id("org.jetbrains.intellij") version "1.11.1-SNAPSHOT"
-    id("org.jetbrains.changelog") version "1.3.1"
+    id("org.jetbrains.intellij") version "1.11.0"
+    id("org.jetbrains.changelog") version "2.0.0"
 
     // ktlint linter - read more: https://github.com/JLLeitschuh/ktlint-gradle
     id("org.jlleitschuh.gradle.ktlint") version "10.3.0"
@@ -297,9 +297,20 @@ tasks {
         from(createOpenApiSourceJar) { into("lib/src") }
     }
 
+    val pluginVersion = version
     // Don't forget to update plugin.xml
     patchPluginXml {
         sinceBuild.set("223.7401.7")
+
+        // Get the latest available change notes from the changelog file
+        changeNotes.set(provider {
+            with(changelog) {
+                renderItem(
+                    getOrNull(pluginVersion.toString()) ?: getLatest(),
+                    org.jetbrains.changelog.Changelog.OutputType.HTML,
+                )
+            }
+        })
     }
 }
 

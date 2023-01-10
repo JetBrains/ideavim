@@ -9,39 +9,6 @@
 <idea-plugin url="https://plugins.jetbrains.com/plugin/164" xmlns:xi="http://www.w3.org/2001/XInclude">
   <name>IdeaVim</name>
   <id>IdeaVIM</id>
-  <change-notes><![CDATA[
-    <h3>Fixes:</h3>
-    <ul>
-      <li><a href="https://youtrack.jetbrains.com/issue/VIM-2797">VIM-2797</a> Introduce variable to mute default argtextobj
-        mappings
-      </li>
-      <li><a href="https://youtrack.jetbrains.com/issue/VIM-758">VIM-758</a> Support d mappings</li>
-      <li><a href="https://youtrack.jetbrains.com/issue/VIM-2577">VIM-2577</a> Fix paste at the end of notebook cell</li>
-      <li><a href="https://youtrack.jetbrains.com/issue/VIM-2813">VIM-2813</a> Migrate update checker to
-        VimStandalonePluginUpdateChecker
-      </li>
-    </ul>
-
-    <h3>Merged PRs:</h3>
-    <ul>
-      <li><a href="https://github.com/JetBrains/ideavim/pull/558">558</a> by <a href="https://github.com/citizenmatt">Matt
-        Ellis</a>: Fix incorrect normalising for trailing inlay
-      </li>
-      <li><a href="https://github.com/JetBrains/ideavim/pull/554">554</a> by <a href="https://github.com/citizenmatt">Matt
-        Ellis</a>: Refactor &quot;last column&quot; calculations
-      </li>
-      <li><a href="https://github.com/JetBrains/ideavim/pull/553">553</a> by <a href="https://github.com/citizenmatt">Matt
-        Ellis</a>: Rearrange and rename some code in engine
-      </li>
-      <li><a href="https://github.com/JetBrains/ideavim/pull/560">560</a> by <a
-          href="https://github.com/Runinho">Runinho</a>: Fix(VIM-2577) paste not working at end of notebook cell
-      </li>
-      <li><a href="https://github.com/JetBrains/ideavim/pull/571">571</a> by <a href="https://github.com/adaext">Ada</a>:
-        Remove the redundant quotation mark at the end of &quot;packadd matchit&quot; command
-      </li>
-    </ul>
-    ]]>
-  </change-notes>
   <description><![CDATA[
       <p>Vim engine for JetBrains IDEs</p>
       <br/>
