@@ -18,29 +18,75 @@ import com.maddyhome.idea.vim.options.UnsignedNumberOption
 
 internal class IjVimOptionService : VimOptionServiceBase() {
 
-  private val customOptions = setOf(
-    ToggleOption(IjOptionConstants.closenotebooks, IjOptionConstants.closenotebooks, true),
-    StringOption(IjOptionConstants.ide, IjOptionConstants.ide, ApplicationNamesInfo.getInstance().fullProductNameWithEdition),
-    ToggleOption(IjOptionConstants.ideacopypreprocess, IjOptionConstants.ideacopypreprocess, false),
-    ToggleOption(IjOptionConstants.ideajoin, IjOptionConstants.ideajoin, false),
-    ToggleOption(IjOptionConstants.ideamarks, IjOptionConstants.ideamarks, true),
-    StringOption(IjOptionConstants.idearefactormode, IjOptionConstants.idearefactormode, "select", isList = false, IjOptionConstants.ideaRefactorModeValues),
-    StringOption(IjOptionConstants.ideastatusicon, IjOptionConstants.ideastatusicon, "enabled", isList = false, IjOptionConstants.ideaStatusIconValues),
-    StringOption(IjOptionConstants.ideavimsupport, IjOptionConstants.ideavimsupport, "dialog", isList = true, IjOptionConstants.ideavimsupportValues),
-    StringOption(IjOptionConstants.ideawrite, IjOptionConstants.ideawrite, "all", isList = false, IjOptionConstants.ideaWriteValues),
-    StringOption(IjOptionConstants.lookupkeys, IjOptionConstants.lookupkeys, "<Tab>,<Down>,<Up>,<Enter>,<Left>,<Right>,<C-Down>,<C-Up>,<PageUp>,<PageDown>,<C-J>,<C-Q>", isList = true),
-    ToggleOption(IjOptionConstants.oldundo, IjOptionConstants.oldundo, true),
-    ToggleOption(IjOptionConstants.trackactionids, "tai", false),
-    UnsignedNumberOption(IjOptionConstants.visualdelay, IjOptionConstants.visualdelay, 100),
+  init {
+    addOption(ToggleOption(IjOptionConstants.closenotebooks, IjOptionConstants.closenotebooks, true))
+    addOption(
+      StringOption(
+        IjOptionConstants.ide,
+        IjOptionConstants.ide,
+        ApplicationNamesInfo.getInstance().fullProductNameWithEdition
+      )
+    )
+    addOption(ToggleOption(IjOptionConstants.ideacopypreprocess, IjOptionConstants.ideacopypreprocess, false))
+    addOption(ToggleOption(IjOptionConstants.ideajoin, IjOptionConstants.ideajoin, false))
+    addOption(ToggleOption(IjOptionConstants.ideamarks, IjOptionConstants.ideamarks, true))
+    addOption(
+      StringOption(
+        IjOptionConstants.idearefactormode,
+        IjOptionConstants.idearefactormode,
+        "select",
+        isList = false,
+        IjOptionConstants.ideaRefactorModeValues
+      )
+    )
+    addOption(
+      StringOption(
+        IjOptionConstants.ideastatusicon,
+        IjOptionConstants.ideastatusicon,
+        "enabled",
+        isList = false,
+        IjOptionConstants.ideaStatusIconValues
+      )
+    )
+    addOption(
+      StringOption(
+        IjOptionConstants.ideavimsupport,
+        IjOptionConstants.ideavimsupport,
+        "dialog",
+        isList = true,
+        IjOptionConstants.ideavimsupportValues
+      )
+    )
+    addOption(
+      StringOption(
+        IjOptionConstants.ideawrite,
+        IjOptionConstants.ideawrite,
+        "all",
+        isList = false,
+        IjOptionConstants.ideaWriteValues
+      )
+    )
+    addOption(
+      StringOption(
+        IjOptionConstants.lookupkeys,
+        IjOptionConstants.lookupkeys,
+        "<Tab>,<Down>,<Up>,<Enter>,<Left>,<Right>,<C-Down>,<C-Up>,<PageUp>,<PageDown>,<C-J>,<C-Q>",
+        isList = true
+      )
+    )
+    addOption(ToggleOption(IjOptionConstants.oldundo, IjOptionConstants.oldundo, true))
+    addOption(ToggleOption(IjOptionConstants.trackactionids, "tai", false))
+    addOption(UnsignedNumberOption(IjOptionConstants.visualdelay, IjOptionConstants.visualdelay, 100))
 
     // This options overrides Vim's default value, so we keep it here
-    StringOption(OptionConstants.clipboard, OptionConstants.clipboardAlias, "ideaput,autoselect,exclude:cons\\|linux", isList = true),
-  )
-
-  init {
-    customOptions.forEach {
-      addOption(it)
-    }
+    addOption(
+      StringOption(
+        OptionConstants.clipboard,
+        OptionConstants.clipboardAlias,
+        "ideaput,autoselect,exclude:cons\\|linux",
+        isList = true
+      )
+    )
   }
 }
 
