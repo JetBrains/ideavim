@@ -39,7 +39,6 @@ import com.maddyhome.idea.vim.key.KeyMappingLayer
 import com.maddyhome.idea.vim.key.KeyStack
 import com.maddyhome.idea.vim.key.Node
 import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
 import java.awt.event.InputEvent
 import java.awt.event.KeyEvent
 import java.util.function.Consumer
@@ -321,8 +320,7 @@ class KeyHandler {
     // Every time a key is pressed and handled, the timer is stopped. E.g. if there is a mapping for "dweri", and the
     // user has typed "dw" wait for the timeout, and then replay "d" and "w" without any mapping (which will of course
     // delete a word)
-    if (injector.optionService
-      .isSet(OptionScope.LOCAL(editor), OptionConstants.timeout, OptionConstants.timeout)
+    if (injector.options(editor).isSet(OptionConstants.timeout)
     ) {
       LOG.trace("Timeout is set. Schedule a mapping timer")
       // XXX There is a strange issue that reports that mapping state is empty at the moment of the function call.

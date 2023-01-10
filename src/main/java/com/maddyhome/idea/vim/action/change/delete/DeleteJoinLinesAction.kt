@@ -15,7 +15,6 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
-import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.services.IjOptionConstants
 
 class DeleteJoinLinesAction : ChangeEditorActionHandler.ConditionalSingleExecution() {
@@ -26,7 +25,7 @@ class DeleteJoinLinesAction : ChangeEditorActionHandler.ConditionalSingleExecuti
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    return !injector.optionService.isSet(OptionScope.LOCAL(editor), IjOptionConstants.ideajoin)
+    return !injector.options(editor).isSet(IjOptionConstants.ideajoin)
   }
 
   override fun execute(

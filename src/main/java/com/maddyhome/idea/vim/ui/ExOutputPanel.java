@@ -21,7 +21,6 @@ import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.newapi.IjExecutionContext;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.options.OptionConstants;
-import com.maddyhome.idea.vim.options.OptionScope;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -34,6 +33,8 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
 
 /**
  * This panel displays text in a <code>more</code> like window.
@@ -270,7 +271,7 @@ public class ExOutputPanel extends JPanel {
     setBounds(bounds);
 
     myScrollPane.getVerticalScrollBar().setValue(0);
-    if (!VimPlugin.getOptionService().isSet(OptionScope.GLOBAL.INSTANCE, OptionConstants.more, OptionConstants.more)) {
+    if (!injector.globalOptions().isSet(OptionConstants.more)) {
       // FIX
       scrollOffset(100000);
     }

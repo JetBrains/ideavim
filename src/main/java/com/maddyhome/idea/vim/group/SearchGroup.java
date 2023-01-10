@@ -38,7 +38,6 @@ import com.maddyhome.idea.vim.newapi.IjVimCaret;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.options.OptionChangeListener;
 import com.maddyhome.idea.vim.options.OptionConstants;
-import com.maddyhome.idea.vim.options.OptionScope;
 import com.maddyhome.idea.vim.regexp.CharPointer;
 import com.maddyhome.idea.vim.regexp.CharacterClasses;
 import com.maddyhome.idea.vim.regexp.RegExp;
@@ -614,7 +613,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
     }
     else {
       // :h :&& - "Note that :s and :& don't keep the flags"
-      do_all = VimPlugin.getOptionService().isSet(new OptionScope.LOCAL(editor), OptionConstants.gdefault, OptionConstants.gdefault);
+      do_all = injector.options(editor).isSet(OptionConstants.gdefault);
       do_ask = false;
       do_error = true;
       do_ic = 0;
@@ -1095,7 +1094,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
   }
 
   private void resetShowSearchHighlight() {
-    showSearchHighlight = VimPlugin.getOptionService().isSet(OptionScope.GLOBAL.INSTANCE, OptionConstants.hlsearch, OptionConstants.hlsearch);
+    showSearchHighlight = injector.globalOptions().isSet(OptionConstants.hlsearch);
   }
 
   private void highlightSearchLines(@NotNull Editor editor, int startLine, int endLine) {
@@ -1201,7 +1200,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
    * @return              The offset to the occurrence or -1 if not found
    */
   private int findItOffset(@NotNull Editor editor, int startOffset, int count, Direction dir) {
-    boolean wrap =  VimPlugin.getOptionService().isSet(OptionScope.GLOBAL.INSTANCE, OptionConstants.wrapscan, OptionConstants.wrapscan);
+    boolean wrap = injector.globalOptions().isSet(OptionConstants.wrapscan);
     logger.debug("Perform search. Direction: " + dir + " wrap: " + wrap);
 
     int offset = 0;
@@ -1422,7 +1421,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
   private @NotNull String lastPatternOffset = "";  // /{pattern}/{offset}. Do not confuse with caret offset!
   private boolean lastIgnoreSmartCase;
   private @NotNull Direction lastDir = Direction.FORWARDS;
-  private boolean showSearchHighlight = VimPlugin.getOptionService().isSet(OptionScope.GLOBAL.INSTANCE, OptionConstants.hlsearch, OptionConstants.hlsearch);
+  private boolean showSearchHighlight = injector.globalOptions().isSet(OptionConstants.hlsearch);
 
   private boolean do_all = false; /* do multiple substitutions per line */
   private boolean do_ask = false; /* ask for confirmation */

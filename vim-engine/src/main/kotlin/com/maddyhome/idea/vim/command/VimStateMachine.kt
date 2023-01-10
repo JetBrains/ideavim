@@ -17,7 +17,6 @@ import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.helper.noneOfEnum
 import com.maddyhome.idea.vim.key.CommandPartNode
 import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
 import org.jetbrains.annotations.Contract
 import java.util.*
 import javax.swing.KeyStroke
@@ -284,7 +283,7 @@ class VimStateMachine(private val editor: VimEditor?) {
 
   private fun doShowMode() {
     val msg = StringBuilder()
-    if (injector.optionService.isSet(OptionScope.GLOBAL, OptionConstants.showmode)) {
+    if (injector.globalOptions().isSet(OptionConstants.showmode)) {
       msg.append(getStatusString())
     }
     if (isRecording) {
@@ -376,7 +375,7 @@ class VimStateMachine(private val editor: VimEditor?) {
      */
     @JvmStatic
     fun getInstance(editor: Any?): VimStateMachine {
-      return if (editor == null || injector.optionService.isSet(OptionScope.GLOBAL, OptionConstants.ideaglobalmode)) {
+      return if (editor == null || injector.globalOptions().isSet(OptionConstants.ideaglobalmode)) {
         globalState
       } else {
         injector.commandStateFor(editor)

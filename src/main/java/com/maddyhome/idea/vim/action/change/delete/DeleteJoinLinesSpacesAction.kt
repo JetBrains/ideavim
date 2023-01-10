@@ -14,7 +14,6 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
-import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.services.IjOptionConstants
 
 class DeleteJoinLinesSpacesAction : ChangeEditorActionHandler.SingleExecution() {
@@ -27,7 +26,7 @@ class DeleteJoinLinesSpacesAction : ChangeEditorActionHandler.SingleExecution() 
     operatorArguments: OperatorArguments,
   ): Boolean {
     if (editor.isOneLineMode()) return false
-    if (injector.optionService.isSet(OptionScope.LOCAL(editor), IjOptionConstants.ideajoin)) {
+    if (injector.options(editor).isSet(IjOptionConstants.ideajoin)) {
       return injector.changeGroup.joinViaIdeaByCount(editor, context, operatorArguments.count1)
     }
     injector.editorGroup.notifyIdeaJoin(editor)

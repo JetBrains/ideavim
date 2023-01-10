@@ -44,7 +44,7 @@ internal class OptionsState : ApplicationUsagesCollector() {
   }
 
   private infix fun BooleanEventField.withOption(name: String): EventPair<Boolean> {
-    return this.with(VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, name))
+    return this.with(injector.globalOptions().isSet(name))
   }
 
   private infix fun StringEventField.withOption(name: String): EventPair<String?> {

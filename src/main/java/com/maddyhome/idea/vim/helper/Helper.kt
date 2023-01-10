@@ -19,8 +19,8 @@ import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
 import java.util.stream.Collectors
 
 /**
@@ -117,6 +117,4 @@ fun vimEnabled(editor: Editor?): Boolean {
 
 fun vimDisabled(editor: Editor?): Boolean = !vimEnabled(editor)
 
-fun experimentalApi(): Boolean {
-  return VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.experimentalapi)
-}
+fun experimentalApi() = injector.globalOptions().isSet(OptionConstants.experimentalapi)

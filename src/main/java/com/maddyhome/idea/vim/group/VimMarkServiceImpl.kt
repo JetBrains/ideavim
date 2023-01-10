@@ -35,9 +35,7 @@ import com.maddyhome.idea.vim.mark.IntellijMark
 import com.maddyhome.idea.vim.mark.Mark
 import com.maddyhome.idea.vim.mark.VimMark.Companion.create
 import com.maddyhome.idea.vim.newapi.IjVimEditor
-import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.services.IjOptionConstants
-import com.maddyhome.idea.vim.vimscript.services.IjVimOptionService
 import org.jdom.Element
 import java.util.*
 
@@ -57,9 +55,7 @@ class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateComponent<Elemen
 
   private fun saveData(element: Element) {
     val globalMarksElement = Element("globalmarks")
-    if (!VimPlugin.getOptionService()
-      .isSet(OptionScope.GLOBAL, IjOptionConstants.ideamarks, IjOptionConstants.ideamarks)
-    ) {
+    if (!injector.globalOptions().isSet(IjOptionConstants.ideamarks)) {
       for (mark in globalMarks.values) {
         val markElem = Element("mark")
         markElem.setAttribute("key", mark.key.toString())
@@ -109,10 +105,7 @@ class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateComponent<Elemen
     // Read access is allowed from event dispatch thread or inside read-action only
     // (see com.intellij.openapi.application.Application.runReadAction())
     val marksElem = element.getChild("globalmarks")
-    if (marksElem != null &&
-      !VimPlugin.getOptionService()
-        .isSet(OptionScope.GLOBAL, IjOptionConstants.ideamarks, IjOptionConstants.ideamarks)
-    ) {
+    if (marksElem != null && !injector.globalOptions().isSet(IjOptionConstants.ideamarks)) {
       val markList = marksElem.getChildren("mark")
       for (aMarkList in markList) {
         val mark: Mark? = create(
@@ -175,9 +168,7 @@ class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateComponent<Elemen
   }
 
   override fun createGlobalMark(editor: VimEditor, ch: Char, offset: Int): Mark? {
-    if (!VimPlugin.getOptionService()
-      .isSet(OptionScope.GLOBAL, IjOptionConstants.ideamarks, IjOptionConstants.ideamarks)
-    ) {
+    if (!injector.globalOptions().isSet(IjOptionConstants.ideamarks)) {
       return super.createGlobalMark(editor, ch, offset)
     }
     val lp = editor.offsetToBufferPosition(offset)
@@ -251,9 +242,7 @@ class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateComponent<Elemen
   class VimBookmarksListener(private val myProject: Project) : BookmarksListener {
     override fun bookmarkAdded(group: BookmarkGroup, bookmark: Bookmark) {
       if (!VimPlugin.isEnabled()) return
-      if (!VimPlugin.getOptionService()
-        .isSet(OptionScope.GLOBAL, IjOptionConstants.ideamarks, IjOptionConstants.ideamarks)
-      ) {
+      if (!injector.globalOptions().isSet(IjOptionConstants.ideamarks)) {
         return
       }
       if (bookmark !is LineBookmark) return
@@ -266,9 +255,7 @@ class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateComponent<Elemen
 
     override fun bookmarkRemoved(group: BookmarkGroup, bookmark: Bookmark) {
       if (!VimPlugin.isEnabled()) return
-      if (!VimPlugin.getOptionService()
-        .isSet(OptionScope.GLOBAL, IjOptionConstants.ideamarks, IjOptionConstants.ideamarks)
-      ) {
+      if (!injector.globalOptions().isSet(IjOptionConstants.ideamarks)) {
         return
       }
       if (bookmark !is LineBookmark) return

@@ -10,7 +10,6 @@ package com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.bi
 
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 
 abstract class BinaryOperatorWithIgnoreCaseOption(
@@ -19,7 +18,7 @@ abstract class BinaryOperatorWithIgnoreCaseOption(
 ) : BinaryOperatorHandler() {
 
   private fun shouldIgnoreCase(): Boolean {
-    return injector.optionService.isSet(OptionScope.GLOBAL, OptionConstants.ignorecase)
+    return injector.globalOptions().isSet(OptionConstants.ignorecase)
   }
 
   override fun performOperation(left: VimDataType, right: VimDataType): VimDataType {
