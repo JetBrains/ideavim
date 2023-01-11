@@ -23,9 +23,15 @@ class BoundedStringListOptionTest : VimTestCase() {
   private val defaultValue = "Monday,Tuesday"
   private val optionService = injector.optionService
 
-  init {
+  override fun setUp() {
+    super.setUp()
     val option = StringOption(optionName, optionName, defaultValue, true, setOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))
     optionService.addOption(option)
+  }
+
+  override fun tearDown() {
+    super.tearDown()
+    optionService.removeOption(optionName)
   }
 
   private fun assertEquals(val1: String, val2: VimDataType) {

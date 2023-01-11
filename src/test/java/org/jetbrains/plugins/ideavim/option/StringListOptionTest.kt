@@ -19,8 +19,14 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 class StringListOptionTest : VimTestCase() {
   private val optionName = "myOpt"
 
-  init {
+  override fun setUp() {
+    super.setUp()
     injector.optionService.addOption(StringOption(optionName, optionName, "", true, null))
+  }
+
+  override fun tearDown() {
+    super.tearDown()
+    injector.optionService.removeOption(optionName)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
