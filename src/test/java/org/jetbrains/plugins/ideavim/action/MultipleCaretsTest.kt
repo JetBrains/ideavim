@@ -17,7 +17,6 @@ import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 /**
@@ -2645,7 +2644,6 @@ rtyfg${c}hzxc"""
 
   // VIM-2703
   fun `test multicaret with unnamed clipboard`() {
-    injector.optionService.appendValue(OptionScope.GLOBAL, OptionConstants.clipboard, OptionConstants.clipboard_unnamed)
     val before = """
             attach${c}Download(null)
             attach${c}Download(null)
@@ -2655,6 +2653,7 @@ rtyfg${c}hzxc"""
             
     """.trimIndent()
     configureByText(before)
+    enterCommand("set clipboard+=unnamed")
     typeText(injector.parser.parseKeys("diw"))
     val after = """
             $c(null)

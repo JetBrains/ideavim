@@ -11,10 +11,7 @@ package org.jetbrains.plugins.ideavim.propertybased
 import com.intellij.ide.IdeEventQueue
 import com.intellij.openapi.editor.Editor
 import com.intellij.testFramework.PlatformTestUtil
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
 import org.jetbrains.jetCheck.Generator
 import org.jetbrains.jetCheck.ImperativeCommand
 import org.jetbrains.jetCheck.PropertyChecker
@@ -45,7 +42,7 @@ class IncrementDecrementTest : VimPropertyTestBase() {
     setupChecks {
       this.neoVim.ignoredRegisters = setOf(':')
     }
-    VimPlugin.getOptionService().appendValue(OptionScope.GLOBAL, OptionConstants.nrformats, "octal", OptionConstants.nrformats)
+    enterCommand("set nrformats+=octal")
     PropertyChecker.checkScenarios {
       ImperativeCommand { env ->
         val number = env.generateValue(testNumberGenerator, "Generate %s number")

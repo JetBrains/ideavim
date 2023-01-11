@@ -40,7 +40,7 @@ class BoundedStringListOptionTest : VimTestCase() {
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test set valid list`() {
     injector.optionService.setOptionValue(GLOBAL, optionName, "Thursday,Friday")
-    assertEquals(VimString("Thursday,Friday"), injector.optionService.getOptionValue(GLOBAL, optionName))
+    assertEquals("Thursday,Friday", injector.optionService.getOptionValue(GLOBAL, optionName))
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
