@@ -42,7 +42,6 @@ class BoundedStringListOptionTest : VimTestCase() {
   fun `test set valid list`() {
     optionService.setOptionValue(GLOBAL, optionName, "Thursday,Friday")
     assertEquals(VimString("Thursday,Friday"), optionService.getOptionValue(GLOBAL, optionName))
-    optionService.resetDefault(GLOBAL, optionName)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
@@ -54,14 +53,12 @@ class BoundedStringListOptionTest : VimTestCase() {
       assertEquals("E474: Invalid argument: $optionName", e.message)
     }
     assertEquals(defaultValue, injector.optionService.getOptionValue(GLOBAL, optionName))
-    optionService.resetDefault(GLOBAL, optionName)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test append single item`() {
     optionService.appendValue(GLOBAL, optionName, "Wednesday")
     assertEquals("Monday,Tuesday,Wednesday", optionService.getOptionValue(GLOBAL, optionName))
-    optionService.resetDefault(GLOBAL, optionName)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
@@ -73,14 +70,12 @@ class BoundedStringListOptionTest : VimTestCase() {
       assertEquals("E474: Invalid argument: $optionName", e.message)
     }
     assertEquals("Monday,Tuesday", optionService.getOptionValue(GLOBAL, optionName))
-    optionService.resetDefault(GLOBAL, optionName)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test append list`() {
     optionService.appendValue(GLOBAL, optionName, "Wednesday,Thursday")
     assertEquals("Monday,Tuesday,Wednesday,Thursday", optionService.getOptionValue(GLOBAL, optionName))
-    optionService.resetDefault(GLOBAL, optionName)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
@@ -92,14 +87,12 @@ class BoundedStringListOptionTest : VimTestCase() {
       assertEquals("E474: Invalid argument: $optionName", e.message)
     }
     assertEquals("Monday,Tuesday", optionService.getOptionValue(GLOBAL, optionName))
-    optionService.resetDefault(GLOBAL, optionName)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test prepend item`() {
     optionService.prependValue(GLOBAL, optionName, "Wednesday")
     assertEquals("Wednesday,Monday,Tuesday", optionService.getOptionValue(GLOBAL, optionName))
-    optionService.resetDefault(GLOBAL, optionName)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
@@ -111,14 +104,12 @@ class BoundedStringListOptionTest : VimTestCase() {
       assertEquals("E474: Invalid argument: $optionName", e.message)
     }
     assertEquals("Monday,Tuesday", optionService.getOptionValue(GLOBAL, optionName))
-    optionService.resetDefault(GLOBAL, optionName)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test prepend list`() {
     optionService.prependValue(GLOBAL, optionName, "Wednesday,Thursday")
     assertEquals("Wednesday,Thursday,Monday,Tuesday", optionService.getOptionValue(GLOBAL, optionName))
-    optionService.resetDefault(GLOBAL, optionName)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
@@ -130,31 +121,26 @@ class BoundedStringListOptionTest : VimTestCase() {
       assertEquals("E474: Invalid argument: $optionName", e.message)
     }
     assertEquals("Monday,Tuesday", optionService.getOptionValue(GLOBAL, optionName))
-    optionService.resetDefault(GLOBAL, optionName)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test remove item`() {
     optionService.removeValue(GLOBAL, optionName, "Monday")
     assertEquals("Tuesday", optionService.getOptionValue(GLOBAL, optionName))
-    optionService.resetDefault(GLOBAL, optionName)
   }
 
   fun `test remove list`() {
     optionService.removeValue(GLOBAL, optionName, "Monday,Tuesday")
     assertEquals("", optionService.getOptionValue(GLOBAL, optionName))
-    optionService.resetDefault(GLOBAL, optionName)
   }
 
   fun `test remove list with wrong order`() {
     optionService.removeValue(GLOBAL, optionName, "Tuesday,Monday")
     assertEquals("Monday,Tuesday", optionService.getOptionValue(GLOBAL, optionName))
-    optionService.resetDefault(GLOBAL, optionName)
   }
 
   fun `test remove list with invalid value`() {
     optionService.removeValue(GLOBAL, optionName, "Monday,Blue")
     assertEquals("Monday,Tuesday", optionService.getOptionValue(GLOBAL, optionName))
-    optionService.resetDefault(GLOBAL, optionName)
   }
 }

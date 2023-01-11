@@ -36,7 +36,6 @@ class StringListOptionTest : VimTestCase() {
     injector.optionService.appendValue(OptionScope.GLOBAL, optionName, "123")
 
     assertEquals("123,456", (injector.optionService.getOptionValue(OptionScope.GLOBAL, optionName) as VimString).value)
-    injector.optionService.resetDefault(OptionScope.GLOBAL, optionName)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
@@ -46,6 +45,5 @@ class StringListOptionTest : VimTestCase() {
     injector.optionService.prependValue(OptionScope.GLOBAL, optionName, "123")
 
     assertEquals("456,123", (injector.optionService.getOptionValue(OptionScope.GLOBAL, optionName) as VimString).value)
-    injector.optionService.resetDefault(OptionScope.GLOBAL, optionName)
   }
 }
