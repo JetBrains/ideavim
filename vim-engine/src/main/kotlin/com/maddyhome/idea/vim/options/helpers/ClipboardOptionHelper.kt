@@ -17,10 +17,9 @@ object ClipboardOptionHelper {
     private set
 
   class IdeaputDisabler : AutoCloseable {
-    private val containedBefore: Boolean
+    private val containedBefore = injector.globalOptions().hasValue(OptionConstants.clipboard, OptionConstants.clipboard_ideaput)
 
     init {
-      containedBefore = injector.globalOptions().hasValue(OptionConstants.clipboard, OptionConstants.clipboard_ideaput)
       injector.optionService.removeValue(
         OptionScope.GLOBAL,
         OptionConstants.clipboard,
@@ -31,12 +30,13 @@ object ClipboardOptionHelper {
     }
 
     override fun close() {
-      if (containedBefore) injector.optionService.appendValue(
-        OptionScope.GLOBAL,
-        OptionConstants.clipboard,
-        OptionConstants.clipboard_ideaput,
-        OptionConstants.clipboard
-      )
+      if (containedBefore) {
+        injector.optionService.appendValue(
+          OptionScope.GLOBAL,
+          OptionConstants.clipboard,
+          OptionConstants.clipboard_ideaput
+        )
+      }
       ideaputDisabled = false
     }
   }
