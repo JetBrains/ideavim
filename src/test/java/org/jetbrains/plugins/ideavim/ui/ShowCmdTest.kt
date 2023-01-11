@@ -27,7 +27,7 @@ class ShowCmdTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SHOW_CMD)
   fun `test showcmd on by default`() {
-    assertTrue(VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.showcmd))
+    assertTrue(options().isSet(OptionConstants.showcmd))
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SHOW_CMD)

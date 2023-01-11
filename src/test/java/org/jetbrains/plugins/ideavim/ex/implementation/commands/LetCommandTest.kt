@@ -8,11 +8,9 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment
 import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -118,19 +116,19 @@ class LetCommandTest : VimTestCase() {
   fun `test let option`() {
     configureByText("\n")
     typeText(commandToKeys("set noincsearch"))
-    assertFalse(VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.incsearch))
+    assertFalse(options().isSet(OptionConstants.incsearch))
     typeText(commandToKeys("let &incsearch = 12"))
-    assertTrue(VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.incsearch))
+    assertTrue(options().isSet(OptionConstants.incsearch))
     typeText(commandToKeys("set noincsearch"))
-    assertFalse(VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.incsearch))
+    assertFalse(options().isSet(OptionConstants.incsearch))
   }
 
   fun `test let option2`() {
     configureByText("\n")
     typeText(commandToKeys("set incsearch"))
-    assertTrue(VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.incsearch))
+    assertTrue(options().isSet(OptionConstants.incsearch))
     typeText(commandToKeys("let &incsearch = 0"))
-    assertFalse(VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.incsearch))
+    assertFalse(options().isSet(OptionConstants.incsearch))
   }
 
   fun `test comment`() {

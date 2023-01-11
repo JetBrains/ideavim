@@ -29,7 +29,6 @@ import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.options.OptionScope
 import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.VimTestCase
 
@@ -268,21 +267,15 @@ class PlugMissingKeysTest : VimTestCase() {
   }
 
   fun `test packadd`() {
-    assertFalse(injector.optionService.isSet(OptionScope.GLOBAL, "matchit"))
-    executeLikeVimrc(
-      "packadd matchit",
-    )
-
-    assertTrue(injector.optionService.isSet(OptionScope.GLOBAL, "matchit"))
+    assertFalse(optionsNoEditor().isSet("matchit"))
+    executeLikeVimrc("packadd matchit")
+    assertTrue(optionsNoEditor().isSet("matchit"))
   }
 
   fun `test packadd ex`() {
-    assertFalse(injector.optionService.isSet(OptionScope.GLOBAL, "matchit"))
-    executeLikeVimrc(
-      "packadd! matchit",
-    )
-
-    assertTrue(injector.optionService.isSet(OptionScope.GLOBAL, "matchit"))
+    assertFalse(optionsNoEditor().isSet("matchit"))
+    executeLikeVimrc("packadd! matchit")
+    assertTrue(optionsNoEditor().isSet("matchit"))
   }
 
   private fun executeLikeVimrc(vararg text: String) {

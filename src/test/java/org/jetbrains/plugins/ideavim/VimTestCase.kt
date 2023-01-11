@@ -68,6 +68,8 @@ import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.parser.errors.IdeavimErrorListener
+import com.maddyhome.idea.vim.vimscript.services.OptionService
+import com.maddyhome.idea.vim.vimscript.services.OptionValueAccessor
 import org.assertj.core.api.Assertions
 import org.junit.Assert
 import java.awt.event.KeyEvent
@@ -323,6 +325,39 @@ abstract class VimTestCase : UsefulTestCase() {
       myFixture.editor.document.setText(text)
     }
   }
+
+
+  /**
+   * Gets an accessor for effective option value
+   *
+   * This will return an accessor to retrieve the effective value for the current editor - a global value for global
+   * options (e.g. 'clipboard') or a (potentially) local value for local to buffer, local to window or global-local
+   * options (e.g. 'iskeyword', 'relativenumber' or 'scrolloff' respectively). Tests are only expected to require
+   * effective values. To test other global/local values, use [OptionService].
+   */
+  protected fun options(): OptionValueAccessor {
+    assertNotNull(
+      "Editor is null! Move the call to after editor is initialised, or use optionsNoEditor",
+      myFixture.editor
+    )
+    return injector.optionService.getValueAccessor(myFixture.editor.vim)
+  }
+
+  /**
+   * Gets an option value accessor purely for global options, when there is no editor available
+   *
+   * Tests should normally use effective option values, via [options], but that requires a test that has created an
+   * editor. If the editor isn't available, this function will return an accessor that can be used to access global
+   * options only. It should not be used to access local options, as there is nothing for them to be local to.
+   *
+   * Note that this isn't handled automatically by [options] to avoid the scenario of trying to use effective values
+   * before the editor has been initialised.
+   */
+  protected fun optionsNoEditor(): OptionValueAccessor {
+    assertNull("Editor is not null! Use options() to access effective option values", myFixture.editor)
+    return injector.optionService.getValueAccessor(null)
+  }
+
 
   fun assertState(textAfter: String) {
     @Suppress("IdeaVimAssertState")
