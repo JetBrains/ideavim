@@ -2667,6 +2667,5 @@ rtyfg${c}hzxc"""
             
     """.trimIndent()
     assertState(after)
-    injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.clipboard)
   }
 }
