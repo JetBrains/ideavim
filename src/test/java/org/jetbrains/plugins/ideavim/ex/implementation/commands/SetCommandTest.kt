@@ -8,7 +8,6 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
@@ -30,9 +29,9 @@ class SetCommandTest : VimTestCase() {
   fun `test toggle option`() {
     configureByText("\n")
     typeText(commandToKeys("set rnu"))
-    assertTrue(VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.relativenumber))
+    assertTrue(options().isSet(OptionConstants.relativenumber))
     typeText(commandToKeys("set rnu!"))
-    assertFalse(VimPlugin.getOptionService().isSet(OptionScope.GLOBAL, OptionConstants.relativenumber))
+    assertFalse(options().isSet(OptionConstants.relativenumber))
   }
 
   // todo we have spaces in assertExOutput because of pad(20) in the com.maddyhome.idea.vim.vimscript.model.commands.SetCommandKt#showOptions method

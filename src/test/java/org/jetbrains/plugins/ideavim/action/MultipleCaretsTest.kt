@@ -1836,9 +1836,7 @@ $c five six se${c}ven eight
      
       """.trimIndent()
     )
-    if (VimPlugin.getOptionService()
-      .isSet(OptionScope.GLOBAL, OptionConstants.experimentalapi, OptionConstants.experimentalapi)
-    ) {
+    if (options().isSet(OptionConstants.experimentalapi)) {
       assertState("${c}\nabcde\n${c}\nabcde\n")
     } else {
       assertState("${c}\nabcde\n${c}\nabcde\n")
