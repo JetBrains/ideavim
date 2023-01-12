@@ -8,11 +8,9 @@
 
 package org.jetbrains.plugins.ideavim.ui
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.ui.ShowCmd
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -32,8 +30,7 @@ class ShowCmdTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SHOW_CMD)
   fun `test showcmd shows nothing if disabled`() {
-    VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.showcmd)
-
+    enterCommand("set noshowcmd")
     typeText(injector.parser.parseKeys("3"))
     assertEquals("", getShowCmdText())
   }

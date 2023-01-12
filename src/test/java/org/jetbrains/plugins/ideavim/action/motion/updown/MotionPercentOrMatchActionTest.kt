@@ -8,11 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.updown
 
-import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.VimStateMachine
-import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -23,7 +19,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 class MotionPercentOrMatchActionTest : VimTestCase() {
   fun `test percent match simple`() {
     typeTextInFile(
-      injector.parser.parseKeys("%"),
+      "%",
       "foo(b${c}ar)\n"
     )
     assertOffset(3)
@@ -31,36 +27,41 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
 
   fun `test percent match multi line`() {
     typeTextInFile(
-      injector.parser.parseKeys("%"),
-      """foo(bar,
-                     |baz,
-                     |${c}quux)
-               """.trimMargin()
+      "%",
+      """
+        |foo(bar,
+        |baz,
+        |${c}quux)
+      """.trimMargin()
     )
     assertOffset(3)
   }
 
   fun `test percent visual mode match multi line end of line`() {
     typeTextInFile(
-      injector.parser.parseKeys("v$%"),
-      """${c}foo(
-                  |bar)""".trimMargin()
+      "v$%",
+      """
+        |${c}foo(
+        |bar)
+      """.trimMargin()
     )
     assertOffset(8)
   }
 
   fun `test percent visual mode match from start multi line end of line`() {
     typeTextInFile(
-      injector.parser.parseKeys("v$%"),
-      """$c(
-                  |bar)""".trimMargin()
+      "v$%",
+      """
+        |$c(
+        |bar)
+      """.trimMargin()
     )
     assertOffset(5)
   }
 
   fun `test percent visual mode find brackets on the end of line`() {
     typeTextInFile(
-      injector.parser.parseKeys("v$%"),
+      "v$%",
       """foo(${c}bar)"""
     )
     assertOffset(3)
@@ -68,7 +69,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
 
   fun `test percent twice visual mode find brackets on the end of line`() {
     typeTextInFile(
-      injector.parser.parseKeys("v$%%"),
+      "v$%%",
       """foo(${c}bar)"""
     )
     assertOffset(7)
@@ -77,7 +78,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN, description = "Matchit plugin affects neovim")
   fun `test percent match parens in string`() {
     typeTextInFile(
-      injector.parser.parseKeys("%"),
+      "%",
       """foo(bar, "foo(bar", ${c}baz)
                """
     )
@@ -87,66 +88,66 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test percent match xml comment start`() {
     configureByXmlText("$c<!-- foo -->")
-    typeText(injector.parser.parseKeys("%"))
+    typeText("%")
     assertState("<!-- foo --$c>")
   }
 
   fun `test percent doesnt match partial xml comment`() {
     configureByXmlText("<!$c-- ")
-    typeText(injector.parser.parseKeys("%"))
+    typeText("%")
     assertState("<!$c-- ")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test percent match xml comment end`() {
     configureByXmlText("<!-- foo --$c>")
-    typeText(injector.parser.parseKeys("%"))
+    typeText("%")
     assertState("$c<!-- foo -->")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN, description = "Matchit plugin affects neovim")
   fun `test percent match java comment start`() {
     configureByJavaText("/$c* foo */")
-    typeText(injector.parser.parseKeys("%"))
+    typeText("%")
     assertState("/* foo *$c/")
   }
 
   fun `test percent doesnt match partial java comment`() {
     configureByJavaText("$c/* ")
-    typeText(injector.parser.parseKeys("%"))
+    typeText("%")
     assertState("$c/* ")
   }
 
   fun `test percent match java comment end`() {
     configureByJavaText("/* foo $c*/")
-    typeText(injector.parser.parseKeys("%"))
+    typeText("%")
     assertState("$c/* foo */")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test percent match java doc comment start`() {
     configureByJavaText("/*$c* foo */")
-    typeText(injector.parser.parseKeys("%"))
+    typeText("%")
     assertState("/** foo *$c/")
   }
 
   fun `test percent match java doc comment end`() {
     configureByJavaText("/** foo *$c/")
-    typeText(injector.parser.parseKeys("%"))
+    typeText("%")
     assertState("$c/** foo */")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN, description = "Matchit plugin affects neovim")
   fun `test percent doesnt match after comment start`() {
     configureByJavaText("/*$c foo */")
-    typeText(injector.parser.parseKeys("%"))
+    typeText("%")
     assertState("/*$c foo */")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.UNCLEAR)
   fun `test percent doesnt match before comment end`() {
     configureByJavaText("/* foo $c */")
-    typeText(injector.parser.parseKeys("%"))
+    typeText("%")
     assertState("/* foo $c */")
   }
 
@@ -238,37 +239,37 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
 
   fun `test count percent moves to line as percentage of file height`() {
     configureByLines(100, "    I found it in a legendary land")
-    typeText(injector.parser.parseKeys("25%"))
+    typeText("25%")
     assertPosition(24, 4)
   }
 
   fun `test count percent moves to line as percentage of file height 2`() {
     configureByLines(50, "    I found it in a legendary land")
-    typeText(injector.parser.parseKeys("25%"))
+    typeText("25%")
     assertPosition(12, 4)
   }
 
   fun `test count percent moves to line as percentage of file height 3`() {
     configureByLines(17, "    I found it in a legendary land")
-    typeText(injector.parser.parseKeys("25%"))
+    typeText("25%")
     assertPosition(4, 4)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test count percent keeps same column with nostartline`() {
-    VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.startofline)
     configureByLines(100, "    I found it in a legendary land")
+    enterCommand("set nostartofline")
     setPositionAndScroll(0, 0, 14)
-    typeText(injector.parser.parseKeys("25%"))
+    typeText("25%")
     assertPosition(24, 14)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test count percent handles shorter line with nostartline`() {
-    VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.startofline)
     configureByLines(100, "    I found it in a legendary land")
-    typeText(injector.parser.parseKeys("A" + " extra text" + "<Esc>"))
-    typeText(injector.parser.parseKeys("25%"))
+    enterCommand("set nostartofline")
+    typeText("A", " extra text", "<Esc>")
+    typeText("25%")
     assertPosition(24, 33)
   }
 }

@@ -11,11 +11,7 @@
 package org.jetbrains.plugins.ideavim.action.change.delete
 
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
-import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -24,7 +20,7 @@ class DeleteMotionActionTest : VimTestCase() {
 
   fun `test delete last line`() {
     typeTextInFile(
-      injector.parser.parseKeys("dd"),
+      "dd",
       """
         def xxx():
           expression one
@@ -41,7 +37,7 @@ class DeleteMotionActionTest : VimTestCase() {
 
   fun `test on line in middle`() {
     typeTextInFile(
-      injector.parser.parseKeys("dd"),
+      "dd",
       """
         def xxx():
           expression${c} one
@@ -58,7 +54,7 @@ class DeleteMotionActionTest : VimTestCase() {
 
   fun `test delete single line`() {
     typeTextInFile(
-      injector.parser.parseKeys("dd"),
+      "dd",
       """
         def x${c}xx():
       """.trimIndent()
@@ -68,15 +64,15 @@ class DeleteMotionActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test delete last line with nostartofline`() {
-    VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.startofline)
-    typeTextInFile(
-      injector.parser.parseKeys("dd"),
+    configureByText(
       """
         |def xxx():
         |  expression one
         |  expression${c} two
       """.trimMargin()
     )
+    enterCommand("set nostartofline")
+    typeText("dd")
     assertState(
       """
         |def xxx():
@@ -88,7 +84,7 @@ class DeleteMotionActionTest : VimTestCase() {
   @VimBehaviorDiffers(originalVimAfter = "  expression two\n")
   fun `test delete last line stored with new line`() {
     typeTextInFile(
-      injector.parser.parseKeys("dd"),
+      "dd",
       """
         def xxx():
           expression one
@@ -101,7 +97,7 @@ class DeleteMotionActionTest : VimTestCase() {
 
   fun `test delete line action multicaret`() {
     typeTextInFile(
-      injector.parser.parseKeys("d3d"),
+      "d3d",
       """
         abc${c}de
         abcde
@@ -118,7 +114,7 @@ class DeleteMotionActionTest : VimTestCase() {
 
   fun `test delete motion action multicaret`() {
     typeTextInFile(
-      injector.parser.parseKeys("dt)"),
+      "dt)",
       """|public class Foo {
          |  int foo(int a, int b) {
          |    boolean bar = (a < 0 && (b < 0 || a > 0)${c} || b != 0);
@@ -164,7 +160,7 @@ class DeleteMotionActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    typeTextInFile(injector.parser.parseKeys("dd"), file)
+    typeTextInFile("dd", file)
     assertState(newFile)
   }
 
@@ -183,8 +179,7 @@ class DeleteMotionActionTest : VimTestCase() {
             
             I found it in a legendary land
             ${c}all rocks and lavender and tufted grass,
-      """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      """.trimIndent()
     )
   }
 
@@ -207,8 +202,7 @@ class DeleteMotionActionTest : VimTestCase() {
             
             I found it in a legendary land
             all rocks and lavender and tufted grass,
-      """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      """.trimIndent()
     )
   }
 }

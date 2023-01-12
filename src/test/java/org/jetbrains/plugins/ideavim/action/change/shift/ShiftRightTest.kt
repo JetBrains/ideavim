@@ -8,10 +8,6 @@
 
 package org.jetbrains.plugins.ideavim.action.change.shift
 
-import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -27,7 +23,7 @@ class ShiftRightTest : VimTestCase() {
               where it was settled on some sodden sand
               hard by the torrent of a mountain pass.
     """.trimIndent()
-    typeTextInFile(injector.parser.parseKeys(">W"), file)
+    typeTextInFile(">W", file)
     assertState(
       """
             A Discovery
@@ -44,7 +40,7 @@ class ShiftRightTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.TABS)
   fun testShiftShiftsOneCharacterSingleLine() {
     configureByText("<caret>w\n")
-    typeText(injector.parser.parseKeys(">>"))
+    typeText(">>")
     assertState("    w\n")
   }
 
@@ -52,56 +48,56 @@ class ShiftRightTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.TABS)
   fun testShiftShiftsOneCharacterMultiLine() {
     configureByText("Hello\n<caret>w\nWorld")
-    typeText(injector.parser.parseKeys(">>"))
+    typeText(">>")
     assertState("Hello\n    w\nWorld")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.TABS)
   fun testShiftShiftsMultipleCharactersOneLine() {
     configureByText("<caret>Hello, world!\n")
-    typeText(injector.parser.parseKeys(">>"))
+    typeText(">>")
     assertState("    Hello, world!\n")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.TABS)
   fun testShiftShiftsMultipleCharactersMultipleLines() {
     configureByText("<caret>Hello,\nworld!\n")
-    typeText(injector.parser.parseKeys("j>>"))
+    typeText("j>>")
     assertState("Hello,\n    world!\n")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.TABS)
   fun testShiftsSingleLineSelection() {
     configureByText("<caret>Hello,\nworld!\n")
-    typeText(injector.parser.parseKeys("jv$>>"))
+    typeText("jv$>>")
     assertState("Hello,\n    world!\n")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.TABS)
   fun testShiftsMultiLineSelection() {
     configureByText("<caret>Hello,\nworld!\n")
-    typeText(injector.parser.parseKeys("vj$>>"))
+    typeText("vj$>>")
     assertState("    Hello,\n    world!\n")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.TABS)
   fun testShiftsMultiLineSelectionSkipsNewline() {
     configureByText("<caret>Hello,\nworld!\n\n")
-    typeText(injector.parser.parseKeys("vG$>>"))
+    typeText("vG$>>")
     assertState("    Hello,\n    world!\n\n")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.TABS)
   fun testShiftsMultiLineSelectionSkipsNewlineWhenCursorNotInFirstColumn() {
     configureByText("<caret>Hello,\n\nworld!\n")
-    typeText(injector.parser.parseKeys("lVG>"))
+    typeText("lVG>")
     assertState("    Hello,\n\n    world!\n")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.TABS)
   fun testShiftsMultiLineSelectionAddsTrailingWhitespaceIfTherePreviouslyWas() {
     configureByText("<caret>Hello,\n    \nworld!\n")
-    typeText(injector.parser.parseKeys("lVG>"))
+    typeText("lVG>")
     assertState("    Hello,\n        \n    world!\n")
   }
 
@@ -109,19 +105,19 @@ class ShiftRightTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.TABS)
   fun testShiftsMultiLineSelectionRepeat() {
     configureByText("<caret>a\nb\n")
-    typeText(injector.parser.parseKeys("Vj>."))
+    typeText("Vj>.")
     assertState("        a\n        b\n")
   }
 
   fun testShiftsDontCrashKeyHandler() {
     configureByText("\n")
-    typeText(injector.parser.parseKeys("<I<>" + "<I<>"))
+    typeText("<I<>" + "<I<>")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.TABS)
   fun testShiftsVisualBlockMode() {
     configureByText("foo<caret>foo\nfoobar\nfoobaz\n")
-    typeText(injector.parser.parseKeys("<C-V>jjl>"))
+    typeText("<C-V>jjl>")
     assertState("foo    foo\nfoo    bar\nfoo    baz\n")
   }
 
@@ -135,7 +131,7 @@ class ShiftRightTest : VimTestCase() {
       |       where it was settled on some sodden sand
       |       hard by the torrent of a mountain pass.
     """.trimMargin()
-    typeTextInFile(injector.parser.parseKeys(">>"), file)
+    typeTextInFile(">>", file)
     assertState(
       """
       |A Discovery
@@ -150,7 +146,6 @@ class ShiftRightTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.TABS)
   fun `test shift right does not move caret with nostartofline`() {
-    VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.startofline)
     val file = """
       |A Discovery
       |
@@ -159,7 +154,9 @@ class ShiftRightTest : VimTestCase() {
       |       where it was settled on some sodden sand
       |       hard by the torrent of a mountain pass.
     """.trimMargin()
-    typeTextInFile(injector.parser.parseKeys(">>"), file)
+    configureByText(file)
+    enterCommand("set nostartofline")
+    typeText(">>")
     assertState(
       """
       |A Discovery
@@ -182,7 +179,7 @@ class ShiftRightTest : VimTestCase() {
               where it was settled on some sodden sand
               hard by the torrent of a mountain pass.
     """.trimIndent()
-    typeTextInFile(injector.parser.parseKeys("i<C-T>"), file)
+    typeTextInFile("i<C-T>", file)
     assertState(
       """
             A Discovery
