@@ -10,8 +10,7 @@ package org.jetbrains.plugins.ideavim.action.motion.screen
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.getOffset
-import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.newapi.IjVimEditor
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
@@ -23,28 +22,28 @@ class MotionFirstScreenLineActionTest : VimTestCase() {
   fun `test move caret to first line of screen`() {
     configureByLines(50, "    I found it in a legendary land")
     setPositionAndScroll(0, 20)
-    typeText(injector.parser.parseKeys("H"))
+    typeText("H")
     assertPosition(0, 4)
   }
 
   fun `test move caret to first line of screen further down file`() {
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(40, 60)
-    typeText(injector.parser.parseKeys("H"))
+    typeText("H")
     assertPosition(40, 4)
   }
 
   fun `test move caret to count line from top of screen`() {
     configureByLines(50, "    I found it in a legendary land")
     setPositionAndScroll(0, 20)
-    typeText(injector.parser.parseKeys("10H"))
+    typeText("10H")
     assertPosition(9, 4)
   }
 
   fun `test move caret to count line from top of screen further down file`() {
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(40, 60)
-    typeText(injector.parser.parseKeys("10H"))
+    typeText("10H")
     assertPosition(49, 4)
   }
 
@@ -53,7 +52,7 @@ class MotionFirstScreenLineActionTest : VimTestCase() {
     assertEquals(35, screenHeight)
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(40, 60)
-    typeText(injector.parser.parseKeys("100H"))
+    typeText("100H")
     assertPosition(74, 4)
   }
 
@@ -61,7 +60,7 @@ class MotionFirstScreenLineActionTest : VimTestCase() {
     VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloff, VimInt(10))
     configureByLines(50, "    I found it in a legendary land")
     setPositionAndScroll(0, 20)
-    typeText(injector.parser.parseKeys("H"))
+    typeText("H")
     assertPosition(0, 4)
   }
 
@@ -70,7 +69,7 @@ class MotionFirstScreenLineActionTest : VimTestCase() {
     VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloff, VimInt(10))
     configureByLines(50, "    I found it in a legendary land")
     setPositionAndScroll(1, 20)
-    typeText(injector.parser.parseKeys("H"))
+    typeText("H")
     assertPosition(11, 4)
   }
 
@@ -79,7 +78,7 @@ class MotionFirstScreenLineActionTest : VimTestCase() {
     VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloff, VimInt(10))
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(20, 40)
-    typeText(injector.parser.parseKeys("H"))
+    typeText("H")
     assertPosition(30, 4)
   }
 
@@ -87,7 +86,7 @@ class MotionFirstScreenLineActionTest : VimTestCase() {
     VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloff, VimInt(10))
     configureByLines(50, "    I found it in a legendary land")
     setPositionAndScroll(0, 20)
-    typeText(injector.parser.parseKeys("5H"))
+    typeText("5H")
     assertPosition(4, 4)
   }
 
@@ -96,14 +95,14 @@ class MotionFirstScreenLineActionTest : VimTestCase() {
     VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloff, VimInt(10))
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(20, 40)
-    typeText(injector.parser.parseKeys("5H"))
+    typeText("5H")
     assertPosition(30, 4)
   }
 
   fun `test operator pending acts to first screen line`() {
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(20, 40, 10)
-    typeText(injector.parser.parseKeys("dH"))
+    typeText("dH")
     assertPosition(20, 4)
     assertLineCount(79)
   }
@@ -111,25 +110,25 @@ class MotionFirstScreenLineActionTest : VimTestCase() {
   fun `test operator pending acts on count line from top of screen`() {
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(20, 40, 10)
-    typeText(injector.parser.parseKeys("d5H"))
+    typeText("d5H")
     assertPosition(24, 4)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test operator pending acts to first screen line with nostartofline`() {
-    VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.startofline)
     configureByLines(100, "    I found it in a legendary land")
+    enterCommand("set nostartofline")
     setPositionAndScroll(20, 40, 10)
-    typeText(injector.parser.parseKeys("dH"))
+    typeText("dH")
     assertPosition(20, 10)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test operator pending acts on count line from top of screen with nostartofline`() {
-    VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.startofline)
     configureByLines(100, "    I found it in a legendary land")
+    enterCommand("set nostartofline")
     setPositionAndScroll(20, 40, 10)
-    typeText(injector.parser.parseKeys("d5H"))
+    typeText("d5H")
     assertPosition(24, 10)
   }
 
@@ -137,36 +136,36 @@ class MotionFirstScreenLineActionTest : VimTestCase() {
     VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloff, VimInt(10))
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(20, 40)
-    typeText(injector.parser.parseKeys("dH"))
+    typeText("dH")
     assertPosition(20, 4)
     assertVisibleArea(10, 44)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test move caret to same column with nostartofline`() {
-    VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.startofline)
     configureByLines(50, "    I found it in a legendary land")
+    enterCommand("set nostartofline")
     setPositionAndScroll(0, 20, 10)
-    typeText(injector.parser.parseKeys("H"))
+    typeText("H")
     assertPosition(0, 10)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test move caret to end of shorter line with nostartofline`() {
-    VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.startofline)
     configureByLines(70, "    I found it in a legendary land")
+    enterCommand("set nostartofline")
     setPositionAndScroll(10, 30, 10)
-    typeText(injector.parser.parseKeys("A" + " extra text" + "<Esc>"))
-    typeText(injector.parser.parseKeys("H"))
+    typeText("A", " extra text", "<Esc>")
+    typeText("H")
     assertPosition(10, 33)
   }
 
   fun `test move caret to first line of screen with inlays`() {
     // We're not scrolling, so inlays don't affect anything. Just place the caret on the first visible line
     configureByLines(50, "    I found it in a legendary land")
-    addBlockInlay(IjVimEditor(myFixture.editor).getOffset(5, 5), true, 10)
+    addBlockInlay(myFixture.editor.vim.getOffset(5, 5), true, 10)
     setPositionAndScroll(0, 20, 10)
-    typeText(injector.parser.parseKeys("H"))
+    typeText("H")
     assertPosition(0, 4)
   }
 
@@ -174,10 +173,10 @@ class MotionFirstScreenLineActionTest : VimTestCase() {
   fun `test keep caret on screen when count is greater than visible lines plus inlays`() {
     assertEquals(35, screenHeight)
     configureByLines(50, "    I found it in a legendary land")
-    addBlockInlay(IjVimEditor(myFixture.editor).getOffset(5, 5), true, 10)
+    addBlockInlay(myFixture.editor.vim.getOffset(5, 5), true, 10)
     setPositionAndScroll(0, 20, 10)
     // Should move to the 34th visible line. We have space for 35 lines, but we're using some of that for inlays
-    typeText(injector.parser.parseKeys("34H"))
+    typeText("34H")
     assertPosition(24, 4)
   }
 }

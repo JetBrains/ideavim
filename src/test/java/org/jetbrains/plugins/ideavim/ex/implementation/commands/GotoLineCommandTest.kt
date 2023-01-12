@@ -199,7 +199,6 @@ class GotoLineCommandTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test goto line moves to same column with nostartofline option`() {
-    VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.startofline)
     val before = """
       A Discovery
 
@@ -209,6 +208,7 @@ class GotoLineCommandTest : VimTestCase() {
       hard by the ${c}torrent of a mountain pass.
     """.trimIndent()
     configureByText(before)
+    enterCommand("set nostartofline")
     enterCommand("3")
     val after = """
       A Discovery
@@ -223,7 +223,6 @@ class GotoLineCommandTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test goto zero relative line with nostartofline option does not move caret`() {
-    VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, OptionConstants.startofline)
     val before = """
       A Discovery
 
@@ -233,6 +232,7 @@ class GotoLineCommandTest : VimTestCase() {
       hard by the torrent of a mountain pass.
     """.trimIndent()
     configureByText(before)
+    enterCommand("set nostartofline")
     enterCommand("+0")
     val after = """
       A Discovery

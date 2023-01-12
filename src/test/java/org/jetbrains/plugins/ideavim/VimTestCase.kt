@@ -158,6 +158,11 @@ abstract class VimTestCase : UsefulTestCase() {
     return typeText(keys)
   }
 
+  protected fun typeTextInFile(keys: String, fileContents: String): Editor {
+    configureByText(fileContents)
+    return typeText(keys)
+  }
+
   protected val screenWidth: Int
     get() = 80
   protected val screenHeight: Int
