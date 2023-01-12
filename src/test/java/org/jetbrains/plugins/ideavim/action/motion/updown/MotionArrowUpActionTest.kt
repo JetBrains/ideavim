@@ -10,12 +10,8 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.updown
 
-import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import org.jetbrains.plugins.ideavim.OptionValueType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -76,8 +72,7 @@ class MotionArrowUpActionTest : VimOptionTestCase(OptionConstants.keymodel) {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-      """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      """.trimIndent()
     )
   }
 
@@ -138,8 +133,7 @@ class MotionArrowUpActionTest : VimOptionTestCase(OptionConstants.keymodel) {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-      """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      """.trimIndent()
     )
   }
 
@@ -169,8 +163,7 @@ class MotionArrowUpActionTest : VimOptionTestCase(OptionConstants.keymodel) {
                 all rocks and${c} lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-      """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      """.trimIndent()
     )
   }
 
@@ -200,9 +193,7 @@ class MotionArrowUpActionTest : VimOptionTestCase(OptionConstants.keymodel) {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-      """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      """.trimIndent()
     )
   }
 
@@ -258,21 +249,19 @@ class MotionArrowUpActionTest : VimOptionTestCase(OptionConstants.keymodel) {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-      """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      """.trimIndent()
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionDefaultAll
   fun `test arrow up in insert mode scrolls caret at scrolloff`() {
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolljump, VimInt(10))
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloff, VimInt(5))
     configureByPages(5)
+    enterCommand("set scrolljump=10")
+    enterCommand("set scrolloff=5")
     setPositionAndScroll(19, 24)
 
-    typeText(injector.parser.parseKeys("i" + "<Up>"))
+    typeText("i", "<Up>")
 
     assertPosition(23, 0)
     assertVisibleArea(9, 43)

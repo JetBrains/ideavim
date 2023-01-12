@@ -10,12 +10,8 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.updown
 
-import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import org.jetbrains.plugins.ideavim.OptionValueType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -78,8 +74,7 @@ class MotionArrowDownActionTest : VimOptionTestCase(OptionConstants.keymodel, Op
                 all rocks and lavender and tufted grass,
                 wher${c}e it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-      """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      """.trimIndent()
     )
   }
 
@@ -142,8 +137,7 @@ class MotionArrowDownActionTest : VimOptionTestCase(OptionConstants.keymodel, Op
                 all rocks and lavender and tufted grass,
                 wher${c}e it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-      """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      """.trimIndent()
     )
   }
 
@@ -174,8 +168,7 @@ class MotionArrowDownActionTest : VimOptionTestCase(OptionConstants.keymodel, Op
                 all rocks and lavender and tufted grass,
                 wher${c}e it was settled on some sodden sand
                 hard by the t${c}orrent of a mountain pass.
-      """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      """.trimIndent()
     )
   }
 
@@ -221,8 +214,7 @@ class MotionArrowDownActionTest : VimOptionTestCase(OptionConstants.keymodel, Op
       """
             class MyClass {
             }${c}
-      """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      """.trimIndent()
     )
   }
 
@@ -241,8 +233,7 @@ class MotionArrowDownActionTest : VimOptionTestCase(OptionConstants.keymodel, Op
       """
             class MyClass {
             ${c}}
-      """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      """.trimIndent()
     )
   }
 
@@ -269,8 +260,7 @@ class MotionArrowDownActionTest : VimOptionTestCase(OptionConstants.keymodel, Op
             yet I am shor${c}t
             Lo and behold, I am the longest yet
             nope.
-      """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      """.trimIndent()
     )
   }
 
@@ -287,8 +277,7 @@ class MotionArrowDownActionTest : VimOptionTestCase(OptionConstants.keymodel, Op
             yet I am short
             Lo and behold, I am the longest ye${c}t
             nope.
-      """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      """.trimIndent()
     )
   }
 
@@ -305,8 +294,7 @@ class MotionArrowDownActionTest : VimOptionTestCase(OptionConstants.keymodel, Op
             yet I am short
             Lo and behold, I am the longest yet
             nope${c}.
-      """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      """.trimIndent()
     )
   }
 
@@ -323,8 +311,7 @@ class MotionArrowDownActionTest : VimOptionTestCase(OptionConstants.keymodel, Op
             yet I am short
             Lo and behold, I am the longest ye${c}t
             nope.
-      """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      """.trimIndent()
     )
   }
 
@@ -343,8 +330,7 @@ class MotionArrowDownActionTest : VimOptionTestCase(OptionConstants.keymodel, Op
             yet I am shor${c}t
             Lo and behold, I am the longest yet
             nope.
-      """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      """.trimIndent()
     )
   }
 
@@ -361,8 +347,7 @@ class MotionArrowDownActionTest : VimOptionTestCase(OptionConstants.keymodel, Op
             yet I am short
             Lo and behold, I am the longest ye${c}t
             nope.
-      """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      """.trimIndent()
     )
   }
 
@@ -379,8 +364,7 @@ class MotionArrowDownActionTest : VimOptionTestCase(OptionConstants.keymodel, Op
             yet I am short
             Lo and behold, I am the longest yet
             nope${c}.
-      """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      """.trimIndent()
     )
   }
 
@@ -397,8 +381,7 @@ class MotionArrowDownActionTest : VimOptionTestCase(OptionConstants.keymodel, Op
             yet I am short
             Lo and behold, I am the longest ye${c}t
             nope.
-      """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      """.trimIndent()
     )
   }
 
@@ -429,9 +412,7 @@ class MotionArrowDownActionTest : VimOptionTestCase(OptionConstants.keymodel, Op
                 ${c}all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-      """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      """.trimIndent()
     )
   }
 
@@ -462,21 +443,19 @@ class MotionArrowDownActionTest : VimOptionTestCase(OptionConstants.keymodel, Op
                 ${c}all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by ${c}the torrent of a mountain pass.
-      """.trimIndent(),
-      VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      """.trimIndent()
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionDefaultAll
   fun `test arrow down in insert mode scrolls caret at scrolloff`() {
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolljump, VimInt(10))
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloff, VimInt(5))
     configureByPages(5)
+    enterCommand("set scrolljump=10")
+    enterCommand("set scrolloff=5")
     setPositionAndScroll(0, 29)
 
-    typeText(injector.parser.parseKeys("i" + "<Down>"))
+    typeText("i", "<Down>")
     assertPosition(30, 0)
     assertVisibleArea(10, 44)
   }

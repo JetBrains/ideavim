@@ -10,8 +10,6 @@ package org.jetbrains.plugins.ideavim.action.scroll
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -59,8 +57,8 @@ class ScrollHalfPageUpActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun`test scroll upwards in first half of first page moves to first line with scrolloff`() {
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloff, VimInt(10))
     configureByPages(5)
+    enterCommand("set scrolloff=10")
     setPositionAndScroll(5, 15)
     typeText("<C-U>")
     assertPosition(0, 0)
@@ -86,8 +84,8 @@ class ScrollHalfPageUpActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun`test scroll upwards uses scroll option`() {
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scroll, VimInt(10))
     configureByPages(5)
+    enterCommand("set scroll=10")
     setPositionAndScroll(50, 53)
     typeText("<C-U>")
     assertPosition(43, 0)

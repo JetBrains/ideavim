@@ -9,9 +9,6 @@
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -246,16 +243,16 @@ class GotoLineCommandTest : VimTestCase() {
   }
 
   fun `test goto line with scrolloff`() {
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloff, VimInt(10))
     configureByLines(100, "    I found it in a legendary land")
+    enterCommand("set scrolloff=10")
     enterCommand("30")
     assertPosition(29, 4)
     assertTopLogicalLine(5)
   }
 
   fun `test goto relative line with scrolloff`() {
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloff, VimInt(10))
     configureByLines(100, "    I found it in a legendary land")
+    enterCommand("set scrolloff=10")
     enterCommand("+30")
     assertPosition(30, 4)
     assertTopLogicalLine(6)

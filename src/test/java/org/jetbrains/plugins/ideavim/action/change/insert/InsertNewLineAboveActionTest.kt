@@ -8,12 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.action.change.insert
 
-import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.VimStateMachine
-import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -85,7 +80,7 @@ class InsertNewLineAboveActionTest : VimTestCase() {
       |}
     """.trimMargin()
     configureByJavaText(before)
-    typeText(injector.parser.parseKeys("O"))
+    typeText("O")
     assertState(after)
   }
 
@@ -107,10 +102,10 @@ class InsertNewLineAboveActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test insert new line above at top of screen does not scroll top of screen`() {
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloff, VimInt(10))
     configureByLines(50, "I found it in a legendary land")
+    enterCommand("set scrolloff=10")
     setPositionAndScroll(5, 15)
-    typeText(injector.parser.parseKeys("O"))
+    typeText("O")
     assertPosition(15, 0)
     assertVisibleArea(5, 39)
   }

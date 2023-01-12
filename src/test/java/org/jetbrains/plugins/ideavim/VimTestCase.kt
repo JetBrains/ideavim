@@ -66,7 +66,6 @@ import com.maddyhome.idea.vim.options.helpers.GuiCursorOptionHelper
 import com.maddyhome.idea.vim.options.helpers.GuiCursorType
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.parser.errors.IdeavimErrorListener
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import com.maddyhome.idea.vim.vimscript.services.OptionValueAccessor
@@ -116,6 +115,9 @@ abstract class VimTestCase : UsefulTestCase() {
 
     VimPlugin.clearError()
   }
+
+  // Hook for setting up the editor
+  open fun setupEditor() {}
 
   private val testDataPath: String
     get() = PathManager.getHomePath() + "/community/plugins/ideavim/testData"
@@ -223,6 +225,7 @@ abstract class VimTestCase : UsefulTestCase() {
     myFixture.configureByText(fileType, content)
     NeovimTesting.setupEditor(myFixture.editor, this)
     setEditorVisibleSize(screenWidth, screenHeight)
+    setupEditor()
     return myFixture.editor
   }
 
@@ -231,6 +234,7 @@ abstract class VimTestCase : UsefulTestCase() {
     myFixture.configureByText(fileName, content)
     NeovimTesting.setupEditor(myFixture.editor, this)
     setEditorVisibleSize(screenWidth, screenHeight)
+    setupEditor()
     return myFixture.editor
   }
 
@@ -239,6 +243,7 @@ abstract class VimTestCase : UsefulTestCase() {
     myFixture.configureByText(fileName, "\n")
     NeovimTesting.setupEditor(myFixture.editor, this)
     setEditorVisibleSize(screenWidth, screenHeight)
+    setupEditor()
     return myFixture.editor
   }
 
@@ -277,13 +282,14 @@ abstract class VimTestCase : UsefulTestCase() {
     // recalculate the correct offsets, and that could move the top and/or caret line
     val scrolloff = options().getIntValue(OptionConstants.scrolloff)
     val scrolljump = options().getIntValue(OptionConstants.scrolljump)
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloff, VimInt(0))
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolljump, VimInt(1))
 
-    typeText(injector.parser.parseKeys("${scrollToLogicalLine + 1}z<CR>" + "${caretLogicalLine + 1}G" + "${caretLogicalColumn + 1}|"))
+    enterCommand("set scrolloff=0")
+    enterCommand("set scrolljump=1")
 
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloff, VimInt(scrolloff))
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolljump, VimInt(scrolljump))
+    typeText("${scrollToLogicalLine + 1}z<CR>", "${caretLogicalLine + 1}G", "${caretLogicalColumn + 1}|")
+
+    enterCommand("set scrolloff=$scrolloff")
+    enterCommand("set scrolljump=$scrolljump")
 
     // Make sure we're where we want to be. If there are block inlays, we can't easily assert the bottom line because
     // we'd have to duplicate the scrolling logic here. Asserting top when we know height is good enough
@@ -457,14 +463,14 @@ abstract class VimTestCase : UsefulTestCase() {
   fun assertNoMapping(from: String) {
     val keys = injector.parser.parseKeys(from)
     for (mode in MappingMode.ALL) {
-      assertNull(VimPlugin.getKey().getKeyMapping(mode).get(keys))
+      assertNull(VimPlugin.getKey().getKeyMapping(mode)[keys])
     }
   }
 
   fun assertNoMapping(from: String, modes: Set<MappingMode>) {
     val keys = injector.parser.parseKeys(from)
     for (mode in modes) {
-      assertNull(VimPlugin.getKey().getKeyMapping(mode).get(keys))
+      assertNull(VimPlugin.getKey().getKeyMapping(mode)[keys])
     }
   }
 
@@ -472,7 +478,7 @@ abstract class VimTestCase : UsefulTestCase() {
     val keys = injector.parser.parseKeys(from)
     val toKeys = injector.parser.parseKeys(to)
     for (mode in modes) {
-      val info = VimPlugin.getKey().getKeyMapping(mode).get(keys)
+      val info = VimPlugin.getKey().getKeyMapping(mode)[keys]
       kotlin.test.assertNotNull(info)
       if (info is ToKeysMappingInfo) {
         assertEquals(toKeys, info.toKeys)
@@ -584,7 +590,7 @@ abstract class VimTestCase : UsefulTestCase() {
   }
 
   protected fun performTest(keys: String, after: String, modeAfter: VimStateMachine.Mode, subModeAfter: SubMode) {
-    typeText(injector.parser.parseKeys(keys))
+    typeText(keys)
     PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
     assertState(after)
     assertState(modeAfter, subModeAfter)
