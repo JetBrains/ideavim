@@ -82,7 +82,7 @@ class ScrollHalfPageUpActionTest : VimTestCase() {
     configureByPages(5)
     setPositionAndScroll(50, 53)
     typeText(injector.parser.parseKeys("10<C-U>"))
-    assertEquals((VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, OptionConstants.scroll) as VimInt).value, 10)
+    assertEquals(10, options().getIntValue(OptionConstants.scroll))
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)

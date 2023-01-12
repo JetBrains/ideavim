@@ -11,7 +11,6 @@ package org.jetbrains.plugins.ideavim.option
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.options.StringOption
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -35,7 +34,7 @@ class StringListOptionTest : VimTestCase() {
     injector.optionService.appendValue(OptionScope.GLOBAL, optionName, "456")
     injector.optionService.appendValue(OptionScope.GLOBAL, optionName, "123")
 
-    assertEquals("123,456", (injector.optionService.getOptionValue(OptionScope.GLOBAL, optionName) as VimString).value)
+    assertEquals("123,456", optionsNoEditor().getStringValue(optionName))
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
@@ -44,6 +43,6 @@ class StringListOptionTest : VimTestCase() {
     injector.optionService.appendValue(OptionScope.GLOBAL, optionName, "123")
     injector.optionService.prependValue(OptionScope.GLOBAL, optionName, "123")
 
-    assertEquals("456,123", (injector.optionService.getOptionValue(OptionScope.GLOBAL, optionName) as VimString).value)
+    assertEquals("456,123", optionsNoEditor().getStringValue(optionName))
   }
 }

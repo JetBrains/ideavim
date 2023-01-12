@@ -20,9 +20,8 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 
 class GuiCursorOptionTest : VimTestCase() {
 
-  private fun getOptionValue(): String {
-    return (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, OptionConstants.guicursor) as VimString).value
-  }
+  private fun getGuiCursorEntries() =
+    optionsNoEditor().getStringListValues(OptionConstants.guicursor).map { GuiCursorOptionHelper.convertToken(it) }
 
   private fun setValue(value: String) {
     return (VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.guicursor, VimString(value)))
@@ -35,7 +34,7 @@ class GuiCursorOptionTest : VimTestCase() {
 
   @Suppress("SpellCheckingInspection")
   fun `test parses default values`() {
-    val values = getOptionValue().split(",").map { GuiCursorOptionHelper.convertToken(it) }
+    val values = getGuiCursorEntries()
     assertEquals(6, values.size)
 
     assertEquals(enumSetOf(GuiCursorMode.NORMAL, GuiCursorMode.VISUAL, GuiCursorMode.CMD_LINE), values[0].modes)
@@ -109,7 +108,7 @@ class GuiCursorOptionTest : VimTestCase() {
 
   fun `test simple string means default caret and highlight group`() {
     setValue("n:MyHighlightGroup")
-    val values = getOptionValue().split(",").map { GuiCursorOptionHelper.convertToken(it) }
+    val values = getGuiCursorEntries()
     assertEquals(1, values.size)
     assertEquals(enumSetOf(GuiCursorMode.NORMAL), values[0].modes)
     // null from convertToken and we'll give it a default value in getAttributes

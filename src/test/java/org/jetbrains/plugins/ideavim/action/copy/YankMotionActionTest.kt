@@ -52,7 +52,7 @@ class YankMotionActionTest : VimTestCase() {
 
   @Suppress("DANGEROUS_CHARACTERS")
   fun `test unnamed saved to " register`() {
-    val clipboardValue = (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, OptionConstants.clipboard) as VimString).value
+    val clipboardValue = optionsNoEditor().getStringValue(OptionConstants.clipboard)
     VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.clipboard, VimString("unnamed"))
 
     try {
