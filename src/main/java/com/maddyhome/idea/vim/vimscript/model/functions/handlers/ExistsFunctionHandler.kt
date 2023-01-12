@@ -37,7 +37,7 @@ object ExistsFunctionHandler : FunctionHandler() {
     return if (expression is SimpleExpression && expression.data is VimString) {
       val parsedValue = VimscriptParser.parseExpression((expression.data as VimString).value)
       if (parsedValue is OptionExpression) {
-        if (injector.optionService.getOptions().any { it == parsedValue.optionName } || injector.optionService.getAbbrevs().any { it == parsedValue.optionName }) {
+        if (injector.optionService.getOptionByNameOrAbbr(parsedValue.optionName) != null) {
           VimInt.ONE
         } else {
           VimInt.ZERO
