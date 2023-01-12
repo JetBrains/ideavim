@@ -41,24 +41,21 @@ class DeleteJoinVisualLinesAction : VisualOperatorActionHandler.SingleExecution(
       injector.changeGroup.joinViaIdeaBySelections(editor, context, caretsAndSelections)
       return true
     }
-    val res = arrayOf(true)
-    editor.forEachNativeCaret(
-      {
-        caret: VimCaret ->
-        if (!caret.isValid) return@forEachNativeCaret
-        val range = caretsAndSelections[caret] ?: return@forEachNativeCaret
-        if (!injector.changeGroup.deleteJoinRange(
-            editor,
-            caret,
-            range.toVimTextRange(true).normalize(),
-            false,
-            operatorArguments
-          )
-        ) {
-          res[0] = false
-        }
-      }, true
-    )
-    return res[0]
+    var res = true
+    editor.nativeCarets().sortedByDescending { it.offset.point }.forEach { caret ->
+      if (!caret.isValid) return@forEach
+      val range = caretsAndSelections[caret] ?: return@forEach
+      if (!injector.changeGroup.deleteJoinRange(
+          editor,
+          caret,
+          range.toVimTextRange(true).normalize(),
+          false,
+          operatorArguments
+        )
+      ) {
+        res = false
+      }
+    }
+    return res
   }
 }

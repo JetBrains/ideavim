@@ -8,7 +8,6 @@
 package com.maddyhome.idea.vim.action.change.delete
 
 import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
@@ -32,13 +31,12 @@ class DeleteJoinLinesSpacesAction : ChangeEditorActionHandler.SingleExecution() 
       return injector.changeGroup.joinViaIdeaByCount(editor, context, operatorArguments.count1)
     }
     injector.editorGroup.notifyIdeaJoin(editor)
-    val res = arrayOf(true)
-    editor.forEachNativeCaret(
-      { caret: VimCaret ->
-        if (!injector.changeGroup.deleteJoinLines(editor, caret, operatorArguments.count1, true, operatorArguments)) res[0] = false
-      },
-      true
-    )
-    return res[0]
+    var res = true
+    editor.nativeCarets().sortedByDescending { it.offset.point }.forEach { caret ->
+      if (!injector.changeGroup.deleteJoinLines(editor, caret, operatorArguments.count1, true, operatorArguments)) {
+        res = false
+      }
+    }
+    return res
   }
 }
