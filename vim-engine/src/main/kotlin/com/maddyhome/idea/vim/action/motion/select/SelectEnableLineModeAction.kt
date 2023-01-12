@@ -33,7 +33,7 @@ class SelectEnableLineModeAction : VimActionHandler.SingleExecution() {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    editor.forEachNativeCaret { caret ->
+    editor.nativeCarets().forEach { caret ->
       val lineEnd = editor.getLineEndForOffset(caret.offset.point)
       val lineStart = editor.getLineStartForOffset(caret.offset.point)
       caret.vimSetSystemSelectionSilently(lineStart, lineEnd)

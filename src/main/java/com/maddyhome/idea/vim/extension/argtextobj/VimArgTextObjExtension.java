@@ -24,7 +24,6 @@ import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
 import com.maddyhome.idea.vim.newapi.IjVimCaret;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
-import kotlin.Unit;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -252,7 +251,7 @@ public class VimArgTextObjExtension implements VimExtension {
       final ArgumentTextObjectHandler textObjectHandler = new ArgumentTextObjectHandler(isInner);
       //noinspection DuplicatedCode
       if (!vimStateMachine.isOperatorPending()) {
-        editor.forEachNativeCaret((VimCaret caret) -> {
+        editor.nativeCarets().forEach((VimCaret caret) -> {
           final TextRange range = textObjectHandler.getRange(editor, caret, context, count, 0, null);
           if (range != null) {
             try (VimListenerSuppressor.Locked ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
@@ -263,7 +262,6 @@ public class VimArgTextObjExtension implements VimExtension {
               }
             }
           }
-          return Unit.INSTANCE;
         });
       } else {
         vimStateMachine.getCommandBuilder().completeCommandPart(new Argument(new Command(count,

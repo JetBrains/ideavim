@@ -159,10 +159,6 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
     }
   }
 
-  override fun forEachNativeCaret(action: (VimCaret) -> Unit) {
-    forEachNativeCaret(action, false)
-  }
-
   override fun forEachNativeCaret(action: (VimCaret) -> Unit, reverse: Boolean) {
     editor.caretModel.runForEachCaret({ action(IjVimCaret(it)) }, reverse)
   }

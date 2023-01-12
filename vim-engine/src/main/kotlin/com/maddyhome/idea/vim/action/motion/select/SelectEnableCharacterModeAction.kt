@@ -32,7 +32,7 @@ class SelectEnableCharacterModeAction : VimActionHandler.SingleExecution() {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    editor.forEachNativeCaret { caret ->
+    editor.nativeCarets().sortedByDescending { it.offset.point }.forEach { caret ->
       val lineEnd = editor.getLineEndForOffset(caret.offset.point)
       caret.run {
         vimSetSystemSelectionSilently(offset.point, (offset.point + 1).coerceAtMost(lineEnd))
