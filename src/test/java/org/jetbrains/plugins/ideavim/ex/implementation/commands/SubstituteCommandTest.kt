@@ -8,10 +8,8 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
 import org.jetbrains.plugins.ideavim.OptionValueType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -29,13 +27,15 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test one letter`() {
     doTest(
-      "s/a/b/",
-      """a${c}baba
-                 |ab
-               """.trimMargin(),
-      """bbaba
-                 |ab
-               """.trimMargin()
+      exCommand("s/a/b/"),
+      """
+        |a${c}baba
+        |ab
+      """.trimMargin(),
+      """
+        |bbaba
+        |ab
+      """.trimMargin()
     )
   }
 
@@ -43,13 +43,15 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test one letter multi per line`() {
     doTest(
-      "s/a/b/g",
-      """a${c}baba
-                 |ab
-               """.trimMargin(),
-      """bbbbb
-                 |ab
-               """.trimMargin()
+      exCommand("s/a/b/g"),
+      """
+        |a${c}baba
+        |ab
+      """.trimMargin(),
+      """
+        |bbbbb
+        |ab
+      """.trimMargin()
     )
   }
 
@@ -57,13 +59,15 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test one letter multi per line whole file`() {
     doTest(
-      "%s/a/b/g",
-      """a${c}baba
-                 |ab
-               """.trimMargin(),
-      """bbbbb
-                 |bb
-               """.trimMargin()
+      exCommand("%s/a/b/g"),
+      """
+        |a${c}baba
+        |ab
+      """.trimMargin(),
+      """
+        |bbbbb
+        |bb
+      """.trimMargin()
     )
   }
 
@@ -72,13 +76,15 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test eoLto quote`() {
     doTest(
-      "s/$/'/g",
-      """${c}one
-                  |two
-               """.trimMargin(),
-      """one'
-                  |two
-               """.trimMargin()
+      exCommand("s/$/'/g"),
+      """
+        |${c}one
+        |two
+      """.trimMargin(),
+      """
+        |one'
+        |two
+      """.trimMargin()
     )
   }
 
@@ -86,13 +92,15 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test soLto quote`() {
     doTest(
-      "s/^/'/g",
-      """${c}one
-                  |two
-               """.trimMargin(),
-      """'one
-                  |two
-               """.trimMargin()
+      exCommand("s/^/'/g"),
+      """
+        |${c}one
+        |two
+      """.trimMargin(),
+      """
+        |'one
+        |two
+      """.trimMargin()
     )
   }
 
@@ -100,7 +108,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test dot to nul`() {
     doTest(
-      "s/\\./\\n/g",
+      exCommand("s/\\./\\n/g"),
       "${c}one.two.three\n",
       "one\u0000two\u0000three\n"
     )
@@ -111,7 +119,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test groups`() {
     doTest(
-      "s/\\(a\\|b\\)/z\\1/g",
+      exCommand("s/\\(a\\|b\\)/z\\1/g"),
       "${c}abcdefg",
       "zazbcdefg"
     )
@@ -121,7 +129,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test to nl`() {
     doTest(
-      "s/\\./\\r/g",
+      exCommand("s/\\./\\r/g"),
       "${c}one.two.three\n",
       "one\ntwo\nthree\n"
     )
@@ -132,7 +140,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test dot to nlDot`() {
     doTest(
-      "s/\\./\\r\\./g",
+      exCommand("s/\\./\\r\\./g"),
       "${c}one.two.three\n",
       "one\n.two\n.three\n"
     )
@@ -143,7 +151,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test end of line to nl`() {
     doTest(
-      "%s/$/\\r/g",
+      exCommand("%s/$/\\r/g"),
       """
         ${c}one
         two
@@ -168,7 +176,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test start of line to nl`() {
     doTest(
-      "%s/^/\\r/g",
+      exCommand("%s/^/\\r/g"),
       """
         ${c}one
         two
@@ -193,7 +201,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test ignorecase option`() {
     doTest(
-      "%s/foo/bar/g",
+      exCommand("%s/foo/bar/g"),
       "foo Foo foo\nFoo FOO foo",
       "bar bar bar\nbar bar bar"
     )
@@ -202,76 +210,83 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test smartcase option`() {
-    VimPlugin.getOptionService().setOption(OptionScope.GLOBAL, OptionConstants.smartcase)
-
     // smartcase does nothing if ignorecase is not set
     doTest(
-      "%s/foo/bar/g",
+      exCommand("%s/foo/bar/g"),
       "foo Foo foo\nFoo FOO foo",
       "bar Foo bar\nFoo FOO bar"
-    )
+    ) {
+      enterCommand("set smartcase")
+    }
     doTest(
-      "%s/Foo/bar/g",
+      exCommand("%s/Foo/bar/g"),
       "foo Foo foo\nFoo FOO foo",
       "foo bar foo\nbar FOO foo"
-    )
+    ) {
+      enterCommand("set smartcase")
+    }
 
-    VimPlugin.getOptionService().setOption(OptionScope.GLOBAL, OptionConstants.ignorecase)
     doTest(
-      "%s/foo/bar/g",
+      exCommand("%s/foo/bar/g"),
       "foo Foo foo\nFoo FOO foo",
       "bar bar bar\nbar bar bar"
-    )
+    ) {
+      enterCommand("set ignorecase")
+    }
     doTest(
-      "%s/Foo/bar/g",
+      exCommand("%s/Foo/bar/g"),
       "foo Foo foo\nFoo FOO foo",
       "foo bar foo\nbar FOO foo"
-    )
+    ) {
+      enterCommand("set ignorecase")
+    }
   }
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test force ignore case flag`() {
     doTest(
-      "%s/foo/bar/gi",
+      exCommand("%s/foo/bar/gi"),
       "foo Foo foo\nFoo FOO foo",
       "bar bar bar\nbar bar bar"
     )
 
-    VimPlugin.getOptionService().setOption(OptionScope.GLOBAL, OptionConstants.ignorecase)
     doTest(
-      "%s/foo/bar/gi",
+      exCommand("%s/foo/bar/gi"),
       "foo Foo foo\nFoo FOO foo",
       "bar bar bar\nbar bar bar"
-    )
+    ) {
+      enterCommand("set ignorecase")
+    }
 
-    VimPlugin.getOptionService().setOption(OptionScope.GLOBAL, OptionConstants.smartcase)
     doTest(
-      "%s/foo/bar/gi",
+      exCommand("%s/foo/bar/gi"),
       "foo Foo foo\nFoo FOO foo",
       "bar bar bar\nbar bar bar"
-    )
+    ) {
+      enterCommand("set smartcase")
+    }
   }
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test force match case flag`() {
     doTest(
-      "%s/foo/bar/gI",
+      exCommand("%s/foo/bar/gI"),
       "foo Foo foo\nFoo FOO foo",
       "bar Foo bar\nFoo FOO bar"
     )
 
-    VimPlugin.getOptionService().setOption(OptionScope.GLOBAL, OptionConstants.ignorecase)
+    enterCommand("set ignorecase")
     doTest(
-      "%s/foo/bar/gI",
+      exCommand("%s/foo/bar/gI"),
       "foo Foo foo\nFoo FOO foo",
       "bar Foo bar\nFoo FOO bar"
     )
 
-    VimPlugin.getOptionService().setOption(OptionScope.GLOBAL, OptionConstants.smartcase)
+    enterCommand("set smartcase")
     doTest(
-      "%s/Foo/bar/gI",
+      exCommand("%s/Foo/bar/gI"),
       "foo Foo foo\nFoo FOO foo",
       "foo bar foo\nbar FOO foo"
     )
@@ -282,7 +297,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test visual substitute doesnt change visual marks`() {
     configureByText("foo\nbar\nbaz\n")
-    typeText(injector.parser.parseKeys("V" + "j" + ":'<,'>s/foo/fuu/<Enter>" + "gv" + "~"))
+    typeText("V", "j", ":'<,'>s/foo/fuu/<Enter>", "gv", "~")
     assertState("FUU\nBAR\nbaz\n")
   }
 
@@ -290,7 +305,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test offset range`() {
     doTest(
-      ".,+2s/a/b/g",
+      exCommand(".,+2s/a/b/g"),
       "aaa\naa${c}a\naaa\naaa\naaa\n",
       "aaa\nbbb\nbbb\nbbb\naaa\n"
     )
@@ -308,7 +323,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
     """.trimMargin()
     configureByJavaText(before)
 
-    typeText(commandToKeys("s/String/Integer"))
+    enterCommand("s/String/Integer")
 
     val after = """public class C {
       |  ${c}Integer a;
@@ -332,7 +347,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
     """.trimMargin()
     configureByJavaText(before)
 
-    typeText(commandToKeys("s/String/Integer/g"))
+    enterCommand("s/String/Integer/g")
 
     val after = """public class C {
       |  ${c}Integer a; Integer e;
@@ -347,7 +362,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test with tabs`() {
-    doTest("s/foo/bar", "\tfoo", "\tbar")
+    doTest(exCommand("s/foo/bar"), "\tfoo", "\tbar")
   }
 
   @VimOptionDefaultAll
@@ -446,7 +461,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
         |hard by the torrent of a mountain pass.""".trimMargin()
     )
 
-    typeText(injector.parser.parseKeys(exCommand("%s/and/or/gc") + "n"))
+    typeText(exCommand("%s/and/or/gc"), "n")
     assertPosition(1, 10)
   }
 
@@ -778,7 +793,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test inline comment is a part of substitute command`() {
     doTest(
-      "s/'/\"/g",
+      exCommand("s/'/\"/g"),
       "'quoted string'",
       "\"quoted string\""
     )
@@ -789,7 +804,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test bar in subsitute command`() {
     doTest(
-      "%s/|/\\&",
+      exCommand("%s/|/\\&"),
       "true | true = true",
       "true & true = true"
     )
@@ -797,15 +812,11 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
 
   // Incsearch highlights handled by SearchGroupTest
 
-  private fun doTest(command: String, before: String, after: String) {
-    doTest(listOf(exCommand(command)), before, after)
-  }
-
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test underscore as delimiter`() {
     doTest(
-      "s_1_2",
+      exCommand("s_1_2"),
       "1 + 2 = 4",
       "2 + 2 = 4"
     )
@@ -821,7 +832,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
       val s3 = "Mark"
       """.trimIndent()
     )
-    typeText(commandToKeys("%s/\\d/\\=21*2"))
+    enterCommand("%s/\\d/\\=21*2")
     assertState(
       """
       val s42 = "oh"
@@ -841,7 +852,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
       0. Coke (2 l.)
       """.trimIndent()
     )
-    typeText(commandToKeys("%s/\\d\\+/\\=line('.')"))
+    enterCommand("%s/\\d\\+/\\=line('.')")
     assertState(
       """
       1. Milk (1 l.)
@@ -860,7 +871,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
       ${c}val ch1 = tree.getChild(0)
       """.trimIndent()
     )
-    typeText(commandToKeys("s/\\d\\+/\\=submatch(0)+1/g"))
+    enterCommand("s/\\d\\+/\\=submatch(0)+1/g")
     assertState(
       """
       val ch1 = tree.getChild(0)
@@ -887,7 +898,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
       endfunction
       """.trimIndent()
     )
-    typeText(commandToKeys("2,4call IncrementWholeLine()"))
+    enterCommand("2,4call IncrementWholeLine()")
     assertState(
       """
       val ch1 = tree.getChild(0)
@@ -911,7 +922,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
       val str2 = "second"
       """.trimIndent()
     )
-    typeText(commandToKeys("%s/\\d\\+/\\=printf('0x%04x', submatch(0))"))
+    enterCommand("%s/\\d\\+/\\=printf('0x%04x', submatch(0))")
     assertPluginError(true)
     assertPluginErrorMessageContains("E117: Unknown function: printf")
     assertState(
@@ -939,7 +950,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
       val str2 = "second"
       """.trimIndent()
     )
-    typeText(commandToKeys("%s/\\d\\+/\\=*&("))
+    enterCommand("%s/\\d\\+/\\=*&(")
     assertPluginError(true)
     assertPluginErrorMessageContains("E15: Invalid expression: *&(")
     assertState(
@@ -959,7 +970,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test removing consecutive matches`() {
     doTest(
-      "%s/[*/]//g",
+      exCommand("%s/[*/]//g"),
       "/* comment */",
       " comment "
     )

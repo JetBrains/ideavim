@@ -8,10 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.option
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.VimStateMachine
-import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -23,8 +20,6 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 class DigraphTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.UNCLEAR, "backspace works strange")
   fun `test digraph`() {
-    VimPlugin.getOptionService().setOption(OptionScope.GLOBAL, OptionConstants.digraph)
-
     doTest(
       "i B<BS>B",
       """
@@ -44,13 +39,13 @@ class DigraphTest : VimTestCase() {
             hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
-    )
+    ) {
+      enterCommand("set digraph")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.UNCLEAR, "backspace works strange")
   fun `test digraph stops`() {
-    VimPlugin.getOptionService().setOption(OptionScope.GLOBAL, OptionConstants.digraph)
-
     doTest(
       "i B<BS>BHello",
       """
@@ -70,13 +65,13 @@ class DigraphTest : VimTestCase() {
             hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
-    )
+    ) {
+      enterCommand("set digraph")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.UNCLEAR, "backspace works strange")
   fun `test digraph double backspace`() {
-    VimPlugin.getOptionService().setOption(OptionScope.GLOBAL, OptionConstants.digraph)
-
     doTest(
       "i B<BS><BS>B",
       """
@@ -96,13 +91,13 @@ class DigraphTest : VimTestCase() {
             hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
-    )
+    ) {
+      enterCommand("set digraph")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.UNCLEAR, "backspace works strange")
   fun `test digraph backspace digraph`() {
-    VimPlugin.getOptionService().setOption(OptionScope.GLOBAL, OptionConstants.digraph)
-
     doTest(
       "i B<BS>B<BS>B",
       """
@@ -122,6 +117,8 @@ class DigraphTest : VimTestCase() {
             hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
-    )
+    ) {
+      enterCommand("set digraph")
+    }
   }
 }

@@ -293,9 +293,7 @@ abstract class VimTestCase : UsefulTestCase() {
     assertTrue(caretLogicalLine >= scrollToLogicalLine)
   }
 
-  protected fun typeText(keys: String): Editor {
-    return typeText(injector.parser.parseKeys(keys))
-  }
+  protected fun typeText(vararg keys: String) = typeText(keys.flatMap { injector.parser.parseKeys(it) })
 
   protected fun typeText(keys: List<KeyStroke?>): Editor {
     val editor = myFixture.editor
@@ -679,7 +677,7 @@ abstract class VimTestCase : UsefulTestCase() {
     fun commandToKeys(command: String): List<KeyStroke> {
       val keys: MutableList<KeyStroke> = ArrayList()
       keys.addAll(injector.parser.parseKeys(":"))
-      keys.addAll(injector.parser.stringToKeys(command))
+      keys.addAll(injector.parser.stringToKeys(command))  // Avoids trying to parse 'command ... <args>' as a special char
       keys.addAll(injector.parser.parseKeys("<Enter>"))
       return keys
     }
@@ -689,7 +687,7 @@ abstract class VimTestCase : UsefulTestCase() {
     fun searchToKeys(pattern: String, forwards: Boolean): List<KeyStroke> {
       val keys: MutableList<KeyStroke> = ArrayList()
       keys.addAll(injector.parser.parseKeys(if (forwards) "/" else "?"))
-      keys.addAll(injector.parser.stringToKeys(pattern))
+      keys.addAll(injector.parser.stringToKeys(pattern))  // Avoids trying to parse 'command ... <args>' as a special char
       keys.addAll(injector.parser.parseKeys("<CR>"))
       return keys
     }
