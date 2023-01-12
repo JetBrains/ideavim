@@ -23,12 +23,7 @@ import java.util.List;
 public class KeywordOptionTest extends VimTestCase {
 
   private List<String> getValues() {
-    return KeywordOptionHelper.INSTANCE.parseValues(getOptionValue());
-  }
-
-  private String getOptionValue() {
-    return ((VimString)VimPlugin.getOptionService()
-      .getOptionValue(OptionScope.GLOBAL.INSTANCE, OptionConstants.iskeyword, OptionConstants.iskeyword)).getValue();
+    return KeywordOptionHelper.INSTANCE.parseValues(optionsNoEditor().getStringValue(OptionConstants.iskeyword));
   }
 
   private void setKeyword(String val) {

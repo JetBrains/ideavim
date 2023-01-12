@@ -10,12 +10,9 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.leftright
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import org.jetbrains.plugins.ideavim.OptionValueType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -50,7 +47,7 @@ class MotionShiftHomeActionTest : VimOptionTestCase(OptionConstants.keymodel, Op
 
   @VimOptionDefaultAll
   fun `test default continueselect`() {
-    val keymodel = (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, OptionConstants.keymodel) as VimString).value
+    val keymodel = optionsNoEditor().getStringListValues(OptionConstants.keymodel)
     assertTrue(OptionConstants.keymodel_continueselect in keymodel)
   }
 

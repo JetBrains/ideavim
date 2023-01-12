@@ -270,8 +270,8 @@ abstract class VimTestCase : UsefulTestCase() {
     // Note that it is possible to request a position which would be invalid under normal Vim!
     // We disable scrolloff + scrolljump, position as requested, and reset. When resetting scrolloff, Vim will
     // recalculate the correct offsets, and that could move the top and/or caret line
-    val scrolloff = (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloff) as VimInt).value
-    val scrolljump = (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, OptionConstants.scrolljump) as VimInt).value
+    val scrolloff = options().getIntValue(OptionConstants.scrolloff)
+    val scrolljump = options().getIntValue(OptionConstants.scrolljump)
     VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloff, VimInt(0))
     VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolljump, VimInt(1))
 

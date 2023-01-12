@@ -32,7 +32,7 @@ class PutViaIdeaTest : VimTestCase() {
 
   override fun setUp() {
     super.setUp()
-    optionsBefore = (VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, OptionConstants.clipboard) as VimString).value
+    optionsBefore = optionsNoEditor().getStringValue(OptionConstants.clipboard)
     VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.clipboard, VimString("ideaput"))
   }
 

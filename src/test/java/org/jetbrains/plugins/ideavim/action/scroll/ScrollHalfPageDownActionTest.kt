@@ -100,7 +100,7 @@ class ScrollHalfPageDownActionTest : VimTestCase() {
     configureByPages(5)
     setPositionAndScroll(100, 110)
     typeText(injector.parser.parseKeys("10<C-D>"))
-    assertEquals((VimPlugin.getOptionService().getOptionValue(OptionScope.GLOBAL, OptionConstants.scroll) as VimInt).value, 10)
+    assertEquals(10, options().getIntValue(OptionConstants.scroll))
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
