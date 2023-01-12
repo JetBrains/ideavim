@@ -28,6 +28,11 @@ class GuiCursorOptionTest : VimTestCase() {
     return (VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.guicursor, VimString(value)))
   }
 
+  private fun assertHasDefaultValue() {
+    val defaultValue = VimPlugin.getOptionService().getOptionByNameOrAbbr(OptionConstants.guicursor)!!.getDefaultValue().asString()
+    assertEquals(defaultValue, optionsNoEditor().getStringValue(OptionConstants.guicursor))
+  }
+
   @Suppress("SpellCheckingInspection")
   fun `test parses default values`() {
     val values = getOptionValue().split(",").map { GuiCursorOptionHelper.convertToken(it) }
@@ -75,31 +80,31 @@ class GuiCursorOptionTest : VimTestCase() {
   fun `test ignores set with missing colon`() {
     // E545: Missing colon: {value}
     assertExException("E545: Missing colon: whatever") { setValue("whatever") }
-    assertTrue(VimPlugin.getOptionService().isDefault(OptionScope.GLOBAL, OptionConstants.guicursor))
+    assertHasDefaultValue()
   }
 
   fun `test ignores set with invalid mode`() {
     // E546: Illegal mode: {value}
     assertExException("E546: Illegal mode: foo:block-Cursor") { setValue("foo:block-Cursor") }
-    assertTrue(VimPlugin.getOptionService().isDefault(OptionScope.GLOBAL, OptionConstants.guicursor))
+    assertHasDefaultValue()
   }
 
   fun `test ignores set with invalid mode 2`() {
     // E546: Illegal mode: {value}
     assertExException("E546: Illegal mode: n-foo:block-Cursor") { setValue("n-foo:block-Cursor") }
-    assertTrue(VimPlugin.getOptionService().isDefault(OptionScope.GLOBAL, OptionConstants.guicursor))
+    assertHasDefaultValue()
   }
 
   fun `test ignores set with zero thickness`() {
     // E549: Illegal percentage
     assertExException("E549: Illegal percentage: n:ver0-Cursor") { setValue("n:ver0-Cursor") }
-    assertTrue(VimPlugin.getOptionService().isDefault(OptionScope.GLOBAL, OptionConstants.guicursor))
+    assertHasDefaultValue()
   }
 
   fun `test ignores set with invalid vertical cursor details`() {
     // E548: Digit expected: {value}
     assertExException("E548: Digit expected: n:ver-Cursor") { setValue("n:ver-Cursor") }
-    assertTrue(VimPlugin.getOptionService().isDefault(OptionScope.GLOBAL, OptionConstants.guicursor))
+    assertHasDefaultValue()
   }
 
   fun `test simple string means default caret and highlight group`() {
