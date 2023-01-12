@@ -8,10 +8,6 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.updown
 
-import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -206,8 +202,8 @@ class MotionGotoLineLastActionTest : VimTestCase() {
   }
 
   fun `test go to line in last half screen of file puts last line at bottom of screen ignoring scrolloff`() {
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloff, VimInt(10))
     configureByLines(100, "    I found it in a legendary land")
+    enterCommand("set scrolloff=10")
     typeText("95G")
     assertPosition(94, 4)
     assertVisibleArea(65, 99)
@@ -232,8 +228,8 @@ class MotionGotoLineLastActionTest : VimTestCase() {
   }
 
   fun `test go to line does not scroll when last line is less than scrolloff above bottom of file`() {
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloff, VimInt(10))
     configureByLines(100, "    I found it in a legendary land")
+    enterCommand("set scrolloff=10")
     setEditorVirtualSpace()
     setPositionAndScroll(67, 97)
     typeText("G")
@@ -242,10 +238,10 @@ class MotionGotoLineLastActionTest : VimTestCase() {
   }
 
   fun `test go to line does not scroll when last line is less than scrolloff above bottom of file with folds`() {
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloff, VimInt(10))
     configureByLines(100, "    I found it in a legendary land")
+    enterCommand("set scrolloff=10")
     setEditorVirtualSpace()
-    typeText("20G" + "V10j" + ":'< +'>action CollapseSelection<CR>" + "V")
+    typeText("20G", "V10j", ":'< +'>action CollapseSelection<CR>", "V")
     setPositionAndScroll(67, 97)
     typeText("G")
     assertPosition(99, 4)

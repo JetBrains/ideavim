@@ -8,11 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.action.scroll
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
-import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -60,7 +56,7 @@ class ScrollPageDownActionTest : VimTestCase() {
   fun `test scroll page down in insert mode with S-Down`() {
     configureByPages(5)
     setPositionAndScroll(0, 0)
-    typeText("i" + "<S-Down>")
+    typeText("i", "<S-Down>")
     assertPosition(33, 0)
     assertVisibleArea(33, 67)
   }
@@ -69,7 +65,7 @@ class ScrollPageDownActionTest : VimTestCase() {
   fun `test scroll page down in insert mode with PageDown`() {
     configureByPages(5)
     setPositionAndScroll(0, 0)
-    typeText("i" + "<PageDown>")
+    typeText("i", "<PageDown>")
     assertPosition(33, 0)
     assertVisibleArea(33, 67)
   }
@@ -114,15 +110,15 @@ class ScrollPageDownActionTest : VimTestCase() {
   fun `test scroll page down in insert mode moves cursor`() {
     configureByPages(5)
     setPositionAndScroll(0, 20)
-    typeText("i" + "<S-Down>")
+    typeText("i", "<S-Down>")
     assertPosition(33, 0)
     assertVisibleArea(33, 67)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll page down moves cursor with scrolloff`() {
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloff, VimInt(10))
     configureByPages(5)
+    enterCommand("set scrolloff=10")
     setPositionAndScroll(0, 20)
     typeText("<C-F>")
     assertPosition(43, 0)
@@ -131,18 +127,18 @@ class ScrollPageDownActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll page down in insert mode moves cursor with scrolloff`() {
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloff, VimInt(10))
     configureByPages(5)
+    enterCommand("set scrolloff=10")
     setPositionAndScroll(0, 20)
-    typeText("i" + "<S-Down>")
+    typeText("i", "<S-Down>")
     assertPosition(43, 0)
     assertVisibleArea(33, 67)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll page down ignores scrolljump`() {
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolljump, VimInt(10))
     configureByPages(5)
+    enterCommand("set scrolljump=10")
     setPositionAndScroll(0, 0)
     typeText("<C-F>")
     assertPosition(33, 0)

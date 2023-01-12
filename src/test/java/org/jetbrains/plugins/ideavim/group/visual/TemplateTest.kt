@@ -20,7 +20,6 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.refactoring.rename.inplace.VariableInplaceRenameHandler
 import com.intellij.testFramework.PlatformTestUtil
 import com.intellij.testFramework.fixtures.CodeInsightTestUtil.doInlineRename
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.helper.inInsertMode
@@ -28,8 +27,6 @@ import com.maddyhome.idea.vim.helper.inNormalMode
 import com.maddyhome.idea.vim.helper.inSelectMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.listener.VimListenerManager
-import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.services.IjOptionConstants
 import org.jetbrains.plugins.ideavim.OptionValueType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -108,10 +105,6 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test selectmode without template`() {
-    VimPlugin.getOptionService().setOptionValue(
-      OptionScope.GLOBAL, IjOptionConstants.idearefactormode,
-      VimString(IjOptionConstants.idearefactormode_visual)
-    )
     configureByJavaText(
       """
             class Hello {
@@ -121,6 +114,7 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
             }
       """.trimIndent()
     )
+    enterCommand("set idearefactormode=visual")
     startRenaming(VariableInplaceRenameHandler())
     waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
     assertState(VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER)

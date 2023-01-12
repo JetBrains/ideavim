@@ -8,11 +8,6 @@
 
 package org.jetbrains.plugins.ideavim.action.scroll
 
-import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -32,7 +27,7 @@ class ScrollLastScreenLinePageStartActionTest : VimTestCase() {
   fun `test scrolls last line on previous page to bottom of screen`() {
     configureByPages(5)
     setPositionAndScroll(99, 119)
-    typeText(injector.parser.parseKeys("z^"))
+    typeText("z^")
     assertPosition(98, 0)
     assertVisibleArea(64, 98)
   }
@@ -40,25 +35,25 @@ class ScrollLastScreenLinePageStartActionTest : VimTestCase() {
   fun `test scrolls to first non-blank in line`() {
     configureByLines(200, "    I found it in a legendary land")
     setPositionAndScroll(99, 119)
-    typeText(injector.parser.parseKeys("z^"))
+    typeText("z^")
     assertPosition(98, 4)
     assertVisibleArea(64, 98)
   }
 
   fun `test scrolls last line on previous page to scrolloff`() {
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloff, VimInt(10))
     configureByPages(5)
+    enterCommand("set scrolloff=10")
     setPositionAndScroll(99, 119)
-    typeText(injector.parser.parseKeys("z^"))
+    typeText("z^")
     assertPosition(98, 0)
     assertVisibleArea(74, 108)
   }
 
   fun `test scrolls last line on previous page ignores scrolljump`() {
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolljump, VimInt(10))
     configureByPages(5)
+    enterCommand("set scrolljump=10")
     setPositionAndScroll(99, 119)
-    typeText(injector.parser.parseKeys("z^"))
+    typeText("z^")
     assertPosition(98, 0)
     assertVisibleArea(64, 98)
   }
@@ -67,7 +62,7 @@ class ScrollLastScreenLinePageStartActionTest : VimTestCase() {
   fun `test count z^ puts count line at bottom of screen then scrolls back a page`() {
     configureByPages(5)
     setPositionAndScroll(140, 150)
-    typeText(injector.parser.parseKeys("100z^"))
+    typeText("100z^")
     // Put 100 at the bottom of the page. Top is 66. Scroll back a page so 66 is at bottom of page
     assertPosition(65, 0)
     assertVisibleArea(31, 65)
@@ -77,7 +72,7 @@ class ScrollLastScreenLinePageStartActionTest : VimTestCase() {
   fun `test z^ on first page puts cursor on first line 1`() {
     configureByLines(50, "    I found it in a legendary land")
     setPositionAndScroll(0, 25)
-    typeText(injector.parser.parseKeys("z^"))
+    typeText("z^")
     assertPosition(0, 4)
     assertVisibleArea(0, 34)
   }
@@ -85,16 +80,16 @@ class ScrollLastScreenLinePageStartActionTest : VimTestCase() {
   fun `test z^ on first page puts cursor on first line 2`() {
     configureByLines(50, "    I found it in a legendary land")
     setPositionAndScroll(0, 6)
-    typeText(injector.parser.parseKeys("z^"))
+    typeText("z^")
     assertPosition(0, 4)
     assertVisibleArea(0, 34)
   }
 
   fun `test z^ on first page ignores scrolloff and puts cursor on last line of previous page`() {
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloff, VimInt(10))
     configureByLines(50, "    I found it in a legendary land")
+    enterCommand("set scrolloff=10")
     setPositionAndScroll(0, 6)
-    typeText(injector.parser.parseKeys("z^"))
+    typeText("z^")
     assertPosition(0, 4)
     assertVisibleArea(0, 34)
   }
@@ -102,7 +97,7 @@ class ScrollLastScreenLinePageStartActionTest : VimTestCase() {
   fun `test z^ on second page puts cursor on previous last line`() {
     configureByLines(50, "    I found it in a legendary land")
     setPositionAndScroll(19, 39)
-    typeText(injector.parser.parseKeys("z^"))
+    typeText("z^")
     assertPosition(18, 4)
     assertVisibleArea(0, 34)
   }

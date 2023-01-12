@@ -14,9 +14,6 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -27,18 +24,8 @@ import java.util.*
  * @author Alex Plate
  */
 class PutViaIdeaTest : VimTestCase() {
-
-  private var optionsBefore: String = ""
-
-  override fun setUp() {
-    super.setUp()
-    optionsBefore = optionsNoEditor().getStringValue(OptionConstants.clipboard)
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.clipboard, VimString("ideaput"))
-  }
-
-  override fun tearDown() {
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.clipboard, VimString(optionsBefore))
-    super.tearDown()
+  override fun setupEditor() {
+    enterCommand("set clipboard=ideaput")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
@@ -48,7 +35,7 @@ class PutViaIdeaTest : VimTestCase() {
 
     injector.registerGroup.storeText('"', "legendary", SelectionType.CHARACTER_WISE)
 
-    typeText(injector.parser.parseKeys("ve" + "p"))
+    typeText("ve", "p")
     val after = "legendar${c}y it in a legendary land"
     assertState(after)
   }
@@ -62,7 +49,7 @@ class PutViaIdeaTest : VimTestCase() {
     VimPlugin.getRegister()
       .storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
 
-    typeText(injector.parser.parseKeys("ppp"))
+    typeText("ppp")
     val after = "Ilegendarylegendarylegendar${c}y found it in a legendary land"
     assertState(after)
   }
@@ -80,7 +67,7 @@ class PutViaIdeaTest : VimTestCase() {
       .storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "legendary$randomUUID", SelectionType.CHARACTER_WISE, false)
 
     val sizeBefore = CopyPasteManager.getInstance().allContents.size
-    typeText(injector.parser.parseKeys("ve" + "p"))
+    typeText("ve", "p")
     assertEquals(sizeBefore, CopyPasteManager.getInstance().allContents.size)
   }
 
@@ -104,7 +91,7 @@ class PutViaIdeaTest : VimTestCase() {
       false
     )
 
-    typeText(injector.parser.parseKeys("p"))
+    typeText("p")
     val after = """
             A Discovery
             

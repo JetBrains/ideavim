@@ -8,12 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.action.change.insert
 
-import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.VimStateMachine
-import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -85,7 +80,7 @@ class InsertNewLineBelowActionTest : VimTestCase() {
       |}
     """.trimMargin()
     configureByJavaText(before)
-    typeText(injector.parser.parseKeys("o"))
+    typeText("o")
     assertState(after)
   }
 
@@ -103,7 +98,7 @@ class InsertNewLineBelowActionTest : VimTestCase() {
       |}
     """.trimMargin()
     configureByJavaText(before)
-    typeText(injector.parser.parseKeys("o"))
+    typeText("o")
     assertState(after)
   }
 
@@ -125,10 +120,10 @@ class InsertNewLineBelowActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test insert new line below at bottom of screen does not scroll bottom of screen`() {
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.scrolloff, VimInt(10))
     configureByLines(50, "I found it in a legendary land")
+    enterCommand("set scrolloff=10")
     setPositionAndScroll(5, 29)
-    typeText(injector.parser.parseKeys("o"))
+    typeText("o")
     assertPosition(30, 0)
     assertVisibleArea(6, 40)
   }
@@ -160,7 +155,7 @@ class InsertNewLineBelowActionTest : VimTestCase() {
         |12${c}3
         |where it was settled on some sodden sand
         |hard by the torrent of a mountain pass.""".trimMargin()
-    doTest("5o123<esc>", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+    doTest("5o123<esc>", before, after)
   }
 
   fun `test insert new line below with folds`() {
