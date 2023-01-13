@@ -26,6 +26,8 @@ IdeaVim has multiple YouTrack statuses, main are:
 
 - Submitted: issue is created by user, but not processed by our team. This is the default status for new tickets.
 - Open: issues is processed by out team, what means that the issues is reproduced and accepted
+- Waiting For Reply: Waiting for further information from the user. These issues are automatically closed if the
+     user doesn't reply in 30 days.
 - Ready To Release: Bug is fixed, but not yet released
 - Fixed: Bug is fixed
 - Closed: Issue is closed by some other reason
