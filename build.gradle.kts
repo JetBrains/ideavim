@@ -303,14 +303,16 @@ tasks {
         sinceBuild.set("223.7401.7")
 
         // Get the latest available change notes from the changelog file
-        changeNotes.set(provider {
-            with(changelog) {
-                renderItem(
-                    getOrNull(pluginVersion.toString()) ?: getLatest(),
-                    org.jetbrains.changelog.Changelog.OutputType.HTML,
-                )
+        changeNotes.set(
+            provider {
+                with(changelog) {
+                    renderItem(
+                        getOrNull(pluginVersion.toString()) ?: getLatest(),
+                        org.jetbrains.changelog.Changelog.OutputType.HTML,
+                    )
+                }
             }
-        })
+        )
     }
 }
 
