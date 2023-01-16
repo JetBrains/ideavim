@@ -60,7 +60,7 @@ class ReplaceWithRegister : VimExtension {
   private class RwrVisual : ExtensionHandler {
     override fun execute(editor: VimEditor, context: ExecutionContext) {
       val typeInEditor = SelectionType.fromSubMode(editor.subMode)
-      editor.forEachCaret { caret ->
+      editor.carets().forEach { caret ->
         val selectionStart = caret.selectionStart
         val selectionEnd = caret.selectionEnd
 
@@ -85,7 +85,7 @@ class ReplaceWithRegister : VimExtension {
 
     override fun execute(editor: VimEditor, context: ExecutionContext) {
       val caretsAndSelections = mutableMapOf<ImmutableVimCaret, VimSelection>()
-      editor.forEachCaret { caret ->
+      editor.carets().forEach { caret ->
         val logicalLine = caret.getBufferPosition().line
         val lineStart = editor.getLineStartOffset(logicalLine)
         val lineEnd = editor.getLineEndOffset(logicalLine, true)
@@ -96,7 +96,7 @@ class ReplaceWithRegister : VimExtension {
         doReplace(editor.ij, caret, PutData.VisualSelection(mapOf(visualSelection), SelectionType.LINE_WISE))
       }
 
-      editor.forEachCaret { caret ->
+      editor.sortedCarets().forEach { caret ->
         val vimStart = caretsAndSelections[caret]?.vimStart
         if (vimStart != null) {
           caret.moveToOffset(vimStart)
