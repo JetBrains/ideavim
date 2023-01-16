@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.group.visual
 
+import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer.mode

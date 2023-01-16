@@ -40,6 +40,7 @@ import com.intellij.ui.awt.RelativePoint
 import com.intellij.util.Consumer
 import com.intellij.util.ui.LafIconLookup
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.NotificationService
 import com.maddyhome.idea.vim.helper.MessageHelper
@@ -220,7 +221,7 @@ private object VimActionsPopup {
   }
 }
 
-private class TutorAction() : DumbAwareAction("Tutor") {
+private class TutorAction : DumbAwareAction("Tutor") {
   override fun actionPerformed(e: AnActionEvent) {
     val project = e.project ?: return
     val file = ScratchRootType.getInstance()

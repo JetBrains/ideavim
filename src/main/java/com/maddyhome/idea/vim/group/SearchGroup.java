@@ -61,7 +61,7 @@ import java.text.NumberFormat;
 import java.text.ParsePosition;
 import java.util.*;
 
-import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
+import static com.maddyhome.idea.vim.api.VimInjectorKt.*;
 import static com.maddyhome.idea.vim.helper.HelperKt.localEditors;
 import static com.maddyhome.idea.vim.helper.SearchHelperKtKt.shouldIgnoreCase;
 import static com.maddyhome.idea.vim.register.RegisterConstants.LAST_SEARCH_REGISTER;
@@ -613,7 +613,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
     }
     else {
       // :h :&& - "Note that :s and :& don't keep the flags"
-      do_all = injector.options(editor).isSet(OptionConstants.gdefault);
+      do_all = options(injector, editor).isSet(OptionConstants.gdefault);
       do_ask = false;
       do_error = true;
       do_ic = 0;
@@ -1094,7 +1094,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
   }
 
   private void resetShowSearchHighlight() {
-    showSearchHighlight = injector.globalOptions().isSet(OptionConstants.hlsearch);
+    showSearchHighlight = globalOptions(injector).isSet(OptionConstants.hlsearch);
   }
 
   private void highlightSearchLines(@NotNull Editor editor, int startLine, int endLine) {
@@ -1200,7 +1200,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
    * @return              The offset to the occurrence or -1 if not found
    */
   private int findItOffset(@NotNull Editor editor, int startOffset, int count, Direction dir) {
-    boolean wrap = injector.globalOptions().isSet(OptionConstants.wrapscan);
+    boolean wrap = globalOptions(injector).isSet(OptionConstants.wrapscan);
     logger.debug("Perform search. Direction: " + dir + " wrap: " + wrap);
 
     int offset = 0;
@@ -1362,7 +1362,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
     }
 
     Element show = search.getChild("show-last");
-    final boolean disableHighlight = injector.globalOptions().hasValue(OptionConstants.viminfo, "h");
+    final boolean disableHighlight = globalOptions(injector).hasValue(OptionConstants.viminfo, "h");
     showSearchHighlight = !disableHighlight && Boolean.parseBoolean(show.getText());
     if (logger.isDebugEnabled()) {
       logger.debug("show=" + show + "(" + show.getText() + ")");
@@ -1421,7 +1421,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
   private @NotNull String lastPatternOffset = "";  // /{pattern}/{offset}. Do not confuse with caret offset!
   private boolean lastIgnoreSmartCase;
   private @NotNull Direction lastDir = Direction.FORWARDS;
-  private boolean showSearchHighlight = injector.globalOptions().isSet(OptionConstants.hlsearch);
+  private boolean showSearchHighlight = globalOptions(injector).isSet(OptionConstants.hlsearch);
 
   private boolean do_all = false; /* do multiple substitutions per line */
   private boolean do_ask = false; /* ask for confirmation */

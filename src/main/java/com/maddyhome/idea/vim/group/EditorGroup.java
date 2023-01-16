@@ -40,7 +40,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
+import static com.maddyhome.idea.vim.api.VimInjectorKt.*;
 import static com.maddyhome.idea.vim.helper.CaretVisualAttributesHelperKt.updateCaretsVisualAttributes;
 
 /**
@@ -56,7 +56,7 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
     @Override
     public void caretPositionChanged(@NotNull CaretEvent e) {
       final boolean requiresRepaint = e.getNewPosition().line != e.getOldPosition().line;
-      if (requiresRepaint && injector.options(new IjVimEditor(e.getEditor())).isSet(OptionConstants.relativenumber)) {
+      if (requiresRepaint && options(injector, new IjVimEditor(e.getEditor())).isSet(OptionConstants.relativenumber)) {
         repaintRelativeLineNumbers(e.getEditor());
       }
     }
@@ -104,7 +104,7 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
   }
 
   private static void updateLineNumbers(final @NotNull Editor editor) {
-    final OptionValueAccessor options = injector.options(new IjVimEditor(editor));
+    final OptionValueAccessor options = options(injector, new IjVimEditor(editor));
     final boolean relativeNumber = options.isSet(OptionConstants.relativenumber);
     final boolean number = options.isSet(OptionConstants.number);
 
@@ -230,7 +230,7 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
   }
 
   public void notifyIdeaJoin(@Nullable Project project) {
-    if (VimPlugin.getVimState().isIdeaJoinNotified() || injector.globalOptions().isSet(IjOptionConstants.ideajoin)) {
+    if (VimPlugin.getVimState().isIdeaJoinNotified() || globalOptions(injector).isSet(IjOptionConstants.ideajoin)) {
       return;
     }
 
@@ -285,7 +285,7 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
   private static class RelativeLineNumberConverter implements LineNumberConverter {
     @Override
     public Integer convert(@NotNull Editor editor, int lineNumber) {
-      final boolean number = injector.options(new IjVimEditor(editor)).isSet(OptionConstants.number);
+      final boolean number = options(injector, new IjVimEditor(editor)).isSet(OptionConstants.number);
       final int caretLine = editor.getCaretModel().getLogicalPosition().line;
 
       // lineNumber is 1 based

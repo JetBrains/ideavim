@@ -46,6 +46,7 @@ import javax.swing.*;
 import java.io.*;
 import java.util.ArrayList;
 
+import static com.maddyhome.idea.vim.api.VimInjectorKt.globalOptions;
 import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
 
 
@@ -188,10 +189,10 @@ public class ProcessGroup extends VimProcessGroupBase {
     // Finally, we're also not bothering with the crazy space and backslash handling of the 'shell' options content.
     return ProgressManager.getInstance().runProcessWithProgressSynchronously(() -> {
 
-      final String shell = injector.globalOptions().getStringValue(OptionConstants.shell);
-      final String shellcmdflag = injector.globalOptions().getStringValue(OptionConstants.shellcmdflag);
-      final String shellxescape = injector.globalOptions().getStringValue(OptionConstants.shellxescape);
-      final String shellxquote = injector.globalOptions().getStringValue(OptionConstants.shellxquote);
+      final String shell = globalOptions(injector).getStringValue(OptionConstants.shell);
+      final String shellcmdflag = globalOptions(injector).getStringValue(OptionConstants.shellcmdflag);
+      final String shellxescape = globalOptions(injector).getStringValue(OptionConstants.shellxescape);
+      final String shellxquote = globalOptions(injector).getStringValue(OptionConstants.shellxquote);
 
       // For Win32. See :help 'shellxescape'
       final String escapedCommand = shellxquote.equals("(")

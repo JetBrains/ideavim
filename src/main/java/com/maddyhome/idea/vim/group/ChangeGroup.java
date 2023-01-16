@@ -64,6 +64,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
+import static com.maddyhome.idea.vim.api.VimInjectorKt.options;
 
 /**
  * Provides all the insert/replace related functionality
@@ -578,7 +579,7 @@ public class ChangeGroup extends VimChangeGroupBase {
       }
     }
 
-    List<String> nf = injector.options(editor).getStringListValues(OptionConstants.nrformats);
+    List<String> nf = options(injector, editor).getStringListValues(OptionConstants.nrformats);
     boolean alpha = nf.contains("alpha");
     boolean hex = nf.contains("hex");
     boolean octal = nf.contains("octal");
@@ -608,7 +609,7 @@ public class ChangeGroup extends VimChangeGroupBase {
 
   @Override
   public boolean changeNumber(final @NotNull VimEditor editor, @NotNull VimCaret caret, final int count) {
-    final List<String> nf = injector.options(editor).getStringListValues(OptionConstants.nrformats);
+    final List<String> nf = options(injector, editor).getStringListValues(OptionConstants.nrformats);
     final boolean alpha = nf.contains("alpha");
     final boolean hex = nf.contains("hex");
     final boolean octal = nf.contains("octal");

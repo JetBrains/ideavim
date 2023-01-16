@@ -10,7 +10,9 @@ package com.maddyhome.idea.vim
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimActionsInitiator
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandBuilder
@@ -268,7 +270,7 @@ class KeyHandler {
     }
     mappingState.stopMappingTimer()
 
-    // Save the unhandled key strokes until we either complete or abandon the sequence.
+    // Save the unhandled keystrokes until we either complete or abandon the sequence.
     LOG.trace("Add key to mapping state")
     mappingState.addKey(key)
     val mapping = injector.keyGroup.getKeyMappingLayer(mappingState.mappingMode)
@@ -326,7 +328,7 @@ class KeyHandler {
       // XXX There is a strange issue that reports that mapping state is empty at the moment of the function call.
       //   At the moment, I see the only one possibility this to happen - other key is handled after the timer executed,
       //   but before invoke later is handled. This is a rare case, so I'll just add a check to isPluginMapping.
-      //   But this "unexpected behaviour" exists and it would be better not to relay on mutable state with delays.
+      //   But this "unexpected behaviour" exists, and it would be better not to relay on mutable state with delays.
       //   https://youtrack.jetbrains.com/issue/VIM-2392
       mappingState.startMappingTimer {
         injector.application.invokeLater(
@@ -619,7 +621,7 @@ class KeyHandler {
         return true
       }
       DigraphResult.RES_UNHANDLED -> {
-        // UNHANDLED means the key stroke made no sense in the context of a digraph, but isn't an error in the current
+        // UNHANDLED means the keystroke made no sense in the context of a digraph, but isn't an error in the current
         // state. E.g. waiting for {char} <BS> {char}. Let the key handler have a go at it.
         if (commandBuilder.expectedArgumentType === Argument.Type.DIGRAPH) {
           commandBuilder.fallbackToCharacterArgument()

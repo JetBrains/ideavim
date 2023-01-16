@@ -34,6 +34,7 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.maddyhome.idea.vim.api.VimInjectorKt.globalOptions;
 import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
 
 /**
@@ -271,7 +272,7 @@ public class ExOutputPanel extends JPanel {
     setBounds(bounds);
 
     myScrollPane.getVerticalScrollBar().setValue(0);
-    if (!injector.globalOptions().isSet(OptionConstants.more)) {
+    if (!globalOptions(injector).isSet(OptionConstants.more)) {
       // FIX
       scrollOffset(100000);
     }

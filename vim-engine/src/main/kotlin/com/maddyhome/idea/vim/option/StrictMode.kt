@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.option
 
+import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.options.OptionConstants
 
