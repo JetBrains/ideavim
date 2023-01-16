@@ -50,26 +50,6 @@ interface VimInjector {
   // [FINISHED] Can't be fully moved to vim-engine.
   val enabler: VimEnabler
 
-  /**
-   * Gets an API for consuming only global options
-   *
-   * This function is intended to retrieve global options, not global values for options that are local to buffer, local
-   * to window or global-local - for that, use [OptionService.getOptionValue]. Typical option access should use
-   * [VimInjector.options] and pass in a [VimEditor] for context. This will return local or global values as
-   * appropriate.
-   */
-  fun globalOptions() = optionService.getValueAccessor(null)
-
-  /**
-   * Gets an API for consuming all options
-   *
-   * This is the preferred means of accessing options as it will return the effective value for the current window or
-   * buffer context
-   * If an editor isn't available to the calling code, the [globalOptions] function can be used to access global
-   * options. It should not be used to access options that are local to buffer, local to window or global-local.
-   */
-  fun options(editor: VimEditor) = optionService.getValueAccessor(editor)
-
   // [UNFINISHED] !! in progress
   val optionService: OptionService
   // [FINISHED] Can't be fully moved to vim-engine.
@@ -165,3 +145,23 @@ interface VimInjector {
 }
 
 lateinit var injector: VimInjector
+
+/**
+ * Gets an API for consuming only global options
+ *
+ * This function is intended to retrieve global options, not global values for options that are local to buffer, local
+ * to window or global-local - for that, use [OptionService.getOptionValue]. Typical option access should use
+ * [VimInjector.options] and pass in a [VimEditor] for context. This will return local or global values as
+ * appropriate.
+ */
+fun VimInjector.globalOptions() = this.optionService.getValueAccessor(null)
+
+/**
+ * Gets an API for consuming all options
+ *
+ * This is the preferred means of accessing options as it will return the effective value for the current window or
+ * buffer context
+ * If an editor isn't available to the calling code, the [globalOptions] function can be used to access global
+ * options. It should not be used to access options that are local to buffer, local to window or global-local.
+ */
+fun VimInjector.options(editor: VimEditor) = this.optionService.getValueAccessor(editor)

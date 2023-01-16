@@ -43,6 +43,7 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.maddyhome.idea.vim.api.VimInjectorKt.globalOptions;
 import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
 import static com.maddyhome.idea.vim.helper.SearchHelperKtKt.checkInString;
 import static com.maddyhome.idea.vim.helper.SearchHelperKtKt.shouldIgnoreCase;
@@ -2393,7 +2394,7 @@ public class SearchHelper {
   }
 
   private static @NotNull String parseMatchPairsOption() {
-    List<String> pairs = injector.globalOptions().getStringListValues(OptionConstants.matchpairs);
+    List<String> pairs = globalOptions(injector).getStringListValues(OptionConstants.matchpairs);
     StringBuilder res = new StringBuilder();
     for (String s : pairs) {
       if (s.length() == 3) {

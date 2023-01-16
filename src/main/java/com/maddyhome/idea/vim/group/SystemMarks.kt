@@ -16,6 +16,7 @@ import com.intellij.ide.bookmark.providers.LineBookmarkProvider
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.services.IjOptionConstants
 

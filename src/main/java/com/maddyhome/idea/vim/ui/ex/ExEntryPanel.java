@@ -43,6 +43,7 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 
+import static com.maddyhome.idea.vim.api.VimInjectorKt.globalOptions;
 import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
 
 /**
@@ -422,7 +423,7 @@ public class ExEntryPanel extends JPanel {
   }
 
   private boolean isIncSearchEnabled() {
-    return injector.globalOptions().isSet(OptionConstants.incsearch);
+    return globalOptions(injector).isSet(OptionConstants.incsearch);
   }
 
   private boolean active;

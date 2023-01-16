@@ -12,6 +12,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getVisualLineCount
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.normalizeVisualColumn
+import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.helper.EditorHelper.getApproximateScreenHeight
