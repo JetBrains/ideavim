@@ -170,7 +170,6 @@ interface VimEditor {
    */
 
   fun forEachCaret(action: (VimCaret) -> Unit)
-  fun forEachCaret(action: (VimCaret) -> Unit, reverse: Boolean = false)
   fun forEachNativeCaret(action: (VimCaret) -> Unit, reverse: Boolean = false)
 
   // --------------------------------------------------------------------

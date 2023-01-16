@@ -148,14 +148,10 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
 
   @Suppress("ideavimRunForEachCaret")
   override fun forEachCaret(action: (VimCaret) -> Unit) {
-    forEachCaret(action, false)
-  }
-
-  override fun forEachCaret(action: (VimCaret) -> Unit, reverse: Boolean) {
     if (editor.inBlockSubMode) {
       action(IjVimCaret(editor.caretModel.primaryCaret))
     } else {
-      editor.caretModel.runForEachCaret({ action(IjVimCaret(it)) }, reverse)
+      editor.caretModel.runForEachCaret({ action(IjVimCaret(it)) }, false)
     }
   }
 
@@ -189,7 +185,11 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
     return editor.document.charsSequence.subSequence(left.point, right.point)
   }
 
-  override fun search(pair: Pair<Offset, Offset>, editor: VimEditor, shiftType: LineDeleteShift): Pair<Pair<Offset, Offset>, LineDeleteShift>? {
+  override fun search(
+    pair: Pair<Offset, Offset>,
+    editor: VimEditor,
+    shiftType: LineDeleteShift
+  ): Pair<Pair<Offset, Offset>, LineDeleteShift>? {
     val ijEditor = (editor as IjVimEditor).editor
     return when (shiftType) {
       LineDeleteShift.NO_NL -> if (pair.noGuard(ijEditor)) return pair to shiftType else null
@@ -206,6 +206,7 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
 
         null
       }
+
       LineDeleteShift.NL_ON_START -> {
         if (pair.noGuard(ijEditor)) return pair to shiftType
 
@@ -436,6 +437,7 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
       (this.first.point + shiftStart).coerceAtLeast(0).offset to (this.second.point + shiftEnd).coerceAtLeast(0).offset
     data.action()
   }
+
   override fun equals(other: Any?): Boolean {
     error("equals and hashCode should not be used with IjVimEditor")
   }
