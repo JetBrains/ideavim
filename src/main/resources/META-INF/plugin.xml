@@ -45,12 +45,6 @@
               topic="com.intellij.openapi.project.ProjectManagerListener"/>
   </applicationListeners>
 
-  <application-components>
-    <component>
-      <implementation-class>com.maddyhome.idea.vim.DynamicLoaderStopper</implementation-class>
-    </component>
-  </application-components>
-
   <extensionPoints>
     <extensionPoint name="vimExtension" beanClass="com.maddyhome.idea.vim.extension.ExtensionBeanClass" dynamic="true">
       <with attribute="implementation" implements="com.maddyhome.idea.vim.extension.VimExtension"/>
@@ -88,9 +82,13 @@
 
     <notificationGroup displayType="STICKY_BALLOON" id="ideavim-sticky"/>
 
+    <!--suppress PluginXmlValidity -->
     <statistics.applicationUsagesCollector implementation="com.maddyhome.idea.vim.statistic.PluginState"/>
+    <!--suppress PluginXmlValidity -->
     <statistics.applicationUsagesCollector implementation="com.maddyhome.idea.vim.statistic.OptionsState"/>
+    <!--suppress PluginXmlValidity -->
     <statistics.applicationUsagesCollector implementation="com.maddyhome.idea.vim.statistic.VimscriptState"/>
+    <!--suppress PluginXmlValidity -->
     <statistics.applicationUsagesCollector implementation="com.maddyhome.idea.vim.statistic.ShortcutConflictState"/>
 
     <statistics.counterUsagesCollector implementationClass="com.maddyhome.idea.vim.statistic.ActionTracker"/>
