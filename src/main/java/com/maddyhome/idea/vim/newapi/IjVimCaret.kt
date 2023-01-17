@@ -16,7 +16,6 @@ import com.maddyhome.idea.vim.api.CaretRegisterStorage
 import com.maddyhome.idea.vim.api.CaretRegisterStorageBase
 import com.maddyhome.idea.vim.api.LocalMarkStorage
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
-import com.maddyhome.idea.vim.api.LocalMarkStorage
 import com.maddyhome.idea.vim.api.SelectionInfo
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimCaretBase
@@ -28,14 +27,8 @@ import com.maddyhome.idea.vim.common.LiveRange
 import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.common.offset
 import com.maddyhome.idea.vim.group.visual.VisualChange
-import com.maddyhome.idea.vim.group.visual.vimLeadSelectionOffset
-import com.maddyhome.idea.vim.group.visual.vimSetSelection
-import com.maddyhome.idea.vim.group.visual.vimSetSystemSelectionSilently
-import com.maddyhome.idea.vim.group.visual.vimUpdateEditorSelection
-import com.maddyhome.idea.vim.helper.inlayAwareVisualColumn
 import com.maddyhome.idea.vim.helper.markStorage
 import com.maddyhome.idea.vim.helper.lastSelectionInfo
-import com.maddyhome.idea.vim.helper.markStorage
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.helper.registerStorage
 import com.maddyhome.idea.vim.helper.resetVimLastColumn
@@ -54,17 +47,6 @@ class IjVimCaret(val caret: Caret) : VimCaretBase() {
       if (storage == null) {
         storage = CaretRegisterStorageBase()
         this.caret.registerStorage = storage
-      }
-      return storage
-    }
-  override val markStorage: LocalMarkStorage
-    get() {
-      var storage = this.caret.markStorage
-      if (storage == null) {
-        storage = LocalMarkStorage(this)
-        this.caret.markStorage = storage
-      } else if (storage.caret != this) {
-        storage.caret = this
       }
       return storage
     }

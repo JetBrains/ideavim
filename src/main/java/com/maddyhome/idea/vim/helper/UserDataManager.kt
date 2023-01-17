@@ -21,9 +21,6 @@ import com.intellij.openapi.util.UserDataHolder
 import com.maddyhome.idea.vim.api.CaretRegisterStorageBase
 import com.maddyhome.idea.vim.api.LocalMarkStorage
 import com.maddyhome.idea.vim.api.SelectionInfo
-import com.maddyhome.idea.vim.api.LocalMarkStorage
-import com.maddyhome.idea.vim.api.VimMarkService
-import com.maddyhome.idea.vim.api.VimMarkServiceBase
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.ex.ExOutputModel

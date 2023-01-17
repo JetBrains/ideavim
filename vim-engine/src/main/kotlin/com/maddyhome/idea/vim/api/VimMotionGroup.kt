@@ -58,8 +58,8 @@ interface VimMotionGroup {
 
   // Move caret to other
   fun moveCaretToMark(caret: ImmutableVimCaret, ch: Char, toLineStart: Boolean): Motion
-  fun moveCaretToJump(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Int
-  fun moveCaretToMatchingPair(editor: VimEditor, caret: ImmutableVimCaret): Int
+  fun moveCaretToJump(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Motion
+  fun moveCaretToMatchingPair(editor: VimEditor, caret: ImmutableVimCaret): Motion
 
   /**
    * Find the offset of the start of the next/previous word/WORD

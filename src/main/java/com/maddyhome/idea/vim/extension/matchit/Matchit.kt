@@ -329,37 +329,45 @@ private fun getMatchitOffset(editor: Editor, caret: Caret, count: Int, isInOpPen
   }
 
   val currentChar = editor.document.charsSequence[caretOffset]
-  var motion = -1
+  var motionOffset: Int? = null
 
   if (count > 0) {
     // Matchit doesn't affect the percent motion, so we fall back to the default behavior.
-    motion = VimPlugin.getMotion().moveCaretToLinePercent(editor.vim, caret.vim, count)
+    motionOffset = VimPlugin.getMotion().moveCaretToLinePercent(editor.vim, caret.vim, count)
   } else {
     // Check the simplest case first.
     if (DEFAULT_PAIRS.contains(currentChar)) {
-      motion = VimPlugin.getMotion().moveCaretToMatchingPair(editor.vim, caret.vim)
+      motionOffset = getMotionOffset(VimPlugin.getMotion().moveCaretToMatchingPair(editor.vim, caret.vim))
     } else {
       val matchitPatterns = FileTypePatterns.getMatchitPatterns(virtualFile)
       if (matchitPatterns != null) {
-        motion = if (reverse) {
+        motionOffset = if (reverse) {
           findMatchingPair(editor, caretOffset, isInOpPending, matchitPatterns.reversedOpenings, matchitPatterns.reversedClosings)
         } else {
           findMatchingPair(editor, caretOffset, isInOpPending, matchitPatterns.openings, matchitPatterns.closings)
         }
       }
 
-      if (motion < 0) {
+      if (motionOffset == null || motionOffset < 0) {
         // Use default motion if the file type isn't supported or we didn't find any extended pairs.
-        motion = VimPlugin.getMotion().moveCaretToMatchingPair(editor.vim, caret.vim)
+        motionOffset = getMotionOffset(VimPlugin.getMotion().moveCaretToMatchingPair(editor.vim, caret.vim))
       }
     }
   }
 
-  if (motion >= 0) {
-    motion = editor.vim.normalizeOffset(motion, false)
+  if (motionOffset != null && motionOffset >= 0) {
+    motionOffset = editor.vim.normalizeOffset(motionOffset, false)
   }
 
-  return motion
+  return motionOffset ?: -1
+}
+
+private fun getMotionOffset(motion: Motion): Int? {
+  return when (motion) {
+    is Motion.AbsoluteOffset -> motion.offset
+    is Motion.AdjustedOffset -> motion.offset
+    is Motion.Error, is Motion.NoMotion -> null
+  }
 }
 
 private fun findMatchingPair(
