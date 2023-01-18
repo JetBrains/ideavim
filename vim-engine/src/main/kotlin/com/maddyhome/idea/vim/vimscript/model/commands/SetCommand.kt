@@ -15,8 +15,8 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.Msg
-import com.maddyhome.idea.vim.option.ToggleOption
 import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.options.ToggleOption
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import java.util.*
 import kotlin.math.ceil
