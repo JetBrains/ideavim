@@ -10,7 +10,7 @@ package com.maddyhome.idea.vim.listener
 
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.diagnostic.vimLogger
-import com.maddyhome.idea.vim.options.helpers.StrictMode
+import com.maddyhome.idea.vim.helper.StrictMode
 import java.io.Closeable
 
 /**

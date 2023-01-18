@@ -75,7 +75,7 @@ import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.helpers.KeywordOptionChangeListener
-import com.maddyhome.idea.vim.options.helpers.StrictMode
+import com.maddyhome.idea.vim.helper.StrictMode
 import com.maddyhome.idea.vim.ui.ShowCmdOptionChangeListener
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import java.awt.event.MouseAdapter

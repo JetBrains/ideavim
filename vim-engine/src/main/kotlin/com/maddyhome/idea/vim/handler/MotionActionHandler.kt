@@ -25,7 +25,7 @@ import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.helper.inBlockSubMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.isEndAllowed
-import com.maddyhome.idea.vim.options.helpers.StrictMode
+import com.maddyhome.idea.vim.helper.StrictMode
 
 /**
  * @author Alex Plate
