@@ -1,14 +1,14 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2023 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
  * https://opensource.org/licenses/MIT.
  */
 
-package com.maddyhome.idea.vim.vimscript.services
+package com.maddyhome.idea.vim.options
 
-import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.vimscript.services.OptionService
 
 /**
  * API for accessing option values in the given scope
