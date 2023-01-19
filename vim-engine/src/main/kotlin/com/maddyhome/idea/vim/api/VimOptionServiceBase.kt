@@ -25,7 +25,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.datatypes.parseNumber
 import com.maddyhome.idea.vim.vimscript.services.OptionService
-import com.maddyhome.idea.vim.vimscript.services.OptionValueAccessor
+import com.maddyhome.idea.vim.options.OptionValueAccessor
 
 abstract class VimOptionServiceBase : OptionService {
 
