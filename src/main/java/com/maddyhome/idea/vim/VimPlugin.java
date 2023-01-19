@@ -190,6 +190,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     return ApplicationManager.getApplication().getService(VariableService.class);
   }
 
+  // Used by which-key 0.8.0, IdeaVimExtension 1.6.5 + 1.6.8
   public static @NotNull OptionService getOptionService() {
     return VimInjectorKt.getInjector().getOptionService();
   }
