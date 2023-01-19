@@ -37,7 +37,6 @@ import com.maddyhome.idea.vim.listener.VimListenerManager;
 import com.maddyhome.idea.vim.newapi.IjVimInjector;
 import com.maddyhome.idea.vim.ui.StatusBarIconFactory;
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
-import com.maddyhome.idea.vim.vimscript.services.IjVimOptionService;
 import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import com.maddyhome.idea.vim.vimscript.services.VariableService;
 import com.maddyhome.idea.vim.yank.YankGroupBase;
@@ -193,10 +192,6 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   // Used by which-key 0.8.0, IdeaVimExtension 1.6.5 + 1.6.8
   public static @NotNull OptionService getOptionService() {
     return VimInjectorKt.getInjector().getOptionService();
-  }
-
-  public static @NotNull IjVimOptionService getOptionServiceImpl() {
-    return (IjVimOptionService)VimInjectorKt.getInjector().getOptionService();
   }
 
   private static @NotNull NotificationService getNotifications() {
