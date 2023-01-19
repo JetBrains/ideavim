@@ -21,6 +21,9 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
  * COMPATIBILITY-LAYER: Moved to a different package
  * Please see: https://jb.gg/zo8n0r
  */
+// Used by:
+// * which-key 0.8.0 - getOptionValue$default(OptionScope, String)
+// * IdeaVimExtension 1.6.8 - setOption$default(Scope, String)
 interface OptionService {
 
   /**
@@ -30,6 +33,7 @@ interface OptionService {
    * @param token used in exception messages
    * @throws ExException("E518: Unknown option: $token")
    */
+  // Used by which-key 0.8.0 - "which-key", "timeout" and "timeoutlen"
   fun getOptionValue(scope: OptionScope, optionName: String, token: String = optionName): VimDataType
 
   /**
@@ -114,19 +118,6 @@ interface OptionService {
   fun removeValue(scope: OptionScope, optionName: String, value: String, token: String = optionName)
 
   /**
-   * Checks if the toggle option on.
-   *
-   * Returns false if [optionName] is not a [ToggleOption]
-   * @param scope global/local option scope
-   * @param optionName option name or alias
-   * @param token used in exception messages
-   * @throws ExException("E518: Unknown option: $token") in case the option is not found
-   */
-  // COMPATIBILITY-LAYER: Used by (older versions of?) plugins
-  @Deprecated("Use OptionValueAccessor.isSet or OptionService.getOptionValue")
-  fun isSet(scope: OptionScope, optionName: String, token: String = optionName): Boolean
-
-  /**
    * Checks if the option's value set to default.
    *
    * @param scope global/local option scope
@@ -171,6 +162,8 @@ interface OptionService {
    * COMPATIBILITY-LAYER: New method added
    * Please see: https://jb.gg/zo8n0r
    */
+  // Used by IdeaVimExtension 1.6.8 - setOption(GLOBAL, "keep-english-in-normal")
+  // Note that Find External Usages doesn't return any results because it calls setOption$default
   fun setOption(scope: Scope, optionName: String, token: String = optionName)
 
   /**
@@ -250,6 +243,7 @@ interface OptionService {
    * COMPATIBILITY-LAYER: Added this class
    * Please see: https://jb.gg/zo8n0r
    */
+  // Used by IdeaVimExtension 1.6.5 + 1.6.8, passed to setOption
   sealed class Scope {
     object GLOBAL : Scope()
     class LOCAL(val editor: VimEditor) : Scope()
