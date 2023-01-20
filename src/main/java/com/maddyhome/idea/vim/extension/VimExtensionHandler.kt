@@ -12,6 +12,7 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.newapi.ij
 
 /**
@@ -19,7 +20,7 @@ import com.maddyhome.idea.vim.newapi.ij
  * Please see: https://jb.gg/zo8n0r
  */
 interface VimExtensionHandler : ExtensionHandler {
-  override fun execute(editor: VimEditor, context: ExecutionContext) {
+  override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
     execute(editor.ij, context.ij)
   }
 

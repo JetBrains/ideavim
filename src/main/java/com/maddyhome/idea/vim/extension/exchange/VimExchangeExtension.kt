@@ -22,6 +22,7 @@ import com.maddyhome.idea.vim.api.getOffset
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.setChangeMarks
 import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.common.TextRange
@@ -105,20 +106,20 @@ class VimExchangeExtension : VimExtension {
   private class ExchangeHandler(private val isLine: Boolean) : ExtensionHandler {
     override val isRepeatable = true
 
-    override fun execute(editor: VimEditor, context: ExecutionContext) {
+    override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
       setOperatorFunction(Operator(false))
       executeNormalWithoutMapping(injector.parser.parseKeys(if (isLine) "g@_" else "g@"), editor.ij)
     }
   }
 
   private class ExchangeClearHandler : ExtensionHandler {
-    override fun execute(editor: VimEditor, context: ExecutionContext) {
+    override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
       clearExchange(editor.ij)
     }
   }
 
   private class VExchangeHandler : ExtensionHandler {
-    override fun execute(editor: VimEditor, context: ExecutionContext) {
+    override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
       runWriteAction {
         val subMode = editor.subMode
         // Leave visual mode to create selection marks

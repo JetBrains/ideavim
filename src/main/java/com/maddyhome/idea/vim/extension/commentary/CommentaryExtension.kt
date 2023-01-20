@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.command.TextObjectVisualType
 import com.maddyhome.idea.vim.command.VimStateMachine
@@ -116,7 +117,7 @@ class CommentaryExtension : VimExtension {
     val plugCommentaryKeys = injector.parser.parseKeys("<Plug>Commentary")
     val plugCommentaryLineKeys = injector.parser.parseKeys("<Plug>CommentaryLine")
     putExtensionHandlerMapping(MappingMode.NX, plugCommentaryKeys, owner, CommentaryOperatorHandler(), false)
-    putExtensionHandlerMapping(MappingMode.O, plugCommentaryKeys, owner, CommentaryTextObjectMotionHandler(), false)
+    putExtensionHandlerMapping(MappingMode.O, plugCommentaryKeys, owner, CommentaryMappingHandler(), false)
     putKeyMappingIfMissing(MappingMode.N, plugCommentaryLineKeys, owner, injector.parser.parseKeys("gc_"), true)
 
     putKeyMappingIfMissing(MappingMode.NXO, injector.parser.parseKeys("gc"), owner, plugCommentaryKeys, true)
@@ -152,7 +153,7 @@ class CommentaryExtension : VimExtension {
       return false
     }
 
-    override fun execute(editor: VimEditor, context: ExecutionContext) {
+    override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
       setOperatorFunction(this)
       executeNormalWithoutMapping(injector.parser.parseKeys("g@"), editor.ij)
     }
@@ -164,29 +165,23 @@ class CommentaryExtension : VimExtension {
     }
   }
 
+  private class CommentaryMappingHandler : ExtensionHandler {
+    override val isRepeatable = true
+
+    override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
+      val commandState = editor.vimStateMachine
+
+      val command = Command(operatorArguments.count1, CommentaryTextObjectMotionHandler, Command.Type.MOTION,  EnumSet.noneOf(CommandFlags::class.java))
+      commandState.commandBuilder.completeCommandPart(Argument(command))
+    }
+  }
+
   /**
    * The text object handler that provides the motion in e.g. `dgc`
    *
    * This object is both the `<Plug>Commentary` mapping handler and the text object handler
    */
-  private class CommentaryTextObjectMotionHandler : TextObjectActionHandler(), ExtensionHandler {
-    override val isRepeatable = true
-
-    override fun execute(editor: VimEditor, context: ExecutionContext) {
-      val commandState = editor.vimStateMachine
-      val count = maxOf(1, commandState.commandBuilder.count)
-
-      val textObjectHandler = this
-      commandState.commandBuilder.completeCommandPart(
-        Argument(
-          Command(
-            count, textObjectHandler, Command.Type.MOTION,
-            EnumSet.noneOf(CommandFlags::class.java)
-          )
-        )
-      )
-    }
-
+  private object CommentaryTextObjectMotionHandler : TextObjectActionHandler() {
     override val visualType: TextObjectVisualType = TextObjectVisualType.LINE_WISE
 
     override fun getRange(

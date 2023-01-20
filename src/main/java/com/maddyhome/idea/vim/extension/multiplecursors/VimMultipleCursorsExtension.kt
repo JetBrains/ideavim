@@ -22,6 +22,7 @@ import com.maddyhome.idea.vim.api.getText
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.extension.ExtensionHandler
@@ -101,7 +102,7 @@ class VimMultipleCursorsExtension : VimExtension {
   }
 
   abstract class WriteActionHandler : ExtensionHandler {
-    override fun execute(editor: VimEditor, context: ExecutionContext) {
+    override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
       ApplicationManager.getApplication().runWriteAction {
         executeInWriteAction(editor.ij, context.ij)
       }

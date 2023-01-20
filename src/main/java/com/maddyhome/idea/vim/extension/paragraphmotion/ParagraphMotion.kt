@@ -15,6 +15,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.normalizeOffset
 import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.extension.VimExtensionFacade
@@ -36,7 +37,7 @@ class ParagraphMotion : VimExtension {
   }
 
   private class ParagraphMotionHandler(private val count: Int) : ExtensionHandler {
-    override fun execute(editor: VimEditor, context: ExecutionContext) {
+    override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
       editor.ij.vimForEachCaret { caret ->
         val motion = moveCaretToNextParagraph(editor.ij, caret, count)
         if (motion >= 0) {

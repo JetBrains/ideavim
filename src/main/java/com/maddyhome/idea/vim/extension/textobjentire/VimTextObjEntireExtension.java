@@ -129,7 +129,7 @@ public class VimTextObjEntireExtension implements VimExtension {
     }
 
     @Override
-    public void execute(@NotNull VimEditor editor, @NotNull ExecutionContext context) {
+    public void execute(@NotNull VimEditor editor, @NotNull ExecutionContext context, @NotNull OperatorArguments operatorArguments) {
       @NotNull VimStateMachine vimStateMachine = VimStateMachine.getInstance(editor);
       int count = Math.max(1, vimStateMachine.getCommandBuilder().getCount());
 

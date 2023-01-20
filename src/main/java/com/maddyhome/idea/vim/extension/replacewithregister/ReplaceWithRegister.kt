@@ -58,7 +58,7 @@ class ReplaceWithRegister : VimExtension {
   }
 
   private class RwrVisual : ExtensionHandler {
-    override fun execute(editor: VimEditor, context: ExecutionContext) {
+    override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
       val typeInEditor = SelectionType.fromSubMode(editor.subMode)
       editor.carets().forEach { caret ->
         val selectionStart = caret.selectionStart
@@ -74,7 +74,7 @@ class ReplaceWithRegister : VimExtension {
   private class RwrMotion : ExtensionHandler {
     override val isRepeatable: Boolean = true
 
-    override fun execute(editor: VimEditor, context: ExecutionContext) {
+    override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
       setOperatorFunction(Operator())
       executeNormalWithoutMapping(injector.parser.parseKeys("g@"), editor.ij)
     }
@@ -83,12 +83,12 @@ class ReplaceWithRegister : VimExtension {
   private class RwrLine : ExtensionHandler {
     override val isRepeatable: Boolean = true
 
-    override fun execute(editor: VimEditor, context: ExecutionContext) {
+    override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
       val caretsAndSelections = mutableMapOf<ImmutableVimCaret, VimSelection>()
       editor.carets().forEach { caret ->
         val logicalLine = caret.getBufferPosition().line
         val lineStart = editor.getLineStartOffset(logicalLine)
-        val lineEnd = editor.getLineEndOffset(logicalLine, true)
+        val lineEnd = editor.getLineEndOffset(logicalLine + operatorArguments.count1 - 1, true)
 
         val visualSelection = caret to VimSelection.create(lineStart, lineEnd, SelectionType.LINE_WISE, editor)
         caretsAndSelections += visualSelection

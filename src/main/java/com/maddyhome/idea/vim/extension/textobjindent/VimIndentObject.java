@@ -256,7 +256,7 @@ public class VimIndentObject implements VimExtension {
     }
 
     @Override
-    public void execute(@NotNull VimEditor editor, @NotNull ExecutionContext context) {
+    public void execute(@NotNull VimEditor editor, @NotNull ExecutionContext context, @NotNull OperatorArguments operatorArguments) {
       IjVimEditor vimEditor = (IjVimEditor)editor;
       @NotNull VimStateMachine vimStateMachine = VimStateMachine.getInstance(vimEditor);
       int count = Math.max(1, vimStateMachine.getCommandBuilder().getCount());

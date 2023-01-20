@@ -16,6 +16,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getLineEndOffset
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.common.TextRange
@@ -74,14 +75,14 @@ class VimSurroundExtension : VimExtension {
   private class YSurroundHandler : ExtensionHandler {
     override val isRepeatable = true
 
-    override fun execute(editor: VimEditor, context: ExecutionContext) {
+    override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
       setOperatorFunction(Operator())
       executeNormalWithoutMapping(injector.parser.parseKeys("g@"), editor.ij)
     }
   }
 
   private class VSurroundHandler : ExtensionHandler {
-    override fun execute(editor: VimEditor, context: ExecutionContext) {
+    override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
       val selectionStart = editor.ij.caretModel.primaryCaret.selectionStart
       // NB: Operator ignores SelectionType anyway
       if (!Operator().apply(editor, context, SelectionType.CHARACTER_WISE)) {
@@ -98,7 +99,7 @@ class VimSurroundExtension : VimExtension {
   private class CSurroundHandler : ExtensionHandler {
     override val isRepeatable = true
 
-    override fun execute(editor: VimEditor, context: ExecutionContext) {
+    override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
       val charFrom = getChar(editor.ij)
       if (charFrom.code == 0) return
 
@@ -200,7 +201,7 @@ class VimSurroundExtension : VimExtension {
   private class DSurroundHandler : ExtensionHandler {
     override val isRepeatable = true
 
-    override fun execute(editor: VimEditor, context: ExecutionContext) {
+    override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
       // Deleting surround is just changing the surrounding to "nothing"
       val charFrom = getChar(editor.ij)
       if (charFrom.code == 0) return

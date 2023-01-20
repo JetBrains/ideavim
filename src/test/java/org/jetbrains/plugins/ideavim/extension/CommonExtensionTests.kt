@@ -16,6 +16,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.extension.Alias
 import com.maddyhome.idea.vim.extension.ExtensionBeanClass
@@ -337,7 +338,7 @@ private class TestExtension : VimExtension {
   }
 
   private class MoveEmulateInclusive : ExtensionHandler {
-    override fun execute(editor: VimEditor, context: ExecutionContext) {
+    override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
       VimPlugin.getVisualMotion().enterVisualMode(editor, VimStateMachine.SubMode.VISUAL_CHARACTER)
       val caret = editor.ij.caretModel.currentCaret
       val newOffset = VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret.vim, 5, editor.isEndAllowed)
@@ -346,19 +347,19 @@ private class TestExtension : VimExtension {
   }
 
   private class MoveBackwards : ExtensionHandler {
-    override fun execute(editor: VimEditor, context: ExecutionContext) {
+    override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
       editor.ij.caretModel.allCarets.forEach { it.moveToOffset(it.offset - 5) }
     }
   }
 
   private class Move : ExtensionHandler {
-    override fun execute(editor: VimEditor, context: ExecutionContext) {
+    override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
       editor.ij.caretModel.allCarets.forEach { it.moveToOffset(it.offset + 5) }
     }
   }
 
   private class MoveLinewise : ExtensionHandler {
-    override fun execute(editor: VimEditor, context: ExecutionContext) {
+    override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
       VimPlugin.getVisualMotion().enterVisualMode(editor, VimStateMachine.SubMode.VISUAL_LINE)
       val caret = editor.ij.caretModel.currentCaret
       val newOffset = VimPlugin.getMotion().getVerticalMotionOffset(editor, caret.vim, 1)
@@ -367,7 +368,7 @@ private class TestExtension : VimExtension {
   }
 
   private class MoveLinewiseInNormal : ExtensionHandler {
-    override fun execute(editor: VimEditor, context: ExecutionContext) {
+    override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
       val caret = editor.ij.caretModel.currentCaret
       val newOffset = VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret.vim, 1, true)
       caret.vim.moveToOffset(newOffset)
@@ -375,7 +376,7 @@ private class TestExtension : VimExtension {
   }
 
   private class DelayedAction : ExtensionHandler.WithCallback() {
-    override fun execute(editor: VimEditor, context: ExecutionContext) {
+    override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
       invokeLater {
         invokeLater {
           editor.ij.caretModel.allCarets.forEach { it.moveToOffset(it.offset + 5) }
@@ -387,7 +388,7 @@ private class TestExtension : VimExtension {
 
   // This action should be registered with WithCallback, but we intentionally made it incorrectly for tests
   private class DelayedIncorrectAction : ExtensionHandler {
-    override fun execute(editor: VimEditor, context: ExecutionContext) {
+    override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
       invokeLater {
         invokeLater {
           editor.ij.caretModel.allCarets.forEach { it.moveToOffset(it.offset + 5) }

@@ -16,6 +16,7 @@ import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.command.SelectionType.Companion.fromSubMode
 import com.maddyhome.idea.vim.command.VimStateMachine
@@ -172,8 +173,9 @@ class ToHandlerMappingInfo(
       }
     }
 
+    val operatorArguments = OperatorArguments(vimStateMachine.isOperatorPending, vimStateMachine.commandBuilder.count, vimStateMachine.mode, vimStateMachine.subMode)
     injector.actionExecutor.executeCommand(
-      editor, { extensionHandler.execute(editor, context) },
+      editor, { extensionHandler.execute(editor, context, operatorArguments) },
       "Vim " + extensionHandler.javaClass.simpleName, null
     )
 

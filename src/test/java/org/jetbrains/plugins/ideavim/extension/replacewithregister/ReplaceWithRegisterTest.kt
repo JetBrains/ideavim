@@ -269,13 +269,6 @@ class ReplaceWithRegisterTest : VimTestCase() {
     )
   }
 
-  @VimBehaviorDiffers(
-    """
-            I found it in a legendary land
-            ${c}I found it in a legendary land
-            hard by the torrent of a mountain pass.
-  """
-  )
   fun `test line with number`() {
     val text = """
             I found it in ${c}a legendary land
@@ -290,7 +283,6 @@ class ReplaceWithRegisterTest : VimTestCase() {
       """
             I found it in a legendary land
             ${c}I found it in a legendary land
-            where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
       """.trimIndent()
     )

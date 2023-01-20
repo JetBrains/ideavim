@@ -91,7 +91,7 @@ class Matchit : VimExtension {
 
   private class MatchitHandler(private val reverse: Boolean) : ExtensionHandler {
 
-    override fun execute(editor: VimEditor, context: ExecutionContext) {
+    override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
       val commandState = editor.vimStateMachine
       val count = commandState.commandBuilder.count
 

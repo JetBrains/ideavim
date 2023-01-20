@@ -50,7 +50,7 @@ class RepeatChangeAction : VimActionHandler.SingleExecution() {
         val processor = CommandProcessor.getInstance()
         processor.executeCommand(
           editor.ij.project,
-          { lastHandler.execute(editor, context) },
+          { lastHandler.execute(editor, context, operatorArguments) },
           "Vim " + lastHandler.javaClass.simpleName,
           null
         )
