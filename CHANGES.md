@@ -25,6 +25,15 @@ usual beta standards.
 
 ## To Be Released
 
+### Features:
+* Now every secondary caret has its own marks. You can use marks and `gv` in multiple-caret mode now.
+
+### Fixes:
+* [VIM-1829](https://youtrack.jetbrains.com/issue/VIM-1829/key-combinations-are-not-working-in-visual-mode-IdeaVim) Fix marks when moving lines up/down
+* [VIM-2130](https://youtrack.jetbrains.com/issue/VIM-2130/Vim-visual-mode-mapping-isnt-behaving-correctly-in-ideavim-it-leaves-visual-mode-after-its-executed) Fix marks when moving lines up/down
+* [VIM-2428](https://youtrack.jetbrains.com/issue/VIM-2428/The-gv-command-doesnt-work) Fix marks when moving lines up/down
+* [VIM-2686](https://youtrack.jetbrains.com/issue/VIM-2686/Multiple-caret-marks) Add idividual mark storage for each secondary caret
+
 ### Merged PRs:
 * [589](https://github.com/JetBrains/ideavim/pull/589) by [Matt Ellis](https://github.com/citizenmatt): Refactor option usage and introduce accessor API
 
@@ -39,10 +48,6 @@ usual beta standards.
 * [VIM-2577](https://youtrack.jetbrains.com/issue/VIM-2577) Fix paste at the end of notebook cell
 * [VIM-2813](https://youtrack.jetbrains.com/issue/VIM-2813) Migrate update checker to VimStandalonePluginUpdateChecker
 * [VIM-2833](https://youtrack.jetbrains.com/issue/VIM-2833) Fix rare deadlock during put in insert mode from clipboard
-* [VIM-1829](https://youtrack.jetbrains.com/issue/VIM-1829/key-combinations-are-not-working-in-visual-mode-IdeaVim) Fix marks when moving lines up/down
-* [VIM-2130](https://youtrack.jetbrains.com/issue/VIM-2130/Vim-visual-mode-mapping-isnt-behaving-correctly-in-ideavim-it-leaves-visual-mode-after-its-executed) Fix marks when moving lines up/down
-* [VIM-2428](https://youtrack.jetbrains.com/issue/VIM-2428/The-gv-command-doesnt-work) Fix marks when moving lines up/down
-* [VIM-2686](https://youtrack.jetbrains.com/issue/VIM-2686/Multiple-caret-marks) Add idividual mark storage for each secondary caret
 
 ### Merged PRs:
 * [558](https://github.com/JetBrains/ideavim/pull/558) by [Matt Ellis](https://github.com/citizenmatt): Fix incorrect normalising for trailing inlay
