@@ -284,8 +284,14 @@ tasks {
         from(sourceSets.main.get().java) {
             include("**/com/maddyhome/idea/vim/**/*.java")
         }
+        from(project(":vim-engine").sourceSets.main.get().java) {
+            include("**/com/maddyhome/idea/vim/**/*.java")
+        }
         // Kotlin sources
         from(kotlin.sourceSets.main.get().kotlin) {
+            include("**/com/maddyhome/idea/vim/**/*.kt")
+        }
+        from(project(":vim-engine").kotlin.sourceSets.main.get().kotlin) {
             include("**/com/maddyhome/idea/vim/**/*.kt")
         }
         destinationDirectory.set(layout.buildDirectory.dir("libs"))
