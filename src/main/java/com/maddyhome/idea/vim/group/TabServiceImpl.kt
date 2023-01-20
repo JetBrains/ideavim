@@ -22,49 +22,49 @@ internal class TabServiceImpl : TabService {
 
   override fun removeTabAt(indexToDelete: Int, indexToSelect: Int, context: ExecutionContext) {
     val tabbedPane = getTabbedPane(context)
-    tabbedPane.removeTabAt(indexToDelete, indexToDelete)
+    tabbedPane?.removeTabAt(indexToDelete, indexToDelete)
   }
 
   override fun getTabCount(context: ExecutionContext): Int {
     val tabs = getTabs(context)
-    return tabs.tabCount
+    return tabs?.tabCount ?: 0
   }
 
   override fun getCurrentTabIndex(context: ExecutionContext): Int {
-    val currentTab = getCurrentTab(context)
-    return getTabs(context).getIndexOf(currentTab)
+    val currentTab = getCurrentTab(context) ?: throw ExException("There is no tab selected")
+    return getTabs(context)?.getIndexOf(currentTab) ?: throw ExException("There are no tabs open")
   }
 
   override fun moveCurrentTabToIndex(index: Int, context: ExecutionContext) {
     val tab = getCurrentTab(context) ?: throw ExException("There is no tab selected")
-    val tabs = getTabs(context)
+    val tabs = getTabs(context) ?: throw ExException("There are no tabs open")
     tabs.removeTab(tab)
     tabs.addTab(tab, index)
     tabs.select(tab, true)
   }
 
   override fun closeAllExceptCurrentTab(context: ExecutionContext) {
-    val currentWindow = getCurrentWindow(context)
+    val currentWindow = getCurrentWindow(context) ?: throw ExException("There is no tab selected")
     currentWindow.closeAllExcept(currentWindow.selectedFile)
   }
 
   private fun getCurrentTab(context: ExecutionContext): TabInfo? {
-    return getTabs(context).selectedInfo
+    return getTabs(context)?.selectedInfo
   }
 
-  private fun getCurrentWindow(context: ExecutionContext): EditorWindow {
+  private fun getCurrentWindow(context: ExecutionContext): EditorWindow? {
     val project = PlatformDataKeys.PROJECT.getData(context.ij) ?: throw ExException("Could not get current tab list")
     val fileEditorManager = FileEditorManagerEx.getInstanceEx(project)
     return fileEditorManager.currentWindow
   }
 
-  private fun getTabbedPane(context: ExecutionContext): EditorTabbedContainer {
+  private fun getTabbedPane(context: ExecutionContext): EditorTabbedContainer? {
     val currentWindow = getCurrentWindow(context)
-    return currentWindow.tabbedPane
+    return currentWindow?.tabbedPane
   }
 
-  private fun getTabs(context: ExecutionContext): JBTabs {
+  private fun getTabs(context: ExecutionContext): JBTabs? {
     val tabbedPane = getTabbedPane(context)
-    return tabbedPane.tabs
+    return tabbedPane?.tabs
   }
 }

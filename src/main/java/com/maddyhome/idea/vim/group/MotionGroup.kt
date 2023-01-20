@@ -296,10 +296,11 @@ class MotionGroup : VimMotionGroupBase() {
     if (editorWindow != null) {
       val tabbedPane = editorWindow.tabbedPane
       if (absolute) {
-        tabbedPane.selectedIndex = value
+        tabbedPane.setSelectedIndex(value)
       } else {
         val tabIndex = (value + tabbedPane.selectedIndex) % tabbedPane.tabCount
-        tabbedPane.selectedIndex = if (tabIndex < 0) tabIndex + tabbedPane.tabCount else tabIndex
+        val newIndex = if (tabIndex < 0) tabIndex + tabbedPane.tabCount else tabIndex
+        tabbedPane.setSelectedIndex(newIndex)
       }
     }
   }

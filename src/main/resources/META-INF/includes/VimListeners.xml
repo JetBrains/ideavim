@@ -34,5 +34,8 @@
 
     <listener class="com.maddyhome.idea.vim.listener.IdeaSpecifics$LookupTopicListener"
               topic="com.intellij.codeInsight.lookup.LookupManagerListener"/>
+
+    <listener class="com.maddyhome.idea.vim.ui.WidgetUpdater"
+              topic="com.intellij.openapi.fileEditor.FileEditorManagerListener"/>
   </projectListeners>
 </idea-plugin>

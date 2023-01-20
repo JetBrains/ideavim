@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.ui
 
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent
+import com.intellij.openapi.fileEditor.FileEditorManagerListener
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.util.NlsSafe
@@ -111,7 +112,8 @@ class ShowCmdStatusBarWidgetFactory : StatusBarWidgetFactory/*, LightEditCompati
 class Widget(project: Project) :
   EditorBasedWidget(project),
   StatusBarWidget.Multiframe,
-  StatusBarWidget.TextPresentation {
+  StatusBarWidget.TextPresentation,
+  FileEditorManagerListener {
 
   override fun ID() = ShowCmd.ID
 
@@ -121,20 +123,24 @@ class Widget(project: Project) :
 
   @VimNlsSafe
   override fun getTooltipText(): String {
-    var count = ShowCmd.getFullText(this.editor)
+    var count = ShowCmd.getFullText(getEditor())
     if (count.isNotBlank()) count = ": $count"
     return "${ShowCmd.displayName}$count"
   }
 
-  override fun getText(): String = ShowCmd.getWidgetText(editor)
+  override fun getText(): String = ShowCmd.getWidgetText(getEditor())
 
   override fun getAlignment() = Component.CENTER_ALIGNMENT
 
   // Multiframe#copy to show the widget on popped out editors
-  override fun copy(): StatusBarWidget = Widget(myProject)
+  override fun copy(): StatusBarWidget = Widget(project)
+}
 
+class WidgetUpdater : FileEditorManagerListener {
   override fun selectionChanged(event: FileEditorManagerEvent) {
     // Update when changing selected editor
-    myStatusBar?.updateWidget(ShowCmd.ID)
+    val windowManager = WindowManager.getInstance()
+    val statusBar = windowManager.getStatusBar(event.manager.project)
+    statusBar.updateWidget(ShowCmd.ID)
   }
 }

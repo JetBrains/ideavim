@@ -10,8 +10,8 @@ package com.maddyhome.idea.vim.config.migration
 
 import com.intellij.openapi.application.PathManager
 import com.intellij.openapi.util.JDOMUtil
-import com.intellij.util.io.exists
 import org.jdom.Element
+import kotlin.io.path.exists
 
 interface ConfigMigrator {
   val fromVersion: Int
