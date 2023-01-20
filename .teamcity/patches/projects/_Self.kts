@@ -2,8 +2,10 @@ package patches.projects
 
 import jetbrains.buildServer.configs.kotlin.v2019_2.*
 import jetbrains.buildServer.configs.kotlin.v2019_2.AmazonEC2CloudImage
+import jetbrains.buildServer.configs.kotlin.v2019_2.AmazonEC2CloudProfile
 import jetbrains.buildServer.configs.kotlin.v2019_2.Project
 import jetbrains.buildServer.configs.kotlin.v2019_2.amazonEC2CloudImage
+import jetbrains.buildServer.configs.kotlin.v2019_2.amazonEC2CloudProfile
 import jetbrains.buildServer.configs.kotlin.v2019_2.ui.*
 
 /*
@@ -44,7 +46,30 @@ changeProject(DslContext.projectId) {
             instanceTags = mapOf(
                 "project" to "idea-vim"
             )
-            source = Source("ami-07c529efaddafcf86")
+            source = Source("ami-087dfbf409df5a55e")
+            param("ebs-optimized", "")
+        }
+        val feature2 = find<AmazonEC2CloudProfile> {
+            amazonEC2CloudProfile {
+                id = "amazon-48"
+                name = "Cloud Agents - Single Build"
+                terminateAfterBuild = true
+                terminateIdleMinutes = 15
+                region = AmazonEC2CloudProfile.Regions.EU_WEST_DUBLIN
+                maxInstancesCount = 10
+                authType = accessKey {
+                    keyId = "credentialsJSON:dbcdb2a2-de5f-4bc9-9421-292b19e83947"
+                    secretKey = "credentialsJSON:65a87fe7-0977-4af9-96f1-344f2b82d269"
+                }
+                param("agentPushPreset", "")
+            }
+        }
+        feature2.apply {
+            name = "Cloud Agents - Single Build"
+            terminateAfterBuild = true
+            terminateIdleMinutes = 15
+            region = AmazonEC2CloudProfile.Regions.EU_WEST_DUBLIN
+            maxInstancesCount = 10
         }
     }
 }
