@@ -56,7 +56,7 @@ sealed class PutVisualTextBaseAction(
 
   private fun getPutDataForCaret(caret: VimCaret, selection: VimSelection?, count: Int): PutData {
     val lastRegisterChar = injector.registerGroup.lastRegisterChar
-    val register = caret.registerStorage.getRegister(caret, lastRegisterChar)
+    val register = caret.registerStorage.getRegister(lastRegisterChar)
     val textData = register?.let {
       PutData.TextData(
         register.text ?: injector.parser.toPrintableString(register.keys),

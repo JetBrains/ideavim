@@ -136,20 +136,20 @@ per-caret marks.
 }
 
 interface CaretRegisterStorage {
-  // todo methods shouldn't have caret in signature
+  val caret: ImmutableVimCaret
   /**
    * Stores text to caret's recordable (named/numbered/unnamed) register
    */
-  fun storeText(caret: ImmutableVimCaret, editor: VimEditor, range: TextRange, type: SelectionType, isDelete: Boolean): Boolean
+  fun storeText(editor: VimEditor, range: TextRange, type: SelectionType, isDelete: Boolean): Boolean
 
   /**
    * Gets text from caret's recordable register
    * If the register is not recordable - global text state will be returned
    */
-  fun getRegister(caret: ImmutableVimCaret, r: Char): Register?
+  fun getRegister(r: Char): Register?
 
-  fun setKeys(caret: ImmutableVimCaret, register: Char, keys: List<KeyStroke>)
-  fun saveRegister(caret: ImmutableVimCaret, r: Char, register: Register)
+  fun setKeys(register: Char, keys: List<KeyStroke>)
+  fun saveRegister(r: Char, register: Register)
 }
 
 data class SelectionInfo(val start: BufferPosition?, val end: BufferPosition?, val type: SelectionType)

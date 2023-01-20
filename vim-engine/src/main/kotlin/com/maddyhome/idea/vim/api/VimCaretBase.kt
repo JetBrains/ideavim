@@ -17,14 +17,14 @@ import javax.swing.KeyStroke
 
 abstract class VimCaretBase : VimCaret
 
-open class CaretRegisterStorageBase : CaretRegisterStorage, VimRegisterGroupBase() {
+open class CaretRegisterStorageBase(override var caret: ImmutableVimCaret) : CaretRegisterStorage, VimRegisterGroupBase() {
   override var lastRegisterChar: Char
     get() {
       return injector.registerGroup.lastRegisterChar
     }
     set(_) {}
 
-  override fun storeText(caret: ImmutableVimCaret, editor: VimEditor, range: TextRange, type: SelectionType, isDelete: Boolean): Boolean {
+  override fun storeText(editor: VimEditor, range: TextRange, type: SelectionType, isDelete: Boolean): Boolean {
     if (caret.isPrimary) {
       return injector.registerGroup.storeText(editor, caret, range, type, isDelete)
     }
@@ -35,14 +35,14 @@ open class CaretRegisterStorageBase : CaretRegisterStorage, VimRegisterGroupBase
     return super.storeText(editor, caret, range, type, isDelete)
   }
 
-  override fun getRegister(caret: ImmutableVimCaret, r: Char): Register? {
+  override fun getRegister(r: Char): Register? {
     if (caret.isPrimary || !RegisterConstants.RECORDABLE_REGISTERS.contains(r)) {
       return injector.registerGroup.getRegister(r)
     }
     return super.getRegister(r) ?: injector.registerGroup.getRegister(r)
   }
 
-  override fun setKeys(caret: ImmutableVimCaret, register: Char, keys: List<KeyStroke>) {
+  override fun setKeys(register: Char, keys: List<KeyStroke>) {
     if (caret.isPrimary) {
       injector.registerGroup.setKeys(register, keys)
     }
@@ -52,7 +52,7 @@ open class CaretRegisterStorageBase : CaretRegisterStorage, VimRegisterGroupBase
     return super.setKeys(register, keys)
   }
 
-  override fun saveRegister(caret: ImmutableVimCaret, r: Char, register: Register) {
+  override fun saveRegister(r: Char, register: Register) {
     if (caret.isPrimary) {
       injector.registerGroup.saveRegister(r, register)
     }

@@ -42,11 +42,12 @@ import com.maddyhome.idea.vim.helper.vimSelectionStartClear
 class IjVimCaret(val caret: Caret) : VimCaretBase() {
   override val registerStorage: CaretRegisterStorage
     get() {
-      // todo update caret in getter to simplify signature
       var storage = this.caret.registerStorage
       if (storage == null) {
-        storage = CaretRegisterStorageBase()
+        storage = CaretRegisterStorageBase(this)
         this.caret.registerStorage = storage
+      } else if (storage.caret != this) {
+        storage.caret = this
       }
       return storage
     }

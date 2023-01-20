@@ -81,7 +81,7 @@ class YankVisualActionTest : VimTestCase() {
     typeText(injector.parser.parseKeys("viw" + "y"))
     val editor = myFixture.editor.vim
     val lastRegister = injector.registerGroup.lastRegisterChar
-    val registers = editor.carets().map { it.registerStorage.getRegister(it, lastRegister)?.rawText }
+    val registers = editor.carets().map { it.registerStorage.getRegister(lastRegister)?.rawText }
     assertEquals(listOf("found", "was"), registers)
   }
 
@@ -155,7 +155,7 @@ class YankVisualActionTest : VimTestCase() {
     typeText(injector.parser.parseKeys("V" + "y"))
     val editor = myFixture.editor.vim
     val lastRegister = injector.registerGroup.lastRegisterChar
-    val registers = editor.carets().map { it.registerStorage.getRegister(it, lastRegister)?.rawText }
+    val registers = editor.carets().map { it.registerStorage.getRegister(lastRegister)?.rawText }
     assertEquals(
       listOf("all rocks and lavender and tufted grass,\n", "hard by the torrent of a mountain pass.\n"),
       registers

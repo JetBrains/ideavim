@@ -42,7 +42,7 @@ open class YankGroupBase : VimYankGroup {
 
     var result = true
     for ((caret, myRange) in caretToRange) {
-      result = caret.registerStorage.storeText(caret, editor, myRange, type, false) && result
+      result = caret.registerStorage.storeText(editor, myRange, type, false) && result
     }
     return result
   }
