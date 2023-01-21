@@ -18,7 +18,7 @@ import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.util.ui.table.JBTableRowEditor
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.vimscript.services.IjOptionConstants
+import com.maddyhome.idea.vim.group.IjOptionConstants
 import java.awt.Component
 import javax.swing.JComponent
 import javax.swing.JTable
@@ -46,8 +46,9 @@ private fun Editor.isDatabaseCell(): Boolean {
 private val Editor.disabledInDialog: Boolean
   get() {
     val ideaVimSupportValue = injector.globalOptions().getStringListValues(IjOptionConstants.ideavimsupport)
-    return (!ideaVimSupportValue.contains(IjOptionConstants.ideavimsupport_dialog) && !ideaVimSupportValue.contains(IjOptionConstants.ideavimsupport_dialoglegacy)) &&
-      (!this.isPrimaryEditor() && !EditorHelper.isFileEditor(this))
+    return (!ideaVimSupportValue.contains(IjOptionConstants.ideavimsupport_dialog)
+      && !ideaVimSupportValue.contains(IjOptionConstants.ideavimsupport_dialoglegacy))
+      && (!this.isPrimaryEditor() && !EditorHelper.isFileEditor(this))
   }
 
 /**

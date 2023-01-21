@@ -6,7 +6,7 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.maddyhome.idea.vim.vimscript.services
+package com.maddyhome.idea.vim.group
 
 import com.intellij.openapi.application.ApplicationNamesInfo
 import com.maddyhome.idea.vim.api.VimOptionGroupBase
@@ -15,7 +15,7 @@ import com.maddyhome.idea.vim.options.StringOption
 import com.maddyhome.idea.vim.options.ToggleOption
 import com.maddyhome.idea.vim.options.UnsignedNumberOption
 
-internal class IjVimOptionGroup : VimOptionGroupBase() {
+internal class OptionGroup : VimOptionGroupBase() {
 
   init {
     addOption(ToggleOption(IjOptionConstants.closenotebooks, IjOptionConstants.closenotebooks, true))

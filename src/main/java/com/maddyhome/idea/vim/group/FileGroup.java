@@ -39,7 +39,6 @@ import com.maddyhome.idea.vim.helper.SearchHelper;
 import com.maddyhome.idea.vim.newapi.ExecuteExtensionKt;
 import com.maddyhome.idea.vim.newapi.IjExecutionContext;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
-import com.maddyhome.idea.vim.vimscript.services.IjOptionConstants;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

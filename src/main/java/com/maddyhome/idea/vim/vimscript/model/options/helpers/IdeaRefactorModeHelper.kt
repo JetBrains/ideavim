@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.helper.hasVisualSelection
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.vimscript.services.IjOptionConstants
+import com.maddyhome.idea.vim.group.IjOptionConstants
 
 object IdeaRefactorModeHelper {
 

@@ -18,7 +18,6 @@ import com.intellij.openapi.project.Project
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.vimscript.services.IjOptionConstants
 
 class SystemMarks {
   companion object {

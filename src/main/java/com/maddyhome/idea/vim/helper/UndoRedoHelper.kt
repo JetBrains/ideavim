@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.common.ChangesListener
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.undo.UndoRedoBase
-import com.maddyhome.idea.vim.vimscript.services.IjOptionConstants
+import com.maddyhome.idea.vim.group.IjOptionConstants
 
 /**
  * @author oleg

@@ -42,7 +42,7 @@ import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.IdeaRefactorModeHelper
-import com.maddyhome.idea.vim.vimscript.services.IjOptionConstants
+import com.maddyhome.idea.vim.group.IjOptionConstants
 import org.jetbrains.annotations.NonNls
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
