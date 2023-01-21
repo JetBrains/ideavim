@@ -14,7 +14,7 @@ import com.intellij.testFramework.PlatformTestUtil
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.createLineBookmark
 import com.maddyhome.idea.vim.group.mnemonic
-import com.maddyhome.idea.vim.vimscript.services.IjOptionConstants
+import com.maddyhome.idea.vim.group.IjOptionConstants
 import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.OptionValueType
 import org.jetbrains.plugins.ideavim.VimOptionTestCase

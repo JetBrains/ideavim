@@ -47,7 +47,7 @@
     <applicationService serviceImplementation="com.maddyhome.idea.vim.vimscript.services.FunctionStorage"
                         serviceInterface="com.maddyhome.idea.vim.api.VimscriptFunctionService"/>
 
-    <applicationService serviceImplementation="com.maddyhome.idea.vim.vimscript.services.IjVimOptionGroup"
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.OptionGroup"
                         serviceInterface="com.maddyhome.idea.vim.api.VimOptionGroup"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.IjVimStorageService"
                         serviceInterface="com.maddyhome.idea.vim.api.VimStorageService"/>

@@ -45,7 +45,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.NotificationService
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.icons.VimIcons
-import com.maddyhome.idea.vim.vimscript.services.IjOptionConstants
+import com.maddyhome.idea.vim.group.IjOptionConstants
 import org.jetbrains.annotations.NonNls
 import java.awt.Point
 import java.awt.event.MouseEvent

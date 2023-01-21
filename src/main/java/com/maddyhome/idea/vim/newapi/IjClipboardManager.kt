@@ -31,7 +31,7 @@ import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.helper.TestClipboardModel
 import com.maddyhome.idea.vim.helper.TestClipboardModel.contents
-import com.maddyhome.idea.vim.vimscript.services.IjOptionConstants
+import com.maddyhome.idea.vim.group.IjOptionConstants
 import java.awt.HeadlessException
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.Transferable

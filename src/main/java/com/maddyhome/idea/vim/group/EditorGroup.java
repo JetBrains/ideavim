@@ -32,7 +32,6 @@ import com.maddyhome.idea.vim.options.LocalOptionChangeListener;
 import com.maddyhome.idea.vim.options.OptionConstants;
 import com.maddyhome.idea.vim.options.OptionValueAccessor;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType;
-import com.maddyhome.idea.vim.vimscript.services.IjOptionConstants;
 import org.jdom.Element;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NonNls;

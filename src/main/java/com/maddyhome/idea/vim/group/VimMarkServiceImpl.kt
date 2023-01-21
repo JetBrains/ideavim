@@ -36,7 +36,6 @@ import com.maddyhome.idea.vim.mark.IntellijMark
 import com.maddyhome.idea.vim.mark.Mark
 import com.maddyhome.idea.vim.mark.VimMark.Companion.create
 import com.maddyhome.idea.vim.newapi.IjVimEditor
-import com.maddyhome.idea.vim.vimscript.services.IjOptionConstants
 import org.jdom.Element
 import java.util.*
 import kotlin.Comparator

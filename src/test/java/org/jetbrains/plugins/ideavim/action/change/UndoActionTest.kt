@@ -9,7 +9,7 @@
 package org.jetbrains.plugins.ideavim.action.change
 
 import com.maddyhome.idea.vim.command.VimStateMachine
-import com.maddyhome.idea.vim.vimscript.services.IjOptionConstants
+import com.maddyhome.idea.vim.group.IjOptionConstants
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class UndoActionTest : VimTestCase() {
