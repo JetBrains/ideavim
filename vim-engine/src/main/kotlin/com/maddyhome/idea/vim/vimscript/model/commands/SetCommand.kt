@@ -77,7 +77,7 @@ data class SetLocalCommand(val ranges: Ranges, val argument: String) : Command.S
 // todo is failOnBad used anywhere?
 fun parseOptionLine(editor: VimEditor, args: String, scope: OptionScope, failOnBad: Boolean): Boolean {
   // No arguments so we show changed values
-  val optionService = injector.optionService
+  val optionService = injector.optionGroup
   when {
     args.isEmpty() -> {
       val changedOptions = optionService.getOptions().filter { !optionService.isDefault(scope, it) }
@@ -172,7 +172,7 @@ fun parseOptionLine(editor: VimEditor, args: String, scope: OptionScope, failOnB
 }
 
 private fun showOptions(editor: VimEditor, nameAndToken: Collection<Pair<String, String>>, scope: OptionScope, showIntro: Boolean) {
-  val optionService = injector.optionService
+  val optionService = injector.optionGroup
   val optionsToShow = mutableListOf<String>()
   var unknownOption: Pair<String, String>? = null
   for (pair in nameAndToken) {
@@ -240,8 +240,8 @@ private fun showOptions(editor: VimEditor, nameAndToken: Collection<Pair<String,
 }
 
 private fun optionToString(scope: OptionScope, name: String): String {
-  val value = injector.optionService.getOptionValue(scope, name)
-  return if (injector.optionService.isToggleOption(name)) {
+  val value = injector.optionGroup.getOptionValue(scope, name)
+  return if (injector.optionGroup.isToggleOption(name)) {
     if (value.asBoolean()) "  $name" else "no$name"
   } else {
     "$name=$value"

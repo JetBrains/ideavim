@@ -37,6 +37,7 @@ import com.maddyhome.idea.vim.api.VimLookupManager
 import com.maddyhome.idea.vim.api.VimMarkService
 import com.maddyhome.idea.vim.api.VimMessages
 import com.maddyhome.idea.vim.api.VimMotionGroup
+import com.maddyhome.idea.vim.api.VimOptionGroup
 import com.maddyhome.idea.vim.api.VimProcessGroup
 import com.maddyhome.idea.vim.api.VimRegexpService
 import com.maddyhome.idea.vim.api.VimScrollGroup
@@ -183,7 +184,7 @@ class IjVimInjector : VimInjectorBase() {
   override val vimscriptParser: VimscriptParser
     get() = com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 
-  override val optionService: OptionService
+  override val optionGroup: VimOptionGroup
     get() = service()
   override val parser: VimStringParser
     get() = service<IjVimStringParser>()

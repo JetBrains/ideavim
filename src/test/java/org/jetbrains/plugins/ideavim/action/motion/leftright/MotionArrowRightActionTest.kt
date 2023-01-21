@@ -336,7 +336,7 @@ class MotionArrowRightActionTest : VimOptionTestCase(OptionConstants.keymodel) {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionDefaultAll
   fun `test whichwrap in the same line`() {
-    injector.optionService.setOptionValue(OptionScope.GLOBAL, OptionConstants.whichwrap, ">")
+    injector.optionGroup.setOptionValue(OptionScope.GLOBAL, OptionConstants.whichwrap, ">")
     doTest(
       listOf("<Right>"),
       """
@@ -346,13 +346,13 @@ class MotionArrowRightActionTest : VimOptionTestCase(OptionConstants.keymodel) {
           Oh, hi Ma${c}rk
       """.trimIndent(),
     )
-    injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
+    injector.optionGroup.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionDefaultAll
   fun `test whichwrap at file end`() {
-    injector.optionService.setOptionValue(OptionScope.GLOBAL, OptionConstants.whichwrap, ">")
+    injector.optionGroup.setOptionValue(OptionScope.GLOBAL, OptionConstants.whichwrap, ">")
     doTest(
       listOf("<Right>"),
       """
@@ -362,13 +362,13 @@ class MotionArrowRightActionTest : VimOptionTestCase(OptionConstants.keymodel) {
           Oh, hi Mar${c}k
       """.trimIndent(),
     )
-    injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
+    injector.optionGroup.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionDefaultAll
   fun `test whichwrap to next line`() {
-    injector.optionService.setOptionValue(OptionScope.GLOBAL, OptionConstants.whichwrap, ">")
+    injector.optionGroup.setOptionValue(OptionScope.GLOBAL, OptionConstants.whichwrap, ">")
     doTest(
       listOf("<Right>"),
       """
@@ -380,13 +380,13 @@ class MotionArrowRightActionTest : VimOptionTestCase(OptionConstants.keymodel) {
           ${c}You are my favourite customer
       """.trimIndent(),
     )
-    injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
+    injector.optionGroup.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionDefaultAll
   fun `test from empty line to empty line`() {
-    injector.optionService.setOptionValue(OptionScope.GLOBAL, OptionConstants.whichwrap, ">")
+    injector.optionGroup.setOptionValue(OptionScope.GLOBAL, OptionConstants.whichwrap, ">")
     doTest(
       listOf("<Right>"),
       """
@@ -402,6 +402,6 @@ class MotionArrowRightActionTest : VimOptionTestCase(OptionConstants.keymodel) {
           You are my favourite customer
       """.trimIndent(),
     )
-    injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
+    injector.optionGroup.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
   }
 }

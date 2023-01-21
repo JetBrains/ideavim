@@ -21,7 +21,7 @@ object ClipboardOptionHelper {
     private val containedBefore = injector.globalOptions().hasValue(OptionConstants.clipboard, OptionConstants.clipboard_ideaput)
 
     init {
-      injector.optionService.removeValue(
+      injector.optionGroup.removeValue(
         OptionScope.GLOBAL,
         OptionConstants.clipboard,
         OptionConstants.clipboard_ideaput,
@@ -32,7 +32,7 @@ object ClipboardOptionHelper {
 
     override fun close() {
       if (containedBefore) {
-        injector.optionService.appendValue(
+        injector.optionGroup.appendValue(
           OptionScope.GLOBAL,
           OptionConstants.clipboard,
           OptionConstants.clipboard_ideaput

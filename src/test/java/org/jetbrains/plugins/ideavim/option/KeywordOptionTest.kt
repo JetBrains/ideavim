@@ -18,13 +18,12 @@ import com.maddyhome.idea.vim.options.helpers.KeywordOptionHelper.toRegex
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import org.jetbrains.plugins.ideavim.VimTestCase
 
-@Suppress("SpellCheckingInspection")
 class KeywordOptionTest : VimTestCase() {
   private val values: List<String>?
     get() = parseValues(optionsNoEditor().getStringValue(OptionConstants.iskeyword))
 
   private fun setKeyword(`val`: String) {
-    VimPlugin.getOptionService()
+    VimPlugin.getOptionGroup()
       .setOptionValue(OptionScope.GLOBAL, OptionConstants.iskeyword, VimString(`val`), "testToken")
   }
 

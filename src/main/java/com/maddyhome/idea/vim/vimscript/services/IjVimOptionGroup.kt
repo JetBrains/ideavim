@@ -9,13 +9,13 @@
 package com.maddyhome.idea.vim.vimscript.services
 
 import com.intellij.openapi.application.ApplicationNamesInfo
-import com.maddyhome.idea.vim.api.VimOptionServiceBase
+import com.maddyhome.idea.vim.api.VimOptionGroupBase
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.StringOption
 import com.maddyhome.idea.vim.options.ToggleOption
 import com.maddyhome.idea.vim.options.UnsignedNumberOption
 
-internal class IjVimOptionService : VimOptionServiceBase() {
+internal class IjVimOptionGroup : VimOptionGroupBase() {
 
   init {
     addOption(ToggleOption(IjOptionConstants.closenotebooks, IjOptionConstants.closenotebooks, true))

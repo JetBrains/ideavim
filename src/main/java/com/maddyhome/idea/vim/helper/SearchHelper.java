@@ -2377,7 +2377,7 @@ public class SearchHelper {
 
   private static @NotNull String getPairChars() {
     if (pairsChars == null) {
-      VimPlugin.getOptionService().addListener(
+      VimPlugin.getOptionGroup().addListener(
         OptionConstants.matchpairs,
         new OptionChangeListener<VimDataType>() {
           @Override

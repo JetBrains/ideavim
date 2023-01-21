@@ -210,7 +210,7 @@ class FindActionIdAction : DumbAwareToggleAction() {
   override fun isSelected(e: AnActionEvent): Boolean = injector.globalOptions().isSet(IjOptionConstants.trackactionids)
 
   override fun setSelected(e: AnActionEvent, state: Boolean) {
-    VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, IjOptionConstants.trackactionids, VimInt(if (state) 1 else 0))
+    VimPlugin.getOptionGroup().setOptionValue(OptionScope.GLOBAL, IjOptionConstants.trackactionids, VimInt(if (state) 1 else 0))
   }
 }
 //endregion

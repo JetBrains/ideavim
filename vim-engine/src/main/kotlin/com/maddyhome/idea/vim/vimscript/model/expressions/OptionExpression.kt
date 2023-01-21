@@ -20,8 +20,8 @@ data class OptionExpression(val scope: Scope, val optionName: String) : Expressi
 
   override fun evaluate(editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType {
     return when (scope) {
-      Scope.GLOBAL_VARIABLE -> injector.optionService.getOptionValue(OptionScope.GLOBAL, optionName, originalString)
-      Scope.LOCAL_VARIABLE -> injector.optionService.getOptionValue(OptionScope.LOCAL(editor), optionName, originalString)
+      Scope.GLOBAL_VARIABLE -> injector.optionGroup.getOptionValue(OptionScope.GLOBAL, optionName, originalString)
+      Scope.LOCAL_VARIABLE -> injector.optionGroup.getOptionValue(OptionScope.LOCAL(editor), optionName, originalString)
       else -> throw ExException("Invalid option scope")
     }
   }

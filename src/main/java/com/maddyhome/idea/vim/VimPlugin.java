@@ -26,6 +26,7 @@ import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.SystemInfo;
 import com.maddyhome.idea.vim.api.VimInjectorKt;
 import com.maddyhome.idea.vim.api.VimKeyGroup;
+import com.maddyhome.idea.vim.api.VimOptionGroup;
 import com.maddyhome.idea.vim.config.VimState;
 import com.maddyhome.idea.vim.config.migration.ApplicationConfigurationMigrator;
 import com.maddyhome.idea.vim.extension.VimExtensionRegistrar;
@@ -189,6 +190,13 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     return ApplicationManager.getApplication().getService(VariableService.class);
   }
 
+  public static @NotNull VimOptionGroup getOptionGroup() {
+    return VimInjectorKt.getInjector().getOptionGroup();
+  }
+
+  /** Deprecated: Use getOptionGroup */
+  @SuppressWarnings("deprecation")
+  @Deprecated
   // Used by which-key 0.8.0, IdeaVimExtension 1.6.5 + 1.6.8
   public static @NotNull OptionService getOptionService() {
     return VimInjectorKt.getInjector().getOptionService();

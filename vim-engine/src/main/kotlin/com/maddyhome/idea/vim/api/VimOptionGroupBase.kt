@@ -15,6 +15,7 @@ import com.maddyhome.idea.vim.options.Option
 import com.maddyhome.idea.vim.options.OptionChangeListener
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.options.OptionValueAccessor
 import com.maddyhome.idea.vim.options.StringOption
 import com.maddyhome.idea.vim.options.ToggleOption
 import com.maddyhome.idea.vim.options.UnsignedNumberOption
@@ -24,16 +25,14 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.datatypes.parseNumber
-import com.maddyhome.idea.vim.vimscript.services.OptionService
-import com.maddyhome.idea.vim.options.OptionValueAccessor
 
-abstract class VimOptionServiceBase : OptionService {
+abstract class VimOptionGroupBase : VimOptionGroup {
 
   private lateinit var globalOptions: OptionValueAccessor
 
   private val localOptionsKey = Key<MutableMap<String, VimDataType>>("localOptions")
 
-  private val logger = vimLogger<VimOptionServiceBase>()
+  private val logger = vimLogger<VimOptionGroupBase>()
   private val globalValues = mutableMapOf<String, VimDataType>()
   private val options = MultikeyMap(
     // Simple options, sorted by name
@@ -247,14 +246,6 @@ abstract class VimOptionServiceBase : OptionService {
       throw ExException("E474: Invalid argument: $token")
     }
     setOptionValue(scope, optionName, VimInt.ONE, token)
-  }
-
-  override fun setOption(scope: OptionService.Scope, optionName: String, token: String) {
-    val newScope = when (scope) {
-      is OptionService.Scope.GLOBAL -> OptionScope.GLOBAL
-      is OptionService.Scope.LOCAL -> OptionScope.LOCAL(scope.editor)
-    }
-    this.setOption(newScope, optionName, token)
   }
 
   /**

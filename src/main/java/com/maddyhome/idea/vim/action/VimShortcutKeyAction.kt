@@ -229,7 +229,7 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
     private var parsedLookupKeys: Set<KeyStroke> = parseLookupKeys()
 
     init {
-      VimPlugin.getOptionService().addListener(
+      VimPlugin.getOptionGroup().addListener(
         IjOptionConstants.lookupkeys,
         { parsedLookupKeys = parseLookupKeys() }
       )

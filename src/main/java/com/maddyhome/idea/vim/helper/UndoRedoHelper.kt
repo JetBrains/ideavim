@@ -31,7 +31,7 @@ import com.maddyhome.idea.vim.vimscript.services.IjOptionConstants
 @Service
 class UndoRedoHelper : UndoRedoBase() {
   init {
-    injector.optionService.addListener(IjOptionConstants.oldundo, {
+    injector.optionGroup.addListener(IjOptionConstants.oldundo, {
       UndoManagerImpl.ourNeverAskUser = !injector.globalOptions().isSet(IjOptionConstants.oldundo)
     }, true)
   }

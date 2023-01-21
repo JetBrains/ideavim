@@ -18,7 +18,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 class ChangeCaseToggleCharacterActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test whichwrap in the same line`() {
-    injector.optionService.setOptionValue(OptionScope.GLOBAL, OptionConstants.whichwrap, "~")
+    injector.optionGroup.setOptionValue(OptionScope.GLOBAL, OptionConstants.whichwrap, "~")
     doTest(
       listOf("~"),
       """
@@ -28,12 +28,12 @@ class ChangeCaseToggleCharacterActionTest : VimTestCase() {
           Oh, hi MA${c}rk
       """.trimIndent(),
     )
-    injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
+    injector.optionGroup.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test whichwrap at file end`() {
-    injector.optionService.setOptionValue(OptionScope.GLOBAL, OptionConstants.whichwrap, "~")
+    injector.optionGroup.setOptionValue(OptionScope.GLOBAL, OptionConstants.whichwrap, "~")
     doTest(
       listOf("~"),
       """
@@ -43,12 +43,12 @@ class ChangeCaseToggleCharacterActionTest : VimTestCase() {
           Oh, hi Mar${c}K
       """.trimIndent(),
     )
-    injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
+    injector.optionGroup.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test whichwrap to next line`() {
-    injector.optionService.setOptionValue(OptionScope.GLOBAL, OptionConstants.whichwrap, "~")
+    injector.optionGroup.setOptionValue(OptionScope.GLOBAL, OptionConstants.whichwrap, "~")
     doTest(
       listOf("~"),
       """
@@ -60,12 +60,12 @@ class ChangeCaseToggleCharacterActionTest : VimTestCase() {
           ${c}You are my favourite customer
       """.trimIndent(),
     )
-    injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
+    injector.optionGroup.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test from empty line to empty line`() {
-    injector.optionService.setOptionValue(OptionScope.GLOBAL, OptionConstants.whichwrap, "~")
+    injector.optionGroup.setOptionValue(OptionScope.GLOBAL, OptionConstants.whichwrap, "~")
     doTest(
       listOf("~"),
       """
@@ -81,6 +81,6 @@ class ChangeCaseToggleCharacterActionTest : VimTestCase() {
           You are my favourite customer
       """.trimIndent(),
     )
-    injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
+    injector.optionGroup.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
   }
 }

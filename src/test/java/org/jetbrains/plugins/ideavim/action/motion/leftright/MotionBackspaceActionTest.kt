@@ -18,7 +18,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 class MotionBackspaceActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test whichwrap in the same line`() {
-    injector.optionService.setOptionValue(OptionScope.GLOBAL, OptionConstants.whichwrap, "b")
+    injector.optionGroup.setOptionValue(OptionScope.GLOBAL, OptionConstants.whichwrap, "b")
     doTest(
       listOf("<BS>"),
       """
@@ -28,12 +28,12 @@ class MotionBackspaceActionTest : VimTestCase() {
           Oh, hi M${c}ark
       """.trimIndent(),
     )
-    injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
+    injector.optionGroup.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test whichwrap at file start`() {
-    injector.optionService.setOptionValue(OptionScope.GLOBAL, OptionConstants.whichwrap, "b")
+    injector.optionGroup.setOptionValue(OptionScope.GLOBAL, OptionConstants.whichwrap, "b")
     doTest(
       listOf("<BS>"),
       """
@@ -43,12 +43,12 @@ class MotionBackspaceActionTest : VimTestCase() {
           ${c}Oh, hi Mark
       """.trimIndent(),
     )
-    injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
+    injector.optionGroup.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test whichwrap to previous line`() {
-    injector.optionService.setOptionValue(OptionScope.GLOBAL, OptionConstants.whichwrap, "b")
+    injector.optionGroup.setOptionValue(OptionScope.GLOBAL, OptionConstants.whichwrap, "b")
     doTest(
       listOf("<BS>"),
       """
@@ -60,12 +60,12 @@ class MotionBackspaceActionTest : VimTestCase() {
           You are my favourite customer
       """.trimIndent(),
     )
-    injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
+    injector.optionGroup.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test from empty line to empty line`() {
-    injector.optionService.setOptionValue(OptionScope.GLOBAL, OptionConstants.whichwrap, "b")
+    injector.optionGroup.setOptionValue(OptionScope.GLOBAL, OptionConstants.whichwrap, "b")
     doTest(
       listOf("<BS>"),
       """
@@ -81,6 +81,6 @@ class MotionBackspaceActionTest : VimTestCase() {
           You are my favourite customer
       """.trimIndent(),
     )
-    injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
+    injector.optionGroup.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
   }
 }

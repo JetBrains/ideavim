@@ -54,7 +54,7 @@ class ExEntryTest : VimTestCase() {
     assertIsDeactivated()
 
     deactivateExEntry()
-    VimPlugin.getOptionService().resetAllOptions()
+    VimPlugin.getOptionGroup().resetAllOptions()
 
     assertFalse(options().isSet(OptionConstants.incsearch))
     typeExInput(":set incsearch<C-J>")
@@ -62,7 +62,7 @@ class ExEntryTest : VimTestCase() {
     assertIsDeactivated()
 
     deactivateExEntry()
-    VimPlugin.getOptionService().resetAllOptions()
+    VimPlugin.getOptionGroup().resetAllOptions()
 
     assertFalse(options().isSet(OptionConstants.incsearch))
     typeExInput(":set incsearch<C-M>")

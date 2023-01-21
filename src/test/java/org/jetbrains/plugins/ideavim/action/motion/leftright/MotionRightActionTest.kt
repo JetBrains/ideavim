@@ -283,7 +283,7 @@ class MotionRightActionTest : VimOptionTestCase(OptionConstants.virtualedit) {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionDefaultAll
   fun `test whichwrap in the same line`() {
-    injector.optionService.setOptionValue(OptionScope.GLOBAL, OptionConstants.whichwrap, "l")
+    injector.optionGroup.setOptionValue(OptionScope.GLOBAL, OptionConstants.whichwrap, "l")
     doTest(
       listOf("l"),
       """
@@ -293,13 +293,13 @@ class MotionRightActionTest : VimOptionTestCase(OptionConstants.virtualedit) {
           Oh, hi Ma${c}rk
       """.trimIndent(),
     )
-    injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
+    injector.optionGroup.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionDefaultAll
   fun `test whichwrap at file end`() {
-    injector.optionService.setOptionValue(OptionScope.GLOBAL, OptionConstants.whichwrap, "l")
+    injector.optionGroup.setOptionValue(OptionScope.GLOBAL, OptionConstants.whichwrap, "l")
     doTest(
       listOf("l"),
       """
@@ -309,13 +309,13 @@ class MotionRightActionTest : VimOptionTestCase(OptionConstants.virtualedit) {
           Oh, hi Mar${c}k
       """.trimIndent(),
     )
-    injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
+    injector.optionGroup.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionDefaultAll
   fun `test whichwrap to next line`() {
-    injector.optionService.setOptionValue(OptionScope.GLOBAL, OptionConstants.whichwrap, "l")
+    injector.optionGroup.setOptionValue(OptionScope.GLOBAL, OptionConstants.whichwrap, "l")
     doTest(
       listOf("l"),
       """
@@ -327,13 +327,13 @@ class MotionRightActionTest : VimOptionTestCase(OptionConstants.virtualedit) {
           ${c}You are my favourite customer
       """.trimIndent(),
     )
-    injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
+    injector.optionGroup.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionDefaultAll
   fun `test from empty line to empty line`() {
-    injector.optionService.setOptionValue(OptionScope.GLOBAL, OptionConstants.whichwrap, "l")
+    injector.optionGroup.setOptionValue(OptionScope.GLOBAL, OptionConstants.whichwrap, "l")
     doTest(
       listOf("l"),
       """
@@ -349,13 +349,13 @@ class MotionRightActionTest : VimOptionTestCase(OptionConstants.virtualedit) {
           You are my favourite customer
       """.trimIndent(),
     )
-    injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
+    injector.optionGroup.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionDefaultAll
   fun `test d command with whichwrap`() {
-    injector.optionService.setOptionValue(OptionScope.GLOBAL, OptionConstants.whichwrap, "h")
+    injector.optionGroup.setOptionValue(OptionScope.GLOBAL, OptionConstants.whichwrap, "h")
     doTest(
       listOf("dl"),
       """
@@ -367,6 +367,6 @@ class MotionRightActionTest : VimOptionTestCase(OptionConstants.virtualedit) {
           You are my favourite customer
       """.trimIndent(),
     )
-    injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
+    injector.optionGroup.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
   }
 }
