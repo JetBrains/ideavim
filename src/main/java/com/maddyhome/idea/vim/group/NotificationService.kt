@@ -67,7 +67,7 @@ class NotificationService(private val project: Project?) {
         notification,
         "set clipboard+=ideaput",
         "ideaput"
-      ) { VimPlugin.getOptionService().appendValue(OptionScope.GLOBAL, OptionConstants.clipboard, OptionConstants.clipboard_ideaput) }
+      ) { VimPlugin.getOptionGroup().appendValue(OptionScope.GLOBAL, OptionConstants.clipboard, OptionConstants.clipboard_ideaput) }
     )
 
     notification.notify(project)
@@ -87,7 +87,7 @@ class NotificationService(private val project: Project?) {
         notification,
         "set ideajoin",
         IjOptionConstants.ideajoin
-      ) { VimPlugin.getOptionService().setOption(OptionScope.GLOBAL, IjOptionConstants.ideajoin) }
+      ) { VimPlugin.getOptionGroup().setOption(OptionScope.GLOBAL, IjOptionConstants.ideajoin) }
     )
 
     notification.addAction(HelpLink(ideajoinExamplesUrl))
@@ -218,7 +218,7 @@ class NotificationService(private val project: Project?) {
 
     class StopTracking : DumbAwareAction("Stop Tracking") {
       override fun actionPerformed(e: AnActionEvent) {
-        VimPlugin.getOptionService().unsetOption(OptionScope.GLOBAL, IjOptionConstants.trackactionids)
+        VimPlugin.getOptionGroup().unsetOption(OptionScope.GLOBAL, IjOptionConstants.trackactionids)
         notification?.expire()
       }
     }

@@ -23,24 +23,24 @@ class BoundedStringListOptionTest : VimTestCase() {
   override fun setUp() {
     super.setUp()
     val option = StringOption(optionName, optionName, defaultValue, true, setOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))
-    injector.optionService.addOption(option)
+    injector.optionGroup.addOption(option)
   }
 
   override fun tearDown() {
     super.tearDown()
-    injector.optionService.removeOption(optionName)
+    injector.optionGroup.removeOption(optionName)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test set valid list`() {
-    injector.optionService.setOptionValue(GLOBAL, optionName, "Thursday,Friday")
+    injector.optionGroup.setOptionValue(GLOBAL, optionName, "Thursday,Friday")
     assertEquals("Thursday,Friday", optionsNoEditor().getStringValue(optionName))
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test set list with invalid value`() {
     try {
-      injector.optionService.setOptionValue(GLOBAL, optionName, "Blue")
+      injector.optionGroup.setOptionValue(GLOBAL, optionName, "Blue")
       fail("Missing exception")
     } catch (e: ExException) {
       assertEquals("E474: Invalid argument: $optionName", e.message)
@@ -50,14 +50,14 @@ class BoundedStringListOptionTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test append single item`() {
-    injector.optionService.appendValue(GLOBAL, optionName, "Wednesday")
+    injector.optionGroup.appendValue(GLOBAL, optionName, "Wednesday")
     assertEquals("Monday,Tuesday,Wednesday", optionsNoEditor().getStringValue(optionName))
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test append invalid item`() {
     try {
-      injector.optionService.appendValue(GLOBAL, optionName, "Blue")
+      injector.optionGroup.appendValue(GLOBAL, optionName, "Blue")
       fail("Missing exception")
     } catch (e: ExException) {
       assertEquals("E474: Invalid argument: $optionName", e.message)
@@ -67,14 +67,14 @@ class BoundedStringListOptionTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test append list`() {
-    injector.optionService.appendValue(GLOBAL, optionName, "Wednesday,Thursday")
+    injector.optionGroup.appendValue(GLOBAL, optionName, "Wednesday,Thursday")
     assertEquals("Monday,Tuesday,Wednesday,Thursday", optionsNoEditor().getStringValue(optionName))
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test append list with invalid item`() {
     try {
-      injector.optionService.appendValue(GLOBAL, optionName, "Wednesday,Blue")
+      injector.optionGroup.appendValue(GLOBAL, optionName, "Wednesday,Blue")
       fail("Missing exception")
     } catch (e: ExException) {
       assertEquals("E474: Invalid argument: $optionName", e.message)
@@ -84,14 +84,14 @@ class BoundedStringListOptionTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test prepend item`() {
-    injector.optionService.prependValue(GLOBAL, optionName, "Wednesday")
+    injector.optionGroup.prependValue(GLOBAL, optionName, "Wednesday")
     assertEquals("Wednesday,Monday,Tuesday", optionsNoEditor().getStringValue(optionName))
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test prepend invalid item`() {
     try {
-      injector.optionService.prependValue(GLOBAL, optionName, "Blue")
+      injector.optionGroup.prependValue(GLOBAL, optionName, "Blue")
       fail("Missing exception")
     } catch (e: ExException) {
       assertEquals("E474: Invalid argument: $optionName", e.message)
@@ -101,14 +101,14 @@ class BoundedStringListOptionTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test prepend list`() {
-    injector.optionService.prependValue(GLOBAL, optionName, "Wednesday,Thursday")
+    injector.optionGroup.prependValue(GLOBAL, optionName, "Wednesday,Thursday")
     assertEquals("Wednesday,Thursday,Monday,Tuesday", optionsNoEditor().getStringValue(optionName))
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test prepend list with invalid item`() {
     try {
-      injector.optionService.prependValue(GLOBAL, optionName, "Wednesday,Blue")
+      injector.optionGroup.prependValue(GLOBAL, optionName, "Wednesday,Blue")
       fail("Missing exception")
     } catch (e: ExException) {
       assertEquals("E474: Invalid argument: $optionName", e.message)
@@ -118,22 +118,22 @@ class BoundedStringListOptionTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test remove item`() {
-    injector.optionService.removeValue(GLOBAL, optionName, "Monday")
+    injector.optionGroup.removeValue(GLOBAL, optionName, "Monday")
     assertEquals("Tuesday", optionsNoEditor().getStringValue(optionName))
   }
 
   fun `test remove list`() {
-    injector.optionService.removeValue(GLOBAL, optionName, "Monday,Tuesday")
+    injector.optionGroup.removeValue(GLOBAL, optionName, "Monday,Tuesday")
     assertEquals("", optionsNoEditor().getStringValue(optionName))
   }
 
   fun `test remove list with wrong order`() {
-    injector.optionService.removeValue(GLOBAL, optionName, "Tuesday,Monday")
+    injector.optionGroup.removeValue(GLOBAL, optionName, "Tuesday,Monday")
     assertEquals("Monday,Tuesday", optionsNoEditor().getStringValue(optionName))
   }
 
   fun `test remove list with invalid value`() {
-    injector.optionService.removeValue(GLOBAL, optionName, "Monday,Blue")
+    injector.optionGroup.removeValue(GLOBAL, optionName, "Monday,Blue")
     assertEquals("Monday,Tuesday", optionsNoEditor().getStringValue(optionName))
   }
 }

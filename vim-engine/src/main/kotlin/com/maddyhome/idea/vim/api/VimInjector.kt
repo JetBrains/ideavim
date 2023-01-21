@@ -49,8 +49,14 @@ interface VimInjector {
   // [FINISHED] Can't be fully moved to vim-engine.
   val enabler: VimEnabler
 
-  // [UNFINISHED] !! in progress
+  // [FINISHED] Fully moved to vim-engine. IJ service implementation adds additional IJ specific options
+  // (These could be moved out of the implementation and into initialisation code)
+  val optionGroup: VimOptionGroup
+
+  @Suppress("DEPRECATION")
+  @Deprecated("Use optionGroup")
   val optionService: OptionService
+
   // [FINISHED] Can't be fully moved to vim-engine.
   val nativeActionManager: NativeActionManager
   // [FINISHED] Can't be fully moved to vim-engine.
@@ -153,7 +159,7 @@ lateinit var injector: VimInjector
  * [VimInjector.options] and pass in a [VimEditor] for context. This will return local or global values as
  * appropriate.
  */
-fun VimInjector.globalOptions() = this.optionService.getValueAccessor(null)
+fun VimInjector.globalOptions() = this.optionGroup.getValueAccessor(null)
 
 /**
  * Gets an API for consuming all options
@@ -163,4 +169,4 @@ fun VimInjector.globalOptions() = this.optionService.getValueAccessor(null)
  * If an editor isn't available to the calling code, the [globalOptions] function can be used to access global
  * options. It should not be used to access options that are local to buffer, local to window or global-local.
  */
-fun VimInjector.options(editor: VimEditor) = this.optionService.getValueAccessor(editor)
+fun VimInjector.options(editor: VimEditor) = this.optionGroup.getValueAccessor(editor)

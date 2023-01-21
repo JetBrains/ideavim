@@ -18,6 +18,7 @@ import com.intellij.openapi.fileEditor.impl.IdeDocumentHistoryImpl.RecentPlacesL
 import com.intellij.openapi.util.text.StringUtil
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimJumpServiceBase
+import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.mark.Jump
@@ -73,7 +74,7 @@ class VimJumpServiceImpl : VimJumpServiceBase(), PersistentStateComponent<Elemen
 
 class JumpsListener : RecentPlacesListener {
   override fun recentPlaceAdded(changePlace: PlaceInfo, isChanged: Boolean) {
-    if (!injector.optionService.getValueAccessor(null).isSet("unifyjumps")) return
+    if (!injector.globalOptions().isSet("unifyjumps")) return
 
     val jumpService = injector.jumpService
     if (!isChanged) {
@@ -85,7 +86,7 @@ class JumpsListener : RecentPlacesListener {
   }
 
   override fun recentPlaceRemoved(changePlace: PlaceInfo, isChanged: Boolean) {
-    if (!injector.optionService.getValueAccessor(null).isSet("unifyjumps")) return
+    if (!injector.globalOptions().isSet("unifyjumps")) return
 
     val jumpService = injector.jumpService
     if (!isChanged) {

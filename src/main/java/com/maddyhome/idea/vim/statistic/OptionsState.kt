@@ -28,18 +28,18 @@ internal class OptionsState : ApplicationUsagesCollector() {
   override fun getGroup(): EventLogGroup = GROUP
 
   override fun getMetrics(): Set<MetricEvent> {
-    val optionService = VimPlugin.getOptionService()
+    val optionGroup = VimPlugin.getOptionGroup()
 
     return setOf(
       OPTIONS.metric(
         IDEAJOIN withOption IjOptionConstants.ideajoin,
         IDEAMARKS withOption IjOptionConstants.ideamarks,
         IDEAREFACTOR withOption IjOptionConstants.idearefactormode,
-        IDEAPUT with optionService.contains(OptionScope.GLOBAL, OptionConstants.clipboard, OptionConstants.clipboard_ideaput),
+        IDEAPUT with optionGroup.contains(OptionScope.GLOBAL, OptionConstants.clipboard, OptionConstants.clipboard_ideaput),
         IDEASTATUSICON withOption IjOptionConstants.ideastatusicon,
         IDEAWRITE withOption IjOptionConstants.ideawrite,
-        IDEASELECTION with optionService.contains(OptionScope.GLOBAL, OptionConstants.selectmode, "ideaselection"),
-        IDEAVIMSUPPORT with optionService.getValues(OptionScope.GLOBAL, IjOptionConstants.ideavimsupport)!!
+        IDEASELECTION with optionGroup.contains(OptionScope.GLOBAL, OptionConstants.selectmode, "ideaselection"),
+        IDEAVIMSUPPORT with optionGroup.getValues(OptionScope.GLOBAL, IjOptionConstants.ideavimsupport)!!
       )
     )
   }

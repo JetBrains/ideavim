@@ -19,7 +19,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 class MotionLeftInsertTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test whichwrap in the same line`() {
-    injector.optionService.setOptionValue(OptionScope.GLOBAL, OptionConstants.whichwrap, "[")
+    injector.optionGroup.setOptionValue(OptionScope.GLOBAL, OptionConstants.whichwrap, "[")
     doTest(
       listOf("i", "<Left>"),
       """
@@ -30,12 +30,12 @@ class MotionLeftInsertTest : VimTestCase() {
       """.trimIndent(),
       VimStateMachine.Mode.INSERT,
     )
-    injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
+    injector.optionGroup.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test whichwrap at file start`() {
-    injector.optionService.setOptionValue(OptionScope.GLOBAL, OptionConstants.whichwrap, "[")
+    injector.optionGroup.setOptionValue(OptionScope.GLOBAL, OptionConstants.whichwrap, "[")
     doTest(
       listOf("i", "<Left>"),
       """
@@ -46,12 +46,12 @@ class MotionLeftInsertTest : VimTestCase() {
       """.trimIndent(),
       VimStateMachine.Mode.INSERT,
     )
-    injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
+    injector.optionGroup.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test whichwrap to previous line`() {
-    injector.optionService.setOptionValue(OptionScope.GLOBAL, OptionConstants.whichwrap, "[")
+    injector.optionGroup.setOptionValue(OptionScope.GLOBAL, OptionConstants.whichwrap, "[")
     doTest(
       listOf("i", "<Left>"),
       """
@@ -64,12 +64,12 @@ class MotionLeftInsertTest : VimTestCase() {
       """.trimIndent(),
       VimStateMachine.Mode.INSERT,
     )
-    injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
+    injector.optionGroup.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test from empty line to empty line`() {
-    injector.optionService.setOptionValue(OptionScope.GLOBAL, OptionConstants.whichwrap, "[")
+    injector.optionGroup.setOptionValue(OptionScope.GLOBAL, OptionConstants.whichwrap, "[")
     doTest(
       listOf("i", "<Left>"),
       """
@@ -86,6 +86,6 @@ class MotionLeftInsertTest : VimTestCase() {
       """.trimIndent(),
       VimStateMachine.Mode.INSERT,
     )
-    injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
+    injector.optionGroup.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
   }
 }

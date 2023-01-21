@@ -71,7 +71,7 @@ import static com.maddyhome.idea.vim.register.RegisterConstants.LAST_SEARCH_REGI
 })
 public class SearchGroup extends VimSearchGroupBase implements PersistentStateComponent<Element> {
   public SearchGroup() {
-    VimPlugin.getOptionService().addListener(OptionConstants.hlsearch, oldValue -> {
+    VimPlugin.getOptionGroup().addListener(OptionConstants.hlsearch, oldValue -> {
       resetShowSearchHighlight();
       forceUpdateSearchHighlights();
     }, false);
@@ -81,8 +81,8 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
         forceUpdateSearchHighlights();
       }
     };
-    VimPlugin.getOptionService().addListener(OptionConstants.ignorecase, updateHighlightsIfVisible, false);
-    VimPlugin.getOptionService().addListener(OptionConstants.smartcase, updateHighlightsIfVisible, false);
+    VimPlugin.getOptionGroup().addListener(OptionConstants.ignorecase, updateHighlightsIfVisible, false);
+    VimPlugin.getOptionGroup().addListener(OptionConstants.smartcase, updateHighlightsIfVisible, false);
   }
 
   public void turnOn() {

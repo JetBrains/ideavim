@@ -50,8 +50,8 @@ abstract class VimOptionTestCase(option: String, vararg otherOptions: String) : 
 
       annotationValues.value.forEach {
         when (it.valueType) {
-          OptionValueType.STRING -> VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, it.optionName, VimString(it.value))
-          OptionValueType.NUMBER -> VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, it.optionName, VimInt(it.value))
+          OptionValueType.STRING -> VimPlugin.getOptionGroup().setOptionValue(OptionScope.GLOBAL, it.optionName, VimString(it.value))
+          OptionValueType.NUMBER -> VimPlugin.getOptionGroup().setOptionValue(OptionScope.GLOBAL, it.optionName, VimInt(it.value))
         }
       }
     }

@@ -38,7 +38,10 @@ import com.intellij.testFramework.fixtures.impl.LightTempDirTestFixtureImpl
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.VimShortcutKeyAction
+import com.maddyhome.idea.vim.api.VimOptionGroup
+import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.api.visualLineToBufferLine
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.VimStateMachine
@@ -69,7 +72,6 @@ import com.maddyhome.idea.vim.options.helpers.GuiCursorType
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
 import com.maddyhome.idea.vim.vimscript.parser.errors.IdeavimErrorListener
-import com.maddyhome.idea.vim.vimscript.services.OptionService
 import org.assertj.core.api.Assertions
 import org.junit.Assert
 import java.awt.event.KeyEvent
@@ -101,11 +103,11 @@ abstract class VimTestCase : UsefulTestCase() {
     if (editor != null) {
       KeyHandler.getInstance().fullReset(editor.vim)
     }
-    VimPlugin.getOptionService().resetAllOptions()
+    VimPlugin.getOptionGroup().resetAllOptions()
     VimPlugin.getKey().resetKeyMappings()
     VimPlugin.getSearch().resetState()
     if (!VimPlugin.isEnabled()) VimPlugin.setEnabled(true)
-    VimPlugin.getOptionService().setOption(OptionScope.GLOBAL, OptionConstants.ideastrictmode)
+    VimPlugin.getOptionGroup().setOption(OptionScope.GLOBAL, OptionConstants.ideastrictmode)
     GuicursorChangeListener.processGlobalValueChange(null)
     Checks.reset()
 
@@ -152,7 +154,7 @@ abstract class VimTestCase : UsefulTestCase() {
 
   protected fun enableExtensions(vararg extensionNames: String) {
     for (name in extensionNames) {
-      VimPlugin.getOptionService().setOption(OptionScope.GLOBAL, name)
+      VimPlugin.getOptionGroup().setOption(OptionScope.GLOBAL, name)
     }
   }
 
@@ -342,14 +344,14 @@ abstract class VimTestCase : UsefulTestCase() {
    * This will return an accessor to retrieve the effective value for the current editor - a global value for global
    * options (e.g. 'clipboard') or a (potentially) local value for local to buffer, local to window or global-local
    * options (e.g. 'iskeyword', 'relativenumber' or 'scrolloff' respectively). Tests are only expected to require
-   * effective values. To test other global/local values, use [OptionService].
+   * effective values. To test other global/local values, use [VimOptionGroup].
    */
   protected fun options(): OptionValueAccessor {
     assertNotNull(
       "Editor is null! Move the call to after editor is initialised, or use optionsNoEditor",
       myFixture.editor
     )
-    return injector.optionService.getValueAccessor(myFixture.editor.vim)
+    return injector.options(myFixture.editor.vim)
   }
 
   /**
@@ -364,7 +366,7 @@ abstract class VimTestCase : UsefulTestCase() {
    */
   protected fun optionsNoEditor(): OptionValueAccessor {
     assertNull("Editor is not null! Use options() to access effective option values", myFixture.editor)
-    return injector.optionService.getValueAccessor(null)
+    return injector.globalOptions()
   }
 
   fun assertState(textAfter: String) {

@@ -58,8 +58,8 @@ object VimExtensionRegistrar : VimExtensionRegistrator {
 
     registeredExtensions.add(name)
     registerAliases(extensionBean)
-    VimPlugin.getOptionService().addOption(ToggleOption(name, getAbbrev(name), false))
-    VimPlugin.getOptionService().addListener(name,
+    VimPlugin.getOptionGroup().addOption(ToggleOption(name, getAbbrev(name), false))
+    VimPlugin.getOptionGroup().addListener(name,
       object : OptionChangeListener<VimDataType> {
         override fun processGlobalValueChange(oldValue: VimDataType?) {
           if (injector.globalOptions().isSet(name)) {
@@ -102,7 +102,7 @@ object VimExtensionRegistrar : VimExtensionRegistrator {
     registeredExtensions.remove(name)
     removeAliases(extension)
     extension.instance.dispose()
-    VimPlugin.getOptionService().removeOption(name)
+    VimPlugin.getOptionGroup().removeOption(name)
     remove(name)
     logger.info("IdeaVim extension '$name' disposed")
   }
@@ -110,7 +110,7 @@ object VimExtensionRegistrar : VimExtensionRegistrator {
   override fun setOptionByPluginAlias(alias: String): Boolean {
     val name = extensionAliases[alias] ?: return false
     try {
-      VimPlugin.getOptionService().setOption(OptionScope.GLOBAL, name)
+      VimPlugin.getOptionGroup().setOption(OptionScope.GLOBAL, name)
     } catch (e: ExException) {
       return false
     }

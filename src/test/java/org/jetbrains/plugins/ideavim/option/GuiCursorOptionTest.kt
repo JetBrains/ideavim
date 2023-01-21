@@ -24,11 +24,11 @@ class GuiCursorOptionTest : VimTestCase() {
     optionsNoEditor().getStringListValues(OptionConstants.guicursor).map { GuiCursorOptionHelper.convertToken(it) }
 
   private fun setValue(value: String) {
-    return (VimPlugin.getOptionService().setOptionValue(OptionScope.GLOBAL, OptionConstants.guicursor, VimString(value)))
+    return (VimPlugin.getOptionGroup().setOptionValue(OptionScope.GLOBAL, OptionConstants.guicursor, VimString(value)))
   }
 
   private fun assertHasDefaultValue() {
-    val defaultValue = VimPlugin.getOptionService().getOptionByNameOrAbbr(OptionConstants.guicursor)!!.getDefaultValue().asString()
+    val defaultValue = VimPlugin.getOptionGroup().getOptionByNameOrAbbr(OptionConstants.guicursor)!!.getDefaultValue().asString()
     assertEquals(defaultValue, optionsNoEditor().getStringValue(OptionConstants.guicursor))
   }
 
@@ -138,7 +138,7 @@ class GuiCursorOptionTest : VimTestCase() {
     assertEquals(GuiCursorType.HOR, attributes.type)
     assertEquals(20, attributes.thickness)
     assertEquals("Cursor", attributes.highlightGroup)
-    VimPlugin.getOptionService().appendValue(OptionScope.GLOBAL, OptionConstants.guicursor, "n:ver75-OtherCursor", OptionConstants.guicursor)
+    VimPlugin.getOptionGroup().appendValue(OptionScope.GLOBAL, OptionConstants.guicursor, "n:ver75-OtherCursor", OptionConstants.guicursor)
     attributes = GuiCursorOptionHelper.getAttributes(GuiCursorMode.NORMAL)
     assertEquals(GuiCursorType.VER, attributes.type)
     assertEquals(75, attributes.thickness)

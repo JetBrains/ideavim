@@ -69,7 +69,7 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     get() = getRegister(lastRegisterChar)
 
   init {
-    injector.optionService.addListener(
+    injector.optionGroup.addListener(
       OptionConstants.clipboard,
       {
         val clipboardOptionValue = injector.globalOptions().getStringListValues(OptionConstants.clipboard)
