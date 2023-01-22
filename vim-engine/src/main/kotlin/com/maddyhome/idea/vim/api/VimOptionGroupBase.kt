@@ -178,10 +178,10 @@ abstract class VimOptionGroupBase : VimOptionGroup {
     ToggleOption(OptionConstants.ideatracetime, OptionConstants.ideatracetime, false),
   )
 
-  override fun setOptionValue(scope: OptionScope, optionName: String, value: VimDataType, token: String) {
-    val option = options.get(optionName) ?: throw ExException("E518: Unknown option: $token")
-    option.checkIfValueValid(value, token)
-    val oldValue = getOptionValue(scope, optionName)
+  override fun setOptionValue(scope: OptionScope, optionName: String, value: VimDataType, commandArgumentText: String) {
+    val option = options.get(optionName) ?: throw ExException("E518: Unknown option: $commandArgumentText")
+    option.checkIfValueValid(value, commandArgumentText)
+    val oldValue = getOptionValue(scope, optionName, commandArgumentText)
     when (scope) {
       is OptionScope.LOCAL -> {
         setLocalOptionValue(option.name, value, scope.editor)
@@ -199,12 +199,12 @@ abstract class VimOptionGroupBase : VimOptionGroup {
   override fun getValues(scope: OptionScope, optionName: String): List<String>? {
     val option = options.get(optionName)
     if (option !is StringOption) return null
-    return option.split(getOptionValue(scope, optionName).asString())
+    return option.split(getOptionValue(scope, optionName, optionName).asString())
   }
 
-  override fun setOptionValue(scope: OptionScope, optionName: String, value: String, token: String) {
-    val vimValue: VimDataType = castToVimDataType(value, optionName, token)
-    setOptionValue(scope, optionName, vimValue, token)
+  override fun setOptionValue(scope: OptionScope, optionName: String, value: String, commandArgumentText: String) {
+    val vimValue: VimDataType = castToVimDataType(value, optionName, commandArgumentText)
+    setOptionValue(scope, optionName, vimValue, commandArgumentText)
   }
 
   private fun setGlobalOptionValue(optionName: String, value: VimDataType) {
@@ -240,76 +240,76 @@ abstract class VimOptionGroupBase : VimOptionGroup {
   /**
    * Sets the option on (true)
    */
-  override fun setOption(scope: OptionScope, optionName: String, token: String) {
-    val option = options.get(optionName) ?: throw ExException("E518: Unknown option: $token")
+  override fun setOption(scope: OptionScope, optionName: String, commandArgumentText: String) {
+    val option = options.get(optionName) ?: throw ExException("E518: Unknown option: $commandArgumentText")
     if (option !is ToggleOption) {
-      throw ExException("E474: Invalid argument: $token")
+      throw ExException("E474: Invalid argument: $commandArgumentText")
     }
-    setOptionValue(scope, optionName, VimInt.ONE, token)
+    setOptionValue(scope, optionName, VimInt.ONE, commandArgumentText)
   }
 
   /**
    * Unsets the option (false)
    */
-  override fun unsetOption(scope: OptionScope, optionName: String, token: String) {
-    val option = options.get(optionName) ?: throw ExException("E518: Unknown option: $token")
+  override fun unsetOption(scope: OptionScope, optionName: String, commandArgumentText: String) {
+    val option = options.get(optionName) ?: throw ExException("E518: Unknown option: $commandArgumentText")
     if (option !is ToggleOption) {
-      throw ExException("E474: Invalid argument: $token")
+      throw ExException("E474: Invalid argument: $commandArgumentText")
     }
-    setOptionValue(scope, optionName, VimInt.ZERO, token)
+    setOptionValue(scope, optionName, VimInt.ZERO, commandArgumentText)
   }
 
-  override fun toggleOption(scope: OptionScope, optionName: String, token: String) {
-    val option = options.get(optionName) ?: throw ExException("E518: Unknown option: $token")
+  override fun toggleOption(scope: OptionScope, optionName: String, commandArgumentText: String) {
+    val option = options.get(optionName) ?: throw ExException("E518: Unknown option: $commandArgumentText")
     if (option !is ToggleOption) {
-      throw ExException("E474: Invalid argument: $token")
+      throw ExException("E474: Invalid argument: $commandArgumentText")
     }
-    val optionValue = getOptionValue(scope, optionName)
+    val optionValue = getOptionValue(scope, optionName, commandArgumentText)
     if (optionValue.asBoolean()) {
-      setOptionValue(scope, optionName, VimInt.ZERO, token)
+      setOptionValue(scope, optionName, VimInt.ZERO, commandArgumentText)
     } else {
-      setOptionValue(scope, optionName, VimInt.ONE, token)
+      setOptionValue(scope, optionName, VimInt.ONE, commandArgumentText)
     }
   }
 
-  override fun isDefault(scope: OptionScope, optionName: String, token: String): Boolean {
-    val defaultValue = options.get(optionName)?.getDefaultValue() ?: throw ExException("E518: Unknown option: $token")
-    return getOptionValue(scope, optionName) == defaultValue
+  override fun isDefault(scope: OptionScope, optionName: String, commandArgumentText: String): Boolean {
+    val defaultValue = options.get(optionName)?.getDefaultValue() ?: throw ExException("E518: Unknown option: $commandArgumentText")
+    return getOptionValue(scope, optionName, commandArgumentText) == defaultValue
   }
 
-  override fun resetDefault(scope: OptionScope, optionName: String, token: String) {
-    val option = options.get(optionName) ?: throw ExException("E518: Unknown option: $token")
-    setOptionValue(scope, optionName, option.getDefaultValue(), token)
+  override fun resetDefault(scope: OptionScope, optionName: String, commandArgumentText: String) {
+    val option = options.get(optionName) ?: throw ExException("E518: Unknown option: $commandArgumentText")
+    setOptionValue(scope, optionName, option.getDefaultValue(), commandArgumentText)
   }
 
-  override fun getOptionValue(scope: OptionScope, optionName: String, token: String): VimDataType {
+  override fun getOptionValue(scope: OptionScope, optionName: String, commandArgumentText: String): VimDataType {
     return when (scope) {
       is OptionScope.LOCAL -> {
         getLocalOptionValue(optionName, scope.editor)
       }
       is OptionScope.GLOBAL -> getGlobalOptionValue(optionName)
-    } ?: throw ExException("E518: Unknown option: $token")
+    } ?: throw ExException("E518: Unknown option: $commandArgumentText")
   }
 
-  override fun appendValue(scope: OptionScope, optionName: String, value: String, token: String) {
-    val option = options.get(optionName) ?: throw ExException("E518: Unknown option: $token")
-    val currentValue = getOptionValue(scope, optionName)
-    val newValue = option.getValueIfAppend(currentValue, value, token)
-    setOptionValue(scope, optionName, newValue, token)
+  override fun appendValue(scope: OptionScope, optionName: String, value: String, commandArgumentText: String) {
+    val option = options.get(optionName) ?: throw ExException("E518: Unknown option: $commandArgumentText")
+    val currentValue = getOptionValue(scope, optionName, commandArgumentText)
+    val newValue = option.getValueIfAppend(currentValue, value, commandArgumentText)
+    setOptionValue(scope, optionName, newValue, commandArgumentText)
   }
 
-  override fun prependValue(scope: OptionScope, optionName: String, value: String, token: String) {
-    val option = options.get(optionName) ?: throw ExException("E518: Unknown option: $token")
-    val currentValue = getOptionValue(scope, optionName)
-    val newValue = option.getValueIfPrepend(currentValue, value, token)
-    setOptionValue(scope, optionName, newValue, token)
+  override fun prependValue(scope: OptionScope, optionName: String, value: String, commandArgumentText: String) {
+    val option = options.get(optionName) ?: throw ExException("E518: Unknown option: $commandArgumentText")
+    val currentValue = getOptionValue(scope, optionName, commandArgumentText)
+    val newValue = option.getValueIfPrepend(currentValue, value, commandArgumentText)
+    setOptionValue(scope, optionName, newValue, commandArgumentText)
   }
 
-  override fun removeValue(scope: OptionScope, optionName: String, value: String, token: String) {
-    val option = options.get(optionName) ?: throw ExException("E518: Unknown option: $token")
-    val currentValue = getOptionValue(scope, optionName)
-    val newValue = option.getValueIfRemove(currentValue, value, token)
-    setOptionValue(scope, optionName, newValue, token)
+  override fun removeValue(scope: OptionScope, optionName: String, value: String, commandArgumentText: String) {
+    val option = options.get(optionName) ?: throw ExException("E518: Unknown option: $commandArgumentText")
+    val currentValue = getOptionValue(scope, optionName, commandArgumentText)
+    val newValue = option.getValueIfRemove(currentValue, value, commandArgumentText)
+    setOptionValue(scope, optionName, newValue, commandArgumentText)
   }
 
   override fun resetAllOptions() {

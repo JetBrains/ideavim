@@ -8,9 +8,6 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.leftright
 
-import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimOptionDefaultAll
@@ -19,7 +16,6 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 class MotionLeftActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test whichwrap in the same line`() {
-    injector.optionGroup.setOptionValue(OptionScope.GLOBAL, OptionConstants.whichwrap, "h")
     doTest(
       listOf("h"),
       """
@@ -28,14 +24,14 @@ class MotionLeftActionTest : VimTestCase() {
       """
           Oh, hi M${c}ark
       """.trimIndent(),
-    )
-    injector.optionGroup.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
+    ) {
+      enterCommand("set whichwrap=h")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionDefaultAll
   fun `test whichwrap at file start`() {
-    injector.optionGroup.setOptionValue(OptionScope.GLOBAL, OptionConstants.whichwrap, "h")
     doTest(
       listOf("h"),
       """
@@ -44,14 +40,14 @@ class MotionLeftActionTest : VimTestCase() {
       """
           ${c}Oh, hi Mark
       """.trimIndent(),
-    )
-    injector.optionGroup.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
+    ) {
+      enterCommand("set whichwrap=h")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionDefaultAll
   fun `test whichwrap to previous line`() {
-    injector.optionGroup.setOptionValue(OptionScope.GLOBAL, OptionConstants.whichwrap, "h")
     doTest(
       listOf("h"),
       """
@@ -62,14 +58,14 @@ class MotionLeftActionTest : VimTestCase() {
           Oh, hi Mar${c}k
           You are my favourite customer
       """.trimIndent(),
-    )
-    injector.optionGroup.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
+    ) {
+      enterCommand("set whichwrap=h")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionDefaultAll
   fun `test from empty line to empty line`() {
-    injector.optionGroup.setOptionValue(OptionScope.GLOBAL, OptionConstants.whichwrap, "h")
     doTest(
       listOf("h"),
       """
@@ -84,14 +80,14 @@ class MotionLeftActionTest : VimTestCase() {
           
           You are my favourite customer
       """.trimIndent(),
-    )
-    injector.optionGroup.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
+    ) {
+      enterCommand("set whichwrap=h")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionDefaultAll
   fun `test d command with whichwrap`() {
-    injector.optionGroup.setOptionValue(OptionScope.GLOBAL, OptionConstants.whichwrap, "h")
     doTest(
       listOf("dh"),
       """
@@ -101,7 +97,8 @@ class MotionLeftActionTest : VimTestCase() {
       """
           Oh, hi Mark${c}You are my favourite customer
       """.trimIndent(),
-    )
-    injector.optionGroup.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
+    ) {
+      enterCommand("set whichwrap=h")
+    }
   }
 }

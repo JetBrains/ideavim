@@ -80,7 +80,7 @@ fun parseOptionLine(editor: VimEditor, args: String, scope: OptionScope, failOnB
   val optionService = injector.optionGroup
   when {
     args.isEmpty() -> {
-      val changedOptions = optionService.getOptions().filter { !optionService.isDefault(scope, it) }
+      val changedOptions = optionService.getOptions().filter { !optionService.isDefault(scope, it, it) }
       showOptions(editor, changedOptions.map { Pair(it, it) }, scope, true)
       return true
     }
@@ -240,7 +240,7 @@ private fun showOptions(editor: VimEditor, nameAndToken: Collection<Pair<String,
 }
 
 private fun optionToString(scope: OptionScope, name: String): String {
-  val value = injector.optionGroup.getOptionValue(scope, name)
+  val value = injector.optionGroup.getOptionValue(scope, name, name)
   return if (injector.optionGroup.isToggleOption(name)) {
     if (value.asBoolean()) "  $name" else "no$name"
   } else {

@@ -35,7 +35,8 @@ object ClipboardOptionHelper {
         injector.optionGroup.appendValue(
           OptionScope.GLOBAL,
           OptionConstants.clipboard,
-          OptionConstants.clipboard_ideaput
+          OptionConstants.clipboard_ideaput,
+          OptionConstants.clipboard
         )
       }
       ideaputDisabled = false

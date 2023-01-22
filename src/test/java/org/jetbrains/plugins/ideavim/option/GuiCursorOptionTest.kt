@@ -24,7 +24,7 @@ class GuiCursorOptionTest : VimTestCase() {
     optionsNoEditor().getStringListValues(OptionConstants.guicursor).map { GuiCursorOptionHelper.convertToken(it) }
 
   private fun setValue(value: String) {
-    return (VimPlugin.getOptionGroup().setOptionValue(OptionScope.GLOBAL, OptionConstants.guicursor, VimString(value)))
+    return VimPlugin.getOptionGroup().setOptionValue(OptionScope.GLOBAL, OptionConstants.guicursor, VimString(value), OptionConstants.guicursor)
   }
 
   private fun assertHasDefaultValue() {

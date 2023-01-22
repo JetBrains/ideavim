@@ -110,7 +110,7 @@ object VimExtensionRegistrar : VimExtensionRegistrator {
   override fun setOptionByPluginAlias(alias: String): Boolean {
     val name = extensionAliases[alias] ?: return false
     try {
-      VimPlugin.getOptionGroup().setOption(OptionScope.GLOBAL, name)
+      VimPlugin.getOptionGroup().setOption(OptionScope.GLOBAL, name, name)
     } catch (e: ExException) {
       return false
     }
