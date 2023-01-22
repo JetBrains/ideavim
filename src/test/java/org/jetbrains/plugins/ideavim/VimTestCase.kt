@@ -106,7 +106,7 @@ abstract class VimTestCase : UsefulTestCase() {
     VimPlugin.getKey().resetKeyMappings()
     VimPlugin.getSearch().resetState()
     if (!VimPlugin.isEnabled()) VimPlugin.setEnabled(true)
-    VimPlugin.getOptionGroup().setOption(OptionScope.GLOBAL, OptionConstants.ideastrictmode)
+    VimPlugin.getOptionGroup().setOption(OptionScope.GLOBAL, OptionConstants.ideastrictmode, OptionConstants.ideastrictmode)
     GuicursorChangeListener.processGlobalValueChange(null)
     Checks.reset()
 
@@ -153,7 +153,7 @@ abstract class VimTestCase : UsefulTestCase() {
 
   protected fun enableExtensions(vararg extensionNames: String) {
     for (name in extensionNames) {
-      VimPlugin.getOptionGroup().setOption(OptionScope.GLOBAL, name)
+      VimPlugin.getOptionGroup().setOption(OptionScope.GLOBAL, name, name)
     }
   }
 
@@ -687,7 +687,9 @@ abstract class VimTestCase : UsefulTestCase() {
     @JvmStatic
     fun commandToKeys(command: String): List<KeyStroke> {
       val keys: MutableList<KeyStroke> = ArrayList()
-      keys.addAll(injector.parser.parseKeys(":"))
+      if (!command.startsWith(":")) {
+        keys.addAll(injector.parser.parseKeys(":"))
+      }
       keys.addAll(injector.parser.stringToKeys(command)) // Avoids trying to parse 'command ... <args>' as a special char
       keys.addAll(injector.parser.parseKeys("<Enter>"))
       return keys

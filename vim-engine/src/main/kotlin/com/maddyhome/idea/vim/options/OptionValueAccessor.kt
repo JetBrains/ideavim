@@ -22,7 +22,7 @@ import com.maddyhome.idea.vim.vimscript.services.OptionService
  */
 class OptionValueAccessor(private val optionGroup: VimOptionGroup, val scope: OptionScope) {
   /** Gets the loosely typed option value */
-  fun getValue(optionName: String) = optionGroup.getOptionValue(scope, optionName)
+  fun getValue(optionName: String) = optionGroup.getOptionValue(scope, optionName, optionName)
 
   /** Gets the option value as an integer */
   fun getIntValue(optionName: String) = getValue(optionName).toVimNumber().value

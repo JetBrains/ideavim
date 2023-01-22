@@ -22,7 +22,7 @@ class PackaddCommand(val ranges: Ranges, val argument: String) : Command.SingleE
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     if (argument == "matchit" || (argument.startsWith("!") && argument.drop(1).trim() == "matchit")) {
-      injector.optionGroup.setOption(OptionScope.GLOBAL, "matchit")
+      injector.optionGroup.setOption(OptionScope.GLOBAL, "matchit", "matchit")
     }
     return ExecutionResult.Success
   }

@@ -30,18 +30,18 @@ class StringListOptionTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test append existing value`() {
-    injector.optionGroup.appendValue(OptionScope.GLOBAL, optionName, "123")
-    injector.optionGroup.appendValue(OptionScope.GLOBAL, optionName, "456")
-    injector.optionGroup.appendValue(OptionScope.GLOBAL, optionName, "123")
+    injector.optionGroup.appendValue(OptionScope.GLOBAL, optionName, "123", optionName)
+    injector.optionGroup.appendValue(OptionScope.GLOBAL, optionName, "456", optionName)
+    injector.optionGroup.appendValue(OptionScope.GLOBAL, optionName, "123", optionName)
 
     assertEquals("123,456", optionsNoEditor().getStringValue(optionName))
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test prepend existing value`() {
-    injector.optionGroup.appendValue(OptionScope.GLOBAL, optionName, "456")
-    injector.optionGroup.appendValue(OptionScope.GLOBAL, optionName, "123")
-    injector.optionGroup.prependValue(OptionScope.GLOBAL, optionName, "123")
+    injector.optionGroup.appendValue(OptionScope.GLOBAL, optionName, "456", optionName)
+    injector.optionGroup.appendValue(OptionScope.GLOBAL, optionName, "123", optionName)
+    injector.optionGroup.prependValue(OptionScope.GLOBAL, optionName, "123", optionName)
 
     assertEquals("456,123", optionsNoEditor().getStringValue(optionName))
   }
