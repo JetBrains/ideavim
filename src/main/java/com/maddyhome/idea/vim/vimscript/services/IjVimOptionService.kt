@@ -15,7 +15,6 @@ import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.StringOption
 import com.maddyhome.idea.vim.options.UnsignedNumberOption
 
-
 internal class IjVimOptionService : VimOptionServiceBase() {
 
   init {

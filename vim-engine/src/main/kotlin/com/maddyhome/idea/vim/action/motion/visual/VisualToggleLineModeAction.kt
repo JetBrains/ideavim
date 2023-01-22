@@ -32,8 +32,7 @@ class VisualToggleLineModeAction : VimActionHandler.ConditionalMulticaret() {
     return if (injector.options(editor).hasValue(OptionConstants.selectmode, OptionConstants.selectmode_cmd)) {
       injector.visualMotionGroup.enterSelectMode(editor, VimStateMachine.SubMode.VISUAL_LINE)
       true
-    }
-    else {
+    } else {
       false
     }
   }

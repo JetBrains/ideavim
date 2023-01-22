@@ -35,31 +35,33 @@ class VimJumpServiceImpl : VimJumpServiceBase(), PersistentStateComponent<Elemen
   }
 
   override fun getState(): Element {
-    val jumpsElem = Element("jumps");
+    val jumpsElem = Element("jumps")
     for (jump in jumps) {
-      val jumpElem = Element("jump");
+      val jumpElem = Element("jump")
       jumpElem.setAttribute("line", jump.line.toString())
       jumpElem.setAttribute("column", jump.col.toString())
       jumpElem.setAttribute("filename", StringUtil.notNullize(jump.filepath))
-      jumpsElem.addContent(jumpElem);
+      jumpsElem.addContent(jumpElem)
       if (logger.isDebug()) {
-        logger.debug("saved jump = $jump");
+        logger.debug("saved jump = $jump")
       }
     }
     return jumpsElem
   }
 
   override fun loadState(state: Element) {
-    val jumpList = state.getChildren("jump");
+    val jumpList = state.getChildren("jump")
     for (jumpElement in jumpList) {
-      val jump = Jump(Integer.parseInt(jumpElement.getAttributeValue("line")),
+      val jump = Jump(
+        Integer.parseInt(jumpElement.getAttributeValue("line")),
         Integer.parseInt(jumpElement.getAttributeValue("column")),
-        jumpElement.getAttributeValue("filename"))
+        jumpElement.getAttributeValue("filename")
+      )
       jumps.add(jump)
     }
 
     if (logger.isDebug()) {
-      logger.debug("jumps=$jumps");
+      logger.debug("jumps=$jumps")
     }
   }
 }

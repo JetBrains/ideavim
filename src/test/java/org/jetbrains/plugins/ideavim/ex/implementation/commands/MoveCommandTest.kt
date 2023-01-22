@@ -13,79 +13,94 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 class MoveCommandTest : VimTestCase() {
 
   fun `test selection marks after moving line up`() {
-    configureByText("""
+    configureByText(
+      """
       ====
       My mother taught me this trick: if you repeat something over and over again it loses its meaning.
       For example: homewor${c}k, homework, homework, homework, homework, homework, homework, homework, homework.
       See, nothing.
       
-      """.trimIndent())
+      """.trimIndent()
+    )
 
     typeText("vb:m '>+1<CR>gv")
-    assertState("""
+    assertState(
+      """
       ====
       My mother taught me this trick: if you repeat something over and over again it loses its meaning.
       See, nothing.
-      For example: ${s}${c}homework${se}, homework, homework, homework, homework, homework, homework, homework, homework.
+      For example: ${s}${c}homework$se, homework, homework, homework, homework, homework, homework, homework, homework.
       
-      """.trimIndent())
+      """.trimIndent()
+    )
   }
 
   fun `test selection marks after moving line down`() {
-    configureByText("""
+    configureByText(
+      """
       ====
       My mother taught me this trick: if you repeat something over and over again it loses its meaning.
       For example: homewor${c}k, homework, homework, homework, homework, homework, homework, homework, homework.
       See, nothing.
       
-      """.trimIndent())
+      """.trimIndent()
+    )
 
     typeText("vb:m '<-2<CR>gv")
-    assertState("""
+    assertState(
+      """
       ====
-      For example: ${s}${c}homework${se}, homework, homework, homework, homework, homework, homework, homework, homework.
+      For example: ${s}${c}homework$se, homework, homework, homework, homework, homework, homework, homework, homework.
       My mother taught me this trick: if you repeat something over and over again it loses its meaning.
       See, nothing.
       
-      """.trimIndent())
+      """.trimIndent()
+    )
   }
 
-
   fun `test marks after moving line up`() {
-    configureByText("""
+    configureByText(
+      """
       ====
       My mother taught me this trick: if you repeat something over and over again it loses its meaning.
       For example: homewor${c}k, homework, homework, homework, homework, homework, homework, homework, homework.
       See, nothing.
       
-      """.trimIndent())
+      """.trimIndent()
+    )
 
     typeText("ma$:m +1<CR>`a")
-    assertState("""
+    assertState(
+      """
       ====
       My mother taught me this trick: if you repeat something over and over again it loses its meaning.
       See, nothing.
       For example: homewor${c}k, homework, homework, homework, homework, homework, homework, homework, homework.
       
-      """.trimIndent())
+      """.trimIndent()
+    )
   }
 
   fun `test marks after moving line down`() {
-    configureByText("""
+    configureByText(
+      """
       ====
       My mother taught me this trick: if you repeat something over and over again it loses its meaning.
       For example: homewor${c}k, homework, homework, homework, homework, homework, homework, homework, homework.
       See, nothing.
       
-      """.trimIndent())
+      """.trimIndent()
+    )
 
     typeText("ma$:m -2<CR>`a")
-    assertState("""
+    assertState(
+      """
       ====
       For example: homewor${c}k, homework, homework, homework, homework, homework, homework, homework, homework.
       My mother taught me this trick: if you repeat something over and over again it loses its meaning.
       See, nothing.
       
-      """.trimIndent())
+      """.trimIndent()
+    )
   }
 }

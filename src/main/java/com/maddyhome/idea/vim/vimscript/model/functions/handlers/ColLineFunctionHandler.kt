@@ -8,7 +8,6 @@
 
 package com.maddyhome.idea.vim.vimscript.model.functions.handlers
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector

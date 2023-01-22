@@ -173,8 +173,9 @@ class PutGroup : VimPutBase() {
 
   override fun notifyAboutIdeaPut(editor: VimEditor?) {
     val project = editor?.ij?.project
-    if (VimPlugin.getVimState().isIdeaPutNotified || ClipboardOptionHelper.ideaputDisabled
-      || injector.globalOptions().hasValue(OptionConstants.clipboard, OptionConstants.clipboard_ideaput)) {
+    if (VimPlugin.getVimState().isIdeaPutNotified || ClipboardOptionHelper.ideaputDisabled ||
+      injector.globalOptions().hasValue(OptionConstants.clipboard, OptionConstants.clipboard_ideaput)
+    ) {
       return
     }
 

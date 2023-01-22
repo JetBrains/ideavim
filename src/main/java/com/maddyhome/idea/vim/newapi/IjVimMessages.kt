@@ -51,8 +51,7 @@ class IjVimMessages : VimMessagesBase() {
   override fun indicateError() {
     if (ApplicationManager.getApplication().isUnitTestMode) {
       error = true
-    }
-    else if (!injector.globalOptions().isSet(OptionConstants.visualbell)) {
+    } else if (!injector.globalOptions().isSet(OptionConstants.visualbell)) {
       // Vim only allows a beep once every half second - :help 'visualbell'
       val currentTimeMillis = System.currentTimeMillis()
       if (currentTimeMillis - lastBeepTimeMillis > 500) {

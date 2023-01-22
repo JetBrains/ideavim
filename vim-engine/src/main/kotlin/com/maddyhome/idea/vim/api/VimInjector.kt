@@ -22,7 +22,6 @@ import com.maddyhome.idea.vim.undo.VimUndoRedo
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import com.maddyhome.idea.vim.vimscript.services.VariableService
 import com.maddyhome.idea.vim.yank.VimYankGroup
-import org.jetbrains.annotations.ApiStatus.ScheduledForRemoval
 
 interface VimInjector {
   // [FINISHED] Fully moved to vim-engine. Should we remove it from injector?

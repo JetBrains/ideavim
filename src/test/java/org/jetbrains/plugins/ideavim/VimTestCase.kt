@@ -335,7 +335,6 @@ abstract class VimTestCase : UsefulTestCase() {
     }
   }
 
-
   /**
    * Gets an accessor for effective option value
    *
@@ -366,7 +365,6 @@ abstract class VimTestCase : UsefulTestCase() {
     assertNull("Editor is not null! Use options() to access effective option values", myFixture.editor)
     return injector.optionService.getValueAccessor(null)
   }
-
 
   fun assertState(textAfter: String) {
     @Suppress("IdeaVimAssertState")
@@ -688,7 +686,7 @@ abstract class VimTestCase : UsefulTestCase() {
     fun commandToKeys(command: String): List<KeyStroke> {
       val keys: MutableList<KeyStroke> = ArrayList()
       keys.addAll(injector.parser.parseKeys(":"))
-      keys.addAll(injector.parser.stringToKeys(command))  // Avoids trying to parse 'command ... <args>' as a special char
+      keys.addAll(injector.parser.stringToKeys(command)) // Avoids trying to parse 'command ... <args>' as a special char
       keys.addAll(injector.parser.parseKeys("<Enter>"))
       return keys
     }
@@ -698,7 +696,7 @@ abstract class VimTestCase : UsefulTestCase() {
     fun searchToKeys(pattern: String, forwards: Boolean): List<KeyStroke> {
       val keys: MutableList<KeyStroke> = ArrayList()
       keys.addAll(injector.parser.parseKeys(if (forwards) "/" else "?"))
-      keys.addAll(injector.parser.stringToKeys(pattern))  // Avoids trying to parse 'command ... <args>' as a special char
+      keys.addAll(injector.parser.stringToKeys(pattern)) // Avoids trying to parse 'command ... <args>' as a special char
       keys.addAll(injector.parser.parseKeys("<CR>"))
       return keys
     }

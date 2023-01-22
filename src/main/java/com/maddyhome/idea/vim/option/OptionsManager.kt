@@ -11,7 +11,6 @@ package com.maddyhome.idea.vim.option
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.helpers.KeywordOptionHelper
-import com.maddyhome.idea.vim.vimscript.services.IjVimOptionService
 
 /**
  * COMPATIBILITY-LAYER: Added a class and package

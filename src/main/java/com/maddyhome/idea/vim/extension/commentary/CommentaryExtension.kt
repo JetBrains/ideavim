@@ -171,7 +171,7 @@ class CommentaryExtension : VimExtension {
     override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
       val commandState = editor.vimStateMachine
 
-      val command = Command(operatorArguments.count1, CommentaryTextObjectMotionHandler, Command.Type.MOTION,  EnumSet.noneOf(CommandFlags::class.java))
+      val command = Command(operatorArguments.count1, CommentaryTextObjectMotionHandler, Command.Type.MOTION, EnumSet.noneOf(CommandFlags::class.java))
       commandState.commandBuilder.completeCommandPart(Argument(command))
     }
   }

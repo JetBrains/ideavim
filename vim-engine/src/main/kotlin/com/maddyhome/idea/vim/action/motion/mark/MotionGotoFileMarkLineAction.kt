@@ -18,7 +18,6 @@ import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
-import com.maddyhome.idea.vim.handler.toMotionOrError
 import java.util.*
 
 class MotionGotoFileMarkLineAction : MotionActionHandler.ForEachCaret() {

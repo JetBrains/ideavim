@@ -104,7 +104,8 @@ class SearchGroupTest : VimTestCase() {
       """
         |${c}I found it in a legendary land
         |all rocks and lavender and tufted grass,
-      """.trimMargin())
+      """.trimMargin()
+    )
     enterSearch("\\(found\\)")
     assertOffset(2)
   }
