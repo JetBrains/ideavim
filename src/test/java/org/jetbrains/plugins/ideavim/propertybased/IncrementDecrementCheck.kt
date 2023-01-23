@@ -42,6 +42,8 @@ class IncrementDecrementTest : VimPropertyTestBase() {
     setupChecks {
       this.neoVim.ignoredRegisters = setOf(':')
     }
+    // Just initialize editor
+    configureByText("")
     enterCommand("set nrformats+=octal")
     PropertyChecker.checkScenarios {
       ImperativeCommand { env ->

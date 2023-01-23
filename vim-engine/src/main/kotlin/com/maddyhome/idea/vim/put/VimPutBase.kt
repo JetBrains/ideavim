@@ -388,7 +388,8 @@ abstract class VimPutBase : VimPut {
           val firstSelectedLine = additionalData["firstSelectedLine"] as Int
           val selectedLines = additionalData["selectedLines"] as Int
           val startColumnOfSelection = additionalData["startColumnOfSelection"] as Int
-          val line = if (data.insertTextBeforeCaret) firstSelectedLine else firstSelectedLine + selectedLines
+          val line = (if (data.insertTextBeforeCaret) firstSelectedLine else firstSelectedLine + selectedLines)
+            .coerceAtMost(vimEditor.lineCount() - 1)
           when (typeInRegister) {
             SelectionType.LINE_WISE -> when {
               data.insertTextBeforeCaret -> listOf(vimEditor.getLineStartOffset(line))
