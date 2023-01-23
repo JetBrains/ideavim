@@ -73,7 +73,7 @@ abstract class VimJumpServiceBase : VimJumpService {
   }
 
   override fun dropLastJump() {
-    jumps.dropLast(1)
+    jumps.removeLast()
   }
 
   override fun updateJumpsFromInsert(editor: VimEditor, startOffset: Int, length: Int) {
