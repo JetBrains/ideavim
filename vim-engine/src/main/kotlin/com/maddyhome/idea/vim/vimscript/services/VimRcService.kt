@@ -50,57 +50,56 @@ object VimRcService {
     return if (xdgConfig != null && xdgConfig.exists()) xdgConfig else null
   }
 
-  private val newIdeaVimRcTemplate = """
-    " .ideavimrc is a configuration file for IdeaVim plugin. It uses
-    "   the same commands as the original .vimrc configuration.
-    " You can find a list of commands here: https://jb.gg/h38q75
-    " Find more examples here: https://jb.gg/share-ideavimrc
+  private fun getNewIdeaVimRcTemplate(vimrc: String) = """
+    |" .ideavimrc is a configuration file for IdeaVim plugin. It uses
+    |"   the same commands as the original .vimrc configuration.
+    |" You can find a list of commands here: https://jb.gg/h38q75
+    |" Find more examples here: https://jb.gg/share-ideavimrc
 
-    "" Source your .vimrc
-    "source ~/.vimrc
+    |$vimrc
+    |"" -- Suggested options --
+    |" Show a few lines of context around the cursor. Note that this makes the
+    |" text scroll if you mouse-click near the start or end of the window.
+    |set scrolloff=5
 
-    "" -- Suggested options --
-    " Show a few lines of context around the cursor. Note that this makes the
-    " text scroll if you mouse-click near the start or end of the window.
-    set scrolloff=5
+    |" Do incremental searching.
+    |set incsearch
 
-    " Do incremental searching.
-    set incsearch
+    |" Don't use Ex mode, use Q for formatting.
+    |map Q gq
 
-    " Don't use Ex mode, use Q for formatting.
-    map Q gq
+    |" --- Enable IdeaVim plugins https://jb.gg/ideavim-plugins
 
-    " --- Enable IdeaVim plugins https://jb.gg/ideavim-plugins
-
-    " Highlight copied text
-    Plug 'machakann/vim-highlightedyank'
-    " Commentary plugin
-    Plug 'tpope/vim-commentary'
+    |" Highlight copied text
+    |Plug 'machakann/vim-highlightedyank'
+    |" Commentary plugin
+    |Plug 'tpope/vim-commentary'
 
 
-    "" -- Map IDE actions to IdeaVim -- https://jb.gg/abva4t
-    "" Map \r to the Reformat Code action
-    "map \r <Action>(ReformatCode)
+    |"" -- Map IDE actions to IdeaVim -- https://jb.gg/abva4t
+    |"" Map \r to the Reformat Code action
+    |"map \r <Action>(ReformatCode)
 
-    "" Map <leader>d to start debug
-    "map <leader>d <Action>(Debug)
+    |"" Map <leader>d to start debug
+    |"map <leader>d <Action>(Debug)
 
-    "" Map \b to toggle the breakpoint on the current line
-    "map \b <Action>(ToggleLineBreakpoint)
+    |"" Map \b to toggle the breakpoint on the current line
+    |"map \b <Action>(ToggleLineBreakpoint)
 
-  """.trimIndent()
+  """.trimMargin()
 
   fun findOrCreateIdeaVimRc(): File? {
     val found = findIdeaVimRc()
     if (found != null) return found
 
     val homeDirName = System.getProperty("user.home")
+    val vimrc = sourceVimrc(homeDirName)
     if (homeDirName != null) {
       for (fileName in HOME_VIMRC_PATHS) {
         try {
           val file = File(homeDirName, fileName)
           file.createNewFile()
-          file.writeText(newIdeaVimRcTemplate)
+          file.writeText(getNewIdeaVimRcTemplate(vimrc))
           injector.vimrcFileState.filePath = file.absolutePath
           return file
         } catch (ignored: IOException) {
@@ -109,6 +108,24 @@ object VimRcService {
       }
     }
     return null
+  }
+
+  private fun sourceVimrc(homeDirName: String): String {
+    if (File(homeDirName, ".vimrc").exists()) {
+      return """
+        |" Source your .vimrc
+        ||source ~/.vimrc
+        |
+        """.trimMargin()
+    }
+    if (File(homeDirName, "_vimrc").exists()) {
+      return """
+        |" Source your _vimrc
+        ||source ~/_vimrc
+        |
+        """.trimMargin()
+    }
+    return ""
   }
 
   @JvmStatic
