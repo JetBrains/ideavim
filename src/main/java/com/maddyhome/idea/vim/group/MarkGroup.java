@@ -31,6 +31,8 @@ import java.util.Set;
 @Deprecated
 @ApiStatus.ScheduledForRemoval(inVersion = "2.3")
 public class MarkGroup {
+  public List<Jump> jumps = VimInjectorKt.injector.getJumpService().getJumps();
+
   public void saveJumpLocation(@NotNull Editor editor) {
     VimInjectorKt.injector.getJumpService().saveJumpLocation(new IjVimEditor(editor));
   }
@@ -113,11 +115,6 @@ public class MarkGroup {
     Set<Mark> marks = VimInjectorKt.injector.getMarkService().getAllLocalMarks(editor.primaryCaret());
     marks.addAll(VimInjectorKt.injector.getMarkService().getGlobalMarks(editor));
     return new ArrayList<>(marks);
-  }
-
-  @NotNull
-  public List<Jump> getJumps() {
-    return VimInjectorKt.injector.getJumpService().getJumps();
   }
 
   public int getJumpSpot() {
