@@ -48,6 +48,8 @@ import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+
 import static com.maddyhome.idea.vim.group.EditorGroup.EDITOR_STORE_ELEMENT;
 import static com.maddyhome.idea.vim.group.KeyGroup.SHORTCUT_CONFLICTS_ELEMENT;
 import static com.maddyhome.idea.vim.vimscript.services.VimRcService.executeIdeaVimRc;
@@ -144,8 +146,8 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
 
   @Deprecated // "Please use `injector.markService` instead"
   @ApiStatus.ScheduledForRemoval(inVersion = "2.3")
-  public static @NotNull VimMarkServiceImpl getMark() {
-    return ((VimMarkServiceImpl)VimInjectorKt.getInjector().getMarkService());
+  public static @NotNull MarkGroup getMark() {
+    return ApplicationManager.getApplication().getService(MarkGroup.class);
   }
 
   public static @NotNull RegisterGroup getRegister() {
