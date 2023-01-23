@@ -203,7 +203,7 @@ Put your settings to `$XDG_CONFIG_HOME/ideavim/ideavimrc` file.
 IdeaVim Plugins
 --------------------
 
-See [doc/emulated-plugins.md](https://github.com/JetBrains/ideavim/wiki/IdeaVim-Plugins)
+See [doc/IdeaVim Plugins.md](https://github.com/JetBrains/ideavim/wiki/IdeaVim-Plugins)
 
 Executing IDE Actions
 ---------------------
