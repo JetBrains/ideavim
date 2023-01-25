@@ -92,6 +92,12 @@
     <statistics.applicationUsagesCollector implementation="com.maddyhome.idea.vim.statistic.ShortcutConflictState"/>
 
     <statistics.counterUsagesCollector implementationClass="com.maddyhome.idea.vim.statistic.ActionTracker"/>
+
+
+<!--    <localInspection language="textmate" shortName="UsePlug" bundle="messages.IdeaVimBundle"-->
+<!--                     key="use.plug.inspection.display.name" groupKey="use.plug.inspection.group.display.name"-->
+<!--                     enabledByDefault="true" level="WARNING"-->
+<!--                     implementationClass="com.maddyhome.idea.vim.inspections.UsePlugSyntaxInspection"/>-->
   </extensions>
 
   <xi:include href="/META-INF/includes/ApplicationServices.xml" xpointer="xpointer(/idea-plugin/*)"/>
