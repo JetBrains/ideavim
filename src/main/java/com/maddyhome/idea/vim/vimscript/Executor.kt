@@ -98,7 +98,9 @@ class Executor : VimScriptExecutorBase() {
     val context = DataContext.EMPTY_CONTEXT.vim
     try {
       execute(file.readText(), editor, context, skipHistory = true, indicateErrors)
-    } catch (ignored: IOException) { }
+    } catch (ignored: IOException) {
+      LOG.error(ignored)
+    }
   }
 
   @Throws(ExException::class)
@@ -107,5 +109,9 @@ class Executor : VimScriptExecutorBase() {
     val text = reg.text ?: return false
     execute(text, editor, context, skipHistory = false, indicateErrors = true, CommandLineVimLContext)
     return true
+  }
+
+  companion object {
+    val LOG = logger<Executor>()
   }
 }

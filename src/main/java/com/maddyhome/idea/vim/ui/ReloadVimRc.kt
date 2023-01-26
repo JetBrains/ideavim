@@ -14,6 +14,7 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.actionSystem.PlatformDataKeys
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.toolbar.floating.AbstractFloatingToolbarProvider
 import com.intellij.openapi.editor.toolbar.floating.FloatingToolbarComponent
@@ -55,6 +56,8 @@ object VimRcFileState : VimrcFileState {
 
   private val saveStateListeners = ArrayList<() -> Unit>()
 
+  private val LOG = logger<VimRcFileState>()
+
   fun saveFileState(filePath: String, text: String) {
     this.filePath = FileUtil.toSystemDependentName(filePath)
     val script = VimscriptParser.parse(text)
@@ -64,7 +67,11 @@ object VimRcFileState : VimrcFileState {
 
   override fun saveFileState(filePath: String) {
     val vimRcFile = VimRcService.findIdeaVimRc()
-    val ideaVimRcText = vimRcFile?.readText() ?: ""
+    val ideaVimRcText = vimRcFile?.let {
+      kotlin.runCatching { it.readText() }
+        .onFailure { LOG.error(it) }
+        .getOrNull()
+    } ?: ""
     saveFileState(filePath, ideaVimRcText)
   }
 
