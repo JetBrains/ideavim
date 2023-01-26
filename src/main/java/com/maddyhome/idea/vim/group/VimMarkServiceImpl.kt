@@ -39,8 +39,7 @@ import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.vimscript.services.IjOptionConstants
 import org.jdom.Element
 import java.util.*
-
-// todo remove marks from register group
+import kotlin.Comparator
 
 // todo save jumps after IDE close
 // todo sync vim jumps with ide jumps
@@ -72,7 +71,7 @@ class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateComponent<Elemen
     }
     element.addContent(globalMarksElement)
     val localMarksElement = Element("localmarks")
-    var files: List<LocalMarks<Char, Mark>> = filepathToLocalMarks.values.sortedWith(kotlin.Comparator.comparing(LocalMarks<Char, Mark>::myTimestamp))
+    var files: List<LocalMarks<Char, Mark>> = filepathToLocalMarks.values.sortedWith(Comparator.comparing(LocalMarks<Char, Mark>::myTimestamp))
     if (files.size > SAVE_MARK_COUNT) {
       files = files.subList(files.size - SAVE_MARK_COUNT, files.size)
     }
@@ -168,16 +167,17 @@ class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateComponent<Elemen
     readData(state)
   }
 
-  override fun createGlobalMark(editor: VimEditor, ch: Char, offset: Int): Mark? {
+  override fun createGlobalMark(editor: VimEditor, char: Char, offset: Int): Mark? {
     if (!injector.globalOptions().isSet(IjOptionConstants.ideamarks)) {
-      return super.createGlobalMark(editor, ch, offset)
+      return super.createGlobalMark(editor, char, offset)
     }
     val lp = editor.offsetToBufferPosition(offset)
     val line = lp.line
     val col = lp.column
-    return createOrGetSystemMark(ch, line, col, editor)
+    return createOrGetSystemMark(char, line, col, editor)
   }
 
+  @Deprecated("Please use removeMark with other signature")
   override fun removeMark(ch: Char, mark: Mark) {
     if (ch.isGlobalMark()) {
       removeGlobalMark(ch)
@@ -186,12 +186,12 @@ class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateComponent<Elemen
     }
   }
 
-  override fun removeGlobalMark(markChar: Char) {
-    val mark = getGlobalMark(markChar)
+  override fun removeGlobalMark(char: Char) {
+    val mark = getGlobalMark(char)
     if (mark is IntellijMark) {
       mark.clear()
     }
-    super.removeGlobalMark(markChar)
+    super.removeGlobalMark(char)
   }
 
   /**
@@ -251,7 +251,7 @@ class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateComponent<Elemen
       val type = bookmarksManager.getType(bookmark) ?: return
       val mnemonic = type.mnemonic
       if ((VimMarkService.UPPERCASE_MARKS + VimMarkService.NUMBERED_MARKS).indexOf(mnemonic) == -1) return
-      createVimMark(bookmark, mnemonic)
+      createVimMark(bookmark)
     }
 
     override fun bookmarkRemoved(group: BookmarkGroup, bookmark: Bookmark) {
@@ -268,7 +268,7 @@ class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateComponent<Elemen
       }
     }
 
-    private fun createVimMark(b: LineBookmark, mnemonic: Char) {
+    private fun createVimMark(b: LineBookmark) {
       var col = 0
       val editor = EditorHelper.getEditor(b.file)
       if (editor != null) col = editor.caretModel.currentCaret.logicalPosition.column
