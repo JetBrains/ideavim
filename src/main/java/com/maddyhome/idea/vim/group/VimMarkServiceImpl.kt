@@ -273,7 +273,7 @@ class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateComponent<Elemen
       val editor = EditorHelper.getEditor(b.file)
       if (editor != null) col = editor.caretModel.currentCaret.logicalPosition.column
       val mark = IntellijMark(b, col, myProject)
-      injector.markService.setGlobalMark(IjVimEditor(editor!!), mark)
+      injector.markService.setGlobalMark(mark)
     }
   }
 

@@ -176,7 +176,7 @@ abstract class VimMarkServiceBase : VimMarkService {
 
     when {
       !markChar.isOperationValidOnMark(VimMarkService.Operation.SET, caret) -> return false
-      markChar.isGlobalMark() -> setGlobalMark(editor, mark)
+      markChar.isGlobalMark() -> setGlobalMark(mark)
       markChar == SELECTION_START_MARK -> setSelectionStartMark(caret, mark.offset(editor))
       markChar == SELECTION_END_MARK -> setSelectionEndMark(caret, mark.offset(editor))
       markChar.isLocalMark() -> {
@@ -208,11 +208,11 @@ abstract class VimMarkServiceBase : VimMarkService {
 
   override fun setGlobalMark(editor: VimEditor, char: Char, offset: Int): Boolean {
     val mark = createGlobalMark(editor, char, offset) ?: return false
-    return setGlobalMark(editor, mark)
+    return setGlobalMark(mark)
   }
 
-  override fun setGlobalMark(editor: VimEditor, mark: Mark): Boolean {
-    if (!mark.key.isOperationValidOnMark(VimMarkService.Operation.SET, editor.primaryCaret())) return false
+  override fun setGlobalMark(mark: Mark): Boolean {
+    if (!isValidMark(mark.key, VimMarkService.Operation.SET, true)) return false
     globalMarks[mark.key] = mark
     return true
   }

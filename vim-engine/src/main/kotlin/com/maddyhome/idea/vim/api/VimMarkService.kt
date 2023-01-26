@@ -79,7 +79,7 @@ interface VimMarkService {
   fun setMark(caret: ImmutableVimCaret, mark: Mark): Boolean
   fun setMark(caret: ImmutableVimCaret, char: Char, offset: Int): Boolean
   fun setGlobalMark(editor: VimEditor, char: Char, offset: Int): Boolean
-  fun setGlobalMark(editor: VimEditor, mark: Mark): Boolean
+  fun setGlobalMark(mark: Mark): Boolean
 
   fun setVisualSelectionMarks(editor: VimEditor)
   fun getVisualSelectionMarks(caret: ImmutableVimCaret): TextRange?
