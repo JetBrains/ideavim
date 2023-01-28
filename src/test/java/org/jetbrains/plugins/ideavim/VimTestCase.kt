@@ -315,8 +315,8 @@ abstract class VimTestCase : UsefulTestCase() {
     )
     val project = myFixture.project
     when (Checks.keyHandler) {
-      Checks.KeyHandlerMethod.DIRECT_TO_VIM -> typeText(keys, editor, project)
-      Checks.KeyHandlerMethod.VIA_IDE -> typeTextViaIde(keys, editor)
+      Checks.KeyHandlerMethod.DIRECT_TO_VIM -> typeText(keys.filterNotNull(), editor, project)
+      Checks.KeyHandlerMethod.VIA_IDE -> typeTextViaIde(keys.filterNotNull(), editor)
     }
     return editor
   }
@@ -631,7 +631,7 @@ abstract class VimTestCase : UsefulTestCase() {
   }
 
   private fun typeTextViaIde(keys: List<KeyStroke?>, editor: Editor) {
-    TestInputModel.getInstance(editor).setKeyStrokes(keys)
+    TestInputModel.getInstance(editor).setKeyStrokes(keys.filterNotNull())
 
     val inputModel = TestInputModel.getInstance(editor)
     var key = inputModel.nextKeyStroke()
@@ -667,7 +667,7 @@ abstract class VimTestCase : UsefulTestCase() {
     fun typeText(keys: List<KeyStroke?>, editor: Editor, project: Project?) {
       val keyHandler = KeyHandler.getInstance()
       val dataContext = EditorDataContext.init(editor)
-      TestInputModel.getInstance(editor).setKeyStrokes(keys)
+      TestInputModel.getInstance(editor).setKeyStrokes(keys.filterNotNull())
       runWriteCommand(
         project,
         Runnable {

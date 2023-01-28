@@ -5,372 +5,486 @@
  * license that can be found in the LICENSE.txt file or at
  * https://opensource.org/licenses/MIT.
  */
+package org.jetbrains.plugins.ideavim.action
 
-package org.jetbrains.plugins.ideavim.action;
+import com.google.common.collect.Lists
+import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.newapi.IjVimEditor
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
+import org.jetbrains.plugins.ideavim.VimTestCase
 
-import com.google.common.collect.Lists;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.api.VimEditor;
-import com.maddyhome.idea.vim.api.VimInjectorKt;
-import com.maddyhome.idea.vim.command.VimStateMachine;
-import com.maddyhome.idea.vim.mark.Mark;
-import com.maddyhome.idea.vim.newapi.IjVimEditor;
-import org.jetbrains.plugins.ideavim.SkipNeovimReason;
-import org.jetbrains.plugins.ideavim.TestWithoutNeovim;
-import org.jetbrains.plugins.ideavim.VimTestCase;
-
-import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
-
-/**
- * @author Tuomas Tynkkynen
- */
-public class MarkTest extends VimTestCase {
+@Suppress("SpellCheckingInspection")
+class MarkTest : VimTestCase() {
   // |m|
-  public void testLocalMark() {
-    typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("ma"), "    foo\n" + "    ba<caret>r\n" + "    baz\n");
-    VimEditor vimEditor = new IjVimEditor(myFixture.getEditor());
-    Mark mark = injector.getMarkService().getMark(vimEditor.primaryCaret(), 'a');
-    assertNotNull(mark);
-    assertEquals(1, mark.getLine());
-    assertEquals(6, mark.getCol());
+  fun testLocalMark() {
+    typeTextInFile(
+      injector.parser.parseKeys("ma"), """    foo
+    ba<caret>r
+    baz
+"""
+    )
+    val vimEditor: VimEditor = IjVimEditor(myFixture.editor)
+    val mark = injector.markService.getMark(vimEditor.primaryCaret(), 'a')
+    assertNotNull(mark)
+    assertEquals(1, mark!!.line)
+    assertEquals(6, mark.col)
   }
 
   // |m|
-  public void testGlobalMark() {
-    typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("mG"), "    foo\n" + "    ba<caret>r\n" + "    baz\n");
-    VimEditor vimEditor = new IjVimEditor(myFixture.getEditor());
-    Mark mark = injector.getMarkService().getMark(vimEditor.primaryCaret(), 'G');
-    assertNotNull(mark);
-    assertEquals(1, mark.getLine());
-    assertEquals(6, mark.getCol());
+  fun testGlobalMark() {
+    typeTextInFile(
+      injector.parser.parseKeys("mG"), """    foo
+    ba<caret>r
+    baz
+"""
+    )
+    val vimEditor: VimEditor = IjVimEditor(myFixture.editor)
+    val mark = injector.markService.getMark(vimEditor.primaryCaret(), 'G')
+    assertNotNull(mark)
+    assertEquals(1, mark!!.line)
+    assertEquals(6, mark.col)
   }
 
   // |m|
-  public void testMarkIsDeletedWhenLineIsDeleted() {
-    typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("mx" + "dd"), "    foo\n" + "    ba<caret>r\n" + "    baz\n");
-    VimEditor vimEditor = new IjVimEditor(myFixture.getEditor());
-    Mark mark = injector.getMarkService().getMark(vimEditor.primaryCaret(), 'x');
-    assertNull(mark);
+  fun testMarkIsDeletedWhenLineIsDeleted() {
+    typeTextInFile(
+      injector.parser.parseKeys("mx" + "dd"), """    foo
+    ba<caret>r
+    baz
+"""
+    )
+    val vimEditor: VimEditor = IjVimEditor(myFixture.editor)
+    val mark = injector.markService.getMark(vimEditor.primaryCaret(), 'x')
+    assertNull(mark)
   }
 
   // |m|
-  public void testMarkIsNotDeletedWhenLineIsOneCharAndReplaced() {
-    typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("ma" + "r1"), "foo\n" + "<caret>0\n" + "bar\n");
-    VimEditor vimEditor = new IjVimEditor(myFixture.getEditor());
-    Mark mark = injector.getMarkService().getMark(vimEditor.primaryCaret(), 'a');
-    assertNotNull(mark);
+  fun testMarkIsNotDeletedWhenLineIsOneCharAndReplaced() {
+    typeTextInFile(
+      injector.parser.parseKeys("ma" + "r1"), """
+     foo
+     <caret>0
+     bar
+     
+     """.trimIndent()
+    )
+    val vimEditor: VimEditor = IjVimEditor(myFixture.editor)
+    val mark = injector.markService.getMark(vimEditor.primaryCaret(), 'a')
+    assertNotNull(mark)
   }
 
   // |m|
-  public void testMarkIsNotDeletedWhenLineIsChanged() {
-    typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("ma" + "cc"), "    foo\n" + "    ba<caret>r\n" + "    baz\n");
-    VimEditor vimEditor = new IjVimEditor(myFixture.getEditor());
-    Mark mark = injector.getMarkService().getMark(vimEditor.primaryCaret(), 'a');
-    assertNotNull(mark);
+  fun testMarkIsNotDeletedWhenLineIsChanged() {
+    typeTextInFile(
+      injector.parser.parseKeys("ma" + "cc"), """    foo
+    ba<caret>r
+    baz
+"""
+    )
+    val vimEditor: VimEditor = IjVimEditor(myFixture.editor)
+    val mark = injector.markService.getMark(vimEditor.primaryCaret(), 'a')
+    assertNotNull(mark)
   }
 
   // |m|
-  public void testMarkIsMovedUpWhenLinesArePartiallyDeletedAbove() {
-    typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("mx" + "2k" + "dd" + "0dw"), "    foo\n" + "    bar\n" + "    ba<caret>z\n");
-    VimEditor vimEditor = new IjVimEditor(myFixture.getEditor());
-    Mark mark = injector.getMarkService().getMark(vimEditor.primaryCaret(), 'x');
-    assertNotNull(mark);
-    assertEquals(1, mark.getLine());
-    assertEquals(6, mark.getCol());
+  fun testMarkIsMovedUpWhenLinesArePartiallyDeletedAbove() {
+    typeTextInFile(
+      injector.parser.parseKeys("mx" + "2k" + "dd" + "0dw"), """    foo
+    bar
+    ba<caret>z
+"""
+    )
+    val vimEditor: VimEditor = IjVimEditor(myFixture.editor)
+    val mark = injector.markService.getMark(vimEditor.primaryCaret(), 'x')
+    assertNotNull(mark)
+    assertEquals(1, mark!!.line)
+    assertEquals(6, mark.col)
   }
 
   // |m|
-  public void testMarkIsMovedUpWhenLinesAreDeletedAbove() {
-    typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("mx" + "2k" + "2dd"), "    foo\n" + "    bar\n" + "    ba<caret>z\n");
-    VimEditor vimEditor = new IjVimEditor(myFixture.getEditor());
-    Mark mark = injector.getMarkService().getMark(vimEditor.primaryCaret(), 'x');
-    assertNotNull(mark);
-    assertEquals(0, mark.getLine());
-    assertEquals(6, mark.getCol());
+  fun testMarkIsMovedUpWhenLinesAreDeletedAbove() {
+    typeTextInFile(
+      injector.parser.parseKeys("mx" + "2k" + "2dd"), """    foo
+    bar
+    ba<caret>z
+"""
+    )
+    val vimEditor: VimEditor = IjVimEditor(myFixture.editor)
+    val mark = injector.markService.getMark(vimEditor.primaryCaret(), 'x')
+    assertNotNull(mark)
+    assertEquals(0, mark!!.line)
+    assertEquals(6, mark.col)
   }
 
   // |m|
-  public void testMarkIsMovedDownWhenLinesAreInsertedAbove() {
-    typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("mY" + "Obiff"), "foo\n" + "ba<caret>r\n" + "baz\n");
-    VimEditor vimEditor = new IjVimEditor(myFixture.getEditor());
-    Mark mark = injector.getMarkService().getMark(vimEditor.primaryCaret(), 'Y');
-    assertNotNull(mark);
-    assertEquals(2, mark.getLine());
-    assertEquals(2, mark.getCol());
+  fun testMarkIsMovedDownWhenLinesAreInsertedAbove() {
+    typeTextInFile(
+      injector.parser.parseKeys("mY" + "Obiff"), """
+     foo
+     ba<caret>r
+     baz
+     
+     """.trimIndent()
+    )
+    val vimEditor: VimEditor = IjVimEditor(myFixture.editor)
+    val mark = injector.markService.getMark(vimEditor.primaryCaret(), 'Y')
+    assertNotNull(mark)
+    assertEquals(2, mark!!.line)
+    assertEquals(2, mark.col)
   }
 
   // |m|
-  public void testMarkIsMovedDownWhenLinesAreInsertedAboveWithIndentation() {
-    typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("mY" + "Obiff"), "    foo\n" + "    ba<caret>r\n" + "    baz\n");
-    VimEditor vimEditor = new IjVimEditor(myFixture.getEditor());
-    Mark mark = injector.getMarkService().getMark(vimEditor.primaryCaret(), 'Y');
-    assertNotNull(mark);
-    assertEquals(2, mark.getLine());
-    assertEquals(6, mark.getCol());
+  fun testMarkIsMovedDownWhenLinesAreInsertedAboveWithIndentation() {
+    typeTextInFile(
+      injector.parser.parseKeys("mY" + "Obiff"), """    foo
+    ba<caret>r
+    baz
+"""
+    )
+    val vimEditor: VimEditor = IjVimEditor(myFixture.editor)
+    val mark = injector.markService.getMark(vimEditor.primaryCaret(), 'Y')
+    assertNotNull(mark)
+    assertEquals(2, mark!!.line)
+    assertEquals(6, mark.col)
   }
 
   // |m| |`|
-  public void testMarkAndJumpToMark() {
-    typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("6l" + "mZ" + "G$" + "`Z"), "    foo\n" + "    bar\n" + "    baz\n");
-    assertOffset(6);
+  fun testMarkAndJumpToMark() {
+    typeTextInFile(
+      injector.parser.parseKeys("6l" + "mZ" + "G$" + "`Z"), """    foo
+    bar
+    baz
+"""
+    )
+    assertOffset(6)
   }
 
   // |m| |'|
-  public void testMarkAndJumpToMarkLeadingSpace() {
-    typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("6l" + "mb" + "G$" + "'b"), "    foo\n" + "    bar\n" + "    baz\n");
-    assertOffset(4);
+  fun testMarkAndJumpToMarkLeadingSpace() {
+    typeTextInFile(
+      injector.parser.parseKeys("6l" + "mb" + "G$" + "'b"), """    foo
+    bar
+    baz
+"""
+    )
+    assertOffset(4)
   }
 
   // |m| |`|
-  public void testDeleteBacktickMotionIsCharacterWise() {
-    typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("mk" + "kh" + "d`k"), "    abcd\n" + "    efgh\n" + "    ij<caret>kl\n" + "    mnop\n");
-    assertState("    abcd\n" + "    ekl\n" + "    mnop\n");
+  fun testDeleteBacktickMotionIsCharacterWise() {
+    typeTextInFile(
+      injector.parser.parseKeys("mk" + "kh" + "d`k"), """    abcd
+    efgh
+    ij<caret>kl
+    mnop
+"""
+    )
+    assertState(
+      """    abcd
+    ekl
+    mnop
+"""
+    )
   }
 
   // |m| |`|
-  public void testDeleteSingleQuoteMotionIsLineWise() {
-    typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("mk" + "kh" + "d'k"), "    abcd\n" + "    efgh\n" + "    ij<caret>kl\n" + "    mnop\n");
-    assertState("    abcd\n" + "    mnop\n");
+  fun testDeleteSingleQuoteMotionIsLineWise() {
+    typeTextInFile(
+      injector.parser.parseKeys("mk" + "kh" + "d'k"), """    abcd
+    efgh
+    ij<caret>kl
+    mnop
+"""
+    )
+    assertState(
+      """    abcd
+    mnop
+"""
+    )
   }
 
   // VIM-43 |i| |`.|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
-  public void testGotoLastChangePosition() {
-    typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("i" + "hello " + "<Esc>" + "gg" + "`."),
-                   "one two\n" + "<caret>hello world\n" + "three four\n");
-    assertOffset(13);
+  fun testGotoLastChangePosition() {
+    typeTextInFile(
+      injector.parser.parseKeys("i" + "hello " + "<Esc>" + "gg" + "`."),
+      """
+                one two
+                <caret>hello world
+                three four
+                
+                """.trimIndent()
+    )
+    assertOffset(13)
   }
 
   // VIM-43 |p| |`.|
-  public void testGotoLastPutPosition() {
-    typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("yy" + "p" + "gg" + "`."), "one two\n" + "<caret>three\n" + "four five\n");
-    assertOffset(14);
+  fun testGotoLastPutPosition() {
+    typeTextInFile(
+      injector.parser.parseKeys("yy" + "p" + "gg" + "`."), """
+     one two
+     <caret>three
+     four five
+     
+     """.trimIndent()
+    )
+    assertOffset(14)
   }
 
   // |i| |`]|
-  public void testGotoLastChangePositionEnd() {
-    doTest(Lists.newArrayList("yiw", "P", "gg", "`]"), "one two\n" + "<caret>three\n" + "four five\n",
-           "one two\n" + "thre<caret>ethree\n" + "four five\n", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE);
+  fun testGotoLastChangePositionEnd() {
+    doTest(
+      Lists.newArrayList("yiw", "P", "gg", "`]"), """
+     one two
+     <caret>three
+     four five
+     
+     """.trimIndent(),
+      """
+                one two
+                thre<caret>ethree
+                four five
+                
+                """.trimIndent(), VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+    )
   }
 
-  public void testVisualMarks() {
-    configureByText("Oh, <caret>hi Mark");
-    typeText(injector.getParser().parseKeys("vw<Esc>"));
-
-    typeText(injector.getParser().parseKeys("`<"));
-    assertOffset(4);
-    typeText(injector.getParser().parseKeys("`>"));
-    assertOffset(7);
+  fun testVisualMarks() {
+    configureByText("Oh, <caret>hi Mark")
+    typeText(injector.parser.parseKeys("vw<Esc>"))
+    typeText(injector.parser.parseKeys("`<"))
+    assertOffset(4)
+    typeText(injector.parser.parseKeys("`>"))
+    assertOffset(7)
   }
 
-
-  public void testVisualMarksForBackwardsSelection() {
-    configureByText("Oh, hi <caret>Mark");
-    typeText(injector.getParser().parseKeys("vb<Esc>"));
-
-    typeText(injector.getParser().parseKeys("`<"));
-    assertOffset(4);
-    typeText(injector.getParser().parseKeys("`>"));
-    assertOffset(7);
+  fun testVisualMarksForBackwardsSelection() {
+    configureByText("Oh, hi <caret>Mark")
+    typeText(injector.parser.parseKeys("vb<Esc>"))
+    typeText(injector.parser.parseKeys("`<"))
+    assertOffset(4)
+    typeText(injector.parser.parseKeys("`>"))
+    assertOffset(7)
   }
 
   // we change start mark, but actually the start and end has changed
-  public void testChangeSelectionStartMarkToBelowPosition() {
-    configureByText("lala\nl<caret>alala\nlala\n");
-    typeText(injector.getParser().parseKeys("v3l<Esc>"));
-
-    typeText(injector.getParser().parseKeys("`<"));
-    assertOffset(6);
-    typeText(injector.getParser().parseKeys("`>"));
-    assertOffset(9);
-
-    typeText(injector.getParser().parseKeys("jhm<"));
-    typeText(injector.getParser().parseKeys("`<"));
-    assertOffset(9);
-    typeText(injector.getParser().parseKeys("`>"));
-    assertOffset(14);
+  fun testChangeSelectionStartMarkToBelowPosition() {
+    configureByText("lala\nl<caret>alala\nlala\n")
+    typeText(injector.parser.parseKeys("v3l<Esc>"))
+    typeText(injector.parser.parseKeys("`<"))
+    assertOffset(6)
+    typeText(injector.parser.parseKeys("`>"))
+    assertOffset(9)
+    typeText(injector.parser.parseKeys("jhm<"))
+    typeText(injector.parser.parseKeys("`<"))
+    assertOffset(9)
+    typeText(injector.parser.parseKeys("`>"))
+    assertOffset(14)
   }
 
   // we change end mark and only end changes
-  public void testChangeSelectionEndMarkToBelowPosition() {
-    configureByText("lala\nl<caret>alala\nlala\n");
-    typeText(injector.getParser().parseKeys("v3l<Esc>"));
-
-    typeText(injector.getParser().parseKeys("`<"));
-    assertOffset(6);
-    typeText(injector.getParser().parseKeys("`>"));
-    assertOffset(9);
-
-    typeText(injector.getParser().parseKeys("jhm>"));
-    typeText(injector.getParser().parseKeys("`<"));
-    assertOffset(6);
-    typeText(injector.getParser().parseKeys("`>"));
-    assertOffset(14);
+  fun testChangeSelectionEndMarkToBelowPosition() {
+    configureByText("lala\nl<caret>alala\nlala\n")
+    typeText(injector.parser.parseKeys("v3l<Esc>"))
+    typeText(injector.parser.parseKeys("`<"))
+    assertOffset(6)
+    typeText(injector.parser.parseKeys("`>"))
+    assertOffset(9)
+    typeText(injector.parser.parseKeys("jhm>"))
+    typeText(injector.parser.parseKeys("`<"))
+    assertOffset(6)
+    typeText(injector.parser.parseKeys("`>"))
+    assertOffset(14)
   }
 
   // we change start mark, but end changes
-  public void testChangeReversedSelectionStartMarkToBelowPosition() {
-    configureByText("lala\nlala<caret>la\nlala\n");
-    typeText(injector.getParser().parseKeys("v3h<Esc>"));
-
-    typeText(injector.getParser().parseKeys("`<"));
-    assertOffset(6);
-    typeText(injector.getParser().parseKeys("`>"));
-    assertOffset(9);
-
-    typeText(injector.getParser().parseKeys("jhm<"));
-    typeText(injector.getParser().parseKeys("`<"));
-    assertOffset(6);
-    typeText(injector.getParser().parseKeys("`>"));
-    assertOffset(14);
+  fun testChangeReversedSelectionStartMarkToBelowPosition() {
+    configureByText("lala\nlala<caret>la\nlala\n")
+    typeText(injector.parser.parseKeys("v3h<Esc>"))
+    typeText(injector.parser.parseKeys("`<"))
+    assertOffset(6)
+    typeText(injector.parser.parseKeys("`>"))
+    assertOffset(9)
+    typeText(injector.parser.parseKeys("jhm<"))
+    typeText(injector.parser.parseKeys("`<"))
+    assertOffset(6)
+    typeText(injector.parser.parseKeys("`>"))
+    assertOffset(14)
   }
 
   // we change end mark, but start and end are changed
-  public void testChangeReversedSelectionEndMarkToBelowPosition() {
-    configureByText("lala\nlala<caret>la\nlala\n");
-    typeText(injector.getParser().parseKeys("v3h<Esc>"));
-
-    typeText(injector.getParser().parseKeys("`<"));
-    assertOffset(6);
-    typeText(injector.getParser().parseKeys("`>"));
-    assertOffset(9);
-
-    typeText(injector.getParser().parseKeys("jhm>"));
-    typeText(injector.getParser().parseKeys("`<"));
-    assertOffset(9);
-    typeText(injector.getParser().parseKeys("`>"));
-    assertOffset(14);
+  fun testChangeReversedSelectionEndMarkToBelowPosition() {
+    configureByText("lala\nlala<caret>la\nlala\n")
+    typeText(injector.parser.parseKeys("v3h<Esc>"))
+    typeText(injector.parser.parseKeys("`<"))
+    assertOffset(6)
+    typeText(injector.parser.parseKeys("`>"))
+    assertOffset(9)
+    typeText(injector.parser.parseKeys("jhm>"))
+    typeText(injector.parser.parseKeys("`<"))
+    assertOffset(9)
+    typeText(injector.parser.parseKeys("`>"))
+    assertOffset(14)
   }
 
   // we change start mark and only it changes
-  public void testChangeSelectionStartMarkToUpperPosition() {
-    configureByText("lala\nl<caret>alala\nlala\n");
-    typeText(injector.getParser().parseKeys("v3l<Esc>"));
-
-    typeText(injector.getParser().parseKeys("`<"));
-    assertOffset(6);
-    typeText(injector.getParser().parseKeys("`>"));
-    assertOffset(9);
-
-    typeText(injector.getParser().parseKeys("khhm<"));
-    typeText(injector.getParser().parseKeys("`<"));
-    assertOffset(1);
-    typeText(injector.getParser().parseKeys("`>"));
-    assertOffset(9);
+  fun testChangeSelectionStartMarkToUpperPosition() {
+    configureByText("lala\nl<caret>alala\nlala\n")
+    typeText(injector.parser.parseKeys("v3l<Esc>"))
+    typeText(injector.parser.parseKeys("`<"))
+    assertOffset(6)
+    typeText(injector.parser.parseKeys("`>"))
+    assertOffset(9)
+    typeText(injector.parser.parseKeys("khhm<"))
+    typeText(injector.parser.parseKeys("`<"))
+    assertOffset(1)
+    typeText(injector.parser.parseKeys("`>"))
+    assertOffset(9)
   }
 
   // we change end mark, but both start and end marks are changed
-  public void testChangeSelectionEndMarkToUpperPosition() {
-    configureByText("lala\nl<caret>alala\nlala\n");
-    typeText(injector.getParser().parseKeys("v3l<Esc>"));
-
-    typeText(injector.getParser().parseKeys("`<"));
-    assertOffset(6);
-    typeText(injector.getParser().parseKeys("`>"));
-    assertOffset(9);
-
-    typeText(injector.getParser().parseKeys("khhm>"));
-    typeText(injector.getParser().parseKeys("`<"));
-    assertOffset(1);
-    typeText(injector.getParser().parseKeys("`>"));
-    assertOffset(6);
+  fun testChangeSelectionEndMarkToUpperPosition() {
+    configureByText("lala\nl<caret>alala\nlala\n")
+    typeText(injector.parser.parseKeys("v3l<Esc>"))
+    typeText(injector.parser.parseKeys("`<"))
+    assertOffset(6)
+    typeText(injector.parser.parseKeys("`>"))
+    assertOffset(9)
+    typeText(injector.parser.parseKeys("khhm>"))
+    typeText(injector.parser.parseKeys("`<"))
+    assertOffset(1)
+    typeText(injector.parser.parseKeys("`>"))
+    assertOffset(6)
   }
 
   // we change end mark, but both start and end marks are changed
-  public void testChangeReversedSelectionStartMarkToUpperPosition() {
-    configureByText("lala\nlala<caret>la\nlala\n");
-    typeText(injector.getParser().parseKeys("v3h<Esc>"));
-
-    typeText(injector.getParser().parseKeys("`<"));
-    assertOffset(6);
-    typeText(injector.getParser().parseKeys("`>"));
-    assertOffset(9);
-
-    typeText(injector.getParser().parseKeys("khhm<"));
-    typeText(injector.getParser().parseKeys("`<"));
-    assertOffset(1);
-    typeText(injector.getParser().parseKeys("`>"));
-    assertOffset(6);
+  fun testChangeReversedSelectionStartMarkToUpperPosition() {
+    configureByText("lala\nlala<caret>la\nlala\n")
+    typeText(injector.parser.parseKeys("v3h<Esc>"))
+    typeText(injector.parser.parseKeys("`<"))
+    assertOffset(6)
+    typeText(injector.parser.parseKeys("`>"))
+    assertOffset(9)
+    typeText(injector.parser.parseKeys("khhm<"))
+    typeText(injector.parser.parseKeys("`<"))
+    assertOffset(1)
+    typeText(injector.parser.parseKeys("`>"))
+    assertOffset(6)
   }
 
   // we change end mark, but both start and end marks are changed
-  public void testChangeReversedSelectionEndMarkToUpperPosition() {
-    configureByText("lala\nlala<caret>la\nlala\n");
-    typeText(injector.getParser().parseKeys("v3h<Esc>"));
-
-    typeText(injector.getParser().parseKeys("`<"));
-    assertOffset(6);
-    typeText(injector.getParser().parseKeys("`>"));
-    assertOffset(9);
-
-    typeText(injector.getParser().parseKeys("khhm>"));
-    typeText(injector.getParser().parseKeys("`<"));
-    assertOffset(1);
-    typeText(injector.getParser().parseKeys("`>"));
-    assertOffset(9);
+  fun testChangeReversedSelectionEndMarkToUpperPosition() {
+    configureByText("lala\nlala<caret>la\nlala\n")
+    typeText(injector.parser.parseKeys("v3h<Esc>"))
+    typeText(injector.parser.parseKeys("`<"))
+    assertOffset(6)
+    typeText(injector.parser.parseKeys("`>"))
+    assertOffset(9)
+    typeText(injector.parser.parseKeys("khhm>"))
+    typeText(injector.parser.parseKeys("`<"))
+    assertOffset(1)
+    typeText(injector.parser.parseKeys("`>"))
+    assertOffset(9)
   }
 
-  public void testVisualLineSelectionMarks() {
-    configureByText("My mother taught me this trick:\n" +
-                    "if you repeat something <caret>over and over again it loses its meaning.\n" +
-                    "For example: homework, homework, homework, homework, homework, homework, homework, homework, homework.\n" +
-                    "See, nothing.\n");
-    typeText(injector.getParser().parseKeys("Vj<Esc>"));
-
-    typeText(injector.getParser().parseKeys("`<"));
-    assertOffset(32);
-    typeText(injector.getParser().parseKeys("`>"));
-    assertOffset(199);
+  fun testVisualLineSelectionMarks() {
+    configureByText(
+      """
+    My mother taught me this trick:
+    if you repeat something <caret>over and over again it loses its meaning.
+    For example: homework, homework, homework, homework, homework, homework, homework, homework, homework.
+    See, nothing.
+    
+    """.trimIndent()
+    )
+    typeText(injector.parser.parseKeys("Vj<Esc>"))
+    typeText(injector.parser.parseKeys("`<"))
+    assertOffset(32)
+    typeText(injector.parser.parseKeys("`>"))
+    assertOffset(199)
   }
 
-  public void testReversedVisualLineSelectionMarks() {
-    configureByText("My mother taught me this trick:\n" +
-                    "if you repeat something over and over again it loses its meaning.\n" +
-                    "For example: homework, homework, homework, homework, <caret>homework, homework, homework, homework, homework.\n" +
-                    "See, nothing.\n");
-    typeText(injector.getParser().parseKeys("Vk<Esc>"));
-
-    typeText(injector.getParser().parseKeys("`<"));
-    assertOffset(32);
-    typeText(injector.getParser().parseKeys("`>"));
-    assertOffset(199);
+  fun testReversedVisualLineSelectionMarks() {
+    configureByText(
+      """
+    My mother taught me this trick:
+    if you repeat something over and over again it loses its meaning.
+    For example: homework, homework, homework, homework, <caret>homework, homework, homework, homework, homework.
+    See, nothing.
+    
+    """.trimIndent()
+    )
+    typeText(injector.parser.parseKeys("Vk<Esc>"))
+    typeText(injector.parser.parseKeys("`<"))
+    assertOffset(32)
+    typeText(injector.parser.parseKeys("`>"))
+    assertOffset(199)
   }
 
-  public void testMulticaretMark() {
-    configureByText("My mother <caret>taught me this trick:\n" +
-                    "if you repeat something <caret>over and over again it loses its meaning.\n" +
-                    "For example: homework, homework, homework, homework, <caret>homework, homework, homework, homework, homework.\n" +
-                    "See, nothing.\n");
-
-    typeText("ma$");
-    assertState("My mother taught me this trick<caret>:\n" +
-                    "if you repeat something over and over again it loses its meaning<caret>.\n" +
-                    "For example: homework, homework, homework, homework, homework, homework, homework, homework, homework<caret>.\n" +
-                    "See, nothing.\n");
-
-    typeText("`a");
-    assertState("My mother <caret>taught me this trick:\n" +
-                    "if you repeat something <caret>over and over again it loses its meaning.\n" +
-                    "For example: homework, homework, homework, homework, <caret>homework, homework, homework, homework, homework.\n" +
-                    "See, nothing.\n");
+  fun testMulticaretMark() {
+    configureByText(
+      """
+    My mother <caret>taught me this trick:
+    if you repeat something <caret>over and over again it loses its meaning.
+    For example: homework, homework, homework, homework, <caret>homework, homework, homework, homework, homework.
+    See, nothing.
+    
+    """.trimIndent()
+    )
+    typeText("ma$")
+    assertState(
+      """
+    My mother taught me this trick<caret>:
+    if you repeat something over and over again it loses its meaning<caret>.
+    For example: homework, homework, homework, homework, homework, homework, homework, homework, homework<caret>.
+    See, nothing.
+    
+    """.trimIndent()
+    )
+    typeText("`a")
+    assertState(
+      """
+    My mother <caret>taught me this trick:
+    if you repeat something <caret>over and over again it loses its meaning.
+    For example: homework, homework, homework, homework, <caret>homework, homework, homework, homework, homework.
+    See, nothing.
+    
+    """.trimIndent()
+    )
   }
 
-  public void testMulticaretSelectionMarks() {
-    configureByText("My mother <caret>taught me this trick:\n" +
-                    "if you repeat something <caret>over and over again it loses its meaning.\n" +
-                    "For example: homework, homework, homework, homework, <caret>homework, homework, homework, homework, homework.\n" +
-                    "See, nothing.\n");
-
-    typeText("vey$p");
-    assertState("My mother taught me this trick:taught\n" +
-                "if you repeat something over and over again it loses its meaning.over\n" +
-                "For example: homework, homework, homework, homework, homework, homework, homework, homework, homework.homework\n" +
-                "See, nothing.\n");
-
-    typeText("gv");
-    assertState("My mother <selection>taugh<caret>t</selection> me this trick:taught\n" +
-                "if you repeat something <selection>ove<caret>r</selection> and over again it loses its meaning.over\n" +
-                "For example: homework, homework, homework, homework, <selection>homewor<caret>k</selection>, homework, homework, homework, homework.homework\n" +
-                "See, nothing.\n");
+  fun testMulticaretSelectionMarks() {
+    configureByText(
+      """
+    My mother <caret>taught me this trick:
+    if you repeat something <caret>over and over again it loses its meaning.
+    For example: homework, homework, homework, homework, <caret>homework, homework, homework, homework, homework.
+    See, nothing.
+    
+    """.trimIndent()
+    )
+    typeText("vey\$p")
+    assertState(
+      """
+    My mother taught me this trick:taught
+    if you repeat something over and over again it loses its meaning.over
+    For example: homework, homework, homework, homework, homework, homework, homework, homework, homework.homework
+    See, nothing.
+    
+    """.trimIndent()
+    )
+    typeText("gv")
+    assertState(
+      """
+    My mother <selection>taugh<caret>t</selection> me this trick:taught
+    if you repeat something <selection>ove<caret>r</selection> and over again it loses its meaning.over
+    For example: homework, homework, homework, homework, <selection>homewor<caret>k</selection>, homework, homework, homework, homework.homework
+    See, nothing.
+    
+    """.trimIndent()
+    )
   }
 }

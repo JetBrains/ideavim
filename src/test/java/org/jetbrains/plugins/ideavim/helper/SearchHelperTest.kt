@@ -5,194 +5,200 @@
  * license that can be found in the LICENSE.txt file or at
  * https://opensource.org/licenses/MIT.
  */
+package org.jetbrains.plugins.ideavim.helper
 
-package org.jetbrains.plugins.ideavim.helper;
+import com.maddyhome.idea.vim.api.VimSearchHelperBase.Companion.findNextWord
+import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.helper.checkInString
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
+import org.jetbrains.plugins.ideavim.VimTestCase
 
-import com.maddyhome.idea.vim.api.VimSearchHelperBase;
-import com.maddyhome.idea.vim.command.VimStateMachine;
-import com.maddyhome.idea.vim.helper.SearchHelperKtKt;
-import org.jetbrains.plugins.ideavim.SkipNeovimReason;
-import org.jetbrains.plugins.ideavim.TestWithoutNeovim;
-import org.jetbrains.plugins.ideavim.VimTestCase;
-
-public class SearchHelperTest extends VimTestCase {
+@Suppress("SpellCheckingInspection")
+class SearchHelperTest : VimTestCase() {
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
-  public void testFindNextWord() {
-    String text = "first second";
-    int nextWordPosition = (int)VimSearchHelperBase.Companion.findNextWord(text, 0, text.length(), 1, true, false);
-
-    assertEquals(nextWordPosition, text.indexOf("second"));
+  fun testFindNextWord() {
+    val text = "first second"
+    val nextWordPosition = findNextWord(text, 0, text.length.toLong(), 1, bigWord = true, spaceWords = false).toInt()
+    assertEquals(nextWordPosition, text.indexOf("second"))
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
-  public void testFindSecondNextWord() {
-    String text = "first second third";
-    int nextWordPosition = (int)VimSearchHelperBase.Companion.findNextWord(text, 0, text.length(), 2, true, false);
-
-    assertEquals(nextWordPosition, text.indexOf("third"));
+  fun testFindSecondNextWord() {
+    val text = "first second third"
+    val nextWordPosition = findNextWord(text, 0, text.length.toLong(), 2, bigWord = true, false).toInt()
+    assertEquals(nextWordPosition, text.indexOf("third"))
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
-  public void testFindAfterLastWord() {
-    String text = "first second";
-    int nextWordPosition = (int)VimSearchHelperBase.Companion.findNextWord(text, 0, text.length(), 3, true, false);
-
-    assertEquals(nextWordPosition, text.length());
+  fun testFindAfterLastWord() {
+    val text = "first second"
+    val nextWordPosition = findNextWord(text, 0, text.length.toLong(), 3, bigWord = true, false).toInt()
+    assertEquals(nextWordPosition, text.length)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
-  public void testFindPreviousWord() {
-    String text = "first second";
-    int previousWordPosition =
-      (int)VimSearchHelperBase.Companion.findNextWord(text, text.indexOf("second"), text.length(), -1, true, false);
-
-    //noinspection ConstantConditions
-    assertEquals(previousWordPosition, text.indexOf("first"));
+  fun testFindPreviousWord() {
+    val text = "first second"
+    val previousWordPosition =
+      findNextWord(text, text.indexOf("second").toLong(), text.length.toLong(), -1, bigWord = true, false).toInt()
+    assertEquals(previousWordPosition, text.indexOf("first"))
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
-  public void testFindSecondPreviousWord() {
-    String text = "first second third";
-    int previousWordPosition =
-      (int)VimSearchHelperBase.Companion.findNextWord(text, text.indexOf("third"), text.length(), -2, true, false);
-
-    //noinspection ConstantConditions
-    assertEquals(previousWordPosition, text.indexOf("first"));
+  fun testFindSecondPreviousWord() {
+    val text = "first second third"
+    val previousWordPosition =
+      findNextWord(
+        text,
+        text.indexOf("third").toLong(),
+        text.length.toLong(),
+        -2,
+        bigWord = true,
+        spaceWords = false
+      ).toInt()
+    assertEquals(previousWordPosition, text.indexOf("first"))
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
-  public void testFindBeforeFirstWord() {
-    String text = "first second";
-    int previousWordPosition =
-      (int)VimSearchHelperBase.Companion.findNextWord(text, text.indexOf("second"), text.length(), -3, true, false);
-
-    //noinspection ConstantConditions
-    assertEquals(previousWordPosition, text.indexOf("first"));
+  fun testFindBeforeFirstWord() {
+    val text = "first second"
+    val previousWordPosition =
+      findNextWord(
+        text,
+        text.indexOf("second").toLong(),
+        text.length.toLong(),
+        -3,
+        bigWord = true,
+        spaceWords = false
+      ).toInt()
+    assertEquals(previousWordPosition, text.indexOf("first"))
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
-  public void testFindPreviousWordWhenCursorOutOfBound() {
-    String text = "first second";
-    int previousWordPosition =
-      (int)VimSearchHelperBase.Companion.findNextWord(text, text.length(), text.length(), -1, true, false);
-
-    assertEquals(previousWordPosition, text.indexOf("second"));
+  fun testFindPreviousWordWhenCursorOutOfBound() {
+    val text = "first second"
+    val previousWordPosition =
+      findNextWord(text, text.length.toLong(), text.length.toLong(), -1, bigWord = true, spaceWords = false).toInt()
+    assertEquals(previousWordPosition, text.indexOf("second"))
   }
 
-  public void testMotionOuterWordAction() {
-    doTest("va(", "((int) nu<caret>m)", "<selection>((int) num)</selection>", VimStateMachine.Mode.VISUAL,
-           VimStateMachine.SubMode.VISUAL_CHARACTER);
-  }
-
-  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
-  public void testCheckInStringInsideDoubleQuotes() {
-    String text = "abc\"def\"ghi";
-    boolean inString = SearchHelperKtKt.checkInString(text, 5, true);
-    assertTrue(inString);
+  fun testMotionOuterWordAction() {
+    doTest(
+      "va(", "((int) nu<caret>m)", "<selection>((int) num)</selection>", VimStateMachine.Mode.VISUAL,
+      VimStateMachine.SubMode.VISUAL_CHARACTER
+    )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
-  public void testCheckInStringWithoutClosingDoubleQuote() {
-    String text = "abcdef\"ghi";
-    boolean inString = SearchHelperKtKt.checkInString(text, 5, true);
-    assertFalse(inString);
+  fun testCheckInStringInsideDoubleQuotes() {
+    val text = "abc\"def\"ghi"
+    val inString = checkInString(text, 5, true)
+    assertTrue(inString)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
-  public void testCheckInStringOnUnpairedSingleQuote() {
-    String text = "abc\"d'ef\"ghi";
-    boolean inString = SearchHelperKtKt.checkInString(text, 5, true);
-    assertTrue(inString);
+  fun testCheckInStringWithoutClosingDoubleQuote() {
+    val text = "abcdef\"ghi"
+    val inString = checkInString(text, 5, true)
+    assertFalse(inString)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
-  public void testCheckInStringOutsideOfDoubleQuotesPair() {
-    String text = "abc\"def\"ghi";
-    boolean inString = SearchHelperKtKt.checkInString(text, 2, true);
-    assertFalse(inString);
+  fun testCheckInStringOnUnpairedSingleQuote() {
+    val text = "abc\"d'ef\"ghi"
+    val inString = checkInString(text, 5, true)
+    assertTrue(inString)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
-  public void testCheckInStringEscapedDoubleQuote() {
-    String text = "abc\\\"def\"ghi";
-    boolean inString = SearchHelperKtKt.checkInString(text, 5, true);
-    assertFalse(inString);
+  fun testCheckInStringOutsideOfDoubleQuotesPair() {
+    val text = "abc\"def\"ghi"
+    val inString = checkInString(text, 2, true)
+    assertFalse(inString)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
-  public void testCheckInStringOddNumberOfDoubleQuotes() {
-    String text = "abc\"def\"gh\"i";
-    boolean inString = SearchHelperKtKt.checkInString(text, 5, true);
-    assertFalse(inString);
+  fun testCheckInStringEscapedDoubleQuote() {
+    val text = "abc\\\"def\"ghi"
+    val inString = checkInString(text, 5, true)
+    assertFalse(inString)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
-  public void testCheckInStringInsideSingleQuotesPair() {
-    String text = "abc\"d'e'f\"ghi";
-    boolean inString = SearchHelperKtKt.checkInString(text, 6, false);
-    assertTrue(inString);
+  fun testCheckInStringOddNumberOfDoubleQuotes() {
+    val text = "abc\"def\"gh\"i"
+    val inString = checkInString(text, 5, true)
+    assertFalse(inString)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
-  public void testCheckInStringOnOpeningDoubleQuote() {
-    String text = "abc\"def\"ghi";
-    boolean inString = SearchHelperKtKt.checkInString(text, 3, true);
-    assertTrue(inString);
+  fun testCheckInStringInsideSingleQuotesPair() {
+    val text = "abc\"d'e'f\"ghi"
+    val inString = checkInString(text, 6, false)
+    assertTrue(inString)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
-  public void testCheckInStringOnClosingDoubleQuote() {
-    String text = "abc\"def\"ghi";
-    boolean inString = SearchHelperKtKt.checkInString(text, 7, true);
-    assertTrue(inString);
+  fun testCheckInStringOnOpeningDoubleQuote() {
+    val text = "abc\"def\"ghi"
+    val inString = checkInString(text, 3, true)
+    assertTrue(inString)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
-  public void testCheckInStringWithoutQuotes() {
-    String text = "abcdefghi";
-    boolean inString = SearchHelperKtKt.checkInString(text, 5, true);
-    assertFalse(inString);
+  fun testCheckInStringOnClosingDoubleQuote() {
+    val text = "abc\"def\"ghi"
+    val inString = checkInString(text, 7, true)
+    assertTrue(inString)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
-  public void testCheckInStringDoubleQuoteInsideSingleQuotes() {
-    String text = "abc'\"'ef\"ghi";
-    boolean inString = SearchHelperKtKt.checkInString(text, 5, true);
-    assertFalse(inString);
+  fun testCheckInStringWithoutQuotes() {
+    val text = "abcdefghi"
+    val inString = checkInString(text, 5, true)
+    assertFalse(inString)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
-  public void testCheckInStringSingleQuotesAreTooFarFromEachOtherToMakePair() {
-    String text = "abc'\"de'f\"ghi";
-    boolean inString = SearchHelperKtKt.checkInString(text, 5, true);
-    assertTrue(inString);
+  fun testCheckInStringDoubleQuoteInsideSingleQuotes() {
+    val text = "abc'\"'ef\"ghi"
+    val inString = checkInString(text, 5, true)
+    assertFalse(inString)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
-  public void testCheckInStringDoubleQuoteInsideSingleQuotesIsInsideSingleQuotedString() {
-    String text = "abc'\"'def\"ghi";
-    boolean inString = SearchHelperKtKt.checkInString(text, 4, false);
-    assertTrue(inString);
+  fun testCheckInStringSingleQuotesAreTooFarFromEachOtherToMakePair() {
+    val text = "abc'\"de'f\"ghi"
+    val inString = checkInString(text, 5, true)
+    assertTrue(inString)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
-  public void testCheckInStringAfterClosingDoubleQuote() {
-    String text = "abc\"def\"ghi";
-    boolean inString = SearchHelperKtKt.checkInString(text, 9, true);
-    assertFalse(inString);
+  fun testCheckInStringDoubleQuoteInsideSingleQuotesIsInsideSingleQuotedString() {
+    val text = "abc'\"'def\"ghi"
+    val inString = checkInString(text, 4, false)
+    assertTrue(inString)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
-  public void testCheckInStringOnMiddleDoubleQuote() {
-    String text = "abc\"def\"gh\"i";
-    boolean inString = SearchHelperKtKt.checkInString(text, 7, true);
-    assertFalse(inString);
+  fun testCheckInStringAfterClosingDoubleQuote() {
+    val text = "abc\"def\"ghi"
+    val inString = checkInString(text, 9, true)
+    assertFalse(inString)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
-  public void testCheckInStringBetweenPairs() {
-    String text = "abc\"def\"gh\"ij\"k";
-    boolean inString = SearchHelperKtKt.checkInString(text, 8, true);
-    assertFalse(inString);
+  fun testCheckInStringOnMiddleDoubleQuote() {
+    val text = "abc\"def\"gh\"i"
+    val inString = checkInString(text, 7, true)
+    assertFalse(inString)
+  }
+
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  fun testCheckInStringBetweenPairs() {
+    val text = "abc\"def\"gh\"ij\"k"
+    val inString = checkInString(text, 8, true)
+    assertFalse(inString)
   }
 }

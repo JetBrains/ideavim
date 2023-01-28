@@ -5,215 +5,192 @@
  * license that can be found in the LICENSE.txt file or at
  * https://opensource.org/licenses/MIT.
  */
+package org.jetbrains.plugins.ideavim.action
 
-package org.jetbrains.plugins.ideavim.action;
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.register.RegisterConstants.LAST_INSERTED_TEXT_REGISTER
+import com.maddyhome.idea.vim.register.RegisterConstants.LAST_SEARCH_REGISTER
+import com.maddyhome.idea.vim.register.RegisterConstants.SMALL_DELETION_REGISTER
+import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.Assert
 
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.api.VimInjectorKt;
-import com.maddyhome.idea.vim.group.RegisterGroup;
-import com.maddyhome.idea.vim.register.Register;
-import org.jetbrains.plugins.ideavim.VimTestCase;
-import org.junit.Assert;
-
-import static com.maddyhome.idea.vim.register.RegisterConstants.*;
-
-/**
- * @author ayzen
- */
-public class SpecialRegistersTest extends VimTestCase {
-
-  private static final String DUMMY_TEXT = "text";
-
-  @Override
-  protected void setUp() throws Exception {
-    super.setUp();
-
-    final RegisterGroup registerGroup = VimPlugin.getRegister();
-    registerGroup.setKeys('a', VimInjectorKt.getInjector().getParser().stringToKeys(DUMMY_TEXT));
-    registerGroup.setKeys(SMALL_DELETION_REGISTER, VimInjectorKt.getInjector().getParser().stringToKeys(DUMMY_TEXT));
-    for (char c = '0'; c <= '9'; c++) {
-      registerGroup.setKeys(c, VimInjectorKt.getInjector().getParser().stringToKeys(DUMMY_TEXT));
+class SpecialRegistersTest : VimTestCase() {
+  @Throws(Exception::class)
+  override fun setUp() {
+    super.setUp()
+    val registerGroup = VimPlugin.getRegister()
+    registerGroup.setKeys('a', injector.parser.stringToKeys(DUMMY_TEXT))
+    registerGroup.setKeys(SMALL_DELETION_REGISTER, injector.parser.stringToKeys(DUMMY_TEXT))
+    run {
+      var c = '0'
+      while (c <= '9') {
+        registerGroup.setKeys(c, injector.parser.stringToKeys(DUMMY_TEXT))
+        c++
+      }
     }
   }
 
   // VIM-581
-  public void testSmallDelete() {
-    typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("de"), "one <caret>two three\n");
-
-    assertEquals("two", getRegisterText(SMALL_DELETION_REGISTER));
+  fun testSmallDelete() {
+    typeTextInFile(injector.parser.parseKeys("de"), "one <caret>two three\n")
+    assertEquals("two", getRegisterText(SMALL_DELETION_REGISTER))
     // Text smaller than line doesn't go to numbered registers (except special cases)
-    assertRegisterNotChanged('1');
+    assertRegisterNotChanged('1')
   }
 
   // |d| |%| Special case for small delete
-  public void testSmallDeleteWithPercent() {
-    typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("d%"), "(one<caret> two) three\n");
-
-    assertRegisterChanged('1');
-    assertRegisterChanged(SMALL_DELETION_REGISTER);
+  fun testSmallDeleteWithPercent() {
+    typeTextInFile(injector.parser.parseKeys("d%"), "(one<caret> two) three\n")
+    assertRegisterChanged('1')
+    assertRegisterChanged(SMALL_DELETION_REGISTER)
   }
 
   // |d| |(| Special case for small delete
-  public void testSmallDeleteTillPrevSentence() {
-    typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("d("), "One. Two<caret>. Three.\n");
-
-    assertRegisterChanged('1');
-    assertRegisterChanged(SMALL_DELETION_REGISTER);
+  fun testSmallDeleteTillPrevSentence() {
+    typeTextInFile(injector.parser.parseKeys("d("), "One. Two<caret>. Three.\n")
+    assertRegisterChanged('1')
+    assertRegisterChanged(SMALL_DELETION_REGISTER)
   }
 
   // |d| |)| Special case for small delete
-  public void testSmallDeleteTillNextSentence() {
-    typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("d)"), "One. <caret>Two. Three.\n");
-
-    assertRegisterChanged('1');
-    assertRegisterChanged(SMALL_DELETION_REGISTER);
+  fun testSmallDeleteTillNextSentence() {
+    typeTextInFile(injector.parser.parseKeys("d)"), "One. <caret>Two. Three.\n")
+    assertRegisterChanged('1')
+    assertRegisterChanged(SMALL_DELETION_REGISTER)
   }
 
   // |d| |`| Special case for small delete
-  public void testSmallDeleteWithMark() {
-    typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("ma" + "b" + "d`a"), "one two<caret> three\n");
-
-    assertRegisterChanged('1');
-    assertRegisterChanged(SMALL_DELETION_REGISTER);
+  fun testSmallDeleteWithMark() {
+    typeTextInFile(injector.parser.parseKeys("ma" + "b" + "d`a"), "one two<caret> three\n")
+    assertRegisterChanged('1')
+    assertRegisterChanged(SMALL_DELETION_REGISTER)
   }
 
   // |d| |/| Special case for small delete
-  public void testSmallDeleteWithSearch() {
-    typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("d/" + "o" + "<Enter>"), "one <caret>two three\n");
-
-    assertRegisterChanged('1');
-    assertRegisterChanged(SMALL_DELETION_REGISTER);
+  fun testSmallDeleteWithSearch() {
+    typeTextInFile(injector.parser.parseKeys("d/" + "o" + "<Enter>"), "one <caret>two three\n")
+    assertRegisterChanged('1')
+    assertRegisterChanged(SMALL_DELETION_REGISTER)
   }
 
   // |d| |?| Special case for small delete
-  public void testSmallDeleteWithBackSearch() {
-    typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("d?" + "t" + "<Enter>"), "one two<caret> three\n");
-
-    assertRegisterChanged('1');
-    assertRegisterChanged(SMALL_DELETION_REGISTER);
+  fun testSmallDeleteWithBackSearch() {
+    typeTextInFile(injector.parser.parseKeys("d?" + "t" + "<Enter>"), "one two<caret> three\n")
+    assertRegisterChanged('1')
+    assertRegisterChanged(SMALL_DELETION_REGISTER)
   }
 
   // |d| |n| Special case for small delete
-  public void testSmallDeleteWithSearchRepeat() {
-    typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("/" + "t" + "<Enter>" + "dn"), "<caret>one two three\n");
-
-    assertRegisterChanged('1');
-    assertRegisterChanged(SMALL_DELETION_REGISTER);
+  fun testSmallDeleteWithSearchRepeat() {
+    typeTextInFile(injector.parser.parseKeys("/" + "t" + "<Enter>" + "dn"), "<caret>one two three\n")
+    assertRegisterChanged('1')
+    assertRegisterChanged(SMALL_DELETION_REGISTER)
   }
 
   // |d| |N| Special case for small delete
-  public void testSmallDeleteWithBackSearchRepeat() {
-    typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("/" + "t" + "<Enter>" + "dN"), "one tw<caret>o three\n");
-
-    assertRegisterChanged('1');
-    assertRegisterChanged(SMALL_DELETION_REGISTER);
+  fun testSmallDeleteWithBackSearchRepeat() {
+    typeTextInFile(injector.parser.parseKeys("/" + "t" + "<Enter>" + "dN"), "one tw<caret>o three\n")
+    assertRegisterChanged('1')
+    assertRegisterChanged(SMALL_DELETION_REGISTER)
   }
 
   // |d| |{| Special case for small delete
-  public void testSmallDeleteTillPrevParagraph() {
-    typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("d{"), "one<caret> two three");
-
-    assertRegisterChanged('1');
-    assertRegisterChanged(SMALL_DELETION_REGISTER);
+  fun testSmallDeleteTillPrevParagraph() {
+    typeTextInFile(injector.parser.parseKeys("d{"), "one<caret> two three")
+    assertRegisterChanged('1')
+    assertRegisterChanged(SMALL_DELETION_REGISTER)
   }
 
   // |d| |}| Special case for small delete
-  public void testSmallDeleteTillNextParagraph() {
-    typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("d}"), "one<caret> two three");
-
-    assertRegisterChanged('1');
-    assertRegisterChanged(SMALL_DELETION_REGISTER);
+  fun testSmallDeleteTillNextParagraph() {
+    typeTextInFile(injector.parser.parseKeys("d}"), "one<caret> two three")
+    assertRegisterChanged('1')
+    assertRegisterChanged(SMALL_DELETION_REGISTER)
   }
 
-  public void testSmallDeleteInRegister() {
-    typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("\"ade"), "one <caret>two three\n");
+  fun testSmallDeleteInRegister() {
+    typeTextInFile(injector.parser.parseKeys("\"ade"), "one <caret>two three\n")
 
     // Small deletes (less than a line) with register specified go to that register and to numbered registers
-    assertRegisterChanged('a');
-    assertRegisterNotChanged('1');
-    assertRegisterNotChanged(SMALL_DELETION_REGISTER);
+    assertRegisterChanged('a')
+    assertRegisterNotChanged('1')
+    assertRegisterNotChanged(SMALL_DELETION_REGISTER)
   }
 
-  public void testLineDelete() {
-    typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("dd"), "one <caret>two three\n");
-
-    assertRegisterChanged('1');
-    assertRegisterNotChanged(SMALL_DELETION_REGISTER);
+  fun testLineDelete() {
+    typeTextInFile(injector.parser.parseKeys("dd"), "one <caret>two three\n")
+    assertRegisterChanged('1')
+    assertRegisterNotChanged(SMALL_DELETION_REGISTER)
   }
 
-  public void testLineDeleteInRegister() {
-    typeTextInFile(VimInjectorKt.getInjector().getParser().parseKeys("\"add"), "one <caret>two three\n");
-
-    assertRegisterChanged('a');
-    assertRegisterNotChanged('1');
+  fun testLineDeleteInRegister() {
+    typeTextInFile(injector.parser.parseKeys("\"add"), "one <caret>two three\n")
+    assertRegisterChanged('a')
+    assertRegisterNotChanged('1')
   }
 
-  public void testNumberedRegistersShifting() {
-    configureByText("<caret>one\ntwo\nthree\nfour\nfive\nsix\nseven\neight\nnine\nten\n");
-
-    typeText(VimInjectorKt.getInjector().getParser().parseKeys("dd" + "dd"));
-    assertEquals("one\n", getRegisterText('2'));
-    assertEquals("two\n", getRegisterText('1'));
-
-    typeText(VimInjectorKt.getInjector().getParser().parseKeys("dd" + "dd" + "dd"));
-    assertEquals("one\n", getRegisterText('5'));
-    assertEquals("four\n", getRegisterText('2'));
-
-    typeText(VimInjectorKt.getInjector().getParser().parseKeys("dd" + "dd" + "dd" + "dd"));
-    assertEquals("one\n", getRegisterText('9'));
+  fun testNumberedRegistersShifting() {
+    configureByText("<caret>one\ntwo\nthree\nfour\nfive\nsix\nseven\neight\nnine\nten\n")
+    typeText(injector.parser.parseKeys("dd" + "dd"))
+    assertEquals("one\n", getRegisterText('2'))
+    assertEquals("two\n", getRegisterText('1'))
+    typeText(injector.parser.parseKeys("dd" + "dd" + "dd"))
+    assertEquals("one\n", getRegisterText('5'))
+    assertEquals("four\n", getRegisterText('2'))
+    typeText(injector.parser.parseKeys("dd" + "dd" + "dd" + "dd"))
+    assertEquals("one\n", getRegisterText('9'))
   }
 
-  public void testSearchRegisterAfterSearch() {
-    configureByText("<caret>one\ntwo\nthree\nfour\nfive\nsix\nseven\neight\nnine\nten\n");
-    enterSearch("three", true);
-    assertEquals("three", getRegisterText(LAST_SEARCH_REGISTER));
+  fun testSearchRegisterAfterSearch() {
+    configureByText("<caret>one\ntwo\nthree\nfour\nfive\nsix\nseven\neight\nnine\nten\n")
+    enterSearch("three", true)
+    assertEquals("three", getRegisterText(LAST_SEARCH_REGISTER))
   }
 
-  public void testSearchRegisterAfterSubstitute() {
-    configureByText("<caret>one\ntwo\nthree\nfour\nfive\nsix\nseven\neight\nnine\nten\n");
-    enterCommand("%s/three/3/g");
-    assertEquals("three", getRegisterText(LAST_SEARCH_REGISTER));
+  fun testSearchRegisterAfterSubstitute() {
+    configureByText("<caret>one\ntwo\nthree\nfour\nfive\nsix\nseven\neight\nnine\nten\n")
+    enterCommand("%s/three/3/g")
+    assertEquals("three", getRegisterText(LAST_SEARCH_REGISTER))
   }
 
-  public void testSearchRegisterAfterSearchRange() {
-    configureByText("<caret>one\ntwo\nthree\nfour\nfive\nsix\nseven\neight\nnine\nten\n");
-    enterCommand("/three/d");
-    assertEquals("three", getRegisterText(LAST_SEARCH_REGISTER));
+  fun testSearchRegisterAfterSearchRange() {
+    configureByText("<caret>one\ntwo\nthree\nfour\nfive\nsix\nseven\neight\nnine\nten\n")
+    enterCommand("/three/d")
+    assertEquals("three", getRegisterText(LAST_SEARCH_REGISTER))
   }
 
-  public void testSearchRegisterAfterMultipleSearchRanges() {
-    configureByText("<caret>one\ntwo\nthree\nfour\nfive\nsix\nseven\neight\nnine\nten\n");
-    enterCommand("/one/;/three/d");
-    assertEquals("three", getRegisterText(LAST_SEARCH_REGISTER));
+  fun testSearchRegisterAfterMultipleSearchRanges() {
+    configureByText("<caret>one\ntwo\nthree\nfour\nfive\nsix\nseven\neight\nnine\nten\n")
+    enterCommand("/one/;/three/d")
+    assertEquals("three", getRegisterText(LAST_SEARCH_REGISTER))
   }
 
-  public void testLastInsertedTextRegister() {
-    configureByText("<caret>");
-
-    typeText(VimInjectorKt.getInjector().getParser().parseKeys("i" + "abc" + "<Esc>"));
-
-    assertEquals("abc", getRegisterText('.'));
-
-    assertRegisterChanged(LAST_INSERTED_TEXT_REGISTER);
-
+  fun testLastInsertedTextRegister() {
+    configureByText("<caret>")
+    typeText(injector.parser.parseKeys("i" + "abc" + "<Esc>"))
+    assertEquals("abc", getRegisterText('.'))
+    assertRegisterChanged(LAST_INSERTED_TEXT_REGISTER)
   }
 
-  private void assertRegisterChanged(char registerName) {
-    String registerText = getRegisterText(registerName);
-    Assert.assertNotEquals(DUMMY_TEXT, registerText);
+  private fun assertRegisterChanged(registerName: Char) {
+    val registerText = getRegisterText(registerName)
+    Assert.assertNotEquals(DUMMY_TEXT, registerText)
   }
 
-  private void assertRegisterNotChanged(char registerName) {
-    String registerText = getRegisterText(registerName);
-    assertEquals(DUMMY_TEXT, registerText);
+  private fun assertRegisterNotChanged(registerName: Char) {
+    val registerText = getRegisterText(registerName)
+    assertEquals(DUMMY_TEXT, registerText)
   }
 
-  private String getRegisterText(char registerName) {
-    final RegisterGroup registerGroup = VimPlugin.getRegister();
-    final Register register = registerGroup.getRegister(registerName);
-    assertNotNull(register);
-
-    return register.getText();
+  private fun getRegisterText(registerName: Char): String? {
+    val registerGroup = VimPlugin.getRegister()
+    val register = registerGroup.getRegister(registerName)
+    assertNotNull(register)
+    return register!!.text
   }
 
+  companion object {
+    private const val DUMMY_TEXT = "text"
+  }
 }

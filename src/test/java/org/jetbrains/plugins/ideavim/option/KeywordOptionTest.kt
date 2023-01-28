@@ -5,164 +5,165 @@
  * license that can be found in the LICENSE.txt file or at
  * https://opensource.org/licenses/MIT.
  */
+package org.jetbrains.plugins.ideavim.option
 
-package org.jetbrains.plugins.ideavim.option;
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.helper.CharacterHelper
+import com.maddyhome.idea.vim.helper.CharacterHelper.charType
+import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.options.helpers.KeywordOptionHelper.parseValues
+import com.maddyhome.idea.vim.options.helpers.KeywordOptionHelper.toRegex
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
+import org.jetbrains.plugins.ideavim.VimTestCase
 
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.api.VimInjectorKt;
-import com.maddyhome.idea.vim.helper.CharacterHelper;
-import com.maddyhome.idea.vim.options.OptionConstants;
-import com.maddyhome.idea.vim.options.OptionScope;
-import com.maddyhome.idea.vim.options.helpers.KeywordOptionHelper;
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
-import org.jetbrains.plugins.ideavim.VimTestCase;
+@Suppress("SpellCheckingInspection")
+class KeywordOptionTest : VimTestCase() {
+  private val values: List<String>?
+    get() = parseValues(optionsNoEditor().getStringValue(OptionConstants.iskeyword))
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class KeywordOptionTest extends VimTestCase {
-
-  private List<String> getValues() {
-    return KeywordOptionHelper.INSTANCE.parseValues(optionsNoEditor().getStringValue(OptionConstants.iskeyword));
-  }
-
-  private void setKeyword(String val) {
+  private fun setKeyword(`val`: String) {
     VimPlugin.getOptionService()
-      .setOptionValue(OptionScope.GLOBAL.INSTANCE, OptionConstants.iskeyword, new VimString(val), "testToken");
+      .setOptionValue(OptionScope.GLOBAL, OptionConstants.iskeyword, VimString(`val`), "testToken")
   }
 
-  private void assertIsKeyword(char c) {
-    CharacterHelper.CharacterType charType = CharacterHelper.charType(c, false);
-    assertSame(CharacterHelper.CharacterType.KEYWORD, charType);
+  private fun assertIsKeyword(c: Char) {
+    val charType = charType(c, false)
+    assertSame(CharacterHelper.CharacterType.KEYWORD, charType)
   }
 
-  private void assertIsNotKeyword(char c) {
-    CharacterHelper.CharacterType charType = CharacterHelper.charType(c, false);
-    assertSame(CharacterHelper.CharacterType.PUNCTUATION, charType);
+  private fun assertIsNotKeyword(c: Char) {
+    val charType = charType(c, false)
+    assertSame(CharacterHelper.CharacterType.PUNCTUATION, charType)
   }
 
-  public void testSingleCommaIsAValue() {
-    setKeyword(",");
-    assertEquals(",", getValues().get(0));
+  fun testSingleCommaIsAValue() {
+    setKeyword(",")
+    assertEquals(",", values!![0])
   }
 
-  public void testSingleCommaIsAValueAsAppend() {
-    VimInjectorKt.getInjector().getVimscriptExecutor().execute("set iskeyword^=,", false);
-    assertTrue(getValues().contains(","));
+  fun testSingleCommaIsAValueAsAppend() {
+    injector.vimscriptExecutor.execute("set iskeyword^=,", false)
+    assertTrue(values!!.contains(","))
   }
 
-  public void testSingleNegatedCommaIsAValue() {
-    setKeyword("^,");
-    assertEquals("^,", getValues().get(0));
+  fun testSingleNegatedCommaIsAValue() {
+    setKeyword("^,")
+    assertEquals("^,", values!![0])
   }
 
-  public void testCommaInARangeIsAValue() {
-    setKeyword("+-,");
-    assertEquals("+-,", getValues().get(0));
+  fun testCommaInARangeIsAValue() {
+    setKeyword("+-,")
+    assertEquals("+-,", values!![0])
   }
 
-  public void testSecondCommaIsASeparator() {
-    setKeyword(",,a");
-    assertEquals(",", getValues().get(0));
-    assertEquals("a", getValues().get(1));
+  fun testSecondCommaIsASeparator() {
+    setKeyword(",,a")
+    assertEquals(",", values!![0])
+    assertEquals("a", values!![1])
   }
 
-  public void testSingleHyphenIsAValue() {
-    setKeyword("-");
-    assertEquals("-", getValues().get(0));
+  fun testSingleHyphenIsAValue() {
+    setKeyword("-")
+    assertEquals("-", values!![0])
   }
 
-  public void testHyphenBetweenCharNumsIsARange() {
-    setKeyword("a-b");
-    assertEquals("a-b", getValues().get(0));
+  fun testHyphenBetweenCharNumsIsARange() {
+    setKeyword("a-b")
+    assertEquals("a-b", values!![0])
   }
 
-  public void testRangeInWhichLeftValueIsHigherThanRightValueIsInvalid() {
+  fun testRangeInWhichLeftValueIsHigherThanRightValueIsInvalid() {
     try {
-      setKeyword("b-a");
-      fail("exception missing");
-    } catch (Exception e) {
-      assertEquals("E474: Invalid argument: testToken", e.getMessage());
+      setKeyword("b-a")
+      fail("exception missing")
+    } catch (e: Exception) {
+      assertEquals("E474: Invalid argument: testToken", e.message)
     }
-    assertDoesntContain(getValues(), new ArrayList<>() {{
-      add("b-a");
-    }});
+    assertDoesntContain(values!!, object : ArrayList<String?>() {
+      init {
+        add("b-a")
+      }
+    })
   }
 
-  public void testTwoAdjacentLettersAreInvalid() {
+  fun testTwoAdjacentLettersAreInvalid() {
     try {
-      setKeyword("ab");
-      fail("exception missing");
-    } catch (Exception e) {
-      assertEquals("E474: Invalid argument: testToken", e.getMessage());
+      setKeyword("ab")
+      fail("exception missing")
+    } catch (e: Exception) {
+      assertEquals("E474: Invalid argument: testToken", e.message)
     }
-    assertDoesntContain(getValues(), new ArrayList<>() {{
-      add("ab");
-    }});
+    assertDoesntContain(values!!, object : ArrayList<String?>() {
+      init {
+        add("ab")
+      }
+    })
   }
 
-  public void testAddsACharByChar() {
-    setKeyword("-");
-    assertIsKeyword('-');
+  fun testAddsACharByChar() {
+    setKeyword("-")
+    assertIsKeyword('-')
   }
 
-  public void testAddsACharByUnicodeCodePoint() {
-    setKeyword("" + (int)'-');
-    assertIsKeyword('-');
+  fun testAddsACharByUnicodeCodePoint() {
+    setKeyword("" + '-'.code)
+    assertIsKeyword('-')
   }
 
-  public void testAddsARange() {
-    setKeyword("a-c");
-    assertIsKeyword('a');
-    assertIsKeyword('b');
-    assertIsKeyword('c');
+  fun testAddsARange() {
+    setKeyword("a-c")
+    assertIsKeyword('a')
+    assertIsKeyword('b')
+    assertIsKeyword('c')
   }
 
-  public void testAtSignRepresentsAllLetters() {
-    setKeyword("@");
-    assertIsKeyword('A');
-    assertIsKeyword('Ā');
+  fun testAtSignRepresentsAllLetters() {
+    setKeyword("@")
+    assertIsKeyword('A')
+    assertIsKeyword('Ā')
   }
 
-  public void testRangeOfAtSignToAtSignRepresentsAtSign() {
-    setKeyword("@-@");
-    assertIsKeyword('@');
+  fun testRangeOfAtSignToAtSignRepresentsAtSign() {
+    setKeyword("@-@")
+    assertIsKeyword('@')
   }
 
-  public void testCaretRemovesAChar() {
-    setKeyword("a");
-    VimInjectorKt.getInjector().getVimscriptExecutor().execute("set iskeyword+=^a", true);
-    assertIsNotKeyword('a');
+  fun testCaretRemovesAChar() {
+    setKeyword("a")
+    injector.vimscriptExecutor.execute("set iskeyword+=^a", true)
+    assertIsNotKeyword('a')
   }
 
-  public void testCaretRemovesARange() {
-    setKeyword("a-c");
-    VimInjectorKt.getInjector().getVimscriptExecutor().execute("set iskeyword+=^b-c,d", true);
-    assertIsKeyword('a');
-    assertIsNotKeyword('b');
-    assertIsNotKeyword('c');
+  fun testCaretRemovesARange() {
+    setKeyword("a-c")
+    injector.vimscriptExecutor.execute("set iskeyword+=^b-c,d", true)
+    assertIsKeyword('a')
+    assertIsNotKeyword('b')
+    assertIsNotKeyword('c')
   }
 
-  public void testCaretAloneRepresentsACaret() {
-    setKeyword("^");
-    assertIsKeyword('^');
+  fun testCaretAloneRepresentsACaret() {
+    setKeyword("^")
+    assertIsKeyword('^')
   }
 
-  public void testMultibyteCharactersAreKeywords() {
-    assertIsKeyword('Ź');
+  fun testMultibyteCharactersAreKeywords() {
+    assertIsKeyword('Ź')
   }
 
-  public void testToRegex() {
-    setKeyword("-,a-c");
-    final List<String> res = KeywordOptionHelper.INSTANCE.toRegex();
-    assertEquals(2, res.size());
-    assertTrue(res.contains("-"));
-    assertTrue(res.contains("[a-c]"));
+  fun testToRegex() {
+    setKeyword("-,a-c")
+    val res = toRegex()
+    assertEquals(2, res.size)
+    assertTrue(res.contains("-"))
+    assertTrue(res.contains("[a-c]"))
   }
 
-  public void testAllLettersToRegex() {
-    setKeyword("@");
-    final List<String> res = KeywordOptionHelper.INSTANCE.toRegex();
-    assertEquals(res.get(0), "\\p{L}");
+  fun testAllLettersToRegex() {
+    setKeyword("@")
+    val res = toRegex()
+    assertEquals(res[0], "\\p{L}")
   }
 }

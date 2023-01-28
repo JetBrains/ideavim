@@ -5,53 +5,42 @@
  * license that can be found in the LICENSE.txt file or at
  * https://opensource.org/licenses/MIT.
  */
+package com.maddyhome.idea.vim.helper
 
-package com.maddyhome.idea.vim.helper;
+import com.google.common.collect.Lists
+import com.intellij.openapi.editor.Editor
+import javax.swing.KeyStroke
 
-import com.google.common.collect.Lists;
-import com.intellij.openapi.editor.Editor;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import javax.swing.*;
-import java.util.List;
-
-/**
- * @author vlan
- */
-public class TestInputModel {
-  private final @NotNull List<KeyStroke> myKeyStrokes = Lists.newArrayList();
-
-  private TestInputModel() {
+class TestInputModel private constructor() {
+  private val myKeyStrokes: MutableList<KeyStroke> = Lists.newArrayList()
+  fun setKeyStrokes(keyStrokes: List<KeyStroke>) {
+    myKeyStrokes.clear()
+    myKeyStrokes.addAll(keyStrokes)
   }
 
-  public static TestInputModel getInstance(@NotNull Editor editor) {
-    TestInputModel model = UserDataManager.getVimTestInputModel(editor);
-    if (model == null) {
-      model = new TestInputModel();
-      UserDataManager.setVimTestInputModel(editor, model);
-    }
-    return model;
-  }
-
-  public void setKeyStrokes(@NotNull List<KeyStroke> keyStrokes) {
-    myKeyStrokes.clear();
-    myKeyStrokes.addAll(keyStrokes);
-  }
-
-  public @Nullable KeyStroke nextKeyStroke() {
+  fun nextKeyStroke(): KeyStroke? {
 
     // Return key from the unfinished mapping
     /*
-    MappingStack mappingStack = KeyHandler.getInstance().getMappingStack();
-    if (mappingStack.hasStroke()) {
-      return mappingStack.feedStroke();
-    }
-    */
+MappingStack mappingStack = KeyHandler.getInstance().getMappingStack();
+if (mappingStack.hasStroke()) {
+  return mappingStack.feedStroke();
+}
+*/
+    return if (myKeyStrokes.isNotEmpty()) {
+      myKeyStrokes.removeAt(0)
+    } else null
+  }
 
-    if (!myKeyStrokes.isEmpty()) {
-      return myKeyStrokes.remove(0);
+  companion object {
+    @JvmStatic
+    fun getInstance(editor: Editor): TestInputModel {
+      var model = editor.vimTestInputModel
+      if (model == null) {
+        model = TestInputModel()
+        editor.vimTestInputModel = model
+      }
+      return model
     }
-    return null;
   }
 }
