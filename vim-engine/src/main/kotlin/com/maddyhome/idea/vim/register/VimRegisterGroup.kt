@@ -24,6 +24,13 @@ interface VimRegisterGroup {
   val lastRegister: Register?
   val lastRegisterChar: Char
   val currentRegister: Char
+  /**
+   * When we access last register, it can be e.g. " because of two reasons:
+   * 1. Because the default register value was used
+   * 2. If the " was specified explicitly
+   * We have this boolean flag to differ this to cases
+   */
+  val isRegisterSpecifiedExplicitly: Boolean
   val defaultRegister: Char
 
   fun isValid(reg: Char): Boolean
@@ -78,4 +85,6 @@ interface VimRegisterGroup {
   fun setKeys(register: Char, keys: List<KeyStroke>)
   fun setKeys(register: Char, keys: List<KeyStroke>, type: SelectionType)
   fun finishRecording(editor: VimEditor)
+  fun getCurrentRegisterForMulticaret(): Char // `set clipbaard+=unnamedplus` should not make system register the default one when working with multiple carets VIM-2804
+  fun isSystemClipboard(register: Char): Boolean
 }

@@ -2665,4 +2665,28 @@ rtyfg${c}hzxc"""
     """.trimIndent()
     assertState(after)
   }
+
+  // VIM-2804
+  fun `test multicaret with unnamed clipboard2`() {
+    val before = """
+            attachDownload(${c}0)
+            attachDownload(${c}1)
+            attachDownload(${c}2)
+            attachDownload(${c}3)
+            attachDownload(${c}4)
+            
+    """.trimIndent()
+    configureByText(before)
+    enterCommand("set clipboard+=unnamed")
+    typeText(injector.parser.parseKeys("yi(" + "A // <Esc>" + "p"))
+    val after = """
+            attachDownload(0) // ${c}0
+            attachDownload(1) // ${c}1
+            attachDownload(2) // ${c}2
+            attachDownload(3) // ${c}3
+            attachDownload(4) // ${c}4
+            
+    """.trimIndent()
+    assertState(after)
+  }
 }

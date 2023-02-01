@@ -47,6 +47,8 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
 
   override var lastRegisterChar = defaultRegisterChar
 
+  override var isRegisterSpecifiedExplicitly = false
+
   /**
    * Gets the last register name selected by the user
    *
@@ -92,6 +94,7 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
    */
   override fun selectRegister(reg: Char): Boolean {
     return if (isValid(reg)) {
+      isRegisterSpecifiedExplicitly = true
       lastRegisterChar = reg
       logger.debug { "register selected: $lastRegister" }
 
@@ -105,6 +108,7 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
    * Reset the selected register back to the default register.
    */
   override fun resetRegister() {
+    isRegisterSpecifiedExplicitly = false
     lastRegisterChar = defaultRegister
     logger.debug("Last register reset to default register")
   }
@@ -121,6 +125,7 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
   }
 
   override fun resetRegisters() {
+    isRegisterSpecifiedExplicitly = false
     defaultRegisterChar = UNNAMED_REGISTER
     lastRegisterChar = defaultRegister
     myRegisters.clear()
@@ -439,5 +444,17 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
 
   companion object {
     val logger = vimLogger<VimRegisterGroupBase>()
+  }
+
+  override fun getCurrentRegisterForMulticaret(): Char {
+    return if (isRegisterSpecifiedExplicitly || !isSystemClipboard(currentRegister)) {
+      currentRegister
+    } else {
+      '"'
+    }
+  }
+
+  override fun isSystemClipboard(register: Char): Boolean {
+    return register == '+' || register == '*'
   }
 }
