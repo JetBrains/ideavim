@@ -38,6 +38,7 @@ usual beta standards.
 * [VIM-2787](https://youtrack.jetbrains.com/issue/VIM-2787) Save ideavimrc loading
 * [VIM-2850](https://youtrack.jetbrains.com/issue/VIM-2850) Marks exception during IDE startup 
 * [VIM-2804](https://youtrack.jetbrains.com/issue/VIM-2804) IdeaVim multiple-cursors copy and paste issue when "set clipboard+=unnamed"
+* [VIM-1768](https://youtrack.jetbrains.com/issue/VIM-1768) Delete surrounding character while in multiple cursors mode
 
 ### Merged PRs:
 * [589](https://github.com/JetBrains/ideavim/pull/589) by [Matt Ellis](https://github.com/citizenmatt): Refactor option usage and introduce accessor API
