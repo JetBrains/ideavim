@@ -8,7 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.action.scroll
 
-import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.options.OptionConstants
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -28,7 +28,7 @@ CTRL-D                  Scroll window Downwards in the buffer.  The number of
  */
 class ScrollHalfPageDownActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
-  fun`test scroll half window downwards keeps cursor on same relative line`() {
+  fun `test scroll half window downwards keeps cursor on same relative line`() {
     configureByPages(5)
     setPositionAndScroll(20, 25)
 
@@ -38,18 +38,18 @@ class ScrollHalfPageDownActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
-  fun`test scroll downwards on last line causes beep`() {
+  fun `test scroll downwards on last line causes beep`() {
     configureByPages(5)
     setPositionAndScroll(146, 175)
 
     typeText("<C-D>")
     assertPosition(175, 0)
     assertVisibleArea(146, 175)
-    assertTrue(VimPlugin.isError())
+    assertTrue(injector.messages.isError())
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
-  fun`test scroll downwards in bottom half of last page moves caret to the last line without scrolling`() {
+  fun `test scroll downwards in bottom half of last page moves caret to the last line without scrolling`() {
     configureByPages(5)
     setPositionAndScroll(140, 165)
 
@@ -59,7 +59,7 @@ class ScrollHalfPageDownActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
-  fun`test scroll downwards in bottom half of last page moves caret to the last line with scrolloff`() {
+  fun `test scroll downwards in bottom half of last page moves caret to the last line with scrolloff`() {
     configureByPages(5)
     enterCommand("set scrolloff=10")
     setPositionAndScroll(140, 164)
@@ -70,7 +70,7 @@ class ScrollHalfPageDownActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
-  fun`test scroll downwards at end of file with existing virtual space moves caret without scrolling window`() {
+  fun `test scroll downwards at end of file with existing virtual space moves caret without scrolling window`() {
     configureByPages(5)
     setPositionAndScroll(146, 165) // 146 at top line means bottom line is 181 (out of 175)
 
@@ -80,7 +80,7 @@ class ScrollHalfPageDownActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
-  fun`test scroll downwards in top half of last page moves cursor down half a page`() {
+  fun `test scroll downwards in top half of last page moves cursor down half a page`() {
     configureByPages(5)
     setPositionAndScroll(146, 150)
 
@@ -90,7 +90,7 @@ class ScrollHalfPageDownActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
-  fun`test scroll count lines downwards`() {
+  fun `test scroll count lines downwards`() {
     configureByPages(5)
     setPositionAndScroll(100, 130)
 
@@ -100,7 +100,7 @@ class ScrollHalfPageDownActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
-  fun`test scroll count downwards modifies scroll option`() {
+  fun `test scroll count downwards modifies scroll option`() {
     configureByPages(5)
     setPositionAndScroll(100, 110)
 
@@ -109,7 +109,7 @@ class ScrollHalfPageDownActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
-  fun`test scroll downwards uses scroll option`() {
+  fun `test scroll downwards uses scroll option`() {
     configureByPages(5)
     enterCommand("set scroll=10")
     setPositionAndScroll(100, 110)
@@ -120,7 +120,7 @@ class ScrollHalfPageDownActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
-  fun`test count scroll downwards is limited to single page`() {
+  fun `test count scroll downwards is limited to single page`() {
     configureByPages(5)
     setPositionAndScroll(100, 110)
 
@@ -130,7 +130,7 @@ class ScrollHalfPageDownActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
-  fun`test scroll downwards puts cursor on first non-blank column`() {
+  fun `test scroll downwards puts cursor on first non-blank column`() {
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(20, 25, 14)
 
@@ -140,7 +140,7 @@ class ScrollHalfPageDownActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
-  fun`test scroll downwards keeps same column with nostartofline`() {
+  fun `test scroll downwards keeps same column with nostartofline`() {
     configureByLines(100, "    I found it in a legendary land")
     enterCommand("set nostartofline")
     setPositionAndScroll(20, 25, 14)

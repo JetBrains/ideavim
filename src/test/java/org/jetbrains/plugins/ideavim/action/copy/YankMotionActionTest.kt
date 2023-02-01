@@ -9,6 +9,7 @@
 package org.jetbrains.plugins.ideavim.action.copy
 
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
 import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.VimTestCase
 
@@ -90,7 +91,7 @@ class YankMotionActionTest : VimTestCase() {
     """.trimIndent()
     typeTextInFile("yk", file)
 
-    assertTrue(VimPlugin.isError())
+    assertTrue(injector.messages.isError())
   }
 
   fun `test yank dollar at last empty line`() {

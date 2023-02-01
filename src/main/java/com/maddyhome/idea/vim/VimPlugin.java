@@ -48,8 +48,6 @@ import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-
 import static com.maddyhome.idea.vim.group.EditorGroup.EDITOR_STORE_ELEMENT;
 import static com.maddyhome.idea.vim.group.KeyGroup.SHORTCUT_CONFLICTS_ELEMENT;
 import static com.maddyhome.idea.vim.vimscript.services.VimRcService.executeIdeaVimRc;
@@ -65,50 +63,25 @@ import static com.maddyhome.idea.vim.vimscript.services.VimRcService.executeIdea
 @State(name = "VimSettings", storages = {@Storage("$APP_CONFIG$/vim_settings.xml")})
 public class VimPlugin implements PersistentStateComponent<Element>, Disposable {
 
+  public static final int STATE_VERSION = 7;
+  private static final String IDEAVIM_PLUGIN_ID = "IdeaVIM";
+  private static final Logger LOG = Logger.getInstance(VimPlugin.class);
+
   static {
     VimInjectorKt.setInjector(new IjVimInjector());
   }
 
-  private static final String IDEAVIM_PLUGIN_ID = "IdeaVIM";
-  public static final int STATE_VERSION = 7;
-
+  private final @NotNull VimState state = new VimState();
+  public Disposable onOffDisposable;
   private int previousStateVersion = 0;
   private String previousKeyMap = "";
-
   // It is enabled by default to avoid any special configuration after plugin installation
   private boolean enabled = true;
-
-  private static final Logger LOG = Logger.getInstance(VimPlugin.class);
-
-  private final @NotNull VimState state = new VimState();
-
-  public Disposable onOffDisposable;
+  private boolean ideavimrcRegistered = false;
+  private boolean stateUpdated = false;
 
   VimPlugin() {
     ApplicationConfigurationMigrator.getInstance().migrate();
-  }
-
-  public void initialize() {
-    LOG.debug("initComponent");
-
-    if (enabled) {
-      Application application = ApplicationManager.getApplication();
-      if (application.isUnitTestMode()) {
-        application.invokeAndWait(this::turnOnPlugin);
-      }
-      else {
-        application.invokeLater(this::turnOnPlugin);
-      }
-    }
-
-    LOG.debug("done");
-  }
-
-  @Override
-  public void dispose() {
-    LOG.debug("disposeComponent");
-    turnOffPlugin(false);
-    LOG.debug("done");
   }
 
   /**
@@ -230,17 +203,6 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     return getNotifications(null);
   }
 
-  private boolean ideavimrcRegistered = false;
-
-  private void registerIdeavimrc() {
-    if (ideavimrcRegistered) return;
-    ideavimrcRegistered = true;
-
-    if (!ApplicationManager.getApplication().isUnitTestMode()) {
-      executeIdeaVimRc();
-    }
-  }
-
   public static @NotNull PluginId getPluginId() {
     return PluginId.getId(IDEAVIM_PLUGIN_ID);
   }
@@ -270,10 +232,6 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     StatusBarIconFactory.Companion.updateIcon();
   }
 
-  public static boolean isError() {
-    return VimInjectorKt.getInjector().getMessages().isError();
-  }
-
   public static String getMessage() {
     return VimInjectorKt.getInjector().getMessages().getStatusBarMessage();
   }
@@ -297,27 +255,59 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     return ApplicationManager.getApplication().getService(VimPlugin.class);
   }
 
+  public void initialize() {
+    LOG.debug("initComponent");
+
+    if (enabled) {
+      Application application = ApplicationManager.getApplication();
+      if (application.isUnitTestMode()) {
+        application.invokeAndWait(this::turnOnPlugin);
+      }
+      else {
+        application.invokeLater(this::turnOnPlugin);
+      }
+    }
+
+    LOG.debug("done");
+  }
+
+  @Override
+  public void dispose() {
+    LOG.debug("disposeComponent");
+    turnOffPlugin(false);
+    LOG.debug("done");
+  }
+
+  private void registerIdeavimrc() {
+    if (ideavimrcRegistered) return;
+    ideavimrcRegistered = true;
+
+    if (!ApplicationManager.getApplication().isUnitTestMode()) {
+      executeIdeaVimRc();
+    }
+  }
+
   /**
    * IdeaVim plugin initialization.
    * This is an important operation and some commands ordering should be preserved.
    * Please make sure that the documentation of this function is in sync with the code
-   *
+   * <p>
    * 1) Update state
-   *    This schedules a state update. In most cases it just shows some dialogs to the user. As I know, there are
-   *      no special reasons to keep this command as a first line, so it seems safe to move it.
+   * This schedules a state update. In most cases it just shows some dialogs to the user. As I know, there are
+   * no special reasons to keep this command as a first line, so it seems safe to move it.
    * 2) Command registration
-   *    This block should be located BEFORE ~/.ideavimrc execution. Without it the commands won't be registered
-   *      and initialized, but ~/.ideavimrc file may refer or execute some commands or functions.
-   *    This block DOES NOT initialize extensions, but only registers the available ones.
+   * This block should be located BEFORE ~/.ideavimrc execution. Without it the commands won't be registered
+   * and initialized, but ~/.ideavimrc file may refer or execute some commands or functions.
+   * This block DOES NOT initialize extensions, but only registers the available ones.
    * 3) ~/.ideavimrc execution
-   *    3.1 executes commands from the .ideavimrc file and 3.2 initializes extensions.
-   *    3.1 MUST BE BEFORE 3.2. This is a flow of vim/IdeaVim initialization, firstly .ideavimrc is executed and then
-   *      the extensions are initialized.
+   * 3.1 executes commands from the .ideavimrc file and 3.2 initializes extensions.
+   * 3.1 MUST BE BEFORE 3.2. This is a flow of vim/IdeaVim initialization, firstly .ideavimrc is executed and then
+   * the extensions are initialized.
    * 4) Components initialization
-   *    This should happen after ideavimrc execution because VimListenerManager accesses `number` option
-   *      to init line numbers and guicaret to initialize carets.
-   *    However, there is a question about listeners attaching. Listeners registration happens after the .ideavimrc
-   *      execution, what theoretically may cause bugs (e.g. VIM-2540)
+   * This should happen after ideavimrc execution because VimListenerManager accesses `number` option
+   * to init line numbers and guicaret to initialize carets.
+   * However, there is a question about listeners attaching. Listeners registration happens after the .ideavimrc
+   * execution, what theoretically may cause bugs (e.g. VIM-2540)
    */
   private void turnOnPlugin() {
     onOffDisposable = Disposer.newDisposable(this, "IdeaVimOnOffDisposer");
@@ -362,8 +352,6 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
 
     Disposer.dispose(onOffDisposable);
   }
-
-  private boolean stateUpdated = false;
 
   private void updateState() {
     if (stateUpdated) return;
@@ -442,8 +430,8 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   private void legacyStateLoading(@NotNull Element element) {
     if (previousStateVersion > 0 && previousStateVersion < 5) {
       // Migrate settings from 4 to 5 version
-      ((VimMarkServiceImpl) VimInjectorKt.getInjector().getMarkService()).loadState(element);
-      ((VimJumpServiceImpl) VimInjectorKt.getInjector().getJumpService()).loadState(element);
+      ((VimMarkServiceImpl)VimInjectorKt.getInjector().getMarkService()).loadState(element);
+      ((VimJumpServiceImpl)VimInjectorKt.getInjector().getJumpService()).loadState(element);
       getRegister().readData(element);
       getSearch().readData(element);
       getHistory().readData(element);

@@ -518,7 +518,7 @@ abstract class VimTestCase : UsefulTestCase() {
   }
 
   fun assertPluginError(isError: Boolean) {
-    Assert.assertEquals(isError, VimPlugin.isError())
+    Assert.assertEquals(isError, injector.messages.isError())
   }
 
   fun assertPluginErrorMessageContains(message: String) {

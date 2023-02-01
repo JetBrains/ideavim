@@ -9,7 +9,6 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.textarea.TextComponentEditorImpl
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.history.HistoryConstants
@@ -729,7 +728,7 @@ n  ,f            <Plug>Foo
     typeText(commandToKeys("map y x"))
     typeText(injector.parser.parseKeys("x"))
 
-    TestCase.assertTrue(VimPlugin.isError())
+    TestCase.assertTrue(injector.messages.isError())
   }
 
   fun `test map with expression`() {

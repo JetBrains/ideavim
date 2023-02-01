@@ -15,6 +15,7 @@ import com.intellij.openapi.progress.util.PotemkinProgress
 import com.maddyhome.idea.vim.KeyHandler.Companion.getInstance
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.MessageHelper.message
 import com.maddyhome.idea.vim.macro.VimMacroBase
 import com.maddyhome.idea.vim.newapi.IjVimEditor
@@ -69,8 +70,8 @@ class MacroGroup : VimMacroBase() {
             } catch (e: ProcessCanceledException) {
               return@runnable
             }
-            ProgressManager.getInstance()
-              .executeNonCancelableSection { getInstance().handleKey(editor, key, context) }
+            ProgressManager.getInstance().executeNonCancelableSection { getInstance().handleKey(editor, key, context) }
+            if (injector.messages.isError()) return@runnable
           }
           keyStack.resetFirst()
         }

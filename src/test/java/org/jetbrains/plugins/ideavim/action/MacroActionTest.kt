@@ -139,4 +139,28 @@ class MacroActionTest : VimTestCase() {
     typeText(injector.parser.parseKeys("qajq" + "4@a"))
     assertState("0\n1\n2\n3\n4\n${c}5\n")
   }
+
+  fun `test stop on error`() {
+    val content = """
+            A Discovery
+
+            ${c}I found it in a legendary land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+    """.trimIndent()
+    configureByText(content)
+    typeText(injector.parser.parseKeys("qa" + "i1<esc>j" + "q" + "gg" + "10@a"))
+
+    assertState(
+      """
+            1A Discovery
+            1
+            11I found it in a legendary land
+            1all rocks and lavender and tufted grass,
+            1where it was settled on some sodden sand
+            ${c}1hard by the torrent of a mountain pass.
+    """.trimIndent()
+    )
+  }
 }

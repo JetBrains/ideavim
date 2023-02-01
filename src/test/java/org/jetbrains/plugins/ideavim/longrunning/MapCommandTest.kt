@@ -8,7 +8,6 @@
 
 package org.jetbrains.plugins.ideavim.longrunning
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -30,6 +29,6 @@ class MapCommandTest : VimTestCase() {
     typeText(commandToKeys("map b wbb"))
     typeText(injector.parser.parseKeys("b"))
 
-    TestCase.assertTrue(VimPlugin.isError())
+    TestCase.assertTrue(injector.messages.isError())
   }
 }
