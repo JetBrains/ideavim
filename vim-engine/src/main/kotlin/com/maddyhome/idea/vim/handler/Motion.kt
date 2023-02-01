@@ -8,6 +8,9 @@
 
 package com.maddyhome.idea.vim.handler
 
+/**
+ * [Error] and [NoMotion] both do not move the caret. However, in case of macros, [Error] stops the macro execution.
+ */
 sealed class Motion {
   object Error : Motion()
   object NoMotion : Motion()
