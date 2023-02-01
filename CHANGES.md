@@ -34,6 +34,8 @@ usual beta standards.
 * [VIM-2428](https://youtrack.jetbrains.com/issue/VIM-2428/The-gv-command-doesnt-work) Fix marks when moving lines up/down
 * [VIM-2686](https://youtrack.jetbrains.com/issue/VIM-2686/Multiple-caret-marks) Add idividual mark storage for each secondary caret
 * [VIM-2840](https://youtrack.jetbrains.com/issue/VIM-2840) Replace with register does not work with count
+* [VIM-658](https://youtrack.jetbrains.com/issue/VIM-658) Stop macro on error
+* [VIM-2787](https://youtrack.jetbrains.com/issue/VIM-2787) Save ideavimrc loading
 
 ### Merged PRs:
 * [589](https://github.com/JetBrains/ideavim/pull/589) by [Matt Ellis](https://github.com/citizenmatt): Refactor option usage and introduce accessor API
