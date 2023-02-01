@@ -7,6 +7,7 @@
  */
 package com.maddyhome.idea.vim.group
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.progress.ProgressManager
@@ -22,6 +23,10 @@ import com.maddyhome.idea.vim.newapi.IjVimEditor
  * Used to handle playback of macros
  */
 class MacroGroup : VimMacroBase() {
+
+  // If it's null, this is the top macro (as in most cases). If it's not null, this macro is executed from top macro
+  private var potemkinProgress: PotemkinProgress? = null
+
   /**
    * This puts a single keystroke at the end of the event queue for playback
    */
@@ -30,6 +35,9 @@ class MacroGroup : VimMacroBase() {
     context: ExecutionContext,
     total: Int,
   ) {
+    // This is to make sure that we don't access potemkin progress from different threads
+    ApplicationManager.getApplication().assertWriteAccessAllowed()
+
     val project = (editor as IjVimEditor).editor.project
     val keyStack = getInstance().keyStack
     if (!keyStack.hasStroke()) {
@@ -37,30 +45,45 @@ class MacroGroup : VimMacroBase() {
       keyStack.removeFirst()
       return
     }
-    val potemkinProgress = PotemkinProgress(
+    val isInternalMacro = potemkinProgress != null
+
+    val myPotemkinProgress = potemkinProgress ?: PotemkinProgress(
       message("progress.title.macro.execution"), project, null,
       message("stop")
     )
-    potemkinProgress.isIndeterminate = false
-    potemkinProgress.fraction = 0.0
-    potemkinProgress.runInSwingThread {
 
-      // Handle one keystroke then queue up the next key
-      for (i in 0 until total) {
-        potemkinProgress.fraction = (i + 1).toDouble() / total
-        while (keyStack.hasStroke()) {
-          val key = keyStack.feedStroke()
-          try {
-            potemkinProgress.checkCanceled()
-          } catch (e: ProcessCanceledException) {
-            return@runInSwingThread
+    if (potemkinProgress == null) potemkinProgress = myPotemkinProgress
+    myPotemkinProgress.isIndeterminate = false
+    myPotemkinProgress.fraction = 0.0
+    try {
+      myPotemkinProgress.text2 = if (isInternalMacro) "Executing internal macro" else ""
+      val runnable = runnable@{
+
+        // Handle one keystroke then queue up the next key
+        for (i in 0 until total) {
+          myPotemkinProgress.fraction = (i + 1).toDouble() / total
+          while (keyStack.hasStroke()) {
+            val key = keyStack.feedStroke()
+            try {
+              myPotemkinProgress.checkCanceled()
+            } catch (e: ProcessCanceledException) {
+              return@runnable
+            }
+            ProgressManager.getInstance()
+              .executeNonCancelableSection { getInstance().handleKey(editor, key, context) }
           }
-          ProgressManager.getInstance()
-            .executeNonCancelableSection { getInstance().handleKey(editor, key, context) }
+          keyStack.resetFirst()
         }
-        keyStack.resetFirst()
+        keyStack.removeFirst()
       }
-      keyStack.removeFirst()
+
+      if (isInternalMacro) {
+          runnable()
+      } else {
+          myPotemkinProgress.runInSwingThread(runnable)
+      }
+    } finally {
+      potemkinProgress = null
     }
   }
 
