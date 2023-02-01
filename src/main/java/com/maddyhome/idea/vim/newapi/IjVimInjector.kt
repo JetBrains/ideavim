@@ -174,7 +174,7 @@ class IjVimInjector : VimInjectorBase() {
     get() = service<CommandGroup>()
 
   override val functionService: VimscriptFunctionService
-    get() = FunctionStorage
+    get() = service()
   override val variableService: VariableService
     get() = service()
   override val vimrcFileState: VimrcFileState

@@ -44,6 +44,8 @@
                         serviceInterface="com.maddyhome.idea.vim.vimscript.services.VariableService"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.IjStatisticsService"
                         serviceInterface="com.maddyhome.idea.vim.api.VimStatistics"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.vimscript.services.FunctionStorage"
+                        serviceInterface="com.maddyhome.idea.vim.api.VimscriptFunctionService"/>
 
     <applicationService serviceImplementation="com.maddyhome.idea.vim.vimscript.services.IjVimOptionService"
                         serviceInterface="com.maddyhome.idea.vim.vimscript.services.OptionService"/>

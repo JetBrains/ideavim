@@ -21,7 +21,7 @@ import com.maddyhome.idea.vim.vimscript.model.functions.FunctionBeanClass
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
 
-object FunctionStorage : VimscriptFunctionService {
+class FunctionStorage : VimscriptFunctionService {
 
   private val logger = logger<FunctionStorage>()
 

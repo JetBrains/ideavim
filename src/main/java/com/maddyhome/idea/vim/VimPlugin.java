@@ -37,7 +37,6 @@ import com.maddyhome.idea.vim.listener.VimListenerManager;
 import com.maddyhome.idea.vim.newapi.IjVimInjector;
 import com.maddyhome.idea.vim.ui.StatusBarIconFactory;
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
-import com.maddyhome.idea.vim.vimscript.services.FunctionStorage;
 import com.maddyhome.idea.vim.vimscript.services.IjVimOptionService;
 import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import com.maddyhome.idea.vim.vimscript.services.VariableService;
@@ -323,7 +322,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     VimExtensionRegistrar.registerExtensions();
 
     // 2.3) Register functions
-    FunctionStorage.INSTANCE.registerHandlers();
+    VimInjectorKt.getInjector().getFunctionService().registerHandlers();
 
     // 3) ~/.ideavimrc execution
     // 3.1) Execute ~/.ideavimrc

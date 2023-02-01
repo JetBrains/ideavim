@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.vimscript.model.functions.handlers
 
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
@@ -38,7 +39,7 @@ object FunctionFunctionHandler : FunctionHandler() {
       throw ExException("E129: Function name required")
     }
     val scopeAndName = arg1.value.extractScopeAndName()
-    val function = FunctionStorage.getFunctionHandlerOrNull(scopeAndName.first, scopeAndName.second, vimContext)
+    val function = injector.functionService.getFunctionHandlerOrNull(scopeAndName.first, scopeAndName.second, vimContext)
       ?: throw ExException("E700: Unknown function: ${if (scopeAndName.first != null) scopeAndName.first!!.c + ":" else ""}${scopeAndName.second}")
 
     var arglist: VimList? = null
@@ -85,7 +86,7 @@ object FuncrefFunctionHandler : FunctionHandler() {
       throw ExException("E129: Function name required")
     }
     val scopeAndName = arg1.value.extractScopeAndName()
-    val function = FunctionStorage.getUserDefinedFunction(scopeAndName.first, scopeAndName.second, vimContext)
+    val function = injector.functionService.getUserDefinedFunction(scopeAndName.first, scopeAndName.second, vimContext)
       ?: throw ExException("E700: Unknown function: ${scopeAndName.first?.toString() ?: ""}${scopeAndName.second}")
     val handler = DefinedFunctionHandler(function)
 

@@ -12,7 +12,7 @@ import com.intellij.openapi.diagnostic.logger
 import com.intellij.serviceContainer.BaseKeyedLazyInstance
 import com.intellij.util.xmlb.annotations.Attribute
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.vimscript.services.FunctionStorage
+import com.maddyhome.idea.vim.api.injector
 
 class FunctionBeanClass : BaseKeyedLazyInstance<FunctionHandler>() {
 
@@ -29,6 +29,6 @@ class FunctionBeanClass : BaseKeyedLazyInstance<FunctionHandler>() {
       logger<FunctionHandler>().error("IdeaVim doesn't accept contributions to `vimActions` extension points. Please create a plugin using `VimExtension`. Plugin to blame: ${this.pluginDescriptor.pluginId}")
       return
     }
-    FunctionStorage.addHandler(this)
+    injector.functionService.addHandler(this)
   }
 }
