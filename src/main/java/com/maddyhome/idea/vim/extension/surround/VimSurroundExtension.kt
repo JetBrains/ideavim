@@ -117,7 +117,7 @@ class VimSurroundExtension : VimExtension {
           .map {
             val oldValue: List<KeyStroke>? = getRegisterForCaret(REGISTER, it)
             setRegisterForCaret(REGISTER, it, null)
-            SurroundingInfo(it, null, oldValue, null)
+            SurroundingInfo(it, null, oldValue)
           }
 
         // Delete surrounding's content
@@ -142,13 +142,6 @@ class VimSurroundExtension : VimExtension {
           if (it.innerText == null && getRegisterForCaret(REGISTER, it.caret)?.isNotEmpty() == true) {
             it.innerText = emptyList()
           }
-
-          // caret should be placed at the first char of inserted text
-          // the best solution would be using [ mark after the paste, but marks are not supported by multicaret
-          // todo
-          if (it.innerText != null) {
-            it.offset = it.caret.offset.point
-          }
         }
 
         surroundings
@@ -168,9 +161,7 @@ class VimSurroundExtension : VimExtension {
           it.restoreRegister()
         }
 
-        if (surroundings.size == 1) {
-          surroundings.first().moveCaret()
-        }
+        executeNormalWithoutMapping(injector.parser.parseKeys("`["), editor.ij)
       }
 
       private fun perform(sequence: String, editor: Editor) {
@@ -186,15 +177,9 @@ class VimSurroundExtension : VimExtension {
     }
   }
 
-  private data class SurroundingInfo(val caret: VimCaret, var innerText: List<KeyStroke>?, val oldRegisterContent: List<KeyStroke>?, var offset: Int?, var isLineEnd: Boolean = false) {
+  private data class SurroundingInfo(val caret: VimCaret, var innerText: List<KeyStroke>?, val oldRegisterContent: List<KeyStroke>?, var isLineEnd: Boolean = false) {
     fun restoreRegister() {
       setRegisterForCaret(REGISTER, caret, oldRegisterContent)
-    }
-
-    fun moveCaret() {
-      if (innerText != null && offset != null) {
-        caret.moveToOffset(offset!! + if (isLineEnd) 1 else 0)
-      }
     }
   }
 

@@ -492,8 +492,8 @@ class VimSurroundExtensionTest : VimTestCase() {
                   (${c}xyz)
                     """
     val after = """
-                  [abc]
-                  [xyz]
+                  ${c}[abc]
+                  ${c}[xyz]
                     """
 
     doTest(listOf("cs(]"), before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
@@ -505,8 +505,8 @@ class VimSurroundExtensionTest : VimTestCase() {
                   (${c}xyz)
                     """
     val after = """
-                  abc
-                  xyz
+                  ${c}abc
+                  ${c}xyz
                     """
 
     doTest(listOf("ds("), before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)

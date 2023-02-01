@@ -481,9 +481,7 @@ abstract class VimPutBase : VimPut {
         startOffset, data.count, data.indent, data.caretAfterInsertedText
       )
       updated = updatedCaret
-      if (updatedCaret == editor.primaryCaret()) {
-        injector.markService.setChangeMarks(updatedCaret, TextRange(startOffset, endOffset))
-      }
+      injector.markService.setChangeMarks(updatedCaret, TextRange(startOffset, endOffset))
       updated = moveCaretToEndPosition(
         editor,
         updatedCaret,

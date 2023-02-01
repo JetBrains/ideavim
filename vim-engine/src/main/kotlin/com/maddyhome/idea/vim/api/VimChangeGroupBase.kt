@@ -180,10 +180,8 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       }
       if (type != null) {
         val start = updatedRange.startOffset
-        if (editor.primaryCaret() == caret) {
-          injector.markService.setMark(caret, MARK_CHANGE_POS, start)
-          injector.markService.setChangeMarks(caret, TextRange(start, start + 1))
-        }
+        injector.markService.setMark(caret, MARK_CHANGE_POS, start)
+        injector.markService.setChangeMarks(caret, TextRange(start, start + 1))
       }
       return true
     }
@@ -425,9 +423,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     val state = getInstance(editor)
     for (caret in editor.nativeCarets()) {
       caret.vimInsertStart = editor.createLiveMarker(caret.offset, caret.offset)
-      if (caret == editor.primaryCaret()) {
-        injector.markService.setMark(caret, MARK_CHANGE_START, caret.offset.point)
-      }
+      injector.markService.setMark(caret, MARK_CHANGE_START, caret.offset.point)
     }
     val cmd = state.executingCommand
     if (cmd != null && state.isDotRepeatInProgress) {
