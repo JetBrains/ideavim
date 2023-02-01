@@ -21,7 +21,6 @@ interface VimMacro {
   fun playbackKeys(
     editor: VimEditor,
     context: ExecutionContext,
-    cnt: Int,
     total: Int,
   )
 

@@ -44,7 +44,7 @@ abstract class VimMacroBase : VimMacro {
         injector.parser.parseKeys(register.rawText)
       }
       KeyHandler.getInstance().keyStack.addKeys(keys)
-      playbackKeys(editor, context, 0, count)
+      playbackKeys(editor, context, count)
     } finally {
       --macroDepth
     }

@@ -297,7 +297,7 @@ public class ExOutputPanel extends JPanel {
         keys.add(key);
         KeyHandler.getInstance().getKeyStack().addKeys(keys);
         VimPlugin.getMacro().playbackKeys(new IjVimEditor(myEditor), new IjExecutionContext(EditorDataContext.init(myEditor, null)),
-                                          0, 1);
+                                          1);
       }
     });
   }

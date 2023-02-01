@@ -7,7 +7,7 @@
  */
 package com.maddyhome.idea.vim.group
 
-import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.util.PotemkinProgress
@@ -28,12 +28,11 @@ class MacroGroup : VimMacroBase() {
   override fun playbackKeys(
     editor: VimEditor,
     context: ExecutionContext,
-    cnt: Int,
     total: Int,
   ) {
     val project = (editor as IjVimEditor).editor.project
     val keyStack = getInstance().keyStack
-    if (!keyStack.hasStroke() || cnt >= total) {
+    if (!keyStack.hasStroke()) {
       logger.debug("done")
       keyStack.removeFirst()
       return
@@ -66,8 +65,6 @@ class MacroGroup : VimMacroBase() {
   }
 
   companion object {
-    private val logger = Logger.getInstance(
-      MacroGroup::class.java.name
-    )
+    private val logger = logger<MacroGroup>()
   }
 }
