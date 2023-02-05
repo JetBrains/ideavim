@@ -79,9 +79,9 @@ class MacroGroup : VimMacroBase() {
       }
 
       if (isInternalMacro) {
-          runnable()
+        runnable()
       } else {
-          myPotemkinProgress.runInSwingThread(runnable)
+        myPotemkinProgress.runInSwingThread(runnable)
       }
     } finally {
       potemkinProgress = null

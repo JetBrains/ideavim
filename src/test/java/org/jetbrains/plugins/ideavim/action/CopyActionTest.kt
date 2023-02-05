@@ -28,12 +28,13 @@ class CopyActionTest : VimTestCase() {
   // |yy|
   fun testYankLine() {
     typeTextInFile(
-      "yy" + "p", """
+      "yy" + "p",
+      """
      one
      tw<caret>o
      three
      
-     """.trimIndent()
+      """.trimIndent()
     )
     assertState(
       """
@@ -42,19 +43,20 @@ class CopyActionTest : VimTestCase() {
     two
     three
     
-    """.trimIndent()
+      """.trimIndent()
     )
   }
 
   // VIM-723 |p|
   fun testYankPasteToEmptyLine() {
     typeTextInFile(
-      "yiw" + "j" + "p", """
+      "yiw" + "j" + "p",
+      """
      foo
      
      bar
      
-     """.trimIndent()
+      """.trimIndent()
     )
     assertState(
       """
@@ -62,18 +64,19 @@ class CopyActionTest : VimTestCase() {
     foo
     bar
     
-    """.trimIndent()
+      """.trimIndent()
     )
   }
 
   // VIM-390 |yy| |p|
   fun testYankLinePasteAtLastLine() {
     typeTextInFile(
-      "yy" + "p", """
+      "yy" + "p",
+      """
      one two
      <caret>three four
      
-     """.trimIndent()
+      """.trimIndent()
     )
     assertState(
       """
@@ -81,7 +84,7 @@ class CopyActionTest : VimTestCase() {
     three four
     three four
     
-    """.trimIndent()
+      """.trimIndent()
     )
   }
 
@@ -119,12 +122,13 @@ class CopyActionTest : VimTestCase() {
   fun testWrongYankQuoteMotion() {
     assertPluginError(false)
     typeTextInFile(
-      "y\"", """
+      "y\"",
+      """
      one <caret>two
      three
      four
      
-     """.trimIndent()
+      """.trimIndent()
     )
     assertPluginError(true)
   }
@@ -132,12 +136,13 @@ class CopyActionTest : VimTestCase() {
   fun testWrongYankQuoteYankLine() {
     assertPluginError(false)
     typeTextInFile(
-      "y\"" + "yy" + "p", """
+      "y\"" + "yy" + "p",
+      """
      one <caret>two
      three
      four
      
-     """.trimIndent()
+      """.trimIndent()
     )
     assertPluginError(false)
     assertState(
@@ -147,18 +152,19 @@ class CopyActionTest : VimTestCase() {
     three
     four
     
-    """.trimIndent()
+      """.trimIndent()
     )
   }
 
   fun testWrongYankRegisterMotion() {
     val editor = typeTextInFile(
-      "y\"" + "0", """
+      "y\"" + "0",
+      """
      one <caret>two
      three
      four
      
-     """.trimIndent()
+      """.trimIndent()
     )
     assertEquals(0, editor.caretModel.offset)
   }
@@ -166,11 +172,12 @@ class CopyActionTest : VimTestCase() {
   // VIM-632 |CTRL-V| |v_y| |p|
   fun testYankVisualBlock() {
     typeTextInFile(
-      "<C-V>" + "jl" + "yl" + "p", """
+      "<C-V>" + "jl" + "yl" + "p",
+      """
      <caret>* one
      * two
      
-     """.trimIndent()
+      """.trimIndent()
     )
 
     // XXX:
@@ -185,7 +192,7 @@ class CopyActionTest : VimTestCase() {
     * * one
     * * two
     
-    """.trimIndent()
+      """.trimIndent()
     )
     assertSelection(null)
     assertOffset(2)
@@ -194,11 +201,12 @@ class CopyActionTest : VimTestCase() {
   // VIM-632 |CTRL-V| |v_y|
   fun testStateAfterYankVisualBlock() {
     typeTextInFile(
-      "<C-V>" + "jl" + "y", """
+      "<C-V>" + "jl" + "y",
+      """
      <caret>foo
      bar
      
-     """.trimIndent()
+      """.trimIndent()
     )
     assertOffset(0)
     assertMode(VimStateMachine.Mode.COMMAND)
@@ -215,7 +223,7 @@ class CopyActionTest : VimTestCase() {
     <caret>bar
     baz
     
-    """.trimIndent()
+      """.trimIndent()
     )
     assertEquals('\"', VimPlugin.getRegister().defaultRegister)
     enterCommand("set clipboard=unnamed")
@@ -240,7 +248,7 @@ class CopyActionTest : VimTestCase() {
     foo
     <caret>foo
     
-    """.trimIndent()
+      """.trimIndent()
     )
   }
 
@@ -255,7 +263,7 @@ class CopyActionTest : VimTestCase() {
     bar
     baz
     
-    """.trimIndent()
+      """.trimIndent()
     )
     typeText("<C-V>j" + "\"*y" + "\"*p")
     val register = VimPlugin.getRegister().getRegister('*')
@@ -264,7 +272,8 @@ class CopyActionTest : VimTestCase() {
       """
     f
     b
-    """.trimIndent(), register!!.text
+      """.trimIndent(),
+      register!!.text
     )
     assertState(
       """
@@ -272,7 +281,7 @@ class CopyActionTest : VimTestCase() {
     bbar
     baz
     
-    """.trimIndent()
+      """.trimIndent()
     )
   }
 
@@ -292,7 +301,7 @@ class CopyActionTest : VimTestCase() {
     <b></b>
     </root>
     
-    """.trimIndent()
+      """.trimIndent()
     )
     typeText("dit", "j", "cit", "<C-R>\"")
     assertState(
@@ -302,7 +311,7 @@ class CopyActionTest : VimTestCase() {
     <b>value</b>
     </root>
     
-    """.trimIndent()
+      """.trimIndent()
     )
   }
 }

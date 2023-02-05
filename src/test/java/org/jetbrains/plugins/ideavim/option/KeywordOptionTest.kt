@@ -81,11 +81,14 @@ class KeywordOptionTest : VimTestCase() {
     } catch (e: Exception) {
       assertEquals("E474: Invalid argument: testToken", e.message)
     }
-    assertDoesntContain(values!!, object : ArrayList<String?>() {
-      init {
-        add("b-a")
+    assertDoesntContain(
+      values!!,
+      object : ArrayList<String?>() {
+        init {
+          add("b-a")
+        }
       }
-    })
+    )
   }
 
   fun testTwoAdjacentLettersAreInvalid() {
@@ -95,11 +98,14 @@ class KeywordOptionTest : VimTestCase() {
     } catch (e: Exception) {
       assertEquals("E474: Invalid argument: testToken", e.message)
     }
-    assertDoesntContain(values!!, object : ArrayList<String?>() {
-      init {
-        add("ab")
+    assertDoesntContain(
+      values!!,
+      object : ArrayList<String?>() {
+        init {
+          add("ab")
+        }
       }
-    })
+    )
   }
 
   fun testAddsACharByChar() {

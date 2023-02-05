@@ -81,7 +81,6 @@ import com.maddyhome.idea.vim.register.VimRegisterGroup
 import com.maddyhome.idea.vim.ui.VimRcFileState
 import com.maddyhome.idea.vim.undo.VimUndoRedo
 import com.maddyhome.idea.vim.vimscript.Executor
-import com.maddyhome.idea.vim.vimscript.services.FunctionStorage
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import com.maddyhome.idea.vim.vimscript.services.PatternService
 import com.maddyhome.idea.vim.vimscript.services.VariableService

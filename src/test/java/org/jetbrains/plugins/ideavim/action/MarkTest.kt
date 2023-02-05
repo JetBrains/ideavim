@@ -21,7 +21,8 @@ class MarkTest : VimTestCase() {
   // |m|
   fun testLocalMark() {
     typeTextInFile(
-      injector.parser.parseKeys("ma"), """    foo
+      injector.parser.parseKeys("ma"),
+      """    foo
     ba<caret>r
     baz
 """
@@ -36,7 +37,8 @@ class MarkTest : VimTestCase() {
   // |m|
   fun testGlobalMark() {
     typeTextInFile(
-      injector.parser.parseKeys("mG"), """    foo
+      injector.parser.parseKeys("mG"),
+      """    foo
     ba<caret>r
     baz
 """
@@ -51,7 +53,8 @@ class MarkTest : VimTestCase() {
   // |m|
   fun testMarkIsDeletedWhenLineIsDeleted() {
     typeTextInFile(
-      injector.parser.parseKeys("mx" + "dd"), """    foo
+      injector.parser.parseKeys("mx" + "dd"),
+      """    foo
     ba<caret>r
     baz
 """
@@ -64,12 +67,13 @@ class MarkTest : VimTestCase() {
   // |m|
   fun testMarkIsNotDeletedWhenLineIsOneCharAndReplaced() {
     typeTextInFile(
-      injector.parser.parseKeys("ma" + "r1"), """
+      injector.parser.parseKeys("ma" + "r1"),
+      """
      foo
      <caret>0
      bar
      
-     """.trimIndent()
+      """.trimIndent()
     )
     val vimEditor: VimEditor = IjVimEditor(myFixture.editor)
     val mark = injector.markService.getMark(vimEditor.primaryCaret(), 'a')
@@ -79,7 +83,8 @@ class MarkTest : VimTestCase() {
   // |m|
   fun testMarkIsNotDeletedWhenLineIsChanged() {
     typeTextInFile(
-      injector.parser.parseKeys("ma" + "cc"), """    foo
+      injector.parser.parseKeys("ma" + "cc"),
+      """    foo
     ba<caret>r
     baz
 """
@@ -92,7 +97,8 @@ class MarkTest : VimTestCase() {
   // |m|
   fun testMarkIsMovedUpWhenLinesArePartiallyDeletedAbove() {
     typeTextInFile(
-      injector.parser.parseKeys("mx" + "2k" + "dd" + "0dw"), """    foo
+      injector.parser.parseKeys("mx" + "2k" + "dd" + "0dw"),
+      """    foo
     bar
     ba<caret>z
 """
@@ -107,7 +113,8 @@ class MarkTest : VimTestCase() {
   // |m|
   fun testMarkIsMovedUpWhenLinesAreDeletedAbove() {
     typeTextInFile(
-      injector.parser.parseKeys("mx" + "2k" + "2dd"), """    foo
+      injector.parser.parseKeys("mx" + "2k" + "2dd"),
+      """    foo
     bar
     ba<caret>z
 """
@@ -122,12 +129,13 @@ class MarkTest : VimTestCase() {
   // |m|
   fun testMarkIsMovedDownWhenLinesAreInsertedAbove() {
     typeTextInFile(
-      injector.parser.parseKeys("mY" + "Obiff"), """
+      injector.parser.parseKeys("mY" + "Obiff"),
+      """
      foo
      ba<caret>r
      baz
      
-     """.trimIndent()
+      """.trimIndent()
     )
     val vimEditor: VimEditor = IjVimEditor(myFixture.editor)
     val mark = injector.markService.getMark(vimEditor.primaryCaret(), 'Y')
@@ -139,7 +147,8 @@ class MarkTest : VimTestCase() {
   // |m|
   fun testMarkIsMovedDownWhenLinesAreInsertedAboveWithIndentation() {
     typeTextInFile(
-      injector.parser.parseKeys("mY" + "Obiff"), """    foo
+      injector.parser.parseKeys("mY" + "Obiff"),
+      """    foo
     ba<caret>r
     baz
 """
@@ -154,7 +163,8 @@ class MarkTest : VimTestCase() {
   // |m| |`|
   fun testMarkAndJumpToMark() {
     typeTextInFile(
-      injector.parser.parseKeys("6l" + "mZ" + "G$" + "`Z"), """    foo
+      injector.parser.parseKeys("6l" + "mZ" + "G$" + "`Z"),
+      """    foo
     bar
     baz
 """
@@ -165,7 +175,8 @@ class MarkTest : VimTestCase() {
   // |m| |'|
   fun testMarkAndJumpToMarkLeadingSpace() {
     typeTextInFile(
-      injector.parser.parseKeys("6l" + "mb" + "G$" + "'b"), """    foo
+      injector.parser.parseKeys("6l" + "mb" + "G$" + "'b"),
+      """    foo
     bar
     baz
 """
@@ -176,7 +187,8 @@ class MarkTest : VimTestCase() {
   // |m| |`|
   fun testDeleteBacktickMotionIsCharacterWise() {
     typeTextInFile(
-      injector.parser.parseKeys("mk" + "kh" + "d`k"), """    abcd
+      injector.parser.parseKeys("mk" + "kh" + "d`k"),
+      """    abcd
     efgh
     ij<caret>kl
     mnop
@@ -193,7 +205,8 @@ class MarkTest : VimTestCase() {
   // |m| |`|
   fun testDeleteSingleQuoteMotionIsLineWise() {
     typeTextInFile(
-      injector.parser.parseKeys("mk" + "kh" + "d'k"), """    abcd
+      injector.parser.parseKeys("mk" + "kh" + "d'k"),
+      """    abcd
     efgh
     ij<caret>kl
     mnop
@@ -216,7 +229,7 @@ class MarkTest : VimTestCase() {
                 <caret>hello world
                 three four
                 
-                """.trimIndent()
+      """.trimIndent()
     )
     assertOffset(13)
   }
@@ -224,12 +237,13 @@ class MarkTest : VimTestCase() {
   // VIM-43 |p| |`.|
   fun testGotoLastPutPosition() {
     typeTextInFile(
-      injector.parser.parseKeys("yy" + "p" + "gg" + "`."), """
+      injector.parser.parseKeys("yy" + "p" + "gg" + "`."),
+      """
      one two
      <caret>three
      four five
      
-     """.trimIndent()
+      """.trimIndent()
     )
     assertOffset(14)
   }
@@ -237,18 +251,20 @@ class MarkTest : VimTestCase() {
   // |i| |`]|
   fun testGotoLastChangePositionEnd() {
     doTest(
-      Lists.newArrayList("yiw", "P", "gg", "`]"), """
+      Lists.newArrayList("yiw", "P", "gg", "`]"),
+      """
      one two
      <caret>three
      four five
      
-     """.trimIndent(),
+      """.trimIndent(),
       """
                 one two
                 thre<caret>ethree
                 four five
                 
-                """.trimIndent(), VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      """.trimIndent(),
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
 
@@ -398,7 +414,7 @@ class MarkTest : VimTestCase() {
     For example: homework, homework, homework, homework, homework, homework, homework, homework, homework.
     See, nothing.
     
-    """.trimIndent()
+      """.trimIndent()
     )
     typeText(injector.parser.parseKeys("Vj<Esc>"))
     typeText(injector.parser.parseKeys("`<"))
@@ -415,7 +431,7 @@ class MarkTest : VimTestCase() {
     For example: homework, homework, homework, homework, <caret>homework, homework, homework, homework, homework.
     See, nothing.
     
-    """.trimIndent()
+      """.trimIndent()
     )
     typeText(injector.parser.parseKeys("Vk<Esc>"))
     typeText(injector.parser.parseKeys("`<"))
@@ -432,7 +448,7 @@ class MarkTest : VimTestCase() {
     For example: homework, homework, homework, homework, <caret>homework, homework, homework, homework, homework.
     See, nothing.
     
-    """.trimIndent()
+      """.trimIndent()
     )
     typeText("ma$")
     assertState(
@@ -442,7 +458,7 @@ class MarkTest : VimTestCase() {
     For example: homework, homework, homework, homework, homework, homework, homework, homework, homework<caret>.
     See, nothing.
     
-    """.trimIndent()
+      """.trimIndent()
     )
     typeText("`a")
     assertState(
@@ -452,7 +468,7 @@ class MarkTest : VimTestCase() {
     For example: homework, homework, homework, homework, <caret>homework, homework, homework, homework, homework.
     See, nothing.
     
-    """.trimIndent()
+      """.trimIndent()
     )
   }
 
@@ -464,7 +480,7 @@ class MarkTest : VimTestCase() {
     For example: homework, homework, homework, homework, <caret>homework, homework, homework, homework, homework.
     See, nothing.
     
-    """.trimIndent()
+      """.trimIndent()
     )
     typeText("vey\$p")
     assertState(
@@ -474,7 +490,7 @@ class MarkTest : VimTestCase() {
     For example: homework, homework, homework, homework, homework, homework, homework, homework, homework.homework
     See, nothing.
     
-    """.trimIndent()
+      """.trimIndent()
     )
     typeText("gv")
     assertState(
@@ -484,7 +500,7 @@ class MarkTest : VimTestCase() {
     For example: homework, homework, homework, homework, <selection>homewor<caret>k</selection>, homework, homework, homework, homework.homework
     See, nothing.
     
-    """.trimIndent()
+      """.trimIndent()
     )
   }
 }

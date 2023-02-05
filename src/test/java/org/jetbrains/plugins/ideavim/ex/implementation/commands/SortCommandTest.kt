@@ -22,7 +22,7 @@ class SortCommandTest : VimTestCase() {
     Test
     Hello World!
     
-    """.trimIndent()
+      """.trimIndent()
     )
     val keys: MutableList<KeyStroke?> = Lists.newArrayList(KeyStroke.getKeyStroke("control V"))
     keys.addAll(injector.parser.stringToKeys("\$j"))
@@ -33,7 +33,7 @@ class SortCommandTest : VimTestCase() {
     Hello World!
     Test
     
-    """.trimIndent()
+      """.trimIndent()
     )
   }
 

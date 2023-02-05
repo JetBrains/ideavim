@@ -25,9 +25,6 @@ import org.antlr.v4.runtime.tree.ParseTree
 
 object VimscriptParser : com.maddyhome.idea.vim.api.VimscriptParser {
 
-
-
-  
   private val logger = logger<VimscriptParser>()
   val linesWithErrors = mutableListOf<Int>()
   private const val MAX_NUMBER_OF_TRIES = 5

@@ -21,7 +21,6 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.functions.DefinedFunctionHandler
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
-import com.maddyhome.idea.vim.vimscript.services.FunctionStorage
 
 object FunctionFunctionHandler : FunctionHandler() {
   override val name = "function"
