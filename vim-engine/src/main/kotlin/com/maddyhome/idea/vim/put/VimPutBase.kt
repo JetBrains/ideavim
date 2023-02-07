@@ -59,7 +59,7 @@ abstract class VimPutBase : VimPut {
     putTextAndSetCaretPosition(editor, context, processedText, data, additionalData)
 
     if (updateVisualMarks) {
-      wrapInsertedTextWithVisualMarks(editor, data, processedText)
+      wrapInsertedTextWithVisualMarks(editor.currentCaret(), data, processedText)
     }
 
     return true
@@ -86,17 +86,16 @@ abstract class VimPutBase : VimPut {
    * see ":h gv":
    * After using "p" or "P" in Visual mode the text that was put will be selected
    */
-  private fun wrapInsertedTextWithVisualMarks(editor: VimEditor, data: PutData, text: ProcessedTextData) {
+  private fun wrapInsertedTextWithVisualMarks(caret: VimCaret, data: PutData, text: ProcessedTextData) {
     val textLength: Int = data.textData?.rawText?.length ?: return
-    val currentCaret = editor.currentCaret()
     val caretsAndSelections = data.visualSelection?.caretsAndSelections ?: return
-    val selection = caretsAndSelections[currentCaret] ?: caretsAndSelections.firstOrNull()?.value ?: return
+    val selection = caretsAndSelections[caret] ?: caretsAndSelections.firstOrNull()?.value ?: return
 
     val leftIndex = min(selection.vimStart, selection.vimEnd)
     val rightIndex = leftIndex + textLength - 1
     val rangeForMarks = TextRange(leftIndex, rightIndex)
-
-    injector.markService.setVisualSelectionMarks(currentCaret, rangeForMarks)
+    
+    injector.markService.setVisualSelectionMarks(caret, rangeForMarks)
   }
 
   @RWLockLabel.SelfSynchronized
@@ -507,8 +506,8 @@ abstract class VimPutBase : VimPut {
     }
     val processedText = processText(editor, caret, data) ?: return false
     val updatedCaret = putForCaret(editor, caret, data, additionalData, context, processedText)
-    if (editor.primaryCaret() == updatedCaret && updateVisualMarks) {
-      wrapInsertedTextWithVisualMarks(editor, data, processedText)
+    if (updateVisualMarks) {
+      wrapInsertedTextWithVisualMarks(updatedCaret, data, processedText)
     }
     return true
   }
