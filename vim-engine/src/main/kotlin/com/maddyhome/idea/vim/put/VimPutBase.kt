@@ -94,7 +94,7 @@ abstract class VimPutBase : VimPut {
     val leftIndex = min(selection.vimStart, selection.vimEnd)
     val rightIndex = leftIndex + textLength - 1
     val rangeForMarks = TextRange(leftIndex, rightIndex)
-    
+
     injector.markService.setVisualSelectionMarks(caret, rangeForMarks)
   }
 
