@@ -98,7 +98,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     isChange: Boolean,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    val endOffset = injector.motion.getOffsetOfHorizontalMotion(editor, caret, count, true)
+    val endOffset = injector.motion.getHorizontalMotion(editor, caret, count, true)
     if (endOffset is AbsoluteOffset) {
       val res = deleteText(
         editor,
@@ -295,7 +295,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
         caret.moveToOffset(position)
       } else {
         repeatInsertText(editor, context, count, operatorArguments)
-        val position = injector.motion.getOffsetOfHorizontalMotion(editor, caret, -1, false)
+        val position = injector.motion.getHorizontalMotion(editor, caret, -1, false)
         caret.moveToMotion(position)
       }
     }
@@ -384,7 +384,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
    */
   override fun insertAfterCursor(editor: VimEditor, context: ExecutionContext) {
     for (caret in editor.nativeCarets()) {
-      caret.moveToMotion(injector.motion.getOffsetOfHorizontalMotion(editor, caret, 1, true))
+      caret.moveToMotion(injector.motion.getHorizontalMotion(editor, caret, 1, true))
     }
     initInsert(editor, context, VimStateMachine.Mode.INSERT)
   }
@@ -663,7 +663,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       if (usesVirtualSpace) {
         caret.moveToOffset(startOffset)
       } else {
-        val pos = injector.motion.getOffsetOfHorizontalMotion(editor, caret, -1, false)
+        val pos = injector.motion.getHorizontalMotion(editor, caret, -1, false)
         caret.moveToMotion(pos)
       }
       return res
@@ -1035,7 +1035,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       if (spaces && !hasTrailingWhitespace) {
         insertText(editor, caret, " ")
         caret.moveToMotion(
-          injector.motion.getOffsetOfHorizontalMotion(editor, caret, -1, true)
+          injector.motion.getHorizontalMotion(editor, caret, -1, true)
         )
       }
     }

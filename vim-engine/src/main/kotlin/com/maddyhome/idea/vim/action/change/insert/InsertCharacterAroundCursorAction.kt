@@ -72,7 +72,7 @@ private fun insertCharacterAroundCursor(editor: VimEditor, caret: VimCaret, dir:
     if (offset < charsSequence.length) {
       val ch = charsSequence[offset]
       (editor as MutableVimEditor).insertText(caret.offset, ch.toString())
-      caret.moveToMotion(injector.motion.getOffsetOfHorizontalMotion(editor, caret, 1, true))
+      caret.moveToMotion(injector.motion.getHorizontalMotion(editor, caret, 1, true))
       res = true
     }
   }

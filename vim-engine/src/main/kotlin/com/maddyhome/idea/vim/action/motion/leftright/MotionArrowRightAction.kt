@@ -19,7 +19,6 @@ import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.NonShiftedSpecialKeyHandler
-import com.maddyhome.idea.vim.handler.toMotionOrError
 import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.helper.usesVirtualSpace
 import com.maddyhome.idea.vim.options.OptionConstants
@@ -44,6 +43,6 @@ class MotionArrowRightAction : NonShiftedSpecialKeyHandler(), ComplicatedKeysAct
     val allowPastEnd = usesVirtualSpace || editor.isEndAllowed
       || operatorArguments.isOperatorPending // because of `d<Right>` removing the last character
     val allowWrap = injector.options(editor).hasValue(OptionConstants.whichwrap, ">")
-    return injector.motion.getOffsetOfHorizontalMotion(editor, caret, operatorArguments.count1, allowPastEnd, allowWrap)
+    return injector.motion.getHorizontalMotion(editor, caret, operatorArguments.count1, allowPastEnd, allowWrap)
   }
 }

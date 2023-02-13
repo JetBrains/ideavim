@@ -342,7 +342,7 @@ private class TestExtension : VimExtension {
     override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
       VimPlugin.getVisualMotion().enterVisualMode(editor, VimStateMachine.SubMode.VISUAL_CHARACTER)
       val caret = editor.ij.caretModel.currentCaret
-      val newOffset = VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret.vim, 5, editor.isEndAllowed)
+      val newOffset = VimPlugin.getMotion().getHorizontalMotion(editor, caret.vim, 5, editor.isEndAllowed)
       caret.vim.moveToMotion(newOffset)
     }
   }
@@ -371,7 +371,7 @@ private class TestExtension : VimExtension {
   private class MoveLinewiseInNormal : ExtensionHandler {
     override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
       val caret = editor.ij.caretModel.currentCaret
-      val newOffset = VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret.vim, 1, true)
+      val newOffset = VimPlugin.getMotion().getHorizontalMotion(editor, caret.vim, 1, true)
       caret.vim.moveToMotion(newOffset)
     }
   }

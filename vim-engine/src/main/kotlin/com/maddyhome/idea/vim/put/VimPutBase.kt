@@ -228,7 +228,7 @@ abstract class VimPutBase : VimPut {
       if (possiblyOverlappedCaret.offset.point != startOffset || possiblyOverlappedCaret == caret) continue
 
       val updated = possiblyOverlappedCaret.moveToMotion(
-        injector.motion.getOffsetOfHorizontalMotion(editor, possiblyOverlappedCaret, 1, true)
+        injector.motion.getHorizontalMotion(editor, possiblyOverlappedCaret, 1, true)
       )
       overlappedCarets.add(updated)
     }
@@ -240,7 +240,7 @@ abstract class VimPutBase : VimPut {
 
     for (overlappedCaret in overlappedCarets) {
       overlappedCaret.moveToMotion(
-        injector.motion.getOffsetOfHorizontalMotion(editor, overlappedCaret, -1, true)
+        injector.motion.getHorizontalMotion(editor, overlappedCaret, -1, true)
       )
     }
 

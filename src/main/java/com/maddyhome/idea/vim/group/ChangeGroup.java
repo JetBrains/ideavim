@@ -51,7 +51,6 @@ import com.maddyhome.idea.vim.newapi.IjVimCaret;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.options.OptionConstants;
 import com.maddyhome.idea.vim.options.OptionScope;
-import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import kotlin.Pair;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function0;
@@ -173,12 +172,12 @@ public class ChangeGroup extends VimChangeGroupBase {
   public boolean changeCaseToggleCharacter(@NotNull VimEditor editor, @NotNull VimCaret caret, int count) {
     boolean allowWrap = injector.getOptionService().getValues(new OptionScope.LOCAL(editor), OptionConstants.whichwrap).contains("~");
     
-    Motion motion = injector.getMotion().getOffsetOfHorizontalMotion(editor, caret, count, true, allowWrap);
+    Motion motion = injector.getMotion().getHorizontalMotion(editor, caret, count, true, allowWrap);
     if (motion instanceof Motion.Error) return false;
     
     changeCase(editor, caret, caret.getOffset().getPoint(), ((Motion.AbsoluteOffset)motion).getOffset(), CharacterHelper.CASE_TOGGLE);
     
-    motion = injector.getMotion().getOffsetOfHorizontalMotion(editor, caret, count, false, allowWrap); // same but without allow end because we can change till end, but can't move caret there
+    motion = injector.getMotion().getHorizontalMotion(editor, caret, count, false, allowWrap); // same but without allow end because we can change till end, but can't move caret there
     if (motion instanceof Motion.AbsoluteOffset) {
       caret.moveToOffset(EngineEditorHelperKt.normalizeOffset(editor, ((Motion.AbsoluteOffset)motion).getOffset(), false));
     }

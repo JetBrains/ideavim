@@ -28,7 +28,7 @@ class MotionBackspaceAction : MotionActionHandler.ForEachCaret() {
     operatorArguments: OperatorArguments,
   ): Motion {
     val allowWrap = injector.options(editor).hasValue(OptionConstants.whichwrap, "b")
-    return injector.motion.getOffsetOfHorizontalMotion(editor, caret, -operatorArguments.count1, allowPastEnd = false, allowWrap)
+    return injector.motion.getHorizontalMotion(editor, caret, -operatorArguments.count1, allowPastEnd = false, allowWrap)
   }
 
   override val motionType: MotionType = MotionType.EXCLUSIVE
@@ -43,7 +43,7 @@ class MotionSpaceAction : MotionActionHandler.ForEachCaret() {
     operatorArguments: OperatorArguments,
   ): Motion {
     val allowWrap = injector.options(editor).hasValue(OptionConstants.whichwrap, "s")
-    return injector.motion.getOffsetOfHorizontalMotion(editor, caret, operatorArguments.count1, allowPastEnd = false, allowWrap)
+    return injector.motion.getHorizontalMotion(editor, caret, operatorArguments.count1, allowPastEnd = false, allowWrap)
   }
 
   override val motionType: MotionType = MotionType.EXCLUSIVE

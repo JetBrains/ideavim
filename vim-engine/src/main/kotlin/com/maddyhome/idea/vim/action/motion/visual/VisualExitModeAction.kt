@@ -45,7 +45,7 @@ class VisualExitModeAction : VimActionHandler.ConditionalMulticaret() {
   ): Boolean {
     val lineEnd = editor.getLineEndForOffset(caret.offset.point)
     if (lineEnd == caret.offset.point) {
-      val position = injector.motion.getOffsetOfHorizontalMotion(editor, caret, -1, false)
+      val position = injector.motion.getHorizontalMotion(editor, caret, -1, false)
       caret.moveToMotion(position)
     }
 

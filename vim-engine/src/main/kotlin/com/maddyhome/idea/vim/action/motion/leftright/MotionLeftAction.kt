@@ -35,7 +35,7 @@ class MotionLeftAction : MotionActionHandler.ForEachCaret() {
   ): Motion {
     val allowWrap = injector.options(editor).hasValue(OptionConstants.whichwrap, "h")
     val allowEnd = operatorArguments.isOperatorPending // dh deletes \n with wrap enabled
-    return injector.motion.getOffsetOfHorizontalMotion(editor, caret, -operatorArguments.count1, allowEnd, allowWrap)
+    return injector.motion.getHorizontalMotion(editor, caret, -operatorArguments.count1, allowEnd, allowWrap)
   }
 }
 
@@ -55,6 +55,6 @@ class MotionLeftInsertModeAction : MotionActionHandler.ForEachCaret(), Complicat
     operatorArguments: OperatorArguments,
   ): Motion {
     val allowWrap = injector.options(editor).hasValue(OptionConstants.whichwrap, "[")
-    return injector.motion.getOffsetOfHorizontalMotion(editor, caret, -operatorArguments.count1, true, allowWrap)
+    return injector.motion.getHorizontalMotion(editor, caret, -operatorArguments.count1, true, allowWrap)
   }
 }

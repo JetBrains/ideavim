@@ -26,7 +26,7 @@ class MotionShiftRightAction : ShiftedArrowKeyHandler(true) {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override fun motionWithKeyModel(editor: VimEditor, caret: VimCaret, context: ExecutionContext, cmd: Command) {
-    val vertical = injector.motion.getOffsetOfHorizontalMotion(editor, caret, cmd.count, true)
+    val vertical = injector.motion.getHorizontalMotion(editor, caret, cmd.count, true)
     caret.moveToMotion(vertical)
   }
 

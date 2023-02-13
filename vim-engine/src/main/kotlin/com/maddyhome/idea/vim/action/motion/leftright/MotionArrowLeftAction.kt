@@ -38,6 +38,6 @@ class MotionArrowLeftAction : NonShiftedSpecialKeyHandler(), ComplicatedKeysActi
   ): Motion {
     val allowWrap = injector.options(editor).hasValue(OptionConstants.whichwrap, "<")
     val allowEnd = operatorArguments.isOperatorPending // d<Left> deletes \n with wrap enabled
-    return injector.motion.getOffsetOfHorizontalMotion(editor, caret, -operatorArguments.count1, allowEnd, allowWrap)
+    return injector.motion.getHorizontalMotion(editor, caret, -operatorArguments.count1, allowEnd, allowWrap)
   }
 }

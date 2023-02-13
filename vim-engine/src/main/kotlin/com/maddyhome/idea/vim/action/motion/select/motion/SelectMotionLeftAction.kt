@@ -19,7 +19,6 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotion
-import com.maddyhome.idea.vim.handler.toMotionOrError
 import com.maddyhome.idea.vim.options.OptionConstants
 
 /**
@@ -52,7 +51,7 @@ class SelectMotionLeftAction : MotionActionHandler.ForEachCaret() {
       }
       // No return statement, perform motion to left
     }
-    return injector.motion.getOffsetOfHorizontalMotion(editor, caret, -operatorArguments.count1, false)
+    return injector.motion.getHorizontalMotion(editor, caret, -operatorArguments.count1, false)
   }
 
   companion object {

@@ -103,7 +103,7 @@ abstract class VimMotionGroupBase : VimMotionGroup {
     return (injector.searchHelper.findNextWord(editor, searchFrom, count, bigWord)).toMotionOrError()
   }
 
-  override fun getOffsetOfHorizontalMotion(
+  override fun getHorizontalMotion(
     editor: VimEditor,
     caret: ImmutableVimCaret,
     count: Int,
