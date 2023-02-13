@@ -47,12 +47,16 @@ changeBuildType(RelativeId("Qodana")) {
         update<Qodana>(1) {
             clearConditions()
             reportAsTests = true
+            linter = customLinter {
+                image = "jetbrains/qodana-jvm:2022.3-eap"
+            }
             additionalDockerArguments = "-e QODANA_TOKEN=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJvcmdhbml6YXRpb24iOiIzUFZrQSIsInByb2plY3QiOiIzN1FlQSIsInRva2VuIjoiM0t2bXoifQ.uohp81tM7iAfvvB6k8faarfpV-OjusAaEbWQ8iNrOgs"
             additionalQodanaArguments = "--baseline qodana.sarif.json"
             param("clonefinder-languages", "")
             param("collect-anonymous-statistics", "")
             param("licenseaudit-enable", "")
             param("clonefinder-languages-container", "")
+            param("linterVersion", "")
             param("clonefinder-queried-project", "")
             param("clonefinder-enable", "")
             param("clonefinder-reference-projects", "")
