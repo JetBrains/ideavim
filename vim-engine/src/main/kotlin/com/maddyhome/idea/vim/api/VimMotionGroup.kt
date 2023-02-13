@@ -19,8 +19,8 @@ interface VimMotionGroup {
   // Note that the following methods require the caret to access the intended vertical position, such as "end of line"
   fun getHorizontalMotion(editor: VimEditor, caret: ImmutableVimCaret, count: Int, allowPastEnd: Boolean, allowWrap: Boolean = false): Motion
   fun getVerticalMotionOffset(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Motion
-  
-  // TODO: Consider naming. These don't move the caret, but calculate offsets. Also consider returning Motion
+
+// TODO: Consider naming. These don't move the caret, but calculate offsets. Also consider returning Motion
 
   // Move caret to specific buffer line
   fun moveCaretToLineStart(editor: VimEditor, line: Int): Int

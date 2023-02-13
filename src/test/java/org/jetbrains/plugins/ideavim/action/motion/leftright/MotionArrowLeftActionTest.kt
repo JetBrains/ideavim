@@ -383,10 +383,10 @@ class MotionArrowLeftActionTest : VimOptionTestCase(OptionConstants.keymodel) {
       listOf("<Left>"),
       """
           Oh, hi Ma${c}rk
-        """.trimIndent(),
+      """.trimIndent(),
       """
           Oh, hi M${c}ark
-        """.trimIndent(),
+      """.trimIndent(),
     )
     injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
   }
@@ -399,10 +399,10 @@ class MotionArrowLeftActionTest : VimOptionTestCase(OptionConstants.keymodel) {
       listOf("<Left>"),
       """
           ${c}Oh, hi Mark
-        """.trimIndent(),
+      """.trimIndent(),
       """
           ${c}Oh, hi Mark
-        """.trimIndent(),
+      """.trimIndent(),
     )
     injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
   }
@@ -416,11 +416,11 @@ class MotionArrowLeftActionTest : VimOptionTestCase(OptionConstants.keymodel) {
       """
           Oh, hi Mark
           ${c}You are my favourite customer
-        """.trimIndent(),
+      """.trimIndent(),
       """
           Oh, hi Mar${c}k
           You are my favourite customer
-        """.trimIndent(),
+      """.trimIndent(),
     )
     injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
   }
@@ -436,13 +436,13 @@ class MotionArrowLeftActionTest : VimOptionTestCase(OptionConstants.keymodel) {
           
           ${c}
           You are my favourite customer
-        """.trimIndent(),
+      """.trimIndent(),
       """
           Oh, hi Mark
           ${c}
           
           You are my favourite customer
-        """.trimIndent(),
+      """.trimIndent(),
     )
     injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
   }

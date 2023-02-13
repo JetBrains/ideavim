@@ -23,10 +23,10 @@ class ChangeCaseToggleCharacterActionTest : VimTestCase() {
       listOf("~"),
       """
           Oh, hi M${c}ark
-        """.trimIndent(),
+      """.trimIndent(),
       """
           Oh, hi MA${c}rk
-        """.trimIndent(),
+      """.trimIndent(),
     )
     injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
   }
@@ -38,10 +38,10 @@ class ChangeCaseToggleCharacterActionTest : VimTestCase() {
       listOf("~"),
       """
           Oh, hi Mar${c}k
-        """.trimIndent(),
+      """.trimIndent(),
       """
           Oh, hi Mar${c}K
-        """.trimIndent(),
+      """.trimIndent(),
     )
     injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
   }
@@ -54,11 +54,11 @@ class ChangeCaseToggleCharacterActionTest : VimTestCase() {
       """
           Oh, hi Mar${c}k
           You are my favourite customer
-        """.trimIndent(),
+      """.trimIndent(),
       """
           Oh, hi MarK
           ${c}You are my favourite customer
-        """.trimIndent(),
+      """.trimIndent(),
     )
     injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
   }
@@ -70,16 +70,16 @@ class ChangeCaseToggleCharacterActionTest : VimTestCase() {
       listOf("~"),
       """
           Oh, hi Mark
-          ${c}
+          $c
 
           You are my favourite customer
-        """.trimIndent(),
+      """.trimIndent(),
       """
           Oh, hi Mark
 
-          ${c}
+          $c
           You are my favourite customer
-        """.trimIndent(),
+      """.trimIndent(),
     )
     injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
   }

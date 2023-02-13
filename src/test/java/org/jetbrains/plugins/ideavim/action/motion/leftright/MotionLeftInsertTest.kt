@@ -24,10 +24,10 @@ class MotionLeftInsertTest : VimTestCase() {
       listOf("i", "<Left>"),
       """
           Oh, hi Ma${c}rk
-        """.trimIndent(),
+      """.trimIndent(),
       """
           Oh, hi M${c}ark
-        """.trimIndent(),
+      """.trimIndent(),
       VimStateMachine.Mode.INSERT,
     )
     injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
@@ -40,10 +40,10 @@ class MotionLeftInsertTest : VimTestCase() {
       listOf("i", "<Left>"),
       """
           ${c}Oh, hi Mark
-        """.trimIndent(),
+      """.trimIndent(),
       """
           ${c}Oh, hi Mark
-        """.trimIndent(),
+      """.trimIndent(),
       VimStateMachine.Mode.INSERT,
     )
     injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
@@ -57,11 +57,11 @@ class MotionLeftInsertTest : VimTestCase() {
       """
           Oh, hi Mark
           ${c}You are my favourite customer
-        """.trimIndent(),
+      """.trimIndent(),
       """
-          Oh, hi Mark${c}
+          Oh, hi Mark$c
           You are my favourite customer
-        """.trimIndent(),
+      """.trimIndent(),
       VimStateMachine.Mode.INSERT,
     )
     injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
@@ -75,15 +75,15 @@ class MotionLeftInsertTest : VimTestCase() {
       """
           Oh, hi Mark
           
-          ${c}
+          $c
           You are my favourite customer
-        """.trimIndent(),
+      """.trimIndent(),
       """
           Oh, hi Mark
-          ${c}
+          $c
           
           You are my favourite customer
-        """.trimIndent(),
+      """.trimIndent(),
       VimStateMachine.Mode.INSERT,
     )
     injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)

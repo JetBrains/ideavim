@@ -24,10 +24,10 @@ class MotionLeftActionTest : VimTestCase() {
       listOf("h"),
       """
           Oh, hi Ma${c}rk
-        """.trimIndent(),
+      """.trimIndent(),
       """
           Oh, hi M${c}ark
-        """.trimIndent(),
+      """.trimIndent(),
     )
     injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
   }
@@ -40,10 +40,10 @@ class MotionLeftActionTest : VimTestCase() {
       listOf("h"),
       """
           ${c}Oh, hi Mark
-        """.trimIndent(),
+      """.trimIndent(),
       """
           ${c}Oh, hi Mark
-        """.trimIndent(),
+      """.trimIndent(),
     )
     injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
   }
@@ -57,11 +57,11 @@ class MotionLeftActionTest : VimTestCase() {
       """
           Oh, hi Mark
           ${c}You are my favourite customer
-        """.trimIndent(),
+      """.trimIndent(),
       """
           Oh, hi Mar${c}k
           You are my favourite customer
-        """.trimIndent(),
+      """.trimIndent(),
     )
     injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
   }
@@ -75,19 +75,19 @@ class MotionLeftActionTest : VimTestCase() {
       """
           Oh, hi Mark
           
-          ${c}
+          $c
           You are my favourite customer
-        """.trimIndent(),
+      """.trimIndent(),
       """
           Oh, hi Mark
-          ${c}
+          $c
           
           You are my favourite customer
-        """.trimIndent(),
+      """.trimIndent(),
     )
     injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
   }
-  
+
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionDefaultAll
   fun `test d command with whichwrap`() {
@@ -97,10 +97,10 @@ class MotionLeftActionTest : VimTestCase() {
       """
           Oh, hi Mark
           ${c}You are my favourite customer
-        """.trimIndent(),
+      """.trimIndent(),
       """
           Oh, hi Mark${c}You are my favourite customer
-        """.trimIndent(),
+      """.trimIndent(),
     )
     injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
   }

@@ -19,7 +19,6 @@ import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
-import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.helper.usesVirtualSpace
 import com.maddyhome.idea.vim.options.OptionConstants
 import java.awt.event.KeyEvent
@@ -36,8 +35,8 @@ class MotionRightAction : MotionActionHandler.ForEachCaret() {
     operatorArguments: OperatorArguments,
   ): Motion {
     val allowWrap = injector.options(editor).hasValue(OptionConstants.whichwrap, "l")
-    val allowEnd = usesVirtualSpace || editor.isEndAllowed
-      || operatorArguments.isOperatorPending // because of `dl` removing the last character
+    val allowEnd = usesVirtualSpace || editor.isEndAllowed ||
+      operatorArguments.isOperatorPending // because of `dl` removing the last character
     return injector.motion.getHorizontalMotion(editor, caret, operatorArguments.count1, allowPastEnd = allowEnd, allowWrap)
   }
 }

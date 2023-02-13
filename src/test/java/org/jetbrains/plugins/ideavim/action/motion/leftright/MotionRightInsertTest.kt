@@ -24,10 +24,10 @@ class MotionRightInsertTest : VimTestCase() {
       listOf("i", "<Right>"),
       """
           Oh, hi M${c}ark
-        """.trimIndent(),
+      """.trimIndent(),
       """
           Oh, hi Ma${c}rk
-        """.trimIndent(),
+      """.trimIndent(),
       VimStateMachine.Mode.INSERT,
     )
     injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
@@ -40,10 +40,10 @@ class MotionRightInsertTest : VimTestCase() {
       listOf("i", "<Right>"),
       """
           Oh, hi Mar${c}k
-        """.trimIndent(),
+      """.trimIndent(),
       """
-          Oh, hi Mark${c}
-        """.trimIndent(),
+          Oh, hi Mark$c
+      """.trimIndent(),
       VimStateMachine.Mode.INSERT,
     )
     injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
@@ -55,11 +55,11 @@ class MotionRightInsertTest : VimTestCase() {
     doTest(
       listOf("i", "<Right>"),
       """
-          Oh, hi Mark${c}
-        """.trimIndent(),
+          Oh, hi Mark$c
+      """.trimIndent(),
       """
-          Oh, hi Mark${c}
-        """.trimIndent(),
+          Oh, hi Mark$c
+      """.trimIndent(),
       VimStateMachine.Mode.INSERT,
     )
     injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
@@ -71,13 +71,13 @@ class MotionRightInsertTest : VimTestCase() {
     doTest(
       listOf("i", "<Right>"),
       """
-          Oh, hi Mark${c}
+          Oh, hi Mark$c
           You are my favourite customer
-        """.trimIndent(),
+      """.trimIndent(),
       """
           Oh, hi Mark
           ${c}You are my favourite customer
-        """.trimIndent(),
+      """.trimIndent(),
       VimStateMachine.Mode.INSERT,
     )
     injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
@@ -90,16 +90,16 @@ class MotionRightInsertTest : VimTestCase() {
       listOf("i", "<Right>"),
       """
           Oh, hi Mark
-          ${c}
+          $c
 
           You are my favourite customer
-        """.trimIndent(),
+      """.trimIndent(),
       """
           Oh, hi Mark
 
-          ${c}
+          $c
           You are my favourite customer
-        """.trimIndent(),
+      """.trimIndent(),
       VimStateMachine.Mode.INSERT,
     )
     injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)

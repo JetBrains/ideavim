@@ -23,10 +23,10 @@ class MotionBackspaceActionTest : VimTestCase() {
       listOf("<BS>"),
       """
           Oh, hi Ma${c}rk
-        """.trimIndent(),
+      """.trimIndent(),
       """
           Oh, hi M${c}ark
-        """.trimIndent(),
+      """.trimIndent(),
     )
     injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
   }
@@ -38,10 +38,10 @@ class MotionBackspaceActionTest : VimTestCase() {
       listOf("<BS>"),
       """
           ${c}Oh, hi Mark
-        """.trimIndent(),
+      """.trimIndent(),
       """
           ${c}Oh, hi Mark
-        """.trimIndent(),
+      """.trimIndent(),
     )
     injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
   }
@@ -54,11 +54,11 @@ class MotionBackspaceActionTest : VimTestCase() {
       """
           Oh, hi Mark
           ${c}You are my favourite customer
-        """.trimIndent(),
+      """.trimIndent(),
       """
           Oh, hi Mar${c}k
           You are my favourite customer
-        """.trimIndent(),
+      """.trimIndent(),
     )
     injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
   }
@@ -71,15 +71,15 @@ class MotionBackspaceActionTest : VimTestCase() {
       """
           Oh, hi Mark
           
-          ${c}
+          $c
           You are my favourite customer
-        """.trimIndent(),
+      """.trimIndent(),
       """
           Oh, hi Mark
-          ${c}
+          $c
           
           You are my favourite customer
-        """.trimIndent(),
+      """.trimIndent(),
     )
     injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
   }
