@@ -13,6 +13,7 @@ package org.jetbrains.plugins.ideavim.action.motion.leftright
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.options.OptionScope
 import org.jetbrains.plugins.ideavim.OptionValueType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -372,5 +373,77 @@ class MotionArrowLeftActionTest : VimOptionTestCase(OptionConstants.keymodel) {
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @VimOptionDefaultAll
+  fun `test whichwrap in the same line`() {
+    injector.optionService.setOptionValue(OptionScope.GLOBAL, OptionConstants.whichwrap, "<")
+    doTest(
+      listOf("<Left>"),
+      """
+          Oh, hi Ma${c}rk
+        """.trimIndent(),
+      """
+          Oh, hi M${c}ark
+        """.trimIndent(),
+    )
+    injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @VimOptionDefaultAll
+  fun `test whichwrap at file start`() {
+    injector.optionService.setOptionValue(OptionScope.GLOBAL, OptionConstants.whichwrap, "<")
+    doTest(
+      listOf("<Left>"),
+      """
+          ${c}Oh, hi Mark
+        """.trimIndent(),
+      """
+          ${c}Oh, hi Mark
+        """.trimIndent(),
+    )
+    injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @VimOptionDefaultAll
+  fun `test whichwrap to previous line`() {
+    injector.optionService.setOptionValue(OptionScope.GLOBAL, OptionConstants.whichwrap, "<")
+    doTest(
+      listOf("<Left>"),
+      """
+          Oh, hi Mark
+          ${c}You are my favourite customer
+        """.trimIndent(),
+      """
+          Oh, hi Mar${c}k
+          You are my favourite customer
+        """.trimIndent(),
+    )
+    injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @VimOptionDefaultAll
+  fun `test from empty line to empty line`() {
+    injector.optionService.setOptionValue(OptionScope.GLOBAL, OptionConstants.whichwrap, "<")
+    doTest(
+      listOf("<Left>"),
+      """
+          Oh, hi Mark
+          
+          ${c}
+          You are my favourite customer
+        """.trimIndent(),
+      """
+          Oh, hi Mark
+          ${c}
+          
+          You are my favourite customer
+        """.trimIndent(),
+    )
+    injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
   }
 }

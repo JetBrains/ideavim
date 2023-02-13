@@ -13,11 +13,13 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.MotionType
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.NonShiftedSpecialKeyHandler
-import com.maddyhome.idea.vim.handler.toMotionOrError
+import com.maddyhome.idea.vim.options.OptionConstants
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
@@ -31,10 +33,11 @@ class MotionArrowLeftAction : NonShiftedSpecialKeyHandler(), ComplicatedKeysActi
     editor: VimEditor,
     caret: ImmutableVimCaret,
     context: ExecutionContext,
-    count: Int,
-    rawCount: Int,
     argument: Argument?,
+    operatorArguments: OperatorArguments
   ): Motion {
-    return injector.motion.getOffsetOfHorizontalMotion(editor, caret, -count, false).toMotionOrError()
+    val allowWrap = injector.options(editor).hasValue(OptionConstants.whichwrap, "<")
+    val allowEnd = operatorArguments.isOperatorPending // d<Left> deletes \n with wrap enabled
+    return injector.motion.getOffsetOfHorizontalMotion(editor, caret, -operatorArguments.count1, allowEnd, allowWrap)
   }
 }

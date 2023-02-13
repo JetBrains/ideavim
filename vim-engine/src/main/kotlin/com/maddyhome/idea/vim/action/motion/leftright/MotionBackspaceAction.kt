@@ -10,16 +10,16 @@ package com.maddyhome.idea.vim.action.motion.leftright
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
-import com.maddyhome.idea.vim.handler.toMotionOrError
-import kotlin.math.max
-import kotlin.math.min
+import com.maddyhome.idea.vim.options.OptionConstants
 
-class MotionLeftWrapAction : MotionActionHandler.ForEachCaret() {
+class MotionBackspaceAction : MotionActionHandler.ForEachCaret() {
   override fun getOffset(
     editor: VimEditor,
     caret: ImmutableVimCaret,
@@ -27,14 +27,14 @@ class MotionLeftWrapAction : MotionActionHandler.ForEachCaret() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    val moveCaretHorizontalWrap = moveCaretHorizontalWrap(editor, caret, -operatorArguments.count1)
-    return if (moveCaretHorizontalWrap < 0) Motion.Error else Motion.AbsoluteOffset(moveCaretHorizontalWrap)
+    val allowWrap = injector.options(editor).hasValue(OptionConstants.whichwrap, "b")
+    return injector.motion.getOffsetOfHorizontalMotion(editor, caret, -operatorArguments.count1, allowPastEnd = false, allowWrap)
   }
 
   override val motionType: MotionType = MotionType.EXCLUSIVE
 }
 
-class MotionRightWrapAction : MotionActionHandler.ForEachCaret() {
+class MotionSpaceAction : MotionActionHandler.ForEachCaret() {
   override fun getOffset(
     editor: VimEditor,
     caret: ImmutableVimCaret,
@@ -42,19 +42,9 @@ class MotionRightWrapAction : MotionActionHandler.ForEachCaret() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    return moveCaretHorizontalWrap(editor, caret, operatorArguments.count1).toMotionOrError()
+    val allowWrap = injector.options(editor).hasValue(OptionConstants.whichwrap, "s")
+    return injector.motion.getOffsetOfHorizontalMotion(editor, caret, operatorArguments.count1, allowPastEnd = false, allowWrap)
   }
 
   override val motionType: MotionType = MotionType.EXCLUSIVE
-}
-
-fun moveCaretHorizontalWrap(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Int {
-  // FIX - allows cursor over newlines
-  val oldOffset = caret.offset.point
-  val offset = min(max(0, caret.offset.point + count), editor.fileSize().toInt())
-  return if (offset == oldOffset) {
-    -1
-  } else {
-    offset
-  }
 }

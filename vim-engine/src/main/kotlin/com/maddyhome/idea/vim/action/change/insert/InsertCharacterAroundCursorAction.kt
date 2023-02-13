@@ -14,6 +14,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimVisualPosition
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.lineLength
+import com.maddyhome.idea.vim.api.moveToMotion
 import com.maddyhome.idea.vim.api.visualLineToBufferLine
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
@@ -71,7 +72,7 @@ private fun insertCharacterAroundCursor(editor: VimEditor, caret: VimCaret, dir:
     if (offset < charsSequence.length) {
       val ch = charsSequence[offset]
       (editor as MutableVimEditor).insertText(caret.offset, ch.toString())
-      caret.moveToOffset(injector.motion.getOffsetOfHorizontalMotion(editor, caret, 1, true))
+      caret.moveToMotion(injector.motion.getOffsetOfHorizontalMotion(editor, caret, 1, true))
       res = true
     }
   }

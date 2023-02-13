@@ -15,6 +15,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.moveToMotion
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.command.VimStateMachine
@@ -342,7 +343,7 @@ private class TestExtension : VimExtension {
       VimPlugin.getVisualMotion().enterVisualMode(editor, VimStateMachine.SubMode.VISUAL_CHARACTER)
       val caret = editor.ij.caretModel.currentCaret
       val newOffset = VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret.vim, 5, editor.isEndAllowed)
-      caret.vim.moveToOffset(newOffset)
+      caret.vim.moveToMotion(newOffset)
     }
   }
 
@@ -371,7 +372,7 @@ private class TestExtension : VimExtension {
     override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
       val caret = editor.ij.caretModel.currentCaret
       val newOffset = VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret.vim, 1, true)
-      caret.vim.moveToOffset(newOffset)
+      caret.vim.moveToMotion(newOffset)
     }
   }
 

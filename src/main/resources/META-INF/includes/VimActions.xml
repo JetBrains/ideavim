@@ -24,13 +24,13 @@
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionLastNonSpaceAction" mappingModes="NXO" keys="g_"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionLeftAction" mappingModes="NXO" keys="h"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionLeftInsertModeAction" mappingModes="I"/>
-    <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionLeftWrapAction" mappingModes="NXO" keys="«BS»,«C-H»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionBackspaceAction" mappingModes="NXO" keys="«BS»,«C-H»"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionLeftMatchCharAction" mappingModes="NXO" keys="F"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionLeftTillMatchCharAction" mappingModes="NXO" keys="T"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionMiddleColumnAction" mappingModes="NXO" keys="gm"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionRightAction" mappingModes="NXO" keys="l"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionRightInsertAction" mappingModes="I"/>
-    <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionRightWrapAction" mappingModes="NXO" keys=" "/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionSpaceAction" mappingModes="NXO" keys=" "/>
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionRightMatchCharAction" mappingModes="NXO" keys="f"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionRightTillMatchCharAction" mappingModes="NXO" keys="t"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionHomeAction" mappingModes="NV" keys="«Home»"/>

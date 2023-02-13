@@ -23,6 +23,7 @@ import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.helper.isEndAllowedIgnoringOnemore
 import com.maddyhome.idea.vim.helper.mode
 import kotlin.math.abs
+import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sign
 
@@ -107,7 +108,8 @@ abstract class VimMotionGroupBase : VimMotionGroup {
     caret: ImmutableVimCaret,
     count: Int,
     allowPastEnd: Boolean,
-  ): Int {
+    allowWrap: Boolean,
+  ): Motion {
     val oldOffset = caret.offset.point
     var diff = 0
     val text = editor.text()
@@ -121,10 +123,19 @@ abstract class VimMotionGroupBase : VimMotionGroup {
         1
       }
     }
-    val offset = editor
-      .normalizeOffset(caret.getLine().line, oldOffset + (sign * diff), allowPastEnd)
+    val offset = if (allowWrap) {
+      var newOffset = oldOffset + sign * diff
+      val oldLine = editor.offsetToBufferPosition(oldOffset).line
+      val newLine = editor.offsetToBufferPosition(newOffset).line
+      if (!allowPastEnd && count > 0 && oldLine == newLine && newOffset == editor.getLineEndForOffset(newOffset)) {
+        ++newOffset // here we skip the /n char and move caret one char forward
+      }
+      editor.normalizeOffset(newOffset, allowPastEnd)
+    } else {
+      editor.normalizeOffset(caret.getLine().line, oldOffset + (sign * diff), allowPastEnd)
+    }
 
-    return if (offset == oldOffset) -1 else offset
+    return offset.toMotionOrError()
   }
 
   override fun moveCaretToRelativeLineStartSkipLeading(

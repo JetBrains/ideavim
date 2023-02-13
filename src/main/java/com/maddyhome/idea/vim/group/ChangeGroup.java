@@ -40,6 +40,7 @@ import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.ranges.LineRange;
 import com.maddyhome.idea.vim.group.visual.VimSelection;
 import com.maddyhome.idea.vim.group.visual.VisualModeHelperKt;
+import com.maddyhome.idea.vim.handler.Motion;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.icons.VimIcons;
 import com.maddyhome.idea.vim.key.KeyHandlerKeeper;
@@ -49,6 +50,8 @@ import com.maddyhome.idea.vim.newapi.IjExecutionContextKt;
 import com.maddyhome.idea.vim.newapi.IjVimCaret;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.options.OptionConstants;
+import com.maddyhome.idea.vim.options.OptionScope;
+import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import kotlin.Pair;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function0;
@@ -168,12 +171,17 @@ public class ChangeGroup extends VimChangeGroupBase {
    */
   @Override
   public boolean changeCaseToggleCharacter(@NotNull VimEditor editor, @NotNull VimCaret caret, int count) {
-    final int offset = injector.getMotion().getOffsetOfHorizontalMotion(editor, caret, count, true);
-    if (offset == -1) {
-      return false;
+    boolean allowWrap = injector.getOptionService().getValues(new OptionScope.LOCAL(editor), OptionConstants.whichwrap).contains("~");
+    
+    Motion motion = injector.getMotion().getOffsetOfHorizontalMotion(editor, caret, count, true, allowWrap);
+    if (motion instanceof Motion.Error) return false;
+    
+    changeCase(editor, caret, caret.getOffset().getPoint(), ((Motion.AbsoluteOffset)motion).getOffset(), CharacterHelper.CASE_TOGGLE);
+    
+    motion = injector.getMotion().getOffsetOfHorizontalMotion(editor, caret, count, false, allowWrap); // same but without allow end because we can change till end, but can't move caret there
+    if (motion instanceof Motion.AbsoluteOffset) {
+      caret.moveToOffset(EngineEditorHelperKt.normalizeOffset(editor, ((Motion.AbsoluteOffset)motion).getOffset(), false));
     }
-    changeCase(editor, caret, caret.getOffset().getPoint(), offset, CharacterHelper.CASE_TOGGLE);
-    caret.moveToOffset(EngineEditorHelperKt.normalizeOffset(editor, offset, false));
     return true;
   }
 

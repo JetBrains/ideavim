@@ -16,6 +16,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.MotionType
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.NonShiftedSpecialKeyHandler
 import com.maddyhome.idea.vim.helper.inInsertMode
@@ -30,9 +31,8 @@ class MotionEndAction : NonShiftedSpecialKeyHandler() {
     editor: VimEditor,
     caret: ImmutableVimCaret,
     context: ExecutionContext,
-    count: Int,
-    rawCount: Int,
     argument: Argument?,
+    operatorArguments: OperatorArguments
   ): Motion {
     var allow = false
     if (editor.inInsertMode) {
@@ -41,7 +41,7 @@ class MotionEndAction : NonShiftedSpecialKeyHandler() {
       allow = !injector.options(editor).hasValue(OptionConstants.selection, "old")
     }
 
-    val offset = injector.motion.moveCaretToRelativeLineEnd(editor, caret, count - 1, allow)
+    val offset = injector.motion.moveCaretToRelativeLineEnd(editor, caret, operatorArguments.count1 - 1, allow)
     return Motion.AdjustedOffset(offset, VimMotionGroupBase.LAST_COLUMN)
   }
 }

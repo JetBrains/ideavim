@@ -52,7 +52,7 @@ class SelectMotionRightAction : MotionActionHandler.ForEachCaret() {
       }
       return caret.offset.point.toMotion()
     }
-    return injector.motion.getOffsetOfHorizontalMotion(editor, caret, operatorArguments.count1, false).toMotionOrError()
+    return injector.motion.getOffsetOfHorizontalMotion(editor, caret, operatorArguments.count1, false)
   }
 
   companion object {

@@ -12,6 +12,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.moveToMotion
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.command.VimStateMachine
@@ -41,7 +42,7 @@ class ResetModeAction : VimActionHandler.ConditionalMulticaret() {
   ): Boolean {
     if (modeBeforeReset == VimStateMachine.Mode.INSERT) {
       val position = injector.motion.getOffsetOfHorizontalMotion(editor, caret, -1, false)
-      caret.moveToOffset(position)
+      caret.moveToMotion(position)
     }
     return true
   }

@@ -10,8 +10,10 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.leftright
 
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.options.OptionScope
 import org.jetbrains.plugins.ideavim.OptionValueType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -276,5 +278,95 @@ class MotionRightActionTest : VimOptionTestCase(OptionConstants.virtualedit) {
       """.trimIndent(),
       VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_BLOCK
     )
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @VimOptionDefaultAll
+  fun `test whichwrap in the same line`() {
+    injector.optionService.setOptionValue(OptionScope.GLOBAL, OptionConstants.whichwrap, "l")
+    doTest(
+      listOf("l"),
+      """
+          Oh, hi M${c}ark
+        """.trimIndent(),
+      """
+          Oh, hi Ma${c}rk
+        """.trimIndent(),
+    )
+    injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @VimOptionDefaultAll
+  fun `test whichwrap at file end`() {
+    injector.optionService.setOptionValue(OptionScope.GLOBAL, OptionConstants.whichwrap, "l")
+    doTest(
+      listOf("l"),
+      """
+          Oh, hi Mar${c}k
+        """.trimIndent(),
+      """
+          Oh, hi Mar${c}k
+        """.trimIndent(),
+    )
+    injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @VimOptionDefaultAll
+  fun `test whichwrap to next line`() {
+    injector.optionService.setOptionValue(OptionScope.GLOBAL, OptionConstants.whichwrap, "l")
+    doTest(
+      listOf("l"),
+      """
+          Oh, hi Mar${c}k
+          You are my favourite customer
+        """.trimIndent(),
+      """
+          Oh, hi Mark
+          ${c}You are my favourite customer
+        """.trimIndent(),
+    )
+    injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @VimOptionDefaultAll
+  fun `test from empty line to empty line`() {
+    injector.optionService.setOptionValue(OptionScope.GLOBAL, OptionConstants.whichwrap, "l")
+    doTest(
+      listOf("l"),
+      """
+          Oh, hi Mark
+          ${c}
+
+          You are my favourite customer
+        """.trimIndent(),
+      """
+          Oh, hi Mark
+
+          ${c}
+          You are my favourite customer
+        """.trimIndent(),
+    )
+    injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
+  }
+  
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @VimOptionDefaultAll
+  fun `test d command with whichwrap`() {
+    injector.optionService.setOptionValue(OptionScope.GLOBAL, OptionConstants.whichwrap, "h")
+    doTest(
+      listOf("dl"),
+      """
+          Oh, hi Mar${c}k
+          You are my favourite customer
+        """.trimIndent(),
+      """
+          Oh, hi Ma${c}r
+          You are my favourite customer
+        """.trimIndent(),
+    )
+    injector.optionService.resetDefault(OptionScope.GLOBAL, OptionConstants.whichwrap)
   }
 }

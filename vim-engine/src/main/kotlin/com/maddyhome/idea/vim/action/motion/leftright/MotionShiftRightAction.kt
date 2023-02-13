@@ -12,6 +12,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.moveToMotion
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.ShiftedArrowKeyHandler
@@ -26,7 +27,7 @@ class MotionShiftRightAction : ShiftedArrowKeyHandler(true) {
 
   override fun motionWithKeyModel(editor: VimEditor, caret: VimCaret, context: ExecutionContext, cmd: Command) {
     val vertical = injector.motion.getOffsetOfHorizontalMotion(editor, caret, cmd.count, true)
-    caret.moveToOffset(vertical)
+    caret.moveToMotion(vertical)
   }
 
   override fun motionWithoutKeyModel(editor: VimEditor, context: ExecutionContext, cmd: Command) {

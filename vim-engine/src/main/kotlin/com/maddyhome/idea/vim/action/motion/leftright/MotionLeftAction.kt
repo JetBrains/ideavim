@@ -13,11 +13,13 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
+import com.maddyhome.idea.vim.options.OptionConstants
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
@@ -31,9 +33,9 @@ class MotionLeftAction : MotionActionHandler.ForEachCaret() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    val offsetOfHorizontalMotion =
-      injector.motion.getOffsetOfHorizontalMotion(editor, caret, -operatorArguments.count1, false)
-    return if (offsetOfHorizontalMotion < 0) Motion.Error else Motion.AbsoluteOffset(offsetOfHorizontalMotion)
+    val allowWrap = injector.options(editor).hasValue(OptionConstants.whichwrap, "h")
+    val allowEnd = operatorArguments.isOperatorPending // dh deletes \n with wrap enabled
+    return injector.motion.getOffsetOfHorizontalMotion(editor, caret, -operatorArguments.count1, allowEnd, allowWrap)
   }
 }
 
@@ -52,8 +54,7 @@ class MotionLeftInsertModeAction : MotionActionHandler.ForEachCaret(), Complicat
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    val offsetOfHorizontalMotion =
-      injector.motion.getOffsetOfHorizontalMotion(editor, caret, -operatorArguments.count1, false)
-    return if (offsetOfHorizontalMotion < 0) Motion.Error else Motion.AbsoluteOffset(offsetOfHorizontalMotion)
+    val allowWrap = injector.options(editor).hasValue(OptionConstants.whichwrap, "[")
+    return injector.motion.getOffsetOfHorizontalMotion(editor, caret, -operatorArguments.count1, true, allowWrap)
   }
 }

@@ -66,6 +66,7 @@ abstract class VimOptionServiceBase : OptionService {
     StringOption(OptionConstants.viminfo, "vi", "'100,<50,s10,h", isList = true),
     StringOption(OptionConstants.virtualedit, "ve", "", isList = false, setOf("onemore", "block", "insert", "all")),
     ToggleOption(OptionConstants.visualbell, "vb", false),
+    StringOption(OptionConstants.whichwrap, "ww", "b,s", true, setOf("b", "s", "h", "l", "<", ">", "~", "[", "]")),
     ToggleOption(OptionConstants.wrapscan, "ws", true),
 
     // Options with longer defaults or additional validation, sorted by name

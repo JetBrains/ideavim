@@ -99,10 +99,10 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     operatorArguments: OperatorArguments,
   ): Boolean {
     val endOffset = injector.motion.getOffsetOfHorizontalMotion(editor, caret, count, true)
-    if (endOffset != -1) {
+    if (endOffset is AbsoluteOffset) {
       val res = deleteText(
         editor,
-        TextRange(caret.offset.point, endOffset),
+        TextRange(caret.offset.point, endOffset.offset),
         SelectionType.CHARACTER_WISE,
         caret,
         operatorArguments
@@ -296,7 +296,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       } else {
         repeatInsertText(editor, context, count, operatorArguments)
         val position = injector.motion.getOffsetOfHorizontalMotion(editor, caret, -1, false)
-        caret.moveToOffset(position)
+        caret.moveToMotion(position)
       }
     }
     repeatLines = 0
@@ -384,7 +384,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
    */
   override fun insertAfterCursor(editor: VimEditor, context: ExecutionContext) {
     for (caret in editor.nativeCarets()) {
-      caret.moveToOffset(injector.motion.getOffsetOfHorizontalMotion(editor, caret, 1, true))
+      caret.moveToMotion(injector.motion.getOffsetOfHorizontalMotion(editor, caret, 1, true))
     }
     initInsert(editor, context, VimStateMachine.Mode.INSERT)
   }
@@ -664,9 +664,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
         caret.moveToOffset(startOffset)
       } else {
         val pos = injector.motion.getOffsetOfHorizontalMotion(editor, caret, -1, false)
-        if (pos != -1) {
-          caret.moveToOffset(pos)
-        }
+        caret.moveToMotion(pos)
       }
       return res
     }
@@ -1036,7 +1034,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       deleteText(editor, TextRange(caret.offset.point, offset), null, caret, operatorArguments)
       if (spaces && !hasTrailingWhitespace) {
         insertText(editor, caret, " ")
-        caret.moveToOffset(
+        caret.moveToMotion(
           injector.motion.getOffsetOfHorizontalMotion(editor, caret, -1, true)
         )
       }

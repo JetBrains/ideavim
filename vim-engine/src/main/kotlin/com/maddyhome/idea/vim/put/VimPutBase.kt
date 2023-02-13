@@ -21,6 +21,7 @@ import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.isLineEmpty
 import com.maddyhome.idea.vim.api.lineLength
+import com.maddyhome.idea.vim.api.moveToMotion
 import com.maddyhome.idea.vim.api.setChangeMarks
 import com.maddyhome.idea.vim.api.setVisualSelectionMarks
 import com.maddyhome.idea.vim.command.OperatorArguments
@@ -226,7 +227,7 @@ abstract class VimPutBase : VimPut {
     for (possiblyOverlappedCaret in editor.carets()) {
       if (possiblyOverlappedCaret.offset.point != startOffset || possiblyOverlappedCaret == caret) continue
 
-      val updated = possiblyOverlappedCaret.moveToOffset(
+      val updated = possiblyOverlappedCaret.moveToMotion(
         injector.motion.getOffsetOfHorizontalMotion(editor, possiblyOverlappedCaret, 1, true)
       )
       overlappedCarets.add(updated)
@@ -238,7 +239,7 @@ abstract class VimPutBase : VimPut {
     )
 
     for (overlappedCaret in overlappedCarets) {
-      overlappedCaret.moveToOffset(
+      overlappedCaret.moveToMotion(
         injector.motion.getOffsetOfHorizontalMotion(editor, overlappedCaret, -1, true)
       )
     }

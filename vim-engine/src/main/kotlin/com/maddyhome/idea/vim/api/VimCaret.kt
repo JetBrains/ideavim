@@ -16,6 +16,7 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.visual.VisualChange
 import com.maddyhome.idea.vim.group.visual.vimMoveBlockSelectionToOffset
 import com.maddyhome.idea.vim.group.visual.vimMoveSelectionToCaret
+import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.inBlockSubMode
 import com.maddyhome.idea.vim.helper.inSelectMode
@@ -133,6 +134,15 @@ per-caret marks.
 
   var vimInsertStart: LiveRange
   var vimLastVisualOperatorRange: VisualChange?
+}
+
+fun VimCaret.moveToMotion(motion: Motion): VimCaret {
+  return if (motion is Motion.AbsoluteOffset) {
+    this.moveToOffset(motion.offset)
+  } else {
+    // todo what should we do if it is a error motion?
+    this
+  }
 }
 
 interface CaretRegisterStorage {

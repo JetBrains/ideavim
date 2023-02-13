@@ -178,7 +178,7 @@ abstract class NonShiftedSpecialKeyHandler : MotionActionHandler.ForEachCaret() 
       editor.exitVisualMode()
     }
 
-    return motion(editor, caret, context, operatorArguments.count1, operatorArguments.count0, argument)
+    return motion(editor, caret, context, argument, operatorArguments)
   }
 
   /**
@@ -188,8 +188,7 @@ abstract class NonShiftedSpecialKeyHandler : MotionActionHandler.ForEachCaret() 
     editor: VimEditor,
     caret: ImmutableVimCaret,
     context: ExecutionContext,
-    count: Int,
-    rawCount: Int,
     argument: Argument?,
+    operatorArguments: OperatorArguments,
   ): Motion
 }

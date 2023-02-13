@@ -53,7 +53,6 @@ class SelectMotionLeftAction : MotionActionHandler.ForEachCaret() {
       // No return statement, perform motion to left
     }
     return injector.motion.getOffsetOfHorizontalMotion(editor, caret, -operatorArguments.count1, false)
-      .toMotionOrError()
   }
 
   companion object {

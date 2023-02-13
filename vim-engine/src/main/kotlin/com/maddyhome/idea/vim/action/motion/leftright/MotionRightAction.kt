@@ -13,12 +13,19 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotionOrError
+import com.maddyhome.idea.vim.helper.inVisualMode
+import com.maddyhome.idea.vim.helper.isEndAllowed
+import com.maddyhome.idea.vim.helper.mode
+import com.maddyhome.idea.vim.helper.usesVirtualSpace
+import com.maddyhome.idea.vim.options.OptionConstants
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
@@ -32,7 +39,10 @@ class MotionRightAction : MotionActionHandler.ForEachCaret() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    return injector.motion.getOffsetOfHorizontalMotion(editor, caret, operatorArguments.count1, true).toMotionOrError()
+    val allowWrap = injector.options(editor).hasValue(OptionConstants.whichwrap, "l")
+    val allowEnd = usesVirtualSpace || editor.isEndAllowed
+      || operatorArguments.isOperatorPending // because of `dl` removing the last character
+    return injector.motion.getOffsetOfHorizontalMotion(editor, caret, operatorArguments.count1, allowPastEnd = allowEnd, allowWrap)
   }
 }
 
@@ -51,6 +61,7 @@ class MotionRightInsertAction : MotionActionHandler.ForEachCaret(), ComplicatedK
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    return injector.motion.getOffsetOfHorizontalMotion(editor, caret, operatorArguments.count1, true).toMotionOrError()
+    val allowWrap = injector.options(editor).hasValue(OptionConstants.whichwrap, "]")
+    return injector.motion.getOffsetOfHorizontalMotion(editor, caret, operatorArguments.count1, allowPastEnd = true, allowWrap)
   }
 }

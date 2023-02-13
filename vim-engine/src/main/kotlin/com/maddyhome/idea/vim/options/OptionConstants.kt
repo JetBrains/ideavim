@@ -64,6 +64,7 @@ class OptionConstants {
     const val undolevels = "undolevels"
     const val visualbell = "visualbell"
     const val wrapscan = "wrapscan"
+    const val whichwrap = "whichwrap"
     const val viminfo = "viminfo"
 
     const val virtualedit = "virtualedit"

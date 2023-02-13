@@ -11,15 +11,17 @@ package com.maddyhome.idea.vim.api
 import com.maddyhome.idea.vim.action.motion.leftright.TillCharacterMotionType
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.OperatorArguments
+import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.handler.Motion
+import org.jetbrains.annotations.ApiStatus.ScheduledForRemoval
 
 interface VimMotionGroup {
 
   // Note that the following methods require the caret to access the intended vertical position, such as "end of line"
-  fun getOffsetOfHorizontalMotion(editor: VimEditor, caret: ImmutableVimCaret, count: Int, allowPastEnd: Boolean): Int
+  fun getOffsetOfHorizontalMotion(editor: VimEditor, caret: ImmutableVimCaret, count: Int, allowPastEnd: Boolean, allowWrap: Boolean = false): Motion
   fun getVerticalMotionOffset(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Motion
-
+  
   // TODO: Consider naming. These don't move the caret, but calculate offsets. Also consider returning Motion
 
   // Move caret to specific buffer line
