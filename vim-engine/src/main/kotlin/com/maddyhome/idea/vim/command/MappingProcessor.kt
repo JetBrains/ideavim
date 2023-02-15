@@ -115,11 +115,19 @@ object MappingProcessor {
               return@invokeLater
             }
             log.trace("processing unhandled keys...")
-            for (keyStroke in unhandledKeys) {
+            for ((index, keyStroke) in unhandledKeys.withIndex()) {
+
+              // Related issue: VIM-2315
+              // If we have two mappings: for `abc` and for `ab`, after typing `ab` we should wait a bit and execute
+              //   `ab` mapping
+              // So, we rerun all keys with mappings with "mappingsCompleted" for the last char to avoid infinite loop
+              //  of waiting for `abc` mapping.
+              val lastKeyInSequence = index == unhandledKeys.lastIndex
+
               KeyHandler.getInstance().handleKey(
                 editor, keyStroke, injector.executionContextManager.onEditor(editor),
                 allowKeyMappings = true,
-                mappingCompleted = true
+                mappingCompleted = lastKeyInSequence
               )
             }
           }, editor

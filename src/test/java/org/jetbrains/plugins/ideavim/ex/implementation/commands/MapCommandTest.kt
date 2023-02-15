@@ -854,8 +854,8 @@ n  ,f            <Plug>Foo
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
-  fun `ignoretest with shorter conflict`() {
+  // Related issue: VIM-2315
+  fun `test with shorter conflict`() {
     val text = """
           -----
           1${c}2345
