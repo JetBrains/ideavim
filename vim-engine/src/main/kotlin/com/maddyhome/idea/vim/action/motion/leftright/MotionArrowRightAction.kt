@@ -19,6 +19,7 @@ import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.NonShiftedSpecialKeyHandler
+import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.helper.usesVirtualSpace
 import com.maddyhome.idea.vim.options.OptionConstants
 import java.awt.event.KeyEvent
