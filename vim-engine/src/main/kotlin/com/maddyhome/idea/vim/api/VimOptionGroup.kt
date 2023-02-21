@@ -176,11 +176,6 @@ interface VimOptionGroup {
   fun getOptions(): Set<String>
 
   /**
-   * @return list of all option abbreviations
-   */
-  fun getAbbrevs(): Set<String>
-
-  /**
    * Adds the option.
    * @param option option
    */

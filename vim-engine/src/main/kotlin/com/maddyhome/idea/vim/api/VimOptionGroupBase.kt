@@ -326,10 +326,6 @@ abstract class VimOptionGroupBase : VimOptionGroup {
     return options.primaryKeys
   }
 
-  override fun getAbbrevs(): Set<String> {
-    return options.secondaryKeys
-  }
-
   override fun addOption(option: Option<out VimDataType>) {
     options.put(option.name, option.abbrev, option)
   }
@@ -411,5 +407,4 @@ private class MultikeyMap(vararg entries: Option<out VimDataType>) {
   }
 
   val primaryKeys get() = primaryKeyStorage.keys
-  val secondaryKeys get() = secondaryKeyStorage.keys
 }
