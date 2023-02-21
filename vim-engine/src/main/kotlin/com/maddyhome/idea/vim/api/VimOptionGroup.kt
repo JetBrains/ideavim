@@ -114,10 +114,9 @@ interface VimOptionGroup {
    *
    * @param scope global/local option scope
    * @param optionName option name or alias
-   * @param commandArgumentText the text of the command argument typed by the user. Used in exception messages
-   * @throws ExException("E518: Unknown option: $token") in case the option is not found
+   * @throws ExException("E518: Unknown option: $optionName") in case the option is not found
    */
-  fun isDefault(scope: OptionScope, optionName: String, commandArgumentText: String): Boolean
+  fun isDefault(scope: OptionScope, optionName: String): Boolean
 
   /**
    * Resets option's value to default.

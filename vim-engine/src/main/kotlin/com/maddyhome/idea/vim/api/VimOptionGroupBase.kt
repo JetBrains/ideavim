@@ -272,9 +272,9 @@ abstract class VimOptionGroupBase : VimOptionGroup {
     }
   }
 
-  override fun isDefault(scope: OptionScope, optionName: String, commandArgumentText: String): Boolean {
-    val defaultValue = options.get(optionName)?.getDefaultValue() ?: throw ExException("E518: Unknown option: $commandArgumentText")
-    return getOptionValue(scope, optionName, commandArgumentText) == defaultValue
+  override fun isDefault(scope: OptionScope, optionName: String): Boolean {
+    val defaultValue = options.get(optionName)?.getDefaultValue() ?: throw ExException("E518: Unknown option: $optionName")
+    return getOptionValue(scope, optionName, optionName) == defaultValue
   }
 
   override fun resetDefault(scope: OptionScope, optionName: String, commandArgumentText: String) {
