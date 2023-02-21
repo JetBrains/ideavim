@@ -204,7 +204,7 @@ interface VimOptionGroup {
   /**
    * Get the [Option] by its name or abbreviation
    */
-  fun getOptionByNameOrAbbr(key: String): Option<out VimDataType>?
+  fun getOption(key: String): Option<out VimDataType>?
 
   /**
    * Return an accessor class to easily retrieve options values

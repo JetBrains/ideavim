@@ -124,7 +124,7 @@ fun parseOptionLine(editor: VimEditor, args: String, scope: OptionScope, failOnB
         }
         // No operator so only the option name was given
         if (eq == -1) {
-          val option = optionService.getOptionByNameOrAbbr(token)
+          val option = optionService.getOption(token)
           when (option) {
             null -> error = Msg.unkopt
             is ToggleOption -> optionService.setOption(scope, token, token)
@@ -176,7 +176,7 @@ private fun showOptions(editor: VimEditor, nameAndToken: Collection<Pair<String,
   val optionsToShow = mutableListOf<String>()
   var unknownOption: Pair<String, String>? = null
   for (pair in nameAndToken) {
-    val myOption = optionService.getOptionByNameOrAbbr(pair.first)
+    val myOption = optionService.getOption(pair.first)
     if (myOption != null) {
       optionsToShow.add(myOption.name)
     } else {
