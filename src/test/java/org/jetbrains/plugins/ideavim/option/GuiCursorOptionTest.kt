@@ -28,7 +28,7 @@ class GuiCursorOptionTest : VimTestCase() {
   }
 
   private fun assertHasDefaultValue() {
-    val defaultValue = VimPlugin.getOptionGroup().getOptionByNameOrAbbr(OptionConstants.guicursor)!!.getDefaultValue().asString()
+    val defaultValue = VimPlugin.getOptionGroup().getOption(OptionConstants.guicursor)!!.getDefaultValue().asString()
     assertEquals(defaultValue, optionsNoEditor().getStringValue(OptionConstants.guicursor))
   }
 

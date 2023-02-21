@@ -345,7 +345,7 @@ abstract class VimOptionGroupBase : VimOptionGroup {
     options.get(optionName)!!.removeOptionChangeListener(listener)
   }
 
-  override fun getOptionByNameOrAbbr(key: String): Option<out VimDataType>? {
+  override fun getOption(key: String): Option<out VimDataType>? {
     return options.get(key)
   }
 
