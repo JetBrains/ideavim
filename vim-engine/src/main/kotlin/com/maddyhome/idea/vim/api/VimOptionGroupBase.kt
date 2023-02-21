@@ -100,7 +100,7 @@ abstract class VimOptionGroupBase : VimOptionGroup {
           injector.messages.indicateError()
           injector.messages.showStatusBarMessage(editor = null, "Failed to parse iskeyword option value")
         }
-        return result ?: split(getDefaultValue().value)
+        return result ?: split(defaultValue.value)
       }
     },
     StringOption(
@@ -145,30 +145,32 @@ abstract class VimOptionGroupBase : VimOptionGroup {
       )
     ),
     object : StringOption(OptionConstants.shellcmdflag, "shcf", "") {
-      // default value changes if so does the "shell" option
-      override fun getDefaultValue(): VimString {
-        val shell = (getGlobalOptionValue(OptionConstants.shell) as VimString).value
-        return VimString(
-          when {
-            injector.systemInfoService.isWindows && shell.contains("powershell") -> "-Command"
-            injector.systemInfoService.isWindows && !shell.contains("sh") -> "/c"
-            else -> "-c"
-          }
-        )
-      }
+      override val defaultValue: VimString
+        get() {
+          // Default value depends on the "shell" option
+          val shell = (getGlobalOptionValue(OptionConstants.shell) as VimString).value
+          return VimString(
+            when {
+              injector.systemInfoService.isWindows && shell.contains("powershell") -> "-Command"
+              injector.systemInfoService.isWindows && !shell.contains("sh") -> "/c"
+              else -> "-c"
+            }
+          )
+        }
     },
     object : StringOption(OptionConstants.shellxquote, "sxq", "") {
-      // default value changes if so does the "shell" option
-      override fun getDefaultValue(): VimString {
-        val shell = (getGlobalOptionValue(OptionConstants.shell) as VimString).value
-        return VimString(
-          when {
-            injector.systemInfoService.isWindows && shell == "cmd.exe" -> "("
-            injector.systemInfoService.isWindows && shell.contains("sh") -> "\""
-            else -> ""
-          }
-        )
-      }
+      override val defaultValue: VimString
+        get() {
+          // Default value depends on the "shell" option
+          val shell = (getGlobalOptionValue(OptionConstants.shell) as VimString).value
+          return VimString(
+            when {
+              injector.systemInfoService.isWindows && shell == "cmd.exe" -> "("
+              injector.systemInfoService.isWindows && shell.contains("sh") -> "\""
+              else -> ""
+            }
+          )
+        }
     },
 
     // IdeaVim specific options. Put any editor/IDE specific options in IjVimOptionService
@@ -229,7 +231,7 @@ abstract class VimOptionGroupBase : VimOptionGroup {
 
   private fun getGlobalOptionValue(optionName: String): VimDataType? {
     val option = options.get(optionName) ?: return null
-    return globalValues[option.name] ?: options.get(option.name)?.getDefaultValue()
+    return globalValues[option.name] ?: options.get(option.name)?.defaultValue
   }
 
   private fun getLocalOptionValue(optionName: String, editor: VimEditor): VimDataType? {
@@ -273,13 +275,13 @@ abstract class VimOptionGroupBase : VimOptionGroup {
   }
 
   override fun isDefault(scope: OptionScope, optionName: String): Boolean {
-    val defaultValue = options.get(optionName)?.getDefaultValue() ?: throw ExException("E518: Unknown option: $optionName")
+    val defaultValue = options.get(optionName)?.defaultValue ?: throw ExException("E518: Unknown option: $optionName")
     return getOptionValue(scope, optionName, optionName) == defaultValue
   }
 
   override fun resetDefault(scope: OptionScope, optionName: String, commandArgumentText: String) {
     val option = options.get(optionName) ?: throw ExException("E518: Unknown option: $commandArgumentText")
-    setOptionValue(scope, optionName, option.getDefaultValue(), commandArgumentText)
+    setOptionValue(scope, optionName, option.defaultValue, commandArgumentText)
   }
 
   override fun getOptionValue(scope: OptionScope, optionName: String, commandArgumentText: String): VimDataType {
