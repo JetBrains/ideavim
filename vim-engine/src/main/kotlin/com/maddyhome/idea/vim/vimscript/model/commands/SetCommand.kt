@@ -13,6 +13,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.Msg
 import com.maddyhome.idea.vim.options.OptionScope
@@ -235,7 +236,7 @@ private fun showOptions(editor: VimEditor, nameAndToken: Collection<Pair<String,
   injector.exOutputPanel.getPanel(editor).output(res.toString())
 
   if (unknownOption != null) {
-    throw ExException("E518: Unknown option: ${unknownOption.second}")
+    throw exExceptionMessage("E518", unknownOption.second)
   }
 }
 

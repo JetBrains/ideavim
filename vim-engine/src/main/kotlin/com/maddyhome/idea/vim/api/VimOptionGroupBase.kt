@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.options.NumberOption
 import com.maddyhome.idea.vim.options.Option
 import com.maddyhome.idea.vim.options.OptionChangeListener
@@ -89,7 +90,7 @@ abstract class VimOptionGroupBase : VimOptionGroup {
       override fun checkIfValueValid(value: VimDataType, token: String) {
         super.checkIfValueValid(value, token)
         if (KeywordOptionHelper.isValueInvalid((value as VimString).value)) {
-          throw ExException("E474: Invalid argument: $token")
+          throw exExceptionMessage("E474", token)
         }
       }
 
@@ -122,7 +123,7 @@ abstract class VimOptionGroupBase : VimOptionGroup {
         super.checkIfValueValid(value, token)
         for (v in split((value as VimString).value)) {
           if (!v.matches(Regex(".:."))) {
-            throw ExException("E474: Invalid argument: $token")
+            throw exExceptionMessage("E474", token)
           }
         }
       }
@@ -181,7 +182,7 @@ abstract class VimOptionGroupBase : VimOptionGroup {
   )
 
   override fun setOptionValue(scope: OptionScope, optionName: String, value: VimDataType, commandArgumentText: String) {
-    val option = options.get(optionName) ?: throw ExException("E518: Unknown option: $commandArgumentText")
+    val option = options.get(optionName) ?: throw exExceptionMessage("E518", commandArgumentText)
     option.checkIfValueValid(value, commandArgumentText)
     val oldValue = getOptionValue(scope, optionName, commandArgumentText)
     when (scope) {
@@ -243,9 +244,9 @@ abstract class VimOptionGroupBase : VimOptionGroup {
    * Sets the option on (true)
    */
   override fun setOption(scope: OptionScope, optionName: String, commandArgumentText: String) {
-    val option = options.get(optionName) ?: throw ExException("E518: Unknown option: $commandArgumentText")
+    val option = options.get(optionName) ?: throw exExceptionMessage("E518", commandArgumentText)
     if (option !is ToggleOption) {
-      throw ExException("E474: Invalid argument: $commandArgumentText")
+      throw exExceptionMessage("E474", commandArgumentText)
     }
     setOptionValue(scope, optionName, VimInt.ONE, commandArgumentText)
   }
@@ -254,17 +255,17 @@ abstract class VimOptionGroupBase : VimOptionGroup {
    * Unsets the option (false)
    */
   override fun unsetOption(scope: OptionScope, optionName: String, commandArgumentText: String) {
-    val option = options.get(optionName) ?: throw ExException("E518: Unknown option: $commandArgumentText")
+    val option = options.get(optionName) ?: throw exExceptionMessage("E518", commandArgumentText)
     if (option !is ToggleOption) {
-      throw ExException("E474: Invalid argument: $commandArgumentText")
+      throw exExceptionMessage("E474", commandArgumentText)
     }
     setOptionValue(scope, optionName, VimInt.ZERO, commandArgumentText)
   }
 
   override fun toggleOption(scope: OptionScope, optionName: String, commandArgumentText: String) {
-    val option = options.get(optionName) ?: throw ExException("E518: Unknown option: $commandArgumentText")
+    val option = options.get(optionName) ?: throw exExceptionMessage("E518", commandArgumentText)
     if (option !is ToggleOption) {
-      throw ExException("E474: Invalid argument: $commandArgumentText")
+      throw exExceptionMessage("E474", commandArgumentText)
     }
     val optionValue = getOptionValue(scope, optionName, commandArgumentText)
     if (optionValue.asBoolean()) {
@@ -275,12 +276,12 @@ abstract class VimOptionGroupBase : VimOptionGroup {
   }
 
   override fun isDefault(scope: OptionScope, optionName: String): Boolean {
-    val defaultValue = options.get(optionName)?.defaultValue ?: throw ExException("E518: Unknown option: $optionName")
+    val defaultValue = options.get(optionName)?.defaultValue ?: throw exExceptionMessage("E518", optionName)
     return getOptionValue(scope, optionName, optionName) == defaultValue
   }
 
   override fun resetDefault(scope: OptionScope, optionName: String, commandArgumentText: String) {
-    val option = options.get(optionName) ?: throw ExException("E518: Unknown option: $commandArgumentText")
+    val option = options.get(optionName) ?: throw exExceptionMessage("E518", commandArgumentText)
     setOptionValue(scope, optionName, option.defaultValue, commandArgumentText)
   }
 
@@ -290,25 +291,25 @@ abstract class VimOptionGroupBase : VimOptionGroup {
         getLocalOptionValue(optionName, scope.editor)
       }
       is OptionScope.GLOBAL -> getGlobalOptionValue(optionName)
-    } ?: throw ExException("E518: Unknown option: $commandArgumentText")
+    } ?: throw exExceptionMessage("E518", commandArgumentText)
   }
 
   override fun appendValue(scope: OptionScope, optionName: String, value: String, commandArgumentText: String) {
-    val option = options.get(optionName) ?: throw ExException("E518: Unknown option: $commandArgumentText")
+    val option = options.get(optionName) ?: throw exExceptionMessage("E518", commandArgumentText)
     val currentValue = getOptionValue(scope, optionName, commandArgumentText)
     val newValue = option.getValueIfAppend(currentValue, value, commandArgumentText)
     setOptionValue(scope, optionName, newValue, commandArgumentText)
   }
 
   override fun prependValue(scope: OptionScope, optionName: String, value: String, commandArgumentText: String) {
-    val option = options.get(optionName) ?: throw ExException("E518: Unknown option: $commandArgumentText")
+    val option = options.get(optionName) ?: throw exExceptionMessage("E518", commandArgumentText)
     val currentValue = getOptionValue(scope, optionName, commandArgumentText)
     val newValue = option.getValueIfPrepend(currentValue, value, commandArgumentText)
     setOptionValue(scope, optionName, newValue, commandArgumentText)
   }
 
   override fun removeValue(scope: OptionScope, optionName: String, value: String, commandArgumentText: String) {
-    val option = options.get(optionName) ?: throw ExException("E518: Unknown option: $commandArgumentText")
+    val option = options.get(optionName) ?: throw exExceptionMessage("E518", commandArgumentText)
     val currentValue = getOptionValue(scope, optionName, commandArgumentText)
     val newValue = option.getValueIfRemove(currentValue, value, commandArgumentText)
     setOptionValue(scope, optionName, newValue, commandArgumentText)
@@ -364,10 +365,10 @@ abstract class VimOptionGroupBase : VimOptionGroup {
   }
 
   private fun castToVimDataType(value: String, optionName: String, token: String): VimDataType {
-    val option = options.get(optionName) ?: throw ExException("E518: Unknown option: $token")
+    val option = options.get(optionName) ?: throw exExceptionMessage("E518", token)
     return when (option) {
-      is NumberOption -> VimInt(parseNumber(value) ?: throw ExException("E521: Number required after =: $token"))
-      is ToggleOption -> throw ExException("E474: Invalid argument: $token")
+      is NumberOption -> VimInt(parseNumber(value) ?: throw exExceptionMessage("E521", token))
+      is ToggleOption -> throw exExceptionMessage("E474", token)
       is StringOption -> VimString(value)
       /**
        * COMPATIBILITY-LAYER: New branch
