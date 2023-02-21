@@ -16,12 +16,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.parseNumber
 import java.util.*
 
 // Note that we don't want a sealed hierarchy, so we can add options with custom validation
-abstract class Option<T : VimDataType>(val name: String, val abbrev: String, private val defaultValue: T) {
-
-  open fun getDefaultValue(): T {
-    return defaultValue
-  }
-
+abstract class Option<T : VimDataType>(val name: String, val abbrev: String, open val defaultValue: T) {
   private val listeners = mutableSetOf<OptionChangeListener<VimDataType>>()
 
   open fun addOptionChangeListener(listener: OptionChangeListener<VimDataType>) {
