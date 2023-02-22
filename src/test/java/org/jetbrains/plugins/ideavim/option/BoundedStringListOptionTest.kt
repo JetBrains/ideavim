@@ -8,7 +8,11 @@
 
 package org.jetbrains.plugins.ideavim.option
 
+import com.maddyhome.idea.vim.api.appendValue
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.prependValue
+import com.maddyhome.idea.vim.api.removeValue
+import com.maddyhome.idea.vim.api.setOptionValue
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.options.OptionScope.GLOBAL
 import com.maddyhome.idea.vim.options.StringOption

@@ -9,6 +9,8 @@
 package org.jetbrains.plugins.ideavim.option
 
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.appendValue
+import com.maddyhome.idea.vim.api.setOptionValue
 import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope

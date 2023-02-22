@@ -8,7 +8,9 @@
 
 package org.jetbrains.plugins.ideavim.option
 
+import com.maddyhome.idea.vim.api.appendValue
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.prependValue
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.options.StringOption
 import org.jetbrains.plugins.ideavim.SkipNeovimReason

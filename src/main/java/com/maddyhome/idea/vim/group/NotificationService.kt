@@ -29,6 +29,9 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.SystemInfo
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.appendValue
+import com.maddyhome.idea.vim.api.setOption
+import com.maddyhome.idea.vim.api.unsetOption
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo

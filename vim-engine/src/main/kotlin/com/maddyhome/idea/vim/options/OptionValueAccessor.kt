@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.options
 
 import com.maddyhome.idea.vim.api.VimOptionGroup
+import com.maddyhome.idea.vim.api.getOptionValue
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 
 /**

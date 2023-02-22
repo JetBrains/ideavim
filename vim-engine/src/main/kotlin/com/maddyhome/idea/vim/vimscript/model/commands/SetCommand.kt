@@ -10,7 +10,16 @@ package com.maddyhome.idea.vim.vimscript.model.commands
 
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.appendValue
+import com.maddyhome.idea.vim.api.getOptionValue
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.prependValue
+import com.maddyhome.idea.vim.api.removeValue
+import com.maddyhome.idea.vim.api.resetDefault
+import com.maddyhome.idea.vim.api.setOption
+import com.maddyhome.idea.vim.api.setOptionValue
+import com.maddyhome.idea.vim.api.toggleOption
+import com.maddyhome.idea.vim.api.unsetOption
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.exExceptionMessage

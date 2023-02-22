@@ -8,8 +8,10 @@
 
 package com.maddyhome.idea.vim.options.helpers
 
+import com.maddyhome.idea.vim.api.appendValue
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.removeValue
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 

@@ -9,7 +9,9 @@
 package com.maddyhome.idea.vim.vimscript.services
 
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.getOptionValue
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.setOption
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType

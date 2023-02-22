@@ -11,6 +11,7 @@ package com.maddyhome.idea.vim.api
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.exExceptionMessage
+import com.maddyhome.idea.vim.helper.StrictMode
 import com.maddyhome.idea.vim.options.NumberOption
 import com.maddyhome.idea.vim.options.Option
 import com.maddyhome.idea.vim.options.OptionChangeListener
@@ -25,7 +26,6 @@ import com.maddyhome.idea.vim.options.helpers.KeywordOptionHelper
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
-import com.maddyhome.idea.vim.vimscript.model.datatypes.parseNumber
 
 abstract class VimOptionGroupBase : VimOptionGroup {
 
@@ -181,18 +181,30 @@ abstract class VimOptionGroupBase : VimOptionGroup {
     ToggleOption(OptionConstants.ideatracetime, OptionConstants.ideatracetime, false),
   )
 
-  override fun setOptionValue(scope: OptionScope, optionName: String, value: VimDataType, commandArgumentText: String) {
-    val option = options.get(optionName) ?: throw exExceptionMessage("E518", commandArgumentText)
-    option.checkIfValueValid(value, commandArgumentText)
-    val oldValue = getOptionValue(scope, optionName, commandArgumentText)
+
+  override fun getOptionValue(option: Option<out VimDataType>, scope: OptionScope): VimDataType {
+    return when (scope) {
+      is OptionScope.LOCAL -> getLocalOptionValue(option.name, scope.editor) as VimDataType
+      is OptionScope.GLOBAL -> getGlobalOptionValue(option.name) as VimDataType
+    }
+  }
+
+  override fun setOptionValue(option: Option<out VimDataType>, scope: OptionScope, value: VimDataType) {
+    // Should always be called with the correct value type, either because code already knows the option, or because
+    // the :set command has already parsed the incoming string into the correct type
+    StrictMode.assert(option.defaultValue::class == value::class, "Incorrect datatype! Expected ${option.defaultValue::class} got ${value::class}")
+
+    // TODO: Convert this to an assert. The value should already be a valid value
+    option.checkIfValueValid(value, value.asString())
+
+    val oldValue = getOptionValue(option, scope)
     when (scope) {
-      is OptionScope.LOCAL -> {
-        setLocalOptionValue(option.name, value, scope.editor)
-      }
+      is OptionScope.LOCAL -> setLocalOptionValue(option.name, value, scope.editor)
       is OptionScope.GLOBAL -> setGlobalOptionValue(option.name, value)
     }
     option.onChanged(scope, oldValue)
   }
+
 
   override fun contains(scope: OptionScope, optionName: String, value: String): Boolean {
     val option = options.get(optionName) as? StringOption ?: return false
@@ -203,11 +215,6 @@ abstract class VimOptionGroupBase : VimOptionGroup {
     val option = options.get(optionName)
     if (option !is StringOption) return null
     return option.split(getOptionValue(scope, optionName, optionName).asString())
-  }
-
-  override fun setOptionValue(scope: OptionScope, optionName: String, value: String, commandArgumentText: String) {
-    val vimValue: VimDataType = castToVimDataType(value, optionName, commandArgumentText)
-    setOptionValue(scope, optionName, vimValue, commandArgumentText)
   }
 
   private fun setGlobalOptionValue(optionName: String, value: VimDataType) {
@@ -240,79 +247,9 @@ abstract class VimOptionGroupBase : VimOptionGroup {
     return localOptions[optionName] ?: getGlobalOptionValue(optionName)
   }
 
-  /**
-   * Sets the option on (true)
-   */
-  override fun setOption(scope: OptionScope, optionName: String, commandArgumentText: String) {
-    val option = options.get(optionName) ?: throw exExceptionMessage("E518", commandArgumentText)
-    if (option !is ToggleOption) {
-      throw exExceptionMessage("E474", commandArgumentText)
-    }
-    setOptionValue(scope, optionName, VimInt.ONE, commandArgumentText)
-  }
-
-  /**
-   * Unsets the option (false)
-   */
-  override fun unsetOption(scope: OptionScope, optionName: String, commandArgumentText: String) {
-    val option = options.get(optionName) ?: throw exExceptionMessage("E518", commandArgumentText)
-    if (option !is ToggleOption) {
-      throw exExceptionMessage("E474", commandArgumentText)
-    }
-    setOptionValue(scope, optionName, VimInt.ZERO, commandArgumentText)
-  }
-
-  override fun toggleOption(scope: OptionScope, optionName: String, commandArgumentText: String) {
-    val option = options.get(optionName) ?: throw exExceptionMessage("E518", commandArgumentText)
-    if (option !is ToggleOption) {
-      throw exExceptionMessage("E474", commandArgumentText)
-    }
-    val optionValue = getOptionValue(scope, optionName, commandArgumentText)
-    if (optionValue.asBoolean()) {
-      setOptionValue(scope, optionName, VimInt.ZERO, commandArgumentText)
-    } else {
-      setOptionValue(scope, optionName, VimInt.ONE, commandArgumentText)
-    }
-  }
-
   override fun isDefault(scope: OptionScope, optionName: String): Boolean {
     val defaultValue = options.get(optionName)?.defaultValue ?: throw exExceptionMessage("E518", optionName)
     return getOptionValue(scope, optionName, optionName) == defaultValue
-  }
-
-  override fun resetDefault(scope: OptionScope, optionName: String, commandArgumentText: String) {
-    val option = options.get(optionName) ?: throw exExceptionMessage("E518", commandArgumentText)
-    setOptionValue(scope, optionName, option.defaultValue, commandArgumentText)
-  }
-
-  override fun getOptionValue(scope: OptionScope, optionName: String, commandArgumentText: String): VimDataType {
-    return when (scope) {
-      is OptionScope.LOCAL -> {
-        getLocalOptionValue(optionName, scope.editor)
-      }
-      is OptionScope.GLOBAL -> getGlobalOptionValue(optionName)
-    } ?: throw exExceptionMessage("E518", commandArgumentText)
-  }
-
-  override fun appendValue(scope: OptionScope, optionName: String, value: String, commandArgumentText: String) {
-    val option = options.get(optionName) ?: throw exExceptionMessage("E518", commandArgumentText)
-    val currentValue = getOptionValue(scope, optionName, commandArgumentText)
-    val newValue = option.getValueIfAppend(currentValue, value, commandArgumentText)
-    setOptionValue(scope, optionName, newValue, commandArgumentText)
-  }
-
-  override fun prependValue(scope: OptionScope, optionName: String, value: String, commandArgumentText: String) {
-    val option = options.get(optionName) ?: throw exExceptionMessage("E518", commandArgumentText)
-    val currentValue = getOptionValue(scope, optionName, commandArgumentText)
-    val newValue = option.getValueIfPrepend(currentValue, value, commandArgumentText)
-    setOptionValue(scope, optionName, newValue, commandArgumentText)
-  }
-
-  override fun removeValue(scope: OptionScope, optionName: String, value: String, commandArgumentText: String) {
-    val option = options.get(optionName) ?: throw exExceptionMessage("E518", commandArgumentText)
-    val currentValue = getOptionValue(scope, optionName, commandArgumentText)
-    val newValue = option.getValueIfRemove(currentValue, value, commandArgumentText)
-    setOptionValue(scope, optionName, newValue, commandArgumentText)
   }
 
   override fun resetAllOptions() {
@@ -361,20 +298,6 @@ abstract class VimOptionGroupBase : VimOptionGroup {
     } else {
       // Maybe cache in editor's user data?
       OptionValueAccessor(this, OptionScope.LOCAL(editor))
-    }
-  }
-
-  private fun castToVimDataType(value: String, optionName: String, token: String): VimDataType {
-    val option = options.get(optionName) ?: throw exExceptionMessage("E518", token)
-    return when (option) {
-      is NumberOption -> VimInt(parseNumber(value) ?: throw exExceptionMessage("E521", token))
-      is ToggleOption -> throw exExceptionMessage("E474", token)
-      is StringOption -> VimString(value)
-      /**
-       * COMPATIBILITY-LAYER: New branch
-       * Please see: https://jb.gg/zo8n0r
-       */
-      else -> error("")
     }
   }
 }
