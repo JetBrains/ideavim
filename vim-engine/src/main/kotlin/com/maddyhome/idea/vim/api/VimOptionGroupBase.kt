@@ -307,6 +307,5 @@ private class MultikeyMap(vararg entries: Option<out VimDataType>) {
     return primaryKeyStorage.containsKey(key) || secondaryKeyStorage.containsKey(key)
   }
 
-  val primaryKeys get() = primaryKeyStorage.keys
   val values get() = primaryKeyStorage.values
 }

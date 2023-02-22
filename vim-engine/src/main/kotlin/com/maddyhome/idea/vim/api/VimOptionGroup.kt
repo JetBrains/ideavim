@@ -14,8 +14,11 @@ import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.options.OptionValueAccessor
 import com.maddyhome.idea.vim.options.StringOption
 import com.maddyhome.idea.vim.options.ToggleOption
+import com.maddyhome.idea.vim.options.appendValue
+import com.maddyhome.idea.vim.options.removeValue
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
 interface VimOptionGroup {
   /**
@@ -131,4 +134,31 @@ fun VimOptionGroup.unsetToggleOption(option: ToggleOption, scope: OptionScope) {
 fun VimOptionGroup.invertToggleOption(option: ToggleOption, scope: OptionScope) {
   val optionValue = getOptionValue(option, scope)
   setOptionValue(option, scope, if (optionValue.asBoolean()) VimInt.ZERO else VimInt.ONE)
+}
+
+
+/**
+ * Convenience function to append a value to a known global option
+ *
+ * There is no validation - the option is assumed to exist, be a string list option, and the passed value is assumed to
+ * be valid.
+ */
+fun VimOptionGroup.unsafeAppendGlobalKnownOptionValue(optionName: String, value: String) {
+  val option = getOption(optionName)!!
+  val existingValue = getOptionValue(option, OptionScope.GLOBAL)
+  val newValue = option.appendValue(existingValue, VimString(value))!!
+  setOptionValue(option, OptionScope.GLOBAL, newValue)
+}
+
+/**
+ * Convenience function to remove a value to a known global option
+ *
+ * There is no validation - the option is assumed to exist, be a string list option, and the passed value is assumed to
+ * be valid.
+ */
+fun VimOptionGroup.unsafeRemoveGlobalKnownOptionValue(optionName: String, value: String) {
+  val option = getOption(optionName)!!
+  val existingValue = getOptionValue(option, OptionScope.GLOBAL)
+  val newValue = option.removeValue(existingValue, VimString(value))!!
+  setOptionValue(option, OptionScope.GLOBAL, newValue)
 }

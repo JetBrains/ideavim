@@ -260,11 +260,10 @@ private fun showOptions(editor: VimEditor, nameAndToken: Collection<Pair<String,
 }
 
 private fun formatKnownOptionValue(option: Option<out VimDataType>, scope: OptionScope): String {
-  val name = option.name
   val value = injector.optionGroup.getOptionValue(option, scope)
   return if (option is ToggleOption) {
-    if (value.asBoolean()) "  $name" else "no$name"
+    if (value.asBoolean()) "  ${option.name}" else "no${option.name}"
   } else {
-    "$name=$value"
+    "${option.name}=$value"
   }
 }
