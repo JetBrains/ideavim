@@ -9,18 +9,13 @@
 package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.ex.ExException
-import com.maddyhome.idea.vim.ex.exExceptionMessage
-import com.maddyhome.idea.vim.options.NumberOption
 import com.maddyhome.idea.vim.options.Option
 import com.maddyhome.idea.vim.options.OptionChangeListener
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.options.OptionValueAccessor
-import com.maddyhome.idea.vim.options.StringOption
 import com.maddyhome.idea.vim.options.ToggleOption
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
-import com.maddyhome.idea.vim.vimscript.model.datatypes.parseNumber
 
 interface VimOptionGroup {
 
@@ -128,39 +123,10 @@ interface VimOptionGroup {
   fun getValueAccessor(editor: VimEditor?): OptionValueAccessor
 }
 
-
-fun VimOptionGroup.getOptionValue(scope: OptionScope, optionName: String, commandArgumentText: String): VimDataType {
-  val option = getOption(optionName) ?: throw exExceptionMessage("E518", commandArgumentText)
-  return getOptionValue(option, scope)
-}
-
-fun VimOptionGroup.setOptionValue(scope: OptionScope, optionName: String, value: VimDataType, commandArgumentText: String) {
-  val option = getOption(optionName) ?: throw exExceptionMessage("E518", commandArgumentText)
-  option.checkIfValueValid(value, commandArgumentText)
-  setOptionValue(option, scope, value)
-}
-
-fun VimOptionGroup.setOptionValue(scope: OptionScope, optionName: String, value: String, commandArgumentText: String) {
-  val option = getOption(optionName) ?: throw exExceptionMessage("E518", commandArgumentText)
-  val vimValue =  when (option) {
-    is NumberOption -> VimInt(parseNumber(value) ?: throw exExceptionMessage("E521", commandArgumentText))
-    is StringOption -> VimString(value)
-    else -> throw exExceptionMessage("E474", commandArgumentText)
-  }
-  option.checkIfValueValid(vimValue, commandArgumentText)
-  setOptionValue(scope, optionName, vimValue, commandArgumentText)
-}
-
 /**
- * Resets option's value to default.
- *
- * @param scope global/local option scope
- * @param optionName option name or alias
- * @param commandArgumentText the text of the command argument typed by the user. Used in exception messages
- * @throws ExException("E518: Unknown option: $token") in case the option is not found
+ * Resets the option back to its default value
  */
-fun VimOptionGroup.resetDefault(scope: OptionScope, optionName: String, commandArgumentText: String) {
-  val option = getOption(optionName) ?: throw exExceptionMessage("E518", commandArgumentText)
+fun VimOptionGroup.resetDefaultValue(option: Option<out VimDataType>, scope: OptionScope) {
   setOptionValue(option, scope, option.defaultValue)
 }
 

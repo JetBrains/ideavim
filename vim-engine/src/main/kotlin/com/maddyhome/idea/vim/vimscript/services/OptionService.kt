@@ -9,7 +9,6 @@
 package com.maddyhome.idea.vim.vimscript.services
 
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.getOptionValue
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.setToggleOption
 import com.maddyhome.idea.vim.ex.ExException
@@ -60,7 +59,8 @@ interface OptionService {
 @Suppress("DEPRECATION")
 internal class OptionServiceImpl: OptionService {
   override fun getOptionValue(scope: OptionScope, optionName: String, token: String): VimDataType {
-    return injector.optionGroup.getOptionValue(scope, optionName, token)
+    val option = injector.optionGroup.getOption(optionName) ?: throw exExceptionMessage("E518", token)
+    return injector.optionGroup.getOptionValue(option, scope)
   }
 
   override fun setOption(scope: OptionService.Scope, optionName: String, token: String) {

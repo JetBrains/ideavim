@@ -208,13 +208,13 @@ abstract class VimOptionGroupBase : VimOptionGroup {
 
   override fun contains(scope: OptionScope, optionName: String, value: String): Boolean {
     val option = options.get(optionName) as? StringOption ?: return false
-    return value in option.split(getOptionValue(scope, optionName, optionName).asString())
+    return value in option.split(getOptionValue(option, scope).asString())
   }
 
   override fun getValues(scope: OptionScope, optionName: String): List<String>? {
     val option = options.get(optionName)
     if (option !is StringOption) return null
-    return option.split(getOptionValue(scope, optionName, optionName).asString())
+    return option.split(getOptionValue(option, scope).asString())
   }
 
   private fun setGlobalOptionValue(optionName: String, value: VimDataType) {
@@ -248,8 +248,8 @@ abstract class VimOptionGroupBase : VimOptionGroup {
   }
 
   override fun isDefault(scope: OptionScope, optionName: String): Boolean {
-    val defaultValue = options.get(optionName)?.defaultValue ?: throw exExceptionMessage("E518", optionName)
-    return getOptionValue(scope, optionName, optionName) == defaultValue
+    val option = options.get(optionName) ?: throw exExceptionMessage("E518", optionName)
+    return getOptionValue(option, scope) == option.defaultValue
   }
 
   override fun resetAllOptions() {

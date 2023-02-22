@@ -32,17 +32,17 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.api.setOptionValue
+import com.maddyhome.idea.vim.api.invertToggleOption
 import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.group.IjOptionConstants
 import com.maddyhome.idea.vim.group.NotificationService
 import com.maddyhome.idea.vim.helper.inNormalMode
 import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
+import com.maddyhome.idea.vim.options.ToggleOption
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.IdeaRefactorModeHelper
-import com.maddyhome.idea.vim.group.IjOptionConstants
 import org.jetbrains.annotations.NonNls
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
@@ -213,7 +213,9 @@ class FindActionIdAction : DumbAwareToggleAction() {
   override fun isSelected(e: AnActionEvent): Boolean = injector.globalOptions().isSet(IjOptionConstants.trackactionids)
 
   override fun setSelected(e: AnActionEvent, state: Boolean) {
-    VimPlugin.getOptionGroup().setOptionValue(OptionScope.GLOBAL, IjOptionConstants.trackactionids, VimInt(if (state) 1 else 0), IjOptionConstants.trackactionids)
+    (injector.optionGroup.getOption(IjOptionConstants.trackactionids) as? ToggleOption)?.let { option ->
+      injector.optionGroup.invertToggleOption(option, OptionScope.GLOBAL)
+    }
   }
 }
 //endregion

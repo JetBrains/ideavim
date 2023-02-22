@@ -11,10 +11,10 @@ package com.maddyhome.idea.vim.vimscript.model.commands
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.api.setOptionValue
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.register.RegisterConstants
@@ -177,10 +177,12 @@ data class LetCommand(
         if (operator == AssignmentOperator.ASSIGNMENT || operator == AssignmentOperator.CONCATENATION ||
           operator == AssignmentOperator.ADDITION || operator == AssignmentOperator.SUBTRACTION
         ) {
+          val option = injector.optionGroup.getOption(variable.optionName)
+            ?: throw exExceptionMessage("E518", variable.originalString)
           val newValue = operator.getNewValue(optionValue, expression.evaluate(editor, context, this))
           when (variable.scope) {
-            Scope.GLOBAL_VARIABLE -> injector.optionGroup.setOptionValue(OptionScope.GLOBAL, variable.optionName, newValue, variable.originalString)
-            Scope.LOCAL_VARIABLE -> injector.optionGroup.setOptionValue(OptionScope.LOCAL(editor), variable.optionName, newValue, variable.originalString)
+            Scope.GLOBAL_VARIABLE -> injector.optionGroup.setOptionValue(option, OptionScope.GLOBAL, newValue)
+            Scope.LOCAL_VARIABLE -> injector.optionGroup.setOptionValue(option, OptionScope.LOCAL(editor), newValue)
             else -> throw ExException("Invalid option scope")
           }
         } else {

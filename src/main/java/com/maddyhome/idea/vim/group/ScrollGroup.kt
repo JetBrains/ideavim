@@ -9,7 +9,6 @@ package com.maddyhome.idea.vim.group
 
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.VisualPosition
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimScrollGroup
@@ -19,10 +18,10 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.normalizeLine
 import com.maddyhome.idea.vim.api.normalizeVisualColumn
 import com.maddyhome.idea.vim.api.normalizeVisualLine
-import com.maddyhome.idea.vim.api.setOptionValue
 import com.maddyhome.idea.vim.api.visualLineToBufferLine
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.ScrollViewHelper
+import com.maddyhome.idea.vim.helper.StrictMode
 import com.maddyhome.idea.vim.helper.getNormalizedScrollOffset
 import com.maddyhome.idea.vim.helper.getNormalizedSideScrollOffset
 import com.maddyhome.idea.vim.helper.localEditors
@@ -32,7 +31,6 @@ import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.LocalOptionChangeListener
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.helper.StrictMode
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import kotlin.math.abs
@@ -302,13 +300,10 @@ class ScrollGroup : VimScrollGroup {
       if (rawCount == 0) {
         return injector.globalOptions().getIntValue(OptionConstants.scroll)
       }
-      // TODO: This needs to be reset whenever the window size changes
-      VimPlugin.getOptionGroup().setOptionValue(
-        OptionScope.GLOBAL,
-        OptionConstants.scroll,
-        VimInt(rawCount),
-        OptionConstants.scroll
-      )
+      // TODO: This should be reset whenever the window size changes
+      injector.optionGroup.getOption(OptionConstants.scroll)?.let { option ->
+        injector.optionGroup.setOptionValue(option, OptionScope.GLOBAL, VimInt(rawCount))
+      }
       return rawCount
     }
   }
