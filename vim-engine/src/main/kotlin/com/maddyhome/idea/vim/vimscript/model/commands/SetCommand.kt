@@ -12,6 +12,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.invertToggleOption
+import com.maddyhome.idea.vim.api.isDefaultValue
 import com.maddyhome.idea.vim.api.resetDefaultValue
 import com.maddyhome.idea.vim.api.setToggleOption
 import com.maddyhome.idea.vim.api.unsetToggleOption
@@ -90,12 +91,12 @@ fun parseOptionLine(editor: VimEditor, args: String, scope: OptionScope, failOnB
   val optionGroup = injector.optionGroup
   when {
     args.isEmpty() -> {
-      val changedOptions = optionGroup.getOptions().filter { !optionGroup.isDefault(scope, it) }
-      showOptions(editor, changedOptions.map { Pair(it, it) }, scope, true)
+      val changedOptions = optionGroup.getAllOptions().filter { !optionGroup.isDefaultValue(it, scope) }
+      showOptions(editor, changedOptions.map { Pair(it.name, it.name) }, scope, true)
       return true
     }
     args == "all" -> {
-      showOptions(editor, optionGroup.getOptions().map { Pair(it, it) }, scope, true)
+      showOptions(editor, optionGroup.getAllOptions().map { Pair(it.name, it.name) }, scope, true)
       return true
     }
     args == "all&" -> {

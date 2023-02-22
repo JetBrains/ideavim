@@ -205,17 +205,9 @@ abstract class VimOptionGroupBase : VimOptionGroup {
     option.onChanged(scope, oldValue)
   }
 
+  override fun getOption(key: String) = options.get(key)
+  override fun getAllOptions() = options.values.toSet()
 
-  override fun contains(scope: OptionScope, optionName: String, value: String): Boolean {
-    val option = options.get(optionName) as? StringOption ?: return false
-    return value in option.split(getOptionValue(option, scope).asString())
-  }
-
-  override fun getValues(scope: OptionScope, optionName: String): List<String>? {
-    val option = options.get(optionName)
-    if (option !is StringOption) return null
-    return option.split(getOptionValue(option, scope).asString())
-  }
 
   private fun setGlobalOptionValue(optionName: String, value: VimDataType) {
     globalValues[optionName] = value
@@ -247,23 +239,10 @@ abstract class VimOptionGroupBase : VimOptionGroup {
     return localOptions[optionName] ?: getGlobalOptionValue(optionName)
   }
 
-  override fun isDefault(scope: OptionScope, optionName: String): Boolean {
-    val option = options.get(optionName) ?: throw exExceptionMessage("E518", optionName)
-    return getOptionValue(option, scope) == option.defaultValue
-  }
-
   override fun resetAllOptions() {
     globalValues.clear()
     injector.editorGroup.localEditors()
       .forEach { injector.vimStorageService.getDataFromEditor(it, localOptionsKey)?.clear() }
-  }
-
-  override fun isToggleOption(optionName: String): Boolean {
-    return options.get(optionName) is ToggleOption
-  }
-
-  override fun getOptions(): Set<String> {
-    return options.primaryKeys
   }
 
   override fun addOption(option: Option<out VimDataType>) {
@@ -283,10 +262,6 @@ abstract class VimOptionGroupBase : VimOptionGroup {
 
   override fun removeListener(optionName: String, listener: OptionChangeListener<VimDataType>) {
     options.get(optionName)!!.removeOptionChangeListener(listener)
-  }
-
-  override fun getOption(key: String): Option<out VimDataType>? {
-    return options.get(key)
   }
 
   override fun getValueAccessor(editor: VimEditor?): OptionValueAccessor {
@@ -333,4 +308,5 @@ private class MultikeyMap(vararg entries: Option<out VimDataType>) {
   }
 
   val primaryKeys get() = primaryKeyStorage.keys
+  val values get() = primaryKeyStorage.values
 }

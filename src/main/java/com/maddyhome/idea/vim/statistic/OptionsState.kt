@@ -14,32 +14,31 @@ import com.intellij.internal.statistic.eventLog.events.BooleanEventField
 import com.intellij.internal.statistic.eventLog.events.EventFields
 import com.intellij.internal.statistic.eventLog.events.EventPair
 import com.intellij.internal.statistic.eventLog.events.StringEventField
+import com.intellij.internal.statistic.eventLog.events.StringListEventField
 import com.intellij.internal.statistic.eventLog.events.VarargEventId
 import com.intellij.internal.statistic.service.fus.collectors.ApplicationUsagesCollector
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.group.IjOptionConstants
+import com.maddyhome.idea.vim.options.OptionConstants
 
 internal class OptionsState : ApplicationUsagesCollector() {
 
   override fun getGroup(): EventLogGroup = GROUP
 
   override fun getMetrics(): Set<MetricEvent> {
-    val optionGroup = VimPlugin.getOptionGroup()
+    val globalOptions = injector.globalOptions()
 
     return setOf(
       OPTIONS.metric(
         IDEAJOIN withOption IjOptionConstants.ideajoin,
         IDEAMARKS withOption IjOptionConstants.ideamarks,
         IDEAREFACTOR withOption IjOptionConstants.idearefactormode,
-        IDEAPUT with optionGroup.contains(OptionScope.GLOBAL, OptionConstants.clipboard, OptionConstants.clipboard_ideaput),
+        IDEAPUT with globalOptions.hasValue(OptionConstants.clipboard, OptionConstants.clipboard_ideaput),
         IDEASTATUSICON withOption IjOptionConstants.ideastatusicon,
         IDEAWRITE withOption IjOptionConstants.ideawrite,
-        IDEASELECTION with optionGroup.contains(OptionScope.GLOBAL, OptionConstants.selectmode, "ideaselection"),
-        IDEAVIMSUPPORT with optionGroup.getValues(OptionScope.GLOBAL, IjOptionConstants.ideavimsupport)!!
+        IDEASELECTION with globalOptions.hasValue(OptionConstants.selectmode, "ideaselection"),
+        IDEAVIMSUPPORT withOption IjOptionConstants.ideavimsupport
       )
     )
   }
@@ -50,6 +49,10 @@ internal class OptionsState : ApplicationUsagesCollector() {
 
   private infix fun StringEventField.withOption(name: String): EventPair<String?> {
     return this.with(injector.globalOptions().getStringValue(name))
+  }
+
+  private infix fun StringListEventField.withOption(name: String): EventPair<List<String>> {
+    return this.with(injector.globalOptions().getStringListValues(name))
   }
 
   companion object {
