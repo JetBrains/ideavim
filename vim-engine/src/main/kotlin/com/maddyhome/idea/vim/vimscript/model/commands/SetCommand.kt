@@ -10,14 +10,10 @@ package com.maddyhome.idea.vim.vimscript.model.commands
 
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.appendValue
 import com.maddyhome.idea.vim.api.getOptionValue
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.api.prependValue
-import com.maddyhome.idea.vim.api.removeValue
 import com.maddyhome.idea.vim.api.resetDefault
 import com.maddyhome.idea.vim.api.setOption
-import com.maddyhome.idea.vim.api.setOptionValue
 import com.maddyhome.idea.vim.api.toggleOption
 import com.maddyhome.idea.vim.api.unsetOption
 import com.maddyhome.idea.vim.command.OperatorArguments
@@ -27,6 +23,9 @@ import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.Msg
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.options.ToggleOption
+import com.maddyhome.idea.vim.options.appendValue
+import com.maddyhome.idea.vim.options.prependValue
+import com.maddyhome.idea.vim.options.removeValue
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import java.util.*
 import kotlin.math.ceil
@@ -87,19 +86,19 @@ data class SetLocalCommand(val ranges: Ranges, val argument: String) : Command.S
 // todo is failOnBad used anywhere?
 fun parseOptionLine(editor: VimEditor, args: String, scope: OptionScope, failOnBad: Boolean): Boolean {
   // No arguments so we show changed values
-  val optionService = injector.optionGroup
+  val optionGroup = injector.optionGroup
   when {
     args.isEmpty() -> {
-      val changedOptions = optionService.getOptions().filter { !optionService.isDefault(scope, it) }
+      val changedOptions = optionGroup.getOptions().filter { !optionGroup.isDefault(scope, it) }
       showOptions(editor, changedOptions.map { Pair(it, it) }, scope, true)
       return true
     }
     args == "all" -> {
-      showOptions(editor, optionService.getOptions().map { Pair(it, it) }, scope, true)
+      showOptions(editor, optionGroup.getOptions().map { Pair(it, it) }, scope, true)
       return true
     }
     args == "all&" -> {
-      optionService.resetAllOptions()
+      optionGroup.resetAllOptions()
       return true
     }
   }
@@ -121,10 +120,10 @@ fun parseOptionLine(editor: VimEditor, args: String, scope: OptionScope, failOnB
 
     when {
       token.endsWith("?") -> toShow.add(Pair(token.dropLast(1), token))
-      token.startsWith("no") -> optionService.unsetOption(scope, token.substring(2), token)
-      token.startsWith("inv") -> optionService.toggleOption(scope, token.substring(3), token)
-      token.endsWith("!") -> optionService.toggleOption(scope, token.dropLast(1), token)
-      token.endsWith("&") -> optionService.resetDefault(scope, token.dropLast(1), token)
+      token.startsWith("no") -> optionGroup.unsetOption(scope, token.substring(2), token)
+      token.startsWith("inv") -> optionGroup.toggleOption(scope, token.substring(3), token)
+      token.endsWith("!") -> optionGroup.toggleOption(scope, token.dropLast(1), token)
+      token.endsWith("&") -> optionGroup.resetDefault(scope, token.dropLast(1), token)
       else -> {
         // This must be one of =, :, +=, -=, or ^=
         // Look for the = or : first
@@ -134,10 +133,10 @@ fun parseOptionLine(editor: VimEditor, args: String, scope: OptionScope, failOnB
         }
         // No operator so only the option name was given
         if (eq == -1) {
-          val option = optionService.getOption(token)
+          val option = optionGroup.getOption(token)
           when (option) {
             null -> error = Msg.unkopt
-            is ToggleOption -> optionService.setOption(scope, token, token)
+            is ToggleOption -> optionGroup.setOption(scope, token, token)
             else -> toShow.add(Pair(option.name, option.abbrev))
           }
         } else {
@@ -150,14 +149,17 @@ fun parseOptionLine(editor: VimEditor, args: String, scope: OptionScope, failOnB
               end--
             }
             // Get option name and value after operator
-            val option = token.take(end)
-            val value = token.substring(eq + 1)
-            when (op) {
-              '+' -> optionService.appendValue(scope, option, value, token)
-              '-' -> optionService.removeValue(scope, option, value, token)
-              '^' -> optionService.prependValue(scope, option, value, token)
-              else -> optionService.setOptionValue(scope, option, value, token)
-            }
+            val optionName = token.take(end)
+            val option = optionGroup.getOption(optionName) ?: throw exExceptionMessage("E518", token)
+            val existingValue = optionGroup.getOptionValue(option, scope)
+            val value = option.parseValue(token.substring(eq + 1), token)
+            val newValue = when (op) {
+              '+' -> option.appendValue(existingValue, value)
+              '^' -> option.prependValue(existingValue, value)
+              '-' -> option.removeValue(existingValue, value)
+              else -> value
+            } ?: throw exExceptionMessage("E474", token)
+            optionGroup.setOptionValue(option, scope, newValue)
           } else {
             error = Msg.unkopt
           }

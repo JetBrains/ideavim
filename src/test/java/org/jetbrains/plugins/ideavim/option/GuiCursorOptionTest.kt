@@ -9,29 +9,25 @@
 package org.jetbrains.plugins.ideavim.option
 
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.api.appendValue
-import com.maddyhome.idea.vim.api.setOptionValue
 import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.options.helpers.GuiCursorMode
 import com.maddyhome.idea.vim.options.helpers.GuiCursorOptionHelper
 import com.maddyhome.idea.vim.options.helpers.GuiCursorType
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class GuiCursorOptionTest : VimTestCase() {
+  override fun setUp() {
+    super.setUp()
+    configureByText("\n")
+  }
 
   private fun getGuiCursorEntries() =
-    optionsNoEditor().getStringListValues(OptionConstants.guicursor).map { GuiCursorOptionHelper.convertToken(it) }
-
-  private fun setValue(value: String) {
-    return VimPlugin.getOptionGroup().setOptionValue(OptionScope.GLOBAL, OptionConstants.guicursor, VimString(value), OptionConstants.guicursor)
-  }
+    options().getStringListValues(OptionConstants.guicursor).map { GuiCursorOptionHelper.convertToken(it) }
 
   private fun assertHasDefaultValue() {
     val defaultValue = VimPlugin.getOptionGroup().getOption(OptionConstants.guicursor)!!.defaultValue.asString()
-    assertEquals(defaultValue, optionsNoEditor().getStringValue(OptionConstants.guicursor))
+    assertEquals(defaultValue, options().getStringValue(OptionConstants.guicursor))
   }
 
   @Suppress("SpellCheckingInspection")
@@ -79,37 +75,42 @@ class GuiCursorOptionTest : VimTestCase() {
   }
 
   fun `test ignores set with missing colon`() {
-    // E545: Missing colon: {value}
-    assertExException("E545: Missing colon: whatever") { setValue("whatever") }
+    enterCommand("set guicursor=whatever")
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E545: Missing colon: whatever")
     assertHasDefaultValue()
   }
 
   fun `test ignores set with invalid mode`() {
-    // E546: Illegal mode: {value}
-    assertExException("E546: Illegal mode: foo:block-Cursor") { setValue("foo:block-Cursor") }
+    enterCommand("set guicursor=foo:block-Cursor")
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E546: Illegal mode: foo:block-Cursor")
     assertHasDefaultValue()
   }
 
   fun `test ignores set with invalid mode 2`() {
-    // E546: Illegal mode: {value}
-    assertExException("E546: Illegal mode: n-foo:block-Cursor") { setValue("n-foo:block-Cursor") }
+    enterCommand("set guicursor=n-foo:block-Cursor")
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E546: Illegal mode: n-foo:block-Cursor")
     assertHasDefaultValue()
   }
 
   fun `test ignores set with zero thickness`() {
-    // E549: Illegal percentage
-    assertExException("E549: Illegal percentage: n:ver0-Cursor") { setValue("n:ver0-Cursor") }
+    enterCommand("set guicursor=n:ver0-Cursor")
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E549: Illegal percentage: n:ver0-Cursor")
     assertHasDefaultValue()
   }
 
   fun `test ignores set with invalid vertical cursor details`() {
-    // E548: Digit expected: {value}
-    assertExException("E548: Digit expected: n:ver-Cursor") { setValue("n:ver-Cursor") }
+    enterCommand("set guicursor=n:ver-Cursor")
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E548: Digit expected: n:ver-Cursor")
     assertHasDefaultValue()
   }
 
   fun `test simple string means default caret and highlight group`() {
-    setValue("n:MyHighlightGroup")
+    enterCommand("set guicursor=n:MyHighlightGroup")
     val values = getGuiCursorEntries()
     assertEquals(1, values.size)
     assertEquals(enumSetOf(GuiCursorMode.NORMAL), values[0].modes)
@@ -120,7 +121,7 @@ class GuiCursorOptionTest : VimTestCase() {
   }
 
   fun `test get effective values`() {
-    setValue("n:hor20-Cursor,i:hor50,a:ver25,n:ver75")
+    enterCommand("set guicursor=n:hor20-Cursor,i:hor50,a:ver25,n:ver75")
     val attributes = GuiCursorOptionHelper.getAttributes(GuiCursorMode.NORMAL)
     assertEquals(GuiCursorType.VER, attributes.type)
     assertEquals(75, attributes.thickness)
@@ -128,19 +129,19 @@ class GuiCursorOptionTest : VimTestCase() {
   }
 
   fun `test get effective values 2`() {
-    setValue("n:hor20-Cursor,i:hor50,a:ver25,n:ver75")
+    enterCommand("set guicursor=n:hor20-Cursor,i:hor50,a:ver25,n:ver75")
     val attributes = GuiCursorOptionHelper.getAttributes(GuiCursorMode.INSERT)
     assertEquals(GuiCursorType.VER, attributes.type)
     assertEquals(25, attributes.thickness)
   }
 
   fun `test get effective values on update`() {
-    setValue("n:hor20-Cursor")
+    enterCommand("set guicursor=n:hor20-Cursor")
     var attributes = GuiCursorOptionHelper.getAttributes(GuiCursorMode.NORMAL)
     assertEquals(GuiCursorType.HOR, attributes.type)
     assertEquals(20, attributes.thickness)
     assertEquals("Cursor", attributes.highlightGroup)
-    VimPlugin.getOptionGroup().appendValue(OptionScope.GLOBAL, OptionConstants.guicursor, "n:ver75-OtherCursor", OptionConstants.guicursor)
+    enterCommand("set guicursor+=n:ver75-OtherCursor")
     attributes = GuiCursorOptionHelper.getAttributes(GuiCursorMode.NORMAL)
     assertEquals(GuiCursorType.VER, attributes.type)
     assertEquals(75, attributes.thickness)
