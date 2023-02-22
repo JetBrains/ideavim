@@ -9,6 +9,8 @@
 package com.maddyhome.idea.vim.options
 
 import com.maddyhome.idea.vim.api.VimOptionGroup
+import com.maddyhome.idea.vim.api.getStringListValues
+import com.maddyhome.idea.vim.api.hasValue
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 
 /**
@@ -35,13 +37,19 @@ class OptionValueAccessor(private val optionGroup: VimOptionGroup, private val s
    *
    * @see hasValue
    */
-  fun getStringListValues(optionName: String) = optionGroup.getValues(scope, optionName)!!
+  fun getStringListValues(optionName: String): List<String> {
+    val option = (optionGroup.getOption(optionName) as? StringOption) ?: return emptyList()
+    return optionGroup.getStringListValues(option, scope)
+  }
 
   /** Checks if a string list option contains a value, or if a simple string value matches the given value
    *
    * If the option is a string option, the given value must match the entire string
    */
-  fun hasValue(optionName: String, value: String) = optionGroup.contains(scope, optionName, value)
+  fun hasValue(optionName: String, value: String): Boolean {
+    val option = (optionGroup.getOption(optionName) as? StringOption) ?: return false
+    return optionGroup.hasValue(option, scope, value)
+  }
 
   /**
    * Checks the option value is set/true

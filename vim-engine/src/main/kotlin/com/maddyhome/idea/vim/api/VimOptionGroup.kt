@@ -8,16 +8,25 @@
 
 package com.maddyhome.idea.vim.api
 
-import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.options.Option
 import com.maddyhome.idea.vim.options.OptionChangeListener
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.options.OptionValueAccessor
+import com.maddyhome.idea.vim.options.StringOption
 import com.maddyhome.idea.vim.options.ToggleOption
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 
 interface VimOptionGroup {
+  /**
+   * Get the [Option] by its name or abbreviation
+   */
+  fun getOption(key: String): Option<out VimDataType>?
+
+  /**
+   * @return list of all options
+   */
+  fun getAllOptions(): Set<Option<out VimDataType>>
 
   /**
    * Get the value for the option in the given scope
@@ -29,55 +38,10 @@ interface VimOptionGroup {
    */
   fun setOptionValue(option: Option<out VimDataType>, scope: OptionScope, value: VimDataType)
 
-
-
-  /**
-   * Checks if the [value] is contained in string option.
-   *
-   * Returns false if there is no option with the given optionName, or it's type is different from string.
-   * @param scope global/local option scope
-   * @param optionName option name or alias
-   * @param value option value
-   */
-  fun contains(scope: OptionScope, optionName: String, value: String): Boolean
-
-  /**
-   * Splits a string option into flags
-   *
-   * e.g. the `fileencodings` option with value "ucs-bom,utf-8,default,latin1" will result listOf("ucs-bom", "utf-8", "default", "latin1")
-   *
-   * returns null if there is no option with the given optionName, or its type is different from string.
-   * @param scope global/local option scope
-   * @param optionName option name or alias
-   */
-  fun getValues(scope: OptionScope, optionName: String): List<String>?
-
-  /**
-   * Checks if the option's value set to default.
-   *
-   * @param scope global/local option scope
-   * @param optionName option name or alias
-   * @throws ExException("E518: Unknown option: $optionName") in case the option is not found
-   */
-  fun isDefault(scope: OptionScope, optionName: String): Boolean
-
-
   /**
    * Resets all options back to default values.
    */
   fun resetAllOptions()
-
-  /**
-   * Checks if the option with given optionName is a toggleOption.
-   * @param optionName option name or alias
-   */
-  fun isToggleOption(optionName: String): Boolean
-
-
-  /**
-   * @return list of all option names
-   */
-  fun getOptions(): Set<String>
 
   /**
    * Adds the option.
@@ -107,11 +71,6 @@ interface VimOptionGroup {
   fun removeListener(optionName: String, listener: OptionChangeListener<VimDataType>)
 
   /**
-   * Get the [Option] by its name or abbreviation
-   */
-  fun getOption(key: String): Option<out VimDataType>?
-
-  /**
    * Return an accessor class to easily retrieve options values
    *
    * Note that passing `null` as an editor means that you're only interested in global options - NOT global values of
@@ -123,11 +82,33 @@ interface VimOptionGroup {
   fun getValueAccessor(editor: VimEditor?): OptionValueAccessor
 }
 
+
+/**
+ * Checks if option is set to its default value
+ */
+fun VimOptionGroup.isDefaultValue(option: Option<out VimDataType>, scope: OptionScope) =
+  getOptionValue(option, scope) == option.defaultValue
+
 /**
  * Resets the option back to its default value
  */
 fun VimOptionGroup.resetDefaultValue(option: Option<out VimDataType>, scope: OptionScope) {
   setOptionValue(option, scope, option.defaultValue)
+}
+
+/**
+ * Checks if the given string option matches the value, or a string list contains the value
+ */
+fun VimOptionGroup.hasValue(option: StringOption, scope: OptionScope, value: String) =
+  value in option.split(getOptionValue(option, scope).asString())
+
+/**
+ * Splits a string list option into flags, or returns a list with a single string value
+ *
+ * E.g. the `fileencodings` option with value "ucs-bom,utf-8,default,latin1" will result listOf("ucs-bom", "utf-8", "default", "latin1")
+ */
+fun VimOptionGroup.getStringListValues(option: StringOption, scope: OptionScope): List<String> {
+  return option.split(getOptionValue(option, scope).asString())
 }
 
 /**
