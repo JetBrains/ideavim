@@ -14,8 +14,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.VimExtensionRegistrator
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.api.setOption
-import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.api.setToggleOption
 import com.maddyhome.idea.vim.key.MappingOwner.Plugin.Companion.remove
 import com.maddyhome.idea.vim.options.OptionChangeListener
 import com.maddyhome.idea.vim.options.OptionScope
@@ -110,11 +109,9 @@ object VimExtensionRegistrar : VimExtensionRegistrator {
 
   override fun setOptionByPluginAlias(alias: String): Boolean {
     val name = extensionAliases[alias] ?: return false
-    try {
-      VimPlugin.getOptionGroup().setOption(OptionScope.GLOBAL, name, name)
-    } catch (e: ExException) {
-      return false
-    }
+    (injector.optionGroup.getOption(name) as? ToggleOption)?.let {
+      injector.optionGroup.setToggleOption(it, OptionScope.GLOBAL)
+    } ?: return false
     return true
   }
 

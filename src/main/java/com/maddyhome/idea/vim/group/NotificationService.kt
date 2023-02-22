@@ -30,13 +30,14 @@ import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.SystemInfo
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.api.setOption
-import com.maddyhome.idea.vim.api.unsetOption
+import com.maddyhome.idea.vim.api.setToggleOption
+import com.maddyhome.idea.vim.api.unsetToggleOption
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.options.ToggleOption
 import com.maddyhome.idea.vim.options.appendValue
 import com.maddyhome.idea.vim.statistic.ActionTracker
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable
@@ -98,7 +99,11 @@ class NotificationService(private val project: Project?) {
         notification,
         "set ideajoin",
         IjOptionConstants.ideajoin
-      ) { VimPlugin.getOptionGroup().setOption(OptionScope.GLOBAL, IjOptionConstants.ideajoin, IjOptionConstants.ideajoin) }
+      ) {
+        (injector.optionGroup.getOption(IjOptionConstants.ideajoin) as? ToggleOption)?.let { option ->
+          injector.optionGroup.setToggleOption(option, OptionScope.GLOBAL)
+        }
+      }
     )
 
     notification.addAction(HelpLink(ideajoinExamplesUrl))
@@ -229,7 +234,9 @@ class NotificationService(private val project: Project?) {
 
     class StopTracking : DumbAwareAction("Stop Tracking") {
       override fun actionPerformed(e: AnActionEvent) {
-        VimPlugin.getOptionGroup().unsetOption(OptionScope.GLOBAL, IjOptionConstants.trackactionids, IjOptionConstants.trackactionids)
+        (injector.optionGroup.getOption(IjOptionConstants.trackactionids) as? ToggleOption)?.let { option ->
+          injector.optionGroup.unsetToggleOption(option, OptionScope.GLOBAL)
+        }
         notification?.expire()
       }
     }
