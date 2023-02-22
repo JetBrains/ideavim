@@ -11,6 +11,7 @@ package com.maddyhome.idea.vim.vimscript.model.commands
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.setOptionValue
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.ex.ExException

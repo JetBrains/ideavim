@@ -14,6 +14,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.VimExtensionRegistrator
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.setOption
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.key.MappingOwner.Plugin.Companion.remove
 import com.maddyhome.idea.vim.options.OptionChangeListener

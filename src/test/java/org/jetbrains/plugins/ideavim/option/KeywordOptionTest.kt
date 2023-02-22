@@ -9,6 +9,7 @@ package org.jetbrains.plugins.ideavim.option
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.setOptionValue
 import com.maddyhome.idea.vim.helper.CharacterHelper
 import com.maddyhome.idea.vim.helper.CharacterHelper.charType
 import com.maddyhome.idea.vim.options.OptionConstants
