@@ -13,9 +13,9 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getOptionValue
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.resetDefault
-import com.maddyhome.idea.vim.api.setOption
-import com.maddyhome.idea.vim.api.toggleOption
-import com.maddyhome.idea.vim.api.unsetOption
+import com.maddyhome.idea.vim.api.setToggleOption
+import com.maddyhome.idea.vim.api.invertToggleOption
+import com.maddyhome.idea.vim.api.unsetToggleOption
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.exExceptionMessage
@@ -120,9 +120,9 @@ fun parseOptionLine(editor: VimEditor, args: String, scope: OptionScope, failOnB
 
     when {
       token.endsWith("?") -> toShow.add(Pair(token.dropLast(1), token))
-      token.startsWith("no") -> optionGroup.unsetOption(scope, token.substring(2), token)
-      token.startsWith("inv") -> optionGroup.toggleOption(scope, token.substring(3), token)
-      token.endsWith("!") -> optionGroup.toggleOption(scope, token.dropLast(1), token)
+      token.startsWith("no") -> optionGroup.unsetToggleOption(getValidToggleOption(token.substring(2), token), scope)
+      token.startsWith("inv") -> optionGroup.invertToggleOption(getValidToggleOption(token.substring(3), token), scope)
+      token.endsWith("!") -> optionGroup.invertToggleOption(getValidToggleOption(token.dropLast(1), token), scope)
       token.endsWith("&") -> optionGroup.resetDefault(scope, token.dropLast(1), token)
       else -> {
         // This must be one of =, :, +=, -=, or ^=
@@ -136,7 +136,7 @@ fun parseOptionLine(editor: VimEditor, args: String, scope: OptionScope, failOnB
           val option = optionGroup.getOption(token)
           when (option) {
             null -> error = Msg.unkopt
-            is ToggleOption -> optionGroup.setOption(scope, token, token)
+            is ToggleOption -> optionGroup.setToggleOption(option, scope)
             else -> toShow.add(Pair(option.name, option.abbrev))
           }
         } else {
@@ -150,7 +150,7 @@ fun parseOptionLine(editor: VimEditor, args: String, scope: OptionScope, failOnB
             }
             // Get option name and value after operator
             val optionName = token.take(end)
-            val option = optionGroup.getOption(optionName) ?: throw exExceptionMessage("E518", token)
+            val option = getValidOption(optionName)
             val existingValue = optionGroup.getOptionValue(option, scope)
             val value = option.parseValue(token.substring(eq + 1), token)
             val newValue = when (op) {
@@ -182,6 +182,12 @@ fun parseOptionLine(editor: VimEditor, args: String, scope: OptionScope, failOnB
 
   return true
 }
+
+private fun getValidOption(optionName: String, token: String = optionName) =
+  injector.optionGroup.getOption(optionName) ?: throw exExceptionMessage("E518", token)
+
+private fun getValidToggleOption(optionName: String, token: String) =
+  getValidOption(optionName, token) as? ToggleOption ?: throw exExceptionMessage("E474", token)
 
 private fun showOptions(editor: VimEditor, nameAndToken: Collection<Pair<String, String>>, scope: OptionScope, showIntro: Boolean) {
   val optionService = injector.optionGroup

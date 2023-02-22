@@ -42,7 +42,7 @@ import com.maddyhome.idea.vim.api.VimOptionGroup
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.options
-import com.maddyhome.idea.vim.api.setOption
+import com.maddyhome.idea.vim.api.setToggleOption
 import com.maddyhome.idea.vim.api.visualLineToBufferLine
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.VimStateMachine
@@ -68,6 +68,7 @@ import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.options.OptionValueAccessor
+import com.maddyhome.idea.vim.options.ToggleOption
 import com.maddyhome.idea.vim.options.helpers.GuiCursorOptionHelper
 import com.maddyhome.idea.vim.options.helpers.GuiCursorType
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
@@ -108,7 +109,9 @@ abstract class VimTestCase : UsefulTestCase() {
     VimPlugin.getKey().resetKeyMappings()
     VimPlugin.getSearch().resetState()
     if (!VimPlugin.isEnabled()) VimPlugin.setEnabled(true)
-    VimPlugin.getOptionGroup().setOption(OptionScope.GLOBAL, OptionConstants.ideastrictmode, OptionConstants.ideastrictmode)
+    (injector.optionGroup.getOption(OptionConstants.ideastrictmode) as? ToggleOption)?.let { option ->
+      injector.optionGroup.setToggleOption(option, OptionScope.GLOBAL)
+    }
     GuicursorChangeListener.processGlobalValueChange(null)
     Checks.reset()
 
@@ -155,7 +158,9 @@ abstract class VimTestCase : UsefulTestCase() {
 
   protected fun enableExtensions(vararg extensionNames: String) {
     for (name in extensionNames) {
-      VimPlugin.getOptionGroup().setOption(OptionScope.GLOBAL, name, name)
+      (injector.optionGroup.getOption(name) as? ToggleOption)?.let { option ->
+        injector.optionGroup.setToggleOption(option, OptionScope.GLOBAL)
+      }
     }
   }
 

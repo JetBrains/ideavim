@@ -11,9 +11,11 @@ package com.maddyhome.idea.vim.vimscript.services
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getOptionValue
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.api.setOption
+import com.maddyhome.idea.vim.api.setToggleOption
 import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.options.ToggleOption
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 
 /**
@@ -66,6 +68,8 @@ internal class OptionServiceImpl: OptionService {
       is OptionService.Scope.GLOBAL -> OptionScope.GLOBAL
       is OptionService.Scope.LOCAL -> OptionScope.LOCAL(scope.editor)
     }
-    injector.optionGroup.setOption(newScope, optionName, token)
+    val option = injector.optionGroup.getOption(optionName) ?: throw exExceptionMessage("E518", token)
+    val toggleOption = (option as? ToggleOption) ?: throw exExceptionMessage("E474", token)
+    injector.optionGroup.setToggleOption(toggleOption, newScope)
   }
 }
