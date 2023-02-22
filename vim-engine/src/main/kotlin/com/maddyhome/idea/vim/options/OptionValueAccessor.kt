@@ -9,7 +9,6 @@
 package com.maddyhome.idea.vim.options
 
 import com.maddyhome.idea.vim.api.VimOptionGroup
-import com.maddyhome.idea.vim.api.getOptionValue
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 
 /**
@@ -23,7 +22,7 @@ import com.maddyhome.idea.vim.vimscript.services.OptionService
  */
 class OptionValueAccessor(private val optionGroup: VimOptionGroup, private val scope: OptionScope) {
   /** Gets the loosely typed option value */
-  fun getValue(optionName: String) = optionGroup.getOptionValue(scope, optionName, optionName)
+  fun getValue(optionName: String) = optionGroup.getOptionValue(optionGroup.getOption(optionName)!!, scope)
 
   /** Gets the option value as an integer */
   fun getIntValue(optionName: String) = getValue(optionName).toVimNumber().value

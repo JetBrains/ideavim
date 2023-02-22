@@ -8,8 +8,8 @@
 
 package org.jetbrains.plugins.ideavim
 
-import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.api.setOptionValue
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
@@ -50,9 +50,10 @@ abstract class VimOptionTestCase(option: String, vararg otherOptions: String) : 
       if (annotationsValueSet != options) kotlin.test.fail("You should present all options in annotations")
 
       annotationValues.value.forEach {
+        val option = injector.optionGroup.getOption(it.optionName) ?: throw exExceptionMessage("E518", it.optionName)
         when (it.valueType) {
-          OptionValueType.STRING -> VimPlugin.getOptionGroup().setOptionValue(OptionScope.GLOBAL, it.optionName, VimString(it.value), it.optionName)
-          OptionValueType.NUMBER -> VimPlugin.getOptionGroup().setOptionValue(OptionScope.GLOBAL, it.optionName, VimInt(it.value), it.optionName)
+          OptionValueType.STRING -> injector.optionGroup.setOptionValue(option, OptionScope.GLOBAL, VimString(it.value))
+          OptionValueType.NUMBER -> injector.optionGroup.setOptionValue(option, OptionScope.GLOBAL, VimInt(it.value))
         }
       }
     }

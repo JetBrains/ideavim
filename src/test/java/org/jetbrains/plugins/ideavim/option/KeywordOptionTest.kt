@@ -7,25 +7,24 @@
  */
 package org.jetbrains.plugins.ideavim.option
 
-import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.api.setOptionValue
 import com.maddyhome.idea.vim.helper.CharacterHelper
 import com.maddyhome.idea.vim.helper.CharacterHelper.charType
 import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.options.helpers.KeywordOptionHelper.parseValues
 import com.maddyhome.idea.vim.options.helpers.KeywordOptionHelper.toRegex
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class KeywordOptionTest : VimTestCase() {
-  private val values: List<String>?
-    get() = parseValues(optionsNoEditor().getStringValue(OptionConstants.iskeyword))
+  override fun setUp() {
+    super.setUp()
+    configureByText("\n")
+  }
 
-  private fun setKeyword(`val`: String) {
-    VimPlugin.getOptionGroup()
-      .setOptionValue(OptionScope.GLOBAL, OptionConstants.iskeyword, VimString(`val`), "testToken")
+  private val values: List<String>?
+    get() = parseValues(options().getStringValue(OptionConstants.iskeyword))
+
+  private fun setKeyword(value: String) {
+    enterCommand("set iskeyword=$value")
   }
 
   private fun assertIsKeyword(c: Char) {
@@ -44,7 +43,7 @@ class KeywordOptionTest : VimTestCase() {
   }
 
   fun testSingleCommaIsAValueAsAppend() {
-    injector.vimscriptExecutor.execute("set iskeyword^=,", false)
+    enterCommand("set iskeyword^=,")
     assertTrue(values!!.contains(","))
   }
 
@@ -75,12 +74,9 @@ class KeywordOptionTest : VimTestCase() {
   }
 
   fun testRangeInWhichLeftValueIsHigherThanRightValueIsInvalid() {
-    try {
-      setKeyword("b-a")
-      fail("exception missing")
-    } catch (e: Exception) {
-      assertEquals("E474: Invalid argument: testToken", e.message)
-    }
+    setKeyword("b-a")
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E474: Invalid argument: iskeyword=b-a")
     assertDoesntContain(
       values!!,
       object : ArrayList<String?>() {
@@ -92,12 +88,9 @@ class KeywordOptionTest : VimTestCase() {
   }
 
   fun testTwoAdjacentLettersAreInvalid() {
-    try {
-      setKeyword("ab")
-      fail("exception missing")
-    } catch (e: Exception) {
-      assertEquals("E474: Invalid argument: testToken", e.message)
-    }
+    setKeyword("ab")
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E474: Invalid argument: iskeyword=ab")
     assertDoesntContain(
       values!!,
       object : ArrayList<String?>() {
@@ -138,13 +131,13 @@ class KeywordOptionTest : VimTestCase() {
 
   fun testCaretRemovesAChar() {
     setKeyword("a")
-    injector.vimscriptExecutor.execute("set iskeyword+=^a", true)
+    enterCommand("set iskeyword+=^a")
     assertIsNotKeyword('a')
   }
 
   fun testCaretRemovesARange() {
     setKeyword("a-c")
-    injector.vimscriptExecutor.execute("set iskeyword+=^b-c,d", true)
+    enterCommand("set iskeyword+=^b-c,d")
     assertIsKeyword('a')
     assertIsNotKeyword('b')
     assertIsNotKeyword('c')
