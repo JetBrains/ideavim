@@ -8,10 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.option
 
-import com.maddyhome.idea.vim.api.appendValue
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.api.prependValue
-import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.options.StringOption
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -23,6 +20,7 @@ class StringListOptionTest : VimTestCase() {
   override fun setUp() {
     super.setUp()
     injector.optionGroup.addOption(StringOption(optionName, optionName, "", true, null))
+    configureByText("\n")
   }
 
   override fun tearDown() {
@@ -32,19 +30,19 @@ class StringListOptionTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test append existing value`() {
-    injector.optionGroup.appendValue(OptionScope.GLOBAL, optionName, "123", optionName)
-    injector.optionGroup.appendValue(OptionScope.GLOBAL, optionName, "456", optionName)
-    injector.optionGroup.appendValue(OptionScope.GLOBAL, optionName, "123", optionName)
+    enterCommand("set $optionName+=123")
+    enterCommand("set $optionName+=456")
+    enterCommand("set $optionName+=123")
 
-    assertEquals("123,456", optionsNoEditor().getStringValue(optionName))
+    assertEquals("123,456", options().getStringValue(optionName))
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test prepend existing value`() {
-    injector.optionGroup.appendValue(OptionScope.GLOBAL, optionName, "456", optionName)
-    injector.optionGroup.appendValue(OptionScope.GLOBAL, optionName, "123", optionName)
-    injector.optionGroup.prependValue(OptionScope.GLOBAL, optionName, "123", optionName)
+    enterCommand("set $optionName+=456")
+    enterCommand("set $optionName+=123")
+    enterCommand("set $optionName^=123")
 
-    assertEquals("456,123", optionsNoEditor().getStringValue(optionName))
+    assertEquals("456,123", options().getStringValue(optionName))
   }
 }

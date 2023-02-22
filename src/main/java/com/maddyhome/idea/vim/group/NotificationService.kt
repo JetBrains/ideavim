@@ -29,7 +29,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.SystemInfo
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.api.appendValue
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.setOption
 import com.maddyhome.idea.vim.api.unsetOption
 import com.maddyhome.idea.vim.helper.MessageHelper
@@ -37,8 +37,10 @@ import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.options.appendValue
 import com.maddyhome.idea.vim.statistic.ActionTracker
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.services.VimRcService
 import java.awt.datatransfer.StringSelection
 import java.io.File
@@ -69,7 +71,14 @@ class NotificationService(private val project: Project?) {
         notification,
         "set clipboard+=ideaput",
         "ideaput"
-      ) { VimPlugin.getOptionGroup().appendValue(OptionScope.GLOBAL, OptionConstants.clipboard, OptionConstants.clipboard_ideaput, OptionConstants.clipboard) }
+      ) {
+        injector.optionGroup.getOption(OptionConstants.clipboard)?.let { option ->
+          val value = injector.optionGroup.getOptionValue(option, OptionScope.GLOBAL)
+          option.appendValue(value, VimString(OptionConstants.clipboard_ideaput))?.let {
+            injector.optionGroup.setOptionValue(option, OptionScope.GLOBAL, it)
+          }
+        }
+      }
     )
 
     notification.notify(project)

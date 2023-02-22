@@ -45,10 +45,7 @@ abstract class Option<T : VimDataType>(val name: String, val abbrev: String, ope
 
   // todo 1.9 should return Result with exceptions
   abstract fun checkIfValueValid(value: VimDataType, token: String)
-
-  abstract fun getValueIfAppend(currentValue: VimDataType, value: String, token: String): T
-  abstract fun getValueIfPrepend(currentValue: VimDataType, value: String, token: String): T
-  abstract fun getValueIfRemove(currentValue: VimDataType, value: String, token: String): T
+  abstract fun parseValue(value: String, token: String): VimDataType
 }
 
 open class StringOption(name: String, abbrev: String, defaultValue: VimString, private val isList: Boolean = false, private val boundedValues: Collection<String>? = null) : Option<VimString>(name, abbrev, defaultValue) {
@@ -68,23 +65,23 @@ open class StringOption(name: String, abbrev: String, defaultValue: VimString, p
     }
   }
 
-  override fun getValueIfAppend(currentValue: VimDataType, value: String, token: String): VimString {
-    val currentString = (currentValue as VimString).value
-    if (split(currentString).contains(value)) return currentValue
-    return VimString(joinValues(currentString, value))
+  override fun parseValue(value: String, token: String) =
+    VimString(value).also { checkIfValueValid(it, token) }
+
+  fun appendValue(currentValue: VimString, value: VimString): VimString {
+    if (split(currentValue.value).contains(value.value)) return currentValue
+    return VimString(joinValues(currentValue.value, value.value))
   }
 
-  override fun getValueIfPrepend(currentValue: VimDataType, value: String, token: String): VimString {
-    val currentString = (currentValue as VimString).value
-    if (split(currentString).contains(value)) return currentValue
-    return VimString(joinValues(value, currentString))
+  fun prependValue(currentValue: VimString, value: VimString): VimString {
+    if (split(currentValue.value).contains(value.value)) return currentValue
+    return VimString(joinValues(value.value, currentValue.value))
   }
 
-  override fun getValueIfRemove(currentValue: VimDataType, value: String, token: String): VimString {
-    val currentValueAsString = (currentValue as VimString).value
+  fun removeValue(currentValue: VimString, value: VimString): VimString {
     val newValue = if (isList) {
-      val valuesToRemove = split(value)
-      val elements = split(currentValueAsString).toMutableList()
+      val valuesToRemove = split(value.value)
+      val elements = split(currentValue.value).toMutableList()
       if (Collections.indexOfSubList(elements, valuesToRemove) != -1) {
         // see `:help set`
         // When the option is a list of flags, {value} must be
@@ -94,7 +91,8 @@ open class StringOption(name: String, abbrev: String, defaultValue: VimString, p
       }
       elements.joinToString(separator = ",")
     } else {
-      currentValueAsString.replace(value, "")
+      // TODO: Not sure this is correct. Should replace just the first occurrence?
+      currentValue.value.replace(value.value, "")
     }
     return VimString(newValue)
   }
@@ -121,20 +119,12 @@ open class NumberOption(name: String, abbrev: String, defaultValue: VimInt) :
     if (value !is VimInt) throw exExceptionMessage("E521", token)
   }
 
-  override fun getValueIfAppend(currentValue: VimDataType, value: String, token: String): VimInt {
-    val valueToAdd = parseNumber(value) ?: throw exExceptionMessage("E521", token)
-    return VimInt((currentValue as VimInt).value + valueToAdd)
-  }
+  override fun parseValue(value: String, token: String) =
+    VimInt(parseNumber(value) ?: throw exExceptionMessage("E521", token)).also { checkIfValueValid(it, token) }
 
-  override fun getValueIfPrepend(currentValue: VimDataType, value: String, token: String): VimInt {
-    val valueToAdd = parseNumber(value) ?: throw exExceptionMessage("E521", token)
-    return VimInt((currentValue as VimInt).value * valueToAdd)
-  }
-
-  override fun getValueIfRemove(currentValue: VimDataType, value: String, token: String): VimInt {
-    val valueToAdd = parseNumber(value) ?: throw exExceptionMessage("E521", token)
-    return VimInt((currentValue as VimInt).value - valueToAdd)
-  }
+  fun addValues(value1: VimInt, value2: VimInt) = VimInt(value1.value + value2.value)
+  fun multiplyValues(value1: VimInt, value2: VimInt) = VimInt(value1.value * value2.value)
+  fun subtractValues(value1: VimInt, value2: VimInt) = VimInt(value1.value - value2.value)
 }
 
 open class UnsignedNumberOption(name: String, abbrev: String, defaultValue: VimInt) :
@@ -157,15 +147,29 @@ class ToggleOption(name: String, abbrev: String, defaultValue: VimInt) : Option<
     if (value !is VimInt) throw exExceptionMessage("E474", token)
   }
 
-  override fun getValueIfAppend(currentValue: VimDataType, value: String, token: String): VimInt {
-    throw exExceptionMessage("E474", token)
-  }
+  override fun parseValue(value: String, token: String) = throw exExceptionMessage("E474", token)
+}
 
-  override fun getValueIfPrepend(currentValue: VimDataType, value: String, token: String): VimInt {
-    throw exExceptionMessage("E474", token)
+fun Option<out VimDataType>.appendValue(currentValue: VimDataType, value: VimDataType): VimDataType? {
+  return when (this) {
+    is StringOption -> this.appendValue(currentValue as VimString, value as VimString)
+    is NumberOption -> this.addValues(currentValue as VimInt, value as VimInt)
+    else -> null
   }
+}
 
-  override fun getValueIfRemove(currentValue: VimDataType, value: String, token: String): VimInt {
-    throw exExceptionMessage("E474", token)
+fun Option<out VimDataType>.prependValue(currentValue: VimDataType, value: VimDataType): VimDataType? {
+  return when (this) {
+    is StringOption -> this.prependValue(currentValue as VimString, value as VimString)
+    is NumberOption -> this.multiplyValues(currentValue as VimInt, value as VimInt)
+    else -> null
+  }
+}
+
+fun Option<out VimDataType>.removeValue(currentValue: VimDataType, value: VimDataType): VimDataType? {
+  return when (this) {
+    is StringOption -> this.removeValue(currentValue as VimString, value as VimString)
+    is NumberOption -> this.subtractValues(currentValue as VimInt, value as VimInt)
+    else -> null
   }
 }

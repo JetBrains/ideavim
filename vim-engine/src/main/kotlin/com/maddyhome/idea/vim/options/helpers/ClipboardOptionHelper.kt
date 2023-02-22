@@ -8,12 +8,13 @@
 
 package com.maddyhome.idea.vim.options.helpers
 
-import com.maddyhome.idea.vim.api.appendValue
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.api.removeValue
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.options.appendValue
+import com.maddyhome.idea.vim.options.removeValue
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
 object ClipboardOptionHelper {
   var ideaputDisabled = false
@@ -23,23 +24,23 @@ object ClipboardOptionHelper {
     private val containedBefore = injector.globalOptions().hasValue(OptionConstants.clipboard, OptionConstants.clipboard_ideaput)
 
     init {
-      injector.optionGroup.removeValue(
-        OptionScope.GLOBAL,
-        OptionConstants.clipboard,
-        OptionConstants.clipboard_ideaput,
-        OptionConstants.clipboard
-      )
+      injector.optionGroup.getOption(OptionConstants.clipboard)?.let { option ->
+        val value = injector.optionGroup.getOptionValue(option, OptionScope.GLOBAL)
+        option.removeValue(value, VimString(OptionConstants.clipboard_ideaput))?.let {
+          injector.optionGroup.setOptionValue(option, OptionScope.GLOBAL, it)
+        }
+      }
       ideaputDisabled = true
     }
 
     override fun close() {
       if (containedBefore) {
-        injector.optionGroup.appendValue(
-          OptionScope.GLOBAL,
-          OptionConstants.clipboard,
-          OptionConstants.clipboard_ideaput,
-          OptionConstants.clipboard
-        )
+        injector.optionGroup.getOption(OptionConstants.clipboard)?.let { option ->
+          val value = injector.optionGroup.getOptionValue(option, OptionScope.GLOBAL)
+          option.appendValue(value, VimString(OptionConstants.clipboard_ideaput))?.let {
+            injector.optionGroup.setOptionValue(option, OptionScope.GLOBAL, it)
+          }
+        }
       }
       ideaputDisabled = false
     }

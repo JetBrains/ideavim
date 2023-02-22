@@ -165,60 +165,6 @@ fun VimOptionGroup.resetDefault(scope: OptionScope, optionName: String, commandA
 }
 
 /**
- * Same as `set {option}+={value}` in Vim documentation.
- * @param scope global/local option scope
- * @param optionName option name or alias
- * @param value option value
- * @param commandArgumentText the text of the command argument typed by the user. Used in exception messages
- * @throws ExException("E518: Unknown option: $token") in case the option is not found
- * @throws ExException("E474: Invalid argument: $token") in case the method was called for the [ToggleOption]
- * @throws ExException("E474: Invalid argument: $token") in case the method was called for the [StringOption] and the argument is invalid (does not satisfy the option bounded values)
- * @throws ExException("E521: Number required after =: $token") in case the cast to VimInt is impossible
- */
-fun VimOptionGroup.appendValue(scope: OptionScope, optionName: String, value: String, commandArgumentText: String) {
-  val option = getOption(optionName) ?: throw exExceptionMessage("E518", commandArgumentText)
-  val currentValue = getOptionValue(scope, optionName, commandArgumentText)
-  val newValue = option.getValueIfAppend(currentValue, value, commandArgumentText)
-  setOptionValue(scope, optionName, newValue, commandArgumentText)
-}
-
-/**
- * Same as `set {option}^={value}` in Vim documentation.
- * @param scope global/local option scope
- * @param optionName option name or alias
- * @param value option value
- * @param commandArgumentText the text of the command argument typed by the user. Used in exception messages
- * @throws ExException("E518: Unknown option: $token") in case the option is not found
- * @throws ExException("E474: Invalid argument: $token") in case the method was called for the [ToggleOption]
- * @throws ExException("E474: Invalid argument: $token") in case the method was called for the [StringOption] and the argument is invalid (does not satisfy the option bounded values)
- * @throws ExException("E521: Number required after =: $token") in case the cast to VimInt is impossible
- */
-fun VimOptionGroup.prependValue(scope: OptionScope, optionName: String, value: String, commandArgumentText: String) {
-  val option = getOption(optionName) ?: throw exExceptionMessage("E518", commandArgumentText)
-  val currentValue = getOptionValue(scope, optionName, commandArgumentText)
-  val newValue = option.getValueIfPrepend(currentValue, value, commandArgumentText)
-  setOptionValue(scope, optionName, newValue, commandArgumentText)
-}
-
-/**
- * Same as `set {option}-={value}` in Vim documentation.
- * @param scope global/local option scope
- * @param optionName option name or alias
- * @param value option value
- * @param commandArgumentText the text of the command argument typed by the user. Used in exception messages
- * @throws ExException("E518: Unknown option: $token") in case the option is not found
- * @throws ExException("E474: Invalid argument: $token") in case the method was called for the [ToggleOption]
- * @throws ExException("E474: Invalid argument: $token") in case the method was called for the [StringOption] and the argument is invalid (does not satisfy the option bounded values)
- * @throws ExException("E521: Number required after =: $token") in case the cast to VimInt is impossible
- */
-fun VimOptionGroup.removeValue(scope: OptionScope, optionName: String, value: String, commandArgumentText: String) {
-  val option = getOption(optionName) ?: throw exExceptionMessage("E518", commandArgumentText)
-  val currentValue = getOptionValue(scope, optionName, commandArgumentText)
-  val newValue = option.getValueIfRemove(currentValue, value, commandArgumentText)
-  setOptionValue(scope, optionName, newValue, commandArgumentText)
-}
-
-/**
  * Sets the option on (true).
  * @param scope global/local option scope
  * @param optionName option name or alias
