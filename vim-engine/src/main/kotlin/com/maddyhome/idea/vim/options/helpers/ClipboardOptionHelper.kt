@@ -10,11 +10,9 @@ package com.maddyhome.idea.vim.options.helpers
 
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.unsafeAppendGlobalKnownOptionValue
+import com.maddyhome.idea.vim.api.unsafeRemoveGlobalKnownOptionValue
 import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.options.appendValue
-import com.maddyhome.idea.vim.options.removeValue
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
 object ClipboardOptionHelper {
   var ideaputDisabled = false
@@ -24,23 +22,19 @@ object ClipboardOptionHelper {
     private val containedBefore = injector.globalOptions().hasValue(OptionConstants.clipboard, OptionConstants.clipboard_ideaput)
 
     init {
-      injector.optionGroup.getOption(OptionConstants.clipboard)?.let { option ->
-        val value = injector.optionGroup.getOptionValue(option, OptionScope.GLOBAL)
-        option.removeValue(value, VimString(OptionConstants.clipboard_ideaput))?.let {
-          injector.optionGroup.setOptionValue(option, OptionScope.GLOBAL, it)
-        }
-      }
+      injector.optionGroup.unsafeRemoveGlobalKnownOptionValue(
+        OptionConstants.clipboard,
+        OptionConstants.clipboard_ideaput
+      )
       ideaputDisabled = true
     }
 
     override fun close() {
       if (containedBefore) {
-        injector.optionGroup.getOption(OptionConstants.clipboard)?.let { option ->
-          val value = injector.optionGroup.getOptionValue(option, OptionScope.GLOBAL)
-          option.appendValue(value, VimString(OptionConstants.clipboard_ideaput))?.let {
-            injector.optionGroup.setOptionValue(option, OptionScope.GLOBAL, it)
-          }
-        }
+        injector.optionGroup.unsafeAppendGlobalKnownOptionValue(
+          OptionConstants.clipboard,
+          OptionConstants.clipboard_ideaput
+        )
       }
       ideaputDisabled = false
     }
