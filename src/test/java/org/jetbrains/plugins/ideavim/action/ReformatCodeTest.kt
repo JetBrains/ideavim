@@ -14,6 +14,10 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 
 // [VERSION UPDATE] 231+ enable tests
 class ReformatCodeTest : VimTestCase() {
+  fun testMark() {
+    assertTrue(true)
+  }
+
   fun ignoretestEmpty() {
     configureByJavaText("<caret>")
     typeText(injector.parser.parseKeys("gqq"))
