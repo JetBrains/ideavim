@@ -128,7 +128,7 @@ fun VimEditor.normalizeLine(line: Int): Int {
  * @return The normalized column number
  */
 fun VimEditor.normalizeOffset(line: Int, offset: Int, allowEnd: Boolean): Int {
-  if (getFileSize(allowEnd) == 0) {
+  if (fileSize() == 0L) {
     return 0
   }
   val min: Int = getLineStartOffset(line)
@@ -148,25 +148,12 @@ fun VimEditor.getLineEndOffset(line: Int, allowEnd: Boolean): Int {
   return if (line < 0) {
     0
   } else if (line >= lineCount()) {
-    getFileSize(allowEnd)
+    fileSize().toInt()
   } else {
     val startOffset: Int = getLineStartOffset(line)
     val endOffset: Int = getLineEndOffset(line)
     endOffset - if (startOffset == endOffset || allowEnd) 0 else 1
   }
-}
-
-/**
- * Gets the actual number of characters in the file
- *
- * @param this@getFileSize            The editor
- * @param includeEndNewLine True include newline
- * @return The file's character count
- */
-@Deprecated("please use the extension in EditorHelper.kt")
-fun VimEditor.getFileSize(includeEndNewLine: Boolean): Int {
-  val len: Int = text().length
-  return if (includeEndNewLine || len == 0 || text()[len - 1] != '\n') len else len - 1
 }
 
 fun VimEditor.normalizeOffset(offset: Int, allowEnd: Boolean = true): Int {

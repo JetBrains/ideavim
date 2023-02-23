@@ -236,4 +236,19 @@ class MotionDownActionTest : VimTestCase() {
       VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
     )
   }
+
+  fun `test move on two empty strings`() {
+    doTest(
+      "\$j",
+      """
+            |${c}
+            |
+      """.trimMargin(),
+      """
+            |
+            |${c}
+      """.trimMargin(),
+      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+    )
+  }
 }
