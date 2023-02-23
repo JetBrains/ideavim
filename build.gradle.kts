@@ -487,7 +487,7 @@ tasks.register("releaseActions") {
         if (tickets.isNotEmpty()) {
             println("Updating statuses for tickets: $tickets")
             setYoutrackStatus(tickets, "Fixed")
-            if (!checkReleaseVersionExists(version.toString())) {
+            if (getVersionIdByName(version.toString()) != null) {
                 addReleaseToYoutrack(version.toString())
             } else {
                 println("Version $version is already exists in YouTrack")
@@ -521,14 +521,17 @@ tasks.register("integrationsTest") {
         setYoutrackStatus(listOf(testTicketId), prevStatus)
 
         // Check adding and removing release
-        guard(!checkReleaseVersionExists("TEST_VERSION")) { "Test version already exists" }
+        val existingVersionId = getVersionIdByName("TEST_VERSION")
+        if (existingVersionId != null) {
+            deleteVersionById(existingVersionId)
+        }
         val versionId = addReleaseToYoutrack("TEST_VERSION")
-        guard(checkReleaseVersionExists("TEST_VERSION")) { "Test version isn't created" }
+        guard(getVersionIdByName("TEST_VERSION") != null) { "Test version isn't created" }
         setYoutrackStatus(listOf(testTicketId), "Fixed")
         setYoutrackFixVersion(listOf(testTicketId), "TEST_VERSION")
         deleteVersionById(versionId)
         setYoutrackStatus(listOf(testTicketId), "Open")
-        guard(!checkReleaseVersionExists("TEST_VERSION")) { "Test version isn't deleted" }
+        guard(getVersionIdByName("TEST_VERSION") == null) { "Test version isn't deleted" }
 
         updateMergedPr(525)
         // TODO: test Ticket parsing
@@ -579,12 +582,12 @@ fun addReleaseToYoutrack(name: String): String {
     }
 }
 
-fun checkReleaseVersionExists(name: String): Boolean {
+fun getVersionIdByName(name: String): String? {
     val client = httpClient()
 
     return runBlocking {
         val response = client.get("https://youtrack.jetbrains.com/api/admin/projects/$vimProjectId/customFields/$fixVersionsFieldId/bundle/values?fields=id,name&query=$name")
-        response.body<JsonArray>().isNotEmpty()
+        response.body<JsonArray>().singleOrNull()?.jsonObject?.get("id")?.jsonPrimitive?.content
     }
 }
 
