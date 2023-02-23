@@ -268,6 +268,7 @@ class MarkTest : VimTestCase() {
     )
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "This test freezes")
   fun testVisualMarks() {
     configureByText("Oh, <caret>hi Mark")
     typeText(injector.parser.parseKeys("vw<Esc>"))
@@ -286,6 +287,7 @@ class MarkTest : VimTestCase() {
     assertOffset(7)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "This test freezes")
   // we change start mark, but actually the start and end has changed
   fun testChangeSelectionStartMarkToBelowPosition() {
     configureByText("lala\nl<caret>alala\nlala\n")

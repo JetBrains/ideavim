@@ -12,6 +12,8 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.newapi.vim
 import junit.framework.TestCase
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.rangeOf
 import org.jetbrains.plugins.ideavim.waitAndAssert
@@ -140,6 +142,7 @@ class MacroActionTest : VimTestCase() {
     assertState("0\n1\n2\n3\n4\n${c}5\n")
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT, "Reports differences in 'a register")
   fun `test stop on error`() {
     val content = """
             A Discovery
