@@ -43,6 +43,11 @@ abstract class VimJumpServiceBase : VimJumpService {
 
     val position = editor.offsetToBufferPosition(offset)
     val jump = Jump(position.line, position.column, path)
+    addJump(jump, reset)
+  }
+
+  override fun addJump(jump: Jump, reset: Boolean) {
+    lastJumpTimeStamp = System.currentTimeMillis()
     val filename = jump.filepath
 
     for (i in jumps.indices) {
@@ -61,7 +66,7 @@ abstract class VimJumpServiceBase : VimJumpService {
       jumpSpot++
     }
 
-    if (jumps.size > Companion.SAVE_JUMP_COUNT) {
+    if (jumps.size > SAVE_JUMP_COUNT) {
       jumps.removeAt(0)
     }
   }
@@ -72,6 +77,11 @@ abstract class VimJumpServiceBase : VimJumpService {
     includeCurrentCommandAsNavigation(editor)
   }
 
+  override fun removeJump(jump: Jump) {
+    val lastIndex = jumps.withIndex().findLast { it.value == jump }?.index ?: return
+    jumps.removeAt(lastIndex)
+  }
+  
   override fun dropLastJump() {
     jumps.removeLast()
   }

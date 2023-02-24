@@ -44,6 +44,11 @@
     <listener class="com.maddyhome.idea.vim.PyNotebooksCloseWorkaround"
               topic="com.intellij.openapi.project.ProjectManagerListener"/>
   </applicationListeners>
+  
+  <projectListeners>
+    <listener class="com.maddyhome.idea.vim.group.JumpsListener"
+              topic="com.intellij.openapi.fileEditor.impl.IdeDocumentHistoryImpl$RecentPlacesListener"/>
+  </projectListeners>
 
   <extensionPoints>
     <extensionPoint name="vimExtension" beanClass="com.maddyhome.idea.vim.extension.ExtensionBeanClass" dynamic="true">
