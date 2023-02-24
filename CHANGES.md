@@ -41,6 +41,7 @@ usual beta standards.
 * [VIM-1768](https://youtrack.jetbrains.com/issue/VIM-1768) Delete surrounding character while in multiple cursors mode
 * [VIM-282](https://youtrack.jetbrains.com/issue/VIM-282) Cursor line wrapping support (whichwrap)
 * [VIM-2315](https://youtrack.jetbrains.com/issue/VIM-2315) Fix overlapping mappings execution
+* [VIM-44](https://youtrack.jetbrains.com/issue/VIM-44) Unify navigation history between ideavim and idea
 
 ### Merged PRs:
 * [589](https://github.com/JetBrains/ideavim/pull/589) by [Matt Ellis](https://github.com/citizenmatt): Refactor option usage and introduce accessor API
