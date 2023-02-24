@@ -23,6 +23,7 @@ import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.mark.Jump
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
+import com.maddyhome.idea.vim.vimscript.services.OptionValueAccessor
 import org.jdom.Element
 
 @State(name = "VimJumpsSettings", storages = [Storage(value = "\$APP_CONFIG$/vim_settings_local.xml", roamingType = RoamingType.DISABLED)])
@@ -73,6 +74,8 @@ class VimJumpServiceImpl: VimJumpServiceBase(), PersistentStateComponent<Element
 
 class JumpsListener : RecentPlacesListener {
   override fun recentPlaceAdded(changePlace: PlaceInfo, isChanged: Boolean) {
+    if (!injector.optionService.getValueAccessor(null).isSet("unifyjumps")) return
+    
     val jumpService = injector.jumpService as VimJumpServiceImpl
     if (!isChanged) {
       if (changePlace.timeStamp < jumpService.lastJumpTimeStamp) return // this listener is notified asynchronously and 
@@ -83,6 +86,8 @@ class JumpsListener : RecentPlacesListener {
   }
 
   override fun recentPlaceRemoved(changePlace: PlaceInfo, isChanged: Boolean) {
+    if (!injector.optionService.getValueAccessor(null).isSet("unifyjumps")) return
+    
     val jumpService = injector.jumpService
     if (!isChanged) {
       val jump = buildJump(changePlace) ?: return
