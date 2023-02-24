@@ -90,6 +90,8 @@ class JumpsListener : RecentPlacesListener {
     
     val jumpService = injector.jumpService
     if (!isChanged) {
+      if (changePlace.timeStamp < jumpService.lastJumpTimeStamp) return // this listener is notified asynchronously and 
+                                                                        // we do not want jumps that were processed before
       val jump = buildJump(changePlace) ?: return
       jumpService.removeJump(jump)
     }
