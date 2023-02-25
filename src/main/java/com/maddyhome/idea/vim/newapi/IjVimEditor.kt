@@ -15,6 +15,7 @@ import com.intellij.openapi.editor.VisualPosition
 import com.intellij.openapi.editor.event.CaretEvent
 import com.intellij.openapi.editor.event.CaretListener
 import com.intellij.openapi.editor.ex.EditorEx
+import com.intellij.openapi.editor.ex.ScrollingModelEx
 import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.intellij.openapi.editor.impl.EditorImpl
 import com.intellij.openapi.vfs.VirtualFileManager
@@ -27,6 +28,7 @@ import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimCaretListener
 import com.maddyhome.idea.vim.api.VimDocument
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.VimScrollingModel
 import com.maddyhome.idea.vim.api.VimSelectionModel
 import com.maddyhome.idea.vim.api.VimVisualPosition
 import com.maddyhome.idea.vim.api.VirtualFile
@@ -261,6 +263,20 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
 
       override fun hasSelection(): Boolean {
         return sm.hasSelection()
+      }
+    }
+  }
+
+  override fun getScrollingModel(): VimScrollingModel {
+    return object : VimScrollingModel {
+      private val sm = editor.scrollingModel as ScrollingModelEx
+
+      override fun accumulateViewportChanges() {
+        sm.accumulateViewportChanges()
+      }
+
+      override fun flushViewportChanges() {
+        sm.flushViewportChanges()
       }
     }
   }
