@@ -42,6 +42,9 @@ class UndoRedoHelper : UndoRedoBase() {
     val fileEditor = TextEditorProvider.getInstance().getTextEditor(editor.ij)
     val undoManager = UndoManager.getInstance(project)
     if (undoManager.isUndoAvailable(fileEditor)) {
+      val scrollingModel = editor.getScrollingModel()
+      scrollingModel.accumulateViewportChanges()
+
       if (injector.globalOptions().isSet(IjOptionConstants.oldundo)) {
         SelectionVimListenerSuppressor.lock().use { undoManager.undo(fileEditor) }
       } else {
@@ -59,6 +62,8 @@ class UndoRedoHelper : UndoRedoBase() {
           }
         }
       }
+
+      scrollingModel.flushViewportChanges()
 
       return true
     }
