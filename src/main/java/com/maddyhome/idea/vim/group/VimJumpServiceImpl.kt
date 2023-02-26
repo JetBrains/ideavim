@@ -23,11 +23,10 @@ import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.mark.Jump
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
-import com.maddyhome.idea.vim.vimscript.services.OptionValueAccessor
 import org.jdom.Element
 
 @State(name = "VimJumpsSettings", storages = [Storage(value = "\$APP_CONFIG$/vim_settings_local.xml", roamingType = RoamingType.DISABLED)])
-class VimJumpServiceImpl: VimJumpServiceBase(), PersistentStateComponent<Element?> {
+class VimJumpServiceImpl : VimJumpServiceBase(), PersistentStateComponent<Element?> {
   companion object {
     private val logger = vimLogger<VimJumpServiceImpl>()
   }
@@ -75,11 +74,11 @@ class VimJumpServiceImpl: VimJumpServiceBase(), PersistentStateComponent<Element
 class JumpsListener : RecentPlacesListener {
   override fun recentPlaceAdded(changePlace: PlaceInfo, isChanged: Boolean) {
     if (!injector.optionService.getValueAccessor(null).isSet("unifyjumps")) return
-    
+
     val jumpService = injector.jumpService as VimJumpServiceImpl
     if (!isChanged) {
-      if (changePlace.timeStamp < jumpService.lastJumpTimeStamp) return // this listener is notified asynchronously and 
-                                                                        // we do not want jumps that were processed before
+      if (changePlace.timeStamp < jumpService.lastJumpTimeStamp) return // this listener is notified asynchronously and
+      // we do not want jumps that were processed before
       val jump = buildJump(changePlace) ?: return
       jumpService.addJump(jump, true)
     }
@@ -87,26 +86,26 @@ class JumpsListener : RecentPlacesListener {
 
   override fun recentPlaceRemoved(changePlace: PlaceInfo, isChanged: Boolean) {
     if (!injector.optionService.getValueAccessor(null).isSet("unifyjumps")) return
-    
+
     val jumpService = injector.jumpService
     if (!isChanged) {
-      if (changePlace.timeStamp < jumpService.lastJumpTimeStamp) return // this listener is notified asynchronously and 
-                                                                        // we do not want jumps that were processed before
+      if (changePlace.timeStamp < jumpService.lastJumpTimeStamp) return // this listener is notified asynchronously and
+      // we do not want jumps that were processed before
       val jump = buildJump(changePlace) ?: return
       jumpService.removeJump(jump)
     }
   }
-  
+
   private fun buildJump(place: PlaceInfo): Jump? {
     val editor = injector.editorGroup.localEditors().firstOrNull { it.ij.virtualFile == place.file } ?: return null
     val offset = place.caretPosition?.startOffset ?: return null
-    
+
     val bufferPosition = editor.offsetToBufferPosition(offset)
     val line = bufferPosition.line
     val col = bufferPosition.column
-    
+
     val path = place.file.path
-    
+
     return Jump(line, col, path)
   }
 }

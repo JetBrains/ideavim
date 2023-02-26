@@ -81,7 +81,7 @@ abstract class VimJumpServiceBase : VimJumpService {
     val lastIndex = jumps.withIndex().findLast { it.value == jump }?.index ?: return
     jumps.removeAt(lastIndex)
   }
-  
+
   override fun dropLastJump() {
     jumps.removeLast()
   }

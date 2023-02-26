@@ -14,7 +14,7 @@ import com.maddyhome.idea.vim.mark.Jump
 // todo docs
 interface VimJumpService {
   var lastJumpTimeStamp: Long
-  
+
   fun includeCurrentCommandAsNavigation(editor: VimEditor)
   fun getJumpSpot(): Int
   fun getJump(count: Int): Jump?
