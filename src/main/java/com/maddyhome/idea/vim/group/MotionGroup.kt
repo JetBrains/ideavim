@@ -20,6 +20,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
+import com.intellij.openapi.vfs.VirtualFileSystem
 import com.intellij.util.MathUtil.clamp
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
@@ -91,8 +92,8 @@ class MotionGroup : VimMotionGroupBase() {
 
   private fun markToVirtualFile(mark: Mark): VirtualFile? {
     val protocol = mark.protocol
-    val fileSystem = VirtualFileManager.getInstance().getFileSystem(protocol)
-    return fileSystem.findFileByPath(mark.filepath)
+    val fileSystem: VirtualFileSystem? = VirtualFileManager.getInstance().getFileSystem(protocol)
+    return fileSystem?.findFileByPath(mark.filepath)
   }
 
   private fun selectEditor(project: Project?, file: VirtualFile) =
