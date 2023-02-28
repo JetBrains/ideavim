@@ -6,7 +6,9 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.gradle
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.qodana
 import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.BuildFailureOnMetric
 import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.failOnMetricChange
+import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.ScheduleTrigger
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.VcsTrigger
+import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.schedule
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
 import jetbrains.buildServer.configs.kotlin.v2019_2.ui.*
 
@@ -69,6 +71,23 @@ changeBuildType(RelativeId("Qodana")) {
         }
         trigger1.apply {
             enabled = false
+
+        }
+        val trigger2 = find<ScheduleTrigger> {
+            schedule {
+                schedulingPolicy = weekly {
+                    dayOfWeek = ScheduleTrigger.DAY.Tuesday
+                }
+                branchFilter = ""
+                triggerBuild = always()
+            }
+        }
+        trigger2.apply {
+            schedulingPolicy = daily {
+                hour = 12
+                minute = 0
+                timezone = "SERVER"
+            }
 
         }
     }
