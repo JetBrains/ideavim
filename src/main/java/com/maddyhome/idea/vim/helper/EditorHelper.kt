@@ -55,7 +55,7 @@ private val Editor.disabledInDialog: Boolean
  */
 fun Editor.isPrimaryEditor(): Boolean {
   val project = project ?: return false
-  val fileEditorManager = FileEditorManagerEx.getInstanceEx(project) ?: return false
+  val fileEditorManager = FileEditorManagerEx.getInstanceEx(project)
   return fileEditorManager.allEditors.any { fileEditor -> this == EditorUtil.getEditorEx(fileEditor) }
 }
 
@@ -76,12 +76,6 @@ private inline fun findParentByCondition(c: Component?, condition: (Component?) 
     eachParent = eachParent.parent
   }
   return null
-}
-
-fun Editor.endsWithNewLine(): Boolean {
-  val textLength = this.document.textLength
-  if (textLength == 0) return false
-  return this.document.charsSequence[textLength - 1] == '\n'
 }
 
 /**

@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.vimscript.services
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.extensions.ExtensionPointName
 import com.maddyhome.idea.vim.api.VimscriptFunctionService
@@ -163,7 +164,7 @@ class FunctionStorage : VimscriptFunctionService {
   }
 
   override fun registerHandlers() {
-    extensionPoint.extensions().forEach(FunctionBeanClass::register)
+    extensionPoint.getExtensionList(ApplicationManager.getApplication()).forEach(FunctionBeanClass::register)
   }
 
   override fun addHandler(handlerHolder: Any) {
