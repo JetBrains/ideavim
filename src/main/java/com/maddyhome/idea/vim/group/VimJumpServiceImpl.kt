@@ -75,7 +75,7 @@ class JumpsListener : RecentPlacesListener {
   override fun recentPlaceAdded(changePlace: PlaceInfo, isChanged: Boolean) {
     if (!injector.optionService.getValueAccessor(null).isSet("unifyjumps")) return
 
-    val jumpService = injector.jumpService as VimJumpServiceImpl
+    val jumpService = injector.jumpService
     if (!isChanged) {
       if (changePlace.timeStamp < jumpService.lastJumpTimeStamp) return // this listener is notified asynchronously, and
       // we do not want jumps that were processed before
