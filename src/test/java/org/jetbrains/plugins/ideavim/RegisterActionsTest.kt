@@ -69,8 +69,7 @@ class RegisterActionsTest : VimTestCase() {
     var motionRightAction: ActionBeanClass? = null
     doTest("l", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE) {
       motionRightAction =
-        VIM_ACTIONS_EP.getExtensionList(null)
-          .filter { it.actionId == "VimPreviousTabAction" }.first()
+        VIM_ACTIONS_EP.getExtensionList(null).first { it.actionId == "VimPreviousTabAction" }
 
       assertNotNull(getCommandNode())
 
