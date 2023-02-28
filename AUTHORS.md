@@ -455,6 +455,10 @@ Contributors:
   [![icon][github]](https://github.com/adaext)
   &nbsp;
   Ada
+* [![icon][mail]](mailto:dominic.palmer@outlook.com)
+  [![icon][github]](https://github.com/dominicpalmer)
+  &nbsp;
+  Dominic Palmer
 
 Previous contributors:
 
