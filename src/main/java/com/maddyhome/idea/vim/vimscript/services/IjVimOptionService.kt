@@ -86,7 +86,7 @@ internal class IjVimOptionService : VimOptionServiceBase() {
         isList = true
       )
     )
-    
+
     addOption(ToggleOption("unifyjumps", "unifyjumps", true))
   }
 }

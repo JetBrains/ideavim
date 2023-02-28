@@ -20,6 +20,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
+import com.intellij.openapi.vfs.VirtualFileSystem
 import com.intellij.util.MathUtil.clamp
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
@@ -30,6 +31,7 @@ import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimChangeGroupBase
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimMotionGroupBase
+import com.maddyhome.idea.vim.api.addJump
 import com.maddyhome.idea.vim.api.anyNonWhitespace
 import com.maddyhome.idea.vim.api.getLeadingCharacterOffset
 import com.maddyhome.idea.vim.api.getVisualLineCount
@@ -91,8 +93,8 @@ class MotionGroup : VimMotionGroupBase() {
 
   private fun markToVirtualFile(mark: Mark): VirtualFile? {
     val protocol = mark.protocol
-    val fileSystem = VirtualFileManager.getInstance().getFileSystem(protocol)
-    return fileSystem.findFileByPath(mark.filepath)
+    val fileSystem: VirtualFileSystem? = VirtualFileManager.getInstance().getFileSystem(protocol)
+    return fileSystem?.findFileByPath(mark.filepath)
   }
 
   private fun selectEditor(project: Project?, file: VirtualFile) =

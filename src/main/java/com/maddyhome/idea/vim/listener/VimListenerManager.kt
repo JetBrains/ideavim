@@ -229,24 +229,34 @@ object VimListenerManager {
       if (selectionEvent.editor.isIdeaVimDisabledHere) return
       val editor = selectionEvent.editor
       val document = editor.document
+      val ijVimEditor = IjVimEditor(editor)
 
       logger.trace { "Selection changed" }
       logger.trace { ExceptionUtil.currentStackTrace() }
 
-      //region Not selected last character protection
-      // Here is currently a bug in IJ for IdeaVim. If you start selection right from the line end, then
-      //  move to the left, the last character remains unselected.
-      //  It's not clear why this happens, but this code fixes it.
+      //region Unselected last character protection
+      // There is currently a bug in IJ for IdeaVim where on selecting from EOL
+      // and dragging left or vertically upwards, the last character prior to EOL
+      // remains unselected. It's not clear why this happens, but this code fixes it.
       val caret = editor.caretModel.currentCaret
-      val lineEnd = IjVimEditor(editor).getLineEndForOffset(caret.offset)
-      val lineStart = IjVimEditor(editor).getLineStartForOffset(caret.offset)
-      if (skipNDragEvents < skipEvents &&
-        lineEnd != lineStart &&
-        selectionEvent.newRange.startOffset == selectionEvent.newRange.endOffset &&
-        selectionEvent.newRange.startOffset == lineEnd - 1 &&
-        selectionEvent.newRange.startOffset == caret.offset
-      ) {
-        caret.setSelection(lineEnd, lineEnd - 1)
+      val caretOffset = caret.offset
+      val lineStart = ijVimEditor.getLineStartForOffset(caret.offset)
+      val lineEnd = ijVimEditor.getLineEndForOffset(caret.offset)
+      val startOffset = selectionEvent.newRange.startOffset
+      val endOffset = selectionEvent.newRange.endOffset
+
+      if (skipNDragEvents < skipEvents && lineStart != lineEnd && startOffset == caretOffset) {
+        if (lineEnd == endOffset - 1)
+        {
+          // When starting on an empty line and dragging vertically upwards onto
+          // another line, the selection should include the entirety of the empty line
+          caret.setSelection(endOffset + 1, startOffset)
+        }
+        else if (lineEnd == startOffset + 1 && startOffset == endOffset) {
+          // When dragging left from EOL on a non-empty line, the selection
+          // should include the last character on the line
+          caret.setSelection(lineEnd, lineEnd - 1)
+        }
       }
       //endregion
 

@@ -50,11 +50,6 @@ public class WindowGroup extends WindowGroupBase {
     }
   }
 
-  public void closeAllExceptCurrentTab(@NotNull DataContext context) {
-    final EditorWindow currentWindow = getFileEditorManager(context).getCurrentWindow();
-    currentWindow.closeAllExcept(currentWindow.getSelectedFile());
-  }
-
   public void closeAll(@NotNull ExecutionContext context) {
     getFileEditorManager(((IjExecutionContext) context).getContext()).closeAllFiles();
   }
@@ -64,7 +59,10 @@ public class WindowGroup extends WindowGroupBase {
     final FileEditorManagerEx fileEditorManager = getFileEditorManager(((DataContext)context.getContext()));
     final EditorWindow current = fileEditorManager.getCurrentWindow();
     if (current != null) {
-      fileEditorManager.getNextWindow(current).setAsCurrentWindow(true);
+      EditorWindow nextWindow = fileEditorManager.getNextWindow(current);
+      if (nextWindow != null) {
+        nextWindow.setAsCurrentWindow(true);
+      }
     }
   }
 
@@ -73,7 +71,10 @@ public class WindowGroup extends WindowGroupBase {
     final FileEditorManagerEx fileEditorManager = getFileEditorManager(((DataContext)context.getContext()));
     final EditorWindow current = fileEditorManager.getCurrentWindow();
     if (current != null) {
-      fileEditorManager.getPrevWindow(current).setAsCurrentWindow(true);
+      EditorWindow prevWindow = fileEditorManager.getPrevWindow(current);
+      if (prevWindow != null) {
+        prevWindow.setAsCurrentWindow(true);
+      }
     }
   }
 

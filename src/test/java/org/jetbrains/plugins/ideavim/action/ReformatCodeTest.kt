@@ -12,7 +12,8 @@ import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
-// [VERSION UPDATE] 231+ enable tests
+// [VERSION UPDATE] 232+ enable tests
+@Suppress("unused")
 class ReformatCodeTest : VimTestCase() {
   fun testMark() {
     assertTrue(true)

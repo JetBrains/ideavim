@@ -45,6 +45,7 @@ usual beta standards.
 
 ### Merged PRs:
 * [589](https://github.com/JetBrains/ideavim/pull/589) by [Matt Ellis](https://github.com/citizenmatt): Refactor option usage and introduce accessor API
+* [604](https://github.com/JetBrains/ideavim/pull/604) by [Dominic Palmer](https://github.com/dominicpalmer): VIM-2773: Include empty lines in the selection when dragging backwards from EOL
 
 ## 2.1.0, 2023-01-10
 

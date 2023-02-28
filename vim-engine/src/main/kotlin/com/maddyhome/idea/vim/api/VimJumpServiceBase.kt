@@ -34,18 +34,6 @@ abstract class VimJumpServiceBase : VimJumpService {
     return jumps
   }
 
-  override fun addJump(editor: VimEditor, reset: Boolean) {
-    addJump(editor, editor.currentCaret().offset.point, reset)
-  }
-
-  private fun addJump(editor: VimEditor, offset: Int, reset: Boolean) {
-    val path = editor.getPath() ?: return
-
-    val position = editor.offsetToBufferPosition(offset)
-    val jump = Jump(position.line, position.column, path)
-    addJump(jump, reset)
-  }
-
   override fun addJump(jump: Jump, reset: Boolean) {
     lastJumpTimeStamp = System.currentTimeMillis()
     val filename = jump.filepath
@@ -81,7 +69,7 @@ abstract class VimJumpServiceBase : VimJumpService {
     val lastIndex = jumps.withIndex().findLast { it.value == jump }?.index ?: return
     jumps.removeAt(lastIndex)
   }
-  
+
   override fun dropLastJump() {
     jumps.removeLast()
   }

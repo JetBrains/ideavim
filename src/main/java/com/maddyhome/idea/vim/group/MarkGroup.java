@@ -10,10 +10,7 @@ package com.maddyhome.idea.vim.group;
 
 import com.intellij.ide.bookmark.LineBookmark;
 import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.api.VimEditor;
-import com.maddyhome.idea.vim.api.VimInjectorKt;
-import com.maddyhome.idea.vim.api.VimMarkService;
-import com.maddyhome.idea.vim.api.VimMarkServiceKt;
+import com.maddyhome.idea.vim.api.*;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.mark.IntellijMark;
 import com.maddyhome.idea.vim.mark.Jump;
@@ -47,7 +44,7 @@ public class MarkGroup {
   }
 
   public void addJump(@NotNull VimEditor editor, boolean reset) {
-    VimInjectorKt.injector.getJumpService().addJump(editor, reset);
+    VimJumpServiceKt.addJump(VimInjectorKt.injector.getJumpService(), editor, reset);
   }
 
   @Nullable

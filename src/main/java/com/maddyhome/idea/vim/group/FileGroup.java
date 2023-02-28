@@ -170,10 +170,11 @@ public class FileGroup extends VimFileBase {
     final FileEditorManagerEx fileEditorManager = FileEditorManagerEx.getInstanceEx(project);
     final EditorWindow window = fileEditorManager.getCurrentWindow();
     VirtualFile[] editors = fileEditorManager.getOpenFiles();
-    if (number >= 0 && number < editors.length) {
-      fileEditorManager.closeFile(editors[number], window);
-    }
-    if (!ApplicationManager.getApplication().isUnitTestMode()) {
+    if (window != null) {
+      if (number >= 0 && number < editors.length) {
+        fileEditorManager.closeFile(editors[number], window);
+      }
+    } if (!ApplicationManager.getApplication().isUnitTestMode()) {
       // This thing doesn't have an implementation in test mode
       EditorsSplitters.focusDefaultComponentInSplittersIfPresent(project);
     }

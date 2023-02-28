@@ -68,7 +68,8 @@ class RegisterActionsTest : VimTestCase() {
     val after = "I f${c}ound it in a legendary land"
     var motionRightAction: ActionBeanClass? = null
     doTest("l", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE) {
-      motionRightAction = VIM_ACTIONS_EP.extensions().filter { it.actionId == "VimPreviousTabAction" }.findFirst().get()
+      motionRightAction =
+        VIM_ACTIONS_EP.getExtensionList(null).first { it.actionId == "VimPreviousTabAction" }
 
       assertNotNull(getCommandNode())
 
