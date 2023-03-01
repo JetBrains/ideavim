@@ -572,8 +572,7 @@ fun getCellType(${s}pos$se: VisualPosition): CellType {
       ${c}A well regulated Militia, 
       being necessary to the security of a free State, 
       the right of the people to keep and bear Arms,
-      shall not be infringed.
-    """.trimIndent()
+      shall not be infringed.""".trimIndent()
     configureByText(before)
 
     typeText(injector.parser.parseKeys("Vjjj<A-n>"))
@@ -582,8 +581,7 @@ fun getCellType(${s}pos$se: VisualPosition): CellType {
       ${c}A well regulated Militia, 
       ${c}being necessary to the security of a free State, 
       ${c}the right of the people to keep and bear Arms,
-      ${c}shall not be infringed.
-    """.trimIndent()
+      ${c}shall not be infringed.""".trimIndent()
     assertState(after)
   }
 }
