@@ -359,7 +359,7 @@ changelog {
 tasks.register("getUnreleasedChangelog") {
     group = "changelog"
     doLast {
-        val log = changelog.getUnreleased().toHTML()
+        val log = changelog.renderItem(changelog.getUnreleased(), org.jetbrains.changelog.Changelog.OutputType.HTML)
         println(log)
     }
 }
