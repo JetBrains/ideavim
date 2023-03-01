@@ -91,6 +91,10 @@ val Editor.inVisualMode
 val Editor.inSelectMode
   get() = this.editorMode == VimStateMachine.Mode.SELECT || this.editorMode == VimStateMachine.Mode.INSERT_SELECT
 
+@get:JvmName("inLineSubMode")
+val Editor.inLineSubMode
+  get() = this.subMode == VimStateMachine.SubMode.VISUAL_LINE
+
 @get:JvmName("inBlockSubMode")
 val Editor.inBlockSubMode
   get() = this.subMode == VimStateMachine.SubMode.VISUAL_BLOCK

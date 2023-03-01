@@ -36,6 +36,7 @@ import com.maddyhome.idea.vim.helper.SearchOptions
 import com.maddyhome.idea.vim.helper.endOffsetInclusive
 import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.helper.exitVisualMode
+import com.maddyhome.idea.vim.helper.inLineSubMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
 import com.maddyhome.idea.vim.helper.userData
@@ -141,6 +142,8 @@ class VimMultipleCursorsExtension : VimExtension {
         // vim-multiple-cursors is case sensitive, so it's ok to use a case sensitive set here
         val patterns = sortedSetOf<String>()
         val newPositions = arrayListOf<VisualPosition>()
+        val isInLineSubMode = editor.inLineSubMode
+        val primaryCaretSelectionEnd = caretModel.primaryCaret.selectionEnd
 
         // If multiple lines are selected, we want to convert the selection to multiple carets, positioned at the start
         // of each line
@@ -164,6 +167,11 @@ class VimMultipleCursorsExtension : VimExtension {
         if (newPositions.size > 0) {
           editor.vim.exitVisualMode()
           newPositions.forEach { editor.caretModel.addCaret(it, true) ?: return }
+          // If we were in visual line mode when selecting and did not select the last line of the document,
+          // we need to remove the primary caret to avoid one extra caret being added
+          if (isInLineSubMode && editor.document.textLength > primaryCaretSelectionEnd) {
+            editor.caretModel.removeCaret(editor.caretModel.primaryCaret)
+          }
           editor.updateCaretsVisualAttributes()
           return
         }

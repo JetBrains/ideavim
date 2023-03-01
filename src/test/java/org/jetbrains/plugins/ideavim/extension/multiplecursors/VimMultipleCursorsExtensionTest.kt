@@ -546,4 +546,44 @@ fun getCellType(${s}pos$se: VisualPosition): CellType {
     val after = "test ${s}t.*st$se toast tallest ${s}t.*st$se"
     assertState(after)
   }
+
+  fun `test visual line mode adds the correct number of cursors`() {
+    val before = """
+      ${c}A well regulated Militia, 
+      being necessary to the security of a free State, 
+      the right of the people to keep and bear Arms,
+      shall not be infringed.
+    """.trimIndent()
+    configureByText(before)
+
+    typeText(injector.parser.parseKeys("Vjj<A-n>"))
+
+    val after = """
+      ${c}A well regulated Militia, 
+      ${c}being necessary to the security of a free State, 
+      ${c}the right of the people to keep and bear Arms,
+      shall not be infringed.
+    """.trimIndent()
+    assertState(after)
+  }
+
+  fun `test visual line mode adds the correct number of cursors when last line of file is selected`() {
+    val before = """
+      ${c}A well regulated Militia, 
+      being necessary to the security of a free State, 
+      the right of the people to keep and bear Arms,
+      shall not be infringed.
+    """.trimIndent()
+    configureByText(before)
+
+    typeText(injector.parser.parseKeys("Vjjj<A-n>"))
+
+    val after = """
+      ${c}A well regulated Militia, 
+      ${c}being necessary to the security of a free State, 
+      ${c}the right of the people to keep and bear Arms,
+      ${c}shall not be infringed.
+    """.trimIndent()
+    assertState(after)
+  }
 }
