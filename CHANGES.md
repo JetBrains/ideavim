@@ -32,7 +32,7 @@ usual beta standards.
 * [VIM-1829](https://youtrack.jetbrains.com/issue/VIM-1829/key-combinations-are-not-working-in-visual-mode-IdeaVim) Fix marks when moving lines up/down
 * [VIM-2130](https://youtrack.jetbrains.com/issue/VIM-2130/Vim-visual-mode-mapping-isnt-behaving-correctly-in-ideavim-it-leaves-visual-mode-after-its-executed) Fix marks when moving lines up/down
 * [VIM-2428](https://youtrack.jetbrains.com/issue/VIM-2428/The-gv-command-doesnt-work) Fix marks when moving lines up/down
-* [VIM-2686](https://youtrack.jetbrains.com/issue/VIM-2686/Multiple-caret-marks) Add idividual mark storage for each secondary caret
+* [VIM-2686](https://youtrack.jetbrains.com/issue/VIM-2686/Multiple-caret-marks) Add individual mark storage for each secondary caret
 * [VIM-2840](https://youtrack.jetbrains.com/issue/VIM-2840) Replace with register does not work with count
 * [VIM-658](https://youtrack.jetbrains.com/issue/VIM-658) Stop macro on error
 * [VIM-2787](https://youtrack.jetbrains.com/issue/VIM-2787) Save ideavimrc loading
