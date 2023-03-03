@@ -104,39 +104,7 @@ class MotionGroup : VimMotionGroupBase() {
     return SearchHelper.findMatchingPairOnCurrentLine(editor.ij, caret.ij).toMotionOrError()
   }
 
-  /**
-   * This moves the caret to the start of the next/previous camel word.
-   *
-   * @param editor The editor to move in
-   * @param caret  The caret to be moved
-   * @param count  The number of words to skip
-   * @return position
-   */
-  fun moveCaretToNextCamel(editor: Editor, caret: Caret, count: Int): Int {
-    return if (caret.offset == 0 && count < 0 || caret.offset >= editor.fileSize - 1 && count > 0) {
-      -1
-    } else {
-      SearchHelper.findNextCamelStart(editor, caret, count)
-    }
-  }
-
-  /**
-   * This moves the caret to the start of the next/previous camel word.
-   *
-   * @param editor The editor to move in
-   * @param caret  The caret to be moved
-   * @param count  The number of words to skip
-   * @return position
-   */
-  fun moveCaretToNextCamelEnd(editor: Editor, caret: Caret, count: Int): Int {
-    return if (caret.offset == 0 && count < 0 || caret.offset >= editor.fileSize - 1 && count > 0) {
-      -1
-    } else {
-      SearchHelper.findNextCamelEnd(editor, caret, count)
-    }
-  }
-
-  override fun moveCaretToFirstDisplayLine(
+    override fun moveCaretToFirstDisplayLine(
     editor: VimEditor,
     caret: ImmutableVimCaret,
     count: Int,
