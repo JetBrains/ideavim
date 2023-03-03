@@ -246,13 +246,11 @@ object VimListenerManager {
       val endOffset = selectionEvent.newRange.endOffset
 
       if (skipNDragEvents < skipEvents && lineStart != lineEnd && startOffset == caretOffset) {
-        if (lineEnd == endOffset - 1)
-        {
+        if (lineEnd == endOffset - 1) {
           // When starting on an empty line and dragging vertically upwards onto
           // another line, the selection should include the entirety of the empty line
           caret.setSelection(endOffset + 1, startOffset)
-        }
-        else if (lineEnd == startOffset + 1 && startOffset == endOffset) {
+        } else if (lineEnd == startOffset + 1 && startOffset == endOffset) {
           // When dragging left from EOL on a non-empty line, the selection
           // should include the last character on the line
           caret.setSelection(lineEnd, lineEnd - 1)
