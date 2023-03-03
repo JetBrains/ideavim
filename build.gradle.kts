@@ -31,6 +31,8 @@ import kotlinx.serialization.json.putJsonObject
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.lib.RepositoryBuilder
 import org.intellij.markdown.ast.getTextInNode
+import org.jetbrains.changelog.Changelog
+import org.jetbrains.changelog.exceptions.MissingVersionException
 import java.net.HttpURLConnection
 import java.net.URL
 
@@ -312,8 +314,13 @@ tasks {
         changeNotes.set(
             provider {
                 with(changelog) {
+                    val log = try {
+                        getUnreleased()
+                    } catch (e: MissingVersionException) {
+                        getOrNull(pluginVersion.toString()) ?: getLatest()
+                    }
                     renderItem(
-                        getOrNull(pluginVersion.toString()) ?: getLatest(),
+                        log,
                         org.jetbrains.changelog.Changelog.OutputType.HTML,
                     )
                 }
@@ -356,14 +363,6 @@ changelog {
 //    version = "0.60"
 }
 
-tasks.register("getUnreleasedChangelog") {
-    group = "changelog"
-    doLast {
-        val log = changelog.renderItem(changelog.getUnreleased(), org.jetbrains.changelog.Changelog.OutputType.HTML)
-        println(log)
-    }
-}
-
 // --- Kover
 
 koverMerged {
@@ -388,7 +387,8 @@ tasks.register("slackNotification") {
             println("Slack Url is not defined")
             return@doLast
         }
-        val changeLog = changelog.getLatest().toText()
+
+        val changeLog = changelog.renderItem(changelog.getLatest(), Changelog.OutputType.PLAIN_TEXT)
         val slackDown = DownParser(changeLog, true).toSlack().toString()
 
         //language=JSON
