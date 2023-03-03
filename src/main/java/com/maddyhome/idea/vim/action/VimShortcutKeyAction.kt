@@ -13,7 +13,7 @@ import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.actionSystem.EmptyAction
+import com.intellij.openapi.actionSystem.AnActionWrapper
 import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.application.invokeLater
 import com.intellij.openapi.diagnostic.debug
@@ -322,7 +322,7 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
 
     @JvmStatic
     val instance: AnAction by lazy {
-      EmptyAction.wrap(ActionManager.getInstance().getAction(ACTION_ID))
+      AnActionWrapper(ActionManager.getInstance().getAction(ACTION_ID))
     }
 
     private fun getKeyStrokes(keyCode: Int, vararg modifiers: Int) =
