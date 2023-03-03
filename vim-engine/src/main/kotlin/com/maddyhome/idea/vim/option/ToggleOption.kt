@@ -47,16 +47,4 @@ class ToggleOption(name: String, abbrev: String, defaultValue: VimInt) : Option<
   fun isSet(): Boolean {
     return injector.optionService.getOptionValue(OptionScope.GLOBAL, name).asBoolean()
   }
-
-  /**
-   * COMPATIBILITY-LAYER: Method added
-   * Please see: https://jb.gg/zo8n0r
-   */
-  @Suppress("DEPRECATION", "PLATFORM_CLASS_MAPPED_TO_KOTLIN")
-  override val value: java.lang.Boolean
-    get() = if (isSet()) {
-      java.lang.Boolean(true)
-    } else {
-      java.lang.Boolean(false)
-    }
 }
