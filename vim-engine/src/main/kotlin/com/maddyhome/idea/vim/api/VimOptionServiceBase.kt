@@ -291,6 +291,7 @@ abstract class VimOptionServiceBase : OptionService {
     setOptionValue(scope, optionName, option.getDefaultValue(), token)
   }
 
+  @Deprecated("Use OptionValueAccessor.isSet or OptionService.getOptionValue")
   override fun isSet(scope: OptionScope, optionName: String, token: String): Boolean {
     val option = options.get(optionName) ?: throw ExException("E518: Unknown option: $token")
     return option is ToggleOption && getOptionValue(scope, optionName).asBoolean()

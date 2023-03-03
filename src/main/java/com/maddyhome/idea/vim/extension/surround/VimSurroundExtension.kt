@@ -196,27 +196,27 @@ class VimSurroundExtension : VimExtension {
   }
 
   private class Operator : OperatorFunction {
-    override fun apply(vimEditor: VimEditor, context: ExecutionContext, selectionType: SelectionType): Boolean {
-      val editor = vimEditor.ij
-      val c = getChar(editor)
+    override fun apply(editor: VimEditor, context: ExecutionContext, selectionType: SelectionType): Boolean {
+      val ijEditor = editor.ij
+      val c = getChar(ijEditor)
       if (c.code == 0) return true
 
-      val pair = getOrInputPair(c, editor) ?: return false
+      val pair = getOrInputPair(c, ijEditor) ?: return false
       // XXX: Will it work with line-wise or block-wise selections?
-      val range = getSurroundRange(editor) ?: return false
+      val range = getSurroundRange(ijEditor) ?: return false
       runWriteAction {
         val change = VimPlugin.getChange()
         val leftSurround = pair.first
-        val primaryCaret = editor.caretModel.primaryCaret
-        change.insertText(IjVimEditor(editor), IjVimCaret(primaryCaret), range.startOffset, leftSurround)
+        val primaryCaret = ijEditor.caretModel.primaryCaret
+        change.insertText(IjVimEditor(ijEditor), IjVimCaret(primaryCaret), range.startOffset, leftSurround)
         change.insertText(
-          IjVimEditor(editor),
+          IjVimEditor(ijEditor),
           IjVimCaret(primaryCaret),
           range.endOffset + leftSurround.length,
           pair.second
         )
         // Jump back to start
-        executeNormalWithoutMapping(injector.parser.parseKeys("`["), editor)
+        executeNormalWithoutMapping(injector.parser.parseKeys("`["), ijEditor)
       }
       return true
     }

@@ -583,8 +583,7 @@ public class SearchHelper {
       if (ret >= 0) {
         return ret;
       }
-      if (commenter instanceof CodeDocumentationAwareCommenter) {
-        final CodeDocumentationAwareCommenter docCommenter = (CodeDocumentationAwareCommenter)commenter;
+      if (commenter instanceof CodeDocumentationAwareCommenter docCommenter) {
         return findMatchingBlockCommentPair(comment, pos, docCommenter.getDocumentationCommentPrefix(),
                                             docCommenter.getDocumentationCommentSuffix());
       }

@@ -86,8 +86,7 @@ public class ExDocument extends PlainDocument {
 
     final Object attribute =
       attributeSet != null ? attributeSet.getAttribute(StyleConstants.ComposedTextAttribute) : null;
-    if (attribute instanceof AttributedString) {
-      final AttributedString as = (AttributedString)attribute;
+    if (attribute instanceof AttributedString as) {
       final Map<AttributedCharacterIterator.Attribute, Object> attributes = as.getIterator().getAttributes();
       if (!attributes.containsKey(TextAttribute.INPUT_METHOD_HIGHLIGHT) &&
           !attributes.containsKey(TextAttribute.INPUT_METHOD_UNDERLINE)) {

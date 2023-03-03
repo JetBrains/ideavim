@@ -7,6 +7,7 @@
  */
 package com.maddyhome.idea.vim;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.extensions.ExtensionPointName;
 import com.maddyhome.idea.vim.group.KeyGroup;
 import com.maddyhome.idea.vim.handler.ActionBeanClass;
@@ -43,8 +44,9 @@ public class RegisterActions {
   }
 
   public static @Nullable EditorActionHandlerBase findAction(@NotNull String id) {
-    return VIM_ACTIONS_EP.extensions().filter(vimActionBean -> vimActionBean.getActionId().equals(id)).findFirst()
-      .map(ActionBeanClass::getInstance).orElse(null);
+    return VIM_ACTIONS_EP.getExtensionList(ApplicationManager.getApplication()).stream()
+        .filter(vimActionBean -> vimActionBean.getActionId().equals(id)).findFirst().map(ActionBeanClass::getInstance)
+        .orElse(null);
   }
 
   public static @NotNull EditorActionHandlerBase findActionOrDie(@NotNull String id) {
@@ -62,7 +64,8 @@ public class RegisterActions {
 
   private static void registerVimCommandActions() {
     KeyGroup parser = VimPlugin.getKey();
-    VIM_ACTIONS_EP.extensions().map(IjVimActionsInitiator::new).forEach(parser::registerCommandAction);
+    VIM_ACTIONS_EP.getExtensionList(ApplicationManager.getApplication()).stream().map(IjVimActionsInitiator::new)
+        .forEach(parser::registerCommandAction);
   }
 
   private static void registerEmptyShortcuts() {

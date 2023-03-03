@@ -54,7 +54,6 @@ fun VimEditor.normalizeVisualColumn(visualLine: Int, col: Int, allowEnd: Boolean
  * Ensures that the supplied column number for the given buffer line is within the range 0 (incl) and the
  * number of columns in the line (excl).
  *
- * @param this@normalizeColumn   The editor
  * @param line     The buffer line number
  * @param col      The column number to normalize
  * @param allowEnd True if newline allowed
@@ -67,9 +66,8 @@ fun VimEditor.normalizeColumn(line: Int, col: Int, allowEnd: Boolean): Int {
 /**
  * Gets the number of characters on the buffer line equivalent to the specified visual line.
  *
- * This will be different than the number of visual characters if there are "real" tabs in the line.
+ * This will be different from the number of visual characters if there are "real" tabs in the line.
  *
- * @param this@getVisualLineLength The editor
  * @param visualLine   The visual line within the file
  * @return The number of characters in the specified line
  */
@@ -81,7 +79,7 @@ fun VimEditor.getVisualLineLength(visualLine: Int): Int {
 }
 
 /**
- * Gets the number of characters on the specified buffer line. This will be different than the number of visual
+ * Gets the number of characters on the specified buffer line. This will be different from the number of visual
  * characters if there are "real" tabs in the line.
  *
  * @return The number of characters in the specified line
@@ -97,7 +95,6 @@ fun VimEditor.lineLength(line: Int): Int {
 /**
  * Converts a visual line number to a buffer line number.
  *
- * @param this@visualLineToBufferLine The editor
  * @param visualLine   The visual line number to convert
  * @return The buffer line number
  */
@@ -109,7 +106,6 @@ fun VimEditor.visualLineToBufferLine(visualLine: Int): Int {
 /**
  * Ensures that the supplied buffer line is within the range 0 (incl) and the number of buffer lines in the file (excl).
  *
- * @param this@normalizeLine The editor
  * @param line   The buffer line number to normalize
  * @return The normalized buffer line number
  */
@@ -121,7 +117,6 @@ fun VimEditor.normalizeLine(line: Int): Int {
  * Ensures that the supplied offset for the given buffer line is within the range for the line. If allowEnd is true, the
  * range will allow for the offset to be one past the last character on the line.
  *
- * @param this@normalizeOffset   The editor
  * @param line     The buffer line number
  * @param offset   The offset to normalize
  * @param allowEnd true if the offset can be one past the last character on the line, false if not
@@ -139,7 +134,6 @@ fun VimEditor.normalizeOffset(line: Int, offset: Int, allowEnd: Boolean): Int {
 /**
  * Returns the offset of the end of the requested line.
  *
- * @param this@getLineEndOffset   The editor
  * @param line     The buffer line to get the end offset for
  * @param allowEnd True include newline
  * @return 0 if line is &lt 0, file size of line is bigger than file, else the end offset for the line
@@ -157,23 +151,22 @@ fun VimEditor.getLineEndOffset(line: Int, allowEnd: Boolean): Int {
 }
 
 fun VimEditor.normalizeOffset(offset: Int, allowEnd: Boolean = true): Int {
-  var offset = offset
-  if (offset <= 0) {
-    offset = 0
+  var myOffset = offset
+  if (myOffset <= 0) {
+    myOffset = 0
   }
   val textLength: Int = text().length
-  if (offset > textLength) {
-    offset = textLength
+  if (myOffset > textLength) {
+    myOffset = textLength
   }
-  val line: Int = offsetToBufferPosition(offset).line
-  return normalizeOffset(line, offset, allowEnd)
+  val line: Int = offsetToBufferPosition(myOffset).line
+  return normalizeOffset(line, myOffset, allowEnd)
 }
 
 /**
  * Ensures that the supplied visual line is within the range 0 (incl) and the number of visual lines in the file
  * (excl).
  *
- * @param this@normalizeVisualLine The editor
  * @param visualLine   The visual line number to normalize
  * @return The normalized visual line number
  */
@@ -182,10 +175,9 @@ fun VimEditor.normalizeVisualLine(visualLine: Int): Int {
 }
 
 /**
- * Gets the number of visible lines in the editor. This will less then the actual number of lines in the file
+ * Gets the number of visible lines in the editor. This will less than the actual number of lines in the file
  * if there are any collapsed folds.
  *
- * @param this@getVisualLineCount The editor
  * @return The number of visible lines in the file
  */
 fun VimEditor.getVisualLineCount(): Int {
@@ -201,7 +193,6 @@ fun VimEditor.getLineStartForOffset(offset: Int): Int {
 /**
  * Gets the offset of the end of the line containing the supplied offset
  *
- * @param this@getLineEndForOffset The editor
  * @param offset The offset within the line
  * @return The offset of the line end
  */
@@ -213,7 +204,6 @@ fun VimEditor.getLineEndForOffset(offset: Int): Int {
 /**
  * Gets a string representation of the file for the supplied offset range
  *
- * @param this@getText The editor
  * @param start  The starting offset (inclusive)
  * @param end    The ending offset (exclusive)
  * @return The string, never null but empty if start == end

@@ -106,22 +106,22 @@ class ReplaceWithRegister : VimExtension {
   }
 
   private class Operator : OperatorFunction {
-    override fun apply(vimEditor: VimEditor, context: ExecutionContext, selectionType: SelectionType): Boolean {
-      val editor = (vimEditor as IjVimEditor).editor
-      val range = getRange(editor) ?: return false
+    override fun apply(editor: VimEditor, context: ExecutionContext, selectionType: SelectionType): Boolean {
+      val ijEditor = (editor as IjVimEditor).editor
+      val range = getRange(ijEditor) ?: return false
       val visualSelection = PutData.VisualSelection(
         mapOf(
-          vimEditor.primaryCaret() to VimSelection.create(
+            editor.primaryCaret() to VimSelection.create(
             range.startOffset,
             range.endOffset - 1,
             selectionType,
-            vimEditor
+                editor
           )
         ),
         selectionType
       )
       // todo multicaret
-      doReplace(editor, vimEditor.primaryCaret(), visualSelection)
+      doReplace(ijEditor, editor.primaryCaret(), visualSelection)
       return true
     }
 

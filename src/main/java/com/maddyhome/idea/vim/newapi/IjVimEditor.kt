@@ -386,12 +386,12 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
     return EditorUtil.getLastVisualLineColumnNumber(this.ij, line)
   }
 
-  override fun visualPositionToBufferPosition(visualPosition: VimVisualPosition): BufferPosition {
+  override fun visualPositionToBufferPosition(position: VimVisualPosition): BufferPosition {
     val logPosition = editor.visualToLogicalPosition(
       VisualPosition(
-        visualPosition.line,
-        visualPosition.column,
-        visualPosition.leansRight
+        position.line,
+        position.column,
+        position.leansRight
       )
     )
     return BufferPosition(logPosition.line, logPosition.column, logPosition.leansForward)

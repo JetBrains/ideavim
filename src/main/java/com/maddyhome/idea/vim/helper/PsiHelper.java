@@ -20,9 +20,12 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
-import gnu.trove.TIntArrayList;
+import com.intellij.util.containers.ContainerUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PsiHelper {
   public static int findMethodStart(@NotNull Editor editor, int offset, int count) {
@@ -40,18 +43,17 @@ public class PsiHelper {
       return -1;
     }
     StructureViewBuilder structureViewBuilder = LanguageStructureViewBuilder.INSTANCE.getStructureViewBuilder(file);
-    if (!(structureViewBuilder instanceof TreeBasedStructureViewBuilder)) return -1;
-    TreeBasedStructureViewBuilder builder = (TreeBasedStructureViewBuilder)structureViewBuilder;
+    if (!(structureViewBuilder instanceof TreeBasedStructureViewBuilder builder)) return -1;
     StructureViewModel model = builder.createStructureViewModel(editor);
 
-    TIntArrayList navigationOffsets = new TIntArrayList();
+    List<Integer> navigationOffsets = new ArrayList<>();
     addNavigationElements(model.getRoot(), navigationOffsets, isStart);
 
     if (navigationOffsets.isEmpty()) {
       return -1;
     }
 
-    navigationOffsets.sort();
+    ContainerUtil.sort(navigationOffsets);
 
     int index = navigationOffsets.size();
     for (int i = 0; i < navigationOffsets.size(); i++) {
@@ -77,7 +79,7 @@ public class PsiHelper {
   }
 
   private static void addNavigationElements(@NotNull TreeElement root,
-                                            @NotNull TIntArrayList navigationOffsets,
+                                            @NotNull List<Integer> navigationOffsets,
                                             boolean start) {
     if (root instanceof PsiTreeElementBase) {
       PsiElement element = ((PsiTreeElementBase<?>)root).getValue();

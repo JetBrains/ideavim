@@ -138,10 +138,10 @@ class VimExchangeExtension : VimExtension {
       else -> error("Invalid SubMode: $this")
     }
 
-    override fun apply(vimEditor: VimEditor, context: ExecutionContext, selectionType: SelectionType): Boolean {
-      val editor = vimEditor.ij
+    override fun apply(editor: VimEditor, context: ExecutionContext, selectionType: SelectionType): Boolean {
+      val ijEditor = editor.ij
       fun highlightExchange(ex: Exchange): RangeHighlighter {
-        val attributes = editor.colorsScheme.getAttributes(EditorColors.TEXT_SEARCH_RESULT_ATTRIBUTES)
+        val attributes = ijEditor.colorsScheme.getAttributes(EditorColors.TEXT_SEARCH_RESULT_ATTRIBUTES)
         val hlArea = when (ex.type) {
           VimStateMachine.SubMode.VISUAL_LINE -> HighlighterTargetArea.LINES_IN_RANGE
           // TODO: handle other modes
@@ -149,21 +149,21 @@ class VimExchangeExtension : VimExtension {
         }
         val isVisualLine = ex.type == VimStateMachine.SubMode.VISUAL_LINE
         val endAdj = if (!(isVisualLine) && (hlArea == HighlighterTargetArea.EXACT_RANGE || (isVisual))) 1 else 0
-        return editor.markupModel.addRangeHighlighter(
-          editor.getMarkOffset(ex.start),
-          (editor.getMarkOffset(ex.end) + endAdj).coerceAtMost(editor.fileSize),
+        return ijEditor.markupModel.addRangeHighlighter(
+          ijEditor.getMarkOffset(ex.start),
+          (ijEditor.getMarkOffset(ex.end) + endAdj).coerceAtMost(ijEditor.fileSize),
           HighlighterLayer.SELECTION - 1,
           attributes,
           hlArea
         )
       }
 
-      val currentExchange = getExchange(editor, isVisual, selectionType)
-      val exchange1 = editor.getUserData(EXCHANGE_KEY)
+      val currentExchange = getExchange(ijEditor, isVisual, selectionType)
+      val exchange1 = ijEditor.getUserData(EXCHANGE_KEY)
       if (exchange1 == null) {
         val highlighter = highlightExchange(currentExchange)
         currentExchange.setHighlighter(highlighter)
-        editor.putUserData(EXCHANGE_KEY, currentExchange)
+        ijEditor.putUserData(EXCHANGE_KEY, currentExchange)
         return true
       } else {
         val cmp = compareExchanges(exchange1, currentExchange)
@@ -188,8 +188,8 @@ class VimExchangeExtension : VimExtension {
             Pair(exchange1, currentExchange)
           }
         }
-        exchange(editor, ex1, ex2, reverse, expand)
-        clearExchange(editor)
+        exchange(ijEditor, ex1, ex2, reverse, expand)
+        clearExchange(ijEditor)
         return true
       }
     }
