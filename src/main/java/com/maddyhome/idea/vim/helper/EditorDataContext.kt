@@ -10,11 +10,13 @@ package com.maddyhome.idea.vim.helper
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.UserDataHolder
 
 class EditorDataContext @Deprecated("Please use `init` method") constructor(
   private val editor: Editor,
+  private val editorContext: DataContext,
   private val contextDelegate: DataContext? = null,
 ) : DataContext, UserDataHolder {
   /**
@@ -28,7 +30,7 @@ class EditorDataContext @Deprecated("Please use `init` method") constructor(
     PlatformDataKeys.EDITOR.name == dataId -> editor
     PlatformDataKeys.PROJECT.name == dataId -> editor.project
     PlatformDataKeys.VIRTUAL_FILE.name == dataId -> EditorHelper.getVirtualFile(editor)
-    else -> contextDelegate?.getData(dataId)
+    else -> editorContext.getData(dataId) ?: contextDelegate?.getData(dataId)
   }
 
   override fun <T : Any?> getUserData(key: Key<T>): T? {
@@ -49,14 +51,15 @@ class EditorDataContext @Deprecated("Please use `init` method") constructor(
     @Suppress("DEPRECATION")
     @JvmStatic
     fun init(editor: Editor, contextDelegate: DataContext? = null): EditorDataContext {
+      val editorContext = EditorUtil.getEditorDataContext(editor)
       return if (contextDelegate is EditorDataContext) {
         if (editor === contextDelegate.editor) {
           contextDelegate
         } else {
-          EditorDataContext(editor, contextDelegate.contextDelegate)
+          EditorDataContext(editor, editorContext, contextDelegate.contextDelegate)
         }
       } else {
-        EditorDataContext(editor, contextDelegate)
+        EditorDataContext(editor, editorContext, contextDelegate)
       }
     }
   }
