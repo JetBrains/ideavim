@@ -21,7 +21,7 @@ import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
-import com.intellij.openapi.project.ProjectManagerListener
+import com.intellij.openapi.startup.ProjectActivity
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowId
 import com.intellij.openapi.wm.ex.ToolWindowManagerEx
@@ -181,8 +181,9 @@ class NerdTree : VimExtension {
     }
   }
 
-  class NerdProjectListener : ProjectManagerListener {
-    override fun projectOpened(project: Project) {
+  // TODO I'm not sure is this activity runs at all? Should we use [RunOnceUtil] instead?
+  class NerdStartupActivity : ProjectActivity {
+    override suspend fun execute(project: Project) {
       synchronized(monitor) {
         if (!commandsRegistered) return
         installDispatcher(project)
@@ -219,8 +220,6 @@ class NerdTree : VimExtension {
     }
 
     override fun update(e: AnActionEvent) {
-      val project = e.project ?: return
-
       // Special processing of esc.
       if ((e.inputEvent as? KeyEvent)?.keyCode == ESCAPE_KEY_CODE) {
         e.presentation.isEnabled = waitForSearch
