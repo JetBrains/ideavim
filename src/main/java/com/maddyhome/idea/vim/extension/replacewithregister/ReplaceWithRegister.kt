@@ -111,11 +111,11 @@ class ReplaceWithRegister : VimExtension {
       val range = getRange(ijEditor) ?: return false
       val visualSelection = PutData.VisualSelection(
         mapOf(
-            editor.primaryCaret() to VimSelection.create(
+          editor.primaryCaret() to VimSelection.create(
             range.startOffset,
             range.endOffset - 1,
             selectionType,
-                editor
+            editor
           )
         ),
         selectionType
