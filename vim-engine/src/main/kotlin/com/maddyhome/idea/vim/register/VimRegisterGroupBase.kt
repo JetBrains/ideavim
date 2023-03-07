@@ -274,17 +274,19 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     isDelete: Boolean,
   ): Boolean {
     if (isRegisterWritable()) {
-      var text = editor.getText(range)
-
-      if (type == SelectionType.LINE_WISE && (text.isEmpty() || text[text.length - 1] != '\n')) {
-        // Linewise selection always has a new line at the end
-        text += '\n'.toString()
-      }
-
+      val text = preprocessTextBeforeStoring(editor.getText(range), type)
       return storeTextInternal(editor, caret, range, text, type, lastRegisterChar, isDelete)
     }
 
     return false
+  }
+  
+  protected fun preprocessTextBeforeStoring(text: String, type: SelectionType): String {
+    if (type == SelectionType.LINE_WISE && (text.isEmpty() || text[text.length - 1] != '\n')) {
+      // Linewise selection always has a new line at the end
+      return text + '\n'
+    }
+    return text
   }
 
   /**

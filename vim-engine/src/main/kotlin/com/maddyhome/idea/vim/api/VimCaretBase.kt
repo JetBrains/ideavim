@@ -31,13 +31,18 @@ open class CaretRegisterStorageBase(override var caret: ImmutableVimCaret) : Car
     set(_) {}
 
   override fun storeText(editor: VimEditor, range: TextRange, type: SelectionType, isDelete: Boolean): Boolean {
+    val registerChar = if (caret.editor.carets().size == 1) currentRegister else getCurrentRegisterForMulticaret()
     if (caret.isPrimary) {
-      return injector.registerGroup.storeText(editor, caret, range, type, isDelete)
+      val registerService = injector.registerGroup
+      registerService.lastRegisterChar = registerChar
+      return registerService.storeText(editor, caret, range, type, isDelete)
+    } else {
+      if (!RegisterConstants.RECORDABLE_REGISTERS.contains(registerChar)) {
+        return false
+      }
+      val text = preprocessTextBeforeStoring(editor.getText(range), type)
+      return storeTextInternal(editor, caret, range, text, type, registerChar, isDelete)
     }
-    if (!RegisterConstants.RECORDABLE_REGISTERS.contains(lastRegisterChar)) {
-      return false
-    }
-    return super.storeText(editor, caret, range, type, isDelete)
   }
 
   override fun getRegister(r: Char): Register? {

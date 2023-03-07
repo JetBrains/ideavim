@@ -22,7 +22,7 @@ interface VimRegisterGroup {
    * @return The register, null if no such register
    */
   val lastRegister: Register?
-  val lastRegisterChar: Char
+  var lastRegisterChar: Char
   val currentRegister: Char
   /**
    * When we access last register, it can be e.g. " because of two reasons:
