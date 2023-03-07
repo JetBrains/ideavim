@@ -43,7 +43,8 @@ import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
-import java.lang.Integer.min
+import kotlin.math.max
+import kotlin.math.min
 
 @NlsSafe
 private const val NEXT_WHOLE_OCCURRENCE = "<Plug>NextWholeOccurrence"
@@ -150,7 +151,16 @@ class VimMultipleCursorsExtension : VimExtension {
           // Keep a track of the selected text, we'll check it later
           patterns.add(selectedText)
 
-          val lines = selectedText.count { it == '\n' }
+          val minOffset = min(caret.selectionEnd, caret.selectionStart)
+          var maxOffset = max(caret.selectionEnd, caret.selectionStart)
+
+          // As the last offset appears after the new line character, technically it's placed on the next line.
+          if (selectedText.lastOrNull() == '\n') {
+            maxOffset -= 1
+          }
+          val start = editor.document.getLineNumber(minOffset)
+          val end = editor.document.getLineNumber(maxOffset)
+          val lines = end - start
           if (lines > 0) {
             val selectionStart = min(caret.selectionStart, caret.selectionEnd)
             val startPosition = editor.offsetToVisualPosition(selectionStart)
@@ -163,7 +173,7 @@ class VimMultipleCursorsExtension : VimExtension {
 
         if (newPositions.size > 0) {
           editor.vim.exitVisualMode()
-          newPositions.forEach { editor.caretModel.addCaret(it, true) ?: return }
+          newPositions.forEach { editor.caretModel.addCaret(it, true) ?: return@forEach }
           editor.updateCaretsVisualAttributes()
           return
         }
