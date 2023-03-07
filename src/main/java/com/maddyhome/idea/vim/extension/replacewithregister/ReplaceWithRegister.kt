@@ -60,7 +60,7 @@ class ReplaceWithRegister : VimExtension {
   private class RwrVisual : ExtensionHandler {
     override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
       val typeInEditor = SelectionType.fromSubMode(editor.subMode)
-      editor.carets().forEach { caret ->
+      editor.sortedCarets().forEach { caret ->
         val selectionStart = caret.selectionStart
         val selectionEnd = caret.selectionEnd
 

@@ -449,4 +449,29 @@ class ReplaceWithRegisterTest : VimTestCase() {
     )
     assertMode(VimStateMachine.Mode.COMMAND)
   }
+
+//  https://youtrack.jetbrains.com/issue/VIM-2881/ReplaceRegister-does-no-longer-worker-with-MultiCursor
+  fun `test multiple carets`() {
+    enableExtensions("multiple-cursors")
+    val text = """
+      ${c}copyMe
+      selectMe
+      selectMe
+      selectMe
+      selectMe
+    """.trimIndent()
+    configureByText(text)
+    enterCommand("set clipboard+=unnamedplus")
+    typeText(injector.parser.parseKeys("ye" + "j" + "<A-n><A-n><A-n><A-n>" + "gr"))
+    assertState(
+      """
+        copyMe
+        copyMe
+        copyMe
+        copyMe
+        copyMe
+      """.trimIndent()
+    )
+    assertMode(VimStateMachine.Mode.COMMAND)
+  }
 }
