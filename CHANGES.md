@@ -43,6 +43,7 @@ usual beta standards.
 * [VIM-2315](https://youtrack.jetbrains.com/issue/VIM-2315) Fix overlapping mappings execution
 * [VIM-44](https://youtrack.jetbrains.com/issue/VIM-44) Unify navigation history between ideavim and idea
 * [VIM-1735](https://youtrack.jetbrains.com/issue/VIM-1735) Fix enabling mulple carets after line selection
+* [VIM-2881](https://youtrack.jetbrains.com/issue/VIM-2881) ReplaceRegister does no longer worker with MultiCursor
 
 ### Merged PRs:
 * [589](https://github.com/JetBrains/ideavim/pull/589) by [Matt Ellis](https://github.com/citizenmatt): Refactor option usage and introduce accessor API
