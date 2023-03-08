@@ -344,6 +344,7 @@ class UiTests {
       enter()
     }
 
+    Thread.sleep(1000)
     assertEquals("One", editor.selectedText)
 
     keyboard {
