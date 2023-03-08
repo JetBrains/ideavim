@@ -9,10 +9,9 @@
 package com.maddyhome.idea.vim
 
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
-import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManagerListener
-import com.intellij.openapi.startup.ProjectActivity
+import com.intellij.openapi.startup.StartupActivity
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.EditorHelper
@@ -22,12 +21,11 @@ import com.maddyhome.idea.vim.vimscript.services.IjOptionConstants
 /**
  * @author Alex Plate
  */
-class PluginStartup : ProjectActivity, DumbAware/*, LightEditCompatible*/ {
+class PluginStartup : StartupActivity.DumbAware/*, LightEditCompatible*/ {
 
   private var firstInitializationOccurred = false
 
-  // TODO: Should we use RunOnceUtil?
-  override suspend fun execute(project: Project) {
+  override fun runActivity(project: Project) {
     if (firstInitializationOccurred) return
     firstInitializationOccurred = true
 
