@@ -39,6 +39,7 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.VimShortcutKeyAction
 import com.maddyhome.idea.vim.api.VimOptionGroup
+import com.maddyhome.idea.vim.api.getKnownToggleOption
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.options
@@ -158,9 +159,7 @@ abstract class VimTestCase : UsefulTestCase() {
 
   protected fun enableExtensions(vararg extensionNames: String) {
     for (name in extensionNames) {
-      (injector.optionGroup.getOption(name) as? ToggleOption)?.let { option ->
-        injector.optionGroup.setToggleOption(option, OptionScope.GLOBAL)
-      }
+      injector.optionGroup.setToggleOption(injector.optionGroup.getKnownToggleOption(name), OptionScope.GLOBAL)
     }
   }
 

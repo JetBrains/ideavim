@@ -14,11 +14,8 @@ import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.options.OptionValueAccessor
 import com.maddyhome.idea.vim.options.StringOption
 import com.maddyhome.idea.vim.options.ToggleOption
-import com.maddyhome.idea.vim.options.appendValue
-import com.maddyhome.idea.vim.options.removeValue
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
 interface VimOptionGroup {
   /**
@@ -138,27 +135,37 @@ fun VimOptionGroup.invertToggleOption(option: ToggleOption, scope: OptionScope) 
 
 
 /**
- * Convenience function to append a value to a known global option
+ * Get an instance of [Option] for a well-known option name
  *
- * There is no validation - the option is assumed to exist, be a string list option, and the passed value is assumed to
- * be valid.
+ * The option must exist, or an exception will be thrown
  */
-fun VimOptionGroup.unsafeAppendGlobalKnownOptionValue(optionName: String, value: String) {
-  val option = getOption(optionName)!!
-  val existingValue = getOptionValue(option, OptionScope.GLOBAL)
-  val newValue = option.appendValue(existingValue, VimString(value))!!
-  setOptionValue(option, OptionScope.GLOBAL, newValue)
-}
+fun VimOptionGroup.getKnownOption(optionName: String) = getOption(optionName)!!
 
 /**
- * Convenience function to remove a value to a known global option
+ * Get an instance of [ToggleOption] for a well-known option name
  *
- * There is no validation - the option is assumed to exist, be a string list option, and the passed value is assumed to
- * be valid.
+ * The option must exist, or an exception will be thrown
  */
-fun VimOptionGroup.unsafeRemoveGlobalKnownOptionValue(optionName: String, value: String) {
-  val option = getOption(optionName)!!
-  val existingValue = getOptionValue(option, OptionScope.GLOBAL)
-  val newValue = option.removeValue(existingValue, VimString(value))!!
-  setOptionValue(option, OptionScope.GLOBAL, newValue)
+fun VimOptionGroup.getKnownToggleOption(optionName: String) = getOption(optionName) as ToggleOption
+
+/**
+ * Get an instance of [StringOption] for a well-known option name
+ *
+ * The option must exist, or an exception will be thrown
+ */
+fun VimOptionGroup.getKnownStringOption(optionName: String) = getOption(optionName) as StringOption
+
+
+/**
+ * Modifies the value of an option by calling the given transform function
+ */
+inline fun <TDataType : VimDataType> VimOptionGroup.modifyOptionValue(
+  option: Option<TDataType>,
+  scope: OptionScope,
+  transform: (TDataType) -> TDataType?,
+) {
+  @Suppress("UNCHECKED_CAST") val currentValue = getOptionValue(option, scope) as TDataType
+  transform(currentValue)?.let {
+    setOptionValue(option, scope, it)
+  }
 }
