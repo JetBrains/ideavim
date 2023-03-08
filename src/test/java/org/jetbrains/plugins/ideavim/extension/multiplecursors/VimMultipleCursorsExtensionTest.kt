@@ -622,8 +622,8 @@ fun getCellType(${s}pos$se: VisualPosition): CellType {
       I found it in a legendary land
       all rocks and lavender and tufted grass,
       
-      ${c}
-      ${c}
+      $c
+      $c
       ${c}where it was settled on some sodden sand
       ${c}hard by the torrent of a mountain pass.""".trimIndent()
     doTest("Vkkk<A-n>", before, after)
@@ -642,8 +642,8 @@ fun getCellType(${s}pos$se: VisualPosition): CellType {
     val after = """
       ${c}I found it in a legendary land
       ${c}all rocks and lavender and tufted grass,
-      ${c}
-      ${c}
+      $c
+      $c
       
       where it was settled on some sodden sand
       hard by the torrent of a mountain pass.""".trimIndent()
