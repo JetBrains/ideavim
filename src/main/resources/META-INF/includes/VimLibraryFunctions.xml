@@ -23,5 +23,6 @@
     <vimLibraryFunction implementation="com.maddyhome.idea.vim.vimscript.model.functions.handlers.ToupperFunctionHandler" name="toupper"/>
     <vimLibraryFunction implementation="com.maddyhome.idea.vim.vimscript.model.functions.handlers.JoinFunctionHandler" name="join"/>
     <vimLibraryFunction implementation="com.maddyhome.idea.vim.vimscript.model.functions.handlers.SplitFunctionHandler" name="split"/>
+    <vimLibraryFunction implementation="com.maddyhome.idea.vim.vimscript.model.functions.handlers.GetFunctionHandler" name="get"/>
   </extensions>
 </idea-plugin>
