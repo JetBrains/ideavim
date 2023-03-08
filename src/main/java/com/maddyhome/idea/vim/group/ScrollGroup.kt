@@ -12,6 +12,7 @@ import com.intellij.openapi.editor.VisualPosition
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimScrollGroup
+import com.maddyhome.idea.vim.api.getKnownOption
 import com.maddyhome.idea.vim.api.getVisualLineCount
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
@@ -301,9 +302,8 @@ class ScrollGroup : VimScrollGroup {
         return injector.globalOptions().getIntValue(OptionConstants.scroll)
       }
       // TODO: This should be reset whenever the window size changes
-      injector.optionGroup.getOption(OptionConstants.scroll)?.let { option ->
-        injector.optionGroup.setOptionValue(option, OptionScope.GLOBAL, VimInt(rawCount))
-      }
+      val option = injector.optionGroup.getKnownOption(OptionConstants.scroll)
+      injector.optionGroup.setOptionValue(option, OptionScope.GLOBAL, VimInt(rawCount))
       return rawCount
     }
   }

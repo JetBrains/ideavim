@@ -30,6 +30,7 @@ import com.intellij.openapi.project.DumbAwareToggleAction
 import com.intellij.openapi.util.TextRange
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.getKnownToggleOption
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.invertToggleOption
@@ -42,7 +43,6 @@ import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.options.ToggleOption
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.IdeaRefactorModeHelper
 import org.jetbrains.annotations.NonNls
 import java.awt.event.KeyEvent
@@ -211,9 +211,8 @@ class FindActionIdAction : DumbAwareToggleAction() {
   override fun isSelected(e: AnActionEvent): Boolean = injector.globalOptions().isSet(IjOptionConstants.trackactionids)
 
   override fun setSelected(e: AnActionEvent, state: Boolean) {
-    (injector.optionGroup.getOption(IjOptionConstants.trackactionids) as? ToggleOption)?.let { option ->
-      injector.optionGroup.invertToggleOption(option, OptionScope.GLOBAL)
-    }
+    val option = injector.optionGroup.getKnownToggleOption(IjOptionConstants.trackactionids)
+    injector.optionGroup.invertToggleOption(option, OptionScope.GLOBAL)
   }
 }
 //endregion

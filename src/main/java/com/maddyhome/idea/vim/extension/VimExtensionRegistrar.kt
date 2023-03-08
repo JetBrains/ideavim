@@ -109,9 +109,8 @@ object VimExtensionRegistrar : VimExtensionRegistrator {
 
   override fun setOptionByPluginAlias(alias: String): Boolean {
     val name = extensionAliases[alias] ?: return false
-    (injector.optionGroup.getOption(name) as? ToggleOption)?.let {
-      injector.optionGroup.setToggleOption(it, OptionScope.GLOBAL)
-    } ?: return false
+    val option = injector.optionGroup.getOption(name) as? ToggleOption ?: return false
+    injector.optionGroup.setToggleOption(option, OptionScope.GLOBAL)
     return true
   }
 

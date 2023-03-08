@@ -9,6 +9,7 @@
 package org.jetbrains.plugins.ideavim.option
 
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.getKnownOption
 import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.helpers.GuiCursorMode
@@ -26,7 +27,7 @@ class GuiCursorOptionTest : VimTestCase() {
     options().getStringListValues(OptionConstants.guicursor).map { GuiCursorOptionHelper.convertToken(it) }
 
   private fun assertHasDefaultValue() {
-    val defaultValue = VimPlugin.getOptionGroup().getOption(OptionConstants.guicursor)!!.defaultValue.asString()
+    val defaultValue = VimPlugin.getOptionGroup().getKnownOption(OptionConstants.guicursor).defaultValue.asString()
     assertEquals(defaultValue, options().getStringValue(OptionConstants.guicursor))
   }
 
