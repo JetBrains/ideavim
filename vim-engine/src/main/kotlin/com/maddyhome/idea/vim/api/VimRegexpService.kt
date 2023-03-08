@@ -10,4 +10,5 @@ package com.maddyhome.idea.vim.api
 
 interface VimRegexpService {
   fun matches(pattern: String, text: String?, ignoreCase: Boolean = false): Boolean
+  fun getAllMatches(text: String, pattern: String): List<Pair<Int, Int>>
 }

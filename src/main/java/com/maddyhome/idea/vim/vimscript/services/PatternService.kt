@@ -35,4 +35,24 @@ object PatternService : VimRegexpService {
     }
     return false
   }
+
+  override fun getAllMatches(text: String, pattern: String): List<Pair<Int, Int>> {
+    val regExp = RegExp()
+    val regMatch = regmmatch_T()
+    regMatch.regprog = regExp.vim_regcomp(pattern, 1)
+    if (regMatch.regprog == null) {
+      return emptyList()
+    }
+
+    val result = mutableListOf<Pair<Int, Int>>()
+    // FIXME I feel pain just looking at it
+    for (i in text.indices) {
+      if (regExp.vim_string_contains_regexp(regMatch, text.substring(i))) {
+        val matchStart = regMatch.startpos[0]?.col ?: continue
+        val matchEnd = regMatch.endpos[0]?.col ?: continue
+        result.add(Pair(matchStart + i, matchEnd + i))
+      }
+    }
+    return result
+  }
 }
