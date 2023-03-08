@@ -16,7 +16,6 @@ import com.intellij.openapi.editor.actionSystem.TypedActionHandlerEx
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.helper.EditorDataContext
 import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
 import com.maddyhome.idea.vim.key.KeyHandlerKeeper
@@ -76,7 +75,7 @@ class VimTypedActionHandler(origHandler: TypedActionHandler) : TypedActionHandle
       val modifiers = if (charTyped == ' ' && VimKeyListener.isSpaceShift) KeyEvent.SHIFT_DOWN_MASK else 0
       val keyStroke = KeyStroke.getKeyStroke(charTyped, modifiers)
       val startTime = if (traceTime) System.currentTimeMillis() else null
-      handler.handleKey(editor.vim, keyStroke, EditorDataContext.init(editor, context).vim)
+      handler.handleKey(editor.vim, keyStroke, injector.executionContextManager.onEditor(editor.vim, context.vim))
       if (startTime != null) {
         val duration = System.currentTimeMillis() - startTime
         LOG.info("VimTypedAction '$charTyped': $duration ms")

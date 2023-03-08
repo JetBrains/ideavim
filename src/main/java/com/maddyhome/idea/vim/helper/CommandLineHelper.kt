@@ -12,6 +12,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.Service
 import com.maddyhome.idea.vim.action.change.Extension
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.ui.ModalEntry
@@ -52,7 +53,7 @@ class CommandLineHelper : VimCommandLineHelper {
       var text: String? = null
       // XXX: The Ex entry panel is used only for UI here, its logic might be inappropriate for input()
       val exEntryPanel = ExEntryPanel.getInstanceWithoutShortcuts()
-      exEntryPanel.activate(editor, EditorDataContext.init(editor), prompt.ifEmpty { " " }, "", 1)
+      exEntryPanel.activate(editor, injector.executionContextManager.onEditor(editor.vim).ij, prompt.ifEmpty { " " }, "", 1)
       ModalEntry.activate(editor.vim) { key: KeyStroke ->
         return@activate when {
           key.isCloseKeyStroke() -> {

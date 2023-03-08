@@ -14,6 +14,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ExecutionContextManagerBase
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.EditorDataContext
 import com.maddyhome.idea.vim.options.helpers.StrictMode
 
@@ -21,8 +22,6 @@ import com.maddyhome.idea.vim.options.helpers.StrictMode
 class IjExecutionContextManager : ExecutionContextManagerBase() {
   override fun onEditor(editor: VimEditor, prevContext: ExecutionContext?): ExecutionContext.Editor {
     if (prevContext is ExecutionContext.CaretAndEditor) {
-      StrictMode.fail("You should not create context on editor from the context on caret and editor")
-      prevContext.updateEditor(editor)
       return prevContext
     }
     return IjEditorExecutionContext(EditorDataContext.init((editor as IjVimEditor).editor, prevContext?.ij))

@@ -46,7 +46,6 @@ import com.maddyhome.idea.vim.command.VimStateMachine.SubMode
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ExOutputModel.Companion.getInstance
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer.swingTimer
-import com.maddyhome.idea.vim.helper.EditorDataContext
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.GuicursorChangeListener
 import com.maddyhome.idea.vim.helper.RunnableHelper.runWriteCommand
@@ -59,6 +58,7 @@ import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.ToKeysMappingInfo
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.newapi.IjVimEditor
+import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
@@ -645,7 +645,7 @@ abstract class VimTestCase : UsefulTestCase() {
 
         val e = AnActionEvent(
           event,
-          EditorDataContext.init(editor),
+          injector.executionContextManager.onEditor(editor.vim).ij,
           ActionPlaces.KEYBOARD_SHORTCUT,
           VimShortcutKeyAction.instance.templatePresentation.clone(),
           ActionManager.getInstance(),
@@ -666,7 +666,7 @@ abstract class VimTestCase : UsefulTestCase() {
 
     fun typeText(keys: List<KeyStroke?>, editor: Editor, project: Project?) {
       val keyHandler = KeyHandler.getInstance()
-      val dataContext = EditorDataContext.init(editor)
+      val dataContext = injector.executionContextManager.onEditor(editor.vim)
       TestInputModel.getInstance(editor).setKeyStrokes(keys.filterNotNull())
       runWriteCommand(
         project,
@@ -674,7 +674,7 @@ abstract class VimTestCase : UsefulTestCase() {
           val inputModel = TestInputModel.getInstance(editor)
           var key = inputModel.nextKeyStroke()
           while (key != null) {
-            keyHandler.handleKey(editor.vim, key, dataContext.vim)
+            keyHandler.handleKey(editor.vim, key, dataContext)
             key = inputModel.nextKeyStroke()
           }
         },

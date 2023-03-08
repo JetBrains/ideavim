@@ -14,7 +14,6 @@ import com.intellij.openapi.editor.VisualPosition
 import com.intellij.openapi.editor.ex.EditorSettingsExternalizable
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.helper.EditorDataContext
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.newapi.vim
 import junit.framework.TestCase
@@ -286,7 +285,10 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
       |all rocks and lavender and tufted grass,
     """.trimMargin()
     )
-    injector.actionExecutor.executeAction("EditorCloneCaretBelow", EditorDataContext.init(myFixture.editor).vim)
+    injector.actionExecutor.executeAction(
+      "EditorCloneCaretBelow",
+      injector.executionContextManager.onEditor(myFixture.editor.vim)
+    )
     TestCase.assertEquals(2, myFixture.editor.caretModel.caretCount)
     assertCaretVisualAttributes(CaretVisualAttributes.Shape.BLOCK, 0f)
   }

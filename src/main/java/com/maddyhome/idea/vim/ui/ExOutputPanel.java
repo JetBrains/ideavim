@@ -17,8 +17,11 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.IJSwingUtilities;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.helper.*;
-import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext;
+import com.maddyhome.idea.vim.api.ExecutionContext;
+import com.maddyhome.idea.vim.helper.HelperKt;
+import com.maddyhome.idea.vim.helper.MessageHelper;
+import com.maddyhome.idea.vim.helper.UiHelper;
+import com.maddyhome.idea.vim.helper.UserDataManager;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.options.OptionConstants;
 import org.jetbrains.annotations.Nls;
@@ -296,8 +299,8 @@ public class ExOutputPanel extends JPanel {
         final List<KeyStroke> keys = new ArrayList<>(1);
         keys.add(key);
         KeyHandler.getInstance().getKeyStack().addKeys(keys);
-        VimPlugin.getMacro().playbackKeys(new IjVimEditor(myEditor), new IjEditorExecutionContext(EditorDataContext.init(myEditor, null)),
-                                          1);
+        ExecutionContext.Editor context = injector.getExecutionContextManager().onEditor(new IjVimEditor(myEditor), null);
+        VimPlugin.getMacro().playbackKeys(new IjVimEditor(myEditor), context, 1);
       }
     });
   }

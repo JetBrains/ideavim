@@ -11,11 +11,11 @@ package com.maddyhome.idea.vim.newapi
 import com.intellij.openapi.actionSystem.DataContext
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.helper.EditorDataContext
+import com.maddyhome.idea.vim.api.injector
 
 open class IjEditorExecutionContext(override val context: DataContext) : ExecutionContext.Editor {
   override fun updateEditor(editor: VimEditor): ExecutionContext {
-    return IjEditorExecutionContext(EditorDataContext.init((editor as IjVimEditor).editor, context))
+    return IjEditorExecutionContext(injector.executionContextManager.onEditor(editor, context.vim).ij)
   }
 }
 

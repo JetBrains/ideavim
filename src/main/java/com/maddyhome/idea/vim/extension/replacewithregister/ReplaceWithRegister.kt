@@ -28,7 +28,6 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.executeNormalWithoutM
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setOperatorFunction
 import com.maddyhome.idea.vim.group.visual.VimSelection
-import com.maddyhome.idea.vim.helper.EditorDataContext
 import com.maddyhome.idea.vim.helper.editorMode
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.mode
@@ -169,7 +168,7 @@ class ReplaceWithRegister : VimExtension {
       ClipboardOptionHelper.IdeaputDisabler().use {
         VimPlugin.getPut().putText(
           IjVimEditor(editor),
-          IjEditorExecutionContext(EditorDataContext.init(editor)),
+          injector.executionContextManager.onEditor(editor.vim),
           putData,
           operatorArguments = OperatorArguments(
             editor.vimStateMachine?.isOperatorPending ?: false,

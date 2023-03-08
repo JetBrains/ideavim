@@ -15,12 +15,12 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.change.Extension
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.CommandAlias
 import com.maddyhome.idea.vim.common.CommandAliasHandler
 import com.maddyhome.idea.vim.helper.CommandLineHelper
-import com.maddyhome.idea.vim.helper.EditorDataContext
 import com.maddyhome.idea.vim.helper.TestInputModel
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.key.MappingOwner
@@ -130,8 +130,8 @@ object VimExtensionFacade {
    */
   @JvmStatic
   fun executeNormalWithoutMapping(keys: List<KeyStroke>, editor: Editor) {
-    val context = EditorDataContext.init(editor)
-    keys.forEach { KeyHandler.getInstance().handleKey(editor.vim, it, context.vim, false, false) }
+    val context = injector.executionContextManager.onEditor(editor.vim)
+    keys.forEach { KeyHandler.getInstance().handleKey(editor.vim, it, context, false, false) }
   }
 
   /** Returns a single key stroke from the user input similar to 'getchar()'. */

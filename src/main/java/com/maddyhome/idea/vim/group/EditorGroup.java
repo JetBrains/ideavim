@@ -13,17 +13,20 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
-import com.intellij.openapi.editor.*;
+import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.EditorGutter;
+import com.intellij.openapi.editor.EditorSettings;
+import com.intellij.openapi.editor.LineNumberConverter;
 import com.intellij.openapi.editor.event.CaretEvent;
 import com.intellij.openapi.editor.event.CaretListener;
 import com.intellij.openapi.editor.ex.EditorGutterComponentEx;
 import com.intellij.openapi.project.Project;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.api.ExecutionContext;
 import com.maddyhome.idea.vim.api.VimEditor;
 import com.maddyhome.idea.vim.api.VimEditorGroup;
 import com.maddyhome.idea.vim.helper.*;
-import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.options.LocalOptionChangeListener;
 import com.maddyhome.idea.vim.options.OptionConstants;
@@ -214,7 +217,8 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
     if (!EditorHelper.isFileEditor(editor) &&
         editor.getDocument().isWritable() &&
         !CommandStateHelper.inInsertMode(editor)) {
-      VimPlugin.getChange().insertBeforeCursor(new IjVimEditor(editor), new IjEditorExecutionContext(EditorDataContext.init(editor, null)));
+      ExecutionContext.Editor context = injector.getExecutionContextManager().onEditor(new IjVimEditor(editor), null);
+      VimPlugin.getChange().insertBeforeCursor(new IjVimEditor(editor), context);
       KeyHandler.getInstance().reset(new IjVimEditor(editor));
     }
     updateCaretsVisualAttributes(editor);
