@@ -21,6 +21,11 @@ import com.maddyhome.idea.vim.vimscript.services.IjOptionConstants
 /**
  * @author Alex Plate
  */
+// This service should be migrated to ProjectActivity. But we should cariful because simple replacement
+// leads to deadlock in tests. I'm not sure about the exact reasons, but "invokeAndWait" inside "initialize" function
+// causes this deadlock. Good new: it's easy reproducible in tests.
+// Previous migration: fc7efd5484a13b40ba9bf86a1d5429e215d973f3
+// Revert: 24dd84b31cffb99eb6114524859a46d02717d33f
 class PluginStartup : StartupActivity.DumbAware/*, LightEditCompatible*/ {
 
   private var firstInitializationOccurred = false
