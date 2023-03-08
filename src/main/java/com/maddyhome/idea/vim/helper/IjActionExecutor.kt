@@ -35,8 +35,8 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import com.maddyhome.idea.vim.newapi.IjNativeAction
+import com.maddyhome.idea.vim.newapi.VimDataContext
 import com.maddyhome.idea.vim.newapi.ij
-import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.annotations.NonNls
 import javax.swing.SwingUtilities
 
@@ -65,8 +65,9 @@ class IjActionExecutor : VimActionExecutor {
    */
   override fun executeAction(editor: VimEditor?, action: NativeAction, context: ExecutionContext): Boolean {
     val ijAction = (action as IjNativeAction).action
+    val dataContext = VimDataContext(context.ij)
     val event = AnActionEvent(
-      null, context.ij, ActionPlaces.KEYBOARD_SHORTCUT, ijAction.templatePresentation.clone(),
+      null, dataContext, ActionPlaces.KEYBOARD_SHORTCUT, ijAction.templatePresentation.clone(),
       ActionManager.getInstance(), 0
     )
     // beforeActionPerformedUpdate should be called to update the action. It fixes some rider-specific problems.
@@ -77,8 +78,8 @@ class IjActionExecutor : VimActionExecutor {
     if (ijAction is ActionGroup && !event.presentation.isPerformGroup) {
       // Some ActionGroups should not be performed, but shown as a popup
       val popup = JBPopupFactory.getInstance()
-        .createActionGroupPopup(event.presentation.text, ijAction, context.ij, false, null, -1)
-      val component = context.ij.getData(PlatformDataKeys.CONTEXT_COMPONENT)
+        .createActionGroupPopup(event.presentation.text, ijAction, dataContext, false, null, -1)
+      val component = dataContext.getData(PlatformDataKeys.CONTEXT_COMPONENT)
       if (component != null) {
         val window = SwingUtilities.getWindowAncestor(component)
         if (window != null) {

@@ -103,6 +103,8 @@
 <!--                     key="use.plug.inspection.display.name" groupKey="use.plug.inspection.group.display.name"-->
 <!--                     enabledByDefault="true" level="WARNING"-->
 <!--                     implementationClass="com.maddyhome.idea.vim.inspections.UsePlugSyntaxInspection"/>-->
+    <editorActionHandler action="EditorEnter" implementationClass="com.maddyhome.idea.vim.handler.VimEnterHandler"
+                         order="first, before editorEnter"/>
   </extensions>
 
   <xi:include href="/META-INF/includes/ApplicationServices.xml" xpointer="xpointer(/idea-plugin/*)"/>

@@ -21,6 +21,19 @@ open class IjEditorExecutionContext(override val context: DataContext) : Executi
 
 class IjCaretAndEditorExecutionContext(override val context: DataContext) : IjEditorExecutionContext(context), ExecutionContext.CaretAndEditor
 
+/**
+ * Data context that defines that some action was started from IdeaVim.
+ * You can call use [runFromVimKey] key to define if intellij action was started from IdeaVim
+ */
+class VimDataContext(private val delegate: DataContext): DataContext {
+  override fun getData(dataId: String): Any? {
+    if (dataId == runFromVimKey) return true
+    return delegate.getData(dataId)
+  }
+}
+
+const val runFromVimKey = "RunFromVim"
+
 val DataContext.vim: ExecutionContext
   get() = IjEditorExecutionContext(this)
 
