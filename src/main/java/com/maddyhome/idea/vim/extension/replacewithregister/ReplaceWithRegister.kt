@@ -35,7 +35,7 @@ import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.key.OperatorFunction
-import com.maddyhome.idea.vim.newapi.IjExecutionContext
+import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
@@ -169,7 +169,7 @@ class ReplaceWithRegister : VimExtension {
       ClipboardOptionHelper.IdeaputDisabler().use {
         VimPlugin.getPut().putText(
           IjVimEditor(editor),
-          IjExecutionContext(EditorDataContext.init(editor)),
+          IjEditorExecutionContext(EditorDataContext.init(editor)),
           putData,
           operatorArguments = OperatorArguments(
             editor.vimStateMachine?.isOperatorPending ?: false,

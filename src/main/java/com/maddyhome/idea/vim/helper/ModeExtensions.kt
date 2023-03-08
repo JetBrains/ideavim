@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.api.getLineStartForOffset
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
-import com.maddyhome.idea.vim.newapi.IjExecutionContext
+import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext
 import com.maddyhome.idea.vim.newapi.IjVimCaret
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.vim
@@ -76,5 +76,5 @@ fun VimEditor.exitSelectMode(adjustCaretPosition: Boolean) {
 }
 
 fun Editor.exitInsertMode(context: DataContext, operatorArguments: OperatorArguments) {
-  VimPlugin.getChange().processEscape(IjVimEditor(this), IjExecutionContext(context), operatorArguments)
+  VimPlugin.getChange().processEscape(IjVimEditor(this), IjEditorExecutionContext(context), operatorArguments)
 }

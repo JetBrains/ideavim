@@ -19,19 +19,11 @@ class ExecutionContextManagerStub : ExecutionContextManager {
     vimLogger<ExecutionContextManagerStub>().warn("ExecutionContextManagerStub is used. Please replace it with your own implementation of ExecutionContextManager.")
   }
 
-  override fun onEditor(editor: VimEditor, prevContext: ExecutionContext?): ExecutionContext {
+  override fun onEditor(editor: VimEditor, prevContext: ExecutionContext?): ExecutionContext.Editor {
     TODO("Not yet implemented")
   }
 
-  override fun onCaret(caret: VimCaret, prevContext: ExecutionContext): ExecutionContext {
-    TODO("Not yet implemented")
-  }
-
-  override fun createCaretSpecificDataContext(context: ExecutionContext, caret: VimCaret): ExecutionContext {
-    TODO("Not yet implemented")
-  }
-
-  override fun createEditorDataContext(editor: VimEditor, context: ExecutionContext): ExecutionContext {
+  override fun onCaret(caret: VimCaret, prevContext: ExecutionContext.Editor): ExecutionContext.CaretAndEditor {
     TODO("Not yet implemented")
   }
 }

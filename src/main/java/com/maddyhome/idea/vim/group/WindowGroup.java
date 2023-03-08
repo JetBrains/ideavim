@@ -20,7 +20,7 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.ExecutionContext;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.RWLockLabel;
-import com.maddyhome.idea.vim.newapi.IjExecutionContext;
+import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -51,7 +51,7 @@ public class WindowGroup extends WindowGroupBase {
   }
 
   public void closeAll(@NotNull ExecutionContext context) {
-    getFileEditorManager(((IjExecutionContext) context).getContext()).closeAllFiles();
+    getFileEditorManager(((IjEditorExecutionContext) context).getContext()).closeAllFiles();
   }
 
   @Override

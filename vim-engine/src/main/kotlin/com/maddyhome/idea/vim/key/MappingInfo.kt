@@ -243,7 +243,7 @@ class ToActionMappingInfo(
   override fun execute(editor: VimEditor, context: ExecutionContext) {
     LOG.debug("Executing 'ToAction' mapping...")
     val editorDataContext = injector.executionContextManager.onEditor(editor, context)
-    val dataContext = injector.executionContextManager.createCaretSpecificDataContext(editorDataContext, editor.currentCaret())
+    val dataContext = injector.executionContextManager.onCaret(editor.currentCaret(), editorDataContext)
     injector.actionExecutor.executeAction(action, dataContext)
   }
 

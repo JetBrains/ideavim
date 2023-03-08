@@ -31,6 +31,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.NativeAction
 import com.maddyhome.idea.vim.api.VimActionExecutor
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import com.maddyhome.idea.vim.newapi.IjNativeAction
@@ -163,7 +164,7 @@ class IjActionExecutor : VimActionExecutor {
     CommandProcessor.getInstance()
       .executeCommand(
         editor.ij.project,
-        { cmd.execute(editor, EditorDataContext.init(editor.ij, context.ij).vim, operatorArguments) },
+        { cmd.execute(editor, injector.executionContextManager.onEditor(editor, context), operatorArguments) },
         cmd.id, DocCommandGroupId.noneGroupId(editor.ij.document), UndoConfirmationPolicy.DEFAULT,
         editor.ij.document
       )

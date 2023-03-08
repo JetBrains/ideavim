@@ -36,7 +36,7 @@ data class EditFileCommand(val ranges: Ranges, val argument: String) : Command.S
 
     // Don't open a choose file dialog under a write action
     injector.application.invokeLater {
-      injector.actionExecutor.executeAction("OpenFile", injector.executionContextManager.createEditorDataContext(editor, context))
+      injector.actionExecutor.executeAction("OpenFile", injector.executionContextManager.onEditor(editor, context))
     }
 
     return ExecutionResult.Success

@@ -18,7 +18,7 @@ import com.intellij.util.IJSwingUtilities;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.helper.*;
-import com.maddyhome.idea.vim.newapi.IjExecutionContext;
+import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.options.OptionConstants;
 import org.jetbrains.annotations.Nls;
@@ -296,7 +296,7 @@ public class ExOutputPanel extends JPanel {
         final List<KeyStroke> keys = new ArrayList<>(1);
         keys.add(key);
         KeyHandler.getInstance().getKeyStack().addKeys(keys);
-        VimPlugin.getMacro().playbackKeys(new IjVimEditor(myEditor), new IjExecutionContext(EditorDataContext.init(myEditor, null)),
+        VimPlugin.getMacro().playbackKeys(new IjVimEditor(myEditor), new IjEditorExecutionContext(EditorDataContext.init(myEditor, null)),
                                           1);
       }
     });

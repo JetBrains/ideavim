@@ -37,7 +37,7 @@ import com.maddyhome.idea.vim.helper.EditorHelperRt;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.SearchHelper;
 import com.maddyhome.idea.vim.newapi.ExecuteExtensionKt;
-import com.maddyhome.idea.vim.newapi.IjExecutionContext;
+import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.vimscript.services.IjOptionConstants;
 import org.jetbrains.annotations.NotNull;
@@ -54,7 +54,7 @@ public class FileGroup extends VimFileBase {
     if (logger.isDebugEnabled()) {
       logger.debug("openFile(" + filename + ")");
     }
-    final Project project = PlatformDataKeys.PROJECT.getData(((IjExecutionContext) context).getContext()); // API change - don't merge
+    final Project project = PlatformDataKeys.PROJECT.getData(((IjEditorExecutionContext) context).getContext()); // API change - don't merge
     if (project == null) return false;
 
     VirtualFile found = findFile(filename, project);
@@ -165,7 +165,7 @@ public class FileGroup extends VimFileBase {
    */
   @Override
   public void closeFile(int number, @NotNull ExecutionContext context) {
-    final Project project = PlatformDataKeys.PROJECT.getData(((IjExecutionContext) context).getContext());
+    final Project project = PlatformDataKeys.PROJECT.getData(((IjEditorExecutionContext) context).getContext());
     if (project == null) return;
     final FileEditorManagerEx fileEditorManager = FileEditorManagerEx.getInstanceEx(project);
     final EditorWindow window = fileEditorManager.getCurrentWindow();
@@ -207,7 +207,7 @@ public class FileGroup extends VimFileBase {
    */
   @Override
   public boolean selectFile(int count, @NotNull ExecutionContext context) {
-    final Project project = PlatformDataKeys.PROJECT.getData(((IjExecutionContext) context).getContext());
+    final Project project = PlatformDataKeys.PROJECT.getData(((IjEditorExecutionContext) context).getContext());
     if (project == null) return false;
     FileEditorManager fem = FileEditorManager.getInstance(project); // API change - don't merge
     VirtualFile[] editors = fem.getOpenFiles();
@@ -227,7 +227,7 @@ public class FileGroup extends VimFileBase {
    * Selects then next or previous editor.
    */
   public void selectNextFile(int count, @NotNull ExecutionContext context) {
-    Project project = PlatformDataKeys.PROJECT.getData(((IjExecutionContext) context).getContext());
+    Project project = PlatformDataKeys.PROJECT.getData(((IjEditorExecutionContext) context).getContext());
     if (project == null) return;
     FileEditorManager fem = FileEditorManager.getInstance(project); // API change - don't merge
     VirtualFile[] editors = fem.getOpenFiles();

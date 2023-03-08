@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.VimEditor;
 import com.maddyhome.idea.vim.api.VimEditorGroup;
 import com.maddyhome.idea.vim.helper.*;
-import com.maddyhome.idea.vim.newapi.IjExecutionContext;
+import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.options.LocalOptionChangeListener;
 import com.maddyhome.idea.vim.options.OptionConstants;
@@ -36,7 +36,6 @@ import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
@@ -215,7 +214,7 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
     if (!EditorHelper.isFileEditor(editor) &&
         editor.getDocument().isWritable() &&
         !CommandStateHelper.inInsertMode(editor)) {
-      VimPlugin.getChange().insertBeforeCursor(new IjVimEditor(editor), new IjExecutionContext(EditorDataContext.init(editor, null)));
+      VimPlugin.getChange().insertBeforeCursor(new IjVimEditor(editor), new IjEditorExecutionContext(EditorDataContext.init(editor, null)));
       KeyHandler.getInstance().reset(new IjVimEditor(editor));
     }
     updateCaretsVisualAttributes(editor);

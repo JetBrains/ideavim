@@ -33,7 +33,7 @@ import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.ex.ranges.LineRange;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.history.HistoryConstants;
-import com.maddyhome.idea.vim.newapi.IjExecutionContext;
+import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext;
 import com.maddyhome.idea.vim.newapi.IjVimCaret;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.options.OptionChangeListener;
@@ -803,7 +803,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
             if (expression != null) {
               try {
               match = expression
-                .evaluate(editor, new IjExecutionContext(EditorDataContext.init(((IjVimEditor) editor).getEditor(), null)), parent)
+                .evaluate(editor, new IjEditorExecutionContext(EditorDataContext.init(((IjVimEditor) editor).getEditor(), null)), parent)
                 .toInsertableString();
               } catch (Exception e) {
                 exceptions.add((ExException) e);

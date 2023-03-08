@@ -66,7 +66,7 @@ import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.listener.AppCodeTemplates
 import com.maddyhome.idea.vim.mark.Mark
-import com.maddyhome.idea.vim.newapi.IjExecutionContext
+import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext
 import com.maddyhome.idea.vim.newapi.IjVimCaret
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
@@ -366,7 +366,7 @@ class MotionGroup : VimMotionGroupBase() {
           val motion = action.getHandlerOffset(
             editor.vim,
             caret.vim,
-            IjExecutionContext(context!!),
+            IjEditorExecutionContext(context!!),
             cmd.argument,
             operatorArguments.withCount0(raw)
           )
@@ -387,7 +387,7 @@ class MotionGroup : VimMotionGroupBase() {
         } else if (cmd.action is TextObjectActionHandler) {
           val action = cmd.action as TextObjectActionHandler
           val range =
-            action.getRange(editor.vim, caret.vim, IjExecutionContext(context!!), cnt, raw, cmd.argument) ?: return null
+            action.getRange(editor.vim, caret.vim, IjEditorExecutionContext(context!!), cnt, raw, cmd.argument) ?: return null
           start = range.startOffset
           end = range.endOffset
           if (cmd.isLinewiseMotion()) end--

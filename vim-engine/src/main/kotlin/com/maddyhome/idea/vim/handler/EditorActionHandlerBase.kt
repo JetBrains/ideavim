@@ -74,7 +74,7 @@ abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
     operatorArguments: OperatorArguments,
   ): Boolean
 
-  fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
+  fun execute(editor: VimEditor, context: ExecutionContext.Editor, operatorArguments: OperatorArguments) {
     val action = { caret: VimCaret -> doExecute(editor, caret, context, operatorArguments) }
     if (myRunForEachCaret) {
       editor.forEachCaret(action)
@@ -83,7 +83,7 @@ abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
     }
   }
 
-  private fun doExecute(editor: VimEditor, caret: VimCaret, context: ExecutionContext, operatorArguments: OperatorArguments) {
+  private fun doExecute(editor: VimEditor, caret: VimCaret, context: ExecutionContext.Editor, operatorArguments: OperatorArguments) {
     if (!injector.enabler.isEnabled()) return
 
     logger.debug("Execute command with handler: " + this.javaClass.name)

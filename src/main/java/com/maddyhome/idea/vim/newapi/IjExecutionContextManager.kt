@@ -15,22 +15,20 @@ import com.maddyhome.idea.vim.api.ExecutionContextManagerBase
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.helper.EditorDataContext
+import com.maddyhome.idea.vim.options.helpers.StrictMode
 
 @Service
 class IjExecutionContextManager : ExecutionContextManagerBase() {
-  override fun onEditor(editor: VimEditor, prevContext: ExecutionContext?): ExecutionContext {
-    return IjExecutionContext(EditorDataContext.init((editor as IjVimEditor).editor, prevContext?.ij))
+  override fun onEditor(editor: VimEditor, prevContext: ExecutionContext?): ExecutionContext.Editor {
+    if (prevContext is ExecutionContext.CaretAndEditor) {
+      StrictMode.fail("You should not create context on editor from the context on caret and editor")
+      prevContext.updateEditor(editor)
+      return prevContext
+    }
+    return IjEditorExecutionContext(EditorDataContext.init((editor as IjVimEditor).editor, prevContext?.ij))
   }
 
-  override fun onCaret(caret: VimCaret, prevContext: ExecutionContext): ExecutionContext {
-    return IjExecutionContext(CaretSpecificDataContext.create(prevContext.ij, caret.ij))
-  }
-
-  override fun createCaretSpecificDataContext(context: ExecutionContext, caret: VimCaret): ExecutionContext {
-    return IjExecutionContext(CaretSpecificDataContext.create(context.ij, caret.ij))
-  }
-
-  override fun createEditorDataContext(editor: VimEditor, context: ExecutionContext): ExecutionContext {
-    return EditorDataContext.init(editor.ij, context.ij).vim
+  override fun onCaret(caret: VimCaret, prevContext: ExecutionContext.Editor): ExecutionContext.CaretAndEditor {
+    return IjCaretAndEditorExecutionContext(CaretSpecificDataContext.create(prevContext.ij, caret.ij))
   }
 }

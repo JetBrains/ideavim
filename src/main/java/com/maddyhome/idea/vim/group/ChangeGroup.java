@@ -45,8 +45,8 @@ import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.icons.VimIcons;
 import com.maddyhome.idea.vim.key.KeyHandlerKeeper;
 import com.maddyhome.idea.vim.listener.VimInsertListener;
-import com.maddyhome.idea.vim.newapi.IjExecutionContext;
-import com.maddyhome.idea.vim.newapi.IjExecutionContextKt;
+import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext;
+import com.maddyhome.idea.vim.newapi.IjEditorExecutionContextKt;
 import com.maddyhome.idea.vim.newapi.IjVimCaret;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.options.OptionConstants;
@@ -99,7 +99,7 @@ public class ChangeGroup extends VimChangeGroupBase {
   @Override
   public void type(@NotNull VimEditor vimEditor, @NotNull ExecutionContext context, char key) {
     Editor editor = ((IjVimEditor) vimEditor).getEditor();
-    DataContext ijContext = IjExecutionContextKt.getIj(context);
+    DataContext ijContext = IjEditorExecutionContextKt.getIj(context);
     final Document doc = ((IjVimEditor) vimEditor).getEditor().getDocument();
     CommandProcessor.getInstance().executeCommand(editor.getProject(), () -> ApplicationManager.getApplication()
                                                     .runWriteAction(() -> KeyHandlerKeeper.getInstance().getOriginalHandler().execute(editor, key, ijContext)), "", doc,
@@ -116,7 +116,7 @@ public class ChangeGroup extends VimChangeGroupBase {
                                                                          final @NotNull Argument argument,
                                                                          boolean isChange,
                                                                          @NotNull OperatorArguments operatorArguments) {
-    final TextRange range = MotionGroup.getMotionRange2(((IjVimEditor) editor).getEditor(), ((IjVimCaret) caret).getCaret(), ((IjExecutionContext) context).getContext(), argument, operatorArguments);
+    final TextRange range = MotionGroup.getMotionRange2(((IjVimEditor) editor).getEditor(), ((IjVimCaret) caret).getCaret(), ((IjEditorExecutionContext) context).getContext(), argument, operatorArguments);
     if (range == null) return null;
 
     // Delete motion commands that are not linewise become linewise if all the following are true:
@@ -210,7 +210,7 @@ public class ChangeGroup extends VimChangeGroupBase {
 
       final int lineLength = EngineEditorHelperKt.lineLength(editor, line);
       if (column < VimMotionGroupBase.LAST_COLUMN && lineLength < column) {
-        final String pad = EditorHelper.pad(((IjVimEditor) editor).getEditor(), ((IjExecutionContext) context).getContext(), line, column);
+        final String pad = EditorHelper.pad(((IjVimEditor) editor).getEditor(), ((IjEditorExecutionContext) context).getContext(), line, column);
         final int offset = editor.getLineEndOffset(line);
         insertText(editor, caret, offset, pad);
       }
@@ -436,7 +436,7 @@ public class ChangeGroup extends VimChangeGroupBase {
     // Remember the current caret column
     final int intendedColumn = caret.getVimLastColumn();
 
-    IndentConfig indentConfig = IndentConfig.create(((IjVimEditor) editor).getEditor(), ((IjExecutionContext) context).getContext());
+    IndentConfig indentConfig = IndentConfig.create(((IjVimEditor) editor).getEditor(), ((IjEditorExecutionContext) context).getContext());
 
     final int sline = editor.offsetToBufferPosition(range.getStartOffset()).getLine();
     final BufferPosition endLogicalPosition = editor.offsetToBufferPosition(range.getEndOffset());
