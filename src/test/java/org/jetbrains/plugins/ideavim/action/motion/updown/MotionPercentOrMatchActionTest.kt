@@ -227,6 +227,34 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
     )
   }
 
+  fun `test motion in text with escape (outer forward)`() {
+    doTest(
+      "%", """ debugPrint$c(\(var)) """,
+      """ debugPrint(\(var)$c) """, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+    )
+  }
+
+  fun `test motion in text with escape (outer backward)`() {
+    doTest(
+      "%", """ debugPrint(\(var)$c) """,
+      """ debugPrint$c(\(var)) """, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+    )
+  }
+
+  fun `test motion in text with escape (inner forward)`() {
+    doTest(
+      "%", """ debugPrint(\$c(var)) """,
+      """ debugPrint(\(var$c)) """, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+    )
+  }
+
+  fun `test motion in text with escape (inner backward)`() {
+    doTest(
+      "%", """ debugPrint(\$c(var)) """,
+      """ debugPrint(\(var$c)) """, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+    )
+  }
+
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN, description = "Matchit plugin affects neovim")
   fun `test deleting with percent motion backward`() {
     doTest("d%", "(foo bar$c)", c, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
