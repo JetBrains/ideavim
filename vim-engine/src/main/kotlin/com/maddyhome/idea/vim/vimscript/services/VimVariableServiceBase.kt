@@ -12,10 +12,12 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.Key
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.vimscript.model.ExecutableContext
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
@@ -186,7 +188,17 @@ abstract class VimVariableServiceBase : VariableService {
   }
 
   protected open fun getVimVariable(name: String, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType? {
-    throw ExException("The 'v:' scope is not implemented yet :(")
+    return when (name) {
+      "count" -> {
+        val count = VimStateMachine.getInstance(editor).commandBuilder.count
+        VimInt(count)
+      }
+      "count1" -> {
+        val count1 = VimStateMachine.getInstance(editor).commandBuilder.count.coerceAtLeast(1)
+        VimInt(count1)
+      }
+      else -> throw ExException("The 'v:' scope is not implemented yet :(")
+    }
   }
 
   protected open fun storeGlobalVariable(name: String, value: VimDataType) {
