@@ -31,6 +31,7 @@ import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.helper.vimStateMachine
+import com.maddyhome.idea.vim.mark.Jump
 import com.maddyhome.idea.vim.mark.Mark
 import com.maddyhome.idea.vim.mark.VimMark
 import java.lang.IllegalArgumentException
@@ -181,6 +182,10 @@ abstract class VimMarkServiceBase : VimMarkService {
       markChar == SELECTION_END_MARK -> setSelectionEndMark(caret, mark.offset(editor))
       markChar.isLocalMark() -> {
         if (caret.isPrimary) {
+          if (mark.key == BEFORE_JUMP_MARK) {
+            val jump = Jump(mark.line, mark.col, mark.filepath)
+            injector.jumpService.addJump(jump, true)
+          }
           getLocalMarks(mark.filepath)[markChar] = mark
         } else {
           caret.markStorage.setMark(mark)

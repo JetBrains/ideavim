@@ -38,4 +38,13 @@ class VimVariableServiceTest : VimTestCase() {
     typeText("5n")
     assertExOutput("5\n")
   }
+
+  fun `test mapping with updating jumplist`() {
+    configureByText("${c}1\n2\n3\n4\n5\n6\n7\n8\n9\n")
+    enterCommand("""
+      nnoremap <expr> j (v:count > 2 ? "m'" . v:count : "") . 'j'
+    """.trimIndent())
+    typeText("3j" + "3j" + "<C-o>")
+    assertState("1\n2\n3\n${c}4\n5\n6\n7\n8\n9\n")
+  }
 }
