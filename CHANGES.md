@@ -45,6 +45,7 @@ usual beta standards.
 * [VIM-1735](https://youtrack.jetbrains.com/issue/VIM-1735) Fix enabling mulple carets after line selection
 * [VIM-2881](https://youtrack.jetbrains.com/issue/VIM-2881) ReplaceRegister does no longer worker with MultiCursor
 * [VIM-2244](https://youtrack.jetbrains.com/issue/VIM-2244) nnoremap mapping doesn't work correctly
+* [VIM-2885](https://youtrack.jetbrains.com/issue/VIM-2885) "v:searchforward" does't work for IdeaVim
 
 ### Merged PRs:
 * [589](https://github.com/JetBrains/ideavim/pull/589) by [Matt Ellis](https://github.com/citizenmatt): Refactor option usage and introduce accessor API
