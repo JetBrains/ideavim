@@ -47,4 +47,24 @@ class VimVariableServiceTest : VimTestCase() {
     typeText("3j" + "3j" + "<C-o>")
     assertState("1\n2\n3\n${c}4\n5\n6\n7\n8\n9\n")
   }
+  
+  fun `test v searchforward with forwards search`() {
+    configureByText("1\n2\n1\n2\n${c}1\n2\n1\n2\n1\n")
+    enterCommand("""
+      nnoremap <expr> n 'Nn'[v:searchforward]
+    """.trimIndent())
+    typeText("/1<CR>" + "n")
+    assertState("1\n2\n1\n2\n1\n2\n1\n2\n${c}1\n")
+  }
+
+  fun `test v searchforward with backwards search`() {
+    configureByText("1\n2\n1\n2\n1\n2\n1\n2\n${c}1\n")
+    enterCommand("""
+      nnoremap <expr> n 'Nn'[v:searchforward]
+    """.trimIndent())
+    typeText("?1<CR>")
+    assertState("1\n2\n1\n2\n1\n2\n${c}1\n2\n1\n")
+    typeText("n")
+    assertState("1\n2\n1\n2\n1\n2\n1\n2\n${c}1\n")
+  }
 }

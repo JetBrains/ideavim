@@ -1124,6 +1124,12 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
     return null;
   }
 
+  @NotNull
+  @Override
+  public Direction getLastSearchDirection() {
+    return lastDir;
+  }
+
   /**
    * Removes and adds highlights for current search pattern when the document is edited
    */

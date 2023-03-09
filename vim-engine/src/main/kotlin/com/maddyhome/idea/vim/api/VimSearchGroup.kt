@@ -45,6 +45,7 @@ interface VimSearchGroup {
   fun findDecimalNumber(line: String): Int?
   fun clearSearchHighlight()
 
+  fun getLastSearchDirection(): Direction
   // Matching the values defined in Vim. Do not change these values, they are used as indexes
   companion object {
     val RE_SEARCH = 0 // Save/use search pattern

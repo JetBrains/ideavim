@@ -13,6 +13,7 @@ import com.maddyhome.idea.vim.api.Key
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.common.Direction
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.vimscript.model.ExecutableContext
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
@@ -196,6 +197,10 @@ abstract class VimVariableServiceBase : VariableService {
       "count1" -> {
         val count1 = VimStateMachine.getInstance(editor).commandBuilder.count.coerceAtLeast(1)
         VimInt(count1)
+      }
+      "searchforward" -> {
+        val searchForward = if (injector.searchGroup.getLastSearchDirection() == Direction.FORWARDS) 1 else 0
+        VimInt(searchForward)
       }
       else -> throw ExException("The 'v:' scope is not implemented yet :(")
     }
