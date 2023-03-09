@@ -240,7 +240,7 @@ intellij {
     instrumentCode.set(instrumentPluginCode.toBoolean())
     intellijRepository.set("https://www.jetbrains.com/intellij-repository")
     // Yaml is only used for testing. It's part of the IdeaIC distribution, but needs to be included as a reference
-    plugins.set(listOf("java", "AceJump:3.8.4", "yaml"))
+    plugins.set(listOf("java", "AceJump:3.8.11", "yaml"/*, "Pythonid:231.8109.2", "com.intellij.clion-swift:231.8109.4"*/))
 }
 
 tasks {

@@ -29,6 +29,7 @@ import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.handler.enableOctopus
+import com.maddyhome.idea.vim.handler.isOctopusEnabled
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.HandlerInjector
 import com.maddyhome.idea.vim.helper.inInsertMode
@@ -108,7 +109,9 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
     val keyStroke = getKeyStroke(e)
     if (editor != null && keyStroke != null) {
       if (enableOctopus) {
-        if (keyStroke == injector.parser.parseKeys("<CR>").first()) return false
+        if (isOctopusEnabled(keyStroke, editor)) {
+          return false
+        }
       }
       if (editor.isIdeaVimDisabledHere) {
         LOG.trace("Do not execute shortcut because it's disabled here")

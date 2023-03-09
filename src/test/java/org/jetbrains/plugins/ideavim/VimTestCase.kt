@@ -46,6 +46,7 @@ import com.maddyhome.idea.vim.command.VimStateMachine.SubMode
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ExOutputModel.Companion.getInstance
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer.swingTimer
+import com.maddyhome.idea.vim.handler.isOctopusEnabled
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.GuicursorChangeListener
 import com.maddyhome.idea.vim.helper.RunnableHelper.runWriteCommand
@@ -636,9 +637,10 @@ abstract class VimTestCase : UsefulTestCase() {
     val inputModel = TestInputModel.getInstance(editor)
     var key = inputModel.nextKeyStroke()
     while (key != null) {
-      val keyChar = key.keyChar
+      val keyChar = key.getChar(editor)
       if (keyChar != KeyEvent.CHAR_UNDEFINED) {
         myFixture.type(keyChar)
+        PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
       } else {
         val event =
           KeyEvent(editor.component, KeyEvent.KEY_PRESSED, Date().time, key.modifiers, key.keyCode, key.keyChar)
@@ -657,6 +659,14 @@ abstract class VimTestCase : UsefulTestCase() {
       }
       key = inputModel.nextKeyStroke()
     }
+  }
+
+  private fun KeyStroke.getChar(editor: Editor): Char {
+    if (keyChar != KeyEvent.CHAR_UNDEFINED) return keyChar
+    if (isOctopusEnabled(this, editor)) {
+      if (keyCode in setOf(KeyEvent.VK_ENTER)) return keyCode.toChar()
+    }
+    return keyChar
   }
 
   companion object {

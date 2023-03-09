@@ -103,8 +103,10 @@
 <!--                     key="use.plug.inspection.display.name" groupKey="use.plug.inspection.group.display.name"-->
 <!--                     enabledByDefault="true" level="WARNING"-->
 <!--                     implementationClass="com.maddyhome.idea.vim.inspections.UsePlugSyntaxInspection"/>-->
+
+<!--    Do not care about red handlers in order. They are necessary for proper ordering, and they'll be resolved when needed -->
     <editorActionHandler action="EditorEnter" implementationClass="com.maddyhome.idea.vim.handler.VimEnterHandler"
-                         order="first, before editorEnter"/>
+                         order="first, before editorEnter, after smart-step-into-enter, after AceHandlerEnter, after jupyterCommandModeEnterKeyHandler, after swift.placeholder.enter"/>
   </extensions>
 
   <xi:include href="/META-INF/includes/ApplicationServices.xml" xpointer="xpointer(/idea-plugin/*)"/>
