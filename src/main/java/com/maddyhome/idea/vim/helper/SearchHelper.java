@@ -675,7 +675,7 @@ public class SearchHelper {
     // Search to start or end of file, as appropriate
     Set<Character> charsToSearch = new HashSet<>(Arrays.asList('\'', '"', '\n', match, found));
     while (pos >= 0 && pos < chars.length() && cnt > 0) {
-      @Nullable Pair<Character, Integer> ci = findPositionOfFirstCharacter(chars, pos, charsToSearch, false, dir);
+      @Nullable Pair<Character, Integer> ci = findPositionOfFirstCharacter(chars, pos, charsToSearch, true, dir);
       if (ci == null) {
         return -1;
       }
