@@ -51,6 +51,7 @@ usual beta standards.
 * [589](https://github.com/JetBrains/ideavim/pull/589) by [Matt Ellis](https://github.com/citizenmatt): Refactor option usage and introduce accessor API
 * [604](https://github.com/JetBrains/ideavim/pull/604) by [Dominic Palmer](https://github.com/dominicpalmer): VIM-2773: Include empty lines in the selection when dragging backwards from EOL
 * [603](https://github.com/JetBrains/ideavim/pull/603) by [Dominic Palmer](https://github.com/dominicpalmer): VIM-2773: Prevent viewport displacement on undo
+* [602](https://github.com/JetBrains/ideavim/pull/602) by [Matt Ellis](https://github.com/citizenmatt): Refactor options service
 
 ## 2.1.0, 2023-01-10
 
