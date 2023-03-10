@@ -12,7 +12,6 @@ import com.intellij.ide.highlighter.HtmlFileType
 import com.intellij.ide.highlighter.JavaFileType
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
-import com.maddyhome.idea.vim.helper.experimentalApi
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class MatchitGeneralTest : VimTestCase() {
@@ -190,14 +189,6 @@ class MatchitGeneralTest : VimTestCase() {
           puts "Positive"
         end
       """.trimIndent(),
-      if (experimentalApi()) {
-        """
-        if x == 0
-          puts "Zero"
-          puts "Positive"
-        end
-        """.trimIndent()
-      } else {
         """
               if x == 0
                 puts "Zero"
@@ -205,7 +196,7 @@ class MatchitGeneralTest : VimTestCase() {
                 puts "Positive"
               end
         """.trimIndent()
-      },
+      ,
       fileName = "ruby.rb"
     )
   }

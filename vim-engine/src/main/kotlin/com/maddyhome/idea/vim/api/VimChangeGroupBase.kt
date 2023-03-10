@@ -1175,32 +1175,18 @@ abstract class VimChangeGroupBase : VimChangeGroup {
         }
       }
     }
-    return if (injector.globalOptions().isSet(OptionConstants.experimentalapi)) {
-//      val (first, second) = getDeleteRangeAndType2(
-//        editor,
-//        caret,
-//        context,
-//        argument,
-//        true,
-//        operatorArguments.withCount0(count0)
-//      )
-//        ?: return false
-      // ChangeGroupKt.changeRange(((IjVimEditor) editor).getEditor(), ((IjVimCaret) caret).getCaret(), deleteRangeAndType.getFirst(), deleteRangeAndType.getSecond(), ((IjExecutionContext) context).getContext());
-      true
-    } else {
-      val (first, second) = getDeleteRangeAndType(
-        editor,
-        caret,
-        context,
-        argument,
-        true,
-        operatorArguments.withCount0(count0)
-      ) ?: return false
-      changeRange(
-        editor, caret, first, second, context,
-        operatorArguments
-      )
-    }
+    val (first, second) = getDeleteRangeAndType(
+      editor,
+      caret,
+      context,
+      argument,
+      true,
+      operatorArguments.withCount0(count0)
+    ) ?: return false
+    return changeRange(
+      editor, caret, first, second, context,
+      operatorArguments
+    )
   }
 
   /**

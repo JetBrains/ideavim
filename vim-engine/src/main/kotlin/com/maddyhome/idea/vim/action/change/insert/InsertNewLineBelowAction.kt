@@ -33,7 +33,6 @@ class InsertNewLineBelowAction : ChangeEditorActionHandler.SingleExecution() {
     operatorArguments: OperatorArguments,
   ): Boolean {
     if (editor.isOneLineMode()) return false
-//    if (experimentalApi()) {
     @Suppress("ConstantConditionIf")
     if (false) {
       injector.changeGroup.insertLineAround(editor, context, 1)
@@ -56,7 +55,6 @@ class InsertNewLineAboveAction : ChangeEditorActionHandler.SingleExecution() {
     operatorArguments: OperatorArguments,
   ): Boolean {
     if (editor.isOneLineMode()) return false
-//    if (experimentalApi()) {
     @Suppress("ConstantConditionIf")
     if (false) {
       injector.changeGroup.insertLineAround(editor, context, 0)

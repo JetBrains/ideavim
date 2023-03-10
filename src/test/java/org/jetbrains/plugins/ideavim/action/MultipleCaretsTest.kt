@@ -1835,11 +1835,7 @@ $c five six se${c}ven eight
      
       """.trimIndent()
     )
-    if (options().isSet(OptionConstants.experimentalapi)) {
-      assertState("${c}\nabcde\n${c}\nabcde\n")
-    } else {
-      assertState("${c}\nabcde\n${c}\nabcde\n")
-    }
+    assertState("${c}\nabcde\n${c}\nabcde\n")
   }
 
   fun testInsertNewLineBelowAction() {

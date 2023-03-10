@@ -175,7 +175,6 @@ abstract class VimOptionGroupBase : VimOptionGroup {
     },
 
     // IdeaVim specific options. Put any editor/IDE specific options in IjVimOptionService
-    ToggleOption(OptionConstants.experimentalapi, OptionConstants.experimentalapi, false),
     ToggleOption(OptionConstants.ideaglobalmode, OptionConstants.ideaglobalmode, false),
     ToggleOption(OptionConstants.ideastrictmode, OptionConstants.ideastrictmode, false),
     ToggleOption(OptionConstants.ideatracetime, OptionConstants.ideatracetime, false),

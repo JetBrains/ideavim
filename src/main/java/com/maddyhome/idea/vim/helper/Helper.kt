@@ -117,5 +117,3 @@ private fun vimEnabled(editor: Editor?): Boolean {
 }
 
 internal fun vimDisabled(editor: Editor?): Boolean = !vimEnabled(editor)
-
-internal fun experimentalApi() = injector.globalOptions().isSet(OptionConstants.experimentalapi)

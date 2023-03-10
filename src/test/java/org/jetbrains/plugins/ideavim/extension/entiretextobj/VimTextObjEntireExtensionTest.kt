@@ -10,7 +10,6 @@ package org.jetbrains.plugins.ideavim.extension.entiretextobj
 
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
-import com.maddyhome.idea.vim.helper.experimentalApi
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -89,11 +88,7 @@ class VimTextObjEntireExtensionTest : VimTestCase() {
     doTest(
       "die",
       "\n  \n \n${poem}\n  \n \n",
-      if (experimentalApi()) {
-        "\n  \n \n<caret>\n  \n \n"
-      } else {
-        "\n  \n \n<caret>\n\n  \n \n"
-      }
+      "\n  \n \n<caret>\n\n  \n \n"
     ) // additional \n because poem ends with a \n
   }
 

@@ -34,16 +34,9 @@ class DeleteMotionAction : ChangeEditorActionHandler.ForEachCaret(), DuplicableO
     operatorArguments: OperatorArguments,
   ): Boolean {
     if (argument == null) return false
-    if (injector.globalOptions().isSet(OptionConstants.experimentalapi)) {
-      val (first, second) = injector.changeGroup
-        .getDeleteRangeAndType2(editor, caret, context, argument, false, operatorArguments)
-        ?: return false
-      return injector.changeGroup.deleteRange2(editor, caret, first, second)
-    } else {
-      val (first, second) = injector.changeGroup
-        .getDeleteRangeAndType(editor, caret, context, argument, false, operatorArguments)
-        ?: return false
-      return injector.changeGroup.deleteRange(editor, caret, first, second, false, operatorArguments)
-    }
+    val (first, second) = injector.changeGroup
+      .getDeleteRangeAndType(editor, caret, context, argument, false, operatorArguments)
+      ?: return false
+    return injector.changeGroup.deleteRange(editor, caret, first, second, false, operatorArguments)
   }
 }

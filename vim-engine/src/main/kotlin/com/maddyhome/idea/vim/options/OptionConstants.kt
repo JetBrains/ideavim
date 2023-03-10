@@ -74,7 +74,6 @@ class OptionConstants {
     const val virtualedit_all = "all"
 
     // IdeaVim specific options
-    const val experimentalapi = "experimentalapi"
     const val ideaglobalmode = "ideaglobalmode"
     const val ideastrictmode = "ideastrictmode"
     const val ideatracetime = "ideatracetime"
