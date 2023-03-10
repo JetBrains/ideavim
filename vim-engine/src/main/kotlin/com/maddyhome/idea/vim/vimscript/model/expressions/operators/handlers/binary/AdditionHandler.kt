@@ -13,7 +13,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFloat
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 
-object AdditionHandler : BinaryOperatorHandler() {
+internal object AdditionHandler : BinaryOperatorHandler() {
 
   override fun performOperation(left: VimDataType, right: VimDataType): VimDataType {
     return if (left is VimFloat || right is VimFloat) {

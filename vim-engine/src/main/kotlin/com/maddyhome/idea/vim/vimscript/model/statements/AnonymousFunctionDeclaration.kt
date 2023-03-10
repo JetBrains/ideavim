@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.OneElementSublistExpre
 import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
 import com.maddyhome.idea.vim.vimscript.model.functions.DefinedFunctionHandler
 
-data class AnonymousFunctionDeclaration(
+public data class AnonymousFunctionDeclaration(
   val sublist: OneElementSublistExpression,
   val args: List<String>,
   val defaultArgs: List<Pair<String, Expression>>,

@@ -19,7 +19,7 @@ import javax.swing.KeyStroke
  *   solves an issus of passing a keystroke to modal entry.
  *   However, some more advanced solution may be necessary in the future.
  */
-class KeyStack {
+public class KeyStack {
   private val stack = ArrayDeque<Frame>()
 
   fun hasStroke(): Boolean {

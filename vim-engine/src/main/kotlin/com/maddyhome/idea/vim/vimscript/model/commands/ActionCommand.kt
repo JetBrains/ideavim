@@ -20,9 +20,9 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * @author smartbomb
  */
-data class ActionCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges) {
+public data class ActionCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges) {
 
-  override val argFlags = flags(
+  override val argFlags: CommandHandlerFlags = flags(
     RangeFlag.RANGE_OPTIONAL,
     ArgumentFlag.ARGUMENT_OPTIONAL,
     Access.READ_ONLY,

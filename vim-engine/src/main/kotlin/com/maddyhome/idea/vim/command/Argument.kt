@@ -19,25 +19,25 @@ import java.util.*
 /**
  * This represents a command argument.
  */
-class Argument private constructor(
-  val character: Char = 0.toChar(),
-  val motion: Command = EMPTY_COMMAND,
-  val offsets: Map<ImmutableVimCaret, VimSelection> = emptyMap(),
-  val string: String = "",
-  val type: Type,
+public class Argument private constructor(
+  public val character: Char = 0.toChar(),
+  public val motion: Command = EMPTY_COMMAND,
+  public val offsets: Map<ImmutableVimCaret, VimSelection> = emptyMap(),
+  public val string: String = "",
+  public val type: Type,
 ) {
-  constructor(motionArg: Command) : this(motion = motionArg, type = Type.MOTION)
-  constructor(charArg: Char) : this(character = charArg, type = Type.CHARACTER)
-  constructor(strArg: String) : this(string = strArg, type = Type.EX_STRING)
-  constructor(offsets: Map<ImmutableVimCaret, VimSelection>) : this(offsets = offsets, type = Type.OFFSETS)
+  public constructor(motionArg: Command) : this(motion = motionArg, type = Type.MOTION)
+  public constructor(charArg: Char) : this(character = charArg, type = Type.CHARACTER)
+  public constructor(strArg: String) : this(string = strArg, type = Type.EX_STRING)
+  public constructor(offsets: Map<ImmutableVimCaret, VimSelection>) : this(offsets = offsets, type = Type.OFFSETS)
 
-  enum class Type {
+  public enum class Type {
     MOTION, CHARACTER, DIGRAPH, EX_STRING, OFFSETS
   }
 
-  companion object {
+  public companion object {
     @JvmField
-    val EMPTY_COMMAND = Command(
+    public val EMPTY_COMMAND: Command = Command(
       0,
       object : MotionActionHandler.SingleExecution() {
         override fun getOffset(

@@ -47,12 +47,12 @@ import javax.swing.KeyStroke
  * This handles every keystroke that the user can argType except those that are still valid hotkeys for various Idea
  * actions. This is a singleton.
  */
-class KeyHandler {
+public class KeyHandler {
 
   private var handleKeyRecursionCount = 0
 
-  val keyStack = KeyStack()
-  val modalEntryKeys: MutableList<KeyStroke> = ArrayList()
+  public val keyStack: KeyStack = KeyStack()
+  public val modalEntryKeys: MutableList<KeyStroke> = ArrayList()
 
   /**
    * This is the main key handler for the Vim plugin. Every keystroke not handled directly by Idea is sent here for
@@ -62,7 +62,7 @@ class KeyHandler {
    * @param key     The keystroke typed by the user
    * @param context The data context
    */
-  fun handleKey(editor: VimEditor, key: KeyStroke, context: ExecutionContext) {
+  public fun handleKey(editor: VimEditor, key: KeyStroke, context: ExecutionContext) {
     handleKey(editor, key, context, allowKeyMappings = true, mappingCompleted = false)
   }
 
@@ -74,7 +74,7 @@ class KeyHandler {
    *
    * TODO mappingCompleted and recursionCounter - we should find a more beautiful way to use them
    */
-  fun handleKey(
+  public fun handleKey(
     editor: VimEditor,
     key: KeyStroke,
     context: ExecutionContext,
@@ -170,7 +170,7 @@ class KeyHandler {
     finishedCommandPreparation(editor, context, editorState, commandBuilder, key, shouldRecord)
   }
 
-  fun finishedCommandPreparation(
+  internal fun finishedCommandPreparation(
     editor: VimEditor,
     context: ExecutionContext,
     editorState: VimStateMachine,
@@ -565,7 +565,7 @@ class KeyHandler {
    *
    * @param editor The editor to reset.
    */
-  fun partialReset(editor: VimEditor) {
+  public fun partialReset(editor: VimEditor) {
     val editorState = getInstance(editor)
     editorState.mappingState.resetMappingSequence()
     editorState.commandBuilder.resetInProgressCommandPart(getKeyRoot(editorState.mappingState.mappingMode))
@@ -576,7 +576,7 @@ class KeyHandler {
    *
    * @param editor The editor to reset.
    */
-  fun reset(editor: VimEditor) {
+  public fun reset(editor: VimEditor) {
     partialReset(editor)
     val editorState = getInstance(editor)
     editorState.commandBuilder.resetAll(getKeyRoot(editorState.mappingState.mappingMode))
@@ -592,7 +592,7 @@ class KeyHandler {
    *
    * @param editor The editor to reset.
    */
-  fun fullReset(editor: VimEditor) {
+  public fun fullReset(editor: VimEditor) {
     injector.messages.clearError()
     getInstance(editor).reset()
     reset(editor)
@@ -649,10 +649,10 @@ class KeyHandler {
     }
   }
 
-  companion object {
+  public companion object {
     private val LOG: VimLogger = vimLogger<KeyHandler>()
 
-    fun <T> isPrefix(list1: List<T>, list2: List<T>): Boolean {
+    internal fun <T> isPrefix(list1: List<T>, list2: List<T>): Boolean {
       if (list1.size > list2.size) {
         return false
       }
@@ -666,6 +666,6 @@ class KeyHandler {
 
     private val instance = KeyHandler()
     @JvmStatic
-    fun getInstance() = instance
+    public fun getInstance(): KeyHandler = instance
   }
 }
