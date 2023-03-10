@@ -46,6 +46,7 @@ usual beta standards.
 * [VIM-2881](https://youtrack.jetbrains.com/issue/VIM-2881) ReplaceRegister does no longer worker with MultiCursor
 * [VIM-2244](https://youtrack.jetbrains.com/issue/VIM-2244) nnoremap mapping doesn't work correctly
 * [VIM-2885](https://youtrack.jetbrains.com/issue/VIM-2885) "v:searchforward" does't work for IdeaVim
+* [VIM-2733](https://youtrack.jetbrains.com/issue/VIM-2733) vim-surround emulation interacts incorrectly with unmatched quotes on previous lines
 
 ### Merged PRs:
 * [589](https://github.com/JetBrains/ideavim/pull/589) by [Matt Ellis](https://github.com/citizenmatt): Refactor option usage and introduce accessor API
