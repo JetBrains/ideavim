@@ -47,6 +47,7 @@ usual beta standards.
 * [VIM-2244](https://youtrack.jetbrains.com/issue/VIM-2244) nnoremap mapping doesn't work correctly
 * [VIM-2885](https://youtrack.jetbrains.com/issue/VIM-2885) "v:searchforward" does't work for IdeaVim
 * [VIM-2733](https://youtrack.jetbrains.com/issue/VIM-2733) vim-surround emulation interacts incorrectly with unmatched quotes on previous lines
+* [VIM-2884](https://youtrack.jetbrains.com/issue/VIM-2884) Moving multiple lines in visual mode is not working
 
 ### Merged PRs:
 * [589](https://github.com/JetBrains/ideavim/pull/589) by [Matt Ellis](https://github.com/citizenmatt): Refactor option usage and introduce accessor API
