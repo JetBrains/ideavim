@@ -47,10 +47,16 @@ data class MoveTextCommand(val ranges: Ranges, val argument: String) : Command.S
     val caretPosition = caret.getBufferPosition()
 
     val goToLineCommand = injector.vimscriptParser.parseCommand(argument) ?: throw ExException("E16: Invalid range")
-    val lineRange = getLineRange(editor, caret)
-
-    val line = min(editor.fileSize().toInt(), normalizeLine(editor, caret, goToLineCommand, lineRange))
+    
     val range = getTextRange(editor, caret, false)
+    
+    /*
+    FIXME: see VIM-2884. It's absolutely not the best way to resolve this bug
+     */
+    caret.moveToOffset(range.startOffset)
+
+    val lineRange = getLineRange(editor, caret)
+    val line = min(editor.fileSize().toInt(), normalizeLine(editor, caret, goToLineCommand, lineRange))
     val shift = line + 1 - editor.offsetToBufferPosition(range.startOffset).line
 
     val text = editor.getText(range)

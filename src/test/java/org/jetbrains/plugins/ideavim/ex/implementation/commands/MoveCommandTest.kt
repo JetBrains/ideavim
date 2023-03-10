@@ -103,4 +103,27 @@ class MoveCommandTest : VimTestCase() {
       """.trimIndent()
     )
   }
+  
+  fun `test moving multiple lines with omitted selection start mark`() {
+    configureByText(
+      """
+      ====
+      My mother taught me this trick: if you repeat something over and over again it loses its meaning.
+      For example: homewor${c}k, homework, homework, homework, homework, homework, homework, homework, homework.
+      See, nothing.
+      
+      """.trimIndent()
+    )
+
+    typeText("Vj:m-2<CR>")
+    assertState(
+      """
+      ====
+      For example: homework, homework, homework, homework, homework, homework, homework, homework, homework.
+      See, nothing.
+      My mother taught me this trick: if you repeat something over and over again it loses its meaning.
+      
+      """.trimIndent()
+    )
+  }
 }
