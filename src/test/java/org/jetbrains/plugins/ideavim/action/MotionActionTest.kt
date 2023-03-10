@@ -529,6 +529,70 @@ class MotionActionTest : VimTestCase() {
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
+  // VIM-2733
+  fun testDeleteOuterQuoteEmptyString() {
+    val keys = listOf("da'")
+    val before = """
+      # Doesn't work <-- note the quote
+
+      print('${c}')
+    """.trimIndent()
+    val after = """
+      # Doesn't work <-- note the quote
+
+      print(${c})
+    """.trimIndent()
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+  }
+  
+  // VIM-2733
+  fun testDeleteOuterQuoteEmptyString2() {
+    val keys = listOf("da'")
+    val before = """
+      # Doesn't work <-- note the quote
+
+      print(${c}'')
+    """.trimIndent()
+    val after = """
+      # Doesn't work <-- note the quote
+
+      print(${c})
+    """.trimIndent()
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+  }
+
+  // VIM-2733
+  fun testDeleteOuterDoubleQuoteEmptyString() {
+    val keys = listOf("da\"")
+    val before = """
+      # This " fails
+
+      print("$c")
+    """.trimIndent()
+    val after = """
+      # This " fails
+
+      print(${c})
+    """.trimIndent()
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+  }
+
+  // VIM-2733
+  fun testDeleteOuterDoubleQuoteEmptyString2() {
+    val keys = listOf("da\"")
+    val before = """
+      # This " fails
+
+      print(${c}"")
+    """.trimIndent()
+    val after = """
+      # This " fails
+
+      print(${c})
+    """.trimIndent()
+    doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+  }
+  
   // VIM-1427
   fun testDeleteOuterTagWithCount() {
     val keys = listOf("d2at")

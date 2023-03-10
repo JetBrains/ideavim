@@ -8,6 +8,8 @@
 
 package com.maddyhome.idea.vim.api
 
+import com.maddyhome.idea.vim.common.Direction
+import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.helper.CharacterHelper
 import com.maddyhome.idea.vim.helper.CharacterHelper.charType
 import kotlin.math.abs
@@ -219,5 +221,101 @@ abstract class VimSearchHelperBase : VimSearchHelper {
       }
       return res
     }
+  }
+  
+  override fun findBlockQuoteInLineRange(editor: VimEditor, caret: ImmutableVimCaret, quote: Char, isOuter: Boolean): TextRange? {
+    var leftQuote: Int
+    var rightQuote: Int
+    
+    val caretOffset = caret.offset.point
+    val quoteAfterCaret : Int = editor.text().indexOfNext(quote, caretOffset, true) ?: return null
+    val quoteBeforeCaret : Int? = editor.text().indexOfPrevious(quote, caretOffset, true)
+    val quotesBeforeCaret : Int = editor.text().occurrencesBeforeOffset(quote, caretOffset, true)
+    
+    if (((caretOffset == quoteAfterCaret) && quotesBeforeCaret % 2 == 0) || quoteBeforeCaret == null) {
+      leftQuote = quoteAfterCaret
+      rightQuote = editor.text().indexOfNext(quote, leftQuote + 1, true) ?: return null
+    } else {
+      leftQuote = quoteBeforeCaret
+      rightQuote = quoteAfterCaret
+    }
+    if (!isOuter) {
+      leftQuote++
+      rightQuote--
+    }
+    return TextRange(leftQuote, rightQuote + 1)
+  }
+
+  /**
+   * @param endOffset         right search border, it is not included in search
+   */
+  private fun CharSequence.occurrencesBeforeOffset(char: Char, endOffset: Int, currentLineOnly: Boolean, searchEscaped: Boolean = false): Int {
+    var counter = 0
+    var i = endOffset
+    while (i > 0 && this[i + Direction.BACKWARDS.toInt()] != '\n') {
+      i = this.indexOfPrevious(char, i, currentLineOnly, searchEscaped) ?: break
+      counter++
+    }
+    return counter
+  }
+
+  /**
+   * @param char              char to look for
+   * @param startIndex        index to start the search from, included in search
+   * @param currentLineOnly   true if search should stop after reaching '\n'
+   * @param searchEscaped     true if escaped chars should appear in search
+   * 
+   * @return                  the closest to [startIndex] position of [char], or null if no [char] was found
+   */
+  private fun CharSequence.indexOfNext(char: Char, startIndex: Int, currentLineOnly: Boolean, searchEscaped: Boolean = false): Int? {
+    return findCharacterPosition(this, char, startIndex, Direction.FORWARDS, currentLineOnly, searchEscaped)
+  }
+
+  /**
+   * @param char              char to look for
+   * @param endIndex          right search border, it is not included in search
+   * @param currentLineOnly   true if search should stop after reaching '\n'
+   * @param searchEscaped     true if escaped chars should appear in search
+   *
+   * @return                  the closest to [endIndex] position of [char], or null if no [char] was found
+   */
+  private fun CharSequence.indexOfPrevious(char: Char, endIndex: Int, currentLineOnly: Boolean, searchEscaped: Boolean = false): Int? {
+    if (endIndex == 0 || (currentLineOnly && this[endIndex - 1] == '\n')) return null
+    return findCharacterPosition(this, char, endIndex - 1, Direction.BACKWARDS, currentLineOnly, searchEscaped)
+  }
+
+  /**
+   * Gets the closest char position in the given direction
+   *
+   * @param startIndex        index to start the search from (included in search)
+   * @param char              character to look for
+   * @param currentLineOnly   true if search should break after reaching '\n'
+   * @param searchEscaped     true if escaped chars should be returned
+   * @param direction         direction to search (forward/backward)
+   * 
+   * @return                  index of the closest char found (null if nothing was found)
+   */
+  private fun findCharacterPosition(charSequence: CharSequence, char: Char, startIndex: Int, direction: Direction, currentLineOnly: Boolean, searchEscaped: Boolean): Int? {
+    var pos = startIndex
+    while (pos >= 0 && pos < charSequence.length && (!currentLineOnly || charSequence[pos] != '\n')) {
+      if (charSequence[pos] == char && (pos == 0 || searchEscaped || isQuoteWithoutEscape(charSequence, pos, char))) {
+        return pos
+      }
+      pos += direction.toInt()
+    }
+    return null
+  }
+
+  /**
+   * Returns true if [quote] is at this [position] and it's not escaped (like \")
+   */
+  private fun isQuoteWithoutEscape(chars: CharSequence, position: Int, quote: Char): Boolean {
+    var i = position
+    if (chars[i] != quote) return false
+    var backslashCounter = 0
+    while (i-- > 0 && chars[i] == '\\') {
+      backslashCounter++
+    }
+    return backslashCounter % 2 == 0
   }
 }

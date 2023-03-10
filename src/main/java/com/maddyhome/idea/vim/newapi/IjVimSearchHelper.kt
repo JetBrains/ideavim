@@ -146,16 +146,7 @@ internal class IjVimSearchHelper : VimSearchHelperBase() {
   override fun findBlockTagRange(editor: VimEditor, caret: ImmutableVimCaret, count: Int, isOuter: Boolean): TextRange? {
     return SearchHelper.findBlockTagRange(editor.ij, caret.ij, count, isOuter)
   }
-
-  override fun findBlockQuoteInLineRange(
-    editor: VimEditor,
-    caret: ImmutableVimCaret,
-    quote: Char,
-    isOuter: Boolean,
-  ): TextRange? {
-    return SearchHelper.findBlockQuoteInLineRange(editor.ij, caret.ij, quote, isOuter)
-  }
-
+  
   override fun findBlockRange(
     editor: VimEditor,
     caret: ImmutableVimCaret,

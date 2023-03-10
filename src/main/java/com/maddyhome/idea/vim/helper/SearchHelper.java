@@ -27,6 +27,7 @@ import com.maddyhome.idea.vim.command.VimStateMachine;
 import com.maddyhome.idea.vim.common.CharacterPosition;
 import com.maddyhome.idea.vim.common.Direction;
 import com.maddyhome.idea.vim.common.TextRange;
+import com.maddyhome.idea.vim.newapi.IjVimCaret;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.options.OptionChangeListener;
 import com.maddyhome.idea.vim.options.OptionConstants;
@@ -491,7 +492,8 @@ public class SearchHelper {
     boolean startPosInStringFound = false;
 
     if (initialPosIsInString) {
-      TextRange quoteRange = findBlockQuoteInLineRange(editor, caret, '"', false);
+      TextRange quoteRange = injector.getSearchHelper()
+        .findBlockQuoteInLineRange(new IjVimEditor(editor), new IjVimCaret(caret), '"', false);
       if (quoteRange != null) {
         int startOffset = quoteRange.getStartOffset();
         int endOffset = quoteRange.getEndOffset();
@@ -728,34 +730,6 @@ public class SearchHelper {
       backslashCounter++;
     }
     return backslashCounter % 2 == 0;
-  }
-
-  private static int findNextQuoteInLine(@NotNull CharSequence chars, int pos, char quote) {
-    return findQuoteInLine(chars, pos, quote, Direction.FORWARDS);
-  }
-
-  private static int findPreviousQuoteInLine(@NotNull CharSequence chars, int pos, char quote) {
-    return findQuoteInLine(chars, pos, quote, Direction.BACKWARDS);
-  }
-
-  private static int findFirstQuoteInLine(@NotNull Editor editor, int pos, char quote) {
-    final int start = EngineEditorHelperKt.getLineStartForOffset(new IjVimEditor(editor), pos);
-    return findNextQuoteInLine(editor.getDocument().getCharsSequence(), start, quote);
-  }
-
-  private static int findQuoteInLine(@NotNull CharSequence chars, int pos, char quote, @NotNull Direction direction) {
-    return findCharacterPosition(chars, pos, quote, true, false, direction);
-  }
-
-  private static int countCharactersInLine(@NotNull CharSequence chars, int pos, char c) {
-    int cnt = 0;
-    while (pos > 0 && (chars.charAt(pos + Direction.BACKWARDS.toInt()) != '\n')) {
-      pos = findCharacterPosition(chars, pos + Direction.BACKWARDS.toInt(), c, false, true, Direction.BACKWARDS);
-      if (pos != -1) {
-        cnt++;
-      }
-    }
-    return cnt;
   }
 
   public static @Nullable Pair<Character, Integer> findPositionOfFirstCharacter(@NotNull CharSequence chars,
@@ -1000,53 +974,6 @@ public class SearchHelper {
     else {
       return openTags.pop();
     }
-  }
-
-
-  public static @Nullable TextRange findBlockQuoteInLineRange(@NotNull Editor editor,
-                                                              @NotNull Caret caret,
-                                                              char quote,
-                                                              boolean isOuter) {
-    final CharSequence chars = editor.getDocument().getCharsSequence();
-    final int pos = caret.getOffset();
-    if (pos >= chars.length() || chars.charAt(pos) == '\n') {
-      return null;
-    }
-
-    int start = findPreviousQuoteInLine(chars, pos, quote);
-    if (start == -1) {
-      start = findFirstQuoteInLine(editor, pos, quote);
-      if (start == -1) {
-        return null;
-      }
-    }
-    final int current = Math.max(start, pos);
-    int end = current;
-
-    if (chars.charAt(pos) == quote && current == pos) {
-      final int quotes = countCharactersInLine(chars, pos, quote) + 1;
-
-      if (quotes % 2 == 0) {
-        start = findPreviousQuoteInLine(chars, current - 1, quote);
-      }
-      else {
-        end = findNextQuoteInLine(chars, current + 1, quote);
-      }
-    }
-    else {
-      end = findNextQuoteInLine(chars, current + 1, quote);
-    }
-
-    if (end == -1) {
-      return null;
-    }
-    if (!isOuter) {
-      start++;
-      end--;
-    }
-
-    // End offset exclusive
-    return new TextRange(start, end + 1);
   }
 
   public static int findNextCamelStart(@NotNull Editor editor, @NotNull Caret caret, int count) {
