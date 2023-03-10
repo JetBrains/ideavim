@@ -53,9 +53,10 @@ abstract class VimPutBase : VimPut {
     data: PutData,
     operatorArguments: OperatorArguments,
     updateVisualMarks: Boolean,
+    saveToRegister: Boolean,
   ): Boolean {
     val additionalData = collectPreModificationData(editor, data)
-    deleteSelectedText(editor, data, operatorArguments)
+    deleteSelectedText(editor, data, operatorArguments, saveToRegister)
     val processedText = processText(editor, null, data) ?: return false
     putTextAndSetCaretPosition(editor, context, processedText, data, additionalData)
 
@@ -100,7 +101,7 @@ abstract class VimPutBase : VimPut {
   }
 
   @RWLockLabel.SelfSynchronized
-  private fun deleteSelectedText(editor: VimEditor, data: PutData, operatorArguments: OperatorArguments) {
+  private fun deleteSelectedText(editor: VimEditor, data: PutData, operatorArguments: OperatorArguments, saveToRegister: Boolean) {
     if (data.visualSelection == null) return
 
     data.visualSelection.caretsAndSelections.entries.sortedByDescending { it.key.getBufferPosition() }
@@ -109,7 +110,7 @@ abstract class VimPutBase : VimPut {
         val range = selection.toVimTextRange(false).normalize()
 
         injector.application.runWriteAction {
-          injector.changeGroup.deleteRange(editor, caret, range, selection.type, false, operatorArguments)
+          injector.changeGroup.deleteRange(editor, caret, range, selection.type, false, operatorArguments, saveToRegister)
         }
         caret.moveToInlayAwareOffset(range.startOffset)
       }
@@ -496,13 +497,14 @@ abstract class VimPutBase : VimPut {
   }
 
   @RWLockLabel.SelfSynchronized
-  override fun putTextForCaret(editor: VimEditor, caret: VimCaret, context: ExecutionContext, data: PutData, updateVisualMarks: Boolean): Boolean {
+  override fun putTextForCaret(editor: VimEditor, caret: VimCaret, context: ExecutionContext, data: PutData, updateVisualMarks: Boolean, modifyRegister: Boolean): Boolean {
     val additionalData = collectPreModificationData(editor, data)
     data.visualSelection?.let {
       deleteSelectedText(
         editor,
         data,
-        OperatorArguments(false, 0, editor.mode, editor.subMode)
+        OperatorArguments(false, 0, editor.mode, editor.subMode),
+        modifyRegister
       )
     }
     val processedText = processText(editor, caret, data) ?: return false

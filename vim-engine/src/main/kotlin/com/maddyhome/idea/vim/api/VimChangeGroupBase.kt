@@ -148,6 +148,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
    * @param editor The editor to delete from
    * @param range  The range to delete
    * @param type   The type of deletion
+   * @param saveToRegister True if deleted text should be saved to register
    * @return true if able to delete the text, false if not
    */
   protected fun deleteText(
@@ -156,6 +157,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     type: SelectionType?,
     caret: VimCaret,
     operatorArguments: OperatorArguments,
+    saveToRegister: Boolean = true,
   ): Boolean {
     var updatedRange = range
     // Fix for https://youtrack.jetbrains.net/issue/VIM-35
@@ -169,8 +171,9 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       }
     }
     if (type == null ||
-      operatorArguments.mode.inInsertMode || caret.registerStorage.storeText(editor, updatedRange, type, true) ||
-      caret != editor.primaryCaret() // sticky tape for VIM-2703 todo remove in the next release
+      operatorArguments.mode.inInsertMode || 
+      !saveToRegister ||
+      caret.registerStorage.storeText(editor, updatedRange, type, true)
     ) {
       val startOffsets = updatedRange.startOffsets
       val endOffsets = updatedRange.endOffsets
@@ -884,6 +887,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
    * @param range    The range to delete
    * @param type     The type of deletion
    * @param isChange Is from a change action
+   * @param saveToRegister True if deleted text should be saved to register
    * @return true if able to delete the text, false if not
    */
   override fun deleteRange(
@@ -893,12 +897,13 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     type: SelectionType?,
     isChange: Boolean,
     operatorArguments: OperatorArguments,
+    saveToRegister: Boolean,
   ): Boolean {
 
     val intendedColumn = caret.vimLastColumn
 
     val removeLastNewLine = removeLastNewLine(editor, range, type)
-    val res = deleteText(editor, range, type, caret, operatorArguments)
+    val res = deleteText(editor, range, type, caret, operatorArguments, saveToRegister)
     var processedCaret = editor.findLastVersionOfCaret(caret) ?: caret
     if (removeLastNewLine) {
       val textLength = editor.fileSize().toInt()

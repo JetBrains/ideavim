@@ -28,6 +28,7 @@ sealed class PutVisualTextBaseAction(
   private val insertTextBeforeCaret: Boolean,
   private val indent: Boolean,
   private val caretAfterInsertedText: Boolean,
+  private val modifyRegister: Boolean = true,
 ) : VisualOperatorActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
@@ -48,7 +49,7 @@ sealed class PutVisualTextBaseAction(
     var result = true
     injector.application.runWriteAction {
       caretToPutData.forEach {
-        result = injector.put.putTextForCaret(editor, it.key, context, it.value, true) && result
+        result = injector.put.putTextForCaret(editor, it.key, context, it.value, true, modifyRegister) && result
       }
     }
     return result
@@ -69,7 +70,7 @@ sealed class PutVisualTextBaseAction(
   }
 }
 
-class PutVisualTextBeforeCursorAction : PutVisualTextBaseAction(insertTextBeforeCaret = true, indent = true, caretAfterInsertedText = false)
+class PutVisualTextBeforeCursorAction : PutVisualTextBaseAction(insertTextBeforeCaret = true, indent = true, caretAfterInsertedText = false, modifyRegister = false)
 class PutVisualTextAfterCursorAction : PutVisualTextBaseAction(insertTextBeforeCaret = false, indent = true, caretAfterInsertedText = false)
 
 class PutVisualTextBeforeCursorNoIndentAction : PutVisualTextBaseAction(insertTextBeforeCaret = true, indent = false, caretAfterInsertedText = false)

@@ -36,10 +36,11 @@ interface VimPut {
     data: PutData,
     operatorArguments: OperatorArguments,
     updateVisualMarks: Boolean = false,
+    modifyRegister: Boolean = true,
   ): Boolean
 
   @RWLockLabel.SelfSynchronized
-  fun putTextForCaret(editor: VimEditor, caret: VimCaret, context: ExecutionContext, data: PutData, updateVisualMarks: Boolean = false): Boolean
+  fun putTextForCaret(editor: VimEditor, caret: VimCaret, context: ExecutionContext, data: PutData, updateVisualMarks: Boolean = false, modifyRegister: Boolean = true): Boolean
 
   @RWLockLabel.SelfSynchronized
   fun putTextViaIde(

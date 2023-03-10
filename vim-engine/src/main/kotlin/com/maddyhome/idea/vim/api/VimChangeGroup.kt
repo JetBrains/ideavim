@@ -93,7 +93,8 @@ interface VimChangeGroup {
     range: TextRange,
     type: SelectionType?,
     isChange: Boolean,
-    operatorArguments: OperatorArguments
+    operatorArguments: OperatorArguments,
+    saveToRegister: Boolean = true,
   ): Boolean
   fun deleteRange2(editor: VimEditor, caret: VimCaret, range: TextRange, type: SelectionType): Boolean
 
