@@ -459,6 +459,10 @@ Contributors:
   [![icon][github]](https://github.com/dominicpalmer)
   &nbsp;
   Dominic Palmer
+* [![icon][mail]](mailto:kawagh.dev@gmail.com)
+  [![icon][github]](https://github.com/kawagh)
+  &nbsp;
+  kawagh
 
 Previous contributors:
 
