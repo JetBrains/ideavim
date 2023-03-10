@@ -78,5 +78,6 @@ class OptionConstants {
     const val ideaglobalmode = "ideaglobalmode"
     const val ideastrictmode = "ideastrictmode"
     const val ideatracetime = "ideatracetime"
+    const val octopushandler = "octopushandler"
   }
 }

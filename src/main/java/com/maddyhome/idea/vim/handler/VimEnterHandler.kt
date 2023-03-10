@@ -14,12 +14,14 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.key
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.newapi.runFromVimKey
 import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.options.OptionConstants
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
@@ -123,5 +125,5 @@ fun isOctopusEnabled(s: KeyStroke, editor: Editor): Boolean {
  */
 val enableOctopus: Boolean
   get() {
-    return false
+    return injector.globalOptions().isSet(OptionConstants.octopushandler)
   }

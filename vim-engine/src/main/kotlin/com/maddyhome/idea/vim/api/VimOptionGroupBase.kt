@@ -179,6 +179,7 @@ abstract class VimOptionGroupBase : VimOptionGroup {
     ToggleOption(OptionConstants.ideaglobalmode, OptionConstants.ideaglobalmode, false),
     ToggleOption(OptionConstants.ideastrictmode, OptionConstants.ideastrictmode, false),
     ToggleOption(OptionConstants.ideatracetime, OptionConstants.ideatracetime, false),
+    ToggleOption(OptionConstants.octopushandler, OptionConstants.octopushandler, false),
   )
 
 
