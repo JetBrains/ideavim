@@ -39,7 +39,7 @@ import com.maddyhome.idea.vim.helper.vimLine
 import com.maddyhome.idea.vim.helper.vimSelectionStart
 import com.maddyhome.idea.vim.helper.vimSelectionStartClear
 
-class IjVimCaret(val caret: Caret) : VimCaretBase() {
+internal class IjVimCaret(val caret: Caret) : VimCaretBase() {
   override val registerStorage: CaretRegisterStorage
     get() {
       var storage = this.caret.registerStorage
@@ -176,10 +176,10 @@ class IjVimCaret(val caret: Caret) : VimCaretBase() {
   override fun hashCode(): Int = this.caret.hashCode()
 }
 
-inline val VimCaret.ij: Caret
+public val VimCaret.ij: Caret
   get() = (this as IjVimCaret).caret
-inline val ImmutableVimCaret.ij: Caret
+public val ImmutableVimCaret.ij: Caret
   get() = (this as IjVimCaret).caret
 
-inline val Caret.vim: VimCaret
+public val Caret.vim: VimCaret
   get() = IjVimCaret(this)

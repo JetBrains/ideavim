@@ -14,7 +14,7 @@ import com.intellij.util.xmlb.annotations.Attribute
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 
-class FunctionBeanClass : BaseKeyedLazyInstance<FunctionHandler>() {
+internal class FunctionBeanClass : BaseKeyedLazyInstance<FunctionHandler>() {
 
   @Attribute("implementation")
   var implementation: String? = null

@@ -20,13 +20,13 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimLookupManager
 
 @Service
-class IjVimLookupManager : VimLookupManager {
+internal class IjVimLookupManager : VimLookupManager {
   override fun getActiveLookup(editor: VimEditor): IjLookup? {
     return LookupManager.getActiveLookup(editor.ij)?.let { IjLookup(it) }
   }
 }
 
-class IjLookup(val lookup: Lookup) : IdeLookup {
+internal class IjLookup(val lookup: Lookup) : IdeLookup {
   override fun down(caret: ImmutableVimCaret, context: ExecutionContext) {
     EditorActionManager.getInstance().getActionHandler(IdeActions.ACTION_EDITOR_MOVE_CARET_DOWN)
       .execute(caret.editor.ij, caret.ij, context.ij)

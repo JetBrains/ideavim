@@ -798,7 +798,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
             }
           }
           if (doReplace) {
-            SubmatchFunctionHandler.INSTANCE.setLatestMatch(((IjVimEditor) editor).getEditor().getDocument().getText(new com.intellij.openapi.util.TextRange(startoff, endoff)));
+            SubmatchFunctionHandler.Companion.getInstance().setLatestMatch(((IjVimEditor) editor).getEditor().getDocument().getText(new com.intellij.openapi.util.TextRange(startoff, endoff)));
             caret.moveToOffset(startoff);
             if (expression != null) {
               try {
@@ -856,7 +856,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
       }
     }
 
-    SubmatchFunctionHandler.INSTANCE.setLatestMatch("");
+    SubmatchFunctionHandler.Companion.getInstance().setLatestMatch("");
 
     // todo throw multiple exceptions at once
     if (!exceptions.isEmpty()) {

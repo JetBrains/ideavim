@@ -47,7 +47,7 @@ private fun doOperatorAction(editor: VimEditor, context: ExecutionContext, textR
   return result
 }
 
-class OperatorAction : VimActionHandler.SingleExecution() {
+internal class OperatorAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 
   override val argumentType: Argument.Type = Argument.Type.MOTION
@@ -99,7 +99,7 @@ class OperatorAction : VimActionHandler.SingleExecution() {
   }
 }
 
-class VisualOperatorAction : VisualOperatorActionHandler.ForEachCaret() {
+internal class VisualOperatorAction : VisualOperatorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_EXIT_VISUAL)

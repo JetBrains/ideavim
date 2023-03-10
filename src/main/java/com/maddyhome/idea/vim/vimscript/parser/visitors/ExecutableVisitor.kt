@@ -33,7 +33,7 @@ import com.maddyhome.idea.vim.vimscript.model.statements.loops.WhileLoop
 import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptBaseVisitor
 import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser
 
-object ExecutableVisitor : VimscriptBaseVisitor<Executable>() {
+internal object ExecutableVisitor : VimscriptBaseVisitor<Executable>() {
 
   override fun visitBlockMember(ctx: VimscriptParser.BlockMemberContext): Executable? {
     return when {

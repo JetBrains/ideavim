@@ -21,7 +21,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 
-object ExistsFunctionHandler : FunctionHandler() {
+internal class ExistsFunctionHandler : FunctionHandler() {
 
   override val name = "exists"
   override val minimumNumberOfArguments = 1

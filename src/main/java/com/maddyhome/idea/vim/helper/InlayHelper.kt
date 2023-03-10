@@ -35,7 +35,7 @@ import com.intellij.openapi.editor.VisualPosition
  * It is recommended to call this method even if the caret hasn't been moved. It will handle the situation where the
  * document has been changed to add an inlay at the caret position, and will move the caret appropriately.
  */
-fun Caret.moveToInlayAwareOffset(offset: Int) {
+internal fun Caret.moveToInlayAwareOffset(offset: Int) {
   // If the target is inside a fold, call the standard moveToOffset to expand and move
   if (editor.foldingModel.isOffsetCollapsed(offset) || !editor.hasBlockOrUnderscoreCaret()) {
     moveToOffset(offset)
@@ -47,7 +47,7 @@ fun Caret.moveToInlayAwareOffset(offset: Int) {
   }
 }
 
-fun Caret.moveToInlayAwareLogicalPosition(pos: LogicalPosition) {
+internal fun Caret.moveToInlayAwareLogicalPosition(pos: LogicalPosition) {
   moveToInlayAwareOffset(editor.logicalPositionToOffset(pos))
 }
 
@@ -66,24 +66,22 @@ private fun getVisualPositionForTextAtOffset(editor: Editor, offset: Int): Visua
   return pos
 }
 
-val Caret.inlayAwareVisualColumn: Int
+internal val Caret.inlayAwareVisualColumn: Int
   get() = this.visualPosition.column - this.amountOfInlaysBeforeCaret
 
-val Caret.amountOfInlaysBeforeCaret: Int
+internal val Caret.amountOfInlaysBeforeCaret: Int
   get() {
     val curLineStartOffset: Int = this.editor.document.getLineStartOffset(logicalPosition.line)
     return this.editor.inlayModel.getInlineElementsInRange(curLineStartOffset, this.offset).size
   }
 
-fun Editor.amountOfInlaysBeforeVisualPosition(pos: VisualPosition): Int {
+internal fun Editor.amountOfInlaysBeforeVisualPosition(pos: VisualPosition): Int {
   val offset = visualPositionToOffset(pos)
   val lineStartOffset = document.getLineStartOffset(visualToLogicalPosition(pos).line)
   return this.inlayModel.getInlineElementsInRange(lineStartOffset, offset).size
 }
 
-fun VisualPosition.toInlayAwareOffset(caret: Caret): Int = this.column - caret.amountOfInlaysBeforeCaret
-
-fun Editor.updateCaretsVisualPosition() {
+internal fun Editor.updateCaretsVisualPosition() {
   // Caret visual position depends on the current mode, especially with respect to inlays. E.g. if an inlay is
   // related to preceding text, the caret is placed between inlay and preceding text in insert mode (usually bar
   // caret) but after the inlay in normal mode (block caret).

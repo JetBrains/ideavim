@@ -11,7 +11,7 @@ import com.google.common.collect.Lists
 import com.intellij.openapi.editor.Editor
 import javax.swing.KeyStroke
 
-class TestInputModel private constructor() {
+internal class TestInputModel private constructor() {
   private val myKeyStrokes: MutableList<KeyStroke> = Lists.newArrayList()
   fun setKeyStrokes(keyStrokes: List<KeyStroke>) {
     myKeyStrokes.clear()

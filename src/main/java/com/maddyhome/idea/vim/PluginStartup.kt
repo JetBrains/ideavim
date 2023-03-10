@@ -26,7 +26,7 @@ import com.maddyhome.idea.vim.group.IjOptionConstants
 // causes this deadlock. Good new: it's easy reproducible in tests.
 // Previous migration: fc7efd5484a13b40ba9bf86a1d5429e215d973f3
 // Revert: 24dd84b31cffb99eb6114524859a46d02717d33f
-class PluginStartup : StartupActivity.DumbAware/*, LightEditCompatible*/ {
+internal class PluginStartup : StartupActivity.DumbAware/*, LightEditCompatible*/ {
 
   private var firstInitializationOccurred = false
 
@@ -40,7 +40,7 @@ class PluginStartup : StartupActivity.DumbAware/*, LightEditCompatible*/ {
 }
 
 // This is a temporal workaround for VIM-2487
-class PyNotebooksCloseWorkaround : ProjectManagerListener {
+internal class PyNotebooksCloseWorkaround : ProjectManagerListener {
   override fun projectClosingBeforeSave(project: Project) {
     if (injector.globalOptions().isSet(IjOptionConstants.closenotebooks)) {
       localEditors().forEach { editor ->

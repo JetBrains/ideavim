@@ -50,7 +50,7 @@ import javax.swing.KeyStroke
  * @author dhleong
  * @author vlan
  */
-class VimSurroundExtension : VimExtension {
+internal class VimSurroundExtension : VimExtension {
 
   override fun getName() = "surround"
 

@@ -22,7 +22,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 
-class GetFunctionHandler : FunctionHandler() {
+internal class GetFunctionHandler : FunctionHandler() {
   override val name: String = "get"
   override val minimumNumberOfArguments: Int = 2
   override val maximumNumberOfArguments: Int = 3

@@ -22,7 +22,7 @@ import com.maddyhome.idea.vim.options.ToggleOption
 import com.maddyhome.idea.vim.statistic.PluginState
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 
-object VimExtensionRegistrar : VimExtensionRegistrator {
+internal object VimExtensionRegistrar : VimExtensionRegistrator {
   internal val registeredExtensions: MutableSet<String> = HashSet()
   internal val extensionAliases = HashMap<String, String>()
   private var extensionRegistered = false

@@ -22,13 +22,12 @@ import com.maddyhome.idea.vim.vimscript.model.functions.FunctionBeanClass
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
 
-class FunctionStorage : VimscriptFunctionService {
+internal class FunctionStorage : VimscriptFunctionService {
 
   private val logger = logger<FunctionStorage>()
 
   private val globalFunctions: MutableMap<String, FunctionDeclaration> = mutableMapOf()
 
-  private val extensionPoint = ExtensionPointName.create<FunctionBeanClass>("IdeaVIM.vimLibraryFunction")
   private val builtInFunctions: MutableMap<String, FunctionHandler> = mutableMapOf()
 
   override fun deleteFunction(name: String, scope: Scope?, vimContext: VimLContext) {
@@ -173,6 +172,16 @@ class FunctionStorage : VimscriptFunctionService {
       builtInFunctions[handlerHolder.name!!] = handlerHolder.instance
     } else {
       logger.error("Received function handler with null name")
+    }
+  }
+
+  companion object {
+    private val extensionPoint = ExtensionPointName.create<FunctionBeanClass>("IdeaVIM.vimLibraryFunction")
+
+    inline fun <reified T: FunctionHandler> getFunctionOfType(): T {
+      val point = extensionPoint.getExtensionList(ApplicationManager.getApplication())
+        .single { it.implementation == T::class.java.name }
+      return point.instance as T
     }
   }
 }

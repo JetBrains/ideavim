@@ -21,7 +21,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 
-object LenFunctionHandler : FunctionHandler() {
+internal class LenFunctionHandler : FunctionHandler() {
 
   override val name = "len"
   override val minimumNumberOfArguments = 1

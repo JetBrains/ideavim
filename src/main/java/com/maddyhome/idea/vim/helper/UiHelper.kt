@@ -19,7 +19,7 @@ import javax.swing.JComponent
 /**
  * Get focus reliably.
  */
-fun requestFocus(component: JComponent) {
+internal fun requestFocus(component: JComponent) {
   IdeFocusManager.findInstance().requestFocus(component, true)
 }
 
@@ -28,11 +28,11 @@ fun requestFocus(component: JComponent) {
  *
  * @see [requestFocus]
  */
-fun runAfterGotFocus(runnable: Runnable) {
+internal fun runAfterGotFocus(runnable: Runnable) {
   IdeFocusManager.findInstance().doWhenFocusSettlesDown(runnable, ModalityState.defaultModalityState())
 }
 
-fun selectFont(forStr: String): Font {
+internal fun selectFont(forStr: String): Font {
   val scheme = EditorColorsManager.getInstance().globalScheme
 
   val fontName = scheme.fontPreferences.realFontFamilies.firstOrNull {

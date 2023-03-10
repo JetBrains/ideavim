@@ -72,7 +72,7 @@ private var Editor.vimMultipleCursorsLastSelection: TextRange? by userData()
  *
  * See https://github.com/terryma/vim-multiple-cursors
  * */
-class VimMultipleCursorsExtension : VimExtension {
+internal class VimMultipleCursorsExtension : VimExtension {
 
   override fun getName() = "multiple-cursors"
 

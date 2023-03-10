@@ -27,7 +27,7 @@ import com.maddyhome.idea.vim.newapi.vim
 /**
  * Pop all modes, but leave editor state. E.g. editor selection is not removed.
  */
-fun Editor.popAllModes() {
+internal fun Editor.popAllModes() {
   val commandState = this.vim.vimStateMachine
   while (commandState.mode != VimStateMachine.Mode.COMMAND) {
     commandState.popModes()
@@ -35,7 +35,7 @@ fun Editor.popAllModes() {
 }
 
 /** [adjustCaretPosition] - if true, caret will be moved one char left if it's on the line end */
-fun Editor.exitSelectMode(adjustCaretPosition: Boolean) {
+internal fun Editor.exitSelectMode(adjustCaretPosition: Boolean) {
   if (!this.inSelectMode) return
 
   this.vim.vimStateMachine.popModes()
@@ -55,7 +55,7 @@ fun Editor.exitSelectMode(adjustCaretPosition: Boolean) {
 }
 
 /** [adjustCaretPosition] - if true, caret will be moved one char left if it's on the line end */
-fun VimEditor.exitSelectMode(adjustCaretPosition: Boolean) {
+internal fun VimEditor.exitSelectMode(adjustCaretPosition: Boolean) {
   if (!this.inSelectMode) return
 
   this.vimStateMachine.popModes()
@@ -75,6 +75,6 @@ fun VimEditor.exitSelectMode(adjustCaretPosition: Boolean) {
   }
 }
 
-fun Editor.exitInsertMode(context: DataContext, operatorArguments: OperatorArguments) {
+internal fun Editor.exitInsertMode(context: DataContext, operatorArguments: OperatorArguments) {
   VimPlugin.getChange().processEscape(IjVimEditor(this), IjEditorExecutionContext(context), operatorArguments)
 }

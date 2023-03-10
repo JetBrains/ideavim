@@ -15,7 +15,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFileManager
 import java.lang.ref.WeakReference
 
-class IntellijMark(bookmark: LineBookmark, override val col: Int, project: Project?) : Mark {
+internal class IntellijMark(bookmark: LineBookmark, override val col: Int, project: Project?) : Mark {
 
   private val project: WeakReference<Project?> = WeakReference(project)
 

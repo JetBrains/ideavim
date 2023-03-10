@@ -16,7 +16,7 @@ import com.maddyhome.idea.vim.ui.ExOutputPanel
 /**
  * @author vlan
  */
-class ExOutputModel private constructor(private val myEditor: Editor) : VimExOutputPanel {
+public class ExOutputModel private constructor(private val myEditor: Editor) : VimExOutputPanel {
   override var text: String? = null
     private set
 
@@ -34,9 +34,9 @@ class ExOutputModel private constructor(private val myEditor: Editor) : VimExOut
     }
   }
 
-  companion object {
+  public companion object {
     @JvmStatic
-    fun getInstance(editor: Editor): ExOutputModel {
+    public fun getInstance(editor: Editor): ExOutputModel {
       var model = editor.vimExOutput
       if (model == null) {
         model = ExOutputModel(editor)

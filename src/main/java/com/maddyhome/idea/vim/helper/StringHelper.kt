@@ -16,20 +16,20 @@ import javax.swing.KeyStroke
  * COMPATIBILITY-LAYER: Created a helper class
  * Please see: https://jb.gg/zo8n0r
  */
-object StringHelper {
+public object StringHelper {
   @JvmStatic
-  fun parseKeys(string: String): List<KeyStroke> {
+  public fun parseKeys(string: String): List<KeyStroke> {
     return injector.parser.parseKeys(string)
   }
 
   @JvmStatic
-  fun parseKeys(vararg string: String): List<KeyStroke> {
+  public fun parseKeys(vararg string: String): List<KeyStroke> {
     return Arrays.stream(string).flatMap { o: String -> injector.parser.parseKeys(o).stream() }
       .collect(Collectors.toList())
   }
 
   @JvmStatic
-  fun isCloseKeyStroke(stroke: KeyStroke): Boolean {
+  public fun isCloseKeyStroke(stroke: KeyStroke): Boolean {
     return stroke.isCloseKeyStroke()
   }
 }

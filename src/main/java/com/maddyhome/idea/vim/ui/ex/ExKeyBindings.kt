@@ -13,7 +13,7 @@ import javax.swing.KeyStroke
 import javax.swing.text.DefaultEditorKit
 import javax.swing.text.JTextComponent.KeyBinding
 
-object ExKeyBindings {
+internal object ExKeyBindings {
 
   // TODO - add the following keys:
   // Ctrl-\ Ctrl-N - abort

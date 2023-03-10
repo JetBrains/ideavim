@@ -53,10 +53,10 @@ import javax.swing.Icon
 import javax.swing.SwingConstants
 
 @NonNls
-const val STATUS_BAR_ICON_ID = "IdeaVim-Icon"
-const val STATUS_BAR_DISPLAY_NAME = "IdeaVim"
+internal const val STATUS_BAR_ICON_ID = "IdeaVim-Icon"
+internal const val STATUS_BAR_DISPLAY_NAME = "IdeaVim"
 
-class StatusBarIconFactory : StatusBarWidgetFactory/*, LightEditCompatible*/ {
+internal class StatusBarIconFactory : StatusBarWidgetFactory/*, LightEditCompatible*/ {
 
   override fun getId(): String = STATUS_BAR_ICON_ID
 
@@ -102,7 +102,7 @@ class StatusBarIconFactory : StatusBarWidgetFactory/*, LightEditCompatible*/ {
   }
 }
 
-class VimStatusBar : StatusBarWidget, StatusBarWidget.IconPresentation {
+internal class VimStatusBar : StatusBarWidget, StatusBarWidget.IconPresentation {
 
   override fun ID(): String = STATUS_BAR_ICON_ID
 
@@ -135,7 +135,7 @@ class VimStatusBar : StatusBarWidget, StatusBarWidget.IconPresentation {
   override fun getPresentation(): StatusBarWidget.WidgetPresentation = this
 }
 
-class VimActions : DumbAwareAction() {
+internal class VimActions : DumbAwareAction() {
 
   override fun actionPerformed(e: AnActionEvent) {
     val project = e.project ?: return

@@ -14,7 +14,7 @@ import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.UserDataHolder
 
-class EditorDataContext @Deprecated("Please use `init` method") constructor(
+internal class EditorDataContext @Deprecated("Please use `init` method") constructor(
   private val editor: Editor,
   private val editorContext: DataContext,
   private val contextDelegate: DataContext? = null,

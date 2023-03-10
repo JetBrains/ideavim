@@ -18,7 +18,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 import com.maddyhome.idea.vim.group.IjOptionConstants
 
-class DeleteJoinLinesAction : ChangeEditorActionHandler.ConditionalSingleExecution() {
+public class DeleteJoinLinesAction : ChangeEditorActionHandler.ConditionalSingleExecution() {
   override val type: Command.Type = Command.Type.DELETE
   override fun runAsMulticaret(
     editor: VimEditor,

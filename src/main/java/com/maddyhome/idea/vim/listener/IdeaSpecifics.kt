@@ -50,7 +50,7 @@ import javax.swing.KeyStroke
 /**
  * @author Alex Plate
  */
-object IdeaSpecifics {
+internal object IdeaSpecifics {
   class VimActionListener : AnActionListener {
     @NonNls
     private val surrounderItems = listOf("if", "if / else", "for")
@@ -209,7 +209,7 @@ object IdeaSpecifics {
 }
 
 //region Find action ID
-class FindActionIdAction : DumbAwareToggleAction() {
+internal class FindActionIdAction : DumbAwareToggleAction() {
   override fun isSelected(e: AnActionEvent): Boolean = injector.globalOptions().isSet(IjOptionConstants.trackactionids)
 
   override fun setSelected(e: AnActionEvent, state: Boolean) {

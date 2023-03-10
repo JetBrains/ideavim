@@ -22,18 +22,18 @@ import com.maddyhome.idea.vim.options.helpers.KeywordOptionHelper
 // ideavim-sneak 1.2.0 which is current - ignorecase + smartcase, both just access isSet property
 // IdeaVim-EasyMotion 1.9 + 1.10 - OptionsManger.iskeyword.toRegex() (plus more in tests, which are already broken)
 // (which-key 0.6.2 uses timeout + timeoutlen, now removed. That plugin version is broken due to other changes)
-object OptionsManager {
-  val ignorecase: ToggleOption
+public object OptionsManager {
+  public val ignorecase: ToggleOption
     get() = ToggleOption(OptionConstants.ignorecase)
-  val smartcase: ToggleOption
+  public val smartcase: ToggleOption
     get() = ToggleOption(OptionConstants.smartcase)
-  val iskeyword: KeywordOption
+  public val iskeyword: KeywordOption
     get() = KeywordOption(KeywordOptionHelper)
 }
 
 @Deprecated("No longer used. Use StringOption or KeywordOptionHelper")
-class KeywordOption(val helper: KeywordOptionHelper) {
-  fun toRegex(): List<String> {
+public class KeywordOption(public val helper: KeywordOptionHelper) {
+  public fun toRegex(): List<String> {
     return helper.toRegex()
   }
 }

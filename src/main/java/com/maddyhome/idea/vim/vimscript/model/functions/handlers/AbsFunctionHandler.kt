@@ -18,7 +18,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 import kotlin.math.abs
 
-object AbsFunctionHandler : FunctionHandler() {
+internal class AbsFunctionHandler : FunctionHandler() {
 
   override val name = "abs"
   override val minimumNumberOfArguments = 1

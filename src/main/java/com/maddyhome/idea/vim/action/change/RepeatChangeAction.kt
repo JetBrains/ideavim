@@ -18,7 +18,7 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.newapi.ij
 
-class RepeatChangeAction : VimActionHandler.SingleExecution() {
+internal class RepeatChangeAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_WRITABLE
 
   override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {

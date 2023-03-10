@@ -14,7 +14,7 @@ import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.Transferable
 import java.awt.datatransfer.UnsupportedFlavorException
 
-object TestClipboardModel {
+internal object TestClipboardModel {
 
   var contents: Transferable = EmptyTransferable
 

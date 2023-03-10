@@ -13,7 +13,7 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.editor.actionSystem.TypedActionHandler
 
 @Service
-class KeyHandlerKeeper {
+internal class KeyHandlerKeeper {
 
   lateinit var originalHandler: TypedActionHandler
 

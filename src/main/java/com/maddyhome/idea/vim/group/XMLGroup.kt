@@ -11,7 +11,7 @@ package com.maddyhome.idea.vim.group
 import org.apache.commons.codec.binary.Base64
 import org.jdom.Element
 
-class XMLGroup {
+internal class XMLGroup {
   /**
    * Set the text of an XML element, safely encode it if needed.
    */

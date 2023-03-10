@@ -15,7 +15,7 @@ import com.maddyhome.idea.vim.EventFacade
 import com.maddyhome.idea.vim.group.SearchGroup
 import com.maddyhome.idea.vim.group.VimMarkServiceImpl
 
-object DocumentManager {
+internal object DocumentManager {
   private val docListeners = mutableSetOf<DocumentListener>()
   private val LISTENER_MARKER = Key<String>("VimlistenerMarker")
 

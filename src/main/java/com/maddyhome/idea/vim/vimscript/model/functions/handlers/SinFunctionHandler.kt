@@ -17,7 +17,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 import kotlin.math.sin
 
-object SinFunctionHandler : FunctionHandler() {
+internal class SinFunctionHandler : FunctionHandler() {
 
   override val name = "sin"
   override val minimumNumberOfArguments = 1

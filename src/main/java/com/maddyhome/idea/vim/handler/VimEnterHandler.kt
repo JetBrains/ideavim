@@ -28,7 +28,7 @@ import javax.swing.KeyStroke
 /**
  * This handler doesn't work in tests for ex commands
  */
-abstract class OctopusHandler(private val nextHandler: EditorActionHandler) : EditorActionHandler() {
+internal abstract class OctopusHandler(private val nextHandler: EditorActionHandler) : EditorActionHandler() {
 
   abstract fun executeHandler(editor: Editor, caret: Caret?, dataContext: DataContext?)
   open fun isHandlerEnabled(editor: Editor, dataContext: DataContext?): Boolean {
@@ -66,7 +66,7 @@ abstract class OctopusHandler(private val nextHandler: EditorActionHandler) : Ed
  * - App code - set handler after
  * - Template - doesn't intersect with enter anymore
  */
-class VimEnterHandler(nextHandler: EditorActionHandler) : VimKeyHandler(nextHandler) {
+internal class VimEnterHandler(nextHandler: EditorActionHandler) : VimKeyHandler(nextHandler) {
   override val key: String = "<CR>"
 }
 
@@ -80,11 +80,11 @@ class VimEnterHandler(nextHandler: EditorActionHandler) : VimKeyHandler(nextHand
  * - App code - Need to review
  * - Template - Need to review
  */
-class VimEscHandler(nextHandler: EditorActionHandler) : VimKeyHandler(nextHandler) {
+internal class VimEscHandler(nextHandler: EditorActionHandler) : VimKeyHandler(nextHandler) {
   override val key: String = "<Esc>"
 }
 
-abstract class VimKeyHandler(nextHandler: EditorActionHandler) : OctopusHandler(nextHandler) {
+internal abstract class VimKeyHandler(nextHandler: EditorActionHandler) : OctopusHandler(nextHandler) {
 
   abstract val key: String
 
@@ -100,7 +100,7 @@ abstract class VimKeyHandler(nextHandler: EditorActionHandler) : OctopusHandler(
   }
 }
 
-fun isOctopusEnabled(s: KeyStroke, editor: Editor): Boolean {
+internal fun isOctopusEnabled(s: KeyStroke, editor: Editor): Boolean {
   if (!enableOctopus) return false
   when {
     s.keyCode == KeyEvent.VK_ENTER -> return editor.mode in listOf(
@@ -123,7 +123,7 @@ fun isOctopusEnabled(s: KeyStroke, editor: Editor): Boolean {
  * If this option is enabled, vim will connect to IDE via EditorActionHandler extension point
  *   what seems to be a way better solution as this is a correct way to override editor actions like enter, right, etc.
  */
-val enableOctopus: Boolean
+internal val enableOctopus: Boolean
   get() {
     return injector.globalOptions().isSet(OptionConstants.octopushandler)
   }

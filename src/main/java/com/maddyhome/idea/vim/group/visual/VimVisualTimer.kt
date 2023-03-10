@@ -52,7 +52,7 @@ import javax.swing.Timer
  *   editorHasSelection is false. Insert mode ([mode]) has no selection and editor also has no selection, so
  *   no adjustment gets performed and IdeaVim stays in insert mode.
  */
-object VimVisualTimer {
+internal object VimVisualTimer {
 
   var swingTimer: Timer? = null
   var mode: VimStateMachine.Mode? = null

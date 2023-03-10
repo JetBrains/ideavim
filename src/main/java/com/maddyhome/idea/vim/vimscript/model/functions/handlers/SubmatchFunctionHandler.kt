@@ -16,8 +16,9 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
+import com.maddyhome.idea.vim.vimscript.services.FunctionStorage
 
-object SubmatchFunctionHandler : FunctionHandler() {
+internal class SubmatchFunctionHandler : FunctionHandler() {
   override val name = "submatch"
   override val minimumNumberOfArguments = 1
   override val maximumNumberOfArguments = 2
@@ -35,5 +36,11 @@ object SubmatchFunctionHandler : FunctionHandler() {
       throw ExException("Sorry, only `submatch(0)` is supported :(")
     }
     return VimString(latestMatch)
+  }
+
+  companion object {
+    fun getInstance(): SubmatchFunctionHandler {
+      return FunctionStorage.getFunctionOfType<SubmatchFunctionHandler>()
+    }
   }
 }

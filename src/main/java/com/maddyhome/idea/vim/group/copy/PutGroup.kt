@@ -51,7 +51,7 @@ import com.maddyhome.idea.vim.put.VimPasteProvider
 import com.maddyhome.idea.vim.put.VimPutBase
 import java.awt.datatransfer.DataFlavor
 
-class PutGroup : VimPutBase() {
+internal class PutGroup : VimPutBase() {
 
   override fun getProviderForPasteViaIde(
     editor: VimEditor,
@@ -185,4 +185,4 @@ class PutGroup : VimPutBase() {
   }
 }
 
-class IjPasteProvider(val pasteProvider: PasteProvider) : VimPasteProvider
+internal class IjPasteProvider(val pasteProvider: PasteProvider) : VimPasteProvider

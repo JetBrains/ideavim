@@ -52,7 +52,7 @@ import java.util.regex.Pattern
  * Port of matchit.vim (https://github.com/chrisbra/matchit)
  * @author Martin Yzeiri (@myzeiri)
  */
-class Matchit : VimExtension {
+internal class Matchit : VimExtension {
 
   override fun getName(): String = "matchit"
 

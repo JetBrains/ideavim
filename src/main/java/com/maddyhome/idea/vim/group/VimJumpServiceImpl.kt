@@ -27,7 +27,7 @@ import com.maddyhome.idea.vim.newapi.ij
 import org.jdom.Element
 
 @State(name = "VimJumpsSettings", storages = [Storage(value = "\$APP_CONFIG$/vim_settings_local.xml", roamingType = RoamingType.DISABLED)])
-class VimJumpServiceImpl : VimJumpServiceBase(), PersistentStateComponent<Element?> {
+internal class VimJumpServiceImpl : VimJumpServiceBase(), PersistentStateComponent<Element?> {
   companion object {
     private val logger = vimLogger<VimJumpServiceImpl>()
   }
@@ -72,7 +72,7 @@ class VimJumpServiceImpl : VimJumpServiceBase(), PersistentStateComponent<Elemen
   }
 }
 
-class JumpsListener : RecentPlacesListener {
+internal class JumpsListener : RecentPlacesListener {
   override fun recentPlaceAdded(changePlace: PlaceInfo, isChanged: Boolean) {
     if (!injector.globalOptions().isSet("unifyjumps")) return
 

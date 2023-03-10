@@ -13,7 +13,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.VimEnabler
 
 @Service
-class IjVimEnabler : VimEnabler {
+internal class IjVimEnabler : VimEnabler {
   override fun isEnabled(): Boolean {
     return VimPlugin.isEnabled()
   }

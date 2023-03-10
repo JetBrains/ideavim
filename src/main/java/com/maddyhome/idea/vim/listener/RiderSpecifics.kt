@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.group.visual.IdeaSelectionControl
 import com.maddyhome.idea.vim.group.visual.moveCaretOneCharLeftFromSelectionEnd
 import com.maddyhome.idea.vim.helper.getTopLevelEditor
 
-class RiderActionListener : AnActionListener {
+internal class RiderActionListener : AnActionListener {
 
   private var editor: Editor? = null
   override fun beforeActionPerformed(action: AnAction, event: AnActionEvent) {

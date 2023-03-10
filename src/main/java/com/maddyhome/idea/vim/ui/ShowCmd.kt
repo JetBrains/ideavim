@@ -34,7 +34,7 @@ import org.jetbrains.annotations.NonNls
 import java.awt.Component
 import java.awt.event.MouseEvent
 
-object ShowCmd {
+internal object ShowCmd {
   // https://github.com/vim/vim/blob/b376ace1aeaa7614debc725487d75c8f756dd773/src/vim.h#L1721
   private const val SHOWCMD_COLS = 10
 
@@ -66,7 +66,7 @@ object ShowCmd {
   }
 }
 
-object ShowCmdOptionChangeListener : OptionChangeListener<VimDataType> {
+internal object ShowCmdOptionChangeListener : OptionChangeListener<VimDataType> {
   override fun processGlobalValueChange(oldValue: VimDataType?) {
     ShowCmd.update()
 
@@ -79,7 +79,7 @@ object ShowCmdOptionChangeListener : OptionChangeListener<VimDataType> {
   }
 }
 
-class ShowCmdStatusBarWidgetFactory : StatusBarWidgetFactory/*, LightEditCompatible*/ {
+internal class ShowCmdStatusBarWidgetFactory : StatusBarWidgetFactory/*, LightEditCompatible*/ {
   override fun getId() = ShowCmd.ID
 
   override fun getDisplayName(): String = ShowCmd.displayName
@@ -109,7 +109,7 @@ class ShowCmdStatusBarWidgetFactory : StatusBarWidgetFactory/*, LightEditCompati
 //
 // We only need to show partial commands, since the standard PositionPanel shows the other information already, with
 // the exception of "{lines}x{columns}" (it shows "x carets" instead)
-class Widget(project: Project) :
+internal class Widget(project: Project) :
   EditorBasedWidget(project),
   StatusBarWidget.Multiframe,
   StatusBarWidget.TextPresentation,
@@ -136,7 +136,7 @@ class Widget(project: Project) :
   override fun copy(): StatusBarWidget = Widget(project)
 }
 
-class WidgetUpdater : FileEditorManagerListener {
+internal class WidgetUpdater : FileEditorManagerListener {
   override fun selectionChanged(event: FileEditorManagerEvent) {
     // Update when changing selected editor
     val windowManager = WindowManager.getInstance()

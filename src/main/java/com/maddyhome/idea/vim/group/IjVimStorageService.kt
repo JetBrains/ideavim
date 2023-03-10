@@ -15,7 +15,7 @@ import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.newapi.ij
 
-class IjVimStorageService : VimStorageServiceBase() {
+internal class IjVimStorageService : VimStorageServiceBase() {
   val bufferToKey = mutableMapOf<String, MutableMap<String, Any?>>()
 
   override fun <T> getDataFromEditor(editor: VimEditor, key: com.maddyhome.idea.vim.api.Key<T>): T? {

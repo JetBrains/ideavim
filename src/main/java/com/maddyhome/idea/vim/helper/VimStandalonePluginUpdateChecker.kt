@@ -16,7 +16,7 @@ import com.maddyhome.idea.vim.group.NotificationService
 import com.maddyhome.idea.vim.icons.VimIcons
 
 @Service(Service.Level.APP)
-class VimStandalonePluginUpdateChecker : StandalonePluginUpdateChecker(
+internal class VimStandalonePluginUpdateChecker : StandalonePluginUpdateChecker(
   VimPlugin.getPluginId(),
   updateTimestampProperty = PROPERTY_NAME,
   NotificationService.IDEAVIM_STICKY_GROUP,

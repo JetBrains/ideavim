@@ -23,7 +23,7 @@ import javax.swing.KeyStroke
  *
  * The mapping for this action means that the ex command is executed as a write action
  */
-class ProcessExEntryAction : VimActionHandler.SingleExecution(), ComplicatedKeysAction {
+public class ProcessExEntryAction : VimActionHandler.SingleExecution(), ComplicatedKeysAction {
   override val keyStrokesSet: Set<List<KeyStroke>> =
     parseKeysSet("<CR>", "<C-M>", 0x0a.toChar().toString(), 0x0d.toChar().toString())
 

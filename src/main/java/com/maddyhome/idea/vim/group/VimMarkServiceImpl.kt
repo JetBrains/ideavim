@@ -45,7 +45,7 @@ import kotlin.Comparator
 
 // todo exception after moving to global mark after deleting it via IDE (impossible to receive markChar)
 @State(name = "VimMarksSettings", storages = [Storage(value = "\$APP_CONFIG$/vim_settings_local.xml", roamingType = RoamingType.DISABLED)])
-class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateComponent<Element?> {
+internal class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateComponent<Element?> {
   private fun createOrGetSystemMark(ch: Char, line: Int, col: Int, editor: VimEditor): Mark? {
     val ijEditor = (editor as IjVimEditor).editor
     val systemMark = createOrGetSystemMark(ch, line, ijEditor) ?: return null

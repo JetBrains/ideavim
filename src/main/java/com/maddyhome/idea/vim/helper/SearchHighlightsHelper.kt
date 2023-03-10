@@ -33,7 +33,7 @@ import java.awt.Color
 import java.awt.Font
 import java.util.*
 
-fun updateSearchHighlights(
+internal fun updateSearchHighlights(
   pattern: String?,
   shouldIgnoreSmartCase: Boolean,
   showHighlights: Boolean,
@@ -42,7 +42,7 @@ fun updateSearchHighlights(
   updateSearchHighlights(pattern, shouldIgnoreSmartCase, showHighlights, -1, null, true, forceUpdate)
 }
 
-fun updateIncsearchHighlights(
+internal fun updateIncsearchHighlights(
   editor: Editor,
   pattern: String,
   forwards: Boolean,
@@ -55,7 +55,7 @@ fun updateIncsearchHighlights(
   return updateSearchHighlights(pattern, false, showHighlights, searchStartOffset, searchRange, forwards, false)
 }
 
-fun addSubstitutionConfirmationHighlight(editor: Editor, start: Int, end: Int): RangeHighlighter {
+internal fun addSubstitutionConfirmationHighlight(editor: Editor, start: Int, end: Int): RangeHighlighter {
   val color = TextAttributes(
     editor.colorsScheme.getColor(EditorColors.SELECTION_FOREGROUND_COLOR),
     editor.colorsScheme.getColor(EditorColors.SELECTION_BACKGROUND_COLOR),
@@ -193,7 +193,7 @@ private fun distance(range: TextRange, pos: Int, forwards: Boolean, size: Int): 
   }
 }
 
-fun highlightSearchResults(editor: Editor, pattern: String, results: List<TextRange>, currentMatchOffset: Int) {
+internal fun highlightSearchResults(editor: Editor, pattern: String, results: List<TextRange>, currentMatchOffset: Int) {
   var highlighters = editor.vimLastHighlighters
   if (highlighters == null) {
     highlighters = mutableListOf()

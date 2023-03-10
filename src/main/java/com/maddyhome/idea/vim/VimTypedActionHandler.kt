@@ -30,7 +30,7 @@ import javax.swing.KeyStroke
  *
  * IDE shortcut keys used by Vim commands are handled by [com.maddyhome.idea.vim.action.VimShortcutKeyAction].
  */
-class VimTypedActionHandler(origHandler: TypedActionHandler) : TypedActionHandlerEx {
+internal class VimTypedActionHandler(origHandler: TypedActionHandler) : TypedActionHandlerEx {
   private val handler = KeyHandler.getInstance()
   private val traceTime = injector.globalOptions().isSet(OptionConstants.ideatracetime)
 
@@ -95,7 +95,7 @@ class VimTypedActionHandler(origHandler: TypedActionHandler) : TypedActionHandle
 /**
  * A nasty workaround to handle `<S-Space>` events. Probably all the key events should go trough this listener.
  */
-object VimKeyListener : KeyAdapter() {
+internal object VimKeyListener : KeyAdapter() {
 
   var isSpaceShift = false
 

@@ -15,9 +15,9 @@ import org.jetbrains.annotations.PropertyKey
 @NonNls
 private const val IDEAVIM_BUNDLE = "messages.IdeaVimBundle"
 
-object MessageHelper : DynamicBundle(IDEAVIM_BUNDLE) {
+internal object MessageHelper : DynamicBundle(IDEAVIM_BUNDLE) {
 
-  const val BUNDLE = IDEAVIM_BUNDLE
+  private const val BUNDLE = IDEAVIM_BUNDLE
 
   @JvmStatic
   fun message(@PropertyKey(resourceBundle = BUNDLE) key: String, vararg params: Any) = getMessage(key, *params)

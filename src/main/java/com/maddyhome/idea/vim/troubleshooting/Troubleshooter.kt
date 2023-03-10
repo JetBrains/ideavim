@@ -18,7 +18,7 @@ import com.maddyhome.idea.vim.key.ToKeysMappingInfo
 
 // [WIP] https://youtrack.jetbrains.com/issue/VIM-2658/Troubleshooter
 @Service
-class Troubleshooter {
+internal class Troubleshooter {
   private val problems: MultiMap<String, Problem> = MultiMap()
 
   fun removeByType(type: String) {
@@ -48,4 +48,4 @@ class Troubleshooter {
   }
 }
 
-class Problem(description: String)
+internal class Problem(description: String)

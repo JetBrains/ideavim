@@ -12,7 +12,7 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 
-class LastTabService(val project: Project) {
+internal class LastTabService(val project: Project) {
 
   var lastTab: VirtualFile? = null
 

@@ -29,7 +29,7 @@ import com.maddyhome.idea.vim.group.IjOptionConstants
  * @author oleg
  */
 @Service
-class UndoRedoHelper : UndoRedoBase() {
+internal class UndoRedoHelper : UndoRedoBase() {
   init {
     injector.optionGroup.addListener(IjOptionConstants.oldundo, {
       UndoManagerImpl.ourNeverAskUser = !injector.globalOptions().isSet(IjOptionConstants.oldundo)

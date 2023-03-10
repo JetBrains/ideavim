@@ -21,7 +21,7 @@ import com.maddyhome.idea.vim.newapi.vim
 /**
  * @author Alex Plate
  */
-class VisualMotionGroup : VimVisualMotionGroupBase() {
+internal class VisualMotionGroup : VimVisualMotionGroupBase() {
   override fun autodetectVisualSubmode(editor: VimEditor): VimStateMachine.SubMode {
     // IJ specific. See https://youtrack.jetbrains.com/issue/VIM-1924.
     val project = editor.ij.project

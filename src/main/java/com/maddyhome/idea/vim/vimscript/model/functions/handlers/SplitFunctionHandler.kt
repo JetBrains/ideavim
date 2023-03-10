@@ -18,7 +18,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 
-class SplitFunctionHandler : FunctionHandler() {
+internal class SplitFunctionHandler : FunctionHandler() {
   override val name: String = "split"
   override val minimumNumberOfArguments: Int = 1
   override val maximumNumberOfArguments: Int = 3

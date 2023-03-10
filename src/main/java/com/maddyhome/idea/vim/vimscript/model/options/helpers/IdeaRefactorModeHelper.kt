@@ -25,7 +25,7 @@ import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.group.IjOptionConstants
 
-object IdeaRefactorModeHelper {
+internal object IdeaRefactorModeHelper {
 
   fun keepMode() =
     injector.globalOptions().hasValue(IjOptionConstants.idearefactormode, IjOptionConstants.idearefactormode_keep)

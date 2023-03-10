@@ -21,8 +21,8 @@ import javax.swing.KeyStroke
 /**
  * @author dhleong
  */
-object ModalEntry {
-  inline fun activate(editor: VimEditor, crossinline processor: (KeyStroke) -> Boolean) {
+public object ModalEntry {
+  public inline fun activate(editor: VimEditor, crossinline processor: (KeyStroke) -> Boolean) {
 
     // Firstly we pull the unfinished keys of the current mapping
     val mappingStack = KeyHandler.getInstance().keyStack

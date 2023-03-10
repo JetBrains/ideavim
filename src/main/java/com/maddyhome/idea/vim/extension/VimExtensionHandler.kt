@@ -19,12 +19,12 @@ import com.maddyhome.idea.vim.newapi.ij
  * COMPATIBILITY-LAYER: Created a class, renamed original class
  * Please see: https://jb.gg/zo8n0r
  */
-interface VimExtensionHandler : ExtensionHandler {
+public interface VimExtensionHandler : ExtensionHandler {
   override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
     execute(editor.ij, context.ij)
   }
 
-  fun execute(editor: Editor, context: DataContext)
+  public fun execute(editor: Editor, context: DataContext)
 
-  abstract class WithCallback : ExtensionHandler.WithCallback(), VimExtensionHandler
+  public abstract class WithCallback : ExtensionHandler.WithCallback(), VimExtensionHandler
 }

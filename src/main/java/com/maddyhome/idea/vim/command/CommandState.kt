@@ -16,21 +16,21 @@ import com.maddyhome.idea.vim.newapi.vim
  * COMPATIBILITY-LAYER: Additional class
  * Please see: https://jb.gg/zo8n0r
  */
-class CommandState(private val machine: VimStateMachine) {
+public class CommandState(private val machine: VimStateMachine) {
 
-  val isOperatorPending: Boolean
+  public val isOperatorPending: Boolean
     get() = machine.isOperatorPending
 
-  val mode: CommandState.Mode
+  public val mode: CommandState.Mode
     get() = machine.mode.ij
 
-  val commandBuilder: CommandBuilder
+  public val commandBuilder: CommandBuilder
     get() = machine.commandBuilder
 
-  val mappingState: MappingState
+  public val mappingState: MappingState
     get() = machine.mappingState
 
-  enum class Mode {
+  public enum class Mode {
     // Basic modes
     COMMAND, VISUAL, SELECT, INSERT, CMD_LINE, /*EX*/
 
@@ -38,19 +38,19 @@ class CommandState(private val machine: VimStateMachine) {
     OP_PENDING, REPLACE /*, VISUAL_REPLACE*/, INSERT_NORMAL, INSERT_VISUAL, INSERT_SELECT
   }
 
-  enum class SubMode {
+  public enum class SubMode {
     NONE, VISUAL_CHARACTER, VISUAL_LINE, VISUAL_BLOCK
   }
 
-  companion object {
+  public companion object {
     @JvmStatic
-    fun getInstance(editor: Editor): CommandState {
+    public fun getInstance(editor: Editor): CommandState {
       return CommandState(editor.vim.vimStateMachine)
     }
   }
 }
 
-val CommandState.SubMode.engine: VimStateMachine.SubMode
+public val CommandState.SubMode.engine: VimStateMachine.SubMode
   get() = when (this) {
     CommandState.SubMode.NONE -> VimStateMachine.SubMode.NONE
     CommandState.SubMode.VISUAL_CHARACTER -> VimStateMachine.SubMode.VISUAL_CHARACTER
@@ -58,7 +58,7 @@ val CommandState.SubMode.engine: VimStateMachine.SubMode
     CommandState.SubMode.VISUAL_BLOCK -> VimStateMachine.SubMode.VISUAL_BLOCK
   }
 
-val CommandState.Mode.engine: VimStateMachine.Mode
+public val CommandState.Mode.engine: VimStateMachine.Mode
   get() = when (this) {
     CommandState.Mode.COMMAND -> VimStateMachine.Mode.COMMAND
     CommandState.Mode.VISUAL -> VimStateMachine.Mode.VISUAL
@@ -72,7 +72,7 @@ val CommandState.Mode.engine: VimStateMachine.Mode
     CommandState.Mode.INSERT_SELECT -> VimStateMachine.Mode.INSERT_SELECT
   }
 
-val VimStateMachine.Mode.ij: CommandState.Mode
+public val VimStateMachine.Mode.ij: CommandState.Mode
   get() = when (this) {
     VimStateMachine.Mode.COMMAND -> CommandState.Mode.COMMAND
     VimStateMachine.Mode.VISUAL -> CommandState.Mode.VISUAL

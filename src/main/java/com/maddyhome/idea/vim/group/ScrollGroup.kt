@@ -37,7 +37,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import kotlin.math.abs
 import kotlin.math.max
 
-class ScrollGroup : VimScrollGroup {
+internal class ScrollGroup : VimScrollGroup {
   override fun scrollCaretIntoView(editor: VimEditor) {
     ScrollViewHelper.scrollCaretIntoView(editor.ij)
   }

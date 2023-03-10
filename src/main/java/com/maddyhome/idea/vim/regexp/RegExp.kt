@@ -8,7 +8,7 @@ import com.maddyhome.idea.vim.helper.Msg
 import org.jetbrains.annotations.NonNls
 import java.util.*
 
-class RegExp {
+internal class RegExp {
     /*
      * The first byte of the regexp internal "program" is actually this magic
      * number; the start node begins in the second byte.  It's used to catch the

@@ -11,7 +11,7 @@ package com.maddyhome.idea.vim.group
 import com.intellij.openapi.util.SystemInfo
 import com.maddyhome.idea.vim.api.SystemInfoService
 
-class IjVimSystemInfoService : SystemInfoService {
+internal class IjVimSystemInfoService : SystemInfoService {
   override val isWindows: Boolean
     get() = SystemInfo.isWindows
 }

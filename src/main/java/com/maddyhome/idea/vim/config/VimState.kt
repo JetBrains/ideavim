@@ -15,7 +15,7 @@ import kotlin.reflect.KProperty
 /**
  * @author Alex Plate
  */
-class VimState {
+internal class VimState {
   var isIdeaJoinNotified by StateProperty("idea-join")
   var isIdeaPutNotified by StateProperty("idea-put")
 
@@ -40,7 +40,7 @@ class VimState {
   }
 }
 
-val map by lazy { mutableMapOf<String, Boolean>() }
+private val map by lazy { mutableMapOf<String, Boolean>() }
 
 private class StateProperty(val xmlName: String) : ReadWriteProperty<VimState, Boolean> {
 

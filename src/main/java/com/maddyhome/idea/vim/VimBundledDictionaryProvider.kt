@@ -10,6 +10,6 @@ package com.maddyhome.idea.vim
 
 import com.intellij.spellchecker.BundledDictionaryProvider
 
-class VimBundledDictionaryProvider : BundledDictionaryProvider {
+internal class VimBundledDictionaryProvider : BundledDictionaryProvider {
   override fun getBundledDictionaries(): Array<String> = arrayOf("/dictionaries/ideavim.dic")
 }

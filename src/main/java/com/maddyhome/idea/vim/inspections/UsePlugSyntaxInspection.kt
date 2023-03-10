@@ -15,7 +15,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiElementVisitor
 import com.intellij.psi.impl.source.tree.LeafPsiElement
 
-class UsePlugSyntaxInspection : LocalInspectionTool() {
+internal class UsePlugSyntaxInspection : LocalInspectionTool() {
   override fun getGroupDisplayName(): String {
     return "Vim"
   }

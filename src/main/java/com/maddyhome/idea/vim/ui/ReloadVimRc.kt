@@ -45,7 +45,7 @@ import org.jetbrains.annotations.TestOnly
  * - Action / action group
  */
 
-object VimRcFileState : VimrcFileState {
+internal object VimRcFileState : VimrcFileState {
   // Hash of .ideavimrc parsed to Script class
   private var state: Int? = null
 
@@ -108,7 +108,7 @@ object VimRcFileState : VimrcFileState {
   }
 }
 
-class ReloadVimRc : DumbAwareAction() {
+internal class ReloadVimRc : DumbAwareAction() {
   override fun update(e: AnActionEvent) {
     val editor = e.getData(PlatformDataKeys.EDITOR) ?: run {
       e.presentation.isEnabledAndVisible = false
@@ -152,7 +152,7 @@ class ReloadVimRc : DumbAwareAction() {
   }
 }
 
-class ReloadFloatingToolbar : AbstractFloatingToolbarProvider(ACTION_GROUP) {
+internal class ReloadFloatingToolbar : AbstractFloatingToolbarProvider(ACTION_GROUP) {
   override val autoHideable: Boolean = false
 
   override fun register(component: FloatingToolbarComponent, parentDisposable: Disposable) {
@@ -167,7 +167,7 @@ class ReloadFloatingToolbar : AbstractFloatingToolbarProvider(ACTION_GROUP) {
   }
 }
 
-class ReloadFloatingToolbarActionGroup : DefaultActionGroup() {
+internal class ReloadFloatingToolbarActionGroup : DefaultActionGroup() {
   companion object {
     const val ACTION_GROUP = "IdeaVim.ReloadVimRc.group"
   }

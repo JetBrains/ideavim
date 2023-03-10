@@ -17,7 +17,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 import java.util.*
 
-class ToupperFunctionHandler : FunctionHandler() {
+internal class ToupperFunctionHandler : FunctionHandler() {
   override val name: String = "toupper"
   override val minimumNumberOfArguments: Int = 1
   override val maximumNumberOfArguments: Int = 1

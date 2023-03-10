@@ -33,7 +33,7 @@ import java.io.IOException
 import javax.swing.JTextArea
 
 @Service
-class Executor : VimScriptExecutorBase() {
+internal class Executor : VimScriptExecutorBase() {
   private val logger = logger<Executor>()
   override var executingVimscript = false
 

@@ -20,7 +20,7 @@ import com.maddyhome.idea.vim.helper.vimSelectionStart
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.vim
 
-fun moveCaretOneCharLeftFromSelectionEnd(editor: Editor, predictedMode: VimStateMachine.Mode) {
+internal fun moveCaretOneCharLeftFromSelectionEnd(editor: Editor, predictedMode: VimStateMachine.Mode) {
   if (predictedMode != VimStateMachine.Mode.VISUAL) {
     if (!predictedMode.isEndAllowed) {
       editor.caretModel.allCarets.forEach { caret ->
@@ -46,7 +46,7 @@ fun moveCaretOneCharLeftFromSelectionEnd(editor: Editor, predictedMode: VimState
 }
 
 @Deprecated("Use same method on VimCaret")
-fun Caret.vimSetSelection(start: Int, end: Int = start, moveCaretToSelectionEnd: Boolean = false) {
+internal fun Caret.vimSetSelection(start: Int, end: Int = start, moveCaretToSelectionEnd: Boolean = false) {
   vimSelectionStart = start
   setVisualSelection(start, end, this.vim)
   if (moveCaretToSelectionEnd && !editor.inBlockSubMode) moveToInlayAwareOffset(end)

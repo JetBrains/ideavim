@@ -16,10 +16,10 @@ import com.maddyhome.idea.vim.api.VimTemplateManager
 import com.maddyhome.idea.vim.api.VimTemplateState
 
 @Service
-class IjTemplateManager : VimTemplateManager {
+internal class IjTemplateManager : VimTemplateManager {
   override fun getTemplateState(editor: VimEditor): VimTemplateState? {
     return TemplateManagerImpl.getTemplateState(editor.ij)?.let { IjTemplateState(it) }
   }
 }
 
-class IjTemplateState(val templateState: TemplateState) : VimTemplateState
+internal class IjTemplateState(val templateState: TemplateState) : VimTemplateState

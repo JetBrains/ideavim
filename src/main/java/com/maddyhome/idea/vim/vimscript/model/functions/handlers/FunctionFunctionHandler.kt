@@ -22,7 +22,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.functions.DefinedFunctionHandler
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 
-object FunctionFunctionHandler : FunctionHandler() {
+internal class FunctionFunctionHandler : FunctionHandler() {
   override val name = "function"
   override val minimumNumberOfArguments: Int = 1
   override val maximumNumberOfArguments: Int = 3
@@ -69,7 +69,7 @@ object FunctionFunctionHandler : FunctionHandler() {
   }
 }
 
-object FuncrefFunctionHandler : FunctionHandler() {
+internal class FuncrefFunctionHandler : FunctionHandler() {
   override val name = "function"
   override val minimumNumberOfArguments: Int = 1
   override val maximumNumberOfArguments: Int = 3

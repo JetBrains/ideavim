@@ -28,7 +28,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 
 // TODO: 03.08.2021 Support second parameter
-object LineFunctionHandler : FunctionHandler() {
+internal class LineFunctionHandler : FunctionHandler() {
 
   override val name = "line"
   override val minimumNumberOfArguments = 1
@@ -45,7 +45,7 @@ object LineFunctionHandler : FunctionHandler() {
   }
 }
 
-object ColFunctionHandler : FunctionHandler() {
+internal class ColFunctionHandler : FunctionHandler() {
 
   override val name = "col"
   override val minimumNumberOfArguments = 1

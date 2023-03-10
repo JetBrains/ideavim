@@ -37,7 +37,7 @@ import java.awt.Font
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
-const val DEFAULT_HIGHLIGHT_DURATION: Long = 300
+internal const val DEFAULT_HIGHLIGHT_DURATION: Long = 300
 
 @NonNls
 private val HIGHLIGHT_DURATION_VARIABLE_NAME = "highlightedyank_highlight_duration"
@@ -52,7 +52,7 @@ private fun getDefaultHighlightTextColor(): Color {
       .also { defaultHighlightTextColor = it }
 }
 
-class HighlightColorResetter : LafManagerListener {
+internal class HighlightColorResetter : LafManagerListener {
   override fun lookAndFeelChanged(source: LafManager) {
     defaultHighlightTextColor = null
   }
@@ -76,7 +76,7 @@ class HighlightColorResetter : LafManagerListener {
  *
  * When a new text is yanked or user starts editing, the old highlighting would be deleted.
  */
-class VimHighlightedYank : VimExtension, VimYankListener, VimInsertListener {
+internal class VimHighlightedYank : VimExtension, VimYankListener, VimInsertListener {
   private val highlightHandler = HighlightHandler()
 
   override fun getName() = "highlightedyank"

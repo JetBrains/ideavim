@@ -21,7 +21,7 @@ import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
 @Service
-class CommandLineHelper : VimCommandLineHelper {
+internal class CommandLineHelper : VimCommandLineHelper {
 
   override fun inputString(vimEditor: VimEditor, prompt: String, finishOn: Char?): String? {
     val editor = vimEditor.ij

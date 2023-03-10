@@ -36,7 +36,7 @@ import com.maddyhome.idea.vim.common.offset
 import com.maddyhome.idea.vim.helper.vimChangeActionSwitchMode
 import com.maddyhome.idea.vim.helper.vimLastColumn
 
-fun changeRange(
+internal fun changeRange(
   editor: Editor,
   caret: Caret,
   range: TextRange,
@@ -98,7 +98,7 @@ fun changeRange(
   }
 }
 
-fun deleteRange(
+internal fun deleteRange(
   editor: VimEditor,
   caret: VimCaret,
   range: TextRange,
@@ -142,7 +142,7 @@ fun deleteRange(
  *   This is probably the kotlin issue, but still
  * - `*` character doesn't appear when `o` in javadoc section
  */
-fun insertLineAround(editor: VimEditor, context: ExecutionContext, shift: Int) {
+internal fun insertLineAround(editor: VimEditor, context: ExecutionContext, shift: Int) {
   val project = (editor as IjVimEditor).editor.project
 
   VimPlugin.getChange().initInsert(editor, context, VimStateMachine.Mode.INSERT)
@@ -200,7 +200,7 @@ fun insertLineAround(editor: VimEditor, context: ExecutionContext, shift: Int) {
   injector.scroll.scrollCaretIntoView(editor)
 }
 
-fun toVimRange(range: TextRange, type: SelectionType): VimRange {
+internal fun toVimRange(range: TextRange, type: SelectionType): VimRange {
   return when (type) {
     SelectionType.LINE_WISE -> {
       VimRange.Line.Offsets(range.startOffset.offset, range.endOffset.offset)

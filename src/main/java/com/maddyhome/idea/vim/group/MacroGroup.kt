@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.newapi.IjVimEditor
 /**
  * Used to handle playback of macros
  */
-class MacroGroup : VimMacroBase() {
+internal class MacroGroup : VimMacroBase() {
 
   // If it's null, this is the top macro (as in most cases). If it's not null, this macro is executed from top macro
   private var potemkinProgress: PotemkinProgress? = null

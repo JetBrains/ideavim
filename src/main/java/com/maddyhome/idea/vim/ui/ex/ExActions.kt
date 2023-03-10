@@ -24,39 +24,39 @@ import javax.swing.text.TextAction
 import kotlin.math.abs
 import kotlin.math.min
 
-interface MultiStepAction : Action {
+internal interface MultiStepAction : Action {
   fun reset()
 }
 
-class HistoryUpAction : TextAction(ExEditorKit.HistoryUp) {
+internal class HistoryUpAction : TextAction(ExEditorKit.HistoryUp) {
   override fun actionPerformed(actionEvent: ActionEvent) {
     val target = getTextComponent(actionEvent) as ExTextField
     target.selectHistory(true, false)
   }
 }
 
-class HistoryDownAction : TextAction(ExEditorKit.HistoryDown) {
+internal class HistoryDownAction : TextAction(ExEditorKit.HistoryDown) {
   override fun actionPerformed(actionEvent: ActionEvent) {
     val target = getTextComponent(actionEvent) as ExTextField
     target.selectHistory(false, false)
   }
 }
 
-class HistoryUpFilterAction : TextAction(ExEditorKit.HistoryUpFilter) {
+internal class HistoryUpFilterAction : TextAction(ExEditorKit.HistoryUpFilter) {
   override fun actionPerformed(actionEvent: ActionEvent) {
     val target = getTextComponent(actionEvent) as ExTextField
     target.selectHistory(true, true)
   }
 }
 
-class HistoryDownFilterAction : TextAction(ExEditorKit.HistoryDownFilter) {
+internal class HistoryDownFilterAction : TextAction(ExEditorKit.HistoryDownFilter) {
   override fun actionPerformed(actionEvent: ActionEvent) {
     val target = getTextComponent(actionEvent) as ExTextField
     target.selectHistory(false, true)
   }
 }
 
-class InsertRegisterAction : TextAction(ExEditorKit.InsertRegister), MultiStepAction {
+internal class InsertRegisterAction : TextAction(ExEditorKit.InsertRegister), MultiStepAction {
   private enum class State {
     SKIP_CTRL_R, WAIT_REGISTER
   }
@@ -101,7 +101,7 @@ class InsertRegisterAction : TextAction(ExEditorKit.InsertRegister), MultiStepAc
   }
 }
 
-class CompleteEntryAction : TextAction(ExEditorKit.CompleteEntry) {
+internal class CompleteEntryAction : TextAction(ExEditorKit.CompleteEntry) {
   override fun actionPerformed(actionEvent: ActionEvent) {
     logger.debug("complete entry")
     val stroke = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0)
@@ -120,21 +120,21 @@ class CompleteEntryAction : TextAction(ExEditorKit.CompleteEntry) {
   }
 }
 
-class CancelEntryAction : TextAction(ExEditorKit.CancelEntry) {
+internal class CancelEntryAction : TextAction(ExEditorKit.CancelEntry) {
   override fun actionPerformed(e: ActionEvent) {
     val target = getTextComponent(e) as ExTextField
     target.cancel()
   }
 }
 
-class EscapeCharAction : TextAction(ExEditorKit.EscapeChar) {
+internal class EscapeCharAction : TextAction(ExEditorKit.EscapeChar) {
   override fun actionPerformed(e: ActionEvent) {
     val target = getTextComponent(e) as ExTextField
     target.escape()
   }
 }
 
-abstract class DeleteCharAction internal constructor(name: String?) : TextAction(name) {
+abstract internal class DeleteCharAction internal constructor(name: String?) : TextAction(name) {
   @kotlin.jvm.Throws(BadLocationException::class)
   fun deleteSelection(doc: Document, dot: Int, mark: Int): Boolean {
     if (dot != mark) {
@@ -181,7 +181,7 @@ abstract class DeleteCharAction internal constructor(name: String?) : TextAction
   }
 }
 
-class DeleteNextCharAction : DeleteCharAction(DefaultEditorKit.deleteNextCharAction) {
+internal class DeleteNextCharAction : DeleteCharAction(DefaultEditorKit.deleteNextCharAction) {
   override fun actionPerformed(e: ActionEvent) {
     val target = getTextComponent(e) as ExTextField
     target.saveLastEntry()
@@ -199,7 +199,7 @@ class DeleteNextCharAction : DeleteCharAction(DefaultEditorKit.deleteNextCharAct
   }
 }
 
-class DeletePreviousCharAction : DeleteCharAction(DefaultEditorKit.deletePrevCharAction) {
+internal class DeletePreviousCharAction : DeleteCharAction(DefaultEditorKit.deletePrevCharAction) {
   override fun actionPerformed(e: ActionEvent) {
     val target = getTextComponent(e) as ExTextField
     target.saveLastEntry()
@@ -219,7 +219,7 @@ class DeletePreviousCharAction : DeleteCharAction(DefaultEditorKit.deletePrevCha
   }
 }
 
-class DeletePreviousWordAction : TextAction(DefaultEditorKit.deletePrevWordAction) {
+internal class DeletePreviousWordAction : TextAction(DefaultEditorKit.deletePrevWordAction) {
   /**
    * Invoked when an action occurs.
    */
@@ -246,7 +246,7 @@ class DeletePreviousWordAction : TextAction(DefaultEditorKit.deletePrevWordActio
   }
 }
 
-class DeleteToCursorAction : TextAction(ExEditorKit.DeleteToCursor) {
+internal class DeleteToCursorAction : TextAction(ExEditorKit.DeleteToCursor) {
   /**
    * Invoked when an action occurs.
    */
@@ -263,7 +263,7 @@ class DeleteToCursorAction : TextAction(ExEditorKit.DeleteToCursor) {
   }
 }
 
-class ToggleInsertReplaceAction : TextAction(ExEditorKit.ToggleInsertReplace) {
+internal class ToggleInsertReplaceAction : TextAction(ExEditorKit.ToggleInsertReplace) {
   /**
    * Invoked when an action occurs.
    */

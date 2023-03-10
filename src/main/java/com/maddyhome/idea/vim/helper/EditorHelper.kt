@@ -23,14 +23,15 @@ import java.awt.Component
 import javax.swing.JComponent
 import javax.swing.JTable
 
-val Editor.fileSize: Int
+@Deprecated("Use fileSize from VimEditor")
+public val Editor.fileSize: Int
   get() = document.textLength
 
 /**
  * There is a problem with one-line editors. At the moment of the editor creation, this property is always set to false.
  *   So, we should enable IdeaVim for such editors and disable it on the first interaction
  */
-val Editor.isIdeaVimDisabledHere: Boolean
+internal val Editor.isIdeaVimDisabledHere: Boolean
   get() {
     val ideaVimSupportValue = injector.globalOptions().getStringListValues(IjOptionConstants.ideavimsupport)
     return disabledInDialog ||
@@ -54,7 +55,7 @@ private val Editor.disabledInDialog: Boolean
 /**
  * Checks if the editor is a primary editor in the main editing area.
  */
-fun Editor.isPrimaryEditor(): Boolean {
+internal fun Editor.isPrimaryEditor(): Boolean {
   val project = project ?: return false
   val fileEditorManager = FileEditorManagerEx.getInstanceEx(project)
   return fileEditorManager.allEditors.any { fileEditor -> this == EditorUtil.getEditorEx(fileEditor) }
@@ -82,11 +83,11 @@ private inline fun findParentByCondition(c: Component?, condition: (Component?) 
 /**
  * Get caret line in vim notation (1-based)
  */
-val Caret.vimLine: Int
+internal val Caret.vimLine: Int
   get() = this.logicalPosition.line + 1
 
 /**
  * Get current caret line in vim notation (1-based)
  */
-val Editor.vimLine: Int
+internal val Editor.vimLine: Int
   get() = this.caretModel.currentCaret.vimLine

@@ -26,7 +26,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  *
  * @author John Weigel
  */
-data class BufferCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges) {
+internal data class BufferCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges) {
   override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {

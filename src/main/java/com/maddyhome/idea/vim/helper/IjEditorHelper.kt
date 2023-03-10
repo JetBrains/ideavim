@@ -22,7 +22,7 @@ import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 
 @Service
-class IjEditorHelper : EngineEditorHelper {
+internal class IjEditorHelper : EngineEditorHelper {
   override fun amountOfInlaysBeforeVisualPosition(editor: VimEditor, pos: VimVisualPosition): Int {
     return (editor as IjVimEditor).editor.amountOfInlaysBeforeVisualPosition(
       VisualPosition(

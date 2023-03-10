@@ -14,10 +14,10 @@ import com.maddyhome.idea.vim.api.NativeAction
 import com.maddyhome.idea.vim.api.VimVisualPosition
 import com.maddyhome.idea.vim.api.injector
 
-fun NativeAction?.execute(context: ExecutionContext) {
+internal fun NativeAction?.execute(context: ExecutionContext) {
   if (this == null) return
   injector.actionExecutor.executeAction(null, this, context)
 }
 
-val VisualPosition.vim: VimVisualPosition
+internal val VisualPosition.vim: VimVisualPosition
   get() = VimVisualPosition(line, column, leansRight)

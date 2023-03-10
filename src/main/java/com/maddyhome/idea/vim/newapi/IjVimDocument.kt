@@ -16,7 +16,7 @@ import com.maddyhome.idea.vim.common.ChangesListener
 import com.maddyhome.idea.vim.common.LiveRange
 import com.maddyhome.idea.vim.common.Offset
 
-class IjVimDocument(private val document: Document) : VimDocument {
+internal class IjVimDocument(private val document: Document) : VimDocument {
 
   private val changeListenersMap: MutableMap<ChangesListener, DocumentListener> = mutableMapOf()
 

@@ -57,7 +57,7 @@ import org.jetbrains.annotations.NonNls
  *        It just won't work if the binding is defined after `set exchange`.
  */
 
-class VimExchangeExtension : VimExtension {
+internal class VimExchangeExtension : VimExtension {
 
   override fun getName() = "exchange"
 

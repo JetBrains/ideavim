@@ -17,7 +17,7 @@ import com.maddyhome.idea.vim.options.OptionConstants
 private data class State(val position: Int, val trigger: Char, val inQuote: Boolean?, val lastOpenSingleQuotePos: Int)
 
 // bounds are considered inside corresponding quotes
-fun checkInString(chars: CharSequence, currentPos: Int, str: Boolean): Boolean {
+internal fun checkInString(chars: CharSequence, currentPos: Int, str: Boolean): Boolean {
   val begin = findPositionOfFirstCharacter(chars, currentPos, setOf('\n'), false, Direction.BACKWARDS)?.second ?: 0
   val changes = quoteChanges(chars, begin)
   // TODO: here we need to keep only the latest element in beforePos (if any) and
@@ -168,7 +168,7 @@ private fun quoteChanges(chars: CharSequence, begin: Int) = sequence {
  * case insensitive search, so `\<Work\>` will match `Work` and `work`. But when choosing the same pattern from search
  * history, the smartcase option is applied, and `\<Work\>` will only match `Work`.
  */
-fun shouldIgnoreCase(pattern: String, ignoreSmartCaseOption: Boolean): Boolean {
+internal fun shouldIgnoreCase(pattern: String, ignoreSmartCaseOption: Boolean): Boolean {
   val sc = injector.globalOptions().isSet(OptionConstants.smartcase) && !ignoreSmartCaseOption
   return injector.globalOptions().isSet(OptionConstants.ignorecase) && !(sc && containsUpperCase(pattern))
 }

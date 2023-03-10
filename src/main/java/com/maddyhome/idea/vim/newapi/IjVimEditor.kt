@@ -58,7 +58,7 @@ import com.maddyhome.idea.vim.helper.StrictMode
 import org.jetbrains.annotations.ApiStatus
 
 @ApiStatus.Internal
-class IjVimEditor(editor: Editor) : MutableLinearEditor() {
+internal class IjVimEditor(editor: Editor) : MutableLinearEditor() {
 
   // All the editor actions should be performed with top level editor!!!
   // Be careful: all the EditorActionHandler implementation should correctly process InjectedEditors
@@ -463,7 +463,7 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor() {
   }
 }
 
-inline val Editor.vim: IjVimEditor
+public val Editor.vim: VimEditor
   get() = IjVimEditor(this)
-inline val VimEditor.ij: Editor
+public val VimEditor.ij: Editor
   get() = (this as IjVimEditor).editor

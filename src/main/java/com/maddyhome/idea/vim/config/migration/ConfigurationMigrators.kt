@@ -13,14 +13,14 @@ import com.intellij.openapi.util.JDOMUtil
 import org.jdom.Element
 import kotlin.io.path.exists
 
-interface ConfigMigrator {
+internal interface ConfigMigrator {
   val fromVersion: Int
   val toVersion: Int
   fun versionUp()
 }
 
 @Suppress("ClassName")
-object `Version 6 to 7 config migration` : ConfigMigrator {
+internal object `Version 6 to 7 config migration` : ConfigMigrator {
   override val fromVersion: Int = 6
   override val toVersion: Int = 7
 

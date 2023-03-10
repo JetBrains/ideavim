@@ -29,7 +29,7 @@ import com.maddyhome.idea.vim.newapi.vim
 /**
  * A collection of hacks to improve the interaction with fancy AppCode templates
  */
-object AppCodeTemplates {
+internal object AppCodeTemplates {
   private val facedAppCodeTemplate = Key.create<IntRange>("FacedAppCodeTemplate")
 
   private const val TEMPLATE_START = "<#T##"

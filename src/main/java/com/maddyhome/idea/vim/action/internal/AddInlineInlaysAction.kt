@@ -22,7 +22,7 @@ import com.maddyhome.idea.vim.newapi.vim
 import java.util.*
 import kotlin.math.max
 
-class AddInlineInlaysAction : AnAction() {
+internal class AddInlineInlaysAction : AnAction() {
   companion object {
     private val random = Random()
   }

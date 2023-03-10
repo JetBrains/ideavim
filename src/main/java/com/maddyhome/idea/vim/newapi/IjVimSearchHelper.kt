@@ -18,7 +18,7 @@ import com.maddyhome.idea.vim.helper.SearchOptions
 import java.util.*
 
 @Service
-class IjVimSearchHelper : VimSearchHelperBase() {
+internal class IjVimSearchHelper : VimSearchHelperBase() {
   override fun findNextParagraph(editor: VimEditor, caret: ImmutableVimCaret, count: Int, allowBlanks: Boolean): Int {
     return SearchHelper.findNextParagraph(
       (editor as IjVimEditor).editor,

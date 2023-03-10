@@ -24,7 +24,7 @@ import java.util.*
 /**
  * @author vlan
  */
-class DeleteJoinVisualLinesAction : VisualOperatorActionHandler.SingleExecution() {
+public class DeleteJoinVisualLinesAction : VisualOperatorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.DELETE
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_EXIT_VISUAL)

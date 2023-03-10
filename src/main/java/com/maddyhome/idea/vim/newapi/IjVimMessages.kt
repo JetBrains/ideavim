@@ -22,7 +22,7 @@ import com.maddyhome.idea.vim.ui.ShowCmd
 import java.awt.Toolkit
 
 @Service
-class IjVimMessages : VimMessagesBase() {
+internal class IjVimMessages : VimMessagesBase() {
 
   private var message: String? = null
   private var error = false

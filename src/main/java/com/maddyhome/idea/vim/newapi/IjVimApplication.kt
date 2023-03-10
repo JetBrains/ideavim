@@ -25,7 +25,7 @@ import javax.swing.KeyStroke
 import javax.swing.SwingUtilities
 
 @Service
-class IjVimApplication : VimApplicationBase() {
+internal class IjVimApplication : VimApplicationBase() {
   override fun isMainThread(): Boolean {
     return ApplicationManager.getApplication().isDispatchThread
   }

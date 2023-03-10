@@ -18,7 +18,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 
-class JoinFunctionHandler : FunctionHandler() {
+internal class JoinFunctionHandler : FunctionHandler() {
   override val name: String = "join"
   override val minimumNumberOfArguments: Int = 1
   override val maximumNumberOfArguments: Int = 2

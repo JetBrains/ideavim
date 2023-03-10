@@ -34,7 +34,7 @@ import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.IdeaRefactorModeHelper
 
-object IdeaSelectionControl {
+internal object IdeaSelectionControl {
   /**
    * This method should be in sync with [predictMode]
    *

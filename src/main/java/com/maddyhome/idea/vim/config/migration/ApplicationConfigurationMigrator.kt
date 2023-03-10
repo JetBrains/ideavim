@@ -24,7 +24,7 @@ private val productionMigrationComponents = MigrationComponents(
 )
 
 // Just a collection of migrators and collectors
-class MigrationComponents(
+internal class MigrationComponents(
   val migrators: Set<ConfigMigrator>,
   val versionDetectors: List<VersionDetector>,
   val currentVersion: Int,
@@ -48,7 +48,7 @@ class MigrationComponents(
  *   we should silently skip it instead of failure.
  */
 @Service
-class ApplicationConfigurationMigrator(migrationComponents: MigrationComponents) {
+internal class ApplicationConfigurationMigrator(migrationComponents: MigrationComponents) {
 
   @Suppress("unused", "HardCodedStringLiteral")
   constructor() : this(productionMigrationComponents)

@@ -23,7 +23,7 @@ import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.tree.ParseTree
 
-object VimscriptParser : com.maddyhome.idea.vim.api.VimscriptParser {
+internal object VimscriptParser : com.maddyhome.idea.vim.api.VimscriptParser {
 
   private val logger = logger<VimscriptParser>()
   val linesWithErrors = mutableListOf<Int>()

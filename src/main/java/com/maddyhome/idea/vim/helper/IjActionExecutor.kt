@@ -41,7 +41,7 @@ import org.jetbrains.annotations.NonNls
 import javax.swing.SwingUtilities
 
 @Service
-class IjActionExecutor : VimActionExecutor {
+internal class IjActionExecutor : VimActionExecutor {
   override val ACTION_EDITOR_NEXT_TEMPLATE_VARIABLE: String
     get() = IdeActions.ACTION_EDITOR_NEXT_TEMPLATE_VARIABLE
   override val ACTION_COLLAPSE_ALL_REGIONS: String

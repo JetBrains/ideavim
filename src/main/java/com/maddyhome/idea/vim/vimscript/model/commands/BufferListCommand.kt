@@ -31,7 +31,7 @@ import org.jetbrains.annotations.NonNls
  *
  * @author John Weigel
  */
-data class BufferListCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges) {
+internal data class BufferListCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges) {
   override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   companion object {

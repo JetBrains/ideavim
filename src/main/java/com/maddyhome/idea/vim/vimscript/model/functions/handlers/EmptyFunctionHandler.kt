@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.asVimInt
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 
-object EmptyFunctionHandler : FunctionHandler() {
+internal class EmptyFunctionHandler : FunctionHandler() {
 
   override val name = "empty"
   override val minimumNumberOfArguments: Int = 1

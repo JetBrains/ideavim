@@ -13,7 +13,7 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.editor.Editor
 
 @Service
-class EditorHolderService {
+internal class EditorHolderService {
   var editor: Editor? = null
 
   companion object {

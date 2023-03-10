@@ -16,7 +16,7 @@ import com.intellij.openapi.project.Project
 /**
  * This provides some helper methods to run code as a command and an application write action
  */
-object RunnableHelper {
+internal object RunnableHelper {
   private val logger = logger<RunnableHelper>()
 
   @JvmStatic

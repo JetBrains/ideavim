@@ -13,11 +13,11 @@ package com.maddyhome.idea.vim.config.migration
 import com.intellij.openapi.application.PathManager
 import org.jetbrains.annotations.NonNls
 
-interface VersionDetector {
+internal interface VersionDetector {
   fun extractVersion(): Int?
 }
 
-object `Detect versions 3, 4, 5, 6` : VersionDetector {
+internal object `Detect versions 3, 4, 5, 6` : VersionDetector {
 
   @NonNls
   val pattern = "state version=\"(.)\"".toRegex()

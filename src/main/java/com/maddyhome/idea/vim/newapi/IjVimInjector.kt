@@ -88,7 +88,7 @@ import com.maddyhome.idea.vim.vimscript.services.VariableService
 import com.maddyhome.idea.vim.yank.VimYankGroup
 import com.maddyhome.idea.vim.yank.YankGroupBase
 
-class IjVimInjector : VimInjectorBase() {
+internal class IjVimInjector : VimInjectorBase() {
   override fun <T : Any> getLogger(clazz: Class<T>): VimLogger = IjVimLogger(Logger.getInstance(clazz::class.java))
 
   override val actionExecutor: VimActionExecutor

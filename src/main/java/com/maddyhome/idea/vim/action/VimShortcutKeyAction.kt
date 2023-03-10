@@ -55,7 +55,7 @@ import javax.swing.KeyStroke
  *
  * These keys are not passed to [com.maddyhome.idea.vim.VimTypedActionHandler] and should be handled by actions.
  */
-class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
+internal class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
   private val traceTime = injector.globalOptions().isSet(OptionConstants.ideatracetime)
 
   override fun actionPerformed(e: AnActionEvent) {

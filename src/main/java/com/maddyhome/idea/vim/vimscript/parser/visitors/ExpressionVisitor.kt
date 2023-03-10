@@ -57,7 +57,7 @@ import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser.Variabl
 import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser.WrappedExpressionContext
 import org.antlr.v4.runtime.ParserRuleContext
 
-object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
+internal object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
 
   override fun visitDictionaryExpression(ctx: DictionaryExpressionContext): Expression {
     val dict: LinkedHashMap<Expression, Expression> = LinkedHashMap()

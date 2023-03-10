@@ -13,13 +13,13 @@ import com.maddyhome.idea.vim.common.LiveRange
 import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.common.offset
 
-class IjLiveRange(val marker: RangeMarker) : LiveRange {
+internal class IjLiveRange(val marker: RangeMarker) : LiveRange {
   override val startOffset: Offset
     get() = marker.startOffset.offset
 }
 
-val RangeMarker.vim: LiveRange
+public val RangeMarker.vim: LiveRange
   get() = IjLiveRange(this)
 
-val LiveRange.ij: RangeMarker
+public val LiveRange.ij: RangeMarker
   get() = (this as IjLiveRange).marker

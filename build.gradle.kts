@@ -216,6 +216,7 @@ java {
 }
 
 kotlin {
+    explicitApi()
     jvmToolchain {
         languageVersion.set(JavaLanguageVersion.of(javaVersion))
     }

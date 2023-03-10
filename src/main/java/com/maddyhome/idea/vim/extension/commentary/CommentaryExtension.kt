@@ -50,7 +50,7 @@ import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import java.util.*
 
-class CommentaryExtension : VimExtension {
+internal class CommentaryExtension : VimExtension {
 
   companion object {
     fun doCommentary(

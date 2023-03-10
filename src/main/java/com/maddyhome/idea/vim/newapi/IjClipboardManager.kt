@@ -39,7 +39,7 @@ import java.awt.datatransfer.UnsupportedFlavorException
 import java.io.IOException
 
 @Service
-class IjClipboardManager : VimClipboardManager {
+internal class IjClipboardManager : VimClipboardManager {
   override fun getClipboardTextAndTransferableData(): Pair<String, List<Any>?>? {
     var res: String? = null
     var transferableData: List<TextBlockTransferableData> = ArrayList()

@@ -115,7 +115,7 @@ import java.util.stream.Collectors
 import kotlin.reflect.KClass
 import kotlin.reflect.full.primaryConstructor
 
-object CommandVisitor : VimscriptBaseVisitor<Command>() {
+internal object CommandVisitor : VimscriptBaseVisitor<Command>() {
 
   private val logger = logger<CommandVisitor>()
   private val expressionVisitor: ExpressionVisitor = ExpressionVisitor

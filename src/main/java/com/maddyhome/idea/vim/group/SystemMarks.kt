@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.newapi.vim
 
-class SystemMarks {
+internal class SystemMarks {
   companion object {
     @JvmStatic
     fun createOrGetSystemMark(ch: Char, line: Int, editor: Editor): LineBookmark? {

@@ -81,7 +81,7 @@ import kotlin.math.min
 /**
  * This handles all motion related commands and marks
  */
-class MotionGroup : VimMotionGroupBase() {
+internal class MotionGroup : VimMotionGroupBase() {
   override fun onAppCodeMovement(editor: VimEditor, caret: VimCaret, offset: Int, oldOffset: Int) {
     AppCodeTemplates.onMovement(editor.ij, caret.ij, oldOffset < offset)
   }
@@ -446,7 +446,7 @@ class MotionGroup : VimMotionGroupBase() {
       if (newVisualLine == caretVisualLine && newColumn != caretColumn) {
         col = newColumn
       }
-      newColumn = vimEditor.normalizeVisualColumn(newVisualLine, newColumn, editor.isEndAllowed)
+      newColumn = vimEditor.normalizeVisualColumn(newVisualLine, newColumn, editor.vim.isEndAllowed)
       if (newVisualLine != caretVisualLine || newColumn != oldColumn) {
         val offset = editor.visualPositionToOffset(VisualPosition(newVisualLine, newColumn))
         vimEditor.primaryCaret().moveToOffset(offset)

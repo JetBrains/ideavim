@@ -50,7 +50,7 @@ import javax.swing.table.TableColumn
 /**
  * @author vlan
  */
-class VimEmulationConfigurable : Configurable {
+internal class VimEmulationConfigurable : Configurable {
   private val settingsPanel: VimSettingsPanel by lazy { VimSettingsPanel() }
 
   override fun getDisplayName(): String = message("configurable.name.vim.emulation")

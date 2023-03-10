@@ -12,7 +12,7 @@ import com.maddyhome.idea.vim.vimscript.model.Script
 import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptBaseVisitor
 import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser
 
-object ScriptVisitor : VimscriptBaseVisitor<Script>() {
+internal object ScriptVisitor : VimscriptBaseVisitor<Script>() {
 
   override fun visitScript(ctx: VimscriptParser.ScriptContext): Script {
     return if (ctx.children != null) {

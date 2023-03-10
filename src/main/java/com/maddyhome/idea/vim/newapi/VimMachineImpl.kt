@@ -12,4 +12,4 @@ import com.intellij.openapi.components.Service
 import com.maddyhome.idea.vim.common.VimMachineBase
 
 @Service
-class VimMachineImpl : VimMachineBase()
+internal class VimMachineImpl : VimMachineBase()

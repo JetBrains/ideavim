@@ -29,11 +29,11 @@ import java.awt.Color
  * Avoid this if possible - we should be using caret shape based on mode. This is only used for IntelliJ specific
  * behaviour, e.g. handling selection updates during mouse drag.
  */
-fun Caret.forceBarCursor() {
+internal fun Caret.forceBarCursor() {
   editor.caretModel.primaryCaret.visualAttributes = BAR
 }
 
-fun Editor.updateCaretsVisualAttributes() {
+internal fun Editor.updateCaretsVisualAttributes() {
   // In notebooks command mode the caret is hidden
   // Without this if the caret appears inside a cell while it shouldn't
   if (!HandlerInjector.notebookCommandMode(this)) {
@@ -47,16 +47,16 @@ fun Editor.updateCaretsVisualAttributes() {
  *
  * Used when Vim emulation is disabled
  */
-fun Editor.removeCaretsVisualAttributes() {
+internal fun Editor.removeCaretsVisualAttributes() {
   caretModel.allCarets.forEach { it.visualAttributes = CaretVisualAttributes.DEFAULT }
 }
 
-fun Editor.hasBlockOrUnderscoreCaret() = isBlockCursorOverride() ||
+internal fun Editor.hasBlockOrUnderscoreCaret() = isBlockCursorOverride() ||
   GuiCursorOptionHelper.getAttributes(guicursorMode()).type.let {
     it == GuiCursorType.BLOCK || it == GuiCursorType.HOR
   }
 
-object GuicursorChangeListener : OptionChangeListener<VimDataType> {
+internal object GuicursorChangeListener : OptionChangeListener<VimDataType> {
   override fun processGlobalValueChange(oldValue: VimDataType?) {
     AttributesCache.clear()
     GuiCursorOptionHelper.clearEffectiveValues()
@@ -143,4 +143,4 @@ private object AttributesCache {
 }
 
 @TestOnly
-fun getGuiCursorMode(editor: Editor) = editor.guicursorMode()
+internal fun getGuiCursorMode(editor: Editor) = editor.guicursorMode()

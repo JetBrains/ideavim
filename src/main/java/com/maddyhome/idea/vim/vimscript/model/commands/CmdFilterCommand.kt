@@ -26,7 +26,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :!"
  */
-data class CmdFilterCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges) {
+internal data class CmdFilterCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges) {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {

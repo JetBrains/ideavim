@@ -55,16 +55,16 @@ import java.util.stream.Collectors
  *   to vim as possible.
  */
 @Target(AnnotationTarget.FUNCTION)
-annotation class VimBehaviorDiffers(
+internal annotation class VimBehaviorDiffers(
   val originalVimAfter: String = "",
   val description: String = "",
   val shouldBeFixed: Boolean = true,
 )
 
-fun <T : Comparable<T>> sort(a: T, b: T) = if (a > b) b to a else a to b
+internal fun <T : Comparable<T>> sort(a: T, b: T) = if (a > b) b to a else a to b
 
 // TODO Should be replaced with VimEditor.carets()
-inline fun Editor.vimForEachCaret(action: (caret: Caret) -> Unit) {
+internal inline fun Editor.vimForEachCaret(action: (caret: Caret) -> Unit) {
   if (this.inBlockSubMode) {
     action(this.caretModel.primaryCaret)
   } else {
@@ -72,26 +72,26 @@ inline fun Editor.vimForEachCaret(action: (caret: Caret) -> Unit) {
   }
 }
 
-fun Editor.getTopLevelEditor() = if (this is EditorWindow) this.delegate else this
+internal fun Editor.getTopLevelEditor() = if (this is EditorWindow) this.delegate else this
 
 /**
  * Return list of editors for local host (for code with me plugin)
  */
-fun localEditors(): List<Editor> {
+public fun localEditors(): List<Editor> {
   return ClientEditorManager.getCurrentInstance().editors().collect(Collectors.toList())
 }
 
-fun localEditors(doc: Document): List<Editor> {
+public fun localEditors(doc: Document): List<Editor> {
   return EditorFactory.getInstance().getEditors(doc)
     .filter { editor -> editor.editorClientId.let { it == null || it == ClientId.currentOrNull } }
 }
 
-fun localEditors(doc: Document, project: Project): List<Editor> {
+public fun localEditors(doc: Document, project: Project): List<Editor> {
   return EditorFactory.getInstance().getEditors(doc, project)
     .filter { editor -> editor.editorClientId.let { it == null || it == ClientId.currentOrNull } }
 }
 
-val Editor.editorClientId: ClientId?
+private val Editor.editorClientId: ClientId?
   get() {
     if (editorClientKey == null) {
       @Suppress("DEPRECATION")
@@ -103,19 +103,19 @@ val Editor.editorClientId: ClientId?
 private var editorClientKey: Key<*>? = null
 
 @Suppress("IncorrectParentDisposable")
-fun Editor.isTemplateActive(): Boolean {
+internal fun Editor.isTemplateActive(): Boolean {
   val project = this.project ?: return false
   // XXX: I've disabled this check to find the stack trace where the project is disposed
 //  if (project.isDisposed) return false
   return TemplateManager.getInstance(project).getActiveTemplate(this) != null
 }
 
-fun vimEnabled(editor: Editor?): Boolean {
+private fun vimEnabled(editor: Editor?): Boolean {
   if (!VimPlugin.isEnabled()) return false
   if (editor != null && editor.isIdeaVimDisabledHere) return false
   return true
 }
 
-fun vimDisabled(editor: Editor?): Boolean = !vimEnabled(editor)
+internal fun vimDisabled(editor: Editor?): Boolean = !vimEnabled(editor)
 
-fun experimentalApi() = injector.globalOptions().isSet(OptionConstants.experimentalapi)
+internal fun experimentalApi() = injector.globalOptions().isSet(OptionConstants.experimentalapi)

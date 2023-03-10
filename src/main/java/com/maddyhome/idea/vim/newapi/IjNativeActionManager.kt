@@ -16,7 +16,7 @@ import com.maddyhome.idea.vim.api.NativeAction
 import com.maddyhome.idea.vim.api.NativeActionManager
 
 @Service
-class IjNativeActionManager : NativeActionManager {
+internal class IjNativeActionManager : NativeActionManager {
   override val enterAction: NativeAction? by lazy { byName(IdeActions.ACTION_EDITOR_ENTER) }
   override val createLineAboveCaret: NativeAction? by lazy { byName("EditorStartNewLineBefore") }
   override val joinLines: NativeAction? by lazy { byName(IdeActions.ACTION_EDITOR_JOIN_LINES) }
@@ -31,7 +31,7 @@ class IjNativeActionManager : NativeActionManager {
   }
 }
 
-val AnAction.vim: IjNativeAction
+public val AnAction.vim: IjNativeAction
   get() = IjNativeAction(this)
 
-class IjNativeAction(override val action: AnAction) : NativeAction
+public class IjNativeAction(override val action: AnAction) : NativeAction

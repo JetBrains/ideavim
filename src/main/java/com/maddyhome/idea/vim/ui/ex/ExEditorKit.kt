@@ -21,7 +21,7 @@ import javax.swing.text.DefaultEditorKit
 import javax.swing.text.Document
 import javax.swing.text.TextAction
 
-object ExEditorKit : DefaultEditorKit() {
+internal object ExEditorKit : DefaultEditorKit() {
 
   @NonNls
   val CancelEntry: String = "cancel-entry"

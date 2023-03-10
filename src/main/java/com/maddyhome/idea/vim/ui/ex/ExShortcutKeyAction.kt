@@ -30,7 +30,7 @@ import javax.swing.KeyStroke
  * component has focus. It registers all shortcuts used by the Swing actions and forwards them directly to the key
  * handler.
  */
-class ExShortcutKeyAction(private val exEntryPanel: ExEntryPanel) : DumbAwareAction() {
+internal class ExShortcutKeyAction(private val exEntryPanel: ExEntryPanel) : DumbAwareAction() {
 
   override fun actionPerformed(e: AnActionEvent) {
     val keyStroke = getKeyStroke(e)

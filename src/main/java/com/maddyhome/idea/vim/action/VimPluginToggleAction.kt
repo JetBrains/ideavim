@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.helper.MessageHelper
  * This class is used to handle the Vim Plugin enabled/disabled toggle. This is most likely used as a menu option
  * but could also be used as a toolbar item.
  */
-class VimPluginToggleAction : DumbAwareToggleAction()/*, LightEditCompatible*/ {
+internal class VimPluginToggleAction : DumbAwareToggleAction()/*, LightEditCompatible*/ {
   override fun isSelected(event: AnActionEvent): Boolean = VimPlugin.isEnabled()
 
   override fun setSelected(event: AnActionEvent, b: Boolean) {

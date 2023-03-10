@@ -13,4 +13,4 @@ import com.maddyhome.idea.vim.api.VimCommandGroupBase
 /**
  * @author Elliot Courant
  */
-class CommandGroup : VimCommandGroupBase()
+internal class CommandGroup : VimCommandGroupBase()

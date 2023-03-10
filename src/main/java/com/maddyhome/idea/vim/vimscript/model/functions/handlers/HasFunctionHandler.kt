@@ -17,7 +17,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 
-object HasFunctionHandler : FunctionHandler() {
+internal class HasFunctionHandler : FunctionHandler() {
   override val name = "has"
   override val minimumNumberOfArguments = 1
   override val maximumNumberOfArguments = 2

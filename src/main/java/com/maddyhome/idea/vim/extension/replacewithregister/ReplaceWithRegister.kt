@@ -34,7 +34,6 @@ import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.key.OperatorFunction
-import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
@@ -42,7 +41,7 @@ import com.maddyhome.idea.vim.options.helpers.ClipboardOptionHelper
 import com.maddyhome.idea.vim.put.PutData
 import org.jetbrains.annotations.NonNls
 
-class ReplaceWithRegister : VimExtension {
+internal class ReplaceWithRegister : VimExtension {
 
   override fun getName(): String = "ReplaceWithRegister"
 

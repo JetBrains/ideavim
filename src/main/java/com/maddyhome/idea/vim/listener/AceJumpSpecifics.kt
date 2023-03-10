@@ -17,7 +17,7 @@ import org.acejump.session.SessionManager
  */
 
 @Suppress("DEPRECATION")
-interface AceJumpService {
+internal interface AceJumpService {
   fun isActive(editor: Editor): Boolean
 
   companion object {
@@ -25,7 +25,7 @@ interface AceJumpService {
   }
 }
 
-class AceJumpServiceImpl : AceJumpService {
+internal class AceJumpServiceImpl : AceJumpService {
   override fun isActive(editor: Editor): Boolean {
     return try {
       SessionManager[editor] != null

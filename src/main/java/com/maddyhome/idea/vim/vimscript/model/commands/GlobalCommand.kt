@@ -31,7 +31,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :global" / "h :vglobal"
  */
-data class GlobalCommand(val ranges: Ranges, val argument: String, val invert: Boolean) : Command.SingleExecution(ranges, argument) {
+internal data class GlobalCommand(val ranges: Ranges, val argument: String, val invert: Boolean) : Command.SingleExecution(ranges, argument) {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {

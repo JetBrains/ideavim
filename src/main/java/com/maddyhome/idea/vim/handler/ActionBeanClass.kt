@@ -36,7 +36,7 @@ import javax.swing.KeyStroke
  *   The reason is startup performance. Using the extension points you don't even have to load classes of actions.
  *   So, all actions are loaded on demand, including classes in classloader.
  */
-class ActionBeanClass : BaseKeyedLazyInstance<EditorActionHandlerBase>() {
+internal class ActionBeanClass : BaseKeyedLazyInstance<EditorActionHandlerBase>() {
   @Attribute("implementation")
   var implementation: String? = null
 

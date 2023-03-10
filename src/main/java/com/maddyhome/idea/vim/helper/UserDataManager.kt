@@ -43,7 +43,7 @@ import kotlin.reflect.KProperty
 /**
  * Caret's offset when entering visual mode
  */
-var Caret.vimSelectionStart: Int
+public var Caret.vimSelectionStart: Int
   get() {
     val selectionStart = _vimSelectionStart
     if (selectionStart == null) {
@@ -56,7 +56,7 @@ var Caret.vimSelectionStart: Int
     _vimSelectionStart = value
   }
 
-fun Caret.vimSelectionStartClear() {
+internal fun Caret.vimSelectionStartClear() {
   this._vimSelectionStart = null
 }
 
@@ -68,7 +68,7 @@ private var Caret._vimSelectionStart: Int? by userDataCaretToEditor()
 // the value is set, if it's not the same during get, we've been moved by IJ and so no longer valid. We also invalidate
 // the cached value through a caret listener handler, to prevent issues with the caret being moved and returned before
 // the cache is checked/invalidated
-var Caret.vimLastColumn: Int
+internal var Caret.vimLastColumn: Int
   get() {
     if (visualPosition != _vimLastColumnPos) {
       vimLastColumn = inlayAwareVisualColumn
@@ -79,27 +79,27 @@ var Caret.vimLastColumn: Int
     _vimLastColumn = value
     _vimLastColumnPos = visualPosition
   }
-fun Caret.resetVimLastColumn() {
+internal fun Caret.resetVimLastColumn() {
   _vimLastColumnPos = null
 }
 private var Caret._vimLastColumn: Int by userDataCaretToEditorOr { (this as Caret).inlayAwareVisualColumn }
 private var Caret._vimLastColumnPos: VisualPosition? by userDataCaretToEditor()
 
 // TODO: Is this a per-caret setting? This data is non-transient, so could be lost during visual block motion
-var Caret.vimLastVisualOperatorRange: VisualChange? by userDataCaretToEditor()
+internal var Caret.vimLastVisualOperatorRange: VisualChange? by userDataCaretToEditor()
 
 // Transient data. Does not need to be restored during visual block motion
-var Caret.vimInsertStart: RangeMarker by userDataOr {
+internal var Caret.vimInsertStart: RangeMarker by userDataOr {
   (this as Caret).editor.document.createRangeMarker(this.offset, this.offset)
 }
 
 // TODO: Data could be lost during visual block motion
-var Caret.registerStorage: CaretRegisterStorageBase? by userDataCaretToEditor()
-var Caret.markStorage: LocalMarkStorage? by userDataCaretToEditor()
-var Caret.lastSelectionInfo: SelectionInfo? by userDataCaretToEditor()
+internal var Caret.registerStorage: CaretRegisterStorageBase? by userDataCaretToEditor()
+internal var Caret.markStorage: LocalMarkStorage? by userDataCaretToEditor()
+internal var Caret.lastSelectionInfo: SelectionInfo? by userDataCaretToEditor()
 
 // ------------------ Editor
-fun unInitializeEditor(editor: Editor) {
+internal fun unInitializeEditor(editor: Editor) {
   editor.vimLastSelectionType = null
   editor.vimStateMachine = null
   editor.vimMorePanel = null
@@ -107,33 +107,33 @@ fun unInitializeEditor(editor: Editor) {
   editor.vimLastHighlighters = null
 }
 
-var Editor.vimLastSearch: String? by userData()
-var Editor.vimLastHighlighters: MutableCollection<RangeHighlighter>? by userData()
-var Editor.vimIncsearchCurrentMatchOffset: Int? by userData()
+internal var Editor.vimLastSearch: String? by userData()
+internal var Editor.vimLastHighlighters: MutableCollection<RangeHighlighter>? by userData()
+internal var Editor.vimIncsearchCurrentMatchOffset: Int? by userData()
 
 /***
  * @see :help visualmode()
  */
-var Editor.vimLastSelectionType: SelectionType? by userData()
-var Editor.vimStateMachine: VimStateMachine? by userData()
-var Editor.vimEditorGroup: Boolean by userDataOr { false }
-var Editor.vimLineNumbersInitialState: Boolean by userDataOr { false }
-var Editor.vimHasRelativeLineNumbersInstalled: Boolean by userDataOr { false }
-var Editor.vimMorePanel: ExOutputPanel? by userData()
-var Editor.vimExOutput: ExOutputModel? by userData()
-var Editor.vimTestInputModel: TestInputModel? by userData()
+internal var Editor.vimLastSelectionType: SelectionType? by userData()
+internal var Editor.vimStateMachine: VimStateMachine? by userData()
+internal var Editor.vimEditorGroup: Boolean by userDataOr { false }
+internal var Editor.vimLineNumbersInitialState: Boolean by userDataOr { false }
+internal var Editor.vimHasRelativeLineNumbersInstalled: Boolean by userDataOr { false }
+internal var Editor.vimMorePanel: ExOutputPanel? by userData()
+internal var Editor.vimExOutput: ExOutputModel? by userData()
+internal var Editor.vimTestInputModel: TestInputModel? by userData()
 
 /**
  * Checks whether a keeping visual mode visual operator action is performed on editor.
  */
-var Editor.vimKeepingVisualOperatorAction: Boolean by userDataOr { false }
-var Editor.vimChangeActionSwitchMode: VimStateMachine.Mode? by userData()
+internal var Editor.vimKeepingVisualOperatorAction: Boolean by userDataOr { false }
+internal var Editor.vimChangeActionSwitchMode: VimStateMachine.Mode? by userData()
 
 /**
  * Function for delegated properties.
  * The property will be delegated to UserData and has nullable type.
  */
-fun <T> userData(): ReadWriteProperty<UserDataHolder, T?> =
+internal fun <T> userData(): ReadWriteProperty<UserDataHolder, T?> =
   object : UserDataReadWriteProperty<UserDataHolder, T?>() {
     override fun getValue(thisRef: UserDataHolder, property: KProperty<*>): T? {
       return thisRef.getUserData(getKey(property))

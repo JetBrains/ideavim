@@ -25,7 +25,7 @@ import com.maddyhome.idea.vim.helper.vimForEachCaret
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 
-class ParagraphMotion : VimExtension {
+internal class ParagraphMotion : VimExtension {
   override fun getName(): String = "vim-paragraph-motion"
 
   override fun init() {

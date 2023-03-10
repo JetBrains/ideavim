@@ -114,7 +114,7 @@ import javax.swing.SwingConstants
  * + A........Zoom (maximize/minimize) the NERDTree window...............|NERDTree-A|
  * ?........Toggle the display of the quick help.......................|NERDTree-?|
  */
-class NerdTree : VimExtension {
+internal class NerdTree : VimExtension {
   override fun getName(): String = pluginName
 
   override fun init() {

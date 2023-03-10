@@ -12,7 +12,7 @@ import com.maddyhome.idea.vim.api.VimStatistics
 import com.maddyhome.idea.vim.statistic.ActionTracker
 import com.maddyhome.idea.vim.statistic.VimscriptState
 
-class IjStatisticsService : VimStatistics {
+internal class IjStatisticsService : VimStatistics {
 
   override fun logTrackedAction(actionId: String) {
     ActionTracker.logTrackedAction(actionId)

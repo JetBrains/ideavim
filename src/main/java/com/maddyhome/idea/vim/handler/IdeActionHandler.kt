@@ -17,7 +17,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 /**
  * Base class for Vim commands handled by existing IDE actions.
  */
-abstract class IdeActionHandler(private val actionName: String) : VimActionHandler.SingleExecution() {
+internal abstract class IdeActionHandler(private val actionName: String) : VimActionHandler.SingleExecution() {
   override fun execute(editor: VimEditor, context: ExecutionContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
     injector.actionExecutor.executeAction(actionName, context)
     injector.scroll.scrollCaretIntoView(editor)
