@@ -255,6 +255,13 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
     )
   }
 
+  fun `test motion in text with quotes and double escape2`() {
+    doTest(
+      "%", """ "I found ${c}it in a \(legendary\) land" """,
+      """ "I found it in a \(legendary\$c) land" """, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+    )
+  }
+
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN, description = "Matchit plugin affects neovim")
   fun `test deleting with percent motion backward`() {
     doTest("d%", "(foo bar$c)", c, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
