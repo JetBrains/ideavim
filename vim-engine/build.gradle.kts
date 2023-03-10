@@ -46,3 +46,7 @@ ktlint {
     disabledRules.add("no-wildcard-imports")
     version.set("0.43.0")
 }
+
+kotlin {
+  explicitApiWarning()
+}
