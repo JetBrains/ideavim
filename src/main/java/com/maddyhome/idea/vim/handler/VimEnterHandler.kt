@@ -19,6 +19,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.key
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.mode
+import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.newapi.runFromVimKey
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
@@ -76,12 +77,20 @@ internal class VimEnterHandler(nextHandler: EditorActionHandler) : VimKeyHandler
  * - Smart step into - set handler after
  * - Python notebooks - set handler after
  * - Ace jump - set handler after
- * - Lookup - ISSUE: Doesn't exit normal mode
+ * - Lookup - It disappears after putting our esc before templateEscape. But I'm not sure why it works like that
  * - App code - Need to review
  * - Template - Need to review
+ *
+ * Also, we need to pass esc to IDE if we're in normal mode and there is nothing to cancel
+ * (e.g. we still can cancel numbers)
  */
 internal class VimEscHandler(nextHandler: EditorActionHandler) : VimKeyHandler(nextHandler) {
   override val key: String = "<Esc>"
+
+  override fun isHandlerEnabled(editor: Editor, dataContext: DataContext?): Boolean {
+    return editor.mode != CommandState.Mode.COMMAND
+      || editor.vimStateMachine?.commandBuilder?.count != 0
+  }
 }
 
 internal abstract class VimKeyHandler(nextHandler: EditorActionHandler) : OctopusHandler(nextHandler) {

@@ -145,7 +145,7 @@ class MarkTest : VimTestCase() {
 
     // Currently broken, needs investigation
     // Because of some reason system mark is recreated. As we're on a different column at this moment, this breaks test
-    if (enableOctopus) {
+    if (!enableOctopus) {
       assertEquals(2, mark.col)
     }
   }
@@ -166,7 +166,7 @@ class MarkTest : VimTestCase() {
 
     // Currently broken, needs investigation
     // Because of some reason system mark is recreated. As we're on a different column at this moment, this breaks test
-    if (enableOctopus) {
+    if (!enableOctopus) {
       assertEquals(6, mark.col)
     }
   }

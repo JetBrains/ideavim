@@ -107,8 +107,10 @@
 <!--    Do not care about red handlers in order. They are necessary for proper ordering, and they'll be resolved when needed -->
     <editorActionHandler action="EditorEnter" implementationClass="com.maddyhome.idea.vim.handler.VimEnterHandler"
                          order="first, before editorEnter, after smart-step-into-enter, after AceHandlerEnter, after jupyterCommandModeEnterKeyHandler, after swift.placeholder.enter"/>
+
+<!--    "first" is not defined for this handler as it leads to "unsatisfied ordering exception". Not sure exectly why, but it appears in tests-->
     <editorActionHandler action="EditorEscape" implementationClass="com.maddyhome.idea.vim.handler.VimEscHandler"
-                         order="first, after smart-step-into-escape, after AceHandlerEscape, after jupyterCommandModeEscKeyHandler"/>
+                         order="after smart-step-into-escape, after AceHandlerEscape, after jupyterCommandModeEscKeyHandler, before templateEscape"/>
   </extensions>
 
   <xi:include href="/META-INF/includes/ApplicationServices.xml" xpointer="xpointer(/idea-plugin/*)"/>

@@ -645,35 +645,48 @@ abstract class VimTestCase : UsefulTestCase() {
     var key = inputModel.nextKeyStroke()
     while (key != null) {
       val keyChar = key.getChar(editor)
-      if (keyChar != KeyEvent.CHAR_UNDEFINED) {
-        myFixture.type(keyChar)
-        PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
-      } else {
-        val event =
-          KeyEvent(editor.component, KeyEvent.KEY_PRESSED, Date().time, key.modifiers, key.keyCode, key.keyChar)
+      when (keyChar) {
+        is CharType.CharDetected -> {
+          myFixture.type(keyChar.char)
+          PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
+        }
+        is CharType.EditorAction -> {
+          myFixture.performEditorAction(keyChar.name)
+        }
+        CharType.UNDEFINED -> {
+          val event =
+            KeyEvent(editor.component, KeyEvent.KEY_PRESSED, Date().time, key.modifiers, key.keyCode, key.keyChar)
 
-        val e = AnActionEvent(
-          event,
-          injector.executionContextManager.onEditor(editor.vim).ij,
-          ActionPlaces.KEYBOARD_SHORTCUT,
-          VimShortcutKeyAction.instance.templatePresentation.clone(),
-          ActionManager.getInstance(),
-          0
-        )
-        if (ActionUtil.lastUpdateAndCheckDumb(VimShortcutKeyAction.instance, e, true)) {
-          ActionUtil.performActionDumbAwareWithCallbacks(VimShortcutKeyAction.instance, e)
+          val e = AnActionEvent(
+            event,
+            injector.executionContextManager.onEditor(editor.vim).ij,
+            ActionPlaces.KEYBOARD_SHORTCUT,
+            VimShortcutKeyAction.instance.templatePresentation.clone(),
+            ActionManager.getInstance(),
+            0
+          )
+          if (ActionUtil.lastUpdateAndCheckDumb(VimShortcutKeyAction.instance, e, true)) {
+            ActionUtil.performActionDumbAwareWithCallbacks(VimShortcutKeyAction.instance, e)
+          }
         }
       }
       key = inputModel.nextKeyStroke()
     }
   }
 
-  private fun KeyStroke.getChar(editor: Editor): Char {
-    if (keyChar != KeyEvent.CHAR_UNDEFINED) return keyChar
+  private fun KeyStroke.getChar(editor: Editor): CharType {
+    if (keyChar != KeyEvent.CHAR_UNDEFINED) return CharType.CharDetected(keyChar)
     if (isOctopusEnabled(this, editor)) {
-      if (keyCode in setOf(KeyEvent.VK_ENTER)) return keyCode.toChar()
+      if (keyCode in setOf(KeyEvent.VK_ENTER)) return CharType.CharDetected(keyCode.toChar())
+      if (keyCode == KeyEvent.VK_ESCAPE) return CharType.EditorAction("EditorEscape")
     }
-    return keyChar
+    return CharType.UNDEFINED
+  }
+
+  sealed interface CharType {
+    object UNDEFINED: CharType
+    class CharDetected(val char: Char): CharType
+    class EditorAction(val name: String): CharType
   }
 
   companion object {
