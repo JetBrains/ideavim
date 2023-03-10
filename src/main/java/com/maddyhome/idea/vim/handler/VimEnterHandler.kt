@@ -64,15 +64,36 @@ abstract class OctopusHandler(private val nextHandler: EditorActionHandler) : Ed
  * - App code - set handler after
  * - Template - doesn't intersect with enter anymore
  */
-class VimEnterHandler(nextHandler: EditorActionHandler) : OctopusHandler(nextHandler) {
+class VimEnterHandler(nextHandler: EditorActionHandler) : VimKeyHandler(nextHandler) {
+  override val key: String = "<CR>"
+}
+
+/**
+ * Known conflicts & solutions:
+ *
+ * - Smart step into - set handler after
+ * - Python notebooks - set handler after
+ * - Ace jump - set handler after
+ * - Lookup - ISSUE: Doesn't exit normal mode
+ * - App code - Need to review
+ * - Template - Need to review
+ */
+class VimEscHandler(nextHandler: EditorActionHandler) : VimKeyHandler(nextHandler) {
+  override val key: String = "<Esc>"
+}
+
+abstract class VimKeyHandler(nextHandler: EditorActionHandler) : OctopusHandler(nextHandler) {
+
+  abstract val key: String
+
   override fun executeHandler(editor: Editor, caret: Caret?, dataContext: DataContext?) {
-    val enterKey = injector.parser.parseKeys("<CR>").first()
+    val enterKey = key(key)
     val context = injector.executionContextManager.onEditor(editor.vim, dataContext?.vim)
     KeyHandler.getInstance().handleKey(editor.vim, enterKey, context)
   }
 
   override fun isHandlerEnabled(editor: Editor, dataContext: DataContext?): Boolean {
-    val enterKey = key("<CR>")
+    val enterKey = key(key)
     return isOctopusEnabled(enterKey, editor)
   }
 }
@@ -81,6 +102,11 @@ fun isOctopusEnabled(s: KeyStroke, editor: Editor): Boolean {
   if (!enableOctopus) return false
   when {
     s.keyCode == KeyEvent.VK_ENTER -> return editor.mode in listOf(
+      CommandState.Mode.COMMAND,
+      CommandState.Mode.INSERT,
+      CommandState.Mode.VISUAL
+    )
+    s.keyCode == KeyEvent.VK_ESCAPE -> return editor.mode in listOf(
       CommandState.Mode.COMMAND,
       CommandState.Mode.INSERT,
       CommandState.Mode.VISUAL
