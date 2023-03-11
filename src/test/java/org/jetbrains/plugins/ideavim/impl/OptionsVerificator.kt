@@ -159,7 +159,7 @@ private class OptionsVerificator : BeforeTestExecutionCallback, AfterTestExecuti
       OptionConstants.timeoutlen,
       OptionConstants.relativenumber,
       OptionConstants.maxmapdepth,
-      OptionConstants.octopushandler,
+      IjOptionConstants.octopushandler,
       IjOptionConstants.ideavimsupport,
       "unifyjumps",
       OptionConstants.sidescrolloff,

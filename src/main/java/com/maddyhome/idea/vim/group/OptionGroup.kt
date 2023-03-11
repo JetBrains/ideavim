@@ -73,6 +73,7 @@ internal class OptionGroup : VimOptionGroupBase() {
         isList = true,
       ),
     )
+    addOption(ToggleOption(IjOptionConstants.octopushandler, IjOptionConstants.octopushandler, false))
     addOption(ToggleOption(IjOptionConstants.oldundo, IjOptionConstants.oldundo, true))
     addOption(ToggleOption(IjOptionConstants.trackactionids, "tai", false))
     addOption(UnsignedNumberOption(IjOptionConstants.visualdelay, IjOptionConstants.visualdelay, 100))
@@ -125,6 +126,8 @@ internal class IjOptionConstants {
     const val oldundo = "oldundo"
     const val trackactionids = "trackactionids"
     const val visualdelay = "visualdelay"
+
+    const val octopushandler = "octopushandler"
 
     val ideaStatusIconValues = setOf(ideastatusicon_enabled, ideastatusicon_gray, ideastatusicon_disabled)
     val ideaRefactorModeValues = setOf(idearefactormode_keep, idearefactormode_select, idearefactormode_visual)
