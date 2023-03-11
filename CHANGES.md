@@ -49,6 +49,7 @@ usual beta standards.
 * [VIM-2733](https://youtrack.jetbrains.com/issue/VIM-2733) vim-surround emulation interacts incorrectly with unmatched quotes on previous lines
 * [VIM-2884](https://youtrack.jetbrains.com/issue/VIM-2884) Moving multiple lines in visual mode is not working
 * [VIM-2868](https://youtrack.jetbrains.com/issue/VIM-2868) Pasting in visual mode with P should not replace yank register like when pasting with p
+* [VIM-2819](https://youtrack.jetbrains.com/issue/VIM-2819) Move command works incorrectly
 
 ### Merged PRs:
 * [589](https://github.com/JetBrains/ideavim/pull/589) by [Matt Ellis](https://github.com/citizenmatt): Refactor option usage and introduce accessor API
