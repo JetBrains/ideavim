@@ -388,7 +388,7 @@ https://github.com/adelarsq/vim-matchit/blob/master/doc/matchit.txt
 Original plugin: [quick-scope](https://github.com/unblevable/quick-scope).
 
 ### Setup:
-- Install [IdeaVim-sneak](https://plugins.jetbrains.com/plugin/15348-ideavim-sneak) plugin.
+- Install [IdeaVim-Quickscope](https://plugins.jetbrains.com/plugin/19417-ideavim-quickscope) plugin.
 - Add the following command to `~/.ideavimrc`: `set quickscope`
 
 ### Instructions
