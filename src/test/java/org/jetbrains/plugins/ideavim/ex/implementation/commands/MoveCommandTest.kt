@@ -126,4 +126,84 @@ class MoveCommandTest : VimTestCase() {
       """.trimIndent()
     )
   }
+  
+  fun `test moving text to first line`() {
+    configureByText(
+      """
+      ====
+      My mother taught me this trick: if you repeat something over and over again it loses its meaning.
+      For example: homewor${c}k, homework, homework, homework, homework, homework, homework, homework, homework.
+      See, nothing.
+      """.trimIndent()
+    )
+    enterCommand("m 0")
+    assertState(
+      """
+      For example: homewor${c}k, homework, homework, homework, homework, homework, homework, homework, homework.
+      ====
+      My mother taught me this trick: if you repeat something over and over again it loses its meaning.
+      See, nothing.
+      """.trimIndent()
+    )
+  }
+
+  fun `test moving multiple lines to text start`() {
+    configureByText(
+      """
+      ====
+      My mother taught me this trick: if you repeat something over and over again it loses its meaning.
+      For example: homewor${c}k, homework, homework, homework, homework, homework, homework, homework, homework.
+      See, nothing.
+      """.trimIndent()
+    )
+    typeText("Vj:m-3<CR>")
+    assertState(
+      """
+      For example: homework, homework, homework, homework, homework, homework, homework, homework, homework.
+      See, nothing.
+      ====
+      My mother taught me this trick: if you repeat something over and over again it loses its meaning.
+      """.trimIndent()
+    )
+  }
+
+  fun `test moving last line does not create empty line`() {
+    configureByText(
+      """
+      ====
+      My mother taught me this trick: if you repeat something over and over again it loses its meaning.
+      For example: homework, homework, homework, homework, homework, homework, homework, homework, homework.
+      See, not${c}hing.
+      """.trimIndent()
+    )
+    enterCommand("m-2")
+    assertState(
+      """
+      ====
+      My mother taught me this trick: if you repeat something over and over again it loses its meaning.
+      See, not${c}hing.
+      For example: homework, homework, homework, homework, homework, homework, homework, homework, homework.
+      """.trimIndent()
+    )
+  }
+
+  fun `test moving line to file end does not create empty line`() {
+    configureByText(
+      """
+      ====
+      My mother taught me this trick: if you repeat something over and over again it loses its meaning.
+      For example: homewor${c}k, homework, homework, homework, homework, homework, homework, homework, homework.
+      See, nothing.
+      """.trimIndent()
+    )
+    enterCommand("m+1")
+    assertState(
+      """
+      ====
+      My mother taught me this trick: if you repeat something over and over again it loses its meaning.
+      See, nothing.
+      For example: homewor${c}k, homework, homework, homework, homework, homework, homework, homework, homework.
+      """.trimIndent()
+    )
+  }
 }
