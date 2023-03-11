@@ -28,13 +28,12 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
 public abstract class VimOptionGroupBase : VimOptionGroup {
-
-  private lateinit var globalOptions: OptionValueAccessor
-
-  private val localOptionsKey = Key<MutableMap<String, VimDataType>>("localOptions")
-
   private val logger = vimLogger<VimOptionGroupBase>()
+
   private val globalValues = mutableMapOf<String, VimDataType>()
+  private val localOptionsKey = Key<MutableMap<String, VimDataType>>("localOptions")
+  private val globalOptionValueAccessor by lazy { OptionValueAccessor(this, OptionScope.GLOBAL) }
+
   private val options = MultikeyMap(
     // Simple options, sorted by name
     StringOption(OptionConstants.clipboard, OptionConstants.clipboardAlias, "autoselect,exclude:cons\\|linux", isList = true),
@@ -265,17 +264,8 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
     options.get(optionName)!!.removeOptionChangeListener(listener)
   }
 
-  override fun getValueAccessor(editor: VimEditor?): OptionValueAccessor {
-    return if (editor == null) {
-      if (!::globalOptions.isInitialized) {
-        globalOptions = OptionValueAccessor(this, OptionScope.GLOBAL)
-      }
-      globalOptions
-    } else {
-      // Maybe cache in editor's user data?
-      OptionValueAccessor(this, OptionScope.LOCAL(editor))
-    }
-  }
+  override fun getValueAccessor(editor: VimEditor?): OptionValueAccessor =
+    if (editor == null) globalOptionValueAccessor else OptionValueAccessor(this, OptionScope.LOCAL(editor))
 }
 
 private class MultikeyMap(vararg entries: Option<out VimDataType>) {
