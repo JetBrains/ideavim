@@ -26,7 +26,7 @@ class WindowDownAction : VimActionHandler.SingleExecution() {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    injector.window.selectWindowInRow(context, cmd.count, true)
+    injector.window.selectWindowInRow(editor.primaryCaret(), context, cmd.count, true)
     return true
   }
 }
@@ -43,7 +43,7 @@ class WindowLeftAction : VimActionHandler.SingleExecution() {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    injector.window.selectWindowInRow(context, cmd.count * -1, false)
+    injector.window.selectWindowInRow(editor.primaryCaret(), context, cmd.count * -1, false)
     return true
   }
 }
@@ -60,7 +60,7 @@ class WindowRightAction : VimActionHandler.SingleExecution() {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    injector.window.selectWindowInRow(context, cmd.count, false)
+    injector.window.selectWindowInRow(editor.primaryCaret(), context, cmd.count, false)
     return true
   }
 }
@@ -77,7 +77,7 @@ class WindowUpAction : VimActionHandler.SingleExecution() {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    injector.window.selectWindowInRow(context, cmd.count * -1, true)
+    injector.window.selectWindowInRow(editor.primaryCaret(), context, cmd.count * -1, true)
     return true
   }
 }

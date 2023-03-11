@@ -10,17 +10,22 @@ package com.maddyhome.idea.vim.group;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
+import com.intellij.openapi.editor.Caret;
+import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx;
 import com.intellij.openapi.fileEditor.impl.EditorComposite;
+import com.intellij.openapi.fileEditor.impl.EditorTabbedContainer;
 import com.intellij.openapi.fileEditor.impl.EditorWindow;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.concurrency.annotations.RequiresReadLock;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.ExecutionContext;
+import com.maddyhome.idea.vim.api.VimCaret;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.RWLockLabel;
 import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext;
+import com.maddyhome.idea.vim.newapi.IjVimCaret;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -100,12 +105,13 @@ public class WindowGroup extends WindowGroupBase {
   @Override
   @RWLockLabel.Readonly
   @RequiresReadLock
-  public void selectWindowInRow(@NotNull ExecutionContext context, int relativePosition, boolean vertical) {
+  public void selectWindowInRow(@NotNull VimCaret caret, @NotNull ExecutionContext context, int relativePosition, boolean vertical) {
+    final Caret ijCaret = ((IjVimCaret) caret).getCaret();
     final FileEditorManagerEx fileEditorManager = getFileEditorManager(((DataContext)context.getContext()));
-    final EditorWindow currentWindow = fileEditorManager.getCurrentWindow();
+    final EditorWindow currentWindow =  fileEditorManager.getCurrentWindow();
     if (currentWindow != null) {
       final EditorWindow[] windows = fileEditorManager.getWindows();
-      final List<EditorWindow> row = findWindowsInRow(currentWindow, Arrays.asList(windows), vertical);
+      final List<EditorWindow> row = findWindowsInRow(ijCaret, currentWindow, Arrays.asList(windows), vertical);
       selectWindow(currentWindow, row, relativePosition);
     }
   }
@@ -118,14 +124,15 @@ public class WindowGroup extends WindowGroupBase {
     windows.get(normalized).setAsCurrentWindow(true);
   }
 
-  private static @NotNull List<EditorWindow> findWindowsInRow(@NotNull EditorWindow anchor,
+  private static @NotNull List<EditorWindow> findWindowsInRow(@NotNull Caret caret,
+                                                              @NotNull EditorWindow editorWindow,
                                                               @NotNull List<EditorWindow> windows, final boolean vertical) {
-    final Rectangle anchorRect = getEditorWindowRectangle(anchor);
-    if (anchorRect != null) {
+    final Point anchorPoint = getCaretPoint(caret);
+    if (anchorPoint != null) {
       final List<EditorWindow> result = new ArrayList<>();
-      final double coord = vertical ? anchorRect.getX() : anchorRect.getY();
+      final double coord = vertical ? anchorPoint.getX() : anchorPoint.getY();
       for (EditorWindow window : windows) {
-        final Rectangle rect = getEditorWindowRectangle(window);
+        final Rectangle rect = getSplitRectangle(window);
         if (rect != null) {
           final double min = vertical ? rect.getX() : rect.getY();
           final double max = min + (vertical ? rect.getWidth() : rect.getHeight());
@@ -135,8 +142,8 @@ public class WindowGroup extends WindowGroupBase {
         }
       }
       result.sort((window1, window2) -> {
-        final Rectangle rect1 = getEditorWindowRectangle(window1);
-        final Rectangle rect2 = getEditorWindowRectangle(window2);
+        final Rectangle rect1 = getSplitRectangle(window1);
+        final Rectangle rect2 = getSplitRectangle(window2);
         if (rect1 != null && rect2 != null) {
           final double diff = vertical ? (rect1.getY() - rect2.getY()) : (rect1.getX() - rect2.getX());
           return diff < 0 ? -1 : diff > 0 ? 1 : 0;
@@ -145,7 +152,7 @@ public class WindowGroup extends WindowGroupBase {
       });
       return result;
     }
-    return Collections.singletonList(anchor);
+    return Collections.singletonList(editorWindow);
   }
 
   private static @NotNull FileEditorManagerEx getFileEditorManager(@NotNull DataContext context) {
@@ -173,11 +180,20 @@ public class WindowGroup extends WindowGroupBase {
     }
   }
 
-  private static @Nullable Rectangle getEditorWindowRectangle(@NotNull EditorWindow window) {
-    final EditorComposite editor = window.getSelectedComposite();
-    if (editor != null) {
-      final Point point = editor.getComponent().getLocationOnScreen();
-      final Dimension dimension = editor.getComponent().getSize();
+  private static @NotNull Point getCaretPoint(@NotNull Caret caret) {
+    final Editor editor = caret.getEditor();
+    final Point caretLocation = editor.logicalPositionToXY(caret.getLogicalPosition());
+    Point caretScreenLocation = editor.getContentComponent().getLocationOnScreen();
+    caretScreenLocation.translate(caretLocation.x, caretLocation.y);
+    return caretScreenLocation;
+  }
+
+  private static @Nullable Rectangle getSplitRectangle(@NotNull EditorWindow window) {
+    final EditorComposite editorComposite = window.getSelectedComposite();
+    if (editorComposite != null) {
+      final EditorTabbedContainer split = window.getTabbedPane();
+      final Point point = split.getComponent().getLocationOnScreen();
+      final Dimension dimension = split.getComponent().getSize();
       return new Rectangle(point, dimension);
     }
     return null;

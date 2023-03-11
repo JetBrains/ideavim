@@ -8,9 +8,10 @@
 package com.maddyhome.idea.vim.group
 
 import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimCaret
 
 interface VimWindowGroup {
-  fun selectWindowInRow(context: ExecutionContext, relativePosition: Int, vertical: Boolean)
+  fun selectWindowInRow(caret: VimCaret, context: ExecutionContext, relativePosition: Int, vertical: Boolean)
   fun selectNextWindow(context: ExecutionContext)
   fun selectWindow(context: ExecutionContext, index: Int)
   fun selectPreviousWindow(context: ExecutionContext)
