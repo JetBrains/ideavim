@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.handler.toMotionOrError
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
-enum public class TillCharacterMotionType {
+public enum class TillCharacterMotionType {
   LAST_F,
   LAST_SMALL_F,
   LAST_T,

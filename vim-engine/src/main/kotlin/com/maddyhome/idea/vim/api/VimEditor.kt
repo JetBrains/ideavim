@@ -280,7 +280,6 @@ public abstract class LinearEditor : VimEditor {
 
 public abstract class MutableLinearEditor : MutableVimEditor, LinearEditor() {
   public abstract fun deleteRange(leftOffset: Offset, rightOffset: Offset)
-
 }
 
 public enum class LineDeleteShift {
@@ -306,4 +305,4 @@ public class BufferPosition(
 }
 
 // TODO: [visual] Try to remove this. It's an IntelliJ concept and doesn't have a Vim equivalent
-public data class VimVisualPosition(val line: Int,  public val column: Int,  public val leansRight: Boolean = false)
+public data class VimVisualPosition(val line: Int, public val column: Int, public val leansRight: Boolean = false)

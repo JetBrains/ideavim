@@ -50,6 +50,7 @@ public object VimExtensionFacade {
     VimPlugin.getKey().putKeyMapping(modes, fromKeys, pluginOwner, extensionHandler, recursive)
   }
 
+
   /**
    * COMPATIBILITY-LAYER: Additional method
    * Please see: https://jb.gg/zo8n0r

@@ -30,7 +30,7 @@ public class MotionLastColumnInsertAction : MotionLastColumnAction() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_STROKE)
 }
 
-open public class MotionLastColumnAction : MotionActionHandler.ForEachCaret() {
+public open class MotionLastColumnAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.INCLUSIVE
 
   override fun getOffset(

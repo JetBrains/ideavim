@@ -20,7 +20,7 @@ public class DeleteCharacterAction : DeleteCharacter({ 1 })
 public class DeleteCharacterLeftAction : DeleteCharacter({ -it })
 public class DeleteCharacterRightAction : DeleteCharacter({ it })
 
-abstract public class DeleteCharacter(private val countModifier: (Int) -> Int) : ChangeEditorActionHandler.ForEachCaret() {
+public abstract class DeleteCharacter(private val countModifier: (Int) -> Int) : ChangeEditorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.DELETE
 
   override fun execute(
