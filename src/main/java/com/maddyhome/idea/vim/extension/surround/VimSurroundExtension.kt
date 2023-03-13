@@ -239,19 +239,19 @@ internal class VimSurroundExtension : VimExtension {
 
       val pair = getOrInputPair(c, ijEditor) ?: return false
       // XXX: Will it work with line-wise or block-wise selections?
-      val range = getSurroundRange(ijEditor) ?: return false
+      val range = getSurroundRange(editor.currentCaret()) ?: return false
       performSurround(pair, range, editor.currentCaret())
       // Jump back to start
       executeNormalWithoutMapping(injector.parser.parseKeys("`["), ijEditor)
       return true
     }
 
-    // todo make it multicaret
-    private fun getSurroundRange(editor: Editor): TextRange? {
-      val vimEditor = editor.vim
-      return when (editor.editorMode) {
-        VimStateMachine.Mode.COMMAND -> injector.markService.getChangeMarks(vimEditor.primaryCaret())
-        VimStateMachine.Mode.VISUAL -> editor.caretModel.primaryCaret.run { TextRange(selectionStart, selectionEnd) }
+    private fun getSurroundRange(caret: VimCaret): TextRange? {
+      val editor = caret.editor
+      val ijEditor = editor.ij
+      return when (ijEditor.editorMode) {
+        VimStateMachine.Mode.COMMAND -> injector.markService.getChangeMarks(caret)
+        VimStateMachine.Mode.VISUAL -> caret.run { TextRange(selectionStart, selectionEnd) }
         else -> null
       }
     }
