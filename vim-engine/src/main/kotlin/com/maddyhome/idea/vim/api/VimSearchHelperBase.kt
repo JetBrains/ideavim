@@ -222,6 +222,114 @@ public abstract class VimSearchHelperBase : VimSearchHelper {
       return res
     }
   }
+
+  override fun findNextCamelStart(chars: CharSequence, startIndex: Int, count: Int): Int? {
+    return findCamelStart(chars, startIndex, count, Direction.FORWARDS)
+  }
+
+  override fun findPreviousCamelStart(chars: CharSequence, endIndex: Int, count: Int): Int? {
+    return findCamelStart(chars, endIndex - 1, count, Direction.BACKWARDS)
+  }
+
+  override fun findNextCamelEnd(chars: CharSequence, startIndex: Int, count: Int): Int? {
+    return findCamelEnd(chars, startIndex, count, Direction.FORWARDS)
+  }
+
+  override fun findPreviousCamelEnd(chars: CharSequence, endIndex: Int, count: Int): Int? {
+    return findCamelEnd(chars, endIndex - 1, count, Direction.BACKWARDS)
+  }
+
+  /**
+   * [startIndex] is inclusive
+   */
+  private fun findCamelStart(chars: CharSequence, startIndex: Int, count: Int, direction: Direction): Int? {
+    assert(count >= 1)
+    var counter = 0
+    var offset = startIndex
+    while (counter < count) {
+      val searchFrom = if (counter == 0) offset else offset + direction.toInt() 
+      offset = findCamelStart(chars, searchFrom, direction) ?: return null
+      ++counter
+    }
+    return offset
+  }
+
+  /**
+   * [startIndex] is inclusive
+   */
+  private fun findCamelEnd(chars: CharSequence, startIndex: Int, count: Int, direction: Direction): Int? {
+    assert(count >= 1)
+    var counter = 0
+    var offset = startIndex
+    while (counter < count) {
+      val searchFrom = if (counter == 0) offset else offset + direction.toInt() 
+      offset = findCamelEnd(chars, searchFrom, direction) ?: return null
+      ++counter
+    }
+    return offset
+  }
+
+  /**
+   * [startIndex] is inclusive
+   */
+  private fun findCamelStart(chars: CharSequence, startIndex: Int, direction: Direction): Int? {
+    var pos = startIndex
+    val size = chars.length
+
+    if (pos < 0 || pos >= size) {
+      return null
+    }
+    
+    while (pos in 0 until size) {
+      if (chars[pos].isUpperCase()) {
+        if ((pos == 0 || !chars[pos - 1].isUpperCase()) ||
+          (pos == size - 1 || chars[pos + 1].isLowerCase())) {
+          return pos
+        }
+      } else if (chars[pos].isLowerCase()) {
+        if (pos == 0 || !chars[pos - 1].isLetter()) {
+          return pos
+        }
+      } else if (chars[pos].isDigit()) {
+        if (pos == 0 || !chars[pos - 1].isDigit()) {
+          return pos
+        }
+      }
+      pos += direction.toInt()
+    }
+    return null
+  }
+
+  /**
+   * [startIndex] is inclusive
+   */
+  private fun findCamelEnd(chars: CharSequence, startIndex: Int, direction: Direction): Int? {
+    var pos = startIndex
+    val size = chars.length
+
+    if (pos < 0 || pos >= size) {
+      return pos
+    }
+
+    while (pos in 0 until size) {
+      if (chars[pos].isUpperCase()) {
+        if (pos == size - 1 || !chars[pos + 1].isLetter() || 
+          (chars[pos + 1].isUpperCase() && pos < size - 2 && chars[pos + 2].isLowerCase())) {
+          return pos
+        }
+      } else if (chars[pos].isLowerCase()) {
+        if (pos == size - 1 || !chars[pos + 1].isLowerCase()) {
+          return pos
+        }
+      } else if (chars[pos].isDigit()) {
+        if (pos == size - 1 || !chars[pos + 1].isDigit()) {
+          return pos
+        }
+      }
+      pos += direction.toInt()
+    }
+    return null
+  }
   
   override fun findBlockQuoteInLineRange(editor: VimEditor, caret: ImmutableVimCaret, quote: Char, isOuter: Boolean): TextRange? {
     var leftQuote: Int

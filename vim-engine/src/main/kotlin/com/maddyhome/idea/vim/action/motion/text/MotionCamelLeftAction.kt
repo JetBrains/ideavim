@@ -14,15 +14,28 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.common.Direction
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotionOrError
 
-public class MotionCamelLeftAction : MotionCamelAction(Direction.BACKWARDS)
-public class MotionCamelRightAction : MotionCamelAction(Direction.FORWARDS)
+public class MotionCamelLeftAction : MotionActionHandler.ForEachCaret() {
+  override val motionType: MotionType = MotionType.EXCLUSIVE
+  
+  override fun getOffset(
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    context: ExecutionContext,
+    argument: Argument?,
+    operatorArguments: OperatorArguments
+  ): Motion {
+    return injector.searchHelper.findPreviousCamelStart(editor.text(), caret.offset.point, operatorArguments.count1)
+      ?.toMotionOrError() ?: Motion.Error
+  }
+}
 
-public sealed class MotionCamelAction(public val direction: Direction) : MotionActionHandler.ForEachCaret() {
+public class MotionCamelRightAction : MotionActionHandler.ForEachCaret() {
+  override val motionType: MotionType = MotionType.EXCLUSIVE
+  
   override fun getOffset(
     editor: VimEditor,
     caret: ImmutableVimCaret,
@@ -30,16 +43,7 @@ public sealed class MotionCamelAction(public val direction: Direction) : MotionA
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    return moveCaretToNextCamel(editor, caret, direction.toInt() * operatorArguments.count1).toMotionOrError()
-  }
-
-  override val motionType: MotionType = MotionType.EXCLUSIVE
-}
-
-private fun moveCaretToNextCamel(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Int {
-  return if ((caret.offset.point == 0 && count < 0 || caret.offset.point >= editor.fileSize() - 1) && count > 0) {
-    -1
-  } else {
-    injector.searchHelper.findNextCamelStart(editor, caret, count)
+    return injector.searchHelper.findNextCamelStart(editor.text(), caret.offset.point + 1, operatorArguments.count1)
+      ?.toMotionOrError() ?: Motion.Error
   }
 }

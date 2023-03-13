@@ -54,14 +54,6 @@ internal class IjVimSearchHelper : VimSearchHelperBase() {
     )
   }
 
-  override fun findNextCamelEnd(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Int {
-    return SearchHelper.findNextCamelEnd(
-      (editor as IjVimEditor).editor,
-      (caret as IjVimCaret).caret,
-      count,
-    )
-  }
-
   override fun findNextSentenceEnd(
     editor: VimEditor,
     caret: ImmutableVimCaret,
@@ -75,14 +67,6 @@ internal class IjVimSearchHelper : VimSearchHelperBase() {
       count,
       countCurrent,
       requireAll,
-    )
-  }
-
-  override fun findNextCamelStart(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Int {
-    return SearchHelper.findNextCamelStart(
-      (editor as IjVimEditor).editor,
-      (caret as IjVimCaret).caret,
-      count,
     )
   }
 

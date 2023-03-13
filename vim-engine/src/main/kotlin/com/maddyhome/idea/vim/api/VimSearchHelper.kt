@@ -36,11 +36,37 @@ public interface VimSearchHelper {
     count: Int,
   ): Int
 
-  public fun findNextCamelEnd(
-    editor: VimEditor,
-    caret: ImmutableVimCaret,
-    count: Int,
-  ): Int
+  /**
+   * @param chars         the char sequence to search in
+   * @param startIndex    the start index (inclusive)
+   * @param count         search for the count-th occurrence
+   * @return              offset of next camelCase or snake_case word start or null if nothing was found
+   */
+  public fun findNextCamelStart(chars: CharSequence, startIndex: Int, count: Int): Int?
+
+  /**
+   * @param chars         the char sequence to search in
+   * @param endIndex      the end index (exclusive)
+   * @param count         search for the count-th occurrence
+   * @return              offset of count-th previous camelCase or snake_case word start or null if nothing was found
+   */
+  public fun findPreviousCamelStart(chars: CharSequence, endIndex: Int, count: Int): Int?
+  
+  /**
+   * @param chars         the char sequence to search in
+   * @param startIndex    the start index (inclusive)
+   * @param count         search for the count-th occurrence
+   * @return              offset of next camelCase or snake_case word start or null if nothing was found
+   */
+  public fun findNextCamelEnd(chars: CharSequence, startIndex: Int, count: Int): Int?
+
+  /**
+   * @param chars         the char sequence to search in
+   * @param endIndex      the end index (exclusive)
+   * @param count         search for the count-th occurrence
+   * @return              offset of count-th previous camelCase or snake_case word end or null if nothing was found
+   */
+  public fun findPreviousCamelEnd(chars: CharSequence, endIndex: Int, count: Int): Int?
 
   public fun findNextSentenceEnd(
     editor: VimEditor,
@@ -48,12 +74,6 @@ public interface VimSearchHelper {
     count: Int,
     countCurrent: Boolean,
     requireAll: Boolean,
-  ): Int
-
-  public fun findNextCamelStart(
-    editor: VimEditor,
-    caret: ImmutableVimCaret,
-    count: Int,
   ): Int
 
   public fun findMethodEnd(
