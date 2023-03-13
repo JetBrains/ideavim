@@ -463,6 +463,10 @@ Contributors:
   [![icon][github]](https://github.com/kawagh)
   &nbsp;
   kawagh
+* [![icon][mail]](mailto:78074243+danisevas@users.noreply.github.com)
+  [![icon][github]](https://github.com/danisevas)
+  &nbsp;
+  Dani Sevastianov
 
 Previous contributors:
 
