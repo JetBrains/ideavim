@@ -13,6 +13,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.endsWithNewLine
 import com.maddyhome.idea.vim.api.getLeadingCharacterOffset
 import com.maddyhome.idea.vim.api.getLineEndOffset
 import com.maddyhome.idea.vim.api.injector
@@ -33,6 +34,7 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissin
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setOperatorFunction
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setRegisterForCaret
 import com.maddyhome.idea.vim.helper.editorMode
+import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.options.helpers.ClipboardOptionHelper
@@ -120,7 +122,7 @@ internal class VimSurroundExtension : VimExtension {
     override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
       val selectionStart = editor.ij.caretModel.primaryCaret.selectionStart
       // NB: Operator ignores SelectionType anyway
-      if (!Operator().apply(editor, context, SelectionType.CHARACTER_WISE)) {
+      if (!Operator().apply(editor, context, SelectionType.fromSubMode(editor.subMode))) {
         return
       }
       runWriteAction {
@@ -240,7 +242,7 @@ internal class VimSurroundExtension : VimExtension {
       val pair = getOrInputPair(c, ijEditor) ?: return false
       // XXX: Will it work with line-wise or block-wise selections?
       val range = getSurroundRange(editor.currentCaret()) ?: return false
-      performSurround(pair, range, editor.currentCaret())
+      performSurround(pair, range, editor.currentCaret(), selectionType == SelectionType.LINE_WISE)
       // Jump back to start
       executeNormalWithoutMapping(injector.parser.parseKeys("`["), ijEditor)
       return true
@@ -322,14 +324,27 @@ internal class VimSurroundExtension : VimExtension {
       } else keyChar
     }
     
-    private fun performSurround(pair: Pair<String, String>, range: TextRange, caret: VimCaret) {
+    private fun performSurround(pair: Pair<String, String>, range: TextRange, caret: VimCaret, tagsOnNewLines: Boolean = false) {
       runWriteAction {
         val editor = caret.editor
         val change = VimPlugin.getChange()
-        val leftSurround = pair.first
+        val leftSurround = pair.first + if (tagsOnNewLines) "\n" else ""
+
+        val isEOF = range.endOffset == editor.text().length
+        val hasNewLine = editor.endsWithNewLine()
+        val rightSurround = if (tagsOnNewLines) {
+          if (isEOF && !hasNewLine) {
+            "\n" + pair.second
+          } else {
+            pair.second + "\n"
+          }
+        } else {
+          pair.second
+        }
+
         change.insertText(editor, caret, range.startOffset, leftSurround)
-        change.insertText(editor, caret, range.endOffset + leftSurround.length, pair.second)
-        injector.markService.setChangeMarks(caret, TextRange(range.startOffset, range.endOffset + leftSurround.length + pair.second.length))
+        change.insertText(editor, caret, range.endOffset + leftSurround.length, rightSurround)
+        injector.markService.setChangeMarks(caret, TextRange(range.startOffset, range.endOffset + leftSurround.length + rightSurround.length))
       }
     }
   }

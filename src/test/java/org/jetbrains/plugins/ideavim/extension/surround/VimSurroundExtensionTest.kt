@@ -87,13 +87,13 @@ class VimSurroundExtensionTest : VimTestCase() {
   fun testSurraungTagAsInIssue() {
     configureByText("<p>${c}Hello</p>")
     typeText(injector.parser.parseKeys("VS<div class = \"container\">"))
-    assertState("<div class = \"container\"><p>Hello</p></div>")
+    assertState("<div class = \"container\">\n<p>Hello</p>\n</div>")
   }
 
   fun testSurroundCustomElement() {
     configureByText("${c}Click me!")
     typeText(injector.parser.parseKeys("VS<custom-button>"))
-    assertState("<custom-button>Click me!</custom-button>")
+    assertState("<custom-button>\nClick me!\n</custom-button>")
   }
 
   fun testSurroundFunctionName() {
@@ -372,8 +372,10 @@ class VimSurroundExtensionTest : VimTestCase() {
       """
       <h1>Title</h1>
       
-      <p>SurroundThis
+      <p>
+      SurroundThis
       </p>
+      
       <p>Some text</p>
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
@@ -405,8 +407,10 @@ class VimSurroundExtensionTest : VimTestCase() {
       """
       <div>
           <p>Some paragraph</p>
-      <p>    Surround This
-      </p>    <p>Some other paragraph</p>
+      <p>
+          Surround This
+      </p>
+          <p>Some other paragraph</p>
       </div>
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
