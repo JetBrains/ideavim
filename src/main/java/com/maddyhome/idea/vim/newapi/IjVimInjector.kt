@@ -53,7 +53,6 @@ import com.maddyhome.idea.vim.api.VimscriptExecutor
 import com.maddyhome.idea.vim.api.VimscriptFunctionService
 import com.maddyhome.idea.vim.api.VimscriptParser
 import com.maddyhome.idea.vim.command.VimStateMachine
-import com.maddyhome.idea.vim.common.VimMachine
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.extension.VimExtensionRegistrar
@@ -159,8 +158,6 @@ internal class IjVimInjector : VimInjectorBase() {
     get() = service<IjVimApplication>()
   override val executionContextManager: ExecutionContextManager
     get() = service<IjExecutionContextManager>()
-  override val vimMachine: VimMachine
-    get() = service<VimMachineImpl>()
   override val enabler: VimEnabler
     get() = service<IjVimEnabler>()
   override val digraphGroup: VimDigraphGroup

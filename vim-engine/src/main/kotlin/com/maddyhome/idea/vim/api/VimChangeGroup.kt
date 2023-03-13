@@ -33,8 +33,6 @@ public interface VimChangeGroup {
 
   public fun insertPreviousInsert(editor: VimEditor, context: ExecutionContext, exit: Boolean, operatorArguments: OperatorArguments)
 
-  public fun insertLineAround(editor: VimEditor, context: ExecutionContext, shift: Int)
-
   public fun initInsert(editor: VimEditor, context: ExecutionContext, mode: VimStateMachine.Mode)
 
   public fun processEscape(editor: VimEditor, context: ExecutionContext?, operatorArguments: OperatorArguments)
@@ -96,8 +94,6 @@ public interface VimChangeGroup {
     operatorArguments: OperatorArguments,
     saveToRegister: Boolean = true,
   ): Boolean
-  public fun deleteRange2(editor: VimEditor, caret: VimCaret, range: TextRange, type: SelectionType): Boolean
-
   public fun changeCharacters(editor: VimEditor, caret: VimCaret, operatorArguments: OperatorArguments): Boolean
 
   public fun changeEndOfLine(editor: VimEditor, caret: VimCaret, count: Int, operatorArguments: OperatorArguments): Boolean

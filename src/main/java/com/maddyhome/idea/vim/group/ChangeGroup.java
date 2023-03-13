@@ -146,19 +146,6 @@ public class ChangeGroup extends VimChangeGroupBase {
     return new Pair<>(range, type);
   }
 
-  @Override
-  public void insertLineAround(@NotNull VimEditor editor, @NotNull ExecutionContext context, int shift) {
-    com.maddyhome.idea.vim.newapi.ChangeGroupKt.insertLineAround(editor, context, shift);
-  }
-
-  @Override
-  public boolean deleteRange2(@NotNull VimEditor editor,
-                              @NotNull VimCaret caret,
-                              @NotNull TextRange range,
-                              @NotNull SelectionType type) {
-    return com.maddyhome.idea.vim.newapi.ChangeGroupKt.deleteRange(editor, caret, range, type);
-  }
-
   /**
    * Toggles the case of count characters
    *

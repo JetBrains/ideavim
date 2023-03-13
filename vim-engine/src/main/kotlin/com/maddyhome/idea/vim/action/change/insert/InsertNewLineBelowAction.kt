@@ -33,12 +33,7 @@ public class InsertNewLineBelowAction : ChangeEditorActionHandler.SingleExecutio
     operatorArguments: OperatorArguments,
   ): Boolean {
     if (editor.isOneLineMode()) return false
-    @Suppress("ConstantConditionIf")
-    if (false) {
-      injector.changeGroup.insertLineAround(editor, context, 1)
-    } else {
-      insertNewLineBelow(editor, context)
-    }
+    insertNewLineBelow(editor, context)
     return true
   }
 }
@@ -55,12 +50,7 @@ public class InsertNewLineAboveAction : ChangeEditorActionHandler.SingleExecutio
     operatorArguments: OperatorArguments,
   ): Boolean {
     if (editor.isOneLineMode()) return false
-    @Suppress("ConstantConditionIf")
-    if (false) {
-      injector.changeGroup.insertLineAround(editor, context, 0)
-    } else {
-      insertNewLineAbove(editor, context)
-    }
+    insertNewLineAbove(editor, context)
     return true
   }
 }

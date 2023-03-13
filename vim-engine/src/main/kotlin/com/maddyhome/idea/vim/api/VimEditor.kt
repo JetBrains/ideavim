@@ -14,12 +14,8 @@ import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.common.EditorLine
 import com.maddyhome.idea.vim.common.LiveRange
 import com.maddyhome.idea.vim.common.Offset
-import com.maddyhome.idea.vim.common.OperatedRange
 import com.maddyhome.idea.vim.common.Pointer
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.common.VimRange
-import com.maddyhome.idea.vim.common.offset
-import com.maddyhome.idea.vim.common.pointer
 
 /**
  * Every line in [VimEditor] ends with a new line TODO <- this is probably not true already
@@ -133,7 +129,6 @@ public interface VimEditor {
   public var vimChangeActionSwitchMode: VimStateMachine.Mode?
   public var vimKeepingVisualOperatorAction: Boolean
 
-  public fun deleteDryRun(range: VimRange): OperatedRange?
   public fun fileSize(): Long
   public fun text(): CharSequence
 
@@ -273,13 +268,6 @@ public interface VimEditor {
 }
 
 public interface MutableVimEditor : VimEditor {
-  /**
-   * Returns actually deleted range and the according text, if any.
-   *
-   * TODO: How to make a clear code difference between [delete] and [deleteDryRun]. How to make sure that [deleteDryRun]
-   *   will be called before [delete]? Should we call [deleteDryRun] before [delete]?
-   */
-  public fun delete(range: VimRange)
   public fun addLine(atPosition: EditorLine.Offset): EditorLine.Pointer?
   public fun insertText(atPosition: Offset, text: CharSequence)
   public fun replaceString(start: Int, end: Int, newString: String)
@@ -293,77 +281,6 @@ public abstract class LinearEditor : VimEditor {
 public abstract class MutableLinearEditor : MutableVimEditor, LinearEditor() {
   public abstract fun deleteRange(leftOffset: Offset, rightOffset: Offset)
 
-  public override fun delete(range: VimRange) {
-    when (range) {
-      is VimRange.Block -> TODO()
-      is VimRange.Character.Multiple -> TODO()
-      is VimRange.Character.Range -> {
-        deleteRange(range.offsetAbove(), range.offsetBelow())
-      }
-      is VimRange.Line.Multiple -> TODO()
-      is VimRange.Line.Range -> {
-        val startOffset = getLineRange(range.lineAbove()).first
-        val endOffset = getLineRange(range.lineBelow()).second
-        deleteRange(startOffset, endOffset)
-      }
-      is VimRange.Line.Offsets -> {
-        var startOffset = getLineRange(getLine(range.offsetAbove())).first
-        var endOffset = getLineRange(getLine(range.offsetBelow())).second
-        var shiftType = LineDeleteShift.NO_NL
-        if (endOffset.point < fileSize() && charAt(endOffset.point.pointer) == '\n') {
-          endOffset = (endOffset.point + 1).offset
-          shiftType = LineDeleteShift.NL_ON_END
-        } else if (startOffset.point > 0 && lfMakesNewLine) {
-          startOffset = (startOffset.point - 1).offset
-          shiftType = LineDeleteShift.NL_ON_START
-        }
-        val (newStart, newEnd) = search((startOffset to endOffset), this, shiftType)?.first ?: return
-        deleteRange(newStart, newEnd)
-      }
-    }
-  }
-
-  public override fun deleteDryRun(range: VimRange): OperatedRange? {
-    return when (range) {
-      is VimRange.Block -> TODO()
-      is VimRange.Character.Multiple -> TODO()
-      is VimRange.Character.Range -> {
-        val textToDelete = getText(range.offsetAbove(), range.offsetBelow())
-        OperatedRange.Characters(textToDelete, range.offsetAbove(), range.offsetBelow())
-      }
-      is VimRange.Line.Multiple -> TODO()
-      is VimRange.Line.Range -> {
-        val startOffset = getLineRange(range.lineAbove()).first
-        val endOffset = getLineRange(range.lineBelow()).second
-        @Suppress("UNUSED_VARIABLE") val textToDelete = getText(startOffset, endOffset)
-        TODO()
-      }
-      is VimRange.Line.Offsets -> {
-        val lineAbove = getLine(range.offsetAbove())
-        var startOffset = getLineRange(lineAbove).first
-        val lineBelow = getLine(range.offsetBelow())
-        var endOffset = getLineRange(lineBelow).second
-        var shiftType = LineDeleteShift.NO_NL
-        if (endOffset.point < fileSize() && charAt(endOffset.point.pointer) == '\n') {
-          endOffset = (endOffset.point + 1).offset
-          shiftType = LineDeleteShift.NL_ON_END
-        } else if (startOffset.point > 0 && lfMakesNewLine) {
-          startOffset = (startOffset.point - 1).offset
-          shiftType = LineDeleteShift.NL_ON_START
-        }
-        val data = search((startOffset to endOffset), this, shiftType) ?: return null
-        val (newStart, newEnd) = data.first
-        shiftType = data.second
-        val textToDelete = getText(newStart, newEnd)
-        OperatedRange.Lines(
-          textToDelete,
-          EditorLine.Offset.init(lineAbove.line, this),
-          lineBelow.line - lineAbove.line,
-          shiftType
-        )
-      }
-    }
-  }
 }
 
 public enum class LineDeleteShift {

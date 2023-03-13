@@ -9,7 +9,6 @@
 package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.command.VimStateMachine
-import com.maddyhome.idea.vim.common.VimMachine
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.group.TabService
 import com.maddyhome.idea.vim.group.VimWindowGroup
@@ -45,8 +44,6 @@ public interface VimInjector {
   // [FINISHED] Fully moved to vim-engine except one method that iterates with IJ.
   // Need to check how it would work in fleet before moving this method.
   public val digraphGroup: VimDigraphGroup
-  // [FINISHED] Fully moved to vim-engine. Should we remove it from injector?
-  public val vimMachine: VimMachine
   // [FINISHED] Can't be fully moved to vim-engine.
   public val enabler: VimEnabler
 

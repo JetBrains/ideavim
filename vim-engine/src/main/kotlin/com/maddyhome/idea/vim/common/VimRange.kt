@@ -20,63 +20,6 @@ import com.maddyhome.idea.vim.mark.VimMarkConstants
 import kotlin.math.max
 import kotlin.math.min
 
-/**
- * Back direction range is possible. `start` is not lower than `end`.
- * TODO: How to show it in code and namings?
- *    How to separate methods that return "starting from" line and "the above line"
- *
- * TODO: How to represent "till last column"
- *
- * [VimRange] includes selection type (line, character, block)
- *
- * Range normalizations (check if line and offsets really exist) are performed in editor implementations.
- */
-public sealed class VimRange {
-  public sealed class Line : VimRange() {
-    public class Range(public val startLine: EditorLine.Pointer, public val endLine: EditorLine.Pointer) : Line() {
-      public fun lineAbove(): EditorLine.Pointer = listOf(startLine, endLine).minByOrNull { it.line }!!
-      public fun lineBelow(): EditorLine.Pointer = listOf(startLine, endLine).maxByOrNull { it.line }!!
-    }
-
-    public class Multiple(public val lines: List<Int>) : Line()
-
-    // TODO: 11.01.2022 How converting offsets to lines work?
-    public class Offsets(public val startOffset: Offset, public val endOffset: Offset) : Line() {
-      public fun offsetAbove(): Offset = min(startOffset.point, endOffset.point).offset
-      public fun offsetBelow(): Offset = max(startOffset.point, endOffset.point).offset
-    }
-  }
-
-  public sealed class Character : VimRange() {
-    public class Range(public val range: VimTextRange) : Character() {
-      public fun offsetAbove(): Offset = min(range.start.point, range.end.point).offset
-      public fun offsetBelow(): Offset = max(range.start.point, range.end.point).offset
-    }
-
-    public class Multiple(public val ranges: List<VimTextRange>) : Character()
-  }
-
-  public class Block(public val start: Offset, public val end: Offset) : VimRange()
-}
-
-/**
- * `start` is not lower than `end`
- */
-public data class VimTextRange(
-  val start: Offset,
-  val end: Offset,
-) {
-  init {
-    if (start.point > end.point) {
-      println()
-    }
-  }
-}
-
-public infix fun Int.including(another: Int): VimTextRange {
-  return VimTextRange(this.offset, another.offset)
-}
-
 public data class Offset(val point: Int)
 public data class Pointer(val point: Int)
 
@@ -84,47 +27,6 @@ public val Int.offset: Offset
   get() = Offset(this)
 public val Int.pointer: Pointer
   get() = Pointer(this)
-
-public interface VimMachine {
-  public fun delete(range: VimRange, editor: VimEditor, caret: ImmutableVimCaret): OperatedRange?
-}
-
-public abstract class VimMachineBase : VimMachine {
-  /**
-   * The information I'd like to know after the deletion:
-   * - What range is deleted?
-   * - What text is deleted?
-   * - Does text have a new line character at the end?
-   * - At what offset?
-   * - What caret?
-   */
-  public override fun delete(range: VimRange, editor: VimEditor, caret: ImmutableVimCaret): OperatedRange? {
-    val operatedText = editor.deleteDryRun(range) ?: return null
-
-    val normalizedRange = operatedText.toNormalizedTextRange(editor)
-    caret.registerStorage.storeText(editor, normalizedRange, operatedText.toType(), true)
-    (editor as MutableVimEditor).delete(range)
-
-    val start = normalizedRange.startOffset
-    injector.markService.setMark(caret, VimMarkConstants.MARK_CHANGE_POS, start)
-    injector.markService.setChangeMarks(caret, TextRange(start, start + 1))
-
-    return operatedText
-  }
-}
-
-public fun OperatedRange.toNormalizedTextRange(editor: VimEditor): TextRange {
-  return when (this) {
-    is OperatedRange.Block -> TODO()
-    is OperatedRange.Lines -> {
-      // TODO: 11.01.2022 This is unsafe
-      val startOffset = editor.getLineStartOffset(this.lineAbove.line)
-      val endOffset = editor.getLineEndOffset(lineAbove.line + linesOperated, true)
-      TextRange(startOffset, endOffset)
-    }
-    is OperatedRange.Characters -> TextRange(this.leftOffset.point, this.rightOffset.point)
-  }
-}
 
 public sealed class EditorLine private constructor(public val line: Int) {
   public class Pointer(line: Int) : EditorLine(line) {

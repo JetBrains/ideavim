@@ -13,8 +13,6 @@ import com.maddyhome.idea.vim.api.stubs.VimApplicationStub
 import com.maddyhome.idea.vim.api.stubs.VimEnablerStub
 import com.maddyhome.idea.vim.api.stubs.VimMessagesStub
 import com.maddyhome.idea.vim.api.stubs.VimProcessGroupStub
-import com.maddyhome.idea.vim.common.VimMachine
-import com.maddyhome.idea.vim.common.VimMachineBase
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.register.VimRegisterGroup
 import com.maddyhome.idea.vim.register.VimRegisterGroupBase
@@ -32,7 +30,6 @@ abstract class VimInjectorBase : VimInjector {
   }
 
   override val parser: VimStringParser = object : VimStringParserBase() {}
-  override val vimMachine: VimMachine = object : VimMachineBase() {}
   override val optionGroup: VimOptionGroup by lazy { object : VimOptionGroupBase() {} }
   @Suppress("DEPRECATION")
   @Deprecated("Use optionGroup")
