@@ -53,6 +53,7 @@ usual beta standards.
 * [VIM-795](https://youtrack.jetbrains.com/issue/VIM-795) Ctrl-w + h doesn't alway work (window navigation to the left window)
 * [VIM-1551](https://youtrack.jetbrains.com/issue/VIM-1551) Surround: line surround not working
 * [VIM-1746](https://youtrack.jetbrains.com/issue/VIM-1746) IdeaVim Surround removes unwanted characters
+* [VIM-1750](https://youtrack.jetbrains.com/issue/VIM-1750) Surround with tag wrong position
 
 ### Merged PRs:
 * [589](https://github.com/JetBrains/ideavim/pull/589) by [Matt Ellis](https://github.com/citizenmatt): Refactor option usage and introduce accessor API
