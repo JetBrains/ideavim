@@ -13,8 +13,10 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.getLeadingCharacterOffset
 import com.maddyhome.idea.vim.api.getLineEndOffset
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.setChangeMarks
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.command.SelectionType
@@ -32,8 +34,6 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.setOperatorFunction
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setRegisterForCaret
 import com.maddyhome.idea.vim.helper.editorMode
 import com.maddyhome.idea.vim.key.OperatorFunction
-import com.maddyhome.idea.vim.newapi.IjVimCaret
-import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.helpers.ClipboardOptionHelper
@@ -59,6 +59,7 @@ internal class VimSurroundExtension : VimExtension {
 
   override fun init() {
     putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys("<Plug>YSurround"), owner, YSurroundHandler(), false)
+    putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys("<Plug>Yssurround"), owner, YSSurroundHandler(), false)
     putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys("<Plug>CSurround"), owner, CSurroundHandler(), false)
     putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys("<Plug>DSurround"), owner, DSurroundHandler(), false)
     putExtensionHandlerMapping(MappingMode.XO, injector.parser.parseKeys("<Plug>VSurround"), owner, VSurroundHandler(), false)
@@ -66,6 +67,7 @@ internal class VimSurroundExtension : VimExtension {
     val noMappings = VimPlugin.getVariableService().getGlobalVariableValue(NO_MAPPINGS)?.asBoolean() ?: false
     if (!noMappings) {
       putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("ys"), owner, injector.parser.parseKeys("<Plug>YSurround"), true)
+      putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("yss"), owner, injector.parser.parseKeys("<Plug>Yssurround"), true)
       putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("cs"), owner, injector.parser.parseKeys("<Plug>CSurround"), true)
       putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("ds"), owner, injector.parser.parseKeys("<Plug>DSurround"), true)
       putKeyMappingIfMissing(MappingMode.XO, injector.parser.parseKeys("S"), owner, injector.parser.parseKeys("<Plug>VSurround"), true)
@@ -78,6 +80,40 @@ internal class VimSurroundExtension : VimExtension {
     override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
       setOperatorFunction(Operator())
       executeNormalWithoutMapping(injector.parser.parseKeys("g@"), editor.ij)
+    }
+  }
+
+  private class YSSurroundHandler : ExtensionHandler {
+    override val isRepeatable = true
+
+    override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
+      val ijEditor = editor.ij
+      val c = getChar(ijEditor)
+      if (c.code == 0) return
+      val pair = getOrInputPair(c, ijEditor) ?: return
+
+      editor.forEachCaret {
+        val line = it.getBufferPosition().line
+        val lineStartOffset = editor.getLeadingCharacterOffset(line)
+        val lineEndOffset = editor.getLineEndOffset(line)
+        val lastNonWhiteSpaceOffset = getLastNonWhitespaceCharacterOffset(editor.text(), lineStartOffset, lineEndOffset)
+        if (lastNonWhiteSpaceOffset != null) {
+          val range = TextRange(lineStartOffset, lastNonWhiteSpaceOffset + 1)
+          performSurround(pair, range, it)
+        }
+//        it.moveToOffset(lineStartOffset)
+      }
+      // Jump back to start
+      executeNormalWithoutMapping(injector.parser.parseKeys("`["), ijEditor)
+    }
+
+    private fun getLastNonWhitespaceCharacterOffset(chars: CharSequence, startOffset: Int, endOffset: Int): Int? {
+      var i = endOffset - 1
+      while (i >= startOffset) {
+        if (!chars[i].isWhitespace()) return i
+        --i
+      }
+      return null
     }
   }
 
@@ -204,20 +240,9 @@ internal class VimSurroundExtension : VimExtension {
       val pair = getOrInputPair(c, ijEditor) ?: return false
       // XXX: Will it work with line-wise or block-wise selections?
       val range = getSurroundRange(ijEditor) ?: return false
-      runWriteAction {
-        val change = VimPlugin.getChange()
-        val leftSurround = pair.first
-        val primaryCaret = ijEditor.caretModel.primaryCaret
-        change.insertText(IjVimEditor(ijEditor), IjVimCaret(primaryCaret), range.startOffset, leftSurround)
-        change.insertText(
-          IjVimEditor(ijEditor),
-          IjVimCaret(primaryCaret),
-          range.endOffset + leftSurround.length,
-          pair.second,
-        )
-        // Jump back to start
-        executeNormalWithoutMapping(injector.parser.parseKeys("`["), ijEditor)
-      }
+      performSurround(pair, range, editor.currentCaret())
+      // Jump back to start
+      executeNormalWithoutMapping(injector.parser.parseKeys("`["), ijEditor)
       return true
     }
 
@@ -249,7 +274,7 @@ internal class VimSurroundExtension : VimExtension {
       ']' to ("[" to "]"),
       'a' to ("<" to ">"),
       '>' to ("<" to ">"),
-      's' to (" " to ""),
+      's' to (" " to "")
     )
 
     private fun getSurroundPair(c: Char): Pair<String, String>? = if (c in SURROUND_PAIRS) {
@@ -294,9 +319,19 @@ internal class VimSurroundExtension : VimExtension {
       val keyChar = key.keyChar
       return if (keyChar == KeyEvent.CHAR_UNDEFINED || keyChar.code == KeyEvent.VK_ESCAPE) {
         0.toChar()
-      } else {
-        keyChar
+      } else keyChar
+    }
+    
+    private fun performSurround(pair: Pair<String, String>, range: TextRange, caret: VimCaret) {
+      runWriteAction {
+        val editor = caret.editor
+        val change = VimPlugin.getChange()
+        val leftSurround = pair.first
+        change.insertText(editor, caret, range.startOffset, leftSurround)
+        change.insertText(editor, caret, range.endOffset + leftSurround.length, pair.second)
+        injector.markService.setChangeMarks(caret, TextRange(range.startOffset, range.endOffset + leftSurround.length + pair.second.length))
       }
     }
   }
 }
+

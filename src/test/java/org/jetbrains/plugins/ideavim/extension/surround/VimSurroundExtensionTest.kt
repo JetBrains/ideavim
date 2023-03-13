@@ -517,4 +517,17 @@ class VimSurroundExtensionTest : VimTestCase() {
 
     doTest(listOf("ds("), before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
+
+  fun `test surround line`() {
+    val before = """
+                  ${c}abc  
+                  ${c}xyz  
+                    """
+    val after = """
+                  ${c}"abc"  
+                  ${c}"xyz"  
+                    """
+
+    doTest(listOf("yss\""), before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+  }
 }
