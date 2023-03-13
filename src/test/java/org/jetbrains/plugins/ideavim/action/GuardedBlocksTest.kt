@@ -34,7 +34,7 @@ class GuardedBlocksTest : VimTestCase() {
       [1234567890
       ]123${c}4567890[
       1234567890]
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(injector.parser.parseKeys("dd"))
     assertState(
@@ -42,7 +42,7 @@ class GuardedBlocksTest : VimTestCase() {
       1234567890
       $c
       1234567890
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -88,7 +88,7 @@ class GuardedBlocksTest : VimTestCase() {
       [123${c}4567890
       ]123456789[0
       1234567890]
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(injector.parser.parseKeys("dd"))
     assertState(
@@ -96,7 +96,7 @@ class GuardedBlocksTest : VimTestCase() {
       123${c}4567890
       1234567890
       1234567890
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -107,7 +107,7 @@ class GuardedBlocksTest : VimTestCase() {
       [1234567890
       ]123456789[0
       123456${c}7890]
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(injector.parser.parseKeys("dd"))
     assertState(
@@ -115,7 +115,7 @@ class GuardedBlocksTest : VimTestCase() {
       1234567890
       1234567890
       123456${c}7890
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -126,7 +126,7 @@ class GuardedBlocksTest : VimTestCase() {
       [1234567890
       ]123${c}4567890[
       1234567890]
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(injector.parser.parseKeys("cc"))
     assertState(
@@ -134,7 +134,7 @@ class GuardedBlocksTest : VimTestCase() {
       1234567890
       $c
       1234567890
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.INSERT)
   }
@@ -146,7 +146,7 @@ class GuardedBlocksTest : VimTestCase() {
       [1234567890
       ]123${c}4567890[
       1234567890]
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(injector.parser.parseKeys("O"))
     assertState(
@@ -155,7 +155,7 @@ class GuardedBlocksTest : VimTestCase() {
       $c
       1234567890
       1234567890
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.INSERT)
   }
@@ -167,7 +167,7 @@ class GuardedBlocksTest : VimTestCase() {
       [1234567890
       ]123${c}4567890[
       1234567890]
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(injector.parser.parseKeys("o"))
     assertState(
@@ -176,7 +176,7 @@ class GuardedBlocksTest : VimTestCase() {
       1234567890
       $c
       1234567890
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.INSERT)
   }
@@ -223,14 +223,14 @@ class GuardedBlocksTest : VimTestCase() {
       """
       [1234567890
       ]12345${c}67890
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(injector.parser.parseKeys("cc"))
     assertState(
       """
       1234567890
       $c
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.INSERT)
   }
@@ -241,14 +241,14 @@ class GuardedBlocksTest : VimTestCase() {
       """
       123456${c}7890[
       1234567890]
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(injector.parser.parseKeys("dd"))
     assertState(
       """
       $c
       1234567890
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
   }
@@ -260,14 +260,14 @@ class GuardedBlocksTest : VimTestCase() {
       1234567890
       123456${c}7890[
       1234567890]
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(injector.parser.parseKeys("dd"))
     assertState(
       """
       ${c}1234567890
       1234567890
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
   }
@@ -279,7 +279,7 @@ class GuardedBlocksTest : VimTestCase() {
       1234567890
       123456${c}7890[
       1234567890]
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(injector.parser.parseKeys("cc"))
     assertState(
@@ -287,7 +287,7 @@ class GuardedBlocksTest : VimTestCase() {
       1234567890
       $c
       1234567890
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.INSERT)
   }
@@ -299,14 +299,14 @@ class GuardedBlocksTest : VimTestCase() {
       1234567890
       $c[
       1234567890]
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(injector.parser.parseKeys("dd"))
     assertState(
       """
       1234567890
       1234567890
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
   }

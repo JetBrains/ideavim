@@ -26,7 +26,7 @@ internal class PluginState : ApplicationUsagesCollector() {
         PLUGIN_ENABLED with VimPlugin.isEnabled(),
         IS_EAP with JoinEap.eapActive(),
         ENABLED_EXTENSIONS with enabledExtensions.toList(),
-      )
+      ),
     )
   }
 

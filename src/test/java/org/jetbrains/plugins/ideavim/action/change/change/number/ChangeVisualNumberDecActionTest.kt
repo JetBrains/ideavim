@@ -22,7 +22,7 @@ class ChangeVisualNumberDecActionTest : VimTestCase() {
       "${c}12345",
       "${c}12344",
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -32,7 +32,7 @@ class ChangeVisualNumberDecActionTest : VimTestCase() {
       "11 <- should not be decremented |${c}11| should not be decremented -> 12",
       "11 <- should not be decremented |${c}10| should not be decremented -> 12",
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -42,7 +42,7 @@ class ChangeVisualNumberDecActionTest : VimTestCase() {
       "11111${c}33333111111",
       "11111${c}33332111111",
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -70,7 +70,7 @@ class ChangeVisualNumberDecActionTest : VimTestCase() {
 
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -88,7 +88,7 @@ class ChangeVisualNumberDecActionTest : VimTestCase() {
                     999
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -98,7 +98,7 @@ class ChangeVisualNumberDecActionTest : VimTestCase() {
       "1 should$c not be decremented -> 2",
       "${c}0 should not be decremented -> 2",
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -111,7 +111,7 @@ class ChangeVisualNumberDecActionTest : VimTestCase() {
                     3
                     ${c}4
                     5
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState(
       """
@@ -120,7 +120,7 @@ class ChangeVisualNumberDecActionTest : VimTestCase() {
                 3
                 ${c}3
                 4
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 }

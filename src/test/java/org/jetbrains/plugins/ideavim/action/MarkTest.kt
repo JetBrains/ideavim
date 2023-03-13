@@ -26,7 +26,7 @@ class MarkTest : VimTestCase() {
       """    foo
     ba<caret>r
     baz
-"""
+""",
     )
     val vimEditor: VimEditor = IjVimEditor(myFixture.editor)
     val mark = injector.markService.getMark(vimEditor.primaryCaret(), 'a')
@@ -42,7 +42,7 @@ class MarkTest : VimTestCase() {
       """    foo
     ba<caret>r
     baz
-"""
+""",
     )
     val vimEditor: VimEditor = IjVimEditor(myFixture.editor)
     val mark = injector.markService.getMark(vimEditor.primaryCaret(), 'G')
@@ -58,7 +58,7 @@ class MarkTest : VimTestCase() {
       """    foo
     ba<caret>r
     baz
-"""
+""",
     )
     val vimEditor: VimEditor = IjVimEditor(myFixture.editor)
     val mark = injector.markService.getMark(vimEditor.primaryCaret(), 'x')
@@ -74,7 +74,7 @@ class MarkTest : VimTestCase() {
      <caret>0
      bar
      
-      """.trimIndent()
+      """.trimIndent(),
     )
     val vimEditor: VimEditor = IjVimEditor(myFixture.editor)
     val mark = injector.markService.getMark(vimEditor.primaryCaret(), 'a')
@@ -88,7 +88,7 @@ class MarkTest : VimTestCase() {
       """    foo
     ba<caret>r
     baz
-"""
+""",
     )
     val vimEditor: VimEditor = IjVimEditor(myFixture.editor)
     val mark = injector.markService.getMark(vimEditor.primaryCaret(), 'a')
@@ -102,7 +102,7 @@ class MarkTest : VimTestCase() {
       """    foo
     bar
     ba<caret>z
-"""
+""",
     )
     val vimEditor: VimEditor = IjVimEditor(myFixture.editor)
     val mark = injector.markService.getMark(vimEditor.primaryCaret(), 'x')
@@ -118,7 +118,7 @@ class MarkTest : VimTestCase() {
       """    foo
     bar
     ba<caret>z
-"""
+""",
     )
     val vimEditor: VimEditor = IjVimEditor(myFixture.editor)
     val mark = injector.markService.getMark(vimEditor.primaryCaret(), 'x')
@@ -136,7 +136,7 @@ class MarkTest : VimTestCase() {
      ba<caret>r
      baz
      
-      """.trimIndent()
+      """.trimIndent(),
     )
     val vimEditor: VimEditor = IjVimEditor(myFixture.editor)
     val mark = injector.markService.getMark(vimEditor.primaryCaret(), 'Y')
@@ -157,7 +157,7 @@ class MarkTest : VimTestCase() {
       """    foo
     ba<caret>r
     baz
-"""
+""",
     )
     val vimEditor: VimEditor = IjVimEditor(myFixture.editor)
     val mark = injector.markService.getMark(vimEditor.primaryCaret(), 'Y')
@@ -178,7 +178,7 @@ class MarkTest : VimTestCase() {
       """    foo
     bar
     baz
-"""
+""",
     )
     assertOffset(6)
   }
@@ -190,7 +190,7 @@ class MarkTest : VimTestCase() {
       """    foo
     bar
     baz
-"""
+""",
     )
     assertOffset(4)
   }
@@ -203,13 +203,13 @@ class MarkTest : VimTestCase() {
     efgh
     ij<caret>kl
     mnop
-"""
+""",
     )
     assertState(
       """    abcd
     ekl
     mnop
-"""
+""",
     )
   }
 
@@ -221,12 +221,12 @@ class MarkTest : VimTestCase() {
     efgh
     ij<caret>kl
     mnop
-"""
+""",
     )
     assertState(
       """    abcd
     mnop
-"""
+""",
     )
   }
 
@@ -240,7 +240,7 @@ class MarkTest : VimTestCase() {
                 <caret>hello world
                 three four
                 
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertOffset(13)
   }
@@ -254,7 +254,7 @@ class MarkTest : VimTestCase() {
      <caret>three
      four five
      
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertOffset(14)
   }
@@ -275,7 +275,8 @@ class MarkTest : VimTestCase() {
                 four five
                 
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -298,8 +299,8 @@ class MarkTest : VimTestCase() {
     assertOffset(7)
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "This test freezes")
   // we change start mark, but actually the start and end has changed
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "This test freezes")
   fun testChangeSelectionStartMarkToBelowPosition() {
     configureByText("lala\nl<caret>alala\nlala\n")
     typeText(injector.parser.parseKeys("v3l<Esc>"))
@@ -427,7 +428,7 @@ class MarkTest : VimTestCase() {
     For example: homework, homework, homework, homework, homework, homework, homework, homework, homework.
     See, nothing.
     
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(injector.parser.parseKeys("Vj<Esc>"))
     typeText(injector.parser.parseKeys("`<"))
@@ -444,7 +445,7 @@ class MarkTest : VimTestCase() {
     For example: homework, homework, homework, homework, <caret>homework, homework, homework, homework, homework.
     See, nothing.
     
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(injector.parser.parseKeys("Vk<Esc>"))
     typeText(injector.parser.parseKeys("`<"))
@@ -461,7 +462,7 @@ class MarkTest : VimTestCase() {
     For example: homework, homework, homework, homework, <caret>homework, homework, homework, homework, homework.
     See, nothing.
     
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText("ma$")
     assertState(
@@ -471,7 +472,7 @@ class MarkTest : VimTestCase() {
     For example: homework, homework, homework, homework, homework, homework, homework, homework, homework<caret>.
     See, nothing.
     
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText("`a")
     assertState(
@@ -481,7 +482,7 @@ class MarkTest : VimTestCase() {
     For example: homework, homework, homework, homework, <caret>homework, homework, homework, homework, homework.
     See, nothing.
     
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -493,7 +494,7 @@ class MarkTest : VimTestCase() {
     For example: homework, homework, homework, homework, <caret>homework, homework, homework, homework, homework.
     See, nothing.
     
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText("vey\$p")
     assertState(
@@ -503,7 +504,7 @@ class MarkTest : VimTestCase() {
     For example: homework, homework, homework, homework, homework, homework, homework, homework, homework.homework
     See, nothing.
     
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText("gv")
     assertState(
@@ -513,7 +514,7 @@ class MarkTest : VimTestCase() {
     For example: homework, homework, homework, homework, <selection>homewor<caret>k</selection>, homework, homework, homework, homework.homework
     See, nothing.
     
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 }

@@ -14,8 +14,11 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 class MotionInnerWordActionTest : VimTestCase() {
   fun `test empty text`() {
     doTest(
-      "viw", "", "",
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER
+      "viw",
+      "",
+      "",
+      VimStateMachine.Mode.VISUAL,
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
     )
   }
 }

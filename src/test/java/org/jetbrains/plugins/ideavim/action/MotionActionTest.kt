@@ -33,7 +33,7 @@ class MotionActionTest : VimTestCase() {
       fileContents,
       "one ${s}two${se}\n",
       VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_CHARACTER
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
     )
   }
 
@@ -211,7 +211,7 @@ class MotionActionTest : VimTestCase() {
       """foo {
     ${c}bar
 }
-"""
+""",
     )
     assertState(
       """
@@ -219,7 +219,7 @@ class MotionActionTest : VimTestCase() {
     
     }
     
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertOffset(6)
   }
@@ -624,7 +624,7 @@ class MotionActionTest : VimTestCase() {
      foo(bar, foo(bar, ${c}baz
      bar(foo)
      
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertOffset(12)
   }
@@ -636,7 +636,7 @@ class MotionActionTest : VimTestCase() {
       """foo {
     bar,
     b${c}az
-"""
+""",
     )
     assertOffset(4)
   }
@@ -647,7 +647,7 @@ class MotionActionTest : VimTestCase() {
       injector.parser.parseKeys("])"),
       """foo(bar, ${c}baz,
    quux)
-"""
+""",
     )
     assertOffset(21)
   }
@@ -787,7 +787,7 @@ class MotionActionTest : VimTestCase() {
      
      two
      
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertOffset(4)
   }
@@ -799,7 +799,7 @@ class MotionActionTest : VimTestCase() {
       """${c}one
  
 two
-"""
+""",
     )
     assertOffset(6)
   }
@@ -830,7 +830,7 @@ two
      ${c}one
      
      
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertOffset(4)
   }
@@ -846,7 +846,7 @@ two
      two
      three
      
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertOffset(4)
   }
@@ -936,7 +936,7 @@ two
                 
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -959,7 +959,7 @@ two
                 
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -992,7 +992,7 @@ two
      bar
      baz
      
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertSelection(
       """
@@ -1000,7 +1000,7 @@ two
     bar
     baz
     
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(injector.parser.parseKeys(">"))
     assertMode(VimStateMachine.Mode.COMMAND)
@@ -1008,14 +1008,14 @@ two
       """    foo
     bar
     baz
-"""
+""",
     )
     typeText(injector.parser.parseKeys("gv"))
     assertSelection(
       """    foo
     bar
     baz
-"""
+""",
     )
     typeText(injector.parser.parseKeys(">"))
     assertMode(VimStateMachine.Mode.COMMAND)
@@ -1023,14 +1023,14 @@ two
       """        foo
         bar
         baz
-"""
+""",
     )
     typeText(injector.parser.parseKeys("gv"))
     assertSelection(
       """        foo
         bar
         baz
-"""
+""",
     )
   }
 
@@ -1059,7 +1059,7 @@ two
      baz
      quux
      
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.VISUAL)
     assertSelection(
@@ -1067,7 +1067,7 @@ two
     bar
     baz
     
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertOffset(8)
   }
@@ -1082,7 +1082,7 @@ two
      ${c}baz
      quux
      
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.VISUAL)
     assertSelection(
@@ -1090,7 +1090,7 @@ two
     bar
     baz
     
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertOffset(4)
   }

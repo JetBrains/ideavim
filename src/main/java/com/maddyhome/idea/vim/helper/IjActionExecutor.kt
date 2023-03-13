@@ -67,8 +67,12 @@ internal class IjActionExecutor : VimActionExecutor {
     val ijAction = (action as IjNativeAction).action
     val dataContext = VimDataContext(context.ij)
     val event = AnActionEvent(
-      null, dataContext, ActionPlaces.KEYBOARD_SHORTCUT, ijAction.templatePresentation.clone(),
-      ActionManager.getInstance(), 0
+      null,
+      dataContext,
+      ActionPlaces.KEYBOARD_SHORTCUT,
+      ijAction.templatePresentation.clone(),
+      ActionManager.getInstance(),
+      0,
     )
     // beforeActionPerformedUpdate should be called to update the action. It fixes some rider-specific problems.
     //   because rider use async update method. See VIM-1819.
@@ -166,8 +170,10 @@ internal class IjActionExecutor : VimActionExecutor {
       .executeCommand(
         editor.ij.project,
         { cmd.execute(editor, injector.executionContextManager.onEditor(editor, context), operatorArguments) },
-        cmd.id, DocCommandGroupId.noneGroupId(editor.ij.document), UndoConfirmationPolicy.DEFAULT,
-        editor.ij.document
+        cmd.id,
+        DocCommandGroupId.noneGroupId(editor.ij.document),
+        UndoConfirmationPolicy.DEFAULT,
+        editor.ij.document,
       )
   }
 

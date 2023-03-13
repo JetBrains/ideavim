@@ -28,7 +28,7 @@ class VisualBlockInsertActionTest : VimTestCase() {
  */
 foo
 bar
-"""
+""",
     )
 
     myFixture.editor.foldingModel.runBatchFoldingOperation {
@@ -43,7 +43,7 @@ bar
  */
 ${c}Xfoo
 Xbar
-"""
+""",
     )
   }
 
@@ -63,7 +63,7 @@ Xbar
 
                     ba_quux_r
 
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -85,7 +85,7 @@ Xbar
                     quux spam eggs
 
         """.trimIndent()
-        )
+        ),
     )
   }
 
@@ -122,7 +122,7 @@ Xbar
                     ba_quux_r
 
         """.trimIndent()
-        )
+        ),
     )
   }
 
@@ -192,7 +192,7 @@ Xbar
       before.trimIndent(),
       before.trimIndent(),
       VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 }

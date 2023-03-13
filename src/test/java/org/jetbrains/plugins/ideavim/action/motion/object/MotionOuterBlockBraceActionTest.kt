@@ -15,7 +15,7 @@ class MotionOuterBlockBraceActionTest : VimTestCase() {
   fun testOutside() {
     typeTextInFile(
       injector.parser.parseKeys("di}"),
-      "${c}foo{bar}\n"
+      "${c}foo{bar}\n",
     )
     assertState("foo{}\n")
   }
@@ -23,7 +23,7 @@ class MotionOuterBlockBraceActionTest : VimTestCase() {
   fun testOutsideInString() {
     typeTextInFile(
       injector.parser.parseKeys("di}"),
-      "\"1${c}23\"foo{bar}\n"
+      "\"1${c}23\"foo{bar}\n",
     )
     assertState("\"123\"foo{}\n")
   }
@@ -31,7 +31,7 @@ class MotionOuterBlockBraceActionTest : VimTestCase() {
   fun testOutsideInString2() {
     typeTextInFile(
       injector.parser.parseKeys("di}"),
-      "\"1${c}23{dsa}d\"foo{bar}\n"
+      "\"1${c}23{dsa}d\"foo{bar}\n",
     )
     assertState("\"123{}d\"foo{bar}\n")
   }

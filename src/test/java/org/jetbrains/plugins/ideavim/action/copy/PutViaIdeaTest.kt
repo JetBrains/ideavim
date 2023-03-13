@@ -88,7 +88,7 @@ class PutViaIdeaTest : VimTestCase() {
       vimEditor.primaryCaret(),
       before rangeOf "\nI found it in a legendary land\n",
       SelectionType.CHARACTER_WISE,
-      false
+      false,
     )
 
     typeText("p")

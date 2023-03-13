@@ -26,7 +26,7 @@ class ChangeNumberDecActionTest : VimTestCase() {
       "00000",
       "01777777777777777777777",
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -40,7 +40,7 @@ class ChangeNumberDecActionTest : VimTestCase() {
       "00005",
       "01777777777777777777773",
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 }

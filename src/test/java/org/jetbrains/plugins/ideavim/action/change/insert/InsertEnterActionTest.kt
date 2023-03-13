@@ -18,12 +18,14 @@ class InsertEnterActionTest : VimTestCase() {
     val before = """I found it in a legendary land
         |${c}all rocks and lavender and tufted grass,
         |where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.""".trimMargin()
+        |hard by the torrent of a mountain pass.
+    """.trimMargin()
     val after = """I found it in a legendary land
         |
         |${c}all rocks and lavender and tufted grass,
         |where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.""".trimMargin()
+        |hard by the torrent of a mountain pass.
+    """.trimMargin()
     doTest(listOf("i", "<Enter>"), before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 
@@ -32,12 +34,14 @@ class InsertEnterActionTest : VimTestCase() {
     val before = """I found it in a legendary land
         |${c}all rocks and lavender and tufted grass,
         |where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.""".trimMargin()
+        |hard by the torrent of a mountain pass.
+    """.trimMargin()
     val after = """I found it in a legendary land
         |
         |${c}all rocks and lavender and tufted grass,
         |where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.""".trimMargin()
+        |hard by the torrent of a mountain pass.
+    """.trimMargin()
     doTest(listOf("i", "<C-M>"), before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 

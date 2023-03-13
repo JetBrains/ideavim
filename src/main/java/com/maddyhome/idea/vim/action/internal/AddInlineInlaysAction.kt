@@ -46,7 +46,7 @@ internal class AddInlineInlaysAction : AnAction() {
       inlayModel.addInlineElement(
         offset,
         relatesToPrecedingText,
-        HintRenderer(if (relatesToPrecedingText) ":$text" else "$text:")
+        HintRenderer(if (relatesToPrecedingText) ":$text" else "$text:"),
       )
       // Every 20 chars +/- 5 chars
       i += 20 + (random.nextInt(10) - 5)

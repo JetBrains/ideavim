@@ -229,8 +229,12 @@ internal class DeletePreviousWordAction : TextAction(DefaultEditorKit.deletePrev
     val doc = target.document
     val caret = target.caret
     val offset = VimSearchHelperBase.Companion.findNextWord(
-      target.actualText, caret.dot.toLong(), target.actualText.length.toLong(),
-      -1, false, false
+      target.actualText,
+      caret.dot.toLong(),
+      target.actualText.length.toLong(),
+      -1,
+      false,
+      false,
     )
     if (logger.isDebugEnabled) logger.debug("offset=$offset")
     try {

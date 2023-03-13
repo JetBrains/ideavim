@@ -114,8 +114,9 @@ internal class AddBlockInlaysAction : AnAction() {
       private fun getCurrentContext(editor: Editor): FontRenderContext {
         val editorContext = FontInfo.getFontRenderContext(editor.contentComponent)
         return FontRenderContext(
-          editorContext.transform, AntialiasingType.getKeyForCurrentScope(false),
-          if (editor is EditorImpl) UISettings.editorFractionalMetricsHint else RenderingHints.VALUE_FRACTIONALMETRICS_OFF
+          editorContext.transform,
+          AntialiasingType.getKeyForCurrentScope(false),
+          if (editor is EditorImpl) UISettings.editorFractionalMetricsHint else RenderingHints.VALUE_FRACTIONALMETRICS_OFF,
         )
       }
 

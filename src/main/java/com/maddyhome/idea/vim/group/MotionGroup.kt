@@ -108,7 +108,7 @@ internal class MotionGroup : VimMotionGroupBase() {
     editor: VimEditor,
     caret: ImmutableVimCaret,
     count: Int,
-    normalizeToScreen: Boolean
+    normalizeToScreen: Boolean,
   ): Int {
     return moveCaretToScreenLocation(editor.ij, caret.ij, ScreenLocation.TOP, count - 1, normalizeToScreen)
   }
@@ -117,7 +117,7 @@ internal class MotionGroup : VimMotionGroupBase() {
     editor: VimEditor,
     caret: ImmutableVimCaret,
     count: Int,
-    normalizeToScreen: Boolean
+    normalizeToScreen: Boolean,
   ): Int {
     return moveCaretToScreenLocation(editor.ij, caret.ij, ScreenLocation.BOTTOM, count - 1, normalizeToScreen)
   }
@@ -212,7 +212,7 @@ internal class MotionGroup : VimMotionGroupBase() {
 
   override fun moveCaretToCurrentDisplayLineStartSkipLeading(
     editor: VimEditor,
-    caret: ImmutableVimCaret
+    caret: ImmutableVimCaret,
   ): @Range(from = 0, to = Int.MAX_VALUE.toLong()) Int {
     val col = EditorHelper.getVisualColumnAtLeftOfDisplay(editor.ij, caret.getVisualPosition().line)
     val bufferLine = caret.getLine().line
@@ -222,7 +222,7 @@ internal class MotionGroup : VimMotionGroupBase() {
   override fun moveCaretToCurrentDisplayLineEnd(
     editor: VimEditor,
     caret: ImmutableVimCaret,
-    allowEnd: Boolean
+    allowEnd: Boolean,
   ): Motion {
     val col = EditorHelper.getVisualColumnAtRightOfDisplay(editor.ij, caret.getVisualPosition().line)
     return moveCaretToColumn(editor, caret, col, allowEnd)
@@ -231,7 +231,7 @@ internal class MotionGroup : VimMotionGroupBase() {
   override fun moveCaretToLineWithSameColumn(
     editor: VimEditor,
     line: Int,
-    caret: ImmutableVimCaret
+    caret: ImmutableVimCaret,
   ): @Range(from = 0, to = Int.MAX_VALUE.toLong()) Int {
     var c = caret.vimLastColumn
     var l = line
@@ -249,7 +249,7 @@ internal class MotionGroup : VimMotionGroupBase() {
   override fun moveCaretToLineWithStartOfLineOption(
     editor: VimEditor,
     line: Int,
-    caret: ImmutableVimCaret
+    caret: ImmutableVimCaret,
   ): @Range(from = 0, to = Int.MAX_VALUE.toLong()) Int {
     return if (injector.options(editor).isSet(OptionConstants.startofline)) {
       moveCaretToLineStartSkipLeading(editor, line)
@@ -292,12 +292,12 @@ internal class MotionGroup : VimMotionGroupBase() {
   override fun moveCaretToLinePercent(
     editor: VimEditor,
     caret: ImmutableVimCaret,
-    count: Int
+    count: Int,
   ): @Range(from = 0, to = Int.MAX_VALUE.toLong()) Int {
     return moveCaretToLineWithStartOfLineOption(
       editor,
       editor.normalizeLine((editor.lineCount() * clamp(count, 0, 100) + 99) / 100 - 1),
-      caret
+      caret,
     )
   }
 
@@ -315,7 +315,7 @@ internal class MotionGroup : VimMotionGroupBase() {
     caret: Caret,
     screenLocation: ScreenLocation,
     visualLineOffset: Int,
-    normalizeToScreen: Boolean
+    normalizeToScreen: Boolean,
   ): @Range(from = 0, to = Int.MAX_VALUE.toLong()) Int {
     val vimEditor = editor.vim
     val scrollOffset = if (normalizeToScreen) getNormalizedScrollOffset(editor) else 0
@@ -342,7 +342,7 @@ internal class MotionGroup : VimMotionGroupBase() {
       caret: Caret,
       context: DataContext?,
       argument: Argument,
-      operatorArguments: OperatorArguments
+      operatorArguments: OperatorArguments,
     ): TextRange? {
       var start: Int
       var end: Int
@@ -368,7 +368,7 @@ internal class MotionGroup : VimMotionGroupBase() {
             caret.vim,
             IjEditorExecutionContext(context!!),
             cmd.argument,
-            operatorArguments.withCount0(raw)
+            operatorArguments.withCount0(raw),
           )
 
           // Invalid motion
@@ -393,7 +393,7 @@ internal class MotionGroup : VimMotionGroupBase() {
           if (cmd.isLinewiseMotion()) end--
         } else {
           throw RuntimeException(
-            "Commands doesn't take " + cmd.action.javaClass.simpleName + " as an operator"
+            "Commands doesn't take " + cmd.action.javaClass.simpleName + " as an operator",
           )
         }
       }

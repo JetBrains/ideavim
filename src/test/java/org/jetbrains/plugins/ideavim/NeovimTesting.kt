@@ -56,7 +56,7 @@ internal object NeovimTesting {
       "--headless",
       "--clean",
       "--cmd", "set noswapfile",
-      "--cmd", "set sol"
+      "--cmd", "set sol",
     )
 
     neovim = pb.start()

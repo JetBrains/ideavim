@@ -48,7 +48,8 @@ class CommandParserTest : VimTestCase() {
     val before = "I ${c}found it in a legendary land"
     val after = if (enableOctopus) {
       """I :>>
-        |${c}found it in a legendary land""".trimMargin()
+        |${c}found it in a legendary land
+      """.trimMargin()
     } else {
       "I :>>${c}found it in a legendary land"
     }
@@ -83,12 +84,12 @@ class CommandParserTest : VimTestCase() {
       """
      let s:patBR = substitute(match_words.',',
       \ s:notslash.'\zs[,:]*,[,:]*', ',', 'g') 
-      """.trimIndent()
+      """.trimIndent(),
     )
     val script2 = VimscriptParser.parse(
       """
      let s:patBR = substitute(match_words.',',s:notslash.'\zs[,:]*,[,:]*', ',', 'g')
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertEquals(1, script1.units.size)
     assertTrue(script1.units[0] is LetCommand)
@@ -100,12 +101,12 @@ class CommandParserTest : VimTestCase() {
       """
      let s:patBR = substitute(match_words.',',
       ${"\t"}\ s:notslash.'\zs[,:]*,[,:]*', ',', 'g') 
-      """.trimIndent()
+      """.trimIndent(),
     )
     val script2 = VimscriptParser.parse(
       """
      let s:patBR = substitute(match_words.',',s:notslash.'\zs[,:]*,[,:]*', ',', 'g')
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertEquals(1, script1.units.size)
     assertTrue(script1.units[0] is LetCommand)
@@ -118,7 +119,7 @@ class CommandParserTest : VimTestCase() {
       """
       let dict = {'one': 1,
       \ 'two': 2}
-      """.trimIndent()
+      """.trimIndent(),
     )
     val script2 = VimscriptParser.parse("let dict = {'one': 1, 'two': 2}")
     assertEquals(1, script1.units.size)
@@ -134,7 +135,7 @@ class CommandParserTest : VimTestCase() {
         let x = 3
         echo ^523
         echo 6
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertTrue(IdeavimErrorListener.testLogger.any { it.startsWith("line 3:5") })
   }
@@ -147,7 +148,7 @@ class CommandParserTest : VimTestCase() {
         echo 6
         *(
         let x = 5
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertTrue(IdeavimErrorListener.testLogger.any { it.startsWith("line 1:14") })
     assertTrue(IdeavimErrorListener.testLogger.any { it.startsWith("line 4:0") })
@@ -214,7 +215,7 @@ class CommandParserTest : VimTestCase() {
           }
         }
         EOF
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertTrue(IdeavimErrorListener.testLogger.isEmpty())
   }
@@ -280,7 +281,7 @@ class CommandParserTest : VimTestCase() {
           }
         }
         END
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertTrue(IdeavimErrorListener.testLogger.isEmpty())
   }
@@ -292,7 +293,7 @@ class CommandParserTest : VimTestCase() {
         let g:auto_save = 2
         echo (*
         let g:y = 10
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertTrue(IdeavimErrorListener.testLogger.any { it.startsWith("line 2:") })
     assertEquals(2, script.units.size)
@@ -314,7 +315,11 @@ class CommandParserTest : VimTestCase() {
         nnoremap Y y${'$'}
 
       """.trimIndent().replace("\n", "\r\n"),
-      myFixture.editor.vim, DataContext.EMPTY_CONTEXT.vim, skipHistory = true, indicateErrors = true, CommandLineVimLContext
+      myFixture.editor.vim,
+      DataContext.EMPTY_CONTEXT.vim,
+      skipHistory = true,
+      indicateErrors = true,
+      CommandLineVimLContext,
     )
     typeText(injector.parser.parseKeys("Yp"))
     assertState("----------\n1234556789${c}067890\n----------\n")
@@ -326,7 +331,7 @@ class CommandParserTest : VimTestCase() {
     val script = VimscriptParser.parse(
       """
         " comment | let x = 10 | echo x
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertEquals(0, script.units.size)
     assertTrue(IdeavimErrorListener.testLogger.isEmpty())
@@ -340,7 +345,7 @@ class CommandParserTest : VimTestCase() {
         \ if line("'\"") > 0 && line ("'\"") <= line("$") |
         \   exe "normal! g'\"" |
         \ endif
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertEquals(0, script.units.size)
     assertTrue(IdeavimErrorListener.testLogger.isEmpty())
@@ -348,7 +353,7 @@ class CommandParserTest : VimTestCase() {
     script = VimscriptParser.parse(
       """
         autocmd BufReadPost * echo "oh, hi Mark"
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertEquals(0, script.units.size)
     assertTrue(IdeavimErrorListener.testLogger.isEmpty())
@@ -359,7 +364,7 @@ class CommandParserTest : VimTestCase() {
     val script = VimscriptParser.parse(
       """
         let x[a, b; c] = something()
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertTrue(IdeavimErrorListener.testLogger.isEmpty())
     assertEquals(1, script.units.size)
@@ -389,7 +394,7 @@ class CommandParserTest : VimTestCase() {
         *(-78fa=09*&
         dfas;dlkfj afjldkfja s;d
         "ideaVim ignore end
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertEquals(3, script.units.size)
     assertTrue(script.units[0] is EchoCommand)
@@ -409,8 +414,8 @@ class CommandParserTest : VimTestCase() {
         let x = 3 |
         finish |
         let x = 10
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     typeText(commandToKeys("echo x"))
     assertExOutput("3\n")
@@ -425,8 +430,8 @@ class CommandParserTest : VimTestCase() {
            set unknowOption |
            let x = 42 |
           endif
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     typeText(commandToKeys("echo x"))
     assertExOutput("42\n")

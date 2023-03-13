@@ -34,7 +34,7 @@ class SelectEnableLineModeActionHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_LINE
+      VimStateMachine.SubMode.VISUAL_LINE,
     )
   }
 
@@ -58,7 +58,7 @@ class SelectEnableLineModeActionHandlerTest : VimTestCase() {
                 ${s}hard by the torrent of a mountain pass$c.$se
       """.trimIndent(),
       VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_LINE
+      VimStateMachine.SubMode.VISUAL_LINE,
     )
   }
 
@@ -82,7 +82,7 @@ class SelectEnableLineModeActionHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_LINE
+      VimStateMachine.SubMode.VISUAL_LINE,
     )
   }
 
@@ -107,7 +107,7 @@ class SelectEnableLineModeActionHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_LINE
+      VimStateMachine.SubMode.VISUAL_LINE,
     )
   }
 }

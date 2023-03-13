@@ -40,7 +40,7 @@ class SearchWholeWordForwardActionTest : VimTestCase() {
           all rocks and lavender and tufted grass,
           where it was settled on some sodden sand
           hard by the torrent of a mountain pass$c.
-        """
+        """,
   )
   fun `test last dot`() {
     doTest(
@@ -57,7 +57,8 @@ class SearchWholeWordForwardActionTest : VimTestCase() {
           where it was settled on some sodden sand
           hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -76,7 +77,8 @@ class SearchWholeWordForwardActionTest : VimTestCase() {
           where it was settled on some sodden sand
           hard by the torrent of a mountain pass
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 }

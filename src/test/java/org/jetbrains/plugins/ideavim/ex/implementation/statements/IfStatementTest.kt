@@ -19,8 +19,8 @@ class IfStatementTest : VimTestCase() {
         "" +
           "if 1 |" +
           " echo 'success' |" +
-          "endif"
-      )
+          "endif",
+      ),
     )
     assertExOutput("success\n")
   }
@@ -32,8 +32,8 @@ class IfStatementTest : VimTestCase() {
         "" +
           "if 0 |" +
           " echo 'success' |" +
-          "endif"
-      )
+          "endif",
+      ),
     )
     assertNoExOutput()
   }
@@ -47,8 +47,8 @@ class IfStatementTest : VimTestCase() {
           " echo 'success' |" +
           "else |" +
           " echo 'failure' |" +
-          "endif"
-      )
+          "endif",
+      ),
     )
     assertExOutput("success\n")
   }
@@ -62,8 +62,8 @@ class IfStatementTest : VimTestCase() {
           " echo 'failure' |" +
           "else |" +
           " echo 'success' |" +
-          "endif"
-      )
+          "endif",
+      ),
     )
     assertExOutput("success\n")
   }
@@ -79,8 +79,8 @@ class IfStatementTest : VimTestCase() {
           " echo 'failure' |" +
           "else |" +
           " echo 'failure' |" +
-          "endif"
-      )
+          "endif",
+      ),
     )
     assertExOutput("success\n")
   }
@@ -96,8 +96,8 @@ class IfStatementTest : VimTestCase() {
           " echo 'success' |" +
           "else |" +
           " echo 'failure' |" +
-          "endif"
-      )
+          "endif",
+      ),
     )
     assertExOutput("success\n")
   }
@@ -115,8 +115,8 @@ class IfStatementTest : VimTestCase() {
           " echo 'success' |" +
           "else |" +
           " echo 'failure' |" +
-          "endif"
-      )
+          "endif",
+      ),
     )
     assertExOutput("success\n")
   }

@@ -116,7 +116,7 @@ class DeleteVisualActionTest : VimTestCase() {
             all rocks ${c}and lavender and tufted grass,
             where it was settled on some sodden sand
             ${se}hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
     IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
     waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
@@ -126,7 +126,7 @@ class DeleteVisualActionTest : VimTestCase() {
             A Discovery
 
             hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState(VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }

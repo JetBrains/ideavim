@@ -40,7 +40,7 @@ class RegistersCommandTest : VimTestCase() {
       |  c  "a   Content for register a
       |  c  "b   Content for register b
       |  c  "c   Content for register c
-    """.trimMargin()
+      """.trimMargin(),
     )
   }
 
@@ -62,7 +62,7 @@ class RegistersCommandTest : VimTestCase() {
       |  c  "o   Content for register o
       |  c  "r   Content for register r
       |  c  "w   Content for register w
-    """.trimMargin()
+      """.trimMargin(),
     )
   }
 
@@ -91,7 +91,7 @@ class RegistersCommandTest : VimTestCase() {
     assertExOutput(
       """Type Name Content
                      |  c  "a   ${(indent + text).take(200)}
-      """.trimMargin()
+      """.trimMargin(),
     )
   }
 
@@ -104,7 +104,7 @@ class RegistersCommandTest : VimTestCase() {
     assertExOutput(
       """Type Name Content
                      |  c  "a   ^IHello World^J^[
-      """.trimMargin()
+      """.trimMargin(),
     )
   }
 
@@ -122,7 +122,7 @@ class RegistersCommandTest : VimTestCase() {
       |  c  "a   Content for register a
       |  c  "b   Content for register b
       |  c  "c   Content for register c
-    """.trimMargin()
+      """.trimMargin(),
     )
   }
 
@@ -140,7 +140,7 @@ class RegistersCommandTest : VimTestCase() {
       |line 9
       |last yank register
       |small delete register
-    """.trimMargin()
+      """.trimMargin(),
     )
 
     // Populate unnamed "" and numbered "1-9 registers - linewise
@@ -218,7 +218,7 @@ class RegistersCommandTest : VimTestCase() {
       |  c  "+   clipboard content
       |  c  ":   ascii
       |  c  "/   search pattern
-    """.trimMargin()
+      """.trimMargin(),
     )
   }
 }

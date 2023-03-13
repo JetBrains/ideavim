@@ -28,23 +28,28 @@ class TryCatchTests {
   companion object {
     @JvmStatic
     val spaces = listOf("", " ")
-      @DataPoints("spaces") get
+      @DataPoints("spaces")
+      get
 
     @JvmStatic
     val tryNames = listOf("try")
-      @DataPoints("try") get
+      @DataPoints("try")
+      get
 
     @JvmStatic
     val catchNames = listOf("cat", "catc", "catch")
-      @DataPoints("catch") get
+      @DataPoints("catch")
+      get
 
     @JvmStatic
     val finallyNames = listOf("fina", "final", "finall", "finally")
-      @DataPoints("finally") get
+      @DataPoints("finally")
+      get
 
     @JvmStatic
     val endtryNames = listOf("endt", "endtr", "endtry")
-      @DataPoints("endtry") get
+      @DataPoints("endtry")
+      get
   }
 
   @Theory
@@ -56,7 +61,7 @@ class TryCatchTests {
     @FromDataPoints("spaces") sp1: String,
     @FromDataPoints("spaces") sp2: String,
     @FromDataPoints("spaces") sp3: String,
-    @FromDataPoints("spaces") sp4: String
+    @FromDataPoints("spaces") sp4: String,
   ) {
     val script = VimscriptParser.parse(
       """
@@ -67,7 +72,7 @@ class TryCatchTests {
         $finallyAlias$sp3
           echo 'finalizing'
         $endtryAlias$sp4
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertEquals(1, script.units.size)
     assertTrue(script.units[0] is TryStatement)
@@ -86,7 +91,7 @@ class TryCatchTests {
         try
           throw 'something'
         endtry
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertEquals(1, script.units.size)
     assertTrue(script.units[0] is TryStatement)
@@ -106,7 +111,7 @@ class TryCatchTests {
         catch /some/
           echo 'caught'
         endtry
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertEquals(1, script.units.size)
     assertTrue(script.units[0] is TryStatement)
@@ -128,7 +133,7 @@ class TryCatchTests {
         catch
           echo 'caught'
         endtry
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertEquals(1, script.units.size)
     assertTrue(script.units[0] is TryStatement)
@@ -150,7 +155,7 @@ class TryCatchTests {
         finally
           echo 'caught'
         endtry
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertEquals(1, script.units.size)
     assertTrue(script.units[0] is TryStatement)
@@ -178,7 +183,7 @@ class TryCatchTests {
           echo 'caught3'
           echo 'caught3'
         endtry
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertEquals(1, script.units.size)
     assertTrue(script.units[0] is TryStatement)
@@ -201,7 +206,7 @@ class TryCatchTests {
       """
         try
         endtry
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertEquals(1, script.units.size)
     assertTrue(script.units[0] is TryStatement)
@@ -219,7 +224,7 @@ class TryCatchTests {
           throw 'something'
         catch
         endtry
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertEquals(1, script.units.size)
     assertTrue(script.units[0] is TryStatement)
@@ -240,7 +245,7 @@ class TryCatchTests {
           throw 'something'
         finally
         endtry
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertEquals(1, script.units.size)
     assertTrue(script.units[0] is TryStatement)

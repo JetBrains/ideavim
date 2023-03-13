@@ -38,7 +38,7 @@ class ForLoopTests {
         for key in keys(mydict)$sp1
             echo key . ':' . mydict(key)$sp2
         endfor$sp3
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertEquals(1, script.units.size)
     assertTrue(script.units[0] is ForLoop)
@@ -55,7 +55,7 @@ class ForLoopTests {
       """
         for g:key in [1, 2, 3]$sp1
         endfor$sp2
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertEquals(1, script.units.size)
     assertTrue(script.units[0] is ForLoop)
@@ -72,7 +72,7 @@ class ForLoopTests {
       """
         for [key, value] in listOfLists$sp1
         endfor$sp2
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertEquals(1, script.units.size)
     assertEquals(listOf("key", "value"), (script.units[0] as ForLoopWithList).variables)

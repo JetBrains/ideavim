@@ -38,7 +38,7 @@ class MatchitGeneralTest : VimTestCase() {
          *
          *$c/
       """.trimIndent(),
-      fileType = JavaFileType.INSTANCE
+      fileType = JavaFileType.INSTANCE,
     )
   }
 
@@ -55,7 +55,7 @@ class MatchitGeneralTest : VimTestCase() {
          *
          */
       """.trimIndent(),
-      fileType = JavaFileType.INSTANCE
+      fileType = JavaFileType.INSTANCE,
     )
   }
 
@@ -74,7 +74,7 @@ class MatchitGeneralTest : VimTestCase() {
         int c;
         int d;
       """.trimIndent(),
-      fileType = HtmlFileType.INSTANCE
+      fileType = HtmlFileType.INSTANCE,
     )
   }
 
@@ -83,7 +83,9 @@ class MatchitGeneralTest : VimTestCase() {
       "v$%",
       """foo(${c}bar)""",
       """foo${s}$c(b${se}ar)""",
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.VISUAL,
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
+      HtmlFileType.INSTANCE,
     )
   }
 
@@ -92,49 +94,73 @@ class MatchitGeneralTest : VimTestCase() {
       "v$%%",
       """foo(${c}bar)""",
       """foo(${s}bar$c)$se""",
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.VISUAL,
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
+      HtmlFileType.INSTANCE,
     )
   }
 
   fun `test delete everything from opening parenthesis to closing parenthesis`() {
     doTest(
       "d%",
-      "$c(x == 123)", "", fileType = HtmlFileType.INSTANCE
+      "$c(x == 123)",
+      "",
+      fileType = HtmlFileType.INSTANCE,
     )
   }
 
   fun `test delete everything from closing parenthesis to opening parenthesis`() {
     doTest(
       "d%",
-      "(x == 123$c)", "", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      "(x == 123$c)",
+      "",
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
+      HtmlFileType.INSTANCE,
     )
   }
 
   fun `test delete everything from opening curly brace to closing curly brace`() {
     doTest(
       "d%",
-      "$c{ foo: 123 }", "", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      "$c{ foo: 123 }",
+      "",
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
+      HtmlFileType.INSTANCE,
     )
   }
 
   fun `test delete everything from closing curly brace to opening curly brace`() {
     doTest(
       "d%",
-      "{ foo: 123 $c}", "", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      "{ foo: 123 $c}",
+      "",
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
+      HtmlFileType.INSTANCE,
     )
   }
 
   fun `test delete everything from opening square bracket to closing square bracket`() {
     doTest(
       "d%",
-      "$c[1, 2, 3]", "", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      "$c[1, 2, 3]",
+      "",
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
+      HtmlFileType.INSTANCE,
     )
   }
 
   fun `test delete everything from closing square bracket to opening square bracket`() {
     doTest(
       "d%",
-      "[1, 2, 3$c]", "", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE, HtmlFileType.INSTANCE
+      "[1, 2, 3$c]",
+      "",
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
+      HtmlFileType.INSTANCE,
     )
   }
 
@@ -146,7 +172,9 @@ class MatchitGeneralTest : VimTestCase() {
       "v$%",
       """</h${c}tml>""",
       """${s}$c</ht${se}ml>""",
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER, HtmlFileType.INSTANCE
+      VimStateMachine.Mode.VISUAL,
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
+      HtmlFileType.INSTANCE,
     )
   }
 
@@ -163,7 +191,9 @@ class MatchitGeneralTest : VimTestCase() {
           puts n
         en${se}d
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER, fileName = "ruby.rb"
+      VimStateMachine.Mode.VISUAL,
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
+      fileName = "ruby.rb",
     )
   }
 
@@ -175,7 +205,7 @@ class MatchitGeneralTest : VimTestCase() {
           puts "Positive"
         end
   """,
-    description = "Our code changes the motion type to linewise, but it should not"
+    description = "Our code changes the motion type to linewise, but it should not",
   )
   fun `test delete from elseif to else`() {
     doTest(
@@ -196,7 +226,7 @@ class MatchitGeneralTest : VimTestCase() {
                 puts "Positive"
               end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -219,7 +249,7 @@ class MatchitGeneralTest : VimTestCase() {
           puts "Positive"
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -242,7 +272,7 @@ class MatchitGeneralTest : VimTestCase() {
           puts "Positive"
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -255,7 +285,7 @@ class MatchitGeneralTest : VimTestCase() {
         </div>
       """.trimIndent(),
       "$c<",
-      fileType = HtmlFileType.INSTANCE
+      fileType = HtmlFileType.INSTANCE,
     )
   }
 
@@ -266,7 +296,7 @@ class MatchitGeneralTest : VimTestCase() {
         $c<div></div>
       """.trimIndent(),
       "$c</div>",
-      fileType = HtmlFileType.INSTANCE
+      fileType = HtmlFileType.INSTANCE,
     )
   }
 
@@ -279,7 +309,7 @@ class MatchitGeneralTest : VimTestCase() {
         end
       """.trimIndent(),
       "",
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -292,7 +322,7 @@ class MatchitGeneralTest : VimTestCase() {
         end
       """.trimIndent(),
       "",
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -305,7 +335,7 @@ class MatchitGeneralTest : VimTestCase() {
         en${c}d
       """.trimIndent(),
       "",
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -318,7 +348,7 @@ class MatchitGeneralTest : VimTestCase() {
         en${c}d
       """.trimIndent(),
       "",
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 }

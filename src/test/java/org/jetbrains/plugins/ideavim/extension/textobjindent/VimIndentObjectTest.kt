@@ -29,7 +29,7 @@ class VimIndentObjectTest : VimTestCase() {
       """
         one
       """.trimIndent(),
-      ""
+      "",
     )
   }
 
@@ -42,7 +42,7 @@ class VimIndentObjectTest : VimTestCase() {
         three
         four
       """.trimIndent(),
-      ""
+      "",
     )
   }
 
@@ -55,7 +55,7 @@ class VimIndentObjectTest : VimTestCase() {
         three
         four
       """.trimIndent(),
-      ""
+      "",
     )
   }
 
@@ -71,7 +71,7 @@ class VimIndentObjectTest : VimTestCase() {
       """
         one
         four
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -86,7 +86,7 @@ class VimIndentObjectTest : VimTestCase() {
       """.trimIndent(),
       """
         four
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -99,7 +99,7 @@ class VimIndentObjectTest : VimTestCase() {
           three
         four
       """.trimIndent(),
-      ""
+      "",
     )
   }
 
@@ -121,7 +121,7 @@ class VimIndentObjectTest : VimTestCase() {
         go hear
         one
         four
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -145,7 +145,7 @@ class VimIndentObjectTest : VimTestCase() {
 
         one
         four
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -161,7 +161,7 @@ class VimIndentObjectTest : VimTestCase() {
       """
         one
         four
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -177,7 +177,7 @@ class VimIndentObjectTest : VimTestCase() {
       """
         one
         four
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -194,7 +194,7 @@ class VimIndentObjectTest : VimTestCase() {
         one
           two
         four
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -213,7 +213,7 @@ class VimIndentObjectTest : VimTestCase() {
           two
         four
         five
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
     assertSelection(null)
@@ -234,7 +234,7 @@ class VimIndentObjectTest : VimTestCase() {
           two
         four
 
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 }

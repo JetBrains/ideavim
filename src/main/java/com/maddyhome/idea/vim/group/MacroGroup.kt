@@ -49,8 +49,10 @@ internal class MacroGroup : VimMacroBase() {
     val isInternalMacro = potemkinProgress != null
 
     val myPotemkinProgress = potemkinProgress ?: PotemkinProgress(
-      message("progress.title.macro.execution"), project, null,
-      message("stop")
+      message("progress.title.macro.execution"),
+      project,
+      null,
+      message("stop"),
     )
 
     if (potemkinProgress == null) potemkinProgress = myPotemkinProgress
@@ -59,7 +61,6 @@ internal class MacroGroup : VimMacroBase() {
     try {
       myPotemkinProgress.text2 = if (isInternalMacro) "Executing internal macro" else ""
       val runnable = runnable@{
-
         // Handle one keystroke then queue up the next key
         for (i in 0 until total) {
           myPotemkinProgress.fraction = (i + 1).toDouble() / total

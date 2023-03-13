@@ -36,7 +36,7 @@ class DelCmdCommandTest : VimTestCase() {
             |Vs          0          vs
             |Wq          0          wq
             |WQ          0          wq
-        """.trimMargin()
+      """.trimMargin(),
     )
 
     typeText(commandToKeys("command W"))
@@ -46,7 +46,7 @@ class DelCmdCommandTest : VimTestCase() {
       """Name        Args       Definition
             |Wq          0          wq
             |WQ          0          wq
-        """.trimMargin()
+      """.trimMargin(),
     )
 
     // Delete one of the aliases and then list all aliases again.
@@ -58,7 +58,7 @@ class DelCmdCommandTest : VimTestCase() {
       """Name        Args       Definition
             |Vs          0          vs
             |WQ          0          wq
-        """.trimMargin()
+      """.trimMargin(),
     )
   }
 

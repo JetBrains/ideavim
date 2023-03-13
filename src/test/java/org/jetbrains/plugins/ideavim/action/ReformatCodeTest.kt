@@ -56,7 +56,7 @@ class ReformatCodeTest : VimTestCase() {
     int b;
     int c;
 }
-"""
+""",
     )
   }
 

@@ -90,8 +90,8 @@ internal class IjClipboardManager : VimClipboardManager {
               file,
               editor,
               textRange.startOffsets,
-              textRange.endOffsets
-            )
+              textRange.endOffsets,
+            ),
           )
         } catch (ignore: IndexNotReadyException) {
         }
@@ -119,8 +119,9 @@ internal class IjClipboardManager : VimClipboardManager {
     val project = editor.project ?: return text
     val file = PsiDocumentManager.getInstance(project).getPsiFile(editor.document) ?: return text
     val rawText = TextBlockTransferable.convertLineSeparators(
-      text, "\n",
-      transferableData as Collection<TextBlockTransferableData?>
+      text,
+      "\n",
+      transferableData as Collection<TextBlockTransferableData?>,
     )
     if (injector.globalOptions().isSet(IjOptionConstants.ideacopypreprocess)) {
       for (processor in CopyPastePreProcessor.EP_NAME.extensionList) {

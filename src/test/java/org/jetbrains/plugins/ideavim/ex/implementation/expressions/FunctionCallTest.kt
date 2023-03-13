@@ -29,8 +29,8 @@ class FunctionCallTest : VimTestCase() {
         return a:number * a:number |
       endfunction |
       echo -3->abs()->Power2()->Power2()
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     assertExOutput("81\n")
 
@@ -46,8 +46,8 @@ class FunctionCallTest : VimTestCase() {
         return a:minuend - a:subtrahend |
       endfunction |
       echo 52->Subtraction(10)
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     assertExOutput("42\n")
 
@@ -70,8 +70,8 @@ class FunctionCallTest : VimTestCase() {
             let a:number = 20 |
           endfunction |
           call ThrowException(20)
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     assertPluginError(true)
     assertPluginErrorMessageContains("E46: Cannot change read-only variable \"a:number\"")
@@ -87,8 +87,8 @@ class FunctionCallTest : VimTestCase() {
         function! Power2(number) |
           return a:number * a:number |
         endfunction |
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     typeText(commandToKeys("let dict = {'power': function('Power2')}"))
     typeText(commandToKeys("echo dict.power(9)"))

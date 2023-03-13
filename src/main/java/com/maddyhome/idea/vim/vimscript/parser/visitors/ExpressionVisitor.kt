@@ -124,7 +124,7 @@ internal object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
       val index = SimpleExpression(ctx.expr(1).text)
       OneElementSublistExpression(index, left)
     } else if (operatorString == "-" && left is OneElementSublistExpression && !containsSpaces(ctx) && matchesLiteralDictionaryKey(
-        ctx.expr(1).text
+        ctx.expr(1).text,
       )
     ) {
       val postfix = "-" + ctx.expr(1).text

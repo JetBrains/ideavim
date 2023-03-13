@@ -195,7 +195,7 @@ class RepeatChangeActionTest : VimTestCase() {
                 |        all rocks and lavender and tufted grass,
                 |        where it was settled on some sodden sand
                 |        hard by the torrent of a mountain pass.
-                """.trimMargin()
+    """.trimMargin()
     val after = """
                 |A Discovery
                 |
@@ -203,7 +203,7 @@ class RepeatChangeActionTest : VimTestCase() {
                 |all rocks and lavender and tufted grass,
                 |where it was settled on some sodden sand
                 |hard by the torrent of a mountain pass.
-                """.trimMargin()
+    """.trimMargin()
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
@@ -238,7 +238,7 @@ class RepeatChangeActionTest : VimTestCase() {
                 XXXXX it was settled on some sodden sand
                 hard ${c}XXXXXe torrent of a mountain pass.
 
-    """
+    """,
   )
   fun `test block motion to end`() {
     val keys = listOf("<C-V>jjerXjl", ".")
@@ -312,7 +312,7 @@ class RepeatChangeActionTest : VimTestCase() {
         Three
         Two
         One
-  """
+  """,
   )
   fun `test redo register feature`() {
     doTest(
@@ -328,7 +328,8 @@ class RepeatChangeActionTest : VimTestCase() {
         One
         
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 }

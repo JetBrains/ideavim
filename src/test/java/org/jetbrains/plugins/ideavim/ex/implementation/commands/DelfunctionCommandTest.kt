@@ -23,8 +23,8 @@ class DelfunctionCommandTest : VimTestCase() {
           "function F1() |" +
             "  return 10 |" +
             "endfunction"
-          )
-      )
+          ),
+      ),
     )
     typeText(commandToKeys("delfunction F1"))
     assertPluginError(false)
@@ -42,8 +42,8 @@ class DelfunctionCommandTest : VimTestCase() {
           "function F1() |" +
             "  return 10 |" +
             "endfunction"
-          )
-      )
+          ),
+      ),
     )
     typeText(commandToKeys("delf F1"))
     assertPluginError(false)

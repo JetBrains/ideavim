@@ -18,7 +18,7 @@ import com.intellij.remoterobot.search.locators.byXpath
 @JvmOverloads
 fun ContainerFixture.gutter(function: Gutter.() -> Unit = {}): ContainerFixture {
   return find<Gutter>(
-    byXpath("//div[@class='EditorGutterComponentImpl']")
+    byXpath("//div[@class='EditorGutterComponentImpl']"),
   )
     .apply { runJs("robot.moveMouse(component);") }
     .apply(function)

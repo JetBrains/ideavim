@@ -39,7 +39,7 @@ internal class ExShortcutKeyAction(private val exEntryPanel: ExEntryPanel) : Dum
       KeyHandler.getInstance().handleKey(
         editor.vim,
         keyStroke,
-        injector.executionContextManager.onEditor(editor.vim, e.dataContext.vim)
+        injector.executionContextManager.onEditor(editor.vim, e.dataContext.vim),
       )
     }
   }
@@ -57,7 +57,6 @@ internal class ExShortcutKeyAction(private val exEntryPanel: ExEntryPanel) : Dum
   }
 
   fun registerCustomShortcutSet() {
-
     val shortcuts = ExKeyBindings.bindings.map {
       KeyboardShortcut(it.key, null)
     }.toTypedArray()

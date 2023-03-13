@@ -547,7 +547,7 @@ class PutVisualTextActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             ${c}Discovery
-    """
+    """,
   )
   @Test
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
@@ -584,7 +584,7 @@ class PutVisualTextActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             ${c}Discovery
-    """
+    """,
   )
   @Test
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
@@ -620,7 +620,7 @@ class PutVisualTextActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             ${c}Discovery
-    """
+    """,
   )
   @Test
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
@@ -711,7 +711,7 @@ class PutVisualTextActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             ${c}A Discovery
-    """
+    """,
   )
   @Test
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
@@ -748,7 +748,7 @@ class PutVisualTextActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             ${c}A Discovery
-    """
+    """,
   )
   @Test
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
@@ -784,7 +784,7 @@ class PutVisualTextActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             ${c}A Discovery
-    """
+    """,
   )
   @Test
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
@@ -867,7 +867,7 @@ class PutVisualTextActionTest : VimTestCase() {
             $c|found|
             |l roc|
             |ere i|
-    """
+    """,
   )
   @Test
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
@@ -928,7 +928,7 @@ class PutVisualTextActionTest : VimTestCase() {
             |found|
             |l roc|
             |ere i|
-    """
+    """,
   )
   @Test
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
@@ -988,7 +988,7 @@ class PutVisualTextActionTest : VimTestCase() {
             $c|found|
             |l roc|
             |ere i|
-    """
+    """,
   )
   @Test
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
@@ -1165,7 +1165,7 @@ class PutVisualTextActionTest : VimTestCase() {
             wht was settled on some sodden sand
             ${c}A Discovery
             hard by the torrent of a mountain pass.
-    """
+    """,
   )
   @Test
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
@@ -1232,7 +1232,7 @@ class PutVisualTextActionTest : VimTestCase() {
             ${c}A Discovery
             A Discovery
             hard by the torrent of a mountain pass.
-            """
+            """,
   )
   @Test
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
@@ -1272,7 +1272,7 @@ class PutVisualTextActionTest : VimTestCase() {
             wht was settled on some sodden sand
             ha the torrent of a mountain pass.
             ${c}A Discovery
-    """
+    """,
   )
   @Test
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
@@ -1311,7 +1311,7 @@ class PutVisualTextActionTest : VimTestCase() {
             w
             ${c}A Discovery
             hard by the torrent of a mountain pass.
-    """
+    """,
   )
   @Test
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)

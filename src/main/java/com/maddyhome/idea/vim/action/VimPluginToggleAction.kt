@@ -31,7 +31,9 @@ internal class VimPluginToggleAction : DumbAwareToggleAction()/*, LightEditCompa
 
     e.presentation.text = if (ActionPlaces.POPUP == e.place) {
       if (VimPlugin.isEnabled()) MessageHelper.message("action.VimPluginToggle.enabled") else MessageHelper.message("action.VimPluginToggle.enable")
-    } else MessageHelper.message("action.VimPluginToggle.text")
+    } else {
+      MessageHelper.message("action.VimPluginToggle.text")
+    }
   }
 
   override fun getActionUpdateThread() = ActionUpdateThread.BGT

@@ -29,7 +29,7 @@ class GnNextTextObjectTest : VimTestCase() {
       """.trimIndent(),
       """
         Hello, this is a ${c} here
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -44,7 +44,7 @@ class GnNextTextObjectTest : VimTestCase() {
       """
         Hello, this is a test here
         Hello, this is a ${c} here
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -65,7 +65,7 @@ class GnNextTextObjectTest : VimTestCase() {
       Hello, this is a NewValue here
       Hello, this is a NewValu${c}e here
       Hello, this is a test here
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -74,7 +74,8 @@ class GnNextTextObjectTest : VimTestCase() {
       listOf("/is<CR>", ":s/test/tester/<CR>", "0", "dgn"),
       "Hello, ${c}this is a test here",
       "Hello, this is a ${c}er here",
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 

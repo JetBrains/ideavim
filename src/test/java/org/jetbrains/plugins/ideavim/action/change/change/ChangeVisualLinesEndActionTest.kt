@@ -67,7 +67,7 @@ class ChangeVisualLinesEndActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             ${c}
-  """
+  """,
   )
   fun `test change last two lines`() {
     val keys = "vjC"

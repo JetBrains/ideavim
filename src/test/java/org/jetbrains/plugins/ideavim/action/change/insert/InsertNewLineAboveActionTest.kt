@@ -18,12 +18,14 @@ class InsertNewLineAboveActionTest : VimTestCase() {
     val before = """I found it in a legendary land
         |${c}all rocks and lavender and tufted grass,
         |where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.""".trimMargin()
+        |hard by the torrent of a mountain pass.
+    """.trimMargin()
     val after = """I found it in a legendary land
         |$c
         |all rocks and lavender and tufted grass,
         |where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.""".trimMargin()
+        |hard by the torrent of a mountain pass.
+    """.trimMargin()
     doTest("O", before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 
@@ -31,12 +33,14 @@ class InsertNewLineAboveActionTest : VimTestCase() {
     val before = """I found it in a legendary land
         |all rocks and ${c}lavender and tufted grass,
         |where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.""".trimMargin()
+        |hard by the torrent of a mountain pass.
+    """.trimMargin()
     val after = """I found it in a legendary land
         |$c
         |all rocks and lavender and tufted grass,
         |where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.""".trimMargin()
+        |hard by the torrent of a mountain pass.
+    """.trimMargin()
     doTest("O", before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 
@@ -44,12 +48,14 @@ class InsertNewLineAboveActionTest : VimTestCase() {
     val before = """    I found it in a legendary land
         |    all rocks and lavender and tufted grass,
         |    ${c}where it was settled on some sodden sand
-        |    hard by the torrent of a mountain pass.""".trimMargin()
+        |    hard by the torrent of a mountain pass.
+    """.trimMargin()
     val after = """    I found it in a legendary land
         |    all rocks and lavender and tufted grass,
         |    $c
         |    where it was settled on some sodden sand
-        |    hard by the torrent of a mountain pass.""".trimMargin()
+        |    hard by the torrent of a mountain pass.
+    """.trimMargin()
     doTest("O", before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 
@@ -57,12 +63,14 @@ class InsertNewLineAboveActionTest : VimTestCase() {
     val before = """    ${c}I found it in a legendary land
         |    all rocks and lavender and tufted grass,
         |    where it was settled on some sodden sand
-        |    hard by the torrent of a mountain pass.""".trimMargin()
+        |    hard by the torrent of a mountain pass.
+    """.trimMargin()
     val after = """    $c
         |    I found it in a legendary land
         |    all rocks and lavender and tufted grass,
         |    where it was settled on some sodden sand
-        |    hard by the torrent of a mountain pass.""".trimMargin()
+        |    hard by the torrent of a mountain pass.
+    """.trimMargin()
     doTest("O", before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 
@@ -88,7 +96,8 @@ class InsertNewLineAboveActionTest : VimTestCase() {
     val before = """    I fou${c}nd it in a legendary land
         |    all rocks and laven${c}der and tufted grass,
         |    where it was sett${c}led on some sodden sand
-        |    hard by the tor${c}rent of a mountain pass.""".trimMargin()
+        |    hard by the tor${c}rent of a mountain pass.
+    """.trimMargin()
     val after = """    $c
         |    I found it in a legendary land
         |    $c
@@ -96,7 +105,8 @@ class InsertNewLineAboveActionTest : VimTestCase() {
         |    $c
         |    where it was settled on some sodden sand
         |    $c
-        |    hard by the torrent of a mountain pass.""".trimMargin()
+        |    hard by the torrent of a mountain pass.
+    """.trimMargin()
     doTest("O", before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 
@@ -114,13 +124,15 @@ class InsertNewLineAboveActionTest : VimTestCase() {
     val before = """${c}I found it in a legendary land
         |all rocks and lavender and tufted grass,
         |where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.""".trimMargin()
+        |hard by the torrent of a mountain pass.
+    """.trimMargin()
     val after = """
         |$c
         |I found it in a legendary land
         |all rocks and lavender and tufted grass,
         |where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.""".trimMargin()
+        |hard by the torrent of a mountain pass.
+    """.trimMargin()
     doTest("O", before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 }

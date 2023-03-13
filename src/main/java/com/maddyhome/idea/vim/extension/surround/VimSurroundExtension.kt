@@ -213,7 +213,7 @@ internal class VimSurroundExtension : VimExtension {
           IjVimEditor(ijEditor),
           IjVimCaret(primaryCaret),
           range.endOffset + leftSurround.length,
-          pair.second
+          pair.second,
         )
         // Jump back to start
         executeNormalWithoutMapping(injector.parser.parseKeys("`["), ijEditor)
@@ -249,7 +249,7 @@ internal class VimSurroundExtension : VimExtension {
       ']' to ("[" to "]"),
       'a' to ("<" to ">"),
       '>' to ("<" to ">"),
-      's' to (" " to "")
+      's' to (" " to ""),
     )
 
     private fun getSurroundPair(c: Char): Pair<String, String>? = if (c in SURROUND_PAIRS) {
@@ -257,7 +257,9 @@ internal class VimSurroundExtension : VimExtension {
     } else if (!c.isLetter()) {
       val s = c.toString()
       s to s
-    } else null
+    } else {
+      null
+    }
 
     private fun inputTagPair(editor: Editor): Pair<String, String>? {
       val tagInput = inputString(editor, "<", '>')
@@ -266,7 +268,9 @@ internal class VimSurroundExtension : VimExtension {
         val tagName = matcher.group(1)
         val tagAttributes = matcher.group(2)
         "<$tagName$tagAttributes>" to "</$tagName>"
-      } else null
+      } else {
+        null
+      }
     }
 
     private fun inputFunctionName(
@@ -290,7 +294,9 @@ internal class VimSurroundExtension : VimExtension {
       val keyChar = key.keyChar
       return if (keyChar == KeyEvent.CHAR_UNDEFINED || keyChar.code == KeyEvent.VK_ESCAPE) {
         0.toChar()
-      } else keyChar
+      } else {
+        keyChar
+      }
     }
   }
 }

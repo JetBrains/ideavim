@@ -71,7 +71,7 @@ class UiTests {
                 |One Two
                 |Three Four
                 |Five
-            """.trimMargin()
+            """.trimMargin(),
           )
         }
       }
@@ -101,7 +101,7 @@ class UiTests {
                 |    System.out.println("Hello");
                 |  }
                 |}
-            """.trimMargin()
+            """.trimMargin(),
           )
         }
       }
@@ -156,7 +156,7 @@ class UiTests {
       Five
       
       """.trimIndent(),
-      editor.text
+      editor.text,
     )
 
     editor.injectText(
@@ -164,7 +164,7 @@ class UiTests {
                 |One Two
                 |Three Four
                 |Five
-            """.trimMargin()
+      """.trimMargin(),
     )
     keyboard {
       enterText(":set clipboard-=unnamed")
@@ -218,8 +218,8 @@ class UiTests {
                 |      }
                 |  }
                 |}
-            """.trimMargin(),
-      editor.text
+      """.trimMargin(),
+      editor.text,
     )
 
     remoteRobot.invokeActionJs("GotoAction")
@@ -267,7 +267,7 @@ class UiTests {
       Three Four
       Five
       """.trimIndent(),
-      editor.text
+      editor.text,
     )
   }
 

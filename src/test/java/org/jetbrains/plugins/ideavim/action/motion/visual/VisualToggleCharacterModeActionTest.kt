@@ -117,7 +117,8 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER
+      VimStateMachine.Mode.VISUAL,
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
     )
   }
 
@@ -140,7 +141,8 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER
+      VimStateMachine.Mode.VISUAL,
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
     )
   }
 
@@ -163,7 +165,8 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER
+      VimStateMachine.Mode.VISUAL,
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
     )
   }
 
@@ -186,7 +189,8 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER
+      VimStateMachine.Mode.VISUAL,
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
     )
   }
 
@@ -209,7 +213,8 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER
+      VimStateMachine.Mode.VISUAL,
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
     )
   }
 
@@ -232,7 +237,8 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER
+      VimStateMachine.Mode.VISUAL,
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
     )
   }
 
@@ -255,7 +261,8 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER
+      VimStateMachine.Mode.VISUAL,
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
     )
   }
 
@@ -278,7 +285,8 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER
+      VimStateMachine.Mode.VISUAL,
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
     )
   }
 
@@ -301,7 +309,8 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER
+      VimStateMachine.Mode.VISUAL,
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
     )
   }
 
@@ -323,7 +332,8 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     where it was settled on some sodden sand
                     har${c}d${se} by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER
+      VimStateMachine.Mode.VISUAL,
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
     )
   }
 
@@ -345,7 +355,8 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     where it was settled on some sodden sand
                     har${c}d${se} by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER
+      VimStateMachine.Mode.VISUAL,
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
     )
   }
 
@@ -367,7 +378,8 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     whe${c}r${se}e it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER
+      VimStateMachine.Mode.VISUAL,
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
     )
   }
 
@@ -399,7 +411,8 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                   w${s}here it was settled on some sodden sand${c}${se}
                   hard by the torrent of a mountain pass.
               """.trimIndent(),*/
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER
+      VimStateMachine.Mode.VISUAL,
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
     )
   }
 
@@ -433,7 +446,8 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                    w${s}here it was settled on some sodden sand[long line]
                    hard by the torrent of a mountain pass.${c}${se}
                """.trimIndent(),*/
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER
+      VimStateMachine.Mode.VISUAL,
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
     )
   }
 
@@ -455,7 +469,8 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     ${se}where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_LINE
+      VimStateMachine.Mode.VISUAL,
+      VimStateMachine.SubMode.VISUAL_LINE,
     )
   }
 
@@ -484,7 +499,8 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     hard by the torrent of a mountain pass.
                     ${c}${se}
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_LINE
+      VimStateMachine.Mode.VISUAL,
+      VimStateMachine.SubMode.VISUAL_LINE,
     )
   }
 
@@ -506,7 +522,8 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     ${s}${c}where it was settled on some sodden sand
                     ${se}hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_LINE
+      VimStateMachine.Mode.VISUAL,
+      VimStateMachine.SubMode.VISUAL_LINE,
     )
   }
 
@@ -528,7 +545,8 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     ${c}where it was settled on some sodden sand
                     ${se}hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_LINE
+      VimStateMachine.Mode.VISUAL,
+      VimStateMachine.SubMode.VISUAL_LINE,
     )
   }
 
@@ -550,7 +568,8 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     where it was settled on some sodden sand
                     ${c}hard by the torrent of a mountain pass.${se}
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_LINE
+      VimStateMachine.Mode.VISUAL,
+      VimStateMachine.SubMode.VISUAL_LINE,
     )
   }
 
@@ -573,7 +592,8 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     ${se}where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_LINE
+      VimStateMachine.Mode.VISUAL,
+      VimStateMachine.SubMode.VISUAL_LINE,
     )
   }
 
@@ -596,7 +616,8 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_BLOCK
+      VimStateMachine.Mode.VISUAL,
+      VimStateMachine.SubMode.VISUAL_BLOCK,
     )
   }
 
@@ -619,7 +640,8 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_BLOCK
+      VimStateMachine.Mode.VISUAL,
+      VimStateMachine.SubMode.VISUAL_BLOCK,
     )
   }
 
@@ -642,7 +664,8 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     wh${s}ere${c} ${se}it was settled on some sodden sand
                     ha${s}rd ${c}b${se}y the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_BLOCK
+      VimStateMachine.Mode.VISUAL,
+      VimStateMachine.SubMode.VISUAL_BLOCK,
     )
   }
 
@@ -665,7 +688,8 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     wh${s}ere it was settled on some sodden sa${c}n${se}d[long line]
                     ha${s}rd by the torrent of a mountain pass.${c}${se}
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_BLOCK
+      VimStateMachine.Mode.VISUAL,
+      VimStateMachine.SubMode.VISUAL_BLOCK,
     )
   }
 
@@ -697,7 +721,8 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                   w${s}here it was settled on some sodden sand[long line${c}]${se}
                   h${s}ard by the torrent of a mountain pass.${c}${se}
               """.trimIndent(),*/
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_BLOCK
+      VimStateMachine.Mode.VISUAL,
+      VimStateMachine.SubMode.VISUAL_BLOCK,
     )
   }
 
@@ -710,7 +735,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     all rocks and lavender and tufted grass,
                     where it was settled on some sodden sand[long line]
                     hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
     enterCommand("set selectmode=cmd")
     typeText("v")

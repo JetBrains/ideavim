@@ -15,12 +15,12 @@ import com.maddyhome.idea.vim.VimPlugin
 // This variable describe migrators and detectors that would be injected during production run
 private val productionMigrationComponents = MigrationComponents(
   migrators = setOf(
-    `Version 6 to 7 config migration`
+    `Version 6 to 7 config migration`,
   ),
   versionDetectors = listOf(
-    `Detect versions 3, 4, 5, 6`
+    `Detect versions 3, 4, 5, 6`,
   ),
-  currentVersion = VimPlugin.STATE_VERSION
+  currentVersion = VimPlugin.STATE_VERSION,
 )
 
 // Just a collection of migrators and collectors
@@ -79,7 +79,9 @@ internal class ApplicationConfigurationMigrator(migrationComponents: MigrationCo
       version = if (configMigrator != null) {
         configMigrator.versionUp()
         configMigrator.toVersion
-      } else version + 1
+      } else {
+        version + 1
+      }
     }
   }
 

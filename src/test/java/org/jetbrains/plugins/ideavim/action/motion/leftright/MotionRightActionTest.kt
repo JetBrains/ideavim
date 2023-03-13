@@ -41,7 +41,8 @@ class MotionRightActionTest : VimOptionTestCase(OptionConstants.virtualedit) {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -65,7 +66,8 @@ class MotionRightActionTest : VimOptionTestCase(OptionConstants.virtualedit) {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -89,7 +91,8 @@ class MotionRightActionTest : VimOptionTestCase(OptionConstants.virtualedit) {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -108,7 +111,8 @@ class MotionRightActionTest : VimOptionTestCase(OptionConstants.virtualedit) {
             Today it is not working
             The test is like that.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -127,7 +131,8 @@ class MotionRightActionTest : VimOptionTestCase(OptionConstants.virtualedit) {
             Today it is not working
             The test is like that.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -152,7 +157,8 @@ class MotionRightActionTest : VimOptionTestCase(OptionConstants.virtualedit) {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -177,7 +183,8 @@ class MotionRightActionTest : VimOptionTestCase(OptionConstants.virtualedit) {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -202,7 +209,8 @@ class MotionRightActionTest : VimOptionTestCase(OptionConstants.virtualedit) {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -226,7 +234,8 @@ class MotionRightActionTest : VimOptionTestCase(OptionConstants.virtualedit) {
         where it was settled on some sodden sand
         hard by the torrent of a mountain pass
       """.trimIndent().dotToTab(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -250,7 +259,8 @@ class MotionRightActionTest : VimOptionTestCase(OptionConstants.virtualedit) {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER
+      VimStateMachine.Mode.VISUAL,
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
     )
   }
 
@@ -274,7 +284,8 @@ class MotionRightActionTest : VimOptionTestCase(OptionConstants.virtualedit) {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_BLOCK
+      VimStateMachine.Mode.VISUAL,
+      VimStateMachine.SubMode.VISUAL_BLOCK,
     )
   }
 

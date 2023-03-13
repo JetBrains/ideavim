@@ -21,10 +21,10 @@ import java.awt.Point
 @JvmOverloads
 fun ContainerFixture.editor(title: String, function: Editor.() -> Unit = {}): Editor {
   find<ComponentFixture>(
-    byXpath("//div[@class='EditorTabs']//div[@accessiblename='$title' and @class='SimpleColoredComponent']")
+    byXpath("//div[@class='EditorTabs']//div[@accessiblename='$title' and @class='SimpleColoredComponent']"),
   ).click()
   return find<Editor>(
-    byXpath("title '$title'", "//div[@accessiblename='Editor for $title' and @class='EditorComponentImpl']")
+    byXpath("title '$title'", "//div[@accessiblename='Editor for $title' and @class='EditorComponentImpl']"),
   )
     .apply { runJs("robot.moveMouse(component);") }
     .apply(function)
@@ -59,7 +59,7 @@ class Editor(
               component.getEditor().getDocument().setText('${text.escape()}')
           })
         })
-"""
+""",
     )
   }
 
@@ -71,7 +71,7 @@ class Editor(
             const visualPosition = editor.offsetToVisualPosition($offset)
             editor.visualPositionToXY(visualPosition) 
         """,
-      true
+      true,
     )
   }
 
@@ -87,7 +87,7 @@ class Editor(
             const visualPosition = editor.offsetToVisualPosition(offset)
             editor.visualPositionToXY(visualPosition)
         """,
-      runInEdt = true
+      runInEdt = true,
     )
     // wait a bit for scroll completed
     Thread.sleep(500)

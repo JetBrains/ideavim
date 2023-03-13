@@ -20,14 +20,14 @@ class InsertAfterLineEndActionTest : VimTestCase() {
                     one two ${c}three
                     sev${c}en si${c}x five
 
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState(
       """
     one two three fou${c}r
     seven six five fou${c}r
 
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -51,7 +51,7 @@ class InsertAfterLineEndActionTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
     assertMode(VimStateMachine.Mode.COMMAND)
   }

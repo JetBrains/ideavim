@@ -36,7 +36,7 @@ class DeleteMarksCommandTest : VimTestCase() {
          corroded tissues could no longer hide
          that priceless mote now dimpling the convex
          and limpid teardrop on a lighted slide.
-         """.trimMargin()
+      """.trimMargin(),
     )
 
     val vimEditor = myFixture.editor.vim

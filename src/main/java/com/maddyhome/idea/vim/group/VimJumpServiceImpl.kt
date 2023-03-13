@@ -61,7 +61,7 @@ internal class VimJumpServiceImpl : VimJumpServiceBase(), PersistentStateCompone
       val jump = Jump(
         Integer.parseInt(jumpElement.getAttributeValue("line")),
         Integer.parseInt(jumpElement.getAttributeValue("column")),
-        jumpElement.getAttributeValue("filename")
+        jumpElement.getAttributeValue("filename"),
       )
       jumps.add(jump)
     }

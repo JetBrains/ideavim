@@ -34,7 +34,7 @@ class MatchitCMakeTest : VimTestCase() {
           message("Non-linux system")
         endif()
       """.trimIndent(),
-      fileName = "CMakeLists.txt"
+      fileName = "CMakeLists.txt",
     )
   }
 
@@ -55,7 +55,7 @@ class MatchitCMakeTest : VimTestCase() {
           message("Non-linux system")
         ${c}endif()
       """.trimIndent(),
-      fileName = "CMakeLists.txt"
+      fileName = "CMakeLists.txt",
     )
   }
 
@@ -76,7 +76,7 @@ class MatchitCMakeTest : VimTestCase() {
           message("Non-linux system")
         endif()
       """.trimIndent(),
-      fileName = "CMakeLists.txt"
+      fileName = "CMakeLists.txt",
     )
   }
 
@@ -105,7 +105,7 @@ class MatchitCMakeTest : VimTestCase() {
           message("Unknown system")
         endif()
       """.trimIndent(),
-      fileName = "CMakeLists.txt"
+      fileName = "CMakeLists.txt",
     )
   }
 
@@ -134,7 +134,7 @@ class MatchitCMakeTest : VimTestCase() {
           message("Unknown system")
         endif()
       """.trimIndent(),
-      fileName = "CMakeLists.txt"
+      fileName = "CMakeLists.txt",
     )
   }
 
@@ -163,7 +163,7 @@ class MatchitCMakeTest : VimTestCase() {
           message("Unknown system")
         endif()
       """.trimIndent(),
-      fileName = "CMakeLists.txt"
+      fileName = "CMakeLists.txt",
     )
   }
 
@@ -192,7 +192,7 @@ class MatchitCMakeTest : VimTestCase() {
           message("Unknown system")
         ${c}endif()
       """.trimIndent(),
-      fileName = "CMakeLists.txt"
+      fileName = "CMakeLists.txt",
     )
   }
 
@@ -221,7 +221,7 @@ class MatchitCMakeTest : VimTestCase() {
           message("Unknown system")
         endif()
       """.trimIndent(),
-      fileName = "CMakeLists.txt"
+      fileName = "CMakeLists.txt",
     )
   }
 
@@ -238,7 +238,7 @@ class MatchitCMakeTest : VimTestCase() {
           message(STATUS "X=${"\${X}"}")
         ${c}endforeach()
       """.trimIndent(),
-      fileName = "CMakeLists.txt"
+      fileName = "CMakeLists.txt",
     )
   }
 
@@ -255,7 +255,7 @@ class MatchitCMakeTest : VimTestCase() {
           message(STATUS "X=${"\${X}"}")
         endforeach()
       """.trimIndent(),
-      fileName = "CMakeLists.txt"
+      fileName = "CMakeLists.txt",
     )
   }
 
@@ -278,7 +278,7 @@ class MatchitCMakeTest : VimTestCase() {
           message(STATUS "X=${"\${X}"}")
         endforeach()
       """.trimIndent(),
-      fileName = "CMakeLists.txt"
+      fileName = "CMakeLists.txt",
     )
   }
 
@@ -301,7 +301,7 @@ class MatchitCMakeTest : VimTestCase() {
           message(STATUS "X=${"\${X}"}")
         ${c}endforeach()
       """.trimIndent(),
-      fileName = "CMakeLists.txt"
+      fileName = "CMakeLists.txt",
     )
   }
 
@@ -318,7 +318,7 @@ class MatchitCMakeTest : VimTestCase() {
           MATH(EXPR VAR "${"\${index}"}+1")
         ${c}endwhile()
       """.trimIndent(),
-      fileName = "CMakeLists.txt"
+      fileName = "CMakeLists.txt",
     )
   }
 
@@ -335,7 +335,7 @@ class MatchitCMakeTest : VimTestCase() {
           MATH(EXPR VAR "${"\${index}"}+1")
         endwhile()
       """.trimIndent(),
-      fileName = "CMakeLists.txt"
+      fileName = "CMakeLists.txt",
     )
   }
 
@@ -358,7 +358,7 @@ class MatchitCMakeTest : VimTestCase() {
           endif()
         endwhile()
       """.trimIndent(),
-      fileName = "CMakeLists.txt"
+      fileName = "CMakeLists.txt",
     )
   }
 
@@ -381,7 +381,7 @@ class MatchitCMakeTest : VimTestCase() {
           endif()
         ${c}endwhile()
       """.trimIndent(),
-      fileName = "CMakeLists.txt"
+      fileName = "CMakeLists.txt",
     )
   }
 
@@ -398,7 +398,7 @@ class MatchitCMakeTest : VimTestCase() {
           bar(x y z)
         ${c}endfunction()
       """.trimIndent(),
-      fileName = "CMakeLists.txt"
+      fileName = "CMakeLists.txt",
     )
   }
 
@@ -415,7 +415,7 @@ class MatchitCMakeTest : VimTestCase() {
           bar(x y z)
         endfunction()
       """.trimIndent(),
-      fileName = "CMakeLists.txt"
+      fileName = "CMakeLists.txt",
     )
   }
 
@@ -432,7 +432,7 @@ class MatchitCMakeTest : VimTestCase() {
           message("arg = ${"\${arg}\""}")
         ${c}endmacro()
       """.trimIndent(),
-      fileName = "CMakeLists.txt"
+      fileName = "CMakeLists.txt",
     )
   }
 
@@ -449,7 +449,7 @@ class MatchitCMakeTest : VimTestCase() {
           message("arg = ${"\${arg}\""}")
         endmacro()
       """.trimIndent(),
-      fileName = "CMakeLists.txt"
+      fileName = "CMakeLists.txt",
     )
   }
 
@@ -472,7 +472,7 @@ class MatchitCMakeTest : VimTestCase() {
           message("Non-linux system")
         ${c}endif()
       """.trimIndent(),
-      fileName = "CMakeLists.txt"
+      fileName = "CMakeLists.txt",
     )
   }
 
@@ -493,7 +493,7 @@ class MatchitCMakeTest : VimTestCase() {
           message("Non-linux system")
         endif()
       """.trimIndent(),
-      fileName = "CMakeLists.txt"
+      fileName = "CMakeLists.txt",
     )
   }
 
@@ -514,7 +514,7 @@ class MatchitCMakeTest : VimTestCase() {
           message("Non-linux system")
         endif()
       """.trimIndent(),
-      fileName = "CMakeLists.txt"
+      fileName = "CMakeLists.txt",
     )
   }
 
@@ -543,7 +543,7 @@ class MatchitCMakeTest : VimTestCase() {
           message("Unknown system")
         ${c}endif()
       """.trimIndent(),
-      fileName = "CMakeLists.txt"
+      fileName = "CMakeLists.txt",
     )
   }
 
@@ -572,7 +572,7 @@ class MatchitCMakeTest : VimTestCase() {
           message("Unknown system")
         endif()
       """.trimIndent(),
-      fileName = "CMakeLists.txt"
+      fileName = "CMakeLists.txt",
     )
   }
 
@@ -601,7 +601,7 @@ class MatchitCMakeTest : VimTestCase() {
           message("Unknown system")
         endif()
       """.trimIndent(),
-      fileName = "CMakeLists.txt"
+      fileName = "CMakeLists.txt",
     )
   }
 
@@ -630,7 +630,7 @@ class MatchitCMakeTest : VimTestCase() {
           message("Unknown system")
         endif()
       """.trimIndent(),
-      fileName = "CMakeLists.txt"
+      fileName = "CMakeLists.txt",
     )
   }
 
@@ -659,7 +659,7 @@ class MatchitCMakeTest : VimTestCase() {
           message("Unknown system")
         endif()
       """.trimIndent(),
-      fileName = "CMakeLists.txt"
+      fileName = "CMakeLists.txt",
     )
   }
 
@@ -676,7 +676,7 @@ class MatchitCMakeTest : VimTestCase() {
           message(STATUS "X=${"\${X}"}")
         ${c}endforeach()
       """.trimIndent(),
-      fileName = "CMakeLists.txt"
+      fileName = "CMakeLists.txt",
     )
   }
 
@@ -693,7 +693,7 @@ class MatchitCMakeTest : VimTestCase() {
           message(STATUS "X=${"\${X}"}")
         endforeach()
       """.trimIndent(),
-      fileName = "CMakeLists.txt"
+      fileName = "CMakeLists.txt",
     )
   }
 
@@ -716,7 +716,7 @@ class MatchitCMakeTest : VimTestCase() {
           message(STATUS "X=${"\${X}"}")
         ${c}endforeach()
       """.trimIndent(),
-      fileName = "CMakeLists.txt"
+      fileName = "CMakeLists.txt",
     )
   }
 
@@ -739,7 +739,7 @@ class MatchitCMakeTest : VimTestCase() {
           message(STATUS "X=${"\${X}"}")
         endforeach()
       """.trimIndent(),
-      fileName = "CMakeLists.txt"
+      fileName = "CMakeLists.txt",
     )
   }
 
@@ -762,7 +762,7 @@ class MatchitCMakeTest : VimTestCase() {
           message(STATUS "X=${"\${X}"}")
         endforeach()
       """.trimIndent(),
-      fileName = "CMakeLists.txt"
+      fileName = "CMakeLists.txt",
     )
   }
 
@@ -779,7 +779,7 @@ class MatchitCMakeTest : VimTestCase() {
           MATH(EXPR VAR "${"\${index}"}+1")
         ${c}endwhile()
       """.trimIndent(),
-      fileName = "CMakeLists.txt"
+      fileName = "CMakeLists.txt",
     )
   }
 
@@ -796,7 +796,7 @@ class MatchitCMakeTest : VimTestCase() {
           MATH(EXPR VAR "${"\${index}"}+1")
         endwhile()
       """.trimIndent(),
-      fileName = "CMakeLists.txt"
+      fileName = "CMakeLists.txt",
     )
   }
 
@@ -819,7 +819,7 @@ class MatchitCMakeTest : VimTestCase() {
           endif()
         ${c}endwhile()
       """.trimIndent(),
-      fileName = "CMakeLists.txt"
+      fileName = "CMakeLists.txt",
     )
   }
 
@@ -842,7 +842,7 @@ class MatchitCMakeTest : VimTestCase() {
           endif()
         endwhile()
       """.trimIndent(),
-      fileName = "CMakeLists.txt"
+      fileName = "CMakeLists.txt",
     )
   }
 
@@ -865,7 +865,7 @@ class MatchitCMakeTest : VimTestCase() {
           endif()
         endwhile()
       """.trimIndent(),
-      fileName = "CMakeLists.txt"
+      fileName = "CMakeLists.txt",
     )
   }
 
@@ -882,7 +882,7 @@ class MatchitCMakeTest : VimTestCase() {
           bar(x y z)
         ${c}endfunction()
       """.trimIndent(),
-      fileName = "CMakeLists.txt"
+      fileName = "CMakeLists.txt",
     )
   }
 
@@ -899,7 +899,7 @@ class MatchitCMakeTest : VimTestCase() {
           bar(x y z)
         endfunction()
       """.trimIndent(),
-      fileName = "CMakeLists.txt"
+      fileName = "CMakeLists.txt",
     )
   }
 
@@ -916,7 +916,7 @@ class MatchitCMakeTest : VimTestCase() {
           message("arg = ${"\${arg}\""}")
         ${c}endmacro()
       """.trimIndent(),
-      fileName = "CMakeLists.txt"
+      fileName = "CMakeLists.txt",
     )
   }
 
@@ -933,7 +933,7 @@ class MatchitCMakeTest : VimTestCase() {
           message("arg = ${"\${arg}\""}")
         endmacro()
       """.trimIndent(),
-      fileName = "CMakeLists.txt"
+      fileName = "CMakeLists.txt",
     )
   }
 }

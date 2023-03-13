@@ -28,8 +28,8 @@ internal class IjEditorHelper : EngineEditorHelper {
       VisualPosition(
         pos.line,
         pos.column,
-        pos.leansRight
-      )
+        pos.leansRight,
+      ),
     )
   }
 

@@ -116,7 +116,7 @@ internal class VimEmulationConfigurable : Configurable {
         helpLine.text = message(
           "configurable.noneditablehandler.helper.text.with.example",
           (firstPerMode.owner as PerMode).toNotation(),
-          KeymapUtil.getShortcutText(KeyboardShortcut(firstPerMode.keyStroke, null))
+          KeymapUtil.getShortcutText(KeyboardShortcut(firstPerMode.keyStroke, null)),
         )
         helpLine.foreground = UIUtil.getInactiveTextColor()
         add(helpLine, BorderLayout.SOUTH)
@@ -185,7 +185,8 @@ internal class VimEmulationConfigurable : Configurable {
     private enum class Column(val index: Int, val title: @Nls(capitalization = Nls.Capitalization.Title) String) {
       KEYSTROKE(0, "Shortcut"),
       IDE_ACTION(1, "IDE Action"),
-      OWNER(2, "Handler");
+      OWNER(2, "Handler"),
+      ;
 
       companion object {
         private val ourMembers: MutableMap<Int, Column> = HashMap()
@@ -296,7 +297,7 @@ internal class VimEmulationConfigurable : Configurable {
   ) : DumbAwareActionButton(
     "Copy Config for .ideavimrc",
     "Copy config for .ideavimrc in sethandler format",
-    AllIcons.Actions.Copy
+    AllIcons.Actions.Copy,
   ) {
 
     override fun updateButton(e: AnActionEvent) {

@@ -31,7 +31,7 @@ class MapCommandTest : VimTestCase() {
   ${c}foo
   bar
   
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(commandToKeys("nmap k j"))
     assertPluginError(false)
@@ -90,14 +90,14 @@ class MapCommandTest : VimTestCase() {
   i  bar           <Esc>
   i  foo           bar
   
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(commandToKeys("map"))
     assertExOutput(
       """   <C-Down>      gt
 n  <Plug>Foo     iHello<Esc>
 n  ,f            <Plug>Foo
-"""
+""",
     )
   }
 
@@ -115,14 +115,14 @@ n  ,f            <Plug>Foo
       """
       Hello$c 1
       Hello 2
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(commandToKeys("nmap dc k"))
     typeText(injector.parser.parseKeys("dd"))
     assertState(
       """
       Hello 2
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -145,7 +145,7 @@ n  ,f            <Plug>Foo
   i  foo           bar
   i  jj          * <Esc>
   
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -156,7 +156,7 @@ n  ,f            <Plug>Foo
   ${c}foo
   bar
   
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(commandToKeys("noremap <Right> <nop>"))
     assertPluginError(false)
@@ -167,7 +167,7 @@ n  ,f            <Plug>Foo
   foo
   bar
   
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertOffset(1)
     typeText(commandToKeys("nmap"))
@@ -193,7 +193,7 @@ n  ,f            <Plug>Foo
   n  ,f            '/f<CR>'
   n  ,g            /g<CR>
   
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -278,7 +278,7 @@ n  ,f            <Plug>Foo
   ${c}foo
   bar
   
-      """.trimIndent()
+      """.trimIndent(),
     )
     injector.vimscriptExecutor.execute("map \u0018i dd\n", true)
     typeText(injector.parser.parseKeys("i" + "#" + "<Esc>"))
@@ -287,7 +287,7 @@ n  ,f            <Plug>Foo
   #foo
   bar
   
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
     typeText(commandToKeys("map"))
@@ -511,7 +511,7 @@ n  ,f            <Plug>Foo
         1<caret>2345
         abcde
         -----
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(commandToKeys("map k <Action>(CommentByLineComment)"))
     typeText(injector.parser.parseKeys("k"))
@@ -521,7 +521,7 @@ n  ,f            <Plug>Foo
         //12345
         abcde
         -----
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -533,7 +533,7 @@ n  ,f            <Plug>Foo
           1<caret>2345
           abcde
           -----
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(commandToKeys("map k <Action>(CommentByLineComment)"))
     typeText(injector.parser.parseKeys("kk"))
@@ -543,7 +543,7 @@ n  ,f            <Plug>Foo
           //12345
           //abcde
           -----
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -555,7 +555,7 @@ n  ,f            <Plug>Foo
           1<caret>2345
           abcde
           -----
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(commandToKeys("map k <Action>(CommentByLineComment)<Action>(CommentByLineComment)"))
     typeText(injector.parser.parseKeys("k"))
@@ -565,7 +565,7 @@ n  ,f            <Plug>Foo
           //12345
           //abcde
           -----
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -577,7 +577,7 @@ n  ,f            <Plug>Foo
           1<caret>2345
           abcde
           -----
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(commandToKeys("map k <Action>(CommentByLineComment)<Action>(CommentByLineComment)<Action>(CommentByLineComment)"))
     typeText(injector.parser.parseKeys("k"))
@@ -587,7 +587,7 @@ n  ,f            <Plug>Foo
           //12345
           //abcde
           //-----
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -599,7 +599,7 @@ n  ,f            <Plug>Foo
           1<caret>2345
           abcde
           -----
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(commandToKeys("imap k <Action>(CommentByLineComment)"))
     typeText(injector.parser.parseKeys("ik"))
@@ -609,7 +609,7 @@ n  ,f            <Plug>Foo
           //12345
           abcde
           -----
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -633,7 +633,7 @@ n  ,f            <Plug>Foo
               12345
               abcde
               -----
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -658,7 +658,7 @@ n  ,f            <Plug>Foo
               12345
               a${c}bcde
               -----
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -686,7 +686,7 @@ n  ,f            <Plug>Foo
               ${c}12345
               abcde
               -----
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -711,7 +711,7 @@ n  ,f            <Plug>Foo
               12345
               ${c}abcde
               -----
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -784,7 +784,11 @@ n  ,f            <Plug>Foo
       let s:mapping = '^f8a'
       nnoremap <expr> t s:mapping
       """.trimIndent(),
-      editor.vim, context.vim, skipHistory = false, indicateErrors = true, null
+      editor.vim,
+      context.vim,
+      skipHistory = false,
+      indicateErrors = true,
+      null,
     )
     typeText(injector.parser.parseKeys("t"))
     assertPluginError(true)
@@ -841,7 +845,7 @@ n  ,f            <Plug>Foo
       private fun myfun(funArg: String) {
         println(${c}funArg)
       }
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(commandToKeys("nnoremap ,f ?\\<fun\\><CR>"))
     typeText(injector.parser.parseKeys(",f"))
@@ -850,7 +854,7 @@ n  ,f            <Plug>Foo
       private ${c}fun myfun(funArg: String) {
         println(funArg)
       }
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -875,7 +879,7 @@ n  ,f            <Plug>Foo
               ${c}12345
               abcde
               -----
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
     assertSubMode(VimStateMachine.SubMode.NONE)
@@ -918,7 +922,7 @@ n  ,g            <Action>(Back)
 n  ,h            <Action>(Back)
 n  ,i            <Action>(Back)
 
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -946,7 +950,7 @@ n  ,g            <Action>(Back)
 n  ,h            <Action>(Back)
 n  ,i            <Action>(Back)
 
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 

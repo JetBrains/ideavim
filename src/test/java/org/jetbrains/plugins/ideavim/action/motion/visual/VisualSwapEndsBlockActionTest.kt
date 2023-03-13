@@ -163,14 +163,14 @@ class VisualSwapEndsBlockActionTest : VimTestCase() {
                     a${c}abcc
                     ddeff
                     
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState(
       """
     a${s}${c}abc${se}c
     d${s}${c}def${se}f
     
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -183,7 +183,7 @@ class VisualSwapEndsBlockActionTest : VimTestCase() {
                     gghii
                     jjkll
 
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState(
       """
@@ -192,7 +192,7 @@ class VisualSwapEndsBlockActionTest : VimTestCase() {
     ${s}${c}gghi${se}i
     jjkll
 
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(injector.parser.parseKeys("j"))
     assertState(
@@ -202,7 +202,7 @@ class VisualSwapEndsBlockActionTest : VimTestCase() {
     ${s}${c}gghi${se}i
     ${s}${c}jjkl${se}l
 
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 }

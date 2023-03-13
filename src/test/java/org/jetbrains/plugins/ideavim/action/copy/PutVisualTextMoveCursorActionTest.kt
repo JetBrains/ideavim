@@ -96,7 +96,7 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
             re it was settled on some sodden sand
             d by the torrent of a mountain pass.
             ${c}A Discovery
-    """
+    """,
   )
   fun `test put line in block selection`() {
     val file = """

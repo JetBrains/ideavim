@@ -233,7 +233,8 @@ class MotionDownActionTest : VimTestCase() {
             I found it in a legendary land
             ${c}
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -248,7 +249,8 @@ class MotionDownActionTest : VimTestCase() {
             |
             |${c}
       """.trimMargin(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 }

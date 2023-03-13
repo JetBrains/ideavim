@@ -32,7 +32,7 @@ class InsertBeforeFirstNonBlankActionTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
     assertMode(VimStateMachine.Mode.COMMAND)
   }

@@ -34,15 +34,21 @@ class ChangeNumberActionTest : VimTestCase() {
 
   fun testIncrementOctal() {
     doTest(
-      Lists.newArrayList(":set nf=octal<Enter>", "<C-A>"), "0477", "0500", VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      Lists.newArrayList(":set nf=octal<Enter>", "<C-A>"),
+      "0477",
+      "0500",
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
   fun testDecrementOctal() {
     doTest(
-      Lists.newArrayList(":set nf=octal<Enter>", "<C-X>"), "010", "007", VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      Lists.newArrayList(":set nf=octal<Enter>", "<C-X>"),
+      "010",
+      "007",
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -65,16 +71,22 @@ class ChangeNumberActionTest : VimTestCase() {
   fun testIncrementNegativeOctal() {
     // Minus isn't processed
     doTest(
-      Lists.newArrayList(":set nf=octal<Enter>", "<C-A>"), "-0477", "-0500", VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      Lists.newArrayList(":set nf=octal<Enter>", "<C-A>"),
+      "-0477",
+      "-0500",
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
   fun testDecrementNegativeOctal() {
     // Minus isn't processed
     doTest(
-      Lists.newArrayList(":set nf=octal<Enter>", "<C-X>"), "-010", "-007", VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      Lists.newArrayList(":set nf=octal<Enter>", "<C-X>"),
+      "-010",
+      "-007",
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -100,50 +112,71 @@ class ChangeNumberActionTest : VimTestCase() {
 
   fun testIncrementAlphaWithNumberFormatAlpha() {
     doTest(
-      Lists.newArrayList(":set nf=alpha<Enter>", "<C-A>"), "foo", "goo", VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      Lists.newArrayList(":set nf=alpha<Enter>", "<C-A>"),
+      "foo",
+      "goo",
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
   fun testIncrementZWithNumberFormatAlpha() {
     doTest(
-      Lists.newArrayList(":set nf=alpha<Enter>", "<C-A>"), "zzz", "zzz", VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      Lists.newArrayList(":set nf=alpha<Enter>", "<C-A>"),
+      "zzz",
+      "zzz",
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
   fun testIncrementXInHexNumberWithNumberFormatAlphaButNotHex() {
     doTest(
-      Lists.newArrayList(":set nf=alpha<Enter>", "<C-A>"), "0<caret>x1", "0y1", VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      Lists.newArrayList(":set nf=alpha<Enter>", "<C-A>"),
+      "0<caret>x1",
+      "0y1",
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
   fun testIncrementXInHexNumberWithNumberFormatHexAlpha() {
     doTest(
-      Lists.newArrayList(":set nf=alpha,hex<Enter>", "<C-A>"), "0<caret>x1", "0x2", VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      Lists.newArrayList(":set nf=alpha,hex<Enter>", "<C-A>"),
+      "0<caret>x1",
+      "0x2",
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
   fun testIncrementHexNumberWithoutNumberFormatHex() {
     doTest(
-      Lists.newArrayList(":set nf=octal<Enter>", "<C-A>"), "0x42", "1x42", VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      Lists.newArrayList(":set nf=octal<Enter>", "<C-A>"),
+      "0x42",
+      "1x42",
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
   fun testIncrementOctalNumberWithoutNumberFormatOctal() {
     doTest(
-      Lists.newArrayList(":set nf=hex<Enter>", "<C-A>"), "077", "078", VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      Lists.newArrayList(":set nf=hex<Enter>", "<C-A>"),
+      "077",
+      "078",
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
   fun testIncrementNegativeOctalNumberWithoutNumberFormatOctal() {
     doTest(
-      Lists.newArrayList(":set nf=hex<Enter>", "<C-A>"), "-077", "-076", VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      Lists.newArrayList(":set nf=hex<Enter>", "<C-A>"),
+      "-077",
+      "-076",
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -157,8 +190,11 @@ class ChangeNumberActionTest : VimTestCase() {
 
   fun testIncrementLocatesNumberOnTheSameLine() {
     doTest(
-      "<C-A>", "foo ->* bar 123\n", "foo ->* bar 12<caret>4\n", VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      "<C-A>",
+      "foo ->* bar 123\n",
+      "foo ->* bar 12<caret>4\n",
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 }

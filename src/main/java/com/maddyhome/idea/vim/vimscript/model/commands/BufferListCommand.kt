@@ -75,8 +75,13 @@ internal data class BufferListCommand(val ranges: Ranges, val argument: String) 
 
         bufferList.add(
           String.format(
-            "   %${bufNumPad}s %s %s%${lineNumPad}s line: %d", index, bufStatus, displayFileName, "", lineNum
-          )
+            "   %${bufNumPad}s %s %s%${lineNumPad}s line: %d",
+            index,
+            bufStatus,
+            displayFileName,
+            "",
+            lineNum,
+          ),
         )
       }
       index++

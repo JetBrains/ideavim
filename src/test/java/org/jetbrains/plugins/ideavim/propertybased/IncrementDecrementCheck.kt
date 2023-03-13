@@ -87,7 +87,7 @@ val differentFormNumberGenerator = Generator.from { env ->
       val sign = it.sign
       val stringNumber = it.absoluteValue.toString(form)
       if (sign < 0) "-$stringNumber" else stringNumber
-    }
+    },
   )
 }
 
@@ -97,14 +97,18 @@ val brokenNumberGenerator = Generator.from { env ->
   if (number.length > 4) {
     val insertAt = env.generate(Generator.integers(4, number.length - 1))
     number.take(insertAt) + bigChar + number.substring(insertAt)
-  } else "$number$bigChar"
+  } else {
+    "$number$bigChar"
+  }
 }
 
 val testNumberGenerator = Generator.from { env ->
   env.generate(
     Generator.frequency(
-      10, differentFormNumberGenerator,
-      1, brokenNumberGenerator
-    )
+      10,
+      differentFormNumberGenerator,
+      1,
+      brokenNumberGenerator,
+    ),
   )
 }

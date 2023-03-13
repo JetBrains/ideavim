@@ -28,7 +28,7 @@ class FuncrefCallTests {
     assertTrue(funcrefCall is FuncrefCallExpression)
     assertEquals(
       OneElementSublistExpression(CurlyBracesName(listOf(SimpleExpression("len"))), Variable(null, "dict")),
-      funcrefCall.expression
+      funcrefCall.expression,
     )
     assertEquals(0, funcrefCall.args.size)
   }
@@ -40,9 +40,9 @@ class FuncrefCallTests {
     assertEquals(
       OneElementSublistExpression(
         CurlyBracesName(listOf(SimpleExpression("len"))),
-        OneElementSublistExpression(SimpleExpression("innerDict"), Variable(null, "dict"))
+        OneElementSublistExpression(SimpleExpression("innerDict"), Variable(null, "dict")),
       ),
-      funcrefCall.expression
+      funcrefCall.expression,
     )
     assertEquals(0, funcrefCall.args.size)
   }
@@ -53,7 +53,7 @@ class FuncrefCallTests {
     assertTrue(funcrefCall is FuncrefCallExpression)
     assertEquals(
       OneElementSublistExpression(CurlyBracesName(listOf(SimpleExpression("len"))), Variable(null, "dict")),
-      funcrefCall.expression
+      funcrefCall.expression,
     )
     assertEquals(2, funcrefCall.args.size)
     assertEquals(Variable(null, "a"), funcrefCall.args[0])

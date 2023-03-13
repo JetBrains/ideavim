@@ -51,6 +51,7 @@ internal class IjVimStorageService : VimStorageServiceBase() {
   }
 
   private val ijKeys = mutableMapOf<String, Key<out Any?>>()
+
   @Suppress("UNCHECKED_CAST")
   private fun <T> getOrCreateIjKey(key: com.maddyhome.idea.vim.api.Key<T>): Key<T> {
     val storedIjKey = ijKeys[key.name]

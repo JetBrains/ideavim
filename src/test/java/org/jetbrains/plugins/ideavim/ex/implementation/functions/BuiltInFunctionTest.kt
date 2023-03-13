@@ -85,7 +85,7 @@ class BuiltInFunctionTest : VimTestCase() {
   1234${c}567890
   4
   5
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(commandToKeys("echo col('.')"))
     assertExOutput("5\n")

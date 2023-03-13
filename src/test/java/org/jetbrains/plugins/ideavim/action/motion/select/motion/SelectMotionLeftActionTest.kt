@@ -25,8 +25,8 @@ class SelectMotionLeftActionTest : VimOptionTestCase(OptionConstants.keymodel) {
     VimTestOption(
       OptionConstants.keymodel,
       OptionValueType.STRING,
-      OptionConstants.keymodel_stopselect
-    )
+      OptionConstants.keymodel_stopselect,
+    ),
   )
   fun `test char select simple move`() {
     doTest(
@@ -48,7 +48,7 @@ class SelectMotionLeftActionTest : VimOptionTestCase(OptionConstants.keymodel) {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -57,8 +57,8 @@ class SelectMotionLeftActionTest : VimOptionTestCase(OptionConstants.keymodel) {
     VimTestOption(
       OptionConstants.keymodel,
       OptionValueType.STRING,
-      OptionConstants.keymodel_stopselect
-    )
+      OptionConstants.keymodel_stopselect,
+    ),
   )
   fun `test select multiple carets`() {
     doTest(
@@ -80,7 +80,7 @@ class SelectMotionLeftActionTest : VimOptionTestCase(OptionConstants.keymodel) {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -106,7 +106,7 @@ class SelectMotionLeftActionTest : VimOptionTestCase(OptionConstants.keymodel) {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_CHARACTER
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
     )
   }
 }

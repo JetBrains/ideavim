@@ -60,7 +60,7 @@ class CmdCommandTest : VimTestCase() {
             |Vs          0          vs
             |Wq          0          wq
             |WQ          0          wq
-        """.trimMargin()
+      """.trimMargin(),
     )
 
     typeText(commandToKeys("command W"))
@@ -70,7 +70,7 @@ class CmdCommandTest : VimTestCase() {
       """Name        Args       Definition
             |Wq          0          wq
             |WQ          0          wq
-        """.trimMargin()
+      """.trimMargin(),
     )
   }
 

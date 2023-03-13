@@ -25,7 +25,8 @@ class MotionParagraphPreviousActionTest : VimTestCase() {
       hard by the torrent of a mountain pass$c.
       """.trimIndent(),
       ".",
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 }

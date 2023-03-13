@@ -58,7 +58,7 @@ class ScrollColumnRightActionTest : VimTestCase() {
         repeat(300) { append("0") }
         appendLine()
         repeat(200) { append("0") }
-      }
+      },
     )
     typeText("j$")
     // Assert we got initial scroll correct

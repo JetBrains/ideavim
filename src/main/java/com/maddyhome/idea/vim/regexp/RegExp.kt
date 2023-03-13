@@ -107,7 +107,9 @@ internal class RegExp {
     }
     return if (c == Magic.STAR || c == Magic.PLUS || c == Magic.LCURLY) {
       MULTI_MULT
-    } else NOT_MULTI
+    } else {
+      NOT_MULTI
+    }
   }
 
     /*
@@ -589,8 +591,8 @@ internal class RegExp {
           injector.messages.message(
             Msg.E62,
             `val`,
-            Character.toString(Magic.no_Magic(peekchr()).toChar())
-          )
+            Character.toString(Magic.no_Magic(peekchr()).toChar()),
+          ),
         )
       }
       return null
@@ -618,7 +620,7 @@ internal class RegExp {
       HEX, NHEX, OCTAL, NOCTAL,
       WORD, NWORD, HEAD, NHEAD,
       ALPHA, NALPHA, LOWER, NLOWER,
-      UPPER, NUPPER
+      UPPER, NUPPER,
     )
     val p: CharPointer
     var extra = 0
@@ -694,8 +696,8 @@ internal class RegExp {
           injector.messages.message(
             Msg.E64,
             `val`,
-            Character.toString(c.toChar())
-          )
+            Character.toString(c.toChar()),
+          ),
         )
         return null
       }
@@ -1096,9 +1098,9 @@ internal class RegExp {
             * e.g., a "[" without matching "]".
             */len = 0
       while (c != '\u0000'.code && (
-        len == 0 || re_multi_type(peekchr()) == NOT_MULTI &&
-          !one_exactly && !Magic.is_Magic(c)
-        )
+          len == 0 || re_multi_type(peekchr()) == NOT_MULTI &&
+            !one_exactly && !Magic.is_Magic(c)
+          )
       ) {
         c = Magic.no_Magic(c)
         regc(c)
@@ -1254,8 +1256,8 @@ internal class RegExp {
                      * "\(", "\|", "\&' or "\n" */if (reg_magic >= MAGIC_OFF &&
           (
             at_start || reg_magic == MAGIC_ALL || prevchr == Magic.LPAREN || prevchr == Magic.PIPE || prevchr == Magic.AMP || prevchr == Magic.n || Magic.no_Magic(
-                prevchr
-              ) == '('.code &&
+              prevchr,
+            ) == '('.code &&
               prevprevchr == Magic.PERCENT
             )
         ) {
@@ -1268,10 +1270,10 @@ internal class RegExp {
           val p = regparse!!.ref(1)
 
           /* ignore \c \C \m and \M after '$' */while (p.charAt(0) == '\\' && (
-            p.charAt(1) == 'c' || p.charAt(
-                1
+              p.charAt(1) == 'c' || p.charAt(
+                1,
               ) == 'C' || p.charAt(1) == 'm' || p.charAt(1) == 'M'
-            )
+              )
           ) {
             p.inc(2)
           }
@@ -1457,9 +1459,11 @@ internal class RegExp {
          * can't go before line 1 */
     return if (reg_firstlnum + lnum < 0) {
       null
-    } else CharPointer(
-      reg_buf!!.getLineBuffer(reg_firstlnum + lnum)
-    )
+    } else {
+      CharPointer(
+        reg_buf!!.getLineBuffer(reg_firstlnum + lnum),
+      )
+    }
 
     // return ml_get_buf(reg_buf, reg_firstlnum + lnum, false);
   }
@@ -1493,7 +1497,7 @@ internal class RegExp {
     buf: VimEditor?,
     lcount: Int,
     lnum: Int,
-    col: Int
+    col: Int,
   ): Int /* window in which to search or null */ /* buffer in which to search */ /* nr of line to start looking for match */ /* column to start looking for match */ {
     val r: Int
     // VimEditor save_curbuf = curbuf;
@@ -1747,9 +1751,9 @@ internal class RegExp {
             /* Only accept single line matches. */
             if (reg_startzpos[i]!!.lnum >= 0 && reg_endzpos[i]!!.lnum == reg_startzpos[i]!!.lnum) {
               re_extmatch_out!!.matches[i] = reg_getline(
-                reg_startzpos[i]!!.lnum
+                reg_startzpos[i]!!.lnum,
               )!!.ref(reg_startzpos[i]!!.col).substring(
-                reg_endzpos[i]!!.col - reg_startzpos[i]!!.col
+                reg_endzpos[i]!!.col - reg_startzpos[i]!!.col,
               )
             }
           } else {
@@ -1813,7 +1817,7 @@ internal class RegExp {
           RE_BOF -> /* Passing -1 to the getline() function provided for the search
                          * should always return null if the current line is the first
                          * line of the file. */if (reglnum != 0 || !reginput!!.equals(regline) || reg_match == null && reg_getline(
-              -1
+              -1,
             ) != null
           ) {
             return false
@@ -1832,7 +1836,8 @@ internal class RegExp {
             }
           }
           RE_LNUM -> if (reg_match != null || !re_num_cmp(
-              reglnum + reg_firstlnum, scan
+              reglnum + reg_firstlnum,
+              scan,
             )
           ) {
             return false
@@ -2028,9 +2033,9 @@ internal class RegExp {
             var opnd: CharPointer
             opnd = scan.OPERAND()
             /* Inline the first byte, for speed. */if (opnd.charAt() != reginput!!.charAt() && (
-              !ireg_ic ||
-                opnd.charAt().lowercaseChar() != reginput!!.charAt().lowercaseChar()
-              )
+                !ireg_ic ||
+                  opnd.charAt().lowercaseChar() != reginput!!.charAt().lowercaseChar()
+                )
             ) {
               return false
             }
@@ -2041,7 +2046,7 @@ internal class RegExp {
               /* Need to match first byte again for multi-byte. */if (cstrncmp(
                   opnd,
                   reginput!!,
-                  len
+                  len,
                 ) != 0
               ) {
                 return false
@@ -2148,7 +2153,6 @@ internal class RegExp {
                   ccol = reg_startpos[no]!!.col
                   clnum = reg_startpos[no]!!.lnum
                   while (true) {
-
                                         /* Since getting one line may invalidate
                                              * the other, need to make copy.  Slow! */if (!regline!!.equals(reg_tofree)) {
                       reg_tofree = regline!!.ref(0)
@@ -2358,7 +2362,6 @@ internal class RegExp {
                 return false
               }
               while (true) {
-
                 /* If it could work, try it. */if (nextb == '\u0000' || reginput!!.charAt() == nextb || reginput!!.charAt() == nextb_ic) {
                   reg_save(save)
                   if (regmatch(next)) {
@@ -2368,7 +2371,7 @@ internal class RegExp {
                 }
                 /* Couldn't or didn't match: try advancing one char. */if (count == minval || regrepeat(
                     scan.OPERAND(),
-                    1
+                    1,
                   ) == 0
                 ) {
                   break
@@ -2425,9 +2428,13 @@ internal class RegExp {
                                  * result, hitting the start of the line or the previous
                                  * line (for multi-line matching).
                                  * Set behind_pos to where the match should end, BHPOS
-                                 * will match it. */save_behind_pos = if (behind_pos == null) null else regsave_T(
-                behind_pos!!
-              )
+                                 * will match it. */save_behind_pos = if (behind_pos == null) {
+                null
+              } else {
+                regsave_T(
+                  behind_pos!!,
+                )
+              }
               behind_pos = regsave_T(save_start)
               while (true) {
                 reg_restore(save_start)
@@ -2942,7 +2949,9 @@ internal class RegExp {
   private fun reg_save_equal(save: regsave_T): Boolean {
     return if (reg_match == null) {
       reglnum == save.pos.lnum && reginput!!.equals(regline!!.ref(save.pos.col))
-    } else reginput!!.equals(save.ptr)
+    } else {
+      reginput!!.equals(save.ptr)
+    }
   }
 
     /*
@@ -2970,7 +2979,9 @@ internal class RegExp {
     if (reg_match == null) {
       posp.col = savep.pos.col
       posp.lnum = savep.pos.lnum
-    } else pp?.assign(savep.ptr!!)
+    } else {
+      pp?.assign(savep.ptr!!)
+    }
   }
 
     /*
@@ -2983,7 +2994,9 @@ internal class RegExp {
     }
     return if (scan.OPERAND_CMP() == '<') {
       `val` < n
-    } else `val` == n
+    } else {
+      `val` == n
+    }
   }
 
     /*
@@ -3664,6 +3677,7 @@ internal class RegExp {
 
     @JvmField
     var lnum = 0
+
     @JvmField
     var col = 0
     override fun toString(): String {
@@ -3702,10 +3716,13 @@ internal class RegExp {
   class regmmatch_T {
     @JvmField
     var regprog: regprog_T? = null
+
     @JvmField
     var startpos = arrayOfNulls<lpos_T>(NSUBEXP)
+
     @JvmField
     var endpos = arrayOfNulls<lpos_T>(NSUBEXP)
+
     @JvmField
     var rmm_ic = false
 
@@ -3965,7 +3982,7 @@ internal class RegExp {
       1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 0, 1, /*  P        S     U  V  W  X        [           _ */
       1, 0, 0, 1, 0, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1, /*     a     c  d     f     h  i     k  l  m  n  o */
       0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, /*  p        s     u  v  w  x     z  {  |     ~    */
-      1, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1
+      1, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1,
     )
 
     /* arguments for reg() */
@@ -3988,7 +4005,7 @@ internal class RegExp {
         i = 0
         while (i < (CharacterClasses.CLASS_NAMES?.size ?: 0)) {
           if (pp.ref(2)
-            .strncmp(CharacterClasses.CLASS_NAMES!![i], CharacterClasses.CLASS_NAMES[i].length) == 0
+              .strncmp(CharacterClasses.CLASS_NAMES!![i], CharacterClasses.CLASS_NAMES[i].length) == 0
           ) {
             pp.inc(CharacterClasses.CLASS_NAMES[i].length + 2)
             return i

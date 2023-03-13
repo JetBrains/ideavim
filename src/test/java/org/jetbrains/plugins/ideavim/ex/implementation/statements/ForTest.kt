@@ -25,8 +25,8 @@ class ForTest : VimTestCase() {
           let result .= i . i |
       endfor |
       echo result
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     assertExOutput("aabbccddeeff\n")
   }
@@ -41,8 +41,8 @@ class ForTest : VimTestCase() {
           let result .= char |
       endfor |
       echo result
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     assertExOutput("hello\n")
   }
@@ -61,8 +61,8 @@ class ForTest : VimTestCase() {
           endif |
       endfor |
       echo result
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     assertExOutput("hello!!\n")
   }
@@ -80,8 +80,8 @@ class ForTest : VimTestCase() {
         let result .= char |
       endfor |
       echo result
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     assertExOutput("123\n")
   }
@@ -101,8 +101,8 @@ class ForTest : VimTestCase() {
         let counter += 1 |
       endfor |
       echo firstDigitIndex
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     assertExOutput("3\n")
   }
@@ -119,8 +119,8 @@ class ForTest : VimTestCase() {
             let secondElements .= s |
           endfor |
           echo firstElements .. ' ' .. secondElements
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     assertExOutput("123 abc\n")
   }
@@ -137,8 +137,8 @@ class ForTest : VimTestCase() {
             let firstElements .= f |
             let secondElements .= s |
           endfor |
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     assertPluginError(true)
     assertPluginErrorMessageContains("E714: List required")
@@ -156,8 +156,8 @@ class ForTest : VimTestCase() {
             let firstElements .= f |
             let secondElements .= s |
           endfor |
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     assertPluginError(true)
     assertPluginErrorMessageContains("E714: List required")
@@ -175,8 +175,8 @@ class ForTest : VimTestCase() {
             let firstElements .= f |
             let secondElements .= s |
           endfor |
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     assertPluginError(true)
     assertPluginErrorMessageContains("E688: More targets than List items")
@@ -194,8 +194,8 @@ class ForTest : VimTestCase() {
             let firstElements .= f |
             let secondElements .= s |
           endfor |
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     assertPluginError(true)
     assertPluginErrorMessageContains("E684: Less targets than List items")

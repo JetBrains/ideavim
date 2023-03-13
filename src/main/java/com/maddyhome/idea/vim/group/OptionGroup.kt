@@ -23,8 +23,8 @@ internal class OptionGroup : VimOptionGroupBase() {
       StringOption(
         IjOptionConstants.ide,
         IjOptionConstants.ide,
-        ApplicationNamesInfo.getInstance().fullProductNameWithEdition
-      )
+        ApplicationNamesInfo.getInstance().fullProductNameWithEdition,
+      ),
     )
     addOption(ToggleOption(IjOptionConstants.ideacopypreprocess, IjOptionConstants.ideacopypreprocess, false))
     addOption(ToggleOption(IjOptionConstants.ideajoin, IjOptionConstants.ideajoin, false))
@@ -35,8 +35,8 @@ internal class OptionGroup : VimOptionGroupBase() {
         IjOptionConstants.idearefactormode,
         "select",
         isList = false,
-        IjOptionConstants.ideaRefactorModeValues
-      )
+        IjOptionConstants.ideaRefactorModeValues,
+      ),
     )
     addOption(
       StringOption(
@@ -44,8 +44,8 @@ internal class OptionGroup : VimOptionGroupBase() {
         IjOptionConstants.ideastatusicon,
         "enabled",
         isList = false,
-        IjOptionConstants.ideaStatusIconValues
-      )
+        IjOptionConstants.ideaStatusIconValues,
+      ),
     )
     addOption(
       StringOption(
@@ -53,8 +53,8 @@ internal class OptionGroup : VimOptionGroupBase() {
         IjOptionConstants.ideavimsupport,
         "dialog",
         isList = true,
-        IjOptionConstants.ideavimsupportValues
-      )
+        IjOptionConstants.ideavimsupportValues,
+      ),
     )
     addOption(
       StringOption(
@@ -62,16 +62,16 @@ internal class OptionGroup : VimOptionGroupBase() {
         IjOptionConstants.ideawrite,
         "all",
         isList = false,
-        IjOptionConstants.ideaWriteValues
-      )
+        IjOptionConstants.ideaWriteValues,
+      ),
     )
     addOption(
       StringOption(
         IjOptionConstants.lookupkeys,
         IjOptionConstants.lookupkeys,
         "<Tab>,<Down>,<Up>,<Enter>,<Left>,<Right>,<C-Down>,<C-Up>,<PageUp>,<PageDown>,<C-J>,<C-Q>",
-        isList = true
-      )
+        isList = true,
+      ),
     )
     addOption(ToggleOption(IjOptionConstants.oldundo, IjOptionConstants.oldundo, true))
     addOption(ToggleOption(IjOptionConstants.trackactionids, "tai", false))
@@ -83,8 +83,8 @@ internal class OptionGroup : VimOptionGroupBase() {
         OptionConstants.clipboard,
         OptionConstants.clipboardAlias,
         "ideaput,autoselect,exclude:cons\\|linux",
-        isList = true
-      )
+        isList = true,
+      ),
     )
 
     addOption(ToggleOption("unifyjumps", "unifyjumps", true))

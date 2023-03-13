@@ -21,7 +21,7 @@ class YankLinesCommandTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 h
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(commandToKeys("3,4y"))
     val yanked = VimPlugin.getRegister().lastRegister!!.text
@@ -29,8 +29,8 @@ class YankLinesCommandTest : VimTestCase() {
       """|I found it in a legendary land
          |all rocks and lavender and tufted grass,
          |
-         """.trimMargin(),
-      yanked
+      """.trimMargin(),
+      yanked,
     )
   }
 
@@ -43,7 +43,7 @@ class YankLinesCommandTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 h
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(commandToKeys("%y"))
     val yanked = VimPlugin.getRegister().lastRegister!!.text
@@ -57,7 +57,7 @@ class YankLinesCommandTest : VimTestCase() {
                 h
                 
       """.trimIndent(),
-      yanked
+      yanked,
     )
   }
 }

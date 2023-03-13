@@ -32,7 +32,8 @@ class MotionParagraphNextActionTest : VimTestCase() {
         void baz() {
         }
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 }

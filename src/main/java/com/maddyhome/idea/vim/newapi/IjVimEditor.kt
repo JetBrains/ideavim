@@ -94,7 +94,6 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor() {
 
   override fun addLine(atPosition: EditorLine.Offset): EditorLine.Pointer {
     val offset: Int = if (atPosition.line < lineCount()) {
-
       // The new line character is inserted before the new line char of the previous line. So it works line an enter
       //   on a line end. I believe that the correct implementation would be to insert the new line char after the
       //   \n of the previous line, however at the moment this won't update the mark on this line.
@@ -190,7 +189,7 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor() {
   override fun search(
     pair: Pair<Offset, Offset>,
     editor: VimEditor,
-    shiftType: LineDeleteShift
+    shiftType: LineDeleteShift,
   ): Pair<Pair<Offset, Offset>, LineDeleteShift>? {
     val ijEditor = (editor as IjVimEditor).editor
     return when (shiftType) {
@@ -391,8 +390,8 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor() {
       VisualPosition(
         position.line,
         position.column,
-        position.leansRight
-      )
+        position.leansRight,
+      ),
     )
     return BufferPosition(logPosition.line, logPosition.column, logPosition.leansForward)
   }

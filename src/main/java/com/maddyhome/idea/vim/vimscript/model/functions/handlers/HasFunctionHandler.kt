@@ -34,9 +34,10 @@ internal class HasFunctionHandler : FunctionHandler() {
     if (feature == "ide") {
       VimscriptState.isIDESpecificConfigurationUsed = true
     }
-    return if (supportedFeatures.contains(feature))
+    return if (supportedFeatures.contains(feature)) {
       VimInt.ONE
-    else
+    } else {
       VimInt.ZERO
+    }
   }
 }

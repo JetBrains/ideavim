@@ -35,7 +35,7 @@ class SelectEnableBlockModeActionHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_BLOCK
+      VimStateMachine.SubMode.VISUAL_BLOCK,
     )
   }
 
@@ -60,7 +60,7 @@ class SelectEnableBlockModeActionHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass$s.$c$se
       """.trimIndent(),
       VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_BLOCK
+      VimStateMachine.SubMode.VISUAL_BLOCK,
     )
   }
 
@@ -84,7 +84,7 @@ class SelectEnableBlockModeActionHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_BLOCK
+      VimStateMachine.SubMode.VISUAL_BLOCK,
     )
   }
 
@@ -109,7 +109,7 @@ class SelectEnableBlockModeActionHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_BLOCK
+      VimStateMachine.SubMode.VISUAL_BLOCK,
     )
   }
 }

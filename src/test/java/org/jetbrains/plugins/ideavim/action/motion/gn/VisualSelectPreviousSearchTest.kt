@@ -31,7 +31,7 @@ class VisualSelectPreviousSearchTest : VimTestCase() {
   fun testSearchMulticaret() {
     typeTextInFile(
       injector.parser.parseKeys("*" + "b" + "gN"),
-      "h<caret>ello world\nh<caret>ello world hello world"
+      "h<caret>ello world\nh<caret>ello world hello world",
     )
     assertEquals(1, myFixture.editor.caretModel.caretCount)
     assertMode(VimStateMachine.Mode.VISUAL)

@@ -17,7 +17,6 @@ import com.maddyhome.idea.vim.group.EditorHolderService
 @Service
 internal class VimProjectService(val project: Project) : Disposable {
   override fun dispose() {
-
     // Not sure if this is a best solution
     EditorHolderService.getInstance().editor = null
   }

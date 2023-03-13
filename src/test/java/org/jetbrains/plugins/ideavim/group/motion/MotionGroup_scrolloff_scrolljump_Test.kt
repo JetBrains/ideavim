@@ -436,7 +436,7 @@ class MotionGroup_scrolloff_scrolljump_Test : VimOptionTestCase(OptionConstants.
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(OptionConstants.scrolljump, OptionValueType.NUMBER, "10"),
-    VimTestOption(OptionConstants.scrolloff, OptionValueType.NUMBER, "5")
+    VimTestOption(OptionConstants.scrolloff, OptionValueType.NUMBER, "5"),
   )
   fun `test scroll up with scrolloff and scrolljump set`() {
     configureByPages(5)
@@ -449,7 +449,7 @@ class MotionGroup_scrolloff_scrolljump_Test : VimOptionTestCase(OptionConstants.
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(OptionConstants.scrolljump, OptionValueType.NUMBER, "10"),
-    VimTestOption(OptionConstants.scrolloff, OptionValueType.NUMBER, "5")
+    VimTestOption(OptionConstants.scrolloff, OptionValueType.NUMBER, "5"),
   )
   fun `test scroll down with scrolloff and scrolljump set`() {
     configureByPages(5)

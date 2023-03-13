@@ -42,7 +42,7 @@ class SearchGroupTest : VimTestCase() {
       """
         |${c}I found it in a legendary land
         |all rocks and lavender and tufted grass,
-      """.trimMargin()
+      """.trimMargin(),
     )
     enterSearch("$")
     assertOffset(29)
@@ -54,7 +54,7 @@ class SearchGroupTest : VimTestCase() {
       """
         |${c}I found it in a legendary land
         |all rocks and lavender and tufted grass,
-      """.trimMargin()
+      """.trimMargin(),
     )
     enterCommand("set hlsearch")
     enterSearch("$")
@@ -78,7 +78,7 @@ class SearchGroupTest : VimTestCase() {
       """
         |${c}I found it in a legendary land
         |all rocks and lavender and tufted grass,
-      """.trimMargin()
+      """.trimMargin(),
     )
     enterCommand("set hlsearch")
     enterSearch("\\&")
@@ -104,7 +104,7 @@ class SearchGroupTest : VimTestCase() {
       """
         |${c}I found it in a legendary land
         |all rocks and lavender and tufted grass,
-      """.trimMargin()
+      """.trimMargin(),
     )
     enterSearch("\\(found\\)")
     assertOffset(2)
@@ -131,7 +131,7 @@ class SearchGroupTest : VimTestCase() {
   fun `test negative lookbehind regression`() {
     val pos = search(
       "a\\@<!b",
-      "${c}ab\n"
+      "${c}ab\n",
     )
     assertEquals(-1, pos)
   }
@@ -195,7 +195,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
         |${c}all rocks and lavender and tufted grass,
         |where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.""".trimMargin()
+        |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
     enterSearch("in/e+10")
     assertPosition(3, 38)
@@ -206,7 +207,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
         |${c}all rocks and lavender and tufted grass,
         |where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.""".trimMargin()
+        |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
     enterSearch("in/e+10")
     typeText("n")
@@ -220,7 +222,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
         |all rocks and lavender and tufted grass,
         |where it was settled on some sodden sand
-        |${c}hard by the torrent of a mountain pass.""".trimMargin()
+        |${c}hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
     enterSearch("ass./e+10")
     typeText("n")
@@ -253,7 +256,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
         |${c}all rocks and lavender and tufted grass,
         |where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.""".trimMargin()
+        |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
     enterSearch("it?s-20", false)
     assertOffset(0)
@@ -265,7 +269,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
         |${c}all rocks and lavender and tufted grass,
         |where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.""".trimMargin()
+        |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
     enterSearch("it?s-20", false)
     typeText("N")
@@ -314,7 +319,7 @@ class SearchGroupTest : VimTestCase() {
         |${c}all rocks and lavender and tufted grass,
         |where it was settled on some sodden sand
         |hard by the torrent of a mountain pass.
-     """.trimMargin()
+      """.trimMargin(),
     )
     enterSearch("rocks/-1")
     assertOffset(0)
@@ -327,7 +332,7 @@ class SearchGroupTest : VimTestCase() {
         |${c}all rocks and lavender and tufted grass,
         |where it was settled on some sodden sand
         |hard by the torrent of a mountain pass.
-      """.trimMargin()
+      """.trimMargin(),
     )
     enterSearch("rocks/+2")
     assertOffset(113)
@@ -397,7 +402,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
          |${c}all rocks and lavender and tufted grass,
          |where it was settled on some sodden sand
-         |hard by the torrent of a mountain pass.""".trimMargin()
+         |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
     enterCommand("set incsearch")
     typeText("/", "la")
@@ -410,7 +416,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
          |${c}all rocks and lavender and tufted grass,
          |where it was settled on some sodden sand
-         |hard by the torrent of a mountain pass.""".trimMargin()
+         |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
     enterCommand("set hlsearch incsearch")
     typeText("/", "la")
@@ -423,7 +430,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
            |${c}all rocks and lavender and tufted grass,
            |where it was settled on some sodden sand
-           |hard by the torrent of a mountain pass.""".trimMargin()
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
     enterCommand("set incsearch")
     typeText("?", "la")
@@ -436,7 +444,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
            |${c}all rocks and lavender and tufted grass,
            |where it was settled on some sodden sand
-           |hard by the torrent of a mountain pass.""".trimMargin()
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
     enterCommand("set hlsearch incsearch")
     typeText("?", "la")
@@ -448,7 +457,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
              |${c}all rocks and lavender and tufted grass,
              |where it was settled on some sodden sand
-             |hard by the torrent of a mountain pass.""".trimMargin()
+             |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
     enterCommand("set incsearch")
     typeText("/", "lazzz")
@@ -460,7 +470,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
              |${c}all rocks and lavender and tufted grass,
              |where it was settled on some sodden sand
-             |hard by the torrent of a mountain pass.""".trimMargin()
+             |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
     enterCommand("set hlsearch incsearch")
     typeText("/", "lazzz")
@@ -472,7 +483,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
            |${c}all rocks and lavender and tufted grass,
            |where it was settled on some sodden sand
-           |hard by the torrent of a mountain pass.""".trimMargin()
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
     enterCommand("set incsearch")
     typeText("/", "la", "<Esc>")
@@ -484,7 +496,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
            |${c}all rocks and lavender and tufted grass,
            |where it was settled on some sodden sand
-           |hard by the torrent of a mountain pass.""".trimMargin()
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
     enterCommand("set hlsearch incsearch")
     typeText("/", "la", "<Esc>")
@@ -497,7 +510,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
            |${c}all rocks and lavender and tufted grass,
            |where it was settled on some sodden sand
-           |hard by the torrent of a mountain pass.""".trimMargin()
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
     enterCommand("set incsearch")
     typeText("/", "wh")
@@ -512,7 +526,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
            |${c}all rocks and lavender and tufted grass,
            |where it was settled on some sodden sand
-           |hard by the torrent of a mountain pass.""".trimMargin()
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
     enterCommand("set hlsearch incsearch")
     typeText("/", "wh")
@@ -526,7 +541,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
            |${c}all rocks and lavender and tufted grass,
            |where it was settled on some sodden sand
-           |hard by the torrent of a mountain pass.""".trimMargin()
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
     enterCommand("set incsearch")
     enterSearch("and")
@@ -538,7 +554,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
            |${c}all rocks and lavender and tufted grass,
            |where it was settled on some sodden sand
-           |hard by the torrent of a mountain pass.""".trimMargin()
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
     enterCommand("set hlsearch incsearch")
     enterSearch("and")
@@ -550,7 +567,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
            |${c}all rocks and lavender and tufted grass,
            |where it was settled on some sodden sand
-           |hard by the torrent of a mountain pass.""".trimMargin()
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
     enterCommand("set incsearch")
 
@@ -561,7 +579,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
            |all rocks ‷and‴ lavender and tufted grass,
            |where it was settled on some sodden sand
-           |hard by the torrent of a mountain pass.""".trimMargin()
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
   }
 
@@ -570,7 +589,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
            |all rocks and lave${c}nder and tufted grass,
            |where it was settled on some sodden sand
-           |hard by the torrent of a mountain pass.""".trimMargin()
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
     enterCommand("set incsearch")
 
@@ -581,7 +601,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
            |all rocks and l‷a‴vender and tufted grass,
            |where it was settled on some sodden sand
-           |hard by the torrent of a mountain pass.""".trimMargin()
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
   }
 
@@ -590,7 +611,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
            |${c}all rocks and lavender and tufted grass,
            |where it was settled on some sodden sand
-           |hard by the torrent of a mountain pass.""".trimMargin()
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
     enterCommand("set hlsearch incsearch")
 
@@ -601,7 +623,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary l«and»
            |all rocks ‷and‴ lavender «and» tufted grass,
            |where it was settled on some sodden s«and»
-           |hard by the torrent of a mountain pass.""".trimMargin()
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
   }
 
@@ -610,7 +633,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
            |${c}all rocks and lavender and tufted grass,
            |where it was settled on some sodden sand
-           |hard by the torrent of a mountain pass.""".trimMargin()
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
     enterCommand("set hlsearch incsearch")
 
@@ -620,7 +644,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary l«and»
            |all rocks ‷and‴ lavender «and» tufted grass,
            |where it was settled on some sodden s«and»
-           |hard by the torrent of a mountain pass.""".trimMargin()
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
     typeText("zz")
 
@@ -629,7 +654,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
            |all rocks and lavender and tufted grass,
            |where it was settled on some sodden sand
-           |hard by the torrent of a mountain pass.""".trimMargin()
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
   }
 
@@ -638,7 +664,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
            |${c}all rocks and lavender and tufted grass,
            |where it was settled on some sodden sand
-           |hard by the torrent of a mountain pass.""".trimMargin()
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
     enterCommand("set hlsearch incsearch")
 
@@ -649,7 +676,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary l«and»
            |all rocks «and» lavender «and» tufted grass,
            |where it was settled on some sodden s«and»
-           |hard by the torrent of a mountain pass.""".trimMargin()
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
     typeText("v")
 
@@ -658,7 +686,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
            |all rocks and la‷v‴ender and tufted grass,
            |where it was settled on some sodden sand
-           |hard by the torrent of a mountain pass.""".trimMargin()
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
   }
 
@@ -667,7 +696,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
            |${c}all rocks and lavender and tufted grass,
            |where it was settled on some sodden sand
-           |hard by the torrent of a mountain pass.""".trimMargin()
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
     enterCommand("set hlsearch incsearch")
 
@@ -679,7 +709,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
            |all rocks and lavender and tufted grass,
            |where it was settled on some sodden sand
-           |hard by the torrent of a mountain pass.""".trimMargin()
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
   }
 
@@ -688,7 +719,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
            |${c}all rocks and lavender and tufted grass,
            |where it was settled on some sodden sand
-           |hard by the torrent of a mountain pass.""".trimMargin()
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
     enterCommand("set hlsearch incsearch")
 
@@ -700,7 +732,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary l«and»
            |all rocks «and» lavender «and» tufted grass,
            |where it was settled on some sodden s«and»
-           |hard by the torrent of a mountain pass.""".trimMargin()
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
   }
 
@@ -709,7 +742,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
            |${c}all rocks and lavender and tufted grass,
            |where it was settled on some sodden sand
-           |hard by the torrent of a mountain pass.""".trimMargin()
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
     enterCommand("set hlsearch incsearch")
 
@@ -722,7 +756,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
            |all rocks and lavender and tufted grass,
            |where it was settled on some sodden sand
-           |hard by the torrent of a mountain pass.""".trimMargin()
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
   }
 
@@ -731,7 +766,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
            |${c}all rocks and lavender and tufted grass,
            |where it was settled on some sodden sand
-           |hard by the torrent of a mountain pass.""".trimMargin()
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
     enterCommand("set hlsearch incsearch")
 
@@ -742,7 +778,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary l‷and‴
            |all rocks «and» lavender «and» tufted grass,
            |where it was settled on some sodden s«and»
-           |hard by the torrent of a mountain pass.""".trimMargin()
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
   }
 
@@ -751,7 +788,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
            |${c}all rocks and lavender and tufted grass,
            |where it was settled on some sodden sand
-           |hard by the torrent of a mountain pass.""".trimMargin()
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
     enterCommand("set hlsearch incsearch")
 
@@ -764,7 +802,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary l«and»
            |all rocks «and» lavender «and» tufted grass,
            |where it was settled on some sodden s«and»
-           |hard by the torrent of a mountain pass.""".trimMargin()
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
   }
 
@@ -773,7 +812,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
            |all rocks and lavender and tufted grass,
            |where it was settled on some sodden sand
-           |${c}hard by the torrent and rush of a mountain pass.""".trimMargin()
+           |${c}hard by the torrent and rush of a mountain pass.
+      """.trimMargin(),
     )
     enterCommand("set hlsearch incsearch")
 
@@ -784,7 +824,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
            |all rocks ‷and‴ lavender «and» tufted grass,
            |where it was settled on some sodden s«and»
-           |hard by the torrent and rush of a mountain pass.""".trimMargin()
+           |hard by the torrent and rush of a mountain pass.
+      """.trimMargin(),
     )
   }
 
@@ -793,7 +834,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
            |${c}all rocks and lavender and tufted grass,
            |where it was settled on some sodden sand
-           |hard by the torrent of a mountain pass.""".trimMargin()
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
     enterCommand("set hlsearch incsearch")
 
@@ -804,7 +846,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
            |all rocks ‷and‴ lavender «and» tufted grass,
            |where it was settled on some sodden sand
-           |hard by the torrent of a mountain pass.""".trimMargin()
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
   }
 
@@ -821,7 +864,8 @@ class SearchGroupTest : VimTestCase() {
            |I found it in a legendary land
            |all rocks and lavender and tufted grass,
            |where it was settled on some sodden sand
-           |hard by the torrent of a mountain pass.""".trimMargin()
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
     enterCommand("set hlsearch incsearch")
 
@@ -840,7 +884,8 @@ class SearchGroupTest : VimTestCase() {
            |I found it in a legendary land
            |all rocks and lavender and tufted grass,
            |where it was settled on some sodden sand
-           |hard by the torrent of a mountain pass.""".trimMargin()
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
   }
 
@@ -849,7 +894,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
              |${c}all rocks and lavender and tufted grass,
              |where it was settled on some sodden sand
-             |hard by the torrent of a mountain pass.""".trimMargin()
+             |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
     enterCommand("set hlsearch incsearch")
 
@@ -860,7 +906,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
              |all rocks and lavender and tufted grass,
              |where it was settled on some sodden sand
-             |hard by the torrent of a mountain pass.""".trimMargin()
+             |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
   }
 
@@ -869,7 +916,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
            |${c}all rocks and lavender and tufted grass,
            |where it was settled on some sodden sand
-           |hard by the torrent of a mountain pass.""".trimMargin()
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
     enterCommand("set hlsearch incsearch")
 
@@ -881,7 +929,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary l«and»
            |all rocks «and» lavender «and» tufted grass,
            |where it was settled on some sodden s«and»
-           |hard by the torrent of a mountain pass.""".trimMargin()
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
 
     // TODO: Check caret position
@@ -892,7 +941,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
            |${c}all rocks and lavender and tufted grass,
            |where it was settled on some sodden sand
-           |hard by the torrent of a mountain pass.""".trimMargin()
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
     enterCommand("set hlsearch incsearch")
 
@@ -904,7 +954,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary l«and»
            |all rocks «and» lavender «and» tufted grass,
            |where it was settled on some sodden s«and»
-           |hard by the torrent of a mountain pass.""".trimMargin()
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
 
     // TODO: Check caret position
@@ -915,7 +966,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
            |${c}all rocks and lavender and tufted grass,
            |where it was settled on some sodden sand
-           |hard by the torrent of a mountain pass.""".trimMargin()
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
     enterCommand("set hlsearch")
 
@@ -927,7 +979,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary l«and»
            |all rocks «and» lavender «and» tufted grass,
            |where it was settled on some sodden s«and»
-           |hard by the torrent of a mountain pass.""".trimMargin()
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
   }
 
@@ -936,7 +989,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
          |${c}all rocks and lavender and tufted grass,
          |where it was settled on some sodden sand
-         |hard by the torrent of a mountain pass.""".trimMargin()
+         |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
     enterCommand("set hlsearch")
 
@@ -949,7 +1003,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary l«and»
            |all rocks «and» lavender «and» tufted grass,
            |where it was settled on some sodden s«and»
-           |hard by the torrent of a mountain pass.""".trimMargin()
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
   }
 
@@ -958,7 +1013,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
          |${c}all rocks and lavender and tufted grass,
          |where it was settled on some sodden sand
-         |hard by the torrent of a mountain pass.""".trimMargin()
+         |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
     enterCommand("set hlsearch")
     enterSearch("zzzz")
@@ -970,7 +1026,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
          |${c}all rocks and lavender and tufted grass,
          |where it was settled on some sodden sand
-         |hard by the torrent of a mountain pass.""".trimMargin()
+         |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
     enterCommand("set hlsearch")
     enterSearch("and")
@@ -983,7 +1040,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
          |${c}all rocks and lavender and tufted grass,
          |where it was settled on some sodden sand
-         |hard by the torrent of a mountain pass.""".trimMargin()
+         |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
     enterCommand("set hlsearch")
 
@@ -997,7 +1055,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary l«and»
            |all rocks «and» lavender «and» tufted grass,
            |where it was settled on some sodden s«and»
-           |hard by the torrent of a mountain pass.""".trimMargin()
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
   }
 
@@ -1008,7 +1067,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
         |${c}all rocks and lavender and tufted grass,
         |where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.""".trimMargin()
+        |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
     enterCommand("set hlsearch incsearch")
 
@@ -1023,7 +1083,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
         |all rocks and «lavender» and tufted grass,
         |where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.""".trimMargin()
+        |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
   }
 
@@ -1032,7 +1093,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
          |${c}all rocks and lavender and tufted grass,
          |where it was settled on some sodden sand
-         |hard by the torrent of a mountain pass.""".trimMargin()
+         |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
     enterCommand("set hlsearch")
     enterSearch("and")
@@ -1045,7 +1107,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
          |${c}all rocks and lavender and tufted grass,
          |where it was settled on some sodden sand
-         |hard by the torrent of a mountain pass.""".trimMargin()
+         |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
 
     val pattern = "and"
@@ -1057,7 +1120,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary l«and»
            |all rocks «and» lavender «and» tufted grass,
            |where it was settled on some sodden s«and»
-           |hard by the torrent of a mountain pass.""".trimMargin()
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
   }
 
@@ -1066,7 +1130,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
          |${c}all rocks and lavender and tufted grass,
          |where it was settled on some sodden sand
-         |hard by the torrent of a mountain pass.""".trimMargin()
+         |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
     enterCommand("set hlsearch")
 
@@ -1079,7 +1144,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary l«and»
            |all «and» lavender «and» tufted grass,
            |where it was settled on some sodden s«and»
-           |hard by the torrent of a mountain pass.""".trimMargin()
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
   }
 
@@ -1088,7 +1154,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
          |${c}all rocks and lavender and tufted grass,
          |where it was settled on some sodden sand
-         |hard by the torrent of a mountain pass.""".trimMargin()
+         |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
     enterCommand("set hlsearch")
 
@@ -1101,7 +1168,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary l«and»
            |all rocks lavender «and» tufted grass,
            |where it was settled on some sodden s«and»
-           |hard by the torrent of a mountain pass.""".trimMargin()
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
   }
 
@@ -1110,7 +1178,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
          |${c}all rocks and lavender and tufted grass,
          |where it was settled on some sodden sand
-         |hard by the torrent of a mountain pass.""".trimMargin()
+         |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
     enterCommand("set hlsearch")
 
@@ -1123,7 +1192,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary l«and»
            |all rocks d lavender «and» tufted grass,
            |where it was settled on some sodden s«and»
-           |hard by the torrent of a mountain pass.""".trimMargin()
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
   }
 
@@ -1132,7 +1202,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
              |${c}all rocks and lavender and tufted grass,
              |where it was settled on some sodden sand
-             |hard by the torrent of a mountain pass.""".trimMargin()
+             |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
     enterCommand("set hlsearch")
 
@@ -1145,7 +1216,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
            |all rocks and lavender and tufted grass,
            |where it was «sled» on some sodden «sand»
-           |hard by the torrent of a mountain pass.""".trimMargin()
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
   }
 
@@ -1154,7 +1226,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
          |${c}all rocks and lavender and tufted grass,
          |where it was settled on some sodden sand
-         |hard by the torrent of a mountain pass.""".trimMargin()
+         |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
     enterCommand("set hlsearch")
 
@@ -1167,7 +1240,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary l«and»
            |all rocks, trees «and» lavender «and» tufted grass,
            |where it was settled on some sodden s«and»
-           |hard by the torrent of a mountain pass.""".trimMargin()
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
   }
 
@@ -1176,7 +1250,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
          |${c}all rocks and lavender and tufted grass,
          |where it was settled on some sodden sand
-         |hard by the torrent of a mountain pass.""".trimMargin()
+         |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
     enterCommand("set hlsearch")
 
@@ -1189,7 +1264,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary l«and»
            |all rocks aFOOnd lavender «and» tufted grass,
            |where it was settled on some sodden s«and»
-           |hard by the torrent of a mountain pass.""".trimMargin()
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
   }
 
@@ -1198,7 +1274,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
          |${c}all rocks and lavender and tufted grass,
          |where it was settled on some sodden sand
-         |hard by the torrent of a mountain pass.""".trimMargin()
+         |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
     enterCommand("set hlsearch")
 
@@ -1211,7 +1288,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
            |all rocks and lavender and tufted grass,
            |where it was «sFOOettled» on some sodden «sand»
-           |hard by the torrent of a mountain pass.""".trimMargin()
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
   }
 
@@ -1220,7 +1298,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
          |${c}all rocks and lavender and tufted grass,
          |where it was settled on some sodden sand
-         |hard by the torrent of a mountain pass.""".trimMargin()
+         |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
     enterCommand("set hlsearch")
 
@@ -1234,7 +1313,8 @@ class SearchGroupTest : VimTestCase() {
            |all rocks «and» lavender «and» tufted grass,
            |«and» then I saw a cat «and» a dog
            |where it was settled on some sodden s«and»
-           |hard by the torrent of a mountain pass.""".trimMargin()
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
   }
 
@@ -1244,7 +1324,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
            |${c}all rocks and lavender and tufted grass,
            |where it was settled on some sodden sand
-           |hard by the torrent of a mountain pass.""".trimMargin()
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
     enterCommand("set hlsearch")
 
@@ -1256,7 +1337,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary l«and»
            |all boulders «and» lavender «and» tufted grass,
            |where it was settled on some sodden s«and»
-           |hard by the torrent of a mountain pass.""".trimMargin()
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
   }
 
@@ -1265,7 +1347,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
          |${c}all rocks and lavender and tufted grass,
          |where it was settled on some sodden sand
-         |hard by the torrent of a mountain pass.""".trimMargin()
+         |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
     enterCommand("set hlsearch")
 
@@ -1278,7 +1361,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary l«and»
          |all rocks also lavender «and» tufted grass,
          |where it was settled on some sodden s«and»
-         |hard by the torrent of a mountain pass.""".trimMargin()
+         |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
   }
 
@@ -1287,7 +1371,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
           |${c}all rocks and lavender and tufted grass,
           |where it was settled on some sodden sand
-          |hard by the torrent of a mountain pass.""".trimMargin()
+          |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
     enterCommand("set hlsearch")
 
@@ -1300,7 +1385,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary l«and»
           |all rocks «and» trees «and» boulders «and» tufted grass,
           |where it was settled on some sodden s«and»
-          |hard by the torrent of a mountain pass.""".trimMargin()
+          |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
   }
 
@@ -1309,7 +1395,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
             |${c}all rocks and lavender and tufted grass,
             |where it was settled on some sodden sand
-            |hard by the torrent of a mountain pass.""".trimMargin()
+            |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
     enterCommand("set hlsearch")
 
@@ -1322,7 +1409,8 @@ class SearchGroupTest : VimTestCase() {
       """I found it in a legendary land
             |all rocks and lavender and tufted grass,
             |where it was «shuffled» on some sodden «sand»
-            |hard by the torrent of a mountain pass.""".trimMargin()
+            |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
   }
 
@@ -1354,7 +1442,8 @@ class SearchGroupTest : VimTestCase() {
         val n = searchGroup.processSearchCommand(editor.vim, pattern, myFixture.caretOffset, Direction.FORWARDS)
         ref.set(n)
       },
-      null, null
+      null,
+      null,
     )
     return ref.get()
   }
@@ -1403,31 +1492,31 @@ class SearchGroupTest : VimTestCase() {
       assertEquals(
         "Incorrect background colour for highlighter at $offsets",
         attributes.backgroundColor,
-        it.textAttributes?.backgroundColor
+        it.textAttributes?.backgroundColor,
       )
       assertEquals(
         "Incorrect foreground colour for highlighter at $offsets",
         attributes.foregroundColor,
-        it.textAttributes?.foregroundColor
+        it.textAttributes?.foregroundColor,
       )
       // TODO: Find a better way to identify the current match
       if (it.textAttributes?.effectType == EffectType.ROUNDED_BOX) {
         assertEquals(
           "Incorrect effect type for highlighter at $offsets",
           EffectType.ROUNDED_BOX,
-          it.textAttributes?.effectType
+          it.textAttributes?.effectType,
         )
         assertEquals("Incorrect effect colour for highlighter at $offsets", caretColour, it.textAttributes?.effectColor)
       } else {
         assertEquals(
           "Incorrect effect type for highlighter at $offsets",
           attributes.effectType,
-          it.textAttributes?.effectType
+          it.textAttributes?.effectType,
         )
         assertEquals(
           "Incorrect effect colour for highlighter at $offsets",
           attributes.effectColor,
-          it.textAttributes?.effectColor
+          it.textAttributes?.effectColor,
         )
       }
     }

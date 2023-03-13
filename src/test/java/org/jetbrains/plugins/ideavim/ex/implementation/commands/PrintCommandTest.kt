@@ -38,7 +38,7 @@ class PrintCommandTest : VimTestCase() {
     
                 I found it in a legendary land
                 
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 

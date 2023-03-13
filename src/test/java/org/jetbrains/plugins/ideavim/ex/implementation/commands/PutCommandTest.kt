@@ -23,7 +23,7 @@ class PutCommandTest : VimTestCase() {
     assertState(
       "Test\n" +
         "Hello World!\n" +
-        "<caret>World\n"
+        "<caret>World\n",
     )
   }
 

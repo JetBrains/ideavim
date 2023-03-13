@@ -212,7 +212,7 @@ internal object CommandVisitor : VimscriptBaseVisitor<Command>() {
       ranges = Ranges()
       ranges.addRange(
         createRange(ctx.shortRange().text, 0, false)
-          ?: throw ExException("Could not create a range")
+          ?: throw ExException("Could not create a range"),
       )
     }
     return GoToLineCommand(ranges)
@@ -252,10 +252,11 @@ internal object CommandVisitor : VimscriptBaseVisitor<Command>() {
         }
       }
       SplitCommand::class -> {
-        if (commandName.startsWith("v"))
+        if (commandName.startsWith("v")) {
           SplitCommand(ranges, argument, SplitType.VERTICAL)
-        else
+        } else {
           SplitCommand(ranges, argument, SplitType.HORIZONTAL)
+        }
       }
       SubstituteCommand::class -> SubstituteCommand(ranges, argument, commandName)
       else -> getCommandByName(commandName).primaryConstructor!!.call(ranges, argument)

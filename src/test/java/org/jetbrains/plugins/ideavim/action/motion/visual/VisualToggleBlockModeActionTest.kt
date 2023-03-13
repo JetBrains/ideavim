@@ -33,7 +33,8 @@ class VisualToggleBlockModeActionTest : VimTestCase() {
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_BLOCK
+      VimStateMachine.Mode.VISUAL,
+      VimStateMachine.SubMode.VISUAL_BLOCK,
     )
   }
 
@@ -56,7 +57,8 @@ class VisualToggleBlockModeActionTest : VimTestCase() {
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_BLOCK
+      VimStateMachine.Mode.VISUAL,
+      VimStateMachine.SubMode.VISUAL_BLOCK,
     )
   }
 
@@ -79,14 +81,18 @@ class VisualToggleBlockModeActionTest : VimTestCase() {
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_BLOCK
+      VimStateMachine.Mode.VISUAL,
+      VimStateMachine.SubMode.VISUAL_BLOCK,
     )
   }
 
   fun `test on empty file`() {
     doTest(
-      "<C-V>", "", "",
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_BLOCK
+      "<C-V>",
+      "",
+      "",
+      VimStateMachine.Mode.VISUAL,
+      VimStateMachine.SubMode.VISUAL_BLOCK,
     )
   }
 
@@ -99,7 +105,7 @@ class VisualToggleBlockModeActionTest : VimTestCase() {
                     all rocks and lavender and tufted grass,
                     where it was settled on some sodden sand[long line]
                     hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
     enterCommand("set selectmode=cmd")
     typeText("<C-V>")

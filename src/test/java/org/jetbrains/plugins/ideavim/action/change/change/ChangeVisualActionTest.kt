@@ -64,7 +64,7 @@ class ChangeVisualActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             
             ${c}
-  """
+  """,
   )
   fun `test multiple line change till the end`() {
     val keys = "Vjc"
@@ -146,7 +146,7 @@ class ChangeVisualActionTest : VimTestCase() {
   fun `test change visual action`() {
     typeTextInFile(
       injector.parser.parseKeys("v2lc" + "aaa" + "<ESC>"),
-      "abcd${c}ffffff${c}abcde${c}aaaa\n"
+      "abcd${c}ffffff${c}abcde${c}aaaa\n",
     )
     assertMode(VimStateMachine.Mode.COMMAND)
     assertState("abcdaa${c}afffaa${c}adeaa${c}aa\n")
@@ -170,7 +170,7 @@ class ChangeVisualActionTest : VimTestCase() {
         
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -192,7 +192,7 @@ class ChangeVisualActionTest : VimTestCase() {
         
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 }

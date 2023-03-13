@@ -33,7 +33,7 @@ class WhileLoopTests {
         while x < 5$sp1
             echo x$sp2
         endwhile$sp3
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertEquals(1, script.units.size)
     assertTrue(script.units[0] is WhileLoop)

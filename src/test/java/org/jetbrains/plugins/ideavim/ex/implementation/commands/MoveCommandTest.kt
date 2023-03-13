@@ -20,7 +20,7 @@ class MoveCommandTest : VimTestCase() {
       For example: homewor${c}k, homework, homework, homework, homework, homework, homework, homework, homework.
       See, nothing.
       
-      """.trimIndent()
+      """.trimIndent(),
     )
 
     typeText("vb:m '>+1<CR>gv")
@@ -31,7 +31,7 @@ class MoveCommandTest : VimTestCase() {
       See, nothing.
       For example: ${s}${c}homework$se, homework, homework, homework, homework, homework, homework, homework, homework.
       
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -43,7 +43,7 @@ class MoveCommandTest : VimTestCase() {
       For example: homewor${c}k, homework, homework, homework, homework, homework, homework, homework, homework.
       See, nothing.
       
-      """.trimIndent()
+      """.trimIndent(),
     )
 
     typeText("vb:m '<-2<CR>gv")
@@ -54,7 +54,7 @@ class MoveCommandTest : VimTestCase() {
       My mother taught me this trick: if you repeat something over and over again it loses its meaning.
       See, nothing.
       
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -66,7 +66,7 @@ class MoveCommandTest : VimTestCase() {
       For example: homewor${c}k, homework, homework, homework, homework, homework, homework, homework, homework.
       See, nothing.
       
-      """.trimIndent()
+      """.trimIndent(),
     )
 
     typeText("ma$:m +1<CR>`a")
@@ -77,7 +77,7 @@ class MoveCommandTest : VimTestCase() {
       See, nothing.
       For example: homewor${c}k, homework, homework, homework, homework, homework, homework, homework, homework.
       
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -89,7 +89,7 @@ class MoveCommandTest : VimTestCase() {
       For example: homewor${c}k, homework, homework, homework, homework, homework, homework, homework, homework.
       See, nothing.
       
-      """.trimIndent()
+      """.trimIndent(),
     )
 
     typeText("ma$:m -2<CR>`a")
@@ -100,7 +100,7 @@ class MoveCommandTest : VimTestCase() {
       My mother taught me this trick: if you repeat something over and over again it loses its meaning.
       See, nothing.
       
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -112,7 +112,7 @@ class MoveCommandTest : VimTestCase() {
       For example: homewor${c}k, homework, homework, homework, homework, homework, homework, homework, homework.
       See, nothing.
       
-      """.trimIndent()
+      """.trimIndent(),
     )
 
     typeText("Vj:m-2<CR>")
@@ -123,7 +123,7 @@ class MoveCommandTest : VimTestCase() {
       See, nothing.
       My mother taught me this trick: if you repeat something over and over again it loses its meaning.
       
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -134,7 +134,7 @@ class MoveCommandTest : VimTestCase() {
       My mother taught me this trick: if you repeat something over and over again it loses its meaning.
       For example: homewor${c}k, homework, homework, homework, homework, homework, homework, homework, homework.
       See, nothing.
-      """.trimIndent()
+      """.trimIndent(),
     )
     enterCommand("m 0")
     assertState(
@@ -143,7 +143,7 @@ class MoveCommandTest : VimTestCase() {
       ====
       My mother taught me this trick: if you repeat something over and over again it loses its meaning.
       See, nothing.
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -154,7 +154,7 @@ class MoveCommandTest : VimTestCase() {
       My mother taught me this trick: if you repeat something over and over again it loses its meaning.
       For example: homewor${c}k, homework, homework, homework, homework, homework, homework, homework, homework.
       See, nothing.
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText("Vj:m-3<CR>")
     assertState(
@@ -163,7 +163,7 @@ class MoveCommandTest : VimTestCase() {
       See, nothing.
       ====
       My mother taught me this trick: if you repeat something over and over again it loses its meaning.
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -174,7 +174,7 @@ class MoveCommandTest : VimTestCase() {
       My mother taught me this trick: if you repeat something over and over again it loses its meaning.
       For example: homework, homework, homework, homework, homework, homework, homework, homework, homework.
       See, not${c}hing.
-      """.trimIndent()
+      """.trimIndent(),
     )
     enterCommand("m-2")
     assertState(
@@ -183,7 +183,7 @@ class MoveCommandTest : VimTestCase() {
       My mother taught me this trick: if you repeat something over and over again it loses its meaning.
       See, not${c}hing.
       For example: homework, homework, homework, homework, homework, homework, homework, homework, homework.
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -194,7 +194,7 @@ class MoveCommandTest : VimTestCase() {
       My mother taught me this trick: if you repeat something over and over again it loses its meaning.
       For example: homewor${c}k, homework, homework, homework, homework, homework, homework, homework, homework.
       See, nothing.
-      """.trimIndent()
+      """.trimIndent(),
     )
     enterCommand("m+1")
     assertState(
@@ -203,7 +203,7 @@ class MoveCommandTest : VimTestCase() {
       My mother taught me this trick: if you repeat something over and over again it loses its meaning.
       See, nothing.
       For example: homewor${c}k, homework, homework, homework, homework, homework, homework, homework, homework.
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 }

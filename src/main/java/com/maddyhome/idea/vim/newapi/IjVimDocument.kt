@@ -28,7 +28,7 @@ internal class IjVimDocument(private val document: Document) : VimDocument {
             event.oldFragment.toString(),
             event.newFragment.toString(),
             event.offset,
-          )
+          ),
         )
       }
     }

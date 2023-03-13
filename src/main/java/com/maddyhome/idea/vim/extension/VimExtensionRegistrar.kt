@@ -47,7 +47,8 @@ internal object VimExtensionRegistrar : VimExtensionRegistrator {
           unregisterExtension(extension)
         }
       },
-      false, VimPlugin.getInstance()
+      false,
+      VimPlugin.getInstance(),
     )
   }
 
@@ -70,7 +71,7 @@ internal object VimExtensionRegistrar : VimExtensionRegistrator {
             extensionBean.instance.dispose()
           }
         }
-      }
+      },
     )
   }
 

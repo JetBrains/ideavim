@@ -17,7 +17,7 @@ import org.jetbrains.plugins.ideavim.VimTestOption
 
 class YankAndPutTest : VimOptionTestCase(OptionConstants.clipboard) {
   @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.clipboard, OptionValueType.STRING, OptionConstants.clipboard_unnamed)
+    VimTestOption(OptionConstants.clipboard, OptionValueType.STRING, OptionConstants.clipboard_unnamed),
   )
   fun `test yank to number register with unnamed`() {
     val before = """
@@ -36,7 +36,7 @@ class YankAndPutTest : VimOptionTestCase(OptionConstants.clipboard) {
       """
             I it found in a legendary land
             all rocks and lavender and tufted grass,
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -44,8 +44,8 @@ class YankAndPutTest : VimOptionTestCase(OptionConstants.clipboard) {
     VimTestOption(
       OptionConstants.clipboard,
       OptionValueType.STRING,
-      OptionConstants.clipboard_unnamed + "," + OptionConstants.clipboard_ideaput
-    )
+      OptionConstants.clipboard_unnamed + "," + OptionConstants.clipboard_ideaput,
+    ),
   )
   fun `test yank to number register with unnamed and ideaput`() {
     val before = """
@@ -64,7 +64,7 @@ class YankAndPutTest : VimOptionTestCase(OptionConstants.clipboard) {
       """
             I it found in a legendary land
             all rocks and lavender and tufted grass,
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -86,7 +86,7 @@ class YankAndPutTest : VimOptionTestCase(OptionConstants.clipboard) {
       """
             I it found in a legendary land
             all rocks and lavender and tufted grass,
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 }

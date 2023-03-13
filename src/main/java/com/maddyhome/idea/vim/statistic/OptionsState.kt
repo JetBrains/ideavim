@@ -38,8 +38,8 @@ internal class OptionsState : ApplicationUsagesCollector() {
         IDEASTATUSICON withOption IjOptionConstants.ideastatusicon,
         IDEAWRITE withOption IjOptionConstants.ideawrite,
         IDEASELECTION with globalOptions.hasValue(OptionConstants.selectmode, "ideaselection"),
-        IDEAVIMSUPPORT withOption IjOptionConstants.ideavimsupport
-      )
+        IDEAVIMSUPPORT withOption IjOptionConstants.ideavimsupport,
+      ),
     )
   }
 

@@ -164,7 +164,7 @@ class VimSurroundExtensionTest : VimTestCase() {
       before,
       after,
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -192,8 +192,11 @@ class VimSurroundExtensionTest : VimTestCase() {
     doTest("veS)", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
     assertMode(VimStateMachine.Mode.COMMAND)
     doTest(
-      "veS(", before,
-      "if ( condition ) {\n" + "}\n", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      "veS(",
+      before,
+      "if ( condition ) {\n" + "}\n",
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
     assertMode(VimStateMachine.Mode.COMMAND)
   }
@@ -354,7 +357,7 @@ class VimSurroundExtensionTest : VimTestCase() {
       </p>
       
       <p>Some text</p>
-  """
+  """,
   )
   fun `test wrap with tag full line`() {
     doTest(
@@ -373,7 +376,8 @@ class VimSurroundExtensionTest : VimTestCase() {
       </p>
       <p>Some text</p>
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -386,7 +390,7 @@ class VimSurroundExtensionTest : VimTestCase() {
           </p>
           <p>Some other paragraph</p>
       </div>
-  """
+  """,
   )
   fun `test wrap with tag full line in middle`() {
     doTest(
@@ -405,7 +409,8 @@ class VimSurroundExtensionTest : VimTestCase() {
       </p>    <p>Some other paragraph</p>
       </div>
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -426,7 +431,8 @@ class VimSurroundExtensionTest : VimTestCase() {
           <p>Some other paragraph</p>
       </div>
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 

@@ -46,7 +46,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
     IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
@@ -66,7 +66,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
     IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
@@ -84,7 +84,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.VISUAL)
     assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
@@ -99,7 +99,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-    """
+    """,
   )
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
@@ -112,7 +112,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
     IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
@@ -130,7 +130,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.VISUAL)
     assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
@@ -148,7 +148,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
     IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
@@ -166,7 +166,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.VISUAL)
     assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
@@ -184,7 +184,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
     IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
@@ -202,7 +202,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.VISUAL)
     assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
@@ -220,7 +220,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
             ${se}all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
     IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
@@ -238,7 +238,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.VISUAL)
     assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
@@ -256,7 +256,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
     IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
@@ -274,7 +274,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.VISUAL)
     assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
@@ -292,7 +292,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
     IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
@@ -310,7 +310,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.VISUAL)
     assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
@@ -328,7 +328,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
             all rocks $s$c${se}and lavender and tufted grass,
             where it was $s${c}settled$se on some sodden sand
             hard by the torrent of a mountain ${s}pass.$c$se
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
     IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
@@ -346,7 +346,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
             all rocks ${s}a${c}n${se}d lavender and tufted grass,
             where it was s$s${c}ettled$se on some sodden sand
             hard by the torrent of a mountain ${s}pass.$c$se
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.VISUAL)
     assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
@@ -364,7 +364,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
     IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
@@ -382,7 +382,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
             ${se}all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.VISUAL)
     assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
@@ -397,7 +397,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
             all rocks$c and lavender and tufted grass,
             ${se}where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.VISUAL)
     assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
@@ -415,7 +415,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
             ${se}all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
     IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
@@ -433,7 +433,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
             all rock${c}s and lavender and tufted grass,
             ${se}where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.VISUAL)
     assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
@@ -451,7 +451,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
             all rocks and lavender and tufted grass,
             where it was settled ${c}on some sodden sand$se
             hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
     IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
@@ -469,7 +469,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent o${c}f a mountain pass.$se
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.VISUAL)
     assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
@@ -487,7 +487,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand$se
             hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
     IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
@@ -505,7 +505,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
             ${s}all rocks and la${c}vender and tufted grass,
             where it was settled on some sodden sand
             ${se}hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.VISUAL)
     assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
@@ -523,7 +523,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
             all rocks and lavender and tufted grass,
             ${s}where it was settled ${c}on some sodden sand
             hard by the torrent of a mountain pass.$se
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
     IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
@@ -541,7 +541,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
             all rocks and la${c}vender and tufted grass,
             ${se}where it was settled on some sodden sand
             ${s}hard by the torrent o${c}f a mountain pass.$se
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.VISUAL)
     assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
@@ -559,7 +559,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
             ${s}all rocks and lavender ${c}and tufted grass,$se
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
     IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
@@ -577,7 +577,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
             all rocks and lavender and tufted grass,
             ${se}where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.VISUAL)
     assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
@@ -595,7 +595,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
             al${s}l roc$c${se}ks and lavender and tufted grass,
             wh${s}ere i$c${se}t was settled on some sodden sand
             ha${s}rd by $c${se}the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
     IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
@@ -616,7 +616,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
             al${s}l roc$c${se}ks and lavender and tufted grass,
             wh${s}ere i$c${se}t was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
     IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
@@ -634,7 +634,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
             al${s}l rock${c}s${se} and lavender and tufted grass,
             wh${s}ere it${c} ${se}was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.VISUAL)
     assertSubMode(VimStateMachine.SubMode.VISUAL_BLOCK)
@@ -652,7 +652,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
             al${s}l rocks and lavender and tufted grass,$c$se
             wh${s}ere it was settled on some sodden sand$c$se
             hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
     IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
@@ -670,7 +670,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
             al${s}l rocks and lavender and tufted gras${c}s${se},
             wh${s}ere it was settled on some sodden sa${c}n${se}d
             ha${s}rd by the torrent of a mountain pass.${c}$se
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.VISUAL)
     assertSubMode(VimStateMachine.SubMode.VISUAL_BLOCK)
@@ -688,7 +688,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
             al$s${c}l roc${se}ks and lavender and tufted grass,
             wh$s${c}ere i${se}t was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
     IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
@@ -706,7 +706,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
             all$s$c roc${se}ks and lavender and tufted grass,
             whe$s${c}re i${se}t was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.VISUAL)
     assertSubMode(VimStateMachine.SubMode.VISUAL_BLOCK)
@@ -717,8 +717,8 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
     VimTestOption(
       OptionConstants.selectmode,
       OptionValueType.STRING,
-      OptionConstants.selectmode_ideaselection
-    )
+      OptionConstants.selectmode_ideaselection,
+    ),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test control selection`() {
@@ -728,7 +728,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
 
             I ${c}found it in a legendary land
             all rocks and lavender and tufted grass,
-      """.trimIndent()
+      """.trimIndent(),
     )
     VimListenerManager.EditorListeners.addAll()
     assertMode(VimStateMachine.Mode.COMMAND)
@@ -747,7 +747,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
 
             I ${c}found it in a legendary land
             all rocks and lavender and tufted grass,
-      """.trimIndent()
+      """.trimIndent(),
     )
     VimListenerManager.EditorListeners.addAll()
     assertMode(VimStateMachine.Mode.COMMAND)
@@ -766,7 +766,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
 
             I ${c}found it in a legendary land
             all rocks and lavender and tufted grass,
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(injector.parser.parseKeys("V"))
     assertMode(VimStateMachine.Mode.VISUAL)
@@ -790,7 +790,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
 
             I ${c}found it in a legendary land
             all rocks and lavender and tufted grass,
-      """.trimIndent()
+      """.trimIndent(),
     )
 
     startDummyTemplate()

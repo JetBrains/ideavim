@@ -30,7 +30,7 @@ class MatchitRubyTest : VimTestCase() {
           puts "result is true"
         ${c}end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -39,7 +39,7 @@ class MatchitRubyTest : VimTestCase() {
       "%",
       """ $c  if some_boolean puts "result is true" end""",
       """   if some_boolean puts "result is true" ${c}end""",
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -48,7 +48,7 @@ class MatchitRubyTest : VimTestCase() {
       "%",
       """ $c class Foo end""",
       """  class Foo ${c}end""",
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -65,7 +65,7 @@ class MatchitRubyTest : VimTestCase() {
           puts "result is true"
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -86,7 +86,7 @@ class MatchitRubyTest : VimTestCase() {
           puts "result is false"
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -107,7 +107,7 @@ class MatchitRubyTest : VimTestCase() {
           puts "result is false"
         ${c}end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -128,7 +128,7 @@ class MatchitRubyTest : VimTestCase() {
           puts "result is false"
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -153,7 +153,7 @@ class MatchitRubyTest : VimTestCase() {
           puts "both values are false"
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -178,7 +178,7 @@ class MatchitRubyTest : VimTestCase() {
           puts "both values are false"
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -199,7 +199,7 @@ class MatchitRubyTest : VimTestCase() {
           puts "second value is true"
         ${c}end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -228,7 +228,7 @@ class MatchitRubyTest : VimTestCase() {
           puts "all values are false"
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -253,7 +253,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         ${c}end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -286,7 +286,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         ${c}end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -311,7 +311,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -336,7 +336,7 @@ class MatchitRubyTest : VimTestCase() {
           ${c}end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -361,7 +361,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -386,7 +386,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -407,7 +407,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         ${c}end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -428,7 +428,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -449,7 +449,7 @@ class MatchitRubyTest : VimTestCase() {
           ${c}end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -470,7 +470,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -507,7 +507,7 @@ class MatchitRubyTest : VimTestCase() {
 
         ${c}end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -536,7 +536,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         ${c}end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -557,7 +557,7 @@ class MatchitRubyTest : VimTestCase() {
           puts some_boolean
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -566,7 +566,7 @@ class MatchitRubyTest : VimTestCase() {
       "%",
       """puts "This line has two statements"; ${c}if true then puts "true" end""",
       """puts "This line has two statements"; if true then puts "true" ${c}end""",
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -575,7 +575,7 @@ class MatchitRubyTest : VimTestCase() {
       "%",
       """puts "This line has two statements"; if true then puts "true" ${c}end""",
       """puts "This line has two statements"; ${c}if true then puts "true" end""",
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -584,7 +584,7 @@ class MatchitRubyTest : VimTestCase() {
       "%",
       """puts "This line has ${c}two statements"; if true then puts "true" end""",
       """puts "This line has two statements"; if true then puts "true" ${c}end""",
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -593,7 +593,7 @@ class MatchitRubyTest : VimTestCase() {
       "%",
       """puts "This line has two statements"; ${c}unless nil then puts "not nil" end""",
       """puts "This line has two statements"; unless nil then puts "not nil" ${c}end""",
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -602,7 +602,7 @@ class MatchitRubyTest : VimTestCase() {
       "%",
       """if tr${c}ue puts "true" end""",
       """${c}if true puts "true" end""",
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -611,7 +611,7 @@ class MatchitRubyTest : VimTestCase() {
       "%",
       """puts "This line has two statements"; unless nil then puts "not nill" ${c}end""",
       """puts "This line has two statements"; ${c}unless nil then puts "not nill" end""",
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -632,7 +632,7 @@ class MatchitRubyTest : VimTestCase() {
        
         [1, 2, 3].each ${c}do |x| puts x end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -657,7 +657,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         ${c}end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -678,7 +678,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         ${c}end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -699,7 +699,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -722,7 +722,7 @@ class MatchitRubyTest : VimTestCase() {
           ${c}end        
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -751,7 +751,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -780,7 +780,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -809,7 +809,7 @@ class MatchitRubyTest : VimTestCase() {
           ${c}end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -838,7 +838,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -861,7 +861,7 @@ class MatchitRubyTest : VimTestCase() {
           ${c}retry
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -884,7 +884,7 @@ class MatchitRubyTest : VimTestCase() {
           retry
         ${c}end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -907,7 +907,7 @@ class MatchitRubyTest : VimTestCase() {
           end        
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -934,7 +934,7 @@ class MatchitRubyTest : VimTestCase() {
             puts "Adult"
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -961,7 +961,7 @@ class MatchitRubyTest : VimTestCase() {
             puts "Adult"
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -988,7 +988,7 @@ class MatchitRubyTest : VimTestCase() {
             puts "Adult"
         ${c}end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -1015,7 +1015,7 @@ class MatchitRubyTest : VimTestCase() {
             puts "Adult"
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -1032,7 +1032,7 @@ class MatchitRubyTest : VimTestCase() {
           var = var + 1
         ${c}end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -1059,7 +1059,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -1086,7 +1086,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -1113,7 +1113,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -1140,7 +1140,7 @@ class MatchitRubyTest : VimTestCase() {
           ${c}end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -1157,7 +1157,7 @@ class MatchitRubyTest : VimTestCase() {
           end comment
         =${c}end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -1174,7 +1174,7 @@ class MatchitRubyTest : VimTestCase() {
           begin comment
         =end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -1203,7 +1203,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         ${c}end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -1232,7 +1232,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -1253,7 +1253,7 @@ class MatchitRubyTest : VimTestCase() {
           puts "result is true"
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -1270,7 +1270,7 @@ class MatchitRubyTest : VimTestCase() {
           puts "result is true"
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -1291,7 +1291,7 @@ class MatchitRubyTest : VimTestCase() {
           puts "result is false"
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -1312,7 +1312,7 @@ class MatchitRubyTest : VimTestCase() {
           puts "result is false"
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -1333,7 +1333,7 @@ class MatchitRubyTest : VimTestCase() {
           puts "result is false"
         ${c}end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -1358,7 +1358,7 @@ class MatchitRubyTest : VimTestCase() {
           puts "both values are false"
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -1383,7 +1383,7 @@ class MatchitRubyTest : VimTestCase() {
           puts "both values are false"
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -1404,7 +1404,7 @@ class MatchitRubyTest : VimTestCase() {
           puts "second value is true"
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -1433,7 +1433,7 @@ class MatchitRubyTest : VimTestCase() {
           puts "all values are false"
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -1466,7 +1466,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -1491,7 +1491,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -1516,7 +1516,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -1541,7 +1541,7 @@ class MatchitRubyTest : VimTestCase() {
           ${c}end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -1566,7 +1566,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         ${c}end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -1587,7 +1587,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -1608,7 +1608,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         ${c}end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -1629,7 +1629,7 @@ class MatchitRubyTest : VimTestCase() {
           ${c}end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -1662,7 +1662,7 @@ class MatchitRubyTest : VimTestCase() {
           puts "I am func_three"
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -1683,7 +1683,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -1720,7 +1720,7 @@ class MatchitRubyTest : VimTestCase() {
 
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -1749,7 +1749,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -1770,7 +1770,7 @@ class MatchitRubyTest : VimTestCase() {
           puts some_boolean
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -1779,7 +1779,7 @@ class MatchitRubyTest : VimTestCase() {
       "g%",
       """if tr${c}ue puts "true" end""",
       """${c}if true puts "true" end""",
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -1804,7 +1804,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         ${c}end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -1825,7 +1825,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         ${c}end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -1846,7 +1846,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -1875,7 +1875,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -1904,7 +1904,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -1933,7 +1933,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -1962,7 +1962,7 @@ class MatchitRubyTest : VimTestCase() {
           ${c}end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -1985,7 +1985,7 @@ class MatchitRubyTest : VimTestCase() {
           ${c}retry
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -2008,7 +2008,7 @@ class MatchitRubyTest : VimTestCase() {
           retry
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -2031,7 +2031,7 @@ class MatchitRubyTest : VimTestCase() {
           ${c}end        
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -2054,7 +2054,7 @@ class MatchitRubyTest : VimTestCase() {
           end        
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -2081,7 +2081,7 @@ class MatchitRubyTest : VimTestCase() {
             puts "Adult"
         ${c}end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -2108,7 +2108,7 @@ class MatchitRubyTest : VimTestCase() {
             puts "Adult"
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -2135,7 +2135,7 @@ class MatchitRubyTest : VimTestCase() {
             puts "Adult"
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -2162,7 +2162,7 @@ class MatchitRubyTest : VimTestCase() {
             puts "Adult"
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -2189,7 +2189,7 @@ class MatchitRubyTest : VimTestCase() {
             puts "Adult"
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -2206,7 +2206,7 @@ class MatchitRubyTest : VimTestCase() {
           var = var + 1
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -2223,7 +2223,7 @@ class MatchitRubyTest : VimTestCase() {
           var = var + 1
         ${c}end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -2250,7 +2250,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -2277,7 +2277,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -2304,7 +2304,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -2331,7 +2331,7 @@ class MatchitRubyTest : VimTestCase() {
           end
         end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -2348,7 +2348,7 @@ class MatchitRubyTest : VimTestCase() {
           end comment
         =${c}end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -2365,7 +2365,7 @@ class MatchitRubyTest : VimTestCase() {
           begin comment
         =end
       """.trimIndent(),
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -2374,7 +2374,7 @@ class MatchitRubyTest : VimTestCase() {
       "g%",
       """puts "This line has ${c}two statements"; if true then puts "true" end""",
       """puts "This line has two statements"; if true then puts "true" ${c}end""",
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -2383,7 +2383,7 @@ class MatchitRubyTest : VimTestCase() {
       "g%",
       """ $c  class Foo end""",
       """   class Foo ${c}end""",
-      fileName = "ruby.rb"
+      fileName = "ruby.rb",
     )
   }
 
@@ -2402,7 +2402,7 @@ class MatchitRubyTest : VimTestCase() {
       """
         <div><div>contents<$c/div></div>
       """.trimIndent(),
-      fileName = "ruby-template.html.erb"
+      fileName = "ruby-template.html.erb",
     )
   }
 
@@ -2427,7 +2427,7 @@ class MatchitRubyTest : VimTestCase() {
           <%= render 'layouts/footer' %>
         <$c/div>
       """.trimIndent(),
-      fileName = "ruby-template.html.erb"
+      fileName = "ruby-template.html.erb",
     )
   }
 
@@ -2452,7 +2452,7 @@ class MatchitRubyTest : VimTestCase() {
           <%= render 'layouts/footer' %>
         </div>
       """.trimIndent(),
-      fileName = "ruby-template.html.erb"
+      fileName = "ruby-template.html.erb",
     )
   }
 
@@ -2477,7 +2477,7 @@ class MatchitRubyTest : VimTestCase() {
           <%= render 'layouts/footer' %>
         </div>
       """.trimIndent(),
-      fileName = "ruby-template.html.erb"
+      fileName = "ruby-template.html.erb",
     )
   }
 
@@ -2502,7 +2502,7 @@ class MatchitRubyTest : VimTestCase() {
           <%= render 'layouts/footer' %>
         </div>
       """.trimIndent(),
-      fileName = "ruby-template.html.erb"
+      fileName = "ruby-template.html.erb",
     )
   }
 
@@ -2511,7 +2511,7 @@ class MatchitRubyTest : VimTestCase() {
       "%",
       """<div class="alert alert-$c<%= message_type %>"><%= message %></div>""",
       """<div class="alert alert-<%= message_type %$c>"><%= message %></div>""",
-      fileName = "ruby-template.html.erb"
+      fileName = "ruby-template.html.erb",
     )
   }
 
@@ -2520,7 +2520,7 @@ class MatchitRubyTest : VimTestCase() {
       "g%",
       """<div class="alert alert-$c<%= message_type %>"><%= message %></div>""",
       """<div class="alert alert-<%= message_type %$c>"><%= message %></div>""",
-      fileName = "ruby-template.html.erb"
+      fileName = "ruby-template.html.erb",
     )
   }
 
@@ -2557,7 +2557,7 @@ class MatchitRubyTest : VimTestCase() {
           <% ${c}end %>
         </tbody>
       """.trimIndent(),
-      fileName = "ruby-template.html.erb"
+      fileName = "ruby-template.html.erb",
     )
   }
 
@@ -2594,7 +2594,7 @@ class MatchitRubyTest : VimTestCase() {
           <% end %>
         </tbody>
       """.trimIndent(),
-      fileName = "ruby-template.html.erb"
+      fileName = "ruby-template.html.erb",
     )
   }
 
@@ -2631,7 +2631,7 @@ class MatchitRubyTest : VimTestCase() {
           <% end %>
         </tbody>
       """.trimIndent(),
-      fileName = "ruby-template.html.erb"
+      fileName = "ruby-template.html.erb",
     )
   }
 
@@ -2668,7 +2668,7 @@ class MatchitRubyTest : VimTestCase() {
           <% end %>
         </tbody>
       """.trimIndent(),
-      fileName = "ruby-template.html.erb"
+      fileName = "ruby-template.html.erb",
     )
   }
 }

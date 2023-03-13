@@ -32,7 +32,7 @@ internal class VimscriptState : ApplicationUsagesCollector() {
         IS_MAP_EXPR_USED with isMapExprUsed,
         IS_FUNCTION_DEF_USED with isFunctionDeclarationUsed,
         IS_FUNCTION_CALL_USED with isFunctionCallUsed,
-      )
+      ),
     )
   }
 

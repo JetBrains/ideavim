@@ -188,9 +188,9 @@ internal fun insertLineAround(editor: VimEditor, context: ExecutionContext, shif
           editor.editor.document.getText(
             com.intellij.openapi.util.TextRange(
               initialLineStart.point,
-              lineStart.point
-            )
-          )
+              lineStart.point,
+            ),
+          ),
         )
 
       vimCaret.moveToOffset(lineStart.point)

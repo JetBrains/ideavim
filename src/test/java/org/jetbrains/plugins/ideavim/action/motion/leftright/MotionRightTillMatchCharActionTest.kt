@@ -18,7 +18,7 @@ class MotionRightTillMatchCharActionTest : VimTestCase() {
       "${c}hello x hello x hello",
       "hello x hello$c x hello",
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -28,7 +28,7 @@ class MotionRightTillMatchCharActionTest : VimTestCase() {
       "${c}hello x hello x hello x hello",
       "hello x hello x hello$c x hello",
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -38,7 +38,7 @@ class MotionRightTillMatchCharActionTest : VimTestCase() {
       "${c}hello x hello x hello x hello",
       "hello x hello$c x hello x hello",
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -48,7 +48,7 @@ class MotionRightTillMatchCharActionTest : VimTestCase() {
       "${c}hello x hello x hello x hello x hello",
       "hello x hello x hello$c x hello x hello",
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -58,7 +58,7 @@ class MotionRightTillMatchCharActionTest : VimTestCase() {
       "hello x hello x ${c}hello x hello x hello",
       "hello x hello x$c hello x hello x hello",
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 }

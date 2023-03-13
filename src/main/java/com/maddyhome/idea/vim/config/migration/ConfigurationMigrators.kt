@@ -39,7 +39,6 @@ internal object `Version 6 to 7 config migration` : ConfigMigrator {
   }
 
   fun performMigration(configuration: Element): Pair<Element, Element> {
-
     val (local, shared) = configuration.getChildren("component").partition { it.getAttribute("name").value in local }
 
     val sharedElement = Element("application")

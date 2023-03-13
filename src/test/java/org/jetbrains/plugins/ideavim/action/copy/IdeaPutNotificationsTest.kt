@@ -49,8 +49,8 @@ class IdeaPutNotificationsTest : VimOptionTestCase(OptionConstants.clipboard) {
     VimTestOption(
       OptionConstants.clipboard,
       OptionValueType.STRING,
-      OptionConstants.clipboard_ideaput
-    )
+      OptionConstants.clipboard_ideaput,
+    ),
   )
   fun `test no notification on ideaput`() {
     val before = "${c}I found it in a legendary land"

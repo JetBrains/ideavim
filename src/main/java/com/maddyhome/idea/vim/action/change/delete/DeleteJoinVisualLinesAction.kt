@@ -50,7 +50,7 @@ public class DeleteJoinVisualLinesAction : VisualOperatorActionHandler.SingleExe
           caret,
           range.toVimTextRange(true).normalize(),
           false,
-          operatorArguments
+          operatorArguments,
         )
       ) {
         res = false

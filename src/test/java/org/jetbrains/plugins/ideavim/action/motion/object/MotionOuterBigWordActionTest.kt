@@ -30,7 +30,8 @@ class MotionOuterBigWordActionTest : VimTestCase() {
       where it was settled on some sodden sand
       ${c}hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -45,7 +46,8 @@ class MotionOuterBigWordActionTest : VimTestCase() {
       I found it in a ${s}legendary land
       $c}$se
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER
+      VimStateMachine.Mode.VISUAL,
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
     )
   }
 }

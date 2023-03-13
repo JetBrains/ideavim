@@ -32,7 +32,7 @@ class ShiftLeftTest : VimTestCase() {
               all rocks and lavender and tufted grass,
               where it was settled on some sodden sand
               hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -55,7 +55,7 @@ class ShiftLeftTest : VimTestCase() {
       |       all rocks and lavender and tufted grass,
       |       where it was settled on some sodden sand
       |       hard by the torrent of a mountain pass.
-      """.trimMargin()
+      """.trimMargin(),
     )
   }
 
@@ -80,7 +80,7 @@ class ShiftLeftTest : VimTestCase() {
       |       all rocks and lavender and tufted grass,
       |       where it was settled on some sodden sand
       |       hard by the torrent of a mountain pass.
-      """.trimMargin()
+      """.trimMargin(),
     )
   }
 
@@ -105,7 +105,7 @@ class ShiftLeftTest : VimTestCase() {
       |       all rocks and lavender and tufted grass,
       |       where it was settled on some sodden sand
       |       hard by the torrent of a mountain pass.
-      """.trimMargin()
+      """.trimMargin(),
     )
   }
 
@@ -127,7 +127,7 @@ class ShiftLeftTest : VimTestCase() {
               all rocks and lavender and tufted grass,
               where it was settled on some sodden sand
               hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 }

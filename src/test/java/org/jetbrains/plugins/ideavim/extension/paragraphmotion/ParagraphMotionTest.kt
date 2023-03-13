@@ -23,12 +23,14 @@ class ParagraphMotionTest : VimTestCase() {
         |${c}all rocks and lavender and tufted grass,
         |
         |where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.""".trimMargin()
+        |hard by the torrent of a mountain pass.
+    """.trimMargin()
     val after = """I found it in a legendary land
         |all rocks and lavender and tufted grass,
         |$c
         |where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.""".trimMargin()
+        |hard by the torrent of a mountain pass.
+    """.trimMargin()
     doTest("}", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
@@ -37,12 +39,14 @@ class ParagraphMotionTest : VimTestCase() {
         |${c}all rocks and lavender and tufted grass,
         |....
         |where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.""".trimMargin().dotToSpace()
+        |hard by the torrent of a mountain pass.
+    """.trimMargin().dotToSpace()
     val after = """I found it in a legendary land
         |all rocks and lavender and tufted grass,
         |$c....
         |where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.""".trimMargin().dotToSpace()
+        |hard by the torrent of a mountain pass.
+    """.trimMargin().dotToSpace()
     doTest("}", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
@@ -51,12 +55,14 @@ class ParagraphMotionTest : VimTestCase() {
         |${c}all rocks and lavender and tufted grass,
         |....
         |where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.""".trimMargin().dotToSpace()
+        |hard by the torrent of a mountain pass.
+    """.trimMargin().dotToSpace()
     val after = """I found it in a legendary land
         |${s}all rocks and lavender and tufted grass,
         |$c.$se...
         |where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.""".trimMargin().dotToSpace()
+        |hard by the torrent of a mountain pass.
+    """.trimMargin().dotToSpace()
     doTest("v}", before, after, VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER)
   }
 
@@ -65,12 +71,14 @@ class ParagraphMotionTest : VimTestCase() {
         |${c}all rocks and lavender and tufted grass,
         |....
         |where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.""".trimMargin().dotToSpace()
+        |hard by the torrent of a mountain pass.
+    """.trimMargin().dotToSpace()
     val after = """I found it in a legendary land
         |$c
         |....
         |where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.""".trimMargin().dotToSpace()
+        |hard by the torrent of a mountain pass.
+    """.trimMargin().dotToSpace()
     doTest("d}", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
@@ -79,12 +87,14 @@ class ParagraphMotionTest : VimTestCase() {
         |all rocks and lavender and tufted grass,
         |
         |${c}where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.""".trimMargin()
+        |hard by the torrent of a mountain pass.
+    """.trimMargin()
     val after = """I found it in a legendary land
         |all rocks and lavender and tufted grass,
         |$c
         |where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.""".trimMargin()
+        |hard by the torrent of a mountain pass.
+    """.trimMargin()
     doTest("{", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
@@ -93,12 +103,14 @@ class ParagraphMotionTest : VimTestCase() {
         |all rocks and lavender and tufted grass,
         |....
         |${c}where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.""".trimMargin().dotToSpace()
+        |hard by the torrent of a mountain pass.
+    """.trimMargin().dotToSpace()
     val after = """I found it in a legendary land
         |all rocks and lavender and tufted grass,
         |$c....
         |where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.""".trimMargin().dotToSpace()
+        |hard by the torrent of a mountain pass.
+    """.trimMargin().dotToSpace()
     doTest("{", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
@@ -107,12 +119,14 @@ class ParagraphMotionTest : VimTestCase() {
         |all rocks and lavender and tufted grass,
         |....
         |${c}where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.""".trimMargin().dotToSpace()
+        |hard by the torrent of a mountain pass.
+    """.trimMargin().dotToSpace()
     val after = """I found it in a legendary land
         |all rocks and lavender and tufted grass,
         |${s}$c....
         |w${se}here it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.""".trimMargin().dotToSpace()
+        |hard by the torrent of a mountain pass.
+    """.trimMargin().dotToSpace()
     doTest("v{", before, after, VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER)
   }
 
@@ -121,12 +135,14 @@ class ParagraphMotionTest : VimTestCase() {
         |all rocks and lavender and tufted grass,
         |....
         |${c}where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.""".trimMargin().dotToSpace()
+        |hard by the torrent of a mountain pass.
+    """.trimMargin().dotToSpace()
     val after = """I found it in a legendary land
         |all rocks and lavender and tufted grass,
         |$c
         |where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.""".trimMargin().dotToSpace()
+        |hard by the torrent of a mountain pass.
+    """.trimMargin().dotToSpace()
     doTest("d{", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 }

@@ -23,8 +23,8 @@ class TryCatchTest : VimTestCase() {
           "  throw 'my exception' |" +
           "catch /my exception/ |" +
           "  echo 'caught' |" +
-          "endtry"
-      )
+          "endtry",
+      ),
     )
     assertPluginError(false)
     assertExOutput("caught\n")
@@ -39,8 +39,8 @@ class TryCatchTest : VimTestCase() {
           "try |" +
           " throw 'my exception' |" +
           "catch /E117:/ |" +
-          "endtry"
-      )
+          "endtry",
+      ),
     )
     assertPluginError(true)
     assertPluginErrorMessageContains("my exception")
@@ -54,8 +54,8 @@ class TryCatchTest : VimTestCase() {
           "try |" +
           " echo undefinedVariable |" +
           "catch /E121: Undefined variable:/ |" +
-          "endtry"
-      )
+          "endtry",
+      ),
     )
     assertPluginError(false)
   }
@@ -69,8 +69,8 @@ class TryCatchTest : VimTestCase() {
           "try |" +
           " echo undefinedVariable |" +
           "catch /E117:/ |" +
-          "endtry"
-      )
+          "endtry",
+      ),
     )
     assertPluginError(true)
     assertPluginErrorMessageContains("E121: Undefined variable: undefinedVariable")
@@ -86,8 +86,8 @@ class TryCatchTest : VimTestCase() {
           "catch /E117:/ |" +
           "  echo 'failure' |" +
           "catch /my exception/ |" +
-          "endtry"
-      )
+          "endtry",
+      ),
     )
     assertPluginError(false)
     assertNoExOutput()
@@ -103,8 +103,8 @@ class TryCatchTest : VimTestCase() {
           "  throw 'my exception' |" +
           "catch /E117:/ |" +
           "catch /E118:/ |" +
-          "endtry"
-      )
+          "endtry",
+      ),
     )
     assertPluginError(true)
     assertPluginErrorMessageContains("my exception")
@@ -122,8 +122,8 @@ class TryCatchTest : VimTestCase() {
           "catch /my exception/ |" +
           "finally |" +
           "  echo 'finally block' |" +
-          "endtry"
-      )
+          "endtry",
+      ),
     )
     assertPluginError(false)
     assertExOutput("finally block\n")
@@ -141,8 +141,8 @@ class TryCatchTest : VimTestCase() {
           "catch /E118:/ |" +
           "finally |" +
           "  echo 'finally block' |" +
-          "endtry"
-      )
+          "endtry",
+      ),
     )
     assertPluginError(true)
     assertPluginErrorMessageContains("my exception")
@@ -162,8 +162,8 @@ class TryCatchTest : VimTestCase() {
         finally |
           let y = 1 |
         endtry |
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     typeText(commandToKeys("echo x .. ' ' .. y"))
     assertExOutput("0 1\n")

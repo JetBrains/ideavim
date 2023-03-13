@@ -97,7 +97,7 @@ abstract class VimTestCase : UsefulTestCase() {
     val fixture = fixtureBuilder.fixture
     myFixture = IdeaTestFixtureFactory.getFixtureFactory().createCodeInsightFixture(
       fixture,
-      LightTempDirTestFixtureImpl(true)
+      LightTempDirTestFixtureImpl(true),
     )
     myFixture.setUp()
     myFixture.testDataPath = testDataPath
@@ -284,7 +284,6 @@ abstract class VimTestCase : UsefulTestCase() {
 
   @JvmOverloads
   protected fun setPositionAndScroll(scrollToLogicalLine: Int, caretLogicalLine: Int, caretLogicalColumn: Int = 0) {
-
     // Note that it is possible to request a position which would be invalid under normal Vim!
     // We disable scrolloff + scrolljump, position as requested, and reset. When resetting scrolloff, Vim will
     // recalculate the correct offsets, and that could move the top and/or caret line
@@ -306,7 +305,7 @@ abstract class VimTestCase : UsefulTestCase() {
 
     // Belt and braces. Let's make sure that the caret is fully onscreen
     val bottomLogicalLine = myFixture.editor.vim.visualLineToBufferLine(
-      EditorHelper.getVisualLineAtBottomOfScreen(myFixture.editor)
+      EditorHelper.getVisualLineAtBottomOfScreen(myFixture.editor),
     )
     assertTrue(bottomLogicalLine >= caretLogicalLine)
     assertTrue(caretLogicalLine >= scrollToLogicalLine)
@@ -319,7 +318,7 @@ abstract class VimTestCase : UsefulTestCase() {
     NeovimTesting.typeCommand(
       keys.filterNotNull().joinToString(separator = "") { injector.parser.toKeyNotation(it) },
       this,
-      editor
+      editor,
     )
     val project = myFixture.project
     when (Checks.keyHandler) {
@@ -354,7 +353,7 @@ abstract class VimTestCase : UsefulTestCase() {
   protected fun options(): OptionValueAccessor {
     assertNotNull(
       "Editor is null! Move the call to after editor is initialised, or use optionsNoEditor",
-      myFixture.editor
+      myFixture.editor,
     )
     return injector.options(myFixture.editor.vim)
   }
@@ -407,7 +406,7 @@ abstract class VimTestCase : UsefulTestCase() {
       Assert.assertEquals(
         "Wrong amount of carets. Did you mean to use assertPosition?",
         expectedOffsets.size,
-        carets.size
+        carets.size,
       )
     }
     Assert.assertEquals("Wrong amount of carets", expectedOffsets.size, carets.size)
@@ -663,7 +662,7 @@ abstract class VimTestCase : UsefulTestCase() {
             ActionPlaces.KEYBOARD_SHORTCUT,
             VimShortcutKeyAction.instance.templatePresentation.clone(),
             ActionManager.getInstance(),
-            0
+            0,
           )
           if (ActionUtil.lastUpdateAndCheckDumb(VimShortcutKeyAction.instance, e, true)) {
             ActionUtil.performActionDumbAwareWithCallbacks(VimShortcutKeyAction.instance, e)
@@ -708,7 +707,8 @@ abstract class VimTestCase : UsefulTestCase() {
             key = inputModel.nextKeyStroke()
           }
         },
-        null, null
+        null,
+        null,
       )
     }
 

@@ -36,7 +36,7 @@ class SelectEscapeActionTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
     assertMode(VimStateMachine.Mode.COMMAND)
   }
@@ -62,7 +62,7 @@ class SelectEscapeActionTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
     assertMode(VimStateMachine.Mode.COMMAND)
   }
@@ -88,7 +88,7 @@ class SelectEscapeActionTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
     assertMode(VimStateMachine.Mode.COMMAND)
   }
@@ -114,7 +114,7 @@ class SelectEscapeActionTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
     assertMode(VimStateMachine.Mode.COMMAND)
   }
@@ -140,7 +140,7 @@ class SelectEscapeActionTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
     assertMode(VimStateMachine.Mode.COMMAND)
   }
@@ -166,7 +166,7 @@ class SelectEscapeActionTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
     assertMode(VimStateMachine.Mode.COMMAND)
   }
@@ -192,7 +192,7 @@ class SelectEscapeActionTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
     assertMode(VimStateMachine.Mode.COMMAND)
   }
@@ -218,7 +218,7 @@ class SelectEscapeActionTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
     assertMode(VimStateMachine.Mode.COMMAND)
   }
@@ -244,7 +244,7 @@ class SelectEscapeActionTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
     assertMode(VimStateMachine.Mode.COMMAND)
   }
@@ -270,7 +270,7 @@ class SelectEscapeActionTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
     assertMode(VimStateMachine.Mode.COMMAND)
   }
@@ -296,7 +296,7 @@ class SelectEscapeActionTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
     assertMode(VimStateMachine.Mode.COMMAND)
   }
@@ -322,7 +322,7 @@ class SelectEscapeActionTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
     assertFalse(myFixture.editor.caretModel.allCarets.any(Caret::hasSelection))
     assertEquals(1, myFixture.editor.caretModel.caretCount)
@@ -351,7 +351,7 @@ class SelectEscapeActionTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
     assertFalse(myFixture.editor.caretModel.allCarets.any(Caret::hasSelection))
     assertEquals(1, myFixture.editor.caretModel.caretCount)
@@ -380,7 +380,7 @@ class SelectEscapeActionTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
     assertFalse(myFixture.editor.caretModel.allCarets.any(Caret::hasSelection))
     assertEquals(1, myFixture.editor.caretModel.caretCount)
@@ -409,7 +409,7 @@ class SelectEscapeActionTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
     assertFalse(myFixture.editor.caretModel.allCarets.any(Caret::hasSelection))
     assertEquals(1, myFixture.editor.caretModel.caretCount)

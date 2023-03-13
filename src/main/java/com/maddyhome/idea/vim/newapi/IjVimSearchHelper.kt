@@ -24,7 +24,7 @@ internal class IjVimSearchHelper : VimSearchHelperBase() {
       (editor as IjVimEditor).editor,
       (caret as IjVimCaret).caret,
       count,
-      allowBlanks
+      allowBlanks,
     )
   }
 
@@ -38,7 +38,9 @@ internal class IjVimSearchHelper : VimSearchHelperBase() {
     return SearchHelper.findNextSentenceStart(
       (editor as IjVimEditor).editor,
       (caret as IjVimCaret).caret,
-      count, countCurrent, requireAll
+      count,
+      countCurrent,
+      requireAll,
     )
   }
 

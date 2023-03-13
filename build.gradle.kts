@@ -69,7 +69,7 @@ plugins {
     id("org.jetbrains.changelog") version "2.0.0"
 
     // ktlint linter - read more: https://github.com/JLLeitschuh/ktlint-gradle
-    id("org.jlleitschuh.gradle.ktlint") version "10.3.0"
+    id("org.jlleitschuh.gradle.ktlint") version "11.3.1"
 
     id("org.jetbrains.kotlinx.kover") version "0.6.1"
     id("com.dorongold.task-tree") version "2.1.0"
@@ -325,7 +325,7 @@ tasks {
                         org.jetbrains.changelog.Changelog.OutputType.HTML,
                     )
                 }
-            }
+            },
         )
     }
 }
@@ -334,7 +334,7 @@ tasks {
 
 ktlint {
     disabledRules.add("no-wildcard-imports")
-    version.set("0.43.0")
+    version.set("0.48.2")
 }
 
 // --- Tests
@@ -780,7 +780,7 @@ fun updateAuthors(uncheckedEmails: Set<String>) {
     for (child in contributorsSection.children) {
         if (child.children.size > 1) {
             existingEmails.add(
-                child.children[1].children[0].children[2].children[2].getTextInNode(authors).toString()
+                child.children[1].children[0].children[2].children[2].getTextInNode(authors).toString(),
             )
         }
     }
@@ -959,7 +959,7 @@ fun httpClient(): HttpClient {
                 Json {
                     prettyPrint = true
                     isLenient = true
-                }
+                },
             )
         }
     }

@@ -104,7 +104,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
       """
             |I found it in a legendary land|
             all |I found it in a legendary land$c| and lavender and tufted grass,
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -120,7 +120,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
       """
             |I found it in a legendary land|
             all |I found it in a legendary land$c| and lavender and tufted grass,
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -140,7 +140,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
             one onetwo three
             one onetwo three
             one two three
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -198,7 +198,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertEquals("legendary", VimPlugin.getRegister().lastRegister?.text)
   }
@@ -219,7 +219,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
             ${c}I found it in a legendary land
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -241,7 +241,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -265,7 +265,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
             one two three
             one two three
             
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -284,7 +284,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
             I found it in a legendary land
             ${c}I found it in a legendary land
             hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -304,7 +304,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
             I found it in a legendary land
             ${c}I found it in a legendary land
             hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -314,7 +314,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
             ${c}I found it in a legendary land
             where it was settled on some sodden sand
             ${c}where it was settled on some sodden sand
-  """
+  """,
   )
   fun `test line multicaret`() {
     val text = """
@@ -333,7 +333,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
             where it was settled on some sodden sand
             where it was settled on some sodden sand
             
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -357,7 +357,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertEquals("legendary", VimPlugin.getRegister().lastRegister?.text)
     assertMode(VimStateMachine.Mode.COMMAND)
@@ -379,7 +379,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
             all |I found it in a legendary land$c| and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
   }
@@ -401,7 +401,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
             where it was |I found it in a legendary land|
             |all rocks and lavender and tufted grass,$c| on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
   }
@@ -424,7 +424,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
   }
@@ -445,7 +445,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
             ${c}I found it in a legendary land
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
   }
@@ -470,7 +470,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
         copyMe
         copyMe
         copyMe
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
   }

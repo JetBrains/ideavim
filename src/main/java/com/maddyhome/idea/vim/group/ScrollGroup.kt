@@ -60,7 +60,7 @@ internal class ScrollGroup : VimScrollGroup {
       val offset = injector.motion.moveCaretToLineWithStartOfLineOption(
         editor,
         editor.visualLineToBufferLine(caretVisualLine),
-        caret
+        caret,
       )
       caret.moveToOffset(offset)
       return result.first
@@ -81,7 +81,7 @@ internal class ScrollGroup : VimScrollGroup {
       val offset = injector.motion.moveCaretToLineWithStartOfLineOption(
         editor,
         editor.visualLineToBufferLine(caretVisualLine),
-        caret
+        caret,
       )
       caret.moveToOffset(offset)
       return result.first
@@ -174,7 +174,7 @@ internal class ScrollGroup : VimScrollGroup {
     editor: VimEditor,
     screenLocation: ScreenLocation,
     rawCount: Int,
-    start: Boolean
+    start: Boolean,
   ) {
     val scrollOffset = getNormalizedScrollOffset(editor.ij)
     val visualLine = if (rawCount == 0) {
@@ -189,7 +189,7 @@ internal class ScrollGroup : VimScrollGroup {
         // Make sure we scroll to an actual line, not virtual space
         EditorHelper.scrollVisualLineToBottomOfScreen(
           editor.ij,
-          editor.normalizeVisualLine(visualLine + scrollOffset)
+          editor.normalizeVisualLine(visualLine + scrollOffset),
         )
       }
     }
@@ -214,7 +214,7 @@ internal class ScrollGroup : VimScrollGroup {
         caretVisualPosition.line,
         EditorHelper.getVisualColumnAtLeftOfDisplay(ijEditor, caretVisualPosition.line) +
           columns,
-        false
+        false,
       )
 
       // If the target column has an inlay preceding it, move passed it. This inlay will have been (incorrectly)

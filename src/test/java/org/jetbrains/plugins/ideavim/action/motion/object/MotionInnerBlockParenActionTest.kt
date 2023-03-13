@@ -28,7 +28,8 @@ class MotionInnerBlockParenActionTest : VimTestCase() {
   fun `test multiline outside parentheses`() {
     configureByText(
       """(outer
-                        |$c(inner))""".trimMargin()
+                        |$c(inner))
+      """.trimMargin(),
     )
     typeText(injector.parser.parseKeys("vi)"))
     assertSelection("inner")
@@ -37,7 +38,8 @@ class MotionInnerBlockParenActionTest : VimTestCase() {
   fun `test multiline in parentheses`() {
     configureByText(
       """(outer
-                        |(inner$c))""".trimMargin()
+                        |(inner$c))
+      """.trimMargin(),
     )
     typeText(injector.parser.parseKeys("vi)"))
     assertSelection("inner")
@@ -46,55 +48,64 @@ class MotionInnerBlockParenActionTest : VimTestCase() {
   fun `test multiline inside of outer parentheses`() {
     configureByText(
       """(outer
-                         |$c (inner))""".trimMargin()
+                         |$c (inner))
+      """.trimMargin(),
     )
     typeText(injector.parser.parseKeys("vi)"))
     assertSelection(
       """outer
-                        | (inner)""".trimMargin()
+                        | (inner)
+      """.trimMargin(),
     )
   }
 
   fun `test double motion`() {
     configureByText(
       """(outer
-                      |$c(inner))""".trimMargin()
+                      |$c(inner))
+      """.trimMargin(),
     )
     typeText(injector.parser.parseKeys("vi)i)"))
     assertSelection(
       """outer
-                          |(inner)""".trimMargin()
+                          |(inner)
+      """.trimMargin(),
     )
   }
 
   fun `test motion with count`() {
     configureByText(
       """(outer
-                          |$c(inner))""".trimMargin()
+                          |$c(inner))
+      """.trimMargin(),
     )
     typeText(injector.parser.parseKeys("v2i)"))
     assertSelection(
       """outer
-                      |(inner)""".trimMargin()
+                      |(inner)
+      """.trimMargin(),
     )
   }
 
   fun `test text object after motion`() {
     configureByText(
       """(outer
-                      |$c(inner))""".trimMargin()
+                      |$c(inner))
+      """.trimMargin(),
     )
     typeText(injector.parser.parseKeys("vlli)"))
     assertSelection(
       """outer
-                      |(inner)""".trimMargin()
+                      |(inner)
+      """.trimMargin(),
     )
   }
 
   fun `test text object after motion outside parentheses`() {
     configureByText(
       """(outer
-                      |(inner$c))""".trimMargin()
+                      |(inner$c))
+      """.trimMargin(),
     )
     typeText(injector.parser.parseKeys("vlli)"))
     assertSelection("inner")
@@ -103,7 +114,8 @@ class MotionInnerBlockParenActionTest : VimTestCase() {
   fun `test text object after motion inside parentheses`() {
     configureByText(
       """(outer
-                      |(${c}inner))""".trimMargin()
+                      |(${c}inner))
+      """.trimMargin(),
     )
     typeText(injector.parser.parseKeys("vllli)"))
     assertSelection("inner")
@@ -113,7 +125,7 @@ class MotionInnerBlockParenActionTest : VimTestCase() {
   fun testDeleteInnerBlock() {
     typeTextInFile(
       injector.parser.parseKeys("di)"),
-      "foo(\"b${c}ar\")\n"
+      "foo(\"b${c}ar\")\n",
     )
     assertState("foo()\n")
   }
@@ -122,7 +134,7 @@ class MotionInnerBlockParenActionTest : VimTestCase() {
   fun testDeleteInnerBlockWithQuote() {
     typeTextInFile(
       injector.parser.parseKeys("di)"),
-      "(abc${c}def'ghi)"
+      "(abc${c}def'ghi)",
     )
     assertState("()")
   }
@@ -131,7 +143,7 @@ class MotionInnerBlockParenActionTest : VimTestCase() {
   fun testDeleteInnerBlockWithDoubleQuote() {
     typeTextInFile(
       injector.parser.parseKeys("di)"),
-      """(abc${c}def"ghi)"""
+      """(abc${c}def"ghi)""",
     )
     assertState("()")
   }
@@ -140,7 +152,7 @@ class MotionInnerBlockParenActionTest : VimTestCase() {
   fun testDeleteInnerBlockCaretBeforeString() {
     typeTextInFile(
       injector.parser.parseKeys("di)"),
-      "foo(${c}\"bar\")\n"
+      "foo(${c}\"bar\")\n",
     )
     assertState("foo()\n")
   }
@@ -149,7 +161,7 @@ class MotionInnerBlockParenActionTest : VimTestCase() {
   fun testChangeInnerBlockCaretBeforeString() {
     typeTextInFile(
       injector.parser.parseKeys("ci)"),
-      "foo(${c}\"bar\")\n"
+      "foo(${c}\"bar\")\n",
     )
     assertState("foo()\n")
   }
@@ -158,7 +170,7 @@ class MotionInnerBlockParenActionTest : VimTestCase() {
   fun testChangeInnerBlockCaretBeforeBlock() {
     typeTextInFile(
       injector.parser.parseKeys("ci)"),
-      "foo$c(bar)\n"
+      "foo$c(bar)\n",
     )
     assertState("foo()\n")
     assertOffset(4)
@@ -174,7 +186,7 @@ class MotionInnerBlockParenActionTest : VimTestCase() {
   fun testDeleteInnerParensBlockBeforeOpen() {
     typeTextInFile(
       injector.parser.parseKeys("di)"),
-      "foo$c(bar)\n"
+      "foo$c(bar)\n",
     )
     assertState("foo()\n")
     assertOffset(4)
@@ -184,7 +196,7 @@ class MotionInnerBlockParenActionTest : VimTestCase() {
   fun testDeleteInnerParensBlockBeforeClose() {
     typeTextInFile(
       injector.parser.parseKeys("di)"),
-      "foo(bar$c)\n"
+      "foo(bar$c)\n",
     )
     assertState("foo()\n")
   }
@@ -192,7 +204,7 @@ class MotionInnerBlockParenActionTest : VimTestCase() {
   fun testOutside() {
     typeTextInFile(
       injector.parser.parseKeys("di)"),
-      "${c}foo(bar)\n"
+      "${c}foo(bar)\n",
     )
     assertState("foo()\n")
   }
@@ -200,7 +212,7 @@ class MotionInnerBlockParenActionTest : VimTestCase() {
   fun testOutsideInString() {
     typeTextInFile(
       injector.parser.parseKeys("di)"),
-      "\"1${c}23\"foo(bar)\n"
+      "\"1${c}23\"foo(bar)\n",
     )
     assertState("\"123\"foo()\n")
   }
@@ -208,7 +220,7 @@ class MotionInnerBlockParenActionTest : VimTestCase() {
   fun testOutsideInString2() {
     typeTextInFile(
       injector.parser.parseKeys("di)"),
-      "\"1${c}23(dsa)d\"foo(bar)\n"
+      "\"1${c}23(dsa)d\"foo(bar)\n",
     )
     assertState("\"123()d\"foo(bar)\n")
   }

@@ -155,9 +155,12 @@ private object VimActionsPopup {
     val actions = getActions()
     val popup = JBPopupFactory.getInstance()
       .createActionGroupPopup(
-        STATUS_BAR_DISPLAY_NAME, actions,
-        dataContext, JBPopupFactory.ActionSelectionAid.SPEEDSEARCH, false,
-        ActionPlaces.POPUP
+        STATUS_BAR_DISPLAY_NAME,
+        actions,
+        dataContext,
+        JBPopupFactory.ActionSelectionAid.SPEEDSEARCH,
+        false,
+        ActionPlaces.POPUP,
       )
     popup.setAdText(MessageHelper.message("popup.advertisement.version", VimPlugin.getVersion()), SwingConstants.CENTER)
 
@@ -176,8 +179,8 @@ private object VimActionsPopup {
       HelpLink(
         MessageHelper.message("action.plugins"),
         "https://jb.gg/ideavim-plugins",
-        null
-      )
+        null,
+      ),
     )
     actionGroup.addSeparator(MessageHelper.message("action.eap.choice.active.text"))
 
@@ -186,8 +189,8 @@ private object VimActionsPopup {
       HelpLink(
         MessageHelper.message("action.about.eap.text"),
         "https://github.com/JetBrains/ideavim#get-early-access",
-        null
-      )
+        null,
+      ),
     )
 
     actionGroup.addSeparator("Learn")
@@ -199,22 +202,22 @@ private object VimActionsPopup {
       HelpLink(
         MessageHelper.message("action.contact.on.twitter.text"),
         "https://twitter.com/ideavim",
-        VimIcons.TWITTER
-      )
+        VimIcons.TWITTER,
+      ),
     )
     actionGroup.add(
       HelpLink(
         MessageHelper.message("action.create.issue.text"),
         "https://youtrack.jetbrains.com/newIssue?project=VIM&description=%0A%0A-----------%0AYou%20can%20improve%20the%20issue%20description%20by%20providing%3A%0A1)%20Your%20%60~%2F.ideavimrc%60%20configuration%20if%20you%20use%20it.%0A2)%20The%20%5Blog%5D(https%3A%2F%2Fintellij-support.jetbrains.com%2Fhc%2Fen-us%2Farticles%2F207241085-Locating-IDE-log-files)%20from%20your%20IDE.%0A%0AVersion:%20${VimPlugin.getVersion()}&c=Affected%20versions%20${VimPlugin.getVersion()}",
-        VimIcons.YOUTRACK
-      )
+        VimIcons.YOUTRACK,
+      ),
     )
     actionGroup.add(
       HelpLink(
         MessageHelper.message("action.contribute.on.github.text"),
         "https://github.com/JetBrains/ideavim",
-        AllIcons.Vcs.Vendors.Github
-      )
+        AllIcons.Vcs.Vendors.Github,
+      ),
     )
 
     return actionGroup

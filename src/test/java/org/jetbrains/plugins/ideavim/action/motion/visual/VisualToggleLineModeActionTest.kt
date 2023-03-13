@@ -33,7 +33,8 @@ class VisualToggleLineModeActionTest : VimTestCase() {
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_LINE
+      VimStateMachine.Mode.VISUAL,
+      VimStateMachine.SubMode.VISUAL_LINE,
     )
   }
 
@@ -56,7 +57,8 @@ class VisualToggleLineModeActionTest : VimTestCase() {
                     ${s}where it ${c}was settled on some sodden sand
                     ${se}hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_LINE
+      VimStateMachine.Mode.VISUAL,
+      VimStateMachine.SubMode.VISUAL_LINE,
     )
   }
 
@@ -79,7 +81,8 @@ class VisualToggleLineModeActionTest : VimTestCase() {
                     wh${c}ere it was settled on some sodden sand
                     ${se}hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_LINE
+      VimStateMachine.Mode.VISUAL,
+      VimStateMachine.SubMode.VISUAL_LINE,
     )
   }
 
@@ -102,7 +105,8 @@ class VisualToggleLineModeActionTest : VimTestCase() {
                     where it was settled on some sodden sand
                     ha${c}rd by the torrent of a mountain pass.${se}
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_LINE
+      VimStateMachine.Mode.VISUAL,
+      VimStateMachine.SubMode.VISUAL_LINE,
     )
   }
 
@@ -115,7 +119,7 @@ class VisualToggleLineModeActionTest : VimTestCase() {
                     all rocks and lavender and tufted grass,
                     where it was settled on some sodden sand[long line]
                     hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
     enterCommand("set selectmode=cmd")
     typeText("V")

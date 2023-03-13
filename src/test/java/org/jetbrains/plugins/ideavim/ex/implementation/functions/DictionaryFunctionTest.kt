@@ -22,8 +22,8 @@ class DictionaryFunctionTest : VimTestCase() {
            function Print() dict |
              echo self.data |
            endfunction
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     typeText(commandToKeys("let dict = {'data': [], 'print': function('Print')}"))
     typeText(commandToKeys("call dict.print()"))
@@ -40,8 +40,8 @@ class DictionaryFunctionTest : VimTestCase() {
            function Print() dict |
              echo self.name |
            endfunction
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     typeText(commandToKeys("let dict = {'name': 'dict_name'}"))
     typeText(commandToKeys("let PrintFr = function('Print')"))
@@ -61,8 +61,8 @@ class DictionaryFunctionTest : VimTestCase() {
            function Print() dict |
              echo self |
            endfunction
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     typeText(commandToKeys("call Print()"))
     assertPluginError(true)
@@ -110,8 +110,8 @@ class DictionaryFunctionTest : VimTestCase() {
            function Print() dict |
              echo self.name |
            endfunction
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     typeText(commandToKeys("let dict = {'name': 'dict', 'print': function('Print')}"))
     typeText(commandToKeys("let dict2 = {'name': 'dict2'}"))
@@ -134,8 +134,8 @@ class DictionaryFunctionTest : VimTestCase() {
            function Print() dict |
              echo self.name |
            endfunction
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     typeText(commandToKeys("let dict = {'name': 'dict', 'print': function('Print')}"))
     typeText(commandToKeys("let dict2 = {'name': 'dict2', 'print': dict.print}"))
@@ -157,8 +157,8 @@ class DictionaryFunctionTest : VimTestCase() {
            function Print() dict |
              echo self.name |
            endfunction
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     typeText(commandToKeys("let dict = {'name': 'dict'}"))
     typeText(commandToKeys("let dict.print = function('Print', dict)"))
@@ -181,8 +181,8 @@ class DictionaryFunctionTest : VimTestCase() {
            function Print() dict |
              let self = [] |
            endfunction
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     typeText(commandToKeys("let dict = {'name': 'dict', 'print': function('Print')}"))
     typeText(commandToKeys("call dict.print()"))
@@ -200,8 +200,8 @@ class DictionaryFunctionTest : VimTestCase() {
            function Print() dict |
              echo self.name |
            endfunction
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     typeText(commandToKeys("let dict = {'name': 'dict', 'innerDict': {'name': 'innerDict', 'print': function('Print')}}"))
     typeText(commandToKeys("call dict.innerDict.print()"))

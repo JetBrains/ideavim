@@ -34,7 +34,7 @@ class JoinLinesCommandTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -58,7 +58,7 @@ class JoinLinesCommandTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -81,7 +81,7 @@ class JoinLinesCommandTest : VimTestCase() {
                 all rocks and lavender and tufted grass, where it was settled on some sodden sand$c hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -94,7 +94,7 @@ class JoinLinesCommandTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(injector.parser.parseKeys("Vjj"))
     typeText(commandToKeys("join"))
@@ -104,7 +104,7 @@ class JoinLinesCommandTest : VimTestCase() {
 
                 I found it in a legendary land all rocks and lavender and tufted grass,$c where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 }

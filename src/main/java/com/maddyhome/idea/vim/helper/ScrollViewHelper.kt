@@ -217,8 +217,9 @@ internal object ScrollViewHelper {
           scrollColumnToLeftOfScreen(editor, position.line, max(0, currentVisualLeftColumn - diff))
         } else {
           scrollColumnToRightOfScreen(
-            editor, position.line,
-            vimEditor.normalizeVisualColumn(position.line, currentVisualRightColumn + diff, false)
+            editor,
+            position.line,
+            vimEditor.normalizeVisualColumn(position.line, currentVisualRightColumn + diff, false),
           )
         }
       }

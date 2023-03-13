@@ -37,7 +37,7 @@ class FalsyOperatorTest {
   fun `nonempty list as a left expression`() {
     assertEquals(
       VimList(mutableListOf(VimInt(1), VimInt(2), VimInt(3))),
-      VimscriptParser.parseExpression("[1, 2, 3] ?? 'list is empty'")!!.evaluate()
+      VimscriptParser.parseExpression("[1, 2, 3] ?? 'list is empty'")!!.evaluate(),
     )
   }
 }

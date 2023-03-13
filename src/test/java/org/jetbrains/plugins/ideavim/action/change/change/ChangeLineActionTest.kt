@@ -37,7 +37,8 @@ class ChangeLineActionTest : VimTestCase() {
             I found it in a legendary land
             $c
       """.trimIndent(),
-      VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.INSERT,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -54,7 +55,8 @@ class ChangeLineActionTest : VimTestCase() {
             $c
             
       """.trimIndent(),
-      VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.INSERT,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -69,7 +71,8 @@ class ChangeLineActionTest : VimTestCase() {
             I found it in a legendary land
             $c
       """.trimIndent(),
-      VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.INSERT,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -86,7 +89,8 @@ class ChangeLineActionTest : VimTestCase() {
             $c
             
       """.trimIndent(),
-      VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.INSERT,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -101,7 +105,8 @@ class ChangeLineActionTest : VimTestCase() {
             $c
             all rocks and lavender and tufted grass,
       """.trimIndent(),
-      VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.INSERT,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -118,7 +123,8 @@ class ChangeLineActionTest : VimTestCase() {
             $c
             
       """.trimIndent(),
-      VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.INSERT,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -135,7 +141,8 @@ class ChangeLineActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             $c
       """.trimIndent(),
-      VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.INSERT,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -172,7 +179,8 @@ class ChangeLineActionTest : VimTestCase() {
             that priceless mote now dimpling the convex
             and limpid teardrop on a lighted slide.
       """.trimIndent(),
-      VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.INSERT,
+      VimStateMachine.SubMode.NONE,
     )
   }
 }

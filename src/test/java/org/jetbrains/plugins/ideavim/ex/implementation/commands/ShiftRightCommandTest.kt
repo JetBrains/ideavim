@@ -22,7 +22,7 @@ class ShiftRightCommandTest : VimTestCase() {
                       |        ${c}all rocks and lavender and tufted grass,
                       |        where it was settled on some sodden sand
                       |        hard by the torrent of a mountain pass.
-                       """.trimMargin()
+    """.trimMargin()
     configureByJavaText(before)
 
     typeText(commandToKeys(">"))
@@ -31,7 +31,7 @@ class ShiftRightCommandTest : VimTestCase() {
                       |            ${c}all rocks and lavender and tufted grass,
                       |        where it was settled on some sodden sand
                       |        hard by the torrent of a mountain pass.
-                       """.trimMargin()
+    """.trimMargin()
     assertState(after)
   }
 
@@ -41,7 +41,7 @@ class ShiftRightCommandTest : VimTestCase() {
                       |        ${c}all rocks and lavender and tufted grass,
                       |        where it was settled on some sodden sand
                       |        hard by the torrent of a mountain pass.
-                       """.trimMargin()
+    """.trimMargin()
     configureByJavaText(before)
 
     typeText(commandToKeys(">>"))
@@ -50,7 +50,7 @@ class ShiftRightCommandTest : VimTestCase() {
                       |                ${c}all rocks and lavender and tufted grass,
                       |        where it was settled on some sodden sand
                       |        hard by the torrent of a mountain pass.
-                       """.trimMargin()
+    """.trimMargin()
     assertState(after)
   }
 
@@ -60,7 +60,7 @@ class ShiftRightCommandTest : VimTestCase() {
                       |        ${c}all rocks and lavender and tufted grass,
                       |        where it was settled on some sodden sand
                       |        hard by the torrent of a mountain pass.
-                       """.trimMargin()
+    """.trimMargin()
     configureByJavaText(before)
 
     typeText(commandToKeys("3,4>"))
@@ -69,7 +69,7 @@ class ShiftRightCommandTest : VimTestCase() {
                       |        all rocks and lavender and tufted grass,
                       |            ${c}where it was settled on some sodden sand
                       |            hard by the torrent of a mountain pass.
-                       """.trimMargin()
+    """.trimMargin()
     assertState(after)
   }
 
@@ -78,7 +78,7 @@ class ShiftRightCommandTest : VimTestCase() {
                       |${c}all rocks and lavender and tufted grass,
                       |    ${c}where it was settled on some sodden sand
                       |    hard by the$c torrent of a mountain pass.
-                       """.trimMargin()
+    """.trimMargin()
     configureByJavaText(before)
 
     typeText(commandToKeys(">"))
@@ -87,7 +87,7 @@ class ShiftRightCommandTest : VimTestCase() {
                       |    ${c}all rocks and lavender and tufted grass,
                       |        ${c}where it was settled on some sodden sand
                       |        ${c}hard by the torrent of a mountain pass.
-                       """.trimMargin()
+    """.trimMargin()
     assertState(after)
   }
 }

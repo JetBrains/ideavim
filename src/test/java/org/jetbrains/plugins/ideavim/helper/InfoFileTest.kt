@@ -29,7 +29,7 @@ class InfoFileTest : VimTestCase() {
     }
     assertTrue(
       notPresentedActions.joinToString(prefix = "Not presented actions in info file: \n", separator = "\n"),
-      notPresentedActions.isEmpty()
+      notPresentedActions.isEmpty(),
     )
   }
 

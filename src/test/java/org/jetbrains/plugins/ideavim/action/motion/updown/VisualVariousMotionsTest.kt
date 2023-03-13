@@ -51,7 +51,7 @@ class VisualVariousMotionsTest : VimTestCase() {
         ${s}fu${c}n${se}c myFunc() {
         ${s}${c}${se}.return anything
         ${s}${c}}${se}
-      """.trimIndent().dotToTab()
+      """.trimIndent().dotToTab(),
     )
 
     typeText(injector.parser.parseKeys("k".repeat(7) + "l".repeat(3)))
@@ -70,7 +70,7 @@ class VisualVariousMotionsTest : VimTestCase() {
         ${s}func m${c}y${se}Func() {
         ${s}.re${c}t${se}urn anything
         ${s}${c}}${se}
-      """.trimIndent().dotToTab()
+      """.trimIndent().dotToTab(),
     )
 
     TestCase.assertEquals(3, myFixture.editor.caretModel.allCarets[1].visualPosition.column)
@@ -92,7 +92,7 @@ class VisualVariousMotionsTest : VimTestCase() {
         ${s}func myF${c}u${se}nc() {
         ${s}.retu${c}r${se}n anything
         ${s}${c}}${se}
-      """.trimIndent().dotToTab()
+      """.trimIndent().dotToTab(),
     )
     TestCase.assertEquals(7, myFixture.editor.caretModel.allCarets[2].visualPosition.column)
   }

@@ -21,8 +21,8 @@ class LambdaTest : VimTestCase() {
         """
           let L = {-> "hello from an empty function"} |
           echo L()
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     assertExOutput("hello from an empty function\n")
   }
@@ -34,8 +34,8 @@ class LambdaTest : VimTestCase() {
         """
           let L = { x -> x + 10 } |
           echo L(32)
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     assertExOutput("42\n")
   }
@@ -47,8 +47,8 @@ class LambdaTest : VimTestCase() {
         """
           let Addition = { x, y -> x + y } |
           echo Addition(-142, 184)
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     assertExOutput("42\n")
   }
@@ -61,8 +61,8 @@ class LambdaTest : VimTestCase() {
           let Addition = { x, y -> x + y } |
           let Subtraction = { x, y -> x - y} |
           echo Addition
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     assertExOutput("function('<lambda>0')\n")
 
@@ -81,8 +81,8 @@ class LambdaTest : VimTestCase() {
             echo a:minuend .. ' - ' .. a:subtrahend .. ' = ' .. Subtract(a:minuend, a:subtrahend) |
           endfunction |
           call Subtraction(5, 2)
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     assertExOutput("5 - 2 = 3\n")
   }
@@ -94,8 +94,8 @@ class LambdaTest : VimTestCase() {
         """
           let L = { x -> x + 10 } |
           echo L(32, 100)
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     assertPluginError(false)
     assertExOutput("42\n")
@@ -109,8 +109,8 @@ class LambdaTest : VimTestCase() {
         """
           let L = { x -> x + 10 } |
           echo L()
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     assertPluginError(true)
     assertPluginErrorMessageContains("E119: Not enough arguments for function: <lambda>0")

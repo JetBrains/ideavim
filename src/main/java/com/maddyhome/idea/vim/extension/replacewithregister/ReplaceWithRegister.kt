@@ -113,10 +113,10 @@ internal class ReplaceWithRegister : VimExtension {
             range.startOffset,
             range.endOffset - 1,
             selectionType,
-            editor
-          )
+            editor,
+          ),
         ),
-        selectionType
+        selectionType,
       )
       // todo multicaret
       doReplace(ijEditor, editor.primaryCaret(), visualSelection)
@@ -162,7 +162,7 @@ internal class ReplaceWithRegister : VimExtension {
         insertTextBeforeCaret = true,
         rawIndent = true,
         caretAfterInsertedText = false,
-        putToLine = -1
+        putToLine = -1,
       )
       ClipboardOptionHelper.IdeaputDisabler().use {
         VimPlugin.getPut().putText(
@@ -171,8 +171,10 @@ internal class ReplaceWithRegister : VimExtension {
           putData,
           operatorArguments = OperatorArguments(
             editor.vimStateMachine?.isOperatorPending ?: false,
-            0, editor.editorMode, editor.subMode
-          )
+            0,
+            editor.editorMode,
+            editor.subMode,
+          ),
         )
       }
 

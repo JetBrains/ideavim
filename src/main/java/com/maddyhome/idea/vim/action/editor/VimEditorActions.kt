@@ -26,14 +26,14 @@ import javax.swing.KeyStroke
 internal class VimEditorBackSpace : IdeActionHandler(IdeActions.ACTION_EDITOR_BACKSPACE), ComplicatedKeysAction {
   override val keyStrokesSet: Set<List<KeyStroke>> = setOf(
     listOf(KeyStroke.getKeyStroke(KeyEvent.VK_H, KeyEvent.CTRL_DOWN_MASK)),
-    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0))
+    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0)),
   )
   override val type: Command.Type = Command.Type.DELETE
 }
 
 internal class VimEditorDelete : IdeActionHandler(IdeActions.ACTION_EDITOR_DELETE), ComplicatedKeysAction {
   override val keyStrokesSet: Set<List<KeyStroke>> = setOf(
-    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0))
+    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0)),
   )
   override val type: Command.Type = Command.Type.DELETE
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_STROKE)
@@ -42,7 +42,7 @@ internal class VimEditorDelete : IdeActionHandler(IdeActions.ACTION_EDITOR_DELET
 internal class VimEditorDown : IdeActionHandler(IdeActions.ACTION_EDITOR_MOVE_CARET_DOWN), ComplicatedKeysAction {
   override val keyStrokesSet: Set<List<KeyStroke>> = setOf(
     listOf(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0)),
-    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_DOWN, 0))
+    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_DOWN, 0)),
   )
   override val type: Command.Type = Command.Type.MOTION
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_CLEAR_STROKES)
@@ -51,7 +51,7 @@ internal class VimEditorDown : IdeActionHandler(IdeActions.ACTION_EDITOR_MOVE_CA
 internal class VimEditorTab : IdeActionHandler(IdeActions.ACTION_EDITOR_TAB), ComplicatedKeysAction {
   override val keyStrokesSet: Set<List<KeyStroke>> = setOf(
     listOf(KeyStroke.getKeyStroke(KeyEvent.VK_I, KeyEvent.CTRL_DOWN_MASK)),
-    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0))
+    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0)),
   )
   override val type: Command.Type = Command.Type.INSERT
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_STROKE)
@@ -60,7 +60,7 @@ internal class VimEditorTab : IdeActionHandler(IdeActions.ACTION_EDITOR_TAB), Co
 internal class VimEditorUp : IdeActionHandler(IdeActions.ACTION_EDITOR_MOVE_CARET_UP), ComplicatedKeysAction {
   override val keyStrokesSet: Set<List<KeyStroke>> = setOf(
     listOf(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0)),
-    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_UP, 0))
+    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_UP, 0)),
   )
   override val type: Command.Type = Command.Type.MOTION
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_CLEAR_STROKES)

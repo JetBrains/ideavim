@@ -86,7 +86,10 @@ internal class IjVimApplication : VimApplicationBase() {
     return KeyEvent(
       component,
       if (stroke.keyChar == KeyEvent.CHAR_UNDEFINED) KeyEvent.KEY_PRESSED else KeyEvent.KEY_TYPED,
-      System.currentTimeMillis(), stroke.modifiers, stroke.keyCode, stroke.keyChar
+      System.currentTimeMillis(),
+      stroke.modifiers,
+      stroke.keyCode,
+      stroke.keyChar,
     )
   }
 

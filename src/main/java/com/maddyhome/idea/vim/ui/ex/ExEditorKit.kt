@@ -108,7 +108,7 @@ internal object ExEditorKit : DefaultEditorKit() {
     HistoryUpFilterAction(),
     HistoryDownFilterAction(),
     ToggleInsertReplaceAction(),
-    InsertRegisterAction()
+    InsertRegisterAction(),
   )
 
   class DefaultExKeyHandler : DefaultKeyTypedAction() {
@@ -128,7 +128,7 @@ internal object ExEditorKit : DefaultEditorKit() {
               KeyHandler.getInstance().handleKey(
                 editor.vim,
                 key,
-                injector.executionContextManager.onEditor(editor.vim, entry.context.vim)
+                injector.executionContextManager.onEditor(editor.vim, entry.context.vim),
               )
             } else {
               val event = ActionEvent(e.source, e.id, c.toString(), e.getWhen(), e.modifiers)

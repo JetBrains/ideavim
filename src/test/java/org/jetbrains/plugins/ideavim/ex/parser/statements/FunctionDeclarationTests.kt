@@ -30,20 +30,24 @@ class FunctionDeclarationTests {
   companion object {
     @JvmStatic
     val spaces = listOf("", " ")
-      @DataPoints("spaces") get
+      @DataPoints("spaces")
+      get
 
     @JvmStatic
     val functionAlias = listOf("fu", "fun", "func", "funct", "functi", "functio", "function")
-      @DataPoints("function") get
+      @DataPoints("function")
+      get
 
     @JvmStatic
     val endfunctionAlias =
       listOf("endf", "endfu", "endfun", "endfunc", "endfunct", "endfuncti", "endfunctio", "endfunction")
-      @DataPoints("endfunction") get
+      @DataPoints("endfunction")
+      get
 
     @JvmStatic
     val flagAlias = listOf("range", "abort", "dict", "closure")
-      @DataPoints("flags") get
+      @DataPoints("flags")
+      get
   }
 
   @Theory
@@ -59,7 +63,7 @@ class FunctionDeclarationTests {
         function helloWorld$sp1($sp2)$sp3
             echo 'hello world'$sp4
         endfunction$sp5
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertEquals(1, script.units.size)
     assertTrue(script.units[0] is FunctionDeclaration)
@@ -93,7 +97,7 @@ class FunctionDeclarationTests {
             $sp7
             return 'true'$sp8
         endfunction$sp9
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertEquals(1, script.units.size)
     assertTrue(script.units[0] is FunctionDeclaration)
@@ -118,7 +122,7 @@ class FunctionDeclarationTests {
       """
         $functionAlias F1()$sp1
         $endfunctionAlias$sp2
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertEquals(1, script.units.size)
     assertTrue(script.units[0] is FunctionDeclaration)
@@ -135,7 +139,7 @@ class FunctionDeclarationTests {
       """
         fun F1()$sp1$flag1$sp2
         endf$sp3
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertEquals(1, script.units.size)
     assertTrue(script.units[0] is FunctionDeclaration)
@@ -155,7 +159,7 @@ class FunctionDeclarationTests {
       """
         fun F1()$sp1$flag1 $flag2$sp2
         endf$sp3
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertEquals(1, script.units.size)
     assertTrue(script.units[0] is FunctionDeclaration)
@@ -171,7 +175,7 @@ class FunctionDeclarationTests {
         function! s:dict.something.Initialize()
             return 'true'
         endfunction
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertEquals(1, script.units.size)
   }

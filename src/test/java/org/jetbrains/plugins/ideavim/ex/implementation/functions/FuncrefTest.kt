@@ -30,8 +30,8 @@ class FuncrefTest : VimTestCase() {
           function! Abs(number) |
             return abs(a:number) |
           endfunction
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     typeText(commandToKeys("let Ff = funcref('Abs', [-10])"))
     typeText(commandToKeys("echo Ff()"))
@@ -68,8 +68,8 @@ class FuncrefTest : VimTestCase() {
           function! Abs(number) |
             return abs(a:number) |
           endfunction
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     typeText(commandToKeys("let Ff = funcref('Abs', 10)"))
     assertPluginError(true)
@@ -87,8 +87,8 @@ class FuncrefTest : VimTestCase() {
           function! Abs(number) |
             return abs(a:number) |
           endfunction
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     typeText(commandToKeys("let Ff = funcref('Abs', [], 40)"))
     assertPluginError(true)
@@ -105,8 +105,8 @@ class FuncrefTest : VimTestCase() {
       function! SayHi() |
         echo 'hello' |
       endfunction
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     typeText(commandToKeys("let Ff = funcref('SayHi')"))
     typeText(commandToKeys("call Ff()"))
@@ -118,8 +118,8 @@ class FuncrefTest : VimTestCase() {
       function! SayHi() |
         echo 'hi' |
       endfunction
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     typeText(commandToKeys("call Ff()"))
     assertExOutput("hello\n")
@@ -136,8 +136,8 @@ class FuncrefTest : VimTestCase() {
       function! SayHi() |
         echo 'hello' |
       endfunction
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     typeText(commandToKeys("let Ff = funcref('SayHi')"))
     typeText(commandToKeys("delfunction! SayHi"))

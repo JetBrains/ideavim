@@ -22,8 +22,8 @@ class FunctionDeclarationTest : VimTestCase() {
           "function GetHiString(name) |" +
           "  return 'Oh hi ' . a:name | " +
           "endfunction |" +
-          "echo GetHiString('Mark')"
-      )
+          "echo GetHiString('Mark')",
+      ),
     )
     assertExOutput("Oh hi Mark\n")
   }
@@ -46,8 +46,8 @@ class FunctionDeclarationTest : VimTestCase() {
           "    return 555 |" +
           "  endfunction |" +
           "  return 10 * F2() |" +
-          "endfunction"
-      )
+          "endfunction",
+      ),
     )
     typeText(commandToKeys("echo F1()"))
     assertExOutput("5550\n")
@@ -69,8 +69,8 @@ class FunctionDeclarationTest : VimTestCase() {
           "    return 555 |" +
           "  endfunction |" +
           "  return 10 * F2() |" +
-          "endfunction"
-      )
+          "endfunction",
+      ),
     )
     typeText(commandToKeys("echo F2()"))
     assertPluginError(true)
@@ -88,16 +88,16 @@ class FunctionDeclarationTest : VimTestCase() {
         "" +
           "function F1() |" +
           "  return 10 |" +
-          "endfunction"
-      )
+          "endfunction",
+      ),
     )
     typeText(
       commandToKeys(
         "" +
           "function F1() |" +
           "  return 100 |" +
-          "endfunction"
-      )
+          "endfunction",
+      ),
     )
     assertPluginError(true)
     assertPluginErrorMessageContains("E122: Function F1 already exists, add ! to replace it")
@@ -115,16 +115,16 @@ class FunctionDeclarationTest : VimTestCase() {
         "" +
           "function F1() |" +
           "  return 10 |" +
-          "endfunction"
-      )
+          "endfunction",
+      ),
     )
     typeText(
       commandToKeys(
         "" +
           "function! F1() |" +
           "  return 100 |" +
-          "endfunction"
-      )
+          "endfunction",
+      ),
     )
     assertPluginError(false)
     typeText(commandToKeys("echo F1()"))
@@ -144,8 +144,8 @@ class FunctionDeclarationTest : VimTestCase() {
           "    return 10 * x |" +
           "  endfunction |" +
           "  return F2() |" +
-          "endfunction"
-      )
+          "endfunction",
+      ),
     )
     typeText(commandToKeys("echo F1()"))
     assertExOutput("50\n")
@@ -166,8 +166,8 @@ class FunctionDeclarationTest : VimTestCase() {
           "    return 10 * x |" +
           "  endfunction |" +
           "  return F2() |" +
-          "endfunction"
-      )
+          "endfunction",
+      ),
     )
     typeText(commandToKeys("echo F1()"))
     assertPluginError(true)
@@ -189,8 +189,8 @@ class FunctionDeclarationTest : VimTestCase() {
           "    let x += 1 |" +
           "    return x |" +
           "  endfunction |" +
-          "endfunction"
-      )
+          "endfunction",
+      ),
     )
     typeText(commandToKeys("echo F1()"))
     typeText(commandToKeys("echo F2()"))
@@ -215,8 +215,8 @@ class FunctionDeclarationTest : VimTestCase() {
           "    let x += 1 |" +
           "    return x |" +
           "  endfunction |" +
-          "endfunction"
-      )
+          "endfunction",
+      ),
     )
     typeText(commandToKeys("echo F1()"))
     typeText(commandToKeys("echo F2()"))
@@ -241,8 +241,8 @@ class FunctionDeclarationTest : VimTestCase() {
           "    return 10 |" +
           "  endfunction |" +
           "  echo x |" +
-          "endfunction"
-      )
+          "endfunction",
+      ),
     )
     typeText(commandToKeys("echo F1()"))
     assertPluginError(true)
@@ -269,8 +269,8 @@ class FunctionDeclarationTest : VimTestCase() {
           "function! F1() |" +
           "  echo unknownVar |" +
           "  let g:x = 10 |" +
-          "endfunction"
-      )
+          "endfunction",
+      ),
     )
     typeText(commandToKeys("echo F1()"))
     assertPluginError(true)
@@ -292,8 +292,8 @@ class FunctionDeclarationTest : VimTestCase() {
           "function! F1() abort |" +
           "  echo unknownVar |" +
           "  let g:x = 10 |" +
-          "endfunction"
-      )
+          "endfunction",
+      ),
     )
     typeText(commandToKeys("echo F1()"))
     assertPluginError(true)
@@ -313,7 +313,7 @@ class FunctionDeclarationTest : VimTestCase() {
         ${c}12345
         abcde
         -----
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(
       commandToKeys(
@@ -321,8 +321,8 @@ class FunctionDeclarationTest : VimTestCase() {
           "let rangesConcatenation = '' |" +
           "function! F1() |" +
           "  let g:rangesConcatenation .= line('.') |" +
-          "endfunction |"
-      )
+          "endfunction |",
+      ),
     )
     typeText(commandToKeys("1,3call F1()"))
     typeText(commandToKeys("echo rangesConcatenation"))
@@ -335,7 +335,7 @@ class FunctionDeclarationTest : VimTestCase() {
         12345
         ${c}abcde
         -----
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(commandToKeys("delf! F1"))
   }
@@ -347,7 +347,7 @@ class FunctionDeclarationTest : VimTestCase() {
         12345
         abcde
         $c-----
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(
       commandToKeys(
@@ -355,8 +355,8 @@ class FunctionDeclarationTest : VimTestCase() {
           "let rangesConcatenation = '' |" +
           "function! F1() range |" +
           "  let g:rangesConcatenation .= line('.') |" +
-          "endfunction |"
-      )
+          "endfunction |",
+      ),
     )
     typeText(commandToKeys("1,3call F1()"))
     typeText(commandToKeys("echo rangesConcatenation"))
@@ -369,7 +369,7 @@ class FunctionDeclarationTest : VimTestCase() {
         12345
         abcde
         -----
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(commandToKeys("delf! F1"))
   }
@@ -383,8 +383,8 @@ class FunctionDeclarationTest : VimTestCase() {
           "function! F1(firstline) |" +
           "  echo unknownVar |" +
           "  let g:x = 10 |" +
-          "endfunction"
-      )
+          "endfunction",
+      ),
     )
     assertPluginError(true)
     assertPluginErrorMessageContains("E125: Illegal argument: firstline")
@@ -395,8 +395,8 @@ class FunctionDeclarationTest : VimTestCase() {
           "function! F1(lastline) |" +
           "  echo unknownVar |" +
           "  let g:x = 10 |" +
-          "endfunction"
-      )
+          "endfunction",
+      ),
     )
     assertPluginError(true)
     assertPluginErrorMessageContains("E125: Illegal argument: lastline")
@@ -412,15 +412,15 @@ class FunctionDeclarationTest : VimTestCase() {
         12${c}345
         abcde
         -----
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(
       commandToKeys(
         "" +
           "function! F1() range |" +
           "  echo a:firstline .. ':' .. a:lastline |" +
-          "endfunction |"
-      )
+          "endfunction |",
+      ),
     )
     typeText(commandToKeys("call F1()"))
     assertPluginError(false)
@@ -431,7 +431,7 @@ class FunctionDeclarationTest : VimTestCase() {
         12${c}345
         abcde
         -----
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(commandToKeys("delf! F1"))
   }
@@ -443,15 +443,15 @@ class FunctionDeclarationTest : VimTestCase() {
         12${c}345
         abcde
         -----
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(
       commandToKeys(
         "" +
           "function! F1() |" +
           "  echo a:firstline .. ':' .. a:lastline |" +
-          "endfunction |"
-      )
+          "endfunction |",
+      ),
     )
     typeText(commandToKeys("1,4call F1()"))
     assertPluginError(false)
@@ -462,7 +462,7 @@ class FunctionDeclarationTest : VimTestCase() {
         12345
         abcde
         $c-----
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(commandToKeys("delf! F1"))
   }
@@ -474,7 +474,7 @@ class FunctionDeclarationTest : VimTestCase() {
         12345
         abcde
         ---$c--
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(
       commandToKeys(
@@ -482,8 +482,8 @@ class FunctionDeclarationTest : VimTestCase() {
           "let columns = '' |" +
           "function! F1() |" +
           "  let g:columns .= col('.') .. ',' |" +
-          "endfunction |"
-      )
+          "endfunction |",
+      ),
     )
     typeText(commandToKeys("call F1()"))
     typeText(commandToKeys("echo columns"))
@@ -506,7 +506,7 @@ class FunctionDeclarationTest : VimTestCase() {
         12345
         abcde
         ---$c--
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(
       commandToKeys(
@@ -514,8 +514,8 @@ class FunctionDeclarationTest : VimTestCase() {
           "let columns = '' |" +
           "function! F1() range |" +
           "  let g:columns .= col('.') .. ',' |" +
-          "endfunction |"
-      )
+          "endfunction |",
+      ),
     )
     typeText(commandToKeys("call F1()"))
     typeText(commandToKeys("echo columns"))
@@ -538,15 +538,15 @@ class FunctionDeclarationTest : VimTestCase() {
         "" +
           "function GetOptionalArgs(...) |" +
           "  return a:000 | " +
-          "endfunction"
-      )
+          "endfunction",
+      ),
     )
     typeText(commandToKeys("echo GetOptionalArgs()"))
     assertExOutput("[]\n")
     typeText(
       commandToKeys(
-        "echo GetOptionalArgs(42, 'optional arg')"
-      )
+        "echo GetOptionalArgs(42, 'optional arg')",
+      ),
     )
     assertExOutput("[42, 'optional arg']\n")
 
@@ -560,8 +560,8 @@ class FunctionDeclarationTest : VimTestCase() {
         "" +
           "function GetDefaultArgs(a = 10, b = 20) |" +
           "  return [a:a, a:b] | " +
-          "endfunction"
-      )
+          "endfunction",
+      ),
     )
     typeText(commandToKeys("echo GetDefaultArgs()"))
     assertExOutput("[10, 20]\n")
@@ -578,15 +578,15 @@ class FunctionDeclarationTest : VimTestCase() {
         "" +
           "function GetOptionalArgs(name, ...) |" +
           "  return a:000 | " +
-          "endfunction"
-      )
+          "endfunction",
+      ),
     )
     typeText(commandToKeys("echo GetOptionalArgs('this arg is not optional')"))
     assertExOutput("[]\n")
     typeText(
       commandToKeys(
-        "echo GetOptionalArgs('this arg is not optional', 42, 'optional arg')"
-      )
+        "echo GetOptionalArgs('this arg is not optional', 42, 'optional arg')",
+      ),
     )
     assertExOutput("[42, 'optional arg']\n")
 
@@ -600,8 +600,8 @@ class FunctionDeclarationTest : VimTestCase() {
         "" +
           "function GetOptionalArgs(name, a = 10, b = 20) |" +
           "  return 'a = ' .. a:a .. ', b = ' .. a:b | " +
-          "endfunction"
-      )
+          "endfunction",
+      ),
     )
     typeText(commandToKeys("echo GetOptionalArgs('this arg is not optional')"))
     assertExOutput("a = 10, b = 20\n")
@@ -622,8 +622,8 @@ class FunctionDeclarationTest : VimTestCase() {
         "" +
           "function GetOptionalArgs(name, a = 10, b = 20, ...) |" +
           "  return {'a': a:a, 'b': a:b, '000': a:000} | " +
-          "endfunction"
-      )
+          "endfunction",
+      ),
     )
     typeText(commandToKeys("echo GetOptionalArgs('this arg is not optional')"))
     assertExOutput("{'a': 10, 'b': 20, '000': []}\n")
@@ -650,8 +650,8 @@ class FunctionDeclarationTest : VimTestCase() {
           finish |
           let g:x = 10 |
         endfunction |
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     typeText(commandToKeys("call F()"))
     typeText(commandToKeys("echo x"))
@@ -669,8 +669,8 @@ class FunctionDeclarationTest : VimTestCase() {
           let a:dict.one = 1 |
           let a:dict['two'] = 2 |
         endfunction
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     typeText(commandToKeys("let d = {}"))
     typeText(commandToKeys("call AddNumbers(d)"))
@@ -689,8 +689,8 @@ class FunctionDeclarationTest : VimTestCase() {
         "" +
           "function s:GetHiString(name) |" +
           "  return 'Oh hi ' . a:name | " +
-          "endfunction"
-      )
+          "endfunction",
+      ),
     )
     assertPluginError(true)
     assertPluginErrorMessageContains("E81: Using <SID> not in a script context")
@@ -700,7 +700,7 @@ class FunctionDeclarationTest : VimTestCase() {
   fun `test get script function in command line context`() {
     configureByText("\n")
     typeText(
-      commandToKeys("echo s:F1()")
+      commandToKeys("echo s:F1()"),
     )
     assertPluginError(true)
     assertPluginErrorMessageContains("E120: Using <SID> not in a script context: s:F1")
@@ -721,8 +721,8 @@ class FunctionDeclarationTest : VimTestCase() {
         "" +
           "function ZeroGenerator() |" +
           "  return | " +
-          "endfunction"
-      )
+          "endfunction",
+      ),
     )
     assertPluginError(false)
     typeText(commandToKeys("echo ZeroGenerator()"))

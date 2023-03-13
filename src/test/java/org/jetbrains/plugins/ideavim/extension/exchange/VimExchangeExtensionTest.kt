@@ -29,7 +29,7 @@ class VimExchangeExtensionTest : VimTestCase() {
       "The quick ${c}brown fox catch over the lazy dog",
       "The quick fox ${c}brown catch over the lazy dog",
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -40,7 +40,7 @@ class VimExchangeExtensionTest : VimTestCase() {
       "The quick ${c}brown fox catch over the lazy dog",
       "The quick fox ${c}brown catch over the lazy dog",
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -51,7 +51,7 @@ class VimExchangeExtensionTest : VimTestCase() {
       "The quick brown ${c}fox catch over the lazy dog",
       "The quick ${c}fox brown catch over the lazy dog",
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -62,7 +62,7 @@ class VimExchangeExtensionTest : VimTestCase() {
       "The quick brown ${c}fox catch over the lazy dog",
       "The quick ${c}fox brown catch over the lazy dog",
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -73,14 +73,14 @@ class VimExchangeExtensionTest : VimTestCase() {
       "The quick ${c}brown fox catch over the lazy dog",
       "The quick fox ${c}brown catch over the lazy dog",
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
   // |X|
   @VimBehaviorDiffers(
     originalVimAfter = "The ${c}brown catch over the lazy dog",
-    shouldBeFixed = true
+    shouldBeFixed = true,
   )
   fun `test visual exchange words from inside`() {
     doTest(
@@ -88,14 +88,14 @@ class VimExchangeExtensionTest : VimTestCase() {
       "The quick ${c}brown fox catch over the lazy dog",
       "The brow${c}n catch over the lazy dog",
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
   // |X|
   @VimBehaviorDiffers(
     originalVimAfter = "The brown ${c}catch over the lazy dog",
-    shouldBeFixed = true
+    shouldBeFixed = true,
   )
   fun `test visual exchange words from outside`() {
     doTest(
@@ -103,7 +103,7 @@ class VimExchangeExtensionTest : VimTestCase() {
       "The ${c}quick brown fox catch over the lazy dog",
       "The brow${c}n catch over the lazy dog",
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -115,7 +115,7 @@ class VimExchangeExtensionTest : VimTestCase() {
        ${c}brown fox
        the lazy dog
        """,
-    shouldBeFixed = true
+    shouldBeFixed = true,
   )
   fun `test exchange lines top down`() {
     doTest(
@@ -131,7 +131,7 @@ class VimExchangeExtensionTest : VimTestCase() {
          the lazy dog
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -143,7 +143,7 @@ class VimExchangeExtensionTest : VimTestCase() {
        ${c}brown fox
        the lazy dog
        """,
-    shouldBeFixed = true
+    shouldBeFixed = true,
   )
   fun `test exchange lines top down with dot`() {
     doTest(
@@ -159,7 +159,7 @@ class VimExchangeExtensionTest : VimTestCase() {
          the lazy dog
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -169,7 +169,7 @@ class VimExchangeExtensionTest : VimTestCase() {
          brown thecatch over
          fox
           lazy dog
-    """
+    """,
   )
   fun `test exchange to the line end`() {
     doTest(
@@ -185,7 +185,7 @@ class VimExchangeExtensionTest : VimTestCase() {
          fox lazy dog
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -197,7 +197,7 @@ class VimExchangeExtensionTest : VimTestCase() {
          ${c}The quick
          brown fox
       """,
-    shouldBeFixed = true
+    shouldBeFixed = true,
   )
   fun `test exchange visual lines`() {
     doTest(
@@ -216,7 +216,7 @@ class VimExchangeExtensionTest : VimTestCase() {
          
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -305,8 +305,8 @@ class VimExchangeExtensionTest : VimTestCase() {
         buildString {
           append("v\$")
           append("X")
-        }
-      )
+        },
+      ),
     )
 
     assertHighlighter(16, 19, HighlighterTargetArea.EXACT_RANGE)
@@ -327,8 +327,8 @@ class VimExchangeExtensionTest : VimTestCase() {
         buildString {
           append("v\$")
           append("X")
-        }
-      )
+        },
+      ),
     )
 
     assertHighlighter(16, 20, HighlighterTargetArea.EXACT_RANGE)
@@ -358,7 +358,7 @@ class VimExchangeExtensionTest : VimTestCase() {
       "The quick brow${c}n fox catch over the lazy dog",
       "The ${c}brown quick fox catch over the lazy dog",
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -368,7 +368,7 @@ class VimExchangeExtensionTest : VimTestCase() {
       "The quick brow${c}n fox catch over the lazy dog",
       "The quick fox ${c}brown catch over the lazy dog",
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -378,7 +378,7 @@ class VimExchangeExtensionTest : VimTestCase() {
       "The quick ${c}brown fox catch over the lazy dog",
       "The quick fox ${c}brown catch over the lazy dog",
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 

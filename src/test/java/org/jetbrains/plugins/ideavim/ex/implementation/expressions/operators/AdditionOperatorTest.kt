@@ -71,7 +71,7 @@ class AdditionOperatorTest {
   fun `list plus list`() {
     assertEquals(
       VimList(mutableListOf(VimInt(3), VimInt(1), VimInt(2))),
-      VimscriptParser.parseExpression("[3] + [1, 2]")!!.evaluate()
+      VimscriptParser.parseExpression("[3] + [1, 2]")!!.evaluate(),
     )
   }
 

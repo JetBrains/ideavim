@@ -32,7 +32,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           second line
         ${c}endef
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
@@ -51,7 +51,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           second line
         endef
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
@@ -68,7 +68,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info defined)
         ${c}endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
@@ -85,7 +85,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info defined)
         endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
@@ -102,7 +102,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not defined)
         ${c}endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
@@ -119,7 +119,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not defined)
         endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
@@ -136,7 +136,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info empty)
         ${c}endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
@@ -153,7 +153,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info empty)
         endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
@@ -170,7 +170,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not empty)
         ${c}endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
@@ -187,7 +187,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not empty)
         endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
@@ -204,7 +204,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not empty)
         endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
@@ -229,7 +229,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not x86 based)
         endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
@@ -254,7 +254,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not x86 based)
         endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
@@ -279,7 +279,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not x86 based)
         endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
@@ -304,7 +304,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not x86 based)
         ${c}endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
@@ -329,7 +329,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not x86 based)
         endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
@@ -354,7 +354,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info x86 based)
         endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
@@ -379,7 +379,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info x86 based)
         endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
@@ -404,7 +404,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info x86 based)
         endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
@@ -429,7 +429,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info x86 based)
         ${c}endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
@@ -454,7 +454,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info x86 based)
         endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
@@ -475,7 +475,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           second line
         ${c}endef
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
@@ -494,7 +494,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           second line
         endef
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
@@ -511,7 +511,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info defined)
         ${c}endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
@@ -528,7 +528,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info defined)
         endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
@@ -545,7 +545,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not defined)
         ${c}endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
@@ -562,7 +562,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not defined)
         endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
@@ -579,7 +579,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info empty)
         ${c}endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
@@ -596,7 +596,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info empty)
         endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
@@ -613,7 +613,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not empty)
         ${c}endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
@@ -630,7 +630,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not empty)
         endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
@@ -647,7 +647,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not empty)
         else
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
@@ -672,7 +672,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not x86 based)
         ${c}endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
@@ -697,7 +697,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not x86 based)
         endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
@@ -722,7 +722,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not x86 based)
         endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
@@ -747,7 +747,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not x86 based)
         endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
@@ -772,7 +772,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info not x86 based)
         endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
@@ -797,7 +797,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info x86 based)
         ${c}endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
@@ -822,7 +822,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info x86 based)
         endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
@@ -847,7 +847,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info x86 based)
         endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
@@ -872,7 +872,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info x86 based)
         endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 
@@ -897,7 +897,7 @@ class MatchitGNUMakeTest : VimTestCase() {
           $(info x86 based)
         endif
       """.trimIndent(),
-      fileName = "Makefile"
+      fileName = "Makefile",
     )
   }
 }

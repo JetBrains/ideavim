@@ -23,7 +23,6 @@ import javax.swing.KeyStroke
  */
 public object ModalEntry {
   public inline fun activate(editor: VimEditor, crossinline processor: (KeyStroke) -> Boolean) {
-
     // Firstly we pull the unfinished keys of the current mapping
     val mappingStack = KeyHandler.getInstance().keyStack
     var stroke = mappingStack.feedSomeStroke()

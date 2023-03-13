@@ -83,7 +83,7 @@ internal class VimMultipleCursorsExtension : VimExtension {
       injector.parser.parseKeys(NEXT_OCCURRENCE),
       owner,
       NextOccurrenceHandler(whole = false),
-      false
+      false,
     )
     putExtensionHandlerMapping(MappingMode.NXO, injector.parser.parseKeys(ALL_WHOLE_OCCURRENCES), owner, AllOccurrencesHandler(), false)
     putExtensionHandlerMapping(
@@ -91,7 +91,7 @@ internal class VimMultipleCursorsExtension : VimExtension {
       injector.parser.parseKeys(ALL_OCCURRENCES),
       owner,
       AllOccurrencesHandler(whole = false),
-      false
+      false,
     )
     putExtensionHandlerMapping(MappingMode.X, injector.parser.parseKeys(SKIP_OCCURRENCE), owner, SkipOccurrenceHandler(), false)
     putExtensionHandlerMapping(MappingMode.X, injector.parser.parseKeys(REMOVE_OCCURRENCE), owner, RemoveOccurrenceHandler(), false)

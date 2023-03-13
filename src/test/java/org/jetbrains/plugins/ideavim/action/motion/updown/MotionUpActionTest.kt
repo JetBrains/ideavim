@@ -54,7 +54,7 @@ class MotionUpActionTest : VimTestCase() {
       """
         I found it in a le${c}gendary land
         all rocks and lavender and tufted grass,
-      """.trimIndent()
+      """.trimIndent(),
     ) {
       // Simulate the caret being moved without IdeaVim knowing and therefore without vimLastColumn being updated
       // This offset is effectively "lave${c}nder"

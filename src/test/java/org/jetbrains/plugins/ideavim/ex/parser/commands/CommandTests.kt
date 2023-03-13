@@ -120,7 +120,7 @@ class CommandTests {
 
         augroup myCmds
         augroup END
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertEquals(2, script.units.size)
     assertTrue(script.units[0] is PlugCommand)
@@ -136,7 +136,7 @@ class CommandTests {
         
         Plug 'danilo-augusto/vim-afterglow'
         set nu rnu
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertEquals(2, script.units.size)
     assertTrue(script.units[0] is PlugCommand)

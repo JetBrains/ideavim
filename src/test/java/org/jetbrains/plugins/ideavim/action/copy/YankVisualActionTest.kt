@@ -32,7 +32,8 @@ class YankVisualActionTest : VimTestCase() {
                             where it was settled on some sodden sand
                             hard by the torrent of a mountain pass.
       """.trimIndent(),
-      "found", SelectionType.CHARACTER_WISE
+      "found",
+      SelectionType.CHARACTER_WISE,
     )
   }
 
@@ -48,7 +49,8 @@ class YankVisualActionTest : VimTestCase() {
                             where it was settled on some sodden sand
                             hard by the torrent of a mountain pass.
       """.trimIndent(),
-      "", SelectionType.CHARACTER_WISE
+      "",
+      SelectionType.CHARACTER_WISE,
     )
   }
 
@@ -64,7 +66,8 @@ class YankVisualActionTest : VimTestCase() {
                             where it was settled on some sodden sand
                             hard by the torrent of a mountain pass.
       """.trimIndent(),
-      "land", SelectionType.CHARACTER_WISE
+      "land",
+      SelectionType.CHARACTER_WISE,
     )
   }
 
@@ -123,7 +126,8 @@ class YankVisualActionTest : VimTestCase() {
                             where it was settled on some sodden sand
                             hard by the torrent of a mountain pass.
       """.trimIndent(),
-      "I found it in a legendary land\n", SelectionType.LINE_WISE
+      "I found it in a legendary land\n",
+      SelectionType.LINE_WISE,
     )
   }
 
@@ -138,7 +142,8 @@ class YankVisualActionTest : VimTestCase() {
                             where it was settled on some sodden sand
                             hard by ${c}the torrent of a mountain pass.
       """.trimIndent(),
-      "hard by the torrent of a mountain pass.\n", SelectionType.LINE_WISE
+      "hard by the torrent of a mountain pass.\n",
+      SelectionType.LINE_WISE,
     )
   }
 
@@ -158,7 +163,7 @@ class YankVisualActionTest : VimTestCase() {
     val registers = editor.carets().map { it.registerStorage.getRegister(lastRegister)?.rawText }
     assertEquals(
       listOf("all rocks and lavender and tufted grass,\n", "hard by the torrent of a mountain pass.\n"),
-      registers
+      registers,
     )
   }
 
@@ -203,7 +208,8 @@ class YankVisualActionTest : VimTestCase() {
                             where it was settled on some sodden sand
                             hard by the torrent of a mountain pass.
       """.trimIndent(),
-      "fo\nl ", SelectionType.BLOCK_WISE
+      "fo\nl ",
+      SelectionType.BLOCK_WISE,
     )
   }
 
@@ -224,7 +230,7 @@ class YankVisualActionTest : VimTestCase() {
                     ere it was settled on some sodden sand
                     rd by the torrent of a mountain pass.
       """.trimIndent(),
-      SelectionType.BLOCK_WISE
+      SelectionType.BLOCK_WISE,
     )
   }
 
@@ -243,7 +249,7 @@ class YankVisualActionTest : VimTestCase() {
                     found it in a legendary land
                     l rocks and lavender and tufted grass,[ additional symbols]
       """.trimIndent(),
-      SelectionType.BLOCK_WISE
+      SelectionType.BLOCK_WISE,
     )
   }
 
@@ -259,7 +265,7 @@ class YankVisualActionTest : VimTestCase() {
                             hard by the torrent of a mountain pass.
       """.trimIndent(),
       "rocks",
-      SelectionType.CHARACTER_WISE
+      SelectionType.CHARACTER_WISE,
     )
   }
 
@@ -275,7 +281,7 @@ class YankVisualActionTest : VimTestCase() {
                             hard by the torrent of a mountain pass.
       """.trimIndent(),
       "all rocks and lavender and tufted grass,[ additional symbols]\n",
-      SelectionType.LINE_WISE
+      SelectionType.LINE_WISE,
     )
   }
 

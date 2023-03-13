@@ -63,7 +63,7 @@ class MapPropertyTest : VimPropertyTestBase() {
 // I think, it would be enough to test normal mode only. Not sure if it's true
 private val modesList = arrayListOf(
   "map", /*"nmap", "vmap", "xmap", "omap", "imap", "vmap",*/
-  "noremap"/*, "nnoremap", "vnoremap", "xnoremap", "onoremap", "inoremap", "vnoremap"*/
+  "noremap", /*, "nnoremap", "vnoremap", "xnoremap", "onoremap", "inoremap", "vnoremap"*/
 )
 
 private val keysPlaying = arrayListOf("h", "j", "k", "l", "w", "b", "e")

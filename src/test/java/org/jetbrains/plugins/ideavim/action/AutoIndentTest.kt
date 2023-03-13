@@ -22,7 +22,7 @@ class AutoIndentTest : VimTestCase() {
    int <caret>b;
    int c;
 }
-"""
+""",
     )
     typeText(injector.parser.parseKeys("=="))
     assertState(
@@ -31,7 +31,7 @@ class AutoIndentTest : VimTestCase() {
     <caret>int b;
    int c;
 }
-"""
+""",
     )
   }
 
@@ -45,7 +45,7 @@ class AutoIndentTest : VimTestCase() {
    int c;
    int d;
 }
-"""
+""",
     )
     typeText(injector.parser.parseKeys("2=="))
     assertState(
@@ -55,7 +55,7 @@ class AutoIndentTest : VimTestCase() {
     int c;
    int d;
 }
-"""
+""",
     )
   }
 
@@ -69,7 +69,7 @@ class AutoIndentTest : VimTestCase() {
    int <caret>c;
    int d;
 }
-"""
+""",
     )
     typeText(injector.parser.parseKeys("=k"))
     assertState(
@@ -79,7 +79,7 @@ class AutoIndentTest : VimTestCase() {
     int c;
    int d;
 }
-"""
+""",
     )
   }
 
@@ -92,7 +92,7 @@ class AutoIndentTest : VimTestCase() {
    int <caret>b;
    int c;
 }
-"""
+""",
     )
     typeText(injector.parser.parseKeys("=l"))
     assertState(
@@ -101,7 +101,7 @@ class AutoIndentTest : VimTestCase() {
     <caret>int b;
    int c;
 }
-"""
+""",
     )
   }
 
@@ -115,7 +115,7 @@ class AutoIndentTest : VimTestCase() {
    int c;
    int d;
 }
-"""
+""",
     )
     typeText(injector.parser.parseKeys("2=j"))
     assertState(
@@ -125,7 +125,7 @@ class AutoIndentTest : VimTestCase() {
     int c;
    int d;
 }
-"""
+""",
     )
   }
 
@@ -138,7 +138,7 @@ class AutoIndentTest : VimTestCase() {
    int <caret>b;
    int c;
 }
-"""
+""",
     )
     typeText(injector.parser.parseKeys("v" + "l" + "="))
     assertState(
@@ -147,7 +147,7 @@ class AutoIndentTest : VimTestCase() {
     <caret>int b;
    int c;
 }
-"""
+""",
     )
   }
 
@@ -161,7 +161,7 @@ class AutoIndentTest : VimTestCase() {
    int c;
    int d;
 }
-"""
+""",
     )
     typeText(injector.parser.parseKeys("v" + "j" + "="))
     assertState(
@@ -171,7 +171,7 @@ class AutoIndentTest : VimTestCase() {
     int c;
    int d;
 }
-"""
+""",
     )
   }
 
@@ -185,7 +185,7 @@ class AutoIndentTest : VimTestCase() {
    int c;
    int d;
 }
-"""
+""",
     )
     typeText(injector.parser.parseKeys("<C-V>" + "j" + "="))
     assertState(
@@ -195,7 +195,7 @@ class AutoIndentTest : VimTestCase() {
     int c;
    int d;
 }
-"""
+""",
     )
   }
 }

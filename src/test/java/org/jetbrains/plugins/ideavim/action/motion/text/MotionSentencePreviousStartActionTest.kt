@@ -20,7 +20,7 @@ class MotionSentencePreviousStartActionTest : VimTestCase() {
         ${c}all rocks and lavender and tufted grass,
         where it was settled on some sodden sand
         hard by the torrent of a mountain pass.
-      """
+      """,
   )
   fun `test with two empty lines`() {
     doTest(
@@ -39,7 +39,8 @@ class MotionSentencePreviousStartActionTest : VimTestCase() {
         where it was settled on some sodden sand
         hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 }

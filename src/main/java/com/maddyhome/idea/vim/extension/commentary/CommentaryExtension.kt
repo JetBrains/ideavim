@@ -127,7 +127,7 @@ internal class CommentaryExtension : VimExtension {
       injector.parser.parseKeys("gcu"),
       owner,
       injector.parser.parseKeys("<Plug>Commentary<Plug>Commentary"),
-      true
+      true,
     )
 
     // Previous versions of IdeaVim used different mappings to Vim's Commentary. Make sure everything works if someone
@@ -192,7 +192,6 @@ internal class CommentaryExtension : VimExtension {
       rawCount: Int,
       argument: Argument?,
     ): TextRange? {
-
       val nativeEditor = (editor as IjVimEditor).editor
       val file = PsiHelper.getFile(nativeEditor) ?: return null
       val lastLine = editor.lineCount()
@@ -218,8 +217,9 @@ internal class CommentaryExtension : VimExtension {
       val startElement = file.findElementAt(startOffset) ?: return false
       var next: PsiElement? = startElement
       while (next != null && next.textRange.startOffset <= endOffset) {
-        if (next !is PsiWhiteSpace && !isComment(next))
+        if (next !is PsiWhiteSpace && !isComment(next)) {
           return false
+        }
         next = PsiTreeUtil.nextLeaf(next, true)
       }
 

@@ -36,7 +36,7 @@ class CmdClearCommandTest : VimTestCase() {
             |Vs          0          vs
             |Wq          0          wq
             |WQ          0          wq
-        """.trimMargin()
+      """.trimMargin(),
     )
 
     // Delete all of the aliases and then list aliases again.

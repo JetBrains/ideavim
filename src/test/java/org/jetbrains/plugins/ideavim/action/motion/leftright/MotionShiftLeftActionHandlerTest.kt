@@ -23,7 +23,7 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(OptionConstants.keymo
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, OptionConstants.keymodel_startsel),
-    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, "")
+    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""),
   )
   fun `test visual left`() {
     doTest(
@@ -44,14 +44,15 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(OptionConstants.keymo
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER
+      VimStateMachine.Mode.VISUAL,
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, OptionConstants.keymodel_startsel),
-    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, "")
+    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""),
   )
   fun `test visual left twice`() {
     doTest(
@@ -72,14 +73,15 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(OptionConstants.keymo
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER
+      VimStateMachine.Mode.VISUAL,
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, OptionConstants.keymodel_startsel),
-    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, OptionConstants.selectmode_key)
+    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, OptionConstants.selectmode_key),
   )
   fun `test select left`() {
     doTest(
@@ -100,14 +102,15 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(OptionConstants.keymo
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT, VimStateMachine.SubMode.VISUAL_CHARACTER
+      VimStateMachine.Mode.SELECT,
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, OptionConstants.keymodel_startsel),
-    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, OptionConstants.selectmode_key)
+    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, OptionConstants.selectmode_key),
   )
   fun `test select left twice`() {
     doTest(
@@ -128,14 +131,15 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(OptionConstants.keymo
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.SELECT, VimStateMachine.SubMode.VISUAL_CHARACTER
+      VimStateMachine.Mode.SELECT,
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
-    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, "")
+    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""),
   )
   fun `test simple motion char mode`() {
     doTest(
@@ -157,14 +161,14 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(OptionConstants.keymo
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_CHARACTER
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
-    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, "")
+    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""),
   )
   fun `test double motion char mode`() {
     doTest(
@@ -186,14 +190,14 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(OptionConstants.keymo
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_CHARACTER
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
-    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, "")
+    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""),
   )
   fun `test at line start char mode`() {
     doTest(
@@ -215,14 +219,14 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(OptionConstants.keymo
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_CHARACTER
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
-    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, "")
+    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""),
   )
   fun `test at file start char mode`() {
     doTest(
@@ -244,14 +248,14 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(OptionConstants.keymo
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_CHARACTER
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
-    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, "")
+    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""),
   )
   fun `test char mode multicaret`() {
     doTest(
@@ -273,14 +277,14 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(OptionConstants.keymo
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_CHARACTER
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
-    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, "")
+    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""),
   )
   fun `test simple motion line mode`() {
     doTest(
@@ -302,14 +306,14 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(OptionConstants.keymo
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_LINE
+      VimStateMachine.SubMode.VISUAL_LINE,
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
-    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, "")
+    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""),
   )
   fun `test to line start line mode`() {
     doTest(
@@ -331,14 +335,14 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(OptionConstants.keymo
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_LINE
+      VimStateMachine.SubMode.VISUAL_LINE,
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
-    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, "")
+    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""),
   )
   fun `test to file start line mode`() {
     doTest(
@@ -360,14 +364,14 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(OptionConstants.keymo
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_LINE
+      VimStateMachine.SubMode.VISUAL_LINE,
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
-    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, "")
+    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""),
   )
   fun `test line mode multicaret`() {
     doTest(
@@ -389,14 +393,14 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(OptionConstants.keymo
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_LINE
+      VimStateMachine.SubMode.VISUAL_LINE,
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
-    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, "")
+    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""),
   )
   fun `test simple motion block mode`() {
     doTest(
@@ -418,14 +422,14 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(OptionConstants.keymo
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_BLOCK
+      VimStateMachine.SubMode.VISUAL_BLOCK,
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
-    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, "")
+    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""),
   )
   fun `test twice motion block mode`() {
     doTest(
@@ -447,14 +451,14 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(OptionConstants.keymo
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_BLOCK
+      VimStateMachine.SubMode.VISUAL_BLOCK,
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
-    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, "")
+    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""),
   )
   fun `test at line start block mode`() {
     doTest(
@@ -476,14 +480,14 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(OptionConstants.keymo
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_BLOCK
+      VimStateMachine.SubMode.VISUAL_BLOCK,
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
-    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, "")
+    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""),
   )
   fun `test at file start block mode`() {
     doTest(
@@ -505,14 +509,14 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(OptionConstants.keymo
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_BLOCK
+      VimStateMachine.SubMode.VISUAL_BLOCK,
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
-    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, "")
+    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""),
   )
   fun `test multiline with empty line block mode`() {
     doTest(
@@ -534,7 +538,7 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(OptionConstants.keymo
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_BLOCK
+      VimStateMachine.SubMode.VISUAL_BLOCK,
     )
     assertCaretsVisualAttributes()
   }
@@ -542,7 +546,7 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(OptionConstants.keymo
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
-    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, "")
+    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""),
   )
   fun `test multiline block mode`() {
     doTest(
@@ -564,7 +568,7 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(OptionConstants.keymo
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_BLOCK
+      VimStateMachine.SubMode.VISUAL_BLOCK,
     )
     assertCaretsVisualAttributes()
   }
@@ -572,7 +576,7 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(OptionConstants.keymo
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, OptionConstants.keymodel_continuevisual),
-    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, "")
+    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""),
   )
   fun `test continuevisual`() {
     doTest(
@@ -594,14 +598,14 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(OptionConstants.keymo
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_CHARACTER
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, ""),
-    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, "")
+    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""),
   )
   fun `test no continueselect`() {
     doTest(
@@ -623,14 +627,14 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(OptionConstants.keymo
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_CHARACTER
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, ""),
-    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, "")
+    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""),
   )
   fun `test no continuevisual`() {
     doTest(
@@ -652,7 +656,7 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(OptionConstants.keymo
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_CHARACTER
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
     )
   }
 }

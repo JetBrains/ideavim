@@ -83,7 +83,7 @@ class KeywordOptionTest : VimTestCase() {
         init {
           add("b-a")
         }
-      }
+      },
     )
   }
 
@@ -97,7 +97,7 @@ class KeywordOptionTest : VimTestCase() {
         init {
           add("ab")
         }
-      }
+      },
     )
   }
 

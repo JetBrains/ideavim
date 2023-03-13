@@ -55,7 +55,7 @@ class SelectExtendVariousMotionsTest : VimTestCase() {
         ${s}fu${c}${se}nc myFunc() {
         ${s}${c}${se}.return anything
         ${s}}${c}${se}
-      """.trimIndent().dotToTab()
+      """.trimIndent().dotToTab(),
     )
 
     typeText(injector.parser.parseKeys("<S-UP>".repeat(7) + "<S-Right>".repeat(3)))
@@ -73,7 +73,7 @@ class SelectExtendVariousMotionsTest : VimTestCase() {
         ${s}func m${c}${se}yFunc() {
         ${s}.re${c}${se}turn anything
         ${s}}${c}${se}
-      """.trimIndent().dotToTab()
+      """.trimIndent().dotToTab(),
     )
 
     typeText(injector.parser.parseKeys("<S-Right>".repeat(2)))
@@ -91,7 +91,7 @@ class SelectExtendVariousMotionsTest : VimTestCase() {
         ${s}func myF${c}${se}unc() {
         ${s}.retu${c}${se}rn anything
         ${s}}${c}${se}
-      """.trimIndent().dotToTab()
+      """.trimIndent().dotToTab(),
     )
   }
 }

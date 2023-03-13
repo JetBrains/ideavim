@@ -29,7 +29,7 @@ class JumpsCommandTest : VimTestCase() {
                       |to science: shape and shade -- the special tinge,
                       |akin to moonlight, tempering its blue,
                       |the dingy underside, the checquered fringe.
-                      """.trimMargin()
+      """.trimMargin(),
     )
 
     enterSearch("sodden")
@@ -45,7 +45,8 @@ class JumpsCommandTest : VimTestCase() {
                      |   2     7   12 to science: shape and shade -- the special tinge,
                      |   1     2    4 all rocks and lavender and tufted grass,
                      |>
-                     |""".trimMargin()
+                     |
+      """.trimMargin(),
     )
   }
 
@@ -60,7 +61,7 @@ class JumpsCommandTest : VimTestCase() {
                       |to science: shape and shade -- the special tinge,
                       |akin to moonlight, tempering its blue,
                       |the dingy underside, the checquered fringe.
-                      """.trimMargin()
+      """.trimMargin(),
     )
 
     enterSearch("sodden")
@@ -78,7 +79,8 @@ class JumpsCommandTest : VimTestCase() {
                      |>  0     7   12 to science: shape and shade -- the special tinge,
                      |   1     2    4 all rocks and lavender and tufted grass,
                      |   2     9   10 the dingy underside, the checquered fringe.
-                     |""".trimMargin()
+                     |
+      """.trimMargin(),
     )
   }
 
@@ -94,7 +96,8 @@ class JumpsCommandTest : VimTestCase() {
       """ jump line  col file/text
                      |   1     1    0 ${text.substring(0, 200)}
                      |>
-                     |""".trimMargin()
+                     |
+      """.trimMargin(),
     )
   }
 
@@ -108,7 +111,8 @@ class JumpsCommandTest : VimTestCase() {
       """ jump line  col file/text
                      |   1     1    0 Hello^FWorld^?
                      |>
-                     |""".trimMargin()
+                     |
+      """.trimMargin(),
     )
   }
 }

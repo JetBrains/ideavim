@@ -39,7 +39,7 @@ class IfStatementTests {
           echo 1
           echo 1
         endif$sp4
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertEquals(1, script.units.size)
     assertTrue(script.units[0] is IfStatement)

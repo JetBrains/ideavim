@@ -111,9 +111,11 @@ internal class Matchit : VimExtension {
           Argument(
             Command(
               count,
-              matchitAction, Command.Type.MOTION, EnumSet.noneOf(CommandFlags::class.java)
-            )
-          )
+              matchitAction,
+              Command.Type.MOTION,
+              EnumSet.noneOf(CommandFlags::class.java),
+            ),
+          ),
         )
       } else {
         editor.sortedCarets().forEach { caret ->
@@ -154,7 +156,7 @@ private data class LanguagePatterns(
       this.openings + newLanguagePatterns.openings,
       this.closings + newLanguagePatterns.closings,
       this.reversedOpenings + newLanguagePatterns.reversedOpenings,
-      this.reversedClosings + newLanguagePatterns.reversedClosings
+      this.reversedClosings + newLanguagePatterns.reversedClosings,
     )
   }
 
@@ -178,7 +180,7 @@ private data class LanguagePatterns(
       // This particular arrangement relies on our checking if the cursor is on a closing pattern first.
       val reversedOpenings = mapOf(
         openingPattern to Pair(openingPattern, closingPattern),
-        middlePattern to Pair(openingAndMiddlePatterns, middlePattern)
+        middlePattern to Pair(openingAndMiddlePatterns, middlePattern),
       )
       val reversedClosings = mapOf(middleAndClosingPatterns to Pair(openingAndMiddlePatterns, middleAndClosingPatterns))
 
@@ -199,7 +201,7 @@ private data class MatchitSearchParams(
   // If the cursor is not in a comment, then we want to ignore any matches found in comments.
   // But if we are in comment, then we only want to match on things in comments. The same goes for quotes.
   val skipComments: Boolean,
-  val skipStrings: Boolean
+  val skipStrings: Boolean,
 )
 
 /**
@@ -235,7 +237,7 @@ private object FileTypePatterns {
   private val htmlLikeFileTypes = setOf(
     "HTML", "XML", "XHTML", "JSP", "JavaScript", "JSX Harmony",
     "TypeScript", "TypeScript JSX", "Vue.js", "Handlebars/Mustache",
-    "Asp", "Razor", "UXML", "Xaml"
+    "Asp", "Razor", "UXML", "Xaml",
   )
 
   private val htmlPatterns = createHtmlPatterns()
@@ -375,7 +377,7 @@ private fun findMatchingPair(
   caretOffset: Int,
   isInOpPending: Boolean,
   openings: PatternsTable,
-  closings: PatternsTable
+  closings: PatternsTable,
 ): Int {
   // For better performance, we limit our search to the current line. This way we don't have to scan the entire file
   // to determine if we're on a pattern or not. The original plugin behaves the same way.

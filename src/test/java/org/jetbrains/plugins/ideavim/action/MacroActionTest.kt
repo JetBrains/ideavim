@@ -163,7 +163,7 @@ class MacroActionTest : VimTestCase() {
             1all rocks and lavender and tufted grass,
             1where it was settled on some sodden sand
             ${c}1hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 }

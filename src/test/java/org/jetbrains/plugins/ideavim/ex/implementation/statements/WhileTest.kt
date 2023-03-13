@@ -20,8 +20,8 @@ class WhileTest : VimTestCase() {
           "let x = 3 | " +
           "while x < 100 | " +
           " let x += 5 | " +
-          "endwhile"
-      )
+          "endwhile",
+      ),
     )
     typeText(commandToKeys("echo x"))
     assertExOutput("103\n")
@@ -39,8 +39,8 @@ class WhileTest : VimTestCase() {
           "  else | " +
           "    let x += 5 | " +
           "  endif | " +
-          "endwhile"
-      )
+          "endwhile",
+      ),
     )
     typeText(commandToKeys("echo x"))
     assertExOutput("13\n")
@@ -59,8 +59,8 @@ class WhileTest : VimTestCase() {
           "    continue | " +
           "  endif |" +
           "  let evenNumbers += 1 | " +
-          "endwhile"
-      )
+          "endwhile",
+      ),
     )
     typeText(commandToKeys("echo evenNumbers"))
     assertExOutput("50\n")

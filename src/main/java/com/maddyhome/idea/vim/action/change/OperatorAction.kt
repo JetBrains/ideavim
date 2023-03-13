@@ -74,9 +74,8 @@ internal class OperatorAction : VimActionHandler.SingleExecution() {
     editor: VimEditor,
     context: ExecutionContext,
     argument: Argument,
-    operatorArguments: OperatorArguments
+    operatorArguments: OperatorArguments,
   ): TextRange? {
-
     // Note that we're using getMotionRange2 in order to avoid normalising the linewise range into line start
     // offsets that will be used to set the change marks. This affects things like the location of the caret in the
     // Commentary extension
@@ -86,9 +85,8 @@ internal class OperatorAction : VimActionHandler.SingleExecution() {
       ijEditor.caretModel.primaryCaret,
       context.ij,
       argument,
-      operatorArguments
+      operatorArguments,
     )?.normalize()?.let {
-
       // If we're linewise, make sure the end offset isn't just the EOL char
       if (argument.motion.isLinewiseMotion() && it.endOffset < editor.fileSize()) {
         TextRange(it.startOffset, it.endOffset + 1)

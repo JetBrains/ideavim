@@ -52,7 +52,7 @@ internal class RepeatChangeAction : VimActionHandler.SingleExecution() {
           editor.ij.project,
           { lastHandler.execute(editor, context, operatorArguments) },
           "Vim " + lastHandler.javaClass.simpleName,
-          null
+          null,
         )
       } else if (!repeatHandler && lastCommand != null) {
         if (cmd.rawCount > 0) {

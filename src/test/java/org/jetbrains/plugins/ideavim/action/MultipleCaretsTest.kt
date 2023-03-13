@@ -47,7 +47,7 @@ class MultipleCaretsTest : VimTestCase() {
      three four fiv${c}e
      si${c}x seven$c
      ${c}eig${c}ht nine ten$c
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState(
       """
@@ -55,7 +55,7 @@ class MultipleCaretsTest : VimTestCase() {
     thr${c}ee four five
     six$c seven
     eig${c}ht nine ten
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -67,7 +67,7 @@ class MultipleCaretsTest : VimTestCase() {
      three four fiv${c}e
      si${c}x seven$c
      ${c}eig${c}ht nine te${c}n
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState(
       """
@@ -75,7 +75,7 @@ class MultipleCaretsTest : VimTestCase() {
     ${c}three four five
     ${c}six seven
     ${c}eight nine ten
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -85,13 +85,13 @@ class MultipleCaretsTest : VimTestCase() {
       """     one$c two
 three$c four
   five$c six
- $c  seven eight"""
+ $c  seven eight""",
     )
     assertState(
       """     ${c}one two
 ${c}three four
   ${c}five six
-   ${c}seven eight"""
+   ${c}seven eight""",
     )
   }
 
@@ -102,14 +102,14 @@ ${c}three four
 three$c four      
  five si${c}x
 seven eight    $c  
-"""
+""",
     )
     assertState(
       """one tw${c}o   
 three fou${c}r      
  five si${c}x
 seven eigh${c}t      
-"""
+""",
     )
   }
 
@@ -119,13 +119,13 @@ seven eigh${c}t
       """
      one ${c}two
      three fou${c}r
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState(
       """
     one tw${c}o
     three fou${c}r
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -147,7 +147,7 @@ seven eigh${c}t
   fun testMotionRightTillMatchCharAction() {
     typeTextInFile(
       injector.parser.parseKeys("2ta"),
-      "${c}b${c}a${c}b${c}a${c}a${c}a${c}ba${c}b"
+      "${c}b${c}a${c}b${c}a${c}a${c}a${c}ba${c}b",
     )
     assertState("ba${c}b${c}a${c}a${c}a${c}ba${c}b")
   }
@@ -165,7 +165,7 @@ seven eigh${c}t
   fun testMotionLastRightTillMatchChar() {
     typeTextInFile(
       injector.parser.parseKeys("ta;"),
-      "${c}b${c}a${c}b${c}a${c}a${c}a${c}ba${c}b"
+      "${c}b${c}a${c}b${c}a${c}a${c}a${c}ba${c}b",
     )
     assertState("ba${c}b${c}a${c}aa${c}ba${c}b")
   }
@@ -183,7 +183,7 @@ seven eigh${c}t
      t${c}wo three
      fo${c}ur
      
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState("${c}one\ntwo thr${c}ee\nfour\n")
   }
@@ -196,7 +196,7 @@ seven eigh${c}t
      two thr${c}ee
      four
      
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState("one\nt${c}wo three\nfo${c}ur\n")
   }
@@ -209,14 +209,14 @@ seven eigh${c}t
      o${c}ne
      t${c}wo$c 
      t${c}hree$c 
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState(
       """
     o${c}n${c}e
     t${c}wo$c 
     three 
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -228,7 +228,7 @@ seven eigh${c}t
                 ${c}tw${c}o          $c 
                 three
                 four
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState(
       """
@@ -236,7 +236,7 @@ seven eigh${c}t
     two           
     t${c}h${c}ree
     ${c}fo${c}u${c}r
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -249,7 +249,7 @@ seven eigh${c}t
      abc${c}de
      abcd${c}e
      
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState(
       """
@@ -258,7 +258,7 @@ seven eigh${c}t
     ab${c}cde
     abc${c}de
     
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -268,13 +268,13 @@ seven eigh${c}t
       """ $c on${c}e$c two
 $c   three$c four
  five six
-"""
+""",
     )
     assertState(
       """  one two
    ${c}three four
  ${c}five six
-"""
+""",
     )
   }
 
@@ -284,13 +284,13 @@ $c   three$c four
       """     one$c two
 three$c four
   five$c six
- $c  seven eight"""
+ $c  seven eight""",
     )
     assertState(
       """     ${c}one two
 ${c}three four
   ${c}five six
-   ${c}seven eight"""
+   ${c}seven eight""",
     )
   }
 
@@ -301,14 +301,14 @@ ${c}three four
   skip this ${c}line
    don't skip this line
     stop there
-"""
+""",
     )
     assertState(
       """xyz
   skip this line
    ${c}don't skip this line
     ${c}stop there
-"""
+""",
     )
   }
 
@@ -317,12 +317,12 @@ ${c}three four
       injector.parser.parseKeys("-"),
       """ one
 $c  tw${c}o
-"""
+""",
     )
     assertState(
       """ ${c}one
   two
-"""
+""",
     )
   }
 
@@ -340,7 +340,7 @@ $c  tw${c}o
   fun testMotionInnerBlockAngleAction() {
     typeTextInFile(
       injector.parser.parseKeys("v" + "2i<"),
-      "<asdf<asdf<a${c}sdf>a${c}sdf>asdf> <asdf<as${c}df>asdf>"
+      "<asdf<asdf<a${c}sdf>a${c}sdf>asdf> <asdf<as${c}df>asdf>",
     )
     assertState("<<selection>asdf<asdf<asdf>asdf>asdf</selection>> <<selection>asdf<asdf>asdf</selection>>")
   }
@@ -348,17 +348,17 @@ $c  tw${c}o
   fun testMotionInnerBlockBackQuoteActionWithNoCount() {
     typeTextInFile(
       injector.parser.parseKeys("v" + "i`"),
-      "`as${c}d${c}f`asdf `a${c}sdf`a${c}sdf`a${c}sdf`"
+      "`as${c}d${c}f`asdf `a${c}sdf`a${c}sdf`a${c}sdf`",
     )
     assertState(
-      "`<selection>asdf</selection>`asdf `<selection>asdf</selection>`<selection>asdf</selection>`<selection>asdf</selection>`"
+      "`<selection>asdf</selection>`asdf `<selection>asdf</selection>`<selection>asdf</selection>`<selection>asdf</selection>`",
     )
   }
 
   fun testMotionInnerBlockBraceAction() {
     typeTextInFile(
       injector.parser.parseKeys("v" + "2i{"),
-      "{asdf{asdf{a${c}sdf}a${c}sdf}asdf} {asdf{as${c}df}asdf}"
+      "{asdf{asdf{a${c}sdf}a${c}sdf}asdf} {asdf{as${c}df}asdf}",
     )
     assertState("{<selection>asdf{asdf{asdf}asdf}asdf</selection>} {<selection>asdf{asdf}asdf</selection>}")
   }
@@ -366,7 +366,7 @@ $c  tw${c}o
   fun testMotionInnerBlockBracketAction() {
     typeTextInFile(
       injector.parser.parseKeys("v" + "2i["),
-      "[asdf[asdf[a${c}sdf]a${c}sdf]asdf] [asdf[as${c}df]asdf]"
+      "[asdf[asdf[a${c}sdf]a${c}sdf]asdf] [asdf[as${c}df]asdf]",
     )
     assertState("[<selection>asdf[asdf[asdf]asdf]asdf</selection>] [<selection>asdf[asdf]asdf</selection>]")
   }
@@ -374,17 +374,17 @@ $c  tw${c}o
   fun testMotionInnerBlockDoubleQuoteActionWithNoCount() {
     typeTextInFile(
       injector.parser.parseKeys("v" + "i\""),
-      "\"as${c}d${c}f\"asdf \"a${c}sdf\"a${c}sdf\"a${c}sdf\""
+      "\"as${c}d${c}f\"asdf \"a${c}sdf\"a${c}sdf\"a${c}sdf\"",
     )
     assertState(
-      "\"<selection>asdf</selection>\"asdf \"<selection>asdf</selection>\"<selection>asdf</selection>\"<selection>asdf</selection>\""
+      "\"<selection>asdf</selection>\"asdf \"<selection>asdf</selection>\"<selection>asdf</selection>\"<selection>asdf</selection>\"",
     )
   }
 
   fun testMotionInnerBlockParenAction() {
     typeTextInFile(
       injector.parser.parseKeys("v" + "2i("),
-      "(asdf(asdf(a${c}sdf)a${c}sdf)asdf) (asdf(as${c}df)asdf)"
+      "(asdf(asdf(a${c}sdf)a${c}sdf)asdf) (asdf(as${c}df)asdf)",
     )
     assertState("(<selection>asdf(asdf(asdf)asdf)asdf</selection>) (<selection>asdf(asdf)asdf</selection>)")
   }
@@ -392,10 +392,10 @@ $c  tw${c}o
   fun testMotionInnerBlockSingleQuoteActionWithNoCount() {
     typeTextInFile(
       injector.parser.parseKeys("v" + "i'"),
-      "'as${c}d${c}f'asdf 'a${c}sdf'a${c}sdf'a${c}sdf'"
+      "'as${c}d${c}f'asdf 'a${c}sdf'a${c}sdf'a${c}sdf'",
     )
     assertState(
-      "'<selection>asdf</selection>'asdf '<selection>asdf</selection>'<selection>asdf</selection>'<selection>asdf</selection>'"
+      "'<selection>asdf</selection>'asdf '<selection>asdf</selection>'<selection>asdf</selection>'<selection>asdf</selection>'",
     )
   }
 
@@ -405,20 +405,20 @@ $c  tw${c}o
       """
                 <asdf1>qwer<asdf2>qwer<asdf3>qw${c}er</asdf3>qw${c}er</asdf2>qwer</asdf1>
                 <asdf1>qwer<asdf2>qw${c}er</asdf2>qwer</asdf1>
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState(
       """
     <asdf1>qwer<asdf2><selection>qwer<asdf3>qwer</asdf3>qwer</selection></asdf2>qwer</asdf1>
     <asdf1>qwer<asdf2><selection>qwer</selection></asdf2>qwer</asdf1>
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
   fun testMotionInnerParagraphAction() {
     typeTextInFile(
       injector.parser.parseKeys("v" + "3ip"),
-      "a${c}bcd\na${c}bcd\n\nabcd\nabcd\n\na${c}bcd\nabcd\n\nabcd\nabcd\n"
+      "a${c}bcd\na${c}bcd\n\nabcd\nabcd\n\na${c}bcd\nabcd\n\nabcd\nabcd\n",
     )
     assertState("<selection>abcd\nabcd\n\nabcd\nabcd\n</selection>\n<selection>abcd\nabcd\n\nabcd\nabcd\n</selection>")
   }
@@ -431,7 +431,7 @@ $c  tw${c}o
   fun testMotionOuterBigWordAction() {
     typeTextInFile(
       injector.parser.parseKeys("v" + "aW"),
-      " a${c}bcd${c}e.abcde.a${c}bcde  a${c}bcde.abcde\n"
+      " a${c}bcd${c}e.abcde.a${c}bcde  a${c}bcde.abcde\n",
     )
     assertState(" <selection>abcde.abcde.abcde  </selection><selection>abcde.abcde</selection>\n")
   }
@@ -439,7 +439,7 @@ $c  tw${c}o
   fun testMotionOuterWordAction() {
     typeTextInFile(
       injector.parser.parseKeys("v" + "aw"),
-      " a${c}bcd${c}e.abcde.a${c}bcde  a${c}bcde.abcde"
+      " a${c}bcd${c}e.abcde.a${c}bcde  a${c}bcde.abcde",
     )
     assertState(" <selection>abcde</selection>.abcde.<selection>abcde  abcde</selection>.abcde")
   }
@@ -447,7 +447,7 @@ $c  tw${c}o
   fun testMotionOuterBlockAngleAction() {
     typeTextInFile(
       injector.parser.parseKeys("v" + "2a<"),
-      "<asdf<asdf<a${c}sdf>a${c}sdf>asdf> <asdf<a${c}sdf>asdf>"
+      "<asdf<asdf<a${c}sdf>a${c}sdf>asdf> <asdf<a${c}sdf>asdf>",
     )
     assertState("<selection><asdf<asdf<asdf>asdf>asdf></selection> <selection><asdf<asdf>asdf></selection>")
   }
@@ -455,7 +455,7 @@ $c  tw${c}o
   fun testMotionOuterBlockBackQuoteAction() {
     typeTextInFile(
       injector.parser.parseKeys("v" + "a`"),
-      "`asdf`asdf`a${c}sdf`a${c}sdf`asdf` `asdf`a${c}sdf`asdf`"
+      "`asdf`asdf`a${c}sdf`a${c}sdf`asdf` `asdf`a${c}sdf`asdf`",
     )
     assertState("`asdf`asdf<selection>`asdf`asdf`</selection>asdf` `asdf<selection>`asdf`</selection>asdf`")
   }
@@ -463,7 +463,7 @@ $c  tw${c}o
   fun testMotionOuterBraceAction() {
     typeTextInFile(
       injector.parser.parseKeys("v" + "2a{"),
-      "{asdf{asdf{a${c}sdf}a${c}sdf}asdf} {asdf{a${c}sdf}asdf}"
+      "{asdf{asdf{a${c}sdf}a${c}sdf}asdf} {asdf{a${c}sdf}asdf}",
     )
     assertState("<selection>{asdf{asdf{asdf}asdf}asdf}</selection> <selection>{asdf{asdf}asdf}</selection>")
   }
@@ -471,7 +471,7 @@ $c  tw${c}o
   fun testMotionOuterBlockBracketAction() {
     typeTextInFile(
       injector.parser.parseKeys("v" + "2a["),
-      "[asdf[asdf[a${c}sdf]a${c}sdf]asdf] [asdf[a${c}sdf]asdf]"
+      "[asdf[asdf[a${c}sdf]a${c}sdf]asdf] [asdf[a${c}sdf]asdf]",
     )
     assertState("<selection>[asdf[asdf[asdf]asdf]asdf]</selection> <selection>[asdf[asdf]asdf]</selection>")
   }
@@ -479,7 +479,7 @@ $c  tw${c}o
   fun testMotionOuterBlockDoubleQuoteAction() {
     typeTextInFile(
       injector.parser.parseKeys("v" + "a\""),
-      "\"asdf\"asdf\"a${c}sdf\"a${c}sdf\"asdf\" \"asdf\"a${c}sdf\"asdf\""
+      "\"asdf\"asdf\"a${c}sdf\"a${c}sdf\"asdf\" \"asdf\"a${c}sdf\"asdf\"",
     )
     assertState("\"asdf\"asdf<selection>\"asdf\"asdf\"</selection>asdf\" \"asdf<selection>\"asdf\"</selection>asdf\"")
   }
@@ -487,7 +487,7 @@ $c  tw${c}o
   fun testMotionOuterBlockParenAction() {
     typeTextInFile(
       injector.parser.parseKeys("v" + "2a("),
-      "(asdf(asdf(a${c}sdf)a${c}sdf)asdf) (asdf(a${c}sdf)asdf)"
+      "(asdf(asdf(a${c}sdf)a${c}sdf)asdf) (asdf(a${c}sdf)asdf)",
     )
     assertState("<selection>(asdf(asdf(asdf)asdf)asdf)</selection> <selection>(asdf(asdf)asdf)</selection>")
   }
@@ -495,7 +495,7 @@ $c  tw${c}o
   fun testMotionOuterBlockSingleQuoteAction() {
     typeTextInFile(
       injector.parser.parseKeys("v" + "a'"),
-      "'asdf'asdf'a${c}sdf'a${c}sdf'asdf' 'asdf'a${c}sdf'asdf'"
+      "'asdf'asdf'a${c}sdf'a${c}sdf'asdf' 'asdf'a${c}sdf'asdf'",
     )
     assertState("'asdf'asdf<selection>'asdf'asdf'</selection>asdf' 'asdf<selection>'asdf'</selection>asdf'")
   }
@@ -506,13 +506,13 @@ $c  tw${c}o
       """
                 <asdf1>qwer<asdf2>qwer<asdf3>qw${c}er</asdf3>qw${c}er</asdf2>qwer</asdf1>
                 <asdf1>qwer<asdf2>qw${c}er</asdf2>qwer</asdf1>
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState(
       """
     <asdf1>qwer<selection><asdf2>qwer<asdf3>qwer</asdf3>qwer</asdf2></selection>qwer</asdf1>
     <asdf1>qwer<selection><asdf2>qwer</asdf2></selection>qwer</asdf1>
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -535,7 +535,7 @@ $c  tw${c}o
   fun testMotionBigWordEndRightAction() {
     typeTextInFile(
       injector.parser.parseKeys("E"),
-      "a$c.as${c}df. a${c}s${c}df.a $c a; as${c}df"
+      "a$c.as${c}df. a${c}s${c}df.a $c a; as${c}df",
     )
     assertState("a.asdf$c. asdf.${c}a  a$c; asd${c}f")
   }
@@ -558,7 +558,7 @@ $c  tw${c}o
   fun testMotionWordEndRightAction() {
     typeTextInFile(
       injector.parser.parseKeys("e"),
-      "a$c.as${c}df. a${c}s${c}df.a $c a; as${c}df"
+      "a$c.as${c}df. a${c}s${c}df.a $c a; as${c}df",
     )
     assertState("a.asd${c}f. asd${c}f.a  ${c}a; asd${c}f")
   }
@@ -576,27 +576,27 @@ $c  tw${c}o
   fun testMotionCamelEndLeftAction() {
     typeTextInFile(
       injector.parser.parseKeys("2]b"),
-      "ClassName.M${c}ethodN${c}ame(${c}Arg1Type arg1Na${c}me, Arg2Type arg2${c}Name) $c{"
+      "ClassName.M${c}ethodN${c}ame(${c}Arg1Type arg1Na${c}me, Arg2Type arg2${c}Name) $c{",
     )
     assertState(
-      "Clas${c}sNam${c}e.Metho${c}dName(Arg1Type ar${c}g1Name, Arg2Type ar${c}g${c}2Name) {"
+      "Clas${c}sNam${c}e.Metho${c}dName(Arg1Type ar${c}g1Name, Arg2Type ar${c}g${c}2Name) {",
     )
   }
 
   fun testMotionCamelEndRightAction() {
     typeTextInFile(
       injector.parser.parseKeys("]w"),
-      "Cl${c}assName.M${c}ethodN${c}ame(${c}Arg1Type arg1Na${c}me, Arg2Type ar${c}g2${c}Name) {"
+      "Cl${c}assName.M${c}ethodN${c}ame(${c}Arg1Type arg1Na${c}me, Arg2Type ar${c}g2${c}Name) {",
     )
     assertState(
-      "Clas${c}sName.Metho${c}dNam${c}e(Ar${c}g1Type arg1Nam${c}e, Arg2Type arg${c}2Nam${c}e) {"
+      "Clas${c}sName.Metho${c}dNam${c}e(Ar${c}g1Type arg1Nam${c}e, Arg2Type arg${c}2Nam${c}e) {",
     )
   }
 
   fun testMotionCamelLeftAction() {
     typeTextInFile(
       injector.parser.parseKeys("2[b"),
-      "ClassName.M${c}ethodN${c}ame(${c}Arg1Type arg1Na${c}me, Arg2Type arg2${c}Name) $c{"
+      "ClassName.M${c}ethodN${c}ame(${c}Arg1Type arg1Na${c}me, Arg2Type arg2${c}Name) $c{",
     )
     assertState("Class${c}Name.${c}MethodName(Arg1Type arg${c}1Name, Arg2Type ${c}arg${c}2Name) {")
   }
@@ -604,10 +604,10 @@ $c  tw${c}o
   fun testMotionCamelRightAction() {
     typeTextInFile(
       injector.parser.parseKeys("[w"),
-      "Cl${c}assName.M${c}ethodN${c}ame(${c}Arg1Type arg1Na${c}me, Arg2Type ar${c}g2Name) {"
+      "Cl${c}assName.M${c}ethodN${c}ame(${c}Arg1Type arg1Na${c}me, Arg2Type ar${c}g2Name) {",
     )
     assertState(
-      "Class${c}Name.Method${c}Name(${c}Arg${c}1Type arg1Name, ${c}Arg2Type arg${c}2Name) {"
+      "Class${c}Name.Method${c}Name(${c}Arg${c}1Type arg1Name, ${c}Arg2Type arg${c}2Name) {",
     )
   }
 
@@ -620,7 +620,7 @@ $c  tw${c}o
     ${c}private static int x$c;    private static void secondMethod(String argument) {
         // Do something.$c..
     }
-}"""
+}""",
     )
     typeText(injector.parser.parseKeys("]M"))
     assertState(
@@ -631,7 +631,7 @@ $c  tw${c}o
     private static int x$c;    private static void secondMethod(String argument) {
         // Do something...
     $c}
-}"""
+}""",
     )
   }
 
@@ -644,7 +644,7 @@ $c  tw${c}o
     ${c}private static int x$c;    private static void secondMethod(String argument) {
         // Do something.$c..
     }
-}"""
+}""",
     )
     typeText(injector.parser.parseKeys("]m"))
     assertState(
@@ -655,7 +655,7 @@ $c  tw${c}o
     ${c}private static int x;    private static void secondMethod(String argument) $c{
         // Do something...
     }
-}"""
+}""",
     )
   }
 
@@ -668,7 +668,7 @@ $c  tw${c}o
     ${c}private static int x$c;    private static void secondMethod(String argument) {
         // Do something.$c..
     }
-}"""
+}""",
     )
     typeText(injector.parser.parseKeys("[M"))
     assertState(
@@ -679,7 +679,7 @@ $c  tw${c}o
     private static int x$c;    private static void secondMethod(String argument) {
         // Do something...
     }
-}"""
+}""",
     )
   }
 
@@ -692,7 +692,7 @@ $c  tw${c}o
     ${c}private static int x$c;    private static void secondMethod(String argument) {
         // Do something.$c..
     }
-}"""
+}""",
     )
     typeText(injector.parser.parseKeys("[m"))
     assertState(
@@ -703,14 +703,14 @@ $c  tw${c}o
     ${c}private static int x;    private static void secondMethod(String argument) $c{
         // Do something...
     }
-}"""
+}""",
     )
   }
 
   fun testMotionNthCharacterAction() {
     typeTextInFile(
       injector.parser.parseKeys("5" + "go"),
-      "${c}on${c}e two thr${c}ee four fiv${c}e six seven eigh${c}t ni${c}ne ten"
+      "${c}on${c}e two thr${c}ee four fiv${c}e six seven eigh${c}t ni${c}ne ten",
     )
     assertState("one ${c}two three four five six seven eight nine ten")
   }
@@ -737,7 +737,7 @@ $c  tw${c}o
      n${c}ot_a_brace
      }
      not_a_${c}brace
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState(
       """
@@ -749,7 +749,7 @@ $c  tw${c}o
     not_a_brace
     $c}
     not_a_brace
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -765,7 +765,7 @@ $c  tw${c}o
      not_a_b${c}race
      $c}
      not_a_brace
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState(
       """
@@ -777,7 +777,7 @@ $c  tw${c}o
     not_a_brace
     }
     not_a_brace
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -793,7 +793,7 @@ $c  tw${c}o
      not_${c}a_brace
      }
      not_a_brace
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState(
       """
@@ -805,7 +805,7 @@ $c  tw${c}o
     not_a_brace
     $c}
     not_a_brace
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -821,7 +821,7 @@ $c  tw${c}o
      not_a_brace
      }
      not_a_brace
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState(
       """
@@ -833,14 +833,14 @@ $c  tw${c}o
     not_a_brace
     }
     not_a_brace
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
   fun testMotionSentenceNextEndAction() {
     typeTextInFile(
       injector.parser.parseKeys("g)"),
-      "a${c}sdf$c. a${c}sdf. a${c}sdf.$c asdf.$c asdf."
+      "a${c}sdf$c. a${c}sdf. a${c}sdf.$c asdf.$c asdf.",
     )
     assertState("asdf$c. asdf$c. asdf$c. asdf$c. asdf$c.")
   }
@@ -853,7 +853,7 @@ $c  tw${c}o
   fun testMotionSentencePreviousEndAction() {
     typeTextInFile(
       injector.parser.parseKeys("g("),
-      "asdf.$c a${c}sdf$c. as${c}df. asd${c}f. ${c}asdf."
+      "asdf.$c a${c}sdf$c. as${c}df. asd${c}f. ${c}asdf.",
     )
     assertState("asdf$c. asdf$c. asdf$c. asdf$c. asdf.")
   }
@@ -861,7 +861,7 @@ $c  tw${c}o
   fun testMotionSentencePreviousStartAction() {
     typeTextInFile(
       injector.parser.parseKeys("("),
-      "asd${c}f. ${c}as${c}df. asdf$c. asdf$c. as${c}df."
+      "asd${c}f. ${c}as${c}df. asdf$c. asdf$c. as${c}df.",
     )
     assertState("${c}asdf. ${c}asdf. ${c}asdf. ${c}asdf. ${c}asdf.")
   }
@@ -890,7 +890,7 @@ $c  tw${c}o
   fun testVisualSwapEndsAction() {
     typeTextInFile(injector.parser.parseKeys("v" + "iw" + "o"), "o${c}ne ${c}two th${c}ree\n")
     assertState(
-      "<selection>${c}one</selection> <selection>${c}two</selection> <selection>${c}three</selection>\n"
+      "<selection>${c}one</selection> <selection>${c}two</selection> <selection>${c}three</selection>\n",
     )
   }
 
@@ -911,7 +911,7 @@ $c  tw${c}o
      eleven twelve
      th${c}irteen fourteen
      
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState(
       """
@@ -923,7 +923,7 @@ $c  tw${c}o
     eleven twelve
     thirteen fourteen
     </selection>
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -935,7 +935,7 @@ $c  tw${c}o
      thr${c}ee four
      five six
      
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState(
       """
@@ -943,7 +943,7 @@ $c  tw${c}o
     three four
     five six
     </selection>
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -957,7 +957,7 @@ $c  tw${c}o
                 seven eight
                 nine t${c}en
                 
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState(
       """
@@ -967,7 +967,7 @@ $c  tw${c}o
     <selection>seven eight
     nine ten
     </selection>
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -981,7 +981,7 @@ $c  tw${c}o
                 seven eight
                 n${c}ine ten
                 
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState(
       """
@@ -991,7 +991,7 @@ $c  tw${c}o
     s<selection>even eight
     ni</selection>ne ten
     
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -1002,7 +1002,7 @@ $c  tw${c}o
     <selection>abc</selection>
     <selection>def</selection>
     
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -1015,7 +1015,7 @@ $c  tw${c}o
      two three
      four fi${c}ve
      
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState(
       """
@@ -1024,7 +1024,7 @@ $c  tw${c}o
     two three
     four fi<selection>${c}v</selection>e
     
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -1037,7 +1037,7 @@ $c  tw${c}o
      two three
      four fi${c}ve
      
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState(
       """
@@ -1046,7 +1046,7 @@ $c  tw${c}o
     <selection>two thre</selection>e
     <selection>four fiv</selection>e
     
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -1060,7 +1060,7 @@ $c  tw${c}o
      two three
      four fi${c}ve
      
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState(
       """
@@ -1070,14 +1070,14 @@ $c  tw${c}o
     two thr<selection>e</selection>e
     four fi<selection>v</selection>e
     
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
   fun testMergingSelections() {
     typeTextInFile(
       injector.parser.parseKeys("v" + "aW" + "l" + "h"),
-      "a${c}bcde.abcde.abcde  ab${c}cde.abcde\n"
+      "a${c}bcde.abcde.abcde  ab${c}cde.abcde\n",
     )
     assertState("<selection>abcde.abcde.abcde  abcde.abcde</selection>\n")
   }
@@ -1136,7 +1136,7 @@ public void bar() {
 y = true; // And this will not
 }
 }
-"""
+""",
     )
     typeText(injector.parser.parseKeys("V2j="))
     assertState(
@@ -1151,14 +1151,14 @@ public void bar() {
 y = true; // And this will not
 }
 }
-"""
+""",
     )
   }
 
   fun testChangeCaseLowerMotionAction() {
     typeTextInFile(
       injector.parser.parseKeys("gu2w"),
-      "O${c}NcE thIs ${c}TEXt wIlL n${c}Ot lOoK s${c}O rIdIcuLoUs\n"
+      "O${c}NcE thIs ${c}TEXt wIlL n${c}Ot lOoK s${c}O rIdIcuLoUs\n",
     )
     assertState("O${c}nce this ${c}text will n${c}ot look s${c}o ridiculous\n")
   }
@@ -1166,7 +1166,7 @@ y = true; // And this will not
   fun testChangeCaseLowerVisualAction() {
     typeTextInFile(
       injector.parser.parseKeys("v2wu"),
-      "O${c}NcE thIs ${c}TEXt wIlL n${c}Ot lOoK s${c}O rIdIcuLoUs\n"
+      "O${c}NcE thIs ${c}TEXt wIlL n${c}Ot lOoK s${c}O rIdIcuLoUs\n",
     )
     assertState("O${c}nce this text will n${c}ot look s${c}o ridiculous\n")
   }
@@ -1189,7 +1189,7 @@ y = true; // And this will not
   fun testChangeCaseUpperMotionAction() {
     typeTextInFile(
       injector.parser.parseKeys("gU2w"),
-      "O${c}NcE thIs ${c}TEXt wIlL ${c}nOt lOoK ${c}sO rIdIcuLoUs\n"
+      "O${c}NcE thIs ${c}TEXt wIlL ${c}nOt lOoK ${c}sO rIdIcuLoUs\n",
     )
     assertState("O${c}NCE THIS ${c}TEXT WILL ${c}NOT LOOK ${c}SO RIDICULOUS\n")
   }
@@ -1197,7 +1197,7 @@ y = true; // And this will not
   fun testChangeCaseUpperVisualAction() {
     typeTextInFile(
       injector.parser.parseKeys("v2wU"),
-      "O${c}NcE thIs ${c}TEXt wIlL N${c}Ot lOoK S${c}O rIdIcuLoUs\n"
+      "O${c}NcE thIs ${c}TEXt wIlL N${c}Ot lOoK S${c}O rIdIcuLoUs\n",
     )
     assertState("O${c}NCE THIS TEXT WILL N${c}OT LOOK S${c}O RIDICULOUS\n")
   }
@@ -1227,7 +1227,7 @@ y = true; // And this will not
                 a${c}bcd${c}e
                 abcde
                 
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState(
       """
@@ -1237,7 +1237,7 @@ y = true; // And this will not
     aab${c}c
     abcde
     
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -1251,7 +1251,7 @@ y = true; // And this will not
      abc${c}de
      abcde
      
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState(
       """
@@ -1259,7 +1259,7 @@ y = true; // And this will not
     abcde
     ${c}a
     
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -1272,7 +1272,7 @@ y = true; // And this will not
      abcde
      abcde
      
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState(
       """
@@ -1280,7 +1280,7 @@ y = true; // And this will not
     $c
     abcde
     
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -1297,7 +1297,7 @@ y = true; // And this will not
      ${c}abcde
      abcde
      
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState(
       """
@@ -1307,14 +1307,14 @@ y = true; // And this will not
     abcde
     $c
     
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
   fun testChangeMotionAction() {
     typeTextInFile(
       injector.parser.parseKeys("ciw" + "correct" + "<ESC>"),
-      "correct correct wron${c}g wr${c}ong correct\n"
+      "correct correct wron${c}g wr${c}ong correct\n",
     )
     assertState("correct correct correc${c}t correc${c}t correct\n")
   }
@@ -1332,7 +1332,7 @@ y = true; // And this will not
   fun testChangeReplaceAction() {
     typeTextInFile(
       injector.parser.parseKeys("Rz" + "<ESC>"),
-      "on${c}e ${c}t${c}w${c}o th${c}r${c}ee"
+      "on${c}e ${c}t${c}w${c}o th${c}r${c}ee",
     )
     assertState("on${c}z ${c}z${c}z${c}z th${c}z${c}ze")
   }
@@ -1367,7 +1367,7 @@ y = true; // And this will not
                 ghi${c}jk
                 ghijk
                 
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState(
       """
@@ -1375,7 +1375,7 @@ y = true; // And this will not
     abcde
     abcd${c}e
     
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -1389,7 +1389,7 @@ y = true; // And this will not
                 ghi${c}jk
                 ghijk
                 
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState(
       """
@@ -1397,7 +1397,7 @@ y = true; // And this will not
     abcde
     abcd${c}e
     
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -1410,7 +1410,7 @@ y = true; // And this will not
      ${c}abcde
      abcd${c}e
      
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState(
       """
@@ -1418,7 +1418,7 @@ y = true; // And this will not
     ${c}bcde
     abc${c}d
     
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -1435,7 +1435,7 @@ y = true; // And this will not
      ${c}abcde
      abcd${c}e
      
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState(
       """
@@ -1443,7 +1443,7 @@ y = true; // And this will not
     ${c}abcde
     a${c}e
     
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -1460,7 +1460,7 @@ y = true; // And this will not
      ${c}abcde
      abcd${c}e
      
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState(
       """
@@ -1468,7 +1468,7 @@ y = true; // And this will not
     ${c}de
     abc${c}d
     
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -1488,7 +1488,7 @@ y = true; // And this will not
      ab${c}cde
      ab${c}cd${c}e
      
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState(
       """
@@ -1499,7 +1499,7 @@ y = true; // And this will not
     a${c}b
     a${c}b
     
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -1514,13 +1514,13 @@ y = true; // And this will not
      a${c}bcd${c}e
      abc${c}de
      
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState(
       """
     ab
     abcd
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -1534,7 +1534,7 @@ abcd${c}e
 abcde
 abc${c}de
   abcde
-"""
+""",
     )
     assertState(
       """
@@ -1542,7 +1542,7 @@ abc${c}de
     abcde${c}abcde${c}abcde
     abcde$c  abcde
     
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -1553,7 +1553,7 @@ abc${c}de
      a${c}bcde
      abcde
      
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState("abcde${c}abcde\n")
   }
@@ -1568,7 +1568,7 @@ abcd${c}e
 abcde
 abc${c}de
   abcde
-"""
+""",
     )
     assertState(
       """
@@ -1576,7 +1576,7 @@ abc${c}de
     abcde$c abcde$c abcde
     abcde$c abcde
     
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -1589,14 +1589,14 @@ abc${c}de
      three
      fo${c}ur
      
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState(
       """
     one${c}two
     three${c}four
     
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -1609,14 +1609,14 @@ abc${c}de
      abcde
      ab${c}cde
      
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState(
       """
     abcde$c abcde
     abcde$c abcde
     
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -1629,7 +1629,7 @@ abc${c}de
      abc${c}de
      abcde
      
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState(
       """
@@ -1638,7 +1638,7 @@ abc${c}de
                 a${c}b</selection>c<selection>de
                 abcd${c}e</selection>
                 
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(injector.parser.parseKeys("d"))
     assertState("abc${c}c\n")
@@ -1653,7 +1653,7 @@ abc${c}de
      ${c}abcde
      ab${c}cde
      
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState(
       """
@@ -1662,7 +1662,7 @@ abc${c}de
     ${c}e
     ab${c}e
     
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -1676,7 +1676,7 @@ abc${c}de
      a${c}bcde
      abcde
      
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState("${c}abcde\n$c")
   }
@@ -1704,14 +1704,14 @@ abc${c}de
      one two three $c 
      seven six five $c 
      
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState(
       """
     one two three fou${c}r 
     seven six five fou${c}r 
     
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -1720,12 +1720,12 @@ abc${c}de
       injector.parser.parseKeys("I" + "four " + "<ESC>"),
       """  three t${c}wo on${c}e
 $c five six se${c}ven eight
-"""
+""",
     )
     assertState(
       """  four$c three two one
  four$c five six seven eight
-"""
+""",
     )
   }
 
@@ -1736,14 +1736,14 @@ $c five six se${c}ven eight
 $c  two three four
 four three two one
 four three two$c 
-"""
+""",
     )
     assertState(
       """ one two three four
  on${c}e two three four
 four three two one
 four three two on${c}e
-"""
+""",
     )
   }
 
@@ -1754,14 +1754,14 @@ four three two on${c}e
  one two three four
 four three two$c 
 four three two one
-"""
+""",
     )
     assertState(
       """ on${c}e two three four
  one two three four
 four three two on${c}e
 four three two one
-"""
+""",
     )
   }
 
@@ -1779,7 +1779,7 @@ four three two one
     ${c}three
     ${c}four
     
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -1788,14 +1788,14 @@ four three two one
       injector.parser.parseKeys("gI" + "four " + "<ESC>"),
       """  three t${c}wo on${c}e
 $c five six se${c}ven eight
-"""
+""",
     )
     assertState(
       """
     four$c   three two one
     four$c  five six seven eight
     
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -1808,7 +1808,7 @@ $c five six se${c}ven eight
                 abcde
                 abc${c}de
                 
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState(
       """
@@ -1820,7 +1820,7 @@ $c five six se${c}ven eight
     abcd${c}e
     abcde
     
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -1832,7 +1832,7 @@ $c five six se${c}ven eight
      a${c}bcd${c}e
      abc${c}d${c}e
      
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState("${c}\nabcde\n${c}\nabcde\n")
   }
@@ -1846,7 +1846,7 @@ $c five six se${c}ven eight
                 abcde
                 abc${c}de
                 
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState(
       """
@@ -1858,14 +1858,14 @@ $c five six se${c}ven eight
     abcde
     abcd${c}e
     
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
   fun testInsertSingleCommandAction() {
     typeTextInFile(
       injector.parser.parseKeys("i" + "<C-O>" + "2h" + "<ESC>"),
-      "one ${c}two ${c}three ${c}four\n"
+      "one ${c}two ${c}three ${c}four\n",
     )
     assertState("o${c}ne t${c}wo thr${c}ee four\n")
   }
@@ -1879,7 +1879,7 @@ $c five six se${c}ven eight
     abcde
     ${c}abcde
     abcde
-"""
+""",
     )
     assertState(
       """    ${c}abcde
@@ -1887,7 +1887,7 @@ $c five six se${c}ven eight
     abcde
 ${c}abcde
 abcde
-"""
+""",
     )
   }
 
@@ -1899,7 +1899,7 @@ abcde
     abcde
     ${c}abcde
     abcde
-"""
+""",
     )
     assertState(
       """    ${c}abcde
@@ -1907,7 +1907,7 @@ abcde
     abcde
 ${c}abcde
 abcde
-"""
+""",
     )
   }
 
@@ -1919,7 +1919,7 @@ abcde
     abcde
     ${c}abcde
     abcde
-"""
+""",
     )
     assertState(
       """    ${c}abcde
@@ -1927,7 +1927,7 @@ abcde
     abcde
 ${c}abcde
 abcde
-"""
+""",
     )
   }
 
@@ -1939,7 +1939,7 @@ abcde
     abcde
 ${c}abcde
 abcde
-"""
+""",
     )
     assertState(
       """        ${c}abcde
@@ -1947,7 +1947,7 @@ abcde
     abcde
     ${c}abcde
     abcde
-"""
+""",
     )
   }
 
@@ -1959,7 +1959,7 @@ abcde
     abcde
 ${c}abcde
 abcde
-"""
+""",
     )
     assertState(
       """        ${c}abcde
@@ -1967,7 +1967,7 @@ abcde
     abcde
     ${c}abcde
     abcde
-"""
+""",
     )
   }
 
@@ -1979,7 +1979,7 @@ abcde
     abcde
 ${c}abcde
 abcde
-"""
+""",
     )
     assertState(
       """        ${c}abcde
@@ -1987,7 +1987,7 @@ abcde
     abcde
     ${c}abcde
     abcde
-"""
+""",
     )
   }
 
@@ -1996,12 +1996,12 @@ abcde
       injector.parser.parseKeys("i" + "<C-Home>"),
       """    sdfdsfa${c}dsf fg dsfg sd${c}fjgkfdgl jsdfnflgj sd
  dflgj dfdsfg
- dfsgj sdf${c}klgj"""
+ dfsgj sdf${c}klgj""",
     )
     assertState(
       """$c    sdfdsfadsf fg dsfg sdfjgkfdgl jsdfnflgj sd
  dflgj dfdsfg
- dfsgj sdfklgj"""
+ dfsgj sdfklgj""",
     )
   }
 
@@ -2012,14 +2012,14 @@ abcde
 nflgj sd
  dflgj dfdsfg
  hdfsgj sdf${c}klgj
-"""
+""",
     )
     assertState(
       """    sdfdsfadsf fg dsfg sdfjgkfdgl jsdf
 nflgj sd
  dflgj dfdsfg
  hdfsgj sdfklgj
-$c"""
+$c""",
     )
   }
 
@@ -2030,14 +2030,14 @@ $c"""
 nflgj sd
  dflgj dfdsfg
  hdfsgj sdf${c}klgj
-"""
+""",
     )
     assertState(
       """    sdfdsfadsf fg dsfg sdfjgkfdgl jsdf
 nflgj sd
  dflgj dfdsfg
  hdfsgj sdfklgj
-$c"""
+$c""",
     )
   }
 
@@ -2045,7 +2045,7 @@ $c"""
   fun testSearchWholeWordForwardAction() {
     typeTextInFile(
       injector.parser.parseKeys("2*"),
-      "q${c}we as${c}d zxc qwe asd zxc qwe asd zxc qwe asd zxc qwe asd zxc "
+      "q${c}we as${c}d zxc qwe asd zxc qwe asd zxc qwe asd zxc qwe asd zxc ",
     )
     assertState("qwe asd zxc qwe asd zxc ${c}qwe ${c}asd zxc qwe asd zxc qwe asd zxc ")
   }
@@ -2053,7 +2053,7 @@ $c"""
   fun testSearchWholeWordBackwardAction() {
     typeTextInFile(
       injector.parser.parseKeys("2#"),
-      "qwe asd zxc qwe asd zxc ${c}qwe ${c}asd zxc qwe asd zxc qwe asd zxc "
+      "qwe asd zxc qwe asd zxc ${c}qwe ${c}asd zxc qwe asd zxc qwe asd zxc ",
     )
     assertState("${c}qwe ${c}asd zxc qwe asd zxc qwe asd zxc qwe asd zxc qwe asd zxc ")
   }
@@ -2061,7 +2061,7 @@ $c"""
   fun testMotionPercentOrMatchAction() {
     typeTextInFile(
       injector.parser.parseKeys("%"),
-      "fdgkh${c}sjh thsth[ sd${c}k er{}gha re${c}ghrjae (ghoefgh kjfgh)sdgfh dgfh]"
+      "fdgkh${c}sjh thsth[ sd${c}k er{}gha re${c}ghrjae (ghoefgh kjfgh)sdgfh dgfh]",
     )
     assertState("fdgkhsjh thsth[ sdk er{$c}gha reghrjae (ghoefgh kjfgh$c)sdgfh dgfh$c]")
   }
@@ -2075,7 +2075,7 @@ $c"""
      dflgjdfsgk${c}d${c}flgjdfsklg
      
      
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState(
       """
@@ -2084,7 +2084,7 @@ $c"""
     dflgjdfsgkdflgjdfsklg
     
     $c
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -2097,7 +2097,7 @@ $c"""
      dflgjdfsgk${c}d${c}flgjdfsklg
      
      
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState(
       """
@@ -2106,7 +2106,7 @@ $c"""
     dflgjdfsgkdflgjdfsklg
     
     
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -2232,7 +2232,7 @@ rtyfg${c}hzxc"""
             zxcvbn
             
       """.trimIndent(),
-      true
+      true,
     )
     testPutOverlapLine(
       """
@@ -2250,7 +2250,7 @@ rtyfg${c}hzxc"""
                 zxcvbn
                 
       """.trimIndent(),
-      true
+      true,
     )
     testPutOverlapLine(
       """
@@ -2268,7 +2268,7 @@ rtyfg${c}hzxc"""
                 zxcvbn
                 
       """.trimIndent(),
-      true
+      true,
     )
   }
 
@@ -2290,7 +2290,7 @@ rtyfg${c}hzxc"""
             ${c}zxcvbn
             
       """.trimIndent(),
-      false
+      false,
     )
     testPutOverlapLine(
       """
@@ -2308,7 +2308,7 @@ rtyfg${c}hzxc"""
                 ${c}zxcvbn
                 
       """.trimIndent(),
-      false
+      false,
     )
     testPutOverlapLine(
       """
@@ -2326,7 +2326,7 @@ rtyfg${c}hzxc"""
                 ${c}zxcvbn
                 
       """.trimIndent(),
-      false
+      false,
     )
   }
 

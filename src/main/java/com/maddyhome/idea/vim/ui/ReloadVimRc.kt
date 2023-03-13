@@ -135,8 +135,11 @@ internal class ReloadVimRc : DumbAwareAction() {
     // XXX: Actually, it worth to add e.presentation.description, but it doesn't work because of some reason
     val sameDoc = VimRcFileState.equalTo(editor.document)
     e.presentation.icon = if (sameDoc) VimIcons.IDEAVIM else AllIcons.Actions.BuildLoadChanges
-    e.presentation.text = if (sameDoc) MessageHelper.message("action.no.changes.text")
-    else MessageHelper.message("action.reload.text")
+    e.presentation.text = if (sameDoc) {
+      MessageHelper.message("action.no.changes.text")
+    } else {
+      MessageHelper.message("action.reload.text")
+    }
 
     e.presentation.isEnabledAndVisible = true
   }

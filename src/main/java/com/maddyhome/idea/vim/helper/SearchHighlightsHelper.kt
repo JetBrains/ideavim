@@ -60,11 +60,15 @@ internal fun addSubstitutionConfirmationHighlight(editor: Editor, start: Int, en
     editor.colorsScheme.getColor(EditorColors.SELECTION_FOREGROUND_COLOR),
     editor.colorsScheme.getColor(EditorColors.SELECTION_BACKGROUND_COLOR),
     editor.colorsScheme.getColor(EditorColors.CARET_COLOR),
-    EffectType.ROUNDED_BOX, Font.PLAIN
+    EffectType.ROUNDED_BOX,
+    Font.PLAIN,
   )
   return editor.markupModel.addRangeHighlighter(
-    start, end, HighlighterLayer.SELECTION,
-    color, HighlighterTargetArea.EXACT_RANGE
+    start,
+    end,
+    HighlighterLayer.SELECTION,
+    color,
+    HighlighterTargetArea.EXACT_RANGE,
   )
 }
 
@@ -219,8 +223,11 @@ private fun highlightMatch(editor: Editor, start: Int, end: Int, current: Boolea
     attributes.errorStripeColor = getFallbackErrorStripeColor(attributes, editor.colorsScheme)
   }
   val highlighter = editor.markupModel.addRangeHighlighter(
-    start, end, HighlighterLayer.SELECTION - 1,
-    attributes, HighlighterTargetArea.EXACT_RANGE
+    start,
+    end,
+    HighlighterLayer.SELECTION - 1,
+    attributes,
+    HighlighterTargetArea.EXACT_RANGE,
   )
   highlighter.errorStripeTooltip = tooltip
   return highlighter

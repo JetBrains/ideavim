@@ -140,7 +140,7 @@ class SetHandlerCommandTest : VimTestCase() {
       normal = ShortcutOwner.IDE,
       insert = ShortcutOwner.IDE,
       visual = ShortcutOwner.IDE,
-      select = ShortcutOwner.IDE
+      select = ShortcutOwner.IDE,
     )
     TestCase.assertEquals("a:ide", owner.toNotation())
   }

@@ -34,7 +34,7 @@ class ActionCommandTest : VimTestCase() {
       "-----\n" +
         "1<caret>2345\n" +
         "abcde\n" +
-        "-----"
+        "-----",
     )
     typeText("vjl")
     enterCommand("'<,'>action CommentByBlockComment")
@@ -43,7 +43,7 @@ class ActionCommandTest : VimTestCase() {
       "-----\n" +
         "1/*2345\n" +
         "abc*/de\n" +
-        "-----"
+        "-----",
     )
   }
 
@@ -54,7 +54,7 @@ class ActionCommandTest : VimTestCase() {
       "-----\n" +
         "1<caret>2345\n" +
         "abcde\n" +
-        "-----"
+        "-----",
     )
     enterCommand("set incsearch")
     typeText("vjl")
@@ -64,7 +64,7 @@ class ActionCommandTest : VimTestCase() {
       "-----\n" +
         "1/*2345\n" +
         "abc*/de\n" +
-        "-----"
+        "-----",
     )
   }
 
@@ -95,7 +95,7 @@ class ActionCommandTest : VimTestCase() {
       "-----\n" +
         "1<caret>2345\n" +
         "abcde\n" +
-        "-----"
+        "-----",
     )
     typeText("Vj")
     enterCommand("'<,'>action CommentByBlockComment")
@@ -106,7 +106,7 @@ class ActionCommandTest : VimTestCase() {
         "12345\n" +
         "abcde\n" +
         "*/\n" +
-        "-----"
+        "-----",
     )
   }
 
@@ -116,7 +116,7 @@ class ActionCommandTest : VimTestCase() {
       "-----\n" +
         "1<caret>2345\n" +
         "abcde\n" +
-        "-----"
+        "-----",
     )
     enterCommand("incsearch")
     typeText("Vj")
@@ -128,7 +128,7 @@ class ActionCommandTest : VimTestCase() {
         "12345\n" +
         "abcde\n" +
         "*/\n" +
-        "-----"
+        "-----",
     )
   }
 
@@ -139,7 +139,7 @@ class ActionCommandTest : VimTestCase() {
       "-----\n" +
         "1<caret>2345\n" +
         "abcde\n" +
-        "-----"
+        "-----",
     )
     typeText("<C-V>lj")
     enterCommand("'<,'>action CommentByBlockComment")
@@ -148,7 +148,7 @@ class ActionCommandTest : VimTestCase() {
       "-----\n" +
         "1/*23*/45\n" +
         "a/*bc*/de\n" +
-        "-----"
+        "-----",
     )
   }
 
@@ -158,7 +158,7 @@ class ActionCommandTest : VimTestCase() {
       "-----\n" +
         "1<caret>2345\n" +
         "abcde\n" +
-        "-----"
+        "-----",
     )
     enterCommand("set incsearch")
     typeText("<C-V>lj")
@@ -168,7 +168,7 @@ class ActionCommandTest : VimTestCase() {
       "-----\n" +
         "1/*23*/45\n" +
         "a/*bc*/de\n" +
-        "-----"
+        "-----",
     )
   }
 }

@@ -31,7 +31,7 @@ class MotionGotoLineLastActionTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 ${c}hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -53,7 +53,7 @@ class MotionGotoLineLastActionTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 ${c}where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -75,7 +75,7 @@ class MotionGotoLineLastActionTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 ${c}hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -97,7 +97,7 @@ class MotionGotoLineLastActionTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 ${c}hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -119,7 +119,7 @@ class MotionGotoLineLastActionTest : VimTestCase() {
         |       all rocks and lavender and tufted grass,
         |       where it was settled on some sodden sand
         |       ${c}hard by the torrent of a mountain pass.
-      """.trimMargin()
+      """.trimMargin(),
     )
   }
 
@@ -142,7 +142,7 @@ class MotionGotoLineLastActionTest : VimTestCase() {
         |       all rocks and lavender and tufted grass,
         |       where it was settled on some sodden sand
         |       hard$c by the torrent of a mountain pass.
-      """.trimMargin()
+      """.trimMargin(),
     ) {
       enterCommand("set nostartofline")
     }
@@ -168,7 +168,7 @@ class MotionGotoLineLastActionTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                 $c
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 

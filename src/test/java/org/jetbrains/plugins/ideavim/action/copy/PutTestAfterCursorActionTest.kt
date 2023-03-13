@@ -32,12 +32,12 @@ class PutTestAfterCursorActionTest : VimTestCase() {
     ExtensionTestUtil.maskExtensions(
       CopyPastePostProcessor.EP_NAME,
       listOf(extension),
-      myFixture.testRootDisposable
+      myFixture.testRootDisposable,
     )
     ExtensionTestUtil.maskExtensions(
       CopyPastePreProcessor.EP_NAME,
       listOf(),
-      myFixture.testRootDisposable
+      myFixture.testRootDisposable,
     )
     setRegister('4', "XXX ")
     doTest(
@@ -45,7 +45,7 @@ class PutTestAfterCursorActionTest : VimTestCase() {
       "This is my$c text",
       "This is my XXX$c text",
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
     assertEquals(1, extension.calledExtractTransferableData)
   }
@@ -57,7 +57,7 @@ class PutTestAfterCursorActionTest : VimTestCase() {
       "This is my$c text",
       "This is my XXX$c text",
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -69,7 +69,7 @@ class PutTestAfterCursorActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             ${c}A Discovery
-    """
+    """,
   )
   @Test
   fun `test put visual text line to last line`() {
@@ -105,7 +105,7 @@ class PutTestAfterCursorActionTest : VimTestCase() {
             GUARD
             I found it in a legendary land
             all rocks and lavender and tufted grass,
-    """
+    """,
   )
   @Test
   fun `test put visual text line before Guard`() {
@@ -173,7 +173,7 @@ class PutTestAfterCursorActionTest : VimTestCase() {
       calledExtractTransferableData += 1
       return listOf(
         // Just some random data
-        CaretStateTransferableData(intArrayOf(), intArrayOf())
+        CaretStateTransferableData(intArrayOf(), intArrayOf()),
       )
     }
   }

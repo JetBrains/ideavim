@@ -28,7 +28,7 @@ class DeleteEndOfLineActionTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 }

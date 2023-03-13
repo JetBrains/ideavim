@@ -115,12 +115,12 @@ internal fun isOctopusEnabled(s: KeyStroke, editor: Editor): Boolean {
     s.keyCode == KeyEvent.VK_ENTER -> return editor.mode in listOf(
       CommandState.Mode.COMMAND,
       CommandState.Mode.INSERT,
-      CommandState.Mode.VISUAL
+      CommandState.Mode.VISUAL,
     )
     s.keyCode == KeyEvent.VK_ESCAPE -> return editor.mode in listOf(
       CommandState.Mode.COMMAND,
       CommandState.Mode.INSERT,
-      CommandState.Mode.VISUAL
+      CommandState.Mode.VISUAL,
     )
   }
   return false

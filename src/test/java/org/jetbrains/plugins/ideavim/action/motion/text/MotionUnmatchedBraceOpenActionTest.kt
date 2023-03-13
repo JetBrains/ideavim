@@ -26,7 +26,8 @@ class MotionUnmatchedBraceOpenActionTest : VimTestCase() {
         
       }
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -47,7 +48,8 @@ class MotionUnmatchedBraceOpenActionTest : VimTestCase() {
         }
       }
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -68,7 +70,8 @@ class MotionUnmatchedBraceOpenActionTest : VimTestCase() {
         }
       }
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -89,7 +92,8 @@ class MotionUnmatchedBraceOpenActionTest : VimTestCase() {
         }
       }
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -100,7 +104,7 @@ class MotionUnmatchedBraceOpenActionTest : VimTestCase() {
           
         }
       }
-  """
+  """,
   )
   fun `test go to next next bracket with great count`() {
     doTest(
@@ -119,7 +123,8 @@ class MotionUnmatchedBraceOpenActionTest : VimTestCase() {
         }
       }
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 }

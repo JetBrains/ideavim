@@ -111,7 +111,7 @@ internal class VimHighlightedYank : VimExtension, VimYankListener, VimInsertList
       val project = editor.project
       if (project != null) {
         Disposer.register(
-          VimProjectService.getInstance(project)
+          VimProjectService.getInstance(project),
         ) {
           this.editor = null
           yankHighlighters.clear()
@@ -141,7 +141,7 @@ internal class VimHighlightedYank : VimExtension, VimYankListener, VimInsertList
         range.endInclusive,
         HighlighterLayer.SELECTION,
         getHighlightTextAttributes(),
-        HighlighterTargetArea.EXACT_RANGE
+        HighlighterTargetArea.EXACT_RANGE,
       )
 
       yankHighlighters.add(highlighter)
@@ -160,7 +160,8 @@ internal class VimHighlightedYank : VimExtension, VimYankListener, VimInsertList
               editor?.markupModel?.removeHighlighter(highlighter) ?: StrictMode.fail("Highlighters without an editor")
             }
           },
-          timeout, TimeUnit.MILLISECONDS
+          timeout,
+          TimeUnit.MILLISECONDS,
         )
       }
     }
@@ -170,7 +171,7 @@ internal class VimHighlightedYank : VimExtension, VimYankListener, VimInsertList
       extractUsersHighlightColor(),
       editor?.colorsScheme?.getColor(EditorColors.CARET_COLOR),
       EffectType.SEARCH_MATCH,
-      Font.PLAIN
+      Font.PLAIN,
     )
 
     private fun extractUsersHighlightDuration(): Long {
@@ -201,7 +202,7 @@ internal class VimHighlightedYank : VimExtension, VimYankListener, VimInsertList
           @VimNlsSafe val message = MessageHelper.message(
             "highlightedyank.invalid.value.of.0.1",
             "g:$variable",
-            e.message ?: ""
+            e.message ?: "",
           )
           VimPlugin.showMessage(message)
 

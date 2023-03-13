@@ -597,7 +597,7 @@ class ExEntryTest : VimTestCase() {
   private fun typeExInput(text: String) {
     assertTrue(
       "Ex command must start with ':', '/' or '?'",
-      text.startsWith(":") || text.startsWith('/') || text.startsWith('?')
+      text.startsWith(":") || text.startsWith('/') || text.startsWith('?'),
     )
 
     val keys = mutableListOf<KeyStroke>()
@@ -615,14 +615,16 @@ class ExEntryTest : VimTestCase() {
         keys.add(it)
       }
     }
-    if (keys.count() > 0)
+    if (keys.count() > 0) {
       typeText(keys)
+    }
   }
 
   private fun deactivateExEntry() {
     // We don't need to reset text, that's handled by #active
-    if (exEntryPanel.isActive)
+    if (exEntryPanel.isActive) {
       typeText("<C-C>")
+    }
   }
 
   @Suppress("DEPRECATION")

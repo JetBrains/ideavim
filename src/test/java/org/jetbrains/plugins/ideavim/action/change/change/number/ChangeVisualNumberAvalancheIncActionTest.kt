@@ -29,7 +29,7 @@ class ChangeVisualNumberAvalancheIncActionTest : VimTestCase() {
                     number 4
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -47,7 +47,7 @@ class ChangeVisualNumberAvalancheIncActionTest : VimTestCase() {
                     number 7
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 }

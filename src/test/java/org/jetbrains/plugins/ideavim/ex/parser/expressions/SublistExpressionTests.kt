@@ -65,7 +65,7 @@ class SublistExpressionTests {
     assertTrue(ex is SublistExpression)
     assertEquals(
       VimList(mutableListOf(VimInt(1), VimInt(2), VimInt(3), VimInt(4), VimInt(5), VimInt(6))),
-      ex.expression.evaluate()
+      ex.expression.evaluate(),
     )
     assertEquals(VimInt(1), ex.from!!.evaluate())
     assertEquals(VimInt(4), ex.to!!.evaluate())
@@ -77,7 +77,7 @@ class SublistExpressionTests {
     assertTrue(ex is SublistExpression)
     assertEquals(
       VimList(mutableListOf(VimInt(1), VimInt(2), VimInt(3), VimInt(4), VimInt(5), VimInt(6))),
-      ex.expression.evaluate()
+      ex.expression.evaluate(),
     )
     assertEquals(VimInt(6), ex.from!!.evaluate())
     assertEquals(VimString("asd"), ex.to!!.evaluate())

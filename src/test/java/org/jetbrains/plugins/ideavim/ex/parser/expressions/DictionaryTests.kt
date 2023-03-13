@@ -25,7 +25,7 @@ class DictionaryTests : ParserTest() {
   fun `empty dictionary test`() {
     assertEquals(
       VimDictionary(linkedMapOf()),
-      VimscriptParser.parseExpression("{}")!!.evaluate()
+      VimscriptParser.parseExpression("{}")!!.evaluate(),
     )
   }
 
@@ -41,9 +41,9 @@ class DictionaryTests : ParserTest() {
           linkedMapOf(
             VimString("a") to VimString("string expression"),
             VimString("b") to VimList(mutableListOf(VimInt(1), VimInt(2))),
-          )
+          ),
         ),
-        VimscriptParser.parseExpression(s)!!.evaluate()
+        VimscriptParser.parseExpression(s)!!.evaluate(),
       )
     }
   }
@@ -60,9 +60,9 @@ class DictionaryTests : ParserTest() {
           linkedMapOf(
             VimString("c") to VimDictionary(linkedMapOf(VimString("key") to VimString("value"))),
             VimString("d") to VimInt(5),
-          )
+          ),
         ),
-        VimscriptParser.parseExpression(s)!!.evaluate()
+        VimscriptParser.parseExpression(s)!!.evaluate(),
       )
     }
   }
@@ -76,10 +76,10 @@ class DictionaryTests : ParserTest() {
       assertEquals(
         VimDictionary(
           linkedMapOf(
-            VimString("e") to VimFloat(4.2)
-          )
+            VimString("e") to VimFloat(4.2),
+          ),
         ),
-        VimscriptParser.parseExpression(s)!!.evaluate()
+        VimscriptParser.parseExpression(s)!!.evaluate(),
       )
     }
   }
@@ -88,7 +88,7 @@ class DictionaryTests : ParserTest() {
   fun `empty literal dictionary test`() {
     assertEquals(
       VimDictionary(linkedMapOf()),
-      VimscriptParser.parseExpression("#{}")!!.evaluate()
+      VimscriptParser.parseExpression("#{}")!!.evaluate(),
     )
   }
 
@@ -102,10 +102,10 @@ class DictionaryTests : ParserTest() {
         VimDictionary(
           linkedMapOf(
             VimString("test") to VimInt(12),
-            VimString("2-1") to VimString("string value")
-          )
+            VimString("2-1") to VimString("string value"),
+          ),
         ),
-        VimscriptParser.parseExpression(s)!!.evaluate()
+        VimscriptParser.parseExpression(s)!!.evaluate(),
       )
     }
   }
@@ -114,7 +114,7 @@ class DictionaryTests : ParserTest() {
   fun `comma at dictionary end test`() {
     assertEquals(
       VimDictionary(linkedMapOf(VimString("one") to VimInt(1))),
-      VimscriptParser.parseExpression("{'one': 1,}")!!.evaluate()
+      VimscriptParser.parseExpression("{'one': 1,}")!!.evaluate(),
     )
   }
 
@@ -122,7 +122,7 @@ class DictionaryTests : ParserTest() {
   fun `comma at literal dictionary end test`() {
     assertEquals(
       VimDictionary(linkedMapOf(VimString("one") to VimInt(1))),
-      VimscriptParser.parseExpression("#{one: 1,}")!!.evaluate()
+      VimscriptParser.parseExpression("#{one: 1,}")!!.evaluate(),
     )
   }
 }

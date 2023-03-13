@@ -26,7 +26,8 @@ class MotionUnmatchedBraceCloseActionTest : VimTestCase() {
         
       $c}
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -47,7 +48,8 @@ class MotionUnmatchedBraceCloseActionTest : VimTestCase() {
         $c}
       }
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -59,7 +61,7 @@ class MotionUnmatchedBraceCloseActionTest : VimTestCase() {
           String  x = "}"
         $c}
       }
-  """
+  """,
   )
   fun `test go to next bracket with quotes`() {
     doTest(
@@ -80,7 +82,8 @@ class MotionUnmatchedBraceCloseActionTest : VimTestCase() {
         }
       }
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -101,7 +104,8 @@ class MotionUnmatchedBraceCloseActionTest : VimTestCase() {
         }
       $c}
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -122,7 +126,8 @@ class MotionUnmatchedBraceCloseActionTest : VimTestCase() {
         }
       $c}
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -143,7 +148,8 @@ class MotionUnmatchedBraceCloseActionTest : VimTestCase() {
         }
       $c}
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -152,7 +158,8 @@ class MotionUnmatchedBraceCloseActionTest : VimTestCase() {
       "]}",
       """ {$c {}} """,
       """ { {}$c} """,
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 }

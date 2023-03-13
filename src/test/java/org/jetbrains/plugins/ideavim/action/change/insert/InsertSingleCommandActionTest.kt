@@ -18,7 +18,7 @@ class InsertSingleCommandActionTest : VimTestCase() {
       "I found ${c}it in a legendary land",
       "I found it ${c}in a legendary land",
       VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 }

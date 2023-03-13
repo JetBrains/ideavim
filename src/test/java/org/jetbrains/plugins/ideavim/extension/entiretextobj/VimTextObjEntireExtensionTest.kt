@@ -55,7 +55,7 @@ class VimTextObjEntireExtensionTest : VimTestCase() {
     doTest(
       "gUie",
       "\n  \n \n${poem}\n \n  \n",
-      "\n  \n \n<caret>${poemUC}\n \n  \n"
+      "\n  \n \n<caret>${poemUC}\n \n  \n",
     )
   }
 
@@ -64,7 +64,7 @@ class VimTextObjEntireExtensionTest : VimTestCase() {
     doTest(
       "guie",
       "\n  \n \n${poem}\n \n  \n",
-      "\n  \n \n<caret>${poemLC}\n \n  \n"
+      "\n  \n \n<caret>${poemLC}\n \n  \n",
     )
   }
 
@@ -74,21 +74,21 @@ class VimTextObjEntireExtensionTest : VimTestCase() {
       "cie",
       "\n  \n \n${poem}\n  \n \n",
       "\n  \n \n<caret>\n\n  \n \n",
-      VimStateMachine.Mode.INSERT
+      VimStateMachine.Mode.INSERT,
     ) // additional \n because poem ends with a \n
   }
 
+  // |d| |ae|
   @VimBehaviorDiffers(
     originalVimAfter =
     "\n  \n \n<caret>\n\n  \n \n",
-    description = "Our code changes the motion type to linewise, but it should not"
+    description = "Our code changes the motion type to linewise, but it should not",
   )
-  // |d| |ae|
   fun testDeleteEntireBufferIgnoreLeadingTrailing() {
     doTest(
       "die",
       "\n  \n \n${poem}\n  \n \n",
-      "\n  \n \n<caret>\n\n  \n \n"
+      "\n  \n \n<caret>\n\n  \n \n",
     ) // additional \n because poem ends with a \n
   }
 
@@ -97,7 +97,7 @@ class VimTextObjEntireExtensionTest : VimTestCase() {
     doTest(
       "yie",
       "\n  \n \n${poem}\n  \n \n",
-      "\n  \n \n<caret>${poemNoCaret}\n  \n \n"
+      "\n  \n \n<caret>${poemNoCaret}\n  \n \n",
     )
   }
 

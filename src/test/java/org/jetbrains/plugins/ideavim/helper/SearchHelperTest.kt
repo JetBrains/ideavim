@@ -55,7 +55,7 @@ class SearchHelperTest : VimTestCase() {
         text.length.toLong(),
         -2,
         bigWord = true,
-        spaceWords = false
+        spaceWords = false,
       ).toInt()
     assertEquals(previousWordPosition, text.indexOf("first"))
   }
@@ -70,7 +70,7 @@ class SearchHelperTest : VimTestCase() {
         text.length.toLong(),
         -3,
         bigWord = true,
-        spaceWords = false
+        spaceWords = false,
       ).toInt()
     assertEquals(previousWordPosition, text.indexOf("first"))
   }
@@ -85,8 +85,11 @@ class SearchHelperTest : VimTestCase() {
 
   fun testMotionOuterWordAction() {
     doTest(
-      "va(", "((int) nu<caret>m)", "<selection>((int) num)</selection>", VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_CHARACTER
+      "va(",
+      "((int) nu<caret>m)",
+      "<selection>((int) num)</selection>",
+      VimStateMachine.Mode.VISUAL,
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
     )
   }
 

@@ -25,13 +25,13 @@ class DeleteMotionActionTest : VimTestCase() {
         def xxx():
           expression one
           expression${c} two
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState(
       """
         def xxx():
           ${c}expression one
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -42,13 +42,13 @@ class DeleteMotionActionTest : VimTestCase() {
         def xxx():
           expression${c} one
           expression two
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState(
       """
         def xxx():
           ${c}expression two
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -57,7 +57,7 @@ class DeleteMotionActionTest : VimTestCase() {
       "dd",
       """
         def x${c}xx():
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState(c)
   }
@@ -69,7 +69,7 @@ class DeleteMotionActionTest : VimTestCase() {
         |def xxx():
         |  expression one
         |  expression${c} two
-      """.trimMargin()
+      """.trimMargin(),
     )
     enterCommand("set nostartofline")
     typeText("dd")
@@ -77,7 +77,7 @@ class DeleteMotionActionTest : VimTestCase() {
       """
         |def xxx():
         |  expression${c} one
-      """.trimMargin()
+      """.trimMargin(),
     )
   }
 
@@ -89,7 +89,7 @@ class DeleteMotionActionTest : VimTestCase() {
         def xxx():
           expression one
           expression${c} two
-      """.trimIndent()
+      """.trimIndent(),
     )
     val savedText = VimPlugin.getRegister().lastRegister?.text ?: ""
     assertEquals("  expression two\n", savedText)
@@ -107,7 +107,7 @@ class DeleteMotionActionTest : VimTestCase() {
         abcde
         abcde
         
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState("${c}abcde\n${c}")
   }
@@ -126,7 +126,7 @@ class DeleteMotionActionTest : VimTestCase() {
          |    }
          |  }
          |}
-        """.trimMargin()
+      """.trimMargin(),
     )
     assertState(
       """|public class Foo {
@@ -140,7 +140,7 @@ class DeleteMotionActionTest : VimTestCase() {
          |    }
          |  }
          |}
-         """.trimMargin()
+      """.trimMargin(),
     )
   }
 
@@ -179,7 +179,7 @@ class DeleteMotionActionTest : VimTestCase() {
             
             I found it in a legendary land
             ${c}all rocks and lavender and tufted grass,
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -202,7 +202,7 @@ class DeleteMotionActionTest : VimTestCase() {
             
             I found it in a legendary land
             all rocks and lavender and tufted grass,
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 }

@@ -67,7 +67,7 @@ inline fun waitAndAssert(timeInMillis: Int = 1000, condition: () -> Boolean) {
 fun waitAndAssertMode(
   fixture: CodeInsightTestFixture,
   mode: VimStateMachine.Mode,
-  timeInMillis: Int? = null
+  timeInMillis: Int? = null,
 ) {
   val timeout = timeInMillis ?: (injector.globalOptions().getIntValue(IjOptionConstants.visualdelay) + 1000)
   waitAndAssert(timeout) { fixture.editor.editorMode == mode }
@@ -99,9 +99,9 @@ fun waitCondition(
 ): Boolean {
   val endTime = System.currentTimeMillis() + durationMillis
   while (System.currentTimeMillis() < endTime) {
-    if (condition())
+    if (condition()) {
       return true
-    else {
+    } else {
       Thread.sleep(interval)
     }
   }

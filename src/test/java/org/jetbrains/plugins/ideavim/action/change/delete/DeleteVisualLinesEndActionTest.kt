@@ -56,7 +56,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
             Yesterday it w${c}
             Today it is not working
             The test is like that.
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -74,7 +74,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
             Yesterday it worke${c}
             Today it is not working
             The test is like that.
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -92,7 +92,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
             Yesterday it worke${c}
             Today it is not working
             The test is like that.
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -304,7 +304,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
                     abcde
                     abcde
 
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState("${c}abcde\n${c}")
   }
@@ -494,7 +494,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
                     abcde
                     abcde
 
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState("${c}abcde\n${c}")
   }
@@ -644,7 +644,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
                     abcde
                     abcde
 
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState(
       """
@@ -654,7 +654,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
     a
     abcde
 
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -673,7 +673,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
             Today it is not working
             The test is like that.
       """.trimIndent(),
-      VimStateMachine.Mode.INSERT
+      VimStateMachine.Mode.INSERT,
     )
   }
 }

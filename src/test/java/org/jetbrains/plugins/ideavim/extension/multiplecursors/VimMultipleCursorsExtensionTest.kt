@@ -246,7 +246,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     description = "Vim does not have native support for multiple cursors, so vim-multiple-cursors fakes it and " +
       "keeps a track of selections added as part of additional cursors. It will only remove selections from these " +
       "additional cursors. IdeaVim has native support, so doesn't track if a selection is due to an additional cursor " +
-      "so IdeaVim will remove arbitrary selections, while vim-multiple-cursors do not."
+      "so IdeaVim will remove arbitrary selections, while vim-multiple-cursors do not.",
   )
   fun testRemoveSelectionVisualMode() {
     val before = """q${s}we
@@ -473,7 +473,8 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     typeText(injector.parser.parseKeys("vjl" + "<A-n>"))
     val after = """jdfsg sdf${c}dfkgjhfkgkldfjsg
                         |dfkjghdfs${c}gs
-                        |dflsgsdfgh""".trimMargin()
+                        |dflsgsdfgh
+    """.trimMargin()
     assertState(after)
   }
 

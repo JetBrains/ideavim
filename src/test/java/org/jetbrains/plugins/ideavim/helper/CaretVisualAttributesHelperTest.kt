@@ -283,11 +283,11 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
       """
       |${c}I found it in a legendary land
       |all rocks and lavender and tufted grass,
-    """.trimMargin()
+      """.trimMargin(),
     )
     injector.actionExecutor.executeAction(
       "EditorCloneCaretBelow",
-      injector.executionContextManager.onEditor(myFixture.editor.vim)
+      injector.executionContextManager.onEditor(myFixture.editor.vim),
     )
     TestCase.assertEquals(2, myFixture.editor.caretModel.caretCount)
     assertCaretVisualAttributes(CaretVisualAttributes.Shape.BLOCK, 0f)

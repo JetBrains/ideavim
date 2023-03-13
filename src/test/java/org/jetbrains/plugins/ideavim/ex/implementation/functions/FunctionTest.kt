@@ -75,8 +75,8 @@ class FunctionTest : VimTestCase() {
       function! SayHi() |
         echo 'hello' |
       endfunction
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     typeText(commandToKeys("let Ff = function('SayHi')"))
     typeText(commandToKeys("call Ff()"))
@@ -88,8 +88,8 @@ class FunctionTest : VimTestCase() {
       function! SayHi() |
         echo 'hi' |
       endfunction
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     typeText(commandToKeys("call Ff()"))
     assertExOutput("hi\n")
@@ -106,8 +106,8 @@ class FunctionTest : VimTestCase() {
       function! SayHi() |
         echo 'hello' |
       endfunction
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     typeText(commandToKeys("let Ff = function('SayHi')"))
     typeText(commandToKeys("delfunction! SayHi"))

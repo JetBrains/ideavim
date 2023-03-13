@@ -34,7 +34,7 @@ class CopyActionTest : VimTestCase() {
      tw<caret>o
      three
      
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState(
       """
@@ -43,7 +43,7 @@ class CopyActionTest : VimTestCase() {
     two
     three
     
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -56,7 +56,7 @@ class CopyActionTest : VimTestCase() {
      
      bar
      
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState(
       """
@@ -64,7 +64,7 @@ class CopyActionTest : VimTestCase() {
     foo
     bar
     
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -76,7 +76,7 @@ class CopyActionTest : VimTestCase() {
      one two
      <caret>three four
      
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertState(
       """
@@ -84,7 +84,7 @@ class CopyActionTest : VimTestCase() {
     three four
     three four
     
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -128,7 +128,7 @@ class CopyActionTest : VimTestCase() {
      three
      four
      
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertPluginError(true)
   }
@@ -142,7 +142,7 @@ class CopyActionTest : VimTestCase() {
      three
      four
      
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertPluginError(false)
     assertState(
@@ -152,7 +152,7 @@ class CopyActionTest : VimTestCase() {
     three
     four
     
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -164,7 +164,7 @@ class CopyActionTest : VimTestCase() {
      three
      four
      
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertEquals(0, editor.caretModel.offset)
   }
@@ -177,7 +177,7 @@ class CopyActionTest : VimTestCase() {
      <caret>* one
      * two
      
-      """.trimIndent()
+      """.trimIndent(),
     )
 
     // XXX:
@@ -192,7 +192,7 @@ class CopyActionTest : VimTestCase() {
     * * one
     * * two
     
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertSelection(null)
     assertOffset(2)
@@ -206,7 +206,7 @@ class CopyActionTest : VimTestCase() {
      <caret>foo
      bar
      
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertOffset(0)
     assertMode(VimStateMachine.Mode.COMMAND)
@@ -223,7 +223,7 @@ class CopyActionTest : VimTestCase() {
     <caret>bar
     baz
     
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertEquals('\"', VimPlugin.getRegister().defaultRegister)
     enterCommand("set clipboard=unnamed")
@@ -248,7 +248,7 @@ class CopyActionTest : VimTestCase() {
     foo
     <caret>foo
     
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -263,7 +263,7 @@ class CopyActionTest : VimTestCase() {
     bar
     baz
     
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText("<C-V>j" + "\"*y" + "\"*p")
     val register = VimPlugin.getRegister().getRegister('*')
@@ -273,7 +273,7 @@ class CopyActionTest : VimTestCase() {
     f
     b
       """.trimIndent(),
-      register!!.text
+      register!!.text,
     )
     assertState(
       """
@@ -281,7 +281,7 @@ class CopyActionTest : VimTestCase() {
     bbar
     baz
     
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -301,7 +301,7 @@ class CopyActionTest : VimTestCase() {
     <b></b>
     </root>
     
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText("dit", "j", "cit", "<C-R>\"")
     assertState(
@@ -311,7 +311,7 @@ class CopyActionTest : VimTestCase() {
     <b>value</b>
     </root>
     
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 }

@@ -35,7 +35,7 @@ internal class FunctionStorage : VimscriptFunctionService {
       throw ExException("E128: Function name must start with a capital or \"s:\": $name")
     }
 
-    if (scope != null)
+    if (scope != null) {
       when (scope) {
         Scope.GLOBAL_VARIABLE -> {
           if (globalFunctions.containsKey(name)) {
@@ -60,6 +60,7 @@ internal class FunctionStorage : VimscriptFunctionService {
         }
         else -> throw ExException("E130: Unknown function: ${scope.c}:$name")
       }
+    }
 
     if (globalFunctions.containsKey(name)) {
       globalFunctions[name]!!.isDeleted = true

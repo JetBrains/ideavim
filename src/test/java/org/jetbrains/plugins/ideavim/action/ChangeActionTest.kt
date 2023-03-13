@@ -23,8 +23,11 @@ class ChangeActionTest : VimTestCase() {
   // VIM-620 |i_CTRL-O|
   fun testInsertSingleCommandAndInserting() {
     doTest(
-      listOf("i", "<C-O>", "a", "123", "<Esc>", "x"), "abc${c}d\n", "abcd12\n", VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      listOf("i", "<C-O>", "a", "123", "<Esc>", "x"),
+      "abc${c}d\n",
+      "abcd12\n",
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -32,7 +35,10 @@ class ChangeActionTest : VimTestCase() {
   fun testInsertSingleCommandAndNewLineInserting() {
     doTest(
       listOf("i", "<C-O>", "o", "123", "<Esc>", "x"),
-      "abc${c}d\n", "abcd\n12\n", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      "abc${c}d\n",
+      "abcd\n12\n",
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -40,7 +46,10 @@ class ChangeActionTest : VimTestCase() {
   fun testInsertSingleCommandAndNewLineInserting2() {
     doTest(
       listOf("i", "<C-O>", "v"),
-      "12${c}345", "12${s}${c}3${se}45", VimStateMachine.Mode.INSERT_VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER
+      "12${c}345",
+      "12${s}${c}3${se}45",
+      VimStateMachine.Mode.INSERT_VISUAL,
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
     )
   }
 
@@ -48,7 +57,10 @@ class ChangeActionTest : VimTestCase() {
   fun testInsertSingleCommandAndNewLineInserting3() {
     doTest(
       listOf("i", "<C-O>", "v", "<esc>"),
-      "12${c}345", "12${c}345", VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
+      "12${c}345",
+      "12${c}345",
+      VimStateMachine.Mode.INSERT,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -56,7 +68,10 @@ class ChangeActionTest : VimTestCase() {
   fun testInsertSingleCommandAndNewLineInserting4() {
     doTest(
       listOf("i", "<C-O>", "v", "d"),
-      "12${c}345", "12${c}45", VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
+      "12${c}345",
+      "12${c}45",
+      VimStateMachine.Mode.INSERT,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -65,7 +80,10 @@ class ChangeActionTest : VimTestCase() {
   fun testInsertSingleCommandAndNewLineInserting5() {
     doTest(
       listOf("i", "<C-O>", "v", "<C-G>"),
-      "12${c}345", "12${s}3${c}${se}45", VimStateMachine.Mode.INSERT_SELECT, VimStateMachine.SubMode.VISUAL_CHARACTER
+      "12${c}345",
+      "12${s}3${c}${se}45",
+      VimStateMachine.Mode.INSERT_SELECT,
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
     )
   }
 
@@ -74,7 +92,10 @@ class ChangeActionTest : VimTestCase() {
   fun testInsertSingleCommandAndNewLineInserting6() {
     doTest(
       listOf("i", "<C-O>", "gh"),
-      "12${c}345", "12${s}3${c}${se}45", VimStateMachine.Mode.INSERT_SELECT, VimStateMachine.SubMode.VISUAL_CHARACTER
+      "12${c}345",
+      "12${s}3${c}${se}45",
+      VimStateMachine.Mode.INSERT_SELECT,
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
     )
   }
 
@@ -83,7 +104,10 @@ class ChangeActionTest : VimTestCase() {
   fun testInsertSingleCommandAndNewLineInserting7() {
     doTest(
       listOf("i", "<C-O>", "gh", "<esc>"),
-      "12${c}345", "123${c}45", VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
+      "12${c}345",
+      "123${c}45",
+      VimStateMachine.Mode.INSERT,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -102,7 +126,10 @@ class ChangeActionTest : VimTestCase() {
   fun testInsertSingleCommand() {
     doTest(
       listOf("i", "def", "<C-O>", "d2h", "x"),
-      "abc$c.\n", "abcdx.\n", VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
+      "abc$c.\n",
+      "abcdx.\n",
+      VimStateMachine.Mode.INSERT,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -127,8 +154,11 @@ class ChangeActionTest : VimTestCase() {
 
   fun testChangeUpperCase() {
     doTest(
-      "gUw", "${c}FooBar Baz\n", "FOOBAR Baz\n", VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      "gUw",
+      "${c}FooBar Baz\n",
+      "FOOBAR Baz\n",
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -138,22 +168,31 @@ class ChangeActionTest : VimTestCase() {
 
   fun testToggleCaseVisual() {
     doTest(
-      "ve~", "${c}FooBar Baz\n", "fOObAR Baz\n", VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      "ve~",
+      "${c}FooBar Baz\n",
+      "fOObAR Baz\n",
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
   fun testChangeUpperCaseVisual() {
     doTest(
-      "veU", "${c}FooBar Baz\n", "FOOBAR Baz\n", VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      "veU",
+      "${c}FooBar Baz\n",
+      "FOOBAR Baz\n",
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
   fun testChangeLowerCaseVisual() {
     doTest(
-      "veu", "${c}FooBar Baz\n", "foobar Baz\n", VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      "veu",
+      "${c}FooBar Baz\n",
+      "foobar Baz\n",
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -173,7 +212,8 @@ class ChangeActionTest : VimTestCase() {
    four
    
       """.trimIndent(),
-      VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.INSERT,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -191,7 +231,8 @@ class ChangeActionTest : VimTestCase() {
         
         
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
     assertOffset(4)
   }
@@ -211,7 +252,7 @@ class ChangeActionTest : VimTestCase() {
    
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -231,7 +272,8 @@ class ChangeActionTest : VimTestCase() {
    three
    
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -245,7 +287,8 @@ class ChangeActionTest : VimTestCase() {
       """one 
  three
 """,
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
     assertOffset(3)
   }
@@ -259,16 +302,20 @@ class ChangeActionTest : VimTestCase() {
    three four
    
       """.trimIndent(),
-      "one four\n", VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      "one four\n",
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
   // VIM-1380 |d| |w| |count|
   fun testDeleteTwoWordsAtLastChar() {
     doTest(
-      "d2w", "on${c}e two three\n", "on${c}three\n", VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      "d2w",
+      "on${c}e two three\n",
+      "on${c}three\n",
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -283,7 +330,7 @@ class ChangeActionTest : VimTestCase() {
   , baz
 """,
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -302,7 +349,7 @@ class ChangeActionTest : VimTestCase() {
    
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -320,7 +367,8 @@ class ChangeActionTest : VimTestCase() {
         bar
         
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
     assertOffset(1)
   }
@@ -334,7 +382,9 @@ class ChangeActionTest : VimTestCase() {
    two
    
       """.trimIndent(),
-      "two\n", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      "two\n",
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -342,8 +392,11 @@ class ChangeActionTest : VimTestCase() {
   fun testInsertFromRegister() {
     setRegister('a', "World")
     doTest(
-      listOf("A", ", ", "<C-R>", "a", "!"), "${c}Hello\n", "Hello, World!\n", VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE
+      listOf("A", ", ", "<C-R>", "a", "!"),
+      "${c}Hello\n",
+      "Hello, World!\n",
+      VimStateMachine.Mode.INSERT,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -351,7 +404,10 @@ class ChangeActionTest : VimTestCase() {
   fun testInsertNewLineAboveFirstLine() {
     doTest(
       listOf("O", "bar"),
-      "fo${c}o\n", "bar\nfoo\n", VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
+      "fo${c}o\n",
+      "bar\nfoo\n",
+      VimStateMachine.Mode.INSERT,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -359,7 +415,10 @@ class ChangeActionTest : VimTestCase() {
   fun testVisualSelectionRightMargin() {
     doTest(
       listOf("v", "k\$d"),
-      "foo\n${c}bar\n", "fooar\n", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      "foo\n${c}bar\n",
+      "fooar\n",
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -381,7 +440,8 @@ class ChangeActionTest : VimTestCase() {
         quux
         
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -402,7 +462,8 @@ class ChangeActionTest : VimTestCase() {
         quux
         
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -417,7 +478,8 @@ quux
       """    a 1 b 2 c 3
 quux
 """,
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -432,7 +494,8 @@ quux
       """    a 1    b 2    c 3
 quux
 """,
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -445,7 +508,9 @@ quux
         
         bar
       """.dotToSpace().trimIndent(),
-      "foo bar", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      "foo bar",
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -456,7 +521,9 @@ quux
         foo..
         bar
       """.dotToSpace().trimIndent(),
-      "foo  bar", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      "foo  bar",
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -471,7 +538,8 @@ quux
       """    a 1 b 2 c 3
 quux
 """,
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -486,14 +554,18 @@ quux
       """    a 1    b 2    c 3
 quux
 """,
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
   fun testDeleteCharVisualBlockOnLastCharOfLine() {
     doTest(
       listOf("<C-V>", "x"),
-      "fo${c}o\n", "fo\n", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      "fo${c}o\n",
+      "fo\n",
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -503,7 +575,10 @@ quux
     }
     doTest(
       listOf("<C-V>", "j", "x"),
-      "\n\n", "\n\n", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      "\n\n",
+      "\n\n",
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -523,7 +598,8 @@ quux
         br
         
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -544,7 +620,8 @@ quux
         br
         
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -555,7 +632,7 @@ quux
   foo
   bar
   
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(injector.parser.parseKeys("<C-V>" + "j" + "x"))
     assertState(
@@ -563,7 +640,7 @@ quux
   oo
   ar
   
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -598,7 +675,8 @@ quux
         ZZZZZz
         
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -613,7 +691,8 @@ foobaz
     bar
 foobaz
 """,
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -629,7 +708,8 @@ foobaz
     r
 foobaz
 """,
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -642,7 +722,10 @@ foobaz
   fun testReplaceMultipleCharsWithTextWithCount() {
     doTest(
       "3sxy<Esc>",
-      "fo${c}obar\n", "fox${c}yr\n", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      "fo${c}obar\n",
+      "fox${c}yr\n",
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -660,7 +743,8 @@ foobaz
         biff
         
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -674,7 +758,10 @@ foobaz
   fun testReplaceModeSwitchToInsertModeAndBack() {
     doTest(
       "RXXX<Ins>YYY<Ins>ZZZ<Esc>",
-      "aaa${c}bbbcccddd\n", "aaaXXXYYYZZ${c}Zddd\n", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      "aaa${c}bbbcccddd\n",
+      "aaaXXXYYYZZ${c}Zddd\n",
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -683,8 +770,10 @@ foobaz
   fun testInsertModeSwitchToReplaceModeAndBack() {
     doTest(
       "iXXX<Ins>YYY<Ins>ZZZ<Esc>",
-      "aaa${c}bbbcccddd\n", "aaaXXXYYYZZ${c}Zcccddd\n", VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      "aaa${c}bbbcccddd\n",
+      "aaaXXXYYYZZ${c}Zcccddd\n",
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -703,7 +792,8 @@ foobaz
         fo${c}o quux
         
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -715,7 +805,7 @@ foobaz
   class C $c{
   }
   
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(injector.parser.parseKeys("o" + "foo(\"<Right>, \"<Right><Right>;" + "<Esc>" + "."))
     assertState(
@@ -723,7 +813,7 @@ foobaz
     foo("", "");
     foo("", "");
 }
-"""
+""",
     )
   }
 
@@ -735,7 +825,7 @@ foobaz
   class C $c{
   }
   
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(injector.parser.parseKeys("o" + "C(" + "<BS>" + "(int i) {}" + "<Esc>" + "."))
     assertState(
@@ -743,7 +833,7 @@ foobaz
     C(int i) {}
     C(int i) {}
 }
-"""
+""",
     )
   }
 
@@ -755,7 +845,7 @@ foobaz
   - 2
   - 3
   
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(injector.parser.parseKeys("d$" + "j" + "."))
     assertState(
@@ -764,7 +854,7 @@ foobaz
   
   - 3
   
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -776,7 +866,7 @@ foobaz
   class C $c{
   }
   
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(injector.parser.parseKeys("o" + "C(" + "<BS>" + "(int i) {" + "<Enter>" + "i = 3;" + "<Esc>" + "<Down>" + "."))
     assertState(
@@ -788,7 +878,7 @@ foobaz
         i = 3;
     }
 }
-"""
+""",
     )
   }
 
@@ -802,7 +892,7 @@ foobaz
   - 2
   - 3
   
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(injector.parser.parseKeys("A" + "<BS>" + "<Esc>" + "j" + "."))
     assertState(
@@ -811,7 +901,7 @@ foobaz
   - 
   - 3
   
-      """.trimIndent()
+      """.trimIndent(),
     )
 
     // Case 2
@@ -821,7 +911,7 @@ foobaz
   - 2
   - 3
   
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(injector.parser.parseKeys("A" + "4" + "<BS>" + "<Esc>" + "j" + "."))
     assertState(
@@ -830,7 +920,7 @@ foobaz
   - 2
   - 3
   
-      """.trimIndent()
+      """.trimIndent(),
     )
 
     // Case 3
@@ -840,7 +930,7 @@ foobaz
   - 2
   - 3
   
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(injector.parser.parseKeys("A" + "<BS>" + "4" + "<Esc>" + "j" + "."))
     assertState(
@@ -849,7 +939,7 @@ foobaz
   - 4
   - 3
   
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -861,7 +951,7 @@ foobaz
  * a little more text
  * and final fold
  */
-and some text after"""
+and some text after""",
     )
     typeText(injector.parser.parseKeys("zc" + "G" + "O"))
     assertState(
@@ -871,7 +961,7 @@ and some text after"""
  * and final fold
  */
 $c
-and some text after"""
+and some text after""",
     )
   }
 
@@ -886,7 +976,7 @@ and some text after"""
            * and final fold
            */
           and some text after
-      """.trimIndent()
+      """.trimIndent(),
     )
 
     myFixture.editor.foldingModel.runBatchFoldingOperation {
@@ -904,14 +994,17 @@ and some text after"""
              */
             $c
             and some text after
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
   fun testRepeatChangeWordDoesNotBreakNextRepeatFind() {
     doTest(
-      "fXcfYPATATA<Esc>fX.;.", "${c}aaaaXBBBBYaaaaaaaXBBBBYaaaaaaXBBBBYaaaaaaaa\n",
-      "aaaaPATATAaaaaaaaPATATAaaaaaaPATATAaaaaaaaa\n", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      "fXcfYPATATA<Esc>fX.;.",
+      "${c}aaaaXBBBBYaaaaaaaXBBBBYaaaaaaXBBBBYaaaaaaaa\n",
+      "aaaaPATATAaaaaaaaPATATAaaaaaaPATATAaaaaaaaa\n",
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -936,7 +1029,7 @@ and some text after"""
         ${c}lorem ipsum dolor sit amet
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -952,7 +1045,7 @@ and some text after"""
         ${c}lorem ipsum dolor sit amet
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -968,7 +1061,7 @@ and some text after"""
         ${c}lorem ipsum dolor sit amet
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -984,7 +1077,7 @@ and some text after"""
         ${c}lorem ipsum dolor sit amet
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -1000,7 +1093,7 @@ and some text after"""
         psum dolor sit amet
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -1016,7 +1109,7 @@ and some text after"""
         ipsum dolor sit amet
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -1034,7 +1127,8 @@ and some text after"""
         ${c}lorem ipsum dolor sit amet
         
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -1053,7 +1147,8 @@ and some text after"""
         gaganis ${c}gaganis gaganis
         
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -1069,7 +1164,8 @@ and some text after"""
         line 1
         ${c}line 3
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 }

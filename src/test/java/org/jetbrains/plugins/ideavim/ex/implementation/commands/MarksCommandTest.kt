@@ -21,7 +21,7 @@ class MarksCommandTest : VimTestCase() {
                       |all rocks$c and lavender and tufted grass,
                       |where it was settled on some sodden sand
                       |hard by the torrent of a mountain pass.
-                    """.trimMargin()
+      """.trimMargin(),
     )
     typeText(injector.parser.parseKeys("VyjVpgv"))
     assertState(
@@ -29,7 +29,7 @@ class MarksCommandTest : VimTestCase() {
                       |all rocks and lavender and tufted grass,
                       |${s}all rocks and lavender and tufted grass,
                       |${se}hard by the torrent of a mountain pass.
-                    """.trimMargin()
+      """.trimMargin(),
     )
   }
 
@@ -39,14 +39,14 @@ class MarksCommandTest : VimTestCase() {
       """
       # (response.get${c}_data(as_text=True))
       # (response.data.decode("utf-8"))
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(injector.parser.parseKeys("vi)yjvi)pgv"))
     assertState(
       """
       # (response.get_data(as_text=True))
       # (response.get_data(as_text=True))
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -70,7 +70,7 @@ class MarksCommandTest : VimTestCase() {
                       |all rocks and lavender and tufted grass,
                       |where it$c was settled on some sodden sand
                       |hard by the torrent of a mountain pass.
-                    """.trimMargin()
+      """.trimMargin(),
     )
     typeText(injector.parser.parseKeys("ma"))
 
@@ -78,7 +78,7 @@ class MarksCommandTest : VimTestCase() {
     assertExOutput(
       """mark line  col file/text
                      | a      3    8 where it was settled on some sodden sand
-    """.trimMargin()
+      """.trimMargin(),
     )
   }
 
@@ -88,7 +88,7 @@ class MarksCommandTest : VimTestCase() {
                       |all rocks and lavender and tufted grass,
                       |where it was settled on some sodden sand
                       |hard by the torrent of a mountain pass.
-                    """.trimMargin()
+      """.trimMargin(),
     )
     typeText(injector.parser.parseKeys("ma"))
 
@@ -96,7 +96,7 @@ class MarksCommandTest : VimTestCase() {
     assertExOutput(
       """mark line  col file/text
                      | a      1    0 I found it in a legendary land
-    """.trimMargin()
+      """.trimMargin(),
     )
   }
 
@@ -106,7 +106,7 @@ class MarksCommandTest : VimTestCase() {
                          |all rocks and lavender and tufted grass,
                          |where it was settled on some sodden sand
                          |hard by the torrent of a mountain pass.
-                       """.trimMargin()
+      """.trimMargin(),
     )
     typeText(injector.parser.parseKeys("ma" + "jl"))
     typeText(injector.parser.parseKeys("mb" + "jl"))
@@ -120,7 +120,7 @@ class MarksCommandTest : VimTestCase() {
                      | b      2    9 all rocks and lavender and tufted grass,
                      | c      3   10 where it was settled on some sodden sand
                      | d      4   11 hard by the torrent of a mountain pass.
-    """.trimMargin()
+      """.trimMargin(),
     )
   }
 
@@ -130,7 +130,7 @@ class MarksCommandTest : VimTestCase() {
                          |all rocks and lavender and tufted grass,
                          |where it was settled on some sodden sand
                          |hard by the torrent of a mountain pass.
-                       """.trimMargin()
+      """.trimMargin(),
     )
     typeText(injector.parser.parseKeys("mA" + "jll"))
     typeText(injector.parser.parseKeys("mB"))
@@ -140,7 +140,7 @@ class MarksCommandTest : VimTestCase() {
       """mark line  col file/text
                      | A      1    8 I found it in a legendary land
                      | B      2   10 all rocks and lavender and tufted grass,
-    """.trimMargin()
+      """.trimMargin(),
     )
   }
 
@@ -150,7 +150,7 @@ class MarksCommandTest : VimTestCase() {
                          |all rocks and lavender and tufted grass,
                          |where it was settled on some sodden sand
                          |hard by the torrent of a mountain pass.
-                       """.trimMargin()
+      """.trimMargin(),
     )
     typeText(injector.parser.parseKeys("ma" + "jl"))
     typeText(injector.parser.parseKeys("mb" + "jl"))
@@ -162,7 +162,7 @@ class MarksCommandTest : VimTestCase() {
       """mark line  col file/text
                      | b      2    9 all rocks and lavender and tufted grass,
                      | D      4   11 hard by the torrent of a mountain pass.
-    """.trimMargin()
+      """.trimMargin(),
     )
   }
 
@@ -172,7 +172,7 @@ class MarksCommandTest : VimTestCase() {
                          |all rocks and lavender and tufted grass,
                          |where it was settled on some sodden sand
                          |hard by the torrent of a mountain pass.
-                       """.trimMargin()
+      """.trimMargin(),
     )
     typeText(injector.parser.parseKeys("ma" + "jl"))
     enterCommand("marks b")
@@ -185,7 +185,7 @@ class MarksCommandTest : VimTestCase() {
                       |all rocks and lavender and tufted grass,
                       |where it was settled on some sodden sand
                       |hard by the torrent of a mountain pass.
-                      """.trimMargin()
+      """.trimMargin(),
     )
     val vimEditor = myFixture.editor.vim
     injector.markService.setMark(vimEditor.primaryCaret(), 'a', 100000)
@@ -193,7 +193,7 @@ class MarksCommandTest : VimTestCase() {
     assertExOutput(
       """mark line  col file/text
                      | a      4   39 hard by the torrent of a mountain pass.
-    """.trimMargin()
+      """.trimMargin(),
     )
   }
 
@@ -206,7 +206,7 @@ class MarksCommandTest : VimTestCase() {
                      | a      1    0 Hello world
                      | b      2    0 ^F
                      | c      3    0 ^?
-    """.trimMargin()
+      """.trimMargin(),
     )
   }
 
@@ -219,7 +219,7 @@ class MarksCommandTest : VimTestCase() {
     assertExOutput(
       """mark line  col file/text
                      | a      1  100 ${text.substring(0, 200)}
-    """.trimMargin()
+      """.trimMargin(),
     )
   }
 
@@ -234,7 +234,7 @@ class MarksCommandTest : VimTestCase() {
                       |to science: shape and shade -- the special tinge,
                       |akin to moonlight, tempering its blue,
                       |the dingy underside, the checquered fringe.
-                      """.trimMargin()
+      """.trimMargin(),
     )
     typeText(injector.parser.parseKeys("ma" + "w" + "mb" + "2w" + "j")) // a + b
     typeText(injector.parser.parseKeys("v2b" + "<Esc>" + "j")) // < and > - last visual selection marks
@@ -244,8 +244,8 @@ class MarksCommandTest : VimTestCase() {
         "i" +
           "inserted text " +
           "<Esc>" +
-          "<CR><CR>"
-      )
+          "<CR><CR>",
+      ),
     ) // ^ - position of end of last insert. Also '.' for start of change
     typeText(injector.parser.parseKeys("w" + "c4w" + "replaced content" + "<Esc>")) // [ and ] - recently changed/yanked
     typeText(injector.parser.parseKeys("gg")) // ' - position before last jump
@@ -266,7 +266,7 @@ class MarksCommandTest : VimTestCase() {
                      | .      8   20 akin replaced content its blue,
                      | <      2   10 all rocks and lavender and tufted grass,
                      | >      2   16 all rocks and lavender and tufted grass,
-                     """.trimMargin()
+      """.trimMargin(),
     )
   }
 }

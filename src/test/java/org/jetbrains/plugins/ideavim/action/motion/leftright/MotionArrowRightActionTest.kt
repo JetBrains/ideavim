@@ -204,7 +204,8 @@ class MotionArrowRightActionTest : VimOptionTestCase(OptionConstants.keymodel) {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER
+      VimStateMachine.Mode.VISUAL,
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
     )
   }
 
@@ -213,8 +214,8 @@ class MotionArrowRightActionTest : VimOptionTestCase(OptionConstants.keymodel) {
     VimTestOption(
       OptionConstants.keymodel,
       OptionValueType.STRING,
-      OptionConstants.keymodel_stopsel
-    )
+      OptionConstants.keymodel_stopsel,
+    ),
   )
   fun `test visual stopsel`() {
     doTest(
@@ -235,7 +236,8 @@ class MotionArrowRightActionTest : VimOptionTestCase(OptionConstants.keymodel) {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -244,8 +246,8 @@ class MotionArrowRightActionTest : VimOptionTestCase(OptionConstants.keymodel) {
     VimTestOption(
       OptionConstants.keymodel,
       OptionValueType.STRING,
-      OptionConstants.keymodel_stopselect
-    )
+      OptionConstants.keymodel_stopselect,
+    ),
   )
   fun `test visual stopselect`() {
     doTest(
@@ -266,7 +268,8 @@ class MotionArrowRightActionTest : VimOptionTestCase(OptionConstants.keymodel) {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER
+      VimStateMachine.Mode.VISUAL,
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
     )
   }
 
@@ -275,8 +278,8 @@ class MotionArrowRightActionTest : VimOptionTestCase(OptionConstants.keymodel) {
     VimTestOption(
       OptionConstants.keymodel,
       OptionValueType.STRING,
-      OptionConstants.keymodel_stopvisual
-    )
+      OptionConstants.keymodel_stopvisual,
+    ),
   )
   fun `test visual stopvisual`() {
     doTest(
@@ -297,7 +300,8 @@ class MotionArrowRightActionTest : VimOptionTestCase(OptionConstants.keymodel) {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -306,8 +310,8 @@ class MotionArrowRightActionTest : VimOptionTestCase(OptionConstants.keymodel) {
     VimTestOption(
       OptionConstants.keymodel,
       OptionValueType.STRING,
-      OptionConstants.keymodel_stopvisual
-    )
+      OptionConstants.keymodel_stopvisual,
+    ),
   )
   fun `test visual stopvisual multicaret`() {
     doTest(
@@ -328,7 +332,8 @@ class MotionArrowRightActionTest : VimOptionTestCase(OptionConstants.keymodel) {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 

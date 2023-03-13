@@ -24,7 +24,8 @@ class MotionSectionForwardEndActionTest : VimTestCase() {
           hard by the torrent of a mountain pass.
       """.trimIndent(),
       "$c.",
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -40,7 +41,8 @@ class MotionSectionForwardEndActionTest : VimTestCase() {
           
       """.trimIndent(),
       "$c.\n",
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -77,7 +79,8 @@ class MotionSectionForwardEndActionTest : VimTestCase() {
         }
       }
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -114,7 +117,8 @@ class MotionSectionForwardEndActionTest : VimTestCase() {
         }
       }
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -151,7 +155,8 @@ class MotionSectionForwardEndActionTest : VimTestCase() {
         }
       $c}
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 }

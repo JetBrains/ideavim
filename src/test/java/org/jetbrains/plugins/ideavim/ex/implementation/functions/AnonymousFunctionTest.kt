@@ -23,8 +23,8 @@ class AnonymousFunctionTest : VimTestCase() {
            function dict.pi() |
              return 3.1415 |
            endfunction
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     typeText(commandToKeys("echo dict.pi()"))
     assertExOutput("3.1415\n")
@@ -56,8 +56,8 @@ class AnonymousFunctionTest : VimTestCase() {
            function dict.getName() |
              return self.name |
            endfunction
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     typeText(commandToKeys("echo dict.getName()"))
     assertExOutput("dict\n")
@@ -72,8 +72,8 @@ class AnonymousFunctionTest : VimTestCase() {
            function dict.dict2.dict3.sayHi() |
              echo 'hi' |
            endfunction
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     typeText(commandToKeys("call dict.dict2.dict3.sayHi()"))
     assertExOutput("hi\n")
@@ -89,8 +89,8 @@ class AnonymousFunctionTest : VimTestCase() {
            function list.sayHi() |
              echo 'hi' |
            endfunction
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     assertPluginError(true)
     assertPluginErrorMessageContains("E1203: Dot can only be used on a dictionary")
@@ -110,8 +110,8 @@ class AnonymousFunctionTest : VimTestCase() {
                return -a:number |
              endif |
            endfunction
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     assertPluginError(true)
     assertPluginErrorMessageContains("E717: Dictionary entry already exists")
@@ -130,8 +130,8 @@ class AnonymousFunctionTest : VimTestCase() {
                return -a:number |
              endif |
            endfunction
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     typeText(commandToKeys("echo dict.abs(-10)"))
     assertExOutput("10\n")
@@ -151,8 +151,8 @@ class AnonymousFunctionTest : VimTestCase() {
                return -a:number |
              endif |
            endfunction
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     assertPluginError(true)
     assertPluginErrorMessageContains("E718: Funcref required")

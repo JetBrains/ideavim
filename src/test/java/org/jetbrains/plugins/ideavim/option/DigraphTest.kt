@@ -38,7 +38,8 @@ class DigraphTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.INSERT,
+      VimStateMachine.SubMode.NONE,
     ) {
       enterCommand("set digraph")
     }
@@ -64,7 +65,8 @@ class DigraphTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.INSERT,
+      VimStateMachine.SubMode.NONE,
     ) {
       enterCommand("set digraph")
     }
@@ -90,7 +92,8 @@ class DigraphTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.INSERT,
+      VimStateMachine.SubMode.NONE,
     ) {
       enterCommand("set digraph")
     }
@@ -116,7 +119,8 @@ class DigraphTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.INSERT,
+      VimStateMachine.SubMode.NONE,
     ) {
       enterCommand("set digraph")
     }

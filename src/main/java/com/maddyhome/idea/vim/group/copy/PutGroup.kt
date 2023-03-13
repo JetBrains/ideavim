@@ -88,7 +88,7 @@ internal class PutGroup : VimPutBase() {
           IjVimCaret(caret),
           text.typeInRegister,
           data,
-          additionalData
+          additionalData,
         ).first()
       val pointMarker = editor.document.createRangeMarker(startOffset, startOffset)
       caret.moveToInlayAwareOffset(startOffset)
@@ -102,7 +102,7 @@ internal class PutGroup : VimPutBase() {
     logger.debug { "Transferable classes: ${text.transferableData.joinToString { it.javaClass.name }}" }
     val origContent: TextBlockTransferable = injector.clipboardManager.setClipboardText(
       text.text,
-      transferableData = text.transferableData
+      transferableData = text.transferableData,
     ) as TextBlockTransferable
     val allContentsAfter = CopyPasteManager.getInstance().allContents
     val sizeAfterInsert = allContentsAfter.size
@@ -125,13 +125,17 @@ internal class PutGroup : VimPutBase() {
       if (!caret.isValid) return@forEach
 
       val caretPossibleEndOffset = lastPastedRegion?.endOffset ?: (startOffset + text.text.length)
-      val endOffset = if (data.indent) doIndent(
-        vimEditor,
-        IjVimCaret(caret),
-        vimContext,
-        startOffset,
+      val endOffset = if (data.indent) {
+        doIndent(
+          vimEditor,
+          IjVimCaret(caret),
+          vimContext,
+          startOffset,
+          caretPossibleEndOffset,
+        )
+      } else {
         caretPossibleEndOffset
-      ) else caretPossibleEndOffset
+      }
       val vimCaret = caret.vim
       injector.markService.setChangeMarks(vimCaret, TextRange(startOffset, endOffset))
       injector.markService.setMark(vimCaret, MARK_CHANGE_POS, startOffset)
@@ -142,7 +146,7 @@ internal class PutGroup : VimPutBase() {
         endOffset,
         text.typeInRegister,
         subMode,
-        data.caretAfterInsertedText
+        data.caretAfterInsertedText,
       )
     }
   }
@@ -166,7 +170,7 @@ internal class PutGroup : VimPutBase() {
       editor,
       caret,
       context,
-      TextRange(startLineOffset, endLineOffset)
+      TextRange(startLineOffset, endLineOffset),
     )
     return editor.getLineEndOffset(endLine, true)
   }

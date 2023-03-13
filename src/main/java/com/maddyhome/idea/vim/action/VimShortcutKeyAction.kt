@@ -73,7 +73,7 @@ internal class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatib
         KeyHandler.getInstance().handleKey(
           editor.vim,
           keyStroke,
-          injector.executionContextManager.onEditor(editor.vim, e.dataContext.vim)
+          injector.executionContextManager.onEditor(editor.vim, e.dataContext.vim),
         )
         if (start != null) {
           val duration = System.currentTimeMillis() - start
@@ -241,7 +241,7 @@ internal class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatib
     init {
       VimPlugin.getOptionGroup().addListener(
         IjOptionConstants.lookupkeys,
-        { parsedLookupKeys = parseLookupKeys() }
+        { parsedLookupKeys = parseLookupKeys() },
       )
     }
 
@@ -271,8 +271,8 @@ internal class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatib
             0,
             InputEvent.CTRL_DOWN_MASK,
             InputEvent.SHIFT_DOWN_MASK,
-            InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK
-          )
+            InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK,
+          ),
         )
         .addAll(
           getKeyStrokes(
@@ -280,8 +280,8 @@ internal class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatib
             0,
             InputEvent.CTRL_DOWN_MASK,
             InputEvent.SHIFT_DOWN_MASK,
-            InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK
-          )
+            InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK,
+          ),
         )
         .addAll(
           getKeyStrokes(
@@ -289,8 +289,8 @@ internal class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatib
             0,
             InputEvent.CTRL_DOWN_MASK,
             InputEvent.SHIFT_DOWN_MASK,
-            InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK
-          )
+            InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK,
+          ),
         )
         .addAll(
           getKeyStrokes(
@@ -298,24 +298,24 @@ internal class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatib
             0,
             InputEvent.CTRL_DOWN_MASK,
             InputEvent.SHIFT_DOWN_MASK,
-            InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK
-          )
+            InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK,
+          ),
         )
         .addAll(
           getKeyStrokes(
             KeyEvent.VK_PAGE_UP,
             0,
             InputEvent.SHIFT_DOWN_MASK,
-            InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK
-          )
+            InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK,
+          ),
         )
         .addAll(
           getKeyStrokes(
             KeyEvent.VK_PAGE_DOWN,
             0,
             InputEvent.SHIFT_DOWN_MASK,
-            InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK
-          )
+            InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK,
+          ),
         ).build()
 
     private const val ACTION_ID = "VimShortcutKeyAction"

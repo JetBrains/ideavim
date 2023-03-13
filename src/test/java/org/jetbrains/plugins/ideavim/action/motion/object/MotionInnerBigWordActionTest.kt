@@ -27,7 +27,8 @@ class MotionInnerBigWordActionTest : VimTestCase() {
           where it was settled on some sodden sand
           hard by the torrent of a mountain$c 
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 }

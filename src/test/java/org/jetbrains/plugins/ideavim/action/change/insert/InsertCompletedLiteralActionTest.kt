@@ -23,23 +23,28 @@ class InsertCompletedLiteralActionTest : VimTestCase() {
   companion object {
     @JvmStatic
     val octalPrefix = listOf("o", "O")
-      @DataPoints("octalPrefix") get
+      @DataPoints("octalPrefix")
+      get
 
     @JvmStatic
     val shortHexPrefix = listOf("x", "X")
-      @DataPoints("shortHexPrefix") get
+      @DataPoints("shortHexPrefix")
+      get
 
     @JvmStatic
     val hexPrefix = listOf("u")
-      @DataPoints("hexPrefix") get
+      @DataPoints("hexPrefix")
+      get
 
     @JvmStatic
     val longHexPrefix = listOf("U")
-      @DataPoints("longHexPrefix") get
+      @DataPoints("longHexPrefix")
+      get
 
     @JvmStatic
     val insertDigraph = listOf("<C-v>", "<C-q>")
-      @DataPoints("insertDigraph") get
+      @DataPoints("insertDigraph")
+      get
   }
 
   private fun checkInsert(code: String, result: String) {

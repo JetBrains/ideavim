@@ -19,7 +19,7 @@ class MotionOuterSentenceActionTest : VimTestCase() {
         all rocks and lavender and tufted grass,
         where it was settled on some sodden sand
         $c
-    """
+    """,
   )
   fun `test on empty last line`() {
     doTest(
@@ -36,7 +36,8 @@ class MotionOuterSentenceActionTest : VimTestCase() {
         where it was settled on some sodden sand
         
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -46,7 +47,7 @@ class MotionOuterSentenceActionTest : VimTestCase() {
         all rocks and lavender and tufted grass,
         where it was settled on some sodden sand
         $c
-    """
+    """,
   )
   fun `test delete on empty last line`() {
     doTest(
@@ -58,7 +59,8 @@ class MotionOuterSentenceActionTest : VimTestCase() {
         $c
       """.trimIndent(),
       "\n",
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 }

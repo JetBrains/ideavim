@@ -41,7 +41,7 @@ class NonVimVisualChangeTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
     VimListenerManager.EditorListeners.add(myFixture.editor)
     typeText(injector.parser.parseKeys("i"))
@@ -59,7 +59,7 @@ class NonVimVisualChangeTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.INSERT)
   }
@@ -74,7 +74,7 @@ class NonVimVisualChangeTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
     VimListenerManager.EditorListeners.add(myFixture.editor)
     typeText(injector.parser.parseKeys("i"))
@@ -97,7 +97,7 @@ class NonVimVisualChangeTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
     VimListenerManager.EditorListeners.add(myFixture.editor)
     typeText(injector.parser.parseKeys("i"))

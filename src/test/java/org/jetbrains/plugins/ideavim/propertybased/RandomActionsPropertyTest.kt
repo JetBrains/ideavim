@@ -114,5 +114,5 @@ private val stinkyKeysList = arrayListOf(
   "<C-]>",
 
   // Next / previous method fails because of vfs sync
-  "]"
+  "]",
 )

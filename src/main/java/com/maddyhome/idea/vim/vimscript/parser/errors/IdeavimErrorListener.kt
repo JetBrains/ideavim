@@ -27,7 +27,7 @@ internal class IdeavimErrorListener : BaseErrorListener() {
     line: Int,
     charPositionInLine: Int,
     msg: String?,
-    e: RecognitionException?
+    e: RecognitionException?,
   ) {
     VimscriptParser.linesWithErrors.add(line)
     val message = "line $line:$charPositionInLine $msg"

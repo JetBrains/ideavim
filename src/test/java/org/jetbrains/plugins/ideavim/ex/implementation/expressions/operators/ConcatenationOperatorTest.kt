@@ -25,10 +25,13 @@ class ConcatenationOperatorTest {
   companion object {
     @JvmStatic
     val operator = listOf(".", "..")
-      @DataPoints("operator") get
+      @DataPoints("operator")
+      get
+
     @JvmStatic
     val spaces = listOf("", " ")
-      @DataPoints("spaces") get
+      @DataPoints("spaces")
+      get
   }
 
   @Theory
@@ -68,7 +71,7 @@ class ConcatenationOperatorTest {
   fun `string and string`(@FromDataPoints("operator") operator: String, @FromDataPoints("spaces") sp1: String, @FromDataPoints("spaces") sp2: String) {
     assertEquals(
       VimString("stringtext"),
-      VimscriptParser.parseExpression("'string'$sp1$operator$sp2'text'")!!.evaluate()
+      VimscriptParser.parseExpression("'string'$sp1$operator$sp2'text'")!!.evaluate(),
     )
   }
 
@@ -76,7 +79,7 @@ class ConcatenationOperatorTest {
   fun `string and integer`(@FromDataPoints("operator") operator: String, @FromDataPoints("spaces") sp1: String, @FromDataPoints("spaces") sp2: String) {
     assertEquals(
       VimString("string3"),
-      VimscriptParser.parseExpression("'string'$sp1$operator${sp2}3")!!.evaluate()
+      VimscriptParser.parseExpression("'string'$sp1$operator${sp2}3")!!.evaluate(),
     )
   }
 

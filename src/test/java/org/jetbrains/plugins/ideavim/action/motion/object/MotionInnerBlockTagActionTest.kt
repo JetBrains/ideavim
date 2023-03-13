@@ -376,7 +376,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     configureByText(
       "<t>Outer\n" +
         "   <t>${c}Inner</t>\n" +
-        "</t>\n"
+        "</t>\n",
     )
     typeText(injector.parser.parseKeys("vit"))
     assertSelection("Inner")
@@ -386,7 +386,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     configureByText(
       "<o>Outer\n" +
         " $c  <t></t>\n" +
-        "</o>\n"
+        "</o>\n",
     )
     typeText(injector.parser.parseKeys("vitit"))
     assertSelection("<t></t>")
@@ -402,7 +402,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     configureByText(
       "<t>Outer\n" +
         "   <t>Inner</t> $c <t>Inner</t>\n" +
-        "</t>\n"
+        "</t>\n",
     )
     typeText(injector.parser.parseKeys("vit"))
     assertSelection("Outer\n" + "   <t>Inner</t>  <t>Inner</t>")
@@ -412,7 +412,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     configureByText(
       "<t>Outer\n" +
         "   <t>${c}Inner</t>\n" +
-        "</t>\n"
+        "</t>\n",
     )
     typeText(injector.parser.parseKeys("v2it"))
     assertSelection("Outer\n" + "   <t>Inner</t>")
@@ -422,7 +422,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     configureByText(
       "<o>Outer\n" +
         "   <t>${c}Inner</t>\n" +
-        "</o>\n"
+        "</o>\n",
     )
     typeText(injector.parser.parseKeys("vitit"))
     assertSelection("<t>Inner</t>")
@@ -432,7 +432,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     configureByText(
       "<t>Outer\n" +
         "   <t>${c}Inner</t>\n" +
-        "</t>\n"
+        "</t>\n",
     )
     typeText(injector.parser.parseKeys("vititit"))
     assertSelection("Outer\n" + "   <t>Inner</t>")
@@ -442,7 +442,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     configureByText(
       "<t>Outer\n" +
         "   <t>Inner</t>\n" +
-        "</${c}t>\n"
+        "</${c}t>\n",
     )
     typeText(injector.parser.parseKeys("vit"))
     assertSelection("Outer\n" + "   <t>Inner</t>")
@@ -452,7 +452,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     configureByText(
       "<${c}t>Outer\n" +
         "   <t>Inner</t>\n" +
-        "</t>\n"
+        "</t>\n",
     )
     typeText(injector.parser.parseKeys("vit"))
     assertSelection("Outer\n" + "   <t>Inner</t>")
@@ -462,7 +462,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     configureByText(
       "$c<t>Outer\n" +
         "   <t>Inner</t>\n" +
-        "</t>\n"
+        "</t>\n",
     )
     typeText(injector.parser.parseKeys("vit"))
     assertSelection("Outer\n" + "   <t>Inner</t>")
@@ -472,7 +472,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     configureByText(
       "<o>Outer\n" +
         " $c  <t></t>\n" +
-        "</o>\n"
+        "</o>\n",
     )
     typeText(injector.parser.parseKeys("vit"))
     assertSelection("<")

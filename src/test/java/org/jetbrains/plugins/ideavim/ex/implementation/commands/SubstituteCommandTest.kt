@@ -35,7 +35,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
       """
         |bbaba
         |ab
-      """.trimMargin()
+      """.trimMargin(),
     )
   }
 
@@ -51,7 +51,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
       """
         |bbbbb
         |ab
-      """.trimMargin()
+      """.trimMargin(),
     )
   }
 
@@ -67,7 +67,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
       """
         |bbbbb
         |bb
-      """.trimMargin()
+      """.trimMargin(),
     )
   }
 
@@ -84,7 +84,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
       """
         |one'
         |two
-      """.trimMargin()
+      """.trimMargin(),
     )
   }
 
@@ -100,7 +100,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
       """
         |'one
         |two
-      """.trimMargin()
+      """.trimMargin(),
     )
   }
 
@@ -110,7 +110,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
     doTest(
       exCommand("s/\\./\\n/g"),
       "${c}one.two.three\n",
-      "one\u0000two\u0000three\n"
+      "one\u0000two\u0000three\n",
     )
   }
 
@@ -121,7 +121,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
     doTest(
       exCommand("s/\\(a\\|b\\)/z\\1/g"),
       "${c}abcdefg",
-      "zazbcdefg"
+      "zazbcdefg",
     )
   }
 
@@ -131,7 +131,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
     doTest(
       exCommand("s/\\./\\r/g"),
       "${c}one.two.three\n",
-      "one\ntwo\nthree\n"
+      "one\ntwo\nthree\n",
     )
   }
 
@@ -142,7 +142,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
     doTest(
       exCommand("s/\\./\\r\\./g"),
       "${c}one.two.three\n",
-      "one\n.two\n.three\n"
+      "one\n.two\n.three\n",
     )
   }
 
@@ -167,7 +167,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
         
         
         
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -192,7 +192,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
         three
         
         
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -203,7 +203,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
     doTest(
       exCommand("%s/foo/bar/g"),
       "foo Foo foo\nFoo FOO foo",
-      "bar bar bar\nbar bar bar"
+      "bar bar bar\nbar bar bar",
     )
   }
 
@@ -214,14 +214,14 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
     doTest(
       exCommand("%s/foo/bar/g"),
       "foo Foo foo\nFoo FOO foo",
-      "bar Foo bar\nFoo FOO bar"
+      "bar Foo bar\nFoo FOO bar",
     ) {
       enterCommand("set smartcase")
     }
     doTest(
       exCommand("%s/Foo/bar/g"),
       "foo Foo foo\nFoo FOO foo",
-      "foo bar foo\nbar FOO foo"
+      "foo bar foo\nbar FOO foo",
     ) {
       enterCommand("set smartcase")
     }
@@ -229,14 +229,14 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
     doTest(
       exCommand("%s/foo/bar/g"),
       "foo Foo foo\nFoo FOO foo",
-      "bar bar bar\nbar bar bar"
+      "bar bar bar\nbar bar bar",
     ) {
       enterCommand("set ignorecase")
     }
     doTest(
       exCommand("%s/Foo/bar/g"),
       "foo Foo foo\nFoo FOO foo",
-      "foo bar foo\nbar FOO foo"
+      "foo bar foo\nbar FOO foo",
     ) {
       enterCommand("set ignorecase")
     }
@@ -248,13 +248,13 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
     doTest(
       exCommand("%s/foo/bar/gi"),
       "foo Foo foo\nFoo FOO foo",
-      "bar bar bar\nbar bar bar"
+      "bar bar bar\nbar bar bar",
     )
 
     doTest(
       exCommand("%s/foo/bar/gi"),
       "foo Foo foo\nFoo FOO foo",
-      "bar bar bar\nbar bar bar"
+      "bar bar bar\nbar bar bar",
     ) {
       enterCommand("set ignorecase")
     }
@@ -262,7 +262,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
     doTest(
       exCommand("%s/foo/bar/gi"),
       "foo Foo foo\nFoo FOO foo",
-      "bar bar bar\nbar bar bar"
+      "bar bar bar\nbar bar bar",
     ) {
       enterCommand("set smartcase")
     }
@@ -274,21 +274,21 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
     doTest(
       exCommand("%s/foo/bar/gI"),
       "foo Foo foo\nFoo FOO foo",
-      "bar Foo bar\nFoo FOO bar"
+      "bar Foo bar\nFoo FOO bar",
     )
 
     enterCommand("set ignorecase")
     doTest(
       exCommand("%s/foo/bar/gI"),
       "foo Foo foo\nFoo FOO foo",
-      "bar Foo bar\nFoo FOO bar"
+      "bar Foo bar\nFoo FOO bar",
     )
 
     enterCommand("set smartcase")
     doTest(
       exCommand("%s/Foo/bar/gI"),
       "foo Foo foo\nFoo FOO foo",
-      "foo bar foo\nbar FOO foo"
+      "foo bar foo\nbar FOO foo",
     )
   }
 
@@ -307,7 +307,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
     doTest(
       exCommand(".,+2s/a/b/g"),
       "aaa\naa${c}a\naaa\naaa\naaa\n",
-      "aaa\nbbb\nbbb\nbbb\naaa\n"
+      "aaa\nbbb\nbbb\nbbb\naaa\n",
     )
   }
 
@@ -375,11 +375,13 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
       """I found it in a legendary land
         |${c}all rocks and lavender and tufted grass,
         |where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.""".trimMargin(),
+        |hard by the torrent of a mountain pass.
+      """.trimMargin(),
       """I found it in a legendary land
         |all rocks AND lavender AND tufted grass,
         |${c}where it was settled on some sodden sAND
-        |hard by the torrent of a mountain pass.""".trimMargin()
+        |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
   }
 
@@ -393,11 +395,13 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
       """I found it in a legendary land
         |${c}all rocks and lavender and tufted grass,
         |where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.""".trimMargin(),
+        |hard by the torrent of a mountain pass.
+      """.trimMargin(),
       """I found it in a legendary land
         |all rocks and lavender AND tufted grass,
         |${c}where it was settled on some sodden sAND
-        |hard by the torrent of a mountain pass.""".trimMargin()
+        |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
   }
 
@@ -411,11 +415,13 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
       """I found it in a legendary land
         |${c}all rocks and lavender and tufted grass,
         |where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.""".trimMargin(),
+        |hard by the torrent of a mountain pass.
+      """.trimMargin(),
       """I found it in a legendary lAND
         |${c}all rocks and lavender AND tufted grass,
         |where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.""".trimMargin()
+        |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
   }
 
@@ -429,11 +435,13 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
       """I found it in a legendary land
         |${c}all rocks and lavender and tufted grass,
         |where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.""".trimMargin(),
+        |hard by the torrent of a mountain pass.
+      """.trimMargin(),
       """I found it in a legendary lAND
         |all rocks and lavender ${c}and tufted grass,
         |where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.""".trimMargin()
+        |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
   }
 
@@ -444,7 +452,8 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
       """I found it in a legendary land
         |${c}all rocks and lavender and tufted grass,
         |where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.""".trimMargin()
+        |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
 
     enterCommand("%s/and/or/gc")
@@ -458,7 +467,8 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
       """I found it in a legendary land
         |${c}all rocks and lavender and tufted grass,
         |where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.""".trimMargin()
+        |hard by the torrent of a mountain pass.
+      """.trimMargin(),
     )
 
     typeText(exCommand("%s/and/or/gc"), "n")
@@ -474,7 +484,8 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
         |One
         |One
         |One
-        |One""".trimMargin()
+        |One
+      """.trimMargin(),
     )
 
     enterCommand(",+3s/One/Two/g")
@@ -484,7 +495,8 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
         |Two
         |Two
         |${c}Two
-        |One""".trimMargin()
+        |One
+      """.trimMargin(),
     )
   }
 
@@ -497,7 +509,8 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
         |One
         |One
         |One
-        |One""".trimMargin()
+        |One
+      """.trimMargin(),
     )
 
     enterCommand(",.+3s/One/Two/g") // todo empty left range!
@@ -507,7 +520,8 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
         |Two
         |Two
         |${c}Two
-        |One""".trimMargin()
+        |One
+      """.trimMargin(),
     )
   }
 
@@ -795,7 +809,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
     doTest(
       exCommand("s/'/\"/g"),
       "'quoted string'",
-      "\"quoted string\""
+      "\"quoted string\"",
     )
   }
 
@@ -806,7 +820,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
     doTest(
       exCommand("%s/|/\\&"),
       "true | true = true",
-      "true & true = true"
+      "true & true = true",
     )
   }
 
@@ -818,7 +832,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
     doTest(
       exCommand("s_1_2"),
       "1 + 2 = 4",
-      "2 + 2 = 4"
+      "2 + 2 = 4",
     )
   }
 
@@ -830,7 +844,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
       val s1 = "oh"
       val s2 = "hi"
       val s3 = "Mark"
-      """.trimIndent()
+      """.trimIndent(),
     )
     enterCommand("%s/\\d/\\=21*2")
     assertState(
@@ -838,7 +852,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
       val s42 = "oh"
       val s42 = "hi"
       val s42 = "Mark"
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -850,7 +864,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
       0. Milk (1 l.)
       0. Bread
       0. Coke (2 l.)
-      """.trimIndent()
+      """.trimIndent(),
     )
     enterCommand("%s/\\d\\+/\\=line('.')")
     assertState(
@@ -858,7 +872,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
       1. Milk (1 l.)
       2. Bread
       3. Coke (2 l.)
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -869,14 +883,14 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
       """
       val ch1 = tree.getChild(0)
       ${c}val ch1 = tree.getChild(0)
-      """.trimIndent()
+      """.trimIndent(),
     )
     enterCommand("s/\\d\\+/\\=submatch(0)+1/g")
     assertState(
       """
       val ch1 = tree.getChild(0)
       val ch2 = tree.getChild(1)
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -889,14 +903,14 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
       val ch1 = tree.getChild(0)
       val ch1 = tree.getChild(0)
       val ch1 = tree.getChild(0)
-      """.trimIndent()
+      """.trimIndent(),
     )
     injector.vimscriptExecutor.execute(
       """
       function! IncrementWholeLine() range|
         execute ":" .. a:firstline .. "," .. a:lastline .. "s/\\d\\+/\\=submatch(0)+line('.')-a:firstline+1/g"|
       endfunction
-      """.trimIndent()
+      """.trimIndent(),
     )
     enterCommand("2,4call IncrementWholeLine()")
     assertState(
@@ -905,7 +919,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
       val ch2 = tree.getChild(1)
       val ch3 = tree.getChild(2)
       val ch4 = tree.getChild(3)
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -920,7 +934,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
       16136
       16140
       val str2 = "second"
-      """.trimIndent()
+      """.trimIndent(),
     )
     enterCommand("%s/\\d\\+/\\=printf('0x%04x', submatch(0))")
     assertPluginError(true)
@@ -933,7 +947,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
       
       
       val str = "second"
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -948,7 +962,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
       16136
       16140
       val str2 = "second"
-      """.trimIndent()
+      """.trimIndent(),
     )
     enterCommand("%s/\\d\\+/\\=*&(")
     assertPluginError(true)
@@ -961,7 +975,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
       
       
       val str = "second"
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -972,7 +986,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
     doTest(
       exCommand("%s/[*/]//g"),
       "/* comment */",
-      " comment "
+      " comment ",
     )
   }
 }

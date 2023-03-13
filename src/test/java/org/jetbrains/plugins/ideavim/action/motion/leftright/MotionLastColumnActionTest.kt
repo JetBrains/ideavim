@@ -98,7 +98,7 @@ class MotionLastColumnActionTest : VimTestCase() {
           all rocks and lavender and tu${c}fted grass,[ additional symbols]
           where it was settled on some sodden sand
           hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -110,7 +110,7 @@ class MotionLastColumnActionTest : VimTestCase() {
             al${s}l rocks and lavender and tufted grass${c},${se}[ additional symbols]
             wh${s}ere it was settled on some sodden san${c}d${se}
             hard by the torrent of a mountain pass.
-    """
+    """,
   )
   fun `test dollar motion in visual block mode with left motion`() {
     val keys = "<C-V>jj\$h"

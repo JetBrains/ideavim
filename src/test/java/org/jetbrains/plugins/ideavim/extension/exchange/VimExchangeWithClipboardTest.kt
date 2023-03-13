@@ -34,7 +34,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
       "The quick ${c}brown fox catch over the lazy dog",
       "The quick fox ${c}brown catch over the lazy dog",
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -46,7 +46,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
       "The quick ${c}brown fox catch over the lazy dog",
       "The quick fox ${c}brown catch over the lazy dog",
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -58,7 +58,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
       "The quick brown ${c}fox catch over the lazy dog",
       "The quick ${c}fox brown catch over the lazy dog",
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -70,7 +70,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
       "The quick brown ${c}fox catch over the lazy dog",
       "The quick ${c}fox brown catch over the lazy dog",
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -82,7 +82,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
       "The quick ${c}brown fox catch over the lazy dog",
       "The quick fox ${c}brown catch over the lazy dog",
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -90,7 +90,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
   @VimOptionTestConfiguration(VimTestOption(OptionConstants.clipboard, OptionValueType.STRING, "unnamed"))
   @VimBehaviorDiffers(
     originalVimAfter = "The ${c}brown catch over the lazy dog",
-    shouldBeFixed = true
+    shouldBeFixed = true,
   )
   fun `test visual exchange words from inside`() {
     doTest(
@@ -98,7 +98,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
       "The quick ${c}brown fox catch over the lazy dog",
       "The brow${c}n catch over the lazy dog",
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -106,7 +106,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
   @VimOptionTestConfiguration(VimTestOption(OptionConstants.clipboard, OptionValueType.STRING, "unnamed"))
   @VimBehaviorDiffers(
     originalVimAfter = "The brown ${c}catch over the lazy dog",
-    shouldBeFixed = true
+    shouldBeFixed = true,
   )
   fun `test visual exchange words from outside`() {
     doTest(
@@ -114,7 +114,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
       "The ${c}quick brown fox catch over the lazy dog",
       "The brow${c}n catch over the lazy dog",
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -127,7 +127,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
        ${c}brown fox
        the lazy dog
        """,
-    shouldBeFixed = true
+    shouldBeFixed = true,
   )
   fun `test exchange lines top down`() {
     doTest(
@@ -143,7 +143,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
          the lazy dog
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -156,7 +156,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
        ${c}brown fox
        the lazy dog
        """,
-    shouldBeFixed = true
+    shouldBeFixed = true,
   )
   fun `test exchange lines top down with dot`() {
     doTest(
@@ -172,7 +172,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
          the lazy dog
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -183,7 +183,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
          brown thecatch over
          fox
           lazy dog
-    """
+    """,
   )
   fun `test exchange to the line end`() {
     doTest(
@@ -199,7 +199,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
          fox lazy dog
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -212,7 +212,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
          ${c}The quick
          brown fox
       """,
-    shouldBeFixed = true
+    shouldBeFixed = true,
   )
   fun `test exchange visual lines`() {
     doTest(
@@ -231,7 +231,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
          
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -326,8 +326,8 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
         buildString {
           append("v\$")
           append("X")
-        }
-      )
+        },
+      ),
     )
 
     assertHighlighter(16, 19, HighlighterTargetArea.EXACT_RANGE)
@@ -349,8 +349,8 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
         buildString {
           append("v\$")
           append("X")
-        }
-      )
+        },
+      ),
     )
 
     assertHighlighter(16, 20, HighlighterTargetArea.EXACT_RANGE)

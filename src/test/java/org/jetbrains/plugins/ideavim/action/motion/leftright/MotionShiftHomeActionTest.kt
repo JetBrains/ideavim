@@ -54,7 +54,7 @@ class MotionShiftHomeActionTest : VimOptionTestCase(OptionConstants.keymodel, Op
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, OptionConstants.keymodel_startsel),
-    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, "")
+    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""),
   )
   fun `test start visual`() {
     val keys = listOf("<S-Home>")
@@ -80,7 +80,7 @@ class MotionShiftHomeActionTest : VimOptionTestCase(OptionConstants.keymodel, Op
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, OptionConstants.keymodel_startsel),
-    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, OptionConstants.selectmode_key)
+    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, OptionConstants.selectmode_key),
   )
   fun `test start select`() {
     val keys = listOf("<S-Home>")
@@ -105,7 +105,7 @@ class MotionShiftHomeActionTest : VimOptionTestCase(OptionConstants.keymodel, Op
 
   @VimOptionTestConfiguration(
     VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, ""),
-    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, "")
+    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""),
   )
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test continue visual`() {
@@ -135,7 +135,7 @@ class MotionShiftHomeActionTest : VimOptionTestCase(OptionConstants.keymodel, Op
 
   @VimOptionTestConfiguration(
     VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, ""),
-    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, "")
+    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""),
   )
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test continue select`() {

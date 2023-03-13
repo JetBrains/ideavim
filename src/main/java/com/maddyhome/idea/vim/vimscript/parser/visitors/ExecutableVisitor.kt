@@ -101,8 +101,8 @@ internal object ExecutableVisitor : VimscriptBaseVisitor<Executable>() {
       catchBlocks.add(
         CatchBlock(
           catchBlock.pattern()?.patternBody()?.text ?: ".",
-          catchBlock.blockMember().mapNotNull { visitBlockMember(it) }
-        )
+          catchBlock.blockMember().mapNotNull { visitBlockMember(it) },
+        ),
       )
     }
     var finallyBlock: FinallyBlock? = null
@@ -126,19 +126,19 @@ internal object ExecutableVisitor : VimscriptBaseVisitor<Executable>() {
     val conditionToBody: MutableList<Pair<Expression, List<Executable>>> = mutableListOf()
     conditionToBody.add(
       ExpressionVisitor.visit(ctx.ifBlock().expr()) to ctx.ifBlock().blockMember()
-        .mapNotNull { visitBlockMember(it) }
+        .mapNotNull { visitBlockMember(it) },
     )
     if (ctx.elifBlock() != null) {
       conditionToBody.addAll(
         ctx.elifBlock().map {
           ExpressionVisitor.visit(it.expr()) to it.blockMember().mapNotNull { it2 -> visitBlockMember(it2) }
-        }
+        },
       )
     }
     if (ctx.elseBlock() != null) {
       conditionToBody.add(
         SimpleExpression(1) to ctx.elseBlock().blockMember()
-          .mapNotNull { visitBlockMember(it) }
+          .mapNotNull { visitBlockMember(it) },
       )
     }
     return IfStatement(conditionToBody)

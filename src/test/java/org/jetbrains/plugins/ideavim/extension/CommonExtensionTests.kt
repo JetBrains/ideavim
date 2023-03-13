@@ -63,7 +63,7 @@ class OpMappingTest : VimTestCase() {
       "${c}I found it in a legendary land",
       "${c}nd it in a legendary land",
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -73,7 +73,7 @@ class OpMappingTest : VimTestCase() {
       "I found ${c}it in a legendary land",
       "I f${c}it in a legendary land",
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -83,7 +83,7 @@ class OpMappingTest : VimTestCase() {
       "${c}I found it in a legendary land",
       "${c}d it in a legendary land",
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -105,7 +105,7 @@ class OpMappingTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -241,7 +241,7 @@ class PlugMissingKeysTest : VimTestCase() {
   fun `test missing keys`() {
     executeLikeVimrc(
       "map myKey <Plug>TestMissing",
-      "Plug 'MyTest'"
+      "Plug 'MyTest'",
     )
 
     val keyMappings = VimPlugin.getKey().getMapTo(MappingMode.NORMAL, injector.parser.parseKeys("<Plug>TestMissing"))
@@ -256,7 +256,7 @@ class PlugMissingKeysTest : VimTestCase() {
   fun `test missing keys enable plugin first`() {
     executeLikeVimrc(
       "Plug 'MyTest'",
-      "map myKey <Plug>TestMissing"
+      "map myKey <Plug>TestMissing",
     )
 
     val keyMappings = VimPlugin.getKey().getMapTo(MappingMode.NORMAL, injector.parser.parseKeys("<Plug>TestMissing"))
@@ -305,14 +305,14 @@ private class TestExtension : VimExtension {
       injector.parser.parseKeys("<Plug>TestExtensionEmulateInclusive"),
       owner,
       MoveEmulateInclusive(),
-      false
+      false,
     )
     putExtensionHandlerMapping(
       MappingMode.O,
       injector.parser.parseKeys("<Plug>TestExtensionBackwardsCharacter"),
       owner,
       MoveBackwards(),
-      false
+      false,
     )
     putExtensionHandlerMapping(MappingMode.O, injector.parser.parseKeys("<Plug>TestExtensionCharacter"), owner, Move(), false)
     putExtensionHandlerMapping(MappingMode.O, injector.parser.parseKeys("<Plug>TestExtensionLinewise"), owner, MoveLinewise(), false)

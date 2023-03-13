@@ -23,7 +23,7 @@ class MarkCommandTest : VimTestCase() {
                          |all rocks and lavender and tufted grass,
                          |where it$c was settled on some sodden sand
                          |hard by the torrent of a mountain pass.
-                       """.trimMargin()
+      """.trimMargin(),
     )
     typeText(commandToKeys("mark a"))
     val vimEditor = myFixture.editor.vim
@@ -39,7 +39,7 @@ class MarkCommandTest : VimTestCase() {
                          |all rocks and lavender and tufted grass,
                          |where it$c was settled on some sodden sand
                          |hard by the torrent of a mountain pass.
-                       """.trimMargin()
+      """.trimMargin(),
     )
     typeText(commandToKeys("mark G"))
     val vimEditor = myFixture.editor.vim
@@ -55,7 +55,7 @@ class MarkCommandTest : VimTestCase() {
                          |all rocks and lavender and tufted grass,
                          |where it$c was settled on some sodden sand
                          |hard by the torrent of a mountain pass.
-                       """.trimMargin()
+      """.trimMargin(),
     )
     typeText(commandToKeys("k a"))
     val vimEditor = myFixture.editor.vim
@@ -71,7 +71,7 @@ class MarkCommandTest : VimTestCase() {
                          |all rocks and lavender and tufted grass,
                          |where it$c was settled on some sodden sand
                          |hard by the torrent of a mountain pass.
-                       """.trimMargin()
+      """.trimMargin(),
     )
     typeText(commandToKeys("1,2 mark a"))
     val vimEditor = myFixture.editor.vim

@@ -29,14 +29,14 @@ class RepeatActionTest : VimTestCase() {
       "The first line.\n" +
         "This is the second line.\n" +
         "Third line here, with a comma.\n" +
-        "Last line."
+        "Last line.",
     )
     typeText(injector.parser.parseKeys("j" + "ct." + "Change the line to point" + "<Esc>" + "j0" + "."))
     assertState(
       "The first line.\n" +
         "Change the line to point.\n" +
         "Change the line to point.\n" +
-        "Last line."
+        "Last line.",
     )
   }
 
@@ -57,14 +57,14 @@ class RepeatActionTest : VimTestCase() {
       "There is a red house.\n" +
         "Another red house there.\n" +
         "They have red windows.\n" +
-        "Good."
+        "Good.",
     )
     typeText(injector.parser.parseKeys("www" + "<C-V>ec" + "blue" + "<Esc>" + "j0w." + "j0ww."))
     assertState(
       "There is a blue house.\n" +
         "Another blue house there.\n" +
         "They have blue windows.\n" +
-        "Good."
+        "Good.",
     )
   }
 }

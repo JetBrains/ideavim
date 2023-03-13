@@ -27,7 +27,8 @@ class InsertDeleteInsertedTextActionTest : VimTestCase() {
 
             I found iti${c}t in a legendary land
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -46,7 +47,8 @@ class InsertDeleteInsertedTextActionTest : VimTestCase() {
 
             I found ii${c}ta legendary land
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 }

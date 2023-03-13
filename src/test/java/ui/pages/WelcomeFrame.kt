@@ -29,8 +29,8 @@ class WelcomeFrame(remoteRobot: RemoteRobot, remoteComponent: RemoteComponent) :
     get() = actionLink(
       byXpath(
         "New Project",
-        "//div[(@class='MainButton' and @text='New Project') or (@accessiblename='New Project' and @class='JButton')]"
-      )
+        "//div[(@class='MainButton' and @text='New Project') or (@accessiblename='New Project' and @class='JButton')]",
+      ),
     )
 
   @Suppress("unused")

@@ -60,7 +60,7 @@ fun RemoteText.moveMouseInGutterTo(goal: RemoteText, fixture: Fixture) {
     robot.pressMouseWhileRunning(MouseButton.LEFT_BUTTON, () => {
       robot.moveMouse(component, point)
     })
-    """
+    """,
   )
 }
 
@@ -74,7 +74,7 @@ fun Point.moveMouseTo(point: Point, fixture: Fixture) {
     robot.pressMouseWhileRunning(MouseButton.LEFT_BUTTON, () => {
       robot.moveMouse(component, point)
     })
-    """
+    """,
   )
 }
 
@@ -91,7 +91,7 @@ fun RemoteText.moveMouseForthAndBack(middle: RemoteText, editor: Editor) {
       robot.moveMouse(component, point)
       robot.moveMouse(component, initialPoint)
     })
-    """
+    """,
   )
 //  waitFor { editor.isBlockCursor }
 }
@@ -106,6 +106,6 @@ fun RemoteRobot.invokeActionJs(actionId: String) {
             const action = actionManager.getAction(actionId);
             actionManager.tryToExecute(action, com.intellij.openapi.ui.playback.commands.ActionCommand.getInputEvent(actionId), null, null, true);
         """,
-    runInEdt = true
+    runInEdt = true,
   )
 }

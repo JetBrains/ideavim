@@ -43,7 +43,8 @@ class MotionArrowDownActionTest : VimOptionTestCase(OptionConstants.keymodel, Op
                 wher${c}e${se} it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER
+      VimStateMachine.Mode.VISUAL,
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
     )
   }
 
@@ -52,8 +53,8 @@ class MotionArrowDownActionTest : VimOptionTestCase(OptionConstants.keymodel, Op
     VimTestOption(
       OptionConstants.keymodel,
       OptionValueType.STRING,
-      OptionConstants.keymodel_stopsel
-    )
+      OptionConstants.keymodel_stopsel,
+    ),
   )
   @VimOptionDefault(OptionConstants.virtualedit)
   fun `test visual stopsel`() {
@@ -74,7 +75,7 @@ class MotionArrowDownActionTest : VimOptionTestCase(OptionConstants.keymodel, Op
                 all rocks and lavender and tufted grass,
                 wher${c}e it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -83,8 +84,8 @@ class MotionArrowDownActionTest : VimOptionTestCase(OptionConstants.keymodel, Op
     VimTestOption(
       OptionConstants.keymodel,
       OptionValueType.STRING,
-      OptionConstants.keymodel_stopselect
-    )
+      OptionConstants.keymodel_stopselect,
+    ),
   )
   @VimOptionDefault(OptionConstants.virtualedit)
   fun `test visual stopselect`() {
@@ -106,7 +107,8 @@ class MotionArrowDownActionTest : VimOptionTestCase(OptionConstants.keymodel, Op
                 wher${c}e${se} it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-      VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER
+      VimStateMachine.Mode.VISUAL,
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
     )
   }
 
@@ -115,8 +117,8 @@ class MotionArrowDownActionTest : VimOptionTestCase(OptionConstants.keymodel, Op
     VimTestOption(
       OptionConstants.keymodel,
       OptionValueType.STRING,
-      OptionConstants.keymodel_stopvisual
-    )
+      OptionConstants.keymodel_stopvisual,
+    ),
   )
   @VimOptionDefault(OptionConstants.virtualedit)
   fun `test visual stopvisual`() {
@@ -137,7 +139,7 @@ class MotionArrowDownActionTest : VimOptionTestCase(OptionConstants.keymodel, Op
                 all rocks and lavender and tufted grass,
                 wher${c}e it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -146,8 +148,8 @@ class MotionArrowDownActionTest : VimOptionTestCase(OptionConstants.keymodel, Op
     VimTestOption(
       OptionConstants.keymodel,
       OptionValueType.STRING,
-      OptionConstants.keymodel_stopvisual
-    )
+      OptionConstants.keymodel_stopvisual,
+    ),
   )
   @VimOptionDefault(OptionConstants.virtualedit)
   fun `test visual stopvisual multicaret`() {
@@ -168,7 +170,7 @@ class MotionArrowDownActionTest : VimOptionTestCase(OptionConstants.keymodel, Op
                 all rocks and lavender and tufted grass,
                 wher${c}e it was settled on some sodden sand
                 hard by the t${c}orrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -195,14 +197,14 @@ class MotionArrowDownActionTest : VimOptionTestCase(OptionConstants.keymodel, Op
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_CHARACTER
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, ""),
-    VimTestOption(OptionConstants.virtualedit, OptionValueType.STRING, OptionConstants.virtualedit_onemore)
+    VimTestOption(OptionConstants.virtualedit, OptionValueType.STRING, OptionConstants.virtualedit_onemore),
   )
   fun `test virtual edit down to shorter line`() {
     doTest(
@@ -214,14 +216,14 @@ class MotionArrowDownActionTest : VimOptionTestCase(OptionConstants.keymodel, Op
       """
             class MyClass {
             }${c}
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, ""),
-    VimTestOption(OptionConstants.virtualedit, OptionValueType.STRING, OptionConstants.virtualedit_onemore)
+    VimTestOption(OptionConstants.virtualedit, OptionValueType.STRING, OptionConstants.virtualedit_onemore),
   )
   fun `test virtual edit down to shorter line after dollar`() {
     doTest(
@@ -233,7 +235,7 @@ class MotionArrowDownActionTest : VimOptionTestCase(OptionConstants.keymodel, Op
       """
             class MyClass {
             ${c}}
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -249,139 +251,147 @@ class MotionArrowDownActionTest : VimOptionTestCase(OptionConstants.keymodel, Op
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, ""),
-    VimTestOption(OptionConstants.virtualedit, OptionValueType.STRING, OptionConstants.virtualedit_onemore)
+    VimTestOption(OptionConstants.virtualedit, OptionValueType.STRING, OptionConstants.virtualedit_onemore),
   )
   fun `test up and down after dollar`() {
     // Arrow keys
     doTest(
-      listOf("$", "<Down>"), start,
+      listOf("$", "<Down>"),
+      start,
       """
             what a long line I am
             yet I am shor${c}t
             Lo and behold, I am the longest yet
             nope.
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, ""),
-    VimTestOption(OptionConstants.virtualedit, OptionValueType.STRING, OptionConstants.virtualedit_onemore)
+    VimTestOption(OptionConstants.virtualedit, OptionValueType.STRING, OptionConstants.virtualedit_onemore),
   )
   fun `test up and down after dollar1`() {
     doTest(
-      listOf("$", "<Down>", "<Down>"), start,
+      listOf("$", "<Down>", "<Down>"),
+      start,
       """
             what a long line I am
             yet I am short
             Lo and behold, I am the longest ye${c}t
             nope.
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, ""),
-    VimTestOption(OptionConstants.virtualedit, OptionValueType.STRING, OptionConstants.virtualedit_onemore)
+    VimTestOption(OptionConstants.virtualedit, OptionValueType.STRING, OptionConstants.virtualedit_onemore),
   )
   fun `test up and down after dollar2`() {
     doTest(
-      listOf("$", "<Down>", "<Down>", "<Down>"), start,
+      listOf("$", "<Down>", "<Down>", "<Down>"),
+      start,
       """
             what a long line I am
             yet I am short
             Lo and behold, I am the longest yet
             nope${c}.
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, ""),
-    VimTestOption(OptionConstants.virtualedit, OptionValueType.STRING, OptionConstants.virtualedit_onemore)
+    VimTestOption(OptionConstants.virtualedit, OptionValueType.STRING, OptionConstants.virtualedit_onemore),
   )
   fun `test up and down after dollar3`() {
     doTest(
-      listOf("$", "<Down>", "<Down>", "<Down>", "<Up>"), start,
+      listOf("$", "<Down>", "<Down>", "<Down>", "<Up>"),
+      start,
       """
             what a long line I am
             yet I am short
             Lo and behold, I am the longest ye${c}t
             nope.
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, ""),
-    VimTestOption(OptionConstants.virtualedit, OptionValueType.STRING, OptionConstants.virtualedit_onemore)
+    VimTestOption(OptionConstants.virtualedit, OptionValueType.STRING, OptionConstants.virtualedit_onemore),
   )
   fun `test up and down after dollar4`() {
     // j k keys
 
     doTest(
-      listOf("$", "j"), start,
+      listOf("$", "j"),
+      start,
       """
             what a long line I am
             yet I am shor${c}t
             Lo and behold, I am the longest yet
             nope.
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, ""),
-    VimTestOption(OptionConstants.virtualedit, OptionValueType.STRING, OptionConstants.virtualedit_onemore)
+    VimTestOption(OptionConstants.virtualedit, OptionValueType.STRING, OptionConstants.virtualedit_onemore),
   )
   fun `test up and down after dollar5`() {
     doTest(
-      listOf("$", "j", "j"), start,
+      listOf("$", "j", "j"),
+      start,
       """
             what a long line I am
             yet I am short
             Lo and behold, I am the longest ye${c}t
             nope.
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, ""),
-    VimTestOption(OptionConstants.virtualedit, OptionValueType.STRING, OptionConstants.virtualedit_onemore)
+    VimTestOption(OptionConstants.virtualedit, OptionValueType.STRING, OptionConstants.virtualedit_onemore),
   )
   fun `test up and down after dollar6`() {
     doTest(
-      listOf("$", "j", "j", "j"), start,
+      listOf("$", "j", "j", "j"),
+      start,
       """
             what a long line I am
             yet I am short
             Lo and behold, I am the longest yet
             nope${c}.
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, ""),
-    VimTestOption(OptionConstants.virtualedit, OptionValueType.STRING, OptionConstants.virtualedit_onemore)
+    VimTestOption(OptionConstants.virtualedit, OptionValueType.STRING, OptionConstants.virtualedit_onemore),
   )
   fun `test up and down after dollar7`() {
     doTest(
-      listOf("$", "j", "j", "j", "k"), start,
+      listOf("$", "j", "j", "j", "k"),
+      start,
       """
             what a long line I am
             yet I am short
             Lo and behold, I am the longest ye${c}t
             nope.
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -390,8 +400,8 @@ class MotionArrowDownActionTest : VimOptionTestCase(OptionConstants.keymodel, Op
     VimTestOption(
       OptionConstants.keymodel,
       OptionValueType.STRING,
-      OptionConstants.keymodel_stopselect
-    )
+      OptionConstants.keymodel_stopselect,
+    ),
   )
   @VimOptionDefault(OptionConstants.virtualedit)
   fun `test char select simple move`() {
@@ -412,7 +422,7 @@ class MotionArrowDownActionTest : VimOptionTestCase(OptionConstants.keymodel, Op
                 ${c}all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -421,8 +431,8 @@ class MotionArrowDownActionTest : VimOptionTestCase(OptionConstants.keymodel, Op
     VimTestOption(
       OptionConstants.keymodel,
       OptionValueType.STRING,
-      OptionConstants.keymodel_stopselect
-    )
+      OptionConstants.keymodel_stopselect,
+    ),
   )
   @VimOptionDefault(OptionConstants.virtualedit)
   fun `test select multiple carets`() {
@@ -443,7 +453,7 @@ class MotionArrowDownActionTest : VimOptionTestCase(OptionConstants.keymodel, Op
                 ${c}all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by ${c}the torrent of a mountain pass.
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 

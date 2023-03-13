@@ -117,10 +117,10 @@ internal object IdeaSpecifics {
 
       //region Enter insert mode after surround with if
       if (surrounderAction == action.javaClass.name && surrounderItems.any {
-        action.templatePresentation.text.endsWith(
-            it
+          action.templatePresentation.text.endsWith(
+            it,
           )
-      }
+        }
       ) {
         editor?.let {
           val commandState = it.vim.vimStateMachine
@@ -165,7 +165,7 @@ internal object IdeaSpecifics {
           if (editor.inNormalMode) {
             VimPlugin.getChange().insertBeforeCursor(
               editor.vim,
-              injector.executionContextManager.onEditor(editor.vim)
+              injector.executionContextManager.onEditor(editor.vim),
             )
             KeyHandler.getInstance().reset(editor.vim)
           }

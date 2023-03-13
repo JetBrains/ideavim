@@ -20,7 +20,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
   fun `test percent match simple`() {
     typeTextInFile(
       "%",
-      "foo(b${c}ar)\n"
+      "foo(b${c}ar)\n",
     )
     assertOffset(3)
   }
@@ -32,7 +32,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
         |foo(bar,
         |baz,
         |${c}quux)
-      """.trimMargin()
+      """.trimMargin(),
     )
     assertOffset(3)
   }
@@ -43,7 +43,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
       """
         |${c}foo(
         |bar)
-      """.trimMargin()
+      """.trimMargin(),
     )
     assertOffset(8)
   }
@@ -54,7 +54,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
       """
         |$c(
         |bar)
-      """.trimMargin()
+      """.trimMargin(),
     )
     assertOffset(5)
   }
@@ -62,7 +62,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
   fun `test percent visual mode find brackets on the end of line`() {
     typeTextInFile(
       "v$%",
-      """foo(${c}bar)"""
+      """foo(${c}bar)""",
     )
     assertOffset(3)
   }
@@ -70,7 +70,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
   fun `test percent twice visual mode find brackets on the end of line`() {
     typeTextInFile(
       "v$%%",
-      """foo(${c}bar)"""
+      """foo(${c}bar)""",
     )
     assertOffset(7)
   }
@@ -80,7 +80,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
     typeTextInFile(
       "%",
       """foo(bar, "foo(bar", ${c}baz)
-               """
+               """,
     )
     assertOffset(3)
   }
@@ -172,7 +172,8 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
              }
             $c}
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -195,70 +196,98 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
             ""${'"'}
             )
       """.trimIndent(),
-      VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
   fun `test motion in text`() {
     doTest(
-      "%", """ "I found ${c}it in a (legendary) land" """,
-      """ "I found it in a (legendary$c) land" """, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      "%",
+      """ "I found ${c}it in a (legendary) land" """,
+      """ "I found it in a (legendary$c) land" """,
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
   fun `test motion in text with quotes`() {
     doTest(
-      "%", """ "I found ${c}it in \"a (legendary) land" """,
-      """ "I found it in \"a (legendary$c) land" """, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      "%",
+      """ "I found ${c}it in \"a (legendary) land" """,
+      """ "I found it in \"a (legendary$c) land" """,
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
   fun `test motion in text with quotes start before quote`() {
     doTest(
-      "%", """ $c "I found it in \"a (legendary) land" """,
-      """  "I found it in \"a (legendary$c) land" """, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      "%",
+      """ $c "I found it in \"a (legendary) land" """,
+      """  "I found it in \"a (legendary$c) land" """,
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
   fun `test motion in text with quotes and double escape`() {
     doTest(
-      "%", """ "I found ${c}it in \\\"a (legendary) land" """,
-      """ "I found it in \\\"a (legendary$c) land" """, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      "%",
+      """ "I found ${c}it in \\\"a (legendary) land" """,
+      """ "I found it in \\\"a (legendary$c) land" """,
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
   fun `test motion in text with escape (outer forward)`() {
     doTest(
-      "%", """ debugPrint$c(\(var)) """,
-      """ debugPrint(\(var)$c) """, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      "%",
+      """ debugPrint$c(\(var)) """,
+      """ debugPrint(\(var)$c) """,
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
   fun `test motion in text with escape (outer backward)`() {
     doTest(
-      "%", """ debugPrint(\(var)$c) """,
-      """ debugPrint$c(\(var)) """, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      "%",
+      """ debugPrint(\(var)$c) """,
+      """ debugPrint$c(\(var)) """,
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
   fun `test motion in text with escape (inner forward)`() {
     doTest(
-      "%", """ debugPrint(\$c(var)) """,
-      """ debugPrint(\(var$c)) """, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      "%",
+      """ debugPrint(\$c(var)) """,
+      """ debugPrint(\(var$c)) """,
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
   fun `test motion in text with escape (inner backward)`() {
     doTest(
-      "%", """ debugPrint(\$c(var)) """,
-      """ debugPrint(\(var$c)) """, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      "%",
+      """ debugPrint(\$c(var)) """,
+      """ debugPrint(\(var$c)) """,
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
   fun `test motion in text with quotes and double escape2`() {
     doTest(
-      "%", """ "I found ${c}it in a \(legendary\) land" """,
-      """ "I found it in a \(legendary\$c) land" """, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE
+      "%",
+      """ "I found ${c}it in a \(legendary\) land" """,
+      """ "I found it in a \(legendary\$c) land" """,
+      VimStateMachine.Mode.COMMAND,
+      VimStateMachine.SubMode.NONE,
     )
   }
 

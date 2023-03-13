@@ -31,7 +31,7 @@ class VisualSelectNextSearchTest : VimTestCase() {
   fun testSearchMulticaret() {
     typeTextInFile(
       injector.parser.parseKeys("*" + "b" + "gn"),
-      "h<caret>ello world\nh<caret>ello world hello world"
+      "h<caret>ello world\nh<caret>ello world hello world",
     )
     assertEquals(1, myFixture.editor.caretModel.caretCount)
     assertMode(VimStateMachine.Mode.VISUAL)
@@ -41,7 +41,7 @@ class VisualSelectNextSearchTest : VimTestCase() {
   fun testSearchFordAndBack() {
     typeTextInFile(
       injector.parser.parseKeys("*" + "2b" + "gn" + "gN"),
-      "h<caret>ello world\nhello world hello world"
+      "h<caret>ello world\nhello world hello world",
     )
     assertOffset(0)
     assertSelection("h")
@@ -77,7 +77,7 @@ class VisualSelectNextSearchTest : VimTestCase() {
   fun testSearchTwiceInVisual() {
     typeTextInFile(
       injector.parser.parseKeys("*" + "gn" + "2gn"),
-      "h<caret>ello world\nhello world hello, hello hello"
+      "h<caret>ello world\nhello world hello, hello hello",
     )
     assertOffset(35)
     assertSelection("hello world hello, hello")
@@ -95,7 +95,7 @@ class VisualSelectNextSearchTest : VimTestCase() {
   fun testCanExitVisualMode() {
     typeTextInFile(
       injector.parser.parseKeys("*" + "gn" + "gn" + "<Esc>"),
-      "h<caret>ello world\nhello world hello, hello"
+      "h<caret>ello world\nhello world hello, hello",
     )
     assertOffset(28)
     assertSelection(null)
@@ -136,7 +136,7 @@ class VisualSelectNextSearchTest : VimTestCase() {
   fun testMixWithN() {
     typeTextInFile(
       injector.parser.parseKeys("*" + "gn" + "n" + "gn"),
-      "h<caret>ello world\nhello world hello, hello"
+      "h<caret>ello world\nhello world hello, hello",
     )
     assertOffset(28)
     assertSelection("hello world hello")
@@ -147,7 +147,7 @@ class VisualSelectNextSearchTest : VimTestCase() {
   fun testMixWithPreviousSearch() {
     typeTextInFile(
       injector.parser.parseKeys("*" + "gn" + "gn" + "gN" + "gn"),
-      "h<caret>ello world\nhello world hello, hello"
+      "h<caret>ello world\nhello world hello, hello",
     )
     assertOffset(28)
     assertSelection("hello world hello")

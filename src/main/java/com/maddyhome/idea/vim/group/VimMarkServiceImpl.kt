@@ -112,7 +112,7 @@ internal class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateCompone
           aMarkList.getAttributeValue("line").toInt(),
           aMarkList.getAttributeValue("column").toInt(),
           aMarkList.getAttributeValue("filename"),
-          aMarkList.getAttributeValue("protocol")
+          aMarkList.getAttributeValue("protocol"),
         )
         if (mark != null) {
           globalMarks[mark.key] = mark
@@ -144,7 +144,7 @@ internal class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateCompone
             aMarkList.getAttributeValue("line").toInt(),
             aMarkList.getAttributeValue("column").toInt(),
             filename,
-            aMarkList.getAttributeValue("protocol")
+            aMarkList.getAttributeValue("protocol"),
           )
           if (mark != null) fmarks[mark.key] = mark
         }
@@ -289,7 +289,7 @@ internal class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateCompone
   companion object {
     private const val SAVE_MARK_COUNT = 20
     private val logger = Logger.getInstance(
-      VimMarkServiceImpl::class.java.name
+      VimMarkServiceImpl::class.java.name,
     )
   }
 }

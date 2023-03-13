@@ -38,7 +38,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_CHARACTER
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
     )
   }
 
@@ -63,7 +63,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_CHARACTER
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
     )
   }
 
@@ -88,7 +88,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_CHARACTER
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
     )
   }
 
@@ -113,7 +113,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_CHARACTER
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
     )
   }
 
@@ -138,7 +138,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_CHARACTER
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
     )
   }
 
@@ -163,7 +163,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_CHARACTER
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
     )
   }
 
@@ -188,7 +188,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_CHARACTER
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
     )
   }
 
@@ -213,7 +213,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_CHARACTER
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
     )
   }
 
@@ -238,7 +238,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_CHARACTER
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
     )
   }
 
@@ -263,7 +263,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_CHARACTER
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
     )
   }
 
@@ -288,7 +288,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_CHARACTER
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
     )
   }
 
@@ -300,7 +300,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-    """
+    """,
   )
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test switch to visual mode characterwise line start`() {
@@ -323,7 +323,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_CHARACTER
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
     )
   }
 
@@ -335,7 +335,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 ${c}a${se}ll rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-    """
+    """,
   )
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test switch to visual mode characterwise end on line start`() {
@@ -358,7 +358,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_CHARACTER
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
     )
   }
 
@@ -383,7 +383,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_CHARACTER
+      VimStateMachine.SubMode.VISUAL_CHARACTER,
     )
   }
 
@@ -408,7 +408,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_LINE
+      VimStateMachine.SubMode.VISUAL_LINE,
     )
   }
 
@@ -433,7 +433,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_LINE
+      VimStateMachine.SubMode.VISUAL_LINE,
     )
   }
 
@@ -458,7 +458,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_LINE
+      VimStateMachine.SubMode.VISUAL_LINE,
     )
   }
 
@@ -483,7 +483,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 ${se}hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_LINE
+      VimStateMachine.SubMode.VISUAL_LINE,
     )
   }
 
@@ -508,7 +508,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_LINE
+      VimStateMachine.SubMode.VISUAL_LINE,
     )
   }
 
@@ -533,7 +533,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_LINE
+      VimStateMachine.SubMode.VISUAL_LINE,
     )
   }
 
@@ -558,7 +558,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_LINE
+      VimStateMachine.SubMode.VISUAL_LINE,
     )
   }
 
@@ -583,7 +583,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_BLOCK
+      VimStateMachine.SubMode.VISUAL_BLOCK,
     )
   }
 
@@ -608,7 +608,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.SELECT,
-      VimStateMachine.SubMode.VISUAL_BLOCK
+      VimStateMachine.SubMode.VISUAL_BLOCK,
     )
   }
 
@@ -633,7 +633,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_BLOCK
+      VimStateMachine.SubMode.VISUAL_BLOCK,
     )
   }
 
@@ -658,7 +658,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       VimStateMachine.Mode.VISUAL,
-      VimStateMachine.SubMode.VISUAL_BLOCK
+      VimStateMachine.SubMode.VISUAL_BLOCK,
     )
   }
 }

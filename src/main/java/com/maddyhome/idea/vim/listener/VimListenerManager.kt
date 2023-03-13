@@ -174,7 +174,6 @@ internal object VimListenerManager {
     }
 
     fun remove(editor: Editor, isReleased: Boolean) {
-
       editor.contentComponent.removeKeyListener(VimKeyListener)
       val eventFacade = EventFacade.getInstance()
       eventFacade.removeEditorMouseListener(editor, EditorMouseHandler)
@@ -491,7 +490,9 @@ internal object VimListenerManager {
                 false
               }
             }
-          } else cutOffEnd = false
+          } else {
+            cutOffEnd = false
+          }
         }
         // Double-clicking a word in IntelliJ will select the word and locate the caret at the end of the selection,
         // on the following character. When using a bar caret, this is drawn as between the end of selection and the
@@ -516,7 +517,7 @@ internal object VimListenerManager {
 
   enum class SelectionSource {
     MOUSE,
-    OTHER
+    OTHER,
   }
 }
 

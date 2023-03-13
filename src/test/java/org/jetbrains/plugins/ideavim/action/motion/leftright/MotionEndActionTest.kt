@@ -95,8 +95,8 @@ class MotionEndActionTest : VimOptionTestCase(OptionConstants.keymodel) {
     VimTestOption(
       OptionConstants.keymodel,
       OptionValueType.STRING,
-      OptionConstants.keymodel_stopvisual
-    )
+      OptionConstants.keymodel_stopvisual,
+    ),
   )
   fun `test exit visual`() {
     val keys = listOf("v", "<End>")
@@ -124,8 +124,8 @@ class MotionEndActionTest : VimOptionTestCase(OptionConstants.keymodel) {
     VimTestOption(
       OptionConstants.keymodel,
       OptionValueType.STRING,
-      OptionConstants.keymodel_stopselect
-    )
+      OptionConstants.keymodel_stopselect,
+    ),
   )
   fun `test exit select`() {
     val keys = listOf("gh", "<End>")

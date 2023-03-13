@@ -19,7 +19,6 @@ internal class TestInputModel private constructor() {
   }
 
   fun nextKeyStroke(): KeyStroke? {
-
     // Return key from the unfinished mapping
     /*
 MappingStack mappingStack = KeyHandler.getInstance().getMappingStack();
@@ -29,7 +28,9 @@ if (mappingStack.hasStroke()) {
 */
     return if (myKeyStrokes.isNotEmpty()) {
       myKeyStrokes.removeAt(0)
-    } else null
+    } else {
+      null
+    }
   }
 
   companion object {

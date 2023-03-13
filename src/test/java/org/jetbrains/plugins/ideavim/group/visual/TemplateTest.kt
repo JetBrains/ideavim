@@ -58,7 +58,7 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
                     int my${c}Var = 5;
                 }
             }
-      """.trimIndent()
+      """.trimIndent(),
     )
     doInlineRename(VariableInplaceRenameHandler(), "myNewVar", myFixture)
     assertState(
@@ -68,7 +68,7 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
                     int my${c}NewVar = 5;
                 }
             }
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -82,7 +82,7 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
                     int my${c}Var = 5;
                 }
             }
-      """.trimIndent()
+      """.trimIndent(),
     )
     startRenaming(VariableInplaceRenameHandler())
     waitAndAssertMode(myFixture, VimStateMachine.Mode.SELECT)
@@ -98,7 +98,7 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
                     int myNewVar${c} = 5;
                 }
             }
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -112,7 +112,7 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
                     int my${c}Var = 5;
                 }
             }
-      """.trimIndent()
+      """.trimIndent(),
     )
     enterCommand("set idearefactormode=visual")
     startRenaming(VariableInplaceRenameHandler())
@@ -132,7 +132,7 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
                     int my${c}Var = 5;
                 }
             }
-      """.trimIndent()
+      """.trimIndent(),
     )
     startRenaming(VariableInplaceRenameHandler())
     waitAndAssertMode(myFixture, VimStateMachine.Mode.SELECT)
@@ -151,7 +151,7 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
                     int pre${c}myVar = 5;
                 }
             }
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -165,7 +165,7 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
                     int my${c}Var = 5;
                 }
             }
-      """.trimIndent()
+      """.trimIndent(),
     )
     startRenaming(VariableInplaceRenameHandler())
     waitAndAssertMode(myFixture, VimStateMachine.Mode.SELECT)
@@ -181,7 +181,7 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
                     int myVar${c} = 5;
                 }
             }
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -195,7 +195,7 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
                     int ${c}myVar = 5;
                 }
             }
-      """.trimIndent()
+      """.trimIndent(),
     )
     startRenaming(VariableInplaceRenameHandler())
     waitAndAssertMode(myFixture, VimStateMachine.Mode.SELECT)
@@ -211,7 +211,7 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
                     int ${c}myVar = 5;
                 }
             }
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -225,7 +225,7 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
                     int myVa${c}r = 5;
                 }
             }
-      """.trimIndent()
+      """.trimIndent(),
     )
     startRenaming(VariableInplaceRenameHandler())
     waitAndAssertMode(myFixture, VimStateMachine.Mode.SELECT)
@@ -241,7 +241,7 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
                     int myVar${c} = 5;
                 }
             }
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -255,7 +255,7 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
                     int my${c}Var = 5;
                 }
             }
-      """.trimIndent()
+      """.trimIndent(),
     )
     startRenaming(VariableInplaceRenameHandler())
     waitAndAssertMode(myFixture, VimStateMachine.Mode.SELECT)
@@ -271,7 +271,7 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
                     int my${c}Var = 5;
                 }
             }
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -285,7 +285,7 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
                     int my${c}Var = 5;
                 }
             }
-      """.trimIndent()
+      """.trimIndent(),
     )
     startRenaming(VariableInplaceRenameHandler())
     waitAndAssertMode(myFixture, VimStateMachine.Mode.SELECT)
@@ -301,7 +301,7 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
                     int Hell${c}o = 5;
                 }
             }
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 
@@ -315,7 +315,7 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
                     int my${c}Var = 5;
                 }
             }
-      """.trimIndent()
+      """.trimIndent(),
     )
     startRenaming(VariableInplaceRenameHandler())
     assertDoesntChange { myFixture.editor.inNormalMode }
@@ -331,7 +331,7 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
                     int my${c}Var = 5;
                 }
             }
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(injector.parser.parseKeys("i"))
     startRenaming(VariableInplaceRenameHandler())
@@ -348,7 +348,7 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
                     int my${c}Var = 5;
                 }
             }
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(injector.parser.parseKeys("vll"))
     startRenaming(VariableInplaceRenameHandler())
@@ -365,7 +365,7 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
                     int my${c}Var = 5;
                 }
             }
-      """.trimIndent()
+      """.trimIndent(),
     )
     startRenaming(VariableInplaceRenameHandler())
     waitAndAssertMode(myFixture, VimStateMachine.Mode.SELECT)
@@ -381,7 +381,7 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
                     int my${c}Var = 5;
                 }
             }
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(injector.parser.parseKeys("i"))
     startRenaming(VariableInplaceRenameHandler())
@@ -398,7 +398,7 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
                     int my${c}Var = 5;
                 }
             }
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(injector.parser.parseKeys("vll"))
     startRenaming(VariableInplaceRenameHandler())
@@ -415,7 +415,7 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
                     int my${c}Var = 5;
                 }
             }
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(injector.parser.parseKeys("vll<C-G>"))
     startRenaming(VariableInplaceRenameHandler())
@@ -432,7 +432,7 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
                     int my${c}Var = 5;
                 }
             }
-      """.trimIndent()
+      """.trimIndent(),
     )
     startRenaming(VariableInplaceRenameHandler())
     waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
@@ -448,7 +448,7 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
                     int my${c}Var = 5;
                 }
             }
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(injector.parser.parseKeys("i"))
     startRenaming(VariableInplaceRenameHandler())
@@ -465,7 +465,7 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
                     int my${c}Var = 5;
                 }
             }
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(injector.parser.parseKeys("vll"))
     startRenaming(VariableInplaceRenameHandler())
@@ -482,7 +482,7 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
                     int my${c}Var = 5;
                 }
             }
-      """.trimIndent()
+      """.trimIndent(),
     )
     typeText(injector.parser.parseKeys("vll<C-G>"))
     startRenaming(VariableInplaceRenameHandler())
@@ -520,7 +520,7 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
                     int my${c}Var = 5;
                 }
             }
-      """.trimIndent()
+      """.trimIndent(),
     )
     startRenaming(VariableInplaceRenameHandler())
     val lookupValue = myFixture.lookupElementStrings?.get(0) ?: kotlin.test.fail()
@@ -532,7 +532,7 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
                     int $lookupValue = 5;
                 }
             }
-      """.trimIndent()
+      """.trimIndent(),
     )
   }
 

@@ -34,10 +34,10 @@ class ListTests {
           VimFloat(4.6),
           VimString("bla bla"),
           VimList(mutableListOf(VimInt(5), VimInt(9))),
-          VimDictionary(linkedMapOf(VimString("key") to VimString("value")))
-        )
+          VimDictionary(linkedMapOf(VimString("key") to VimString("value"))),
+        ),
       ),
-      VimscriptParser.parseExpression("[1, 4.6, 'bla bla', [5, 9], {'key' : 'value'}]")!!.evaluate()
+      VimscriptParser.parseExpression("[1, 4.6, 'bla bla', [5, 9], {'key' : 'value'}]")!!.evaluate(),
     )
   }
 

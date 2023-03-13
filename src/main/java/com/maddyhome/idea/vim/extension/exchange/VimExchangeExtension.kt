@@ -154,7 +154,7 @@ internal class VimExchangeExtension : VimExtension {
           (ijEditor.getMarkOffset(ex.end) + endAdj).coerceAtMost(ijEditor.fileSize),
           HighlighterLayer.SELECTION - 1,
           attributes,
-          hlArea
+          hlArea,
         )
       }
 
@@ -200,7 +200,7 @@ internal class VimExchangeExtension : VimExtension {
         val vimEditor = editor.vim
         injector.markService.setChangeMarks(
           vimEditor.primaryCaret(),
-          TextRange(editor.getMarkOffset(targetExchange.start), editor.getMarkOffset(targetExchange.end) + 1)
+          TextRange(editor.getMarkOffset(targetExchange.start), editor.getMarkOffset(targetExchange.end) + 1),
         )
         // do this instead of direct text manipulation to set change marks
         setRegister('z', injector.parser.stringToKeys(sourceExchange.text), SelectionType.fromSubMode(sourceExchange.type))
@@ -217,16 +217,16 @@ internal class VimExchangeExtension : VimExtension {
             primaryCaret.moveToInlayAwareLogicalPosition(
               LogicalPosition(
                 ex1.start.line,
-                ex1.start.col - horizontalOffset
-              )
+                ex1.start.col - horizontalOffset,
+              ),
             )
           } else if (ex1.end.line - ex1.start.line != ex2.end.line - ex2.start.line) {
             val verticalOffset = ex1.end.line - ex2.end.line
             primaryCaret.moveToInlayAwareLogicalPosition(
               LogicalPosition(
                 ex1.start.line - verticalOffset,
-                ex1.start.col
-              )
+                ex1.start.col,
+              ),
             )
           }
         }
@@ -308,7 +308,6 @@ internal class VimExchangeExtension : VimExtension {
     }
 
     private fun getExchange(editor: Editor, isVisual: Boolean, selectionType: SelectionType): Exchange {
-
       // TODO: improve KeyStroke list to sting conversion
       fun getRegisterText(reg: Char): String = getRegister(reg)?.map { it.keyChar }?.joinToString("") ?: ""
       fun getMarks(isVisual: Boolean): Pair<Mark, Mark> {

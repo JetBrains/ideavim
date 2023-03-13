@@ -15,7 +15,6 @@ import org.jetbrains.plugins.ideavim.VimTestCase
  */
 class BufferCloseCommandTest : VimTestCase() {
   fun `test close file by bd command`() {
-
     val psiFile1 = myFixture.configureByText("A_Discovery1", "I found it in a legendary land")
     val psiFile2 = myFixture.configureByText("A_Discovery2", "all rocks and lavender and tufted grass,")
 
