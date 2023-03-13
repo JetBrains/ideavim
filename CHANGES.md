@@ -51,6 +51,7 @@ usual beta standards.
 * [VIM-2868](https://youtrack.jetbrains.com/issue/VIM-2868) Pasting in visual mode with P should not replace yank register like when pasting with p
 * [VIM-2819](https://youtrack.jetbrains.com/issue/VIM-2819) Move command works incorrectly
 * [VIM-795](https://youtrack.jetbrains.com/issue/VIM-795) Ctrl-w + h doesn't alway work (window navigation to the left window)
+* [VIM-1551](https://youtrack.jetbrains.com/issue/VIM-1551) Surround: line surround not working
 
 ### Merged PRs:
 * [589](https://github.com/JetBrains/ideavim/pull/589) by [Matt Ellis](https://github.com/citizenmatt): Refactor option usage and introduce accessor API
