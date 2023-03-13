@@ -22,7 +22,7 @@ import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.options.OptionConstants
 
-abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
+public abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
   override val exclusiveSelection: Boolean
     get() = injector.globalOptions().hasValue(OptionConstants.selection, "exclusive")
   override val selectionAdj: Int

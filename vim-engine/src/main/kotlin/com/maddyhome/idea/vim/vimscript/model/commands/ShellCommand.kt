@@ -18,8 +18,8 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  * @author John Grib
  * see "h :shell"
  */
-data class ShellCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
-  override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_FORBIDDEN, Access.READ_ONLY)
+public data class ShellCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
+  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_FORBIDDEN, Access.READ_ONLY)
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     return if (injector.actionExecutor.executeAction("ActivateTerminalToolWindow", context)) ExecutionResult.Success else ExecutionResult.Error
   }

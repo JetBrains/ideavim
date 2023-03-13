@@ -26,12 +26,12 @@ import java.util.*
 import javax.swing.KeyStroke
 import kotlin.math.min
 
-abstract class VimKeyGroupBase : VimKeyGroup {
+public abstract class VimKeyGroupBase : VimKeyGroup {
   @JvmField
-  val myShortcutConflicts: MutableMap<KeyStroke, ShortcutOwnerInfo> = LinkedHashMap()
-  val requiredShortcutKeys: MutableSet<RequiredShortcut> = HashSet(300)
-  val keyRoots: MutableMap<MappingMode, CommandPartNode<VimActionsInitiator>> = EnumMap(MappingMode::class.java)
-  val keyMappings: MutableMap<MappingMode, KeyMapping> = EnumMap(MappingMode::class.java)
+  public val myShortcutConflicts: MutableMap<KeyStroke, ShortcutOwnerInfo> = LinkedHashMap()
+  public val requiredShortcutKeys: MutableSet<RequiredShortcut> = HashSet(300)
+  public val keyRoots: MutableMap<MappingMode, CommandPartNode<VimActionsInitiator>> = EnumMap(MappingMode::class.java)
+  public val keyMappings: MutableMap<MappingMode, KeyMapping> = EnumMap(MappingMode::class.java)
 
   override var operatorFunction: OperatorFunction? = null
 
@@ -61,7 +61,7 @@ abstract class VimKeyGroupBase : VimKeyGroup {
    * @param mappingMode The mapping mode
    * @return The key mapping tree root
    */
-  override fun getKeyRoot(mappingMode: MappingMode) = keyRoots.getOrPut(mappingMode) { RootNode() }
+  override fun getKeyRoot(mappingMode: MappingMode): CommandPartNode<VimActionsInitiator> = keyRoots.getOrPut(mappingMode) { RootNode() }
 
   override fun getKeyMappingLayer(mode: MappingMode): KeyMappingLayer = getKeyMapping(mode)
 
@@ -116,8 +116,8 @@ abstract class VimKeyGroupBase : VimKeyGroup {
     prefixes = HashMap()
   }
 
-  var identityChecker: MutableMap<MappingMode, MutableSet<MutableList<KeyStroke>>>? = null
-  var prefixes: MutableMap<MutableList<KeyStroke>, String>? = null
+  private var identityChecker: MutableMap<MappingMode, MutableSet<MutableList<KeyStroke>>>? = null
+  private var prefixes: MutableMap<MutableList<KeyStroke>, String>? = null
 
   override fun getKeyMappingByOwner(owner: MappingOwner): List<Pair<List<KeyStroke>, MappingInfo>> {
     return MappingMode.values().map { getKeyMapping(it) }.flatMap { it.getByOwner(owner) }

@@ -12,15 +12,15 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.helper.SearchOptions
 import java.util.*
 
-interface VimSearchHelper {
-  fun findNextParagraph(
+public interface VimSearchHelper {
+  public fun findNextParagraph(
     editor: VimEditor,
     caret: ImmutableVimCaret,
     count: Int,
     allowBlanks: Boolean,
   ): Int
 
-  fun findNextSentenceStart(
+  public fun findNextSentenceStart(
     editor: VimEditor,
     caret: ImmutableVimCaret,
     count: Int,
@@ -28,7 +28,7 @@ interface VimSearchHelper {
     requireAll: Boolean,
   ): Int
 
-  fun findSection(
+  public fun findSection(
     editor: VimEditor,
     caret: ImmutableVimCaret,
     type: Char,
@@ -36,13 +36,13 @@ interface VimSearchHelper {
     count: Int,
   ): Int
 
-  fun findNextCamelEnd(
+  public fun findNextCamelEnd(
     editor: VimEditor,
     caret: ImmutableVimCaret,
     count: Int,
   ): Int
 
-  fun findNextSentenceEnd(
+  public fun findNextSentenceEnd(
     editor: VimEditor,
     caret: ImmutableVimCaret,
     count: Int,
@@ -50,39 +50,39 @@ interface VimSearchHelper {
     requireAll: Boolean,
   ): Int
 
-  fun findNextCamelStart(
+  public fun findNextCamelStart(
     editor: VimEditor,
     caret: ImmutableVimCaret,
     count: Int,
   ): Int
 
-  fun findMethodEnd(
+  public fun findMethodEnd(
     editor: VimEditor,
     caret: ImmutableVimCaret,
     count: Int,
   ): Int
 
-  fun findMethodStart(
+  public fun findMethodStart(
     editor: VimEditor,
     caret: ImmutableVimCaret,
     count: Int,
   ): Int
 
-  fun findUnmatchedBlock(
+  public fun findUnmatchedBlock(
     editor: VimEditor,
     caret: ImmutableVimCaret,
     type: Char,
     count: Int,
   ): Int
 
-  fun findNextWordEnd(
+  public fun findNextWordEnd(
     editor: VimEditor,
     caret: ImmutableVimCaret,
     count: Int,
     bigWord: Boolean,
   ): Int
 
-  fun findNextWordEnd(
+  public fun findNextWordEnd(
     chars: CharSequence,
     pos: Int,
     size: Int,
@@ -91,9 +91,9 @@ interface VimSearchHelper {
     spaceWords: Boolean,
   ): Int
 
-  fun findNextWord(editor: VimEditor, searchFrom: Int, count: Int, bigWord: Boolean): Long
+  public fun findNextWord(editor: VimEditor, searchFrom: Int, count: Int, bigWord: Boolean): Long
 
-  fun findPattern(
+  public fun findPattern(
     editor: VimEditor,
     pattern: String?,
     startOffset: Int,
@@ -101,14 +101,14 @@ interface VimSearchHelper {
     searchOptions: EnumSet<SearchOptions>?,
   ): TextRange?
 
-  fun findNextCharacterOnLine(
+  public fun findNextCharacterOnLine(
     editor: VimEditor,
     caret: ImmutableVimCaret,
     count: Int,
     ch: Char,
   ): Int
 
-  fun findWordUnderCursor(
+  public fun findWordUnderCursor(
     editor: VimEditor,
     caret: ImmutableVimCaret,
     count: Int,
@@ -118,35 +118,35 @@ interface VimSearchHelper {
     hasSelection: Boolean,
   ): TextRange
 
-  fun findSentenceRange(
+  public fun findSentenceRange(
     editor: VimEditor,
     caret: ImmutableVimCaret,
     count: Int,
     isOuter: Boolean,
   ): TextRange
 
-  fun findParagraphRange(
+  public fun findParagraphRange(
     editor: VimEditor,
     caret: ImmutableVimCaret,
     count: Int,
     isOuter: Boolean,
   ): TextRange?
 
-  fun findBlockTagRange(
+  public fun findBlockTagRange(
     editor: VimEditor,
     caret: ImmutableVimCaret,
     count: Int,
     isOuter: Boolean,
   ): TextRange?
 
-  fun findBlockQuoteInLineRange(
+  public fun findBlockQuoteInLineRange(
     editor: VimEditor,
     caret: ImmutableVimCaret,
     quote: Char,
     isOuter: Boolean,
   ): TextRange?
 
-  fun findBlockRange(
+  public fun findBlockRange(
     editor: VimEditor,
     caret: ImmutableVimCaret,
     type: Char,

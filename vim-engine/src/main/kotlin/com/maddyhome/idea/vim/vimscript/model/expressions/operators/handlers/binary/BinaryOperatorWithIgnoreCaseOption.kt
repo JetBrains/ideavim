@@ -13,7 +13,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 
-abstract class BinaryOperatorWithIgnoreCaseOption(
+public abstract class BinaryOperatorWithIgnoreCaseOption(
   private val caseInsensitiveImpl: BinaryOperatorHandler,
   private val caseSensitiveImpl: BinaryOperatorHandler,
 ) : BinaryOperatorHandler() {

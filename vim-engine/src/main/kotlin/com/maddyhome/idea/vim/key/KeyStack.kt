@@ -22,11 +22,11 @@ import javax.swing.KeyStroke
 public class KeyStack {
   private val stack = ArrayDeque<Frame>()
 
-  fun hasStroke(): Boolean {
+  public fun hasStroke(): Boolean {
     return stack.isNotEmpty() && stack.first().hasStroke()
   }
 
-  fun feedSomeStroke(): KeyStroke? {
+  public fun feedSomeStroke(): KeyStroke? {
     stack.forEach {
       if (it.hasStroke()) {
         return it.feed()
@@ -35,23 +35,23 @@ public class KeyStack {
     return null
   }
 
-  fun feedStroke(): KeyStroke {
+  public fun feedStroke(): KeyStroke {
     val frame = stack.first()
     val key = frame.feed()
     return key
   }
 
-  fun addKeys(keyStrokes: List<KeyStroke>) {
+  public fun addKeys(keyStrokes: List<KeyStroke>) {
     stack.addFirst(Frame(keyStrokes))
   }
 
-  fun removeFirst() {
+  public fun removeFirst() {
     if (stack.isNotEmpty()) {
       stack.removeFirst()
     }
   }
 
-  fun resetFirst() {
+  public fun resetFirst() {
     if (stack.isNotEmpty()) {
       stack.first().resetPointer()
     }

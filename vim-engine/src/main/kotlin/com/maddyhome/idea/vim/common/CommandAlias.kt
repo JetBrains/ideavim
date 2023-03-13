@@ -17,17 +17,17 @@ import org.jetbrains.annotations.NonNls
 /**
  * @author Elliot Courant
  */
-sealed class CommandAlias(
+public sealed class CommandAlias(
   protected val minimumNumberOfArguments: Int,
   protected val maximumNumberOfArguments: Int,
-  val name: String,
+  public val name: String,
 ) {
 
-  class Ex(
+  public class Ex(
     minimumNumberOfArguments: Int,
     maximumNumberOfArguments: Int,
     name: String,
-    val command: String,
+    public val command: String,
   ) : CommandAlias(minimumNumberOfArguments, maximumNumberOfArguments, name) {
     override fun getCommand(input: String, count: Int): GoalCommand {
       if (this.maximumNumberOfArguments == 0 && this.maximumNumberOfArguments == 0) {
@@ -63,11 +63,11 @@ sealed class CommandAlias(
     override fun printValue(): String = command
   }
 
-  class Call(
+  public class Call(
     minimumNumberOfArguments: Int,
     maximumNumberOfArguments: Int,
     name: String,
-    val handler: CommandAliasHandler,
+    public val handler: CommandAliasHandler,
   ) : CommandAlias(minimumNumberOfArguments, maximumNumberOfArguments, name) {
     override fun getCommand(input: String, count: Int): GoalCommand {
       return GoalCommand.Call(handler)
@@ -76,7 +76,7 @@ sealed class CommandAlias(
     override fun printValue(): String = handler.javaClass.toString()
   }
 
-  val numberOfArguments =
+  public val numberOfArguments: String =
     when {
       this.minimumNumberOfArguments == 0 && this.maximumNumberOfArguments == 0 -> "0" // No arguments
       this.minimumNumberOfArguments == 0 && this.maximumNumberOfArguments == -1 -> "*" // Any number of arguments
@@ -85,9 +85,9 @@ sealed class CommandAlias(
       else -> this.minimumNumberOfArguments.toString() // Specified number of arguments
     }
 
-  abstract fun getCommand(input: String, count: Int): GoalCommand
+  public abstract fun getCommand(input: String, count: Int): GoalCommand
 
-  abstract fun printValue(): String
+  public abstract fun printValue(): String
 
   private companion object {
     @NonNls
@@ -104,16 +104,16 @@ sealed class CommandAlias(
   }
 }
 
-sealed class GoalCommand {
-  class Ex(val command: String) : GoalCommand() {
-    companion object {
-      val EMPTY = Ex("")
+public sealed class GoalCommand {
+  public class Ex(public val command: String) : GoalCommand() {
+    public companion object {
+      public val EMPTY: Ex = Ex("")
     }
   }
 
-  class Call(val handler: CommandAliasHandler) : GoalCommand()
+  public class Call(public val handler: CommandAliasHandler) : GoalCommand()
 }
 
-interface CommandAliasHandler {
-  fun execute(command: String, ranges: Ranges, editor: VimEditor, context: ExecutionContext)
+public interface CommandAliasHandler {
+  public fun execute(command: String, ranges: Ranges, editor: VimEditor, context: ExecutionContext)
 }

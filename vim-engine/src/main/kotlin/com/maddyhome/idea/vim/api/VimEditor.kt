@@ -66,7 +66,7 @@ import com.maddyhome.idea.vim.common.TextRange
  *   public fun lineStart(line: Int): Int
  *   public fun deleteAt(offset: Int)
  *
- *   val lineStart = data.lineStart(x)
+ *   public val lineStart = data.lineStart(x)
  *   data.deleteAt(lineStart)
  *   ```
  *   This code compiles and looks fine. However, with [Offset] and [Pointer] approach it would fail
@@ -74,7 +74,7 @@ import com.maddyhome.idea.vim.common.TextRange
  *   public fun lineStart(line: Int): Offset // <- return the removed position
  *   public fun deleteAt(offset: Pointer)
  *
- *   val lineStart: Offset = data.lineStart(x)
+ *   public val lineStart: Offset = data.lineStart(x)
  *   data.deleteAt(lineStart) // ERROR: incorrect argument type
  *   ```
  *   So, we have to convert the [Offset] to [Pointer] somehow and during the conversion we may observe the problem
@@ -86,7 +86,7 @@ import com.maddyhome.idea.vim.common.TextRange
  *     return if (this < forData.length) Pointer(this) else null
  *   }
  *
- *   val lineFirstCharacter: Pointer = data.lineStart(x).toPointer(data)
+ *   public val lineFirstCharacter: Pointer = data.lineStart(x).toPointer(data)
  *   if (lineFirstCharacter != null) {
  *     data.deleteAt(lineFirstCharacter)
  *   }
@@ -306,4 +306,4 @@ public class BufferPosition(
 }
 
 // TODO: [visual] Try to remove this. It's an IntelliJ concept and doesn't have a Vim equivalent
-public data class VimVisualPosition(val line: Int, val column: Int, val leansRight: Boolean = false)
+public data class VimVisualPosition(val line: Int,  public val column: Int,  public val leansRight: Boolean = false)

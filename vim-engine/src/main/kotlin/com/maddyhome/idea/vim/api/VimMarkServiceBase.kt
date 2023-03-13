@@ -40,20 +40,20 @@ import java.lang.Integer.min
 import java.util.*
 import kotlin.collections.HashMap
 
-abstract class VimMarkServiceBase : VimMarkService {
-  companion object {
+public abstract class VimMarkServiceBase : VimMarkService {
+  public companion object {
     private val logger = vimLogger<VimMarkServiceBase>()
   }
   @JvmField
-  protected val globalMarks = HashMap<Char, Mark>()
+  protected val globalMarks: java.util.HashMap<Char, Mark> = HashMap()
 
   // marks are stored for primary caret only
-  protected val filepathToLocalMarks = HashMap<String, LocalMarks<Char, Mark>>()
+  protected val filepathToLocalMarks: java.util.HashMap<String, LocalMarks<Char, Mark>> = HashMap()
 
-  class LocalMarks<K, V> : HashMap<K, V>() {
-    var myTimestamp = Date()
+  public class LocalMarks<K, V> : HashMap<K, V>() {
+    public var myTimestamp: Date = Date()
 
-    fun setTimestamp(timestamp: Date) {
+    public fun setTimestamp(timestamp: Date) {
       this.myTimestamp = timestamp
     }
 
@@ -70,7 +70,7 @@ abstract class VimMarkServiceBase : VimMarkService {
    * @return The map of marks. The keys are `Character`s of the mark names, the values are
    * `Mark`s.
    */
-  fun getLocalMarks(filePath: String): LocalMarks<Char, Mark> {
+  public fun getLocalMarks(filePath: String): LocalMarks<Char, Mark> {
     return filepathToLocalMarks.getOrPut(filePath) { LocalMarks() }
   }
 
@@ -557,24 +557,24 @@ abstract class VimMarkServiceBase : VimMarkService {
     return VimMark(char, position.line, position.column, editor.getPath() ?: return null, editor.extractProtocol())
   }
 
-  protected fun Char.normalizeMarkChar() = if (this == '`') '\'' else this
+  protected fun Char.normalizeMarkChar(): Char = if (this == '`') '\'' else this
 }
 
-class LocalMarkStorage(var caret: ImmutableVimCaret) {
+public class LocalMarkStorage(public var caret: ImmutableVimCaret) {
   private val marks = HashMap<Char, Mark>()
 
-  fun getMarks(): Map<Char, Mark> {
+  public fun getMarks(): Map<Char, Mark> {
     return marks.toMap()
   }
 
-  fun getMark(char: Char): Mark? {
+  public fun getMark(char: Char): Mark? {
     if (caret.isPrimary) {
       return injector.markService.getMark(caret, char)
     }
     return marks[char]
   }
 
-  fun setMark(mark: Mark): Boolean {
+  public fun setMark(mark: Mark): Boolean {
     // todo check if set is valid for secondary caret
     if (caret.isPrimary) {
       return injector.markService.setMark(caret, mark)
@@ -584,7 +584,7 @@ class LocalMarkStorage(var caret: ImmutableVimCaret) {
     return true
   }
 
-  fun removeMark(char: Char) {
+  public fun removeMark(char: Char) {
     if (caret.isPrimary) {
       return injector.markService.removeLocalMark(caret, char)
     } else {
@@ -592,7 +592,7 @@ class LocalMarkStorage(var caret: ImmutableVimCaret) {
     }
   }
 
-  fun clear(caret: ImmutableVimCaret) {
+  public fun clear(caret: ImmutableVimCaret) {
     if (caret.isPrimary) {
       injector.markService.resetAllMarksForCaret(caret)
     } else {

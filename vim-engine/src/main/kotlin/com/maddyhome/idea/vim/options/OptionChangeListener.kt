@@ -10,13 +10,13 @@ package com.maddyhome.idea.vim.options
 
 import com.maddyhome.idea.vim.api.VimEditor
 
-fun interface OptionChangeListener<T> {
+public fun interface OptionChangeListener<T> {
 
-  fun processGlobalValueChange(oldValue: T?)
+  public fun processGlobalValueChange(oldValue: T?)
 }
 
 // options that can change their values in specific editors
-interface LocalOptionChangeListener<T> : OptionChangeListener<T> {
+public interface LocalOptionChangeListener<T> : OptionChangeListener<T> {
 
-  fun processLocalValueChange(oldValue: T?, editor: VimEditor)
+  public fun processLocalValueChange(oldValue: T?, editor: VimEditor)
 }

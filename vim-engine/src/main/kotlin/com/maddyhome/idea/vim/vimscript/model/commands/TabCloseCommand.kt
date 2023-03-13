@@ -19,9 +19,9 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  * @author Rieon Ke
  * see "h :tabclose"
  */
-data class TabCloseCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
+public data class TabCloseCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
 
-  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     val current = injector.tabService.getCurrentTabIndex(context)

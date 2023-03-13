@@ -40,8 +40,8 @@ import javax.swing.KeyStroke
  *  SpecialKeyHandlers are not presented here because these handlers are created to a limited set of commands and they
  *    are already implemented.
  */
-abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
-  val id: String = getActionId(this::class.java.name)
+public abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
+  public val id: String = getActionId(this::class.java.name)
 
   /**
    * Note: I don't like this field because it controls RW lock. In case we process RW lock inside the command,
@@ -53,9 +53,9 @@ abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
    *   but there is some logic depending on other command types and such change may cause bugs.
    * It looks like it'll be needed to split command type and synchronization type.
    */
-  abstract val type: Command.Type
+  public abstract val type: Command.Type
 
-  open val argumentType: Argument.Type? = null
+  public open val argumentType: Argument.Type? = null
 
   /**
    * Returns various binary flags for the command.
@@ -64,9 +64,9 @@ abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
    *
    * @see com.maddyhome.idea.vim.command.Command
    */
-  open val flags: EnumSet<CommandFlags> = noneOfEnum()
+  public open val flags: EnumSet<CommandFlags> = noneOfEnum()
 
-  abstract fun baseExecute(
+  public abstract fun baseExecute(
     editor: VimEditor,
     caret: VimCaret,
     context: ExecutionContext,
@@ -74,7 +74,7 @@ abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
     operatorArguments: OperatorArguments,
   ): Boolean
 
-  fun execute(editor: VimEditor, context: ExecutionContext.Editor, operatorArguments: OperatorArguments) {
+  public fun execute(editor: VimEditor, context: ExecutionContext.Editor, operatorArguments: OperatorArguments) {
     val action = { caret: VimCaret -> doExecute(editor, caret, context, operatorArguments) }
     if (myRunForEachCaret) {
       editor.forEachCaret(action)
@@ -103,17 +103,17 @@ abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
     ) injector.messages.indicateError()
   }
 
-  open fun process(cmd: Command) {
+  public open fun process(cmd: Command) {
     // No-op
   }
 
-  companion object {
+  public companion object {
     private val logger = vimLogger<EditorActionHandlerBase>()
 
-    fun parseKeysSet(keyStrings: List<String>) = keyStrings.map { injector.parser.parseKeys(it) }.toSet()
+    public fun parseKeysSet(keyStrings: List<String>): Set<List<KeyStroke>> = keyStrings.map { injector.parser.parseKeys(it) }.toSet()
 
     @JvmStatic
-    fun parseKeysSet(@NonNls vararg keyStrings: String): Set<List<KeyStroke>> = List(keyStrings.size) {
+    public fun parseKeysSet(@NonNls vararg keyStrings: String): Set<List<KeyStroke>> = List(keyStrings.size) {
       injector.parser.parseKeys(keyStrings[it])
     }.toSet()
 
@@ -121,7 +121,7 @@ abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
     private const val VimActionPrefix = "Vim"
 
     @NonNls
-    fun getActionId(classFullName: String): String {
+    public fun getActionId(classFullName: String): String {
       return classFullName
         .takeLastWhile { it != '.' }
         .let { if (it.startsWith(VimActionPrefix, true)) it else "$VimActionPrefix$it" }

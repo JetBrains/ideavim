@@ -14,7 +14,7 @@ package com.maddyhome.idea.vim.command
  * The terminology is taken directly from vim.
  * If no count is provided, [count0] defaults to zero.
  */
-data class OperatorArguments(
+public data class OperatorArguments(
   val isOperatorPending: Boolean,
   val count0: Int,
 
@@ -23,5 +23,5 @@ data class OperatorArguments(
 ) {
   val count1: Int = count0.coerceAtLeast(1)
 
-  fun withCount0(count0: Int) = this.copy(count0 = count0)
+  public fun withCount0(count0: Int): OperatorArguments = this.copy(count0 = count0)
 }

@@ -10,16 +10,16 @@ package com.maddyhome.idea.vim.api
 import com.maddyhome.idea.vim.command.Command
 import javax.swing.KeyStroke
 
-interface VimProcessGroup {
-  val lastCommand: String?
+public interface VimProcessGroup {
+  public val lastCommand: String?
 
-  fun startSearchCommand(editor: VimEditor, context: ExecutionContext?, count: Int, leader: Char)
-  fun endSearchCommand(): String
-  fun processExKey(editor: VimEditor, stroke: KeyStroke): Boolean
-  fun startFilterCommand(editor: VimEditor, context: ExecutionContext?, cmd: Command)
-  fun startExCommand(editor: VimEditor, context: ExecutionContext?, cmd: Command)
-  fun processExEntry(editor: VimEditor, context: ExecutionContext): Boolean
-  fun cancelExEntry(editor: VimEditor, resetCaret: Boolean)
+  public fun startSearchCommand(editor: VimEditor, context: ExecutionContext?, count: Int, leader: Char)
+  public fun endSearchCommand(): String
+  public fun processExKey(editor: VimEditor, stroke: KeyStroke): Boolean
+  public fun startFilterCommand(editor: VimEditor, context: ExecutionContext?, cmd: Command)
+  public fun startExCommand(editor: VimEditor, context: ExecutionContext?, cmd: Command)
+  public fun processExEntry(editor: VimEditor, context: ExecutionContext): Boolean
+  public fun cancelExEntry(editor: VimEditor, resetCaret: Boolean)
   @kotlin.jvm.Throws(java.lang.Exception::class)
-  fun executeCommand(editor: VimEditor, command: String, input: CharSequence?, currentDirectoryPath: String?): String?
+  public fun executeCommand(editor: VimEditor, command: String, input: CharSequence?, currentDirectoryPath: String?): String?
 }

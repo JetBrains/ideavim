@@ -12,21 +12,21 @@ import com.maddyhome.idea.vim.command.VimStateMachine.SubMode
 /**
  * @author vlan
  */
-enum class SelectionType(val value: Int) {
+public enum class SelectionType(public val value: Int) {
   // Integer values for registers serialization in RegisterGroup.readData()
   LINE_WISE(1 shl 1),
   CHARACTER_WISE(1 shl 2),
   BLOCK_WISE(1 shl 3);
 
-  fun toSubMode() = when (this) {
+  public fun toSubMode(): SubMode = when (this) {
     LINE_WISE -> SubMode.VISUAL_LINE
     CHARACTER_WISE -> SubMode.VISUAL_CHARACTER
     BLOCK_WISE -> SubMode.VISUAL_BLOCK
   }
 
-  companion object {
+  public companion object {
     @JvmStatic
-    fun fromValue(value: Int): SelectionType {
+    public fun fromValue(value: Int): SelectionType {
       for (type in values()) {
         if (type.value == value) {
           return type
@@ -36,7 +36,7 @@ enum class SelectionType(val value: Int) {
     }
 
     @JvmStatic
-    fun fromSubMode(subMode: SubMode): SelectionType = when (subMode) {
+    public fun fromSubMode(subMode: SubMode): SelectionType = when (subMode) {
       SubMode.VISUAL_LINE -> LINE_WISE
       SubMode.VISUAL_BLOCK -> BLOCK_WISE
       else -> CHARACTER_WISE
@@ -44,6 +44,6 @@ enum class SelectionType(val value: Int) {
   }
 }
 
-val SelectionType.isLine get() = this == SelectionType.LINE_WISE
-val SelectionType.isChar get() = this == SelectionType.CHARACTER_WISE
-val SelectionType.isBlock get() = this == SelectionType.BLOCK_WISE
+public val SelectionType.isLine: Boolean get() = this == SelectionType.LINE_WISE
+public val SelectionType.isChar: Boolean get() = this == SelectionType.CHARACTER_WISE
+public val SelectionType.isBlock: Boolean get() = this == SelectionType.BLOCK_WISE

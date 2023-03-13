@@ -14,13 +14,13 @@ import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.regexp.CharPointer
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 
-interface VimSearchGroup {
-  var lastSearchPattern: String?
-  var lastSubstitutePattern: String?
-  fun findUnderCaret(editor: VimEditor): TextRange?
-  fun searchBackward(editor: VimEditor, offset: Int, count: Int): TextRange?
-  fun getNextSearchRange(editor: VimEditor, count: Int, forwards: Boolean): TextRange?
-  fun processSearchRange(
+public interface VimSearchGroup {
+  public var lastSearchPattern: String?
+  public var lastSubstitutePattern: String?
+  public fun findUnderCaret(editor: VimEditor): TextRange?
+  public fun searchBackward(editor: VimEditor, offset: Int, count: Int): TextRange?
+  public fun getNextSearchRange(editor: VimEditor, count: Int, forwards: Boolean): TextRange?
+  public fun processSearchRange(
     editor: VimEditor,
     pattern: String,
     patternOffset: Int,
@@ -28,11 +28,11 @@ interface VimSearchGroup {
     direction: Direction,
   ): Int
 
-  fun searchNext(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Int
-  fun searchPrevious(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Int
-  fun processSearchCommand(editor: VimEditor, command: String, startOffset: Int, dir: Direction): Int
-  fun searchWord(editor: VimEditor, caret: ImmutableVimCaret, count: Int, whole: Boolean, dir: Direction): Int
-  fun processSubstituteCommand(
+  public fun searchNext(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Int
+  public fun searchPrevious(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Int
+  public fun processSearchCommand(editor: VimEditor, command: String, startOffset: Int, dir: Direction): Int
+  public fun searchWord(editor: VimEditor, caret: ImmutableVimCaret, count: Int, whole: Boolean, dir: Direction): Int
+  public fun processSubstituteCommand(
     editor: VimEditor,
     caret: VimCaret,
     range: LineRange,
@@ -41,19 +41,19 @@ interface VimSearchGroup {
     parent: VimLContext,
   ): Boolean
   // TODO rewrite this
-  fun search_regcomp(pat: CharPointer?, which_pat: Int, patSave: Int): Pair<Boolean, Triple<Any, String, Any>>
-  fun findDecimalNumber(line: String): Int?
-  fun clearSearchHighlight()
+  public fun search_regcomp(pat: CharPointer?, which_pat: Int, patSave: Int): Pair<Boolean, Triple<Any, String, Any>>
+  public fun findDecimalNumber(line: String): Int?
+  public fun clearSearchHighlight()
 
-  fun getLastSearchDirection(): Direction
+  public fun getLastSearchDirection(): Direction
   // Matching the values defined in Vim. Do not change these values, they are used as indexes
-  companion object {
-    val RE_SEARCH = 0 // Save/use search pattern
+  public companion object {
+    public val RE_SEARCH: Int = 0 // Save/use search pattern
 
-    val RE_SUBST = 1 // Save/use substitute pattern
+    public val RE_SUBST: Int = 1 // Save/use substitute pattern
 
-    val RE_BOTH = 2 // Save to both patterns
+    public val RE_BOTH: Int = 2 // Save to both patterns
 
-    val RE_LAST = 2 // Use last used pattern if "pat" is NULL
+    public val RE_LAST: Int = 2 // Use last used pattern if "pat" is NULL
   }
 }

@@ -14,7 +14,7 @@ import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 
-class ExecutionContextManagerStub : ExecutionContextManager {
+public class ExecutionContextManagerStub : ExecutionContextManager {
   init {
     vimLogger<ExecutionContextManagerStub>().warn("ExecutionContextManagerStub is used. Please replace it with your own implementation of ExecutionContextManager.")
   }

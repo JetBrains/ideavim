@@ -14,7 +14,7 @@ import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.expressions.operators.BinaryOperator
 
-data class BinExpression(val left: Expression, val right: Expression, val operator: BinaryOperator) : Expression() {
+public data class BinExpression(val left: Expression, val right: Expression, val operator: BinaryOperator) : Expression() {
 
   override fun evaluate(editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType {
     return operator.handler.performOperation(

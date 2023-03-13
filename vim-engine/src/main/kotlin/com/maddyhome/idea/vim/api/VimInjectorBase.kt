@@ -13,6 +13,7 @@ import com.maddyhome.idea.vim.api.stubs.VimApplicationStub
 import com.maddyhome.idea.vim.api.stubs.VimEnablerStub
 import com.maddyhome.idea.vim.api.stubs.VimMessagesStub
 import com.maddyhome.idea.vim.api.stubs.VimProcessGroupStub
+import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.register.VimRegisterGroup
 import com.maddyhome.idea.vim.register.VimRegisterGroupBase
@@ -23,10 +24,10 @@ import com.maddyhome.idea.vim.vimscript.services.VimVariableServiceBase
 import com.maddyhome.idea.vim.yank.VimYankGroup
 import com.maddyhome.idea.vim.yank.YankGroupBase
 
-abstract class VimInjectorBase : VimInjector {
-  companion object {
-    val logger by lazy { vimLogger<VimInjectorBase>() }
-    val registerGroupStub by lazy { object : VimRegisterGroupBase() {} }
+public abstract class VimInjectorBase : VimInjector {
+  public companion object {
+    public val logger: VimLogger by lazy { vimLogger<VimInjectorBase>() }
+    public val registerGroupStub: VimRegisterGroupBase by lazy { object : VimRegisterGroupBase() {} }
   }
 
   override val parser: VimStringParser = object : VimStringParserBase() {}

@@ -15,7 +15,7 @@ import com.maddyhome.idea.vim.group.visual.VimSelection
 /**
  * [putToLine] has affect only of [insertTextBeforeCaret] is false and [visualSelection] is null
  */
-data class PutData(
+public data class PutData(
   val textData: TextData?,
   val visualSelection: VisualSelection?,
   val count: Int,
@@ -27,12 +27,12 @@ data class PutData(
   val indent: Boolean =
     if (rawIndent && textData?.typeInRegister != SelectionType.LINE_WISE && visualSelection?.typeInEditor != SelectionType.LINE_WISE) false else rawIndent
 
-  data class VisualSelection(
+  public data class VisualSelection(
     val caretsAndSelections: Map<VimCaret, VimSelection>,
     val typeInEditor: SelectionType,
   )
 
-  data class TextData(
+  public data class TextData(
     val rawText: String?,
     val typeInRegister: SelectionType,
     val transferableData: List<Any>,

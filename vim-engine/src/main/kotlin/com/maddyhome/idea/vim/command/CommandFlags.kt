@@ -12,18 +12,18 @@ package com.maddyhome.idea.vim.command
  * Vim defines three types of motions. These types mostly affect the behaviour of `d` command and friends.
  * The type of the motion can be found in vim documentation for this motion.
  */
-enum class MotionType {
+public enum class MotionType {
   INCLUSIVE,
   EXCLUSIVE,
   LINE_WISE
 }
 
-enum class TextObjectVisualType {
+public enum class TextObjectVisualType {
   CHARACTER_WISE,
   LINE_WISE
 }
 
-enum class CommandFlags {
+public enum class CommandFlags {
   /**
    * Motion flags
    *

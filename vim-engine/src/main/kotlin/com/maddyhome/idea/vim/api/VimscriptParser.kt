@@ -12,9 +12,9 @@ import com.maddyhome.idea.vim.vimscript.model.Script
 import com.maddyhome.idea.vim.vimscript.model.commands.Command
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 
-interface VimscriptParser {
+public interface VimscriptParser {
 
-  fun parse(script: String): Script
-  fun parseCommand(command: String): Command?
-  fun parseExpression(expression: String): Expression?
+  public fun parse(script: String): Script
+  public fun parseCommand(command: String): Command?
+  public fun parseExpression(expression: String): Expression?
 }

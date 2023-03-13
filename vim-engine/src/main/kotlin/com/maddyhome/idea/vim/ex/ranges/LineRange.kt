@@ -7,13 +7,13 @@
  */
 package com.maddyhome.idea.vim.ex.ranges
 
-class LineRange(startLine: Int, endLine: Int) {
+public class LineRange(startLine: Int, endLine: Int) {
 
   @JvmField
-  val startLine: Int
+  public val startLine: Int
 
   @JvmField
-  val endLine: Int
+  public val endLine: Int
 
   init {
     if (endLine >= startLine) {

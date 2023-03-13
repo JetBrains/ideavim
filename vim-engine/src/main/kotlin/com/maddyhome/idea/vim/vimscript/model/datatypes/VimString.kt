@@ -10,7 +10,7 @@ package com.maddyhome.idea.vim.vimscript.model.datatypes
 
 import java.util.*
 
-data class VimString(val value: String) : VimDataType() {
+public data class VimString(val value: String) : VimDataType() {
 
   // todo refactoring
   override fun asDouble(): Double {

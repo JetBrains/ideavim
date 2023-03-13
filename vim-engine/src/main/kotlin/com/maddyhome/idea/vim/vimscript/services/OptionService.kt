@@ -25,7 +25,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 // * which-key 0.8.0 - getOptionValue$default(OptionScope, String)
 // * IdeaVimExtension 1.6.8 - setOption$default(Scope, String)
 @Deprecated("Use VimOptionGroup")
-interface OptionService {
+public interface OptionService {
 
   /**
    * Gets option value.
@@ -35,7 +35,7 @@ interface OptionService {
    * @throws ExException("E518: Unknown option: $token")
    */
   // Used by which-key 0.8.0 - "which-key", "timeout" and "timeoutlen"
-  fun getOptionValue(scope: OptionScope, optionName: String, token: String = optionName): VimDataType
+  public fun getOptionValue(scope: OptionScope, optionName: String, token: String = optionName): VimDataType
 
   /**
    * COMPATIBILITY-LAYER: New method added
@@ -43,16 +43,16 @@ interface OptionService {
    */
   // Used by IdeaVimExtension 1.6.8 - setOption(GLOBAL, "keep-english-in-normal")
   // Note that Find External Usages doesn't return any results because it calls setOption$default
-  fun setOption(scope: Scope, optionName: String, token: String = optionName)
+  public fun setOption(scope: Scope, optionName: String, token: String = optionName)
 
   /**
    * COMPATIBILITY-LAYER: Added this class
    * Please see: https://jb.gg/zo8n0r
    */
   // Used by IdeaVimExtension 1.6.5 + 1.6.8, passed to setOption
-  sealed class Scope {
-    object GLOBAL : Scope()
-    class LOCAL(val editor: VimEditor) : Scope()
+  public sealed class Scope {
+    public object GLOBAL : Scope()
+    public class LOCAL(public val editor: VimEditor) : Scope()
   }
 }
 

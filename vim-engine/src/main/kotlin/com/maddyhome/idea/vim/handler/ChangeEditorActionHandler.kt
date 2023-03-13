@@ -25,15 +25,15 @@ import com.maddyhome.idea.vim.command.OperatorArguments
  *   - [ChangeEditorActionHandler.SingleExecution]
  *   - [ChangeEditorActionHandler.ForEachCaret]
  */
-sealed class ChangeEditorActionHandler : EditorActionHandlerBase(false) {
+public sealed class ChangeEditorActionHandler : EditorActionHandlerBase(false) {
 
   /**
    * This handler executes an action for each caret. That means that if you have 5 carets, [execute] will be
    *   called 5 times.
    * @see [ChangeEditorActionHandler.SingleExecution] for only one execution.
    */
-  abstract class ForEachCaret : ChangeEditorActionHandler() {
-    abstract fun execute(
+  public abstract class ForEachCaret : ChangeEditorActionHandler() {
+    public abstract fun execute(
       editor: VimEditor,
       caret: VimCaret,
       context: ExecutionContext,
@@ -47,8 +47,8 @@ sealed class ChangeEditorActionHandler : EditorActionHandlerBase(false) {
    *   [execute] will be called 1 time.
    * @see [ChangeEditorActionHandler.ForEachCaret] for per-caret execution
    */
-  abstract class SingleExecution : ChangeEditorActionHandler() {
-    abstract fun execute(
+  public abstract class SingleExecution : ChangeEditorActionHandler() {
+    public abstract fun execute(
       editor: VimEditor,
       context: ExecutionContext,
       argument: Argument?,
@@ -56,15 +56,15 @@ sealed class ChangeEditorActionHandler : EditorActionHandlerBase(false) {
     ): Boolean
   }
 
-  abstract class ConditionalSingleExecution : ChangeEditorActionHandler() {
-    abstract fun runAsMulticaret(
+  public abstract class ConditionalSingleExecution : ChangeEditorActionHandler() {
+    public abstract fun runAsMulticaret(
       editor: VimEditor,
       context: ExecutionContext,
       cmd: Command,
       operatorArguments: OperatorArguments,
     ): Boolean
 
-    abstract fun execute(
+    public abstract fun execute(
       editor: VimEditor,
       caret: VimCaret,
       context: ExecutionContext,
@@ -72,7 +72,7 @@ sealed class ChangeEditorActionHandler : EditorActionHandlerBase(false) {
       operatorArguments: OperatorArguments,
     ): Boolean
 
-    abstract fun execute(
+    public abstract fun execute(
       editor: VimEditor,
       context: ExecutionContext,
       argument: Argument?,

@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
 
 // todo refactor us senpai :(
-data class ForLoop(val variable: Variable, val iterable: Expression, val body: List<Executable>) : Executable {
+public data class ForLoop(val variable: Variable, val iterable: Expression, val body: List<Executable>) : Executable {
   override lateinit var vimContext: VimLContext
 
   override fun execute(editor: VimEditor, context: ExecutionContext): ExecutionResult {
@@ -84,7 +84,7 @@ data class ForLoop(val variable: Variable, val iterable: Expression, val body: L
   }
 }
 
-data class ForLoopWithList(val variables: List<String>, val iterable: Expression, val body: List<Executable>) :
+public data class ForLoopWithList(val variables: List<String>, val iterable: Expression, val body: List<Executable>) :
   Executable {
   override lateinit var vimContext: VimLContext
 

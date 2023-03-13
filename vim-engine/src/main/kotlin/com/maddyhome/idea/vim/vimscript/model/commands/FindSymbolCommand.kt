@@ -18,8 +18,8 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :symbol"
  */
-data class FindSymbolCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
-  override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+public data class FindSymbolCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
+  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     // TODO: Check the command argument and jump to a specific symbol
     injector.application.invokeLater { injector.actionExecutor.executeAction("GotoSymbol", context) }

@@ -8,7 +8,7 @@
 
 package com.maddyhome.idea.vim.api
 
-interface VimExtensionRegistrator {
-  fun setOptionByPluginAlias(alias: String): Boolean
-  fun getExtensionNameByAlias(alias: String): String?
+public interface VimExtensionRegistrator {
+  public fun setOptionByPluginAlias(alias: String): Boolean
+  public fun getExtensionNameByAlias(alias: String): String?
 }

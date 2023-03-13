@@ -17,8 +17,8 @@ import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.commands.Command
 
-data class MapClearCommand(val ranges: Ranges, val argument: String, val cmd: String) : Command.SingleExecution(ranges, argument) {
-  override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_FORBIDDEN, Access.READ_ONLY)
+public data class MapClearCommand(val ranges: Ranges, val argument: String, val cmd: String) : Command.SingleExecution(ranges, argument) {
+  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_FORBIDDEN, Access.READ_ONLY)
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     return if (executeCommand()) ExecutionResult.Success else ExecutionResult.Error
@@ -32,7 +32,7 @@ data class MapClearCommand(val ranges: Ranges, val argument: String, val cmd: St
     return true
   }
 
-  companion object {
+  public companion object {
     private val COMMAND_INFOS = arrayOf(
       CommandInfo("mapc", "lear", MappingMode.NVO, false),
       CommandInfo("nmapc", "lear", MappingMode.N, false),

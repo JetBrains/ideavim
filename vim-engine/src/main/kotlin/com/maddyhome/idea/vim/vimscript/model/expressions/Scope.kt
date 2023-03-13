@@ -8,7 +8,7 @@
 
 package com.maddyhome.idea.vim.vimscript.model.expressions
 
-enum class Scope(val c: String) {
+public enum class Scope(public val c: String) {
 
   BUFFER_VARIABLE("b"),
   WINDOW_VARIABLE("w"),
@@ -19,8 +19,8 @@ enum class Scope(val c: String) {
   FUNCTION_VARIABLE("a"),
   VIM_VARIABLE("v");
 
-  companion object {
-    fun getByValue(s: String): Scope? {
+  public companion object {
+    public fun getByValue(s: String): Scope? {
       return values().firstOrNull { it.c == s }
     }
   }

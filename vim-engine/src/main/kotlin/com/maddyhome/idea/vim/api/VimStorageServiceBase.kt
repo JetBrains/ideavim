@@ -8,4 +8,4 @@
 
 package com.maddyhome.idea.vim.api
 
-abstract class VimStorageServiceBase : VimStorageService
+public abstract class VimStorageServiceBase : VimStorageService

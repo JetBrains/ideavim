@@ -17,7 +17,7 @@ import com.maddyhome.idea.vim.options.OptionConstants
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
-class DigraphSequence {
+public class DigraphSequence {
   private var digraphState = DIG_STATE_PENDING
   private var digraphChar = 0.toChar()
   private lateinit var codeChars: CharArray
@@ -25,23 +25,23 @@ class DigraphSequence {
   private var codeType = 0
   private var codeMax = 0
 
-  fun isDigraphStart(key: KeyStroke): Boolean {
+  public fun isDigraphStart(key: KeyStroke): Boolean {
     return digraphState == DIG_STATE_PENDING && // if state has changed, then it's not a start
       key.keyCode == KeyEvent.VK_K && key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0
   }
 
-  fun isLiteralStart(key: KeyStroke): Boolean {
+  public fun isLiteralStart(key: KeyStroke): Boolean {
     return digraphState == DIG_STATE_PENDING && // if state has changed, then it's not a start
       (key.keyCode == KeyEvent.VK_V || key.keyCode == KeyEvent.VK_Q) && key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0
   }
 
-  fun startDigraphSequence(): DigraphResult {
+  public fun startDigraphSequence(): DigraphResult {
     logger.debug("startDigraphSequence")
     digraphState = DIG_STATE_DIG_ONE
     return DigraphResult.HANDLED_DIGRAPH
   }
 
-  fun startLiteralSequence(): DigraphResult {
+  public fun startLiteralSequence(): DigraphResult {
     logger.debug("startLiteralSequence")
     digraphState = DIG_STATE_CODE_START
     codeChars = CharArray(8)
@@ -49,7 +49,7 @@ class DigraphSequence {
     return DigraphResult.HANDLED_LITERAL
   }
 
-  fun processKey(key: KeyStroke, editor: VimEditor): DigraphResult {
+  public fun processKey(key: KeyStroke, editor: VimEditor): DigraphResult {
     return when (digraphState) {
       DIG_STATE_PENDING -> {
         logger.debug("DIG_STATE_PENDING")
@@ -220,12 +220,12 @@ class DigraphSequence {
     return null
   }
 
-  fun reset() {
+  public fun reset() {
     digraphState = DIG_STATE_PENDING
     codeChars = CharArray(8)
   }
 
-  companion object {
+  public companion object {
     private const val DIG_STATE_PENDING = 1
     private const val DIG_STATE_DIG_ONE = 2
     private const val DIG_STATE_DIG_TWO = 3

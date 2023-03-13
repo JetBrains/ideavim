@@ -40,10 +40,10 @@ import kotlin.math.min
 /**
  * @author vlan
  */
-sealed class MappingInfo(
-  val fromKeys: List<KeyStroke>,
-  val isRecursive: Boolean,
-  val owner: MappingOwner,
+public sealed class MappingInfo(
+  public val fromKeys: List<KeyStroke>,
+  public val isRecursive: Boolean,
+  public val owner: MappingOwner,
 ) : Comparable<MappingInfo>, MappingInfoLayer {
 
   @VimNlsSafe
@@ -77,8 +77,8 @@ sealed class MappingInfo(
   }
 }
 
-class ToKeysMappingInfo(
-  val toKeys: List<KeyStroke>,
+public class ToKeysMappingInfo(
+  public val toKeys: List<KeyStroke>,
   fromKeys: List<KeyStroke>,
   isRecursive: Boolean,
   owner: MappingOwner,
@@ -101,12 +101,12 @@ class ToKeysMappingInfo(
     keyHandler.keyStack.removeFirst()
   }
 
-  companion object {
+  public companion object {
     private val LOG = vimLogger<ToKeysMappingInfo>()
   }
 }
 
-class ToExpressionMappingInfo(
+public class ToExpressionMappingInfo(
   private val toExpression: Expression,
   fromKeys: List<KeyStroke>,
   isRecursive: Boolean,
@@ -129,12 +129,12 @@ class ToExpressionMappingInfo(
     }
   }
 
-  companion object {
+  public companion object {
     private val LOG = vimLogger<ToExpressionMappingInfo>()
   }
 }
 
-class ToHandlerMappingInfo(
+public class ToHandlerMappingInfo(
   private val extensionHandler: ExtensionHandler,
   fromKeys: List<KeyStroke>,
   isRecursive: Boolean,
@@ -190,7 +190,7 @@ class ToHandlerMappingInfo(
     }
   }
 
-  companion object {
+  public companion object {
     private val LOG = vimLogger<ToHandlerMappingInfo>()
 
     private fun myFun(
@@ -232,8 +232,8 @@ class ToHandlerMappingInfo(
   }
 }
 
-class ToActionMappingInfo(
-  val action: String,
+public class ToActionMappingInfo(
+  public val action: String,
   fromKeys: List<KeyStroke>,
   isRecursive: Boolean,
   owner: MappingOwner,
@@ -247,7 +247,7 @@ class ToActionMappingInfo(
     injector.actionExecutor.executeAction(action, dataContext)
   }
 
-  companion object {
+  public companion object {
     private val LOG = vimLogger<ToActionMappingInfo>()
   }
 }

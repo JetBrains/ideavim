@@ -21,6 +21,7 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
+import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.helper.inBlockSubMode
 import com.maddyhome.idea.vim.helper.inVisualMode
@@ -33,7 +34,7 @@ import com.maddyhome.idea.vim.helper.StrictMode
  * Base class for motion handlers.
  * @see [MotionActionHandler.SingleExecution] and [MotionActionHandler.ForEachCaret]
  */
-sealed class MotionActionHandler : EditorActionHandlerBase(false) {
+public sealed class MotionActionHandler : EditorActionHandlerBase(false) {
 
   /**
    * Base class for motion handlers.
@@ -41,7 +42,7 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
    *   called 5 times.
    * @see [MotionActionHandler.SingleExecution] for only one execution
    */
-  abstract class ForEachCaret : MotionActionHandler() {
+  public abstract class ForEachCaret : MotionActionHandler() {
 
     /**
      * This method should return new offset for [caret]
@@ -49,7 +50,7 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
      *   called 5 times.
      * The method executes only once it there is block selection.
      */
-    abstract fun getOffset(
+    public abstract fun getOffset(
       editor: VimEditor,
       caret: ImmutableVimCaret,
       context: ExecutionContext,
@@ -64,13 +65,13 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
    *   [getOffset] will be called 1 time.
    * @see [MotionActionHandler.ForEachCaret] for per-caret execution
    */
-  abstract class SingleExecution : MotionActionHandler() {
+  public abstract class SingleExecution : MotionActionHandler() {
     /**
      * This method should return new offset for primary caret
      * It executes once for all carets. That means that if you have 5 carets, [getOffset] will be
      *   called 1 time.
      */
-    abstract fun getOffset(
+    public abstract fun getOffset(
       editor: VimEditor,
       context: ExecutionContext,
       argument: Argument?,
@@ -78,11 +79,11 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
     ): Motion
   }
 
-  abstract val motionType: MotionType
+  public abstract val motionType: MotionType
 
   final override val type: Command.Type = Command.Type.MOTION
 
-  fun getHandlerOffset(
+  public fun getHandlerOffset(
     editor: VimEditor,
     caret: ImmutableVimCaret,
     context: ExecutionContext,
@@ -237,7 +238,7 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
     }
   }
 
-  companion object {
-    val logger = vimLogger<MotionActionHandler>()
+  public companion object {
+    public val logger: VimLogger = vimLogger<MotionActionHandler>()
   }
 }

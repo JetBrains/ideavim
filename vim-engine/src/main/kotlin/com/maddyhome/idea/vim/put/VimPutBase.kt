@@ -33,6 +33,7 @@ import com.maddyhome.idea.vim.command.isLine
 import com.maddyhome.idea.vim.common.Offset
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.common.offset
+import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.helper.RWLockLabel
 import com.maddyhome.idea.vim.helper.firstOrNull
@@ -45,7 +46,7 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
-abstract class VimPutBase : VimPut {
+public abstract class VimPutBase : VimPut {
   @RWLockLabel.SelfSynchronized
   override fun putText(
     editor: VimEditor,
@@ -542,8 +543,8 @@ abstract class VimPutBase : VimPut {
     }
   }
 
-  companion object {
-    val logger by lazy { vimLogger<VimPutBase>() }
+  public companion object {
+    public val logger: VimLogger by lazy { vimLogger<VimPutBase>() }
   }
 }
 

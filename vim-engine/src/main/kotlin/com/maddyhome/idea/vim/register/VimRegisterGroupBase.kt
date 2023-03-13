@@ -16,6 +16,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.options.OptionConstants
@@ -31,7 +32,7 @@ import com.maddyhome.idea.vim.register.RegisterConstants.VALID_REGISTERS
 import com.maddyhome.idea.vim.register.RegisterConstants.WRITABLE_REGISTERS
 import javax.swing.KeyStroke
 
-abstract class VimRegisterGroupBase : VimRegisterGroup {
+public abstract class VimRegisterGroupBase : VimRegisterGroup {
 
   @JvmField
   protected var recordRegister: Char = 0.toChar()
@@ -40,14 +41,14 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
   protected var recordList: MutableList<KeyStroke>? = null
 
   @JvmField
-  protected val myRegisters = HashMap<Char, Register>()
+  protected val myRegisters: java.util.HashMap<Char, Register> = HashMap<Char, Register>()
 
   @JvmField
-  protected var defaultRegisterChar = UNNAMED_REGISTER
+  protected var defaultRegisterChar: Char = UNNAMED_REGISTER
 
-  override var lastRegisterChar = defaultRegisterChar
+  override var lastRegisterChar: Char = defaultRegisterChar
 
-  override var isRegisterSpecifiedExplicitly = false
+  override var isRegisterSpecifiedExplicitly: Boolean = false
 
   /**
    * Gets the last register name selected by the user
@@ -154,7 +155,7 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     return false
   }
 
-  fun storeTextInternal(
+  public fun storeTextInternal(
     editor: VimEditor,
     caret: ImmutableVimCaret,
     range: TextRange,
@@ -444,8 +445,8 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     recordRegister = 0.toChar()
   }
 
-  companion object {
-    val logger = vimLogger<VimRegisterGroupBase>()
+  public companion object {
+    public val logger: VimLogger = vimLogger<VimRegisterGroupBase>()
   }
 
   override fun getCurrentRegisterForMulticaret(): Char {

@@ -8,7 +8,7 @@
 
 package com.maddyhome.idea.vim.api
 
-interface VimStorageService {
+public interface VimStorageService {
   /**
    * Gets data from editor (in Vim it is called window).
    * Vim stores there window scoped (`w:`) variables and local options.
@@ -17,7 +17,7 @@ interface VimStorageService {
    * @param editor editor/window to get the value from
    * @param key key
    */
-  fun <T> getDataFromEditor(editor: VimEditor, key: Key<T>): T?
+  public fun <T> getDataFromEditor(editor: VimEditor, key: Key<T>): T?
 
   /**
    * Puts data to editor (in Vim it is called window).
@@ -28,7 +28,7 @@ interface VimStorageService {
    * @param key key
    * @param data data to store
    */
-  fun <T> putDataToEditor(editor: VimEditor, key: Key<T>, data: T)
+  public fun <T> putDataToEditor(editor: VimEditor, key: Key<T>, data: T)
 
   /**
    * Gets data from buffer
@@ -37,7 +37,7 @@ interface VimStorageService {
    * @param editor editor/window with the buffer opened
    * @param key key
    */
-  fun <T> getDataFromBuffer(editor: VimEditor, key: Key<T>): T?
+  public fun <T> getDataFromBuffer(editor: VimEditor, key: Key<T>): T?
 
   /**
    * Puts data to buffer
@@ -47,7 +47,7 @@ interface VimStorageService {
    * @param key key
    * @param data data to store
    */
-  fun <T> putDataToBuffer(editor: VimEditor, key: Key<T>, data: T)
+  public fun <T> putDataToBuffer(editor: VimEditor, key: Key<T>, data: T)
 
   /**
    * Gets data from tab (group of windows)
@@ -56,7 +56,7 @@ interface VimStorageService {
    * @param editor editor/window in the tap page
    * @param key key
    */
-  fun <T> getDataFromTab(editor: VimEditor, key: Key<T>): T?
+  public fun <T> getDataFromTab(editor: VimEditor, key: Key<T>): T?
 
   /**
    * Puts data to tab (group of windows)
@@ -66,7 +66,7 @@ interface VimStorageService {
    * @param key key
    * @param data data to store
    */
-  fun <T> putDataToTab(editor: VimEditor, key: Key<T>, data: T)
+  public fun <T> putDataToTab(editor: VimEditor, key: Key<T>, data: T)
 }
 
-data class Key<T>(val name: String)
+public data class Key<T>(val name: String)

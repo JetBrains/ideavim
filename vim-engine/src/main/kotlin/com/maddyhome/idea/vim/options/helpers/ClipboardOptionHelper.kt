@@ -17,11 +17,11 @@ import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.options.StringOption
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
-object ClipboardOptionHelper {
-  var ideaputDisabled = false
+public object ClipboardOptionHelper {
+  public var ideaputDisabled: Boolean = false
     private set
 
-  class IdeaputDisabler : AutoCloseable {
+  public class IdeaputDisabler : AutoCloseable {
     private val containedBefore =
       injector.globalOptions().hasValue(OptionConstants.clipboard, OptionConstants.clipboard_ideaput)
 

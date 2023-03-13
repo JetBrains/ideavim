@@ -10,14 +10,14 @@ package com.maddyhome.idea.vim.group
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 
-interface VimWindowGroup {
-  fun selectWindowInRow(caret: VimCaret, context: ExecutionContext, relativePosition: Int, vertical: Boolean)
-  fun selectNextWindow(context: ExecutionContext)
-  fun selectWindow(context: ExecutionContext, index: Int)
-  fun selectPreviousWindow(context: ExecutionContext)
-  fun closeAllExceptCurrent(context: ExecutionContext)
-  fun splitWindowVertical(context: ExecutionContext, filename: String)
-  fun splitWindowHorizontal(context: ExecutionContext, filename: String)
-  fun closeCurrentWindow(context: ExecutionContext)
-  fun closeAll(context: ExecutionContext)
+public interface VimWindowGroup {
+  public fun selectWindowInRow(caret: VimCaret, context: ExecutionContext, relativePosition: Int, vertical: Boolean)
+  public fun selectNextWindow(context: ExecutionContext)
+  public fun selectWindow(context: ExecutionContext, index: Int)
+  public fun selectPreviousWindow(context: ExecutionContext)
+  public fun closeAllExceptCurrent(context: ExecutionContext)
+  public fun splitWindowVertical(context: ExecutionContext, filename: String)
+  public fun splitWindowHorizontal(context: ExecutionContext, filename: String)
+  public fun closeCurrentWindow(context: ExecutionContext)
+  public fun closeAll(context: ExecutionContext)
 }

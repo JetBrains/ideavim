@@ -22,11 +22,11 @@ import com.maddyhome.idea.vim.helper.subMode
 import java.util.*
 import kotlin.math.min
 
-object VisualOperation {
+public object VisualOperation {
   /**
    * Get [VisualChange] of current visual operation
    */
-  fun getRange(editor: VimEditor, caret: ImmutableVimCaret, cmdFlags: EnumSet<CommandFlags>): VisualChange {
+  public fun getRange(editor: VimEditor, caret: ImmutableVimCaret, cmdFlags: EnumSet<CommandFlags>): VisualChange {
     var (start, end) = caret.run {
       if (editor.inBlockSubMode) sort(vimSelectionStart, offset.point) else sort(selectionStart, selectionEnd)
     }
@@ -55,7 +55,7 @@ object VisualOperation {
   /**
    * Calculate end offset of [VisualChange]
    */
-  fun calculateRange(editor: VimEditor, range: VisualChange, count: Int, caret: ImmutableVimCaret): Int {
+  public fun calculateRange(editor: VimEditor, range: VisualChange, count: Int, caret: ImmutableVimCaret): Int {
     var (lines, chars, type) = range
     if (type == SelectionType.LINE_WISE || type == SelectionType.BLOCK_WISE || lines > 1) {
       lines *= count

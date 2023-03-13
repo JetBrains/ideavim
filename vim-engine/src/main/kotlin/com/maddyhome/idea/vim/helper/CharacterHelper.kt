@@ -13,10 +13,10 @@ import java.lang.Character.UnicodeBlock
 /**
  * This helper class is used when working with various character level operations
  */
-object CharacterHelper {
-  const val CASE_TOGGLE = '~'
-  const val CASE_UPPER = 'u'
-  const val CASE_LOWER = 'l'
+public object CharacterHelper {
+  public const val CASE_TOGGLE: Char = '~'
+  public const val CASE_UPPER: Char = 'u'
+  public const val CASE_LOWER: Char = 'l'
 
   /**
    * This returns the type of the supplied character. The logic is as follows:<br></br>
@@ -30,7 +30,7 @@ object CharacterHelper {
    * @return The type of the character
    */
   @JvmStatic
-  fun charType(ch: Char, punctuationAsLetters: Boolean): CharacterType {
+  public fun charType(ch: Char, punctuationAsLetters: Boolean): CharacterType {
     val block = UnicodeBlock.of(ch)
     return if (Character.isWhitespace(ch)) {
       CharacterType.WHITESPACE
@@ -50,14 +50,14 @@ object CharacterHelper {
   }
 
   @JvmStatic
-  fun isInvisibleControlCharacter(ch: Char): Boolean {
+  public fun isInvisibleControlCharacter(ch: Char): Boolean {
     val type = Character.getType(ch).toByte()
     return type == Character.CONTROL || type == Character.FORMAT || type == Character.PRIVATE_USE ||
       type == Character.SURROGATE || type == Character.UNASSIGNED
   }
 
   @JvmStatic
-  fun isZeroWidthCharacter(ch: Char) = ch == '\ufeff' || ch == '\u200b' || ch == '\u200c' || ch == '\u200d'
+  public fun isZeroWidthCharacter(ch: Char): Boolean = ch == '\ufeff' || ch == '\u200b' || ch == '\u200c' || ch == '\u200d'
 
   private fun isHalfWidthKatakanaLetter(ch: Char): Boolean = ch in '\uFF66'..'\uFF9F'
 
@@ -69,7 +69,7 @@ object CharacterHelper {
    * @return The character with changed case or the original if not a letter
    */
   @JvmStatic
-  fun changeCase(ch: Char, type: Char): Char = when (type) {
+  public fun changeCase(ch: Char, type: Char): Char = when (type) {
     CASE_TOGGLE -> when {
       Character.isLowerCase(ch) -> Character.toUpperCase(ch)
       Character.isUpperCase(ch) -> Character.toLowerCase(ch)
@@ -80,7 +80,7 @@ object CharacterHelper {
     else -> ch
   }
 
-  enum class CharacterType {
+  public enum class CharacterType {
     KEYWORD, HIRAGANA, KATAKANA, HALF_WIDTH_KATAKANA, CJK_UNIFIED_IDEOGRAPHS, PUNCTUATION, WHITESPACE
   }
 }

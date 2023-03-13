@@ -8,4 +8,4 @@
 
 package com.maddyhome.idea.vim.api
 
-abstract class VimSearchGroupBase : VimSearchGroup
+public abstract class VimSearchGroupBase : VimSearchGroup

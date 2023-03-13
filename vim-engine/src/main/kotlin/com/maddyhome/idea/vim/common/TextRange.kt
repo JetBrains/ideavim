@@ -15,13 +15,13 @@ import kotlin.math.min
 /**
  * Please prefer [com.maddyhome.idea.vim.group.visual.VimSelection] for visual selection
  */
-class TextRange(val startOffsets: IntArray, val endOffsets: IntArray) {
-  constructor(start: Int, end: Int) : this(intArrayOf(start), intArrayOf(end))
+public class TextRange(public val startOffsets: IntArray, public val endOffsets: IntArray) {
+  public constructor(start: Int, end: Int) : this(intArrayOf(start), intArrayOf(end))
 
-  val isMultiple
+  public val isMultiple: Boolean
     get() = startOffsets.size > 1
 
-  val maxLength: Int
+  public val maxLength: Int
     get() {
       var max = 0
       for (i in 0 until size()) {
@@ -30,7 +30,7 @@ class TextRange(val startOffsets: IntArray, val endOffsets: IntArray) {
       return max
     }
 
-  val selectionCount: Int
+  public val selectionCount: Int
     get() {
       var res = 0
       for (i in 0 until size()) {
@@ -39,15 +39,15 @@ class TextRange(val startOffsets: IntArray, val endOffsets: IntArray) {
       return res
     }
 
-  fun size(): Int = startOffsets.size
+  public fun size(): Int = startOffsets.size
 
-  val startOffset: Int
+  public val startOffset: Int
     get() = startOffsets.first()
 
-  val endOffset: Int
+  public val endOffset: Int
     get() = endOffsets.last()
 
-  fun normalize(): TextRange {
+  public fun normalize(): TextRange {
     normalizeIndex(0)
     return this
   }
@@ -61,7 +61,7 @@ class TextRange(val startOffsets: IntArray, val endOffsets: IntArray) {
   }
 
   @Contract(mutates = "this")
-  fun normalize(fileSize: Int): Boolean {
+  public fun normalize(fileSize: Int): Boolean {
     for (i in 0 until size()) {
       normalizeIndex(i)
       startOffsets[i] = max(0, min(startOffsets[i], fileSize))
@@ -73,7 +73,7 @@ class TextRange(val startOffsets: IntArray, val endOffsets: IntArray) {
     return true
   }
 
-  operator fun contains(offset: Int): Boolean = if (isMultiple) false else offset in startOffset until endOffset
+  public operator fun contains(offset: Int): Boolean = if (isMultiple) false else offset in startOffset until endOffset
 
   override fun toString(): String {
     @NonNls val sb = StringBuilder()

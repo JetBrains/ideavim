@@ -36,8 +36,8 @@ import kotlin.math.min
 /**
  * see "h :set"
  */
-data class SetCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
-  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+public data class SetCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
+  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     val result = parseOptionLine(editor, argument, OptionScope.GLOBAL, failOnBad = true)
@@ -49,8 +49,8 @@ data class SetCommand(val ranges: Ranges, val argument: String) : Command.Single
   }
 }
 
-data class SetLocalCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
-  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+public data class SetLocalCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
+  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     return if (parseOptionLine(editor, argument, OptionScope.LOCAL(editor), failOnBad = true)) {
@@ -86,7 +86,7 @@ data class SetLocalCommand(val ranges: Ranges, val argument: String) : Command.S
  * @return True if no errors were found, false if there were any errors
  */
 // todo is failOnBad used anywhere?
-fun parseOptionLine(editor: VimEditor, args: String, scope: OptionScope, failOnBad: Boolean): Boolean {
+public fun parseOptionLine(editor: VimEditor, args: String, scope: OptionScope, failOnBad: Boolean): Boolean {
   // No arguments so we show changed values
   val optionGroup = injector.optionGroup
   when {

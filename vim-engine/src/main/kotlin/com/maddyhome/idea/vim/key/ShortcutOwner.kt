@@ -12,16 +12,16 @@ import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.helper.mode
 import org.jetbrains.annotations.NonNls
 
-sealed class ShortcutOwnerInfo {
-  data class AllModes(val owner: ShortcutOwner) : ShortcutOwnerInfo()
+public sealed class ShortcutOwnerInfo {
+  public data class AllModes(val owner: ShortcutOwner) : ShortcutOwnerInfo()
 
-  data class PerMode(
+  public data class PerMode(
     val normal: ShortcutOwner,
     val insert: ShortcutOwner,
     val visual: ShortcutOwner,
     val select: ShortcutOwner,
   ) : ShortcutOwnerInfo() {
-    fun toNotation(): String {
+    public fun toNotation(): String {
       val owners = HashMap<ShortcutOwner, MutableList<String>>()
       owners[normal] = (owners[normal] ?: mutableListOf()).also { it.add("n") }
       owners[insert] = (owners[insert] ?: mutableListOf()).also { it.add("i") }
@@ -69,7 +69,7 @@ sealed class ShortcutOwnerInfo {
     }
   }
 
-  fun forEditor(editor: VimEditor): ShortcutOwner {
+  public fun forEditor(editor: VimEditor): ShortcutOwner {
     return when (this) {
       is AllModes -> this.owner
       is PerMode -> when (editor.mode) {
@@ -87,14 +87,14 @@ sealed class ShortcutOwnerInfo {
     }
   }
 
-  companion object {
+  public companion object {
     @JvmField
-    val allUndefined = AllModes(ShortcutOwner.UNDEFINED)
-    val allVim = AllModes(ShortcutOwner.VIM)
-    val allIde = AllModes(ShortcutOwner.IDE)
+    public val allUndefined: AllModes = AllModes(ShortcutOwner.UNDEFINED)
+    public val allVim: AllModes = AllModes(ShortcutOwner.VIM)
+    public val allIde: AllModes = AllModes(ShortcutOwner.IDE)
 
-    val allPerModeVim = PerMode(ShortcutOwner.VIM, ShortcutOwner.VIM, ShortcutOwner.VIM, ShortcutOwner.VIM)
-    val allPerModeIde = PerMode(ShortcutOwner.IDE, ShortcutOwner.IDE, ShortcutOwner.IDE, ShortcutOwner.IDE)
+    public val allPerModeVim: PerMode = PerMode(ShortcutOwner.VIM, ShortcutOwner.VIM, ShortcutOwner.VIM, ShortcutOwner.VIM)
+    public val allPerModeIde: PerMode = PerMode(ShortcutOwner.IDE, ShortcutOwner.IDE, ShortcutOwner.IDE, ShortcutOwner.IDE)
 
     private val wights = mapOf(
       "a" to 0,
@@ -107,7 +107,7 @@ sealed class ShortcutOwnerInfo {
   }
 }
 
-enum class ShortcutOwner(val ownerName: @NonNls String, private val title: @NonNls String) {
+public enum class ShortcutOwner(public val ownerName: @NonNls String, private val title: @NonNls String) {
   UNDEFINED("undefined", "Undefined"),
   IDE(Constants.IDE_STRING, "IDE"),
   VIM(Constants.VIM_STRING, "Vim");
@@ -119,15 +119,15 @@ enum class ShortcutOwner(val ownerName: @NonNls String, private val title: @NonN
     const val VIM_STRING: @NonNls String = "vim"
   }
 
-  companion object {
+  public companion object {
     @JvmStatic
-    fun fromString(s: String): ShortcutOwner = when (s) {
+    public fun fromString(s: String): ShortcutOwner = when (s) {
       Constants.IDE_STRING -> IDE
       Constants.VIM_STRING -> VIM
       else -> UNDEFINED
     }
 
-    fun fromStringOrNull(s: String): ShortcutOwner? {
+    public fun fromStringOrNull(s: String): ShortcutOwner? {
       return when {
         Constants.IDE_STRING.equals(s, ignoreCase = true) -> IDE
         Constants.VIM_STRING.equals(s, ignoreCase = true) -> VIM

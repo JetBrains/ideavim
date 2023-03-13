@@ -14,7 +14,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 
-fun VimEditor.exitVisualMode() {
+public fun VimEditor.exitVisualMode() {
   val selectionType = SelectionType.fromSubMode(this.subMode)
   SelectionVimListenerSuppressor.lock().use {
     if (inBlockSubMode) {

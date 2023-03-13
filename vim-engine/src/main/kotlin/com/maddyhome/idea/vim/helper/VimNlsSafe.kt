@@ -12,4 +12,4 @@ import org.jetbrains.annotations.NonNls
 
 // [VERSION UPDATE] 203+ replace this annotation with @VimNlsSafe
 @NonNls
-annotation class VimNlsSafe
+public annotation class VimNlsSafe

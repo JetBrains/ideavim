@@ -15,7 +15,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 
-class FalsyExpression(val left: Expression, val right: Expression) : Expression() {
+public class FalsyExpression(public val left: Expression, public val right: Expression) : Expression() {
 
   override fun evaluate(editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType {
     val leftValue = left.evaluate(editor, context, vimContext)

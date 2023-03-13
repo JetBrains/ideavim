@@ -8,8 +8,8 @@
 
 package com.maddyhome.idea.vim.common
 
-interface ChangesListener {
-  fun documentChanged(change: Change)
+public interface ChangesListener {
+  public fun documentChanged(change: Change)
 
-  class Change(val oldFragment: String, val newFragment: String, val offset: Int)
+  public class Change(public val oldFragment: String, public val newFragment: String, public val offset: Int)
 }

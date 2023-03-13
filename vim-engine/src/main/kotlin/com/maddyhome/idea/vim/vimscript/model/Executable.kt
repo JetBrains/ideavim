@@ -11,13 +11,13 @@ package com.maddyhome.idea.vim.vimscript.model
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 
-interface Executable : VimLContext {
+public interface Executable : VimLContext {
 
-  var vimContext: VimLContext
+  public var vimContext: VimLContext
 
   override fun getPreviousParentContext(): VimLContext {
     return vimContext
   }
 
-  fun execute(editor: VimEditor, context: ExecutionContext): ExecutionResult
+  public fun execute(editor: VimEditor, context: ExecutionContext): ExecutionResult
 }

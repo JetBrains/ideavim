@@ -10,28 +10,28 @@ package com.maddyhome.idea.vim.diagnostic
 
 import com.maddyhome.idea.vim.api.injector
 
-interface VimLogger {
-  fun isTrace(): Boolean
-  fun trace(data: String)
+public interface VimLogger {
+  public fun isTrace(): Boolean
+  public fun trace(data: String)
 
-  fun isDebug(): Boolean
-  fun debug(data: String)
+  public fun isDebug(): Boolean
+  public fun debug(data: String)
 
-  fun warn(message: String)
-  fun error(message: String)
-  fun info(message: String)
+  public fun warn(message: String)
+  public fun error(message: String)
+  public fun info(message: String)
 }
 
-fun VimLogger.trace(message: () -> String) {
+public fun VimLogger.trace(message: () -> String) {
   if (isTrace()) {
     trace(message())
   }
 }
 
-fun VimLogger.debug(message: () -> String) {
+public fun VimLogger.debug(message: () -> String) {
   if (isDebug()) {
     debug(message())
   }
 }
 
-inline fun <reified T : Any> vimLogger(): VimLogger = injector.getLogger(T::class.java)
+inline public fun <reified T : Any> vimLogger(): VimLogger = injector.getLogger(T::class.java)

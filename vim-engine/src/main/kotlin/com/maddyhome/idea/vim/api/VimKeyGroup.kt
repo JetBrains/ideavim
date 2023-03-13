@@ -19,13 +19,13 @@ import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import javax.swing.KeyStroke
 
-interface VimKeyGroup {
-  fun getKeyRoot(mappingMode: MappingMode): CommandPartNode<VimActionsInitiator>
-  fun getKeyMappingLayer(mode: MappingMode): KeyMappingLayer
-  fun getActions(editor: VimEditor, keyStroke: KeyStroke): List<NativeAction>
-  fun getKeymapConflicts(keyStroke: KeyStroke): List<NativeAction>
+public interface VimKeyGroup {
+  public fun getKeyRoot(mappingMode: MappingMode): CommandPartNode<VimActionsInitiator>
+  public fun getKeyMappingLayer(mode: MappingMode): KeyMappingLayer
+  public fun getActions(editor: VimEditor, keyStroke: KeyStroke): List<NativeAction>
+  public fun getKeymapConflicts(keyStroke: KeyStroke): List<NativeAction>
 
-  fun putKeyMapping(
+  public fun putKeyMapping(
     modes: Set<MappingMode>,
     fromKeys: List<KeyStroke>,
     owner: MappingOwner,
@@ -33,7 +33,7 @@ interface VimKeyGroup {
     recursive: Boolean,
   )
 
-  fun putKeyMapping(
+  public fun putKeyMapping(
     modes: Set<MappingMode>,
     fromKeys: List<KeyStroke>,
     owner: MappingOwner,
@@ -41,7 +41,7 @@ interface VimKeyGroup {
     recursive: Boolean,
   )
 
-  fun putKeyMapping(
+  public fun putKeyMapping(
     modes: Set<MappingMode>,
     fromKeys: List<KeyStroke>,
     owner: MappingOwner,
@@ -50,19 +50,19 @@ interface VimKeyGroup {
     recursive: Boolean,
   )
 
-  fun removeKeyMapping(owner: MappingOwner)
-  fun removeKeyMapping(modes: Set<MappingMode>)
-  fun removeKeyMapping(modes: Set<MappingMode>, keys: List<KeyStroke>)
-  fun showKeyMappings(modes: Set<MappingMode>, editor: VimEditor): Boolean
-  fun getKeyMapping(mode: MappingMode): KeyMapping
-  fun getKeyMappingByOwner(owner: MappingOwner): List<Pair<List<KeyStroke>, MappingInfo>>
-  fun updateShortcutKeysRegistration()
-  fun getMapTo(mode: MappingMode, toKeys: List<KeyStroke>): List<Pair<List<KeyStroke>, MappingInfo>>
-  fun unregisterCommandActions()
-  fun resetKeyMappings()
-  fun hasmapto(mode: MappingMode, toKeys: List<KeyStroke>): Boolean
+  public fun removeKeyMapping(owner: MappingOwner)
+  public fun removeKeyMapping(modes: Set<MappingMode>)
+  public fun removeKeyMapping(modes: Set<MappingMode>, keys: List<KeyStroke>)
+  public fun showKeyMappings(modes: Set<MappingMode>, editor: VimEditor): Boolean
+  public fun getKeyMapping(mode: MappingMode): KeyMapping
+  public fun getKeyMappingByOwner(owner: MappingOwner): List<Pair<List<KeyStroke>, MappingInfo>>
+  public fun updateShortcutKeysRegistration()
+  public fun getMapTo(mode: MappingMode, toKeys: List<KeyStroke>): List<Pair<List<KeyStroke>, MappingInfo>>
+  public fun unregisterCommandActions()
+  public fun resetKeyMappings()
+  public fun hasmapto(mode: MappingMode, toKeys: List<KeyStroke>): Boolean
 
-  val shortcutConflicts: MutableMap<KeyStroke, ShortcutOwnerInfo>
-  val savedShortcutConflicts: MutableMap<KeyStroke, ShortcutOwnerInfo>
-  var operatorFunction: OperatorFunction?
+  public val shortcutConflicts: MutableMap<KeyStroke, ShortcutOwnerInfo>
+  public val savedShortcutConflicts: MutableMap<KeyStroke, ShortcutOwnerInfo>
+  public var operatorFunction: OperatorFunction?
 }

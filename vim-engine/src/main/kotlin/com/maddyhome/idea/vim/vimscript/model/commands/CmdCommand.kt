@@ -22,8 +22,8 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
  * @author Elliot Courant
  * see "h :command"
  */
-data class CmdCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges) {
-  override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+public data class CmdCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges) {
+  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   private val unsupportedArgs = listOf(
     Regex("-range(=[^ ])?") to "-range",

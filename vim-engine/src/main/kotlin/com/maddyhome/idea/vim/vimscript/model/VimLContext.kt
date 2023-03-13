@@ -10,18 +10,18 @@ package com.maddyhome.idea.vim.vimscript.model
 
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
 
-sealed interface VimLContext {
+public sealed interface VimLContext {
 
   // todo rename
-  fun getPreviousParentContext(): VimLContext
+  public fun getPreviousParentContext(): VimLContext
 
-  fun isFirstParentContext(): Boolean {
+  public fun isFirstParentContext(): Boolean {
     return this is Script || this is CommandLineVimLContext
   }
 
   // todo rename
   // todo documentation
-  fun getFirstParentContext(): VimLContext {
+  public fun getFirstParentContext(): VimLContext {
     return if (isFirstParentContext()) {
       this
     } else {
@@ -31,7 +31,7 @@ sealed interface VimLContext {
   }
 
   // todo better name
-  fun getExecutableContext(executable: VimLContext): ExecutableContext {
+  public fun getExecutableContext(executable: VimLContext): ExecutableContext {
     var currentNode: VimLContext = executable
     while (currentNode !is FunctionDeclaration && !currentNode.isFirstParentContext()) {
       currentNode = currentNode.getPreviousParentContext()
@@ -44,7 +44,7 @@ sealed interface VimLContext {
     }
   }
 
-  fun getScript(): Script? {
+  public fun getScript(): Script? {
     val firstParentContext = getFirstParentContext()
     return if (firstParentContext is Script) firstParentContext else null
   }
@@ -53,7 +53,7 @@ sealed interface VimLContext {
 /*
  * VimL that was invoked from command line
  */
-object CommandLineVimLContext : VimLContext {
+public object CommandLineVimLContext : VimLContext {
 
   override fun getPreviousParentContext(): VimLContext {
     throw RuntimeException("Command line has no parent context")
@@ -61,7 +61,7 @@ object CommandLineVimLContext : VimLContext {
 }
 
 // todo rename
-enum class ExecutableContext {
+public enum class ExecutableContext {
   COMMAND_LINE,
   SCRIPT,
   FUNCTION

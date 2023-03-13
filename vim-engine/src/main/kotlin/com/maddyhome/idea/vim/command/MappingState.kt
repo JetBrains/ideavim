@@ -17,26 +17,26 @@ import java.awt.event.ActionListener
 import javax.swing.KeyStroke
 import javax.swing.Timer
 
-class MappingState {
+public class MappingState {
   // Map command depth. 0 - if it is not a map command. 1 - regular map command. 2+ - nested map commands
   private var mapDepth = 0
 
-  fun isExecutingMap(): Boolean {
+  public fun isExecutingMap(): Boolean {
     return mapDepth > 0
   }
 
-  fun startMapExecution() {
+  public fun startMapExecution() {
     ++mapDepth
   }
 
-  fun stopMapExecution() {
+  public fun stopMapExecution() {
     --mapDepth
   }
 
-  val keys: Iterable<KeyStroke>
+  public val keys: Iterable<KeyStroke>
     get() = keyList
 
-  var mappingMode = MappingMode.NORMAL
+  public var mappingMode: MappingMode = MappingMode.NORMAL
 
   private val timer = Timer(injector.globalOptions().getIntValue(OptionConstants.timeoutlen), null)
   private var keyList = mutableListOf<KeyStroke>()
@@ -45,37 +45,37 @@ class MappingState {
     timer.isRepeats = false
   }
 
-  fun startMappingTimer(actionListener: ActionListener) {
+  public fun startMappingTimer(actionListener: ActionListener) {
     timer.initialDelay = injector.globalOptions().getIntValue(OptionConstants.timeoutlen)
     timer.actionListeners.forEach { timer.removeActionListener(it) }
     timer.addActionListener(actionListener)
     timer.start()
   }
 
-  fun stopMappingTimer() {
+  public fun stopMappingTimer() {
     LOG.trace { "Stop mapping timer" }
     timer.stop()
     timer.actionListeners.forEach { timer.removeActionListener(it) }
   }
 
-  fun addKey(key: KeyStroke) {
+  public fun addKey(key: KeyStroke) {
     keyList.add(key)
   }
 
-  fun detachKeys(): List<KeyStroke> {
+  public fun detachKeys(): List<KeyStroke> {
     val currentKeys = keyList
     keyList = mutableListOf()
     return currentKeys
   }
 
-  fun resetMappingSequence() {
+  public fun resetMappingSequence() {
     LOG.trace("Reset mapping sequence")
     stopMappingTimer()
     keyList.clear()
     // NOTE: We intentionally don't reset mapping mode here
   }
 
-  companion object {
+  public companion object {
     private val LOG = vimLogger<MappingState>()
   }
 }

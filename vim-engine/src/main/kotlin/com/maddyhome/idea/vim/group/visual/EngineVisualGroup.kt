@@ -12,7 +12,7 @@ import com.maddyhome.idea.vim.api.*
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.helper.*
 
-fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: VimCaret) {
+public fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: VimCaret) {
   val (start, end) = if (selectionStart > selectionEnd) selectionEnd to selectionStart else selectionStart to selectionEnd
   val editor = caret.editor
   val subMode = editor.subMode
@@ -83,7 +83,7 @@ fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: VimCaret) 
  * This method doesn't change CommandState and operates only with caret and it's properties
  * if [moveCaretToSelectionEnd] is true, caret movement to [end] will be performed
  */
-fun VimCaret.vimSetSelection(start: Int, end: Int = start, moveCaretToSelectionEnd: Boolean = false) {
+public fun VimCaret.vimSetSelection(start: Int, end: Int = start, moveCaretToSelectionEnd: Boolean = false) {
   vimSelectionStart = start
   setVisualSelection(start, end, this)
   if (moveCaretToSelectionEnd && !editor.inBlockSubMode) moveToInlayAwareOffset(end)
@@ -96,7 +96,7 @@ fun VimCaret.vimSetSelection(start: Int, end: Int = start, moveCaretToSelectionE
  *
  * @see vimMoveSelectionToCaret for character and line selection
  */
-fun vimMoveBlockSelectionToOffset(editor: VimEditor, offset: Int) {
+public fun vimMoveBlockSelectionToOffset(editor: VimEditor, offset: Int) {
   val primaryCaret = editor.primaryCaret()
   val startOffsetMark = primaryCaret.vimSelectionStart
 
@@ -108,7 +108,7 @@ fun vimMoveBlockSelectionToOffset(editor: VimEditor, offset: Int) {
  * This method is created only for Character and Line mode
  * @see vimMoveBlockSelectionToOffset for blockwise selection
  */
-fun VimCaret.vimMoveSelectionToCaret(vimSelectionStart: Int = this.vimSelectionStart) {
+public fun VimCaret.vimMoveSelectionToCaret(vimSelectionStart: Int = this.vimSelectionStart) {
   if (!editor.inVisualMode && !editor.inSelectMode) error("Attempt to extent selection in non-visual mode")
   if (editor.inBlockSubMode) error("Move caret with [vimMoveBlockSelectionToOffset]")
 
@@ -121,7 +121,7 @@ fun VimCaret.vimMoveSelectionToCaret(vimSelectionStart: Int = this.vimSelectionS
  * Update selection according to new CommandState
  * This method should be used for switching from character to line wise selection and so on
  */
-fun VimCaret.vimUpdateEditorSelection() {
+public fun VimCaret.vimUpdateEditorSelection() {
   val startOffsetMark = vimSelectionStart
   setVisualSelection(startOffsetMark, offset.point, this)
 }
@@ -129,7 +129,7 @@ fun VimCaret.vimUpdateEditorSelection() {
 /**
  * This works almost like [Caret.getLeadSelectionOffset] in IJ, but vim-specific
  */
-val ImmutableVimCaret.vimLeadSelectionOffset: Int
+public val ImmutableVimCaret.vimLeadSelectionOffset: Int
   get() {
     val caretOffset = offset.point
     if (hasSelection()) {

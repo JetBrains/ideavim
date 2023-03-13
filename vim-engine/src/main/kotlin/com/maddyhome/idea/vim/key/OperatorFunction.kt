@@ -14,14 +14,14 @@ import com.maddyhome.idea.vim.command.SelectionType
 /**
  * @author vlan
  */
-interface OperatorFunction {
+public interface OperatorFunction {
   /**
    * The value of 'operatorfunc' to be used as the operator function in 'g@'.
    *
    *
    * Make sure to synchronize your function properly using read/write actions.
    */
-  fun apply(editor: VimEditor, context: ExecutionContext, selectionType: SelectionType): Boolean
+  public fun apply(editor: VimEditor, context: ExecutionContext, selectionType: SelectionType): Boolean
 
-  fun postProcessSelection(): Boolean = true
+  public fun postProcessSelection(): Boolean = true
 }

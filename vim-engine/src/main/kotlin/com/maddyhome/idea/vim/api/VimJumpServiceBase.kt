@@ -10,11 +10,11 @@ package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.mark.Jump
 
-abstract class VimJumpServiceBase : VimJumpService {
+public abstract class VimJumpServiceBase : VimJumpService {
   @JvmField
   protected val jumps: MutableList<Jump> = ArrayList() // todo should it be mutable?
   @JvmField
-  protected var jumpSpot = -1
+  protected var jumpSpot: Int = -1
 
   override fun getJumpSpot(): Int {
     return jumpSpot
@@ -87,7 +87,7 @@ abstract class VimJumpServiceBase : VimJumpService {
     jumpSpot = -1
   }
 
-  companion object {
-    const val SAVE_JUMP_COUNT = 100
+  public companion object {
+    public const val SAVE_JUMP_COUNT: Int = 100
   }
 }

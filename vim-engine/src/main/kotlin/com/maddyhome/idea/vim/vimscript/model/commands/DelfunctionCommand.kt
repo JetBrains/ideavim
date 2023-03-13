@@ -20,14 +20,14 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 /**
  * see "h :delfunction"
  */
-data class DelfunctionCommand(
+public data class DelfunctionCommand(
   val ranges: Ranges,
   val scope: Scope?,
   val name: String,
   val ignoreIfMissing: Boolean,
 ) : Command.SingleExecution(ranges) {
 
-  override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     if (ignoreIfMissing) {

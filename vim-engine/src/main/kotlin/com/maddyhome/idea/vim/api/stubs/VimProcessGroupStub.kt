@@ -15,7 +15,7 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import javax.swing.KeyStroke
 
-class VimProcessGroupStub : VimProcessGroupBase() {
+public class VimProcessGroupStub : VimProcessGroupBase() {
   init {
     vimLogger<ExecutionContextManagerStub>().warn("VimProcessGroupStub is used. Please replace it with your own implementation of VimProcessGroup.")
   }

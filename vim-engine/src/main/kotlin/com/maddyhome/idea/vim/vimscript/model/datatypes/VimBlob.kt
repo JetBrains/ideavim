@@ -8,7 +8,7 @@
 
 package com.maddyhome.idea.vim.vimscript.model.datatypes
 
-class VimBlob : VimDataType() {
+public class VimBlob : VimDataType() {
 
   override fun asDouble(): Double {
     TODO("Not yet implemented")

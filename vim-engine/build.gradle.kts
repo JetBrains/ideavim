@@ -48,5 +48,5 @@ ktlint {
 }
 
 kotlin {
-//  explicitApi()
+  explicitApi()
 }

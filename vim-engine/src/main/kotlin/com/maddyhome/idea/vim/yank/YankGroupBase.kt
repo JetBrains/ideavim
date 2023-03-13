@@ -24,7 +24,7 @@ import com.maddyhome.idea.vim.listener.VimYankListener
 import org.jetbrains.annotations.Contract
 import kotlin.math.min
 
-open class YankGroupBase : VimYankGroup {
+public open class YankGroupBase : VimYankGroup {
   private val yankListeners: MutableList<VimYankListener> = ArrayList()
 
   private fun yankRange(
@@ -191,9 +191,9 @@ open class YankGroupBase : VimYankGroup {
     }
   }
 
-  override fun addListener(listener: VimYankListener) = yankListeners.add(listener)
-  override fun removeListener(listener: VimYankListener) = yankListeners.remove(listener)
-  override fun notifyListeners(editor: VimEditor, textRange: TextRange) = yankListeners.forEach {
+  override fun addListener(listener: VimYankListener): Boolean = yankListeners.add(listener)
+  override fun removeListener(listener: VimYankListener): Boolean = yankListeners.remove(listener)
+  override fun notifyListeners(editor: VimEditor, textRange: TextRange): Unit = yankListeners.forEach {
     it.yankPerformed(editor, textRange)
   }
 }

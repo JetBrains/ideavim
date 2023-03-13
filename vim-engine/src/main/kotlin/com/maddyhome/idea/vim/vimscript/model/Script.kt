@@ -13,7 +13,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
 
-data class Script(val units: List<Executable> = ArrayList()) : Executable {
+public data class Script(val units: List<Executable> = ArrayList()) : Executable {
   override lateinit var vimContext: VimLContext
 
   /**

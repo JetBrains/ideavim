@@ -12,11 +12,11 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 
 public object VimRepeater {
-  public var repeatHandler = false
+  public var repeatHandler: Boolean = false
 
   public var lastChangeCommand: Command? = null
     private set
-  public var lastChangeRegister = injector.registerGroup.defaultRegister
+  public var lastChangeRegister: Char = injector.registerGroup.defaultRegister
 
   public fun saveLastChange(command: Command) {
     lastChangeCommand = command

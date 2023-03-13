@@ -17,7 +17,7 @@ import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 
-data class TryStatement(val tryBlock: TryBlock, val catchBlocks: List<CatchBlock>, val finallyBlock: FinallyBlock?) :
+public data class TryStatement(val tryBlock: TryBlock, val catchBlocks: List<CatchBlock>, val finallyBlock: FinallyBlock?) :
   Executable {
   override lateinit var vimContext: VimLContext
 
@@ -66,7 +66,7 @@ data class TryStatement(val tryBlock: TryBlock, val catchBlocks: List<CatchBlock
   }
 }
 
-data class TryBlock(val body: List<Executable>) : Executable {
+public data class TryBlock(val body: List<Executable>) : Executable {
   override lateinit var vimContext: VimLContext
   override fun execute(editor: VimEditor, context: ExecutionContext): ExecutionResult {
     body.forEach { it.vimContext = this.vimContext }
@@ -74,7 +74,7 @@ data class TryBlock(val body: List<Executable>) : Executable {
   }
 }
 
-data class CatchBlock(val pattern: String, val body: List<Executable>) : Executable {
+public data class CatchBlock(val pattern: String, val body: List<Executable>) : Executable {
   override lateinit var vimContext: VimLContext
   override fun execute(editor: VimEditor, context: ExecutionContext): ExecutionResult {
     body.forEach { it.vimContext = this.vimContext }
@@ -82,7 +82,7 @@ data class CatchBlock(val pattern: String, val body: List<Executable>) : Executa
   }
 }
 
-data class FinallyBlock(val body: List<Executable>) : Executable {
+public data class FinallyBlock(val body: List<Executable>) : Executable {
   override lateinit var vimContext: VimLContext
   override fun execute(editor: VimEditor, context: ExecutionContext): ExecutionResult {
     body.forEach { it.vimContext = this.vimContext }
@@ -90,7 +90,7 @@ data class FinallyBlock(val body: List<Executable>) : Executable {
   }
 }
 
-fun executeBody(
+public fun executeBody(
   body: List<Executable>,
   editor: VimEditor,
   context: ExecutionContext,

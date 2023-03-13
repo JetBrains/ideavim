@@ -10,11 +10,11 @@ package com.maddyhome.idea.vim.group
 
 import com.maddyhome.idea.vim.api.ExecutionContext
 
-interface TabService {
+public interface TabService {
 
-  fun removeTabAt(indexToDelete: Int, indexToSelect: Int, context: ExecutionContext)
-  fun getTabCount(context: ExecutionContext): Int
-  fun getCurrentTabIndex(context: ExecutionContext): Int
-  fun moveCurrentTabToIndex(index: Int, context: ExecutionContext)
-  fun closeAllExceptCurrentTab(context: ExecutionContext)
+  public fun removeTabAt(indexToDelete: Int, indexToSelect: Int, context: ExecutionContext)
+  public fun getTabCount(context: ExecutionContext): Int
+  public fun getCurrentTabIndex(context: ExecutionContext): Int
+  public fun moveCurrentTabToIndex(index: Int, context: ExecutionContext)
+  public fun closeAllExceptCurrentTab(context: ExecutionContext)
 }

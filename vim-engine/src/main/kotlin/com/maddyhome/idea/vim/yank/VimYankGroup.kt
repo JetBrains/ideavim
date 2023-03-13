@@ -15,7 +15,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
 
-interface VimYankGroup {
+public interface VimYankGroup {
   /**
    * This yanks the text moved over by the motion command argument.
    *
@@ -24,7 +24,7 @@ interface VimYankGroup {
    * @param argument The motion command argument
    * @return true if able to yank the text, false if not
    */
-  fun yankMotion(
+  public fun yankMotion(
     editor: VimEditor,
     context: ExecutionContext,
     argument: Argument,
@@ -38,7 +38,7 @@ interface VimYankGroup {
    * @param count  The number of lines to yank
    * @return true if able to yank the lines, false if not
    */
-  fun yankLine(editor: VimEditor, count: Int): Boolean
+  public fun yankLine(editor: VimEditor, count: Int): Boolean
 
   /**
    * This yanks a range of text
@@ -48,8 +48,8 @@ interface VimYankGroup {
    * @param type   The type of yank
    * @return true if able to yank the range, false if not
    */
-  fun yankRange(editor: VimEditor, range: TextRange?, type: SelectionType, moveCursor: Boolean): Boolean
-  fun notifyListeners(editor: VimEditor, textRange: TextRange)
-  fun addListener(listener: com.maddyhome.idea.vim.listener.VimYankListener): Boolean
-  fun removeListener(listener: com.maddyhome.idea.vim.listener.VimYankListener): Boolean
+  public fun yankRange(editor: VimEditor, range: TextRange?, type: SelectionType, moveCursor: Boolean): Boolean
+  public fun notifyListeners(editor: VimEditor, textRange: TextRange)
+  public fun addListener(listener: com.maddyhome.idea.vim.listener.VimYankListener): Boolean
+  public fun removeListener(listener: com.maddyhome.idea.vim.listener.VimYankListener): Boolean
 }

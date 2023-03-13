@@ -11,7 +11,7 @@ package com.maddyhome.idea.vim.undo
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 
-interface VimUndoRedo {
-  fun undo(editor: VimEditor, context: ExecutionContext): Boolean
-  fun redo(editor: VimEditor, context: ExecutionContext): Boolean
+public interface VimUndoRedo {
+  public fun undo(editor: VimEditor, context: ExecutionContext): Boolean
+  public fun redo(editor: VimEditor, context: ExecutionContext): Boolean
 }

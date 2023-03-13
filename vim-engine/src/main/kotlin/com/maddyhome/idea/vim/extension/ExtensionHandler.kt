@@ -16,9 +16,9 @@ import com.maddyhome.idea.vim.command.OperatorArguments
  *
  * @author vlan
  */
-interface ExtensionHandler {
+public interface ExtensionHandler {
   @Deprecated("Please use ExtensionHandler#execute(VimEditor, ExecutionContext, OperatorArguments) instead")
-  fun execute(editor: VimEditor, context: ExecutionContext) {}
+  public fun execute(editor: VimEditor, context: ExecutionContext) {}
 
   /**
    * Executes the action.
@@ -30,16 +30,16 @@ interface ExtensionHandler {
    * for a write action, you'll have to apply it by yourself if you're modifying IntelliJ's data structures like
    * documents or virtual files.
    */
-  fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
+  public fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
     execute(editor, context)
   }
 
-  val isRepeatable: Boolean
+  public val isRepeatable: Boolean
     get() = false
 
-  abstract class WithCallback : ExtensionHandler {
-    var _backingFunction: Runnable? = null
-    fun continueVimExecution() {
+  public abstract class WithCallback : ExtensionHandler {
+    public var _backingFunction: Runnable? = null
+    public fun continueVimExecution() {
       if (_backingFunction != null) {
         _backingFunction!!.run()
       }

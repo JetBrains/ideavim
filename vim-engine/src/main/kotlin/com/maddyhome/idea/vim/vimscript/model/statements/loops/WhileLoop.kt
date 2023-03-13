@@ -16,7 +16,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 
-data class WhileLoop(val condition: Expression, val body: List<Executable>) : Executable {
+public data class WhileLoop(val condition: Expression, val body: List<Executable>) : Executable {
   override lateinit var vimContext: VimLContext
 
   override fun execute(editor: VimEditor, context: ExecutionContext): ExecutionResult {

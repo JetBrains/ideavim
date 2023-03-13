@@ -8,17 +8,17 @@
 
 package com.maddyhome.idea.vim.common
 
-enum class Direction(private val value: Int) {
+public enum class Direction(private val value: Int) {
   BACKWARDS(-1), FORWARDS(1);
 
-  fun toInt(): Int = value
-  fun reverse(): Direction = when (this) {
+  public fun toInt(): Int = value
+  public fun reverse(): Direction = when (this) {
     BACKWARDS -> FORWARDS
     FORWARDS -> BACKWARDS
   }
 
-  companion object {
-    fun fromInt(value: Int) = when (value) {
+  public companion object {
+    public fun fromInt(value: Int): Direction = when (value) {
       BACKWARDS.value -> BACKWARDS
       FORWARDS.value -> FORWARDS
       else -> FORWARDS

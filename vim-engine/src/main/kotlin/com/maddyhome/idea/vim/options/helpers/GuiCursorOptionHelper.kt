@@ -16,11 +16,11 @@ import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.options.OptionConstants
 import java.util.*
 
-object GuiCursorOptionHelper {
+public object GuiCursorOptionHelper {
 
   private val effectiveValues = mutableMapOf<GuiCursorMode, GuiCursorAttributes>()
 
-  fun convertToken(token: String): GuiCursorEntry {
+  public fun convertToken(token: String): GuiCursorEntry {
     val split = token.split(':')
     if (split.size == 1) {
       throw exExceptionMessage("E545", token)
@@ -76,7 +76,7 @@ object GuiCursorOptionHelper {
     return GuiCursorEntry(token, modes, type, thickness, highlightGroup, lmapHighlightGroup, blinkModes)
   }
 
-  fun getAttributes(mode: GuiCursorMode): GuiCursorAttributes {
+  public fun getAttributes(mode: GuiCursorMode): GuiCursorAttributes {
     return effectiveValues.computeIfAbsent(mode) {
       var type = GuiCursorType.BLOCK
       var thickness = 0
@@ -108,12 +108,12 @@ object GuiCursorOptionHelper {
     }
   }
 
-  fun clearEffectiveValues() {
+  public fun clearEffectiveValues() {
     effectiveValues.clear()
   }
 }
 
-enum class GuiCursorMode(val token: String) {
+public enum class GuiCursorMode(public val token: String) {
   NORMAL("n"),
   VISUAL("v"),
   VISUAL_EXCLUSIVE("ve"),
@@ -126,14 +126,14 @@ enum class GuiCursorMode(val token: String) {
   SHOW_MATCH("sm"),
   ALL("a");
 
-  override fun toString() = token
+  public override fun toString(): String = token
 
-  companion object {
-    fun fromString(s: String) = values().firstOrNull { it.token == s }
+  public companion object {
+    public fun fromString(s: String): GuiCursorMode? = values().firstOrNull { it.token == s }
 
     // Used in FleetVim
     @Suppress("unused")
-    fun fromMode(mode: VimStateMachine.Mode, isReplaceCharacter: Boolean): GuiCursorMode {
+    public fun fromMode(mode: VimStateMachine.Mode, isReplaceCharacter: Boolean): GuiCursorMode {
       if (isReplaceCharacter) {
         // Can be true for NORMAL and VISUAL
         return REPLACE
@@ -156,28 +156,28 @@ enum class GuiCursorMode(val token: String) {
   }
 }
 
-enum class GuiCursorType(val token: String) {
+public enum class GuiCursorType(public val token: String) {
   BLOCK("block"),
   VER("ver"),
   HOR("hor")
 }
 
-class GuiCursorEntry(
+public class GuiCursorEntry(
   private val originalString: String,
-  val modes: EnumSet<GuiCursorMode>,
-  val type: GuiCursorType?,
-  val thickness: Int?,
-  val highlightGroup: String,
-  val lmapHighlightGroup: String,
-  val blinkModes: List<String>
+  public val modes: EnumSet<GuiCursorMode>,
+  public val type: GuiCursorType?,
+  public val thickness: Int?,
+  public val highlightGroup: String,
+  public val lmapHighlightGroup: String,
+  public val blinkModes: List<String>
 ) {
-  override fun toString(): String {
+  public override fun toString(): String {
     // We need to match the original string for output and remove purposes
     return originalString
   }
 }
 
-data class GuiCursorAttributes(
+public data class GuiCursorAttributes(
   val type: GuiCursorType,
   val thickness: Int,
   val highlightGroup: String,

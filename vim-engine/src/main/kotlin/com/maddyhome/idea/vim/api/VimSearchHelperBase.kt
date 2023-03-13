@@ -15,7 +15,7 @@ import com.maddyhome.idea.vim.helper.CharacterHelper.charType
 import kotlin.math.abs
 import kotlin.math.min
 
-abstract class VimSearchHelperBase : VimSearchHelper {
+public abstract class VimSearchHelperBase : VimSearchHelper {
   override fun findNextWord(editor: VimEditor, searchFrom: Int, count: Int, bigWord: Boolean): Long {
     return findNextWord(editor.text(), searchFrom.toLong(), editor.fileSize(), count, bigWord, false)
   }
@@ -38,8 +38,8 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     return VimSearchHelperBase.findNextWordEnd(chars, pos, size, count, bigWord, spaceWords)
   }
 
-  companion object {
-    fun findNextWord(
+  public companion object {
+    public fun findNextWord(
       chars: CharSequence,
       pos: Long,
       size: Long,
@@ -61,7 +61,7 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     }
 
     // TODO: 18.08.2022 Make private
-    fun findNextWordOne(
+    public fun findNextWordOne(
       chars: CharSequence,
       pos: Long,
       size: Long,
@@ -125,7 +125,7 @@ abstract class VimSearchHelperBase : VimSearchHelper {
      * An empty line is considered a whitespace break.
      */
     // TODO: 18.08.2022 Make private
-    fun skipSpace(chars: CharSequence, offset: Long, step: Int, size: Long): Long {
+    public fun skipSpace(chars: CharSequence, offset: Long, step: Int, size: Long): Long {
       var _offset = offset
       var prev = 0.toChar()
       while (_offset in 0 until size) {
@@ -138,11 +138,11 @@ abstract class VimSearchHelperBase : VimSearchHelper {
       return if (_offset < size) _offset else size - 1
     }
 
-    operator fun CharSequence.get(index: Long): Char {
+    public operator fun CharSequence.get(index: Long): Char {
       return this[index.toInt()]
     }
 
-    fun findNextWordEndOne(
+    public fun findNextWordEndOne(
       chars: CharSequence,
       pos: Int,
       size: Int,
@@ -201,7 +201,7 @@ abstract class VimSearchHelperBase : VimSearchHelper {
       }
       return res
     }
-    fun findNextWordEnd(
+    public fun findNextWordEnd(
       chars: CharSequence,
       pos: Int,
       size: Int,

@@ -27,7 +27,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
-abstract class VimOptionGroupBase : VimOptionGroup {
+public abstract class VimOptionGroupBase : VimOptionGroup {
 
   private lateinit var globalOptions: OptionValueAccessor
 
@@ -204,8 +204,8 @@ abstract class VimOptionGroupBase : VimOptionGroup {
     option.onChanged(scope, oldValue)
   }
 
-  override fun getOption(key: String) = options.get(key)
-  override fun getAllOptions() = options.values.toSet()
+  override fun getOption(key: String): Option<out VimDataType>? = options.get(key)
+  override fun getAllOptions(): Set<Option<out VimDataType>> = options.values.toSet()
 
   private fun setGlobalOptionValue(optionName: String, value: VimDataType) {
     globalValues[optionName] = value
@@ -286,24 +286,24 @@ private class MultikeyMap(vararg entries: Option<out VimDataType>) {
     }
   }
 
-  fun put(key1: String, key2: String, value: Option<out VimDataType>) {
+  public fun put(key1: String, key2: String, value: Option<out VimDataType>) {
     primaryKeyStorage[key1] = value
     secondaryKeyStorage[key2] = value
   }
 
-  fun get(key: String): Option<out VimDataType>? {
+  public fun get(key: String): Option<out VimDataType>? {
     return primaryKeyStorage[key] ?: secondaryKeyStorage[key]
   }
 
-  fun remove(key: String) {
+  public fun remove(key: String) {
     val option = primaryKeyStorage[key] ?: secondaryKeyStorage[key]
     primaryKeyStorage.values.remove(option)
     secondaryKeyStorage.values.remove(option)
   }
 
-  fun contains(key: String): Boolean {
+  public fun contains(key: String): Boolean {
     return primaryKeyStorage.containsKey(key) || secondaryKeyStorage.containsKey(key)
   }
 
-  val values get() = primaryKeyStorage.values
+  public val values get() = primaryKeyStorage.values
 }

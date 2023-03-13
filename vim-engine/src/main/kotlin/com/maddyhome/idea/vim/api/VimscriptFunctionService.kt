@@ -13,14 +13,14 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
 
-interface VimscriptFunctionService {
+public interface VimscriptFunctionService {
 
-  fun deleteFunction(name: String, scope: Scope? = null, vimContext: VimLContext)
-  fun storeFunction(declaration: FunctionDeclaration)
-  fun getFunctionHandler(scope: Scope?, name: String, vimContext: VimLContext): FunctionHandler
-  fun getFunctionHandlerOrNull(scope: Scope?, name: String, vimContext: VimLContext): FunctionHandler?
-  fun getUserDefinedFunction(scope: Scope?, name: String, vimContext: VimLContext): FunctionDeclaration?
-  fun getBuiltInFunction(name: String): FunctionHandler?
-  fun registerHandlers()
-  fun addHandler(handlerHolder: Any)
+  public fun deleteFunction(name: String, scope: Scope? = null, vimContext: VimLContext)
+  public fun storeFunction(declaration: FunctionDeclaration)
+  public fun getFunctionHandler(scope: Scope?, name: String, vimContext: VimLContext): FunctionHandler
+  public fun getFunctionHandlerOrNull(scope: Scope?, name: String, vimContext: VimLContext): FunctionHandler?
+  public fun getUserDefinedFunction(scope: Scope?, name: String, vimContext: VimLContext): FunctionDeclaration?
+  public fun getBuiltInFunction(name: String): FunctionHandler?
+  public fun registerHandlers()
+  public fun addHandler(handlerHolder: Any)
 }

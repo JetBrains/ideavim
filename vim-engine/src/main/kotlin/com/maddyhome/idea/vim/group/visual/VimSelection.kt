@@ -36,18 +36,18 @@ import kotlin.math.min
  *
  * All starts are included and ends are excluded
  */
-sealed class VimSelection {
-  abstract val type: SelectionType
-  abstract val vimStart: Int
-  abstract val vimEnd: Int
+public sealed class VimSelection {
+  public abstract val type: SelectionType
+  public abstract val vimStart: Int
+  public abstract val vimEnd: Int
   protected abstract val editor: VimEditor
 
-  abstract fun toVimTextRange(skipNewLineForLineMode: Boolean = false): TextRange
+  public abstract fun toVimTextRange(skipNewLineForLineMode: Boolean = false): TextRange
 
-  abstract fun getNativeStartAndEnd(): Pair<Int, Int>
+  public abstract fun getNativeStartAndEnd(): Pair<Int, Int>
 
-  companion object {
-    fun create(vimStart: Int, vimEnd: Int, type: SelectionType, editor: VimEditor) = when (type) {
+  public companion object {
+    public fun create(vimStart: Int, vimEnd: Int, type: SelectionType, editor: VimEditor): VimSelection = when (type) {
       CHARACTER_WISE -> {
         val nativeSelection = charToNativeSelection(editor, vimStart, vimEnd, VimStateMachine.Mode.VISUAL)
         VimCharacterSelection(vimStart, vimEnd, nativeSelection.first, nativeSelection.second, editor)
@@ -87,26 +87,26 @@ sealed class VimSelection {
  *
  * All starts are included and ends are excluded
  */
-sealed class VimSimpleSelection : VimSelection() {
-  abstract val nativeStart: Int
-  abstract val nativeEnd: Int
-  abstract val normNativeStart: Int
-  abstract val normNativeEnd: Int
+public sealed class VimSimpleSelection : VimSelection() {
+  public abstract val nativeStart: Int
+  public abstract val nativeEnd: Int
+  public abstract val normNativeStart: Int
+  public abstract val normNativeEnd: Int
 
-  override fun getNativeStartAndEnd() = normNativeStart to normNativeEnd
+  override fun getNativeStartAndEnd(): Pair<Int, Int> = normNativeStart to normNativeEnd
 
-  companion object {
+  public companion object {
     /**
      * Create character- and linewise selection if native selection is already known. Doesn't work for block selection
      */
-    fun createWithNative(
+    public fun createWithNative(
       vimStart: Int,
       vimEnd: Int,
       nativeStart: Int,
       nativeEnd: Int,
       type: SelectionType,
       editor: VimEditor,
-    ) = when (type) {
+    ): VimSimpleSelection = when (type) {
       CHARACTER_WISE -> VimCharacterSelection(vimStart, vimEnd, nativeStart, nativeEnd, editor)
       LINE_WISE -> VimLineSelection(vimStart, vimEnd, nativeStart, nativeEnd, editor)
       BLOCK_WISE -> error("This method works only for line and character selection")
@@ -114,32 +114,32 @@ sealed class VimSimpleSelection : VimSelection() {
   }
 }
 
-class VimCharacterSelection(
+public class VimCharacterSelection(
   override val vimStart: Int,
   override val vimEnd: Int,
   override val nativeStart: Int,
   override val nativeEnd: Int,
   override val editor: VimEditor,
 ) : VimSimpleSelection() {
-  override val normNativeStart = min(nativeStart, nativeEnd)
-  override val normNativeEnd = max(nativeStart, nativeEnd)
+  override val normNativeStart: Int = min(nativeStart, nativeEnd)
+  override val normNativeEnd: Int = max(nativeStart, nativeEnd)
   override val type: SelectionType = CHARACTER_WISE
 
-  override fun toVimTextRange(skipNewLineForLineMode: Boolean) = TextRange(normNativeStart, normNativeEnd)
+  override fun toVimTextRange(skipNewLineForLineMode: Boolean): TextRange = TextRange(normNativeStart, normNativeEnd)
 }
 
-class VimLineSelection(
+public class VimLineSelection(
   override val vimStart: Int,
   override val vimEnd: Int,
   override val nativeStart: Int,
   override val nativeEnd: Int,
   override val editor: VimEditor,
 ) : VimSimpleSelection() {
-  override val normNativeStart = min(nativeStart, nativeEnd)
-  override val normNativeEnd = max(nativeStart, nativeEnd)
-  override val type = LINE_WISE
+  override val normNativeStart: Int = min(nativeStart, nativeEnd)
+  override val normNativeEnd: Int = max(nativeStart, nativeEnd)
+  override val type: SelectionType = LINE_WISE
 
-  override fun toVimTextRange(skipNewLineForLineMode: Boolean) =
+  override fun toVimTextRange(skipNewLineForLineMode: Boolean): TextRange =
     if (skipNewLineForLineMode && editor.fileSize() >= normNativeEnd && normNativeEnd > 0 && editor.charAt(Pointer(normNativeEnd - 1)) == '\n') {
       TextRange(normNativeStart, (normNativeEnd - 1).coerceAtLeast(0))
     } else {
@@ -147,17 +147,17 @@ class VimLineSelection(
     }
 }
 
-class VimBlockSelection(
+public class VimBlockSelection(
   override val vimStart: Int,
   override val vimEnd: Int,
   override val editor: VimEditor,
   private val toLineEnd: Boolean,
 ) : VimSelection() {
-  override fun getNativeStartAndEnd() = blockToNativeSelection(editor, vimStart, vimEnd, VimStateMachine.Mode.VISUAL).let {
+  override fun getNativeStartAndEnd(): Pair<Int, Int> = blockToNativeSelection(editor, vimStart, vimEnd, VimStateMachine.Mode.VISUAL).let {
     editor.bufferPositionToOffset(it.first) to editor.bufferPositionToOffset(it.second)
   }
 
-  override val type = BLOCK_WISE
+  override val type: SelectionType = BLOCK_WISE
 
   override fun toVimTextRange(skipNewLineForLineMode: Boolean): TextRange {
     val starts = mutableListOf<Int>()

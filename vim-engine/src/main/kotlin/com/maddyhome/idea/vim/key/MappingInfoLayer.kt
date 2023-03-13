@@ -11,7 +11,7 @@ package com.maddyhome.idea.vim.key
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 
-interface MappingInfoLayer {
-  fun getPresentableString(): String
-  fun execute(editor: VimEditor, context: ExecutionContext)
+public interface MappingInfoLayer {
+  public fun getPresentableString(): String
+  public fun execute(editor: VimEditor, context: ExecutionContext)
 }

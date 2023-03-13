@@ -27,19 +27,19 @@ import javax.swing.KeyStroke
  *
  * // TODO: 21.02.2022 This constructor should be empty
  */
-class VimStateMachine(private val editor: VimEditor?) {
-  val commandBuilder = CommandBuilder(getKeyRootNode(MappingMode.NORMAL))
+public class VimStateMachine(private val editor: VimEditor?) {
+  public val commandBuilder: CommandBuilder = CommandBuilder(getKeyRootNode(MappingMode.NORMAL))
   private val modeStates = Stack<ModeState>()
-  val mappingState = MappingState()
-  val digraphSequence = DigraphSequence()
-  var isRecording = false
+  public val mappingState: MappingState = MappingState()
+  public val digraphSequence: DigraphSequence = DigraphSequence()
+  public var isRecording: Boolean = false
     set(value) {
       field = value
       doShowMode()
     }
-  var isDotRepeatInProgress = false
-  var isRegisterPending = false
-  var isReplaceCharacter = false
+  public var isDotRepeatInProgress: Boolean = false
+  public var isRegisterPending: Boolean = false
+  public var isReplaceCharacter: Boolean = false
     set(value) {
       field = value
       onModeChanged()
@@ -55,28 +55,28 @@ class VimStateMachine(private val editor: VimEditor?) {
    *
    * This field is reset after the command has been executed.
    */
-  var executingCommand: Command? = null
+  public var executingCommand: Command? = null
     private set
 
-  val isOperatorPending: Boolean
+  public val isOperatorPending: Boolean
     get() = mappingState.mappingMode == MappingMode.OP_PENDING && !commandBuilder.isEmpty
 
   init {
     pushModes(defaultModeState.mode, defaultModeState.subMode)
   }
 
-  fun isDuplicateOperatorKeyStroke(key: KeyStroke?): Boolean {
+  public fun isDuplicateOperatorKeyStroke(key: KeyStroke?): Boolean {
     return isOperatorPending && commandBuilder.isDuplicateOperatorKeyStroke(key!!)
   }
 
-  fun setExecutingCommand(cmd: Command) {
+  public fun setExecutingCommand(cmd: Command) {
     executingCommand = cmd
   }
 
-  val executingCommandFlags: EnumSet<CommandFlags>
+  public val executingCommandFlags: EnumSet<CommandFlags>
     get() = executingCommand?.flags ?: noneOfEnum()
 
-  fun pushModes(mode: Mode, submode: SubMode) {
+  public fun pushModes(mode: Mode, submode: SubMode) {
     val newModeState = ModeState(mode, submode)
 
     logger.debug("Push new mode state: ${newModeState.toSimpleString()}")
@@ -91,7 +91,7 @@ class VimStateMachine(private val editor: VimEditor?) {
     }
   }
 
-  fun popModes() {
+  public fun popModes() {
     val popped = modeStates.pop()
     setMappingMode()
     if (popped != currentModeState()) {
@@ -102,19 +102,19 @@ class VimStateMachine(private val editor: VimEditor?) {
     logger.debug { "Stack of mode states after pop: ${toSimpleString()}" }
   }
 
-  fun resetOpPending() {
+  public fun resetOpPending() {
     if (mode == Mode.OP_PENDING) {
       popModes()
     }
   }
 
-  fun resetReplaceCharacter() {
+  public fun resetReplaceCharacter() {
     if (isReplaceCharacter) {
       isReplaceCharacter = false
     }
   }
 
-  fun resetRegisterPending() {
+  public fun resetRegisterPending() {
     if (isRegisterPending) {
       isRegisterPending = false
     }
@@ -144,10 +144,10 @@ class VimStateMachine(private val editor: VimEditor?) {
     mappingState.mappingMode = modeToMappingMode(mode)
   }
 
-  val mode: Mode
+  public val mode: Mode
     get() = currentModeState().mode
 
-  var subMode: SubMode
+  public var subMode: SubMode
     get() = currentModeState().subMode
     set(submode) {
       val modeState = currentModeState()
@@ -155,19 +155,19 @@ class VimStateMachine(private val editor: VimEditor?) {
       pushModes(modeState.mode, submode)
     }
 
-  fun startDigraphSequence() {
+  public fun startDigraphSequence() {
     digraphSequence.startDigraphSequence()
   }
 
-  fun startLiteralSequence() {
+  public fun startLiteralSequence() {
     digraphSequence.startLiteralSequence()
   }
 
-  fun processDigraphKey(key: KeyStroke, editor: VimEditor): DigraphResult {
+  public fun processDigraphKey(key: KeyStroke, editor: VimEditor): DigraphResult {
     return digraphSequence.processKey(key, editor)
   }
 
-  fun resetDigraph() {
+  public fun resetDigraph() {
     digraphSequence.reset()
   }
 
@@ -175,7 +175,7 @@ class VimStateMachine(private val editor: VimEditor?) {
    * Toggles the insert/overwrite state. If currently insert, goto replace mode. If currently replace, goto insert
    * mode.
    */
-  fun toggleInsertOverwrite() {
+  public fun toggleInsertOverwrite() {
     val oldMode = mode
     var newMode = oldMode
     if (oldMode == Mode.INSERT) {
@@ -193,14 +193,14 @@ class VimStateMachine(private val editor: VimEditor?) {
   /**
    * Resets the command, mode, visual mode, and mapping mode to initial values.
    */
-  fun reset() {
+  public fun reset() {
     executingCommand = null
     resetModes()
     commandBuilder.resetInProgressCommandPart(getKeyRootNode(mappingState.mappingMode))
     digraphSequence.reset()
   }
 
-  fun toSimpleString(): String = modeStates.joinToString { it.toSimpleString() }
+  public fun toSimpleString(): String = modeStates.joinToString { it.toSimpleString() }
 
   /**
    * It's a bit more complicated
@@ -250,7 +250,7 @@ class VimStateMachine(private val editor: VimEditor?) {
    *   be added. It's better not to compare the whole string but only
    *   the leading character(s).
    */
-  fun toVimNotation(): String {
+  public fun toVimNotation(): String {
     return when (mode) {
       Mode.COMMAND -> "n"
       Mode.VISUAL -> when (subMode) {
@@ -296,7 +296,7 @@ class VimStateMachine(private val editor: VimEditor?) {
     injector.messages.showMode(editor, msg.toString())
   }
 
-  fun getStatusString(): String {
+  public fun getStatusString(): String {
     val pos = modeStates.size - 1
     val modeState = if (pos >= 0) {
       modeStates[pos]
@@ -349,7 +349,7 @@ class VimStateMachine(private val editor: VimEditor?) {
     }
   }
 
-  enum class Mode {
+  public enum class Mode {
     // Basic modes
     COMMAND, VISUAL, SELECT, INSERT, CMD_LINE, /*EX*/
 
@@ -357,7 +357,7 @@ class VimStateMachine(private val editor: VimEditor?) {
     OP_PENDING, REPLACE /*, VISUAL_REPLACE*/, INSERT_NORMAL, INSERT_VISUAL, INSERT_SELECT
   }
 
-  enum class SubMode {
+  public enum class SubMode {
     NONE, VISUAL_CHARACTER, VISUAL_LINE, VISUAL_BLOCK
   }
 
@@ -365,7 +365,7 @@ class VimStateMachine(private val editor: VimEditor?) {
     fun toSimpleString(): String = "$mode:$subMode"
   }
 
-  companion object {
+  public companion object {
     private val logger = vimLogger<VimStateMachine>()
     private val defaultModeState = ModeState(Mode.COMMAND, SubMode.NONE)
     private val globalState = VimStateMachine(null)
@@ -375,7 +375,7 @@ class VimStateMachine(private val editor: VimEditor?) {
      * Please see: https://jb.gg/zo8n0r
      */
     @JvmStatic
-    fun getInstance(editor: Any?): VimStateMachine {
+    public fun getInstance(editor: Any?): VimStateMachine {
       return if (editor == null || injector.globalOptions().isSet(OptionConstants.ideaglobalmode)) {
         globalState
       } else {
@@ -388,7 +388,7 @@ class VimStateMachine(private val editor: VimEditor?) {
     }
 
     @Contract(pure = true)
-    fun modeToMappingMode(mode: Mode): MappingMode {
+    public fun modeToMappingMode(mode: Mode): MappingMode {
       return when (mode) {
         Mode.COMMAND -> MappingMode.NORMAL
         Mode.INSERT, Mode.REPLACE -> MappingMode.INSERT

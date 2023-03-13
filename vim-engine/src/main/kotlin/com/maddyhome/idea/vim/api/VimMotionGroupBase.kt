@@ -26,8 +26,8 @@ import kotlin.math.abs
 import kotlin.math.min
 import kotlin.math.sign
 
-abstract class VimMotionGroupBase : VimMotionGroup {
-  override var lastFTCmd = TillCharacterMotionType.LAST_SMALL_T
+public abstract class VimMotionGroupBase : VimMotionGroup {
+  override var lastFTCmd: TillCharacterMotionType = TillCharacterMotionType.LAST_SMALL_T
   override var lastFTChar: Char = ' '
 
   override fun getVerticalMotionOffset(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Motion {
@@ -360,7 +360,7 @@ abstract class VimMotionGroupBase : VimMotionGroup {
     return editor.getLeadingCharacterOffset(line)
   }
 
-  companion object {
-    const val LAST_COLUMN = 9999
+  public companion object {
+    public const val LAST_COLUMN: Int = 9999
   }
 }

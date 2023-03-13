@@ -54,7 +54,7 @@ public class SelectMotionRightAction : MotionActionHandler.ForEachCaret() {
     return injector.motion.getHorizontalMotion(editor, caret, operatorArguments.count1, false)
   }
 
-  companion object {
+  private companion object {
     private val logger = injector.getLogger(SelectMotionRightAction::class.java)
   }
 }

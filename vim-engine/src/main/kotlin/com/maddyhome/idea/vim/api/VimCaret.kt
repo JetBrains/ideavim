@@ -30,7 +30,7 @@ import javax.swing.KeyStroke
  * This interface is not yet actively adapted around vim-engine.
  *
  * I'll be needed to understand how can we merge mutable IJ carets and fully immutable Fleet carets.
- * This interface exposes immutable functions of the caret, but doesn't solve this issue completely.
+ * This interface exposes immutable public sealedctions of the caret, but doesn't solve this issue completely.
  *
  * TODO: Switch names: ImmutableVimCaret -> VimCaret & VimCaret -> MutableVimCaret
  *       to be consistent with VimEditor

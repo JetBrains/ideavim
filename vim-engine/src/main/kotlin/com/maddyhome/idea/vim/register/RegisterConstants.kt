@@ -8,33 +8,33 @@
 
 package com.maddyhome.idea.vim.register
 
-object RegisterConstants {
-  const val UNNAMED_REGISTER = '"'
-  const val LAST_SEARCH_REGISTER = '/'
-  const val LAST_COMMAND_REGISTER = ':'
-  const val LAST_INSERTED_TEXT_REGISTER = '.'
-  const val SMALL_DELETION_REGISTER = '-'
-  const val BLACK_HOLE_REGISTER = '_'
-  const val ALTERNATE_BUFFER_REGISTER = '#'
-  const val EXPRESSION_BUFFER_REGISTER = '='
-  const val CURRENT_FILENAME_REGISTER = '%'
-  const val CLIPBOARD_REGISTERS = "*+"
-  const val NUMBERED_REGISTERS = "0123456789"
-  const val NAMED_REGISTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+public object RegisterConstants {
+  public const val UNNAMED_REGISTER: Char = '"'
+  public const val LAST_SEARCH_REGISTER: Char = '/'
+  public const val LAST_COMMAND_REGISTER: Char = ':'
+  public const val LAST_INSERTED_TEXT_REGISTER: Char = '.'
+  public const val SMALL_DELETION_REGISTER: Char = '-'
+  public const val BLACK_HOLE_REGISTER: Char = '_'
+  public const val ALTERNATE_BUFFER_REGISTER: Char = '#'
+  public const val EXPRESSION_BUFFER_REGISTER: Char = '='
+  public const val CURRENT_FILENAME_REGISTER: Char = '%'
+  public const val CLIPBOARD_REGISTERS: String = "*+"
+  public const val NUMBERED_REGISTERS: String = "0123456789"
+  public const val NAMED_REGISTERS: String = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
-  const val WRITABLE_REGISTERS = (
+  public const val WRITABLE_REGISTERS: String = (
     NUMBERED_REGISTERS + NAMED_REGISTERS + CLIPBOARD_REGISTERS +
       SMALL_DELETION_REGISTER + BLACK_HOLE_REGISTER + UNNAMED_REGISTER + LAST_SEARCH_REGISTER
     )
 
-  const val READONLY_REGISTERS = (
+  public const val READONLY_REGISTERS: String = (
     "" +
       CURRENT_FILENAME_REGISTER + LAST_COMMAND_REGISTER + LAST_INSERTED_TEXT_REGISTER + ALTERNATE_BUFFER_REGISTER +
       EXPRESSION_BUFFER_REGISTER
     ) // Expression buffer is not actually readonly
 
-  const val RECORDABLE_REGISTERS = NUMBERED_REGISTERS + NAMED_REGISTERS + UNNAMED_REGISTER
-  const val PLAYBACK_REGISTERS =
+  public const val RECORDABLE_REGISTERS: String = NUMBERED_REGISTERS + NAMED_REGISTERS + UNNAMED_REGISTER
+  public const val PLAYBACK_REGISTERS: String =
     RECORDABLE_REGISTERS + UNNAMED_REGISTER + CLIPBOARD_REGISTERS + LAST_INSERTED_TEXT_REGISTER
-  const val VALID_REGISTERS = WRITABLE_REGISTERS + READONLY_REGISTERS
+  public const val VALID_REGISTERS: String = WRITABLE_REGISTERS + READONLY_REGISTERS
 }

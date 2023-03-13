@@ -20,7 +20,7 @@ import javax.swing.KeyStroke
  *
  * @author vlan
  */
-class KeyMapping : Iterable<List<KeyStroke?>?>, KeyMappingLayer {
+public class KeyMapping : Iterable<List<KeyStroke?>?>, KeyMappingLayer {
   /**
    * Contains all key mapping for some mode.
    */
@@ -36,7 +36,7 @@ class KeyMapping : Iterable<List<KeyStroke?>?>, KeyMappingLayer {
     return ArrayList(myKeys.keys).iterator()
   }
 
-  operator fun get(keys: Iterable<KeyStroke>): MappingInfo? {
+  public operator fun get(keys: Iterable<KeyStroke>): MappingInfo? {
     // Having a parameter of Iterable allows for a nicer API, because we know when a given list is immutable.
     // TODO: Should we change this to be a trie?
     assert(keys is List<*>) { "keys must be of type List<KeyStroke>" }
@@ -55,7 +55,7 @@ class KeyMapping : Iterable<List<KeyStroke?>?>, KeyMappingLayer {
     return null
   }
 
-  fun put(
+  public fun put(
     fromKeys: List<KeyStroke>,
     owner: MappingOwner,
     extensionHandler: ExtensionHandler,
@@ -65,7 +65,7 @@ class KeyMapping : Iterable<List<KeyStroke?>?>, KeyMappingLayer {
     fillPrefixes(fromKeys)
   }
 
-  fun put(
+  public fun put(
     fromKeys: List<KeyStroke>,
     toKeys: List<KeyStroke>,
     owner: MappingOwner,
@@ -75,7 +75,7 @@ class KeyMapping : Iterable<List<KeyStroke?>?>, KeyMappingLayer {
     fillPrefixes(fromKeys)
   }
 
-  fun put(
+  public fun put(
     fromKeys: List<KeyStroke>,
     toExpression: Expression,
     owner: MappingOwner,
@@ -96,7 +96,7 @@ class KeyMapping : Iterable<List<KeyStroke?>?>, KeyMappingLayer {
     }
   }
 
-  fun delete(owner: MappingOwner) {
+  public fun delete(owner: MappingOwner) {
     val toRemove = myKeys.entries.stream()
       .filter { (_, value): Map.Entry<List<KeyStroke>, MappingInfo> -> value.owner == owner }
       .collect(Collectors.toList())
@@ -110,12 +110,12 @@ class KeyMapping : Iterable<List<KeyStroke?>?>, KeyMappingLayer {
     toRemove.map { it.key }.forEach(this::removePrefixes)
   }
 
-  fun delete(keys: List<KeyStroke>) {
+  public fun delete(keys: List<KeyStroke>) {
     myKeys.remove(keys) ?: return
     removePrefixes(keys)
   }
 
-  fun delete() {
+  public fun delete() {
     myKeys.clear()
     myPrefixes.clear()
   }
@@ -134,7 +134,7 @@ class KeyMapping : Iterable<List<KeyStroke?>?>, KeyMappingLayer {
     }
   }
 
-  fun getByOwner(owner: MappingOwner): List<Pair<List<KeyStroke>, MappingInfo>> {
+  public fun getByOwner(owner: MappingOwner): List<Pair<List<KeyStroke>, MappingInfo>> {
     return myKeys.entries.stream()
       .filter { (_, value): Map.Entry<List<KeyStroke>, MappingInfo> -> value.owner == owner }
       .map { (key, value): Map.Entry<List<KeyStroke>, MappingInfo> ->
@@ -156,12 +156,12 @@ class KeyMapping : Iterable<List<KeyStroke?>?>, KeyMappingLayer {
     return firstChar == injector.parser.actionKeyStroke.keyCode && lastChar != ')'
   }
 
-  fun hasmapto(toKeys: List<KeyStroke?>): Boolean {
+  public fun hasmapto(toKeys: List<KeyStroke?>): Boolean {
     return myKeys.values.stream()
       .anyMatch { o: MappingInfo? -> o is ToKeysMappingInfo && o.toKeys == toKeys }
   }
 
-  fun getMapTo(toKeys: List<KeyStroke?>): List<Pair<List<KeyStroke>, MappingInfo>> {
+  public fun getMapTo(toKeys: List<KeyStroke?>): List<Pair<List<KeyStroke>, MappingInfo>> {
     return myKeys.entries.stream()
       .filter { (_, value): Map.Entry<List<KeyStroke>, MappingInfo> -> value is ToKeysMappingInfo && value.toKeys == toKeys }
       .map { (key, value): Map.Entry<List<KeyStroke>, MappingInfo> ->

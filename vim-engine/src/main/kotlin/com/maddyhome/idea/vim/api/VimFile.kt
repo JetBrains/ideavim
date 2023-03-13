@@ -8,16 +8,16 @@
 
 package com.maddyhome.idea.vim.api
 
-interface VimFile {
-  fun displayFileInfo(vimEditor: VimEditor, fullPath: Boolean)
-  fun displayHexInfo(editor: VimEditor)
-  fun displayLocationInfo(vimEditor: VimEditor)
-  fun selectPreviousTab(context: ExecutionContext)
-  fun saveFile(context: ExecutionContext)
-  fun saveFiles(context: ExecutionContext)
-  fun closeFile(editor: VimEditor, context: ExecutionContext)
-  fun closeFile(number: Int, context: ExecutionContext)
-  fun selectFile(count: Int, context: ExecutionContext): Boolean
-  fun selectNextFile(count: Int, context: ExecutionContext)
-  fun openFile(filename: String, context: ExecutionContext): Boolean
+public interface VimFile {
+  public fun displayFileInfo(vimEditor: VimEditor, fullPath: Boolean)
+  public fun displayHexInfo(editor: VimEditor)
+  public fun displayLocationInfo(vimEditor: VimEditor)
+  public fun selectPreviousTab(context: ExecutionContext)
+  public fun saveFile(context: ExecutionContext)
+  public fun saveFiles(context: ExecutionContext)
+  public fun closeFile(editor: VimEditor, context: ExecutionContext)
+  public fun closeFile(number: Int, context: ExecutionContext)
+  public fun selectFile(count: Int, context: ExecutionContext): Boolean
+  public fun selectNextFile(count: Int, context: ExecutionContext)
+  public fun openFile(filename: String, context: ExecutionContext): Boolean
 }

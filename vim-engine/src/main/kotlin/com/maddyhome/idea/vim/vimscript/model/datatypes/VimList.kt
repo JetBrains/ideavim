@@ -10,9 +10,9 @@ package com.maddyhome.idea.vim.vimscript.model.datatypes
 
 import com.maddyhome.idea.vim.ex.ExException
 
-data class VimList(val values: MutableList<VimDataType>) : VimDataType() {
+public data class VimList(val values: MutableList<VimDataType>) : VimDataType() {
 
-  operator fun get(index: Int): VimDataType = this.values[index]
+  public operator fun get(index: Int): VimDataType = this.values[index]
 
   override fun asDouble(): Double {
     throw ExException("E745: Using a List as a Number")

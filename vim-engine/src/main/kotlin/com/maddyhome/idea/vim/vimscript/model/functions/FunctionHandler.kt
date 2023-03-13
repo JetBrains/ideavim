@@ -17,17 +17,17 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 
-abstract class FunctionHandler {
+public abstract class FunctionHandler {
 
-  abstract val name: String
-  open val scope: Scope? = null
-  abstract val minimumNumberOfArguments: Int?
-  abstract val maximumNumberOfArguments: Int?
-  var ranges: Ranges? = null
+  public abstract val name: String
+  public open val scope: Scope? = null
+  public abstract val minimumNumberOfArguments: Int?
+  public abstract val maximumNumberOfArguments: Int?
+  public var ranges: Ranges? = null
 
   protected abstract fun doFunction(argumentValues: List<Expression>, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType
 
-  fun executeFunction(arguments: List<Expression>, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType {
+  public fun executeFunction(arguments: List<Expression>, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType {
     checkFunctionCall(arguments)
     val result = doFunction(arguments, editor, context, vimContext)
     ranges = null

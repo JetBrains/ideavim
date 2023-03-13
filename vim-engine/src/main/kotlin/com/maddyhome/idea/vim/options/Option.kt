@@ -17,18 +17,18 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.parseNumber
 import java.util.*
 
 // Note that we don't want a sealed hierarchy, so we can add options with custom validation
-abstract class Option<T : VimDataType>(val name: String, val abbrev: String, open val defaultValue: T) {
+public abstract class Option<T : VimDataType>(public val name: String, public val abbrev: String, public open val defaultValue: T) {
   private val listeners = mutableSetOf<OptionChangeListener<VimDataType>>()
 
-  open fun addOptionChangeListener(listener: OptionChangeListener<VimDataType>) {
+  public open fun addOptionChangeListener(listener: OptionChangeListener<VimDataType>) {
     listeners.add(listener)
   }
 
-  open fun removeOptionChangeListener(listener: OptionChangeListener<VimDataType>) {
+  public open fun removeOptionChangeListener(listener: OptionChangeListener<VimDataType>) {
     listeners.remove(listener)
   }
 
-  fun onChanged(scope: OptionScope, oldValue: VimDataType) {
+  public fun onChanged(scope: OptionScope, oldValue: VimDataType) {
     for (listener in listeners) {
       when (scope) {
         is OptionScope.GLOBAL -> listener.processGlobalValueChange(oldValue)
@@ -44,12 +44,12 @@ abstract class Option<T : VimDataType>(val name: String, val abbrev: String, ope
   }
 
   // todo 1.9 should return Result with exceptions
-  abstract fun checkIfValueValid(value: VimDataType, token: String)
-  abstract fun parseValue(value: String, token: String): VimDataType
+  public abstract fun checkIfValueValid(value: VimDataType, token: String)
+  public abstract fun parseValue(value: String, token: String): VimDataType
 }
 
-open class StringOption(name: String, abbrev: String, defaultValue: VimString, private val isList: Boolean = false, private val boundedValues: Collection<String>? = null) : Option<VimString>(name, abbrev, defaultValue) {
-  constructor(name: String, abbrev: String, defaultValue: String, isList: Boolean = false, boundedValues: Collection<String>? = null) : this(name, abbrev, VimString(defaultValue), isList, boundedValues)
+public open class StringOption(name: String, abbrev: String, defaultValue: VimString, private val isList: Boolean = false, private val boundedValues: Collection<String>? = null) : Option<VimString>(name, abbrev, defaultValue) {
+  public constructor(name: String, abbrev: String, defaultValue: String, isList: Boolean = false, boundedValues: Collection<String>? = null) : this(name, abbrev, VimString(defaultValue), isList, boundedValues)
 
   override fun checkIfValueValid(value: VimDataType, token: String) {
     if (value !is VimString) {
@@ -65,20 +65,20 @@ open class StringOption(name: String, abbrev: String, defaultValue: VimString, p
     }
   }
 
-  override fun parseValue(value: String, token: String) =
+  override fun parseValue(value: String, token: String): VimString =
     VimString(value).also { checkIfValueValid(it, token) }
 
-  fun appendValue(currentValue: VimString, value: VimString): VimString {
+  public fun appendValue(currentValue: VimString, value: VimString): VimString {
     if (split(currentValue.value).contains(value.value)) return currentValue
     return VimString(joinValues(currentValue.value, value.value))
   }
 
-  fun prependValue(currentValue: VimString, value: VimString): VimString {
+  public fun prependValue(currentValue: VimString, value: VimString): VimString {
     if (split(currentValue.value).contains(value.value)) return currentValue
     return VimString(joinValues(value.value, currentValue.value))
   }
 
-  fun removeValue(currentValue: VimString, value: VimString): VimString {
+  public fun removeValue(currentValue: VimString, value: VimString): VimString {
     val newValue = if (isList) {
       val valuesToRemove = split(value.value)
       val elements = split(currentValue.value).toMutableList()
@@ -97,7 +97,7 @@ open class StringOption(name: String, abbrev: String, defaultValue: VimString, p
     return VimString(newValue)
   }
 
-  open fun split(value: String): List<String> {
+  public open fun split(value: String): List<String> {
     return if (isList) {
       value.split(",")
     } else {
@@ -111,26 +111,26 @@ open class StringOption(name: String, abbrev: String, defaultValue: VimString, p
   }
 }
 
-open class NumberOption(name: String, abbrev: String, defaultValue: VimInt) :
+public open class NumberOption(name: String, abbrev: String, defaultValue: VimInt) :
   Option<VimInt>(name, abbrev, defaultValue) {
-  constructor(name: String, abbrev: String, defaultValue: Int) : this(name, abbrev, VimInt(defaultValue))
+  public constructor(name: String, abbrev: String, defaultValue: Int) : this(name, abbrev, VimInt(defaultValue))
 
   override fun checkIfValueValid(value: VimDataType, token: String) {
     if (value !is VimInt) throw exExceptionMessage("E521", token)
   }
 
-  override fun parseValue(value: String, token: String) =
+  override fun parseValue(value: String, token: String): VimInt =
     VimInt(parseNumber(value) ?: throw exExceptionMessage("E521", token)).also { checkIfValueValid(it, token) }
 
-  fun addValues(value1: VimInt, value2: VimInt) = VimInt(value1.value + value2.value)
-  fun multiplyValues(value1: VimInt, value2: VimInt) = VimInt(value1.value * value2.value)
-  fun subtractValues(value1: VimInt, value2: VimInt) = VimInt(value1.value - value2.value)
+  public fun addValues(value1: VimInt, value2: VimInt): VimInt = VimInt(value1.value + value2.value)
+  public fun multiplyValues(value1: VimInt, value2: VimInt): VimInt = VimInt(value1.value * value2.value)
+  public fun subtractValues(value1: VimInt, value2: VimInt): VimInt = VimInt(value1.value - value2.value)
 }
 
-open class UnsignedNumberOption(name: String, abbrev: String, defaultValue: VimInt) :
+public open class UnsignedNumberOption(name: String, abbrev: String, defaultValue: VimInt) :
   NumberOption(name, abbrev, defaultValue) {
 
-  constructor(name: String, abbrev: String, defaultValue: Int) : this(name, abbrev, VimInt(defaultValue))
+  public constructor(name: String, abbrev: String, defaultValue: Int) : this(name, abbrev, VimInt(defaultValue))
 
   override fun checkIfValueValid(value: VimDataType, token: String) {
     super.checkIfValueValid(value, token)
@@ -140,17 +140,17 @@ open class UnsignedNumberOption(name: String, abbrev: String, defaultValue: VimI
   }
 }
 
-class ToggleOption(name: String, abbrev: String, defaultValue: VimInt) : Option<VimInt>(name, abbrev, defaultValue) {
-  constructor(name: String, abbrev: String, defaultValue: Boolean) : this(name, abbrev, if (defaultValue) VimInt.ONE else VimInt.ZERO)
+public class ToggleOption(name: String, abbrev: String, defaultValue: VimInt) : Option<VimInt>(name, abbrev, defaultValue) {
+  public constructor(name: String, abbrev: String, defaultValue: Boolean) : this(name, abbrev, if (defaultValue) VimInt.ONE else VimInt.ZERO)
 
   override fun checkIfValueValid(value: VimDataType, token: String) {
     if (value !is VimInt) throw exExceptionMessage("E474", token)
   }
 
-  override fun parseValue(value: String, token: String) = throw exExceptionMessage("E474", token)
+  override fun parseValue(value: String, token: String): Nothing = throw exExceptionMessage("E474", token)
 }
 
-fun Option<out VimDataType>.appendValue(currentValue: VimDataType, value: VimDataType): VimDataType? {
+public fun Option<out VimDataType>.appendValue(currentValue: VimDataType, value: VimDataType): VimDataType? {
   return when (this) {
     is StringOption -> this.appendValue(currentValue as VimString, value as VimString)
     is NumberOption -> this.addValues(currentValue as VimInt, value as VimInt)
@@ -158,7 +158,7 @@ fun Option<out VimDataType>.appendValue(currentValue: VimDataType, value: VimDat
   }
 }
 
-fun Option<out VimDataType>.prependValue(currentValue: VimDataType, value: VimDataType): VimDataType? {
+public fun Option<out VimDataType>.prependValue(currentValue: VimDataType, value: VimDataType): VimDataType? {
   return when (this) {
     is StringOption -> this.prependValue(currentValue as VimString, value as VimString)
     is NumberOption -> this.multiplyValues(currentValue as VimInt, value as VimInt)
@@ -166,7 +166,7 @@ fun Option<out VimDataType>.prependValue(currentValue: VimDataType, value: VimDa
   }
 }
 
-fun Option<out VimDataType>.removeValue(currentValue: VimDataType, value: VimDataType): VimDataType? {
+public fun Option<out VimDataType>.removeValue(currentValue: VimDataType, value: VimDataType): VimDataType? {
   return when (this) {
     is StringOption -> this.removeValue(currentValue as VimString, value as VimString)
     is NumberOption -> this.subtractValues(currentValue as VimInt, value as VimInt)

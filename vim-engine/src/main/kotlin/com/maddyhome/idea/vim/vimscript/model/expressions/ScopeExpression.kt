@@ -14,7 +14,7 @@ import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 
-data class ScopeExpression(val scope: Scope) : Expression() {
+public data class ScopeExpression(val scope: Scope) : Expression() {
 
   // this expression should never have been evaluated and only be used as a function argument
   override fun evaluate(editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType {

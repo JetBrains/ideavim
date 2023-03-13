@@ -15,7 +15,7 @@ import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import java.util.regex.Pattern
 
-object KeywordOptionHelper {
+public object KeywordOptionHelper {
 
   private const val allLettersRegex = "\\p{L}"
   private val validationPattern =
@@ -27,19 +27,19 @@ object KeywordOptionHelper {
     updateSpecs()
   }
 
-  fun updateSpecs() {
+  public fun updateSpecs() {
     keywordSpecs = valuesToValidatedAndReversedSpecs(
       parseValues(injector.globalOptions().getStringValue(OptionConstants.iskeyword))
     )!!.toMutableList()
   }
 
-  fun isValueInvalid(value: String): Boolean {
+  public fun isValueInvalid(value: String): Boolean {
     val values = parseValues(value)
     val specs = valuesToValidatedAndReversedSpecs(values)
     return values == null || specs == null
   }
 
-  fun isKeyword(c: Char): Boolean {
+  public fun isKeyword(c: Char): Boolean {
     if (c.code >= '\u0100'.code) {
       return true
     }
@@ -51,7 +51,7 @@ object KeywordOptionHelper {
     return false
   }
 
-  fun toRegex(): List<String> {
+  public fun toRegex(): List<String> {
     return keywordSpecs.map {
       it.initializeValues()
       if (it.isAllLetters) {
@@ -64,7 +64,7 @@ object KeywordOptionHelper {
     }
   }
 
-  fun parseValues(content: String): List<String>? {
+  public fun parseValues(content: String): List<String>? {
     if (!validationPattern.matcher(content).matches()) {
       return null
     }
@@ -193,8 +193,8 @@ object KeywordOptionHelper {
   }
 }
 
-object KeywordOptionChangeListener : OptionChangeListener<VimDataType> {
-  override fun processGlobalValueChange(oldValue: VimDataType?) {
+public object KeywordOptionChangeListener : OptionChangeListener<VimDataType> {
+  public override fun processGlobalValueChange(oldValue: VimDataType?) {
     KeywordOptionHelper.updateSpecs()
   }
 }

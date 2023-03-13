@@ -19,6 +19,6 @@ package com.maddyhome.idea.vim.command
  * If some command implements this interface, and the user enters motion operator that is the same as the command itself, the
  *   motion operator will be replaced with `_`.
  */
-interface DuplicableOperatorAction {
-  val duplicateWith: Char
+public interface DuplicableOperatorAction {
+  public val duplicateWith: Char
 }

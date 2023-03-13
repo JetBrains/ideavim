@@ -16,12 +16,12 @@ import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.helper.RWLockLabel
 
-interface VimPut {
-  fun doIndent(editor: VimEditor, caret: VimCaret, context: ExecutionContext, startOffset: Int, endOffset: Int): Int
+public interface VimPut {
+  public fun doIndent(editor: VimEditor, caret: VimCaret, context: ExecutionContext, startOffset: Int, endOffset: Int): Int
 
-  fun notifyAboutIdeaPut(editor: VimEditor?)
+  public fun notifyAboutIdeaPut(editor: VimEditor?)
   @RWLockLabel.SelfSynchronized
-  fun putTextAndSetCaretPosition(
+  public fun putTextAndSetCaretPosition(
     editor: VimEditor,
     context: ExecutionContext,
     text: ProcessedTextData,
@@ -30,7 +30,7 @@ interface VimPut {
   )
 
   @RWLockLabel.SelfSynchronized
-  fun putText(
+  public fun putText(
     editor: VimEditor,
     context: ExecutionContext,
     data: PutData,
@@ -40,10 +40,10 @@ interface VimPut {
   ): Boolean
 
   @RWLockLabel.SelfSynchronized
-  fun putTextForCaret(editor: VimEditor, caret: VimCaret, context: ExecutionContext, data: PutData, updateVisualMarks: Boolean = false, modifyRegister: Boolean = true): Boolean
+  public fun putTextForCaret(editor: VimEditor, caret: VimCaret, context: ExecutionContext, data: PutData, updateVisualMarks: Boolean = false, modifyRegister: Boolean = true): Boolean
 
   @RWLockLabel.SelfSynchronized
-  fun putTextViaIde(
+  public fun putTextViaIde(
     pasteProvider: VimPasteProvider,
     vimEditor: VimEditor,
     vimContext: ExecutionContext,
@@ -53,11 +53,11 @@ interface VimPut {
     additionalData: Map<String, Any>,
   )
 
-  fun getProviderForPasteViaIde(
+  public fun getProviderForPasteViaIde(
     editor: VimEditor,
     typeInRegister: SelectionType,
     data: PutData,
   ): VimPasteProvider?
 }
 
-interface VimPasteProvider
+public interface VimPasteProvider

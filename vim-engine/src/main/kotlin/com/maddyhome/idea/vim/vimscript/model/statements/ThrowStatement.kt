@@ -16,7 +16,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 
-data class ThrowStatement(val expression: Expression) : Executable {
+public data class ThrowStatement(val expression: Expression) : Executable {
   override lateinit var vimContext: VimLContext
 
   override fun execute(editor: VimEditor, context: ExecutionContext): ExecutionResult {

@@ -17,43 +17,43 @@ import com.maddyhome.idea.vim.options.ToggleOption
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 
-interface VimOptionGroup {
+public interface VimOptionGroup {
   /**
    * Get the [Option] by its name or abbreviation
    */
-  fun getOption(key: String): Option<out VimDataType>?
+  public fun getOption(key: String): Option<out VimDataType>?
 
   /**
    * @return list of all options
    */
-  fun getAllOptions(): Set<Option<out VimDataType>>
+  public fun getAllOptions(): Set<Option<out VimDataType>>
 
   /**
    * Get the value for the option in the given scope
    */
-  fun getOptionValue(option: Option<out VimDataType>, scope: OptionScope): VimDataType
+  public fun getOptionValue(option: Option<out VimDataType>, scope: OptionScope): VimDataType
 
   /**
    * Set the value for the option in the given scope
    */
-  fun setOptionValue(option: Option<out VimDataType>, scope: OptionScope, value: VimDataType)
+  public fun setOptionValue(option: Option<out VimDataType>, scope: OptionScope, value: VimDataType)
 
   /**
    * Resets all options back to default values.
    */
-  fun resetAllOptions()
+  public fun resetAllOptions()
 
   /**
    * Adds the option.
    * @param option option
    */
-  fun addOption(option: Option<out VimDataType>)
+  public fun addOption(option: Option<out VimDataType>)
 
   /**
    * Removes the option.
    * @param optionName option name or alias
    */
-  fun removeOption(optionName: String)
+  public fun removeOption(optionName: String)
 
   /**
    * Adds a listener to the option.
@@ -61,14 +61,14 @@ interface VimOptionGroup {
    * @param listener option listener
    * @param executeOnAdd whether execute listener after the method call or not
    */
-  fun addListener(optionName: String, listener: OptionChangeListener<VimDataType>, executeOnAdd: Boolean = false)
+  public fun addListener(optionName: String, listener: OptionChangeListener<VimDataType>, executeOnAdd: Boolean = false)
 
   /**
    * Remove the listener from the option.
    * @param optionName option name or alias
    * @param listener option listener
    */
-  fun removeListener(optionName: String, listener: OptionChangeListener<VimDataType>)
+  public fun removeListener(optionName: String, listener: OptionChangeListener<VimDataType>)
 
   /**
    * Return an accessor class to easily retrieve options values
@@ -79,26 +79,26 @@ interface VimOptionGroup {
    * @param editor The editor to use to retrieve local option values. If `null`, then only global values are available
    * @return An instance of [OptionValueAccessor] to provide easy API to get option values
    */
-  fun getValueAccessor(editor: VimEditor?): OptionValueAccessor
+  public fun getValueAccessor(editor: VimEditor?): OptionValueAccessor
 }
 
 /**
  * Checks if option is set to its default value
  */
-fun VimOptionGroup.isDefaultValue(option: Option<out VimDataType>, scope: OptionScope) =
+public fun VimOptionGroup.isDefaultValue(option: Option<out VimDataType>, scope: OptionScope): Boolean =
   getOptionValue(option, scope) == option.defaultValue
 
 /**
  * Resets the option back to its default value
  */
-fun VimOptionGroup.resetDefaultValue(option: Option<out VimDataType>, scope: OptionScope) {
+public fun VimOptionGroup.resetDefaultValue(option: Option<out VimDataType>, scope: OptionScope) {
   setOptionValue(option, scope, option.defaultValue)
 }
 
 /**
  * Checks if the given string option matches the value, or a string list contains the value
  */
-fun VimOptionGroup.hasValue(option: StringOption, scope: OptionScope, value: String) =
+public fun VimOptionGroup.hasValue(option: StringOption, scope: OptionScope, value: String): Boolean =
   value in option.split(getOptionValue(option, scope).asString())
 
 /**
@@ -106,28 +106,28 @@ fun VimOptionGroup.hasValue(option: StringOption, scope: OptionScope, value: Str
  *
  * E.g. the `fileencodings` option with value "ucs-bom,utf-8,default,latin1" will result listOf("ucs-bom", "utf-8", "default", "latin1")
  */
-fun VimOptionGroup.getStringListValues(option: StringOption, scope: OptionScope): List<String> {
+public fun VimOptionGroup.getStringListValues(option: StringOption, scope: OptionScope): List<String> {
   return option.split(getOptionValue(option, scope).asString())
 }
 
 /**
  * Sets the toggle option on
  */
-fun VimOptionGroup.setToggleOption(option: ToggleOption, scope: OptionScope) {
+public fun VimOptionGroup.setToggleOption(option: ToggleOption, scope: OptionScope) {
   setOptionValue(option, scope, VimInt.ONE)
 }
 
 /**
  * Unsets a toggle option
  */
-fun VimOptionGroup.unsetToggleOption(option: ToggleOption, scope: OptionScope) {
+public fun VimOptionGroup.unsetToggleOption(option: ToggleOption, scope: OptionScope) {
   setOptionValue(option, scope, VimInt.ZERO)
 }
 
 /**
  * Inverts toggle option value, setting it on if off, or off if on.
  */
-fun VimOptionGroup.invertToggleOption(option: ToggleOption, scope: OptionScope) {
+public fun VimOptionGroup.invertToggleOption(option: ToggleOption, scope: OptionScope) {
   val optionValue = getOptionValue(option, scope)
   setOptionValue(option, scope, if (optionValue.asBoolean()) VimInt.ZERO else VimInt.ONE)
 }
@@ -137,26 +137,26 @@ fun VimOptionGroup.invertToggleOption(option: ToggleOption, scope: OptionScope) 
  *
  * The option must exist, or an exception will be thrown
  */
-fun VimOptionGroup.getKnownOption(optionName: String) = getOption(optionName)!!
+public fun VimOptionGroup.getKnownOption(optionName: String): Option<out VimDataType> = getOption(optionName)!!
 
 /**
  * Get an instance of [ToggleOption] for a well-known option name
  *
  * The option must exist, or an exception will be thrown
  */
-fun VimOptionGroup.getKnownToggleOption(optionName: String) = getOption(optionName) as ToggleOption
+public fun VimOptionGroup.getKnownToggleOption(optionName: String): ToggleOption = getOption(optionName) as ToggleOption
 
 /**
  * Get an instance of [StringOption] for a well-known option name
  *
  * The option must exist, or an exception will be thrown
  */
-fun VimOptionGroup.getKnownStringOption(optionName: String) = getOption(optionName) as StringOption
+public fun VimOptionGroup.getKnownStringOption(optionName: String): StringOption = getOption(optionName) as StringOption
 
 /**
  * Modifies the value of an option by calling the given transform function
  */
-inline fun <TDataType : VimDataType> VimOptionGroup.modifyOptionValue(
+public inline fun <TDataType : VimDataType> VimOptionGroup.modifyOptionValue(
   option: Option<TDataType>,
   scope: OptionScope,
   transform: (TDataType) -> TDataType?,

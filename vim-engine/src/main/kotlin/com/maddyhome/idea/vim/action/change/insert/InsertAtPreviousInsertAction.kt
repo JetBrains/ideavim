@@ -42,7 +42,7 @@ public class InsertAtPreviousInsertAction : ChangeEditorActionHandler.SingleExec
  * @param editor The editor to insert into
  */
 // todo make it multicaret
-fun insertAtPreviousInsert(editor: VimEditor, context: ExecutionContext) {
+private fun insertAtPreviousInsert(editor: VimEditor, context: ExecutionContext) {
   editor.removeSecondaryCarets()
   val caret = editor.primaryCaret()
   val motion = injector.motion.moveCaretToMark(editor.primaryCaret(), VimMarkService.INSERT_EXIT_MARK, false)

@@ -10,7 +10,7 @@ package com.maddyhome.idea.vim.vimscript.model.datatypes
 
 import com.maddyhome.idea.vim.ex.ExException
 
-data class VimDictionary(val dictionary: LinkedHashMap<VimString, VimDataType>) : VimDataType() {
+public data class VimDictionary(val dictionary: LinkedHashMap<VimString, VimDataType>) : VimDataType() {
 
   override fun asDouble(): Double {
     throw ExException("E728: Using a Dictionary as a Number")

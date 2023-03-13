@@ -20,43 +20,43 @@ import org.jetbrains.annotations.TestOnly
 import java.util.*
 import javax.swing.KeyStroke
 
-class CommandBuilder(private var currentCommandPartNode: CommandPartNode<VimActionsInitiator>) {
+public class CommandBuilder(private var currentCommandPartNode: CommandPartNode<VimActionsInitiator>) {
   private val commandParts = ArrayDeque<Command>()
   private var keyList = mutableListOf<KeyStroke>()
 
-  var commandState = CurrentCommandState.NEW_COMMAND
-  var count = 0
+  public var commandState: CurrentCommandState = CurrentCommandState.NEW_COMMAND
+  public var count: Int = 0
     private set
-  val keys: Iterable<KeyStroke> get() = keyList
+  public val keys: Iterable<KeyStroke> get() = keyList
 
   // The argument type for the current command part's action. Kept separate to handle digraphs and characters. We first
   // try to accept a digraph. If we get it, set expected argument type to character and handle the converted key. If we
   // fail to convert to a digraph, set expected argument type to character and try to handle the key again.
-  var expectedArgumentType: Argument.Type? = null
+  public var expectedArgumentType: Argument.Type? = null
     private set
 
   private var prevExpectedArgumentType: Argument.Type? = null
 
-  val isReady get() = commandState == CurrentCommandState.READY
-  val isBad get() = commandState == CurrentCommandState.BAD_COMMAND
-  val isEmpty get() = commandParts.isEmpty()
-  val isAtDefaultState get() = isEmpty && count == 0 && expectedArgumentType == null
+  public val isReady: Boolean get() = commandState == CurrentCommandState.READY
+  public val isBad: Boolean get() = commandState == CurrentCommandState.BAD_COMMAND
+  public val isEmpty: Boolean get() = commandParts.isEmpty()
+  public val isAtDefaultState: Boolean get() = isEmpty && count == 0 && expectedArgumentType == null
 
-  val isExpectingCount: Boolean
+  public val isExpectingCount: Boolean
     get() {
       return commandState == CurrentCommandState.NEW_COMMAND &&
         expectedArgumentType != Argument.Type.CHARACTER &&
         expectedArgumentType != Argument.Type.DIGRAPH
     }
 
-  fun pushCommandPart(action: EditorActionHandlerBase) {
+  public fun pushCommandPart(action: EditorActionHandlerBase) {
     commandParts.add(Command(count, action, action.type, action.flags))
     prevExpectedArgumentType = expectedArgumentType
     expectedArgumentType = action.argumentType
     count = 0
   }
 
-  fun pushCommandPart(register: Char) {
+  public fun pushCommandPart(register: Char) {
     // We will never execute this command, but we need to push something to correctly handle counts on either side of a
     // select register command part. e.g. 2"a2d2w or even crazier 2"a2"a2"a2"a2"a2d2w
     commandParts.add(Command(count, register))
@@ -64,24 +64,24 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode<VimActi
     count = 0
   }
 
-  fun popCommandPart(): Command {
+  public fun popCommandPart(): Command {
     val command = commandParts.removeLast()
     expectedArgumentType = if (commandParts.size > 0) commandParts.peekLast().action.argumentType else null
     return command
   }
 
-  fun fallbackToCharacterArgument() {
+  public fun fallbackToCharacterArgument() {
     // Finished handling DIGRAPH. We either succeeded, in which case handle the converted character, or failed to parse,
     // in which case try to handle input as a character argument.
     assert(expectedArgumentType == Argument.Type.DIGRAPH) { "Cannot move state from $expectedArgumentType to CHARACTER" }
     expectedArgumentType = Argument.Type.CHARACTER
   }
 
-  fun addKey(key: KeyStroke) {
+  public fun addKey(key: KeyStroke) {
     keyList.add(key)
   }
 
-  fun addCountCharacter(key: KeyStroke) {
+  public fun addCountCharacter(key: KeyStroke) {
     count = (count * 10) + (key.keyChar - '0')
     // If count overflows and flips negative, reset to 999999999L. In Vim, count is a long, which is *usually* 32 bits,
     // so will flip at 2147483648. We store count as an Int, which is also 32 bit.
@@ -92,20 +92,20 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode<VimActi
     addKey(key)
   }
 
-  fun deleteCountCharacter() {
+  public fun deleteCountCharacter() {
     count /= 10
     keyList.removeAt(keyList.size - 1)
   }
 
-  fun setCurrentCommandPartNode(newNode: CommandPartNode<VimActionsInitiator>) {
+  public fun setCurrentCommandPartNode(newNode: CommandPartNode<VimActionsInitiator>) {
     currentCommandPartNode = newNode
   }
 
-  fun getChildNode(key: KeyStroke): Node<VimActionsInitiator>? {
+  public fun getChildNode(key: KeyStroke): Node<VimActionsInitiator>? {
     return currentCommandPartNode[key]
   }
 
-  fun isAwaitingCharOrDigraphArgument(): Boolean {
+  public fun isAwaitingCharOrDigraphArgument(): Boolean {
     if (commandParts.size == 0) return false
     val argumentType = commandParts.peekLast().action.argumentType
     val awaiting = argumentType == Argument.Type.CHARACTER || argumentType == Argument.Type.DIGRAPH
@@ -113,7 +113,7 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode<VimActi
     return awaiting
   }
 
-  fun isBuildingMultiKeyCommand(): Boolean {
+  public fun isBuildingMultiKeyCommand(): Boolean {
     // Don't apply mapping if we're in the middle of building a multi-key command.
     // E.g. given nmap s v, don't try to map <C-W>s to <C-W>v
     //   Similarly, nmap <C-W>a <C-W>s should not try to map the second <C-W> in <C-W><C-W>
@@ -124,29 +124,29 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode<VimActi
     return isMultikey
   }
 
-  fun isPuttingLiteral(): Boolean {
+  public fun isPuttingLiteral(): Boolean {
     return !commandParts.isEmpty() && commandParts.last.action.id == "VimInsertCompletedLiteralAction"
   }
 
-  fun isDone(): Boolean {
+  public fun isDone(): Boolean {
     return commandParts.isEmpty()
   }
 
-  fun completeCommandPart(argument: Argument) {
+  public fun completeCommandPart(argument: Argument) {
     commandParts.peekLast().argument = argument
     commandState = CurrentCommandState.READY
   }
 
-  fun isDuplicateOperatorKeyStroke(key: KeyStroke): Boolean {
+  public fun isDuplicateOperatorKeyStroke(key: KeyStroke): Boolean {
     val action = commandParts.peekLast().action as? DuplicableOperatorAction
     return action?.duplicateWith == key.keyChar
   }
 
-  fun hasCurrentCommandPartArgument(): Boolean {
+  public fun hasCurrentCommandPartArgument(): Boolean {
     return commandParts.peek()?.argument != null
   }
 
-  fun buildCommand(): Command {
+  public fun buildCommand(): Command {
     if (commandParts.last.action.id == "VimInsertCompletedDigraphAction" || commandParts.last.action.id == "VimResetModeAction") {
       expectedArgumentType = prevExpectedArgumentType
       prevExpectedArgumentType = null
@@ -171,7 +171,7 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode<VimActi
     return command
   }
 
-  fun resetAll(commandPartNode: CommandPartNode<VimActionsInitiator>) {
+  public fun resetAll(commandPartNode: CommandPartNode<VimActionsInitiator>) {
     resetInProgressCommandPart(commandPartNode)
     commandState = CurrentCommandState.NEW_COMMAND
     commandParts.clear()
@@ -180,19 +180,19 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode<VimActi
     prevExpectedArgumentType = null
   }
 
-  fun resetCount() {
+  public fun resetCount() {
     count = 0
   }
 
-  fun resetInProgressCommandPart(commandPartNode: CommandPartNode<VimActionsInitiator>) {
+  public fun resetInProgressCommandPart(commandPartNode: CommandPartNode<VimActionsInitiator>) {
     count = 0
     setCurrentCommandPartNode(commandPartNode)
   }
 
   @TestOnly
-  fun getCurrentTrie(): CommandPartNode<VimActionsInitiator> = currentCommandPartNode
+  public fun getCurrentTrie(): CommandPartNode<VimActionsInitiator> = currentCommandPartNode
 
-  companion object {
+  public companion object {
     private val LOG = vimLogger<CommandBuilder>()
   }
 }

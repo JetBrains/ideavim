@@ -18,14 +18,14 @@ import kotlin.math.min
 /**
  * Handles the set of range values entered as part of an Ex command.
  */
-class Ranges {
+public class Ranges {
   /** Adds a range to the list */
-  fun addRange(range: Array<Range>) {
+  public fun addRange(range: Array<Range>) {
     ranges.addAll(range)
   }
 
   /** Gets the number of ranges in the list */
-  fun size(): Int = ranges.size
+  public fun size(): Int = ranges.size
 
   /**
    * Sets the default line to be used by this range if no range was actually given by the user. -1 is used to
@@ -33,7 +33,7 @@ class Ranges {
    *
    * @param line The line or -1 for current line
    */
-  fun setDefaultLine(line: Int) {
+  public fun setDefaultLine(line: Int) {
     defaultLine = line
   }
 
@@ -43,17 +43,17 @@ class Ranges {
    * @param editor  The editor to get the line for
    * @return The line number represented by the range
    */
-  fun getLine(editor: VimEditor): Int {
+  public fun getLine(editor: VimEditor): Int {
     processRange(editor)
     return endLine
   }
 
-  fun getLine(editor: VimEditor, caret: VimCaret): Int {
+  public fun getLine(editor: VimEditor, caret: VimCaret): Int {
     processRange(editor, caret)
     return endLine
   }
 
-  fun getFirstLine(editor: VimEditor, caret: VimCaret): Int {
+  public fun getFirstLine(editor: VimEditor, caret: VimCaret): Int {
     processRange(editor, caret)
     return startLine
   }
@@ -66,9 +66,9 @@ class Ranges {
    * @param count   The count given at the end of the command or -1 if no such count (use end line)
    * @return count if count != -1, else return end line of range
    */
-  fun getCount(editor: VimEditor, count: Int): Int = if (count == -1) getLine(editor) else count
+  public fun getCount(editor: VimEditor, count: Int): Int = if (count == -1) getLine(editor) else count
 
-  fun getCount(editor: VimEditor, caret: VimCaret, count: Int): Int {
+  public fun getCount(editor: VimEditor, caret: VimCaret, count: Int): Int {
     return if (count == -1) getLine(editor, caret) else count
   }
 
@@ -80,7 +80,7 @@ class Ranges {
    * @param count   The count given at the end of the command or -1 if no such count
    * @return The line range
    */
-  fun getLineRange(editor: VimEditor, count: Int): LineRange {
+  public fun getLineRange(editor: VimEditor, count: Int): LineRange {
     processRange(editor)
     val end: Int
     val start: Int
@@ -94,7 +94,7 @@ class Ranges {
     return LineRange(start, end)
   }
 
-  fun getLineRange(editor: VimEditor, caret: VimCaret, count: Int): LineRange {
+  public fun getLineRange(editor: VimEditor, caret: VimCaret, count: Int): LineRange {
     processRange(editor, caret)
     return if (count == -1) LineRange(startLine, endLine) else LineRange(endLine, endLine + count - 1)
   }
@@ -108,14 +108,14 @@ class Ranges {
    * @param count   The count given at the end of the command or -1 if no such count
    * @return The text range
    */
-  fun getTextRange(editor: VimEditor, count: Int): TextRange {
+  public fun getTextRange(editor: VimEditor, count: Int): TextRange {
     val lr = getLineRange(editor, count)
     val start = editor.getLineStartOffset(lr.startLine)
     val end = editor.getLineEndOffset(lr.endLine, true) + 1
     return TextRange(start, min(end, editor.fileSize().toInt()))
   }
 
-  fun getTextRange(editor: VimEditor, caret: VimCaret, count: Int): TextRange {
+  public fun getTextRange(editor: VimEditor, caret: VimCaret, count: Int): TextRange {
     val lineRange = getLineRange(editor, caret, count)
     val start = editor.getLineStartOffset(lineRange.startLine)
     val end = editor.getLineEndOffset(lineRange.endLine, true) + 1
@@ -202,5 +202,5 @@ class Ranges {
   private var count = 0
   private var defaultLine = -1
   private var done = false
-  var ranges: MutableList<Range> = mutableListOf()
+  public var ranges: MutableList<Range> = mutableListOf()
 }

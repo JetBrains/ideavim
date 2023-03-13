@@ -21,7 +21,7 @@ import com.maddyhome.idea.vim.key.KeyMappingLayer
 import com.maddyhome.idea.vim.options.OptionConstants
 import javax.swing.KeyStroke
 
-object MappingProcessor {
+public object MappingProcessor {
 
   private val log = vimLogger<MappingProcessor>()
 

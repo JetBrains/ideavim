@@ -10,7 +10,7 @@ package com.maddyhome.idea.vim.options
 
 import com.maddyhome.idea.vim.api.VimEditor
 
-sealed class OptionScope {
-  object GLOBAL : OptionScope()
-  class LOCAL(val editor: VimEditor) : OptionScope()
+public sealed class OptionScope {
+  public object GLOBAL : OptionScope()
+  public class LOCAL(public val editor: VimEditor) : OptionScope()
 }

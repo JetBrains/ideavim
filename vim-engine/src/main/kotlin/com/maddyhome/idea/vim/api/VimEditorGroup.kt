@@ -8,7 +8,7 @@
 
 package com.maddyhome.idea.vim.api
 
-interface VimEditorGroup {
-  fun notifyIdeaJoin(editor: VimEditor)
-  fun localEditors(): Collection<VimEditor>
+public interface VimEditorGroup {
+  public fun notifyIdeaJoin(editor: VimEditor)
+  public fun localEditors(): Collection<VimEditor>
 }

@@ -30,8 +30,8 @@ import javax.swing.KeyStroke
 /**
  * @author vlan
  */
-data class MapCommand(val ranges: Ranges, val argument: String, val cmd: String) : Command.SingleExecution(ranges, argument) {
-  override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+public data class MapCommand(val ranges: Ranges, val argument: String, val cmd: String) : Command.SingleExecution(ranges, argument) {
+  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   @Throws(ExException::class)
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
@@ -125,7 +125,7 @@ data class MapCommand(val ranges: Ranges, val argument: String, val cmd: String)
     val secondArgument: String,
   )
 
-  companion object {
+  public companion object {
     private const val CTRL_V = '\u0016'
     private val COMMAND_INFOS = arrayOf(
       // TODO: Support smap, map!, lmap

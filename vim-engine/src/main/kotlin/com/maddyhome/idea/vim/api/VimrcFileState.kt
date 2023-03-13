@@ -8,8 +8,8 @@
 
 package com.maddyhome.idea.vim.api
 
-interface VimrcFileState {
-  var filePath: String?
+public interface VimrcFileState {
+  public var filePath: String?
 
-  fun saveFileState(filePath: String)
+  public fun saveFileState(filePath: String)
 }

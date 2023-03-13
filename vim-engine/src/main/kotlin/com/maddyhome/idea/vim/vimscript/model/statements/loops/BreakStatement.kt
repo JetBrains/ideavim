@@ -14,7 +14,7 @@ import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 
-object BreakStatement : Executable {
+public object BreakStatement : Executable {
   override lateinit var vimContext: VimLContext
 
   override fun execute(editor: VimEditor, context: ExecutionContext): ExecutionResult {

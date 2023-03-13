@@ -19,9 +19,9 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 /**
  * see "h :echo"
  */
-data class EchoCommand(val ranges: Ranges, val args: List<Expression>) : Command.SingleExecution(ranges) {
+public data class EchoCommand(val ranges: Ranges, val args: List<Expression>) : Command.SingleExecution(ranges) {
 
-  override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult.Success {
     val text = args.joinToString(separator = " ", postfix = "\n") {

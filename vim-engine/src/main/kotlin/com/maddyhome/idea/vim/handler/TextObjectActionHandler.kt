@@ -32,7 +32,7 @@ import com.maddyhome.idea.vim.helper.subMode
  *
  * This handler gets executed for each caret.
  */
-abstract class TextObjectActionHandler : EditorActionHandlerBase(true) {
+public abstract class TextObjectActionHandler : EditorActionHandlerBase(true) {
 
   final override val type: Command.Type = Command.Type.MOTION
 
@@ -41,9 +41,9 @@ abstract class TextObjectActionHandler : EditorActionHandlerBase(true) {
    * E.g. In visual line-wise mode, `aw` will switch to character mode.
    *   In visual character mode, `ip` will switch to line-wise mode.
    */
-  abstract val visualType: TextObjectVisualType
+  public abstract val visualType: TextObjectVisualType
 
-  abstract fun getRange(
+  public abstract fun getRange(
     editor: VimEditor,
     caret: ImmutableVimCaret,
     context: ExecutionContext,

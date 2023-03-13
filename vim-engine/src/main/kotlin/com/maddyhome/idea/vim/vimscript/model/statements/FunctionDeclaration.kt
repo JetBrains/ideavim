@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 
-data class FunctionDeclaration(
+public data class FunctionDeclaration(
   val scope: Scope?,
   val name: String,
   val args: List<String>,
@@ -30,7 +30,7 @@ data class FunctionDeclaration(
   val hasOptionalArguments: Boolean,
 ) : Executable {
   override lateinit var vimContext: VimLContext
-  var isDeleted = false
+  var isDeleted: Boolean = false
 
   /**
    * we store the "a:" and "l:" scope variables here
@@ -53,14 +53,14 @@ data class FunctionDeclaration(
   }
 }
 
-enum class FunctionFlag(val abbrev: String) {
+public enum class FunctionFlag(public val abbrev: String) {
   RANGE("range"),
   ABORT("abort"),
   DICT("dict"),
   CLOSURE("closure");
 
-  companion object {
-    fun getByName(abbrev: String): FunctionFlag? {
+  public companion object {
+    public fun getByName(abbrev: String): FunctionFlag? {
       return values().firstOrNull { it.abbrev == abbrev }
     }
   }

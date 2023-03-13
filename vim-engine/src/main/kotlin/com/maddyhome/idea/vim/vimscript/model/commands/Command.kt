@@ -35,15 +35,15 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import java.util.*
 
-sealed class Command(var commandRanges: Ranges, val commandArgument: String) : Executable {
+public sealed class Command(public var commandRanges: Ranges, public val commandArgument: String) : Executable {
   override lateinit var vimContext: VimLContext
 
-  abstract val argFlags: CommandHandlerFlags
+  public abstract val argFlags: CommandHandlerFlags
   protected open val optFlags: EnumSet<CommandFlags> = noneOfEnum()
   private val logger = vimLogger<Command>()
 
-  abstract class ForEachCaret(ranges: Ranges, argument: String = "") : Command(ranges, argument) {
-    abstract fun processCommand(
+  public abstract class ForEachCaret(ranges: Ranges, argument: String = "") : Command(ranges, argument) {
+    public abstract fun processCommand(
       editor: VimEditor,
       caret: VimCaret,
       context: ExecutionContext,
@@ -51,8 +51,8 @@ sealed class Command(var commandRanges: Ranges, val commandArgument: String) : E
     ): ExecutionResult
   }
 
-  abstract class SingleExecution(ranges: Ranges, argument: String = "") : Command(ranges, argument) {
-    abstract fun processCommand(
+  public abstract class SingleExecution(ranges: Ranges, argument: String = "") : Command(ranges, argument) {
+    public abstract fun processCommand(
       editor: VimEditor,
       context: ExecutionContext,
       operatorArguments: OperatorArguments,
@@ -132,7 +132,7 @@ sealed class Command(var commandRanges: Ranges, val commandArgument: String) : E
     }
   }
 
-  enum class RangeFlag {
+  public enum class RangeFlag {
     /**
      * Indicates that a range must be specified with this command
      */
@@ -155,7 +155,7 @@ sealed class Command(var commandRanges: Ranges, val commandArgument: String) : E
     RANGE_IS_COUNT
   }
 
-  enum class ArgumentFlag {
+  public enum class ArgumentFlag {
     /**
      * Indicates that an argument must be specified with this command
      */
@@ -172,7 +172,7 @@ sealed class Command(var commandRanges: Ranges, val commandArgument: String) : E
     ARGUMENT_FORBIDDEN
   }
 
-  enum class Access {
+  public enum class Access {
     /**
      * Indicates that this is a command that modifies the editor
      */
@@ -189,7 +189,7 @@ sealed class Command(var commandRanges: Ranges, val commandArgument: String) : E
     SELF_SYNCHRONIZED
   }
 
-  enum class Flag {
+  public enum class Flag {
     /**
      * This command should not exit visual mode.
      *
@@ -199,44 +199,44 @@ sealed class Command(var commandRanges: Ranges, val commandArgument: String) : E
     SAVE_VISUAL
   }
 
-  data class CommandHandlerFlags(
+  public data class CommandHandlerFlags(
     val rangeFlag: RangeFlag,
     val argumentFlag: ArgumentFlag,
     val access: Access,
     val flags: Set<Flag>,
   )
 
-  fun flags(rangeFlag: RangeFlag, argumentFlag: ArgumentFlag, access: Access, vararg flags: Flag) =
+  public fun flags(rangeFlag: RangeFlag, argumentFlag: ArgumentFlag, access: Access, vararg flags: Flag): CommandHandlerFlags =
     CommandHandlerFlags(rangeFlag, argumentFlag, access, flags.toSet())
 
-  fun getLine(editor: VimEditor): Int = commandRanges.getLine(editor)
+  public fun getLine(editor: VimEditor): Int = commandRanges.getLine(editor)
 
-  fun getLine(editor: VimEditor, caret: VimCaret): Int = commandRanges.getLine(editor, caret)
+  public fun getLine(editor: VimEditor, caret: VimCaret): Int = commandRanges.getLine(editor, caret)
 
-  fun getCount(editor: VimEditor, defaultCount: Int, checkCount: Boolean): Int {
+  public fun getCount(editor: VimEditor, defaultCount: Int, checkCount: Boolean): Int {
     val count = if (checkCount) countArgument else -1
 
     val res = commandRanges.getCount(editor, count)
     return if (res == -1) defaultCount else res
   }
 
-  fun getCount(editor: VimEditor, caret: VimCaret, defaultCount: Int, checkCount: Boolean): Int {
+  public fun getCount(editor: VimEditor, caret: VimCaret, defaultCount: Int, checkCount: Boolean): Int {
     val count = commandRanges.getCount(editor, caret, if (checkCount) countArgument else -1)
     return if (count == -1) defaultCount else count
   }
 
-  fun getLineRange(editor: VimEditor): LineRange = commandRanges.getLineRange(editor, -1)
+  public fun getLineRange(editor: VimEditor): LineRange = commandRanges.getLineRange(editor, -1)
 
-  fun getLineRange(editor: VimEditor, caret: VimCaret, checkCount: Boolean = false): LineRange {
+  public fun getLineRange(editor: VimEditor, caret: VimCaret, checkCount: Boolean = false): LineRange {
     return commandRanges.getLineRange(editor, caret, if (checkCount) countArgument else -1)
   }
 
-  fun getTextRange(editor: VimEditor, checkCount: Boolean): TextRange {
+  public fun getTextRange(editor: VimEditor, checkCount: Boolean): TextRange {
     val count = if (checkCount) countArgument else -1
     return commandRanges.getTextRange(editor, count)
   }
 
-  fun getTextRange(editor: VimEditor, caret: VimCaret, checkCount: Boolean): TextRange {
+  public fun getTextRange(editor: VimEditor, caret: VimCaret, checkCount: Boolean): TextRange {
     return commandRanges.getTextRange(editor, caret, if (checkCount) countArgument else -1)
   }
 

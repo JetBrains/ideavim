@@ -18,12 +18,12 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
-data class SimpleExpression(val data: VimDataType) : Expression() {
-  constructor(value: Int) : this(VimInt(value))
-  constructor(value: Double) : this(VimFloat(value))
-  constructor(value: String) : this(VimString(value))
-  constructor(value: MutableList<VimDataType>) : this(VimList(value))
-  constructor(value: LinkedHashMap<VimString, VimDataType>) : this(VimDictionary(value))
+public data class SimpleExpression(val data: VimDataType) : Expression() {
+  public constructor(value: Int) : this(VimInt(value))
+  public constructor(value: Double) : this(VimFloat(value))
+  public constructor(value: String) : this(VimString(value))
+  public constructor(value: MutableList<VimDataType>) : this(VimList(value))
+  public constructor(value: LinkedHashMap<VimString, VimDataType>) : this(VimDictionary(value))
 
   override fun evaluate(editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType {
     return data

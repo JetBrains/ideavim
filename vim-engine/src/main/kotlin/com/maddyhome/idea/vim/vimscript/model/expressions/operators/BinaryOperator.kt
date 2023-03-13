@@ -47,7 +47,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.bin
 import com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.binary.UnequalsHandler
 import com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.binary.UnequalsIgnoreCaseHandler
 
-enum class BinaryOperator(val value: String, val handler: BinaryOperatorHandler) {
+public enum class BinaryOperator(public val value: String, public val handler: BinaryOperatorHandler) {
   MULTIPLICATION("*", MultiplicationHandler),
   DIVISION("/", DivisionHandler),
   ADDITION("+", AdditionHandler),
@@ -88,8 +88,8 @@ enum class BinaryOperator(val value: String, val handler: BinaryOperatorHandler)
   DOESNT_MATCH_IGNORE_CASE("!~?", DoesntMatchIgnoreCaseHandler),
   DOESNT_MATCH_CASE_SENSITIVE("!~#", DoesntMatchIgnoreCaseHandler);
 
-  companion object {
-    fun getByValue(value: String): BinaryOperator? {
+  public companion object {
+    public fun getByValue(value: String): BinaryOperator? {
       return values().firstOrNull { it.value == value }
     }
   }

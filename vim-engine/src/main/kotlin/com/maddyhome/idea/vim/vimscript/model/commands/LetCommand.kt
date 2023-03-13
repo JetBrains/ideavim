@@ -42,7 +42,7 @@ import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
 /**
  * see "h :let"
  */
-data class LetCommand(
+public data class LetCommand(
   val ranges: Ranges,
   val variable: Expression,
   val operator: AssignmentOperator,
@@ -50,10 +50,10 @@ data class LetCommand(
   val isSyntaxSupported: Boolean,
 ) : Command.SingleExecution(ranges) {
 
-  companion object {
+  private companion object {
     private val logger = vimLogger<LetCommand>()
   }
-  override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   @Throws(ExException::class)
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {

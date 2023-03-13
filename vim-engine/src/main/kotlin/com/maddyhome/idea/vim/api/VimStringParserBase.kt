@@ -16,7 +16,7 @@ import java.awt.event.KeyEvent
 import java.util.*
 import javax.swing.KeyStroke
 
-abstract class VimStringParserBase : VimStringParser {
+public abstract class VimStringParserBase : VimStringParser {
   override val plugKeyStroke: KeyStroke
     get() = parseKeys("<Plug>")[0]
 
@@ -539,7 +539,7 @@ abstract class VimStringParserBase : VimStringParser {
     INIT, ESCAPE, SPECIAL
   }
 
-  companion object {
+  private companion object {
     private const val CMD_PREFIX = "d-"
     private const val META_PREFIX = "m-"
     private const val ALT_PREFIX = "a-"

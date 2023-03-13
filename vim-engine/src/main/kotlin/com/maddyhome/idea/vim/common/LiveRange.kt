@@ -8,6 +8,6 @@
 
 package com.maddyhome.idea.vim.common
 
-interface LiveRange {
-  val startOffset: Offset
+public interface LiveRange {
+  public val startOffset: Offset
 }

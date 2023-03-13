@@ -8,4 +8,4 @@
 
 package com.maddyhome.idea.vim.api
 
-abstract class VimScriptExecutorBase : VimscriptExecutor
+public abstract class VimScriptExecutorBase : VimscriptExecutor

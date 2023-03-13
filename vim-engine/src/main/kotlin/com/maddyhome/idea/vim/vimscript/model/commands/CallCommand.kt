@@ -26,9 +26,9 @@ import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
 /**
  * see "h :call"
  */
-class CallCommand(val ranges: Ranges, val functionCall: Expression) : Command.SingleExecution(ranges) {
+public class CallCommand(public val ranges: Ranges, public val functionCall: Expression) : Command.SingleExecution(ranges) {
 
-  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
+  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
     if (functionCall is FunctionCallExpression) {

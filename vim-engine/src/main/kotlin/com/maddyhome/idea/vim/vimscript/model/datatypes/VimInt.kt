@@ -10,9 +10,9 @@ package com.maddyhome.idea.vim.vimscript.model.datatypes
 
 import java.util.*
 
-data class VimInt(val value: Int) : VimDataType() {
+public data class VimInt(val value: Int) : VimDataType() {
 
-  constructor(octalDecimalOrHexNumber: String) : this(parseNumber(octalDecimalOrHexNumber) ?: 0)
+  public constructor(octalDecimalOrHexNumber: String) : this(parseNumber(octalDecimalOrHexNumber) ?: 0)
 
   override fun asDouble(): Double {
     return value.toDouble()
@@ -40,15 +40,15 @@ data class VimInt(val value: Int) : VimDataType() {
     this.isLocked = false
   }
 
-  operator fun compareTo(b: Int): Int = this.value.compareTo(b)
+  public operator fun compareTo(b: Int): Int = this.value.compareTo(b)
 
-  companion object {
-    val ZERO = VimInt(0)
-    val ONE = VimInt(1)
+  public companion object {
+    public val ZERO: VimInt = VimInt(0)
+    public val ONE: VimInt = VimInt(1)
   }
 }
 
-fun parseNumber(octalDecimalOrHexNumber: String): Int? {
+public fun parseNumber(octalDecimalOrHexNumber: String): Int? {
   val n = octalDecimalOrHexNumber.lowercase(Locale.getDefault())
   return when {
     n.matches(Regex("[-]?0[x][0-9a-f]+")) -> n.replaceFirst("0x", "").toInt(16)
@@ -58,9 +58,9 @@ fun parseNumber(octalDecimalOrHexNumber: String): Int? {
   }
 }
 
-fun Boolean.asVimInt(): VimInt = if (this) VimInt.ONE else VimInt.ZERO
+public fun Boolean.asVimInt(): VimInt = if (this) VimInt.ONE else VimInt.ZERO
 
-fun Int.asVimInt(): VimInt = when (this) {
+public fun Int.asVimInt(): VimInt = when (this) {
   0 -> VimInt.ZERO
   1 -> VimInt.ONE
   else -> VimInt(this)

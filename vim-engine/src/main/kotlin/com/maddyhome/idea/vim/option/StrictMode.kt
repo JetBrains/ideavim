@@ -13,15 +13,15 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.options.OptionConstants
 
 @Deprecated("Please use StrictMode from com.maddyhome.idea.vim.options.helpers", replaceWith = ReplaceWith("com.maddyhome.idea.vim.helper.StrictMode"))
-object StrictMode {
+public object StrictMode {
   @JvmName("assertTrue")
-  fun assert(condition: Boolean, message: String) {
+  public fun assert(condition: Boolean, message: String) {
     if (!condition) {
       fail(message)
     }
   }
 
-  fun fail(message: String) {
+  public fun fail(message: String) {
     if (injector.globalOptions().isSet(OptionConstants.ideastrictmode)) {
       error(message)
     }
