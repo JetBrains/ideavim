@@ -15,6 +15,9 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.rangeOf
 
 class PutTextBeforeCursorActionTest : VimTestCase() {
+  /**
+   * @author Oskar Persson 
+   */
   fun `test put visual text character to line twice with separate commands large P`() {
     val before = """
             A Discovery

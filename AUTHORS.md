@@ -467,6 +467,10 @@ Contributors:
   [![icon][github]](https://github.com/danisevas)
   &nbsp;
   Dani Sevastianov
+* [![icon][mail]](mailto:oskar.persson@polken.se)
+  [![icon][github]](https://github.com/oskarpersson/)
+  &nbsp;
+  Oskar Persson 
 
 Previous contributors:
 
