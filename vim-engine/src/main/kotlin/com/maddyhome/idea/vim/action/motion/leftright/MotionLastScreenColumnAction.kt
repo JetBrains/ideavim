@@ -22,7 +22,7 @@ import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.options.OptionConstants
 
-class MotionLastScreenColumnAction : MotionActionHandler.ForEachCaret() {
+public class MotionLastScreenColumnAction : MotionActionHandler.ForEachCaret() {
   override fun getOffset(
     editor: VimEditor,
     caret: ImmutableVimCaret,

@@ -22,7 +22,7 @@ import com.maddyhome.idea.vim.handler.toMotionOrError
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
-sealed class MotionUnmatchedAction(private val motionChar: Char) : MotionActionHandler.ForEachCaret() {
+public sealed class MotionUnmatchedAction(private val motionChar: Char) : MotionActionHandler.ForEachCaret() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
 
   override val motionType: MotionType = MotionType.EXCLUSIVE
@@ -39,10 +39,10 @@ sealed class MotionUnmatchedAction(private val motionChar: Char) : MotionActionH
   }
 }
 
-class MotionUnmatchedBraceCloseAction : MotionUnmatchedAction('}')
-class MotionUnmatchedBraceOpenAction : MotionUnmatchedAction('{')
-class MotionUnmatchedParenCloseAction : MotionUnmatchedAction(')')
-class MotionUnmatchedParenOpenAction : MotionUnmatchedAction('(')
+public class MotionUnmatchedBraceCloseAction : MotionUnmatchedAction('}')
+public class MotionUnmatchedBraceOpenAction : MotionUnmatchedAction('{')
+public class MotionUnmatchedParenCloseAction : MotionUnmatchedAction(')')
+public class MotionUnmatchedParenOpenAction : MotionUnmatchedAction('(')
 
 private fun moveCaretToUnmatchedBlock(editor: VimEditor, caret: ImmutableVimCaret, count: Int, type: Char): Int {
   return if (editor.currentCaret().offset.point == 0 && count < 0 || editor.currentCaret().offset.point >= editor.fileSize() - 1 && count > 0) {

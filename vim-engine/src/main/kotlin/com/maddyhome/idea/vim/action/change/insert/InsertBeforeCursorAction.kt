@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.helper.enumSetOf
 import org.jetbrains.annotations.Contract
 import java.util.*
 
-class InsertBeforeCursorAction : ChangeEditorActionHandler.SingleExecution() {
+public class InsertBeforeCursorAction : ChangeEditorActionHandler.SingleExecution() {
   @get:Contract(pure = true)
   override val type: Command.Type = Command.Type.INSERT
 

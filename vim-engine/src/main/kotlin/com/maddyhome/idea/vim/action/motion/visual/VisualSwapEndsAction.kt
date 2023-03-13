@@ -20,7 +20,7 @@ import com.maddyhome.idea.vim.helper.inBlockSubMode
 /**
  * @author vlan
  */
-class VisualSwapEndsAction : VimActionHandler.ForEachCaret() {
+public class VisualSwapEndsAction : VimActionHandler.ForEachCaret() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
@@ -36,7 +36,7 @@ class VisualSwapEndsAction : VimActionHandler.ForEachCaret() {
 /**
  * @author vlan
  */
-class VisualSwapEndsBlockAction : VimActionHandler.SingleExecution() {
+public class VisualSwapEndsBlockAction : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 

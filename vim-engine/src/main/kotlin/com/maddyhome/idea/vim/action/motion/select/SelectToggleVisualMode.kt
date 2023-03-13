@@ -24,7 +24,7 @@ import com.maddyhome.idea.vim.helper.vimStateMachine
  * @author Alex Plate
  */
 
-class SelectToggleVisualMode : VimActionHandler.SingleExecution() {
+public class SelectToggleVisualMode : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
@@ -38,8 +38,8 @@ class SelectToggleVisualMode : VimActionHandler.SingleExecution() {
     return true
   }
 
-  companion object {
-    fun toggleMode(editor: VimEditor) {
+  public companion object {
+    public fun toggleMode(editor: VimEditor) {
       val commandState = editor.vimStateMachine
       val subMode = commandState.subMode
       val mode = commandState.mode

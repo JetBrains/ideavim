@@ -8,4 +8,4 @@
 
 package com.maddyhome.idea.vim.api
 
-abstract class ExecutionContextManagerBase : ExecutionContextManager
+public abstract class ExecutionContextManagerBase : ExecutionContextManager

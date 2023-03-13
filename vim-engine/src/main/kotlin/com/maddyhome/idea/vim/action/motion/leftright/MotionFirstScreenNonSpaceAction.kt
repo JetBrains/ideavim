@@ -18,7 +18,7 @@ import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotion
 
-class MotionFirstScreenNonSpaceAction : MotionActionHandler.ForEachCaret() {
+public class MotionFirstScreenNonSpaceAction : MotionActionHandler.ForEachCaret() {
   override fun getOffset(
     editor: VimEditor,
     caret: ImmutableVimCaret,

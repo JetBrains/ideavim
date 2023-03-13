@@ -17,7 +17,7 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
-class FilePreviousAction : VimActionHandler.SingleExecution(), ComplicatedKeysAction {
+public class FilePreviousAction : VimActionHandler.SingleExecution(), ComplicatedKeysAction {
   override val keyStrokesSet: Set<List<KeyStroke>> = setOf(
     listOf(KeyStroke.getKeyStroke(KeyEvent.VK_6, KeyEvent.CTRL_DOWN_MASK or KeyEvent.SHIFT_DOWN_MASK)),
     listOf(KeyStroke.getKeyStroke(KeyEvent.VK_CIRCUMFLEX, KeyEvent.CTRL_DOWN_MASK)),

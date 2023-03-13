@@ -23,12 +23,12 @@ import com.maddyhome.idea.vim.handler.toMotionOrError
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
-class MotionSectionBackwardEndAction : MotionSectionAction('}', Direction.BACKWARDS)
-class MotionSectionBackwardStartAction : MotionSectionAction('{', Direction.BACKWARDS)
-class MotionSectionForwardEndAction : MotionSectionAction('}', Direction.FORWARDS)
-class MotionSectionForwardStartAction : MotionSectionAction('{', Direction.FORWARDS)
+public class MotionSectionBackwardEndAction : MotionSectionAction('}', Direction.BACKWARDS)
+public class MotionSectionBackwardStartAction : MotionSectionAction('{', Direction.BACKWARDS)
+public class MotionSectionForwardEndAction : MotionSectionAction('}', Direction.FORWARDS)
+public class MotionSectionForwardStartAction : MotionSectionAction('{', Direction.FORWARDS)
 
-sealed class MotionSectionAction(private val charType: Char, val direction: Direction) : MotionActionHandler.ForEachCaret() {
+public sealed class MotionSectionAction(private val charType: Char, public val direction: Direction) : MotionActionHandler.ForEachCaret() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
 
   override fun getOffset(
@@ -50,7 +50,7 @@ sealed class MotionSectionAction(private val charType: Char, val direction: Dire
   override val motionType: MotionType = MotionType.EXCLUSIVE
 }
 
-fun getCaretToSectionMotion(editor: VimEditor, caret: ImmutableVimCaret, type: Char, dir: Int, count: Int): Int {
+private fun getCaretToSectionMotion(editor: VimEditor, caret: ImmutableVimCaret, type: Char, dir: Int, count: Int): Int {
   return if (caret.offset.point == 0 && count < 0 || caret.offset.point >= editor.fileSize() - 1 && count > 0) {
     -1
   } else {

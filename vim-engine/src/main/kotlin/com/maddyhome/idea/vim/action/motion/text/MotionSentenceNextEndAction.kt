@@ -23,10 +23,10 @@ import com.maddyhome.idea.vim.handler.toMotionOrError
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
-class MotionSentenceNextEndAction : MotionSentenceEndAction(Direction.FORWARDS)
-class MotionSentencePreviousEndAction : MotionSentenceEndAction(Direction.BACKWARDS)
+public class MotionSentenceNextEndAction : MotionSentenceEndAction(Direction.FORWARDS)
+public class MotionSentencePreviousEndAction : MotionSentenceEndAction(Direction.BACKWARDS)
 
-sealed class MotionSentenceEndAction(val direction: Direction) : MotionActionHandler.ForEachCaret() {
+public sealed class MotionSentenceEndAction(public val direction: Direction) : MotionActionHandler.ForEachCaret() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
 
   override fun getOffset(

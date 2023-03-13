@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
  * @author Alex Plate
  */
 // FIXME: 2019-07-05 Workaround to make jump through methods work
-class CtrlDownAction : VimActionHandler.SingleExecution() {
+public class CtrlDownAction : VimActionHandler.SingleExecution() {
 
   private val keySet = parseKeysSet("<C-Down>")
 
@@ -40,7 +40,7 @@ class CtrlDownAction : VimActionHandler.SingleExecution() {
   }
 }
 
-class CtrlUpAction : VimActionHandler.SingleExecution() {
+public class CtrlUpAction : VimActionHandler.SingleExecution() {
 
   private val keySet = parseKeysSet("<C-Up>")
 

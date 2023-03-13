@@ -15,9 +15,9 @@ import com.maddyhome.idea.vim.register.RegisterConstants
 import com.maddyhome.idea.vim.register.VimRegisterGroupBase
 import javax.swing.KeyStroke
 
-abstract class VimCaretBase : VimCaret
+public abstract class VimCaretBase : VimCaret
 
-open class CaretRegisterStorageBase(override var caret: ImmutableVimCaret) : CaretRegisterStorage, VimRegisterGroupBase() {
+public open class CaretRegisterStorageBase(override var caret: ImmutableVimCaret) : CaretRegisterStorage, VimRegisterGroupBase() {
   override var lastRegisterChar: Char
     get() {
       return injector.registerGroup.lastRegisterChar

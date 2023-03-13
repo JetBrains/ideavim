@@ -17,7 +17,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 
-class MotionLastMatchCharAction : MotionActionHandler.ForEachCaret() {
+public class MotionLastMatchCharAction : MotionActionHandler.ForEachCaret() {
   override fun getOffset(
     editor: VimEditor,
     caret: ImmutableVimCaret,
@@ -32,7 +32,7 @@ class MotionLastMatchCharAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 }
 
-class MotionLastMatchCharReverseAction : MotionActionHandler.ForEachCaret() {
+public class MotionLastMatchCharReverseAction : MotionActionHandler.ForEachCaret() {
   override fun getOffset(
     editor: VimEditor,
     caret: ImmutableVimCaret,

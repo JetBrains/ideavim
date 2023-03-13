@@ -19,10 +19,10 @@ import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotionOrError
 
-class MotionCamelLeftAction : MotionCamelAction(Direction.BACKWARDS)
-class MotionCamelRightAction : MotionCamelAction(Direction.FORWARDS)
+public class MotionCamelLeftAction : MotionCamelAction(Direction.BACKWARDS)
+public class MotionCamelRightAction : MotionCamelAction(Direction.FORWARDS)
 
-sealed class MotionCamelAction(val direction: Direction) : MotionActionHandler.ForEachCaret() {
+public sealed class MotionCamelAction(public val direction: Direction) : MotionActionHandler.ForEachCaret() {
   override fun getOffset(
     editor: VimEditor,
     caret: ImmutableVimCaret,

@@ -21,7 +21,7 @@ import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
-class InsertNewLineBelowAction : ChangeEditorActionHandler.SingleExecution() {
+public class InsertNewLineBelowAction : ChangeEditorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.INSERT
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MULTIKEY_UNDO)
@@ -43,7 +43,7 @@ class InsertNewLineBelowAction : ChangeEditorActionHandler.SingleExecution() {
   }
 }
 
-class InsertNewLineAboveAction : ChangeEditorActionHandler.SingleExecution() {
+public class InsertNewLineAboveAction : ChangeEditorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.INSERT
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MULTIKEY_UNDO)

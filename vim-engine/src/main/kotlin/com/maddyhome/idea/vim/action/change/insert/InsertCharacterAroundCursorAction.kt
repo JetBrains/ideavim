@@ -21,7 +21,7 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 
-class InsertCharacterAboveCursorAction : ChangeEditorActionHandler.ForEachCaret() {
+public class InsertCharacterAboveCursorAction : ChangeEditorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.INSERT
 
   override fun execute(
@@ -37,7 +37,7 @@ class InsertCharacterAboveCursorAction : ChangeEditorActionHandler.ForEachCaret(
   }
 }
 
-class InsertCharacterBelowCursorAction : ChangeEditorActionHandler.ForEachCaret() {
+public class InsertCharacterBelowCursorAction : ChangeEditorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.INSERT
 
   override fun execute(

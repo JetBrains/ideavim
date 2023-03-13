@@ -20,7 +20,7 @@ import com.maddyhome.idea.vim.handler.ShiftedArrowKeyHandler
  * @author Alex Plate
  */
 
-class MotionShiftLeftAction : ShiftedArrowKeyHandler(true) {
+public class MotionShiftLeftAction : ShiftedArrowKeyHandler(true) {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 

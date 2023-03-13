@@ -23,7 +23,7 @@ import java.util.*
 /**
  * @author vlan
  */
-class ChangeCaseLowerVisualAction : VisualOperatorActionHandler.ForEachCaret() {
+public class ChangeCaseLowerVisualAction : VisualOperatorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.CHANGE
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_EXIT_VISUAL)

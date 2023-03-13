@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
-class ChangeCharacterAction : ChangeEditorActionHandler.ForEachCaret() {
+public class ChangeCharacterAction : ChangeEditorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.CHANGE
 
   override val argumentType: Argument.Type = Argument.Type.DIGRAPH

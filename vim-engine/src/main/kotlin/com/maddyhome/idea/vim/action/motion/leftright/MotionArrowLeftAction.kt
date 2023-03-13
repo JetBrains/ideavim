@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.options.OptionConstants
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
-class MotionArrowLeftAction : NonShiftedSpecialKeyHandler(), ComplicatedKeysAction {
+public class MotionArrowLeftAction : NonShiftedSpecialKeyHandler(), ComplicatedKeysAction {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
   override val keyStrokesSet: Set<List<KeyStroke>> =

@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
  * @author Alex Plate
  */
 
-class SelectEnterAction : VimActionHandler.SingleExecution() {
+public class SelectEnterAction : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.INSERT
 

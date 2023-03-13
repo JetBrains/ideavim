@@ -12,24 +12,24 @@ import com.maddyhome.idea.vim.common.TextRange
 import java.nio.CharBuffer
 
 // TODO: [visual] try to remove all uses of visual line/position. This is an IntelliJ concept
-interface EngineEditorHelper {
+public interface EngineEditorHelper {
   // Keep it for now. See the IJ implementation, there are some hacks regarding that
-  fun amountOfInlaysBeforeVisualPosition(editor: VimEditor, pos: VimVisualPosition): Int
-  fun getVisualLineAtTopOfScreen(editor: VimEditor): Int
-  fun getVisualLineAtBottomOfScreen(editor: VimEditor): Int
-  fun getApproximateScreenWidth(editor: VimEditor): Int
-  fun handleWithReadonlyFragmentModificationHandler(editor: VimEditor, exception: java.lang.Exception)
-  fun pad(editor: VimEditor, context: ExecutionContext, line: Int, to: Int): String
-  fun inlayAwareOffsetToVisualPosition(editor: VimEditor, offset: Int): VimVisualPosition
+  public fun amountOfInlaysBeforeVisualPosition(editor: VimEditor, pos: VimVisualPosition): Int
+  public fun getVisualLineAtTopOfScreen(editor: VimEditor): Int
+  public fun getVisualLineAtBottomOfScreen(editor: VimEditor): Int
+  public fun getApproximateScreenWidth(editor: VimEditor): Int
+  public fun handleWithReadonlyFragmentModificationHandler(editor: VimEditor, exception: java.lang.Exception)
+  public fun pad(editor: VimEditor, context: ExecutionContext, line: Int, to: Int): String
+  public fun inlayAwareOffsetToVisualPosition(editor: VimEditor, offset: Int): VimVisualPosition
 }
 
-fun VimEditor.endsWithNewLine(): Boolean {
+public fun VimEditor.endsWithNewLine(): Boolean {
   val textLength = this.fileSize().toInt()
   if (textLength == 0) return false
   return this.text()[textLength - 1] == '\n'
 }
 
-fun VimEditor.getLeadingCharacterOffset(line: Int, col: Int = 0): Int {
+public fun VimEditor.getLeadingCharacterOffset(line: Int, col: Int = 0): Int {
   val start = getLineStartOffset(line) + col
   val end = getLineEndOffset(line)
   val chars = text()
@@ -46,7 +46,7 @@ fun VimEditor.getLeadingCharacterOffset(line: Int, col: Int = 0): Int {
   return pos
 }
 
-fun VimEditor.normalizeVisualColumn(visualLine: Int, col: Int, allowEnd: Boolean): Int {
+public fun VimEditor.normalizeVisualColumn(visualLine: Int, col: Int, allowEnd: Boolean): Int {
   return (this.getVisualLineLength(visualLine) - if (allowEnd) 0 else 1).coerceIn(0..col)
 }
 
@@ -59,7 +59,7 @@ fun VimEditor.normalizeVisualColumn(visualLine: Int, col: Int, allowEnd: Boolean
  * @param allowEnd True if newline allowed
  * @return The normalized column number
  */
-fun VimEditor.normalizeColumn(line: Int, col: Int, allowEnd: Boolean): Int {
+public fun VimEditor.normalizeColumn(line: Int, col: Int, allowEnd: Boolean): Int {
   return (lineLength(line) - if (allowEnd) 0 else 1).coerceIn(0..col)
 }
 
@@ -74,7 +74,7 @@ fun VimEditor.normalizeColumn(line: Int, col: Int, allowEnd: Boolean): Int {
 // TODO: [visual] try to get rid of this. It's probably not doing what you think it's doing
 // This gets the length of the visual line's buffer line, not the length of the visual line. With soft wraps, these can
 // be very different values.
-fun VimEditor.getVisualLineLength(visualLine: Int): Int {
+public fun VimEditor.getVisualLineLength(visualLine: Int): Int {
   return lineLength(visualLineToBufferLine(visualLine))
 }
 
@@ -84,7 +84,7 @@ fun VimEditor.getVisualLineLength(visualLine: Int): Int {
  *
  * @return The number of characters in the specified line
  */
-fun VimEditor.lineLength(line: Int): Int {
+public fun VimEditor.lineLength(line: Int): Int {
   return if (lineCount() == 0) {
     0
   } else {
@@ -98,7 +98,7 @@ fun VimEditor.lineLength(line: Int): Int {
  * @param visualLine   The visual line number to convert
  * @return The buffer line number
  */
-fun VimEditor.visualLineToBufferLine(visualLine: Int): Int {
+public fun VimEditor.visualLineToBufferLine(visualLine: Int): Int {
   val bufferLine: Int = visualPositionToBufferPosition(VimVisualPosition(visualLine, 0)).line
   return normalizeLine(bufferLine)
 }
@@ -109,7 +109,7 @@ fun VimEditor.visualLineToBufferLine(visualLine: Int): Int {
  * @param line   The buffer line number to normalize
  * @return The normalized buffer line number
  */
-fun VimEditor.normalizeLine(line: Int): Int {
+public fun VimEditor.normalizeLine(line: Int): Int {
   return line.coerceIn(0 until lineCount().coerceAtLeast(1))
 }
 
@@ -122,7 +122,7 @@ fun VimEditor.normalizeLine(line: Int): Int {
  * @param allowEnd true if the offset can be one past the last character on the line, false if not
  * @return The normalized column number
  */
-fun VimEditor.normalizeOffset(line: Int, offset: Int, allowEnd: Boolean): Int {
+public fun VimEditor.normalizeOffset(line: Int, offset: Int, allowEnd: Boolean): Int {
   if (fileSize() == 0L) {
     return 0
   }
@@ -138,7 +138,7 @@ fun VimEditor.normalizeOffset(line: Int, offset: Int, allowEnd: Boolean): Int {
  * @param allowEnd True include newline
  * @return 0 if line is &lt 0, file size of line is bigger than file, else the end offset for the line
  */
-fun VimEditor.getLineEndOffset(line: Int, allowEnd: Boolean): Int {
+public fun VimEditor.getLineEndOffset(line: Int, allowEnd: Boolean): Int {
   return if (line < 0) {
     0
   } else if (line >= lineCount()) {
@@ -150,7 +150,7 @@ fun VimEditor.getLineEndOffset(line: Int, allowEnd: Boolean): Int {
   }
 }
 
-fun VimEditor.normalizeOffset(offset: Int, allowEnd: Boolean = true): Int {
+public fun VimEditor.normalizeOffset(offset: Int, allowEnd: Boolean = true): Int {
   var myOffset = offset
   if (myOffset <= 0) {
     myOffset = 0
@@ -170,7 +170,7 @@ fun VimEditor.normalizeOffset(offset: Int, allowEnd: Boolean = true): Int {
  * @param visualLine   The visual line number to normalize
  * @return The normalized visual line number
  */
-fun VimEditor.normalizeVisualLine(visualLine: Int): Int {
+public fun VimEditor.normalizeVisualLine(visualLine: Int): Int {
   return visualLine.coerceIn(0 until getVisualLineCount().coerceAtLeast(1))
 }
 
@@ -180,12 +180,12 @@ fun VimEditor.normalizeVisualLine(visualLine: Int): Int {
  *
  * @return The number of visible lines in the file
  */
-fun VimEditor.getVisualLineCount(): Int {
+public fun VimEditor.getVisualLineCount(): Int {
   val count = lineCount()
   return if (count == 0) 0 else this.bufferLineToVisualLine(count - 1) + 1
 }
 
-fun VimEditor.getLineStartForOffset(offset: Int): Int {
+public fun VimEditor.getLineStartForOffset(offset: Int): Int {
   val pos = offsetToBufferPosition(normalizeOffset(offset, true))
   return getLineStartOffset(pos.line)
 }
@@ -196,7 +196,7 @@ fun VimEditor.getLineStartForOffset(offset: Int): Int {
  * @param offset The offset within the line
  * @return The offset of the line end
  */
-fun VimEditor.getLineEndForOffset(offset: Int): Int {
+public fun VimEditor.getLineEndForOffset(offset: Int): Int {
   val pos = offsetToBufferPosition(normalizeOffset(offset, true))
   return getLineEndOffset(pos.line)
 }
@@ -208,13 +208,13 @@ fun VimEditor.getLineEndForOffset(offset: Int): Int {
  * @param end    The ending offset (exclusive)
  * @return The string, never null but empty if start == end
  */
-fun VimEditor.getText(start: Int, end: Int): String {
+public fun VimEditor.getText(start: Int, end: Int): String {
   if (start == end) return ""
   val documentChars: CharSequence = text()
   return documentChars.subSequence(normalizeOffset(start), normalizeOffset(end)).toString()
 }
 
-fun VimEditor.getText(range: TextRange): String {
+public fun VimEditor.getText(range: TextRange): String {
   val len = range.size()
   return if (len == 1) {
     val start = range.startOffset
@@ -242,14 +242,14 @@ fun VimEditor.getText(range: TextRange): String {
   }
 }
 
-fun VimEditor.getOffset(line: Int, column: Int): Int {
+public fun VimEditor.getOffset(line: Int, column: Int): Int {
   return bufferPositionToOffset(BufferPosition(line, column))
 }
-fun VimEditor.getLineBuffer(line: Int): CharBuffer {
+public fun VimEditor.getLineBuffer(line: Int): CharBuffer {
   val start: Int = getLineStartOffset(line)
   return CharBuffer.wrap(text(), start, start + getLineEndOffset(line, true) - getLineStartOffset(line))
 }
-fun VimEditor.anyNonWhitespace(offset: Int, dir: Int): Boolean {
+public fun VimEditor.anyNonWhitespace(offset: Int, dir: Int): Boolean {
   val start: Int
   val end: Int
   val fileSize = fileSize().toInt()
@@ -269,7 +269,7 @@ fun VimEditor.anyNonWhitespace(offset: Int, dir: Int): Boolean {
   return false
 }
 
-fun VimEditor.isLineEmpty(line: Int, allowBlanks: Boolean): Boolean {
+public fun VimEditor.isLineEmpty(line: Int, allowBlanks: Boolean): Boolean {
   val chars: CharSequence = text()
   if (chars.isEmpty()) return true
   var offset: Int = getLineStartOffset(line)

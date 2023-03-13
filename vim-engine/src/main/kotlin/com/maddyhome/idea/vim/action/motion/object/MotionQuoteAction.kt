@@ -20,7 +20,7 @@ import com.maddyhome.idea.vim.handler.TextObjectActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
-class MotionInnerBlockBackQuoteAction : TextObjectActionHandler() {
+public class MotionInnerBlockBackQuoteAction : TextObjectActionHandler() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
 
@@ -38,7 +38,7 @@ class MotionInnerBlockBackQuoteAction : TextObjectActionHandler() {
   }
 }
 
-class MotionInnerBlockDoubleQuoteAction : TextObjectActionHandler() {
+public class MotionInnerBlockDoubleQuoteAction : TextObjectActionHandler() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
 
@@ -56,7 +56,7 @@ class MotionInnerBlockDoubleQuoteAction : TextObjectActionHandler() {
   }
 }
 
-class MotionInnerBlockSingleQuoteAction : TextObjectActionHandler() {
+public class MotionInnerBlockSingleQuoteAction : TextObjectActionHandler() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
 
@@ -74,7 +74,7 @@ class MotionInnerBlockSingleQuoteAction : TextObjectActionHandler() {
   }
 }
 
-class MotionOuterBlockBackQuoteAction : TextObjectActionHandler() {
+public class MotionOuterBlockBackQuoteAction : TextObjectActionHandler() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
 
@@ -92,7 +92,7 @@ class MotionOuterBlockBackQuoteAction : TextObjectActionHandler() {
   }
 }
 
-class MotionOuterBlockDoubleQuoteAction : TextObjectActionHandler() {
+public class MotionOuterBlockDoubleQuoteAction : TextObjectActionHandler() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
 
@@ -110,7 +110,7 @@ class MotionOuterBlockDoubleQuoteAction : TextObjectActionHandler() {
   }
 }
 
-class MotionOuterBlockSingleQuoteAction : TextObjectActionHandler() {
+public class MotionOuterBlockSingleQuoteAction : TextObjectActionHandler() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
 

@@ -11,15 +11,15 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import org.jetbrains.annotations.NonNls
 
-interface VimActionExecutor {
+public interface VimActionExecutor {
 
-  val ACTION_EDITOR_NEXT_TEMPLATE_VARIABLE: String
-  val ACTION_COLLAPSE_ALL_REGIONS: String
-  val ACTION_COLLAPSE_REGION: String
-  val ACTION_COLLAPSE_REGION_RECURSIVELY: String
-  val ACTION_EXPAND_ALL_REGIONS: String
-  val ACTION_EXPAND_REGION: String
-  val ACTION_EXPAND_REGION_RECURSIVELY: String
+  public val ACTION_EDITOR_NEXT_TEMPLATE_VARIABLE: String
+  public val ACTION_COLLAPSE_ALL_REGIONS: String
+  public val ACTION_COLLAPSE_REGION: String
+  public val ACTION_COLLAPSE_REGION_RECURSIVELY: String
+  public val ACTION_EXPAND_ALL_REGIONS: String
+  public val ACTION_EXPAND_REGION: String
+  public val ACTION_EXPAND_REGION_RECURSIVELY: String
 
   /**
    * Execute an action
@@ -27,7 +27,7 @@ interface VimActionExecutor {
    * @param action  The action to execute
    * @param context The context to run it in
    */
-  fun executeAction(editor: VimEditor?, action: NativeAction, context: ExecutionContext): Boolean
+  public fun executeAction(editor: VimEditor?, action: NativeAction, context: ExecutionContext): Boolean
 
   /**
    * Execute an action by name
@@ -35,27 +35,27 @@ interface VimActionExecutor {
    * @param name    The name of the action to execute
    * @param context The context to run it in
    */
-  fun executeAction(name: @NonNls String, context: ExecutionContext): Boolean
+  public fun executeAction(name: @NonNls String, context: ExecutionContext): Boolean
 
-  fun executeCommand(
+  public fun executeCommand(
     editor: VimEditor?,
     runnable: Runnable,
     name: String?,
     groupId: Any?,
   )
 
-  fun executeEsc(context: ExecutionContext): Boolean
+  public fun executeEsc(context: ExecutionContext): Boolean
 
-  fun executeVimAction(
+  public fun executeVimAction(
     editor: VimEditor,
     cmd: EditorActionHandlerBase,
     context: ExecutionContext,
     operatorArguments: OperatorArguments,
   )
 
-  fun findVimAction(id: String): EditorActionHandlerBase?
-  fun findVimActionOrDie(id: String): EditorActionHandlerBase
+  public fun findVimAction(id: String): EditorActionHandlerBase?
+  public fun findVimActionOrDie(id: String): EditorActionHandlerBase
 
-  fun getAction(actionId: String): NativeAction?
-  fun getActionIdList(idPrefix: String): List<String>
+  public fun getAction(actionId: String): NativeAction?
+  public fun getActionIdList(idPrefix: String): List<String>
 }

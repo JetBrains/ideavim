@@ -22,7 +22,7 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
  * @author Alex Plate
  */
 
-class SelectEnableBlockModeAction : VimActionHandler.SingleExecution() {
+public class SelectEnableBlockModeAction : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 

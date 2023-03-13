@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.options.OptionConstants
 
-class MotionBackspaceAction : MotionActionHandler.ForEachCaret() {
+public class MotionBackspaceAction : MotionActionHandler.ForEachCaret() {
   override fun getOffset(
     editor: VimEditor,
     caret: ImmutableVimCaret,
@@ -34,7 +34,7 @@ class MotionBackspaceAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 }
 
-class MotionSpaceAction : MotionActionHandler.ForEachCaret() {
+public class MotionSpaceAction : MotionActionHandler.ForEachCaret() {
   override fun getOffset(
     editor: VimEditor,
     caret: ImmutableVimCaret,

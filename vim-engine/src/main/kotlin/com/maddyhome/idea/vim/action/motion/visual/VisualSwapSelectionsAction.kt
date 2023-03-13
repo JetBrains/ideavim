@@ -22,7 +22,7 @@ import com.maddyhome.idea.vim.helper.subMode
 /**
  * @author vlan
  */
-class VisualSwapSelectionsAction : VimActionHandler.SingleExecution() {
+public class VisualSwapSelectionsAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   // FIXME: 2019-03-05 Make it multicaret

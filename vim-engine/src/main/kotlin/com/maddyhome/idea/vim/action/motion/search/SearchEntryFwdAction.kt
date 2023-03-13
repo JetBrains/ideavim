@@ -22,7 +22,7 @@ import com.maddyhome.idea.vim.handler.toMotionOrError
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
-class SearchEntryFwdAction : MotionActionHandler.ForEachCaret() {
+public class SearchEntryFwdAction : MotionActionHandler.ForEachCaret() {
   override val argumentType: Argument.Type = Argument.Type.EX_STRING
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)

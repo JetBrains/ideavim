@@ -26,11 +26,11 @@ import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.options.OptionConstants
 import java.util.*
 
-class MotionLastColumnInsertAction : MotionLastColumnAction() {
+public class MotionLastColumnInsertAction : MotionLastColumnAction() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_STROKE)
 }
 
-open class MotionLastColumnAction : MotionActionHandler.ForEachCaret() {
+open public class MotionLastColumnAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.INCLUSIVE
 
   override fun getOffset(

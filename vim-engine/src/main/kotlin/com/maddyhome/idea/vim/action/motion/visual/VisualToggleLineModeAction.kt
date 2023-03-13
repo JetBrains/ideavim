@@ -20,7 +20,7 @@ import com.maddyhome.idea.vim.group.visual.vimSetSelection
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.options.OptionConstants
 
-class VisualToggleLineModeAction : VimActionHandler.ConditionalMulticaret() {
+public class VisualToggleLineModeAction : VimActionHandler.ConditionalMulticaret() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
   override fun runAsMulticaret(

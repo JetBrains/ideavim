@@ -23,7 +23,7 @@ import java.awt.event.KeyEvent
 import java.util.*
 import javax.swing.KeyStroke
 
-class MotionScrollPageUpAction : VimActionHandler.SingleExecution() {
+public class MotionScrollPageUpAction : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
@@ -34,7 +34,7 @@ class MotionScrollPageUpAction : VimActionHandler.SingleExecution() {
   }
 }
 
-class MotionScrollPageUpInsertModeAction : VimActionHandler.SingleExecution(), ComplicatedKeysAction {
+public class MotionScrollPageUpInsertModeAction : VimActionHandler.SingleExecution(), ComplicatedKeysAction {
 
   override val keyStrokesSet: Set<List<KeyStroke>> = setOf(
     listOf(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, 0))

@@ -8,8 +8,8 @@
 
 package com.maddyhome.idea.vim.api
 
-interface ExEntryPanel {
-  fun isActive(): Boolean
-  fun clearCurrentAction()
-  fun setCurrentActionPromptCharacter(char: Char)
+public interface ExEntryPanel {
+  public fun isActive(): Boolean
+  public fun clearCurrentAction()
+  public fun setCurrentActionPromptCharacter(char: Char)
 }

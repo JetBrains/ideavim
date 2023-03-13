@@ -16,11 +16,11 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 
-class DeleteCharacterAction : DeleteCharacter({ 1 })
-class DeleteCharacterLeftAction : DeleteCharacter({ -it })
-class DeleteCharacterRightAction : DeleteCharacter({ it })
+public class DeleteCharacterAction : DeleteCharacter({ 1 })
+public class DeleteCharacterLeftAction : DeleteCharacter({ -it })
+public class DeleteCharacterRightAction : DeleteCharacter({ it })
 
-abstract class DeleteCharacter(private val countModifier: (Int) -> Int) : ChangeEditorActionHandler.ForEachCaret() {
+abstract public class DeleteCharacter(private val countModifier: (Int) -> Int) : ChangeEditorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.DELETE
 
   override fun execute(

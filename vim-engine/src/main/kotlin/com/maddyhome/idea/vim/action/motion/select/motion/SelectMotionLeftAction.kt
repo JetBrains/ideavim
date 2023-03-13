@@ -25,7 +25,7 @@ import com.maddyhome.idea.vim.options.OptionConstants
  * @author Alex Plate
  */
 
-class SelectMotionLeftAction : MotionActionHandler.ForEachCaret() {
+public class SelectMotionLeftAction : MotionActionHandler.ForEachCaret() {
 
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
@@ -54,7 +54,7 @@ class SelectMotionLeftAction : MotionActionHandler.ForEachCaret() {
     return injector.motion.getHorizontalMotion(editor, caret, -operatorArguments.count1, false)
   }
 
-  companion object {
+  private companion object {
     private val logger = injector.getLogger(SelectMotionLeftAction::class.java)
   }
 }

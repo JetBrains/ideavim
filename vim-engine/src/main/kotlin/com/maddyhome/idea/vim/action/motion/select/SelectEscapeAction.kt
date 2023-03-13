@@ -15,7 +15,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.inBlockSubMode
 
-class SelectEscapeAction : VimActionHandler.SingleExecution() {
+public class SelectEscapeAction : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 

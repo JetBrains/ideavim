@@ -15,7 +15,7 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 
-class MotionMarkAction : VimActionHandler.SingleExecution() {
+public class MotionMarkAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override val argumentType: Argument.Type = Argument.Type.CHARACTER

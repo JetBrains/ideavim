@@ -20,7 +20,7 @@ import com.maddyhome.idea.vim.handler.TextObjectActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
-class MotionInnerBlockTagAction : TextObjectActionHandler() {
+public class MotionInnerBlockTagAction : TextObjectActionHandler() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
 
@@ -38,7 +38,7 @@ class MotionInnerBlockTagAction : TextObjectActionHandler() {
   }
 }
 
-class MotionOuterBlockTagAction : TextObjectActionHandler() {
+public class MotionOuterBlockTagAction : TextObjectActionHandler() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
 

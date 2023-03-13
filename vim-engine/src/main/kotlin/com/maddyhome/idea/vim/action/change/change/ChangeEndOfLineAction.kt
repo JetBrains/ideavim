@@ -21,7 +21,7 @@ import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
-class ChangeEndOfLineAction : ChangeEditorActionHandler.ForEachCaret() {
+public class ChangeEndOfLineAction : ChangeEditorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.CHANGE
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(FLAG_NO_REPEAT_INSERT, FLAG_MULTIKEY_UNDO)

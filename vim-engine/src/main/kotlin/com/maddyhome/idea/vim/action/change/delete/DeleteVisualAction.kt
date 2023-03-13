@@ -22,7 +22,7 @@ import java.util.*
 /**
  * @author vlan
  */
-class DeleteVisualAction : VisualOperatorActionHandler.ForEachCaret() {
+public class DeleteVisualAction : VisualOperatorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.DELETE
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_EXIT_VISUAL)

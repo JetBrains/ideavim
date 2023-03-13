@@ -17,7 +17,7 @@ import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import java.util.*
 
-class InsertInsertAction : VimActionHandler.SingleExecution() {
+public class InsertInsertAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.INSERT
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_STROKE)

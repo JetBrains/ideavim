@@ -16,7 +16,7 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 
-class ChangeCaseToggleCharacterAction : ChangeEditorActionHandler.ForEachCaret() {
+public class ChangeCaseToggleCharacterAction : ChangeEditorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.CHANGE
 
   override fun execute(

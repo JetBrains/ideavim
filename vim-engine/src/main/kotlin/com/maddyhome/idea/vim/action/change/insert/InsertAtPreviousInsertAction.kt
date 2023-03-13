@@ -20,7 +20,7 @@ import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
-class InsertAtPreviousInsertAction : ChangeEditorActionHandler.SingleExecution() {
+public class InsertAtPreviousInsertAction : ChangeEditorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.INSERT
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MULTIKEY_UNDO)

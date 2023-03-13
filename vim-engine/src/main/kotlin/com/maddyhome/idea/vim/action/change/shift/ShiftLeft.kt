@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
-class ShiftLeftLinesAction : ChangeEditorActionHandler.ForEachCaret() {
+public class ShiftLeftLinesAction : ChangeEditorActionHandler.ForEachCaret() {
 
   override val type: Command.Type = Command.Type.INSERT
 
@@ -42,7 +42,7 @@ class ShiftLeftLinesAction : ChangeEditorActionHandler.ForEachCaret() {
   }
 }
 
-class ShiftLeftMotionAction : ChangeEditorActionHandler.ForEachCaret(), DuplicableOperatorAction {
+public class ShiftLeftMotionAction : ChangeEditorActionHandler.ForEachCaret(), DuplicableOperatorAction {
   override val type: Command.Type = Command.Type.CHANGE
 
   override val argumentType: Argument.Type = Argument.Type.MOTION
@@ -63,7 +63,7 @@ class ShiftLeftMotionAction : ChangeEditorActionHandler.ForEachCaret(), Duplicab
   }
 }
 
-class ShiftLeftVisualAction : VisualOperatorActionHandler.ForEachCaret() {
+public class ShiftLeftVisualAction : VisualOperatorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.CHANGE
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_EXIT_VISUAL)

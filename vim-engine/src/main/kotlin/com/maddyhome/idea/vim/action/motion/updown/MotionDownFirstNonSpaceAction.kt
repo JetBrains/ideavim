@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotion
 
-class MotionDownFirstNonSpaceAction : MotionActionHandler.ForEachCaret() {
+public class MotionDownFirstNonSpaceAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.LINE_WISE
 
   override fun getOffset(
@@ -33,7 +33,7 @@ class MotionDownFirstNonSpaceAction : MotionActionHandler.ForEachCaret() {
   }
 }
 
-class EnterNormalAction : MotionActionHandler.ForEachCaret() {
+public class EnterNormalAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.LINE_WISE
 
   override fun getOffset(

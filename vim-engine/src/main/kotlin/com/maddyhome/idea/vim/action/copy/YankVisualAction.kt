@@ -23,7 +23,7 @@ import java.util.*
 /**
  * @author vlan
  */
-class YankVisualAction : VisualOperatorActionHandler.SingleExecution() {
+public class YankVisualAction : VisualOperatorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.COPY
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_EXIT_VISUAL)

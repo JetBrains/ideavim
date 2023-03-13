@@ -24,7 +24,7 @@ import java.awt.event.KeyEvent
 import java.util.*
 import javax.swing.KeyStroke
 
-class MotionWordRightAction : MotionActionHandler.ForEachCaret() {
+public class MotionWordRightAction : MotionActionHandler.ForEachCaret() {
 
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
@@ -39,7 +39,7 @@ class MotionWordRightAction : MotionActionHandler.ForEachCaret() {
   }
 }
 
-class MotionWordRightInsertAction : MotionActionHandler.ForEachCaret(), ComplicatedKeysAction {
+public class MotionWordRightInsertAction : MotionActionHandler.ForEachCaret(), ComplicatedKeysAction {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
   override val keyStrokesSet: Set<List<KeyStroke>> = setOf(

@@ -17,7 +17,7 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
-class UndoAction : VimActionHandler.SingleExecution(), ComplicatedKeysAction {
+public class UndoAction : VimActionHandler.SingleExecution(), ComplicatedKeysAction {
   override val keyStrokesSet: Set<List<KeyStroke>> = setOf(
     injector.parser.parseKeys("u"),
     listOf(KeyStroke.getKeyStroke(KeyEvent.VK_UNDO, 0))

@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler
 import com.maddyhome.idea.vim.helper.mode
 
-class MotionInnerBigWordAction : TextObjectActionHandler() {
+public class MotionInnerBigWordAction : TextObjectActionHandler() {
 
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
 
@@ -35,7 +35,7 @@ class MotionInnerBigWordAction : TextObjectActionHandler() {
   }
 }
 
-class MotionOuterBigWordAction : TextObjectActionHandler() {
+public class MotionOuterBigWordAction : TextObjectActionHandler() {
 
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
 
@@ -51,7 +51,7 @@ class MotionOuterBigWordAction : TextObjectActionHandler() {
   }
 }
 
-class MotionInnerWordAction : TextObjectActionHandler() {
+public class MotionInnerWordAction : TextObjectActionHandler() {
 
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
 
@@ -67,7 +67,7 @@ class MotionInnerWordAction : TextObjectActionHandler() {
   }
 }
 
-class MotionOuterWordAction : TextObjectActionHandler() {
+public class MotionOuterWordAction : TextObjectActionHandler() {
 
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
 
@@ -83,7 +83,7 @@ class MotionOuterWordAction : TextObjectActionHandler() {
   }
 }
 
-fun getWordRange(
+private fun getWordRange(
   editor: VimEditor,
   caret: ImmutableVimCaret,
   count: Int,

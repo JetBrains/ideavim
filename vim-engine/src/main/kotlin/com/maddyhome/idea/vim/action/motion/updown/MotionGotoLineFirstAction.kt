@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.handler.toMotion
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
-class MotionGotoLineFirstAction : MotionActionHandler.ForEachCaret() {
+public class MotionGotoLineFirstAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.LINE_WISE
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
@@ -40,7 +40,7 @@ class MotionGotoLineFirstAction : MotionActionHandler.ForEachCaret() {
   }
 }
 
-class MotionGotoLineFirstInsertAction : MotionActionHandler.ForEachCaret() {
+public class MotionGotoLineFirstInsertAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_CLEAR_STROKES)

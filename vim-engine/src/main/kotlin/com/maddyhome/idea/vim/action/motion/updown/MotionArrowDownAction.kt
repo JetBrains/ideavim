@@ -21,7 +21,7 @@ import com.maddyhome.idea.vim.handler.NonShiftedSpecialKeyHandler
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
-class MotionArrowDownAction : NonShiftedSpecialKeyHandler(), ComplicatedKeysAction {
+public class MotionArrowDownAction : NonShiftedSpecialKeyHandler(), ComplicatedKeysAction {
   override val motionType: MotionType = MotionType.LINE_WISE
 
   override val keyStrokesSet: Set<List<KeyStroke>> =

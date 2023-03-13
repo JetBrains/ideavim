@@ -23,7 +23,7 @@ import java.awt.event.KeyEvent
 import java.util.*
 import javax.swing.KeyStroke
 
-class MotionScrollPageDownAction : VimActionHandler.SingleExecution() {
+public class MotionScrollPageDownAction : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
@@ -34,7 +34,7 @@ class MotionScrollPageDownAction : VimActionHandler.SingleExecution() {
   }
 }
 
-class MotionScrollPageDownInsertModeAction : VimActionHandler.SingleExecution(), ComplicatedKeysAction {
+public class MotionScrollPageDownInsertModeAction : VimActionHandler.SingleExecution(), ComplicatedKeysAction {
 
   override val keyStrokesSet: Set<List<KeyStroke>> = setOf(
     listOf(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, 0))

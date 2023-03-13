@@ -22,7 +22,7 @@ import java.util.*
 /**
  * @author vlan
  */
-class AutoIndentLinesVisualAction : VisualOperatorActionHandler.ForEachCaret() {
+public class AutoIndentLinesVisualAction : VisualOperatorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.CHANGE
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_EXIT_VISUAL)

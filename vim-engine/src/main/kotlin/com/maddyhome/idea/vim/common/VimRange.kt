@@ -31,38 +31,38 @@ import kotlin.math.min
  *
  * Range normalizations (check if line and offsets really exist) are performed in editor implementations.
  */
-sealed class VimRange {
-  sealed class Line : VimRange() {
-    class Range(val startLine: EditorLine.Pointer, val endLine: EditorLine.Pointer) : Line() {
-      fun lineAbove(): EditorLine.Pointer = listOf(startLine, endLine).minByOrNull { it.line }!!
-      fun lineBelow(): EditorLine.Pointer = listOf(startLine, endLine).maxByOrNull { it.line }!!
+public sealed class VimRange {
+  public sealed class Line : VimRange() {
+    public class Range(public val startLine: EditorLine.Pointer, public val endLine: EditorLine.Pointer) : Line() {
+      public fun lineAbove(): EditorLine.Pointer = listOf(startLine, endLine).minByOrNull { it.line }!!
+      public fun lineBelow(): EditorLine.Pointer = listOf(startLine, endLine).maxByOrNull { it.line }!!
     }
 
-    class Multiple(val lines: List<Int>) : Line()
+    public class Multiple(public val lines: List<Int>) : Line()
 
     // TODO: 11.01.2022 How converting offsets to lines work?
-    class Offsets(val startOffset: Offset, val endOffset: Offset) : Line() {
-      fun offsetAbove(): Offset = min(startOffset.point, endOffset.point).offset
-      fun offsetBelow(): Offset = max(startOffset.point, endOffset.point).offset
+    public class Offsets(public val startOffset: Offset, public val endOffset: Offset) : Line() {
+      public fun offsetAbove(): Offset = min(startOffset.point, endOffset.point).offset
+      public fun offsetBelow(): Offset = max(startOffset.point, endOffset.point).offset
     }
   }
 
-  sealed class Character : VimRange() {
-    class Range(val range: VimTextRange) : Character() {
-      fun offsetAbove(): Offset = min(range.start.point, range.end.point).offset
-      fun offsetBelow(): Offset = max(range.start.point, range.end.point).offset
+  public sealed class Character : VimRange() {
+    public class Range(public val range: VimTextRange) : Character() {
+      public fun offsetAbove(): Offset = min(range.start.point, range.end.point).offset
+      public fun offsetBelow(): Offset = max(range.start.point, range.end.point).offset
     }
 
-    class Multiple(val ranges: List<VimTextRange>) : Character()
+    public class Multiple(public val ranges: List<VimTextRange>) : Character()
   }
 
-  class Block(val start: Offset, val end: Offset) : VimRange()
+  public class Block(public val start: Offset, public val end: Offset) : VimRange()
 }
 
 /**
  * `start` is not lower than `end`
  */
-data class VimTextRange(
+public data class VimTextRange(
   val start: Offset,
   val end: Offset,
 ) {
@@ -73,23 +73,23 @@ data class VimTextRange(
   }
 }
 
-infix fun Int.including(another: Int): VimTextRange {
+public infix fun Int.including(another: Int): VimTextRange {
   return VimTextRange(this.offset, another.offset)
 }
 
-data class Offset(val point: Int)
-data class Pointer(val point: Int)
+public data class Offset(val point: Int)
+public data class Pointer(val point: Int)
 
-val Int.offset: Offset
+public val Int.offset: Offset
   get() = Offset(this)
-val Int.pointer: Pointer
+public val Int.pointer: Pointer
   get() = Pointer(this)
 
-interface VimMachine {
-  fun delete(range: VimRange, editor: VimEditor, caret: ImmutableVimCaret): OperatedRange?
+public interface VimMachine {
+  public fun delete(range: VimRange, editor: VimEditor, caret: ImmutableVimCaret): OperatedRange?
 }
 
-abstract class VimMachineBase : VimMachine {
+public abstract class VimMachineBase : VimMachine {
   /**
    * The information I'd like to know after the deletion:
    * - What range is deleted?
@@ -98,7 +98,7 @@ abstract class VimMachineBase : VimMachine {
    * - At what offset?
    * - What caret?
    */
-  override fun delete(range: VimRange, editor: VimEditor, caret: ImmutableVimCaret): OperatedRange? {
+  public override fun delete(range: VimRange, editor: VimEditor, caret: ImmutableVimCaret): OperatedRange? {
     val operatedText = editor.deleteDryRun(range) ?: return null
 
     val normalizedRange = operatedText.toNormalizedTextRange(editor)
@@ -113,7 +113,7 @@ abstract class VimMachineBase : VimMachine {
   }
 }
 
-fun OperatedRange.toNormalizedTextRange(editor: VimEditor): TextRange {
+public fun OperatedRange.toNormalizedTextRange(editor: VimEditor): TextRange {
   return when (this) {
     is OperatedRange.Block -> TODO()
     is OperatedRange.Lines -> {
@@ -126,10 +126,10 @@ fun OperatedRange.toNormalizedTextRange(editor: VimEditor): TextRange {
   }
 }
 
-sealed class EditorLine private constructor(val line: Int) {
-  class Pointer(line: Int) : EditorLine(line) {
-    companion object {
-      fun init(line: Int, forEditor: VimEditor): Pointer {
+public sealed class EditorLine private constructor(public val line: Int) {
+  public class Pointer(line: Int) : EditorLine(line) {
+    public companion object {
+      public fun init(line: Int, forEditor: VimEditor): Pointer {
         if (line < 0) error("")
         if (line >= forEditor.lineCount()) error("")
         return Pointer(line)
@@ -137,14 +137,14 @@ sealed class EditorLine private constructor(val line: Int) {
     }
   }
 
-  class Offset(line: Int) : EditorLine(line) {
+  public class Offset(line: Int) : EditorLine(line) {
 
-    fun toPointer(forEditor: VimEditor): Pointer {
+    public fun toPointer(forEditor: VimEditor): Pointer {
       return Pointer.init(line.coerceAtMost(forEditor.lineCount() - 1), forEditor)
     }
 
-    companion object {
-      fun init(line: Int, forEditor: VimEditor): Offset {
+    public companion object {
+      public fun init(line: Int, forEditor: VimEditor): Offset {
         if (line < 0) error("")
         // TODO: 28.12.2021 Is this logic correct?
         //   IJ has an additional line
@@ -155,16 +155,16 @@ sealed class EditorLine private constructor(val line: Int) {
   }
 }
 
-sealed class OperatedRange {
-  class Lines(
-    val text: CharSequence,
-    val lineAbove: EditorLine.Offset,
-    val linesOperated: Int,
-    val shiftType: LineDeleteShift,
+public sealed class OperatedRange {
+  public class Lines(
+    public val text: CharSequence,
+    public val lineAbove: EditorLine.Offset,
+    public val linesOperated: Int,
+    public val shiftType: LineDeleteShift,
   ) : OperatedRange()
 
-  class Characters(val text: CharSequence, val leftOffset: Offset, val rightOffset: Offset) : OperatedRange()
-  class Block : OperatedRange() {
+  public class Characters(public val text: CharSequence, public val leftOffset: Offset, public val rightOffset: Offset) : OperatedRange()
+  public class Block : OperatedRange() {
     init {
       TODO()
     }

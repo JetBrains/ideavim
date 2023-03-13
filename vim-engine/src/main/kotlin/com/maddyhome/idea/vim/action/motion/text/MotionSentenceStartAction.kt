@@ -22,7 +22,7 @@ import com.maddyhome.idea.vim.handler.toMotionOrError
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
-class MotionSentenceNextStartAction : MotionActionHandler.ForEachCaret() {
+public class MotionSentenceNextStartAction : MotionActionHandler.ForEachCaret() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
 
   override fun getOffset(
@@ -38,7 +38,7 @@ class MotionSentenceNextStartAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 }
 
-class MotionSentencePreviousStartAction : MotionActionHandler.ForEachCaret() {
+public class MotionSentencePreviousStartAction : MotionActionHandler.ForEachCaret() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
 
   override fun getOffset(

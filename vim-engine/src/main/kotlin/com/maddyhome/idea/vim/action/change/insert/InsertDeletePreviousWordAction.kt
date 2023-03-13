@@ -22,7 +22,7 @@ import com.maddyhome.idea.vim.handler.Motion.AbsoluteOffset
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
-class InsertDeletePreviousWordAction : ChangeEditorActionHandler.ForEachCaret() {
+public class InsertDeletePreviousWordAction : ChangeEditorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.INSERT
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_CLEAR_STROKES)
@@ -47,7 +47,7 @@ class InsertDeletePreviousWordAction : ChangeEditorActionHandler.ForEachCaret() 
  * @param editor The editor to delete the text from
  * @return true if able to delete text, false if not
  */
-fun insertDeletePreviousWord(editor: VimEditor, caret: VimCaret, operatorArguments: OperatorArguments): Boolean {
+private fun insertDeletePreviousWord(editor: VimEditor, caret: VimCaret, operatorArguments: OperatorArguments): Boolean {
   val deleteTo: Int = if (caret.getBufferPosition().column == 0) {
     caret.offset.point - 1
   } else {

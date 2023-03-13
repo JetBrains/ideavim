@@ -18,7 +18,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.endOffsetInclusive
 
-class FilterMotionAction : VimActionHandler.SingleExecution(), DuplicableOperatorAction {
+public class FilterMotionAction : VimActionHandler.SingleExecution(), DuplicableOperatorAction {
 
   override val type: Command.Type = Command.Type.CHANGE
 

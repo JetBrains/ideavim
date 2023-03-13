@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.mode
 
-class ResetModeAction : VimActionHandler.ConditionalMulticaret() {
+public class ResetModeAction : VimActionHandler.ConditionalMulticaret() {
   private lateinit var modeBeforeReset: VimStateMachine.Mode
   override val type: Command.Type = Command.Type.OTHER_WRITABLE
   override fun runAsMulticaret(

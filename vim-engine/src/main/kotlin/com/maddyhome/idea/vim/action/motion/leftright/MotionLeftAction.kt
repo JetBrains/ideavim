@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.options.OptionConstants
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
-class MotionLeftAction : MotionActionHandler.ForEachCaret() {
+public class MotionLeftAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
   override fun getOffset(
@@ -39,7 +39,7 @@ class MotionLeftAction : MotionActionHandler.ForEachCaret() {
   }
 }
 
-class MotionLeftInsertModeAction : MotionActionHandler.ForEachCaret(), ComplicatedKeysAction {
+public class MotionLeftInsertModeAction : MotionActionHandler.ForEachCaret(), ComplicatedKeysAction {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
   override val keyStrokesSet: Set<List<KeyStroke>> = setOf(

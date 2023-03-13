@@ -18,7 +18,7 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
 /**
  * @author Alex Plate
  */
-class LookupUpAction : VimActionHandler.SingleExecution() {
+public class LookupUpAction : VimActionHandler.SingleExecution() {
 
   private val keySet = setOf(injector.parser.parseKeys("<C-P>"))
 

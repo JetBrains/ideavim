@@ -22,7 +22,7 @@ import java.util.*
 /**
  * @author vlan
  */
-class ChangeVisualAction : VisualOperatorActionHandler.ForEachCaret() {
+public class ChangeVisualAction : VisualOperatorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.CHANGE
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MULTIKEY_UNDO, CommandFlags.FLAG_EXIT_VISUAL)

@@ -10,6 +10,6 @@ package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 
-interface VimActionsInitiator {
-  fun getInstance(): EditorActionHandlerBase
+public interface VimActionsInitiator {
+  public fun getInstance(): EditorActionHandlerBase
 }

@@ -20,7 +20,7 @@ import com.maddyhome.idea.vim.helper.vimStateMachine
 /**
  * @author vlan
  */
-class VisualSelectPreviousAction : VimActionHandler.SingleExecution() {
+public class VisualSelectPreviousAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override fun execute(

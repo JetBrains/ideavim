@@ -17,7 +17,7 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
 /**
  * @author vlan
  */
-class WindowDownAction : VimActionHandler.SingleExecution() {
+public class WindowDownAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override fun execute(
@@ -34,7 +34,7 @@ class WindowDownAction : VimActionHandler.SingleExecution() {
 /**
  * @author vlan
  */
-class WindowLeftAction : VimActionHandler.SingleExecution() {
+public class WindowLeftAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override fun execute(
@@ -51,7 +51,7 @@ class WindowLeftAction : VimActionHandler.SingleExecution() {
 /**
  * @author vlan
  */
-class WindowRightAction : VimActionHandler.SingleExecution() {
+public class WindowRightAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override fun execute(
@@ -68,7 +68,7 @@ class WindowRightAction : VimActionHandler.SingleExecution() {
 /**
  * @author vlan
  */
-class WindowUpAction : VimActionHandler.SingleExecution() {
+public class WindowUpAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override fun execute(

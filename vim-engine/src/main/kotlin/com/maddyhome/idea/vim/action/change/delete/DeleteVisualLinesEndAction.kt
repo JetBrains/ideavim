@@ -26,7 +26,7 @@ import java.util.*
 /**
  * @author vlan
  */
-class DeleteVisualLinesEndAction : VisualOperatorActionHandler.ForEachCaret() {
+public class DeleteVisualLinesEndAction : VisualOperatorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.DELETE
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_EXIT_VISUAL)

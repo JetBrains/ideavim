@@ -17,7 +17,7 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
 /**
  * @author rasendubi
  */
-class WindowOnlyAction : VimActionHandler.SingleExecution() {
+public class WindowOnlyAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override fun execute(

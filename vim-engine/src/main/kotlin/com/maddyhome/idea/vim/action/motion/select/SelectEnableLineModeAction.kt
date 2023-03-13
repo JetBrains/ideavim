@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
  * @author Alex Plate
  */
 
-class SelectEnableLineModeAction : VimActionHandler.SingleExecution() {
+public class SelectEnableLineModeAction : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 

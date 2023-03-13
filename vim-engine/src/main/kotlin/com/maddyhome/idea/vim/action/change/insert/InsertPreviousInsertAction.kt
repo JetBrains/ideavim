@@ -18,7 +18,7 @@ import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
-class InsertPreviousInsertAction : ChangeEditorActionHandler.SingleExecution() {
+public class InsertPreviousInsertAction : ChangeEditorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.INSERT
 
   override fun execute(
@@ -32,7 +32,7 @@ class InsertPreviousInsertAction : ChangeEditorActionHandler.SingleExecution() {
   }
 }
 
-class InsertPreviousInsertExitAction : ChangeEditorActionHandler.SingleExecution(), ComplicatedKeysAction {
+public class InsertPreviousInsertExitAction : ChangeEditorActionHandler.SingleExecution(), ComplicatedKeysAction {
   override val keyStrokesSet: Set<List<KeyStroke>> = setOf(
     listOf(KeyStroke.getKeyStroke(KeyEvent.VK_2, KeyEvent.CTRL_DOWN_MASK or KeyEvent.SHIFT_DOWN_MASK)),
     listOf(KeyStroke.getKeyStroke(KeyEvent.VK_2, KeyEvent.CTRL_DOWN_MASK)),

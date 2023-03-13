@@ -23,20 +23,20 @@ import com.maddyhome.idea.vim.handler.toMotionOrError
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
-enum class TillCharacterMotionType {
+enum public class TillCharacterMotionType {
   LAST_F,
   LAST_SMALL_F,
   LAST_T,
   LAST_SMALL_T,
 }
 
-class MotionLeftMatchCharAction : TillCharacterMotion(Direction.BACKWARDS, TillCharacterMotionType.LAST_F, false)
-class MotionLeftTillMatchCharAction : TillCharacterMotion(Direction.BACKWARDS, TillCharacterMotionType.LAST_T, true)
-class MotionRightMatchCharAction : TillCharacterMotion(Direction.FORWARDS, TillCharacterMotionType.LAST_SMALL_F, false)
-class MotionRightTillMatchCharAction :
+public class MotionLeftMatchCharAction : TillCharacterMotion(Direction.BACKWARDS, TillCharacterMotionType.LAST_F, false)
+public class MotionLeftTillMatchCharAction : TillCharacterMotion(Direction.BACKWARDS, TillCharacterMotionType.LAST_T, true)
+public class MotionRightMatchCharAction : TillCharacterMotion(Direction.FORWARDS, TillCharacterMotionType.LAST_SMALL_F, false)
+public class MotionRightTillMatchCharAction :
   TillCharacterMotion(Direction.FORWARDS, TillCharacterMotionType.LAST_SMALL_T, true)
 
-sealed class TillCharacterMotion(
+public sealed class TillCharacterMotion(
   private val direction: Direction,
   private val tillCharacterMotionType: TillCharacterMotionType,
   private val finishBeforeCharacter: Boolean,

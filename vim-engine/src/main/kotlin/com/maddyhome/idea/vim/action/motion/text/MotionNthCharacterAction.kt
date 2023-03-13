@@ -22,7 +22,7 @@ import java.util.*
 import kotlin.math.max
 import kotlin.math.min
 
-class MotionNthCharacterAction : MotionActionHandler.ForEachCaret() {
+public class MotionNthCharacterAction : MotionActionHandler.ForEachCaret() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
 
   override fun getOffset(

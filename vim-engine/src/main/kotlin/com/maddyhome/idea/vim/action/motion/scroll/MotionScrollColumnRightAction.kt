@@ -16,7 +16,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import java.util.*
 
-class MotionScrollColumnRightAction : VimActionHandler.SingleExecution() {
+public class MotionScrollColumnRightAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_IGNORE_SIDE_SCROLL_JUMP)

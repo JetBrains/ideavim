@@ -26,7 +26,7 @@ import java.util.*
 /**
  * @author vlan
  */
-class ChangeVisualCharacterAction : VisualOperatorActionHandler.ForEachCaret() {
+public class ChangeVisualCharacterAction : VisualOperatorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.CHANGE
 
   override val argumentType: Argument.Type = Argument.Type.DIGRAPH

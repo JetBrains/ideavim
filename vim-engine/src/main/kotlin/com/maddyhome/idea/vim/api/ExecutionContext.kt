@@ -12,17 +12,17 @@ package com.maddyhome.idea.vim.api
  * This would be ideal if we could provide a typed solution, but sofar this is just a holder
  */
 
-sealed interface ExecutionContext {
-  val context: Any
+public sealed interface ExecutionContext {
+  public val context: Any
 
   // TODO: 10.02.2022 Not sure about this method
-  fun updateEditor(editor: VimEditor): ExecutionContext
+  public fun updateEditor(editor: VimEditor): ExecutionContext
 
-  interface Editor : ExecutionContext
-  interface CaretAndEditor : Editor
+  public interface Editor : ExecutionContext
+  public interface CaretAndEditor : Editor
 }
 
-interface ExecutionContextManager {
-  fun onEditor(editor: VimEditor, prevContext: ExecutionContext? = null): ExecutionContext.Editor
-  fun onCaret(caret: VimCaret, prevContext: ExecutionContext.Editor): ExecutionContext.CaretAndEditor
+public interface ExecutionContextManager {
+  public fun onEditor(editor: VimEditor, prevContext: ExecutionContext? = null): ExecutionContext.Editor
+  public fun onCaret(caret: VimCaret, prevContext: ExecutionContext.Editor): ExecutionContext.CaretAndEditor
 }

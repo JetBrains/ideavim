@@ -21,7 +21,7 @@ import com.maddyhome.idea.vim.helper.exitVisualMode
 /**
  * @author vlan
  */
-class VisualExitModeAction : VimActionHandler.ConditionalMulticaret() {
+public class VisualExitModeAction : VimActionHandler.ConditionalMulticaret() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
   override fun runAsMulticaret(
     editor: VimEditor,

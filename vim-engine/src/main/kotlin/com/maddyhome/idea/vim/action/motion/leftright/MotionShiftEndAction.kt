@@ -21,7 +21,7 @@ import com.maddyhome.idea.vim.helper.inSelectMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.options.OptionConstants
 
-class MotionShiftEndAction : ShiftedSpecialKeyHandler() {
+public class MotionShiftEndAction : ShiftedSpecialKeyHandler() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 

@@ -17,7 +17,7 @@ import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.register.RegisterConstants.LAST_COMMAND_REGISTER
 
-class PlaybackRegisterAction : VimActionHandler.SingleExecution() {
+public class PlaybackRegisterAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 
   override val argumentType: Argument.Type = Argument.Type.CHARACTER

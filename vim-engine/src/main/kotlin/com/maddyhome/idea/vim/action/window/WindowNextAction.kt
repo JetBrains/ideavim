@@ -17,7 +17,7 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
 /**
  * @author rasendubi
  */
-class WindowNextAction : VimActionHandler.SingleExecution() {
+public class WindowNextAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override fun execute(
@@ -35,7 +35,7 @@ class WindowNextAction : VimActionHandler.SingleExecution() {
   }
 }
 
-class WindowPrevAction : VimActionHandler.SingleExecution() {
+public class WindowPrevAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override fun execute(

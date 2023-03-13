@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
-sealed class IncNumber(val inc: Int, private val avalanche: Boolean) : VisualOperatorActionHandler.ForEachCaret() {
+public sealed class IncNumber(public val inc: Int, private val avalanche: Boolean) : VisualOperatorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.CHANGE
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_EXIT_VISUAL)
 
@@ -35,7 +35,7 @@ sealed class IncNumber(val inc: Int, private val avalanche: Boolean) : VisualOpe
   }
 }
 
-class ChangeVisualNumberIncAction : IncNumber(1, false)
-class ChangeVisualNumberDecAction : IncNumber(-1, false)
-class ChangeVisualNumberAvalancheIncAction : IncNumber(1, true)
-class ChangeVisualNumberAvalancheDecAction : IncNumber(-1, true)
+public class ChangeVisualNumberIncAction : IncNumber(1, false)
+public class ChangeVisualNumberDecAction : IncNumber(-1, false)
+public class ChangeVisualNumberAvalancheIncAction : IncNumber(1, true)
+public class ChangeVisualNumberAvalancheDecAction : IncNumber(-1, true)

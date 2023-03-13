@@ -21,7 +21,7 @@ import javax.swing.KeyStroke
  * @author Alex Plate
  */
 
-class SelectDeleteAction : VimActionHandler.SingleExecution() {
+public class SelectDeleteAction : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.INSERT
 

@@ -31,7 +31,7 @@ zH                      Move the view on the text half a screenwidth to the
 
 [count] is used but undocumented.
  */
-class MotionScrollHalfWidthRightAction : VimActionHandler.SingleExecution() {
+public class MotionScrollHalfWidthRightAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_IGNORE_SIDE_SCROLL_JUMP)

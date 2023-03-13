@@ -22,7 +22,7 @@ import com.maddyhome.idea.vim.handler.toMotion
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
-class MotionFirstColumnAction : MotionActionHandler.ForEachCaret() {
+public class MotionFirstColumnAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
   override fun getOffset(
@@ -36,7 +36,7 @@ class MotionFirstColumnAction : MotionActionHandler.ForEachCaret() {
   }
 }
 
-class MotionFirstColumnInsertModeAction : MotionActionHandler.ForEachCaret() {
+public class MotionFirstColumnInsertModeAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_STROKE)

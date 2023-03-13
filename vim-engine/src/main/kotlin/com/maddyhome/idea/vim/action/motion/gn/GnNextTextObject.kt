@@ -21,7 +21,7 @@ import com.maddyhome.idea.vim.handler.TextObjectActionHandler
  * @author Alex Plate
  */
 
-class GnNextTextObject : TextObjectActionHandler() {
+public class GnNextTextObject : TextObjectActionHandler() {
 
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
 

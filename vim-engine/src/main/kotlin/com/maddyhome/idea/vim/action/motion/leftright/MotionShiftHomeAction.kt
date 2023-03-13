@@ -18,7 +18,7 @@ import com.maddyhome.idea.vim.handler.ShiftedSpecialKeyHandler
 /**
  * @author Alex Plate
  */
-class MotionShiftHomeAction : ShiftedSpecialKeyHandler() {
+public class MotionShiftHomeAction : ShiftedSpecialKeyHandler() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 

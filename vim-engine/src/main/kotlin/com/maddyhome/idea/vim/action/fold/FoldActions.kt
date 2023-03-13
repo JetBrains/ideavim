@@ -15,7 +15,7 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 
-class VimCollapseAllRegions : VimActionHandler.SingleExecution() {
+public class VimCollapseAllRegions : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
@@ -30,7 +30,7 @@ class VimCollapseAllRegions : VimActionHandler.SingleExecution() {
   }
 }
 
-class VimCollapseRegion : VimActionHandler.SingleExecution() {
+public class VimCollapseRegion : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
@@ -45,7 +45,7 @@ class VimCollapseRegion : VimActionHandler.SingleExecution() {
   }
 }
 
-class VimCollapseRegionRecursively : VimActionHandler.SingleExecution() {
+public class VimCollapseRegionRecursively : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override fun execute(
@@ -59,7 +59,7 @@ class VimCollapseRegionRecursively : VimActionHandler.SingleExecution() {
   }
 }
 
-class VimExpandAllRegions : VimActionHandler.SingleExecution() {
+public class VimExpandAllRegions : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
@@ -74,7 +74,7 @@ class VimExpandAllRegions : VimActionHandler.SingleExecution() {
   }
 }
 
-class VimExpandRegion : VimActionHandler.SingleExecution() {
+public class VimExpandRegion : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
@@ -89,7 +89,7 @@ class VimExpandRegion : VimActionHandler.SingleExecution() {
   }
 }
 
-class VimExpandRegionRecursively : VimActionHandler.SingleExecution() {
+public class VimExpandRegionRecursively : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 

@@ -21,7 +21,7 @@ import com.maddyhome.idea.vim.put.PutData
 import com.maddyhome.idea.vim.register.Register
 import com.maddyhome.idea.vim.vimscript.model.Script
 
-class InsertRegisterAction : VimActionHandler.SingleExecution() {
+public class InsertRegisterAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 
   override val argumentType: Argument.Type = Argument.Type.CHARACTER

@@ -18,7 +18,7 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
 /**
  * @author Alex Plate
  */
-class LookupDownAction : VimActionHandler.SingleExecution() {
+public class LookupDownAction : VimActionHandler.SingleExecution() {
 
   private val keySet = parseKeysSet("<C-N>")
 

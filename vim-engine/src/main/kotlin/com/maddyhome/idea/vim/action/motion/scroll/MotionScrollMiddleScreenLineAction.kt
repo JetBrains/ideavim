@@ -17,7 +17,7 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
-class MotionScrollMiddleScreenLineAction : VimActionHandler.SingleExecution() {
+public class MotionScrollMiddleScreenLineAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_IGNORE_SCROLL_JUMP)
@@ -32,7 +32,7 @@ class MotionScrollMiddleScreenLineAction : VimActionHandler.SingleExecution() {
   }
 }
 
-class MotionScrollMiddleScreenLineStartAction : VimActionHandler.SingleExecution() {
+public class MotionScrollMiddleScreenLineStartAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_IGNORE_SCROLL_JUMP)

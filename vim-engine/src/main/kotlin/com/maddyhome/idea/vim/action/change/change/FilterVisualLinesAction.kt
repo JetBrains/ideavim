@@ -21,7 +21,7 @@ import java.util.*
 /**
  * @author vlan
  */
-class FilterVisualLinesAction : VimActionHandler.SingleExecution() {
+public class FilterVisualLinesAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.CHANGE
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_LINEWISE)

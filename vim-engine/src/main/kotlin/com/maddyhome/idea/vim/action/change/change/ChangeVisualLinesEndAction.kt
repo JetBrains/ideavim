@@ -29,7 +29,7 @@ import java.util.*
 /**
  * @author vlan
  */
-class ChangeVisualLinesEndAction : VisualOperatorActionHandler.ForEachCaret() {
+public class ChangeVisualLinesEndAction : VisualOperatorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.CHANGE
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(FLAG_MOT_LINEWISE, FLAG_MULTIKEY_UNDO, FLAG_EXIT_VISUAL)

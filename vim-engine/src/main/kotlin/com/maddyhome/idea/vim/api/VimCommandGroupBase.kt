@@ -12,9 +12,9 @@ import com.maddyhome.idea.vim.api.VimCommandGroup.Companion.BLACKLISTED_ALIASES
 import com.maddyhome.idea.vim.common.CommandAlias
 import com.maddyhome.idea.vim.common.GoalCommand
 
-abstract class VimCommandGroupBase : VimCommandGroup {
-  companion object {
-    private val overridePrefix = "!"
+public abstract class VimCommandGroupBase : VimCommandGroup {
+  public companion object {
+    private const val overridePrefix = "!"
   }
   private var aliases = HashMap<String, CommandAlias>()
 

@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotion
 
-open class MotionUpAction : MotionActionHandler.ForEachCaret() {
+open public class MotionUpAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.LINE_WISE
 
   override fun getOffset(
@@ -33,7 +33,7 @@ open class MotionUpAction : MotionActionHandler.ForEachCaret() {
   }
 }
 
-class MotionUpCtrlPAction : MotionUpAction() {
+public class MotionUpCtrlPAction : MotionUpAction() {
   override fun getOffset(
     editor: VimEditor,
     caret: ImmutableVimCaret,
@@ -54,7 +54,7 @@ class MotionUpCtrlPAction : MotionUpAction() {
   }
 }
 
-class MotionUpNotLineWiseAction : MotionActionHandler.ForEachCaret() {
+public class MotionUpNotLineWiseAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
   override fun getOffset(

@@ -19,12 +19,12 @@ import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.Motion.AbsoluteOffset
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 
-class MotionBigWordEndLeftAction : WordEndAction(Direction.BACKWARDS, true)
-class MotionBigWordEndRightAction : WordEndAction(Direction.FORWARDS, true)
-class MotionWordEndLeftAction : WordEndAction(Direction.BACKWARDS, false)
-class MotionWordEndRightAction : WordEndAction(Direction.FORWARDS, false)
+public class MotionBigWordEndLeftAction : WordEndAction(Direction.BACKWARDS, true)
+public class MotionBigWordEndRightAction : WordEndAction(Direction.FORWARDS, true)
+public class MotionWordEndLeftAction : WordEndAction(Direction.BACKWARDS, false)
+public class MotionWordEndRightAction : WordEndAction(Direction.FORWARDS, false)
 
-sealed class WordEndAction(val direction: Direction, val bigWord: Boolean) : MotionActionHandler.ForEachCaret() {
+public sealed class WordEndAction(public val direction: Direction, public val bigWord: Boolean) : MotionActionHandler.ForEachCaret() {
   override fun getOffset(
     editor: VimEditor,
     caret: ImmutableVimCaret,
@@ -38,7 +38,7 @@ sealed class WordEndAction(val direction: Direction, val bigWord: Boolean) : Mot
   override val motionType: MotionType = MotionType.INCLUSIVE
 }
 
-fun moveCaretToNextWordEnd(editor: VimEditor, caret: ImmutableVimCaret, count: Int, bigWord: Boolean): Motion {
+private fun moveCaretToNextWordEnd(editor: VimEditor, caret: ImmutableVimCaret, count: Int, bigWord: Boolean): Motion {
   if (caret.offset.point == 0 && count < 0 || caret.offset.point >= editor.fileSize() - 1 && count > 0) {
     return Motion.Error
   }

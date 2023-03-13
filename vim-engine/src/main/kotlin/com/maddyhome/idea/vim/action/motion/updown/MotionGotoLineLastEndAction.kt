@@ -27,7 +27,7 @@ import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.options.OptionConstants
 import java.util.*
 
-class MotionGotoLineLastEndAction : MotionActionHandler.ForEachCaret() {
+public class MotionGotoLineLastEndAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.LINE_WISE
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
@@ -50,7 +50,7 @@ class MotionGotoLineLastEndAction : MotionActionHandler.ForEachCaret() {
   }
 }
 
-class MotionGotoLineLastEndInsertAction : MotionActionHandler.ForEachCaret() {
+public class MotionGotoLineLastEndInsertAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_CLEAR_STROKES)

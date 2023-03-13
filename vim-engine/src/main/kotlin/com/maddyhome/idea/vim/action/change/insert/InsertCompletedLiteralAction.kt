@@ -17,7 +17,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import javax.swing.KeyStroke
 
-class InsertCompletedLiteralAction : VimActionHandler.SingleExecution() {
+public class InsertCompletedLiteralAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.INSERT
   override val argumentType: Argument.Type = Argument.Type.DIGRAPH
 

@@ -22,7 +22,7 @@ import com.maddyhome.idea.vim.handler.toMotionOrNoMotion
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
-class SearchWholeWordForwardAction : MotionActionHandler.ForEachCaret() {
+public class SearchWholeWordForwardAction : MotionActionHandler.ForEachCaret() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
 
   override fun getOffset(

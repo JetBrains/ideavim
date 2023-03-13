@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.helper.noneOfEnum
 import java.util.*
 import kotlin.math.max
 
-class VisualSelectNextSearch : MotionActionHandler.SingleExecution() {
+public class VisualSelectNextSearch : MotionActionHandler.SingleExecution() {
   override val flags: EnumSet<CommandFlags> = noneOfEnum()
 
   override fun getOffset(
@@ -38,7 +38,7 @@ class VisualSelectNextSearch : MotionActionHandler.SingleExecution() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 }
 
-class VisualSelectPreviousSearch : MotionActionHandler.SingleExecution() {
+public class VisualSelectPreviousSearch : MotionActionHandler.SingleExecution() {
   override val flags: EnumSet<CommandFlags> = noneOfEnum()
 
   override fun getOffset(

@@ -20,7 +20,7 @@ import com.maddyhome.idea.vim.handler.TextObjectActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
-class MotionInnerBlockAngleAction : TextObjectActionHandler() {
+public class MotionInnerBlockAngleAction : TextObjectActionHandler() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
 
@@ -38,7 +38,7 @@ class MotionInnerBlockAngleAction : TextObjectActionHandler() {
   }
 }
 
-class MotionInnerBlockBraceAction : TextObjectActionHandler() {
+public class MotionInnerBlockBraceAction : TextObjectActionHandler() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
 
@@ -56,7 +56,7 @@ class MotionInnerBlockBraceAction : TextObjectActionHandler() {
   }
 }
 
-class MotionInnerBlockBracketAction : TextObjectActionHandler() {
+public class MotionInnerBlockBracketAction : TextObjectActionHandler() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
 
@@ -74,7 +74,7 @@ class MotionInnerBlockBracketAction : TextObjectActionHandler() {
   }
 }
 
-class MotionInnerBlockParenAction : TextObjectActionHandler() {
+public class MotionInnerBlockParenAction : TextObjectActionHandler() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
 
@@ -92,7 +92,7 @@ class MotionInnerBlockParenAction : TextObjectActionHandler() {
   }
 }
 
-class MotionOuterBlockAngleAction : TextObjectActionHandler() {
+public class MotionOuterBlockAngleAction : TextObjectActionHandler() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
 
@@ -110,7 +110,7 @@ class MotionOuterBlockAngleAction : TextObjectActionHandler() {
   }
 }
 
-class MotionOuterBlockBraceAction : TextObjectActionHandler() {
+public class MotionOuterBlockBraceAction : TextObjectActionHandler() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
 
@@ -128,7 +128,7 @@ class MotionOuterBlockBraceAction : TextObjectActionHandler() {
   }
 }
 
-class MotionOuterBlockBracketAction : TextObjectActionHandler() {
+public class MotionOuterBlockBracketAction : TextObjectActionHandler() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
 
@@ -146,7 +146,7 @@ class MotionOuterBlockBracketAction : TextObjectActionHandler() {
   }
 }
 
-class MotionOuterBlockParenAction : TextObjectActionHandler() {
+public class MotionOuterBlockParenAction : TextObjectActionHandler() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
 

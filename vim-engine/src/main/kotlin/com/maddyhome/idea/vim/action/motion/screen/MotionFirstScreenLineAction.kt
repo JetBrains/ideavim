@@ -31,7 +31,7 @@ H                       To line [count] from top (Home) of window (default:
                         scroll.  E.g. "yH" yanks from the first visible line
                         until the cursor line (inclusive).
  */
-abstract class MotionFirstScreenLineActionBase(private val operatorPending: Boolean) :
+abstract public class MotionFirstScreenLineActionBase(private val operatorPending: Boolean) :
   MotionActionHandler.ForEachCaret() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
 
@@ -53,5 +53,5 @@ abstract class MotionFirstScreenLineActionBase(private val operatorPending: Bool
   }
 }
 
-class MotionFirstScreenLineAction : MotionFirstScreenLineActionBase(false)
-class MotionOpPendingFirstScreenLineAction : MotionFirstScreenLineActionBase(true)
+public class MotionFirstScreenLineAction : MotionFirstScreenLineActionBase(false)
+public class MotionOpPendingFirstScreenLineAction : MotionFirstScreenLineActionBase(true)

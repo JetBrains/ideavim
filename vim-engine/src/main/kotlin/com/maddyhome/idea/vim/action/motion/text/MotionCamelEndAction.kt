@@ -19,10 +19,10 @@ import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotionOrError
 
-class MotionCamelEndLeftAction : MotionCamelEndAction(Direction.BACKWARDS)
-class MotionCamelEndRightAction : MotionCamelEndAction(Direction.FORWARDS)
+public class MotionCamelEndLeftAction : MotionCamelEndAction(Direction.BACKWARDS)
+public class MotionCamelEndRightAction : MotionCamelEndAction(Direction.FORWARDS)
 
-sealed class MotionCamelEndAction(val direction: Direction) : MotionActionHandler.ForEachCaret() {
+public sealed class MotionCamelEndAction(public val direction: Direction) : MotionActionHandler.ForEachCaret() {
   override fun getOffset(
     editor: VimEditor,
     caret: ImmutableVimCaret,
@@ -36,7 +36,7 @@ sealed class MotionCamelEndAction(val direction: Direction) : MotionActionHandle
   override val motionType: MotionType = MotionType.INCLUSIVE
 }
 
-fun moveCaretToNextCamelEnd(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Int {
+private fun moveCaretToNextCamelEnd(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Int {
   return if (caret.offset.point == 0 && count < 0 || caret.offset.point >= editor.fileSize() - 1 && count > 0) {
     -1
   } else {

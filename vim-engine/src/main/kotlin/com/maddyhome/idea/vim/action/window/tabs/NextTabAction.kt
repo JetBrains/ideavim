@@ -14,7 +14,7 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 
-class NextTabAction : VimActionHandler.SingleExecution() {
+public class NextTabAction : VimActionHandler.SingleExecution() {
   override fun execute(
     editor: VimEditor,
     context: ExecutionContext,

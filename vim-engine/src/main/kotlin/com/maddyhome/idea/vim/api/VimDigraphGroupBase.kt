@@ -12,7 +12,7 @@ import com.maddyhome.idea.vim.helper.EngineStringHelper
 import java.util.*
 import javax.swing.KeyStroke
 
-abstract class VimDigraphGroupBase() : VimDigraphGroup {
+public abstract class VimDigraphGroupBase() : VimDigraphGroup {
 
   override fun getDigraph(ch1: Char, ch2: Char): Char {
     var key = String(charArrayOf(ch1, ch2))
@@ -1682,7 +1682,7 @@ abstract class VimDigraphGroupBase() : VimDigraphGroup {
     's', 't', '\ufb06'
   )
   protected val digraphs: HashMap<String, Char> = HashMap<String, Char>(defaultDigraphs.size)
-  protected val keys = TreeMap<Char, String>()
+  protected val keys: TreeMap<Char, String> = TreeMap<Char, String>()
 
   init {
     loadDigraphs()

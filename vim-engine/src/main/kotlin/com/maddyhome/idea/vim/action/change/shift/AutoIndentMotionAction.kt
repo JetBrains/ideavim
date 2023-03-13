@@ -20,7 +20,7 @@ import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 /**
  * @author Aleksey Lagoshin
  */
-class AutoIndentMotionAction : ChangeEditorActionHandler.ForEachCaret(), DuplicableOperatorAction {
+public class AutoIndentMotionAction : ChangeEditorActionHandler.ForEachCaret(), DuplicableOperatorAction {
   override val type: Command.Type = Command.Type.CHANGE
 
   override val argumentType: Argument.Type = Argument.Type.MOTION

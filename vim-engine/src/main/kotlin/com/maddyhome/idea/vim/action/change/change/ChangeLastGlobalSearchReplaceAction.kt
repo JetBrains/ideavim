@@ -17,7 +17,7 @@ import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 import com.maddyhome.idea.vim.vimscript.model.Script
 
-class ChangeLastGlobalSearchReplaceAction : ChangeEditorActionHandler.SingleExecution() {
+public class ChangeLastGlobalSearchReplaceAction : ChangeEditorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 
   override fun execute(

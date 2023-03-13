@@ -45,7 +45,7 @@ import javax.swing.KeyStroke
 import kotlin.math.abs
 import kotlin.math.min
 
-abstract class VimChangeGroupBase : VimChangeGroup {
+public abstract class VimChangeGroupBase : VimChangeGroup {
   private var repeatLines: Int = 0
   private var repeatColumn: Int = 0
   private var repeatAppend: Boolean = false
@@ -54,22 +54,22 @@ abstract class VimChangeGroupBase : VimChangeGroup {
   protected val strokes: MutableList<Any> = ArrayList()
 
   @JvmField
-  protected var repeatCharsCount = 0
+  protected var repeatCharsCount: Int = 0
 
   @JvmField
   protected var lastStrokes: MutableList<Any>? = null
 
   @JvmField
-  protected var oldOffset = -1
+  protected var oldOffset: Int = -1
 
   // Workaround for VIM-1546. Another solution is highly appreciated.
-  var tabAction = false
+  public var tabAction: Boolean = false
 
   @JvmField
   protected var vimDocumentListener: ChangesListener? = null
 
   @JvmField
-  protected var lastLower = true
+  protected var lastLower: Boolean = true
 
   @JvmField
   protected var vimDocument: VimDocument? = null
@@ -210,7 +210,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     return insertText(editor, caret, caret.offset.point, str)
   }
 
-  open fun insertText(editor: VimEditor, caret: VimCaret, start: BufferPosition, str: String) {
+  public open fun insertText(editor: VimEditor, caret: VimCaret, start: BufferPosition, str: String) {
     insertText(editor, caret, editor.bufferPositionToOffset(start), str)
   }
 
@@ -1261,7 +1261,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     return true
   }
 
-  companion object {
+  public companion object {
     private const val MAX_REPEAT_CHARS_COUNT = 10000
     private val logger = vimLogger<VimChangeGroupBase>()
 
@@ -1275,7 +1275,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
      * @param range  The range corresponding to the selected block
      * @return total number of lines
      */
-    fun getLinesCountInVisualBlock(editor: VimEditor, range: TextRange): Int {
+    public fun getLinesCountInVisualBlock(editor: VimEditor, range: TextRange): Int {
       val startOffsets = range.startOffsets
       if (startOffsets.isEmpty()) return 0
       val firstStart = editor.offsetToBufferPosition(startOffsets[0])
@@ -1284,18 +1284,18 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     }
 
     protected const val HEX_START: @NonNls String = "0x"
-    const val VIM_MOTION_BIG_WORD_RIGHT = "VimMotionBigWordRightAction"
-    const val VIM_MOTION_WORD_RIGHT = "VimMotionWordRightAction"
-    const val VIM_MOTION_CAMEL_RIGHT = "VimMotionCamelRightAction"
-    const val VIM_MOTION_WORD_END_RIGHT = "VimMotionWordEndRightAction"
-    const val VIM_MOTION_BIG_WORD_END_RIGHT = "VimMotionBigWordEndRightAction"
-    const val VIM_MOTION_CAMEL_END_RIGHT = "VimMotionCamelEndRightAction"
-    const val MAX_HEX_INTEGER: @NonNls String = "ffffffffffffffff"
-    val wordMotions: Set<String> = setOf(VIM_MOTION_WORD_RIGHT, VIM_MOTION_BIG_WORD_RIGHT, VIM_MOTION_CAMEL_RIGHT)
+    public const val VIM_MOTION_BIG_WORD_RIGHT: String = "VimMotionBigWordRightAction"
+    public const val VIM_MOTION_WORD_RIGHT: String = "VimMotionWordRightAction"
+    public const val VIM_MOTION_CAMEL_RIGHT: String = "VimMotionCamelRightAction"
+    public const val VIM_MOTION_WORD_END_RIGHT: String = "VimMotionWordEndRightAction"
+    public const val VIM_MOTION_BIG_WORD_END_RIGHT: String = "VimMotionBigWordEndRightAction"
+    public const val VIM_MOTION_CAMEL_END_RIGHT: String = "VimMotionCamelEndRightAction"
+    public const val MAX_HEX_INTEGER: @NonNls String = "ffffffffffffffff"
+    public val wordMotions: Set<String> = setOf(VIM_MOTION_WORD_RIGHT, VIM_MOTION_BIG_WORD_RIGHT, VIM_MOTION_CAMEL_RIGHT)
   }
 }
 
-fun OperatedRange.toType() = when (this) {
+public fun OperatedRange.toType(): SelectionType = when (this) {
   is OperatedRange.Characters -> SelectionType.CHARACTER_WISE
   is OperatedRange.Lines -> SelectionType.LINE_WISE
   is OperatedRange.Block -> SelectionType.BLOCK_WISE

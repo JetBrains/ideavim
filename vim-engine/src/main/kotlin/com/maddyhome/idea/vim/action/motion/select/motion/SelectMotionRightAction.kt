@@ -25,7 +25,7 @@ import com.maddyhome.idea.vim.options.OptionConstants
  * @author Alex Plate
  */
 
-class SelectMotionRightAction : MotionActionHandler.ForEachCaret() {
+public class SelectMotionRightAction : MotionActionHandler.ForEachCaret() {
 
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
