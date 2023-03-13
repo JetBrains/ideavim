@@ -530,4 +530,10 @@ class VimSurroundExtensionTest : VimTestCase() {
 
     doTest(listOf("yss\""), before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
+
+  fun `test csw`() {
+    val before = "var1, va${c}r2, var3"
+    val after = "var1, ${c}\"var2\", var3"
+    doTest(listOf("csw\""), before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+  }
 }

@@ -35,7 +35,6 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.setRegisterForCaret
 import com.maddyhome.idea.vim.helper.editorMode
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.newapi.ij
-import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.helpers.ClipboardOptionHelper
 import com.maddyhome.idea.vim.put.PutData
 import org.jetbrains.annotations.NonNls
@@ -171,8 +170,9 @@ internal class VimSurroundExtension : VimExtension {
           }
         }
 
-        // Remove surrounding
-        perform("da" + pick(charFrom), editor.ij)
+        if (charFrom != 'w') {
+          perform("da" + pick(charFrom), editor.ij) // Remove surrounding
+        }
 
         surroundings.forEach {
           if (it.innerText == null && getRegisterForCaret(REGISTER, it.caret)?.isNotEmpty() == true) {
