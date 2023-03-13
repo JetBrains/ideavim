@@ -300,7 +300,7 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor() {
       0
     } else if (line >= this.lineCount()) {
       if (lineCount() != 0) {
-        StrictMode.fail("Incorrect line: $line")
+        StrictMode.fail("Incorrect line: $line, out of ${lineCount()}")
       }
       editor.fileSize
     } else {
