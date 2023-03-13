@@ -12,6 +12,7 @@ iskeyword
 keymodel
 lookupKeys
 matchpairs
+mapleader
 nrformats
 relativenumber
 scrolljump
