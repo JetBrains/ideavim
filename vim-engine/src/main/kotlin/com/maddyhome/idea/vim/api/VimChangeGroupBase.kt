@@ -171,7 +171,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       }
     }
     if (type == null ||
-      operatorArguments.mode.inInsertMode || 
+      operatorArguments.mode.inInsertMode ||
       !saveToRegister ||
       caret.registerStorage.storeText(editor, updatedRange, type, true)
     ) {

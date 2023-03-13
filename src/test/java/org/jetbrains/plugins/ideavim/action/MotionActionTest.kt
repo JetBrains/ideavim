@@ -535,28 +535,28 @@ class MotionActionTest : VimTestCase() {
     val before = """
       # Doesn't work <-- note the quote
 
-      print('${c}')
+      print('$c')
     """.trimIndent()
     val after = """
       # Doesn't work <-- note the quote
 
-      print(${c})
+      print($c)
     """.trimIndent()
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
-  
-  // VIM-2733
+
+// VIM-2733
   fun testDeleteOuterQuoteEmptyString2() {
     val keys = listOf("da'")
     val before = """
       # Doesn't work <-- note the quote
 
-      print(${c}'')
+      print($c'')
     """.trimIndent()
     val after = """
       # Doesn't work <-- note the quote
 
-      print(${c})
+      print($c)
     """.trimIndent()
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
@@ -572,7 +572,7 @@ class MotionActionTest : VimTestCase() {
     val after = """
       # This " fails
 
-      print(${c})
+      print($c)
     """.trimIndent()
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
@@ -583,17 +583,17 @@ class MotionActionTest : VimTestCase() {
     val before = """
       # This " fails
 
-      print(${c}"")
+      print($c"")
     """.trimIndent()
     val after = """
       # This " fails
 
-      print(${c})
+      print($c)
     """.trimIndent()
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
-  
-  // VIM-1427
+
+// VIM-1427
   fun testDeleteOuterTagWithCount() {
     val keys = listOf("d2at")
     val before = "<a><b><c>$c</c></b></a>"

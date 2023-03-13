@@ -17,8 +17,8 @@ import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.helper.editorMode
 import com.maddyhome.idea.vim.group.IjOptionConstants
+import com.maddyhome.idea.vim.helper.editorMode
 import kotlin.test.fail
 
 /**

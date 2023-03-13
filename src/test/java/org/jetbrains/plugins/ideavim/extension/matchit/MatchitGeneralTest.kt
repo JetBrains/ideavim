@@ -189,14 +189,13 @@ class MatchitGeneralTest : VimTestCase() {
           puts "Positive"
         end
       """.trimIndent(),
-        """
+      """
               if x == 0
                 puts "Zero"
               $c
                 puts "Positive"
               end
-        """.trimIndent()
-      ,
+      """.trimIndent(),
       fileName = "ruby.rb"
     )
   }

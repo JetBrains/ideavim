@@ -59,7 +59,8 @@ internal object VimExtensionRegistrar : VimExtensionRegistrator {
     registeredExtensions.add(name)
     registerAliases(extensionBean)
     VimPlugin.getOptionGroup().addOption(ToggleOption(name, getAbbrev(name), false))
-    VimPlugin.getOptionGroup().addListener(name,
+    VimPlugin.getOptionGroup().addListener(
+      name,
       object : OptionChangeListener<VimDataType> {
         override fun processGlobalValueChange(oldValue: VimDataType?) {
           if (injector.globalOptions().isSet(name)) {

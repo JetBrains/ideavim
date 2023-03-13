@@ -181,7 +181,6 @@ abstract class VimOptionGroupBase : VimOptionGroup {
     ToggleOption(OptionConstants.octopushandler, OptionConstants.octopushandler, false),
   )
 
-
   override fun getOptionValue(option: Option<out VimDataType>, scope: OptionScope): VimDataType {
     return when (scope) {
       is OptionScope.LOCAL -> getLocalOptionValue(option.name, scope.editor) as VimDataType
@@ -207,7 +206,6 @@ abstract class VimOptionGroupBase : VimOptionGroup {
 
   override fun getOption(key: String) = options.get(key)
   override fun getAllOptions() = options.values.toSet()
-
 
   private fun setGlobalOptionValue(optionName: String, value: VimDataType) {
     globalValues[optionName] = value

@@ -134,7 +134,7 @@ internal class EscapeCharAction : TextAction(ExEditorKit.EscapeChar) {
   }
 }
 
-abstract internal class DeleteCharAction internal constructor(name: String?) : TextAction(name) {
+internal abstract class DeleteCharAction internal constructor(name: String?) : TextAction(name) {
   @kotlin.jvm.Throws(BadLocationException::class)
   fun deleteSelection(doc: Document, dot: Int, mark: Int): Boolean {
     if (dot != mark) {

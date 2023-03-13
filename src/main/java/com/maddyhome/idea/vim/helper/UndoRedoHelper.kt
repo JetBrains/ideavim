@@ -20,10 +20,10 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.ChangesListener
+import com.maddyhome.idea.vim.group.IjOptionConstants
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.undo.UndoRedoBase
-import com.maddyhome.idea.vim.group.IjOptionConstants
 
 /**
  * @author oleg

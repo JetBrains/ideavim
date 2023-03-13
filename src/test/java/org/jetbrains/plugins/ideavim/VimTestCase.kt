@@ -684,9 +684,9 @@ abstract class VimTestCase : UsefulTestCase() {
   }
 
   sealed interface CharType {
-    object UNDEFINED: CharType
-    class CharDetected(val char: Char): CharType
-    class EditorAction(val name: String): CharType
+    object UNDEFINED : CharType
+    class CharDetected(val char: Char) : CharType
+    class EditorAction(val name: String) : CharType
   }
 
   companion object {

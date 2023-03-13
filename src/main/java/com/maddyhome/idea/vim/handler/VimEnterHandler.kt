@@ -88,8 +88,8 @@ internal class VimEscHandler(nextHandler: EditorActionHandler) : VimKeyHandler(n
   override val key: String = "<Esc>"
 
   override fun isHandlerEnabled(editor: Editor, dataContext: DataContext?): Boolean {
-    return editor.mode != CommandState.Mode.COMMAND
-      || editor.vimStateMachine?.commandBuilder?.count != 0
+    return editor.mode != CommandState.Mode.COMMAND ||
+      editor.vimStateMachine?.commandBuilder?.count != 0
   }
 }
 

@@ -103,7 +103,7 @@ class MoveCommandTest : VimTestCase() {
       """.trimIndent()
     )
   }
-  
+
   fun `test moving multiple lines with omitted selection start mark`() {
     configureByText(
       """
@@ -126,7 +126,7 @@ class MoveCommandTest : VimTestCase() {
       """.trimIndent()
     )
   }
-  
+
   fun `test moving text to first line`() {
     configureByText(
       """

@@ -82,7 +82,6 @@ interface VimOptionGroup {
   fun getValueAccessor(editor: VimEditor?): OptionValueAccessor
 }
 
-
 /**
  * Checks if option is set to its default value
  */
@@ -133,7 +132,6 @@ fun VimOptionGroup.invertToggleOption(option: ToggleOption, scope: OptionScope) 
   setOptionValue(option, scope, if (optionValue.asBoolean()) VimInt.ZERO else VimInt.ONE)
 }
 
-
 /**
  * Get an instance of [Option] for a well-known option name
  *
@@ -154,7 +152,6 @@ fun VimOptionGroup.getKnownToggleOption(optionName: String) = getOption(optionNa
  * The option must exist, or an exception will be thrown
  */
 fun VimOptionGroup.getKnownStringOption(optionName: String) = getOption(optionName) as StringOption
-
 
 /**
  * Modifies the value of an option by calling the given transform function

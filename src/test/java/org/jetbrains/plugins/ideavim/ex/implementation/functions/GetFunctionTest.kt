@@ -16,7 +16,7 @@ class GetFunctionTest : VimTestCase() {
     typeText(commandToKeys("echo get({1: 'one', 2: 'two', 3: 'three'}, '2')"))
     assertExOutput("two\n")
   }
-  
+
   fun `test get by nonexistent key in dictionary`() {
     configureByText("\n")
     typeText(commandToKeys("echo get({1: 'one', 2: 'two', 3: 'three'}, '10')"))

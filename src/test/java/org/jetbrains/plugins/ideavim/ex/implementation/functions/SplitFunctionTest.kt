@@ -16,7 +16,7 @@ class SplitFunctionTest : VimTestCase() {
     typeText(commandToKeys("echo split('Hello world')"))
     assertExOutput("['Hello', 'world']\n")
   }
-  
+
   fun `test split comma separated text`() {
     configureByText("\n")
     typeText(commandToKeys("echo split('a,b,c,d', ',')"))
@@ -28,7 +28,7 @@ class SplitFunctionTest : VimTestCase() {
     typeText(commandToKeys("echo split(',a,b,c,d,', ',')"))
     assertExOutput("['a', 'b', 'c', 'd']\n")
   }
-  
+
   fun `test split comma separated text with keepempty flag`() {
     configureByText("\n")
     typeText(commandToKeys("echo split(',a,b,c,,d,', ',', 1)"))

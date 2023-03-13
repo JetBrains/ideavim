@@ -178,7 +178,7 @@ internal class FunctionStorage : VimscriptFunctionService {
   companion object {
     private val extensionPoint = ExtensionPointName.create<FunctionBeanClass>("IdeaVIM.vimLibraryFunction")
 
-    inline fun <reified T: FunctionHandler> getFunctionOfType(): T {
+    inline fun <reified T : FunctionHandler> getFunctionOfType(): T {
       val point = extensionPoint.getExtensionList(ApplicationManager.getApplication())
         .single { it.implementation == T::class.java.name }
       return point.instance as T

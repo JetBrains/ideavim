@@ -49,8 +49,7 @@ class CommandParserTest : VimTestCase() {
     val after = if (enableOctopus) {
       """I :>>
         |${c}found it in a legendary land""".trimMargin()
-    }
-    else {
+    } else {
       "I :>>${c}found it in a legendary land"
     }
     doTest(exCommand(">>"), before, after) {
