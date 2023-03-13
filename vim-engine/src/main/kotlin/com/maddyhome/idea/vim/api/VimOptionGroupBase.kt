@@ -27,16 +27,17 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
-public abstract class VimOptionGroupBase : VimOptionGroup {
-  private val logger = vimLogger<VimOptionGroupBase>()
+public object Options {
+  private val logger = vimLogger<Options>()
 
-  private val globalValues = mutableMapOf<String, VimDataType>()
-  private val localOptionsKey = Key<MutableMap<String, VimDataType>>("localOptions")
-  private val globalOptionValueAccessor by lazy { OptionValueAccessor(this, OptionScope.GLOBAL) }
+  public fun getOption(key: String): Option<out VimDataType>? = options.get(key)
+  public fun getAllOptions(): Set<Option<out VimDataType>> = options.values.toSet()
+
+  public fun addOption(option: Option<out VimDataType>): Unit = options.put(option.name, option.abbrev, option)
+  public fun removeOption(optionName: String): Unit = options.remove(optionName)
 
   private val options = MultikeyMap(
     // Simple options, sorted by name
-    StringOption(OptionConstants.clipboard, OptionConstants.clipboardAlias, "autoselect,exclude:cons\\|linux", isList = true),
     ToggleOption(OptionConstants.digraph, "dg", false),
     ToggleOption(OptionConstants.gdefault, "gd", false),
     UnsignedNumberOption(OptionConstants.history, "hi", 50),
@@ -51,8 +52,6 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
     NumberOption(OptionConstants.scroll, "scr", 0),
     NumberOption(OptionConstants.scrolloff, "so", 0),
     StringOption(OptionConstants.selection, "sel", "inclusive", isList = false, setOf("old", "inclusive", "exclusive")),
-    StringOption(OptionConstants.shell, "sh", if (injector.systemInfoService.isWindows) "cmd.exe" else System.getenv("SHELL") ?: "sh"),
-    StringOption(OptionConstants.shellxescape, "sxe", if (injector.systemInfoService.isWindows) "\"&|<>()@^" else "", isList = false),
     ToggleOption(OptionConstants.showcmd, "sc", true),
     ToggleOption(OptionConstants.showmode, "smd", true),
     NumberOption(OptionConstants.sidescroll, "ss", 0),
@@ -148,11 +147,16 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
         OptionConstants.selectmode_ideaselection,
       ),
     ),
+    StringOption(
+      OptionConstants.shell,
+      "sh",
+      if (injector.systemInfoService.isWindows) "cmd.exe" else System.getenv("SHELL") ?: "sh"
+    ),
     object : StringOption(OptionConstants.shellcmdflag, "shcf", "") {
       override val defaultValue: VimString
         get() {
           // Default value depends on the "shell" option
-          val shell = (getGlobalOptionValue(OptionConstants.shell) as VimString).value
+          val shell = injector.globalOptions().getStringValue(OptionConstants.shell)
           return VimString(
             when {
               injector.systemInfoService.isWindows && shell.contains("powershell") -> "-Command"
@@ -162,11 +166,17 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
           )
         }
     },
+    StringOption(
+      OptionConstants.shellxescape,
+      "sxe",
+      if (injector.systemInfoService.isWindows) "\"&|<>()@^" else "",
+      isList = false
+    ),
     object : StringOption(OptionConstants.shellxquote, "sxq", "") {
       override val defaultValue: VimString
         get() {
           // Default value depends on the "shell" option
-          val shell = (getGlobalOptionValue(OptionConstants.shell) as VimString).value
+          val shell = injector.globalOptions().getStringValue(OptionConstants.shell)
           return VimString(
             when {
               injector.systemInfoService.isWindows && shell == "cmd.exe" -> "("
@@ -177,16 +187,30 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
         }
     },
 
+    // TODO: Clipboard is special - it is overridden to provide a new default value for the IJ implementation
+    StringOption(
+      OptionConstants.clipboard,
+      OptionConstants.clipboardAlias,
+      "autoselect,exclude:cons\\|linux",
+      isList = true
+    ),
+
     // IdeaVim specific options. Put any editor/IDE specific options in IjVimOptionService
     ToggleOption(OptionConstants.ideaglobalmode, OptionConstants.ideaglobalmode, false),
     ToggleOption(OptionConstants.ideastrictmode, OptionConstants.ideastrictmode, false),
     ToggleOption(OptionConstants.ideatracetime, OptionConstants.ideatracetime, false),
   )
+}
+
+public abstract class VimOptionGroupBase : VimOptionGroup {
+  private val globalValues = mutableMapOf<String, VimDataType>()
+  private val localOptionsKey = Key<MutableMap<String, VimDataType>>("localOptions")
+  private val globalOptionValueAccessor by lazy { OptionValueAccessor(this, OptionScope.GLOBAL) }
 
   override fun getOptionValue(option: Option<out VimDataType>, scope: OptionScope): VimDataType {
     return when (scope) {
-      is OptionScope.LOCAL -> getLocalOptionValue(option.name, scope.editor) as VimDataType
-      is OptionScope.GLOBAL -> getGlobalOptionValue(option.name) as VimDataType
+      is OptionScope.LOCAL -> getLocalOptionValue(option, scope.editor)
+      is OptionScope.GLOBAL -> getGlobalOptionValue(option)
     }
   }
 
@@ -206,8 +230,8 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
     option.onChanged(scope, oldValue)
   }
 
-  override fun getOption(key: String): Option<out VimDataType>? = options.get(key)
-  override fun getAllOptions(): Set<Option<out VimDataType>> = options.values.toSet()
+  override fun getOption(key: String): Option<out VimDataType>? = Options.getOption(key)
+  override fun getAllOptions(): Set<Option<out VimDataType>> = Options.getAllOptions()
 
   private fun setGlobalOptionValue(optionName: String, value: VimDataType) {
     globalValues[optionName] = value
@@ -229,14 +253,12 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
     localOptions[optionName] = value
   }
 
-  private fun getGlobalOptionValue(optionName: String): VimDataType? {
-    val option = options.get(optionName) ?: return null
-    return globalValues[option.name] ?: options.get(option.name)?.defaultValue
-  }
+  private fun getGlobalOptionValue(option: Option<out VimDataType>) =
+    globalValues[option.name] ?: option.defaultValue
 
-  private fun getLocalOptionValue(optionName: String, editor: VimEditor): VimDataType? {
+  private fun getLocalOptionValue(option: Option<out VimDataType>, editor: VimEditor): VimDataType {
     val localOptions = getLocalOptions(editor)
-    return localOptions[optionName] ?: getGlobalOptionValue(optionName)
+    return localOptions[option.name] ?: getGlobalOptionValue(option)
   }
 
   override fun resetAllOptions() {
@@ -246,22 +268,23 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
   }
 
   override fun addOption(option: Option<out VimDataType>) {
-    options.put(option.name, option.abbrev, option)
+    Options.addOption(option)
   }
 
   override fun removeOption(optionName: String) {
-    options.remove(optionName)
+    Options.removeOption(optionName)
   }
 
   override fun addListener(optionName: String, listener: OptionChangeListener<VimDataType>, executeOnAdd: Boolean) {
-    options.get(optionName)!!.addOptionChangeListener(listener)
+    val option = Options.getOption(optionName)!!
+    option.addOptionChangeListener(listener)
     if (executeOnAdd) {
-      listener.processGlobalValueChange(getGlobalOptionValue(optionName))
+      listener.processGlobalValueChange(getGlobalOptionValue(option))
     }
   }
 
   override fun removeListener(optionName: String, listener: OptionChangeListener<VimDataType>) {
-    options.get(optionName)!!.removeOptionChangeListener(listener)
+    Options.getOption(optionName)!!.removeOptionChangeListener(listener)
   }
 
   override fun getValueAccessor(editor: VimEditor?): OptionValueAccessor =
