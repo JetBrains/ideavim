@@ -12,7 +12,8 @@ import com.maddyhome.idea.vim.api.VimOptionGroupBase
 
 internal class OptionGroup : VimOptionGroupBase() {
   init {
-    IjOptions.initialise()
+    // Force IjOptions to initialise (temporary work around)
+    val xx = IjOptions.closenotebooks
   }
 }
 
