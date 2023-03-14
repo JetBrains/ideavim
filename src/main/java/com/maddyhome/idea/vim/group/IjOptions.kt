@@ -18,25 +18,17 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 
 @Suppress("SpellCheckingInspection")
 public object IjOptions {
-  public val closenotebooks: ToggleOption =
-    addOption(ToggleOption(IjOptionConstants.closenotebooks, IjOptionConstants.closenotebooks, true))
-  public val ide: StringOption = addOption(
-    StringOption(
-      IjOptionConstants.ide,
-      IjOptionConstants.ide,
-      ApplicationNamesInfo.getInstance().fullProductNameWithEdition
-    )
-  )
+  public val closenotebooks: ToggleOption = addOption(ToggleOption("closenotebooks", "closenotebooks", true))
+  public val ide: StringOption =
+    addOption(StringOption("ide", "ide", ApplicationNamesInfo.getInstance().fullProductNameWithEdition))
   public val ideacopypreprocess: ToggleOption =
-    addOption(ToggleOption(IjOptionConstants.ideacopypreprocess, IjOptionConstants.ideacopypreprocess, false))
-  public val ideajoin: ToggleOption =
-    addOption(ToggleOption(IjOptionConstants.ideajoin, IjOptionConstants.ideajoin, false))
-  public val ideamarks: ToggleOption =
-    addOption(ToggleOption(IjOptionConstants.ideamarks, IjOptionConstants.ideamarks, true))
+    addOption(ToggleOption("ideacopypreprocess", "ideacopypreprocess", false))
+  public val ideajoin: ToggleOption = addOption(ToggleOption("ideajoin", "ideajoin", false))
+  public val ideamarks: ToggleOption = addOption(ToggleOption("ideamarks", "ideamarks", true))
   public val idearefactormode: StringOption = addOption(
     StringOption(
-      IjOptionConstants.idearefactormode,
-      IjOptionConstants.idearefactormode,
+      "idearefactormode",
+      "idearefactormode",
       "select",
       isList = false,
       IjOptionConstants.ideaRefactorModeValues
@@ -44,8 +36,8 @@ public object IjOptions {
   )
   public val ideastatusicon: StringOption = addOption(
     StringOption(
-      IjOptionConstants.ideastatusicon,
-      IjOptionConstants.ideastatusicon,
+      "ideastatusicon",
+      "ideastatusicon",
       "enabled",
       isList = false,
       IjOptionConstants.ideaStatusIconValues
@@ -53,37 +45,28 @@ public object IjOptions {
   )
   public val ideavimsupport: StringOption = addOption(
     StringOption(
-      IjOptionConstants.ideavimsupport,
-      IjOptionConstants.ideavimsupport,
+      "ideavimsupport",
+      "ideavimsupport",
       "dialog",
       isList = true,
       IjOptionConstants.ideavimsupportValues
     )
   )
-  public val ideawrite: StringOption = addOption(
-    StringOption(
-      IjOptionConstants.ideawrite,
-      IjOptionConstants.ideawrite,
-      "all",
-      isList = false,
-      IjOptionConstants.ideaWriteValues
-    )
-  )
+  @JvmField public val ideawrite: StringOption =
+    addOption(StringOption("ideawrite", "ideawrite", "all", isList = false, IjOptionConstants.ideaWriteValues))
   public val lookupkeys: StringOption = addOption(
     StringOption(
-      IjOptionConstants.lookupkeys,
-      IjOptionConstants.lookupkeys,
+      "lookupkeys",
+      "lookupkeys",
       "<Tab>,<Down>,<Up>,<Enter>,<Left>,<Right>,<C-Down>,<C-Up>,<PageUp>,<PageDown>,<C-J>,<C-Q>",
       isList = true
     )
   )
-  public val octopusHandler: ToggleOption =
-    addOption(ToggleOption(IjOptionConstants.octopushandler, IjOptionConstants.octopushandler, false))
-  public val oldundo: ToggleOption = addOption(ToggleOption(IjOptionConstants.oldundo, IjOptionConstants.oldundo, true))
-  public val trackactionids: ToggleOption = addOption(ToggleOption(IjOptionConstants.trackactionids, "tai", false))
+  public val octopushandler: ToggleOption = addOption(ToggleOption("octopushandler", "octopushandler", false))
+  public val oldundo: ToggleOption = addOption(ToggleOption("oldundo", "oldundo", true))
+  public val trackactionids: ToggleOption = addOption(ToggleOption("trackactionids", "tai", false))
   public val unifyjumps: ToggleOption = addOption(ToggleOption("unifyjumps", "unifyjumps", true))
-  public val visualdelay: UnsignedNumberOption =
-    addOption(UnsignedNumberOption(IjOptionConstants.visualdelay, IjOptionConstants.visualdelay, 100))
+  public val visualdelay: UnsignedNumberOption = addOption(UnsignedNumberOption("visualdelay", "visualdelay", 100))
 
   // TODO: Figure out how to nicely override clipboard's default value for the IntelliJ specific ideaput value
   // This options overrides Vim's default value, so we keep it here

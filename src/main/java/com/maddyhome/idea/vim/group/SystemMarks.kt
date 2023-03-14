@@ -23,7 +23,7 @@ internal class SystemMarks {
   companion object {
     @JvmStatic
     fun createOrGetSystemMark(ch: Char, line: Int, editor: Editor): LineBookmark? {
-      if (!injector.options(editor.vim).isSet(IjOptionConstants.ideamarks)) return null
+      if (!injector.options(editor.vim).isSet(IjOptions.ideamarks)) return null
 
       val project = editor.project ?: return null
       val type = BookmarkType.get(ch)

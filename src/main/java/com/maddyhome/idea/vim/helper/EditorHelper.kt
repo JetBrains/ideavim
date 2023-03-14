@@ -19,6 +19,7 @@ import com.intellij.util.ui.table.JBTableRowEditor
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.IjOptionConstants
+import com.maddyhome.idea.vim.group.IjOptions
 import java.awt.Component
 import javax.swing.JComponent
 import javax.swing.JTable
@@ -33,7 +34,7 @@ public val Editor.fileSize: Int
  */
 internal val Editor.isIdeaVimDisabledHere: Boolean
   get() {
-    val ideaVimSupportValue = injector.globalOptions().getStringListValues(IjOptionConstants.ideavimsupport)
+    val ideaVimSupportValue = injector.globalOptions().getStringListValues(IjOptions.ideavimsupport)
     return disabledInDialog ||
       (!ClientId.isCurrentlyUnderLocalId) || // CWM-927
       (!ideaVimSupportValue.contains(IjOptionConstants.ideavimsupport_singleline) && isDatabaseCell()) ||
@@ -46,7 +47,7 @@ private fun Editor.isDatabaseCell(): Boolean {
 
 private val Editor.disabledInDialog: Boolean
   get() {
-    val ideaVimSupportValue = injector.globalOptions().getStringListValues(IjOptionConstants.ideavimsupport)
+    val ideaVimSupportValue = injector.globalOptions().getStringListValues(IjOptions.ideavimsupport)
     return (
       !ideaVimSupportValue.contains(IjOptionConstants.ideavimsupport_dialog) &&
         !ideaVimSupportValue.contains(IjOptionConstants.ideavimsupport_dialoglegacy)

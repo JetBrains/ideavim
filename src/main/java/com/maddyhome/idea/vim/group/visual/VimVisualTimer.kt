@@ -11,7 +11,7 @@ package com.maddyhome.idea.vim.group.visual
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.VimStateMachine
-import com.maddyhome.idea.vim.group.IjOptionConstants
+import com.maddyhome.idea.vim.group.IjOptions
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer.mode
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer.singleTask
 import java.awt.event.ActionEvent
@@ -64,9 +64,7 @@ internal object VimVisualTimer {
     if (mode == null) mode = currentMode
 
     // Default delay - 100 ms
-    val timer = Timer(injector.globalOptions().getIntValue(IjOptionConstants.visualdelay)) {
-      timerAction(task)
-    }
+    val timer = Timer(injector.globalOptions().getIntValue(IjOptions.visualdelay)) { timerAction(task) }
     timer.isRepeats = false
     timer.start()
     swingTimer = timer

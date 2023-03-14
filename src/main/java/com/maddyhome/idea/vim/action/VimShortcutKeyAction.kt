@@ -30,6 +30,7 @@ import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.group.IjOptionConstants
+import com.maddyhome.idea.vim.group.IjOptions
 import com.maddyhome.idea.vim.handler.enableOctopus
 import com.maddyhome.idea.vim.handler.isOctopusEnabled
 import com.maddyhome.idea.vim.helper.EditorHelper
@@ -191,7 +192,7 @@ internal class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatib
   }
 
   private fun isEnabledForEscape(editor: Editor): Boolean {
-    val ideaVimSupportDialog = injector.options(editor.vim).hasValue(IjOptionConstants.ideavimsupport, IjOptionConstants.ideavimsupport_dialog)
+    val ideaVimSupportDialog = injector.options(editor.vim).hasValue(IjOptions.ideavimsupport, IjOptionConstants.ideavimsupport_dialog)
     return editor.isPrimaryEditor() ||
       EditorHelper.isFileEditor(editor) && !editor.inNormalMode ||
       ideaVimSupportDialog && !editor.inNormalMode
@@ -239,15 +240,12 @@ internal class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatib
     private var parsedLookupKeys: Set<KeyStroke> = parseLookupKeys()
 
     init {
-      VimPlugin.getOptionGroup().addListener(
-        IjOptionConstants.lookupkeys,
-        { parsedLookupKeys = parseLookupKeys() },
-      )
+      VimPlugin.getOptionGroup().addListener(IjOptions.lookupkeys.name, { parsedLookupKeys = parseLookupKeys() })
     }
 
     fun isEnabledForLookup(keyStroke: KeyStroke): Boolean = keyStroke !in parsedLookupKeys
 
-    private fun parseLookupKeys() = injector.globalOptions().getStringListValues(IjOptionConstants.lookupkeys)
+    private fun parseLookupKeys() = injector.globalOptions().getStringListValues(IjOptions.lookupkeys)
       .map { injector.parser.parseKeys(it) }
       .filter { it.isNotEmpty() }
       .map { it.first() }

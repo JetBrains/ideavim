@@ -16,7 +16,6 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimOptionGroup
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.diagnostic.vimLogger
-import com.maddyhome.idea.vim.group.IjOptionConstants
 import com.maddyhome.idea.vim.options.NumberOption
 import com.maddyhome.idea.vim.options.Option
 import com.maddyhome.idea.vim.options.OptionChangeListener
@@ -28,6 +27,7 @@ import com.maddyhome.idea.vim.options.UnsignedNumberOption
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
+import org.jetbrains.plugins.ideavim.TestIjOptionConstants
 import org.jetbrains.plugins.ideavim.TestOptionConstants
 import org.jetbrains.plugins.ideavim.product
 import org.junit.jupiter.api.TestTemplate
@@ -155,10 +155,10 @@ private class OptionsVerificator : BeforeTestExecutionCallback, AfterTestExecuti
       TestOptionConstants.guicursor,
       TestOptionConstants.ideaglobalmode,
       TestOptionConstants.ideatracetime,
-      IjOptionConstants.ideavimsupport,
+      TestIjOptionConstants.ideavimsupport,
       TestOptionConstants.maxmapdepth,
       TestOptionConstants.number,
-      IjOptionConstants.octopushandler,
+      TestIjOptionConstants.octopushandler,
       TestOptionConstants.relativenumber,
       TestOptionConstants.scrolljump,
       TestOptionConstants.scrolloff,
@@ -166,8 +166,8 @@ private class OptionsVerificator : BeforeTestExecutionCallback, AfterTestExecuti
       TestOptionConstants.sidescroll,
       TestOptionConstants.sidescrolloff,
       TestOptionConstants.timeoutlen,
-      IjOptionConstants.trackactionids,
-      IjOptionConstants.unifyjumps,
+      TestIjOptionConstants.trackactionids,
+      TestIjOptionConstants.unifyjumps,
       TestOptionConstants.virtualedit,
       TestOptionConstants.whichwrap,
     )

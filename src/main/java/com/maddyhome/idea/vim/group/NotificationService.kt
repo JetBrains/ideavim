@@ -30,7 +30,6 @@ import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.SystemInfo
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.Options
-import com.maddyhome.idea.vim.api.getKnownToggleOption
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.modifyOptionValue
 import com.maddyhome.idea.vim.api.setToggleOption
@@ -98,10 +97,9 @@ internal class NotificationService(private val project: Project?) {
       AppendToIdeaVimRcAction(
         notification,
         "set ideajoin",
-        IjOptionConstants.ideajoin,
+        "idejoin"
       ) {
-        val option = injector.optionGroup.getKnownToggleOption(IjOptionConstants.ideajoin)
-        injector.optionGroup.setToggleOption(option, OptionScope.GLOBAL)
+        injector.optionGroup.setToggleOption(IjOptions.ideajoin, OptionScope.GLOBAL)
       },
     )
 
@@ -234,8 +232,7 @@ internal class NotificationService(private val project: Project?) {
 
     class StopTracking : DumbAwareAction("Stop Tracking") {
       override fun actionPerformed(e: AnActionEvent) {
-        val option = injector.optionGroup.getKnownToggleOption(IjOptionConstants.trackactionids)
-        injector.optionGroup.unsetToggleOption(option, OptionScope.GLOBAL)
+        injector.optionGroup.unsetToggleOption(IjOptions.trackactionids, OptionScope.GLOBAL)
         notification?.expire()
       }
     }

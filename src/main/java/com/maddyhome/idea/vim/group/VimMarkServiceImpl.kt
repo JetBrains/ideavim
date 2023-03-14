@@ -38,7 +38,6 @@ import com.maddyhome.idea.vim.mark.VimMark.Companion.create
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import org.jdom.Element
 import java.util.*
-import kotlin.Comparator
 
 // todo save jumps after IDE close
 // todo sync vim jumps with ide jumps
@@ -54,7 +53,7 @@ internal class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateCompone
 
   private fun saveData(element: Element) {
     val globalMarksElement = Element("globalmarks")
-    if (!injector.globalOptions().isSet(IjOptionConstants.ideamarks)) {
+    if (!injector.globalOptions().isSet(IjOptions.ideamarks)) {
       for (mark in globalMarks.values) {
         val markElem = Element("mark")
         markElem.setAttribute("key", mark.key.toString())
@@ -104,7 +103,7 @@ internal class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateCompone
     // Read access is allowed from event dispatch thread or inside read-action only
     // (see com.intellij.openapi.application.Application.runReadAction())
     val marksElem = element.getChild("globalmarks")
-    if (marksElem != null && !injector.globalOptions().isSet(IjOptionConstants.ideamarks)) {
+    if (marksElem != null && !injector.globalOptions().isSet(IjOptions.ideamarks)) {
       val markList = marksElem.getChildren("mark")
       for (aMarkList in markList) {
         val mark: Mark? = create(
@@ -167,7 +166,7 @@ internal class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateCompone
   }
 
   override fun createGlobalMark(editor: VimEditor, char: Char, offset: Int): Mark? {
-    if (!injector.globalOptions().isSet(IjOptionConstants.ideamarks)) {
+    if (!injector.globalOptions().isSet(IjOptions.ideamarks)) {
       return super.createGlobalMark(editor, char, offset)
     }
     val lp = editor.offsetToBufferPosition(offset)
@@ -242,7 +241,7 @@ internal class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateCompone
   class VimBookmarksListener(private val myProject: Project) : BookmarksListener {
     override fun bookmarkAdded(group: BookmarkGroup, bookmark: Bookmark) {
       if (!VimPlugin.isEnabled()) return
-      if (!injector.globalOptions().isSet(IjOptionConstants.ideamarks)) {
+      if (!injector.globalOptions().isSet(IjOptions.ideamarks)) {
         return
       }
       if (bookmark !is LineBookmark) return
@@ -255,7 +254,7 @@ internal class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateCompone
 
     override fun bookmarkRemoved(group: BookmarkGroup, bookmark: Bookmark) {
       if (!VimPlugin.isEnabled()) return
-      if (!injector.globalOptions().isSet(IjOptionConstants.ideamarks)) {
+      if (!injector.globalOptions().isSet(IjOptions.ideamarks)) {
         return
       }
       if (bookmark !is LineBookmark) return

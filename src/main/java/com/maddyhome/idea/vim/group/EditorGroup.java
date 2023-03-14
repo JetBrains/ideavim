@@ -232,7 +232,7 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
   }
 
   public void notifyIdeaJoin(@Nullable Project project) {
-    if (VimPlugin.getVimState().isIdeaJoinNotified() || globalOptions(injector).isSet(IjOptionConstants.ideajoin)) {
+    if (VimPlugin.getVimState().isIdeaJoinNotified() || globalOptions(injector).isSet(IjOptions.INSTANCE.getIdeajoin())) {
       return;
     }
 
