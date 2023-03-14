@@ -9,14 +9,16 @@
 package com.maddyhome.idea.vim.group
 
 import com.intellij.openapi.application.ApplicationNamesInfo
+import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.VimOptionGroupBase
+import com.maddyhome.idea.vim.options.Option
 import com.maddyhome.idea.vim.options.StringOption
 import com.maddyhome.idea.vim.options.ToggleOption
 import com.maddyhome.idea.vim.options.UnsignedNumberOption
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 
-internal class OptionGroup : VimOptionGroupBase() {
-
-  init {
+public object IjOptions {
+  public fun initialise() {
     addOption(ToggleOption(IjOptionConstants.closenotebooks, IjOptionConstants.closenotebooks, true))
     addOption(
       StringOption(
@@ -89,6 +91,16 @@ internal class OptionGroup : VimOptionGroupBase() {
 //    )
 
     addOption(ToggleOption("unifyjumps", "unifyjumps", true))
+  }
+
+  // This needs to be Option<out VimDataType> so that it can work with derived option types, such as NumberOption, which
+  // derives from Option<VimInt>
+  private fun <T : Option<out VimDataType>> addOption(option: T) = option.also { Options.addOption(option) }
+}
+
+internal class OptionGroup : VimOptionGroupBase() {
+  init {
+    IjOptions.initialise()
   }
 }
 
