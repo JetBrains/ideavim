@@ -74,7 +74,7 @@ internal class VimJumpServiceImpl : VimJumpServiceBase(), PersistentStateCompone
 
 internal class JumpsListener : RecentPlacesListener {
   override fun recentPlaceAdded(changePlace: PlaceInfo, isChanged: Boolean) {
-    if (!injector.globalOptions().isSet("unifyjumps")) return
+    if (!injector.globalOptions().isSet(IjOptions.unifyjumps)) return
 
     val jumpService = injector.jumpService
     if (!isChanged) {
@@ -86,7 +86,7 @@ internal class JumpsListener : RecentPlacesListener {
   }
 
   override fun recentPlaceRemoved(changePlace: PlaceInfo, isChanged: Boolean) {
-    if (!injector.globalOptions().isSet("unifyjumps")) return
+    if (!injector.globalOptions().isSet(IjOptions.unifyjumps)) return
 
     val jumpService = injector.jumpService
     if (!isChanged) {

@@ -59,12 +59,13 @@ internal object VimExtensionRegistrar : VimExtensionRegistrator {
 
     registeredExtensions.add(name)
     registerAliases(extensionBean)
-    VimPlugin.getOptionGroup().addOption(ToggleOption(name, getAbbrev(name), false))
+    val option = ToggleOption(name, getAbbrev(name), false)
+    VimPlugin.getOptionGroup().addOption(option)
     VimPlugin.getOptionGroup().addListener(
       name,
       object : OptionChangeListener<VimDataType> {
         override fun processGlobalValueChange(oldValue: VimDataType?) {
-          if (injector.globalOptions().isSet(name)) {
+          if (injector.globalOptions().isSet(option)) {
             initExtension(extensionBean, name)
             PluginState.enabledExtensions.add(name)
           } else {

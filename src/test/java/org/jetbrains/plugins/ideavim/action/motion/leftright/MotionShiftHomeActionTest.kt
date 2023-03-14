@@ -10,6 +10,7 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.leftright
 
+import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.options.OptionConstants
@@ -54,7 +55,7 @@ class MotionShiftHomeActionTest : VimTestCase() {
     VimOption(TestOptionConstants.selectmode, doesntAffectTest = true),
   )
   fun `test default continueselect`() {
-    val keymodel = optionsNoEditor().getStringListValues(TestOptionConstants.keymodel)
+    val keymodel = optionsNoEditor().getStringListValues(Options.keymodel)
     kotlin.test.assertTrue(OptionConstants.keymodel_continueselect in keymodel)
   }
 
