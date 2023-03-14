@@ -25,37 +25,52 @@ import com.maddyhome.idea.vim.vimscript.services.OptionService
  */
 public class OptionValueAccessor(private val optionGroup: VimOptionGroup, public val scope: OptionScope) {
   /** Gets the loosely typed option value */
-  public fun getValue(optionName: String): VimDataType = optionGroup.getOptionValue(optionGroup.getOption(optionName)!!, scope)
+  public fun getValue(option: Option<out VimDataType>): VimDataType = optionGroup.getOptionValue(option, scope)
 
   /** Gets the option value as an integer */
-  public fun getIntValue(optionName: String): Int = getValue(optionName).toVimNumber().value
+  public fun getIntValue(option: NumberOption): Int = getValue(option).toVimNumber().value
 
   /** Gets the option value as a string */
-  public fun getStringValue(optionName: String): String = getValue(optionName).asString()
+  public fun getStringValue(option: StringOption): String = getValue(option).asString()
 
   /**
    * Gets the option value as a string list
    *
    * @see hasValue
    */
-  public fun getStringListValues(optionName: String): List<String> {
-    val option = (optionGroup.getOption(optionName) as? StringOption) ?: return emptyList()
-    return optionGroup.getStringListValues(option, scope)
-  }
+  public fun getStringListValues(option: StringOption): List<String> = optionGroup.getStringListValues(option, scope)
 
   /** Checks if a string list option contains a value, or if a simple string value matches the given value
    *
    * If the option is a string option, the given value must match the entire string
    */
-  public fun hasValue(optionName: String, value: String): Boolean {
-    val option = (optionGroup.getOption(optionName) as? StringOption) ?: return false
-    return optionGroup.hasValue(option, scope, value)
-  }
+  public fun hasValue(option: StringOption, value: String): Boolean = optionGroup.hasValue(option, scope, value)
 
   /**
    * Checks the option value is set/true
    *
    * The option is most likely a toggle option, but this is not required.
    */
-  public fun isSet(optionName: String): Boolean = getValue(optionName).asBoolean()
+  public fun isSet(option: ToggleOption): Boolean = getValue(option).asBoolean()
+
+  // TODO: Temporary during migration away from string constants
+  public fun isSet(name: String): Boolean {
+    val option = optionGroup.getOption(name) as ToggleOption
+    return isSet(option)
+  }
+
+  public fun hasValue(name: String, value: String): Boolean {
+    val option = optionGroup.getOption(name) as StringOption
+    return hasValue(option, value)
+  }
+
+  public fun getStringListValues(name: String): List<String> {
+    val option = optionGroup.getOption(name) as StringOption
+    return getStringListValues(option)
+  }
+
+  public fun getIntValue(name: String): Int {
+    val option = optionGroup.getOption(name) as NumberOption
+    return getIntValue(option)
+  }
 }

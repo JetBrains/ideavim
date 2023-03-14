@@ -21,17 +21,17 @@ import org.junit.jupiter.api.TestInfo
 class BoundedStringListOptionTest : VimTestCase() {
   private val optionName = "myOpt"
   private val defaultValue = "Monday,Tuesday"
+  private val option = StringOption(
+    optionName,
+    optionName,
+    defaultValue,
+    true,
+    setOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"),
+  )
 
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {
     super.setUp(testInfo)
-    val option = StringOption(
-      optionName,
-      optionName,
-      defaultValue,
-      true,
-      setOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"),
-    )
     injector.optionGroup.addOption(option)
     configureByText("\n")
   }
@@ -46,7 +46,7 @@ class BoundedStringListOptionTest : VimTestCase() {
   @Test
   fun `test set valid list`() {
     enterCommand("set $optionName=Thursday,Friday")
-    kotlin.test.assertEquals("Thursday,Friday", options().getStringValue(optionName))
+    kotlin.test.assertEquals("Thursday,Friday", options().getStringValue(option))
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
@@ -55,14 +55,14 @@ class BoundedStringListOptionTest : VimTestCase() {
     enterCommand("set $optionName=Blue")
     assertPluginError(true)
     assertPluginErrorMessageContains("E474: Invalid argument: $optionName")
-    kotlin.test.assertEquals(defaultValue, options().getStringValue(optionName))
+    kotlin.test.assertEquals(defaultValue, options().getStringValue(option))
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   @Test
   fun `test append single item`() {
     enterCommand("set $optionName+=Wednesday")
-    kotlin.test.assertEquals("Monday,Tuesday,Wednesday", options().getStringValue(optionName))
+    kotlin.test.assertEquals("Monday,Tuesday,Wednesday", options().getStringValue(option))
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
@@ -71,14 +71,14 @@ class BoundedStringListOptionTest : VimTestCase() {
     enterCommand("set $optionName+=Blue")
     assertPluginError(true)
     assertPluginErrorMessageContains("E474: Invalid argument: $optionName")
-    kotlin.test.assertEquals("Monday,Tuesday", options().getStringValue(optionName))
+    kotlin.test.assertEquals("Monday,Tuesday", options().getStringValue(option))
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   @Test
   fun `test append list`() {
     enterCommand("set $optionName+=Wednesday,Thursday")
-    kotlin.test.assertEquals("Monday,Tuesday,Wednesday,Thursday", options().getStringValue(optionName))
+    kotlin.test.assertEquals("Monday,Tuesday,Wednesday,Thursday", options().getStringValue(option))
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
@@ -87,14 +87,14 @@ class BoundedStringListOptionTest : VimTestCase() {
     enterCommand("set $optionName+=Wednesday,Blue")
     assertPluginError(true)
     assertPluginErrorMessageContains("E474: Invalid argument: $optionName")
-    kotlin.test.assertEquals("Monday,Tuesday", options().getStringValue(optionName))
+    kotlin.test.assertEquals("Monday,Tuesday", options().getStringValue(option))
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   @Test
   fun `test prepend item`() {
     enterCommand("set $optionName^=Wednesday")
-    kotlin.test.assertEquals("Wednesday,Monday,Tuesday", options().getStringValue(optionName))
+    kotlin.test.assertEquals("Wednesday,Monday,Tuesday", options().getStringValue(option))
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
@@ -103,14 +103,14 @@ class BoundedStringListOptionTest : VimTestCase() {
     enterCommand("set $optionName^=Blue")
     assertPluginError(true)
     assertPluginErrorMessageContains("E474: Invalid argument: $optionName")
-    kotlin.test.assertEquals("Monday,Tuesday", options().getStringValue(optionName))
+    kotlin.test.assertEquals("Monday,Tuesday", options().getStringValue(option))
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   @Test
   fun `test prepend list`() {
     enterCommand("set $optionName^=Wednesday,Thursday")
-    kotlin.test.assertEquals("Wednesday,Thursday,Monday,Tuesday", options().getStringValue(optionName))
+    kotlin.test.assertEquals("Wednesday,Thursday,Monday,Tuesday", options().getStringValue(option))
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
@@ -119,31 +119,31 @@ class BoundedStringListOptionTest : VimTestCase() {
     enterCommand("set $optionName^=Wednesday,Blue")
     assertPluginError(true)
     assertPluginErrorMessageContains("E474: Invalid argument: $optionName")
-    kotlin.test.assertEquals("Monday,Tuesday", options().getStringValue(optionName))
+    kotlin.test.assertEquals("Monday,Tuesday", options().getStringValue(option))
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   @Test
   fun `test remove item`() {
     enterCommand("set $optionName-=Monday")
-    kotlin.test.assertEquals("Tuesday", options().getStringValue(optionName))
+    kotlin.test.assertEquals("Tuesday", options().getStringValue(option))
   }
 
   @Test
   fun `test remove list`() {
     enterCommand("set $optionName-=Monday,Tuesday")
-    kotlin.test.assertEquals("", options().getStringValue(optionName))
+    kotlin.test.assertEquals("", options().getStringValue(option))
   }
 
   @Test
   fun `test remove list with wrong order`() {
     enterCommand("set $optionName-=Tuesday,Monday")
-    kotlin.test.assertEquals("Monday,Tuesday", options().getStringValue(optionName))
+    kotlin.test.assertEquals("Monday,Tuesday", options().getStringValue(option))
   }
 
   @Test
   fun `test remove list with invalid value`() {
     enterCommand("set $optionName-=Monday,Blue")
-    kotlin.test.assertEquals("Monday,Tuesday", options().getStringValue(optionName))
+    kotlin.test.assertEquals("Monday,Tuesday", options().getStringValue(option))
   }
 }

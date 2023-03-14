@@ -25,6 +25,7 @@ import com.intellij.openapi.util.Key
 import com.intellij.ui.KeyStrokeAdapter
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.options
@@ -44,7 +45,6 @@ import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
 import com.maddyhome.idea.vim.listener.AceJumpService
 import com.maddyhome.idea.vim.listener.AppCodeTemplates.appCodeTemplateCaptured
 import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.options.OptionConstants
 import java.awt.event.InputEvent
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
@@ -56,7 +56,7 @@ import javax.swing.KeyStroke
  * These keys are not passed to [com.maddyhome.idea.vim.VimTypedActionHandler] and should be handled by actions.
  */
 internal class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
-  private val traceTime = injector.globalOptions().isSet(OptionConstants.ideatracetime)
+  private val traceTime = injector.globalOptions().isSet(Options.ideatracetime)
 
   override fun actionPerformed(e: AnActionEvent) {
     LOG.trace("Executing shortcut key action")

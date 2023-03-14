@@ -20,7 +20,6 @@ import com.maddyhome.idea.vim.group.IjOptionConstants
 import com.maddyhome.idea.vim.options.NumberOption
 import com.maddyhome.idea.vim.options.Option
 import com.maddyhome.idea.vim.options.OptionChangeListener
-import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.options.OptionValueAccessor
 import com.maddyhome.idea.vim.options.StringOption
@@ -29,6 +28,7 @@ import com.maddyhome.idea.vim.options.UnsignedNumberOption
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
+import org.jetbrains.plugins.ideavim.TestOptionConstants
 import org.jetbrains.plugins.ideavim.product
 import org.junit.jupiter.api.TestTemplate
 import org.junit.jupiter.api.extension.AfterTestExecutionCallback
@@ -152,24 +152,24 @@ private class OptionsVerificator : BeforeTestExecutionCallback, AfterTestExecuti
   companion object {
     val LOG by lazy { vimLogger<OptionsVerificator>() }
     private val ignored = setOf(
-      OptionConstants.guicursor,
-      OptionConstants.ideaglobalmode,
-      OptionConstants.ideatracetime,
-      OptionConstants.number,
-      OptionConstants.timeoutlen,
-      OptionConstants.relativenumber,
-      OptionConstants.maxmapdepth,
-      IjOptionConstants.octopushandler,
+      TestOptionConstants.guicursor,
+      TestOptionConstants.ideaglobalmode,
+      TestOptionConstants.ideatracetime,
       IjOptionConstants.ideavimsupport,
-      "unifyjumps",
-      OptionConstants.sidescrolloff,
-      OptionConstants.sidescroll,
-      OptionConstants.scrolloff,
-      OptionConstants.scrolljump,
+      TestOptionConstants.maxmapdepth,
+      TestOptionConstants.number,
+      IjOptionConstants.octopushandler,
+      TestOptionConstants.relativenumber,
+      TestOptionConstants.scrolljump,
+      TestOptionConstants.scrolloff,
+      TestOptionConstants.showmode,
+      TestOptionConstants.sidescroll,
+      TestOptionConstants.sidescrolloff,
+      TestOptionConstants.timeoutlen,
       IjOptionConstants.trackactionids,
-      OptionConstants.showmode,
-      OptionConstants.virtualedit,
-      OptionConstants.whichwrap,
+      IjOptionConstants.unifyjumps,
+      TestOptionConstants.virtualedit,
+      TestOptionConstants.whichwrap,
     )
   }
 }

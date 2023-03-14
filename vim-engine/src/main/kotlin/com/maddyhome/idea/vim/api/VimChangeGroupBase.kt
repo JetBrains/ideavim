@@ -36,7 +36,6 @@ import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.mark.VimMarkConstants.MARK_CHANGE_END
 import com.maddyhome.idea.vim.mark.VimMarkConstants.MARK_CHANGE_POS
 import com.maddyhome.idea.vim.mark.VimMarkConstants.MARK_CHANGE_START
-import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.register.RegisterConstants.LAST_INSERTED_TEXT_REGISTER
 import org.jetbrains.annotations.NonNls
 import java.awt.event.KeyEvent
@@ -948,7 +947,7 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
     var endOffset = range.endOffset
     val fileSize = editor.fileSize().toInt()
     if (endOffset > fileSize) {
-      check(!injector.globalOptions().isSet(OptionConstants.ideastrictmode)) {
+      check(!injector.globalOptions().isSet(Options.ideastrictmode)) {
         "Incorrect offset. File size: $fileSize, offset: $endOffset"
       }
       endOffset = fileSize

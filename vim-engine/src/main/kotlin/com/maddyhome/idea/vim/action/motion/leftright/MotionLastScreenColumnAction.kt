@@ -9,6 +9,7 @@ package com.maddyhome.idea.vim.action.motion.leftright
 
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
+import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimMotionGroupBase
 import com.maddyhome.idea.vim.api.injector
@@ -20,7 +21,6 @@ import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.helper.inVisualMode
-import com.maddyhome.idea.vim.options.OptionConstants
 
 public class MotionLastScreenColumnAction : MotionActionHandler.ForEachCaret() {
   override fun getOffset(
@@ -34,7 +34,7 @@ public class MotionLastScreenColumnAction : MotionActionHandler.ForEachCaret() {
     if (editor.inInsertMode) {
       allow = true
     } else if (editor.inVisualMode) {
-      allow = !injector.options(editor).hasValue(OptionConstants.selection, "old")
+      allow = !injector.options(editor).hasValue(Options.selection, "old")
     }
     val motion = injector.motion.moveCaretToCurrentDisplayLineEnd(editor, caret, allow)
     return when (motion) {

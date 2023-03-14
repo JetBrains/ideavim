@@ -13,16 +13,17 @@ package org.jetbrains.plugins.ideavim.action.motion.select.motion
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.options.OptionConstants
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestOptionConstants
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.impl.OptionTest
 import org.jetbrains.plugins.ideavim.impl.TraceOptions
 import org.jetbrains.plugins.ideavim.impl.VimOption
 
-@TraceOptions(OptionConstants.keymodel)
+@TraceOptions(TestOptionConstants.keymodel)
 class SelectMotionRightActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(VimOption(OptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_stopselect]))
+  @OptionTest(VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_stopselect]))
   fun `test char select simple move`() {
     doTest(
       listOf("viw", "<C-G>", "<Right>"),
@@ -48,7 +49,7 @@ class SelectMotionRightActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(VimOption(OptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_stopselect]))
+  @OptionTest(VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_stopselect]))
   fun `test select multiple carets`() {
     doTest(
       listOf("viw", "<C-G>", "<Right>"),
@@ -74,7 +75,7 @@ class SelectMotionRightActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(VimOption(OptionConstants.keymodel, limitedValues = [""]))
+  @OptionTest(VimOption(TestOptionConstants.keymodel, limitedValues = [""]))
   fun `test without stopsel`() {
     doTest(
       listOf("viw", "<C-G>", "<Right>"),

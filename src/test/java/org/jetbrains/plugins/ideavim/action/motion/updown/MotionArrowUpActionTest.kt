@@ -13,16 +13,17 @@ package org.jetbrains.plugins.ideavim.action.motion.updown
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.options.OptionConstants
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestOptionConstants
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.impl.OptionTest
 import org.jetbrains.plugins.ideavim.impl.TraceOptions
 import org.jetbrains.plugins.ideavim.impl.VimOption
 
-@TraceOptions(OptionConstants.keymodel)
+@TraceOptions(TestOptionConstants.keymodel)
 class MotionArrowUpActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(VimOption(OptionConstants.keymodel, doesntAffectTest = true))
+  @OptionTest(VimOption(TestOptionConstants.keymodel, doesntAffectTest = true))
   fun `test visual default options`() {
     doTest(
       listOf("v", "<Up>"),
@@ -48,7 +49,7 @@ class MotionArrowUpActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(VimOption(OptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_stopsel]))
+  @OptionTest(VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_stopsel]))
   fun `test visual stopsel`() {
     doTest(
       listOf("v", "<Up>"),
@@ -72,7 +73,7 @@ class MotionArrowUpActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(VimOption(OptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_stopselect]))
+  @OptionTest(VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_stopselect]))
   fun `test visual stopselect`() {
     doTest(
       listOf("v", "<Up>"),
@@ -98,7 +99,7 @@ class MotionArrowUpActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(VimOption(OptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_stopvisual]))
+  @OptionTest(VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_stopvisual]))
   fun `test visual stopvisual`() {
     doTest(
       listOf("v", "<Up>"),
@@ -122,7 +123,7 @@ class MotionArrowUpActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(VimOption(OptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_stopvisual]))
+  @OptionTest(VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_stopvisual]))
   fun `test visual stopvisual multicaret`() {
     doTest(
       listOf("v", "<Up>"),
@@ -146,7 +147,7 @@ class MotionArrowUpActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(VimOption(OptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_stopselect]))
+  @OptionTest(VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_stopselect]))
   fun `test char select simple move`() {
     doTest(
       listOf("gH", "<Up>"),
@@ -170,7 +171,7 @@ class MotionArrowUpActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(VimOption(OptionConstants.keymodel, limitedValues = [""]))
+  @OptionTest(VimOption(TestOptionConstants.keymodel, limitedValues = [""]))
   fun `test char select stopsel`() {
     doTest(
       listOf("gh", "<Up>"),
@@ -196,7 +197,7 @@ class MotionArrowUpActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(VimOption(OptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_stopselect]))
+  @OptionTest(VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_stopselect]))
   fun `test select multiple carets`() {
     doTest(
       listOf("gH", "<Up>"),
@@ -220,7 +221,7 @@ class MotionArrowUpActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(VimOption(OptionConstants.keymodel, doesntAffectTest = true))
+  @OptionTest(VimOption(TestOptionConstants.keymodel, doesntAffectTest = true))
   fun `test arrow up in insert mode scrolls caret at scrolloff`() {
     configureByPages(5)
     enterCommand("set scrolljump=10")

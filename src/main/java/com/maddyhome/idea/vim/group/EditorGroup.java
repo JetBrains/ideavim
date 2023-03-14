@@ -24,12 +24,12 @@ import com.intellij.openapi.project.Project;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.ExecutionContext;
+import com.maddyhome.idea.vim.api.Options;
 import com.maddyhome.idea.vim.api.VimEditor;
 import com.maddyhome.idea.vim.api.VimEditorGroup;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.options.LocalOptionChangeListener;
-import com.maddyhome.idea.vim.options.OptionConstants;
 import com.maddyhome.idea.vim.options.OptionValueAccessor;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType;
 import org.jdom.Element;
@@ -57,7 +57,7 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
     @Override
     public void caretPositionChanged(@NotNull CaretEvent e) {
       final boolean requiresRepaint = e.getNewPosition().line != e.getOldPosition().line;
-      if (requiresRepaint && options(injector, new IjVimEditor(e.getEditor())).isSet(OptionConstants.relativenumber)) {
+      if (requiresRepaint && options(injector, new IjVimEditor(e.getEditor())).isSet(Options.relativenumber)) {
         repaintRelativeLineNumbers(e.getEditor());
       }
     }
@@ -106,8 +106,8 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
 
   private static void updateLineNumbers(final @NotNull Editor editor) {
     final OptionValueAccessor options = options(injector, new IjVimEditor(editor));
-    final boolean relativeNumber = options.isSet(OptionConstants.relativenumber);
-    final boolean number = options.isSet(OptionConstants.number);
+    final boolean relativeNumber = options.isSet(Options.relativenumber);
+    final boolean number = options.isSet(Options.number);
 
     final boolean showBuiltinEditorLineNumbers = shouldShowBuiltinLineNumbers(editor, number, relativeNumber);
 
@@ -287,7 +287,7 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
   private static class RelativeLineNumberConverter implements LineNumberConverter {
     @Override
     public Integer convert(@NotNull Editor editor, int lineNumber) {
-      final boolean number = options(injector, new IjVimEditor(editor)).isSet(OptionConstants.number);
+      final boolean number = options(injector, new IjVimEditor(editor)).isSet(Options.number);
       final int caretLine = editor.getCaretModel().getLogicalPosition().line;
 
       // lineNumber is 1 based

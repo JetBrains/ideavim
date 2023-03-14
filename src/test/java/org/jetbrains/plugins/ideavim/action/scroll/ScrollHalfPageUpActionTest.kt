@@ -8,8 +8,8 @@
 
 package org.jetbrains.plugins.ideavim.action.scroll
 
+import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.options.OptionConstants
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -86,7 +86,7 @@ class ScrollHalfPageUpActionTest : VimTestCase() {
     configureByPages(5)
     setPositionAndScroll(50, 53)
     typeText("10<C-U>")
-    kotlin.test.assertEquals(10, options().getIntValue(OptionConstants.scroll))
+    kotlin.test.assertEquals(10, options().getIntValue(Options.scroll))
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)

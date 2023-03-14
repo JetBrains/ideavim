@@ -29,7 +29,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.SystemInfo
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.api.getKnownStringOption
+import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.getKnownToggleOption
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.modifyOptionValue
@@ -75,9 +75,8 @@ internal class NotificationService(private val project: Project?) {
         "set clipboard+=ideaput",
         "ideaput",
       ) {
-        val option = injector.optionGroup.getKnownStringOption(OptionConstants.clipboard)
-        injector.optionGroup.modifyOptionValue(option, OptionScope.GLOBAL) {
-          option.appendValue(it, VimString(OptionConstants.clipboard_ideaput))
+        injector.optionGroup.modifyOptionValue(Options.clipboard, OptionScope.GLOBAL) {
+          Options.clipboard.appendValue(it, VimString(OptionConstants.clipboard_ideaput))
         }
       },
     )

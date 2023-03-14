@@ -8,12 +8,12 @@
 
 package com.maddyhome.idea.vim.options.helpers
 
+import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.helper.enumSetOf
-import com.maddyhome.idea.vim.options.OptionConstants
 import java.util.*
 
 public object GuiCursorOptionHelper {
@@ -83,7 +83,7 @@ public object GuiCursorOptionHelper {
       var highlightGroup = ""
       var lmapHighlightGroup = ""
       var blinkModes = emptyList<String>()
-      injector.globalOptions().getStringListValues(OptionConstants.guicursor)
+      injector.globalOptions().getStringListValues(Options.guicursor)
         .map { convertToken(it) }
         .forEach { data ->
           if (data.modes.contains(mode) || data.modes.contains(GuiCursorMode.ALL)) {

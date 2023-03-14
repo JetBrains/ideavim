@@ -8,9 +8,9 @@
 
 package com.maddyhome.idea.vim.option
 
+import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.options.OptionConstants
 
 @Deprecated("Please use StrictMode from com.maddyhome.idea.vim.options.helpers", replaceWith = ReplaceWith("com.maddyhome.idea.vim.helper.StrictMode"))
 public object StrictMode {
@@ -22,7 +22,7 @@ public object StrictMode {
   }
 
   public fun fail(message: String) {
-    if (injector.globalOptions().isSet(OptionConstants.ideastrictmode)) {
+    if (injector.globalOptions().isSet(Options.ideastrictmode)) {
       error(message)
     }
   }

@@ -9,7 +9,7 @@ package org.jetbrains.plugins.ideavim.action
 
 import com.google.common.collect.Lists
 import com.maddyhome.idea.vim.command.VimStateMachine
-import com.maddyhome.idea.vim.options.OptionConstants
+import org.jetbrains.plugins.ideavim.TestOptionConstants
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.impl.OptionTest
 import org.jetbrains.plugins.ideavim.impl.VimOption
@@ -95,7 +95,7 @@ class ChangeNumberActionTest : VimTestCase() {
     )
   }
 
-  @OptionTest(VimOption(OptionConstants.nrformats, limitedValues = ["octal"]))
+  @OptionTest(VimOption(TestOptionConstants.nrformats, limitedValues = ["octal"]))
   fun testDecrementNegativeOctal() {
     // Minus isn't processed
     doTest(

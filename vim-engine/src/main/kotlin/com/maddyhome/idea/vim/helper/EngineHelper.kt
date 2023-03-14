@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.helper
 
+import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
@@ -59,7 +60,7 @@ public val VimStateMachine.Mode.isEndAllowed: Boolean
   }
 
 public val usesVirtualSpace: Boolean
-  get() = injector.globalOptions().hasValue(OptionConstants.virtualedit, OptionConstants.virtualedit_onemore)
+  get() = injector.globalOptions().hasValue(Options.virtualedit, OptionConstants.virtualedit_onemore)
 
 public val VimEditor.isEndAllowed: Boolean
   get() = when (this.mode) {

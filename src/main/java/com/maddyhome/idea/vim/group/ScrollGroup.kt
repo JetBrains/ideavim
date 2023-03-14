@@ -9,10 +9,10 @@ package com.maddyhome.idea.vim.group
 
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.VisualPosition
+import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimScrollGroup
-import com.maddyhome.idea.vim.api.getKnownOption
 import com.maddyhome.idea.vim.api.getVisualLineCount
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
@@ -30,7 +30,6 @@ import com.maddyhome.idea.vim.helper.vimEditorGroup
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.LocalOptionChangeListener
-import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
@@ -299,11 +298,10 @@ internal class ScrollGroup : VimScrollGroup {
 
     private fun getScrollOption(rawCount: Int): Int {
       if (rawCount == 0) {
-        return injector.globalOptions().getIntValue(OptionConstants.scroll)
+        return injector.globalOptions().getIntValue(Options.scroll)
       }
       // TODO: This should be reset whenever the window size changes
-      val option = injector.optionGroup.getKnownOption(OptionConstants.scroll)
-      injector.optionGroup.setOptionValue(option, OptionScope.GLOBAL, VimInt(rawCount))
+      injector.optionGroup.setOptionValue(Options.scroll, OptionScope.GLOBAL, VimInt(rawCount))
       return rawCount
     }
   }

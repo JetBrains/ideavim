@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.group.visual
 
 import com.maddyhome.idea.vim.api.BufferPosition
+import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getLineEndForOffset
 import com.maddyhome.idea.vim.api.getLineStartForOffset
@@ -16,7 +17,6 @@ import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.lineLength
 import com.maddyhome.idea.vim.command.VimStateMachine
-import com.maddyhome.idea.vim.options.OptionConstants
 
 public fun charToNativeSelection(editor: VimEditor, start: Int, end: Int, mode: VimStateMachine.Mode): Pair<Int, Int> {
   val (nativeStart, nativeEnd) = sort(start, end)
@@ -42,7 +42,7 @@ public fun lineToNativeSelection(editor: VimEditor, start: Int, end: Int): Pair<
 
 public fun <T : Comparable<T>> sort(a: T, b: T): Pair<T, T> = if (a > b) b to a else a to b
 
-private fun isExclusiveSelection() = injector.globalOptions().hasValue(OptionConstants.selection, "exclusive")
+private fun isExclusiveSelection() = injector.globalOptions().hasValue(Options.selection, "exclusive")
 
 public fun blockToNativeSelection(
   editor: VimEditor,

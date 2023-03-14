@@ -10,14 +10,15 @@ package org.jetbrains.plugins.ideavim.action.copy
 
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.options.OptionConstants
+import org.jetbrains.plugins.ideavim.TestOptionConstants
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.impl.OptionTest
 import org.jetbrains.plugins.ideavim.impl.TraceOptions
 import org.jetbrains.plugins.ideavim.impl.VimOption
 
-@TraceOptions(OptionConstants.clipboard)
+@TraceOptions(TestOptionConstants.clipboard)
 class YankAndPutTest : VimTestCase() {
-  @OptionTest(VimOption(OptionConstants.clipboard, limitedValues = [OptionConstants.clipboard_unnamed]))
+  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = [OptionConstants.clipboard_unnamed]))
   fun `test yank to number register with unnamed`() {
     val before = """
             I ${c}found it in a legendary land
@@ -39,7 +40,7 @@ class YankAndPutTest : VimTestCase() {
     )
   }
 
-  @OptionTest(VimOption(OptionConstants.clipboard, limitedValues = [OptionConstants.clipboard_unnamed + "," + OptionConstants.clipboard_ideaput]))
+  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = [OptionConstants.clipboard_unnamed + "," + OptionConstants.clipboard_ideaput]))
   fun `test yank to number register with unnamed and ideaput`() {
     val before = """
             I ${c}found it in a legendary land
@@ -61,7 +62,7 @@ class YankAndPutTest : VimTestCase() {
     )
   }
 
-  @OptionTest(VimOption(OptionConstants.clipboard, limitedValues = [""]))
+  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = [""]))
   fun `test yank to number register`() {
     val before = """
             I ${c}found it in a legendary land

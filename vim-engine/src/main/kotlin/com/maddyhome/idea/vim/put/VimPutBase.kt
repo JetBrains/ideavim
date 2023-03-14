@@ -12,6 +12,7 @@ import com.maddyhome.idea.vim.api.BufferPosition
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.MutableVimEditor
+import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getLineEndForOffset
@@ -537,7 +538,7 @@ public abstract class VimPutBase : VimPut {
   ) {
     val visualSelection = data.visualSelection
     val subMode = visualSelection?.typeInEditor?.toSubMode() ?: VimStateMachine.SubMode.NONE
-    if (injector.globalOptions().hasValue(OptionConstants.clipboard, OptionConstants.clipboard_ideaput)) {
+    if (injector.globalOptions().hasValue(Options.clipboard, OptionConstants.clipboard_ideaput)) {
       val idePasteProvider = getProviderForPasteViaIde(editor, text.typeInRegister, data)
       if (idePasteProvider != null) {
         logger.debug("Perform put via idea paste")

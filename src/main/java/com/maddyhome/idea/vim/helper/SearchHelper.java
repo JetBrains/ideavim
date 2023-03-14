@@ -22,6 +22,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.EngineEditorHelperKt;
+import com.maddyhome.idea.vim.api.Options;
 import com.maddyhome.idea.vim.api.VimSearchHelperBase;
 import com.maddyhome.idea.vim.command.VimStateMachine;
 import com.maddyhome.idea.vim.common.CharacterPosition;
@@ -30,7 +31,6 @@ import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.newapi.IjVimCaret;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.options.OptionChangeListener;
-import com.maddyhome.idea.vim.options.OptionConstants;
 import com.maddyhome.idea.vim.regexp.CharPointer;
 import com.maddyhome.idea.vim.regexp.RegExp;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType;
@@ -2214,7 +2214,7 @@ public class SearchHelper {
   private static @NotNull String getPairChars() {
     if (pairsChars == null) {
       VimPlugin.getOptionGroup().addListener(
-        OptionConstants.matchpairs,
+        Options.matchpairs.getName(),
         new OptionChangeListener<VimDataType>() {
           @Override
           public void processGlobalValueChange(@Nullable VimDataType oldValue) {
@@ -2229,7 +2229,7 @@ public class SearchHelper {
   }
 
   private static @NotNull String parseMatchPairsOption() {
-    List<String> pairs = globalOptions(injector).getStringListValues(OptionConstants.matchpairs);
+    List<String> pairs = globalOptions(injector).getStringListValues(Options.matchpairs);
     StringBuilder res = new StringBuilder();
     for (String s : pairs) {
       if (s.length() == 3) {

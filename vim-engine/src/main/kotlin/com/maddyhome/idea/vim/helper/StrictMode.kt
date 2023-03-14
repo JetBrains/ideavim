@@ -8,9 +8,9 @@
 
 package com.maddyhome.idea.vim.helper
 
+import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.options.OptionConstants
 
 public object StrictMode {
   @JvmName("assertTrue")
@@ -21,7 +21,7 @@ public object StrictMode {
   }
 
   public fun fail(message: String) {
-    if (injector.globalOptions().isSet(OptionConstants.ideastrictmode)) {
+    if (injector.globalOptions().isSet(Options.ideastrictmode)) {
       error(message)
     }
   }

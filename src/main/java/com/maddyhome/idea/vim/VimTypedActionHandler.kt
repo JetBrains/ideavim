@@ -14,13 +14,13 @@ import com.intellij.openapi.editor.actionSystem.ActionPlan
 import com.intellij.openapi.editor.actionSystem.TypedActionHandler
 import com.intellij.openapi.editor.actionSystem.TypedActionHandlerEx
 import com.intellij.openapi.progress.ProcessCanceledException
+import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
 import com.maddyhome.idea.vim.key.KeyHandlerKeeper
 import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.options.OptionConstants
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
@@ -32,7 +32,7 @@ import javax.swing.KeyStroke
  */
 internal class VimTypedActionHandler(origHandler: TypedActionHandler) : TypedActionHandlerEx {
   private val handler = KeyHandler.getInstance()
-  private val traceTime = injector.globalOptions().isSet(OptionConstants.ideatracetime)
+  private val traceTime = injector.globalOptions().isSet(Options.ideatracetime)
 
   init {
     KeyHandlerKeeper.getInstance().originalHandler = origHandler

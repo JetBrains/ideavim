@@ -18,12 +18,12 @@ import com.intellij.util.IJSwingUtilities;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.ExecutionContext;
+import com.maddyhome.idea.vim.api.Options;
 import com.maddyhome.idea.vim.helper.HelperKt;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.UiHelper;
 import com.maddyhome.idea.vim.helper.UserDataManager;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
-import com.maddyhome.idea.vim.options.OptionConstants;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -275,7 +275,7 @@ public class ExOutputPanel extends JPanel {
     setBounds(bounds);
 
     myScrollPane.getVerticalScrollBar().setValue(0);
-    if (!globalOptions(injector).isSet(OptionConstants.more)) {
+    if (!globalOptions(injector).isSet(Options.more)) {
       // FIX
       scrollOffset(100000);
     }

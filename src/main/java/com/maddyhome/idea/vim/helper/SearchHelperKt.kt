@@ -8,11 +8,11 @@
 
 package com.maddyhome.idea.vim.helper
 
+import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.Direction
 import com.maddyhome.idea.vim.helper.SearchHelper.findPositionOfFirstCharacter
-import com.maddyhome.idea.vim.options.OptionConstants
 
 private data class State(val position: Int, val trigger: Char, val inQuote: Boolean?, val lastOpenSingleQuotePos: Int)
 
@@ -169,8 +169,8 @@ private fun quoteChanges(chars: CharSequence, begin: Int) = sequence {
  * history, the smartcase option is applied, and `\<Work\>` will only match `Work`.
  */
 internal fun shouldIgnoreCase(pattern: String, ignoreSmartCaseOption: Boolean): Boolean {
-  val sc = injector.globalOptions().isSet(OptionConstants.smartcase) && !ignoreSmartCaseOption
-  return injector.globalOptions().isSet(OptionConstants.ignorecase) && !(sc && containsUpperCase(pattern))
+  val sc = injector.globalOptions().isSet(Options.smartcase) && !ignoreSmartCaseOption
+  return injector.globalOptions().isSet(Options.ignorecase) && !(sc && containsUpperCase(pattern))
 }
 
 private fun containsUpperCase(pattern: String): Boolean {

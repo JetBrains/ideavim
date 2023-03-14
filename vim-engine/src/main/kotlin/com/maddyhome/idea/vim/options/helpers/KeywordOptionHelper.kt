@@ -8,10 +8,10 @@
 
 package com.maddyhome.idea.vim.options.helpers
 
+import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.options.OptionChangeListener
-import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import java.util.regex.Pattern
 
@@ -29,7 +29,7 @@ public object KeywordOptionHelper {
 
   public fun updateSpecs() {
     keywordSpecs = valuesToValidatedAndReversedSpecs(
-      parseValues(injector.globalOptions().getStringValue(OptionConstants.iskeyword)),
+      parseValues(injector.globalOptions().getStringValue(Options.iskeyword)),
     )!!.toMutableList()
   }
 

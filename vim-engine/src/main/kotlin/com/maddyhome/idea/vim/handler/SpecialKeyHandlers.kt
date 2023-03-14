@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.handler
 
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
+import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.globalOptions
@@ -55,9 +56,9 @@ public abstract class ShiftedSpecialKeyHandler : VimActionHandler.ConditionalMul
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    val startSel = injector.globalOptions().hasValue(OptionConstants.keymodel, OptionConstants.keymodel_startsel)
+    val startSel = injector.globalOptions().hasValue(Options.keymodel, OptionConstants.keymodel_startsel)
     if (startSel && !editor.inVisualMode && !editor.inSelectMode) {
-      if (injector.globalOptions().hasValue(OptionConstants.selectmode, OptionConstants.selectmode_key)) {
+      if (injector.globalOptions().hasValue(Options.selectmode, OptionConstants.selectmode_key)) {
         injector.visualMotionGroup.enterSelectMode(editor, VimStateMachine.SubMode.VISUAL_CHARACTER)
       } else {
         injector.visualMotionGroup
@@ -92,7 +93,7 @@ public abstract class ShiftedArrowKeyHandler(private val runBothCommandsAsMultic
     val (inVisualMode, inSelectMode, withKey) = withKeyOrNot(editor)
     if (withKey) {
       if (!inVisualMode && !inSelectMode) {
-        if (injector.globalOptions().hasValue(OptionConstants.selectmode, OptionConstants.selectmode_key)) {
+        if (injector.globalOptions().hasValue(Options.selectmode, OptionConstants.selectmode_key)) {
           injector.visualMotionGroup.enterSelectMode(editor, VimStateMachine.SubMode.VISUAL_CHARACTER)
         } else {
           injector.visualMotionGroup
@@ -106,7 +107,7 @@ public abstract class ShiftedArrowKeyHandler(private val runBothCommandsAsMultic
   }
 
   private fun withKeyOrNot(editor: VimEditor): Triple<Boolean, Boolean, Boolean> {
-    val keymodelOption = injector.globalOptions().getStringListValues(OptionConstants.keymodel)
+    val keymodelOption = injector.globalOptions().getStringListValues(Options.keymodel)
     val startSel = OptionConstants.keymodel_startsel in keymodelOption
     val inVisualMode = editor.inVisualMode
     val inSelectMode = editor.inSelectMode
@@ -170,7 +171,7 @@ public abstract class NonShiftedSpecialKeyHandler : MotionActionHandler.ForEachC
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    val keymodel = injector.globalOptions().getStringListValues(OptionConstants.keymodel)
+    val keymodel = injector.globalOptions().getStringListValues(Options.keymodel)
     if (editor.inSelectMode && (OptionConstants.keymodel_stopsel in keymodel || OptionConstants.keymodel_stopselect in keymodel)) {
       editor.exitSelectModeNative(false)
     }

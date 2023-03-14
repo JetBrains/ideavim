@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.register
 
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
+import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getText
 import com.maddyhome.idea.vim.api.globalOptions
@@ -19,7 +20,6 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
-import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.register.RegisterConstants.BLACK_HOLE_REGISTER
 import com.maddyhome.idea.vim.register.RegisterConstants.CLIPBOARD_REGISTERS
 import com.maddyhome.idea.vim.register.RegisterConstants.LAST_SEARCH_REGISTER
@@ -71,9 +71,9 @@ public abstract class VimRegisterGroupBase : VimRegisterGroup {
 
   init {
     injector.optionGroup.addListener(
-      OptionConstants.clipboard,
+      Options.clipboard.name,
       {
-        val clipboardOptionValue = injector.globalOptions().getStringListValues(OptionConstants.clipboard)
+        val clipboardOptionValue = injector.globalOptions().getStringListValues(Options.clipboard)
         defaultRegisterChar = when {
           "unnamed" in clipboardOptionValue -> '*'
           "unnamedplus" in clipboardOptionValue -> '+'

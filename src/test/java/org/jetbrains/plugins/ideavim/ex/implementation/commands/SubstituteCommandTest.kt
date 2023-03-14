@@ -10,8 +10,8 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
-import com.maddyhome.idea.vim.options.OptionConstants
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestOptionConstants
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.impl.OptionTest
@@ -22,11 +22,11 @@ import org.junit.jupiter.api.Disabled
 /**
  * @author Alex Plate
  */
-@TraceOptions(OptionConstants.smartcase, OptionConstants.ignorecase)
+@TraceOptions(TestOptionConstants.smartcase, TestOptionConstants.ignorecase)
 class SubstituteCommandTest : VimTestCase() {
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test one letter`() {
@@ -44,8 +44,8 @@ class SubstituteCommandTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test one letter multi per line`() {
@@ -63,8 +63,8 @@ class SubstituteCommandTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test one letter multi per line whole file`() {
@@ -83,8 +83,8 @@ class SubstituteCommandTest : VimTestCase() {
 
   // VIM-146
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test eoLto quote`() {
@@ -102,8 +102,8 @@ class SubstituteCommandTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test soLto quote`() {
@@ -121,8 +121,8 @@ class SubstituteCommandTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test dot to nul`() {
@@ -135,8 +135,8 @@ class SubstituteCommandTest : VimTestCase() {
 
   // VIM-528
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test groups`() {
@@ -148,8 +148,8 @@ class SubstituteCommandTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test to nl`() {
@@ -162,8 +162,8 @@ class SubstituteCommandTest : VimTestCase() {
 
   // VIM-289
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test dot to nlDot`() {
@@ -176,8 +176,8 @@ class SubstituteCommandTest : VimTestCase() {
 
   // VIM-702
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test end of line to nl`() {
@@ -204,8 +204,8 @@ class SubstituteCommandTest : VimTestCase() {
 
   // VIM-702
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test start of line to nl`() {
@@ -231,8 +231,8 @@ class SubstituteCommandTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, limitedValues = ["true"]),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, limitedValues = ["true"]),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test ignorecase option`() {
@@ -244,8 +244,8 @@ class SubstituteCommandTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test smartcase option`() {
@@ -282,8 +282,8 @@ class SubstituteCommandTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test force ignore case flag`() {
@@ -311,8 +311,8 @@ class SubstituteCommandTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test force match case flag`() {
@@ -339,8 +339,8 @@ class SubstituteCommandTest : VimTestCase() {
 
   // VIM-864
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test visual substitute doesnt change visual marks`() {
@@ -350,8 +350,8 @@ class SubstituteCommandTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test offset range`() {
@@ -363,8 +363,8 @@ class SubstituteCommandTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test multiple carets`() {
@@ -390,8 +390,8 @@ class SubstituteCommandTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test multiple carets substitute all occurrences`() {
@@ -417,8 +417,8 @@ class SubstituteCommandTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test with tabs`() {
@@ -426,8 +426,8 @@ class SubstituteCommandTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test confirm all replaces all in range`() {
@@ -449,8 +449,8 @@ class SubstituteCommandTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test confirm all replaces all in rest of range`() {
@@ -472,8 +472,8 @@ class SubstituteCommandTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test confirm options`() {
@@ -495,8 +495,8 @@ class SubstituteCommandTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test confirm options with quit`() {
@@ -518,8 +518,8 @@ class SubstituteCommandTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test confirm moves caret to first match`() {
@@ -536,8 +536,8 @@ class SubstituteCommandTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test confirm moves caret to next match`() {
@@ -554,8 +554,8 @@ class SubstituteCommandTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test alternative range format`() {
@@ -582,8 +582,8 @@ class SubstituteCommandTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test alternative range format with second dot`() {
@@ -610,8 +610,8 @@ class SubstituteCommandTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test substitute pattern becomes last used pattern for search next`() {
@@ -632,8 +632,8 @@ class SubstituteCommandTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test colon-s repeats last substitution`() {
@@ -654,8 +654,8 @@ class SubstituteCommandTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test colon-s repeats last substitution without range`() {
@@ -677,8 +677,8 @@ class SubstituteCommandTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test colon-ampersand repeats last substitution without range`() {
@@ -700,8 +700,8 @@ class SubstituteCommandTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test colon-s repeats last substitution with new range`() {
@@ -723,8 +723,8 @@ class SubstituteCommandTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test colon-ampersand repeats last substitution with new range`() {
@@ -746,8 +746,8 @@ class SubstituteCommandTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test colon-s repeats last substitution with reset flags`() {
@@ -760,8 +760,8 @@ class SubstituteCommandTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test colon-ampersand repeats last substitution with reset flags`() {
@@ -774,8 +774,8 @@ class SubstituteCommandTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test colon-s repeats last substitution with new flags`() {
@@ -791,8 +791,8 @@ class SubstituteCommandTest : VimTestCase() {
       "It tries to find a command called e.g. 'si'",
   )
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @Disabled
   fun `test colon-s repeats last substitution with new flags (no spaces)`() {
@@ -803,8 +803,8 @@ class SubstituteCommandTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test colon-ampersand repeats last substitution with new flags`() {
@@ -816,8 +816,8 @@ class SubstituteCommandTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test colon-s ampersand does NOT repeat last substitution`() {
@@ -833,8 +833,8 @@ class SubstituteCommandTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test colon-ampersand-ampersand repeats last substitution with previous flags`() {
@@ -849,8 +849,8 @@ class SubstituteCommandTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test colon-s repeats last substitution with count acts like line range`() {
@@ -872,8 +872,8 @@ class SubstituteCommandTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test colon-s repeats last substitution after search`() {
@@ -885,8 +885,8 @@ class SubstituteCommandTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test colon-tilde repeats last substitution with last search pattern`() {
@@ -898,8 +898,8 @@ class SubstituteCommandTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test colon-ampersand r repeats last substitution with last search pattern`() {
@@ -911,8 +911,8 @@ class SubstituteCommandTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test new substitution using previous flags`() {
@@ -924,8 +924,8 @@ class SubstituteCommandTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test replace tilde with last replace string`() {
@@ -937,8 +937,8 @@ class SubstituteCommandTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test replace tilde with last replace string 2`() {
@@ -951,8 +951,8 @@ class SubstituteCommandTest : VimTestCase() {
 
   // VIM-2409
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test inline comment is a part of substitute command`() {
@@ -965,8 +965,8 @@ class SubstituteCommandTest : VimTestCase() {
 
   // VIM-2417
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test bar in subsitute command`() {
@@ -980,8 +980,8 @@ class SubstituteCommandTest : VimTestCase() {
   // Incsearch highlights handled by SearchGroupTest
 
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test underscore as delimiter`() {
@@ -993,8 +993,8 @@ class SubstituteCommandTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test simple expression`() {
@@ -1016,8 +1016,8 @@ class SubstituteCommandTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test line-dependent expression`() {
@@ -1039,8 +1039,8 @@ class SubstituteCommandTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test substitute with submatch function`() {
@@ -1060,8 +1060,8 @@ class SubstituteCommandTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test substitute with submatch function2`() {
@@ -1092,8 +1092,8 @@ class SubstituteCommandTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test exception during expression evaluation`() {
@@ -1123,8 +1123,8 @@ class SubstituteCommandTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test invalid expression`() {
@@ -1155,8 +1155,8 @@ class SubstituteCommandTest : VimTestCase() {
 
   // VIM-2553
   @OptionTest(
-    VimOption(OptionConstants.smartcase, doesntAffectTest = true),
-    VimOption(OptionConstants.ignorecase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test removing consecutive matches`() {

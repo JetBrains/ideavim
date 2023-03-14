@@ -17,10 +17,13 @@ import com.intellij.internal.statistic.eventLog.events.StringEventField
 import com.intellij.internal.statistic.eventLog.events.StringListEventField
 import com.intellij.internal.statistic.eventLog.events.VarargEventId
 import com.intellij.internal.statistic.service.fus.collectors.ApplicationUsagesCollector
+import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.IjOptionConstants
 import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.options.StringOption
+import com.maddyhome.idea.vim.options.ToggleOption
 
 internal class OptionsState : ApplicationUsagesCollector() {
 
@@ -34,25 +37,28 @@ internal class OptionsState : ApplicationUsagesCollector() {
         IDEAJOIN withOption IjOptionConstants.ideajoin,
         IDEAMARKS withOption IjOptionConstants.ideamarks,
         IDEAREFACTOR withOption IjOptionConstants.idearefactormode,
-        IDEAPUT with globalOptions.hasValue(OptionConstants.clipboard, OptionConstants.clipboard_ideaput),
+        IDEAPUT with globalOptions.hasValue(Options.clipboard, OptionConstants.clipboard_ideaput),
         IDEASTATUSICON withOption IjOptionConstants.ideastatusicon,
         IDEAWRITE withOption IjOptionConstants.ideawrite,
-        IDEASELECTION with globalOptions.hasValue(OptionConstants.selectmode, "ideaselection"),
+        IDEASELECTION with globalOptions.hasValue(Options.selectmode, "ideaselection"),
         IDEAVIMSUPPORT withOption IjOptionConstants.ideavimsupport,
       ),
     )
   }
 
   private infix fun BooleanEventField.withOption(name: String): EventPair<Boolean> {
-    return this.with(injector.globalOptions().isSet(name))
+    val option = injector.optionGroup.getOption(name) as ToggleOption
+    return this.with(injector.globalOptions().isSet(option))
   }
 
   private infix fun StringEventField.withOption(name: String): EventPair<String?> {
-    return this.with(injector.globalOptions().getStringValue(name))
+    val option = injector.optionGroup.getOption(name) as StringOption
+    return this.with(injector.globalOptions().getStringValue(option))
   }
 
   private infix fun StringListEventField.withOption(name: String): EventPair<List<String>> {
-    return this.with(injector.globalOptions().getStringListValues(name))
+    val option = injector.optionGroup.getOption(name) as StringOption
+    return this.with(injector.globalOptions().getStringListValues(option))
   }
 
   companion object {

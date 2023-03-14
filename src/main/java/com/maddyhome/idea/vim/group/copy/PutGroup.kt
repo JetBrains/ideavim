@@ -21,6 +21,7 @@ import com.intellij.openapi.ide.CopyPasteManager
 import com.intellij.util.PlatformUtils
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getLineEndOffset
@@ -209,7 +210,7 @@ internal class PutGroup : VimPutBase() {
   override fun notifyAboutIdeaPut(editor: VimEditor?) {
     val project = editor?.ij?.project
     if (VimPlugin.getVimState().isIdeaPutNotified || ClipboardOptionHelper.ideaputDisabled ||
-      injector.globalOptions().hasValue(OptionConstants.clipboard, OptionConstants.clipboard_ideaput)
+      injector.globalOptions().hasValue(Options.clipboard, OptionConstants.clipboard_ideaput)
     ) {
       return
     }

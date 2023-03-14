@@ -8,7 +8,7 @@
 
 package com.maddyhome.idea.vim.options.helpers
 
-import com.maddyhome.idea.vim.api.getKnownStringOption
+import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.modifyOptionValue
@@ -23,7 +23,7 @@ public object ClipboardOptionHelper {
 
   public class IdeaputDisabler : AutoCloseable {
     private val containedBefore =
-      injector.globalOptions().hasValue(OptionConstants.clipboard, OptionConstants.clipboard_ideaput)
+      injector.globalOptions().hasValue(Options.clipboard, OptionConstants.clipboard_ideaput)
 
     init {
       modifyClipboardOption { option, currentValue ->
@@ -43,9 +43,8 @@ public object ClipboardOptionHelper {
     }
 
     private inline fun modifyClipboardOption(transform: (StringOption, VimString) -> VimString) {
-      val option = injector.optionGroup.getKnownStringOption(OptionConstants.clipboard)
-      injector.optionGroup.modifyOptionValue(option, OptionScope.GLOBAL) {
-        transform(option, it)
+      injector.optionGroup.modifyOptionValue(Options.clipboard, OptionScope.GLOBAL) {
+        transform(Options.clipboard, it)
       }
     }
   }

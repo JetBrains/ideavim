@@ -37,7 +37,6 @@ import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext;
 import com.maddyhome.idea.vim.newapi.IjVimCaret;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.options.OptionChangeListener;
-import com.maddyhome.idea.vim.options.OptionConstants;
 import com.maddyhome.idea.vim.regexp.CharPointer;
 import com.maddyhome.idea.vim.regexp.CharacterClasses;
 import com.maddyhome.idea.vim.regexp.RegExp;
@@ -71,7 +70,7 @@ import static com.maddyhome.idea.vim.register.RegisterConstants.LAST_SEARCH_REGI
 })
 public class SearchGroup extends VimSearchGroupBase implements PersistentStateComponent<Element> {
   public SearchGroup() {
-    VimPlugin.getOptionGroup().addListener(OptionConstants.hlsearch, oldValue -> {
+    VimPlugin.getOptionGroup().addListener(Options.hlsearch.getName(), oldValue -> {
       resetShowSearchHighlight();
       forceUpdateSearchHighlights();
     }, false);
@@ -81,8 +80,8 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
         forceUpdateSearchHighlights();
       }
     };
-    VimPlugin.getOptionGroup().addListener(OptionConstants.ignorecase, updateHighlightsIfVisible, false);
-    VimPlugin.getOptionGroup().addListener(OptionConstants.smartcase, updateHighlightsIfVisible, false);
+    VimPlugin.getOptionGroup().addListener(Options.ignorecase.getName(), updateHighlightsIfVisible, false);
+    VimPlugin.getOptionGroup().addListener(Options.smartcase.getName(), updateHighlightsIfVisible, false);
   }
 
   public void turnOn() {
@@ -613,7 +612,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
     }
     else {
       // :h :&& - "Note that :s and :& don't keep the flags"
-      do_all = options(injector, editor).isSet(OptionConstants.gdefault);
+      do_all = options(injector, editor).isSet(Options.gdefault);
       do_ask = false;
       do_error = true;
       do_ic = 0;
@@ -1095,7 +1094,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
   }
 
   private void resetShowSearchHighlight() {
-    showSearchHighlight = globalOptions(injector).isSet(OptionConstants.hlsearch);
+    showSearchHighlight = globalOptions(injector).isSet(Options.hlsearch);
   }
 
   private void highlightSearchLines(@NotNull Editor editor, int startLine, int endLine) {
@@ -1207,7 +1206,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
    * @return              The offset to the occurrence or -1 if not found
    */
   private int findItOffset(@NotNull Editor editor, int startOffset, int count, Direction dir) {
-    boolean wrap = globalOptions(injector).isSet(OptionConstants.wrapscan);
+    boolean wrap = globalOptions(injector).isSet(Options.wrapscan);
     logger.debug("Perform search. Direction: " + dir + " wrap: " + wrap);
 
     int offset = 0;
@@ -1369,7 +1368,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
     }
 
     Element show = search.getChild("show-last");
-    final boolean disableHighlight = globalOptions(injector).hasValue(OptionConstants.viminfo, "h");
+    final boolean disableHighlight = globalOptions(injector).hasValue(Options.viminfo, "h");
     showSearchHighlight = !disableHighlight && Boolean.parseBoolean(show.getText());
     if (logger.isDebugEnabled()) {
       logger.debug("show=" + show + "(" + show.getText() + ")");
@@ -1428,7 +1427,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
   private @NotNull String lastPatternOffset = "";  // /{pattern}/{offset}. Do not confuse with caret offset!
   private boolean lastIgnoreSmartCase;
   private @NotNull Direction lastDir = Direction.FORWARDS;
-  private boolean showSearchHighlight = globalOptions(injector).isSet(OptionConstants.hlsearch);
+  private boolean showSearchHighlight = globalOptions(injector).isSet(Options.hlsearch);
 
   private boolean do_all = false; /* do multiple substitutions per line */
   private boolean do_ask = false; /* ask for confirmation */
