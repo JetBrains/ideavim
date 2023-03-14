@@ -132,12 +132,6 @@ public fun VimOptionGroup.invertToggleOption(option: ToggleOption, scope: Option
   setOptionValue(option, scope, if (optionValue.asBoolean()) VimInt.ZERO else VimInt.ONE)
 }
 
-/**
- * Get an instance of [Option] for a well-known option name
- *
- * The option must exist, or an exception will be thrown
- */
-public fun VimOptionGroup.getKnownOption(optionName: String): Option<out VimDataType> = getOption(optionName)!!
 
 /**
  * Get an instance of [ToggleOption] for a well-known option name
@@ -146,12 +140,6 @@ public fun VimOptionGroup.getKnownOption(optionName: String): Option<out VimData
  */
 public fun VimOptionGroup.getKnownToggleOption(optionName: String): ToggleOption = getOption(optionName) as ToggleOption
 
-/**
- * Get an instance of [StringOption] for a well-known option name
- *
- * The option must exist, or an exception will be thrown
- */
-public fun VimOptionGroup.getKnownStringOption(optionName: String): StringOption = getOption(optionName) as StringOption
 
 /**
  * Modifies the value of an option by calling the given transform function
