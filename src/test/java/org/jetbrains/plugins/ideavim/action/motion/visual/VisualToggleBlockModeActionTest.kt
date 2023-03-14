@@ -12,8 +12,10 @@ package org.jetbrains.plugins.ideavim.action.motion.visual
 
 import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class VisualToggleBlockModeActionTest : VimTestCase() {
+  @Test
   fun `test enter visual with count`() {
     doTest(
       "1<C-V>",
@@ -38,6 +40,7 @@ class VisualToggleBlockModeActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test enter visual with five count`() {
     doTest(
       "5<C-V>",
@@ -62,6 +65,7 @@ class VisualToggleBlockModeActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test enter visual with 100 count`() {
     doTest(
       "100<C-V>",
@@ -86,6 +90,7 @@ class VisualToggleBlockModeActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test on empty file`() {
     doTest(
       "<C-V>",
@@ -96,6 +101,7 @@ class VisualToggleBlockModeActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test selectmode option`() {
     configureByText(
       """

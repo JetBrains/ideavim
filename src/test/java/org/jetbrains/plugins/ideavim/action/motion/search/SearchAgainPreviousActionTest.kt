@@ -13,9 +13,11 @@ import com.maddyhome.idea.vim.common.Direction
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class SearchAgainPreviousActionTest : VimTestCase() {
   @TestWithoutNeovim(reason = SkipNeovimReason.EDITOR_MODIFICATION)
+  @Test
   fun `test search with tabs`() {
     val before = """
   I found it in a legendary land
@@ -33,6 +35,7 @@ class SearchAgainPreviousActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.EDITOR_MODIFICATION)
+  @Test
   fun `test search with tabs 2`() {
     val before = """
   I found it in a legendary land
@@ -50,6 +53,7 @@ class SearchAgainPreviousActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.EDITOR_MODIFICATION)
+  @Test
   fun `test search with tabs 3`() {
     val before = """
   I found it in a legendary land
@@ -67,6 +71,7 @@ class SearchAgainPreviousActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.EDITOR_MODIFICATION)
+  @Test
   fun `test search with tabs with wrap`() {
     val before = """
   I found it in a legendary land
@@ -83,6 +88,7 @@ class SearchAgainPreviousActionTest : VimTestCase() {
     doTestWithSearch("N", before, after)
   }
 
+  @Test
   fun `test search previous after search command with offset`() {
     val before = """
       ${c}I found it in a legendary land
@@ -111,6 +117,7 @@ class SearchAgainPreviousActionTest : VimTestCase() {
     doTest(listOf(searchCommand("/and/1"), "G", "N"), before, after)
   }
 
+  @Test
   fun `test search previous after substitute command`() {
     val before = """
       I found it in a legendary land
@@ -129,6 +136,7 @@ class SearchAgainPreviousActionTest : VimTestCase() {
     doTest(listOf(exCommand("s/all/with"), "N"), before, after)
   }
 
+  @Test
   fun `test search previous after substitute does not reset search offset`() {
     val before = """
       ${c}I found it in a legendary land

@@ -10,21 +10,25 @@ package org.jetbrains.plugins.ideavim.ex.implementation.functions
 
 import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class BuiltInFunctionTest : VimTestCase() {
 
+  @Test
   fun `test abs`() {
     configureByText("\n")
     typeText(commandToKeys("echo abs(-123) abs(2)"))
     assertExOutput("123 2\n")
   }
 
+  @Test
   fun `test sin`() {
     configureByText("\n")
     typeText(commandToKeys("echo sin(0) sin(1)"))
     assertExOutput("0.0 0.841471\n")
   }
 
+  @Test
   fun `test empty`() {
     configureByText("\n")
     typeText(commandToKeys("echo empty(0) empty(1)"))
@@ -37,6 +41,7 @@ class BuiltInFunctionTest : VimTestCase() {
     assertExOutput("0 1\n")
   }
 
+  @Test
   fun `test line`() {
     configureByText("1\n2\n${c}3\n4\n5")
     typeText(commandToKeys("echo line('.')"))
@@ -77,6 +82,7 @@ class BuiltInFunctionTest : VimTestCase() {
   }
 
   // XXX virtualedit is not tested
+  @Test
   fun `test col`() {
     configureByText(
       """
@@ -122,6 +128,7 @@ class BuiltInFunctionTest : VimTestCase() {
     assertExOutput("0 1 1 0 2\n")
   }
 
+  @Test
   fun `test exists`() {
     configureByText("\n")
     typeText(commandToKeys("echo exists(5)"))
@@ -134,6 +141,7 @@ class BuiltInFunctionTest : VimTestCase() {
     assertExOutput("0\n")
   }
 
+  @Test
   fun `test len`() {
     configureByText("\n")
     typeText(commandToKeys("echo len(123)"))

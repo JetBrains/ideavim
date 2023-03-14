@@ -17,10 +17,12 @@ import com.maddyhome.idea.vim.common.Direction
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 import javax.swing.KeyStroke
 
 class GnNextTextObjectTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun `test delete word`() {
     doTestWithSearch(
       injector.parser.parseKeys("dgn"),
@@ -34,6 +36,7 @@ class GnNextTextObjectTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun `test delete second word`() {
     doTestWithSearch(
       injector.parser.parseKeys("2dgn"),
@@ -49,6 +52,7 @@ class GnNextTextObjectTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun `test with repeat`() {
     doTestWithSearch(
       injector.parser.parseKeys("cgnNewValue<ESC>..."),
@@ -69,6 +73,7 @@ class GnNextTextObjectTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test gn uses last used pattern not just search pattern`() {
     doTest(
       listOf("/is<CR>", ":s/test/tester/<CR>", "0", "dgn"),
@@ -81,7 +86,7 @@ class GnNextTextObjectTest : VimTestCase() {
 
   private fun doTestWithSearch(keys: List<KeyStroke>, before: String, after: String) {
     configureByText(before)
-    VimPlugin.getSearch().setLastSearchState(myFixture.editor, "test", "", Direction.FORWARDS)
+    VimPlugin.getSearch().setLastSearchState(fixture.editor, "test", "", Direction.FORWARDS)
     typeText(keys)
     assertState(after)
     assertState(VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)

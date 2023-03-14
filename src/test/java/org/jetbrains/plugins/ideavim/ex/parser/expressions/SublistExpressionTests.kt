@@ -14,24 +14,32 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.SublistExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
+import org.jetbrains.plugins.ideavim.combinate
 import org.jetbrains.plugins.ideavim.ex.evaluate
-import org.junit.experimental.theories.DataPoints
-import org.junit.experimental.theories.Theories
-import org.junit.experimental.theories.Theory
-import org.junit.runner.RunWith
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-@RunWith(Theories::class)
 class SublistExpressionTests {
 
   companion object {
     @JvmStatic
-    val values = listOf("", " ") @DataPoints get
+    fun args2(): List<Arguments> = combinate(spaces, spaces)
+    @JvmStatic
+    fun args3(): List<Arguments> = combinate(spaces, spaces, spaces)
+    @JvmStatic
+    fun args4(): List<Arguments> = combinate(spaces, spaces, spaces, spaces)
+    @JvmStatic
+    fun args6(): List<Arguments> = combinate(spaces, spaces, spaces, spaces, spaces, spaces)
+
+    val spaces = listOf("", " ")
   }
 
-  @Theory
+  @ParameterizedTest
+  @MethodSource("args2")
   fun `sublist with no range specified`(sp1: String, sp2: String) {
     val ex = VimscriptParser.parseExpression("1[$sp1:$sp2]")
     assertTrue(ex is SublistExpression)
@@ -40,7 +48,8 @@ class SublistExpressionTests {
     assertNull(ex.to)
   }
 
-  @Theory
+  @ParameterizedTest
+  @MethodSource("args3")
   fun `sublist with only start specified`(sp1: String, sp2: String, sp3: String) {
     val ex = VimscriptParser.parseExpression("'text'[${sp1}2$sp2:$sp3]")
     assertTrue(ex is SublistExpression)
@@ -49,7 +58,8 @@ class SublistExpressionTests {
     assertNull(ex.to)
   }
 
-  @Theory
+  @ParameterizedTest
+  @MethodSource("args3")
   fun `sublist with only end specified`(sp1: String, sp2: String, sp3: String) {
     val ex = VimscriptParser.parseExpression("var[$sp1:${sp2}32$sp3]")
     assertTrue(ex is SublistExpression)
@@ -59,7 +69,8 @@ class SublistExpressionTests {
     assertEquals(VimInt(32), ex.to!!.evaluate())
   }
 
-  @Theory
+  @ParameterizedTest
+  @MethodSource("args4")
   fun `sublist with range specified`(sp1: String, sp2: String, sp3: String, sp4: String) {
     val ex = VimscriptParser.parseExpression("[1, 2, 3, 4, 5, 6][${sp1}1$sp2:${sp3}4$sp4]")
     assertTrue(ex is SublistExpression)
@@ -71,7 +82,8 @@ class SublistExpressionTests {
     assertEquals(VimInt(4), ex.to!!.evaluate())
   }
 
-  @Theory
+  @ParameterizedTest
+  @MethodSource("args6")
   fun `sublist with non int expressions in ranges`(sp1: String, sp2: String, sp3: String, sp4: String, sp5: String, sp6: String) {
     val ex = VimscriptParser.parseExpression("[1, 2, 3, 4, 5, 6][${sp1}1$sp2+${sp3}5$sp4:$sp5'asd'$sp6]")
     assertTrue(ex is SublistExpression)

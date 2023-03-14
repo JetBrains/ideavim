@@ -13,8 +13,10 @@ import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class RepeatChangeActionTest : VimTestCase() {
+  @Test
   fun `test simple repeat`() {
     val keys = listOf("v2erXj^", ".")
     val before = """
@@ -36,6 +38,7 @@ class RepeatChangeActionTest : VimTestCase() {
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun `test simple repeat with dollar motion`() {
     val keys = listOf("v\$rXj^", ".")
     val before = """
@@ -57,6 +60,7 @@ class RepeatChangeActionTest : VimTestCase() {
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun `test repeat to line end`() {
     val keys = listOf("v2erXj\$b", ".")
     val before = """
@@ -79,6 +83,7 @@ class RepeatChangeActionTest : VimTestCase() {
   }
 
   @VimBehaviorDiffers(description = "Different caret position")
+  @Test
   fun `test repeat multiline`() {
     val keys = listOf("vjlrXj", ".")
     val before = """
@@ -100,6 +105,7 @@ class RepeatChangeActionTest : VimTestCase() {
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun `test count doesn't affect repeat`() {
     val keys = listOf("v2erXj^", "10.")
     val before = """
@@ -121,6 +127,7 @@ class RepeatChangeActionTest : VimTestCase() {
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun `test multicaret`() {
     val keys = listOf("v2erXj^", ".")
     val before = """
@@ -142,6 +149,7 @@ class RepeatChangeActionTest : VimTestCase() {
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun `test line motion`() {
     val keys = listOf("VrXj^", ".")
     val before = """
@@ -164,6 +172,7 @@ class RepeatChangeActionTest : VimTestCase() {
   }
 
   @VimBehaviorDiffers(description = "Wrong caret position")
+  @Test
   fun `test line motion to end`() {
     val keys = listOf("VjrX2j^", ".")
     val before = """
@@ -186,6 +195,7 @@ class RepeatChangeActionTest : VimTestCase() {
   }
 
   @VimBehaviorDiffers(description = "Wrong caret position")
+  @Test
   fun `test line motion shift`() {
     val keys = listOf("V3j<", ".")
     val before = """
@@ -208,6 +218,7 @@ class RepeatChangeActionTest : VimTestCase() {
   }
 
   @VimBehaviorDiffers(description = "Wrong caret position")
+  @Test
   fun `test block motion`() {
     val keys = listOf("<C-V>jerXll", ".")
     val before = """
@@ -240,6 +251,7 @@ class RepeatChangeActionTest : VimTestCase() {
 
     """,
   )
+  @Test
   fun `test block motion to end`() {
     val keys = listOf("<C-V>jjerXjl", ".")
     val before = """
@@ -264,6 +276,7 @@ class RepeatChangeActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.UNCLEAR)
+  @Test
   fun `test block with dollar motion`() {
     val keys = listOf("<C-V>j\$rXj^", ".")
     val before = """
@@ -285,6 +298,7 @@ class RepeatChangeActionTest : VimTestCase() {
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun `test repeat with count`() {
     val keys = listOf("4x", "j", ".")
     val before = """
@@ -314,6 +328,7 @@ class RepeatChangeActionTest : VimTestCase() {
         One
   """,
   )
+  @Test
   fun `test redo register feature`() {
     doTest(
       listOf("dd", "dd", "dd", "\"1p", ".", "."),

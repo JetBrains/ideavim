@@ -9,7 +9,7 @@
 package org.jetbrains.plugins.ideavim.config.migration
 
 import com.maddyhome.idea.vim.config.migration.`Detect versions 3, 4, 5, 6`
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 

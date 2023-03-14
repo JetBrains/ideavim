@@ -12,9 +12,11 @@ import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimOptionDefaultAll
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class MotionLeftActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
   fun `test whichwrap in the same line`() {
     doTest(
       listOf("h"),
@@ -31,6 +33,7 @@ class MotionLeftActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionDefaultAll
+  @Test
   fun `test whichwrap at file start`() {
     doTest(
       listOf("h"),
@@ -47,6 +50,7 @@ class MotionLeftActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionDefaultAll
+  @Test
   fun `test whichwrap to previous line`() {
     doTest(
       listOf("h"),
@@ -65,6 +69,7 @@ class MotionLeftActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionDefaultAll
+  @Test
   fun `test from empty line to empty line`() {
     doTest(
       listOf("h"),
@@ -87,6 +92,7 @@ class MotionLeftActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionDefaultAll
+  @Test
   fun `test d command with whichwrap`() {
     doTest(
       listOf("dh"),

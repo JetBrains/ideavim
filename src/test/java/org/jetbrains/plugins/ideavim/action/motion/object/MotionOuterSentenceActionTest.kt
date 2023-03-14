@@ -11,6 +11,7 @@ package org.jetbrains.plugins.ideavim.action.motion.`object`
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class MotionOuterSentenceActionTest : VimTestCase() {
   @VimBehaviorDiffers(
@@ -21,6 +22,7 @@ class MotionOuterSentenceActionTest : VimTestCase() {
         $c
     """,
   )
+  @Test
   fun `test on empty last line`() {
     doTest(
       "=as",
@@ -49,6 +51,7 @@ class MotionOuterSentenceActionTest : VimTestCase() {
         $c
     """,
   )
+  @Test
   fun `test delete on empty last line`() {
     doTest(
       "das",

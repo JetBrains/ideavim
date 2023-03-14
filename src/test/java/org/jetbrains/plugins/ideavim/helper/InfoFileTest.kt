@@ -11,12 +11,14 @@ package org.jetbrains.plugins.ideavim.helper
 import com.maddyhome.idea.vim.RegisterActions.VIM_ACTIONS_EP
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 import java.io.File
 
 /**
  * @author Alex Plate
  */
 class InfoFileTest : VimTestCase() {
+  @Test
   fun `test info`() {
     val text = File("src/main/java/com/maddyhome/idea/vim/package-info.java").readText()
 
@@ -27,9 +29,9 @@ class InfoFileTest : VimTestCase() {
         notPresentedActions += actionName
       }
     }
-    assertTrue(
-      notPresentedActions.joinToString(prefix = "Not presented actions in info file: \n", separator = "\n"),
+    kotlin.test.assertTrue(
       notPresentedActions.isEmpty(),
+      notPresentedActions.joinToString(prefix = "Not presented actions in info file: \n", separator = "\n")
     )
   }
 

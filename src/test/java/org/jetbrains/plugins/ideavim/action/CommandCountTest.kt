@@ -12,20 +12,24 @@ import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class CommandCountTest : VimTestCase() {
+  @Test
   fun `test count operator motion`() {
     configureByText("${c}1234567890")
     typeText(injector.parser.parseKeys("3dl"))
     assertState("4567890")
   }
 
+  @Test
   fun `test operator count motion`() {
     configureByText("${c}1234567890")
     typeText(injector.parser.parseKeys("d3l"))
     assertState("4567890")
   }
 
+  @Test
   fun `test count operator count motion`() {
     configureByText("${c}1234567890")
     typeText(injector.parser.parseKeys("2d3l"))
@@ -33,12 +37,14 @@ class CommandCountTest : VimTestCase() {
   }
 
   // See https://github.com/vim/vim/blob/b376ace1aeaa7614debc725487d75c8f756dd773/src/normal.c#L631
+  @Test
   fun `test count resets to 999999999L if gets too large`() {
     configureByText("1")
     typeText(injector.parser.parseKeys("12345678901234567890<C-A>"))
     assertState("1000000000")
   }
 
+  @Test
   fun `test count select register count operator count motion`() {
     configureByText("${c}123456789012345678901234567890")
     typeText(injector.parser.parseKeys("2\"a3d4l")) // Delete 24 characters
@@ -46,6 +52,7 @@ class CommandCountTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.TABS)
+  @Test
   fun `test multiple select register counts`() {
     configureByText("${c}12345678901234567890123456789012345678901234567890")
     typeText(injector.parser.parseKeys("2\"a2\"b2\"b2d2l")) // Delete 32 characters

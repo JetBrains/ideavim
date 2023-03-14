@@ -12,10 +12,12 @@ import com.maddyhome.idea.vim.helper.EditorHelper
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 @Suppress("ClassName")
 class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
   @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
+  @Test
   fun `test moving up causes scrolling up`() {
     configureByPages(5)
     setPositionAndScroll(19, 24)
@@ -26,6 +28,7 @@ class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
+  @Test
   fun `test scroll up with scrolljump`() {
     configureByPages(5)
     enterCommand("set scrolljump=10")
@@ -37,6 +40,7 @@ class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
+  @Test
   fun `test scroll up with scrolloff`() {
     configureByPages(5)
     enterCommand("set scrolloff=5")
@@ -48,6 +52,7 @@ class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
+  @Test
   fun `test scroll up with scrolljump and scrolloff 1`() {
     configureByPages(5)
     enterCommand("set scrolljump=10")
@@ -60,6 +65,7 @@ class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
+  @Test
   fun `test scroll up with scrolljump and scrolloff 2`() {
     configureByPages(5)
     enterCommand("set scrolljump=10")
@@ -72,6 +78,7 @@ class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
+  @Test
   fun `test scroll up with collapsed folds`() {
     configureByPages(5)
     // TODO: Implement zf
@@ -83,11 +90,8 @@ class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
     assertVisibleArea(15, 53)
   }
 
-  // TODO: Handle soft wraps
-//  fun `test scroll up with soft wraps`() {
-//  }
-
   @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
+  @Test
   fun `test scroll up more than half height moves caret to middle 1`() {
     configureByPages(5)
     setPositionAndScroll(115, 149)
@@ -98,6 +102,7 @@ class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
+  @Test
   fun `test scroll up more than half height moves caret to middle with scrolloff`() {
     configureByPages(5)
     enterCommand("set scrolljump=10")
@@ -111,6 +116,7 @@ class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
+  @Test
   fun `test scroll up with less than half height moves caret to top of screen`() {
     configureByPages(5)
     enterCommand("set scrolljump=10")
@@ -123,6 +129,7 @@ class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
+  @Test
   fun `test moving down causes scrolling down`() {
     configureByPages(5)
     setPositionAndScroll(0, 29)
@@ -133,6 +140,7 @@ class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
+  @Test
   fun `test scroll down with scrolljump`() {
     configureByPages(5)
     enterCommand("set scrolljump=10")
@@ -144,6 +152,7 @@ class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
+  @Test
   fun `test scroll down with scrolloff`() {
     configureByPages(5)
     enterCommand("set scrolloff=5")
@@ -155,6 +164,7 @@ class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
+  @Test
   fun `test scroll down with scrolljump and scrolloff 1`() {
     configureByPages(5)
     enterCommand("set scrolljump=10")
@@ -167,6 +177,7 @@ class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
+  @Test
   fun `test scroll down with scrolljump and scrolloff 2`() {
     configureByPages(5)
     enterCommand("set scrolljump=15")
@@ -179,6 +190,7 @@ class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
+  @Test
   fun `test scroll down with scrolljump and scrolloff 3`() {
     configureByPages(5)
     enterCommand("set scrolljump=20")
@@ -191,6 +203,7 @@ class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
+  @Test
   fun `test scroll down with scrolljump and scrolloff 4`() {
     configureByPages(5)
     enterCommand("set scrolljump=11")
@@ -203,6 +216,7 @@ class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
+  @Test
   fun `test scroll down with scrolljump and scrolloff 5`() {
     configureByPages(5)
     enterCommand("set scrolljump=10")
@@ -215,6 +229,7 @@ class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
+  @Test
   fun `test scroll down with scrolljump and scrolloff 6`() {
     configureByPages(5)
     enterCommand("set scrolljump=10")
@@ -227,6 +242,7 @@ class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
+  @Test
   fun `test scroll down too large cursor is centred`() {
     configureByPages(5)
     enterCommand("set scrolljump=10")
@@ -239,6 +255,6 @@ class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
   }
 
   private fun assertVisualLineAtMiddleOfScreen(expected: Int) {
-    assertEquals(expected, EditorHelper.getVisualLineAtMiddleOfScreen(myFixture.editor))
+    kotlin.test.assertEquals(expected, EditorHelper.getVisualLineAtMiddleOfScreen(fixture.editor))
   }
 }

@@ -12,9 +12,11 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class JoinLinesCommandTest : VimTestCase() {
   @VimBehaviorDiffers(description = "Different caret position")
+  @Test
   fun `test simple join`() {
     doTest(
       exCommand("j"),
@@ -39,6 +41,7 @@ class JoinLinesCommandTest : VimTestCase() {
   }
 
   @VimBehaviorDiffers(description = "Different caret position")
+  @Test
   fun `test simple join full command`() {
     doTest(
       exCommand("join"),
@@ -63,6 +66,7 @@ class JoinLinesCommandTest : VimTestCase() {
   }
 
   @VimBehaviorDiffers(description = "Different caret position")
+  @Test
   fun `test join with range`() {
     doTest(
       exCommand("4,6j"),
@@ -85,6 +89,7 @@ class JoinLinesCommandTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test join multicaret`() {
     configureByText(
       """

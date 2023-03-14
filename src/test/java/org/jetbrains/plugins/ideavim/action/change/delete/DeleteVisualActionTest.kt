@@ -15,11 +15,13 @@ import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.waitAndAssertMode
+import org.junit.jupiter.api.Test
 
 /**
  * @author Alex Plate
  */
 class DeleteVisualActionTest : VimTestCase() {
+  @Test
   fun `test delete block SE direction`() {
     val keys = listOf("<C-V>e2j", "d")
     val before = """
@@ -41,6 +43,7 @@ class DeleteVisualActionTest : VimTestCase() {
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun `test delete block SW direction`() {
     val keys = listOf("<C-V>b2j", "d")
     val before = """
@@ -62,6 +65,7 @@ class DeleteVisualActionTest : VimTestCase() {
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun `test delete block NW direction`() {
     val keys = listOf("<C-V>b2k", "d")
     val before = """
@@ -83,6 +87,7 @@ class DeleteVisualActionTest : VimTestCase() {
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun `test delete block NE direction`() {
     val keys = listOf("<C-V>2e2k", "d")
     val before = """
@@ -105,6 +110,7 @@ class DeleteVisualActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun `test delete after extend selection`() {
     // This test emulates deletion after structural selection
     // In short, when caret is not on the selection end
@@ -118,8 +124,8 @@ class DeleteVisualActionTest : VimTestCase() {
             ${se}hard by the torrent of a mountain pass.
       """.trimIndent(),
     )
-    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
+    IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
+    waitAndAssertMode(fixture, VimStateMachine.Mode.VISUAL)
     typeText(injector.parser.parseKeys("d"))
     assertState(
       """
@@ -131,6 +137,7 @@ class DeleteVisualActionTest : VimTestCase() {
     assertState(VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun `test delete with dollar motion`() {
     val keys = listOf("<C-V>3j$", "d")
     val before = """

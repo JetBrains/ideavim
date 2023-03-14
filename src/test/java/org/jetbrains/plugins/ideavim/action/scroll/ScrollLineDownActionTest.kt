@@ -12,6 +12,7 @@ import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 /*
                                                        *CTRL-E*
@@ -20,6 +21,7 @@ CTRL-E                  Scroll window [count] lines downwards in the buffer.
                         Mnemonic: Extra lines.
  */
 class ScrollLineDownActionTest : VimTestCase() {
+  @Test
   fun `test scroll single line down`() {
     configureByPages(5)
     setPositionAndScroll(0, 34)
@@ -28,6 +30,7 @@ class ScrollLineDownActionTest : VimTestCase() {
     assertVisibleArea(1, 35)
   }
 
+  @Test
   fun `test scroll line down will keep cursor on screen`() {
     configureByPages(5)
     setPositionAndScroll(0, 0)
@@ -36,6 +39,7 @@ class ScrollLineDownActionTest : VimTestCase() {
     assertVisibleArea(1, 35)
   }
 
+  @Test
   fun `test scroll line down will maintain current column at start of line with sidescrolloff`() {
     configureByPages(5)
     enterCommand("set scrolloff=10")
@@ -45,6 +49,7 @@ class ScrollLineDownActionTest : VimTestCase() {
     assertTopLogicalLine(31)
   }
 
+  @Test
   fun `test scroll count lines down`() {
     configureByPages(5)
     setPositionAndScroll(0, 34)
@@ -53,6 +58,7 @@ class ScrollLineDownActionTest : VimTestCase() {
     assertVisibleArea(10, 44)
   }
 
+  @Test
   fun `test scroll count lines down will keep cursor on screen`() {
     configureByPages(5)
     setPositionAndScroll(0, 0)
@@ -62,6 +68,7 @@ class ScrollLineDownActionTest : VimTestCase() {
   }
 
   @VimBehaviorDiffers(description = "Vim has virtual space at the end of the file, IntelliJ (by default) does not")
+  @Test
   fun `test too many lines down stops at last line`() {
     configureByPages(5) // 5 * 35 = 175
     setPositionAndScroll(100, 100)
@@ -75,6 +82,7 @@ class ScrollLineDownActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  @Test
   fun `test scroll down uses scrolloff and moves cursor`() {
     configureByPages(5)
     enterCommand("set scrolloff=10")
@@ -84,6 +92,7 @@ class ScrollLineDownActionTest : VimTestCase() {
     assertVisibleArea(21, 55)
   }
 
+  @Test
   fun `test scroll down is not affected by scrolljump`() {
     configureByPages(5)
     enterCommand("set scrolljump=10")
@@ -93,6 +102,7 @@ class ScrollLineDownActionTest : VimTestCase() {
     assertVisibleArea(21, 55)
   }
 
+  @Test
   fun `test scroll down in visual mode`() {
     configureByPages(5)
     setPositionAndScroll(20, 30)
@@ -100,6 +110,7 @@ class ScrollLineDownActionTest : VimTestCase() {
     assertVisibleArea(21, 55)
   }
 
+  @Test
   fun `test scroll last line down at end of file with virtual space`() {
     configureByLines(100, "    I found it in a legendary land")
     setEditorVirtualSpace()
@@ -109,6 +120,7 @@ class ScrollLineDownActionTest : VimTestCase() {
     assertVisibleArea(76, 99)
   }
 
+  @Test
   fun `test scroll line down at end of file with virtual space and scrolloff`() {
     configureByLines(100, "    I found it in a legendary land")
     enterCommand("set scrolloff=10")

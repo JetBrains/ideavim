@@ -9,6 +9,7 @@
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.options.OptionConstants
 import org.jetbrains.plugins.ideavim.OptionValueType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -18,6 +19,8 @@ import org.jetbrains.plugins.ideavim.VimOptionDefaultAll
 import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
 import org.jetbrains.plugins.ideavim.VimTestOption
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
 
 /**
  * @author Alex Plate
@@ -25,6 +28,7 @@ import org.jetbrains.plugins.ideavim.VimTestOption
 class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, OptionConstants.ignorecase) {
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test one letter`() {
     doTest(
       exCommand("s/a/b/"),
@@ -41,6 +45,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test one letter multi per line`() {
     doTest(
       exCommand("s/a/b/g"),
@@ -57,6 +62,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test one letter multi per line whole file`() {
     doTest(
       exCommand("%s/a/b/g"),
@@ -74,6 +80,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
   // VIM-146
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test eoLto quote`() {
     doTest(
       exCommand("s/$/'/g"),
@@ -90,6 +97,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test soLto quote`() {
     doTest(
       exCommand("s/^/'/g"),
@@ -106,6 +114,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test dot to nul`() {
     doTest(
       exCommand("s/\\./\\n/g"),
@@ -117,6 +126,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
   // VIM-528
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test groups`() {
     doTest(
       exCommand("s/\\(a\\|b\\)/z\\1/g"),
@@ -127,6 +137,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test to nl`() {
     doTest(
       exCommand("s/\\./\\r/g"),
@@ -138,6 +149,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
   // VIM-289
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test dot to nlDot`() {
     doTest(
       exCommand("s/\\./\\r\\./g"),
@@ -149,6 +161,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
   // VIM-702
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test end of line to nl`() {
     doTest(
       exCommand("%s/$/\\r/g"),
@@ -174,6 +187,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
   // VIM-702
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test start of line to nl`() {
     doTest(
       exCommand("%s/^/\\r/g"),
@@ -199,6 +213,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
   @VimOptionTestConfiguration(VimTestOption(OptionConstants.ignorecase, OptionValueType.NUMBER, "1"))
   @VimOptionDefault(OptionConstants.smartcase)
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test ignorecase option`() {
     doTest(
       exCommand("%s/foo/bar/g"),
@@ -209,6 +224,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test smartcase option`() {
     // smartcase does nothing if ignorecase is not set
     doTest(
@@ -244,6 +260,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test force ignore case flag`() {
     doTest(
       exCommand("%s/foo/bar/gi"),
@@ -270,6 +287,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test force match case flag`() {
     doTest(
       exCommand("%s/foo/bar/gI"),
@@ -295,6 +313,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
   // VIM-864
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test visual substitute doesnt change visual marks`() {
     configureByText("foo\nbar\nbaz\n")
     typeText("V", "j", ":'<,'>s/foo/fuu/<Enter>", "gv", "~")
@@ -303,6 +322,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test offset range`() {
     doTest(
       exCommand(".,+2s/a/b/g"),
@@ -313,6 +333,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test multiple carets`() {
     val before = """public class C {
       |  Stri${c}ng a;
@@ -337,6 +358,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test multiple carets substitute all occurrences`() {
     val before = """public class C {
       |  Stri${c}ng a; String e;
@@ -361,12 +383,14 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test with tabs`() {
     doTest(exCommand("s/foo/bar"), "\tfoo", "\tbar")
   }
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test confirm all replaces all in range`() {
     // Make sure the "a" is added as part of the same injector.parser.parseKeys as the <Enter>, as it needs to be available while the
     // <Enter> is processed
@@ -387,6 +411,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test confirm all replaces all in rest of range`() {
     // Make sure the "a" is added as part of the same injector.parser.parseKeys as the <Enter>, as it needs to be available while the
     // <Enter> is processed
@@ -407,6 +432,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test confirm options`() {
     // Make sure the "a" is added as part of the same injector.parser.parseKeys as the <Enter>, as it needs to be available while the
     // <Enter> is processed
@@ -427,6 +453,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test confirm options with quit`() {
     // Make sure the "a" is added as part of the same injector.parser.parseKeys as the <Enter>, as it needs to be available while the
     // <Enter> is processed
@@ -447,6 +474,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test confirm moves caret to first match`() {
     configureByText(
       """I found it in a legendary land
@@ -462,6 +490,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test confirm moves caret to next match`() {
     configureByText(
       """I found it in a legendary land
@@ -477,6 +506,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test alternative range format`() {
     configureByText(
       """One
@@ -502,6 +532,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test alternative range format with second dot`() {
     configureByText(
       """One
@@ -527,6 +558,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test substitute pattern becomes last used pattern for search next`() {
     val before = """
        I found it in a legendary land
@@ -546,6 +578,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test colon-s repeats last substitution`() {
     val before = """
        ${c}I found it in a legendary land
@@ -565,6 +598,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test colon-s repeats last substitution without range`() {
     val before = """
        I found it in a legendary land
@@ -585,6 +619,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test colon-ampersand repeats last substitution without range`() {
     val before = """
        I found it in a legendary land
@@ -605,6 +640,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test colon-s repeats last substitution with new range`() {
     val before = """
        I found it in a legendary land
@@ -625,6 +661,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test colon-ampersand repeats last substitution with new range`() {
     val before = """
        I found it in a legendary land
@@ -645,6 +682,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test colon-s repeats last substitution with reset flags`() {
     val before = "${c}I found it in a legendary land"
     val after = "${c}z found it in a legendary land"
@@ -656,6 +694,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test colon-ampersand repeats last substitution with reset flags`() {
     val before = "${c}I found it in a legendary land"
     val after = "${c}z found it in a legendary land"
@@ -667,6 +706,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test colon-s repeats last substitution with new flags`() {
     val before = "${c}I found it in a legendary land"
     val after = "${c}z found zt in a legendary land"
@@ -675,18 +715,21 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
     doTest(listOf(exCommand("s/i/z"), exCommand("s i")), before, after)
   }
 
-//  @VimBehaviorDiffers(description = "Vim supports :s[flags] but IdeaVim's command parser does not handle this." +
-//    "It tries to find a command called e.g. 'si'")
-//  @VimOptionDefaultAll
-//  fun `test colon-s repeats last substitution with new flags (no spaces)`() {
-//    val before = "${c}I found it in a legendary land"
-//    val after = "${c}z found zt in a legendary land"
-//
-//    doTest(listOf(exCommand("s/i/z"), exCommand("si")), before, after)
-//  }
+  @VimBehaviorDiffers(description = "Vim supports :s[flags] but IdeaVim's command parser does not handle this." +
+    "It tries to find a command called e.g. 'si'")
+  @VimOptionDefaultAll
+  @Test
+  @Disabled
+  fun `test colon-s repeats last substitution with new flags (no spaces)`() {
+    val before = "${c}I found it in a legendary land"
+    val after = "${c}z found zt in a legendary land"
+
+    doTest(listOf(exCommand("s/i/z"), exCommand("si")), before, after)
+  }
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test colon-ampersand repeats last substitution with new flags`() {
     val before = "${c}I found it in a legendary land"
     val after = "${c}z found zt in a legendary land"
@@ -697,6 +740,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test colon-s ampersand does NOT repeat last substitution`() {
     // :s [flag] - & means use previous flags
     // See :h :& - "Note that after :substitute the '&' flag can't be used, it's recognized as a separator"
@@ -711,6 +755,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test colon-ampersand-ampersand repeats last substitution with previous flags`() {
     // :s [flag] - & means use previous flags
     // See :h :& - "Note that after :substitute the '&' flag can't be used, it's recognized as a separator"
@@ -724,6 +769,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test colon-s repeats last substitution with count acts like line range`() {
     val before = """
        ${c}I found it in a legendary land
@@ -744,6 +790,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test colon-s repeats last substitution after search`() {
     val before = "${c}I found it in a legendary land"
     val after = "${c}I found zt zn a legendary land"
@@ -754,6 +801,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test colon-tilde repeats last substitution with last search pattern`() {
     val before = "${c}I found it in a legendary land"
     val after = "${c}I founz zt in a legendary land"
@@ -764,6 +812,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test colon-ampersand r repeats last substitution with last search pattern`() {
     val before = "${c}I found it in a legendary land"
     val after = "${c}I founz zt in a legendary land"
@@ -774,6 +823,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test new substitution using previous flags`() {
     val before = "${c}I found it in a legendary land"
     val after = "${c}I fouxd zt zx a legexdary laxd"
@@ -784,6 +834,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test replace tilde with last replace string`() {
     val before = "${c}I found it in a legendary land"
     val after = "${c}I found zzzt in a zzzegendary land"
@@ -794,6 +845,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test replace tilde with last replace string 2`() {
     val before = "${c}I found it in a legendary land"
     val after = "${c}I found zzzt in a aazzzbbzzzegendary land"
@@ -805,6 +857,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
   // VIM-2409
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test inline comment is a part of substitute command`() {
     doTest(
       exCommand("s/'/\"/g"),
@@ -816,6 +869,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
   // VIM-2417
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test bar in subsitute command`() {
     doTest(
       exCommand("%s/|/\\&"),
@@ -828,6 +882,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test underscore as delimiter`() {
     doTest(
       exCommand("s_1_2"),
@@ -838,6 +893,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test simple expression`() {
     configureByText(
       """
@@ -858,6 +914,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test line-dependent expression`() {
     configureByText(
       """
@@ -878,6 +935,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test substitute with submatch function`() {
     configureByText(
       """
@@ -896,6 +954,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test substitute with submatch function2`() {
     configureByText(
       """
@@ -925,6 +984,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test exception during expression evaluation`() {
     configureByText(
       """
@@ -953,6 +1013,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test invalid expression`() {
     configureByText(
       """
@@ -982,6 +1043,7 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
   // VIM-2553
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test removing consecutive matches`() {
     doTest(
       exCommand("%s/[*/]//g"),

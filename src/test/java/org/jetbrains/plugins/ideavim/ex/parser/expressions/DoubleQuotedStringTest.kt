@@ -9,7 +9,7 @@
 package org.jetbrains.plugins.ideavim.ex.parser.expressions
 
 import com.maddyhome.idea.vim.api.injector
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import java.awt.event.InputEvent.CTRL_DOWN_MASK
 import javax.swing.KeyStroke.getKeyStroke
 import kotlin.test.assertEquals

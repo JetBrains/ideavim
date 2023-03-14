@@ -15,8 +15,10 @@ import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.helper.vimSelectionStart
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.rangeOf
+import org.junit.jupiter.api.Test
 
 class VisualToggleCharacterModeActionTest : VimTestCase() {
+  @Test
   fun `test vim start after enter visual`() {
     val before = """
             A Discovery
@@ -29,9 +31,10 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
     configureByText(before)
     typeText("v")
     val startOffset = (before rangeOf "found").startOffset
-    assertEquals(startOffset, myFixture.editor.caretModel.primaryCaret.vimSelectionStart)
+    kotlin.test.assertEquals(startOffset, fixture.editor.caretModel.primaryCaret.vimSelectionStart)
   }
 
+  @Test
   fun `test vim start after enter visual with motion`() {
     val before = """
             A Discovery
@@ -44,9 +47,10 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
     configureByText(before)
     typeText("vl")
     val startOffset = (before rangeOf "found").startOffset
-    assertEquals(startOffset, myFixture.editor.caretModel.primaryCaret.vimSelectionStart)
+    kotlin.test.assertEquals(startOffset, fixture.editor.caretModel.primaryCaret.vimSelectionStart)
   }
 
+  @Test
   fun `test vim start after enter visual multicaret`() {
     val before = """
             A Discovery
@@ -60,10 +64,11 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
     typeText("vl")
     val startOffset1 = (before rangeOf "found").startOffset
     val startOffset2 = (before rangeOf "settled").startOffset
-    assertEquals(startOffset1, myFixture.editor.caretModel.allCarets[0].vimSelectionStart)
-    assertEquals(startOffset2, myFixture.editor.caretModel.allCarets[1].vimSelectionStart)
+    kotlin.test.assertEquals(startOffset1, fixture.editor.caretModel.allCarets[0].vimSelectionStart)
+    kotlin.test.assertEquals(startOffset2, fixture.editor.caretModel.allCarets[1].vimSelectionStart)
   }
 
+  @Test
   fun `test vim start after enter visual multicaret with merge`() {
     val before = """
             A Discovery
@@ -77,10 +82,11 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
     typeText("v2e")
     val startOffset1 = (before rangeOf "legendary").startOffset
     val startOffset2 = (before rangeOf "settled").startOffset
-    assertEquals(startOffset1, myFixture.editor.caretModel.allCarets[0].vimSelectionStart)
-    assertEquals(startOffset2, myFixture.editor.caretModel.allCarets[1].vimSelectionStart)
+    kotlin.test.assertEquals(startOffset1, fixture.editor.caretModel.allCarets[0].vimSelectionStart)
+    kotlin.test.assertEquals(startOffset2, fixture.editor.caretModel.allCarets[1].vimSelectionStart)
   }
 
+  @Test
   fun `test vim start after enter visual multicaret with merge to left`() {
     val before = """
             A Discovery
@@ -94,10 +100,11 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
     typeText("v2b")
     val startOffset1 = (before rangeOf "legendary").startOffset
     val startOffset2 = (before rangeOf "settled").startOffset
-    assertEquals(startOffset1, myFixture.editor.caretModel.allCarets[0].vimSelectionStart)
-    assertEquals(startOffset2, myFixture.editor.caretModel.allCarets[1].vimSelectionStart)
+    kotlin.test.assertEquals(startOffset1, fixture.editor.caretModel.allCarets[0].vimSelectionStart)
+    kotlin.test.assertEquals(startOffset2, fixture.editor.caretModel.allCarets[1].vimSelectionStart)
   }
 
+  @Test
   fun `test enter visual with count`() {
     doTest(
       "1v",
@@ -122,6 +129,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test enter visual with count multicaret`() {
     doTest(
       "1v",
@@ -146,6 +154,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test enter visual with five count`() {
     doTest(
       "5v",
@@ -170,6 +179,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test enter visual with 100 count`() {
     doTest(
       "100v",
@@ -194,6 +204,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test enter visual with count after visual operation`() {
     doTest(
       listOf("vedx", "1v"),
@@ -218,6 +229,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test enter visual with count after visual operation multicaret`() {
     doTest(
       listOf("vedx", "1v"),
@@ -242,6 +254,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test enter visual with count after visual operation multiple time`() {
     doTest(
       listOf("vedx", "1v", "<ESC>bb", "1v"),
@@ -266,6 +279,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test enter visual with double count after visual operation`() {
     doTest(
       listOf("vedx", "2v"),
@@ -290,6 +304,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test enter visual with ten count after visual operation`() {
     doTest(
       listOf("vedx", "10v"),
@@ -314,6 +329,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test enter visual with double count after visual operation multiline`() {
     doTest(
       listOf("vjld", "2v"),
@@ -337,6 +353,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test enter visual with ten count after visual operation multiline`() {
     doTest(
       listOf("vjld", "10v"),
@@ -360,6 +377,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test enter visual with count after multiline visual operation`() {
     doTest(
       listOf("vjld", "1v"),
@@ -384,6 +402,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
   }
 
   @VimBehaviorDiffers(description = "Different caret postion")
+  @Test
   fun `test enter visual with count with dollar motion`() {
     doTest(
       listOf("v\$dj", "1v"),
@@ -417,6 +436,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
   }
 
   @VimBehaviorDiffers(description = "Different caret position")
+  @Test
   fun `test enter visual with count with dollar motion and down movement`() {
     // expect to see switches v, $, d, v.
     doTest(
@@ -451,6 +471,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test enter visual with count after line visual operation`() {
     doTest(
       listOf("Vd", "1v"),
@@ -474,6 +495,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test enter visual with count after line visual operation to line end`() {
     doTest(
       listOf("V3jd3k", "1v"),
@@ -505,6 +527,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
   }
 
   @VimBehaviorDiffers(description = "Different caret position")
+  @Test
   fun `test enter visual with count after line visual operation multicaret`() {
     doTest(
       listOf("Vd", "1v"),
@@ -527,6 +550,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test enter visual with double count after line visual operation`() {
     doTest(
       listOf("Vd", "2v"),
@@ -550,6 +574,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test enter visual with ten count after line visual operation`() {
     doTest(
       listOf("Vd", "10v"),
@@ -574,6 +599,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
   }
 
   @VimBehaviorDiffers(description = "Different caret position")
+  @Test
   fun `test enter visual with count after line visual operation with dollar motion`() {
     doTest(
       listOf("V\$d", "1v"),
@@ -597,6 +623,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test enter visual with count after block visual operation`() {
     doTest(
       listOf("<C-V>jld", "1v"),
@@ -621,6 +648,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test enter visual with count after block visual operation multiple time`() {
     doTest(
       listOf("<C-V>jld", "1v", "<ESC>kh", "1v"),
@@ -645,6 +673,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test enter visual with double count after block visual operation`() {
     doTest(
       listOf("<C-V>jld", "2v"),
@@ -669,6 +698,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test enter visual with ten count after block visual operation`() {
     doTest(
       listOf("<C-V>jld", "20v"),
@@ -693,6 +723,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test enter visual with dollar motion count after block visual operation`() {
     doTest(
       listOf("<C-V>j\$d2j", "1v"),
@@ -726,6 +757,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test selectmode option`() {
     configureByText(
       """

@@ -11,11 +11,13 @@ package org.jetbrains.plugins.ideavim.action.change.change.number
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 /**
  * @author Alex Plate
  */
 class ChangeVisualNumberIncActionTest : VimTestCase() {
+  @Test
   fun `test inc visual full number`() {
     doTest(
       "V<C-A>",
@@ -26,6 +28,7 @@ class ChangeVisualNumberIncActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test inc visual multiple numbers`() {
     doTest(
       "v10w<C-A>",
@@ -36,6 +39,7 @@ class ChangeVisualNumberIncActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test inc visual part of number`() {
     doTest(
       "v4l<C-A>",
@@ -46,6 +50,7 @@ class ChangeVisualNumberIncActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test inc visual multiple lines`() {
     doTest(
       "V2j<C-A>",
@@ -74,6 +79,7 @@ class ChangeVisualNumberIncActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test inc visual 999 multiple lines`() {
     doTest(
       "V2j<C-A>",
@@ -92,6 +98,7 @@ class ChangeVisualNumberIncActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test inc visual multiple numbers on line`() {
     doTest(
       "V<C-A>",
@@ -102,6 +109,7 @@ class ChangeVisualNumberIncActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test change number inc visual multiple cursor`() {
     typeTextInFile(
       injector.parser.parseKeys("Vj<C-A>"),
@@ -124,6 +132,7 @@ class ChangeVisualNumberIncActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test two numbers on the same line`() {
     doTest(
       "v$<C-A>",
@@ -134,6 +143,7 @@ class ChangeVisualNumberIncActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test two numbers on the same line with two lines`() {
     doTest(
       "vj<C-A>",
@@ -148,6 +158,7 @@ class ChangeVisualNumberIncActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test two numbers on the same line with three lines`() {
     doTest(
       "vjj<C-A>",
@@ -164,6 +175,7 @@ class ChangeVisualNumberIncActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test block nothing increment`() {
     doTest(
       "<C-V>jjll<C-A>",
@@ -182,6 +194,7 @@ class ChangeVisualNumberIncActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test block increment end`() {
     doTest(
       "<C-V>jj$<C-A>",

@@ -15,8 +15,10 @@ import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class MotionLastColumnActionTest : VimTestCase() {
+  @Test
   fun `test dollar motion`() {
     val keys = "$"
     val before = """
@@ -38,6 +40,7 @@ class MotionLastColumnActionTest : VimTestCase() {
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun `test dollar motion with motion to longer line`() {
     val keys = "\$j"
     val before = """
@@ -59,6 +62,7 @@ class MotionLastColumnActionTest : VimTestCase() {
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun `test dollar motion in visual block mode`() {
     val keys = "<C-V>jj\$"
     val before = """
@@ -80,6 +84,7 @@ class MotionLastColumnActionTest : VimTestCase() {
     doTest(keys, before, after, VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_BLOCK)
   }
 
+  @Test
   fun `test dollar motion resets intended location after motion`() {
     doTest(
       "\$hlj",
@@ -112,6 +117,7 @@ class MotionLastColumnActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.
     """,
   )
+  @Test
   fun `test dollar motion in visual block mode with left motion`() {
     val keys = "<C-V>jj\$h"
     val before = """
@@ -133,6 +139,7 @@ class MotionLastColumnActionTest : VimTestCase() {
     doTest(keys, before, after, VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_BLOCK)
   }
 
+  @Test
   fun `test dollar motion from insert mode`() {
     val keys = "i<C-O>$"
     val before = """
@@ -155,6 +162,7 @@ class MotionLastColumnActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.CTRL_CODES)
+  @Test
   fun `test dollar motion from insert mode with deletion`() {
     val keys = "i<C-O>d$"
     val before = """

@@ -13,11 +13,15 @@ import com.intellij.ide.highlighter.JavaFileType
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInfo
 
 class MatchitGeneralTest : VimTestCase() {
   @Throws(Exception::class)
-  override fun setUp() {
-    super.setUp()
+  @BeforeEach
+  override fun setUp(testInfo: TestInfo) {
+    super.setUp(testInfo)
     enableExtensions("matchit")
   }
 
@@ -25,6 +29,7 @@ class MatchitGeneralTest : VimTestCase() {
    * Tests to make sure we didn't break the default % motion
    */
 
+  @Test
   fun `test jump from Java comment start to end`() {
     doTest(
       "%",
@@ -42,6 +47,7 @@ class MatchitGeneralTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from Java comment end to start`() {
     doTest(
       "%",
@@ -59,6 +65,7 @@ class MatchitGeneralTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test 25 percent jump`() {
     doTest(
       "25%",
@@ -78,6 +85,7 @@ class MatchitGeneralTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from visual end of line to opening parenthesis`() {
     doTest(
       "v$%",
@@ -89,6 +97,7 @@ class MatchitGeneralTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from visual end of line to opening parenthesis then back to closing`() {
     doTest(
       "v$%%",
@@ -100,6 +109,7 @@ class MatchitGeneralTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test delete everything from opening parenthesis to closing parenthesis`() {
     doTest(
       "d%",
@@ -109,6 +119,7 @@ class MatchitGeneralTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test delete everything from closing parenthesis to opening parenthesis`() {
     doTest(
       "d%",
@@ -120,6 +131,7 @@ class MatchitGeneralTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test delete everything from opening curly brace to closing curly brace`() {
     doTest(
       "d%",
@@ -131,6 +143,7 @@ class MatchitGeneralTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test delete everything from closing curly brace to opening curly brace`() {
     doTest(
       "d%",
@@ -142,6 +155,7 @@ class MatchitGeneralTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test delete everything from opening square bracket to closing square bracket`() {
     doTest(
       "d%",
@@ -153,6 +167,7 @@ class MatchitGeneralTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test delete everything from closing square bracket to opening square bracket`() {
     doTest(
       "d%",
@@ -167,6 +182,7 @@ class MatchitGeneralTest : VimTestCase() {
   /*
    * Tests for visual mode and deleting on the new Matchit patterns.
    */
+  @Test
   fun `test jump from visual end of line to opening angle bracket`() {
     doTest(
       "v$%",
@@ -178,6 +194,7 @@ class MatchitGeneralTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from visual end of line to start of for loop`() {
     doTest(
       "v$%",
@@ -207,6 +224,7 @@ class MatchitGeneralTest : VimTestCase() {
   """,
     description = "Our code changes the motion type to linewise, but it should not",
   )
+  @Test
   fun `test delete from elseif to else`() {
     doTest(
       "d%",
@@ -230,6 +248,7 @@ class MatchitGeneralTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test delete from elseif to else 2`() {
     doTest(
       "d%",
@@ -253,6 +272,7 @@ class MatchitGeneralTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test delete from else to elsif with reverse motion`() {
     doTest(
       "dg%",
@@ -276,6 +296,7 @@ class MatchitGeneralTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test delete from opening to closing div`() {
     doTest(
       "d%",
@@ -289,6 +310,7 @@ class MatchitGeneralTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test delete from opening angle bracket to closing angle bracket`() {
     doTest(
       "d%",
@@ -300,6 +322,7 @@ class MatchitGeneralTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test delete whole function from def`() {
     doTest(
       "d%",
@@ -313,6 +336,7 @@ class MatchitGeneralTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test delete whole function from def with reverse motion`() {
     doTest(
       "dg%",
@@ -326,6 +350,7 @@ class MatchitGeneralTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test delete whole function from end`() {
     doTest(
       "d%",
@@ -339,6 +364,7 @@ class MatchitGeneralTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test delete whole function from end with reverse motion`() {
     doTest(
       "dg%",

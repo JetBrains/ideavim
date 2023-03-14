@@ -10,21 +10,25 @@ package org.jetbrains.plugins.ideavim.action.motion.`object`
 
 import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class MotionOuterBlockParenActionTest : VimTestCase() {
   // VIM-1633 |v_a)|
+  @Test
   fun `test single letter with single parentheses`() {
     configureByText("(${c}a)")
     typeText(injector.parser.parseKeys("va)"))
     assertSelection("(a)")
   }
 
+  @Test
   fun `test single letter with double parentheses`() {
     configureByText("((${c}a))")
     typeText(injector.parser.parseKeys("va)"))
     assertSelection("(a)")
   }
 
+  @Test
   fun `test multiline outside parentheses`() {
     configureByText(
       """(outer
@@ -35,6 +39,7 @@ class MotionOuterBlockParenActionTest : VimTestCase() {
     assertSelection("(inner)")
   }
 
+  @Test
   fun `test multiline in parentheses`() {
     configureByText(
       """(outer
@@ -45,6 +50,7 @@ class MotionOuterBlockParenActionTest : VimTestCase() {
     assertSelection("(inner)")
   }
 
+  @Test
   fun `test multiline inside of outer parentheses`() {
     configureByText(
       """(outer
@@ -59,6 +65,7 @@ class MotionOuterBlockParenActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test double motion`() {
     configureByText(
       """(outer
@@ -73,6 +80,7 @@ class MotionOuterBlockParenActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test motion with count`() {
     configureByText(
       """(outer
@@ -87,6 +95,7 @@ class MotionOuterBlockParenActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test text object after motion`() {
     configureByText(
       """(outer
@@ -101,6 +110,7 @@ class MotionOuterBlockParenActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test text object after motion outside parentheses`() {
     configureByText(
       """(outer
@@ -112,6 +122,7 @@ class MotionOuterBlockParenActionTest : VimTestCase() {
   }
 
   // |d| |v_ab|
+  @Test
   fun testDeleteOuterBlock() {
     typeTextInFile(
       injector.parser.parseKeys("da)"),

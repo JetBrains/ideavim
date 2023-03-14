@@ -12,12 +12,17 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
+import kotlin.test.assertNotNull
 
 class MultipleCaretsTest : VimTestCase() {
+  @Test
   fun testGotoToNthCharacter() {
     val before = "qwe rty a${c}sd\n fgh zx${c}c ${c}vbn"
     configureByText(before)
@@ -26,6 +31,7 @@ class MultipleCaretsTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun testGotoLine() {
     val before = "qwe\n" + "rty\n" + "asd\n" + "f${c}gh\n" + "zxc\n" + "v${c}bn\n"
     configureByText(before)
@@ -34,6 +40,7 @@ class MultipleCaretsTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun testGotoLineInc() {
     val before = """
       qwe
@@ -58,6 +65,7 @@ class MultipleCaretsTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun testJoinLines() {
     val before = "qwe\n" + "r${c}ty\n" + "asd\n" + "fg${c}h\n" + "zxc\n" + "vbn\n"
     configureByText(before)
@@ -66,15 +74,18 @@ class MultipleCaretsTest : VimTestCase() {
     assertState(after)
   }
 
-//  fun testJoinVisualLines() {
-//    val before = "qwe\n" + "r${c}ty\n" + "asd\n" + "fg${c}h\n" + "zxc\n" + "vbn\n"
-//    configureByText(before)
-//    typeText(parseKeys("vj"))
-//    typeText(commandToKeys("j"))
-//    val after = "qwe\n" + "rty${c} asd\n" + "fgh${c} zxc\n" + "vbn\n"
-//    myFixture.checkResult(after)
-//  }
+  @Test
+  @Disabled
+  fun testJoinVisualLines() {
+    val before = "qwe\n" + "r${c}ty\n" + "asd\n" + "fg${c}h\n" + "zxc\n" + "vbn\n"
+    configureByText(before)
+    typeText(parseKeys("vj"))
+    typeText(commandToKeys("j"))
+    val after = "qwe\n" + "rty${c} asd\n" + "fgh${c} zxc\n" + "vbn\n"
+    fixture.checkResult(after)
+  }
 
+  @Test
   fun testCopyText() {
     val before = "qwe\n" + "rty\n" + "a${c}sd\n" + "fg${c}h\n" + "zxc\n" + "vbn\n"
     configureByText(before)
@@ -83,15 +94,19 @@ class MultipleCaretsTest : VimTestCase() {
     assertState(after)
   }
 
-//  fun testCopyVisualText() {
-//    val before = "qwe\n" + "${c}rty\n" + "asd\n" + "f${c}gh\n" + "zxc\n" + "vbn\n"
-//    configureByText(before)
-//    typeText(parseKeys("vj"))
-//    typeText(commandToKeys(":co 2"))
-//    val after = "qwe\n" + "rty\n" + "${c}rty\n" + "asd\n" + "${c}fgh\n" + "zxc\n" + "asd\n" + "fgh\n" + "zxc\n" + "vbn\n"
-//    myFixture.checkResult(after)
-//  }
+  @Test
+  @Disabled
+  fun testCopyVisualText() {
+    val before = "qwe\n" + "${c}rty\n" + "asd\n" + "f${c}gh\n" + "zxc\n" + "vbn\n"
+    configureByText(before)
+    typeText(parseKeys("vj"))
+    typeText(commandToKeys(":co 2"))
+    val after =
+      "qwe\n" + "rty\n" + "${c}rty\n" + "asd\n" + "${c}fgh\n" + "zxc\n" + "asd\n" + "fgh\n" + "zxc\n" + "vbn\n"
+    fixture.checkResult(after)
+  }
 
+  @Test
   fun testPutText() {
     // This test produces double ${c}zxc on 3rd line if non-idea paste is used
     val before = """
@@ -105,7 +120,8 @@ class MultipleCaretsTest : VimTestCase() {
     """.trimIndent()
     val editor = configureByText(before)
     val vimEditor = editor.vim
-    VimPlugin.getRegister().storeText(vimEditor, vimEditor.primaryCaret(), TextRange(16, 19), SelectionType.CHARACTER_WISE, false)
+    VimPlugin.getRegister()
+      .storeText(vimEditor, vimEditor.primaryCaret(), TextRange(16, 19), SelectionType.CHARACTER_WISE, false)
     typeText(commandToKeys("pu"))
     val after = """
           qwe
@@ -122,6 +138,7 @@ class MultipleCaretsTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "register")
+  @Test
   fun testPutTextCertainLine() {
     // This test produces triple ${c}zxc if non-idea paste is used
     val before = """
@@ -135,7 +152,8 @@ class MultipleCaretsTest : VimTestCase() {
     """.trimIndent()
     val editor = configureByText(before)
     val vimEditor = editor.vim
-    VimPlugin.getRegister().storeText(vimEditor, vimEditor.primaryCaret(), TextRange(16, 19), SelectionType.CHARACTER_WISE, false)
+    VimPlugin.getRegister()
+      .storeText(vimEditor, vimEditor.primaryCaret(), TextRange(16, 19), SelectionType.CHARACTER_WISE, false)
     typeText(commandToKeys("4pu"))
     val after = """
           qwe
@@ -150,42 +168,52 @@ class MultipleCaretsTest : VimTestCase() {
     assertState(after)
   }
 
-//  fun testPutVisualLines() {
-//    val before = "${c}qwe\n" + "rty\n" + "as${c}d\n" + "fgh\n" + "zxc\n" + "vbn\n"
-//    val editor = configureByText(before)
-//    VimPlugin.getRegister().storeText(editor.vim, TextRange(16, 19), SelectionType.CHARACTER_WISE, false)
-//
-//    typeText(parseKeys("vj"))
-//    typeText(commandToKeys("pu"))
-//
-//    val after = "qwe\n" + "rty\n" + "${c}zxc\n" + "asd\n" + "fgh\n" + "${c}zxc\n" + "zxc\n" + "vbn\n"
-//    myFixture.checkResult(after)
-//  }
+  @Test
+  @Disabled
+  fun testPutVisualLines() {
+    val before = "${c}qwe\n" + "rty\n" + "as${c}d\n" + "fgh\n" + "zxc\n" + "vbn\n"
+    val editor = configureByText(before)
+    VimPlugin.getRegister()
+      .storeText(editor.vim, editor.vim.primaryCaret(), TextRange(16, 19), SelectionType.CHARACTER_WISE, false)
 
-//  fun testMoveTextBeforeCarets() {
-//    val before = "qwe\n" + "rty\n" + "${c}asd\n" + "fgh\n" + "z${c}xc\n" + "vbn\n"
-//    configureByText(before)
-//    typeText(commandToKeys("m 1"))
-//    val after = "qwe\n" + "${c}asd\n" + "${c}zxc\n" + "rty\n" + "fgh\n" + "vbn\n"
-//    assertState(after)
-//  }
-//
-//  fun testMoveTextAfterCarets() {
-//    val before = "q${c}we\n" + "rty\n" + "${c}asd\n" + "fgh\n" + "zxc\n" + "vbn\n"
-//    configureByText(before)
-//    typeText(commandToKeys("m 4"))
-//    val after = "rty\n" + "fgh\n" + "zxc\n" + "${c}qwe\n" + "${c}asd\n" + "vbn\n"
-//    assertState(after)
-//  }
-//
-//  fun testMoveTextBetweenCarets() {
-//    val before = "q${c}we\n" + "rty\n" + "${c}asd\n" + "fgh\n" + "zxc\n" + "vbn\n"
-//    configureByText(before)
-//    typeText(commandToKeys("m 2"))
-//    val after = "rty\n" + "${c}qwe\n" + "${c}asd\n" + "fgh\n" + "zxc\n" + "vbn\n"
-//    assertState(after)
-//  }
+    typeText(parseKeys("vj"))
+    typeText(commandToKeys("pu"))
 
+    val after = "qwe\n" + "rty\n" + "${c}zxc\n" + "asd\n" + "fgh\n" + "${c}zxc\n" + "zxc\n" + "vbn\n"
+    fixture.checkResult(after)
+  }
+
+  @Test
+  @Disabled
+  fun testMoveTextBeforeCarets() {
+    val before = "qwe\n" + "rty\n" + "${c}asd\n" + "fgh\n" + "z${c}xc\n" + "vbn\n"
+    configureByText(before)
+    typeText(commandToKeys("m 1"))
+    val after = "qwe\n" + "${c}asd\n" + "${c}zxc\n" + "rty\n" + "fgh\n" + "vbn\n"
+    assertState(after)
+  }
+
+  @Test
+  @Disabled
+  fun testMoveTextAfterCarets() {
+    val before = "q${c}we\n" + "rty\n" + "${c}asd\n" + "fgh\n" + "zxc\n" + "vbn\n"
+    configureByText(before)
+    typeText(commandToKeys("m 4"))
+    val after = "rty\n" + "fgh\n" + "zxc\n" + "${c}qwe\n" + "${c}asd\n" + "vbn\n"
+    assertState(after)
+  }
+
+  @Test
+  @Disabled
+  fun testMoveTextBetweenCarets() {
+    val before = "q${c}we\n" + "rty\n" + "${c}asd\n" + "fgh\n" + "zxc\n" + "vbn\n"
+    configureByText(before)
+    typeText(commandToKeys("m 2"))
+    val after = "rty\n" + "${c}qwe\n" + "${c}asd\n" + "fgh\n" + "zxc\n" + "vbn\n"
+    assertState(after)
+  }
+
+  @Test
   fun testYankLines() {
     val before = """qwe
       |rt${c}y
@@ -198,9 +226,9 @@ class MultipleCaretsTest : VimTestCase() {
     typeText(commandToKeys("y"))
 
     val lastRegister = VimPlugin.getRegister().lastRegister
-    assertNotNull(lastRegister)
-    val text = lastRegister!!.text
-    assertNotNull(text)
+    assertNotNull<Any>(lastRegister)
+    val text = lastRegister.text
+    assertNotNull<Any>(text)
 
     typeText(injector.parser.parseKeys("p"))
     val after = """qwe
@@ -215,6 +243,7 @@ class MultipleCaretsTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun testDeleteLines() {
     val before = """qwe
       |r${c}ty
@@ -228,9 +257,9 @@ class MultipleCaretsTest : VimTestCase() {
     typeText(commandToKeys("d"))
 
     val lastRegister = VimPlugin.getRegister().lastRegister
-    assertNotNull(lastRegister)
-    val text = lastRegister!!.text
-    assertNotNull(text)
+    assertNotNull<Any>(lastRegister)
+    val text = lastRegister.text
+    assertNotNull<Any>(text)
 
     val after = """qwe
       |${c}asd
@@ -240,6 +269,7 @@ class MultipleCaretsTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun testSortRangeWholeFile() {
     val before = """qwe
       |as${c}d
@@ -256,6 +286,7 @@ class MultipleCaretsTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun testSortRange() {
     val before = """qwe
       |as${c}d
@@ -278,6 +309,7 @@ class MultipleCaretsTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun testSortRangeReverse() {
     val before = """qwe
       |as${c}d
@@ -299,6 +331,7 @@ class MultipleCaretsTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun testSortRangeIgnoreCase() {
     val before = """qwe
       |as${c}d

@@ -9,8 +9,10 @@
 package org.jetbrains.plugins.ideavim.ex.implementation.services
 
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class VimVariableServiceTest : VimTestCase() {
+  @Test
   fun `test v count variable without count specified`() {
     configureByText("\n")
     enterCommand("nnoremap <expr> n ':echo ' .. v:count .. \"\\<CR>\"")
@@ -18,6 +20,7 @@ class VimVariableServiceTest : VimTestCase() {
     assertExOutput("0\n")
   }
 
+  @Test
   fun `test v count variable`() {
     configureByText("\n")
     enterCommand("nnoremap <expr> n ':' .. \"\\<C-u>\" .. 'echo ' .. v:count .. \"\\<CR>\"")
@@ -25,6 +28,7 @@ class VimVariableServiceTest : VimTestCase() {
     assertExOutput("5\n")
   }
 
+  @Test
   fun `test v count1 variable without count specified`() {
     configureByText("\n")
     enterCommand("nnoremap <expr> n ':echo ' .. v:count1 .. \"\\<CR>\"")
@@ -32,6 +36,7 @@ class VimVariableServiceTest : VimTestCase() {
     assertExOutput("1\n")
   }
 
+  @Test
   fun `test v count1 variable`() {
     configureByText("\n")
     enterCommand("nnoremap <expr> n ':' .. \"\\<C-u>\" .. 'echo ' .. v:count1 .. \"\\<CR>\"")
@@ -39,6 +44,7 @@ class VimVariableServiceTest : VimTestCase() {
     assertExOutput("5\n")
   }
 
+  @Test
   fun `test mapping with updating jumplist`() {
     configureByText("${c}1\n2\n3\n4\n5\n6\n7\n8\n9\n")
     enterCommand(
@@ -50,6 +56,7 @@ class VimVariableServiceTest : VimTestCase() {
     assertState("1\n2\n3\n${c}4\n5\n6\n7\n8\n9\n")
   }
 
+  @Test
   fun `test v searchforward with forwards search`() {
     configureByText("1\n2\n1\n2\n${c}1\n2\n1\n2\n1\n")
     enterCommand(
@@ -61,6 +68,7 @@ class VimVariableServiceTest : VimTestCase() {
     assertState("1\n2\n1\n2\n1\n2\n1\n2\n${c}1\n")
   }
 
+  @Test
   fun `test v searchforward with backwards search`() {
     configureByText("1\n2\n1\n2\n1\n2\n1\n2\n${c}1\n")
     enterCommand(

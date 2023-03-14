@@ -13,12 +13,14 @@ import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 /**
  * @author Alex Plate
  */
 class SelectKeyHandlerTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test type in select mode`() {
     val typed = "Hello"
     this.doTest(
@@ -45,6 +47,7 @@ class SelectKeyHandlerTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test char mode on empty line`() {
     val typed = "Hello"
     this.doTest(
@@ -71,6 +74,7 @@ class SelectKeyHandlerTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test char mode backspace`() {
     this.doTest(
       listOf("gh", "<BS>"),
@@ -96,6 +100,7 @@ class SelectKeyHandlerTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test char mode delete`() {
     this.doTest(
       listOf("gh", "<DEL>"),
@@ -121,6 +126,7 @@ class SelectKeyHandlerTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test char mode multicaret`() {
     val typed = "Hello"
     this.doTest(
@@ -147,6 +153,7 @@ class SelectKeyHandlerTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test line mode`() {
     val typed = "Hello"
     this.doTest(
@@ -173,6 +180,7 @@ class SelectKeyHandlerTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test line mode empty line`() {
     val typed = "Hello"
     this.doTest(
@@ -199,6 +207,7 @@ class SelectKeyHandlerTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test line mode multicaret`() {
     val typed = "Hello"
     this.doTest(
@@ -225,6 +234,7 @@ class SelectKeyHandlerTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test type in select block mode`() {
     val typed = "Hello"
     this.doTest(
@@ -261,6 +271,7 @@ class SelectKeyHandlerTest : VimTestCase() {
     """,
   )
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test block mode empty line`() {
     val typed = "Hello"
     this.doTest(
@@ -287,6 +298,7 @@ class SelectKeyHandlerTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test block mode longer line`() {
     val typed = "Hello"
     this.doTest(
@@ -313,6 +325,7 @@ class SelectKeyHandlerTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test block mode longer line with esc`() {
     val typed = "Hello"
     this.doTest(

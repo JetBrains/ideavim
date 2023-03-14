@@ -11,11 +11,13 @@ package org.jetbrains.plugins.ideavim.action.change.change.number
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 /**
  * @author Alex Plate
  */
 class ChangeVisualNumberDecActionTest : VimTestCase() {
+  @Test
   fun `test dec visual full number`() {
     doTest(
       "V<C-X>",
@@ -26,6 +28,7 @@ class ChangeVisualNumberDecActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test dec visual multiple numbers`() {
     doTest(
       "v10w<C-X>",
@@ -36,6 +39,7 @@ class ChangeVisualNumberDecActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test dec visual part of number`() {
     doTest(
       "v4l<C-X>",
@@ -46,6 +50,7 @@ class ChangeVisualNumberDecActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test dec visual multiple lines`() {
     doTest(
       "V2j<C-X>",
@@ -74,6 +79,7 @@ class ChangeVisualNumberDecActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test dec visual 1000 multiple lines`() {
     doTest(
       "V2j<C-X>",
@@ -92,6 +98,7 @@ class ChangeVisualNumberDecActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test dec visual multiple numbers on line`() {
     doTest(
       "V<C-X>",
@@ -102,6 +109,7 @@ class ChangeVisualNumberDecActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test change number dec visual action`() {
     typeTextInFile(
       injector.parser.parseKeys("Vj<C-X>"),

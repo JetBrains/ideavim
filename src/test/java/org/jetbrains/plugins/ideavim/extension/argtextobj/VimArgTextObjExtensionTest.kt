@@ -12,13 +12,17 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInfo
 import java.util.*
 
 @Suppress("SpellCheckingInspection")
 class VimArgTextObjExtensionTest : VimTestCase() {
   @Throws(Exception::class)
-  override fun setUp() {
-    super.setUp()
+  @BeforeEach
+  override fun setUp(testInfo: TestInfo) {
+    super.setUp(testInfo)
     enableExtensions("argtextobj")
   }
 
@@ -26,6 +30,7 @@ class VimArgTextObjExtensionTest : VimTestCase() {
     injector.vimscriptExecutor.execute("let argtextobj_pairs='$value'", true)
   }
 
+  @Test
   fun testDeleteAnArgument() {
     doTest(
       Lists.newArrayList("daa"),
@@ -43,6 +48,7 @@ class VimArgTextObjExtensionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun testChangeInnerArgument() {
     doTest(
       Lists.newArrayList("cia"),
@@ -53,6 +59,7 @@ class VimArgTextObjExtensionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun testSmartArgumentRecognition() {
     doTest(
       Lists.newArrayList("dia"),
@@ -70,6 +77,7 @@ class VimArgTextObjExtensionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun testIgnoreQuotedArguments() {
     doTest(
       Lists.newArrayList("daa"),
@@ -101,6 +109,7 @@ class VimArgTextObjExtensionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun testDeleteTwoArguments() {
     doTest(
       Lists.newArrayList("d2aa"),
@@ -146,6 +155,7 @@ class VimArgTextObjExtensionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun testSelectTwoArguments() {
     doTest(
       Lists.newArrayList("v2aa"),
@@ -163,6 +173,7 @@ class VimArgTextObjExtensionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun testArgumentsInsideAngleBrackets() {
     setArgTextObjPairsVariable("(:),<:>")
     doTest(
@@ -174,6 +185,7 @@ class VimArgTextObjExtensionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun testWhenUnbalancedHigherPriorityPairIsUsed() {
     setArgTextObjPairsVariable("{:},(:)")
     doTest(
@@ -192,6 +204,7 @@ class VimArgTextObjExtensionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun testBracketPriorityToHangleShiftOperators() {
     doTest(
       Lists.newArrayList("dia"),
@@ -216,6 +229,7 @@ class VimArgTextObjExtensionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun testEmptyFile() {
     assertPluginError(false)
     doTest(
@@ -236,6 +250,7 @@ class VimArgTextObjExtensionTest : VimTestCase() {
     assertPluginError(true)
   }
 
+  @Test
   fun testEmptyLine() {
     assertPluginError(false)
     doTest(
@@ -256,6 +271,7 @@ class VimArgTextObjExtensionTest : VimTestCase() {
     assertPluginError(true)
   }
 
+  @Test
   fun testEmptyArg() {
     assertPluginError(false)
     doTest(
@@ -276,6 +292,7 @@ class VimArgTextObjExtensionTest : VimTestCase() {
     assertPluginError(true)
   }
 
+  @Test
   fun testSkipCommasInsideNestedPairs() {
     val before = """void foo(int arg1)
 {   methodCall(arg1, "{ arg1 , 2");
@@ -285,6 +302,7 @@ class VimArgTextObjExtensionTest : VimTestCase() {
     assertPluginError(true)
   }
 
+  @Test
   fun testHandleNestedPairs() {
     doTest(
       Lists.newArrayList("dia"),
@@ -295,6 +313,7 @@ class VimArgTextObjExtensionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun testHandleNestedParenthesisForASingleArgument() {
     doTest(
       Lists.newArrayList("dia"),
@@ -305,6 +324,7 @@ class VimArgTextObjExtensionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun testHandleImbalancedPairs() {
     doTest(
       Lists.newArrayList("dia"),
@@ -340,6 +360,7 @@ class VimArgTextObjExtensionTest : VimTestCase() {
     assertPluginError(true)
   }
 
+  @Test
   fun testArgumentBoundsSearchIsLimitedByLineCount() {
     val before = """foo(
 ${java.lang.String.join("", Collections.nCopies(10, "   arg,\n"))}   last<caret>Arg)"""
@@ -347,6 +368,7 @@ ${java.lang.String.join("", Collections.nCopies(10, "   arg,\n"))}   last<caret>
     assertPluginError(true)
   }
 
+  @Test
   fun testExtendVisualSelection() {
     doTest(
       Lists.newArrayList("vllia"),
@@ -364,6 +386,7 @@ ${java.lang.String.join("", Collections.nCopies(10, "   arg,\n"))}   last<caret>
     )
   }
 
+  @Test
   fun testExtendVisualSelectionUsesCaretPos() {
     doTest(
       Lists.newArrayList("vllia"),
@@ -374,6 +397,7 @@ ${java.lang.String.join("", Collections.nCopies(10, "   arg,\n"))}   last<caret>
     )
   }
 
+  @Test
   fun testDeleteArrayArgument() {
     setArgTextObjPairsVariable("[:],(:)")
     doTest(
@@ -392,6 +416,7 @@ ${java.lang.String.join("", Collections.nCopies(10, "   arg,\n"))}   last<caret>
     )
   }
 
+  @Test
   fun testDeleteInClass() {
     doTest(
       Lists.newArrayList("dia"),
@@ -409,6 +434,7 @@ ${java.lang.String.join("", Collections.nCopies(10, "   arg,\n"))}   last<caret>
     )
   }
 
+  @Test
   fun testFunctionWithSpaceAfterName() {
     doTest(
       Lists.newArrayList("dia"),
@@ -430,6 +456,7 @@ ${java.lang.String.join("", Collections.nCopies(10, "   arg,\n"))}   last<caret>
     originalVimAfter = "function (int <caret>a, int b)",
     description = "Should work the same as testFunctionWithSpaceAfterName",
   )
+  @Test
   fun testFunctionWithSpaceAfterNameWithTwoArgs() {
     doTest(
       Lists.newArrayList("dia"),
@@ -447,6 +474,7 @@ ${java.lang.String.join("", Collections.nCopies(10, "   arg,\n"))}   last<caret>
     )
   }
 
+  @Test
   fun testDeleteInIf() {
     doTest(
       Lists.newArrayList("dia"),
@@ -464,6 +492,7 @@ ${java.lang.String.join("", Collections.nCopies(10, "   arg,\n"))}   last<caret>
     )
   }
 
+  @Test
   fun testParseVariablePairs() {
     assertPluginError(false)
     setArgTextObjPairsVariable("[:], (:)")
@@ -536,6 +565,7 @@ ${java.lang.String.join("", Collections.nCopies(10, "   arg,\n"))}   last<caret>
     assertPluginError(false)
   }
 
+  @Test
   fun testCppLambaArguments() {
     setArgTextObjPairsVariable("[:],(:),{:},<:>")
     doTest(

@@ -11,9 +11,11 @@ package org.jetbrains.plugins.ideavim.ex.implementation.statements
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class ForTest : VimTestCase() {
 
+  @Test
   fun `test iterating over string`() {
     configureByText("\n")
     typeText(
@@ -31,6 +33,7 @@ class ForTest : VimTestCase() {
     assertExOutput("aabbccddeeff\n")
   }
 
+  @Test
   fun `test iterating over list`() {
     configureByText("\n")
     typeText(
@@ -47,6 +50,7 @@ class ForTest : VimTestCase() {
     assertExOutput("hello\n")
   }
 
+  @Test
   fun `test iterating over modifying list`() {
     configureByText("\n")
     typeText(
@@ -67,6 +71,7 @@ class ForTest : VimTestCase() {
     assertExOutput("hello!!\n")
   }
 
+  @Test
   fun `test continue`() {
     configureByText("\n")
     typeText(
@@ -86,6 +91,7 @@ class ForTest : VimTestCase() {
     assertExOutput("123\n")
   }
 
+  @Test
   fun `test break`() {
     configureByText("\n")
     typeText(
@@ -107,6 +113,7 @@ class ForTest : VimTestCase() {
     assertExOutput("3\n")
   }
 
+  @Test
   fun `test for with list`() {
     configureByText("\n")
     typeText(
@@ -126,6 +133,7 @@ class ForTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test for with list and non-list iterable`() {
     configureByText("\n")
     typeText(
@@ -145,6 +153,7 @@ class ForTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test for with list and non-list iterable item`() {
     configureByText("\n")
     typeText(
@@ -164,6 +173,7 @@ class ForTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test for with list and different length iterable item 1`() {
     configureByText("\n")
     typeText(
@@ -183,6 +193,7 @@ class ForTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test for with list and different length iterable item 2`() {
     configureByText("\n")
     typeText(

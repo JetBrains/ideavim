@@ -13,6 +13,7 @@ import com.maddyhome.idea.vim.options.OptionConstants
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 /*
                                                        *CTRL-U*
@@ -28,6 +29,7 @@ CTRL-U                  Scroll window Upwards in the buffer.  The number of
  */
 class ScrollHalfPageUpActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  @Test
   fun `test scroll half window upwards keeps cursor on same relative line`() {
     configureByPages(5)
     setPositionAndScroll(50, 60)
@@ -37,16 +39,18 @@ class ScrollHalfPageUpActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  @Test
   fun `test scroll upwards on first line causes beep`() {
     configureByPages(5)
     setPositionAndScroll(0, 0)
     typeText("<C-U>")
     assertPosition(0, 0)
     assertVisibleArea(0, 34)
-    assertTrue(injector.messages.isError())
+    kotlin.test.assertTrue(injector.messages.isError())
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  @Test
   fun `test scroll upwards in first half of first page moves to first line`() {
     configureByPages(5)
     setPositionAndScroll(5, 10)
@@ -56,6 +60,7 @@ class ScrollHalfPageUpActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  @Test
   fun `test scroll upwards in first half of first page moves to first line with scrolloff`() {
     configureByPages(5)
     enterCommand("set scrolloff=10")
@@ -66,6 +71,7 @@ class ScrollHalfPageUpActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  @Test
   fun `test scroll count lines upwards`() {
     configureByPages(5)
     setPositionAndScroll(50, 53)
@@ -75,14 +81,16 @@ class ScrollHalfPageUpActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  @Test
   fun `test scroll count modifies scroll option`() {
     configureByPages(5)
     setPositionAndScroll(50, 53)
     typeText("10<C-U>")
-    assertEquals(10, options().getIntValue(OptionConstants.scroll))
+    kotlin.test.assertEquals(10, options().getIntValue(OptionConstants.scroll))
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  @Test
   fun `test scroll upwards uses scroll option`() {
     configureByPages(5)
     enterCommand("set scroll=10")
@@ -93,6 +101,7 @@ class ScrollHalfPageUpActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  @Test
   fun `test count scroll upwards is limited to a single page`() {
     configureByPages(5)
     setPositionAndScroll(100, 134)
@@ -102,6 +111,7 @@ class ScrollHalfPageUpActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  @Test
   fun `test scroll up puts cursor on first non-blank column`() {
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(50, 60, 14)
@@ -111,6 +121,7 @@ class ScrollHalfPageUpActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  @Test
   fun `test scroll upwards keeps same column with nostartofline`() {
     configureByLines(100, "    I found it in a legendary land")
     enterCommand("set nostartofline")

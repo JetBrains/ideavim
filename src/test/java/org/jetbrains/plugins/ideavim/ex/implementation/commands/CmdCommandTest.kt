@@ -11,11 +11,13 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 /**
  * @author Elliot Courant
  */
 class CmdCommandTest : VimTestCase() {
+  @Test
   fun `test recursive`() {
     VimPlugin.getCommand().resetAliases()
     configureByText("\n")
@@ -27,6 +29,7 @@ class CmdCommandTest : VimTestCase() {
     assertPluginError(true) // Recursive command should error.
   }
 
+  @Test
   fun `test list aliases`() {
     VimPlugin.getCommand().resetAliases()
     configureByText("\n")
@@ -74,6 +77,7 @@ class CmdCommandTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test bad alias`() {
     VimPlugin.getCommand().resetAliases()
     configureByText("\n")
@@ -85,6 +89,7 @@ class CmdCommandTest : VimTestCase() {
     assertPluginError(false)
   }
 
+  @Test
   fun `test lowercase should fail`() {
     VimPlugin.getCommand().resetAliases()
     configureByText("\n")
@@ -92,6 +97,7 @@ class CmdCommandTest : VimTestCase() {
     assertPluginError(true)
   }
 
+  @Test
   fun `test blacklisted alias should fail`() {
     VimPlugin.getCommand().resetAliases()
     configureByText("\n")
@@ -103,6 +109,7 @@ class CmdCommandTest : VimTestCase() {
     assertPluginError(true)
   }
 
+  @Test
   fun `test add an existing alias and overwrite`() {
     VimPlugin.getCommand().resetAliases()
     configureByText("\n")
@@ -114,6 +121,7 @@ class CmdCommandTest : VimTestCase() {
     assertPluginError(false)
   }
 
+  @Test
   fun `test add command with arguments`() {
     VimPlugin.getCommand().resetAliases()
     configureByText("\n")
@@ -121,22 +129,25 @@ class CmdCommandTest : VimTestCase() {
     assertPluginError(false)
   }
 
+  @Test
   fun `test add command with range`() {
     VimPlugin.getCommand().resetAliases()
     configureByText("\n")
     typeText(commandToKeys("command! -range Error echo <args>"))
     assertPluginError(false)
-    assertEquals("'-range' is not supported by `command`", injector.messages.getStatusBarMessage())
+    kotlin.test.assertEquals("'-range' is not supported by `command`", injector.messages.getStatusBarMessage())
   }
 
+  @Test
   fun `test add command with complete`() {
     VimPlugin.getCommand().resetAliases()
     configureByText("\n")
     typeText(commandToKeys("command! -complete=color Error echo <args>"))
     assertPluginError(false)
-    assertEquals("'-complete' is not supported by `command`", injector.messages.getStatusBarMessage())
+    kotlin.test.assertEquals("'-complete' is not supported by `command`", injector.messages.getStatusBarMessage())
   }
 
+  @Test
   fun `test add command with arguments short`() {
     VimPlugin.getCommand().resetAliases()
     configureByText("\n")
@@ -144,6 +155,7 @@ class CmdCommandTest : VimTestCase() {
     assertPluginError(false)
   }
 
+  @Test
   fun `test add command with arguments even shorter`() {
     VimPlugin.getCommand().resetAliases()
     configureByText("\n")
@@ -151,6 +163,7 @@ class CmdCommandTest : VimTestCase() {
     assertPluginError(false)
   }
 
+  @Test
   fun `test add command with various arguments`() {
     VimPlugin.getCommand().resetAliases()
     configureByText("\n")
@@ -166,6 +179,7 @@ class CmdCommandTest : VimTestCase() {
     assertPluginError(false)
   }
 
+  @Test
   fun `test add command with invalid arguments`() {
     VimPlugin.getCommand().resetAliases()
     configureByText("\n")
@@ -177,6 +191,7 @@ class CmdCommandTest : VimTestCase() {
     assertPluginError(true)
   }
 
+  @Test
   fun `test run command with arguments`() {
     VimPlugin.getCommand().resetAliases()
     configureByText("\n")
@@ -195,6 +210,7 @@ class CmdCommandTest : VimTestCase() {
     assertExOutput("test message\n")
   }
 
+  @Test
   fun `test run command that creates another command`() {
     VimPlugin.getCommand().resetAliases()
     configureByText("\n")
@@ -207,6 +223,7 @@ class CmdCommandTest : VimTestCase() {
     assertExOutput("test\n")
   }
 
+  @Test
   fun `test run command missing required argument`() {
     VimPlugin.getCommand().resetAliases()
     configureByText("\n")

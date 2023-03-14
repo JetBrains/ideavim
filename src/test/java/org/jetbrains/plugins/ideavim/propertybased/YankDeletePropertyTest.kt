@@ -17,8 +17,10 @@ import org.jetbrains.jetCheck.ImperativeCommand
 import org.jetbrains.jetCheck.PropertyChecker
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.propertybased.samples.loremText
+import org.junit.jupiter.api.Test
 
 class YankDeletePropertyTest : VimPropertyTestBase() {
+  @Test
   fun testYankDelete() {
     PropertyChecker.checkScenarios {
       ImperativeCommand { env ->

@@ -14,15 +14,20 @@ import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.yaml.YAMLFileType
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInfo
 
 @Suppress("SpellCheckingInspection")
 class CommentaryExtensionTest : VimTestCase() {
-  override fun setUp() {
-    super.setUp()
+  @BeforeEach
+  override fun setUp(testInfo: TestInfo) {
+    super.setUp(testInfo)
     enableExtensions("commentary")
   }
 
   // |gc| |l| + move caret
+  @Test
   fun testBlockCommentSingle() {
     doTest(
       "gcll",
@@ -36,6 +41,7 @@ class CommentaryExtensionTest : VimTestCase() {
   }
 
   // |gc| |iw|
+  @Test
   fun testBlockCommentInnerWord() {
     doTest(
       "gciw",
@@ -49,6 +55,7 @@ class CommentaryExtensionTest : VimTestCase() {
   }
 
   // |gc| |iw|
+  @Test
   fun testBlockCommentTillForward() {
     doTest(
       "gct{",
@@ -61,6 +68,7 @@ class CommentaryExtensionTest : VimTestCase() {
   }
 
   // |gc| |ab|
+  @Test
   fun testBlockCommentOuterParens() {
     doTest(
       "gcab",
@@ -77,6 +85,7 @@ class CommentaryExtensionTest : VimTestCase() {
    *  otherwise, they are incredibly difficult to undo
    */
 // |gc| |j|
+  @Test
   fun testLineCommentDown() {
     doTest(
       "gcj",
@@ -89,6 +98,7 @@ class CommentaryExtensionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun testLineCommentDownPreservesAbsoluteCaretLocation() {
     doTest(
       "gcj",
@@ -102,6 +112,7 @@ class CommentaryExtensionTest : VimTestCase() {
   }
 
   // |gc| |ip|
+  @Test
   fun testLineCommentInnerParagraph() {
     doTest(
       "gcip",
@@ -115,6 +126,7 @@ class CommentaryExtensionTest : VimTestCase() {
   }
 
   // |gc| |ip|
+  @Test
   fun testLineCommentSingleLineInnerParagraph() {
     doTest(
       "gcip",
@@ -127,6 +139,7 @@ class CommentaryExtensionTest : VimTestCase() {
   }
 
   /* Ensure uncommenting works as well */ // |gc| |ip|
+  @Test
   fun testLineUncommentInnerParagraph() {
     doTest(
       "gcip",
@@ -141,6 +154,7 @@ class CommentaryExtensionTest : VimTestCase() {
   }
 
   // |gc| |ip|
+  @Test
   fun testLineUncommentSingleLineInnerParagraph() {
     doTest(
       "gcip",
@@ -153,6 +167,7 @@ class CommentaryExtensionTest : VimTestCase() {
   }
 
   /* Visual mode */ // |gc| |ip|
+  @Test
   fun testLineCommentVisualInnerParagraph() {
     doTest(
       "vipgc",
@@ -166,6 +181,7 @@ class CommentaryExtensionTest : VimTestCase() {
   }
 
   // |gc| |ip|
+  @Test
   fun testLineUncommentVisualInnerParagraph() {
     doTest(
       "vipgc",
@@ -179,6 +195,7 @@ class CommentaryExtensionTest : VimTestCase() {
   }
 
   /* Special shortcut gcc is always linewise */ // |gcc|
+  @Test
   fun testLineCommentShortcut() {
     doTest(
       "gccj",
@@ -193,6 +210,7 @@ class CommentaryExtensionTest : VimTestCase() {
   }
 
   // |gcc|
+  @Test
   fun testLineCommentShortcutSetsCaretToMotionLocation() {
     doTest(
       "gcc",
@@ -206,6 +224,7 @@ class CommentaryExtensionTest : VimTestCase() {
   }
 
   // |gcc|
+  @Test
   fun testLineUncommentShortcut() {
     doTest(
       "gcc",
@@ -220,6 +239,7 @@ class CommentaryExtensionTest : VimTestCase() {
   }
 
   // |gcc|
+  @Test
   fun testHTMLCommentShortcut() {
     doTest(
       "gcc",
@@ -232,6 +252,7 @@ class CommentaryExtensionTest : VimTestCase() {
     assertSelection(null)
   }
 
+  @Test
   fun `test comment motion repeat`() {
     doTest(
       "gcj" + "jj.",
@@ -253,6 +274,7 @@ class CommentaryExtensionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test comment motion right repeat`() {
     doTest(
       "gciw" + "jj.",
@@ -274,6 +296,7 @@ class CommentaryExtensionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test comment line repeat`() {
     doTest(
       "gcc" + "j.",
@@ -292,6 +315,7 @@ class CommentaryExtensionTest : VimTestCase() {
   }
 
   @VimBehaviorDiffers(description = "IntelliJ's uncomment leaves the leading whitespace")
+  @Test
   fun `test uncomment with gcgc`() {
     doTest(
       "gcgc",
@@ -314,6 +338,7 @@ class CommentaryExtensionTest : VimTestCase() {
   }
 
   @VimBehaviorDiffers(description = "IntelliJ's uncomment leaves the leading whitespace")
+  @Test
   fun `test uncomment with gcu`() {
     doTest(
       "gcu",
@@ -335,6 +360,7 @@ class CommentaryExtensionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test comment line with count`() {
     // Caret position is kept as the position *before* the commenting. This is how Vim works
     doTest(
@@ -361,6 +387,7 @@ class CommentaryExtensionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test text object deletes single line comment`() {
     doTest(
       "dgc",
@@ -377,6 +404,7 @@ class CommentaryExtensionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test text object deletes multiple line comments`() {
     doTest(
       "dgc",
@@ -397,6 +425,7 @@ class CommentaryExtensionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test text object deletes multiple line comments 2`() {
     doTest(
       "dgc",
@@ -417,6 +446,7 @@ class CommentaryExtensionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test text object deletes single line comment from leading whitespace`() {
     doTest(
       "dgc",
@@ -433,6 +463,7 @@ class CommentaryExtensionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test text object deletes single line comment from leading whitespace 2`() {
     doTest(
       "dgc",
@@ -451,6 +482,7 @@ class CommentaryExtensionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test text object deletes single line comment from leading whitespace 3`() {
     doTest(
       "dgc",
@@ -471,6 +503,7 @@ class CommentaryExtensionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test text object deletes single line comment from trailing whitespace`() {
     doTest(
       "dgc",
@@ -490,6 +523,7 @@ class CommentaryExtensionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test text object deletes single line comments separated by whitespace`() {
     doTest(
       "dgc",
@@ -508,6 +542,7 @@ class CommentaryExtensionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test text object deletes disjointed single line comments from whitespace`() {
     doTest(
       "dgc",
@@ -531,6 +566,7 @@ class CommentaryExtensionTest : VimTestCase() {
         final Int value = 42;
   """,
   )
+  @Test
   fun `test text object deletes single line comment from current line`() {
     doTest(
       "dgc",
@@ -548,6 +584,7 @@ class CommentaryExtensionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test text object deletes single line comment from current line 2`() {
     doTest(
       "dgc",
@@ -566,6 +603,7 @@ class CommentaryExtensionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test text object does not delete line with comment and text`() {
     doTest(
       "dgc",
@@ -581,6 +619,7 @@ class CommentaryExtensionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test text object deletes block comment`() {
     doTest(
       "dgc",
@@ -597,6 +636,7 @@ class CommentaryExtensionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test text object deletes multi-line block comment`() {
     doTest(
       "dgc",
@@ -615,6 +655,7 @@ class CommentaryExtensionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test text object deletes adjoining multi-line block comments`() {
     doTest(
       "dgc",
@@ -636,6 +677,7 @@ class CommentaryExtensionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test text object deletes adjoining multi-line block comments 2`() {
     doTest(
       "dgc",
@@ -658,6 +700,7 @@ class CommentaryExtensionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test text object does not delete line with text and block comment`() {
     doTest(
       "dgc",
@@ -673,6 +716,7 @@ class CommentaryExtensionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test text object deletes JavaDoc comment`() {
     doTest(
       "dgc",
@@ -695,6 +739,7 @@ class CommentaryExtensionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test text object deletes JavaDoc comment from leading whitespace`() {
     doTest(
       "dgc",
@@ -718,6 +763,7 @@ class CommentaryExtensionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test text object deletes JavaDoc comment and adjoining comments`() {
     doTest(
       "dgc",
@@ -741,6 +787,7 @@ class CommentaryExtensionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test text object deletes JavaDoc comment and adjoining comments separated by whitespace`() {
     doTest(
       "dgc",
@@ -767,6 +814,7 @@ class CommentaryExtensionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test Commentary command comments current line`() {
     doTest(
       ":Commentary<CR>",
@@ -786,6 +834,7 @@ class CommentaryExtensionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test Commentary command comments simple line range`() {
     doTest(
       ":2Commentary<CR>",
@@ -805,6 +854,7 @@ class CommentaryExtensionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test Commentary command comments line range`() {
     doTest(
       ":1,3Commentary<CR>",
@@ -835,6 +885,7 @@ class CommentaryExtensionTest : VimTestCase() {
       "Note that Escape exits Visual mode, but leaves the caret where it is",
     shouldBeFixed = true,
   )
+  @Test
   fun `test Commentary command comments visual range`() {
     doTest(
       "Vjj" + ":Commentary<CR>",
@@ -854,6 +905,7 @@ class CommentaryExtensionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test Commentary command comments search range`() {
     doTest(
       ":g/value2/Commentary<CR>",
@@ -877,6 +929,7 @@ class CommentaryExtensionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test block comment falls back to line comment when not available`() {
     doTest(
       "gcw",

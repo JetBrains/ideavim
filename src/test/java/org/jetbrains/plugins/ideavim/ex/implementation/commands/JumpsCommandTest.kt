@@ -10,14 +10,17 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class JumpsCommandTest : VimTestCase() {
+  @Test
   fun `test shows empty list`() {
     configureByText("")
     enterCommand("jumps")
     assertExOutput(" jump line  col file/text\n>\n")
   }
 
+  @Test
   fun `test show jump list`() {
     configureByText(
       """I found ${c}it in a legendary land
@@ -50,6 +53,7 @@ class JumpsCommandTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test highlights current jump spot`() {
     configureByText(
       """I found ${c}it in a legendary land
@@ -84,6 +88,7 @@ class JumpsCommandTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test list trims and truncates`() {
     val indent = " ".repeat(100)
     val text = "Really long line ".repeat(1000)
@@ -101,6 +106,7 @@ class JumpsCommandTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test correctly encodes non-printable characters`() {
     configureByText("\u0009Hello\u0006World\u007f")
 

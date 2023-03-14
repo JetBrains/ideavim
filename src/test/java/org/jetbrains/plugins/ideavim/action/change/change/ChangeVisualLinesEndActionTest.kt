@@ -13,8 +13,10 @@ package org.jetbrains.plugins.ideavim.action.change.change
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class ChangeVisualLinesEndActionTest : VimTestCase() {
+  @Test
   fun `test change last line`() {
     val keys = "VC"
     val before = """
@@ -36,6 +38,7 @@ class ChangeVisualLinesEndActionTest : VimTestCase() {
     doTest(keys, before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun `test last empty line`() {
     val keys = "vC"
     val before = """
@@ -69,6 +72,7 @@ class ChangeVisualLinesEndActionTest : VimTestCase() {
             ${c}
   """,
   )
+  @Test
   fun `test change last two lines`() {
     val keys = "vjC"
     val before = """

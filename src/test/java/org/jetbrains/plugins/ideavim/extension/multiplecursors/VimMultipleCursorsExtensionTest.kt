@@ -16,14 +16,19 @@ import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInfo
 
 class VimMultipleCursorsExtensionTest : VimTestCase() {
 
-  override fun setUp() {
-    super.setUp()
+  @BeforeEach
+  override fun setUp(testInfo: TestInfo) {
+    super.setUp(testInfo)
     enableExtensions("multiple-cursors")
   }
 
+  @Test
   fun testNextOccurrence() {
     val before = """public class ChangeLineAction extends EditorAction {
   public ChangeLineAction() {
@@ -63,6 +68,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun testAllOccurrencesIterative() {
     val before = """public class ChangeLineAction extends EditorAction {
   public ChangeLineAction() {
@@ -102,6 +108,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun testNotWholeOccurrence() {
     val before = """Int
       |Integer
@@ -126,6 +133,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun testSelectSubstring() {
     val before = """q${c}we
       |asdqweasd
@@ -144,6 +152,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun testSelectSingleOccurrence() {
     val before = """q${c}we
       |asd
@@ -166,6 +175,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun testSelectionWithMultipleCarets() {
     val before = """qwe
       |sdfgdfs${c}fdasfg
@@ -179,6 +189,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     assertState(before)
   }
 
+  @Test
   fun testSelectAll() {
     val before = """qwe
       |asd
@@ -199,6 +210,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun testSelectAllNotWhole() {
     val before = """Int
       |Integer
@@ -222,6 +234,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun testSelectAllSingleOccurrence() {
     val before = """qwe
       |asd
@@ -248,6 +261,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
       "additional cursors. IdeaVim has native support, so doesn't track if a selection is due to an additional cursor " +
       "so IdeaVim will remove arbitrary selections, while vim-multiple-cursors do not.",
   )
+  @Test
   fun testRemoveSelectionVisualMode() {
     val before = """q${s}we
       |dsgkldfjs ldfl gkjsdsl kj
@@ -267,6 +281,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun testRemoveSubSelection() {
     val before = """Int
       |kekInteger
@@ -283,6 +298,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun testRemoveOccurrence() {
     val before = """private i${c}nt a = 0;
       |private int b = 1;
@@ -303,6 +319,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun testSkipOccurrence() {
     val before = """pr${c}ivate int a = 0;
       |private int b = 1;
@@ -320,6 +337,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun testSkipAndThenSelectAllOccurrences() {
     val before = """pr${c}ivate int a = 0;
       |private int b = 1;
@@ -337,6 +355,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun testSeveralActions() {
     val before = """public class Main {
       |  public static void main(String[] args) {
@@ -405,6 +424,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     assertState(afterInsert)
   }
 
+  @Test
   fun testSelectTwice() {
     val before = """qwe
       |asd
@@ -429,6 +449,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun testSkipSelectionSubstring() {
     val before = """qw${c}e
       |asdqweasd
@@ -449,6 +470,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun testSkipSelectionVisualMode() {
     val before = """q${s}we
       |dsgkldfjs ldfl gkjsdsl kj
@@ -463,6 +485,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     assertState(before)
   }
 
+  @Test
   fun testAddSelectionVisualMode() {
     val before = """jdfsg sdf${c}dfkgjhfkgkldfjsg
       |dfkjghdfsgs
@@ -478,6 +501,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun testNextOccurrenceCaseSensitive() {
     val before = """@TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
 fun getCellType(${c}pos: VisualPosition): CellType {
@@ -511,6 +535,7 @@ fun getCellType(${s}pos$se: VisualPosition): CellType {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
   fun `test with tabs`() {
     val before = """
   I found it in a legendary land
@@ -528,6 +553,7 @@ fun getCellType(${s}pos$se: VisualPosition): CellType {
     doTest(keys, before, after, VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER)
   }
 
+  @Test
   fun `test pattern is always case sensitive`() {
     val before = """test ${c}Test tEst TeSt tEST Test test Test test"""
     configureByText(before)
@@ -538,6 +564,7 @@ fun getCellType(${s}pos$se: VisualPosition): CellType {
     assertState(after)
   }
 
+  @Test
   fun `test ignores regex in search pattern`() {
     val before = "test ${s}t.*st${c}$se toast tallest t.*st"
     val editor = configureByText(before)
@@ -548,6 +575,7 @@ fun getCellType(${s}pos$se: VisualPosition): CellType {
     assertState(after)
   }
 
+  @Test
   fun `test adding multicaret after linewise selection`() {
     val before = """
       ${c}I found it in a legendary land
@@ -565,6 +593,7 @@ fun getCellType(${s}pos$se: VisualPosition): CellType {
     doTest("Vjj<A-n>", before, after)
   }
 
+  @Test
   fun `test adding multicaret after linewise selection till the last line`() {
     val before = """
       ${c}I found it in a legendary land
@@ -581,6 +610,7 @@ fun getCellType(${s}pos$se: VisualPosition): CellType {
     doTest("Vjjj<A-n>", before, after)
   }
 
+  @Test
   fun `test adding multicaret after linewise selection moving up`() {
     val before = """
       I found it in a legendary land
@@ -598,6 +628,7 @@ fun getCellType(${s}pos$se: VisualPosition): CellType {
     doTest("Vkk<A-n>", before, after)
   }
 
+  @Test
   fun `test adding multicaret after linewise selection moving up from down`() {
     val before = """
       I found it in a legendary land
@@ -615,6 +646,7 @@ fun getCellType(${s}pos$se: VisualPosition): CellType {
     doTest("Vkk<A-n>", before, after)
   }
 
+  @Test
   fun `test adding multicaret after linewise selection moving up to empty lines`() {
     val before = """
       I found it in a legendary land
@@ -638,6 +670,7 @@ fun getCellType(${s}pos$se: VisualPosition): CellType {
     doTest("Vkkk<A-n>", before, after)
   }
 
+  @Test
   fun `test adding multicaret after linewise selection moving down to empty lines`() {
     val before = """
       ${c}I found it in a legendary land

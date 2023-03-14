@@ -13,11 +13,13 @@ import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.rangeOf
+import org.junit.jupiter.api.Test
 
 class PutTextBeforeCursorActionTest : VimTestCase() {
   /**
-   * @author Oskar Persson 
+   * @author Oskar Persson
    */
+  @Test
   fun `test put visual text character to line twice with separate commands large P`() {
     val before = """
             A Discovery

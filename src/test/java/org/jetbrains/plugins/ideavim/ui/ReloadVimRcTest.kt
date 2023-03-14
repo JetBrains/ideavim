@@ -13,16 +13,22 @@ import com.maddyhome.idea.vim.ui.VimRcFileState
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInfo
 
 class ReloadVimRcTest : VimTestCase() {
   private val editorFactory = MockEditorFactory()
 
-  override fun setUp() {
-    super.setUp()
+  @BeforeEach
+  override fun setUp(testInfo: TestInfo) {
+    super.setUp(testInfo)
     VimRcFileState.clear()
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test equalTo`() {
     val file = """
       map x y
@@ -32,35 +38,38 @@ class ReloadVimRcTest : VimTestCase() {
 
     val document = editorFactory.createDocument(file)
 
-    assertTrue(VimRcFileState.equalTo(document))
+    kotlin.test.assertTrue(VimRcFileState.equalTo(document))
   }
 
   // TODO
-//  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
-//  fun `test equalTo with whitespaces`() {
-//    val s = " " // Just to see whitespaces in the following code
-//    val origFile = """
-//      map x y
-//      set myPlugin
-//      map z t
-//    """.trimIndent()
-//    val changedFile = """
-//      map x y
-//      set myPlugin$s$s$s$s$s$s
-//
-//
-//            map z t
-//    """.trimIndent()
-//
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
+  @Disabled
+  fun `test equalTo with whitespaces`() {
+    val s = " " // Just to see whitespaces in the following code
+    val origFile = """
+      map x y
+      set myPlugin
+      map z t
+    """.trimIndent()
+    val changedFile = """
+      map x y
+      set myPlugin$s$s$s$s$s$s
+
+
+            map z t
+    """.trimIndent()
+
 //    val lines = convertFileToLines(origFile)
 //    VimRcFileState.saveFileState("", lines)
 //
 //    val document = editorFactory.createDocument(changedFile)
 //
 //    assertTrue(VimRcFileState.equalTo(document))
-//  }
+  }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test equalTo with whitespaces and comments`() {
     val s = " " // Just to see whitespaces in the following code
     val origFile = """
@@ -79,10 +88,11 @@ class ReloadVimRcTest : VimTestCase() {
 
     val document = editorFactory.createDocument(changedFile)
 
-    assertTrue(VimRcFileState.equalTo(document))
+    kotlin.test.assertTrue(VimRcFileState.equalTo(document))
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test equalTo add line`() {
     val origFile = """
       map x y
@@ -98,10 +108,11 @@ class ReloadVimRcTest : VimTestCase() {
 
     val document = editorFactory.createDocument(changedFile)
 
-    assertFalse(VimRcFileState.equalTo(document))
+    kotlin.test.assertFalse(VimRcFileState.equalTo(document))
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test equalTo remove line`() {
     val origFile = """
       map x y
@@ -115,6 +126,6 @@ class ReloadVimRcTest : VimTestCase() {
 
     val document = editorFactory.createDocument(changedFile)
 
-    assertFalse(VimRcFileState.equalTo(document))
+    kotlin.test.assertFalse(VimRcFileState.equalTo(document))
   }
 }

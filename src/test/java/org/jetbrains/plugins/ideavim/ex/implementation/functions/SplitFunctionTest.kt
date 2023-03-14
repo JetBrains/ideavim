@@ -9,26 +9,31 @@
 package org.jetbrains.plugins.ideavim.ex.implementation.functions
 
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class SplitFunctionTest : VimTestCase() {
+  @Test
   fun `test split with default delimiter`() {
     configureByText("\n")
     typeText(commandToKeys("echo split('Hello world')"))
     assertExOutput("['Hello', 'world']\n")
   }
 
+  @Test
   fun `test split comma separated text`() {
     configureByText("\n")
     typeText(commandToKeys("echo split('a,b,c,d', ',')"))
     assertExOutput("['a', 'b', 'c', 'd']\n")
   }
 
+  @Test
   fun `test split comma separated text 2`() {
     configureByText("\n")
     typeText(commandToKeys("echo split(',a,b,c,d,', ',')"))
     assertExOutput("['a', 'b', 'c', 'd']\n")
   }
 
+  @Test
   fun `test split comma separated text with keepempty flag`() {
     configureByText("\n")
     typeText(commandToKeys("echo split(',a,b,c,,d,', ',', 1)"))

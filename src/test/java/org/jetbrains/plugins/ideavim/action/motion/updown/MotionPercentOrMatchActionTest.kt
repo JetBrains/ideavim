@@ -12,11 +12,13 @@ import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 /**
  * @author Alex Plate
  */
 class MotionPercentOrMatchActionTest : VimTestCase() {
+  @Test
   fun `test percent match simple`() {
     typeTextInFile(
       "%",
@@ -25,6 +27,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
     assertOffset(3)
   }
 
+  @Test
   fun `test percent match multi line`() {
     typeTextInFile(
       "%",
@@ -37,6 +40,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
     assertOffset(3)
   }
 
+  @Test
   fun `test percent visual mode match multi line end of line`() {
     typeTextInFile(
       "v$%",
@@ -48,6 +52,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
     assertOffset(8)
   }
 
+  @Test
   fun `test percent visual mode match from start multi line end of line`() {
     typeTextInFile(
       "v$%",
@@ -59,6 +64,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
     assertOffset(5)
   }
 
+  @Test
   fun `test percent visual mode find brackets on the end of line`() {
     typeTextInFile(
       "v$%",
@@ -67,6 +73,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
     assertOffset(3)
   }
 
+  @Test
   fun `test percent twice visual mode find brackets on the end of line`() {
     typeTextInFile(
       "v$%%",
@@ -76,6 +83,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN, description = "Matchit plugin affects neovim")
+  @Test
   fun `test percent match parens in string`() {
     typeTextInFile(
       "%",
@@ -86,12 +94,14 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun `test percent match xml comment start`() {
     configureByXmlText("$c<!-- foo -->")
     typeText("%")
     assertState("<!-- foo --$c>")
   }
 
+  @Test
   fun `test percent doesnt match partial xml comment`() {
     configureByXmlText("<!$c-- ")
     typeText("%")
@@ -99,6 +109,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun `test percent match xml comment end`() {
     configureByXmlText("<!-- foo --$c>")
     typeText("%")
@@ -106,18 +117,21 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN, description = "Matchit plugin affects neovim")
+  @Test
   fun `test percent match java comment start`() {
     configureByJavaText("/$c* foo */")
     typeText("%")
     assertState("/* foo *$c/")
   }
 
+  @Test
   fun `test percent doesnt match partial java comment`() {
     configureByJavaText("$c/* ")
     typeText("%")
     assertState("$c/* ")
   }
 
+  @Test
   fun `test percent match java comment end`() {
     configureByJavaText("/* foo $c*/")
     typeText("%")
@@ -125,12 +139,14 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun `test percent match java doc comment start`() {
     configureByJavaText("/*$c* foo */")
     typeText("%")
     assertState("/** foo *$c/")
   }
 
+  @Test
   fun `test percent match java doc comment end`() {
     configureByJavaText("/** foo *$c/")
     typeText("%")
@@ -138,6 +154,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN, description = "Matchit plugin affects neovim")
+  @Test
   fun `test percent doesnt match after comment start`() {
     configureByJavaText("/*$c foo */")
     typeText("%")
@@ -145,12 +162,14 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.UNCLEAR)
+  @Test
   fun `test percent doesnt match before comment end`() {
     configureByJavaText("/* foo $c */")
     typeText("%")
     assertState("/* foo $c */")
   }
 
+  @Test
   fun `test motion with quote on the way`() {
     doTest(
       "%",
@@ -177,6 +196,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test motion outside text`() {
     doTest(
       "%",
@@ -201,6 +221,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test motion in text`() {
     doTest(
       "%",
@@ -211,6 +232,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test motion in text with quotes`() {
     doTest(
       "%",
@@ -221,6 +243,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test motion in text with quotes start before quote`() {
     doTest(
       "%",
@@ -231,6 +254,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test motion in text with quotes and double escape`() {
     doTest(
       "%",
@@ -241,6 +265,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test motion in text with escape (outer forward)`() {
     doTest(
       "%",
@@ -251,6 +276,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test motion in text with escape (outer backward)`() {
     doTest(
       "%",
@@ -261,6 +287,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test motion in text with escape (inner forward)`() {
     doTest(
       "%",
@@ -271,6 +298,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test motion in text with escape (inner backward)`() {
     doTest(
       "%",
@@ -281,6 +309,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test motion in text with quotes and double escape2`() {
     doTest(
       "%",
@@ -292,27 +321,32 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN, description = "Matchit plugin affects neovim")
+  @Test
   fun `test deleting with percent motion backward`() {
     doTest("d%", "(foo bar$c)", c, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN, description = "Matchit plugin affects neovim")
+  @Test
   fun `test deleting with percent motion`() {
     doTest("d%", "$c(foo bar)", c, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun `test count percent moves to line as percentage of file height`() {
     configureByLines(100, "    I found it in a legendary land")
     typeText("25%")
     assertPosition(24, 4)
   }
 
+  @Test
   fun `test count percent moves to line as percentage of file height 2`() {
     configureByLines(50, "    I found it in a legendary land")
     typeText("25%")
     assertPosition(12, 4)
   }
 
+  @Test
   fun `test count percent moves to line as percentage of file height 3`() {
     configureByLines(17, "    I found it in a legendary land")
     typeText("25%")
@@ -320,6 +354,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  @Test
   fun `test count percent keeps same column with nostartline`() {
     configureByLines(100, "    I found it in a legendary land")
     enterCommand("set nostartofline")
@@ -329,6 +364,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
   fun `test count percent handles shorter line with nostartline`() {
     configureByLines(100, "    I found it in a legendary land")
     enterCommand("set nostartofline")

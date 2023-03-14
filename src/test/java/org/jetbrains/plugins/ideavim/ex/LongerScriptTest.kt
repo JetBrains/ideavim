@@ -12,12 +12,14 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 import com.maddyhome.idea.vim.vimscript.parser.errors.IdeavimErrorListener
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 import kotlin.system.measureTimeMillis
 
 // todo time limit
 class LongerScriptTest : VimTestCase() {
 
   // it's always broken somehow
+  @Test
   fun `test token helper function`() {
     configureByText("\n")
     val function = """
@@ -65,6 +67,7 @@ class LongerScriptTest : VimTestCase() {
     assertExOutput("'s' | 'su' | 'sub' | 'subs' | 'subst' | 'substi' | 'substit' | 'substitu' | 'substitut' | 'substitute';\n")
   }
 
+  @Test
   fun `test matchit vim parsing time`() {
     val script = """
       "  matchit.vim: (global plugin) Extended "%" matching
@@ -837,6 +840,7 @@ class LongerScriptTest : VimTestCase() {
     println(parsingTime)
   }
 
+  @Test
   fun `test abolish vim parsing time`() {
     val script = """
       " abolish.vim - Language friendly searches, substitutions, and abbreviations

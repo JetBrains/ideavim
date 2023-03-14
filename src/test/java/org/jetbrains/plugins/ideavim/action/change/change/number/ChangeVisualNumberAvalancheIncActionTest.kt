@@ -10,11 +10,13 @@ package org.jetbrains.plugins.ideavim.action.change.change.number
 
 import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 /**
  * @author Alex Plate
  */
 class ChangeVisualNumberAvalancheIncActionTest : VimTestCase() {
+  @Test
   fun `test inc visual avalanche`() {
     doTest(
       "VGg<C-A>",
@@ -33,6 +35,7 @@ class ChangeVisualNumberAvalancheIncActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test inc visual avalanche multiple times`() {
     doTest(
       "VG2g<C-A>",

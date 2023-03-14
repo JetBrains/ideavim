@@ -10,7 +10,7 @@ package org.jetbrains.plugins.ideavim.ex.parser.commands
 
 import com.maddyhome.idea.vim.vimscript.model.commands.CmdFilterCommand
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 

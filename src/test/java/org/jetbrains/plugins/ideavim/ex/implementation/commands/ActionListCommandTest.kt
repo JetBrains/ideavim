@@ -11,26 +11,30 @@ import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.util.ArrayUtil
 import com.maddyhome.idea.vim.ex.ExOutputModel.Companion.getInstance
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 import java.util.*
+import kotlin.test.assertNotNull
 
 @Suppress("SpellCheckingInspection")
 class ActionListCommandTest : VimTestCase() {
+  @Test
   fun testListAllActions() {
     configureByText("\n")
     typeText(commandToKeys("actionlist"))
-    val output = getInstance(myFixture.editor).text
-    assertNotNull(output)
+    val output = getInstance(fixture.editor).text
+    assertNotNull<Any>(output)
 
     // Header line
     val displayedLines = output!!.split("\n".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-    assertEquals("--- Actions ---", displayedLines[0])
+    kotlin.test.assertEquals("--- Actions ---", displayedLines[0])
 
     // Action lines
     val displayedActionNum = displayedLines.size - 1
     val actionIds = ActionManager.getInstance().getActionIdList("")
-    assertEquals(displayedActionNum, actionIds.size)
+    kotlin.test.assertEquals(displayedActionNum, actionIds.size)
   }
 
+  @Test
   fun testSearchByActionName() {
     configureByText("\n")
     typeText(commandToKeys("actionlist quickimpl"))
@@ -38,13 +42,14 @@ class ActionListCommandTest : VimTestCase() {
     for (i in displayedLines.indices) {
       val line = displayedLines[i]
       if (i == 0) {
-        assertEquals("--- Actions ---", line)
+        kotlin.test.assertEquals("--- Actions ---", line)
       } else {
-        assertTrue(line.lowercase(Locale.getDefault()).contains("quickimpl"))
+        kotlin.test.assertTrue(line.lowercase(Locale.getDefault()).contains("quickimpl"))
       }
     }
   }
 
+  @Test
   fun testSearchByAssignedShortcutKey() {
     configureByText("\n")
     typeText(commandToKeys("actionlist <M-S-"))
@@ -52,15 +57,15 @@ class ActionListCommandTest : VimTestCase() {
     for (i in displayedLines.indices) {
       val line = displayedLines[i]
       if (i == 0) {
-        assertEquals("--- Actions ---", line)
+        kotlin.test.assertEquals("--- Actions ---", line)
       } else {
-        assertTrue(line.lowercase(Locale.getDefault()).contains("<m-s-"))
+        kotlin.test.assertTrue(line.lowercase(Locale.getDefault()).contains("<m-s-"))
       }
     }
   }
 
   private fun parseActionListOutput(): Array<String> {
-    val output = getInstance(myFixture.editor).text
+    val output = getInstance(fixture.editor).text
     return output?.split("\n".toRegex())?.dropLastWhile { it.isEmpty() }?.toTypedArray()
       ?: ArrayUtil.EMPTY_STRING_ARRAY
   }

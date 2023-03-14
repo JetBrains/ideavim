@@ -11,9 +11,11 @@ package org.jetbrains.plugins.ideavim.ex.implementation.expressions
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class LambdaTest : VimTestCase() {
 
+  @Test
   fun `test lambda with no args`() {
     configureByText("\n")
     typeText(
@@ -27,6 +29,7 @@ class LambdaTest : VimTestCase() {
     assertExOutput("hello from an empty function\n")
   }
 
+  @Test
   fun `test lambda with one arg`() {
     configureByText("\n")
     typeText(
@@ -40,6 +43,7 @@ class LambdaTest : VimTestCase() {
     assertExOutput("42\n")
   }
 
+  @Test
   fun `test lambda with multiple arguments`() {
     configureByText("\n")
     typeText(
@@ -53,6 +57,7 @@ class LambdaTest : VimTestCase() {
     assertExOutput("42\n")
   }
 
+  @Test
   fun `test lambda's name`() {
     configureByText("\n")
     typeText(
@@ -70,6 +75,7 @@ class LambdaTest : VimTestCase() {
     assertExOutput("function('<lambda>1')\n")
   }
 
+  @Test
   fun `test lambda is a closure function`() {
     // in this test we test that we can access outer function variables from lambda
     configureByText("\n")
@@ -87,6 +93,7 @@ class LambdaTest : VimTestCase() {
     assertExOutput("5 - 2 = 3\n")
   }
 
+  @Test
   fun `test lambda with more arguments than needed`() {
     configureByText("\n")
     typeText(
@@ -102,6 +109,7 @@ class LambdaTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test lambda with less arguments than needed`() {
     configureByText("\n")
     typeText(
@@ -116,12 +124,14 @@ class LambdaTest : VimTestCase() {
     assertPluginErrorMessageContains("E119: Not enough arguments for function: <lambda>0")
   }
 
+  @Test
   fun `test lambda function call with no args`() {
     configureByText("\n")
     typeText(commandToKeys("echo {-> 'hello from an empty function'}()"))
     assertExOutput("hello from an empty function\n")
   }
 
+  @Test
   fun `test lambda function call with args`() {
     configureByText("\n")
     typeText(commandToKeys("echo {x, y -> x*y}(6, 7)"))

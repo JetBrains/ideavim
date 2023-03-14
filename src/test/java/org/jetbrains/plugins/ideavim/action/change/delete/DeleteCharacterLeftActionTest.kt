@@ -9,9 +9,11 @@
 package org.jetbrains.plugins.ideavim.action.change.delete
 
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 // |X|
 class DeleteCharacterLeftActionTest : VimTestCase() {
+  @Test
   fun `test delete single character`() {
     val keys = "X"
     val before = "I f${c}ound it in a legendary land"
@@ -21,6 +23,7 @@ class DeleteCharacterLeftActionTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun `test delete multiple characters`() {
     val keys = "5X"
     val before = "I found$c it in a legendary land"
@@ -30,6 +33,7 @@ class DeleteCharacterLeftActionTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun `test deletes min of count and start of line`() {
     val keys = "25X"
     val before = """
@@ -53,6 +57,7 @@ class DeleteCharacterLeftActionTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun `test delete with inlay relating to preceding text`() {
     val keys = "X"
     val before = "I fo${c}und it in a legendary land"
@@ -78,6 +83,7 @@ class DeleteCharacterLeftActionTest : VimTestCase() {
     assertVisualPosition(0, 4)
   }
 
+  @Test
   fun `test delete with inlay relating to following text`() {
     // This should have the same behaviour as related to preceding text
     val keys = "X"
@@ -103,6 +109,7 @@ class DeleteCharacterLeftActionTest : VimTestCase() {
     assertVisualPosition(0, 4)
   }
 
+  @Test
   fun `test deleting characters scrolls caret into view`() {
     configureByText("Hello world".repeat(200))
     enterCommand("set sidescrolloff=5")

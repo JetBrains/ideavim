@@ -11,9 +11,11 @@ package org.jetbrains.plugins.ideavim.action.motion.text
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class MotionSectionForwardEndActionTest : VimTestCase() {
   @VimBehaviorDiffers(originalVimAfter = c, description = "Full text is deleted")
+  @Test
   fun `test remove full text`() {
     doTest(
       "d][",
@@ -30,6 +32,7 @@ class MotionSectionForwardEndActionTest : VimTestCase() {
   }
 
   @VimBehaviorDiffers(originalVimAfter = c, description = "Full text is deleted")
+  @Test
   fun `test remove full text with new line at the end`() {
     doTest(
       "d][",
@@ -46,6 +49,7 @@ class MotionSectionForwardEndActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test move forward`() {
     doTest(
       "][",
@@ -84,6 +88,7 @@ class MotionSectionForwardEndActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test move forward twice`() {
     doTest(
       "][][",
@@ -122,6 +127,7 @@ class MotionSectionForwardEndActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test move forward till the end`() {
     doTest(
       "][][][",

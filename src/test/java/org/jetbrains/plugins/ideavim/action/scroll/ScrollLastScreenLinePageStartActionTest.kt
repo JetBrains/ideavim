@@ -11,6 +11,7 @@ package org.jetbrains.plugins.ideavim.action.scroll
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 /*
                                                        *z^*
@@ -24,6 +25,7 @@ z^                      Without [count]: Redraw with the line just above the
                         the first non-blank in the line.
  */
 class ScrollLastScreenLinePageStartActionTest : VimTestCase() {
+  @Test
   fun `test scrolls last line on previous page to bottom of screen`() {
     configureByPages(5)
     setPositionAndScroll(99, 119)
@@ -32,6 +34,7 @@ class ScrollLastScreenLinePageStartActionTest : VimTestCase() {
     assertVisibleArea(64, 98)
   }
 
+  @Test
   fun `test scrolls to first non-blank in line`() {
     configureByLines(200, "    I found it in a legendary land")
     setPositionAndScroll(99, 119)
@@ -40,6 +43,7 @@ class ScrollLastScreenLinePageStartActionTest : VimTestCase() {
     assertVisibleArea(64, 98)
   }
 
+  @Test
   fun `test scrolls last line on previous page to scrolloff`() {
     configureByPages(5)
     enterCommand("set scrolloff=10")
@@ -49,6 +53,7 @@ class ScrollLastScreenLinePageStartActionTest : VimTestCase() {
     assertVisibleArea(74, 108)
   }
 
+  @Test
   fun `test scrolls last line on previous page ignores scrolljump`() {
     configureByPages(5)
     enterCommand("set scrolljump=10")
@@ -59,6 +64,7 @@ class ScrollLastScreenLinePageStartActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  @Test
   fun `test count z^ puts count line at bottom of screen then scrolls back a page`() {
     configureByPages(5)
     setPositionAndScroll(140, 150)
@@ -69,6 +75,7 @@ class ScrollLastScreenLinePageStartActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  @Test
   fun `test z^ on first page puts cursor on first line 1`() {
     configureByLines(50, "    I found it in a legendary land")
     setPositionAndScroll(0, 25)
@@ -77,6 +84,7 @@ class ScrollLastScreenLinePageStartActionTest : VimTestCase() {
     assertVisibleArea(0, 34)
   }
 
+  @Test
   fun `test z^ on first page puts cursor on first line 2`() {
     configureByLines(50, "    I found it in a legendary land")
     setPositionAndScroll(0, 6)
@@ -85,6 +93,7 @@ class ScrollLastScreenLinePageStartActionTest : VimTestCase() {
     assertVisibleArea(0, 34)
   }
 
+  @Test
   fun `test z^ on first page ignores scrolloff and puts cursor on last line of previous page`() {
     configureByLines(50, "    I found it in a legendary land")
     enterCommand("set scrolloff=10")
@@ -94,6 +103,7 @@ class ScrollLastScreenLinePageStartActionTest : VimTestCase() {
     assertVisibleArea(0, 34)
   }
 
+  @Test
   fun `test z^ on second page puts cursor on previous last line`() {
     configureByLines(50, "    I found it in a legendary land")
     setPositionAndScroll(19, 39)

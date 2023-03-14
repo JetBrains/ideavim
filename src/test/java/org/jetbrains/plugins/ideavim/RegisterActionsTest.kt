@@ -15,10 +15,12 @@ import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.handler.ActionBeanClass
 import com.maddyhome.idea.vim.key.CommandNode
 import com.maddyhome.idea.vim.key.CommandPartNode
-import junit.framework.TestCase
+import org.junit.jupiter.api.Test
 import javax.swing.KeyStroke
+import kotlin.test.assertNotNull
 
 class RegisterActionsTest : VimTestCase() {
+  @Test
   fun `test simple action`() {
     val before = "I ${c}found it in a legendary land"
     val after = "I f${c}ound it in a legendary land"
@@ -26,6 +28,7 @@ class RegisterActionsTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.EDITOR_MODIFICATION)
+  @Test
   fun `test action in disabled plugin`() {
     try {
       setupChecks {
@@ -42,6 +45,7 @@ class RegisterActionsTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.EDITOR_MODIFICATION)
+  @Test
   fun `test turn plugin off and on`() {
     val before = "I ${c}found it in a legendary land"
     val after = "I f${c}ound it in a legendary land"
@@ -52,6 +56,7 @@ class RegisterActionsTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.EDITOR_MODIFICATION)
+  @Test
   fun `test enable twice`() {
     val before = "I ${c}found it in a legendary land"
     val after = "I f${c}ound it in a legendary land"
@@ -63,6 +68,7 @@ class RegisterActionsTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.EDITOR_MODIFICATION)
+  @Test
   fun `test unregister extension`() {
     val before = "I ${c}found it in a legendary land"
     val after = "I f${c}ound it in a legendary land"
@@ -71,15 +77,15 @@ class RegisterActionsTest : VimTestCase() {
       motionRightAction =
         VIM_ACTIONS_EP.getExtensionList(null).first { it.actionId == "VimPreviousTabAction" }
 
-      assertNotNull(getCommandNode())
+      assertNotNull<Any>(getCommandNode())
 
       @Suppress("DEPRECATION")
       VIM_ACTIONS_EP.getPoint(null).unregisterExtension(motionRightAction!!)
-      assertNull(getCommandNode())
+      kotlin.test.assertNull(getCommandNode())
     }
     @Suppress("DEPRECATION")
     VIM_ACTIONS_EP.getPoint(null).registerExtension(motionRightAction!!)
-    TestCase.assertNotNull(getCommandNode())
+    assertNotNull<Any>(getCommandNode())
   }
 
   private fun getCommandNode(): CommandNode<*>? {

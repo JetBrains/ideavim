@@ -10,9 +10,11 @@ package org.jetbrains.plugins.ideavim.action.change.delete
 
 import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 // |x|
 class DeleteCharacterRightActionTest : VimTestCase() {
+  @Test
   fun `test delete single character`() {
     val keys = injector.parser.parseKeys("x")
     val before = "I ${c}found it in a legendary land"
@@ -22,6 +24,7 @@ class DeleteCharacterRightActionTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun `test delete multiple characters`() {
     val keys = injector.parser.parseKeys("5x")
     val before = "I ${c}found it in a legendary land"
@@ -31,6 +34,7 @@ class DeleteCharacterRightActionTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun `test deletes min of count and end of line`() {
     val keys = injector.parser.parseKeys("20x")
     val before = """
@@ -54,6 +58,7 @@ class DeleteCharacterRightActionTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun `test delete with inlay relating to preceding text`() {
     val keys = injector.parser.parseKeys("x")
     val before = "I f${c}ound it in a legendary land"
@@ -81,6 +86,7 @@ class DeleteCharacterRightActionTest : VimTestCase() {
     assertVisualPosition(0, 4)
   }
 
+  @Test
   fun `test delete with inlay relating to following text`() {
     // This should have the same behaviour as related to preceding text
     val keys = injector.parser.parseKeys("x")

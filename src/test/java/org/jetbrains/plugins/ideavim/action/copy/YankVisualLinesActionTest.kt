@@ -11,13 +11,14 @@ package org.jetbrains.plugins.ideavim.action.copy
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.VimStateMachine
-import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 /**
  * @author Alex Plate
  */
 class YankVisualLinesActionTest : VimTestCase() {
+  @Test
   fun `test from visual mode`() {
     val text = """
             A Discovery
@@ -35,9 +36,10 @@ class YankVisualLinesActionTest : VimTestCase() {
     configureByText(text)
     typeText(injector.parser.parseKeys("vjY"))
     val savedText = VimPlugin.getRegister().lastRegister?.text ?: kotlin.test.fail()
-    TestCase.assertEquals(yankedTest, savedText)
+    kotlin.test.assertEquals(yankedTest, savedText)
   }
 
+  @Test
   fun `test from visual mode till the end`() {
     val text = """
             A Discovery
@@ -62,9 +64,10 @@ class YankVisualLinesActionTest : VimTestCase() {
             
     """.trimIndent()
     val savedText = VimPlugin.getRegister().lastRegister?.text ?: kotlin.test.fail()
-    TestCase.assertEquals(yankedTest, savedText)
+    kotlin.test.assertEquals(yankedTest, savedText)
   }
 
+  @Test
   fun `test from line visual mode`() {
     val text = """
             A Discovery
@@ -82,6 +85,6 @@ class YankVisualLinesActionTest : VimTestCase() {
     configureByText(text)
     typeText(injector.parser.parseKeys("VjY"))
     val savedText = VimPlugin.getRegister().lastRegister?.text ?: kotlin.test.fail()
-    TestCase.assertEquals(yankedTest, savedText)
+    kotlin.test.assertEquals(yankedTest, savedText)
   }
 }

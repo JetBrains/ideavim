@@ -11,9 +11,11 @@ package org.jetbrains.plugins.ideavim.ex.implementation.functions
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class FunctionTest : VimTestCase() {
 
+  @Test
   fun `test function for built-in function`() {
     configureByText("\n")
     typeText(commandToKeys("let Ff = function('abs')"))
@@ -24,6 +26,7 @@ class FunctionTest : VimTestCase() {
     assertExOutput("abs\n")
   }
 
+  @Test
   fun `test function with arglist`() {
     configureByText("\n")
     typeText(commandToKeys("let Ff = function('abs', [-10])"))
@@ -35,6 +38,7 @@ class FunctionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test function for unknown function`() {
     configureByText("\n")
     typeText(commandToKeys("let Ff = function('unknown')"))
@@ -44,6 +48,7 @@ class FunctionTest : VimTestCase() {
 
   // todo in release 1.9 (good example of multiple exceptions at once)
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test function with wrong function name`() {
     configureByText("\n")
     typeText(commandToKeys("let Ff = function(32)"))
@@ -52,6 +57,7 @@ class FunctionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test function with wrong second argument`() {
     configureByText("\n")
     typeText(commandToKeys("let Ff = function('abs', 10)"))
@@ -60,6 +66,7 @@ class FunctionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test function with wrong third argument`() {
     configureByText("\n")
     typeText(commandToKeys("let Ff = function('abs', [], 40)"))
@@ -67,6 +74,7 @@ class FunctionTest : VimTestCase() {
     assertPluginErrorMessageContains("E922: expected a dict")
   }
 
+  @Test
   fun `test redefining a function`() {
     configureByText("\n")
     typeText(
@@ -98,6 +106,7 @@ class FunctionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test deleting function`() {
     configureByText("\n")
     typeText(

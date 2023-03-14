@@ -30,6 +30,7 @@ import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
 import org.jetbrains.plugins.ideavim.VimTestOption
 import org.jetbrains.plugins.ideavim.waitAndAssert
 import org.jetbrains.plugins.ideavim.waitAndAssertMode
+import org.junit.jupiter.api.Test
 
 /**
  * @author Alex Plate
@@ -37,6 +38,7 @@ import org.jetbrains.plugins.ideavim.waitAndAssertMode
 class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test enable character selection no selection`() {
     configureByText(
       """
@@ -49,7 +51,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
       """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
-    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
+    IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
     assertMode(VimStateMachine.Mode.COMMAND)
     assertSubMode(VimStateMachine.SubMode.NONE)
     assertCaretsVisualAttributes()
@@ -57,6 +59,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test enable character selection cursor in the middle`() {
     configureByText(
       """
@@ -69,8 +72,8 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
       """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
-    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
+    IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
+    waitAndAssertMode(fixture, VimStateMachine.Mode.VISUAL)
     assertMode(VimStateMachine.Mode.VISUAL)
     assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
     assertCaretsVisualAttributes()
@@ -103,6 +106,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
   )
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test enable character selection cursor on end`() {
     configureByText(
       """
@@ -115,8 +119,8 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
       """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
-    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
+    IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
+    waitAndAssertMode(fixture, VimStateMachine.Mode.VISUAL)
     assertMode(VimStateMachine.Mode.VISUAL)
     assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
     assertCaretsVisualAttributes()
@@ -139,6 +143,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test enable character selection cursor on start`() {
     configureByText(
       """
@@ -151,8 +156,8 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
       """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
-    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
+    IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
+    waitAndAssertMode(fixture, VimStateMachine.Mode.VISUAL)
     assertMode(VimStateMachine.Mode.VISUAL)
     assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
     assertCaretsVisualAttributes()
@@ -175,6 +180,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test enable character selection lineend`() {
     configureByText(
       """
@@ -187,8 +193,8 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
       """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
-    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
+    IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
+    waitAndAssertMode(fixture, VimStateMachine.Mode.VISUAL)
     assertMode(VimStateMachine.Mode.VISUAL)
     assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
     assertCaretsVisualAttributes()
@@ -211,6 +217,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test enable character selection next line`() {
     configureByText(
       """
@@ -223,8 +230,8 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
       """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
-    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
+    IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
+    waitAndAssertMode(fixture, VimStateMachine.Mode.VISUAL)
     assertMode(VimStateMachine.Mode.VISUAL)
     assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
     assertCaretsVisualAttributes()
@@ -247,6 +254,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test enable character selection start on line start`() {
     configureByText(
       """
@@ -259,8 +267,8 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
       """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
-    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
+    IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
+    waitAndAssertMode(fixture, VimStateMachine.Mode.VISUAL)
     assertMode(VimStateMachine.Mode.VISUAL)
     assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
     assertCaretsVisualAttributes()
@@ -283,6 +291,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test enable character selection start on line end`() {
     configureByText(
       """
@@ -295,8 +304,8 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
       """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
-    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
+    IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
+    waitAndAssertMode(fixture, VimStateMachine.Mode.VISUAL)
     assertMode(VimStateMachine.Mode.VISUAL)
     assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
     assertCaretsVisualAttributes()
@@ -319,6 +328,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test enable character selection multicaret`() {
     configureByText(
       """
@@ -331,8 +341,8 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
       """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
-    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
+    IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
+    waitAndAssertMode(fixture, VimStateMachine.Mode.VISUAL)
     assertMode(VimStateMachine.Mode.VISUAL)
     assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
     assertCaretsVisualAttributes()
@@ -355,6 +365,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test enable line selection`() {
     configureByText(
       """
@@ -367,8 +378,8 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
       """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
-    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
+    IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
+    waitAndAssertMode(fixture, VimStateMachine.Mode.VISUAL)
     assertMode(VimStateMachine.Mode.VISUAL)
     assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
     assertCaretsVisualAttributes()
@@ -406,6 +417,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test enable line selection next line`() {
     configureByText(
       """
@@ -418,8 +430,8 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
       """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
-    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
+    IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
+    waitAndAssertMode(fixture, VimStateMachine.Mode.VISUAL)
     assertMode(VimStateMachine.Mode.VISUAL)
     assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
     assertCaretsVisualAttributes()
@@ -442,6 +454,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test enable line selection cursor on last line`() {
     configureByText(
       """
@@ -454,8 +467,8 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
       """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
-    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
+    IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
+    waitAndAssertMode(fixture, VimStateMachine.Mode.VISUAL)
     assertMode(VimStateMachine.Mode.VISUAL)
     assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
     assertCaretsVisualAttributes()
@@ -478,6 +491,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test enable line selection cursor on first line`() {
     configureByText(
       """
@@ -490,8 +504,8 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
       """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
-    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
+    IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
+    waitAndAssertMode(fixture, VimStateMachine.Mode.VISUAL)
     assertMode(VimStateMachine.Mode.VISUAL)
     assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
     assertCaretsVisualAttributes()
@@ -514,6 +528,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test enable line selection multicaret`() {
     configureByText(
       """
@@ -526,8 +541,8 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
       """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
-    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
+    IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
+    waitAndAssertMode(fixture, VimStateMachine.Mode.VISUAL)
     assertMode(VimStateMachine.Mode.VISUAL)
     assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
     assertCaretsVisualAttributes()
@@ -550,6 +565,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test enable line selection motion up`() {
     configureByText(
       """
@@ -562,8 +578,8 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
       """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
-    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
+    IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
+    waitAndAssertMode(fixture, VimStateMachine.Mode.VISUAL)
     assertMode(VimStateMachine.Mode.VISUAL)
     assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
     assertCaretsVisualAttributes()
@@ -586,6 +602,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test enable character selection looks like block`() {
     configureByText(
       """
@@ -598,8 +615,8 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
       """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
-    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
+    IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
+    waitAndAssertMode(fixture, VimStateMachine.Mode.VISUAL)
     assertMode(VimStateMachine.Mode.VISUAL)
     assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
     assertCaretsVisualAttributes()
@@ -607,6 +624,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test enable character selection`() {
     configureByText(
       """
@@ -619,8 +637,8 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
       """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
-    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
+    IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
+    waitAndAssertMode(fixture, VimStateMachine.Mode.VISUAL)
     assertMode(VimStateMachine.Mode.VISUAL)
     assertSubMode(VimStateMachine.SubMode.VISUAL_BLOCK)
     assertCaretsVisualAttributes()
@@ -643,6 +661,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test enable character selection with longer line`() {
     configureByText(
       """
@@ -655,8 +674,8 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
       """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
-    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
+    IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
+    waitAndAssertMode(fixture, VimStateMachine.Mode.VISUAL)
     assertMode(VimStateMachine.Mode.VISUAL)
     assertSubMode(VimStateMachine.SubMode.VISUAL_BLOCK)
     assertCaretsVisualAttributes()
@@ -679,6 +698,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test enable character selection caret to the left`() {
     configureByText(
       """
@@ -691,8 +711,8 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
       """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
-    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
+    IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
+    waitAndAssertMode(fixture, VimStateMachine.Mode.VISUAL)
     assertMode(VimStateMachine.Mode.VISUAL)
     assertSubMode(VimStateMachine.SubMode.VISUAL_BLOCK)
     assertCaretsVisualAttributes()
@@ -721,6 +741,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
     ),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test control selection`() {
     configureByText(
       """
@@ -733,13 +754,14 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
     VimListenerManager.EditorListeners.addAll()
     assertMode(VimStateMachine.Mode.COMMAND)
 
-    myFixture.editor.selectionModel.setSelection(5, 10)
+    fixture.editor.selectionModel.setSelection(5, 10)
 
-    waitAndAssertMode(myFixture, VimStateMachine.Mode.SELECT)
+    waitAndAssertMode(fixture, VimStateMachine.Mode.SELECT)
   }
 
   @VimOptionTestConfiguration(VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""))
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test control selection to visual mode`() {
     configureByText(
       """
@@ -752,13 +774,14 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
     VimListenerManager.EditorListeners.addAll()
     assertMode(VimStateMachine.Mode.COMMAND)
 
-    myFixture.editor.selectionModel.setSelection(5, 10)
+    fixture.editor.selectionModel.setSelection(5, 10)
 
-    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
+    waitAndAssertMode(fixture, VimStateMachine.Mode.VISUAL)
   }
 
   @VimOptionTestConfiguration(VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""))
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test control selection from line to char visual modes`() {
     configureByText(
       """
@@ -772,10 +795,10 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
     assertMode(VimStateMachine.Mode.VISUAL)
     assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
 
-    myFixture.editor.selectionModel.setSelection(2, 5)
-    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
+    fixture.editor.selectionModel.setSelection(2, 5)
+    IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
 
-    waitAndAssert { myFixture.editor.subMode == VimStateMachine.SubMode.VISUAL_CHARACTER }
+    waitAndAssert { fixture.editor.subMode == VimStateMachine.SubMode.VISUAL_CHARACTER }
     assertMode(VimStateMachine.Mode.VISUAL)
     assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
     assertCaretsVisualAttributes()
@@ -783,6 +806,7 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
 
   @VimOptionTestConfiguration(VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""))
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test control selection from line to char visual modes in keep mode`() {
     configureByText(
       """
@@ -801,20 +825,20 @@ class IdeaVisualControlTest : VimOptionTestCase(OptionConstants.selectmode) {
     assertMode(VimStateMachine.Mode.VISUAL)
     assertSubMode(VimStateMachine.SubMode.VISUAL_LINE)
 
-    myFixture.editor.selectionModel.setSelection(2, 5)
-    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
+    fixture.editor.selectionModel.setSelection(2, 5)
+    IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
 
-    waitAndAssert { myFixture.editor.subMode == VimStateMachine.SubMode.VISUAL_CHARACTER }
+    waitAndAssert { fixture.editor.subMode == VimStateMachine.SubMode.VISUAL_CHARACTER }
     assertMode(VimStateMachine.Mode.VISUAL)
     assertSubMode(VimStateMachine.SubMode.VISUAL_CHARACTER)
     assertCaretsVisualAttributes()
   }
 
   private fun startDummyTemplate() {
-    TemplateManagerImpl.setTemplateTesting(myFixture.testRootDisposable)
-    val templateManager = TemplateManager.getInstance(myFixture.project)
+    TemplateManagerImpl.setTemplateTesting(fixture.testRootDisposable)
+    val templateManager = TemplateManager.getInstance(fixture.project)
     val createdTemplate = templateManager.createTemplate("", "")
     createdTemplate.addVariable(ConstantNode("1"), true)
-    templateManager.startTemplate(myFixture.editor, createdTemplate)
+    templateManager.startTemplate(fixture.editor, createdTemplate)
   }
 }

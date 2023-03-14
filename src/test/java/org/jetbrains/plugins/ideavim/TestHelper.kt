@@ -13,12 +13,16 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.testFramework.EditorTestUtil
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
+import com.maddyhome.idea.vim.api.getKnownToggleOption
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.setToggleOption
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.IjOptionConstants
 import com.maddyhome.idea.vim.helper.editorMode
+import com.maddyhome.idea.vim.options.OptionScope
+import javax.swing.KeyStroke
 import kotlin.test.fail
 
 /**
@@ -107,3 +111,39 @@ fun waitCondition(
   }
   return false
 }
+
+internal const val c = EditorTestUtil.CARET_TAG
+internal const val s = EditorTestUtil.SELECTION_START_TAG
+internal const val se = EditorTestUtil.SELECTION_END_TAG
+
+internal fun enableExtensions(vararg extensionNames: String) {
+  for (name in extensionNames) {
+    injector.optionGroup.setToggleOption(injector.optionGroup.getKnownToggleOption(name), OptionScope.GLOBAL)
+  }
+}
+
+internal fun String.dotToTab(): String = replace('.', '\t')
+
+internal fun String.dotToSpace(): String = replace('.', ' ')
+
+internal fun commandToKeys(command: String): List<KeyStroke> {
+  val keys: MutableList<KeyStroke> = ArrayList()
+  if (!command.startsWith(":")) {
+    keys.addAll(injector.parser.parseKeys(":"))
+  }
+  keys.addAll(injector.parser.stringToKeys(command)) // Avoids trying to parse 'command ... <args>' as a special char
+  keys.addAll(injector.parser.parseKeys("<Enter>"))
+  return keys
+}
+
+internal fun exCommand(command: String) = ":$command<CR>"
+
+internal fun searchToKeys(pattern: String, forwards: Boolean): List<KeyStroke> {
+  val keys: MutableList<KeyStroke> = ArrayList()
+  keys.addAll(injector.parser.parseKeys(if (forwards) "/" else "?"))
+  keys.addAll(injector.parser.stringToKeys(pattern)) // Avoids trying to parse 'command ... <args>' as a special char
+  keys.addAll(injector.parser.parseKeys("<CR>"))
+  return keys
+}
+
+internal fun searchCommand(pattern: String) = "$pattern<CR>"

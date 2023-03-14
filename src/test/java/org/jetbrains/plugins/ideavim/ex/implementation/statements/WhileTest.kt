@@ -9,9 +9,11 @@
 package org.jetbrains.plugins.ideavim.ex.implementation.statements
 
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class WhileTest : VimTestCase() {
 
+  @Test
   fun `test while`() {
     configureByText("\n")
     typeText(
@@ -27,6 +29,7 @@ class WhileTest : VimTestCase() {
     assertExOutput("103\n")
   }
 
+  @Test
   fun `test while with break`() {
     configureByText("\n")
     typeText(
@@ -46,6 +49,7 @@ class WhileTest : VimTestCase() {
     assertExOutput("13\n")
   }
 
+  @Test
   fun `test while with continue`() {
     configureByText("\n")
     typeText(

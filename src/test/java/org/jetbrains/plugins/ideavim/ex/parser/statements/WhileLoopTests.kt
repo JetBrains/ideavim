@@ -11,22 +11,25 @@ package org.jetbrains.plugins.ideavim.ex.parser.statements
 import com.maddyhome.idea.vim.vimscript.model.commands.EchoCommand
 import com.maddyhome.idea.vim.vimscript.model.statements.loops.WhileLoop
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
-import org.junit.experimental.theories.DataPoints
-import org.junit.experimental.theories.Theories
-import org.junit.experimental.theories.Theory
-import org.junit.runner.RunWith
+import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.combinate
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-@RunWith(Theories::class)
-class WhileLoopTests {
+class WhileLoopTests : VimTestCase() {
 
   companion object {
+    val values = listOf("", " ")
+
     @JvmStatic
-    val values = listOf("", " ") @DataPoints get
+    fun arg3(): List<Arguments> = combinate(values, values, values)
   }
 
-  @Theory
+  @ParameterizedTest
+  @MethodSource("arg3")
   fun `while loop`(sp1: String, sp2: String, sp3: String) {
     val script = VimscriptParser.parse(
       """

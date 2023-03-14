@@ -11,10 +11,12 @@ import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class AutoIndentTest : VimTestCase() {
   // VIM-256 |==|
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
+  @Test
   fun testCaretPositionAfterAutoIndent() {
     configureByJavaText(
       """class C {
@@ -37,6 +39,7 @@ class AutoIndentTest : VimTestCase() {
 
   // |2==|
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
+  @Test
   fun testAutoIndentWithCount() {
     configureByJavaText(
       """class C {
@@ -61,6 +64,7 @@ class AutoIndentTest : VimTestCase() {
 
   // |=k|
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
+  @Test
   fun testAutoIndentWithUpMotion() {
     configureByJavaText(
       """class C {
@@ -85,6 +89,7 @@ class AutoIndentTest : VimTestCase() {
 
   // |=l|
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
+  @Test
   fun testAutoIndentWithRightMotion() {
     configureByJavaText(
       """class C {
@@ -107,6 +112,7 @@ class AutoIndentTest : VimTestCase() {
 
   // |2=j|
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
+  @Test
   fun testAutoIndentWithCountsAndDownMotion() {
     configureByJavaText(
       """class C {
@@ -131,6 +137,7 @@ class AutoIndentTest : VimTestCase() {
 
   // |v| |l| |=|
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
+  @Test
   fun testVisualAutoIndent() {
     configureByJavaText(
       """class C {
@@ -153,6 +160,7 @@ class AutoIndentTest : VimTestCase() {
 
   // |v| |j| |=|
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
+  @Test
   fun testVisualMultilineAutoIndent() {
     configureByJavaText(
       """class C {
@@ -177,6 +185,7 @@ class AutoIndentTest : VimTestCase() {
 
   // |C-v| |j| |=|
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
+  @Test
   fun testVisualBlockAutoIndent() {
     configureByJavaText(
       """class C {

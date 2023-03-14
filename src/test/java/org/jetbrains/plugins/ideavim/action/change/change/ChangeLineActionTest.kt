@@ -10,8 +10,10 @@ package org.jetbrains.plugins.ideavim.action.change.change
 
 import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class ChangeLineActionTest : VimTestCase() {
+  @Test
   fun `test on empty file`() {
     setupChecks {
       this.neoVim.ignoredRegisters = setOf('1', '"')
@@ -19,6 +21,7 @@ class ChangeLineActionTest : VimTestCase() {
     doTest("cc", "", "", VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun `test on empty file with S`() {
     setupChecks {
       this.neoVim.ignoredRegisters = setOf('1', '"')
@@ -26,6 +29,7 @@ class ChangeLineActionTest : VimTestCase() {
     doTest("S", "", "", VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun `test on last line with S`() {
     doTest(
       "S",
@@ -42,6 +46,7 @@ class ChangeLineActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test on last line with new line with S`() {
     doTest(
       "S",
@@ -60,6 +65,7 @@ class ChangeLineActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test on very last line with new line with S`() {
     doTest(
       "S",
@@ -76,6 +82,7 @@ class ChangeLineActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test on very last line with new line with S2`() {
     doTest(
       "S",
@@ -94,6 +101,7 @@ class ChangeLineActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test on first line with new line with S`() {
     doTest(
       "S",
@@ -110,6 +118,7 @@ class ChangeLineActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test on last line with new line with cc`() {
     doTest(
       "cc",
@@ -128,6 +137,7 @@ class ChangeLineActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test on last line`() {
     doTest(
       "cc",
@@ -146,6 +156,7 @@ class ChangeLineActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test S with count`() {
     doTest(
       "3S",

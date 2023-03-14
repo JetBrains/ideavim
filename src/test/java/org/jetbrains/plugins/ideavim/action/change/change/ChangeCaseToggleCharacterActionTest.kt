@@ -11,9 +11,11 @@ package org.jetbrains.plugins.ideavim.action.change.change
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class ChangeCaseToggleCharacterActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
   fun `test whichwrap in the same line`() {
     doTest(
       listOf("~"),
@@ -29,6 +31,7 @@ class ChangeCaseToggleCharacterActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
   fun `test whichwrap at file end`() {
     doTest(
       listOf("~"),
@@ -44,6 +47,7 @@ class ChangeCaseToggleCharacterActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
   fun `test whichwrap to next line`() {
     doTest(
       listOf("~"),
@@ -61,6 +65,7 @@ class ChangeCaseToggleCharacterActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
   fun `test from empty line to empty line`() {
     doTest(
       listOf("~"),

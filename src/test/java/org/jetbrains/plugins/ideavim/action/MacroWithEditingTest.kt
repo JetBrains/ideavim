@@ -14,9 +14,11 @@ import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.waitAndAssert
+import org.junit.jupiter.api.Test
 
 class MacroWithEditingTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun `test print macro`() {
     typeTextInFile(injector.parser.parseKeys("qa" + "iHello<Esc>" + "q"), "")
     setText("")
@@ -24,23 +26,25 @@ class MacroWithEditingTest : VimTestCase() {
     assertState("iHello" + 27.toChar())
   }
 
+  @Test
   fun `test copy and perform macro`() {
     typeTextInFile(injector.parser.parseKeys("^v\$h\"wy"), "iHello<Esc>")
-    assertEquals("iHello<Esc>", VimPlugin.getRegister().getRegister('w')?.rawText)
+    kotlin.test.assertEquals("iHello<Esc>", VimPlugin.getRegister().getRegister('w')?.rawText)
     setText("")
     typeText(injector.parser.parseKeys("@w"))
     waitAndAssert {
-      myFixture.editor.document.text == "Hello"
+      fixture.editor.document.text == "Hello"
     }
   }
 
+  @Test
   fun `test copy and perform macro ctrl_a`() {
     typeTextInFile(injector.parser.parseKeys("^v\$h\"wy"), "<C-A>")
-    assertEquals("<C-A>", VimPlugin.getRegister().getRegister('w')?.rawText)
+    kotlin.test.assertEquals("<C-A>", VimPlugin.getRegister().getRegister('w')?.rawText)
     setText("1")
     typeText(injector.parser.parseKeys("@w"))
     waitAndAssert {
-      myFixture.editor.document.text == "2"
+      fixture.editor.document.text == "2"
     }
   }
 }

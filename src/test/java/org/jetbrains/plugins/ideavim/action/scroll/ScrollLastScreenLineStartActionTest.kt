@@ -9,6 +9,7 @@
 package org.jetbrains.plugins.ideavim.action.scroll
 
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 /*
                                                        *z-*
@@ -17,6 +18,7 @@ z-                      Redraw, line [count] at bottom of window (default
                         line.
  */
 class ScrollLastScreenLineStartActionTest : VimTestCase() {
+  @Test
   fun `test scroll current line to bottom of screen`() {
     configureByPages(5)
     setPositionAndScroll(40, 60)
@@ -25,6 +27,7 @@ class ScrollLastScreenLineStartActionTest : VimTestCase() {
     assertVisibleArea(26, 60)
   }
 
+  @Test
   fun `test scroll current line to bottom of screen and move cursor to first non-blank`() {
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(40, 60, 14)
@@ -33,6 +36,7 @@ class ScrollLastScreenLineStartActionTest : VimTestCase() {
     assertVisibleArea(26, 60)
   }
 
+  @Test
   fun `test scroll current line to bottom of screen minus scrolloff`() {
     configureByPages(5)
     enterCommand("set scrolloff=10")
@@ -42,6 +46,7 @@ class ScrollLastScreenLineStartActionTest : VimTestCase() {
     assertVisibleArea(36, 70)
   }
 
+  @Test
   fun `test scrolls count line to bottom of screen`() {
     configureByPages(5)
     setPositionAndScroll(40, 60)
@@ -50,6 +55,7 @@ class ScrollLastScreenLineStartActionTest : VimTestCase() {
     assertVisibleArea(65, 99)
   }
 
+  @Test
   fun `test scrolls count line to bottom of screen minus scrolloff`() {
     configureByPages(5)
     enterCommand("set scrolloff=10")
@@ -59,6 +65,7 @@ class ScrollLastScreenLineStartActionTest : VimTestCase() {
     assertVisibleArea(75, 109)
   }
 
+  @Test
   fun `test scrolls current line to bottom of screen ignoring scrolljump`() {
     configureByPages(5)
     enterCommand("set scrolljump=10")
@@ -68,6 +75,7 @@ class ScrollLastScreenLineStartActionTest : VimTestCase() {
     assertVisibleArea(26, 60)
   }
 
+  @Test
   fun `test scrolls correctly when less than a page to scroll`() {
     configureByPages(5)
     setPositionAndScroll(5, 15)

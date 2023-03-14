@@ -11,9 +11,11 @@ package org.jetbrains.plugins.ideavim.action.change.insert
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class InsertBackspaceActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun `test insert backspace`() {
     val before = "I fo${c}und it in a legendary land"
     val after = "I f${c}und it in a legendary land"
@@ -25,6 +27,7 @@ class InsertBackspaceActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
   fun `test insert backspace scrolls start of line`() {
     configureByColumns(200)
     enterCommand("set sidescrolloff=10")

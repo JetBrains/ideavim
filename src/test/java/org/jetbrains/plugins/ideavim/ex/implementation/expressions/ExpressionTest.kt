@@ -12,12 +12,14 @@ import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.vimscript.model.expressions.Register
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.ex.evaluate
+import org.junit.jupiter.api.Test
 
 class ExpressionTest : VimTestCase() {
 
+  @Test
   fun `test multiline register content`() {
     configureByText("${c}Oh\nHi\nMark\n")
     typeText(parseKeys("VGy"))
-    assertEquals("Oh\nHi\nMark\n", Register('"').evaluate().toString())
+    kotlin.test.assertEquals("Oh\nHi\nMark\n", Register('"').evaluate().toString())
   }
 }

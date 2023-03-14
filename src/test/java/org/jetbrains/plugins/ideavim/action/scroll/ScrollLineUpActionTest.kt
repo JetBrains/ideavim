@@ -11,6 +11,7 @@ package org.jetbrains.plugins.ideavim.action.scroll
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 /*
                                                        *CTRL-Y*
@@ -21,6 +22,7 @@ CTRL-Y                  Scroll window [count] lines upwards in the buffer.
  */
 class ScrollLineUpActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  @Test
   fun `test scroll single line up`() {
     configureByPages(5)
     setPositionAndScroll(29, 29)
@@ -30,6 +32,7 @@ class ScrollLineUpActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  @Test
   fun `test scroll line up will keep cursor on screen`() {
     configureByPages(5)
     setPositionAndScroll(29, 63)
@@ -39,6 +42,7 @@ class ScrollLineUpActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  @Test
   fun `test scroll line up will maintain current column at start of line with sidescrolloff`() {
     configureByPages(5)
     enterCommand("set sidescrolloff=10")
@@ -49,6 +53,7 @@ class ScrollLineUpActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  @Test
   fun `test scroll count lines up`() {
     configureByPages(5)
     setPositionAndScroll(29, 29)
@@ -58,6 +63,7 @@ class ScrollLineUpActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  @Test
   fun `test scroll count lines up will keep cursor on screen`() {
     configureByPages(5)
     setPositionAndScroll(29, 63)
@@ -67,6 +73,7 @@ class ScrollLineUpActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  @Test
   fun `test too many lines up stops at zero`() {
     configureByPages(5)
     setPositionAndScroll(29, 29)
@@ -76,6 +83,7 @@ class ScrollLineUpActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  @Test
   fun `test too many lines up stops at zero and keeps cursor on screen`() {
     configureByPages(5)
     setPositionAndScroll(59, 59)
@@ -85,6 +93,7 @@ class ScrollLineUpActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  @Test
   fun `test scroll up uses scrolloff and moves cursor`() {
     configureByPages(5)
     enterCommand("set scrolloff=10")
@@ -95,6 +104,7 @@ class ScrollLineUpActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  @Test
   fun `test scroll up is not affected by scrolljump`() {
     configureByPages(5)
     enterCommand("set scrolljump=10")
@@ -105,6 +115,7 @@ class ScrollLineUpActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  @Test
   fun `test scroll line up in visual mode`() {
     configureByPages(5)
     setPositionAndScroll(29, 29)
@@ -113,6 +124,7 @@ class ScrollLineUpActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  @Test
   fun `test scroll line up with virtual space`() {
     configureByLines(100, "    I found it in a legendary land")
     setEditorVirtualSpace()
@@ -122,6 +134,7 @@ class ScrollLineUpActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  @Test
   fun `test scroll line up with virtual space and scrolloff`() {
     configureByLines(100, "    I found it in a legendary land")
     enterCommand("set scrolloff=10")
@@ -135,6 +148,7 @@ class ScrollLineUpActionTest : VimTestCase() {
 
   // This actually works, but the set up puts us in the wrong position
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  @Test
   fun `test scroll line up on last line with scrolloff`() {
     configureByLines(100, "    I found it in a legendary land")
     enterCommand("set scrolloff=10")

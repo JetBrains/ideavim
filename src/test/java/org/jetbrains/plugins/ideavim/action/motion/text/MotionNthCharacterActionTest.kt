@@ -11,8 +11,10 @@ package org.jetbrains.plugins.ideavim.action.motion.text
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class MotionNthCharacterActionTest : VimTestCase() {
+  @Test
   fun `test goto without count`() {
     doTest(
       "go",
@@ -37,6 +39,7 @@ class MotionNthCharacterActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test goto with 0`() {
     doTest(
       "0go",
@@ -61,6 +64,7 @@ class MotionNthCharacterActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test goto with 1`() {
     doTest(
       "1go",
@@ -85,6 +89,7 @@ class MotionNthCharacterActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test goto with 2`() {
     doTest(
       "2go",
@@ -109,6 +114,7 @@ class MotionNthCharacterActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test goto with 10`() {
     doTest(
       "10go",
@@ -133,6 +139,7 @@ class MotionNthCharacterActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test goto with 1000`() {
     doTest(
       "1000go",
@@ -167,6 +174,7 @@ class MotionNthCharacterActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.$c
   """,
   )
+  @Test
   fun `test goto with 1000 in visual mode`() {
     doTest(
       "v1000go",
@@ -202,6 +210,7 @@ class MotionNthCharacterActionTest : VimTestCase() {
             $c
   """,
   )
+  @Test
   fun `test goto with 1000 and new line`() {
     doTest(
       "1000go",

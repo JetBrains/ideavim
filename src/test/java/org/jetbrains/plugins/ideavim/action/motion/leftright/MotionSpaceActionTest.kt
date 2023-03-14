@@ -11,9 +11,11 @@ package org.jetbrains.plugins.ideavim.action.motion.leftright
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class MotionSpaceActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
   fun `test whichwrap in the same line`() {
     doTest(
       listOf("<Space>"),
@@ -29,6 +31,7 @@ class MotionSpaceActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
   fun `test whichwrap at file end`() {
     doTest(
       listOf("<Space>"),
@@ -44,6 +47,7 @@ class MotionSpaceActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
   fun `test whichwrap to next line`() {
     doTest(
       listOf("<Space>"),
@@ -61,6 +65,7 @@ class MotionSpaceActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
   fun `test from empty line to empty line`() {
     doTest(
       listOf("<Space>"),

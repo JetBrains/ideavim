@@ -19,10 +19,12 @@ import org.jetbrains.plugins.ideavim.VimOptionDefaultAll
 import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
 import org.jetbrains.plugins.ideavim.VimTestOption
+import org.junit.jupiter.api.Test
 
 class MotionArrowUpActionTest : VimOptionTestCase(OptionConstants.keymodel) {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionDefaultAll
+  @Test
   fun `test visual default options`() {
     doTest(
       listOf("v", "<Up>"),
@@ -55,6 +57,7 @@ class MotionArrowUpActionTest : VimOptionTestCase(OptionConstants.keymodel) {
       OptionConstants.keymodel_stopsel,
     ),
   )
+  @Test
   fun `test visual stopsel`() {
     doTest(
       listOf("v", "<Up>"),
@@ -85,6 +88,7 @@ class MotionArrowUpActionTest : VimOptionTestCase(OptionConstants.keymodel) {
       OptionConstants.keymodel_stopselect,
     ),
   )
+  @Test
   fun `test visual stopselect`() {
     doTest(
       listOf("v", "<Up>"),
@@ -117,6 +121,7 @@ class MotionArrowUpActionTest : VimOptionTestCase(OptionConstants.keymodel) {
       OptionConstants.keymodel_stopvisual,
     ),
   )
+  @Test
   fun `test visual stopvisual`() {
     doTest(
       listOf("v", "<Up>"),
@@ -147,6 +152,7 @@ class MotionArrowUpActionTest : VimOptionTestCase(OptionConstants.keymodel) {
       OptionConstants.keymodel_stopvisual,
     ),
   )
+  @Test
   fun `test visual stopvisual multicaret`() {
     doTest(
       listOf("v", "<Up>"),
@@ -177,6 +183,7 @@ class MotionArrowUpActionTest : VimOptionTestCase(OptionConstants.keymodel) {
       OptionConstants.keymodel_stopselect,
     ),
   )
+  @Test
   fun `test char select simple move`() {
     doTest(
       listOf("gH", "<Up>"),
@@ -201,6 +208,7 @@ class MotionArrowUpActionTest : VimOptionTestCase(OptionConstants.keymodel) {
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, ""))
+  @Test
   fun `test char select stopsel`() {
     doTest(
       listOf("gh", "<Up>"),
@@ -233,6 +241,7 @@ class MotionArrowUpActionTest : VimOptionTestCase(OptionConstants.keymodel) {
       OptionConstants.keymodel_stopselect,
     ),
   )
+  @Test
   fun `test select multiple carets`() {
     doTest(
       listOf("gH", "<Up>"),
@@ -257,6 +266,7 @@ class MotionArrowUpActionTest : VimOptionTestCase(OptionConstants.keymodel) {
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionDefaultAll
+  @Test
   fun `test arrow up in insert mode scrolls caret at scrolloff`() {
     configureByPages(5)
     enterCommand("set scrolljump=10")

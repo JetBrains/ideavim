@@ -16,10 +16,12 @@ import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
 import org.jetbrains.plugins.ideavim.VimTestOption
+import org.junit.jupiter.api.Test
 
 class DeleteJoinVisualLinesSpacesActionTest : VimOptionTestCase(IjOptionConstants.ideajoin) {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(VimTestOption(IjOptionConstants.ideajoin, OptionValueType.NUMBER, "1"))
+  @Test
   fun `test join via idea`() {
     doTest(
       "VjJ",

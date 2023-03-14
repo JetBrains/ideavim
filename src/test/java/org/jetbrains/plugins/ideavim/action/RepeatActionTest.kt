@@ -12,7 +12,7 @@ import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 class RepeatActionTest : VimTestCase() {
 
@@ -41,8 +41,8 @@ class RepeatActionTest : VimTestCase() {
   }
 
   // VIM-1644
-  @Test
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun testRepeatChangeInVisualMode() {
     configureByText("foobar foobar")
     typeText(injector.parser.parseKeys("<C-V>llc" + "fu" + "<Esc>" + "w" + "."))
@@ -50,8 +50,8 @@ class RepeatActionTest : VimTestCase() {
   }
 
   // VIM-1644
-  @Test
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun testRepeatChangeInVisualModeMultiline() {
     configureByText(
       "There is a red house.\n" +

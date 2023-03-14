@@ -14,11 +14,16 @@ import com.maddyhome.idea.vim.register.RegisterConstants.LAST_SEARCH_REGISTER
 import com.maddyhome.idea.vim.register.RegisterConstants.SMALL_DELETION_REGISTER
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.Assert
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInfo
+import kotlin.test.assertNotNull
 
 class SpecialRegistersTest : VimTestCase() {
   @Throws(Exception::class)
-  override fun setUp() {
-    super.setUp()
+  @BeforeEach
+  override fun setUp(testInfo: TestInfo) {
+    super.setUp(testInfo)
     val registerGroup = VimPlugin.getRegister()
     registerGroup.setKeys('a', injector.parser.stringToKeys(DUMMY_TEXT))
     registerGroup.setKeys(SMALL_DELETION_REGISTER, injector.parser.stringToKeys(DUMMY_TEXT))
@@ -32,14 +37,16 @@ class SpecialRegistersTest : VimTestCase() {
   }
 
   // VIM-581
+  @Test
   fun testSmallDelete() {
     typeTextInFile(injector.parser.parseKeys("de"), "one <caret>two three\n")
-    assertEquals("two", getRegisterText(SMALL_DELETION_REGISTER))
+    kotlin.test.assertEquals("two", getRegisterText(SMALL_DELETION_REGISTER))
     // Text smaller than line doesn't go to numbered registers (except special cases)
     assertRegisterNotChanged('1')
   }
 
   // |d| |%| Special case for small delete
+  @Test
   fun testSmallDeleteWithPercent() {
     typeTextInFile(injector.parser.parseKeys("d%"), "(one<caret> two) three\n")
     assertRegisterChanged('1')
@@ -47,6 +54,7 @@ class SpecialRegistersTest : VimTestCase() {
   }
 
   // |d| |(| Special case for small delete
+  @Test
   fun testSmallDeleteTillPrevSentence() {
     typeTextInFile(injector.parser.parseKeys("d("), "One. Two<caret>. Three.\n")
     assertRegisterChanged('1')
@@ -54,6 +62,7 @@ class SpecialRegistersTest : VimTestCase() {
   }
 
   // |d| |)| Special case for small delete
+  @Test
   fun testSmallDeleteTillNextSentence() {
     typeTextInFile(injector.parser.parseKeys("d)"), "One. <caret>Two. Three.\n")
     assertRegisterChanged('1')
@@ -61,6 +70,7 @@ class SpecialRegistersTest : VimTestCase() {
   }
 
   // |d| |`| Special case for small delete
+  @Test
   fun testSmallDeleteWithMark() {
     typeTextInFile(injector.parser.parseKeys("ma" + "b" + "d`a"), "one two<caret> three\n")
     assertRegisterChanged('1')
@@ -68,6 +78,7 @@ class SpecialRegistersTest : VimTestCase() {
   }
 
   // |d| |/| Special case for small delete
+  @Test
   fun testSmallDeleteWithSearch() {
     typeTextInFile(injector.parser.parseKeys("d/" + "o" + "<Enter>"), "one <caret>two three\n")
     assertRegisterChanged('1')
@@ -75,6 +86,7 @@ class SpecialRegistersTest : VimTestCase() {
   }
 
   // |d| |?| Special case for small delete
+  @Test
   fun testSmallDeleteWithBackSearch() {
     typeTextInFile(injector.parser.parseKeys("d?" + "t" + "<Enter>"), "one two<caret> three\n")
     assertRegisterChanged('1')
@@ -82,6 +94,7 @@ class SpecialRegistersTest : VimTestCase() {
   }
 
   // |d| |n| Special case for small delete
+  @Test
   fun testSmallDeleteWithSearchRepeat() {
     typeTextInFile(injector.parser.parseKeys("/" + "t" + "<Enter>" + "dn"), "<caret>one two three\n")
     assertRegisterChanged('1')
@@ -89,6 +102,7 @@ class SpecialRegistersTest : VimTestCase() {
   }
 
   // |d| |N| Special case for small delete
+  @Test
   fun testSmallDeleteWithBackSearchRepeat() {
     typeTextInFile(injector.parser.parseKeys("/" + "t" + "<Enter>" + "dN"), "one tw<caret>o three\n")
     assertRegisterChanged('1')
@@ -96,6 +110,7 @@ class SpecialRegistersTest : VimTestCase() {
   }
 
   // |d| |{| Special case for small delete
+  @Test
   fun testSmallDeleteTillPrevParagraph() {
     typeTextInFile(injector.parser.parseKeys("d{"), "one<caret> two three")
     assertRegisterChanged('1')
@@ -103,12 +118,14 @@ class SpecialRegistersTest : VimTestCase() {
   }
 
   // |d| |}| Special case for small delete
+  @Test
   fun testSmallDeleteTillNextParagraph() {
     typeTextInFile(injector.parser.parseKeys("d}"), "one<caret> two three")
     assertRegisterChanged('1')
     assertRegisterChanged(SMALL_DELETION_REGISTER)
   }
 
+  @Test
   fun testSmallDeleteInRegister() {
     typeTextInFile(injector.parser.parseKeys("\"ade"), "one <caret>two three\n")
 
@@ -118,58 +135,66 @@ class SpecialRegistersTest : VimTestCase() {
     assertRegisterNotChanged(SMALL_DELETION_REGISTER)
   }
 
+  @Test
   fun testLineDelete() {
     typeTextInFile(injector.parser.parseKeys("dd"), "one <caret>two three\n")
     assertRegisterChanged('1')
     assertRegisterNotChanged(SMALL_DELETION_REGISTER)
   }
 
+  @Test
   fun testLineDeleteInRegister() {
     typeTextInFile(injector.parser.parseKeys("\"add"), "one <caret>two three\n")
     assertRegisterChanged('a')
     assertRegisterNotChanged('1')
   }
 
+  @Test
   fun testNumberedRegistersShifting() {
     configureByText("<caret>one\ntwo\nthree\nfour\nfive\nsix\nseven\neight\nnine\nten\n")
     typeText(injector.parser.parseKeys("dd" + "dd"))
-    assertEquals("one\n", getRegisterText('2'))
-    assertEquals("two\n", getRegisterText('1'))
+    kotlin.test.assertEquals("one\n", getRegisterText('2'))
+    kotlin.test.assertEquals("two\n", getRegisterText('1'))
     typeText(injector.parser.parseKeys("dd" + "dd" + "dd"))
-    assertEquals("one\n", getRegisterText('5'))
-    assertEquals("four\n", getRegisterText('2'))
+    kotlin.test.assertEquals("one\n", getRegisterText('5'))
+    kotlin.test.assertEquals("four\n", getRegisterText('2'))
     typeText(injector.parser.parseKeys("dd" + "dd" + "dd" + "dd"))
-    assertEquals("one\n", getRegisterText('9'))
+    kotlin.test.assertEquals("one\n", getRegisterText('9'))
   }
 
+  @Test
   fun testSearchRegisterAfterSearch() {
     configureByText("<caret>one\ntwo\nthree\nfour\nfive\nsix\nseven\neight\nnine\nten\n")
     enterSearch("three", true)
-    assertEquals("three", getRegisterText(LAST_SEARCH_REGISTER))
+    kotlin.test.assertEquals("three", getRegisterText(LAST_SEARCH_REGISTER))
   }
 
+  @Test
   fun testSearchRegisterAfterSubstitute() {
     configureByText("<caret>one\ntwo\nthree\nfour\nfive\nsix\nseven\neight\nnine\nten\n")
     enterCommand("%s/three/3/g")
-    assertEquals("three", getRegisterText(LAST_SEARCH_REGISTER))
+    kotlin.test.assertEquals("three", getRegisterText(LAST_SEARCH_REGISTER))
   }
 
+  @Test
   fun testSearchRegisterAfterSearchRange() {
     configureByText("<caret>one\ntwo\nthree\nfour\nfive\nsix\nseven\neight\nnine\nten\n")
     enterCommand("/three/d")
-    assertEquals("three", getRegisterText(LAST_SEARCH_REGISTER))
+    kotlin.test.assertEquals("three", getRegisterText(LAST_SEARCH_REGISTER))
   }
 
+  @Test
   fun testSearchRegisterAfterMultipleSearchRanges() {
     configureByText("<caret>one\ntwo\nthree\nfour\nfive\nsix\nseven\neight\nnine\nten\n")
     enterCommand("/one/;/three/d")
-    assertEquals("three", getRegisterText(LAST_SEARCH_REGISTER))
+    kotlin.test.assertEquals("three", getRegisterText(LAST_SEARCH_REGISTER))
   }
 
+  @Test
   fun testLastInsertedTextRegister() {
     configureByText("<caret>")
     typeText(injector.parser.parseKeys("i" + "abc" + "<Esc>"))
-    assertEquals("abc", getRegisterText('.'))
+    kotlin.test.assertEquals("abc", getRegisterText('.'))
     assertRegisterChanged(LAST_INSERTED_TEXT_REGISTER)
   }
 
@@ -180,13 +205,13 @@ class SpecialRegistersTest : VimTestCase() {
 
   private fun assertRegisterNotChanged(registerName: Char) {
     val registerText = getRegisterText(registerName)
-    assertEquals(DUMMY_TEXT, registerText)
+    kotlin.test.assertEquals(DUMMY_TEXT, registerText)
   }
 
   private fun getRegisterText(registerName: Char): String? {
     val registerGroup = VimPlugin.getRegister()
     val register = registerGroup.getRegister(registerName)
-    assertNotNull(register)
+    assertNotNull<Any>(register)
     return register!!.text
   }
 

@@ -11,8 +11,10 @@ package org.jetbrains.plugins.ideavim.action.change.insert
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class InsertTabActionTest : VimTestCase() {
+  @Test
   fun `test insert tab`() {
     setupChecks {
       keyHandler = Checks.KeyHandlerMethod.DIRECT_TO_VIM
@@ -27,6 +29,7 @@ class InsertTabActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
   fun `test insert tab scrolls at end of line`() {
     setupChecks {
       keyHandler = Checks.KeyHandlerMethod.DIRECT_TO_VIM
@@ -40,6 +43,7 @@ class InsertTabActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
   fun `test insert tab scrolls at end of line 2`() {
     configureByColumns(200)
     enterCommand("set sidescrolloff=10")

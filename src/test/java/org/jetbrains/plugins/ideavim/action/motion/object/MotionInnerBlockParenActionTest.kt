@@ -10,21 +10,25 @@ package org.jetbrains.plugins.ideavim.action.motion.`object`
 
 import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class MotionInnerBlockParenActionTest : VimTestCase() {
   // VIM-1633 |v_i)|
+  @Test
   fun `test single letter with single parentheses`() {
     configureByText("(${c}a)")
     typeText(injector.parser.parseKeys("vi)"))
     assertSelection("a")
   }
 
+  @Test
   fun `test single letter with double parentheses`() {
     configureByText("((${c}a))")
     typeText(injector.parser.parseKeys("vi)"))
     assertSelection("(a)")
   }
 
+  @Test
   fun `test multiline outside parentheses`() {
     configureByText(
       """(outer
@@ -35,6 +39,7 @@ class MotionInnerBlockParenActionTest : VimTestCase() {
     assertSelection("inner")
   }
 
+  @Test
   fun `test multiline in parentheses`() {
     configureByText(
       """(outer
@@ -45,6 +50,7 @@ class MotionInnerBlockParenActionTest : VimTestCase() {
     assertSelection("inner")
   }
 
+  @Test
   fun `test multiline inside of outer parentheses`() {
     configureByText(
       """(outer
@@ -59,6 +65,7 @@ class MotionInnerBlockParenActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test double motion`() {
     configureByText(
       """(outer
@@ -73,6 +80,7 @@ class MotionInnerBlockParenActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test motion with count`() {
     configureByText(
       """(outer
@@ -87,6 +95,7 @@ class MotionInnerBlockParenActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test text object after motion`() {
     configureByText(
       """(outer
@@ -101,6 +110,7 @@ class MotionInnerBlockParenActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test text object after motion outside parentheses`() {
     configureByText(
       """(outer
@@ -111,6 +121,7 @@ class MotionInnerBlockParenActionTest : VimTestCase() {
     assertSelection("inner")
   }
 
+  @Test
   fun `test text object after motion inside parentheses`() {
     configureByText(
       """(outer
@@ -122,6 +133,7 @@ class MotionInnerBlockParenActionTest : VimTestCase() {
   }
 
   // VIM-326 |d| |v_ib|
+  @Test
   fun testDeleteInnerBlock() {
     typeTextInFile(
       injector.parser.parseKeys("di)"),
@@ -131,6 +143,7 @@ class MotionInnerBlockParenActionTest : VimTestCase() {
   }
 
   // VIM-1008 |d| |v_ib|
+  @Test
   fun testDeleteInnerBlockWithQuote() {
     typeTextInFile(
       injector.parser.parseKeys("di)"),
@@ -140,6 +153,7 @@ class MotionInnerBlockParenActionTest : VimTestCase() {
   }
 
   // VIM-1008 |d| |v_ib|
+  @Test
   fun testDeleteInnerBlockWithDoubleQuote() {
     typeTextInFile(
       injector.parser.parseKeys("di)"),
@@ -149,6 +163,7 @@ class MotionInnerBlockParenActionTest : VimTestCase() {
   }
 
   // VIM-326 |d| |v_ib|
+  @Test
   fun testDeleteInnerBlockCaretBeforeString() {
     typeTextInFile(
       injector.parser.parseKeys("di)"),
@@ -158,6 +173,7 @@ class MotionInnerBlockParenActionTest : VimTestCase() {
   }
 
   // VIM-326 |c| |v_ib|
+  @Test
   fun testChangeInnerBlockCaretBeforeString() {
     typeTextInFile(
       injector.parser.parseKeys("ci)"),
@@ -167,6 +183,7 @@ class MotionInnerBlockParenActionTest : VimTestCase() {
   }
 
   // VIM-392 |c| |v_ib|
+  @Test
   fun testChangeInnerBlockCaretBeforeBlock() {
     typeTextInFile(
       injector.parser.parseKeys("ci)"),
@@ -177,12 +194,14 @@ class MotionInnerBlockParenActionTest : VimTestCase() {
   }
 
   // |v_ib|
+  @Test
   fun testInnerBlockCrashWhenNoDelimiterFound() {
     typeTextInFile(injector.parser.parseKeys("di)"), "(x\n")
     assertState("(x\n")
   }
 
   // VIM-275 |d| |v_ib|
+  @Test
   fun testDeleteInnerParensBlockBeforeOpen() {
     typeTextInFile(
       injector.parser.parseKeys("di)"),
@@ -193,6 +212,7 @@ class MotionInnerBlockParenActionTest : VimTestCase() {
   }
 
   // |d| |v_ib|
+  @Test
   fun testDeleteInnerParensBlockBeforeClose() {
     typeTextInFile(
       injector.parser.parseKeys("di)"),
@@ -201,6 +221,7 @@ class MotionInnerBlockParenActionTest : VimTestCase() {
     assertState("foo()\n")
   }
 
+  @Test
   fun testOutside() {
     typeTextInFile(
       injector.parser.parseKeys("di)"),
@@ -209,6 +230,7 @@ class MotionInnerBlockParenActionTest : VimTestCase() {
     assertState("foo()\n")
   }
 
+  @Test
   fun testOutsideInString() {
     typeTextInFile(
       injector.parser.parseKeys("di)"),
@@ -217,6 +239,7 @@ class MotionInnerBlockParenActionTest : VimTestCase() {
     assertState("\"123\"foo()\n")
   }
 
+  @Test
   fun testOutsideInString2() {
     typeTextInFile(
       injector.parser.parseKeys("di)"),

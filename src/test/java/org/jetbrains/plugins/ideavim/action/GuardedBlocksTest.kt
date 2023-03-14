@@ -13,21 +13,22 @@ import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertDoesNotThrow
 
 class GuardedBlocksTest : VimTestCase() {
   @TestWithoutNeovim(reason = SkipNeovimReason.GUARDED_BLOCKS)
-  fun `ignoretest delete char with block`() {
+  @Test
+  fun `test delete char with block`() {
     configureAndGuard("[123${c}4567890]")
-    try {
+    assertDoesNotThrow {
       typeText(injector.parser.parseKeys("x"))
-    } catch (e: Throwable) {
-      // Catch exception
-      return
     }
-    fail()
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.GUARDED_BLOCKS)
+  @Test
   fun `test delete line with block`() {
     configureAndGuard(
       """
@@ -46,9 +47,10 @@ class GuardedBlocksTest : VimTestCase() {
     )
   }
 
-/*
   // Probably it's better to put the caret after 1
   @TestWithoutNeovim(reason = SkipNeovimReason.GUARDED_BLOCKS)
+  @Test
+  @Disabled
   fun `test delete line with block and longer start`() {
     configureAndGuard("""
       [1234567890
@@ -62,10 +64,10 @@ class GuardedBlocksTest : VimTestCase() {
       1234567890
     """.trimIndent())
   }
-*/
 
-/*
   @TestWithoutNeovim(reason = SkipNeovimReason.GUARDED_BLOCKS)
+  @Test
+  @Disabled
   fun `test delete line with block and shorter end`() {
     configureAndGuard("""
       [1234567890
@@ -79,10 +81,11 @@ class GuardedBlocksTest : VimTestCase() {
       1234567890
     """.trimIndent())
   }
-*/
 
   @TestWithoutNeovim(reason = SkipNeovimReason.GUARDED_BLOCKS)
-  fun `ignoretest delete line fully unmodifiable`() {
+  @Test
+  @Disabled
+  fun `test delete line fully unmodifiable`() {
     configureAndGuard(
       """
       [123${c}4567890
@@ -101,7 +104,9 @@ class GuardedBlocksTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.GUARDED_BLOCKS)
-  fun `ignoretest delete line fully unmodifiable end`() {
+  @Test
+  @Disabled
+  fun `test delete line fully unmodifiable end`() {
     configureAndGuard(
       """
       [1234567890
@@ -120,7 +125,9 @@ class GuardedBlocksTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.GUARDED_BLOCKS)
-  fun `ignoretest change line with block`() {
+  @Test
+  @Disabled
+  fun `test change line with block`() {
     configureAndGuard(
       """
       [1234567890
@@ -140,6 +147,7 @@ class GuardedBlocksTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.GUARDED_BLOCKS)
+  @Test
   fun `test change line with block1`() {
     configureAndGuard(
       """
@@ -161,6 +169,7 @@ class GuardedBlocksTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.GUARDED_BLOCKS)
+  @Test
   fun `test change line with block2`() {
     configureAndGuard(
       """
@@ -181,8 +190,9 @@ class GuardedBlocksTest : VimTestCase() {
     assertMode(VimStateMachine.Mode.INSERT)
   }
 
-/*
   @TestWithoutNeovim(reason = SkipNeovimReason.GUARDED_BLOCKS)
+  @Test
+  @Disabled
   fun `test change line with block with longer start`() {
     configureAndGuard("""
       [1234567890
@@ -195,12 +205,12 @@ class GuardedBlocksTest : VimTestCase() {
       1${c}
       1234567890
     """.trimIndent())
-    assertMode(CommandState.Mode.INSERT)
+    assertMode(VimStateMachine.Mode.INSERT)
   }
-*/
 
-/*
   @TestWithoutNeovim(reason = SkipNeovimReason.GUARDED_BLOCKS)
+  @Test
+  @Disabled
   fun `test change line with block with shorter end`() {
     configureAndGuard("""
       [1234567890
@@ -213,12 +223,13 @@ class GuardedBlocksTest : VimTestCase() {
       ${c}0
       1234567890
     """.trimIndent())
-    assertMode(CommandState.Mode.INSERT)
+    assertMode(VimStateMachine.Mode.INSERT)
   }
-*/
 
   @TestWithoutNeovim(reason = SkipNeovimReason.GUARDED_BLOCKS)
-  fun `ignoretest change line with block at the end`() {
+  @Test
+  @Disabled
+  fun `test change line with block at the end`() {
     configureAndGuard(
       """
       [1234567890
@@ -236,6 +247,7 @@ class GuardedBlocksTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.GUARDED_BLOCKS)
+  @Test
   fun `test delete line near the guard`() {
     configureAndGuard(
       """
@@ -254,7 +266,9 @@ class GuardedBlocksTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.GUARDED_BLOCKS)
-  fun `ignoretest delete line near the guard with line above`() {
+  @Test
+  @Disabled
+  fun `test delete line near the guard with line above`() {
     configureAndGuard(
       """
       1234567890
@@ -273,6 +287,7 @@ class GuardedBlocksTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.GUARDED_BLOCKS)
+  @Test
   fun `test change line near the guard with line above`() {
     configureAndGuard(
       """
@@ -293,6 +308,7 @@ class GuardedBlocksTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.GUARDED_BLOCKS)
+  @Test
   fun `test delete line near the guard with line above on empty line`() {
     configureAndGuard(
       """

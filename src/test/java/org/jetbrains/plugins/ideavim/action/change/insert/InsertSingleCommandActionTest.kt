@@ -10,8 +10,10 @@ package org.jetbrains.plugins.ideavim.action.change.insert
 
 import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class InsertSingleCommandActionTest : VimTestCase() {
+  @Test
   fun `test enter visual`() {
     doTest(
       listOf("i", "<C-O>", "vlll", "<Esc>"),

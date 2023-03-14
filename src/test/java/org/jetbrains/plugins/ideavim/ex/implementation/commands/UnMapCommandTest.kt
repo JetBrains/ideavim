@@ -10,10 +10,14 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.command.MappingMode
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInfo
 
 class UnMapCommandTest : VimTestCase() {
-  override fun setUp() {
-    super.setUp()
+  @BeforeEach
+  override fun setUp(testInfo: TestInfo) {
+    super.setUp(testInfo)
     configureByText(
       """
                 A Discovery
@@ -26,6 +30,7 @@ class UnMapCommandTest : VimTestCase() {
     )
   }
 
+  @Test
   fun testMapKtoJ() {
     putMapping(MappingMode.N, "k", "j", false)
 
@@ -34,6 +39,7 @@ class UnMapCommandTest : VimTestCase() {
     assertNoMapping("k")
   }
 
+  @Test
   fun `test mappings in insert mode`() {
     putMapping(MappingMode.I, "jk", "<Esc>", false)
 
@@ -42,6 +48,7 @@ class UnMapCommandTest : VimTestCase() {
     assertNoMapping("jk")
   }
 
+  @Test
   fun `test removing only part of keys`() {
     putMapping(MappingMode.I, "jk", "<Esc>", false)
 
@@ -51,6 +58,7 @@ class UnMapCommandTest : VimTestCase() {
     assertMappingExists("jk", "<Esc>", MappingMode.I)
   }
 
+  @Test
   fun `test removing keys from a different mode`() {
     putMapping(MappingMode.I, "jk", "<Esc>", false)
 

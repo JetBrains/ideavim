@@ -15,14 +15,15 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.IjOptionConstants
 import com.maddyhome.idea.vim.group.createLineBookmark
 import com.maddyhome.idea.vim.group.mnemonic
-import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.OptionValueType
 import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
 import org.jetbrains.plugins.ideavim.VimTestOption
+import org.junit.jupiter.api.Test
 
 class MotionMarkActionTest : VimOptionTestCase(IjOptionConstants.ideamarks) {
   @VimOptionTestConfiguration(VimTestOption(IjOptionConstants.ideamarks, OptionValueType.NUMBER, "1"))
+  @Test
   fun `test simple add mark`() {
     val keys = injector.parser.parseKeys("mA")
     val text = """
@@ -39,6 +40,7 @@ class MotionMarkActionTest : VimOptionTestCase(IjOptionConstants.ideamarks) {
   }
 
   @VimOptionTestConfiguration(VimTestOption(IjOptionConstants.ideamarks, OptionValueType.NUMBER, "1"))
+  @Test
   fun `test simple add multiple marks`() {
     val keys = injector.parser.parseKeys("mAj" + "mBj" + "mC")
     val text = """
@@ -55,6 +57,7 @@ class MotionMarkActionTest : VimOptionTestCase(IjOptionConstants.ideamarks) {
   }
 
   @VimOptionTestConfiguration(VimTestOption(IjOptionConstants.ideamarks, OptionValueType.NUMBER, "1"))
+  @Test
   fun `test simple add multiple marks on same line`() {
     val keys = injector.parser.parseKeys("mA" + "mB" + "mC")
     val text = """
@@ -74,6 +77,7 @@ class MotionMarkActionTest : VimOptionTestCase(IjOptionConstants.ideamarks) {
   }
 
   @VimOptionTestConfiguration(VimTestOption(IjOptionConstants.ideamarks, OptionValueType.NUMBER, "1"))
+  @Test
   fun `test move to another line`() {
     val keys = injector.parser.parseKeys("mAjj" + "mA")
     val text = """
@@ -90,6 +94,7 @@ class MotionMarkActionTest : VimOptionTestCase(IjOptionConstants.ideamarks) {
   }
 
   @VimOptionTestConfiguration(VimTestOption(IjOptionConstants.ideamarks, OptionValueType.NUMBER, "1"))
+  @Test
   fun `test simple system mark`() {
     val text = """
             A Discovery
@@ -100,14 +105,15 @@ class MotionMarkActionTest : VimOptionTestCase(IjOptionConstants.ideamarks) {
             hard by the torrent of a mountain pass.
     """.trimIndent()
     configureByText(text)
-    myFixture.project.createLineBookmark(myFixture.editor, 2, 'A')
+    fixture.project.createLineBookmark(fixture.editor, 2, 'A')
     PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
     val vimMarks = injector.markService.getAllGlobalMarks()
-    TestCase.assertEquals(1, vimMarks.size)
-    TestCase.assertEquals('A', vimMarks.first().key)
+    kotlin.test.assertEquals(1, vimMarks.size)
+    kotlin.test.assertEquals('A', vimMarks.first().key)
   }
 
   @VimOptionTestConfiguration(VimTestOption(IjOptionConstants.ideamarks, OptionValueType.NUMBER, "1"))
+  @Test
   fun `test system mark move to another line`() {
     val text = """
             A Discovery
@@ -119,25 +125,25 @@ class MotionMarkActionTest : VimOptionTestCase(IjOptionConstants.ideamarks) {
     """.trimIndent()
     configureByText(text)
 
-    val bookmark = myFixture.project.createLineBookmark(myFixture.editor, 2, 'A')
+    val bookmark = fixture.project.createLineBookmark(fixture.editor, 2, 'A')
 
-    BookmarksManager.getInstance(myFixture.project)?.remove(bookmark!!)
-    myFixture.project.createLineBookmark(myFixture.editor, 4, 'A')
+    BookmarksManager.getInstance(fixture.project)?.remove(bookmark!!)
+    fixture.project.createLineBookmark(fixture.editor, 4, 'A')
     PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
     val vimMarks = injector.markService.getAllGlobalMarks()
-    TestCase.assertEquals(1, vimMarks.size)
+    kotlin.test.assertEquals(1, vimMarks.size)
     val mark = vimMarks.first()
-    TestCase.assertEquals('A', mark.key)
-    TestCase.assertEquals(4, mark.line)
+    kotlin.test.assertEquals('A', mark.key)
+    kotlin.test.assertEquals(4, mark.line)
   }
 
   private fun checkMarks(vararg marks: Pair<Char, Int>) {
-    val project = myFixture.project
+    val project = fixture.project
     val validBookmarks = BookmarksManager.getInstance(project)!!.bookmarks.sortedBy { it.mnemonic(project) }
-    assertEquals(marks.size, validBookmarks.size)
+    kotlin.test.assertEquals(marks.size, validBookmarks.size)
     marks.sortedBy { it.first }.forEachIndexed { index, (mn, line) ->
-      assertEquals(mn, validBookmarks[index].mnemonic(project))
-      assertEquals(line, (validBookmarks[index] as LineBookmark).line)
+      kotlin.test.assertEquals(mn, validBookmarks[index].mnemonic(project))
+      kotlin.test.assertEquals(line, (validBookmarks[index] as LineBookmark).line)
     }
   }
 }

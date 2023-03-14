@@ -16,11 +16,13 @@ import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class VisualBlockInsertActionTest : VimTestCase() {
 
   // VIM-1110 |CTRL-V| |v_b_i| |zc|
   @TestWithoutNeovim(SkipNeovimReason.FOLDING)
+  @Test
   fun `test block insert after folds`() {
     configureByJavaText(
       """$c/**
@@ -31,9 +33,9 @@ bar
 """,
     )
 
-    myFixture.editor.foldingModel.runBatchFoldingOperation {
-      CodeFoldingManager.getInstance(myFixture.project).updateFoldRegions(myFixture.editor)
-      FoldingUtil.findFoldRegionStartingAtLine(myFixture.editor, 0)!!.isExpanded = false
+    fixture.editor.foldingModel.runBatchFoldingOperation {
+      CodeFoldingManager.getInstance(fixture.project).updateFoldRegions(fixture.editor)
+      FoldingUtil.findFoldRegionStartingAtLine(fixture.editor, 0)!!.isExpanded = false
     }
 
     typeText(injector.parser.parseKeys("j" + "<C-V>" + "j" + "I" + "X" + "<Esc>"))
@@ -49,6 +51,7 @@ Xbar
 
   // VIM-1379 |CTRL-V| |j| |v_b_I|
   @TestWithoutNeovim(SkipNeovimReason.VISUAL_BLOCK_MODE)
+  @Test
   fun `test insert visual block with empty line in the middle`() {
     doTest(
       listOf("ll", "<C-V>", "jjI", "_quux_", "<Esc>"),
@@ -69,6 +72,7 @@ Xbar
 
   // VIM-632 |CTRL-V| |v_b_I|
   @TestWithoutNeovim(SkipNeovimReason.VISUAL_BLOCK_MODE)
+  @Test
   fun `test change visual block`() {
     doTest(
       listOf("<C-V>", "j", "I", "quux ", "<Esc>"),
@@ -89,6 +93,7 @@ Xbar
     )
   }
 
+  @Test
   fun `test visual block insert`() {
     val before = """
             ${c}int a;
@@ -106,6 +111,7 @@ Xbar
 
   // VIM-1379 |CTRL-V| |j| |v_b_I|
   @TestWithoutNeovim(SkipNeovimReason.VISUAL_BLOCK_MODE)
+  @Test
   fun `test insert visual block with shorter line in the middle`() {
     doTest(
       listOf("ll", "<C-V>", "jjI", "_quux_", "<Esc>"),
@@ -127,6 +133,7 @@ Xbar
   }
 
   @TestWithoutNeovim(SkipNeovimReason.VISUAL_BLOCK_MODE)
+  @Test
   fun `test insert in non block mode`() {
     doTest(
       listOf("vwIHello<esc>"),
@@ -150,6 +157,7 @@ Xbar
   }
 
   @TestWithoutNeovim(SkipNeovimReason.VISUAL_BLOCK_MODE)
+  @Test
   fun `test block mode with inlays`() {
     val before = """
                 A Discovery
@@ -178,6 +186,7 @@ Xbar
   }
 
   @TestWithoutNeovim(SkipNeovimReason.VISUAL_BLOCK_MODE)
+  @Test
   fun `test insert with block on one line`() {
     val before = """
                 A Discovery

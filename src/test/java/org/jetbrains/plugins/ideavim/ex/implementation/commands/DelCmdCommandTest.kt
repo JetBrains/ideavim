@@ -10,11 +10,13 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.VimPlugin
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 /**
  * @author Elliot Courant
  */
 class DelCmdCommandTest : VimTestCase() {
+  @Test
   fun `test remove alias`() {
     VimPlugin.getCommand().resetAliases()
     configureByText("\n")
@@ -62,6 +64,7 @@ class DelCmdCommandTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test remove non-existant alias`() {
     VimPlugin.getCommand().resetAliases()
     configureByText("\n")

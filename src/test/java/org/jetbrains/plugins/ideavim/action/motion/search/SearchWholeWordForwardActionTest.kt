@@ -11,8 +11,10 @@ package org.jetbrains.plugins.ideavim.action.motion.search
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class SearchWholeWordForwardActionTest : VimTestCase() {
+  @Test
   fun `test with tabs`() {
     val before = """
   .he${c}llo 1
@@ -28,6 +30,7 @@ class SearchWholeWordForwardActionTest : VimTestCase() {
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun `test backward search on empty string`() {
     doTest("*", "", "", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
     assertPluginError(false)
@@ -42,6 +45,7 @@ class SearchWholeWordForwardActionTest : VimTestCase() {
           hard by the torrent of a mountain pass$c.
         """,
   )
+  @Test
   fun `test last dot`() {
     doTest(
       "*",
@@ -62,6 +66,7 @@ class SearchWholeWordForwardActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test last word`() {
     doTest(
       "*",

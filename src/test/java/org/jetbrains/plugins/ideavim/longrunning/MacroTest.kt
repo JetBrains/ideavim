@@ -13,11 +13,13 @@ import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class MacroTest : VimTestCase() {
 
   // was a problem on revision affec9bb61ea5e1e635673a0041d61f7af3722b2
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test no StackOverflowException`() {
     configureByText("abc de${c}fg")
     typeText(injector.parser.parseKeys("qahlq"))

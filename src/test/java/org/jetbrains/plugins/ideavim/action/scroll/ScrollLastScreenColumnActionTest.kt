@@ -12,6 +12,7 @@ import com.intellij.openapi.editor.Inlay
 import com.maddyhome.idea.vim.helper.EditorHelper
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.Assert
+import org.junit.jupiter.api.Test
 import kotlin.math.roundToInt
 
 /*
@@ -21,12 +22,14 @@ ze                      Scroll the text horizontally to position the cursor
                         works when 'wrap' is off.
  */
 class ScrollLastScreenColumnActionTest : VimTestCase() {
+  @Test
   fun `test scroll caret column to last screen column`() {
     configureByColumns(200)
     typeText("100|", "ze")
     assertVisibleLineBounds(0, 20, 99)
   }
 
+  @Test
   fun `test scroll caret column to last screen column with sidescrolloff`() {
     configureByColumns(200)
     enterCommand("set sidescrolloff=10")
@@ -34,18 +37,21 @@ class ScrollLastScreenColumnActionTest : VimTestCase() {
     assertVisibleLineBounds(0, 30, 109)
   }
 
+  @Test
   fun `test scroll at or near start of line does nothing`() {
     configureByColumns(200)
     typeText("10|", "ze")
     assertVisibleLineBounds(0, 0, 79)
   }
 
+  @Test
   fun `test scroll end of line to last screen column`() {
     configureByColumns(200)
     typeText("$", "ze")
     assertVisibleLineBounds(0, 120, 199)
   }
 
+  @Test
   fun `test scroll end of line to last screen column with sidescrolloff`() {
     configureByColumns(200)
     enterCommand("set scrolloff=10")
@@ -54,6 +60,7 @@ class ScrollLastScreenColumnActionTest : VimTestCase() {
     assertVisibleLineBounds(0, 120, 199)
   }
 
+  @Test
   fun `test scroll caret column to last screen column with sidescrolloff containing an inline inlay`() {
     // The offset should include space for the inlay
     configureByColumns(200)
@@ -69,6 +76,7 @@ class ScrollLastScreenColumnActionTest : VimTestCase() {
     assertVisibleLineBounds(0, 108 - availableColumns + 1, 108)
   }
 
+  @Test
   fun `test last screen column does not include previous inline inlay associated with preceding text`() {
     // The inlay is associated with the column before the caret, appears on the left of the caret, so does not affect
     // the last visible column
@@ -79,6 +87,7 @@ class ScrollLastScreenColumnActionTest : VimTestCase() {
     assertVisibleLineBounds(0, 99 - availableColumns + 1, 99)
   }
 
+  @Test
   fun `test last screen column does not include previous inline inlay associated with following text`() {
     // The inlay is associated with the caret, but appears on the left, so does not affect the last visible column
     configureByColumns(200)
@@ -88,24 +97,26 @@ class ScrollLastScreenColumnActionTest : VimTestCase() {
     assertVisibleLineBounds(0, 99 - availableColumns + 1, 99)
   }
 
+  @Test
   fun `test last screen column includes subsequent inline inlay associated with preceding text`() {
     // The inlay is inserted after the caret and relates to the caret column. It should still be visible
     configureByColumns(200)
     val inlay = addInlay(100, true, 5)
     typeText("100|", "ze")
-    val visibleArea = myFixture.editor.scrollingModel.visibleArea
+    val visibleArea = fixture.editor.scrollingModel.visibleArea
     val textWidth = visibleArea.width - inlay.widthInPixels
-    val availableColumns = (textWidth / EditorHelper.getPlainSpaceWidthFloat(myFixture.editor)).roundToInt()
+    val availableColumns = (textWidth / EditorHelper.getPlainSpaceWidthFloat(fixture.editor)).roundToInt()
 
     // The last visible text column will be 99, but it will be positioned before the inlay
     assertVisibleLineBounds(0, 99 - availableColumns + 1, 99)
 
     // We have to assert the location of the inlay
-    val inlayX = myFixture.editor.visualPositionToPoint2D(inlay.visualPosition).x.roundToInt()
+    val inlayX = fixture.editor.visualPositionToPoint2D(inlay.visualPosition).x.roundToInt()
     Assert.assertEquals(visibleArea.x + textWidth, inlayX)
     Assert.assertEquals(visibleArea.x + visibleArea.width, inlayX + inlay.widthInPixels)
   }
 
+  @Test
   fun `test last screen column does not include subsequent inline inlay associated with following text`() {
     // The inlay is inserted after the caret, and relates to text after the caret. It should not affect the last visible
     // column
@@ -116,7 +127,7 @@ class ScrollLastScreenColumnActionTest : VimTestCase() {
   }
 
   private fun getAvailableColumns(inlay: Inlay<*>): Int {
-    val textWidth = myFixture.editor.scrollingModel.visibleArea.width - inlay.widthInPixels
-    return (textWidth / EditorHelper.getPlainSpaceWidthFloat(myFixture.editor)).roundToInt()
+    val textWidth = fixture.editor.scrollingModel.visibleArea.width - inlay.widthInPixels
+    return (textWidth / EditorHelper.getPlainSpaceWidthFloat(fixture.editor)).roundToInt()
   }
 }

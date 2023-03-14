@@ -9,16 +9,20 @@ package org.jetbrains.plugins.ideavim.helper
 
 import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 import java.awt.event.InputEvent
 import javax.swing.KeyStroke
+import kotlin.test.assertEquals
 
 class StringHelperTest : VimTestCase() {
+  @Test
   fun testFalseSpecialKey() {
     val expectedKeys = injector.parser.parseKeys("move '<-2").toMutableList()
     expectedKeys.addAll(injector.parser.parseKeys("<CR>"))
-    assertEquals(expectedKeys, injector.parser.parseKeys("move '<-2<CR>"))
+    kotlin.test.assertEquals(expectedKeys, injector.parser.parseKeys("move '<-2<CR>"))
   }
 
+  @Test
   fun testParseKeyModifiers() {
     assertTypedKeyStroke('C', "C")
     assertTypedKeyStroke('c', "c")
@@ -37,6 +41,7 @@ class StringHelperTest : VimTestCase() {
     assertPressedKeyStroke("meta control alt shift C", "<D-C-A-S-C>")
   }
 
+  @Test
   fun testParseSpecialKeys() {
     assertTypedKeyStroke('<', "<")
     assertTypedKeyStroke('>', ">")
@@ -49,61 +54,69 @@ class StringHelperTest : VimTestCase() {
   }
 
   // VIM-645
+  @Test
   fun testParseSpaceAsTyped() {
     assertTypedKeyStroke(' ', "<Space>")
   }
 
   // VIM-660
+  @Test
   fun testParseCtrlSpace() {
     assertPressedKeyStroke("control SPACE", "<C-Space>")
   }
 
   // VIM-655
+  @Test
   fun testParseTypedShiftChar() {
     assertTypedKeyStroke('H', "<S-h>")
   }
 
   // VIM-651
+  @Test
   fun testParseBackspace() {
     assertPressedKeyStroke("BACK_SPACE", "<BS>")
     assertPressedKeyStroke("BACK_SPACE", "<Backspace>")
   }
 
   // VIM-666
+  @Test
   fun testParseBarSpecialKey() {
     assertTypedKeyStroke('|', "<Bar>")
   }
 
   // VIM-679
+  @Test
   fun testControlXCharacter() {
     assertPressedKeyStroke("control X", "\u0018")
   }
 
+  @Test
   fun testControlBoundCharacters() {
     assertKeyStroke(KeyStroke.getKeyStroke('@'.code, InputEvent.CTRL_DOWN_MASK), "\u0000")
     assertKeyStroke(KeyStroke.getKeyStroke('_'.code, InputEvent.CTRL_DOWN_MASK), "\u001F")
   }
 
+  @Test
   fun testControlExceptionCharacters() {
     assertPressedKeyStroke("TAB", "\t") // U+0009
     assertPressedKeyStroke("ENTER", "\n") // U+000A
   }
 
   private fun assertPressedKeyStroke(expected: String, actual: String) {
-    assertEquals(KeyStroke.getKeyStroke(expected), parseKeyStroke(actual))
+    kotlin.test.assertEquals(KeyStroke.getKeyStroke(expected), parseKeyStroke(actual))
   }
 
   private fun assertKeyStroke(expected: KeyStroke, actual: String) {
-    assertEquals(expected, parseKeyStroke(actual))
+    kotlin.test.assertEquals(expected, parseKeyStroke(actual))
   }
 
   private fun assertTypedKeyStroke(expected: Char, actual: String) {
-    assertEquals(KeyStroke.getKeyStroke(expected), parseKeyStroke(actual))
+    kotlin.test.assertEquals(KeyStroke.getKeyStroke(expected), parseKeyStroke(actual))
   }
 
   private fun parseKeyStroke(s: String): KeyStroke {
     val actualStrokes = injector.parser.parseKeys(s)
-    assertEquals(injector.parser.toKeyNotation(actualStrokes), 1, actualStrokes.size)
+    assertEquals<Any>(1, actualStrokes.size, injector.parser.toKeyNotation(actualStrokes))
     return actualStrokes[0]
   }
 }

@@ -18,6 +18,7 @@ import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.rangeOf
+import org.junit.jupiter.api.Test
 import java.util.*
 
 /**
@@ -29,6 +30,7 @@ class PutViaIdeaTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun `test simple insert via idea`() {
     val before = "${c}I found it in a legendary land"
     configureByText(before)
@@ -41,11 +43,12 @@ class PutViaIdeaTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun `test insert several times`() {
     val before = "${c}I found it in a legendary land"
     configureByText(before)
 
-    val vimEditor = myFixture.editor.vim
+    val vimEditor = fixture.editor.vim
     VimPlugin.getRegister()
       .storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
 
@@ -54,6 +57,7 @@ class PutViaIdeaTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun `test insert doesn't clear existing elements`() {
     val randomUUID = UUID.randomUUID()
     val before = "${c}I found it in a legendary$randomUUID land"
@@ -62,16 +66,23 @@ class PutViaIdeaTest : VimTestCase() {
     CopyPasteManager.getInstance().setContents(TextBlockTransferable("Fill", emptyList(), null))
     CopyPasteManager.getInstance().setContents(TextBlockTransferable("Buffer", emptyList(), null))
 
-    val vimEditor = myFixture.editor.vim
+    val vimEditor = fixture.editor.vim
     VimPlugin.getRegister()
-      .storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "legendary$randomUUID", SelectionType.CHARACTER_WISE, false)
+      .storeText(
+        vimEditor,
+        vimEditor.primaryCaret(),
+        before rangeOf "legendary$randomUUID",
+        SelectionType.CHARACTER_WISE,
+        false
+      )
 
     val sizeBefore = CopyPasteManager.getInstance().allContents.size
     typeText("ve", "p")
-    assertEquals(sizeBefore, CopyPasteManager.getInstance().allContents.size)
+    kotlin.test.assertEquals(sizeBefore, CopyPasteManager.getInstance().allContents.size)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun `test insert block with newline`() {
     val before = """
             A Discovery
@@ -82,7 +93,7 @@ class PutViaIdeaTest : VimTestCase() {
     """.trimIndent()
     configureByText(before)
 
-    val vimEditor = myFixture.editor.vim
+    val vimEditor = fixture.editor.vim
     VimPlugin.getRegister().storeText(
       vimEditor,
       vimEditor.primaryCaret(),

@@ -13,111 +13,137 @@ import com.maddyhome.idea.vim.options.StringOption
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInfo
 
 class BoundedStringListOptionTest : VimTestCase() {
   private val optionName = "myOpt"
   private val defaultValue = "Monday,Tuesday"
 
-  override fun setUp() {
-    super.setUp()
-    val option = StringOption(optionName, optionName, defaultValue, true, setOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))
+  @BeforeEach
+  override fun setUp(testInfo: TestInfo) {
+    super.setUp(testInfo)
+    val option = StringOption(
+      optionName,
+      optionName,
+      defaultValue,
+      true,
+      setOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
+    )
     injector.optionGroup.addOption(option)
     configureByText("\n")
   }
 
+  @AfterEach
   override fun tearDown() {
     super.tearDown()
     injector.optionGroup.removeOption(optionName)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test set valid list`() {
     enterCommand("set $optionName=Thursday,Friday")
-    assertEquals("Thursday,Friday", options().getStringValue(optionName))
+    kotlin.test.assertEquals("Thursday,Friday", options().getStringValue(optionName))
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test set list with invalid value`() {
     enterCommand("set $optionName=Blue")
     assertPluginError(true)
     assertPluginErrorMessageContains("E474: Invalid argument: $optionName")
-    assertEquals(defaultValue, options().getStringValue(optionName))
+    kotlin.test.assertEquals(defaultValue, options().getStringValue(optionName))
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test append single item`() {
     enterCommand("set $optionName+=Wednesday")
-    assertEquals("Monday,Tuesday,Wednesday", options().getStringValue(optionName))
+    kotlin.test.assertEquals("Monday,Tuesday,Wednesday", options().getStringValue(optionName))
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test append invalid item`() {
     enterCommand("set $optionName+=Blue")
     assertPluginError(true)
     assertPluginErrorMessageContains("E474: Invalid argument: $optionName")
-    assertEquals("Monday,Tuesday", options().getStringValue(optionName))
+    kotlin.test.assertEquals("Monday,Tuesday", options().getStringValue(optionName))
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test append list`() {
     enterCommand("set $optionName+=Wednesday,Thursday")
-    assertEquals("Monday,Tuesday,Wednesday,Thursday", options().getStringValue(optionName))
+    kotlin.test.assertEquals("Monday,Tuesday,Wednesday,Thursday", options().getStringValue(optionName))
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test append list with invalid item`() {
     enterCommand("set $optionName+=Wednesday,Blue")
     assertPluginError(true)
     assertPluginErrorMessageContains("E474: Invalid argument: $optionName")
-    assertEquals("Monday,Tuesday", options().getStringValue(optionName))
+    kotlin.test.assertEquals("Monday,Tuesday", options().getStringValue(optionName))
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test prepend item`() {
     enterCommand("set $optionName^=Wednesday")
-    assertEquals("Wednesday,Monday,Tuesday", options().getStringValue(optionName))
+    kotlin.test.assertEquals("Wednesday,Monday,Tuesday", options().getStringValue(optionName))
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test prepend invalid item`() {
     enterCommand("set $optionName^=Blue")
     assertPluginError(true)
     assertPluginErrorMessageContains("E474: Invalid argument: $optionName")
-    assertEquals("Monday,Tuesday", options().getStringValue(optionName))
+    kotlin.test.assertEquals("Monday,Tuesday", options().getStringValue(optionName))
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test prepend list`() {
     enterCommand("set $optionName^=Wednesday,Thursday")
-    assertEquals("Wednesday,Thursday,Monday,Tuesday", options().getStringValue(optionName))
+    kotlin.test.assertEquals("Wednesday,Thursday,Monday,Tuesday", options().getStringValue(optionName))
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test prepend list with invalid item`() {
     enterCommand("set $optionName^=Wednesday,Blue")
     assertPluginError(true)
     assertPluginErrorMessageContains("E474: Invalid argument: $optionName")
-    assertEquals("Monday,Tuesday", options().getStringValue(optionName))
+    kotlin.test.assertEquals("Monday,Tuesday", options().getStringValue(optionName))
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test remove item`() {
     enterCommand("set $optionName-=Monday")
-    assertEquals("Tuesday", options().getStringValue(optionName))
+    kotlin.test.assertEquals("Tuesday", options().getStringValue(optionName))
   }
 
+  @Test
   fun `test remove list`() {
     enterCommand("set $optionName-=Monday,Tuesday")
-    assertEquals("", options().getStringValue(optionName))
+    kotlin.test.assertEquals("", options().getStringValue(optionName))
   }
 
+  @Test
   fun `test remove list with wrong order`() {
     enterCommand("set $optionName-=Tuesday,Monday")
-    assertEquals("Monday,Tuesday", options().getStringValue(optionName))
+    kotlin.test.assertEquals("Monday,Tuesday", options().getStringValue(optionName))
   }
 
+  @Test
   fun `test remove list with invalid value`() {
     enterCommand("set $optionName-=Monday,Blue")
-    assertEquals("Monday,Tuesday", options().getStringValue(optionName))
+    kotlin.test.assertEquals("Monday,Tuesday", options().getStringValue(optionName))
   }
 }

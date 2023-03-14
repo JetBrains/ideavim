@@ -15,17 +15,20 @@ import com.maddyhome.idea.vim.helper.vimStateMachine
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 /**
  * @author vlan
  */
 class MotionActionTest : VimTestCase() {
+  @Test
   fun testDoubleToggleVisual() {
     val contents = "one tw${c}o\n"
     doTest("vv", contents, contents, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   // VIM-198 |v_iw|
+  @Test
   fun testVisualMotionInnerWordNewLineAtEOF() {
     val fileContents = "one tw${c}o\n"
     doTest(
@@ -38,6 +41,7 @@ class MotionActionTest : VimTestCase() {
   }
 
   // |v_iW|
+  @Test
   fun testVisualMotionInnerBigWord() {
     val fileContents = "one tw${c}o.three four\n"
     val fileContentsAfter = "one ${s}two.thre${c}e$se four\n"
@@ -45,6 +49,7 @@ class MotionActionTest : VimTestCase() {
     assertSelection("two.three")
   }
 
+  @Test
   fun testEscapeInCommand() {
     val content = """
      on${c}e two
@@ -56,6 +61,7 @@ class MotionActionTest : VimTestCase() {
     assertOffset(2)
   }
 
+  @Test
   fun testEscapeInCommandAndNumber() {
     val content = """
      on${c}e two
@@ -64,12 +70,13 @@ class MotionActionTest : VimTestCase() {
     """.trimIndent()
     doTest(listOf("12", "<Esc>"), content, content, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
     assertPluginError(false)
-    val vimCommandState = myFixture.editor.vimStateMachine
+    val vimCommandState = fixture.editor.vimStateMachine
     kotlin.test.assertNotNull(vimCommandState)
     assertEmpty(vimCommandState.commandBuilder.keys.toList())
   }
 
   // |h| |l|
+  @Test
   fun testLeftRightMove() {
     val before = "on${c}e two three four five six seven\n"
     val after = "one two three ${c}four five six seven\n"
@@ -77,6 +84,7 @@ class MotionActionTest : VimTestCase() {
   }
 
   // |j| |k|
+  @Test
   fun testUpDownMove() {
     val before = """
      one
@@ -96,12 +104,14 @@ class MotionActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
+  @Test
   fun testDeleteDigitsInCount() {
     typeTextInFile(injector.parser.parseKeys("42<Delete>l"), "on${c}e two three four five six seven\n")
     assertOffset(6)
   }
 
   // |f|
+  @Test
   fun testForwardToTab() {
     val before = "on${c}e two\tthree\nfour\n"
     val after = "one two${c}\tthree\nfour\n"
@@ -109,6 +119,7 @@ class MotionActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
+  @Test
   fun testIllegalCharArgument() {
     typeTextInFile(injector.parser.parseKeys("f<Insert>"), "on${c}e two three four five six seven\n")
     assertOffset(2)
@@ -116,6 +127,7 @@ class MotionActionTest : VimTestCase() {
   }
 
   // |F| |i_CTRL-K|
+  @Test
   fun testBackToDigraph() {
     val before = "Hallo, Öster${c}reich!\n"
     val after = "Hallo, ${c}Österreich!\n"
@@ -124,6 +136,7 @@ class MotionActionTest : VimTestCase() {
   }
 
   // VIM-771 |t| |;|
+  @Test
   fun testTillCharRight() {
     val keys = listOf("t:;")
     val before = "$c 1:a 2:b 3:c \n"
@@ -132,6 +145,7 @@ class MotionActionTest : VimTestCase() {
   }
 
   // VIM-771 |t| |;|
+  @Test
   fun testTillCharRightRepeated() {
     val keys = listOf("t:;")
     val before = "$c 1:a 2:b 3:c \n"
@@ -140,6 +154,7 @@ class MotionActionTest : VimTestCase() {
   }
 
   // VIM-771 |t| |;|
+  @Test
   fun testTillCharRightRepeatedWithCount2() {
     val keys = listOf("t:2;")
     val before = "$c 1:a 2:b 3:c \n"
@@ -148,6 +163,7 @@ class MotionActionTest : VimTestCase() {
   }
 
   // VIM-771 |t| |;|
+  @Test
   fun testTillCharRightRepeatedWithCountHigherThan2() {
     val keys = listOf("t:3;")
     val before = "$c 1:a 2:b 3:c \n"
@@ -156,6 +172,7 @@ class MotionActionTest : VimTestCase() {
   }
 
   // VIM-771 |t| |,|
+  @Test
   fun testTillCharRightReverseRepeated() {
     val keys = listOf("t:,,")
     val before = " 1:a 2:b$c 3:c \n"
@@ -164,6 +181,7 @@ class MotionActionTest : VimTestCase() {
   }
 
   // VIM-771 |t| |,|
+  @Test
   fun testTillCharRightReverseRepeatedWithCount2() {
     val keys = listOf("t:,2,")
     val before = " 1:a 2:b$c 3:c \n"
@@ -172,6 +190,7 @@ class MotionActionTest : VimTestCase() {
   }
 
   // VIM-771 |t| |,|
+  @Test
   fun testTillCharRightReverseRepeatedWithCountHigherThan3() {
     val keys = listOf("t:,3,")
     val before = " 0:_ 1:a 2:b$c 3:c \n"
@@ -180,6 +199,7 @@ class MotionActionTest : VimTestCase() {
   }
 
   // VIM-314 |d| |v_iB|
+  @Test
   fun testDeleteInnerCurlyBraceBlock() {
     val keys = listOf("di{")
     val before = "{foo, b${c}ar, baz}\n"
@@ -188,6 +208,7 @@ class MotionActionTest : VimTestCase() {
   }
 
   // VIM-314 |d| |v_iB|
+  @Test
   fun testDeleteInnerCurlyBraceBlockCaretBeforeString() {
     val keys = listOf("di{")
     val before = "{foo, ${c}\"bar\", baz}\n"
@@ -196,6 +217,7 @@ class MotionActionTest : VimTestCase() {
   }
 
   // |d| |v_aB|
+  @Test
   fun testDeleteOuterCurlyBraceBlock() {
     val keys = listOf("da{")
     val before = "x = {foo, b${c}ar, baz};\n"
@@ -205,6 +227,7 @@ class MotionActionTest : VimTestCase() {
 
   // VIM-261 |c| |v_iB|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
+  @Test
   fun testChangeInnerCurlyBraceBlockMultiLine() {
     typeTextInFile(
       injector.parser.parseKeys("ci{"),
@@ -225,6 +248,7 @@ class MotionActionTest : VimTestCase() {
   }
 
   // |d| |v_aw|
+  @Test
   fun testDeleteOuterWord() {
     val keys = listOf("daw")
     val before = "one t${c}wo three\n"
@@ -233,6 +257,7 @@ class MotionActionTest : VimTestCase() {
   }
 
   // |d| |v_aW|
+  @Test
   fun testDeleteOuterBigWord() {
     val keys = listOf("daW")
     val before = "one \"t${c}wo\" three\n"
@@ -241,6 +266,7 @@ class MotionActionTest : VimTestCase() {
   }
 
   // |d| |v_is|
+  @Test
   fun testDeleteInnerSentence() {
     val keys = listOf("dis")
     val before = "Hello World! How a${c}re you? Bye.\n"
@@ -249,6 +275,7 @@ class MotionActionTest : VimTestCase() {
   }
 
   // |d| |v_as|
+  @Test
   fun testDeleteOuterSentence() {
     val keys = listOf("das")
     val before = "Hello World! How a${c}re you? Bye.\n"
@@ -258,6 +285,7 @@ class MotionActionTest : VimTestCase() {
 
   // |v_as|
   @TestWithoutNeovim(SkipNeovimReason.UNCLEAR)
+  @Test
   fun testSentenceMotionPastStartOfFile() {
     val keys = listOf("8(")
 
@@ -275,6 +303,7 @@ class MotionActionTest : VimTestCase() {
   }
 
   // |d| |v_ip|
+  @Test
   fun testDeleteInnerParagraph() {
     val keys = listOf("dip")
     val before = """
@@ -297,6 +326,7 @@ class MotionActionTest : VimTestCase() {
   }
 
   // |d| |v_ap|
+  @Test
   fun testDeleteOuterParagraph() {
     val keys = listOf("dap")
     val before = """
@@ -318,6 +348,7 @@ class MotionActionTest : VimTestCase() {
   }
 
   // |d| |v_a]|
+  @Test
   fun testDeleteOuterBracketBlock() {
     val keys = listOf("da]")
     val before = """foo = [
@@ -331,6 +362,7 @@ class MotionActionTest : VimTestCase() {
   }
 
   // |d| |v_i]|
+  @Test
   fun testDeleteInnerBracketBlock() {
     val keys = listOf("di]")
     val before = "foo = [one, t${c}wo];\n"
@@ -339,6 +371,7 @@ class MotionActionTest : VimTestCase() {
   }
 
   // VIM-1287 |d| |v_i(|
+  @Test
   fun testSelectInsideForStringLiteral() {
     val keys = listOf("di(")
     val before = "(text \"with quotes(and ${c}braces)\")"
@@ -347,6 +380,7 @@ class MotionActionTest : VimTestCase() {
   }
 
   // VIM-1287 |d| |v_i{|
+  @Test
   fun testBadlyNestedBlockInsideString() {
     val before = "{\"{foo, ${c}bar\", baz}}"
     val keys = listOf("di{")
@@ -355,6 +389,7 @@ class MotionActionTest : VimTestCase() {
   }
 
   // VIM-1287 |d| |v_i{|
+  @Test
   fun testDeleteInsideBadlyNestedBlock() {
     val before = "a{\"{foo}, ${c}bar\", baz}b}"
     val keys = listOf("di{")
@@ -363,6 +398,7 @@ class MotionActionTest : VimTestCase() {
   }
 
   // VIM-1008 |c| |v_i{|
+  @Test
   fun testDeleteInsideDoubleQuotesSurroundedBlockWithSingleQuote() {
     val before = "\"{do${c}esn't work}\""
     val keys = listOf("ci{")
@@ -371,6 +407,7 @@ class MotionActionTest : VimTestCase() {
   }
 
   // VIM-1008 |c| |v_i{|
+  @Test
   fun testDeleteInsideSingleQuotesSurroundedBlock() {
     val keys = listOf("ci{")
     val before = "'{does n${c}ot work}'"
@@ -379,6 +416,7 @@ class MotionActionTest : VimTestCase() {
   }
 
   // VIM-1008 |c| |v_i{|
+  @Test
   fun testDeleteInsideDoublySurroundedBlock() {
     val before = "<p class=\"{{ \$ctrl.so${c}meClassName }}\"></p>"
     val keys = listOf("ci{")
@@ -387,6 +425,7 @@ class MotionActionTest : VimTestCase() {
   }
 
   // |d| |v_i>|
+  @Test
   fun testDeleteInnerAngleBracketBlock() {
     val keys = listOf("di>")
     val before = "Foo<Foo, B${c}ar> bar\n"
@@ -395,6 +434,7 @@ class MotionActionTest : VimTestCase() {
   }
 
   // |d| |v_a>|
+  @Test
   fun testDeleteOuterAngleBracketBlock() {
     val keys = listOf("da>")
     val before = "Foo<Foo, B${c}ar> bar\n"
@@ -403,6 +443,7 @@ class MotionActionTest : VimTestCase() {
   }
 
   // VIM-132 |d| |v_i"|
+  @Test
   fun testDeleteInnerDoubleQuoteString() {
     val keys = listOf("di\"")
     val before = "foo = \"bar b${c}az\";\n"
@@ -412,6 +453,7 @@ class MotionActionTest : VimTestCase() {
 
   // VIM-132 |d| |v_a"|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
+  @Test
   fun testDeleteOuterDoubleQuoteString() {
     val keys = listOf("da\"")
     val before = "foo = \"bar b${c}az\";\n"
@@ -420,6 +462,7 @@ class MotionActionTest : VimTestCase() {
   }
 
   // VIM-132 |d| |v_i"|
+  @Test
   fun testDeleteDoubleQuotedStringStart() {
     val keys = listOf("di\"")
     val before = "foo = [\"one\", ${c}\"two\", \"three\"];\n"
@@ -428,6 +471,7 @@ class MotionActionTest : VimTestCase() {
   }
 
   // VIM-132 |d| |v_i"|
+  @Test
   fun testDeleteDoubleQuotedStringEnd() {
     val keys = listOf("di\"")
     val before = "foo = [\"one\", \"two${c}\", \"three\"];\n"
@@ -436,6 +480,7 @@ class MotionActionTest : VimTestCase() {
   }
 
   // VIM-132 |d| |v_i"|
+  @Test
   fun testDeleteDoubleQuotedStringWithEscapes() {
     val keys = listOf("di\"")
     val before = "foo = \"fo\\\"o b${c}ar\";\n"
@@ -444,6 +489,7 @@ class MotionActionTest : VimTestCase() {
   }
 
   // VIM-132 |d| |v_i"|
+  @Test
   fun testDeleteDoubleQuotedStringBefore() {
     val keys = listOf("di\"")
     val before = "f${c}oo = [\"one\", \"two\", \"three\"];\n"
@@ -451,6 +497,7 @@ class MotionActionTest : VimTestCase() {
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun testDeleteDoubleQuotedStringOddNumberOfQuotes() {
     val keys = listOf("di\"")
     val before = "abc\"def${c}\"gh\"i"
@@ -458,6 +505,7 @@ class MotionActionTest : VimTestCase() {
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun testDeleteDoubleQuotedStringBetweenEvenNumberOfQuotes() {
     val keys = listOf("di\"")
     val before = "abc\"def\"g${c}h\"ijk\"l"
@@ -465,6 +513,7 @@ class MotionActionTest : VimTestCase() {
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun testDeleteDoubleQuotedStringOddNumberOfQuotesOnLast() {
     val keys = listOf("di\"")
     val before = "abcdef\"gh\"ij${c}\"kl"
@@ -472,6 +521,7 @@ class MotionActionTest : VimTestCase() {
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun testDeleteDoubleQuotedStringEvenNumberOfQuotesOnLast() {
     val keys = listOf("di\"")
     val before = "abc\"def\"gh\"ij${c}\"kl"
@@ -480,6 +530,7 @@ class MotionActionTest : VimTestCase() {
   }
 
   // VIM-132 |v_i"|
+  @Test
   fun testInnerDoubleQuotedStringSelection() {
     val keys = listOf("vi\"")
     val before = "foo = [\"o${c}ne\", \"two\"];\n"
@@ -488,6 +539,7 @@ class MotionActionTest : VimTestCase() {
   }
 
   // |c| |v_i"|
+  @Test
   fun testChangeEmptyQuotedString() {
     val keys = listOf("ci\"")
     val before = "foo = \"${c}\";\n"
@@ -496,6 +548,7 @@ class MotionActionTest : VimTestCase() {
   }
 
   // VIM-132 |d| |v_i'|
+  @Test
   fun testDeleteInnerSingleQuoteString() {
     val keys = listOf("di'")
     val before = "foo = 'bar b${c}az';\n"
@@ -504,6 +557,7 @@ class MotionActionTest : VimTestCase() {
   }
 
   // VIM-132 |d| |v_i`|
+  @Test
   fun testDeleteInnerBackQuoteString() {
     val keys = listOf("di`")
     val before = "foo = `bar b${c}az`;\n"
@@ -513,6 +567,7 @@ class MotionActionTest : VimTestCase() {
 
   // VIM-132 |d| |v_a'|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
+  @Test
   fun testDeleteOuterSingleQuoteString() {
     val keys = listOf("da'")
     val before = "foo = 'bar b${c}az';\n"
@@ -522,6 +577,7 @@ class MotionActionTest : VimTestCase() {
 
   // VIM-132 |d| |v_a`|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
+  @Test
   fun testDeleteOuterBackQuoteString() {
     val keys = listOf("da`")
     val before = "foo = `bar b${c}az`;\n"
@@ -530,6 +586,7 @@ class MotionActionTest : VimTestCase() {
   }
 
   // VIM-2733
+  @Test
   fun testDeleteOuterQuoteEmptyString() {
     val keys = listOf("da'")
     val before = """
@@ -546,6 +603,7 @@ class MotionActionTest : VimTestCase() {
   }
 
 // VIM-2733
+  @Test
   fun testDeleteOuterQuoteEmptyString2() {
     val keys = listOf("da'")
     val before = """
@@ -562,6 +620,7 @@ class MotionActionTest : VimTestCase() {
   }
 
   // VIM-2733
+  @Test
   fun testDeleteOuterDoubleQuoteEmptyString() {
     val keys = listOf("da\"")
     val before = """
@@ -578,6 +637,7 @@ class MotionActionTest : VimTestCase() {
   }
 
   // VIM-2733
+  @Test
   fun testDeleteOuterDoubleQuoteEmptyString2() {
     val keys = listOf("da\"")
     val before = """
@@ -594,6 +654,7 @@ class MotionActionTest : VimTestCase() {
   }
 
 // VIM-1427
+  @Test
   fun testDeleteOuterTagWithCount() {
     val keys = listOf("d2at")
     val before = "<a><b><c>$c</c></b></a>"
@@ -602,6 +663,7 @@ class MotionActionTest : VimTestCase() {
   }
 
   // VIM-2113
+  @Test
   fun testReplaceEmptyTagContent() {
     val keys = listOf("cit")
     val before = "<a><c>$c</c></a>"
@@ -609,6 +671,7 @@ class MotionActionTest : VimTestCase() {
     doTest(keys, before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun testDeleteToDigraph() {
     val keys = listOf("d/<C-K>O:<CR>")
     val before = "ab${c}cdÖef"
@@ -617,6 +680,7 @@ class MotionActionTest : VimTestCase() {
   }
 
   // |[(|
+  @Test
   fun testUnmatchedOpenParenthesis() {
     typeTextInFile(
       injector.parser.parseKeys("[("),
@@ -630,6 +694,7 @@ class MotionActionTest : VimTestCase() {
   }
 
   // |[{|
+  @Test
   fun testUnmatchedOpenBracketMultiLine() {
     typeTextInFile(
       injector.parser.parseKeys("[{"),
@@ -642,6 +707,7 @@ class MotionActionTest : VimTestCase() {
   }
 
   // |])|
+  @Test
   fun testUnmatchedCloseParenthesisMultiLine() {
     typeTextInFile(
       injector.parser.parseKeys("])"),
@@ -653,6 +719,7 @@ class MotionActionTest : VimTestCase() {
   }
 
   // |]}|
+  @Test
   fun testUnmatchedCloseBracket() {
     typeTextInFile(injector.parser.parseKeys("]}"), "{bar, ${c}baz}\n")
     assertOffset(9)
@@ -660,6 +727,7 @@ class MotionActionTest : VimTestCase() {
 
   // VIM-965 |[m|
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT, "File type specific")
+  @Test
   fun testMethodMovingInNonJavaFile() {
     configureByJsonText("{\"foo\": \"${c}bar\"}\n")
     typeText(injector.parser.parseKeys("[m"))
@@ -668,6 +736,7 @@ class MotionActionTest : VimTestCase() {
 
   // VIM-331 |w|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
+  @Test
   fun testNonAsciiLettersInWord() {
     typeTextInFile(injector.parser.parseKeys("w"), "Če${c}ská republika")
     assertOffset(6)
@@ -675,6 +744,7 @@ class MotionActionTest : VimTestCase() {
 
   // VIM-58 |w|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
+  @Test
   fun testHiraganaToPunctuation() {
     typeTextInFile(injector.parser.parseKeys("w"), "は${c}はは!!!")
     assertOffset(3)
@@ -682,6 +752,7 @@ class MotionActionTest : VimTestCase() {
 
   // VIM-58 |w|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
+  @Test
   fun testHiraganaToFullWidthPunctuation() {
     typeTextInFile(injector.parser.parseKeys("w"), "は${c}はは！！！")
     assertOffset(3)
@@ -689,6 +760,7 @@ class MotionActionTest : VimTestCase() {
 
   // VIM-58 |w|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
+  @Test
   fun testKatakanaToHiragana() {
     typeTextInFile(injector.parser.parseKeys("w"), "チ${c}チチははは")
     assertOffset(3)
@@ -696,6 +768,7 @@ class MotionActionTest : VimTestCase() {
 
   // VIM-58 |w|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
+  @Test
   fun testKatakanaToHalfWidthKana() {
     typeTextInFile(injector.parser.parseKeys("w"), "チ${c}チチｳｳｳ")
     assertOffset(3)
@@ -703,6 +776,7 @@ class MotionActionTest : VimTestCase() {
 
   // VIM-58 |w|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
+  @Test
   fun testKatakanaToDigits() {
     typeTextInFile(injector.parser.parseKeys("w"), "チ${c}チチ123")
     assertOffset(3)
@@ -710,6 +784,7 @@ class MotionActionTest : VimTestCase() {
 
   // VIM-58 |w|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
+  @Test
   fun testKatakanaToLetters() {
     typeTextInFile(injector.parser.parseKeys("w"), "チ${c}チチ123")
     assertOffset(3)
@@ -717,6 +792,7 @@ class MotionActionTest : VimTestCase() {
 
   // VIM-58 |w|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
+  @Test
   fun testKatakanaToFullWidthLatin() {
     typeTextInFile(injector.parser.parseKeys("w"), "チ${c}チチＡＡＡ")
     assertOffset(3)
@@ -724,6 +800,7 @@ class MotionActionTest : VimTestCase() {
 
   // VIM-58 |w|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
+  @Test
   fun testKatakanaToFullWidthDigits() {
     typeTextInFile(injector.parser.parseKeys("w"), "チ${c}チチ３３３")
     assertOffset(3)
@@ -731,6 +808,7 @@ class MotionActionTest : VimTestCase() {
 
   // VIM-58 |w|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
+  @Test
   fun testHiraganaToKatakana() {
     typeTextInFile(injector.parser.parseKeys("w"), "は${c}ははチチチ")
     assertOffset(3)
@@ -738,6 +816,7 @@ class MotionActionTest : VimTestCase() {
 
   // VIM-58 |w|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
+  @Test
   fun testHalftWidthKanaToLetters() {
     typeTextInFile(injector.parser.parseKeys("w"), "ｳｳｳAAA")
     assertOffset(3)
@@ -745,6 +824,7 @@ class MotionActionTest : VimTestCase() {
 
   // |w|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
+  @Test
   fun testCjkToPunctuation() {
     typeTextInFile(injector.parser.parseKeys("w"), "测试${c}测试!!!")
     assertOffset(4)
@@ -752,6 +832,7 @@ class MotionActionTest : VimTestCase() {
 
   // |w|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
+  @Test
   fun testCjkToFullWidthPunctuation() {
     typeTextInFile(injector.parser.parseKeys("w"), "测试${c}测试！！！")
     assertOffset(4)
@@ -759,6 +840,7 @@ class MotionActionTest : VimTestCase() {
 
   // |w|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
+  @Test
   fun testCjkToDigits() {
     typeTextInFile(injector.parser.parseKeys("w"), "测试${c}测试123")
     assertOffset(4)
@@ -766,6 +848,7 @@ class MotionActionTest : VimTestCase() {
 
   // |w|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
+  @Test
   fun testCjkToFullWidthLatin() {
     typeTextInFile(injector.parser.parseKeys("w"), "测试${c}测试ＡＡＡ")
     assertOffset(4)
@@ -773,12 +856,14 @@ class MotionActionTest : VimTestCase() {
 
   // |w|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
+  @Test
   fun testCjkToFullWidthDigits() {
     typeTextInFile(injector.parser.parseKeys("w"), "测试${c}测试３３３")
     assertOffset(4)
   }
 
   // |w|
+  @Test
   fun testEmptyLineIsWord() {
     typeTextInFile(
       injector.parser.parseKeys("w"),
@@ -793,6 +878,7 @@ class MotionActionTest : VimTestCase() {
   }
 
   // |w|
+  @Test
   fun testNotEmptyLineIsNotWord() {
     typeTextInFile(
       injector.parser.parseKeys("w"),
@@ -806,23 +892,27 @@ two
 
   // VIM-312 |w|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
+  @Test
   fun testLastWord() {
     typeTextInFile(injector.parser.parseKeys("w"), "${c}one\n")
     assertOffset(2)
   }
 
   // |b|
+  @Test
   fun testWordBackwardsAtFirstLineWithWhitespaceInFront() {
     typeTextInFile(injector.parser.parseKeys("b"), "    ${c}x\n")
     assertOffset(0)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
+  @Test
   fun testRightToLastChar() {
     typeTextInFile(injector.parser.parseKeys("i<Right>"), "on${c}e\n")
     assertOffset(3)
   }
 
+  @Test
   fun testDownToLastEmptyLine() {
     typeTextInFile(
       injector.parser.parseKeys("j"),
@@ -837,6 +927,7 @@ two
 
   // VIM-262 |c_CTRL-R|
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
+  @Test
   fun testSearchFromRegister() {
     VimPlugin.getRegister().setKeys('a', injector.parser.stringToKeys("two"))
     typeTextInFile(
@@ -852,6 +943,7 @@ two
   }
 
   // |v_gv|
+  @Test
   fun testSwapVisualSelections() {
     val keys = listOf("viw", "<Esc>", "0", "viw", "gv", "d")
     val before = "foo ${c}bar\n"
@@ -860,6 +952,7 @@ two
   }
 
   // |CTRL-V|
+  @Test
   fun testVisualBlockSelectionsDisplayedCorrectlyMovingRight() {
     val keys = listOf("<C-V>jl")
     val before = """
@@ -876,6 +969,7 @@ two
   }
 
   // |CTRL-V|
+  @Test
   fun testVisualBlockSelectionsDisplayedCorrectlyMovingLeft() {
     val keys = listOf("<C-V>jh")
     val before = """
@@ -892,6 +986,7 @@ two
   }
 
   // |CTRL-V|
+  @Test
   fun testVisualBlockSelectionsDisplayedCorrectlyInDollarMode() {
     val keys = listOf("<C-V>jj$")
     val before = """
@@ -910,6 +1005,7 @@ two
   }
 
   // |v_o|
+  @Test
   fun testSwapVisualSelectionEnds() {
     val keys = listOf("v", "l", "o", "l", "d")
     val before = "${c}foo\n"
@@ -918,6 +1014,7 @@ two
   }
 
   // VIM-564 |g_|
+  @Test
   fun testToLastNonBlankCharacterInLine() {
     doTest(
       "g_",
@@ -941,6 +1038,7 @@ two
   }
 
   // |3g_|
+  @Test
   fun testToLastNonBlankCharacterInLineWithCount3() {
     doTest(
       "3g_",
@@ -965,6 +1063,7 @@ two
 
   // VIM-646 |gv|
   @TestWithoutNeovim(SkipNeovimReason.UNCLEAR)
+  @Test
   fun testRestoreMultiLineSelectionAfterYank() {
     val keys = listOf("V", "j", "y", "G", "p", "gv", "d")
     val before = """
@@ -984,6 +1083,7 @@ two
 
   // |v_>| |gv|
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "Complicated")
+  @Test
   fun testRestoreMultiLineSelectionAfterIndent() {
     typeTextInFile(
       injector.parser.parseKeys("V" + "2j"),
@@ -1035,6 +1135,7 @@ two
   }
 
   // VIM-862 |gv|
+  @Test
   fun testRestoreSelectionRange() {
     val keys = listOf("vl", "<Esc>", "gv")
     val before = """
@@ -1050,6 +1151,7 @@ two
     doTest(keys, before, after, VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER)
   }
 
+  @Test
   fun testVisualLineSelectDown() {
     typeTextInFile(
       injector.parser.parseKeys("Vj"),
@@ -1073,6 +1175,7 @@ two
   }
 
   // VIM-784
+  @Test
   fun testVisualLineSelectUp() {
     typeTextInFile(
       injector.parser.parseKeys("Vk"),
@@ -1095,12 +1198,14 @@ two
     assertOffset(4)
   }
 
+  @Test
   fun `test gv after backwards selection`() {
     configureByText("${c}Oh, hi Mark\n")
     typeText(parseKeys("yw" + "$" + "vb" + "p" + "gv"))
     assertSelection("Oh")
   }
 
+  @Test
   fun `test gv after linewise selection`() {
     configureByText("${c}Oh, hi Mark\nOh, hi Markus\n")
     typeText(parseKeys("V" + "y" + "j" + "V" + "p" + "gv"))

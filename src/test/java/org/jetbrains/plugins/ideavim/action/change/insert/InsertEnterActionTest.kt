@@ -12,8 +12,10 @@ import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class InsertEnterActionTest : VimTestCase() {
+  @Test
   fun `test insert enter`() {
     val before = """I found it in a legendary land
         |${c}all rocks and lavender and tufted grass,
@@ -30,6 +32,7 @@ class InsertEnterActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.CTRL_CODES)
+  @Test
   fun `test insert enter with C-M`() {
     val before = """I found it in a legendary land
         |${c}all rocks and lavender and tufted grass,
@@ -46,6 +49,7 @@ class InsertEnterActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
   fun `test insert enter scrolls view up at scrolloff`() {
     configureByLines(50, "I found it in a legendary land")
     enterCommand("set scrolloff=10")

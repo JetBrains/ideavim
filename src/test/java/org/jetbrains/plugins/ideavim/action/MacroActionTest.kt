@@ -11,44 +11,49 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.newapi.vim
-import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.rangeOf
 import org.jetbrains.plugins.ideavim.waitAndAssert
+import org.junit.jupiter.api.Test
+import kotlin.test.assertNotNull
 
 /**
  * @author vlan
  */
 class MacroActionTest : VimTestCase() {
   // |q|
+  @Test
   fun testRecordMacro() {
     val editor = typeTextInFile(injector.parser.parseKeys("qa" + "3l" + "q"), "on<caret>e two three\n")
     val commandState = editor.vim.vimStateMachine
-    assertFalse(commandState.isRecording)
+    kotlin.test.assertFalse(commandState.isRecording)
     val registerGroup = VimPlugin.getRegister()
     val register = registerGroup.getRegister('a')
-    assertNotNull(register)
-    assertEquals("3l", register!!.text)
+    assertNotNull<Any>(register)
+    kotlin.test.assertEquals("3l", register.text)
   }
 
+  @Test
   fun testRecordMacroDoesNotExpandMap() {
     configureByText("")
     enterCommand("imap pp hello")
     typeText(injector.parser.parseKeys("qa" + "i" + "pp<Esc>" + "q"))
     val register = VimPlugin.getRegister().getRegister('a')
-    assertNotNull(register)
-    assertEquals("ipp<Esc>", injector.parser.toKeyNotation(register!!.keys))
+    assertNotNull<Any>(register)
+    kotlin.test.assertEquals("ipp<Esc>", injector.parser.toKeyNotation(register.keys))
   }
 
+  @Test
   fun testRecordMacroWithDigraph() {
     typeTextInFile(injector.parser.parseKeys("qa" + "i" + "<C-K>OK<Esc>" + "q"), "")
     val register = VimPlugin.getRegister().getRegister('a')
-    assertNotNull(register)
-    assertEquals("i<C-K>OK<Esc>", injector.parser.toKeyNotation(register!!.keys))
+    assertNotNull<Any>(register)
+    kotlin.test.assertEquals("i<C-K>OK<Esc>", injector.parser.toKeyNotation(register.keys))
   }
 
+  @Test
   fun `test macro with search`() {
     val content = """
             A Discovery
@@ -64,10 +69,11 @@ class MacroActionTest : VimTestCase() {
     val startOffset = content.rangeOf("rocks").startOffset
 
     waitAndAssert {
-      startOffset == myFixture.editor.caretModel.offset
+      startOffset == fixture.editor.caretModel.offset
     }
   }
 
+  @Test
   fun `test macro with command`() {
     val content = """
             A Discovery
@@ -82,9 +88,10 @@ class MacroActionTest : VimTestCase() {
 
     val register = VimPlugin.getRegister().getRegister('a')
     val registerSize = register!!.keys.size
-    TestCase.assertEquals(9, registerSize)
+    kotlin.test.assertEquals(9, registerSize)
   }
 
+  @Test
   fun `test last command`() {
     val content = "${c}0\n1\n2\n3\n"
     configureByText(content)
@@ -92,6 +99,7 @@ class MacroActionTest : VimTestCase() {
     assertState("2\n3\n")
   }
 
+  @Test
   fun `test last command with count`() {
     val content = "${c}0\n1\n2\n3\n4\n5\n"
     configureByText(content)
@@ -99,6 +107,7 @@ class MacroActionTest : VimTestCase() {
     assertState("5\n")
   }
 
+  @Test
   fun `test last command as last macro with count`() {
     val content = "${c}0\n1\n2\n3\n4\n5\n"
     configureByText(content)
@@ -106,6 +115,7 @@ class MacroActionTest : VimTestCase() {
     assertState("5\n")
   }
 
+  @Test
   fun `test last command as last macro multiple times`() {
     val content = "${c}0\n1\n2\n3\n4\n5\n"
     configureByText(content)
@@ -129,13 +139,14 @@ class MacroActionTest : VimTestCase() {
     val startOffset = content.rangeOf("rocks").startOffset
 
     waitAndAssert {
-      println(myFixture.editor.caretModel.offset)
+      println(fixture.editor.caretModel.offset)
       println(startOffset)
       println()
-      startOffset == myFixture.editor.caretModel.offset
+      startOffset == fixture.editor.caretModel.offset
     }
   }
 
+  @Test
   fun `test macro with count`() {
     configureByText("${c}0\n1\n2\n3\n4\n5\n")
     typeText(injector.parser.parseKeys("qajq" + "4@a"))
@@ -143,6 +154,7 @@ class MacroActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT, "Reports differences in 'a register")
+  @Test
   fun `test stop on error`() {
     val content = """
             A Discovery

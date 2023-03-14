@@ -18,6 +18,7 @@ import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
 import org.jetbrains.plugins.ideavim.VimTestOption
+import org.junit.jupiter.api.Test
 
 class SelectMotionRightActionTest : VimOptionTestCase(OptionConstants.keymodel) {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
@@ -28,6 +29,7 @@ class SelectMotionRightActionTest : VimOptionTestCase(OptionConstants.keymodel) 
       OptionConstants.keymodel_stopselect,
     ),
   )
+  @Test
   fun `test char select simple move`() {
     doTest(
       listOf("viw", "<C-G>", "<Right>"),
@@ -60,6 +62,7 @@ class SelectMotionRightActionTest : VimOptionTestCase(OptionConstants.keymodel) 
       OptionConstants.keymodel_stopselect,
     ),
   )
+  @Test
   fun `test select multiple carets`() {
     doTest(
       listOf("viw", "<C-G>", "<Right>"),
@@ -86,6 +89,7 @@ class SelectMotionRightActionTest : VimOptionTestCase(OptionConstants.keymodel) 
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, ""))
+  @Test
   fun `test without stopsel`() {
     doTest(
       listOf("viw", "<C-G>", "<Right>"),

@@ -12,17 +12,22 @@ import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInfo
 
 /**
  * @author Shrikant Sharat Kandula (@sharat87)
  */
 @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
 class VimIndentObjectTest : VimTestCase() {
-  override fun setUp() {
-    super.setUp()
+  @BeforeEach
+  override fun setUp(testInfo: TestInfo) {
+    super.setUp(testInfo)
     enableExtensions("textobj-indent")
   }
 
+  @Test
   fun testSingleLine() {
     doTest(
       "dii",
@@ -33,6 +38,7 @@ class VimIndentObjectTest : VimTestCase() {
     )
   }
 
+  @Test
   fun testDeleteFlatIndent() {
     doTest(
       "dii",
@@ -46,6 +52,7 @@ class VimIndentObjectTest : VimTestCase() {
     )
   }
 
+  @Test
   fun testDeleteOuterFlatIndent() {
     doTest(
       "dai",
@@ -59,6 +66,7 @@ class VimIndentObjectTest : VimTestCase() {
     )
   }
 
+  @Test
   fun testDeleteInnerIndent() {
     doTest(
       "2Gdii",
@@ -75,6 +83,7 @@ class VimIndentObjectTest : VimTestCase() {
     )
   }
 
+  @Test
   fun testDeleteOuterIndent() {
     doTest(
       "2Gdai",
@@ -90,6 +99,7 @@ class VimIndentObjectTest : VimTestCase() {
     )
   }
 
+  @Test
   fun testDeleteFarOuterIndent() {
     doTest(
       "2GdaI",
@@ -103,6 +113,7 @@ class VimIndentObjectTest : VimTestCase() {
     )
   }
 
+  @Test
   fun testDeleteInnerIndentWithLinesAbove() {
     doTest(
       "5Gdii",
@@ -125,6 +136,7 @@ class VimIndentObjectTest : VimTestCase() {
     )
   }
 
+  @Test
   fun testDeleteInnerIndentWithBlankLinesAbove() {
     doTest(
       "6Gdii",
@@ -149,6 +161,7 @@ class VimIndentObjectTest : VimTestCase() {
     )
   }
 
+  @Test
   fun testNested1() {
     doTest(
       "2Gdii",
@@ -165,6 +178,7 @@ class VimIndentObjectTest : VimTestCase() {
     )
   }
 
+  @Test
   fun testNested1a() {
     doTest(
       "3Gdai",
@@ -181,6 +195,7 @@ class VimIndentObjectTest : VimTestCase() {
     )
   }
 
+  @Test
   fun testNested2() {
     doTest(
       "3Gdii",
@@ -198,6 +213,7 @@ class VimIndentObjectTest : VimTestCase() {
     )
   }
 
+  @Test
   fun testNested3() {
     doTest(
       "3Gdii",
@@ -219,6 +235,7 @@ class VimIndentObjectTest : VimTestCase() {
     assertSelection(null)
   }
 
+  @Test
   fun testNested4() {
     doTest(
       "3Gdii",

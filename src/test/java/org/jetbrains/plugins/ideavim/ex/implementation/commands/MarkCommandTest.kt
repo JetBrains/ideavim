@@ -10,13 +10,15 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim
-import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
+import kotlin.test.fail
 
 /**
  * @author Alex Plate
  */
 class MarkCommandTest : VimTestCase() {
+  @Test
   fun `test simple mark`() {
     configureByText(
       """I found it in a legendary land
@@ -26,13 +28,14 @@ class MarkCommandTest : VimTestCase() {
       """.trimMargin(),
     )
     typeText(commandToKeys("mark a"))
-    val vimEditor = myFixture.editor.vim
+    val vimEditor = fixture.editor.vim
     injector.markService.getMark(vimEditor.primaryCaret(), 'a')?.let {
-      assertEquals(2, it.line)
-      assertEquals(0, it.col)
-    } ?: TestCase.fail("Mark is null")
+      kotlin.test.assertEquals(2, it.line)
+      kotlin.test.assertEquals(0, it.col)
+    } ?: fail("Mark is null")
   }
 
+  @Test
   fun `test global mark`() {
     configureByText(
       """I found it in a legendary land
@@ -42,13 +45,14 @@ class MarkCommandTest : VimTestCase() {
       """.trimMargin(),
     )
     typeText(commandToKeys("mark G"))
-    val vimEditor = myFixture.editor.vim
+    val vimEditor = fixture.editor.vim
     injector.markService.getMark(vimEditor.primaryCaret(), 'G')?.let {
-      assertEquals(2, it.line)
-      assertEquals(0, it.col)
-    } ?: TestCase.fail("Mark is null")
+      kotlin.test.assertEquals(2, it.line)
+      kotlin.test.assertEquals(0, it.col)
+    } ?: fail("Mark is null")
   }
 
+  @Test
   fun `test k mark`() {
     configureByText(
       """I found it in a legendary land
@@ -58,13 +62,14 @@ class MarkCommandTest : VimTestCase() {
       """.trimMargin(),
     )
     typeText(commandToKeys("k a"))
-    val vimEditor = myFixture.editor.vim
+    val vimEditor = fixture.editor.vim
     injector.markService.getMark(vimEditor.primaryCaret(), 'a')?.let {
-      assertEquals(2, it.line)
-      assertEquals(0, it.col)
-    } ?: TestCase.fail("Mark is null")
+      kotlin.test.assertEquals(2, it.line)
+      kotlin.test.assertEquals(0, it.col)
+    } ?: fail("Mark is null")
   }
 
+  @Test
   fun `test mark in range`() {
     configureByText(
       """I found it in a legendary land
@@ -74,10 +79,10 @@ class MarkCommandTest : VimTestCase() {
       """.trimMargin(),
     )
     typeText(commandToKeys("1,2 mark a"))
-    val vimEditor = myFixture.editor.vim
+    val vimEditor = fixture.editor.vim
     injector.markService.getMark(vimEditor.primaryCaret(), 'a')?.let {
-      assertEquals(1, it.line)
-      assertEquals(0, it.col)
-    } ?: TestCase.fail("Mark is null")
+      kotlin.test.assertEquals(1, it.line)
+      kotlin.test.assertEquals(0, it.col)
+    } ?: fail("Mark is null")
   }
 }

@@ -13,9 +13,11 @@ import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class SelectEscapeActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test exit char mode`() {
     this.doTest(
       listOf("gh", "<esc>"),
@@ -42,6 +44,7 @@ class SelectEscapeActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test exit char mode on line start`() {
     this.doTest(
       listOf("gh", "<esc>"),
@@ -68,6 +71,7 @@ class SelectEscapeActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test exit char mode on line end`() {
     this.doTest(
       listOf("gh", "<esc>"),
@@ -94,6 +98,7 @@ class SelectEscapeActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test exit char mode on file start`() {
     this.doTest(
       listOf("gh", "<S-Left>", "<esc>"),
@@ -120,6 +125,7 @@ class SelectEscapeActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test exit char mode on empty line`() {
     this.doTest(
       listOf("gh", "<esc>"),
@@ -146,6 +152,7 @@ class SelectEscapeActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test exit char mode multicaret`() {
     this.doTest(
       listOf("gh", "<esc>"),
@@ -172,6 +179,7 @@ class SelectEscapeActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test exit in select line mode`() {
     this.doTest(
       listOf("gH", "<esc>"),
@@ -198,6 +206,7 @@ class SelectEscapeActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test exit line mode line end`() {
     this.doTest(
       listOf("gH", "<esc>"),
@@ -224,6 +233,7 @@ class SelectEscapeActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test exit line mode file start`() {
     this.doTest(
       listOf("gH", "<esc>"),
@@ -250,6 +260,7 @@ class SelectEscapeActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test exit line mode empty line`() {
     this.doTest(
       listOf("gH", "<esc>"),
@@ -276,6 +287,7 @@ class SelectEscapeActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test exit line mode multicaret`() {
     this.doTest(
       listOf("gH", "<esc>"),
@@ -302,6 +314,7 @@ class SelectEscapeActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test exit in select block mode`() {
     this.doTest(
       listOf("g<C-H>", "<esc>"),
@@ -324,13 +337,14 @@ class SelectEscapeActionTest : VimTestCase() {
       VimStateMachine.Mode.COMMAND,
       VimStateMachine.SubMode.NONE,
     )
-    assertFalse(myFixture.editor.caretModel.allCarets.any(Caret::hasSelection))
-    assertEquals(1, myFixture.editor.caretModel.caretCount)
+    kotlin.test.assertFalse(fixture.editor.caretModel.allCarets.any(Caret::hasSelection))
+    kotlin.test.assertEquals(1, fixture.editor.caretModel.caretCount)
     assertCaretsVisualAttributes()
     assertMode(VimStateMachine.Mode.COMMAND)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test exit block mode with motion`() {
     this.doTest(
       listOf("g<C-H>", "<S-Down>", "<S-Right>", "<esc>"),
@@ -353,13 +367,14 @@ class SelectEscapeActionTest : VimTestCase() {
       VimStateMachine.Mode.COMMAND,
       VimStateMachine.SubMode.NONE,
     )
-    assertFalse(myFixture.editor.caretModel.allCarets.any(Caret::hasSelection))
-    assertEquals(1, myFixture.editor.caretModel.caretCount)
+    kotlin.test.assertFalse(fixture.editor.caretModel.allCarets.any(Caret::hasSelection))
+    kotlin.test.assertEquals(1, fixture.editor.caretModel.caretCount)
     assertCaretsVisualAttributes()
     assertMode(VimStateMachine.Mode.COMMAND)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test exit block mode on longer line`() {
     this.doTest(
       listOf("g<C-H>", "<S-Down>", "<S-Right>".repeat(3), "<esc>"),
@@ -382,13 +397,14 @@ class SelectEscapeActionTest : VimTestCase() {
       VimStateMachine.Mode.COMMAND,
       VimStateMachine.SubMode.NONE,
     )
-    assertFalse(myFixture.editor.caretModel.allCarets.any(Caret::hasSelection))
-    assertEquals(1, myFixture.editor.caretModel.caretCount)
+    kotlin.test.assertFalse(fixture.editor.caretModel.allCarets.any(Caret::hasSelection))
+    kotlin.test.assertEquals(1, fixture.editor.caretModel.caretCount)
     assertCaretsVisualAttributes()
     assertMode(VimStateMachine.Mode.COMMAND)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test exit block mode on longer line till end`() {
     this.doTest(
       listOf("g<C-H>", "<S-Down>", "<S-Right>".repeat(5), "<esc>"),
@@ -411,8 +427,8 @@ class SelectEscapeActionTest : VimTestCase() {
       VimStateMachine.Mode.COMMAND,
       VimStateMachine.SubMode.NONE,
     )
-    assertFalse(myFixture.editor.caretModel.allCarets.any(Caret::hasSelection))
-    assertEquals(1, myFixture.editor.caretModel.caretCount)
+    kotlin.test.assertFalse(fixture.editor.caretModel.allCarets.any(Caret::hasSelection))
+    kotlin.test.assertEquals(1, fixture.editor.caretModel.caretCount)
     assertCaretsVisualAttributes()
     assertMode(VimStateMachine.Mode.COMMAND)
   }

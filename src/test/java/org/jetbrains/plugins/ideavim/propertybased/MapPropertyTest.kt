@@ -13,6 +13,7 @@ import org.jetbrains.jetCheck.Generator
 import org.jetbrains.jetCheck.ImperativeCommand
 import org.jetbrains.jetCheck.PropertyChecker
 import org.jetbrains.plugins.ideavim.propertybased.samples.simpleText
+import org.junit.jupiter.api.Test
 
 // TODO: 25.01.2021 Add neovim test integration
 class MapPropertyTest : VimPropertyTestBase() {
@@ -55,6 +56,7 @@ class MapPropertyTest : VimPropertyTestBase() {
     }
   }
 
+  @Test
   fun testEmpty() {
     // Just an empty test
   }

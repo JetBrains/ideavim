@@ -12,9 +12,11 @@ import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class MotionLeftInsertTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
   fun `test whichwrap in the same line`() {
     doTest(
       listOf("i", "<Left>"),
@@ -31,6 +33,7 @@ class MotionLeftInsertTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
   fun `test whichwrap at file start`() {
     doTest(
       listOf("i", "<Left>"),
@@ -47,6 +50,7 @@ class MotionLeftInsertTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
   fun `test whichwrap to previous line`() {
     doTest(
       listOf("i", "<Left>"),
@@ -65,6 +69,7 @@ class MotionLeftInsertTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
   fun `test from empty line to empty line`() {
     doTest(
       listOf("i", "<Left>"),

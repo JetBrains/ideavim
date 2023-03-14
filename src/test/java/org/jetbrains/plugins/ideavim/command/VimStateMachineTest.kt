@@ -14,132 +14,149 @@ import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class VimStateMachineTest : VimTestCase() {
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test status string in normal`() {
     configureByText("123")
-    val statusString = myFixture.editor.vim.vimStateMachine.getStatusString()
-    assertEquals("", statusString)
+    val statusString = fixture.editor.vim.vimStateMachine.getStatusString()
+    kotlin.test.assertEquals("", statusString)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test status string in insert`() {
     configureByText("123")
     typeText(injector.parser.parseKeys("i"))
-    val statusString = myFixture.editor.vim.vimStateMachine.getStatusString()
-    assertEquals("-- INSERT --", statusString)
+    val statusString = fixture.editor.vim.vimStateMachine.getStatusString()
+    kotlin.test.assertEquals("-- INSERT --", statusString)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test status string in replace`() {
     configureByText("123")
     typeText(injector.parser.parseKeys("R"))
-    val statusString = myFixture.editor.vim.vimStateMachine.getStatusString()
-    assertEquals("-- REPLACE --", statusString)
+    val statusString = fixture.editor.vim.vimStateMachine.getStatusString()
+    kotlin.test.assertEquals("-- REPLACE --", statusString)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test status string in visual`() {
     configureByText("123")
     typeText(injector.parser.parseKeys("v"))
-    val statusString = myFixture.editor.vim.vimStateMachine.getStatusString()
-    assertEquals("-- VISUAL --", statusString)
+    val statusString = fixture.editor.vim.vimStateMachine.getStatusString()
+    kotlin.test.assertEquals("-- VISUAL --", statusString)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test status string in visual line`() {
     configureByText("123")
     typeText(injector.parser.parseKeys("V"))
-    val statusString = myFixture.editor.vim.vimStateMachine.getStatusString()
-    assertEquals("-- VISUAL LINE --", statusString)
+    val statusString = fixture.editor.vim.vimStateMachine.getStatusString()
+    kotlin.test.assertEquals("-- VISUAL LINE --", statusString)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test status string in visual block`() {
     configureByText("123")
     typeText(injector.parser.parseKeys("<C-V>"))
-    val statusString = myFixture.editor.vim.vimStateMachine.getStatusString()
-    assertEquals("-- VISUAL BLOCK --", statusString)
+    val statusString = fixture.editor.vim.vimStateMachine.getStatusString()
+    kotlin.test.assertEquals("-- VISUAL BLOCK --", statusString)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test status string in select`() {
     configureByText("123")
     typeText(injector.parser.parseKeys("gh"))
-    val statusString = myFixture.editor.vim.vimStateMachine.getStatusString()
-    assertEquals("-- SELECT --", statusString)
+    val statusString = fixture.editor.vim.vimStateMachine.getStatusString()
+    kotlin.test.assertEquals("-- SELECT --", statusString)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test status string in select line`() {
     configureByText("123")
     typeText(injector.parser.parseKeys("gH"))
-    val statusString = myFixture.editor.vim.vimStateMachine.getStatusString()
-    assertEquals("-- SELECT LINE --", statusString)
+    val statusString = fixture.editor.vim.vimStateMachine.getStatusString()
+    kotlin.test.assertEquals("-- SELECT LINE --", statusString)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test status string in select block`() {
     configureByText("123")
     typeText(injector.parser.parseKeys("g<C-H>"))
-    val statusString = myFixture.editor.vim.vimStateMachine.getStatusString()
-    assertEquals("-- SELECT BLOCK --", statusString)
+    val statusString = fixture.editor.vim.vimStateMachine.getStatusString()
+    kotlin.test.assertEquals("-- SELECT BLOCK --", statusString)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test status string in one command`() {
     configureByText("123")
     typeText(injector.parser.parseKeys("i<C-O>"))
-    val statusString = myFixture.editor.vim.vimStateMachine.getStatusString()
-    assertEquals("-- (insert) --", statusString)
+    val statusString = fixture.editor.vim.vimStateMachine.getStatusString()
+    kotlin.test.assertEquals("-- (insert) --", statusString)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test status string in one command visual`() {
     configureByText("123")
     typeText(injector.parser.parseKeys("i<C-O>v"))
-    val statusString = myFixture.editor.vim.vimStateMachine.getStatusString()
-    assertEquals("-- (insert) VISUAL --", statusString)
+    val statusString = fixture.editor.vim.vimStateMachine.getStatusString()
+    kotlin.test.assertEquals("-- (insert) VISUAL --", statusString)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test status string in one command visual block`() {
     configureByText("123")
     typeText(injector.parser.parseKeys("i<C-O><C-V>"))
-    val statusString = myFixture.editor.vim.vimStateMachine.getStatusString()
-    assertEquals("-- (insert) VISUAL BLOCK --", statusString)
+    val statusString = fixture.editor.vim.vimStateMachine.getStatusString()
+    kotlin.test.assertEquals("-- (insert) VISUAL BLOCK --", statusString)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test status string in one command visual line`() {
     configureByText("123")
     typeText(injector.parser.parseKeys("i<C-O>V"))
-    val statusString = myFixture.editor.vim.vimStateMachine.getStatusString()
-    assertEquals("-- (insert) VISUAL LINE --", statusString)
+    val statusString = fixture.editor.vim.vimStateMachine.getStatusString()
+    kotlin.test.assertEquals("-- (insert) VISUAL LINE --", statusString)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test status string in one command select`() {
     configureByText("123")
     typeText(injector.parser.parseKeys("i<C-O>gh"))
-    val statusString = myFixture.editor.vim.vimStateMachine.getStatusString()
-    assertEquals("-- (insert) SELECT --", statusString)
+    val statusString = fixture.editor.vim.vimStateMachine.getStatusString()
+    kotlin.test.assertEquals("-- (insert) SELECT --", statusString)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test status string in one command select block`() {
     configureByText("123")
     typeText(injector.parser.parseKeys("i<C-O>g<C-H>"))
-    val statusString = myFixture.editor.vim.vimStateMachine.getStatusString()
-    assertEquals("-- (insert) SELECT BLOCK --", statusString)
+    val statusString = fixture.editor.vim.vimStateMachine.getStatusString()
+    kotlin.test.assertEquals("-- (insert) SELECT BLOCK --", statusString)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test status string in one command select line`() {
     configureByText("123")
     typeText(injector.parser.parseKeys("i<C-O>gH"))
-    val statusString = myFixture.editor.vim.vimStateMachine.getStatusString()
-    assertEquals("-- (insert) SELECT LINE --", statusString)
+    val statusString = fixture.editor.vim.vimStateMachine.getStatusString()
+    kotlin.test.assertEquals("-- (insert) SELECT LINE --", statusString)
   }
 }

@@ -11,9 +11,11 @@ package org.jetbrains.plugins.ideavim.action.change.insert
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class InsertDeleteInsertedTextActionTest : VimTestCase() {
   // VIM-1655
+  @Test
   fun `test deleted text is not yanked`() {
     doTest(
       listOf("yiw", "ea", "Hello", "<C-U>", "<ESC>p"),
@@ -34,6 +36,7 @@ class InsertDeleteInsertedTextActionTest : VimTestCase() {
 
   // VIM-1655
   @VimBehaviorDiffers(description = "Inserted text is not deleted after <C-U>")
+  @Test
   fun `test deleted text is not yanked after replace`() {
     doTest(
       listOf("yiw", "eR", "Hello", "<C-U>", "<ESC>p"),

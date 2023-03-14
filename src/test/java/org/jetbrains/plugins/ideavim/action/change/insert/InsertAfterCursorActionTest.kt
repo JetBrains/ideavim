@@ -12,9 +12,11 @@ import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class InsertAfterCursorActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.INLAYS)
+  @Test
   fun `test insert after cursor with inlay with preceding text places caret between inlay and preceding text`() {
     configureByText("I found it i${c}n a legendary land")
     // Inlay is at vp 13. Preceding text is at 12. Caret should be between preceding and inlay = 13
@@ -25,6 +27,7 @@ class InsertAfterCursorActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.INLAYS)
+  @Test
   fun `test insert after cursor with inlay with following text places caret between inlay and following text`() {
     configureByText("I found it$c in a legendary land")
     // Inlay is at offset 11, following text is at vp 12

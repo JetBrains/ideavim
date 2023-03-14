@@ -11,9 +11,11 @@ package org.jetbrains.plugins.ideavim.ex.implementation.statements
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class TryCatchTest : VimTestCase() {
 
+  @Test
   fun `test successful catch of a throw statement`() {
     configureByText("\n")
     typeText(
@@ -31,6 +33,7 @@ class TryCatchTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test unsuccessful catch of a throw statement`() {
     configureByText("\n")
     typeText(
@@ -46,6 +49,7 @@ class TryCatchTest : VimTestCase() {
     assertPluginErrorMessageContains("my exception")
   }
 
+  @Test
   fun `test vim statement successful catch`() {
     configureByText("\n")
     typeText(
@@ -61,6 +65,7 @@ class TryCatchTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test vim statement unsuccessful catch`() {
     configureByText("\n")
     typeText(
@@ -76,6 +81,7 @@ class TryCatchTest : VimTestCase() {
     assertPluginErrorMessageContains("E121: Undefined variable: undefinedVariable")
   }
 
+  @Test
   fun `test multiple catches`() {
     configureByText("\n")
     typeText(
@@ -94,6 +100,7 @@ class TryCatchTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test no matching catch among multiple`() {
     configureByText("\n")
     typeText(
@@ -110,6 +117,7 @@ class TryCatchTest : VimTestCase() {
     assertPluginErrorMessageContains("my exception")
   }
 
+  @Test
   fun `test finally after catch`() {
     configureByText("\n")
     typeText(
@@ -130,6 +138,7 @@ class TryCatchTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test finally after unsuccessful catch`() {
     configureByText("\n")
     typeText(
@@ -149,6 +158,7 @@ class TryCatchTest : VimTestCase() {
     assertExOutput("finally block\n")
   }
 
+  @Test
   fun `test finish in try catch`() {
     configureByText("\n")
     typeText(

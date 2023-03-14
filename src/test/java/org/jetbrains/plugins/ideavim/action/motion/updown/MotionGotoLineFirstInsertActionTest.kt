@@ -11,9 +11,11 @@ package org.jetbrains.plugins.ideavim.action.motion.updown
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class MotionGotoLineFirstInsertActionTest : VimTestCase() {
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test simple motion`() {
     doTest(
       listOf("i", "<C-Home>", "<Esc>"),
@@ -37,6 +39,7 @@ class MotionGotoLineFirstInsertActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test simple motion ignores nostartofline`() {
     doTest(
       listOf("i", "<C-Home>", "<Esc>"),

@@ -17,28 +17,34 @@ import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
+import kotlin.test.assertNotNull
 
 /**
  * @author Vasily Alferov
  */
 class MultipleCaretsTest : VimTestCase() {
   // com.maddyhome.idea.vim.action.visual.leftright
+  @Test
   fun testMotionLeftAction() {
     typeTextInFile(injector.parser.parseKeys("3h"), "abc${c}de$c")
     assertState("${c}ab${c}cde")
   }
 
+  @Test
   fun testMotionRightAction() {
     typeTextInFile(injector.parser.parseKeys("l"), "ab${c}cd${c}ef")
     assertState("abc${c}de${c}f")
   }
 
+  @Test
   fun testMovementMerging() {
     val editor = typeTextInFile(injector.parser.parseKeys("2h"), "o${c}n${c}e")
-    assertEquals(1, editor.caretModel.caretCount)
+    kotlin.test.assertEquals(1, editor.caretModel.caretCount)
     assertState("${c}one")
   }
 
+  @Test
   fun testMotionColumnAction() {
     typeTextInFile(
       injector.parser.parseKeys("4|"),
@@ -59,6 +65,7 @@ class MultipleCaretsTest : VimTestCase() {
     )
   }
 
+  @Test
   fun testMotionFirstColumnAction() {
     typeTextInFile(
       injector.parser.parseKeys("0"),
@@ -79,6 +86,7 @@ class MultipleCaretsTest : VimTestCase() {
     )
   }
 
+  @Test
   fun testMotionFirstNonSpaceAction() {
     typeTextInFile(
       injector.parser.parseKeys("^"),
@@ -95,6 +103,7 @@ ${c}three four
     )
   }
 
+  @Test
   fun testMotionLastNonSpaceAction() {
     typeTextInFile(
       injector.parser.parseKeys("g_"),
@@ -113,6 +122,7 @@ seven eigh${c}t
     )
   }
 
+  @Test
   fun testMotionLastColumnAction() {
     typeTextInFile(
       injector.parser.parseKeys("$"),
@@ -129,21 +139,25 @@ seven eigh${c}t
     )
   }
 
+  @Test
   fun testMotionLeftMatchCharAction() {
     typeTextInFile(injector.parser.parseKeys("2Fa"), "a${c}a${c}abab${c}ab${c}ab${c}b${c}x")
     assertState("${c}a${c}a${c}ab${c}ab${c}ababbx")
   }
 
+  @Test
   fun testMotionRightMatchCharAction() {
     typeTextInFile(injector.parser.parseKeys("2fb"), "a${c}a${c}abab${c}ab${c}ab${c}b${c}x")
     assertState("aaaba${c}baba${c}b${c}b${c}x")
   }
 
+  @Test
   fun testMotionLeftTillMatchCharAction() {
     typeTextInFile(injector.parser.parseKeys("2Ta"), "b${c}a${c}ba${c}a${c}a${c}ba${c}b")
     assertState("b${c}a${c}ba${c}a${c}a${c}bab")
   }
 
+  @Test
   fun testMotionRightTillMatchCharAction() {
     typeTextInFile(
       injector.parser.parseKeys("2ta"),
@@ -152,16 +166,19 @@ seven eigh${c}t
     assertState("ba${c}b${c}a${c}a${c}a${c}ba${c}b")
   }
 
+  @Test
   fun testMotionLastLeftMatchChar() {
     typeTextInFile(injector.parser.parseKeys("Fa;"), "a${c}a${c}abab${c}ab${c}ab${c}b${c}x")
     assertState("${c}aa${c}ab${c}ab${c}ababbx")
   }
 
+  @Test
   fun testMotionLastRightMatchChar() {
     typeTextInFile(injector.parser.parseKeys("fb;"), "${c}a${c}aabab${c}ab${c}ab${c}b${c}x")
     assertState("aaaba${c}baba${c}b${c}b${c}x")
   }
 
+  @Test
   fun testMotionLastRightTillMatchChar() {
     typeTextInFile(
       injector.parser.parseKeys("ta;"),
@@ -170,11 +187,13 @@ seven eigh${c}t
     assertState("ba${c}b${c}a${c}aa${c}ba${c}b")
   }
 
+  @Test
   fun testMotionLastMatchCharReverse() {
     typeTextInFile(injector.parser.parseKeys("fa" + "2;" + "3,"), "abaab${c}a${c}baaa${c}abaaba")
     assertState("abaab${c}abaaa${c}abaaba")
   }
 
+  @Test
   fun testMotionLeftWrap() {
     typeTextInFile(
       injector.parser.parseKeys("5<BS>"),
@@ -188,6 +207,7 @@ seven eigh${c}t
     assertState("${c}one\ntwo thr${c}ee\nfour\n")
   }
 
+  @Test
   fun testMotionRightWrap() {
     typeTextInFile(
       injector.parser.parseKeys("5<Space>"),
@@ -202,6 +222,7 @@ seven eigh${c}t
   }
 
   // com.maddyhome.idea.vim.action.visual.updown
+  @Test
   fun testMotionUpAction() {
     typeTextInFile(
       injector.parser.parseKeys("k"),
@@ -220,6 +241,7 @@ seven eigh${c}t
     )
   }
 
+  @Test
   fun testMotionDownAction() {
     typeTextInFile(
       injector.parser.parseKeys("2j"),
@@ -240,6 +262,7 @@ seven eigh${c}t
     )
   }
 
+  @Test
   fun testLeftRightAndUpDownMovements() {
     typeTextInFile(
       injector.parser.parseKeys("khj"),
@@ -262,6 +285,7 @@ seven eigh${c}t
     )
   }
 
+  @Test
   fun testMotionDownFirstNonSpaceAction() {
     typeTextInFile(
       injector.parser.parseKeys("+"),
@@ -278,6 +302,7 @@ $c   three$c four
     )
   }
 
+  @Test
   fun testMotionDownLess1FirstNonSpaceActionWithNoCount() {
     typeTextInFile(
       injector.parser.parseKeys("_"),
@@ -294,6 +319,7 @@ ${c}three four
     )
   }
 
+  @Test
   fun testMotionDownLess1FirstNonSpaceActionWithCount() {
     typeTextInFile(
       injector.parser.parseKeys("3_"),
@@ -312,6 +338,7 @@ ${c}three four
     )
   }
 
+  @Test
   fun testMotionUpFirstNonSpaceAction() {
     typeTextInFile(
       injector.parser.parseKeys("-"),
@@ -327,16 +354,19 @@ $c  tw${c}o
   }
 
   // com.maddyhome.idea.vim.action.visual.object
+  @Test
   fun testMotionInnerBigWordAction() {
     typeTextInFile(injector.parser.parseKeys("v" + "iW"), "a,${c}bc${c}d,e f,g${c}hi,j")
     assertState("<selection>a,bcd,e</selection> <selection>f,ghi,j</selection>")
   }
 
+  @Test
   fun testMotionInnerWordAction() {
     typeTextInFile(injector.parser.parseKeys("v" + "iw"), "a,${c}bc${c}d,e f,g${c}hi,j")
     assertState("a,<selection>bcd</selection>,e f,<selection>ghi</selection>,j")
   }
 
+  @Test
   fun testMotionInnerBlockAngleAction() {
     typeTextInFile(
       injector.parser.parseKeys("v" + "2i<"),
@@ -345,6 +375,7 @@ $c  tw${c}o
     assertState("<<selection>asdf<asdf<asdf>asdf>asdf</selection>> <<selection>asdf<asdf>asdf</selection>>")
   }
 
+  @Test
   fun testMotionInnerBlockBackQuoteActionWithNoCount() {
     typeTextInFile(
       injector.parser.parseKeys("v" + "i`"),
@@ -355,6 +386,7 @@ $c  tw${c}o
     )
   }
 
+  @Test
   fun testMotionInnerBlockBraceAction() {
     typeTextInFile(
       injector.parser.parseKeys("v" + "2i{"),
@@ -363,6 +395,7 @@ $c  tw${c}o
     assertState("{<selection>asdf{asdf{asdf}asdf}asdf</selection>} {<selection>asdf{asdf}asdf</selection>}")
   }
 
+  @Test
   fun testMotionInnerBlockBracketAction() {
     typeTextInFile(
       injector.parser.parseKeys("v" + "2i["),
@@ -371,6 +404,7 @@ $c  tw${c}o
     assertState("[<selection>asdf[asdf[asdf]asdf]asdf</selection>] [<selection>asdf[asdf]asdf</selection>]")
   }
 
+  @Test
   fun testMotionInnerBlockDoubleQuoteActionWithNoCount() {
     typeTextInFile(
       injector.parser.parseKeys("v" + "i\""),
@@ -381,6 +415,7 @@ $c  tw${c}o
     )
   }
 
+  @Test
   fun testMotionInnerBlockParenAction() {
     typeTextInFile(
       injector.parser.parseKeys("v" + "2i("),
@@ -389,6 +424,7 @@ $c  tw${c}o
     assertState("(<selection>asdf(asdf(asdf)asdf)asdf</selection>) (<selection>asdf(asdf)asdf</selection>)")
   }
 
+  @Test
   fun testMotionInnerBlockSingleQuoteActionWithNoCount() {
     typeTextInFile(
       injector.parser.parseKeys("v" + "i'"),
@@ -399,6 +435,7 @@ $c  tw${c}o
     )
   }
 
+  @Test
   fun testMotionInnerBlockTagAction() {
     typeTextInFile(
       injector.parser.parseKeys("v" + "it"),
@@ -415,6 +452,7 @@ $c  tw${c}o
     )
   }
 
+  @Test
   fun testMotionInnerParagraphAction() {
     typeTextInFile(
       injector.parser.parseKeys("v" + "3ip"),
@@ -423,11 +461,13 @@ $c  tw${c}o
     assertState("<selection>abcd\nabcd\n\nabcd\nabcd\n</selection>\n<selection>abcd\nabcd\n\nabcd\nabcd\n</selection>")
   }
 
+  @Test
   fun testMotionInnerSentenceAction() {
     typeTextInFile(injector.parser.parseKeys("v" + "3is"), "a${c}bcd a${c}bcd. abcd abcd. a${c}bcd abcd.")
     assertState("<selection>abcd abcd. abcd abcd.</selection><selection> abcd abcd.</selection>")
   }
 
+  @Test
   fun testMotionOuterBigWordAction() {
     typeTextInFile(
       injector.parser.parseKeys("v" + "aW"),
@@ -436,6 +476,7 @@ $c  tw${c}o
     assertState(" <selection>abcde.abcde.abcde  </selection><selection>abcde.abcde</selection>\n")
   }
 
+  @Test
   fun testMotionOuterWordAction() {
     typeTextInFile(
       injector.parser.parseKeys("v" + "aw"),
@@ -444,6 +485,7 @@ $c  tw${c}o
     assertState(" <selection>abcde</selection>.abcde.<selection>abcde  abcde</selection>.abcde")
   }
 
+  @Test
   fun testMotionOuterBlockAngleAction() {
     typeTextInFile(
       injector.parser.parseKeys("v" + "2a<"),
@@ -452,6 +494,7 @@ $c  tw${c}o
     assertState("<selection><asdf<asdf<asdf>asdf>asdf></selection> <selection><asdf<asdf>asdf></selection>")
   }
 
+  @Test
   fun testMotionOuterBlockBackQuoteAction() {
     typeTextInFile(
       injector.parser.parseKeys("v" + "a`"),
@@ -460,6 +503,7 @@ $c  tw${c}o
     assertState("`asdf`asdf<selection>`asdf`asdf`</selection>asdf` `asdf<selection>`asdf`</selection>asdf`")
   }
 
+  @Test
   fun testMotionOuterBraceAction() {
     typeTextInFile(
       injector.parser.parseKeys("v" + "2a{"),
@@ -468,6 +512,7 @@ $c  tw${c}o
     assertState("<selection>{asdf{asdf{asdf}asdf}asdf}</selection> <selection>{asdf{asdf}asdf}</selection>")
   }
 
+  @Test
   fun testMotionOuterBlockBracketAction() {
     typeTextInFile(
       injector.parser.parseKeys("v" + "2a["),
@@ -476,6 +521,7 @@ $c  tw${c}o
     assertState("<selection>[asdf[asdf[asdf]asdf]asdf]</selection> <selection>[asdf[asdf]asdf]</selection>")
   }
 
+  @Test
   fun testMotionOuterBlockDoubleQuoteAction() {
     typeTextInFile(
       injector.parser.parseKeys("v" + "a\""),
@@ -484,6 +530,7 @@ $c  tw${c}o
     assertState("\"asdf\"asdf<selection>\"asdf\"asdf\"</selection>asdf\" \"asdf<selection>\"asdf\"</selection>asdf\"")
   }
 
+  @Test
   fun testMotionOuterBlockParenAction() {
     typeTextInFile(
       injector.parser.parseKeys("v" + "2a("),
@@ -492,6 +539,7 @@ $c  tw${c}o
     assertState("<selection>(asdf(asdf(asdf)asdf)asdf)</selection> <selection>(asdf(asdf)asdf)</selection>")
   }
 
+  @Test
   fun testMotionOuterBlockSingleQuoteAction() {
     typeTextInFile(
       injector.parser.parseKeys("v" + "a'"),
@@ -500,6 +548,7 @@ $c  tw${c}o
     assertState("'asdf'asdf<selection>'asdf'asdf'</selection>asdf' 'asdf<selection>'asdf'</selection>asdf'")
   }
 
+  @Test
   fun testMotionOuterBlockTagAction() {
     typeTextInFile(
       injector.parser.parseKeys("v" + "at"),
@@ -516,22 +565,26 @@ $c  tw${c}o
     )
   }
 
+  @Test
   fun testMotionOuterParagraphAction() {
     typeTextInFile(injector.parser.parseKeys("v" + "2ap"), "a${c}sdf\n\na${c}sdf\n\nasdf\n\n")
     assertState("<selection>asdf\n\nasdf\n\nasdf\n\n</selection>")
   }
 
+  @Test
   fun testMotionOuterSentenceAction() {
     typeTextInFile(injector.parser.parseKeys("v" + "2as"), "a${c}sdf. a${c}sdf. asdf.")
     assertState("<selection>asdf. asdf. asdf.</selection>")
   }
 
   // com.maddyhime.idea.vim.action.visual.text
+  @Test
   fun testMotionBigWordEndLeftAction() {
     typeTextInFile(injector.parser.parseKeys("gE"), "a.asdf. a${c}sdf$c.a a; as${c}df\n a${c}sdf")
     assertState("a.asdf$c. asdf.a a$c; asd${c}f\n asdf")
   }
 
+  @Test
   fun testMotionBigWordEndRightAction() {
     typeTextInFile(
       injector.parser.parseKeys("E"),
@@ -540,21 +593,25 @@ $c  tw${c}o
     assertState("a.asdf$c. asdf.${c}a  a$c; asd${c}f")
   }
 
+  @Test
   fun testMotionBigWordLeftAction() {
     typeTextInFile(injector.parser.parseKeys("B"), "a$c.as${c}df. a${c}sdf.a $c a; as${c}df")
     assertState("${c}a.asdf. ${c}asdf.a  a; ${c}asdf")
   }
 
+  @Test
   fun testMotionBigWordRightAction() {
     typeTextInFile(injector.parser.parseKeys("W"), "a$c.as${c}df. a${c}sdf.a $c a; as${c}df")
     assertState("a.asdf. ${c}asdf.a  ${c}a; asd${c}f")
   }
 
+  @Test
   fun testMotionWordEndLeftAction() {
     typeTextInFile(injector.parser.parseKeys("ge"), "a.asdf. a${c}sdf$c.a a; as${c}df\n a${c}sdf")
     assertState("a.asdf$c. asd${c}f.a a$c; asd${c}f\n asdf")
   }
 
+  @Test
   fun testMotionWordEndRightAction() {
     typeTextInFile(
       injector.parser.parseKeys("e"),
@@ -563,16 +620,19 @@ $c  tw${c}o
     assertState("a.asd${c}f. asd${c}f.a  ${c}a; asd${c}f")
   }
 
+  @Test
   fun testMotionWordLeftAction() {
     typeTextInFile(injector.parser.parseKeys("b"), "a$c.as${c}df. a${c}sdf.a $c a; as${c}df")
     assertState("${c}a.${c}asdf. ${c}asdf.${c}a  a; ${c}asdf")
   }
 
+  @Test
   fun testMotionWordRightAction() {
     typeTextInFile(injector.parser.parseKeys("w"), "a$c.as${c}df. a${c}sdf.a $c a; as${c}df")
     assertState("a.${c}asdf$c. asdf$c.a  ${c}a; asd${c}f")
   }
 
+  @Test
   fun testMotionCamelEndLeftAction() {
     typeTextInFile(
       injector.parser.parseKeys("2]b"),
@@ -583,6 +643,7 @@ $c  tw${c}o
     )
   }
 
+  @Test
   fun testMotionCamelEndRightAction() {
     typeTextInFile(
       injector.parser.parseKeys("]w"),
@@ -593,6 +654,7 @@ $c  tw${c}o
     )
   }
 
+  @Test
   fun testMotionCamelLeftAction() {
     typeTextInFile(
       injector.parser.parseKeys("2[b"),
@@ -601,6 +663,7 @@ $c  tw${c}o
     assertState("Class${c}Name.${c}MethodName(Arg1Type arg${c}1Name, Arg2Type ${c}arg${c}2Name) {")
   }
 
+  @Test
   fun testMotionCamelRightAction() {
     typeTextInFile(
       injector.parser.parseKeys("[w"),
@@ -611,6 +674,7 @@ $c  tw${c}o
     )
   }
 
+  @Test
   fun testMotionMethodNextEndAction() {
     configureByJavaText(
       """public class Foo {
@@ -635,6 +699,7 @@ $c  tw${c}o
     )
   }
 
+  @Test
   fun testMotionMethodNextStartAction() {
     configureByJavaText(
       """public class Foo {
@@ -659,6 +724,7 @@ $c  tw${c}o
     )
   }
 
+  @Test
   fun testMotionMethodPreviousEndAction() {
     configureByJavaText(
       """public class Foo {
@@ -683,6 +749,7 @@ $c  tw${c}o
     )
   }
 
+  @Test
   fun testMotionMethodPreviousStartAction() {
     configureByJavaText(
       """public class Foo {
@@ -707,6 +774,7 @@ $c  tw${c}o
     )
   }
 
+  @Test
   fun testMotionNthCharacterAction() {
     typeTextInFile(
       injector.parser.parseKeys("5" + "go"),
@@ -715,16 +783,19 @@ $c  tw${c}o
     assertState("one ${c}two three four five six seven eight nine ten")
   }
 
+  @Test
   fun testMotionParagraphNextAction() {
     typeTextInFile(injector.parser.parseKeys("2}"), "o${c}ne\n\n${c}two\n\nthree\nthree\n\nfour\n\nfive")
     assertState("one\n\ntwo\n${c}\nthree\nthree\n${c}\nfour\n\nfive")
   }
 
+  @Test
   fun testMotionParagraphPreviousAction() {
     typeTextInFile(injector.parser.parseKeys("2{"), "one\n\ntwo\n\nthree\nthree\n\nfou${c}r\n\nfi${c}ve")
     assertState("one\n\ntwo\n${c}\nthree\nthree\n${c}\nfour\n\nfive")
   }
 
+  @Test
   fun testMotionSectionBackwardEndAction() {
     typeTextInFile(
       injector.parser.parseKeys("[]"),
@@ -753,6 +824,7 @@ $c  tw${c}o
     )
   }
 
+  @Test
   fun testMotionSectionBackwardStartAction() {
     typeTextInFile(
       injector.parser.parseKeys("[["),
@@ -781,6 +853,7 @@ $c  tw${c}o
     )
   }
 
+  @Test
   fun testMotionSectionForwardEndAction() {
     typeTextInFile(
       injector.parser.parseKeys("]["),
@@ -809,6 +882,7 @@ $c  tw${c}o
     )
   }
 
+  @Test
   fun testMotionSectionForwardStartAction() {
     typeTextInFile(
       injector.parser.parseKeys("]]"),
@@ -837,6 +911,7 @@ $c  tw${c}o
     )
   }
 
+  @Test
   fun testMotionSentenceNextEndAction() {
     typeTextInFile(
       injector.parser.parseKeys("g)"),
@@ -845,11 +920,13 @@ $c  tw${c}o
     assertState("asdf$c. asdf$c. asdf$c. asdf$c. asdf$c.")
   }
 
+  @Test
   fun testMotionSentenceNextStartAction() {
     typeTextInFile(injector.parser.parseKeys(")"), "a${c}sdf. ${c}asdf.$c asdf. ${c}asdf. asdf.")
     assertState("asdf. ${c}asdf. ${c}asdf. asdf. ${c}asdf.")
   }
 
+  @Test
   fun testMotionSentencePreviousEndAction() {
     typeTextInFile(
       injector.parser.parseKeys("g("),
@@ -858,6 +935,7 @@ $c  tw${c}o
     assertState("asdf$c. asdf$c. asdf$c. asdf$c. asdf.")
   }
 
+  @Test
   fun testMotionSentencePreviousStartAction() {
     typeTextInFile(
       injector.parser.parseKeys("("),
@@ -866,27 +944,32 @@ $c  tw${c}o
     assertState("${c}asdf. ${c}asdf. ${c}asdf. ${c}asdf. ${c}asdf.")
   }
 
+  @Test
   fun testMotionUnmatchedBraceCloseAction() {
     typeTextInFile(injector.parser.parseKeys("]}"), "{{}$c }$c }$c {}}$c{}}")
     assertState("{{} $c} $c} {}$c}{$c}}")
   }
 
+  @Test
   fun testMotionUnmatchedBraceOpenAction() {
     typeTextInFile(injector.parser.parseKeys("[{"), "{$c {{}$c }{$c}{$c} ")
     assertState("$c{ $c{{} }$c{}$c{} ")
   }
 
+  @Test
   fun testMotionUnmatchedParenCloseAction() {
     typeTextInFile(injector.parser.parseKeys("])"), "(()$c )$c )$c ())$c())")
     assertState("(() $c) $c) ()$c)($c))")
   }
 
+  @Test
   fun testMotionUnmatchedParenOpenAction() {
     typeTextInFile(injector.parser.parseKeys("[("), "($c (()$c )($c)($c) ")
     assertState("$c( $c(() )$c()$c() ")
   }
 
   // com.maddyhome.idea.vim.action.visual.visual
+  @Test
   fun testVisualSwapEndsAction() {
     typeTextInFile(injector.parser.parseKeys("v" + "iw" + "o"), "o${c}ne ${c}two th${c}ree\n")
     assertState(
@@ -894,11 +977,13 @@ $c  tw${c}o
     )
   }
 
+  @Test
   fun testVisualToggleCharacterMode() {
     typeTextInFile(injector.parser.parseKeys("v" + "e"), "o${c}ne ${c}two th${c}ree")
     assertState("o<selection>ne</selection> <selection>two</selection> th<selection>ree</selection>")
   }
 
+  @Test
   fun testVisualToggleLineMode() {
     typeTextInFile(
       injector.parser.parseKeys("V" + "2k"),
@@ -927,6 +1012,7 @@ $c  tw${c}o
     )
   }
 
+  @Test
   fun testVisualModeMerging() {
     typeTextInFile(
       injector.parser.parseKeys("V" + "j"),
@@ -947,6 +1033,7 @@ $c  tw${c}o
     )
   }
 
+  @Test
   fun testVisualCharacterToVisualLineModeSwitch() {
     typeTextInFile(
       injector.parser.parseKeys("v" + "k" + "V"),
@@ -971,6 +1058,7 @@ $c  tw${c}o
     )
   }
 
+  @Test
   fun testVisualLineToVisualCharacterModeSwitch() {
     typeTextInFile(
       injector.parser.parseKeys("V" + "k" + "v"),
@@ -995,6 +1083,7 @@ $c  tw${c}o
     )
   }
 
+  @Test
   fun testVisualBlockDownAfterLineEndMovement() {
     typeTextInFile(injector.parser.parseKeys("<C-V>\$j"), "abc\ndef\n")
     assertState(
@@ -1006,6 +1095,7 @@ $c  tw${c}o
     )
   }
 
+  @Test
   fun testVisualBlockDownMovementAfterShorterLineAction() {
     typeTextInFile(
       injector.parser.parseKeys("<C-V>" + "kkjj"),
@@ -1028,6 +1118,7 @@ $c  tw${c}o
     )
   }
 
+  @Test
   fun testVisualBlockDownMovementWithEmptyLineInMiddle() {
     typeTextInFile(
       injector.parser.parseKeys("<C-V>" + "3k" + "j"),
@@ -1050,6 +1141,7 @@ $c  tw${c}o
     )
   }
 
+  @Test
   fun testVisualBlockDownMovementWithManyEmptyLinesInMiddle() {
     typeTextInFile(
       injector.parser.parseKeys("<C-V>" + "4kjjj"),
@@ -1074,6 +1166,7 @@ $c  tw${c}o
     )
   }
 
+  @Test
   fun testMergingSelections() {
     typeTextInFile(
       injector.parser.parseKeys("v" + "aW" + "l" + "h"),
@@ -1082,47 +1175,56 @@ $c  tw${c}o
     assertState("<selection>abcde.abcde.abcde  abcde.abcde</selection>\n")
   }
 
+  @Test
   fun testVisualMotionUp() {
     typeTextInFile(injector.parser.parseKeys("v" + "k" + "k"), "abcde\nabcde\nab${c}cde\n")
     assertState("ab<selection>cde\nabcde\nabc</selection>de\n")
   }
 
+  @Test
   fun testVisualMotionDown() {
     typeTextInFile(injector.parser.parseKeys("v" + "2j" + "j"), "ab${c}cde\nabcde\n\nabcde\n")
     assertState("ab<selection>cde\nabcde\n\nabc</selection>de\n")
   }
 
+  @Test
   fun testVisualLineMotionUp() {
     typeTextInFile(injector.parser.parseKeys("V" + "2k" + "k"), "abcde\nabcde\n\nab${c}cde\nabcde\n")
     assertState("<selection>ab${c}cde\nabcde\n\nabcde\n</selection>abcde\n")
   }
 
+  @Test
   fun testVisualLineMotionDown() {
     typeTextInFile(injector.parser.parseKeys("V" + "2j" + "j"), "ab${c}cde\nabcde\n\nabcde\nabcde\n")
     assertState("<selection>abcde\nabcde\n\nab${c}cde\n</selection>abcde\n")
   }
 
+  @Test
   fun testVisualCharacterUpMerging() {
     typeTextInFile(injector.parser.parseKeys("v" + "2k" + "k"), "abcde\nabcde\n\nabc${c}de\nab${c}cde\n")
     assertState("abc<selection>${c}de\nabcde\n\nabcde\nabc</selection>de\n")
   }
 
+  @Test
   fun testVisualCharacterDownMerging() {
     typeTextInFile(injector.parser.parseKeys("v" + "2j" + "j"), "abc${c}de\nab${c}cde\n\nabcde\nabcde\n")
     assertState("abc<selection>de\nabcde\n\nabcde\nab${c}c</selection>de\n")
   }
 
+  @Test
   fun testVisualLineUpMerging() {
     typeTextInFile(injector.parser.parseKeys("V" + "2k" + "k"), "abcde\nabcde\n\nabc${c}de\nab${c}cde\n")
     assertState("<selection>abc${c}de\nabcde\n\nabcde\nabcde\n</selection>")
   }
 
+  @Test
   fun testVisualLineDownMerging() {
     typeTextInFile(injector.parser.parseKeys("V" + "2j" + "j"), "abc${c}de\nab${c}cde\n\nabcde\nabcde\n")
     assertState("<selection>abcde\nabcde\n\nabcde\nab${c}cde\n</selection>")
   }
 
   // com.maddyhome.idea.vim.action.change.change
+  @Test
   fun testAutoIndentLinesVisualAction() {
     configureByJavaText(
       """${c}public class Foo {
@@ -1155,6 +1257,7 @@ y = true; // And this will not
     )
   }
 
+  @Test
   fun testChangeCaseLowerMotionAction() {
     typeTextInFile(
       injector.parser.parseKeys("gu2w"),
@@ -1163,6 +1266,7 @@ y = true; // And this will not
     assertState("O${c}nce this ${c}text will n${c}ot look s${c}o ridiculous\n")
   }
 
+  @Test
   fun testChangeCaseLowerVisualAction() {
     typeTextInFile(
       injector.parser.parseKeys("v2wu"),
@@ -1171,21 +1275,25 @@ y = true; // And this will not
     assertState("O${c}nce this text will n${c}ot look s${c}o ridiculous\n")
   }
 
+  @Test
   fun testChangeCaseToggleCharacterAction() {
     typeTextInFile(injector.parser.parseKeys("5~"), "OnE t${c}Wo ${c}ThReE$c fOuR fIvE\n")
     assertState("OnE twO Th${c}rEe$c FoUr$c fIvE\n")
   }
 
+  @Test
   fun testChangeCaseToggleMotionAction() {
     typeTextInFile(injector.parser.parseKeys("g~e"), "${c}capitalize ${c}UNCAPITALIZE$c ${c}sTaY\n")
     assertState("${c}CAPITALIZE ${c}uncapitalize$c ${c}sTaY\n")
   }
 
+  @Test
   fun testChangeCaseToggleVisualAction() {
     typeTextInFile(injector.parser.parseKeys("ve~"), "${c}capitalize ${c}UNCAPITALIZE\n")
     assertState("${c}CAPITALIZE ${c}uncapitalize\n")
   }
 
+  @Test
   fun testChangeCaseUpperMotionAction() {
     typeTextInFile(
       injector.parser.parseKeys("gU2w"),
@@ -1194,6 +1302,7 @@ y = true; // And this will not
     assertState("O${c}NCE THIS ${c}TEXT WILL ${c}NOT LOOK ${c}SO RIDICULOUS\n")
   }
 
+  @Test
   fun testChangeCaseUpperVisualAction() {
     typeTextInFile(
       injector.parser.parseKeys("v2wU"),
@@ -1202,21 +1311,25 @@ y = true; // And this will not
     assertState("O${c}NCE THIS TEXT WILL N${c}OT LOOK S${c}O RIDICULOUS\n")
   }
 
+  @Test
   fun testChangeCharacterAction() {
     typeTextInFile(injector.parser.parseKeys("rz"), "on${c}e ${c}t${c}w${c}o th${c}r${c}ee")
     assertState("on${c}z ${c}z${c}z${c}z th${c}z${c}ze")
   }
 
+  @Test
   fun testChangeCharacterActionWithCount() {
     typeTextInFile(injector.parser.parseKeys("2rz"), "on${c}e ${c}t${c}w${c}o th${c}r${c}ee")
     assertState("on${c}zz${c}z${c}z${c}zzth${c}z${c}zz")
   }
 
+  @Test
   fun testChangeCharactersAction() {
     typeTextInFile(injector.parser.parseKeys("4s" + "<ESC>"), "on${c}e two ${c}th${c}ee four five\n")
     assertState("o${c}no$c r five\n")
   }
 
+  @Test
   fun testChangeEndOfLineAction() {
     typeTextInFile(
       injector.parser.parseKeys("Cabc" + "<ESC>"),
@@ -1241,6 +1354,7 @@ y = true; // And this will not
     )
   }
 
+  @Test
   fun testChangeLineAction() {
     typeTextInFile(
       injector.parser.parseKeys("c2ca" + "<ESC>"),
@@ -1263,6 +1377,7 @@ y = true; // And this will not
     )
   }
 
+  @Test
   fun testOneCaretPositionAfterChangeLineAction() {
     typeTextInFile(
       injector.parser.parseKeys("c2c" + "<ESC>"),
@@ -1284,6 +1399,7 @@ y = true; // And this will not
     )
   }
 
+  @Test
   fun testCaretPositionAfterChangeLineAction() {
     typeTextInFile(
       injector.parser.parseKeys("c2c" + "<ESC>"),
@@ -1311,6 +1427,7 @@ y = true; // And this will not
     )
   }
 
+  @Test
   fun testChangeMotionAction() {
     typeTextInFile(
       injector.parser.parseKeys("ciw" + "correct" + "<ESC>"),
@@ -1319,16 +1436,19 @@ y = true; // And this will not
     assertState("correct correct correc${c}t correc${c}t correct\n")
   }
 
+  @Test
   fun testChangeNumberIncAction() {
     typeTextInFile(injector.parser.parseKeys("<C-A>"), "1${c}7${c}7 2${c}38 ${c}999\n")
     assertState("17${c}9 23${c}9 100${c}0\n")
   }
 
+  @Test
   fun testChangeNumberDecAction() {
     typeTextInFile(injector.parser.parseKeys("<C-X>"), "1${c}8${c}1 2${c}40 ${c}1001\n")
     assertState("17${c}9 23${c}9 100${c}0\n")
   }
 
+  @Test
   fun testChangeReplaceAction() {
     typeTextInFile(
       injector.parser.parseKeys("Rz" + "<ESC>"),
@@ -1337,6 +1457,7 @@ y = true; // And this will not
     assertState("on${c}z ${c}z${c}z${c}z th${c}z${c}ze")
   }
 
+  @Test
   fun testChangeReplaceActionWithSeveralCharacters() {
     val before = """
             ${c}qwe
@@ -1352,11 +1473,13 @@ y = true; // And this will not
     assertState(after)
   }
 
+  @Test
   fun testChangeVisualCharacterAction() {
     typeTextInFile(injector.parser.parseKeys("v2lra"), "abcd${c}ffffff${c}abcde${c}aaaa\n")
     assertState("abcdaa${c}afffaa${c}adeaa${c}aa\n")
   }
 
+  @Test
   fun testChangeVisualLinesAction() {
     typeTextInFile(
       injector.parser.parseKeys("VjS" + "abcde" + "<ESC>"),
@@ -1379,6 +1502,7 @@ y = true; // And this will not
     )
   }
 
+  @Test
   fun testChangeVisualLinesEndAction() {
     typeTextInFile(
       injector.parser.parseKeys("vjC" + "abcde" + "<ESC>"),
@@ -1402,6 +1526,7 @@ y = true; // And this will not
   }
 
   // com.maddyhome.idea.vim.action.change.delete
+  @Test
   fun testDeleteCharacterAction() {
     typeTextInFile(
       injector.parser.parseKeys("<Del>"),
@@ -1422,11 +1547,13 @@ y = true; // And this will not
     )
   }
 
+  @Test
   fun testDeleteCharacterActionOrder() {
     typeTextInFile(injector.parser.parseKeys("<Del>"), "ab${c}c${c}d${c}e abcde\n")
     assertState("ab$c abcde\n")
   }
 
+  @Test
   fun testDeleteCharacterLeftAction() {
     typeTextInFile(
       injector.parser.parseKeys("3X"),
@@ -1447,11 +1574,13 @@ y = true; // And this will not
     )
   }
 
+  @Test
   fun testDeleteCharacterLeftCaretMerging() {
     typeTextInFile(injector.parser.parseKeys("3X"), "a${c}bc${c}def${c}ghij${c}klmn${c}op${c}q")
     assertState("gq")
   }
 
+  @Test
   fun testDeleteCharacterRightAction() {
     typeTextInFile(
       injector.parser.parseKeys("3x"),
@@ -1472,11 +1601,13 @@ y = true; // And this will not
     )
   }
 
+  @Test
   fun testDeleteCharacterRightCaretMerging() {
     typeTextInFile(injector.parser.parseKeys("4x"), "o${c}ne ${c}two ${c}three four")
     assertState("o$c four")
   }
 
+  @Test
   fun testDeleteEndOfLineAction() {
     typeTextInFile(
       injector.parser.parseKeys("D"),
@@ -1503,6 +1634,7 @@ y = true; // And this will not
     )
   }
 
+  @Test
   fun testDeleteEndOfLineActionWithCount() {
     typeTextInFile(
       injector.parser.parseKeys("3D"),
@@ -1524,6 +1656,7 @@ y = true; // And this will not
     )
   }
 
+  @Test
   fun testDeleteJoinLinesAction() {
     typeTextInFile(
       injector.parser.parseKeys("gJ"),
@@ -1546,6 +1679,7 @@ abc${c}de
     )
   }
 
+  @Test
   fun testDeleteJoinLinesSimpleAction() {
     typeTextInFile(
       injector.parser.parseKeys("gJ"),
@@ -1558,6 +1692,7 @@ abc${c}de
     assertState("abcde${c}abcde\n")
   }
 
+  @Test
   fun testDeleteJoinLinesSpacesAction() {
     typeTextInFile(
       injector.parser.parseKeys("J"),
@@ -1580,6 +1715,7 @@ abc${c}de
     )
   }
 
+  @Test
   fun testDeleteJoinVisualLinesAction() {
     typeTextInFile(
       injector.parser.parseKeys("VkgJ"),
@@ -1600,6 +1736,7 @@ abc${c}de
     )
   }
 
+  @Test
   fun testDeleteJoinVisualLinesSpacesAction() {
     typeTextInFile(
       injector.parser.parseKeys("VkJ"),
@@ -1620,6 +1757,7 @@ abc${c}de
     )
   }
 
+  @Test
   fun testDeleteVisualAction() {
     typeTextInFile(
       injector.parser.parseKeys("vlj"),
@@ -1644,6 +1782,7 @@ abc${c}de
     assertState("abc${c}c\n")
   }
 
+  @Test
   fun testDeleteVisualActionWithMultipleCaretsLeft() {
     typeTextInFile(
       injector.parser.parseKeys("v" + "fd" + "d"),
@@ -1666,6 +1805,7 @@ abc${c}de
     )
   }
 
+  @Test
   fun testDeleteVisualLinesAction() {
     typeTextInFile(
       injector.parser.parseKeys("Vjd"),
@@ -1682,21 +1822,25 @@ abc${c}de
   }
 
   // com.maddyhome.idea.vim.action.change.insert
+  @Test
   fun testInsertEscape() {
     typeTextInFile(injector.parser.parseKeys("i" + "<ESC>" + "i" + "<ESC>"), "on${c}e tw${c}o th${c}ree")
     assertState("${c}one ${c}two ${c}three")
   }
 
+  @Test
   fun testInsertAfterCursorActionMovement() {
     typeTextInFile(injector.parser.parseKeys("a" + "<ESC>"), "on${c}e two th${c}ree")
     assertState("on${c}e two th${c}ree")
   }
 
+  @Test
   fun testInsertAfterCursorAction() {
     typeTextInFile(injector.parser.parseKeys("a" + "abcd" + "<ESC>"), "on${c}e two th${c}re${c}e")
     assertState("oneabc${c}d two thrabc${c}deeabc${c}d")
   }
 
+  @Test
   fun testInsertBeforeCursorAction() {
     typeTextInFile(
       injector.parser.parseKeys("i" + "four" + "<ESC>"),
@@ -1715,6 +1859,7 @@ abc${c}de
     )
   }
 
+  @Test
   fun testInsertBeforeFirstNonBlankAction() {
     typeTextInFile(
       injector.parser.parseKeys("I" + "four " + "<ESC>"),
@@ -1729,6 +1874,7 @@ $c five six se${c}ven eight
     )
   }
 
+  @Test
   fun testInsertCharacterAboveCursorAction() {
     typeTextInFile(
       injector.parser.parseKeys("a" + "<C-Y>" + "<C-Y>" + "<C-Y>" + "<ESC>"),
@@ -1747,6 +1893,7 @@ four three two on${c}e
     )
   }
 
+  @Test
   fun testInsertCharacterBelowCursorAction() {
     typeTextInFile(
       injector.parser.parseKeys("a" + "<C-E>" + "<C-E>" + "<C-E>" + "<ESC>"),
@@ -1765,11 +1912,13 @@ four three two one
     )
   }
 
+  @Test
   fun testInsertDeleteInsertedTextAction() {
     typeTextInFile(injector.parser.parseKeys("a" + "asdf" + "<C-U>" + "<ESC>"), "on${c}e two th${c}ree")
     assertState("on${c}e two th${c}ree")
   }
 
+  @Test
   fun testInsertEnterAction() {
     typeTextInFile(injector.parser.parseKeys("i" + "<C-M>" + "<ESC>"), "one${c}two${c}three${c}four\n")
     assertState(
@@ -1783,6 +1932,7 @@ four three two one
     )
   }
 
+  @Test
   fun testInsertLineStartAction() {
     typeTextInFile(
       injector.parser.parseKeys("gI" + "four " + "<ESC>"),
@@ -1799,6 +1949,7 @@ $c five six se${c}ven eight
     )
   }
 
+  @Test
   fun testInsertNewLineAboveAction() {
     typeTextInFile(
       injector.parser.parseKeys("O" + "abcde" + "<ESC>"),
@@ -1825,6 +1976,7 @@ $c five six se${c}ven eight
   }
 
   @VimBehaviorDiffers(originalVimAfter = "${c}\n${c}\nabcde\n${c}\n${c}\nabcde\n")
+  @Test
   fun testInsertNewLineAboveActionWithMultipleCaretsInLine() {
     typeTextInFile(
       injector.parser.parseKeys("O" + "<ESC>"),
@@ -1837,6 +1989,7 @@ $c five six se${c}ven eight
     assertState("${c}\nabcde\n${c}\nabcde\n")
   }
 
+  @Test
   fun testInsertNewLineBelowAction() {
     typeTextInFile(
       injector.parser.parseKeys("o" + "abcde" + "<ESC>"),
@@ -1862,6 +2015,7 @@ $c five six se${c}ven eight
     )
   }
 
+  @Test
   fun testInsertSingleCommandAction() {
     typeTextInFile(
       injector.parser.parseKeys("i" + "<C-O>" + "2h" + "<ESC>"),
@@ -1871,6 +2025,7 @@ $c five six se${c}ven eight
   }
 
   // com.maddyhome.idea.vim.action.change.shift
+  @Test
   fun testShiftLeftLinesAction() {
     typeTextInFile(
       injector.parser.parseKeys("2<<"),
@@ -1891,6 +2046,7 @@ abcde
     )
   }
 
+  @Test
   fun testShiftLeftMotionAction() {
     typeTextInFile(
       injector.parser.parseKeys("<j"),
@@ -1911,6 +2067,7 @@ abcde
     )
   }
 
+  @Test
   fun testShiftLeftVisualAction() {
     typeTextInFile(
       injector.parser.parseKeys("Vj<"),
@@ -1931,6 +2088,7 @@ abcde
     )
   }
 
+  @Test
   fun testShiftRightLinesAction() {
     typeTextInFile(
       injector.parser.parseKeys("2>>"),
@@ -1951,6 +2109,7 @@ abcde
     )
   }
 
+  @Test
   fun testShiftRightMotionAction() {
     typeTextInFile(
       injector.parser.parseKeys(">j"),
@@ -1971,6 +2130,7 @@ abcde
     )
   }
 
+  @Test
   fun testShiftRightVisualAction() {
     typeTextInFile(
       injector.parser.parseKeys("Vj>"),
@@ -1991,6 +2151,7 @@ abcde
     )
   }
 
+  @Test
   fun testMotionGoToLineFirst() {
     typeTextInFile(
       injector.parser.parseKeys("i" + "<C-Home>"),
@@ -2005,6 +2166,7 @@ abcde
     )
   }
 
+  @Test
   fun testMotionGotoLineLastEnd() {
     typeTextInFile(
       injector.parser.parseKeys("<C-End>"),
@@ -2023,6 +2185,7 @@ $c""",
     )
   }
 
+  @Test
   fun testMotionGotoLineLastEndInsertMode() {
     typeTextInFile(
       injector.parser.parseKeys("i" + "<C-End>"),
@@ -2042,6 +2205,7 @@ $c""",
   }
 
   @TestFor(classes = [SearchWholeWordForwardAction::class])
+  @Test
   fun testSearchWholeWordForwardAction() {
     typeTextInFile(
       injector.parser.parseKeys("2*"),
@@ -2050,6 +2214,7 @@ $c""",
     assertState("qwe asd zxc qwe asd zxc ${c}qwe ${c}asd zxc qwe asd zxc qwe asd zxc ")
   }
 
+  @Test
   fun testSearchWholeWordBackwardAction() {
     typeTextInFile(
       injector.parser.parseKeys("2#"),
@@ -2058,6 +2223,7 @@ $c""",
     assertState("${c}qwe ${c}asd zxc qwe asd zxc qwe asd zxc qwe asd zxc qwe asd zxc ")
   }
 
+  @Test
   fun testMotionPercentOrMatchAction() {
     typeTextInFile(
       injector.parser.parseKeys("%"),
@@ -2066,6 +2232,7 @@ $c""",
     assertState("fdgkhsjh thsth[ sdk er{$c}gha reghrjae (ghoefgh kjfgh$c)sdgfh dgfh$c]")
   }
 
+  @Test
   fun testMotionGotoLineLastAction() {
     typeTextInFile(
       injector.parser.parseKeys("G"),
@@ -2088,6 +2255,7 @@ $c""",
     )
   }
 
+  @Test
   fun testMotionGotoLineLastWithArgumentAction() {
     typeTextInFile(
       injector.parser.parseKeys("1G"),
@@ -2110,6 +2278,7 @@ $c""",
     )
   }
 
+  @Test
   fun testInsertAtPreviousInsert() {
     val before = """qw${c}e
   a${c}s${c}d
@@ -2121,6 +2290,7 @@ rtyfg${c}hzxc"""
     assertState(after)
   }
 
+  @Test
   fun testAutoIndentRange() {
     val before = "cl${c}ass C {\n C(int i) {\nmy${c}I = i;\n}\n private int myI;\n}"
     configureByJavaText(before)
@@ -2134,6 +2304,7 @@ rtyfg${c}hzxc"""
     assertState(after)
   }
 
+  @Test
   fun testAutoIndentMotion() {
     val before = "cl${c}ass C {\n C(int i) {\nmy${c}I = i;\n}\n private int myI;\n}"
     configureByJavaText(before)
@@ -2147,6 +2318,7 @@ rtyfg${c}hzxc"""
     assertState(after)
   }
 
+  @Test
   fun testAutoIndentLines() {
     val before = "class C {\n C$c(int i) {\nmyI = i;\n}\n p${c}rivate int myI;\n}"
     configureByJavaText(before)
@@ -2155,6 +2327,7 @@ rtyfg${c}hzxc"""
     assertState(after)
   }
 
+  @Test
   fun testPutTextBeforeCursor() {
     val before = "${c}qwe asd ${c}zxc rty ${c}fgh vbn"
     configureByText(before)
@@ -2164,16 +2337,19 @@ rtyfg${c}hzxc"""
     assertState(after)
   }
 
+  @Test
   fun testPutTextBeforeCursorOverlapRange() {
     val before = "${c}q${c}we asd zxc rty ${c}fgh vbn"
     val editor = configureByText(before)
     injector.registerGroup.storeText('*', "fgh")
-    VimPlugin.getRegister().storeText(IjVimEditor(editor), editor.vim.primaryCaret(), TextRange(16, 19), SelectionType.CHARACTER_WISE, false)
+    VimPlugin.getRegister()
+      .storeText(IjVimEditor(editor), editor.vim.primaryCaret(), TextRange(16, 19), SelectionType.CHARACTER_WISE, false)
     typeText(injector.parser.parseKeys("\"*P"))
     val after = "fg${c}hqfg${c}hwe asd zxc rty fg${c}hfgh vbn"
     assertState(after)
   }
 
+  @Test
   fun testPutTextAfterCursor() {
     val before = "${c}qwe asd ${c}zxc rty ${c}fgh vbn"
     configureByText(before)
@@ -2183,6 +2359,7 @@ rtyfg${c}hzxc"""
     assertState(after)
   }
 
+  @Test
   fun testPutTextAfterCursorOverlapRange() {
     val before = "${c}q${c}we asd zxc rty ${c}fgh vbn"
     configureByText(before)
@@ -2192,6 +2369,7 @@ rtyfg${c}hzxc"""
     assertState(after)
   }
 
+  @Test
   fun testPutTextBeforeCursorLinewise() {
     val before = """
             q${c}werty
@@ -2214,6 +2392,7 @@ rtyfg${c}hzxc"""
     assertState(after)
   }
 
+  @Test
   fun testPutTextBeforeCursorLinewiseOverlapRange() {
     // Non-ide insert will produce double "${c}zxcvbn\n"
     testPutOverlapLine(
@@ -2272,6 +2451,7 @@ rtyfg${c}hzxc"""
     )
   }
 
+  @Test
   fun testPutTextAfterCursorLinewiseOverlapRange() {
     // Non-ide insert will produce double "${c}zxcvbn\n"
     testPutOverlapLine(
@@ -2337,6 +2517,7 @@ rtyfg${c}hzxc"""
     assertState(after)
   }
 
+  @Test
   fun testPutTextAfterCursorLinewise() {
     val before = """
             q${c}werty
@@ -2359,6 +2540,7 @@ rtyfg${c}hzxc"""
     assertState(after)
   }
 
+  @Test
   fun testPutTextBeforeCursorMoveCursor() {
     val before = "qw${c}e asd z${c}xc rty ${c}fgh vbn"
     configureByText(before)
@@ -2368,6 +2550,7 @@ rtyfg${c}hzxc"""
     assertState(after)
   }
 
+  @Test
   fun testPutTextAfterCursorMoveCursor() {
     val before = "qw${c}e asd z${c}xc rty ${c}fgh vbn"
     configureByText(before)
@@ -2377,6 +2560,7 @@ rtyfg${c}hzxc"""
     assertState(after)
   }
 
+  @Test
   fun testPutTextBeforeCursorMoveCursorLinewise() {
     val before = """
             qwert${c}y
@@ -2399,6 +2583,7 @@ rtyfg${c}hzxc"""
     assertState(after)
   }
 
+  @Test
   fun testPutTextAfterCursorMoveCursorLinewise() {
     val before = """
             qwert${c}y
@@ -2421,6 +2606,7 @@ rtyfg${c}hzxc"""
     assertState(after)
   }
 
+  @Test
   fun testPutTextBeforeCursorWithIndention() {
     val before = """class C {
     C(int i) {
@@ -2451,6 +2637,7 @@ rtyfg${c}hzxc"""
     assertState(after)
   }
 
+  @Test
   fun testPutTextAfterCursorWithIndention() {
     val before = """class C {
     C(int i) {
@@ -2481,6 +2668,7 @@ rtyfg${c}hzxc"""
     assertState(after)
   }
 
+  @Test
   fun testPutTextBeforeCursorBlockwise() {
     val before = """ *$c on${c}e
  * two
@@ -2494,6 +2682,7 @@ rtyfg${c}hzxc"""
     assertState(after)
   }
 
+  @Test
   fun testPutTextAfterCursorBlockwise() {
     val before = """ *$c on${c}e
  * two
@@ -2507,6 +2696,7 @@ rtyfg${c}hzxc"""
     assertState(after)
   }
 
+  @Test
   fun testPutLinewiseWithoutLineSeparatorAtTheEndOfFile() {
     val before = """
       qwe
@@ -2534,19 +2724,21 @@ rtyfg${c}hzxc"""
     assertState(after)
   }
 
+  @Test
   fun testYankMotion() {
     val before = "qwe ${c}asd ${c}zxc"
     configureByText(before)
     typeText(injector.parser.parseKeys("ye"))
     val lastRegister = VimPlugin.getRegister().lastRegister
-    assertNotNull(lastRegister)
+    assertNotNull<Any>(lastRegister)
     val text = lastRegister!!.text
-    assertNotNull(text)
+    assertNotNull<Any>(text)
     typeText(injector.parser.parseKeys("P"))
     val after = "qwe as${c}dasd zx${c}czxc"
     assertState(after)
   }
 
+  @Test
   fun testYankMotionLineWise() {
     val before = """
             ${c}qwe
@@ -2560,9 +2752,9 @@ rtyfg${c}hzxc"""
     configureByText(before)
     typeText(injector.parser.parseKeys("yj"))
     val lastRegister = VimPlugin.getRegister().lastRegister
-    assertNotNull(lastRegister)
+    assertNotNull<Any>(lastRegister)
     val text = lastRegister!!.text
-    assertNotNull(text)
+    assertNotNull<Any>(text)
     typeText(injector.parser.parseKeys("P"))
     val after = """
             ${c}qwe
@@ -2580,6 +2772,7 @@ rtyfg${c}hzxc"""
     assertState(after)
   }
 
+  @Test
   fun testYankLine() {
     val before = """
             ${c}qwe
@@ -2593,9 +2786,9 @@ rtyfg${c}hzxc"""
     configureByText(before)
     typeText(injector.parser.parseKeys("2yy"))
     val lastRegister = VimPlugin.getRegister().lastRegister
-    assertNotNull(lastRegister)
+    assertNotNull<Any>(lastRegister)
     val text = lastRegister!!.text
-    assertNotNull(text)
+    assertNotNull<Any>(text)
     typeText(injector.parser.parseKeys("j" + "p"))
     val after = """
             qwe
@@ -2613,6 +2806,7 @@ rtyfg${c}hzxc"""
     assertState(after)
   }
 
+  @Test
   fun `test multicaret with change`() {
     val before = """
             ${c}qwe
@@ -2638,6 +2832,7 @@ rtyfg${c}hzxc"""
   }
 
   // VIM-2703
+  @Test
   fun `test multicaret with unnamed clipboard`() {
     val before = """
             attach${c}Download(null)
@@ -2662,6 +2857,7 @@ rtyfg${c}hzxc"""
   }
 
   // VIM-2804
+  @Test
   fun `test multicaret with unnamed clipboard2`() {
     val before = """
             attachDownload(${c}0)

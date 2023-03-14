@@ -11,10 +11,12 @@ package org.jetbrains.plugins.ideavim.ex.implementation.functions
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class FuncrefTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test funcref for built-in function`() {
     configureByText("\n")
     typeText(commandToKeys("let Ff = funcref('abs')"))
@@ -22,6 +24,7 @@ class FuncrefTest : VimTestCase() {
     assertPluginErrorMessageContains("E700: Unknown function: abs")
   }
 
+  @Test
   fun `test funcref with arglist`() {
     configureByText("\n")
     typeText(
@@ -44,6 +47,7 @@ class FuncrefTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test funcref for unknown function`() {
     configureByText("\n")
     typeText(commandToKeys("let Ff = funcref('Unknown')"))
@@ -52,6 +56,7 @@ class FuncrefTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test funcref with wrong function name`() {
     configureByText("\n")
     typeText(commandToKeys("let Ff = funcref(32)"))
@@ -60,6 +65,7 @@ class FuncrefTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test funcref with wrong second argument`() {
     configureByText("\n")
     typeText(
@@ -79,6 +85,7 @@ class FuncrefTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test funcref with wrong third argument`() {
     configureByText("\n")
     typeText(
@@ -97,6 +104,7 @@ class FuncrefTest : VimTestCase() {
     typeText(commandToKeys("delfunction! Abs"))
   }
 
+  @Test
   fun `test redefining a function`() {
     configureByText("\n")
     typeText(
@@ -128,6 +136,7 @@ class FuncrefTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test deleting function`() {
     configureByText("\n")
     typeText(

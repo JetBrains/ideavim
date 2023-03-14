@@ -7,16 +7,22 @@
  */
 package org.jetbrains.plugins.ideavim.option
 
+import com.intellij.testFramework.UsefulTestCase.assertDoesntContain
 import com.maddyhome.idea.vim.helper.CharacterHelper
 import com.maddyhome.idea.vim.helper.CharacterHelper.charType
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.helpers.KeywordOptionHelper.parseValues
 import com.maddyhome.idea.vim.options.helpers.KeywordOptionHelper.toRegex
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInfo
+import kotlin.test.assertSame
 
 class KeywordOptionTest : VimTestCase() {
-  override fun setUp() {
-    super.setUp()
+  @BeforeEach
+  override fun setUp(testInfo: TestInfo) {
+    super.setUp(testInfo)
     configureByText("\n")
   }
 
@@ -37,42 +43,50 @@ class KeywordOptionTest : VimTestCase() {
     assertSame(CharacterHelper.CharacterType.PUNCTUATION, charType)
   }
 
+  @Test
   fun testSingleCommaIsAValue() {
     setKeyword(",")
-    assertEquals(",", values!![0])
+    kotlin.test.assertEquals(",", values!![0])
   }
 
+  @Test
   fun testSingleCommaIsAValueAsAppend() {
     enterCommand("set iskeyword^=,")
-    assertTrue(values!!.contains(","))
+    kotlin.test.assertTrue(values!!.contains(","))
   }
 
+  @Test
   fun testSingleNegatedCommaIsAValue() {
     setKeyword("^,")
-    assertEquals("^,", values!![0])
+    kotlin.test.assertEquals("^,", values!![0])
   }
 
+  @Test
   fun testCommaInARangeIsAValue() {
     setKeyword("+-,")
-    assertEquals("+-,", values!![0])
+    kotlin.test.assertEquals("+-,", values!![0])
   }
 
+  @Test
   fun testSecondCommaIsASeparator() {
     setKeyword(",,a")
-    assertEquals(",", values!![0])
-    assertEquals("a", values!![1])
+    kotlin.test.assertEquals(",", values!![0])
+    kotlin.test.assertEquals("a", values!![1])
   }
 
+  @Test
   fun testSingleHyphenIsAValue() {
     setKeyword("-")
-    assertEquals("-", values!![0])
+    kotlin.test.assertEquals("-", values!![0])
   }
 
+  @Test
   fun testHyphenBetweenCharNumsIsARange() {
     setKeyword("a-b")
-    assertEquals("a-b", values!![0])
+    kotlin.test.assertEquals("a-b", values!![0])
   }
 
+  @Test
   fun testRangeInWhichLeftValueIsHigherThanRightValueIsInvalid() {
     setKeyword("b-a")
     assertPluginError(true)
@@ -87,6 +101,7 @@ class KeywordOptionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun testTwoAdjacentLettersAreInvalid() {
     setKeyword("ab")
     assertPluginError(true)
@@ -101,16 +116,19 @@ class KeywordOptionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun testAddsACharByChar() {
     setKeyword("-")
     assertIsKeyword('-')
   }
 
+  @Test
   fun testAddsACharByUnicodeCodePoint() {
     setKeyword("" + '-'.code)
     assertIsKeyword('-')
   }
 
+  @Test
   fun testAddsARange() {
     setKeyword("a-c")
     assertIsKeyword('a')
@@ -118,23 +136,27 @@ class KeywordOptionTest : VimTestCase() {
     assertIsKeyword('c')
   }
 
+  @Test
   fun testAtSignRepresentsAllLetters() {
     setKeyword("@")
     assertIsKeyword('A')
     assertIsKeyword('Ā')
   }
 
+  @Test
   fun testRangeOfAtSignToAtSignRepresentsAtSign() {
     setKeyword("@-@")
     assertIsKeyword('@')
   }
 
+  @Test
   fun testCaretRemovesAChar() {
     setKeyword("a")
     enterCommand("set iskeyword+=^a")
     assertIsNotKeyword('a')
   }
 
+  @Test
   fun testCaretRemovesARange() {
     setKeyword("a-c")
     enterCommand("set iskeyword+=^b-c,d")
@@ -143,26 +165,30 @@ class KeywordOptionTest : VimTestCase() {
     assertIsNotKeyword('c')
   }
 
+  @Test
   fun testCaretAloneRepresentsACaret() {
     setKeyword("^")
     assertIsKeyword('^')
   }
 
+  @Test
   fun testMultibyteCharactersAreKeywords() {
     assertIsKeyword('Ź')
   }
 
+  @Test
   fun testToRegex() {
     setKeyword("-,a-c")
     val res = toRegex()
-    assertEquals(2, res.size)
-    assertTrue(res.contains("-"))
-    assertTrue(res.contains("[a-c]"))
+    kotlin.test.assertEquals(2, res.size)
+    kotlin.test.assertTrue(res.contains("-"))
+    kotlin.test.assertTrue(res.contains("[a-c]"))
   }
 
+  @Test
   fun testAllLettersToRegex() {
     setKeyword("@")
     val res = toRegex()
-    assertEquals(res[0], "\\p{L}")
+    kotlin.test.assertEquals(res[0], "\\p{L}")
   }
 }

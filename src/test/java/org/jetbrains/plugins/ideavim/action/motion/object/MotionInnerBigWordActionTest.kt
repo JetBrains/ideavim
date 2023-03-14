@@ -10,8 +10,10 @@ package org.jetbrains.plugins.ideavim.action.motion.`object`
 
 import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class MotionInnerBigWordActionTest : VimTestCase() {
+  @Test
   fun `test at last dot`() {
     doTest(
       "diW",

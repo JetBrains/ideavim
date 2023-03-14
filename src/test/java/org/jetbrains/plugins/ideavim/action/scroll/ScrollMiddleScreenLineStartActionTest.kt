@@ -10,6 +10,7 @@ package org.jetbrains.plugins.ideavim.action.scroll
 
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 /*
                                                        *z.*
@@ -18,6 +19,7 @@ z.                      Redraw, line [count] at center of window (default
                         line.
  */
 class ScrollMiddleScreenLineStartActionTest : VimTestCase() {
+  @Test
   fun `test scrolls current line to middle of screen`() {
     configureByPages(5)
     setPositionAndScroll(40, 45)
@@ -26,6 +28,7 @@ class ScrollMiddleScreenLineStartActionTest : VimTestCase() {
     assertVisibleArea(28, 62)
   }
 
+  @Test
   fun `test scrolls current line to middle of screen and moves cursor to first non-blank`() {
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(40, 45, 14)
@@ -34,6 +37,7 @@ class ScrollMiddleScreenLineStartActionTest : VimTestCase() {
     assertVisibleArea(28, 62)
   }
 
+  @Test
   fun `test scrolls count line to the middle of the screen`() {
     configureByPages(5)
     setPositionAndScroll(40, 45)
@@ -42,6 +46,7 @@ class ScrollMiddleScreenLineStartActionTest : VimTestCase() {
     assertVisibleArea(82, 116)
   }
 
+  @Test
   fun `test scrolls count line ignoring scrolljump`() {
     configureByPages(5)
     enterCommand("set scrolljump=10")
@@ -51,6 +56,7 @@ class ScrollMiddleScreenLineStartActionTest : VimTestCase() {
     assertVisibleArea(82, 116)
   }
 
+  @Test
   fun `test scrolls correctly when count line is in first half of first page`() {
     configureByPages(5)
     setPositionAndScroll(40, 45)
@@ -60,6 +66,7 @@ class ScrollMiddleScreenLineStartActionTest : VimTestCase() {
   }
 
   @VimBehaviorDiffers(description = "Virtual space at end of file")
+  @Test
   fun `test scrolls last line of file correctly`() {
     configureByPages(5)
     setPositionAndScroll(0, 0)

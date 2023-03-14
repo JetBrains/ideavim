@@ -15,13 +15,15 @@ import com.maddyhome.idea.vim.newapi.IjVimEditor
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class VimEditorTest : VimTestCase() {
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test delete string`() {
     configureByText("01234567890")
-    val vimEditor = IjVimEditor(myFixture.editor)
-    WriteCommandAction.runWriteCommandAction(myFixture.project) {
+    val vimEditor = IjVimEditor(fixture.editor)
+    WriteCommandAction.runWriteCommandAction(fixture.project) {
       runWriteAction {
         vimEditor.deleteRange(0.offset, 5.offset)
       }

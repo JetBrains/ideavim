@@ -11,8 +11,10 @@ package org.jetbrains.plugins.ideavim.action.copy
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class YankLineActionTest : VimTestCase() {
+  @Test
   fun `test yank to number register`() {
     val before = """
             ${c}I found it in a legendary land
@@ -21,6 +23,6 @@ class YankLineActionTest : VimTestCase() {
     configureByText(before)
     typeText(injector.parser.parseKeys("\"4yy"))
     val register = VimPlugin.getRegister().getRegister('4')!!
-    assertEquals("I found it in a legendary land\n", register.text)
+    kotlin.test.assertEquals("I found it in a legendary land\n", register.text)
   }
 }

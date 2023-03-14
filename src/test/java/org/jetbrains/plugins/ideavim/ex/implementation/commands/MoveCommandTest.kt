@@ -9,9 +9,11 @@
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class MoveCommandTest : VimTestCase() {
 
+  @Test
   fun `test selection marks after moving line up`() {
     configureByText(
       """
@@ -35,6 +37,7 @@ class MoveCommandTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test selection marks after moving line down`() {
     configureByText(
       """
@@ -58,6 +61,7 @@ class MoveCommandTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test marks after moving line up`() {
     configureByText(
       """
@@ -81,6 +85,7 @@ class MoveCommandTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test marks after moving line down`() {
     configureByText(
       """
@@ -104,6 +109,7 @@ class MoveCommandTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test moving multiple lines with omitted selection start mark`() {
     configureByText(
       """
@@ -127,6 +133,7 @@ class MoveCommandTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test moving text to first line`() {
     configureByText(
       """
@@ -147,6 +154,7 @@ class MoveCommandTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test moving multiple lines to text start`() {
     configureByText(
       """
@@ -167,6 +175,7 @@ class MoveCommandTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test moving last line does not create empty line`() {
     configureByText(
       """
@@ -187,6 +196,7 @@ class MoveCommandTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test moving line to file end does not create empty line`() {
     configureByText(
       """

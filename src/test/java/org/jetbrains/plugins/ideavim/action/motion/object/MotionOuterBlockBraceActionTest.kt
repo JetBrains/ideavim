@@ -10,8 +10,10 @@ package org.jetbrains.plugins.ideavim.action.motion.`object`
 
 import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class MotionOuterBlockBraceActionTest : VimTestCase() {
+  @Test
   fun testOutside() {
     typeTextInFile(
       injector.parser.parseKeys("di}"),
@@ -20,6 +22,7 @@ class MotionOuterBlockBraceActionTest : VimTestCase() {
     assertState("foo{}\n")
   }
 
+  @Test
   fun testOutsideInString() {
     typeTextInFile(
       injector.parser.parseKeys("di}"),
@@ -28,6 +31,7 @@ class MotionOuterBlockBraceActionTest : VimTestCase() {
     assertState("\"123\"foo{}\n")
   }
 
+  @Test
   fun testOutsideInString2() {
     typeTextInFile(
       injector.parser.parseKeys("di}"),

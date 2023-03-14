@@ -16,7 +16,7 @@ import com.intellij.remoterobot.stepsProcessing.step
 import com.intellij.remoterobot.utils.keyboard
 import org.assertj.swing.core.MouseButton
 import org.junit.Rule
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import ui.pages.Editor
 import ui.pages.IdeaFrame
 import ui.pages.actionMenu

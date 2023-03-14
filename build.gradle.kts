@@ -118,6 +118,10 @@ dependencies {
     api(project(":vim-engine"))
 
     testApi("com.squareup.okhttp3:okhttp:4.10.0")
+
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
+    testImplementation("org.junit.jupiter:junit-jupiter-engine:5.9.2")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.9.2")
 }
 
 configurations {
@@ -341,6 +345,7 @@ ktlint {
 
 tasks {
     test {
+        useJUnitPlatform()
         exclude("**/propertybased/**")
         exclude("**/longrunning/**")
         exclude("/ui/**")

@@ -9,14 +9,16 @@
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 /**
  * @author Michal Placek
  */
 class BufferCloseCommandTest : VimTestCase() {
+  @Test
   fun `test close file by bd command`() {
-    val psiFile1 = myFixture.configureByText("A_Discovery1", "I found it in a legendary land")
-    val psiFile2 = myFixture.configureByText("A_Discovery2", "all rocks and lavender and tufted grass,")
+    val psiFile1 = fixture.configureByText("A_Discovery1", "I found it in a legendary land")
+    val psiFile2 = fixture.configureByText("A_Discovery2", "all rocks and lavender and tufted grass,")
 
     fileManager.openFile(psiFile1.virtualFile, false)
     fileManager.openFile(psiFile2.virtualFile, true)

@@ -14,8 +14,10 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class ChangeVisualActionTest : VimTestCase() {
+  @Test
   fun `test multiple line change`() {
     val keys = "VjcHello<esc>"
     val before = """
@@ -36,6 +38,7 @@ class ChangeVisualActionTest : VimTestCase() {
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun `test multiple line change in text middle`() {
     val keys = "Vjc"
     val before = """
@@ -66,6 +69,7 @@ class ChangeVisualActionTest : VimTestCase() {
             ${c}
   """,
   )
+  @Test
   fun `test multiple line change till the end`() {
     val keys = "Vjc"
     val before = """
@@ -88,6 +92,7 @@ class ChangeVisualActionTest : VimTestCase() {
     doTest(keys, before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun `test multiple line change till the end with two new lines`() {
     val keys = "Vjc"
     val before = """
@@ -115,6 +120,7 @@ class ChangeVisualActionTest : VimTestCase() {
   }
 
   @VimBehaviorDiffers(description = "Wrong caret position")
+  @Test
   fun `test change with dollar motion`() {
     val keys = listOf("<C-V>3j$", "c", "Hello<Esc>")
     val before = """
@@ -136,6 +142,7 @@ class ChangeVisualActionTest : VimTestCase() {
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun `test replace first line`() {
     val keys = "VcHello<esc>"
     val before = "${c}A Discovery"
@@ -143,6 +150,7 @@ class ChangeVisualActionTest : VimTestCase() {
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun `test change visual action`() {
     typeTextInFile(
       injector.parser.parseKeys("v2lc" + "aaa" + "<ESC>"),
@@ -154,6 +162,7 @@ class ChangeVisualActionTest : VimTestCase() {
 
   // VIM-1379 |CTRL-V| |j| |v_b_c|
   @VimBehaviorDiffers(description = "Different caret position")
+  @Test
   fun `test change visual block with empty line in the middle`() {
     doTest(
       listOf("ll", "<C-V>", "ljjc", "_quux_", "<Esc>"),
@@ -176,6 +185,7 @@ class ChangeVisualActionTest : VimTestCase() {
 
   // VIM-1379 |CTRL-V| |j| |v_b_c|
   @VimBehaviorDiffers(description = "Different caret position")
+  @Test
   fun `test change visual block with shorter line in the middle`() {
     doTest(
       listOf("ll", "<C-V>", "ljjc", "_quux_", "<Esc>"),

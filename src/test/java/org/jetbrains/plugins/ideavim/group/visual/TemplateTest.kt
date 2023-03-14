@@ -37,19 +37,24 @@ import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
 import org.jetbrains.plugins.ideavim.VimTestOption
 import org.jetbrains.plugins.ideavim.assertDoesntChange
 import org.jetbrains.plugins.ideavim.waitAndAssertMode
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInfo
 
 /**
  * @author Alex Plate
  */
 class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
 
-  override fun setUp() {
-    super.setUp()
-    TemplateManagerImpl.setTemplateTesting(myFixture.testRootDisposable)
+  @BeforeEach
+  override fun setUp(testInfo: TestInfo) {
+    super.setUp(testInfo)
+    TemplateManagerImpl.setTemplateTesting(fixture.testRootDisposable)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   @VimOptionDefaultAll
+  @Test
   fun `test simple rename`() {
     configureByJavaText(
       """
@@ -60,7 +65,7 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
             }
       """.trimIndent(),
     )
-    doInlineRename(VariableInplaceRenameHandler(), "myNewVar", myFixture)
+    doInlineRename(VariableInplaceRenameHandler(), "myNewVar", fixture)
     assertState(
       """
             class Hello {
@@ -74,6 +79,7 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
+  @Test
   fun `test type rename`() {
     configureByJavaText(
       """
@@ -85,7 +91,7 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
       """.trimIndent(),
     )
     startRenaming(VariableInplaceRenameHandler())
-    waitAndAssertMode(myFixture, VimStateMachine.Mode.SELECT)
+    waitAndAssertMode(fixture, VimStateMachine.Mode.SELECT)
     assertState(VimStateMachine.Mode.SELECT, VimStateMachine.SubMode.VISUAL_CHARACTER)
 
     typeText(injector.parser.parseKeys("myNewVar" + "<CR>"))
@@ -104,6 +110,7 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
+  @Test
   fun `test selectmode without template`() {
     configureByJavaText(
       """
@@ -116,7 +123,7 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
     )
     enterCommand("set idearefactormode=visual")
     startRenaming(VariableInplaceRenameHandler())
-    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
+    waitAndAssertMode(fixture, VimStateMachine.Mode.VISUAL)
     assertState(VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER)
     // Disable template
     typeText(injector.parser.parseKeys("<CR>"))
@@ -124,6 +131,7 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
+  @Test
   fun `test prepend`() {
     configureByJavaText(
       """
@@ -135,10 +143,10 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
       """.trimIndent(),
     )
     startRenaming(VariableInplaceRenameHandler())
-    waitAndAssertMode(myFixture, VimStateMachine.Mode.SELECT)
+    waitAndAssertMode(fixture, VimStateMachine.Mode.SELECT)
     assertState(VimStateMachine.Mode.SELECT, VimStateMachine.SubMode.VISUAL_CHARACTER)
 
-    LookupManager.hideActiveLookup(myFixture.project)
+    LookupManager.hideActiveLookup(fixture.project)
     typeText(injector.parser.parseKeys("<Left>"))
     assertState(VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
     typeText(injector.parser.parseKeys("pre" + "<CR>"))
@@ -157,6 +165,7 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
+  @Test
   fun `test motion right`() {
     configureByJavaText(
       """
@@ -168,10 +177,10 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
       """.trimIndent(),
     )
     startRenaming(VariableInplaceRenameHandler())
-    waitAndAssertMode(myFixture, VimStateMachine.Mode.SELECT)
+    waitAndAssertMode(fixture, VimStateMachine.Mode.SELECT)
     assertState(VimStateMachine.Mode.SELECT, VimStateMachine.SubMode.VISUAL_CHARACTER)
 
-    LookupManager.hideActiveLookup(myFixture.project)
+    LookupManager.hideActiveLookup(fixture.project)
     typeText(injector.parser.parseKeys("<Right>"))
     assertState(VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
     assertState(
@@ -187,6 +196,7 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
+  @Test
   fun `test motion left on age`() {
     configureByJavaText(
       """
@@ -198,10 +208,10 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
       """.trimIndent(),
     )
     startRenaming(VariableInplaceRenameHandler())
-    waitAndAssertMode(myFixture, VimStateMachine.Mode.SELECT)
+    waitAndAssertMode(fixture, VimStateMachine.Mode.SELECT)
     assertState(VimStateMachine.Mode.SELECT, VimStateMachine.SubMode.VISUAL_CHARACTER)
 
-    LookupManager.hideActiveLookup(myFixture.project)
+    LookupManager.hideActiveLookup(fixture.project)
     typeText(injector.parser.parseKeys("<Left>"))
     assertState(VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
     assertState(
@@ -217,6 +227,7 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
+  @Test
   fun `test motion right on age`() {
     configureByJavaText(
       """
@@ -228,10 +239,10 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
       """.trimIndent(),
     )
     startRenaming(VariableInplaceRenameHandler())
-    waitAndAssertMode(myFixture, VimStateMachine.Mode.SELECT)
+    waitAndAssertMode(fixture, VimStateMachine.Mode.SELECT)
     assertState(VimStateMachine.Mode.SELECT, VimStateMachine.SubMode.VISUAL_CHARACTER)
 
-    LookupManager.hideActiveLookup(myFixture.project)
+    LookupManager.hideActiveLookup(fixture.project)
     typeText(injector.parser.parseKeys("<Right>"))
     assertState(VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
     assertState(
@@ -247,6 +258,7 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
+  @Test
   fun `test escape`() {
     configureByJavaText(
       """
@@ -258,7 +270,7 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
       """.trimIndent(),
     )
     startRenaming(VariableInplaceRenameHandler())
-    waitAndAssertMode(myFixture, VimStateMachine.Mode.SELECT)
+    waitAndAssertMode(fixture, VimStateMachine.Mode.SELECT)
     assertState(VimStateMachine.Mode.SELECT, VimStateMachine.SubMode.VISUAL_CHARACTER)
 
     typeText(injector.parser.parseKeys("<ESC>"))
@@ -277,6 +289,7 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
+  @Test
   fun `test escape after typing`() {
     configureByJavaText(
       """
@@ -288,7 +301,7 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
       """.trimIndent(),
     )
     startRenaming(VariableInplaceRenameHandler())
-    waitAndAssertMode(myFixture, VimStateMachine.Mode.SELECT)
+    waitAndAssertMode(fixture, VimStateMachine.Mode.SELECT)
     assertState(VimStateMachine.Mode.SELECT, VimStateMachine.SubMode.VISUAL_CHARACTER)
 
     typeText(injector.parser.parseKeys("Hello" + "<ESC>"))
@@ -305,8 +318,15 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
     )
   }
 
-  @VimOptionTestConfiguration(VimTestOption(IjOptionConstants.idearefactormode, OptionValueType.STRING, IjOptionConstants.idearefactormode_keep))
+  @VimOptionTestConfiguration(
+    VimTestOption(
+      IjOptionConstants.idearefactormode,
+      OptionValueType.STRING,
+      IjOptionConstants.idearefactormode_keep
+    )
+  )
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
+  @Test
   fun `test template in normal mode`() {
     configureByJavaText(
       """
@@ -318,11 +338,18 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
       """.trimIndent(),
     )
     startRenaming(VariableInplaceRenameHandler())
-    assertDoesntChange { myFixture.editor.inNormalMode }
+    assertDoesntChange { fixture.editor.inNormalMode }
   }
 
-  @VimOptionTestConfiguration(VimTestOption(IjOptionConstants.idearefactormode, OptionValueType.STRING, IjOptionConstants.idearefactormode_keep))
+  @VimOptionTestConfiguration(
+    VimTestOption(
+      IjOptionConstants.idearefactormode,
+      OptionValueType.STRING,
+      IjOptionConstants.idearefactormode_keep
+    )
+  )
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
+  @Test
   fun `test save mode for insert mode`() {
     configureByJavaText(
       """
@@ -335,11 +362,18 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
     )
     typeText(injector.parser.parseKeys("i"))
     startRenaming(VariableInplaceRenameHandler())
-    assertDoesntChange { myFixture.editor.inInsertMode }
+    assertDoesntChange { fixture.editor.inInsertMode }
   }
 
-  @VimOptionTestConfiguration(VimTestOption(IjOptionConstants.idearefactormode, OptionValueType.STRING, IjOptionConstants.idearefactormode_keep))
+  @VimOptionTestConfiguration(
+    VimTestOption(
+      IjOptionConstants.idearefactormode,
+      OptionValueType.STRING,
+      IjOptionConstants.idearefactormode_keep
+    )
+  )
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
+  @Test
   fun `test save mode for visual mode`() {
     configureByJavaText(
       """
@@ -352,11 +386,18 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
     )
     typeText(injector.parser.parseKeys("vll"))
     startRenaming(VariableInplaceRenameHandler())
-    assertDoesntChange { myFixture.editor.inVisualMode }
+    assertDoesntChange { fixture.editor.inVisualMode }
   }
 
-  @VimOptionTestConfiguration(VimTestOption(IjOptionConstants.idearefactormode, OptionValueType.STRING, IjOptionConstants.idearefactormode_select))
+  @VimOptionTestConfiguration(
+    VimTestOption(
+      IjOptionConstants.idearefactormode,
+      OptionValueType.STRING,
+      IjOptionConstants.idearefactormode_select
+    )
+  )
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
+  @Test
   fun `test template to select in normal mode`() {
     configureByJavaText(
       """
@@ -368,11 +409,18 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
       """.trimIndent(),
     )
     startRenaming(VariableInplaceRenameHandler())
-    waitAndAssertMode(myFixture, VimStateMachine.Mode.SELECT)
+    waitAndAssertMode(fixture, VimStateMachine.Mode.SELECT)
   }
 
-  @VimOptionTestConfiguration(VimTestOption(IjOptionConstants.idearefactormode, OptionValueType.STRING, IjOptionConstants.idearefactormode_select))
+  @VimOptionTestConfiguration(
+    VimTestOption(
+      IjOptionConstants.idearefactormode,
+      OptionValueType.STRING,
+      IjOptionConstants.idearefactormode_select
+    )
+  )
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
+  @Test
   fun `test template to select in insert mode`() {
     configureByJavaText(
       """
@@ -385,11 +433,18 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
     )
     typeText(injector.parser.parseKeys("i"))
     startRenaming(VariableInplaceRenameHandler())
-    waitAndAssertMode(myFixture, VimStateMachine.Mode.SELECT)
+    waitAndAssertMode(fixture, VimStateMachine.Mode.SELECT)
   }
 
-  @VimOptionTestConfiguration(VimTestOption(IjOptionConstants.idearefactormode, OptionValueType.STRING, IjOptionConstants.idearefactormode_select))
+  @VimOptionTestConfiguration(
+    VimTestOption(
+      IjOptionConstants.idearefactormode,
+      OptionValueType.STRING,
+      IjOptionConstants.idearefactormode_select
+    )
+  )
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
+  @Test
   fun `test template to select in visual mode`() {
     configureByJavaText(
       """
@@ -402,11 +457,18 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
     )
     typeText(injector.parser.parseKeys("vll"))
     startRenaming(VariableInplaceRenameHandler())
-    assertDoesntChange { myFixture.editor.inVisualMode }
+    assertDoesntChange { fixture.editor.inVisualMode }
   }
 
-  @VimOptionTestConfiguration(VimTestOption(IjOptionConstants.idearefactormode, OptionValueType.STRING, IjOptionConstants.idearefactormode_select))
+  @VimOptionTestConfiguration(
+    VimTestOption(
+      IjOptionConstants.idearefactormode,
+      OptionValueType.STRING,
+      IjOptionConstants.idearefactormode_select
+    )
+  )
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
+  @Test
   fun `test template to select in select mode`() {
     configureByJavaText(
       """
@@ -419,11 +481,18 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
     )
     typeText(injector.parser.parseKeys("vll<C-G>"))
     startRenaming(VariableInplaceRenameHandler())
-    assertDoesntChange { myFixture.editor.inSelectMode }
+    assertDoesntChange { fixture.editor.inSelectMode }
   }
 
-  @VimOptionTestConfiguration(VimTestOption(IjOptionConstants.idearefactormode, OptionValueType.STRING, IjOptionConstants.idearefactormode_visual))
+  @VimOptionTestConfiguration(
+    VimTestOption(
+      IjOptionConstants.idearefactormode,
+      OptionValueType.STRING,
+      IjOptionConstants.idearefactormode_visual
+    )
+  )
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
+  @Test
   fun `test template to visual in normal mode`() {
     configureByJavaText(
       """
@@ -435,11 +504,18 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
       """.trimIndent(),
     )
     startRenaming(VariableInplaceRenameHandler())
-    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
+    waitAndAssertMode(fixture, VimStateMachine.Mode.VISUAL)
   }
 
-  @VimOptionTestConfiguration(VimTestOption(IjOptionConstants.idearefactormode, OptionValueType.STRING, IjOptionConstants.idearefactormode_visual))
+  @VimOptionTestConfiguration(
+    VimTestOption(
+      IjOptionConstants.idearefactormode,
+      OptionValueType.STRING,
+      IjOptionConstants.idearefactormode_visual
+    )
+  )
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
+  @Test
   fun `test template to visual in insert mode`() {
     configureByJavaText(
       """
@@ -452,11 +528,18 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
     )
     typeText(injector.parser.parseKeys("i"))
     startRenaming(VariableInplaceRenameHandler())
-    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
+    waitAndAssertMode(fixture, VimStateMachine.Mode.VISUAL)
   }
 
-  @VimOptionTestConfiguration(VimTestOption(IjOptionConstants.idearefactormode, OptionValueType.STRING, IjOptionConstants.idearefactormode_visual))
+  @VimOptionTestConfiguration(
+    VimTestOption(
+      IjOptionConstants.idearefactormode,
+      OptionValueType.STRING,
+      IjOptionConstants.idearefactormode_visual
+    )
+  )
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
+  @Test
   fun `test template to visual in visual mode`() {
     configureByJavaText(
       """
@@ -469,11 +552,18 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
     )
     typeText(injector.parser.parseKeys("vll"))
     startRenaming(VariableInplaceRenameHandler())
-    assertDoesntChange { myFixture.editor.inVisualMode }
+    assertDoesntChange { fixture.editor.inVisualMode }
   }
 
-  @VimOptionTestConfiguration(VimTestOption(IjOptionConstants.idearefactormode, OptionValueType.STRING, IjOptionConstants.idearefactormode_visual))
+  @VimOptionTestConfiguration(
+    VimTestOption(
+      IjOptionConstants.idearefactormode,
+      OptionValueType.STRING,
+      IjOptionConstants.idearefactormode_visual
+    )
+  )
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
+  @Test
   fun `test template to visual in select mode`() {
     configureByJavaText(
       """
@@ -486,19 +576,26 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
     )
     typeText(injector.parser.parseKeys("vll<C-G>"))
     startRenaming(VariableInplaceRenameHandler())
-    assertDoesntChange { myFixture.editor.inSelectMode }
+    assertDoesntChange { fixture.editor.inSelectMode }
   }
 
-  @VimOptionTestConfiguration(VimTestOption(IjOptionConstants.idearefactormode, OptionValueType.STRING, IjOptionConstants.idearefactormode_keep))
+  @VimOptionTestConfiguration(
+    VimTestOption(
+      IjOptionConstants.idearefactormode,
+      OptionValueType.STRING,
+      IjOptionConstants.idearefactormode_keep
+    )
+  )
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
+  @Test
   fun `test template with multiple times`() {
     configureByJavaText(c)
-    val manager = TemplateManager.getInstance(myFixture.project)
+    val manager = TemplateManager.getInstance(fixture.project)
     val template = manager.createTemplate("vn", "user", "\$V1$ var = \$V2$;")
     template.addVariable("V1", "", "\"123\"", true)
     template.addVariable("V2", "", "\"239\"", true)
 
-    manager.startTemplate(myFixture.editor, template)
+    manager.startTemplate(fixture.editor, template)
     PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
 
     assertMode(VimStateMachine.Mode.COMMAND)
@@ -507,11 +604,18 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
     assertMode(VimStateMachine.Mode.COMMAND)
     assertOffset(12)
     typeText(injector.parser.parseKeys("<CR>"))
-    assertNull(TemplateManagerImpl.getTemplateState(myFixture.editor))
+    kotlin.test.assertNull(TemplateManagerImpl.getTemplateState(fixture.editor))
   }
 
-  @VimOptionTestConfiguration(VimTestOption(IjOptionConstants.idearefactormode, OptionValueType.STRING, IjOptionConstants.idearefactormode_keep))
+  @VimOptionTestConfiguration(
+    VimTestOption(
+      IjOptionConstants.idearefactormode,
+      OptionValueType.STRING,
+      IjOptionConstants.idearefactormode_keep
+    )
+  )
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
+  @Test
   fun `test template with lookup`() {
     configureByJavaText(
       """
@@ -523,8 +627,8 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
       """.trimIndent(),
     )
     startRenaming(VariableInplaceRenameHandler())
-    val lookupValue = myFixture.lookupElementStrings?.get(0) ?: kotlin.test.fail()
-    myFixture.finishLookup(Lookup.NORMAL_SELECT_CHAR)
+    val lookupValue = fixture.lookupElementStrings?.get(0) ?: kotlin.test.fail()
+    fixture.finishLookup(Lookup.NORMAL_SELECT_CHAR)
     assertState(
       """
             class Hello {
@@ -537,13 +641,13 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
   }
 
   private fun startRenaming(handler: VariableInplaceRenameHandler): Editor {
-    val editor = if (myFixture.editor is EditorWindow) (myFixture.editor as EditorWindow).delegate else myFixture.editor
+    val editor = if (fixture.editor is EditorWindow) (fixture.editor as EditorWindow).delegate else fixture.editor
     VimListenerManager.EditorListeners.add(editor)
 
-    handler.doRename(myFixture.elementAtCaret, editor, dataContext)
+    handler.doRename(fixture.elementAtCaret, editor, dataContext)
     return editor
   }
 
   private val dataContext
-    get() = DataManager.getInstance().getDataContext(myFixture.editor.component)
+    get() = DataManager.getInstance().getDataContext(fixture.editor.component)
 }

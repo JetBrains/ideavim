@@ -12,8 +12,10 @@ import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class InsertNewLineBelowActionTest : VimTestCase() {
+  @Test
   fun `test insert new line below`() {
     val before = """I found it in a legendary land
         |${c}all rocks and lavender and tufted grass,
@@ -29,6 +31,7 @@ class InsertNewLineBelowActionTest : VimTestCase() {
     doTest("o", before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun `test insert new line below with caret in middle of line`() {
     val before = """I found it in a legendary land
         |all rocks and ${c}lavender and tufted grass,
@@ -44,6 +47,7 @@ class InsertNewLineBelowActionTest : VimTestCase() {
     doTest("o", before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun `test insert new line below matches indent for plain text`() {
     val before = """    I found it in a legendary land
         |    ${c}all rocks and lavender and tufted grass,
@@ -59,6 +63,7 @@ class InsertNewLineBelowActionTest : VimTestCase() {
     doTest("o", before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun `test insert new line below matches indent for plain text 1`() {
     val before = """    I found it in a legendary land
         | $c   all rocks and lavender and tufted grass,
@@ -75,6 +80,7 @@ class InsertNewLineBelowActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN) // Java support would be a neovim plugin
+  @Test
   fun `test insert new line below matches indent for java`() {
     val before = """public class C {
       |  ${c}Integer a;
@@ -93,6 +99,7 @@ class InsertNewLineBelowActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN) // Java support would be a neovim plugin
+  @Test
   fun `test insert new line below matches indent for java 1`() {
     val before = """public class C {
       |$c  Integer a;
@@ -110,6 +117,7 @@ class InsertNewLineBelowActionTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun `test insert new line below with multiple carets`() {
     val before = """    I fou${c}nd it in a legendary land
         |    all rocks and laven${c}der and tufted grass,
@@ -129,6 +137,7 @@ class InsertNewLineBelowActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
   fun `test insert new line below at bottom of screen does not scroll bottom of screen`() {
     configureByLines(50, "I found it in a legendary land")
     enterCommand("set scrolloff=10")
@@ -138,6 +147,7 @@ class InsertNewLineBelowActionTest : VimTestCase() {
     assertVisibleArea(6, 40)
   }
 
+  @Test
   fun `test insert new line below with count`() {
     val before = """I found it in a legendary land
         |${c}all rocks and lavender and tufted grass,
@@ -153,6 +163,7 @@ class InsertNewLineBelowActionTest : VimTestCase() {
     doTest("5o", before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun `test insert new line below with count and escape`() {
     val before = """I found it in a legendary land
         |${c}all rocks and lavender and tufted grass,
@@ -172,6 +183,7 @@ class InsertNewLineBelowActionTest : VimTestCase() {
     doTest("5o123<esc>", before, after)
   }
 
+  @Test
   fun `test insert new line below with folds`() {
     val before = """I found it in a legendary land
         |${c}all rocks [and lavender] and tufted grass,
@@ -191,6 +203,7 @@ class InsertNewLineBelowActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.FOLDING, "Neovim doesn't support arbitrary folds")
+  @Test
   fun `test insert new line below with folds 2`() {
     val before = """I found it in a legendary land
         |${c}all rocks [and lavender and tufted grass,
@@ -209,6 +222,7 @@ class InsertNewLineBelowActionTest : VimTestCase() {
     performTest("o", after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun `test pycharm notebook folders`() {
     val before = """[I found it in a legendary land
         |]${c}all rocks and lavender and tufted grass,

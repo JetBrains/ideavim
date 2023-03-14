@@ -12,13 +12,17 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.TestClipboardModel
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Test
 
 class RegistersCommandTest : VimTestCase() {
+  @AfterEach
   override fun tearDown() {
     super.tearDown()
     TestClipboardModel.clearClipboard()
   }
 
+  @Test
   fun `test list empty registers`() {
     TestClipboardModel.clearClipboard()
     configureByText("")
@@ -26,6 +30,7 @@ class RegistersCommandTest : VimTestCase() {
     assertExOutput("Type Name Content\n")
   }
 
+  @Test
   fun `test argument filters output`() {
     configureByText("")
 
@@ -44,6 +49,7 @@ class RegistersCommandTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test argument allows spaces`() {
     configureByText("")
 
@@ -66,6 +72,7 @@ class RegistersCommandTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test list nothing if no registers match`() {
     configureByText("")
 
@@ -78,6 +85,7 @@ class RegistersCommandTest : VimTestCase() {
     assertExOutput("Type Name Content\n")
   }
 
+  @Test
   fun `test list truncates long registers`() {
     configureByText("")
 
@@ -95,6 +103,7 @@ class RegistersCommandTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test correctly encodes non printable characters`() {
     configureByText("")
 
@@ -108,6 +117,7 @@ class RegistersCommandTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test display synonym for registers command`() {
     configureByText("")
 
@@ -126,6 +136,7 @@ class RegistersCommandTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test list all registers in correct order`() {
     configureByText(
       """"<caret>line 0

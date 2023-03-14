@@ -12,8 +12,10 @@ import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class InsertNewLineAboveActionTest : VimTestCase() {
+  @Test
   fun `test insert new line above`() {
     val before = """I found it in a legendary land
         |${c}all rocks and lavender and tufted grass,
@@ -29,6 +31,7 @@ class InsertNewLineAboveActionTest : VimTestCase() {
     doTest("O", before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun `test insert new line above with caret in middle of line`() {
     val before = """I found it in a legendary land
         |all rocks and ${c}lavender and tufted grass,
@@ -44,6 +47,7 @@ class InsertNewLineAboveActionTest : VimTestCase() {
     doTest("O", before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun `test insert new line above matches indent for plain text`() {
     val before = """    I found it in a legendary land
         |    all rocks and lavender and tufted grass,
@@ -59,6 +63,7 @@ class InsertNewLineAboveActionTest : VimTestCase() {
     doTest("O", before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun `test insert new line above matches indent for first line of plain text`() {
     val before = """    ${c}I found it in a legendary land
         |    all rocks and lavender and tufted grass,
@@ -75,6 +80,7 @@ class InsertNewLineAboveActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN) // Java support would be a neovim plugin
+  @Test
   fun `test insert new line above matches indent for java`() {
     val before = """public class C {
       |  Integer a;
@@ -92,6 +98,7 @@ class InsertNewLineAboveActionTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun `test insert new line above with multiple carets`() {
     val before = """    I fou${c}nd it in a legendary land
         |    all rocks and laven${c}der and tufted grass,
@@ -111,6 +118,7 @@ class InsertNewLineAboveActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
   fun `test insert new line above at top of screen does not scroll top of screen`() {
     configureByLines(50, "I found it in a legendary land")
     enterCommand("set scrolloff=10")
@@ -120,6 +128,7 @@ class InsertNewLineAboveActionTest : VimTestCase() {
     assertVisibleArea(5, 39)
   }
 
+  @Test
   fun `test insert new line above first line`() {
     val before = """${c}I found it in a legendary land
         |all rocks and lavender and tufted grass,

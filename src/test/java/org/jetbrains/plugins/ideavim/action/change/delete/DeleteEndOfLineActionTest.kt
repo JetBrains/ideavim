@@ -10,8 +10,10 @@ package org.jetbrains.plugins.ideavim.action.change.delete
 
 import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class DeleteEndOfLineActionTest : VimTestCase() {
+  @Test
   fun `test delete on empty line`() {
     doTest(
       "D",

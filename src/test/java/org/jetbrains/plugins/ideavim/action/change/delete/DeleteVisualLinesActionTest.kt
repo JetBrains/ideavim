@@ -12,8 +12,10 @@ package org.jetbrains.plugins.ideavim.action.change.delete
 
 import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class DeleteVisualLinesActionTest : VimTestCase() {
+  @Test
   fun `test remove line in char visual mode`() {
     doTest(
       "vlllX",
@@ -33,6 +35,7 @@ class DeleteVisualLinesActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test remove line in char visual mode last line`() {
     doTest(
       "vlllX",
@@ -52,6 +55,7 @@ class DeleteVisualLinesActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test remove line in line visual mode`() {
     doTest(
       "VX",
@@ -71,6 +75,7 @@ class DeleteVisualLinesActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test remove line in line visual mode line end`() {
     doTest(
       "VX",
@@ -90,6 +95,7 @@ class DeleteVisualLinesActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test multiple line delete till the end`() {
     val keys = "Vjd"
     val before = """
@@ -111,6 +117,7 @@ class DeleteVisualLinesActionTest : VimTestCase() {
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun `test multiple line delete till the end with a new line`() {
     val keys = "Vjd"
     val before = """

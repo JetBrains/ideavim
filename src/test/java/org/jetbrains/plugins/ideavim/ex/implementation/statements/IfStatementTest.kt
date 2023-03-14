@@ -9,9 +9,11 @@
 package org.jetbrains.plugins.ideavim.ex.implementation.statements
 
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class IfStatementTest : VimTestCase() {
 
+  @Test
   fun `test simple if with true condition`() {
     configureByText("\n")
     typeText(
@@ -25,6 +27,7 @@ class IfStatementTest : VimTestCase() {
     assertExOutput("success\n")
   }
 
+  @Test
   fun `test simple if with false condition`() {
     configureByText("\n")
     typeText(
@@ -38,6 +41,7 @@ class IfStatementTest : VimTestCase() {
     assertNoExOutput()
   }
 
+  @Test
   fun `test unreachable else`() {
     configureByText("\n")
     typeText(
@@ -53,6 +57,7 @@ class IfStatementTest : VimTestCase() {
     assertExOutput("success\n")
   }
 
+  @Test
   fun `test else`() {
     configureByText("\n")
     typeText(
@@ -68,6 +73,7 @@ class IfStatementTest : VimTestCase() {
     assertExOutput("success\n")
   }
 
+  @Test
   fun `test unreachable elif`() {
     configureByText("\n")
     typeText(
@@ -85,6 +91,7 @@ class IfStatementTest : VimTestCase() {
     assertExOutput("success\n")
   }
 
+  @Test
   fun `test elif`() {
     configureByText("\n")
     typeText(
@@ -102,6 +109,7 @@ class IfStatementTest : VimTestCase() {
     assertExOutput("success\n")
   }
 
+  @Test
   fun `test multiple elifs`() {
     configureByText("\n")
     typeText(

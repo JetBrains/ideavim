@@ -14,11 +14,13 @@ import org.jetbrains.plugins.ideavim.OptionValueType
 import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
 import org.jetbrains.plugins.ideavim.VimTestOption
+import org.junit.jupiter.api.Test
 
 class YankAndPutTest : VimOptionTestCase(OptionConstants.clipboard) {
   @VimOptionTestConfiguration(
     VimTestOption(OptionConstants.clipboard, OptionValueType.STRING, OptionConstants.clipboard_unnamed),
   )
+  @Test
   fun `test yank to number register with unnamed`() {
     val before = """
             I ${c}found it in a legendary land
@@ -47,6 +49,7 @@ class YankAndPutTest : VimOptionTestCase(OptionConstants.clipboard) {
       OptionConstants.clipboard_unnamed + "," + OptionConstants.clipboard_ideaput,
     ),
   )
+  @Test
   fun `test yank to number register with unnamed and ideaput`() {
     val before = """
             I ${c}found it in a legendary land
@@ -69,6 +72,7 @@ class YankAndPutTest : VimOptionTestCase(OptionConstants.clipboard) {
   }
 
   @VimOptionTestConfiguration(VimTestOption(OptionConstants.clipboard, OptionValueType.STRING, ""))
+  @Test
   fun `test yank to number register`() {
     val before = """
             I ${c}found it in a legendary land

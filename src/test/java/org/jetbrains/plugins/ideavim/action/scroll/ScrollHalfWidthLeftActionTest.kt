@@ -12,6 +12,7 @@ import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 /*
 For the following four commands the cursor follows the screen.  If the
@@ -28,6 +29,7 @@ zH                      Move the view on the text half a screenwidth to the
  */
 class ScrollHalfWidthLeftActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  @Test
   fun `test scroll half page width`() {
     configureByColumns(200)
     typeText("zL")
@@ -35,6 +37,7 @@ class ScrollHalfWidthLeftActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  @Test
   fun `test scroll keeps cursor in place if already in scrolled area`() {
     configureByColumns(200)
     typeText("50|", "zL")
@@ -43,6 +46,7 @@ class ScrollHalfWidthLeftActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  @Test
   fun `test scroll moves cursor if moves off screen 1`() {
     configureByColumns(200)
     typeText("zL")
@@ -51,6 +55,7 @@ class ScrollHalfWidthLeftActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  @Test
   fun `test scroll moves cursor if moves off screen 2`() {
     configureByColumns(200)
     typeText("10|", "zL")
@@ -59,6 +64,7 @@ class ScrollHalfWidthLeftActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  @Test
   fun `test scroll count half page widths`() {
     configureByColumns(300)
     typeText("3zL")
@@ -67,6 +73,7 @@ class ScrollHalfWidthLeftActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  @Test
   fun `test scroll half page width with sidescrolloff`() {
     configureByColumns(200)
     enterCommand("set sidescrolloff=10")
@@ -76,6 +83,7 @@ class ScrollHalfWidthLeftActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  @Test
   fun `test scroll half page width ignores sidescroll`() {
     configureByColumns(200)
     enterCommand("set sidescroll=10")
@@ -86,6 +94,7 @@ class ScrollHalfWidthLeftActionTest : VimTestCase() {
 
   @VimBehaviorDiffers(description = "Vim has virtual space at end of line")
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  @Test
   fun `test scroll at end of line does not use full virtual space`() {
     configureByColumns(200)
     typeText("200|", "ze", "zL")
@@ -95,6 +104,7 @@ class ScrollHalfWidthLeftActionTest : VimTestCase() {
 
   @VimBehaviorDiffers(description = "Vim has virtual space at end of line")
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  @Test
   fun `test scroll near end of line does not use full virtual space`() {
     configureByColumns(200)
     typeText("190|", "ze", "zL")
@@ -103,6 +113,7 @@ class ScrollHalfWidthLeftActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  @Test
   fun `test scroll includes inlay visual column in half page width`() {
     configureByColumns(200)
     addInlay(20, true, 5)
@@ -113,6 +124,7 @@ class ScrollHalfWidthLeftActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  @Test
   fun `test scroll with inlay in scrolled area and left of the cursor`() {
     configureByColumns(200)
     addInlay(20, true, 5)

@@ -11,22 +11,25 @@ package org.jetbrains.plugins.ideavim.ex.parser.expressions
 import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.TernaryExpression
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
-import org.junit.experimental.theories.DataPoints
-import org.junit.experimental.theories.Theories
-import org.junit.experimental.theories.Theory
-import org.junit.runner.RunWith
+import org.jetbrains.plugins.ideavim.combinate
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-@RunWith(Theories::class)
 class TernaryExpressionTests {
 
   companion object {
     @JvmStatic
-    val values = listOf("", " ") @DataPoints get
+    val values = listOf("", " ")
+
+    @JvmStatic
+    fun arg8(): List<Arguments> = combinate(values, values, values, values, values, values, values, values)
   }
 
-  @Theory
+  @ParameterizedTest
+  @MethodSource("arg8")
   fun `simple expression`(sp1: String, sp2: String, sp3: String, sp4: String, sp5: String, sp6: String, sp7: String, sp8: String) {
     val expression = VimscriptParser.parseExpression("1$sp1?$sp2'2'$sp3:3")
     assertTrue(expression is TernaryExpression)

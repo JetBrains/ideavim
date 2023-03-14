@@ -12,6 +12,7 @@ import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 /**
  * @author Alex Plate
@@ -19,6 +20,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 // TODO: 2019-06-18 VimOptionsTestCase
 class DigraphTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.UNCLEAR, "backspace works strange")
+  @Test
   fun `test digraph`() {
     doTest(
       "i B<BS>B",
@@ -46,6 +48,7 @@ class DigraphTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.UNCLEAR, "backspace works strange")
+  @Test
   fun `test digraph stops`() {
     doTest(
       "i B<BS>BHello",
@@ -73,6 +76,7 @@ class DigraphTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.UNCLEAR, "backspace works strange")
+  @Test
   fun `test digraph double backspace`() {
     doTest(
       "i B<BS><BS>B",
@@ -100,6 +104,7 @@ class DigraphTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.UNCLEAR, "backspace works strange")
+  @Test
   fun `test digraph backspace digraph`() {
     doTest(
       "i B<BS>B<BS>B",

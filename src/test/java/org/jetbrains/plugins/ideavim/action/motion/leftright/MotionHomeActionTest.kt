@@ -19,10 +19,12 @@ import org.jetbrains.plugins.ideavim.VimOptionDefaultAll
 import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
 import org.jetbrains.plugins.ideavim.VimTestOption
+import org.junit.jupiter.api.Test
 
 class MotionHomeActionTest : VimOptionTestCase(OptionConstants.keymodel) {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionDefaultAll
+  @Test
   fun `test motion home`() {
     val keys = "<Home>"
     val before = """
@@ -45,13 +47,15 @@ class MotionHomeActionTest : VimOptionTestCase(OptionConstants.keymodel) {
   }
 
   @VimOptionDefaultAll
+  @Test
   fun `test default stop select`() {
     val keymodel = optionsNoEditor().getStringListValues(OptionConstants.keymodel)
-    assertTrue(OptionConstants.keymodel_stopselect in keymodel)
+    kotlin.test.assertTrue(OptionConstants.keymodel_stopselect in keymodel)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, ""))
+  @Test
   fun `test continue visual`() {
     val keys = listOf("v", "<Home>")
     val before = """
@@ -75,6 +79,7 @@ class MotionHomeActionTest : VimOptionTestCase(OptionConstants.keymodel) {
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, ""))
+  @Test
   fun `test continue select`() {
     val keys = listOf("gh", "<Home>")
     val before = """
@@ -104,6 +109,7 @@ class MotionHomeActionTest : VimOptionTestCase(OptionConstants.keymodel) {
       OptionConstants.keymodel_stopvisual,
     ),
   )
+  @Test
   fun `test exit visual`() {
     val keys = listOf("v", "<Home>")
     val before = """
@@ -133,6 +139,7 @@ class MotionHomeActionTest : VimOptionTestCase(OptionConstants.keymodel) {
       OptionConstants.keymodel_stopselect,
     ),
   )
+  @Test
   fun `test exit select`() {
     val keys = listOf("gh", "<Home>")
     val before = """

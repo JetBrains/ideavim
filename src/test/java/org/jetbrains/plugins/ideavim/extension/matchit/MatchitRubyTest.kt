@@ -9,14 +9,19 @@
 package org.jetbrains.plugins.ideavim.extension.matchit
 
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInfo
 
 class MatchitRubyTest : VimTestCase() {
   @Throws(Exception::class)
-  override fun setUp() {
-    super.setUp()
+  @BeforeEach
+  override fun setUp(testInfo: TestInfo) {
+    super.setUp(testInfo)
     enableExtensions("matchit")
   }
 
+  @Test
   fun `test basic jump from if to end`() {
     doTest(
       "%",
@@ -34,6 +39,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from whitespace before if to end`() {
     doTest(
       "%",
@@ -43,6 +49,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from whitespace before class to end`() {
     doTest(
       "%",
@@ -52,6 +59,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test basic jump from end to if`() {
     doTest(
       "%",
@@ -69,6 +77,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test basic jump from if to else`() {
     doTest(
       "%",
@@ -90,6 +99,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test basic jump from else to end`() {
     doTest(
       "%",
@@ -111,6 +121,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from end to if in if-else structure`() {
     doTest(
       "%",
@@ -132,6 +143,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from if to elsif`() {
     doTest(
       "%",
@@ -157,6 +169,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from elsif to else`() {
     doTest(
       "%",
@@ -182,6 +195,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from elsif to end`() {
     doTest(
       "%",
@@ -203,6 +217,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from elsif to elsif`() {
     doTest(
       "%",
@@ -232,6 +247,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from for to end`() {
     doTest(
       "%",
@@ -257,6 +273,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from for to end and ignore inner if blocks`() {
     doTest(
       "%",
@@ -290,6 +307,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from if to break`() {
     doTest(
       "%",
@@ -315,6 +333,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from break to end`() {
     doTest(
       "%",
@@ -340,6 +359,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from end to if`() {
     doTest(
       "%",
@@ -365,6 +385,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from end to for`() {
     doTest(
       "%",
@@ -390,6 +411,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test basic jump from class to end`() {
     doTest(
       "%",
@@ -411,6 +433,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test basic jump from end to class`() {
     doTest(
       "%",
@@ -432,6 +455,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test basic jump from def to end`() {
     doTest(
       "%",
@@ -453,6 +477,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test basic jump from end to def`() {
     doTest(
       "%",
@@ -474,6 +499,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from class to end ignoring nested class`() {
     doTest(
       "%",
@@ -511,6 +537,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from if to end over inner loop`() {
     doTest(
       "%",
@@ -540,6 +567,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from end to if ignoring malformed code`() {
     doTest(
       "%",
@@ -561,6 +589,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from if to end after a semicolon`() {
     doTest(
       "%",
@@ -570,6 +599,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from end to if after a semicolon`() {
     doTest(
       "%",
@@ -579,6 +609,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from before if and semicolon to end`() {
     doTest(
       "%",
@@ -588,6 +619,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from unless to end after a semicolon`() {
     doTest(
       "%",
@@ -597,6 +629,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from one line condition to if`() {
     doTest(
       "%",
@@ -606,6 +639,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from end to unless after a semicolon`() {
     doTest(
       "%",
@@ -615,6 +649,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from end to do when no other opening keyword is present`() {
     doTest(
       "%",
@@ -636,6 +671,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from do to end`() {
     doTest(
       "%",
@@ -661,6 +697,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from module to end`() {
     doTest(
       "%",
@@ -682,6 +719,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from end to module`() {
     doTest(
       "%",
@@ -703,6 +741,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from while to end`() {
     doTest(
       "%",
@@ -726,6 +765,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from begin to rescue`() {
     doTest(
       "%",
@@ -755,6 +795,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from rescue to ensure`() {
     doTest(
       "%",
@@ -784,6 +825,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from ensure to end`() {
     doTest(
       "%",
@@ -813,6 +855,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from end to begin`() {
     doTest(
       "%",
@@ -842,6 +885,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from rescue to retry`() {
     doTest(
       "%",
@@ -865,6 +909,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from retry to end`() {
     doTest(
       "%",
@@ -888,6 +933,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from end to while`() {
     doTest(
       "%",
@@ -911,6 +957,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from case to when`() {
     doTest(
       "%",
@@ -938,6 +985,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from when to when`() {
     doTest(
       "%",
@@ -965,6 +1013,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from else to end in case block`() {
     doTest(
       "%",
@@ -992,6 +1041,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from end to case`() {
     doTest(
       "%",
@@ -1019,6 +1069,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from until to end`() {
     doTest(
       "%",
@@ -1036,6 +1087,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from if to redo`() {
     doTest(
       "%",
@@ -1063,6 +1115,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from redo to elsif`() {
     doTest(
       "%",
@@ -1090,6 +1143,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from elsif to next`() {
     doTest(
       "%",
@@ -1117,6 +1171,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from next to end`() {
     doTest(
       "%",
@@ -1144,6 +1199,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from =begin to =end`() {
     doTest(
       "%",
@@ -1161,6 +1217,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from =end to =begin`() {
     doTest(
       "%",
@@ -1178,6 +1235,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from middle of cucumber test to end`() {
     doTest(
       "%",
@@ -1207,6 +1265,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from end of cucumber test to do`() {
     doTest(
       "%",
@@ -1240,6 +1299,7 @@ class MatchitRubyTest : VimTestCase() {
    * Tests for reverse g% motion
    */
 
+  @Test
   fun `test basic reverse jump from end to if `() {
     doTest(
       "g%",
@@ -1257,6 +1317,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test basic reverse jump from end to if`() {
     doTest(
       "g%",
@@ -1274,6 +1335,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test basic reverse jump from else to if`() {
     doTest(
       "g%",
@@ -1295,6 +1357,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test basic reverse jump from end to else`() {
     doTest(
       "g%",
@@ -1316,6 +1379,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test reverse jump from if to end in if-else structure`() {
     doTest(
       "g%",
@@ -1337,6 +1401,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test reverse jump from elsif to if`() {
     doTest(
       "g%",
@@ -1362,6 +1427,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test reverse jump from else to elsif`() {
     doTest(
       "g%",
@@ -1387,6 +1453,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test reverse jump from end to elsif`() {
     doTest(
       "g%",
@@ -1408,6 +1475,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test reverse jump from elsif to elsif`() {
     doTest(
       "g%",
@@ -1437,6 +1505,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test reverse jump from end to for and ignore inner if blocks`() {
     doTest(
       "g%",
@@ -1470,6 +1539,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test reverse jump from break to if`() {
     doTest(
       "g%",
@@ -1495,6 +1565,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test reverse jump from end to break`() {
     doTest(
       "g%",
@@ -1520,6 +1591,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test reverse jump from if to end ignoring break`() {
     doTest(
       "g%",
@@ -1545,6 +1617,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test reverse jump from for to end ignoring nested if`() {
     doTest(
       "g%",
@@ -1570,6 +1643,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test basic reverse jump from end to class`() {
     doTest(
       "g%",
@@ -1591,6 +1665,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test basic reverse jump from class to end`() {
     doTest(
       "g%",
@@ -1612,6 +1687,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test reverse jump from def to end`() {
     doTest(
       "g%",
@@ -1633,6 +1709,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test reverse jump from end to def across multiple functions`() {
     doTest(
       "g%",
@@ -1666,6 +1743,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test reverse jump from end to def`() {
     doTest(
       "g%",
@@ -1687,6 +1765,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test reverse jump from end to class ignoring nested class`() {
     doTest(
       "g%",
@@ -1724,6 +1803,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test reverse jump from end to if over inner loop`() {
     doTest(
       "g%",
@@ -1753,6 +1833,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test reverse jump from end to if ignoring malformed code`() {
     doTest(
       "g%",
@@ -1774,6 +1855,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test reverse jump from one line condition to if`() {
     doTest(
       "g%",
@@ -1783,6 +1865,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test reverse jump from do to end`() {
     doTest(
       "g%",
@@ -1808,6 +1891,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test reverse jump from module to end`() {
     doTest(
       "g%",
@@ -1829,6 +1913,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test reverse jump from end to module`() {
     doTest(
       "g%",
@@ -1850,6 +1935,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test reverse jump from end to ensure`() {
     doTest(
       "g%",
@@ -1879,6 +1965,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test reverse jump from ensure to rescue`() {
     doTest(
       "g%",
@@ -1908,6 +1995,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test reverse jump from rescue to begin`() {
     doTest(
       "g%",
@@ -1937,6 +2025,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test reverse jump from begin to end`() {
     doTest(
       "g%",
@@ -1966,6 +2055,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test reverse jump from end to retry`() {
     doTest(
       "g%",
@@ -1989,6 +2079,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test reverse jump from retry to rescue`() {
     doTest(
       "g%",
@@ -2012,6 +2103,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test reverse jump from while to end`() {
     doTest(
       "g%",
@@ -2035,6 +2127,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test reverse jump from end to while`() {
     doTest(
       "g%",
@@ -2058,6 +2151,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test reverse jump from case to end`() {
     doTest(
       "g%",
@@ -2085,6 +2179,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test reverse jump from end to else in case block`() {
     doTest(
       "g%",
@@ -2112,6 +2207,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test reverse jump from else to when`() {
     doTest(
       "g%",
@@ -2139,6 +2235,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test reverse jump from when to when`() {
     doTest(
       "g%",
@@ -2166,6 +2263,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test reverse jump from when to case`() {
     doTest(
       "g%",
@@ -2193,6 +2291,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test reverse jump from end to until`() {
     doTest(
       "g%",
@@ -2210,6 +2309,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test reverse jump from until to end`() {
     doTest(
       "g%",
@@ -2227,6 +2327,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test reverse jump from end to next`() {
     doTest(
       "g%",
@@ -2254,6 +2355,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test reverse jump from next to elsif`() {
     doTest(
       "g%",
@@ -2281,6 +2383,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test reverse jump from elsif to redo`() {
     doTest(
       "g%",
@@ -2308,6 +2411,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test reverse jump from redo to if`() {
     doTest(
       "g%",
@@ -2335,6 +2439,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test reverse jump from =begin to =end`() {
     doTest(
       "g%",
@@ -2352,6 +2457,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test reverse jump from =end to =begin`() {
     doTest(
       "g%",
@@ -2369,6 +2475,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test reverse jump from before if and semicolon to end`() {
     doTest(
       "g%",
@@ -2378,6 +2485,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test reverse jump from whitespace before class to end`() {
     doTest(
       "g%",
@@ -2391,6 +2499,7 @@ class MatchitRubyTest : VimTestCase() {
    * Tests for embedded Ruby
    */
 
+  @Test
   fun `test jump from opening to closing HTML tag`() {
     // This is just to test that HTML jumps are working in Ruby files.
     // MatchitHtmlTest is what tests the correctness of the HTML jumps.
@@ -2406,6 +2515,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from opening to closing div while on class attribute`() {
     doTest(
       "%",
@@ -2431,6 +2541,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from do to end in template block`() {
     doTest(
       "%",
@@ -2456,6 +2567,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from end to do in template block`() {
     doTest(
       "%",
@@ -2481,6 +2593,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from closing to opening div`() {
     doTest(
       "%",
@@ -2506,6 +2619,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from opening to closing angle bracket in template`() {
     doTest(
       "%",
@@ -2515,6 +2629,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test reverse jump from opening to closing angle bracket in template`() {
     doTest(
       "g%",
@@ -2524,6 +2639,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from do to end in table template`() {
     doTest(
       "%",
@@ -2561,6 +2677,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from if to else in table template`() {
     doTest(
       "%",
@@ -2598,6 +2715,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test jump from else to end in table template`() {
     doTest(
       "%",
@@ -2635,6 +2753,7 @@ class MatchitRubyTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test reverse jump from end to else in table template`() {
     doTest(
       "g%",

@@ -20,10 +20,12 @@ import org.jetbrains.plugins.ideavim.VimOptionDefaultAll
 import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
 import org.jetbrains.plugins.ideavim.VimTestOption
+import org.junit.jupiter.api.Test
 
 class MotionShiftHomeActionTest : VimOptionTestCase(OptionConstants.keymodel, OptionConstants.selectmode) {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionDefaultAll
+  @Test
   fun `test simple home`() {
     val keys = listOf("<S-Home>")
     val before = """
@@ -46,9 +48,10 @@ class MotionShiftHomeActionTest : VimOptionTestCase(OptionConstants.keymodel, Op
   }
 
   @VimOptionDefaultAll
+  @Test
   fun `test default continueselect`() {
     val keymodel = optionsNoEditor().getStringListValues(OptionConstants.keymodel)
-    assertTrue(OptionConstants.keymodel_continueselect in keymodel)
+    kotlin.test.assertTrue(OptionConstants.keymodel_continueselect in keymodel)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
@@ -56,6 +59,7 @@ class MotionShiftHomeActionTest : VimOptionTestCase(OptionConstants.keymodel, Op
     VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, OptionConstants.keymodel_startsel),
     VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""),
   )
+  @Test
   fun `test start visual`() {
     val keys = listOf("<S-Home>")
     val before = """
@@ -82,6 +86,7 @@ class MotionShiftHomeActionTest : VimOptionTestCase(OptionConstants.keymodel, Op
     VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, OptionConstants.keymodel_startsel),
     VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, OptionConstants.selectmode_key),
   )
+  @Test
   fun `test start select`() {
     val keys = listOf("<S-Home>")
     val before = """
@@ -108,6 +113,7 @@ class MotionShiftHomeActionTest : VimOptionTestCase(OptionConstants.keymodel, Op
     VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""),
   )
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
   fun `test continue visual`() {
     val before = """
             A Discovery
@@ -138,6 +144,7 @@ class MotionShiftHomeActionTest : VimOptionTestCase(OptionConstants.keymodel, Op
     VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""),
   )
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
   fun `test continue select`() {
     val before = """
             A Discovery

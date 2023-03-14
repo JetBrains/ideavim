@@ -13,6 +13,8 @@ import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.TestInfo
 
 /**
  * @author Alex Plate
@@ -33,9 +35,10 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 abstract class VimOptionTestCase(option: String, vararg otherOptions: String) : VimTestCase() {
   private val options: Set<String> = setOf(option, *otherOptions)
 
-  override fun setUp() {
-    super.setUp()
-    val testMethod = this.javaClass.getMethod(this.name)
+  @BeforeEach
+  override fun setUp(testInfo: TestInfo) {
+    super.setUp(testInfo)
+    val testMethod = this.testInfo.testMethod.get()
     if (!testMethod.isAnnotationPresent(VimOptionDefaultAll::class.java)) {
       if (!testMethod.isAnnotationPresent(VimOptionTestConfiguration::class.java)) kotlin.test.fail("You should add VimOptionTestConfiguration with options for this method")
 

@@ -13,39 +13,45 @@ import com.maddyhome.idea.vim.helper.checkInString
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 @Suppress("SpellCheckingInspection")
 class SearchHelperTest : VimTestCase() {
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun testFindNextWord() {
     val text = "first second"
     val nextWordPosition = findNextWord(text, 0, text.length.toLong(), 1, bigWord = true, spaceWords = false).toInt()
-    assertEquals(nextWordPosition, text.indexOf("second"))
+    kotlin.test.assertEquals(nextWordPosition, text.indexOf("second"))
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun testFindSecondNextWord() {
     val text = "first second third"
     val nextWordPosition = findNextWord(text, 0, text.length.toLong(), 2, bigWord = true, false).toInt()
-    assertEquals(nextWordPosition, text.indexOf("third"))
+    kotlin.test.assertEquals(nextWordPosition, text.indexOf("third"))
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun testFindAfterLastWord() {
     val text = "first second"
     val nextWordPosition = findNextWord(text, 0, text.length.toLong(), 3, bigWord = true, false).toInt()
-    assertEquals(nextWordPosition, text.length)
+    kotlin.test.assertEquals(nextWordPosition, text.length)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun testFindPreviousWord() {
     val text = "first second"
     val previousWordPosition =
       findNextWord(text, text.indexOf("second").toLong(), text.length.toLong(), -1, bigWord = true, false).toInt()
-    assertEquals(previousWordPosition, text.indexOf("first"))
+    kotlin.test.assertEquals(previousWordPosition, text.indexOf("first"))
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun testFindSecondPreviousWord() {
     val text = "first second third"
     val previousWordPosition =
@@ -57,10 +63,11 @@ class SearchHelperTest : VimTestCase() {
         bigWord = true,
         spaceWords = false,
       ).toInt()
-    assertEquals(previousWordPosition, text.indexOf("first"))
+    kotlin.test.assertEquals(previousWordPosition, text.indexOf("first"))
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun testFindBeforeFirstWord() {
     val text = "first second"
     val previousWordPosition =
@@ -72,17 +79,19 @@ class SearchHelperTest : VimTestCase() {
         bigWord = true,
         spaceWords = false,
       ).toInt()
-    assertEquals(previousWordPosition, text.indexOf("first"))
+    kotlin.test.assertEquals(previousWordPosition, text.indexOf("first"))
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun testFindPreviousWordWhenCursorOutOfBound() {
     val text = "first second"
     val previousWordPosition =
       findNextWord(text, text.length.toLong(), text.length.toLong(), -1, bigWord = true, spaceWords = false).toInt()
-    assertEquals(previousWordPosition, text.indexOf("second"))
+    kotlin.test.assertEquals(previousWordPosition, text.indexOf("second"))
   }
 
+  @Test
   fun testMotionOuterWordAction() {
     doTest(
       "va(",
@@ -94,114 +103,130 @@ class SearchHelperTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun testCheckInStringInsideDoubleQuotes() {
     val text = "abc\"def\"ghi"
     val inString = checkInString(text, 5, true)
-    assertTrue(inString)
+    kotlin.test.assertTrue(inString)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun testCheckInStringWithoutClosingDoubleQuote() {
     val text = "abcdef\"ghi"
     val inString = checkInString(text, 5, true)
-    assertFalse(inString)
+    kotlin.test.assertFalse(inString)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun testCheckInStringOnUnpairedSingleQuote() {
     val text = "abc\"d'ef\"ghi"
     val inString = checkInString(text, 5, true)
-    assertTrue(inString)
+    kotlin.test.assertTrue(inString)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun testCheckInStringOutsideOfDoubleQuotesPair() {
     val text = "abc\"def\"ghi"
     val inString = checkInString(text, 2, true)
-    assertFalse(inString)
+    kotlin.test.assertFalse(inString)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun testCheckInStringEscapedDoubleQuote() {
     val text = "abc\\\"def\"ghi"
     val inString = checkInString(text, 5, true)
-    assertFalse(inString)
+    kotlin.test.assertFalse(inString)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun testCheckInStringOddNumberOfDoubleQuotes() {
     val text = "abc\"def\"gh\"i"
     val inString = checkInString(text, 5, true)
-    assertFalse(inString)
+    kotlin.test.assertFalse(inString)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun testCheckInStringInsideSingleQuotesPair() {
     val text = "abc\"d'e'f\"ghi"
     val inString = checkInString(text, 6, false)
-    assertTrue(inString)
+    kotlin.test.assertTrue(inString)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun testCheckInStringOnOpeningDoubleQuote() {
     val text = "abc\"def\"ghi"
     val inString = checkInString(text, 3, true)
-    assertTrue(inString)
+    kotlin.test.assertTrue(inString)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun testCheckInStringOnClosingDoubleQuote() {
     val text = "abc\"def\"ghi"
     val inString = checkInString(text, 7, true)
-    assertTrue(inString)
+    kotlin.test.assertTrue(inString)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun testCheckInStringWithoutQuotes() {
     val text = "abcdefghi"
     val inString = checkInString(text, 5, true)
-    assertFalse(inString)
+    kotlin.test.assertFalse(inString)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun testCheckInStringDoubleQuoteInsideSingleQuotes() {
     val text = "abc'\"'ef\"ghi"
     val inString = checkInString(text, 5, true)
-    assertFalse(inString)
+    kotlin.test.assertFalse(inString)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun testCheckInStringSingleQuotesAreTooFarFromEachOtherToMakePair() {
     val text = "abc'\"de'f\"ghi"
     val inString = checkInString(text, 5, true)
-    assertTrue(inString)
+    kotlin.test.assertTrue(inString)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun testCheckInStringDoubleQuoteInsideSingleQuotesIsInsideSingleQuotedString() {
     val text = "abc'\"'def\"ghi"
     val inString = checkInString(text, 4, false)
-    assertTrue(inString)
+    kotlin.test.assertTrue(inString)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun testCheckInStringAfterClosingDoubleQuote() {
     val text = "abc\"def\"ghi"
     val inString = checkInString(text, 9, true)
-    assertFalse(inString)
+    kotlin.test.assertFalse(inString)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun testCheckInStringOnMiddleDoubleQuote() {
     val text = "abc\"def\"gh\"i"
     val inString = checkInString(text, 7, true)
-    assertFalse(inString)
+    kotlin.test.assertFalse(inString)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun testCheckInStringBetweenPairs() {
     val text = "abc\"def\"gh\"ij\"k"
     val inString = checkInString(text, 8, true)
-    assertFalse(inString)
+    kotlin.test.assertFalse(inString)
   }
 }

@@ -11,10 +11,12 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class LockVarCommandTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test lock int variable`() {
     configureByText("\n")
     typeText(commandToKeys("let x = 10"))
@@ -24,6 +26,7 @@ class LockVarCommandTest : VimTestCase() {
     assertPluginErrorMessageContains("E741: Value is locked: x")
   }
 
+  @Test
   fun `test unlock int variable`() {
     configureByText("\n")
     typeText(commandToKeys("let x = 10"))
@@ -36,6 +39,7 @@ class LockVarCommandTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test lock list variable`() {
     configureByText("\n")
     typeText(commandToKeys("let x = [1]"))
@@ -46,6 +50,7 @@ class LockVarCommandTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test lock list variable 2`() {
     configureByText("\n")
     typeText(commandToKeys("let x = [1]"))
@@ -55,6 +60,7 @@ class LockVarCommandTest : VimTestCase() {
     assertPluginErrorMessageContains("E741: Value is locked: x")
   }
 
+  @Test
   fun `test reassigning assigned locked value`() {
     configureByText("\n")
     typeText(commandToKeys("let x = 10"))
@@ -69,6 +75,7 @@ class LockVarCommandTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test list elements are also locked`() {
     configureByText("\n")
     typeText(commandToKeys("let x = [1, 2]"))
@@ -81,6 +88,7 @@ class LockVarCommandTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test dict elements are also locked`() {
     configureByText("\n")
     typeText(commandToKeys("let x = {'one': 1}"))
@@ -93,6 +101,7 @@ class LockVarCommandTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test can modify dict elements but not the dict itself`() {
     configureByText("\n")
     typeText(commandToKeys("let x = {'one': 1}"))
@@ -109,6 +118,7 @@ class LockVarCommandTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test dict elements are also locked 2`() {
     configureByText("\n")
     typeText(commandToKeys("let x = {'one': 1}"))
@@ -120,6 +130,7 @@ class LockVarCommandTest : VimTestCase() {
     assertExOutput("{'one': 1}\n")
   }
 
+  @Test
   fun `test default lock depth`() {
     configureByText("\n")
     typeText(commandToKeys("let x = {'list': [1]}"))
@@ -130,6 +141,7 @@ class LockVarCommandTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test custom lock depth`() {
     configureByText("\n")
     typeText(commandToKeys("let x = {'list': [1]}"))

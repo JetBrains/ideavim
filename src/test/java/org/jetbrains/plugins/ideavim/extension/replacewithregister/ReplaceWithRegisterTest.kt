@@ -17,14 +17,19 @@ import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.register.RegisterConstants.UNNAMED_REGISTER
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.rangeOf
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInfo
 
 class ReplaceWithRegisterTest : VimTestCase() {
 
-  override fun setUp() {
-    super.setUp()
+  @BeforeEach
+  override fun setUp(testInfo: TestInfo) {
+    super.setUp(testInfo)
     enableExtensions("ReplaceWithRegister")
   }
 
+  @Test
   fun `test replace with empty register`() {
     val text = "one ${c}two three"
     VimPlugin.getRegister().resetRegisters()
@@ -34,17 +39,20 @@ class ReplaceWithRegisterTest : VimTestCase() {
     assertState(text)
   }
 
+  @Test
   fun `test simple replace`() {
     val text = "one ${c}two three"
 
     configureByText(text)
-    val vimEditor = myFixture.editor.vim
-    VimPlugin.getRegister().storeText(vimEditor, vimEditor.primaryCaret(), text rangeOf "one", SelectionType.CHARACTER_WISE, false)
+    val vimEditor = fixture.editor.vim
+    VimPlugin.getRegister()
+      .storeText(vimEditor, vimEditor.primaryCaret(), text rangeOf "one", SelectionType.CHARACTER_WISE, false)
     typeText(injector.parser.parseKeys("griw"))
     assertState("one on${c}e three")
-    assertEquals("one", VimPlugin.getRegister().lastRegister?.text)
+    kotlin.test.assertEquals("one", VimPlugin.getRegister().lastRegister?.text)
   }
 
+  @Test
   fun `test empty text`() {
     val text = ""
 
@@ -54,6 +62,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
     assertState("on${c}e")
   }
 
+  @Test
   fun `test replace with empty text`() {
     val text = "${c}one"
 
@@ -63,27 +72,30 @@ class ReplaceWithRegisterTest : VimTestCase() {
     assertState(c)
   }
 
+  @Test
   fun `test replace use different register`() {
     val text = "one ${c}two three four"
 
     configureByText(text)
     typeText(injector.parser.parseKeys("\"ayiw" + "w" + "\"agriw"))
     assertState("one two tw${c}o four")
-    assertEquals("two", VimPlugin.getRegister().lastRegister?.text)
+    kotlin.test.assertEquals("two", VimPlugin.getRegister().lastRegister?.text)
     typeText(injector.parser.parseKeys("w" + "griw"))
     assertState("one two two tw${c}o")
-    assertEquals("two", VimPlugin.getRegister().lastRegister?.text)
+    kotlin.test.assertEquals("two", VimPlugin.getRegister().lastRegister?.text)
   }
 
+  @Test
   fun `test replace use clipboard register`() {
     val text = "one ${c}two three four"
 
     configureByText(text)
     typeText(injector.parser.parseKeys("\"+yiw" + "w" + "\"+griw" + "w" + "\"+griw"))
     assertState("one two two tw${c}o")
-    assertEquals("two", VimPlugin.getRegister().lastRegister?.text)
+    kotlin.test.assertEquals("two", VimPlugin.getRegister().lastRegister?.text)
   }
 
+  @Test
   fun `test replace use wrong register`() {
     val text = "one ${c}two three"
 
@@ -92,6 +104,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
     assertState(text)
   }
 
+  @Test
   fun `test replace with line`() {
     val text = """
             |I fou${c}nd it in a legendary land|
@@ -108,6 +121,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test replace with line with clipboard register`() {
     val text = """
             |I fou${c}nd it in a legendary land|
@@ -124,6 +138,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test replace block selection`() {
     val text = """
             ${c}one two three
@@ -144,42 +159,49 @@ class ReplaceWithRegisterTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test replace with number`() {
     val text = "one ${c}two three four"
 
     configureByText(text)
-    val vimEditor = myFixture.editor.vim
-    VimPlugin.getRegister().storeText(vimEditor, vimEditor.primaryCaret(), text rangeOf "one", SelectionType.CHARACTER_WISE, false)
+    val vimEditor = fixture.editor.vim
+    VimPlugin.getRegister()
+      .storeText(vimEditor, vimEditor.primaryCaret(), text rangeOf "one", SelectionType.CHARACTER_WISE, false)
     typeText(injector.parser.parseKeys("3griw"))
     assertState("one on${c}e four")
-    assertEquals("one", VimPlugin.getRegister().lastRegister?.text)
+    kotlin.test.assertEquals("one", VimPlugin.getRegister().lastRegister?.text)
   }
 
   @VimBehaviorDiffers("one on${c}e on${c}e four")
+  @Test
   fun `test replace with multiple carets`() {
     val text = "one ${c}two ${c}three four"
 
     configureByText(text)
-    val vimEditor = myFixture.editor.vim
-    VimPlugin.getRegister().storeText(vimEditor, vimEditor.primaryCaret(), text rangeOf "one", SelectionType.CHARACTER_WISE, false)
+    val vimEditor = fixture.editor.vim
+    VimPlugin.getRegister()
+      .storeText(vimEditor, vimEditor.primaryCaret(), text rangeOf "one", SelectionType.CHARACTER_WISE, false)
     typeText(injector.parser.parseKeys("griw"))
     assertState("one two one four")
-    assertEquals("one", VimPlugin.getRegister().lastRegister?.text)
+    kotlin.test.assertEquals("one", VimPlugin.getRegister().lastRegister?.text)
   }
 
+  @Test
   fun `test dot repeat`() {
     val text = "one ${c}two three four"
 
     configureByText(text)
-    val vimEditor = myFixture.editor.vim
-    VimPlugin.getRegister().storeText(vimEditor, vimEditor.primaryCaret(), text rangeOf "one", SelectionType.CHARACTER_WISE, false)
+    val vimEditor = fixture.editor.vim
+    VimPlugin.getRegister()
+      .storeText(vimEditor, vimEditor.primaryCaret(), text rangeOf "one", SelectionType.CHARACTER_WISE, false)
     typeText(injector.parser.parseKeys("griw" + "w" + "."))
     assertState("one one on${c}e four")
-    assertEquals("one", VimPlugin.getRegister().lastRegister?.text)
+    kotlin.test.assertEquals("one", VimPlugin.getRegister().lastRegister?.text)
   }
 
   // --------------------------------------- grr --------------------------
 
+  @Test
   fun `test line replace`() {
     val text = """
             I found it in ${c}a legendary land
@@ -189,8 +211,9 @@ class ReplaceWithRegisterTest : VimTestCase() {
     """.trimIndent()
 
     configureByText(text)
-    val vimEditor = myFixture.editor.vim
-    VimPlugin.getRegister().storeText(vimEditor, vimEditor.primaryCaret(), text rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
+    val vimEditor = fixture.editor.vim
+    VimPlugin.getRegister()
+      .storeText(vimEditor, vimEditor.primaryCaret(), text rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
     typeText(injector.parser.parseKeys("grr"))
     assertState(
       """
@@ -200,9 +223,10 @@ class ReplaceWithRegisterTest : VimTestCase() {
             hard by the torrent of a mountain pass.
       """.trimIndent(),
     )
-    assertEquals("legendary", VimPlugin.getRegister().lastRegister?.text)
+    kotlin.test.assertEquals("legendary", VimPlugin.getRegister().lastRegister?.text)
   }
 
+  @Test
   fun `test line replace with line`() {
     val text = """
             I found it in ${c}a legendary land
@@ -223,6 +247,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test line replace with line empty line`() {
     val text = """
             I found it in ${c}a legendary land
@@ -246,6 +271,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
   }
 
   @VimBehaviorDiffers(description = "Where is the new line comes from?...")
+  @Test
   fun `test line replace with block`() {
     val text = """
             ${c}one two three
@@ -269,6 +295,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test line with number`() {
     val text = """
             I found it in ${c}a legendary land
@@ -288,6 +315,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test line dot repeat`() {
     val text = """
             I found it in ${c}a legendary land
@@ -316,6 +344,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
             ${c}where it was settled on some sodden sand
   """,
   )
+  @Test
   fun `test line multicaret`() {
     val text = """
             I found it in ${c}a legendary land
@@ -339,6 +368,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
 
   // ------------------------------------- gr + visual ----------------------
 
+  @Test
   fun `test visual replace`() {
     val text = """
             I ${c}found it in a legendary land
@@ -348,8 +378,9 @@ class ReplaceWithRegisterTest : VimTestCase() {
     """.trimIndent()
 
     configureByText(text)
-    val vimEditor = myFixture.editor.vim
-    VimPlugin.getRegister().storeText(vimEditor, vimEditor.primaryCaret(), text rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
+    val vimEditor = fixture.editor.vim
+    VimPlugin.getRegister()
+      .storeText(vimEditor, vimEditor.primaryCaret(), text rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
     typeText(injector.parser.parseKeys("viw" + "gr"))
     assertState(
       """
@@ -359,10 +390,11 @@ class ReplaceWithRegisterTest : VimTestCase() {
             hard by the torrent of a mountain pass.
       """.trimIndent(),
     )
-    assertEquals("legendary", VimPlugin.getRegister().lastRegister?.text)
+    kotlin.test.assertEquals("legendary", VimPlugin.getRegister().lastRegister?.text)
     assertMode(VimStateMachine.Mode.COMMAND)
   }
 
+  @Test
   fun `test visual replace with line`() {
     val text = """
             |I fo${c}und it in a legendary land|
@@ -384,6 +416,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
     assertMode(VimStateMachine.Mode.COMMAND)
   }
 
+  @Test
   fun `test visual replace with two lines`() {
     val text = """
             |I found it in ${c}a legendary land|
@@ -406,6 +439,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
     assertMode(VimStateMachine.Mode.COMMAND)
   }
 
+  @Test
   fun `test visual line replace`() {
     val text = """
             I fo${c}und it in a legendary land
@@ -415,8 +449,9 @@ class ReplaceWithRegisterTest : VimTestCase() {
     """.trimIndent()
 
     configureByText(text)
-    val vimEditor = myFixture.editor.vim
-    VimPlugin.getRegister().storeText(vimEditor, vimEditor.primaryCaret(), text rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
+    val vimEditor = fixture.editor.vim
+    VimPlugin.getRegister()
+      .storeText(vimEditor, vimEditor.primaryCaret(), text rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
     typeText(injector.parser.parseKeys("V" + "gr"))
     assertState(
       """
@@ -429,6 +464,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
     assertMode(VimStateMachine.Mode.COMMAND)
   }
 
+  @Test
   fun `test visual line replace with line`() {
     val text = """
             I fo${c}und it in a legendary land
@@ -450,7 +486,8 @@ class ReplaceWithRegisterTest : VimTestCase() {
     assertMode(VimStateMachine.Mode.COMMAND)
   }
 
-//  https://youtrack.jetbrains.com/issue/VIM-2881/ReplaceRegister-does-no-longer-worker-with-MultiCursor
+  //  https://youtrack.jetbrains.com/issue/VIM-2881/ReplaceRegister-does-no-longer-worker-with-MultiCursor
+  @Test
   fun `test multiple carets`() {
     enableExtensions("multiple-cursors")
     val text = """

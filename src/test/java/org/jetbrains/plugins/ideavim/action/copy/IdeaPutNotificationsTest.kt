@@ -21,25 +21,28 @@ import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
 import org.jetbrains.plugins.ideavim.VimTestOption
 import org.jetbrains.plugins.ideavim.rangeOf
+import org.junit.jupiter.api.Test
 
 /**
  * @author Alex Plate
  */
 class IdeaPutNotificationsTest : VimOptionTestCase(OptionConstants.clipboard) {
   @VimOptionTestConfiguration(VimTestOption(OptionConstants.clipboard, OptionValueType.STRING, ""))
+  @Test
   fun `test notification exists if no ideaput`() {
     val before = "${c}I found it in a legendary land"
     configureByText(before)
     appReadySetup(false)
-    val vimEditor = myFixture.editor.vim
-    VimPlugin.getRegister().storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
+    val vimEditor = fixture.editor.vim
+    VimPlugin.getRegister()
+      .storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
     typeText(injector.parser.parseKeys("p"))
 
-    val notification = ActionCenter.getNotifications(myFixture.project, true).last()
+    val notification = ActionCenter.getNotifications(fixture.project, true).last()
     try {
-      assertEquals(NotificationService.IDEAVIM_NOTIFICATION_TITLE, notification.title)
-      assertTrue(OptionConstants.clipboard_ideaput in notification.content)
-      assertEquals(2, notification.actions.size)
+      kotlin.test.assertEquals(NotificationService.IDEAVIM_NOTIFICATION_TITLE, notification.title)
+      kotlin.test.assertTrue(OptionConstants.clipboard_ideaput in notification.content)
+      kotlin.test.assertEquals(2, notification.actions.size)
     } finally {
       notification.expire()
     }
@@ -52,33 +55,37 @@ class IdeaPutNotificationsTest : VimOptionTestCase(OptionConstants.clipboard) {
       OptionConstants.clipboard_ideaput,
     ),
   )
+  @Test
   fun `test no notification on ideaput`() {
     val before = "${c}I found it in a legendary land"
     configureByText(before)
     appReadySetup(false)
-    val vimEditor = myFixture.editor.vim
-    VimPlugin.getRegister().storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
+    val vimEditor = fixture.editor.vim
+    VimPlugin.getRegister()
+      .storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
     typeText(injector.parser.parseKeys("p"))
 
-    val notifications = ActionCenter.getNotifications(myFixture.project, true)
-    assertTrue(notifications.isEmpty() || notifications.last().isExpired || OptionConstants.clipboard_ideaput !in notifications.last().content)
+    val notifications = ActionCenter.getNotifications(fixture.project, true)
+    kotlin.test.assertTrue(notifications.isEmpty() || notifications.last().isExpired || OptionConstants.clipboard_ideaput !in notifications.last().content)
   }
 
   @VimOptionTestConfiguration(VimTestOption(OptionConstants.clipboard, OptionValueType.STRING, ""))
+  @Test
   fun `test no notification if already was`() {
     val before = "${c}I found it in a legendary land"
     configureByText(before)
     appReadySetup(true)
-    val vimEditor = myFixture.editor.vim
-    VimPlugin.getRegister().storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
+    val vimEditor = fixture.editor.vim
+    VimPlugin.getRegister()
+      .storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
     typeText(injector.parser.parseKeys("p"))
 
-    val notifications = EventLog.getLogModel(myFixture.project).notifications
-    assertTrue(notifications.isEmpty() || notifications.last().isExpired || OptionConstants.clipboard_ideaput !in notifications.last().content)
+    val notifications = EventLog.getLogModel(fixture.project).notifications
+    kotlin.test.assertTrue(notifications.isEmpty() || notifications.last().isExpired || OptionConstants.clipboard_ideaput !in notifications.last().content)
   }
 
   private fun appReadySetup(notifierEnabled: Boolean) {
-    EventLog.markAllAsRead(myFixture.project)
+    EventLog.markAllAsRead(fixture.project)
     VimPlugin.getVimState().isIdeaPutNotified = notifierEnabled
   }
 }

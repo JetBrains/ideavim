@@ -18,16 +18,21 @@ import org.jetbrains.plugins.ideavim.OptionValueType
 import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
 import org.jetbrains.plugins.ideavim.VimTestOption
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInfo
 
 class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard) {
   @Throws(Exception::class)
-  override fun setUp() {
-    super.setUp()
+  @BeforeEach
+  override fun setUp(testInfo: TestInfo) {
+    super.setUp(testInfo)
     enableExtensions("exchange")
   }
 
   // |cx|
   @VimOptionTestConfiguration(VimTestOption(OptionConstants.clipboard, OptionValueType.STRING, "unnamed"))
+  @Test
   fun `test exchange words left to right`() {
     doTest(
       listOf("cxe", "w", "cxe"),
@@ -40,6 +45,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
 
   // |cx|
   @VimOptionTestConfiguration(VimTestOption(OptionConstants.clipboard, OptionValueType.STRING, "unnamed"))
+  @Test
   fun `test exchange words dot repeat`() {
     doTest(
       listOf("cxiw", "w", "."),
@@ -52,6 +58,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
 
   // |cx|
   @VimOptionTestConfiguration(VimTestOption(OptionConstants.clipboard, OptionValueType.STRING, "unnamed"))
+  @Test
   fun `test exchange words right to left`() {
     doTest(
       listOf("cxe", "b", "cxe"),
@@ -64,6 +71,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
 
   // |cx|
   @VimOptionTestConfiguration(VimTestOption(OptionConstants.clipboard, OptionValueType.STRING, "unnamed"))
+  @Test
   fun `test exchange words right to left with dot`() {
     doTest(
       listOf("cxe", "b", "."),
@@ -76,6 +84,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
 
   // |X|
   @VimOptionTestConfiguration(VimTestOption(OptionConstants.clipboard, OptionValueType.STRING, "unnamed"))
+  @Test
   fun `test visual exchange words left to right`() {
     doTest(
       listOf("veX", "w", "veX"),
@@ -92,6 +101,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
     originalVimAfter = "The ${c}brown catch over the lazy dog",
     shouldBeFixed = true,
   )
+  @Test
   fun `test visual exchange words from inside`() {
     doTest(
       listOf("veX", "b", "v3e", "X"),
@@ -108,6 +118,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
     originalVimAfter = "The brown ${c}catch over the lazy dog",
     shouldBeFixed = true,
   )
+  @Test
   fun `test visual exchange words from outside`() {
     doTest(
       listOf("v3e", "X", "w", "veX"),
@@ -129,6 +140,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
        """,
     shouldBeFixed = true,
   )
+  @Test
   fun `test exchange lines top down`() {
     doTest(
       listOf("cxx", "j", "cxx"),
@@ -158,6 +170,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
        """,
     shouldBeFixed = true,
   )
+  @Test
   fun `test exchange lines top down with dot`() {
     doTest(
       listOf("cxx", "j", "."),
@@ -185,6 +198,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
           lazy dog
     """,
   )
+  @Test
   fun `test exchange to the line end`() {
     doTest(
       listOf("v$", "X", "jj^ve", "X"),
@@ -214,6 +228,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
       """,
     shouldBeFixed = true,
   )
+  @Test
   fun `test exchange visual lines`() {
     doTest(
       listOf("Vj", "X", "jj", "Vj", "X"),
@@ -236,6 +251,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
   }
 
   @VimOptionTestConfiguration(VimTestOption(OptionConstants.clipboard, OptionValueType.STRING, "unnamed"))
+  @Test
   fun `test visual char highlighter`() {
     val before = """
          The ${c}quick
@@ -253,6 +269,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
   }
 
   @VimOptionTestConfiguration(VimTestOption(OptionConstants.clipboard, OptionValueType.STRING, "unnamed"))
+  @Test
   fun `test visual line highdhitligthhter`() {
     val before = """
          The ${c}quick
@@ -270,6 +287,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
   }
 
   @VimOptionTestConfiguration(VimTestOption(OptionConstants.clipboard, OptionValueType.STRING, "unnamed"))
+  @Test
   fun `test till the line end highlighter`() {
     val before = """
          The ${c}quick
@@ -285,6 +303,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
   }
 
   @VimOptionTestConfiguration(VimTestOption(OptionConstants.clipboard, OptionValueType.STRING, "unnamed"))
+  @Test
   fun `test pre line end highlighter`() {
     val before = """
          The ${c}quick
@@ -300,6 +319,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
   }
 
   @VimOptionTestConfiguration(VimTestOption(OptionConstants.clipboard, OptionValueType.STRING, "unnamed"))
+  @Test
   fun `test pre pre line end highlighter`() {
     val before = """
          The ${c}quick
@@ -315,6 +335,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
   }
 
   @VimOptionTestConfiguration(VimTestOption(OptionConstants.clipboard, OptionValueType.STRING, "unnamed"))
+  @Test
   fun `test to file end highlighter`() {
     val before = """
          The quick
@@ -337,6 +358,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
   }
 
   @VimOptionTestConfiguration(VimTestOption(OptionConstants.clipboard, OptionValueType.STRING, "unnamed"))
+  @Test
   fun `test to file end with new line highlighter`() {
     val before = """
          The quick
@@ -364,10 +386,10 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(OptionConstants.clipboard
   }
 
   private fun assertHighlighter(start: Int, end: Int, area: HighlighterTargetArea) {
-    val currentExchange = myFixture.editor.getUserData(VimExchangeExtension.EXCHANGE_KEY)!!
+    val currentExchange = fixture.editor.getUserData(VimExchangeExtension.EXCHANGE_KEY)!!
     val highlighter = currentExchange.getHighlighter()!!
-    assertEquals(start, highlighter.startOffset)
-    assertEquals(end, highlighter.endOffset)
-    assertEquals(area, highlighter.targetArea)
+    kotlin.test.assertEquals(start, highlighter.startOffset)
+    kotlin.test.assertEquals(end, highlighter.endOffset)
+    kotlin.test.assertEquals(area, highlighter.targetArea)
   }
 }

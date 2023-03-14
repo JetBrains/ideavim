@@ -10,142 +10,166 @@ package org.jetbrains.plugins.ideavim.action.motion.`object`
 
 import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class MotionOuterBlockTagActionTest : VimTestCase() {
 
   // |d| |v_at|
+  @Test
   fun testDeleteOuterTagBlockBefore() {
     typeTextInFile(injector.parser.parseKeys("dat"), "abc${c}de<tag>fg</tag>hi")
     assertState("abcde<tag>fg</tag>hi")
   }
 
   // |d| |v_at|
+  @Test
   fun testDeleteOuterTagBlockInOpen() {
     typeTextInFile(injector.parser.parseKeys("dat"), "abcde<ta${c}g>fg</tag>hi")
     assertState("abcdehi")
   }
 
   // |d| |v_at|
+  @Test
   fun testDeleteOuterTagBlockInOpenWithArgs() {
     typeTextInFile(injector.parser.parseKeys("dat"), "abcde<ta${c}g name = \"name\">fg</tag>hi")
     assertState("abcdehi")
   }
 
   // |d| |v_at|
+  @Test
   fun testDeleteOuterTagBlockBetween() {
     typeTextInFile(injector.parser.parseKeys("dat"), "abcde<tag>f${c}g</tag>hi")
     assertState("abcdehi")
   }
 
   // |d| |v_at|
+  @Test
   fun testDeleteOuterTagBlockBetweenWithArgs() {
     typeTextInFile(injector.parser.parseKeys("dat"), "abcde<tag name = \"name\">f${c}g</tag>hi")
     assertState("abcdehi")
   }
 
   // |d| |v_at|
+  @Test
   fun testDeleteOuterTagBlockInClose() {
     typeTextInFile(injector.parser.parseKeys("dat"), "abcde<tag>fg</ta${c}g>hi")
     assertState("abcdehi")
   }
 
   // |d| |v_at|
+  @Test
   fun testDeleteOuterTagBlockAfter() {
     typeTextInFile(injector.parser.parseKeys("dat"), "abcde<tag>fg</tag>h${c}i")
     assertState("abcde<tag>fg</tag>hi")
   }
 
   // |d| |v_at|
+  @Test
   fun testDeleteOuterTagBlockInAlone() {
     typeTextInFile(injector.parser.parseKeys("dat"), "abcde<ta${c}g>fghi")
     assertState("abcde<tag>fghi")
   }
 
   // |d| |v_at|
+  @Test
   fun testDeleteOuterTagBlockWithoutTags() {
     typeTextInFile(injector.parser.parseKeys("dat"), "abc${c}de")
     assertState("abcde")
   }
 
   // |d| |v_at|
+  @Test
   fun testDeleteOuterTagBlockBeforeWithoutOpenTag() {
     typeTextInFile(injector.parser.parseKeys("dat"), "abc${c}defg</tag>hi")
     assertState("abcdefg</tag>hi")
   }
 
   // |d| |v_at|
+  @Test
   fun testDeleteOuterTagBlockInCloseWithoutOpenTag() {
     typeTextInFile(injector.parser.parseKeys("dat"), "abcdefg</ta${c}g>hi")
     assertState("abcdefg</tag>hi")
   }
 
   // |d| |v_at|
+  @Test
   fun testDeleteOuterTagBlockAfterWithoutOpenTag() {
     typeTextInFile(injector.parser.parseKeys("dat"), "abcdefg</tag>h${c}i")
     assertState("abcdefg</tag>hi")
   }
 
   // |d| |v_at|
+  @Test
   fun testDeleteOuterTagBlockBeforeWithoutCloseTag() {
     typeTextInFile(injector.parser.parseKeys("dat"), "abc${c}defg<tag>hi")
     assertState("abcdefg<tag>hi")
   }
 
   // |d| |v_at|
+  @Test
   fun testDeleteOuterTagBlockInOpenWithoutCloseTag() {
     typeTextInFile(injector.parser.parseKeys("dat"), "abcdefg<ta${c}g>hi")
     assertState("abcdefg<tag>hi")
   }
 
   // |d| |v_at|
+  @Test
   fun testDeleteOuterTagBlockAfterWithoutCloseTag() {
     typeTextInFile(injector.parser.parseKeys("dat"), "abcdefg<tag>h${c}i")
     assertState("abcdefg<tag>hi")
   }
 
   // |d| |v_at|
+  @Test
   fun testDeleteOuterTagBlockBeforeWrongOrder() {
     typeTextInFile(injector.parser.parseKeys("dat"), "abc${c}de</tag>fg<tag>hi")
     assertState("abcde</tag>fg<tag>hi")
   }
 
   // |d| |v_at|
+  @Test
   fun testDeleteOuterTagBlockInOpenWrongOrder() {
     typeTextInFile(injector.parser.parseKeys("dat"), "abcde</ta${c}g>fg<tag>hi")
     assertState("abcde</tag>fg<tag>hi")
   }
 
   // |d| |v_at|
+  @Test
   fun testDeleteOuterTagBlockBetweenWrongOrder() {
     typeTextInFile(injector.parser.parseKeys("dat"), "abcde</tag>f${c}g<tag>hi")
     assertState("abcde</tag>fg<tag>hi")
   }
 
   // |d| |v_at|
+  @Test
   fun testDeleteOuterTagBlockInCloseWrongOrder() {
     typeTextInFile(injector.parser.parseKeys("dat"), "abcde</tag>fg<ta${c}g>hi")
     assertState("abcde</tag>fg<tag>hi")
   }
 
   // |d| |v_at|
+  @Test
   fun testDeleteOuterTagBlockAfterWrongOrder() {
     typeTextInFile(injector.parser.parseKeys("dat"), "abcde</tag>fg<tag>h${c}i")
     assertState("abcde</tag>fg<tag>hi")
   }
 
   // |d| |v_it|
+  @Test
   fun testDeleteInnerTagAngleBrackets() {
     typeTextInFile(injector.parser.parseKeys("dit"), "<div ${c}hello=\"d > hsj < akl\"></div>")
     assertState("<div hello=\"d ></div>")
   }
 
   // VIM-1090 |d| |v_at|
+  @Test
   fun testDeleteOuterTagDuplicateTags() {
     typeTextInFile(injector.parser.parseKeys("dat"), "<a><a></a></a$c>")
     assertState("")
   }
 
   // |v_it| |v_at|
+  @Test
   fun testTagSelectionSkipsWhitespaceAtStartOfLine() {
     // Also skip tabs
     configureByText(
@@ -157,6 +181,7 @@ class MotionOuterBlockTagActionTest : VimTestCase() {
     assertSelection("<t>Inner</t>")
   }
 
+  @Test
   fun `test skip new line`() {
     // Newline must not be skipped
     configureByText("${c}\n" + "    <t>asdf</t>")
@@ -164,6 +189,7 @@ class MotionOuterBlockTagActionTest : VimTestCase() {
     assertSelection(null)
   }
 
+  @Test
   fun `test whitespace skip`() {
     // Whitespace is only skipped if there is nothing else at the start of the line
     configureByText(
@@ -180,6 +206,7 @@ class MotionOuterBlockTagActionTest : VimTestCase() {
   }
 
   // |v_at|
+  @Test
   fun testNestedTagSelection() {
     configureByText(
       "<t>Outer\n" +
@@ -190,6 +217,7 @@ class MotionOuterBlockTagActionTest : VimTestCase() {
     assertSelection("<t>Inner</t>")
   }
 
+  @Test
   fun `test nested tags between tags`() {
     configureByText(
       "<t>Outer\n" +
@@ -204,6 +232,7 @@ class MotionOuterBlockTagActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test nested tags double motion`() {
     configureByText(
       "<t>Outer\n" +
@@ -218,6 +247,7 @@ class MotionOuterBlockTagActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test nested tags number motion`() {
     configureByText(
       "<t>Outer\n" +
@@ -232,6 +262,7 @@ class MotionOuterBlockTagActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test nested tags on outer`() {
     configureByText(
       "<t>Outer\n" +
@@ -246,6 +277,7 @@ class MotionOuterBlockTagActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test nested tags on outer start`() {
     configureByText(
       "<${c}t>Outer\n" +
@@ -260,6 +292,7 @@ class MotionOuterBlockTagActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test nested tags outside outer`() {
     configureByText(
       "$c<t>Outer\n" +

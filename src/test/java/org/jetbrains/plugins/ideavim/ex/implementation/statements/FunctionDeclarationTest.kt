@@ -11,9 +11,11 @@ package org.jetbrains.plugins.ideavim.ex.implementation.statements
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class FunctionDeclarationTest : VimTestCase() {
 
+  @Test
   fun `test user defined function`() {
     configureByText("\n")
     typeText(
@@ -29,6 +31,7 @@ class FunctionDeclarationTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test unknown function`() {
     configureByText("\n")
     typeText(commandToKeys("echo GetHiString('Mark')"))
@@ -36,6 +39,7 @@ class FunctionDeclarationTest : VimTestCase() {
     assertPluginErrorMessageContains("E117: Unknown function: GetHiString")
   }
 
+  @Test
   fun `test nested function`() {
     configureByText("\n")
     typeText(
@@ -59,6 +63,7 @@ class FunctionDeclarationTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test call nested function without calling a container function`() {
     configureByText("\n")
     typeText(
@@ -81,6 +86,7 @@ class FunctionDeclarationTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test defining an existing function`() {
     configureByText("\n")
     typeText(
@@ -108,6 +114,7 @@ class FunctionDeclarationTest : VimTestCase() {
     typeText(commandToKeys("delf! F1"))
   }
 
+  @Test
   fun `test redefining an existing function`() {
     configureByText("\n")
     typeText(
@@ -133,6 +140,7 @@ class FunctionDeclarationTest : VimTestCase() {
     typeText(commandToKeys("delf! F1"))
   }
 
+  @Test
   fun `test closure function`() {
     configureByText("\n")
     typeText(
@@ -155,6 +163,7 @@ class FunctionDeclarationTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test outer variable cannot be reached from inner function`() {
     configureByText("\n")
     typeText(
@@ -178,6 +187,7 @@ class FunctionDeclarationTest : VimTestCase() {
     typeText(commandToKeys("delf! F2"))
   }
 
+  @Test
   fun `test call closure function multiple times`() {
     configureByText("\n")
     typeText(
@@ -204,6 +214,7 @@ class FunctionDeclarationTest : VimTestCase() {
     typeText(commandToKeys("delf! F2"))
   }
 
+  @Test
   fun `test local variables exist after delfunction command`() {
     configureByText("\n")
     typeText(
@@ -230,6 +241,7 @@ class FunctionDeclarationTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test outer function does not see inner closure function variable`() {
     configureByText("\n")
     typeText(
@@ -261,6 +273,7 @@ class FunctionDeclarationTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test function without abort flag`() {
     configureByText("\n")
     typeText(
@@ -284,6 +297,7 @@ class FunctionDeclarationTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test function with abort flag`() {
     configureByText("\n")
     typeText(
@@ -306,6 +320,7 @@ class FunctionDeclarationTest : VimTestCase() {
     typeText(commandToKeys("delf! F1"))
   }
 
+  @Test
   fun `test function without range flag`() {
     configureByText(
       """
@@ -340,6 +355,7 @@ class FunctionDeclarationTest : VimTestCase() {
     typeText(commandToKeys("delf! F1"))
   }
 
+  @Test
   fun `test function with range flag`() {
     configureByText(
       """
@@ -375,6 +391,7 @@ class FunctionDeclarationTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test trying to create a function with firstline or lastline argument`() {
     configureByText("\n")
     typeText(
@@ -405,6 +422,7 @@ class FunctionDeclarationTest : VimTestCase() {
     typeText(commandToKeys("delf! F2"))
   }
 
+  @Test
   fun `test firstline and lastline default value if no range specified`() {
     configureByText(
       """
@@ -436,6 +454,7 @@ class FunctionDeclarationTest : VimTestCase() {
     typeText(commandToKeys("delf! F1"))
   }
 
+  @Test
   fun `test firstline and lastline default value if range is specified`() {
     configureByText(
       """
@@ -467,6 +486,7 @@ class FunctionDeclarationTest : VimTestCase() {
     typeText(commandToKeys("delf! F1"))
   }
 
+  @Test
   fun `test functions without range flag columns`() {
     configureByText(
       """
@@ -499,6 +519,7 @@ class FunctionDeclarationTest : VimTestCase() {
     typeText(commandToKeys("delf! F1"))
   }
 
+  @Test
   fun `test functions with range flag columns`() {
     configureByText(
       """
@@ -531,6 +552,7 @@ class FunctionDeclarationTest : VimTestCase() {
     typeText(commandToKeys("delf! F1"))
   }
 
+  @Test
   fun `test only optional arguments`() {
     configureByText("\n")
     typeText(
@@ -553,6 +575,7 @@ class FunctionDeclarationTest : VimTestCase() {
     typeText(commandToKeys("delfunction! GetOptionalArgs"))
   }
 
+  @Test
   fun `test only default arguments`() {
     configureByText("\n")
     typeText(
@@ -571,6 +594,7 @@ class FunctionDeclarationTest : VimTestCase() {
     typeText(commandToKeys("delfunction! GetDefaultArgs"))
   }
 
+  @Test
   fun `test optional arguments`() {
     configureByText("\n")
     typeText(
@@ -593,6 +617,7 @@ class FunctionDeclarationTest : VimTestCase() {
     typeText(commandToKeys("delfunction! GetOptionalArgs"))
   }
 
+  @Test
   fun `test arguments with default values`() {
     configureByText("\n")
     typeText(
@@ -615,6 +640,7 @@ class FunctionDeclarationTest : VimTestCase() {
     typeText(commandToKeys("delfunction! GetOptionalArgs"))
   }
 
+  @Test
   fun `test arguments with default values and optional args`() {
     configureByText("\n")
     typeText(
@@ -640,6 +666,7 @@ class FunctionDeclarationTest : VimTestCase() {
     typeText(commandToKeys("delfunction! GetOptionalArgs"))
   }
 
+  @Test
   fun `test finish statement in function`() {
     configureByText("\n")
     typeText(
@@ -660,6 +687,7 @@ class FunctionDeclarationTest : VimTestCase() {
     typeText(commandToKeys("delfunction! F"))
   }
 
+  @Test
   fun `test args are passed to function by reference`() {
     configureByText("\n")
     typeText(
@@ -682,6 +710,7 @@ class FunctionDeclarationTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test define script function in command line context`() {
     configureByText("\n")
     typeText(
@@ -697,6 +726,7 @@ class FunctionDeclarationTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test get script function in command line context`() {
     configureByText("\n")
     typeText(
@@ -707,6 +737,7 @@ class FunctionDeclarationTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test get built-in function with global scope`() {
     configureByText("\n")
     typeText(commandToKeys("echo g:abs(-10)"))
@@ -714,6 +745,7 @@ class FunctionDeclarationTest : VimTestCase() {
     assertPluginErrorMessageContains("E117: Unknown function: g:abs")
   }
 
+  @Test
   fun `test return with no expression`() {
     configureByText("\n")
     typeText(

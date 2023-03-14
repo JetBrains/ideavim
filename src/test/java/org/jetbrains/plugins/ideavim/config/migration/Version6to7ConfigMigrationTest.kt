@@ -13,7 +13,7 @@ package org.jetbrains.plugins.ideavim.config.migration
 import com.intellij.openapi.util.JDOMUtil
 import com.maddyhome.idea.vim.config.migration.`Version 6 to 7 config migration`
 import org.intellij.lang.annotations.Language
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertTrue
 
 class `Version 6 to 7 config migration test` {

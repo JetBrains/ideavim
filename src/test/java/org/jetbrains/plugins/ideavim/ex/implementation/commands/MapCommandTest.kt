@@ -11,13 +11,15 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.textarea.TextComponentEditorImpl
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.history.HistoryConstants
 import com.maddyhome.idea.vim.newapi.vim
-import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.waitAndAssert
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
 import javax.swing.JTextArea
 
 /**
@@ -25,6 +27,7 @@ import javax.swing.JTextArea
  */
 class MapCommandTest : VimTestCase() {
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
+  @Test
   fun testMapKtoJ() {
     configureByText(
       """
@@ -41,6 +44,7 @@ class MapCommandTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
+  @Test
   fun testInsertMapJKtoEsc() {
     configureByText("${c}World!\n")
     typeText(commandToKeys("imap jk <Esc>"))
@@ -51,6 +55,7 @@ class MapCommandTest : VimTestCase() {
     assertOffset(6)
   }
 
+  @Test
   fun testBackslashAtEnd() {
     configureByText("\n")
     typeText(commandToKeys("imap foo\\ bar"))
@@ -60,6 +65,7 @@ class MapCommandTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "bad replace term codes")
+  @Test
   fun testUnfinishedSpecialKey() {
     configureByText("\n")
     typeText(commandToKeys("imap <Esc foo"))
@@ -68,6 +74,7 @@ class MapCommandTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun testUnknownSpecialKey() {
     configureByText("\n")
     typeText(commandToKeys("imap <foo> bar"))
@@ -75,6 +82,7 @@ class MapCommandTest : VimTestCase() {
     assertState("bar\n")
   }
 
+  @Test
   fun testMapTable() {
     configureByText("\n")
     typeText(commandToKeys("map <C-Down> gt"))
@@ -101,6 +109,7 @@ n  ,f            <Plug>Foo
     )
   }
 
+  @Test
   fun testRecursiveMapping() {
     configureByText("\n")
     typeText(commandToKeys("imap foo bar"))
@@ -110,6 +119,7 @@ n  ,f            <Plug>Foo
     assertState("quux\n")
   }
 
+  @Test
   fun testddWithMapping() {
     configureByText(
       """
@@ -126,6 +136,7 @@ n  ,f            <Plug>Foo
     )
   }
 
+  @Test
   fun testNonRecursiveMapping() {
     configureByText("\n")
     typeText(commandToKeys("inoremap a b"))
@@ -135,6 +146,7 @@ n  ,f            <Plug>Foo
     assertState("ba\n")
   }
 
+  @Test
   fun testNonRecursiveMapTable() {
     configureByText("\n")
     typeText(commandToKeys("inoremap jj <Esc>"))
@@ -150,6 +162,7 @@ n  ,f            <Plug>Foo
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
+  @Test
   fun testNop() {
     configureByText(
       """
@@ -174,6 +187,7 @@ n  ,f            <Plug>Foo
     assertExOutput("n  <Right>     * <Nop>\n")
   }
 
+  @Test
   fun testIgnoreModifiers() {
     configureByText("\n")
     typeText(commandToKeys("nmap <buffer> ,a /a<CR>"))
@@ -199,6 +213,7 @@ n  ,f            <Plug>Foo
 
   // VIM-645 |:nmap|
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "Bad replace of term codes")
+  @Test
   fun testMapSpace() {
     configureByText("foo\n")
     typeText(commandToKeys("nmap <space> dw"))
@@ -209,6 +224,7 @@ n  ,f            <Plug>Foo
   }
 
   // VIM-661 |:noremap| |r|
+  @Test
   fun testNoMappingInReplaceCharacterArgument() {
     configureByText("${c}foo\n")
     typeText(commandToKeys("noremap A Z"))
@@ -217,6 +233,7 @@ n  ,f            <Plug>Foo
   }
 
   // VIM-661 |:omap| |d| |t|
+  @Test
   fun testNoMappingInNonFirstCharOfOperatorPendingMode() {
     configureByText("${c}foo, bar\n")
     typeText(commandToKeys("omap , ?"))
@@ -226,6 +243,7 @@ n  ,f            <Plug>Foo
 
   // VIM-666 |:imap|
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun testIgnoreEverythingAfterBar() {
     configureByText("${c}foo\n")
     typeText(commandToKeys("imap a b |c \" Something else"))
@@ -234,6 +252,7 @@ n  ,f            <Plug>Foo
   }
 
   // VIM-666 |:imap|
+  @Test
   fun testBarEscaped() {
     configureByText("${c}foo\n")
     typeText(commandToKeys("imap a b \\| c"))
@@ -243,6 +262,7 @@ n  ,f            <Plug>Foo
 
   // VIM-666 |:imap|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
+  @Test
   fun testBarEscapedSeveralSpaces() {
     configureByText("${c}foo\n")
     typeText(commandToKeys("imap a b \\| c    |"))
@@ -251,6 +271,7 @@ n  ,f            <Plug>Foo
   }
 
   // VIM-670 |:map|
+  @Test
   fun testFirstCharIsNonRecursive() {
     configureByText("\n")
     typeText(commandToKeys("map ab abcd"))
@@ -260,6 +281,7 @@ n  ,f            <Plug>Foo
 
   // VIM-676 |:map|
   @TestWithoutNeovim(reason = SkipNeovimReason.VIM_SCRIPT)
+  @Test
   fun testBackspaceCharacterInVimRc() {
     configureByText("\n")
     injector.vimscriptExecutor.execute("inoremap # X\u0008#\n")
@@ -272,6 +294,7 @@ n  ,f            <Plug>Foo
 
   // VIM-679 |:map|
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun testCancelCharacterInVimRc() {
     configureByText(
       """
@@ -298,6 +321,7 @@ n  ,f            <Plug>Foo
 
   // VIM-679 |:map|
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun testBarCtrlVEscaped() {
     configureByText("${c}foo\n")
     injector.vimscriptExecutor.execute("imap a b \u0016|\u0016| c |\n")
@@ -307,6 +331,7 @@ n  ,f            <Plug>Foo
 
   // VIM-679 |:map|
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "bad term codes")
+  @Test
   fun testCtrlMCtrlLAsNewLine() {
     configureByText("${c}foo\n")
     injector.vimscriptExecutor.execute("map A :%s/foo/bar/g\r\u000C\n")
@@ -315,6 +340,7 @@ n  ,f            <Plug>Foo
   }
 
   // VIM-700 |:map|
+  @Test
   fun testRemappingZero() {
     configureByText("x${c}yz\n")
     typeText(commandToKeys("map 0 ~"))
@@ -324,6 +350,7 @@ n  ,f            <Plug>Foo
 
   // VIM-700 |:map|
   @TestWithoutNeovim(reason = SkipNeovimReason.VIM_SCRIPT)
+  @Test
   fun testRemappingZeroStillAllowsZeroToBeUsedInCount() {
     configureByText("a${c}bcdefghijklmnop\n")
     injector.vimscriptExecutor.execute("map 0 ^")
@@ -333,6 +360,7 @@ n  ,f            <Plug>Foo
 
   // VIM-700 |:map|
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "bad term codes")
+  @Test
   fun testRemappingDeleteOverridesRemovingLastDigitFromCount() {
     configureByText("a${c}bcdefghijklmnop\n")
     typeText(commandToKeys("map <Del> ~"))
@@ -342,6 +370,7 @@ n  ,f            <Plug>Foo
 
   // VIM-650 |mapleader|
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "Bad replace of term codes")
+  @Test
   fun testMapLeader() {
     configureByText("\n")
     typeText(commandToKeys("let mapleader = \",\""))
@@ -352,6 +381,7 @@ n  ,f            <Plug>Foo
 
   // VIM-650 |mapleader|
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "Bad replace of term codes")
+  @Test
   fun testMapLeaderToSpace() {
     configureByText("\n")
     typeText(commandToKeys("let mapleader = \"\\<SPACE>\""))
@@ -362,6 +392,7 @@ n  ,f            <Plug>Foo
 
   // VIM-650 |mapleader|
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "Bad replace of term codes")
+  @Test
   fun testMapLeaderToSpaceWithWhitespace() {
     configureByText("\n")
     typeText(commandToKeys("let mapleader = \" \""))
@@ -371,6 +402,7 @@ n  ,f            <Plug>Foo
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "bad replace term codes")
+  @Test
   fun testAmbiguousMapping() {
     configureByText("\n")
     typeText(commandToKeys("nmap ,f iHello<Esc>"))
@@ -384,6 +416,7 @@ n  ,f            <Plug>Foo
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "bad term codes")
+  @Test
   fun testLongAmbiguousMapping() {
     configureByText("\n")
     typeText(commandToKeys("nmap ,foo iHello<Esc>"))
@@ -397,6 +430,7 @@ n  ,f            <Plug>Foo
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUG)
+  @Test
   fun testPlugMapping() {
     configureByText("\n")
     typeText(commandToKeys("nmap ,f <Plug>Foo"))
@@ -405,6 +439,7 @@ n  ,f            <Plug>Foo
     assertState("Hello!\n")
   }
 
+  @Test
   fun testIntersectingCommands() {
     configureByText("123${c}4567890")
     typeText(commandToKeys("map ds h"))
@@ -414,6 +449,7 @@ n  ,f            <Plug>Foo
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUG)
+  @Test
   fun testIncompleteMapping() {
     configureByText("123${c}4567890")
     typeText(commandToKeys("map <Plug>(Hi)l lll"))
@@ -422,6 +458,7 @@ n  ,f            <Plug>Foo
     assertState("12${c}34567890")
   }
 
+  @Test
   fun testIntersectingCommands2() {
     configureByText("123${c}4567890")
     typeText(commandToKeys("map as x"))
@@ -430,6 +467,7 @@ n  ,f            <Plug>Foo
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
+  @Test
   fun testMapZero() {
     configureByText("A quick ${c}brown fox jumps over the lazy dog")
     typeText(commandToKeys("nmap 0 w"))
@@ -438,6 +476,7 @@ n  ,f            <Plug>Foo
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
+  @Test
   fun testMapZeroIgnoredInCount() {
     configureByText("A quick ${c}brown fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
     typeText(commandToKeys("nmap 0 w"))
@@ -446,6 +485,7 @@ n  ,f            <Plug>Foo
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
+  @Test
   fun testMapNonZeroDigit() {
     configureByText("A quick ${c}brown fox jumps over the lazy dog")
     typeText(commandToKeys("nmap 2 w"))
@@ -454,6 +494,7 @@ n  ,f            <Plug>Foo
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
+  @Test
   fun testMapNonZeroDigitNotIncludedInCount() {
     configureByText("A quick ${c}brown fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
     typeText(commandToKeys("nmap 2 w"))
@@ -462,6 +503,7 @@ n  ,f            <Plug>Foo
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "Bad replace of term codes")
+  @Test
   fun testShiftSpace() {
     configureByText("A quick ${c}brown fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
     typeText(commandToKeys("nmap <S-Space> w"))
@@ -470,6 +512,7 @@ n  ,f            <Plug>Foo
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "Bad replace of term codes")
+  @Test
   fun testShiftSpaceAndWorkInInsertMode() {
     configureByText("A quick ${c}brown fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
     typeText(commandToKeys("nmap <S-Space> w"))
@@ -478,6 +521,7 @@ n  ,f            <Plug>Foo
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "Bad replace of term codes")
+  @Test
   fun testShiftLetter() {
     configureByText("A quick ${c}brown fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
     typeText(commandToKeys("nmap <S-D> w"))
@@ -485,6 +529,7 @@ n  ,f            <Plug>Foo
     assertState("A quick brown ${c}fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
   }
 
+  @Test
   fun testUppercaseLetter() {
     configureByText("A quick ${c}brown fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
     typeText(commandToKeys("nmap D w"))
@@ -493,6 +538,7 @@ n  ,f            <Plug>Foo
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "Bad replace of term codes")
+  @Test
   fun `test shift letter doesn't break insert mode`() {
     configureByText("A quick ${c}brown fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
     typeText(commandToKeys("nmap <S-D> w"))
@@ -504,6 +550,7 @@ n  ,f            <Plug>Foo
   }
 
   @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
+  @Test
   fun `test comment line with action`() {
     configureByJavaText(
       """
@@ -526,6 +573,7 @@ n  ,f            <Plug>Foo
   }
 
   @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
+  @Test
   fun `test execute two actions with two mappings`() {
     configureByJavaText(
       """
@@ -548,6 +596,7 @@ n  ,f            <Plug>Foo
   }
 
   @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
+  @Test
   fun `test execute two actions with single mappings`() {
     configureByJavaText(
       """
@@ -570,6 +619,7 @@ n  ,f            <Plug>Foo
   }
 
   @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
+  @Test
   fun `test execute three actions with single mappings`() {
     configureByJavaText(
       """
@@ -592,6 +642,7 @@ n  ,f            <Plug>Foo
   }
 
   @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
+  @Test
   fun `test execute action from insert mode`() {
     configureByJavaText(
       """
@@ -614,6 +665,7 @@ n  ,f            <Plug>Foo
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
+  @Test
   fun `test execute mapping with a delay`() {
     val text = """
           -----
@@ -638,6 +690,7 @@ n  ,f            <Plug>Foo
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
+  @Test
   fun `test execute mapping with a delay and second mapping`() {
     val text = """
           -----
@@ -663,6 +716,7 @@ n  ,f            <Plug>Foo
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun `test execute mapping with a delay and second mapping and another starting mappings`() {
     // TODO: 24.01.2021  mapping time should be only 1000 sec
     val text = """
@@ -690,6 +744,7 @@ n  ,f            <Plug>Foo
     )
   }
 
+  @Test
   fun `test execute mapping with a delay and second mapping and another starting mappings with another key`() {
     val text = """
           -----
@@ -715,6 +770,7 @@ n  ,f            <Plug>Foo
     )
   }
 
+  @Test
   fun `test recursion`() {
     val text = """
           -----
@@ -728,9 +784,10 @@ n  ,f            <Plug>Foo
     typeText(commandToKeys("map y x"))
     typeText(injector.parser.parseKeys("x"))
 
-    TestCase.assertTrue(injector.messages.isError())
+    kotlin.test.assertTrue(injector.messages.isError())
   }
 
+  @Test
   fun `test map with expression`() {
     // we test that ternary expression works and cursor stays at the same place after leaving normal mode
     val text = """
@@ -754,6 +811,7 @@ n  ,f            <Plug>Foo
     assertState(text2)
   }
 
+  @Test
   fun `test map with invalid expression`() {
     val text = """
           -----
@@ -768,6 +826,7 @@ n  ,f            <Plug>Foo
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test map expr context`() {
     val text = """
           -----
@@ -796,27 +855,34 @@ n  ,f            <Plug>Foo
   }
 
   // todo keyPresses invoked inside a script should have access to the script context
-//  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
-//  fun `test map expr context`() {
-//    configureByText("\n")
-//    typeText(commandToKeys("""
-//      let s:var = 'itext'|
-//      nnoremap <expr> t s:var|
-//      fun! T()|
-//        normal t|
-//      endfun|
-//    """.trimIndent()))
-//    assertState("\n")
-//    typeText(commandToKeys("call T()"))
-//    assertPluginError(false)
-//    assertState("text\n")
-//
-//    typeText(parseKeys("t"))
-//    assertPluginError(true)
-//    assertPluginErrorMessageContains("E121: Undefined variable: s:var")
-//  }
+  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
+  @Test
+  @Disabled
+  fun `test map expr context 2`() {
+    configureByText("\n")
+    typeText(
+      commandToKeys(
+        """
+      let s:var = 'itext'|
+      nnoremap <expr> t s:var|
+      fun! T()|
+        normal t|
+      endfun|
+    """.trimIndent()
+      )
+    )
+    assertState("\n")
+    typeText(commandToKeys("call T()"))
+    assertPluginError(false)
+    assertState("text\n")
+
+    typeText(parseKeys("t"))
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E121: Undefined variable: s:var")
+  }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test exception during expression evaluation in map with expression`() {
     val text = """
           -----
@@ -832,6 +898,7 @@ n  ,f            <Plug>Foo
     assertState(text)
   }
 
+  @Test
   fun `test rhc with triangle brackets`() {
     configureByText("\n")
     typeText(commandToKeys("inoremap p <p>"))
@@ -839,6 +906,7 @@ n  ,f            <Plug>Foo
     assertState("<p>\n")
   }
 
+  @Test
   fun `test pattern in mapping`() {
     configureByText(
       """
@@ -859,6 +927,7 @@ n  ,f            <Plug>Foo
   }
 
   // Related issue: VIM-2315
+  @Test
   fun `test with shorter conflict`() {
     val text = """
           -----
@@ -898,6 +967,7 @@ n  ,f            <Plug>Foo
     }
   }
 
+  @Test
   fun `test autocast to action notation`() {
     configureByText("\n")
     typeText(commandToKeys("nmap ,a :action Back<CR>"))
@@ -926,6 +996,7 @@ n  ,i            <Action>(Back)
     )
   }
 
+  @Test
   fun `test autocast to action notation 2`() {
     configureByText("\n")
     typeText(commandToKeys("nnoremap ,a :action Back<CR>"))
@@ -954,11 +1025,15 @@ n  ,i            <Action>(Back)
     )
   }
 
+  @Test
   fun `test command from map isn't added to history`() {
     configureByText("\n")
     typeText(commandToKeys("map A :echo 42<CR>"))
     typeText(injector.parser.parseKeys("A"))
     assertExOutput("42\n")
-    assertEquals("map A :echo 42<CR>", injector.historyGroup.getEntries(HistoryConstants.COMMAND, 0, 0).last().entry)
+    kotlin.test.assertEquals(
+      "map A :echo 42<CR>",
+      injector.historyGroup.getEntries(HistoryConstants.COMMAND, 0, 0).last().entry
+    )
   }
 }

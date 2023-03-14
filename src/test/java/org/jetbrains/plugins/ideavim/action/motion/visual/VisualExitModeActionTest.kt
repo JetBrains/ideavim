@@ -10,13 +10,16 @@ package org.jetbrains.plugins.ideavim.action.motion.visual
 
 import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class VisualExitModeActionTest : VimTestCase() {
+  @Test
   fun `test exit visual mode after line end`() {
     doTest("vl<Esc>", "12${c}3", "12${c}3", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
     assertCaretsVisualAttributes()
   }
 
+  @Test
   fun `test double exit`() {
     doTest("vl<Esc><Esc>", "12${c}3", "12${c}3", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
     assertCaretsVisualAttributes()

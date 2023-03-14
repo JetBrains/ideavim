@@ -9,14 +9,15 @@
 package org.jetbrains.plugins.ideavim.longrunning
 
 import com.maddyhome.idea.vim.api.injector
-import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class MapCommandTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test double recursion`() {
     val text = """
           -----
@@ -29,6 +30,6 @@ class MapCommandTest : VimTestCase() {
     typeText(commandToKeys("map b wbb"))
     typeText(injector.parser.parseKeys("b"))
 
-    TestCase.assertTrue(injector.messages.isError())
+    kotlin.test.assertTrue(injector.messages.isError())
   }
 }

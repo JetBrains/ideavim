@@ -11,12 +11,13 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.history.HistoryConstants
-import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class GlobalCommandTest : VimTestCase() {
+  @Test
   fun `test default range`() {
     doTest(
       "g/found/d",
@@ -31,6 +32,7 @@ class GlobalCommandTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test default range first line`() {
     doTest(
       "g/Discovery/d",
@@ -45,6 +47,7 @@ class GlobalCommandTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test default range last line`() {
     doTest(
       "g/torrent/d",
@@ -59,6 +62,7 @@ class GlobalCommandTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test two lines`() {
     doTest(
       "g/it/d",
@@ -72,6 +76,7 @@ class GlobalCommandTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test two lines force`() {
     doTest(
       "g!/it/d",
@@ -83,6 +88,7 @@ class GlobalCommandTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test vglobal`() {
     doTest(
       "v/it/d",
@@ -94,6 +100,7 @@ class GlobalCommandTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test current line`() {
     doTest(
       ".g/found/d",
@@ -102,6 +109,7 @@ class GlobalCommandTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test current line right place`() {
     doTest(
       ".g/found/d",
@@ -123,6 +131,7 @@ class GlobalCommandTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test nested global`() {
     doTest(
       "g/found/v/notfound/d",
@@ -144,6 +153,7 @@ class GlobalCommandTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test nested multiple lines`() {
     doTest(
       "g/it/v/notit/d",
@@ -164,6 +174,7 @@ class GlobalCommandTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test check history`() {
     VimPlugin.getHistory().clear()
     val initialEntries = VimPlugin.getHistory().getEntries(HistoryConstants.COMMAND, 0, 0)
@@ -179,12 +190,13 @@ class GlobalCommandTest : VimTestCase() {
       """.trimIndent(),
     )
     val entries = VimPlugin.getHistory().getEntries(HistoryConstants.COMMAND, 0, 0)
-    TestCase.assertEquals(1, entries.size - initialEntries.size)
+    kotlin.test.assertEquals(1, entries.size - initialEntries.size)
     val element = entries.last()
-    TestCase.assertEquals("g/found/d", element.entry)
+    kotlin.test.assertEquals("g/found/d", element.entry)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun `test g only`() {
     doTest(
       "g",
@@ -195,6 +207,7 @@ class GlobalCommandTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun `test g with one separator`() {
     doTest(
       "g/",
@@ -205,6 +218,7 @@ class GlobalCommandTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun `test g with one separator and pattern`() {
     doTest(
       "g/found",
@@ -215,6 +229,7 @@ class GlobalCommandTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun `test g with one separator and pattern and separator`() {
     doTest(
       "g/found",
@@ -239,6 +254,7 @@ class GlobalCommandTest : VimTestCase() {
     """.trimIndent()
   }
 
+  @Test
   fun `test bar in command`() {
     doTest(
       "g/\\vfound|rocks/d",

@@ -66,6 +66,14 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.plugins.ideavim.c
+import org.jetbrains.plugins.ideavim.dotToSpace
+import org.jetbrains.plugins.ideavim.s
+import org.jetbrains.plugins.ideavim.se
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import org.junit.jupiter.api.Test
+import kotlin.test.assertFalse
 
 import javax.swing.*;
 import java.awt.*;
@@ -76,9 +84,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.jetbrains.plugins.ideavim.c
+import org.jetbrains.plugins.ideavim.dotToSpace
+import org.jetbrains.plugins.ideavim.s
+import org.jetbrains.plugins.ideavim.se
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import org.junit.jupiter.api.Test
+import kotlin.test.assertFalse
 
 import static com.intellij.openapi.actionSystem.CommonDataKeys.*;
 import static com.intellij.openapi.actionSystem.PlatformDataKeys.PROJECT_FILE_DIRECTORY;
+import org.jetbrains.plugins.ideavim.c
+import org.jetbrains.plugins.ideavim.dotToSpace
+import org.jetbrains.plugins.ideavim.s
+import org.jetbrains.plugins.ideavim.se
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import org.junit.jupiter.api.Test
+import kotlin.test.assertFalse
 
 /**
  * This handles every keystroke that the user can argType except those that are still valid hotkeys for various Idea

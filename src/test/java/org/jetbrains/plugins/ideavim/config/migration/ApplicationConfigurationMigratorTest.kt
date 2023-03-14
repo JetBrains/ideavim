@@ -12,7 +12,7 @@ import com.maddyhome.idea.vim.config.migration.ApplicationConfigurationMigrator
 import com.maddyhome.idea.vim.config.migration.ConfigMigrator
 import com.maddyhome.idea.vim.config.migration.MigrationComponents
 import com.maddyhome.idea.vim.config.migration.VersionDetector
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 

@@ -9,14 +9,16 @@
 package org.jetbrains.plugins.ideavim.key
 
 import com.maddyhome.idea.vim.key.MappingOwner
-import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
+import kotlin.test.assertSame
 
 class MappingOwnerTest : VimTestCase() {
+  @Test
   fun `test get two plugin owners`() {
     val pluginName = "MyPlugin"
     val firstOwner = MappingOwner.Plugin.get(pluginName)
     val secondOwner = MappingOwner.Plugin.get(pluginName)
-    TestCase.assertSame(firstOwner, secondOwner)
+    assertSame(firstOwner, secondOwner)
   }
 }

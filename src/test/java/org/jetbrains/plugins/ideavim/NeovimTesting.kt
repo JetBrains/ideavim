@@ -14,6 +14,7 @@ import com.ensarsarajcic.neovim.java.api.types.api.VimCoords
 import com.ensarsarajcic.neovim.java.corerpc.client.ProcessRpcConnection
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.LogicalPosition
+import com.intellij.util.containers.toArray
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.CharacterPosition
@@ -29,6 +30,9 @@ import com.maddyhome.idea.vim.register.RegisterConstants.LAST_INSERTED_TEXT_REGI
 import com.maddyhome.idea.vim.register.RegisterConstants.LAST_SEARCH_REGISTER
 import com.maddyhome.idea.vim.register.RegisterConstants.VALID_REGISTERS
 import org.junit.Assert.assertEquals
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInfo
+import org.junit.jupiter.params.provider.Arguments
 
 internal object NeovimTesting {
   private lateinit var neovimApi: NeovimApi
@@ -45,7 +49,7 @@ internal object NeovimTesting {
 
   private var singleCaret = true
 
-  fun setUp(test: VimTestCase) {
+  fun setUp(test: TestInfo) {
     if (!neovimEnabled(test)) return
     val nvimPath = System.getenv("ideavim.nvim.path") ?: "nvim"
 
@@ -65,10 +69,10 @@ internal object NeovimTesting {
     exitCommand = neovimApi.replaceTermcodes("<esc><esc>:qa!", true, false, true).get()
     escapeCommand = neovimApi.replaceTermcodes("<esc>", true, false, true).get()
     ctrlcCommand = neovimApi.replaceTermcodes("<C-C>", true, false, true).get()
-    currentTestName = test.name
+    currentTestName = test.displayName
   }
 
-  fun tearDown(test: VimTestCase) {
+  fun tearDown(test: TestInfo) {
     if (!neovimEnabled(test)) return
     println("Tested with neovim: $neovimTestsCounter")
     if (VimTestCase.Checks.neoVim.exitOnTearDown) {
@@ -82,8 +86,8 @@ internal object NeovimTesting {
     }
   }
 
-  private fun neovimEnabled(test: VimTestCase, editor: Editor? = null): Boolean {
-    val method = test.javaClass.getMethod(test.name)
+  private fun neovimEnabled(test: TestInfo, editor: Editor? = null): Boolean {
+    val method = test.testMethod.get()
     val noBehaviourDiffers = !method.isAnnotationPresent(VimBehaviorDiffers::class.java)
     val noTestingWithoutNeovim = !method.isAnnotationPresent(TestWithoutNeovim::class.java) &&
       !test.javaClass.isAnnotationPresent(TestWithoutNeovim::class.java)
@@ -103,14 +107,14 @@ internal object NeovimTesting {
       singleCaret
   }
 
-  fun setupEditor(editor: Editor, test: VimTestCase) {
+  fun setupEditor(editor: Editor, test: TestInfo) {
     if (!neovimEnabled(test, editor)) return
     neovimApi.currentBuffer.get().setLines(0, -1, false, editor.document.text.split("\n")).get()
     val charPosition = CharacterPosition.fromOffset(editor, editor.caretModel.offset)
     neovimApi.currentWindow.get().setCursor(VimCoords(charPosition.line + 1, charPosition.column)).get()
   }
 
-  fun typeCommand(keys: String, test: VimTestCase, editor: Editor) {
+  fun typeCommand(keys: String, test: TestInfo, editor: Editor) {
     if (!neovimEnabled(test, editor)) return
     when {
       keys.equals("<esc>", ignoreCase = true) -> neovimApi.input(escapeCommand).get()
@@ -122,7 +126,7 @@ internal object NeovimTesting {
     }
   }
 
-  fun assertState(editor: Editor, test: VimTestCase) {
+  fun assertState(editor: Editor, test: TestInfo) {
     if (!neovimEnabled(test, editor)) return
     if (currentTestName != "") {
       currentTestName = ""
@@ -134,7 +138,7 @@ internal object NeovimTesting {
     assertRegisters()
   }
 
-  fun setRegister(register: Char, keys: String, test: VimTestCase) {
+  fun setRegister(register: Char, keys: String, test: TestInfo) {
     if (!neovimEnabled(test)) return
     neovimApi.callFunction("setreg", listOf(register, keys, 'c'))
   }
@@ -142,7 +146,7 @@ internal object NeovimTesting {
   private fun getCaret(): VimCoords = neovimApi.currentWindow.get().cursor.get()
   private fun getText(): String = neovimApi.currentBuffer.get().getLines(0, -1, false).get().joinToString("\n")
 
-  fun assertCaret(editor: Editor, test: VimTestCase) {
+  fun assertCaret(editor: Editor, test: TestInfo) {
     if (!neovimEnabled(test, editor)) return
     if (currentTestName != "") {
       currentTestName = ""
@@ -199,6 +203,7 @@ internal object NeovimTesting {
   }
 }
 
+@Test
 annotation class TestWithoutNeovim(val reason: SkipNeovimReason, val description: String = "")
 
 enum class SkipNeovimReason {
@@ -237,4 +242,19 @@ enum class SkipNeovimReason {
 
 fun LogicalPosition.toVimCoords(): VimCoords {
   return VimCoords(this.line + 1, this.column)
+}
+
+fun <T, S, V> Collection<T>.cartesianProduct(other: Iterable<S>, transformer: (first: T, second: S) -> V): List<V> {
+  return this.flatMap { first -> other.map { second -> transformer.invoke(first, second) } }
+}
+
+// Cartesian product of multiple lists. Useful for making parameterized tests with all available combinations.
+// Can be used instead of @Theory from JUnit 4
+fun combinate(vararg elements: List<String>): List<Arguments> {
+  val res =  elements.fold(listOf<List<String>>(emptyList())) { acc, items ->
+    acc.cartesianProduct(items) { accItems, item ->
+      accItems + item
+    }
+  }
+  return res.map { Arguments.of(*it.toArray(emptyArray())) }
 }

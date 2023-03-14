@@ -11,9 +11,11 @@ package org.jetbrains.plugins.ideavim.action.change.shift
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class ShiftLeftTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun `test shift till new line`() {
     val file = """
             A Discovery
@@ -37,6 +39,7 @@ class ShiftLeftTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
   fun `test shift left positions caret at first non-blank char`() {
     val file = """
       |A Discovery
@@ -60,6 +63,7 @@ class ShiftLeftTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
   fun `test shift left does not move caret with nostartofline`() {
     val file = """
       |A Discovery
@@ -85,6 +89,7 @@ class ShiftLeftTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
   fun `test shift left positions caret at end of line with nostartofline`() {
     val file = """
       |A Discovery
@@ -109,6 +114,7 @@ class ShiftLeftTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test shift ctrl-D`() {
     val file = """
             A Discovery

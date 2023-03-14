@@ -11,10 +11,12 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class MarksCommandTest : VimTestCase() {
 
   // https://youtrack.jetbrains.com/issue/VIM-2223
+  @Test
   fun `test gv after replacing a line`() {
     configureByText(
       """I found it in a legendary land
@@ -34,6 +36,7 @@ class MarksCommandTest : VimTestCase() {
   }
 
   // https://youtrack.jetbrains.com/issue/VIM-1684
+  @Test
   fun `test reselecting different text length`() {
     configureByText(
       """
@@ -51,6 +54,7 @@ class MarksCommandTest : VimTestCase() {
   }
 
   // https://youtrack.jetbrains.com/issue/VIM-2491
+  @Test
   fun `test mapping with gv`() {
     configureByText("Oh, hi ${c}Andy Tom John")
     typeText(commandToKeys("xnoremap p pgvy"))
@@ -58,12 +62,14 @@ class MarksCommandTest : VimTestCase() {
     assertState("Oh, hi Andy Andy Andy")
   }
 
+  @Test
   fun `test list empty marks`() {
     configureByText("")
     enterCommand("marks")
     assertExOutput("mark line  col file/text\n")
   }
 
+  @Test
   fun `test list simple mark`() {
     configureByText(
       """I found it in a legendary land
@@ -82,6 +88,7 @@ class MarksCommandTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test line number is 1-based and column is 0-based`() {
     configureByText(
       """${c}I found it in a legendary land
@@ -100,6 +107,7 @@ class MarksCommandTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test list multiple marks`() {
     configureByText(
       """I found ${c}it in a legendary land
@@ -124,6 +132,7 @@ class MarksCommandTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test lists global marks`() {
     configureByText(
       """I found ${c}it in a legendary land
@@ -144,6 +153,7 @@ class MarksCommandTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test argument filters output`() {
     configureByText(
       """I found ${c}it in a legendary land
@@ -166,6 +176,7 @@ class MarksCommandTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test list nothing if no marks match`() {
     configureByText(
       """I found ${c}it in a legendary land
@@ -179,6 +190,7 @@ class MarksCommandTest : VimTestCase() {
     assertExOutput("mark line  col file/text\n")
   }
 
+  @Test
   fun `test correctly handles invalid mark location`() {
     configureByText(
       """I found ${c}it in a legendary land
@@ -187,7 +199,7 @@ class MarksCommandTest : VimTestCase() {
                       |hard by the torrent of a mountain pass.
       """.trimMargin(),
     )
-    val vimEditor = myFixture.editor.vim
+    val vimEditor = fixture.editor.vim
     injector.markService.setMark(vimEditor.primaryCaret(), 'a', 100000)
     enterCommand("marks")
     assertExOutput(
@@ -197,6 +209,7 @@ class MarksCommandTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test correctly encodes non printable characters`() {
     configureByText("$c\u0009Hello world\n\u0006\n\u007f")
     typeText(injector.parser.parseKeys("ma" + "j" + "mb" + "j" + "mc"))
@@ -210,6 +223,7 @@ class MarksCommandTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test list trims and truncates`() {
     val indent = " ".repeat(100)
     val text = "Really long line ".repeat(1000)
@@ -223,6 +237,7 @@ class MarksCommandTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test list all marks in correct order`() {
     configureByText(
       """I found ${c}it in a legendary land

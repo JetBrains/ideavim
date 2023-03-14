@@ -23,21 +23,22 @@ import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.rangeOf
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import java.awt.datatransfer.Transferable
 
 class PutTestAfterCursorActionTest : VimTestCase() {
+  @Test
   fun `test platform handlers are called`() {
     val extension = TestExtension()
     ExtensionTestUtil.maskExtensions(
       CopyPastePostProcessor.EP_NAME,
       listOf(extension),
-      myFixture.testRootDisposable,
+      fixture.testRootDisposable,
     )
     ExtensionTestUtil.maskExtensions(
       CopyPastePreProcessor.EP_NAME,
       listOf(),
-      myFixture.testRootDisposable,
+      fixture.testRootDisposable,
     )
     setRegister('4', "XXX ")
     doTest(
@@ -47,9 +48,10 @@ class PutTestAfterCursorActionTest : VimTestCase() {
       VimStateMachine.Mode.COMMAND,
       VimStateMachine.SubMode.NONE,
     )
-    assertEquals(1, extension.calledExtractTransferableData)
+    kotlin.test.assertEquals(1, extension.calledExtractTransferableData)
   }
 
+  @Test
   fun `test put from number register`() {
     setRegister('4', "XXX ")
     doTest(
@@ -83,7 +85,8 @@ class PutTestAfterCursorActionTest : VimTestCase() {
     """.trimIndent()
     val editor = configureByText(before)
     val vimEditor = editor.vim
-    VimPlugin.getRegister().storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
+    VimPlugin.getRegister()
+      .storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
     typeText(injector.parser.parseKeys("p"))
     val after = """
             A Discovery
@@ -120,7 +123,13 @@ class PutTestAfterCursorActionTest : VimTestCase() {
     val guardRange = before rangeOf "\nGUARD\n"
     editor.document.createGuardedBlock(guardRange.startOffset, guardRange.endOffset)
     val vimEditor = editor.vim
-    injector.registerGroup.storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "I found it in a legendary land\n", SelectionType.LINE_WISE, false)
+    injector.registerGroup.storeText(
+      vimEditor,
+      vimEditor.primaryCaret(),
+      before rangeOf "I found it in a legendary land\n",
+      SelectionType.LINE_WISE,
+      false
+    )
     typeText(injector.parser.parseKeys("p"))
     val after = """
             A Discovery
@@ -145,7 +154,8 @@ class PutTestAfterCursorActionTest : VimTestCase() {
     """.trimIndent()
     val editor = configureByText(before)
     val vimEditor = editor.vim
-    VimPlugin.getRegister().storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
+    VimPlugin.getRegister()
+      .storeText(vimEditor, vimEditor.primaryCaret(), before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
     typeText(injector.parser.parseKeys("vep"))
     val after = """
             A Discovery

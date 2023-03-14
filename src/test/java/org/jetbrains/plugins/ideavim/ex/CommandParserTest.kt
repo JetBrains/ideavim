@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.vimscript.parser.errors.IdeavimErrorListener
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 /**
  * @author Alex Plate
@@ -33,6 +34,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 class CommandParserTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.UNCLEAR, "Caret different position")
+  @Test
   fun `test simple ex command execution`() {
     val keys = ">>"
     val before = "I ${c}found it in a legendary land"
@@ -41,6 +43,7 @@ class CommandParserTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.EDITOR_MODIFICATION)
+  @Test
   fun `test execute in disabled state`() {
     setupChecks {
       caretShape = false
@@ -59,6 +62,7 @@ class CommandParserTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.EDITOR_MODIFICATION)
+  @Test
   fun `test turn off and on`() {
     val before = "I ${c}found it in a legendary land"
     val after = "        ${c}I found it in a legendary land"
@@ -69,6 +73,7 @@ class CommandParserTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.EDITOR_MODIFICATION)
+  @Test
   fun `test turn off and on twice`() {
     val before = "I ${c}found it in a legendary land"
     val after = "        ${c}I found it in a legendary land"
@@ -79,6 +84,7 @@ class CommandParserTest : VimTestCase() {
     }
   }
 
+  @Test
   fun `test multiline command input`() {
     val script1 = VimscriptParser.parse(
       """
@@ -91,11 +97,12 @@ class CommandParserTest : VimTestCase() {
      let s:patBR = substitute(match_words.',',s:notslash.'\zs[,:]*,[,:]*', ',', 'g')
       """.trimIndent(),
     )
-    assertEquals(1, script1.units.size)
-    assertTrue(script1.units[0] is LetCommand)
-    assertEquals(script1, script2)
+    kotlin.test.assertEquals(1, script1.units.size)
+    kotlin.test.assertTrue(script1.units[0] is LetCommand)
+    kotlin.test.assertEquals(script1, script2)
   }
 
+  @Test
   fun `test multiline command input with tabs`() {
     val script1 = VimscriptParser.parse(
       """
@@ -108,11 +115,12 @@ class CommandParserTest : VimTestCase() {
      let s:patBR = substitute(match_words.',',s:notslash.'\zs[,:]*,[,:]*', ',', 'g')
       """.trimIndent(),
     )
-    assertEquals(1, script1.units.size)
-    assertTrue(script1.units[0] is LetCommand)
-    assertEquals(script1, script2)
+    kotlin.test.assertEquals(1, script1.units.size)
+    kotlin.test.assertTrue(script1.units[0] is LetCommand)
+    kotlin.test.assertEquals(script1, script2)
   }
 
+  @Test
   fun `test multiline expression input`() {
     configureByText("\n")
     val script1 = VimscriptParser.parse(
@@ -122,11 +130,12 @@ class CommandParserTest : VimTestCase() {
       """.trimIndent(),
     )
     val script2 = VimscriptParser.parse("let dict = {'one': 1, 'two': 2}")
-    assertEquals(1, script1.units.size)
-    assertTrue(script1.units[0] is LetCommand)
-    assertEquals(script1, script2)
+    kotlin.test.assertEquals(1, script1.units.size)
+    kotlin.test.assertTrue(script1.units[0] is LetCommand)
+    kotlin.test.assertEquals(script1, script2)
   }
 
+  @Test
   fun `test errors`() {
     configureByText("\n")
     VimscriptParser.parse(
@@ -137,9 +146,10 @@ class CommandParserTest : VimTestCase() {
         echo 6
       """.trimIndent(),
     )
-    assertTrue(IdeavimErrorListener.testLogger.any { it.startsWith("line 3:5") })
+    kotlin.test.assertTrue(IdeavimErrorListener.testLogger.any { it.startsWith("line 3:5") })
   }
 
+  @Test
   fun `test errors 2`() {
     VimscriptParser.parse(
       """
@@ -150,10 +160,11 @@ class CommandParserTest : VimTestCase() {
         let x = 5
       """.trimIndent(),
     )
-    assertTrue(IdeavimErrorListener.testLogger.any { it.startsWith("line 1:14") })
-    assertTrue(IdeavimErrorListener.testLogger.any { it.startsWith("line 4:0") })
+    kotlin.test.assertTrue(IdeavimErrorListener.testLogger.any { it.startsWith("line 1:14") })
+    kotlin.test.assertTrue(IdeavimErrorListener.testLogger.any { it.startsWith("line 4:0") })
   }
 
+  @Test
   fun `test lua code in vimrc with 'lua EOF'`() {
     VimscriptParser.parse(
       """
@@ -217,9 +228,10 @@ class CommandParserTest : VimTestCase() {
         EOF
       """.trimIndent(),
     )
-    assertTrue(IdeavimErrorListener.testLogger.isEmpty())
+    kotlin.test.assertTrue(IdeavimErrorListener.testLogger.isEmpty())
   }
 
+  @Test
   fun `test lua code in vimrc with 'lua END'`() {
     VimscriptParser.parse(
       """
@@ -283,9 +295,10 @@ class CommandParserTest : VimTestCase() {
         END
       """.trimIndent(),
     )
-    assertTrue(IdeavimErrorListener.testLogger.isEmpty())
+    kotlin.test.assertTrue(IdeavimErrorListener.testLogger.isEmpty())
   }
 
+  @Test
   fun `test lines with errors are skipped`() {
     configureByText("\n")
     val script = VimscriptParser.parse(
@@ -295,18 +308,19 @@ class CommandParserTest : VimTestCase() {
         let g:y = 10
       """.trimIndent(),
     )
-    assertTrue(IdeavimErrorListener.testLogger.any { it.startsWith("line 2:") })
-    assertEquals(2, script.units.size)
-    assertTrue(script.units[0] is LetCommand)
+    kotlin.test.assertTrue(IdeavimErrorListener.testLogger.any { it.startsWith("line 2:") })
+    kotlin.test.assertEquals(2, script.units.size)
+    kotlin.test.assertTrue(script.units[0] is LetCommand)
     val let1 = script.units[0] as LetCommand
-    assertEquals(Variable(Scope.GLOBAL_VARIABLE, "auto_save"), let1.variable)
-    assertEquals(SimpleExpression(2), let1.expression)
+    kotlin.test.assertEquals(Variable(Scope.GLOBAL_VARIABLE, "auto_save"), let1.variable)
+    kotlin.test.assertEquals(SimpleExpression(2), let1.expression)
     val let2 = script.units[1] as LetCommand
-    assertEquals(Variable(Scope.GLOBAL_VARIABLE, "y"), let2.variable)
-    assertEquals(SimpleExpression(10), let2.expression)
+    kotlin.test.assertEquals(Variable(Scope.GLOBAL_VARIABLE, "y"), let2.variable)
+    kotlin.test.assertEquals(SimpleExpression(10), let2.expression)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test bug with caret return symbol`() {
     configureByText("----------\n1234${c}567890\n----------\n")
     injector.vimscriptExecutor.execute(
@@ -315,7 +329,7 @@ class CommandParserTest : VimTestCase() {
         nnoremap Y y${'$'}
 
       """.trimIndent().replace("\n", "\r\n"),
-      myFixture.editor.vim,
+      fixture.editor.vim,
       DataContext.EMPTY_CONTEXT.vim,
       skipHistory = true,
       indicateErrors = true,
@@ -323,9 +337,10 @@ class CommandParserTest : VimTestCase() {
     )
     typeText(injector.parser.parseKeys("Yp"))
     assertState("----------\n1234556789${c}067890\n----------\n")
-    assertTrue(IdeavimErrorListener.testLogger.isEmpty())
+    kotlin.test.assertTrue(IdeavimErrorListener.testLogger.isEmpty())
   }
 
+  @Test
   fun `test bars do not break comments`() {
     configureByText("\n")
     val script = VimscriptParser.parse(
@@ -333,10 +348,11 @@ class CommandParserTest : VimTestCase() {
         " comment | let x = 10 | echo x
       """.trimIndent(),
     )
-    assertEquals(0, script.units.size)
-    assertTrue(IdeavimErrorListener.testLogger.isEmpty())
+    kotlin.test.assertEquals(0, script.units.size)
+    kotlin.test.assertTrue(IdeavimErrorListener.testLogger.isEmpty())
   }
 
+  @Test
   fun `test autocmd is parsed without any errors`() {
     configureByText("\n")
     var script = VimscriptParser.parse(
@@ -347,18 +363,19 @@ class CommandParserTest : VimTestCase() {
         \ endif
       """.trimIndent(),
     )
-    assertEquals(0, script.units.size)
-    assertTrue(IdeavimErrorListener.testLogger.isEmpty())
+    kotlin.test.assertEquals(0, script.units.size)
+    kotlin.test.assertTrue(IdeavimErrorListener.testLogger.isEmpty())
 
     script = VimscriptParser.parse(
       """
         autocmd BufReadPost * echo "oh, hi Mark"
       """.trimIndent(),
     )
-    assertEquals(0, script.units.size)
-    assertTrue(IdeavimErrorListener.testLogger.isEmpty())
+    kotlin.test.assertEquals(0, script.units.size)
+    kotlin.test.assertTrue(IdeavimErrorListener.testLogger.isEmpty())
   }
 
+  @Test
   fun `test unknown let command's cases`() {
     configureByText("\n")
     val script = VimscriptParser.parse(
@@ -366,11 +383,12 @@ class CommandParserTest : VimTestCase() {
         let x[a, b; c] = something()
       """.trimIndent(),
     )
-    assertTrue(IdeavimErrorListener.testLogger.isEmpty())
-    assertEquals(1, script.units.size)
-    assertFalse((script.units[0] as LetCommand).isSyntaxSupported)
+    kotlin.test.assertTrue(IdeavimErrorListener.testLogger.isEmpty())
+    kotlin.test.assertEquals(1, script.units.size)
+    kotlin.test.assertFalse((script.units[0] as LetCommand).isSyntaxSupported)
   }
 
+  @Test
   fun `test ignore commands between comments`() {
     configureByText("\n")
     val script = VimscriptParser.parse(
@@ -396,16 +414,17 @@ class CommandParserTest : VimTestCase() {
         "ideaVim ignore end
       """.trimIndent(),
     )
-    assertEquals(3, script.units.size)
-    assertTrue(script.units[0] is EchoCommand)
-    assertEquals(SimpleExpression(1), (script.units[0] as EchoCommand).args[0])
-    assertTrue(script.units[1] is EchoCommand)
-    assertEquals(SimpleExpression(3), (script.units[1] as EchoCommand).args[0])
-    assertTrue(script.units[2] is EchoCommand)
-    assertEquals(SimpleExpression(6), (script.units[2] as EchoCommand).args[0])
-    assertTrue(IdeavimErrorListener.testLogger.isEmpty())
+    kotlin.test.assertEquals(3, script.units.size)
+    kotlin.test.assertTrue(script.units[0] is EchoCommand)
+    kotlin.test.assertEquals(SimpleExpression(1), (script.units[0] as EchoCommand).args[0])
+    kotlin.test.assertTrue(script.units[1] is EchoCommand)
+    kotlin.test.assertEquals(SimpleExpression(3), (script.units[1] as EchoCommand).args[0])
+    kotlin.test.assertTrue(script.units[2] is EchoCommand)
+    kotlin.test.assertEquals(SimpleExpression(6), (script.units[2] as EchoCommand).args[0])
+    kotlin.test.assertTrue(IdeavimErrorListener.testLogger.isEmpty())
   }
 
+  @Test
   fun `test finish statement`() {
     configureByText("\n")
     typeText(
@@ -421,6 +440,7 @@ class CommandParserTest : VimTestCase() {
     assertExOutput("3\n")
   }
 
+  @Test
   fun `test all the lines are executed`() {
     configureByText("\n")
     typeText(
@@ -437,17 +457,19 @@ class CommandParserTest : VimTestCase() {
     assertExOutput("42\n")
   }
 
+  @Test
   fun `test carriage return in the end of a command`() {
     val command = VimscriptParser.parseCommand("normal /search\r")
-    assertTrue(command is NormalCommand)
-    assertEquals("/search\r", (command as NormalCommand).argument)
+    kotlin.test.assertTrue(command is NormalCommand)
+    kotlin.test.assertEquals("/search\r", (command as NormalCommand).argument)
   }
 
+  @Test
   fun `test carriage return in the end of a script`() {
     val script = VimscriptParser.parse("normal /search\r")
-    assertEquals(1, script.units.size)
+    kotlin.test.assertEquals(1, script.units.size)
     val command = script.units[0]
-    assertTrue(command is NormalCommand)
-    assertEquals("/search\r", (command as NormalCommand).argument)
+    kotlin.test.assertTrue(command is NormalCommand)
+    kotlin.test.assertEquals("/search\r", (command as NormalCommand).argument)
   }
 }

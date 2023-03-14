@@ -9,15 +9,18 @@
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class ExecuteCommandTest : VimTestCase() {
 
+  @Test
   fun `test execute with one expression`() {
     configureByText("\n")
     typeText(commandToKeys("execute 'echo 42'"))
     assertExOutput("42\n")
   }
 
+  @Test
   fun `test execute with range`() {
     configureByText("\n")
     typeText(commandToKeys("1,2execute 'echo 42'"))
@@ -25,18 +28,21 @@ class ExecuteCommandTest : VimTestCase() {
     assertPluginError(true)
   }
 
+  @Test
   fun `test execute multiple expressions`() {
     configureByText("\n")
     typeText(commandToKeys("execute 'echo' 4 + 2 * 3"))
     assertExOutput("10\n")
   }
 
+  @Test
   fun `test execute adds space between expressions if missing`() {
     configureByText("\n")
     typeText(commandToKeys("execute 'echo ' . \"'result =\"4+2*3.\"'\""))
     assertExOutput("result = 10\n")
   }
 
+  @Test
   fun `test execute without spaces`() {
     configureByText("\n")
     typeText(commandToKeys("execute('echo '.42)"))

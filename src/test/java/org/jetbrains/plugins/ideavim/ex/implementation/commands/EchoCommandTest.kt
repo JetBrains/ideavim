@@ -9,33 +9,39 @@
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class EchoCommandTest : VimTestCase() {
 
+  @Test
   fun `test echo with a string`() {
     configureByText("\n")
     typeText(commandToKeys("echo \"Hello, World!\""))
     assertExOutput("Hello, World!\n")
   }
 
+  @Test
   fun `test echo with an expression`() {
     configureByText("\n")
     typeText(commandToKeys("echo 3 + 7"))
     assertExOutput("10\n")
   }
 
+  @Test
   fun `test echo with multiple expressions`() {
     configureByText("\n")
     typeText(commandToKeys("echo 3 + 7 'Hello ' . 'world'"))
     assertExOutput("10 Hello world\n")
   }
 
+  @Test
   fun `test ec`() {
     configureByText("\n")
     typeText(commandToKeys("ec 3"))
     assertExOutput("3\n")
   }
 
+  @Test
   fun `test echo without spaces`() {
     configureByText("\n")
     typeText(commandToKeys("echo(42)(999)"))

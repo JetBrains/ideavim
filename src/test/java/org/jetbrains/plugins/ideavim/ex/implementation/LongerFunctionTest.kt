@@ -8,7 +8,10 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation
 
+import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
 
 class LongerFunctionTest : VimTestCase() {
   val script = """
@@ -80,30 +83,30 @@ class LongerFunctionTest : VimTestCase() {
   """.trimIndent()
 
   // todo normal required
-//  fun `test 1`() {
-//    configureByText("""
-//      const val ${c}VERY_IMPORTANT_VALUE = 42
-//    """.trimIndent())
-//    injector.vimscriptExecutor.execute(script)
-//    typeText(injector.parser.parseKeys("veu"))
-//    assertState("""
-//      const val veryImportantValue${c} = 42
-//    """.trimIndent())
-//  }
+  @Test
+  @Disabled
+  fun `test 1`() {
+    configureByText("""
+      const val ${c}VERY_IMPORTANT_VALUE = 42
+    """.trimIndent())
+    injector.vimscriptExecutor.execute(script)
+    typeText(injector.parser.parseKeys("veu"))
+    assertState("""
+      const val veryImportantValue${c} = 42
+    """.trimIndent())
+  }
 
   // todo normal required
-//  fun `test 2`() {
-//    configureByText("""
-//      val ${c}myCamelCaseValue = "Hi, I'm a simple value"
-//    """.trimIndent())
-//    injector.vimscriptExecutor.execute(script)
-//    typeText(injector.parser.parseKeys("veU"))
-//    assertState("""
-//      val MY_CAMEL_CASE_VALUE${c} = "Hi, I'm a simple value"
-//    """.trimIndent())
-//  }
-
-  // Remove this test when tests above will be uncommented
-  fun `test mock`() {
+  @Test
+  @Disabled
+  fun `test 2`() {
+    configureByText("""
+      val ${c}myCamelCaseValue = "Hi, I'm a simple value"
+    """.trimIndent())
+    injector.vimscriptExecutor.execute(script)
+    typeText(injector.parser.parseKeys("veU"))
+    assertState("""
+      val MY_CAMEL_CASE_VALUE${c} = "Hi, I'm a simple value"
+    """.trimIndent())
   }
 }

@@ -20,52 +20,56 @@ import org.jetbrains.plugins.ideavim.OptionValueType
 import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
 import org.jetbrains.plugins.ideavim.VimTestOption
+import org.junit.jupiter.api.Test
 
 /**
  * @author Alex Plate
  */
 class JoinNotificationTest : VimOptionTestCase(IjOptionConstants.ideajoin) {
   @VimOptionTestConfiguration(VimTestOption(IjOptionConstants.ideajoin, OptionValueType.NUMBER, "0"))
+  @Test
   fun `test notification shown for no ideajoin`() {
     val before = "I found${c} it\n in a legendary land"
     configureByText(before)
     appReadySetup(false)
     typeText(injector.parser.parseKeys("J"))
 
-    val notification = ActionCenter.getNotifications(myFixture.project, true).last()
+    val notification = ActionCenter.getNotifications(fixture.project, true).last()
     try {
-      assertEquals(NotificationService.IDEAVIM_NOTIFICATION_TITLE, notification.title)
-      assertTrue(IjOptionConstants.ideajoin in notification.content)
-      assertEquals(3, notification.actions.size)
+      kotlin.test.assertEquals(NotificationService.IDEAVIM_NOTIFICATION_TITLE, notification.title)
+      kotlin.test.assertTrue(IjOptionConstants.ideajoin in notification.content)
+      kotlin.test.assertEquals(3, notification.actions.size)
     } finally {
       notification.expire()
     }
   }
 
   @VimOptionTestConfiguration(VimTestOption(IjOptionConstants.ideajoin, OptionValueType.NUMBER, "1"))
+  @Test
   fun `test notification not shown for ideajoin`() {
     val before = "I found${c} it\n in a legendary land"
     configureByText(before)
     appReadySetup(false)
     typeText(injector.parser.parseKeys("J"))
 
-    val notifications = ActionCenter.getNotifications(myFixture.project, true)
-    assertTrue(notifications.isEmpty() || notifications.last().isExpired || IjOptionConstants.ideajoin !in notifications.last().content)
+    val notifications = ActionCenter.getNotifications(fixture.project, true)
+    kotlin.test.assertTrue(notifications.isEmpty() || notifications.last().isExpired || IjOptionConstants.ideajoin !in notifications.last().content)
   }
 
   @VimOptionTestConfiguration(VimTestOption(IjOptionConstants.ideajoin, OptionValueType.NUMBER, "0"))
+  @Test
   fun `test notification not shown if was shown already`() {
     val before = "I found${c} it\n in a legendary land"
     configureByText(before)
     appReadySetup(true)
     typeText(injector.parser.parseKeys("J"))
 
-    val notifications = EventLog.getLogModel(myFixture.project).notifications
-    assertTrue(notifications.isEmpty() || notifications.last().isExpired || IjOptionConstants.ideajoin !in notifications.last().content)
+    val notifications = EventLog.getLogModel(fixture.project).notifications
+    kotlin.test.assertTrue(notifications.isEmpty() || notifications.last().isExpired || IjOptionConstants.ideajoin !in notifications.last().content)
   }
 
   private fun appReadySetup(notifierEnabled: Boolean) {
-    EventLog.markAllAsRead(myFixture.project)
+    EventLog.markAllAsRead(fixture.project)
     VimPlugin.getVimState().isIdeaJoinNotified = notifierEnabled
   }
 }

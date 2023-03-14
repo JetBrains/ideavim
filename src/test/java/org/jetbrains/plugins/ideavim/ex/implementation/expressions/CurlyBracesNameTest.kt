@@ -9,9 +9,11 @@
 package org.jetbrains.plugins.ideavim.ex.implementation.expressions
 
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class CurlyBracesNameTest : VimTestCase() {
 
+  @Test
   fun `test name with expression`() {
     configureByText("\n")
     typeText(commandToKeys("let x1 = 10"))
@@ -19,6 +21,7 @@ class CurlyBracesNameTest : VimTestCase() {
     assertExOutput("10\n")
   }
 
+  @Test
   fun `test name with inner template`() {
     configureByText("\n")
     typeText(commandToKeys("let eleven = 11"))
@@ -28,6 +31,7 @@ class CurlyBracesNameTest : VimTestCase() {
     assertExOutput("11\n")
   }
 
+  @Test
   fun `test multiple templates inside a template`() {
     configureByText("\n")
     typeText(commandToKeys("let x1 = 'el'"))

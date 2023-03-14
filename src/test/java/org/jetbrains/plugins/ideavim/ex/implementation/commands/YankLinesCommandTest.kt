@@ -10,8 +10,10 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.VimPlugin
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class YankLinesCommandTest : VimTestCase() {
+  @Test
   fun `test copy with range`() {
     configureByText(
       """
@@ -25,15 +27,16 @@ class YankLinesCommandTest : VimTestCase() {
     )
     typeText(commandToKeys("3,4y"))
     val yanked = VimPlugin.getRegister().lastRegister!!.text
-    assertEquals(
+    kotlin.test.assertEquals(
       """|I found it in a legendary land
          |all rocks and lavender and tufted grass,
          |
       """.trimMargin(),
-      yanked,
+      yanked
     )
   }
 
+  @Test
   fun `test copy with one char on the last line`() {
     configureByText(
       """
@@ -47,7 +50,7 @@ class YankLinesCommandTest : VimTestCase() {
     )
     typeText(commandToKeys("%y"))
     val yanked = VimPlugin.getRegister().lastRegister!!.text
-    assertEquals(
+    kotlin.test.assertEquals(
       """
                 A Discovery
 
@@ -57,7 +60,7 @@ class YankLinesCommandTest : VimTestCase() {
                 h
                 
       """.trimIndent(),
-      yanked,
+      yanked
     )
   }
 }

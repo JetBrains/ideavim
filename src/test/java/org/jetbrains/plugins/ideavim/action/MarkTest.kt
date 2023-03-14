@@ -16,10 +16,13 @@ import com.maddyhome.idea.vim.newapi.IjVimEditor
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
+import kotlin.test.assertNotNull
 
 @Suppress("SpellCheckingInspection")
 class MarkTest : VimTestCase() {
   // |m|
+  @Test
   fun testLocalMark() {
     typeTextInFile(
       injector.parser.parseKeys("ma"),
@@ -28,14 +31,15 @@ class MarkTest : VimTestCase() {
     baz
 """,
     )
-    val vimEditor: VimEditor = IjVimEditor(myFixture.editor)
+    val vimEditor: VimEditor = IjVimEditor(fixture.editor)
     val mark = injector.markService.getMark(vimEditor.primaryCaret(), 'a')
-    assertNotNull(mark)
-    assertEquals(1, mark!!.line)
-    assertEquals(6, mark.col)
+    assertNotNull<Any>(mark)
+    kotlin.test.assertEquals(1, mark.line)
+    kotlin.test.assertEquals(6, mark.col)
   }
 
   // |m|
+  @Test
   fun testGlobalMark() {
     typeTextInFile(
       injector.parser.parseKeys("mG"),
@@ -44,14 +48,15 @@ class MarkTest : VimTestCase() {
     baz
 """,
     )
-    val vimEditor: VimEditor = IjVimEditor(myFixture.editor)
+    val vimEditor: VimEditor = IjVimEditor(fixture.editor)
     val mark = injector.markService.getMark(vimEditor.primaryCaret(), 'G')
-    assertNotNull(mark)
-    assertEquals(1, mark!!.line)
-    assertEquals(6, mark.col)
+    assertNotNull<Any>(mark)
+    kotlin.test.assertEquals(1, mark.line)
+    kotlin.test.assertEquals(6, mark.col)
   }
 
   // |m|
+  @Test
   fun testMarkIsDeletedWhenLineIsDeleted() {
     typeTextInFile(
       injector.parser.parseKeys("mx" + "dd"),
@@ -60,12 +65,13 @@ class MarkTest : VimTestCase() {
     baz
 """,
     )
-    val vimEditor: VimEditor = IjVimEditor(myFixture.editor)
+    val vimEditor: VimEditor = IjVimEditor(fixture.editor)
     val mark = injector.markService.getMark(vimEditor.primaryCaret(), 'x')
-    assertNull(mark)
+    kotlin.test.assertNull(mark)
   }
 
   // |m|
+  @Test
   fun testMarkIsNotDeletedWhenLineIsOneCharAndReplaced() {
     typeTextInFile(
       injector.parser.parseKeys("ma" + "r1"),
@@ -76,12 +82,13 @@ class MarkTest : VimTestCase() {
      
       """.trimIndent(),
     )
-    val vimEditor: VimEditor = IjVimEditor(myFixture.editor)
+    val vimEditor: VimEditor = IjVimEditor(fixture.editor)
     val mark = injector.markService.getMark(vimEditor.primaryCaret(), 'a')
-    assertNotNull(mark)
+    assertNotNull<Any>(mark)
   }
 
   // |m|
+  @Test
   fun testMarkIsNotDeletedWhenLineIsChanged() {
     typeTextInFile(
       injector.parser.parseKeys("ma" + "cc"),
@@ -90,12 +97,13 @@ class MarkTest : VimTestCase() {
     baz
 """,
     )
-    val vimEditor: VimEditor = IjVimEditor(myFixture.editor)
+    val vimEditor: VimEditor = IjVimEditor(fixture.editor)
     val mark = injector.markService.getMark(vimEditor.primaryCaret(), 'a')
-    assertNotNull(mark)
+    assertNotNull<Any>(mark)
   }
 
   // |m|
+  @Test
   fun testMarkIsMovedUpWhenLinesArePartiallyDeletedAbove() {
     typeTextInFile(
       injector.parser.parseKeys("mx" + "2k" + "dd" + "0dw"),
@@ -104,14 +112,15 @@ class MarkTest : VimTestCase() {
     ba<caret>z
 """,
     )
-    val vimEditor: VimEditor = IjVimEditor(myFixture.editor)
+    val vimEditor: VimEditor = IjVimEditor(fixture.editor)
     val mark = injector.markService.getMark(vimEditor.primaryCaret(), 'x')
-    assertNotNull(mark)
-    assertEquals(1, mark!!.line)
-    assertEquals(6, mark.col)
+    assertNotNull<Any>(mark)
+    kotlin.test.assertEquals(1, mark.line)
+    kotlin.test.assertEquals(6, mark.col)
   }
 
   // |m|
+  @Test
   fun testMarkIsMovedUpWhenLinesAreDeletedAbove() {
     typeTextInFile(
       injector.parser.parseKeys("mx" + "2k" + "2dd"),
@@ -120,14 +129,15 @@ class MarkTest : VimTestCase() {
     ba<caret>z
 """,
     )
-    val vimEditor: VimEditor = IjVimEditor(myFixture.editor)
+    val vimEditor: VimEditor = IjVimEditor(fixture.editor)
     val mark = injector.markService.getMark(vimEditor.primaryCaret(), 'x')
-    assertNotNull(mark)
-    assertEquals(0, mark!!.line)
-    assertEquals(6, mark.col)
+    assertNotNull<Any>(mark)
+    kotlin.test.assertEquals(0, mark.line)
+    kotlin.test.assertEquals(6, mark.col)
   }
 
   // |m|
+  @Test
   fun testMarkIsMovedDownWhenLinesAreInsertedAbove() {
     typeTextInFile(
       injector.parser.parseKeys("mY" + "Obiff"),
@@ -138,10 +148,10 @@ class MarkTest : VimTestCase() {
      
       """.trimIndent(),
     )
-    val vimEditor: VimEditor = IjVimEditor(myFixture.editor)
+    val vimEditor: VimEditor = IjVimEditor(fixture.editor)
     val mark = injector.markService.getMark(vimEditor.primaryCaret(), 'Y')
-    assertNotNull(mark)
-    assertEquals(2, mark!!.line)
+    assertNotNull<Any>(mark)
+    kotlin.test.assertEquals(2, mark.line)
 
     // Currently broken, needs investigation
     // Because of some reason system mark is recreated. As we're on a different column at this moment, this breaks test
@@ -151,6 +161,7 @@ class MarkTest : VimTestCase() {
   }
 
   // |m|
+  @Test
   fun testMarkIsMovedDownWhenLinesAreInsertedAboveWithIndentation() {
     typeTextInFile(
       injector.parser.parseKeys("mY" + "Obiff"),
@@ -159,10 +170,10 @@ class MarkTest : VimTestCase() {
     baz
 """,
     )
-    val vimEditor: VimEditor = IjVimEditor(myFixture.editor)
+    val vimEditor: VimEditor = IjVimEditor(fixture.editor)
     val mark = injector.markService.getMark(vimEditor.primaryCaret(), 'Y')
-    assertNotNull(mark)
-    assertEquals(2, mark!!.line)
+    assertNotNull<Any>(mark)
+    kotlin.test.assertEquals(2, mark.line)
 
     // Currently broken, needs investigation
     // Because of some reason system mark is recreated. As we're on a different column at this moment, this breaks test
@@ -172,6 +183,7 @@ class MarkTest : VimTestCase() {
   }
 
   // |m| |`|
+  @Test
   fun testMarkAndJumpToMark() {
     typeTextInFile(
       injector.parser.parseKeys("6l" + "mZ" + "G$" + "`Z"),
@@ -184,6 +196,7 @@ class MarkTest : VimTestCase() {
   }
 
   // |m| |'|
+  @Test
   fun testMarkAndJumpToMarkLeadingSpace() {
     typeTextInFile(
       injector.parser.parseKeys("6l" + "mb" + "G$" + "'b"),
@@ -196,6 +209,7 @@ class MarkTest : VimTestCase() {
   }
 
   // |m| |`|
+  @Test
   fun testDeleteBacktickMotionIsCharacterWise() {
     typeTextInFile(
       injector.parser.parseKeys("mk" + "kh" + "d`k"),
@@ -214,6 +228,7 @@ class MarkTest : VimTestCase() {
   }
 
   // |m| |`|
+  @Test
   fun testDeleteSingleQuoteMotionIsLineWise() {
     typeTextInFile(
       injector.parser.parseKeys("mk" + "kh" + "d'k"),
@@ -232,6 +247,7 @@ class MarkTest : VimTestCase() {
 
   // VIM-43 |i| |`.|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
+  @Test
   fun testGotoLastChangePosition() {
     typeTextInFile(
       injector.parser.parseKeys("i" + "hello " + "<Esc>" + "gg" + "`."),
@@ -246,6 +262,7 @@ class MarkTest : VimTestCase() {
   }
 
   // VIM-43 |p| |`.|
+  @Test
   fun testGotoLastPutPosition() {
     typeTextInFile(
       injector.parser.parseKeys("yy" + "p" + "gg" + "`."),
@@ -260,6 +277,7 @@ class MarkTest : VimTestCase() {
   }
 
   // |i| |`]|
+  @Test
   fun testGotoLastChangePositionEnd() {
     doTest(
       Lists.newArrayList("yiw", "P", "gg", "`]"),
@@ -281,6 +299,7 @@ class MarkTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "This test freezes")
+  @Test
   fun testVisualMarks() {
     configureByText("Oh, <caret>hi Mark")
     typeText(injector.parser.parseKeys("vw<Esc>"))
@@ -290,6 +309,7 @@ class MarkTest : VimTestCase() {
     assertOffset(7)
   }
 
+  @Test
   fun testVisualMarksForBackwardsSelection() {
     configureByText("Oh, hi <caret>Mark")
     typeText(injector.parser.parseKeys("vb<Esc>"))
@@ -301,6 +321,7 @@ class MarkTest : VimTestCase() {
 
   // we change start mark, but actually the start and end has changed
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "This test freezes")
+  @Test
   fun testChangeSelectionStartMarkToBelowPosition() {
     configureByText("lala\nl<caret>alala\nlala\n")
     typeText(injector.parser.parseKeys("v3l<Esc>"))
@@ -316,6 +337,7 @@ class MarkTest : VimTestCase() {
   }
 
   // we change end mark and only end changes
+  @Test
   fun testChangeSelectionEndMarkToBelowPosition() {
     configureByText("lala\nl<caret>alala\nlala\n")
     typeText(injector.parser.parseKeys("v3l<Esc>"))
@@ -331,6 +353,7 @@ class MarkTest : VimTestCase() {
   }
 
   // we change start mark, but end changes
+  @Test
   fun testChangeReversedSelectionStartMarkToBelowPosition() {
     configureByText("lala\nlala<caret>la\nlala\n")
     typeText(injector.parser.parseKeys("v3h<Esc>"))
@@ -346,6 +369,7 @@ class MarkTest : VimTestCase() {
   }
 
   // we change end mark, but start and end are changed
+  @Test
   fun testChangeReversedSelectionEndMarkToBelowPosition() {
     configureByText("lala\nlala<caret>la\nlala\n")
     typeText(injector.parser.parseKeys("v3h<Esc>"))
@@ -361,6 +385,7 @@ class MarkTest : VimTestCase() {
   }
 
   // we change start mark and only it changes
+  @Test
   fun testChangeSelectionStartMarkToUpperPosition() {
     configureByText("lala\nl<caret>alala\nlala\n")
     typeText(injector.parser.parseKeys("v3l<Esc>"))
@@ -376,6 +401,7 @@ class MarkTest : VimTestCase() {
   }
 
   // we change end mark, but both start and end marks are changed
+  @Test
   fun testChangeSelectionEndMarkToUpperPosition() {
     configureByText("lala\nl<caret>alala\nlala\n")
     typeText(injector.parser.parseKeys("v3l<Esc>"))
@@ -391,6 +417,7 @@ class MarkTest : VimTestCase() {
   }
 
   // we change end mark, but both start and end marks are changed
+  @Test
   fun testChangeReversedSelectionStartMarkToUpperPosition() {
     configureByText("lala\nlala<caret>la\nlala\n")
     typeText(injector.parser.parseKeys("v3h<Esc>"))
@@ -406,6 +433,7 @@ class MarkTest : VimTestCase() {
   }
 
   // we change end mark, but both start and end marks are changed
+  @Test
   fun testChangeReversedSelectionEndMarkToUpperPosition() {
     configureByText("lala\nlala<caret>la\nlala\n")
     typeText(injector.parser.parseKeys("v3h<Esc>"))
@@ -420,6 +448,7 @@ class MarkTest : VimTestCase() {
     assertOffset(9)
   }
 
+  @Test
   fun testVisualLineSelectionMarks() {
     configureByText(
       """
@@ -437,6 +466,7 @@ class MarkTest : VimTestCase() {
     assertOffset(199)
   }
 
+  @Test
   fun testReversedVisualLineSelectionMarks() {
     configureByText(
       """
@@ -454,6 +484,7 @@ class MarkTest : VimTestCase() {
     assertOffset(199)
   }
 
+  @Test
   fun testMulticaretMark() {
     configureByText(
       """
@@ -486,6 +517,7 @@ class MarkTest : VimTestCase() {
     )
   }
 
+  @Test
   fun testMulticaretSelectionMarks() {
     configureByText(
       """

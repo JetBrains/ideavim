@@ -12,8 +12,10 @@ import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class MotionGotoLineFirstActionTest : VimTestCase() {
+  @Test
   fun `test simple motion`() {
     doTest(
       "gg",
@@ -38,6 +40,7 @@ class MotionGotoLineFirstActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test motion with count`() {
     doTest(
       "5gg",
@@ -62,6 +65,7 @@ class MotionGotoLineFirstActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test motion with large count`() {
     doTest(
       "100gg",
@@ -86,6 +90,7 @@ class MotionGotoLineFirstActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test motion with zero count`() {
     doTest(
       "0gg",
@@ -110,6 +115,7 @@ class MotionGotoLineFirstActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test moves caret to first non-blank char`() {
     doTest(
       "gg",
@@ -135,6 +141,7 @@ class MotionGotoLineFirstActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test moves caret to same column with nostartofline`() {
     doTest(
       "gg",

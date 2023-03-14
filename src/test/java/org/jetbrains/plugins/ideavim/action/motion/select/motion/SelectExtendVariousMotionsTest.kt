@@ -14,6 +14,7 @@ import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 /**
  * @author Alex Plate
@@ -23,6 +24,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 class SelectExtendVariousMotionsTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.TABS)
+  @Test
   fun `test with tabs`() {
     val code = """
         class Scratch {

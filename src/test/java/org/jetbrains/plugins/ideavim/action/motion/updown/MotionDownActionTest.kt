@@ -14,11 +14,13 @@ import com.intellij.codeInsight.daemon.impl.HintRenderer
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 /**
  * @author Alex Plate
  */
 class MotionDownActionTest : VimTestCase() {
+  @Test
   fun `test motion down in visual block mode`() {
     val keys = "<C-V>2kjjj"
     val before = """
@@ -40,6 +42,7 @@ class MotionDownActionTest : VimTestCase() {
     doTest(keys, before, after, VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_BLOCK)
   }
 
+  @Test
   fun `test motion down in visual block mode with dollar motion`() {
     val keys = "<C-V>\$jj"
     val before = """
@@ -61,6 +64,7 @@ class MotionDownActionTest : VimTestCase() {
     doTest(keys, before, after, VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_BLOCK)
   }
 
+  @Test
   fun `test last column after line deletion`() {
     val keys = listOf("Vd", "j")
     val before = """
@@ -75,6 +79,7 @@ class MotionDownActionTest : VimTestCase() {
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun `test with inlays - move down from line with preceding inlay`() {
     val keys = injector.parser.parseKeys("j")
     val before = """
@@ -86,11 +91,12 @@ class MotionDownActionTest : VimTestCase() {
             all rocks and la${c}vender and tufted grass,
     """.trimIndent()
     configureByText(before)
-    myFixture.editor.inlayModel.addInlineElement(2, HintRenderer("Hello"))
+    fixture.editor.inlayModel.addInlineElement(2, HintRenderer("Hello"))
     typeText(keys)
     assertState(after)
   }
 
+  @Test
   fun `test with inlays - move down to correct column on line with preceding inlay`() {
     val keys = injector.parser.parseKeys("j")
     val before = """
@@ -102,11 +108,12 @@ class MotionDownActionTest : VimTestCase() {
             all rocks and la${c}vender and tufted grass,
     """.trimIndent()
     configureByText(before)
-    myFixture.editor.inlayModel.addInlineElement(before.indexOf("rocks"), HintRenderer("Hello"))
+    fixture.editor.inlayModel.addInlineElement(before.indexOf("rocks"), HintRenderer("Hello"))
     typeText(keys)
     assertState(after)
   }
 
+  @Test
   fun `test with inlays - move down from line with preceding inlay to line with preceding inlay`() {
     val keys = injector.parser.parseKeys("j")
     val before = """
@@ -118,12 +125,13 @@ class MotionDownActionTest : VimTestCase() {
             all rocks and la${c}vender and tufted grass,
     """.trimIndent()
     configureByText(before)
-    myFixture.editor.inlayModel.addInlineElement(before.indexOf("rocks"), HintRenderer("Hello"))
-    myFixture.editor.inlayModel.addInlineElement(before.indexOf("found"), HintRenderer("Hello"))
+    fixture.editor.inlayModel.addInlineElement(before.indexOf("rocks"), HintRenderer("Hello"))
+    fixture.editor.inlayModel.addInlineElement(before.indexOf("found"), HintRenderer("Hello"))
     typeText(keys)
     assertState(after)
   }
 
+  @Test
   fun `test with inlays - move down from long line with inlay to correct column`() {
     val keys = injector.parser.parseKeys("j")
     val before = """
@@ -135,11 +143,12 @@ class MotionDownActionTest : VimTestCase() {
             all rocks and lavende${c}r
     """.trimIndent()
     configureByText(before)
-    myFixture.editor.inlayModel.addInlineElement(before.indexOf("found"), HintRenderer("Hello"))
+    fixture.editor.inlayModel.addInlineElement(before.indexOf("found"), HintRenderer("Hello"))
     typeText(keys)
     assertState(after)
   }
 
+  @Test
   fun `test with inlays - move down from line with inlay and back to correct column`() {
     val keys = injector.parser.parseKeys("jk")
     val before = """
@@ -151,11 +160,12 @@ class MotionDownActionTest : VimTestCase() {
             all rocks and lavender
     """.trimIndent()
     configureByText(before)
-    myFixture.editor.inlayModel.addInlineElement(before.indexOf("found"), HintRenderer("Hello"))
+    fixture.editor.inlayModel.addInlineElement(before.indexOf("found"), HintRenderer("Hello"))
     typeText(keys)
     assertState(after)
   }
 
+  @Test
   fun `test motion up down without inlays`() {
     val keys = injector.parser.parseKeys("jk")
     val before = """
@@ -171,6 +181,7 @@ class MotionDownActionTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun `test with inlays - long line moving onto shorter line with inlay before caret`() {
     val keys = injector.parser.parseKeys("j")
     val before = """
@@ -182,11 +193,12 @@ class MotionDownActionTest : VimTestCase() {
             all rocks and lavende${c}r
     """.trimIndent()
     configureByText(before)
-    myFixture.editor.inlayModel.addInlineElement(before.indexOf("rocks"), HintRenderer("Hello"))
+    fixture.editor.inlayModel.addInlineElement(before.indexOf("rocks"), HintRenderer("Hello"))
     typeText(keys)
     assertState(after)
   }
 
+  @Test
   fun `test with inlays - long line moving onto shorter line with trailing inlay`() {
     val keys = injector.parser.parseKeys("j")
     val before = """
@@ -200,12 +212,13 @@ class MotionDownActionTest : VimTestCase() {
             and tufted grass,
     """.trimIndent()
     configureByText(before)
-    val inlayOffset = myFixture.editor.document.getLineEndOffset(1)
-    myFixture.editor.inlayModel.addInlineElement(inlayOffset, HintRenderer("Hello"))
+    val inlayOffset = fixture.editor.document.getLineEndOffset(1)
+    fixture.editor.inlayModel.addInlineElement(inlayOffset, HintRenderer("Hello"))
     typeText(keys)
     assertState(after)
   }
 
+  @Test
   fun `test with inlays - move down onto line with inlay and back to correct column`() {
     val keys = injector.parser.parseKeys("jk")
     val before = """
@@ -217,11 +230,12 @@ class MotionDownActionTest : VimTestCase() {
             all rocks and lavender
     """.trimIndent()
     configureByText(before)
-    myFixture.editor.inlayModel.addInlineElement(before.indexOf("rocks"), HintRenderer("Hello"))
+    fixture.editor.inlayModel.addInlineElement(before.indexOf("rocks"), HintRenderer("Hello"))
     typeText(keys)
     assertState(after)
   }
 
+  @Test
   fun `test motion to the last empty line`() {
     doTest(
       "j",
@@ -238,6 +252,7 @@ class MotionDownActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test move on two empty strings`() {
     doTest(
       "\$j",

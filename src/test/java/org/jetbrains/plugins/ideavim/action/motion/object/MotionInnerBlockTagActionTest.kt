@@ -13,10 +13,12 @@ import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class MotionInnerBlockTagActionTest : VimTestCase() {
 
   // |d| |v_it|
+  @Test
   fun testDeleteInnerTagBlockCaretInHtml() {
     val keys = listOf("dit")
     val before = "<template ${c}name=\"hello\">\n" +
@@ -29,6 +31,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
   }
 
   // |d| |v_it|
+  @Test
   fun testDeleteInnerTagBlockCaretInHtmlUnclosedTag() {
     val keys = listOf("dit")
     val before = "<template ${c}name=\"hello\">\n" +
@@ -41,6 +44,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun testDeleteInnerTagBlockCaretEdgeTag() {
     val keys = listOf("dit")
     val before = "<template name=\"hello\"$c>\n" +
@@ -54,6 +58,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
   }
 
   // |d| |v_it|
+  @Test
   fun testDeleteInnerTagBlockBefore() {
     val keys = listOf("dit")
     val before = "abc${c}de<tag>fg</tag>hi"
@@ -62,6 +67,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
   }
 
   // |d| |v_it|
+  @Test
   fun testDeleteInnerTagBlockInOpen() {
     val keys = listOf("dit")
     val before = "abcde<ta${c}g>fg</tag>hi"
@@ -70,6 +76,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
   }
 
   // |d| |v_it|
+  @Test
   fun testDeleteInnerTagBlockInOpenEndOfLine() {
     val keys = listOf("dit")
     val before = "abcde<ta${c}g>fg</tag>"
@@ -78,6 +85,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
   }
 
   // |d| |v_it|
+  @Test
   fun testDeleteInnerTagBlockInOpenStartOfLine() {
     val keys = listOf("dit")
     val before = "<ta${c}g>fg</tag>hi"
@@ -86,6 +94,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
   }
 
   // |d| |v_it|
+  @Test
   fun testDeleteInnerTagBlockInOpenWithArgs() {
     val keys = listOf("dit")
     val before = "abcde<ta${c}g name = \"name\">fg</tag>hi"
@@ -94,6 +103,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
   }
 
   // |d| |v_it|
+  @Test
   fun testDeleteInnerTagBlockBetween() {
     val keys = listOf("dit")
     val before = "abcde<tag>f${c}g</tag>hi"
@@ -103,6 +113,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
 
   // |d| |v_it|
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun testDeleteInnerTagBlockBetweenTagWithRegex() {
     val keys = listOf("dit")
     val before = "abcde<[abc]*>af${c}gbc</[abc]*>hi"
@@ -111,6 +122,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
   }
 
   // |d| |v_it|
+  @Test
   fun testDeleteInnerTagBlockBetweenCamelCase() {
     val keys = listOf("dit")
     val before = "abcde<tAg>f${c}g</tag>hi"
@@ -119,6 +131,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
   }
 
   // |d| |v_it|
+  @Test
   fun testDeleteInnerTagBlockBetweenCaps() {
     val keys = listOf("dit")
     val before = "abcde<tag>f${c}g</TAG>hi"
@@ -127,6 +140,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
   }
 
   // |d| |v_it|
+  @Test
   fun testDeleteInnerTagBlockBetweenWithSpaceBeforeTag() {
     val keys = listOf("dit")
     val before = "abcde< tag>f${c}g</ tag>hi"
@@ -135,6 +149,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
   }
 
   // |d| |v_it|
+  @Test
   fun testDeleteInnerTagBlockBetweenWithSpaceAfterTag() {
     val keys = listOf("dit")
     val before = "abcde<tag >f${c}g</tag>hi"
@@ -143,6 +158,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
   }
 
   // |d| |v_it|
+  @Test
   fun testDeleteInnerTagBlockBetweenWithArgs() {
     val keys = listOf("dit")
     val before = "abcde<tag name = \"name\">f${c}g</tag>hi"
@@ -151,6 +167,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
   }
 
   // |d| |v_it|
+  @Test
   fun testDeleteInnerTagBlockInClose() {
     val keys = listOf("dit")
     val before = "abcde<tag>fg</ta${c}g>hi"
@@ -159,6 +176,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
   }
 
   // |d| |v_it|
+  @Test
   fun testDeleteInnerTagBlockAfter() {
     val keys = listOf("dit")
     val before = "abcde<tag>fg</tag>h${c}i"
@@ -167,6 +185,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
   }
 
   // |d| |v_it|
+  @Test
   fun testDeleteInnerTagBlockInAlone() {
     val keys = listOf("dit")
     val before = "abcde<ta${c}g>fghi"
@@ -175,6 +194,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
   }
 
   // |d| |v_it|
+  @Test
   fun testDeleteInnerTagBlockWithoutTags() {
     val keys = listOf("dit")
     val before = "abc${c}de"
@@ -183,6 +203,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
   }
 
   // |d| |v_it|
+  @Test
   fun testDeleteInnerTagBlockBeforeWithoutOpenTag() {
     val keys = listOf("dit")
     val before = "abc${c}defg</tag>hi"
@@ -191,6 +212,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
   }
 
   // |d| |v_it|
+  @Test
   fun testDeleteInnerTagBlockInCloseWithoutOpenTag() {
     val keys = listOf("dit")
     val before = "abcdefg</ta${c}g>hi"
@@ -199,6 +221,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
   }
 
   // |d| |v_it|
+  @Test
   fun testDeleteInnerTagBlockAfterWithoutOpenTag() {
     val keys = listOf("dit")
     val before = "abcdefg</tag>h${c}i"
@@ -207,6 +230,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
   }
 
   // |d| |v_it|
+  @Test
   fun testDeleteInnerTagBlockBeforeWithoutCloseTag() {
     val keys = listOf("dit")
     val before = "abc${c}defg<tag>hi"
@@ -215,6 +239,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
   }
 
   // |d| |v_it|
+  @Test
   fun testDeleteInnerTagBlockInOpenWithoutCloseTag() {
     val keys = listOf("dit")
     val before = "abcdefg<ta${c}g>hi"
@@ -223,6 +248,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
   }
 
   // |d| |v_it|
+  @Test
   fun testDeleteInnerTagBlockAfterWithoutCloseTag() {
     val keys = listOf("dit")
     val before = "abcdefg<tag>h${c}i"
@@ -231,6 +257,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
   }
 
   // |d| |v_it|
+  @Test
   fun testDeleteInnerTagBlockBeforeWrongOrder() {
     val keys = listOf("dit")
     val before = "abc${c}de</tag>fg<tag>hi"
@@ -239,6 +266,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
   }
 
   // |d| |v_it|
+  @Test
   fun testDeleteInnerTagBlockInOpenWrongOrder() {
     val keys = listOf("dit")
     val before = "abcde</ta${c}g>fg<tag>hi"
@@ -247,6 +275,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
   }
 
   // |d| |v_it|
+  @Test
   fun testDeleteInnerTagBlockBetweenWrongOrder() {
     val keys = listOf("dit")
     val before = "abcde</tag>f${c}g<tag>hi"
@@ -255,6 +284,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
   }
 
   // |d| |v_it|
+  @Test
   fun testDeleteInnerTagBlockInCloseWrongOrder() {
     val keys = listOf("dit")
     val before = "abcde</tag>fg<ta${c}g>hi"
@@ -264,6 +294,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
 
   // |d| |v_it|
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun testDeleteInnerTagBlockTwoTagsWrongOrder() {
     val keys = listOf("dit")
     val before = "<foo><html>t${c}ext</foo></html>"
@@ -273,6 +304,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
 
   // |d| |v_it|
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun testDeleteInnerTagBlockTwoTagsWrongOrderInClosingTag() {
     val keys = listOf("dit")
     val before = "<foo><html>text</foo></htm${c}l>"
@@ -281,6 +313,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
   }
 
   // |d| |v_it|
+  @Test
   fun testDeleteInnerTagBlockAfterWrongOrder() {
     val keys = listOf("dit")
     val before = "abcde</tag>fg<tag>h${c}i"
@@ -289,6 +322,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
   }
 
   // |d| |v_it|
+  @Test
   fun testDeleteInnerTagBlockBracketInside() {
     val keys = listOf("dit")
     val before = "abcde<tag>f$c<>g</tag>hi"
@@ -297,6 +331,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
   }
 
   // |d| |v_it|
+  @Test
   fun testDeleteInnerTagBlockBracketInsideString() {
     val keys = listOf("dit")
     val before = "abcde<tag>f${c}\"<>\"g</tag>hi"
@@ -305,6 +340,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
   }
 
   // |d| |v_it|
+  @Test
   fun testDeleteInnerTagIsCaseInsensitive() {
     val keys = listOf("dit")
     val before = "<a> <as${c}df> </A>"
@@ -313,6 +349,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
   }
 
   // |d| |v_it|
+  @Test
   fun testDeleteInnerTagSlashesInAttribute() {
     val keys = listOf("dit")
     val before = "<a href=\"https://isitchristmas.com\" class=\"button\">Bing ${c}Bing bing</a>"
@@ -322,6 +359,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
 
   // VIM-1090 |d| |v_it|
   // Adapted from vim source file "test_textobjects.vim"
+  @Test
   fun testDeleteInnerTagDuplicateTags() {
     val keys = listOf("dit")
     val before = "<b>as${c}d<i>as<b />df</i>asdf</b>"
@@ -330,6 +368,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
   }
 
   // |v_it|
+  @Test
   fun testFileStartsWithSlash() {
     val before = """
       /*hello
@@ -349,6 +388,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
   }
 
   // |v_it|
+  @Test
   fun testSelectInnerTagEmptyTag() {
     val before = "<a>$c</a>"
     val after = "$s<a></a$c>$se"
@@ -357,6 +397,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     doTest(keys, before, after, VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER)
   }
 
+  @Test
   fun `test single character`() {
     // The whole tag block is also selected if there is only a single character inside
     val before = "<a>${c}a</a>"
@@ -365,6 +406,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     doTest(keys, before, after, VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER)
   }
 
+  @Test
   fun `test single character inside tag`() {
     configureByText("<a$c></a>")
     typeText(injector.parser.parseKeys("vit"))
@@ -372,6 +414,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
   }
 
   // VIM-1633 |v_it|
+  @Test
   fun testNestedInTagSelection() {
     configureByText(
       "<t>Outer\n" +
@@ -382,6 +425,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     assertSelection("Inner")
   }
 
+  @Test
   fun `test nested tag double motion`() {
     configureByText(
       "<o>Outer\n" +
@@ -392,12 +436,14 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     assertSelection("<t></t>")
   }
 
+  @Test
   fun `test in inner tag double motion`() {
     configureByText("<o><t>$c</t>\n</o>")
     typeText(injector.parser.parseKeys("vitit"))
     assertSelection("<o><t></t>\n</o>")
   }
 
+  @Test
   fun `test nested tags between tags`() {
     configureByText(
       "<t>Outer\n" +
@@ -408,6 +454,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     assertSelection("Outer\n" + "   <t>Inner</t>  <t>Inner</t>")
   }
 
+  @Test
   fun `test nested tags number motion`() {
     configureByText(
       "<t>Outer\n" +
@@ -418,6 +465,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     assertSelection("Outer\n" + "   <t>Inner</t>")
   }
 
+  @Test
   fun `test nested tags double motion`() {
     configureByText(
       "<o>Outer\n" +
@@ -428,6 +476,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     assertSelection("<t>Inner</t>")
   }
 
+  @Test
   fun `test nested tags triple motion`() {
     configureByText(
       "<t>Outer\n" +
@@ -438,6 +487,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     assertSelection("Outer\n" + "   <t>Inner</t>")
   }
 
+  @Test
   fun `test nested tags in closing tag`() {
     configureByText(
       "<t>Outer\n" +
@@ -448,6 +498,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     assertSelection("Outer\n" + "   <t>Inner</t>")
   }
 
+  @Test
   fun `test nested tags in opening tag`() {
     configureByText(
       "<${c}t>Outer\n" +
@@ -458,6 +509,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     assertSelection("Outer\n" + "   <t>Inner</t>")
   }
 
+  @Test
   fun `test nested tags ouside tag`() {
     configureByText(
       "$c<t>Outer\n" +
@@ -468,6 +520,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     assertSelection("Outer\n" + "   <t>Inner</t>")
   }
 
+  @Test
   fun `test skip whitespace at start of line`() {
     configureByText(
       "<o>Outer\n" +

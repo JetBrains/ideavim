@@ -9,26 +9,31 @@
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class PrintCommandTest : VimTestCase() {
+  @Test
   fun `test default range`() {
     configureByText(initialText)
     typeText(commandToKeys("p"))
     assertExOutput("A Discovery\n")
   }
 
+  @Test
   fun `test default range with P`() {
     configureByText(initialText)
     typeText(commandToKeys("P"))
     assertExOutput("A Discovery\n")
   }
 
+  @Test
   fun `test full text`() {
     configureByText(initialText)
     typeText(commandToKeys("%p"))
     assertExOutput(initialText)
   }
 
+  @Test
   fun `test with count`() {
     configureByText(initialText)
     typeText(commandToKeys("p 3"))

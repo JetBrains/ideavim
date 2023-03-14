@@ -9,6 +9,7 @@
 package org.jetbrains.plugins.ideavim.group
 
 import com.intellij.idea.TestFor
+import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.editor.colors.EditorColors
 import com.intellij.openapi.editor.colors.EditorColorsManager
 import com.intellij.openapi.editor.markup.EffectType
@@ -21,11 +22,14 @@ import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
+import kotlin.test.assertEquals
 
 /**
  * @author Alex Plate
  */
 class SearchGroupTest : VimTestCase() {
+  @Test
   fun `test one letter`() {
     configureByText(
       """
@@ -37,6 +41,7 @@ class SearchGroupTest : VimTestCase() {
     assertOffset(5)
   }
 
+  @Test
   fun `test end of line`() {
     configureByText(
       """
@@ -49,6 +54,7 @@ class SearchGroupTest : VimTestCase() {
   }
 
   // VIM-146
+  @Test
   fun `test end of line with highlighting`() {
     configureByText(
       """
@@ -61,6 +67,7 @@ class SearchGroupTest : VimTestCase() {
     assertOffset(29)
   }
 
+  @Test
   fun `test 'and' without branches`() {
     configureByText(
       """
@@ -73,6 +80,7 @@ class SearchGroupTest : VimTestCase() {
   }
 
   // VIM-226
+  @Test
   fun `test 'and' without branches with highlighting`() {
     configureByText(
       """
@@ -86,6 +94,7 @@ class SearchGroupTest : VimTestCase() {
   }
 
   // VIM-528
+  @Test
   fun `test not found`() {
     configureByText(
       """
@@ -99,6 +108,7 @@ class SearchGroupTest : VimTestCase() {
   }
 
   // VIM-528
+  @Test
   fun `test grouping`() {
     configureByText(
       """
@@ -111,6 +121,7 @@ class SearchGroupTest : VimTestCase() {
   }
 
   // VIM-855
+  @Test
   fun `test character class regression`() {
     configureByText("${c}bb\n")
     enterSearch("[^c]b")
@@ -118,25 +129,28 @@ class SearchGroupTest : VimTestCase() {
   }
 
   // VIM-855
+  @Test
   fun `test character class regression case insensitive`() {
     val pos = search(
       "\\c[ABC]b",
       "${c}dd\n",
     )
-    assertEquals(-1, pos)
+    kotlin.test.assertEquals(-1, pos)
   }
 
   // VIM-856
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
+  @Test
   fun `test negative lookbehind regression`() {
     val pos = search(
       "a\\@<!b",
       "${c}ab\n",
     )
-    assertEquals(-1, pos)
+    kotlin.test.assertEquals(-1, pos)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
+  @Test
   fun `test smart case search case insensitive`() {
     configureByText("obj.toString();\n")
     enterCommand("set ignorecase smartcase")
@@ -144,6 +158,7 @@ class SearchGroupTest : VimTestCase() {
     assertOffset(4)
   }
 
+  @Test
   fun `test smart case search case sensitive`() {
     configureByText(
       """
@@ -156,6 +171,7 @@ class SearchGroupTest : VimTestCase() {
     assertOffset(20)
   }
 
+  @Test
   fun `test search motion`() {
     configureByText("${c}one two\n")
     enterSearch("two")
@@ -163,12 +179,14 @@ class SearchGroupTest : VimTestCase() {
   }
 
   // |/pattern/e|
+  @Test
   fun `test search e motion offset`() {
     configureByText("${c}one two three")
     enterSearch("two/e")
     assertOffset(6)
   }
 
+  @Test
   fun `test search e-1 motion offset`() {
     doTest(
       "/two/e-1<Enter>",
@@ -178,18 +196,21 @@ class SearchGroupTest : VimTestCase() {
   }
 
   // |/pattern/e|
+  @Test
   fun `test search e+2 motion offset`() {
     configureByText("${c}one two three")
     enterSearch("two/e+2")
     assertOffset(8)
   }
 
+  @Test
   fun `test reverse search e+2 motion offset finds next match when starting on matching offset`() {
     configureByText("one two three one two ${c}three")
     enterSearch("two?e+2", false)
     assertOffset(8)
   }
 
+  @Test
   fun `test search e+10 motion offset at end of file`() {
     configureByText(
       """I found it in a legendary land
@@ -202,6 +223,7 @@ class SearchGroupTest : VimTestCase() {
     assertPosition(3, 38)
   }
 
+  @Test
   fun `test search e+10 motion offset wraps at end of file`() {
     configureByText(
       """I found it in a legendary land
@@ -217,6 +239,7 @@ class SearchGroupTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun `test search e+10 motion offset wraps at exactly end of file`() {
     configureByText(
       """I found it in a legendary land
@@ -232,6 +255,7 @@ class SearchGroupTest : VimTestCase() {
   }
 
   // |/pattern/s|
+  @Test
   fun `test search s motion offset`() {
     configureByText("${c}one two three")
     enterSearch("two/s")
@@ -239,18 +263,21 @@ class SearchGroupTest : VimTestCase() {
   }
 
   // |/pattern/s|
+  @Test
   fun `test search s-2 motion offset`() {
     configureByText("${c}one two three")
     enterSearch("two/s-2")
     assertOffset(2)
   }
 
+  @Test
   fun `test search s-2 motion offset finds next match when starting on matching offset`() {
     configureByText("on${c}e two three one two three")
     enterSearch("two/s-2")
     assertOffset(16)
   }
 
+  @Test
   fun `test reverse search s-20 motion offset at beginning of file`() {
     configureByText(
       """I found it in a legendary land
@@ -264,6 +291,7 @@ class SearchGroupTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun `test reverse search s-20 motion offset wraps at beginning of file`() {
     configureByText(
       """I found it in a legendary land
@@ -279,12 +307,14 @@ class SearchGroupTest : VimTestCase() {
   }
 
   // |/pattern/s|
+  @Test
   fun `test search s+1 motion offset`() {
     configureByText("${c}one two three")
     enterSearch("two/s+1")
     assertOffset(5)
   }
 
+  @Test
   fun `test reverse search s+2 motion offset finds next match when starting at matching offset`() {
     configureByText("one two three one tw${c}o three")
     enterSearch("two?s+2", false)
@@ -292,6 +322,7 @@ class SearchGroupTest : VimTestCase() {
   }
 
   // |/pattern/b|
+  @Test
   fun `test search b motion offset`() {
     configureByText("${c}one two three")
     enterSearch("two/b")
@@ -299,6 +330,7 @@ class SearchGroupTest : VimTestCase() {
   }
 
   // |/pattern/b|
+  @Test
   fun `test search b-2 motion offset`() {
     configureByText("${c}one two three")
     enterSearch("two/b-2")
@@ -306,12 +338,14 @@ class SearchGroupTest : VimTestCase() {
   }
 
   // |/pattern/b|
+  @Test
   fun `test search b+1 motion offset`() {
     configureByText("${c}one two three")
     enterSearch("two/b+1")
     assertOffset(5)
   }
 
+  @Test
   fun `test search above line motion offset`() {
     configureByText(
       """
@@ -325,6 +359,7 @@ class SearchGroupTest : VimTestCase() {
     assertOffset(0)
   }
 
+  @Test
   fun `test search below line motion offset`() {
     configureByText(
       """
@@ -339,6 +374,7 @@ class SearchGroupTest : VimTestCase() {
   }
 
   // |i_CTRL-K|
+  @Test
   fun `test search digraph`() {
     configureByText("${c}Hallo Österreich!\n")
     // enterSearch doesn't parse the special keys
@@ -347,6 +383,7 @@ class SearchGroupTest : VimTestCase() {
   }
 
   @TestFor(classes = [SearchWholeWordForwardAction::class])
+  @Test
   fun `test search word matches case`() {
     configureByText("${c}Editor editor Editor")
     typeText("*")
@@ -354,6 +391,7 @@ class SearchGroupTest : VimTestCase() {
   }
 
   @TestFor(classes = [SearchWholeWordForwardAction::class])
+  @Test
   fun `test search next word matches case`() {
     configureByText("${c}Editor editor Editor editor Editor")
     typeText("*", "n")
@@ -362,6 +400,7 @@ class SearchGroupTest : VimTestCase() {
 
   @TestFor(classes = [SearchWholeWordForwardAction::class])
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
+  @Test
   fun `test search word honours ignorecase`() {
     configureByText("${c}editor Editor editor")
     enterCommand("set ignorecase")
@@ -371,6 +410,7 @@ class SearchGroupTest : VimTestCase() {
 
   @TestFor(classes = [SearchWholeWordForwardAction::class])
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
+  @Test
   fun `test search next word honours ignorecase`() {
     configureByText("${c}editor Editor editor")
     enterCommand("set ignorecase")
@@ -380,6 +420,7 @@ class SearchGroupTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   @TestFor(classes = [SearchWholeWordForwardAction::class])
+  @Test
   fun `test search word overrides smartcase`() {
     configureByText("${c}Editor editor Editor")
     enterCommand("set ignorecase smartcase")
@@ -389,6 +430,7 @@ class SearchGroupTest : VimTestCase() {
 
   @TestFor(classes = [SearchWholeWordForwardAction::class])
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
+  @Test
   fun `test search next word overrides smartcase`() {
     configureByText("${c}Editor editor editor")
     enterCommand("set ignorecase smartcase")
@@ -397,6 +439,7 @@ class SearchGroupTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
   fun `test incsearch moves caret to start of first match`() {
     configureByText(
       """I found it in a legendary land
@@ -411,6 +454,7 @@ class SearchGroupTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
   fun `test incsearch + hlsearch moves caret to start of first match`() {
     configureByText(
       """I found it in a legendary land
@@ -425,6 +469,7 @@ class SearchGroupTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
   fun `test incsearch moves caret to start of first match (backwards)`() {
     configureByText(
       """I found it in a legendary land
@@ -439,6 +484,7 @@ class SearchGroupTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
   fun `test incsearch + hlsearch moves caret to start of first match (backwards)`() {
     configureByText(
       """I found it in a legendary land
@@ -452,6 +498,7 @@ class SearchGroupTest : VimTestCase() {
     assertPosition(0, 26)
   }
 
+  @Test
   fun `test incsearch resets caret if no match found`() {
     configureByText(
       """I found it in a legendary land
@@ -465,6 +512,7 @@ class SearchGroupTest : VimTestCase() {
     assertPosition(1, 0)
   }
 
+  @Test
   fun `test incsearch + hlsearch resets caret if no match found`() {
     configureByText(
       """I found it in a legendary land
@@ -478,6 +526,7 @@ class SearchGroupTest : VimTestCase() {
     assertPosition(1, 0)
   }
 
+  @Test
   fun `test incsearch resets caret if cancelled`() {
     configureByText(
       """I found it in a legendary land
@@ -491,6 +540,7 @@ class SearchGroupTest : VimTestCase() {
     assertPosition(1, 0)
   }
 
+  @Test
   fun `test incsearch + hlsearch resets caret if cancelled`() {
     configureByText(
       """I found it in a legendary land
@@ -505,6 +555,7 @@ class SearchGroupTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
   fun `test incsearch resets caret on backspace`() {
     configureByText(
       """I found it in a legendary land
@@ -521,6 +572,7 @@ class SearchGroupTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
   fun `test incsearch + hlsearch resets caret on backspace`() {
     configureByText(
       """I found it in a legendary land
@@ -536,6 +588,7 @@ class SearchGroupTest : VimTestCase() {
     assertPosition(1, 0)
   }
 
+  @Test
   fun `test search result position with incsearch`() {
     configureByText(
       """I found it in a legendary land
@@ -549,6 +602,7 @@ class SearchGroupTest : VimTestCase() {
     assertPosition(1, 10)
   }
 
+  @Test
   fun `test search result position with incsearch + hlsearch`() {
     configureByText(
       """I found it in a legendary land
@@ -562,6 +616,7 @@ class SearchGroupTest : VimTestCase() {
     assertPosition(1, 10)
   }
 
+  @Test
   fun `test incsearch highlights only current match with nohlsearch`() {
     configureByText(
       """I found it in a legendary land
@@ -584,6 +639,7 @@ class SearchGroupTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test incsearch highlights only current match with nohlsearch (backwards)`() {
     configureByText(
       """I found it in a legendary land
@@ -606,6 +662,7 @@ class SearchGroupTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test incsearch highlights all matches with hlsearch enabled`() {
     configureByText(
       """I found it in a legendary land
@@ -628,6 +685,7 @@ class SearchGroupTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test incsearch removes all highlights if no match`() {
     configureByText(
       """I found it in a legendary land
@@ -659,6 +717,7 @@ class SearchGroupTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test incsearch does not hide previous search until first character is typed`() {
     configureByText(
       """I found it in a legendary land
@@ -691,6 +750,7 @@ class SearchGroupTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test incsearch does not show previous search highlights when text field is deleted`() {
     configureByText(
       """I found it in a legendary land
@@ -714,6 +774,7 @@ class SearchGroupTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test cancelling incsearch shows previous search highlights`() {
     configureByText(
       """I found it in a legendary land
@@ -737,6 +798,7 @@ class SearchGroupTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test cancelling incsearch does not show previous search highlights after nohls command`() {
     configureByText(
       """I found it in a legendary land
@@ -761,6 +823,7 @@ class SearchGroupTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test incsearch highlights for substitute command`() {
     configureByText(
       """I found it in a legendary land
@@ -783,6 +846,7 @@ class SearchGroupTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test incsearch only highlights for substitute command after valid argument`() {
     configureByText(
       """I found it in a legendary land
@@ -807,6 +871,7 @@ class SearchGroupTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test incsearch highlights for substitute command only highlights in range`() {
     configureByText(
       """I found it in a legendary land
@@ -829,6 +894,7 @@ class SearchGroupTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test incsearch highlights for substitute command in current line with no range`() {
     configureByText(
       """I found it in a legendary land
@@ -851,6 +917,7 @@ class SearchGroupTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test incsearch for substitute command starts at beginning of range not caret position`() {
     configureByText(
       """I found it in a legendary land
@@ -889,6 +956,7 @@ class SearchGroupTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test incsearch highlights for substitute command clears highlights on backspace`() {
     configureByText(
       """I found it in a legendary land
@@ -911,6 +979,7 @@ class SearchGroupTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test incsearch highlights for substitute command resets highlights on backspace`() {
     configureByText(
       """I found it in a legendary land
@@ -936,6 +1005,7 @@ class SearchGroupTest : VimTestCase() {
     // TODO: Check caret position
   }
 
+  @Test
   fun `test cancelling incsearch highlights for substitute command shows previous highlights`() {
     configureByText(
       """I found it in a legendary land
@@ -961,6 +1031,7 @@ class SearchGroupTest : VimTestCase() {
     // TODO: Check caret position
   }
 
+  @Test
   fun `test highlight search results`() {
     configureByText(
       """I found it in a legendary land
@@ -984,6 +1055,7 @@ class SearchGroupTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test search removes previous search highlights`() {
     configureByText(
       """I found it in a legendary land
@@ -1008,6 +1080,7 @@ class SearchGroupTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test no highlights for unmatched search`() {
     configureByText(
       """I found it in a legendary land
@@ -1021,6 +1094,7 @@ class SearchGroupTest : VimTestCase() {
     assertNoSearchHighlights()
   }
 
+  @Test
   fun `test nohlsearch command removes highlights`() {
     configureByText(
       """I found it in a legendary land
@@ -1035,6 +1109,7 @@ class SearchGroupTest : VimTestCase() {
     assertNoSearchHighlights()
   }
 
+  @Test
   fun `test find next after nohlsearch command shows highlights`() {
     configureByText(
       """I found it in a legendary land
@@ -1060,6 +1135,7 @@ class SearchGroupTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test nohlsearch correctly resets incsearch highlights after deleting last occurrence`() {
     // Crazy edge case bug. With incsearch enabled, search for something with only one occurrence, delete it, call
     // :nohlsearch, undo and search next - highlights don't work anymore
@@ -1088,6 +1164,7 @@ class SearchGroupTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test nohlsearch option hides search highlights`() {
     configureByText(
       """I found it in a legendary land
@@ -1102,6 +1179,7 @@ class SearchGroupTest : VimTestCase() {
     assertNoSearchHighlights()
   }
 
+  @Test
   fun `test setting hlsearch option shows search highlights for last search`() {
     configureByText(
       """I found it in a legendary land
@@ -1125,6 +1203,7 @@ class SearchGroupTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test deleting text moves search highlights`() {
     configureByText(
       """I found it in a legendary land
@@ -1149,6 +1228,7 @@ class SearchGroupTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test deleting match removes search highlight`() {
     configureByText(
       """I found it in a legendary land
@@ -1173,6 +1253,7 @@ class SearchGroupTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test deleting part of match removes search highlight`() {
     configureByText(
       """I found it in a legendary land
@@ -1197,6 +1278,7 @@ class SearchGroupTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test deleting part of match keeps highlight if pattern still matches`() {
     configureByText(
       """I found it in a legendary land
@@ -1221,6 +1303,7 @@ class SearchGroupTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test inserting text moves search highlights`() {
     configureByText(
       """I found it in a legendary land
@@ -1245,6 +1328,7 @@ class SearchGroupTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test inserting text inside match removes search highlight`() {
     configureByText(
       """I found it in a legendary land
@@ -1269,6 +1353,7 @@ class SearchGroupTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test inserting text inside match keeps highlight if pattern still matches`() {
     configureByText(
       """I found it in a legendary land
@@ -1293,6 +1378,7 @@ class SearchGroupTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test inserting text shows highlight if it contains matches`() {
     configureByText(
       """I found it in a legendary land
@@ -1318,6 +1404,7 @@ class SearchGroupTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test replacing text moves search highlights`() {
     val pattern = "and"
     configureByText(
@@ -1342,6 +1429,7 @@ class SearchGroupTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test replacing text inside match removes search highlight`() {
     configureByText(
       """I found it in a legendary land
@@ -1366,6 +1454,7 @@ class SearchGroupTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test replacing text shows highlight if it contains matches`() {
     configureByText(
       """I found it in a legendary land
@@ -1390,6 +1479,7 @@ class SearchGroupTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test replacing text inside match keeps highlight if pattern still matches`() {
     configureByText(
       """I found it in a legendary land
@@ -1414,6 +1504,7 @@ class SearchGroupTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test search highlight with tabs`() {
     configureByText("\tfoo")
     enterCommand("set hlsearch")
@@ -1424,22 +1515,23 @@ class SearchGroupTest : VimTestCase() {
 
   // Ensure that the offsets for the last carriage return in the file are valid, even though it's for a line that
   // doesn't exist
+  @Test
   fun `test find last cr in file`() {
     val res = search("\\n", "Something\n")
-    assertEquals(9, res)
+    kotlin.test.assertEquals(9, res)
   }
 
   private fun search(pattern: String, input: String): Int {
     configureByText(input)
-    val editor = myFixture.editor
-    val project = myFixture.project
+    val editor = fixture.editor
+    val project = fixture.project
     val searchGroup = VimPlugin.getSearch()
     val ref = Ref.create(-1)
     RunnableHelper.runReadCommand(
       project,
       {
         // Does not move the caret!
-        val n = searchGroup.processSearchCommand(editor.vim, pattern, myFixture.caretOffset, Direction.FORWARDS)
+        val n = searchGroup.processSearchCommand(editor.vim, pattern, fixture.caretOffset, Direction.FORWARDS)
         ref.set(n)
       },
       null,
@@ -1449,15 +1541,15 @@ class SearchGroupTest : VimTestCase() {
   }
 
   private fun assertNoSearchHighlights() {
-    assertEquals(0, myFixture.editor.markupModel.allHighlighters.size)
+    kotlin.test.assertEquals(0, fixture.editor.markupModel.allHighlighters.size)
   }
 
   @Suppress("DEPRECATION")
   private fun assertSearchHighlights(tooltip: String, expected: String) {
-    val allHighlighters = myFixture.editor.markupModel.allHighlighters
+    val allHighlighters = fixture.editor.markupModel.allHighlighters
 
-    LOG.debug("Current text: ${myFixture.editor.document.text}")
-    val actual = StringBuilder(myFixture.editor.document.text)
+    thisLogger().debug("Current text: ${fixture.editor.document.text}")
+    val actual = StringBuilder(fixture.editor.document.text)
     val inserts = mutableMapOf<Int, String>()
 
     // Digraphs:
@@ -1480,7 +1572,7 @@ class SearchGroupTest : VimTestCase() {
       offset += v.length
     }
 
-    assertEquals(expected, actual.toString())
+    kotlin.test.assertEquals(expected, actual.toString())
 
     // Assert all highlighters have the correct tooltip and text attributes
     val editorColorsScheme = EditorColorsManager.getInstance().globalScheme
@@ -1488,35 +1580,35 @@ class SearchGroupTest : VimTestCase() {
     val caretColour = editorColorsScheme.getColor(EditorColors.CARET_COLOR)
     allHighlighters.forEach {
       val offsets = "(${it.startOffset}, ${it.endOffset})"
-      assertEquals("Incorrect tooltip for highlighter at $offsets", tooltip, it.errorStripeTooltip)
+      kotlin.test.assertEquals(tooltip, it.errorStripeTooltip, "Incorrect tooltip for highlighter at $offsets")
       assertEquals(
-        "Incorrect background colour for highlighter at $offsets",
         attributes.backgroundColor,
         it.textAttributes?.backgroundColor,
+        "Incorrect background colour for highlighter at $offsets"
       )
       assertEquals(
-        "Incorrect foreground colour for highlighter at $offsets",
         attributes.foregroundColor,
         it.textAttributes?.foregroundColor,
+        "Incorrect foreground colour for highlighter at $offsets"
       )
       // TODO: Find a better way to identify the current match
       if (it.textAttributes?.effectType == EffectType.ROUNDED_BOX) {
         assertEquals(
-          "Incorrect effect type for highlighter at $offsets",
           EffectType.ROUNDED_BOX,
           it.textAttributes?.effectType,
+          "Incorrect effect type for highlighter at $offsets"
         )
-        assertEquals("Incorrect effect colour for highlighter at $offsets", caretColour, it.textAttributes?.effectColor)
+        assertEquals(caretColour, it.textAttributes?.effectColor, "Incorrect effect colour for highlighter at $offsets")
       } else {
         assertEquals(
-          "Incorrect effect type for highlighter at $offsets",
           attributes.effectType,
           it.textAttributes?.effectType,
+          "Incorrect effect type for highlighter at $offsets"
         )
         assertEquals(
-          "Incorrect effect colour for highlighter at $offsets",
           attributes.effectColor,
           it.textAttributes?.effectColor,
+          "Incorrect effect colour for highlighter at $offsets"
         )
       }
     }

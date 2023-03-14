@@ -12,6 +12,7 @@ import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 /*
                                                        *z+*
@@ -22,6 +23,7 @@ z+                      Without [count]: Redraw with the line just below the
  */
 class ScrollFirstScreenLinePageStartActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  @Test
   fun `test scrolls first line on next page to top of screen`() {
     configureByPages(5)
     setPositionAndScroll(0, 20)
@@ -31,6 +33,7 @@ class ScrollFirstScreenLinePageStartActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  @Test
   fun `test scrolls to first non-blank in line`() {
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(0, 20)
@@ -40,6 +43,7 @@ class ScrollFirstScreenLinePageStartActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  @Test
   fun `test scrolls first line on next page to scrolloff`() {
     configureByPages(5)
     enterCommand("set scrolloff=10")
@@ -50,6 +54,7 @@ class ScrollFirstScreenLinePageStartActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  @Test
   fun `test scrolls first line on next page ignores scrolljump`() {
     configureByPages(5)
     enterCommand("set scrolljump=10")
@@ -59,6 +64,7 @@ class ScrollFirstScreenLinePageStartActionTest : VimTestCase() {
     assertVisibleArea(35, 69)
   }
 
+  @Test
   fun `test count z+ scrolls count line to top of screen`() {
     configureByPages(5)
     setPositionAndScroll(0, 20)
@@ -67,6 +73,7 @@ class ScrollFirstScreenLinePageStartActionTest : VimTestCase() {
     assertVisibleArea(99, 133)
   }
 
+  @Test
   fun `test count z+ scrolls count line to top of screen plus scrolloff`() {
     configureByPages(5)
     enterCommand("set scrolloff=10")
@@ -77,6 +84,7 @@ class ScrollFirstScreenLinePageStartActionTest : VimTestCase() {
   }
 
   @VimBehaviorDiffers(description = "Requires virtual space support")
+  @Test
   fun `test scroll on penultimate page`() {
     configureByPages(5)
     setPositionAndScroll(130, 145)

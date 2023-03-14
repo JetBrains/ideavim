@@ -10,16 +10,20 @@ package org.jetbrains.plugins.ideavim.action.change.change.number
 
 import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class ChangeNumberDecActionTest : VimTestCase() {
+  @Test
   fun `test decrement hex to negative value`() {
     doTest("<C-X>", "0x0000", "0xffffffffffffffff", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun `test decrement hex to negative value by 10`() {
     doTest("10<C-X>", "0x0005", "0xfffffffffffffffb", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun `test decrement oct to negative value`() {
     doTest(
       ":set nrformats+=octal<CR><C-X>",
@@ -30,10 +34,12 @@ class ChangeNumberDecActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test decrement incorrect octal`() {
     doTest(":set nrformats+=octal<CR><C-X>", "008", "7", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun `test decrement oct to negative value by 10`() {
     doTest(
       ":set nrformats+=octal<CR>10<C-X>",

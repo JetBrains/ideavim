@@ -10,8 +10,10 @@ package org.jetbrains.plugins.ideavim.action.motion.leftright
 
 import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class MotionRightMatchCharActionTest : VimTestCase() {
+  @Test
   fun `test move and repeat`() {
     doTest(
       "fx;",
@@ -22,6 +24,7 @@ class MotionRightMatchCharActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test move and repeat twice`() {
     doTest(
       "fx;;",
@@ -32,6 +35,7 @@ class MotionRightMatchCharActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test move and repeat two`() {
     doTest(
       "fx2;",
@@ -42,6 +46,7 @@ class MotionRightMatchCharActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test move and repeat three`() {
     doTest(
       "fx3;",

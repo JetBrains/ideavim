@@ -19,11 +19,13 @@ import org.jetbrains.plugins.ideavim.NeovimTesting
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 import kotlin.math.absoluteValue
 import kotlin.math.sign
 
 class IncrementDecrementTest : VimPropertyTestBase() {
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun testPlayingWithNumbers() {
     PropertyChecker.checkScenarios {
       ImperativeCommand { env ->
@@ -38,6 +40,7 @@ class IncrementDecrementTest : VimPropertyTestBase() {
     }
   }
 
+  @Test
   fun testPlayingWithNumbersGenerateNumber() {
     setupChecks {
       this.neoVim.ignoredRegisters = setOf(':')
@@ -52,12 +55,12 @@ class IncrementDecrementTest : VimPropertyTestBase() {
         try {
           moveCaretToRandomPlace(env, editor)
 
-          NeovimTesting.setupEditor(editor, this)
-          NeovimTesting.typeCommand(":set nrformats+=octal<CR>", this, editor)
+          NeovimTesting.setupEditor(editor, this.testInfo)
+          NeovimTesting.typeCommand(":set nrformats+=octal<CR>", this.testInfo, editor)
 
           env.executeCommands(Generator.sampledFrom(IncrementDecrementActions(editor, this)))
 
-          NeovimTesting.assertState(editor, this)
+          NeovimTesting.assertState(editor, this.testInfo)
         } finally {
           reset(editor)
         }
@@ -73,7 +76,7 @@ private class IncrementDecrementActions(private val editor: Editor, val test: Vi
     val action = injector.parser.parseKeys(key).single()
     env.logMessage("Use command: ${injector.parser.toKeyNotation(action)}.")
     VimTestCase.typeText(listOf(action), editor, editor.project)
-    NeovimTesting.typeCommand(key, test, editor)
+    NeovimTesting.typeCommand(key, test.testInfo, editor)
 
     IdeEventQueue.getInstance().flushQueue()
     PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()

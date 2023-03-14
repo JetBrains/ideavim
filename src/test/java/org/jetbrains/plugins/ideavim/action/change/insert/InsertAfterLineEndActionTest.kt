@@ -11,8 +11,10 @@ package org.jetbrains.plugins.ideavim.action.change.insert
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class InsertAfterLineEndActionTest : VimTestCase() {
+  @Test
   fun `test insert after line end action`() {
     typeTextInFile(
       injector.parser.parseKeys("A" + " four" + "<ESC>"),
@@ -31,6 +33,7 @@ class InsertAfterLineEndActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test multiple carets`() {
     doTest(
       "AHello<esc>",

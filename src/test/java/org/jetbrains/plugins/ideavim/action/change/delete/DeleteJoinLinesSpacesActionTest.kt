@@ -16,9 +16,11 @@ import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
 import org.jetbrains.plugins.ideavim.VimTestOption
+import org.junit.jupiter.api.Test
 
 class DeleteJoinLinesSpacesActionTest : VimOptionTestCase(IjOptionConstants.ideajoin) {
   @VimOptionTestConfiguration(VimTestOption(IjOptionConstants.ideajoin, OptionValueType.NUMBER, "1"))
+  @Test
   fun `test join with idea`() {
     doTest(
       "J",
@@ -43,6 +45,7 @@ class DeleteJoinLinesSpacesActionTest : VimOptionTestCase(IjOptionConstants.idea
   }
 
   @VimOptionTestConfiguration(VimTestOption(IjOptionConstants.ideajoin, OptionValueType.NUMBER, "1"))
+  @Test
   fun `test join with idea with count`() {
     doTest(
       "3J",
@@ -67,6 +70,7 @@ class DeleteJoinLinesSpacesActionTest : VimOptionTestCase(IjOptionConstants.idea
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(VimTestOption(IjOptionConstants.ideajoin, OptionValueType.NUMBER, "1"))
+  @Test
   fun `test join with idea with large count`() {
     doTest(
       "10J",

@@ -12,9 +12,11 @@ import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class SelectEnableBlockModeActionHandlerTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test entering select mode`() {
     doTest(
       listOf("g<C-H>"),
@@ -40,6 +42,7 @@ class SelectEnableBlockModeActionHandlerTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test entering select mode at the end of file`() {
     doTest(
       "g<C-H>",
@@ -64,6 +67,7 @@ class SelectEnableBlockModeActionHandlerTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test entering select mode on empty line`() {
     doTest(
       "g<C-H>",
@@ -89,6 +93,7 @@ class SelectEnableBlockModeActionHandlerTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
+  @Test
   fun `test entering select mode multicaret`() {
     doTest(
       listOf("g<C-H>"),

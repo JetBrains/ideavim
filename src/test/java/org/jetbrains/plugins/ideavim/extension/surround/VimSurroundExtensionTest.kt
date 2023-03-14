@@ -14,19 +14,24 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInfo
 
 /**
  * @author dhleong
  */
 class VimSurroundExtensionTest : VimTestCase() {
   @Throws(Exception::class)
-  override fun setUp() {
-    super.setUp()
+  @BeforeEach
+  override fun setUp(testInfo: TestInfo) {
+    super.setUp(testInfo)
     enableExtensions("surround")
   }
 
   /* surround */
 
+  @Test
   fun testSurroundWordParens() {
     val before = "if ${c}condition {\n" + "}\n"
     val after = "if ${c}(condition) {\n" + "}\n"
@@ -36,6 +41,7 @@ class VimSurroundExtensionTest : VimTestCase() {
     doTest("yse(", before, "if ( condition ) {\n" + "}\n", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun testSurroundWORDBlock() {
     val before = "if (condition) ${c}return;\n"
     val after = "if (condition) {return;}\n"
@@ -45,6 +51,7 @@ class VimSurroundExtensionTest : VimTestCase() {
     doTest("ysE{", before, "if (condition) { return; }\n", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun testSurroundWordArray() {
     val before = "int foo = bar${c}index;"
     val after = "int foo = bar[index];"
@@ -54,6 +61,7 @@ class VimSurroundExtensionTest : VimTestCase() {
     doTest("yse[", before, "int foo = bar[ index ];", VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun testSurroundWordAngle() {
     val before = "foo = new Bar${c}Baz();"
     val after = "foo = new Bar<Baz>();"
@@ -62,6 +70,7 @@ class VimSurroundExtensionTest : VimTestCase() {
     doTest("yse>", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun testSurroundQuotes() {
     val before = "foo = ${c}new Bar.Baz;"
     val after = "foo = \"new Bar.Baz\";"
@@ -70,6 +79,7 @@ class VimSurroundExtensionTest : VimTestCase() {
     doTest("ys4w\"", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun testSurroundTag() {
     configureByText("Hello ${c}World!\n")
     typeText(injector.parser.parseKeys("ysiw<em>"))
@@ -77,6 +87,7 @@ class VimSurroundExtensionTest : VimTestCase() {
   }
 
   // VIM-1569
+  @Test
   fun testSurroundTagWithAttributes() {
     configureByText("Hello ${c}World!")
     typeText(injector.parser.parseKeys("ysiw<span class=\"important\" data-foo=\"bar\">"))
@@ -84,24 +95,28 @@ class VimSurroundExtensionTest : VimTestCase() {
   }
 
   // VIM-1569
+  @Test
   fun testSurraungTagAsInIssue() {
     configureByText("<p>${c}Hello</p>")
     typeText(injector.parser.parseKeys("VS<div class = \"container\">"))
     assertState("<div class = \"container\">\n<p>Hello</p>\n</div>")
   }
 
+  @Test
   fun testSurroundCustomElement() {
     configureByText("${c}Click me!")
     typeText(injector.parser.parseKeys("VS<custom-button>"))
     assertState("<custom-button>\nClick me!\n</custom-button>")
   }
 
+  @Test
   fun testSurroundFunctionName() {
     configureByText("foo = b${c}ar")
     typeText(injector.parser.parseKeys("ysiwfbaz"))
     assertState("foo = ${c}baz(bar)")
   }
 
+  @Test
   fun testSurroundFunctionNameDoesNothingIfInputIsEmpty() {
     // The cursor does not move. This is different from Vim
     // where the cursor moves to the beginning of the text object.
@@ -110,18 +125,21 @@ class VimSurroundExtensionTest : VimTestCase() {
     assertState("foo = b${c}ar")
   }
 
+  @Test
   fun testSurroundFunctionNameWithInnerSpacing() {
     configureByText("foo = b${c}ar")
     typeText(injector.parser.parseKeys("ysiwFbaz"))
     assertState("foo = ${c}baz( bar )")
   }
 
+  @Test
   fun testSurroundSpace() {
     configureByText("foo(b${c}ar)")
     typeText(injector.parser.parseKeys("csbs"))
     assertState("foo${c} bar")
   }
 
+  @Test
   fun testRepeatSurround() {
     val before = "if ${c}condition {\n}\n"
     val after = "if ((condition)) {\n}\n"
@@ -129,6 +147,7 @@ class VimSurroundExtensionTest : VimTestCase() {
     doTest(listOf("ysiw)", "l", "."), before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun testRepeatSurroundDouble() {
     val before = "if ${c}condition {\n}\n"
     val after = "if (((condition))) {\n}\n"
@@ -136,6 +155,7 @@ class VimSurroundExtensionTest : VimTestCase() {
     doTest(listOf("ysiw)", "l", ".", "l", "."), before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun testRepeatDifferentChanges() {
     val before = """
                   if "${c}condition" { }
@@ -149,6 +169,7 @@ class VimSurroundExtensionTest : VimTestCase() {
     doTest(listOf("ysiw)", "cs\"'", "j", "."), before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun testRepeatWrapWithFunction() {
     val before = """
                   if "${c}condition" { }
@@ -168,6 +189,7 @@ class VimSurroundExtensionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun testRepeatWrapWithTag() {
     val before = """
                   ${c}abc
@@ -183,6 +205,7 @@ class VimSurroundExtensionTest : VimTestCase() {
 
   /* visual surround */
 
+  @Test
   fun testVisualSurroundWordParens() {
     val before = "if ${c}condition {\n" + "}\n"
     val after = "if ${c}(condition) {\n" + "}\n"
@@ -203,6 +226,7 @@ class VimSurroundExtensionTest : VimTestCase() {
 
   /* Delete surroundings */
 
+  @Test
   fun testDeleteSurroundingParens() {
     val before = "if (${c}condition) {\n" + "}\n"
     val after = "if condition {\n" + "}\n"
@@ -212,6 +236,7 @@ class VimSurroundExtensionTest : VimTestCase() {
     doTest("ds)", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun testDeleteSurroundingQuote() {
     val before = "if (\"${c}foo\".equals(foo)) {\n" + "}\n"
     val after = "if (${c}foo.equals(foo)) {\n" + "}\n"
@@ -219,6 +244,7 @@ class VimSurroundExtensionTest : VimTestCase() {
     doTest("ds\"", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun testDeleteSurroundingBlock() {
     val before = "if (condition) {${c}return;}\n"
     val after = "if (condition) return;\n"
@@ -228,6 +254,7 @@ class VimSurroundExtensionTest : VimTestCase() {
     doTest("ds{", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun testDeleteSurroundingArray() {
     val before = "int foo = bar[${c}index];"
     val after = "int foo = barindex;"
@@ -237,6 +264,7 @@ class VimSurroundExtensionTest : VimTestCase() {
     doTest("ds[", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun testDeleteSurroundingAngle() {
     val before = "foo = new Bar<${c}Baz>();"
     val after = "foo = new BarBaz();"
@@ -246,6 +274,7 @@ class VimSurroundExtensionTest : VimTestCase() {
     doTest("ds<", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun testDeleteSurroundingTag() {
     val before = "<div><p>${c}Foo</p></div>"
     val after = "<div>${c}Foo</div>"
@@ -254,6 +283,7 @@ class VimSurroundExtensionTest : VimTestCase() {
   }
 
   // VIM-1085
+  @Test
   fun testDeleteSurroundingParamsAtLineEnd() {
     val before = "Foo\n" + "Seq(\"-${c}Yrangepos\")\n"
     val after = "Foo\n" + "Seq\"-Yrangepos\"\n"
@@ -262,6 +292,7 @@ class VimSurroundExtensionTest : VimTestCase() {
   }
 
   // VIM-1085
+  @Test
   fun testDeleteMultiLineSurroundingParamsAtLineEnd() {
     val before = "Foo\n" +
       "Bar\n" +
@@ -278,6 +309,7 @@ class VimSurroundExtensionTest : VimTestCase() {
   }
 
   // VIM-2227
+  @Test
   fun testDeleteInvalidSurroundingCharacter() {
     val text = "if (${c}condition) {"
 
@@ -287,6 +319,7 @@ class VimSurroundExtensionTest : VimTestCase() {
     doTest("yibds{", text, text, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun testRepeatDeleteSurroundParens() {
     val before = "if ((${c}condition)) {\n}\n"
     val after = "if condition {\n}\n"
@@ -294,6 +327,7 @@ class VimSurroundExtensionTest : VimTestCase() {
     doTest(listOf("dsb."), before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun testRepeatDeleteSurroundQuotes() {
     val before = "if (\"${c}condition\") {\n}\n"
     val after = "if (condition) {\n}\n"
@@ -303,6 +337,7 @@ class VimSurroundExtensionTest : VimTestCase() {
 
   /* Change surroundings */
 
+  @Test
   fun testChangeSurroundingParens() {
     val before = "if (${c}condition) {\n" + "}\n"
     val after = "if [condition] {\n" + "}\n"
@@ -310,6 +345,7 @@ class VimSurroundExtensionTest : VimTestCase() {
     doTest(listOf("csbr"), before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun testChangeSurroundingBlock() {
     val before = "if (condition) {${c}return;}"
     val after = "if (condition) (return;)"
@@ -317,6 +353,7 @@ class VimSurroundExtensionTest : VimTestCase() {
     doTest(listOf("csBb"), before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun testChangeSurroundingTagSimple() {
     val before = "<div><p>${c}Foo</p></div>"
     val after = "<div>${c}(Foo)</div>"
@@ -324,6 +361,7 @@ class VimSurroundExtensionTest : VimTestCase() {
     doTest(listOf("cstb"), before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun testChangeSurroundingTagAnotherTag() {
     val before = "<div><p>${c}Foo</p></div>"
     val after = "<div>${c}<b>Foo</b></div>"
@@ -331,6 +369,7 @@ class VimSurroundExtensionTest : VimTestCase() {
     doTest(listOf("cst<b>"), before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun testRepeatChangeSurroundingParens() {
     val before = "foo(${c}index)(index2) = bar;"
     val after = "foo[index][index2] = bar;"
@@ -339,6 +378,7 @@ class VimSurroundExtensionTest : VimTestCase() {
   }
 
   // VIM-2227
+  @Test
   fun testChangeInvalidSurroundingCharacter() {
     val text = "if (${c}condition) {"
 
@@ -359,6 +399,7 @@ class VimSurroundExtensionTest : VimTestCase() {
       <p>Some text</p>
   """,
   )
+  @Test
   fun `test wrap with tag full line`() {
     doTest(
       listOf("VS<p>"),
@@ -394,6 +435,7 @@ class VimSurroundExtensionTest : VimTestCase() {
       </div>
   """,
   )
+  @Test
   fun `test wrap with tag full line in middle`() {
     doTest(
       listOf("VS<p>"),
@@ -418,6 +460,7 @@ class VimSurroundExtensionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test wrap line with char selection`() {
     doTest(
       listOf("vawES<p>"),
@@ -440,6 +483,7 @@ class VimSurroundExtensionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun testWithAnExistingMapping() {
     val before = "(foo)"
     val after = "[foo]"
@@ -451,6 +495,7 @@ class VimSurroundExtensionTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun `test change new line`() {
     val before = """
       "\n"
@@ -462,6 +507,7 @@ class VimSurroundExtensionTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun testMappingSurroundPlugin() {
     val before = "if (condition) ${c}return;\n"
     val after = "if (condition) \"return\";\n"
@@ -469,6 +515,7 @@ class VimSurroundExtensionTest : VimTestCase() {
     doTest(":map gw ysiw\"<CR>gw", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun testSurroundPluginWithMacro() {
     val before = """
       if (con${c}dition) return;
@@ -482,6 +529,7 @@ class VimSurroundExtensionTest : VimTestCase() {
     doTest("qqds)qj@q", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun testSurroundPluginWithMacroAndMapping() {
     val before = """
       if (con${c}dition) return;
@@ -496,6 +544,7 @@ class VimSurroundExtensionTest : VimTestCase() {
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun `test change surround with multicaret`() {
     val before = """
                   (${c}abc)
@@ -509,6 +558,7 @@ class VimSurroundExtensionTest : VimTestCase() {
     doTest(listOf("cs(]"), before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun `test delete surround with multicaret`() {
     val before = """
                   (${c}abc)

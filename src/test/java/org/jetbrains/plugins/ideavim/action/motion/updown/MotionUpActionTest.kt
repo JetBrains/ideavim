@@ -11,8 +11,10 @@ package org.jetbrains.plugins.ideavim.action.motion.updown
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class MotionUpActionTest : VimTestCase() {
+  @Test
   fun `test last column empty`() {
     val keys = "k"
     val before = """
@@ -26,6 +28,7 @@ class MotionUpActionTest : VimTestCase() {
     doTest(keys, before, after)
   }
 
+  @Test
   fun `test last column to shorter line`() {
     val keys = "kkkjjj"
     val before = """
@@ -44,6 +47,7 @@ class MotionUpActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.EDITOR_MODIFICATION)
+  @Test
   fun `test caret moved outside of IdeaVim control`() {
     doTest(
       "k",

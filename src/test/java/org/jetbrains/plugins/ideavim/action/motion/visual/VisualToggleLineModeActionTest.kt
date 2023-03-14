@@ -12,8 +12,10 @@ package org.jetbrains.plugins.ideavim.action.motion.visual
 
 import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class VisualToggleLineModeActionTest : VimTestCase() {
+  @Test
   fun `test enter visual with count`() {
     doTest(
       "1V",
@@ -38,6 +40,7 @@ class VisualToggleLineModeActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test enter visual with count multicaret`() {
     doTest(
       "1V",
@@ -62,6 +65,7 @@ class VisualToggleLineModeActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test enter visual with 3 count`() {
     doTest(
       "3V",
@@ -86,6 +90,7 @@ class VisualToggleLineModeActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test enter visual with 100 count`() {
     doTest(
       "100V",
@@ -110,6 +115,7 @@ class VisualToggleLineModeActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test selectmode option`() {
     configureByText(
       """

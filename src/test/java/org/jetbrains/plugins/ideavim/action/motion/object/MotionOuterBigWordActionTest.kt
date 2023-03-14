@@ -12,9 +12,11 @@ import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class MotionOuterBigWordActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.UNCLEAR, description = "Wrong caret position, but in real neovim works fine")
+  @Test
   fun `test on last dot`() {
     doTest(
       "<aW",
@@ -35,6 +37,7 @@ class MotionOuterBigWordActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test past end in visual`() {
     doTest(
       "v\$aW",

@@ -22,6 +22,7 @@ import org.jetbrains.jetCheck.PropertyChecker
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.propertybased.samples.javaText
 import org.jetbrains.plugins.ideavim.propertybased.samples.loremText
+import org.junit.jupiter.api.Test
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
@@ -31,6 +32,7 @@ import javax.swing.KeyStroke
  * See the log if this test fails, it contains the instructions on how to reproduce the test.
  */
 class RandomActionsPropertyTest : VimPropertyTestBase() {
+  @Test
   fun testRandomActions() {
     PropertyChecker.checkScenarios {
       ImperativeCommand { env ->
@@ -45,6 +47,7 @@ class RandomActionsPropertyTest : VimPropertyTestBase() {
     }
   }
 
+  @Test
   fun testRandomActionsOnLoremIpsum() {
     PropertyChecker.checkScenarios {
       ImperativeCommand { env ->
@@ -59,6 +62,7 @@ class RandomActionsPropertyTest : VimPropertyTestBase() {
     }
   }
 
+  @Test
   fun testRandomActionsOnJavaCode() {
     PropertyChecker.checkScenarios {
       ImperativeCommand { env ->

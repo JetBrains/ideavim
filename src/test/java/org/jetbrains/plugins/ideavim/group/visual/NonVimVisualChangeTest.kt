@@ -24,12 +24,14 @@ import org.jetbrains.plugins.ideavim.assertDoesntChange
 import org.jetbrains.plugins.ideavim.rangeOf
 import org.jetbrains.plugins.ideavim.waitAndAssert
 import org.jetbrains.plugins.ideavim.waitAndAssertMode
+import org.junit.jupiter.api.Test
 
 /**
  * @author Alex Plate
  */
 class NonVimVisualChangeTest : VimTestCase() {
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test save mode after removing text`() {
     // PyCharm uses BackspaceHandler.deleteToTargetPosition to remove indent
     // See https://github.com/JetBrains/ideavim/pull/186#issuecomment-486656093
@@ -43,12 +45,12 @@ class NonVimVisualChangeTest : VimTestCase() {
             hard by the torrent of a mountain pass.
       """.trimIndent(),
     )
-    VimListenerManager.EditorListeners.add(myFixture.editor)
+    VimListenerManager.EditorListeners.add(fixture.editor)
     typeText(injector.parser.parseKeys("i"))
     assertMode(VimStateMachine.Mode.INSERT)
     ApplicationManager.getApplication().runWriteAction {
       CommandProcessor.getInstance().runUndoTransparentAction {
-        BackspaceHandler.deleteToTargetPosition(myFixture.editor, LogicalPosition(2, 0))
+        BackspaceHandler.deleteToTargetPosition(fixture.editor, LogicalPosition(2, 0))
       }
     }
     assertState(
@@ -65,6 +67,7 @@ class NonVimVisualChangeTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test enable and disable selection`() {
     configureByText(
       """
@@ -76,18 +79,19 @@ class NonVimVisualChangeTest : VimTestCase() {
             hard by the torrent of a mountain pass.
       """.trimIndent(),
     )
-    VimListenerManager.EditorListeners.add(myFixture.editor)
+    VimListenerManager.EditorListeners.add(fixture.editor)
     typeText(injector.parser.parseKeys("i"))
     assertMode(VimStateMachine.Mode.INSERT)
 
     // Fast add and remove selection
-    myFixture.editor.selectionModel.setSelection(0, 10)
-    myFixture.editor.selectionModel.removeSelection()
+    fixture.editor.selectionModel.setSelection(0, 10)
+    fixture.editor.selectionModel.removeSelection()
 
-    assertDoesntChange { myFixture.editor.editorMode == VimStateMachine.Mode.INSERT }
+    assertDoesntChange { fixture.editor.editorMode == VimStateMachine.Mode.INSERT }
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test enable, disable, and enable selection again`() {
     configureByText(
       """
@@ -99,19 +103,20 @@ class NonVimVisualChangeTest : VimTestCase() {
             hard by the torrent of a mountain pass.
       """.trimIndent(),
     )
-    VimListenerManager.EditorListeners.add(myFixture.editor)
+    VimListenerManager.EditorListeners.add(fixture.editor)
     typeText(injector.parser.parseKeys("i"))
     assertMode(VimStateMachine.Mode.INSERT)
 
     // Fast add and remove selection
-    myFixture.editor.selectionModel.setSelection(0, 10)
-    myFixture.editor.selectionModel.removeSelection()
-    myFixture.editor.selectionModel.setSelection(0, 10)
+    fixture.editor.selectionModel.setSelection(0, 10)
+    fixture.editor.selectionModel.removeSelection()
+    fixture.editor.selectionModel.setSelection(0, 10)
 
-    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
+    waitAndAssertMode(fixture, VimStateMachine.Mode.VISUAL)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test switch from char to line visual mode`() {
     val text = """
             A Discovery
@@ -122,17 +127,17 @@ class NonVimVisualChangeTest : VimTestCase() {
             hard by the torrent of a mountain pass.
     """.trimIndent()
     configureByText(text)
-    VimListenerManager.EditorListeners.add(myFixture.editor)
+    VimListenerManager.EditorListeners.add(fixture.editor)
     typeText(injector.parser.parseKeys("i"))
     assertMode(VimStateMachine.Mode.INSERT)
 
     val range = text.rangeOf("Discovery")
-    myFixture.editor.selectionModel.setSelection(range.startOffset, range.endOffset)
-    waitAndAssertMode(myFixture, VimStateMachine.Mode.VISUAL)
-    assertEquals(VimStateMachine.SubMode.VISUAL_CHARACTER, myFixture.editor.subMode)
+    fixture.editor.selectionModel.setSelection(range.startOffset, range.endOffset)
+    waitAndAssertMode(fixture, VimStateMachine.Mode.VISUAL)
+    kotlin.test.assertEquals(VimStateMachine.SubMode.VISUAL_CHARACTER, fixture.editor.subMode)
 
     val rangeLine = text.rangeOf("A Discovery\n")
-    myFixture.editor.selectionModel.setSelection(rangeLine.startOffset, rangeLine.endOffset)
-    waitAndAssert { myFixture.editor.subMode == VimStateMachine.SubMode.VISUAL_LINE }
+    fixture.editor.selectionModel.setSelection(rangeLine.startOffset, rangeLine.endOffset)
+    waitAndAssert { fixture.editor.subMode == VimStateMachine.SubMode.VISUAL_LINE }
   }
 }

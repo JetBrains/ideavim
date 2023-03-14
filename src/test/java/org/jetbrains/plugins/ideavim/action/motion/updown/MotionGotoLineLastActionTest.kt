@@ -11,8 +11,10 @@ package org.jetbrains.plugins.ideavim.action.motion.updown
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class MotionGotoLineLastActionTest : VimTestCase() {
+  @Test
   fun `test simple motion`() {
     doTest(
       "G",
@@ -35,6 +37,7 @@ class MotionGotoLineLastActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test motion with count`() {
     doTest(
       "5G",
@@ -57,6 +60,7 @@ class MotionGotoLineLastActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test motion with large count`() {
     doTest(
       "100G",
@@ -79,6 +83,7 @@ class MotionGotoLineLastActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test motion with zero count`() {
     doTest(
       "0G",
@@ -101,6 +106,7 @@ class MotionGotoLineLastActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test moves caret to first non-blank char`() {
     doTest(
       "G",
@@ -124,6 +130,7 @@ class MotionGotoLineLastActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test moves caret to same column with nostartofline`() {
     doTest(
       "G",
@@ -148,6 +155,7 @@ class MotionGotoLineLastActionTest : VimTestCase() {
     }
   }
 
+  @Test
   fun `test with last empty line`() {
     doTest(
       "G",
@@ -172,6 +180,7 @@ class MotionGotoLineLastActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test scrolling positions target line in middle of screen`() {
     configureByLines(100, "    I found it in a legendary land")
     typeText("70G")
@@ -179,6 +188,7 @@ class MotionGotoLineLastActionTest : VimTestCase() {
     assertVisibleArea(52, 86)
   }
 
+  @Test
   fun `test go to last line of file puts target line at bottom of screen`() {
     configureByLines(100, "    I found it in a legendary land")
     typeText("G")
@@ -186,6 +196,7 @@ class MotionGotoLineLastActionTest : VimTestCase() {
     assertVisibleArea(65, 99)
   }
 
+  @Test
   fun `test go to last line of file puts target line at bottom of screen with virtual space enabled`() {
     configureByLines(100, "    I found it in a legendary land")
     setEditorVirtualSpace()
@@ -194,6 +205,7 @@ class MotionGotoLineLastActionTest : VimTestCase() {
     assertVisibleArea(65, 99)
   }
 
+  @Test
   fun `test go to line in last half screen of file puts last line at bottom of screen`() {
     configureByLines(100, "    I found it in a legendary land")
     typeText("90G")
@@ -201,6 +213,7 @@ class MotionGotoLineLastActionTest : VimTestCase() {
     assertVisibleArea(65, 99)
   }
 
+  @Test
   fun `test go to line in last half screen of file puts last line at bottom of screen ignoring scrolloff`() {
     configureByLines(100, "    I found it in a legendary land")
     enterCommand("set scrolloff=10")
@@ -209,6 +222,7 @@ class MotionGotoLineLastActionTest : VimTestCase() {
     assertVisibleArea(65, 99)
   }
 
+  @Test
   fun `test go to line does not scroll when default virtual space already at bottom of file`() {
     // Editor has 5 lines of virtual space by default
     configureByLines(100, "    I found it in a legendary land")
@@ -218,6 +232,7 @@ class MotionGotoLineLastActionTest : VimTestCase() {
     assertVisibleArea(69, 99)
   }
 
+  @Test
   fun `test go to line does not scroll when full virtual space already at bottom of file`() {
     configureByLines(100, "    I found it in a legendary land")
     setEditorVirtualSpace()
@@ -227,6 +242,7 @@ class MotionGotoLineLastActionTest : VimTestCase() {
     assertVisibleArea(85, 99)
   }
 
+  @Test
   fun `test go to line does not scroll when last line is less than scrolloff above bottom of file`() {
     configureByLines(100, "    I found it in a legendary land")
     enterCommand("set scrolloff=10")
@@ -237,6 +253,7 @@ class MotionGotoLineLastActionTest : VimTestCase() {
     assertVisibleArea(67, 99)
   }
 
+  @Test
   fun `test go to line does not scroll when last line is less than scrolloff above bottom of file with folds`() {
     configureByLines(100, "    I found it in a legendary land")
     enterCommand("set scrolloff=10")

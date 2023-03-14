@@ -11,12 +11,14 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 /**
  * @author Alex Plate
  */
 class ShiftRightCommandTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "Replace term codes issues")
+  @Test
   fun `test simple right shift`() {
     val before = """        I found it in a legendary land
                       |        ${c}all rocks and lavender and tufted grass,
@@ -36,6 +38,7 @@ class ShiftRightCommandTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "Replace term codes issues")
+  @Test
   fun `test double right shift`() {
     val before = """        I found it in a legendary land
                       |        ${c}all rocks and lavender and tufted grass,
@@ -55,6 +58,7 @@ class ShiftRightCommandTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "Replace term codes issues")
+  @Test
   fun `test range right shift`() {
     val before = """        I found it in a legendary land
                       |        ${c}all rocks and lavender and tufted grass,
@@ -73,6 +77,7 @@ class ShiftRightCommandTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun `test multiple carets`() {
     val before = """    I found it in a legendary land
                       |${c}all rocks and lavender and tufted grass,

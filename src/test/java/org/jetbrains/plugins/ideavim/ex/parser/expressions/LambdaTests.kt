@@ -15,35 +15,43 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
 import com.maddyhome.idea.vim.vimscript.model.expressions.operators.BinaryOperator
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
-import org.junit.experimental.theories.DataPoints
-import org.junit.experimental.theories.Theories
-import org.junit.experimental.theories.Theory
-import org.junit.runner.RunWith
+import org.jetbrains.plugins.ideavim.combinate
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import kotlin.test.assertEquals
 
-@RunWith(Theories::class)
 class LambdaTests {
 
   companion object {
+    val values = listOf("", " ")
+
     @JvmStatic
-    val values = listOf("", " ") @DataPoints get
+    fun arg3(): List<Arguments> = combinate(values, values, values)
+    @JvmStatic
+    fun arg4(): List<Arguments> = combinate(values, values, values, values)
+    @JvmStatic
+    fun arg6(): List<Arguments> = combinate(values, values, values, values, values, values)
   }
 
-  @Theory
+  @ParameterizedTest
+  @MethodSource("arg3")
   fun `lambda with no args test`(sp1: String, sp2: String, sp3: String) {
     val lambdaExpression = VimscriptParser.parseExpression("{$sp1->$sp2'error'$sp3}") as LambdaExpression
     assertEquals(0, lambdaExpression.args.size)
     assertEquals(SimpleExpression("error"), lambdaExpression.expr)
   }
 
-  @Theory
+  @ParameterizedTest
+  @MethodSource("arg6")
   fun `lambda with multiple args test`(sp1: String, sp2: String, sp3: String, sp4: String, sp5: String, sp6: String) {
     val lambdaExpression = VimscriptParser.parseExpression("{${sp1}a$sp2,${sp3}b$sp4->${sp5}a+b$sp6}") as LambdaExpression
     assertEquals(listOf("a", "b"), lambdaExpression.args)
     assertEquals(BinExpression(Variable(null, "a"), Variable(null, "b"), BinaryOperator.ADDITION), lambdaExpression.expr)
   }
 
-  @Theory
+  @Test
   fun `lambda function call with no args test`() {
     val functionCall = VimscriptParser.parseExpression("{->'error'}()") as LambdaFunctionCallExpression
     assertEquals(0, functionCall.arguments.size)
@@ -51,7 +59,8 @@ class LambdaTests {
     assertEquals(SimpleExpression("error"), functionCall.lambda.expr)
   }
 
-  @Theory
+  @ParameterizedTest
+  @MethodSource("arg4")
   fun `lambda function call with multiple args test`(sp1: String, sp2: String, sp3: String, sp4: String) {
     val functionCall = VimscriptParser.parseExpression("{->'error'}(${sp1}a$sp2,${sp3}b$sp4)") as LambdaFunctionCallExpression
     assertEquals(2, functionCall.arguments.size)

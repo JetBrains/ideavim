@@ -11,14 +11,15 @@
 package org.jetbrains.plugins.ideavim.action.motion.updown
 
 import com.maddyhome.idea.vim.api.injector
-import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 /**
  * @author Alex Plate
  */
 class VisualVariousMotionsTest : VimTestCase() {
 
+  @Test
   fun `test with tabs`() {
     val code = """
         class Scratch {
@@ -73,9 +74,9 @@ class VisualVariousMotionsTest : VimTestCase() {
       """.trimIndent().dotToTab(),
     )
 
-    TestCase.assertEquals(3, myFixture.editor.caretModel.allCarets[1].visualPosition.column)
-    TestCase.assertEquals(3, myFixture.editor.caretModel.allCarets[2].visualPosition.column)
-    TestCase.assertEquals(3, myFixture.editor.caretModel.allCarets[3].visualPosition.column)
+    kotlin.test.assertEquals(3, fixture.editor.caretModel.allCarets[1].visualPosition.column)
+    kotlin.test.assertEquals(3, fixture.editor.caretModel.allCarets[2].visualPosition.column)
+    kotlin.test.assertEquals(3, fixture.editor.caretModel.allCarets[3].visualPosition.column)
 
     typeText(injector.parser.parseKeys("l".repeat(2)))
 
@@ -94,6 +95,6 @@ class VisualVariousMotionsTest : VimTestCase() {
         ${s}${c}}${se}
       """.trimIndent().dotToTab(),
     )
-    TestCase.assertEquals(7, myFixture.editor.caretModel.allCarets[2].visualPosition.column)
+    kotlin.test.assertEquals(7, fixture.editor.caretModel.allCarets[2].visualPosition.column)
   }
 }

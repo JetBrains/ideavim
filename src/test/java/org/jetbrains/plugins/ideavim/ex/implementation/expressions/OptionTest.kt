@@ -11,10 +11,12 @@ package org.jetbrains.plugins.ideavim.ex.implementation.expressions
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class OptionTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test option`() {
     configureByText("\n")
     enterCommand("set ignorecase") // Default is off
@@ -23,6 +25,7 @@ class OptionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test option2`() {
     configureByText("\n")
     enterCommand("set ignorecase") // Default is off
@@ -31,6 +34,7 @@ class OptionTest : VimTestCase() {
     assertExOutput("ignore case is off\n")
   }
 
+  @Test
   fun `test multiple options`() {
     configureByText("\n")
     enterCommand("set ignorecase digraph") // Both off by default

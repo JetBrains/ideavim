@@ -11,8 +11,10 @@ package org.jetbrains.plugins.ideavim.action.change
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.group.IjOptionConstants
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class UndoActionTest : VimTestCase() {
+  @Test
   fun `test simple undo`() {
     val keys = listOf("dw", "u")
     val before = """
@@ -25,8 +27,8 @@ class UndoActionTest : VimTestCase() {
     """.trimIndent()
     val after = before
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
-    val editor = myFixture.editor
-    assertFalse(editor.caretModel.primaryCaret.hasSelection())
+    val editor = fixture.editor
+    kotlin.test.assertFalse(editor.caretModel.primaryCaret.hasSelection())
   }
 
   // Not yet supported
@@ -42,9 +44,10 @@ class UndoActionTest : VimTestCase() {
     """.trimIndent()
     val after = before
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
-    assertFalse(hasSelection())
+    kotlin.test.assertFalse(hasSelection())
   }
 
+  @Test
   fun `test undo with count`() {
     val keys = listOf("dwdwdw", "2u")
     val before = """
@@ -64,9 +67,10 @@ class UndoActionTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
     """.trimIndent()
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
-    assertFalse(hasSelection())
+    kotlin.test.assertFalse(hasSelection())
   }
 
+  @Test
   fun `test cursor movements do not require additional undo`() {
     if (!optionsNoEditor().isSet(IjOptionConstants.oldundo)) {
       val keys = listOf("a1<Esc>ea2<Esc>ea3<Esc>", "uu")
@@ -87,12 +91,12 @@ class UndoActionTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent()
       doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
-      assertFalse(hasSelection())
+      kotlin.test.assertFalse(hasSelection())
     }
   }
 
   private fun hasSelection(): Boolean {
-    val editor = myFixture.editor
+    val editor = fixture.editor
     return editor.caretModel.primaryCaret.hasSelection()
   }
 }

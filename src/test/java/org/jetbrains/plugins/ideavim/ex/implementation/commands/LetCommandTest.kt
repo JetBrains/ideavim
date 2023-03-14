@@ -14,9 +14,11 @@ import com.maddyhome.idea.vim.options.OptionConstants
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class LetCommandTest : VimTestCase() {
 
+  @Test
   fun `test assignment to string`() {
     configureByText("\n")
     typeText(commandToKeys("let s = \"foo\""))
@@ -24,6 +26,7 @@ class LetCommandTest : VimTestCase() {
     assertExOutput("foo\n")
   }
 
+  @Test
   fun `test assignment to number`() {
     configureByText("\n")
     typeText(commandToKeys("let s = 100"))
@@ -31,6 +34,7 @@ class LetCommandTest : VimTestCase() {
     assertExOutput("100\n")
   }
 
+  @Test
   fun `test assignment to expression`() {
     configureByText("\n")
     typeText(commandToKeys("let s = 10 + 20 * 4"))
@@ -38,6 +42,7 @@ class LetCommandTest : VimTestCase() {
     assertExOutput("90\n")
   }
 
+  @Test
   fun `test adding new pair to dictionary`() {
     configureByText("\n")
     typeText(commandToKeys("let s = {'key1' : 1}"))
@@ -46,6 +51,7 @@ class LetCommandTest : VimTestCase() {
     assertExOutput("{'key1': 1, 'key2': 2}\n")
   }
 
+  @Test
   fun `test editing existing pair in dictionary`() {
     configureByText("\n")
     typeText(commandToKeys("let s = {'key1' : 1}"))
@@ -54,6 +60,7 @@ class LetCommandTest : VimTestCase() {
     assertExOutput("{'key1': 2}\n")
   }
 
+  @Test
   fun `test assignment plus operator`() {
     configureByText("\n")
     typeText(commandToKeys("let s = 10"))
@@ -62,6 +69,7 @@ class LetCommandTest : VimTestCase() {
     assertExOutput("15\n")
   }
 
+  @Test
   fun `test changing list item`() {
     configureByText("\n")
     typeText(commandToKeys("let s = [1, 1]"))
@@ -71,6 +79,7 @@ class LetCommandTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test changing list item with index out of range`() {
     configureByText("\n")
     typeText(commandToKeys("let s = [1, 1]"))
@@ -79,6 +88,7 @@ class LetCommandTest : VimTestCase() {
     assertPluginErrorMessageContains("E684: list index out of range: 2")
   }
 
+  @Test
   fun `test changing list with sublist expression`() {
     configureByText("\n")
     typeText(commandToKeys("let s = [1, 2, 3]"))
@@ -88,6 +98,7 @@ class LetCommandTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test changing list with sublist expression and larger list`() {
     configureByText("\n")
     typeText(commandToKeys("let s = [1, 2, 3]"))
@@ -97,6 +108,7 @@ class LetCommandTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test changing list with sublist expression and smaller list`() {
     configureByText("\n")
     typeText(commandToKeys("let s = [1, 2, 3]"))
@@ -105,6 +117,7 @@ class LetCommandTest : VimTestCase() {
     assertPluginErrorMessageContains("E711: List value does not have enough items")
   }
 
+  @Test
   fun `test changing list with sublist expression and undefined end`() {
     configureByText("\n")
     typeText(commandToKeys("let s = [1, 2, 3]"))
@@ -113,24 +126,27 @@ class LetCommandTest : VimTestCase() {
     assertExOutput("[1, 5, 5, 5, 5]\n")
   }
 
+  @Test
   fun `test let option`() {
     configureByText("\n")
     typeText(commandToKeys("set noincsearch"))
-    assertFalse(options().isSet(OptionConstants.incsearch))
+    kotlin.test.assertFalse(options().isSet(OptionConstants.incsearch))
     typeText(commandToKeys("let &incsearch = 12"))
-    assertTrue(options().isSet(OptionConstants.incsearch))
+    kotlin.test.assertTrue(options().isSet(OptionConstants.incsearch))
     typeText(commandToKeys("set noincsearch"))
-    assertFalse(options().isSet(OptionConstants.incsearch))
+    kotlin.test.assertFalse(options().isSet(OptionConstants.incsearch))
   }
 
+  @Test
   fun `test let option2`() {
     configureByText("\n")
     typeText(commandToKeys("set incsearch"))
-    assertTrue(options().isSet(OptionConstants.incsearch))
+    kotlin.test.assertTrue(options().isSet(OptionConstants.incsearch))
     typeText(commandToKeys("let &incsearch = 0"))
-    assertFalse(options().isSet(OptionConstants.incsearch))
+    kotlin.test.assertFalse(options().isSet(OptionConstants.incsearch))
   }
 
+  @Test
   fun `test comment`() {
     configureByText("\n")
     typeText(commandToKeys("let s = [1, 2, 3] \" my list for storing numbers"))
@@ -138,14 +154,16 @@ class LetCommandTest : VimTestCase() {
     assertExOutput("[1, 2, 3]\n")
   }
 
+  @Test
   fun `test vimScriptGlobalEnvironment`() {
     configureByText("\n")
     typeText(commandToKeys("let g:WhichKey_ShowVimActions = \"true\""))
     typeText(commandToKeys("echo g:WhichKey_ShowVimActions"))
     assertExOutput("true\n")
-    assertEquals("true", VimScriptGlobalEnvironment.getInstance().variables["g:WhichKey_ShowVimActions"])
+    kotlin.test.assertEquals("true", VimScriptGlobalEnvironment.getInstance().variables["g:WhichKey_ShowVimActions"])
   }
 
+  @Test
   fun `test list is passed by reference`() {
     configureByText("\n")
     typeText(commandToKeys("let list = [1, 2, 3]"))
@@ -156,6 +174,7 @@ class LetCommandTest : VimTestCase() {
     assertExOutput("[1, 2, 3, 4]\n")
   }
 
+  @Test
   fun `test list is passed by reference 2`() {
     configureByText("\n")
     typeText(commandToKeys("let list = [1, 2, 3, []]"))
@@ -166,6 +185,7 @@ class LetCommandTest : VimTestCase() {
     assertExOutput("[1, 2, 3, [4]]\n")
   }
 
+  @Test
   fun `test list is passed by reference 3`() {
     configureByText("\n")
     typeText(commandToKeys("let list = [1, 2, 3, []]"))
@@ -177,6 +197,7 @@ class LetCommandTest : VimTestCase() {
     assertExOutput("[1, 2, 3, [4]]\n")
   }
 
+  @Test
   fun `test list is passed by reference 4`() {
     configureByText("\n")
     typeText(commandToKeys("let list = [1, 2, 3]"))
@@ -188,6 +209,7 @@ class LetCommandTest : VimTestCase() {
     assertExOutput("[1, 2, 3, 4]\n")
   }
 
+  @Test
   fun `test number is passed by value`() {
     configureByText("\n")
     typeText(commandToKeys("let number = 10"))
@@ -198,6 +220,7 @@ class LetCommandTest : VimTestCase() {
     assertExOutput("10\n")
   }
 
+  @Test
   fun `test string is passed by value`() {
     configureByText("\n")
     typeText(commandToKeys("let string = 'abc'"))
@@ -208,6 +231,7 @@ class LetCommandTest : VimTestCase() {
     assertExOutput("abc\n")
   }
 
+  @Test
   fun `test dict is passed by reference`() {
     configureByText("\n")
     typeText(commandToKeys("let dictionary = {}"))
@@ -219,6 +243,7 @@ class LetCommandTest : VimTestCase() {
     assertExOutput("{'one': 1, 'two': 2}\n")
   }
 
+  @Test
   fun `test dict is passed by reference 2`() {
     configureByText("\n")
     typeText(commandToKeys("let list = [1, 2, 3, {'a': 'b'}]"))
@@ -229,6 +254,7 @@ class LetCommandTest : VimTestCase() {
     assertExOutput("{'a': 'b', 'key': 'value'}\n")
   }
 
+  @Test
   fun `test numbered register`() {
     configureByText("\n")
     typeText(commandToKeys("let @4 = 'inumber register works'"))
@@ -239,6 +265,7 @@ class LetCommandTest : VimTestCase() {
     assertState("number register works\n")
   }
 
+  @Test
   fun `test lowercase letter register`() {
     configureByText("\n")
     typeText(commandToKeys("let @o = 'ilowercase letter register works'"))
@@ -249,6 +276,7 @@ class LetCommandTest : VimTestCase() {
     assertState("lowercase letter register works\n")
   }
 
+  @Test
   fun `test uppercase letter register`() {
     configureByText("\n")
     typeText(commandToKeys("let @O = 'iuppercase letter register works'"))
@@ -264,6 +292,7 @@ class LetCommandTest : VimTestCase() {
     assertExOutput("iuppercase letter register works!\n")
   }
 
+  @Test
   fun `test unnamed register`() {
     configureByText("\n")
     typeText(commandToKeys("let @\" = 'iunnamed register works'"))
@@ -275,6 +304,7 @@ class LetCommandTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test define script variable with command line context`() {
     configureByText("\n")
     typeText(commandToKeys("let s:my_var = 'oh, hi Mark'"))
@@ -283,6 +313,7 @@ class LetCommandTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test define local variable with command line context`() {
     configureByText("\n")
     typeText(commandToKeys("let l:my_var = 'oh, hi Mark'"))
@@ -291,6 +322,7 @@ class LetCommandTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test define function variable with command line context`() {
     configureByText("\n")
     typeText(commandToKeys("let a:my_var = 'oh, hi Mark'"))

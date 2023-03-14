@@ -12,9 +12,11 @@ import com.maddyhome.idea.vim.options.OptionConstants
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class SetCommandTest : VimTestCase() {
 
+  @Test
   fun `test unknown option`() {
     configureByText("\n")
     enterCommand("set unknownOption")
@@ -22,42 +24,46 @@ class SetCommandTest : VimTestCase() {
     assertPluginErrorMessageContains("Unknown option: unknownOption")
   }
 
+  @Test
   fun `test toggle option`() {
     configureByText("\n")
     enterCommand("set rnu")
-    assertTrue(options().isSet(OptionConstants.relativenumber))
+    kotlin.test.assertTrue(options().isSet(OptionConstants.relativenumber))
     enterCommand("set rnu!")
-    assertFalse(options().isSet(OptionConstants.relativenumber))
+    kotlin.test.assertFalse(options().isSet(OptionConstants.relativenumber))
   }
 
   // todo we have spaces in assertExOutput because of pad(20) in the com.maddyhome.idea.vim.vimscript.model.commands.SetCommandKt#showOptions method
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test number option`() {
     configureByText("\n")
     enterCommand("set scrolloff&")
-    assertEquals(0, options().getIntValue(OptionConstants.scrolloff))
+    kotlin.test.assertEquals<Int>(0, options().getIntValue(OptionConstants.scrolloff))
     enterCommand("set scrolloff?")
     assertExOutput("scrolloff=0         \n")
     enterCommand("set scrolloff=5")
-    assertEquals(5, options().getIntValue(OptionConstants.scrolloff))
+    kotlin.test.assertEquals(5, options().getIntValue(OptionConstants.scrolloff))
     enterCommand("set scrolloff?")
     assertExOutput("scrolloff=5         \n")
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test toggle option as a number`() {
     configureByText("\n")
     enterCommand("set number&")
-    assertEquals(0, options().getIntValue(OptionConstants.number))
+    kotlin.test.assertEquals(0, options().getIntValue(OptionConstants.number))
     enterCommand("set number?")
     assertExOutput("nonumber            \n")
     enterCommand("let &nu=1000")
-    assertEquals(1000, options().getIntValue(OptionConstants.number))
+    kotlin.test.assertEquals(1000, options().getIntValue(OptionConstants.number))
     enterCommand("set number?")
     assertExOutput("  number            \n")
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test toggle option exceptions`() {
     configureByText("\n")
     enterCommand("set number+=10")
@@ -83,6 +89,7 @@ class SetCommandTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test number option exceptions`() {
     configureByText("\n")
     enterCommand("set scrolloff+=10")
@@ -105,19 +112,21 @@ class SetCommandTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test string option`() {
     configureByText("\n")
     enterCommand("set selection&")
-    assertEquals("inclusive", options().getStringValue(OptionConstants.selection))
+    kotlin.test.assertEquals("inclusive", options().getStringValue(OptionConstants.selection))
     enterCommand("set selection?")
     assertExOutput("selection=inclusive \n")
     enterCommand("set selection=exclusive")
-    assertEquals("exclusive", options().getStringValue(OptionConstants.selection))
+    kotlin.test.assertEquals("exclusive", options().getStringValue(OptionConstants.selection))
     enterCommand("set selection?")
     assertExOutput("selection=exclusive \n")
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test show numbered value`() {
     configureByText("\n")
     enterCommand("set so")
@@ -125,6 +134,7 @@ class SetCommandTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  @Test
   fun `test show numbered value with questionmark`() {
     configureByText("\n")
     enterCommand("set so?")

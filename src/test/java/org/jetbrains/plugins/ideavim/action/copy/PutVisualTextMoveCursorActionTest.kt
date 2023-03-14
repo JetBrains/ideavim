@@ -18,6 +18,8 @@ import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.Ignore
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
 
 /**
  * @author Alex Plate
@@ -26,6 +28,7 @@ import org.junit.Ignore
 class PutVisualTextMoveCursorActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun `test put visual text`() {
     val before = "${c}I found it in a legendary land"
     val editor = configureByText(before)
@@ -37,6 +40,7 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun `test put visual text linewise`() {
     val before = "${c}I found it in a legendary land"
     val editor = configureByText(before)
@@ -52,6 +56,7 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun `test put visual text line linewise`() {
     val before = "${c}I found it in a legendary land"
     val editor = configureByText(before)
@@ -63,6 +68,7 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun `test replace row`() {
     val file = """
             A Discovery
@@ -98,6 +104,7 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
             ${c}A Discovery
     """,
   )
+  @Test
   fun `test put line in block selection`() {
     val file = """
             ${c}A Discovery
@@ -122,6 +129,7 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun `test Put visual text linewise`() {
     val before = "${c}I found it in a legendary land"
     val editor = configureByText(before)
@@ -137,6 +145,7 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun `test Put visual text`() {
     val before = "${c}I found it in a legendary land"
     val editor = configureByText(before)
@@ -148,6 +157,7 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun `test Put visual text full line`() {
     val before = "${c}I found it in a legendary land"
     val editor = configureByText(before)
@@ -159,6 +169,7 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun `test Put visual text line linewise`() {
     val before = "${c}I found it in a legendary land"
     val editor = configureByText(before)
@@ -170,6 +181,7 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.CTRL_CODES)
+  @Test
   fun `test Put line in block selection`() {
     val file = """
             ${c}A Discovery
@@ -194,6 +206,7 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
 
   // Legacy tests
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun `test put visual text linewise multicaret`() {
     val before = """
             q${c}werty
@@ -246,6 +259,7 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun `test put visual block linewise`() {
     val before = """
             qw${c}e
@@ -274,7 +288,9 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
 
   @Suppress("unused")
   @Ignore
-  fun `ignoretest put visual text multicaret`() {
+  @Test
+  @Disabled
+  fun `test put visual text multicaret`() {
     val before = "${c}qwe asd ${c}zxc rty ${c}fgh vbn"
     val editor = configureByText(before)
     val vimEditor = editor.vim

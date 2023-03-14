@@ -10,12 +10,14 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 /**
  * @author Alex Plate
  */
 class PutCommandTest : VimTestCase() {
   // VIM-550 |:put|
+  @Test
   fun `test put creates new line`() {
     configureByText("Test\n" + "Hello <caret>World!\n")
     typeText(injector.parser.parseKeys("\"ayw"))
@@ -28,6 +30,7 @@ class PutCommandTest : VimTestCase() {
   }
 
   // VIM-551 |:put|
+  @Test
   fun `test put default`() {
     configureByText("<caret>Hello World!\n")
     typeText(injector.parser.parseKeys("yw"))

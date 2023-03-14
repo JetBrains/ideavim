@@ -11,9 +11,12 @@ package org.jetbrains.plugins.ideavim.ex.implementation.functions
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
 
 class AnonymousFunctionTest : VimTestCase() {
 
+  @Test
   fun `test anonymous function`() {
     configureByText("\n")
     typeText(commandToKeys("let dict = {}"))
@@ -31,22 +34,25 @@ class AnonymousFunctionTest : VimTestCase() {
   }
 
   // todo. `commandToKeys` is executed as if it would from the command line. so no script - no scope ¯\_(ツ)_/¯
-//  fun `test anonymous function with scope`() {
-//    configureByText("\n")d
-//    typeText(commandToKeys("let s:dict = {}"))
-//    typeText(
-//      commandToKeys(
-//        """
-//           function s:dict.pi() |
-//             return 3.1415 |
-//           endfunction
-//        """.trimIndent()
-//      )
-//    )
-//    typeText(commandToKeys("echo s:dict.pi()"))
-//    assertExOutput("3.1415\n")
-//  }
+  @Test
+  @Disabled
+  fun `test anonymous function with scope`() {
+    configureByText("\n")
+    typeText(commandToKeys("let s:dict = {}"))
+    typeText(
+      commandToKeys(
+        """
+           function s:dict.pi() |
+             return 3.1415 |
+           endfunction
+        """.trimIndent()
+      )
+    )
+    typeText(commandToKeys("echo s:dict.pi()"))
+    assertExOutput("3.1415\n")
+  }
 
+  @Test
   fun `test self in anonymous function`() {
     configureByText("\n")
     typeText(commandToKeys("let dict = {'name': 'dict'}"))
@@ -63,6 +69,7 @@ class AnonymousFunctionTest : VimTestCase() {
     assertExOutput("dict\n")
   }
 
+  @Test
   fun `test inner anonymous function`() {
     configureByText("\n")
     typeText(commandToKeys("let dict = {'dict2': {'dict3': {}}}"))
@@ -80,6 +87,7 @@ class AnonymousFunctionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test anonymous function for non-dict variable`() {
     configureByText("\n")
     typeText(commandToKeys("let list = []"))
@@ -97,6 +105,7 @@ class AnonymousFunctionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test dictionary function already exists`() {
     configureByText("\n")
     typeText(commandToKeys("let dict = {'abs' : function('abs')}"))
@@ -117,6 +126,7 @@ class AnonymousFunctionTest : VimTestCase() {
     assertPluginErrorMessageContains("E717: Dictionary entry already exists")
   }
 
+  @Test
   fun `test replace existing function`() {
     configureByText("\n")
     typeText(commandToKeys("let dict = {'abs' : function('abs')}"))
@@ -138,6 +148,7 @@ class AnonymousFunctionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
   fun `test funcref required`() {
     configureByText("\n")
     typeText(commandToKeys("let dict = {'abs' : 'absolute'}"))

@@ -11,15 +11,18 @@ package org.jetbrains.plugins.ideavim.ex.implementation.expressions
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class FunctionCallTest : VimTestCase() {
 
+  @Test
   fun `test function as method call`() {
     configureByText("\n")
     typeText(commandToKeys("echo -4->abs()"))
     assertExOutput("4\n")
   }
 
+  @Test
   fun `test chained function as method call`() {
     configureByText("\n")
     typeText(
@@ -37,6 +40,7 @@ class FunctionCallTest : VimTestCase() {
     typeText(commandToKeys("delfunction! Power2"))
   }
 
+  @Test
   fun `test function as method call with args`() {
     configureByText("\n")
     typeText(
@@ -54,6 +58,7 @@ class FunctionCallTest : VimTestCase() {
     typeText(commandToKeys("delfunction! Subtraction"))
   }
 
+  @Test
   fun `test function as method call with lambda`() {
     configureByText("\n")
     typeText(commandToKeys("echo 52->{x,y -> x-y}(10)"))
@@ -61,6 +66,7 @@ class FunctionCallTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test read-only variable`() {
     configureByText("\n")
     typeText(
@@ -79,6 +85,7 @@ class FunctionCallTest : VimTestCase() {
     typeText(commandToKeys("delfunction! ThrowException"))
   }
 
+  @Test
   fun `test dict function call`() {
     configureByText("\n")
     typeText(

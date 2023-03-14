@@ -12,8 +12,10 @@ import com.maddyhome.idea.vim.VimPlugin
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class GotoLineCommandTest : VimTestCase() {
+  @Test
   fun `test goto explicit line`() {
     val before = """
       A Discovery
@@ -36,6 +38,7 @@ class GotoLineCommandTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun `test goto explicit line check history`() {
     val before = """
       A Discovery
@@ -62,6 +65,7 @@ class GotoLineCommandTest : VimTestCase() {
     kotlin.test.assertEquals("3", register.text)
   }
 
+  @Test
   fun `test goto positive relative line`() {
     val before = """
       A Discovery
@@ -84,6 +88,7 @@ class GotoLineCommandTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun `test goto using forward search range`() {
     val before = """
       A Discovery
@@ -106,6 +111,7 @@ class GotoLineCommandTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun `test goto using backward search range`() {
     val before = """
       A Discovery
@@ -128,6 +134,7 @@ class GotoLineCommandTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun `test goto negative relative line`() {
     val before = """
       A Discovery
@@ -150,6 +157,7 @@ class GotoLineCommandTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun `test goto line moves to first non-blank char`() {
     val before = """
       A Discovery
@@ -172,6 +180,7 @@ class GotoLineCommandTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun `test goto zero relative line moves to first non-blank char on current line`() {
     val before = """
       A Discovery
@@ -195,6 +204,7 @@ class GotoLineCommandTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun `test goto line moves to same column with nostartofline option`() {
     val before = """
       A Discovery
@@ -219,6 +229,7 @@ class GotoLineCommandTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun `test goto zero relative line with nostartofline option does not move caret`() {
     val before = """
       A Discovery
@@ -242,6 +253,7 @@ class GotoLineCommandTest : VimTestCase() {
     assertState(after)
   }
 
+  @Test
   fun `test goto line with scrolloff`() {
     configureByLines(100, "    I found it in a legendary land")
     enterCommand("set scrolloff=10")
@@ -250,6 +262,7 @@ class GotoLineCommandTest : VimTestCase() {
     assertTopLogicalLine(5)
   }
 
+  @Test
   fun `test goto relative line with scrolloff`() {
     configureByLines(100, "    I found it in a legendary land")
     enterCommand("set scrolloff=10")

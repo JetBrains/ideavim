@@ -11,9 +11,11 @@ package org.jetbrains.plugins.ideavim.action.change.shift
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class ShiftRightTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.TABS)
+  @Test
   fun `test shift till new line`() {
     val file = """
             A Discovery
@@ -38,6 +40,7 @@ class ShiftRightTest : VimTestCase() {
 
   // VIM-407
   @TestWithoutNeovim(SkipNeovimReason.TABS)
+  @Test
   fun testShiftShiftsOneCharacterSingleLine() {
     configureByText("<caret>w\n")
     typeText(">>")
@@ -46,6 +49,7 @@ class ShiftRightTest : VimTestCase() {
 
   // VIM-407
   @TestWithoutNeovim(SkipNeovimReason.TABS)
+  @Test
   fun testShiftShiftsOneCharacterMultiLine() {
     configureByText("Hello\n<caret>w\nWorld")
     typeText(">>")
@@ -53,6 +57,7 @@ class ShiftRightTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.TABS)
+  @Test
   fun testShiftShiftsMultipleCharactersOneLine() {
     configureByText("<caret>Hello, world!\n")
     typeText(">>")
@@ -60,6 +65,7 @@ class ShiftRightTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.TABS)
+  @Test
   fun testShiftShiftsMultipleCharactersMultipleLines() {
     configureByText("<caret>Hello,\nworld!\n")
     typeText("j>>")
@@ -67,6 +73,7 @@ class ShiftRightTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.TABS)
+  @Test
   fun testShiftsSingleLineSelection() {
     configureByText("<caret>Hello,\nworld!\n")
     typeText("jv$>>")
@@ -74,6 +81,7 @@ class ShiftRightTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.TABS)
+  @Test
   fun testShiftsMultiLineSelection() {
     configureByText("<caret>Hello,\nworld!\n")
     typeText("vj$>>")
@@ -81,6 +89,7 @@ class ShiftRightTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.TABS)
+  @Test
   fun testShiftsMultiLineSelectionSkipsNewline() {
     configureByText("<caret>Hello,\nworld!\n\n")
     typeText("vG$>>")
@@ -88,6 +97,7 @@ class ShiftRightTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.TABS)
+  @Test
   fun testShiftsMultiLineSelectionSkipsNewlineWhenCursorNotInFirstColumn() {
     configureByText("<caret>Hello,\n\nworld!\n")
     typeText("lVG>")
@@ -95,6 +105,7 @@ class ShiftRightTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.TABS)
+  @Test
   fun testShiftsMultiLineSelectionAddsTrailingWhitespaceIfTherePreviouslyWas() {
     configureByText("<caret>Hello,\n    \nworld!\n")
     typeText("lVG>")
@@ -103,18 +114,21 @@ class ShiftRightTest : VimTestCase() {
 
   // VIM-705 repeating a multiline indent would only affect last line
   @TestWithoutNeovim(SkipNeovimReason.TABS)
+  @Test
   fun testShiftsMultiLineSelectionRepeat() {
     configureByText("<caret>a\nb\n")
     typeText("Vj>.")
     assertState("        a\n        b\n")
   }
 
+  @Test
   fun testShiftsDontCrashKeyHandler() {
     configureByText("\n")
     typeText("<I<>" + "<I<>")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.TABS)
+  @Test
   fun testShiftsVisualBlockMode() {
     configureByText("foo<caret>foo\nfoobar\nfoobaz\n")
     typeText("<C-V>jjl>")
@@ -122,6 +136,7 @@ class ShiftRightTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.TABS)
+  @Test
   fun `test shift right positions caret at first non-blank char`() {
     val file = """
       |A Discovery
@@ -145,6 +160,7 @@ class ShiftRightTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.TABS)
+  @Test
   fun `test shift right does not move caret with nostartofline`() {
     val file = """
       |A Discovery
@@ -170,6 +186,7 @@ class ShiftRightTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.TABS)
+  @Test
   fun `test shift ctrl-t`() {
     val file = """
             A Discovery

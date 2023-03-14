@@ -9,8 +9,10 @@
 package org.jetbrains.plugins.ideavim.action.motion.search
 
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class SearchAgainNextActionTest : VimTestCase() {
+  @Test
   fun `test search next after search command with offset`() {
     val before = """
       ${c}I found it in a legendary land
@@ -39,6 +41,7 @@ class SearchAgainNextActionTest : VimTestCase() {
     doTest(listOf(searchCommand("/and/3"), "n"), before, after)
   }
 
+  @Test
   fun `test search next after substitute command`() {
     val before = """
        I found it in a legendary land
@@ -67,6 +70,7 @@ class SearchAgainNextActionTest : VimTestCase() {
     doTest(listOf(exCommand("s/it/I"), "n"), before, after)
   }
 
+  @Test
   fun `test search next after substitute does not reset search offset`() {
     val before = """
        ${c}I found it in a legendary land

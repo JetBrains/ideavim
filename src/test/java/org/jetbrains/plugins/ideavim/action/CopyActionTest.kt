@@ -13,6 +13,8 @@ import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
+import kotlin.test.assertNotNull
 
 /**
  * @author vlan
@@ -20,12 +22,14 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 @Suppress("SpellCheckingInspection")
 class CopyActionTest : VimTestCase() {
   // |y| |p| |count|
+  @Test
   fun testYankPutCharacters() {
     typeTextInFile("y2h" + "p", "one two<caret> three\n")
     assertState("one twwoo three\n")
   }
 
   // |yy|
+  @Test
   fun testYankLine() {
     typeTextInFile(
       "yy" + "p",
@@ -48,6 +52,7 @@ class CopyActionTest : VimTestCase() {
   }
 
   // VIM-723 |p|
+  @Test
   fun testYankPasteToEmptyLine() {
     typeTextInFile(
       "yiw" + "j" + "p",
@@ -69,6 +74,7 @@ class CopyActionTest : VimTestCase() {
   }
 
   // VIM-390 |yy| |p|
+  @Test
   fun testYankLinePasteAtLastLine() {
     typeTextInFile(
       "yy" + "p",
@@ -89,6 +95,7 @@ class CopyActionTest : VimTestCase() {
   }
 
   // |register| |y|
+  @Test
   fun testYankRegister() {
     typeTextInFile("\"ayl" + "l" + "\"byl" + "\"ap" + "\"bp", "hel<caret>lo world\n")
     assertState("hellolo world\n")
@@ -96,29 +103,34 @@ class CopyActionTest : VimTestCase() {
 
   // |register| |y| |quote|
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
+  @Test
   fun testYankRegisterUsesLastEnteredRegister() {
     typeTextInFile("\"a\"byl" + "\"ap", "hel<caret>lo world\n")
     assertState("helllo world\n")
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
+  @Test
   fun testYankAppendRegister() {
     typeTextInFile("\"Ayl" + "l" + "\"Ayl" + "\"Ap", "hel<caret>lo world\n")
     assertState("hellolo world\n")
   }
 
+  @Test
   fun testYankWithInvalidRegister() {
     typeTextInFile("\"&", "hel<caret>lo world\n")
     assertPluginError(true)
   }
 
   // |P|
+  @Test
   fun testYankPutBefore() {
     typeTextInFile("y2l" + "P", "<caret>two\n")
     assertState("twtwo\n")
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun testWrongYankQuoteMotion() {
     assertPluginError(false)
     typeTextInFile(
@@ -133,6 +145,7 @@ class CopyActionTest : VimTestCase() {
     assertPluginError(true)
   }
 
+  @Test
   fun testWrongYankQuoteYankLine() {
     assertPluginError(false)
     typeTextInFile(
@@ -156,6 +169,7 @@ class CopyActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun testWrongYankRegisterMotion() {
     val editor = typeTextInFile(
       "y\"" + "0",
@@ -166,10 +180,11 @@ class CopyActionTest : VimTestCase() {
      
       """.trimIndent(),
     )
-    assertEquals(0, editor.caretModel.offset)
+    kotlin.test.assertEquals(0, editor.caretModel.offset)
   }
 
   // VIM-632 |CTRL-V| |v_y| |p|
+  @Test
   fun testYankVisualBlock() {
     typeTextInFile(
       "<C-V>" + "jl" + "yl" + "p",
@@ -199,6 +214,7 @@ class CopyActionTest : VimTestCase() {
   }
 
   // VIM-632 |CTRL-V| |v_y|
+  @Test
   fun testStateAfterYankVisualBlock() {
     typeTextInFile(
       "<C-V>" + "jl" + "y",
@@ -216,6 +232,7 @@ class CopyActionTest : VimTestCase() {
   // VIM-476 |yy| |'clipboard'|
   // TODO: Review this test
   // This doesn't use the system clipboard, but the TestClipboardModel
+  @Test
   fun testClipboardUnnamed() {
     configureByText(
       """
@@ -225,24 +242,25 @@ class CopyActionTest : VimTestCase() {
     
       """.trimIndent(),
     )
-    assertEquals('\"', VimPlugin.getRegister().defaultRegister)
+    kotlin.test.assertEquals('\"', VimPlugin.getRegister().defaultRegister)
     enterCommand("set clipboard=unnamed")
-    assertEquals('*', VimPlugin.getRegister().defaultRegister)
+    kotlin.test.assertEquals('*', VimPlugin.getRegister().defaultRegister)
     typeText("yy")
     val starRegister = VimPlugin.getRegister().getRegister('*')
-    assertNotNull(starRegister)
-    assertEquals("bar\n", starRegister!!.text)
+    assertNotNull<Any>(starRegister)
+    kotlin.test.assertEquals("bar\n", starRegister.text)
   }
 
   // VIM-792 |"*| |yy| |p|
   // TODO: Review this test
   // This doesn't use the system clipboard, but the TestClipboardModel
+  @Test
   fun testLineWiseClipboardYankPaste() {
     configureByText("<caret>foo\n")
     typeText("\"*yy" + "\"*p")
     val register = VimPlugin.getRegister().getRegister('*')
-    assertNotNull(register)
-    assertEquals("foo\n", register!!.text)
+    assertNotNull<Any>(register)
+    kotlin.test.assertEquals("foo\n", register.text)
     assertState(
       """
     foo
@@ -256,6 +274,7 @@ class CopyActionTest : VimTestCase() {
   // TODO: Review this test
   // This doesn't use the system clipboard, but the TestClipboardModel
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
+  @Test
   fun testBlockWiseClipboardYankPaste() {
     configureByText(
       """
@@ -267,13 +286,13 @@ class CopyActionTest : VimTestCase() {
     )
     typeText("<C-V>j" + "\"*y" + "\"*p")
     val register = VimPlugin.getRegister().getRegister('*')
-    assertNotNull(register)
-    assertEquals(
+    assertNotNull<Any>(register)
+    kotlin.test.assertEquals(
       """
     f
     b
       """.trimIndent(),
-      register!!.text,
+      register.text
     )
     assertState(
       """
@@ -287,12 +306,14 @@ class CopyActionTest : VimTestCase() {
 
   // VIM-1431
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
+  @Test
   fun testPutInEmptyFile() {
     VimPlugin.getRegister().setKeys('a', injector.parser.parseKeys("test"))
     typeTextInFile("\"ap", "")
     assertState("test")
   }
 
+  @Test
   fun testOverridingRegisterWithEmptyTag() {
     configureByText(
       """

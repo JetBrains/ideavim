@@ -16,9 +16,11 @@ import com.maddyhome.idea.vim.command.VimStateMachine
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class VisualSwapEndsBlockActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.VISUAL_BLOCK_MODE)
+  @Test
   fun `test simple block selection SE`() {
     val keys = listOf("<C-V>2e2j", "O")
     val before = """
@@ -38,10 +40,11 @@ class VisualSwapEndsBlockActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.
     """.trimIndent()
     doTest(keys, before, after, VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_BLOCK)
-    assertEquals(LogicalPosition(4, 2), myFixture.editor.caretModel.primaryCaret.logicalPosition)
+    kotlin.test.assertEquals(LogicalPosition(4, 2), fixture.editor.caretModel.primaryCaret.logicalPosition)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.VISUAL_BLOCK_MODE)
+  @Test
   fun `test simple block selection SW`() {
     val keys = listOf("<C-V>2b2j", "O")
     val before = """
@@ -61,10 +64,11 @@ class VisualSwapEndsBlockActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.
     """.trimIndent()
     doTest(keys, before, after, VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_BLOCK)
-    assertEquals(LogicalPosition(4, 8), myFixture.editor.caretModel.primaryCaret.logicalPosition)
+    kotlin.test.assertEquals(LogicalPosition(4, 8), fixture.editor.caretModel.primaryCaret.logicalPosition)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.VISUAL_BLOCK_MODE)
+  @Test
   fun `test simple block selection NE`() {
     val keys = listOf("<C-V>3e2k", "O")
     val before = """
@@ -84,10 +88,11 @@ class VisualSwapEndsBlockActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.
     """.trimIndent()
     doTest(keys, before, after, VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_BLOCK)
-    assertEquals(LogicalPosition(2, 2), myFixture.editor.caretModel.primaryCaret.logicalPosition)
+    kotlin.test.assertEquals(LogicalPosition(2, 2), fixture.editor.caretModel.primaryCaret.logicalPosition)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.VISUAL_BLOCK_MODE)
+  @Test
   fun `test simple block selection NW`() {
     val keys = listOf("<C-V>3b2k", "O")
     val before = """
@@ -107,10 +112,11 @@ class VisualSwapEndsBlockActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.
     """.trimIndent()
     doTest(keys, before, after, VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_BLOCK)
-    assertEquals(LogicalPosition(2, 8), myFixture.editor.caretModel.primaryCaret.logicalPosition)
+    kotlin.test.assertEquals(LogicalPosition(2, 8), fixture.editor.caretModel.primaryCaret.logicalPosition)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.VISUAL_BLOCK_MODE)
+  @Test
   fun `test with short line`() {
     val keys = listOf("<C-V>2j5e", "O")
     val before = """
@@ -130,10 +136,11 @@ class VisualSwapEndsBlockActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.
     """.trimIndent()
     doTest(keys, before, after, VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_BLOCK)
-    assertEquals(LogicalPosition(4, 26), myFixture.editor.caretModel.primaryCaret.logicalPosition)
+    kotlin.test.assertEquals(LogicalPosition(4, 26), fixture.editor.caretModel.primaryCaret.logicalPosition)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.VISUAL_BLOCK_MODE)
+  @Test
   fun `test to long line`() {
     val keys = listOf("<C-V>j5e", "O")
     val before = """
@@ -153,9 +160,10 @@ class VisualSwapEndsBlockActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.
     """.trimIndent()
     doTest(keys, before, after, VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_BLOCK)
-    assertEquals(LogicalPosition(3, 26), myFixture.editor.caretModel.primaryCaret.logicalPosition)
+    kotlin.test.assertEquals(LogicalPosition(3, 26), fixture.editor.caretModel.primaryCaret.logicalPosition)
   }
 
+  @Test
   fun testVisualSwapEndsBlockActionInBlockMode() {
     typeTextInFile(
       injector.parser.parseKeys("<C-V>" + "2l" + "j" + "O"),
@@ -174,6 +182,7 @@ class VisualSwapEndsBlockActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun testVisualBlockMovementAfterSwapEndsBlockAction() {
     typeTextInFile(
       injector.parser.parseKeys("<C-V>" + "2l" + "j" + "O" + "k" + "h" + "j"),

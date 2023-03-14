@@ -15,23 +15,28 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.statements.loops.ForLoop
 import com.maddyhome.idea.vim.vimscript.model.statements.loops.ForLoopWithList
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
+import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.combinate
 import org.jetbrains.plugins.ideavim.ex.evaluate
-import org.junit.experimental.theories.DataPoints
-import org.junit.experimental.theories.Theories
-import org.junit.experimental.theories.Theory
-import org.junit.runner.RunWith
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-@RunWith(Theories::class)
-class ForLoopTests {
+class ForLoopTests : VimTestCase() {
 
   companion object {
     @JvmStatic
-    val values = listOf("", " ") @DataPoints get
+    val values = listOf("", " ")
+    @JvmStatic
+    fun arg3(): List<Arguments> = combinate(values, values, values)
+    @JvmStatic
+    fun arg2(): List<Arguments> = combinate(values, values)
   }
 
-  @Theory
+  @ParameterizedTest
+  @MethodSource("arg3")
   fun `for loop`(sp1: String, sp2: String, sp3: String) {
     val script = VimscriptParser.parse(
       """
@@ -49,7 +54,8 @@ class ForLoopTests {
     assertEquals(1, f.body.size)
   }
 
-  @Theory
+  @ParameterizedTest
+  @MethodSource("arg3")
   fun `empty for loop`(sp1: String, sp2: String, sp3: String) {
     val script = VimscriptParser.parse(
       """
@@ -66,7 +72,8 @@ class ForLoopTests {
     assertEquals(0, f.body.size)
   }
 
-  @Theory
+  @ParameterizedTest
+  @MethodSource("arg2")
   fun `for loop with list`(sp1: String, sp2: String) {
     val script = VimscriptParser.parse(
       """

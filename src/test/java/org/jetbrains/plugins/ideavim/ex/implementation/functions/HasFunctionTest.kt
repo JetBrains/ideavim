@@ -11,21 +11,25 @@ package org.jetbrains.plugins.ideavim.ex.implementation.functions
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class HasFunctionTest : VimTestCase() {
 
+  @Test
   fun `test has for supported feature`() {
     configureByText("\n")
     typeText(commandToKeys("echo has('ide')"))
     assertExOutput("1\n")
   }
 
+  @Test
   fun `test has for unsupported feature`() {
     configureByText("\n")
     typeText(commandToKeys("echo has('autocmd')"))
     assertExOutput("0\n")
   }
 
+  @Test
   fun `test has for int as an argument`() {
     configureByText("\n")
     typeText(commandToKeys("echo has(42)"))
@@ -33,6 +37,7 @@ class HasFunctionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
+  @Test
   fun `test has for list as an argument`() {
     configureByText("\n")
     typeText(commandToKeys("echo has([])"))

@@ -11,22 +11,27 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 /*
 class NormalCommandTest : VimTestCase() {
 
+  @Test
   fun `test simple execution`() {
     doTest("normal x", "123<caret>456", "123<caret>56")
   }
 
+  @Test
   fun `test short command`() {
     doTest("norm x", "123<caret>456", "123<caret>56")
   }
 
+  @Test
   fun `test multiple commands`() {
     doTest("normal xiNewText", "123<caret>456", "123NewTex<caret>t56")
   }
 
+  @Test
   fun `test range single stroke`() {
     doTest(".norm x", "123<caret>456", "<caret>23456")
   }
 
+  @Test
   fun `test range multiple strokes`() {
     doTest(
       "1,3norm x",
@@ -47,6 +52,7 @@ class NormalCommandTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test with mapping`() {
     configureByText(
       """
@@ -65,6 +71,7 @@ class NormalCommandTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test with disabled mapping`() {
     configureByText(
       """
@@ -84,6 +91,7 @@ class NormalCommandTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test from visual mode`() {
     configureByText(
       """
@@ -107,6 +115,7 @@ class NormalCommandTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test execute visual mode`() {
     configureByText(
       """
@@ -127,6 +136,7 @@ class NormalCommandTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test execute macros`() {
     configureByText(
       """
@@ -152,6 +162,7 @@ class NormalCommandTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test command executes at selection start`() {
     configureByText("hello <caret>world !")
     typeText(parseKeys("vw"))
@@ -159,12 +170,14 @@ class NormalCommandTest : VimTestCase() {
     assertState("hello <caret>orld !")
   }
 
+  @Test
   fun `test false escape`() {
     configureByText("hello <caret>world !")
     typeText(commandToKeys("norm i<Esc>"))
     assertState("hello <Esc<caret>>world !")
   }
 
+  @Test
   fun `test C-R`() {
     configureByText("myprop: \"my value\"")
     typeText(commandToKeys("exe \"norm ^dei-\\<C-R>\\\"-\""))

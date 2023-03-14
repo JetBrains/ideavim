@@ -20,10 +20,12 @@ import org.jetbrains.plugins.ideavim.VimOptionDefaultAll
 import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
 import org.jetbrains.plugins.ideavim.VimTestOption
+import org.junit.jupiter.api.Test
 
 class MotionShiftEndActionTest : VimOptionTestCase(OptionConstants.keymodel, OptionConstants.selectmode) {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionDefaultAll
+  @Test
   fun `test simple end`() {
     val keys = listOf("<S-End>")
     val before = """
@@ -50,6 +52,7 @@ class MotionShiftEndActionTest : VimOptionTestCase(OptionConstants.keymodel, Opt
     VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, OptionConstants.keymodel_startsel),
     VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""),
   )
+  @Test
   fun `test start visual`() {
     val keys = listOf("<S-End>")
     val before = """
@@ -76,6 +79,7 @@ class MotionShiftEndActionTest : VimOptionTestCase(OptionConstants.keymodel, Opt
     VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, OptionConstants.keymodel_startsel),
     VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, OptionConstants.selectmode_key),
   )
+  @Test
   fun `test start select`() {
     val keys = listOf("<S-End>")
     val before = """
@@ -102,6 +106,7 @@ class MotionShiftEndActionTest : VimOptionTestCase(OptionConstants.keymodel, Opt
     VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""),
   )
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
   fun `test continue visual`() {
     val before = """
             A Discovery
@@ -132,6 +137,7 @@ class MotionShiftEndActionTest : VimOptionTestCase(OptionConstants.keymodel, Opt
     VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""),
   )
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
   fun `test continue select`() {
     val before = """
             A Discovery

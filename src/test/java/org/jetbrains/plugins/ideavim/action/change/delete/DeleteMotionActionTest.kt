@@ -15,9 +15,11 @@ import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 class DeleteMotionActionTest : VimTestCase() {
 
+  @Test
   fun `test delete last line`() {
     typeTextInFile(
       "dd",
@@ -35,6 +37,7 @@ class DeleteMotionActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test on line in middle`() {
     typeTextInFile(
       "dd",
@@ -52,6 +55,7 @@ class DeleteMotionActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test delete single line`() {
     typeTextInFile(
       "dd",
@@ -63,6 +67,7 @@ class DeleteMotionActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
   fun `test delete last line with nostartofline`() {
     configureByText(
       """
@@ -82,6 +87,7 @@ class DeleteMotionActionTest : VimTestCase() {
   }
 
   @VimBehaviorDiffers(originalVimAfter = "  expression two\n")
+  @Test
   fun `test delete last line stored with new line`() {
     typeTextInFile(
       "dd",
@@ -92,9 +98,10 @@ class DeleteMotionActionTest : VimTestCase() {
       """.trimIndent(),
     )
     val savedText = VimPlugin.getRegister().lastRegister?.text ?: ""
-    assertEquals("  expression two\n", savedText)
+    kotlin.test.assertEquals("  expression two\n", savedText)
   }
 
+  @Test
   fun `test delete line action multicaret`() {
     typeTextInFile(
       "d3d",
@@ -112,6 +119,7 @@ class DeleteMotionActionTest : VimTestCase() {
     assertState("${c}abcde\n${c}")
   }
 
+  @Test
   fun `test delete motion action multicaret`() {
     typeTextInFile(
       "dt)",
@@ -144,6 +152,7 @@ class DeleteMotionActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test delete empty line`() {
     val file = """
             A Discovery
@@ -164,6 +173,7 @@ class DeleteMotionActionTest : VimTestCase() {
     assertState(newFile)
   }
 
+  @Test
   fun `test delete on last line`() {
     doTest(
       "dd",
@@ -183,6 +193,7 @@ class DeleteMotionActionTest : VimTestCase() {
     )
   }
 
+  @Test
   fun `test empty line`() {
     doTest(
       "dd",

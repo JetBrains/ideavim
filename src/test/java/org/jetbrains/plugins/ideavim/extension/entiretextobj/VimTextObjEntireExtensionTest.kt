@@ -13,6 +13,9 @@ import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInfo
 import java.util.*
 
 /**
@@ -20,37 +23,44 @@ import java.util.*
  */
 @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
 class VimTextObjEntireExtensionTest : VimTestCase() {
-  override fun setUp() {
-    super.setUp()
+  @BeforeEach
+  override fun setUp(testInfo: TestInfo) {
+    super.setUp(testInfo)
     enableExtensions("textobj-entire")
   }
 
   // |gU| |ae|
+  @Test
   fun testUpperCaseEntireBuffer() {
     doTest("gUae", poem, "<caret>$poemUC")
   }
 
   // |gu| |ae|
+  @Test
   fun testLowerCaseEntireBuffer() {
     doTest("guae", poem, "<caret>$poemLC")
   }
 
   // |c| |ae|
+  @Test
   fun testChangeEntireBuffer() {
     doTest("cae", poem, "<caret>", VimStateMachine.Mode.INSERT)
   }
 
   // |d| |ae|
+  @Test
   fun testDeleteEntireBuffer() {
     doTest("dae", poem, "<caret>")
   }
 
   // |y| |ae|
+  @Test
   fun testYankEntireBuffer() {
     doTest("yae", poem, "<caret>$poemNoCaret")
   }
 
   // |gU| |ie|
+  @Test
   fun testUpperCaseEntireBufferIgnoreLeadingTrailing() {
     doTest(
       "gUie",
@@ -60,6 +70,7 @@ class VimTextObjEntireExtensionTest : VimTestCase() {
   }
 
   // |gu| |ae|
+  @Test
   fun testLowerCaseEntireBufferIgnoreLeadingTrailing() {
     doTest(
       "guie",
@@ -69,6 +80,7 @@ class VimTextObjEntireExtensionTest : VimTestCase() {
   }
 
   // |c| |ae|
+  @Test
   fun testChangeEntireBufferIgnoreLeadingTrailing() {
     doTest(
       "cie",
@@ -84,6 +96,7 @@ class VimTextObjEntireExtensionTest : VimTestCase() {
     "\n  \n \n<caret>\n\n  \n \n",
     description = "Our code changes the motion type to linewise, but it should not",
   )
+  @Test
   fun testDeleteEntireBufferIgnoreLeadingTrailing() {
     doTest(
       "die",
@@ -93,6 +106,7 @@ class VimTextObjEntireExtensionTest : VimTestCase() {
   }
 
   // |y| |ae|
+  @Test
   fun testYankEntireBufferIgnoreLeadingTrailing() {
     doTest(
       "yie",
