@@ -18,10 +18,10 @@ import com.maddyhome.idea.vim.api.injector
 @Deprecated("Please use com.maddyhome.idea.vim.options.ToggleOption")
 // Used by ideavim-sneak 1.2.0, which uses isSet()
 // (Used by which-key 0.6.2, which is broken due to changed T in CommandPartNode<T>)
-public open class ToggleOption(private val name: String) {
+public open class ToggleOption(private val option: com.maddyhome.idea.vim.options.ToggleOption) {
   /**
    * COMPATIBILITY-LAYER: Method added
    * Please see: https://jb.gg/zo8n0r
    */
-  public fun isSet(): Boolean = injector.globalOptions().isSet(name)
+  public fun isSet(): Boolean = injector.globalOptions().isSet(option)
 }

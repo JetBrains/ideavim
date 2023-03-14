@@ -40,6 +40,7 @@ import com.intellij.util.ui.EmptyClipboardOwner
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.VimShortcutKeyAction
+import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.VimOptionGroup
 import com.maddyhome.idea.vim.api.getKnownToggleOption
 import com.maddyhome.idea.vim.api.globalOptions
@@ -68,10 +69,8 @@ import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.options.OptionValueAccessor
-import com.maddyhome.idea.vim.options.ToggleOption
 import com.maddyhome.idea.vim.options.helpers.GuiCursorOptionHelper
 import com.maddyhome.idea.vim.options.helpers.GuiCursorType
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
@@ -128,9 +127,7 @@ abstract class VimTestCase {
     VimPlugin.getKey().resetKeyMappings()
     VimPlugin.getSearch().resetState()
     if (!VimPlugin.isEnabled()) VimPlugin.setEnabled(true)
-    (injector.optionGroup.getOption(OptionConstants.ideastrictmode) as? ToggleOption)?.let { option ->
-      injector.optionGroup.setToggleOption(option, OptionScope.GLOBAL)
-    }
+    injector.optionGroup.setToggleOption(Options.ideastrictmode, OptionScope.GLOBAL)
     GuicursorChangeListener.processGlobalValueChange(null)
     Checks.reset()
     clearClipboard()
@@ -302,8 +299,8 @@ abstract class VimTestCase {
     // Note that it is possible to request a position which would be invalid under normal Vim!
     // We disable scrolloff + scrolljump, position as requested, and reset. When resetting scrolloff, Vim will
     // recalculate the correct offsets, and that could move the top and/or caret line
-    val scrolloff = options().getIntValue(OptionConstants.scrolloff)
-    val scrolljump = options().getIntValue(OptionConstants.scrolljump)
+    val scrolloff = options().getIntValue(Options.scrolloff)
+    val scrolljump = options().getIntValue(Options.scrolljump)
 
     enterCommand("set scrolloff=0")
     enterCommand("set scrolljump=1")

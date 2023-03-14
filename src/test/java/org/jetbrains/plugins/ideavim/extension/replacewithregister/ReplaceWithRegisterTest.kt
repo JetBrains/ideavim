@@ -10,6 +10,7 @@ package org.jetbrains.plugins.ideavim.extension.replacewithregister
 
 import com.intellij.testFramework.UsefulTestCase.assertContainsElements
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.command.VimStateMachine
@@ -493,7 +494,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
   fun `test multiple carets`() {
   // Behaviour of pasting a full line with multiple carets is undefined in Vim and has different implementation in
   // IdeaVim depending on if ideaput is specified in 'clipboard' or not
-  assertContainsElements(optionsNoEditor().getStringListValues(OptionConstants.clipboard), OptionConstants.clipboard_ideaput)
+  assertContainsElements(optionsNoEditor().getStringListValues(Options.clipboard), OptionConstants.clipboard_ideaput)
 
   enableExtensions("multiple-cursors")
     val text = """

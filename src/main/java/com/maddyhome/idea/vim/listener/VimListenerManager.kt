@@ -39,6 +39,7 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimKeyListener
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.VimTypedActionHandler
+import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.getLineEndForOffset
 import com.maddyhome.idea.vim.api.getLineStartForOffset
 import com.maddyhome.idea.vim.api.injector
@@ -74,7 +75,6 @@ import com.maddyhome.idea.vim.listener.MouseEventsDataHolder.skipNDragEvents
 import com.maddyhome.idea.vim.listener.VimListenerManager.EditorListeners.add
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.helpers.KeywordOptionChangeListener
 import com.maddyhome.idea.vim.ui.ShowCmdOptionChangeListener
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
@@ -111,12 +111,12 @@ internal object VimListenerManager {
       }
 
       val optionGroup = VimPlugin.getOptionGroup()
-      optionGroup.addListener(OptionConstants.number, EditorGroup.NumberChangeListener.INSTANCE)
-      optionGroup.addListener(OptionConstants.relativenumber, EditorGroup.NumberChangeListener.INSTANCE)
-      optionGroup.addListener(OptionConstants.scrolloff, ScrollGroup.ScrollOptionsChangeListener)
-      optionGroup.addListener(OptionConstants.showcmd, ShowCmdOptionChangeListener)
-      optionGroup.addListener(OptionConstants.guicursor, GuicursorChangeListener)
-      optionGroup.addListener(OptionConstants.iskeyword, KeywordOptionChangeListener, true)
+      optionGroup.addListener(Options.number.name, EditorGroup.NumberChangeListener.INSTANCE)
+      optionGroup.addListener(Options.relativenumber.name, EditorGroup.NumberChangeListener.INSTANCE)
+      optionGroup.addListener(Options.scrolloff.name, ScrollGroup.ScrollOptionsChangeListener)
+      optionGroup.addListener(Options.showcmd.name, ShowCmdOptionChangeListener)
+      optionGroup.addListener(Options.guicursor.name, GuicursorChangeListener)
+      optionGroup.addListener(Options.iskeyword.name, KeywordOptionChangeListener, true)
 
       EventFacade.getInstance().addEditorFactoryListener(VimEditorFactoryListener, VimPlugin.getInstance().onOffDisposable)
 
@@ -127,12 +127,12 @@ internal object VimListenerManager {
       EventFacade.getInstance().restoreTypedActionHandler()
 
       val optionGroup = VimPlugin.getOptionGroup()
-      optionGroup.removeListener(OptionConstants.number, EditorGroup.NumberChangeListener.INSTANCE)
-      optionGroup.removeListener(OptionConstants.relativenumber, EditorGroup.NumberChangeListener.INSTANCE)
-      optionGroup.removeListener(OptionConstants.scrolloff, ScrollGroup.ScrollOptionsChangeListener)
-      optionGroup.removeListener(OptionConstants.showcmd, ShowCmdOptionChangeListener)
-      optionGroup.removeListener(OptionConstants.guicursor, GuicursorChangeListener)
-      optionGroup.removeListener(OptionConstants.iskeyword, KeywordOptionChangeListener)
+      optionGroup.removeListener(Options.number.name, EditorGroup.NumberChangeListener.INSTANCE)
+      optionGroup.removeListener(Options.relativenumber.name, EditorGroup.NumberChangeListener.INSTANCE)
+      optionGroup.removeListener(Options.scrolloff.name, ScrollGroup.ScrollOptionsChangeListener)
+      optionGroup.removeListener(Options.showcmd.name, ShowCmdOptionChangeListener)
+      optionGroup.removeListener(Options.guicursor.name, GuicursorChangeListener)
+      optionGroup.removeListener(Options.iskeyword.name, KeywordOptionChangeListener)
     }
   }
 

@@ -10,7 +10,6 @@ package com.maddyhome.idea.vim.group
 
 import com.intellij.openapi.application.ApplicationNamesInfo
 import com.maddyhome.idea.vim.api.VimOptionGroupBase
-import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.StringOption
 import com.maddyhome.idea.vim.options.ToggleOption
 import com.maddyhome.idea.vim.options.UnsignedNumberOption
@@ -78,15 +77,16 @@ internal class OptionGroup : VimOptionGroupBase() {
     addOption(ToggleOption(IjOptionConstants.trackactionids, "tai", false))
     addOption(UnsignedNumberOption(IjOptionConstants.visualdelay, IjOptionConstants.visualdelay, 100))
 
+    // TODO: Figure out how to nicely override clipboard's default value for the IntelliJ specific ideaput value
     // This options overrides Vim's default value, so we keep it here
-    addOption(
-      StringOption(
-        OptionConstants.clipboard,
-        OptionConstants.clipboardAlias,
-        "ideaput,autoselect,exclude:cons\\|linux",
-        isList = true,
-      ),
-    )
+//    addOption(
+//      StringOption(
+//        OptionConstants.clipboard,
+//        "cb",
+//        "ideaput,autoselect,exclude:cons\\|linux",
+//        isList = true,
+//      ),
+//    )
 
     addOption(ToggleOption("unifyjumps", "unifyjumps", true))
   }
@@ -123,11 +123,11 @@ internal class IjOptionConstants {
     const val ideawrite_file = "file"
 
     const val lookupkeys = "lookupkeys"
+    const val octopushandler = "octopushandler"
     const val oldundo = "oldundo"
     const val trackactionids = "trackactionids"
+    const val unifyjumps = "unifyjumps"
     const val visualdelay = "visualdelay"
-
-    const val octopushandler = "octopushandler"
 
     val ideaStatusIconValues = setOf(ideastatusicon_enabled, ideastatusicon_gray, ideastatusicon_disabled)
     val ideaRefactorModeValues = setOf(idearefactormode_keep, idearefactormode_select, idearefactormode_visual)

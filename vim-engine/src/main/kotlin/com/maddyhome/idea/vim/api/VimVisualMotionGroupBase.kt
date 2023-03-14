@@ -20,11 +20,10 @@ import com.maddyhome.idea.vim.helper.pushSelectMode
 import com.maddyhome.idea.vim.helper.pushVisualMode
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.helper.vimStateMachine
-import com.maddyhome.idea.vim.options.OptionConstants
 
 public abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
   override val exclusiveSelection: Boolean
-    get() = injector.globalOptions().hasValue(OptionConstants.selection, "exclusive")
+    get() = injector.globalOptions().hasValue(Options.selection, "exclusive")
   override val selectionAdj: Int
     get() = if (exclusiveSelection) 0 else 1
 

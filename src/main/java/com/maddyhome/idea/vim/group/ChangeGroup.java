@@ -49,7 +49,6 @@ import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext;
 import com.maddyhome.idea.vim.newapi.IjEditorExecutionContextKt;
 import com.maddyhome.idea.vim.newapi.IjVimCaret;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
-import com.maddyhome.idea.vim.options.OptionConstants;
 import kotlin.Pair;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function0;
@@ -156,7 +155,7 @@ public class ChangeGroup extends VimChangeGroupBase {
    */
   @Override
   public boolean changeCaseToggleCharacter(@NotNull VimEditor editor, @NotNull VimCaret caret, int count) {
-    boolean allowWrap = options(injector, editor).hasValue(OptionConstants.whichwrap, "~");
+    boolean allowWrap = options(injector, editor).hasValue(Options.whichwrap, "~");
 
     Motion motion = injector.getMotion().getHorizontalMotion(editor, caret, count, true, allowWrap);
     if (motion instanceof Motion.Error) return false;
@@ -572,7 +571,7 @@ public class ChangeGroup extends VimChangeGroupBase {
       }
     }
 
-    List<String> nf = options(injector, editor).getStringListValues(OptionConstants.nrformats);
+    List<String> nf = options(injector, editor).getStringListValues(Options.nrformats);
     boolean alpha = nf.contains("alpha");
     boolean hex = nf.contains("hex");
     boolean octal = nf.contains("octal");
@@ -602,7 +601,7 @@ public class ChangeGroup extends VimChangeGroupBase {
 
   @Override
   public boolean changeNumber(final @NotNull VimEditor editor, @NotNull VimCaret caret, final int count) {
-    final List<String> nf = options(injector, editor).getStringListValues(OptionConstants.nrformats);
+    final List<String> nf = options(injector, editor).getStringListValues(Options.nrformats);
     final boolean alpha = nf.contains("alpha");
     final boolean hex = nf.contains("hex");
     final boolean octal = nf.contains("octal");

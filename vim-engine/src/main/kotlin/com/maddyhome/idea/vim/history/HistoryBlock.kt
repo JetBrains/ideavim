@@ -8,9 +8,9 @@
 
 package com.maddyhome.idea.vim.history
 
+import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.options.OptionConstants
 
 public class HistoryBlock {
   private val entries: MutableList<HistoryEntry> = ArrayList()
@@ -36,6 +36,6 @@ public class HistoryBlock {
   }
 
   public companion object {
-    private fun maxLength() = injector.globalOptions().getIntValue(OptionConstants.history)
+    private fun maxLength() = injector.globalOptions().getIntValue(Options.history)
   }
 }

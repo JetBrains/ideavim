@@ -13,15 +13,16 @@ package org.jetbrains.plugins.ideavim.action.motion.leftright
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.options.OptionConstants
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestOptionConstants
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.impl.OptionTest
 import org.jetbrains.plugins.ideavim.impl.TraceOptions
 import org.jetbrains.plugins.ideavim.impl.VimOption
 
-@TraceOptions(OptionConstants.virtualedit)
+@TraceOptions(TestOptionConstants.virtualedit)
 class MotionRightActionTest : VimTestCase() {
-  @OptionTest(VimOption(OptionConstants.virtualedit, doesntAffectTest = true))
+  @OptionTest(VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true))
   fun `test simple motion`() {
     doTest(
       "l",
@@ -46,7 +47,7 @@ class MotionRightActionTest : VimTestCase() {
     )
   }
 
-  @OptionTest(VimOption(OptionConstants.virtualedit, doesntAffectTest = true))
+  @OptionTest(VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true))
   fun `test simple motion with repeat`() {
     doTest(
       "3l",
@@ -71,7 +72,7 @@ class MotionRightActionTest : VimTestCase() {
     )
   }
 
-  @OptionTest(VimOption(OptionConstants.virtualedit, doesntAffectTest = true))
+  @OptionTest(VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true))
   fun `test simple motion to the end`() {
     doTest(
       "3l",
@@ -97,7 +98,7 @@ class MotionRightActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(VimOption(OptionConstants.virtualedit, limitedValues = [OptionConstants.virtualedit_onemore]))
+  @OptionTest(VimOption(TestOptionConstants.virtualedit, limitedValues = [OptionConstants.virtualedit_onemore]))
   fun `test virtual edit motion to the end`() {
     doTest(
       "3l",
@@ -117,7 +118,7 @@ class MotionRightActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(VimOption(OptionConstants.virtualedit, limitedValues = [OptionConstants.virtualedit_onemore]))
+  @OptionTest(VimOption(TestOptionConstants.virtualedit, limitedValues = [OptionConstants.virtualedit_onemore]))
   fun `test virtual edit motion after dollar`() {
     doTest(
       "\$l",
@@ -137,7 +138,7 @@ class MotionRightActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NON_ASCII)
-  @OptionTest(VimOption(OptionConstants.virtualedit, doesntAffectTest = true))
+  @OptionTest(VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true))
   fun `test simple motion non-ascii`() {
     doTest(
       "l",
@@ -163,7 +164,7 @@ class MotionRightActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NON_ASCII)
-  @OptionTest(VimOption(OptionConstants.virtualedit, doesntAffectTest = true))
+  @OptionTest(VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true))
   fun `test simple motion emoji`() {
     doTest(
       "l",
@@ -189,7 +190,7 @@ class MotionRightActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NON_ASCII)
-  @OptionTest(VimOption(OptionConstants.virtualedit, doesntAffectTest = true))
+  @OptionTest(VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true))
   fun `test simple motion czech`() {
     doTest(
       "l",
@@ -214,7 +215,7 @@ class MotionRightActionTest : VimTestCase() {
     )
   }
 
-  @OptionTest(VimOption(OptionConstants.virtualedit, doesntAffectTest = true))
+  @OptionTest(VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true))
   fun `test simple motion tab`() {
     doTest(
       "l",
@@ -239,7 +240,7 @@ class MotionRightActionTest : VimTestCase() {
     )
   }
 
-  @OptionTest(VimOption(OptionConstants.virtualedit, doesntAffectTest = true))
+  @OptionTest(VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true))
   fun `test char visual mode`() {
     doTest(
       listOf("v", "ll"),
@@ -264,7 +265,7 @@ class MotionRightActionTest : VimTestCase() {
     )
   }
 
-  @OptionTest(VimOption(OptionConstants.virtualedit, doesntAffectTest = true))
+  @OptionTest(VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true))
   fun `test block visual mode`() {
     doTest(
       listOf("<C-V>", "ll"),
@@ -290,7 +291,7 @@ class MotionRightActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(VimOption(OptionConstants.virtualedit, doesntAffectTest = true))
+  @OptionTest(VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true))
   fun `test whichwrap in the same line`() {
     doTest(
       listOf("l"),
@@ -306,7 +307,7 @@ class MotionRightActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(VimOption(OptionConstants.virtualedit, doesntAffectTest = true))
+  @OptionTest(VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true))
   fun `test whichwrap at file end`() {
     doTest(
       listOf("l"),
@@ -322,7 +323,7 @@ class MotionRightActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(VimOption(OptionConstants.virtualedit, doesntAffectTest = true))
+  @OptionTest(VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true))
   fun `test whichwrap to next line`() {
     doTest(
       listOf("l"),
@@ -340,7 +341,7 @@ class MotionRightActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(VimOption(OptionConstants.virtualedit, doesntAffectTest = true))
+  @OptionTest(VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true))
   fun `test from empty line to empty line`() {
     doTest(
       listOf("l"),
@@ -362,7 +363,7 @@ class MotionRightActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(VimOption(OptionConstants.virtualedit, doesntAffectTest = true))
+  @OptionTest(VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true))
   fun `test d command with whichwrap`() {
     doTest(
       listOf("dl"),

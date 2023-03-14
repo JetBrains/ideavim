@@ -20,11 +20,12 @@ import org.junit.jupiter.api.TestInfo
 
 class StringListOptionTest : VimTestCase() {
   private val optionName = "myOpt"
+  private val option = StringOption(optionName, optionName, "", true, null)
 
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {
     super.setUp(testInfo)
-    injector.optionGroup.addOption(StringOption(optionName, optionName, "", true, null))
+    injector.optionGroup.addOption(option)
     configureByText("\n")
   }
 
@@ -41,7 +42,7 @@ class StringListOptionTest : VimTestCase() {
     enterCommand("set $optionName+=456")
     enterCommand("set $optionName+=123")
 
-    kotlin.test.assertEquals("123,456", options().getStringValue(optionName))
+    kotlin.test.assertEquals("123,456", options().getStringValue(option))
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
@@ -51,6 +52,6 @@ class StringListOptionTest : VimTestCase() {
     enterCommand("set $optionName+=123")
     enterCommand("set $optionName^=123")
 
-    kotlin.test.assertEquals("456,123", options().getStringValue(optionName))
+    kotlin.test.assertEquals("456,123", options().getStringValue(option))
   }
 }

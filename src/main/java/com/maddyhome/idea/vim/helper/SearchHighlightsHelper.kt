@@ -21,13 +21,13 @@ import com.intellij.openapi.editor.markup.TextAttributes
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.ui.ColorUtil
+import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.options.OptionConstants
 import org.jetbrains.annotations.Contract
 import java.awt.Color
 import java.awt.Font
@@ -51,7 +51,7 @@ internal fun updateIncsearchHighlights(
 ): Int {
   val searchStartOffset =
     if (searchRange != null) editor.vim.getLineStartOffset(searchRange.startLine) else caretOffset
-  val showHighlights = injector.options(editor.vim).isSet(OptionConstants.hlsearch)
+  val showHighlights = injector.options(editor.vim).isSet(Options.hlsearch)
   return updateSearchHighlights(pattern, false, showHighlights, searchStartOffset, searchRange, forwards, false)
 }
 
@@ -115,7 +115,7 @@ private fun updateSearchHighlights(
       } else if (shouldAddCurrentMatchSearchHighlight(pattern, showHighlights, initialOffset)) {
         // nohlsearch + incsearch
         val searchOptions = EnumSet.of(SearchOptions.WHOLE_FILE)
-        if (injector.globalOptions().isSet(OptionConstants.wrapscan)) {
+        if (injector.globalOptions().isSet(Options.wrapscan)) {
           searchOptions.add(SearchOptions.WRAP)
         }
         if (shouldIgnoreSmartCase) searchOptions.add(SearchOptions.IGNORE_SMARTCASE)
@@ -177,7 +177,7 @@ private fun findClosestMatch(editor: Editor, results: List<TextRange>, initialOf
     }
     d2 - d1
   }
-  if (!injector.globalOptions().isSet(OptionConstants.wrapscan)) {
+  if (!injector.globalOptions().isSet(Options.wrapscan)) {
     val start = max.startOffset
     if (forwards && start < initialOffset) {
       return -1

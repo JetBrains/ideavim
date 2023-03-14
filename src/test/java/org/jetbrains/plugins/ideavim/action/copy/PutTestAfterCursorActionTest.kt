@@ -16,7 +16,7 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.psi.PsiFile
 import com.intellij.testFramework.ExtensionTestUtil
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.api.getKnownStringOption
+import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.modifyOptionValue
 import com.maddyhome.idea.vim.command.SelectionType
@@ -34,9 +34,8 @@ import java.awt.datatransfer.Transferable
 class PutTestAfterCursorActionTest : VimTestCase() {
   @Test
   fun `test platform handlers are called`() {
-    val option = injector.optionGroup.getKnownStringOption(OptionConstants.clipboard)
-    injector.optionGroup.modifyOptionValue(option, OptionScope.GLOBAL) {
-      option.prependValue(it, VimString(OptionConstants.clipboard_ideaput))
+    injector.optionGroup.modifyOptionValue(Options.clipboard, OptionScope.GLOBAL) {
+      Options.clipboard.prependValue(it, VimString(OptionConstants.clipboard_ideaput))
     }
     val extension = TestExtension()
     ExtensionTestUtil.maskExtensions(

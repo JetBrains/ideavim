@@ -10,7 +10,7 @@
 
 package com.maddyhome.idea.vim.option
 
-import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.options.helpers.KeywordOptionHelper
 
 /**
@@ -24,9 +24,9 @@ import com.maddyhome.idea.vim.options.helpers.KeywordOptionHelper
 // (which-key 0.6.2 uses timeout + timeoutlen, now removed. That plugin version is broken due to other changes)
 public object OptionsManager {
   public val ignorecase: ToggleOption
-    get() = ToggleOption(OptionConstants.ignorecase)
+    get() = ToggleOption(Options.ignorecase)
   public val smartcase: ToggleOption
-    get() = ToggleOption(OptionConstants.smartcase)
+    get() = ToggleOption(Options.smartcase)
   public val iskeyword: KeywordOption
     get() = KeywordOption(KeywordOptionHelper)
 }

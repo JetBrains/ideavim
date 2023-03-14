@@ -13,7 +13,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.extension.exchange.VimExchangeExtension
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
-import com.maddyhome.idea.vim.options.OptionConstants
+import org.jetbrains.plugins.ideavim.TestOptionConstants
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.impl.OptionTest
 import org.jetbrains.plugins.ideavim.impl.TraceOptions
@@ -21,7 +21,7 @@ import org.jetbrains.plugins.ideavim.impl.VimOption
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInfo
 
-@TraceOptions(OptionConstants.clipboard)
+@TraceOptions(TestOptionConstants.clipboard)
 class VimExchangeWithClipboardTest : VimTestCase() {
   @Throws(Exception::class)
   @BeforeEach
@@ -31,7 +31,7 @@ class VimExchangeWithClipboardTest : VimTestCase() {
   }
 
   // |cx|
-  @OptionTest(VimOption(OptionConstants.clipboard, limitedValues = ["unnamed"]))
+  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = ["unnamed"]))
   fun `test exchange words left to right`() {
     doTest(
       listOf("cxe", "w", "cxe"),
@@ -43,7 +43,7 @@ class VimExchangeWithClipboardTest : VimTestCase() {
   }
 
   // |cx|
-  @OptionTest(VimOption(OptionConstants.clipboard, limitedValues = ["unnamed"]))
+  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = ["unnamed"]))
   fun `test exchange words dot repeat`() {
     doTest(
       listOf("cxiw", "w", "."),
@@ -55,7 +55,7 @@ class VimExchangeWithClipboardTest : VimTestCase() {
   }
 
   // |cx|
-  @OptionTest(VimOption(OptionConstants.clipboard, limitedValues = ["unnamed"]))
+  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = ["unnamed"]))
   fun `test exchange words right to left`() {
     doTest(
       listOf("cxe", "b", "cxe"),
@@ -67,7 +67,7 @@ class VimExchangeWithClipboardTest : VimTestCase() {
   }
 
   // |cx|
-  @OptionTest(VimOption(OptionConstants.clipboard, limitedValues = ["unnamed"]))
+  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = ["unnamed"]))
   fun `test exchange words right to left with dot`() {
     doTest(
       listOf("cxe", "b", "."),
@@ -79,7 +79,7 @@ class VimExchangeWithClipboardTest : VimTestCase() {
   }
 
   // |X|
-  @OptionTest(VimOption(OptionConstants.clipboard, limitedValues = ["unnamed"]))
+  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = ["unnamed"]))
   fun `test visual exchange words left to right`() {
     doTest(
       listOf("veX", "w", "veX"),
@@ -91,7 +91,7 @@ class VimExchangeWithClipboardTest : VimTestCase() {
   }
 
   // |X|
-  @OptionTest(VimOption(OptionConstants.clipboard, limitedValues = ["unnamed"]))
+  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = ["unnamed"]))
   @VimBehaviorDiffers(
     originalVimAfter = "The ${c}brown catch over the lazy dog",
     shouldBeFixed = true,
@@ -107,7 +107,7 @@ class VimExchangeWithClipboardTest : VimTestCase() {
   }
 
   // |X|
-  @OptionTest(VimOption(OptionConstants.clipboard, limitedValues = ["unnamed"]))
+  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = ["unnamed"]))
   @VimBehaviorDiffers(
     originalVimAfter = "The brown ${c}catch over the lazy dog",
     shouldBeFixed = true,
@@ -123,7 +123,7 @@ class VimExchangeWithClipboardTest : VimTestCase() {
   }
 
   // |cxx|
-  @OptionTest(VimOption(OptionConstants.clipboard, limitedValues = ["unnamed"]))
+  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = ["unnamed"]))
   @VimBehaviorDiffers(
     originalVimAfter =
     """The quick
@@ -152,7 +152,7 @@ class VimExchangeWithClipboardTest : VimTestCase() {
   }
 
   // |cxx|
-  @OptionTest(VimOption(OptionConstants.clipboard, limitedValues = ["unnamed"]))
+  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = ["unnamed"]))
   @VimBehaviorDiffers(
     originalVimAfter =
     """The quick
@@ -180,7 +180,7 @@ class VimExchangeWithClipboardTest : VimTestCase() {
     )
   }
 
-  @OptionTest(VimOption(OptionConstants.clipboard, limitedValues = ["unnamed"]))
+  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = ["unnamed"]))
   @VimBehaviorDiffers(
     originalVimAfter = """
          The quick
@@ -207,7 +207,7 @@ class VimExchangeWithClipboardTest : VimTestCase() {
     )
   }
 
-  @OptionTest(VimOption(OptionConstants.clipboard, limitedValues = ["unnamed"]))
+  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = ["unnamed"]))
   @VimBehaviorDiffers(
     originalVimAfter =
     """
@@ -239,7 +239,7 @@ class VimExchangeWithClipboardTest : VimTestCase() {
     )
   }
 
-  @OptionTest(VimOption(OptionConstants.clipboard, limitedValues = ["unnamed"]))
+  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = ["unnamed"]))
   fun `test visual char highlighter`() {
     val before = """
          The ${c}quick
@@ -256,7 +256,7 @@ class VimExchangeWithClipboardTest : VimTestCase() {
     exitExchange()
   }
 
-  @OptionTest(VimOption(OptionConstants.clipboard, limitedValues = ["unnamed"]))
+  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = ["unnamed"]))
   fun `test visual line highdhitligthhter`() {
     val before = """
          The ${c}quick
@@ -273,7 +273,7 @@ class VimExchangeWithClipboardTest : VimTestCase() {
     exitExchange()
   }
 
-  @OptionTest(VimOption(OptionConstants.clipboard, limitedValues = ["unnamed"]))
+  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = ["unnamed"]))
   fun `test till the line end highlighter`() {
     val before = """
          The ${c}quick
@@ -288,7 +288,7 @@ class VimExchangeWithClipboardTest : VimTestCase() {
     exitExchange()
   }
 
-  @OptionTest(VimOption(OptionConstants.clipboard, limitedValues = ["unnamed"]))
+  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = ["unnamed"]))
   fun `test pre line end highlighter`() {
     val before = """
          The ${c}quick
@@ -303,7 +303,7 @@ class VimExchangeWithClipboardTest : VimTestCase() {
     exitExchange()
   }
 
-  @OptionTest(VimOption(OptionConstants.clipboard, limitedValues = ["unnamed"]))
+  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = ["unnamed"]))
   fun `test pre pre line end highlighter`() {
     val before = """
          The ${c}quick
@@ -318,7 +318,7 @@ class VimExchangeWithClipboardTest : VimTestCase() {
     exitExchange()
   }
 
-  @OptionTest(VimOption(OptionConstants.clipboard, limitedValues = ["unnamed"]))
+  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = ["unnamed"]))
   fun `test to file end highlighter`() {
     val before = """
          The quick
@@ -340,7 +340,7 @@ class VimExchangeWithClipboardTest : VimTestCase() {
     exitExchange()
   }
 
-  @OptionTest(VimOption(OptionConstants.clipboard, limitedValues = ["unnamed"]))
+  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = ["unnamed"]))
   fun `test to file end with new line highlighter`() {
     val before = """
          The quick

@@ -9,9 +9,9 @@
 package org.jetbrains.plugins.ideavim.ex
 
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
-import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.ui.ex.ExDocument
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -32,47 +32,47 @@ class ExEntryTest : VimTestCase() {
 
   @Test
   fun `test cancel entry`() {
-    kotlin.test.assertFalse(options().isSet(OptionConstants.incsearch))
+    kotlin.test.assertFalse(options().isSet(Options.incsearch))
     typeExInput(":set incsearch<Esc>")
-    kotlin.test.assertFalse(options().isSet(OptionConstants.incsearch))
+    kotlin.test.assertFalse(options().isSet(Options.incsearch))
     assertIsDeactivated()
 
     deactivateExEntry()
 
-    kotlin.test.assertFalse(options().isSet(OptionConstants.incsearch))
+    kotlin.test.assertFalse(options().isSet(Options.incsearch))
     typeExInput(":set incsearch<C-[>")
-    kotlin.test.assertFalse(options().isSet(OptionConstants.incsearch))
+    kotlin.test.assertFalse(options().isSet(Options.incsearch))
     assertIsDeactivated()
 
     deactivateExEntry()
 
-    kotlin.test.assertFalse(options().isSet(OptionConstants.incsearch))
+    kotlin.test.assertFalse(options().isSet(Options.incsearch))
     typeExInput(":set incsearch<C-C>")
-    kotlin.test.assertFalse(options().isSet(OptionConstants.incsearch))
+    kotlin.test.assertFalse(options().isSet(Options.incsearch))
     assertIsDeactivated()
   }
 
   @Test
   fun `test complete entry`() {
-    kotlin.test.assertFalse(options().isSet(OptionConstants.incsearch))
+    kotlin.test.assertFalse(options().isSet(Options.incsearch))
     typeExInput(":set incsearch<Enter>")
-    kotlin.test.assertTrue(options().isSet(OptionConstants.incsearch))
+    kotlin.test.assertTrue(options().isSet(Options.incsearch))
     assertIsDeactivated()
 
     deactivateExEntry()
     VimPlugin.getOptionGroup().resetAllOptions()
 
-    kotlin.test.assertFalse(options().isSet(OptionConstants.incsearch))
+    kotlin.test.assertFalse(options().isSet(Options.incsearch))
     typeExInput(":set incsearch<C-J>")
-    kotlin.test.assertTrue(options().isSet(OptionConstants.incsearch))
+    kotlin.test.assertTrue(options().isSet(Options.incsearch))
     assertIsDeactivated()
 
     deactivateExEntry()
     VimPlugin.getOptionGroup().resetAllOptions()
 
-    kotlin.test.assertFalse(options().isSet(OptionConstants.incsearch))
+    kotlin.test.assertFalse(options().isSet(Options.incsearch))
     typeExInput(":set incsearch<C-M>")
-    kotlin.test.assertTrue(options().isSet(OptionConstants.incsearch))
+    kotlin.test.assertTrue(options().isSet(Options.incsearch))
     assertIsDeactivated()
   }
 

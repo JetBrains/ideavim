@@ -8,9 +8,9 @@
 package org.jetbrains.plugins.ideavim.option
 
 import com.intellij.testFramework.UsefulTestCase.assertDoesntContain
+import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.helper.CharacterHelper
 import com.maddyhome.idea.vim.helper.CharacterHelper.charType
-import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.helpers.KeywordOptionHelper.parseValues
 import com.maddyhome.idea.vim.options.helpers.KeywordOptionHelper.toRegex
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -27,7 +27,7 @@ class KeywordOptionTest : VimTestCase() {
   }
 
   private val values: List<String>?
-    get() = parseValues(options().getStringValue(OptionConstants.iskeyword))
+    get() = parseValues(options().getStringValue(Options.iskeyword))
 
   private fun setKeyword(value: String) {
     enterCommand("set iskeyword=$value")

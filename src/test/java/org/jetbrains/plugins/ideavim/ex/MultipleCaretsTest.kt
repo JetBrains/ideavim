@@ -9,6 +9,7 @@
 package org.jetbrains.plugins.ideavim.ex
 
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
@@ -16,12 +17,14 @@ import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestOptionConstants
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.impl.OptionTest
 import org.jetbrains.plugins.ideavim.impl.VimOption
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
+import kotlin.test.assertContains
 import kotlin.test.assertNotNull
 
 class MultipleCaretsTest : VimTestCase() {
@@ -113,9 +116,12 @@ class MultipleCaretsTest : VimTestCase() {
    * This test produces different results depending on `ideaput` option.
    * Both results can be treated as correct, as the original vim doesn't have support for multicaret
    */
-  @OptionTest(VimOption(OptionConstants.clipboard, limitedValues = ["ideaput"]))
+  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = ["ideaput"]))
   fun testPutText() {
     // This test produces double ${c}zxc on 3rd line if non-idea paste is used
+    // TODO: Investigate differences and reconcile
+    assertContains(optionsNoEditor().getStringListValues(Options.clipboard), OptionConstants.clipboard_ideaput)
+
     val before = """
           ${c}qwe
           rty
@@ -148,7 +154,7 @@ class MultipleCaretsTest : VimTestCase() {
    * This test produces different results depending on `ideaput` option.
    * Both results can be treated as correct, as the original vim doesn't have support for multicaret
    */
-  @OptionTest(VimOption(OptionConstants.clipboard, limitedValues = [""]))
+  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = [""]))
   fun testPutTextWithoutIdeaput() {
     // This test produces double ${c}zxc on 3rd line if non-idea paste is used
     val before = """
@@ -185,7 +191,7 @@ class MultipleCaretsTest : VimTestCase() {
    * Both results can be treated as correct, as the original vim doesn't have support for multicaret
    */
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "register")
-  @OptionTest(VimOption(OptionConstants.clipboard, limitedValues = [""]))
+  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = [""]))
   fun testPutTextCertainLine() {
     val before = """
           ${c}qwe
@@ -221,7 +227,7 @@ class MultipleCaretsTest : VimTestCase() {
    * Both results can be treated as correct, as the original vim doesn't have support for multicaret
    */
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "register")
-  @OptionTest(VimOption(OptionConstants.clipboard, limitedValues = ["ideaput"]))
+  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = ["ideaput"]))
   fun testPutTextCertainLineWithIdeaPut() {
     val before = """
           ${c}qwe

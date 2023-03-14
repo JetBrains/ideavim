@@ -19,12 +19,12 @@ import com.intellij.openapi.editor.ScrollingModel;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.util.IJSwingUtilities;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.api.Options;
 import com.maddyhome.idea.vim.ex.ranges.LineRange;
 import com.maddyhome.idea.vim.helper.SearchHighlightsHelper;
 import com.maddyhome.idea.vim.helper.UiHelper;
 import com.maddyhome.idea.vim.newapi.IjVimCaret;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
-import com.maddyhome.idea.vim.options.OptionConstants;
 import com.maddyhome.idea.vim.regexp.CharPointer;
 import com.maddyhome.idea.vim.regexp.RegExp;
 import com.maddyhome.idea.vim.ui.ExPanelBorder;
@@ -423,7 +423,7 @@ public class ExEntryPanel extends JPanel {
   }
 
   private boolean isIncSearchEnabled() {
-    return globalOptions(injector).isSet(OptionConstants.incsearch);
+    return globalOptions(injector).isSet(Options.incsearch);
   }
 
   private boolean active;

@@ -17,6 +17,7 @@ import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestOptionConstants
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.impl.OptionTest
@@ -29,10 +30,10 @@ import java.util.*
 /**
  * @author Alex Plate
  */
-@TraceOptions(OptionConstants.clipboard)
+@TraceOptions(TestOptionConstants.clipboard)
 class PutViaIdeaTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
-  @OptionTest(VimOption(OptionConstants.clipboard, limitedValues = [OptionConstants.clipboard_ideaput]))
+  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = [OptionConstants.clipboard_ideaput]))
   fun `test simple insert via idea`() {
     val before = "${c}Lorem ipsum dolor sit amet,"
     configureByText(before)
@@ -45,7 +46,7 @@ class PutViaIdeaTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
-  @OptionTest(VimOption(OptionConstants.clipboard, limitedValues = [OptionConstants.clipboard_ideaput]))
+  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = [OptionConstants.clipboard_ideaput]))
   fun `test insert several times`() {
     val before = "${c}I found it in a legendary land"
     configureByText(before)
@@ -59,7 +60,7 @@ class PutViaIdeaTest : VimTestCase() {
     assertState(after)
   }
 
-  @OptionTest(VimOption(OptionConstants.clipboard, limitedValues = [OptionConstants.clipboard_ideaput]))
+  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = [OptionConstants.clipboard_ideaput]))
   fun `test insert doesn't clear existing elements`() {
     val randomUUID = UUID.randomUUID()
     val before = "${c}I found it in a legendary$randomUUID land"
@@ -84,7 +85,7 @@ class PutViaIdeaTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
-  @OptionTest(VimOption(OptionConstants.clipboard, limitedValues = [OptionConstants.clipboard_ideaput]))
+  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = [OptionConstants.clipboard_ideaput]))
   fun `test insert block with newline`() {
     val before = """
             Lorem Ipsum
@@ -118,7 +119,7 @@ class PutViaIdeaTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
-  @OptionTest(VimOption(OptionConstants.clipboard, limitedValues = [OptionConstants.clipboard_ideaput]))
+  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = [OptionConstants.clipboard_ideaput]))
   fun `test insert block w1ith newline`() {
     val before = """
             A Discovery

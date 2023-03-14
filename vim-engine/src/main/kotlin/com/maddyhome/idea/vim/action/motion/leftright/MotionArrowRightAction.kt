@@ -11,6 +11,7 @@ package com.maddyhome.idea.vim.action.motion.leftright
 import com.maddyhome.idea.vim.action.ComplicatedKeysAction
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
+import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.options
@@ -21,7 +22,6 @@ import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.NonShiftedSpecialKeyHandler
 import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.helper.usesVirtualSpace
-import com.maddyhome.idea.vim.options.OptionConstants
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
@@ -42,7 +42,7 @@ public class MotionArrowRightAction : NonShiftedSpecialKeyHandler(), Complicated
   ): Motion {
     val allowPastEnd = usesVirtualSpace || editor.isEndAllowed ||
       operatorArguments.isOperatorPending // because of `d<Right>` removing the last character
-    val allowWrap = injector.options(editor).hasValue(OptionConstants.whichwrap, ">")
+    val allowWrap = injector.options(editor).hasValue(Options.whichwrap, ">")
     return injector.motion.getHorizontalMotion(editor, caret, operatorArguments.count1, allowPastEnd, allowWrap)
   }
 }
