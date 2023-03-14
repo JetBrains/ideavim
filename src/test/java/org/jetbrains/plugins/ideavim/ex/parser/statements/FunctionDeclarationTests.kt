@@ -16,7 +16,7 @@ import com.maddyhome.idea.vim.vimscript.model.statements.ReturnStatement
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 import com.maddyhome.idea.vim.vimscript.parser.errors.IdeavimErrorListener
 import org.jetbrains.plugins.ideavim.VimTestCase
-import org.jetbrains.plugins.ideavim.combinate
+import org.jetbrains.plugins.ideavim.product
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -44,15 +44,15 @@ class FunctionDeclarationTests : VimTestCase() {
     val flagAlias = listOf("range", "abort", "dict", "closure")
 
     @JvmStatic
-    fun spaces5(): List<Arguments> = combinate(spaces, spaces, spaces, spaces, spaces)
+    fun spaces5(): List<Arguments> = product(spaces, spaces, spaces, spaces, spaces)
     @JvmStatic
-    fun spaces9(): List<Arguments> = combinate(spaces, spaces, spaces, spaces, spaces, spaces, spaces, spaces, spaces)
+    fun spaces9(): List<Arguments> = product(spaces, spaces, spaces, spaces, spaces, spaces, spaces, spaces, spaces)
     @JvmStatic
-    fun function(): List<Arguments> = combinate(functionAlias, endfunctionAlias, spaces, spaces)
+    fun function(): List<Arguments> = product(functionAlias, endfunctionAlias, spaces, spaces)
     @JvmStatic
-    fun flags(): List<Arguments> = combinate(flagAlias, spaces, spaces, spaces)
+    fun flags(): List<Arguments> = product(flagAlias, spaces, spaces, spaces)
     @JvmStatic
-    fun flagsFlags(): List<Arguments> = combinate(flagAlias, flagAlias, spaces, spaces, spaces)
+    fun flagsFlags(): List<Arguments> = product(flagAlias, flagAlias, spaces, spaces, spaces)
   }
 
   @ParameterizedTest

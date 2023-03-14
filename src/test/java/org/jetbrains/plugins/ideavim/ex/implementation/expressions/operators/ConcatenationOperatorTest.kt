@@ -11,7 +11,7 @@ package org.jetbrains.plugins.ideavim.ex.implementation.expressions.operators
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
-import org.jetbrains.plugins.ideavim.combinate
+import org.jetbrains.plugins.ideavim.product
 import org.jetbrains.plugins.ideavim.ex.evaluate
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -28,9 +28,9 @@ class ConcatenationOperatorTest {
     val spaces = listOf("", " ")
 
     @JvmStatic
-    fun operatorSpaces(): List<Arguments> = combinate(operator, spaces)
+    fun operatorSpaces(): List<Arguments> = product(operator, spaces)
     @JvmStatic
-    fun operatorSpacesSpaces(): List<Arguments> = combinate(operator, spaces, spaces)
+    fun operatorSpacesSpaces(): List<Arguments> = product(operator, spaces, spaces)
   }
 
   @ParameterizedTest

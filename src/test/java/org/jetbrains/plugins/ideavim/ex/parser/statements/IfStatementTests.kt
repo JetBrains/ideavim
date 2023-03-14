@@ -11,7 +11,7 @@ package org.jetbrains.plugins.ideavim.ex.parser.statements
 import com.maddyhome.idea.vim.vimscript.model.statements.IfStatement
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 import org.jetbrains.plugins.ideavim.VimTestCase
-import org.jetbrains.plugins.ideavim.combinate
+import org.jetbrains.plugins.ideavim.product
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
@@ -24,7 +24,7 @@ class IfStatementTests : VimTestCase() {
     @JvmStatic
     val values = listOf("", " ")
     @JvmStatic
-    fun arg4(): List<Arguments> = combinate(values, values, values, values)
+    fun arg4(): List<Arguments> = product(values, values, values, values)
   }
 
   @ParameterizedTest
