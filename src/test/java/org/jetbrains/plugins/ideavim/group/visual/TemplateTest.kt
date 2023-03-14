@@ -29,6 +29,7 @@ import com.maddyhome.idea.vim.helper.inSelectMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.listener.VimListenerManager
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestIjOptionConstants
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.assertDoesntChange
@@ -42,7 +43,7 @@ import org.junit.jupiter.api.TestInfo
 /**
  * @author Alex Plate
  */
-@TraceOptions(IjOptionConstants.idearefactormode)
+@TraceOptions(TestIjOptionConstants.idearefactormode)
 class TemplateTest : VimTestCase() {
 
   @BeforeEach
@@ -52,7 +53,7 @@ class TemplateTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
-  @OptionTest(VimOption(IjOptionConstants.idearefactormode, doesntAffectTest = true))
+  @OptionTest(VimOption(TestIjOptionConstants.idearefactormode, doesntAffectTest = true))
   fun `test simple rename`() {
     configureByJavaText(
       """
@@ -75,7 +76,7 @@ class TemplateTest : VimTestCase() {
     )
   }
 
-  @OptionTest(VimOption(IjOptionConstants.idearefactormode, doesntAffectTest = true))
+  @OptionTest(VimOption(TestIjOptionConstants.idearefactormode, doesntAffectTest = true))
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test type rename`() {
     configureByJavaText(
@@ -105,7 +106,7 @@ class TemplateTest : VimTestCase() {
     )
   }
 
-  @OptionTest(VimOption(IjOptionConstants.idearefactormode, doesntAffectTest = true))
+  @OptionTest(VimOption(TestIjOptionConstants.idearefactormode, doesntAffectTest = true))
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test selectmode without template`() {
     configureByJavaText(
@@ -125,7 +126,7 @@ class TemplateTest : VimTestCase() {
     typeText(injector.parser.parseKeys("<CR>"))
   }
 
-  @OptionTest(VimOption(IjOptionConstants.idearefactormode, doesntAffectTest = true))
+  @OptionTest(VimOption(TestIjOptionConstants.idearefactormode, doesntAffectTest = true))
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test prepend`() {
     configureByJavaText(
@@ -158,7 +159,7 @@ class TemplateTest : VimTestCase() {
     )
   }
 
-  @OptionTest(VimOption(IjOptionConstants.idearefactormode, doesntAffectTest = true))
+  @OptionTest(VimOption(TestIjOptionConstants.idearefactormode, doesntAffectTest = true))
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test motion right`() {
     configureByJavaText(
@@ -188,7 +189,7 @@ class TemplateTest : VimTestCase() {
     )
   }
 
-  @OptionTest(VimOption(IjOptionConstants.idearefactormode, doesntAffectTest = true))
+  @OptionTest(VimOption(TestIjOptionConstants.idearefactormode, doesntAffectTest = true))
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test motion left on age`() {
     configureByJavaText(
@@ -218,7 +219,7 @@ class TemplateTest : VimTestCase() {
     )
   }
 
-  @OptionTest(VimOption(IjOptionConstants.idearefactormode, doesntAffectTest = true))
+  @OptionTest(VimOption(TestIjOptionConstants.idearefactormode, doesntAffectTest = true))
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test motion right on age`() {
     configureByJavaText(
@@ -248,7 +249,7 @@ class TemplateTest : VimTestCase() {
     )
   }
 
-  @OptionTest(VimOption(IjOptionConstants.idearefactormode, doesntAffectTest = true))
+  @OptionTest(VimOption(TestIjOptionConstants.idearefactormode, doesntAffectTest = true))
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test escape`() {
     configureByJavaText(
@@ -278,7 +279,7 @@ class TemplateTest : VimTestCase() {
     )
   }
 
-  @OptionTest(VimOption(IjOptionConstants.idearefactormode, doesntAffectTest = true))
+  @OptionTest(VimOption(TestIjOptionConstants.idearefactormode, doesntAffectTest = true))
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test escape after typing`() {
     configureByJavaText(
@@ -309,7 +310,7 @@ class TemplateTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(IjOptionConstants.idearefactormode, limitedValues = [IjOptionConstants.idearefactormode_keep]),
+    VimOption(TestIjOptionConstants.idearefactormode, limitedValues = [IjOptionConstants.idearefactormode_keep]),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test template in normal mode`() {
@@ -327,7 +328,7 @@ class TemplateTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(IjOptionConstants.idearefactormode, limitedValues = [IjOptionConstants.idearefactormode_keep]),
+    VimOption(TestIjOptionConstants.idearefactormode, limitedValues = [IjOptionConstants.idearefactormode_keep]),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test save mode for insert mode`() {
@@ -346,7 +347,7 @@ class TemplateTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(IjOptionConstants.idearefactormode, limitedValues = [IjOptionConstants.idearefactormode_keep]),
+    VimOption(TestIjOptionConstants.idearefactormode, limitedValues = [IjOptionConstants.idearefactormode_keep]),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test save mode for visual mode`() {
@@ -365,7 +366,7 @@ class TemplateTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(IjOptionConstants.idearefactormode, limitedValues = [IjOptionConstants.idearefactormode_select]),
+    VimOption(TestIjOptionConstants.idearefactormode, limitedValues = [IjOptionConstants.idearefactormode_select]),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test template to select in normal mode`() {
@@ -383,7 +384,7 @@ class TemplateTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(IjOptionConstants.idearefactormode, limitedValues = [IjOptionConstants.idearefactormode_select]),
+    VimOption(TestIjOptionConstants.idearefactormode, limitedValues = [IjOptionConstants.idearefactormode_select]),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test template to select in insert mode`() {
@@ -402,7 +403,7 @@ class TemplateTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(IjOptionConstants.idearefactormode, limitedValues = [IjOptionConstants.idearefactormode_select]),
+    VimOption(TestIjOptionConstants.idearefactormode, limitedValues = [IjOptionConstants.idearefactormode_select]),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test template to select in visual mode`() {
@@ -421,7 +422,7 @@ class TemplateTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(IjOptionConstants.idearefactormode, limitedValues = [IjOptionConstants.idearefactormode_select]),
+    VimOption(TestIjOptionConstants.idearefactormode, limitedValues = [IjOptionConstants.idearefactormode_select]),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test template to select in select mode`() {
@@ -440,7 +441,7 @@ class TemplateTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(IjOptionConstants.idearefactormode, limitedValues = [IjOptionConstants.idearefactormode_visual]),
+    VimOption(TestIjOptionConstants.idearefactormode, limitedValues = [IjOptionConstants.idearefactormode_visual]),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test template to visual in normal mode`() {
@@ -458,7 +459,7 @@ class TemplateTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(IjOptionConstants.idearefactormode, limitedValues = [IjOptionConstants.idearefactormode_visual]),
+    VimOption(TestIjOptionConstants.idearefactormode, limitedValues = [IjOptionConstants.idearefactormode_visual]),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test template to visual in insert mode`() {
@@ -477,7 +478,7 @@ class TemplateTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(IjOptionConstants.idearefactormode, limitedValues = [IjOptionConstants.idearefactormode_visual]),
+    VimOption(TestIjOptionConstants.idearefactormode, limitedValues = [IjOptionConstants.idearefactormode_visual]),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test template to visual in visual mode`() {
@@ -496,7 +497,7 @@ class TemplateTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(IjOptionConstants.idearefactormode, limitedValues = [IjOptionConstants.idearefactormode_visual]),
+    VimOption(TestIjOptionConstants.idearefactormode, limitedValues = [IjOptionConstants.idearefactormode_visual]),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test template to visual in select mode`() {
@@ -515,7 +516,7 @@ class TemplateTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(IjOptionConstants.idearefactormode, limitedValues = [IjOptionConstants.idearefactormode_keep]),
+    VimOption(TestIjOptionConstants.idearefactormode, limitedValues = [IjOptionConstants.idearefactormode_keep]),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test template with multiple times`() {
@@ -538,7 +539,7 @@ class TemplateTest : VimTestCase() {
   }
 
   @OptionTest(
-    VimOption(IjOptionConstants.idearefactormode, limitedValues = [IjOptionConstants.idearefactormode_keep]),
+    VimOption(TestIjOptionConstants.idearefactormode, limitedValues = [IjOptionConstants.idearefactormode_keep]),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test template with lookup`() {

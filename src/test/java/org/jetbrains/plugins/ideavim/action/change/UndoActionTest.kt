@@ -9,7 +9,7 @@
 package org.jetbrains.plugins.ideavim.action.change
 
 import com.maddyhome.idea.vim.command.VimStateMachine
-import com.maddyhome.idea.vim.group.IjOptionConstants
+import com.maddyhome.idea.vim.group.IjOptions
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
@@ -72,7 +72,7 @@ class UndoActionTest : VimTestCase() {
 
   @Test
   fun `test cursor movements do not require additional undo`() {
-    if (!optionsNoEditor().isSet(IjOptionConstants.oldundo)) {
+    if (!optionsNoEditor().isSet(IjOptions.oldundo)) {
       val keys = listOf("a1<Esc>ea2<Esc>ea3<Esc>", "uu")
       val before = """
                 Lorem Ipsum

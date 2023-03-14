@@ -14,7 +14,7 @@ import com.intellij.openapi.project.ProjectManagerListener
 import com.intellij.openapi.startup.StartupActivity
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.group.IjOptionConstants
+import com.maddyhome.idea.vim.group.IjOptions
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.localEditors
 
@@ -42,7 +42,7 @@ internal class PluginStartup : StartupActivity.DumbAware/*, LightEditCompatible*
 // This is a temporal workaround for VIM-2487
 internal class PyNotebooksCloseWorkaround : ProjectManagerListener {
   override fun projectClosingBeforeSave(project: Project) {
-    if (injector.globalOptions().isSet(IjOptionConstants.closenotebooks)) {
+    if (injector.globalOptions().isSet(IjOptions.closenotebooks)) {
       localEditors().forEach { editor ->
         val virtualFile = EditorHelper.getVirtualFile(editor)
         if (virtualFile?.extension == "ipynb") {

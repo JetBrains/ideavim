@@ -37,3 +37,18 @@ class TestOptionConstants {
     const val ideatracetime = "ideatracetime"
   }
 }
+
+class TestIjOptionConstants {
+  @Suppress("SpellCheckingInspection")
+  companion object {
+
+    // IntelliJ implementation specific
+    const val ideajoin = "ideajoin"
+    const val ideamarks = "ideamarks"
+    const val idearefactormode = "idearefactormode"
+    const val ideavimsupport = "ideavimsupport"
+    const val octopushandler = "octopushandler"
+    const val trackactionids = "trackactionids"
+    const val unifyjumps = "unifyjumps"
+  }
+}

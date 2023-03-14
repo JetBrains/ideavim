@@ -12,7 +12,6 @@ import com.intellij.internal.statistic.beans.MetricEvent
 import com.intellij.internal.statistic.eventLog.EventLogGroup
 import com.intellij.internal.statistic.eventLog.events.BooleanEventField
 import com.intellij.internal.statistic.eventLog.events.EventFields
-import com.intellij.internal.statistic.eventLog.events.EventPair
 import com.intellij.internal.statistic.eventLog.events.StringEventField
 import com.intellij.internal.statistic.eventLog.events.StringListEventField
 import com.intellij.internal.statistic.eventLog.events.VarargEventId
@@ -21,6 +20,7 @@ import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.IjOptionConstants
+import com.maddyhome.idea.vim.group.IjOptions
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.StringOption
 import com.maddyhome.idea.vim.options.ToggleOption
@@ -34,44 +34,39 @@ internal class OptionsState : ApplicationUsagesCollector() {
 
     return setOf(
       OPTIONS.metric(
-        IDEAJOIN withOption IjOptionConstants.ideajoin,
-        IDEAMARKS withOption IjOptionConstants.ideamarks,
-        IDEAREFACTOR withOption IjOptionConstants.idearefactormode,
+        IDEAJOIN withOption IjOptions.ideajoin,
+        IDEAMARKS withOption IjOptions.ideamarks,
+        IDEAREFACTOR withOption IjOptions.idearefactormode,
         IDEAPUT with globalOptions.hasValue(Options.clipboard, OptionConstants.clipboard_ideaput),
-        IDEASTATUSICON withOption IjOptionConstants.ideastatusicon,
-        IDEAWRITE withOption IjOptionConstants.ideawrite,
+        IDEASTATUSICON withOption IjOptions.ideastatusicon,
+        IDEAWRITE withOption IjOptions.ideawrite,
         IDEASELECTION with globalOptions.hasValue(Options.selectmode, "ideaselection"),
-        IDEAVIMSUPPORT withOption IjOptionConstants.ideavimsupport,
+        IDEAVIMSUPPORT withOption IjOptions.ideavimsupport,
       ),
     )
   }
 
-  private infix fun BooleanEventField.withOption(name: String): EventPair<Boolean> {
-    val option = injector.optionGroup.getOption(name) as ToggleOption
-    return this.with(injector.globalOptions().isSet(option))
-  }
+  private infix fun BooleanEventField.withOption(option: ToggleOption) =
+    this.with(injector.globalOptions().isSet(option))
 
-  private infix fun StringEventField.withOption(name: String): EventPair<String?> {
-    val option = injector.optionGroup.getOption(name) as StringOption
-    return this.with(injector.globalOptions().getStringValue(option))
-  }
+  private infix fun StringEventField.withOption(option: StringOption) =
+    this.with(injector.globalOptions().getStringValue(option))
 
-  private infix fun StringListEventField.withOption(name: String): EventPair<List<String>> {
-    val option = injector.optionGroup.getOption(name) as StringOption
-    return this.with(injector.globalOptions().getStringListValues(option))
-  }
+  private infix fun StringListEventField.withOption(option: StringOption) =
+    this.with(injector.globalOptions().getStringListValues(option))
 
   companion object {
     private val GROUP = EventLogGroup("vim.options", 1)
 
-    private val IDEAJOIN = BooleanEventField(IjOptionConstants.ideajoin)
-    private val IDEAMARKS = BooleanEventField(IjOptionConstants.ideamarks)
-    private val IDEAREFACTOR = EventFields.String(IjOptionConstants.ideamarks, IjOptionConstants.ideaRefactorModeValues.toList())
+    private val IDEAJOIN = BooleanEventField(IjOptions.ideajoin.name)
+    private val IDEAMARKS = BooleanEventField(IjOptions.ideamarks.name)
+    // TODO: This looks like the wrong name!!
+    private val IDEAREFACTOR = EventFields.String(IjOptions.ideamarks.name, IjOptionConstants.ideaRefactorModeValues.toList())
     private val IDEAPUT = BooleanEventField("ideaput")
-    private val IDEASTATUSICON = EventFields.String(IjOptionConstants.ideastatusicon, IjOptionConstants.ideaStatusIconValues.toList())
-    private val IDEAWRITE = EventFields.String(IjOptionConstants.ideawrite, IjOptionConstants.ideaWriteValues.toList())
+    private val IDEASTATUSICON = EventFields.String(IjOptions.ideastatusicon.name, IjOptionConstants.ideaStatusIconValues.toList())
+    private val IDEAWRITE = EventFields.String(IjOptions.ideawrite.name, IjOptionConstants.ideaWriteValues.toList())
     private val IDEASELECTION = BooleanEventField("ideaselection")
-    private val IDEAVIMSUPPORT = EventFields.StringList(IjOptionConstants.ideavimsupport, IjOptionConstants.ideavimsupportValues.toList())
+    private val IDEAVIMSUPPORT = EventFields.StringList(IjOptions.ideavimsupport.name, IjOptionConstants.ideavimsupportValues.toList())
 
     private val OPTIONS: VarargEventId = GROUP.registerVarargEvent(
       "vim.options",

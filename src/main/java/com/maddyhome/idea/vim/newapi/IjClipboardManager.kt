@@ -28,7 +28,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
-import com.maddyhome.idea.vim.group.IjOptionConstants
+import com.maddyhome.idea.vim.group.IjOptions
 import java.awt.HeadlessException
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.Transferable
@@ -120,7 +120,7 @@ internal class IjClipboardManager : VimClipboardManager {
       "\n",
       transferableData as Collection<TextBlockTransferableData?>,
     )
-    if (injector.globalOptions().isSet(IjOptionConstants.ideacopypreprocess)) {
+    if (injector.globalOptions().isSet(IjOptions.ideacopypreprocess)) {
       for (processor in CopyPastePreProcessor.EP_NAME.extensionList) {
         val escapedText = processor.preprocessOnCopy(file, textRange.startOffsets, textRange.endOffsets, rawText)
         if (escapedText != null) {

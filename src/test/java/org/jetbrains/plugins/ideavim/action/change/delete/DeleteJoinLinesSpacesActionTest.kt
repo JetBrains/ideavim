@@ -9,8 +9,8 @@
 package org.jetbrains.plugins.ideavim.action.change.delete
 
 import com.maddyhome.idea.vim.command.VimStateMachine
-import com.maddyhome.idea.vim.group.IjOptionConstants
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestIjOptionConstants
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.impl.OptionTest
@@ -19,7 +19,7 @@ import org.jetbrains.plugins.ideavim.impl.VimOption
 
 @TraceOptions
 class DeleteJoinLinesSpacesActionTest : VimTestCase() {
-  @OptionTest(VimOption(IjOptionConstants.ideajoin))
+  @OptionTest(VimOption(TestIjOptionConstants.ideajoin))
   fun `test join with idea`() {
     doTest(
       "J",
@@ -43,7 +43,7 @@ class DeleteJoinLinesSpacesActionTest : VimTestCase() {
     )
   }
 
-  @OptionTest(VimOption(IjOptionConstants.ideajoin))
+  @OptionTest(VimOption(TestIjOptionConstants.ideajoin))
   fun `test join with idea with count`() {
     doTest(
       "3J",
@@ -67,7 +67,7 @@ class DeleteJoinLinesSpacesActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(VimOption(IjOptionConstants.ideajoin))
+  @OptionTest(VimOption(TestIjOptionConstants.ideajoin))
   fun `test join with idea with large count`() {
     doTest(
       "10J",

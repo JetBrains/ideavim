@@ -18,7 +18,7 @@ import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.key
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.group.IjOptionConstants
+import com.maddyhome.idea.vim.group.IjOptions
 import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.newapi.runFromVimKey
@@ -134,5 +134,5 @@ internal fun isOctopusEnabled(s: KeyStroke, editor: Editor): Boolean {
  */
 internal val enableOctopus: Boolean
   get() {
-    return injector.globalOptions().isSet(IjOptionConstants.octopushandler)
+    return injector.globalOptions().isSet(IjOptions.octopushandler)
   }
