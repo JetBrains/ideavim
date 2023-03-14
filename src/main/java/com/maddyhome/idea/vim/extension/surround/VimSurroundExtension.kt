@@ -15,7 +15,6 @@ import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.endsWithNewLine
 import com.maddyhome.idea.vim.api.getLeadingCharacterOffset
-import com.maddyhome.idea.vim.api.getLineEndOffset
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.setChangeMarks
 import com.maddyhome.idea.vim.command.MappingMode
@@ -162,18 +161,16 @@ internal class VimSurroundExtension : VimExtension {
 
         // Add info about surrounding's inner text and location
         surroundings.forEach {
+          // Delete surrounding chars if necessary
+          val currentSurrounding = getCurrentSurrounding(it.caret, pick(charFrom))
+          if (currentSurrounding != null) {
+            it.caret.moveToOffset(currentSurrounding.startOffset)
+            editor.deleteString(currentSurrounding)
+          }
+
           val registerValue = getRegisterForCaret(REGISTER, it.caret)
           val innerValue = if (registerValue.isNullOrEmpty()) null else registerValue
           it.innerText = innerValue
-
-          val lineEndOffset = editor.getLineEndOffset(it.caret.getLine().line, false)
-          if (lineEndOffset == it.caret.offset.point) {
-            it.isLineEnd = true
-          }
-        }
-
-        if (charFrom != 'w') {
-          perform("da" + pick(charFrom), editor.ij) // Remove surrounding
         }
 
         surroundings.forEach {
@@ -188,7 +185,7 @@ internal class VimSurroundExtension : VimExtension {
             val innerValue = injector.parser.toPrintableString(surrounding.innerText!!)
             val text = newSurround?.let { it.first + innerValue + it.second } ?: innerValue
             val textData = PutData.TextData(text, SelectionType.CHARACTER_WISE, emptyList())
-            val putData = PutData(textData, null, 1, insertTextBeforeCaret = !surrounding.isLineEnd, rawIndent = true, caretAfterInsertedText = false)
+            val putData = PutData(textData, null, 1, insertTextBeforeCaret = true, rawIndent = true, caretAfterInsertedText = false)
 
             surrounding.caret to putData
           }.forEach {
@@ -212,10 +209,34 @@ internal class VimSurroundExtension : VimExtension {
         'r' -> ']'
         else -> charFrom
       }
+
+      private fun getCurrentSurrounding(caret: VimCaret, char: Char): TextRange? {
+        val editor = caret.editor
+        val searchHelper = injector.searchHelper
+        return when (char) {
+          't' -> searchHelper.findBlockTagRange(editor, caret, 1, true)
+          '(', ')', 'b' -> searchHelper.findBlockRange(editor, caret, '(', 1,true)
+          '[', ']' -> searchHelper.findBlockRange(editor, caret, '[', 1,true)
+          '{', '}', 'B' -> searchHelper.findBlockRange(editor, caret, '{', 1,true)
+          '<', '>' -> searchHelper.findBlockRange(editor, caret, '<', 1,true)
+          '`', '\'', '"' -> {
+            val caretOffset = caret.offset.point
+            val text = editor.text()
+            if (text.getOrNull(caretOffset - 1) == char && text.getOrNull(caretOffset) == char) {
+              TextRange(caretOffset - 1, caretOffset + 1)
+            } else {
+              searchHelper.findBlockQuoteInLineRange(editor, caret, char, true)
+            }
+          }
+          'p' -> searchHelper.findParagraphRange(editor, caret, 1, true)
+          's' -> searchHelper.findSentenceRange(editor, caret, 1, true)
+          else -> null
+        }
+      }
     }
   }
 
-  private data class SurroundingInfo(val caret: VimCaret, var innerText: List<KeyStroke>?, val oldRegisterContent: List<KeyStroke>?, var isLineEnd: Boolean = false) {
+  private data class SurroundingInfo(val caret: VimCaret, var innerText: List<KeyStroke>?, val oldRegisterContent: List<KeyStroke>?) {
     fun restoreRegister() {
       setRegisterForCaret(REGISTER, caret, oldRegisterContent)
     }

@@ -572,6 +572,7 @@ class VimSurroundExtensionTest : VimTestCase() {
     doTest(listOf("ds("), before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun `test surround line`() {
     val before = """
                   ${c}abc  
@@ -585,9 +586,32 @@ class VimSurroundExtensionTest : VimTestCase() {
     doTest(listOf("yss\""), before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
+  @Test
   fun `test csw`() {
     val before = "var1, va${c}r2, var3"
     val after = "var1, ${c}\"var2\", var3"
     doTest(listOf("csw\""), before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+  }
+
+  @Test
+  fun `test surround does not remove unnecessary chars`() {
+    val before = """
+      <a id="languageChanger" class="shababMallFont" href="?lang={{ App::getLocale() == "en" ? "a${c}r" : "en" }}">
+    """
+    val after = """
+      <a id="languageChanger" class="shababMallFont" href="?lang={{ App::getLocale() == "en" ? ${c}'ar' : "en" }}">
+    """
+    doTest(listOf("cs\"'"), before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
+  }
+
+  @Test
+  fun `test surround does not remove unnecessary chars 2`() {
+    val before = """
+      "Hello "H${c}I test test" extra information"
+    """
+    val after = """
+      "Hello (HI test test) extra information"
+    """
+    doTest(listOf("cs\")"), before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 }
