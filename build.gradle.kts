@@ -138,16 +138,19 @@ tasks.register<Test>("testWithNeovim") {
     exclude("/ui/**")
     exclude("**/longrunning/**")
     exclude("**/propertybased/**")
+    useJUnitPlatform()
 }
 
 tasks.register<Test>("testPropertyBased") {
     group = "verification"
 //    include("**/propertybased/**")
+    useJUnitPlatform()
 }
 
 tasks.register<Test>("testLongRunning") {
     group = "verification"
 //    include("**/longrunning/**")
+    useJUnitPlatform()
 }
 
 tasks {
@@ -354,6 +357,7 @@ tasks {
 
 tasks.register<Test>("testUi") {
     group = "verification"
+    useJUnitPlatform()
     include("/ui/**")
 }
 
