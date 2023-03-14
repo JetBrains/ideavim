@@ -54,6 +54,7 @@ usual beta standards.
 * [VIM-1551](https://youtrack.jetbrains.com/issue/VIM-1551) Surround: line surround not working
 * [VIM-1746](https://youtrack.jetbrains.com/issue/VIM-1746) IdeaVim Surround removes unwanted characters
 * [VIM-1750](https://youtrack.jetbrains.com/issue/VIM-1750) Surround with tag wrong position
+* [VIM-2286](https://youtrack.jetbrains.com/issue/VIM-2286) Set surround not working for me as expected
 
 ### Merged PRs:
 * [589](https://github.com/JetBrains/ideavim/pull/589) by [Matt Ellis](https://github.com/citizenmatt): Refactor option usage and introduce accessor API
