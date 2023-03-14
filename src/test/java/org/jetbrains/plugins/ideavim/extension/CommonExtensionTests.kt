@@ -31,11 +31,14 @@ import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.options.OptionScope
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class OpMappingTest : VimTestCase() {
   private var initialized = false
@@ -221,22 +224,22 @@ class PlugExtensionsTest : VimTestCase() {
   fun `test enable via plug`() {
     injector.vimscriptExecutor.execute("Plug 'MyTest'", false)
 
-    kotlin.test.assertTrue(extension.ext.initialized)
+    assertTrue(extension.ext.initialized)
   }
 
   @Test
   fun `test enable via plugin`() {
     injector.vimscriptExecutor.execute("Plugin 'MyTest'", false)
 
-    kotlin.test.assertTrue(extension.ext.initialized)
+    assertTrue(extension.ext.initialized)
   }
 
   @Test
   fun `test enable via plug and disable via set`() {
     injector.vimscriptExecutor.execute("Plug 'MyTest'")
     injector.vimscriptExecutor.execute("set noTestExtension")
-    kotlin.test.assertTrue(extension.ext.initialized)
-    kotlin.test.assertTrue(extension.ext.disposed)
+    assertTrue(extension.ext.initialized)
+    assertTrue(extension.ext.disposed)
   }
 }
 
@@ -293,16 +296,26 @@ class PlugMissingKeysTest : VimTestCase() {
 
   @Test
   fun `test packadd`() {
-    kotlin.test.assertFalse(optionsNoEditor().isSet("matchit"))
+    assertOptionUnset("matchit")
     executeLikeVimrc("packadd matchit")
-    kotlin.test.assertTrue(optionsNoEditor().isSet("matchit"))
+    assertOptionSet("matchit")
   }
 
   @Test
   fun `test packadd ex`() {
-    kotlin.test.assertFalse(optionsNoEditor().isSet("matchit"))
+    assertOptionUnset("matchit")
     executeLikeVimrc("packadd! matchit")
-    kotlin.test.assertTrue(optionsNoEditor().isSet("matchit"))
+    assertOptionSet("matchit")
+  }
+
+  private fun assertOptionSet(name: String) {
+    val option = injector.optionGroup.getOption(name)!!
+    assertTrue(injector.optionGroup.getOptionValue(option, OptionScope.GLOBAL).asBoolean())
+  }
+
+  private fun assertOptionUnset(name: String) {
+    val option = injector.optionGroup.getOption(name)!!
+    assertFalse(injector.optionGroup.getOptionValue(option, OptionScope.GLOBAL).asBoolean())
   }
 
   private fun executeLikeVimrc(vararg text: String) {

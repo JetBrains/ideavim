@@ -52,25 +52,4 @@ public class OptionValueAccessor(private val optionGroup: VimOptionGroup, public
    * The option is most likely a toggle option, but this is not required.
    */
   public fun isSet(option: ToggleOption): Boolean = getValue(option).asBoolean()
-
-  // TODO: Temporary during migration away from string constants
-  public fun isSet(name: String): Boolean {
-    val option = optionGroup.getOption(name) as ToggleOption
-    return isSet(option)
-  }
-
-  public fun hasValue(name: String, value: String): Boolean {
-    val option = optionGroup.getOption(name) as StringOption
-    return hasValue(option, value)
-  }
-
-  public fun getStringListValues(name: String): List<String> {
-    val option = optionGroup.getOption(name) as StringOption
-    return getStringListValues(option)
-  }
-
-  public fun getIntValue(name: String): Int {
-    val option = optionGroup.getOption(name) as NumberOption
-    return getIntValue(option)
-  }
 }
