@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.extension.nerdtree
 
 import com.intellij.ide.projectView.ProjectView
+import com.intellij.ide.projectView.impl.AbstractProjectViewPane
 import com.intellij.ide.projectView.impl.ProjectViewImpl
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.ActionUpdateThread
@@ -170,7 +171,9 @@ internal class NerdTree : VimExtension {
       val dispatcher = NerdDispatcher.getInstance(project)
       if (dispatcher.speedSearchListenerInstalled) return
 
-      val tree = ProjectView.getInstance(project).currentProjectViewPane.tree ?: return
+      // I specify nullability explicitly as we've got a lot of exceptions saying this property is null
+      val currentProjectViewPane: AbstractProjectViewPane? = ProjectView.getInstance(project).currentProjectViewPane
+      val tree = currentProjectViewPane?.tree ?: return
       val supply = SpeedSearchSupply.getSupply(tree, true) ?: return
 
       // NB: Here might be some issues with concurrency, but it's not really bad, I think
