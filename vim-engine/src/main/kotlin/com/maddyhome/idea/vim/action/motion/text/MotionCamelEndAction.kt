@@ -20,7 +20,7 @@ import com.maddyhome.idea.vim.handler.toMotionOrError
 
 public class MotionCamelEndLeftAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.INCLUSIVE
-  
+
   override fun getOffset(
     editor: VimEditor,
     caret: ImmutableVimCaret,
@@ -35,7 +35,7 @@ public class MotionCamelEndLeftAction : MotionActionHandler.ForEachCaret() {
 
 public class MotionCamelEndRightAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.INCLUSIVE
-  
+
   override fun getOffset(
     editor: VimEditor,
     caret: ImmutableVimCaret,

@@ -29,8 +29,10 @@ class LambdaTests {
 
     @JvmStatic
     fun arg3(): List<Arguments> = product(values, values, values)
+
     @JvmStatic
     fun arg4(): List<Arguments> = product(values, values, values, values)
+
     @JvmStatic
     fun arg6(): List<Arguments> = product(values, values, values, values, values, values)
   }

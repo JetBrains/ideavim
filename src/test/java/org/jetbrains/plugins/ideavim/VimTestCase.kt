@@ -483,7 +483,7 @@ abstract class VimTestCase {
       injector.parser.parseKeys(from),
       MappingOwner.IdeaVim.System,
       injector.parser.parseKeys(to),
-      recursive
+      recursive,
     )
   }
 
@@ -574,7 +574,7 @@ abstract class VimTestCase {
         kotlin.test.assertEquals(shape, editor.caretModel.primaryCaret.visualAttributes.shape)
         kotlin.test.assertEquals(
           attributes.thickness / 100.0F,
-          editor.caretModel.primaryCaret.visualAttributes.thickness
+          editor.caretModel.primaryCaret.visualAttributes.thickness,
         )
         editor.caretModel.primaryCaret.visualAttributes.color?.let {
           kotlin.test.assertEquals(colour, it)
@@ -602,7 +602,7 @@ abstract class VimTestCase {
       subModeAfter,
       fileType,
       fileName,
-      afterEditorInitialized
+      afterEditorInitialized,
     )
   }
 
@@ -649,7 +649,7 @@ abstract class VimTestCase {
   protected fun addInlay(
     offset: Int,
     relatesToPrecedingText: Boolean,
-    @Suppress("SameParameterValue") widthInColumns: Int
+    @Suppress("SameParameterValue") widthInColumns: Int,
   ): Inlay<*> {
     val widthInPixels = (EditorHelper.getPlainSpaceWidthFloat(fixture.editor) * widthInColumns).roundToInt()
     return EditorTestUtil.addInlay(fixture.editor, offset, relatesToPrecedingText, widthInPixels)
@@ -662,7 +662,7 @@ abstract class VimTestCase {
   protected fun addBlockInlay(
     offset: Int,
     @Suppress("SameParameterValue") showAbove: Boolean,
-    heightInRows: Int
+    heightInRows: Int,
   ): Inlay<*> {
     val widthInColumns = 10 // Arbitrary width. We don't care.
     val widthInPixels = (EditorHelper.getPlainSpaceWidthFloat(fixture.editor) * widthInColumns).roundToInt()

@@ -297,7 +297,7 @@ internal class VimSurroundExtension : VimExtension {
       ']' to ("[" to "]"),
       'a' to ("<" to ">"),
       '>' to ("<" to ">"),
-      's' to (" " to "")
+      's' to (" " to ""),
     )
 
     private fun getSurroundPair(c: Char): Pair<String, String>? = if (c in SURROUND_PAIRS) {
@@ -342,9 +342,11 @@ internal class VimSurroundExtension : VimExtension {
       val keyChar = key.keyChar
       return if (keyChar == KeyEvent.CHAR_UNDEFINED || keyChar.code == KeyEvent.VK_ESCAPE) {
         0.toChar()
-      } else keyChar
+      } else {
+        keyChar
+      }
     }
-    
+
     private fun performSurround(pair: Pair<String, String>, range: TextRange, caret: VimCaret, tagsOnNewLines: Boolean = false) {
       runWriteAction {
         val editor = caret.editor
@@ -370,4 +372,3 @@ internal class VimSurroundExtension : VimExtension {
     }
   }
 }
-

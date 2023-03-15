@@ -66,7 +66,7 @@ class VimHighlightedYankTest : VimTestCase() {
 
     kotlin.test.assertEquals(
       "highlightedyank: Invalid value of g:highlightedyank_highlight_duration -- For input string: \"500.15\"",
-      VimPlugin.getMessage()
+      VimPlugin.getMessage(),
     )
   }
 
@@ -89,7 +89,7 @@ class VimHighlightedYankTest : VimTestCase() {
 
       kotlin.test.assertTrue(
         VimPlugin.getMessage().contains("highlightedyank: Invalid value of g:highlightedyank_highlight_color"),
-        color
+        color,
       )
     }
   }
@@ -113,7 +113,7 @@ class VimHighlightedYankTest : VimTestCase() {
       codeWithMultipleCurors,
       codeWithMultipleCurors,
       VimStateMachine.Mode.COMMAND,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
 
     val highlighters = fixture.editor.markupModel.allHighlighters
@@ -130,7 +130,7 @@ class VimHighlightedYankTest : VimTestCase() {
       codeWithMultipleCurors,
       codeWithMultipleCurors,
       VimStateMachine.Mode.INSERT,
-      VimStateMachine.SubMode.NONE
+      VimStateMachine.SubMode.NONE,
     )
 
     assertAllHighlightersCount(0)

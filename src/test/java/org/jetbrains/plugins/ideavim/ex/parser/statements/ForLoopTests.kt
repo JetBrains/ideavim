@@ -16,8 +16,8 @@ import com.maddyhome.idea.vim.vimscript.model.statements.loops.ForLoop
 import com.maddyhome.idea.vim.vimscript.model.statements.loops.ForLoopWithList
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 import org.jetbrains.plugins.ideavim.VimTestCase
-import org.jetbrains.plugins.ideavim.product
 import org.jetbrains.plugins.ideavim.ex.evaluate
+import org.jetbrains.plugins.ideavim.product
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
@@ -29,8 +29,10 @@ class ForLoopTests : VimTestCase() {
   companion object {
     @JvmStatic
     val values = listOf("", " ")
+
     @JvmStatic
     fun arg3(): List<Arguments> = product(values, values, values)
+
     @JvmStatic
     fun arg2(): List<Arguments> = product(values, values)
   }

@@ -36,7 +36,7 @@ class InsertRegisterTest : VimTestCase() {
             hard by the torrent of a mountain pass.
             I found it in a legendary land
             all rocks and lavender and tufted grass,
-            ${c}
+            $c
     """.trimIndent()
     doTest(keys, before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }

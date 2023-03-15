@@ -45,8 +45,8 @@ class AnonymousFunctionTest : VimTestCase() {
            function s:dict.pi() |
              return 3.1415 |
            endfunction
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     typeText(commandToKeys("echo s:dict.pi()"))
     assertExOutput("3.1415\n")

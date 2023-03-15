@@ -128,7 +128,10 @@ class ChangeActionTest : VimTestCase() {
   fun testInsertSingleCommandAndNewLineInserting8() {
     doTest(
       listOf("i", "<C-O>", "gh", "d"),
-      "12${c}345", "12d${c}45", VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE
+      "12${c}345",
+      "12d${c}45",
+      VimStateMachine.Mode.INSERT,
+      VimStateMachine.SubMode.NONE,
     )
   }
 
@@ -1046,7 +1049,7 @@ and some text after""",
       """.trimIndent(),
     )
 
-   fixture.editor.foldingModel.runBatchFoldingOperation {
+    fixture.editor.foldingModel.runBatchFoldingOperation {
       CodeFoldingManager.getInstance(fixture.project).updateFoldRegions(fixture.editor)
       FoldingUtil.findFoldRegionStartingAtLine(fixture.editor, 0)!!.isExpanded = false
     }

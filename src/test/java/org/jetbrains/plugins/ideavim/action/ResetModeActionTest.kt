@@ -130,7 +130,7 @@ class ResetModeActionTest : VimTestCase() {
         injector.parser.parseKeys("<C-D>"),
         owner,
         injector.parser.parseKeys("<Esc>"),
-        false
+        false,
       )
 
     val keys = listOf("d", "<C-D>", "dw")

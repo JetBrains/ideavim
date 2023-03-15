@@ -333,7 +333,7 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
   private fun assertCaretVisualAttributes(
     caret: Caret,
     expectedShape: CaretVisualAttributes.Shape,
-    expectedThickness: Float
+    expectedThickness: Float,
   ) {
     kotlin.test.assertEquals(expectedShape, caret.visualAttributes.shape)
     kotlin.test.assertEquals(expectedThickness, caret.visualAttributes.thickness)

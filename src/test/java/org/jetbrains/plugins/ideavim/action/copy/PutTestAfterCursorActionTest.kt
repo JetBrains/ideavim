@@ -128,7 +128,7 @@ class PutTestAfterCursorActionTest : VimTestCase() {
       vimEditor.primaryCaret(),
       before rangeOf "I found it in a legendary land\n",
       SelectionType.LINE_WISE,
-      false
+      false,
     )
     typeText(injector.parser.parseKeys("p"))
     val after = """

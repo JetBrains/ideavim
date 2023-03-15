@@ -251,7 +251,7 @@ fun <T, S, V> Collection<T>.cartesianProduct(other: Iterable<S>, transformer: (f
 // Cartesian product of multiple lists. Useful for making parameterized tests with all available combinations.
 // Can be used instead of @Theory from JUnit 4
 fun product(vararg elements: List<String>): List<Arguments> {
-  val res =  elements.fold(listOf<List<String>>(emptyList())) { acc, items ->
+  val res = elements.fold(listOf<List<String>>(emptyList())) { acc, items ->
     acc.cartesianProduct(items) { accItems, item ->
       accItems + item
     }

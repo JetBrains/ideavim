@@ -32,7 +32,7 @@ class YankLinesCommandTest : VimTestCase() {
          |all rocks and lavender and tufted grass,
          |
       """.trimMargin(),
-      yanked
+      yanked,
     )
   }
 
@@ -60,7 +60,7 @@ class YankLinesCommandTest : VimTestCase() {
                 h
                 
       """.trimIndent(),
-      yanked
+      yanked,
     )
   }
 }

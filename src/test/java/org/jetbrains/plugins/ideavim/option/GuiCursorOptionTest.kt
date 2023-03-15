@@ -45,8 +45,9 @@ class GuiCursorOptionTest : VimTestCase() {
       enumSetOf<GuiCursorMode>(
         GuiCursorMode.NORMAL,
         GuiCursorMode.VISUAL,
-        GuiCursorMode.CMD_LINE
-      ), values[0].modes
+        GuiCursorMode.CMD_LINE,
+      ),
+      values[0].modes,
     )
     kotlin.test.assertEquals(GuiCursorType.BLOCK, values[0].type)
     kotlin.test.assertEquals("Cursor", values[0].highlightGroup)
@@ -66,7 +67,7 @@ class GuiCursorOptionTest : VimTestCase() {
 
     kotlin.test.assertEquals(
       enumSetOf<GuiCursorMode>(GuiCursorMode.INSERT, GuiCursorMode.CMD_LINE_INSERT),
-      values[3].modes
+      values[3].modes,
     )
     kotlin.test.assertEquals(GuiCursorType.VER, values[3].type)
     kotlin.test.assertEquals(25, values[3].thickness)
@@ -75,7 +76,7 @@ class GuiCursorOptionTest : VimTestCase() {
 
     kotlin.test.assertEquals(
       enumSetOf<GuiCursorMode>(GuiCursorMode.REPLACE, GuiCursorMode.CMD_LINE_REPLACE),
-      values[4].modes
+      values[4].modes,
     )
     kotlin.test.assertEquals(GuiCursorType.HOR, values[4].type)
     kotlin.test.assertEquals(20, values[4].thickness)

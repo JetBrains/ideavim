@@ -322,8 +322,8 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
     VimTestOption(
       IjOptionConstants.idearefactormode,
       OptionValueType.STRING,
-      IjOptionConstants.idearefactormode_keep
-    )
+      IjOptionConstants.idearefactormode_keep,
+    ),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   @Test
@@ -345,8 +345,8 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
     VimTestOption(
       IjOptionConstants.idearefactormode,
       OptionValueType.STRING,
-      IjOptionConstants.idearefactormode_keep
-    )
+      IjOptionConstants.idearefactormode_keep,
+    ),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   @Test
@@ -369,8 +369,8 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
     VimTestOption(
       IjOptionConstants.idearefactormode,
       OptionValueType.STRING,
-      IjOptionConstants.idearefactormode_keep
-    )
+      IjOptionConstants.idearefactormode_keep,
+    ),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   @Test
@@ -393,8 +393,8 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
     VimTestOption(
       IjOptionConstants.idearefactormode,
       OptionValueType.STRING,
-      IjOptionConstants.idearefactormode_select
-    )
+      IjOptionConstants.idearefactormode_select,
+    ),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   @Test
@@ -416,8 +416,8 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
     VimTestOption(
       IjOptionConstants.idearefactormode,
       OptionValueType.STRING,
-      IjOptionConstants.idearefactormode_select
-    )
+      IjOptionConstants.idearefactormode_select,
+    ),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   @Test
@@ -440,8 +440,8 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
     VimTestOption(
       IjOptionConstants.idearefactormode,
       OptionValueType.STRING,
-      IjOptionConstants.idearefactormode_select
-    )
+      IjOptionConstants.idearefactormode_select,
+    ),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   @Test
@@ -464,8 +464,8 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
     VimTestOption(
       IjOptionConstants.idearefactormode,
       OptionValueType.STRING,
-      IjOptionConstants.idearefactormode_select
-    )
+      IjOptionConstants.idearefactormode_select,
+    ),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   @Test
@@ -488,8 +488,8 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
     VimTestOption(
       IjOptionConstants.idearefactormode,
       OptionValueType.STRING,
-      IjOptionConstants.idearefactormode_visual
-    )
+      IjOptionConstants.idearefactormode_visual,
+    ),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   @Test
@@ -511,8 +511,8 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
     VimTestOption(
       IjOptionConstants.idearefactormode,
       OptionValueType.STRING,
-      IjOptionConstants.idearefactormode_visual
-    )
+      IjOptionConstants.idearefactormode_visual,
+    ),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   @Test
@@ -535,8 +535,8 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
     VimTestOption(
       IjOptionConstants.idearefactormode,
       OptionValueType.STRING,
-      IjOptionConstants.idearefactormode_visual
-    )
+      IjOptionConstants.idearefactormode_visual,
+    ),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   @Test
@@ -559,8 +559,8 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
     VimTestOption(
       IjOptionConstants.idearefactormode,
       OptionValueType.STRING,
-      IjOptionConstants.idearefactormode_visual
-    )
+      IjOptionConstants.idearefactormode_visual,
+    ),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   @Test
@@ -583,8 +583,8 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
     VimTestOption(
       IjOptionConstants.idearefactormode,
       OptionValueType.STRING,
-      IjOptionConstants.idearefactormode_keep
-    )
+      IjOptionConstants.idearefactormode_keep,
+    ),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   @Test
@@ -611,8 +611,8 @@ class TemplateTest : VimOptionTestCase(IjOptionConstants.idearefactormode) {
     VimTestOption(
       IjOptionConstants.idearefactormode,
       OptionValueType.STRING,
-      IjOptionConstants.idearefactormode_keep
-    )
+      IjOptionConstants.idearefactormode_keep,
+    ),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   @Test

@@ -175,7 +175,7 @@ class YankVisualActionTest : VimTestCase() {
     val registers = editor.carets().map { it.registerStorage.getRegister(lastRegister)?.rawText }
     kotlin.test.assertEquals(
       listOf("all rocks and lavender and tufted grass,\n", "hard by the torrent of a mountain pass.\n"),
-      registers
+      registers,
     )
   }
 

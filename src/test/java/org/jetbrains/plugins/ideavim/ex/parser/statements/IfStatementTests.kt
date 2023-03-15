@@ -23,6 +23,7 @@ class IfStatementTests : VimTestCase() {
   companion object {
     @JvmStatic
     val values = listOf("", " ")
+
     @JvmStatic
     fun arg4(): List<Arguments> = product(values, values, values, values)
   }

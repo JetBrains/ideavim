@@ -31,7 +31,7 @@ class InfoFileTest : VimTestCase() {
     }
     kotlin.test.assertTrue(
       notPresentedActions.isEmpty(),
-      notPresentedActions.joinToString(prefix = "Not presented actions in info file: \n", separator = "\n")
+      notPresentedActions.joinToString(prefix = "Not presented actions in info file: \n", separator = "\n"),
     )
   }
 

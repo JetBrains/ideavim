@@ -81,7 +81,7 @@ class MultipleCaretsTest : VimTestCase() {
     configureByText(before)
     typeText(parseKeys("vj"))
     typeText(commandToKeys("j"))
-    val after = "qwe\n" + "rty${c} asd\n" + "fgh${c} zxc\n" + "vbn\n"
+    val after = "qwe\n" + "rty$c asd\n" + "fgh$c zxc\n" + "vbn\n"
     fixture.checkResult(after)
   }
 

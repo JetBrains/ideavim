@@ -27,8 +27,8 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 import org.jetbrains.plugins.ideavim.VimTestCase
-import org.jetbrains.plugins.ideavim.product
 import org.jetbrains.plugins.ideavim.ex.evaluate
+import org.jetbrains.plugins.ideavim.product
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -41,8 +41,10 @@ class CommandTests : VimTestCase() {
   companion object {
     @JvmStatic
     val values = listOf("", " ")
+
     @JvmStatic
     fun arg1(): List<Arguments> = product(values)
+
     @JvmStatic
     fun arg3(): List<Arguments> = product(values, values, values)
   }

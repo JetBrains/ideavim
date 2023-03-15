@@ -632,7 +632,7 @@ class ExEntryTest : VimTestCase() {
   private fun typeExInput(text: String) {
     kotlin.test.assertTrue(
       text.startsWith(":") || text.startsWith('/') || text.startsWith('?'),
-      "Ex command must start with ':', '/' or '?'"
+      "Ex command must start with ':', '/' or '?'",
     )
 
     val keys = mutableListOf<KeyStroke>()

@@ -30,7 +30,7 @@ class BoundedStringListOptionTest : VimTestCase() {
       optionName,
       defaultValue,
       true,
-      setOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
+      setOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"),
     )
     injector.optionGroup.addOption(option)
     configureByText("\n")

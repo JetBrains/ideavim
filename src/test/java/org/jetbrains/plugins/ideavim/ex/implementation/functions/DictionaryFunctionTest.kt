@@ -87,8 +87,8 @@ class DictionaryFunctionTest : VimTestCase() {
            function Print() dict |
              echo self.name |
            endfunction
-        """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     typeText(commandToKeys("let dict = {'name': 'dict', 'print': function('Print')}"))
     typeText(commandToKeys("echo dict.print"))

@@ -52,34 +52,42 @@ class GuardedBlocksTest : VimTestCase() {
   @Test
   @Disabled
   fun `test delete line with block and longer start`() {
-    configureAndGuard("""
+    configureAndGuard(
+      """
       [1234567890
       1]23${c}4567890[
       1234567890]
-      """.trimIndent())
+      """.trimIndent(),
+    )
     typeText(injector.parser.parseKeys("dd"))
-    assertState("""
+    assertState(
+      """
       1234567890
       ${c}1
       1234567890
-    """.trimIndent())
+      """.trimIndent(),
+    )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.GUARDED_BLOCKS)
   @Test
   @Disabled
   fun `test delete line with block and shorter end`() {
-    configureAndGuard("""
+    configureAndGuard(
+      """
       [1234567890
       ]123${c}456789[0
       1234567890]
-      """.trimIndent())
+      """.trimIndent(),
+    )
     typeText(injector.parser.parseKeys("dd"))
-    assertState("""
+    assertState(
+      """
       1234567890
       ${c}0
       1234567890
-    """.trimIndent())
+      """.trimIndent(),
+    )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.GUARDED_BLOCKS)
@@ -194,17 +202,21 @@ class GuardedBlocksTest : VimTestCase() {
   @Test
   @Disabled
   fun `test change line with block with longer start`() {
-    configureAndGuard("""
+    configureAndGuard(
+      """
       [1234567890
       1]23${c}4567890[
       1234567890]
-      """.trimIndent())
+      """.trimIndent(),
+    )
     typeText(injector.parser.parseKeys("cc"))
-    assertState("""
+    assertState(
+      """
       1234567890
-      1${c}
+      1$c
       1234567890
-    """.trimIndent())
+      """.trimIndent(),
+    )
     assertMode(VimStateMachine.Mode.INSERT)
   }
 
@@ -212,17 +224,21 @@ class GuardedBlocksTest : VimTestCase() {
   @Test
   @Disabled
   fun `test change line with block with shorter end`() {
-    configureAndGuard("""
+    configureAndGuard(
+      """
       [1234567890
       ]123${c}456789[0
       1234567890]
-      """.trimIndent())
+      """.trimIndent(),
+    )
     typeText(injector.parser.parseKeys("cc"))
-    assertState("""
+    assertState(
+      """
       1234567890
       ${c}0
       1234567890
-    """.trimIndent())
+      """.trimIndent(),
+    )
     assertMode(VimStateMachine.Mode.INSERT)
   }
 

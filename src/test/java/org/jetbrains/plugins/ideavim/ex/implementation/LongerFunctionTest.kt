@@ -86,27 +86,35 @@ class LongerFunctionTest : VimTestCase() {
   @Test
   @Disabled
   fun `test 1`() {
-    configureByText("""
+    configureByText(
+      """
       const val ${c}VERY_IMPORTANT_VALUE = 42
-    """.trimIndent())
+      """.trimIndent(),
+    )
     injector.vimscriptExecutor.execute(script)
     typeText(injector.parser.parseKeys("veu"))
-    assertState("""
-      const val veryImportantValue${c} = 42
-    """.trimIndent())
+    assertState(
+      """
+      const val veryImportantValue$c = 42
+      """.trimIndent(),
+    )
   }
 
   // todo normal required
   @Test
   @Disabled
   fun `test 2`() {
-    configureByText("""
+    configureByText(
+      """
       val ${c}myCamelCaseValue = "Hi, I'm a simple value"
-    """.trimIndent())
+      """.trimIndent(),
+    )
     injector.vimscriptExecutor.execute(script)
     typeText(injector.parser.parseKeys("veU"))
-    assertState("""
-      val MY_CAMEL_CASE_VALUE${c} = "Hi, I'm a simple value"
-    """.trimIndent())
+    assertState(
+      """
+      val MY_CAMEL_CASE_VALUE$c = "Hi, I'm a simple value"
+      """.trimIndent(),
+    )
   }
 }

@@ -868,8 +868,8 @@ n  ,f            <Plug>Foo
       fun! T()|
         normal t|
       endfun|
-    """.trimIndent()
-      )
+        """.trimIndent(),
+      ),
     )
     assertState("\n")
     typeText(commandToKeys("call T()"))
@@ -1033,7 +1033,7 @@ n  ,i            <Action>(Back)
     assertExOutput("42\n")
     kotlin.test.assertEquals(
       "map A :echo 42<CR>",
-      injector.historyGroup.getEntries(HistoryConstants.COMMAND, 0, 0).last().entry
+      injector.historyGroup.getEntries(HistoryConstants.COMMAND, 0, 0).last().entry,
     )
   }
 }

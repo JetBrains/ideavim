@@ -715,8 +715,10 @@ class SubstituteCommandTest : VimOptionTestCase(OptionConstants.smartcase, Optio
     doTest(listOf(exCommand("s/i/z"), exCommand("s i")), before, after)
   }
 
-  @VimBehaviorDiffers(description = "Vim supports :s[flags] but IdeaVim's command parser does not handle this." +
-    "It tries to find a command called e.g. 'si'")
+  @VimBehaviorDiffers(
+    description = "Vim supports :s[flags] but IdeaVim's command parser does not handle this." +
+      "It tries to find a command called e.g. 'si'",
+  )
   @VimOptionDefaultAll
   @Test
   @Disabled

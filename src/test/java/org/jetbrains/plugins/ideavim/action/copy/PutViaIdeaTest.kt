@@ -73,7 +73,7 @@ class PutViaIdeaTest : VimTestCase() {
         vimEditor.primaryCaret(),
         before rangeOf "legendary$randomUUID",
         SelectionType.CHARACTER_WISE,
-        false
+        false,
       )
 
     val sizeBefore = CopyPasteManager.getInstance().allContents.size

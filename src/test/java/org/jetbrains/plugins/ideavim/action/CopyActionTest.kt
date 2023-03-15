@@ -292,7 +292,7 @@ class CopyActionTest : VimTestCase() {
     f
     b
       """.trimIndent(),
-      register.text
+      register.text,
     )
     assertState(
       """

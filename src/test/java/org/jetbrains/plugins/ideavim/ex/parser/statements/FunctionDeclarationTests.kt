@@ -45,12 +45,16 @@ class FunctionDeclarationTests : VimTestCase() {
 
     @JvmStatic
     fun spaces5(): List<Arguments> = product(spaces, spaces, spaces, spaces, spaces)
+
     @JvmStatic
     fun spaces9(): List<Arguments> = product(spaces, spaces, spaces, spaces, spaces, spaces, spaces, spaces, spaces)
+
     @JvmStatic
     fun function(): List<Arguments> = product(functionAlias, endfunctionAlias, spaces, spaces)
+
     @JvmStatic
     fun flags(): List<Arguments> = product(flagAlias, spaces, spaces, spaces)
+
     @JvmStatic
     fun flagsFlags(): List<Arguments> = product(flagAlias, flagAlias, spaces, spaces, spaces)
   }
@@ -200,7 +204,7 @@ class FunctionDeclarationTests : VimTestCase() {
            endif
            return
         endfunc
-      """.trimIndent()
+      """.trimIndent(),
     )
     assertEmpty(IdeavimErrorListener.testLogger)
   }

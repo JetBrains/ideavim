@@ -1584,31 +1584,31 @@ class SearchGroupTest : VimTestCase() {
       assertEquals(
         attributes.backgroundColor,
         it.textAttributes?.backgroundColor,
-        "Incorrect background colour for highlighter at $offsets"
+        "Incorrect background colour for highlighter at $offsets",
       )
       assertEquals(
         attributes.foregroundColor,
         it.textAttributes?.foregroundColor,
-        "Incorrect foreground colour for highlighter at $offsets"
+        "Incorrect foreground colour for highlighter at $offsets",
       )
       // TODO: Find a better way to identify the current match
       if (it.textAttributes?.effectType == EffectType.ROUNDED_BOX) {
         assertEquals(
           EffectType.ROUNDED_BOX,
           it.textAttributes?.effectType,
-          "Incorrect effect type for highlighter at $offsets"
+          "Incorrect effect type for highlighter at $offsets",
         )
         assertEquals(caretColour, it.textAttributes?.effectColor, "Incorrect effect colour for highlighter at $offsets")
       } else {
         assertEquals(
           attributes.effectType,
           it.textAttributes?.effectType,
-          "Incorrect effect type for highlighter at $offsets"
+          "Incorrect effect type for highlighter at $offsets",
         )
         assertEquals(
           attributes.effectColor,
           it.textAttributes?.effectColor,
-          "Incorrect effect colour for highlighter at $offsets"
+          "Incorrect effect colour for highlighter at $offsets",
         )
       }
     }
