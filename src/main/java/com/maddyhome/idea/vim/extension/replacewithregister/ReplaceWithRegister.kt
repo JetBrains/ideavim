@@ -142,7 +142,8 @@ internal class ReplaceWithRegister : VimExtension {
     private const val RWR_VISUAL = "<Plug>ReplaceWithRegisterVisual"
 
     private fun doReplace(editor: Editor, caret: ImmutableVimCaret, visualSelection: PutData.VisualSelection) {
-      val lastRegisterChar = injector.registerGroup.lastRegisterChar
+      val registerGroup = injector.registerGroup
+      val lastRegisterChar = if (editor.caretModel.caretCount == 0) registerGroup.currentRegister else registerGroup.getCurrentRegisterForMulticaret()
       val savedRegister = caret.registerStorage.getRegister(lastRegisterChar) ?: return
 
       var usedType = savedRegister.type
