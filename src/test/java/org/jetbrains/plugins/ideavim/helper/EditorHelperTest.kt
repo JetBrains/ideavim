@@ -12,7 +12,6 @@ import com.maddyhome.idea.vim.helper.EditorHelper
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
-import org.junit.Assert
 import org.junit.jupiter.api.Test
 import kotlin.math.roundToInt
 
@@ -24,7 +23,7 @@ class EditorHelperTest : VimTestCase() {
     EditorHelper.scrollColumnToLeftOfScreen(fixture.editor, 0, 2)
     val visibleArea = fixture.editor.scrollingModel.visibleArea
     val columnWidth = EditorHelper.getPlainSpaceWidthFloat(fixture.editor)
-    Assert.assertEquals((2 * columnWidth).roundToInt(), visibleArea.x)
+    assertEquals((2 * columnWidth).roundToInt(), visibleArea.x)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
@@ -35,7 +34,7 @@ class EditorHelperTest : VimTestCase() {
     EditorHelper.scrollColumnToRightOfScreen(fixture.editor, 0, column)
     val visibleArea = fixture.editor.scrollingModel.visibleArea
     val columnWidth = EditorHelper.getPlainSpaceWidthFloat(fixture.editor)
-    Assert.assertEquals(((column - screenWidth + 1) * columnWidth).roundToInt(), visibleArea.x)
+    assertEquals(((column - screenWidth + 1) * columnWidth).roundToInt(), visibleArea.x)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
@@ -48,7 +47,7 @@ class EditorHelperTest : VimTestCase() {
     EditorHelper.scrollColumnToMiddleOfScreen(fixture.editor, 0, 99)
     val visibleArea = fixture.editor.scrollingModel.visibleArea
     val columnWidth = EditorHelper.getPlainSpaceWidthFloat(fixture.editor)
-    Assert.assertEquals((59 * columnWidth).roundToInt(), visibleArea.x)
+    assertEquals((59 * columnWidth).roundToInt(), visibleArea.x)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
@@ -62,6 +61,6 @@ class EditorHelperTest : VimTestCase() {
     EditorHelper.scrollColumnToMiddleOfScreen(fixture.editor, 0, 99)
     val visibleArea = fixture.editor.scrollingModel.visibleArea
     val columnWidth = EditorHelper.getPlainSpaceWidthFloat(fixture.editor)
-    Assert.assertEquals((59 * columnWidth).roundToInt(), visibleArea.x)
+    assertEquals((59 * columnWidth).roundToInt(), visibleArea.x)
   }
 }

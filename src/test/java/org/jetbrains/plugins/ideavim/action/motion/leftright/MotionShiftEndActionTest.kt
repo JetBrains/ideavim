@@ -50,8 +50,8 @@ class MotionShiftEndActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @OptionTest(
-      VimOption(OptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_startsel]),
-      VimOption(OptionConstants.selectmode, limitedValues = [""]),
+    VimOption(OptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_startsel]),
+    VimOption(OptionConstants.selectmode, limitedValues = [""]),
   )
   fun `test start visual`() {
     val keys = listOf("<S-End>")
@@ -76,8 +76,8 @@ class MotionShiftEndActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @OptionTest(
-      VimOption(OptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_startsel]),
-      VimOption(OptionConstants.selectmode, limitedValues = [OptionConstants.selectmode_key]),
+    VimOption(OptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_startsel]),
+    VimOption(OptionConstants.selectmode, limitedValues = [OptionConstants.selectmode_key]),
   )
   fun `test start select`() {
     val keys = listOf("<S-End>")
@@ -101,8 +101,8 @@ class MotionShiftEndActionTest : VimTestCase() {
   }
 
   @OptionTest(
-      VimOption(OptionConstants.keymodel, limitedValues = [""]),
-      VimOption(OptionConstants.selectmode, limitedValues = [""]),
+    VimOption(OptionConstants.keymodel, limitedValues = [""]),
+    VimOption(OptionConstants.selectmode, limitedValues = [""]),
   )
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test continue visual`() {
@@ -131,8 +131,8 @@ class MotionShiftEndActionTest : VimTestCase() {
   }
 
   @OptionTest(
-      VimOption(OptionConstants.keymodel, limitedValues = [""]),
-      VimOption(OptionConstants.selectmode, limitedValues = [""]),
+    VimOption(OptionConstants.keymodel, limitedValues = [""]),
+    VimOption(OptionConstants.selectmode, limitedValues = [""]),
   )
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test continue select`() {

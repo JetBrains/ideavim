@@ -135,7 +135,7 @@ class SearchGroupTest : VimTestCase() {
       "\\c[ABC]b",
       "${c}dd\n",
     )
-    kotlin.test.assertEquals(-1, pos)
+    assertEquals(-1, pos)
   }
 
   // VIM-856
@@ -146,7 +146,7 @@ class SearchGroupTest : VimTestCase() {
       "a\\@<!b",
       "${c}ab\n",
     )
-    kotlin.test.assertEquals(-1, pos)
+    assertEquals(-1, pos)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
@@ -1518,7 +1518,7 @@ class SearchGroupTest : VimTestCase() {
   @Test
   fun `test find last cr in file`() {
     val res = search("\\n", "Something\n")
-    kotlin.test.assertEquals(9, res)
+    assertEquals(9, res)
   }
 
   private fun search(pattern: String, input: String): Int {
@@ -1541,7 +1541,7 @@ class SearchGroupTest : VimTestCase() {
   }
 
   private fun assertNoSearchHighlights() {
-    kotlin.test.assertEquals(0, fixture.editor.markupModel.allHighlighters.size)
+    assertEquals(0, fixture.editor.markupModel.allHighlighters.size)
   }
 
   @Suppress("DEPRECATION")
@@ -1572,7 +1572,7 @@ class SearchGroupTest : VimTestCase() {
       offset += v.length
     }
 
-    kotlin.test.assertEquals(expected, actual.toString())
+    assertEquals(expected, actual.toString())
 
     // Assert all highlighters have the correct tooltip and text attributes
     val editorColorsScheme = EditorColorsManager.getInstance().globalScheme
@@ -1580,7 +1580,7 @@ class SearchGroupTest : VimTestCase() {
     val caretColour = editorColorsScheme.getColor(EditorColors.CARET_COLOR)
     allHighlighters.forEach {
       val offsets = "(${it.startOffset}, ${it.endOffset})"
-      kotlin.test.assertEquals(tooltip, it.errorStripeTooltip, "Incorrect tooltip for highlighter at $offsets")
+      assertEquals(tooltip, it.errorStripeTooltip, "Incorrect tooltip for highlighter at $offsets")
       assertEquals(
         attributes.backgroundColor,
         it.textAttributes?.backgroundColor,

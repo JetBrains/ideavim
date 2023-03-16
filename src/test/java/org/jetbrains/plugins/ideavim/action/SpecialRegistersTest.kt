@@ -13,7 +13,6 @@ import com.maddyhome.idea.vim.register.RegisterConstants.LAST_INSERTED_TEXT_REGI
 import com.maddyhome.idea.vim.register.RegisterConstants.LAST_SEARCH_REGISTER
 import com.maddyhome.idea.vim.register.RegisterConstants.SMALL_DELETION_REGISTER
 import org.jetbrains.plugins.ideavim.VimTestCase
-import org.junit.Assert
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
@@ -200,7 +199,7 @@ class SpecialRegistersTest : VimTestCase() {
 
   private fun assertRegisterChanged(registerName: Char) {
     val registerText = getRegisterText(registerName)
-    Assert.assertNotEquals(DUMMY_TEXT, registerText)
+    assertNotEquals(DUMMY_TEXT, registerText)
   }
 
   private fun assertRegisterNotChanged(registerName: Char) {

@@ -10,9 +10,9 @@ package org.jetbrains.plugins.ideavim.action
 import com.google.common.collect.Lists
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.options.OptionConstants
-import org.jetbrains.plugins.ideavim.impl.VimOption
-import org.jetbrains.plugins.ideavim.impl.OptionTest
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.impl.OptionTest
+import org.jetbrains.plugins.ideavim.impl.VimOption
 import org.junit.jupiter.api.Test
 
 class ChangeNumberActionTest : VimTestCase() {

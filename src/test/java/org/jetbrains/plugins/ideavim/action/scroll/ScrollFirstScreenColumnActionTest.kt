@@ -12,7 +12,6 @@ import com.intellij.openapi.editor.Inlay
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
-import org.junit.Assert
 import org.junit.jupiter.api.Test
 import kotlin.math.roundToInt
 
@@ -74,7 +73,7 @@ class ScrollFirstScreenColumnActionTest : VimTestCase() {
 
     // The first visible text column will be 99, with the inlay positioned to the left of it
     assertVisibleLineBounds(0, 99, 99 + availableColumns - 1)
-    Assert.assertEquals(visibleArea.x, inlay.bounds!!.x)
+    assertEquals(visibleArea.x, inlay.bounds!!.x)
   }
 
   @Test

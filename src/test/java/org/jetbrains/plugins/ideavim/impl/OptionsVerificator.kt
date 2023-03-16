@@ -107,7 +107,6 @@ internal annotation class VimOption(
   val doesntAffectTest: Boolean = false,
 )
 
-
 //  ----------- Implementation
 
 private class OptionsVerificator : BeforeTestExecutionCallback, AfterTestExecutionCallback {
@@ -315,7 +314,9 @@ private class VimOptionsInvocator : TestTemplateInvocationContextProvider {
                 .map { VimString(it.joinToString(",")) }
             }.flatten()
             valuesCombinations.map { option to it }
-          } else fail("Cannot generate values automatically. Please specify option values explicitelly using 'limitedValues' field")
+          } else {
+            fail("Cannot generate values automatically. Please specify option values explicitelly using 'limitedValues' field")
+          }
         } else {
           val boundedValues = option.boundedValues
           if (boundedValues != null) {

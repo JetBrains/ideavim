@@ -14,7 +14,6 @@ import com.ensarsarajcic.neovim.java.api.types.api.VimCoords
 import com.ensarsarajcic.neovim.java.corerpc.client.ProcessRpcConnection
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.LogicalPosition
-import com.intellij.util.containers.toArray
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.CharacterPosition
@@ -31,7 +30,6 @@ import com.maddyhome.idea.vim.register.RegisterConstants.LAST_SEARCH_REGISTER
 import com.maddyhome.idea.vim.register.RegisterConstants.VALID_REGISTERS
 import org.junit.Assert.assertEquals
 import org.junit.jupiter.api.TestInfo
-import org.junit.jupiter.params.provider.Arguments
 
 internal object NeovimTesting {
   private lateinit var neovimApi: NeovimApi

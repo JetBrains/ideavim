@@ -13,12 +13,12 @@ package org.jetbrains.plugins.ideavim.action.motion.leftright
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.options.OptionConstants
-import org.jetbrains.plugins.ideavim.impl.VimOption
-import org.jetbrains.plugins.ideavim.impl.OptionTest
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.impl.TraceOptions
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.impl.OptionTest
+import org.jetbrains.plugins.ideavim.impl.TraceOptions
+import org.jetbrains.plugins.ideavim.impl.VimOption
 
 @TraceOptions(OptionConstants.keymodel, OptionConstants.selectmode)
 class MotionShiftHomeActionTest : VimTestCase() {
@@ -59,8 +59,8 @@ class MotionShiftHomeActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @OptionTest(
-      VimOption(OptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_startsel]),
-      VimOption(OptionConstants.selectmode, limitedValues = [""]),
+    VimOption(OptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_startsel]),
+    VimOption(OptionConstants.selectmode, limitedValues = [""]),
   )
   fun `test start visual`() {
     val keys = listOf("<S-Home>")
@@ -85,8 +85,8 @@ class MotionShiftHomeActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @OptionTest(
-      VimOption(OptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_startsel]),
-      VimOption(OptionConstants.selectmode, limitedValues = [OptionConstants.selectmode_key]),
+    VimOption(OptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_startsel]),
+    VimOption(OptionConstants.selectmode, limitedValues = [OptionConstants.selectmode_key]),
   )
   fun `test start select`() {
     val keys = listOf("<S-Home>")
@@ -110,8 +110,8 @@ class MotionShiftHomeActionTest : VimTestCase() {
   }
 
   @OptionTest(
-      VimOption(OptionConstants.keymodel, limitedValues = [""]),
-      VimOption(OptionConstants.selectmode, limitedValues = [""]),
+    VimOption(OptionConstants.keymodel, limitedValues = [""]),
+    VimOption(OptionConstants.selectmode, limitedValues = [""]),
   )
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test continue visual`() {
@@ -140,8 +140,8 @@ class MotionShiftHomeActionTest : VimTestCase() {
   }
 
   @OptionTest(
-      VimOption(OptionConstants.keymodel, limitedValues = [""]),
-      VimOption(OptionConstants.selectmode, limitedValues = [""]),
+    VimOption(OptionConstants.keymodel, limitedValues = [""]),
+    VimOption(OptionConstants.selectmode, limitedValues = [""]),
   )
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test continue select`() {

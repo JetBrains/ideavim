@@ -11,7 +11,6 @@ package org.jetbrains.plugins.ideavim.action.scroll
 import com.intellij.openapi.editor.Inlay
 import com.maddyhome.idea.vim.helper.EditorHelper
 import org.jetbrains.plugins.ideavim.VimTestCase
-import org.junit.Assert
 import org.junit.jupiter.api.Test
 import kotlin.math.roundToInt
 
@@ -112,8 +111,8 @@ class ScrollLastScreenColumnActionTest : VimTestCase() {
 
     // We have to assert the location of the inlay
     val inlayX = fixture.editor.visualPositionToPoint2D(inlay.visualPosition).x.roundToInt()
-    Assert.assertEquals(visibleArea.x + textWidth, inlayX)
-    Assert.assertEquals(visibleArea.x + visibleArea.width, inlayX + inlay.widthInPixels)
+    assertEquals(visibleArea.x + textWidth, inlayX)
+    assertEquals(visibleArea.x + visibleArea.width, inlayX + inlay.widthInPixels)
   }
 
   @Test
