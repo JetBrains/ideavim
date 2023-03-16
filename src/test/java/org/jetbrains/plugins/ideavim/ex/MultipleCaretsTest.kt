@@ -14,9 +14,12 @@ import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.options.OptionConstants
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.impl.OptionTest
+import org.jetbrains.plugins.ideavim.impl.VimOption
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import kotlin.test.assertNotNull
@@ -106,7 +109,11 @@ class MultipleCaretsTest : VimTestCase() {
     fixture.checkResult(after)
   }
 
-  @Test
+  /**
+   * This test produces different results depending on `ideaput` option.
+   * Both results can be treated as correct, as the original vim doesn't have support for multicaret
+   */
+  @OptionTest(VimOption(OptionConstants.clipboard, limitedValues = ["ideaput"]))
   fun testPutText() {
     // This test produces double ${c}zxc on 3rd line if non-idea paste is used
     val before = """
@@ -137,10 +144,85 @@ class MultipleCaretsTest : VimTestCase() {
     assertState(after)
   }
 
+  /**
+   * This test produces different results depending on `ideaput` option.
+   * Both results can be treated as correct, as the original vim doesn't have support for multicaret
+   */
+  @OptionTest(VimOption(OptionConstants.clipboard, limitedValues = [""]))
+  fun testPutTextWithoutIdeaput() {
+    // This test produces double ${c}zxc on 3rd line if non-idea paste is used
+    val before = """
+          ${c}qwe
+          rty
+          ${c}as${c}d
+          fgh
+          zxc
+          vbn
+
+    """.trimIndent()
+    val editor = configureByText(before)
+    val vimEditor = editor.vim
+    VimPlugin.getRegister()
+      .storeText(vimEditor, vimEditor.primaryCaret(), TextRange(16, 19), SelectionType.CHARACTER_WISE, false)
+    typeText(commandToKeys("pu"))
+    val after = """
+          qwe
+          ${c}zxc
+          rty
+          asd
+          ${c}zxc
+          ${c}zxc
+          fgh
+          zxc
+          vbn
+
+    """.trimIndent()
+    assertState(after)
+  }
+
+  /**
+   * This test produces different results depending on `ideaput` option.
+   * Both results can be treated as correct, as the original vim doesn't have support for multicaret
+   */
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "register")
-  @Test
+  @OptionTest(VimOption(OptionConstants.clipboard, limitedValues = [""]))
   fun testPutTextCertainLine() {
-    // This test produces triple ${c}zxc if non-idea paste is used
+    val before = """
+          ${c}qwe
+          rty
+          ${c}as${c}d
+          fgh
+          zxc
+          vbn
+
+    """.trimIndent()
+    val editor = configureByText(before)
+    val vimEditor = editor.vim
+    VimPlugin.getRegister()
+      .storeText(vimEditor, vimEditor.primaryCaret(), TextRange(16, 19), SelectionType.CHARACTER_WISE, false)
+    typeText(commandToKeys("4pu"))
+    val after = """
+          qwe
+          rty
+          asd
+          fgh
+          ${c}zxc
+          ${c}zxc
+          ${c}zxc
+          zxc
+          vbn
+
+    """.trimIndent()
+    assertState(after)
+  }
+
+  /**
+   * This test produces different results depending on `ideaput` option.
+   * Both results can be treated as correct, as the original vim doesn't have support for multicaret
+   */
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "register")
+  @OptionTest(VimOption(OptionConstants.clipboard, limitedValues = ["ideaput"]))
+  fun testPutTextCertainLineWithIdeaPut() {
     val before = """
           ${c}qwe
           rty
