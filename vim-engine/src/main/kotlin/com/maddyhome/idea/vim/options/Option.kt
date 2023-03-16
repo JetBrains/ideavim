@@ -149,27 +149,3 @@ public class ToggleOption(name: String, abbrev: String, defaultValue: VimInt) : 
 
   override fun parseValue(value: String, token: String): Nothing = throw exExceptionMessage("E474", token)
 }
-
-public fun Option<out VimDataType>.appendValue(currentValue: VimDataType, value: VimDataType): VimDataType? {
-  return when (this) {
-    is StringOption -> this.appendValue(currentValue as VimString, value as VimString)
-    is NumberOption -> this.addValues(currentValue as VimInt, value as VimInt)
-    else -> null
-  }
-}
-
-public fun Option<out VimDataType>.prependValue(currentValue: VimDataType, value: VimDataType): VimDataType? {
-  return when (this) {
-    is StringOption -> this.prependValue(currentValue as VimString, value as VimString)
-    is NumberOption -> this.multiplyValues(currentValue as VimInt, value as VimInt)
-    else -> null
-  }
-}
-
-public fun Option<out VimDataType>.removeValue(currentValue: VimDataType, value: VimDataType): VimDataType? {
-  return when (this) {
-    is StringOption -> this.removeValue(currentValue as VimString, value as VimString)
-    is NumberOption -> this.subtractValues(currentValue as VimInt, value as VimInt)
-    else -> null
-  }
-}
