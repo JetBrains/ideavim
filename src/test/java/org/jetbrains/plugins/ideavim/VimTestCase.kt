@@ -148,7 +148,7 @@ abstract class VimTestCase {
     get() = PathManager.getHomePath() + "/community/plugins/ideavim/testData"
 
   @AfterEach
-  open fun tearDown() {
+  open fun tearDown(testInfo: TestInfo) {
     val swingTimer = swingTimer
     swingTimer?.stop()
     val bookmarksManager = BookmarksManager.getInstance(fixture.project)

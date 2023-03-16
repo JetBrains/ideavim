@@ -29,8 +29,8 @@ class StringListOptionTest : VimTestCase() {
   }
 
   @AfterEach
-  override fun tearDown() {
-    super.tearDown()
+  override fun tearDown(testInfo: TestInfo) {
+    super.tearDown(super.testInfo)
     injector.optionGroup.removeOption(optionName)
   }
 

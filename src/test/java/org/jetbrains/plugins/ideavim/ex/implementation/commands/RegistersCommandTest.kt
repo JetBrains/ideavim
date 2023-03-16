@@ -14,11 +14,12 @@ import com.maddyhome.idea.vim.helper.TestClipboardModel
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInfo
 
 class RegistersCommandTest : VimTestCase() {
   @AfterEach
-  override fun tearDown() {
-    super.tearDown()
+  override fun tearDown(testInfo: TestInfo) {
+    super.tearDown(super.testInfo)
     TestClipboardModel.clearClipboard()
   }
 

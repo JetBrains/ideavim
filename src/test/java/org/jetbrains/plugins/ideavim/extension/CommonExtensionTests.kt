@@ -56,10 +56,10 @@ class OpMappingTest : VimTestCase() {
   }
 
   @AfterEach
-  override fun tearDown() {
+  override fun tearDown(testInfo: TestInfo) {
     @Suppress("DEPRECATION")
     VimExtension.EP_NAME.point.unregisterExtension(extension)
-    super.tearDown()
+    super.tearDown(super.testInfo)
   }
 
   @Test
@@ -211,10 +211,10 @@ class PlugExtensionsTest : VimTestCase() {
   }
 
   @AfterEach
-  override fun tearDown() {
+  override fun tearDown(testInfo: TestInfo) {
     @Suppress("DEPRECATION")
     VimExtension.EP_NAME.point.unregisterExtension(extension)
-    super.tearDown()
+    super.tearDown(super.testInfo)
   }
 
   @Test
@@ -253,10 +253,10 @@ class PlugMissingKeysTest : VimTestCase() {
   }
 
   @AfterEach
-  override fun tearDown() {
+  override fun tearDown(testInfo: TestInfo) {
     @Suppress("DEPRECATION")
     VimExtension.EP_NAME.point.unregisterExtension(extension)
-    super.tearDown()
+    super.tearDown(super.testInfo)
   }
 
   @Test
