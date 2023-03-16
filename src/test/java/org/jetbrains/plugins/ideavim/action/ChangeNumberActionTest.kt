@@ -99,7 +99,7 @@ class ChangeNumberActionTest : VimTestCase() {
   fun testDecrementNegativeOctal() {
     // Minus isn't processed
     doTest(
-      Lists.newArrayList("<C-X>"),
+      Lists.newArrayList(":set nf=octal<Enter>", "<C-X>"),
       "-010",
       "-007",
       VimStateMachine.Mode.COMMAND,
