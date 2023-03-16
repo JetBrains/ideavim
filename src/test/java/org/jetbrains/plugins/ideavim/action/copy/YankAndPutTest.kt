@@ -10,17 +10,14 @@ package org.jetbrains.plugins.ideavim.action.copy
 
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.options.OptionConstants
-import org.jetbrains.plugins.ideavim.OptionValueType
-import org.jetbrains.plugins.ideavim.VimOptionTestCase
-import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
-import org.jetbrains.plugins.ideavim.VimTestOption
-import org.junit.jupiter.api.Test
+import org.jetbrains.plugins.ideavim.impl.VimOption
+import org.jetbrains.plugins.ideavim.impl.OptionTest
+import org.jetbrains.plugins.ideavim.impl.TraceOptions
+import org.jetbrains.plugins.ideavim.VimTestCase
 
-class YankAndPutTest : VimOptionTestCase(OptionConstants.clipboard) {
-  @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.clipboard, OptionValueType.STRING, OptionConstants.clipboard_unnamed),
-  )
-  @Test
+@TraceOptions(OptionConstants.clipboard)
+class YankAndPutTest : VimTestCase() {
+  @OptionTest(VimOption(OptionConstants.clipboard, limitedValues = [OptionConstants.clipboard_unnamed]))
   fun `test yank to number register with unnamed`() {
     val before = """
             I ${c}found it in a legendary land
@@ -42,14 +39,7 @@ class YankAndPutTest : VimOptionTestCase(OptionConstants.clipboard) {
     )
   }
 
-  @VimOptionTestConfiguration(
-    VimTestOption(
-      OptionConstants.clipboard,
-      OptionValueType.STRING,
-      OptionConstants.clipboard_unnamed + "," + OptionConstants.clipboard_ideaput,
-    ),
-  )
-  @Test
+  @OptionTest(VimOption(OptionConstants.clipboard, limitedValues = [OptionConstants.clipboard_unnamed + "," + OptionConstants.clipboard_ideaput]))
   fun `test yank to number register with unnamed and ideaput`() {
     val before = """
             I ${c}found it in a legendary land
@@ -71,8 +61,7 @@ class YankAndPutTest : VimOptionTestCase(OptionConstants.clipboard) {
     )
   }
 
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.clipboard, OptionValueType.STRING, ""))
-  @Test
+  @OptionTest(VimOption(OptionConstants.clipboard, limitedValues = [""]))
   fun `test yank to number register`() {
     val before = """
             I ${c}found it in a legendary land

@@ -13,19 +13,20 @@ package org.jetbrains.plugins.ideavim.action.motion.leftright
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.options.OptionConstants
-import org.jetbrains.plugins.ideavim.OptionValueType
+import org.jetbrains.plugins.ideavim.impl.VimOption
+import org.jetbrains.plugins.ideavim.impl.OptionTest
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimOptionDefaultAll
-import org.jetbrains.plugins.ideavim.VimOptionTestCase
-import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
-import org.jetbrains.plugins.ideavim.VimTestOption
-import org.junit.jupiter.api.Test
+import org.jetbrains.plugins.ideavim.impl.TraceOptions
+import org.jetbrains.plugins.ideavim.VimTestCase
 
-class MotionShiftHomeActionTest : VimOptionTestCase(OptionConstants.keymodel, OptionConstants.selectmode) {
+@TraceOptions(OptionConstants.keymodel, OptionConstants.selectmode)
+class MotionShiftHomeActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionDefaultAll
-  @Test
+  @OptionTest(
+    VimOption(OptionConstants.keymodel, doesntAffectTest = true),
+    VimOption(OptionConstants.selectmode, doesntAffectTest = true),
+  )
   fun `test simple home`() {
     val keys = listOf("<S-Home>")
     val before = """
@@ -47,19 +48,20 @@ class MotionShiftHomeActionTest : VimOptionTestCase(OptionConstants.keymodel, Op
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
-  @VimOptionDefaultAll
-  @Test
+  @OptionTest(
+    VimOption(OptionConstants.keymodel, doesntAffectTest = true),
+    VimOption(OptionConstants.selectmode, doesntAffectTest = true),
+  )
   fun `test default continueselect`() {
     val keymodel = optionsNoEditor().getStringListValues(OptionConstants.keymodel)
     kotlin.test.assertTrue(OptionConstants.keymodel_continueselect in keymodel)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, OptionConstants.keymodel_startsel),
-    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""),
+  @OptionTest(
+      VimOption(OptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_startsel]),
+      VimOption(OptionConstants.selectmode, limitedValues = [""]),
   )
-  @Test
   fun `test start visual`() {
     val keys = listOf("<S-Home>")
     val before = """
@@ -82,11 +84,10 @@ class MotionShiftHomeActionTest : VimOptionTestCase(OptionConstants.keymodel, Op
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, OptionConstants.keymodel_startsel),
-    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, OptionConstants.selectmode_key),
+  @OptionTest(
+      VimOption(OptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_startsel]),
+      VimOption(OptionConstants.selectmode, limitedValues = [OptionConstants.selectmode_key]),
   )
-  @Test
   fun `test start select`() {
     val keys = listOf("<S-Home>")
     val before = """
@@ -108,12 +109,11 @@ class MotionShiftHomeActionTest : VimOptionTestCase(OptionConstants.keymodel, Op
     doTest(keys, before, after, VimStateMachine.Mode.SELECT, VimStateMachine.SubMode.VISUAL_CHARACTER)
   }
 
-  @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, ""),
-    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""),
+  @OptionTest(
+      VimOption(OptionConstants.keymodel, limitedValues = [""]),
+      VimOption(OptionConstants.selectmode, limitedValues = [""]),
   )
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @Test
   fun `test continue visual`() {
     val before = """
             A Discovery
@@ -139,12 +139,11 @@ class MotionShiftHomeActionTest : VimOptionTestCase(OptionConstants.keymodel, Op
     assertState(VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER)
   }
 
-  @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, ""),
-    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""),
+  @OptionTest(
+      VimOption(OptionConstants.keymodel, limitedValues = [""]),
+      VimOption(OptionConstants.selectmode, limitedValues = [""]),
   )
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @Test
   fun `test continue select`() {
     val before = """
             A Discovery

@@ -9,6 +9,9 @@ package org.jetbrains.plugins.ideavim.action
 
 import com.google.common.collect.Lists
 import com.maddyhome.idea.vim.command.VimStateMachine
+import com.maddyhome.idea.vim.options.OptionConstants
+import org.jetbrains.plugins.ideavim.impl.VimOption
+import org.jetbrains.plugins.ideavim.impl.OptionTest
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
@@ -92,11 +95,11 @@ class ChangeNumberActionTest : VimTestCase() {
     )
   }
 
-  @Test
+  @OptionTest(VimOption(OptionConstants.nrformats, limitedValues = ["octal"]))
   fun testDecrementNegativeOctal() {
     // Minus isn't processed
     doTest(
-      Lists.newArrayList(":set nf=octal<Enter>", "<C-X>"),
+      Lists.newArrayList("<C-X>"),
       "-010",
       "-007",
       VimStateMachine.Mode.COMMAND,

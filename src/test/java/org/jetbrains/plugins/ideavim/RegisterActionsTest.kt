@@ -15,12 +15,18 @@ import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.handler.ActionBeanClass
 import com.maddyhome.idea.vim.key.CommandNode
 import com.maddyhome.idea.vim.key.CommandPartNode
+import com.maddyhome.idea.vim.options.OptionConstants
+import org.jetbrains.plugins.ideavim.impl.OptionTest
+import org.jetbrains.plugins.ideavim.impl.VimOption
 import org.junit.jupiter.api.Test
 import javax.swing.KeyStroke
 import kotlin.test.assertNotNull
 
 class RegisterActionsTest : VimTestCase() {
-  @Test
+  @OptionTest(
+    VimOption(OptionConstants.virtualedit, doesntAffectTest = true),
+    VimOption(OptionConstants.whichwrap, doesntAffectTest = true),
+  )
   fun `test simple action`() {
     val before = "I ${c}found it in a legendary land"
     val after = "I f${c}ound it in a legendary land"
@@ -45,7 +51,10 @@ class RegisterActionsTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.EDITOR_MODIFICATION)
-  @Test
+  @OptionTest(
+    VimOption(OptionConstants.virtualedit, doesntAffectTest = true),
+    VimOption(OptionConstants.whichwrap, doesntAffectTest = true),
+  )
   fun `test turn plugin off and on`() {
     val before = "I ${c}found it in a legendary land"
     val after = "I f${c}ound it in a legendary land"
@@ -56,7 +65,10 @@ class RegisterActionsTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.EDITOR_MODIFICATION)
-  @Test
+  @OptionTest(
+    VimOption(OptionConstants.virtualedit, doesntAffectTest = true),
+    VimOption(OptionConstants.whichwrap, doesntAffectTest = true),
+  )
   fun `test enable twice`() {
     val before = "I ${c}found it in a legendary land"
     val after = "I f${c}ound it in a legendary land"
@@ -68,7 +80,10 @@ class RegisterActionsTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.EDITOR_MODIFICATION)
-  @Test
+  @OptionTest(
+    VimOption(OptionConstants.virtualedit, doesntAffectTest = true),
+    VimOption(OptionConstants.whichwrap, doesntAffectTest = true),
+  )
   fun `test unregister extension`() {
     val before = "I ${c}found it in a legendary land"
     val after = "I f${c}ound it in a legendary land"

@@ -324,8 +324,8 @@ abstract class VimTestCase {
     val bottomLogicalLine = fixture.editor.vim.visualLineToBufferLine(
       EditorHelper.getVisualLineAtBottomOfScreen(fixture.editor),
     )
-    kotlin.test.assertTrue(bottomLogicalLine >= caretLogicalLine)
-    kotlin.test.assertTrue(caretLogicalLine >= scrollToLogicalLine)
+    assertTrue(bottomLogicalLine >= caretLogicalLine)
+    assertTrue(caretLogicalLine >= scrollToLogicalLine)
   }
 
   protected fun typeText(vararg keys: String) = typeText(keys.flatMap { injector.parser.parseKeys(it) })
@@ -405,7 +405,7 @@ abstract class VimTestCase {
     val carets = fixture.editor.caretModel.allCarets
     assertEquals(1, carets.size, "Wrong amount of carets")
     val actualPosition = carets[0].logicalPosition
-    kotlin.test.assertEquals(LogicalPosition(line, column), actualPosition)
+    assertEquals(LogicalPosition(line, column), actualPosition)
     NeovimTesting.assertCaret(fixture.editor, testInfo)
   }
 
@@ -413,7 +413,7 @@ abstract class VimTestCase {
     val carets = fixture.editor.caretModel.allCarets
     assertEquals(1, carets.size, "Wrong amount of carets")
     val actualPosition = carets[0].visualPosition
-    kotlin.test.assertEquals(VisualPosition(visualLine, visualColumn), actualPosition)
+    assertEquals(VisualPosition(visualLine, visualColumn), actualPosition)
   }
 
   fun assertOffset(vararg expectedOffsets: Int) {
@@ -427,7 +427,7 @@ abstract class VimTestCase {
     }
     assertEquals(expectedOffsets.size, carets.size, "Wrong amount of carets")
     for (i in expectedOffsets.indices) {
-      kotlin.test.assertEquals(expectedOffsets[i], carets[i].offset)
+      assertEquals(expectedOffsets[i], carets[i].offset)
     }
 
     NeovimTesting.assertState(fixture.editor, testInfo)
@@ -470,11 +470,11 @@ abstract class VimTestCase {
 
     val expected = ScreenBounds(leftLogicalColumn, rightLogicalColumn)
     val actual = ScreenBounds(actualLeftLogicalColumn, actualRightLogicalColumn)
-    kotlin.test.assertEquals(expected, actual)
+    assertEquals(expected, actual)
   }
 
   fun assertLineCount(expected: Int) {
-    kotlin.test.assertEquals(expected, fixture.editor.vim.lineCount())
+    assertEquals(expected, fixture.editor.vim.lineCount())
   }
 
   fun putMapping(modes: Set<MappingMode>, from: String, to: String, recursive: Boolean) {
@@ -490,14 +490,14 @@ abstract class VimTestCase {
   fun assertNoMapping(from: String) {
     val keys = injector.parser.parseKeys(from)
     for (mode in MappingMode.ALL) {
-      kotlin.test.assertNull(VimPlugin.getKey().getKeyMapping(mode)[keys])
+      assertNull(VimPlugin.getKey().getKeyMapping(mode)[keys])
     }
   }
 
   fun assertNoMapping(from: String, modes: Set<MappingMode>) {
     val keys = injector.parser.parseKeys(from)
     for (mode in modes) {
-      kotlin.test.assertNull(VimPlugin.getKey().getKeyMapping(mode)[keys])
+      assertNull(VimPlugin.getKey().getKeyMapping(mode)[keys])
     }
   }
 
@@ -508,7 +508,7 @@ abstract class VimTestCase {
       val info = VimPlugin.getKey().getKeyMapping(mode)[keys]
       assertNotNull<Any>(info)
       if (info is ToKeysMappingInfo) {
-        kotlin.test.assertEquals(toKeys, info.toKeys)
+        assertEquals(toKeys, info.toKeys)
       }
     }
   }
@@ -521,23 +521,23 @@ abstract class VimTestCase {
 
   fun assertMode(expectedMode: VimStateMachine.Mode) {
     val mode = fixture.editor.editorMode
-    kotlin.test.assertEquals(expectedMode, mode)
+    assertEquals(expectedMode, mode)
   }
 
   fun assertSubMode(expectedSubMode: SubMode) {
     val subMode = fixture.editor.subMode
-    kotlin.test.assertEquals(expectedSubMode, subMode)
+    assertEquals(expectedSubMode, subMode)
   }
 
   fun assertSelection(expected: String?) {
     val selected = fixture.editor.selectionModel.selectedText
-    kotlin.test.assertEquals(expected, selected)
+    assertEquals(expected, selected)
   }
 
   fun assertExOutput(expected: String) {
     val actual = getInstance(fixture.editor).text
     assertNotNull("No Ex output", actual)
-    kotlin.test.assertEquals(expected, actual)
+    assertEquals(expected, actual)
     NeovimTesting.typeCommand("<esc>", testInfo, fixture.editor)
   }
 
@@ -547,7 +547,7 @@ abstract class VimTestCase {
   }
 
   fun assertPluginError(isError: Boolean) {
-    kotlin.test.assertEquals(isError, injector.messages.isError())
+    assertEquals(isError, injector.messages.isError())
   }
 
   fun assertPluginErrorMessageContains(message: String) {
@@ -563,21 +563,21 @@ abstract class VimTestCase {
     editor.caretModel.allCarets.forEach { caret ->
       // All carets should be the same except when in block sub mode, where we "hide" them (by drawing a zero width bar)
       if (caret !== editor.caretModel.primaryCaret && editor.inBlockSubMode) {
-        kotlin.test.assertEquals(CaretVisualAttributes.Shape.BAR, caret.visualAttributes.shape)
-        kotlin.test.assertEquals(0F, caret.visualAttributes.thickness)
+        assertEquals(CaretVisualAttributes.Shape.BAR, caret.visualAttributes.shape)
+        assertEquals(0F, caret.visualAttributes.thickness)
       } else {
         val shape = when (attributes.type) {
           GuiCursorType.BLOCK -> CaretVisualAttributes.Shape.BLOCK
           GuiCursorType.VER -> CaretVisualAttributes.Shape.BAR
           GuiCursorType.HOR -> CaretVisualAttributes.Shape.UNDERSCORE
         }
-        kotlin.test.assertEquals(shape, editor.caretModel.primaryCaret.visualAttributes.shape)
-        kotlin.test.assertEquals(
+        assertEquals(shape, editor.caretModel.primaryCaret.visualAttributes.shape)
+        assertEquals(
           attributes.thickness / 100.0F,
           editor.caretModel.primaryCaret.visualAttributes.thickness,
         )
         editor.caretModel.primaryCaret.visualAttributes.color?.let {
-          kotlin.test.assertEquals(colour, it)
+          assertEquals(colour, it)
         }
       }
     }
@@ -679,7 +679,7 @@ abstract class VimTestCase {
     val exception = assertThrows<ExException> {
       action()
     }
-    kotlin.test.assertEquals(expectedErrorMessage, exception.message)
+    assertEquals(expectedErrorMessage, exception.message)
   }
 
   private fun typeTextViaIde(keys: List<KeyStroke?>, editor: Editor) {

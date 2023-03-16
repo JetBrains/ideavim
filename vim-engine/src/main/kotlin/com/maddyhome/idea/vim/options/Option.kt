@@ -48,7 +48,7 @@ public abstract class Option<T : VimDataType>(public val name: String, public va
   public abstract fun parseValue(value: String, token: String): VimDataType
 }
 
-public open class StringOption(name: String, abbrev: String, defaultValue: VimString, private val isList: Boolean = false, private val boundedValues: Collection<String>? = null) : Option<VimString>(name, abbrev, defaultValue) {
+public open class StringOption(name: String, abbrev: String, defaultValue: VimString, public val isList: Boolean = false, public val boundedValues: Collection<String>? = null) : Option<VimString>(name, abbrev, defaultValue) {
   public constructor(name: String, abbrev: String, defaultValue: String, isList: Boolean = false, boundedValues: Collection<String>? = null) : this(name, abbrev, VimString(defaultValue), isList, boundedValues)
 
   override fun checkIfValueValid(value: VimDataType, token: String) {

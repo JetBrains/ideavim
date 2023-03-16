@@ -30,7 +30,6 @@ import com.maddyhome.idea.vim.register.RegisterConstants.LAST_INSERTED_TEXT_REGI
 import com.maddyhome.idea.vim.register.RegisterConstants.LAST_SEARCH_REGISTER
 import com.maddyhome.idea.vim.register.RegisterConstants.VALID_REGISTERS
 import org.junit.Assert.assertEquals
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.params.provider.Arguments
 
@@ -203,7 +202,6 @@ internal object NeovimTesting {
   }
 }
 
-@Test
 annotation class TestWithoutNeovim(val reason: SkipNeovimReason, val description: String = "")
 
 enum class SkipNeovimReason {
@@ -242,19 +240,4 @@ enum class SkipNeovimReason {
 
 fun LogicalPosition.toVimCoords(): VimCoords {
   return VimCoords(this.line + 1, this.column)
-}
-
-fun <T, S, V> Collection<T>.cartesianProduct(other: Iterable<S>, transformer: (first: T, second: S) -> V): List<V> {
-  return this.flatMap { first -> other.map { second -> transformer.invoke(first, second) } }
-}
-
-// Cartesian product of multiple lists. Useful for making parameterized tests with all available combinations.
-// Can be used instead of @Theory from JUnit 4
-fun productForArguments(vararg elements: List<String>): List<Arguments> {
-  val res = elements.fold(listOf<List<String>>(emptyList())) { acc, items ->
-    acc.cartesianProduct(items) { accItems, item ->
-      accItems + item
-    }
-  }
-  return res.map { Arguments.of(*it.toArray(emptyArray())) }
 }

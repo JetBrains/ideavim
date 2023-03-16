@@ -12,21 +12,20 @@ package org.jetbrains.plugins.ideavim.action.motion.leftright
 
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.options.OptionConstants
-import org.jetbrains.plugins.ideavim.OptionValueType
+import org.jetbrains.plugins.ideavim.impl.VimOption
+import org.jetbrains.plugins.ideavim.impl.OptionTest
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimOptionTestCase
-import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
-import org.jetbrains.plugins.ideavim.VimTestOption
-import org.junit.jupiter.api.Test
+import org.jetbrains.plugins.ideavim.impl.TraceOptions
+import org.jetbrains.plugins.ideavim.VimTestCase
 
-class MotionShiftRightActionHandlerTest : VimOptionTestCase(OptionConstants.keymodel, OptionConstants.selectmode) {
+@TraceOptions(OptionConstants.keymodel, OptionConstants.selectmode)
+class MotionShiftRightActionHandlerTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, OptionConstants.keymodel_startsel),
-    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""),
+  @OptionTest(
+    VimOption(OptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_startsel]),
+    VimOption(OptionConstants.selectmode, limitedValues = [""]),
   )
-  @Test
   fun `test visual right`() {
     doTest(
       listOf("<S-Right>"),
@@ -52,11 +51,10 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(OptionConstants.keym
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, OptionConstants.keymodel_startsel),
-    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""),
+  @OptionTest(
+    VimOption(OptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_startsel]),
+    VimOption(OptionConstants.selectmode, limitedValues = [""]),
   )
-  @Test
   fun `test visual right twice`() {
     doTest(
       listOf("<S-Right><S-Right>"),
@@ -82,11 +80,10 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(OptionConstants.keym
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, OptionConstants.keymodel_startsel),
-    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, OptionConstants.selectmode_key),
+  @OptionTest(
+    VimOption(OptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_startsel]),
+    VimOption(OptionConstants.selectmode, limitedValues = [OptionConstants.selectmode_key]),
   )
-  @Test
   fun `test select right`() {
     doTest(
       listOf("<S-Right>"),
@@ -112,11 +109,10 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(OptionConstants.keym
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, OptionConstants.keymodel_startsel),
-    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, OptionConstants.selectmode_key),
+  @OptionTest(
+    VimOption(OptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_startsel]),
+    VimOption(OptionConstants.selectmode, limitedValues = [OptionConstants.selectmode_key]),
   )
-  @Test
   fun `test select right twice`() {
     doTest(
       listOf("<S-Right><S-Right>"),
@@ -142,11 +138,10 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(OptionConstants.keym
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
-    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""),
+  @OptionTest(
+    VimOption(OptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_continueselect]),
+    VimOption(OptionConstants.selectmode, limitedValues = [""]),
   )
-  @Test
   fun `test simple motion char mode`() {
     doTest(
       listOf("gh", "<S-Right>"),
@@ -172,11 +167,10 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(OptionConstants.keym
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
-    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""),
+  @OptionTest(
+    VimOption(OptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_continueselect]),
+    VimOption(OptionConstants.selectmode, limitedValues = [""]),
   )
-  @Test
   fun `test at the lineend char mode`() {
     doTest(
       listOf("gh", "<S-Right>"),
@@ -202,11 +196,10 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(OptionConstants.keym
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
-    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""),
+  @OptionTest(
+    VimOption(OptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_continueselect]),
+    VimOption(OptionConstants.selectmode, limitedValues = [""]),
   )
-  @Test
   fun `test out of line char mode`() {
     doTest(
       listOf("gh", "<S-Right>".repeat(2)),
@@ -232,11 +225,10 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(OptionConstants.keym
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
-    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""),
+  @OptionTest(
+    VimOption(OptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_continueselect]),
+    VimOption(OptionConstants.selectmode, limitedValues = [""]),
   )
-  @Test
   fun `test file end char mode`() {
     doTest(
       listOf("gh", "<S-Right>".repeat(2)),
@@ -262,11 +254,10 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(OptionConstants.keym
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
-    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""),
+  @OptionTest(
+    VimOption(OptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_continueselect]),
+    VimOption(OptionConstants.selectmode, limitedValues = [""]),
   )
-  @Test
   fun `test file char mode multicaret`() {
     doTest(
       listOf("gh", "<S-Right>".repeat(2)),
@@ -292,11 +283,10 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(OptionConstants.keym
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
-    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""),
+  @OptionTest(
+    VimOption(OptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_continueselect]),
+    VimOption(OptionConstants.selectmode, limitedValues = [""]),
   )
-  @Test
   fun `test simple motion line mode`() {
     doTest(
       listOf("gH", "<S-Right>"),
@@ -322,11 +312,10 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(OptionConstants.keym
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
-    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""),
+  @OptionTest(
+    VimOption(OptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_continueselect]),
+    VimOption(OptionConstants.selectmode, limitedValues = [""]),
   )
-  @Test
   fun `test lineend line mode`() {
     doTest(
       listOf("gH", "<S-Right>"),
@@ -352,11 +341,10 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(OptionConstants.keym
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
-    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""),
+  @OptionTest(
+    VimOption(OptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_continueselect]),
+    VimOption(OptionConstants.selectmode, limitedValues = [""]),
   )
-  @Test
   fun `test out of line line mode`() {
     doTest(
       listOf("gH", "<S-Right>".repeat(2)),
@@ -382,11 +370,10 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(OptionConstants.keym
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
-    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""),
+  @OptionTest(
+    VimOption(OptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_continueselect]),
+    VimOption(OptionConstants.selectmode, limitedValues = [""]),
   )
-  @Test
   fun `test fileend line mode`() {
     doTest(
       listOf("gH", "<S-Right>"),
@@ -412,11 +399,10 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(OptionConstants.keym
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
-    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""),
+  @OptionTest(
+    VimOption(OptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_continueselect]),
+    VimOption(OptionConstants.selectmode, limitedValues = [""]),
   )
-  @Test
   fun `test line mode multicaret`() {
     doTest(
       listOf("gH", "<S-Right>"),
@@ -442,11 +428,10 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(OptionConstants.keym
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
-    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""),
+  @OptionTest(
+    VimOption(OptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_continueselect]),
+    VimOption(OptionConstants.selectmode, limitedValues = [""]),
   )
-  @Test
   fun `test simple motion block mode`() {
     doTest(
       listOf("g<C-H>", "<S-Right>"),
@@ -472,11 +457,10 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(OptionConstants.keym
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
-    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""),
+  @OptionTest(
+    VimOption(OptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_continueselect]),
+    VimOption(OptionConstants.selectmode, limitedValues = [""]),
   )
-  @Test
   fun `test at the lineend block mode`() {
     doTest(
       listOf("g<C-H>", "<S-Right>"),
@@ -502,11 +486,10 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(OptionConstants.keym
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
-    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""),
+  @OptionTest(
+    VimOption(OptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_continueselect]),
+    VimOption(OptionConstants.selectmode, limitedValues = [""]),
   )
-  @Test
   fun `test out of line block mode`() {
     doTest(
       listOf("g<C-H>", "<S-Right>".repeat(2)),
@@ -532,11 +515,10 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(OptionConstants.keym
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
-    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""),
+  @OptionTest(
+    VimOption(OptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_continueselect]),
+    VimOption(OptionConstants.selectmode, limitedValues = [""]),
   )
-  @Test
   fun `test file end block mode`() {
     doTest(
       listOf("g<C-H>", "<S-Right>".repeat(2)),
@@ -562,11 +544,10 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(OptionConstants.keym
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, OptionConstants.keymodel_continueselect),
-    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""),
+  @OptionTest(
+    VimOption(OptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_continueselect]),
+    VimOption(OptionConstants.selectmode, limitedValues = [""]),
   )
-  @Test
   fun `test to longer line block mode`() {
     doTest(
       listOf("g<C-H>", "<S-Down>", "<S-Right>".repeat(3)),
@@ -592,11 +573,10 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(OptionConstants.keym
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, OptionConstants.keymodel_continuevisual),
-    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""),
+  @OptionTest(
+    VimOption(OptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_continuevisual]),
+    VimOption(OptionConstants.selectmode, limitedValues = [""]),
   )
-  @Test
   fun `test continuevisual`() {
     doTest(
       listOf("v", "<S-Right>".repeat(3)),
@@ -622,11 +602,10 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(OptionConstants.keym
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, ""),
-    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""),
+  @OptionTest(
+    VimOption(OptionConstants.keymodel, limitedValues = [""]),
+    VimOption(OptionConstants.selectmode, limitedValues = [""]),
   )
-  @Test
   fun `test no continueselect`() {
     doTest(
       listOf("gh", "<S-Right>".repeat(3)),
@@ -652,11 +631,10 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(OptionConstants.keym
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, ""),
-    VimTestOption(OptionConstants.selectmode, OptionValueType.STRING, ""),
+  @OptionTest(
+    VimOption(OptionConstants.keymodel, limitedValues = [""]),
+    VimOption(OptionConstants.selectmode, limitedValues = [""]),
   )
-  @Test
   fun `test no continuevisual`() {
     doTest(
       listOf("v", "<S-Right>".repeat(3)),

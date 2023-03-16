@@ -12,18 +12,16 @@ package org.jetbrains.plugins.ideavim.action.change.delete
 
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.options.OptionConstants
-import org.jetbrains.plugins.ideavim.OptionValueType
+import org.jetbrains.plugins.ideavim.impl.VimOption
+import org.jetbrains.plugins.ideavim.impl.OptionTest
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimOptionDefaultAll
-import org.jetbrains.plugins.ideavim.VimOptionTestCase
-import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
-import org.jetbrains.plugins.ideavim.VimTestOption
-import org.junit.jupiter.api.Test
+import org.jetbrains.plugins.ideavim.impl.TraceOptions
+import org.jetbrains.plugins.ideavim.VimTestCase
 
-class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtualedit) {
-  @VimOptionDefaultAll
-  @Test
+@TraceOptions(OptionConstants.virtualedit)
+class DeleteVisualLinesEndActionTest : VimTestCase() {
+  @OptionTest(VimOption(OptionConstants.virtualedit))
   fun `test simple deletion`() {
     val keys = listOf("v", "D")
     val before = """
@@ -45,8 +43,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.virtualedit, OptionValueType.STRING, OptionConstants.virtualedit_onemore))
-  @Test
+  @OptionTest(VimOption(OptionConstants.virtualedit, limitedValues = [OptionConstants.virtualedit_onemore]))
   fun `test virtual edit delete middle to end`() {
     doTest(
       "D",
@@ -64,8 +61,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.virtualedit, OptionValueType.STRING, OptionConstants.virtualedit_onemore))
-  @Test
+  @OptionTest(VimOption(OptionConstants.virtualedit, limitedValues = [OptionConstants.virtualedit_onemore]))
   fun `test virtual edit delete end to end`() {
     doTest(
       "D",
@@ -83,8 +79,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.virtualedit, OptionValueType.STRING, OptionConstants.virtualedit_onemore))
-  @Test
+  @OptionTest(VimOption(OptionConstants.virtualedit, limitedValues = [OptionConstants.virtualedit_onemore]))
   fun `test virtual edit delete to end from virtual space`() {
     doTest(
       "D",
@@ -101,8 +96,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
     )
   }
 
-  @VimOptionDefaultAll
-  @Test
+  @OptionTest(VimOption(OptionConstants.virtualedit))
   fun `test simple deletion with indent`() {
     val keys = listOf("v", "D")
     val before = """
@@ -123,9 +117,8 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
     doTest(keys, before, after)
   }
 
-  @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
-  @Test
+  @OptionTest(VimOption(OptionConstants.virtualedit))
   fun `test simple deletion with indent and nostartofline`() {
     val keys = listOf("v", "D")
     val before = """
@@ -148,8 +141,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
     }
   }
 
-  @VimOptionDefaultAll
-  @Test
+  @OptionTest(VimOption(OptionConstants.virtualedit))
   fun `test simple deletion empty line`() {
     val keys = listOf("v", "D")
     val before = """
@@ -170,8 +162,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
     doTest(keys, before, after)
   }
 
-  @VimOptionDefaultAll
-  @Test
+  @OptionTest(VimOption(OptionConstants.virtualedit))
   fun `test simple deletion last line`() {
     val keys = listOf("v", "D")
     val before = """
@@ -194,8 +185,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
     doTest(keys, before, after)
   }
 
-  @VimOptionDefaultAll
-  @Test
+  @OptionTest(VimOption(OptionConstants.virtualedit))
   fun `test simple deletion first line`() {
     val keys = listOf("v", "D")
     val before = """
@@ -216,8 +206,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
     doTest(keys, before, after)
   }
 
-  @VimOptionDefaultAll
-  @Test
+  @OptionTest(VimOption(OptionConstants.virtualedit))
   fun `test simple deletion before empty`() {
     val keys = listOf("v", "D")
     val before = """
@@ -240,8 +229,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
     doTest(keys, before, after)
   }
 
-  @VimOptionDefaultAll
-  @Test
+  @OptionTest(VimOption(OptionConstants.virtualedit))
   fun `test simple deletion last line without empty line`() {
     val keys = listOf("v", "D")
     val before = """
@@ -262,8 +250,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
     doTest(keys, before, after)
   }
 
-  @VimOptionDefaultAll
-  @Test
+  @OptionTest(VimOption(OptionConstants.virtualedit))
   fun `test simple deletion multiline`() {
     val keys = listOf("vj", "D")
     val before = """
@@ -283,8 +270,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
     doTest(keys, before, after)
   }
 
-  @VimOptionDefaultAll
-  @Test
+  @OptionTest(VimOption(OptionConstants.virtualedit))
   fun `test simple deletion multiline motion up`() {
     val keys = listOf("vk", "D")
     val before = """
@@ -304,9 +290,8 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
     doTest(keys, before, after)
   }
 
-  @VimOptionDefaultAll
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @Test
+  @OptionTest(VimOption(OptionConstants.virtualedit))
   fun `test delete visual lines end action`() {
     typeTextInFile(
       "v" + "2j" + "D",
@@ -324,8 +309,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
     assertState("${c}abcde\n${c}")
   }
 
-  @VimOptionDefaultAll
-  @Test
+  @OptionTest(VimOption(OptionConstants.virtualedit))
   fun `test line simple deletion`() {
     val keys = listOf("V", "D")
     val before = """
@@ -346,8 +330,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
     doTest(keys, before, after)
   }
 
-  @VimOptionDefaultAll
-  @Test
+  @OptionTest(VimOption(OptionConstants.virtualedit))
   fun `test line deletion with indent`() {
     val keys = listOf("V", "D")
     val before = """
@@ -368,9 +351,8 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
     doTest(keys, before, after)
   }
 
-  @VimOptionDefaultAll
+  @OptionTest(VimOption(OptionConstants.virtualedit))
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
-  @Test
   fun `test line deletion with indent and nostartofline`() {
     val keys = listOf("V", "D")
     val before = """
@@ -393,8 +375,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
     }
   }
 
-  @VimOptionDefaultAll
-  @Test
+  @OptionTest(VimOption(OptionConstants.virtualedit))
   fun `test line deletion empty line`() {
     val keys = listOf("V", "D")
     val before = """
@@ -415,8 +396,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
     doTest(keys, before, after)
   }
 
-  @VimOptionDefaultAll
-  @Test
+  @OptionTest(VimOption(OptionConstants.virtualedit))
   fun `test line deletion last line`() {
     val keys = listOf("V", "D")
     val before = """
@@ -439,8 +419,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
     doTest(keys, before, after)
   }
 
-  @VimOptionDefaultAll
-  @Test
+  @OptionTest(VimOption(OptionConstants.virtualedit))
   fun `test line deletion last line without empty line`() {
     val keys = listOf("V", "D")
     val before = """
@@ -461,8 +440,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
     doTest(keys, before, after)
   }
 
-  @VimOptionDefaultAll
-  @Test
+  @OptionTest(VimOption(OptionConstants.virtualedit))
   fun `test line deletion multiline`() {
     val keys = listOf("Vj", "D")
     val before = """
@@ -482,8 +460,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
     doTest(keys, before, after)
   }
 
-  @VimOptionDefaultAll
-  @Test
+  @OptionTest(VimOption(OptionConstants.virtualedit))
   fun `test line deletion multiline motion up`() {
     val keys = listOf("Vk", "D")
     val before = """
@@ -503,9 +480,8 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
     doTest(keys, before, after)
   }
 
-  @VimOptionDefaultAll
+  @OptionTest(VimOption(OptionConstants.virtualedit))
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @Test
   fun `test line delete visual lines end action`() {
     typeTextInFile(
       "V" + "2j" + "D",
@@ -523,8 +499,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
     assertState("${c}abcde\n${c}")
   }
 
-  @VimOptionDefaultAll
-  @Test
+  @OptionTest(VimOption(OptionConstants.virtualedit))
   fun `test block simple deletion`() {
     val keys = listOf("<C-V>", "D")
     val before = """
@@ -546,8 +521,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
     doTest(keys, before, after)
   }
 
-  @VimOptionDefaultAll
-  @Test
+  @OptionTest(VimOption(OptionConstants.virtualedit))
   fun `test block deletion empty line`() {
     val keys = listOf("<C-V>", "D")
     val before = """
@@ -569,8 +543,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
     doTest(keys, before, after)
   }
 
-  @VimOptionDefaultAll
-  @Test
+  @OptionTest(VimOption(OptionConstants.virtualedit))
   fun `test block deletion last line`() {
     val keys = listOf("<C-V>", "D")
     val before = """
@@ -594,8 +567,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
     doTest(keys, before, after)
   }
 
-  @VimOptionDefaultAll
-  @Test
+  @OptionTest(VimOption(OptionConstants.virtualedit))
   fun `test block deletion last line without empty line`() {
     val keys = listOf("<C-V>", "D")
     val before = """
@@ -617,8 +589,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
     doTest(keys, before, after)
   }
 
-  @VimOptionDefaultAll
-  @Test
+  @OptionTest(VimOption(OptionConstants.virtualedit))
   fun `test block deletion multiline`() {
     val keys = listOf("<C-V>j", "D")
     val before = """
@@ -640,8 +611,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
     doTest(keys, before, after)
   }
 
-  @VimOptionDefaultAll
-  @Test
+  @OptionTest(VimOption(OptionConstants.virtualedit))
   fun `test block deletion multiline motion up`() {
     val keys = listOf("<C-V>k", "D")
     val before = """
@@ -663,8 +633,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
     doTest(keys, before, after)
   }
 
-  @VimOptionDefaultAll
-  @Test
+  @OptionTest(VimOption(OptionConstants.virtualedit))
   fun `test delete visual block line end action`() {
     typeTextInFile(
       "<C-V>" + "2j" + "2l" + "D",
@@ -690,9 +659,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(OptionConstants.virtual
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.virtualedit, OptionValueType.STRING, OptionConstants.virtualedit_onemore))
-  @Test
-  fun `test change dollar`() {
+  @OptionTest(VimOption(OptionConstants.virtualedit, limitedValues = [OptionConstants.virtualedit_onemore]))  fun `test change dollar`() {
     doTest(
       "c$",
       """

@@ -10,7 +10,6 @@ package org.jetbrains.plugins.ideavim.action.motion.leftright
 
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimOptionDefaultAll
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
@@ -32,7 +31,6 @@ class MotionLeftActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionDefaultAll
   @Test
   fun `test whichwrap at file start`() {
     doTest(
@@ -49,7 +47,6 @@ class MotionLeftActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionDefaultAll
   @Test
   fun `test whichwrap to previous line`() {
     doTest(
@@ -68,7 +65,6 @@ class MotionLeftActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionDefaultAll
   @Test
   fun `test from empty line to empty line`() {
     doTest(
@@ -91,7 +87,6 @@ class MotionLeftActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionDefaultAll
   @Test
   fun `test d command with whichwrap`() {
     doTest(

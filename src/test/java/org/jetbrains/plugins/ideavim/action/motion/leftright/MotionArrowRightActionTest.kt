@@ -13,20 +13,18 @@ package org.jetbrains.plugins.ideavim.action.motion.leftright
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.options.OptionConstants
-import org.jetbrains.plugins.ideavim.OptionValueType
+import org.jetbrains.plugins.ideavim.impl.VimOption
+import org.jetbrains.plugins.ideavim.impl.OptionTest
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimOptionDefaultAll
-import org.jetbrains.plugins.ideavim.VimOptionTestCase
-import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
-import org.jetbrains.plugins.ideavim.VimTestOption
-import org.junit.jupiter.api.Test
+import org.jetbrains.plugins.ideavim.impl.TraceOptions
+import org.jetbrains.plugins.ideavim.VimTestCase
 
-class MotionArrowRightActionTest : VimOptionTestCase(OptionConstants.keymodel) {
+@TraceOptions(OptionConstants.keymodel)
+class MotionArrowRightActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.INLAYS)
-  @VimOptionDefaultAll
-  @Test
+  @OptionTest(VimOption(OptionConstants.keymodel, doesntAffectTest = true))
   fun `test with inlay related to preceding text and block caret`() {
     val before = "I f${c}ound it in a legendary land"
     val after = "I fo${c}und it in a legendary land"
@@ -50,8 +48,7 @@ class MotionArrowRightActionTest : VimOptionTestCase(OptionConstants.keymodel) {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.INLAYS)
-  @VimOptionDefaultAll
-  @Test
+  @OptionTest(VimOption(OptionConstants.keymodel, doesntAffectTest = true))
   fun `test with inlay related to preceding text and block caret 2`() {
     val before = "I fo${c}und it in a legendary land"
     val after = "I fou${c}nd it in a legendary land"
@@ -73,8 +70,7 @@ class MotionArrowRightActionTest : VimOptionTestCase(OptionConstants.keymodel) {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.INLAYS)
-  @VimOptionDefaultAll
-  @Test
+  @OptionTest(VimOption(OptionConstants.keymodel, doesntAffectTest = true))
   fun `test with inlay related to preceding text and bar caret`() {
     val before = "I f${c}ound it in a legendary land"
     val after = "I fo${c}und it in a legendary land"
@@ -102,8 +98,7 @@ class MotionArrowRightActionTest : VimOptionTestCase(OptionConstants.keymodel) {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.INLAYS)
-  @VimOptionDefaultAll
-  @Test
+  @OptionTest(VimOption(OptionConstants.keymodel, doesntAffectTest = true))
   fun `test with inlay related to preceding text and bar caret 2`() {
     val before = "I fo${c}und it in a legendary land"
     val after = "I fou${c}nd it in a legendary land"
@@ -139,8 +134,7 @@ class MotionArrowRightActionTest : VimOptionTestCase(OptionConstants.keymodel) {
 
   // Kotlin parameter hints are a good example of inlays related to following text
   @TestWithoutNeovim(SkipNeovimReason.INLAYS)
-  @VimOptionDefaultAll
-  @Test
+  @OptionTest(VimOption(OptionConstants.keymodel, doesntAffectTest = true))
   fun `test with inlay related to following text and block caret`() {
     val before = "I f${c}ound it in a legendary land"
     val after = "I fo${c}und it in a legendary land"
@@ -163,8 +157,7 @@ class MotionArrowRightActionTest : VimOptionTestCase(OptionConstants.keymodel) {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.INLAYS)
-  @VimOptionDefaultAll
-  @Test
+  @OptionTest(VimOption(OptionConstants.keymodel, doesntAffectTest = true))
   fun `test with inlay related to following text and bar caret`() {
     val before = "I f${c}ound it in a legendary land"
     val after = "I fo${c}und it in a legendary land"
@@ -191,8 +184,7 @@ class MotionArrowRightActionTest : VimOptionTestCase(OptionConstants.keymodel) {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionDefaultAll
-  @Test
+  @OptionTest(VimOption(OptionConstants.keymodel, doesntAffectTest = true))
   fun `test visual default options`() {
     doTest(
       listOf("v", "<Right>"),
@@ -218,14 +210,7 @@ class MotionArrowRightActionTest : VimOptionTestCase(OptionConstants.keymodel) {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(
-      OptionConstants.keymodel,
-      OptionValueType.STRING,
-      OptionConstants.keymodel_stopsel,
-    ),
-  )
-  @Test
+  @OptionTest(VimOption(OptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_stopsel]))
   fun `test visual stopsel`() {
     doTest(
       listOf("v", "<Right>"),
@@ -251,15 +236,8 @@ class MotionArrowRightActionTest : VimOptionTestCase(OptionConstants.keymodel) {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(
-      OptionConstants.keymodel,
-      OptionValueType.STRING,
-      OptionConstants.keymodel_stopselect,
-    ),
-  )
-  @Test
-  fun `test visual stopselect`() {
+@OptionTest(VimOption(OptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_stopselect]))
+    fun `test visual stopselect`() {
     doTest(
       listOf("v", "<Right>"),
       """
@@ -284,14 +262,7 @@ class MotionArrowRightActionTest : VimOptionTestCase(OptionConstants.keymodel) {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(
-      OptionConstants.keymodel,
-      OptionValueType.STRING,
-      OptionConstants.keymodel_stopvisual,
-    ),
-  )
-  @Test
+  @OptionTest(VimOption(OptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_stopvisual]))
   fun `test visual stopvisual`() {
     doTest(
       listOf("v", "<Right>"),
@@ -317,14 +288,7 @@ class MotionArrowRightActionTest : VimOptionTestCase(OptionConstants.keymodel) {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(
-      OptionConstants.keymodel,
-      OptionValueType.STRING,
-      OptionConstants.keymodel_stopvisual,
-    ),
-  )
-  @Test
+  @OptionTest(VimOption(OptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_stopvisual]))
   fun `test visual stopvisual multicaret`() {
     doTest(
       listOf("v", "<Right>"),
@@ -350,8 +314,7 @@ class MotionArrowRightActionTest : VimOptionTestCase(OptionConstants.keymodel) {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionDefaultAll
-  @Test
+  @OptionTest(VimOption(OptionConstants.keymodel, doesntAffectTest = true))
   fun `test whichwrap in the same line`() {
     doTest(
       listOf("<Right>"),
@@ -367,8 +330,7 @@ class MotionArrowRightActionTest : VimOptionTestCase(OptionConstants.keymodel) {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionDefaultAll
-  @Test
+  @OptionTest(VimOption(OptionConstants.keymodel, doesntAffectTest = true))
   fun `test whichwrap at file end`() {
     doTest(
       listOf("<Right>"),
@@ -384,8 +346,7 @@ class MotionArrowRightActionTest : VimOptionTestCase(OptionConstants.keymodel) {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionDefaultAll
-  @Test
+  @OptionTest(VimOption(OptionConstants.keymodel, doesntAffectTest = true))
   fun `test whichwrap to next line`() {
     doTest(
       listOf("<Right>"),
@@ -403,8 +364,7 @@ class MotionArrowRightActionTest : VimOptionTestCase(OptionConstants.keymodel) {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionDefaultAll
-  @Test
+  @OptionTest(VimOption(OptionConstants.keymodel, doesntAffectTest = true))
   fun `test from empty line to empty line`() {
     doTest(
       listOf("<Right>"),

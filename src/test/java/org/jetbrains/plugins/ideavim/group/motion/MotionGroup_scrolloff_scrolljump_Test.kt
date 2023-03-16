@@ -12,21 +12,19 @@ package org.jetbrains.plugins.ideavim.group.motion
 
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.options.OptionConstants
-import org.jetbrains.plugins.ideavim.OptionValueType
+import org.jetbrains.plugins.ideavim.impl.VimOption
+import org.jetbrains.plugins.ideavim.impl.OptionTest
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimOptionTestCase
-import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
-import org.jetbrains.plugins.ideavim.VimTestOption
-import org.junit.jupiter.api.Test
+import org.jetbrains.plugins.ideavim.impl.TraceOptions
+import org.jetbrains.plugins.ideavim.VimTestCase
 
 // These tests are sanity tests for scrolloff and scrolljump, with actions that move the cursor. Other actions that are
 // affected by scrolloff or scrolljump should include that in the action specific tests
-class MotionGroup_scrolloff_Test : VimOptionTestCase(OptionConstants.scrolloff) {
+@TraceOptions(OptionConstants.scrolloff)
+class MotionGroup_scrolloff_Test : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.scrolloff, OptionValueType.NUMBER, "0"))
-  @Test
-  fun `test move up shows no context with scrolloff=0`() {
+  @OptionTest(VimOption(OptionConstants.scrolloff, limitedValues = ["0"]))  fun `test move up shows no context with scrolloff=0`() {
     configureByPages(5)
     setPositionAndScroll(25, 25)
     typeText("k")
@@ -35,9 +33,7 @@ class MotionGroup_scrolloff_Test : VimOptionTestCase(OptionConstants.scrolloff) 
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.scrolloff, OptionValueType.NUMBER, "1"))
-  @Test
-  fun `test move up shows context line with scrolloff=1`() {
+  @OptionTest(VimOption(OptionConstants.scrolloff, limitedValues = ["1"]))  fun `test move up shows context line with scrolloff=1`() {
     configureByPages(5)
     setPositionAndScroll(25, 26)
     typeText("k")
@@ -46,9 +42,7 @@ class MotionGroup_scrolloff_Test : VimOptionTestCase(OptionConstants.scrolloff) 
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.scrolloff, OptionValueType.NUMBER, "10"))
-  @Test
-  fun `test move up shows context lines with scrolloff=10`() {
+  @OptionTest(VimOption(OptionConstants.scrolloff, limitedValues = ["10"]))  fun `test move up shows context lines with scrolloff=10`() {
     configureByPages(5)
     setPositionAndScroll(25, 35)
     typeText("k")
@@ -57,9 +51,7 @@ class MotionGroup_scrolloff_Test : VimOptionTestCase(OptionConstants.scrolloff) 
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.scrolloff, OptionValueType.NUMBER, "15"))
-  @Test
-  fun `test move up when scrolloff is slightly less than half screen height`() {
+  @OptionTest(VimOption(OptionConstants.scrolloff, limitedValues = ["15"]))  fun `test move up when scrolloff is slightly less than half screen height`() {
     // Screen height = 35. scrolloff=15. This gives 5 possible caret lines without scrolling (48, 49, 50, 51 + 52)
     configureByPages(5)
     setPositionAndScroll(33, 52)
@@ -87,9 +79,7 @@ class MotionGroup_scrolloff_Test : VimOptionTestCase(OptionConstants.scrolloff) 
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.scrolloff, OptionValueType.NUMBER, "16"))
-  @Test
-  fun `test move up when scrolloff is slightly less than half screen height 2`() {
+  @OptionTest(VimOption(OptionConstants.scrolloff, limitedValues = ["16"]))  fun `test move up when scrolloff is slightly less than half screen height 2`() {
     // Screen height = 35. scrolloff=16. This gives 3 possible caret lines without scrolling (49, 50 + 51)
     configureByPages(5)
     setPositionAndScroll(33, 51)
@@ -109,9 +99,7 @@ class MotionGroup_scrolloff_Test : VimOptionTestCase(OptionConstants.scrolloff) 
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.scrolloff, OptionValueType.NUMBER, "16"))
-  @Test
-  fun `test move up when scrolloff is slightly less than half screen height 3`() {
+  @OptionTest(VimOption(OptionConstants.scrolloff, limitedValues = ["16"]))  fun `test move up when scrolloff is slightly less than half screen height 3`() {
     // Screen height = 34. scrolloff=16
     // Even numbers. 2 possible caret lines without scrolling (49 + 50)
     configureByPages(5)
@@ -129,9 +117,8 @@ class MotionGroup_scrolloff_Test : VimOptionTestCase(OptionConstants.scrolloff) 
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.scrolloff, OptionValueType.NUMBER, "17"))
+  @OptionTest(VimOption(OptionConstants.scrolloff, limitedValues = ["17"]))
   @VimBehaviorDiffers(description = "Moving up in Vim will always have 16 lines above the caret line. IdeaVim keeps 17")
-  @Test
   fun `test move up when scrolloff is exactly screen height`() {
     // Page height = 34. scrolloff=17
     // 2 possible caret lines without scrolling (49 + 50)
@@ -150,9 +137,7 @@ class MotionGroup_scrolloff_Test : VimOptionTestCase(OptionConstants.scrolloff) 
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.scrolloff, OptionValueType.NUMBER, "17"))
-  @Test
-  fun `test move up when scrolloff is slightly greater than screen height keeps cursor in centre of screen`() {
+  @OptionTest(VimOption(OptionConstants.scrolloff, limitedValues = ["17"]))  fun `test move up when scrolloff is slightly greater than screen height keeps cursor in centre of screen`() {
     // Page height = 35. scrolloff=17
     configureByPages(5)
     setPositionAndScroll(33, 50)
@@ -163,9 +148,7 @@ class MotionGroup_scrolloff_Test : VimOptionTestCase(OptionConstants.scrolloff) 
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.scrolloff, OptionValueType.NUMBER, "22"))
-  @Test
-  fun `test move up when scrolloff is slightly greater than screen height keeps cursor in centre of screen 2`() {
+  @OptionTest(VimOption(OptionConstants.scrolloff, limitedValues = ["22"]))  fun `test move up when scrolloff is slightly greater than screen height keeps cursor in centre of screen 2`() {
     // Page height = 35. scrolloff=17
     configureByPages(5)
     setPositionAndScroll(33, 50)
@@ -176,9 +159,7 @@ class MotionGroup_scrolloff_Test : VimOptionTestCase(OptionConstants.scrolloff) 
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.scrolloff, OptionValueType.NUMBER, "0"))
-  @Test
-  fun `test move down shows no context with scrolloff=0`() {
+  @OptionTest(VimOption(OptionConstants.scrolloff, limitedValues = ["0"]))  fun `test move down shows no context with scrolloff=0`() {
     configureByPages(5)
     setPositionAndScroll(25, 59)
     typeText("j")
@@ -187,9 +168,7 @@ class MotionGroup_scrolloff_Test : VimOptionTestCase(OptionConstants.scrolloff) 
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.scrolloff, OptionValueType.NUMBER, "1"))
-  @Test
-  fun `test move down shows context line with scrolloff=1`() {
+  @OptionTest(VimOption(OptionConstants.scrolloff, limitedValues = ["1"]))  fun `test move down shows context line with scrolloff=1`() {
     configureByPages(5)
     setPositionAndScroll(25, 58)
     typeText("j")
@@ -198,9 +177,7 @@ class MotionGroup_scrolloff_Test : VimOptionTestCase(OptionConstants.scrolloff) 
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.scrolloff, OptionValueType.NUMBER, "10"))
-  @Test
-  fun `test move down shows context lines with scrolloff=10`() {
+  @OptionTest(VimOption(OptionConstants.scrolloff, limitedValues = ["10"]))  fun `test move down shows context lines with scrolloff=10`() {
     configureByPages(5)
     setPositionAndScroll(25, 49)
     typeText("j")
@@ -209,9 +186,7 @@ class MotionGroup_scrolloff_Test : VimOptionTestCase(OptionConstants.scrolloff) 
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.scrolloff, OptionValueType.NUMBER, "15"))
-  @Test
-  fun `test move down when scrolloff is slightly less than half screen height`() {
+  @OptionTest(VimOption(OptionConstants.scrolloff, limitedValues = ["15"]))  fun `test move down when scrolloff is slightly less than half screen height`() {
     // Screen height = 35. scrolloff=15. This gives 5 possible caret lines without scrolling (48, 49, 50, 51 + 52)
     configureByPages(5)
     setPositionAndScroll(33, 48)
@@ -239,9 +214,7 @@ class MotionGroup_scrolloff_Test : VimOptionTestCase(OptionConstants.scrolloff) 
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.scrolloff, OptionValueType.NUMBER, "16"))
-  @Test
-  fun `test move down when scrolloff is slightly less than half screen height 2`() {
+  @OptionTest(VimOption(OptionConstants.scrolloff, limitedValues = ["16"]))  fun `test move down when scrolloff is slightly less than half screen height 2`() {
     // Screen height = 35. scrolloff=16. This gives 3 possible caret lines without scrolling (49, 50 + 51)
     configureByPages(5)
     setPositionAndScroll(33, 49)
@@ -261,9 +234,7 @@ class MotionGroup_scrolloff_Test : VimOptionTestCase(OptionConstants.scrolloff) 
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.scrolloff, OptionValueType.NUMBER, "16"))
-  @Test
-  fun `test move down when scrolloff is slightly less than half screen height 3`() {
+  @OptionTest(VimOption(OptionConstants.scrolloff, limitedValues = ["16"]))  fun `test move down when scrolloff is slightly less than half screen height 3`() {
     // Screen height = 34. scrolloff=16
     // Even numbers. 2 possible caret lines without scrolling (49 + 50)
     configureByPages(5)
@@ -281,9 +252,7 @@ class MotionGroup_scrolloff_Test : VimOptionTestCase(OptionConstants.scrolloff) 
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.scrolloff, OptionValueType.NUMBER, "17"))
-  @Test
-  fun `test move down when scrolloff is exactly screen height`() {
+  @OptionTest(VimOption(OptionConstants.scrolloff, limitedValues = ["17"]))  fun `test move down when scrolloff is exactly screen height`() {
     // Page height = 34. scrolloff=17
     // 2 possible caret lines without scrolling (49 + 50), but moving to line 51 will scroll 2 lines!
     configureByPages(5)
@@ -301,9 +270,7 @@ class MotionGroup_scrolloff_Test : VimOptionTestCase(OptionConstants.scrolloff) 
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.scrolloff, OptionValueType.NUMBER, "17"))
-  @Test
-  fun `test move down when scrolloff is slightly greater than half screen height keeps cursor in centre of screen`() {
+  @OptionTest(VimOption(OptionConstants.scrolloff, limitedValues = ["17"]))  fun `test move down when scrolloff is slightly greater than half screen height keeps cursor in centre of screen`() {
     // Page height = 35. scrolloff=17
     configureByPages(5)
     setPositionAndScroll(33, 50)
@@ -314,9 +281,7 @@ class MotionGroup_scrolloff_Test : VimOptionTestCase(OptionConstants.scrolloff) 
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.scrolloff, OptionValueType.NUMBER, "22"))
-  @Test
-  fun `test move down when scrolloff is slightly greater than half screen height keeps cursor in centre of screen 2`() {
+  @OptionTest(VimOption(OptionConstants.scrolloff, limitedValues = ["22"]))  fun `test move down when scrolloff is slightly greater than half screen height keeps cursor in centre of screen 2`() {
     // Page height = 35. scrolloff=17
     configureByPages(5)
     setPositionAndScroll(33, 50)
@@ -327,9 +292,7 @@ class MotionGroup_scrolloff_Test : VimOptionTestCase(OptionConstants.scrolloff) 
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.scrolloff, OptionValueType.NUMBER, "999"))
-  @Test
-  fun `test scrolloff=999 keeps cursor in centre of screen`() {
+  @OptionTest(VimOption(OptionConstants.scrolloff, limitedValues = ["999"]))  fun `test scrolloff=999 keeps cursor in centre of screen`() {
     configureByPages(5)
     setPositionAndScroll(25, 42)
 
@@ -343,9 +306,7 @@ class MotionGroup_scrolloff_Test : VimOptionTestCase(OptionConstants.scrolloff) 
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.scrolloff, OptionValueType.NUMBER, "999"))
-  @Test
-  fun `test scrolloff=999 keeps cursor in centre of screen with even screen height`() {
+  @OptionTest(VimOption(OptionConstants.scrolloff, limitedValues = ["999"]))  fun `test scrolloff=999 keeps cursor in centre of screen with even screen height`() {
     configureByPages(5)
     setEditorVisibleSize(screenWidth, 34)
     setPositionAndScroll(26, 42)
@@ -360,9 +321,7 @@ class MotionGroup_scrolloff_Test : VimOptionTestCase(OptionConstants.scrolloff) 
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.scrolloff, OptionValueType.NUMBER, "0"))
-  @Test
-  fun `test reposition cursor when scrolloff is set`() {
+  @OptionTest(VimOption(OptionConstants.scrolloff, limitedValues = ["0"]))  fun `test reposition cursor when scrolloff is set`() {
     configureByPages(5)
     setPositionAndScroll(50, 50)
 
@@ -372,11 +331,10 @@ class MotionGroup_scrolloff_Test : VimOptionTestCase(OptionConstants.scrolloff) 
   }
 }
 
-class MotionGroup_scrolljump_Test : VimOptionTestCase(OptionConstants.scrolljump) {
+@TraceOptions(OptionConstants.scrolljump)
+class MotionGroup_scrolljump_Test : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.scrolljump, OptionValueType.NUMBER, "0"))
-  @Test
-  fun `test move up scrolls single line with scrolljump=0`() {
+  @OptionTest(VimOption(OptionConstants.scrolljump, limitedValues = ["0"]))  fun `test move up scrolls single line with scrolljump=0`() {
     configureByPages(5)
     setPositionAndScroll(25, 25)
     typeText("k")
@@ -385,9 +343,7 @@ class MotionGroup_scrolljump_Test : VimOptionTestCase(OptionConstants.scrolljump
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.scrolljump, OptionValueType.NUMBER, "1"))
-  @Test
-  fun `test move up scrolls single line with scrolljump=1`() {
+  @OptionTest(VimOption(OptionConstants.scrolljump, limitedValues = ["1"]))  fun `test move up scrolls single line with scrolljump=1`() {
     configureByPages(5)
     setPositionAndScroll(25, 25)
     typeText("k")
@@ -396,9 +352,7 @@ class MotionGroup_scrolljump_Test : VimOptionTestCase(OptionConstants.scrolljump
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.scrolljump, OptionValueType.NUMBER, "10"))
-  @Test
-  fun `test move up scrolls multiple lines with scrolljump=10`() {
+  @OptionTest(VimOption(OptionConstants.scrolljump, limitedValues = ["10"]))  fun `test move up scrolls multiple lines with scrolljump=10`() {
     configureByPages(5)
     setPositionAndScroll(25, 25)
     typeText("k")
@@ -407,9 +361,7 @@ class MotionGroup_scrolljump_Test : VimOptionTestCase(OptionConstants.scrolljump
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.scrolljump, OptionValueType.NUMBER, "0"))
-  @Test
-  fun `test move down scrolls single line with scrolljump=0`() {
+  @OptionTest(VimOption(OptionConstants.scrolljump, limitedValues = ["0"]))  fun `test move down scrolls single line with scrolljump=0`() {
     configureByPages(5)
     setPositionAndScroll(25, 59)
     typeText("j")
@@ -418,9 +370,7 @@ class MotionGroup_scrolljump_Test : VimOptionTestCase(OptionConstants.scrolljump
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.scrolljump, OptionValueType.NUMBER, "1"))
-  @Test
-  fun `test move down scrolls single line with scrolljump=1`() {
+  @OptionTest(VimOption(OptionConstants.scrolljump, limitedValues = ["1"]))  fun `test move down scrolls single line with scrolljump=1`() {
     configureByPages(5)
     setPositionAndScroll(25, 59)
     typeText("j")
@@ -429,9 +379,7 @@ class MotionGroup_scrolljump_Test : VimOptionTestCase(OptionConstants.scrolljump
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.scrolljump, OptionValueType.NUMBER, "10"))
-  @Test
-  fun `test move down scrolls multiple lines with scrolljump=10`() {
+  @OptionTest(VimOption(OptionConstants.scrolljump, limitedValues = ["10"]))  fun `test move down scrolls multiple lines with scrolljump=10`() {
     configureByPages(5)
     setPositionAndScroll(25, 59)
     typeText("j")
@@ -440,9 +388,7 @@ class MotionGroup_scrolljump_Test : VimOptionTestCase(OptionConstants.scrolljump
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.scrolljump, OptionValueType.NUMBER, "-50"))
-  @Test
-  fun `test negative scrolljump treated as percentage 1`() {
+  @OptionTest(VimOption(OptionConstants.scrolljump, limitedValues = ["-50"]))  fun `test negative scrolljump treated as percentage 1`() {
     configureByPages(5)
     setPositionAndScroll(39, 39)
     typeText("k")
@@ -451,9 +397,7 @@ class MotionGroup_scrolljump_Test : VimOptionTestCase(OptionConstants.scrolljump
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.scrolljump, OptionValueType.NUMBER, "-10"))
-  @Test
-  fun `test negative scrolljump treated as percentage 2`() {
+  @OptionTest(VimOption(OptionConstants.scrolljump, limitedValues = ["-10"]))  fun `test negative scrolljump treated as percentage 2`() {
     configureByPages(5)
     setPositionAndScroll(39, 39)
     typeText("k")
@@ -462,13 +406,13 @@ class MotionGroup_scrolljump_Test : VimOptionTestCase(OptionConstants.scrolljump
   }
 }
 
-class MotionGroup_scrolloff_scrolljump_Test : VimOptionTestCase(OptionConstants.scrolljump, OptionConstants.scrolloff) {
+@TraceOptions(OptionConstants.scrolljump, OptionConstants.scrolloff)
+class MotionGroup_scrolloff_scrolljump_Test : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.scrolljump, OptionValueType.NUMBER, "10"),
-    VimTestOption(OptionConstants.scrolloff, OptionValueType.NUMBER, "5"),
+  @OptionTest(
+    VimOption(OptionConstants.scrolljump, limitedValues = ["10"]),
+    VimOption(OptionConstants.scrolloff, limitedValues = ["5"]),
   )
-  @Test
   fun `test scroll up with scrolloff and scrolljump set`() {
     configureByPages(5)
     setPositionAndScroll(50, 55)
@@ -478,11 +422,10 @@ class MotionGroup_scrolloff_scrolljump_Test : VimOptionTestCase(OptionConstants.
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(OptionConstants.scrolljump, OptionValueType.NUMBER, "10"),
-    VimTestOption(OptionConstants.scrolloff, OptionValueType.NUMBER, "5"),
+  @OptionTest(
+    VimOption(OptionConstants.scrolljump, limitedValues = ["10"]),
+    VimOption(OptionConstants.scrolloff, limitedValues = ["5"]),
   )
-  @Test
   fun `test scroll down with scrolloff and scrolljump set`() {
     configureByPages(5)
     setPositionAndScroll(50, 79)

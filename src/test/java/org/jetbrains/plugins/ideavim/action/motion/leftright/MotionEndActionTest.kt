@@ -12,19 +12,17 @@ package org.jetbrains.plugins.ideavim.action.motion.leftright
 
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.options.OptionConstants
-import org.jetbrains.plugins.ideavim.OptionValueType
+import org.jetbrains.plugins.ideavim.impl.VimOption
+import org.jetbrains.plugins.ideavim.impl.OptionTest
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimOptionDefaultAll
-import org.jetbrains.plugins.ideavim.VimOptionTestCase
-import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
-import org.jetbrains.plugins.ideavim.VimTestOption
-import org.junit.jupiter.api.Test
+import org.jetbrains.plugins.ideavim.impl.TraceOptions
+import org.jetbrains.plugins.ideavim.VimTestCase
 
-class MotionEndActionTest : VimOptionTestCase(OptionConstants.keymodel) {
+@TraceOptions(OptionConstants.keymodel)
+class MotionEndActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionDefaultAll
-  @Test
+  @OptionTest(VimOption(OptionConstants.keymodel, doesntAffectTest = true))
   fun `test motion end`() {
     val keys = listOf("<End>")
     val before = """
@@ -47,8 +45,7 @@ class MotionEndActionTest : VimOptionTestCase(OptionConstants.keymodel) {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, ""))
-  @Test
+@OptionTest(VimOption(OptionConstants.keymodel, limitedValues = [""]))
   fun `test continue visual`() {
     val keys = listOf("v", "<End>")
     val before = """
@@ -71,8 +68,7 @@ class MotionEndActionTest : VimOptionTestCase(OptionConstants.keymodel) {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, ""))
-  @Test
+@OptionTest(VimOption(OptionConstants.keymodel, limitedValues = [""]))
   fun `test continue select`() {
     val keys = listOf("gh", "<End>")
     val before = """
@@ -95,15 +91,7 @@ class MotionEndActionTest : VimOptionTestCase(OptionConstants.keymodel) {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(
-      OptionConstants.keymodel,
-      OptionValueType.STRING,
-      OptionConstants.keymodel_stopvisual,
-    ),
-  )
-  @Test
-  fun `test exit visual`() {
+  @OptionTest(VimOption(OptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_stopvisual]))  fun `test exit visual`() {
     val keys = listOf("v", "<End>")
     val before = """
             A Discovery
@@ -125,14 +113,7 @@ class MotionEndActionTest : VimOptionTestCase(OptionConstants.keymodel) {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(
-      OptionConstants.keymodel,
-      OptionValueType.STRING,
-      OptionConstants.keymodel_stopselect,
-    ),
-  )
-  @Test
+@OptionTest(VimOption(OptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_stopselect]))
   fun `test exit select`() {
     val keys = listOf("gh", "<End>")
     val before = """
@@ -154,9 +135,8 @@ class MotionEndActionTest : VimOptionTestCase(OptionConstants.keymodel) {
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
-  @VimOptionDefaultAll
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @Test
+  @OptionTest(VimOption(OptionConstants.keymodel, doesntAffectTest = true))
   fun `test delete to the end`() {
     val keys = listOf("d", "<End>")
     val before = """

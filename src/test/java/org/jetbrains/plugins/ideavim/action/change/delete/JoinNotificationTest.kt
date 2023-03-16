@@ -16,18 +16,17 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.IjOptionConstants
 import com.maddyhome.idea.vim.group.NotificationService
-import org.jetbrains.plugins.ideavim.OptionValueType
-import org.jetbrains.plugins.ideavim.VimOptionTestCase
-import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
-import org.jetbrains.plugins.ideavim.VimTestOption
-import org.junit.jupiter.api.Test
+import org.jetbrains.plugins.ideavim.impl.VimOption
+import org.jetbrains.plugins.ideavim.impl.OptionTest
+import org.jetbrains.plugins.ideavim.impl.TraceOptions
+import org.jetbrains.plugins.ideavim.VimTestCase
 
 /**
  * @author Alex Plate
  */
-class JoinNotificationTest : VimOptionTestCase(IjOptionConstants.ideajoin) {
-  @VimOptionTestConfiguration(VimTestOption(IjOptionConstants.ideajoin, OptionValueType.NUMBER, "0"))
-  @Test
+@TraceOptions(IjOptionConstants.ideajoin)
+class JoinNotificationTest : VimTestCase() {
+  @OptionTest(VimOption(IjOptionConstants.ideajoin, limitedValues = ["false"]))
   fun `test notification shown for no ideajoin`() {
     val before = "I found${c} it\n in a legendary land"
     configureByText(before)
@@ -44,8 +43,7 @@ class JoinNotificationTest : VimOptionTestCase(IjOptionConstants.ideajoin) {
     }
   }
 
-  @VimOptionTestConfiguration(VimTestOption(IjOptionConstants.ideajoin, OptionValueType.NUMBER, "1"))
-  @Test
+  @OptionTest(VimOption(IjOptionConstants.ideajoin, limitedValues = ["true"]))
   fun `test notification not shown for ideajoin`() {
     val before = "I found${c} it\n in a legendary land"
     configureByText(before)
@@ -56,8 +54,7 @@ class JoinNotificationTest : VimOptionTestCase(IjOptionConstants.ideajoin) {
     kotlin.test.assertTrue(notifications.isEmpty() || notifications.last().isExpired || IjOptionConstants.ideajoin !in notifications.last().content)
   }
 
-  @VimOptionTestConfiguration(VimTestOption(IjOptionConstants.ideajoin, OptionValueType.NUMBER, "0"))
-  @Test
+  @OptionTest(VimOption(IjOptionConstants.ideajoin, limitedValues = ["false"]))
   fun `test notification not shown if was shown already`() {
     val before = "I found${c} it\n in a legendary land"
     configureByText(before)

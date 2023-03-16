@@ -12,24 +12,17 @@ package org.jetbrains.plugins.ideavim.action.motion.select.motion
 
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.options.OptionConstants
-import org.jetbrains.plugins.ideavim.OptionValueType
+import org.jetbrains.plugins.ideavim.impl.VimOption
+import org.jetbrains.plugins.ideavim.impl.OptionTest
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimOptionTestCase
-import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
-import org.jetbrains.plugins.ideavim.VimTestOption
-import org.junit.jupiter.api.Test
+import org.jetbrains.plugins.ideavim.impl.TraceOptions
+import org.jetbrains.plugins.ideavim.VimTestCase
 
-class SelectMotionRightActionTest : VimOptionTestCase(OptionConstants.keymodel) {
+@TraceOptions(OptionConstants.keymodel)
+class SelectMotionRightActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(
-      OptionConstants.keymodel,
-      OptionValueType.STRING,
-      OptionConstants.keymodel_stopselect,
-    ),
-  )
-  @Test
+  @OptionTest(VimOption(OptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_stopselect]))
   fun `test char select simple move`() {
     doTest(
       listOf("viw", "<C-G>", "<Right>"),
@@ -55,14 +48,7 @@ class SelectMotionRightActionTest : VimOptionTestCase(OptionConstants.keymodel) 
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(
-    VimTestOption(
-      OptionConstants.keymodel,
-      OptionValueType.STRING,
-      OptionConstants.keymodel_stopselect,
-    ),
-  )
-  @Test
+  @OptionTest(VimOption(OptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_stopselect]))
   fun `test select multiple carets`() {
     doTest(
       listOf("viw", "<C-G>", "<Right>"),
@@ -88,8 +74,7 @@ class SelectMotionRightActionTest : VimOptionTestCase(OptionConstants.keymodel) 
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(OptionConstants.keymodel, OptionValueType.STRING, ""))
-  @Test
+  @OptionTest(VimOption(OptionConstants.keymodel, limitedValues = [""]))
   fun `test without stopsel`() {
     doTest(
       listOf("viw", "<C-G>", "<Right>"),

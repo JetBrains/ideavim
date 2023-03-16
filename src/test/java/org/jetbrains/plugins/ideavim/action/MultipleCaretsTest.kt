@@ -2731,7 +2731,7 @@ rtyfg${c}hzxc"""
     typeText(injector.parser.parseKeys("ye"))
     val lastRegister = VimPlugin.getRegister().lastRegister
     assertNotNull<Any>(lastRegister)
-    val text = lastRegister!!.text
+    val text = lastRegister.text
     assertNotNull<Any>(text)
     typeText(injector.parser.parseKeys("P"))
     val after = "qwe as${c}dasd zx${c}czxc"
@@ -2753,7 +2753,7 @@ rtyfg${c}hzxc"""
     typeText(injector.parser.parseKeys("yj"))
     val lastRegister = VimPlugin.getRegister().lastRegister
     assertNotNull<Any>(lastRegister)
-    val text = lastRegister!!.text
+    val text = lastRegister.text
     assertNotNull<Any>(text)
     typeText(injector.parser.parseKeys("P"))
     val after = """
@@ -2787,7 +2787,7 @@ rtyfg${c}hzxc"""
     typeText(injector.parser.parseKeys("2yy"))
     val lastRegister = VimPlugin.getRegister().lastRegister
     assertNotNull<Any>(lastRegister)
-    val text = lastRegister!!.text
+    val text = lastRegister.text
     assertNotNull<Any>(text)
     typeText(injector.parser.parseKeys("j" + "p"))
     val after = """
