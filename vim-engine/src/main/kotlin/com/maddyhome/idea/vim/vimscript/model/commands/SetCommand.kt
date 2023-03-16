@@ -21,14 +21,15 @@ import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.Msg
+import com.maddyhome.idea.vim.options.NumberOption
 import com.maddyhome.idea.vim.options.Option
 import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.options.StringOption
 import com.maddyhome.idea.vim.options.ToggleOption
-import com.maddyhome.idea.vim.options.appendValue
-import com.maddyhome.idea.vim.options.prependValue
-import com.maddyhome.idea.vim.options.removeValue
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import java.util.*
 import kotlin.math.ceil
 import kotlin.math.min
@@ -157,9 +158,9 @@ public fun parseOptionLine(editor: VimEditor, args: String, scope: OptionScope, 
             val existingValue = optionGroup.getOptionValue(option, scope)
             val value = option.parseValue(token.substring(eq + 1), token)
             val newValue = when (op) {
-              '+' -> option.appendValue(existingValue, value)
-              '^' -> option.prependValue(existingValue, value)
-              '-' -> option.removeValue(existingValue, value)
+              '+' -> appendValue(option, existingValue, value)
+              '^' -> prependValue(option, existingValue, value)
+              '-' -> removeValue(option, existingValue, value)
               else -> value
             } ?: throw exExceptionMessage("E474", token)
             optionGroup.setOptionValue(option, scope, newValue)
@@ -266,5 +267,29 @@ private fun formatKnownOptionValue(option: Option<out VimDataType>, scope: Optio
     if (value.asBoolean()) "  ${option.name}" else "no${option.name}"
   } else {
     "${option.name}=$value"
+  }
+}
+
+private fun appendValue(option: Option<out VimDataType>, currentValue: VimDataType, value: VimDataType): VimDataType? {
+  return when (option) {
+    is StringOption -> option.appendValue(currentValue as VimString, value as VimString)
+    is NumberOption -> option.addValues(currentValue as VimInt, value as VimInt)
+    else -> null
+  }
+}
+
+private fun prependValue(option: Option<out VimDataType>, currentValue: VimDataType, value: VimDataType): VimDataType? {
+  return when (option) {
+    is StringOption -> option.prependValue(currentValue as VimString, value as VimString)
+    is NumberOption -> option.multiplyValues(currentValue as VimInt, value as VimInt)
+    else -> null
+  }
+}
+
+private fun removeValue(option: Option<out VimDataType>, currentValue: VimDataType, value: VimDataType): VimDataType? {
+  return when (option) {
+    is StringOption -> option.removeValue(currentValue as VimString, value as VimString)
+    is NumberOption -> option.subtractValues(currentValue as VimInt, value as VimInt)
+    else -> null
   }
 }
