@@ -16,6 +16,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
+import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
 
 class SpecialRegistersTest : VimTestCase() {

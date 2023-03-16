@@ -14,6 +14,7 @@ import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 import kotlin.math.roundToInt
+import kotlin.test.assertEquals
 
 /*
                                                        *zs*
