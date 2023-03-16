@@ -63,7 +63,7 @@ private fun insertDeleteInsertedText(
       TextRange(deleteTo.point, offset.point),
       SelectionType.CHARACTER_WISE,
       false,
-      operatorArguments
+      operatorArguments,
     )
     return true
   }

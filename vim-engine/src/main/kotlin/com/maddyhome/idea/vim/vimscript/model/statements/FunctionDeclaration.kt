@@ -57,7 +57,8 @@ public enum class FunctionFlag(public val abbrev: String) {
   RANGE("range"),
   ABORT("abort"),
   DICT("dict"),
-  CLOSURE("closure");
+  CLOSURE("closure"),
+  ;
 
   public companion object {
     public fun getByName(abbrev: String): FunctionFlag? {

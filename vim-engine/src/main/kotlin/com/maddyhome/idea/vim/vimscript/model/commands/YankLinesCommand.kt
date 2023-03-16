@@ -48,8 +48,13 @@ public data class YankLinesCommand(val ranges: Ranges, var argument: String) : C
     return if (injector.yank.yankRange(
         editor,
         TextRange(starts.toIntArray(), ends.toIntArray()),
-        SelectionType.LINE_WISE, false
+        SelectionType.LINE_WISE,
+        false,
       )
-    ) ExecutionResult.Success else ExecutionResult.Error
+    ) {
+      ExecutionResult.Success
+    } else {
+      ExecutionResult.Error
+    }
   }
 }

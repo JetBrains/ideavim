@@ -80,7 +80,7 @@ public sealed class VimActionHandler(myRunForEachCaret: Boolean) : EditorActionH
     caret: VimCaret,
     context: ExecutionContext,
     cmd: Command,
-    operatorArguments: OperatorArguments
+    operatorArguments: OperatorArguments,
   ): Boolean {
     return when (this) {
       is ForEachCaret -> execute(editor, caret, context, cmd, operatorArguments)

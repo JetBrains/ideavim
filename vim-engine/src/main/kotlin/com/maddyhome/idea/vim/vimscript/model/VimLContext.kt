@@ -64,5 +64,5 @@ public object CommandLineVimLContext : VimLContext {
 public enum class ExecutableContext {
   COMMAND_LINE,
   SCRIPT,
-  FUNCTION
+  FUNCTION,
 }

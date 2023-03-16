@@ -40,7 +40,7 @@ public class ChangeCaseLowerMotionAction : ChangeEditorActionHandler.ForEachCare
           context,
           CharacterHelper.CASE_LOWER,
           argument,
-          operatorArguments
+          operatorArguments,
         )
   }
 }

@@ -45,7 +45,7 @@ public data class UnMapCommand(val ranges: Ranges, val argument: String, val cmd
       CommandInfo("sunm", "ap", MappingMode.S, false),
       CommandInfo("ou", "nmap", MappingMode.O, false),
       CommandInfo("iu", "nmap", MappingMode.I, false),
-      CommandInfo("cu", "nmap", MappingMode.C, false)
+      CommandInfo("cu", "nmap", MappingMode.C, false),
     )
   }
 }

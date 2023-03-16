@@ -27,7 +27,7 @@ public class MotionHomeAction : NonShiftedSpecialKeyHandler() {
     caret: ImmutableVimCaret,
     context: ExecutionContext,
     argument: Argument?,
-    operatorArguments: OperatorArguments
+    operatorArguments: OperatorArguments,
   ): Motion {
     return injector.motion.moveCaretToCurrentLineStart(editor, caret).toMotionOrError()
   }

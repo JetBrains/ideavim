@@ -77,7 +77,7 @@ private fun insertRegister(
   editor: VimEditor,
   context: ExecutionContext,
   key: Char,
-  operatorArguments: OperatorArguments
+  operatorArguments: OperatorArguments,
 ): Boolean {
   val register: Register? = injector.registerGroup.getRegister(key)
   if (register != null) {

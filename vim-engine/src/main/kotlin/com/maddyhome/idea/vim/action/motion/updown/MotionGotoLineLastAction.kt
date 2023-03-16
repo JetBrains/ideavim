@@ -39,7 +39,7 @@ public class MotionGotoLineLastAction : MotionActionHandler.ForEachCaret() {
         editor.lineCount() - 1
       } else {
         operatorArguments.count0 - 1
-      }
+      },
     )
     return injector.motion.moveCaretToLineWithStartOfLineOption(editor, line, caret).toMotion()
   }

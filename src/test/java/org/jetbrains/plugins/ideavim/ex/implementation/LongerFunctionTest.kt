@@ -10,7 +10,6 @@ package org.jetbrains.plugins.ideavim.ex.implementation
 
 import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.VimTestCase
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class LongerFunctionTest : VimTestCase() {
@@ -150,25 +149,33 @@ class LongerFunctionTest : VimTestCase() {
 
   @Test
   fun `test invert function in normal mode`() {
-    configureByText("""
+    configureByText(
+      """
       val myValue = t${c}rue
-      """)
+      """,
+    )
     injector.vimscriptExecutor.execute(invert)
     typeText("!")
-    assertState("""
+    assertState(
+      """
       val myValue = fals${c}e
-      """)
+      """,
+    )
   }
 
   @Test
   fun `test invert function in visual mode`() {
-    configureByText("""
+    configureByText(
+      """
       val my${c}StartOffset = 10
-      """)
+      """,
+    )
     injector.vimscriptExecutor.execute(invert)
     typeText("vtO!")
-    assertState("""
+    assertState(
+      """
       val myEndOffset = 10
-      """)
+      """,
+    )
   }
 }

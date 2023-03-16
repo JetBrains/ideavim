@@ -47,14 +47,14 @@ public data class MoveTextCommand(val ranges: Ranges, val argument: String) : Co
     val caretPosition = caret.getBufferPosition()
 
     val goToLineCommand = injector.vimscriptParser.parseCommand(argument) ?: throw ExException("E16: Invalid range")
-    
+
     val range = getTextRange(editor, caret, false)
-    
+
     /*
     FIXME: see VIM-2884. It's absolutely not the best way to resolve this bug
      */
     caret.moveToOffset(range.startOffset)
-    
+
     val lineRange = getLineRange(editor, caret)
     val line = min(editor.fileSize().toInt(), normalizeLine(editor, caret, goToLineCommand, lineRange))
     val linesMoved = lineRange.endLine - lineRange.startLine + 1
@@ -63,7 +63,6 @@ public data class MoveTextCommand(val ranges: Ranges, val argument: String) : Co
       throw ExException("E16: Invalid range")
     }
     val shift = line + 1 - editor.offsetToBufferPosition(range.startOffset).line
-
 
     val localMarks = injector.markService.getAllLocalMarks(caret)
       .filter { range.contains(it.offset(editor)) }
@@ -79,10 +78,10 @@ public data class MoveTextCommand(val ranges: Ranges, val argument: String) : Co
 
     val text = editor.getText(range)
     val textData = PutData.TextData(text, SelectionType.LINE_WISE, emptyList())
-    
+
     val dropNewLineInEnd = (line + linesMoved == editor.lineCount() - 1 && text.last() == '\n') ||
       (lineRange.endLine == editor.lineCount() - 1)
-    
+
     editor.deleteString(range)
     val putData = if (line == -1) {
       caret.moveToOffset(0)
@@ -91,7 +90,7 @@ public data class MoveTextCommand(val ranges: Ranges, val argument: String) : Co
       PutData(textData, null, 1, insertTextBeforeCaret = false, rawIndent = true, caretAfterInsertedText = false, putToLine = line)
     }
     injector.put.putTextForCaret(editor, caret, context, putData)
-    
+
     if (dropNewLineInEnd) {
       assert(editor.text().last() == '\n')
       editor.deleteString(TextRange(editor.text().length - 1, editor.text().length))
@@ -155,9 +154,9 @@ public data class MoveTextCommand(val ranges: Ranges, val argument: String) : Co
   ): Int {
     var line = command.commandRanges.getFirstLine(editor, caret)
     val adj = lineRange.endLine - lineRange.startLine + 1
-    if (line >= lineRange.endLine)
+    if (line >= lineRange.endLine) {
       line -= adj
-    else if (line >= lineRange.startLine) throw InvalidRangeException(injector.messages.message(Msg.e_backrange))
+    } else if (line >= lineRange.startLine) throw InvalidRangeException(injector.messages.message(Msg.e_backrange))
 
     return line
   }

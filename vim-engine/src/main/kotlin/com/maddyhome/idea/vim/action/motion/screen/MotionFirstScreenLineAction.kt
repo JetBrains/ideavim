@@ -44,7 +44,6 @@ public abstract class MotionFirstScreenLineActionBase(private val operatorPendin
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-
     // Only apply scrolloff for NX motions. For op pending, use the actual first line and apply scrolloff after.
     // E.g. yH will yank from first visible line to current line, but it also moves the caret to the first visible line.
     // This is inside scrolloff, so Vim scrolls

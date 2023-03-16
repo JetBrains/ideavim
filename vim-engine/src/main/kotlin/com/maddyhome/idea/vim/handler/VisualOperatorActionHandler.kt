@@ -113,7 +113,7 @@ public sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false)
     caret: VimCaret,
     context: ExecutionContext,
     cmd: Command,
-    operatorArguments: OperatorArguments
+    operatorArguments: OperatorArguments,
   ): Boolean {
     logger.info("Execute visual command $cmd")
 
@@ -147,7 +147,7 @@ public sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false)
               context,
               cmd,
               selections.values.first(),
-              operatorArguments
+              operatorArguments,
             )
           else -> editor.forEachNativeCaret(
             { currentCaret ->
@@ -155,7 +155,7 @@ public sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false)
               val loopRes = executeAction(editor, currentCaret, context, cmd, range, operatorArguments)
               res[0] = loopRes and res[0]
             },
-            true
+            true,
           )
         }
 
@@ -184,8 +184,9 @@ public sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false)
             primaryCaret to VimBlockSelection(
               primaryCaret.offset.point,
               end,
-              this, range.columns >= VimMotionGroupBase.LAST_COLUMN
-            )
+              this,
+              range.columns >= VimMotionGroupBase.LAST_COLUMN,
+            ),
           )
         } else {
           val carets = mutableMapOf<VimCaret, VimSelection>()
@@ -203,8 +204,9 @@ public sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false)
           primaryCaret to VimBlockSelection(
             primaryCaret.vimSelectionStart,
             primaryCaret.offset.point,
-            this, primaryCaret.vimLastColumn >= VimMotionGroupBase.LAST_COLUMN
-          )
+            this,
+            primaryCaret.vimLastColumn >= VimMotionGroupBase.LAST_COLUMN,
+          ),
         )
       }
       else -> this.nativeCarets().associateWith { caret ->
@@ -215,7 +217,7 @@ public sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false)
           caret.selectionStart,
           caret.selectionEnd,
           SelectionType.fromSubMode(subMode),
-          this
+          this,
         )
       }
     }
@@ -224,7 +226,7 @@ public sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false)
   private class VisualStartFinishWrapper(
     private val editor: VimEditor,
     private val cmd: Command,
-    private val visualOperatorActionHandler: VisualOperatorActionHandler
+    private val visualOperatorActionHandler: VisualOperatorActionHandler,
   ) {
     private val visualChanges = mutableMapOf<VimCaret, VisualChange?>()
 
@@ -236,7 +238,9 @@ public sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false)
         val change =
           if (this@VisualStartFinishWrapper.editor.inVisualMode && !this@VisualStartFinishWrapper.editor.inRepeatMode) {
             VisualOperation.getRange(this@VisualStartFinishWrapper.editor, it, this@VisualStartFinishWrapper.cmd.flags)
-          } else null
+          } else {
+            null
+          }
         this@VisualStartFinishWrapper.visualChanges[it] = change
       }
       logger.debug { visualChanges.values.joinToString("\n") { "Caret: $visualChanges" } }

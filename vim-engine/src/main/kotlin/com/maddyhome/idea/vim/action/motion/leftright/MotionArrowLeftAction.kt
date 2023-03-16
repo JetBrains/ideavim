@@ -34,7 +34,7 @@ public class MotionArrowLeftAction : NonShiftedSpecialKeyHandler(), ComplicatedK
     caret: ImmutableVimCaret,
     context: ExecutionContext,
     argument: Argument?,
-    operatorArguments: OperatorArguments
+    operatorArguments: OperatorArguments,
   ): Motion {
     val allowWrap = injector.options(editor).hasValue(OptionConstants.whichwrap, "<")
     val allowEnd = operatorArguments.isOperatorPending // d<Left> deletes \n with wrap enabled

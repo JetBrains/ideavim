@@ -20,6 +20,7 @@ public interface VimProcessGroup {
   public fun startExCommand(editor: VimEditor, context: ExecutionContext?, cmd: Command)
   public fun processExEntry(editor: VimEditor, context: ExecutionContext): Boolean
   public fun cancelExEntry(editor: VimEditor, resetCaret: Boolean)
+
   @kotlin.jvm.Throws(java.lang.Exception::class)
   public fun executeCommand(editor: VimEditor, command: String, input: CharSequence?, currentDirectoryPath: String?): String?
 }

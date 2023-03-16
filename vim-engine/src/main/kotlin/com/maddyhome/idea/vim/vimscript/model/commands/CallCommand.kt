@@ -35,13 +35,13 @@ public class CallCommand(public val ranges: Ranges, public val functionCall: Exp
       val function = injector.functionService.getFunctionHandlerOrNull(
         functionCall.scope,
         functionCall.functionName.evaluate(editor, context, vimContext).value,
-        vimContext
+        vimContext,
       )
       if (function != null) {
         if (function is DefinedFunctionHandler && function.function.flags.contains(FunctionFlag.DICT)) {
           throw ExException(
             "E725: Calling dict function without Dictionary: " +
-              (functionCall.scope?.toString() ?: "") + functionCall.functionName.evaluate(editor, context, vimContext)
+              (functionCall.scope?.toString() ?: "") + functionCall.functionName.evaluate(editor, context, vimContext),
           )
         }
         function.ranges = ranges

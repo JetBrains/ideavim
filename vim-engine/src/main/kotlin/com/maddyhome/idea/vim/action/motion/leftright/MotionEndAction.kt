@@ -32,7 +32,7 @@ public class MotionEndAction : NonShiftedSpecialKeyHandler() {
     caret: ImmutableVimCaret,
     context: ExecutionContext,
     argument: Argument?,
-    operatorArguments: OperatorArguments
+    operatorArguments: OperatorArguments,
   ): Motion {
     var allow = false
     if (editor.inInsertMode) {

@@ -41,7 +41,7 @@ public data class MapClearCommand(val ranges: Ranges, val argument: String, val 
       CommandInfo("smapc", "lear", MappingMode.S, false),
       CommandInfo("omapc", "lear", MappingMode.O, false),
       CommandInfo("imapc", "lear", MappingMode.I, false),
-      CommandInfo("cmapc", "lear", MappingMode.C, false)
+      CommandInfo("cmapc", "lear", MappingMode.C, false),
     )
   }
 }

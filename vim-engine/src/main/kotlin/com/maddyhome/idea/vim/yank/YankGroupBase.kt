@@ -81,7 +81,7 @@ public open class YankGroupBase : VimYankGroup {
     editor: VimEditor,
     context: ExecutionContext,
     argument: Argument,
-    operatorArguments: OperatorArguments
+    operatorArguments: OperatorArguments,
   ): Boolean {
     val motion = argument.motion
     val type = if (motion.isLinewiseMotion()) SelectionType.LINE_WISE else SelectionType.CHARACTER_WISE
@@ -114,7 +114,7 @@ public open class YankGroupBase : VimYankGroup {
       caretToRange,
       range,
       type,
-      startOffsets
+      startOffsets,
     )
   }
 

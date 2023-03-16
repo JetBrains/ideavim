@@ -215,10 +215,10 @@ internal class VimSurroundExtension : VimExtension {
         val searchHelper = injector.searchHelper
         return when (char) {
           't' -> searchHelper.findBlockTagRange(editor, caret, 1, true)
-          '(', ')', 'b' -> searchHelper.findBlockRange(editor, caret, '(', 1,true)
-          '[', ']' -> searchHelper.findBlockRange(editor, caret, '[', 1,true)
-          '{', '}', 'B' -> searchHelper.findBlockRange(editor, caret, '{', 1,true)
-          '<', '>' -> searchHelper.findBlockRange(editor, caret, '<', 1,true)
+          '(', ')', 'b' -> searchHelper.findBlockRange(editor, caret, '(', 1, true)
+          '[', ']' -> searchHelper.findBlockRange(editor, caret, '[', 1, true)
+          '{', '}', 'B' -> searchHelper.findBlockRange(editor, caret, '{', 1, true)
+          '<', '>' -> searchHelper.findBlockRange(editor, caret, '<', 1, true)
           '`', '\'', '"' -> {
             val caretOffset = caret.offset.point
             val text = editor.text()

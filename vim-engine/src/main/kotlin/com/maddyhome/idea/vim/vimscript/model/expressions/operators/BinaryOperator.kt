@@ -86,7 +86,8 @@ public enum class BinaryOperator(public val value: String, public val handler: B
   MATCHES_CASE_SENSITIVE("=~#", MatchesCaseSensitiveHandler),
   DOESNT_MATCH("!~", DoesntMatchHandler),
   DOESNT_MATCH_IGNORE_CASE("!~?", DoesntMatchIgnoreCaseHandler),
-  DOESNT_MATCH_CASE_SENSITIVE("!~#", DoesntMatchIgnoreCaseHandler);
+  DOESNT_MATCH_CASE_SENSITIVE("!~#", DoesntMatchIgnoreCaseHandler),
+  ;
 
   public companion object {
     public fun getByValue(value: String): BinaryOperator? {

@@ -44,12 +44,13 @@ public class Argument private constructor(
           editor: VimEditor,
           context: ExecutionContext,
           argument: Argument?,
-          operatorArguments: OperatorArguments
+          operatorArguments: OperatorArguments,
         ) = Motion.NoMotion
 
         override val motionType: MotionType = MotionType.EXCLUSIVE
       },
-      Command.Type.MOTION, EnumSet.noneOf(CommandFlags::class.java)
+      Command.Type.MOTION,
+      EnumSet.noneOf(CommandFlags::class.java),
     )
   }
 }

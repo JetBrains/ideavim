@@ -43,7 +43,9 @@ public enum class MappingMode {
   /**
    * Indicates this key mapping applies to Command Line mode
    */
-  CMD_LINE;
+  CMD_LINE,
+
+  ;
 
   public companion object {
     @JvmField

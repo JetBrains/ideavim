@@ -85,8 +85,8 @@ private fun insertNewLineAbove(editor: VimEditor, context: ExecutionContext) {
   val hasGuards = moves.stream().anyMatch { (_, second): Pair<VimCaret?, Int?> ->
     editor.document.getOffsetGuard(
       Offset(
-        second!!
-      )
+        second!!,
+      ),
     ) != null
   }
   if (!hasGuards) {

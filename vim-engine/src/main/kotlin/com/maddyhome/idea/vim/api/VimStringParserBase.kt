@@ -442,7 +442,9 @@ public abstract class VimStringParserBase : VimStringParser {
   private fun octalDigitToNumber(c: Char): Int? {
     return if (c in '0'..'7') {
       c.code - '0'.code
-    } else null
+    } else {
+      null
+    }
   }
 
   private fun hexDigitToNumber(c: Char): Int? {

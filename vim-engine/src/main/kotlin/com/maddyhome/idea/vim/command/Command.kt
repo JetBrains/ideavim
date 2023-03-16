@@ -31,7 +31,7 @@ public data class Command(
     rawCount,
     NonExecutableActionHandler,
     Type.SELECT_REGISTER,
-    EnumSet.of(CommandFlags.FLAG_EXPECT_MORE)
+    EnumSet.of(CommandFlags.FLAG_EXPECT_MORE),
   ) {
     this.register = register
   }
@@ -94,7 +94,9 @@ public data class Command(
     /**
      * Represent commands that don't require an outer read or write action for synchronization.
      */
-    OTHER_SELF_SYNCHRONIZED;
+    OTHER_SELF_SYNCHRONIZED,
+
+    ;
 
     public val isRead: Boolean
       get() = when (this) {
@@ -119,7 +121,7 @@ private object NonExecutableActionHandler : EditorActionHandlerBase(false) {
     caret: VimCaret,
     context: ExecutionContext,
     cmd: Command,
-    operatorArguments: OperatorArguments
+    operatorArguments: OperatorArguments,
   ): Boolean {
     error("This action should not be executed")
   }

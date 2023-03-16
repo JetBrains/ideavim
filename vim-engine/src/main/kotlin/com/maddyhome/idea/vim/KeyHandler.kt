@@ -213,7 +213,9 @@ public class KeyHandler {
   ): Node<VimActionsInitiator>? {
     return if (editorState.isDuplicateOperatorKeyStroke(key)) {
       editorState.commandBuilder.getChildNode(KeyStroke.getKeyStroke('_'))
-    } else node
+    } else {
+      node
+    }
   }
 
   private fun handleEditorReset(
@@ -235,7 +237,8 @@ public class KeyHandler {
           injector.actionExecutor.executeCommand(
             editor,
             { executed[0] = injector.actionExecutor.executeEsc(context) },
-            "", null
+            "",
+            null,
           )
           indicateError = !executed[0]!!
         }
@@ -287,7 +290,9 @@ public class KeyHandler {
     }
     return if (editorState.isRegisterPending) {
       true
-    } else key.keyChar == '"' && !editorState.isOperatorPending && editorState.commandBuilder.expectedArgumentType == null
+    } else {
+      key.keyChar == '"' && !editorState.isOperatorPending && editorState.commandBuilder.expectedArgumentType == null
+    }
   }
 
   private fun handleSelectRegister(vimStateMachine: VimStateMachine, chKey: Char) {
@@ -412,7 +417,9 @@ public class KeyHandler {
     val command = editorState.commandBuilder.buildCommand()
     val operatorArguments = OperatorArguments(
       editorState.mappingState.mappingMode == MappingMode.OP_PENDING,
-      command.rawCount, editorState.mode, editorState.subMode
+      command.rawCount,
+      editorState.mode,
+      editorState.subMode,
     )
 
     // If we were in "operator pending" mode, reset back to normal mode.
@@ -665,6 +672,7 @@ public class KeyHandler {
     }
 
     private val instance = KeyHandler()
+
     @JvmStatic
     public fun getInstance(): KeyHandler = instance
   }

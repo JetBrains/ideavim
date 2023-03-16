@@ -48,7 +48,7 @@ public class DeleteVisualLinesAction : VisualOperatorActionHandler.ForEachCaret(
         val endsWithNewLine = if (lineEndForOffset.toLong() == editor.fileSize()) 0 else 1
         val lineRange = TextRange(
           editor.getLineStartForOffset(textRange.startOffset),
-          lineEndForOffset + endsWithNewLine
+          lineEndForOffset + endsWithNewLine,
         )
         Triple(caret, lineRange, SelectionType.LINE_WISE)
       }

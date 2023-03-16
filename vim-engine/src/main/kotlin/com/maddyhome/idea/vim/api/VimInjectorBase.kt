@@ -32,6 +32,7 @@ public abstract class VimInjectorBase : VimInjector {
 
   override val parser: VimStringParser = object : VimStringParserBase() {}
   override val optionGroup: VimOptionGroup by lazy { object : VimOptionGroupBase() {} }
+
   @Suppress("DEPRECATION")
   @Deprecated("Use optionGroup")
   final override val optionService: OptionService = OptionServiceImpl()

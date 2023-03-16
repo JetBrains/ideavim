@@ -29,7 +29,7 @@ public object KeywordOptionHelper {
 
   public fun updateSpecs() {
     keywordSpecs = valuesToValidatedAndReversedSpecs(
-      parseValues(injector.globalOptions().getStringValue(OptionConstants.iskeyword))
+      parseValues(injector.globalOptions().getStringValue(OptionConstants.iskeyword)),
     )!!.toMutableList()
   }
 
@@ -188,7 +188,9 @@ public object KeywordOptionHelper {
       }
       return if (isRange) {
         code >= rangeLow!! && code <= rangeHigh!!
-      } else code == rangeLow
+      } else {
+        code == rangeLow
+      }
     }
   }
 }

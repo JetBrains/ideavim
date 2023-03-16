@@ -102,7 +102,7 @@ public sealed class ShortcutOwnerInfo {
       "i" to 2,
       "x" to 3,
       "s" to 4,
-      "v" to 5
+      "v" to 5,
     )
   }
 }
@@ -110,7 +110,8 @@ public sealed class ShortcutOwnerInfo {
 public enum class ShortcutOwner(public val ownerName: @NonNls String, private val title: @NonNls String) {
   UNDEFINED("undefined", "Undefined"),
   IDE(Constants.IDE_STRING, "IDE"),
-  VIM(Constants.VIM_STRING, "Vim");
+  VIM(Constants.VIM_STRING, "Vim"),
+  ;
 
   override fun toString(): String = title
 

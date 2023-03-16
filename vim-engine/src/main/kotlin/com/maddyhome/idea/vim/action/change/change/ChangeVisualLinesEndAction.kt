@@ -58,7 +58,7 @@ public class ChangeVisualLinesEndAction : VisualOperatorActionHandler.ForEachCar
       val endsWithNewLine = if (lineEndForOffset.toLong() == editor.fileSize()) 0 else 1
       val lineRange = TextRange(
         editor.getLineStartForOffset(vimTextRange.startOffset),
-        lineEndForOffset + endsWithNewLine
+        lineEndForOffset + endsWithNewLine,
       )
       injector.changeGroup.changeRange(editor, caret, lineRange, SelectionType.LINE_WISE, context, operatorArguments)
     }

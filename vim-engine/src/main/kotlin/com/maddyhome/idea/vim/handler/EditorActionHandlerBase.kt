@@ -98,9 +98,11 @@ public abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boo
         caret,
         injector.executionContextManager.onCaret(caret, context),
         cmd,
-        operatorArguments
+        operatorArguments,
       )
-    ) injector.messages.indicateError()
+    ) {
+      injector.messages.indicateError()
+    }
   }
 
   public open fun process(cmd: Command) {

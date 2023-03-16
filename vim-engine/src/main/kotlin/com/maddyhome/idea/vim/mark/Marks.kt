@@ -46,7 +46,7 @@ public data class VimMark(
         line ?: return null,
         col ?: 0,
         filename ?: return null,
-        protocol ?: ""
+        protocol ?: "",
       )
     }
   }

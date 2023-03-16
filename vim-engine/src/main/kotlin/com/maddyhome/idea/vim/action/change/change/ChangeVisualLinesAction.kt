@@ -47,7 +47,7 @@ public class ChangeVisualLinesAction : VisualOperatorActionHandler.ForEachCaret(
     val endsWithNewLine = if (lineEndForOffset.toLong() == editor.fileSize()) 0 else 1
     val lineRange = TextRange(
       editor.getLineStartForOffset(textRange.startOffset),
-      lineEndForOffset + endsWithNewLine
+      lineEndForOffset + endsWithNewLine,
     )
     return injector.changeGroup.changeRange(
       editor,
@@ -55,7 +55,7 @@ public class ChangeVisualLinesAction : VisualOperatorActionHandler.ForEachCaret(
       lineRange,
       SelectionType.LINE_WISE,
       context,
-      operatorArguments
+      operatorArguments,
     )
   }
 }

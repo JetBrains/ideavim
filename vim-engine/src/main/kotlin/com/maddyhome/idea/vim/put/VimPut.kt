@@ -20,6 +20,7 @@ public interface VimPut {
   public fun doIndent(editor: VimEditor, caret: VimCaret, context: ExecutionContext, startOffset: Int, endOffset: Int): Int
 
   public fun notifyAboutIdeaPut(editor: VimEditor?)
+
   @RWLockLabel.SelfSynchronized
   public fun putTextAndSetCaretPosition(
     editor: VimEditor,

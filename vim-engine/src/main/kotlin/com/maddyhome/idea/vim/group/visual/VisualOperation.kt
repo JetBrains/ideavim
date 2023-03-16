@@ -43,10 +43,12 @@ public object VisualOperation {
 
     val chars = if (editor.primaryCaret().vimLastColumn == VimMotionGroupBase.LAST_COLUMN) {
       VimMotionGroupBase.LAST_COLUMN
-    } else when (type) {
-      SelectionType.LINE_WISE -> ep.column
-      SelectionType.CHARACTER_WISE -> if (lines > 1) ep.column - injector.visualMotionGroup.selectionAdj else ep.column - sp.column
-      SelectionType.BLOCK_WISE -> ep.column - sp.column + 1
+    } else {
+      when (type) {
+        SelectionType.LINE_WISE -> ep.column
+        SelectionType.CHARACTER_WISE -> if (lines > 1) ep.column - injector.visualMotionGroup.selectionAdj else ep.column - sp.column
+        SelectionType.BLOCK_WISE -> ep.column - sp.column + 1
+      }
     }
 
     return VisualChange(lines, chars, type)

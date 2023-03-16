@@ -23,7 +23,6 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 public data class RegistersCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {
-
     val registerGroup = injector.registerGroup
     val regs = registerGroup.getRegisters()
       .filter { argument.isEmpty() || argument.contains(it.name) }

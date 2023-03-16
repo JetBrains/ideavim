@@ -166,7 +166,11 @@ public class ToHandlerMappingInfo(
           injector.application.invokeLater {
             KeyHandler.getInstance().finishedCommandPreparation(
               editor,
-              context, VimStateMachine.getInstance(editor), VimStateMachine.getInstance(editor).commandBuilder, null, false
+              context,
+              VimStateMachine.getInstance(editor),
+              VimStateMachine.getInstance(editor).commandBuilder,
+              null,
+              false,
             )
           }
         }
@@ -175,8 +179,10 @@ public class ToHandlerMappingInfo(
 
     val operatorArguments = OperatorArguments(vimStateMachine.isOperatorPending, vimStateMachine.commandBuilder.count, vimStateMachine.mode, vimStateMachine.subMode)
     injector.actionExecutor.executeCommand(
-      editor, { extensionHandler.execute(editor, context, operatorArguments) },
-      "Vim " + extensionHandler.javaClass.simpleName, null
+      editor,
+      { extensionHandler.execute(editor, context, operatorArguments) },
+      "Vim " + extensionHandler.javaClass.simpleName,
+      null,
     )
 
     if (extensionHandler.isRepeatable) {

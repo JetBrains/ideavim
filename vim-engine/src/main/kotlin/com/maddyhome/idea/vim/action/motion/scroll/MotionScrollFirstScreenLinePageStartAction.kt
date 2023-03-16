@@ -33,7 +33,7 @@ public class MotionScrollFirstScreenLinePageStartAction : VimActionHandler.Singl
     var rawCount = cmd.rawCount
     if (rawCount == 0) {
       val nextVisualLine = editor.normalizeVisualLine(
-        injector.engineEditorHelper.getVisualLineAtBottomOfScreen(editor) + 1
+        injector.engineEditorHelper.getVisualLineAtBottomOfScreen(editor) + 1,
       )
       rawCount = editor.visualLineToBufferLine(nextVisualLine) + 1 // rawCount is 1 based
     }

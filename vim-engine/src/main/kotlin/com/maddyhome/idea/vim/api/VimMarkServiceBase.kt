@@ -44,6 +44,7 @@ public abstract class VimMarkServiceBase : VimMarkService {
   public companion object {
     private val logger = vimLogger<VimMarkServiceBase>()
   }
+
   @JvmField
   protected val globalMarks: java.util.HashMap<Char, Mark> = HashMap()
 

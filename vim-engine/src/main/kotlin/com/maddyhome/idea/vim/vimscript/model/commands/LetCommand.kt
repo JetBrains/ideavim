@@ -134,7 +134,7 @@ public data class LetCommand(
             val from = Integer.parseInt(variable.from?.evaluate(editor, context, this)?.toString() ?: "0")
             val to = Integer.parseInt(
               variable.to?.evaluate(editor, context, this)?.toString()
-                ?: (variableValue.values.size - 1).toString()
+                ?: (variableValue.values.size - 1).toString(),
             )
 
             val expressionValue = expression.evaluate(editor, context, this)
@@ -200,7 +200,7 @@ public data class LetCommand(
               """
               Error during `let ${variable.originalString} ${operator.value} ${expression.originalString}` command execution.
               Could not set register value
-              """.trimIndent()
+              """.trimIndent(),
             )
           }
         } else if (RegisterConstants.VALID_REGISTERS.contains(variable.char)) {

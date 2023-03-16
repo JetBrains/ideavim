@@ -62,17 +62,19 @@ public class CharPointer {
   public fun charAt(offset: Int = 0): Char {
     return if (end(offset)) {
       '\u0000'
-    } else seq[pointer + offset]
+    } else {
+      seq[pointer + offset]
+    }
   }
 
   @JvmOverloads
-  operator public fun inc(cnt: Int = 1): CharPointer {
+  public operator fun inc(cnt: Int = 1): CharPointer {
     pointer += cnt
     return this
   }
 
   @JvmOverloads
-  operator public fun dec(cnt: Int = 1): CharPointer {
+  public operator fun dec(cnt: Int = 1): CharPointer {
     pointer -= cnt
     return this
   }
@@ -126,8 +128,12 @@ public class CharPointer {
     for (i in 0 until l) {
       val c1 = cs1[i]
       val c2 = cs2[i]
-      val notEqual = if (ignoreCase) c1.lowercaseChar() != c2.lowercaseChar() &&
-        c1.uppercaseChar() != c2.uppercaseChar() else c1 != c2
+      val notEqual = if (ignoreCase) {
+        c1.lowercaseChar() != c2.lowercaseChar() &&
+          c1.uppercaseChar() != c2.uppercaseChar()
+      } else {
+        c1 != c2
+      }
       if (notEqual) return 1
     }
     return 0
@@ -208,7 +214,7 @@ public class CharPointer {
     return seq[pointer + 7]
   }
 
-  override public fun equals(obj: Any?): Boolean {
+  public override fun equals(obj: Any?): Boolean {
     if (obj is CharPointer) {
       val ptr = obj
       return ptr.seq === seq && ptr.pointer == pointer
@@ -216,7 +222,7 @@ public class CharPointer {
     return false
   }
 
-  override public fun hashCode(): Int {
+  public override fun hashCode(): Int {
     return Objects.hash(seq, pointer)
   }
 
@@ -238,7 +244,7 @@ public class CharPointer {
     return Math.min(seq.length, pos)
   }
 
-  override public fun toString(): String {
+  public override fun toString(): String {
     return substring(strlen())
   }
 }

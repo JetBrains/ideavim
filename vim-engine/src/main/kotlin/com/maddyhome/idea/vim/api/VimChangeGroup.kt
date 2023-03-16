@@ -48,7 +48,7 @@ public interface VimChangeGroup {
     caret: VimCaret,
     count: Int,
     isChange: Boolean,
-    operatorArguments: OperatorArguments
+    operatorArguments: OperatorArguments,
   ): Boolean
 
   public fun processSingleCommand(editor: VimEditor)
@@ -60,7 +60,7 @@ public interface VimChangeGroup {
     caret: VimCaret,
     count: Int,
     spaces: Boolean,
-    operatorArguments: OperatorArguments
+    operatorArguments: OperatorArguments,
   ): Boolean
 
   public fun processKey(editor: VimEditor, context: ExecutionContext, key: KeyStroke): Boolean
@@ -74,7 +74,7 @@ public interface VimChangeGroup {
     caret: VimCaret,
     range: TextRange,
     spaces: Boolean,
-    operatorArguments: OperatorArguments
+    operatorArguments: OperatorArguments,
   ): Boolean
 
   public fun joinViaIdeaByCount(editor: VimEditor, context: ExecutionContext, count: Int): Boolean
@@ -121,7 +121,7 @@ public interface VimChangeGroup {
     range: TextRange,
     type: SelectionType,
     context: ExecutionContext,
-    operatorArguments: OperatorArguments
+    operatorArguments: OperatorArguments,
   ): Boolean
 
   public fun changeCaseMotion(editor: VimEditor, caret: VimCaret, context: ExecutionContext?, type: Char, argument: Argument, operatorArguments: OperatorArguments): Boolean
@@ -140,7 +140,7 @@ public interface VimChangeGroup {
     context: ExecutionContext,
     lines: Int,
     dir: Int,
-    operatorArguments: OperatorArguments
+    operatorArguments: OperatorArguments,
   )
 
   public fun insertText(editor: VimEditor, caret: VimCaret, offset: Int, str: String): VimCaret
@@ -156,7 +156,7 @@ public interface VimChangeGroup {
     range: TextRange,
     count: Int,
     dir: Int,
-    operatorArguments: OperatorArguments
+    operatorArguments: OperatorArguments,
   )
 
   public fun changeNumberVisualMode(editor: VimEditor, caret: VimCaret, selectedRange: TextRange, count: Int, avalanche: Boolean): Boolean

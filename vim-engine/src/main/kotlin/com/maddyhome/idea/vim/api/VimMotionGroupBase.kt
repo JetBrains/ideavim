@@ -41,8 +41,9 @@ public abstract class VimMotionGroupBase : VimMotionGroup {
 
     if (intendedColumn == LAST_COLUMN) {
       val normalisedColumn = editor.normalizeVisualColumn(
-        line, intendedColumn,
-        editor.mode.isEndAllowedIgnoringOnemore
+        line,
+        intendedColumn,
+        editor.mode.isEndAllowedIgnoringOnemore,
       )
       val newPos = VimVisualPosition(line, normalisedColumn, false)
       return editor.visualPositionToOffset(newPos).point.toAdjustedMotionOrError(intendedColumn)
@@ -75,7 +76,7 @@ public abstract class VimMotionGroupBase : VimMotionGroup {
     return editor.normalizeOffset(
       line,
       editor.getLineEndOffset(line, allowPastEnd),
-      allowPastEnd
+      allowPastEnd,
     )
   }
 
@@ -203,14 +204,16 @@ public abstract class VimMotionGroupBase : VimMotionGroup {
   ): Int {
     val line = editor.normalizeVisualLine(caret.getVisualPosition().line + cntForward)
 
-    return if (line < 0) 0 else {
+    return if (line < 0) {
+      0
+    } else {
       moveCaretToLineEnd(editor, editor.visualLineToBufferLine(line), allowPastEnd)
     }
   }
 
   override fun moveCaretToRelativeLineEndSkipTrailing(editor: VimEditor, caret: ImmutableVimCaret, linesOffset: Int): Int {
     val line = editor.visualLineToBufferLine(
-      editor.normalizeVisualLine(caret.getVisualPosition().line + linesOffset)
+      editor.normalizeVisualLine(caret.getVisualPosition().line + linesOffset),
     )
     val start = editor.getLineStartOffset(line)
     val end = editor.getLineEndOffset(line, true)
@@ -311,7 +314,7 @@ public abstract class VimMotionGroupBase : VimMotionGroup {
         if (cmd.isLinewiseMotion()) end--
       } else {
         throw RuntimeException(
-          "Commands doesn't take " + cmdAction.javaClass.simpleName + " as an operator"
+          "Commands doesn't take " + cmdAction.javaClass.simpleName + " as an operator",
         )
       }
 

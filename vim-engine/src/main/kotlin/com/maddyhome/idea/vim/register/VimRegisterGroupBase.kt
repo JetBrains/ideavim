@@ -81,7 +81,7 @@ public abstract class VimRegisterGroupBase : VimRegisterGroup {
         }
         lastRegisterChar = defaultRegisterChar
       },
-      true
+      true,
     )
   }
 
@@ -220,7 +220,7 @@ public abstract class VimRegisterGroupBase : VimRegisterGroup {
         (
           (type === SelectionType.CHARACTER_WISE || type === SelectionType.BLOCK_WISE) && (
             editor.offsetToBufferPosition(
-              start
+              start,
             ).line == editor.offsetToBufferPosition(end).line
             )
           )
@@ -281,7 +281,7 @@ public abstract class VimRegisterGroupBase : VimRegisterGroup {
 
     return false
   }
-  
+
   protected fun preprocessTextBeforeStoring(text: String, type: SelectionType): String {
     if (type == SelectionType.LINE_WISE && (text.isEmpty() || text[text.length - 1] != '\n')) {
       // Linewise selection always has a new line at the end

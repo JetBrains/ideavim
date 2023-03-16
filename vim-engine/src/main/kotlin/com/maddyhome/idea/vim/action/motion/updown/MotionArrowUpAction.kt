@@ -32,7 +32,7 @@ public class MotionArrowUpAction : NonShiftedSpecialKeyHandler(), ComplicatedKey
     caret: ImmutableVimCaret,
     context: ExecutionContext,
     argument: Argument?,
-    operatorArguments: OperatorArguments
+    operatorArguments: OperatorArguments,
   ): Motion {
     return injector.motion.getVerticalMotionOffset(editor, caret, -operatorArguments.count1)
   }

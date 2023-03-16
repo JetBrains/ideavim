@@ -30,7 +30,7 @@ public data class RepeatCommand(val ranges: Ranges, val argument: String) : Comm
     editor: VimEditor,
     caret: VimCaret,
     context: ExecutionContext,
-    operatorArguments: OperatorArguments
+    operatorArguments: OperatorArguments,
   ): ExecutionResult {
     var arg = argument[0]
     if (arg == '@') arg = lastArg
@@ -38,15 +38,19 @@ public data class RepeatCommand(val ranges: Ranges, val argument: String) : Comm
 
     val line = getLine(editor, caret)
     caret.moveToOffset(
-      injector.motion.moveCaretToLineWithSameColumn(editor, line, editor.primaryCaret())
+      injector.motion.moveCaretToLineWithSameColumn(editor, line, editor.primaryCaret()),
     )
 
     if (arg == ':') {
       return if (injector.vimscriptExecutor.executeLastCommand(
           editor,
-          context
+          context,
         )
-      ) ExecutionResult.Success else ExecutionResult.Error
+      ) {
+        ExecutionResult.Success
+      } else {
+        ExecutionResult.Error
+      }
     }
 
     val reg = injector.registerGroup.getPlaybackRegister(arg) ?: return ExecutionResult.Error
@@ -58,7 +62,7 @@ public data class RepeatCommand(val ranges: Ranges, val argument: String) : Comm
       context,
       skipHistory = false,
       indicateErrors = true,
-      this.vimContext
+      this.vimContext,
     )
     return ExecutionResult.Success
   }

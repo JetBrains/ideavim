@@ -11,10 +11,13 @@ package com.maddyhome.idea.vim.history
 public object HistoryConstants {
   @JvmField
   public val SEARCH: String = "search"
+
   @JvmField
   public val COMMAND: String = "cmd"
+
   @JvmField
   public val EXPRESSION: String = "expr"
+
   @JvmField
   public val INPUT: String = "input"
 }

@@ -17,6 +17,7 @@ public interface VimStringParser {
    * Fake key for `<Plug>` mappings
    */
   public val plugKeyStroke: KeyStroke
+
   /**
    * Fake key for `<Action>` mappings
    */

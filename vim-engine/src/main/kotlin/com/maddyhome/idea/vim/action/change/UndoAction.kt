@@ -20,7 +20,7 @@ import javax.swing.KeyStroke
 public class UndoAction : VimActionHandler.SingleExecution(), ComplicatedKeysAction {
   override val keyStrokesSet: Set<List<KeyStroke>> = setOf(
     injector.parser.parseKeys("u"),
-    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_UNDO, 0))
+    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_UNDO, 0)),
   )
 
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED

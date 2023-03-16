@@ -17,7 +17,8 @@ public enum class Scope(public val c: String) {
   LOCAL_VARIABLE("l"),
   SCRIPT_VARIABLE("s"),
   FUNCTION_VARIABLE("a"),
-  VIM_VARIABLE("v");
+  VIM_VARIABLE("v"),
+  ;
 
   public companion object {
     public fun getByValue(s: String): Scope? {

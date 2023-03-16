@@ -158,6 +158,7 @@ public interface VimEditor {
   private fun List<VimCaret>.sortedByOffset(): List<VimCaret> {
     return this.sortedWith(compareBy { it.offset.point }).reversed()
   }
+
   /**
    * This method should perform caret merging after the operations. This is similar to IJ runForEachCaret
    * TODO review

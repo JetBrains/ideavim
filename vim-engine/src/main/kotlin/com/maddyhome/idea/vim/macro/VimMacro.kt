@@ -46,6 +46,6 @@ public interface VimMacro {
   public fun playbackLastRegister(
     editor: VimEditor,
     context: ExecutionContext,
-    count: Int
+    count: Int,
   ): Boolean
 }

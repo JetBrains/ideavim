@@ -43,7 +43,7 @@ public sealed class MotionSectionAction(private val charType: Char, public val d
       caret,
       charType,
       direction.toInt(),
-      operatorArguments.count1
+      operatorArguments.count1,
     ).toMotionOrError()
   }
 

@@ -28,7 +28,7 @@ public data class NormalCommand(val ranges: Ranges, val argument: String) : Comm
     RangeFlag.RANGE_OPTIONAL,
     ArgumentFlag.ARGUMENT_OPTIONAL,
     Access.WRITABLE,
-    Flag.SAVE_VISUAL
+    Flag.SAVE_VISUAL,
   )
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {

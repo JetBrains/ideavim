@@ -43,7 +43,7 @@ public data class SortCommand(val ranges: Ranges, val argument: String) : Comman
       val range = getSortLineRange(editor, primaryCaret)
       val worked = injector.changeGroup.sortRange(editor, primaryCaret, range, lineComparator)
       primaryCaret.moveToInlayAwareOffset(
-        injector.motion.moveCaretToLineStartSkipLeading(editor, range.startLine)
+        injector.motion.moveCaretToLineStartSkipLeading(editor, range.startLine),
       )
       return if (worked) ExecutionResult.Success else ExecutionResult.Error
     }
@@ -113,7 +113,9 @@ public data class SortCommand(val ranges: Ranges, val argument: String) : Comman
         } else {
           if (n2 == null) 1 else n1.compareTo(n2)
         }
-      } else o1ToCompare.compareTo(o2ToCompare)
+      } else {
+        o1ToCompare.compareTo(o2ToCompare)
+      }
     }
   }
 }

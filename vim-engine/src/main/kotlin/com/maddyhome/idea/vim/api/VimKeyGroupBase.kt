@@ -96,12 +96,15 @@ public abstract class VimKeyGroupBase : VimKeyGroup {
       }
 
       val actionExceptions = listOf(
-        "VimInsertDeletePreviousWordAction", "VimInsertAfterCursorAction", "VimInsertBeforeCursorAction",
-        "VimFilterVisualLinesAction", "VimAutoIndentMotionAction"
+        "VimInsertDeletePreviousWordAction",
+        "VimInsertAfterCursorAction",
+        "VimInsertBeforeCursorAction",
+        "VimFilterVisualLinesAction",
+        "VimAutoIndentMotionAction",
       )
       if (i == shortOne && action.id !in actionExceptions && entry.value !in actionExceptions) {
         throw RuntimeException(
-          "Prefix found! $keys in command ${action.id} is the same as ${prefix.joinToString(", ") { it.toString() }} in ${entry.value}"
+          "Prefix found! $keys in command ${action.id} is the same as ${prefix.joinToString(", ") { it.toString() }} in ${entry.value}",
         )
       }
     }

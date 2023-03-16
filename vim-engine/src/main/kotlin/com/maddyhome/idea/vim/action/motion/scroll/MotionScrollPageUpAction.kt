@@ -37,7 +37,7 @@ public class MotionScrollPageUpAction : VimActionHandler.SingleExecution() {
 public class MotionScrollPageUpInsertModeAction : VimActionHandler.SingleExecution(), ComplicatedKeysAction {
 
   override val keyStrokesSet: Set<List<KeyStroke>> = setOf(
-    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, 0))
+    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, 0)),
   )
 
   override val type: Command.Type = Command.Type.OTHER_READONLY

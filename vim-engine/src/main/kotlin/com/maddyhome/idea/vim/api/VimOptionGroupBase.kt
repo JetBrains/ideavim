@@ -71,14 +71,15 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
 
     // Options with longer defaults or additional validation, sorted by name
     object : StringOption(
-      OptionConstants.guicursor, "gcr",
+      OptionConstants.guicursor,
+      "gcr",
       "n-v-c:block-Cursor/lCursor," +
         "ve:ver35-Cursor," +
         "o:hor50-Cursor," +
         "i-ci:ver25-Cursor/lCursor," +
         "r-cr:hor20-Cursor/lCursor," +
         "sm:block-Cursor-blinkwait175-blinkoff150-blinkon175",
-      isList = true
+      isList = true,
     ) {
       override fun checkIfValueValid(value: VimDataType, token: String) {
         super.checkIfValueValid(value, token)
@@ -115,8 +116,8 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
         OptionConstants.keymodel_stopselect,
         OptionConstants.keymodel_stopvisual,
         OptionConstants.keymodel_continueselect,
-        OptionConstants.keymodel_continuevisual
-      )
+        OptionConstants.keymodel_continuevisual,
+      ),
     ),
     object : StringOption(OptionConstants.matchpairs, "mps", "(:),{:},[:]", isList = true) {
       override fun checkIfValueValid(value: VimDataType, token: String) {
@@ -137,13 +138,16 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
       }
     },
     StringOption(
-      OptionConstants.selectmode, "slm", "", isList = true,
+      OptionConstants.selectmode,
+      "slm",
+      "",
+      isList = true,
       setOf(
         OptionConstants.selectmode_mouse,
         OptionConstants.selectmode_key,
         OptionConstants.selectmode_cmd,
-        OptionConstants.selectmode_ideaselection
-      )
+        OptionConstants.selectmode_ideaselection,
+      ),
     ),
     object : StringOption(OptionConstants.shellcmdflag, "shcf", "") {
       override val defaultValue: VimString
@@ -155,7 +159,7 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
               injector.systemInfoService.isWindows && shell.contains("powershell") -> "-Command"
               injector.systemInfoService.isWindows && !shell.contains("sh") -> "/c"
               else -> "-c"
-            }
+            },
           )
         }
     },
@@ -169,7 +173,7 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
               injector.systemInfoService.isWindows && shell == "cmd.exe" -> "("
               injector.systemInfoService.isWindows && shell.contains("sh") -> "\""
               else -> ""
-            }
+            },
           )
         }
     },

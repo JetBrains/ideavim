@@ -152,7 +152,9 @@ public val ImmutableVimCaret.vimLeadSelectionOffset: Int
         if (caretLine == selectionStartLine) {
           val column = editor.offsetToBufferPosition(selectionEnd).column
           if (column == 0) (selectionEnd - 1).coerceAtLeast(0) else selectionEnd
-        } else selectionStart
+        } else {
+          selectionStart
+        }
       } else if (editor.inBlockSubMode) {
         val selections = editor.nativeCarets().map { it.selectionStart to it.selectionEnd }.sortedBy { it.first }
         val pCaret = editor.primaryCaret()

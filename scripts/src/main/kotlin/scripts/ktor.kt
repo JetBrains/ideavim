@@ -38,7 +38,7 @@ fun httpClient(): HttpClient {
         Json {
           prettyPrint = true
           isLenient = true
-        }
+        },
       )
     }
   }

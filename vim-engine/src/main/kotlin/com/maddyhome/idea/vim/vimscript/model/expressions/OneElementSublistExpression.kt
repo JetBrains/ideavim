@@ -25,8 +25,8 @@ public data class OneElementSublistExpression(val index: Expression, val express
       return expressionValue.dictionary[VimString(index.evaluate(editor, context, vimContext).asString())]
         ?: throw ExException(
           "E716: Key not present in Dictionary: \"${
-          index.evaluate(editor, context, vimContext).asString()
-          }\""
+            index.evaluate(editor, context, vimContext).asString()
+          }\"",
         )
     } else {
       val indexValue = Integer.parseInt(index.evaluate(editor, context, vimContext).asString())

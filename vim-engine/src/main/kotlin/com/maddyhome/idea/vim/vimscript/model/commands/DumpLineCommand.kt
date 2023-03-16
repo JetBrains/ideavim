@@ -34,7 +34,7 @@ public data class DumpLineCommand(val ranges: Ranges, val argument: String) : Co
 
       for (i in start..end) {
         logger.debug(
-          "Offset $i, char=${chars[i]}, lp=${editor.offsetToBufferPosition(i)}, vp=${editor.offsetToVisualPosition(i)}"
+          "Offset $i, char=${chars[i]}, lp=${editor.offsetToBufferPosition(i)}, vp=${editor.offsetToVisualPosition(i)}",
         )
       }
     }

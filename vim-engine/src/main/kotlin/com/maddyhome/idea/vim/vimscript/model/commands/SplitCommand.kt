@@ -34,5 +34,5 @@ public data class SplitCommand(val ranges: Ranges, val argument: String, val spl
 
 public enum class SplitType {
   VERTICAL,
-  HORIZONTAL
+  HORIZONTAL,
 }

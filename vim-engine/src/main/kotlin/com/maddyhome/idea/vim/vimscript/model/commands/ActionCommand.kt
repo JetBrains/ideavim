@@ -26,7 +26,7 @@ public data class ActionCommand(val ranges: Ranges, val argument: String) : Comm
     RangeFlag.RANGE_OPTIONAL,
     ArgumentFlag.ARGUMENT_OPTIONAL,
     Access.READ_ONLY,
-    Flag.SAVE_VISUAL
+    Flag.SAVE_VISUAL,
   )
 
   override fun processCommand(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments): ExecutionResult {

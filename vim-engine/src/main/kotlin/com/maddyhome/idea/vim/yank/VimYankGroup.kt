@@ -28,7 +28,7 @@ public interface VimYankGroup {
     editor: VimEditor,
     context: ExecutionContext,
     argument: Argument,
-    operatorArguments: OperatorArguments
+    operatorArguments: OperatorArguments,
   ): Boolean
 
   /**

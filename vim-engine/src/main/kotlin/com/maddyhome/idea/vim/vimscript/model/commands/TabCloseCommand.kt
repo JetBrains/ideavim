@@ -53,7 +53,6 @@ public data class TabCloseCommand(val ranges: Ranges, val argument: String) : Co
    * @return tab index to close
    */
   private fun getTabIndexToClose(arg: String, current: Int, last: Int): Int? {
-
     if (arg.isEmpty()) return current
     if (last < 0) return null
 

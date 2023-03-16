@@ -33,7 +33,9 @@ public class InsertCharacterAboveCursorAction : ChangeEditorActionHandler.ForEac
   ): Boolean {
     return if (editor.isOneLineMode()) {
       false
-    } else insertCharacterAroundCursor(editor, caret, -1)
+    } else {
+      insertCharacterAroundCursor(editor, caret, -1)
+    }
   }
 }
 
@@ -49,7 +51,9 @@ public class InsertCharacterBelowCursorAction : ChangeEditorActionHandler.ForEac
   ): Boolean {
     return if (editor.isOneLineMode()) {
       false
-    } else insertCharacterAroundCursor(editor, caret, 1)
+    } else {
+      insertCharacterAroundCursor(editor, caret, 1)
+    }
   }
 }
 

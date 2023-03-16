@@ -24,7 +24,8 @@ public enum class AssignmentOperator(public val value: String) {
   MULTIPLICATION("*="),
   DIVISION("/="),
   MODULUS("%="),
-  CONCATENATION(".=");
+  CONCATENATION(".="),
+  ;
 
   public companion object {
     public fun getByValue(value: String): AssignmentOperator {

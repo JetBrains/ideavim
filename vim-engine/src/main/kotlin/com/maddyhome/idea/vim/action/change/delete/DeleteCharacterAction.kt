@@ -35,7 +35,7 @@ public abstract class DeleteCharacter(private val countModifier: (Int) -> Int) :
       caret,
       countModifier(operatorArguments.count1),
       false,
-      operatorArguments
+      operatorArguments,
     )
   }
 }

@@ -27,7 +27,7 @@ public data class JoinLinesCommand(val ranges: Ranges, val argument: String) : C
     editor: VimEditor,
     caret: VimCaret,
     context: ExecutionContext,
-    operatorArguments: OperatorArguments
+    operatorArguments: OperatorArguments,
   ): ExecutionResult {
     val arg = argument
     val spaces = arg.isEmpty() || arg[0] != '!'
@@ -35,14 +35,19 @@ public data class JoinLinesCommand(val ranges: Ranges, val argument: String) : C
     val textRange = getTextRange(editor, caret, true)
 
     return if (injector.changeGroup.deleteJoinRange(
-        editor, caret,
+        editor,
+        caret,
         TextRange(
-            textRange.startOffset,
-            textRange.endOffset - 1
-          ),
+          textRange.startOffset,
+          textRange.endOffset - 1,
+        ),
         spaces,
-        operatorArguments
+        operatorArguments,
       )
-    ) ExecutionResult.Success else ExecutionResult.Error
+    ) {
+      ExecutionResult.Success
+    } else {
+      ExecutionResult.Error
+    }
   }
 }

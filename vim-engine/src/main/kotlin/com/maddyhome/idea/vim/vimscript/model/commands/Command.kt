@@ -47,7 +47,7 @@ public sealed class Command(public var commandRanges: Ranges, public val command
       editor: VimEditor,
       caret: VimCaret,
       context: ExecutionContext,
-      operatorArguments: OperatorArguments
+      operatorArguments: OperatorArguments,
     ): ExecutionResult
   }
 
@@ -96,7 +96,7 @@ public sealed class Command(public var commandRanges: Ranges, public val command
               result = processCommand(editor, caret, context, operatorArguments)
             }
           },
-          true
+          true,
         )
       }
       is SingleExecution -> result = processCommand(editor, context, operatorArguments)
@@ -152,7 +152,7 @@ public sealed class Command(public var commandRanges: Ranges, public val command
      * Indicates that the command takes a count, not a range - effects default
      * Works like RANGE_OPTIONAL
      */
-    RANGE_IS_COUNT
+    RANGE_IS_COUNT,
   }
 
   public enum class ArgumentFlag {
@@ -169,7 +169,7 @@ public sealed class Command(public var commandRanges: Ranges, public val command
     /**
      * Indicates that an argument can't be specified for this command
      */
-    ARGUMENT_FORBIDDEN
+    ARGUMENT_FORBIDDEN,
   }
 
   public enum class Access {
@@ -186,7 +186,7 @@ public sealed class Command(public var commandRanges: Ranges, public val command
     /**
      * Indicates that this command handles writability by itself
      */
-    SELF_SYNCHRONIZED
+    SELF_SYNCHRONIZED,
   }
 
   public enum class Flag {
@@ -196,7 +196,7 @@ public sealed class Command(public var commandRanges: Ranges, public val command
      * Vim exits visual mode before command execution, but in this case :action will work incorrect.
      *   With this flag visual mode will not be exited while command execution.
      */
-    SAVE_VISUAL
+    SAVE_VISUAL,
   }
 
   public data class CommandHandlerFlags(

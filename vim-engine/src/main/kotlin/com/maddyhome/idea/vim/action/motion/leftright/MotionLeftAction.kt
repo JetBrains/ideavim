@@ -44,7 +44,7 @@ public class MotionLeftInsertModeAction : MotionActionHandler.ForEachCaret(), Co
 
   override val keyStrokesSet: Set<List<KeyStroke>> = setOf(
     listOf(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0)),
-    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_LEFT, 0))
+    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_LEFT, 0)),
   )
 
   override fun getOffset(

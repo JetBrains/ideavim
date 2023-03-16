@@ -15,12 +15,12 @@ package com.maddyhome.idea.vim.command
 public enum class MotionType {
   INCLUSIVE,
   EXCLUSIVE,
-  LINE_WISE
+  LINE_WISE,
 }
 
 public enum class TextObjectVisualType {
   CHARACTER_WISE,
-  LINE_WISE
+  LINE_WISE,
 }
 
 public enum class CommandFlags {

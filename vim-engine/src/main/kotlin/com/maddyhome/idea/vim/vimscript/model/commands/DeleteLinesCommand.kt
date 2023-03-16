@@ -27,7 +27,7 @@ public data class DeleteLinesCommand(val ranges: Ranges, var argument: String) :
     editor: VimEditor,
     caret: VimCaret,
     context: ExecutionContext,
-    operatorArguments: OperatorArguments
+    operatorArguments: OperatorArguments,
   ): ExecutionResult {
     val argument = this.argument
     val register = if (argument.isNotEmpty() && !argument[0].isDigit()) {
@@ -41,8 +41,11 @@ public data class DeleteLinesCommand(val ranges: Ranges, var argument: String) :
 
     val textRange = getTextRange(editor, caret, true)
     return if (injector.changeGroup
-      .deleteRange(editor, caret, textRange, SelectionType.LINE_WISE, false, operatorArguments)
-    ) ExecutionResult.Success
-    else ExecutionResult.Error
+        .deleteRange(editor, caret, textRange, SelectionType.LINE_WISE, false, operatorArguments)
+    ) {
+      ExecutionResult.Success
+    } else {
+      ExecutionResult.Error
+    }
   }
 }

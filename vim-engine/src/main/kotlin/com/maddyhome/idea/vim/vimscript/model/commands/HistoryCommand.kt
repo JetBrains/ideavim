@@ -81,13 +81,17 @@ public data class HistoryCommand(val ranges: Ranges, val argument: String) : Com
         logger.debug("bad number")
         return ExecutionResult.Error
       }
-    } else 0
+    } else {
+      0
+    }
     val l = if (last.isNotEmpty()) {
       last.toIntOrNull() ?: run {
         logger.debug("bad number")
         return ExecutionResult.Error
       }
-    } else 0
+    } else {
+      0
+    }
 
     val p = processKey(f, l)
     val res = when (key[0]) {

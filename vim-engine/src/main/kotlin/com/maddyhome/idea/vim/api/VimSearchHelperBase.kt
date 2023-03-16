@@ -247,7 +247,7 @@ public abstract class VimSearchHelperBase : VimSearchHelper {
     var counter = 0
     var offset = startIndex
     while (counter < count) {
-      val searchFrom = if (counter == 0) offset else offset + direction.toInt() 
+      val searchFrom = if (counter == 0) offset else offset + direction.toInt()
       offset = findCamelStart(chars, searchFrom, direction) ?: return null
       ++counter
     }
@@ -262,7 +262,7 @@ public abstract class VimSearchHelperBase : VimSearchHelper {
     var counter = 0
     var offset = startIndex
     while (counter < count) {
-      val searchFrom = if (counter == 0) offset else offset + direction.toInt() 
+      val searchFrom = if (counter == 0) offset else offset + direction.toInt()
       offset = findCamelEnd(chars, searchFrom, direction) ?: return null
       ++counter
     }
@@ -279,11 +279,12 @@ public abstract class VimSearchHelperBase : VimSearchHelper {
     if (pos < 0 || pos >= size) {
       return null
     }
-    
+
     while (pos in 0 until size) {
       if (chars[pos].isUpperCase()) {
         if ((pos == 0 || !chars[pos - 1].isUpperCase()) ||
-          (pos == size - 1 || chars[pos + 1].isLowerCase())) {
+          (pos == size - 1 || chars[pos + 1].isLowerCase())
+        ) {
           return pos
         }
       } else if (chars[pos].isLowerCase()) {
@@ -313,8 +314,9 @@ public abstract class VimSearchHelperBase : VimSearchHelper {
 
     while (pos in 0 until size) {
       if (chars[pos].isUpperCase()) {
-        if (pos == size - 1 || !chars[pos + 1].isLetter() || 
-          (chars[pos + 1].isUpperCase() && pos < size - 2 && chars[pos + 2].isLowerCase())) {
+        if (pos == size - 1 || !chars[pos + 1].isLetter() ||
+          (chars[pos + 1].isUpperCase() && pos < size - 2 && chars[pos + 2].isLowerCase())
+        ) {
           return pos
         }
       } else if (chars[pos].isLowerCase()) {
@@ -330,16 +332,16 @@ public abstract class VimSearchHelperBase : VimSearchHelper {
     }
     return null
   }
-  
+
   override fun findBlockQuoteInLineRange(editor: VimEditor, caret: ImmutableVimCaret, quote: Char, isOuter: Boolean): TextRange? {
     var leftQuote: Int
     var rightQuote: Int
-    
+
     val caretOffset = caret.offset.point
-    val quoteAfterCaret : Int = editor.text().indexOfNext(quote, caretOffset, true) ?: return null
-    val quoteBeforeCaret : Int? = editor.text().indexOfPrevious(quote, caretOffset, true)
-    val quotesBeforeCaret : Int = editor.text().occurrencesBeforeOffset(quote, caretOffset, true)
-    
+    val quoteAfterCaret: Int = editor.text().indexOfNext(quote, caretOffset, true) ?: return null
+    val quoteBeforeCaret: Int? = editor.text().indexOfPrevious(quote, caretOffset, true)
+    val quotesBeforeCaret: Int = editor.text().occurrencesBeforeOffset(quote, caretOffset, true)
+
     if (((caretOffset == quoteAfterCaret) && quotesBeforeCaret % 2 == 0) || quoteBeforeCaret == null) {
       leftQuote = quoteAfterCaret
       rightQuote = editor.text().indexOfNext(quote, leftQuote + 1, true) ?: return null
@@ -372,8 +374,8 @@ public abstract class VimSearchHelperBase : VimSearchHelper {
    * @param startIndex        index to start the search from, included in search
    * @param currentLineOnly   true if search should stop after reaching '\n'
    * @param searchEscaped     true if escaped chars should appear in search
-   * 
-   * @return                  the closest to [startIndex] position of [char], or null if no [char] was found
+   *
+   * @return the closest to [startIndex] position of [char], or null if no [char] was found
    */
   private fun CharSequence.indexOfNext(char: Char, startIndex: Int, currentLineOnly: Boolean, searchEscaped: Boolean = false): Int? {
     return findCharacterPosition(this, char, startIndex, Direction.FORWARDS, currentLineOnly, searchEscaped)
@@ -385,7 +387,7 @@ public abstract class VimSearchHelperBase : VimSearchHelper {
    * @param currentLineOnly   true if search should stop after reaching '\n'
    * @param searchEscaped     true if escaped chars should appear in search
    *
-   * @return                  the closest to [endIndex] position of [char], or null if no [char] was found
+   * @return the closest to [endIndex] position of [char], or null if no [char] was found
    */
   private fun CharSequence.indexOfPrevious(char: Char, endIndex: Int, currentLineOnly: Boolean, searchEscaped: Boolean = false): Int? {
     if (endIndex == 0 || (currentLineOnly && this[endIndex - 1] == '\n')) return null
@@ -400,8 +402,8 @@ public abstract class VimSearchHelperBase : VimSearchHelper {
    * @param currentLineOnly   true if search should break after reaching '\n'
    * @param searchEscaped     true if escaped chars should be returned
    * @param direction         direction to search (forward/backward)
-   * 
-   * @return                  index of the closest char found (null if nothing was found)
+   *
+   * @return index of the closest char found (null if nothing was found)
    */
   private fun findCharacterPosition(charSequence: CharSequence, char: Char, startIndex: Int, direction: Direction, currentLineOnly: Boolean, searchEscaped: Boolean): Int? {
     var pos = startIndex

@@ -16,7 +16,8 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.una
 public enum class UnaryOperator(public val value: String, public val handler: UnaryOperatorHandler) {
   NOT("!", NotOperatorHandler),
   PLUS("+", PlusOperatorHandler),
-  MINUS("-", MinusOperatorHandler);
+  MINUS("-", MinusOperatorHandler),
+  ;
 
   public companion object {
     public fun getByValue(value: String): UnaryOperator {

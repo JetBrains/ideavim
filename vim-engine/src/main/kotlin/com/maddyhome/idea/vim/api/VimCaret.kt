@@ -147,6 +147,7 @@ public fun VimCaret.moveToMotion(motion: Motion): VimCaret {
 
 public interface CaretRegisterStorage {
   public val caret: ImmutableVimCaret
+
   /**
    * Stores text to caret's recordable (named/numbered/unnamed) register
    */

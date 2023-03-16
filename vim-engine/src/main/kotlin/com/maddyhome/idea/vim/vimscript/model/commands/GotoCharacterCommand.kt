@@ -27,7 +27,7 @@ public data class GotoCharacterCommand(val ranges: Ranges, val argument: String)
     editor: VimEditor,
     caret: VimCaret,
     context: ExecutionContext,
-    operatorArguments: OperatorArguments
+    operatorArguments: OperatorArguments,
   ): ExecutionResult {
     val count = getCount(editor, caret, 1, true)
     if (count <= 0) return ExecutionResult.Error

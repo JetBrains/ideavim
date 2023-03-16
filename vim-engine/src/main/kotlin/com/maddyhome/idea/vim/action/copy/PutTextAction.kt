@@ -29,7 +29,7 @@ public sealed class PutTextBaseAction(
     editor: VimEditor,
     context: ExecutionContext,
     argument: Argument?,
-    operatorArguments: OperatorArguments
+    operatorArguments: OperatorArguments,
   ): Boolean {
     val count = operatorArguments.count1
     val sortedCarets = editor.sortedCarets()
@@ -60,7 +60,7 @@ public sealed class PutTextBaseAction(
       TextData(
         register.text ?: injector.parser.toPrintableString(register.keys),
         register.type,
-        register.transferableData
+        register.transferableData,
       )
     }
     return PutData(textData, null, count, insertTextBeforeCaret, indent, caretAfterInsertedText, -1)

@@ -36,7 +36,7 @@ public class ChangeMotionAction : ChangeEditorActionHandler.ForEachCaret(), Dupl
       caret,
       context,
       argument,
-      operatorArguments
+      operatorArguments,
     )
   }
 }

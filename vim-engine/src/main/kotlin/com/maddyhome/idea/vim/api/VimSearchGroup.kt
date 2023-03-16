@@ -40,12 +40,14 @@ public interface VimSearchGroup {
     exarg: String,
     parent: VimLContext,
   ): Boolean
+
   // TODO rewrite this
   public fun search_regcomp(pat: CharPointer?, which_pat: Int, patSave: Int): Pair<Boolean, Triple<Any, String, Any>>
   public fun findDecimalNumber(line: String): Int?
   public fun clearSearchHighlight()
 
   public fun getLastSearchDirection(): Direction
+
   // Matching the values defined in Vim. Do not change these values, they are used as indexes
   public companion object {
     public val RE_SEARCH: Int = 0 // Save/use search pattern

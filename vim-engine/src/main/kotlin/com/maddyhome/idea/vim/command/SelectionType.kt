@@ -16,7 +16,8 @@ public enum class SelectionType(public val value: Int) {
   // Integer values for registers serialization in RegisterGroup.readData()
   LINE_WISE(1 shl 1),
   CHARACTER_WISE(1 shl 2),
-  BLOCK_WISE(1 shl 3);
+  BLOCK_WISE(1 shl 3),
+  ;
 
   public fun toSubMode(): SubMode = when (this) {
     LINE_WISE -> SubMode.VISUAL_LINE

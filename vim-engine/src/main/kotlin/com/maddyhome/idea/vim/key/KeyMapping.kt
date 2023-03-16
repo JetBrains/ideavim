@@ -59,7 +59,7 @@ public class KeyMapping : Iterable<List<KeyStroke?>?>, KeyMappingLayer {
     fromKeys: List<KeyStroke>,
     owner: MappingOwner,
     extensionHandler: ExtensionHandler,
-    recursive: Boolean
+    recursive: Boolean,
   ) {
     myKeys[ArrayList(fromKeys)] = ToHandlerMappingInfo(extensionHandler, fromKeys, recursive, owner)
     fillPrefixes(fromKeys)
@@ -69,7 +69,7 @@ public class KeyMapping : Iterable<List<KeyStroke?>?>, KeyMappingLayer {
     fromKeys: List<KeyStroke>,
     toKeys: List<KeyStroke>,
     owner: MappingOwner,
-    recursive: Boolean
+    recursive: Boolean,
   ) {
     myKeys[ArrayList(fromKeys)] = ToKeysMappingInfo(toKeys, fromKeys, recursive, owner)
     fillPrefixes(fromKeys)
@@ -80,7 +80,7 @@ public class KeyMapping : Iterable<List<KeyStroke?>?>, KeyMappingLayer {
     toExpression: Expression,
     owner: MappingOwner,
     originalString: String,
-    recursive: Boolean
+    recursive: Boolean,
   ) {
     myKeys[ArrayList(fromKeys)] =
       ToExpressionMappingInfo(toExpression, fromKeys, recursive, owner, originalString)
@@ -103,9 +103,10 @@ public class KeyMapping : Iterable<List<KeyStroke?>?>, KeyMappingLayer {
     toRemove.forEach(
       Consumer { (key, value): Map.Entry<List<KeyStroke>, MappingInfo> ->
         myKeys.remove(
-          key, value
+          key,
+          value,
         )
-      }
+      },
     )
     toRemove.map { it.key }.forEach(this::removePrefixes)
   }
@@ -139,7 +140,8 @@ public class KeyMapping : Iterable<List<KeyStroke?>?>, KeyMappingLayer {
       .filter { (_, value): Map.Entry<List<KeyStroke>, MappingInfo> -> value.owner == owner }
       .map { (key, value): Map.Entry<List<KeyStroke>, MappingInfo> ->
         Pair(
-          key, value
+          key,
+          value,
         )
       }.collect(Collectors.toList())
   }
@@ -166,7 +168,8 @@ public class KeyMapping : Iterable<List<KeyStroke?>?>, KeyMappingLayer {
       .filter { (_, value): Map.Entry<List<KeyStroke>, MappingInfo> -> value is ToKeysMappingInfo && value.toKeys == toKeys }
       .map { (key, value): Map.Entry<List<KeyStroke>, MappingInfo> ->
         Pair(
-          key, value
+          key,
+          value,
         )
       }.collect(Collectors.toList())
   }

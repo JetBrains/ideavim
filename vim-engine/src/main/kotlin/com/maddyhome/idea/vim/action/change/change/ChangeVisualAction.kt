@@ -41,7 +41,7 @@ public class ChangeVisualAction : VisualOperatorActionHandler.ForEachCaret() {
       range.toVimTextRange(false),
       range.type,
       context,
-      operatorArguments
+      operatorArguments,
     )
   }
 }

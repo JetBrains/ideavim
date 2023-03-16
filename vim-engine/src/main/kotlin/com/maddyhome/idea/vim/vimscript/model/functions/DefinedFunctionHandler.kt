@@ -47,8 +47,8 @@ public data class DefinedFunctionHandler(val function: FunctionDeclaration) : Fu
       ranges!!.addRange(
         arrayOf(
           LineNumberRange(currentLine, 0, false),
-          LineNumberRange(currentLine, 0, false)
-        )
+          LineNumberRange(currentLine, 0, false),
+        ),
       )
     }
     initializeFunctionVariables(argumentValues, editor, context, vimContext)
@@ -129,7 +129,7 @@ public data class DefinedFunctionHandler(val function: FunctionDeclaration) : Fu
         argumentValues[index].evaluate(editor, context, functionCallContext),
         editor,
         context,
-        function
+        function,
       )
     }
     // optional function arguments with default values
@@ -140,7 +140,7 @@ public data class DefinedFunctionHandler(val function: FunctionDeclaration) : Fu
         expressionToStore.evaluate(editor, context, functionCallContext),
         editor,
         context,
-        function
+        function,
       )
     }
     // all the other optional arguments passed to function are stored in a:000 variable
@@ -148,7 +148,7 @@ public data class DefinedFunctionHandler(val function: FunctionDeclaration) : Fu
       val remainingArgs = if (function.args.size + function.defaultArgs.size < argumentValues.size) {
         VimList(
           argumentValues.subList(function.args.size + function.defaultArgs.size, argumentValues.size)
-            .map { it.evaluate(editor, context, functionCallContext) }.toMutableList()
+            .map { it.evaluate(editor, context, functionCallContext) }.toMutableList(),
         )
       } else {
         VimList(mutableListOf())
@@ -158,16 +158,22 @@ public data class DefinedFunctionHandler(val function: FunctionDeclaration) : Fu
         remainingArgs,
         editor,
         context,
-        function
+        function,
       )
     }
     injector.variableService.storeVariable(
       Variable(Scope.FUNCTION_VARIABLE, "firstline"),
-      VimInt(ranges!!.getFirstLine(editor, editor.currentCaret()) + 1), editor, context, function
+      VimInt(ranges!!.getFirstLine(editor, editor.currentCaret()) + 1),
+      editor,
+      context,
+      function,
     )
     injector.variableService.storeVariable(
       Variable(Scope.FUNCTION_VARIABLE, "lastline"),
-      VimInt(ranges!!.getLine(editor, editor.currentCaret()) + 1), editor, context, function
+      VimInt(ranges!!.getLine(editor, editor.currentCaret()) + 1),
+      editor,
+      context,
+      function,
     )
   }
 }

@@ -140,7 +140,7 @@ public class Ranges {
       endLine = range.getLine(editor, lastZero)
       if (range.isMove) {
         editor.primaryCaret().moveToOffset(
-          injector.motion.moveCaretToLineWithSameColumn(editor, endLine, editor.primaryCaret())
+          injector.motion.moveCaretToLineWithSameColumn(editor, endLine, editor.primaryCaret()),
         )
       }
       // Did that last range represent the start of the file?
@@ -161,9 +161,11 @@ public class Ranges {
     for (range in ranges) {
       startLine = endLine
       endLine = range.getLine(editor, caret, lastZero)
-      if (range.isMove) caret.moveToOffset(
-        injector.motion.moveCaretToLineWithSameColumn(editor, endLine, editor.primaryCaret())
-      )
+      if (range.isMove) {
+        caret.moveToOffset(
+          injector.motion.moveCaretToLineWithSameColumn(editor, endLine, editor.primaryCaret()),
+        )
+      }
       lastZero = endLine < 0
       ++count
     }

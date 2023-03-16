@@ -29,8 +29,9 @@ public data class PutLinesCommand(val ranges: Ranges, val argument: String) : Co
     val registerGroup = injector.registerGroup
     val arg = argument
     if (arg.isNotEmpty()) {
-      if (!registerGroup.selectRegister(arg[0]))
+      if (!registerGroup.selectRegister(arg[0])) {
         return ExecutionResult.Error
+      }
     } else {
       registerGroup.selectRegister(registerGroup.defaultRegister)
     }
@@ -40,7 +41,7 @@ public data class PutLinesCommand(val ranges: Ranges, val argument: String) : Co
       PutData.TextData(
         it.text ?: injector.parser.toKeyNotation(it.keys),
         SelectionType.LINE_WISE,
-        it.transferableData
+        it.transferableData,
       )
     }
     val putData = PutData(
@@ -50,7 +51,7 @@ public data class PutLinesCommand(val ranges: Ranges, val argument: String) : Co
       insertTextBeforeCaret = false,
       rawIndent = false,
       caretAfterInsertedText = false,
-      putToLine = line
+      putToLine = line,
     )
     return if (injector.put.putText(editor, context, putData, operatorArguments = operatorArguments)) ExecutionResult.Success else ExecutionResult.Error
   }

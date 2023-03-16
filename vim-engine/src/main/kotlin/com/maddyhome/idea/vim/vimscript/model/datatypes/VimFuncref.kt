@@ -74,7 +74,7 @@ public data class VimFuncref(
           dictionary!!,
           editor,
           context,
-          handler.function
+          handler.function,
         )
       }
     }

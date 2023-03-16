@@ -23,10 +23,10 @@ import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.diagnostic.vimLogger
+import com.maddyhome.idea.vim.helper.StrictMode
 import com.maddyhome.idea.vim.helper.inBlockSubMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.isEndAllowed
-import com.maddyhome.idea.vim.helper.StrictMode
 
 /**
  * @author Alex Plate
@@ -75,7 +75,7 @@ public sealed class MotionActionHandler : EditorActionHandlerBase(false) {
       editor: VimEditor,
       context: ExecutionContext,
       argument: Argument?,
-      operatorArguments: OperatorArguments
+      operatorArguments: OperatorArguments,
     ): Motion
   }
 
@@ -132,7 +132,7 @@ public sealed class MotionActionHandler : EditorActionHandlerBase(false) {
                   caret,
                   context,
                   cmd,
-                  operatorArguments
+                  operatorArguments,
                 )
               }
             } finally {
@@ -151,7 +151,7 @@ public sealed class MotionActionHandler : EditorActionHandlerBase(false) {
     caret: VimCaret,
     context: ExecutionContext,
     cmd: Command,
-    operatorArguments: OperatorArguments
+    operatorArguments: OperatorArguments,
   ) {
     val offset = getOffset(editor, caret, context, cmd.argument, operatorArguments)
     when (offset) {
@@ -200,7 +200,7 @@ public sealed class MotionActionHandler : EditorActionHandlerBase(false) {
   private fun prepareMoveToAbsoluteOffset(
     editor: VimEditor,
     cmd: Command,
-    offset: Motion.AbsoluteOffset
+    offset: Motion.AbsoluteOffset,
   ): Int {
     var resultOffset = offset.offset
     if (resultOffset < 0) {

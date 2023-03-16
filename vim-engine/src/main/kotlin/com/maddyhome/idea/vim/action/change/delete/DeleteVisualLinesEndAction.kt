@@ -55,14 +55,14 @@ public class DeleteVisualLinesEndAction : VisualOperatorActionHandler.ForEachCar
         blockRange,
         SelectionType.BLOCK_WISE,
         false,
-        operatorArguments
+        operatorArguments,
       )
     } else {
       val lineEndForOffset = editor.getLineEndForOffset(vimTextRange.endOffset)
       val endsWithNewLine = if (lineEndForOffset.toLong() == editor.fileSize()) 0 else 1
       val lineRange = TextRange(
         editor.getLineStartForOffset(vimTextRange.startOffset),
-        lineEndForOffset + endsWithNewLine
+        lineEndForOffset + endsWithNewLine,
       )
       injector.changeGroup.deleteRange(editor, caret, lineRange, SelectionType.LINE_WISE, false, operatorArguments)
     }

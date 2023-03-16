@@ -27,14 +27,18 @@ public data class ShiftRightCommand(val ranges: Ranges, val argument: String, va
     editor: VimEditor,
     caret: VimCaret,
     context: ExecutionContext,
-    operatorArguments: OperatorArguments
+    operatorArguments: OperatorArguments,
   ): ExecutionResult {
     val range = getTextRange(editor, caret, true)
     val endOffsets = range.endOffsets.map { it - 1 }.toIntArray()
     injector.changeGroup.indentRange(
-      editor, caret, context,
+      editor,
+      caret,
+      context,
       TextRange(range.startOffsets, endOffsets),
-      length, 1, operatorArguments
+      length,
+      1,
+      operatorArguments,
     )
     return ExecutionResult.Success
   }

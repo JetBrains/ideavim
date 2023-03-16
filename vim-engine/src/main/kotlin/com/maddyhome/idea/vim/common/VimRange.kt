@@ -8,17 +8,8 @@
 
 package com.maddyhome.idea.vim.common
 
-import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.LineDeleteShift
-import com.maddyhome.idea.vim.api.MutableVimEditor
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.getLineEndOffset
-import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.api.setChangeMarks
-import com.maddyhome.idea.vim.api.toType
-import com.maddyhome.idea.vim.mark.VimMarkConstants
-import kotlin.math.max
-import kotlin.math.min
 
 public data class Offset(val point: Int)
 public data class Pointer(val point: Int)

@@ -57,7 +57,7 @@ public interface OptionService {
 }
 
 @Suppress("DEPRECATION")
-internal class OptionServiceImpl: OptionService {
+internal class OptionServiceImpl : OptionService {
   override fun getOptionValue(scope: OptionScope, optionName: String, token: String): VimDataType {
     val option = injector.optionGroup.getOption(optionName) ?: throw exExceptionMessage("E518", token)
     return injector.optionGroup.getOptionValue(option, scope)

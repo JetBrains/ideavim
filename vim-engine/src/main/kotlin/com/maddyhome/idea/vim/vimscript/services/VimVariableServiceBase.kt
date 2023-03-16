@@ -121,7 +121,7 @@ public abstract class VimVariableServiceBase : VariableService {
       ?: throw ExException(
         "E121: Undefined variable: " +
           (if (variable.scope != null) variable.scope.c + ":" else "") +
-          variable.name.evaluate(editor, context, vimContext).value
+          variable.name.evaluate(editor, context, vimContext).value,
       )
   }
 

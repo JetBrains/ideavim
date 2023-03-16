@@ -35,7 +35,7 @@ public object GuiCursorOptionHelper {
     modes.addAll(
       modeList.split('-').map {
         GuiCursorMode.fromString(it) ?: throw exExceptionMessage("E546", token)
-      }
+      },
     )
 
     var type: GuiCursorType? = null
@@ -124,7 +124,8 @@ public enum class GuiCursorMode(public val token: String) {
   CMD_LINE_INSERT("ci"),
   CMD_LINE_REPLACE("cr"),
   SHOW_MATCH("sm"),
-  ALL("a");
+  ALL("a"),
+  ;
 
   public override fun toString(): String = token
 
@@ -159,7 +160,7 @@ public enum class GuiCursorMode(public val token: String) {
 public enum class GuiCursorType(public val token: String) {
   BLOCK("block"),
   VER("ver"),
-  HOR("hor")
+  HOR("hor"),
 }
 
 public class GuiCursorEntry(
@@ -169,7 +170,7 @@ public class GuiCursorEntry(
   public val thickness: Int?,
   public val highlightGroup: String,
   public val lmapHighlightGroup: String,
-  public val blinkModes: List<String>
+  public val blinkModes: List<String>,
 ) {
   public override fun toString(): String {
     // We need to match the original string for output and remove purposes
@@ -182,5 +183,5 @@ public data class GuiCursorAttributes(
   val thickness: Int,
   val highlightGroup: String,
   val lmapHighlightGroup: String,
-  val blinkModes: List<String>
+  val blinkModes: List<String>,
 )

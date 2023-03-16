@@ -19,7 +19,7 @@ public data class BinExpression(val left: Expression, val right: Expression, val
   override fun evaluate(editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType {
     return operator.handler.performOperation(
       left.evaluate(editor, context, vimContext),
-      right.evaluate(editor, context, vimContext)
+      right.evaluate(editor, context, vimContext),
     )
   }
 }

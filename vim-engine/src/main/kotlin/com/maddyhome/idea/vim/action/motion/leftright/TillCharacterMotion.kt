@@ -62,14 +62,14 @@ public sealed class TillCharacterMotion(
           editor,
           caret,
           direction.toInt() * operatorArguments.count1,
-          argument.character
+          argument.character,
         )
     } else {
       injector.motion.moveCaretToNextCharacterOnLine(
         editor,
         caret,
         direction.toInt() * operatorArguments.count1,
-        argument.character
+        argument.character,
       )
     }
     injector.motion.setLastFTCmd(tillCharacterMotionType, argument.character)

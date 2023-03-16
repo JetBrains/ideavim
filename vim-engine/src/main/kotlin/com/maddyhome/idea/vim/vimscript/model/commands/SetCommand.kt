@@ -60,6 +60,7 @@ public data class SetLocalCommand(val ranges: Ranges, val argument: String) : Co
     }
   }
 }
+
 /**
  * This parses a set of :set commands. The following types of commands are supported:
  *

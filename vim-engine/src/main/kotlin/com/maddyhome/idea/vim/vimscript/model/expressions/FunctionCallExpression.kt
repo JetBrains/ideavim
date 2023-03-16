@@ -30,7 +30,7 @@ public data class FunctionCallExpression(val scope: Scope?, val functionName: Cu
       if (handler is DefinedFunctionHandler && handler.function.flags.contains(FunctionFlag.DICT)) {
         throw ExException(
           "E725: Calling dict function without Dictionary: " +
-            (scope?.toString() ?: "") + functionName.evaluate(editor, context, vimContext)
+            (scope?.toString() ?: "") + functionName.evaluate(editor, context, vimContext),
         )
       }
       return handler.executeFunction(this.arguments, editor, context, vimContext)

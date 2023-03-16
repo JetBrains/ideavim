@@ -83,7 +83,7 @@ public class ShiftRightVisualAction : VisualOperatorActionHandler.ForEachCaret()
       range.toVimTextRange(false),
       cmd.count,
       1,
-      operatorArguments
+      operatorArguments,
     )
     return true
   }

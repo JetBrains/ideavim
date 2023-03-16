@@ -85,7 +85,7 @@ public sealed class Range(
       } else if (str == "%") {
         return arrayOf(
           LineNumberRange(0, 0, move),
-          LineNumberRange(LineNumberRange.LAST_LINE, offset, move)
+          LineNumberRange(LineNumberRange.LAST_LINE, offset, move),
         )
       } else if (str == "$") {
         return arrayOf(LineNumberRange(LineNumberRange.LAST_LINE, offset, move))

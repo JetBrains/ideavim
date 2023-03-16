@@ -116,14 +116,14 @@ public object VimRcService {
         |" Source your .vimrc
         ||source ~/.vimrc
         |
-        """.trimMargin()
+      """.trimMargin()
     }
     if (File(homeDirName, "_vimrc").exists()) {
       return """
         |" Source your _vimrc
         ||source ~/_vimrc
         |
-        """.trimMargin()
+      """.trimMargin()
     }
     return ""
   }

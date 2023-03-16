@@ -82,6 +82,6 @@ private fun moveCaretGotoLineLastEnd(
   return injector.motion.moveCaretToLineEnd(
     editor,
     if (rawCount == 0) editor.normalizeLine(editor.lineCount() - 1) else line,
-    pastEnd
+    pastEnd,
   )
 }

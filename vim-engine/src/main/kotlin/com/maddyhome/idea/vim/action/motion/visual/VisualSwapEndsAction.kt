@@ -29,7 +29,7 @@ public class VisualSwapEndsAction : VimActionHandler.ForEachCaret() {
     caret: VimCaret,
     context: ExecutionContext,
     cmd: Command,
-    operatorArguments: OperatorArguments
+    operatorArguments: OperatorArguments,
   ): Boolean = swapVisualEnds(caret)
 }
 

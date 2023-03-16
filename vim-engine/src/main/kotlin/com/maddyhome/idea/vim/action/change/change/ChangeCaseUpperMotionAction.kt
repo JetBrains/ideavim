@@ -40,7 +40,7 @@ public class ChangeCaseUpperMotionAction : ChangeEditorActionHandler.ForEachCare
           context,
           CharacterHelper.CASE_UPPER,
           argument,
-          operatorArguments
+          operatorArguments,
         )
   }
 }

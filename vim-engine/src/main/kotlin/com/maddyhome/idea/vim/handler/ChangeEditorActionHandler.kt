@@ -108,7 +108,7 @@ public sealed class ChangeEditorActionHandler : EditorActionHandlerBase(false) {
                 worked[0] = false
               }
             },
-            true
+            true,
           )
         }
         is SingleExecution -> {
@@ -124,7 +124,7 @@ public sealed class ChangeEditorActionHandler : EditorActionHandlerBase(false) {
                   worked[0] = false
                 }
               },
-              true
+              true,
             )
           } else {
             worked[0] = execute(editor, context, cmd.argument, operatorArguments)

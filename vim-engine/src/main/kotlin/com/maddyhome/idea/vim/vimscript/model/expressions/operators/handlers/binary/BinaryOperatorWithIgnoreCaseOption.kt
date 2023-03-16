@@ -23,7 +23,10 @@ public abstract class BinaryOperatorWithIgnoreCaseOption(
   }
 
   override fun performOperation(left: VimDataType, right: VimDataType): VimDataType {
-    return if (shouldIgnoreCase()) caseInsensitiveImpl.performOperation(left, right) else
+    return if (shouldIgnoreCase()) {
+      caseInsensitiveImpl.performOperation(left, right)
+    } else {
       caseSensitiveImpl.performOperation(left, right)
+    }
   }
 }

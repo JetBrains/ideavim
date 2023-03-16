@@ -43,7 +43,7 @@ public data class CopyTextCommand(val ranges: Ranges, val argument: String) : Co
         insertTextBeforeCaret = false,
         rawIndent = true,
         caretAfterInsertedText = false,
-        putToLine = line
+        putToLine = line,
       )
       injector.put.putTextForCaret(editor, caret, context, putData)
     }

@@ -30,7 +30,7 @@ public class MotionArrowRightAction : NonShiftedSpecialKeyHandler(), Complicated
 
   override val keyStrokesSet: Set<List<KeyStroke>> = setOf(
     injector.parser.parseKeys("<Right>"),
-    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_RIGHT, 0))
+    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_RIGHT, 0)),
   )
 
   override fun motion(

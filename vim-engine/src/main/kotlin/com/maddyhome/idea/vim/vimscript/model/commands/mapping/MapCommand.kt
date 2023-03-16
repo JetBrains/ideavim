@@ -58,8 +58,11 @@ public data class MapCommand(val ranges: Ranges, val argument: String, val cmd: 
     }
 
     val mappingOwner =
-      if (injector.vimscriptExecutor.executingVimscript) MappingOwner.IdeaVim.InitScript
-      else MappingOwner.IdeaVim.Other
+      if (injector.vimscriptExecutor.executingVimscript) {
+        MappingOwner.IdeaVim.InitScript
+      } else {
+        MappingOwner.IdeaVim.Other
+      }
     if (arguments.specialArguments.contains(EXPR)) {
       injector.statisticsService.setIfMapExprUsed(true)
       injector.keyGroup
@@ -100,7 +103,8 @@ public data class MapCommand(val ranges: Ranges, val argument: String, val cmd: 
     SPECIAL("<special>"),
     SCRIPT("<script>"),
     EXPR("<expr>"),
-    UNIQUE("<unique>");
+    UNIQUE("<unique>"),
+    ;
 
     override fun toString(): String {
       return this.myName
@@ -144,7 +148,7 @@ public data class MapCommand(val ranges: Ranges, val argument: String, val cmd: 
       CommandInfo("xn", "oremap", MappingMode.X, false),
       CommandInfo("ono", "remap", MappingMode.O, false),
       CommandInfo("ino", "remap", MappingMode.I, false),
-      CommandInfo("cno", "remap", MappingMode.C, false)
+      CommandInfo("cno", "remap", MappingMode.C, false),
     )
     private val UNSUPPORTED_SPECIAL_ARGUMENTS = EnumSet.of(SCRIPT)
     private val logger = vimLogger<MapCommand>()

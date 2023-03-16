@@ -48,7 +48,7 @@ public sealed class CommandAlias(
             Arguments -> arrayOf(cleanedInput)
             QuotedArguments -> arrayOf("'$cleanedInput'")
             else -> emptyArray()
-          }.joinToString(", ")
+          }.joinToString(", "),
         )
       }
 

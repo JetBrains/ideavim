@@ -30,7 +30,7 @@ public class ChangeLastSearchReplaceAction : ChangeEditorActionHandler.SingleExe
     for (caret in editor.carets()) {
       val line = caret.getBufferPosition().line
       if (!injector.searchGroup
-        .processSubstituteCommand(editor, caret, LineRange(line, line), "s", "//~/", Script(listOf()))
+          .processSubstituteCommand(editor, caret, LineRange(line, line), "s", "//~/", Script(listOf()))
       ) {
         result = false
       }

@@ -40,7 +40,7 @@ public class ChangeCaseToggleMotionAction : ChangeEditorActionHandler.ForEachCar
           context,
           CharacterHelper.CASE_TOGGLE,
           argument,
-          operatorArguments
+          operatorArguments,
         )
   }
 }

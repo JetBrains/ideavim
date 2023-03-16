@@ -26,24 +26,31 @@ import com.maddyhome.idea.vim.yank.VimYankGroup
 public interface VimInjector {
   // [FINISHED] Fully moved to vim-engine. Should we remove it from injector?
   public val parser: VimStringParser
+
   // [FINISHED] Can't be fully moved to vim-engine
   public val messages: VimMessages
+
   // [FINISHED] Fully moved to vim-engine. Only state left in the IJ
   // Let's keep the state saver as is until we'll figure out how to implement this in fleet.
   public val registerGroup: VimRegisterGroup
   public val registerGroupIfCreated: VimRegisterGroup?
+
   // [FINISHED] Can't be fully moved to vim-engine.
   // Lots of interaction with EX panel. Let's refactor it when figure out how it works in fleet.
   public val processGroup: VimProcessGroup
+
   // [FINISHED] Can't be fully moved to vim-engine.
   // A lot of interaction with IJ.
   public val application: VimApplication
+
   // [FINISHED] Can't be fully moved to vim-engine.
   // Getting contextes. Need to clarify how it works in fleet before refactoring.
   public val executionContextManager: ExecutionContextManager
+
   // [FINISHED] Fully moved to vim-engine except one method that iterates with IJ.
   // Need to check how it would work in fleet before moving this method.
   public val digraphGroup: VimDigraphGroup
+
   // [FINISHED] Can't be fully moved to vim-engine.
   public val enabler: VimEnabler
 
@@ -57,8 +64,10 @@ public interface VimInjector {
 
   // [FINISHED] Can't be fully moved to vim-engine.
   public val nativeActionManager: NativeActionManager
+
   // [FINISHED] Can't be fully moved to vim-engine.
   public val keyGroup: VimKeyGroup
+
   // [FINISHED] Only state left in the IJ && some IJ specifics
   public val markService: VimMarkService
 
@@ -66,6 +75,7 @@ public interface VimInjector {
 
   // [FINISHED] Only IJ staff left
   public val visualMotionGroup: VimVisualMotionGroup
+
   // [FINISHED] Class moved to vim-engine, but it's attached to Editor using IJ things
   public fun commandStateFor(editor: VimEditor): VimStateMachine
   // [FINISHED] Class moved to vim-engine, but it's attached to Editor using IJ things
@@ -74,67 +84,95 @@ public interface VimInjector {
    * Please see: https://jb.gg/zo8n0r
    */
   public fun commandStateFor(editor: Any): VimStateMachine
+
   // !! in progress
   public val engineEditorHelper: EngineEditorHelper
+
   // [FINISHED] Only IJ staff
   public val editorGroup: VimEditorGroup
+
   // [FINISHED] Fully moved to vim-engine. Should we remove it from injector?
   public val commandGroup: VimCommandGroup
+
   // !! in progress
   public val changeGroup: VimChangeGroup
+
   // Can't be fully moved to vim-engine.
   public val actionExecutor: VimActionExecutor
+
   // Can't be fully moved to vim-engine.
   public val exEntryPanel: ExEntryPanel
+
   // Can't be fully moved to vim-engine.
   public val exOutputPanel: VimExOutputPanelService
+
   // Can't be fully moved to vim-engine.
   public val clipboardManager: VimClipboardManager
+
   // Only state left in the IJ
   public val historyGroup: VimHistory
+
   // !! in progress
   public val extensionRegistrator: VimExtensionRegistrator
+
   // Can't be fully moved to vim-engine.
   public val tabService: TabService
+
   // !! in progress
   public val regexpService: VimRegexpService
 
   // !! in progress
   public val searchHelper: VimSearchHelper
+
   // !! in progress
   public val motion: VimMotionGroup
   public val scroll: VimScrollGroup
+
   // Can't be fully moved to vim-engine.
   public val lookupManager: VimLookupManager
+
   // Can't be fully moved to vim-engine.
   public val templateManager: VimTemplateManager
+
   // !! in progress
   public val searchGroup: VimSearchGroup
+
   // Can't be fully moved to vim-engine.
   public val statisticsService: VimStatistics
+
   // !! in progress
   public val put: VimPut
+
   // Can't be fully moved to vim-engine.
   public val window: VimWindowGroup
+
   // !! in progress
   public val yank: VimYankGroup
+
   // !! in progress
   public val file: VimFile
+
   // !! in progress
   public val macro: VimMacro
+
   // !! in progress
   public val undo: VimUndoRedo
+
   // !! in progress
   public val commandLineHelper: VimCommandLineHelper
 
   // Can't be fully moved to vim-engine.
   public val vimscriptExecutor: VimscriptExecutor
+
   // Can't be fully moved to vim-engine.
   public val vimscriptParser: VimscriptParser
+
   // !! in progress
   public val variableService: VariableService
+
   // !! in progress
   public val functionService: VimscriptFunctionService
+
   // Can't be fully moved to vim-engine.
   public val vimrcFileState: VimrcFileState
 

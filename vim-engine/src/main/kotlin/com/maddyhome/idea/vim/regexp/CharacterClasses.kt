@@ -26,7 +26,7 @@ public object CharacterClasses {
     "tab:]",
     "return:]",
     "backspace:]",
-    "escape:]"
+    "escape:]",
   )
   public const val RI_DIGIT: Int = 0x01
   public const val RI_HEX: Int = 0x02

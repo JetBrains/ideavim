@@ -161,7 +161,8 @@ public inline fun <TDataType : VimDataType> VimOptionGroup.modifyOptionValue(
   scope: OptionScope,
   transform: (TDataType) -> TDataType?,
 ) {
-  @Suppress("UNCHECKED_CAST") val currentValue = getOptionValue(option, scope) as TDataType
+  @Suppress("UNCHECKED_CAST")
+  val currentValue = getOptionValue(option, scope) as TDataType
   transform(currentValue)?.let {
     setOptionValue(option, scope, it)
   }

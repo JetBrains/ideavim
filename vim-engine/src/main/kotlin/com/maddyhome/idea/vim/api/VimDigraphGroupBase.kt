@@ -42,8 +42,8 @@ public abstract class VimDigraphGroupBase() : VimDigraphGroup {
           ch.code,
           ch.code,
           ch.code,
-          digraphText
-        )
+          digraphText,
+        ),
       )
     } else {
       injector.messages.showStatusBarMessage(
@@ -54,8 +54,8 @@ public abstract class VimDigraphGroupBase() : VimDigraphGroup {
           ch.code,
           ch.code,
           ch.code,
-          digraphText
-        )
+          digraphText,
+        ),
       )
     }
   }
@@ -1679,7 +1679,7 @@ public abstract class VimDigraphGroupBase() : VimDigraphGroup {
     'f', 'i', '\ufb01', // LATIN SMALL LIGATURE FI
     'f', 'l', '\ufb02', // LATIN SMALL LIGATURE FL
     'f', 't', '\ufb05', // LATIN SMALL LIGATURE FT
-    's', 't', '\ufb06'
+    's', 't', '\ufb06',
   )
   protected val digraphs: HashMap<String, Char> = HashMap<String, Char>(defaultDigraphs.size)
   protected val keys: TreeMap<Char, String> = TreeMap<Char, String>()

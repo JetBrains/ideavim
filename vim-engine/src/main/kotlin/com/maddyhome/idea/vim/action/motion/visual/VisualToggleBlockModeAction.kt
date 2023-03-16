@@ -28,7 +28,9 @@ public class VisualToggleBlockModeAction : VimActionHandler.SingleExecution() {
   ): Boolean {
     return if (injector.options(editor).hasValue(OptionConstants.selectmode, OptionConstants.selectmode_cmd)) {
       injector.visualMotionGroup.enterSelectMode(editor, VimStateMachine.SubMode.VISUAL_BLOCK)
-    } else injector.visualMotionGroup
-      .toggleVisual(editor, cmd.count, cmd.rawCount, VimStateMachine.SubMode.VISUAL_BLOCK)
+    } else {
+      injector.visualMotionGroup
+        .toggleVisual(editor, cmd.count, cmd.rawCount, VimStateMachine.SubMode.VISUAL_BLOCK)
+    }
   }
 }

@@ -39,12 +39,15 @@ public data class LambdaExpression(val args: List<String>, val expr: Expression)
     for (argument in args) {
       body.add(
         LetCommand(
-          Ranges(), Variable(Scope.LOCAL_VARIABLE, argument), AssignmentOperator.ASSIGNMENT,
+          Ranges(),
+          Variable(Scope.LOCAL_VARIABLE, argument),
+          AssignmentOperator.ASSIGNMENT,
           Variable(
-            Scope.FUNCTION_VARIABLE, argument
+            Scope.FUNCTION_VARIABLE,
+            argument,
           ),
-          true
-        )
+          true,
+        ),
       )
     }
     body.add(ReturnStatement(expr))

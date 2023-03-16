@@ -116,7 +116,6 @@ public object MappingProcessor {
             }
             log.trace("processing unhandled keys...")
             for ((index, keyStroke) in unhandledKeys.withIndex()) {
-
               // Related issue: VIM-2315
               // If we have two mappings: for `abc` and for `ab`, after typing `ab` we should wait a bit and execute
               //   `ab` mapping
@@ -125,12 +124,15 @@ public object MappingProcessor {
               val lastKeyInSequence = index == unhandledKeys.lastIndex
 
               KeyHandler.getInstance().handleKey(
-                editor, keyStroke, injector.executionContextManager.onEditor(editor),
+                editor,
+                keyStroke,
+                injector.executionContextManager.onEditor(editor),
                 allowKeyMappings = true,
-                mappingCompleted = lastKeyInSequence
+                mappingCompleted = lastKeyInSequence,
               )
             }
-          }, editor
+          },
+          editor,
         )
       }
     }
@@ -185,7 +187,7 @@ public object MappingProcessor {
         """
                 Caught exception during ${mappingInfo.getPresentableString()}
                 ${e.message}
-        """.trimIndent()
+        """.trimIndent(),
       )
     } catch (e: NotImplementedError) {
       injector.messages.showStatusBarMessage(editor, e.message)
@@ -194,7 +196,7 @@ public object MappingProcessor {
         """
                  Caught exception during ${mappingInfo.getPresentableString()}
                  ${e.message}
-        """.trimIndent()
+        """.trimIndent(),
       )
     } finally {
       mappingState.stopMapExecution()
@@ -236,9 +238,11 @@ public object MappingProcessor {
     if (isPluginMapping(unhandledKeyStrokes)) {
       log.trace("This is a plugin mapping, process it")
       KeyHandler.getInstance().handleKey(
-        editor, unhandledKeyStrokes[unhandledKeyStrokes.size - 1], context,
+        editor,
+        unhandledKeyStrokes[unhandledKeyStrokes.size - 1],
+        context,
         allowKeyMappings = true,
-        mappingCompleted = false
+        mappingCompleted = false,
       )
     } else {
       log.trace("Process abandoned keys.")

@@ -26,7 +26,7 @@ public class MotionCamelLeftAction : MotionActionHandler.ForEachCaret() {
     caret: ImmutableVimCaret,
     context: ExecutionContext,
     argument: Argument?,
-    operatorArguments: OperatorArguments
+    operatorArguments: OperatorArguments,
   ): Motion {
     return injector.searchHelper.findPreviousCamelStart(editor.text(), caret.offset.point, operatorArguments.count1)
       ?.toMotionOrError() ?: Motion.Error

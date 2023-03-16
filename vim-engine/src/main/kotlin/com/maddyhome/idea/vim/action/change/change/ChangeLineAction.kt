@@ -42,7 +42,7 @@ public class ChangeLineAction : ChangeEditorActionHandler.ForEachCaret() {
       caret,
       context,
       Argument(command),
-      operatorArguments
+      operatorArguments,
     )
   }
 }
