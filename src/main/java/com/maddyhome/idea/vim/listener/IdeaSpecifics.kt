@@ -22,6 +22,7 @@ import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.AnActionResult
+import com.intellij.openapi.actionSystem.AnActionWrapper
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.ex.AnActionListener
 import com.intellij.openapi.actionSystem.impl.ProxyShortcutSet
@@ -30,6 +31,7 @@ import com.intellij.openapi.project.DumbAwareToggleAction
 import com.intellij.openapi.util.TextRange
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.action.VimShortcutKeyAction
 import com.maddyhome.idea.vim.api.getKnownToggleOption
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
@@ -67,7 +69,8 @@ internal object IdeaSpecifics {
         editor = hostEditor
       }
 
-      if (injector.globalOptions().isSet(IjOptionConstants.trackactionids)) {
+      val isVimAction = (action as? AnActionWrapper)?.delegate is VimShortcutKeyAction
+      if (!isVimAction && injector.globalOptions().isSet(IjOptionConstants.trackactionids)) {
         if (action !is NotificationService.ActionIdNotifier.CopyActionId && action !is NotificationService.ActionIdNotifier.StopTracking) {
           val id: String? = ActionManager.getInstance().getId(action) ?: (action.shortcutSet as? ProxyShortcutSet)?.actionId
           VimPlugin.getNotifications(event.dataContext.getData(CommonDataKeys.PROJECT)).notifyActionId(id)
