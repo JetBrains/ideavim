@@ -12,6 +12,7 @@ import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 /*
 z<Right>    or                                         *zl* *z<Right>*
@@ -21,6 +22,7 @@ zl                      Move the view on the text [count] characters to the
  */
 class ScrollColumnLeftActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun`test scrolls column to left`() {
     configureByColumns(200)
     typeText("100|", "zl")
@@ -29,6 +31,7 @@ class ScrollColumnLeftActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun`test scrolls column to left with zRight`() {
     configureByColumns(200)
     typeText("100|", "z<Right>")
@@ -37,6 +40,7 @@ class ScrollColumnLeftActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun`test scroll first column to left moves cursor`() {
     configureByColumns(200)
     typeText("100|", "zs", "zl")
@@ -45,6 +49,7 @@ class ScrollColumnLeftActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun`test scrolls count columns to left`() {
     configureByColumns(200)
     typeText("100|", "10zl")
@@ -53,6 +58,7 @@ class ScrollColumnLeftActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun`test scrolls count columns to left with zRight`() {
     configureByColumns(200)
     typeText("100|", "10z<Right>")
@@ -61,6 +67,7 @@ class ScrollColumnLeftActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun`test scrolls column to left with sidescrolloff moves cursor`() {
     configureByColumns(200)
     enterCommand("set sidescrolloff=10")
@@ -70,6 +77,7 @@ class ScrollColumnLeftActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun`test scroll column to left ignores sidescroll`() {
     configureByColumns(200)
     enterCommand("set sidescroll=10")
@@ -86,6 +94,7 @@ class ScrollColumnLeftActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun`test scroll column to left on last page enters virtual space`() {
     configureByColumns(200)
     typeText("200|", "ze", "zl")
@@ -101,6 +110,7 @@ class ScrollColumnLeftActionTest : VimTestCase() {
 
   @VimBehaviorDiffers(description = "Vim has virtual space at end of line")
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun`test scroll columns to left on last page does not have full virtual space`() {
     configureByColumns(200)
     typeText("200|", "ze", "50zl")
@@ -111,6 +121,7 @@ class ScrollColumnLeftActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun`test scroll column to left correctly scrolls inline inlay associated with preceding text`() {
     configureByColumns(200)
     addInlay(67, true, 5)
@@ -124,6 +135,7 @@ class ScrollColumnLeftActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
   fun`test scroll column to left correctly scrolls inline inlay associated with following text`() {
     configureByColumns(200)
     addInlay(67, false, 5)

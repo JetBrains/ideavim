@@ -12,6 +12,7 @@ import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Test
 
 /*
 z<Left>      or                                        *zh* *z<Left>*
@@ -21,6 +22,7 @@ zh                      Move the view on the text [count] characters to the
  */
 class ScrollColumnRightActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  @Test
   fun`test scrolls column to right`() {
     configureByColumns(200)
     typeText("100|", "zh")
@@ -29,6 +31,7 @@ class ScrollColumnRightActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  @Test
   fun`test scrolls column to right with zLeft`() {
     configureByColumns(200)
     typeText("100|", "z<Left>")
@@ -38,6 +41,7 @@ class ScrollColumnRightActionTest : VimTestCase() {
 
   @VimBehaviorDiffers(description = "Vim has virtual space at the end of line. IdeaVim will scroll up to length of longest line")
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  @Test
   fun`test scroll last column to right moves cursor 1`() {
     configureByColumns(200)
     typeText("$")
@@ -52,6 +56,7 @@ class ScrollColumnRightActionTest : VimTestCase() {
 
   @VimBehaviorDiffers(description = "Vim has virtual space at the end of line. IdeaVim will scroll up to length of longest line")
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  @Test
   fun`test scroll last column to right moves cursor 2`() {
     configureByText(
       buildString {
@@ -72,6 +77,7 @@ class ScrollColumnRightActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  @Test
   fun`test scrolls count columns to right`() {
     configureByColumns(200)
     typeText("100|", "10zh")
@@ -80,6 +86,7 @@ class ScrollColumnRightActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  @Test
   fun`test scrolls count columns to right with zLeft`() {
     configureByColumns(200)
     typeText("100|", "10z<Left>")
@@ -88,6 +95,7 @@ class ScrollColumnRightActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  @Test
   fun`test scrolls column to right with sidescrolloff moves cursor`() {
     configureByColumns(200)
     enterCommand("set sidescrolloff=10")
@@ -97,6 +105,7 @@ class ScrollColumnRightActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  @Test
   fun`test scroll column to right ignores sidescroll`() {
     configureByColumns(200)
     enterCommand("set sidescroll=10")
@@ -112,6 +121,7 @@ class ScrollColumnRightActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  @Test
   fun`test scroll column to right on first page does nothing`() {
     configureByColumns(200)
     typeText("10|", "zh")
@@ -120,6 +130,7 @@ class ScrollColumnRightActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  @Test
   fun`test scroll column to right correctly scrolls inline inlay associated with preceding text`() {
     configureByColumns(200)
     addInlay(130, true, 5)
@@ -135,6 +146,7 @@ class ScrollColumnRightActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  @Test
   fun`test scroll column to right correctly scrolls inline inlay associated with following text`() {
     configureByColumns(200)
     addInlay(130, false, 5)
@@ -150,6 +162,7 @@ class ScrollColumnRightActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  @Test
   fun`test scroll column to right with preceding inline inlay moves cursor at end of screen`() {
     configureByColumns(200)
     addInlay(90, false, 5)
