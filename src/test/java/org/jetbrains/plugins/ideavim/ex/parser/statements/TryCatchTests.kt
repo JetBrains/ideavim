@@ -12,7 +12,7 @@ import com.maddyhome.idea.vim.vimscript.model.statements.ThrowStatement
 import com.maddyhome.idea.vim.vimscript.model.statements.TryStatement
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 import org.jetbrains.plugins.ideavim.VimTestCase
-import org.jetbrains.plugins.ideavim.product
+import org.jetbrains.plugins.ideavim.productForArguments
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -41,7 +41,7 @@ class TryCatchTests : VimTestCase() {
     val endtryNames = listOf("endt", "endtr", "endtry")
 
     @JvmStatic
-    fun combinations(): List<Arguments> = product(tryNames, catchNames, finallyNames, endtryNames, spaces, spaces, spaces, spaces)
+    fun combinations(): List<Arguments> = productForArguments(tryNames, catchNames, finallyNames, endtryNames, spaces, spaces, spaces, spaces)
   }
 
   @ParameterizedTest

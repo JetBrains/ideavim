@@ -12,7 +12,7 @@ import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 import org.jetbrains.plugins.ideavim.ex.evaluate
-import org.jetbrains.plugins.ideavim.product
+import org.jetbrains.plugins.ideavim.productForArguments
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
@@ -28,10 +28,10 @@ class ConcatenationOperatorTest {
     val spaces = listOf("", " ")
 
     @JvmStatic
-    fun operatorSpaces(): List<Arguments> = product(operator, spaces)
+    fun operatorSpaces(): List<Arguments> = productForArguments(operator, spaces)
 
     @JvmStatic
-    fun operatorSpacesSpaces(): List<Arguments> = product(operator, spaces, spaces)
+    fun operatorSpacesSpaces(): List<Arguments> = productForArguments(operator, spaces, spaces)
   }
 
   @ParameterizedTest

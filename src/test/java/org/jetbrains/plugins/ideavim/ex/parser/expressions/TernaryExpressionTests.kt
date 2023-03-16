@@ -11,7 +11,7 @@ package org.jetbrains.plugins.ideavim.ex.parser.expressions
 import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.TernaryExpression
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
-import org.jetbrains.plugins.ideavim.product
+import org.jetbrains.plugins.ideavim.productForArguments
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
@@ -25,7 +25,7 @@ class TernaryExpressionTests {
     val values = listOf("", " ")
 
     @JvmStatic
-    fun arg8(): List<Arguments> = product(values, values, values, values, values, values, values, values)
+    fun arg8(): List<Arguments> = productForArguments(values, values, values, values, values, values, values, values)
   }
 
   @ParameterizedTest

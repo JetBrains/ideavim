@@ -15,7 +15,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.SublistExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 import org.jetbrains.plugins.ideavim.ex.evaluate
-import org.jetbrains.plugins.ideavim.product
+import org.jetbrains.plugins.ideavim.productForArguments
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
@@ -27,16 +27,16 @@ class SublistExpressionTests {
 
   companion object {
     @JvmStatic
-    fun args2(): List<Arguments> = product(spaces, spaces)
+    fun args2(): List<Arguments> = productForArguments(spaces, spaces)
 
     @JvmStatic
-    fun args3(): List<Arguments> = product(spaces, spaces, spaces)
+    fun args3(): List<Arguments> = productForArguments(spaces, spaces, spaces)
 
     @JvmStatic
-    fun args4(): List<Arguments> = product(spaces, spaces, spaces, spaces)
+    fun args4(): List<Arguments> = productForArguments(spaces, spaces, spaces, spaces)
 
     @JvmStatic
-    fun args6(): List<Arguments> = product(spaces, spaces, spaces, spaces, spaces, spaces)
+    fun args6(): List<Arguments> = productForArguments(spaces, spaces, spaces, spaces, spaces, spaces)
 
     val spaces = listOf("", " ")
   }
