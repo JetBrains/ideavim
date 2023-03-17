@@ -13,7 +13,6 @@ import com.intellij.codeInsight.editorActions.CopyPastePreProcessor
 import com.intellij.codeInsight.editorActions.TextBlockTransferable
 import com.intellij.codeInsight.editorActions.TextBlockTransferableData
 import com.intellij.ide.CopyPasteManagerEx
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.editor.CaretStateTransferableData
 import com.intellij.openapi.editor.RawText
@@ -30,8 +29,6 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.group.IjOptionConstants
-import com.maddyhome.idea.vim.helper.TestClipboardModel
-import com.maddyhome.idea.vim.helper.TestClipboardModel.contents
 import java.awt.HeadlessException
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.Transferable
@@ -135,12 +132,7 @@ internal class IjClipboardManager : VimClipboardManager {
   }
 
   private fun setContents(contents: Transferable) {
-    if (ApplicationManager.getApplication().isUnitTestMode) {
-      TestClipboardModel.contents = contents
-      CopyPasteManagerEx.getInstanceEx().setContents(contents)
-    } else {
-      CopyPasteManagerEx.getInstanceEx().setContents(contents)
-    }
+    CopyPasteManagerEx.getInstanceEx().setContents(contents)
   }
 
   private fun collectTransferableData(transferable: Transferable): List<TextBlockTransferableData> {
@@ -154,13 +146,7 @@ internal class IjClipboardManager : VimClipboardManager {
     return allValues
   }
 
-  private fun getContents(): Transferable? {
-    if (ApplicationManager.getApplication().isUnitTestMode) {
-      return contents
-    }
-    val manager = CopyPasteManagerEx.getInstanceEx()
-    return manager.contents
-  }
+  private fun getContents(): Transferable? = CopyPasteManagerEx.getInstanceEx().contents
 
   companion object {
     val logger = vimLogger<IjClipboardManager>()

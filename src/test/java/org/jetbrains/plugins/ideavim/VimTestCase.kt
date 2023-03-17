@@ -7,6 +7,7 @@
  */
 package org.jetbrains.plugins.ideavim
 
+import com.intellij.ide.ClipboardSynchronizer
 import com.intellij.ide.bookmark.BookmarksManager
 import com.intellij.ide.highlighter.JavaFileType
 import com.intellij.ide.highlighter.XmlFileType
@@ -35,6 +36,7 @@ import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
 import com.intellij.testFramework.fixtures.impl.LightTempDirTestFixtureImpl
 import com.intellij.testFramework.junit5.RunInEdt
+import com.intellij.util.ui.EmptyClipboardOwner
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.VimShortcutKeyAction
@@ -77,6 +79,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
 import com.maddyhome.idea.vim.vimscript.parser.errors.IdeavimErrorListener
 import org.assertj.core.api.Assertions
 import org.jetbrains.annotations.ApiStatus
+import org.jetbrains.plugins.ideavim.impl.EmptyTransferable
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInfo
@@ -130,6 +133,7 @@ abstract class VimTestCase {
     }
     GuicursorChangeListener.processGlobalValueChange(null)
     Checks.reset()
+    clearClipboard()
 
     // Make sure the entry text field gets a bounds, or we won't be able to work out caret location
     ExEntryPanel.getInstance().entry.setBounds(0, 0, 100, 25)
@@ -721,6 +725,11 @@ abstract class VimTestCase {
       if (keyCode == KeyEvent.VK_ESCAPE) return CharType.EditorAction("EditorEscape")
     }
     return CharType.UNDEFINED
+  }
+
+  private fun clearClipboard() {
+    ClipboardSynchronizer.getInstance().resetContent();
+    ClipboardSynchronizer.getInstance().setContent(EmptyTransferable, EmptyClipboardOwner.INSTANCE)
   }
 
   sealed interface CharType {

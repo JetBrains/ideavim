@@ -36,7 +36,6 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.RWLockLabel
-import com.maddyhome.idea.vim.helper.TestClipboardModel
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.mark.VimMarkConstants.MARK_CHANGE_POS
 import com.maddyhome.idea.vim.newapi.IjVimCaret
@@ -98,7 +97,6 @@ internal class PutGroup : VimPutBase() {
     val allContentsBefore = CopyPasteManager.getInstance().allContents
     val sizeBeforeInsert = allContentsBefore.size
     val firstItemBefore = allContentsBefore.firstOrNull()
-    val origTestContents = TestClipboardModel.contents
     logger.debug { "Transferable classes: ${text.transferableData.joinToString { it.javaClass.name }}" }
     val origContent: TextBlockTransferable = injector.clipboardManager.setClipboardText(
       text.text,
@@ -111,7 +109,6 @@ internal class PutGroup : VimPutBase() {
     } finally {
       val textOnTop =
         ((firstItemBefore as? TextBlockTransferable)?.getTransferData(DataFlavor.stringFlavor) as? String) != text.text
-      TestClipboardModel.contents = origTestContents
       if (sizeBeforeInsert != sizeAfterInsert || textOnTop) {
         // Sometimes inserted text replaces existing one. E.g. on insert with + or * register
         (CopyPasteManager.getInstance() as? CopyPasteManagerEx)?.run { removeContent(origContent) }

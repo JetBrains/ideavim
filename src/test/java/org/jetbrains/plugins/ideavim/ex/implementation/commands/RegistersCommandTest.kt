@@ -10,22 +10,12 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.helper.TestClipboardModel
 import org.jetbrains.plugins.ideavim.VimTestCase
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInfo
 
 class RegistersCommandTest : VimTestCase() {
-  @AfterEach
-  override fun tearDown(testInfo: TestInfo) {
-    super.tearDown(super.testInfo)
-    TestClipboardModel.clearClipboard()
-  }
-
   @Test
   fun `test list empty registers`() {
-    TestClipboardModel.clearClipboard()
     configureByText("")
     enterCommand("registers")
     assertExOutput("Type Name Content\n")
@@ -173,7 +163,7 @@ class RegistersCommandTest : VimTestCase() {
     }
 
     // Clipboard registers "* "+
-    TestClipboardModel.setClipboardText("clipboard content")
+    injector.clipboardManager.setClipboardText("clipboard content", "clipboard content", emptyList())
 
     // Last search register "/
     enterSearch("search pattern")
@@ -234,3 +224,4 @@ class RegistersCommandTest : VimTestCase() {
     )
   }
 }
+
