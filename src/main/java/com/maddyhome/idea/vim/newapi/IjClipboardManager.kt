@@ -55,7 +55,7 @@ internal class IjClipboardManager : VimClipboardManager {
   }
 
   @Suppress("UNCHECKED_CAST")
-  override fun setClipboardText(text: String, rawText: String, transferableData: List<Any>): Any? {
+  override fun setClipboardText(text: String, rawText: String, transferableData: List<Any>): Transferable? {
     val transferableData1 = (transferableData as List<TextBlockTransferableData>).toMutableList()
     try {
       val s = TextBlockTransferable.convertLineSeparators(text, "\n", transferableData1)
@@ -75,9 +75,9 @@ internal class IjClipboardManager : VimClipboardManager {
   override fun getTransferableData(vimEditor: VimEditor, textRange: TextRange, text: String): List<Any> {
     val editor = (vimEditor as IjVimEditor).editor
     val transferableData: MutableList<TextBlockTransferableData> = ArrayList()
-    val project = editor.project ?: return ArrayList()
+    val project = editor.project ?: return emptyList()
 
-    val file = PsiDocumentManager.getInstance(project).getPsiFile(editor.document) ?: return ArrayList()
+    val file = PsiDocumentManager.getInstance(project).getPsiFile(editor.document) ?: return emptyList()
     DumbService.getInstance(project).withAlternativeResolveEnabled {
       for (processor in CopyPastePostProcessor.EP_NAME.extensionList) {
         try {

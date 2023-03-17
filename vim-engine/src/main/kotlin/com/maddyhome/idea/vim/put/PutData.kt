@@ -36,5 +36,6 @@ public data class PutData(
     val rawText: String?,
     val typeInRegister: SelectionType,
     val transferableData: List<Any>,
+    val registerChar: Char?,
   )
 }

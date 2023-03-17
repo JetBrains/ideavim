@@ -184,7 +184,7 @@ internal class VimSurroundExtension : VimExtension {
           .map { surrounding ->
             val innerValue = injector.parser.toPrintableString(surrounding.innerText!!)
             val text = newSurround?.let { it.first + innerValue + it.second } ?: innerValue
-            val textData = PutData.TextData(text, SelectionType.CHARACTER_WISE, emptyList())
+            val textData = PutData.TextData(text, SelectionType.CHARACTER_WISE, emptyList(), null)
             val putData = PutData(textData, null, 1, insertTextBeforeCaret = true, rawIndent = true, caretAfterInsertedText = false)
 
             surrounding.caret to putData

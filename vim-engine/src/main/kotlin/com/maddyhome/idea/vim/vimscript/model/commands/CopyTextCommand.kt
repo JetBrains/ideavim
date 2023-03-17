@@ -35,7 +35,7 @@ public data class CopyTextCommand(val ranges: Ranges, val argument: String) : Co
       val line = goToLineCommand.commandRanges.getFirstLine(editor, caret)
 
       val transferableData = injector.clipboardManager.getTransferableData(editor, range, text)
-      val textData = PutData.TextData(text, SelectionType.LINE_WISE, transferableData)
+      val textData = PutData.TextData(text, SelectionType.LINE_WISE, transferableData, null)
       val putData = PutData(
         textData,
         null,

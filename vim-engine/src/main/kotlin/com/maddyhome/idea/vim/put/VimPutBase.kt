@@ -58,7 +58,7 @@ public abstract class VimPutBase : VimPut {
   ): Boolean {
     val additionalData = collectPreModificationData(editor, data)
     deleteSelectedText(editor, data, operatorArguments, saveToRegister)
-    val processedText = processText(editor, null, data) ?: return false
+    val processedText = processText(null, data) ?: return false
     putTextAndSetCaretPosition(editor, context, processedText, data, additionalData)
 
     if (updateVisualMarks) {
@@ -119,7 +119,7 @@ public abstract class VimPutBase : VimPut {
       }
   }
 
-  private fun processText(editor: VimEditor, caret: VimCaret?, data: PutData): ProcessedTextData? {
+  private fun processText(caret: VimCaret?, data: PutData): ProcessedTextData? {
     var text = data.textData?.rawText ?: run {
       if (caret == null) return null
       if (data.visualSelection != null) {
@@ -139,7 +139,12 @@ public abstract class VimPutBase : VimPut {
         text.dropLast(1)
     }
 
-    return ProcessedTextData(text, data.textData.typeInRegister, data.textData.transferableData)
+    return ProcessedTextData(
+      text,
+      data.textData.typeInRegister,
+      data.textData.transferableData,
+      data.textData.registerChar
+    )
   }
 
   protected fun moveCaretToEndPosition(
@@ -514,7 +519,7 @@ public abstract class VimPutBase : VimPut {
         modifyRegister,
       )
     }
-    val processedText = processText(editor, caret, data) ?: return false
+    val processedText = processText(caret, data) ?: return false
     val updatedCaret = putForCaret(editor, caret, data, additionalData, context, processedText)
     if (updateVisualMarks) {
       wrapInsertedTextWithVisualMarks(updatedCaret, data, processedText)

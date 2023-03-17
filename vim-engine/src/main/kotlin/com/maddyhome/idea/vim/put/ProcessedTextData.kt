@@ -14,4 +14,5 @@ public data class ProcessedTextData(
   val text: String,
   val typeInRegister: SelectionType,
   val transferableData: List<Any>,
+  val registerChar: Char?,
 )

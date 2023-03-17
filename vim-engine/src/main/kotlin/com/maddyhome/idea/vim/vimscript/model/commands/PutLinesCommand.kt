@@ -42,6 +42,7 @@ public data class PutLinesCommand(val ranges: Ranges, val argument: String) : Co
         it.text ?: injector.parser.toKeyNotation(it.keys),
         SelectionType.LINE_WISE,
         it.transferableData,
+        null,
       )
     }
     val putData = PutData(

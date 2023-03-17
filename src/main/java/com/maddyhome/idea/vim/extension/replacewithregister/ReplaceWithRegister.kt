@@ -154,7 +154,7 @@ internal class ReplaceWithRegister : VimExtension {
         usedType = SelectionType.CHARACTER_WISE
       }
 
-      val textData = PutData.TextData(usedText, usedType, savedRegister.transferableData)
+      val textData = PutData.TextData(usedText, usedType, savedRegister.transferableData, savedRegister.name)
 
       val putData = PutData(
         textData,

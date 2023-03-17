@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.common.TextRange
+import java.awt.datatransfer.Transferable
 
 public interface VimClipboardManager {
   /**
@@ -21,7 +22,7 @@ public interface VimClipboardManager {
   /**
    * Puts the supplied text into the system clipboard
    */
-  public fun setClipboardText(text: String, rawText: String = text, transferableData: List<Any>): Any?
+  public fun setClipboardText(text: String, rawText: String = text, transferableData: List<Any>): Transferable?
 
   public fun getTransferableData(vimEditor: VimEditor, textRange: TextRange, text: String): List<Any>
 

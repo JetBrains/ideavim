@@ -48,6 +48,7 @@ import com.maddyhome.idea.vim.put.ProcessedTextData
 import com.maddyhome.idea.vim.put.PutData
 import com.maddyhome.idea.vim.put.VimPasteProvider
 import com.maddyhome.idea.vim.put.VimPutBase
+import com.maddyhome.idea.vim.register.RegisterConstants
 import java.awt.datatransfer.DataFlavor
 
 internal class PutGroup : VimPutBase() {
@@ -94,24 +95,13 @@ internal class PutGroup : VimPutBase() {
       carets[caret] = pointMarker
     }
 
-    val allContentsBefore = CopyPasteManager.getInstance().allContents
-    val sizeBeforeInsert = allContentsBefore.size
-    val firstItemBefore = allContentsBefore.firstOrNull()
-    logger.debug { "Transferable classes: ${text.transferableData.joinToString { it.javaClass.name }}" }
-    val origContent: TextBlockTransferable = injector.clipboardManager.setClipboardText(
-      text.text,
-      transferableData = text.transferableData,
-    ) as TextBlockTransferable
-    val allContentsAfter = CopyPasteManager.getInstance().allContents
-    val sizeAfterInsert = allContentsAfter.size
-    try {
+    val registerChar = text.registerChar
+    if (registerChar != null && registerChar in RegisterConstants.CLIPBOARD_REGISTERS) {
       (pasteProvider as IjPasteProvider).pasteProvider.performPaste(context)
-    } finally {
-      val textOnTop =
-        ((firstItemBefore as? TextBlockTransferable)?.getTransferData(DataFlavor.stringFlavor) as? String) != text.text
-      if (sizeBeforeInsert != sizeAfterInsert || textOnTop) {
-        // Sometimes inserted text replaces existing one. E.g. on insert with + or * register
-        (CopyPasteManager.getInstance() as? CopyPasteManagerEx)?.run { removeContent(origContent) }
+    }
+    else {
+      pasteKeepingClipboard(text) {
+        (pasteProvider as IjPasteProvider).pasteProvider.performPaste(context)
       }
     }
 
@@ -145,6 +135,51 @@ internal class PutGroup : VimPutBase() {
         subMode,
         data.caretAfterInsertedText,
       )
+    }
+  }
+
+  /**
+   * ideaput - option that enables "smartness" of the insert operation. For example, it automatically
+   *   inserts import statements, or converts Java code to kotlin.
+   * Unfortunately, at the moment, this functionality of "additional text processing" is bound to
+   *   paste operation. So here we do the trick, in order to insert text from the register with all the
+   *   brains from IJ, we put this text into the clipboard and perform a regular IJ paste.
+   * In order to do this properly, after the paste, we should remove the clipboard text from
+   *   the kill ring (stack of clipboard items)
+   * So, generally this function should look like this:
+   * ```
+   * setClipboardText(text)
+   * try {
+   *   performPaste()
+   * } finally {
+   *   removeTextFromClipboard()
+   * }
+   * ```
+   * And it was like this till some moment. However, if our text to paste matches the text that is already placed
+   *   in the clipboard, instead of putting new text on top of stack, it merges the text into the last stack item.
+   * So, all the other code in this function is created to detect such case and do not remove last clipboard item.
+   */
+  private fun pasteKeepingClipboard(text: ProcessedTextData, doPaste: () -> Unit) {
+    val allContentsBefore = CopyPasteManager.getInstance().allContents
+    val sizeBeforeInsert = allContentsBefore.size
+    val firstItemBefore = allContentsBefore.firstOrNull()
+    logger.debug { "Transferable classes: ${text.transferableData.joinToString { it.javaClass.name }}" }
+    val origContent: TextBlockTransferable = injector.clipboardManager.setClipboardText(
+      text.text,
+      transferableData = text.transferableData,
+    ) as TextBlockTransferable
+    val allContentsAfter = CopyPasteManager.getInstance().allContents
+    val sizeAfterInsert = allContentsAfter.size
+    try {
+      doPaste()
+    } finally {
+      val textInClipboard = (firstItemBefore as? TextBlockTransferable)
+        ?.getTransferData(DataFlavor.stringFlavor) as? String
+      val textOnTop = textInClipboard != null && textInClipboard != text.text
+      if (sizeBeforeInsert != sizeAfterInsert || textOnTop) {
+        // Sometimes an inserted text replaces an existing one. E.g. on insert with + or * register
+        (CopyPasteManager.getInstance() as? CopyPasteManagerEx)?.run { removeContent(origContent) }
+      }
     }
   }
 

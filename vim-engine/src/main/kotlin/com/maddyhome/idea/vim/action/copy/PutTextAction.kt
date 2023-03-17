@@ -61,6 +61,7 @@ public sealed class PutTextBaseAction(
         register.text ?: injector.parser.toPrintableString(register.keys),
         register.type,
         register.transferableData,
+        register.name,
       )
     }
     return PutData(textData, null, count, insertTextBeforeCaret, indent, caretAfterInsertedText, -1)

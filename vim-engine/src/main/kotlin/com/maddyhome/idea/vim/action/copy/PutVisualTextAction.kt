@@ -63,6 +63,7 @@ public sealed class PutVisualTextBaseAction(
         register.text ?: injector.parser.toPrintableString(register.keys),
         register.type,
         register.transferableData,
+        register.name,
       )
     }
     val visualSelection = selection?.let { PutData.VisualSelection(mapOf(caret to it), it.type) }
