@@ -14,23 +14,23 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.options.OptionConstants
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.impl.OptionTest
+import org.jetbrains.plugins.ideavim.impl.TraceOptions
+import org.jetbrains.plugins.ideavim.impl.VimOption
 import org.jetbrains.plugins.ideavim.rangeOf
-import org.junit.jupiter.api.Test
 import java.util.*
 
 /**
  * @author Alex Plate
  */
+@TraceOptions(OptionConstants.clipboard)
 class PutViaIdeaTest : VimTestCase() {
-  override fun setupEditor() {
-    enterCommand("set clipboard=ideaput")
-  }
-
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
-  @Test
+  @OptionTest(VimOption(OptionConstants.clipboard, limitedValues = [OptionConstants.clipboard_ideaput]))
   fun `test simple insert via idea`() {
     val before = "${c}I found it in a legendary land"
     configureByText(before)
@@ -43,7 +43,7 @@ class PutViaIdeaTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
-  @Test
+  @OptionTest(VimOption(OptionConstants.clipboard, limitedValues = [OptionConstants.clipboard_ideaput]))
   fun `test insert several times`() {
     val before = "${c}I found it in a legendary land"
     configureByText(before)
@@ -57,7 +57,7 @@ class PutViaIdeaTest : VimTestCase() {
     assertState(after)
   }
 
-  @Test
+  @OptionTest(VimOption(OptionConstants.clipboard, limitedValues = [OptionConstants.clipboard_ideaput]))
   fun `test insert doesn't clear existing elements`() {
     val randomUUID = UUID.randomUUID()
     val before = "${c}I found it in a legendary$randomUUID land"
@@ -82,7 +82,7 @@ class PutViaIdeaTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
-  @Test
+  @OptionTest(VimOption(OptionConstants.clipboard, limitedValues = [OptionConstants.clipboard_ideaput]))
   fun `test insert block with newline`() {
     val before = """
             A Discovery

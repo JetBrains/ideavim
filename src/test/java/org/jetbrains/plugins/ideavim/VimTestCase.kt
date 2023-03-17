@@ -141,9 +141,6 @@ abstract class VimTestCase {
     this.testInfo = testInfo
   }
 
-  // Hook for setting up the editor
-  open fun setupEditor() {}
-
   private val testDataPath: String
     get() = PathManager.getHomePath() + "/community/plugins/ideavim/testData"
 
@@ -252,7 +249,6 @@ abstract class VimTestCase {
     fixture.configureByText(fileType, content)
     NeovimTesting.setupEditor(fixture.editor, testInfo)
     setEditorVisibleSize(screenWidth, screenHeight)
-    setupEditor()
     return fixture.editor
   }
 
@@ -260,7 +256,6 @@ abstract class VimTestCase {
     fixture.configureByText(fileName, content)
     NeovimTesting.setupEditor(fixture.editor, testInfo)
     setEditorVisibleSize(screenWidth, screenHeight)
-    setupEditor()
     return fixture.editor
   }
 
@@ -268,7 +263,6 @@ abstract class VimTestCase {
     fixture.configureByText(fileName, "\n")
     NeovimTesting.setupEditor(fixture.editor, testInfo)
     setEditorVisibleSize(screenWidth, screenHeight)
-    setupEditor()
     return fixture.editor
   }
 
