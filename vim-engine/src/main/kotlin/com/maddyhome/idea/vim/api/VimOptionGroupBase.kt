@@ -27,7 +27,7 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
     }
   }
 
-  override fun setOptionValue(option: Option<out VimDataType>, scope: OptionScope, value: VimDataType) {
+  override fun <T : VimDataType> setOptionValue(option: Option<T>, scope: OptionScope, value: T) {
     // Should always be called with the correct value type, either because code already knows the option, or because
     // the :set command has already parsed the incoming string into the correct type
     StrictMode.assert(option.defaultValue::class == value::class, "Incorrect datatype! Expected ${option.defaultValue::class} got ${value::class}")

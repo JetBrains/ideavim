@@ -36,7 +36,7 @@ public interface VimOptionGroup {
   /**
    * Set the value for the option in the given scope
    */
-  public fun setOptionValue(option: Option<out VimDataType>, scope: OptionScope, value: VimDataType)
+  public fun <T : VimDataType> setOptionValue(option: Option<T>, scope: OptionScope, value: T)
 
   /**
    * Resets all options back to default values.

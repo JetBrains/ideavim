@@ -384,11 +384,15 @@ class VimOptionsInvocationContext(private val options: List<Pair<Option<out VimD
   }
 }
 
-class OptionsSetup(private val options: List<Pair<Option<*>, VimDataType?>>) : BeforeTestExecutionCallback {
+class OptionsSetup(private val options: List<Pair<Option<out VimDataType>, VimDataType?>>) : BeforeTestExecutionCallback {
   override fun beforeTestExecution(context: ExtensionContext?) {
     options.forEach { (key, value) ->
       if (value != null) {
-        injector.optionGroup.setOptionValue(key, OptionScope.GLOBAL, value)
+        // We must explicitly make an unchecked cast to remove the out annotation so that we can set the value, or the
+        // compiler will treat the value as type `CapturedType(out VimDataType)`, which cannot be passed in (producer vs
+        // consumer)
+        @Suppress("UNCHECKED_CAST") val option = key as Option<VimDataType>
+        injector.optionGroup.setOptionValue(option, OptionScope.GLOBAL, value)
       }
     }
   }
