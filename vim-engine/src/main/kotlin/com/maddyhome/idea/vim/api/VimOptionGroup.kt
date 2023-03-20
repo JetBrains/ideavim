@@ -31,7 +31,7 @@ public interface VimOptionGroup {
   /**
    * Get the value for the option in the given scope
    */
-  public fun getOptionValue(option: Option<out VimDataType>, scope: OptionScope): VimDataType
+  public fun <T : VimDataType> getOptionValue(option: Option<T>, scope: OptionScope): T
 
   /**
    * Set the value for the option in the given scope
@@ -136,14 +136,10 @@ public fun VimOptionGroup.invertToggleOption(option: ToggleOption, scope: Option
 /**
  * Modifies the value of an option by calling the given transform function
  */
-public inline fun <TDataType : VimDataType> VimOptionGroup.modifyOptionValue(
-  option: Option<TDataType>,
+public inline fun <T : Option<TDataType>, TDataType : VimDataType> VimOptionGroup.modifyOptionValue(
+  option: T,
   scope: OptionScope,
-  transform: (TDataType) -> TDataType?,
+  transform: T.(TDataType) -> TDataType?
 ) {
-  @Suppress("UNCHECKED_CAST")
-  val currentValue = getOptionValue(option, scope) as TDataType
-  transform(currentValue)?.let {
-    setOptionValue(option, scope, it)
-  }
+  option.transform(getOptionValue(option, scope))?.let { setOptionValue(option, scope, it) }
 }

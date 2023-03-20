@@ -20,7 +20,7 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
   private val localOptionsKey = Key<MutableMap<String, VimDataType>>("localOptions")
   private val globalOptionValueAccessor by lazy { OptionValueAccessor(this, OptionScope.GLOBAL) }
 
-  override fun getOptionValue(option: Option<out VimDataType>, scope: OptionScope): VimDataType {
+  override fun <T : VimDataType> getOptionValue(option: Option<T>, scope: OptionScope): T {
     return when (scope) {
       is OptionScope.LOCAL -> getLocalOptionValue(option, scope.editor)
       is OptionScope.GLOBAL -> getGlobalOptionValue(option)
@@ -66,12 +66,17 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
     localOptions[optionName] = value
   }
 
-  private fun getGlobalOptionValue(option: Option<out VimDataType>) =
-    globalValues[option.name] ?: option.defaultValue
+  private fun <T : VimDataType> getGlobalOptionValue(option: Option<T>): T {
+    // We know that the datatype is correct, because we added it via the same strongly typed option
+    @Suppress("UNCHECKED_CAST")
+    return globalValues[option.name] as? T ?: option.defaultValue
+  }
 
-  private fun getLocalOptionValue(option: Option<out VimDataType>, editor: VimEditor): VimDataType {
+  private fun <T : VimDataType> getLocalOptionValue(option: Option<T>, editor: VimEditor): T {
     val localOptions = getLocalOptions(editor)
-    return localOptions[option.name] ?: getGlobalOptionValue(option)
+    // Again, we know this cast is safe because we added it with the same strongly typed option
+    @Suppress("UNCHECKED_CAST")
+    return localOptions[option.name] as? T ?: getGlobalOptionValue(option)
   }
 
   override fun resetAllOptions() {

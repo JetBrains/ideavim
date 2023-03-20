@@ -14,7 +14,6 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.modifyOptionValue
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.options.StringOption
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
 public object ClipboardOptionHelper {
@@ -26,8 +25,8 @@ public object ClipboardOptionHelper {
       injector.globalOptions().hasValue(Options.clipboard, OptionConstants.clipboard_ideaput)
 
     init {
-      modifyClipboardOption { option, currentValue ->
-        option.removeValue(currentValue, VimString(OptionConstants.clipboard_ideaput))
+      injector.optionGroup.modifyOptionValue(Options.clipboard, OptionScope.GLOBAL) {
+        removeValue(it, VimString(OptionConstants.clipboard_ideaput))
       }
 
       ideaputDisabled = true
@@ -35,17 +34,11 @@ public object ClipboardOptionHelper {
 
     override fun close() {
       if (containedBefore) {
-        modifyClipboardOption { option, currentValue ->
-          option.appendValue(currentValue, VimString(OptionConstants.clipboard_ideaput))
+        injector.optionGroup.modifyOptionValue(Options.clipboard, OptionScope.GLOBAL) {
+          appendValue(it, VimString(OptionConstants.clipboard_ideaput))
         }
       }
       ideaputDisabled = false
-    }
-
-    private inline fun modifyClipboardOption(transform: (StringOption, VimString) -> VimString) {
-      injector.optionGroup.modifyOptionValue(Options.clipboard, OptionScope.GLOBAL) {
-        transform(Options.clipboard, it)
-      }
     }
   }
 }
