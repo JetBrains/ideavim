@@ -111,12 +111,12 @@ internal object VimListenerManager {
       }
 
       val optionGroup = VimPlugin.getOptionGroup()
-      optionGroup.addListener(Options.number.name, EditorGroup.NumberChangeListener.INSTANCE)
-      optionGroup.addListener(Options.relativenumber.name, EditorGroup.NumberChangeListener.INSTANCE)
-      optionGroup.addListener(Options.scrolloff.name, ScrollGroup.ScrollOptionsChangeListener)
-      optionGroup.addListener(Options.showcmd.name, ShowCmdOptionChangeListener)
-      optionGroup.addListener(Options.guicursor.name, GuicursorChangeListener)
-      optionGroup.addListener(Options.iskeyword.name, KeywordOptionChangeListener, true)
+      optionGroup.addListener(Options.number, EditorGroup.NumberChangeListener.INSTANCE)
+      optionGroup.addListener(Options.relativenumber, EditorGroup.NumberChangeListener.INSTANCE)
+      optionGroup.addListener(Options.scrolloff, ScrollGroup.ScrollOptionsChangeListener)
+      optionGroup.addListener(Options.showcmd, ShowCmdOptionChangeListener)
+      optionGroup.addListener(Options.guicursor, GuicursorChangeListener)
+      optionGroup.addListener(Options.iskeyword, KeywordOptionChangeListener, true)
 
       EventFacade.getInstance().addEditorFactoryListener(VimEditorFactoryListener, VimPlugin.getInstance().onOffDisposable)
 
@@ -127,12 +127,12 @@ internal object VimListenerManager {
       EventFacade.getInstance().restoreTypedActionHandler()
 
       val optionGroup = VimPlugin.getOptionGroup()
-      optionGroup.removeListener(Options.number.name, EditorGroup.NumberChangeListener.INSTANCE)
-      optionGroup.removeListener(Options.relativenumber.name, EditorGroup.NumberChangeListener.INSTANCE)
-      optionGroup.removeListener(Options.scrolloff.name, ScrollGroup.ScrollOptionsChangeListener)
-      optionGroup.removeListener(Options.showcmd.name, ShowCmdOptionChangeListener)
-      optionGroup.removeListener(Options.guicursor.name, GuicursorChangeListener)
-      optionGroup.removeListener(Options.iskeyword.name, KeywordOptionChangeListener)
+      optionGroup.removeListener(Options.number, EditorGroup.NumberChangeListener.INSTANCE)
+      optionGroup.removeListener(Options.relativenumber, EditorGroup.NumberChangeListener.INSTANCE)
+      optionGroup.removeListener(Options.scrolloff, ScrollGroup.ScrollOptionsChangeListener)
+      optionGroup.removeListener(Options.showcmd, ShowCmdOptionChangeListener)
+      optionGroup.removeListener(Options.guicursor, GuicursorChangeListener)
+      optionGroup.removeListener(Options.iskeyword, KeywordOptionChangeListener)
     }
   }
 

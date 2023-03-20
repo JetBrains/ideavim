@@ -205,19 +205,19 @@ internal class OptionsTracer(
     return vimOptionGroup.getOptionValue(option, scope)
   }
 
-  override fun addListener(optionName: String, listener: OptionChangeListener<VimDataType>, executeOnAdd: Boolean) {
+  override fun <T : VimDataType> addListener(option: Option<T>, listener: OptionChangeListener<T>, executeOnAdd: Boolean) {
     ignoreFlag.set(true)
     try {
-      vimOptionGroup.addListener(optionName, listener, executeOnAdd)
+      vimOptionGroup.addListener(option, listener, executeOnAdd)
     } finally {
       ignoreFlag.set(false)
     }
   }
 
-  override fun removeListener(optionName: String, listener: OptionChangeListener<VimDataType>) {
+  override fun <T : VimDataType> removeListener(option: Option<T>, listener: OptionChangeListener<T>) {
     ignoreFlag.set(true)
     try {
-      vimOptionGroup.removeListener(optionName, listener)
+      vimOptionGroup.removeListener(option, listener)
     } finally {
       ignoreFlag.set(false)
     }

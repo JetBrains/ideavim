@@ -240,7 +240,7 @@ internal class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatib
     private var parsedLookupKeys: Set<KeyStroke> = parseLookupKeys()
 
     init {
-      VimPlugin.getOptionGroup().addListener(IjOptions.lookupkeys.name, { parsedLookupKeys = parseLookupKeys() })
+      VimPlugin.getOptionGroup().addListener(IjOptions.lookupkeys, { parsedLookupKeys = parseLookupKeys() })
     }
 
     fun isEnabledForLookup(keyStroke: KeyStroke): Boolean = keyStroke !in parsedLookupKeys

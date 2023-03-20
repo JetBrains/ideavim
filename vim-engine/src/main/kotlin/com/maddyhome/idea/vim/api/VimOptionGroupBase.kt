@@ -93,16 +93,19 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
     Options.removeOption(optionName)
   }
 
-  override fun addListener(optionName: String, listener: OptionChangeListener<VimDataType>, executeOnAdd: Boolean) {
-    val option = Options.getOption(optionName)!!
+  override fun <T : VimDataType> addListener(
+    option: Option<T>,
+    listener: OptionChangeListener<T>,
+    executeOnAdd: Boolean
+  ) {
     option.addOptionChangeListener(listener)
     if (executeOnAdd) {
       listener.processGlobalValueChange(getGlobalOptionValue(option))
     }
   }
 
-  override fun removeListener(optionName: String, listener: OptionChangeListener<VimDataType>) {
-    Options.getOption(optionName)!!.removeOptionChangeListener(listener)
+  override fun <T : VimDataType> removeListener(option: Option<T>, listener: OptionChangeListener<T>) {
+    option.removeOptionChangeListener(listener)
   }
 
   override fun getValueAccessor(editor: VimEditor?): OptionValueAccessor =

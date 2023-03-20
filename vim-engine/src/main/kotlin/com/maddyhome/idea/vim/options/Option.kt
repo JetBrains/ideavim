@@ -32,17 +32,17 @@ import java.util.*
  * We also want to avoid a sealed hierarchy, since we create object instances with custom validation for some options.
  */
 public abstract class Option<T : VimDataType>(public val name: String, public val abbrev: String, public open val defaultValue: T) {
-  private val listeners = mutableSetOf<OptionChangeListener<VimDataType>>()
+  private val listeners = mutableSetOf<OptionChangeListener<T>>()
 
-  public open fun addOptionChangeListener(listener: OptionChangeListener<VimDataType>) {
+  public open fun addOptionChangeListener(listener: OptionChangeListener<T>) {
     listeners.add(listener)
   }
 
-  public open fun removeOptionChangeListener(listener: OptionChangeListener<VimDataType>) {
+  public open fun removeOptionChangeListener(listener: OptionChangeListener<T>) {
     listeners.remove(listener)
   }
 
-  public fun onChanged(scope: OptionScope, oldValue: VimDataType) {
+  public fun onChanged(scope: OptionScope, oldValue: T) {
     for (listener in listeners) {
       when (scope) {
         is OptionScope.GLOBAL -> listener.processGlobalValueChange(oldValue)
