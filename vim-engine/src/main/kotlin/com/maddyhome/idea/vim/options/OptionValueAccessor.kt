@@ -25,13 +25,13 @@ import com.maddyhome.idea.vim.vimscript.services.OptionService
  */
 public class OptionValueAccessor(private val optionGroup: VimOptionGroup, public val scope: OptionScope) {
   /** Gets the loosely typed option value */
-  public fun getValue(option: Option<out VimDataType>): VimDataType = optionGroup.getOptionValue(option, scope)
+  public fun <T : VimDataType> getValue(option: Option<T>): T = optionGroup.getOptionValue(option, scope)
 
   /** Gets the option value as an integer */
-  public fun getIntValue(option: NumberOption): Int = getValue(option).toVimNumber().value
+  public fun getIntValue(option: NumberOption): Int = getValue(option).value
 
   /** Gets the option value as a string */
-  public fun getStringValue(option: StringOption): String = getValue(option).asString()
+  public fun getStringValue(option: StringOption): String = getValue(option).value
 
   /**
    * Gets the option value as a string list
