@@ -224,8 +224,8 @@ internal class OptionsTracer(
   }
 
   override fun getValueAccessor(editor: VimEditor?): OptionValueAccessor {
-    // I don't like this solution. Would love to see something better without rewrapping.
-    // The point is that OptionValueAccesor should use our group to be property traced
+    // I don't like this solution. Would love to see something better without re-wrapping.
+    // The point is that OptionValueAccessor should use our group to be property traced
     val accessor = vimOptionGroup.getValueAccessor(editor)
     return OptionValueAccessor(this, accessor.scope)
   }
@@ -241,7 +241,7 @@ private class VimOptionsInvocator : TestTemplateInvocationContextProvider {
   override fun provideTestTemplateInvocationContexts(context: ExtensionContext): Stream<TestTemplateInvocationContext> {
     val fixture = fixtureSetup()
     try {
-      return generateContextes(context)
+      return generateContexts(context)
     } finally {
       fixture.tearDown()
     }
@@ -252,29 +252,29 @@ private class VimOptionsInvocator : TestTemplateInvocationContextProvider {
     val factory = IdeaTestFixtureFactory.getFixtureFactory()
     val projectDescriptor = LightProjectDescriptor.EMPTY_PROJECT_DESCRIPTOR
     val fixtureBuilder = factory.createLightFixtureBuilder(projectDescriptor, "IdeaVim")
-    val fixture = fixtureBuilder.fixture
-    val myfixture = IdeaTestFixtureFactory.getFixtureFactory().createCodeInsightFixture(
-      fixture,
+    val projectFixture = fixtureBuilder.fixture
+    val testFixture = IdeaTestFixtureFactory.getFixtureFactory().createCodeInsightFixture(
+      projectFixture,
       LightTempDirTestFixtureImpl(true),
     )
-    myfixture.setUp()
-    return myfixture
+    testFixture.setUp()
+    return testFixture
   }
 
-  private fun generateContextes(context: ExtensionContext): Stream<TestTemplateInvocationContext> {
+  private fun generateContexts(context: ExtensionContext): Stream<TestTemplateInvocationContext> {
     val annotation = context.testMethod.get().getAnnotation(OptionTest::class.java)
-    val options: List<List<Pair<Option<out VimDataType>, VimDataType?>>> = annotation.value.map {
-      val optionName = it.name
+    val options: List<List<Pair<Option<out VimDataType>, VimDataType?>>> = annotation.value.map { vimOption ->
+      val optionName = vimOption.name
       val option = injector.optionGroup.getOption(optionName)!!
-      if (!it.doesntAffectTest) {
-        if (it.limitedValues.isEmpty()) {
+      if (!vimOption.doesntAffectTest) {
+        if (vimOption.limitedValues.isEmpty()) {
           defaultOptionCombinations(option)
         } else {
           when (option) {
-            is ToggleOption -> it.limitedValues.map { option to if (it == "true") VimInt.ONE else VimInt.ZERO }
-            is NumberOption -> it.limitedValues.map { option to VimInt(it) }
+            is ToggleOption -> vimOption.limitedValues.map { option to if (it == "true") VimInt.ONE else VimInt.ZERO }
+            is NumberOption -> vimOption.limitedValues.map { option to VimInt(it) }
             is StringOption -> {
-              it.limitedValues.map { limitedValue -> option to VimString(limitedValue) }
+              vimOption.limitedValues.map { limitedValue -> option to VimString(limitedValue) }
             }
 
             else -> error("Unexpected option type: $option")
@@ -297,33 +297,30 @@ private class VimOptionsInvocator : TestTemplateInvocationContextProvider {
     return when (option) {
       is ToggleOption -> listOf(option to VimInt.ONE, option to VimInt.ZERO)
       is NumberOption -> {
-        val vals = if (option is UnsignedNumberOption) {
+        val values = if (option is UnsignedNumberOption) {
           listOf(VimInt.ZERO, VimInt.ONE, VimInt(10), VimInt(1000))
         } else {
           listOf(VimInt(-1000), VimInt(-10), VimInt(-1), VimInt.ZERO, VimInt.ONE, VimInt(10), VimInt(1000))
         }
-        vals.map { option to it }
+        values.map { option to it }
       }
 
       is StringOption -> {
         if (option.isList) {
           val boundedValues = option.boundedValues
           if (boundedValues != null) {
-            val valuesCombinations = boundedValues.indices.map {
-              kCombinations(boundedValues.toList(), it + 1)
+            val valuesCombinations = boundedValues.indices.map { index ->
+              kCombinations(boundedValues.toList(), index + 1)
                 .map { VimString(it.joinToString(",")) }
             }.flatten()
             valuesCombinations.map { option to it }
           } else {
-            fail("Cannot generate values automatically. Please specify option values explicitelly using 'limitedValues' field")
+            fail("Cannot generate values automatically. Please specify option values explicitly using 'limitedValues' field")
           }
         } else {
           val boundedValues = option.boundedValues
-          if (boundedValues != null) {
-            boundedValues.map { option to VimString(it) }
-          } else {
-            fail("Cannot generate values automatically. Please specify option values explicitelly using 'limitedValues' field")
-          }
+          boundedValues?.map { option to VimString(it) }
+            ?: fail("Cannot generate values automatically. Please specify option values explicitly using 'limitedValues' field")
         }
       }
 
@@ -345,19 +342,19 @@ private fun <T> kCombinations(input: List<T>, sequenceLength: Int): List<List<T>
     }
     subsets.add(getSubset(input, s))
     while (true) {
-      var i: Int = sequenceLength - 1
-      while (i >= 0 && s[i] == input.size - sequenceLength + i) {
-        i--
+      var j: Int = sequenceLength - 1
+      while (j >= 0 && s[j] == input.size - sequenceLength + j) {
+        j--
       }
-      if (i < 0) {
+      if (j < 0) {
         break
       }
-      s[i]++ // increment this item
-      ++i
-      while (i < sequenceLength) {
+      s[j]++ // increment this item
+      ++j
+      while (j < sequenceLength) {
         // fill up remaining items
-        s[i] = s[i - 1] + 1
-        i++
+        s[j] = s[j - 1] + 1
+        j++
       }
       subsets.add(getSubset(input, s))
     }
