@@ -137,7 +137,9 @@ public fun parseOptionLine(editor: VimEditor, args: String, scope: OptionScope, 
         }
         // No operator so only the option name was given
         if (eq == -1) {
-          val option = optionGroup.getOption(token)
+          // We must explicitly treat the return value as covariant instead of `Option<VimDataType>?` so that we can
+          // successfully check the type against `ToggleOption`.
+          val option: Option<out VimDataType>? = optionGroup.getOption(token)
           when (option) {
             null -> error = Msg.unkopt
             is ToggleOption -> optionGroup.setToggleOption(option, scope)
@@ -195,7 +197,7 @@ private fun getValidToggleOption(optionName: String, token: String) =
 
 private fun showOptions(editor: VimEditor, nameAndToken: Collection<Pair<String, String>>, scope: OptionScope, showIntro: Boolean) {
   val optionService = injector.optionGroup
-  val optionsToShow = mutableListOf<Option<out VimDataType>>()
+  val optionsToShow = mutableListOf<Option<VimDataType>>()
   var unknownOption: Pair<String, String>? = null
   for (pair in nameAndToken) {
     val myOption = optionService.getOption(pair.first)
@@ -270,7 +272,7 @@ private fun formatKnownOptionValue(option: Option<out VimDataType>, scope: Optio
   }
 }
 
-private fun appendValue(option: Option<out VimDataType>, currentValue: VimDataType, value: VimDataType): VimDataType? {
+private fun appendValue(option: Option<VimDataType>, currentValue: VimDataType, value: VimDataType): VimDataType? {
   return when (option) {
     is StringOption -> option.appendValue(currentValue as VimString, value as VimString)
     is NumberOption -> option.addValues(currentValue as VimInt, value as VimInt)
@@ -278,7 +280,7 @@ private fun appendValue(option: Option<out VimDataType>, currentValue: VimDataTy
   }
 }
 
-private fun prependValue(option: Option<out VimDataType>, currentValue: VimDataType, value: VimDataType): VimDataType? {
+private fun prependValue(option: Option<VimDataType>, currentValue: VimDataType, value: VimDataType): VimDataType? {
   return when (option) {
     is StringOption -> option.prependValue(currentValue as VimString, value as VimString)
     is NumberOption -> option.multiplyValues(currentValue as VimInt, value as VimInt)
@@ -286,7 +288,7 @@ private fun prependValue(option: Option<out VimDataType>, currentValue: VimDataT
   }
 }
 
-private fun removeValue(option: Option<out VimDataType>, currentValue: VimDataType, value: VimDataType): VimDataType? {
+private fun removeValue(option: Option<VimDataType>, currentValue: VimDataType, value: VimDataType): VimDataType? {
   return when (option) {
     is StringOption -> option.removeValue(currentValue as VimString, value as VimString)
     is NumberOption -> option.subtractValues(currentValue as VimInt, value as VimInt)

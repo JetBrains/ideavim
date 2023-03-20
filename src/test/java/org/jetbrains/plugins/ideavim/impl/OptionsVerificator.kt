@@ -183,14 +183,14 @@ internal class OptionsTracer(
   private val trace: OptionsTraceCollector,
   private val ignoreFlag: AtomicBoolean,
 ) : VimOptionGroup by vimOptionGroup {
-  override fun getOption(key: String): Option<out VimDataType>? {
+  override fun getOption(key: String): Option<VimDataType>? {
     if (!ignoreFlag.get()) {
       trace.requestedKeys += key
     }
     return vimOptionGroup.getOption(key)
   }
 
-  override fun getAllOptions(): Set<Option<out VimDataType>> {
+  override fun getAllOptions(): Set<Option<VimDataType>> {
     val allOptions = vimOptionGroup.getAllOptions()
     if (!ignoreFlag.get()) {
       allOptions.forEach { trace.requestedKeys += it.name }
@@ -265,7 +265,9 @@ private class VimOptionsInvocator : TestTemplateInvocationContextProvider {
     val annotation = context.testMethod.get().getAnnotation(OptionTest::class.java)
     val options: List<List<Pair<Option<out VimDataType>, VimDataType?>>> = annotation.value.map { vimOption ->
       val optionName = vimOption.name
-      val option = injector.optionGroup.getOption(optionName)!!
+      // Explicitly treat the return value as covariant, so we can compare it against derived types that are specialised
+      // by derived types of `VimDataType`
+      val option: Option<out VimDataType> = injector.optionGroup.getOption(optionName)!!
       if (!vimOption.doesntAffectTest) {
         if (vimOption.limitedValues.isEmpty()) {
           defaultOptionCombinations(option)
