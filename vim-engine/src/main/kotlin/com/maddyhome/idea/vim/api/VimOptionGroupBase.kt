@@ -8,7 +8,6 @@
 
 package com.maddyhome.idea.vim.api
 
-import com.maddyhome.idea.vim.helper.StrictMode
 import com.maddyhome.idea.vim.options.Option
 import com.maddyhome.idea.vim.options.OptionChangeListener
 import com.maddyhome.idea.vim.options.OptionScope
@@ -28,11 +27,6 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
   }
 
   override fun <T : VimDataType> setOptionValue(option: Option<T>, scope: OptionScope, value: T) {
-    // Should always be called with the correct value type, either because code already knows the option, or because
-    // the :set command has already parsed the incoming string into the correct type
-    StrictMode.assert(option.defaultValue::class == value::class, "Incorrect datatype! Expected ${option.defaultValue::class} got ${value::class}")
-
-    // TODO: Convert this to an assert. The value should already be a valid value
     option.checkIfValueValid(value, value.asString())
 
     val oldValue = getOptionValue(option, scope)
