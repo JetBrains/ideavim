@@ -29,11 +29,24 @@ public object Options {
   private val logger = vimLogger<Options>()
   private val options = MultikeyMap()
 
-  public fun getOption(key: String): Option<out VimDataType>? = options.get(key)
-  public fun getAllOptions(): Set<Option<out VimDataType>> = options.values.toSet()
+  public fun getOption(key: String): Option<VimDataType>? = options.get(key)
+  public fun getAllOptions(): Set<Option<VimDataType>> = options.values.toSet()
 
-  public fun <T : Option<out VimDataType>> addOption(option: T): T =
-    option.also { options.put(option.name, option.abbrev, option) }
+  /**
+   * Add an option
+   *
+   * Note that the generic type is `Option<out VimDataType>` so that it will handle derived types that have a more
+   * derived type parameter. E.g. `NumberOption`, which derives from `Option<VimInt>`.
+   */
+  public fun <T : Option<out VimDataType>> addOption(option: T): T {
+    return option.also {
+      // This suppresses a variance problem. We need to be generic with an upper bound of `Option<out VimDataType` so
+      // that we can both accept and then return a derived type which is generic by a type derived from `VimDataType`.
+      // But we don't want the stored option to be covariant everywhere, as it's not a covariant type
+      @Suppress("UNCHECKED_CAST")
+      options.put(option.name, option.abbrev, option as Option<VimDataType>)
+    }
+  }
 
   public fun removeOption(optionName: String): Unit = options.remove(optionName)
 
@@ -243,9 +256,9 @@ public object Options {
   public val ideatracetime: ToggleOption = addOption(ToggleOption("ideatracetime", "ideatracetime", false))
 }
 
-private class MultikeyMap(vararg entries: Option<out VimDataType>) {
-  private val primaryKeyStorage: MutableMap<String, Option<out VimDataType>> = mutableMapOf()
-  private val secondaryKeyStorage: MutableMap<String, Option<out VimDataType>> = mutableMapOf()
+private class MultikeyMap(vararg entries: Option<VimDataType>) {
+  private val primaryKeyStorage: MutableMap<String, Option<VimDataType>> = mutableMapOf()
+  private val secondaryKeyStorage: MutableMap<String, Option<VimDataType>> = mutableMapOf()
 
   init {
     for (entry in entries) {
@@ -254,12 +267,12 @@ private class MultikeyMap(vararg entries: Option<out VimDataType>) {
     }
   }
 
-  fun put(key1: String, key2: String, value: Option<out VimDataType>) {
+  fun put(key1: String, key2: String, value: Option<VimDataType>) {
     primaryKeyStorage[key1] = value
     secondaryKeyStorage[key2] = value
   }
 
-  fun get(key: String): Option<out VimDataType>? {
+  fun get(key: String): Option<VimDataType>? {
     return primaryKeyStorage[key] ?: secondaryKeyStorage[key]
   }
 

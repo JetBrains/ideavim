@@ -16,7 +16,21 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.datatypes.parseNumber
 import java.util.*
 
-// Note that we don't want a sealed hierarchy, so we can add options with custom validation
+/**
+ * The base class of option types
+ *
+ * This class is generic on the datatype of the option, which must be a type derived from [VimDataType], such as
+ * [VimInt] or [VimString]. Vim data types are used so that we can easily use options as VimScript variables.
+ *
+ * A note on variance: derived classes will also use a derived type of [VimDataType], which means that e.g.
+ * `StringOption` would derive from `Option<VimString>`, which is not assignable to `Option<VimDataType>`. This can work
+ * if we make the type covariant (e.g. `Option<out T : VimDataType>`) however the type is not covariant - it's not
+ * solely a producer ([onChanged] is a consumer, for example), so we must keep [T] as invariant. Furthermore, if we make
+ * it covariant, then we also lose some type safety, with something like `setValue(numberOption, VimString("foo"))` not
+ * treated as an error.
+ *
+ * We also want to avoid a sealed hierarchy, since we create object instances with custom validation for some options.
+ */
 public abstract class Option<T : VimDataType>(public val name: String, public val abbrev: String, public open val defaultValue: T) {
   private val listeners = mutableSetOf<OptionChangeListener<VimDataType>>()
 

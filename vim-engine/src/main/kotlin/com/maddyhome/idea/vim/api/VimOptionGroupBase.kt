@@ -43,8 +43,8 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
     option.onChanged(scope, oldValue)
   }
 
-  override fun getOption(key: String): Option<out VimDataType>? = Options.getOption(key)
-  override fun getAllOptions(): Set<Option<out VimDataType>> = Options.getAllOptions()
+  override fun getOption(key: String): Option<VimDataType>? = Options.getOption(key)
+  override fun getAllOptions(): Set<Option<VimDataType>> = Options.getAllOptions()
 
   private fun setGlobalOptionValue(optionName: String, value: VimDataType) {
     globalValues[optionName] = value

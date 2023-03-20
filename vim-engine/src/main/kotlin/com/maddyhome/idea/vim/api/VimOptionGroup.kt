@@ -21,12 +21,12 @@ public interface VimOptionGroup {
   /**
    * Get the [Option] by its name or abbreviation
    */
-  public fun getOption(key: String): Option<out VimDataType>?
+  public fun getOption(key: String): Option<VimDataType>?
 
   /**
    * @return list of all options
    */
-  public fun getAllOptions(): Set<Option<out VimDataType>>
+  public fun getAllOptions(): Set<Option<VimDataType>>
 
   /**
    * Get the value for the option in the given scope
@@ -45,6 +45,10 @@ public interface VimOptionGroup {
 
   /**
    * Adds the option.
+   *
+   * Note that this function accepts a covariant version of [Option] so it can accept derived instances that are
+   * specialised by a type derived from [VimDataType].
+   *
    * @param option option
    */
   public fun addOption(option: Option<out VimDataType>)
@@ -85,13 +89,13 @@ public interface VimOptionGroup {
 /**
  * Checks if option is set to its default value
  */
-public fun VimOptionGroup.isDefaultValue(option: Option<out VimDataType>, scope: OptionScope): Boolean =
+public fun <T: VimDataType> VimOptionGroup.isDefaultValue(option: Option<T>, scope: OptionScope): Boolean =
   getOptionValue(option, scope) == option.defaultValue
 
 /**
  * Resets the option back to its default value
  */
-public fun VimOptionGroup.resetDefaultValue(option: Option<out VimDataType>, scope: OptionScope) {
+public fun <T: VimDataType> VimOptionGroup.resetDefaultValue(option: Option<T>, scope: OptionScope) {
   setOptionValue(option, scope, option.defaultValue)
 }
 
