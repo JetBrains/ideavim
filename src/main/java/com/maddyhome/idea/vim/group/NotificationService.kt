@@ -75,7 +75,7 @@ internal class NotificationService(private val project: Project?) {
         "ideaput",
       ) {
         injector.optionGroup.modifyOptionValue(Options.clipboard, OptionScope.GLOBAL) {
-          Options.clipboard.appendValue(it, VimString(OptionConstants.clipboard_ideaput))
+          appendValue(it, VimString(OptionConstants.clipboard_ideaput))
         }
       },
     )

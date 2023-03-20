@@ -198,7 +198,7 @@ internal class OptionsTracer(
     return allOptions
   }
 
-  override fun getOptionValue(option: Option<out VimDataType>, scope: OptionScope): VimDataType {
+  override fun <T : VimDataType> getOptionValue(option: Option<T>, scope: OptionScope): T {
     if (!ignoreFlag.get()) {
       trace.requestedKeys += option.name
     }
