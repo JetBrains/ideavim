@@ -212,14 +212,14 @@ IdeaVim adds various commands for listing and executing arbitrary IDE actions as
 Ex commands or via `:map` command mappings:
 
 ### Executing actions:
-* `:action {action_id}`
-    * Execute an action by `{action_id}`. Works from Ex command line.
-    * Please don't use `:action` in mappings. Use `<Action>` instead.
 * `<Action>({action_id})`
     * For the mappings you can use a special `<Action>` keyword. Don't forget the parentheses.
     * E.g. `map gh <Action>(ShowErrorDescription)`  <- execute hover on `gh`.
     * :warning: Mappings to `<Action>` don't work with `noremap`. 
       If you know the case when it's needed, please [let us know](https://github.com/JetBrains/ideavim#contact-maintainers).
+* `:action {action_id}`
+    * Execute an action by `{action_id}`. Works from Ex command line.
+    * Please don't use `:action` in mappings. Use `<Action>` instead.
 
 ### Finding action ids:
 
