@@ -26,12 +26,12 @@ class MotionMarkActionTest : VimTestCase() {
   fun `test simple add mark`() {
     val keys = injector.parser.parseKeys("mA")
     val text = """
-            A Discovery
+            Lorem Ipsum
 
             I ${c}found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     configureByText(text)
     typeText(keys)
@@ -42,12 +42,12 @@ class MotionMarkActionTest : VimTestCase() {
   fun `test simple add multiple marks`() {
     val keys = injector.parser.parseKeys("mAj" + "mBj" + "mC")
     val text = """
-            A Discovery
+            Lorem Ipsum
 
             I ${c}found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     configureByText(text)
     typeText(keys)
@@ -58,12 +58,12 @@ class MotionMarkActionTest : VimTestCase() {
   fun `test simple add multiple marks on same line`() {
     val keys = injector.parser.parseKeys("mA" + "mB" + "mC")
     val text = """
-            A Discovery
+            Lorem Ipsum
 
             I ${c}found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     configureByText(text)
     typeText(keys)
@@ -77,12 +77,12 @@ class MotionMarkActionTest : VimTestCase() {
   fun `test move to another line`() {
     val keys = injector.parser.parseKeys("mAjj" + "mA")
     val text = """
-            A Discovery
+            Lorem Ipsum
 
             I ${c}found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     configureByText(text)
     typeText(keys)
@@ -92,12 +92,12 @@ class MotionMarkActionTest : VimTestCase() {
   @OptionTest(VimOption(IjOptionConstants.ideamarks, limitedValues = ["true"]))
   fun `test simple system mark`() {
     val text = """
-            A Discovery
+            Lorem Ipsum
 
             I ${c}found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     configureByText(text)
     fixture.project.createLineBookmark(fixture.editor, 2, 'A')
@@ -110,12 +110,12 @@ class MotionMarkActionTest : VimTestCase() {
   @OptionTest(VimOption(IjOptionConstants.ideamarks, limitedValues = ["true"]))
   fun `test system mark move to another line`() {
     val text = """
-            A Discovery
+            Lorem Ipsum
 
             I ${c}found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     configureByText(text)
 

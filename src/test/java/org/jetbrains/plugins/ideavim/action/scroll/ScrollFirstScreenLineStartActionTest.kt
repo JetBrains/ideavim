@@ -30,7 +30,7 @@ class ScrollFirstScreenLineStartActionTest : VimTestCase() {
 
   @Test
   fun `test scroll current line to top of screen and move to first non-blank`() {
-    configureByLines(100, "    I found it in a legendary land")
+    configureByLines(100, "    Lorem ipsum dolor sit amet,")
     setPositionAndScroll(0, 19, 0)
     typeText("z<CR>")
     assertPosition(19, 4)

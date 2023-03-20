@@ -20,12 +20,12 @@ class InsertDeleteInsertedTextActionTest : VimTestCase() {
     doTest(
       listOf("yiw", "ea", "Hello", "<C-U>", "<ESC>p"),
       """
-            A Discovery
+            Lorem Ipsum
 
             I found ${c}it in a legendary land
       """.trimIndent(),
       """
-            A Discovery
+            Lorem Ipsum
 
             I found iti${c}t in a legendary land
       """.trimIndent(),
@@ -41,12 +41,12 @@ class InsertDeleteInsertedTextActionTest : VimTestCase() {
     doTest(
       listOf("yiw", "eR", "Hello", "<C-U>", "<ESC>p"),
       """
-            A Discovery
+            Lorem Ipsum
 
             I found ${c}it in a legendary land
       """.trimIndent(),
       """
-            A Discovery
+            Lorem Ipsum
 
             I found ii${c}ta legendary land
       """.trimIndent(),

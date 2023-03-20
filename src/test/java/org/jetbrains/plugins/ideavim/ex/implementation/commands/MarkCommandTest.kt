@@ -21,10 +21,10 @@ class MarkCommandTest : VimTestCase() {
   @Test
   fun `test simple mark`() {
     configureByText(
-      """I found it in a legendary land
-                         |all rocks and lavender and tufted grass,
+      """Lorem ipsum dolor sit amet,
+                         |consectetur adipiscing elit
                          |where it$c was settled on some sodden sand
-                         |hard by the torrent of a mountain pass.
+                         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
     )
     typeText(commandToKeys("mark a"))
@@ -38,10 +38,10 @@ class MarkCommandTest : VimTestCase() {
   @Test
   fun `test global mark`() {
     configureByText(
-      """I found it in a legendary land
-                         |all rocks and lavender and tufted grass,
+      """Lorem ipsum dolor sit amet,
+                         |consectetur adipiscing elit
                          |where it$c was settled on some sodden sand
-                         |hard by the torrent of a mountain pass.
+                         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
     )
     typeText(commandToKeys("mark G"))
@@ -55,10 +55,10 @@ class MarkCommandTest : VimTestCase() {
   @Test
   fun `test k mark`() {
     configureByText(
-      """I found it in a legendary land
-                         |all rocks and lavender and tufted grass,
+      """Lorem ipsum dolor sit amet,
+                         |consectetur adipiscing elit
                          |where it$c was settled on some sodden sand
-                         |hard by the torrent of a mountain pass.
+                         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
     )
     typeText(commandToKeys("k a"))
@@ -72,10 +72,10 @@ class MarkCommandTest : VimTestCase() {
   @Test
   fun `test mark in range`() {
     configureByText(
-      """I found it in a legendary land
-                         |all rocks and lavender and tufted grass,
+      """Lorem ipsum dolor sit amet,
+                         |consectetur adipiscing elit
                          |where it$c was settled on some sodden sand
-                         |hard by the torrent of a mountain pass.
+                         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
     )
     typeText(commandToKeys("1,2 mark a"))

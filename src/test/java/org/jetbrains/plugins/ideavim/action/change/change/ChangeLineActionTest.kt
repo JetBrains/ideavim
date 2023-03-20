@@ -34,11 +34,11 @@ class ChangeLineActionTest : VimTestCase() {
     doTest(
       "S",
       """
-            I found it in a legendary land
+            Lorem ipsum dolor sit amet,
             all ${c}rocks and lavender and tufted grass,
       """.trimIndent(),
       """
-            I found it in a legendary land
+            Lorem ipsum dolor sit amet,
             $c
       """.trimIndent(),
       VimStateMachine.Mode.INSERT,
@@ -51,12 +51,12 @@ class ChangeLineActionTest : VimTestCase() {
     doTest(
       "S",
       """
-            I found it in a legendary land
+            Lorem ipsum dolor sit amet,
             all ${c}rocks and lavender and tufted grass,
             
       """.trimIndent(),
       """
-            I found it in a legendary land
+            Lorem ipsum dolor sit amet,
             $c
             
       """.trimIndent(),
@@ -70,11 +70,11 @@ class ChangeLineActionTest : VimTestCase() {
     doTest(
       "S",
       """
-            I found it in a legendary land
+            Lorem ipsum dolor sit amet,
             all ${c}rocks and lavender and tufted grass,
       """.trimIndent(),
       """
-            I found it in a legendary land
+            Lorem ipsum dolor sit amet,
             $c
       """.trimIndent(),
       VimStateMachine.Mode.INSERT,
@@ -87,12 +87,12 @@ class ChangeLineActionTest : VimTestCase() {
     doTest(
       "S",
       """
-            I found it in a legendary land
+            Lorem ipsum dolor sit amet,
             all ${c}rocks and lavender and tufted grass,
             
       """.trimIndent(),
       """
-            I found it in a legendary land
+            Lorem ipsum dolor sit amet,
             $c
             
       """.trimIndent(),
@@ -107,11 +107,11 @@ class ChangeLineActionTest : VimTestCase() {
       "S",
       """
             I ${c}found it in a legendary land
-            all rocks and lavender and tufted grass,
+            consectetur adipiscing elit
       """.trimIndent(),
       """
             $c
-            all rocks and lavender and tufted grass,
+            consectetur adipiscing elit
       """.trimIndent(),
       VimStateMachine.Mode.INSERT,
       VimStateMachine.SubMode.NONE,
@@ -123,12 +123,12 @@ class ChangeLineActionTest : VimTestCase() {
     doTest(
       "cc",
       """
-            I found it in a legendary land
+            Lorem ipsum dolor sit amet,
             all ${c}rocks and lavender and tufted grass,
             
       """.trimIndent(),
       """
-            I found it in a legendary land
+            Lorem ipsum dolor sit amet,
             $c
             
       """.trimIndent(),
@@ -142,13 +142,13 @@ class ChangeLineActionTest : VimTestCase() {
     doTest(
       "cc",
       """
-            I found it in a legendary land
-            all rocks and lavender and tufted grass,
+            Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit
             $c
       """.trimIndent(),
       """
-            I found it in a legendary land
-            all rocks and lavender and tufted grass,
+            Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit
             $c
       """.trimIndent(),
       VimStateMachine.Mode.INSERT,
@@ -161,10 +161,10 @@ class ChangeLineActionTest : VimTestCase() {
     doTest(
       "3S",
       """
-            ${c}I found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            ${c}Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
 
             The features it combines mark it as new
             to science: shape and shade -- the special tinge,
@@ -178,7 +178,7 @@ class ChangeLineActionTest : VimTestCase() {
       """.trimIndent(),
       """
             $c
-            hard by the torrent of a mountain pass.
+            Cras id tellus in ex imperdiet egestas.
 
             The features it combines mark it as new
             to science: shape and shade -- the special tinge,

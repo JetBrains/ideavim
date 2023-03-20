@@ -20,19 +20,19 @@ class ShiftRightCommandTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "Replace term codes issues")
   @Test
   fun `test simple right shift`() {
-    val before = """        I found it in a legendary land
-                      |        ${c}all rocks and lavender and tufted grass,
-                      |        where it was settled on some sodden sand
-                      |        hard by the torrent of a mountain pass.
+    val before = """        Lorem ipsum dolor sit amet,
+                      |        ${c}consectetur adipiscing elit
+                      |        Sed in orci mauris.
+                      |        Cras id tellus in ex imperdiet egestas.
     """.trimMargin()
     configureByJavaText(before)
 
     typeText(commandToKeys(">"))
 
-    val after = """        I found it in a legendary land
-                      |            ${c}all rocks and lavender and tufted grass,
-                      |        where it was settled on some sodden sand
-                      |        hard by the torrent of a mountain pass.
+    val after = """        Lorem ipsum dolor sit amet,
+                      |            ${c}consectetur adipiscing elit
+                      |        Sed in orci mauris.
+                      |        Cras id tellus in ex imperdiet egestas.
     """.trimMargin()
     assertState(after)
   }
@@ -40,19 +40,19 @@ class ShiftRightCommandTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "Replace term codes issues")
   @Test
   fun `test double right shift`() {
-    val before = """        I found it in a legendary land
-                      |        ${c}all rocks and lavender and tufted grass,
-                      |        where it was settled on some sodden sand
-                      |        hard by the torrent of a mountain pass.
+    val before = """        Lorem ipsum dolor sit amet,
+                      |        ${c}consectetur adipiscing elit
+                      |        Sed in orci mauris.
+                      |        Cras id tellus in ex imperdiet egestas.
     """.trimMargin()
     configureByJavaText(before)
 
     typeText(commandToKeys(">>"))
 
-    val after = """        I found it in a legendary land
-                      |                ${c}all rocks and lavender and tufted grass,
-                      |        where it was settled on some sodden sand
-                      |        hard by the torrent of a mountain pass.
+    val after = """        Lorem ipsum dolor sit amet,
+                      |                ${c}consectetur adipiscing elit
+                      |        Sed in orci mauris.
+                      |        Cras id tellus in ex imperdiet egestas.
     """.trimMargin()
     assertState(after)
   }
@@ -60,19 +60,19 @@ class ShiftRightCommandTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "Replace term codes issues")
   @Test
   fun `test range right shift`() {
-    val before = """        I found it in a legendary land
-                      |        ${c}all rocks and lavender and tufted grass,
-                      |        where it was settled on some sodden sand
-                      |        hard by the torrent of a mountain pass.
+    val before = """        Lorem ipsum dolor sit amet,
+                      |        ${c}consectetur adipiscing elit
+                      |        Sed in orci mauris.
+                      |        Cras id tellus in ex imperdiet egestas.
     """.trimMargin()
     configureByJavaText(before)
 
     typeText(commandToKeys("3,4>"))
 
-    val after = """        I found it in a legendary land
-                      |        all rocks and lavender and tufted grass,
-                      |            ${c}where it was settled on some sodden sand
-                      |            hard by the torrent of a mountain pass.
+    val after = """        Lorem ipsum dolor sit amet,
+                      |        consectetur adipiscing elit
+                      |            ${c}Sed in orci mauris.
+                      |            Cras id tellus in ex imperdiet egestas.
     """.trimMargin()
     assertState(after)
   }

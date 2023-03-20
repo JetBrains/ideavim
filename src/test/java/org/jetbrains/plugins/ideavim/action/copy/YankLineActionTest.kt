@@ -17,12 +17,12 @@ class YankLineActionTest : VimTestCase() {
   @Test
   fun `test yank to number register`() {
     val before = """
-            ${c}I found it in a legendary land
-            all rocks and lavender and tufted grass,
+            ${c}Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit
     """.trimIndent()
     configureByText(before)
     typeText(injector.parser.parseKeys("\"4yy"))
     val register = VimPlugin.getRegister().getRegister('4')!!
-    kotlin.test.assertEquals("I found it in a legendary land\n", register.text)
+    kotlin.test.assertEquals("Lorem ipsum dolor sit amet,\n", register.text)
   }
 }

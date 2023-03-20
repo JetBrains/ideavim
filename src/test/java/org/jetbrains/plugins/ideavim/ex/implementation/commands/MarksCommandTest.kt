@@ -91,10 +91,10 @@ class MarksCommandTest : VimTestCase() {
   @Test
   fun `test line number is 1-based and column is 0-based`() {
     configureByText(
-      """${c}I found it in a legendary land
-                      |all rocks and lavender and tufted grass,
-                      |where it was settled on some sodden sand
-                      |hard by the torrent of a mountain pass.
+      """${c}Lorem ipsum dolor sit amet,
+                      |consectetur adipiscing elit
+                      |Sed in orci mauris.
+                      |Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
     )
     typeText(injector.parser.parseKeys("ma"))
@@ -102,7 +102,7 @@ class MarksCommandTest : VimTestCase() {
     enterCommand("marks")
     assertExOutput(
       """mark line  col file/text
-                     | a      1    0 I found it in a legendary land
+                     | a      1    0 Lorem ipsum dolor sit amet,
       """.trimMargin(),
     )
   }
@@ -157,9 +157,9 @@ class MarksCommandTest : VimTestCase() {
   fun `test argument filters output`() {
     configureByText(
       """I found ${c}it in a legendary land
-                         |all rocks and lavender and tufted grass,
-                         |where it was settled on some sodden sand
-                         |hard by the torrent of a mountain pass.
+                         |consectetur adipiscing elit
+                         |Sed in orci mauris.
+                         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
     )
     typeText(injector.parser.parseKeys("ma" + "jl"))
@@ -170,8 +170,8 @@ class MarksCommandTest : VimTestCase() {
     enterCommand("marks bdD")
     assertExOutput(
       """mark line  col file/text
-                     | b      2    9 all rocks and lavender and tufted grass,
-                     | D      4   11 hard by the torrent of a mountain pass.
+                     | b      2    9 consectetur adipiscing elit
+                     | D      4   11 Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
     )
   }
@@ -180,9 +180,9 @@ class MarksCommandTest : VimTestCase() {
   fun `test list nothing if no marks match`() {
     configureByText(
       """I found ${c}it in a legendary land
-                         |all rocks and lavender and tufted grass,
-                         |where it was settled on some sodden sand
-                         |hard by the torrent of a mountain pass.
+                         |consectetur adipiscing elit
+                         |Sed in orci mauris.
+                         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
     )
     typeText(injector.parser.parseKeys("ma" + "jl"))
@@ -194,9 +194,9 @@ class MarksCommandTest : VimTestCase() {
   fun `test correctly handles invalid mark location`() {
     configureByText(
       """I found ${c}it in a legendary land
-                      |all rocks and lavender and tufted grass,
-                      |where it was settled on some sodden sand
-                      |hard by the torrent of a mountain pass.
+                      |consectetur adipiscing elit
+                      |Sed in orci mauris.
+                      |Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
     )
     val vimEditor = fixture.editor.vim
@@ -204,7 +204,7 @@ class MarksCommandTest : VimTestCase() {
     enterCommand("marks")
     assertExOutput(
       """mark line  col file/text
-                     | a      4   39 hard by the torrent of a mountain pass.
+                     | a      4   39 Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
     )
   }

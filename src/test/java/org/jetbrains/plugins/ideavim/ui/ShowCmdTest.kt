@@ -25,7 +25,7 @@ class ShowCmdTest : VimTestCase() {
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {
     super.setUp(testInfo)
-    val before = "${c}I found it in a legendary land"
+    val before = "${c}Lorem ipsum dolor sit amet,"
     configureByText(before)
   }
 

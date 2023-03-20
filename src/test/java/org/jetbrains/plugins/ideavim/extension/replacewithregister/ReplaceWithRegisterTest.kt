@@ -205,9 +205,9 @@ class ReplaceWithRegisterTest : VimTestCase() {
   fun `test line replace`() {
     val text = """
             I found it in ${c}a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
 
     configureByText(text)
@@ -218,9 +218,9 @@ class ReplaceWithRegisterTest : VimTestCase() {
     assertState(
       """
             ${c}legendary
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
     kotlin.test.assertEquals("legendary", VimPlugin.getRegister().lastRegister?.text)
@@ -338,10 +338,10 @@ class ReplaceWithRegisterTest : VimTestCase() {
 
   @VimBehaviorDiffers(
     """
-            I found it in a legendary land
-            ${c}I found it in a legendary land
-            where it was settled on some sodden sand
-            ${c}where it was settled on some sodden sand
+            Lorem ipsum dolor sit amet,
+            ${c}Lorem ipsum dolor sit amet,
+            Sed in orci mauris.
+            ${c}Sed in orci mauris.
   """,
   )
   @Test
@@ -372,9 +372,9 @@ class ReplaceWithRegisterTest : VimTestCase() {
   fun `test visual replace`() {
     val text = """
             I ${c}found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
 
     configureByText(text)
@@ -385,9 +385,9 @@ class ReplaceWithRegisterTest : VimTestCase() {
     assertState(
       """
             I legendar${c}y it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
     kotlin.test.assertEquals("legendary", VimPlugin.getRegister().lastRegister?.text)
@@ -443,9 +443,9 @@ class ReplaceWithRegisterTest : VimTestCase() {
   fun `test visual line replace`() {
     val text = """
             I fo${c}und it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
 
     configureByText(text)
@@ -456,9 +456,9 @@ class ReplaceWithRegisterTest : VimTestCase() {
     assertState(
       """
             ${c}legendary
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)

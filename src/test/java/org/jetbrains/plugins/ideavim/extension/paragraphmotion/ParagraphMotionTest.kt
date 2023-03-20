@@ -24,102 +24,102 @@ class ParagraphMotionTest : VimTestCase() {
 
   @Test
   fun `test paragraph next without whitespace`() {
-    val before = """I found it in a legendary land
-        |${c}all rocks and lavender and tufted grass,
+    val before = """Lorem ipsum dolor sit amet,
+        |${c}consectetur adipiscing elit
         |
-        |where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
     """.trimMargin()
-    val after = """I found it in a legendary land
-        |all rocks and lavender and tufted grass,
+    val after = """Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
         |$c
-        |where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
     """.trimMargin()
     doTest("}", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @Test
   fun `test paragraph next with whitespace`() {
-    val before = """I found it in a legendary land
-        |${c}all rocks and lavender and tufted grass,
+    val before = """Lorem ipsum dolor sit amet,
+        |${c}consectetur adipiscing elit
         |....
-        |where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
     """.trimMargin().dotToSpace()
-    val after = """I found it in a legendary land
-        |all rocks and lavender and tufted grass,
+    val after = """Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
         |$c....
-        |where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
     """.trimMargin().dotToSpace()
     doTest("}", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @Test
   fun `test paragraph next with whitespace visual`() {
-    val before = """I found it in a legendary land
-        |${c}all rocks and lavender and tufted grass,
+    val before = """Lorem ipsum dolor sit amet,
+        |${c}consectetur adipiscing elit
         |....
-        |where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
     """.trimMargin().dotToSpace()
-    val after = """I found it in a legendary land
-        |${s}all rocks and lavender and tufted grass,
+    val after = """Lorem ipsum dolor sit amet,
+        |${s}consectetur adipiscing elit
         |$c.$se...
-        |where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
     """.trimMargin().dotToSpace()
     doTest("v}", before, after, VimStateMachine.Mode.VISUAL, VimStateMachine.SubMode.VISUAL_CHARACTER)
   }
 
   @Test
   fun `test paragraph next with whitespace delete`() {
-    val before = """I found it in a legendary land
-        |${c}all rocks and lavender and tufted grass,
+    val before = """Lorem ipsum dolor sit amet,
+        |${c}consectetur adipiscing elit
         |....
-        |where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
     """.trimMargin().dotToSpace()
-    val after = """I found it in a legendary land
+    val after = """Lorem ipsum dolor sit amet,
         |$c
         |....
-        |where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
     """.trimMargin().dotToSpace()
     doTest("d}", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @Test
   fun `test paragraph prev without whitespace`() {
-    val before = """I found it in a legendary land
-        |all rocks and lavender and tufted grass,
+    val before = """Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
         |
-        |${c}where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.
+        |${c}Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
     """.trimMargin()
-    val after = """I found it in a legendary land
-        |all rocks and lavender and tufted grass,
+    val after = """Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
         |$c
-        |where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
     """.trimMargin()
     doTest("{", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
 
   @Test
   fun `test paragraph prev with whitespace`() {
-    val before = """I found it in a legendary land
-        |all rocks and lavender and tufted grass,
+    val before = """Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
         |....
-        |${c}where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.
+        |${c}Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
     """.trimMargin().dotToSpace()
-    val after = """I found it in a legendary land
-        |all rocks and lavender and tufted grass,
+    val after = """Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
         |$c....
-        |where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
     """.trimMargin().dotToSpace()
     doTest("{", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
@@ -143,17 +143,17 @@ class ParagraphMotionTest : VimTestCase() {
 
   @Test
   fun `test paragraph prev with whitespace delete`() {
-    val before = """I found it in a legendary land
-        |all rocks and lavender and tufted grass,
+    val before = """Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
         |....
-        |${c}where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.
+        |${c}Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
     """.trimMargin().dotToSpace()
-    val after = """I found it in a legendary land
-        |all rocks and lavender and tufted grass,
+    val after = """Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
         |$c
-        |where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
     """.trimMargin().dotToSpace()
     doTest("d{", before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }

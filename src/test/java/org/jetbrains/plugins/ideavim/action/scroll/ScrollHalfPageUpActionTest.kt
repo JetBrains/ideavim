@@ -113,7 +113,7 @@ class ScrollHalfPageUpActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   @Test
   fun `test scroll up puts cursor on first non-blank column`() {
-    configureByLines(100, "    I found it in a legendary land")
+    configureByLines(100, "    Lorem ipsum dolor sit amet,")
     setPositionAndScroll(50, 60, 14)
     typeText("<C-U>")
     assertPosition(43, 4)
@@ -123,7 +123,7 @@ class ScrollHalfPageUpActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   @Test
   fun `test scroll upwards keeps same column with nostartofline`() {
-    configureByLines(100, "    I found it in a legendary land")
+    configureByLines(100, "    Lorem ipsum dolor sit amet,")
     enterCommand("set nostartofline")
     setPositionAndScroll(50, 60, 14)
     typeText("<C-U>")

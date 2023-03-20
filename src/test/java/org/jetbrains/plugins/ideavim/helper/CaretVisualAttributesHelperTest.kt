@@ -25,14 +25,14 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   @Test
   fun `test default normal mode caret is block`() {
-    configureByText("I found it in a legendary land")
+    configureByText("Lorem ipsum dolor sit amet,")
     assertCaretVisualAttributes(CaretVisualAttributes.Shape.BLOCK, 0F)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   @Test
   fun `test default insert mode caret is vertical bar`() {
-    configureByText("I found it in a legendary land")
+    configureByText("Lorem ipsum dolor sit amet,")
     typeText("i")
     assertCaretVisualAttributes(CaretVisualAttributes.Shape.BAR, 0.25F)
   }
@@ -40,7 +40,7 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   @Test
   fun `test insert mode caret is reset after Escape`() {
-    configureByText("I found it in a legendary land")
+    configureByText("Lorem ipsum dolor sit amet,")
     typeText("i", "<Esc>")
     assertCaretVisualAttributes(CaretVisualAttributes.Shape.BLOCK, 0F)
   }
@@ -48,7 +48,7 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   @Test
   fun `test default replace mode caret is underscore`() {
-    configureByText("I found it in a legendary land")
+    configureByText("Lorem ipsum dolor sit amet,")
     typeText("R")
     assertCaretVisualAttributes(CaretVisualAttributes.Shape.UNDERSCORE, 0.2F)
   }
@@ -56,7 +56,7 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   @Test
   fun `test default op pending caret is thick underscore`() {
-    configureByText("I found it in a legendary land")
+    configureByText("Lorem ipsum dolor sit amet,")
     typeText("d")
     assertCaretVisualAttributes(CaretVisualAttributes.Shape.UNDERSCORE, 0.5F)
   }
@@ -64,7 +64,7 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   @Test
   fun `test caret is reset after op pending`() {
-    configureByText("I found it in a legendary land")
+    configureByText("Lorem ipsum dolor sit amet,")
     typeText("d$")
     assertCaretVisualAttributes(CaretVisualAttributes.Shape.BLOCK, 0F)
   }
@@ -72,7 +72,7 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   @Test
   fun `test default visual mode caret is block`() {
-    configureByText("I found it in a legendary land")
+    configureByText("Lorem ipsum dolor sit amet,")
     typeText("ve")
     assertCaretVisualAttributes(CaretVisualAttributes.Shape.BLOCK, 0F)
   }
@@ -80,7 +80,7 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   @Test
   fun `test visual block hides secondary carets`() {
-    configureByLines(5, "I found it in a legendary land")
+    configureByLines(5, "Lorem ipsum dolor sit amet,")
     typeText("w", "<C-V>2j5l")
     assertCaretVisualAttributes(CaretVisualAttributes.Shape.BLOCK, 0F)
     fixture.editor.caretModel.allCarets.forEach {
@@ -95,7 +95,7 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
   @Test
   fun `test select mode uses insert mode caret`() {
     // Vim doesn't have a different caret for SELECT, and doesn't have an option in guicursor to change SELECT mode
-    configureByText("I found it in a legendary land")
+    configureByText("Lorem ipsum dolor sit amet,")
     typeText("v7l", "<C-G>")
     assertCaretVisualAttributes(CaretVisualAttributes.Shape.BAR, 0.25F)
   }
@@ -194,7 +194,7 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   @Test
   fun `test changing guicursor option updates caret immediately`() {
-    configureByText("I found it in a legendary land")
+    configureByText("Lorem ipsum dolor sit amet,")
     enterCommand("set guicursor=n:hor22")
     assertCaretVisualAttributes(CaretVisualAttributes.Shape.UNDERSCORE, 0.22F)
   }
@@ -202,7 +202,7 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   @Test
   fun `test changing guicursor option invalidates caches correctly`() {
-    configureByText("I found it in a legendary land")
+    configureByText("Lorem ipsum dolor sit amet,")
     typeText("i")
     assertCaretVisualAttributes(CaretVisualAttributes.Shape.BAR, 0.25F)
     typeText("<Esc>")
@@ -214,7 +214,7 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   @Test
   fun `test caret uses last matching guicursor option`() {
-    configureByText("I found it in a legendary land")
+    configureByText("Lorem ipsum dolor sit amet,")
     // This will give us three matching options for INSERT
     enterCommand("set guicursor+=i:ver25")
     enterCommand("set guicursor+=i:hor75")
@@ -225,7 +225,7 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   @Test
   fun `test block used when caret shape is unspecified`() {
-    configureByText("I found it in a legendary land")
+    configureByText("Lorem ipsum dolor sit amet,")
     enterCommand("set guicursor=c:ver25")
     assertCaretVisualAttributes(CaretVisualAttributes.Shape.BLOCK, 0.0F)
     typeText("i")
@@ -235,7 +235,7 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   @Test
   fun `test 'all' guicursor option`() {
-    configureByText("I found it in a legendary land")
+    configureByText("Lorem ipsum dolor sit amet,")
     enterCommand("set guicursor+=a:ver25")
     assertCaretVisualAttributes(CaretVisualAttributes.Shape.BAR, 0.25F)
   }
@@ -243,7 +243,7 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   @Test
   fun `test 'all' guicursor option without cursor shape does not affect existing shapes`() {
-    configureByText("I found it in a legendary land")
+    configureByText("Lorem ipsum dolor sit amet,")
     enterCommand("set guicursor+=a:blinkwait200-blinkoff125-blinkon150-Cursor/lCursor")
     typeText("i")
     assertCaretVisualAttributes(CaretVisualAttributes.Shape.BAR, 0.25F)
@@ -252,7 +252,7 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   @Test
   fun `test 'all' guicursor option can be overridden`() {
-    configureByText("I found it in a legendary land")
+    configureByText("Lorem ipsum dolor sit amet,")
     // A specific entry added after "all" takes precedence
     enterCommand("set guicursor+=a:ver25")
     enterCommand("set guicursor+=i:hor75")
@@ -266,7 +266,7 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
     val originalValue = EditorSettingsExternalizable.getInstance().isBlockCursor
     EditorSettingsExternalizable.getInstance().isBlockCursor = true
     try {
-      configureByText("I found it in a legendary land")
+      configureByText("Lorem ipsum dolor sit amet,")
       typeText("i")
       assertCaretVisualAttributes(CaretVisualAttributes.Shape.BLOCK, 1.0F)
     } finally {
@@ -277,7 +277,7 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   @Test
   fun `test reset caret shape when disable plugin`() {
-    configureByText("I found it in a legendary land")
+    configureByText("Lorem ipsum dolor sit amet,")
     typeText("i")
     VimPlugin.setEnabled(false)
     assertCaretVisualAttributes(CaretVisualAttributes.Shape.DEFAULT, 1.0f)
@@ -286,7 +286,7 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   @Test
   fun `test reset caret shape when disable plugin 2`() {
-    configureByText("I found it in a legendary land")
+    configureByText("Lorem ipsum dolor sit amet,")
     typeText("v2e")
     VimPlugin.setEnabled(false)
     assertCaretVisualAttributes(CaretVisualAttributes.Shape.DEFAULT, 1.0f)
@@ -295,7 +295,7 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   @Test
   fun `test reset caret shape when disable plugin 3`() {
-    configureByText("I found it in a legendary land")
+    configureByText("Lorem ipsum dolor sit amet,")
     typeText("r")
     VimPlugin.setEnabled(false)
     assertCaretVisualAttributes(CaretVisualAttributes.Shape.DEFAULT, 1.0f)
@@ -304,7 +304,7 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   @Test
   fun `test adding new caret via IJ`() {
-    configureByText("${c}I found it in a legendary land")
+    configureByText("${c}Lorem ipsum dolor sit amet,")
     fixture.editor.caretModel.addCaret(VisualPosition(0, 5))
     assertCaretVisualAttributes(CaretVisualAttributes.Shape.BLOCK, 0f)
   }
@@ -314,8 +314,8 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
   fun `test adding new caret below`() {
     configureByText(
       """
-      |${c}I found it in a legendary land
-      |all rocks and lavender and tufted grass,
+      |${c}Lorem ipsum dolor sit amet,
+      |consectetur adipiscing elit
       """.trimMargin(),
     )
     injector.actionExecutor.executeAction(

@@ -1095,11 +1095,11 @@ and some text after""",
       "ld^j",
       """
         lorem ${c}ipsum dolor sit amet
-        lorem ipsum dolor sit amet
+        Lorem Ipsumm dolor sit amet
       """.trimIndent(),
       """
         psum dolor sit amet
-        ${c}lorem ipsum dolor sit amet
+        ${c}Lorem Ipsumm dolor sit amet
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
       VimStateMachine.SubMode.NONE,
@@ -1112,11 +1112,11 @@ and some text after""",
       "ldbj",
       """
         lorem$c ipsum dolor sit amet
-        lorem ipsum dolor sit amet
+        Lorem Ipsumm dolor sit amet
       """.trimIndent(),
       """
         ipsum dolor sit amet
-        ${c}lorem ipsum dolor sit amet
+        ${c}Lorem Ipsumm dolor sit amet
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
       VimStateMachine.SubMode.NONE,
@@ -1129,11 +1129,11 @@ and some text after""",
       "lcb<Esc>j",
       """
         lorem$c ipsum dolor sit amet
-        lorem ipsum dolor sit amet
+        Lorem Ipsumm dolor sit amet
       """.trimIndent(),
       """
         ipsum dolor sit amet
-        ${c}lorem ipsum dolor sit amet
+        ${c}Lorem Ipsumm dolor sit amet
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
       VimStateMachine.SubMode.NONE,
@@ -1146,11 +1146,11 @@ and some text after""",
       "lc^<Esc>j",
       """
         lorem$c ipsum dolor sit amet
-        lorem ipsum dolor sit amet
+        Lorem Ipsumm dolor sit amet
       """.trimIndent(),
       """
         ipsum dolor sit amet
-        ${c}lorem ipsum dolor sit amet
+        ${c}Lorem Ipsumm dolor sit amet
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
       VimStateMachine.SubMode.NONE,
@@ -1162,11 +1162,11 @@ and some text after""",
     doTest(
       "ld^k",
       """
-        lorem ipsum dolor sit amet
+        Lorem Ipsumm dolor sit amet
         lorem ${c}ipsum dolor sit amet
       """.trimIndent(),
       """
-        ${c}lorem ipsum dolor sit amet
+        ${c}Lorem Ipsumm dolor sit amet
         psum dolor sit amet
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
@@ -1179,11 +1179,11 @@ and some text after""",
     doTest(
       "lcb<Esc>k",
       """
-        lorem ipsum dolor sit amet
+        Lorem Ipsumm dolor sit amet
         lorem$c ipsum dolor sit amet
       """.trimIndent(),
       """
-        ${c}lorem ipsum dolor sit amet
+        ${c}Lorem Ipsumm dolor sit amet
         ipsum dolor sit amet
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,

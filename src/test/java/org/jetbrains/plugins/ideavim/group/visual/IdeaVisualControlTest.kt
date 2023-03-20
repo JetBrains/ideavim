@@ -37,12 +37,12 @@ class IdeaVisualControlTest : VimTestCase() {
   fun `test enable character selection no selection`() {
     configureByText(
       """
-            A Discovery
+            Lorem Ipsum
 
             I $s$c${se}found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
@@ -57,12 +57,12 @@ class IdeaVisualControlTest : VimTestCase() {
   fun `test enable character selection cursor in the middle`() {
     configureByText(
       """
-            A Discovery
+            Lorem Ipsum
 
             I ${s}found$c it$se in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
@@ -75,12 +75,12 @@ class IdeaVisualControlTest : VimTestCase() {
     typeText(injector.parser.parseKeys("l"))
     assertState(
       """
-            A Discovery
+            Lorem Ipsum
 
             I ${s}found ${c}i${se}t in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.VISUAL)
@@ -90,12 +90,12 @@ class IdeaVisualControlTest : VimTestCase() {
 
   @VimBehaviorDiffers(
     originalVimAfter = """
-            A Discovery
+            Lorem Ipsum
 
             I ${s}found i${c}t$se in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """,
   )
   @OptionTest(VimOption(OptionConstants.selectmode, doesntAffectTest = true))
@@ -103,12 +103,12 @@ class IdeaVisualControlTest : VimTestCase() {
   fun `test enable character selection cursor on end`() {
     configureByText(
       """
-            A Discovery
+            Lorem Ipsum
 
             I ${s}found it$c$se in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
@@ -121,12 +121,12 @@ class IdeaVisualControlTest : VimTestCase() {
     typeText(injector.parser.parseKeys("l"))
     assertState(
       """
-            A Discovery
+            Lorem Ipsum
 
             I ${s}found it ${c}i${se}n a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.VISUAL)
@@ -139,12 +139,12 @@ class IdeaVisualControlTest : VimTestCase() {
   fun `test enable character selection cursor on start`() {
     configureByText(
       """
-            A Discovery
+            Lorem Ipsum
 
             I $s${c}found it$se in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
@@ -157,12 +157,12 @@ class IdeaVisualControlTest : VimTestCase() {
     typeText(injector.parser.parseKeys("l"))
     assertState(
       """
-            A Discovery
+            Lorem Ipsum
 
             I f${s}${c}ound it$se in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.VISUAL)
@@ -175,12 +175,12 @@ class IdeaVisualControlTest : VimTestCase() {
   fun `test enable character selection lineend`() {
     configureByText(
       """
-            A Discovery
+            Lorem Ipsum
 
             I ${s}found ${c}it in a legendary land$se
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
@@ -193,12 +193,12 @@ class IdeaVisualControlTest : VimTestCase() {
     typeText(injector.parser.parseKeys("l"))
     assertState(
       """
-            A Discovery
+            Lorem Ipsum
 
             I ${s}found i${c}t${se} in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.VISUAL)
@@ -211,12 +211,12 @@ class IdeaVisualControlTest : VimTestCase() {
   fun `test enable character selection next line`() {
     configureByText(
       """
-            A Discovery
+            Lorem Ipsum
 
             I ${s}found ${c}it in a legendary land
-            ${se}all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            ${se}consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
@@ -229,12 +229,12 @@ class IdeaVisualControlTest : VimTestCase() {
     typeText(injector.parser.parseKeys("l"))
     assertState(
       """
-            A Discovery
+            Lorem Ipsum
 
             I ${s}found i${c}t${se} in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.VISUAL)
@@ -247,12 +247,12 @@ class IdeaVisualControlTest : VimTestCase() {
   fun `test enable character selection start on line start`() {
     configureByText(
       """
-            A Discovery
+            Lorem Ipsum
 
             ${s}I found ${c}it ${se}in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
@@ -265,12 +265,12 @@ class IdeaVisualControlTest : VimTestCase() {
     typeText(injector.parser.parseKeys("l"))
     assertState(
       """
-            A Discovery
+            Lorem Ipsum
 
             ${s}I found i${c}t${se} in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.VISUAL)
@@ -283,12 +283,12 @@ class IdeaVisualControlTest : VimTestCase() {
   fun `test enable character selection start on line end`() {
     configureByText(
       """
-            A Discovery
+            Lorem Ipsum
             $s
             I found ${c}it ${se}in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
@@ -301,12 +301,12 @@ class IdeaVisualControlTest : VimTestCase() {
     typeText(injector.parser.parseKeys("l"))
     assertState(
       """
-            A Discovery
+            Lorem Ipsum
             $s
             I found i${c}t${se} in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.VISUAL)
@@ -319,7 +319,7 @@ class IdeaVisualControlTest : VimTestCase() {
   fun `test enable character selection multicaret`() {
     configureByText(
       """
-            A Discovery
+            Lorem Ipsum
             $s
             I found ${c}it ${se}in a legendary land
             all rocks $s$c${se}and lavender and tufted grass,
@@ -337,7 +337,7 @@ class IdeaVisualControlTest : VimTestCase() {
     typeText(injector.parser.parseKeys("l"))
     assertState(
       """
-            A Discovery
+            Lorem Ipsum
             $s
             I found i${c}t${se} in a legendary land
             all rocks ${s}a${c}n${se}d lavender and tufted grass,
@@ -586,7 +586,7 @@ class IdeaVisualControlTest : VimTestCase() {
   fun `test enable character selection looks like block`() {
     configureByText(
       """
-            A Discovery
+            Lorem Ipsum
 
             I ${s}found$c$se it in a legendary land
             al${s}l roc$c${se}ks and lavender and tufted grass,
@@ -607,12 +607,12 @@ class IdeaVisualControlTest : VimTestCase() {
   fun `test enable character selection`() {
     configureByText(
       """
-            A Discovery
+            Lorem Ipsum
 
             I ${s}found$c$se it in a legendary land
             al${s}l roc$c${se}ks and lavender and tufted grass,
             wh${s}ere i$c${se}t was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.COMMAND)
@@ -625,12 +625,12 @@ class IdeaVisualControlTest : VimTestCase() {
     typeText(injector.parser.parseKeys("l"))
     assertState(
       """
-            A Discovery
+            Lorem Ipsum
 
             I ${s}found ${c}i${se}t in a legendary land
             al${s}l rock${c}s${se} and lavender and tufted grass,
             wh${s}ere it${c} ${se}was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.VISUAL)
@@ -715,10 +715,10 @@ class IdeaVisualControlTest : VimTestCase() {
   fun `test control selection`() {
     configureByText(
       """
-            A Discovery
+            Lorem Ipsum
 
             I ${c}found it in a legendary land
-            all rocks and lavender and tufted grass,
+            consectetur adipiscing elit
       """.trimIndent(),
     )
     VimListenerManager.EditorListeners.addAll()
@@ -734,10 +734,10 @@ class IdeaVisualControlTest : VimTestCase() {
   fun `test control selection to visual mode`() {
     configureByText(
       """
-            A Discovery
+            Lorem Ipsum
 
             I ${c}found it in a legendary land
-            all rocks and lavender and tufted grass,
+            consectetur adipiscing elit
       """.trimIndent(),
     )
     VimListenerManager.EditorListeners.addAll()
@@ -753,10 +753,10 @@ class IdeaVisualControlTest : VimTestCase() {
   fun `test control selection from line to char visual modes`() {
     configureByText(
       """
-            A Discovery
+            Lorem Ipsum
 
             I ${c}found it in a legendary land
-            all rocks and lavender and tufted grass,
+            consectetur adipiscing elit
       """.trimIndent(),
     )
     typeText(injector.parser.parseKeys("V"))
@@ -777,10 +777,10 @@ class IdeaVisualControlTest : VimTestCase() {
   fun `test control selection from line to char visual modes in keep mode`() {
     configureByText(
       """
-            A Discovery
+            Lorem Ipsum
 
             I ${c}found it in a legendary land
-            all rocks and lavender and tufted grass,
+            consectetur adipiscing elit
       """.trimIndent(),
     )
 

@@ -126,7 +126,7 @@ class ScrollLineUpActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   @Test
   fun `test scroll line up with virtual space`() {
-    configureByLines(100, "    I found it in a legendary land")
+    configureByLines(100, "    Lorem ipsum dolor sit amet,")
     setEditorVirtualSpace()
     setPositionAndScroll(85, 90, 4)
     typeText("<C-Y>")
@@ -136,7 +136,7 @@ class ScrollLineUpActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   @Test
   fun `test scroll line up with virtual space and scrolloff`() {
-    configureByLines(100, "    I found it in a legendary land")
+    configureByLines(100, "    Lorem ipsum dolor sit amet,")
     enterCommand("set scrolloff=10")
     setEditorVirtualSpace()
     // Last line is scrolloff from top. <C-Y> should just move last line down
@@ -150,7 +150,7 @@ class ScrollLineUpActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   @Test
   fun `test scroll line up on last line with scrolloff`() {
-    configureByLines(100, "    I found it in a legendary land")
+    configureByLines(100, "    Lorem ipsum dolor sit amet,")
     enterCommand("set scrolloff=10")
     setEditorVirtualSpace()
     setPositionAndScroll(65, 99, 4)

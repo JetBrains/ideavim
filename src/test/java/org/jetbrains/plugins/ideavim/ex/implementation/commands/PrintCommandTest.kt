@@ -16,14 +16,14 @@ class PrintCommandTest : VimTestCase() {
   fun `test default range`() {
     configureByText(initialText)
     typeText(commandToKeys("p"))
-    assertExOutput("A Discovery\n")
+    assertExOutput("Lorem Ipsum\n")
   }
 
   @Test
   fun `test default range with P`() {
     configureByText(initialText)
     typeText(commandToKeys("P"))
-    assertExOutput("A Discovery\n")
+    assertExOutput("Lorem Ipsum\n")
   }
 
   @Test
@@ -39,9 +39,9 @@ class PrintCommandTest : VimTestCase() {
     typeText(commandToKeys("p 3"))
     assertExOutput(
       """
-                A Discovery
+                Lorem Ipsum
     
-                I found it in a legendary land
+                Lorem ipsum dolor sit amet,
                 
       """.trimIndent(),
     )
@@ -49,12 +49,12 @@ class PrintCommandTest : VimTestCase() {
 
   companion object {
     private val initialText = """
-                A Discovery
+                Lorem Ipsum
     
-                I found it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass. 
+                Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas. 
     """.trimIndent()
   }
 }

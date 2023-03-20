@@ -21,7 +21,7 @@ class ExitCommandTest : VimTestCase() {
       neoVim.exitOnTearDown = false
     }
     @Suppress("IdeaVimAssertState")
-    val psiFile = fixture.configureByText("A_Discovery", "I found it in a legendary land")
+    val psiFile = fixture.configureByText("A_Discovery", "Lorem ipsum dolor sit amet,")
     fileManager.openFile(psiFile.virtualFile, false)
     kotlin.test.assertNotNull<Any>(fileManager.currentFile)
 
@@ -35,7 +35,7 @@ class ExitCommandTest : VimTestCase() {
       neoVim.exitOnTearDown = false
     }
     @Suppress("IdeaVimAssertState")
-    val psiFile = fixture.configureByText("A_Discovery", "I found it in a legendary land")
+    val psiFile = fixture.configureByText("A_Discovery", "Lorem ipsum dolor sit amet,")
     fileManager.openFile(psiFile.virtualFile, false)
     kotlin.test.assertNotNull<Any>(fileManager.currentFile)
 
@@ -49,8 +49,8 @@ class ExitCommandTest : VimTestCase() {
     setupChecks {
       neoVim.exitOnTearDown = false
     }
-    val psiFile1 = fixture.configureByText("A_Discovery1", "I found it in a legendary land")
-    val psiFile2 = fixture.configureByText("A_Discovery2", "all rocks and lavender and tufted grass,")
+    val psiFile1 = fixture.configureByText("A_Discovery1", "Lorem ipsum dolor sit amet,")
+    val psiFile2 = fixture.configureByText("A_Discovery2", "consectetur adipiscing elit")
     fileManager.openFile(psiFile1.virtualFile, false)
     fileManager.openFile(psiFile2.virtualFile, false)
     kotlin.test.assertNotNull<Any>(fileManager.currentFile)

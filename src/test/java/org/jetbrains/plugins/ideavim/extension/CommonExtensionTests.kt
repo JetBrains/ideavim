@@ -100,18 +100,18 @@ class OpMappingTest : VimTestCase() {
     doTest(
       "dO",
       """
-                A Discovery
+                Lorem Ipsum
 
                 I ${c}found it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       """
-                A Discovery
+                Lorem Ipsum
 
-                ${c}where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                ${c}Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
       VimStateMachine.SubMode.NONE,

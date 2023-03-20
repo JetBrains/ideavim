@@ -29,7 +29,7 @@ class ScrollLastScreenLineStartActionTest : VimTestCase() {
 
   @Test
   fun `test scroll current line to bottom of screen and move cursor to first non-blank`() {
-    configureByLines(100, "    I found it in a legendary land")
+    configureByLines(100, "    Lorem ipsum dolor sit amet,")
     setPositionAndScroll(40, 60, 14)
     typeText("z-")
     assertPosition(60, 4)

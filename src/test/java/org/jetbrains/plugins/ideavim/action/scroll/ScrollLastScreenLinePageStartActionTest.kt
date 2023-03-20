@@ -36,7 +36,7 @@ class ScrollLastScreenLinePageStartActionTest : VimTestCase() {
 
   @Test
   fun `test scrolls to first non-blank in line`() {
-    configureByLines(200, "    I found it in a legendary land")
+    configureByLines(200, "    Lorem ipsum dolor sit amet,")
     setPositionAndScroll(99, 119)
     typeText("z^")
     assertPosition(98, 4)
@@ -77,7 +77,7 @@ class ScrollLastScreenLinePageStartActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   @Test
   fun `test z^ on first page puts cursor on first line 1`() {
-    configureByLines(50, "    I found it in a legendary land")
+    configureByLines(50, "    Lorem ipsum dolor sit amet,")
     setPositionAndScroll(0, 25)
     typeText("z^")
     assertPosition(0, 4)
@@ -86,7 +86,7 @@ class ScrollLastScreenLinePageStartActionTest : VimTestCase() {
 
   @Test
   fun `test z^ on first page puts cursor on first line 2`() {
-    configureByLines(50, "    I found it in a legendary land")
+    configureByLines(50, "    Lorem ipsum dolor sit amet,")
     setPositionAndScroll(0, 6)
     typeText("z^")
     assertPosition(0, 4)
@@ -95,7 +95,7 @@ class ScrollLastScreenLinePageStartActionTest : VimTestCase() {
 
   @Test
   fun `test z^ on first page ignores scrolloff and puts cursor on last line of previous page`() {
-    configureByLines(50, "    I found it in a legendary land")
+    configureByLines(50, "    Lorem ipsum dolor sit amet,")
     enterCommand("set scrolloff=10")
     setPositionAndScroll(0, 6)
     typeText("z^")
@@ -105,7 +105,7 @@ class ScrollLastScreenLinePageStartActionTest : VimTestCase() {
 
   @Test
   fun `test z^ on second page puts cursor on previous last line`() {
-    configureByLines(50, "    I found it in a legendary land")
+    configureByLines(50, "    Lorem ipsum dolor sit amet,")
     setPositionAndScroll(19, 39)
     typeText("z^")
     assertPosition(18, 4)

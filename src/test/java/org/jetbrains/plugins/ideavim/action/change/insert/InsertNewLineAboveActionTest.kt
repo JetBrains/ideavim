@@ -17,16 +17,16 @@ import org.junit.jupiter.api.Test
 class InsertNewLineAboveActionTest : VimTestCase() {
   @Test
   fun `test insert new line above`() {
-    val before = """I found it in a legendary land
-        |${c}all rocks and lavender and tufted grass,
-        |where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.
+    val before = """Lorem ipsum dolor sit amet,
+        |${c}consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
     """.trimMargin()
-    val after = """I found it in a legendary land
+    val after = """Lorem ipsum dolor sit amet,
         |$c
-        |all rocks and lavender and tufted grass,
-        |where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
     """.trimMargin()
     doTest("O", before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
@@ -49,32 +49,32 @@ class InsertNewLineAboveActionTest : VimTestCase() {
 
   @Test
   fun `test insert new line above matches indent for plain text`() {
-    val before = """    I found it in a legendary land
-        |    all rocks and lavender and tufted grass,
-        |    ${c}where it was settled on some sodden sand
-        |    hard by the torrent of a mountain pass.
+    val before = """    Lorem ipsum dolor sit amet,
+        |    consectetur adipiscing elit
+        |    ${c}Sed in orci mauris.
+        |    Cras id tellus in ex imperdiet egestas.
     """.trimMargin()
-    val after = """    I found it in a legendary land
-        |    all rocks and lavender and tufted grass,
+    val after = """    Lorem ipsum dolor sit amet,
+        |    consectetur adipiscing elit
         |    $c
-        |    where it was settled on some sodden sand
-        |    hard by the torrent of a mountain pass.
+        |    Sed in orci mauris.
+        |    Cras id tellus in ex imperdiet egestas.
     """.trimMargin()
     doTest("O", before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
 
   @Test
   fun `test insert new line above matches indent for first line of plain text`() {
-    val before = """    ${c}I found it in a legendary land
-        |    all rocks and lavender and tufted grass,
-        |    where it was settled on some sodden sand
-        |    hard by the torrent of a mountain pass.
+    val before = """    ${c}Lorem ipsum dolor sit amet,
+        |    consectetur adipiscing elit
+        |    Sed in orci mauris.
+        |    Cras id tellus in ex imperdiet egestas.
     """.trimMargin()
     val after = """    $c
-        |    I found it in a legendary land
-        |    all rocks and lavender and tufted grass,
-        |    where it was settled on some sodden sand
-        |    hard by the torrent of a mountain pass.
+        |    Lorem ipsum dolor sit amet,
+        |    consectetur adipiscing elit
+        |    Sed in orci mauris.
+        |    Cras id tellus in ex imperdiet egestas.
     """.trimMargin()
     doTest("O", before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }
@@ -120,7 +120,7 @@ class InsertNewLineAboveActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @Test
   fun `test insert new line above at top of screen does not scroll top of screen`() {
-    configureByLines(50, "I found it in a legendary land")
+    configureByLines(50, "Lorem ipsum dolor sit amet,")
     enterCommand("set scrolloff=10")
     setPositionAndScroll(5, 15)
     typeText("O")
@@ -130,17 +130,17 @@ class InsertNewLineAboveActionTest : VimTestCase() {
 
   @Test
   fun `test insert new line above first line`() {
-    val before = """${c}I found it in a legendary land
-        |all rocks and lavender and tufted grass,
-        |where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.
+    val before = """${c}Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
     """.trimMargin()
     val after = """
         |$c
-        |I found it in a legendary land
-        |all rocks and lavender and tufted grass,
-        |where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
     """.trimMargin()
     doTest("O", before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
   }

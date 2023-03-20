@@ -20,20 +20,20 @@ class RepeatChangeActionTest : VimTestCase() {
   fun `test simple repeat`() {
     val keys = listOf("v2erXj^", ".")
     val before = """
-                A Discovery
+                Lorem Ipsum
 
-                ${c}I found it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                ${c}Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     val after = """
-                A Discovery
+                Lorem Ipsum
 
-                XXXXXXXXXX in a legendary land
-                ${c}XXXXXXXXXXand lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                XXXXXXXXXXX dolor sit amet,
+                ${c}XXXXXXXXXXX adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
@@ -42,20 +42,20 @@ class RepeatChangeActionTest : VimTestCase() {
   fun `test simple repeat with dollar motion`() {
     val keys = listOf("v\$rXj^", ".")
     val before = """
-                A Discovery
+                Lorem Ipsum
 
-                ${c}I found it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                ${c}Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     val after = """
-                A Discovery
+                Lorem Ipsum
 
-                XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-                ${c}XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                XXXXXXXXXXXXXXXXXXXXXXXXXXX
+                ${c}XXXXXXXXXXXXXXXXXXXXXXXXXXX
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
@@ -176,19 +176,19 @@ class RepeatChangeActionTest : VimTestCase() {
   fun `test line motion to end`() {
     val keys = listOf("VjrX2j^", ".")
     val before = """
-                A Discovery
+                Lorem Ipsum
 
-                ${c}I found it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                ${c}Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     val after = """
-                A Discovery
+                Lorem Ipsum
 
-                XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-                XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-                where it was settled on some sodden sand
+                XXXXXXXXXXXXXXXXXXXXXXXXXXX
+                XXXXXXXXXXXXXXXXXXXXXXXXXXX
+                Sed in orci mauris.
                 ${c}XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
     """.trimIndent()
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
@@ -199,20 +199,20 @@ class RepeatChangeActionTest : VimTestCase() {
   fun `test line motion shift`() {
     val keys = listOf("V3j<", ".")
     val before = """
-                |A Discovery
+                |Lorem Ipsum
                 |
-                |        ${c}I found it in a legendary land
-                |        all rocks and lavender and tufted grass,
-                |        where it was settled on some sodden sand
-                |        hard by the torrent of a mountain pass.
+                |        ${c}Lorem ipsum dolor sit amet,
+                |        consectetur adipiscing elit
+                |        Sed in orci mauris.
+                |        Cras id tellus in ex imperdiet egestas.
     """.trimMargin()
     val after = """
-                |A Discovery
+                |Lorem Ipsum
                 |
-                |${c}I found it in a legendary land
-                |all rocks and lavender and tufted grass,
-                |where it was settled on some sodden sand
-                |hard by the torrent of a mountain pass.
+                |${c}Lorem ipsum dolor sit amet,
+                |consectetur adipiscing elit
+                |Sed in orci mauris.
+                |Cras id tellus in ex imperdiet egestas.
     """.trimMargin()
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
@@ -242,7 +242,7 @@ class RepeatChangeActionTest : VimTestCase() {
 
   @VimBehaviorDiffers(
     """
-                A Discovery
+                Lorem Ipsum
 
                 XXXXXnd it in a legendary land
                 XXXXXocks and lavender and tufted grass,
@@ -302,20 +302,20 @@ class RepeatChangeActionTest : VimTestCase() {
   fun `test repeat with count`() {
     val keys = listOf("4x", "j", ".")
     val before = """
-              A Discovery
+              Lorem Ipsum
   
-              ${c}I found it in a legendary land
-              all rocks and lavender and tufted grass,
-              where it was settled on some sodden sand
-              hard by the torrent of a mountain pass.
+              ${c}Lorem ipsum dolor sit amet,
+              consectetur adipiscing elit
+              Sed in orci mauris.
+              Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     val after = """
-              A Discovery
+              Lorem Ipsum
   
-              und it in a legendary land
-              ${c}rocks and lavender and tufted grass,
-              where it was settled on some sodden sand
-              hard by the torrent of a mountain pass.
+              m ipsum dolor sit amet,
+              ${c}ectetur adipiscing elit
+              Sed in orci mauris.
+              Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }

@@ -25,19 +25,19 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
   fun `test simple deletion`() {
     val keys = listOf("v", "D")
     val before = """
-            A Discovery
+            Lorem Ipsum
 
             I ${c}found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     val after = """
-            A Discovery
+            Lorem Ipsum
 
-            ${c}all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            ${c}consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     doTest(keys, before, after)
   }
@@ -100,19 +100,19 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
   fun `test simple deletion with indent`() {
     val keys = listOf("v", "D")
     val before = """
-            A Discovery
+            Lorem Ipsum
 
             I ${c}found it in a legendary land
-                all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+                consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     val after = """
-            A Discovery
+            Lorem Ipsum
 
-                ${c}all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+                ${c}consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     doTest(keys, before, after)
   }
@@ -122,19 +122,19 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
   fun `test simple deletion with indent and nostartofline`() {
     val keys = listOf("v", "D")
     val before = """
-            A Discovery
+            Lorem Ipsum
 
             I ${c}found it in a legendary land
-                all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+                consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     val after = """
-            A Discovery
+            Lorem Ipsum
 
-              ${c}  all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+              ${c}  consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     doTest(keys, before, after) {
       enterCommand("set nostartofline")
@@ -145,19 +145,19 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
   fun `test simple deletion empty line`() {
     val keys = listOf("v", "D")
     val before = """
-            A Discovery
+            Lorem Ipsum
             ${c}
-            I found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     val after = """
-            A Discovery
-            ${c}I found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            Lorem Ipsum
+            ${c}Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     doTest(keys, before, after)
   }
@@ -166,20 +166,20 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
   fun `test simple deletion last line`() {
     val keys = listOf("v", "D")
     val before = """
-            A Discovery
+            Lorem Ipsum
 
-            I found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
+            Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit
+            Sed in orci mauris.
             hard by the ${c}torrent of a mountain pass.
 
     """.trimIndent()
     val after = """
-            A Discovery
+            Lorem Ipsum
 
-            I found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
+            Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit
+            Sed in orci mauris.
             ${c}
     """.trimIndent()
     doTest(keys, before, after)
@@ -191,17 +191,17 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
     val before = """
             A ${c}Discovery
 
-            I found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     val after = """
             ${c}
-            I found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     doTest(keys, before, after)
   }
@@ -210,21 +210,21 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
   fun `test simple deletion before empty`() {
     val keys = listOf("v", "D")
     val before = """
-            A Discovery
+            Lorem Ipsum
 
-            I found it in a legendary land
+            Lorem ipsum dolor sit amet,
             all ${c}rocks and lavender and tufted grass,
 
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     val after = """
-            A Discovery
+            Lorem Ipsum
 
-            I found it in a legendary land
+            Lorem ipsum dolor sit amet,
             ${c}
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     doTest(keys, before, after)
   }
@@ -233,19 +233,19 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
   fun `test simple deletion last line without empty line`() {
     val keys = listOf("v", "D")
     val before = """
-            A Discovery
+            Lorem Ipsum
 
-            I found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
+            Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit
+            Sed in orci mauris.
             hard by the ${c}torrent of a mountain pass.
     """.trimIndent()
     val after = """
-            A Discovery
+            Lorem Ipsum
 
-            I found it in a legendary land
-            all rocks and lavender and tufted grass,
-            ${c}where it was settled on some sodden sand
+            Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit
+            ${c}Sed in orci mauris.
     """.trimIndent()
     doTest(keys, before, after)
   }
@@ -254,18 +254,18 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
   fun `test simple deletion multiline`() {
     val keys = listOf("vj", "D")
     val before = """
-            A Discovery
+            Lorem Ipsum
 
             I ${c}found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     val after = """
-            A Discovery
+            Lorem Ipsum
 
-            ${c}where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            ${c}Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     doTest(keys, before, after)
   }
@@ -274,18 +274,18 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
   fun `test simple deletion multiline motion up`() {
     val keys = listOf("vk", "D")
     val before = """
-            A Discovery
+            Lorem Ipsum
 
-            I found it in a legendary land
+            Lorem ipsum dolor sit amet,
             all ${c}rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     val after = """
-            A Discovery
+            Lorem Ipsum
 
-            ${c}where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            ${c}Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     doTest(keys, before, after)
   }
@@ -313,19 +313,19 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
   fun `test line simple deletion`() {
     val keys = listOf("V", "D")
     val before = """
-            A Discovery
+            Lorem Ipsum
 
             I ${c}found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     val after = """
-            A Discovery
+            Lorem Ipsum
 
-            ${c}all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            ${c}consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     doTest(keys, before, after)
   }
@@ -334,19 +334,19 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
   fun `test line deletion with indent`() {
     val keys = listOf("V", "D")
     val before = """
-            A Discovery
+            Lorem Ipsum
 
             I ${c}found it in a legendary land
-                all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+                consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     val after = """
-            A Discovery
+            Lorem Ipsum
 
-                ${c}all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+                ${c}consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     doTest(keys, before, after)
   }
@@ -356,19 +356,19 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
   fun `test line deletion with indent and nostartofline`() {
     val keys = listOf("V", "D")
     val before = """
-            A Discovery
+            Lorem Ipsum
 
             I ${c}found it in a legendary land
-                all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+                consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     val after = """
-            A Discovery
+            Lorem Ipsum
 
-              ${c}  all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+              ${c}  consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     doTest(keys, before, after) {
       enterCommand("set nostartofline")
@@ -379,19 +379,19 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
   fun `test line deletion empty line`() {
     val keys = listOf("V", "D")
     val before = """
-            A Discovery
+            Lorem Ipsum
             ${c}
-            I found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     val after = """
-            A Discovery
-            ${c}I found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            Lorem Ipsum
+            ${c}Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     doTest(keys, before, after)
   }
@@ -400,20 +400,20 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
   fun `test line deletion last line`() {
     val keys = listOf("V", "D")
     val before = """
-            A Discovery
+            Lorem Ipsum
 
-            I found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
+            Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit
+            Sed in orci mauris.
             hard by the ${c}torrent of a mountain pass.
 
     """.trimIndent()
     val after = """
-            A Discovery
+            Lorem Ipsum
 
-            I found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
+            Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit
+            Sed in orci mauris.
             ${c}
     """.trimIndent()
     doTest(keys, before, after)
@@ -423,19 +423,19 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
   fun `test line deletion last line without empty line`() {
     val keys = listOf("V", "D")
     val before = """
-            A Discovery
+            Lorem Ipsum
 
-            I found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
+            Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit
+            Sed in orci mauris.
             hard by the ${c}torrent of a mountain pass.
     """.trimIndent()
     val after = """
-            A Discovery
+            Lorem Ipsum
 
-            I found it in a legendary land
-            all rocks and lavender and tufted grass,
-            ${c}where it was settled on some sodden sand
+            Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit
+            ${c}Sed in orci mauris.
     """.trimIndent()
     doTest(keys, before, after)
   }
@@ -444,18 +444,18 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
   fun `test line deletion multiline`() {
     val keys = listOf("Vj", "D")
     val before = """
-            A Discovery
+            Lorem Ipsum
 
             I ${c}found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     val after = """
-            A Discovery
+            Lorem Ipsum
 
-            ${c}where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            ${c}Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     doTest(keys, before, after)
   }
@@ -464,18 +464,18 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
   fun `test line deletion multiline motion up`() {
     val keys = listOf("Vk", "D")
     val before = """
-            A Discovery
+            Lorem Ipsum
 
-            I found it in a legendary land
+            Lorem ipsum dolor sit amet,
             all ${c}rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     val after = """
-            A Discovery
+            Lorem Ipsum
 
-            ${c}where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            ${c}Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     doTest(keys, before, after)
   }
@@ -503,20 +503,20 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
   fun `test block simple deletion`() {
     val keys = listOf("<C-V>", "D")
     val before = """
-            A Discovery
+            Lorem Ipsum
 
             I${c} found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     val after = """
-            A Discovery
+            Lorem Ipsum
 
             I
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     doTest(keys, before, after)
   }
@@ -525,20 +525,20 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
   fun `test block deletion empty line`() {
     val keys = listOf("<C-V>", "D")
     val before = """
-            A Discovery
+            Lorem Ipsum
             ${c}
-            I found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     val after = """
-            A Discovery
+            Lorem Ipsum
             ${c}
-            I found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     doTest(keys, before, after)
   }
@@ -547,20 +547,20 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
   fun `test block deletion last line`() {
     val keys = listOf("<C-V>", "D")
     val before = """
-            A Discovery
+            Lorem Ipsum
 
-            I found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
+            Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit
+            Sed in orci mauris.
             hard by the${c} torrent of a mountain pass.
 
     """.trimIndent()
     val after = """
-            A Discovery
+            Lorem Ipsum
 
-            I found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
+            Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit
+            Sed in orci mauris.
             hard by the
 
     """.trimIndent()
@@ -571,19 +571,19 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
   fun `test block deletion last line without empty line`() {
     val keys = listOf("<C-V>", "D")
     val before = """
-            A Discovery
+            Lorem Ipsum
 
-            I found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
+            Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit
+            Sed in orci mauris.
             hard by the${c} torrent of a mountain pass.
     """.trimIndent()
     val after = """
-            A Discovery
+            Lorem Ipsum
 
-            I found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
+            Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit
+            Sed in orci mauris.
             hard by the
     """.trimIndent()
     doTest(keys, before, after)
@@ -593,20 +593,20 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
   fun `test block deletion multiline`() {
     val keys = listOf("<C-V>j", "D")
     val before = """
-            A Discovery
+            Lorem Ipsum
 
             I${c} found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     val after = """
-            A Discovery
+            Lorem Ipsum
 
             I
-            a
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            c
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     doTest(keys, before, after)
   }

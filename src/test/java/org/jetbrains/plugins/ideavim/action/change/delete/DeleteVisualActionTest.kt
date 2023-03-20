@@ -25,20 +25,20 @@ class DeleteVisualActionTest : VimTestCase() {
   fun `test delete block SE direction`() {
     val keys = listOf("<C-V>e2j", "d")
     val before = """
-            A Discovery
+            Lorem Ipsum
 
             I |${c}found| it in a legendary land
             al|l roc|ks and lavender and tufted grass,
             wh|ere i|t was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     val after = """
-            A Discovery
+            Lorem Ipsum
 
             I |$c| it in a legendary land
             al||ks and lavender and tufted grass,
             wh||t was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
@@ -47,20 +47,20 @@ class DeleteVisualActionTest : VimTestCase() {
   fun `test delete block SW direction`() {
     val keys = listOf("<C-V>b2j", "d")
     val before = """
-            A Discovery
+            Lorem Ipsum
 
             I |foun${c}d| it in a legendary land
             al|l roc|ks and lavender and tufted grass,
             wh|ere i|t was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     val after = """
-            A Discovery
+            Lorem Ipsum
 
             I |$c| it in a legendary land
             al||ks and lavender and tufted grass,
             wh||t was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
@@ -69,20 +69,20 @@ class DeleteVisualActionTest : VimTestCase() {
   fun `test delete block NW direction`() {
     val keys = listOf("<C-V>b2k", "d")
     val before = """
-            A Discovery
+            Lorem Ipsum
 
             I |found| it in a legendary land
             al|l roc|ks and lavender and tufted grass,
             wh|ere ${c}i|t was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     val after = """
-            A Discovery
+            Lorem Ipsum
 
             I |$c| it in a legendary land
             al||ks and lavender and tufted grass,
             wh||t was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
@@ -91,20 +91,20 @@ class DeleteVisualActionTest : VimTestCase() {
   fun `test delete block NE direction`() {
     val keys = listOf("<C-V>2e2k", "d")
     val before = """
-            A Discovery
+            Lorem Ipsum
 
             I |found| it in a legendary land
             al|l roc|ks and lavender and tufted grass,
             wh|${c}ere i|t was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     val after = """
-            A Discovery
+            Lorem Ipsum
 
             I |$c| it in a legendary land
             al||ks and lavender and tufted grass,
             wh||t was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
   }
@@ -116,12 +116,12 @@ class DeleteVisualActionTest : VimTestCase() {
     // In short, when caret is not on the selection end
     configureByText(
       """
-            A Discovery
+            Lorem Ipsum
 
-            ${s}I found it in a legendary land
+            ${s}Lorem ipsum dolor sit amet,
             all rocks ${c}and lavender and tufted grass,
-            where it was settled on some sodden sand
-            ${se}hard by the torrent of a mountain pass.
+            Sed in orci mauris.
+            ${se}Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
     IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
@@ -129,9 +129,9 @@ class DeleteVisualActionTest : VimTestCase() {
     typeText(injector.parser.parseKeys("d"))
     assertState(
       """
-            A Discovery
+            Lorem Ipsum
 
-            hard by the torrent of a mountain pass.
+            Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
     assertState(VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
@@ -141,7 +141,7 @@ class DeleteVisualActionTest : VimTestCase() {
   fun `test delete with dollar motion`() {
     val keys = listOf("<C-V>3j$", "d")
     val before = """
-            A Discovery
+            Lorem Ipsum
 
             I |${c}found it in a legendary land
             al|l rocks and lavender and tufted grass,[ additional symbols]
@@ -149,7 +149,7 @@ class DeleteVisualActionTest : VimTestCase() {
             ha|rd by the torrent of a mountain pass.
     """.trimIndent()
     val after = """
-            A Discovery
+            Lorem Ipsum
 
             I |
             al|

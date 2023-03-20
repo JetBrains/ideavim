@@ -155,19 +155,19 @@ class DeleteMotionActionTest : VimTestCase() {
   @Test
   fun `test delete empty line`() {
     val file = """
-            A Discovery
+            Lorem Ipsum
             ${c}
-            I found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     val newFile = """
-            A Discovery
-            ${c}I found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            Lorem Ipsum
+            ${c}Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     typeTextInFile("dd", file)
     assertState(newFile)
@@ -178,17 +178,17 @@ class DeleteMotionActionTest : VimTestCase() {
     doTest(
       "dd",
       """
-            A Discovery
+            Lorem Ipsum
             
-            I found it in a legendary land
-            all rocks and lavender and tufted grass,
+            Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit
             ${c}
       """.trimIndent(),
       """
-            A Discovery
+            Lorem Ipsum
             
-            I found it in a legendary land
-            ${c}all rocks and lavender and tufted grass,
+            Lorem ipsum dolor sit amet,
+            ${c}consectetur adipiscing elit
       """.trimIndent(),
     )
   }
@@ -198,21 +198,21 @@ class DeleteMotionActionTest : VimTestCase() {
     doTest(
       "dd",
       """
-            A Discovery
+            Lorem Ipsum
             
             ${c}
             
             
-            I found it in a legendary land
-            all rocks and lavender and tufted grass,
+            Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit
       """.trimIndent(),
       """
-            A Discovery
+            Lorem Ipsum
             
             ${c}
             
-            I found it in a legendary land
-            all rocks and lavender and tufted grass,
+            Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit
       """.trimIndent(),
     )
   }

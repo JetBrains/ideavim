@@ -27,7 +27,7 @@ class ScrollLastScreenLineActionTest : VimTestCase() {
 
   @Test
   fun `test scroll current line to bottom of screen and leave cursor in current column`() {
-    configureByLines(100, "    I found it in a legendary land")
+    configureByLines(100, "    Lorem ipsum dolor sit amet,")
     setPositionAndScroll(40, 60, 14)
     typeText("zb")
     assertPosition(60, 14)
@@ -84,7 +84,7 @@ class ScrollLastScreenLineActionTest : VimTestCase() {
 
   @Test
   fun `test scrolls last line to bottom of screen with virtual space`() {
-    configureByLines(100, "    I found it in a legendary land")
+    configureByLines(100, "    Lorem ipsum dolor sit amet,")
     setEditorVirtualSpace()
     setPositionAndScroll(80, 99, 4)
     typeText("zb")
@@ -94,7 +94,7 @@ class ScrollLastScreenLineActionTest : VimTestCase() {
 
   @Test
   fun `test scrolls last line to bottom of screen with virtual space when caret less than scrolloff from bottom`() {
-    configureByLines(100, "    I found it in a legendary land")
+    configureByLines(100, "    Lorem ipsum dolor sit amet,")
     enterCommand("set scrolloff=10")
     setEditorVirtualSpace()
     setPositionAndScroll(80, 97, 4)

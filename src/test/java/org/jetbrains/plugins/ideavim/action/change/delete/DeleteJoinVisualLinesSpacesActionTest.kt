@@ -25,19 +25,19 @@ class DeleteJoinVisualLinesSpacesActionTest : VimTestCase() {
     doTest(
       "VjJ",
       """
-                A Discovery
+                Lorem Ipsum
 
-                ${c}I found it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                ${c}Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       """
-                A Discovery
+                Lorem Ipsum
 
-                ${c}I found it in a legendary land all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                ${c}Lorem ipsum dolor sit amet, consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
       VimStateMachine.SubMode.NONE,

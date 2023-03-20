@@ -21,7 +21,7 @@ class YankAndPutTest : VimTestCase() {
   fun `test yank to number register with unnamed`() {
     val before = """
             I ${c}found it in a legendary land
-            all rocks and lavender and tufted grass,
+            consectetur adipiscing elit
     """.trimIndent()
     configureByText(before)
     // Select and yank first word
@@ -34,7 +34,7 @@ class YankAndPutTest : VimTestCase() {
     assertState(
       """
             I it found in a legendary land
-            all rocks and lavender and tufted grass,
+            consectetur adipiscing elit
       """.trimIndent(),
     )
   }
@@ -43,7 +43,7 @@ class YankAndPutTest : VimTestCase() {
   fun `test yank to number register with unnamed and ideaput`() {
     val before = """
             I ${c}found it in a legendary land
-            all rocks and lavender and tufted grass,
+            consectetur adipiscing elit
     """.trimIndent()
     configureByText(before)
     // Select and yank first word
@@ -56,7 +56,7 @@ class YankAndPutTest : VimTestCase() {
     assertState(
       """
             I it found in a legendary land
-            all rocks and lavender and tufted grass,
+            consectetur adipiscing elit
       """.trimIndent(),
     )
   }
@@ -65,7 +65,7 @@ class YankAndPutTest : VimTestCase() {
   fun `test yank to number register`() {
     val before = """
             I ${c}found it in a legendary land
-            all rocks and lavender and tufted grass,
+            consectetur adipiscing elit
     """.trimIndent()
     configureByText(before)
     // Select and yank first word
@@ -78,7 +78,7 @@ class YankAndPutTest : VimTestCase() {
     assertState(
       """
             I it found in a legendary land
-            all rocks and lavender and tufted grass,
+            consectetur adipiscing elit
       """.trimIndent(),
     )
   }

@@ -17,8 +17,8 @@ import org.junit.jupiter.api.Test
 class BufferCloseCommandTest : VimTestCase() {
   @Test
   fun `test close file by bd command`() {
-    val psiFile1 = fixture.configureByText("A_Discovery1", "I found it in a legendary land")
-    val psiFile2 = fixture.configureByText("A_Discovery2", "all rocks and lavender and tufted grass,")
+    val psiFile1 = fixture.configureByText("A_Discovery1", "Lorem ipsum dolor sit amet,")
+    val psiFile2 = fixture.configureByText("A_Discovery2", "consectetur adipiscing elit")
 
     fileManager.openFile(psiFile1.virtualFile, false)
     fileManager.openFile(psiFile2.virtualFile, true)

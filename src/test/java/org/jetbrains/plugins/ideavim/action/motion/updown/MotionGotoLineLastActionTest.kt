@@ -182,7 +182,7 @@ class MotionGotoLineLastActionTest : VimTestCase() {
 
   @Test
   fun `test scrolling positions target line in middle of screen`() {
-    configureByLines(100, "    I found it in a legendary land")
+    configureByLines(100, "    Lorem ipsum dolor sit amet,")
     typeText("70G")
     assertPosition(69, 4)
     assertVisibleArea(52, 86)
@@ -190,7 +190,7 @@ class MotionGotoLineLastActionTest : VimTestCase() {
 
   @Test
   fun `test go to last line of file puts target line at bottom of screen`() {
-    configureByLines(100, "    I found it in a legendary land")
+    configureByLines(100, "    Lorem ipsum dolor sit amet,")
     typeText("G")
     assertPosition(99, 4)
     assertVisibleArea(65, 99)
@@ -198,7 +198,7 @@ class MotionGotoLineLastActionTest : VimTestCase() {
 
   @Test
   fun `test go to last line of file puts target line at bottom of screen with virtual space enabled`() {
-    configureByLines(100, "    I found it in a legendary land")
+    configureByLines(100, "    Lorem ipsum dolor sit amet,")
     setEditorVirtualSpace()
     typeText("G")
     assertPosition(99, 4)
@@ -207,7 +207,7 @@ class MotionGotoLineLastActionTest : VimTestCase() {
 
   @Test
   fun `test go to line in last half screen of file puts last line at bottom of screen`() {
-    configureByLines(100, "    I found it in a legendary land")
+    configureByLines(100, "    Lorem ipsum dolor sit amet,")
     typeText("90G")
     assertPosition(89, 4)
     assertVisibleArea(65, 99)
@@ -215,7 +215,7 @@ class MotionGotoLineLastActionTest : VimTestCase() {
 
   @Test
   fun `test go to line in last half screen of file puts last line at bottom of screen ignoring scrolloff`() {
-    configureByLines(100, "    I found it in a legendary land")
+    configureByLines(100, "    Lorem ipsum dolor sit amet,")
     enterCommand("set scrolloff=10")
     typeText("95G")
     assertPosition(94, 4)
@@ -225,7 +225,7 @@ class MotionGotoLineLastActionTest : VimTestCase() {
   @Test
   fun `test go to line does not scroll when default virtual space already at bottom of file`() {
     // Editor has 5 lines of virtual space by default
-    configureByLines(100, "    I found it in a legendary land")
+    configureByLines(100, "    Lorem ipsum dolor sit amet,")
     setPositionAndScroll(69, 85)
     typeText("G")
     assertPosition(99, 4)
@@ -234,7 +234,7 @@ class MotionGotoLineLastActionTest : VimTestCase() {
 
   @Test
   fun `test go to line does not scroll when full virtual space already at bottom of file`() {
-    configureByLines(100, "    I found it in a legendary land")
+    configureByLines(100, "    Lorem ipsum dolor sit amet,")
     setEditorVirtualSpace()
     setPositionAndScroll(85, 85)
     typeText("G")
@@ -244,7 +244,7 @@ class MotionGotoLineLastActionTest : VimTestCase() {
 
   @Test
   fun `test go to line does not scroll when last line is less than scrolloff above bottom of file`() {
-    configureByLines(100, "    I found it in a legendary land")
+    configureByLines(100, "    Lorem ipsum dolor sit amet,")
     enterCommand("set scrolloff=10")
     setEditorVirtualSpace()
     setPositionAndScroll(67, 97)
@@ -255,7 +255,7 @@ class MotionGotoLineLastActionTest : VimTestCase() {
 
   @Test
   fun `test go to line does not scroll when last line is less than scrolloff above bottom of file with folds`() {
-    configureByLines(100, "    I found it in a legendary land")
+    configureByLines(100, "    Lorem ipsum dolor sit amet,")
     enterCommand("set scrolloff=10")
     setEditorVirtualSpace()
     typeText("20G", "V10j", ":'< +'>action CollapseSelection<CR>", "V")

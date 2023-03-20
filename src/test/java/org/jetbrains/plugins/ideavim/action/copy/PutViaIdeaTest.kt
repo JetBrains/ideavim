@@ -34,13 +34,13 @@ class PutViaIdeaTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   @OptionTest(VimOption(OptionConstants.clipboard, limitedValues = [OptionConstants.clipboard_ideaput]))
   fun `test simple insert via idea`() {
-    val before = "${c}I found it in a legendary land"
+    val before = "${c}Lorem ipsum dolor sit amet,"
     configureByText(before)
 
     injector.registerGroup.storeText('"', "legendary", SelectionType.CHARACTER_WISE)
 
     typeText("ve", "p")
-    val after = "legendar${c}y it in a legendary land"
+    val after = "legendar${c}y ipsum dolor sit amet,"
     assertState(after)
   }
 
@@ -87,11 +87,11 @@ class PutViaIdeaTest : VimTestCase() {
   @OptionTest(VimOption(OptionConstants.clipboard, limitedValues = [OptionConstants.clipboard_ideaput]))
   fun `test insert block with newline`() {
     val before = """
-            A Discovery
+            Lorem Ipsum
             $c
-            I found it in a legendary land
+            Lorem ipsum dolor sit amet,
             
-            hard by the torrent of a mountain pass.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     configureByText(before)
 
@@ -99,20 +99,20 @@ class PutViaIdeaTest : VimTestCase() {
     VimPlugin.getRegister().storeText(
       vimEditor,
       vimEditor.primaryCaret(),
-      before rangeOf "\nI found it in a legendary land\n",
+      before rangeOf "\nLorem ipsum dolor sit amet,\n",
       SelectionType.CHARACTER_WISE,
       false,
     )
 
     typeText("p")
     val after = """
-            A Discovery
+            Lorem Ipsum
             
-            I found it in a legendary land
+            Lorem ipsum dolor sit amet,
             
-            I found it in a legendary land
+            Lorem ipsum dolor sit amet,
             
-            hard by the torrent of a mountain pass.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     assertState(after)
   }

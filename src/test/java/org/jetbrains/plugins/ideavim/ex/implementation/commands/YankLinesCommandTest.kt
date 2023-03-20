@@ -17,19 +17,19 @@ class YankLinesCommandTest : VimTestCase() {
   fun `test copy with range`() {
     configureByText(
       """
-                A Discovery
+                Lorem Ipsum
 
-                ${c}I found it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
+                ${c}Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit
+                Sed in orci mauris.
                 h
       """.trimIndent(),
     )
     typeText(commandToKeys("3,4y"))
     val yanked = VimPlugin.getRegister().lastRegister!!.text
     kotlin.test.assertEquals(
-      """|I found it in a legendary land
-         |all rocks and lavender and tufted grass,
+      """|Lorem ipsum dolor sit amet,
+         |consectetur adipiscing elit
          |
       """.trimMargin(),
       yanked,
@@ -40,11 +40,11 @@ class YankLinesCommandTest : VimTestCase() {
   fun `test copy with one char on the last line`() {
     configureByText(
       """
-                A Discovery
+                Lorem Ipsum
 
-                ${c}I found it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
+                ${c}Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit
+                Sed in orci mauris.
                 h
       """.trimIndent(),
     )
@@ -52,11 +52,11 @@ class YankLinesCommandTest : VimTestCase() {
     val yanked = VimPlugin.getRegister().lastRegister!!.text
     kotlin.test.assertEquals(
       """
-                A Discovery
+                Lorem Ipsum
 
-                I found it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
+                Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit
+                Sed in orci mauris.
                 h
                 
       """.trimIndent(),

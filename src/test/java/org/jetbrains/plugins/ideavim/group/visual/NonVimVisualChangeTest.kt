@@ -37,12 +37,12 @@ class NonVimVisualChangeTest : VimTestCase() {
     // See https://github.com/JetBrains/ideavim/pull/186#issuecomment-486656093
     configureByText(
       """
-            A Discovery
+            Lorem Ipsum
 
             I ${c}found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
     VimListenerManager.EditorListeners.add(fixture.editor)
@@ -55,12 +55,12 @@ class NonVimVisualChangeTest : VimTestCase() {
     }
     assertState(
       """
-            A Discovery
+            Lorem Ipsum
 
             found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
     assertMode(VimStateMachine.Mode.INSERT)
@@ -71,12 +71,12 @@ class NonVimVisualChangeTest : VimTestCase() {
   fun `test enable and disable selection`() {
     configureByText(
       """
-            A Discovery
+            Lorem Ipsum
 
             I ${c}found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
     VimListenerManager.EditorListeners.add(fixture.editor)
@@ -95,12 +95,12 @@ class NonVimVisualChangeTest : VimTestCase() {
   fun `test enable, disable, and enable selection again`() {
     configureByText(
       """
-            A Discovery
+            Lorem Ipsum
 
             I ${c}found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
     VimListenerManager.EditorListeners.add(fixture.editor)

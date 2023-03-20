@@ -87,9 +87,16 @@ Here are some guides for testing:
 
 1. Read the javadoc for the `@VimBehaviorDiffers` annotation in the source code.
 
-2. Please avoid senseless text like "dhjkwaldjwa", "asdasdasd", "123 123 123 123", etc. Try to choose an example
-text that is easy to read and understand what is wrong if the test fails. For example, take a few lines from your
-favorite poem, or use Vladimir Nabokov’s “A Discovery" if you don't have one.
+2. Please avoid senseless text like "dhjkwaldjwa", "asdasdasd", "123 123 123 123", etc. Use a few lines of code or
+the following template:
+```text
+Lorem Ipsum
+
+Lorem ipsum dolor sit amet,
+consectetur adipiscing elit
+Sed in orci mauris.
+Cras id tellus in ex imperdiet egestas.
+```
 
 3. Don't forget to test your functionality with line start, line end, file start, file end, empty line, multiple
 carets, dollar motion, etc.

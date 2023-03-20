@@ -30,7 +30,7 @@ class ScrollMiddleScreenLineActionTest : VimTestCase() {
 
   @Test
   fun `test scrolls current line to middle of screen and keeps cursor in the same column`() {
-    configureByLines(100, "    I found it in a legendary land")
+    configureByLines(100, "    Lorem ipsum dolor sit amet,")
     setPositionAndScroll(40, 45, 14)
     typeText("zz")
     assertPosition(45, 14)

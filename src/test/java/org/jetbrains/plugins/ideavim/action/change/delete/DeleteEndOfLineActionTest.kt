@@ -18,16 +18,16 @@ class DeleteEndOfLineActionTest : VimTestCase() {
     doTest(
       "D",
       """
-                A Discovery
+                Lorem Ipsum
                 $c
-                I found it in a legendary land
-                all rocks and lavender and tufted grass,
+                Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit
       """.trimIndent(),
       """
-                A Discovery
+                Lorem Ipsum
                 $c
-                I found it in a legendary land
-                all rocks and lavender and tufted grass,
+                Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
       VimStateMachine.SubMode.NONE,

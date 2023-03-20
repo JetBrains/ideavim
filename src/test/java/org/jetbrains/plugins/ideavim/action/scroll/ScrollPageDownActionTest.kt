@@ -260,7 +260,7 @@ class ScrollPageDownActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   @Test
   fun `test scroll page down puts cursor on first non-blank column`() {
-    configureByLines(100, "    I found it in a legendary land")
+    configureByLines(100, "    Lorem ipsum dolor sit amet,")
     setPositionAndScroll(20, 25, 14)
     typeText("<C-F>")
     assertPosition(53, 4)
@@ -270,7 +270,7 @@ class ScrollPageDownActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   @Test
   fun `test scroll page down keeps same column with nostartofline`() {
-    configureByLines(100, "    I found it in a legendary land")
+    configureByLines(100, "    Lorem ipsum dolor sit amet,")
     enterCommand("set nostartofline")
     setPositionAndScroll(20, 25, 14)
     typeText("<C-F>")

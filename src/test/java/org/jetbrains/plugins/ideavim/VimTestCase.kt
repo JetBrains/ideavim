@@ -274,7 +274,7 @@ abstract class VimTestCase {
   protected fun configureByPages(pageCount: Int) {
     val stringBuilder = StringBuilder()
     repeat(pageCount * screenHeight) {
-      stringBuilder.appendLine("I found it in a legendary land")
+      stringBuilder.appendLine("Lorem ipsum dolor sit amet,")
     }
     configureByText(stringBuilder.toString())
   }

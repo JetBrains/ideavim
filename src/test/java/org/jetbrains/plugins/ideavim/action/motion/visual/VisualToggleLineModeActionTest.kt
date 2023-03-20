@@ -20,20 +20,20 @@ class VisualToggleLineModeActionTest : VimTestCase() {
     doTest(
       "1V",
       """
-                    A Discovery
+                    Lorem Ipsum
 
                     I ${c}found it in a legendary land
-                    all rocks and lavender and tufted grass,
-                    where it was settled on some sodden sand
-                    hard by the torrent of a mountain pass.
+                    consectetur adipiscing elit
+                    Sed in orci mauris.
+                    Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       """
-                    A Discovery
+                    Lorem Ipsum
 
                     ${s}I ${c}found it in a legendary land
-                    ${se}all rocks and lavender and tufted grass,
-                    where it was settled on some sodden sand
-                    hard by the torrent of a mountain pass.
+                    ${se}consectetur adipiscing elit
+                    Sed in orci mauris.
+                    Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       VimStateMachine.Mode.VISUAL,
       VimStateMachine.SubMode.VISUAL_LINE,
@@ -45,20 +45,20 @@ class VisualToggleLineModeActionTest : VimTestCase() {
     doTest(
       "1V",
       """
-                    A Discovery
+                    Lorem Ipsum
 
                     I ${c}found it in a legendary land
-                    all rocks and lavender and tufted grass,
+                    consectetur adipiscing elit
                     where it ${c}was settled on some sodden sand
-                    hard by the torrent of a mountain pass.
+                    Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       """
-                    A Discovery
+                    Lorem Ipsum
 
                     ${s}I ${c}found it in a legendary land
-                    ${se}all rocks and lavender and tufted grass,
+                    ${se}consectetur adipiscing elit
                     ${s}where it ${c}was settled on some sodden sand
-                    ${se}hard by the torrent of a mountain pass.
+                    ${se}Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       VimStateMachine.Mode.VISUAL,
       VimStateMachine.SubMode.VISUAL_LINE,
@@ -119,12 +119,12 @@ class VisualToggleLineModeActionTest : VimTestCase() {
   fun `test selectmode option`() {
     configureByText(
       """
-                    A Discovery
+                    Lorem Ipsum
 
                     I${c} found it in a legendary land
-                    all rocks and lavender and tufted grass,
-                    where it was settled on some sodden sand[long line]
-                    hard by the torrent of a mountain pass.
+                    consectetur adipiscing elit
+                    Sed in orci mauris.[long line]
+                    Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
     enterCommand("set selectmode=cmd")

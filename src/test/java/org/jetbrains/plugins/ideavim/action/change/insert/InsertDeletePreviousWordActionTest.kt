@@ -68,12 +68,12 @@ class InsertDeletePreviousWordActionTest : VimTestCase() {
     doTest(
       listOf("i", "<C-W>", "<C-W>", "<C-W>", "<C-W>"),
       """
-            A Discovery
+            Lorem Ipsum
             
                  I${c} found it in a legendary land
       """.trimIndent(),
       """
-            A Discovery${c} found it in a legendary land
+            Lorem Ipsum${c} found it in a legendary land
       """.trimIndent(),
       VimStateMachine.Mode.INSERT,
       VimStateMachine.SubMode.NONE,

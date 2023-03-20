@@ -21,14 +21,14 @@ class DeleteVisualLinesActionTest : VimTestCase() {
       "vlllX",
       """
                 I found ${c}it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       """
-                ${c}all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                ${c}consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
       VimStateMachine.SubMode.NONE,
@@ -40,15 +40,15 @@ class DeleteVisualLinesActionTest : VimTestCase() {
     doTest(
       "vlllX",
       """
-                I found it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
+                Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit
+                Sed in orci mauris.
                 hard by ${c}the torrent of a mountain pass.
       """.trimIndent(),
       """
-                I found it in a legendary land
-                all rocks and lavender and tufted grass,
-                ${c}where it was settled on some sodden sand
+                Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit
+                ${c}Sed in orci mauris.
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
       VimStateMachine.SubMode.NONE,
@@ -61,14 +61,14 @@ class DeleteVisualLinesActionTest : VimTestCase() {
       "VX",
       """
                 I found ${c}it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       """
-                ${c}all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                ${c}consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
       VimStateMachine.SubMode.NONE,
@@ -80,15 +80,15 @@ class DeleteVisualLinesActionTest : VimTestCase() {
     doTest(
       "VX",
       """
-                I found it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
+                Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit
+                Sed in orci mauris.
                 hard by ${c}the torrent of a mountain pass.
       """.trimIndent(),
       """
-                I found it in a legendary land
-                all rocks and lavender and tufted grass,
-                ${c}where it was settled on some sodden sand
+                Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit
+                ${c}Sed in orci mauris.
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
       VimStateMachine.SubMode.NONE,
@@ -99,19 +99,19 @@ class DeleteVisualLinesActionTest : VimTestCase() {
   fun `test multiple line delete till the end`() {
     val keys = "Vjd"
     val before = """
-            A Discovery
+            Lorem Ipsum
 
-            I found it in a legendary land
-            all rocks and lavender and tufted grass,
+            Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit
             
-            ${c}where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            ${c}Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     val after = """
-            A Discovery
+            Lorem Ipsum
 
-            I found it in a legendary land
-            all rocks and lavender and tufted grass,
+            Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit
             ${c}
     """.trimIndent()
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
@@ -121,20 +121,20 @@ class DeleteVisualLinesActionTest : VimTestCase() {
   fun `test multiple line delete till the end with a new line`() {
     val keys = "Vjd"
     val before = """
-            A Discovery
+            Lorem Ipsum
 
-            I found it in a legendary land
-            all rocks and lavender and tufted grass,
+            Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit
             
-            ${c}where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            ${c}Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
             
     """.trimIndent()
     val after = """
-            A Discovery
+            Lorem Ipsum
 
-            I found it in a legendary land
-            all rocks and lavender and tufted grass,
+            Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit
             
             ${c}
     """.trimIndent()

@@ -578,17 +578,17 @@ fun getCellType(${s}pos$se: VisualPosition): CellType {
   @Test
   fun `test adding multicaret after linewise selection`() {
     val before = """
-      ${c}I found it in a legendary land
-      all rocks and lavender and tufted grass,
-      where it was settled on some sodden sand
-      hard by the torrent of a mountain pass. 
+      ${c}Lorem ipsum dolor sit amet,
+      consectetur adipiscing elit
+      Sed in orci mauris.
+      Cras id tellus in ex imperdiet egestas. 
     """.trimIndent()
 
     val after = """
-      ${c}I found it in a legendary land
-      ${c}all rocks and lavender and tufted grass,
-      ${c}where it was settled on some sodden sand
-      hard by the torrent of a mountain pass. 
+      ${c}Lorem ipsum dolor sit amet,
+      ${c}consectetur adipiscing elit
+      ${c}Sed in orci mauris.
+      Cras id tellus in ex imperdiet egestas. 
     """.trimIndent()
     doTest("Vjj<A-n>", before, after)
   }
@@ -596,16 +596,16 @@ fun getCellType(${s}pos$se: VisualPosition): CellType {
   @Test
   fun `test adding multicaret after linewise selection till the last line`() {
     val before = """
-      ${c}I found it in a legendary land
-      all rocks and lavender and tufted grass,
-      where it was settled on some sodden sand
-      hard by the torrent of a mountain pass. 
+      ${c}Lorem ipsum dolor sit amet,
+      consectetur adipiscing elit
+      Sed in orci mauris.
+      Cras id tellus in ex imperdiet egestas. 
     """.trimIndent()
     val after = """
-      ${c}I found it in a legendary land
-      ${c}all rocks and lavender and tufted grass,
-      ${c}where it was settled on some sodden sand
-      ${c}hard by the torrent of a mountain pass. 
+      ${c}Lorem ipsum dolor sit amet,
+      ${c}consectetur adipiscing elit
+      ${c}Sed in orci mauris.
+      ${c}Cras id tellus in ex imperdiet egestas. 
     """.trimIndent()
     doTest("Vjjj<A-n>", before, after)
   }
@@ -613,17 +613,17 @@ fun getCellType(${s}pos$se: VisualPosition): CellType {
   @Test
   fun `test adding multicaret after linewise selection moving up`() {
     val before = """
-      I found it in a legendary land
-      all rocks and lavender and tufted grass,
-      ${c}where it was settled on some sodden sand
-      hard by the torrent of a mountain pass.
+      Lorem ipsum dolor sit amet,
+      consectetur adipiscing elit
+      ${c}Sed in orci mauris.
+      Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
 
     val after = """
-      ${c}I found it in a legendary land
-      ${c}all rocks and lavender and tufted grass,
-      ${c}where it was settled on some sodden sand
-      hard by the torrent of a mountain pass.
+      ${c}Lorem ipsum dolor sit amet,
+      ${c}consectetur adipiscing elit
+      ${c}Sed in orci mauris.
+      Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     doTest("Vkk<A-n>", before, after)
   }
@@ -631,17 +631,17 @@ fun getCellType(${s}pos$se: VisualPosition): CellType {
   @Test
   fun `test adding multicaret after linewise selection moving up from down`() {
     val before = """
-      I found it in a legendary land
-      all rocks and lavender and tufted grass,
-      where it was settled on some sodden sand
-      ${c}hard by the torrent of a mountain pass.
+      Lorem ipsum dolor sit amet,
+      consectetur adipiscing elit
+      Sed in orci mauris.
+      ${c}Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
 
     val after = """
-      I found it in a legendary land
-      ${c}all rocks and lavender and tufted grass,
-      ${c}where it was settled on some sodden sand
-      ${c}hard by the torrent of a mountain pass.
+      Lorem ipsum dolor sit amet,
+      ${c}consectetur adipiscing elit
+      ${c}Sed in orci mauris.
+      ${c}Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     doTest("Vkk<A-n>", before, after)
   }
@@ -649,23 +649,23 @@ fun getCellType(${s}pos$se: VisualPosition): CellType {
   @Test
   fun `test adding multicaret after linewise selection moving up to empty lines`() {
     val before = """
-      I found it in a legendary land
-      all rocks and lavender and tufted grass,
+      Lorem ipsum dolor sit amet,
+      consectetur adipiscing elit
       
       
       
-      where it was settled on some sodden sand
-      ${c}hard by the torrent of a mountain pass.
+      Sed in orci mauris.
+      ${c}Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
 
     val after = """
-      I found it in a legendary land
-      all rocks and lavender and tufted grass,
+      Lorem ipsum dolor sit amet,
+      consectetur adipiscing elit
       
       $c
       $c
-      ${c}where it was settled on some sodden sand
-      ${c}hard by the torrent of a mountain pass.
+      ${c}Sed in orci mauris.
+      ${c}Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     doTest("Vkkk<A-n>", before, after)
   }
@@ -673,23 +673,23 @@ fun getCellType(${s}pos$se: VisualPosition): CellType {
   @Test
   fun `test adding multicaret after linewise selection moving down to empty lines`() {
     val before = """
-      ${c}I found it in a legendary land
-      all rocks and lavender and tufted grass,
+      ${c}Lorem ipsum dolor sit amet,
+      consectetur adipiscing elit
       
       
       
-      where it was settled on some sodden sand
-      hard by the torrent of a mountain pass.
+      Sed in orci mauris.
+      Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
 
     val after = """
-      ${c}I found it in a legendary land
-      ${c}all rocks and lavender and tufted grass,
+      ${c}Lorem ipsum dolor sit amet,
+      ${c}consectetur adipiscing elit
       $c
       $c
       
-      where it was settled on some sodden sand
-      hard by the torrent of a mountain pass.
+      Sed in orci mauris.
+      Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     doTest("Vjjj<A-n>", before, after)
   }

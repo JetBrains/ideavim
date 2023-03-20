@@ -25,20 +25,20 @@ class DigraphTest : VimTestCase() {
     doTest(
       "i B<BS>B",
       """
-            A Discovery
+            Lorem Ipsum
 
             I found it$c in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       """
-            A Discovery
+            Lorem Ipsum
 
             I found it ¦$c in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       VimStateMachine.Mode.INSERT,
       VimStateMachine.SubMode.NONE,
@@ -53,20 +53,20 @@ class DigraphTest : VimTestCase() {
     doTest(
       "i B<BS>BHello",
       """
-            A Discovery
+            Lorem Ipsum
 
             I found it$c in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       """
-            A Discovery
+            Lorem Ipsum
 
             I found it ¦Hello$c in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       VimStateMachine.Mode.INSERT,
       VimStateMachine.SubMode.NONE,
@@ -81,20 +81,20 @@ class DigraphTest : VimTestCase() {
     doTest(
       "i B<BS><BS>B",
       """
-            A Discovery
+            Lorem Ipsum
 
             I found it$c in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       """
-            A Discovery
+            Lorem Ipsum
 
             I found itB$c in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       VimStateMachine.Mode.INSERT,
       VimStateMachine.SubMode.NONE,
@@ -109,20 +109,20 @@ class DigraphTest : VimTestCase() {
     doTest(
       "i B<BS>B<BS>B",
       """
-            A Discovery
+            Lorem Ipsum
 
             I found it$c in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       """
-            A Discovery
+            Lorem Ipsum
 
             I found it B$c in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       VimStateMachine.Mode.INSERT,
       VimStateMachine.SubMode.NONE,

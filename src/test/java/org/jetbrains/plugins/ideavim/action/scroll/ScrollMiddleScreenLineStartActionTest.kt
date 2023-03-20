@@ -30,7 +30,7 @@ class ScrollMiddleScreenLineStartActionTest : VimTestCase() {
 
   @Test
   fun `test scrolls current line to middle of screen and moves cursor to first non-blank`() {
-    configureByLines(100, "    I found it in a legendary land")
+    configureByLines(100, "    Lorem ipsum dolor sit amet,")
     setPositionAndScroll(40, 45, 14)
     typeText("z.")
     assertPosition(45, 4)

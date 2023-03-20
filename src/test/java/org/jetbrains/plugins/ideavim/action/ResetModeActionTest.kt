@@ -24,8 +24,8 @@ class ResetModeActionTest : VimTestCase() {
   @Test
   fun `test reset from normal mode`() {
     val keys = "<C-\\><C-N>"
-    val before = "A Discovery"
-    val after = "A Discovery"
+    val before = "Lorem Ipsum"
+    val after = "Lorem Ipsum"
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
     kotlin.test.assertFalse(fixture.editor.selectionModel.hasSelection())
   }
@@ -33,8 +33,8 @@ class ResetModeActionTest : VimTestCase() {
   @Test
   fun `test reset from insert mode`() {
     val keys = listOf("i", "<C-\\><C-N>")
-    val before = "A Discovery"
-    val after = "A Discovery"
+    val before = "Lorem Ipsum"
+    val after = "Lorem Ipsum"
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
     kotlin.test.assertFalse(fixture.editor.selectionModel.hasSelection())
   }
@@ -51,8 +51,8 @@ class ResetModeActionTest : VimTestCase() {
   @Test
   fun `test reset and execute command`() {
     val keys = listOf("i", "<C-\\><C-N>", "3l")
-    val before = "${c}A Discovery"
-    val after = "A D${c}iscovery"
+    val before = "${c}Lorem Ipsum"
+    val after = "Lorem Ipsum"
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
     kotlin.test.assertFalse(fixture.editor.selectionModel.hasSelection())
   }
@@ -60,8 +60,8 @@ class ResetModeActionTest : VimTestCase() {
   @Test
   fun `test reset from visual mode`() {
     val keys = listOf("V", "<C-\\><C-N>")
-    val before = "A Discovery"
-    val after = "A Discovery"
+    val before = "Lorem Ipsum"
+    val after = "Lorem Ipsum"
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
     kotlin.test.assertFalse(fixture.editor.selectionModel.hasSelection())
   }
@@ -69,8 +69,8 @@ class ResetModeActionTest : VimTestCase() {
   @Test
   fun `test reset from select mode`() {
     val keys = listOf("gH", "<C-\\><C-N>")
-    val before = "A Discovery"
-    val after = "A Discovery"
+    val before = "Lorem Ipsum"
+    val after = "Lorem Ipsum"
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
     kotlin.test.assertFalse(fixture.editor.selectionModel.hasSelection())
   }
@@ -78,8 +78,8 @@ class ResetModeActionTest : VimTestCase() {
   @Test
   fun `test reset from operator-pending mode`() {
     val keys = listOf("d", "<C-\\><C-N>")
-    val before = "A Discovery"
-    val after = "A Discovery"
+    val before = "Lorem Ipsum"
+    val after = "Lorem Ipsum"
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
     kotlin.test.assertFalse(fixture.editor.selectionModel.hasSelection())
   }
@@ -87,8 +87,8 @@ class ResetModeActionTest : VimTestCase() {
   @Test
   fun `test reset from operator-pending mode with delete`() {
     val keys = "d<Esc>dw"
-    val before = "A Discovery"
-    val after = "Discovery"
+    val before = "Lorem Ipsum"
+    val after = "Ipsum"
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
     kotlin.test.assertFalse(fixture.editor.selectionModel.hasSelection())
   }
@@ -96,8 +96,8 @@ class ResetModeActionTest : VimTestCase() {
   @Test
   fun `test delete command after resetting operator-pending mode`() {
     val keys = listOf("d", "<C-\\><C-N>", "dw")
-    val before = "A Discovery"
-    val after = "Discovery"
+    val before = "Lorem Ipsum"
+    val after = "Ipsum"
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
     kotlin.test.assertFalse(fixture.editor.selectionModel.hasSelection())
   }
@@ -105,8 +105,8 @@ class ResetModeActionTest : VimTestCase() {
   @Test
   fun `test delete command after resetting operator-pending mode with esc`() {
     val keys = listOf("d", "<Esc>", "dw")
-    val before = "A Discovery"
-    val after = "Discovery"
+    val before = "Lorem Ipsum"
+    val after = "Ipsum"
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
     kotlin.test.assertFalse(fixture.editor.selectionModel.hasSelection())
   }
@@ -115,8 +115,8 @@ class ResetModeActionTest : VimTestCase() {
   @Test
   fun `test delete command after resetting operator-pending mode with ctrl open bracket`() {
     val keys = listOf("d", "<C-[>", "dw")
-    val before = "A Discovery"
-    val after = "Discovery"
+    val before = "Lorem Ipsum"
+    val after = "Ipsum"
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
     kotlin.test.assertFalse(fixture.editor.selectionModel.hasSelection())
   }
@@ -134,8 +134,8 @@ class ResetModeActionTest : VimTestCase() {
       )
 
     val keys = listOf("d", "<C-D>", "dw")
-    val before = "A Discovery"
-    val after = "Discovery"
+    val before = "Lorem Ipsum"
+    val after = "Ipsum"
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
     kotlin.test.assertFalse(fixture.editor.selectionModel.hasSelection())
   }
@@ -143,8 +143,8 @@ class ResetModeActionTest : VimTestCase() {
   @Test
   fun `test non-delete commands after resetting operator-pending mode`() {
     val keys = listOf("c", "<C-\\><C-N>", "another")
-    val before = "A Discovery"
-    val after = "Another Discovery"
+    val before = "Lorem Ipsum"
+    val after = "Lnotherorem Ipsum"
     doTest(keys, before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
     kotlin.test.assertFalse(fixture.editor.selectionModel.hasSelection())
   }

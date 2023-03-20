@@ -20,20 +20,20 @@ class SelectEnableLineModeActionHandlerTest : VimTestCase() {
     doTest(
       "gH",
       """
-                A Discovery
+                Lorem Ipsum
 
-                ${c}I found it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                ${c}Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       """
-                A Discovery
+                Lorem Ipsum
 
-                $s${c}I found it in a legendary land$se
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                $s${c}Lorem ipsum dolor sit amet,$se
+                consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       VimStateMachine.Mode.SELECT,
       VimStateMachine.SubMode.VISUAL_LINE,
@@ -45,19 +45,19 @@ class SelectEnableLineModeActionHandlerTest : VimTestCase() {
     doTest(
       "gH",
       """
-                A Discovery
+                Lorem Ipsum
 
-                I found it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
+                Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit
+                Sed in orci mauris.
                 hard by the torrent of a mountain pass$c.
       """.trimIndent(),
       """
-                A Discovery
+                Lorem Ipsum
 
-                I found it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
+                Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit
+                Sed in orci mauris.
                 ${s}hard by the torrent of a mountain pass$c.$se
       """.trimIndent(),
       VimStateMachine.Mode.SELECT,
@@ -70,20 +70,20 @@ class SelectEnableLineModeActionHandlerTest : VimTestCase() {
     doTest(
       "gH",
       """
-                A Discovery
+                Lorem Ipsum
                 $c
-                I found it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       """
-                A Discovery
+                Lorem Ipsum
                 $s$c$se
-                I found it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       VimStateMachine.Mode.SELECT,
       VimStateMachine.SubMode.VISUAL_LINE,
@@ -96,20 +96,20 @@ class SelectEnableLineModeActionHandlerTest : VimTestCase() {
     doTest(
       listOf("gH"),
       """
-                A Discovery
+                Lorem Ipsum
                 $c
-                ${c}I found it in a legendary land
-                all rocks and lavender and tufted grass,
+                ${c}Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit
                 where it was ${c}settled on ${c}some sodden sand
-                hard by the torrent of a mountain pass.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       """
-                A Discovery
+                Lorem Ipsum
                 $s$c$se
-                $s${c}I found it in a legendary land$se
-                all rocks and lavender and tufted grass,
+                $s${c}Lorem ipsum dolor sit amet,$se
+                consectetur adipiscing elit
                 ${s}where it was ${c}settled on some sodden sand$se
-                hard by the torrent of a mountain pass.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       VimStateMachine.Mode.SELECT,
       VimStateMachine.SubMode.VISUAL_LINE,

@@ -18,12 +18,12 @@ class UndoActionTest : VimTestCase() {
   fun `test simple undo`() {
     val keys = listOf("dw", "u")
     val before = """
-                A Discovery
+                Lorem Ipsum
 
-                ${c}I found it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                ${c}Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     val after = before
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
@@ -35,12 +35,12 @@ class UndoActionTest : VimTestCase() {
   fun `undo after selection`() {
     val keys = listOf("v3eld", "u")
     val before = """
-                A Discovery
+                Lorem Ipsum
 
-                ${c}I found it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                ${c}Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     val after = before
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
@@ -51,20 +51,20 @@ class UndoActionTest : VimTestCase() {
   fun `test undo with count`() {
     val keys = listOf("dwdwdw", "2u")
     val before = """
-                A Discovery
+                Lorem Ipsum
 
-                ${c}I found it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                ${c}Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     val after = """
-                A Discovery
+                Lorem Ipsum
 
-                ${c}found it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                ${c}ipsum dolor sit amet,
+                consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
     kotlin.test.assertFalse(hasSelection())
@@ -75,20 +75,20 @@ class UndoActionTest : VimTestCase() {
     if (!optionsNoEditor().isSet(IjOptionConstants.oldundo)) {
       val keys = listOf("a1<Esc>ea2<Esc>ea3<Esc>", "uu")
       val before = """
-                A Discovery
+                Lorem Ipsum
 
-                ${c}I found it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                ${c}Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent()
       val after = """
-                A Discovery
+                Lorem Ipsum
 
                 I1 found$c it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent()
       doTest(keys, before, after, VimStateMachine.Mode.COMMAND, VimStateMachine.SubMode.NONE)
       kotlin.test.assertFalse(hasSelection())

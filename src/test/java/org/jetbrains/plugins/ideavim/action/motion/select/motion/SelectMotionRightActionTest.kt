@@ -27,20 +27,20 @@ class SelectMotionRightActionTest : VimTestCase() {
     doTest(
       listOf("viw", "<C-G>", "<Right>"),
       """
-                A Discovery
+                Lorem Ipsum
 
                 I ${c}found it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       """
-                A Discovery
+                Lorem Ipsum
 
                 I found${c} it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
       VimStateMachine.SubMode.NONE,
@@ -53,20 +53,20 @@ class SelectMotionRightActionTest : VimTestCase() {
     doTest(
       listOf("viw", "<C-G>", "<Right>"),
       """
-                A Discovery
+                Lorem Ipsum
 
                 I ${c}found it in a legendary land
-                all rocks and lavender and tufted grass,
+                consectetur adipiscing elit
                 where it was settled on some sodden san${c}d
-                hard by the torrent of a mountain pass.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       """
-                A Discovery
+                Lorem Ipsum
 
                 I found${c} it in a legendary land
-                all rocks and lavender and tufted grass,
+                consectetur adipiscing elit
                 where it was settled on some sodden san${c}d
-                hard by the torrent of a mountain pass.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
       VimStateMachine.SubMode.NONE,
@@ -79,20 +79,20 @@ class SelectMotionRightActionTest : VimTestCase() {
     doTest(
       listOf("viw", "<C-G>", "<Right>"),
       """
-                A Discovery
+                Lorem Ipsum
 
                 I ${c}found it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       """
-                A Discovery
+                Lorem Ipsum
 
                 I ${s}found ${c}${se}it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       VimStateMachine.Mode.SELECT,
       VimStateMachine.SubMode.VISUAL_CHARACTER,

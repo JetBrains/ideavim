@@ -35,7 +35,7 @@ class ScrollFirstScreenLinePageStartActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   @Test
   fun `test scrolls to first non-blank in line`() {
-    configureByLines(100, "    I found it in a legendary land")
+    configureByLines(100, "    Lorem ipsum dolor sit amet,")
     setPositionAndScroll(0, 20)
     typeText("z+")
     assertPosition(35, 4)

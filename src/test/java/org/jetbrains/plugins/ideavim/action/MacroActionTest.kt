@@ -56,17 +56,17 @@ class MacroActionTest : VimTestCase() {
   @Test
   fun `test macro with search`() {
     val content = """
-            A Discovery
+            Lorem Ipsum
 
-            ${c}I found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            ${c}Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     configureByText(content)
-    typeText(injector.parser.parseKeys("qa" + "/rocks<CR>" + "q" + "gg" + "@a"))
+    typeText(injector.parser.parseKeys("qa" + "/consectetur<CR>" + "q" + "gg" + "@a"))
 
-    val startOffset = content.rangeOf("rocks").startOffset
+    val startOffset = content.rangeOf("consectetur").startOffset
 
     waitAndAssert {
       startOffset == fixture.editor.caretModel.offset
@@ -76,12 +76,12 @@ class MacroActionTest : VimTestCase() {
   @Test
   fun `test macro with command`() {
     val content = """
-            A Discovery
+            Lorem Ipsum
 
-            ${c}I found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            ${c}Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     configureByText(content)
     typeText(injector.parser.parseKeys("qa" + ":map x y<CR>" + "q"))
@@ -126,12 +126,12 @@ class MacroActionTest : VimTestCase() {
   // Broken, see the resulting text
   fun `ignore test macro with macro`() {
     val content = """
-            A Discovery
+            Lorem Ipsum
 
-            ${c}I found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            ${c}Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     configureByText(content)
     typeText(injector.parser.parseKeys("qa" + "l" + "q" + "qb" + "10@a" + "q" + "2@b"))
@@ -157,24 +157,24 @@ class MacroActionTest : VimTestCase() {
   @Test
   fun `test stop on error`() {
     val content = """
-            A Discovery
+            Lorem Ipsum
 
-            ${c}I found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            ${c}Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     configureByText(content)
     typeText(injector.parser.parseKeys("qa" + "i1<esc>j" + "q" + "gg" + "10@a"))
 
     assertState(
       """
-            1A Discovery
+            1Lorem Ipsum
             1
-            11I found it in a legendary land
-            1all rocks and lavender and tufted grass,
-            1where it was settled on some sodden sand
-            ${c}1hard by the torrent of a mountain pass.
+            11Lorem ipsum dolor sit amet,
+            1consectetur adipiscing elit
+            1Sed in orci mauris.
+            ${c}1Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
   }

@@ -18,15 +18,15 @@ class MotionInnerBigWordActionTest : VimTestCase() {
     doTest(
       "diW",
       """
-          I found it in a legendary land
-          all rocks and lavender and tufted grass,
-          where it was settled on some sodden sand
+          Lorem ipsum dolor sit amet,
+          consectetur adipiscing elit
+          Sed in orci mauris.
           hard by the torrent of a mountain pass$c.
       """.trimIndent(),
       """
-          I found it in a legendary land
-          all rocks and lavender and tufted grass,
-          where it was settled on some sodden sand
+          Lorem ipsum dolor sit amet,
+          consectetur adipiscing elit
+          Sed in orci mauris.
           hard by the torrent of a mountain$c 
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,

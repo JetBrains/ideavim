@@ -17,12 +17,12 @@ class YankMotionActionTest : VimTestCase() {
   @Test
   fun `test yank till new line`() {
     val file = """
-            A Discovery
+            Lorem Ipsum
 
             I found it in a legendary l${c}and
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     typeTextInFile("yW", file)
     val text = VimPlugin.getRegister().lastRegister?.text ?: kotlin.test.fail()
@@ -33,12 +33,12 @@ class YankMotionActionTest : VimTestCase() {
   @Test
   fun `test yank caret doesn't move`() {
     val file = """
-            A Discovery
+            Lorem Ipsum
 
             I found it in a legendary l${c}and
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     configureByText(file)
 
@@ -90,10 +90,10 @@ class YankMotionActionTest : VimTestCase() {
     val file = """
             A ${c}Discovery
 
-            I found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     typeTextInFile("yk", file)
 
@@ -103,12 +103,12 @@ class YankMotionActionTest : VimTestCase() {
   @Test
   fun `test yank dollar at last empty line`() {
     val file = """
-            A Discovery
+            Lorem Ipsum
 
-            I found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
             $c
     """.trimIndent()
     typeTextInFile("y$", file)
@@ -120,12 +120,12 @@ class YankMotionActionTest : VimTestCase() {
   @Test
   fun `test yank to star with mapping`() {
     val file = """
-            A Discovery
+            Lorem Ipsum
 
             I found it in a ${c}legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     typeTextInFile(commandToKeys("map * *zz"), file)
     typeTextInFile("\"*yiw", file)
@@ -137,12 +137,12 @@ class YankMotionActionTest : VimTestCase() {
   @Test
   fun `test yank to star with yank mapping`() {
     val file = """
-            A Discovery
+            Lorem Ipsum
 
             I found it in a ${c}legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     typeTextInFile(commandToKeys("map * *yiw"), file)
     typeTextInFile("\"*", file)

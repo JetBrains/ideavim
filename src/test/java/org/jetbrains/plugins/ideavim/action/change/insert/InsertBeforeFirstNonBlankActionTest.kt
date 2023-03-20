@@ -18,20 +18,20 @@ class InsertBeforeFirstNonBlankActionTest : VimTestCase() {
     doTest(
       "IHello<esc>",
       """
-                ${c}A Discovery
+                ${c}Lorem Ipsum
 
-                ${c}I found it in a legendary land
-                all rocks and ${c}lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                ${c}Lorem ipsum dolor sit amet,
+                consect${c}etur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       """
-                Hell${c}oA Discovery
+                Hell${c}oLorem Ipsum
 
-                Hell${c}oI found it in a legendary land
-                Hell${c}oall rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                Hell${c}oLorem ipsum dolor sit amet,
+                Hell${c}oconsectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
       VimStateMachine.SubMode.NONE,

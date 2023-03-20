@@ -29,7 +29,7 @@ class ScrollFirstScreenLineActionTest : VimTestCase() {
 
   @Test
   fun `test scroll current line to top of screen and leave cursor in current column`() {
-    configureByLines(100, "    I found it in a legendary land")
+    configureByLines(100, "    Lorem ipsum dolor sit amet,")
     setPositionAndScroll(0, 19, 14)
     typeText("zt")
     assertPosition(19, 14)

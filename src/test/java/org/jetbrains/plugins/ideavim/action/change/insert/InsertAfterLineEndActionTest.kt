@@ -38,20 +38,20 @@ class InsertAfterLineEndActionTest : VimTestCase() {
     doTest(
       "AHello<esc>",
       """
-                ${c}A Discovery
+                ${c}Lorem Ipsum
 
-                ${c}I found it in a legendary land
-                all rocks and ${c}lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                ${c}Lorem ipsum dolor sit amet,
+                consectet${c}ur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       """
-                A DiscoveryHell${c}o
+                Lorem IpsumHell${c}o
 
-                I found it in a legendary landHell${c}o
-                all rocks and lavender and tufted grass,Hell${c}o
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                Lorem ipsum dolor sit amet,Hell${c}o
+                consectetur adipiscing elitHell${c}o
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
       VimStateMachine.SubMode.NONE,

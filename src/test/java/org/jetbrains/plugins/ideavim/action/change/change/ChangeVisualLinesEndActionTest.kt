@@ -20,19 +20,19 @@ class ChangeVisualLinesEndActionTest : VimTestCase() {
   fun `test change last line`() {
     val keys = "VC"
     val before = """
-            A Discovery
+            Lorem Ipsum
 
-            I found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            ${c}hard by the torrent of a mountain pass.
+            Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            ${c}Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     val after = """
-            A Discovery
+            Lorem Ipsum
 
-            I found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
+            Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit
+            Sed in orci mauris.
             ${c}
     """.trimIndent()
     doTest(keys, before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
@@ -42,21 +42,21 @@ class ChangeVisualLinesEndActionTest : VimTestCase() {
   fun `test last empty line`() {
     val keys = "vC"
     val before = """
-            A Discovery
+            Lorem Ipsum
 
-            I found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
             ${c}
     """.trimIndent()
     val after = """
-            A Discovery
+            Lorem Ipsum
 
-            I found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
             ${c}
     """.trimIndent()
     doTest(keys, before, after, VimStateMachine.Mode.INSERT, VimStateMachine.SubMode.NONE)
@@ -64,11 +64,11 @@ class ChangeVisualLinesEndActionTest : VimTestCase() {
 
   @VimBehaviorDiffers(
     originalVimAfter = """
-            A Discovery
+            Lorem Ipsum
 
-            I found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
+            Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit
+            Sed in orci mauris.
             ${c}
   """,
   )
@@ -76,20 +76,20 @@ class ChangeVisualLinesEndActionTest : VimTestCase() {
   fun `test change last two lines`() {
     val keys = "vjC"
     val before = """
-            A Discovery
+            Lorem Ipsum
 
-            I found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
+            Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit
+            Sed in orci mauris.
             hard by the torrent of a mountain pass${c}.
             
     """.trimIndent()
     val after = """
-            A Discovery
+            Lorem Ipsum
 
-            I found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
+            Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit
+            Sed in orci mauris.
             ${c}
             
     """.trimIndent()

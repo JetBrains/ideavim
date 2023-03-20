@@ -23,10 +23,10 @@ import kotlin.test.assertNull
 class DeleteMarksCommandTest : VimTestCase() {
   private fun setUpMarks(marks: String) {
     configureByText(
-      """I found it in a legendary land
-         all rocks and lavender and tufted grass,
-         where it was settled on some sodden sand
-         hard by the torrent of a mountain pass.
+      """Lorem ipsum dolor sit amet,
+         consectetur adipiscing elit
+         Sed in orci mauris.
+         Cras id tellus in ex imperdiet egestas.
 
          The features it combines mark it as new
          to science: shape and shade -- the special tinge,

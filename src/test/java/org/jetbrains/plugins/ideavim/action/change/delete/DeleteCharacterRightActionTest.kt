@@ -38,20 +38,20 @@ class DeleteCharacterRightActionTest : VimTestCase() {
   fun `test deletes min of count and end of line`() {
     val keys = injector.parser.parseKeys("20x")
     val before = """
-            A Discovery
+            Lorem Ipsum
 
             I found it in a legendary l${c}and
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     val after = """
-            A Discovery
+            Lorem Ipsum
 
             I found it in a legendary ${c}l
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     configureByText(before)
     typeText(keys)

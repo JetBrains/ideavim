@@ -20,20 +20,20 @@ class VisualToggleBlockModeActionTest : VimTestCase() {
     doTest(
       "1<C-V>",
       """
-                    A Discovery
+                    Lorem Ipsum
 
                     I ${c}found it in a legendary land
-                    all rocks and lavender and tufted grass,
-                    where it was settled on some sodden sand
-                    hard by the torrent of a mountain pass.
+                    consectetur adipiscing elit
+                    Sed in orci mauris.
+                    Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       """
-                    A Discovery
+                    Lorem Ipsum
 
                     I ${s}${c}f${se}ound it in a legendary land
-                    all rocks and lavender and tufted grass,
-                    where it was settled on some sodden sand
-                    hard by the torrent of a mountain pass.
+                    consectetur adipiscing elit
+                    Sed in orci mauris.
+                    Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       VimStateMachine.Mode.VISUAL,
       VimStateMachine.SubMode.VISUAL_BLOCK,
@@ -45,20 +45,20 @@ class VisualToggleBlockModeActionTest : VimTestCase() {
     doTest(
       "5<C-V>",
       """
-                    A Discovery
+                    Lorem Ipsum
 
                     I ${c}found it in a legendary land
-                    all rocks and lavender and tufted grass,
-                    where it was settled on some sodden sand
-                    hard by the torrent of a mountain pass.
+                    consectetur adipiscing elit
+                    Sed in orci mauris.
+                    Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       """
-                    A Discovery
+                    Lorem Ipsum
 
                     I ${s}foun${c}d${se} it in a legendary land
-                    all rocks and lavender and tufted grass,
-                    where it was settled on some sodden sand
-                    hard by the torrent of a mountain pass.
+                    consectetur adipiscing elit
+                    Sed in orci mauris.
+                    Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       VimStateMachine.Mode.VISUAL,
       VimStateMachine.SubMode.VISUAL_BLOCK,
@@ -70,20 +70,20 @@ class VisualToggleBlockModeActionTest : VimTestCase() {
     doTest(
       "100<C-V>",
       """
-                    A Discovery
+                    Lorem Ipsum
 
                     I ${c}found it in a legendary land
-                    all rocks and lavender and tufted grass,
-                    where it was settled on some sodden sand
-                    hard by the torrent of a mountain pass.
+                    consectetur adipiscing elit
+                    Sed in orci mauris.
+                    Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       """
-                    A Discovery
+                    Lorem Ipsum
 
                     I ${s}found it in a legendary land${c}${se}
-                    all rocks and lavender and tufted grass,
-                    where it was settled on some sodden sand
-                    hard by the torrent of a mountain pass.
+                    consectetur adipiscing elit
+                    Sed in orci mauris.
+                    Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       VimStateMachine.Mode.VISUAL,
       VimStateMachine.SubMode.VISUAL_BLOCK,
@@ -105,12 +105,12 @@ class VisualToggleBlockModeActionTest : VimTestCase() {
   fun `test selectmode option`() {
     configureByText(
       """
-                    A Discovery
+                    Lorem Ipsum
 
                     I${c} found it in a legendary land
-                    all rocks and lavender and tufted grass,
-                    where it was settled on some sodden sand[long line]
-                    hard by the torrent of a mountain pass.
+                    consectetur adipiscing elit
+                    Sed in orci mauris.[long line]
+                    Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
     enterCommand("set selectmode=cmd")

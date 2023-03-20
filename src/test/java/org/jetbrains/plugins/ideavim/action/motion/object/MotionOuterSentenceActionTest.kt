@@ -16,9 +16,9 @@ import org.junit.jupiter.api.Test
 class MotionOuterSentenceActionTest : VimTestCase() {
   @VimBehaviorDiffers(
     originalVimAfter = """
-        I found it in a legendary land
-        all rocks and lavender and tufted grass,
-        where it was settled on some sodden sand
+        Lorem ipsum dolor sit amet,
+        consectetur adipiscing elit
+        Sed in orci mauris.
         $c
     """,
   )
@@ -27,15 +27,15 @@ class MotionOuterSentenceActionTest : VimTestCase() {
     doTest(
       "=as",
       """
-        I found it in a legendary land
-        all rocks and lavender and tufted grass,
-        where it was settled on some sodden sand
+        Lorem ipsum dolor sit amet,
+        consectetur adipiscing elit
+        Sed in orci mauris.
         $c
       """.trimIndent(),
       """
-        ${c}I found it in a legendary land
-        all rocks and lavender and tufted grass,
-        where it was settled on some sodden sand
+        ${c}Lorem ipsum dolor sit amet,
+        consectetur adipiscing elit
+        Sed in orci mauris.
         
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
@@ -45,9 +45,9 @@ class MotionOuterSentenceActionTest : VimTestCase() {
 
   @VimBehaviorDiffers(
     originalVimAfter = """
-        I found it in a legendary land
-        all rocks and lavender and tufted grass,
-        where it was settled on some sodden sand
+        Lorem ipsum dolor sit amet,
+        consectetur adipiscing elit
+        Sed in orci mauris.
         $c
     """,
   )
@@ -56,9 +56,9 @@ class MotionOuterSentenceActionTest : VimTestCase() {
     doTest(
       "das",
       """
-        I found it in a legendary land
-        all rocks and lavender and tufted grass,
-        where it was settled on some sodden sand
+        Lorem ipsum dolor sit amet,
+        consectetur adipiscing elit
+        Sed in orci mauris.
         $c
       """.trimIndent(),
       "\n",

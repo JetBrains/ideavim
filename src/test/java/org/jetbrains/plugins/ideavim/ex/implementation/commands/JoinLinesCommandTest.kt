@@ -21,19 +21,19 @@ class JoinLinesCommandTest : VimTestCase() {
     doTest(
       exCommand("j"),
       """
-                A Discovery
+                Lorem Ipsum
 
-                ${c}I found it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                ${c}Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       """
-                A Discovery
+                Lorem Ipsum
 
-                I found it in a legendary land$c all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                Lorem ipsum dolor sit amet,$c consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
       VimStateMachine.SubMode.NONE,
@@ -46,19 +46,19 @@ class JoinLinesCommandTest : VimTestCase() {
     doTest(
       exCommand("join"),
       """
-                A Discovery
+                Lorem Ipsum
 
-                ${c}I found it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                ${c}Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       """
-                A Discovery
+                Lorem Ipsum
 
-                I found it in a legendary land$c all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                Lorem ipsum dolor sit amet,$c consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
       VimStateMachine.SubMode.NONE,
@@ -71,18 +71,18 @@ class JoinLinesCommandTest : VimTestCase() {
     doTest(
       exCommand("4,6j"),
       """
-                A Discovery
+                Lorem Ipsum
 
-                ${c}I found it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                ${c}Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       """
-                A Discovery
+                Lorem Ipsum
 
-                I found it in a legendary land
-                all rocks and lavender and tufted grass, where it was settled on some sodden sand$c hard by the torrent of a mountain pass.
+                Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit Sed in orci mauris.$c Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       VimStateMachine.Mode.COMMAND,
       VimStateMachine.SubMode.NONE,
@@ -93,22 +93,22 @@ class JoinLinesCommandTest : VimTestCase() {
   fun `test join multicaret`() {
     configureByText(
       """
-                A Discovery
+                Lorem Ipsum
 
-                ${c}I found it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                ${c}Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit
+                Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
     typeText(injector.parser.parseKeys("Vjj"))
     typeText(commandToKeys("join"))
     assertState(
       """
-                A Discovery
+                Lorem Ipsum
 
-                I found it in a legendary land all rocks and lavender and tufted grass,$c where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit$c Sed in orci mauris.
+                Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
   }

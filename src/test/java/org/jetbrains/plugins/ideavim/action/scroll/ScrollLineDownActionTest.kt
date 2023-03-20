@@ -112,7 +112,7 @@ class ScrollLineDownActionTest : VimTestCase() {
 
   @Test
   fun `test scroll last line down at end of file with virtual space`() {
-    configureByLines(100, "    I found it in a legendary land")
+    configureByLines(100, "    Lorem ipsum dolor sit amet,")
     setEditorVirtualSpace()
     setPositionAndScroll(75, 99, 4)
     typeText("<C-E>")
@@ -122,7 +122,7 @@ class ScrollLineDownActionTest : VimTestCase() {
 
   @Test
   fun `test scroll line down at end of file with virtual space and scrolloff`() {
-    configureByLines(100, "    I found it in a legendary land")
+    configureByLines(100, "    Lorem ipsum dolor sit amet,")
     enterCommand("set scrolloff=10")
     setEditorVirtualSpace()
     setPositionAndScroll(75, 95, 4)
