@@ -72,7 +72,7 @@ internal class StatusBarIconFactory : StatusBarWidgetFactory/*, LightEditCompati
   }
 
   override fun createWidget(project: Project): StatusBarWidget {
-    VimPlugin.getOptionGroup().addListener(IjOptions.ideastatusicon.name, { updateAll() })
+    VimPlugin.getOptionGroup().addListener(IjOptions.ideastatusicon, { updateAll() })
     return VimStatusBar()
   }
 

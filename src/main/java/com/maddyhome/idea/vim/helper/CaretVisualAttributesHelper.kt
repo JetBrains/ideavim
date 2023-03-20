@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.options.OptionChangeListener
 import com.maddyhome.idea.vim.options.helpers.GuiCursorMode
 import com.maddyhome.idea.vim.options.helpers.GuiCursorOptionHelper
 import com.maddyhome.idea.vim.options.helpers.GuiCursorType
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import org.jetbrains.annotations.TestOnly
 import java.awt.Color
 
@@ -56,8 +56,8 @@ internal fun Editor.hasBlockOrUnderscoreCaret() = isBlockCursorOverride() ||
     it == GuiCursorType.BLOCK || it == GuiCursorType.HOR
   }
 
-internal object GuicursorChangeListener : OptionChangeListener<VimDataType> {
-  override fun processGlobalValueChange(oldValue: VimDataType?) {
+internal object GuicursorChangeListener : OptionChangeListener<VimString> {
+  override fun processGlobalValueChange(oldValue: VimString?) {
     AttributesCache.clear()
     GuiCursorOptionHelper.clearEffectiveValues()
     localEditors().forEach { it.updatePrimaryCaretVisualAttributes() }

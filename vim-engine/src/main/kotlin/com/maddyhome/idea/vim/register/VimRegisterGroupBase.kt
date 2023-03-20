@@ -71,7 +71,7 @@ public abstract class VimRegisterGroupBase : VimRegisterGroup {
 
   init {
     injector.optionGroup.addListener(
-      Options.clipboard.name,
+      Options.clipboard,
       {
         val clipboardOptionValue = injector.globalOptions().getStringListValues(Options.clipboard)
         defaultRegisterChar = when {

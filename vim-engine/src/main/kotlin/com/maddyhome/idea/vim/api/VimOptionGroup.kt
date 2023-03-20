@@ -61,18 +61,20 @@ public interface VimOptionGroup {
 
   /**
    * Adds a listener to the option.
-   * @param optionName option name or alias
+   * @param option the option
    * @param listener option listener
    * @param executeOnAdd whether execute listener after the method call or not
    */
-  public fun addListener(optionName: String, listener: OptionChangeListener<VimDataType>, executeOnAdd: Boolean = false)
+  public fun <T : VimDataType> addListener(option: Option<T>,
+                                           listener: OptionChangeListener<T>,
+                                           executeOnAdd: Boolean = false)
 
   /**
    * Remove the listener from the option.
-   * @param optionName option name or alias
+   * @param option the option
    * @param listener option listener
    */
-  public fun removeListener(optionName: String, listener: OptionChangeListener<VimDataType>)
+  public fun <T : VimDataType> removeListener(option: Option<T>, listener: OptionChangeListener<T>)
 
   /**
    * Return an accessor class to easily retrieve options values

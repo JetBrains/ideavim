@@ -31,7 +31,6 @@ import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.LocalOptionChangeListener
 import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import kotlin.math.abs
 import kotlin.math.max
@@ -261,8 +260,8 @@ internal class ScrollGroup : VimScrollGroup {
     TOP, MIDDLE, BOTTOM
   }
 
-  object ScrollOptionsChangeListener : LocalOptionChangeListener<VimDataType> {
-    override fun processGlobalValueChange(oldValue: VimDataType?) {
+  object ScrollOptionsChangeListener : LocalOptionChangeListener<VimInt> {
+    override fun processGlobalValueChange(oldValue: VimInt?) {
       for (editor in localEditors()) {
         if (editor.vimEditorGroup) {
           ScrollViewHelper.scrollCaretIntoView(editor)
@@ -270,7 +269,7 @@ internal class ScrollGroup : VimScrollGroup {
       }
     }
 
-    override fun processLocalValueChange(oldValue: VimDataType?, editor: VimEditor) {
+    override fun processLocalValueChange(oldValue: VimInt?, editor: VimEditor) {
       editor.ij.apply {
         if (vimEditorGroup) {
           ScrollViewHelper.scrollCaretIntoView(this)

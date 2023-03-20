@@ -12,7 +12,7 @@ import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.options.OptionChangeListener
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import java.util.regex.Pattern
 
 public object KeywordOptionHelper {
@@ -195,8 +195,8 @@ public object KeywordOptionHelper {
   }
 }
 
-public object KeywordOptionChangeListener : OptionChangeListener<VimDataType> {
-  public override fun processGlobalValueChange(oldValue: VimDataType?) {
+public object KeywordOptionChangeListener : OptionChangeListener<VimString> {
+  public override fun processGlobalValueChange(oldValue: VimString?) {
     KeywordOptionHelper.updateSpecs()
   }
 }

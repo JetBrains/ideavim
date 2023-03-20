@@ -20,7 +20,7 @@ import com.maddyhome.idea.vim.options.OptionChangeListener
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.options.ToggleOption
 import com.maddyhome.idea.vim.statistic.PluginState
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 
 internal object VimExtensionRegistrar : VimExtensionRegistrator {
   internal val registeredExtensions: MutableSet<String> = HashSet()
@@ -62,9 +62,9 @@ internal object VimExtensionRegistrar : VimExtensionRegistrator {
     val option = ToggleOption(name, getAbbrev(name), false)
     VimPlugin.getOptionGroup().addOption(option)
     VimPlugin.getOptionGroup().addListener(
-      name,
-      object : OptionChangeListener<VimDataType> {
-        override fun processGlobalValueChange(oldValue: VimDataType?) {
+      option,
+      object : OptionChangeListener<VimInt> {
+        override fun processGlobalValueChange(oldValue: VimInt?) {
           if (injector.globalOptions().isSet(option)) {
             initExtension(extensionBean, name)
             PluginState.enabledExtensions.add(name)

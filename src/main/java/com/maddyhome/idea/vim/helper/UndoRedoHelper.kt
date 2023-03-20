@@ -31,7 +31,7 @@ import com.maddyhome.idea.vim.undo.UndoRedoBase
 @Service
 internal class UndoRedoHelper : UndoRedoBase() {
   init {
-    injector.optionGroup.addListener(IjOptions.oldundo.name, {
+    injector.optionGroup.addListener(IjOptions.oldundo, {
       UndoManagerImpl.ourNeverAskUser = !injector.globalOptions().isSet(IjOptions.oldundo)
     }, true)
   }
