@@ -15,9 +15,24 @@ import com.maddyhome.idea.vim.options.StringOption
 import com.maddyhome.idea.vim.options.ToggleOption
 import com.maddyhome.idea.vim.options.UnsignedNumberOption
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
 @Suppress("SpellCheckingInspection")
 public object IjOptions {
+
+  /**
+   * Initialise additional actions for [IjOptions]
+   *
+   * This serves two purposes. Firstly, it overrides the default value of `'clipboard'` to support 'ideaput'. It also
+   * means that the properties in this class are initialised at a deterministic time, and the same for [Options], by
+   * calling a function on that class.
+   */
+  public fun initialise() {
+    // The IntelliJ implementation of 'clipboard' supports a new item - `ideaput`, which will use IntelliJ's paste
+    // processors to e.g. convert Java to Kotlin
+    Options.overrideDefaultValue(Options.clipboard, VimString("ideaput,autoselect,exclude:cons\\|linux"))
+  }
+
   public val closenotebooks: ToggleOption = addOption(ToggleOption("closenotebooks", "closenotebooks", true))
   public val ide: StringOption =
     addOption(StringOption("ide", "ide", ApplicationNamesInfo.getInstance().fullProductNameWithEdition))
@@ -67,17 +82,6 @@ public object IjOptions {
   public val trackactionids: ToggleOption = addOption(ToggleOption("trackactionids", "tai", false))
   public val unifyjumps: ToggleOption = addOption(ToggleOption("unifyjumps", "unifyjumps", true))
   public val visualdelay: UnsignedNumberOption = addOption(UnsignedNumberOption("visualdelay", "visualdelay", 100))
-
-  // TODO: Figure out how to nicely override clipboard's default value for the IntelliJ specific ideaput value
-  // This options overrides Vim's default value, so we keep it here
-//    addOption(
-//      StringOption(
-//        OptionConstants.clipboard,
-//        "cb",
-//        "ideaput,autoselect,exclude:cons\\|linux",
-//        isList = true
-//      )
-//    )
 
   // This needs to be Option<out VimDataType> so that it can work with derived option types, such as NumberOption, which
   // derives from Option<VimInt>

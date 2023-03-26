@@ -50,6 +50,16 @@ public object Options {
 
   public fun removeOption(optionName: String): Unit = options.remove(optionName)
 
+  /**
+   * Override the default value of an option
+   *
+   * Use with care! This function is intended for an implementation to provide additional values, such as `'clipboard'`
+   * supporting 'ideaput' to use IntelliJ's paste handlers.
+   */
+  public fun <T : VimDataType> overrideDefaultValue(option: Option<T>, newDefaultValue: T) {
+    option.overrideDefaultValue(newDefaultValue)
+  }
+
   // Simple options, sorted by name
   // Note that we expose options as strongly typed properties to make it easier to consume them. The VimOptionGroup API
   // will return strongly typed VimDataType derived instances if given a strongly typed option, but fetching by name
@@ -240,12 +250,13 @@ public object Options {
       }
   })
 
-  // TODO: Clipboard is special - ideaput should only be defined in the IntelliJ build
+  // Note that IntelliJ overrides clipboard's default value to include the `ideaput` option.
+  // TODO: Technically, we should validate values, but that requires handling exclude, which is irrelevant to us
   public val clipboard: StringOption = addOption(
     StringOption(
       "clipboard",
       "cb",
-      "ideaput,autoselect,exclude:cons\\|linux",
+      "autoselect,exclude:cons\\|linux",
       isList = true
     )
   )
