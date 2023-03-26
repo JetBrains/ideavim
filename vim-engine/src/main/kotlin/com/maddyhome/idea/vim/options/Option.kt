@@ -31,8 +31,17 @@ import java.util.*
  *
  * We also want to avoid a sealed hierarchy, since we create object instances with custom validation for some options.
  */
-public abstract class Option<T : VimDataType>(public val name: String, public val abbrev: String, public open val defaultValue: T) {
+public abstract class Option<T : VimDataType>(public val name: String, public val abbrev: String, defaultValue: T) {
   private val listeners = mutableSetOf<OptionChangeListener<T>>()
+
+  private var defaultValueField = defaultValue
+
+  public open val defaultValue: T
+    get() = defaultValueField
+
+  internal fun overrideDefaultValue(newDefaultValue: T) {
+    defaultValueField = newDefaultValue
+  }
 
   public open fun addOptionChangeListener(listener: OptionChangeListener<T>) {
     listeners.add(listener)

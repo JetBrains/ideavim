@@ -86,6 +86,14 @@ public interface VimOptionGroup {
    * @return An instance of [OptionValueAccessor] to provide easy API to get option values
    */
   public fun getValueAccessor(editor: VimEditor?): OptionValueAccessor
+
+  /**
+   * Override the original default value of the option with an implementation specific value
+   *
+   * This is added specifically for `'clipboard'` to support the `ideaput` value in the IntelliJ implementation.
+   * This function should be used with care!
+   */
+  public fun <T : VimDataType> overrideDefaultValue(option: Option<T>, newDefaultValue: T)
 }
 
 /**

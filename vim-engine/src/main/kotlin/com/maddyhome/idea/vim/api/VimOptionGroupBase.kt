@@ -104,4 +104,9 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
 
   override fun getValueAccessor(editor: VimEditor?): OptionValueAccessor =
     if (editor == null) globalOptionValueAccessor else OptionValueAccessor(this, OptionScope.LOCAL(editor))
+
+
+  final override fun <T : VimDataType> overrideDefaultValue(option: Option<T>, newDefaultValue: T) {
+    option.overrideDefaultValue(newDefaultValue)
+  }
 }
