@@ -16,7 +16,6 @@ public abstract class VimCommandGroupBase : VimCommandGroup {
   public companion object {
     private const val overridePrefix = "!"
   }
-
   private var aliases = HashMap<String, CommandAlias>()
 
   override fun isAlias(command: String): Boolean {

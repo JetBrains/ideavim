@@ -79,11 +79,9 @@ internal var Caret.vimLastColumn: Int
     _vimLastColumn = value
     _vimLastColumnPos = visualPosition
   }
-
 internal fun Caret.resetVimLastColumn() {
   _vimLastColumnPos = null
 }
-
 private var Caret._vimLastColumn: Int by userDataCaretToEditorOr { (this as Caret).inlayAwareVisualColumn }
 private var Caret._vimLastColumnPos: VisualPosition? by userDataCaretToEditor()
 

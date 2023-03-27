@@ -18,8 +18,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
  */
 public interface ExtensionHandler {
   @Deprecated("Please use ExtensionHandler#execute(VimEditor, ExecutionContext, OperatorArguments) instead")
-  public fun execute(editor: VimEditor, context: ExecutionContext) {
-  }
+  public fun execute(editor: VimEditor, context: ExecutionContext) {}
 
   /**
    * Executes the action.

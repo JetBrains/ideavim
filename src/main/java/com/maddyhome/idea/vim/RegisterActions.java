@@ -43,15 +43,13 @@ public class RegisterActions {
     }, VimPlugin.getInstance());
   }
 
-  public static @Nullable
-  EditorActionHandlerBase findAction(@NotNull String id) {
+  public static @Nullable EditorActionHandlerBase findAction(@NotNull String id) {
     return VIM_ACTIONS_EP.getExtensionList(ApplicationManager.getApplication()).stream()
-      .filter(vimActionBean -> vimActionBean.getActionId().equals(id)).findFirst().map(ActionBeanClass::getInstance)
-      .orElse(null);
+        .filter(vimActionBean -> vimActionBean.getActionId().equals(id)).findFirst().map(ActionBeanClass::getInstance)
+        .orElse(null);
   }
 
-  public static @NotNull
-  EditorActionHandlerBase findActionOrDie(@NotNull String id) {
+  public static @NotNull EditorActionHandlerBase findActionOrDie(@NotNull String id) {
     EditorActionHandlerBase action = findAction(id);
     if (action == null) throw new RuntimeException("Action " + id + " is not registered");
     return action;
@@ -67,7 +65,7 @@ public class RegisterActions {
   private static void registerVimCommandActions() {
     KeyGroup parser = VimPlugin.getKey();
     VIM_ACTIONS_EP.getExtensionList(ApplicationManager.getApplication()).stream().map(IjVimActionsInitiator::new)
-      .forEach(parser::registerCommandAction);
+        .forEach(parser::registerCommandAction);
   }
 
   private static void registerEmptyShortcuts() {

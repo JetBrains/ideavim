@@ -17,7 +17,6 @@ import org.antlr.v4.runtime.Recognizer
 
 internal class IdeavimErrorListener : BaseErrorListener() {
   private val logger = logger<IdeavimErrorListener>()
-
   companion object {
     val testLogger = mutableListOf<String>()
   }

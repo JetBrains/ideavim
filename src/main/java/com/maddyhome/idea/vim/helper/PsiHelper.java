@@ -61,7 +61,8 @@ public class PsiHelper {
         index = i;
         if (count > 0) count--;
         break;
-      } else if (navigationOffsets.get(i) == offset) {
+      }
+      else if (navigationOffsets.get(i) == offset) {
         index = i;
         break;
       }
@@ -69,7 +70,8 @@ public class PsiHelper {
     int resultIndex = index + count;
     if (resultIndex < 0) {
       resultIndex = 0;
-    } else if (resultIndex >= navigationOffsets.size()) {
+    }
+    else if (resultIndex >= navigationOffsets.size()) {
       resultIndex = navigationOffsets.size() - 1;
     }
 
@@ -80,7 +82,7 @@ public class PsiHelper {
                                             @NotNull List<Integer> navigationOffsets,
                                             boolean start) {
     if (root instanceof PsiTreeElementBase) {
-      PsiElement element = ((PsiTreeElementBase<?>) root).getValue();
+      PsiElement element = ((PsiTreeElementBase<?>)root).getValue();
       int offset;
       if (start) {
         offset = element.getTextRange().getStartOffset();
@@ -93,7 +95,8 @@ public class PsiHelper {
             offset += braceIndex;
           }
         }
-      } else {
+      }
+      else {
         offset = element.getTextRange().getEndOffset() - 1;
       }
       if (!navigationOffsets.contains(offset)) {
@@ -105,8 +108,7 @@ public class PsiHelper {
     }
   }
 
-  public static @Nullable
-  PsiFile getFile(@NotNull Editor editor) {
+  public static @Nullable PsiFile getFile(@NotNull Editor editor) {
     VirtualFile vf = EditorHelper.getVirtualFile(editor);
     if (vf != null) {
       Project proj = editor.getProject();

@@ -31,7 +31,6 @@ internal class VimJumpServiceImpl : VimJumpServiceBase(), PersistentStateCompone
   companion object {
     private val logger = vimLogger<VimJumpServiceImpl>()
   }
-
   override var lastJumpTimeStamp: Long = 0
 
   override fun includeCurrentCommandAsNavigation(editor: VimEditor) {

@@ -44,7 +44,7 @@ import static com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingI
  *     <li>Then copy the resulting text to another application ("*yie)</li>
  *   </ul>
  * </ul>
- * <p>
+ *
  * See also the reference manual for more details at:
  * https://github.com/kana/vim-textobj-entire/blob/master/doc/textobj-entire.txt
  *
@@ -62,7 +62,7 @@ public class VimTextObjEntireExtension implements VimExtension {
   @Override
   public void init() {
     putExtensionHandlerMapping(MappingMode.XO, VimInjectorKt.getInjector().getParser().parseKeys("<Plug>textobj-entire-a"), getOwner(),
-      new VimTextObjEntireExtension.EntireHandler(false), false);
+                               new VimTextObjEntireExtension.EntireHandler(false), false);
     putExtensionHandlerMapping(MappingMode.XO, VimInjectorKt.getInjector().getParser().parseKeys("<Plug>textobj-entire-i"), getOwner(),
       new VimTextObjEntireExtension.EntireHandler(true), false);
 
@@ -97,12 +97,12 @@ public class VimTextObjEntireExtension implements VimExtension {
                                 int count,
                                 int rawCount,
                                 @Nullable Argument argument) {
-        int start = 0, end = ((IjVimEditor) editor).getEditor().getDocument().getTextLength();
+        int start = 0, end = ((IjVimEditor)editor).getEditor().getDocument().getTextLength();
 
         // for the `ie` text object we don't want leading an trailing spaces
         // so we have to scan the document text to find the correct start & end
         if (ignoreLeadingAndTrailing) {
-          String content = ((IjVimEditor) editor).getEditor().getDocument().getText();
+          String content = ((IjVimEditor)editor).getEditor().getDocument().getText();
           for (int i = 0; i < content.length(); ++i) {
             if (!Character.isWhitespace(content.charAt(i))) {
               start = i;
@@ -151,8 +151,8 @@ public class VimTextObjEntireExtension implements VimExtension {
         });
       } else {
         vimStateMachine.getCommandBuilder().completeCommandPart(new Argument(new Command(count,
-          textObjectHandler, Command.Type.MOTION,
-          EnumSet.noneOf(CommandFlags.class))));
+                                                                                         textObjectHandler, Command.Type.MOTION,
+                                                                                         EnumSet.noneOf(CommandFlags.class))));
       }
     }
   }

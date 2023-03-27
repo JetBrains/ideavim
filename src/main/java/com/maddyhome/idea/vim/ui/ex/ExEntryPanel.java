@@ -145,7 +145,7 @@ public class ExEntryPanel extends JPanel {
     if (!ApplicationManager.getApplication().isUnitTestMode()) {
       JRootPane root = SwingUtilities.getRootPane(parent);
       if (root == null) return;
-      oldGlass = (JComponent) root.getGlassPane();
+      oldGlass = (JComponent)root.getGlassPane();
       oldLayout = oldGlass.getLayout();
       wasOpaque = oldGlass.isOpaque();
       oldGlass.setLayout(null);
@@ -203,7 +203,8 @@ public class ExEntryPanel extends JPanel {
       }
 
       entry.deactivate();
-    } finally {
+    }
+    finally {
 
       // Make sure we hide the UI, especially if something goes wrong
       if (!ApplicationManager.getApplication().isUnitTestMode()) {
@@ -235,13 +236,12 @@ public class ExEntryPanel extends JPanel {
     }
     final ScrollingModel scrollingModel = editor.getScrollingModel();
     if (scrollingModel.getHorizontalScrollOffset() != horizontalOffset ||
-      scrollingModel.getVerticalScrollOffset() != verticalOffset) {
+        scrollingModel.getVerticalScrollOffset() != verticalOffset) {
       scrollingModel.scroll(horizontalOffset, verticalOffset);
     }
   }
 
-  private final @NotNull
-  DocumentListener fontListener = new DocumentAdapter() {
+  private final @NotNull DocumentListener fontListener = new DocumentAdapter() {
     @Override
     protected void textChanged(@NotNull DocumentEvent e) {
       String text = entry.getActualText();
@@ -252,8 +252,7 @@ public class ExEntryPanel extends JPanel {
     }
   };
 
-  private final @NotNull
-  DocumentListener incSearchDocumentListener = new DocumentAdapter() {
+  private final @NotNull DocumentListener incSearchDocumentListener = new DocumentAdapter() {
     @Override
     protected void textChanged(@NotNull DocumentEvent e) {
       final Editor editor = entry.getEditor();
@@ -297,15 +296,15 @@ public class ExEntryPanel extends JPanel {
         final int matchOffset = SearchHighlightsHelper.updateIncsearchHighlights(editor, pattern, forwards, caretOffset, searchRange);
         if (matchOffset != -1) {
           new IjVimCaret(editor.getCaretModel().getPrimaryCaret()).moveToOffset(matchOffset);
-        } else {
+        }
+        else {
           resetCaretOffset(editor);
         }
       }
     }
 
     @Contract("null -> null")
-    private @Nullable
-    Command getIncsearchCommand(@Nullable String commandText) {
+    private @Nullable Command getIncsearchCommand(@Nullable String commandText) {
       if (commandText == null) return null;
       try {
         final Command exCommand = VimscriptParser.INSTANCE.parseCommand(commandText);
@@ -313,7 +312,8 @@ public class ExEntryPanel extends JPanel {
         if (exCommand instanceof SubstituteCommand) {
           return exCommand;
         }
-      } catch (Exception e) {
+      }
+      catch(Exception e) {
         logger.warn("Cannot parse command for incsearch", e);
       }
 
@@ -353,13 +353,11 @@ public class ExEntryPanel extends JPanel {
    *
    * @return The user entered text
    */
-  public @NotNull
-  String getText() {
+  public @NotNull String getText() {
     return entry.getActualText();
   }
 
-  public @NotNull
-  ExTextField getEntry() {
+  public @NotNull ExTextField getEntry() {
     return entry;
   }
 
@@ -412,7 +410,7 @@ public class ExEntryPanel extends JPanel {
     if (parent == null) return;
 
     Container scroll = SwingUtilities.getAncestorOfClass(JScrollPane.class, parent);
-    int height = (int) getPreferredSize().getHeight();
+    int height = (int)getPreferredSize().getHeight();
     if (scroll != null) {
       Rectangle bounds = scroll.getBounds();
       bounds.translate(0, scroll.getHeight() - height);
@@ -432,12 +430,9 @@ public class ExEntryPanel extends JPanel {
   private int count;
 
   // UI stuff
-  private @Nullable
-  JComponent parent;
-  private final @NotNull
-  JLabel label;
-  private final @NotNull
-  ExTextField entry;
+  private @Nullable JComponent parent;
+  private final @NotNull JLabel label;
+  private final @NotNull ExTextField entry;
   private JComponent oldGlass;
   private LayoutManager oldLayout;
   private boolean wasOpaque;
@@ -447,8 +442,7 @@ public class ExEntryPanel extends JPanel {
   private int horizontalOffset;
   private int caretOffset;
 
-  private final @NotNull
-  ComponentListener resizePanelListener = new ComponentAdapter() {
+  private final @NotNull ComponentListener resizePanelListener = new ComponentAdapter() {
     @Override
     public void componentResized(ComponentEvent e) {
       positionPanel();

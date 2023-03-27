@@ -387,8 +387,7 @@ internal class MotionGroup : VimMotionGroupBase() {
         } else if (cmd.action is TextObjectActionHandler) {
           val action = cmd.action as TextObjectActionHandler
           val range =
-            action.getRange(editor.vim, caret.vim, IjEditorExecutionContext(context!!), cnt, raw, cmd.argument)
-              ?: return null
+            action.getRange(editor.vim, caret.vim, IjEditorExecutionContext(context!!), cnt, raw, cmd.argument) ?: return null
           start = range.startOffset
           end = range.endOffset
           if (cmd.isLinewiseMotion()) end--

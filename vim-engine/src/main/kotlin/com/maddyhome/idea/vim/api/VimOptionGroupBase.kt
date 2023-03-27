@@ -52,8 +52,7 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
     NumberOption(OptionConstants.scroll, "scr", 0),
     NumberOption(OptionConstants.scrolloff, "so", 0),
     StringOption(OptionConstants.selection, "sel", "inclusive", isList = false, setOf("old", "inclusive", "exclusive")),
-    StringOption(OptionConstants.shell, "sh", if (injector.systemInfoService.isWindows) "cmd.exe" else System.getenv("SHELL")
-      ?: "sh"),
+    StringOption(OptionConstants.shell, "sh", if (injector.systemInfoService.isWindows) "cmd.exe" else System.getenv("SHELL") ?: "sh"),
     StringOption(OptionConstants.shellxescape, "sxe", if (injector.systemInfoService.isWindows) "\"&|<>()@^" else "", isList = false),
     ToggleOption(OptionConstants.showcmd, "sc", true),
     ToggleOption(OptionConstants.showmode, "smd", true),

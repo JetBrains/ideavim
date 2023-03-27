@@ -84,7 +84,6 @@ internal class IjVimCaret(val caret: Caret) : VimCaretBase() {
     set(value) {
       caret.vimLastColumn = value
     }
-
   override fun resetLastColumn() = caret.resetVimLastColumn()
   override val selectionStart: Int
     get() = caret.selectionStart

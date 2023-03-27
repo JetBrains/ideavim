@@ -49,8 +49,7 @@ import static com.maddyhome.idea.vim.helper.CaretVisualAttributesHelperKt.update
  */
 @State(name = "VimEditorSettings", storages = {@Storage(value = "$APP_CONFIG$/vim_settings.xml")})
 public class EditorGroup implements PersistentStateComponent<Element>, VimEditorGroup {
-  public static final @NonNls
-  String EDITOR_STORE_ELEMENT = "editor";
+  public static final @NonNls String EDITOR_STORE_ELEMENT = "editor";
 
   private Boolean isKeyRepeat = null;
 
@@ -126,7 +125,8 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
       if (!hasRelativeLineNumbersInstalled(editor)) {
         installRelativeLineNumbers(editor);
       }
-    } else if (hasRelativeLineNumbersInstalled(editor)) {
+    }
+    else if (hasRelativeLineNumbersInstalled(editor)) {
       removeRelativeLineNumbers(editor);
     }
   }
@@ -192,8 +192,7 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
     }
   }
 
-  public @Nullable
-  Boolean isKeyRepeat() {
+  public @Nullable Boolean isKeyRepeat() {
     return isKeyRepeat;
   }
 
@@ -215,8 +214,8 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
     initLineNumbers(editor);
     // Turn on insert mode if editor doesn't have any file
     if (!EditorHelper.isFileEditor(editor) &&
-      editor.getDocument().isWritable() &&
-      !CommandStateHelper.inInsertMode(editor)) {
+        editor.getDocument().isWritable() &&
+        !CommandStateHelper.inInsertMode(editor)) {
       ExecutionContext.Editor context = injector.getExecutionContextManager().onEditor(new IjVimEditor(editor), null);
       VimPlugin.getChange().insertBeforeCursor(new IjVimEditor(editor), context);
       KeyHandler.getInstance().reset(new IjVimEditor(editor));
@@ -277,7 +276,7 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
 
     @Override
     public void processLocalValueChange(@Nullable VimDataType oldValue, @NotNull VimEditor editor) {
-      Editor ijEditor = ((IjVimEditor) editor).getEditor();
+      Editor ijEditor = ((IjVimEditor)editor).getEditor();
 
       if (UserDataManager.getVimEditorGroup(ijEditor) && supportsVimLineNumbers(ijEditor)) {
         updateLineNumbers(ijEditor);
@@ -294,7 +293,8 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
       // lineNumber is 1 based
       if (number && (lineNumber - 1) == caretLine) {
         return lineNumber;
-      } else {
+      }
+      else {
         final int visualLine = new IjVimEditor(editor).bufferLineToVisualLine(lineNumber - 1);
         final int currentVisualLine = new IjVimEditor(editor).bufferLineToVisualLine(caretLine);
         return Math.abs(currentVisualLine - visualLine);

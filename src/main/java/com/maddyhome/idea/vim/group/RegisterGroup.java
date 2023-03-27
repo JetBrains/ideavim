@@ -57,7 +57,8 @@ public class RegisterGroup extends VimRegisterGroupBase implements PersistentSta
         final Element textElement = new Element("text");
         VimPlugin.getXML().setSafeXmlText(textElement, text);
         registerElement.addContent(textElement);
-      } else {
+      }
+      else {
         logger.trace("Save register as 'keys'");
         final Element keys = new Element("keys");
         final List<KeyStroke> list = register.getKeys();
@@ -101,11 +102,13 @@ public class RegisterGroup extends VimRegisterGroupBase implements PersistentSta
           if (text != null) {
             logger.trace("Register data parsed");
             register = new Register(key, type, text, Collections.emptyList());
-          } else {
+          }
+          else {
             logger.trace("Cannot parse register data");
             register = null;
           }
-        } else {
+        }
+        else {
           logger.trace("Register has 'keys' element");
           final Element keysElement = registerElement.getChild("keys");
           final List<Element> keyElements = keysElement.getChildren("key");
@@ -113,11 +116,11 @@ public class RegisterGroup extends VimRegisterGroupBase implements PersistentSta
           for (Element keyElement : keyElements) {
             final int code = Integer.parseInt(keyElement.getAttributeValue("code"));
             final int modifiers = Integer.parseInt(keyElement.getAttributeValue("mods"));
-            final char c = (char) Integer.parseInt(keyElement.getAttributeValue("char"));
+            final char c = (char)Integer.parseInt(keyElement.getAttributeValue("char"));
             //noinspection MagicConstant
             strokes.add(c == KeyEvent.CHAR_UNDEFINED ?
-              KeyStroke.getKeyStroke(code, modifiers) :
-              KeyStroke.getKeyStroke(c));
+                        KeyStroke.getKeyStroke(code, modifiers) :
+                        KeyStroke.getKeyStroke(c));
           }
           register = new Register(key, type, strokes);
         }

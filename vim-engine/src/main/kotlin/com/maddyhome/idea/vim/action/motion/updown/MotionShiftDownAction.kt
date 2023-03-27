@@ -33,8 +33,7 @@ public class MotionShiftDownAction : ShiftedArrowKeyHandler(false) {
       }
 
       is Motion.AbsoluteOffset -> caret.moveToOffset(vertical.offset)
-      is Motion.NoMotion -> {
-      }
+      is Motion.NoMotion -> {}
       is Motion.Error -> injector.messages.indicateError()
     }
   }
