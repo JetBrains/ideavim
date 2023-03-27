@@ -89,7 +89,7 @@ public class ExDocument extends PlainDocument {
     if (attribute instanceof AttributedString as) {
       final Map<AttributedCharacterIterator.Attribute, Object> attributes = as.getIterator().getAttributes();
       if (!attributes.containsKey(TextAttribute.INPUT_METHOD_HIGHLIGHT) &&
-          !attributes.containsKey(TextAttribute.INPUT_METHOD_UNDERLINE)) {
+        !attributes.containsKey(TextAttribute.INPUT_METHOD_UNDERLINE)) {
         as.addAttribute(TextAttribute.INPUT_METHOD_HIGHLIGHT, InputMethodHighlight.UNSELECTED_CONVERTED_TEXT_HIGHLIGHT);
       }
     }

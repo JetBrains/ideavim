@@ -45,7 +45,7 @@ class Editor(
     get() = callJs("component.getEditor().getCaretModel().getOffset()", runInEdt = true)
 
   val isBlockCursor: Boolean
-//    get() = callJs("component.getEditor().getSettings().isBlockCursor()", true)
+    //    get() = callJs("component.getEditor().getSettings().isBlockCursor()", true)
     // Doesn't work at the moment because remote robot can't resolve classes from a plugin classloader
     get() = callJs("com.maddyhome.idea.vim.helper.CaretVisualAttributesHelperKt.hasBlockOrUnderscoreCaret(component.getEditor())", true)
 

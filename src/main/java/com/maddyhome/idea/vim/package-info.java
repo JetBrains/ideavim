@@ -8,13 +8,13 @@
 
 /**
  * IdeaVim command index.
- *
- *
+ * <p>
+ * <p>
  * 1. Insert mode
- *
+ * <p>
  * tag                    action
  * -------------------------------------------------------------------------------------------------------------------
- *
+ * <p>
  * |i_CTRL-@|             {@link com.maddyhome.idea.vim.action.change.insert.InsertPreviousInsertExitAction}
  * |i_CTRL-A|             {@link com.maddyhome.idea.vim.action.change.insert.InsertPreviousInsertAction}
  * |i_CTRL-C|             {@link com.maddyhome.idea.vim.action.change.insert.InsertExitModeAction}
@@ -80,13 +80,13 @@
  * |i_<F1>|               IntelliJ help
  * |i_<Insert>|           IntelliJ editor toggle insert/replace
  * |i_CTRL-X_index|       TO BE IMPLEMENTED
- *
- *
+ * <p>
+ * <p>
  * 2. Normal mode
- *
+ * <p>
  * tag                    action
  * -------------------------------------------------------------------------------------------------------------------
- *
+ * <p>
  * |CTRL-A|               {@link com.maddyhome.idea.vim.action.change.change.number.ChangeNumberIncAction}
  * |CTRL-B|               {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollPageUpAction}
  * |CTRL-C|               TO BE IMPLEMENTED
@@ -241,18 +241,18 @@
  * |<S-Home>|             {@link com.maddyhome.idea.vim.action.motion.leftright.MotionShiftHomeAction}
  * |<S-End>|              {@link com.maddyhome.idea.vim.action.motion.leftright.MotionShiftEndAction}
  * |<Up>|                 {@link com.maddyhome.idea.vim.action.motion.updown.MotionArrowUpAction}
- *
- *
+ * <p>
+ * <p>
  * 2.1. Text objects
- *
+ * <p>
  * Text object commands are listed in the visual mode section.
- *
- *
+ * <p>
+ * <p>
  * 2.2. Window commands
- *
+ * <p>
  * tag                    action
  * -------------------------------------------------------------------------------------------------------------------
- *
+ * <p>
  * |CTRL-W_+|             TO BE IMPLEMENTED
  * |CTRL-W_-|             TO BE IMPLEMENTED
  * |CTRL-W_<|             TO BE IMPLEMENTED
@@ -305,10 +305,10 @@
  * |CTRL-W_CTRL-J|        {@link com.maddyhome.idea.vim.action.window.WindowDownAction}
  * |CTRL-W_CTRL-K|        {@link com.maddyhome.idea.vim.action.window.WindowUpAction}
  * |CTRL-W_CTRL-L|        {@link com.maddyhome.idea.vim.action.window.WindowRightAction}
- *
- *
+ * <p>
+ * <p>
  * 2.3. Square bracket commands
- *
+ * <p>
  * tag                    action
  * -------------------------------------------------------------------------------------------------------------------
  * |[_CTRL-D|             TO BE IMPLEMENTED
@@ -361,13 +361,13 @@
  * |]s|                   TO BE IMPLEMENTED
  * |]z|                   TO BE IMPLEMENTED
  * |]}|                   {@link com.maddyhome.idea.vim.action.motion.text.MotionUnmatchedBraceCloseAction}
- *
- *
+ * <p>
+ * <p>
  * 2.4. Commands starting with 'g'
- *
+ * <p>
  * tag                    action
  * -------------------------------------------------------------------------------------------------------------------
- *
+ * <p>
  * |g_CTRL-A|             not applicable
  * |g_CTRL-G|             {@link com.maddyhome.idea.vim.action.file.FileGetLocationInfoAction}
  * |g_CTRL-H|             {@link com.maddyhome.idea.vim.action.motion.select.SelectEnableBlockModeAction}
@@ -434,10 +434,10 @@
  * |g<End>|               {@link com.maddyhome.idea.vim.action.motion.leftright.MotionLastScreenColumnAction}
  * |g<Home>|              {@link com.maddyhome.idea.vim.action.motion.leftright.MotionFirstScreenColumnAction}
  * |g<Up>|                {@link com.maddyhome.idea.vim.action.motion.updown.MotionUpNotLineWiseAction}
- *
- *
+ * <p>
+ * <p>
  * 2.5. Commands starting with 'z'
- *
+ * <p>
  * tag                    action
  * -------------------------------------------------------------------------------------------------------------------
  * |z<CR>|                {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollFirstScreenLineStartAction}
@@ -484,13 +484,13 @@
  * |zz|                   {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollMiddleScreenLineAction}
  * |z<Left>|              {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollColumnRightAction}
  * |z<Right>|             {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollColumnLeftAction}
- *
- *
+ * <p>
+ * <p>
  * 3. Visual mode
- *
+ * <p>
  * tag                    action
  * -------------------------------------------------------------------------------------------------------------------
- *
+ * <p>
  * |v_CTRL-\_CTRL-N|      {@link com.maddyhome.idea.vim.action.motion.visual.VisualExitModeAction}
  * |v_CTRL-\_CTRL-G|      TO BE IMPLEMENTED
  * |v_CTRL-A|             {@link com.maddyhome.idea.vim.action.change.change.number.ChangeVisualNumberIncAction}
@@ -578,10 +578,10 @@
  * |v_~|                  {@link com.maddyhome.idea.vim.action.change.change.ChangeCaseToggleVisualAction}
  * |v_`|                  {@link com.maddyhome.idea.vim.action.motion.mark.MotionGotoFileMarkAction}
  * |v_'|                  {@link com.maddyhome.idea.vim.action.motion.mark.MotionGotoFileMarkLineAction}
- *
- *
+ * <p>
+ * <p>
  * 4. Select mode
- *
+ * <p>
  * tag                    action
  * -------------------------------------------------------------------------------------------------------------------
  * |<BS>|                 {@link com.maddyhome.idea.vim.action.motion.select.SelectDeleteAction}
@@ -597,12 +597,12 @@
  * |<Left>|               {@link com.maddyhome.idea.vim.action.motion.select.motion.SelectMotionLeftAction}
  * |<Right>|              {@link com.maddyhome.idea.vim.action.motion.select.motion.SelectMotionRightAction}
  * |<Up>|                 {@link com.maddyhome.idea.vim.action.motion.updown.MotionArrowUpAction}
- *
+ * <p>
  * 5. Command line editing
- *
+ * <p>
  * tag                    action
  * -------------------------------------------------------------------------------------------------------------------
- *
+ * <p>
  * |c_CTRL-A|             TO BE IMPLEMENTED
  * |c_CTRL-B|             {@link javax.swing.text.DefaultEditorKit#beginLineAction}
  * |c_CTRL-C|             {@link com.maddyhome.idea.vim.ui.ex.CancelEntryAction}
@@ -665,13 +665,13 @@
  * |c_digraph|            {char1} <BS> {char2}
  * |c_wildchar|           TO BE IMPLEMENTED
  * |'cedit'|              TO BE IMPLEMENTED
- *
- *
+ * <p>
+ * <p>
  * 6. Ex commands
- *
+ * <p>
  * tag                    handler
  * -------------------------------------------------------------------------------------------------------------------
- *
+ * <p>
  * |:map|                 {@link com.maddyhome.idea.vim.vimscript.model.commands.mapping.MapCommand}
  * |:nmap|                ...
  * |:vmap|                ...
@@ -696,12 +696,12 @@
  * |:delcommand|          {@link com.maddyhome.idea.vim.vimscript.model.commands.DelCmdCommand}
  * |:comclear|            {@link com.maddyhome.idea.vim.vimscript.model.commands.CmdClearCommand}
  * ...
- *
+ * <p>
  * The list of supported Ex commands is incomplete.
- *
- *
+ * <p>
+ * <p>
  * A. Misc commands
- *
+ * <p>
  * tag                    handler
  * -------------------------------------------------------------------------------------------------------------------
  * |]b|                   {@link com.maddyhome.idea.vim.action.motion.text.MotionCamelEndLeftAction}
@@ -710,8 +710,8 @@
  * |[w|                   {@link com.maddyhome.idea.vim.action.motion.text.MotionCamelRightAction}
  * |g(|                   {@link com.maddyhome.idea.vim.action.motion.text.MotionSentencePreviousEndAction}
  * |g)|                   {@link com.maddyhome.idea.vim.action.motion.text.MotionSentenceNextEndAction}
- *
- *
+ * <p>
+ * <p>
  * See also :help index.
  *
  * @author vlan

@@ -59,7 +59,7 @@ public class MarkGroup {
 
   @Nullable
   public Mark createSystemMark(char ch, int line, int col, @NotNull VimEditor editor) {
-    Editor ijEditor = ((IjVimEditor)editor).getEditor();
+    Editor ijEditor = ((IjVimEditor) editor).getEditor();
     @Nullable LineBookmark systemMark = SystemMarks.createOrGetSystemMark(ch, line, ijEditor);
     if (systemMark == null) {
       return null;

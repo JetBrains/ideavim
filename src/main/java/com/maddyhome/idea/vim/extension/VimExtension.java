@@ -18,10 +18,12 @@ import org.jetbrains.annotations.NotNull;
  * @author vlan
  */
 public interface VimExtension {
-  @NotNull ExtensionPointName<ExtensionBeanClass> EP_NAME = ExtensionPointName.create("IdeaVIM.vimExtension");
+  @NotNull
+  ExtensionPointName<ExtensionBeanClass> EP_NAME = ExtensionPointName.create("IdeaVIM.vimExtension");
 
   @VimNlsSafe
-  @NotNull String getName();
+  @NotNull
+  String getName();
 
   default MappingOwner getOwner() {
     return MappingOwner.Plugin.Companion.get(getName());

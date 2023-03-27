@@ -42,7 +42,8 @@ public class EditorHelper {
   // Code Vision)
   private static final int BLOCK_INLAY_MAX_LINE_HEIGHT = 3;
 
-  public static @NotNull Rectangle getVisibleArea(final @NotNull Editor editor) {
+  public static @NotNull
+  Rectangle getVisibleArea(final @NotNull Editor editor) {
     return editor.getScrollingModel().getVisibleAreaOnScrollingFinished();
   }
 
@@ -84,7 +85,7 @@ public class EditorHelper {
     // (either because it's too short, or it's been scrolled up)
     final Rectangle visibleArea = getVisibleArea(editor);
     return getFullVisualLine(editor, visibleArea.y + visibleArea.height, visibleArea.y,
-                             visibleArea.y + visibleArea.height);
+      visibleArea.y + visibleArea.height);
   }
 
   public static int getVisualLineAtBottomOfScreen(final @NotNull Editor editor) {
@@ -155,7 +156,7 @@ public class EditorHelper {
    * @return The number of screen columns
    */
   public static int getApproximateScreenWidth(final @NotNull Editor editor) {
-    return (int)(getVisibleArea(editor).width / getPlainSpaceWidthFloat(editor));
+    return (int) (getVisibleArea(editor).width / getPlainSpaceWidthFloat(editor));
   }
 
   /**
@@ -194,7 +195,7 @@ public class EditorHelper {
   public static int getVisualColumnAtRightOfDisplay(final @NotNull Editor editor, int visualLine) {
     final Rectangle area = getVisibleArea(editor);
     return getFullVisualColumn(editor, area.x + area.width - 1, editor.visualLineToY(visualLine), area.x,
-                               area.x + area.width);
+      area.x + area.width);
   }
 
   /**
@@ -203,7 +204,8 @@ public class EditorHelper {
    * @param file The virtual file get the editor for
    * @return The matching editor or null if no match was found
    */
-  public static @Nullable Editor getEditor(final @Nullable VirtualFile file) {
+  public static @Nullable
+  Editor getEditor(final @Nullable VirtualFile file) {
     if (file == null) {
       return null;
     }
@@ -220,10 +222,11 @@ public class EditorHelper {
     return null;
   }
 
-  public static @NotNull String pad(final @NotNull Editor editor,
-                                    @NotNull DataContext context,
-                                    int line,
-                                    final int to) {
+  public static @NotNull
+  String pad(final @NotNull Editor editor,
+             @NotNull DataContext context,
+             int line,
+             final int to) {
     final int len = EngineEditorHelperKt.lineLength(new IjVimEditor(editor), line);
     if (len >= to) return "";
 
@@ -236,7 +239,8 @@ public class EditorHelper {
    *
    * @param editor The editor from which the carets are taken
    */
-  public static @NotNull List<Caret> getOrderedCaretsList(@NotNull Editor editor) {
+  public static @NotNull
+  List<Caret> getOrderedCaretsList(@NotNull Editor editor) {
     @NotNull List<Caret> carets = editor.getCaretModel().getAllCarets();
 
     carets.sort(Comparator.comparingInt(Caret::getOffset));
@@ -275,8 +279,7 @@ public class EditorHelper {
     int inlayOffset = 0;
     if (topInlayHeight > caretScreenOffset) {
       inlayOffset = topInlayHeight;
-    }
-    else if (bottomInlayHeight > visibleArea.height - caretScreenOffset + editor.getLineHeight()) {
+    } else if (bottomInlayHeight > visibleArea.height - caretScreenOffset + editor.getLineHeight()) {
       inlayOffset = -bottomInlayHeight;
     }
 
@@ -343,8 +346,7 @@ public class EditorHelper {
     // screen
     if (!allowVirtualSpace && offset > offsetForLastLineAtBottom) {
       scrollVertically(editor, offsetForLastLineAtBottom);
-    }
-    else {
+    } else {
       scrollVertically(editor, offset);
     }
   }
@@ -395,8 +397,7 @@ public class EditorHelper {
     Inlay<?> inlay = editor.getInlayModel().getInlineElementAt(new VisualPosition(visualLine, visualColumn));
     if (inlay != null && inlay.isRelatedToPrecedingText()) {
       targetVisualColumn = visualColumn + 1;
-    }
-    else if (visualColumn > 0) {
+    } else if (visualColumn > 0) {
       inlay = editor.getInlayModel().getInlineElementAt(new VisualPosition(visualLine, visualColumn - 1));
       if (inlay != null && !inlay.isRelatedToPrecedingText()) {
         targetVisualColumn = visualColumn - 1;
@@ -430,8 +431,7 @@ public class EditorHelper {
     Inlay<?> inlay = editor.getInlayModel().getInlineElementAt(new VisualPosition(visualLine, visualColumn));
     if (inlay != null && !inlay.isRelatedToPrecedingText()) {
       targetVisualColumn = visualColumn - 1;
-    }
-    else {
+    } else {
       // If the target column is followed by an inlay which is associated with it, make the inlay the target column so
       // it is visible
       inlay = editor.getInlayModel().getInlineElementAt(new VisualPosition(visualLine, visualColumn + 1));
@@ -449,8 +449,8 @@ public class EditorHelper {
   /**
    * Scroll page down, moving text up.
    *
-   * @param editor  The editor to scroll
-   * @param pages   How many pages to scroll
+   * @param editor The editor to scroll
+   * @param pages  How many pages to scroll
    * @return A pair consisting of a flag to show if scrolling was completed, and a visual line to position the cart on
    */
   public static Pair<Boolean, Integer> scrollFullPageDown(final @NotNull Editor editor, int pages) {
@@ -471,8 +471,7 @@ public class EditorHelper {
         // If we're on the last page, end nicely on the last line, otherwise move the caret to the last line of the file
         if (i == pages - 1) {
           caretVisualLine = lastVisualLine;
-        }
-        else {
+        } else {
           @NotNull final VimEditor editor1 = new IjVimEditor(editor);
           caretVisualLine = EngineEditorHelperKt.getVisualLineCount(editor1) - 1;
           completed = false;
@@ -501,8 +500,8 @@ public class EditorHelper {
   /**
    * Scroll page up, moving text down.
    *
-   * @param editor  The editor to scroll
-   * @param pages   How many pages to scroll
+   * @param editor The editor to scroll
+   * @param pages  How many pages to scroll
    * @return A pair consisting of a flag to show if scrolling was completed, and a visual line to position the cart on
    */
   public static Pair<Boolean, Integer> scrollFullPageUp(final @NotNull Editor editor, int pages) {
@@ -524,8 +523,7 @@ public class EditorHelper {
       if (targetBottomVisualLine == 1) {
         completed = i == pages - 1;
         break;
-      }
-      else if (targetBottomVisualLine == lastVisualLine) {
+      } else if (targetBottomVisualLine == lastVisualLine) {
         // Vim normally scrolls up window height minus two. When there are only one or two lines in the screen, due to
         // end of file and virtual space, it scrolls window height minus one, or just plain windows height. IntelliJ
         // doesn't allow us only one line when virtual space is enabled, so we only need to handle the two line case.
@@ -551,8 +549,7 @@ public class EditorHelper {
     int yActual = editor.visualLineToY(line);
     if (yActual < topBound) {
       line++;
-    }
-    else if (yActual + editor.getLineHeight() > bottomBound) {
+    } else if (yActual + editor.getLineHeight() > bottomBound) {
       line--;
     }
     return line;
@@ -583,8 +580,7 @@ public class EditorHelper {
       }
 
       return getPreviousNonInlayVisualPosition(editor, closestVisualPosition).column;
-    }
-    else {
+    } else {
       return getNextNonInlayVisualPosition(editor, closestVisualPosition).column;
     }
   }
@@ -617,7 +613,8 @@ public class EditorHelper {
    * @param editor The editor
    * @return The virtual file for the editor
    */
-  public static @Nullable VirtualFile getVirtualFile(@NotNull Editor editor) {
+  public static @Nullable
+  VirtualFile getVirtualFile(@NotNull Editor editor) {
     return FileDocumentManager.getInstance().getFile(editor.getDocument());
   }
 

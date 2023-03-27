@@ -201,6 +201,7 @@ public abstract class VimSearchHelperBase : VimSearchHelper {
       }
       return res
     }
+
     public fun findNextWordEnd(
       chars: CharSequence,
       pos: Int,

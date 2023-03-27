@@ -23,7 +23,8 @@ internal class VimscriptState : ApplicationUsagesCollector() {
     return setOf(
       VIMSCRIPT.metric(
         SOURCED_FILES with sourcedFiles.size,
-        IDEAVIMRC_SIZE with (VimRcService.findIdeaVimRc()?.readLines()?.filter { !it.matches(Regex("\\s*\".*")) && it.isNotBlank() }?.size ?: -1),
+        IDEAVIMRC_SIZE with (VimRcService.findIdeaVimRc()?.readLines()?.filter { !it.matches(Regex("\\s*\".*")) && it.isNotBlank() }?.size
+          ?: -1),
         EXTENSIONS_ENABLED_BY_SET with (PluginState.enabledExtensions - extensionsEnabledWithPlug).toList(),
         EXTENSIONS_ENABLED_BY_PLUG with extensionsEnabledWithPlug.toList(),
         IS_IDE_SPECIFIC_CONFIGURATION_USED with isIDESpecificConfigurationUsed,

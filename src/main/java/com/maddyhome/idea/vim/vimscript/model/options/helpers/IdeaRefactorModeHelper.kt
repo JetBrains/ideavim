@@ -29,6 +29,7 @@ internal object IdeaRefactorModeHelper {
 
   fun keepMode() =
     injector.globalOptions().hasValue(IjOptionConstants.idearefactormode, IjOptionConstants.idearefactormode_keep)
+
   fun selectMode() =
     injector.globalOptions().hasValue(IjOptionConstants.idearefactormode, IjOptionConstants.idearefactormode_select)
 

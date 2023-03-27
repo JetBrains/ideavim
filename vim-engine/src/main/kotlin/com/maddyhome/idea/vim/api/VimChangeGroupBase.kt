@@ -178,7 +178,8 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
       val startOffsets = updatedRange.startOffsets
       val endOffsets = updatedRange.endOffsets
       for (i in updatedRange.size() - 1 downTo 0) {
-        val (newRange, _) = editor.search(startOffsets[i].offset to endOffsets[i].offset, editor, LineDeleteShift.NL_ON_END) ?: continue
+        val (newRange, _) = editor.search(startOffsets[i].offset to endOffsets[i].offset, editor, LineDeleteShift.NL_ON_END)
+          ?: continue
         editor.deleteString(TextRange(newRange.first.point, newRange.second.point))
       }
       if (type != null) {

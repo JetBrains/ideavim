@@ -47,7 +47,8 @@ import static java.lang.Math.*;
  */
 public class ExTextField extends JTextField {
 
-  public static final @NonNls String KEYMAP_NAME = "ex";
+  public static final @NonNls
+  String KEYMAP_NAME = "ex";
 
   public boolean useHandleKeyFromEx = true;
 
@@ -141,7 +142,7 @@ public class ExTextField extends JTextField {
 
   /**
    * Stores the current text for use in filtering history. Required for scrolling through multiple history entries
-   *
+   * <p>
    * Called whenever the text is changed, either by typing, or by special characters altering the text (e.g. Delete)
    */
   void saveLastEntry() {
@@ -161,8 +162,7 @@ public class ExTextField extends JTextField {
         String txt;
         if (i == history.size()) {
           txt = lastEntry;
-        }
-        else {
+        } else {
           HistoryEntry entry = history.get(i);
           txt = entry.getEntry();
         }
@@ -176,14 +176,12 @@ public class ExTextField extends JTextField {
       }
 
       VimPlugin.indicateError();
-    }
-    else {
+    } else {
       histIndex += dir;
       String txt;
       if (histIndex == history.size()) {
         txt = lastEntry;
-      }
-      else {
+      } else {
         HistoryEntry entry = history.get(histIndex);
         txt = entry.getEntry();
       }
@@ -256,8 +254,7 @@ public class ExTextField extends JTextField {
     // dispatch to ExEntryPanel#handleKey and if it's processed, mark the event as consumed.
     if (currentAction != null) {
       currentAction.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, String.valueOf(c), modifiers));
-    }
-    else {
+    } else {
       KeyEvent event = new KeyEvent(this, keyChar != KeyEvent.CHAR_UNDEFINED ? KeyEvent.KEY_TYPED :
         (stroke.isOnKeyRelease() ? KeyEvent.KEY_RELEASED : KeyEvent.KEY_PRESSED),
         (new Date()).getTime(), modifiers, keyCode, c);
@@ -265,7 +262,7 @@ public class ExTextField extends JTextField {
       useHandleKeyFromEx = false;
       try {
         super.processKeyEvent(event);
-      }finally {
+      } finally {
         useHandleKeyFromEx = true;
       }
     }
@@ -285,7 +282,8 @@ public class ExTextField extends JTextField {
    * @return the default model implementation
    */
   @Override
-  protected @NotNull Document createDefaultModel() {
+  protected @NotNull
+  Document createDefaultModel() {
     return new ExDocument();
   }
 
@@ -295,8 +293,7 @@ public class ExTextField extends JTextField {
   void escape() {
     if (currentAction != null) {
       clearCurrentAction();
-    }
-    else {
+    } else {
       cancel();
     }
   }
@@ -324,7 +321,7 @@ public class ExTextField extends JTextField {
 
   /**
    * Text to show while composing a digraph or inserting a literal or register
-   *
+   * <p>
    * The prompt character is inserted directly into the text of the text field, rather than drawn over the top of the
    * current character. When the action has been completed, the new character(s) are either inserted or overwritten,
    * depending on the insert/overwrite status of the text field. This mimics Vim's behaviour.
@@ -363,7 +360,7 @@ public class ExTextField extends JTextField {
   }
 
   private void setInsertMode() {
-    ExDocument doc = (ExDocument)getDocument();
+    ExDocument doc = (ExDocument) getDocument();
     if (doc.isOverwrite()) {
       doc.toggleInsertReplace();
     }
@@ -371,7 +368,7 @@ public class ExTextField extends JTextField {
   }
 
   void toggleInsertReplace() {
-    ExDocument doc = (ExDocument)getDocument();
+    ExDocument doc = (ExDocument) getDocument();
     doc.toggleInsertReplace();
     resetCaret();
   }
@@ -379,13 +376,11 @@ public class ExTextField extends JTextField {
   private void resetCaret() {
     if (getCaretPosition() == super.getText().length() || currentActionPromptCharacterOffset == super.getText().length() - 1) {
       setNormalModeCaret();
-    }
-    else {
-      ExDocument doc = (ExDocument)getDocument();
+    } else {
+      ExDocument doc = (ExDocument) getDocument();
       if (doc.isOverwrite()) {
         setReplaceModeCaret();
-      }
-      else {
+      } else {
         setInsertModeCaret();
       }
     }
@@ -480,21 +475,19 @@ public class ExTextField extends JTextField {
           final Area area = new Area(new Rectangle2D.Double(r.getX(), r.getY(), caretWidth, r.getHeight()));
           area.subtract(new Area(new Rectangle2D.Double(r.getX() + outlineThickness, r.getY() + outlineThickness, caretWidth - (2 * outlineThickness), r.getHeight() - (2 * outlineThickness))));
           g2d.fill(area);
-        }
-        else {
+        } else {
           final double caretHeight = getCaretHeight(r.getHeight());
           final double caretWidth = getCaretWidth(fm, r.getX(), thickness);
           g2d.fill(new Rectangle2D.Double(r.getX(), r.getY() + r.getHeight() - caretHeight, caretWidth, caretHeight));
         }
-      }
-      finally {
+      } finally {
         g2d.dispose();
       }
     }
 
     /**
      * Updates the bounds of the caret and repaints those bounds.
-     *
+     * <p>
      * This method is not guaranteed to be called before paint(). The bounds are for use by repaint().
      *
      * @param r The current location of the caret, usually provided by MapToView. The x and y appear to be the upper
@@ -512,21 +505,21 @@ public class ExTextField extends JTextField {
         final FontMetrics fm = getComponent().getFontMetrics(getComponent().getFont());
         x = r.x;
         y = r.y;
-        width = (int)ceil(getCaretWidth(fm, r.x, 100)) + 1;
+        width = (int) ceil(getCaretWidth(fm, r.x, 100)) + 1;
         height = r.height;
         repaint();
       }
     }
 
-    private @Nullable Rectangle2D modelToView(int dot) {
+    private @Nullable
+    Rectangle2D modelToView(int dot) {
       if (dot > getComponent().getDocument().getLength()) {
         return null;
       }
 
       try {
         return getComponent().getUI().modelToView2D(getComponent(), dot, getDotBias());
-      }
-      catch (BadLocationException e) {
+      } catch (BadLocationException e) {
         return null;
       }
     }
@@ -539,15 +532,13 @@ public class ExTextField extends JTextField {
       final Rectangle2D r = modelToView(getDot() + 1);
       if (r != null) {
         width = r.getX() - dotX;
-      }
-      else {
+      } else {
         char c = ' ';
         try {
           if (getDot() < getComponent().getDocument().getLength()) {
             c = getComponent().getText(getDot(), 1).charAt(0);
           }
-        }
-        catch (BadLocationException e) {
+        } catch (BadLocationException e) {
           // Ignore
         }
         width = fm.charWidth(c);
@@ -565,7 +556,8 @@ public class ExTextField extends JTextField {
   }
 
   @TestOnly
-  public @NonNls String getCaretShape() {
+  public @NonNls
+  String getCaretShape() {
     CommandLineCaret caret = (CommandLineCaret) getCaret();
     return String.format("%s %d", caret.mode, caret.thickness);
   }
@@ -576,7 +568,8 @@ public class ExTextField extends JTextField {
   private String actualText;
   private List<HistoryEntry> history;
   private int histIndex = 0;
-  private @Nullable MultiStepAction currentAction;
+  private @Nullable
+  MultiStepAction currentAction;
   private char currentActionPromptCharacter;
   private int currentActionPromptCharacterOffset = -1;
 

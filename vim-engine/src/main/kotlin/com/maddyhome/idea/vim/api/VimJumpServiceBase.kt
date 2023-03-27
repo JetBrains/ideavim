@@ -13,6 +13,7 @@ import com.maddyhome.idea.vim.mark.Jump
 public abstract class VimJumpServiceBase : VimJumpService {
   @JvmField
   protected val jumps: MutableList<Jump> = ArrayList() // todo should it be mutable?
+
   @JvmField
   protected var jumpSpot: Int = -1
 

@@ -73,11 +73,11 @@ public object Magic {
   public const val X: Int = 'X'.code - 256
   public const val z: Int = 'z'.code - 256
 
-    /*
-   * Magic characters have a special meaning, they don't match literally.
-   * Magic characters are negative.  This separates them from literal characters
-   * (possibly multi-byte).  Only ASCII characters can be Magic.
-   */
+  /*
+ * Magic characters have a special meaning, they don't match literally.
+ * Magic characters are negative.  This separates them from literal characters
+ * (possibly multi-byte).  Only ASCII characters can be Magic.
+ */
   public fun magic(x: Int): Int {
     return x - 256
   }
