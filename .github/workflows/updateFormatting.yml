@@ -25,8 +25,10 @@ jobs:
           server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
           settings-path: ${{ github.workspace }} # location for the settings.xml file
 
-      - name: Format files
-        run: ./gradlew ktlintFormat
+      - uses: findologic/intellij-format-action@v1.1.0
+        with:
+          include-glob: '*.kt,*.java'
+          path: .
 
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v4
