@@ -728,7 +728,7 @@ abstract class VimTestCase {
   }
 
   private fun clearClipboard() {
-    ClipboardSynchronizer.getInstance().resetContent();
+    ClipboardSynchronizer.getInstance().resetContent()
     ClipboardSynchronizer.getInstance().setContent(EmptyTransferable, EmptyClipboardOwner.INSTANCE)
   }
 

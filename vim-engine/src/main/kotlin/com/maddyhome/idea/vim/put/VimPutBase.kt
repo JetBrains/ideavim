@@ -143,7 +143,7 @@ public abstract class VimPutBase : VimPut {
       text,
       data.textData.typeInRegister,
       data.textData.transferableData,
-      data.textData.registerChar
+      data.textData.registerChar,
     )
   }
 

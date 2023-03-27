@@ -224,4 +224,3 @@ class RegistersCommandTest : VimTestCase() {
     )
   }
 }
-

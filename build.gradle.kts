@@ -340,7 +340,6 @@ tasks {
 // --- Linting
 
 ktlint {
-    disabledRules.add("no-wildcard-imports")
     version.set("0.48.2")
 }
 

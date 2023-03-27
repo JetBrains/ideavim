@@ -98,8 +98,7 @@ internal class PutGroup : VimPutBase() {
     val registerChar = text.registerChar
     if (registerChar != null && registerChar in RegisterConstants.CLIPBOARD_REGISTERS) {
       (pasteProvider as IjPasteProvider).pasteProvider.performPaste(context)
-    }
-    else {
+    } else {
       pasteKeepingClipboard(text) {
         (pasteProvider as IjPasteProvider).pasteProvider.performPaste(context)
       }
