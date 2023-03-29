@@ -12,6 +12,7 @@ import com.maddyhome.idea.vim.options.Option
 import com.maddyhome.idea.vim.options.OptionChangeListener
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.options.OptionValueAccessor
+import com.maddyhome.idea.vim.options.StringListOption
 import com.maddyhome.idea.vim.options.StringOption
 import com.maddyhome.idea.vim.options.ToggleOption
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
@@ -117,9 +118,15 @@ public fun <T: VimDataType> VimOptionGroup.resetDefaultValue(option: Option<T>, 
 }
 
 /**
- * Checks if the given string option matches the value, or a string list contains the value
+ * Checks if the given string option matches the value
  */
 public fun VimOptionGroup.hasValue(option: StringOption, scope: OptionScope, value: String): Boolean =
+  value == getOptionValue(option, scope).asString()
+
+/**
+ * Checks if the given string list option contains the value
+ */
+public fun VimOptionGroup.hasValue(option: StringListOption, scope: OptionScope, value: String): Boolean =
   value in option.split(getOptionValue(option, scope).asString())
 
 /**
@@ -127,7 +134,7 @@ public fun VimOptionGroup.hasValue(option: StringOption, scope: OptionScope, val
  *
  * E.g. the `fileencodings` option with value "ucs-bom,utf-8,default,latin1" will result listOf("ucs-bom", "utf-8", "default", "latin1")
  */
-public fun VimOptionGroup.getStringListValues(option: StringOption, scope: OptionScope): List<String> {
+public fun VimOptionGroup.getStringListValues(option: StringListOption, scope: OptionScope): List<String> {
   return option.split(getOptionValue(option, scope).asString())
 }
 

@@ -22,6 +22,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.IjOptionConstants
 import com.maddyhome.idea.vim.group.IjOptions
 import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.options.StringListOption
 import com.maddyhome.idea.vim.options.StringOption
 import com.maddyhome.idea.vim.options.ToggleOption
 
@@ -52,7 +53,7 @@ internal class OptionsState : ApplicationUsagesCollector() {
   private infix fun StringEventField.withOption(option: StringOption) =
     this.with(injector.globalOptions().getStringValue(option))
 
-  private infix fun StringListEventField.withOption(option: StringOption) =
+  private infix fun StringListEventField.withOption(option: StringListOption) =
     this.with(injector.globalOptions().getStringListValues(option))
 
   companion object {

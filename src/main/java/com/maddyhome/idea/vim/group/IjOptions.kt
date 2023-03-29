@@ -11,6 +11,7 @@ package com.maddyhome.idea.vim.group
 import com.intellij.openapi.application.ApplicationNamesInfo
 import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.options.Option
+import com.maddyhome.idea.vim.options.StringListOption
 import com.maddyhome.idea.vim.options.StringOption
 import com.maddyhome.idea.vim.options.ToggleOption
 import com.maddyhome.idea.vim.options.UnsignedNumberOption
@@ -42,7 +43,6 @@ public object IjOptions {
       "idearefactormode",
       "idearefactormode",
       "select",
-      isList = false,
       IjOptionConstants.ideaRefactorModeValues
     )
   )
@@ -51,28 +51,24 @@ public object IjOptions {
       "ideastatusicon",
       "ideastatusicon",
       "enabled",
-      isList = false,
       IjOptionConstants.ideaStatusIconValues
     )
   )
-  public val ideavimsupport: StringOption = addOption(
-    StringOption(
+  public val ideavimsupport: StringListOption = addOption(
+    StringListOption(
       "ideavimsupport",
       "ideavimsupport",
       "dialog",
-      isList = true,
       IjOptionConstants.ideavimsupportValues
     )
   )
   @JvmField public val ideawrite: StringOption =
-    addOption(StringOption("ideawrite", "ideawrite", "all", isList = false, IjOptionConstants.ideaWriteValues))
-  public val lookupkeys: StringOption = addOption(
-    StringOption(
+    addOption(StringOption("ideawrite", "ideawrite", "all", IjOptionConstants.ideaWriteValues))
+  public val lookupkeys: StringListOption = addOption(
+    StringListOption(
       "lookupkeys",
       "lookupkeys",
-      "<Tab>,<Down>,<Up>,<Enter>,<Left>,<Right>,<C-Down>,<C-Up>,<PageUp>,<PageDown>,<C-J>,<C-Q>",
-      isList = true
-    )
+      "<Tab>,<Down>,<Up>,<Enter>,<Left>,<Right>,<C-Down>,<C-Up>,<PageUp>,<PageDown>,<C-J>,<C-Q>")
   )
   public val octopushandler: ToggleOption = addOption(ToggleOption("octopushandler", "octopushandler", false))
   public val oldundo: ToggleOption = addOption(ToggleOption("oldundo", "oldundo", true))
