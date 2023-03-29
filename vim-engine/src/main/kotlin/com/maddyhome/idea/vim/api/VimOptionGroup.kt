@@ -102,6 +102,16 @@ public interface VimOptionGroup {
    * This function should be used with care!
    */
   public fun <T : VimDataType> overrideDefaultValue(option: Option<T>, newDefaultValue: T)
+
+  /**
+   * Return an accessor for options that only have a global value
+   */
+  public fun getGlobalOptions(): GlobalOptions
+
+  /**
+   * Return an accessor for the effective value of local options
+   */
+  public fun getEffectiveOptions(editor: VimEditor): EffectiveOptions
 }
 
 /**

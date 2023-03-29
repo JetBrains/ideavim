@@ -40,9 +40,9 @@ import com.intellij.util.ui.EmptyClipboardOwner
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.VimShortcutKeyAction
+import com.maddyhome.idea.vim.api.EffectiveOptions
 import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.VimOptionGroup
-import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.api.setToggleOption
@@ -52,6 +52,7 @@ import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.command.VimStateMachine.SubMode
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ExOutputModel.Companion.getInstance
+import com.maddyhome.idea.vim.group.GlobalIjOptions
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer.swingTimer
 import com.maddyhome.idea.vim.handler.isOctopusEnabled
 import com.maddyhome.idea.vim.helper.EditorHelper
@@ -66,10 +67,10 @@ import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.ToKeysMappingInfo
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.newapi.IjVimEditor
+import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.options.OptionValueAccessor
 import com.maddyhome.idea.vim.options.ToggleOption
 import com.maddyhome.idea.vim.options.helpers.GuiCursorOptionHelper
 import com.maddyhome.idea.vim.options.helpers.GuiCursorType
@@ -300,8 +301,8 @@ abstract class VimTestCase {
     // Note that it is possible to request a position which would be invalid under normal Vim!
     // We disable scrolloff + scrolljump, position as requested, and reset. When resetting scrolloff, Vim will
     // recalculate the correct offsets, and that could move the top and/or caret line
-    val scrolloff = options().getIntValue(Options.scrolloff)
-    val scrolljump = options().getIntValue(Options.scrolljump)
+    val scrolloff = options().scrolloff
+    val scrolljump = options().scrolljump
 
     enterCommand("set scrolloff=0")
     enterCommand("set scrolljump=1")
@@ -363,7 +364,7 @@ abstract class VimTestCase {
    * options (e.g. 'iskeyword', 'relativenumber' or 'scrolloff' respectively). Tests are only expected to require
    * effective values. To test other global/local values, use [VimOptionGroup].
    */
-  protected fun options(): OptionValueAccessor {
+  protected fun options(): EffectiveOptions {
     assertNotNull(
       fixture.editor,
       "Editor is null! Move the call to after editor is initialised, or use optionsNoEditor",
@@ -381,9 +382,9 @@ abstract class VimTestCase {
    * Note that this isn't handled automatically by [options] to avoid the scenario of trying to use effective values
    * before the editor has been initialised.
    */
-  protected fun optionsNoEditor(): OptionValueAccessor {
+  protected fun optionsNoEditor(): GlobalIjOptions {
     assertNull(fixture.editor, "Editor is not null! Use options() to access effective option values")
-    return injector.globalOptions()
+    return injector.globalIjOptions()
   }
 
   fun assertState(textAfter: String) {

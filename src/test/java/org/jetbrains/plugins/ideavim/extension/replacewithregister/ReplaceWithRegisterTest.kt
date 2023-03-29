@@ -10,7 +10,6 @@ package org.jetbrains.plugins.ideavim.extension.replacewithregister
 
 import com.intellij.testFramework.UsefulTestCase.assertContainsElements
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.command.VimStateMachine
@@ -23,6 +22,7 @@ import org.jetbrains.plugins.ideavim.rangeOf
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
+import kotlin.test.assertEquals
 
 class ReplaceWithRegisterTest : VimTestCase() {
 
@@ -52,7 +52,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
       .storeText(vimEditor, vimEditor.primaryCaret(), text rangeOf "one", SelectionType.CHARACTER_WISE, false)
     typeText(injector.parser.parseKeys("griw"))
     assertState("one on${c}e three")
-    kotlin.test.assertEquals("one", VimPlugin.getRegister().lastRegister?.text)
+    assertEquals("one", VimPlugin.getRegister().lastRegister?.text)
   }
 
   @Test
@@ -82,10 +82,10 @@ class ReplaceWithRegisterTest : VimTestCase() {
     configureByText(text)
     typeText(injector.parser.parseKeys("\"ayiw" + "w" + "\"agriw"))
     assertState("one two tw${c}o four")
-    kotlin.test.assertEquals("two", VimPlugin.getRegister().lastRegister?.text)
+    assertEquals("two", VimPlugin.getRegister().lastRegister?.text)
     typeText(injector.parser.parseKeys("w" + "griw"))
     assertState("one two two tw${c}o")
-    kotlin.test.assertEquals("two", VimPlugin.getRegister().lastRegister?.text)
+    assertEquals("two", VimPlugin.getRegister().lastRegister?.text)
   }
 
   @Test
@@ -95,7 +95,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
     configureByText(text)
     typeText(injector.parser.parseKeys("\"+yiw" + "w" + "\"+griw" + "w" + "\"+griw"))
     assertState("one two two tw${c}o")
-    kotlin.test.assertEquals("two", VimPlugin.getRegister().lastRegister?.text)
+    assertEquals("two", VimPlugin.getRegister().lastRegister?.text)
   }
 
   @Test
@@ -172,7 +172,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
       .storeText(vimEditor, vimEditor.primaryCaret(), text rangeOf "one", SelectionType.CHARACTER_WISE, false)
     typeText(injector.parser.parseKeys("3griw"))
     assertState("one on${c}e four")
-    kotlin.test.assertEquals("one", VimPlugin.getRegister().lastRegister?.text)
+    assertEquals("one", VimPlugin.getRegister().lastRegister?.text)
   }
 
   @VimBehaviorDiffers("one on${c}e on${c}e four")
@@ -186,7 +186,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
       .storeText(vimEditor, vimEditor.primaryCaret(), text rangeOf "one", SelectionType.CHARACTER_WISE, false)
     typeText(injector.parser.parseKeys("griw"))
     assertState("one two one four")
-    kotlin.test.assertEquals("one", VimPlugin.getRegister().lastRegister?.text)
+    assertEquals("one", VimPlugin.getRegister().lastRegister?.text)
   }
 
   @Test
@@ -199,7 +199,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
       .storeText(vimEditor, vimEditor.primaryCaret(), text rangeOf "one", SelectionType.CHARACTER_WISE, false)
     typeText(injector.parser.parseKeys("griw" + "w" + "."))
     assertState("one one on${c}e four")
-    kotlin.test.assertEquals("one", VimPlugin.getRegister().lastRegister?.text)
+    assertEquals("one", VimPlugin.getRegister().lastRegister?.text)
   }
 
   // --------------------------------------- grr --------------------------
@@ -226,7 +226,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
             Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
-    kotlin.test.assertEquals("legendary", VimPlugin.getRegister().lastRegister?.text)
+    assertEquals("legendary", VimPlugin.getRegister().lastRegister?.text)
   }
 
   @Test
@@ -393,7 +393,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
             Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
     )
-    kotlin.test.assertEquals("legendary", VimPlugin.getRegister().lastRegister?.text)
+    assertEquals("legendary", VimPlugin.getRegister().lastRegister?.text)
     assertMode(VimStateMachine.Mode.COMMAND)
   }
 
@@ -494,7 +494,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
   fun `test multiple carets`() {
   // Behaviour of pasting a full line with multiple carets is undefined in Vim and has different implementation in
   // IdeaVim depending on if ideaput is specified in 'clipboard' or not
-  assertContainsElements(optionsNoEditor().getStringListValues(Options.clipboard), OptionConstants.clipboard_ideaput)
+  assertContainsElements(optionsNoEditor().clipboard, OptionConstants.clipboard_ideaput)
 
   enableExtensions("multiple-cursors")
     val text = """

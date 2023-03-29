@@ -8,13 +8,15 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
-import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class LetCommandTest : VimTestCase() {
 
@@ -130,20 +132,20 @@ class LetCommandTest : VimTestCase() {
   fun `test let option`() {
     configureByText("\n")
     typeText(commandToKeys("set noincsearch"))
-    kotlin.test.assertFalse(options().isSet(Options.incsearch))
+    assertFalse(options().incsearch)
     typeText(commandToKeys("let &incsearch = 12"))
-    kotlin.test.assertTrue(options().isSet(Options.incsearch))
+    assertTrue(options().incsearch)
     typeText(commandToKeys("set noincsearch"))
-    kotlin.test.assertFalse(options().isSet(Options.incsearch))
+    assertFalse(options().incsearch)
   }
 
   @Test
   fun `test let option2`() {
     configureByText("\n")
     typeText(commandToKeys("set incsearch"))
-    kotlin.test.assertTrue(options().isSet(Options.incsearch))
+    assertTrue(options().incsearch)
     typeText(commandToKeys("let &incsearch = 0"))
-    kotlin.test.assertFalse(options().isSet(Options.incsearch))
+    assertFalse(options().incsearch)
   }
 
   @Test
@@ -160,7 +162,7 @@ class LetCommandTest : VimTestCase() {
     typeText(commandToKeys("let g:WhichKey_ShowVimActions = \"true\""))
     typeText(commandToKeys("echo g:WhichKey_ShowVimActions"))
     assertExOutput("true\n")
-    kotlin.test.assertEquals("true", VimScriptGlobalEnvironment.getInstance().variables["g:WhichKey_ShowVimActions"])
+    assertEquals("true", VimScriptGlobalEnvironment.getInstance().variables["g:WhichKey_ShowVimActions"])
   }
 
   @Test

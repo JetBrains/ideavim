@@ -8,12 +8,13 @@
 
 package org.jetbrains.plugins.ideavim.action.scroll
 
-import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 /*
                                                        *CTRL-D*
@@ -48,7 +49,7 @@ class ScrollHalfPageDownActionTest : VimTestCase() {
     typeText("<C-D>")
     assertPosition(175, 0)
     assertVisibleArea(146, 175)
-    kotlin.test.assertTrue(injector.messages.isError())
+    assertTrue(injector.messages.isError())
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
@@ -114,7 +115,7 @@ class ScrollHalfPageDownActionTest : VimTestCase() {
     setPositionAndScroll(100, 110)
 
     typeText("10<C-D>")
-    kotlin.test.assertEquals(10, options().getIntValue(Options.scroll))
+    assertEquals(10, options().scroll)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)

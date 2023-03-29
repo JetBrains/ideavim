@@ -15,6 +15,9 @@ import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class SetCommandTest : VimTestCase() {
 
@@ -30,9 +33,9 @@ class SetCommandTest : VimTestCase() {
   fun `test toggle option`() {
     configureByText("\n")
     enterCommand("set rnu")
-    kotlin.test.assertTrue(options().isSet(Options.relativenumber))
+    assertTrue(options().relativenumber)
     enterCommand("set rnu!")
-    kotlin.test.assertFalse(options().isSet(Options.relativenumber))
+    assertFalse(options().relativenumber)
   }
 
   // todo we have spaces in assertExOutput because of pad(20) in the com.maddyhome.idea.vim.vimscript.model.commands.SetCommandKt#showOptions method
@@ -41,11 +44,11 @@ class SetCommandTest : VimTestCase() {
   fun `test number option`() {
     configureByText("\n")
     enterCommand("set scrolloff&")
-    kotlin.test.assertEquals(0, options().getIntValue(Options.scrolloff))
+    assertEquals(0, options().scrolloff)
     enterCommand("set scrolloff?")
     assertExOutput("scrolloff=0         \n")
     enterCommand("set scrolloff=5")
-    kotlin.test.assertEquals(5, options().getIntValue(Options.scrolloff))
+    assertEquals(5, options().scrolloff)
     enterCommand("set scrolloff?")
     assertExOutput("scrolloff=5         \n")
   }
@@ -55,11 +58,11 @@ class SetCommandTest : VimTestCase() {
   fun `test toggle option as a number`() {
     configureByText("\n")
     enterCommand("set number&")
-    kotlin.test.assertEquals(0, injector.optionGroup.getOptionValue(Options.number, OptionScope.GLOBAL).asDouble().toInt())
+    assertEquals(0, injector.optionGroup.getOptionValue(Options.number, OptionScope.GLOBAL).asDouble().toInt())
     enterCommand("set number?")
     assertExOutput("nonumber            \n")
     enterCommand("let &nu=1000")
-    kotlin.test.assertEquals(1000, injector.optionGroup.getOptionValue(Options.number, OptionScope.GLOBAL).asDouble().toInt())
+    assertEquals(1000, injector.optionGroup.getOptionValue(Options.number, OptionScope.GLOBAL).asDouble().toInt())
     enterCommand("set number?")
     assertExOutput("  number            \n")
   }
@@ -118,11 +121,11 @@ class SetCommandTest : VimTestCase() {
   fun `test string option`() {
     configureByText("\n")
     enterCommand("set selection&")
-    kotlin.test.assertEquals("inclusive", options().getStringValue(Options.selection))
+    assertEquals("inclusive", options().selection)
     enterCommand("set selection?")
     assertExOutput("selection=inclusive \n")
     enterCommand("set selection=exclusive")
-    kotlin.test.assertEquals("exclusive", options().getStringValue(Options.selection))
+    assertEquals("exclusive", options().selection)
     enterCommand("set selection?")
     assertExOutput("selection=exclusive \n")
   }

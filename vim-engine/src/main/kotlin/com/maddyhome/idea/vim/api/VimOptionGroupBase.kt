@@ -15,6 +15,8 @@ import com.maddyhome.idea.vim.options.OptionValueAccessor
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 
 public abstract class VimOptionGroupBase : VimOptionGroup {
+  // TODO: Remove this lazy. It's only required to stop a cyclic dependency during migration
+  private val myGlobalOptions by lazy { GlobalOptions() }
   private val globalValues = mutableMapOf<String, VimDataType>()
   private val localOptionsKey = Key<MutableMap<String, VimDataType>>("localOptions")
   private val globalOptionValueAccessor by lazy { OptionValueAccessor(this, OptionScope.GLOBAL) }
@@ -113,4 +115,8 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
   final override fun <T : VimDataType> overrideDefaultValue(option: Option<T>, newDefaultValue: T) {
     option.overrideDefaultValue(newDefaultValue)
   }
+
+  override fun getGlobalOptions(): GlobalOptions = myGlobalOptions
+
+  override fun getEffectiveOptions(editor: VimEditor): EffectiveOptions = EffectiveOptions(OptionScope.LOCAL(editor))
 }

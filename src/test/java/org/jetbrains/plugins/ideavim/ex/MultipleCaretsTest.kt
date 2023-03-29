@@ -9,7 +9,6 @@
 package org.jetbrains.plugins.ideavim.ex
 
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
@@ -120,7 +119,7 @@ class MultipleCaretsTest : VimTestCase() {
   fun testPutText() {
     // This test produces double ${c}zxc on 3rd line if non-idea paste is used
     // TODO: Investigate differences and reconcile
-    assertContains(optionsNoEditor().getStringListValues(Options.clipboard), OptionConstants.clipboard_ideaput)
+    assertContains(optionsNoEditor().clipboard, OptionConstants.clipboard_ideaput)
 
     val before = """
           ${c}qwe

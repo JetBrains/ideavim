@@ -10,7 +10,6 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.leftright
 
-import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.options.OptionConstants
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -20,6 +19,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.impl.OptionTest
 import org.jetbrains.plugins.ideavim.impl.TraceOptions
 import org.jetbrains.plugins.ideavim.impl.VimOption
+import kotlin.test.assertTrue
 
 @TraceOptions(TestOptionConstants.keymodel)
 class MotionHomeActionTest : VimTestCase() {
@@ -48,8 +48,8 @@ class MotionHomeActionTest : VimTestCase() {
 
   @OptionTest(VimOption(TestOptionConstants.keymodel, doesntAffectTest = true))
   fun `test default stop select`() {
-    val keymodel = optionsNoEditor().getStringListValues(Options.keymodel)
-    kotlin.test.assertTrue(OptionConstants.keymodel_stopselect in keymodel)
+    val keymodel = optionsNoEditor().keymodel
+    assertTrue(OptionConstants.keymodel_stopselect in keymodel)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)

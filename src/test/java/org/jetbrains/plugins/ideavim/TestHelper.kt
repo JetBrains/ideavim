@@ -14,12 +14,11 @@ import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.testFramework.EditorTestUtil
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import com.intellij.util.containers.toArray
-import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.group.IjOptions
 import com.maddyhome.idea.vim.helper.editorMode
+import com.maddyhome.idea.vim.newapi.globalIjOptions
 import org.junit.jupiter.params.provider.Arguments
 import kotlin.test.fail
 
@@ -71,7 +70,7 @@ fun waitAndAssertMode(
   mode: VimStateMachine.Mode,
   timeInMillis: Int? = null,
 ) {
-  val timeout = timeInMillis ?: (injector.globalOptions().getIntValue(IjOptions.visualdelay) + 1000)
+  val timeout = timeInMillis ?: (injector.globalIjOptions().visualdelay + 1000)
   waitAndAssert(timeout) { fixture.editor.editorMode == mode }
 }
 

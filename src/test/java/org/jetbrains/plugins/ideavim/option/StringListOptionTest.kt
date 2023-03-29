@@ -9,6 +9,8 @@
 package org.jetbrains.plugins.ideavim.option
 
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.options.StringListOption
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -17,6 +19,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
+import kotlin.test.assertEquals
 
 class StringListOptionTest : VimTestCase() {
   private val optionName = "myOpt"
@@ -35,6 +38,9 @@ class StringListOptionTest : VimTestCase() {
     injector.optionGroup.removeOption(optionName)
   }
 
+  private fun getOptionValue() =
+    injector.optionGroup.getOptionValue(option, OptionScope.LOCAL(fixture.editor.vim)).value
+
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   @Test
   fun `test append existing value`() {
@@ -42,7 +48,7 @@ class StringListOptionTest : VimTestCase() {
     enterCommand("set $optionName+=456")
     enterCommand("set $optionName+=123")
 
-    kotlin.test.assertEquals("123,456", options().getStringValue(option))
+    assertEquals("123,456", getOptionValue())
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
@@ -52,6 +58,6 @@ class StringListOptionTest : VimTestCase() {
     enterCommand("set $optionName+=123")
     enterCommand("set $optionName^=123")
 
-    kotlin.test.assertEquals("456,123", options().getStringValue(option))
+    assertEquals("456,123", getOptionValue())
   }
 }
