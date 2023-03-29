@@ -33,18 +33,22 @@ public class OptionValueAccessor(private val optionGroup: VimOptionGroup, public
   /** Gets the option value as a string */
   public fun getStringValue(option: StringOption): String = getValue(option).value
 
+  /** Gets the option value as a string */
+  public fun getStringValue(option: StringListOption): String = getValue(option).value
+
   /**
    * Gets the option value as a string list
    *
    * @see hasValue
    */
-  public fun getStringListValues(option: StringOption): List<String> = optionGroup.getStringListValues(option, scope)
+  public fun getStringListValues(option: StringListOption): List<String> = optionGroup.getStringListValues(option, scope)
 
   /** Checks if a string list option contains a value, or if a simple string value matches the given value
    *
    * If the option is a string option, the given value must match the entire string
    */
   public fun hasValue(option: StringOption, value: String): Boolean = optionGroup.hasValue(option, scope, value)
+  public fun hasValue(option: StringListOption, value: String): Boolean = optionGroup.hasValue(option, scope, value)
 
   /**
    * Checks the option value is set/true

@@ -15,6 +15,7 @@ import com.maddyhome.idea.vim.options.NumberOption
 import com.maddyhome.idea.vim.options.Option
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.options.StringListOption
 import com.maddyhome.idea.vim.options.StringOption
 import com.maddyhome.idea.vim.options.ToggleOption
 import com.maddyhome.idea.vim.options.UnsignedNumberOption
@@ -78,24 +79,26 @@ public object Options {
   @JvmField public val hlsearch: ToggleOption = addOption(ToggleOption("hlsearch", "hls", false))
   @JvmField public val ignorecase: ToggleOption = addOption(ToggleOption("ignorecase", "ic", false))
   @JvmField public val incsearch: ToggleOption = addOption(ToggleOption("incsearch", "is", false))
-  public val keymodel: StringOption = addOption(StringOption(
-    "keymodel",
-    "km",
-    "${OptionConstants.keymodel_continueselect},${OptionConstants.keymodel_stopselect}",
-    isList = true,
-    setOf(
-      OptionConstants.keymodel_startsel,
-      OptionConstants.keymodel_stopsel,
-      OptionConstants.keymodel_stopselect,
-      OptionConstants.keymodel_stopvisual,
-      OptionConstants.keymodel_continueselect,
-      OptionConstants.keymodel_continuevisual
+  public val keymodel: StringListOption = addOption(
+    StringListOption(
+      "keymodel",
+      "km",
+      "${OptionConstants.keymodel_continueselect},${OptionConstants.keymodel_stopselect}",
+      setOf(
+        OptionConstants.keymodel_startsel,
+        OptionConstants.keymodel_stopsel,
+        OptionConstants.keymodel_stopselect,
+        OptionConstants.keymodel_stopvisual,
+        OptionConstants.keymodel_continueselect,
+        OptionConstants.keymodel_continuevisual
+      )
     )
-  ))
+  )
   public val maxmapdepth: NumberOption = addOption(NumberOption("maxmapdepth", "mmd", 20))
   @JvmField public val more: ToggleOption = addOption(ToggleOption("more", "more", true))
-  @JvmField public val nrformats: StringOption =
-    addOption(StringOption("nrformats", "nf", "hex", isList = true, setOf("octal", "hex", "alpha")))
+  @JvmField public val nrformats: StringListOption = addOption(
+    StringListOption("nrformats", "nf", "hex", setOf("octal", "hex", "alpha"))
+  )
   @JvmField public val number: ToggleOption = addOption(ToggleOption("number", "nu", false))
   @JvmField public val relativenumber: ToggleOption = addOption(ToggleOption("relativenumber", "rnu", false))
   public val scroll: NumberOption = addOption(NumberOption("scroll", "scr", 0))
@@ -105,13 +108,12 @@ public object Options {
       "selection",
       "sel",
       "inclusive",
-      isList = false,
       setOf("old", "inclusive", "exclusive")
     )
   )
-  public val selectmode: StringOption = addOption(
-    StringOption(
-      "selectmode", "slm", "", isList = true,
+  public val selectmode: StringListOption = addOption(
+    StringListOption(
+      "selectmode", "slm", "",
       setOf(
         OptionConstants.selectmode_mouse,
         OptionConstants.selectmode_key,
@@ -131,8 +133,7 @@ public object Options {
     StringOption(
       "shellxescape",
       "sxe",
-      if (injector.systemInfoService.isWindows) "\"&|<>()@^" else "",
-      isList = false
+      if (injector.systemInfoService.isWindows) "\"&|<>()@^" else ""
     )
   )
   public val showcmd: ToggleOption = addOption(ToggleOption("showcmd", "sc", true))
@@ -144,23 +145,21 @@ public object Options {
   public val timeout: ToggleOption = addOption(ToggleOption("timeout", "to", true))
   public val timeoutlen: UnsignedNumberOption = addOption(UnsignedNumberOption("timeoutlen", "tm", 1000))
   public val undolevels: UnsignedNumberOption = addOption(UnsignedNumberOption("undolevels", "ul", 1000))
-  @JvmField public val viminfo: StringOption = addOption(StringOption("viminfo", "vi", "'100,<50,s10,h", isList = true))
-  public val virtualedit: StringOption = addOption(
-    StringOption(
+  @JvmField public val viminfo: StringListOption = addOption(StringListOption("viminfo", "vi", "'100,<50,s10,h"))
+  public val virtualedit: StringListOption = addOption(
+    StringListOption(
       "virtualedit",
       "ve",
       "",
-      isList = false,
       setOf("onemore", "block", "insert", "all")
     )
   )
   public val visualbell: ToggleOption = addOption(ToggleOption("visualbell", "vb", false))
-  @JvmField public val whichwrap: StringOption = addOption(
-    StringOption(
+  @JvmField public val whichwrap: StringListOption = addOption(
+    StringListOption(
       "whichwrap",
       "ww",
       "b,s",
-      true,
       setOf("b", "s", "h", "l", "<", ">", "~", "[", "]")
     )
   )
@@ -168,16 +167,14 @@ public object Options {
 
 
   // More complex options, with additional validation, etc.
-  public val guicursor: StringOption = addOption(object : StringOption(
+  public val guicursor: StringListOption = addOption(object : StringListOption(
     "guicursor", "gcr",
     "n-v-c:block-Cursor/lCursor," +
       "ve:ver35-Cursor," +
       "o:hor50-Cursor," +
       "i-ci:ver25-Cursor/lCursor," +
       "r-cr:hor20-Cursor/lCursor," +
-      "sm:block-Cursor-blinkwait175-blinkoff150-blinkon175",
-    isList = true
-  ) {
+      "sm:block-Cursor-blinkwait175-blinkoff150-blinkon175") {
     override fun checkIfValueValid(value: VimDataType, token: String) {
       super.checkIfValueValid(value, token)
       val valueAsString = (value as VimString).value
@@ -185,7 +182,7 @@ public object Options {
     }
   })
 
-  public val iskeyword: StringOption = addOption(object : StringOption("iskeyword", "isk", "@,48-57,_", isList = true) {
+  public val iskeyword: StringListOption = addOption(object : StringListOption("iskeyword", "isk", "@,48-57,_") {
     override fun checkIfValueValid(value: VimDataType, token: String) {
       super.checkIfValueValid(value, token)
       if (KeywordOptionHelper.isValueInvalid((value as VimString).value)) {
@@ -205,7 +202,7 @@ public object Options {
   })
 
   @JvmField
-  public val matchpairs: StringOption = addOption(object : StringOption("matchpairs", "mps", "(:),{:},[:]", isList = true) {
+  public val matchpairs: StringListOption = addOption(object : StringListOption("matchpairs", "mps", "(:),{:},[:]") {
     override fun checkIfValueValid(value: VimDataType, token: String) {
       super.checkIfValueValid(value, token)
       for (v in split((value as VimString).value)) {
@@ -259,14 +256,8 @@ public object Options {
 
   // Note that IntelliJ overrides clipboard's default value to include the `ideaput` option.
   // TODO: Technically, we should validate values, but that requires handling exclude, which is irrelevant to us
-  public val clipboard: StringOption = addOption(
-    StringOption(
-      "clipboard",
-      "cb",
-      "autoselect,exclude:cons\\|linux",
-      isList = true
-    )
-  )
+  public val clipboard: StringListOption =
+    addOption(StringListOption("clipboard", "cb", "autoselect,exclude:cons\\|linux"))
 
   // IdeaVim specific options. Put any editor or IDE specific options in IjVimOptionService
   public val ideaglobalmode: ToggleOption = addOption(ToggleOption("ideaglobalmode", "ideaglobalmode", false))

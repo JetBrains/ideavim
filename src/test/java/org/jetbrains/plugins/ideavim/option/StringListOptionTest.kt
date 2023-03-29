@@ -9,7 +9,7 @@
 package org.jetbrains.plugins.ideavim.option
 
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.options.StringOption
+import com.maddyhome.idea.vim.options.StringListOption
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -20,7 +20,7 @@ import org.junit.jupiter.api.TestInfo
 
 class StringListOptionTest : VimTestCase() {
   private val optionName = "myOpt"
-  private val option = StringOption(optionName, optionName, "", true, null)
+  private val option = StringListOption(optionName, optionName, "", null)
 
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {

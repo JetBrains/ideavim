@@ -71,8 +71,50 @@ public abstract class Option<T : VimDataType>(public val name: String, public va
   public abstract fun parseValue(value: String, token: String): VimDataType
 }
 
-public open class StringOption(name: String, abbrev: String, defaultValue: VimString, public val isList: Boolean = false, public val boundedValues: Collection<String>? = null) : Option<VimString>(name, abbrev, defaultValue) {
-  public constructor(name: String, abbrev: String, defaultValue: String, isList: Boolean = false, boundedValues: Collection<String>? = null) : this(name, abbrev, VimString(defaultValue), isList, boundedValues)
+public open class StringOption(name: String, abbrev: String, defaultValue: VimString, public val boundedValues: Collection<String>? = null) : Option<VimString>(name, abbrev, defaultValue) {
+  public constructor(name: String, abbrev: String, defaultValue: String, boundedValues: Collection<String>? = null) : this(name, abbrev, VimString(defaultValue), boundedValues)
+
+  override fun checkIfValueValid(value: VimDataType, token: String) {
+    if (value !is VimString) {
+      throw exExceptionMessage("E474", token)
+    }
+
+    if (value.value.isEmpty()) {
+      return
+    }
+
+    if (boundedValues != null && !boundedValues.contains(value.value)) {
+      throw exExceptionMessage("E474", token)
+    }
+  }
+
+  override fun parseValue(value: String, token: String): VimString =
+    VimString(value).also { checkIfValueValid(it, token) }
+
+  public fun appendValue(currentValue: VimString, value: VimString): VimString =
+    VimString(currentValue.value + value.value)
+
+  public fun prependValue(currentValue: VimString, value: VimString): VimString =
+    VimString(value.value + currentValue.value)
+
+  public fun removeValue(currentValue: VimString, value: VimString): VimString {
+    // TODO: Not sure this is correct. Should replace just the first occurrence?
+    return VimString(currentValue.value.replace(value.value, ""))
+  }
+}
+
+/**
+ * Represents a string that is a comma-separated list of values
+ */
+public open class StringListOption(
+  name: String,
+  abbrev: String,
+  defaultValue: VimString,
+  public val boundedValues: Collection<String>? = null,
+) : Option<VimString>(name, abbrev, defaultValue) {
+
+  public constructor(name: String, abbrev: String, defaultValue: String, boundedValues: Collection<String>? = null)
+    : this(name, abbrev, VimString(defaultValue), boundedValues)
 
   override fun checkIfValueValid(value: VimDataType, token: String) {
     if (value !is VimString) {
@@ -92,44 +134,34 @@ public open class StringOption(name: String, abbrev: String, defaultValue: VimSt
     VimString(value).also { checkIfValueValid(it, token) }
 
   public fun appendValue(currentValue: VimString, value: VimString): VimString {
+    // TODO: What happens if we're trying to add a sublist that already exists?
     if (split(currentValue.value).contains(value.value)) return currentValue
     return VimString(joinValues(currentValue.value, value.value))
   }
 
   public fun prependValue(currentValue: VimString, value: VimString): VimString {
+    // TODO: What happens if we're trying to add a sublist that already exists?
     if (split(currentValue.value).contains(value.value)) return currentValue
     return VimString(joinValues(value.value, currentValue.value))
   }
 
   public fun removeValue(currentValue: VimString, value: VimString): VimString {
-    val newValue = if (isList) {
-      val valuesToRemove = split(value.value)
-      val elements = split(currentValue.value).toMutableList()
-      if (Collections.indexOfSubList(elements, valuesToRemove) != -1) {
-        // see `:help set`
-        // When the option is a list of flags, {value} must be
-        // exactly as they appear in the option.  Remove flags
-        // one by one to avoid problems.
-        elements.removeAll(valuesToRemove)
-      }
-      elements.joinToString(separator = ",")
-    } else {
-      // TODO: Not sure this is correct. Should replace just the first occurrence?
-      currentValue.value.replace(value.value, "")
+    val valuesToRemove = split(value.value)
+    val elements = split(currentValue.value).toMutableList()
+    if (Collections.indexOfSubList(elements, valuesToRemove) != -1) {
+      // see `:help set`
+      // When the option is a list of flags, {value} must be
+      // exactly as they appear in the option.  Remove flags
+      // one by one to avoid problems.
+      elements.removeAll(valuesToRemove)
     }
-    return VimString(newValue)
+    return VimString(elements.joinToString(separator = ","))
   }
 
-  public open fun split(value: String): List<String> {
-    return if (isList) {
-      value.split(",")
-    } else {
-      listOf(value)
-    }
-  }
+  public open fun split(value: String): List<String> = value.split(",")
 
   private fun joinValues(first: String, second: String): String {
-    val separator = if (isList && first.isNotEmpty()) "," else ""
+    val separator = if (first.isNotEmpty()) "," else ""
     return first + separator + second
   }
 }

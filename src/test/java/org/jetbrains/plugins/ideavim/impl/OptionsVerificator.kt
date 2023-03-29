@@ -21,6 +21,7 @@ import com.maddyhome.idea.vim.options.Option
 import com.maddyhome.idea.vim.options.OptionChangeListener
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.options.OptionValueAccessor
+import com.maddyhome.idea.vim.options.StringListOption
 import com.maddyhome.idea.vim.options.StringOption
 import com.maddyhome.idea.vim.options.ToggleOption
 import com.maddyhome.idea.vim.options.UnsignedNumberOption
@@ -275,7 +276,7 @@ private class VimOptionsInvocator : TestTemplateInvocationContextProvider {
           when (option) {
             is ToggleOption -> vimOption.limitedValues.map { option to if (it == "true") VimInt.ONE else VimInt.ZERO }
             is NumberOption -> vimOption.limitedValues.map { option to VimInt(it) }
-            is StringOption -> {
+            is StringOption, is StringListOption -> {
               vimOption.limitedValues.map { limitedValue -> option to VimString(limitedValue) }
             }
 
@@ -308,21 +309,21 @@ private class VimOptionsInvocator : TestTemplateInvocationContextProvider {
       }
 
       is StringOption -> {
-        if (option.isList) {
-          val boundedValues = option.boundedValues
-          if (boundedValues != null) {
-            val valuesCombinations = boundedValues.indices.map { index ->
-              kCombinations(boundedValues.toList(), index + 1)
-                .map { VimString(it.joinToString(",")) }
-            }.flatten()
-            valuesCombinations.map { option to it }
-          } else {
-            fail("Cannot generate values automatically. Please specify option values explicitly using 'limitedValues' field")
-          }
+        val boundedValues = option.boundedValues
+        boundedValues?.map { option to VimString(it) }
+          ?: fail("Cannot generate values automatically. Please specify option values explicitly using 'limitedValues' field")
+      }
+
+      is StringListOption -> {
+        val boundedValues = option.boundedValues
+        if (boundedValues != null) {
+          val valuesCombinations = boundedValues.indices.map { index ->
+            kCombinations(boundedValues.toList(), index + 1)
+              .map { VimString(it.joinToString(",")) }
+          }.flatten()
+          valuesCombinations.map { option to it }
         } else {
-          val boundedValues = option.boundedValues
-          boundedValues?.map { option to VimString(it) }
-            ?: fail("Cannot generate values automatically. Please specify option values explicitly using 'limitedValues' field")
+          fail("Cannot generate values automatically. Please specify option values explicitly using 'limitedValues' field")
         }
       }
 

@@ -9,7 +9,7 @@
 package org.jetbrains.plugins.ideavim.option
 
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.options.StringOption
+import com.maddyhome.idea.vim.options.StringListOption
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -21,11 +21,10 @@ import org.junit.jupiter.api.TestInfo
 class BoundedStringListOptionTest : VimTestCase() {
   private val optionName = "myOpt"
   private val defaultValue = "Monday,Tuesday"
-  private val option = StringOption(
+  private val option = StringListOption(
     optionName,
     optionName,
     defaultValue,
-    true,
     setOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"),
   )
 

@@ -24,6 +24,7 @@ import com.maddyhome.idea.vim.helper.Msg
 import com.maddyhome.idea.vim.options.NumberOption
 import com.maddyhome.idea.vim.options.Option
 import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.options.StringListOption
 import com.maddyhome.idea.vim.options.StringOption
 import com.maddyhome.idea.vim.options.ToggleOption
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
@@ -275,6 +276,7 @@ private fun formatKnownOptionValue(option: Option<out VimDataType>, scope: Optio
 private fun appendValue(option: Option<VimDataType>, currentValue: VimDataType, value: VimDataType): VimDataType? {
   return when (option) {
     is StringOption -> option.appendValue(currentValue as VimString, value as VimString)
+    is StringListOption -> option.appendValue(currentValue as VimString, value as VimString)
     is NumberOption -> option.addValues(currentValue as VimInt, value as VimInt)
     else -> null
   }
@@ -283,6 +285,7 @@ private fun appendValue(option: Option<VimDataType>, currentValue: VimDataType, 
 private fun prependValue(option: Option<VimDataType>, currentValue: VimDataType, value: VimDataType): VimDataType? {
   return when (option) {
     is StringOption -> option.prependValue(currentValue as VimString, value as VimString)
+    is StringListOption -> option.prependValue(currentValue as VimString, value as VimString)
     is NumberOption -> option.multiplyValues(currentValue as VimInt, value as VimInt)
     else -> null
   }
@@ -291,6 +294,7 @@ private fun prependValue(option: Option<VimDataType>, currentValue: VimDataType,
 private fun removeValue(option: Option<VimDataType>, currentValue: VimDataType, value: VimDataType): VimDataType? {
   return when (option) {
     is StringOption -> option.removeValue(currentValue as VimString, value as VimString)
+    is StringListOption -> option.removeValue(currentValue as VimString, value as VimString)
     is NumberOption -> option.subtractValues(currentValue as VimInt, value as VimInt)
     else -> null
   }
