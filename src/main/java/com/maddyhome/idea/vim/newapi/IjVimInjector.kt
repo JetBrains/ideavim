@@ -30,6 +30,7 @@ import com.maddyhome.idea.vim.api.VimExOutputPanel
 import com.maddyhome.idea.vim.api.VimExOutputPanelService
 import com.maddyhome.idea.vim.api.VimExtensionRegistrator
 import com.maddyhome.idea.vim.api.VimFile
+import com.maddyhome.idea.vim.api.VimInjector
 import com.maddyhome.idea.vim.api.VimInjectorBase
 import com.maddyhome.idea.vim.api.VimJumpService
 import com.maddyhome.idea.vim.api.VimKeyGroup
@@ -58,7 +59,9 @@ import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.extension.VimExtensionRegistrar
 import com.maddyhome.idea.vim.group.CommandGroup
 import com.maddyhome.idea.vim.group.EditorGroup
+import com.maddyhome.idea.vim.group.EffectiveIjOptions
 import com.maddyhome.idea.vim.group.FileGroup
+import com.maddyhome.idea.vim.group.GlobalIjOptions
 import com.maddyhome.idea.vim.group.HistoryGroup
 import com.maddyhome.idea.vim.group.MacroGroup
 import com.maddyhome.idea.vim.group.MotionGroup
@@ -211,4 +214,9 @@ internal class IjVimInjector : VimInjectorBase() {
     get() = service<IjEditorHelper>()
   override val editorGroup: VimEditorGroup
     get() = service<EditorGroup>()
+}
+
+public fun VimInjector.globalIjOptions(): GlobalIjOptions = this.optionGroup.getGlobalOptions() as GlobalIjOptions
+public fun VimInjector.ijOptions(editor: VimEditor): EffectiveIjOptions {
+  return this.optionGroup.getEffectiveOptions(editor) as EffectiveIjOptions
 }

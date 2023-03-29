@@ -15,7 +15,6 @@ import com.maddyhome.idea.vim.group.VimWindowGroup
 import com.maddyhome.idea.vim.helper.VimCommandLineHelper
 import com.maddyhome.idea.vim.history.VimHistory
 import com.maddyhome.idea.vim.macro.VimMacro
-import com.maddyhome.idea.vim.options.OptionValueAccessor
 import com.maddyhome.idea.vim.put.VimPut
 import com.maddyhome.idea.vim.register.VimRegisterGroup
 import com.maddyhome.idea.vim.undo.VimUndoRedo
@@ -195,7 +194,7 @@ public lateinit var injector: VimInjector
  * [VimInjector.options] and pass in a [VimEditor] for context. This will return local or global public values as
  * appropriate.
  */
-public fun VimInjector.globalOptions(): OptionValueAccessor = this.optionGroup.getValueAccessor(null)
+public fun VimInjector.globalOptions(): GlobalOptions = this.optionGroup.getGlobalOptions()
 
 /**
  * Gets an API for consuming all options
@@ -205,4 +204,4 @@ public fun VimInjector.globalOptions(): OptionValueAccessor = this.optionGroup.g
  * If an editor isn't available to the calling code, the [globalOptions] function can be used to access global
  * options. It should not be used to access options that are local to buffer, local to window or global-local.
  */
-public fun VimInjector.options(editor: VimEditor): OptionValueAccessor = this.optionGroup.getValueAccessor(editor)
+public fun VimInjector.options(editor: VimEditor): EffectiveOptions = this.optionGroup.getEffectiveOptions(editor)

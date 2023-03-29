@@ -27,11 +27,10 @@ class GuiCursorOptionTest : VimTestCase() {
   }
 
   private fun getGuiCursorEntries() =
-    options().getStringListValues(Options.guicursor).map { GuiCursorOptionHelper.convertToken(it) }
+    options().guicursor.map { GuiCursorOptionHelper.convertToken(it) }
 
   private fun assertHasDefaultValue() {
-    val defaultValue = Options.guicursor.defaultValue.asString()
-    assertEquals(defaultValue, options().getStringValue(Options.guicursor))
+    assertEquals(Options.guicursor.defaultValue.value, options().guicursor.value)
   }
 
   @Suppress("SpellCheckingInspection")

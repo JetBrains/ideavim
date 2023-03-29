@@ -8,14 +8,22 @@
 
 package com.maddyhome.idea.vim.group
 
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimOptionGroupBase
+import com.maddyhome.idea.vim.options.OptionScope
 
 internal class OptionGroup : VimOptionGroupBase() {
+  // TODO: Get rid of this lazy. It's only there to prevent a cyclic dependency during migration
+  private val myGlobalOptions by lazy { GlobalIjOptions() }
+
   override fun initialiseOptions() {
     // We MUST call super!
     super.initialiseOptions()
     IjOptions.initialise()
   }
+
+  override fun getGlobalOptions() = myGlobalOptions
+  override fun getEffectiveOptions(editor: VimEditor) = EffectiveIjOptions(OptionScope.LOCAL(editor))
 }
 
 internal class IjOptionConstants {

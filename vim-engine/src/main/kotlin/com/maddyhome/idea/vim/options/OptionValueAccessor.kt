@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.vimscript.services.OptionService
  * All functions assume that the option exists, and that the calling code knows what type to expect. Trying to retrieve
  * a non-existent option, or calling the wrong accessor will lead to exceptions or incorrect behaviour.
  */
-public class OptionValueAccessor(private val optionGroup: VimOptionGroup, public val scope: OptionScope) {
+public open class OptionValueAccessor(private val optionGroup: VimOptionGroup, public val scope: OptionScope) {
   /** Gets the loosely typed option value */
   public fun <T : VimDataType> getValue(option: Option<T>): T = optionGroup.getOptionValue(option, scope)
 

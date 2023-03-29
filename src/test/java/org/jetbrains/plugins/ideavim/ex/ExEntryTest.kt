@@ -9,7 +9,6 @@
 package org.jetbrains.plugins.ideavim.ex
 
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.ui.ex.ExDocument
@@ -22,6 +21,9 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class ExEntryTest : VimTestCase() {
   @BeforeEach
@@ -32,47 +34,47 @@ class ExEntryTest : VimTestCase() {
 
   @Test
   fun `test cancel entry`() {
-    kotlin.test.assertFalse(options().isSet(Options.incsearch))
+    assertFalse(options().incsearch)
     typeExInput(":set incsearch<Esc>")
-    kotlin.test.assertFalse(options().isSet(Options.incsearch))
+    assertFalse(options().incsearch)
     assertIsDeactivated()
 
     deactivateExEntry()
 
-    kotlin.test.assertFalse(options().isSet(Options.incsearch))
+    assertFalse(options().incsearch)
     typeExInput(":set incsearch<C-[>")
-    kotlin.test.assertFalse(options().isSet(Options.incsearch))
+    assertFalse(options().incsearch)
     assertIsDeactivated()
 
     deactivateExEntry()
 
-    kotlin.test.assertFalse(options().isSet(Options.incsearch))
+    assertFalse(options().incsearch)
     typeExInput(":set incsearch<C-C>")
-    kotlin.test.assertFalse(options().isSet(Options.incsearch))
+    assertFalse(options().incsearch)
     assertIsDeactivated()
   }
 
   @Test
   fun `test complete entry`() {
-    kotlin.test.assertFalse(options().isSet(Options.incsearch))
+    assertFalse(options().incsearch)
     typeExInput(":set incsearch<Enter>")
-    kotlin.test.assertTrue(options().isSet(Options.incsearch))
+    assertTrue(options().incsearch)
     assertIsDeactivated()
 
     deactivateExEntry()
     VimPlugin.getOptionGroup().resetAllOptions()
 
-    kotlin.test.assertFalse(options().isSet(Options.incsearch))
+    assertFalse(options().incsearch)
     typeExInput(":set incsearch<C-J>")
-    kotlin.test.assertTrue(options().isSet(Options.incsearch))
+    assertTrue(options().incsearch)
     assertIsDeactivated()
 
     deactivateExEntry()
     VimPlugin.getOptionGroup().resetAllOptions()
 
-    kotlin.test.assertFalse(options().isSet(Options.incsearch))
+    assertFalse(options().incsearch)
     typeExInput(":set incsearch<C-M>")
-    kotlin.test.assertTrue(options().isSet(Options.incsearch))
+    assertTrue(options().incsearch)
     assertIsDeactivated()
   }
 
@@ -82,22 +84,22 @@ class ExEntryTest : VimTestCase() {
     // Show vertical bar in insert mode
     // Show horizontal bar in replace mode
     typeExInput(":")
-    kotlin.test.assertEquals("BLOCK 100", exEntryPanel.entry.caretShape)
+    assertEquals("BLOCK 100", exEntryPanel.entry.caretShape)
 
     typeText("set")
-    kotlin.test.assertEquals("BLOCK 100", exEntryPanel.entry.caretShape)
+    assertEquals("BLOCK 100", exEntryPanel.entry.caretShape)
 
     deactivateExEntry()
     typeExInput(":set<Home>")
-    kotlin.test.assertEquals("VER 25", exEntryPanel.entry.caretShape)
+    assertEquals("VER 25", exEntryPanel.entry.caretShape)
 
     deactivateExEntry()
     typeExInput(":set<Home><Insert>")
-    kotlin.test.assertEquals("HOR 20", exEntryPanel.entry.caretShape)
+    assertEquals("HOR 20", exEntryPanel.entry.caretShape)
 
     deactivateExEntry()
     typeExInput(":set<Home><Insert><Insert>")
-    kotlin.test.assertEquals("VER 25", exEntryPanel.entry.caretShape)
+    assertEquals("VER 25", exEntryPanel.entry.caretShape)
   }
 
   @Test
@@ -105,22 +107,22 @@ class ExEntryTest : VimTestCase() {
     enterCommand("set guicursor=c:ver50,ci:hor75,cr:block")
 
     typeExInput(":")
-    kotlin.test.assertEquals("VER 50", exEntryPanel.entry.caretShape)
+    assertEquals("VER 50", exEntryPanel.entry.caretShape)
 
     typeText("set")
-    kotlin.test.assertEquals("VER 50", exEntryPanel.entry.caretShape)
+    assertEquals("VER 50", exEntryPanel.entry.caretShape)
 
     deactivateExEntry()
     typeExInput(":set<Home>")
-    kotlin.test.assertEquals("HOR 75", exEntryPanel.entry.caretShape)
+    assertEquals("HOR 75", exEntryPanel.entry.caretShape)
 
     deactivateExEntry()
     typeExInput(":set<Home><Insert>")
-    kotlin.test.assertEquals("BLOCK 100", exEntryPanel.entry.caretShape)
+    assertEquals("BLOCK 100", exEntryPanel.entry.caretShape)
 
     deactivateExEntry()
     typeExInput(":set<Home><Insert><Insert>")
-    kotlin.test.assertEquals("HOR 75", exEntryPanel.entry.caretShape)
+    assertEquals("HOR 75", exEntryPanel.entry.caretShape)
   }
 
   @Test
@@ -369,18 +371,18 @@ class ExEntryTest : VimTestCase() {
   @Test
   fun `test toggle insert replace`() {
     val exDocument = exEntryPanel.entry.document as ExDocument
-    kotlin.test.assertFalse(exDocument.isOverwrite)
+    assertFalse(exDocument.isOverwrite)
     typeExInput(":set<C-B>digraph")
     assertExText("digraphset")
 
     deactivateExEntry()
 
     typeExInput(":set<C-B><Insert>digraph")
-    kotlin.test.assertTrue(exDocument.isOverwrite)
+    assertTrue(exDocument.isOverwrite)
     assertExText("digraph")
 
     typeText("<Insert><C-B>set ")
-    kotlin.test.assertFalse(exDocument.isOverwrite)
+    assertFalse(exDocument.isOverwrite)
     assertExText("set digraph")
   }
 
@@ -476,7 +478,7 @@ class ExEntryTest : VimTestCase() {
     // this isn't true - digraph entry is stopped, but command line mode continues
     typeExInput(":<C-K>O<Esc>K")
     assertIsActive()
-    kotlin.test.assertEquals("K", exEntryPanel.text)
+    assertEquals("K", exEntryPanel.text)
 
     deactivateExEntry()
   }
@@ -630,7 +632,7 @@ class ExEntryTest : VimTestCase() {
   }
 
   private fun typeExInput(text: String) {
-    kotlin.test.assertTrue(
+    assertTrue(
       text.startsWith(":") || text.startsWith('/') || text.startsWith('?'),
       "Ex command must start with ':', '/' or '?'",
     )
@@ -662,22 +664,21 @@ class ExEntryTest : VimTestCase() {
     }
   }
 
-  @Suppress("DEPRECATION")
   private fun assertExText(expected: String) {
     // Get the text directly from the text field. This will include any "prompt" chars for e.g. digraphs
-    kotlin.test.assertEquals(expected, exEntryPanel.entry.text)
+    assertEquals(expected, exEntryPanel.entry.text)
   }
 
   private fun assertIsActive() {
-    kotlin.test.assertTrue(exEntryPanel.isActive)
+    assertTrue(exEntryPanel.isActive)
   }
 
   private fun assertIsDeactivated() {
-    kotlin.test.assertFalse(exEntryPanel.isActive)
+    assertFalse(exEntryPanel.isActive)
   }
 
   private fun assertExOffset(expected: Int) {
-    kotlin.test.assertEquals(expected, caret.dot)
+    assertEquals(expected, caret.dot)
   }
 
   private val exEntryPanel
