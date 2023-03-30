@@ -26,7 +26,6 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.group.IjOptionConstants
 import com.maddyhome.idea.vim.group.IjOptions
 import com.maddyhome.idea.vim.handler.enableOctopus
@@ -211,7 +210,7 @@ internal class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatib
   }
 
   private fun isEnabledForEscape(editor: Editor): Boolean {
-    val ideaVimSupportDialog = injector.options(editor.vim).hasValue(IjOptions.ideavimsupport, IjOptionConstants.ideavimsupport_dialog)
+    val ideaVimSupportDialog = injector.globalIjOptions().ideavimsupport.contains(IjOptionConstants.ideavimsupport_dialog)
     return editor.isPrimaryEditor() ||
       EditorHelper.isFileEditor(editor) && !editor.inNormalMode ||
       ideaVimSupportDialog && !editor.inNormalMode

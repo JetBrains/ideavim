@@ -9,7 +9,6 @@
 package com.maddyhome.idea.vim.action.motion.visual
 
 import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -30,7 +29,7 @@ public class VisualToggleLineModeAction : VimActionHandler.ConditionalMulticaret
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    return if (injector.options(editor).hasValue(Options.selectmode, OptionConstants.selectmode_cmd)) {
+    return if (injector.options(editor).selectmode.contains(OptionConstants.selectmode_cmd)) {
       injector.visualMotionGroup.enterSelectMode(editor, VimStateMachine.SubMode.VISUAL_LINE)
       true
     } else {

@@ -13,7 +13,6 @@ import com.intellij.openapi.diagnostic.trace
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.command.VimStateMachine
@@ -139,7 +138,7 @@ internal object IdeaSelectionControl {
     selectionSource: VimListenerManager.SelectionSource,
     logReason: Boolean,
   ): VimStateMachine.Mode {
-    val selectmode = injector.options(editor.vim).getStringListValues(Options.selectmode)
+    val selectmode = injector.options(editor.vim).selectmode
     return when {
       editor.isOneLineMode -> {
         if (logReason) logger.debug("Enter select mode. Reason: one line mode")

@@ -10,7 +10,6 @@ package com.maddyhome.idea.vim.command
 
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.options
@@ -97,8 +96,7 @@ public object MappingProcessor {
     // Every time a key is pressed and handled, the timer is stopped. E.g. if there is a mapping for "dweri", and the
     // user has typed "dw" wait for the timeout, and then replay "d" and "w" without any mapping (which will of course
     // delete a word)
-    if (injector.options(editor).isSet(Options.timeout)
-    ) {
+    if (injector.options(editor).timeout) {
       log.trace("timeout is set. schedule a mapping timer")
       // XXX There is a strange issue that reports that mapping state is empty at the moment of the function call.
       //   At the moment, I see the only one possibility this to happen - other key is handled after the timer executed,

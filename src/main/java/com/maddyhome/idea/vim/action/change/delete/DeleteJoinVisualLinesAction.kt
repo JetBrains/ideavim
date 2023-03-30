@@ -11,14 +11,13 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.group.IjOptions
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
+import com.maddyhome.idea.vim.newapi.ijOptions
 import java.util.*
 
 /**
@@ -37,7 +36,7 @@ public class DeleteJoinVisualLinesAction : VisualOperatorActionHandler.SingleExe
     operatorArguments: OperatorArguments,
   ): Boolean {
     if (editor.isOneLineMode()) return false
-    if (injector.options(editor).isSet(IjOptions.ideajoin)) {
+    if (injector.ijOptions(editor).ideajoin) {
       injector.changeGroup.joinViaIdeaBySelections(editor, context, caretsAndSelections)
       return true
     }

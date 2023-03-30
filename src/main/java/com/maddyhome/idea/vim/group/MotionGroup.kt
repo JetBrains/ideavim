@@ -27,7 +27,6 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.BufferPosition
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
-import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimChangeGroupBase
 import com.maddyhome.idea.vim.api.VimEditor
@@ -251,7 +250,7 @@ internal class MotionGroup : VimMotionGroupBase() {
     line: Int,
     caret: ImmutableVimCaret,
   ): @Range(from = 0, to = Int.MAX_VALUE.toLong()) Int {
-    return if (injector.options(editor).isSet(Options.startofline)) {
+    return if (injector.options(editor).startofline) {
       moveCaretToLineStartSkipLeading(editor, line)
     } else {
       moveCaretToLineWithSameColumn(editor, line, caret)

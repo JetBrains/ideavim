@@ -10,7 +10,6 @@ package com.maddyhome.idea.vim.action.motion.updown
 
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
-import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.normalizeLine
@@ -43,7 +42,7 @@ public class MotionGotoLineLastEndAction : MotionActionHandler.ForEachCaret() {
     if (editor.inInsertMode) {
       allow = true
     } else if (editor.inVisualMode) {
-      allow = !injector.options(editor).hasValue(Options.selection, "old")
+      allow = injector.options(editor).selection != "old"
     }
 
     return moveCaretGotoLineLastEnd(editor, operatorArguments.count0, operatorArguments.count1 - 1, allow).toMotion()
@@ -66,7 +65,7 @@ public class MotionGotoLineLastEndInsertAction : MotionActionHandler.ForEachCare
     if (editor.inInsertMode) {
       allow = true
     } else if (editor.inVisualMode) {
-      allow = !injector.options(editor).hasValue(Options.selection, "old")
+      allow = injector.options(editor).selection != "old"
     }
 
     return moveCaretGotoLineLastEnd(editor, operatorArguments.count0, operatorArguments.count1 - 1, allow).toMotion()
