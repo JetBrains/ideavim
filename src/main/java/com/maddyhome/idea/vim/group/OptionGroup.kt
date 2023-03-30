@@ -13,17 +13,17 @@ import com.maddyhome.idea.vim.api.VimOptionGroupBase
 import com.maddyhome.idea.vim.options.OptionScope
 
 internal class OptionGroup : VimOptionGroupBase() {
-  private val globalOptionsAccessor = GlobalIjOptions()
-
   override fun initialiseOptions() {
     // We MUST call super!
     super.initialiseOptions()
     IjOptions.initialise()
   }
-
-  override fun getGlobalOptions() = globalOptionsAccessor
-  override fun getEffectiveOptions(editor: VimEditor) = EffectiveIjOptions(OptionScope.LOCAL(editor))
 }
+
+private val globalOptionsAccessor = GlobalIjOptions()
+
+public fun getGlobalIjOptions(): GlobalIjOptions = globalOptionsAccessor
+public fun getEffectiveIjOptions(editor: VimEditor): EffectiveIjOptions = EffectiveIjOptions(OptionScope.LOCAL(editor))
 
 internal class IjOptionConstants {
   @Suppress("SpellCheckingInspection", "MemberVisibilityCanBePrivate")
