@@ -293,23 +293,30 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
    * IdeaVim plugin initialization.
    * This is an important operation and some commands ordering should be preserved.
    * Please make sure that the documentation of this function is in sync with the code
-   * <p>
-   * 1) Update state
+   * <ol>
+   * <li>Update state<br>
    * This schedules a state update. In most cases it just shows some dialogs to the user. As I know, there are
-   * no special reasons to keep this command as a first line, so it seems safe to move it.
-   * 2) Command registration
+   * no special reasons to keep this command as a first line, so it seems safe to move it.</li>
+   * <li>Command registration<br>
    * This block should be located BEFORE ~/.ideavimrc execution. Without it the commands won't be registered
    * and initialized, but ~/.ideavimrc file may refer or execute some commands or functions.
-   * This block DOES NOT initialize extensions, but only registers the available ones.
-   * 3) ~/.ideavimrc execution
-   * 3.1 executes commands from the .ideavimrc file and 3.2 initializes extensions.
-   * 3.1 MUST BE BEFORE 3.2. This is a flow of vim/IdeaVim initialization, firstly .ideavimrc is executed and then
-   * the extensions are initialized.
-   * 4) Components initialization
+   * This block DOES NOT initialize extensions, but only registers the available ones.</li>
+   * <li>Options initialisation<br>
+   * This is required to ensure that all options are correctly initialised and registered. Must be before any commands
+   * are executed.</li>
+   * <li>~/.ideavimrc execution<br>
+   * <ul>
+   * <li>4.1 executes commands from the .ideavimrc file and 4.2 initializes extensions.</li>
+   * <li>4.1 MUST BE BEFORE 4.2. This is a flow of vim/IdeaVim initialization, firstly .ideavimrc is executed and then
+   * the extensions are initialized.</li>
+   * </ul>
+   * </li>
+   * <li>Components initialization<br>
    * This should happen after ideavimrc execution because VimListenerManager accesses `number` option
    * to init line numbers and guicaret to initialize carets.
    * However, there is a question about listeners attaching. Listeners registration happens after the .ideavimrc
-   * execution, what theoretically may cause bugs (e.g. VIM-2540)
+   * execution, what theoretically may cause bugs (e.g. VIM-2540)</li>
+   * </ol>
    */
   private void turnOnPlugin() {
     onOffDisposable = Disposer.newDisposable(this, "IdeaVimOnOffDisposer");
@@ -327,11 +334,14 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     // 2.3) Register functions
     VimInjectorKt.getInjector().getFunctionService().registerHandlers();
 
-    // 3) ~/.ideavimrc execution
-    // 3.1) Execute ~/.ideavimrc
+    // 3) Option initialisation
+    VimInjectorKt.getInjector().getOptionGroup().initialiseOptions();
+
+    // 4) ~/.ideavimrc execution
+    // 4.1) Execute ~/.ideavimrc
     registerIdeavimrc();
 
-    // 3.2) Initialize extensions. Always after 3.1
+    // 4.2) Initialize extensions. Always after 3.1
     VimExtensionRegistrar.enableDelayedExtensions();
 
     // Turing on should be performed after all commands registration

@@ -20,16 +20,13 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 @Suppress("SpellCheckingInspection")
 public object IjOptions {
 
-  /**
-   * Initialise additional actions for [IjOptions]
-   *
-   * This serves two purposes. Firstly, it overrides the default value of `'clipboard'` to support 'ideaput'. It also
-   * means that the properties in this class are initialised at a deterministic time, and the same for [Options], by
-   * calling a function on that class.
-   */
   public fun initialise() {
-    // The IntelliJ implementation of 'clipboard' supports a new item - `ideaput`, which will use IntelliJ's paste
-    // processors to e.g. convert Java to Kotlin
+    // Calling this method allows for deterministic initialisation of IjOptions, specifically initialising the
+    // properties and registering the IJ specific options. Once added, they can be safely accessed by name, e.g. by the
+    // implementation of `:set` while executing ~/.ideavimrc
+
+    // We also override the default value of 'clipboard', because IntelliJ supports the 'ideaput' item, which will use
+    // IntelliJ's paste processes (e.g. to convert pasted Java to Kotlin)
     Options.overrideDefaultValue(Options.clipboard, VimString("ideaput,autoselect,exclude:cons\\|linux"))
   }
 
