@@ -41,8 +41,8 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.VimShortcutKeyAction
 import com.maddyhome.idea.vim.api.EffectiveOptions
-import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.VimOptionGroup
+import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.api.setToggleOption
@@ -128,7 +128,7 @@ abstract class VimTestCase {
     VimPlugin.getKey().resetKeyMappings()
     VimPlugin.getSearch().resetState()
     if (!VimPlugin.isEnabled()) VimPlugin.setEnabled(true)
-    injector.optionGroup.setToggleOption(Options.ideastrictmode, OptionScope.GLOBAL)
+    injector.globalOptions().ideastrictmode = true
     GuicursorChangeListener.processGlobalValueChange(null)
     Checks.reset()
     clearClipboard()

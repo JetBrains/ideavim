@@ -16,16 +16,13 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.psi.PsiFile
 import com.intellij.testFramework.ExtensionTestUtil
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.api.Options
+import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.api.modifyOptionValue
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.rangeOf
 import org.junit.jupiter.api.Test
@@ -34,9 +31,8 @@ import java.awt.datatransfer.Transferable
 class PutTestAfterCursorActionTest : VimTestCase() {
   @Test
   fun `test platform handlers are called`() {
-    injector.optionGroup.modifyOptionValue(Options.clipboard, OptionScope.GLOBAL) {
-      Options.clipboard.prependValue(it, VimString(OptionConstants.clipboard_ideaput))
-    }
+    injector.globalOptions().clipboard.prependValue(OptionConstants.clipboard_ideaput)
+
     val extension = TestExtension()
     ExtensionTestUtil.maskExtensions(
       CopyPastePostProcessor.EP_NAME,
