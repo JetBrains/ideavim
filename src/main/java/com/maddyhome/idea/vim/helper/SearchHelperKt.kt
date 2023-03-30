@@ -8,7 +8,6 @@
 
 package com.maddyhome.idea.vim.helper
 
-import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.Direction
@@ -169,8 +168,8 @@ private fun quoteChanges(chars: CharSequence, begin: Int) = sequence {
  * history, the smartcase option is applied, and `\<Work\>` will only match `Work`.
  */
 internal fun shouldIgnoreCase(pattern: String, ignoreSmartCaseOption: Boolean): Boolean {
-  val sc = injector.globalOptions().isSet(Options.smartcase) && !ignoreSmartCaseOption
-  return injector.globalOptions().isSet(Options.ignorecase) && !(sc && containsUpperCase(pattern))
+  val sc = injector.globalOptions().smartcase && !ignoreSmartCaseOption
+  return injector.globalOptions().ignorecase && !(sc && containsUpperCase(pattern))
 }
 
 private fun containsUpperCase(pattern: String): Boolean {

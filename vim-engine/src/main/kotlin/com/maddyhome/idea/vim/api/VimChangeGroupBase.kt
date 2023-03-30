@@ -947,7 +947,7 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
     var endOffset = range.endOffset
     val fileSize = editor.fileSize().toInt()
     if (endOffset > fileSize) {
-      check(!injector.globalOptions().isSet(Options.ideastrictmode)) {
+      check(!injector.globalOptions().ideastrictmode) {
         "Incorrect offset. File size: $fileSize, offset: $endOffset"
       }
       endOffset = fileSize

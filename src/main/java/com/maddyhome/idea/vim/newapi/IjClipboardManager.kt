@@ -23,12 +23,10 @@ import com.intellij.openapi.project.IndexNotReadyException
 import com.intellij.psi.PsiDocumentManager
 import com.maddyhome.idea.vim.api.VimClipboardManager
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
-import com.maddyhome.idea.vim.group.IjOptions
 import java.awt.HeadlessException
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.Transferable
@@ -120,7 +118,7 @@ internal class IjClipboardManager : VimClipboardManager {
       "\n",
       transferableData as Collection<TextBlockTransferableData?>,
     )
-    if (injector.globalOptions().isSet(IjOptions.ideacopypreprocess)) {
+    if (injector.ijOptions(vimEditor).ideacopypreprocess) {
       for (processor in CopyPastePreProcessor.EP_NAME.extensionList) {
         val escapedText = processor.preprocessOnCopy(file, textRange.startOffsets, textRange.endOffsets, rawText)
         if (escapedText != null) {

@@ -14,13 +14,12 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.key
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.group.IjOptions
 import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.vimStateMachine
+import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.runFromVimKey
 import com.maddyhome.idea.vim.newapi.vim
 import java.awt.event.KeyEvent
@@ -133,6 +132,4 @@ internal fun isOctopusEnabled(s: KeyStroke, editor: Editor): Boolean {
  *   what seems to be a way better solution as this is a correct way to override editor actions like enter, right, etc.
  */
 internal val enableOctopus: Boolean
-  get() {
-    return injector.globalOptions().isSet(IjOptions.octopushandler)
-  }
+  get() = injector.globalIjOptions().octopushandler

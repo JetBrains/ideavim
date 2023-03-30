@@ -33,7 +33,6 @@ import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.options.OptionChangeListener;
 import com.maddyhome.idea.vim.regexp.CharPointer;
 import com.maddyhome.idea.vim.regexp.RegExp;
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
 import kotlin.Pair;
 import org.jetbrains.annotations.Contract;
@@ -2230,7 +2229,7 @@ public class SearchHelper {
   }
 
   private static @NotNull String parseMatchPairsOption() {
-    List<String> pairs = globalOptions(injector).getStringListValues(Options.matchpairs);
+    List<String> pairs = globalOptions(injector).getMatchpairs();
     StringBuilder res = new StringBuilder();
     for (String s : pairs) {
       if (s.length() == 3) {

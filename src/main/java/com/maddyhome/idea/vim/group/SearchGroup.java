@@ -43,7 +43,6 @@ import com.maddyhome.idea.vim.regexp.RegExp;
 import com.maddyhome.idea.vim.ui.ModalEntry;
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
 import com.maddyhome.idea.vim.vimscript.model.VimLContext;
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression;
@@ -1095,7 +1094,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
   }
 
   private void resetShowSearchHighlight() {
-    showSearchHighlight = globalOptions(injector).isSet(Options.hlsearch);
+    showSearchHighlight = globalOptions(injector).getHlsearch();
   }
 
   private void highlightSearchLines(@NotNull Editor editor, int startLine, int endLine) {
@@ -1207,7 +1206,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
    * @return              The offset to the occurrence or -1 if not found
    */
   private int findItOffset(@NotNull Editor editor, int startOffset, int count, Direction dir) {
-    boolean wrap = globalOptions(injector).isSet(Options.wrapscan);
+    boolean wrap = globalOptions(injector).getWrapscan();
     logger.debug("Perform search. Direction: " + dir + " wrap: " + wrap);
 
     int offset = 0;
@@ -1369,7 +1368,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
     }
 
     Element show = search.getChild("show-last");
-    final boolean disableHighlight = globalOptions(injector).hasValue(Options.viminfo, "h");
+    final boolean disableHighlight = globalOptions(injector).getViminfo().contains("h");
     showSearchHighlight = !disableHighlight && Boolean.parseBoolean(show.getText());
     if (logger.isDebugEnabled()) {
       logger.debug("show=" + show + "(" + show.getText() + ")");
@@ -1428,7 +1427,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
   private @NotNull String lastPatternOffset = "";  // /{pattern}/{offset}. Do not confuse with caret offset!
   private boolean lastIgnoreSmartCase;
   private @NotNull Direction lastDir = Direction.FORWARDS;
-  private boolean showSearchHighlight = globalOptions(injector).isSet(Options.hlsearch);
+  private boolean showSearchHighlight = globalOptions(injector).getHlsearch();
 
   private boolean do_all = false; /* do multiple substitutions per line */
   private boolean do_ask = false; /* ask for confirmation */

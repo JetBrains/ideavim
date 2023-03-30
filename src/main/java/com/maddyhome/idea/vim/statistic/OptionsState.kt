@@ -12,18 +12,14 @@ import com.intellij.internal.statistic.beans.MetricEvent
 import com.intellij.internal.statistic.eventLog.EventLogGroup
 import com.intellij.internal.statistic.eventLog.events.BooleanEventField
 import com.intellij.internal.statistic.eventLog.events.EventFields
-import com.intellij.internal.statistic.eventLog.events.StringEventField
-import com.intellij.internal.statistic.eventLog.events.StringListEventField
 import com.intellij.internal.statistic.eventLog.events.VarargEventId
 import com.intellij.internal.statistic.service.fus.collectors.ApplicationUsagesCollector
-import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.IjOptionConstants
 import com.maddyhome.idea.vim.group.IjOptions
+import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.StringListOption
-import com.maddyhome.idea.vim.options.StringOption
 import com.maddyhome.idea.vim.options.ToggleOption
 
 internal class OptionsState : ApplicationUsagesCollector() {
@@ -32,29 +28,24 @@ internal class OptionsState : ApplicationUsagesCollector() {
 
   override fun getMetrics(): Set<MetricEvent> {
     val globalOptions = injector.globalOptions()
+    val globalIjOptions = injector.globalIjOptions()
 
     return setOf(
       OPTIONS.metric(
-        IDEAJOIN withOption IjOptions.ideajoin,
-        IDEAMARKS withOption IjOptions.ideamarks,
-        IDEAREFACTOR withOption IjOptions.idearefactormode,
-        IDEAPUT with globalOptions.hasValue(Options.clipboard, OptionConstants.clipboard_ideaput),
-        IDEASTATUSICON withOption IjOptions.ideastatusicon,
-        IDEAWRITE withOption IjOptions.ideawrite,
-        IDEASELECTION with globalOptions.hasValue(Options.selectmode, "ideaselection"),
-        IDEAVIMSUPPORT withOption IjOptions.ideavimsupport,
+        IDEAJOIN withOption IjOptions.ideajoin, // ideajoin is global-local. We can only report the global value
+        IDEAMARKS with globalIjOptions.ideamarks,
+        IDEAREFACTOR with globalIjOptions.idearefactormode,
+        IDEAPUT with globalOptions.clipboard.contains(OptionConstants.clipboard_ideaput),
+        IDEASTATUSICON with globalIjOptions.ideastatusicon,
+        IDEAWRITE with globalIjOptions.ideawrite,
+        IDEASELECTION with globalOptions.selectmode.contains(OptionConstants.selectmode_ideaselection),
+        IDEAVIMSUPPORT with globalIjOptions.ideavimsupport,
       ),
     )
   }
 
   private infix fun BooleanEventField.withOption(option: ToggleOption) =
     this.with(injector.globalOptions().isSet(option))
-
-  private infix fun StringEventField.withOption(option: StringOption) =
-    this.with(injector.globalOptions().getStringValue(option))
-
-  private infix fun StringListEventField.withOption(option: StringListOption) =
-    this.with(injector.globalOptions().getStringListValues(option))
 
   companion object {
     private val GROUP = EventLogGroup("vim.options", 1)
@@ -63,10 +54,10 @@ internal class OptionsState : ApplicationUsagesCollector() {
     private val IDEAMARKS = BooleanEventField(IjOptions.ideamarks.name)
     // TODO: This looks like the wrong name!!
     private val IDEAREFACTOR = EventFields.String(IjOptions.ideamarks.name, IjOptionConstants.ideaRefactorModeValues.toList())
-    private val IDEAPUT = BooleanEventField("ideaput")
+    private val IDEAPUT = BooleanEventField(OptionConstants.clipboard_ideaput)
     private val IDEASTATUSICON = EventFields.String(IjOptions.ideastatusicon.name, IjOptionConstants.ideaStatusIconValues.toList())
     private val IDEAWRITE = EventFields.String(IjOptions.ideawrite.name, IjOptionConstants.ideaWriteValues.toList())
-    private val IDEASELECTION = BooleanEventField("ideaselection")
+    private val IDEASELECTION = BooleanEventField(OptionConstants.selectmode_ideaselection)
     private val IDEAVIMSUPPORT = EventFields.StringList(IjOptions.ideavimsupport.name, IjOptionConstants.ideavimsupportValues.toList())
 
     private val OPTIONS: VarargEventId = GROUP.registerVarargEvent(

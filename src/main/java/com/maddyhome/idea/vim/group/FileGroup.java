@@ -45,8 +45,8 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.util.Collection;
 
-import static com.maddyhome.idea.vim.api.VimInjectorKt.globalOptions;
 import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
+import static com.maddyhome.idea.vim.newapi.IjVimInjectorKt.globalIjOptions;
 
 public class FileGroup extends VimFileBase {
   public boolean openFile(@NotNull String filename, @NotNull ExecutionContext context) {
@@ -185,7 +185,7 @@ public class FileGroup extends VimFileBase {
   @Override
   public void saveFile(@NotNull ExecutionContext context) {
     NativeAction action;
-    if (globalOptions(injector).hasValue(IjOptions.ideawrite, IjOptionConstants.ideawrite_all)) {
+    if (globalIjOptions(injector).getIdeawrite().contains(IjOptionConstants.ideawrite_all)) {
       action = injector.getNativeActionManager().getSaveAll();
     }
     else {

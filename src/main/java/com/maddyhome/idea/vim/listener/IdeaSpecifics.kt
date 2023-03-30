@@ -32,17 +32,14 @@ import com.intellij.openapi.util.TextRange
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.VimShortcutKeyAction
-import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.api.invertToggleOption
 import com.maddyhome.idea.vim.command.VimStateMachine
-import com.maddyhome.idea.vim.group.IjOptions
 import com.maddyhome.idea.vim.group.NotificationService
 import com.maddyhome.idea.vim.helper.inNormalMode
 import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
 import com.maddyhome.idea.vim.helper.vimStateMachine
+import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.IdeaRefactorModeHelper
 import org.jetbrains.annotations.NonNls
 import java.awt.event.KeyEvent
@@ -69,7 +66,7 @@ internal object IdeaSpecifics {
       }
 
       val isVimAction = (action as? AnActionWrapper)?.delegate is VimShortcutKeyAction
-      if (!isVimAction && injector.globalOptions().isSet(IjOptions.trackactionids)) {
+      if (!isVimAction && injector.globalIjOptions().trackactionids) {
         if (action !is NotificationService.ActionIdNotifier.CopyActionId && action !is NotificationService.ActionIdNotifier.StopTracking) {
           val id: String? = ActionManager.getInstance().getId(action) ?: (action.shortcutSet as? ProxyShortcutSet)?.actionId
           VimPlugin.getNotifications(event.dataContext.getData(CommonDataKeys.PROJECT)).notifyActionId(id)
@@ -212,10 +209,10 @@ internal object IdeaSpecifics {
 
 //region Find action ID
 internal class FindActionIdAction : DumbAwareToggleAction() {
-  override fun isSelected(e: AnActionEvent): Boolean = injector.globalOptions().isSet(IjOptions.trackactionids)
+  override fun isSelected(e: AnActionEvent): Boolean = injector.globalIjOptions().trackactionids
 
   override fun setSelected(e: AnActionEvent, state: Boolean) {
-    injector.optionGroup.invertToggleOption(IjOptions.trackactionids, OptionScope.GLOBAL)
+    injector.globalIjOptions().trackactionids = !injector.globalIjOptions().trackactionids
   }
 }
 //endregion

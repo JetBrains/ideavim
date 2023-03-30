@@ -40,13 +40,13 @@ import com.intellij.ui.awt.RelativePoint
 import com.intellij.util.Consumer
 import com.intellij.util.ui.LafIconLookup
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.IjOptionConstants
 import com.maddyhome.idea.vim.group.IjOptions
 import com.maddyhome.idea.vim.group.NotificationService
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.icons.VimIcons
+import com.maddyhome.idea.vim.newapi.globalIjOptions
 import org.jetbrains.annotations.NonNls
 import java.awt.Point
 import java.awt.event.MouseEvent
@@ -68,7 +68,7 @@ internal class StatusBarIconFactory : StatusBarWidgetFactory/*, LightEditCompati
   }
 
   override fun isAvailable(project: Project): Boolean {
-    return !injector.globalOptions().hasValue(IjOptions.ideastatusicon, IjOptionConstants.ideastatusicon_disabled)
+    return injector.globalIjOptions().ideastatusicon != IjOptionConstants.ideastatusicon_disabled
   }
 
   override fun createWidget(project: Project): StatusBarWidget {
@@ -118,7 +118,7 @@ internal class VimStatusBar : StatusBarWidget, StatusBarWidget.IconPresentation 
   override fun getTooltipText() = STATUS_BAR_DISPLAY_NAME
 
   override fun getIcon(): Icon {
-    if (injector.globalOptions().hasValue(IjOptions.ideastatusicon, IjOptionConstants.ideastatusicon_gray)) {
+    if (injector.globalIjOptions().ideastatusicon == IjOptionConstants.ideastatusicon_gray) {
       return VimIcons.IDEAVIM_DISABLED
     }
     return if (VimPlugin.isEnabled()) VimIcons.IDEAVIM else VimIcons.IDEAVIM_DISABLED
