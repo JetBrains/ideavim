@@ -14,6 +14,12 @@ To apply the patch, change the root project
 accordingly, and delete the patch script.
 */
 changeProject(DslContext.projectId) {
+    params {
+        add {
+            password("env.CERTIFICATE_CHAIN", "credentialsJSON:1bab4a88-10e7-4bf9-856c-e6253499dc95", display = ParameterDisplay.HIDDEN)
+        }
+    }
+
     features {
         val feature1 = find<AmazonEC2CloudImage> {
             amazonEC2CloudImage {
@@ -46,7 +52,7 @@ changeProject(DslContext.projectId) {
             instanceTags = mapOf(
                 "project" to "idea-vim"
             )
-            source = Source("ami-087dfbf409df5a55e")
+            source = Source("ami-0fa17ce8238eb8868")
             param("ebs-optimized", "")
         }
         val feature2 = find<AmazonEC2CloudProfile> {

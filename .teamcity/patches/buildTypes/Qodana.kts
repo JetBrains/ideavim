@@ -88,6 +88,7 @@ changeBuildType(RelativeId("Qodana")) {
                 minute = 0
                 timezone = "SERVER"
             }
+            param("dayOfWeek", "Sunday")
 
         }
     }
