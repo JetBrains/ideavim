@@ -13,8 +13,7 @@ import com.maddyhome.idea.vim.api.VimOptionGroupBase
 import com.maddyhome.idea.vim.options.OptionScope
 
 internal class OptionGroup : VimOptionGroupBase() {
-  // TODO: Get rid of this lazy. It's only there to prevent a cyclic dependency during migration
-  private val myGlobalOptions by lazy { GlobalIjOptions() }
+  private val myGlobalOptions = GlobalIjOptions()
 
   override fun initialiseOptions() {
     // We MUST call super!

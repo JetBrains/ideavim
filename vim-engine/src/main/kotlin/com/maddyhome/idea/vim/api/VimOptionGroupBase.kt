@@ -15,8 +15,7 @@ import com.maddyhome.idea.vim.options.OptionValueAccessor
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 
 public abstract class VimOptionGroupBase : VimOptionGroup {
-  // TODO: Remove this lazy. It's only required to stop a cyclic dependency during migration
-  private val myGlobalOptions by lazy { GlobalOptions() }
+  private val myGlobalOptions = GlobalOptions()
   private val globalValues = mutableMapOf<String, VimDataType>()
   private val localOptionsKey = Key<MutableMap<String, VimDataType>>("localOptions")
   private val globalOptionValueAccessor by lazy { OptionValueAccessor(this, OptionScope.GLOBAL) }

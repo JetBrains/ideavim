@@ -11,7 +11,6 @@ package com.maddyhome.idea.vim.api
 import com.maddyhome.idea.vim.options.NumberOption
 import com.maddyhome.idea.vim.options.Option
 import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.options.OptionValueAccessor
 import com.maddyhome.idea.vim.options.StringListOption
 import com.maddyhome.idea.vim.options.StringOption
 import com.maddyhome.idea.vim.options.ToggleOption
@@ -26,10 +25,7 @@ import kotlin.reflect.KProperty
 /**
  * Base class to provide mechanisms to delegate properties to get/set option values
  */
-// TODO: Remove this base class! This is added simply to make it easier to migrate usages
-public abstract class OptionsPropertiesBase(scope: OptionScope = OptionScope.GLOBAL)
-  : OptionValueAccessor(injector.optionGroup, scope) {
-
+public abstract class OptionsPropertiesBase(private val scope: OptionScope = OptionScope.GLOBAL) {
   /**
    * Provide a delegate property to get/set boolean option values
    */
