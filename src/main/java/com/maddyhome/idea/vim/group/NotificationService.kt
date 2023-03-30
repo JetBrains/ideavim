@@ -31,13 +31,11 @@ import com.intellij.openapi.util.SystemInfo
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.api.setToggleOption
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.statistic.ActionTracker
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable
 import com.maddyhome.idea.vim.vimscript.services.VimRcService
@@ -97,7 +95,7 @@ internal class NotificationService(private val project: Project?) {
         "set ideajoin",
         "idejoin"
       ) {
-        injector.optionGroup.setToggleOption(IjOptions.ideajoin, OptionScope.GLOBAL)
+        injector.globalIjOptions().ideajoin = true
       },
     )
 

@@ -10,6 +10,12 @@ package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.options.OptionScope
 
+/**
+ * An accessor class for global options
+ *
+ * This class provides access to options that only have a global value, and do not have a separate value local to a
+ * buffer (document) or window (editor).
+ */
 @Suppress("unused", "SpellCheckingInspection")
 public open class GlobalOptions(scope: OptionScope = OptionScope.GLOBAL): OptionsPropertiesBase(scope) {
   public val clipboard: StringListOptionValue by optionProperty(Options.clipboard)
@@ -53,7 +59,12 @@ public open class GlobalOptions(scope: OptionScope = OptionScope.GLOBAL): Option
   public var ideatracetime: Boolean by optionProperty(Options.ideatracetime)
 }
 
-
+/**
+ * An accessor class for the values of options in effect for the given scope
+ *
+ * As a convenience, this class can also access the global options that are effective in the given scope. The values
+ * will be the same as in the global scope.
+ */
 @Suppress("unused")
 public open class EffectiveOptions(scope: OptionScope.LOCAL): GlobalOptions(scope) {
 //  public val iskeyword: StringListOptionValue by optionProperty(Options.iskeyword)

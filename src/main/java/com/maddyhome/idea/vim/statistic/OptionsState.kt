@@ -20,8 +20,6 @@ import com.maddyhome.idea.vim.group.IjOptionConstants
 import com.maddyhome.idea.vim.group.IjOptions
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.options.OptionConstants
-import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.options.ToggleOption
 
 internal class OptionsState : ApplicationUsagesCollector() {
 
@@ -33,7 +31,7 @@ internal class OptionsState : ApplicationUsagesCollector() {
 
     return setOf(
       OPTIONS.metric(
-        IDEAJOIN withOption IjOptions.ideajoin, // ideajoin is global-local. We can only report the global value
+        IDEAJOIN with globalIjOptions.ideajoin,
         IDEAMARKS with globalIjOptions.ideamarks,
         IDEAREFACTOR with globalIjOptions.idearefactormode,
         IDEAPUT with globalOptions.clipboard.contains(OptionConstants.clipboard_ideaput),
@@ -44,9 +42,6 @@ internal class OptionsState : ApplicationUsagesCollector() {
       ),
     )
   }
-
-  private infix fun BooleanEventField.withOption(option: ToggleOption) =
-    this.with(injector.optionGroup.getOptionValue(option, OptionScope.GLOBAL).asBoolean())
 
   companion object {
     private val GROUP = EventLogGroup("vim.options", 1)
