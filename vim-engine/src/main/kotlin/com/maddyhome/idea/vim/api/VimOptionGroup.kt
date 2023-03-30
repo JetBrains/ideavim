@@ -12,7 +12,6 @@ import com.maddyhome.idea.vim.options.Option
 import com.maddyhome.idea.vim.options.OptionChangeListener
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.options.StringListOption
-import com.maddyhome.idea.vim.options.StringOption
 import com.maddyhome.idea.vim.options.ToggleOption
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
@@ -116,18 +115,6 @@ public fun <T: VimDataType> VimOptionGroup.resetDefaultValue(option: Option<T>, 
 }
 
 /**
- * Checks if the given string option matches the value
- */
-public fun VimOptionGroup.hasValue(option: StringOption, scope: OptionScope, value: String): Boolean =
-  value == getOptionValue(option, scope).asString()
-
-/**
- * Checks if the given string list option contains the value
- */
-public fun VimOptionGroup.hasValue(option: StringListOption, scope: OptionScope, value: String): Boolean =
-  value in option.split(getOptionValue(option, scope).asString())
-
-/**
  * Splits a string list option into flags, or returns a list with a single string value
  *
  * E.g. the `fileencodings` option with value "ucs-bom,utf-8,default,latin1" will result listOf("ucs-bom", "utf-8", "default", "latin1")
@@ -156,16 +143,4 @@ public fun VimOptionGroup.unsetToggleOption(option: ToggleOption, scope: OptionS
 public fun VimOptionGroup.invertToggleOption(option: ToggleOption, scope: OptionScope) {
   val optionValue = getOptionValue(option, scope)
   setOptionValue(option, scope, if (optionValue.asBoolean()) VimInt.ZERO else VimInt.ONE)
-}
-
-
-/**
- * Modifies the value of an option by calling the given transform function
- */
-public inline fun <T : Option<TDataType>, TDataType : VimDataType> VimOptionGroup.modifyOptionValue(
-  option: T,
-  scope: OptionScope,
-  transform: T.(TDataType) -> TDataType?
-) {
-  option.transform(getOptionValue(option, scope))?.let { setOptionValue(option, scope, it) }
 }

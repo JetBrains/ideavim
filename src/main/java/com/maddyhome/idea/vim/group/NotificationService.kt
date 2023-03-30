@@ -29,19 +29,17 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.SystemInfo
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.api.Options
+import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.api.modifyOptionValue
 import com.maddyhome.idea.vim.api.setToggleOption
-import com.maddyhome.idea.vim.api.unsetToggleOption
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
+import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.statistic.ActionTracker
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.services.VimRcService
 import java.awt.datatransfer.StringSelection
 import java.io.File
@@ -71,12 +69,12 @@ internal class NotificationService(private val project: Project?) {
     notification.addAction(
       AppendToIdeaVimRcAction(
         notification,
-        "set clipboard+=ideaput",
+        "set clipboard^=ideaput",
         "ideaput",
       ) {
-        injector.optionGroup.modifyOptionValue(Options.clipboard, OptionScope.GLOBAL) {
-          appendValue(it, VimString(OptionConstants.clipboard_ideaput))
-        }
+        // Technically, we're supposed to prepend values to clipboard so that it's not added to the "exclude" item.
+        // Since we don't handle exclude, it's safe to append. But let's be clean.
+        injector.globalOptions().clipboard.prependValue(OptionConstants.clipboard_ideaput)
       },
     )
 
@@ -232,7 +230,7 @@ internal class NotificationService(private val project: Project?) {
 
     class StopTracking : DumbAwareAction("Stop Tracking") {
       override fun actionPerformed(e: AnActionEvent) {
-        injector.optionGroup.unsetToggleOption(IjOptions.trackactionids, OptionScope.GLOBAL)
+        injector.globalIjOptions().trackactionids = false
         notification?.expire()
       }
     }
