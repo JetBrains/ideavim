@@ -17,7 +17,6 @@ import com.intellij.openapi.util.NlsSafe
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getText
 import com.maddyhome.idea.vim.api.injector
@@ -319,7 +318,7 @@ internal class VimMultipleCursorsExtension : VimExtension {
 
   private fun findNextOccurrence(editor: Editor, startOffset: Int, text: String, whole: Boolean): Int {
     val searchOptions = enumSetOf(SearchOptions.WHOLE_FILE)
-    if (injector.options(editor.vim).isSet(Options.wrapscan)) {
+    if (injector.options(editor.vim).wrapscan) {
       searchOptions.add(SearchOptions.WRAP)
     }
 

@@ -7,7 +7,6 @@
  */
 package com.maddyhome.idea.vim.common
 
-import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.options
@@ -53,9 +52,7 @@ public class DigraphSequence {
     return when (digraphState) {
       DIG_STATE_PENDING -> {
         logger.debug("DIG_STATE_PENDING")
-        if (key.keyCode == KeyEvent.VK_BACK_SPACE &&
-          injector.options(editor).isSet(Options.digraph)
-        ) {
+        if (key.keyCode == KeyEvent.VK_BACK_SPACE && injector.options(editor).digraph) {
           digraphState = DIG_STATE_BACK_SPACE
         } else if (key.keyChar != KeyEvent.CHAR_UNDEFINED) {
           digraphChar = key.keyChar

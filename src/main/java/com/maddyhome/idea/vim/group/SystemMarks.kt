@@ -16,14 +16,13 @@ import com.intellij.ide.bookmark.providers.LineBookmarkProvider
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.api.options
-import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.newapi.globalIjOptions
 
 internal class SystemMarks {
   companion object {
     @JvmStatic
     fun createOrGetSystemMark(ch: Char, line: Int, editor: Editor): LineBookmark? {
-      if (!injector.options(editor.vim).isSet(IjOptions.ideamarks)) return null
+      if (!injector.globalIjOptions().ideamarks) return null
 
       val project = editor.project ?: return null
       val type = BookmarkType.get(ch)

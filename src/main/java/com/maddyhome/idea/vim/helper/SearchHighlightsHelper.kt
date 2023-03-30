@@ -21,7 +21,6 @@ import com.intellij.openapi.editor.markup.TextAttributes
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.ui.ColorUtil
-import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.options
@@ -51,7 +50,7 @@ internal fun updateIncsearchHighlights(
 ): Int {
   val searchStartOffset =
     if (searchRange != null) editor.vim.getLineStartOffset(searchRange.startLine) else caretOffset
-  val showHighlights = injector.options(editor.vim).isSet(Options.hlsearch)
+  val showHighlights = injector.options(editor.vim).hlsearch
   return updateSearchHighlights(pattern, false, showHighlights, searchStartOffset, searchRange, forwards, false)
 }
 

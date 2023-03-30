@@ -10,7 +10,6 @@ package com.maddyhome.idea.vim.action.motion.leftright
 
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
-import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimMotionGroupBase
 import com.maddyhome.idea.vim.api.injector
@@ -41,7 +40,7 @@ public open class MotionLastColumnAction : MotionActionHandler.ForEachCaret() {
     operatorArguments: OperatorArguments,
   ): Motion {
     val allow = if (editor.inVisualMode) {
-      !injector.options(editor).hasValue(Options.selection, "old")
+      injector.options(editor).selection != "old"
     } else {
       if (operatorArguments.isOperatorPending) false else editor.isEndAllowed
     }

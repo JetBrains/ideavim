@@ -155,7 +155,7 @@ public class ChangeGroup extends VimChangeGroupBase {
    */
   @Override
   public boolean changeCaseToggleCharacter(@NotNull VimEditor editor, @NotNull VimCaret caret, int count) {
-    boolean allowWrap = options(injector, editor).hasValue(Options.whichwrap, "~");
+    boolean allowWrap = options(injector, editor).getWhichwrap().contains("~");
 
     Motion motion = injector.getMotion().getHorizontalMotion(editor, caret, count, true, allowWrap);
     if (motion instanceof Motion.Error) return false;
@@ -571,7 +571,7 @@ public class ChangeGroup extends VimChangeGroupBase {
       }
     }
 
-    List<String> nf = options(injector, editor).getStringListValues(Options.nrformats);
+    List<String> nf = options(injector, editor).getNrformats();
     boolean alpha = nf.contains("alpha");
     boolean hex = nf.contains("hex");
     boolean octal = nf.contains("octal");
@@ -601,7 +601,7 @@ public class ChangeGroup extends VimChangeGroupBase {
 
   @Override
   public boolean changeNumber(final @NotNull VimEditor editor, @NotNull VimCaret caret, final int count) {
-    final List<String> nf = options(injector, editor).getStringListValues(Options.nrformats);
+    final List<String> nf = options(injector, editor).getNrformats();
     final boolean alpha = nf.contains("alpha");
     final boolean hex = nf.contains("hex");
     final boolean octal = nf.contains("octal");

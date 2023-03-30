@@ -10,7 +10,6 @@ package com.maddyhome.idea.vim.action.motion.leftright
 
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
-import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimMotionGroupBase
 import com.maddyhome.idea.vim.api.injector
@@ -38,7 +37,7 @@ public class MotionEndAction : NonShiftedSpecialKeyHandler() {
     if (editor.inInsertMode) {
       allow = true
     } else if (editor.inVisualMode || editor.inSelectMode) {
-      allow = !injector.options(editor).hasValue(Options.selection, "old")
+      allow = injector.options(editor).selection != "old"
     }
 
     val offset = injector.motion.moveCaretToRelativeLineEnd(editor, caret, operatorArguments.count1 - 1, allow)

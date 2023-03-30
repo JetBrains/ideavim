@@ -9,7 +9,6 @@
 package com.maddyhome.idea.vim.vimscript.model.functions.handlers
 
 import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.lineLength
@@ -68,7 +67,7 @@ private fun currentCol(editor: VimEditor): VimInt {
 
   // If virtualedit is set, the col is one more
   // XXX Should we also check the current mode?
-  if (injector.options(editor).getStringListValues(Options.virtualedit).isNotEmpty()) {
+  if (injector.options(editor).virtualedit.isNotEmpty()) {
     lineLength += 1
   }
 

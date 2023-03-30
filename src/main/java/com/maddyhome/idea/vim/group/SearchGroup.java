@@ -612,7 +612,7 @@ public class SearchGroup extends VimSearchGroupBase implements PersistentStateCo
     }
     else {
       // :h :&& - "Note that :s and :& don't keep the flags"
-      do_all = options(injector, editor).isSet(Options.gdefault);
+      do_all = options(injector, editor).getGdefault();
       do_ask = false;
       do_error = true;
       do_ic = 0;

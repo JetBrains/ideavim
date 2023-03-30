@@ -11,7 +11,6 @@ package com.maddyhome.idea.vim.action.motion.leftright
 import com.maddyhome.idea.vim.action.ComplicatedKeysAction
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
-import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.options
@@ -36,7 +35,7 @@ public class MotionArrowLeftAction : NonShiftedSpecialKeyHandler(), ComplicatedK
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    val allowWrap = injector.options(editor).hasValue(Options.whichwrap, "<")
+    val allowWrap = injector.options(editor).whichwrap.contains("<")
     val allowEnd = operatorArguments.isOperatorPending // d<Left> deletes \n with wrap enabled
     return injector.motion.getHorizontalMotion(editor, caret, -operatorArguments.count1, allowEnd, allowWrap)
   }
