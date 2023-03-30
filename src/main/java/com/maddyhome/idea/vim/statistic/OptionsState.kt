@@ -20,6 +20,7 @@ import com.maddyhome.idea.vim.group.IjOptionConstants
 import com.maddyhome.idea.vim.group.IjOptions
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.options.ToggleOption
 
 internal class OptionsState : ApplicationUsagesCollector() {
@@ -45,7 +46,7 @@ internal class OptionsState : ApplicationUsagesCollector() {
   }
 
   private infix fun BooleanEventField.withOption(option: ToggleOption) =
-    this.with(injector.globalOptions().isSet(option))
+    this.with(injector.optionGroup.getOptionValue(option, OptionScope.GLOBAL).asBoolean())
 
   companion object {
     private val GROUP = EventLogGroup("vim.options", 1)

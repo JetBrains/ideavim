@@ -12,7 +12,6 @@ import com.intellij.openapi.extensions.ExtensionPointListener
 import com.intellij.openapi.extensions.PluginDescriptor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.VimExtensionRegistrator
-import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.setToggleOption
 import com.maddyhome.idea.vim.key.MappingOwner.Plugin.Companion.remove
@@ -65,7 +64,7 @@ internal object VimExtensionRegistrar : VimExtensionRegistrator {
       option,
       object : OptionChangeListener<VimInt> {
         override fun processGlobalValueChange(oldValue: VimInt?) {
-          if (injector.globalOptions().isSet(option)) {
+          if (injector.optionGroup.getOptionValue(option, OptionScope.GLOBAL).asBoolean()) {
             initExtension(extensionBean, name)
             PluginState.enabledExtensions.add(name)
           } else {
