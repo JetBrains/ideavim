@@ -11,14 +11,12 @@ package com.maddyhome.idea.vim.api
 import com.maddyhome.idea.vim.options.Option
 import com.maddyhome.idea.vim.options.OptionChangeListener
 import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.options.OptionValueAccessor
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 
 public abstract class VimOptionGroupBase : VimOptionGroup {
-  private val myGlobalOptions = GlobalOptions()
+  private val globalOptionsAccessor = GlobalOptions()
   private val globalValues = mutableMapOf<String, VimDataType>()
   private val localOptionsKey = Key<MutableMap<String, VimDataType>>("localOptions")
-  private val globalOptionValueAccessor by lazy { OptionValueAccessor(this, OptionScope.GLOBAL) }
 
   override fun initialiseOptions() {
     Options.initialise()
@@ -107,15 +105,11 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
     option.removeOptionChangeListener(listener)
   }
 
-  override fun getValueAccessor(editor: VimEditor?): OptionValueAccessor =
-    if (editor == null) globalOptionValueAccessor else OptionValueAccessor(this, OptionScope.LOCAL(editor))
-
-
   final override fun <T : VimDataType> overrideDefaultValue(option: Option<T>, newDefaultValue: T) {
     option.overrideDefaultValue(newDefaultValue)
   }
 
-  override fun getGlobalOptions(): GlobalOptions = myGlobalOptions
+  override fun getGlobalOptions(): GlobalOptions = globalOptionsAccessor
 
   override fun getEffectiveOptions(editor: VimEditor): EffectiveOptions = EffectiveOptions(OptionScope.LOCAL(editor))
 }
