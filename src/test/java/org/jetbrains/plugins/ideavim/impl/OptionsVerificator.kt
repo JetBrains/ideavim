@@ -12,7 +12,6 @@ import com.intellij.testFramework.LightProjectDescriptor
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
 import com.intellij.testFramework.fixtures.impl.LightTempDirTestFixtureImpl
-import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimOptionGroup
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.diagnostic.vimLogger
@@ -20,7 +19,6 @@ import com.maddyhome.idea.vim.options.NumberOption
 import com.maddyhome.idea.vim.options.Option
 import com.maddyhome.idea.vim.options.OptionChangeListener
 import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.options.OptionValueAccessor
 import com.maddyhome.idea.vim.options.StringListOption
 import com.maddyhome.idea.vim.options.StringOption
 import com.maddyhome.idea.vim.options.ToggleOption
@@ -222,13 +220,6 @@ internal class OptionsTracer(
     } finally {
       ignoreFlag.set(false)
     }
-  }
-
-  override fun getValueAccessor(editor: VimEditor?): OptionValueAccessor {
-    // I don't like this solution. Would love to see something better without re-wrapping.
-    // The point is that OptionValueAccessor should use our group to be property traced
-    val accessor = vimOptionGroup.getValueAccessor(editor)
-    return OptionValueAccessor(this, accessor.scope)
   }
 
   companion object

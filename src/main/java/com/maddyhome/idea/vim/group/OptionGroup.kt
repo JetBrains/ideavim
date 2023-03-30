@@ -13,7 +13,7 @@ import com.maddyhome.idea.vim.api.VimOptionGroupBase
 import com.maddyhome.idea.vim.options.OptionScope
 
 internal class OptionGroup : VimOptionGroupBase() {
-  private val myGlobalOptions = GlobalIjOptions()
+  private val globalOptionsAccessor = GlobalIjOptions()
 
   override fun initialiseOptions() {
     // We MUST call super!
@@ -21,7 +21,7 @@ internal class OptionGroup : VimOptionGroupBase() {
     IjOptions.initialise()
   }
 
-  override fun getGlobalOptions() = myGlobalOptions
+  override fun getGlobalOptions() = globalOptionsAccessor
   override fun getEffectiveOptions(editor: VimEditor) = EffectiveIjOptions(OptionScope.LOCAL(editor))
 }
 

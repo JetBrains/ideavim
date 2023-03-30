@@ -216,7 +216,13 @@ internal class IjVimInjector : VimInjectorBase() {
     get() = service<EditorGroup>()
 }
 
+/**
+ * Get an accessor for the IntelliJ implementation specific global options
+ */
 public fun VimInjector.globalIjOptions(): GlobalIjOptions = this.optionGroup.getGlobalOptions() as GlobalIjOptions
-public fun VimInjector.ijOptions(editor: VimEditor): EffectiveIjOptions {
-  return this.optionGroup.getEffectiveOptions(editor) as EffectiveIjOptions
-}
+
+/**
+ * Get an accessor for the IntelliJ implementation specific effective options for the given editor
+ */
+public fun VimInjector.ijOptions(editor: VimEditor): EffectiveIjOptions =
+  this.optionGroup.getEffectiveOptions(editor) as EffectiveIjOptions

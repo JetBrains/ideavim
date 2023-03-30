@@ -8,8 +8,8 @@
 
 package com.maddyhome.idea.vim.option
 
-import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.options.OptionScope
 
 /**
  * COMPATIBILITY-LAYER: Moved out of class and to a different package
@@ -23,5 +23,5 @@ public open class ToggleOption(private val option: com.maddyhome.idea.vim.option
    * COMPATIBILITY-LAYER: Method added
    * Please see: https://jb.gg/zo8n0r
    */
-  public fun isSet(): Boolean = injector.globalOptions().isSet(option)
+  public fun isSet(): Boolean = injector.optionGroup.getOptionValue(option, OptionScope.GLOBAL).asBoolean()
 }

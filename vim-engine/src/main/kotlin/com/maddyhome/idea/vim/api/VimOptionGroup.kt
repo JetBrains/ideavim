@@ -11,7 +11,6 @@ package com.maddyhome.idea.vim.api
 import com.maddyhome.idea.vim.options.Option
 import com.maddyhome.idea.vim.options.OptionChangeListener
 import com.maddyhome.idea.vim.options.OptionScope
-import com.maddyhome.idea.vim.options.OptionValueAccessor
 import com.maddyhome.idea.vim.options.StringListOption
 import com.maddyhome.idea.vim.options.StringOption
 import com.maddyhome.idea.vim.options.ToggleOption
@@ -83,17 +82,6 @@ public interface VimOptionGroup {
    * @param listener option listener
    */
   public fun <T : VimDataType> removeListener(option: Option<T>, listener: OptionChangeListener<T>)
-
-  /**
-   * Return an accessor class to easily retrieve options values
-   *
-   * Note that passing `null` as an editor means that you're only interested in global options - NOT global values of
-   * local to buffer or local to window or global-local options! For that, use [getOptionValue].
-   *
-   * @param editor The editor to use to retrieve local option values. If `null`, then only global values are available
-   * @return An instance of [OptionValueAccessor] to provide easy API to get option values
-   */
-  public fun getValueAccessor(editor: VimEditor?): OptionValueAccessor
 
   /**
    * Override the original default value of the option with an implementation specific value
