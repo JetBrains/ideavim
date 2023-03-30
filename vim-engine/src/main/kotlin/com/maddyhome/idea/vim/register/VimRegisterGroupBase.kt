@@ -73,7 +73,7 @@ public abstract class VimRegisterGroupBase : VimRegisterGroup {
     injector.optionGroup.addListener(
       Options.clipboard,
       {
-        val clipboardOptionValue = injector.globalOptions().getStringListValues(Options.clipboard)
+        val clipboardOptionValue = injector.globalOptions().clipboard
         defaultRegisterChar = when {
           "unnamed" in clipboardOptionValue -> '*'
           "unnamedplus" in clipboardOptionValue -> '+'

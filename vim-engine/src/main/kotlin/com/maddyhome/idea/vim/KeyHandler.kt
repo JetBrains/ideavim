@@ -8,7 +8,6 @@
 package com.maddyhome.idea.vim
 
 import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.VimActionsInitiator
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.globalOptions
@@ -88,7 +87,7 @@ public class KeyHandler {
         Key: $key
       """.trimIndent()
     }
-    val maxMapDepth = injector.globalOptions().getIntValue(Options.maxmapdepth)
+    val maxMapDepth = injector.globalOptions().maxmapdepth
     if (handleKeyRecursionCount >= maxMapDepth) {
       injector.messages.showStatusBarMessage(editor, injector.messages.message("E223"))
       injector.messages.indicateError()

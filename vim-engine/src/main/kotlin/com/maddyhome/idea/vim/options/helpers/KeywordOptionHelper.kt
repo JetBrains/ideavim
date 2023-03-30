@@ -8,7 +8,6 @@
 
 package com.maddyhome.idea.vim.options.helpers
 
-import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.options.OptionChangeListener
@@ -28,9 +27,7 @@ public object KeywordOptionHelper {
   }
 
   public fun updateSpecs() {
-    keywordSpecs = valuesToValidatedAndReversedSpecs(
-      parseValues(injector.globalOptions().getStringValue(Options.iskeyword)),
-    )!!.toMutableList()
+    keywordSpecs = valuesToValidatedAndReversedSpecs(injector.globalOptions().iskeyword)!!.toMutableList()
   }
 
   public fun isValueInvalid(value: String): Boolean {

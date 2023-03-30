@@ -21,7 +21,6 @@ import com.intellij.openapi.wm.WindowManager
 import com.intellij.openapi.wm.impl.status.EditorBasedWidget
 import com.intellij.openapi.wm.impl.status.widget.StatusBarWidgetsManager
 import com.intellij.util.Consumer
-import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.EngineStringHelper
@@ -59,7 +58,7 @@ internal object ShowCmd {
   }
 
   fun getFullText(editor: Editor?): String {
-    if (!injector.globalOptions().isSet(Options.showcmd) || editor == null || editor.isDisposed) return ""
+    if (!injector.globalOptions().showcmd || editor == null || editor.isDisposed) return ""
 
     val editorState = editor.vim.vimStateMachine
     return EngineStringHelper.toPrintableCharacters(editorState.commandBuilder.keys + editorState.mappingState.keys)
@@ -88,7 +87,7 @@ internal class ShowCmdStatusBarWidgetFactory : StatusBarWidgetFactory/*, LightEd
     // Nothing
   }
 
-  override fun isAvailable(project: Project): Boolean = injector.globalOptions().isSet(Options.showcmd)
+  override fun isAvailable(project: Project): Boolean = injector.globalOptions().showcmd
 
   override fun createWidget(project: Project): StatusBarWidget = Widget(project)
 

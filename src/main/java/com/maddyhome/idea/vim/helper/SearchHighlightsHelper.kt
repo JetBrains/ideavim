@@ -115,7 +115,7 @@ private fun updateSearchHighlights(
       } else if (shouldAddCurrentMatchSearchHighlight(pattern, showHighlights, initialOffset)) {
         // nohlsearch + incsearch
         val searchOptions = EnumSet.of(SearchOptions.WHOLE_FILE)
-        if (injector.globalOptions().isSet(Options.wrapscan)) {
+        if (injector.globalOptions().wrapscan) {
           searchOptions.add(SearchOptions.WRAP)
         }
         if (shouldIgnoreSmartCase) searchOptions.add(SearchOptions.IGNORE_SMARTCASE)
@@ -177,7 +177,7 @@ private fun findClosestMatch(editor: Editor, results: List<TextRange>, initialOf
     }
     d2 - d1
   }
-  if (!injector.globalOptions().isSet(Options.wrapscan)) {
+  if (!injector.globalOptions().wrapscan) {
     val start = max.startOffset
     if (forwards && start < initialOffset) {
       return -1

@@ -185,10 +185,10 @@ public class ProcessGroup extends VimProcessGroupBase {
     // Finally, we're also not bothering with the crazy space and backslash handling of the 'shell' options content.
     return ProgressManager.getInstance().runProcessWithProgressSynchronously(() -> {
 
-      final String shell = globalOptions(injector).getStringValue(Options.shell);
-      final String shellcmdflag = globalOptions(injector).getStringValue(Options.shellcmdflag);
-      final String shellxescape = globalOptions(injector).getStringValue(Options.shellxescape);
-      final String shellxquote = globalOptions(injector).getStringValue(Options.shellxquote);
+      final String shell = globalOptions(injector).getShell();
+      final String shellcmdflag = globalOptions(injector).getShellcmdflag();
+      final String shellxescape = globalOptions(injector).getShellxescape();
+      final String shellxquote = globalOptions(injector).getShellxquote();
 
       // For Win32. See :help 'shellxescape'
       final String escapedCommand = shellxquote.equals("(")

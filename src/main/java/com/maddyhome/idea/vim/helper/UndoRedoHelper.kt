@@ -17,11 +17,11 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.fileEditor.impl.text.TextEditorProvider
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.ChangesListener
 import com.maddyhome.idea.vim.group.IjOptions
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
+import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.undo.UndoRedoBase
 
@@ -32,7 +32,7 @@ import com.maddyhome.idea.vim.undo.UndoRedoBase
 internal class UndoRedoHelper : UndoRedoBase() {
   init {
     injector.optionGroup.addListener(IjOptions.oldundo, {
-      UndoManagerImpl.ourNeverAskUser = !injector.globalOptions().isSet(IjOptions.oldundo)
+      UndoManagerImpl.ourNeverAskUser = !injector.globalIjOptions().oldundo
     }, true)
   }
 
@@ -45,7 +45,7 @@ internal class UndoRedoHelper : UndoRedoBase() {
       val scrollingModel = editor.getScrollingModel()
       scrollingModel.accumulateViewportChanges()
 
-      if (injector.globalOptions().isSet(IjOptions.oldundo)) {
+      if (injector.globalIjOptions().oldundo) {
         SelectionVimListenerSuppressor.lock().use { undoManager.undo(fileEditor) }
       } else {
         performUntilFileChanges(editor, { undoManager.isUndoAvailable(fileEditor) }, { undoManager.undo(fileEditor) })
@@ -76,7 +76,7 @@ internal class UndoRedoHelper : UndoRedoBase() {
     val fileEditor = TextEditorProvider.getInstance().getTextEditor(editor.ij)
     val undoManager = UndoManager.getInstance(project)
     if (undoManager.isRedoAvailable(fileEditor)) {
-      if (injector.globalOptions().isSet(IjOptions.oldundo)) {
+      if (injector.globalIjOptions().oldundo) {
         SelectionVimListenerSuppressor.lock().use { undoManager.redo(fileEditor) }
       } else {
         performUntilFileChanges(editor, { undoManager.isRedoAvailable(fileEditor) }, { undoManager.redo(fileEditor) })

@@ -41,8 +41,10 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-import static com.maddyhome.idea.vim.api.VimInjectorKt.*;
+import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
+import static com.maddyhome.idea.vim.api.VimInjectorKt.options;
 import static com.maddyhome.idea.vim.helper.CaretVisualAttributesHelperKt.updateCaretsVisualAttributes;
+import static com.maddyhome.idea.vim.newapi.IjVimInjectorKt.ijOptions;
 
 /**
  * @author vlan
@@ -231,8 +233,8 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
     CaretVisualAttributesHelperKt.removeCaretsVisualAttributes(editor);
   }
 
-  public void notifyIdeaJoin(@Nullable Project project) {
-    if (VimPlugin.getVimState().isIdeaJoinNotified() || globalOptions(injector).isSet(IjOptions.INSTANCE.getIdeajoin())) {
+  public void notifyIdeaJoin(@Nullable Project project, @NotNull VimEditor editor) {
+    if (VimPlugin.getVimState().isIdeaJoinNotified() || ijOptions(injector, editor).getIdeajoin()) {
       return;
     }
 
@@ -255,7 +257,7 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
 
   @Override
   public void notifyIdeaJoin(@NotNull VimEditor editor) {
-    notifyIdeaJoin(((IjVimEditor) editor).getEditor().getProject());
+    notifyIdeaJoin(((IjVimEditor) editor).getEditor().getProject(), editor);
   }
 
   public static class NumberChangeListener implements LocalOptionChangeListener<VimInt> {

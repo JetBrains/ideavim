@@ -8,7 +8,6 @@
 
 package com.maddyhome.idea.vim.option
 
-import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 
@@ -22,7 +21,7 @@ public object StrictMode {
   }
 
   public fun fail(message: String) {
-    if (injector.globalOptions().isSet(Options.ideastrictmode)) {
+    if (injector.globalOptions().ideastrictmode) {
       error(message)
     }
   }

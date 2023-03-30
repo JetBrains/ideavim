@@ -7,7 +7,6 @@
  */
 package com.maddyhome.idea.vim.command
 
-import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.VimActionsInitiator
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.globalOptions
@@ -284,7 +283,7 @@ public class VimStateMachine(private val editor: VimEditor?) {
 
   private fun doShowMode() {
     val msg = StringBuilder()
-    if (injector.globalOptions().isSet(Options.showmode)) {
+    if (injector.globalOptions().showmode) {
       msg.append(getStatusString())
     }
     if (isRecording) {
@@ -376,7 +375,7 @@ public class VimStateMachine(private val editor: VimEditor?) {
      */
     @JvmStatic
     public fun getInstance(editor: Any?): VimStateMachine {
-      return if (editor == null || injector.globalOptions().isSet(Options.ideaglobalmode)) {
+      return if (editor == null || injector.globalOptions().ideaglobalmode) {
         globalState
       } else {
         injector.commandStateFor(editor)
