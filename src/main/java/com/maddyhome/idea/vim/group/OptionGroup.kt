@@ -11,7 +11,9 @@ package com.maddyhome.idea.vim.group
 import com.maddyhome.idea.vim.api.VimOptionGroupBase
 
 internal class OptionGroup : VimOptionGroupBase() {
-  init {
+  override fun initialiseOptions() {
+    // We MUST call super!
+    super.initialiseOptions()
     IjOptions.initialise()
   }
 }

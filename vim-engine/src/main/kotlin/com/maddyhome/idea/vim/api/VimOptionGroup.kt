@@ -19,6 +19,13 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 
 public interface VimOptionGroup {
   /**
+   * Called to initialise the options
+   *
+   * This function must be idempotent, as it is called each time the plugin is enabled.
+   */
+  public fun initialiseOptions()
+
+  /**
    * Get the [Option] by its name or abbreviation
    */
   public fun getOption(key: String): Option<VimDataType>?

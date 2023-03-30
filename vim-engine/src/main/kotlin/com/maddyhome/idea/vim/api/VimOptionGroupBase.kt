@@ -19,6 +19,10 @@ public abstract class VimOptionGroupBase : VimOptionGroup {
   private val localOptionsKey = Key<MutableMap<String, VimDataType>>("localOptions")
   private val globalOptionValueAccessor by lazy { OptionValueAccessor(this, OptionScope.GLOBAL) }
 
+  override fun initialiseOptions() {
+    Options.initialise()
+  }
+
   override fun <T : VimDataType> getOptionValue(option: Option<T>, scope: OptionScope): T {
     return when (scope) {
       is OptionScope.LOCAL -> getLocalOptionValue(option, scope.editor)

@@ -29,6 +29,13 @@ public object Options {
   private val logger = vimLogger<Options>()
   private val options = MultikeyMap()
 
+  public fun initialise() {
+    // Do nothing!
+    // Calling this method allows for deterministic initialisation of the Options singleton, specifically initialising
+    // the properties and registering the IJ specific options. Once added, they can be safely accessed by name, e.g. by
+    // the implementation of `:set` while executing ~/.ideavimrc
+  }
+
   public fun getOption(key: String): Option<VimDataType>? = options.get(key)
   public fun getAllOptions(): Set<Option<VimDataType>> = options.values.toSet()
 
