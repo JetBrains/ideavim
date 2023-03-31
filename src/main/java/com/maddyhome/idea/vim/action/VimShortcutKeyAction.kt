@@ -16,7 +16,6 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.AnActionWrapper
 import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.application.invokeLater
-import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.progress.ProcessCanceledException
@@ -94,8 +93,9 @@ internal class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatib
 
   override fun update(e: AnActionEvent) {
     val start = if (traceTime) System.currentTimeMillis() else null
-    e.presentation.isEnabled = isEnabled(e)
-    LOG.debug { "Shortcut key. Enabled: ${e.presentation.isEnabled}" }
+    val actionEnableStatus = isEnabled(e)
+    e.presentation.isEnabled = actionEnableStatus.isEnabled
+    actionEnableStatus.printLog()
     if (start != null) {
       val keyStroke = getKeyStroke(e)
       val duration = System.currentTimeMillis() - start
@@ -103,26 +103,25 @@ internal class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatib
     }
   }
 
-  private fun isEnabled(e: AnActionEvent): Boolean {
-    if (!VimPlugin.isEnabled()) return false
+  private fun isEnabled(e: AnActionEvent): ActionEnableStatus {
+    if (!VimPlugin.isEnabled()) return ActionEnableStatus.no("IdeaVim is disabled", LogLevel.DEBUG)
     val editor = getEditor(e)
     val keyStroke = getKeyStroke(e)
     if (editor != null && keyStroke != null) {
       if (enableOctopus) {
         if (isOctopusEnabled(keyStroke, editor)) {
-          return false
+          return ActionEnableStatus.no("Octopus handler is enabled", LogLevel.DEBUG)
         }
       }
       if (editor.isIdeaVimDisabledHere) {
-        LOG.trace("Do not execute shortcut because it's disabled here")
-        return false
+        return ActionEnableStatus.no("IdeaVim is disabled in this place", LogLevel.INFO)
       }
       // Workaround for smart step into
       @Suppress("DEPRECATION", "LocalVariableName", "VariableNaming")
       val SMART_STEP_INPLACE_DATA = Key.findKeyByName("SMART_STEP_INPLACE_DATA")
       if (SMART_STEP_INPLACE_DATA != null && editor.getUserData(SMART_STEP_INPLACE_DATA) != null) {
         LOG.trace("Do not execute shortcut because of smart step")
-        return false
+        return ActionEnableStatus.no("Smart step into is active", LogLevel.INFO)
       }
 
       val keyCode = keyStroke.keyCode
@@ -132,24 +131,32 @@ internal class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatib
         if (keyCode == KeyEvent.VK_RIGHT || keyCode == KeyEvent.VK_KP_RIGHT || keyCode == KeyEvent.VK_ENTER) {
           invokeLater { editor.updateCaretsVisualAttributes() }
         }
-        return false
+        return ActionEnableStatus.no("Python notebook is in command mode", LogLevel.INFO)
       }
 
       if (AceJumpService.getInstance()?.isActive(editor) == true) {
-        LOG.trace("Do not execute shortcut because AceJump is active")
-        return false
+        return ActionEnableStatus.no("AceJump is active", LogLevel.INFO)
       }
 
       if (LookupManager.getActiveLookup(editor) != null && !LookupKeys.isEnabledForLookup(keyStroke)) {
-        LOG.trace("Do not execute shortcut because of lookup keys")
-        return false
+        return ActionEnableStatus.no("Lookup keys are active", LogLevel.INFO)
       }
 
-      if (keyCode == KeyEvent.VK_ESCAPE) return isEnabledForEscape(editor)
+      if (keyCode == KeyEvent.VK_ESCAPE) {
+        return if (isEnabledForEscape(editor)) {
+          ActionEnableStatus.yes("Is enabled for Esc", LogLevel.INFO)
+        } else {
+          ActionEnableStatus.no("Is disabled for Esc", LogLevel.INFO)
+        }
+      }
 
-      if (keyCode == KeyEvent.VK_TAB && editor.isTemplateActive()) return false
+      if (keyCode == KeyEvent.VK_TAB && editor.isTemplateActive()) {
+        return ActionEnableStatus.no("The key is tab and the template is active", LogLevel.INFO)
+      }
 
-      if ((keyCode == KeyEvent.VK_TAB || keyCode == KeyEvent.VK_ENTER) && editor.appCodeTemplateCaptured()) return false
+      if ((keyCode == KeyEvent.VK_TAB || keyCode == KeyEvent.VK_ENTER) && editor.appCodeTemplateCaptured()) {
+        return ActionEnableStatus.no("App code template is active", LogLevel.INFO)
+      }
 
       if (editor.inInsertMode) {
         if (keyCode == KeyEvent.VK_TAB) {
@@ -166,28 +173,40 @@ internal class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatib
           // change of multiple whitespace characters, which is normally ignored because it's auto-indent content from
           // hitting <Enter>. When this flag is set, we record the whitespace as the output of the <Tab>
           VimPlugin.getChange().tabAction = true
-          return false
+          return ActionEnableStatus.no("Tab action in insert mode", LogLevel.INFO)
         }
         // Debug watch, Python console, etc.
-        if (keyStroke in NON_FILE_EDITOR_KEYS && !EditorHelper.isFileEditor(editor)) return false
+        if (keyStroke in NON_FILE_EDITOR_KEYS && !EditorHelper.isFileEditor(editor)) {
+          return ActionEnableStatus.no("Non file editor keys", LogLevel.INFO)
+        }
       }
 
-      if (keyStroke in VIM_ONLY_EDITOR_KEYS) return true
+      if (keyStroke in VIM_ONLY_EDITOR_KEYS) {
+        return ActionEnableStatus.yes("Vim only editor keys", LogLevel.INFO)
+      }
 
       val savedShortcutConflicts = VimPlugin.getKey().savedShortcutConflicts
       val info = savedShortcutConflicts[keyStroke]
       return when (info?.forEditor(editor.vim)) {
-        ShortcutOwner.VIM -> true
-        ShortcutOwner.IDE -> !isShortcutConflict(keyStroke)
+        ShortcutOwner.VIM -> {
+          return ActionEnableStatus.yes("Owner is vim", LogLevel.DEBUG)
+        }
+        ShortcutOwner.IDE -> {
+          if (!isShortcutConflict(keyStroke)) {
+            ActionEnableStatus.yes("Owner is IDE, but no actionve shortcut conflict", LogLevel.DEBUG)
+          } else {
+            ActionEnableStatus.no("Owner is IDE", LogLevel.DEBUG)
+          }
+        }
         else -> {
           if (isShortcutConflict(keyStroke)) {
             savedShortcutConflicts[keyStroke] = ShortcutOwnerInfo.allUndefined
           }
-          true
+          ActionEnableStatus.yes("Enable vim for shortcut without owner", LogLevel.DEBUG)
         }
       }
     }
-    return false
+    return ActionEnableStatus.no("End of the selection", LogLevel.DEBUG)
   }
 
   private fun isEnabledForEscape(editor: Editor): Boolean {
@@ -338,4 +357,28 @@ internal class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatib
     private fun getKeyStrokes(keyCode: Int, vararg modifiers: Int) =
       modifiers.map { KeyStroke.getKeyStroke(keyCode, it) }
   }
+}
+
+private class ActionEnableStatus(
+  val isEnabled: Boolean,
+  val message: String,
+  val logLevel: LogLevel,
+) {
+  fun printLog() {
+    when (logLevel) {
+      LogLevel.INFO -> LOG.info("IdeaVim keys are enabled = $isEnabled: $message")
+      LogLevel.DEBUG -> LOG.debug("IdeaVim keys are enabled = $isEnabled: $message")
+    }
+  }
+
+  companion object {
+    private val LOG = logger<ActionEnableStatus>()
+
+    fun no(message: String, logLevel: LogLevel) = ActionEnableStatus(false, message, logLevel)
+    fun yes(message: String, logLevel: LogLevel) = ActionEnableStatus(true, message, logLevel)
+  }
+}
+
+private enum class LogLevel {
+  DEBUG, INFO,
 }
