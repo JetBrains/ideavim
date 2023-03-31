@@ -73,7 +73,7 @@ plugins {
 //    id("org.jlleitschuh.gradle.ktlint") version "11.3.1"
 
     id("org.jetbrains.kotlinx.kover") version "0.6.1"
-    id("com.dorongold.task-tree") version "2.1.0"
+    id("com.dorongold.task-tree") version "2.1.1"
 }
 
 // Import variables from gradle.properties file
