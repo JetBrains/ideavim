@@ -61,7 +61,7 @@ internal abstract class OctopusHandler(private val nextHandler: EditorActionHand
 /**
  * Known conflicts & solutions:
  * - Smart step into - set handler after
- * - Python notebooks - set handler after
+ * - Python notebooks - set handler before - test needed!
  * - Ace jump - set handler after
  * - Lookup - doesn't intersect with enter anymore
  * - App code - set handler after
@@ -75,7 +75,7 @@ internal class VimEnterHandler(nextHandler: EditorActionHandler) : VimKeyHandler
  * Known conflicts & solutions:
  *
  * - Smart step into - set handler after
- * - Python notebooks - set handler after
+ * - Python notebooks - set handler before - test needed
  * - Ace jump - set handler after
  * - Lookup - It disappears after putting our esc before templateEscape. But I'm not sure why it works like that
  * - App code - Need to review
