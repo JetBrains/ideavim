@@ -11,6 +11,7 @@ package com.maddyhome.idea.vim.vimscript.model.statements.loops
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
@@ -21,10 +22,12 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
+import com.maddyhome.idea.vim.vimscript.parser.DeletionInfo
 
 // todo refactor us senpai :(
 public data class ForLoop(val variable: Variable, val iterable: Expression, val body: List<Executable>) : Executable {
   override lateinit var vimContext: VimLContext
+  override lateinit var rangeInScript: TextRange
 
   override fun execute(editor: VimEditor, context: ExecutionContext): ExecutionResult {
     injector.statisticsService.setIfLoopUsed(true)
@@ -82,11 +85,17 @@ public data class ForLoop(val variable: Variable, val iterable: Expression, val 
     }
     return result
   }
+
+  override fun restoreOriginalRange(deletionInfo: DeletionInfo) {
+    super.restoreOriginalRange(deletionInfo)
+    body.forEach { it.restoreOriginalRange(deletionInfo) }
+  }
 }
 
 public data class ForLoopWithList(val variables: List<String>, val iterable: Expression, val body: List<Executable>) :
   Executable {
   override lateinit var vimContext: VimLContext
+  override lateinit var rangeInScript: TextRange
 
   override fun execute(editor: VimEditor, context: ExecutionContext): ExecutionResult {
     var result: ExecutionResult = ExecutionResult.Success
@@ -137,5 +146,10 @@ public data class ForLoopWithList(val variables: List<String>, val iterable: Exp
     for (item in list.values.withIndex()) {
       injector.variableService.storeVariable(Variable(null, variables[item.index]), item.value, editor, context, this)
     }
+  }
+
+  override fun restoreOriginalRange(deletionInfo: DeletionInfo) {
+    super.restoreOriginalRange(deletionInfo)
+    body.forEach { it.restoreOriginalRange(deletionInfo) }
   }
 }

@@ -817,7 +817,7 @@ WS:                     [ \t]+;
 INLINE_SEPARATOR:       '\n' (' ' | '\t')* BACKSLASH -> skip;
 LUA_CODE:               'lua' WS* '<<' WS* 'EOF' .*? 'EOF' -> skip;
 LUA_CODE2:              'lua' WS* '<<' WS* 'END' .*? 'END' -> skip;
-IDEAVIM_IGNORE:         ('ideavim' | 'ideaVim' | 'IdeaVim') WS 'ignore' .*? ('ideavim' | 'ideaVim' | 'IdeaVim') WS 'ignore end' -> skip;
+IDEAVIM_IGNORE:         ('ideavim' | 'ideaVim' | 'IdeaVim') WS 'ignore' .*? ('ideavim' | 'ideaVim' | 'IdeaVim') WS 'ignore end' NEW_LINE -> skip;
 AUGROUP_SKIP:           NEW_LINE (WS|COLON)* AUGROUP .*? AUGROUP WS+ END -> skip;
 
 // All the other symbols

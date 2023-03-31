@@ -15,7 +15,7 @@ import kotlin.math.min
 /**
  * Please prefer [com.maddyhome.idea.vim.group.visual.VimSelection] for visual selection
  */
-public class TextRange(public val startOffsets: IntArray, public val endOffsets: IntArray) {
+public data class TextRange(public val startOffsets: IntArray, public val endOffsets: IntArray) {
   public constructor(start: Int, end: Int) : this(intArrayOf(start), intArrayOf(end))
 
   public val isMultiple: Boolean
@@ -94,5 +94,21 @@ public class TextRange(public val startOffsets: IntArray, public val endOffsets:
     }
     sb.append('}')
     return sb.toString()
+  }
+
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (javaClass != other?.javaClass) return false
+
+    other as TextRange
+
+    if (!startOffsets.contentEquals(other.startOffsets)) return false
+    return endOffsets.contentEquals(other.endOffsets)
+  }
+
+  override fun hashCode(): Int {
+    var result = startOffsets.contentHashCode()
+    result = 31 * result + endOffsets.contentHashCode()
+    return result
   }
 }

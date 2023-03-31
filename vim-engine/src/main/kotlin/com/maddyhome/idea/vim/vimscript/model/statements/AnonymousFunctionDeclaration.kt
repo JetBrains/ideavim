@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.vimscript.model.statements
 
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
@@ -22,6 +23,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.OneElementSublistExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
 import com.maddyhome.idea.vim.vimscript.model.functions.DefinedFunctionHandler
+import com.maddyhome.idea.vim.vimscript.parser.DeletionInfo
 
 public data class AnonymousFunctionDeclaration(
   val sublist: OneElementSublistExpression,
@@ -34,6 +36,7 @@ public data class AnonymousFunctionDeclaration(
 ) : Executable {
 
   override lateinit var vimContext: VimLContext
+  override lateinit var rangeInScript: TextRange
 
   override fun execute(editor: VimEditor, context: ExecutionContext): ExecutionResult {
     val container = sublist.expression.evaluate(editor, context, vimContext)
@@ -53,5 +56,10 @@ public data class AnonymousFunctionDeclaration(
     container.dictionary[index] = VimFuncref(DefinedFunctionHandler(declaration), VimList(mutableListOf()), container, VimFuncref.Type.FUNCREF)
     container.dictionary[index]
     return ExecutionResult.Success
+  }
+
+  override fun restoreOriginalRange(deletionInfo: DeletionInfo) {
+    super.restoreOriginalRange(deletionInfo)
+    body.forEach { it.restoreOriginalRange(deletionInfo) }
   }
 }

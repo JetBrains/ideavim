@@ -37,6 +37,7 @@ import java.util.*
 
 public sealed class Command(public var commandRanges: Ranges, public val commandArgument: String) : Executable {
   override lateinit var vimContext: VimLContext
+  override lateinit var rangeInScript: TextRange
 
   public abstract val argFlags: CommandHandlerFlags
   protected open val optFlags: EnumSet<CommandFlags> = noneOfEnum()

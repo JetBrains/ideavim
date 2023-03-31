@@ -15,11 +15,13 @@ import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser
 internal object ScriptVisitor : VimscriptBaseVisitor<Script>() {
 
   override fun visitScript(ctx: VimscriptParser.ScriptContext): Script {
-    return if (ctx.children != null) {
+    val script = if (ctx.children != null) {
       val statements = ctx.children.mapNotNull { ExecutableVisitor.visit(it) }
       Script(statements)
     } else {
       Script(emptyList())
     }
+    script.rangeInScript = ctx.getTextRange()
+    return script
   }
 }

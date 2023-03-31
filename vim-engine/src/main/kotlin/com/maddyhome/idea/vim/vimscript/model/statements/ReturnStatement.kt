@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.vimscript.model.statements
 
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
@@ -17,6 +18,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 
 public data class ReturnStatement(val expression: Expression) : Executable {
   override lateinit var vimContext: VimLContext
+  override lateinit var rangeInScript: TextRange
 
   override fun execute(editor: VimEditor, context: ExecutionContext): ExecutionResult {
     return ExecutionResult.Return(expression.evaluate(editor, context, this))

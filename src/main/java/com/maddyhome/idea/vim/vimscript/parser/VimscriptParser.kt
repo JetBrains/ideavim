@@ -29,34 +29,36 @@ internal object VimscriptParser : com.maddyhome.idea.vim.api.VimscriptParser {
   val linesWithErrors = mutableListOf<Int>()
   private const val MAX_NUMBER_OF_TRIES = 5
   private var tries = 0
+  private var deletionInfo: DeletionInfo = DeletionInfo()
 
   override fun parse(script: String): Script {
     val preprocessedText = uncommentIdeaVimIgnore(getTextWithoutErrors(script))
     linesWithErrors.clear()
     val parser = getParser(addNewlineIfMissing(preprocessedText), true)
     val AST: ParseTree = parser.script()
-    return if (linesWithErrors.isNotEmpty()) {
+    val script = if (linesWithErrors.isNotEmpty()) {
       if (tries > MAX_NUMBER_OF_TRIES) {
         // I don't think, that it's possible to enter an infinite recursion with any vimrc, but let's have it just in case
         logger.warn("Reached the maximum number of tries to fix a script. Parsing is stopped.")
-        linesWithErrors.clear()
-        tries = 0
+        resetParser()
         return Script(listOf())
       } else {
         tries += 1
         parse(preprocessedText)
       }
     } else {
-      tries = 0
       ScriptVisitor.visit(AST)
     }
+    script.units.forEach { it.restoreOriginalRange(deletionInfo) }
+    resetParser()
+    return script
   }
 
   override fun parseExpression(expression: String): Expression? {
     val parser = getParser(expression, true)
     val AST: ParseTree = parser.expr()
     if (linesWithErrors.isNotEmpty()) {
-      linesWithErrors.clear()
+      resetParser()
       return null
     }
     return ExpressionVisitor.visit(AST)
@@ -66,7 +68,7 @@ internal object VimscriptParser : com.maddyhome.idea.vim.api.VimscriptParser {
     val parser = getParser(addNewlineIfMissing(command), true)
     val AST: ParseTree = parser.command()
     if (linesWithErrors.isNotEmpty()) {
-      linesWithErrors.clear()
+      resetParser()
       return null
     }
     return CommandVisitor.visit(AST)
@@ -89,7 +91,7 @@ internal object VimscriptParser : com.maddyhome.idea.vim.api.VimscriptParser {
     val parser = getParser(addNewlineIfMissing(text), true)
     val AST: ParseTree = parser.letCommands()
     if (linesWithErrors.isNotEmpty()) {
-      linesWithErrors.clear()
+      resetParser()
       return null
     }
     return CommandVisitor.visit(AST)
@@ -108,21 +110,64 @@ internal object VimscriptParser : com.maddyhome.idea.vim.api.VimscriptParser {
   }
 
   private fun getTextWithoutErrors(text: String): String {
-    linesWithErrors.sortDescending()
-    val lineNumbersToDelete = linesWithErrors
-    val lines = text.split("\n", "\r\n").toMutableList()
+    val lineNumbersToDelete = linesWithErrors.sortedDescending()
+    val lines = splitToLines(text).toMutableList()
     for (lineNumber in lineNumbersToDelete) {
       // this may happen if we have an error somewhere at the end and parser can't find any matching token till EOF (EOF's line number is lines.size)
       if (lines.size <= lineNumber) {
         logger.warn("Parsing error affects lines till EOF")
       } else {
+        deletionInfo.registerDeletion(lines[lineNumber - 1].first, lines[lineNumber - 1].second.length)
         lines.removeAt(lineNumber - 1)
       }
     }
-    return lines.joinToString(separator = "\n")
+    return lines.joinToString(separator = "") { it.second }
   }
 
   private fun uncommentIdeaVimIgnore(configuration: String): String {
-    return configuration.replace(Regex("\"( )*ideavim ignore", RegexOption.IGNORE_CASE), "ideavim ignore")
+    val ideavimIgnore = "ideavim ignore"
+    val ideavimIgnorePattern = Regex("\"( )*ideavim ignore", RegexOption.IGNORE_CASE)
+    val result = StringBuilder()
+
+    var startIndex = 0
+    val matches = ideavimIgnorePattern.findAll(configuration, startIndex)
+    for (match in matches) {
+      result.append(configuration.substring(startIndex, match.range.first))
+      result.append(ideavimIgnore)
+      startIndex = match.range.last + 1
+      val delta = match.range.last - match.range.first + 1 - ideavimIgnore.length
+      if (delta > 0) {
+        deletionInfo.registerDeletion(match.range.first, delta)
+      }
+    }
+    result.append(configuration.substring(startIndex))
+    return result.toString()
+  }
+
+  // pair for line start offset + line text
+  private fun splitToLines(text: String): List<Pair<Int, String>> {
+    val result = mutableListOf<Pair<Int, String>>()
+
+    val currentLine = StringBuilder()
+    var currentLineStartOffset = 0
+
+    for ((i, char) in text.withIndex()) {
+      currentLine.append(char)
+      if (char == '\n') {
+        result.add(Pair(currentLineStartOffset, currentLine.toString()))
+        currentLineStartOffset = i + 1
+        currentLine.clear()
+      }
+    }
+    if (currentLine.isNotEmpty()) {
+      result.add(Pair(currentLineStartOffset, currentLine.toString()))
+    }
+    return result
+  }
+
+  private fun resetParser() {
+    tries = 0
+    linesWithErrors.clear()
+    deletionInfo.reset()
   }
 }
