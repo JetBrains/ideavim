@@ -23,7 +23,7 @@ dependencies {
     compileOnly("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.7.20")
 
     implementation("io.ktor:ktor-client-core:2.2.4")
-    implementation("io.ktor:ktor-client-cio:2.1.3")
+    implementation("io.ktor:ktor-client-cio:2.2.4")
     implementation("io.ktor:ktor-client-content-negotiation:2.2.4")
     implementation("io.ktor:ktor-serialization-kotlinx-json:2.1.3")
     implementation("io.ktor:ktor-client-auth:2.2.4")

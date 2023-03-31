@@ -49,7 +49,7 @@ buildscript {
         classpath("org.kohsuke:github-api:1.305")
 
         classpath("io.ktor:ktor-client-core:2.2.4")
-        classpath("io.ktor:ktor-client-cio:2.1.3")
+        classpath("io.ktor:ktor-client-cio:2.2.4")
         classpath("io.ktor:ktor-client-auth:2.2.4")
         classpath("io.ktor:ktor-client-content-negotiation:2.2.4")
         classpath("io.ktor:ktor-serialization-kotlinx-json:2.1.3")
