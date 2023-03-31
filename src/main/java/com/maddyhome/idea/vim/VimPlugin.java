@@ -341,7 +341,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     // 4.1) Execute ~/.ideavimrc
     registerIdeavimrc();
 
-    // 4.2) Initialize extensions. Always after 3.1
+    // 4.2) Initialize extensions. Always after 4.1
     VimExtensionRegistrar.enableDelayedExtensions();
 
     // Turing on should be performed after all commands registration
