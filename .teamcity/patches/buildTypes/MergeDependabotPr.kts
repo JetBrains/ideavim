@@ -3,6 +3,7 @@ package patches.buildTypes
 import jetbrains.buildServer.configs.kotlin.v2019_2.*
 import jetbrains.buildServer.configs.kotlin.v2019_2.BuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildFeatures.perfmon
+import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.gradle
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
 import jetbrains.buildServer.configs.kotlin.v2019_2.ui.*
 
@@ -17,6 +18,13 @@ create(DslContext.projectId, BuildType({
 
     vcs {
         root(RelativeId("HttpsGithubComJetBrainsIdeavimRefsHeadsMaster"))
+    }
+
+    steps {
+        gradle {
+            tasks = "clean build"
+            gradleWrapperPath = ""
+        }
     }
 
     triggers {
