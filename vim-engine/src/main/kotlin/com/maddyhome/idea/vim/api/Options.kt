@@ -74,11 +74,11 @@ public object Options {
   // loses that type information, and we also have to check that the option is not null, even if we know it exists.
   // types
   public val digraph: ToggleOption = addOption(ToggleOption("digraph", "dg", false))
-  @JvmField public val gdefault: ToggleOption = addOption(ToggleOption("gdefault", "gd", false))
+  public val gdefault: ToggleOption = addOption(ToggleOption("gdefault", "gd", false))
   public val history: UnsignedNumberOption = addOption(UnsignedNumberOption("history", "hi", 50))
   @JvmField public val hlsearch: ToggleOption = addOption(ToggleOption("hlsearch", "hls", false))
   @JvmField public val ignorecase: ToggleOption = addOption(ToggleOption("ignorecase", "ic", false))
-  @JvmField public val incsearch: ToggleOption = addOption(ToggleOption("incsearch", "is", false))
+  public val incsearch: ToggleOption = addOption(ToggleOption("incsearch", "is", false))
   public val keymodel: StringListOption = addOption(
     StringListOption(
       "keymodel",
@@ -95,12 +95,12 @@ public object Options {
     )
   )
   public val maxmapdepth: NumberOption = addOption(NumberOption("maxmapdepth", "mmd", 20))
-  @JvmField public val more: ToggleOption = addOption(ToggleOption("more", "more", true))
-  @JvmField public val nrformats: StringListOption = addOption(
+  public val more: ToggleOption = addOption(ToggleOption("more", "more", true))
+  public val nrformats: StringListOption = addOption(
     StringListOption("nrformats", "nf", "hex", setOf("octal", "hex", "alpha"))
   )
-  @JvmField public val number: ToggleOption = addOption(ToggleOption("number", "nu", false))
-  @JvmField public val relativenumber: ToggleOption = addOption(ToggleOption("relativenumber", "rnu", false))
+  public val number: ToggleOption = addOption(ToggleOption("number", "nu", false))
+  public val relativenumber: ToggleOption = addOption(ToggleOption("relativenumber", "rnu", false))
   public val scroll: NumberOption = addOption(NumberOption("scroll", "scr", 0))
   public val scrolloff: NumberOption = addOption(NumberOption("scrolloff", "so", 0))
   public val selection: StringOption = addOption(
@@ -122,14 +122,14 @@ public object Options {
       )
     )
   )
-  @JvmField public val shell: StringOption = addOption(
+  public val shell: StringOption = addOption(
     StringOption(
       "shell",
       "sh",
       if (injector.systemInfoService.isWindows) "cmd.exe" else System.getenv("SHELL") ?: "sh"
     )
   )
-  @JvmField public val shellxescape: StringOption = addOption(
+  public val shellxescape: StringOption = addOption(
     StringOption(
       "shellxescape",
       "sxe",
@@ -145,7 +145,7 @@ public object Options {
   public val timeout: ToggleOption = addOption(ToggleOption("timeout", "to", true))
   public val timeoutlen: UnsignedNumberOption = addOption(UnsignedNumberOption("timeoutlen", "tm", 1000))
   public val undolevels: UnsignedNumberOption = addOption(UnsignedNumberOption("undolevels", "ul", 1000))
-  @JvmField public val viminfo: StringListOption = addOption(StringListOption("viminfo", "vi", "'100,<50,s10,h"))
+  public val viminfo: StringListOption = addOption(StringListOption("viminfo", "vi", "'100,<50,s10,h"))
   public val virtualedit: StringListOption = addOption(
     StringListOption(
       "virtualedit",
@@ -155,7 +155,7 @@ public object Options {
     )
   )
   public val visualbell: ToggleOption = addOption(ToggleOption("visualbell", "vb", false))
-  @JvmField public val whichwrap: StringListOption = addOption(
+  public val whichwrap: StringListOption = addOption(
     StringListOption(
       "whichwrap",
       "ww",
@@ -163,7 +163,7 @@ public object Options {
       setOf("b", "s", "h", "l", "<", ">", "~", "[", "]")
     )
   )
-  @JvmField public val wrapscan: ToggleOption = addOption(ToggleOption("wrapscan", "ws", true))
+  public val wrapscan: ToggleOption = addOption(ToggleOption("wrapscan", "ws", true))
 
 
   // More complex options, with additional validation, etc.
@@ -201,8 +201,7 @@ public object Options {
     }
   })
 
-  @JvmField
-  public val matchpairs: StringListOption = addOption(object : StringListOption("matchpairs", "mps", "(:),{:},[:]") {
+  @JvmField public val matchpairs: StringListOption = addOption(object : StringListOption("matchpairs", "mps", "(:),{:},[:]") {
     override fun checkIfValueValid(value: VimDataType, token: String) {
       super.checkIfValueValid(value, token)
       for (v in split((value as VimString).value)) {
@@ -222,7 +221,6 @@ public object Options {
     }
   })
 
-  @JvmField
   public val shellcmdflag: StringOption = addOption(object : StringOption("shellcmdflag", "shcf", "") {
     override val defaultValue: VimString
       get() {
@@ -238,7 +236,6 @@ public object Options {
       }
   })
 
-  @JvmField
   public val shellxquote: StringOption = addOption(object : StringOption("shellxquote", "sxq", "") {
     override val defaultValue: VimString
       get() {
