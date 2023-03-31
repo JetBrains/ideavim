@@ -56,6 +56,7 @@ usual beta standards.
 * [VIM-1750](https://youtrack.jetbrains.com/issue/VIM-1750) Surround with tag wrong position
 * [VIM-2286](https://youtrack.jetbrains.com/issue/VIM-2286) Set surround not working for me as expected
 * [VIM-2433](https://youtrack.jetbrains.com/issue/VIM-2433) Do not clear clipboard after inserting with ideaput
+* [VIM-2896](https://youtrack.jetbrains.com/issue/VIM-2896) Correct ordering of handlers
 
 ### Merged PRs:
 * [589](https://github.com/JetBrains/ideavim/pull/589) by [Matt Ellis](https://github.com/citizenmatt): Refactor option usage and introduce accessor API
