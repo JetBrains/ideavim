@@ -15,6 +15,7 @@ in the root project, and delete the patch script.
 create(DslContext.projectId, BuildType({
     id("MergeDependabotPr")
     name = "Merge Dependabot PR"
+    description = "Automatically merge dependency bump pull request"
 
     vcs {
         root(RelativeId("HttpsGithubComJetBrainsIdeavimRefsHeadsMaster"))
