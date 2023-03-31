@@ -11,13 +11,16 @@ package com.maddyhome.idea.vim.vimscript.model.functions.handlers
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
+import com.maddyhome.idea.vim.vimscript.model.expressions.OneElementSublistExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.OptionExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
+import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 
@@ -33,20 +36,17 @@ internal class ExistsFunctionHandler : FunctionHandler() {
     context: ExecutionContext,
     vimContext: VimLContext,
   ): VimDataType {
-    val expression = argumentValues[0]
-    return if (expression is SimpleExpression && expression.data is VimString) {
-      val parsedValue = VimscriptParser.parseExpression((expression.data as VimString).value)
-      if (parsedValue is OptionExpression) {
-        if (injector.optionGroup.getOption(parsedValue.optionName) != null) {
-          VimInt.ONE
-        } else {
-          VimInt.ZERO
-        }
-      } else {
-        TODO()
+    val expressionValue = argumentValues[0].evaluate(editor, context, vimContext)
+    val parsedExpression = VimscriptParser.parseExpression(expressionValue.asString())
+    val result = when (parsedExpression) {
+      is OptionExpression -> {
+        injector.optionGroup.getOption(parsedExpression.optionName) != null
       }
-    } else {
-      VimInt.ZERO
+      is Variable -> {
+        injector.variableService.getNullableVariableValue(parsedExpression, editor, context, vimContext) != null
+      }
+      else -> throw ExException("exists function is not fully implemented")
     }
+    return if (result) VimInt.ONE else VimInt.ZERO
   }
 }
