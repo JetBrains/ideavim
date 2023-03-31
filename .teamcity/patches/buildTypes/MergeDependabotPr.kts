@@ -30,6 +30,7 @@ create(DslContext.projectId, BuildType({
 
     triggers {
         vcs {
+            branchFilter = "+:dependabot/*"
         }
     }
 
