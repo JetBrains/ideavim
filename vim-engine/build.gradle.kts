@@ -9,7 +9,7 @@
 plugins {
     java
     kotlin("jvm")
-    id("org.jlleitschuh.gradle.ktlint")
+//    id("org.jlleitschuh.gradle.ktlint")
 }
 
 // group 'org.jetbrains.ideavim'
@@ -42,9 +42,9 @@ tasks {
 
 // --- Linting
 
-ktlint {
-    version.set("0.48.2")
-}
+//ktlint {
+//    version.set("0.48.2")
+//}
 
 kotlin {
     explicitApi()
