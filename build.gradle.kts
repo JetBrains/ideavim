@@ -33,6 +33,7 @@ import org.eclipse.jgit.lib.RepositoryBuilder
 import org.intellij.markdown.ast.getTextInNode
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.changelog.exceptions.MissingVersionException
+import org.kohsuke.github.GHUser
 import java.net.HttpURLConnection
 import java.net.URL
 
@@ -776,7 +777,15 @@ fun updateAuthors(uncheckedEmails: Set<String>) {
             println("Email '$email' is from dependabot. Skip it")
             continue
         }
-        val user = ghRepository.getCommit(hash).author
+        if ("tcuser" in email) {
+            println("Email '$email' is from teamcity. Skip it")
+            continue
+        }
+        val user: GHUser? = ghRepository.getCommit(hash).author
+        if (user == null) {
+            println("Cant get the commit author. Email: $email. Commit: $hash")
+            continue
+        }
         val htmlUrl = user.htmlUrl.toString()
         val name = user.name ?: user.login
         users.add(Author(name, htmlUrl, email))
