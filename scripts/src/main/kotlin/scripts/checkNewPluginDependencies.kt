@@ -10,6 +10,8 @@ package scripts
 
 import io.ktor.client.call.*
 import io.ktor.client.request.*
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonPrimitive
 
 /**
  * Marketplace has an API to get all plugins that depend on our plugin.
@@ -29,6 +31,7 @@ val knownPlugins = listOf(
   "com.github.copilot",
   "com.github.dankinsoid.multicursor",
   "com.joshestein.ideavim-quickscope",
+  "cc.implicated.intellij.plugins.bunny", // I don't want to include this plugin in the list of IdeaVim plugins as I don't understand what this is for
 )
 
 suspend fun main() {
@@ -38,5 +41,24 @@ suspend fun main() {
   }
   val output = response.body<List<String>>()
   println(output)
-  if (knownPlugins != output) error("Unknown plugins list: $output")
+  if (knownPlugins != output) {
+    val newPlugins = (output - knownPlugins).map { it to (getPluginLinkByXmlId(it) ?: "Can't find plugin link") }
+    val removedPlugins = (knownPlugins - output.toSet()).map { it to (getPluginLinkByXmlId(it) ?: "Can't find plugin link") }
+    error(
+      """
+        
+      Unregistered plugins:
+      ${if (newPlugins.isNotEmpty()) newPlugins.joinToString(separator = "\n") { it.first + "(" + it.second + ")" } else "No unregistered plugins"}
+      
+      Removed plugins:
+      ${if (removedPlugins.isNotEmpty()) removedPlugins.joinToString(separator = "\n") { it.first + "(" + it.second + ")" } else "No removed plugins"}
+    """.trimIndent()
+    )
+  }
+}
+
+private suspend fun getPluginLinkByXmlId(it: String): String? {
+  val newPluginLink = client.get("https://plugins.jetbrains.com/api/plugins/intellij/$it")
+    .body<JsonObject>()["link"]?.jsonPrimitive?.content
+  return newPluginLink?.let { "https://plugins.jetbrains.com$it" }
 }
