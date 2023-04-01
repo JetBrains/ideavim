@@ -20,6 +20,7 @@ import com.maddyhome.idea.vim.group.IjOptionConstants
 import com.maddyhome.idea.vim.group.IjOptions
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.options.OptionScope
 
 internal class OptionsState : ApplicationUsagesCollector() {
 
@@ -30,8 +31,10 @@ internal class OptionsState : ApplicationUsagesCollector() {
     val globalIjOptions = injector.globalIjOptions()
 
     return setOf(
+      // ideajoin is global-local. We're only interested in the global value, not the effective value, which a) might
+      // be set at local scope and b) isn't accessible without an editor
       OPTIONS.metric(
-        IDEAJOIN with globalIjOptions.ideajoin,
+        IDEAJOIN with injector.optionGroup.getOptionValue(IjOptions.ideajoin, OptionScope.GLOBAL).asBoolean(),
         IDEAMARKS with globalIjOptions.ideamarks,
         IDEAREFACTOR with globalIjOptions.idearefactormode,
         IDEAPUT with globalOptions.clipboard.contains(OptionConstants.clipboard_ideaput),

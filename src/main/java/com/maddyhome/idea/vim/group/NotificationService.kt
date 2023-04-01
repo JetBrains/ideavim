@@ -36,8 +36,10 @@ import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.options.OptionScope
 import com.maddyhome.idea.vim.statistic.ActionTracker
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.services.VimRcService
 import java.awt.datatransfer.StringSelection
 import java.io.File
@@ -95,7 +97,8 @@ internal class NotificationService(private val project: Project?) {
         "set ideajoin",
         "idejoin"
       ) {
-        injector.globalIjOptions().ideajoin = true
+        // 'ideajoin' is global-local, so we'll set it as a global value
+        injector.optionGroup.setOptionValue(IjOptions.ideajoin, OptionScope.GLOBAL, VimInt.ONE)
       },
     )
 
