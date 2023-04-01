@@ -29,3 +29,5 @@ jobs:
 
       - name: Update YouTrack
         run: ./gradlew scripts:updateAffectedRates
+        env:
+          YOUTRACK_TOKEN: ${{ secrets.YOUTRACK_TOKEN }}
