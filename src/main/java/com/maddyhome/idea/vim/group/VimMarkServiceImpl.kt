@@ -21,8 +21,11 @@ import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.event.DocumentEvent
 import com.intellij.openapi.editor.event.DocumentListener
+import com.intellij.openapi.fileEditor.FileEditorManager
+import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.text.StringUtil
+import com.intellij.util.asSafely
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimMarkService
@@ -30,7 +33,6 @@ import com.maddyhome.idea.vim.api.VimMarkServiceBase
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.SystemMarks.Companion.createOrGetSystemMark
-import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.localEditors
 import com.maddyhome.idea.vim.mark.IntellijMark
 import com.maddyhome.idea.vim.mark.Mark
@@ -268,7 +270,9 @@ internal class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateCompone
 
     private fun createVimMark(b: LineBookmark) {
       var col = 0
-      val editor = EditorHelper.getEditor(b.file)
+      val editor = FileEditorManager.getInstance(myProject).getSelectedEditor(b.file)
+        ?.asSafely<TextEditor>()
+        ?.editor
       if (editor != null) col = editor.caretModel.currentCaret.logicalPosition.column
       val mark = IntellijMark(b, col, myProject)
       injector.markService.setGlobalMark(mark)
