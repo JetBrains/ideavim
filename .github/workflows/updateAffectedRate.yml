@@ -30,4 +30,4 @@ jobs:
       - name: Update YouTrack
         run: ./gradlew scripts:updateAffectedRates
         env:
-          YOUTRACK_TOKEN: ${{ secrets.YOUTRACK_TOKEN }}
+          YOUTRACK_TOKEN: ${{ secrets.YOU_TRACK_UPDATE_ISSUES }}
