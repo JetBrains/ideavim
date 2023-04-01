@@ -27,6 +27,7 @@ suspend fun setYoutrackStatus(tickets: Collection<String>, status: String) {
   for (ticket in tickets) {
     println("Try to set $ticket to $status")
     val response =
+      // I've updated default url in client, so this may be broken now
       client.post("https://youtrack.jetbrains.com/api/issues/$ticket?fields=customFields(id,name,value(id,name))") {
         contentType(ContentType.Application.Json)
         accept(ContentType.Application.Json)

@@ -10,6 +10,7 @@ package scripts
 
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
+import io.ktor.client.plugins.*
 import io.ktor.client.plugins.auth.*
 import io.ktor.client.plugins.auth.providers.*
 import io.ktor.client.plugins.contentnegotiation.*
@@ -25,6 +26,9 @@ internal val client = HttpClient(CIO) {
 fun httpClient(): HttpClient {
   return HttpClient(CIO) {
     expectSuccess = true
+    defaultRequest {
+      url("https://youtrack.jetbrains.com/api/")
+    }
     install(Auth) {
       bearer {
         loadTokens {
