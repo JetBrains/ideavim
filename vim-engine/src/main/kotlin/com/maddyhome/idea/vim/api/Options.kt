@@ -226,7 +226,7 @@ public object Options {
     }
   })
 
-  @JvmField public val matchpairs: StringListOption = addOption(object : StringListOption("matchpairs", "mps", "(:),{:},[:]") {
+   public val matchpairs: StringListOption = addOption(object : StringListOption("matchpairs", "mps", "(:),{:},[:]") {
     override fun checkIfValueValid(value: VimDataType, token: String) {
       super.checkIfValueValid(value, token)
       for (v in split((value as VimString).value)) {
