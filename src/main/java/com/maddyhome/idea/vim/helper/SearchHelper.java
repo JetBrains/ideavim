@@ -22,7 +22,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.EngineEditorHelperKt;
-import com.maddyhome.idea.vim.api.Options;
+import com.maddyhome.idea.vim.api.VimEditor;
 import com.maddyhome.idea.vim.api.VimSearchHelperBase;
 import com.maddyhome.idea.vim.command.VimStateMachine;
 import com.maddyhome.idea.vim.common.CharacterPosition;
@@ -30,10 +30,8 @@ import com.maddyhome.idea.vim.common.Direction;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.newapi.IjVimCaret;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
-import com.maddyhome.idea.vim.options.OptionChangeListener;
 import com.maddyhome.idea.vim.regexp.CharPointer;
 import com.maddyhome.idea.vim.regexp.RegExp;
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
 import kotlin.Pair;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -44,8 +42,7 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.maddyhome.idea.vim.api.VimInjectorKt.globalOptions;
-import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
+import static com.maddyhome.idea.vim.api.VimInjectorKt.*;
 import static com.maddyhome.idea.vim.helper.SearchHelperKtKt.checkInString;
 import static com.maddyhome.idea.vim.helper.SearchHelperKtKt.shouldIgnoreCase;
 
@@ -611,7 +608,8 @@ public class SearchHelper {
     }
 
     int line = caret.getLogicalPosition().line;
-    int end = EngineEditorHelperKt.getLineEndOffset(new IjVimEditor(editor), line, true);
+    final IjVimEditor vimEditor = new IjVimEditor(editor);
+    int end = EngineEditorHelperKt.getLineEndOffset(vimEditor, line, true);
 
     // To handle the case where visual mode allows the user to go past the end of the line,
     // which will prevent loc from finding a pairable character below
@@ -619,11 +617,13 @@ public class SearchHelper {
       pos = end - 1;
     }
 
+    final String pairChars = parseMatchPairsOption(vimEditor);
+
     CharSequence chars = editor.getDocument().getCharsSequence();
     int loc = -1;
     // Search the remainder of the current line for one of the candidate characters
     while (pos < end) {
-      loc = getPairChars().indexOf(chars.charAt(pos));
+      loc = pairChars.indexOf(chars.charAt(pos));
       if (loc >= 0) {
         break;
       }
@@ -637,8 +637,8 @@ public class SearchHelper {
       // What direction should we go now (-1 is backward, 1 is forward)
       Direction dir = loc % 2 == 0 ? Direction.FORWARDS : Direction.BACKWARDS;
       // Which character did we find and which should we now search for
-      char found = getPairChars().charAt(loc);
-      char match = getPairChars().charAt(loc + dir.toInt());
+      char found = pairChars.charAt(loc);
+      char match = pairChars.charAt(loc + dir.toInt());
       res = findBlockLocation(chars, found, match, dir, pos, 1, true);
     }
 
@@ -1506,25 +1506,8 @@ public class SearchHelper {
     return PsiHelper.findMethodEnd(editor, caret.getOffset(), count);
   }
 
-  private static @NotNull String getPairChars() {
-    if (pairsChars == null) {
-      VimPlugin.getOptionGroup().addListener(
-        Options.matchpairs,
-        new OptionChangeListener<VimString>() {
-          @Override
-          public void processGlobalValueChange(@Nullable VimString oldValue) {
-            pairsChars = parseMatchPairsOption();
-          }
-        },
-        true
-      );
-    }
-
-    return pairsChars;
-  }
-
-  private static @NotNull String parseMatchPairsOption() {
-    List<String> pairs = globalOptions(injector).getMatchpairs();
+  private static @NotNull String parseMatchPairsOption(final VimEditor vimEditor) {
+    List<String> pairs = options(injector, vimEditor).getMatchpairs();
     StringBuilder res = new StringBuilder();
     for (String s : pairs) {
       if (s.length() == 3) {
@@ -1553,7 +1536,6 @@ public class SearchHelper {
     private final int position;
   }
 
-  private static @Nullable String pairsChars = null;
   private static final @NotNull String blockChars = "{}()[]<>";
 
   private static final Logger logger = Logger.getInstance(SearchHelper.class.getName());
