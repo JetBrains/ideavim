@@ -362,7 +362,9 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     // Unregister vim actions in command mode
     RegisterActions.unregisterActions();
 
-    Disposer.dispose(onOffDisposable);
+    if (onOffDisposable != null) {
+      Disposer.dispose(onOffDisposable);
+    }
   }
 
   private void updateState() {
