@@ -32,6 +32,8 @@ import com.maddyhome.idea.vim.listener.VimListenerManager
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.IdeaRefactorModeHelper
+import com.maddyhome.idea.vim.vimscript.model.options.helpers.isIdeaRefactorModeKeep
+import com.maddyhome.idea.vim.vimscript.model.options.helpers.isIdeaRefactorModeSelect
 
 internal object IdeaSelectionControl {
   /**
@@ -123,7 +125,7 @@ internal object IdeaSelectionControl {
   }
 
   private fun dontChangeMode(editor: Editor): Boolean =
-    editor.isTemplateActive() && (IdeaRefactorModeHelper.keepMode() || editor.editorMode.hasVisualSelection)
+    editor.isTemplateActive() && (editor.vim.isIdeaRefactorModeKeep || editor.editorMode.hasVisualSelection)
 
   private fun chooseNonSelectionMode(editor: Editor): VimStateMachine.Mode {
     val templateActive = editor.isTemplateActive()
@@ -148,7 +150,7 @@ internal object IdeaSelectionControl {
         if (logReason) logger.debug("Enter select mode. Selection source is mouse and selectMode option has mouse")
         VimStateMachine.Mode.SELECT
       }
-      editor.isTemplateActive() && IdeaRefactorModeHelper.selectMode() -> {
+      editor.isTemplateActive() && editor.vim.isIdeaRefactorModeSelect -> {
         if (logReason) logger.debug("Enter select mode. Template is active and selectMode has template")
         VimStateMachine.Mode.SELECT
       }

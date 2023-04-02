@@ -41,6 +41,7 @@ import com.maddyhome.idea.vim.helper.vimStateMachine
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.IdeaRefactorModeHelper
+import com.maddyhome.idea.vim.vimscript.model.options.helpers.isIdeaRefactorModeKeep
 import org.jetbrains.annotations.NonNls
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
@@ -149,13 +150,13 @@ internal object IdeaSpecifics {
           oldIndex: Int,
           newIndex: Int,
         ) {
-          if (IdeaRefactorModeHelper.keepMode()) {
-            IdeaRefactorModeHelper.correctSelection(editor)
+          if (templateState.editor.vim.isIdeaRefactorModeKeep) {
+            IdeaRefactorModeHelper.correctSelection(templateState.editor)
           }
         }
       })
 
-      if (IdeaRefactorModeHelper.keepMode()) {
+      if (state.editor.vim.isIdeaRefactorModeKeep) {
         IdeaRefactorModeHelper.correctSelection(editor)
       } else {
         if (!editor.selectionModel.hasSelection()) {

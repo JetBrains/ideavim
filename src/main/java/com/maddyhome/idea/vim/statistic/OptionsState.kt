@@ -31,12 +31,12 @@ internal class OptionsState : ApplicationUsagesCollector() {
     val globalIjOptions = injector.globalIjOptions()
 
     return setOf(
-      // ideajoin is global-local. We're only interested in the global value, not the effective value, which a) might
-      // be set at local scope and b) isn't accessible without an editor
+      // ideajoin and idearefactor area global-local. We're only interested in the global value, not the effective
+      // value, which a) might be set at local scope and b) isn't accessible without an editor
       OPTIONS.metric(
         IDEAJOIN with injector.optionGroup.getOptionValue(IjOptions.ideajoin, OptionScope.GLOBAL).asBoolean(),
         IDEAMARKS with globalIjOptions.ideamarks,
-        IDEAREFACTOR with globalIjOptions.idearefactormode,
+        IDEAREFACTOR with injector.optionGroup.getOptionValue(IjOptions.idearefactormode, OptionScope.GLOBAL).asString(),
         IDEAPUT with globalOptions.clipboard.contains(OptionConstants.clipboard_ideaput),
         IDEASTATUSICON with globalIjOptions.ideastatusicon,
         IDEAWRITE with globalIjOptions.ideawrite,

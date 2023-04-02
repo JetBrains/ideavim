@@ -30,13 +30,6 @@ public open class GlobalIjOptions(scope: OptionScope = OptionScope.GLOBAL) : Glo
   public var trackactionids: Boolean by optionProperty(IjOptions.trackactionids)
   public var visualdelay: Int by optionProperty(IjOptions.visualdelay)
 
-  // TODO: Handle these options as global-local
-  // Decide if they should live in global or effective options when we support global-local
-  // (I suspect they should live in effective, because we'll always want to read the local value. We are unlikely to
-  // ever set from code, but we'd expect normal `:set` behaviour, which appears to be to write to the global value).
-  // Also double check that these options should be global-local
-  public var idearefactormode: String by optionProperty(IjOptions.idearefactormode)
-
   // Temporary options to control work-in-progress behaviour
   public var octopushandler: Boolean by optionProperty(IjOptions.octopushandler)
   public var oldundo: Boolean by optionProperty(IjOptions.oldundo)
@@ -51,4 +44,5 @@ public open class GlobalIjOptions(scope: OptionScope = OptionScope.GLOBAL) : Glo
 public class EffectiveIjOptions(scope: OptionScope.LOCAL): GlobalIjOptions(scope) {
   public var ideacopypreprocess: Boolean by optionProperty(IjOptions.ideacopypreprocess)
   public var ideajoin: Boolean by optionProperty(IjOptions.ideajoin)
+  public var idearefactormode: String by optionProperty(IjOptions.idearefactormode)
 }
