@@ -9,8 +9,8 @@
 package com.maddyhome.idea.vim.helper
 
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.options.OptionConstants
@@ -45,30 +45,21 @@ public val VimStateMachine.Mode.inVisualMode: Boolean
 public val VimEditor.inBlockSubMode: Boolean
   get() = this.subMode == VimStateMachine.SubMode.VISUAL_BLOCK
 
-/**
- * Please use `isEndAllowed` based on `Editor` (another extension function)
- * It takes "single command" into account.
- */
-public val VimStateMachine.Mode.isEndAllowed: Boolean
-  get() = when (this) {
-    VimStateMachine.Mode.INSERT, VimStateMachine.Mode.VISUAL, VimStateMachine.Mode.SELECT -> true
-    VimStateMachine.Mode.COMMAND, VimStateMachine.Mode.CMD_LINE, VimStateMachine.Mode.REPLACE, VimStateMachine.Mode.OP_PENDING -> usesVirtualSpace
-    VimStateMachine.Mode.INSERT_NORMAL -> usesVirtualSpace
-    VimStateMachine.Mode.INSERT_VISUAL -> usesVirtualSpace
-    VimStateMachine.Mode.INSERT_SELECT -> usesVirtualSpace
-  }
-
-public val usesVirtualSpace: Boolean
-  get() = injector.globalOptions().virtualedit.contains(OptionConstants.virtualedit_onemore)
+public val VimEditor.usesVirtualSpace: Boolean
+  get() = injector.options(this).virtualedit.contains(OptionConstants.virtualedit_onemore)
 
 public val VimEditor.isEndAllowed: Boolean
-  get() = when (this.mode) {
+  get() = this.isEndAllowed(this.mode)
+
+public fun VimEditor.isEndAllowed(mode: VimStateMachine.Mode): Boolean {
+  return when (mode) {
     VimStateMachine.Mode.INSERT, VimStateMachine.Mode.VISUAL, VimStateMachine.Mode.SELECT, VimStateMachine.Mode.INSERT_VISUAL, VimStateMachine.Mode.INSERT_SELECT -> true
     VimStateMachine.Mode.COMMAND, VimStateMachine.Mode.CMD_LINE, VimStateMachine.Mode.REPLACE, VimStateMachine.Mode.OP_PENDING, VimStateMachine.Mode.INSERT_NORMAL -> {
       // One day we'll use a proper insert_normal mode
-      if (this.mode.inSingleMode) true else usesVirtualSpace
+      if (mode.inSingleMode) true else usesVirtualSpace
     }
   }
+}
 
 public val VimStateMachine.Mode.inSingleMode: Boolean
   get() = when (this) {

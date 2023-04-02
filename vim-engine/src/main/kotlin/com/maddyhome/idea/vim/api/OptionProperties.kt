@@ -50,7 +50,6 @@ public open class GlobalOptions(scope: OptionScope = OptionScope.GLOBAL): Option
 
   // TODO: Make these options local
   public val iskeyword: StringListOptionValue by optionProperty(Options.iskeyword)
-  public val virtualedit: StringListOptionValue by optionProperty(Options.virtualedit)
 
   // IdeaVim specific options. Put any editor or IDE specific options in IjVimOptionService
   public var ideaglobalmode: Boolean by optionProperty(Options.ideaglobalmode)
@@ -75,5 +74,5 @@ public open class EffectiveOptions(scope: OptionScope.LOCAL): GlobalOptions(scop
   public var scrolloff: Int by optionProperty(Options.scrolloff)
   public var sidescrolloff: Int by optionProperty(Options.sidescrolloff)
   public var undolevels: Int by optionProperty(Options.undolevels)
-//  public val virtualedit: StringListOptionValue by optionProperty(Options.virtualedit)
+  public val virtualedit: StringListOptionValue by optionProperty(Options.virtualedit)
 }

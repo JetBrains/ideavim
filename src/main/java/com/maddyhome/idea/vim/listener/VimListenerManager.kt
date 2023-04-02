@@ -478,7 +478,7 @@ internal object VimListenerManager {
         1 -> {
           // If you click after the line, the caret is placed by IJ after the last symbol.
           // This is not allowed in some vim modes, so we move the caret over the last symbol.
-          if (!predictedMode.isEndAllowed) {
+          if (!editor.vim.isEndAllowed(predictedMode)) {
             @Suppress("ideavimRunForEachCaret")
             editor.caretModel.runForEachCaret { caret ->
               val lineEnd = IjVimEditor(editor).getLineEndForOffset(caret.offset)

@@ -35,7 +35,7 @@ public class MotionRightAction : MotionActionHandler.ForEachCaret() {
     operatorArguments: OperatorArguments,
   ): Motion {
     val allowWrap = injector.options(editor).whichwrap.contains("l")
-    val allowEnd = usesVirtualSpace || editor.isEndAllowed ||
+    val allowEnd = editor.usesVirtualSpace || editor.isEndAllowed ||
       operatorArguments.isOperatorPending // because of `dl` removing the last character
     return injector.motion.getHorizontalMotion(editor, caret, operatorArguments.count1, allowPastEnd = allowEnd, allowWrap)
   }

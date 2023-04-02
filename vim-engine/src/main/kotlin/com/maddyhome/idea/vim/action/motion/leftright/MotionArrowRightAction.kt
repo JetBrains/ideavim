@@ -39,7 +39,7 @@ public class MotionArrowRightAction : NonShiftedSpecialKeyHandler(), Complicated
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    val allowPastEnd = usesVirtualSpace || editor.isEndAllowed ||
+    val allowPastEnd = editor.usesVirtualSpace || editor.isEndAllowed ||
       operatorArguments.isOperatorPending // because of `d<Right>` removing the last character
     val allowWrap = injector.options(editor).whichwrap.contains(">")
     return injector.motion.getHorizontalMotion(editor, caret, operatorArguments.count1, allowPastEnd, allowWrap)
