@@ -22,7 +22,7 @@ import com.maddyhome.idea.vim.newapi.vim
 
 internal fun moveCaretOneCharLeftFromSelectionEnd(editor: Editor, predictedMode: VimStateMachine.Mode) {
   if (predictedMode != VimStateMachine.Mode.VISUAL) {
-    if (!predictedMode.isEndAllowed) {
+    if (!editor.vim.isEndAllowed(predictedMode)) {
       editor.caretModel.allCarets.forEach { caret ->
         val lineEnd = IjVimEditor(editor).getLineEndForOffset(caret.offset)
         val lineStart = IjVimEditor(editor).getLineStartForOffset(caret.offset)

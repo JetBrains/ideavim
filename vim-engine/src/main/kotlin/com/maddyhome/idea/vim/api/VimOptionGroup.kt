@@ -144,3 +144,11 @@ public fun VimOptionGroup.invertToggleOption(option: ToggleOption, scope: Option
   val optionValue = getOptionValue(option, scope)
   setOptionValue(option, scope, if (optionValue.asBoolean()) VimInt.ZERO else VimInt.ONE)
 }
+
+/**
+ * Checks a string list option to see if it contains a specific value
+ */
+public fun VimOptionGroup.hasValue(option: StringListOption, scope: OptionScope, value: String): Boolean {
+  val optionValue = getOptionValue(option, scope)
+  return option.split(optionValue.asString()).contains(value)
+}

@@ -668,7 +668,7 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
       editor.nativeCarets().filter { it != caret && rangeToDelete.contains(it.offset.point) }
         .forEach { editor.removeCaret(it) }
       val res = deleteText(editor, rangeToDelete, SelectionType.CHARACTER_WISE, caret, operatorArguments)
-      if (usesVirtualSpace) {
+      if (editor.usesVirtualSpace) {
         caret.moveToOffset(startOffset)
       } else {
         val pos = injector.motion.getHorizontalMotion(editor, caret, -1, false)
