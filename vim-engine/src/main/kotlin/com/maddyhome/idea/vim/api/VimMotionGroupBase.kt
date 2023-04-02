@@ -100,7 +100,7 @@ public abstract class VimMotionGroupBase : VimMotionGroup {
     if ((searchFrom == 0 && count < 0) || (searchFrom >= size - 1 && count > 0)) {
       return Motion.Error
     }
-    return (injector.searchHelper.findNextWord(editor, searchFrom, count, bigWord)).toMotionOrError()
+    return (injector.searchHelper.findNextWord(editor, searchFrom, count, bigWord, false)).toMotionOrError()
   }
 
   override fun getHorizontalMotion(

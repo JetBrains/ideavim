@@ -11,7 +11,6 @@ package com.maddyhome.idea.vim.ui.ex;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.project.Project;
 import com.intellij.ui.paint.PaintUtil;
 import com.intellij.util.ui.JBUI;
 import com.maddyhome.idea.vim.VimPlugin;
@@ -221,7 +220,6 @@ public class ExTextField extends JTextField {
 
   void setEditor(@NotNull Editor editor, DataContext context) {
     this.context = context;
-    Project project = editor.getProject();
     EditorHolderService.getInstance().setEditor(editor);
   }
 

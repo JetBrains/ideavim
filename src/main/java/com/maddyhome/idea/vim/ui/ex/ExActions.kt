@@ -9,9 +9,10 @@
 package com.maddyhome.idea.vim.ui.ex
 
 import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.editor.textarea.TextComponentEditorImpl
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.api.VimSearchHelperBase
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim
 import java.awt.event.ActionEvent
 import java.awt.event.KeyEvent
@@ -228,18 +229,16 @@ internal class DeletePreviousWordAction : TextAction(DefaultEditorKit.deletePrev
     target.saveLastEntry()
     val doc = target.document
     val caret = target.caret
-    val offset = VimSearchHelperBase.Companion.findNextWord(
-      target.actualText,
-      caret.dot.toLong(),
-      target.actualText.length.toLong(),
-      -1,
-      false,
-      false,
-    )
+    val project = target.editor.project
+
+    // Note that we need an editor when searching because we need per-editor options (i.e. 'iskeyword')
+    // TODO: We also need to initialise the options when creating TextComponentImpl
+    val editor = TextComponentEditorImpl(project, target)
+    val offset = injector.searchHelper.findNextWord(editor.vim, caret.dot, -1, bigWord = false, spaceWords = false)
     if (logger.isDebugEnabled) logger.debug("offset=$offset")
     try {
       val pos = caret.dot
-      doc.remove(offset.toInt(), (pos - offset).toInt())
+      doc.remove(offset, pos - offset)
     } catch (ex: BadLocationException) {
       // ignore
     }

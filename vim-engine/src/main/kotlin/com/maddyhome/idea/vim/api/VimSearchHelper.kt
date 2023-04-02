@@ -103,23 +103,31 @@ public interface VimSearchHelper {
     count: Int,
   ): Int
 
-  public fun findNextWordEnd(
-    editor: VimEditor,
-    caret: ImmutableVimCaret,
-    count: Int,
-    bigWord: Boolean,
-  ): Int
+  /**
+   * Find the next word in the editor's document, from the given starting point
+   *
+   * @param editor The editor's document to search in. Editor is required because word boundaries depend on
+   *               local-to-buffer options
+   * @param searchFrom The offset in the document to search from
+   * @param count      Return an offset to the [count] word from the starting position. Will search backwards if negative
+   * @param bigWord    Use WORD instead of word boundaries
+   * @param spaceWords Include whitespace as part of a word, e.g. the difference between `iw` and `aw` motions
+   * @return The offset of the [count] next word, or `0` or the offset of the end of file if not found
+   */
+  public fun findNextWord(editor: VimEditor, searchFrom: Int, count: Int, bigWord: Boolean, spaceWords: Boolean): Int
 
-  public fun findNextWordEnd(
-    chars: CharSequence,
-    pos: Int,
-    size: Int,
-    count: Int,
-    bigWord: Boolean,
-    spaceWords: Boolean,
-  ): Int
-
-  public fun findNextWord(editor: VimEditor, searchFrom: Int, count: Int, bigWord: Boolean): Long
+  /**
+   * Find the end offset of the next word in the editor's document, from the given starting point
+   *
+   * @param editor The editor's document to search in. Editor is required because word boundaries depend on
+   *               local-to-buffer options
+   * @param searchFrom The offset in the document to search from
+   * @param count      Return an offset to the [count] word from the starting position. Will search backwards if negative
+   * @param bigWord    Use WORD instead of word boundaries
+   * @param spaceWords Include whitespace as part of a word, e.g. the difference between `iw` and `aw` motions
+   * @return The offset of the [count] next word, or `0` or the offset of the end of file if not found
+   */
+  public fun findNextWordEnd(editor: VimEditor, searchFrom: Int, count: Int, bigWord: Boolean, spaceWords: Boolean): Int
 
   public fun findPattern(
     editor: VimEditor,

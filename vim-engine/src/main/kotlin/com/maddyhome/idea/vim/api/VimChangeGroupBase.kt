@@ -1174,8 +1174,8 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
     }
     if (kludge) {
       val cnt = operatorArguments.count1 * motion.count
-      val pos1 = injector.searchHelper.findNextWordEnd(chars, offset, fileSize, cnt, bigWord, false)
-      val pos2 = injector.searchHelper.findNextWordEnd(chars, pos1, fileSize, -cnt, bigWord, false)
+      val pos1 = injector.searchHelper.findNextWordEnd(editor, offset, cnt, bigWord, false)
+      val pos2 = injector.searchHelper.findNextWordEnd(editor, pos1, -cnt, bigWord, false)
       if (logger.isDebug()) {
         logger.debug("pos=$offset")
         logger.debug("pos1=$pos1")

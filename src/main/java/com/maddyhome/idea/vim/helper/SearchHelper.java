@@ -23,7 +23,6 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.EngineEditorHelperKt;
 import com.maddyhome.idea.vim.api.VimEditor;
-import com.maddyhome.idea.vim.api.VimSearchHelperBase;
 import com.maddyhome.idea.vim.command.VimStateMachine;
 import com.maddyhome.idea.vim.common.CharacterPosition;
 import com.maddyhome.idea.vim.common.Direction;
@@ -42,7 +41,8 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.maddyhome.idea.vim.api.VimInjectorKt.*;
+import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
+import static com.maddyhome.idea.vim.api.VimInjectorKt.options;
 import static com.maddyhome.idea.vim.helper.SearchHelperKtKt.checkInString;
 import static com.maddyhome.idea.vim.helper.SearchHelperKtKt.shouldIgnoreCase;
 
@@ -748,21 +748,6 @@ public class SearchHelper {
     return null;
   }
 
-  private static int findCharacterPosition(@NotNull CharSequence chars,
-                                           int pos,
-                                           final char c,
-                                           boolean currentLineOnly,
-                                           boolean searchEscaped,
-                                           @NotNull Direction direction) {
-    while (pos >= 0 && pos < chars.length() && (!currentLineOnly || chars.charAt(pos) != '\n')) {
-      if (chars.charAt(pos) == c && (pos == 0 || searchEscaped || isQuoteWithoutEscape(chars, pos, c))) {
-        return pos;
-      }
-      pos += direction.toInt();
-    }
-    return -1;
-  }
-
   /**
    * returns new position which ignore whitespaces at beginning of the line
    */
@@ -989,19 +974,15 @@ public class SearchHelper {
    * This counts all the words in the file.
    */
   public static @NotNull CountPosition countWords(@NotNull Editor editor, int start, int end) {
-    CharSequence chars = editor.getDocument().getCharsSequence();
     int offset = editor.getCaretModel().getOffset();
+    final IjVimEditor vimEditor = new IjVimEditor(editor);
 
-    return countWords(chars, start, end, offset);
-  }
-
-  public static @NotNull CountPosition countWords(@NotNull CharSequence chars, int start, int end, int offset) {
     int count = 1;
     int position = 0;
     int last = -1;
     int res = start;
     while (true) {
-      res = (int)VimSearchHelperBase.Companion.findNextWordOne(chars, res, end, 1, true, false);
+      res = injector.getSearchHelper().findNextWord(vimEditor, res, 1, true, false);
       if (res == start || res == 0 || res > end || res == last) {
         break;
       }
@@ -1261,8 +1242,9 @@ public class SearchHelper {
    * @return The text range of the found word or null if there is no word under/after the cursor on the line
    */
   public static @Nullable TextRange findWordUnderCursor(@NotNull Editor editor, @NotNull Caret caret) {
+    final IjVimEditor vimEditor = new IjVimEditor(editor);
     CharSequence chars = editor.getDocument().getCharsSequence();
-    int stop = EngineEditorHelperKt.getLineEndOffset(new IjVimEditor(editor), caret.getLogicalPosition().line, true);
+    int stop = EngineEditorHelperKt.getLineEndOffset(vimEditor, caret.getLogicalPosition().line, true);
 
     int pos = caret.getOffset();
     // Technically the first condition is covered by the second one, but let it be
@@ -1305,7 +1287,7 @@ public class SearchHelper {
       end = start + 1;
     }
     else {
-      end = VimSearchHelperBase.Companion.findNextWordEnd(chars, start, stop, 1, false, false) + 1;
+      end = injector.getSearchHelper().findNextWordEnd(vimEditor, start, 1, false, false) + 1;
     }
 
     return new TextRange(start, end);
@@ -1342,6 +1324,7 @@ public class SearchHelper {
     int pos = caret.getOffset();
     if (chars.length() <= pos) return new TextRange(chars.length() - 1, chars.length() - 1);
 
+    final IjVimEditor vimEditor = new IjVimEditor(editor);
     boolean startSpace = CharacterHelper.charType(chars.charAt(pos), isBig) == CharacterHelper.CharacterType.WHITESPACE;
     // Find word start
     boolean onWordStart = pos == min ||
@@ -1356,13 +1339,13 @@ public class SearchHelper {
 
     if ((!onWordStart && !(startSpace && isOuter)) || hasSelection || (count > 1 && dir == -1)) {
       if (dir == 1) {
-        start = (int)VimSearchHelperBase.Companion.findNextWord(chars, pos, max, -1, isBig, !isOuter);
+        start = injector.getSearchHelper().findNextWord(vimEditor, pos, -1, isBig, !isOuter);
       }
       else {
-        start = (int)VimSearchHelperBase.Companion.findNextWord(chars, pos, max, -(count - (onWordStart && !hasSelection ? 1 : 0)), isBig, !isOuter);
+        start = injector.getSearchHelper().findNextWord(vimEditor, pos, -(count - (onWordStart && !hasSelection ? 1 : 0)), isBig, !isOuter);
       }
 
-      start = EngineEditorHelperKt.normalizeOffset(new IjVimEditor(editor), start, false);
+      start = EngineEditorHelperKt.normalizeOffset(vimEditor, start, false);
     }
 
     if (logger.isDebugEnabled()) logger.debug("start=" + start);
@@ -1377,14 +1360,11 @@ public class SearchHelper {
     int end = pos;
     if (!onWordEnd || hasSelection || (count > 1 && dir == 1) || (startSpace && isOuter)) {
       if (dir == 1) {
-        end = VimSearchHelperBase.Companion.findNextWordEnd(chars, pos, max, count -
-                                               (onWordEnd &&
-                                                !hasSelection &&
-                                                (!(startSpace && isOuter) || (startSpace && !isOuter)) ? 1 : 0), isBig,
-                              !isOuter);
+        int c = count - (onWordEnd && !hasSelection && (!(startSpace && isOuter) || (startSpace && !isOuter)) ? 1 : 0);
+        end = injector.getSearchHelper().findNextWordEnd(vimEditor, pos, c, isBig, !isOuter);
       }
       else {
-        end = VimSearchHelperBase.Companion.findNextWordEnd(chars, pos, max, 1, isBig, !isOuter);
+        end = injector.getSearchHelper().findNextWordEnd(vimEditor, pos, 1, isBig, !isOuter);
       }
     }
 
@@ -1394,7 +1374,7 @@ public class SearchHelper {
     if (dir == 1 && isOuter) {
       int firstEnd = end;
       if (count > 1) {
-        firstEnd = VimSearchHelperBase.Companion.findNextWordEnd(chars, pos, max, 1, isBig, false);
+        firstEnd = injector.getSearchHelper().findNextWordEnd(vimEditor, pos, 1, isBig, false);
       }
       if (firstEnd < max - 1) {
         if (CharacterHelper.charType(chars.charAt(firstEnd + 1), false) != CharacterHelper.CharacterType.WHITESPACE) {
@@ -1415,7 +1395,7 @@ public class SearchHelper {
     if (!goForward && dir == 1 && isOuter) {
       int firstEnd = end;
       if (count > 1) {
-        firstEnd = VimSearchHelperBase.Companion.findNextWordEnd(chars, pos, max, 1, isBig, false);
+        firstEnd = injector.getSearchHelper().findNextWordEnd(vimEditor, pos, 1, isBig, false);
       }
       if (firstEnd < max - 1) {
         if (CharacterHelper.charType(chars.charAt(firstEnd + 1), false) != CharacterHelper.CharacterType.WHITESPACE) {
@@ -1438,7 +1418,7 @@ public class SearchHelper {
     }
 
     if (goForward) {
-      if (EngineEditorHelperKt.anyNonWhitespace(new IjVimEditor(editor), end, 1)) {
+      if (EngineEditorHelperKt.anyNonWhitespace(vimEditor, end, 1)) {
         while (end + 1 < max &&
                CharacterHelper.charType(chars.charAt(end + 1), false) == CharacterHelper.CharacterType.WHITESPACE) {
           end++;
@@ -1446,7 +1426,7 @@ public class SearchHelper {
       }
     }
     if (goBack) {
-      if (EngineEditorHelperKt.anyNonWhitespace(new IjVimEditor(editor), start, -1)) {
+      if (EngineEditorHelperKt.anyNonWhitespace(vimEditor, start, -1)) {
         while (start > min &&
                CharacterHelper.charType(chars.charAt(start - 1), false) == CharacterHelper.CharacterType.WHITESPACE) {
           start--;
