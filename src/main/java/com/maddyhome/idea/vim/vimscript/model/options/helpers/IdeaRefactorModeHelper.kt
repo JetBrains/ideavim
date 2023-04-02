@@ -15,6 +15,7 @@ import com.intellij.codeInsight.lookup.impl.LookupImpl
 import com.intellij.codeInsight.template.impl.TemplateManagerImpl
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.IjOptionConstants
 import com.maddyhome.idea.vim.helper.editorMode
@@ -22,15 +23,16 @@ import com.maddyhome.idea.vim.helper.hasBlockOrUnderscoreCaret
 import com.maddyhome.idea.vim.helper.hasVisualSelection
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
-import com.maddyhome.idea.vim.newapi.globalIjOptions
+import com.maddyhome.idea.vim.newapi.ijOptions
 import com.maddyhome.idea.vim.newapi.vim
 
-internal object IdeaRefactorModeHelper {
+public val VimEditor.isIdeaRefactorModeKeep: Boolean
+  get() = injector.ijOptions(this).idearefactormode.contains(IjOptionConstants.idearefactormode_keep)
 
-  fun keepMode() =
-    injector.globalIjOptions().idearefactormode.contains(IjOptionConstants.idearefactormode_keep)
-  fun selectMode() =
-    injector.globalIjOptions().idearefactormode.contains(IjOptionConstants.idearefactormode_select)
+public val VimEditor.isIdeaRefactorModeSelect: Boolean
+  get() = injector.ijOptions(this).idearefactormode.contains(IjOptionConstants.idearefactormode_select)
+
+internal object IdeaRefactorModeHelper {
 
   fun correctSelection(editor: Editor) {
     val action: () -> Unit = {
