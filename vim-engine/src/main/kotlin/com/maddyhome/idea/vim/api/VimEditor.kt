@@ -130,6 +130,13 @@ public interface VimEditor {
   public var vimKeepingVisualOperatorAction: Boolean
 
   public fun fileSize(): Long
+
+  /**
+   * Return the text of the document
+   *
+   * This function should expect to be called multiple times, and therefore should not allocate and copy the entire text
+   * of the document. For example, the search helpers call this function repeatedly.
+   */
   public fun text(): CharSequence
 
   /**

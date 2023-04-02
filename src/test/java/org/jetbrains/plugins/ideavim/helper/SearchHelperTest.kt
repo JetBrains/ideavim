@@ -7,9 +7,10 @@
  */
 package org.jetbrains.plugins.ideavim.helper
 
-import com.maddyhome.idea.vim.api.VimSearchHelperBase.Companion.findNextWord
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.helper.checkInString
+import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -21,7 +22,9 @@ class SearchHelperTest : VimTestCase() {
   @Test
   fun testFindNextWord() {
     val text = "first second"
-    val nextWordPosition = findNextWord(text, 0, text.length.toLong(), 1, bigWord = true, spaceWords = false).toInt()
+    configureByText(text)
+    val nextWordPosition =
+      injector.searchHelper.findNextWord(fixture.editor.vim, 0, 1, bigWord = true, spaceWords = false)
     kotlin.test.assertEquals(nextWordPosition, text.indexOf("second"))
   }
 
@@ -29,7 +32,8 @@ class SearchHelperTest : VimTestCase() {
   @Test
   fun testFindSecondNextWord() {
     val text = "first second third"
-    val nextWordPosition = findNextWord(text, 0, text.length.toLong(), 2, bigWord = true, false).toInt()
+    configureByText(text)
+    val nextWordPosition = injector.searchHelper.findNextWord(fixture.editor.vim, 0, 2, bigWord = true, false)
     kotlin.test.assertEquals(nextWordPosition, text.indexOf("third"))
   }
 
@@ -37,7 +41,8 @@ class SearchHelperTest : VimTestCase() {
   @Test
   fun testFindAfterLastWord() {
     val text = "first second"
-    val nextWordPosition = findNextWord(text, 0, text.length.toLong(), 3, bigWord = true, false).toInt()
+    configureByText(text)
+    val nextWordPosition = injector.searchHelper.findNextWord(fixture.editor.vim, 0, 3, bigWord = true, false)
     kotlin.test.assertEquals(nextWordPosition, text.length)
   }
 
@@ -45,8 +50,9 @@ class SearchHelperTest : VimTestCase() {
   @Test
   fun testFindPreviousWord() {
     val text = "first second"
+    configureByText(text)
     val previousWordPosition =
-      findNextWord(text, text.indexOf("second").toLong(), text.length.toLong(), -1, bigWord = true, false).toInt()
+      injector.searchHelper.findNextWord(fixture.editor.vim, text.indexOf("second"), -1, bigWord = true, false)
     kotlin.test.assertEquals(previousWordPosition, text.indexOf("first"))
   }
 
@@ -54,15 +60,15 @@ class SearchHelperTest : VimTestCase() {
   @Test
   fun testFindSecondPreviousWord() {
     val text = "first second third"
+    configureByText(text)
     val previousWordPosition =
-      findNextWord(
-        text,
-        text.indexOf("third").toLong(),
-        text.length.toLong(),
+      injector.searchHelper.findNextWord(
+        fixture.editor.vim,
+        text.indexOf("third"),
         -2,
         bigWord = true,
         spaceWords = false,
-      ).toInt()
+      )
     kotlin.test.assertEquals(previousWordPosition, text.indexOf("first"))
   }
 
@@ -70,15 +76,15 @@ class SearchHelperTest : VimTestCase() {
   @Test
   fun testFindBeforeFirstWord() {
     val text = "first second"
+    configureByText(text)
     val previousWordPosition =
-      findNextWord(
-        text,
-        text.indexOf("second").toLong(),
-        text.length.toLong(),
+      injector.searchHelper.findNextWord(
+        fixture.editor.vim,
+        text.indexOf("second"),
         -3,
         bigWord = true,
         spaceWords = false,
-      ).toInt()
+      )
     kotlin.test.assertEquals(previousWordPosition, text.indexOf("first"))
   }
 
@@ -86,8 +92,9 @@ class SearchHelperTest : VimTestCase() {
   @Test
   fun testFindPreviousWordWhenCursorOutOfBound() {
     val text = "first second"
+    configureByText(text)
     val previousWordPosition =
-      findNextWord(text, text.length.toLong(), text.length.toLong(), -1, bigWord = true, spaceWords = false).toInt()
+      injector.searchHelper.findNextWord(fixture.editor.vim, text.length, -1, bigWord = true, spaceWords = false)
     kotlin.test.assertEquals(previousWordPosition, text.indexOf("second"))
   }
 
