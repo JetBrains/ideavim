@@ -10,8 +10,8 @@ package org.jetbrains.plugins.ideavim.option
 import com.intellij.testFramework.UsefulTestCase.assertDoesntContain
 import com.maddyhome.idea.vim.helper.CharacterHelper
 import com.maddyhome.idea.vim.helper.CharacterHelper.charType
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.helpers.KeywordOptionHelper
-import com.maddyhome.idea.vim.options.helpers.KeywordOptionHelper.toRegex
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -35,12 +35,12 @@ class KeywordOptionTest : VimTestCase() {
   }
 
   private fun assertIsKeyword(c: Char) {
-    val charType = charType(c, false)
+    val charType = charType(fixture.editor.vim, c, false)
     assertSame(CharacterHelper.CharacterType.KEYWORD, charType)
   }
 
   private fun assertIsNotKeyword(c: Char) {
-    val charType = charType(c, false)
+    val charType = charType(fixture.editor.vim, c, false)
     assertSame(CharacterHelper.CharacterType.PUNCTUATION, charType)
   }
 
@@ -177,19 +177,21 @@ class KeywordOptionTest : VimTestCase() {
     assertIsKeyword('Ź')
   }
 
+  @Suppress("DEPRECATION")
   @Test
   fun testToRegex() {
     setKeyword("-,a-c")
-    val res = toRegex()
+    val res = KeywordOptionHelper.toRegex()
     assertEquals(2, res.size)
     assertTrue(res.contains("-"))
     assertTrue(res.contains("[a-c]"))
   }
 
+  @Suppress("DEPRECATION")
   @Test
   fun testAllLettersToRegex() {
     setKeyword("@")
-    val res = toRegex()
+    val res = KeywordOptionHelper.toRegex()
     assertEquals(res[0], "\\p{L}")
   }
 }

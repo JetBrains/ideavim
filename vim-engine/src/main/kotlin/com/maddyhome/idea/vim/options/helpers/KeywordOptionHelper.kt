@@ -8,10 +8,11 @@
 
 package com.maddyhome.idea.vim.options.helpers
 
-import com.maddyhome.idea.vim.api.globalOptions
+import com.maddyhome.idea.vim.api.Options
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.options.OptionChangeListener
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
+import com.maddyhome.idea.vim.api.options
+import com.maddyhome.idea.vim.options.OptionScope
 import java.util.regex.Pattern
 
 public object KeywordOptionHelper {
@@ -20,27 +21,21 @@ public object KeywordOptionHelper {
   private val validationPattern =
     Pattern.compile("(\\^?(([^0-9^]|[0-9]{1,3})-([^0-9]|[0-9]{1,3})|([^0-9^]|[0-9]{1,3})),)*\\^?(([^0-9^]|[0-9]{1,3})-([^0-9]|[0-9]{1,3})|([^0-9]|[0-9]{1,3})),?$")
 
-  private lateinit var keywordSpecs: MutableList<KeywordSpec>
-
-  init {
-    updateSpecs()
-  }
-
-  public fun updateSpecs() {
-    keywordSpecs = valuesToValidatedAndReversedSpecs(injector.globalOptions().iskeyword)!!.toMutableList()
-  }
-
   public fun isValueInvalid(value: String): Boolean {
     val values = parseValues(value)
     val specs = valuesToValidatedAndReversedSpecs(values)
     return values == null || specs == null
   }
 
-  public fun isKeyword(c: Char): Boolean {
+  public fun isKeyword(editor: VimEditor, c: Char): Boolean {
     if (c.code >= '\u0100'.code) {
       return true
     }
-    for (spec in keywordSpecs) {
+
+    // TODO: This value should not be re-parsed on each check
+    val isKeyword = injector.options(editor).iskeyword
+    val specs = valuesToValidatedAndReversedSpecs(isKeyword) ?: return false
+    for (spec in specs) {
       if (spec.contains(c.code)) {
         return !spec.negate()
       }
@@ -48,8 +43,14 @@ public object KeywordOptionHelper {
     return false
   }
 
+  // TODO: Come up with a more friendly API for IdeaVim-EasyMotion
+  // Perhaps pass in VimEditor, or allow retrieving the list of KeywordSpec
+  @Deprecated("Only maintained for compatibility. Does not handle local-to-buffer iskeyword option")
   public fun toRegex(): List<String> {
-    return keywordSpecs.map {
+    // 'iskeyword' is a local-to-buffer option, but we're not passed an editor. We have to use the global value
+    val isKeyword = injector.optionGroup.getOptionValue(Options.iskeyword, OptionScope.GLOBAL).value
+    val specs = valuesToValidatedAndReversedSpecs(parseValues(isKeyword)) ?: emptyList()
+    return specs.map {
       it.initializeValues()
       if (it.isAllLetters) {
         allLettersRegex
@@ -189,11 +190,5 @@ public object KeywordOptionHelper {
         code == rangeLow
       }
     }
-  }
-}
-
-public object KeywordOptionChangeListener : OptionChangeListener<VimString> {
-  public override fun processGlobalValueChange(oldValue: VimString?) {
-    KeywordOptionHelper.updateSpecs()
   }
 }

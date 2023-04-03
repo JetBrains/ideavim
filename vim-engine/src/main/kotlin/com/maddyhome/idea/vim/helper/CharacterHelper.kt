@@ -7,6 +7,7 @@
  */
 package com.maddyhome.idea.vim.helper
 
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.options.helpers.KeywordOptionHelper
 import java.lang.Character.UnicodeBlock
 
@@ -30,7 +31,7 @@ public object CharacterHelper {
    * @return The type of the character
    */
   @JvmStatic
-  public fun charType(ch: Char, punctuationAsLetters: Boolean): CharacterType {
+  public fun charType(editor: VimEditor, ch: Char, punctuationAsLetters: Boolean): CharacterType {
     val block = UnicodeBlock.of(ch)
     return if (Character.isWhitespace(ch)) {
       CharacterType.WHITESPACE
@@ -42,7 +43,7 @@ public object CharacterHelper {
       CharacterType.HALF_WIDTH_KATAKANA
     } else if (block == UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS) {
       CharacterType.CJK_UNIFIED_IDEOGRAPHS
-    } else if (punctuationAsLetters || KeywordOptionHelper.isKeyword(ch)) {
+    } else if (punctuationAsLetters || KeywordOptionHelper.isKeyword(editor, ch)) {
       CharacterType.KEYWORD
     } else {
       CharacterType.PUNCTUATION

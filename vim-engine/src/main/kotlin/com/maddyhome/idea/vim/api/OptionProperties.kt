@@ -48,9 +48,6 @@ public open class GlobalOptions(scope: OptionScope = OptionScope.GLOBAL): Option
   public val whichwrap: StringListOptionValue by optionProperty(Options.whichwrap)
   public var wrapscan: Boolean by optionProperty(Options.wrapscan)
 
-  // TODO: Make these options local
-  public val iskeyword: StringListOptionValue by optionProperty(Options.iskeyword)
-
   // IdeaVim specific options. Put any editor or IDE specific options in IjVimOptionService
   public var ideaglobalmode: Boolean by optionProperty(Options.ideaglobalmode)
   public var ideastrictmode: Boolean by optionProperty(Options.ideastrictmode)
@@ -65,7 +62,7 @@ public open class GlobalOptions(scope: OptionScope = OptionScope.GLOBAL): Option
  */
 @Suppress("unused")
 public open class EffectiveOptions(scope: OptionScope.LOCAL): GlobalOptions(scope) {
-//  public val iskeyword: StringListOptionValue by optionProperty(Options.iskeyword)
+  public val iskeyword: StringListOptionValue by optionProperty(Options.iskeyword)
   public val matchpairs: StringListOptionValue by optionProperty(Options.matchpairs)
   public val nrformats: StringListOptionValue by optionProperty(Options.nrformats)
   public var number: Boolean by optionProperty(Options.number)

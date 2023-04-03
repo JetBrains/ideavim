@@ -1256,16 +1256,16 @@ public class SearchHelper {
       CharacterHelper.CharacterType.PUNCTUATION};
     for (int i = 0; i < 2; i++) {
       start = pos;
-      CharacterHelper.CharacterType type = CharacterHelper.charType(chars.charAt(start), false);
+      CharacterHelper.CharacterType type = CharacterHelper.charType(vimEditor, chars.charAt(start), false);
       if (type == types[i]) {
         // Search back for start of word
-        while (start > 0 && CharacterHelper.charType(chars.charAt(start - 1), false) == types[i]) {
+        while (start > 0 && CharacterHelper.charType(vimEditor, chars.charAt(start - 1), false) == types[i]) {
           start--;
         }
       }
       else {
         // Search forward for start of word
-        while (start < stop && CharacterHelper.charType(chars.charAt(start), false) != types[i]) {
+        while (start < stop && CharacterHelper.charType(vimEditor, chars.charAt(start), false) != types[i]) {
           start++;
         }
       }
@@ -1283,7 +1283,7 @@ public class SearchHelper {
     // Special case 1 character words because 'findNextWordEnd' returns one to many chars
     if (start < stop &&
         (start >= chars.length() - 1 ||
-         CharacterHelper.charType(chars.charAt(start + 1), false) != CharacterHelper.CharacterType.KEYWORD)) {
+         CharacterHelper.charType(vimEditor, chars.charAt(start + 1), false) != CharacterHelper.CharacterType.KEYWORD)) {
       end = start + 1;
     }
     else {
@@ -1325,11 +1325,11 @@ public class SearchHelper {
     if (chars.length() <= pos) return new TextRange(chars.length() - 1, chars.length() - 1);
 
     final IjVimEditor vimEditor = new IjVimEditor(editor);
-    boolean startSpace = CharacterHelper.charType(chars.charAt(pos), isBig) == CharacterHelper.CharacterType.WHITESPACE;
+    boolean startSpace = CharacterHelper.charType(vimEditor, chars.charAt(pos), isBig) == CharacterHelper.CharacterType.WHITESPACE;
     // Find word start
     boolean onWordStart = pos == min ||
-                          CharacterHelper.charType(chars.charAt(pos - 1), isBig) !=
-                          CharacterHelper.charType(chars.charAt(pos), isBig);
+                          CharacterHelper.charType(vimEditor, chars.charAt(pos - 1), isBig) !=
+                          CharacterHelper.charType(vimEditor, chars.charAt(pos), isBig);
     int start = pos;
 
     if (logger.isDebugEnabled()) {
@@ -1352,8 +1352,8 @@ public class SearchHelper {
 
     // Find word end
     boolean onWordEnd = pos >= max - 1 ||
-                        CharacterHelper.charType(chars.charAt(pos + 1), isBig) !=
-                        CharacterHelper.charType(chars.charAt(pos), isBig);
+                        CharacterHelper.charType(vimEditor, chars.charAt(pos + 1), isBig) !=
+                        CharacterHelper.charType(vimEditor, chars.charAt(pos), isBig);
 
     if (logger.isDebugEnabled()) logger.debug("onWordEnd=" + onWordEnd);
 
@@ -1377,14 +1377,14 @@ public class SearchHelper {
         firstEnd = injector.getSearchHelper().findNextWordEnd(vimEditor, pos, 1, isBig, false);
       }
       if (firstEnd < max - 1) {
-        if (CharacterHelper.charType(chars.charAt(firstEnd + 1), false) != CharacterHelper.CharacterType.WHITESPACE) {
+        if (CharacterHelper.charType(vimEditor, chars.charAt(firstEnd + 1), false) != CharacterHelper.CharacterType.WHITESPACE) {
           goBack = true;
         }
       }
     }
     if (dir == -1 && isOuter && startSpace) {
       if (pos > min) {
-        if (CharacterHelper.charType(chars.charAt(pos - 1), false) != CharacterHelper.CharacterType.WHITESPACE) {
+        if (CharacterHelper.charType(vimEditor, chars.charAt(pos - 1), false) != CharacterHelper.CharacterType.WHITESPACE) {
           goBack = true;
         }
       }
@@ -1398,15 +1398,15 @@ public class SearchHelper {
         firstEnd = injector.getSearchHelper().findNextWordEnd(vimEditor, pos, 1, isBig, false);
       }
       if (firstEnd < max - 1) {
-        if (CharacterHelper.charType(chars.charAt(firstEnd + 1), false) != CharacterHelper.CharacterType.WHITESPACE) {
+        if (CharacterHelper.charType(vimEditor, chars.charAt(firstEnd + 1), false) != CharacterHelper.CharacterType.WHITESPACE) {
           goForward = true;
         }
       }
     }
     if (!goForward && dir == 1 && isOuter && !startSpace && !hasSelection) {
       if (end < max - 1) {
-        if (CharacterHelper.charType(chars.charAt(end + 1), !isBig) !=
-            CharacterHelper.charType(chars.charAt(end), !isBig)) {
+        if (CharacterHelper.charType(vimEditor, chars.charAt(end + 1), !isBig) !=
+            CharacterHelper.charType(vimEditor, chars.charAt(end), !isBig)) {
           goForward = true;
         }
       }
@@ -1420,7 +1420,7 @@ public class SearchHelper {
     if (goForward) {
       if (EngineEditorHelperKt.anyNonWhitespace(vimEditor, end, 1)) {
         while (end + 1 < max &&
-               CharacterHelper.charType(chars.charAt(end + 1), false) == CharacterHelper.CharacterType.WHITESPACE) {
+               CharacterHelper.charType(vimEditor, chars.charAt(end + 1), false) == CharacterHelper.CharacterType.WHITESPACE) {
           end++;
         }
       }
@@ -1428,7 +1428,7 @@ public class SearchHelper {
     if (goBack) {
       if (EngineEditorHelperKt.anyNonWhitespace(vimEditor, start, -1)) {
         while (start > min &&
-               CharacterHelper.charType(chars.charAt(start - 1), false) == CharacterHelper.CharacterType.WHITESPACE) {
+               CharacterHelper.charType(vimEditor, chars.charAt(start - 1), false) == CharacterHelper.CharacterType.WHITESPACE) {
           start--;
         }
       }

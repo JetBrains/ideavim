@@ -8,9 +8,9 @@
 
 package com.maddyhome.idea.vim.api
 
-import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.exExceptionMessage
+import com.maddyhome.idea.vim.helper.StrictMode
 import com.maddyhome.idea.vim.options.NumberOption
 import com.maddyhome.idea.vim.options.Option
 import com.maddyhome.idea.vim.options.OptionConstants
@@ -27,7 +27,6 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
 @Suppress("unused", "SpellCheckingInspection")
 public object Options {
-  private val logger = vimLogger<Options>()
   private val options = MultikeyMap()
 
   public fun initialise() {
@@ -217,11 +216,8 @@ public object Options {
 
     override fun split(value: String): List<String> {
       val result = KeywordOptionHelper.parseValues(value)
-      if (result == null) {
-        logger.error("KeywordOptionHelper failed to parse $value")
-        injector.messages.indicateError()
-        injector.messages.showStatusBarMessage(editor = null, "Failed to parse iskeyword option value")
-      }
+      StrictMode.assert(result != null, "Cannot split iskeyword value: $ value")
+
       return result ?: split(defaultValue.value)
     }
   })
