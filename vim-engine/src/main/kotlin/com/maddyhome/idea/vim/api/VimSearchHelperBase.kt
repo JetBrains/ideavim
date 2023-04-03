@@ -79,10 +79,10 @@ public abstract class VimSearchHelperBase : VimSearchHelper {
     var _pos = if (pos < size) pos else min(size, (chars.length - 1))
     // For back searches, skip any current whitespace so we start at the end of a word
     if (step < 0 && _pos > 0) {
-      if (charType(chars[_pos - 1], bigWord) === CharacterHelper.CharacterType.WHITESPACE && !spaceWords) {
-        _pos = skipSpace(chars, _pos - 1, step, size) + 1
+      if (charType(editor, chars[_pos - 1], bigWord) === CharacterHelper.CharacterType.WHITESPACE && !spaceWords) {
+        _pos = skipSpace(editor, chars, _pos - 1, step, size) + 1
       }
-      if (_pos > 0 && charType(chars[_pos], bigWord) !== charType(chars[_pos - 1], bigWord)) {
+      if (_pos > 0 && charType(editor, chars[_pos], bigWord) !== charType(editor, chars[_pos - 1], bigWord)) {
         _pos += step
       }
     }
@@ -90,23 +90,23 @@ public abstract class VimSearchHelperBase : VimSearchHelper {
     if (_pos < 0 || _pos >= size) {
       return _pos
     }
-    var type = charType(chars[_pos], bigWord)
+    var type = charType(editor, chars[_pos], bigWord)
     if (type === CharacterHelper.CharacterType.WHITESPACE && step < 0 && _pos > 0 && !spaceWords) {
-      type = charType(chars[_pos - 1], bigWord)
+      type = charType(editor, chars[_pos - 1], bigWord)
     }
     _pos += step
     while (_pos in 0 until size && !found) {
-      val newType = charType(chars[_pos], bigWord)
+      val newType = charType(editor, chars[_pos], bigWord)
       if (newType !== type) {
         if (newType === CharacterHelper.CharacterType.WHITESPACE && step >= 0 && !spaceWords) {
-          _pos = skipSpace(chars, _pos, step, size)
+          _pos = skipSpace(editor, chars, _pos, step, size)
           res = _pos
         } else if (step < 0) {
           res = _pos + 1
         } else {
           res = _pos
         }
-        type = charType(chars[res], bigWord)
+        type = charType(editor, chars[res], bigWord)
         found = true
       }
       _pos += step
@@ -138,14 +138,14 @@ public abstract class VimSearchHelperBase : VimSearchHelper {
     var found = false
     // For forward searches, skip any current whitespace so we start at the start of a word
     if (step > 0 && pos < size - 1) {
-      if (charType(chars[pos + 1], bigWord) === CharacterHelper.CharacterType.WHITESPACE &&
+      if (charType(editor, chars[pos + 1], bigWord) === CharacterHelper.CharacterType.WHITESPACE &&
         !spaceWords
       ) {
-        pos = skipSpace(chars, pos + 1, step, size) - 1
+        pos = skipSpace(editor, chars, pos + 1, step, size) - 1
       }
       if (pos < size - 1 &&
-        charType(chars[pos], bigWord) !==
-        charType(chars[pos + 1], bigWord)
+        charType(editor, chars[pos], bigWord) !==
+        charType(editor, chars[pos + 1], bigWord)
       ) {
         pos += step
       }
@@ -154,18 +154,18 @@ public abstract class VimSearchHelperBase : VimSearchHelper {
     if (pos < 0 || pos >= size) {
       return pos
     }
-    var type = charType(chars[pos], bigWord)
+    var type = charType(editor, chars[pos], bigWord)
     if (type === CharacterHelper.CharacterType.WHITESPACE && step >= 0 && pos < size - 1 && !spaceWords) {
-      type = charType(chars[pos + 1], bigWord)
+      type = charType(editor, chars[pos + 1], bigWord)
     }
     pos += step
     while (pos >= 0 && pos < size && !found) {
-      val newType = charType(chars[pos], bigWord)
+      val newType = charType(editor, chars[pos], bigWord)
       if (newType !== type) {
         if (step >= 0) {
           res = pos - 1
         } else if (newType === CharacterHelper.CharacterType.WHITESPACE && step < 0 && !spaceWords) {
-          pos = skipSpace(chars, pos, step, size)
+          pos = skipSpace(editor, chars, pos, step, size)
           res = pos
         } else {
           res = pos
@@ -186,13 +186,13 @@ public abstract class VimSearchHelperBase : VimSearchHelper {
     return res
   }
 
-  private fun skipSpace(chars: CharSequence, offset: Int, step: Int, size: Int): Int {
+  private fun skipSpace(editor: VimEditor, chars: CharSequence, offset: Int, step: Int, size: Int): Int {
     var _offset = offset
     var prev = 0.toChar()
     while (_offset in 0 until size) {
       val c = chars[_offset]
       if (c == '\n' && c == prev) break
-      if (charType(c, false) !== CharacterHelper.CharacterType.WHITESPACE) break
+      if (charType(editor, c, false) !== CharacterHelper.CharacterType.WHITESPACE) break
       prev = c
       _offset += step
     }

@@ -75,7 +75,6 @@ import com.maddyhome.idea.vim.listener.MouseEventsDataHolder.skipNDragEvents
 import com.maddyhome.idea.vim.listener.VimListenerManager.EditorListeners.add
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.options.helpers.KeywordOptionChangeListener
 import com.maddyhome.idea.vim.ui.ShowCmdOptionChangeListener
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import java.awt.event.MouseAdapter
@@ -116,7 +115,6 @@ internal object VimListenerManager {
       optionGroup.addListener(Options.scrolloff, ScrollGroup.ScrollOptionsChangeListener)
       optionGroup.addListener(Options.showcmd, ShowCmdOptionChangeListener)
       optionGroup.addListener(Options.guicursor, GuicursorChangeListener)
-      optionGroup.addListener(Options.iskeyword, KeywordOptionChangeListener, true)
 
       EventFacade.getInstance().addEditorFactoryListener(VimEditorFactoryListener, VimPlugin.getInstance().onOffDisposable)
 
@@ -132,7 +130,6 @@ internal object VimListenerManager {
       optionGroup.removeListener(Options.scrolloff, ScrollGroup.ScrollOptionsChangeListener)
       optionGroup.removeListener(Options.showcmd, ShowCmdOptionChangeListener)
       optionGroup.removeListener(Options.guicursor, GuicursorChangeListener)
-      optionGroup.removeListener(Options.iskeyword, KeywordOptionChangeListener)
     }
   }
 

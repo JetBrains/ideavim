@@ -454,7 +454,7 @@ public class ChangeGroup extends VimChangeGroupBase {
             int weoff = editor.bufferPositionToOffset(epos);
             int pos;
             for (pos = wsoff; pos <= weoff; pos++) {
-              if (CharacterHelper.charType(chars.charAt(pos), false) != CharacterHelper.CharacterType.WHITESPACE) {
+              if (CharacterHelper.charType(editor, chars.charAt(pos), false) != CharacterHelper.CharacterType.WHITESPACE) {
                 break;
               }
             }

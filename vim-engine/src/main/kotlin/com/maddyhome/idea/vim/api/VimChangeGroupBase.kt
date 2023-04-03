@@ -1144,9 +1144,9 @@ public abstract class VimChangeGroupBase : VimChangeGroup {
     val offset = caret.offset.point
     val fileSize = editor.fileSize().toInt()
     if (fileSize > 0 && offset < fileSize) {
-      val charType = charType(chars[offset], bigWord)
+      val charType = charType(editor, chars[offset], bigWord)
       if (charType !== CharacterHelper.CharacterType.WHITESPACE) {
-        val lastWordChar = offset >= fileSize - 1 || charType(chars[offset + 1], bigWord) !== charType
+        val lastWordChar = offset >= fileSize - 1 || charType(editor, chars[offset + 1], bigWord) !== charType
         if (wordMotions.contains(id) && lastWordChar && motion.count == 1) {
           val res = deleteCharacter(editor, caret, 1, true, operatorArguments)
           if (res) {
