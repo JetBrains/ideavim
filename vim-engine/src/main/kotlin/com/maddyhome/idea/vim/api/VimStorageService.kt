@@ -70,3 +70,12 @@ public interface VimStorageService {
 }
 
 public data class Key<T>(val name: String)
+
+public fun <T> VimStorageService.getOrPutEditorData(editor: VimEditor, key: Key<T>, provider: () -> T): T =
+  getDataFromEditor(editor, key) ?: provider().also { putDataToEditor(editor, key, it) }
+
+public fun <T> VimStorageService.getOrPutBufferData(editor: VimEditor, key: Key<T>, provider: () -> T): T =
+  getDataFromBuffer(editor, key) ?: provider().also { putDataToBuffer(editor, key, it) }
+
+public fun <T> VimStorageService.getOrPutTabData(editor: VimEditor, key: Key<T>, provider: () -> T): T =
+  getDataFromTab(editor, key) ?: provider().also { putDataToTab(editor, key, it) }

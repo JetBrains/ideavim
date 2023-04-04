@@ -11,6 +11,9 @@ package com.maddyhome.idea.vim.vimscript.services
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.Key
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.getOrPutBufferData
+import com.maddyhome.idea.vim.api.getOrPutEditorData
+import com.maddyhome.idea.vim.api.getOrPutTabData
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.common.Direction
@@ -30,35 +33,14 @@ public abstract class VimVariableServiceBase : VariableService {
   private val bufferVariablesKey = Key<MutableMap<String, VimDataType>>("BufferVariables")
   private val tabVariablesKey = Key<MutableMap<String, VimDataType>>("WindowVariables")
 
-  private fun getWindowVariables(editor: VimEditor): MutableMap<String, VimDataType> {
-    val storedVariableMap = injector.vimStorageService.getDataFromEditor(editor, windowVariablesKey)
-    if (storedVariableMap != null) {
-      return storedVariableMap
-    }
-    val windowVariables = mutableMapOf<String, VimDataType>()
-    injector.vimStorageService.putDataToEditor(editor, windowVariablesKey, windowVariables)
-    return windowVariables
-  }
+  private fun getWindowVariables(editor: VimEditor) =
+    injector.vimStorageService.getOrPutEditorData(editor, windowVariablesKey) { mutableMapOf() }
 
-  private fun getBufferVariables(editor: VimEditor): MutableMap<String, VimDataType> {
-    val storedVariableMap = injector.vimStorageService.getDataFromBuffer(editor, bufferVariablesKey)
-    if (storedVariableMap != null) {
-      return storedVariableMap
-    }
-    val bufferVariables = mutableMapOf<String, VimDataType>()
-    injector.vimStorageService.putDataToBuffer(editor, bufferVariablesKey, bufferVariables)
-    return bufferVariables
-  }
+  private fun getBufferVariables(editor: VimEditor) =
+    injector.vimStorageService.getOrPutBufferData(editor, bufferVariablesKey) { mutableMapOf() }
 
-  private fun getTabVariables(editor: VimEditor): MutableMap<String, VimDataType> {
-    val storedVariableMap = injector.vimStorageService.getDataFromTab(editor, tabVariablesKey)
-    if (storedVariableMap != null) {
-      return storedVariableMap
-    }
-    val tabVariables = mutableMapOf<String, VimDataType>()
-    injector.vimStorageService.putDataToTab(editor, tabVariablesKey, tabVariables)
-    return tabVariables
-  }
+  private fun getTabVariables(editor: VimEditor) =
+    injector.vimStorageService.getOrPutTabData(editor, tabVariablesKey) { mutableMapOf() }
 
   protected fun getDefaultVariableScope(executable: VimLContext): Scope {
     return when (executable.getExecutableContext(executable)) {
