@@ -44,6 +44,8 @@ import com.maddyhome.idea.vim.listener.AceJumpService
 import com.maddyhome.idea.vim.listener.AppCodeTemplates.appCodeTemplateCaptured
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import java.awt.event.InputEvent
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
@@ -255,15 +257,13 @@ internal class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatib
    *   if the pressed key is presented in this list. The caches are used to speedup the process.
    */
   private object LookupKeys {
-    private var parsedLookupKeys: Set<KeyStroke> = parseLookupKeys()
-
-    init {
-      VimPlugin.getOptionGroup().addListener(IjOptions.lookupkeys, { parsedLookupKeys = parseLookupKeys() })
+    fun isEnabledForLookup(keyStroke: KeyStroke): Boolean {
+      val parsedLookupKeys =
+        injector.optionGroup.getParsedEffectiveOptionValue(IjOptions.lookupkeys, OptionScope.GLOBAL, ::parseLookupKeys)
+      return keyStroke !in parsedLookupKeys
     }
 
-    fun isEnabledForLookup(keyStroke: KeyStroke): Boolean = keyStroke !in parsedLookupKeys
-
-    private fun parseLookupKeys() = injector.globalIjOptions().lookupkeys
+    private fun parseLookupKeys(value: VimString) = IjOptions.lookupkeys.split(value.asString())
       .map { injector.parser.parseKeys(it) }
       .filter { it.isNotEmpty() }
       .map { it.first() }

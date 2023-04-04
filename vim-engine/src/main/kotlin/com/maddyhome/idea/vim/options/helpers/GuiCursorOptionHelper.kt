@@ -8,17 +8,16 @@
 
 package com.maddyhome.idea.vim.options.helpers
 
-import com.maddyhome.idea.vim.api.globalOptions
+import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.VimStateMachine
 import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.helper.enumSetOf
+import com.maddyhome.idea.vim.options.OptionScope
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import java.util.*
 
 public object GuiCursorOptionHelper {
-
-  private val effectiveValues = mutableMapOf<GuiCursorMode, GuiCursorAttributes>()
-
   public fun convertToken(token: String): GuiCursorEntry {
     val split = token.split(':')
     if (split.size == 1) {
@@ -72,43 +71,70 @@ public object GuiCursorOptionHelper {
       }
     }
 
-    return GuiCursorEntry(token, modes, type, thickness, highlightGroup, lmapHighlightGroup, blinkModes)
+    return GuiCursorEntry(modes, type, thickness, highlightGroup, lmapHighlightGroup, blinkModes)
   }
 
   public fun getAttributes(mode: GuiCursorMode): GuiCursorAttributes {
-    return effectiveValues.computeIfAbsent(mode) {
-      var type = GuiCursorType.BLOCK
-      var thickness = 0
-      var highlightGroup = ""
-      var lmapHighlightGroup = ""
-      var blinkModes = emptyList<String>()
-      injector.globalOptions().guicursor
-        .map { convertToken(it) }
-        .forEach { data ->
-          if (data.modes.contains(mode) || data.modes.contains(GuiCursorMode.ALL)) {
-            if (data.type != null) {
-              type = data.type
-            }
-            if (data.thickness != null) {
-              thickness = data.thickness
-            }
-            if (data.highlightGroup.isNotEmpty()) {
-              highlightGroup = data.highlightGroup
-            }
-            if (data.lmapHighlightGroup.isNotEmpty()) {
-              lmapHighlightGroup = data.lmapHighlightGroup
-            }
-            if (data.blinkModes.isNotEmpty()) {
-              blinkModes = data.blinkModes
-            }
-          }
-        }
-      GuiCursorAttributes(type, thickness, highlightGroup, lmapHighlightGroup, blinkModes)
-    }
+    val attributes = injector.optionGroup.getParsedEffectiveOptionValue(Options.guicursor, OptionScope.GLOBAL, ::parseGuicursor)
+    return attributes[mode] ?: GuiCursorAttributes.DEFAULT
   }
 
-  public fun clearEffectiveValues() {
-    effectiveValues.clear()
+  private fun parseGuicursor(guicursor: VimString) = GuiCursorAttributeBuilders().also { builders ->
+    // Split into entries. Each entry has a list of modes and various attributes and adds to/overrides current values
+    Options.guicursor.split(guicursor.asString()).map { convertToken(it) }
+      .forEach { entry ->
+        entry.modes.forEach {
+          if (it == GuiCursorMode.ALL) {
+            builders.updateAllModes(entry)
+          } else {
+            builders.updateMode(it, entry)
+          }
+        }
+      }
+  }.build()
+
+  private class GuiCursorAttributeBuilders {
+    private class GuiCursorAttributesBuilder {
+      private var type: GuiCursorType = GuiCursorType.BLOCK
+      private var thickness: Int = 0
+      private var highlightGroup: String = ""
+      private var lmapHighlightGroup: String = ""
+      private var blinkModes: List<String> = emptyList()
+
+      fun updateFrom(entry: GuiCursorEntry) {
+        if (entry.type != null) {
+          type = entry.type
+        }
+        if (entry.thickness != null) {
+          thickness = entry.thickness
+        }
+        if (entry.highlightGroup.isNotEmpty()) {
+          highlightGroup = entry.highlightGroup
+        }
+        if (entry.lmapHighlightGroup.isNotEmpty()) {
+          lmapHighlightGroup = entry.lmapHighlightGroup
+        }
+        if (entry.blinkModes.isNotEmpty()) {
+          blinkModes = entry.blinkModes
+        }
+      }
+
+      fun build() = GuiCursorAttributes(type, thickness, highlightGroup, lmapHighlightGroup, blinkModes)
+    }
+
+    private val builders = mutableMapOf<GuiCursorMode, GuiCursorAttributesBuilder>()
+
+    fun updateMode(mode: GuiCursorMode, entry: GuiCursorEntry) {
+      builders.getOrPut(mode) { GuiCursorAttributesBuilder() }.updateFrom(entry)
+    }
+
+    fun updateAllModes(entry: GuiCursorEntry) {
+      GuiCursorMode.values().filter { it != GuiCursorMode.ALL }.forEach {
+        updateMode(it, entry)
+      }
+    }
+
+    fun build() = builders.map { it.key to it.value.build() }.toMap()
   }
 }
 
@@ -163,19 +189,13 @@ public enum class GuiCursorType(public val token: String) {
 }
 
 public class GuiCursorEntry(
-  private val originalString: String,
   public val modes: EnumSet<GuiCursorMode>,
   public val type: GuiCursorType?,
   public val thickness: Int?,
   public val highlightGroup: String,
   public val lmapHighlightGroup: String,
   public val blinkModes: List<String>,
-) {
-  public override fun toString(): String {
-    // We need to match the original string for output and remove purposes
-    return originalString
-  }
-}
+)
 
 public data class GuiCursorAttributes(
   val type: GuiCursorType,
@@ -183,4 +203,14 @@ public data class GuiCursorAttributes(
   val highlightGroup: String,
   val lmapHighlightGroup: String,
   val blinkModes: List<String>,
-)
+) {
+  public companion object {
+    public val DEFAULT: GuiCursorAttributes = GuiCursorAttributes(GuiCursorType.BLOCK,
+      thickness = 0,
+      highlightGroup = "",
+      lmapHighlightGroup = "",
+      blinkModes = emptyList()
+    )
+  }
+}
+

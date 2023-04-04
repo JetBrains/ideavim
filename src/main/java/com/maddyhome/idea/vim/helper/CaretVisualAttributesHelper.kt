@@ -59,7 +59,6 @@ internal fun Editor.hasBlockOrUnderscoreCaret() = isBlockCursorOverride() ||
 internal object GuicursorChangeListener : OptionChangeListener<VimString> {
   override fun processGlobalValueChange(oldValue: VimString?) {
     AttributesCache.clear()
-    GuiCursorOptionHelper.clearEffectiveValues()
     localEditors().forEach { it.updatePrimaryCaretVisualAttributes() }
   }
 }
