@@ -8,7 +8,7 @@ name: Update Affected Rate field on YouTrack
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 * * * *'
+    - cron: '0 8 * * *'
 
 jobs:
   build:
