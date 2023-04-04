@@ -471,6 +471,10 @@ Contributors:
   [![icon][github]](https://github.com/oskarpersson/)
   &nbsp;
   Oskar Persson 
+* [![icon][mail]](mailto:silence.m@hotmail.com)
+  [![icon][github]](https://github.com/Stzx)
+  &nbsp;
+  Silence Tai
 
 Previous contributors:
 
