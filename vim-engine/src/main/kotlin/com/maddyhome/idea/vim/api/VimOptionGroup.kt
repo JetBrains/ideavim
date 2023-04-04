@@ -45,6 +45,28 @@ public interface VimOptionGroup {
   public fun <T : VimDataType> setOptionValue(option: Option<T>, scope: OptionScope, value: T)
 
   /**
+   * Get or create cached, parsed data for the option value effective for the editor
+   *
+   * The parsed data is created by the given [provider], based on the effective value of the option in the given
+   * [scope] (there is no reason to parse global/local data unless it is the effective value). The parsed data is then
+   * cached, and the cache is cleared when the effective option value is changed.
+   *
+   * It is not expected for this function to be used by general purpose use code, but by helper objects that will parse
+   * complex options and provide a user facing API for the data. E.g. for `'guicursor'` and `'iskeyword'` options.
+   *
+   * @param option  The option to return parsed data for
+   * @param scope The option scope to use to get the effective option value
+   * @param provider  If the parsed value does not exist, the effective option value is retrieved and passed to the
+   *                  provider. The resulting value is cached.
+   * @return The cached, parsed option value, ready to be used by code.
+   */
+  public fun <T : VimDataType, TData : Any> getParsedEffectiveOptionValue(
+    option: Option<T>,
+    scope: OptionScope,
+    provider: (T) -> TData,
+  ): TData
+
+  /**
    * Resets all options back to default values.
    */
   public fun resetAllOptions()
