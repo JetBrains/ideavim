@@ -5,8 +5,11 @@ name: Update Authors
 
 on:
   workflow_dispatch:
-  push:
-    branches: [ master ]
+  schedule:
+    - cron: '0 9 * * *'
+# Workflow run on push is disabled to avoid conflicts when merging PR
+#  push:
+#    branches: [ master ]
 
 jobs:
   build:

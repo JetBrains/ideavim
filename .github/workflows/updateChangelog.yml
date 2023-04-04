@@ -5,13 +5,15 @@ name: Update Changelog
 
 on:
   workflow_dispatch:
-  push:
-    branches: [ master ]
+  schedule:
+    - cron: '0 10 * * *'
+# Workflow run on push is disabled to avoid conflicts when merging PR
+#  push:
+#    branches: [ master ]
 
 jobs:
   build:
 
-    if: github.event.pull_request.merged != true
     runs-on: ubuntu-latest
 
     steps:
@@ -46,4 +48,3 @@ jobs:
           commit_user_email: aleksei.plate@jetbrains.com
           commit_author: Alex Plate <aleksei.plate@jetbrains.com>
           file_pattern: CHANGES.md
-          skip_fetch: false

@@ -32,19 +32,6 @@ jobs:
         env:
           GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
 
-      # Reuse from update changelog
-      - uses: nrwl/last-successful-commit-action@v1
-        id: last_successful_commit
-        with:
-          branch: 'master'
-          workflow_id: 'updateChangelog.yml'
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Update changelog
-        run: ./gradlew updateChangelog
-        env:
-          SUCCESS_COMMIT: ${{ steps.last_successful_commit.outputs.commit_hash }}
-
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
